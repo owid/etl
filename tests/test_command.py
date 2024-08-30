@@ -11,6 +11,7 @@ import time
 import pytest
 
 from etl import command as cmd
+from etl.steps import compile_steps
 
 
 def test_timed_run():
@@ -24,7 +25,7 @@ def dag():
 
 
 def test_validate_private_steps(dag):
-    cmd._validate_private_steps(dag)
+    cmd._validate_private_steps(compile_steps(dag))
 
     # public step with private dependency should raise an error
     new_dag = dict(
@@ -34,17 +35,7 @@ def test_validate_private_steps(dag):
         },
     )
     with pytest.raises(ValueError):
-        cmd._validate_private_steps(new_dag)
-
-    # private grapher step should not raise an error even if
-    # it is using private dependency
-    new_dag = dict(
-        dag,
-        **{
-            "grapher://c": {"data-private://a"},
-        },
-    )
-    cmd._validate_private_steps(new_dag)
+        cmd._validate_private_steps(compile_steps(new_dag))
 
 
 def test_exec_graph_parallel():

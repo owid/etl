@@ -18,7 +18,7 @@ class StepForm(BaseModel):
     errors: Dict[str, Any] = {}
     step_name: str
 
-    def __init__(self: Self, **kwargs: str | int) -> None:
+    def __init__(self: Self, **kwargs: str | int) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct parent class."""
         super().__init__(**kwargs)
         self.validate()
@@ -36,7 +36,7 @@ class StepForm(BaseModel):
         # st.write(data)
         return cls(**data)
 
-    def validate(self: Self) -> None:
+    def validate(self: Self) -> None:  # type: ignore[reportIncompatibleMethodOverride]
         """Validate form fields."""
         raise NotImplementedError("Needs to be implemented in the child class!")
 

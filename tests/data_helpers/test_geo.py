@@ -5,11 +5,12 @@
 import json
 import unittest
 import warnings
+from typing import cast
 from unittest.mock import mock_open, patch
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from owid.datautils import dataframes
 from pytest import warns
 from structlog.testing import capture_logs
@@ -851,10 +852,12 @@ class MockIncomeGroupsDataset:
             return mock_tb_income_groups
         elif name == "income_groups_latest":
             return mock_tb_income_groups_latest
+        else:
+            raise KeyError(f"Table {name} not found.")
 
 
-ds_regions = MockRegionsDataset()
-ds_income_groups = MockIncomeGroupsDataset()
+ds_regions = cast(Dataset, MockRegionsDataset())
+ds_income_groups = cast(Dataset, MockIncomeGroupsDataset())
 
 
 class TestAddRegionsToTable(unittest.TestCase):

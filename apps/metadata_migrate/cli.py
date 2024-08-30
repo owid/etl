@@ -324,22 +324,22 @@ def _create_origin_from_source(ds: Dataset, source: Source, license: Optional[Li
         description += source.description
 
     origin = Origin(
-        title=ds.metadata.title,
-        producer=source.name,
+        title=ds.metadata.title,  # type: ignore[reportArgumentType]
+        producer=source.name,  # type: ignore[reportArgumentType]
         citation_full=source.published_by,
         license=license,
         description=description,
         url_main=source.url,
         url_download=source.source_data_url,
         date_accessed=source.date_accessed,
-        date_published=source.publication_date or source.publication_year,
+        date_published=source.publication_date or source.publication_year,  # type: ignore[reportArgumentType]
     )
 
     if not origin.date_published:
         log.warning(
             f"missing publication_date and publication_year in source, using date_accessed: {origin.date_accessed}"
         )
-        origin.date_published = origin.date_accessed
+        origin.date_published = origin.date_accessed  # type: ignore
     return origin
 
 

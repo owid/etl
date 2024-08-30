@@ -298,7 +298,7 @@ def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame]:
     ].drop_duplicates()
     # df_geo = df_geo.to_crs(3310)
 
-    return tb_indicator, df_geo
+    return tb_indicator, df_geo  # type: ignore[reportReturnType]
 
 
 @st.cache_data
@@ -827,16 +827,16 @@ def plot_chart_gdp_pc(countries_guessed: List[str], years_guessed: List[str], so
             countries_guessed,
             years_guessed=years_guessed,
             solution=solution,
-            column_indicator=GDP_INDICATOR,
-            title=gdp_indicator_titles[GDP_INDICATOR],
+            column_indicator=GDP_INDICATOR,  # type: ignore[reportArgumentType]
+            title=gdp_indicator_titles[GDP_INDICATOR],  # type: ignore[reportArgumentType]
             column_country="location",
         )
     else:
         _plot_chart(
             countries_guessed,
             solution=solution,
-            column_indicator=GDP_INDICATOR,
-            title=gdp_indicator_titles[GDP_INDICATOR],
+            column_indicator=GDP_INDICATOR,  # type: ignore[reportArgumentType]
+            title=gdp_indicator_titles[GDP_INDICATOR],  # type: ignore[reportArgumentType]
             column_country="location",
         )
 

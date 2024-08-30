@@ -3,7 +3,7 @@
 meta:
   origin:
     producer: World Health Organization
-    title: Monkeypox
+    title: Mpox confirmed cases and deaths
     description: |-
       Data on mpox is collated by the World Health Organization since 2022, and is updated as new information is reported.
 
@@ -11,11 +11,11 @@ meta:
 
     # Citation
     citation_full: |-
-      Global Health Estimates 2021: Deaths by Cause, Age, Sex, by Country and by Region, 2000-2021. Geneva, World Health Organization; 2024.
+      Mpox confirmed cases and deaths. World Health Organization; 2024.
     attribution_short: WHO
 
     # Files
-    url_main: https://extranet.who.int/publicemergency/
+    url_main: https://frontdoor-l4uikgap6gz3m.azurefd.net/MPX/V_MPX_VALIDATED_DAILY
     date_accessed: 2024-08-07
     date_published: "2024-08-07"
 
@@ -24,6 +24,6 @@ meta:
       name: CC BY 4.0
 
 outs:
-  - md5: a30850f5629e82ab6f36b7bd0e6e1f7e
-    size: 559938
+  - md5: 5a0c6feb2e1dfdaa64a2b643515ba435
+    size: 561610
     path: monkeypox.csv

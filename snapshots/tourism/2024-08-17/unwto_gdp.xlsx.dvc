@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Tourism direct GDP as a proportion of total GDP
+    description: |-
+      Indicator 8.9.1 on Tourism Direct GDP helps to monitor Target 8.9 which calls on countries “to promote sustainable tourism” under Goal 8 on decent Work and Economic Growth.
+    date_published: "2024-04-29"
+
+    # Citation
+    producer: UNWTO
+    citation_full: |-
+      World Tourism Organization (2024), Tourism direct GDP as a proportion of total GDP, UNWTO, Madrid:
+      https://www.unwto.org/tourism-statistics/economic-contribution-SDG [17-08-2024].
+
+    # Files
+    url_main: https://www.unwto.org/tourism-statistics/economic-contribution-SDG
+    url_download: http://pre-webunwto.s3.eu-west-1.amazonaws.com/s3fs-public/2024-04/Indicator-8_9_1-2022-UN_Tourism_april2024_update.xlsx
+    date_accessed: 2024-08-17
+
+    # License
+    license:
+      name: © UNWTO, 92844/14/23
+      url: https://www.unwto.org/copyright
+outs:
+  - md5: 59d7f0de99ca71355adf49c9c0792df7
+    size: 94361
+    path: unwto_gdp.xlsx

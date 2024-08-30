@@ -32,14 +32,23 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["monkeypox"].reset_index()
     tb_suspected = ds_suspected["africa_cdc"].reset_index()
+    cols = ["country", "date", "suspected_cases_cumulative"]
+    tb_suspected = tb_suspected[cols]
+    assert tb_suspected.shape[1] == len(cols)
     origins = tb["total_conf_cases"].metadata.origins
     #
     # Process data.
     #
+    tb_orig = tb.copy()
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
+        make_missing_countries_nan=True,
     )
+
+    missing_countries = set(tb_orig[tb.country.isnull()].country)
+    if missing_countries:
+        raise ValueError(f"Missing countries in monkeypox.meta.yml: {missing_countries}")
 
     tb = (
         tb.pipe(clean_columns)

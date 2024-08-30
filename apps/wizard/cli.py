@@ -30,7 +30,7 @@ set_rich_click_style()
 @click.command(cls=RichCommand, context_settings=dict(show_default=True))
 @click.argument(
     "phase",
-    type=click.Choice(WIZARD_PHASES.__args__),  # type: ignore
+    type=click.Choice(WIZARD_PHASES),
     default="all",
 )
 @click.option(
@@ -52,7 +52,7 @@ set_rich_click_style()
     help="Application port.",
 )
 def cli(
-    phase: Iterable[WIZARD_PHASES],
+    phase: Iterable[str],
     run_checks: bool,
     dummy_data: bool,
     port: int,

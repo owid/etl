@@ -20,7 +20,7 @@ from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
 from etl.explorer_helpers import Explorer
 from etl.grapher_model import Entity, Variable
-from etl.paths import BASE_DIR
+from etl.paths import EXPLORERS_DIR
 
 # TODO:
 #  * Create another slider (from 0 to 10) for tolerance.
@@ -29,8 +29,6 @@ from etl.paths import BASE_DIR
 # Logging
 log = get_logger()
 
-# Default path to the explorers folder.
-EXPLORERS_DIR = BASE_DIR.parent / "owid-content/explorers"
 # EXPLORER_NAME_DEFAULT = "natural-disasters-temp"
 EXPLORER_NAME_DEFAULT = "minerals"
 
@@ -832,7 +830,7 @@ def update_explorer_file(mb: MapBracketer, explorer: Explorer) -> None:
         st.error("Explorer has not changed")
         return
     else:
-        explorer.write()
+        explorer.save()
         st.info(f"Successfully updated {explorer.name} explorer file.")
 
 
@@ -984,10 +982,14 @@ elif use_type == USE_TYPE_EXPLORERS:
                     if variable_id not in variable_ids_with_brackets_already_defined
                 ]
 
+            if len(variable_ids) == 0:
+                st.error("No variables to choose from. They may have map brackets already defined.")
+                st.stop()
+
         # Select a variable id from a dropdown menu.
         variable_id: str = str(
             st.selectbox(  # type: ignore
-                label="Indicator id",
+                label=f"Indicator id ({len(variable_ids)} variables available)",
                 options=variable_ids,
                 index=0,
             )

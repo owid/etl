@@ -13,7 +13,7 @@ import argparse
 
 import pandas as pd
 from owid.catalog import Dataset
-from shared import INCLUDED_DATASETS_CODES, VERSION
+from shared import INCLUDED_DATASETS_CODES, VERSION  # type: ignore[reportMissingImports]
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR

@@ -83,20 +83,3 @@ where
 !!! example
 
     `walden://irena/2022-10-07/renewable_electricity_capacity_and_generation`
-
-### Path for `backport://`
-
-```
-backport://backport/owid/latest/<dataset-name>
-```
-
-where
-
-| Prefix         | Description                                                                                                                                                                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `dataset-name` | Name of the dataset. It follows the format `dataset_<dataset-id>_<dataset-name>`, where `dataset-id` corresponds to the dataset Grapher id and `dataset-name` is the name of the dataset in Grapher (with lower case, and all symbols replaced by underscores). |
-
-!!! example
-
-    `backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08`
-

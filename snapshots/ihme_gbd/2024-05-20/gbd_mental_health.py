@@ -24,7 +24,7 @@ import click
 import pandas as pd
 from owid.datautils.dataframes import concatenate
 from owid.repack import repack_frame
-from shared import download_data
+from shared import download_data  # type: ignore[reportMissingImports]
 from structlog import get_logger
 
 from etl.snapshot import Snapshot

@@ -40,7 +40,7 @@ warnings.simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 paths = PathFinder(__file__)
 
 # Prefix used for "share" columns.
-SHARE_OF_GLOBAL_PREFIX = "share_of_global_"
+SHARE_OF_GLOBAL_PREFIX = "share of global "
 
 # We use World data from USGS.
 # We will also aggregate all other data to create a "World (aggregated)" for sanity check purposes (and then remove it).
@@ -53,37 +53,37 @@ DEVIATION_MAX_ACCEPTED = 10
 # complexity to the explorer. But we may decide to bring them back in the future.
 COLUMNS_TO_DISCARD = [
     "production|Alumina|Refinery|tonnes",
-    "unit_value|Alumina|Refinery|constant 1998 US$ per tonne",
-    "share_of_global_production|Alumina|Refinery|tonnes",
+    "unit value|Alumina|Refinery|constant 1998 US$ per tonne",
+    "share of global production|Alumina|Refinery|tonnes",
     "production|Bromine|Processing|tonnes",
     "reserves|Bromine|Processing|tonnes",
-    "share_of_global_production|Bromine|Processing|tonnes",
+    "share of global production|Bromine|Processing|tonnes",
     "production|Diatomite|Mine|tonnes",
     "reserves|Diatomite|Mine|tonnes",
-    "unit_value|Diatomite|Mine|constant 1998 US$ per tonne",
-    "share_of_global_production|Diatomite|Mine|tonnes",
+    "unit value|Diatomite|Mine|constant 1998 US$ per tonne",
+    "share of global production|Diatomite|Mine|tonnes",
     "production|Indium|Refinery|tonnes",
-    "unit_value|Indium|Refinery|constant 1998 US$ per tonne",
-    "share_of_global_production|Indium|Refinery|tonnes",
+    "unit value|Indium|Refinery|constant 1998 US$ per tonne",
+    "share of global production|Indium|Refinery|tonnes",
     "production|Perlite|Mine|tonnes",
     "reserves|Perlite|Mine|tonnes",
-    "unit_value|Perlite|Mine|constant 1998 US$ per tonne",
-    "share_of_global_production|Perlite|Mine|tonnes",
+    "unit value|Perlite|Mine|constant 1998 US$ per tonne",
+    "share of global production|Perlite|Mine|tonnes",
     "production|Pumice and pumicite|Mine|tonnes",
-    "unit_value|Pumice and pumicite|Mine|constant 1998 US$ per tonne",
-    "share_of_global_production|Pumice and pumicite|Mine|tonnes",
+    "unit value|Pumice and pumicite|Mine|constant 1998 US$ per tonne",
+    "share of global production|Pumice and pumicite|Mine|tonnes",
     "production|Rhenium|Mine|tonnes",
     "reserves|Rhenium|Mine|tonnes",
-    "share_of_global_production|Rhenium|Mine|tonnes",
+    "share of global production|Rhenium|Mine|tonnes",
     "production|Soda ash|Natural and synthetic|tonnes",
     "production|Soda ash|Natural|tonnes",
     "production|Soda ash|Synthetic|tonnes",
     "reserves|Soda ash|Natural|tonnes",
-    "unit_value|Soda ash|Natural and synthetic|constant 1998 US$ per tonne",
-    "share_of_global_production|Soda ash|Natural and synthetic|tonnes",
-    "share_of_global_production|Soda ash|Natural|tonnes",
-    "share_of_global_production|Soda ash|Synthetic|tonnes",
-    "share_of_global_reserves|Soda ash|Natural|tonnes",
+    "unit value|Soda ash|Natural and synthetic|constant 1998 US$ per tonne",
+    "share of global production|Soda ash|Natural and synthetic|tonnes",
+    "share of global production|Soda ash|Natural|tonnes",
+    "share of global production|Soda ash|Synthetic|tonnes",
+    "share of global reserves|Soda ash|Natural|tonnes",
     "production|Salt|Brine salt|tonnes",
     "production|Salt|Evaporated salt|tonnes",
     "production|Salt|Other salt|tonnes",
@@ -104,6 +104,17 @@ ACCEPTED_DEVIATIONS = [
     ("World (BGS)", "production|Steel|Processing, crude|tonnes", [2020]),
     ("World (BGS)", "production|Silver|Mine|tonnes", [2020]),
     ("World (BGS)", "production|Mercury|Mine|tonnes", [2022]),
+]
+
+# BGS does not provide any global data. But we created an aggregated World (which we will later on call "World (BGS)").
+# This is used mainly for checking purposes (to be able to compare BGS data with USGS data).
+# However, for specific minerals, we will keep this global aggregate, since having global data for them is useful.
+# We will check that the data is reasonably complete in those cases.
+COLUMNS_TO_KEEP_WORLD_BGS = [
+    "production|Coal|Mine|tonnes",
+    "production|Petroleum|Crude|tonnes",
+    "production|Nickel|Processing|tonnes",
+    "production|Uranium|Mine|tonnes",
 ]
 
 # Given that BGS and USGS data often have big discrepancies, we will combine columns only after inspection.
@@ -135,6 +146,8 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # Big global disagreement.
     # NOTE: We decided to remove "Clays" altogether.
     # "production|Clays|Mine, kaolin|tonnes",
+    # Reasonable global agreement, except for Turkey and Finland, where USGS is significantly larger.
+    "production|Chromium|Mine|tonnes",
     # Reasonable global agreement, except for DRC, that is much larger than World on certain years.
     # TODO: This should be investigated.
     # "production|Cobalt|Mine|tonnes",
@@ -222,10 +235,9 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # Reasonable global agreement, except for certain countries: China, Sierra Leone.
     "production|Zirconium and hafnium|Mine|tonnes",
 ]
-# The following list contains all columns where USGS (current and historical) overlaps with BGS.
-# NOTE: To visually inspect certain columns, the easiest is to redefine COMBINE_BGS_AND_USGS_COLUMNS again here below,
-#  only with the columns to inspect. Then, uncomment the line columns_to_plot=COMBINE_BGS_AND_USGS_COLUMNS in run().
+# Columns to plot with the individual data sources differentiated.
 PLOT_TO_COMPARE_DATA_SOURCES = [
+    # "production|Chromium|Mine|tonnes",
     # 'production|Titanium|Mine, ilmenite|tonnes',
     # 'production|Helium|Mine|tonnes',
 ]
@@ -602,10 +614,11 @@ def combine_data(
     # by USGS.
     _raise_error_on_large_deviations(tb=tb, ds_regions=ds_regions)
 
-    # It would be useful to have a global total for Coal and Petroleum, which come from BGS and are quite complete.
-    tb_global = tb[tb["country"] == "World (BGS)"][
-        ["country", "year", "production|Coal|Mine|tonnes", "production|Petroleum|Crude|tonnes"]
-    ].reset_index(drop=True)
+    # It would be useful to have a global total for certain cases, like Coal and Petroleum, and some critical minerals,
+    # which come from BGS and are quite complete.
+    tb_global = tb[tb["country"] == "World (BGS)"][["country", "year"] + COLUMNS_TO_KEEP_WORLD_BGS].reset_index(
+        drop=True
+    )
     tb_global["country"] = tb_global["country"].replace("World (BGS)", "World")
 
     # For all other indicators, remove the "World (BGS)" (aggregated in the garden BGS step), that was only kept for sanity checks.
@@ -635,12 +648,12 @@ def _add_global_data_for_comparison(tb: Table, ds_regions: Dataset) -> Table:
 
     # Known overlaps between historical and successor regions (only on years when the historical region dissolved).
     accepted_overlaps = [
-        {1991: {"USSR", "Russia"}},
+        # {1991: {"USSR", "Russia"}},
         {1992: {"Czechia", "Czechoslovakia"}},
         {1992: {"Slovakia", "Czechoslovakia"}},
-        {1990: {"Germany", "East Germany"}},
-        {1990: {"Germany", "West Germany"}},
-        {1990: {"Yemen", "Yemen People's Republic"}},
+        # {1990: {"Germany", "East Germany"}},
+        # {1990: {"Germany", "West Germany"}},
+        # {1990: {"Yemen", "Yemen People's Republic"}},
     ]
     # Regions to create.
     # NOTE: We only need "World", but we need other regions to construct it.
@@ -734,6 +747,11 @@ def run(dest_dir: str) -> None:
     tb = improve_metadata(
         tb=tb, tb_usgs_flat=tb_usgs_flat, tb_bgs_flat=tb_bgs_flat, tb_usgs_historical_flat=tb_usgs_historical_flat
     )
+    # NOTE: Titles, units and descriptions generated with the above function will be overwritten by the content of the
+    #  accompanying meta.yaml file.
+    #  To regenerate that yaml file, execute the following lines and manually copy the content in the meta.yaml file.
+    # from etl.helpers import print_tables_metadata_template
+    # print_tables_metadata_template([tb], fields=["title", "unit", "short_unit", "description_short", "presentation.title_public"])
 
     # Discard some columns, since they are not as critical, and add too much complexity to the explorer.
     tb = tb.drop(columns=COLUMNS_TO_DISCARD, errors="raise")

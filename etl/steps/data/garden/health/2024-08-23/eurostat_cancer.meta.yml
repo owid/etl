@@ -1,0 +1,52 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Cancer
+    display:
+      numDecimalPlaces: 1
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  eurostat_cancer:
+    variables:
+      cervical_cancer_f:
+        title: Cervical cancer screening coverage amongst women aged 20 to 69 years
+        unit: '%'
+        short_unit: '%'
+        description_from_producer: The indicator covering cervical cancer is defined in line with the 2003 Council Recommendation on cancer screening (2003/878/EC). It concerns the population of women aged 20 to 69 years having been screened for cervical cancer within the previous 3 years (or according to the specific screening frequency recommended in each country). The data presented are administrative data from cervical cancer screening programmes.
+        description_short: Share of women aged 20 to 69 years who have been screened for cervical cancer within the previous 3 years.
+
+      colon_and_rectum_cancer_f:
+        title: Colon and rectum cancer screening coverage amongst women aged 50 to 74 years
+        unit: '%'
+        short_unit: '%'
+        description_from_producer: The indicator covering colon and rectum cancer is defined in line with the 2003 Council Recommendation on cancer screening (2003/878/EC). It concerns the population of women aged 50 to 74 years having been screened for colon and rectum cancer within the previous 2 years (or according to the specific screening frequency recommended in each country). The data presented are administrative data from colon and rectum cancer screening programmes.
+        description_short: Share of women aged 50 to 74 years who have been screened for colon and rectum cancer within the previous 2 years.
+
+      colon_and_rectum_cancer_m:
+        title: Colon and rectum cancer screening coverage amongst men aged 50 to 74 years
+        unit: '%'
+        short_unit: '%'
+        description_from_producer: The indicator covering colon and rectum cancer is defined in line with the 2003 Council Recommendation on cancer screening (2003/878/EC). It concerns the population of men aged 50 to 74 years having been screened for colon and rectum cancer within the previous 2 years (or according to the specific screening frequency recommended in each country). The data presented are administrative data from colon and rectum cancer screening programmes.
+        description_short: Share of men aged 50 to 74 years who have been screened for colon and rectum cancer within the previous 2 years.
+
+      colon_and_rectum_cancer_t:
+        title: Colon and rectum cancer screening coverage amongst people aged 50 to 74 years
+        unit: '%'
+        short_unit: '%'
+        description_from_producer: The indicator covering colon and rectum cancer is defined in line with the 2003 Council Recommendation on cancer screening (2003/878/EC). It concerns the population of people aged 50 to 74 years having been screened for colon and rectum cancer within the previous 2 years (or according to the specific screening frequency recommended in each country). The data presented are administrative data from colon and rectum cancer screening programmes.
+        description_short: Share of people aged 50 to 74 years who have been screened for colon and rectum cancer within the previous 2 years.
+
+      breast_cancer_f:
+        title: Breast cancer screening coverage amongst women aged 50 to 69 years
+        unit: '%'
+        short_unit: '%'
+        description_from_producer: The indicator covering breast cancer is defined in line with the 2003 Council Recommendation on cancer screening (2003/878/EC). It concerns the population of women aged 50 to 69 years having been screened for breast cancer within the previous 2 years (or according to the specific screening frequency recommended in each country). The data presented are administrative data from breast cancer screening programmes.
+        description_short: Share of women aged 50 to 69 years who have been screened for breast cancer within the previous 2 years.

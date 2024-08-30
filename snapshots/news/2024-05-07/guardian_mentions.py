@@ -707,7 +707,7 @@ def get_country_name_variations(country_names: Optional[Set[str]] = None):
         "United Kingdom": "UK",
         "United States": "US",
     }
-    name_variations = {country_names_guardian.get(c, c): names for c, names in name_variations.items()}
+    name_variations = {country_names_guardian.get(c, c): names for c, names in name_variations.items()}  # type: ignore[reportCallIssue]
 
     # Sort
     names_sorted = sorted(name_variations)  # type: ignore

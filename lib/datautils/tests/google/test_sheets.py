@@ -55,7 +55,7 @@ class TestGSheetsApi:
     def test_sheets(self, mock_init, mock_sheets_from_files):
         api = GSheetsApi(self.clients_secrets, self.credentials_path)
         _ = api.sheets
-        assert api.sheets.name == "hello"
+        assert api.sheets.name == "hello"  # type: ignore[reportAttributeAccessIssue]
 
     @mock.patch("gsheets.Sheets.from_files", side_effect=MockSheets.from_files)
     @mock.patch("gsheets.Sheets.get", side_effect=MockSheets.get)

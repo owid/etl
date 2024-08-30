@@ -208,7 +208,7 @@ def parse_metadata_from_csv(
         date_published=str(dt.date.today()),  # type: ignore
     )
 
-    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, origin
+    return DatasetMeta(**dataset_dict), {k: VariableMeta(**v) for k, v in variables_dict.items()}, origin  # type: ignore
 
 
 ###################################
@@ -250,6 +250,9 @@ def import_google_sheets(url: str) -> Dict[str, Any]:
 
 
 def parse_data_from_sheets(data_df: pd.DataFrame) -> pd.DataFrame:
+    # drop empty rows
+    data_df = data_df.dropna(how="all")
+
     # lowercase columns names
     for col in data_df.columns:
         if col.lower() in ("entity", "year", "country"):
@@ -301,7 +304,7 @@ def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
     # short_name is not used anymore
     source.pop("short_name", None)
 
-    return Source(**source)
+    return Source(**source)  # type: ignore[reportCallIssue]
 
 
 def _parse_origins(origins_meta_df: pd.DataFrame) -> Optional[Origin]:

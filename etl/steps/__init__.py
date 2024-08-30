@@ -55,6 +55,7 @@ def compile_steps(
     excludes: Optional[List[str]] = None,
     downstream: bool = False,
     only: bool = False,
+    exact_match: bool = False,
 ) -> List["Step"]:
     """
     Return the list of steps which, if executed in order, mean that every
@@ -64,7 +65,7 @@ def compile_steps(
     excludes = excludes or []
 
     # make sure each step runs after its dependencies
-    steps = to_dependency_order(dag, includes, excludes, downstream=downstream, only=only)
+    steps = to_dependency_order(dag, includes, excludes, downstream=downstream, only=only, exact_match=exact_match)
 
     # parse the steps into Python objects
     return [parse_step(name, dag) for name in steps]
@@ -76,13 +77,18 @@ def to_dependency_order(
     excludes: List[str],
     downstream: bool = False,
     only: bool = False,
+    exact_match: bool = False,
 ) -> List[str]:
     """
     Organize the steps in dependency order with a topological sort. In other words,
     the resulting list of steps is a valid ordering of steps such that no step is run
     before the steps it depends on. Note: this ordering is not necessarily unique.
     """
-    subgraph = filter_to_subgraph(dag, includes, downstream=downstream, only=only) if includes else dag
+    subgraph = (
+        filter_to_subgraph(dag, includes, downstream=downstream, only=only, exact_match=exact_match)
+        if includes
+        else dag
+    )
     in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
 
     # filter out explicit excludes
@@ -91,7 +97,9 @@ def to_dependency_order(
     return filtered
 
 
-def filter_to_subgraph(graph: Graph, includes: Iterable[str], downstream: bool = False, only: bool = False) -> Graph:
+def filter_to_subgraph(
+    graph: Graph, includes: Iterable[str], downstream: bool = False, only: bool = False, exact_match: bool = False
+) -> Graph:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
 
@@ -102,7 +110,10 @@ def filter_to_subgraph(graph: Graph, includes: Iterable[str], downstream: bool =
     dependent on B).
     """
     all_steps = graph_nodes(graph)
-    included = {s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)}
+    if exact_match:
+        included = set(includes) & all_steps
+    else:
+        included = {s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)}
 
     if only:
         # Only include explicitly selected nodes
@@ -226,17 +237,14 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     elif step_type == "grapher":
         step = GrapherStep(path, dependencies)
 
-    elif step_type == "backport":
-        step = BackportStep(path, dependencies)
+    elif step_type == "export":
+        step = ExportStep(path, dependencies)
 
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
 
     elif step_type == "walden-private":
         step = WaldenStepPrivate(path)
-
-    elif step_type == "backport-private":
-        step = BackportStepPrivate(path, dependencies)
 
     elif step_type == "snapshot-private":
         step = SnapshotStepPrivate(path)
@@ -259,6 +267,8 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
     -------
     step : str
         Step (as it appears in the dag).
+    step_type : str
+        Type of step (e.g. data or export).
     kind : str
         Kind of step (namely, 'public' or 'private').
     channel: str
@@ -312,6 +322,7 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
 
     attributes = {
         "step": step,
+        "step_type": prefix,
         "kind": kind,
         "channel": channel,
         "namespace": namespace,
@@ -925,7 +936,8 @@ class GrapherStep(Step):
             gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
 
     def checksum_output(self) -> str:
-        raise NotImplementedError("GrapherStep should not be used as an input")
+        """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
+        return self.data_step.checksum_input()
 
     @classmethod
     def _cleanup_ghost_resources(
@@ -959,6 +971,52 @@ class GrapherStep(Step):
         # TODO: cleanup origins that are not used by any variable
 
         return success
+
+
+class ExportStep(DataStep):
+    """
+    A step which exports something once. For instance committing to a Github repository
+    or creating a TSV file for owid-content.
+    """
+
+    path: str
+    dependencies: List[Step]
+
+    def __init__(self, path: str, dependencies: List[Step]) -> None:
+        self.dependencies = dependencies
+        self.path = path
+
+    def __str__(self) -> str:
+        return f"export://{self.path}"
+
+    def run(self) -> None:
+        # make sure the enclosing folder is there
+        self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
+
+        sp = self._search_path
+        if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
+            if config.DEBUG:
+                DataStep._run_py_isolated(self)  # type: ignore
+            else:
+                DataStep._run_py(self)  # type: ignore
+
+        # save checksum
+        from etl.helpers import create_dataset
+
+        ds = create_dataset(self._dest_dir, tables=[])
+        ds.metadata.source_checksum = self.checksum_input()
+        ds.save()
+
+    def checksum_output(self) -> str:
+        raise NotImplementedError("ExportStep should not be used as an input")
+
+    @property
+    def _search_path(self) -> Path:
+        return paths.STEP_DIR / "export" / self.path
+
+    @property
+    def _dest_dir(self) -> Path:
+        return paths.EXPORT_DIR / self.path.lstrip("/")
 
 
 @dataclass
@@ -1029,34 +1087,6 @@ class ETagStep(Step):
         return get_etag(f"https://{self.path}")
 
 
-class BackportStep(DataStep):
-    dependencies = []
-
-    def __str__(self) -> str:
-        return f"backport://{self.path}"
-
-    def run(self) -> None:
-        from etl import backport_helpers
-
-        # make sure the enclosing folder is there
-        self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
-
-        dataset = backport_helpers.create_dataset(self._dest_dir.as_posix(), self._dest_dir.name)
-
-        # modify the dataset to remember what inputs were used to build it
-        dataset.metadata.source_checksum = self.checksum_input()
-        dataset.save()
-
-        self.after_run()
-
-    def can_execute(self, archive_ok: bool = True) -> bool:
-        return True
-
-    @property
-    def _dest_dir(self) -> Path:
-        return paths.DATA_DIR / self.path.lstrip("/")
-
-
 class PrivateMixin:
     def after_run(self) -> None:
         """Make dataset private"""
@@ -1078,13 +1108,6 @@ class WaldenStepPrivate(WaldenStep):
 
     def __str__(self) -> str:
         return f"walden-private://{self.path}"
-
-
-class BackportStepPrivate(PrivateMixin, BackportStep):
-    is_public = False
-
-    def __str__(self) -> str:
-        return f"backport-private://{self.path}"
 
 
 def select_dirty_steps(steps: List[Step], workers: int = 1) -> List[Step]:

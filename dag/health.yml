@@ -140,7 +140,7 @@ steps:
 
   # Cholera
   data://garden/who/2023-06-01/cholera:
-    - backport://backport/owid/latest/dataset_5676_global_health_observatory__world_health_organization__2022_08
+    - data://garden/who/2024-01-03/gho
     - snapshot://fasttrack/2023-05-31/cholera.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2021-07-01/wb_income
@@ -719,3 +719,15 @@ steps:
     - data://garden/who/latest/monkeypox
   data://explorers/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
+  export://github/who/latest/monkeypox:
+    - data://garden/who/latest/monkeypox
+  data://meadow/health/2024-08-23/eurostat_cancer:
+    - snapshot://health/2024-08-23/eurostat_cancer.csv
+  data://garden/health/2024-08-23/eurostat_cancer:
+    - data://meadow/health/2024-08-23/eurostat_cancer
+  data://grapher/health/2024-08-23/eurostat_cancer:
+    - data://garden/health/2024-08-23/eurostat_cancer
+
+  # Multi-dim indicators
+  export://multidim/health/latest/causes_of_death:
+    - grapher://grapher/ihme_gbd/2024-05-20/gbd_cause
