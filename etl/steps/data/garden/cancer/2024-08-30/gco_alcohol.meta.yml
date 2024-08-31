@@ -5,7 +5,30 @@ definitions:
       topic_tags:
         - Cancer
 
-
+    processing_level: minor
+    display:
+      numDecimalPlaces: 1
+  sex: |-
+    <% if sex == "both" %>all individuals <% elif sex == "male" %>males <% elif sex == "female" %>females <%- endif %>
+  value:
+    unit: |-
+      <% if indicator == "asr" %>per 100 000 people<% elif indicator == "paf" %> %>%<%  <%- endif -%>
+    short_unit: |-
+      <% if indicator == "asr" %>per 100 000 people<% elif indicator == "paf" %> %>%<% <%- endif -%>
+    title: |-
+      <% if indicator == "asr"%>
+      Age-standardized rates for the number of new  << cancer.lower() >> cancer cases attributable to alcohol drinking among {definitions.sex}
+      <% elif metric == "paf"%>
+      Proportion of << cancer.lower() >> cancer deaths among {definitions.sex} attributable to alcohol consumption
+      <%- endif -%>
+    description_short: |-
+      <% if metric == "asr"%>
+      The age-standardized rate for the number of new << cancer.lower() >> cancer cases attributable to alcohol drinking among {definitions.sex} per 100,000 people.
+      <% elif metric == "paf" %>
+      Proportion of << cancer.lower() >> cancer deaths among {definitions.sex} attributable to alcohol consumption, relative to the total number of all cancer cases.
+      <%- endif -%>
+  footnote: |-
+    <% if metric == "asr" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -15,44 +38,16 @@ dataset:
 tables:
   gco_alcohol:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
-
+      value:
+        title: |-
+          {definitions.value.title}
+        unit: |-
+          {definitions.value.unit}
+        short_unit: |-
+          {definitions.value.short_unit}
+        description_short: |-
+          {definitions.value.description_short}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
