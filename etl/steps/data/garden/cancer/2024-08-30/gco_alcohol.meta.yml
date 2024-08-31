@@ -14,7 +14,7 @@ definitions:
     unit: |-
       <% if indicator == "asr" %>per 100 000 people<% elif indicator == "paf" %>%<% endif %>
     short_unit: |-
-      <% if indicator == "asr" %>per 100 000 people<% elif indicator == "paf" %>%<% endif %>
+      <% if indicator == "asr" %> <% elif indicator == "paf" %>%<% endif %>
     title: |-
       <% if indicator == "asr" %>
       Age-standardized rates for the number of new << cancer.lower() >> cancer cases attributable to alcohol drinking among {definitions.sex}
