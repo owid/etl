@@ -12,7 +12,7 @@ definitions:
     <% if sex == "both" %>all individuals<% elif sex == "male" %>males<% elif sex == "female" %>females<% endif %>
   value:
     unit: |-
-      <% if indicator == "asr" %>per 100 000 people<% elif indicator == "paf" %>%<% endif %>
+      <% if indicator == "asr" %>per 100,000 people<% elif indicator == "paf" %>%<% endif %>
     short_unit: |-
       <% if indicator == "asr" %> <% elif indicator == "paf" %>%<% endif %>
     title: |-
