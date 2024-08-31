@@ -9,27 +9,26 @@ definitions:
     display:
       numDecimalPlaces: 1
   sex: |-
-    <% if sex == "both" %>all individuals <% elif sex == "male" %>males <% elif sex == "female" %>females <%- endif %>
+    <% if sex == "both" %>all individuals<% elif sex == "male" %>males<% elif sex == "female" %>females<% endif %>
   value:
     unit: |-
-      <% if indicator == "asr" %>per 100 000 people<% elif indicator == "paf" %> %>%<%  <%- endif -%>
+      <% if indicator == "asr" %>per 100 000 people<% elif indicator == "paf" %>%<% endif %>
     short_unit: |-
-      <% if indicator == "asr" %>per 100 000 people<% elif indicator == "paf" %> %>%<% <%- endif -%>
+      <% if indicator == "asr" %>per 100 000 people<% elif indicator == "paf" %>%<% endif %>
     title: |-
-      <% if indicator == "asr"%>
-      Age-standardized rates for the number of new  << cancer.lower() >> cancer cases attributable to alcohol drinking among {definitions.sex}
-      <% elif metric == "paf"%>
+      <% if indicator == "asr" %>
+      Age-standardized rates for the number of new << cancer.lower() >> cancer cases attributable to alcohol drinking among {definitions.sex}
+      <% elif indicator == "paf" %>
       Proportion of << cancer.lower() >> cancer deaths among {definitions.sex} attributable to alcohol consumption
-      <%- endif -%>
+      <% endif %>
     description_short: |-
-      <% if metric == "asr"%>
+      <% if indicator == "asr" %>
       The age-standardized rate for the number of new << cancer.lower() >> cancer cases attributable to alcohol drinking among {definitions.sex} per 100,000 people.
-      <% elif metric == "paf" %>
+      <% elif indicator == "paf" %>
       Proportion of << cancer.lower() >> cancer deaths among {definitions.sex} attributable to alcohol consumption, relative to the total number of all cancer cases.
-      <%- endif -%>
+      <% endif %>
   footnote: |-
-    <% if metric == "asr" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
-# Learn more about the available fields:
+    <% if indicator == "asr" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% endif %># Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
