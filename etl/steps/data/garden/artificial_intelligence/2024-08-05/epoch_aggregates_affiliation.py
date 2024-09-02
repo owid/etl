@@ -1,5 +1,7 @@
 """Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of researcher affiliation."""
 
+import datetime as dt
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -58,11 +60,15 @@ def run(dest_dir: str) -> None:
     # Set the index to year and country
     tb_agg = tb_agg.format(["year", "organization_categorization"])
 
+    date_acessed = tb_agg.yearly_count.m.origins[0].date_accessed
+
     #
     # Save outputs.
     #
     ds_garden = create_dataset(
-        dest_dir, tables=[tb_agg], yaml_params={"date_accessed": tb_agg.yearly_count.m.origins[0].date_accessed}
+        dest_dir,
+        tables=[tb_agg],
+        yaml_params={"date_accessed": dt.datetime.strptime(date_acessed, "%Y-%m-%d").strftime("%d %B %Y")},
     )
     ds_garden.save()
 
