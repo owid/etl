@@ -1,6 +1,7 @@
 import functools
 import os
 import warnings
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
@@ -423,8 +424,10 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
     df["is_archived"] = df["is_archived"].astype(bool)
     df["is_private"] = df["is_private"].astype(bool)
 
+    etl_paths = [CatalogPath(etl_path) for etl_path in df["etl_path"]]
+
     # Sanity check.
-    unknown_channels = set([etl_path.split("/")[0] for etl_path in set(df["etl_path"])]) - {"grapher"}
+    unknown_channels = set([etl_path.channel for etl_path in set(etl_paths)]) - {"grapher"}
     if len(unknown_channels) > 0:
         log.error(
             "Variables in grapher DB are expected to come only from ETL grapher channel, "
@@ -434,7 +437,8 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
     # Create a column with the step name.
     # First assume all steps are public (hence starting with "data://").
     # Then edit private steps so they start with "data-private://".
-    df["step"] = ["data://" + "/".join(etl_path.split("#")[0].split("/")[:-1]) for etl_path in df["etl_path"]]
+    # TODO
+    df["step"] = [f"data://{etl_path.uri}" for etl_path in etl_paths]
     df.loc[df["is_private"], "step"] = df[df["is_private"]]["step"].str.replace("data://", "data-private://")
 
     return df
@@ -505,3 +509,49 @@ def get_dataset_charts(dataset_ids: List[str], db_conn: Optional[pymysql.Connect
     ]
 
     return df
+
+
+@dataclass(unsafe_hash=True)
+class CatalogPath:
+    """Helper class to parse and manipulate catalog paths.
+
+    Examples:
+        channel/namespace/version/dataset/table#column:
+        data://channel/namespace/version/dataset/table#column:
+    """
+
+    path: str
+
+    def __init__(self, path: str) -> None:
+        assert "://" not in path, "Path should not contain ://"
+        assert "#" in path, "CatalogPath should contain a table and a column"
+        self.path = path
+
+    @property
+    def channel(self) -> str:
+        return self.path.split("/")[0]
+
+    @property
+    def namespace(self) -> str:
+        return self.path.split("/")[1]
+
+    @property
+    def version(self) -> str:
+        return self.path.split("/")[2]
+
+    @property
+    def dataset(self) -> str:
+        return self.path.split("/")[3]
+
+    @property
+    def table(self) -> str:
+        return self.path.split("/")[4]
+
+    @property
+    def column(self) -> str:
+        return self.path.split("#")[-1]
+
+    @property
+    def uri(self) -> str:
+        """Return dataset URI `channel/namespace/version/dataset`."""
+        return f"{self.channel}/{self.namespace}/{self.version}/{self.dataset}"

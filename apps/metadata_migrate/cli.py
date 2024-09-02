@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from etl import config
 from etl import grapher_model as gm
 from etl.command import main as etl_main
-from etl.db import get_engine, read_sql
+from etl.db import CatalogPath, get_engine, read_sql
 from etl.metadata_export import merge_or_create_yaml, reorder_fields
 from etl.paths import BASE_DIR, DAG_FILE, DATA_DIR, STEP_DIR
 
@@ -122,10 +122,10 @@ def cli(
         assert variable.catalogPath, f"Variable {var_id} does not come from ETL. Migrate it there first."
 
         # extract dataset URI and columns
-        uri, cols = variable.catalogPath.split("#")
-        cols = f"^{cols}$"
-        uri = uri.split("/", 1)[1]
-        uri, table_name = uri.rsplit("/", 1)
+        catalog_path = CatalogPath(variable.catalogPath)
+        cols = f"^{catalog_path.column}$"
+        uri = catalog_path.uri
+        table_name = catalog_path.table
     else:
         grapher_config = None
 
