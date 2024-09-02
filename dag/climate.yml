@@ -295,3 +295,8 @@ steps:
   #
   data://grapher/climate/2024-07-23/climate_change_impacts_monthly:
     - data://garden/climate/2024-07-23/climate_change_impacts
+  #
+  # NSIDC - Monthly sea ice anomalies.
+  #
+  data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly:
+    - data://garden/climate/2024-07-23/sea_ice_index
