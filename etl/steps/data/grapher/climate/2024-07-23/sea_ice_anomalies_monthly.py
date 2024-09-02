@@ -57,14 +57,22 @@ def run(dest_dir: str) -> None:
     # Improve metadata.
     tb_months.metadata.title = "Monthly sea ice extent"
     for column in tb_months.columns:
-        year = column[-4:]
+        year = int(column[-4:])
         title = column.replace("_", " ").capitalize()
-        if int(year) >= 2020:
-            color = "#8e0f0f"
-        else:
-            color = "#a1abc3"
+        if 1970 <= year < 1980:
+            color = "#E9F2FF"  # 1970s: Very light blue
+        elif 1980 <= year < 1990:
+            color = "#CCE0FF"  # 1980s: Light blue
+        elif 1990 <= year < 2000:
+            color = "#99C2FF"  # 1990s: Medium blue
+        elif 2000 <= year < 2010:
+            color = "#66A3FF"  # 2000s: Darker blue
+        elif 2010 <= year < 2020:
+            color = "#3385FF"  # 2010s: Even darker blue
+        else:  # From 2020 onwards, use dark red.
+            color = "#8E0F0F"
         tb_months[column].metadata.title = title
-        tb_months[column].metadata.display = {"name": year, "color": color}
+        tb_months[column].metadata.display = {"name": str(year), "color": color}
         tb_months[column].metadata.presentation.title_public = title
 
     #
