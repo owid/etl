@@ -212,6 +212,10 @@ tb = {_snippet_dataset(ds_b, table_name)}
                     col_a = table_a[col]
                     col_b = table_b[col]
 
+                    # sort origins
+                    for tab in (table_a, table_b):
+                        tab[col].m.origins = sorted(tab[col].m.origins, key=lambda x: (x.title, x.title_snapshot))
+
                     # metadata diff
                     meta_diff = _dict_diff(
                         _column_metadata_dict(col_a.metadata), _column_metadata_dict(col_b.metadata), tabs=4
