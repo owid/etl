@@ -214,7 +214,9 @@ tb = {_snippet_dataset(ds_b, table_name)}
 
                     # sort origins
                     for tab in (table_a, table_b):
-                        tab[col].m.origins = sorted(tab[col].m.origins, key=lambda x: (x.title, x.title_snapshot))
+                        tab[col].m.origins = sorted(
+                            tab[col].m.origins, key=lambda x: (x.title or "", x.title_snapshot or "")
+                        )
 
                     # metadata diff
                     meta_diff = _dict_diff(
