@@ -303,7 +303,10 @@ class Table(pd.DataFrame):
             metadata = self.metadata.to_dict()  # type: ignore
             metadata["primary_key"] = self.primary_key
             metadata["fields"] = self._get_fields_as_dict()
-            json.dump(metadata, ostream, indent=2, default=str)
+            try:
+                json.dump(metadata, ostream, indent=2, default=str, allow_nan=False)
+            except ValueError as e:
+                raise ValueError(f"metadata contains NaNs:\n{metadata}") from e
 
     @classmethod
     def read_csv(cls, path: Union[str, Path], **kwargs) -> "Table":
