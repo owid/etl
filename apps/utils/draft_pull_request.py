@@ -85,6 +85,17 @@ description = "- " + "\n- ".join(
 )
 
 
+def _branch_exists_remotely(new_branch, remote_branches):
+    if new_branch in remote_branches:
+        log.error(
+            f"New branch '{new_branch}' already exists in remote. "
+            "Either manually create a pull request from github, or use a different name for the new branch."
+        )
+        return True
+    else:
+        return False
+
+
 @click.command(name="draft-pr", cls=RichCommand, help=__doc__)
 @click.argument(
     "new-branch",
@@ -172,6 +183,11 @@ def cli(
                 "or switch to the new branch and run this tool without specifying a new branch."
             )
             return
+
+        # Ensure the new branch does not already exist remotely.
+        if _branch_exists_remotely(new_branch=new_branch, remote_branches=remote_branches):
+            return
+
         try:
             log.info(
                 f"Switching to base branch '{base_branch}', creating new branch '{new_branch}' from there, and switching to it."
@@ -182,12 +198,8 @@ def cli(
             log.error(f"Failed to create a new branch from '{base_branch}':\n{e}")
             return
 
-    # Ensure the new branch does not already exist in remote.
-    if new_branch in remote_branches:
-        log.error(
-            f"New branch '{new_branch}' already exists in remote. "
-            "Either manually create a pull request from github, or use a different name for the new branch."
-        )
+    # Ensure the new branch does not already exist remotely.
+    if _branch_exists_remotely(new_branch=new_branch, remote_branches=remote_branches):
         return
 
     log.info("Creating an empty commit.")
