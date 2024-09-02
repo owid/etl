@@ -714,13 +714,20 @@ steps:
     - data://meadow/who/latest/monkeypox
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
-    - data://grapher/fasttrack/latest/africa_cdc
+    - data://garden/health/latest/global_health_mpox
   data://grapher/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
   data://explorers/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
   export://github/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
+# Mpox - Global.health
+  data://meadow/health/latest/global_health_mpox:
+    - snapshot://health/latest/global_health_mpox.csv
+  data://garden/health/latest/global_health_mpox:
+    - data://meadow/health/latest/global_health_mpox
+
+  # Eurostat cancer
   data://meadow/health/2024-08-23/eurostat_cancer:
     - snapshot://health/2024-08-23/eurostat_cancer.csv
   data://garden/health/2024-08-23/eurostat_cancer:
@@ -728,10 +735,9 @@ steps:
   data://grapher/health/2024-08-23/eurostat_cancer:
     - data://garden/health/2024-08-23/eurostat_cancer
 
+
   # Multi-dim indicators
   export://multidim/health/latest/causes_of_death:
     - grapher://grapher/ihme_gbd/2024-05-20/gbd_cause
-  data://meadow/health/latest/global_health_mpox:
-    - snapshot://health/latest/global_health_mpox.csv
-  data://garden/health/latest/global_health_mpox:
-    - data://meadow/health/latest/global_health_mpox
+
+

@@ -38,7 +38,8 @@ def run(dest_dir: str) -> None:
     tb = pr.concat([tb, tb_2023]).sort_values(["country", "date"])
     # Calculate the cumulative
     tb["case_status"] = tb["case_status"].astype("int")
-    tb["cumulative_cases"] = tb.groupby(["country"])["case_status"].cumsum()
+    tb["suspected_cases_cumulative_cases"] = tb.groupby(["country"])["case_status"].cumsum()
+    tb = tb.rename(columns={"case_status": "reported_cases"})
     tb = tb.format(["country", "date"])
 
     #
