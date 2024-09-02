@@ -512,6 +512,7 @@ class Table(pd.DataFrame):
         self,
         path: Union[Path, str],
         table_name: str,
+        yaml_params: Optional[Dict[str, Any]] = None,
         extra_variables: Literal["raise", "ignore"] = "raise",
         if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
     ) -> None:
@@ -526,6 +527,7 @@ class Table(pd.DataFrame):
             path=path,
             table_name=table_name,
             extra_variables=extra_variables,
+            yaml_params=yaml_params,
             if_origins_exist=if_origins_exist,
         )
 

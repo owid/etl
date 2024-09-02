@@ -181,6 +181,7 @@ def create_dataset(
     formats: List[FileFormat] = DEFAULT_FORMATS,
     check_variables_metadata: bool = False,
     run_grapher_checks: bool = True,
+    yaml_params: Optional[Dict[str, Any]] = None,
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
     errors: Literal["ignore", "warn", "raise"] = "raise",
     repack: bool = True,
@@ -200,6 +201,7 @@ def create_dataset(
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
     :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
+    :param yaml_params: Dictionary of parameters that can be used in the metadata yaml file.
     :param if_origins_exist: What to do if origins already exist in the dataset metadata.
     :param repack: Repack dataframe before adding it to the dataset.
 
@@ -250,7 +252,7 @@ def create_dataset(
 
     meta_path = get_metadata_path(str(dest_dir))
     if meta_path.exists():
-        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, errors=errors)
+        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, yaml_params=yaml_params, errors=errors)
 
     # another override YAML file with higher priority
     meta_override_path = get_metadata_path(str(dest_dir)).with_suffix(".override.yml")

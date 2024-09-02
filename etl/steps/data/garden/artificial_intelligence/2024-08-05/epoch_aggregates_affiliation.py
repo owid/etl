@@ -61,7 +61,9 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_garden = create_dataset(dest_dir, tables=[tb_agg])
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb_agg], yaml_params={"date_accessed": tb_agg.yearly_count.m.origins[0].date_accessed}
+    )
     ds_garden.save()
 
     paths.log.info("epoch_aggregates_affiliation.end")
