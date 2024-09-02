@@ -41,6 +41,7 @@ def run(dest_dir: str) -> None:
         index_cols=["country", "year", "metric", "measure", "cause", "age"],
         regions=REGIONS,
         age_group_mapping=AGE_GROUPS_RANGES,
+        run_percent=True,
     )
 
     # Split into two tables: one for deaths, one for DALYs

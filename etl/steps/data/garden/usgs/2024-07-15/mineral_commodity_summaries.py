@@ -102,11 +102,11 @@ COMMODITY_MAPPING = {
     ("Cadmium", "Refinery production"): ("Cadmium", "Refinery"),
     ("Cement", "Cement production, estimated"): ("Cement", "Processing"),
     ("Cement", "Clinker capacity, estimated"): None,
-    # NOTE: USGS current data for chromium is odd: It is either significantly larger or significantly smaller than USGS
-    #  historical data, and changes abruptly from one year to another. For now, ignore.
-    ("Chromium", "Mine production, marketable chromite ore"): None,
-    ("Chromium", "Mne production, grosss weight, marketable chromite ore"): None,
-    ("Chromium", "Mne production, marketable chromite ore, gross weight"): None,
+    # NOTE: Chromium mine production in USGS historical is different to USGS current
+    # (see notes in USGS historical garden step).
+    ("Chromium", "Mine production, marketable chromite ore"): ("Chromium", "Mine"),
+    ("Chromium", "Mne production, grosss weight, marketable chromite ore"): ("Chromium", "Mine"),
+    ("Chromium", "Mne production, marketable chromite ore, gross weight"): ("Chromium", "Mine"),
     # NOTE: The following could be mapped to ("Clays", "Mine, bentonite"). We decided to remove "Clays".
     ("Clays", "Bentonite, mine production"): None,
     # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
@@ -404,6 +404,7 @@ FOOTNOTES = {
     # "reserves|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
     "production|Bismuth|Refinery|tonnes": "Values are reported in tonnes of metal content.",
     "reserves|Platinum group metals|Mine, platinum|tonnes": "Reserves include all platinum group metals.",
+    "production|Chromium|Mine|tonnes": "Values are reported in tonnes of gross weight of marketable chromite ore.",
 }
 
 # Dictionary of special units.
@@ -561,6 +562,10 @@ def extract_and_clean_data_for_year_and_mineral(data: Dict[int, Any], year: int,
         # Reserves column is called "Reserves_kt", however, the numbers show kilograms.
         # See that the metadata xml file mentions "Reserves_kg", and the 2024 file is in kg.
         d = d.rename(columns={"Reserves_kt": "Reserves_kg"}, errors="raise")
+    if (year == 2023) & (mineral == "CHROMIUM"):
+        # Production is clearly in kilotonnes. That's what the notes say,
+        # and that's also how the data is in the 2022 and 2024 files.
+        d = d.rename(columns={"Prod_t_2021": "Prod_kt_2021", "Prod_t_est_2022": "Prod_kt_est_2022"}, errors="raise")
 
     ############################################################################################################
 

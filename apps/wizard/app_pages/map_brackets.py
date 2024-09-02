@@ -982,10 +982,14 @@ elif use_type == USE_TYPE_EXPLORERS:
                     if variable_id not in variable_ids_with_brackets_already_defined
                 ]
 
+            if len(variable_ids) == 0:
+                st.error("No variables to choose from. They may have map brackets already defined.")
+                st.stop()
+
         # Select a variable id from a dropdown menu.
         variable_id: str = str(
             st.selectbox(  # type: ignore
-                label="Indicator id",
+                label=f"Indicator id ({len(variable_ids)} variables available)",
                 options=variable_ids,
                 index=0,
             )

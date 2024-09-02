@@ -14,12 +14,15 @@ def run(dest_dir: str) -> None:
     ds = paths.load_dataset("monkeypox")
     tb = ds.read_table("monkeypox")
 
+    # Process it for backwards compatibility.
+    tb = tb.rename(columns={"country": "location"}).drop(columns=["suspected_cases_cumulative", "annotation"])
+
     # Commit the data to the repository
     gh.commit_file_to_github(
         tb.to_csv(index=False),
         repo_name="monkeypox",
         file_path="owid-monkeypox-data.csv",
         commit_message="data(mpx): automated update",
-        branch="master",
+        branch="main",
         dry_run=not config.MONKEYPOX_COMMIT,
     )
