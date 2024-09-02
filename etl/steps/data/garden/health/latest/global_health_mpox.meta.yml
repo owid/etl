@@ -19,7 +19,7 @@ tables:
       reported_cases:
         title: Reported mpox cases
         unit: cases
-      cumulative_cases:
+      suspected_cases_cumulative:
         title: Cumulative mpox cases
         unit: cases
         description_processing: Data for 2024 is taken from Global.health, data for 2023 is taken from Africa CDC.
