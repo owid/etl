@@ -731,3 +731,7 @@ steps:
   # Multi-dim indicators
   export://multidim/health/latest/causes_of_death:
     - grapher://grapher/ihme_gbd/2024-05-20/gbd_cause
+  data://meadow/health/latest/global_health_mpox:
+    - snapshot://health/latest/global_health_mpox.csv
+  data://garden/health/latest/global_health_mpox:
+    - data://meadow/health/latest/global_health_mpox
