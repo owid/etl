@@ -4,7 +4,7 @@ sqlacodegen --generator dataclasses --options use_inflect mysql://root:owid@loca
 ```
 or
 ```
-sqlacodegen --generator dataclasses --options use_inflect mysql://owid:owid@staging-site-branch:3306/owid
+sqlacodegen --generator dataclasses --options use_inflect mysql://owid:@staging-site-branch:3306/owid
 ```
 
 If you want to add a new table to ORM, add --tables mytable to the command above.
@@ -243,8 +243,7 @@ class ChartConfig(Base):
     __tablename__ = "chart_configs"
     __table_args__ = (Index("idx_chart_configs_slug", "slug"),)
 
-    id: Mapped[bytes] = mapped_column(BINARY(16), primary_key=True, server_default=text("uuid_to_bin(uuid(),1)"))
-    uuid: Mapped[Optional[str]] = mapped_column(String(36), Computed("(bin_to_uuid(`id`,1))", persisted=False))
+    id: Mapped[bytes] = mapped_column(BINARY(16), primary_key=True)
     patch: Mapped[dict] = mapped_column(JSON, nullable=False)
     full: Mapped[dict] = mapped_column(JSON, nullable=False)
     slug: Mapped[Optional[str]] = mapped_column(
