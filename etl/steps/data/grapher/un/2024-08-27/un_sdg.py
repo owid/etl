@@ -18,6 +18,8 @@ log = getLogger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+pd.options.mode.chained_assignment = None
+
 
 # only include tables containing INCLUDE string, this is useful for debugging
 # but should be None before merging to master!!
