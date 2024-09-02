@@ -149,7 +149,10 @@ def cli(
 
     # Update the list of remote branches in the local repository.
     origin = repo.remote(name="origin")
-    origin.fetch()
+    # NOTE: The option prune=True removes local references to branches that no longer exist on the remote repository.
+    #  Otherwise, this script might raise an error claiming that your proposed branch exists in remote, even if that
+    #  branch was already deleted.
+    origin.fetch(prune=True)
     # List all remote branches.
     remote_branches = [ref.name.split("origin/")[-1] for ref in origin.refs if ref.remote_head != "HEAD"]
 
