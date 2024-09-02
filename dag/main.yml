@@ -798,10 +798,9 @@ steps:
     - data://meadow/un/2024-08-27/un_sdg
     - snapshot://un/2024-08-27/un_sdg_unit.csv
     - snapshot://un/2024-08-27/un_sdg_dimension.json
-
-
   data://grapher/un/2024-08-27/un_sdg:
     - data://garden/un/2024-08-27/un_sdg
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
