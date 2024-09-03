@@ -303,5 +303,5 @@ steps:
   #
   # NSIDC - Monthly sea ice anomalies (each country corresponds to a year).
   #
-  data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly_arctic:
+  data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly_alternative:
     - data://garden/climate/2024-07-23/sea_ice_index
