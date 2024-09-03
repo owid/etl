@@ -21,8 +21,10 @@ def create_yearly_table(tb: Table) -> Table:
 
     tb_yearly = tb_yearly[tb_yearly["year"] == tb_yearly["year"].max()].reset_index(drop=True)
 
+    # NOTE: Ideally, we would rename these entities that appear in the legend. However, there seems to be a bug (somewhere between ETL and grapher), that causes "selectedEntityColors" to be lower case, removing spaces, making them different to "selectedEntityNames".
+    # Therefore, for now, I will use names that are not affected by the bug.
     # tb_yearly["country"] = tb_yearly["location"] + " " + tb_yearly["year"].astype("string")
-    tb_yearly["country"] = tb_yearly["location"].str.lower() + tb_yearly["year"].astype("string")
+    tb_yearly["country"] = tb_yearly["location"].str.lower() + ":" + tb_yearly["year"].astype("string")
     tb_yearly = tb_yearly.drop(columns=["decade", "year", "location"], errors="raise").rename(
         columns={"month": "year"}, errors="raise"
     )
@@ -40,7 +42,7 @@ def create_decadal_table(tb: Table) -> Table:
     )
 
     # tb_decadal["country"] = tb_decadal["location"] + " " + tb_decadal["decade"].astype("string") + "s"
-    tb_decadal["country"] = tb_decadal["location"].str.lower() + tb_decadal["decade"].astype("string") + "s"
+    tb_decadal["country"] = tb_decadal["location"].str.lower() + ":" + tb_decadal["decade"].astype("string") + "s"
     tb_decadal = tb_decadal.drop(columns=["decade", "location"], errors="raise").rename(
         columns={"month": "year"}, errors="raise"
     )
@@ -52,12 +54,14 @@ def improve_metadata(tb: Table) -> Table:
     tb = tb.copy()
 
     # Main title (which will be used for the indicator, the table, and the dataset).
-    title = "Monthly sea ice extent"
-    description_short_yearly = "Mean sea ice extent for each month. For example, June 2010 represents the sea ice extent averaged over all days in June 2010."
+    title = "Monthly sea ice extent in the northern and southern hemispheres"
+    description_short_yearly = "Each point represents the sea ice extent, averaged over all days in the month, then averaged across all years in the decade. The current decade is highlighted in red, with the current year shown in black for comparison. Sea ice peaks around February in the north and September in the south."
+    footnote = "The horizontal axis shows months from January (1) to December (12). All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current decade."
 
     colors = {}
-    columns = sorted(set(tb["country"]), reverse=False)
-    for column in columns:
+    columns = sorted(set(tb["country"]))
+    years = [int(re.findall(r"\d{4}", column)[0]) for column in columns]
+    for year, column in zip(years, columns):
         year = int(re.findall(r"\d{4}", column)[0])
         if 1980 <= year < 1990:
             # Light blue.
@@ -71,7 +75,7 @@ def improve_metadata(tb: Table) -> Table:
         elif 2010 <= year < 2020:
             # Darker blue.
             color = "#3366FF"
-        elif year == int(tb["country"].max()[-4:]):
+        elif year == max(years):
             # Black.
             color = "#000000"
         else:
@@ -91,6 +95,11 @@ def improve_metadata(tb: Table) -> Table:
     tb[column].metadata.presentation.grapher_config = {
         "selectedEntityNames": columns,
         "selectedEntityColors": colors,
+        "originUrl": "https://ourworldindata.org/climate-change",
+        "note": footnote,
+        "hideAnnotationFieldsInTitle": {"time": True},
+        "entityType": "location and year",
+        "entityTypePlural": "locations and years",
     }
 
     return tb
@@ -150,9 +159,9 @@ def run(dest_dir: str) -> None:
     #
     # Rename locations conveniently.
     tb = tb.astype({"location": "string"})
-    tb.loc[tb["location"] == "Northern Hemisphere", "location"] = "Arctic"
-    tb.loc[tb["location"] == "Southern Hemisphere", "location"] = "Antarctic"
-    assert set(tb["location"]) == {"Antarctic", "Arctic"}, "Unexpected locations."
+    tb.loc[tb["location"] == "Northern Hemisphere", "location"] = "North"
+    tb.loc[tb["location"] == "Southern Hemisphere", "location"] = "South"
+    assert set(tb["location"]) == {"North", "South"}, "Unexpected locations."
 
     # Create columns for month, year, and decade.
     tb["year"] = tb["date"].dt.year
