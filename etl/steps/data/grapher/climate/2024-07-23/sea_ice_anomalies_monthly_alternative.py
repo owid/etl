@@ -14,14 +14,12 @@ paths = PathFinder(__file__)
 # This is chosen because the minimum year informed is 1978 (with only 2 months informed).
 # NOTE: We could include 1979. But, for consistency between yearly and decadal data, we ignore this year.
 YEAR_MIN = 1980
-# TODO: Describe.
-USE_DECADAL_DATA_PRIOR_TO_YEAR = 2020
 
 
 def create_yearly_table(tb: Table) -> Table:
     tb_yearly = tb.copy()
 
-    tb_yearly = tb_yearly[tb_yearly["year"] >= USE_DECADAL_DATA_PRIOR_TO_YEAR].reset_index(drop=True)
+    tb_yearly = tb_yearly[tb_yearly["year"] == tb_yearly["year"].max()].reset_index(drop=True)
 
     # tb_yearly["country"] = tb_yearly["location"] + " " + tb_yearly["year"].astype("string")
     tb_yearly["country"] = tb_yearly["location"].str.lower() + tb_yearly["year"].astype("string")
@@ -34,8 +32,6 @@ def create_yearly_table(tb: Table) -> Table:
 
 def create_decadal_table(tb: Table) -> Table:
     tb_decadal = tb.copy()
-
-    tb_decadal = tb_decadal[tb_decadal["year"] < USE_DECADAL_DATA_PRIOR_TO_YEAR].reset_index(drop=True)
 
     # Calculate the sea ice extent of each month, averaged over the same 10 months of each decade.
     # For example, January 1990 will be the average sea ice extent of the 10 months of January between 1990 and 1999.
@@ -72,7 +68,7 @@ def improve_metadata(tb: Table) -> Table:
         elif 2000 <= year < 2010:
             # Medium blue.
             color = "#6699FF"
-        elif 2010 <= year < USE_DECADAL_DATA_PRIOR_TO_YEAR:
+        elif 2010 <= year < 2020:
             # Darker blue.
             color = "#3366FF"
         elif year == int(tb["country"].max()[-4:]):
