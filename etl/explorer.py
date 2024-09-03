@@ -98,7 +98,7 @@ class Explorer:
         self.content_raw = None
 
     @classmethod
-    def from_content(
+    def from_raw_string(
         cls,
         content: Optional[str] = None,
         sep: str = ",",
@@ -145,7 +145,7 @@ class Explorer:
             df_graphers = cls._parse_df_graphers(df)
 
             # Columns
-            if "columns" in df[df.columns[0]]:
+            if "columns" in set(df[df.columns[0]].unique()):
                 df_columns = cls._parse_df_columns(df)
             else:
                 df_columns = None
@@ -180,7 +180,7 @@ class Explorer:
                 sep = ","
             else:
                 sep = "\t"
-            return cls.from_content(content, sep=sep, name=name)
+            return cls.from_raw_string(content, sep=sep, name=name)
         else:
             raise ValueError(f"Unknown path '{path}'!")
 
@@ -272,7 +272,7 @@ class Explorer:
 
         if df[df.columns[0]].isna().all():
             if (df.columns[0] == "graphers") | (df.columns[-1] == "graphers"):
-                df[df.columns[0]] = "graphers"
+                df[df.columns[0]] = df[df.columns[0]].fillna("graphers")
         else:
             name_fillna = {"columns", "graphers"} - set(df[df.columns[0]])
             assert len(name_fillna) >= 1
@@ -367,13 +367,12 @@ class Explorer:
         # 1/ CONFIG (and comments)
         # Pre-process special fields
         conf = copy(self.config)
-        # conf["selection"] = "\t".join(self.config["selection"])
         # Convert to dataframe df_config
         df_config = pd.DataFrame.from_dict([conf]).T.reset_index()
         df_config.columns = [0, 1]
-        df_config = self._add_top_empty_row(df_config)
+        df_config = self._add_empty_row(df_config)
         # True, False -> 'true', 'false'
-        df_config[1] = df_config[1].replace({False: "false", True: "true"})
+        df_config[1] = df_config[1].apply(lambda x: str(x).lower() if str(x) in {"False", "True"} else x)
         dfs.append(df_config)
 
         # 2/ GRAPHERS
@@ -385,6 +384,7 @@ class Explorer:
         if len(self.df_columns) > 0:
             df_columns = self._df_columns_to_content(self.df_columns)
             df_columns = self._adapt_df_nested(df_columns, "columns")
+            df_columns = self._add_empty_row(df_columns, "top")
             dfs.append(df_columns)
 
         # Combine
@@ -407,6 +407,8 @@ class Explorer:
     def content(self) -> str:
         """Based on modified config, graphers and column, build the raw content text."""
         content = self.df.to_csv(sep="\t", index=False, header=False)
+        content = [c.rstrip() for c in content.splitlines()]
+        content = "\n".join(content)
         return content
 
     def _df_graphers_to_content(self, df: pd.DataFrame):
@@ -478,8 +480,8 @@ class Explorer:
         df = pd.concat([headers, df], ignore_index=True)
         df.columns = range(1, df.shape[1] + 1)
 
-        # Add empty row
-        df = self._add_top_empty_row(df)
+        # Add empty row at the top
+        df = self._add_empty_row(df, "top")
 
         # Add top-level property name
         df[0] = keyword
@@ -491,9 +493,15 @@ class Explorer:
         return df
 
     @staticmethod
-    def _add_top_empty_row(df: pd.DataFrame):
+    def _add_empty_row(df: pd.DataFrame, where: str = "top"):
         empty_row = pd.DataFrame([[np.nan] * len(df.columns)], columns=df.columns)
-        df = pd.concat([empty_row, df], ignore_index=True)
+        if where == "top":
+            dfs = [empty_row, df]
+        elif where == "bottom":
+            dfs = [df, empty_row]
+        else:
+            raise ValueError("`where` should be 'top' or 'bottom'.")
+        df = pd.concat(dfs, ignore_index=True)
         return df
 
     @staticmethod
