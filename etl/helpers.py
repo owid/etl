@@ -1108,7 +1108,7 @@ def create_dag_archive_file(dag_file_archive: Path) -> None:
         file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")
 
 
-def create_explorer(
+def create_explorer_old(
     dest_dir: Union[str, Path],
     config: Dict[str, Any],
     df_graphers: pd.DataFrame,
@@ -1132,7 +1132,7 @@ def create_explorer(
     return explorer
 
 
-def create_explorer2(
+def create_explorer(
     dest_dir: Union[str, Path],
     config: Dict[str, Any],
     df_graphers: pd.DataFrame,
