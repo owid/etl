@@ -69,21 +69,34 @@ def create_decadal_table(tb: Table) -> Table:
 def improve_metadata(tb: Table) -> Table:
     tb = tb.copy()
 
+    # Table title (which will also become the dataset title).
     tb.metadata.title = "Monthly sea ice extent"
+
+    description_short_yearly = "Mean sea ice extent for each month. For example, June 2010 represents the sea ice extent averaged over all days in June 2010."
+    description_short_decadal = "Average of monthly means over the decade. For example, June 2010 represents the mean sea ice extent for June — calculated as the average over all days in the month — averaged across all Junes from 2010 to 2019."
     for column in tb.drop(columns=["country", "year"]).columns:
         year = int(re.findall(r"\d{4}", column)[0])
         title = column.replace("_", " ").capitalize()
         if 1980 <= year < 1990:
-            color = "#E9F2FF"  # 1970s: Very light blue
+            # Very light blue.
+            color = "#E9F2FF"
         elif 1990 <= year < 2000:
-            color = "#CCE0FF"  # 1980s: Light blue
+            # Light blue.
+            color = "#CCE0FF"
         elif 2000 <= year < 2010:
-            color = "#99C2FF"  # 1990s: Medium blue
+            # Medium blue.
+            color = "#99C2FF"
         elif 2010 <= year < 2020:
-            color = "#66A3FF"  # 2000s: Darker blue
-        else:  # From 2020 onwards, use dark red.
+            # Darker blue.
+            color = "#66A3FF"
+        else:
+            # Dark red.
             color = "#8E0F0F"
         tb[column].metadata.title = title
+        if f"{year}s" in column:
+            tb[column].metadata.description_short = description_short_decadal
+        else:
+            tb[column].metadata.description_short = description_short_yearly
         tb[column].metadata.display = {"name": str(year), "color": color}
         tb[column].metadata.presentation.title_public = title
 
@@ -151,7 +164,6 @@ def run(dest_dir: str) -> None:
     # For visualization purposes, create one indicator for each year.
     # Each indicator will have "location" as the "entity" column, and one time stamp for each month in the "time" column.
     # TODO: Alternatively, consider creating only one indicator for arctic ocean, and another for antarctica, where the "entity" column is the year, and the "time" column is the month.
-    # TODO: Add descriptions (short description, and processing description to explain averages).
 
     # Create columns for month, year, and decade.
     tb["year"] = tb["date"].dt.year
@@ -167,12 +179,11 @@ def run(dest_dir: str) -> None:
     # Create decadal table.
     tb_decadal = create_decadal_table(tb=tb)
 
-    # Improve metadata.
-    tb_yearly = improve_metadata(tb=tb_yearly)
-    tb_decadal = improve_metadata(tb=tb_decadal)
-
     # Combine both tables.
     tb_combined = tb_yearly.merge(tb_decadal, on=["country", "year"], how="outer")
+
+    # Improve metadata.
+    tb_combined = improve_metadata(tb=tb_combined)
 
     # Improve format.
     tb_combined = tb_combined.format()
