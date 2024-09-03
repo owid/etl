@@ -3,7 +3,7 @@
 import pandas as pd
 import yaml
 
-from etl.helpers import PathFinder, create_explorer2
+from etl.helpers import PathFinder, create_explorer
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -150,7 +150,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new explorers dataset and tsv file.
-    ds_explorer = create_explorer2(dest_dir=dest_dir, config=header, df_graphers=df_grapher)
+    ds_explorer = create_explorer(dest_dir=dest_dir, config=header, df_graphers=df_grapher)
     ds_explorer.save()
 
 
