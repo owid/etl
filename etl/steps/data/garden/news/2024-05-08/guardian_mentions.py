@@ -88,7 +88,7 @@ def run(dest_dir: str) -> None:
         columns={col: f"{col}_10y_avg" for col in tb_10y_avg.columns if col not in COLUMN_INDEX}
     )
     columns_indicators = [col for col in tb_10y_avg.columns if col not in COLUMN_INDEX]
-    tb_10y_avg = tb_10y_avg.groupby("country")[columns_indicators].mean().reset_index()
+    tb_10y_avg = tb_10y_avg.groupby("country", observed=False)[columns_indicators].mean().reset_index()
     tb_10y_avg["year"] = YEAR_DEC_MAX
 
     # Estimate log(10-year average)
