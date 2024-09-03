@@ -42,7 +42,6 @@ def run(dest_dir: str) -> None:
 
     # Add table of processed data to the new dataset.
     # add tables to dataset
-    clean_source_map = load_clean_source_mapping()
 
     all_tables = []
 
@@ -57,7 +56,8 @@ def run(dest_dir: str) -> None:
         # meta = tb.metadata
 
         tb = create_table(tb)
-        tb["source_producer"] = clean_source_name(tb["source"], clean_source_map)
+        tb["source_producer"] = clean_source_name(tb["source"], load_clean_source_mapping())
+        tb["attribution_short"] = add_short_source_name(tb["source"], load_short_source_mapping())
 
         tb_var_gr = tb.groupby("variable_name")
 
@@ -97,6 +97,17 @@ def clean_source_name(raw_source: pd.Series, clean_source_map: Dict[str, str]) -
         clean_source = clean_source_map[source_name]
 
     return clean_source
+
+
+def add_short_source_name(raw_source: pd.Series, short_source_map: Dict[str, str]) -> str:
+    if len(raw_source.drop_duplicates()) > 1:
+        short_source = "Data from multiple sources compiled by the UN"
+    else:
+        source_name = raw_source.drop_duplicates().iloc[0].strip()
+        assert source_name in short_source_map, f"{repr(source_name)} not in un_sdg.sources_short.json - please add"
+        short_source = short_source_map[source_name]
+
+    return short_source
 
 
 def load_source_description() -> dict:
@@ -153,7 +164,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
         date_accessed=DATE_ACCESSED,
         url_main="https://unstats.un.org/sdgs/dataportal",
         url_download="https://unstats.un.org/sdgapi",
-        attribution_short="UN DESA",
+        attribution_short=tb["attribution_short"].iloc[0],
         license=License(name="© 2024 United Nations", url="https://www.un.org/en/about-us/terms-of-use"),
     )
 
@@ -234,6 +245,15 @@ def load_clean_source_mapping() -> Dict[str, str]:
     Load the existing json which maps the raw sources to a cleaner version of the sources.
     """
     with open(paths.directory / "un_sdg.sources.json", "r") as f:
+        sources = json.load(f)
+        return cast(Dict[str, str], sources)
+
+
+def load_short_source_mapping() -> Dict[str, str]:
+    """
+    Load the existing json which maps the raw sources to a cleaner version of the sources.
+    """
+    with open(paths.directory / "un_sdg.sources_short.json", "r") as f:
         sources = json.load(f)
         return cast(Dict[str, str], sources)
 
