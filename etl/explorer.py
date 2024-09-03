@@ -8,7 +8,7 @@ TODO:
 from copy import copy
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -52,21 +52,73 @@ class Explorer:
     ```
     """
 
-    def __init__(self, content: Optional[str] = None, sep: str = ","):
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        config: Optional[Dict[str, Any]] = None,
+        df_graphers: Optional[pd.DataFrame] = None,
+        df_columns: Optional[pd.DataFrame] = None,
+        comments: Optional[List[str]] = None,
+    ):
+        """Build Explorer object from `content`.
+
+        `content` is the raw text from the explorer config file.
+        `sep`: is the delimiter in the config file. ',' for CSV, '\t' for TSV.
+        """
+        if name is None:
+            log.warning("`name` not set. Using 'unknown_name'.")
+            name = "unknown_name"
+
+        # Configuration of the explorer (defined at the beginning of the file).
+        if config is None:
+            config = {
+                "explorerTitle": name,
+                "isPublished": "false",
+            }
+        # Graphers table of the explorer.
+        if df_graphers is None:
+            df_graphers = pd.DataFrame([], columns=["yVariableIds"])
+        # Columns table of the explorer.
+        if df_columns is None:
+            df_columns = pd.DataFrame([], columns=["variableId"])
+        # Comments at the beginning of the explorer file.
+        if comments is None:
+            comments = []
+
+        self.config = config
+        self.df_graphers = df_graphers
+        self.df_columns = df_columns
+        self.comments = comments
+
+        # Others
+        self.name = name
+
+        # Path
+        self.path = None
+        self.content_raw = None
+
+    @classmethod
+    def from_content(
+        cls,
+        content: Optional[str] = None,
+        sep: str = ",",
+        name: Optional[str] = None,
+    ):
         """Build Explorer object from `content`.
 
         `content` is the raw text from the explorer config file.
         `sep`: is the delimiter in the config file. ',' for CSV, '\t' for TSV.
         """
         # Comments at the beginning of the explorer file.
-        self.comments = []
-        self.path = None
+        comments = []
+
         if content is None:
             log.info("Initializing a new explorer file from scratch.")
-            self.create_empty_fields()
+
+            explorer = cls(name=name)
         else:
             # Text content of an explorer file. (this is given by the user)
-            self.content_raw = content
+            content_raw = content
 
             # Split content in lines
             content = content.splitlines()
@@ -77,44 +129,45 @@ class Explorer:
                 if line[:8] in {"columns", "graphers"}:
                     break
                 elif line.startswith("#"):
-                    self.comments.append(line)
+                    comments.append(line)
                 else:
                     config_raw.append(line)
 
             # Config
-            self.config = self._parse_config(config_raw, sep)
+            config = cls._parse_config(config_raw, sep)
 
             # Read graphers (and columns) as dataframe
             csv_data = StringIO("\n".join(content[line_nr:]))
             df = pd.read_csv(csv_data, sep=sep, skiprows=0)
-            df = self._process_df(df, sep)
+            df = cls._process_df(df, sep)
 
             # Graphers
-            self.df_graphers = self._parse_df_graphers(df)
+            df_graphers = cls._parse_df_graphers(df)
 
             # Columns
-            self.df_columns = self._parse_df_columns(df)
+            if "columns" in df[df.columns[0]]:
+                df_columns = cls._parse_df_columns(df)
+            else:
+                df_columns = None
 
-    def create_empty_fields(self):
-        """Create empty object if no content is provided.
+            explorer = cls(
+                name=name,
+                config=config,
+                df_graphers=df_graphers,
+                df_columns=df_columns,
+                comments=comments,
+            )
 
-        This can be useful when explorer config is created on the fly.
-        """
-        # Initialize all required internal attributes.
-        # Text content of an explorer file.
-        self.content_raw = ""
-        # Configuration of the explorer (defined at the beginning of the file).
-        self.config = {
-            "explorerTitle": self.name,
-            "isPublished": "false",
-        }
-        # Graphers table of the explorer.
-        self.df_graphers = pd.DataFrame([], columns=["yVariableIds"])
-        # Columns table of the explorer.
-        self.df_columns = pd.DataFrame([], columns=["variableId"])
+            explorer.content_raw = content_raw
+
+        return explorer
 
     @classmethod
-    def from_file(cls, path: str) -> "Explorer":
+    def from_file(
+        cls,
+        path: str,
+        name: Optional[str] = None,
+    ) -> "Explorer":
         """Load explorer config from a given path (tsv or csv)."""
 
         if not (path.endswith("csv") or path.endswith("tsv")):
@@ -127,7 +180,7 @@ class Explorer:
                 sep = ","
             else:
                 sep = "\t"
-            return cls(content, sep=sep)
+            return cls.from_content(content, sep=sep, name=name)
         else:
             raise ValueError(f"Unknown path '{path}'!")
 
@@ -137,32 +190,40 @@ class Explorer:
 
         NOTE: owid-content should be at the same level as etl.
         """
-        name = name
         path = (Path(EXPLORERS_DIR) / name).with_suffix(".explorer.tsv")
 
         # Build explorer from file
-        explorer = cls.from_file(path)
+        explorer = cls.from_file(str(path), name=name)
 
         # Save path to use when exporting?
         explorer.path = path
 
         return explorer
 
-    def to_owid_content(self):
-        self.path.
+    def export(self, path: Union[str, Path]):
+        """Export file."""
+        path = Path(path)
+        # Write parsed content to file.
+        path.write_text(self.content)
 
-    def save(self, path: Optional[Union[str, Path]] = None) -> None:
+    def to_owid_content(self, path: Optional[Union[str, Path]] = None):
+        """Save your config in owid-content and push to server if applicable.
+
+        This is useful when working with config files from the owid-content repository.
+        """
         if path is None:
             path = self.path
 
-        path = Path(path)
-
-        # Write parsed content to file.
-        path.write_text(self.content)
+        # Export content to path
+        self.export(path)
 
         # Upload it to staging server.
         if config.STAGING:
             upload_file_to_server(path, f"owid@{config.DB_HOST}:~/owid-content/explorers/")
+
+    def save(self, path: Optional[Union[str, Path]] = None) -> None:
+        """See docs for `to_owid_content`."""
+        self.to_owid_content(path)
 
     @staticmethod
     def _parse_config(config_raw, sep) -> Dict[str, Any]:
@@ -208,18 +269,24 @@ class Explorer:
 
         # Categorize columns vs graphers
         df[df.columns[0]] = df[df.columns[0]].ffill()
-        name_fillna = {"columns", "graphers"} - set(df[df.columns[0]])
-        assert len(name_fillna) >= 1
-        df[df.columns[0]] = df[df.columns[0]].fillna(name_fillna.pop())
+
+        if df[df.columns[0]].isna().all():
+            if (df.columns[0] == "graphers") | (df.columns[-1] == "graphers"):
+                df[df.columns[0]] = "graphers"
+        else:
+            name_fillna = {"columns", "graphers"} - set(df[df.columns[0]])
+            assert len(name_fillna) >= 1
+            df[df.columns[0]] = df[df.columns[0]].fillna(name_fillna.pop())
 
         return df
 
-    def _parse_df_graphers(self, df: pd.DataFrame) -> pd.DataFrame:
+    @classmethod
+    def _parse_df_graphers(cls, df: pd.DataFrame) -> pd.DataFrame:
         # Get raw graphers
-        df = self._get_df_nested(df, "graphers")
+        df = cls._get_df_nested(df, "graphers")
 
         # Boolean types
-        df = self._process_df_common(df)
+        df = cls._process_df_common(df)
 
         # Convert "yVariableIds" into a list of integers, or strings (if they are catalog paths).
         if "yVariableIds" in df.columns:
@@ -230,8 +297,9 @@ class Explorer:
 
         return df
 
-    def _parse_df_columns(self, df: pd.DataFrame) -> pd.DataFrame:
-        df = self._get_df_nested(df, "columns")
+    @classmethod
+    def _parse_df_columns(cls, df: pd.DataFrame) -> pd.DataFrame:
+        df = cls._get_df_nested(df, "columns")
 
         def _parse_color_numeric(value):
             if isinstance(value, str):
@@ -250,7 +318,7 @@ class Explorer:
             return value
 
         # Boolean types
-        df = self._process_df_common(df)
+        df = cls._process_df_common(df)
 
         # Convert string variable ids to integers.
         if "variableId" in df.columns:
@@ -289,36 +357,50 @@ class Explorer:
 
     @property
     def df(self):
+        dfs = []
+
+        # 0/ COMMENTS
+        if self.comments != []:
+            df_comments = pd.DataFrame(self.comments, columns=[0])
+            dfs.append(df_comments)
+
         # 1/ CONFIG (and comments)
         # Pre-process special fields
         conf = copy(self.config)
-        conf["selection"] = "\t".join(self.config["selection"])
+        # conf["selection"] = "\t".join(self.config["selection"])
         # Convert to dataframe df_config
         df_config = pd.DataFrame.from_dict([conf]).T.reset_index()
         df_config.columns = [0, 1]
         df_config = self._add_top_empty_row(df_config)
-        if self.comments != []:
-            df_comments = pd.DataFrame(self.comments, columns=[0])
-            df_config = pd.concat([df_comments, df_config], ignore_index=True)
         # True, False -> 'true', 'false'
         df_config[1] = df_config[1].replace({False: "false", True: "true"})
+        dfs.append(df_config)
 
         # 2/ GRAPHERS
         df_graphers = self._df_graphers_to_content(self.df_graphers)
         df_graphers = self._adapt_df_nested(df_graphers, "graphers")
-        # 3/ COLUMNS
-        df_columns = self._df_columns_to_content(self.df_columns)
-        df_columns = self._adapt_df_nested(df_columns, "columns")
+        dfs.append(df_graphers)
+
+        # 3/ COLUMNS (only if there's any!)
+        if len(self.df_columns) > 0:
+            df_columns = self._df_columns_to_content(self.df_columns)
+            df_columns = self._adapt_df_nested(df_columns, "columns")
+            dfs.append(df_columns)
 
         # Combine
         df = pd.concat(
-            [
-                df_config,
-                df_graphers,
-                df_columns,
-            ],
+            dfs,
             ignore_index=True,
         )
+
+        # Fix config.selection (should be tabbed!)
+        selections = df.loc[df[0] == "selection", 1].item()
+        for i, selection in enumerate(selections):
+            if i + 1 > df.shape[1] - 1:
+                # Add column
+                df[i + 1] = ""
+            df.loc[df[0] == "selection", i + 1] = selection
+
         return df
 
     @property
