@@ -15,6 +15,9 @@ git add .
 git commit -m ":robot: update: monkeypox" || true
 git push origin master -q || true
 
+echo '--- Commit dataset to https://github.com/owid/monkeypox'
+MONKEYPOX_COMMIT=1 poetry run etlr github/who/latest/monkeypox --export
+
 end_time=$(date +%s)
 
 echo "--- Done! ($(($end_time - $start_time))s)"

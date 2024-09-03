@@ -93,7 +93,7 @@ for ind_code in t.columns:
     meta.title = ind.loc[ind_code]
     short_unit = ind_unit_code[ind_code]
     meta.short_unit = short_unit if not pd.isnull(short_unit) else None
-    meta.unit = ind_unit_name[ind_code]
+    meta.unit = ind_unit_name[ind_code] if not pd.isnull(ind_unit_name[ind_code]) else None
 
 t.head()
 
@@ -111,7 +111,7 @@ for col in t.columns:
     assert t[col].metadata.short_name
     assert t[col].metadata.title
     assert t[col].metadata.short_unit or col == "unem_ra"
-    assert t[col].metadata.unit
+    assert t[col].metadata.unit or col == "unem_ra"
 
 # ## Save the dataset
 
