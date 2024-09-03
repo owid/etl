@@ -48,12 +48,14 @@ def cli(dry_run: bool) -> None:
             if "Unknown MySQL server host" in str(e):
                 log.warning("scan-chart-diff.unknown-host", pr=pr)
                 continue
+            # PRs with schema migrations
             if "Unknown database" in str(e):
                 log.warning("scan-chart-diff.unknown-database", pr=pr)
                 continue
             if "Unknown column" in str(e):
                 log.warning("scan-chart-diff.unknown-column", pr=pr)
                 continue
+            # Server is likely not ready yet
             if "Can't connect to MySQL server" in str(e):
                 log.warning("scan-chart-diff.cant-connect", pr=pr)
                 continue

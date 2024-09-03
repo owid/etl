@@ -139,8 +139,8 @@ class ChartDiff:
         If slug of the chart miss-matches between target and source sessions, an error is displayed.
         """
         if self.target_chart:
-            assert self.source_chart.config["slug"] == self.target_chart.config["slug"], "Slug mismatch!"
-        return self.source_chart.config.get("slug", "no-slug")
+            assert self.source_chart.slug == self.target_chart.slug, "Slug mismatch!"
+        return self.source_chart.slug or "no-slug"
 
     @property
     def in_conflict(self) -> bool:
@@ -470,6 +470,8 @@ class ChartDiffsLoader:
         metadata: bool = False,
         sync: bool = False,
         chart_ids: Optional[List[int]] = None,
+        source_session: Optional[Session] = None,
+        target_session: Optional[Session] = None,
     ) -> List[ChartDiff]:
         """Optimised version of get_diffs."""
         if chart_ids:
@@ -479,8 +481,11 @@ class ChartDiffsLoader:
         # Get ids of charts with relevant changes
         df_charts = self.get_charts_df(config, data, metadata)
 
-        with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
+        if source_session and target_session:
             chart_diffs = ChartDiff.from_charts_df(df_charts, source_session, target_session)
+        else:
+            with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
+                chart_diffs = ChartDiff.from_charts_df(df_charts, source_session, target_session)
 
         self._diffs = chart_diffs
 
@@ -607,11 +612,12 @@ def _modified_chart_configs_by_admin(
     base_q = """
     select
         c.id as chartId,
-        MD5(c.config) as chartChecksum,
+        MD5(cc.full) as chartChecksum,
         c.lastEditedByUserId as chartLastEditedByUserId,
         c.publishedByUserId as chartPublishedByUserId,
         c.lastEditedAt as chartLastEditedAt
     from charts as c
+    join chart_configs as cc on c.configId = cc.id
     where
     """
     # NOTE: We assume that all changes on staging server are done by Admin user with ID = 1. This is
