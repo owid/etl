@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, List, Literal, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 
@@ -12,6 +12,7 @@ def update_metadata_from_yaml(
     tb: Table,
     path: Union[Path, str],
     table_name: str,
+    yaml_params: Optional[Dict[str, Any]] = None,
     extra_variables: Literal["raise", "ignore"] = "raise",
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
 ) -> None:
@@ -29,11 +30,13 @@ def update_metadata_from_yaml(
     :param path: Path to YAML file.
     :param table_name: Name of table, also updates this in the metadata.
     """
-    # load YAML file as dictionary, add parameters from dataset metadata
+    # Add parameters from dataset metadata
+    params = DatasetMeta._params_yaml(tb.metadata.dataset or DatasetMeta())
+    params.update(yaml_params or {})
+
+    # load YAML file as dictionary
     # TODO: tb.metadata.dataset reference shouldn't exist
-    annot = dynamic_yaml_to_dict(
-        dynamic_yaml_load(path, DatasetMeta._params_yaml(tb.metadata.dataset or DatasetMeta()))
-    )
+    annot = dynamic_yaml_to_dict(dynamic_yaml_load(path, params))
 
     tb.metadata.short_name = table_name
 

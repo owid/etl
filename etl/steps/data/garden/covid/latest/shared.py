@@ -9,6 +9,10 @@ from owid.catalog.processing import concat
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
+# NOTE: date format changed on 2024-09-01
+# DATE_FORMAT = "%Y-%m-%d"
+DATE_FORMAT = "%d/%m/%y"
+
 
 def run(dest_dir: str, paths: PathFinder) -> None:
     #
@@ -58,7 +62,7 @@ def fill_date_gaps(tb: Table) -> Table:
         - Reindexing the dataframe to have all dates for all locations.
     """
     # Ensure date is of type date
-    tb["date"] = pd.to_datetime(tb["date"], format="%Y-%m-%d").astype("datetime64[ns]")
+    tb["date"] = pd.to_datetime(tb["date"], format=DATE_FORMAT).astype("datetime64[ns]")
 
     # Get set of locations
     countries = set(tb["country"])

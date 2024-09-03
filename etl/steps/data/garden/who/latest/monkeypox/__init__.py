@@ -162,6 +162,10 @@ def add_regions(tb: Table) -> Table:
     regions = regions[regions.date < str(datetime.date.today())]
     tb = tb.drop(columns="region")
 
+    # Add iso codes to regions
+    region_to_iso = ds_regions["regions"].reset_index().set_index("name").code
+    regions["iso_code"] = regions.country.map(region_to_iso)
+
     # Concatenate with tb
     return pr.concat([tb, regions])
 

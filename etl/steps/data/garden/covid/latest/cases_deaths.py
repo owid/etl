@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
-from shared import add_last12m_to_metric, add_population_2022, add_regions, fill_date_gaps
+from shared import DATE_FORMAT, add_last12m_to_metric, add_population_2022, add_regions, fill_date_gaps
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -67,7 +67,7 @@ def run(dest_dir: str) -> None:
     tb[["total_cases", "total_deaths"]] = tb.groupby("country")[["total_cases", "total_deaths"]].ffill()  # type: ignore
 
     # Main processing
-    tb["date"] = pd.to_datetime(tb["date"], format="%Y-%m-%d")
+    tb["date"] = pd.to_datetime(tb["date"], format=DATE_FORMAT)
 
     # Remaining processing
     ## Drop rows

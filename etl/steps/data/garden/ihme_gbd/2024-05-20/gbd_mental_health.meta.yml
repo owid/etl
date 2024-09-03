@@ -77,6 +77,8 @@ tables:
           {definitions.value.title}
         unit: |-
           {definitions.value.unit}
+        short_unit: |-
+          {definitions.value.short_unit}
         description_short: |-
           {definitions.value.description_short}
         presentation:

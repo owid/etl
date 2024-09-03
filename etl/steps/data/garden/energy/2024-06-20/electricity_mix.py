@@ -445,6 +445,18 @@ def run(dest_dir: str) -> None:
         .empty
     ), error
     tb_review.loc[tb_review["country"] == "Oceania", affected_columns] = None
+
+    # Coal generation in Ember data is missing.
+    # The reason may be that Switzerland stopped using coal for electricity before year 2000:
+    # https://data.worldbank.org/indicator/EG.ELC.COAL.ZS?locations=CH
+    # Ideally, the data should be zero, instead of missing.
+    error = "Expected missing data for Switzerland coal generation. That may no longer be the case. Remove this code."
+    assert (
+        tb_ember.loc[(tb_ember["country"] == "Switzerland") & (tb_ember["year"] > 1999)]["coal_generation__twh"]
+        .isnull()
+        .all()
+    ), error
+    tb_ember.loc[(tb_ember["country"] == "Switzerland") & (tb_ember["year"] > 1999), "coal_generation__twh"] = 0
     ####################################################################################################################
 
     # Combine both tables, giving priority to Ember data (on overlapping values).
