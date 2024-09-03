@@ -64,23 +64,23 @@ def improve_metadata(tb: Table) -> Table:
     for column in columns:
         year = int(re.findall(r"\d{4}", column)[0])
         if 1980 <= year < 1990:
-            # Very light blue.
-            color = "#E9F2FF"
-        elif 1990 <= year < 2000:
             # Light blue.
-            color = "#CCE0FF"
+            color = "#CCE5FF"
+        elif 1990 <= year < 2000:
+            # Medium light blue.
+            color = "#99CCFF"
         elif 2000 <= year < 2010:
             # Medium blue.
-            color = "#99C2FF"
+            color = "#6699FF"
         elif 2010 <= year < USE_DECADAL_DATA_PRIOR_TO_YEAR:
             # Darker blue.
-            color = "#66A3FF"
+            color = "#3366FF"
         elif year == int(tb["country"].max()[-4:]):
-            # Black:
+            # Black.
             color = "#000000"
         else:
-            # Dark red.
-            color = "#8E0F0F"
+            # Red.
+            color = "#F89B9B"
         colors[column] = color
 
     # Rename table.

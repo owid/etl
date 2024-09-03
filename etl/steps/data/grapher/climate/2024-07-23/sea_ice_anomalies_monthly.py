@@ -74,24 +74,28 @@ def improve_metadata(tb: Table) -> Table:
 
     description_short_yearly = "Mean sea ice extent for each month. For example, June 2010 represents the sea ice extent averaged over all days in June 2010."
     description_short_decadal = "Average of monthly means over the decade. For example, June 2010 represents the mean sea ice extent for June — calculated as the average over all days in the month — averaged across all Junes from 2010 to 2019."
-    for column in tb.drop(columns=["country", "year"]).columns:
-        year = int(re.findall(r"\d{4}", column)[0])
+    columns = tb.drop(columns=["country", "year"]).columns
+    years = [int(re.findall(r"\d{4}", column)[0]) for column in columns]
+    for year, column in zip(years, columns):
         title = column.replace("_", " ").capitalize()
         if 1980 <= year < 1990:
-            # Very light blue.
-            color = "#E9F2FF"
-        elif 1990 <= year < 2000:
             # Light blue.
-            color = "#CCE0FF"
+            color = "#CCE5FF"
+        elif 1990 <= year < 2000:
+            # Medium light blue.
+            color = "#99CCFF"
         elif 2000 <= year < 2010:
             # Medium blue.
-            color = "#99C2FF"
+            color = "#6699FF"
         elif 2010 <= year < 2020:
             # Darker blue.
-            color = "#66A3FF"
+            color = "#3366FF"
+        elif year == max(years):
+            # Black.
+            color = "#000000"
         else:
-            # Dark red.
-            color = "#8E0F0F"
+            # Red.
+            color = "#F89B9B"
         tb[column].metadata.title = title
         if f"{year}s" in column:
             tb[column].metadata.description_short = description_short_decadal
