@@ -98,10 +98,12 @@ def improve_metadata(tb: Table) -> Table:
             color = "#F89B9B"
         tb[column].metadata.title = title
         if f"{year}s" in column:
+            display_name = f"{year}s"
             tb[column].metadata.description_short = description_short_decadal
         else:
+            display_name = str(year)
             tb[column].metadata.description_short = description_short_yearly
-        tb[column].metadata.display = {"name": str(year), "color": color}
+        tb[column].metadata.display = {"name": display_name, "color": color}
         tb[column].metadata.presentation.title_public = title
 
     return tb
@@ -161,13 +163,12 @@ def run(dest_dir: str) -> None:
     #
     # Rename locations conveniently.
     tb = tb.astype({"location": "string"})
-    tb.loc[tb["location"] == "Northern Hemisphere", "location"] = "Arctic Ocean"
-    tb.loc[tb["location"] == "Southern Hemisphere", "location"] = "Antarctica"
-    assert set(tb["location"]) == {"Antarctica", "Arctic Ocean"}, "Unexpected locations."
+    # tb.loc[tb["location"] == "Northern Hemisphere", "location"] = "Arctic Ocean"
+    # tb.loc[tb["location"] == "Southern Hemisphere", "location"] = "Antarctica"
+    # assert set(tb["location"]) == {"Antarctica", "Arctic Ocean"}, "Unexpected locations."
+    assert set(tb["location"]) == {"Northern Hemisphere", "Southern Hemisphere"}, "Unexpected locations."
 
     # For visualization purposes, create one indicator for each year.
-    # Each indicator will have "location" as the "entity" column, and one time stamp for each month in the "time" column.
-    # TODO: Alternatively, consider creating only one indicator for arctic ocean, and another for antarctica, where the "entity" column is the year, and the "time" column is the month.
 
     # Create columns for month, year, and decade.
     tb["year"] = tb["date"].dt.year
