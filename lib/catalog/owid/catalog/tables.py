@@ -303,7 +303,10 @@ class Table(pd.DataFrame):
             metadata = self.metadata.to_dict()  # type: ignore
             metadata["primary_key"] = self.primary_key
             metadata["fields"] = self._get_fields_as_dict()
-            json.dump(metadata, ostream, indent=2, default=str)
+            try:
+                json.dump(metadata, ostream, indent=2, default=str, allow_nan=False)
+            except ValueError as e:
+                raise ValueError(f"metadata contains NaNs:\n{metadata}") from e
 
     @classmethod
     def read_csv(cls, path: Union[str, Path], **kwargs) -> "Table":
@@ -512,6 +515,7 @@ class Table(pd.DataFrame):
         self,
         path: Union[Path, str],
         table_name: str,
+        yaml_params: Optional[Dict[str, Any]] = None,
         extra_variables: Literal["raise", "ignore"] = "raise",
         if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
     ) -> None:
@@ -526,6 +530,7 @@ class Table(pd.DataFrame):
             path=path,
             table_name=table_name,
             extra_variables=extra_variables,
+            yaml_params=yaml_params,
             if_origins_exist=if_origins_exist,
         )
 

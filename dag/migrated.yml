@@ -28,7 +28,3 @@ steps:
     - data://garden/gapminder/2019-05-25/fertility_rate
   data://garden/gapminder/2019-05-25/fertility_rate:
     - snapshot://gapminder/2019-05-25/fertility_rate.feather
-  data://grapher/wb/2017-04-16/world_gdp:
-    - data://garden/wb/2017-04-16/world_gdp
-  data://garden/wb/2017-04-16/world_gdp:
-    - snapshot://wb/2017-04-16/world_gdp.feather
