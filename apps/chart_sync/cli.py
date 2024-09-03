@@ -103,15 +103,18 @@ def cli(
     # adding entries to chart_dimensions. We can't directly update it in MySQL
     target_api: AdminAPI = AdminAPI(target_engine) if not dry_run else None  # type: ignore
 
-    # Get all chart diffs between source and target
-    cd_loader = ChartDiffsLoader(source_engine, target_engine)
-    chart_diffs = cd_loader.get_diffs(config=True, metadata=False, data=False)
-
-    if chart_id:
-        chart_diffs = [cd for cd in chart_diffs if cd.source_chart.id == chart_id]
-
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:
+            # Get all chart diffs between source and target
+            # NOTE: We're creating two paris of sessions here, it'd be nicer to only create a single one
+            cd_loader = ChartDiffsLoader(source_engine, target_engine)
+            chart_diffs = cd_loader.get_diffs(
+                config=True, metadata=False, data=False, source_session=source_session, target_session=target_session
+            )
+
+            if chart_id:
+                chart_diffs = [cd for cd in chart_diffs if cd.source_chart.id == chart_id]
+
             # Get staging server creation time
             SERVER_CREATION_TIME = get_staging_creation_time(source_session)
 
@@ -149,7 +152,7 @@ def cli(
                     continue
 
                 # Map variable IDs from source to target
-                migrated_chart = diff.source_chart.migrate_to_db(source_session, target_session)
+                migrated_config = diff.source_chart.migrate_config(source_session, target_session)
 
                 # Chart in target exists, update it
                 if diff.target_chart:
@@ -168,7 +171,7 @@ def cli(
                         log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
                         charts_synced += 1
                         if not dry_run:
-                            target_api.update_chart(chart_id, migrated_chart.config)
+                            target_api.update_chart(chart_id, migrated_config)
 
                     # Rejected chart diff
                     elif diff.is_rejected:
@@ -196,13 +199,13 @@ def cli(
                     if diff.is_approved:
                         charts_synced += 1
                         if not dry_run:
-                            resp = target_api.create_chart(migrated_chart.config)
+                            resp = target_api.create_chart(migrated_config)
                             target_api.set_tags(resp["chartId"], chart_tags)
                         else:
                             resp = {"chartId": None}
                         log.info(
                             "chart_sync.create_chart",
-                            published=migrated_chart.config.get("isPublished"),
+                            published=migrated_config.get("isPublished"),
                             slug=chart_slug,
                             new_chart_id=resp["chartId"],
                         )

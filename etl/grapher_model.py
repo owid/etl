@@ -14,6 +14,7 @@ Another option is to run `show create table mytable;` in MySQL and then ask Chat
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
 """
 
+import copy
 import json
 import random
 from datetime import date, datetime
@@ -66,7 +67,6 @@ from sqlalchemy.sql import Select
 from typing_extensions import Self, TypedDict
 
 from etl import config, paths
-from etl.config import GRAPHER_USER_ID
 from etl.db import read_sql
 
 log = structlog.get_logger()
@@ -402,7 +402,7 @@ class Chart(Base):
         """
         return read_sql(q, session, params={"chart_id": self.id}).set_index("catalogPath")
 
-    def migrate_to_db(self, source_session: Session, target_session: Session) -> "Chart":
+    def migrate_config(self, source_session: Session, target_session: Session) -> Dict[str, Any]:
         """Remap variable ids from source to target session. Variable in source is uniquely identified
         by its catalogPath if available, or by name and datasetId otherwise. It is looked up
         by this identifier in the target session to get the new variable id.
@@ -438,15 +438,10 @@ class Chart(Base):
             remap_ids[source_var_id] = target_var.id
 
         # copy chart as a new object
-        target_chart = Chart.from_dict(self.dict())
-        del target_chart.id
-        target_chart.config = _remap_variable_ids(target_chart.config, remap_ids)
+        config = copy.deepcopy(self.config)
+        config = _remap_variable_ids(config, remap_ids)
 
-        # set proper GRAPHER_USER_ID
-        assert GRAPHER_USER_ID
-        target_chart.lastEditedByUserId = int(GRAPHER_USER_ID)
-
-        return target_chart
+        return config
 
     def tags(self, session: Session) -> List[Dict[str, Any]]:
         """Return tags in a format suitable for Admin API."""

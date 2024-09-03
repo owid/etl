@@ -470,6 +470,8 @@ class ChartDiffsLoader:
         metadata: bool = False,
         sync: bool = False,
         chart_ids: Optional[List[int]] = None,
+        source_session: Optional[Session] = None,
+        target_session: Optional[Session] = None,
     ) -> List[ChartDiff]:
         """Optimised version of get_diffs."""
         if chart_ids:
@@ -479,8 +481,11 @@ class ChartDiffsLoader:
         # Get ids of charts with relevant changes
         df_charts = self.get_charts_df(config, data, metadata)
 
-        with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
+        if source_session and target_session:
             chart_diffs = ChartDiff.from_charts_df(df_charts, source_session, target_session)
+        else:
+            with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
+                chart_diffs = ChartDiff.from_charts_df(df_charts, source_session, target_session)
 
         self._diffs = chart_diffs
 
