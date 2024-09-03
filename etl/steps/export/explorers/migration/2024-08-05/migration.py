@@ -4,8 +4,8 @@ from pathlib import Path
 import pandas as pd
 from migration_config_dict import ADDITIONAL_DESCRIPTIONS, CONFIG_DICT, MAP_BRACKETS, SORTER  # type: ignore
 
-from etl.explorer_helpers import Explorer
-from etl.helpers import PathFinder, create_explorer
+from etl.explorer import Explorer
+from etl.helpers import PathFinder, create_explorer2
 from etl.paths import EXPLORERS_DIR
 
 # Get paths and naming conventions for current step.
@@ -48,7 +48,7 @@ def run(dest_dir: str) -> None:
     if USE_EXISTING_MAP_BRACKETS:
         expl_path = (Path(EXPLORERS_DIR) / paths.short_name).with_suffix(".explorer.tsv")
         if expl_path.exists():
-            old_explorer = Explorer(paths.short_name)
+            old_explorer = Explorer.from_owid_content(paths.short_name)
             df_columns = old_explorer.df_columns
             for _, row in df_columns.iterrows():
                 var_title = row["slug"]
@@ -140,7 +140,7 @@ def run(dest_dir: str) -> None:
     df_columns["colorScaleEqualSizeBins"] = True
 
     # Save outputs.
-    ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers, df_columns=df_columns)
+    ds_explorer = create_explorer2(dest_dir=dest_dir, config=config, df_graphers=df_graphers, df_columns=df_columns)
     ds_explorer.save()
 
 
