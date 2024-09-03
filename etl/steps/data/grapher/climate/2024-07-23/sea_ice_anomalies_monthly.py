@@ -9,10 +9,17 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Minimum year to consider.
+# This is chosen because the minimum year informed is 1978 (with only 2 months informed).
+# NOTE: We could include 1979. But, for consistency between yearly and decadal data, we ignore this year.
+YEAR_MIN = 1980
+
 
 def create_yearly_table(tb: Table) -> Table:
+    # Ignore the very first years (1978 and 1979), as explained above (where YEAR_MIN is defined).
+    _tb = tb[tb["year"] >= YEAR_MIN].reset_index(drop=True)
     # Create a table with a column for each year.
-    tb_yearly = tb.pivot(
+    tb_yearly = _tb.pivot(
         index=["location", "month"], columns=["year"], values="sea_ice_extent", join_column_levels_with=""
     )
 
@@ -31,8 +38,12 @@ def create_yearly_table(tb: Table) -> Table:
 
 
 def create_decadal_table(tb: Table) -> Table:
-    # Calculate decadal averages.
-    tb_grouped = tb.groupby(["location", "month", "decade"], observed=True, as_index=False).agg(
+    # Ignore the very first decade (1970s), since it contains only 2 years.
+    _tb = tb[tb["year"] >= YEAR_MIN].reset_index(drop=True)
+
+    # Calculate the sea ice extent of each month, averaged over the same 10 months of each decade.
+    # For example, January 1990 will be the average sea ice extent of the 10 months of January between 1990 and 1999.
+    tb_grouped = _tb.groupby(["location", "month", "decade"], observed=True, as_index=False).agg(
         {"sea_ice_extent": "mean"}
     )
 
@@ -62,16 +73,14 @@ def improve_metadata(tb: Table) -> Table:
     for column in tb.drop(columns=["country", "year"]).columns:
         year = int(re.findall(r"\d{4}", column)[0])
         title = column.replace("_", " ").capitalize()
-        if 1970 <= year < 1980:
+        if 1980 <= year < 1990:
             color = "#E9F2FF"  # 1970s: Very light blue
-        elif 1980 <= year < 1990:
-            color = "#CCE0FF"  # 1980s: Light blue
         elif 1990 <= year < 2000:
-            color = "#99C2FF"  # 1990s: Medium blue
+            color = "#CCE0FF"  # 1980s: Light blue
         elif 2000 <= year < 2010:
-            color = "#66A3FF"  # 2000s: Darker blue
+            color = "#99C2FF"  # 1990s: Medium blue
         elif 2010 <= year < 2020:
-            color = "#3385FF"  # 2010s: Even darker blue
+            color = "#66A3FF"  # 2000s: Darker blue
         else:  # From 2020 onwards, use dark red.
             color = "#8E0F0F"
         tb[column].metadata.title = title
@@ -79,6 +88,47 @@ def improve_metadata(tb: Table) -> Table:
         tb[column].metadata.presentation.title_public = title
 
     return tb
+
+
+def sanity_check_inputs(tb: Table) -> None:
+    error = "Expected 1978 to be the first year in the data. Data may have changed. Consider editing YEAR_MIN"
+    assert tb["year"].min() == 1978, error
+
+    # All years should have 12 months except:
+    # * The very first year in the data (1978).
+    # * Years 1987 and 1988, that have 11 months (because 1987-12 and 1988-01 are missing).
+    # * The very last year in the data (since it's the ongoing year).
+    error = "Expected 12 months per year."
+    assert (
+        tb[~tb["year"].isin([tb["year"].min(), 1987, 1988, tb["year"].max()])]
+        .groupby(["location", "year"])
+        .count()["sea_ice_extent"]
+        == 12
+    ).all(), error
+    # Each month-year should appear only once in the data.
+    error = "Repeated months."
+    assert (tb.groupby(["location", "year", "month"]).count()["sea_ice_extent"] == 1).all(), error
+    # Each month-decade should appear 10 times (one per year in the decade), except:
+    # * The very first decade (1970s), since it starts in 1978. This decade will be ignored in the decadal data.
+    # * January and December 1980s, that appear 9 times (because 1987-12 and 1988-01 are missing).
+    # * The very last decade (since it's the ongoing decade).
+    error = "Expected 10 instances of each month per decade (except in specific cases)."
+    exceptions = tb[
+        (tb["decade"] == tb["decade"].min())
+        | (tb["decade"] == tb["decade"].max())
+        | ((tb["decade"] == 1980) & (tb["month"].isin([1, 12])))
+    ].index
+    assert (tb.drop(exceptions).groupby(["location", "decade", "month"]).count()["sea_ice_extent"] == 10).all(), error
+    assert (
+        tb[(tb["decade"] == 1980) & (tb["month"].isin([1, 12]))]
+        .groupby(["location", "decade", "month"])
+        .count()["sea_ice_extent"]
+        == 9
+    ).all(), error
+    assert (
+        tb[(tb["decade"] == tb["decade"].max())].groupby(["location", "decade", "month"]).count()["sea_ice_extent"]
+        <= 10
+    ).all(), error
 
 
 def run(dest_dir: str) -> None:
@@ -103,14 +153,13 @@ def run(dest_dir: str) -> None:
     # TODO: Alternatively, consider creating only one indicator for arctic ocean, and another for antarctica, where the "entity" column is the year, and the "time" column is the month.
     # TODO: Add descriptions (short description, and processing description to explain averages).
 
-    # Create a month and a year columns.
+    # Create columns for month, year, and decade.
     tb["year"] = tb["date"].dt.year
     tb["month"] = tb["date"].dt.month
-    assert (tb.groupby(["location", "year"]).count()["sea_ice_extent"] <= 12).all(), "More than 12 months in a year."
-    assert (tb.groupby(["location", "year", "month"]).count()["sea_ice_extent"] == 1).all(), "Repeated months."
-
-    # Add a column for decade.
     tb["decade"] = (tb["year"] // 10) * 10
+
+    # Sanity checks.
+    sanity_check_inputs(tb=tb)
 
     # Create yearly table.
     tb_yearly = create_yearly_table(tb=tb)
