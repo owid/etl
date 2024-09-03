@@ -27,7 +27,7 @@ import structlog
 from owid import catalog
 from owid.catalog.meta import VARIABLE_TYPE
 from sqlalchemy import (
-    BINARY,
+    CHAR,
     BigInteger,
     Computed,
     Date,
@@ -243,7 +243,7 @@ class ChartConfig(Base):
     __tablename__ = "chart_configs"
     __table_args__ = (Index("idx_chart_configs_slug", "slug"),)
 
-    id: Mapped[bytes] = mapped_column(BINARY(16), primary_key=True)
+    id: Mapped[bytes] = mapped_column(CHAR(36), primary_key=True)
     patch: Mapped[dict] = mapped_column(JSON, nullable=False)
     full: Mapped[dict] = mapped_column(JSON, nullable=False)
     slug: Mapped[Optional[str]] = mapped_column(
@@ -281,7 +281,7 @@ class Chart(Base):
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
-    configId: Mapped[bytes] = mapped_column(BINARY(16))
+    configId: Mapped[bytes] = mapped_column(CHAR(36))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
