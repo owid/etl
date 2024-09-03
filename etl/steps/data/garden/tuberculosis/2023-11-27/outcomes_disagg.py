@@ -72,7 +72,7 @@ def combining_sexes_for_all_age_groups(tb: Table) -> Table:
     msk = tb["age_group"].isin(age_groups_with_both_sexes)
     tb_age = tb[~msk]
     tb_gr = (
-        tb_age.groupby(["country", "year", "age_group", "cohort_type"], dropna=False)[
+        tb_age.groupby(["country", "year", "age_group", "cohort_type"], dropna=False, observed=False)[
             ["coh", "succ", "fail", "died", "lost", "neval"]
         ]
         .sum()
@@ -91,7 +91,7 @@ def add_region_sum_aggregates(tb: Table, ds_regions: Dataset, ds_income_groups: 
     Calculate region aggregates for all for each combination of age-group, sex and risk factor in the dataset.
     """
     # Create the groups we want to aggregate over.
-    tb_gr = tb.groupby(["year", "age_group", "sex", "cohort_type"])
+    tb_gr = tb.groupby(["year", "age_group", "sex", "cohort_type"], observed=False)
     tb_gr_out = Table()
     for gr_name, gr in tb_gr:
         for region in REGIONS_TO_ADD:
