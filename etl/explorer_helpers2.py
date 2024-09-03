@@ -60,7 +60,7 @@ class Explorer:
         """
         # Comments at the beginning of the explorer file.
         self.comments = []
-
+        self.path = None
         if content is None:
             log.info("Initializing a new explorer file from scratch.")
             self.create_empty_fields()
@@ -144,8 +144,25 @@ class Explorer:
         explorer = cls.from_file(path)
 
         # Save path to use when exporting?
+        explorer.path = path
 
         return explorer
+
+    def to_owid_content(self):
+        self.path.
+
+    def save(self, path: Optional[Union[str, Path]] = None) -> None:
+        if path is None:
+            path = self.path
+
+        path = Path(path)
+
+        # Write parsed content to file.
+        path.write_text(self.content)
+
+        # Upload it to staging server.
+        if config.STAGING:
+            upload_file_to_server(path, f"owid@{config.DB_HOST}:~/owid-content/explorers/")
 
     @staticmethod
     def _parse_config(config_raw, sep) -> Dict[str, Any]:
@@ -412,19 +429,6 @@ class Explorer:
 
         return content_has_changed
 
-    def save(self, path: Optional[Union[str, Path]] = None) -> None:
-        if path is None:
-            path = self.path
-
-        path = Path(path)
-
-        # Write parsed content to file.
-        path.write_text(self.content)
-
-        # Upload it to staging server.
-        if config.STAGING:
-            upload_file_to_server(path, f"owid@{config.DB_HOST}:~/owid-content/explorers/")
-
     def get_variable_config(self, variable_id: int) -> Dict[str, Any]:
         variable_config = {}
         # Load configuration for a variable from the explorer columns section, if any.
@@ -449,11 +453,6 @@ class Explorer:
                 # Not sure if this could happen, but raise an error if there are multiple entries for the same variable.
                 log.error(f"Explorer 'columns' table contains multiple rows for variable {catalog_path}")
         return variable_config
-
-    def check(self) -> None:
-        # TODO: Create checks that raise warnings and errors if the explorer has formatting issue.
-        log.warning("Function not yet implemented!")
-        pass
 
     def convert_ids_to_etl_paths(self) -> None:
         # Gather all variable ids from the graphers and columns tables.
