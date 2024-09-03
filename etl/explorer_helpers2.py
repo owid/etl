@@ -1,6 +1,14 @@
+"""
+TODO:
+    - Why float in colorScaleNumericBins
+    - Test without columns
+    - Compare content and content_raw
+    - Test it in Pablo's scripts
+"""
+from copy import copy
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -19,6 +27,29 @@ class Explorer:
     """Explorer object that lets us parse an explorer file, create a new one, modify its content, and write a tsv file.
 
     NOTE: For now, this class is only adapted to indicator-based explorers!
+
+    You can modify four fields of the explorer config:
+
+        - self.comments: List with comments. This should be preceeded by tge '#' sign, and are placed at the top of the explorer config.
+        - self.config: Dictionary with the explorer config parameters. This comes at first, before defining the graphers and columns.
+        - self.df_graphers: Dataframe with the graphers configuration. Each row in the dataframe defines an explorer view.
+        - self.df_columns: Dataframe with the columns configuration. Use this to customize some of the FASTT of the indicators. This is optional.
+
+    Example:
+    --------
+
+    ```py
+    explorer = Explorer.from_file("explorer.tsv")
+
+    # Edit config
+    explorer.config['key'] = ...
+    # Edit comments:
+    explorer.comments.append("# Something")
+    # Edit graphers
+    explorer.df_graphers = ...
+    # Edit columns
+    explorer.df_columns = ...
+    ```
     """
 
     def __init__(self, content: Optional[str] = None, sep: str = ","):
@@ -32,10 +63,10 @@ class Explorer:
 
         if content is None:
             log.info("Initializing a new explorer file from scratch.")
-            self.create_empty()
+            self.create_empty_fields()
         else:
             # Text content of an explorer file. (this is given by the user)
-            self.content = content
+            self.content_raw = content
 
             # Split content in lines
             content = content.splitlines()
@@ -58,13 +89,29 @@ class Explorer:
             df = pd.read_csv(csv_data, sep=sep, skiprows=0)
             df = self._process_df(df, sep)
 
-            # Separate graphers and columns tables
-            df_graphers = self._get_df_nested(df, "graphers")
-            df_columns = self._get_df_nested(df, "columns")
+            # Graphers
+            self.df_graphers = self._parse_df_graphers(df)
 
-            # Process dataframes
-            self.df_graphers = self._upgrade_df_graphers(df_graphers)
-            self.df_columns = self._upgrade_df_columns(df_columns)
+            # Columns
+            self.df_columns = self._parse_df_columns(df)
+
+    def create_empty_fields(self):
+        """Create empty object if no content is provided.
+
+        This can be useful when explorer config is created on the fly.
+        """
+        # Initialize all required internal attributes.
+        # Text content of an explorer file.
+        self.content_raw = ""
+        # Configuration of the explorer (defined at the beginning of the file).
+        self.config = {
+            "explorerTitle": self.name,
+            "isPublished": "false",
+        }
+        # Graphers table of the explorer.
+        self.df_graphers = pd.DataFrame([], columns=["yVariableIds"])
+        # Columns table of the explorer.
+        self.df_columns = pd.DataFrame([], columns=["variableId"])
 
     @classmethod
     def from_file(cls, path: str) -> "Explorer":
@@ -101,7 +148,8 @@ class Explorer:
         return explorer
 
     @staticmethod
-    def _parse_config(config_raw, sep):
+    def _parse_config(config_raw, sep) -> Dict[str, Any]:
+        """Parse the config at the top of the explorer file."""
         config_raw = [c for c in config_raw if c.strip() != ""]
         if sep == ",":
             csv_data = StringIO("\n".join(config_raw))
@@ -113,21 +161,29 @@ class Explorer:
             df_config = df_config.dropna(subset=df_config.columns[1])
 
             assert df_config.shape[1] == 2, "Header of explorer should only have two columns! Please review"
-            config = df_config.set_index(df_config.columns[0]).squeeze().to_dict()
+            conf = df_config.set_index(df_config.columns[0]).squeeze().to_dict()
         elif sep == "\t":
-            config = {
+            conf = {
                 parts[0]: parts[1] if len(parts) > 1 else None for parts in (line.split("\t", 1) for line in config_raw)
             }
         else:
             raise ValueError(f"Unknown separator {sep}")
 
-        if "selection" in config:
-            config["selection"] = config["selection"].split("\t")
-        return config
+        if "selection" in conf:
+            conf["selection"] = conf["selection"].split("\t")
+
+        # 'true' -> True, 'false' -> False
+        bool_mapping = {
+            "true": True,
+            "false": False,
+        }
+        for k in conf.keys():
+            conf[k] = bool_mapping.get(str(conf[k]), conf[k])
+        return conf
 
     @staticmethod
     def _process_df(df: pd.DataFrame, sep: str = "\t"):
-        """Some minor initial formatting of the explorer config content."""
+        """Some minor initial formatting of the explorer graphers (and columns) content."""
         if sep == "\t":
             df = df.reset_index()
         elif sep == ",":
@@ -141,46 +197,10 @@ class Explorer:
 
         return df
 
-    @staticmethod
-    def _get_df_nested(df: pd.DataFrame, keyword: str) -> pd.DataFrame:
-        """Get graphers/columns fields as a clean dataframe."""
-        # Keep relevant rows
-        df = df.loc[df[df.columns[0]].isin([keyword])]
-        # Remove first column, and first row
-        df = df.drop(columns=[df.columns[0]]).dropna(axis=0, how="all").reset_index(drop=True)
-        # Set column headers
-        df, df.columns = df[1:], df.iloc[0]
-        # Remove unnecessary columns
-        df = df.dropna(axis=1, how="all")
-        return df
+    def _parse_df_graphers(self, df: pd.DataFrame) -> pd.DataFrame:
+        # Get raw graphers
+        df = self._get_df_nested(df, "graphers")
 
-    def create_empty(self):
-        """Create empty object if no content is provided.
-
-        This can be useful when explorer config is created on the fly.
-        """
-        # Initialize all required internal attributes.
-        # Text content of an explorer file.
-        self.content = ""
-        # Configuration of the explorer (defined at the beginning of the file).
-        self.config = {
-            "explorerTitle": self.name,
-            "isPublished": "false",
-        }
-        # Graphers table of the explorer.
-        self.df_graphers = pd.DataFrame([], columns=["yVariableIds"])
-        # Columns table of the explorer.
-        self.df_columns = pd.DataFrame([], columns=["variableId"])
-
-    @staticmethod
-    def _process_df_common(df) -> pd.DataFrame:
-        # Boolean types
-        for column in df.columns:
-            if set(df[column]) <= {"false", "true", None}:
-                df[column] = df[column].map({"false": False, "true": True, None: None}).astype(bool)
-        return df
-
-    def _upgrade_df_graphers(self, df: pd.DataFrame) -> pd.DataFrame:
         # Boolean types
         df = self._process_df_common(df)
 
@@ -193,7 +213,9 @@ class Explorer:
 
         return df
 
-    def _upgrade_df_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+    def _parse_df_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        df = self._get_df_nested(df, "columns")
+
         def _parse_color_numeric(value):
             if isinstance(value, str):
                 value = value.split(";")
@@ -227,11 +249,32 @@ class Explorer:
 
         return df
 
+    @staticmethod
+    def _get_df_nested(df: pd.DataFrame, keyword: str) -> pd.DataFrame:
+        """Get graphers/columns fields as clean dataframes."""
+        # Keep relevant rows
+        df = df.loc[df[df.columns[0]].isin([keyword])]
+        # Remove first column, and first row
+        df = df.drop(columns=[df.columns[0]]).dropna(axis=0, how="all").reset_index(drop=True)
+        # Set column headers
+        df, df.columns = df[1:], df.iloc[0]
+        # Remove unnecessary columns
+        df = df.dropna(axis=1, how="all")
+        return df
+
+    @staticmethod
+    def _process_df_common(df) -> pd.DataFrame:
+        # Boolean types
+        for column in df.columns:
+            if set(df[column]) <= {"false", "true", None}:
+                df[column] = df[column].map({"false": False, "true": True, None: None}).astype(bool)
+        return df
+
     @property
-    def generate_df(self):
+    def df(self):
         # 1/ CONFIG (and comments)
         # Pre-process special fields
-        conf = self.config
+        conf = copy(self.config)
         conf["selection"] = "\t".join(self.config["selection"])
         # Convert to dataframe df_config
         df_config = pd.DataFrame.from_dict([conf]).T.reset_index()
@@ -240,13 +283,15 @@ class Explorer:
         if self.comments != []:
             df_comments = pd.DataFrame(self.comments, columns=[0])
             df_config = pd.concat([df_comments, df_config], ignore_index=True)
+        # True, False -> 'true', 'false'
+        df_config[1] = df_config[1].replace({False: "false", True: "true"})
 
         # 2/ GRAPHERS
-        df_graphers = self._adapt_df_nested(self.df_graphers, "graphers")
-        df_graphers = self._downgrade_df_graphers(df_graphers)
+        df_graphers = self._df_graphers_to_content(self.df_graphers)
+        df_graphers = self._adapt_df_nested(df_graphers, "graphers")
         # 3/ COLUMNS
-        df_columns = self._adapt_df_nested(self.df_columns, "columns")
-        df_columns = self._downgrade_df_columns(df_columns)
+        df_columns = self._df_columns_to_content(self.df_columns)
+        df_columns = self._adapt_df_nested(df_columns, "columns")
 
         # Combine
         df = pd.concat(
@@ -259,56 +304,75 @@ class Explorer:
         )
         return df
 
-    def generate_content(self) -> str:
-        content = self.as_df.to_csv(sep="\t", index=False, header=False)
+    @property
+    def content(self) -> str:
+        """Based on modified config, graphers and column, build the raw content text."""
+        content = self.df.to_csv(sep="\t", index=False, header=False)
         return content
 
-    def _downgrade_df_graphers(self, df: pd.DataFrame):
+    def _df_graphers_to_content(self, df: pd.DataFrame):
+        df_ = df.copy()
         # Convert boolean columns to strings of true, false.
-        for column in df.select_dtypes(include="bool").columns:
-            df[column] = df[column].astype(str).str.lower()
+        for column in df_.select_dtypes(include="bool").columns:
+            df_[column] = df_[column].astype(str).str.lower()
 
-        if "yVariableIds" in df.columns:
-            if not all([isinstance(ids, list) for ids in df["yVariableIds"]]):
+        if "yVariableIds" in df_.columns:
+            if not all([isinstance(ids, list) for ids in df_["yVariableIds"]]):
                 raise ValueError(
                     "Each row in 'yVariableIds' (in the graphers dataframe) must contain a list of variable ids (or ETL paths)."
                 )
             # Convert lists of variable ids to strings.
-            df["yVariableIds"] = df["yVariableIds"].apply(lambda x: " ".join(str(variable_id) for variable_id in x))
+            df_["yVariableIds"] = df_["yVariableIds"].apply(lambda x: " ".join(str(variable_id) for variable_id in x))
 
         # For convenience, ensure the first columns are index columns (yVariableIds, variableId and/or catalogPath).
         index_columns = ["yVariableIds"]
-        df = df[
-            [col for col in index_columns if col in df.columns]
-            + [col for col in df.columns if col not in index_columns]
+        df_ = df_[
+            [col for col in index_columns if col in df_.columns]
+            + [col for col in df_.columns if col not in index_columns]
         ]
-        return df
+        return df_
 
-    def _downgrade_df_columns(self, df: pd.DataFrame):
+    def _df_columns_to_content(self, df: pd.DataFrame):
+        df_ = df.copy()
+
+        def _parse_color_numeric(value):
+            if isinstance(value, list):
+                elements = []
+                for v in value:
+                    # value = value.split(";")
+                    # values_new = []
+                    # for v in value:
+                    if isinstance(v, tuple):
+                        assert len(v) == 3, "Tuple must be of length 3!"
+                        elements.append(",".join([str(vv) for vv in v]))
+                    else:
+                        elements.append(str(v))
+                return ";".join(elements)
+            return value
+
         # Convert boolean columns to strings of true, false.
-        for column in df.select_dtypes(include="bool").columns:
-            df[column] = df[column].astype(str).str.lower()
+        for column in df_.select_dtypes(include="bool").columns:
+            df_[column] = df_[column].astype(str).str.lower()
 
-        if "colorScaleNumericBins" in df.columns:
-            # Convert list of brackets into strings separated by ";".
-            df["colorScaleNumericBins"] = [
-                ";".join(map(str, row)) if row else "" for row in df["colorScaleNumericBins"]
-            ]
-        if "variableId" in df.columns:
-            if df["variableId"].isnull().all():
+        # Convert strings of brackets separated by ";" to list of brackets.
+        if "colorScaleNumericBins" in df_.columns:
+            df_["colorScaleNumericBins"] = df_["colorScaleNumericBins"].apply(_parse_color_numeric)
+
+        if "variableId" in df_.columns:
+            if df_["variableId"].isnull().all():
                 # Remove column if it contains only nan.
-                df = df.drop(columns=["variableId"])
+                df_ = df_.drop(columns=["variableId"])
             else:
                 # Otherwise, ensure it's made of integers (and possibly nans).
-                df["variableId"] = df["variableId"].astype("Int64")
+                df_["variableId"] = df_["variableId"].astype("Int64")
 
         # For convenience, ensure the first columns are index columns (yVariableIds, variableId and/or catalogPath).
         index_columns = ["catalogPath", "variableId"]
-        df = df[
-            [col for col in index_columns if col in df.columns]
-            + [col for col in df.columns if col not in index_columns]
+        df_ = df_[
+            [col for col in index_columns if col in df_.columns]
+            + [col for col in df_.columns if col not in index_columns]
         ]
-        return df
+        return df_
 
     def _adapt_df_nested(self, df: pd.DataFrame, keyword: str):
         headers = pd.DataFrame([df.columns.values], columns=df.columns)
@@ -334,43 +398,6 @@ class Explorer:
         return df
 
     @staticmethod
-    def _df_to_lines(df: pd.DataFrame) -> List[str]:
-        df = df.copy()
-
-        if df.empty:
-            return []
-
-        if "colorScaleNumericBins" in df.columns:
-            # Convert list of brackets into strings separated by ";".
-            df["colorScaleNumericBins"] = [
-                ";".join(map(str, row)) if row else "" for row in df["colorScaleNumericBins"]
-            ]
-
-        if "variableId" in df.columns:
-            if df["variableId"].isnull().all():
-                # Remove column if it contains only nan.
-                df = df.drop(columns=["variableId"])
-            else:
-                # Otherwise, ensure it's made of integers (and possibly nans).
-                df["variableId"] = df["variableId"].astype("Int64")
-
-        # Convert boolean columns to strings of true, false.
-        for column in df.select_dtypes(include="bool").columns:
-            df[column] = df[column].astype(str).str.lower()
-
-        # For convenience, ensure the first columns are index columns (yVariableIds, variableId and/or catalogPath).
-        index_columns = ["yVariableIds", "catalogPath", "variableId"]
-        df = df[
-            [col for col in index_columns if col in df.columns]
-            + [col for col in df.columns if col not in index_columns]
-        ]
-
-        df_tsv = df.to_csv(sep="\t", index=False)
-        lines = ["\t" + line.rstrip() if len(line) > 0 else "" for line in df_tsv.split("\n")]  # type: ignore
-
-        return lines
-
-    @staticmethod
     def _ignore_commented_and_empty_lines(content: str) -> str:
         _content = "\n".join([line for line in content.split("\n") if (len(line) > 0) and (not line.startswith("#"))])
         return _content
@@ -379,8 +406,8 @@ class Explorer:
         # Return True if content of explorer has changed, and False otherwise.
         # NOTE: The original content and the generated one may differ either because of commented lines or empty lines.
         # Ignore those lines, and check if the original and the new content coincide.
-        original = self._ignore_commented_and_empty_lines(content=self.content)
-        current = self._ignore_commented_and_empty_lines(content=self.generate_content())
+        original = self._ignore_commented_and_empty_lines(content=self.content_raw)
+        current = self._ignore_commented_and_empty_lines(content=self.content)
         content_has_changed = original != current
 
         return content_has_changed
@@ -392,7 +419,7 @@ class Explorer:
         path = Path(path)
 
         # Write parsed content to file.
-        path.write_text(self.generate_content())
+        path.write_text(self.content)
 
         # Upload it to staging server.
         if config.STAGING:
