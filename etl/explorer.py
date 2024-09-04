@@ -118,6 +118,7 @@ class Explorer:
             explorer = cls(name=name)
         else:
             # Text content of an explorer file. (this is given by the user)
+            assert isinstance(content, str), "content should be a string!"
             content_raw = content
 
             # Split content in lines
@@ -531,6 +532,10 @@ class Explorer:
         # Return True if content of explorer has changed, and False otherwise.
         # NOTE: The original content and the generated one may differ either because of commented lines or empty lines.
         # Ignore those lines, and check if the original and the new content coincide.
+        if self.content_raw is None:
+            log.warning("There is no original content to compare with!")
+            return True
+
         original = self._ignore_commented_and_empty_lines(content=self.content_raw)
         current = self._ignore_commented_and_empty_lines(content=self.content)
         content_has_changed = original != current
