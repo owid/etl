@@ -147,7 +147,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
     indicator = tb["variable_name"].iloc[0].split("-")[0].strip()
     series_code = tb["seriescode"].iloc[0].upper()
     series_description = tb["seriesdescription"].iloc[0]
-    source_desc_out = create_metadata_desc(
+    source_desc = create_metadata_desc(
         indicator=indicator, series_code=series_code, source_desc=source_desc, series_description=series_description
     )
     tb.short_name = tb["variable_name"].iloc[0]
@@ -170,7 +170,8 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
 
     tb["meta"] = VariableMeta(
         title=tb["variable_name_meta"].iloc[0],
-        description_short=source_desc_out,
+        description_short=series_description,
+        description_from_producer=source_desc,
         origins=[origin],
         unit=tb["long_unit"].iloc[0].lower(),
         short_unit=tb["short_unit"].iloc[0],
