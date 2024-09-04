@@ -2,7 +2,6 @@
 
 import re
 
-import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -15,49 +14,70 @@ paths = PathFinder(__file__)
 # NOTE: We could include 1979. But, for consistency between yearly and decadal data, we ignore this year.
 YEAR_MIN = 1980
 
-# Location (either "Arctic" or "Antarctic").
-LOCATION = "Arctic"
-
 
 def create_yearly_table(tb: Table) -> Table:
-    tb_yearly = tb.copy()
+    # Ignore the very first years (1978 and 1979), as explained above (where YEAR_MIN is defined).
+    _tb = tb[tb["year"] >= YEAR_MIN].reset_index(drop=True)
+    # Create a table with a column for each year.
+    tb_yearly = _tb.pivot(
+        index=["location", "month"], columns=["year"], values="sea_ice_extent", join_column_levels_with=""
+    )
 
-    tb_yearly = tb_yearly[tb_yearly["year"] == tb_yearly["year"].max()].reset_index(drop=True)
-    tb_yearly = tb_yearly.drop(columns=["decade", "location"], errors="raise").rename(
-        columns={"year": "country", "month": "year"}, errors="raise"
+    # To adjust to grapher, rename location column.
+    tb_yearly = tb_yearly.rename(columns={"location": "country", "month": "year"}, errors="raise")
+
+    # Ensure all column names are strings.
+    tb_yearly = tb_yearly.rename(
+        columns={
+            column: f"sea_ice_extent_in_{column}" for column in tb_yearly.drop(columns=["country", "year"]).columns
+        },
+        errors="raise",
     )
 
     return tb_yearly
 
 
 def create_decadal_table(tb: Table) -> Table:
-    tb_decadal = tb.copy()
+    # Ignore the very first decade (1970s), since it contains only 2 years.
+    _tb = tb[tb["year"] >= YEAR_MIN].reset_index(drop=True)
 
     # Calculate the sea ice extent of each month, averaged over the same 10 months of each decade.
     # For example, January 1990 will be the average sea ice extent of the 10 months of January between 1990 and 1999.
-    tb_decadal["decade"] = tb_decadal["decade"].astype("string") + "s"
-    tb_decadal = tb_decadal.groupby(["location", "month", "decade"], observed=True, as_index=False).agg(
+    tb_grouped = _tb.groupby(["location", "month", "decade"], observed=True, as_index=False).agg(
         {"sea_ice_extent": "mean"}
     )
-    tb_decadal = tb_decadal.drop(columns=["location"], errors="raise").rename(
-        columns={"decade": "country", "month": "year"}, errors="raise"
+
+    # Pivot the table to get decades as columns.
+    tb_decadal = tb_grouped.pivot(
+        index=["location", "month"], columns="decade", values="sea_ice_extent", join_column_levels_with=""
+    )
+
+    # To adjust to grapher, rename location column.
+    tb_decadal = tb_decadal.rename(columns={"location": "country", "month": "year"}, errors="raise")
+
+    # Rename columns conveniently.
+    tb_decadal = tb_decadal.rename(
+        columns={
+            column: f"sea_ice_extent_in_the_{int(column)}s"
+            for column in tb_decadal.drop(columns=["country", "year"]).columns
+        }
     )
 
     return tb_decadal
 
 
 def improve_metadata(tb: Table) -> Table:
-    tb = tb.astype({"country": "string"}).copy()
+    tb = tb.copy()
 
-    # Main title (which will be used for the indicator, the table, and the dataset).
-    title = f"Monthly sea ice extent in the {LOCATION}, decadal average"
-    description_short_yearly = "Each point represents the sea ice extent, averaged over all days in the month, then averaged across all years in the decade. The current decade is highlighted in red, with the current year shown in black for comparison."
-    footnote = "The horizontal axis shows months from January (1) to December (12). All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current decade."
+    # Table title (which will also become the dataset title).
+    tb.metadata.title = "Monthly sea ice extent"
 
-    colors = {}
-    columns = [str(year) for year in set(tb["country"])]
+    description_short_yearly = "Mean sea ice extent for each month. For example, June 2010 represents the sea ice extent averaged over all days in June 2010."
+    description_short_decadal = "Average of monthly means over the decade. For example, June 2010 represents the mean sea ice extent for June — calculated as the average over all days in the month — averaged across all Junes from 2010 to 2019."
+    columns = tb.drop(columns=["country", "year"]).columns
     years = [int(re.findall(r"\d{4}", column)[0]) for column in columns]
     for year, column in zip(years, columns):
+        title = column.replace("_", " ").capitalize()
         if 1980 <= year < 1990:
             # Light blue.
             color = "#CCE5FF"
@@ -76,26 +96,15 @@ def improve_metadata(tb: Table) -> Table:
         else:
             # Red.
             color = "#F89B9B"
-        colors[column] = color
-
-    # Rename table.
-    tb.metadata.title = title
-
-    # Name of data column (there is only one).
-    column = "sea_ice_extent"
-    tb[column].metadata.title = title
-    tb[column].metadata.description_short = description_short_yearly
-    tb[column].metadata.presentation.title_public = title
-    # Set color for each entity.
-    tb[column].metadata.presentation.grapher_config = {
-        "selectedEntityNames": columns,
-        "selectedEntityColors": colors,
-        "originUrl": "https://ourworldindata.org/climate-change",
-        "note": footnote,
-        "hideAnnotationFieldsInTitle": {"time": True},
-        "entityType": "year",
-        "entityTypePlural": "years",
-    }
+        tb[column].metadata.title = title
+        if f"{year}s" in column:
+            display_name = f"{year}s"
+            tb[column].metadata.description_short = description_short_decadal
+        else:
+            display_name = str(year)
+            tb[column].metadata.description_short = description_short_yearly
+        tb[column].metadata.display = {"name": display_name, "color": color}
+        tb[column].metadata.presentation.title_public = title
 
     return tb
 
@@ -156,7 +165,9 @@ def run(dest_dir: str) -> None:
     tb = tb.astype({"location": "string"})
     tb.loc[tb["location"] == "Northern Hemisphere", "location"] = "Arctic"
     tb.loc[tb["location"] == "Southern Hemisphere", "location"] = "Antarctic"
-    assert set(tb["location"]) == {"Arctic", "Antarctic"}, "Unexpected locations."
+    assert set(tb["location"]) == {"Antarctic", "Arctic"}, "Unexpected locations."
+
+    # For visualization purposes, create one indicator for each year.
 
     # Create columns for month, year, and decade.
     tb["year"] = tb["date"].dt.year
@@ -166,28 +177,20 @@ def run(dest_dir: str) -> None:
     # Sanity checks.
     sanity_check_inputs(tb=tb)
 
-    # Select years after a certain minimum (see explanation above, where YEAR_MIN is defined) and a certain location.
-    tb = (
-        tb[(tb["year"] >= YEAR_MIN) & (tb["location"] == LOCATION)]
-        .sort_values(["year", "month"], ascending=(False, True))
-        .drop(columns=["date"], errors="raise")
-        .reset_index(drop=True)
-    )
-
-    # Create yearly table, adapted to grapher.
+    # Create yearly table.
     tb_yearly = create_yearly_table(tb=tb)
 
-    # Create decadal table, adapted to grapher.
+    # Create decadal table.
     tb_decadal = create_decadal_table(tb=tb)
 
-    # Combine both tables (take decadal data prior to 2020, and individual years from 2020 on).
-    tb_combined = pr.concat([tb_decadal, tb_yearly], ignore_index=True)
+    # Combine both tables.
+    tb_combined = tb_yearly.merge(tb_decadal, on=["country", "year"], how="outer")
 
     # Improve metadata.
     tb_combined = improve_metadata(tb=tb_combined)
 
     # Improve format.
-    tb_combined = tb_combined.format(sort_rows=False)
+    tb_combined = tb_combined.format()
 
     #
     # Save outputs.

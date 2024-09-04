@@ -47,21 +47,19 @@ def improve_metadata(tb: Table) -> Table:
     tb.metadata.title = "Sea ice extent in the northern and southern hemispheres by year"
     for column in tb.drop(columns=["country", "year"]).columns:
         location = column.split("sea_ice_extent_")[-1].title()
-        title = f"Sea ice extent in the {location} by year"
-        description_short_yearly = "Each point represents the sea ice extent, averaged over all days in the month."
+        title = f"Monthly sea ice extent in the {location}"
+        description_short = "Each point represents the sea ice extent, averaged over all days in the month."
         subtitle = (
-            description_short_yearly
+            description_short
             + " Years in the current decade are highlighted in red, with the current year highlighted in black."
         )
         footnote = (
             "All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current year."
         )
 
-        # Name of data column (there is only one).
         tb[column].metadata.title = title
-        tb[column].metadata.description_short = description_short_yearly
+        tb[column].metadata.description_short = description_short
         tb[column].metadata.presentation.title_public = title
-        # Set color for each entity.
         tb[column].metadata.presentation.grapher_config = {
             "subtitle": subtitle,
             "note": footnote,
