@@ -233,6 +233,12 @@ class Explorer:
             csv_data = StringIO("\n".join(config_raw))
             df_config = pd.read_csv(csv_data, sep=sep, skiprows=0)
 
+            if "selection" in set(df_config[df_config.columns[0]]):
+                selection = df_config.loc[df_config[df_config.columns[0]] == "selection", df_config.columns[1:]].dropna(axis=1).squeeze().tolist()
+                selection = "\t".join(selection)
+                df_config.loc[df_config[df_config.columns[0]] == "selection", df_config.columns[1]] = selection
+                df_config.loc[df_config[df_config.columns[0]] == "selection", df_config.columns[2:]] = np.nan
+
             # Drop columns with all NaNs
             df_config = df_config.dropna(axis=1, how="all")
             # Drop rows with value NaN
@@ -356,6 +362,10 @@ class Explorer:
         return df
 
     @property
+    def df_graphers_output(self):
+        return self._df_graphers_output(self.df_graphers)
+
+    @property
     def df(self):
         dfs = []
 
@@ -376,14 +386,12 @@ class Explorer:
         dfs.append(df_config)
 
         # 2/ GRAPHERS
-        df_graphers = self._df_graphers_to_content(self.df_graphers)
-        df_graphers = self._adapt_df_nested(df_graphers, "graphers")
+        df_graphers = self._adapt_df_nested(self._df_graphers_output, "graphers")
         dfs.append(df_graphers)
 
         # 3/ COLUMNS (only if there's any!)
         if len(self.df_columns) > 0:
-            df_columns = self._df_columns_to_content(self.df_columns)
-            df_columns = self._adapt_df_nested(df_columns, "columns")
+            df_columns = self._adapt_df_nested(self._df_columns_output, "columns")
             df_columns = self._add_empty_row(df_columns, "top")
             dfs.append(df_columns)
 
@@ -411,8 +419,9 @@ class Explorer:
         content = "\n".join(content)
         return content
 
-    def _df_graphers_to_content(self, df: pd.DataFrame):
-        df_ = df.copy()
+    @property
+    def _df_graphers_output(self):
+        df_ = self.df_graphers.copy()
         # Convert boolean columns to strings of true, false.
         for column in df_.select_dtypes(include="bool").columns:
             df_[column] = df_[column].astype(str).str.lower()
@@ -433,8 +442,9 @@ class Explorer:
         ]
         return df_
 
-    def _df_columns_to_content(self, df: pd.DataFrame):
-        df_ = df.copy()
+    @property
+    def _df_columns_output(self):
+        df_ = self.df_columns.copy()
 
         def _parse_color_numeric(value):
             if isinstance(value, list):
@@ -585,6 +595,8 @@ class Explorer:
             ]
         )
 
+        if not self.df_columns.empty and ("variableId" not in self.df_columns.columns):
+            raise ValueError("This config file does not contain a `variableId` column in the columns section. It might be the case that it was already migrated to ETL-paths. Please review.")
         # Map variable ids to etl paths in the columns table, whenever possible.
         # Here, I assume that, if there is a catalog path, then add it to the catalogPath column, and make the value in variableId None.
         # And, if there is no catalog path, then keep the variableId as it is, and make catalogPath None.
