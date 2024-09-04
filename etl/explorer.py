@@ -234,7 +234,12 @@ class Explorer:
             df_config = pd.read_csv(csv_data, sep=sep, skiprows=0)
 
             if "selection" in set(df_config[df_config.columns[0]]):
-                selection = df_config.loc[df_config[df_config.columns[0]] == "selection", df_config.columns[1:]].dropna(axis=1).squeeze().tolist()
+                selection = (
+                    df_config.loc[df_config[df_config.columns[0]] == "selection", df_config.columns[1:]]
+                    .dropna(axis=1)
+                    .squeeze()
+                    .tolist()
+                )
                 selection = "\t".join(selection)
                 df_config.loc[df_config[df_config.columns[0]] == "selection", df_config.columns[1]] = selection
                 df_config.loc[df_config[df_config.columns[0]] == "selection", df_config.columns[2:]] = np.nan
@@ -596,7 +601,9 @@ class Explorer:
         )
 
         if not self.df_columns.empty and ("variableId" not in self.df_columns.columns):
-            raise ValueError("This config file does not contain a `variableId` column in the columns section. It might be the case that it was already migrated to ETL-paths. Please review.")
+            raise ValueError(
+                "This config file does not contain a `variableId` column in the columns section. It might be the case that it was already migrated to ETL-paths. Please review."
+            )
         # Map variable ids to etl paths in the columns table, whenever possible.
         # Here, I assume that, if there is a catalog path, then add it to the catalogPath column, and make the value in variableId None.
         # And, if there is no catalog path, then keep the variableId as it is, and make catalogPath None.

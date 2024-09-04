@@ -51,9 +51,17 @@ with st.container(border=True):
         explorer.convert_ids_to_etl_paths()
 
         # Downloads
-        st.download_button("Download `graphers` (CSV)", explorer._df_graphers_output.to_csv(sep=",", index=False), file_name="graphers.csv")
+        st.download_button(
+            "Download `graphers` (CSV)",
+            explorer._df_graphers_output.to_csv(sep=",", index=False),
+            file_name="graphers.csv",
+        )
         if not explorer.df_columns.empty:
-            st.download_button("Download `columns` (CSV)", explorer._df_columns_output.to_csv(sep=",", index=False), file_name="columns.csv")
+            st.download_button(
+                "Download `columns` (CSV)",
+                explorer._df_columns_output.to_csv(sep=",", index=False),
+                file_name="columns.csv",
+            )
 
         filename = f"modified-{uploaded_file.name.replace('.csv', '.tsv')}"
         st.download_button("Download new config (TSV)", explorer.content, file_name=filename)
