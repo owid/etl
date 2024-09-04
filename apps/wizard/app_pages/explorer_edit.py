@@ -1,10 +1,7 @@
-"""Helper tool to create map brackets for all indicators in an indicator-based explorer.
-
-"""
-import numpy as np
-import pandas as pd
-import streamlit as st
+"""Helper tool to create map brackets for all indicators in an indicator-based explorer."""
 from io import StringIO
+
+import streamlit as st
 
 from etl.explorer import Explorer
 
@@ -53,13 +50,13 @@ with st.container(border=True):
         # Downloads
         st.download_button(
             "Download `graphers` (CSV)",
-            explorer._df_graphers_output.to_csv(sep=",", index=False),
+            explorer._df_graphers_output.to_csv(sep=",", index=False),  # type: ignore
             file_name="graphers.csv",
         )
         if not explorer.df_columns.empty:
             st.download_button(
                 "Download `columns` (CSV)",
-                explorer._df_columns_output.to_csv(sep=",", index=False),
+                explorer._df_columns_output.to_csv(sep=",", index=False),  # type: ignore
                 file_name="columns.csv",
             )
 

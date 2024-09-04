@@ -121,11 +121,12 @@ class Explorer:
             content_raw = content
 
             # Split content in lines
-            content = content.splitlines()
+            content_list = content.splitlines()
 
             # Get raw data
             config_raw = []
-            for line_nr, line in enumerate(content):
+            line_nr = 0
+            for line_nr, line in enumerate(content_list):
                 if line[:8] in {"columns", "graphers"}:
                     break
                 elif line.startswith("#"):
@@ -137,7 +138,7 @@ class Explorer:
             config = cls._parse_config(config_raw, sep)
 
             # Read graphers (and columns) as dataframe
-            csv_data = StringIO("\n".join(content[line_nr:]))
+            csv_data = StringIO("\n".join(content_list[line_nr:]))
             df = pd.read_csv(csv_data, sep=sep, skiprows=0)
             df = cls._process_df(df, sep)
 
@@ -215,10 +216,13 @@ class Explorer:
             path = self.path
 
         # Export content to path
+        assert isinstance(path, (str, Path)), "Path should be a string or a Path object."
         self.export(path)
 
         # Upload it to staging server.
         if config.STAGING:
+            if isinstance(path, str):
+                path = Path(path)
             upload_file_to_server(path, f"owid@{config.DB_HOST}:~/owid-content/explorers/")
 
     def save(self, path: Optional[Union[str, Path]] = None) -> None:
@@ -259,7 +263,8 @@ class Explorer:
             raise ValueError(f"Unknown separator {sep}")
 
         if "selection" in conf:
-            conf["selection"] = conf["selection"].split("\t")
+            assert isinstance(conf["selection"], str), "selection should be a string!"
+            conf["selection"] = conf["selection"].split("\t")  # type: ignore
 
         # 'true' -> True, 'false' -> False
         bool_mapping = {
@@ -367,11 +372,7 @@ class Explorer:
         return df
 
     @property
-    def df_graphers_output(self):
-        return self._df_graphers_output(self.df_graphers)
-
-    @property
-    def df(self):
+    def df(self) -> pd.DataFrame:
         dfs = []
 
         # 0/ COMMENTS
@@ -383,7 +384,7 @@ class Explorer:
         # Pre-process special fields
         conf = copy(self.config)
         # Convert to dataframe df_config
-        df_config = pd.DataFrame.from_dict([conf]).T.reset_index()
+        df_config = pd.DataFrame.from_dict([conf]).T.reset_index()  # type: ignore
         df_config.columns = [0, 1]
         df_config = self._add_empty_row(df_config)
         # True, False -> 'true', 'false'
@@ -414,12 +415,14 @@ class Explorer:
                 df[i + 1] = ""
             df.loc[df[0] == "selection", i + 1] = selection
 
-        return df
+        assert isinstance(df, pd.DataFrame), "df should be a dataframe!"
+        return df  # type: ignore
 
     @property
     def content(self) -> str:
         """Based on modified config, graphers and column, build the raw content text."""
         content = self.df.to_csv(sep="\t", index=False, header=False)
+        assert isinstance(content, str), "content should be a string!"
         content = [c.rstrip() for c in content.splitlines()]
         content = "\n".join(content)
         return content
