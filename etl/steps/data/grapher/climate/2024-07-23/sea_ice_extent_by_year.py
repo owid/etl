@@ -14,18 +14,11 @@ paths = PathFinder(__file__)
 # NOTE: We could include 1979. But, for consistency between yearly and decadal data, we ignore this year.
 YEAR_MIN = 1980
 
-# Location (either "Arctic" or "Antarctic").
-LOCATION = "Arctic"
-
 
 def improve_metadata(tb: Table) -> Table:
     tb = tb.copy()
 
-    # Main title (which will be used for the indicator, the table, and the dataset).
-    title = f"Monthly sea ice extent in the {LOCATION}"
-    description_short_yearly = "Each point represents the sea ice extent, averaged over all days in the month. Years in the current decade are highlighted in red, with the current year highlighted in black."
-    footnote = "The horizontal axis shows months from January (1) to December (12). All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current year."
-
+    # Gather years in the data, and assign colors to them.
     colors = {}
     columns = [str(year) for year in sorted(set(tb["country"]), reverse=True)]
     years = [int(re.findall(r"\d{4}", column)[0]) for column in columns]
@@ -51,23 +44,34 @@ def improve_metadata(tb: Table) -> Table:
         colors[column] = color
 
     # Rename table.
-    tb.metadata.title = title
+    tb.metadata.title = "Sea ice extent in the northern and southern hemispheres by year"
+    for column in tb.drop(columns=["country", "year"]).columns:
+        location = column.split("sea_ice_extent_")[-1].title()
+        title = f"Sea ice extent in the {location} by year"
+        description_short_yearly = "Each point represents the sea ice extent, averaged over all days in the month."
+        subtitle = (
+            description_short_yearly
+            + " Years in the current decade are highlighted in red, with the current year highlighted in black."
+        )
+        footnote = (
+            "All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current year."
+        )
 
-    # Name of data column (there is only one).
-    column = "sea_ice_extent"
-    tb[column].metadata.title = title
-    tb[column].metadata.description_short = description_short_yearly
-    tb[column].metadata.presentation.title_public = title
-    # Set color for each entity.
-    tb[column].metadata.presentation.grapher_config = {
-        "selectedEntityNames": columns,
-        "selectedEntityColors": colors,
-        "originUrl": "https://ourworldindata.org/climate-change",
-        "note": footnote,
-        "hideAnnotationFieldsInTitle": {"time": True},
-        "entityType": "year",
-        "entityTypePlural": "years",
-    }
+        # Name of data column (there is only one).
+        tb[column].metadata.title = title
+        tb[column].metadata.description_short = description_short_yearly
+        tb[column].metadata.presentation.title_public = title
+        # Set color for each entity.
+        tb[column].metadata.presentation.grapher_config = {
+            "subtitle": subtitle,
+            "note": footnote,
+            "selectedEntityNames": columns,
+            "selectedEntityColors": colors,
+            "originUrl": "https://ourworldindata.org/climate-change",
+            "hideAnnotationFieldsInTitle": {"time": True},
+            "entityType": "year",
+            "entityTypePlural": "years",
+        }
 
     return tb
 
@@ -140,16 +144,19 @@ def run(dest_dir: str) -> None:
 
     # Select years after a certain minimum (see explanation above, where YEAR_MIN is defined) and a certain location.
     tb = (
-        tb[(tb["year"] >= YEAR_MIN) & (tb["location"] == LOCATION)]
+        tb[(tb["year"] >= YEAR_MIN)]
         .sort_values(["year", "month"], ascending=(False, True))
         .drop(columns=["date"], errors="raise")
         .reset_index(drop=True)
     )
 
+    # Create one column for each hemisphere.
+    tb = tb.pivot(
+        index=["year", "month"], columns=["location"], values=["sea_ice_extent"], join_column_levels_with="_"
+    ).underscore()
+
     # Create yearly table, adapted column names to grapher.
-    tb = tb.drop(columns=["decade", "location"], errors="raise").rename(
-        columns={"year": "country", "month": "year"}, errors="raise"
-    )
+    tb = tb.rename(columns={"year": "country", "month": "year"}, errors="raise")
 
     # Improve metadata.
     tb = improve_metadata(tb=tb)

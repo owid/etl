@@ -298,17 +298,8 @@ steps:
   #
   # NSIDC - Monthly sea ice anomalies (one indicator per year).
   #
+  # TODO: Delete.
   data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly:
-    - data://garden/climate/2024-07-23/sea_ice_index
-  #
-  # NSIDC - Monthly sea ice anomalies (one indicator containing all years, only northern hemisphere).
-  #
-  data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly_by_year_north:
-    - data://garden/climate/2024-07-23/sea_ice_index
-  #
-  # NSIDC - Monthly sea ice anomalies (one indicator containing all years, only southern hemisphere).
-  #
-  data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly_by_year_south:
     - data://garden/climate/2024-07-23/sea_ice_index
   #
   # NSIDC - Monthly sea ice anomalies (one indicator containing all decades, only northern hemisphere).
@@ -324,4 +315,9 @@ steps:
   # NSIDC - Monthly sea ice anomalies ("country" for month names, "year" for years, one indicator per hemisphere).
   #
   data://grapher/climate/2024-07-23/sea_ice_anomalies_by_month:
+    - data://garden/climate/2024-07-23/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice extent ("country" for years, "year" for month number, one indicator per hemisphere).
+  #
+  data://grapher/climate/2024-07-23/sea_ice_extent_by_year:
     - data://garden/climate/2024-07-23/sea_ice_index

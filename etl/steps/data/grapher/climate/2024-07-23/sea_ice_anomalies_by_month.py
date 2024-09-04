@@ -24,7 +24,6 @@ def improve_metadata(tb: Table) -> Table:
     tb.metadata.title = "Sea ice anomaly in the northern and southern hemispheres"
     for column in tb.drop(columns=["country", "year"]).columns:
         location = column.split("sea_ice_extent_")[-1].title()
-        # Main title (which will be used for the indicator, the table, and the dataset).
         title = f"Sea ice anomaly in the {location} by month"
         description_short_yearly = f"Each point represents the sea ice extent, averaged over all days in the month, with respect to the same month in {REFERENCE_YEAR}."
         footnote = (
