@@ -23,8 +23,8 @@ def improve_metadata(tb: Table) -> Table:
 
     # Main title (which will be used for the indicator, the table, and the dataset).
     title = f"Monthly sea ice extent in the {LOCATION}"
-    description_short_yearly = "Each point represents the sea ice extent, averaged over all days in the month, then averaged across all years in the decade. The current decade is highlighted in red, with the current year shown in black for comparison."
-    footnote = "The horizontal axis shows months from January (1) to December (12). All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current decade."
+    description_short_yearly = "Each point represents the sea ice extent, averaged over all days in the month. Years in the current decade are highlighted in red, with the current year highlighted in black."
+    footnote = "The horizontal axis shows months from January (1) to December (12). All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current year."
 
     colors = {}
     columns = [str(year) for year in sorted(set(tb["country"]), reverse=True)]

@@ -325,3 +325,13 @@ steps:
   #
   data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly_by_decade_south:
     - data://garden/climate/2024-07-23/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice anomalies (one indicator, "country" contains months, "year" contains years, only north).
+  #
+  data://grapher/climate/2024-07-23/sea_ice_anomalies_by_month_north:
+    - data://garden/climate/2024-07-23/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice anomalies (one indicator, "country" contains months, "year" contains years, only south).
+  #
+  data://grapher/climate/2024-07-23/sea_ice_anomalies_by_month_south:
+    - data://garden/climate/2024-07-23/sea_ice_index

@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import re
 
 from owid.catalog import Table
 
@@ -17,38 +16,19 @@ YEAR_MIN = 1980
 # Location (either "Arctic" or "Antarctic").
 LOCATION = "Arctic"
 
+# Reference year. The monthly value of sea ice extent on this year will be subtracted from each data point.
+REFERENCE_YEAR = 2000
+
 
 def improve_metadata(tb: Table) -> Table:
     tb = tb.copy()
 
     # Main title (which will be used for the indicator, the table, and the dataset).
     title = f"Monthly sea ice extent in the {LOCATION}"
-    description_short_yearly = "Each point represents the sea ice extent, averaged over all days in the month. Years in the current decade are highlighted in red, with the current year highlighted in black."
-    footnote = "The horizontal axis shows months from January (1) to December (12). All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current year."
-
-    colors = {}
-    columns = [str(year) for year in sorted(set(tb["country"]), reverse=True)]
-    years = [int(re.findall(r"\d{4}", column)[0]) for column in columns]
-    for year, column in zip(years, columns):
-        if 1980 <= year < 1990:
-            # Light blue.
-            color = "#CCE5FF"
-        elif 1990 <= year < 2000:
-            # Medium light blue.
-            color = "#99CCFF"
-        elif 2000 <= year < 2010:
-            # Medium blue.
-            color = "#6699FF"
-        elif 2010 <= year < 2020:
-            # Darker blue.
-            color = "#3366FF"
-        elif year == max(years):
-            # Black.
-            color = "#000000"
-        else:
-            # Red.
-            color = "#F89B9B"
-        colors[column] = color
+    description_short_yearly = f"Each point represents the sea ice extent, averaged over all days in the month, with respect to the same month in {REFERENCE_YEAR}."
+    footnote = (
+        "All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current year."
+    )
 
     # Rename table.
     tb.metadata.title = title
@@ -60,13 +40,13 @@ def improve_metadata(tb: Table) -> Table:
     tb[column].metadata.presentation.title_public = title
     # Set color for each entity.
     tb[column].metadata.presentation.grapher_config = {
-        "selectedEntityNames": columns,
-        "selectedEntityColors": colors,
+        # "selectedEntityNames": columns,
+        # "selectedEntityColors": colors,
         "originUrl": "https://ourworldindata.org/climate-change",
         "note": footnote,
-        "hideAnnotationFieldsInTitle": {"time": True},
-        "entityType": "year",
-        "entityTypePlural": "years",
+        # "hideAnnotationFieldsInTitle": {"time": True},
+        "entityType": "month",
+        "entityTypePlural": "months",
     }
 
     return tb
@@ -133,6 +113,7 @@ def run(dest_dir: str) -> None:
     # Create columns for month, year, and decade.
     tb["year"] = tb["date"].dt.year
     tb["month"] = tb["date"].dt.month
+    tb["month_name"] = tb["date"].dt.strftime("%B")
     tb["decade"] = (tb["year"] // 10) * 10
 
     # Sanity checks.
@@ -142,14 +123,20 @@ def run(dest_dir: str) -> None:
     tb = (
         tb[(tb["year"] >= YEAR_MIN) & (tb["location"] == LOCATION)]
         .sort_values(["year", "month"], ascending=(False, True))
-        .drop(columns=["date"], errors="raise")
+        .drop(columns=["date", "location", "month", "decade"], errors="raise")
         .reset_index(drop=True)
     )
 
-    # Create yearly table, adapted column names to grapher.
-    tb = tb.drop(columns=["decade", "location"], errors="raise").rename(
-        columns={"year": "country", "month": "year"}, errors="raise"
+    # Subtract the value of sea ice extent on a certain reference year.
+    tb_reference = tb[tb["year"] == REFERENCE_YEAR][["month_name", "sea_ice_extent"]].rename(
+        columns={"sea_ice_extent": "sea_ice_extent_reference"}, errors="raise"
     )
+    tb = tb.merge(tb_reference, on=["month_name"], how="left")
+    tb["sea_ice_extent"] -= tb["sea_ice_extent_reference"]
+    tb = tb.drop(columns=["sea_ice_extent_reference"], errors="raise")
+
+    # Adapt column names to grapher.
+    tb = tb.rename(columns={"month_name": "country"}, errors="raise")
 
     # Improve metadata.
     tb = improve_metadata(tb=tb)
