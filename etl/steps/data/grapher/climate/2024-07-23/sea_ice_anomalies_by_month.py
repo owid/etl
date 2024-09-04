@@ -13,9 +13,6 @@ paths = PathFinder(__file__)
 # NOTE: We could include 1979. But, for consistency between yearly and decadal data, we ignore this year.
 YEAR_MIN = 1980
 
-# Location (either "Arctic" or "Antarctic").
-LOCATION = "Arctic"
-
 # Reference year. The monthly value of sea ice extent on this year will be subtracted from each data point.
 REFERENCE_YEAR = 2000
 
@@ -23,31 +20,44 @@ REFERENCE_YEAR = 2000
 def improve_metadata(tb: Table) -> Table:
     tb = tb.copy()
 
-    # Main title (which will be used for the indicator, the table, and the dataset).
-    title = f"Monthly sea ice extent in the {LOCATION}"
-    description_short_yearly = f"Each point represents the sea ice extent, averaged over all days in the month, with respect to the same month in {REFERENCE_YEAR}."
-    footnote = (
-        "All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current year."
-    )
-
     # Rename table.
-    tb.metadata.title = title
+    tb.metadata.title = "Sea ice anomaly in the northern and southern hemispheres"
+    for column in tb.drop(columns=["country", "year"]).columns:
+        location = column.split("sea_ice_extent_")[-1].title()
+        # Main title (which will be used for the indicator, the table, and the dataset).
+        title = f"Sea ice anomaly in the {location} by month"
+        description_short_yearly = f"Each point represents the sea ice extent, averaged over all days in the month, with respect to the same month in {REFERENCE_YEAR}."
+        footnote = (
+            "All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current year."
+        )
 
-    # Name of data column (there is only one).
-    column = "sea_ice_extent"
-    tb[column].metadata.title = title
-    tb[column].metadata.description_short = description_short_yearly
-    tb[column].metadata.presentation.title_public = title
-    # Set color for each entity.
-    tb[column].metadata.presentation.grapher_config = {
-        # "selectedEntityNames": columns,
-        # "selectedEntityColors": colors,
-        "originUrl": "https://ourworldindata.org/climate-change",
-        "note": footnote,
-        # "hideAnnotationFieldsInTitle": {"time": True},
-        "entityType": "month",
-        "entityTypePlural": "months",
-    }
+        # Name of data column (there is only one).
+        tb[column].metadata.title = title
+        tb[column].metadata.description_short = description_short_yearly
+        tb[column].metadata.presentation.title_public = title
+        # Set color for each entity.
+        tb[column].metadata.presentation.grapher_config = {
+            "selectedEntityNames": [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+            ],
+            # "selectedEntityColors": colors,
+            "originUrl": "https://ourworldindata.org/climate-change",
+            "note": footnote,
+            # "hideAnnotationFieldsInTitle": {"time": True},
+            "entityType": "month",
+            "entityTypePlural": "months",
+        }
 
     return tb
 
@@ -121,19 +131,24 @@ def run(dest_dir: str) -> None:
 
     # Select years after a certain minimum (see explanation above, where YEAR_MIN is defined) and a certain location.
     tb = (
-        tb[(tb["year"] >= YEAR_MIN) & (tb["location"] == LOCATION)]
+        tb[(tb["year"] >= YEAR_MIN)]
         .sort_values(["year", "month"], ascending=(False, True))
-        .drop(columns=["date", "location", "month", "decade"], errors="raise")
+        .drop(columns=["date", "month", "decade"], errors="raise")
         .reset_index(drop=True)
     )
 
     # Subtract the value of sea ice extent on a certain reference year.
-    tb_reference = tb[tb["year"] == REFERENCE_YEAR][["month_name", "sea_ice_extent"]].rename(
+    tb_reference = tb[tb["year"] == REFERENCE_YEAR][["location", "month_name", "sea_ice_extent"]].rename(
         columns={"sea_ice_extent": "sea_ice_extent_reference"}, errors="raise"
     )
-    tb = tb.merge(tb_reference, on=["month_name"], how="left")
+    tb = tb.merge(tb_reference, on=["location", "month_name"], how="left")
     tb["sea_ice_extent"] -= tb["sea_ice_extent_reference"]
     tb = tb.drop(columns=["sea_ice_extent_reference"], errors="raise")
+
+    # Create one column for each hemisphere.
+    tb = tb.pivot(
+        index=["year", "month_name"], columns=["location"], values=["sea_ice_extent"], join_column_levels_with="_"
+    ).underscore()
 
     # Adapt column names to grapher.
     tb = tb.rename(columns={"month_name": "country"}, errors="raise")
