@@ -31,6 +31,7 @@ INCLUDE = None
 
 # for origins
 DATE_ACCESSED = "2024-08-27"
+CURRENT_YEAR = 2024
 
 
 def run(dest_dir: str) -> None:
@@ -58,6 +59,7 @@ def run(dest_dir: str) -> None:
         tb = create_table(tb)
         tb["source_producer"] = clean_source_name(tb["source"], load_clean_source_mapping())
         tb["attribution_short"] = add_short_source_name(tb["source"], load_short_source_mapping())
+        tb["citation"] = get_citation(tb["source"])
 
         tb_var_gr = tb.groupby("variable_name")
 
@@ -100,14 +102,28 @@ def clean_source_name(raw_source: pd.Series, clean_source_map: Dict[str, str]) -
 
 
 def add_short_source_name(raw_source: pd.Series, short_source_map: Dict[str, str]) -> str:
-    if len(raw_source.drop_duplicates()) > 1:
-        short_source = "Data from multiple sources compiled by the UN"
+    sources = raw_source.drop_duplicates()
+    if len(sources) > 1:
+        short_source = "Multiple sources via UN"
     else:
-        source_name = raw_source.drop_duplicates().iloc[0].strip()
+        source_name = sources.iloc[0].strip()
         assert source_name in short_source_map, f"{repr(source_name)} not in un_sdg.sources_short.json - please add"
         short_source = short_source_map[source_name]
 
     return short_source
+
+
+def get_citation(raw_source: pd.Series) -> str:
+    """Get original citation from the UN SDG dataset. This is uncleaned and should only be used for the full citation"""
+    sources = raw_source.drop_duplicates()
+    if len(sources) > 1:
+        citation = ", ".join([source_name for _, source_name in sources.items()])
+    else:
+        citation = sources.iloc[0].strip()
+    citation = (
+        f"{citation} via UN SDG Indicators Database, UN Department of Economic and Social Affairs ({CURRENT_YEAR})"
+    )
+    return citation
 
 
 def load_source_description() -> dict:
@@ -154,18 +170,18 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
 
     source_in_tb = tb["source_producer"].iloc[0]
     title_in_tb = tb["source"].iloc[0]
+    citation_in_tb = tb["citation"].iloc[0]
 
-    # TODO create attribution short for all sources, figure out what to do with the license
     origin = Origin(
         producer=source_in_tb,
         title=title_in_tb,
         description="The United Nations Sustainable Development Goal (SDG) dataset is the primary collection of data tracking progress towards the SDG indicators, compiled from officially-recognized international sources.",
-        citation_full=f"{source_in_tb} via UN SDG Indicators Database, UN Department of Economic and Social Affairs (2024)",
+        citation_full=citation_in_tb,
         date_accessed=DATE_ACCESSED,
         url_main="https://unstats.un.org/sdgs/dataportal",
         url_download="https://unstats.un.org/sdgapi",
         attribution_short=tb["attribution_short"].iloc[0],
-        license=License(name="© 2024 United Nations", url="https://www.un.org/en/about-us/terms-of-use"),
+        license=License(name=f"© {CURRENT_YEAR} United Nations", url="https://www.un.org/en/about-us/terms-of-use"),
     )
 
     tb["meta"] = VariableMeta(
@@ -177,7 +193,8 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
         short_unit=tb["short_unit"].iloc[0],
     )
 
-    # hotfix for ind 14.2.1
+    # hotfix for ind 14.2.1 - for some reason underscore function does not work as expected
+    # TODO: figure out why
     var_name = underscore(tb["variable_name"].iloc[0][0:254], validate=False)
     special_chars = ["(", ")", "+", "!", ","]
     for char in special_chars:
@@ -185,7 +202,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
             var_name = var_name.replace(char, "_")
     tb["variable"] = var_name
 
-    tb = tb[["country", "year", "value", "variable", "meta"]].copy()
+    tb = tb[["country", "year", "value", "variable", "meta"]]
     # convert integer values to int but round float to 2 decimal places, string remain as string
     tb["value"] = tb["value"].apply(value_convert)
     tb = tb.set_index(["year", "country"])
