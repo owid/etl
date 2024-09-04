@@ -16,7 +16,7 @@ paths = PathFinder(__file__)
 YEAR_MIN = 1980
 
 # Location (either "Arctic" or "Antarctic").
-LOCATION = "Antarctic"
+LOCATION = "Arctic"
 
 
 def create_yearly_table(tb: Table) -> Table:
@@ -35,6 +35,7 @@ def create_decadal_table(tb: Table) -> Table:
 
     # Calculate the sea ice extent of each month, averaged over the same 10 months of each decade.
     # For example, January 1990 will be the average sea ice extent of the 10 months of January between 1990 and 1999.
+    tb_decadal["decade"] = tb_decadal["decade"].astype("string") + "s"
     tb_decadal = tb_decadal.groupby(["location", "month", "decade"], observed=True, as_index=False).agg(
         {"sea_ice_extent": "mean"}
     )
@@ -46,7 +47,7 @@ def create_decadal_table(tb: Table) -> Table:
 
 
 def improve_metadata(tb: Table) -> Table:
-    tb = tb.copy()
+    tb = tb.astype({"country": "string"}).copy()
 
     # Main title (which will be used for the indicator, the table, and the dataset).
     title = f"Monthly sea ice extent in the {LOCATION}, decadal average"
@@ -54,7 +55,7 @@ def improve_metadata(tb: Table) -> Table:
     footnote = "The horizontal axis shows months from January (1) to December (12). All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current decade."
 
     colors = {}
-    columns = [str(year) for year in sorted(set(tb["country"]), reverse=True)]
+    columns = [str(year) for year in set(tb["country"])]
     years = [int(re.findall(r"\d{4}", column)[0]) for column in columns]
     for year, column in zip(years, columns):
         if 1980 <= year < 1990:
