@@ -290,7 +290,7 @@ class Chart(Base):
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     publishedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
 
-    chart_config: Mapped["ChartConfig"] = relationship("ChartConfig", back_populates="chartss")
+    chart_config: Mapped["ChartConfig"] = relationship("ChartConfig", back_populates="chartss", lazy="joined")
 
     @hybrid_property
     def config(self) -> dict[str, Any]:  # type: ignore
