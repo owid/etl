@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
         if age_group == 10:
             tb_pop_filter = create_ten_year_age_groups(tb_pop)
         # Group by country and year, and apply the custom function
-        tb_pop_filter = tb_pop_filter.groupby(["location", "year"]).apply(get_largest_age_group)
+        tb_pop_filter = tb_pop_filter.groupby(["location", "year"], observed=False).apply(get_largest_age_group)
         # The function above creates NAs for some locations that don't appear to be in the table e.g. Vatican, Melanesia, so dropping here
         tb_pop_filter = tb_pop_filter.dropna()
         tb_pop_filter = tb_pop_filter.reset_index(drop=True)
@@ -55,11 +55,11 @@ def create_ten_year_age_groups(tb: Table) -> Table:
 
     # Create the 0-9 and 10-19 age groups
     tb_0_9 = tb[(tb.age == "0-4") | (tb.age == "5-9")]
-    tb_0_9 = tb_0_9.groupby(["location", "year"])["value"].sum().reset_index()
+    tb_0_9 = tb_0_9.groupby(["location", "year"], observed=False)["value"].sum().reset_index()
     tb_0_9["age"] = "0-9"
 
     tb_10_19 = tb[(tb.age == "10-14") | (tb.age == "15-19")]
-    tb_10_19 = tb_10_19.groupby(["location", "year"])["value"].sum().reset_index()
+    tb_10_19 = tb_10_19.groupby(["location", "year"], observed=False)["value"].sum().reset_index()
     tb_10_19["age"] = "10-19"
     # Drop the 0-4, 5-9, 10-14 and 15-19 age groups
     tb = tb[(tb.age != "0-4") & (tb.age != "5-9") & (tb.age != "10-14") & (tb.age != "15-19")]

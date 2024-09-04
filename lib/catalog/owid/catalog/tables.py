@@ -1000,9 +1000,11 @@ class Table(pd.DataFrame):
     def sort_index(self, *args, **kwargs) -> "Table":
         return super().sort_index(*args, **kwargs)  # type: ignore
 
-    def groupby(self, *args, **kwargs) -> "TableGroupBy":
-        """Groupby that preserves metadata."""
-        return TableGroupBy(pd.DataFrame.groupby(self.copy(deep=False), *args, **kwargs), self.metadata, self._fields)
+    def groupby(self, *args, observed=True, **kwargs) -> "TableGroupBy":
+        """Groupby that preserves metadata. It uses observed=True by default."""
+        return TableGroupBy(
+            pd.DataFrame.groupby(self.copy(deep=False), *args, observed=observed, **kwargs), self.metadata, self._fields
+        )
 
     def rolling(self, *args, **kwargs) -> "TableRolling":
         """Rolling operation that preserves metadata."""

@@ -52,11 +52,11 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["country"])
     tb = tb.rename(columns={"region": "country"})
     # Ensure the regions with the same country name are summed
-    tb = tb.groupby(["year", "plastic_fate", "country"])["value"].sum().reset_index()
+    tb = tb.groupby(["year", "plastic_fate", "country"], observed=False)["value"].sum().reset_index()
     # Add the metadata back to the table
     tb.metadata = metadata
     # Calculate the global totals
-    total_df = tb.groupby(["year", "plastic_fate"])["value"].sum()
+    total_df = tb.groupby(["year", "plastic_fate"], observed=False)["value"].sum()
     total_df = total_df.reset_index()
 
     total_df["country"] = "World"
