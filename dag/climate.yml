@@ -296,12 +296,32 @@ steps:
   data://grapher/climate/2024-07-23/climate_change_impacts_monthly:
     - data://garden/climate/2024-07-23/climate_change_impacts
   #
-  # NSIDC - Monthly sea ice anomalies.
+  # NSIDC - Monthly sea ice anomalies (one indicator per year).
   #
   data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly:
     - data://garden/climate/2024-07-23/sea_ice_index
   #
-  # NSIDC - Monthly sea ice anomalies (each country corresponds to a year).
+  # NSIDC - Monthly sea ice anomalies (one indicator containing all years, showing north and south in the same chart).
   #
   data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly_alternative:
+    - data://garden/climate/2024-07-23/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice anomalies (one indicator containing all years, only northern hemisphere).
+  #
+  data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly_by_year_north:
+    - data://garden/climate/2024-07-23/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice anomalies (one indicator containing all years, only southern hemisphere).
+  #
+  data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly_by_year_south:
+    - data://garden/climate/2024-07-23/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice anomalies (one indicator containing all decades, only northern hemisphere).
+  #
+  data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly_by_decade_north:
+    - data://garden/climate/2024-07-23/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice anomalies (one indicator containing all decades, only southern hemisphere).
+  #
+  data://grapher/climate/2024-07-23/sea_ice_anomalies_monthly_by_decade_south:
     - data://garden/climate/2024-07-23/sea_ice_index
