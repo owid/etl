@@ -59,7 +59,7 @@ def run(dest_dir: str) -> None:
         tb = create_table(tb)
         tb["source_producer"] = clean_source_name(tb["source"], load_clean_source_mapping())
         tb["attribution_short"] = add_short_source_name(tb["source"], load_short_source_mapping())
-        tb["citation"] = get_citation(tb["source"])
+        tb["source_title"] = get_source(tb["source"])
 
         tb_var_gr = tb.groupby("variable_name")
 
@@ -113,17 +113,16 @@ def add_short_source_name(raw_source: pd.Series, short_source_map: Dict[str, str
     return short_source
 
 
-def get_citation(raw_source: pd.Series) -> str:
-    """Get original citation from the UN SDG dataset. This is uncleaned and should only be used for the full citation"""
+def get_source(raw_source: pd.Series) -> str:
+    """Get source for origin title and citation. Lists up to 3 sources, more are combined into 'multiple sources'."""
     sources = raw_source.drop_duplicates()
-    if len(sources) > 1:
-        citation = ", ".join([source_name for _, source_name in sources.items()])
+    if len(sources) == 1:
+        title = sources.iloc[0].strip()
+    elif len(sources) <= 3:
+        title = ", ".join([source_name for _, source_name in sources.items()])
     else:
-        citation = sources.iloc[0].strip()
-    citation = (
-        f"{citation} via UN SDG Indicators Database, UN Department of Economic and Social Affairs ({CURRENT_YEAR})"
-    )
-    return citation
+        title = "Data from multiple sources"
+    return title
 
 
 def load_source_description() -> dict:
@@ -169,14 +168,13 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
     tb.short_name = tb["variable_name"].iloc[0]
 
     source_in_tb = tb["source_producer"].iloc[0]
-    title_in_tb = tb["source"].iloc[0]
-    citation_in_tb = tb["citation"].iloc[0]
+    title_in_tb = tb["source_title"].iloc[0]
 
     origin = Origin(
         producer=source_in_tb,
         title=title_in_tb,
         description="The United Nations Sustainable Development Goal (SDG) dataset is the primary collection of data tracking progress towards the SDG indicators, compiled from officially-recognized international sources.",
-        citation_full=citation_in_tb,
+        citation_full=f"{title_in_tb} via UN SDG Indicators Database, UN Department of Economic and Social Affairs ({CURRENT_YEAR})",
         date_accessed=DATE_ACCESSED,
         url_main="https://unstats.un.org/sdgs/dataportal",
         url_download="https://unstats.un.org/sdgapi",
