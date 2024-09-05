@@ -22,4 +22,8 @@ tables:
         description_processing: |-
           The most common cancer type as a cause of death was identified using the age-standardized death rate per 100,000 people. The age-standardized death rate allows for fair comparisons across different populations by accounting for age distribution differences.
         unit: ''
+        presentation:
+          grapher_config:
+            note: |-
+              All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
 
