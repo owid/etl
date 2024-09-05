@@ -4,8 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Global Health
-      display:
-          numDecimalPlaces: 0
+    display:
+      numDecimalPlaces: 0
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -20,20 +20,19 @@ tables:
         title: Number of specimens with pathogen <<organism>>
         unit: specimens
         description_short: |-
-          The number of specimens detected with respiratory pathogen <<organism>>.
+          The number of specimens detected with respiratory pathogen << organism >>.
 
       percentage:
         title: Percentage of specimens with pathogen <<organism>>
         description_short: |-
-          The share of specimens detected with respiratory pathogen <<organism>>.
-        unit: '%'
-        short_unit: '%'
+          The share of specimens detected with respiratory pathogen << organism >>.
+        unit: "%"
+        short_unit: "%"
         display:
           numDecimalPlaces: 2
 
       tested:
         title: Total number of specimens tested for pathogen <<organism>> present
         description_short: |-
-          The number of specimens tested to detect the respiratory pathogen <<organism>>. Some of these specimens may have tested positive for the pathogen, while others (or all of them) may have tested negative.
+          The number of specimens tested to detect the respiratory pathogen << organism >>. Some of these specimens may have tested positive for the pathogen, while others (or all of them) may have tested negative.
         unit: specimens
-
