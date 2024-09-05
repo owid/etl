@@ -1,0 +1,25 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Causes of Death
+        - Cancer
+    processing_level: minor
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  mortality_database_cancer:
+    variables:
+      cause:
+        title: The most common cancer type as a cause of death in << sex.lower() >>
+        description_short: Most common cause of cancer deaths in << sex.lower() >> per 100,000 people.
+        description_processing: |-
+          The most common cancer type as a cause of death was identified using the age-standardized death rate per 100,000 people. The age-standardized death rate allows for fair comparisons across different populations by accounting for age distribution differences.
+        unit: ''
+
