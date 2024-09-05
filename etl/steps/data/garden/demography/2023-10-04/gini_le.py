@@ -57,7 +57,7 @@ def run(dest_dir: str) -> None:
     tb = tb.sort_values(["location", "year", "sex", "age"])
 
     # Estimates
-    tb = tb.groupby(["location", "year", "sex"], as_index=False).apply(gini_from_mx)
+    tb = tb.groupby(["location", "year", "sex"], as_index=False, observed=False).apply(gini_from_mx)
     tb.life_expectancy_gini.m.origins = origins
 
     # Rename columns

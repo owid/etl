@@ -56,6 +56,14 @@ steps:
   data://grapher/war/2023-09-21/prio_v31:
     - data://garden/war/2023-09-21/prio_v31
 
+  # UCDP/PRIO
+  data://garden/war/2024-08-26/ucdp_prio:
+    - data://garden/war/2024-08-26/ucdp
+    - data://garden/war/2023-09-21/prio_v31
+    - data://garden/countries/2024-08-27/gleditsch
+  data://grapher/war/2024-08-26/ucdp_prio:
+    - data://garden/war/2024-08-26/ucdp_prio
+
   # COW - Wars
   data://meadow/war/2023-09-21/cow:
     - snapshot://war/2023-09-21/cow_extra_state.csv
@@ -115,14 +123,6 @@ steps:
     - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/war/2023-09-27/peace_diehl:
     - data://garden/war/2023-09-27/peace_diehl
-
-  # UCDP/PRIO
-  data://garden/war/2024-08-26/ucdp_prio:
-    - data://garden/war/2024-08-26/ucdp
-    - data://garden/war/2023-09-21/prio_v31
-    - data://garden/countries/2023-09-25/gleditsch
-  data://grapher/war/2024-08-26/ucdp_prio:
-    - data://garden/war/2024-08-26/ucdp_prio
 
   # Chupilkin and Koczan (Supplementary dataset to CoW)
   data://meadow/war/2023-11-29/chupilkin_koczan:

@@ -10,8 +10,9 @@ from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # NOTE: date format changed on 2024-09-01
-# DATE_FORMAT = "%Y-%m-%d"
-DATE_FORMAT = "%d/%m/%y"
+# NOTE: date format changed back to %Y-%m-%d on 2024-09-05
+DATE_FORMAT = "%Y-%m-%d"
+# DATE_FORMAT = "%d/%m/%y"
 
 
 def run(dest_dir: str, paths: PathFinder) -> None:
