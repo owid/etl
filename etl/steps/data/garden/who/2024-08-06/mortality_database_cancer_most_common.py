@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import re
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -21,12 +19,11 @@ def run(dest_dir: str) -> None:
     #
     # Remove rows with missing values in 'age_standardized_death_rate_per_100_000_standard_population'
     tb = tb.dropna(subset=["age_standardized_death_rate_per_100_000_standard_population"])
+    tb = tb[["country", "year", "sex", "cause", "age_standardized_death_rate_per_100_000_standard_population"]]
 
     # Group by 'country', 'year', 'sex', and 'age_group' and find the cause with the maximum death rate
     tb = tb.loc[
-        tb.groupby(["country", "year", "sex", "age_group"])[
-            "age_standardized_death_rate_per_100_000_standard_population"
-        ].idxmax()
+        tb.groupby(["country", "year", "sex"])["age_standardized_death_rate_per_100_000_standard_population"].idxmax()
     ]
 
     # Replace "cancer" or "cancers" with an empty string, and replace commas with "and"
