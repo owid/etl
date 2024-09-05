@@ -295,3 +295,18 @@ steps:
   #
   data://grapher/climate/2024-07-23/climate_change_impacts_monthly:
     - data://garden/climate/2024-07-23/climate_change_impacts
+  #
+  # NSIDC - Monthly sea ice anomalies ("country" for month names, "year" for years, one indicator per hemisphere).
+  #
+  data://grapher/climate/2024-07-23/sea_ice_anomalies_by_month:
+    - data://garden/climate/2024-07-23/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice extent ("country" for years, "year" for month number, one indicator per hemisphere).
+  #
+  data://grapher/climate/2024-07-23/sea_ice_extent_by_year:
+    - data://garden/climate/2024-07-23/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice extent ("country" for decades and latest year, "year" for month number, one indicator per hemisphere).
+  #
+  data://grapher/climate/2024-07-23/sea_ice_extent_by_decade:
+    - data://garden/climate/2024-07-23/sea_ice_index
