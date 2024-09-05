@@ -10,8 +10,8 @@ paths = PathFinder(__file__)
 
 # Rename organism
 ORGANISM_RENAME = {
-    "Human_coronavirus": "Human coronavirus",
-    "Human_coronavirus.2019": "Human coronavirus 2019",
+    "Human_coronavirus": "Other coronaviruses",
+    "Human_coronavirus.2019": "COVID-19",
     "Influenza.A.H3N2": "Influenza A (H3N2)",
     "Influenza.A.H1N1": "Influenza A (H1N1)",
     "Influenza.B": "Influenza B",
@@ -19,8 +19,8 @@ ORGANISM_RENAME = {
     "RSV.B": "RSV B",
     "Adenovirus": "Adenovirus",
     "Enterovirus": "Enterovirus",
-    "Human_metapneumovirus": "Human metapneumovirus",
-    "Human_parainfluenza": "Human parainfluenza",
+    "Human_metapneumovirus": "Metapneumovirus",
+    "Human_parainfluenza": "Parainfluenza",
     "Rhinovirus": "Rhinovirus",
 }
 
