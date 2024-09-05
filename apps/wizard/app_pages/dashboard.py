@@ -123,7 +123,7 @@ log = get_logger()
 ########################################
 # TITLE and DESCRIPTION
 ########################################
-st.title("ETL Dashboard 📋 :grey[Control panel for ETL steps]")
+st.title(":material/tv_gen: ETL Dashboard **:grey[Control panel for ETL steps]**")
 st.markdown(
     """\
 Explore all active ETL steps, and, if you are working on your local machine, perform some actions.

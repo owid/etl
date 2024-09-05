@@ -56,7 +56,9 @@ class Explorer:
             self.content = f.read()
 
         if "yVariableIds" not in self.content:
-            raise NotImplementedError("For the moment, Explorer is only adapted to indicator-based explorers.")
+            raise NotImplementedError(
+                "Unexpected error. This can be for various reasons. Likely reasons are: (i) For the moment, Explorer is only adapted to indicator-based explorers. (ii) Explorer config tsv is not up-to-date in owid-content, pelase pull latest changes."
+            )
 
     def _parse_content(self):
         # Initialize flags that will help parse the content.
