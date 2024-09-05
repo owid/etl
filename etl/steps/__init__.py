@@ -34,6 +34,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 from sqlalchemy.engine import Engine
 
+from apps.chart_sync.admin_api import AdminAPI
 from etl import config, files, git_helpers, paths
 from etl import grapher_helpers as gh
 from etl.config import TLS_VERIFY
@@ -861,6 +862,7 @@ class GrapherStep(Step):
         dataset.metadata = gh._adapt_dataset_metadata_for_grapher(dataset.metadata)
 
         engine = get_engine()
+        admin_api = AdminAPI(engine)
 
         assert dataset.metadata.namespace
         dataset_upsert_results = gi.upsert_dataset(
@@ -910,6 +912,7 @@ class GrapherStep(Step):
                         thread_pool.submit(
                             gi.upsert_table,
                             engine,
+                            admin_api,
                             t,
                             dataset_upsert_results,
                             catalog_path=catalog_path,
