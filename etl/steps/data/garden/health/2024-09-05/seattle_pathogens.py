@@ -52,7 +52,7 @@ def run(dest_dir: str) -> None:
 
     # Estimate percentage
     assert (tb["tested"] != 0).all(), "Some zeroes in tested column! This can lead to division by zero."
-    tb["percentage"] = tb["present"] / tb["tested"]
+    tb["percentage"] = 100 * tb["present"] / tb["tested"]
 
     # Add entity
     tb["country"] = "Seattle"
