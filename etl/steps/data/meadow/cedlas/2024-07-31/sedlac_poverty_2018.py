@@ -140,8 +140,6 @@ def format_long_tables(
         # Do the same for year
         t["year"] = t.loc[t["index"].astype(str).str[:4].str.isnumeric(), "index"]
 
-        t.to_csv("t.csv")
-
         # Assert if null values in index are for for certain countries
         countries_with_null = []
 
