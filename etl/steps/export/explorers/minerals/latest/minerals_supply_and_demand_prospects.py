@@ -145,7 +145,7 @@ def run(dest_dir: str) -> None:
     # Prepare explorer metadata.
     config = {
         "explorerTitle": "Minerals Supply and Demand Prospects",
-        "explorerSubtitle": "",
+        "explorerSubtitle": "Explore data from the IEA on the future outlook for mineral supply and demand.",
         "entityType": "country or technology",
         # Ensure all entities (countries or technologies) are selected by default, so that stacked area charts are always showing totals.
         "selection": sorted(set(tb["country"])),
