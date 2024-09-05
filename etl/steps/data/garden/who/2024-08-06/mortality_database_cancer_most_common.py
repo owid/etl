@@ -20,6 +20,7 @@ def run(dest_dir: str) -> None:
     # Remove rows with missing values in 'age_standardized_death_rate_per_100_000_standard_population'
     tb = tb.dropna(subset=["age_standardized_death_rate_per_100_000_standard_population"])
     tb = tb[["country", "year", "sex", "cause", "age_standardized_death_rate_per_100_000_standard_population"]]
+    tb["cause"] = tb["cause"].astype("string")
 
     # Group by 'country', 'year', 'sex', and 'age_group' and find the cause with the maximum death rate
     tb = tb.loc[
