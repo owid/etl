@@ -1,6 +1,9 @@
 definitions:
   common:
     processing_level: major
+    description_processing: |-
+      - We have integrated data from multiple sheets within the IEA's Critical Minerals Dataset to provide a comprehensive overview.
+      - Where applicable, we have merged supply and demand data, enabling the calculation of relative shares for a more detailed analysis.
     presentation:
       topic_tags:
         - Metals & Minerals

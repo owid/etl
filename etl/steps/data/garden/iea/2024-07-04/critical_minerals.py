@@ -34,17 +34,12 @@ from typing import Tuple
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table, VariablePresentationMeta
 from owid.datautils.dataframes import map_series
-from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
-# Initialize log.
-log = get_logger()
-
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
 
 # Names of technologies accounted for in the data.
 technologies = {
@@ -391,7 +386,7 @@ def add_share_columns(tb_demand: Table, tb_supply: Table) -> Tuple[Table, Table]
         )
         .size()
     )
-    assert (grouped == 3).all()
+    assert (grouped == 3).all(), "Unexpected number of rows (see explanation in the code)."
     # Fill all cases where "scenario" is now nan (for "Mine" process) with a reasonable label.
     tb_supply["scenario"] = tb_supply["scenario"].astype("string").fillna(ALL_SCENARIOS_LABEL)
 
@@ -558,7 +553,7 @@ def improve_metadata_of_tables_by_technology_and_by_country(tb_demand_flat, tb_s
             elif process == "Refinery":
                 mineral_process = f"refined {mineral.lower()}"
             else:
-                log.warning(f"Unexpected process for column {column}")
+                paths.log.warning(f"Unexpected process for column {column}")
             # Fix special cases.
             mineral_process = mineral_process.replace("pgms", "PGMs")
 
@@ -577,7 +572,7 @@ def improve_metadata_of_tables_by_technology_and_by_country(tb_demand_flat, tb_s
                 scenario_name = ""
                 scenario_dod = ""
             else:
-                log.warning(f"Unexpected scenario for column {column}")
+                paths.log.warning(f"Unexpected scenario for column {column}")
             # * Case description:
             if case == "Base case":
                 case_description = (
@@ -604,7 +599,7 @@ def improve_metadata_of_tables_by_technology_and_by_country(tb_demand_flat, tb_s
             elif case == "Wider use of silicon-rich anodes":
                 case_description = "Projections assume a wider use of silicon-rich anodes."
             else:
-                log.warning(f"Unexpected case for column {column}")
+                paths.log.warning(f"Unexpected case for column {column}")
 
             # Initialize a list of footnotes.
             footnotes = []
@@ -651,7 +646,7 @@ def improve_metadata_of_tables_by_technology_and_by_country(tb_demand_flat, tb_s
                     f"Projected demand of {mineral_process}, assuming IEA's [{scenario_name}](#dod:{scenario_dod}), as a share of the projected global demand of {mineral_process}."
                 )
             else:
-                log.warning(f"Unexpected metric for column {column}")
+                paths.log.warning(f"Unexpected metric for column {column}")
             # Append the case description at the end.
             short_descriptions.append(case_description)
 
