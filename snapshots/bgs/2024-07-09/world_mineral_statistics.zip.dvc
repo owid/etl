@@ -20,13 +20,15 @@ meta:
     attribution_short: BGS
 
     # Files
-    url_main: https://www2.bgs.ac.uk/mineralsuk/statistics/worldStatistics.html
+    url_main: https://www.bgs.ac.uk/mineralsuk/statistics/world-mineral-statistics/
     date_accessed: 2024-07-09
 
     # License
     license:
       name: © Natural Environment Research Council (NERC) and/or the authority that commissioned the work
-      url: https://www2.bgs.ac.uk/mineralsUk/statistics/termsAndConditions.html
+      url: https://www.bgs.ac.uk/mineralsuk/statistics/world-mineral-statistics/
+      # NOTE: BGS is migrating their page to a new format, and the following link is currently broken.
+      # url: https://www2.bgs.ac.uk/mineralsUk/statistics/termsAndConditions.html
 
 outs:
   - md5: e73b1fb2d1977c1398de343bd58f0c82

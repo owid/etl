@@ -95,7 +95,7 @@ def combining_sexes_for_all_age_groups(tb: Table) -> Table:
     msk = tb["age_group"].isin(age_groups_with_both_sexes)
     tb_age = tb[~msk]
     tb_gr = (
-        tb_age.groupby(["country", "year", "age_group", "risk_factor"], dropna=False)[
+        tb_age.groupby(["country", "year", "age_group", "risk_factor"], dropna=False, observed=False)[
             ["best", "lo", "hi", "population"]
         ]
         .sum()

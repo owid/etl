@@ -56,7 +56,7 @@ def run(dest_dir: str) -> None:
 
     # Format dataframe
     log.info("avian: format dataframe")
-    tb = tb.groupby(["date", "country", "indicator"], as_index=False).size()
+    tb = tb.groupby(["date", "country", "indicator"], as_index=False, observed=False).size()
     tb = tb.pivot(index=["date", "country"], columns="indicator", values="size").reset_index()
 
     # Add regions
@@ -88,7 +88,7 @@ def add_regions(tb: Table, ds_regions: Dataset) -> Table:
         # Add region
         tb_region = tb[tb["country"].isin(countries_in_region)].copy()
         tb_region["country"] = region
-        tb_region = tb_region.groupby(["date", "country"], as_index=False)["avian_cases"].sum()
+        tb_region = tb_region.groupby(["date", "country"], as_index=False, observed=False)["avian_cases"].sum()
 
         # Combine
         tb = pr.concat([tb, tb_region], ignore_index=True)
@@ -102,7 +102,7 @@ def add_world(tb: Table) -> Table:
     tb_world = tb[~tb["country"].isin(REGIONS)].copy()
 
     # Aggregate
-    tb_world = tb_world.groupby("date", as_index=False)["avian_cases"].sum()
+    tb_world = tb_world.groupby("date", as_index=False, observed=False)["avian_cases"].sum()
     tb_world["country"] = "World"
 
     # Combine

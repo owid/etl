@@ -890,7 +890,7 @@ st.set_page_config(
     page_icon="🪄",
     # initial_sidebar_state="collapsed",
 )
-st.title("🗺️ Map bracketer")
+st.title(":material/map: Map bracketer")
 with st.popover("ℹ️ Learn about it"):
     st.markdown(
         "This tool will find optimal map brackets for a specific variable, and let you manually edit it in a way that is consistent with our guidelines."
