@@ -75,7 +75,9 @@ def improve_metadata(tb: Table) -> Table:
     for column in tb.drop(columns=["country", "year"]).columns:
         location = column.split("sea_ice_extent_")[-1].title()
         title = f"Monthly sea ice extent in the {location}, decadal average"
-        description_short = "Each point represents the sea ice extent, averaged over all days in the month, then averaged across all years in the decade."
+        description_short = (
+            "Each point represents the monthly average sea ice extent, averaged across all years within the decade."
+        )
         subtitle = (
             description_short
             + " The current decade is highlighted in red, with the current year shown in black for comparison."

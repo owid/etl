@@ -25,7 +25,7 @@ def improve_metadata(tb: Table) -> Table:
     for column in tb.drop(columns=["country", "year"]).columns:
         location = column.split("sea_ice_extent_")[-1].title()
         title = f"Sea ice anomaly in the {location} by month"
-        description_short_yearly = f"Each point represents the sea ice extent, averaged over all days in the month, with respect to the same month in {REFERENCE_YEAR}."
+        description_short_yearly = f"Each point represents the monthly average sea ice extent with respect to the same month in {REFERENCE_YEAR}, which is close to the midpoint of the series."
         footnote = (
             "All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current year."
         )
