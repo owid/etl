@@ -14,8 +14,8 @@ paths = PathFinder(__file__)
 YEAR_MIN = 1980
 
 # For each month's sea ice extent, subtract a certain baseline sea ice extent, calculated as an average value (for that month) between two reference years (defined above as REFERENCE_YEAR_MIN and REFERENCE_YEAR_MAX).
-# NOTE: The lower reference year is excluded.
-REFERENCE_YEAR_MIN = 1980
+# NOTE: Both min and max years are included.
+REFERENCE_YEAR_MIN = 1981
 REFERENCE_YEAR_MAX = 2010
 
 
@@ -27,7 +27,7 @@ def improve_metadata(tb: Table) -> Table:
     for column in tb.drop(columns=["country", "year"]).columns:
         location = column.split("sea_ice_extent_")[-1].title()
         title = f"Sea ice anomaly in the {location} by month"
-        description_short_yearly = f"Each point represents the monthly average sea ice extent relative to a baseline, which is the average sea ice extent for the same month over the {REFERENCE_YEAR_MAX-REFERENCE_YEAR_MIN}-year period from {REFERENCE_YEAR_MIN} to {REFERENCE_YEAR_MAX}."
+        description_short_yearly = f"Each point represents the monthly average sea ice extent relative to a baseline, which is the average sea ice extent for the same month over the {REFERENCE_YEAR_MAX-REFERENCE_YEAR_MIN+1}-year period from {REFERENCE_YEAR_MIN} to {REFERENCE_YEAR_MAX}."
         footnote = (
             "All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current year."
         )
@@ -140,7 +140,7 @@ def run(dest_dir: str) -> None:
 
     # For each month's sea ice extent, subtract a certain baseline sea ice extent, calculated as an average value (for that month) between two reference years (defined above as REFERENCE_YEAR_MIN and REFERENCE_YEAR_MAX)
     tb_reference = (
-        tb[(tb["year"] > REFERENCE_YEAR_MIN) & (tb["year"] >= REFERENCE_YEAR_MAX)]
+        tb[(tb["year"] >= REFERENCE_YEAR_MIN) & (tb["year"] >= REFERENCE_YEAR_MAX)]
         .groupby(["location", "month_name"], as_index=False)
         .agg({"sea_ice_extent": "mean"})
         .rename(columns={"sea_ice_extent": "sea_ice_extent_reference"}, errors="raise")
