@@ -190,6 +190,7 @@ def add_per_capita_variables(combined: Table, ds_population: Dataset) -> Table:
         "renewable_generation__twh",
         "solar_generation__twh",
         "total_generation__twh",
+        "total_demand__twh",
         "wind_generation__twh",
         "solar_and_wind_generation__twh",
     ]

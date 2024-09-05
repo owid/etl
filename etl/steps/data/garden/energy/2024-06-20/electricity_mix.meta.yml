@@ -363,6 +363,16 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: Total electricity generation per person
+      per_capita_total_demand__kwh:
+        title: Per capita electricity demand - kWh
+        short_unit: kWh
+        unit: kilowatt-hours
+        description_short: *description_short_per_capita
+        display:
+          name: Total electricity
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Total electricity demand per person
       per_capita_wind_generation__kwh:
         title: Wind electricity per capita - kWh
         short_unit: kWh
