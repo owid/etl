@@ -17,11 +17,11 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Keep only the columns relevant for age-standardized death rate per 100,000 standard population which we'll use to get the most deadly cancers
+    tb = tb[["country", "year", "sex", "cause", "age_standardized_death_rate_per_100_000_standard_population"]]
+
     # Remove rows with missing values in 'age_standardized_death_rate_per_100_000_standard_population'
     tb = tb.dropna(subset=["age_standardized_death_rate_per_100_000_standard_population"])
-    tb = tb[["country", "year", "sex", "cause", "age_standardized_death_rate_per_100_000_standard_population"]]
-    tb["cause"] = tb["cause"].astype("string")
-
     # Group by 'country', 'year', 'sex', and 'age_group' and find the cause with the maximum death rate
     tb = tb.loc[
         tb.groupby(["country", "year", "sex"])["age_standardized_death_rate_per_100_000_standard_population"].idxmax()
@@ -31,7 +31,6 @@ def run(dest_dir: str) -> None:
     tb["cause"] = (
         tb["cause"].str.replace(r"\bcancers?\b", "", case=False, regex=True).str.replace(",", " and").str.strip()
     )
-    # Keep only the 'cause' column
     tb = tb[["country", "year", "sex", "cause"]]
 
     tb = tb.format(["country", "year", "sex"])
