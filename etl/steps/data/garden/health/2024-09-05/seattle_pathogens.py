@@ -47,11 +47,15 @@ def run(dest_dir: str) -> None:
     # Change date format from week YYYY-Www to YYYY-MM-DD
     tb["date"] = pd.to_datetime(tb["week"].astype("string") + "-1", format="%G-W%V-%w")
 
-    # Add entity
-    tb["country"] = "World"
-
     # Keep relevant columns
-    tb = tb[["country", "date", "organism", "present", "tested"]]
+    tb = tb[["date", "organism", "present", "tested"]]
+
+    # Estimate percentage
+    assert (tb["tested"] != 0).all(), "Some zeroes in tested column! This can lead to division by zero."
+    tb["percentage"] = tb["present"] / tb["tested"]
+
+    # Add entity
+    tb["country"] = "Seattle"
 
     # Format
     tb = tb.format(["country", "date", "organism"])
