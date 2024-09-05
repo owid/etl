@@ -114,12 +114,17 @@ def add_short_source_name(raw_source: pd.Series, short_source_map: Dict[str, str
 
 
 def get_source(raw_source: pd.Series) -> str:
-    """Get source for origin title and citation. Lists up to 3 sources, more are combined into 'multiple sources'."""
+    """Get source for origin title and citation. Lists up to 3 sources, more are combined into 'multiple sources'.
+    Shortens title if it is too long."""
     sources = raw_source.drop_duplicates()
     if len(sources) == 1:
         title = sources.iloc[0].strip()
+        if len(title) > 250:
+            title = title[:250] + "..."
     elif len(sources) <= 3:
         title = ", ".join([source_name for _, source_name in sources.items()])
+        if len(title) > 250:
+            title = "Data from multiple sources"
     else:
         title = "Data from multiple sources"
     return title
