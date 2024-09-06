@@ -11,8 +11,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("mortality_database_cancer")
-    tables = list(ds_garden)
+    ds_garden = paths.load_dataset("mortality_database_cancer_most_common")
+    tables = [ds_garden[tab] for tab in sorted(ds_garden.table_names)]
 
     ds_grapher = create_dataset(dest_dir=dest_dir, tables=tables, default_metadata=ds_garden.metadata)
     # Checks.
