@@ -288,7 +288,87 @@ ds_explorer.save()
 
 ### Creating multi-dimensional indicators
 
-TODO
+Multi-dimensional indicators are powered by a configuration that is typically created from a YAML file. The structure of the YAML file looks like this:
+
+```yaml
+definitions:
+  table: grapher/energy/2024-05-08/primary_energy_consumption/primary_energy_consumption
+
+title:
+  title: Energy use
+  titleVariant: by energy source
+defaultSelection:
+  - World
+  - Europe
+  - Mexico
+topicTags:
+  - Energy
+dimensions:
+  - slug: source
+    name: Energy source
+    choices:
+      - slug: all
+        name: All sources
+        group: Aggregates
+        description: Total energy use
+      - slug: fossil
+        name: Fossil fuels
+        group: Aggregates
+        description: The sum of coal, oil and gas
+      ...
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: total
+        name: Total consumption
+        description: The amount of energy consumed nationally per year
+      - slug: per_capita
+        name: Consumption per capita
+        description: The average amount of energy each person consumes per year
+      ...
+
+views:
+  - dimensions:
+      source: all
+      metric: total
+    indicators:
+      y: "{definitions.table}#primary_energy_consumption__twh"
+  - dimensions:
+      source: all
+      metric: per_capita
+    indicators:
+      # This could be a list of indicators
+      y: "{definitions.table}#primary_energy_consumption_per_capita__kwh"
+```
+
+The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically. However, it's a good idea to create a few of them manually to start.
+
+You can also combine manually defined views with generated ones. See the `etl.multidim` module for available helper functions or refer to examples from `etl/steps/export/multidim/`. Feel free to add or modify the helper functions as needed.
+
+The export step loads the YAML file, adds `views` to the config, and then calls the function.
+
+```python
+def run(dest_dir: str) -> None:
+    engine = get_engine()
+
+    # Load YAML file
+    with open(CURRENT_DIR / "energy.yml") as istream:
+        config = yaml.safe_load(istream)
+
+    # Programatically generate views
+    config['views'] = ...
+
+    multidim.upsert_multidim_data_page("mdd-energy", config, engine)
+```
+
+To see the multi-dimensional indicator in Admin, run
+
+```bash
+etlr export://multidim/energy/latest/energy --export
+```
+
+and check out the preview at http://staging-site-my-branch/admin/grapher/mdd-name.
+
 
 ### Exporting data to GitHub
 

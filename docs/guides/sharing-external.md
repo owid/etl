@@ -11,6 +11,6 @@ Sometimes it's useful to share our work with external people to get feedback bef
 To share explorers with the public, follow these steps:
 
 1. Create a branch wiht `-public` suffix (thus creating staging server).
-2. Publish your explorer.
-3. Commit something to trigger manual deploy (this is only needed once after publishing).
+2. Set `isPublished` to `true` in your explorer configuration.
+3. Trigger manual deploy from Admin (this is only needed to do once) or commit to trigger it automatically.
 4. Share your explorer with public on e.g. https://staging-site-my-branch.tail6e23.ts.net/explorers/my-explorer.
