@@ -27,13 +27,6 @@ tables:
             The estimated number of << cancer.lower() >> cancer cases attributable to << agent.lower() >> among {definitions.sex}
          unit: cases
 
-       ir_att:
-         title: |-
-           Incidence rate of << cancer.lower() >> cancer attributable to << agent.lower() >> among {definitions.sex}
-         description_short: |-
-            The estimated incidence rate of << cancer.lower() >> cancer attributable to << agent.lower() >>among {definitions.sex}
-         unit: per 100,000 people
-
        asir_att:
           title: |-
             Age-standardized incidence rate of << cancer.lower() >> cancer attributable to << agent.lower() >> among {definitions.sex}
@@ -50,13 +43,6 @@ tables:
           description_short: |-
             Proportion of << cancer.lower() >> cancer cances among {definitions.sex} attributable to << agent.lower() >>
           unit: '%'
-
-       ir:
-          title: |-
-            Incidence rate of << cancer.lower() >> cancer among {definitions.sex}
-          description_short: |-
-            The estimated incidence rate of << cancer.lower() >> cancer among {definitions.sex}
-          unit: per 100,000 people
 
        asir:
           title: |-
