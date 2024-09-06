@@ -43,6 +43,7 @@ tables:
           description_short: |-
             Proportion of << cancer.lower() >> cancer cances among {definitions.sex} attributable to << agent.lower() >>
           unit: '%'
+          short_unit: '%'
 
        asir:
           title: |-
@@ -54,13 +55,15 @@ tables:
             grapher_config:
               note: |-
                 {definitions.footnote}
-       asr:
+       asir_asir_att_share:
           title: |-
-            Age-standardized rates for the number of << cancer.lower() >> cancer cases
+            Share of the age-standardized incidence rate of << cancer.lower() >> attributable to << agent.lower() >> among {definitions.sex}
           description_short: |-
-            The age-standardized rate for the number of << cancer.lower() >> cancer cases among {definitions.sex}
-          unit: per 100,000 people
+            The estimated share of the age-standardized incidence rate of << cancer.lower() >> attributable to << agent.lower() >> among {definitions.sex}
+          unit:  '%'
+          short_unit: '%'
           presentation:
             grapher_config:
               note: |-
                 {definitions.footnote}
+
