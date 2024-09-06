@@ -385,7 +385,7 @@ def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, targe
 ########################################
 def main():
     st.title(
-        "Chart ⚡ **:gray[Diff]**",
+        ":material/difference: Chart Diff",
         help=f"""
 **Chart diff** is a living page that compares all ongoing charts between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
 

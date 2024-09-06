@@ -301,7 +301,7 @@ def export_metadata() -> None:
 # MAIN ##################################################
 #########################################################
 # TITLE
-st.title("Create step 🐆 **:gray[Express]**")
+st.title(":material/bolt: Express **:gray[Create steps]**")
 
 st.info("Use this step to create Meadow, Garden and Grapher step for a _single dataset_!")
 

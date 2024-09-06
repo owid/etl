@@ -127,9 +127,9 @@ else:
 
 # TITLE
 if st.session_state["meadow.edit_dataset"]:
-    st.title("Edit step  **:gray[Meadow]**")
+    st.title(":material/nature: Meadow  **:gray[Edit step]**")
 else:
-    st.title("Create step  **:gray[Meadow]**")
+    st.title(":material/nature: Meadow  **:gray[Create step]**")
 
 # SIDEBAR
 with st.sidebar:

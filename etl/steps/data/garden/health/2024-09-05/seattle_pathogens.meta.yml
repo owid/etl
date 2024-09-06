@@ -1,0 +1,40 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+    display:
+      numDecimalPlaces: 0
+      name: << organism >>
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Pathogens, SFA Study
+
+tables:
+  seattle_pathogens:
+    variables:
+      present:
+        title: Number of specimens with pathogen <<organism>>
+        unit: specimens
+        description_short: |-
+          The number of specimens detected with respiratory pathogen << organism >>.
+
+      percentage:
+        title: Percentage of specimens with pathogen <<organism>>
+        description_short: |-
+          The share of specimens detected with respiratory pathogen << organism >>.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+          name: << organism >>
+
+      tested:
+        title: Total number of specimens tested for pathogen <<organism>> present
+        description_short: |-
+          The number of specimens tested to detect the respiratory pathogen << organism >>. Some of these specimens may have tested positive for the pathogen, while others (or all of them) may have tested negative.
+        unit: specimens
