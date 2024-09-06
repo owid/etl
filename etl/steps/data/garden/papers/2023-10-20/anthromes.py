@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -183,12 +182,12 @@ def calculate_share_of_land_type(tb: Table, land_areas: Table) -> Table:
 
 
 def calculate_area_of_each_land_type(tb: Table) -> Table:
-    tb_global = tb.groupby(["year", "value"])["land_ar"].sum()
+    tb_global = tb.groupby(["year", "value"], observed=False)["land_ar"].sum()
     tb_global = tb_global.reset_index()
     tb_global["regn_nm"] = "World"
     tb_global["land_ar"] = tb_global["land_ar"].replace(np.nan, 0)
 
-    tb_regional = tb.groupby(["year", "value", "regn_nm"])["land_ar"].sum()
+    tb_regional = tb.groupby(["year", "value", "regn_nm"], observed=False)["land_ar"].sum()
     tb_regional = tb_regional.reset_index()
     tb_regional["land_ar"] = tb_regional["land_ar"].replace(np.nan, 0)
 
@@ -203,7 +202,7 @@ def calculate_regional_land_areas(tb: Table) -> Table:
 
     """
     # Calculate land area for each region
-    land_areas = tb.groupby("regn_nm").sum().drop(columns="id").reset_index()
+    land_areas = tb.groupby("regn_nm", observed=False).sum().drop(columns="id").reset_index()
     # Add a row for 'world' with the sum of 'land_ar'
     world_row = Table({"regn_nm": ["World"], "land_ar": [land_areas["land_ar"].sum()]})
     # Concatenate the 'world_row' DataFrame with the original DataFrame

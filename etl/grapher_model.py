@@ -2,6 +2,11 @@
 ```
 sqlacodegen --generator dataclasses --options use_inflect mysql://root:owid@localhost:3306/owid
 ```
+or
+```
+sqlacodegen --generator dataclasses --options use_inflect mysql://owid:@staging-site-branch:3306/owid
+```
+
 If you want to add a new table to ORM, add --tables mytable to the command above.
 
 Another option is to run `show create table mytable;` in MySQL and then ask ChatGPT to convert it to SQLAlchemy 2 ORM.
@@ -9,6 +14,7 @@ Another option is to run `show create table mytable;` in MySQL and then ask Chat
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
 """
 
+import copy
 import json
 import random
 from datetime import date, datetime
@@ -21,8 +27,8 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog.meta import VARIABLE_TYPE
-from sqlalchemy import JSON as _JSON
 from sqlalchemy import (
+    CHAR,
     BigInteger,
     Computed,
     Date,
@@ -32,12 +38,14 @@ from sqlalchemy import (
     Index,
     Integer,
     SmallInteger,
+    String,
     and_,
     func,
     or_,
     select,
     text,
 )
+from sqlalchemy import JSON as _JSON
 from sqlalchemy.dialects.mysql import (
     ENUM,
     LONGTEXT,
@@ -46,12 +54,19 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import DeclarativeBase, Mapped, MappedAsDataclass, Session, mapped_column  # type: ignore
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import (  # type: ignore
+    DeclarativeBase,
+    Mapped,
+    MappedAsDataclass,
+    Session,
+    mapped_column,
+    relationship,
+)
 from sqlalchemy.sql import Select
 from typing_extensions import Self, TypedDict
 
 from etl import config, paths
-from etl.config import GRAPHER_USER_ID
 from etl.db import read_sql
 
 log = structlog.get_logger()
@@ -178,7 +193,7 @@ class Tag(Base):
     @classmethod
     def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
         """Load topic tags by their names in the order given in `tag_names`."""
-        tags = session.scalars(select(Tag).where(Tag.name.in_(tag_names), Tag.slug.isnot(None))).all()
+        tags = session.scalars(select(Tag).where(Tag.name.in_(tag_names))).all()
 
         if len(tags) != len(tag_names):
             found_tags = [tag.name for tag in tags]
@@ -224,9 +239,28 @@ class ChartRevisions(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
 
+class ChartConfig(Base):
+    __tablename__ = "chart_configs"
+    __table_args__ = (Index("idx_chart_configs_slug", "slug"),)
+
+    id: Mapped[bytes] = mapped_column(CHAR(36), primary_key=True)
+    patch: Mapped[dict] = mapped_column(JSON, nullable=False)
+    full: Mapped[dict] = mapped_column(JSON, nullable=False)
+    slug: Mapped[Optional[str]] = mapped_column(
+        String(255), Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True)
+    )
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, onupdate=func.current_timestamp())
+
+    chartss: Mapped[List["Chart"]] = relationship("Chart", back_populates="chart_config")
+
+
 class Chart(Base):
     __tablename__ = "charts"
     __table_args__ = (
+        ForeignKeyConstraint(
+            ["configId"], ["chart_configs.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="charts_configId"
+        ),
         ForeignKeyConstraint(
             ["lastEditedByUserId"],
             ["users.id"],
@@ -243,27 +277,36 @@ class Chart(Base):
         ),
         Index("charts_lastEditedByUserId", "lastEditedByUserId"),
         Index("charts_publishedByUserId", "publishedByUserId"),
-        Index("charts_slug", "slug"),
+        Index("configId", "configId", unique=True),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
-    config: Mapped[dict] = mapped_column(JSON)
+    configId: Mapped[bytes] = mapped_column(CHAR(36))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
     isIndexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
-    slug: Mapped[str] = mapped_column(
-        VARCHAR(255), Computed("(json_unquote(json_extract(`config`,_utf8mb4'$.slug')))", persisted=False)
-    )
-    type: Mapped[Optional[str]] = mapped_column(
-        VARCHAR(255),
-        Computed(
-            "(coalesce(json_unquote(json_extract(`config`,_utf8mb4'$.type')),_utf8mb4'LineChart'))", persisted=False
-        ),
-    )
     updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     publishedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
+
+    chart_config: Mapped["ChartConfig"] = relationship("ChartConfig", back_populates="chartss", lazy="joined")
+
+    @hybrid_property
+    def config(self) -> dict[str, Any]:  # type: ignore
+        return self.chart_config.full
+
+    @config.expression
+    def config(cls):
+        return select(ChartConfig.full).where(ChartConfig.id == cls.configId).scalar_subquery()
+
+    @hybrid_property
+    def slug(self) -> Optional[str]:  # type: ignore
+        return self.chart_config.slug
+
+    @slug.expression
+    def slug(cls):
+        return select(ChartConfig.slug).where(ChartConfig.id == cls.configId).scalar_subquery()
 
     @classmethod
     def load_chart(cls, session: Session, chart_id: Optional[int] = None, slug: Optional[str] = None) -> "Chart":
@@ -359,7 +402,7 @@ class Chart(Base):
         """
         return read_sql(q, session, params={"chart_id": self.id}).set_index("catalogPath")
 
-    def migrate_to_db(self, source_session: Session, target_session: Session) -> "Chart":
+    def migrate_config(self, source_session: Session, target_session: Session) -> Dict[str, Any]:
         """Remap variable ids from source to target session. Variable in source is uniquely identified
         by its catalogPath if available, or by name and datasetId otherwise. It is looked up
         by this identifier in the target session to get the new variable id.
@@ -395,15 +438,10 @@ class Chart(Base):
             remap_ids[source_var_id] = target_var.id
 
         # copy chart as a new object
-        target_chart = Chart.from_dict(self.dict())
-        del target_chart.id
-        target_chart.config = _remap_variable_ids(target_chart.config, remap_ids)
+        config = copy.deepcopy(self.config)
+        config = _remap_variable_ids(config, remap_ids)
 
-        # set proper GRAPHER_USER_ID
-        assert GRAPHER_USER_ID
-        target_chart.lastEditedByUserId = int(GRAPHER_USER_ID)
-
-        return target_chart
+        return config
 
     def tags(self, session: Session) -> List[Dict[str, Any]]:
         """Return tags in a format suitable for Admin API."""
@@ -890,7 +928,6 @@ class Variable(Base):
         'display': '{}',
         'columnOrder': 0,
         'originalMetadata': '{}',
-        'grapherConfigAdmin': None
     }
     """
 
@@ -934,7 +971,6 @@ class Variable(Base):
     sourceId: Mapped[Optional[int]] = mapped_column(Integer, default=None)
     shortUnit: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     originalMetadata: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
-    grapherConfigAdmin: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     shortName: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767), default=None)
     dimensions: Mapped[Optional[Dimensions]] = mapped_column(JSON, default=None)
@@ -952,9 +988,10 @@ class Variable(Base):
     licenses: Mapped[Optional[list[dict]]] = mapped_column(JSON, default=None)
     # NOTE: License should be the resulting license, given all licenses of the indicator’s origins and given the indicator’s processing level.
     license: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
-    grapherConfigETL: Mapped[Optional[dict]] = mapped_column(JSON, default=None)
     type: Mapped[Optional[VARIABLE_TYPE]] = mapped_column(ENUM(*get_args(VARIABLE_TYPE)), default=None)
     sort: Mapped[Optional[list[str]]] = mapped_column(JSON, default=None)
+    grapherConfigIdAdmin: Mapped[Optional[str]] = mapped_column(VARCHAR(32), default=None)
+    grapherConfigIdETL: Mapped[Optional[bytes]] = mapped_column(CHAR(32), default=None)
     dataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
     metadataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
 
@@ -1038,11 +1075,8 @@ class Variable(Base):
                 ds.code = self.code
             if self.originalMetadata is not None:
                 ds.originalMetadata = self.originalMetadata
-            if self.grapherConfigETL is not None:
-                ds.grapherConfigETL = self.grapherConfigETL
             if self.sort is not None:
                 ds.sort = self.sort
-            assert self.grapherConfigAdmin is None, "grapherConfigETL should be used instead of grapherConfigAdmin"
 
         session.add(ds)
 
@@ -1082,10 +1116,6 @@ class Variable(Base):
 
         if metadata.description_key:
             assert isinstance(metadata.description_key, list), "descriptionKey should be a list of bullet points"
-
-        # rename grapherConfig to grapherConfigETL
-        if "grapherConfig" in presentation_dict:
-            presentation_dict["grapherConfigETL"] = presentation_dict.pop("grapherConfig")
 
         return cls(
             shortName=short_name,
@@ -1488,6 +1518,28 @@ class ChartDiffConflicts(Base):
         assert len(chart_ids) == len(conflicts), "Length of chart_ids and conflicts must be the same."
 
         return conflicts
+
+
+class MultiDimDataPage(Base):
+    __tablename__ = "multi_dim_data_pages"
+
+    slug: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
+    config: Mapped[dict] = mapped_column(JSON)
+    published: Mapped[int] = mapped_column(TINYINT, server_default=text("'0'"), init=False)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
+
+    def upsert(self, session: Session) -> "MultiDimDataPage":
+        cls = self.__class__
+        existing = session.scalars(select(cls).where(cls.slug == self.slug)).one_or_none()
+        if existing:
+            existing.config = self.config
+            return existing
+        else:
+            session.add(self)
+            return self
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:

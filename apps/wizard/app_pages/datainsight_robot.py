@@ -13,7 +13,7 @@ st.set_page_config(
     page_title="Data insight robot",
     page_icon="🪄",
 )
-st.title("💡 Data insighter")
+st.title(":material/lightbulb: Data insighter")
 st.markdown("Generate data insights from a chart view.")
 
 

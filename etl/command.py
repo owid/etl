@@ -6,7 +6,6 @@
 import difflib
 import itertools
 import json
-import os
 import re
 import resource
 import sys
@@ -19,14 +18,13 @@ from graphlib import TopologicalSorter
 from multiprocessing import Manager
 from os import environ
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterator, List, Optional, Set
+from typing import Any, Callable, Dict, Iterator, List, Optional
 
 import rich_click as click
 import structlog
 from ipdb import launch_ipdb_on_exception
 
 from etl import config, files, paths
-from etl.snapshot import snapshot_catalog
 from etl.steps import (
     DAG,
     DataStep,
@@ -72,11 +70,10 @@ log = structlog.get_logger()
     help="Upsert datasets from grapher channel to DB _(OWID staff only, DB access required)_",
 )
 @click.option(
-    "--explorer/--no-explorer",
-    "-x/-nx",
+    "--export/--no-export",
     default=False,
     type=bool,
-    help="Write explorer tsv file to owid-content repository.",
+    help="Run export steps like writing explorer TSV file to owid-content repository _(OWID staff only, access required)_",
 )
 @click.option(
     "--ipdb",
@@ -94,6 +91,12 @@ log = structlog.get_logger()
     "-o",
     is_flag=True,
     help="Only run the selected step (no upstream or downstream dependencies). Overrides `--downstream` option.",
+)
+@click.option(
+    "--exact-match",
+    "-x",
+    is_flag=True,
+    help="Steps should exactly match the arguments (if so, pass the steps with their full name, e.g. 'data://garden/.../step_name').",
 )
 @click.option(
     "--exclude",
@@ -144,10 +147,11 @@ def main_cli(
     force: bool = False,
     private: bool = False,
     grapher: bool = False,
-    explorer: bool = False,
+    export: bool = False,
     ipdb: bool = False,
     downstream: bool = False,
     only: bool = False,
+    exact_match: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 1,
@@ -195,9 +199,10 @@ def main_cli(
         force=force,
         private=private,
         grapher=grapher,
-        explorer=explorer,
+        export=export,
         downstream=downstream,
         only=only,
+        exact_match=exact_match,
         exclude=exclude,
         dag_path=dag_path,
         workers=workers,
@@ -227,9 +232,10 @@ def main(
     force: bool = False,
     private: bool = False,
     grapher: bool = False,
-    explorer: bool = False,
+    export: bool = False,
     downstream: bool = False,
     only: bool = False,
+    exact_match: bool = False,
     exclude: Optional[str] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 1,
@@ -241,13 +247,7 @@ def main(
     if grapher:
         sanity_check_db_settings()
 
-    if explorer:
-        # Set the global variable "EXPLORER" to True.
-        os.environ["EXPLORER"] = "1"
-        # Given that (indicator-based) explorers will always rely on grapher steps, ensure the grapher flag is set.
-        grapher = True
-
-    dag = construct_dag(dag_path, private=private, grapher=grapher)
+    dag = construct_dag(dag_path, private=private, grapher=grapher, export=export)
 
     excludes = exclude.split(",") if exclude else []
 
@@ -260,6 +260,7 @@ def main(
         private=private,
         downstream=downstream,
         only=only,
+        exact_match=exact_match,
         excludes=excludes,
         workers=workers,
         strict=strict,
@@ -276,15 +277,30 @@ def sanity_check_db_settings() -> None:
         sys.exit(1)
 
 
-def construct_dag(dag_path: Path, private: bool, grapher: bool) -> DAG:
+def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) -> DAG:
     """Construct full DAG."""
 
     # Load our graph of steps and the things they depend on
     dag = load_dag(dag_path)
 
-    # If --grapher is set, add steps for upserting to DB
+    # Make sure we don't have both public and private steps in the same DAG
+    _check_public_private_steps(dag)
+
+    # if export is not set, remove all steps
+    if not export:
+        dag = {step: deps for step, deps in dag.items() if not step.startswith("export://")}
+
+    # If --grapher is set, add all steps for upserting to DB
     if grapher:
-        dag.update(_grapher_steps(dag, private))
+        steps = _grapher_steps(dag, private)
+        dag.update(steps)
+    # Otherwise just add those in dependencies, even if they're private
+    else:
+        steps = _grapher_steps(dag, True)
+        for deps in list(dag.values()):
+            for dep in deps:
+                if dep.startswith("grapher://"):
+                    dag[dep] = steps[dep]
 
     return dag
 
@@ -297,6 +313,7 @@ def run_dag(
     private: bool = False,
     downstream: bool = False,
     only: bool = False,
+    exact_match: bool = False,
     excludes: Optional[List[str]] = None,
     workers: int = 1,
     strict: Optional[bool] = None,
@@ -310,8 +327,6 @@ def run_dag(
     """
     excludes = excludes or []
 
-    _validate_private_steps(dag)
-
     if not private:
         excludes.append("-private://")
 
@@ -319,7 +334,10 @@ def run_dag(
     # but are not supposed to be in DB
     excludes.append("grapher://grapher/regions/latest/regions")
 
-    steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only)
+    steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only, exact_match=exact_match)
+
+    if not private:
+        _validate_private_steps(steps)
 
     if not steps:
         # If no steps are found, the most likely case is that the step passed as argument was misspelled.
@@ -584,55 +602,16 @@ def timed_run(f: Callable[[], Any]) -> float:
     return time.time() - start_time
 
 
-def _validate_private_steps(dag: DAG) -> None:
+def _validate_private_steps(steps: list[Step]) -> None:
     """Make sure there are no public steps that have private steps as dependency."""
-    for step_name, step_dependencies in dag.items():
-        # does not apply for private and grapher steps
-        if _is_private_step(step_name) or step_name.startswith("grapher://"):
-            continue
-        for dependency in step_dependencies:
-            if _is_private_step(dependency):
-                raise ValueError(f"Public step {step_name} has a dependency on private {dependency}")
+    for step in steps:
+        for dep in step.dependencies:
+            if not dep.is_public:
+                raise ValueError(f"Public step {step} depends on private step {dep}. Use --private flag.")
 
 
 def _is_private_step(step_name: str) -> bool:
     return bool(re.findall(r".*?-private://", step_name))
-
-
-def _backporting_steps(private: bool, filter_steps: Optional[Set[str]] = None) -> DAG:
-    """Return a DAG of steps for backporting datasets."""
-    dag: DAG = {}
-
-    # get all backports, this takes a long time
-    if filter_steps is None:
-        match = "backport/.*"
-    elif len(filter_steps) == 0:
-        return {}
-    else:
-        match = "|".join([step.split("/")[-1] for step in filter_steps])
-
-    # load all backported snapshots
-    for snap in snapshot_catalog(match):
-        # skip private backported steps
-        if not private and not snap.metadata.is_public:
-            continue
-
-        # two files are generated for each dataset, skip one
-        if snap.metadata.short_name.endswith("_config"):
-            # skip archived backported datasets
-            if "(archived)" in snap.metadata.name:  # type: ignore
-                continue
-
-            short_name = snap.metadata.short_name.removesuffix("_config")
-
-            private_suffix = "" if snap.metadata.is_public else "-private"
-
-            dag[f"backport{private_suffix}://backport/owid/latest/{short_name}"] = {
-                f"snapshot{private_suffix}://backport/latest/{short_name}_values.feather",
-                f"snapshot{private_suffix}://backport/latest/{short_name}_config.json",
-            }
-
-    return dag
 
 
 def _grapher_steps(dag: DAG, private: bool) -> DAG:
@@ -661,6 +640,21 @@ def _set_dependencies_to_nondirty(step: Step) -> None:
     if isinstance(step, GrapherStep):
         for step_dep in step.data_step.dependencies:
             step.data_step.is_dirty = lambda: False
+
+
+def _check_public_private_steps(dag: DAG) -> None:
+    """Make sure we don't mix public and private steps for the same dataset."""
+    all_steps = set(dag.keys()) | set(itertools.chain.from_iterable(dag.values()))
+    private_steps = {s for s in all_steps if _is_private_step(s)}
+    public_steps = all_steps - private_steps
+
+    # strip prefix
+    private_steps = {s.split("://")[1] for s in private_steps if not s.startswith("grapher://")}
+    public_steps = {s.split("://")[1] for s in public_steps if not s.startswith("grapher://")}
+
+    common = private_steps & public_steps
+    if common:
+        raise ValueError(f"Dataset has both public and private version: {common}")
 
 
 if __name__ == "__main__":

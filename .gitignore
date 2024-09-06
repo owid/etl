@@ -17,6 +17,7 @@ data/*
 !data/garden/
 data/garden/*
 !data/garden/reference/
+export/*
 .env
 .env.*
 *.dot

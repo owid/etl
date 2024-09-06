@@ -97,7 +97,7 @@ def sort_indicators(indicators: List[str]) -> List[str]:
 
 
 # Page config
-st.title("🎶 Entity Harmonizer")
+st.title(":material/music_note: Entity Harmonizer")
 
 # Set states
 st.session_state["show_all"] = st.session_state.get("show_all", False)

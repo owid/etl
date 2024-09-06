@@ -1,0 +1,38 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tourism
+    display:
+      numDecimalPlaces: 0
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+
+tables:
+  unwto_environment:
+    variables:
+      seea_tables:
+        title: Number of tables in the System of Environmental and Economic Account
+        unit: tables
+        description_short: Number of tables in the SEEA that track key environmental aspects of tourism, including water, energy, GHG emissions, and solid waste.
+
+      tsa_tables:
+        title: Number of tables in the Tourism Satellite Account
+        unit: tables
+        description_short: Number of tables in the TSA that track key economic aspects of tourism, including expenditure, production, and employment.
+
+      total_tables:
+       title: Total number of tables
+       unit: tables
+       description_short: Monitoring is expressed as the number of data tables implemented within the Tourism Satellite Account (TSA) and the System of Environmental and Economic Accounts (SEEA). These tables organize and track key economic and environmental aspects of tourism, such as expenditure, production, employment, and resource flows.
+       description_key:
+        - The Tourism Satellite Account (TSA) and System of Environmental and Economic Accounts (SEEA) are standardized methods used by countries to measure the economic and environmental impacts of tourism.
+        - TSA tables track economic aspects of tourism, such as tourist spending, the production of tourism-related goods and services, and employment in the tourism sector.
+        - SEEA tables monitor environmental impacts, including the consumption of resources like water and energy, as well as the emission of greenhouse gases and generation of waste by the tourism industry.
+        - National governments or statistical agencies collect and organize data into these tables to understand tourism's influence on the economy and environment.
+        - The number of tables implemented indicates how comprehensively tourism's impacts are being tracked, with more tables providing a more detailed and nuanced understanding.

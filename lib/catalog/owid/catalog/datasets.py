@@ -11,7 +11,7 @@ from glob import glob
 from os import environ
 from os.path import join
 from pathlib import Path
-from typing import Iterator, List, Literal, Optional, Union
+from typing import Any, Dict, Iterator, List, Literal, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -41,7 +41,16 @@ assert PREFERRED_FORMAT in DEFAULT_FORMATS
 assert SUPPORTED_FORMATS[0] == PREFERRED_FORMAT
 
 # available channels in the catalog
-CHANNEL = Literal["snapshot", "garden", "meadow", "grapher", "open_numbers", "examples", "explorers", "external"]
+CHANNEL = Literal[
+    "snapshot",
+    "garden",
+    "meadow",
+    "grapher",
+    "open_numbers",
+    "examples",
+    "explorers",
+    "external",
+]
 
 # all pandas nullable dtypes
 NULLABLE_DTYPES = [f"{sign}{typ}{size}" for typ in ("Int", "Float") for sign in ("", "U") for size in (8, 16, 32, 64)]
@@ -204,6 +213,7 @@ class Dataset:
     def update_metadata(
         self,
         metadata_path: Path,
+        yaml_params: Optional[Dict[str, Any]] = None,
         if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
         if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
         errors: Literal["ignore", "warn", "raise"] = "raise",
@@ -213,6 +223,7 @@ class Dataset:
 
         :param metadata_path: Path to *.meta.yml file with metadata. Check out other metadata files
             for examples, this function doesn't do schema validation
+        :param yaml_params: Additional parameters to pass to the YAML loader
         :param if_source_exists: What to do if source already exists in metadata. Possible values:
             - "replace" (default): replace existing source with new one
             - "append": append new source to existing ones
@@ -241,7 +252,9 @@ class Dataset:
                             if errors == "warn":
                                 warnings.warn(str(e))
                             continue
-                table.update_metadata_from_yaml(metadata_path, table_name, if_origins_exist=if_origins_exist)
+                table.update_metadata_from_yaml(
+                    metadata_path, table_name, if_origins_exist=if_origins_exist, yaml_params=yaml_params
+                )
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 
     def index(self, catalog_path: Path = Path("/")) -> pd.DataFrame:

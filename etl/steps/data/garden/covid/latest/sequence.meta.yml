@@ -1,8 +1,5 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
-  common_display: &common_display
-    zeroDay: "2020-01-21"
-    yearIsDay: true
   common:
     processing_level: major
     presentation:
@@ -11,7 +8,6 @@ definitions:
         - Global Health
     display:
       numDecimalPlaces: 0
-      <<: *common_display
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -43,7 +39,6 @@ tables:
             <% else %>
             << variant >>
             <%- endif -%>
-          <<: *common_display
 
       perc_sequences:
         title: "Share of sequenced COVID-19 genomes - Variant: << variant >>"
@@ -68,7 +63,6 @@ tables:
             <% else %>
             << variant >>
             <%- endif -%>
-          <<: *common_display
         presentation:
           grapher_config:
             note: This share may not reflect the complete breakdown of cases, since only a fraction of all cases are sequenced. Recently-discovered or actively-monitored variants may be overrepresented, as suspected cases of these variants are likely to be sequenced preferentially or faster than other cases.
@@ -101,7 +95,6 @@ tables:
         unit: "sequenced genomes per million people"
         display:
           numDecimalPlaces: 3
-          <<: *common_display
 
       num_sequences_cumulative:
         title: Cumulative number of sequenced COVID-19 genomes
@@ -116,4 +109,3 @@ tables:
         unit: "sequenced genomes per million people"
         display:
           numDecimalPlaces: 3
-          <<: *common_display

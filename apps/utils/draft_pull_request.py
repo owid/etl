@@ -85,6 +85,17 @@ description = "- " + "\n- ".join(
 )
 
 
+def _branch_exists_remotely(new_branch, remote_branches):
+    if new_branch in remote_branches:
+        log.error(
+            f"New branch '{new_branch}' already exists in remote. "
+            "Either manually create a pull request from github, or use a different name for the new branch."
+        )
+        return True
+    else:
+        return False
+
+
 @click.command(name="draft-pr", cls=RichCommand, help=__doc__)
 @click.argument(
     "new-branch",
@@ -107,18 +118,12 @@ description = "- " + "\n- ".join(
     "-s",
     help="Scope of the PR (only relevant if --title is given). This text will be preprended to the PR title. \n\n\n**Examples**: 'demography' for data work on this field, 'etl.db' if working on specific modules, 'wizard', etc.",
 )
-@click.option(
-    "--step-update",
-    is_flag=True,
-    help="Run after updating a step in ETL Dashboard. In addition to creating PR, this will commit generated files.",
-)
 def cli(
     new_branch: Optional[str] = None,
     base_branch: Optional[str] = None,
     title: Optional[str] = None,
     category: Optional[str] = None,
     scope: Optional[str] = None,
-    step_update: bool = False,
 ) -> None:
     if not GITHUB_TOKEN:
         log.error(
@@ -144,7 +149,10 @@ def cli(
 
     # Update the list of remote branches in the local repository.
     origin = repo.remote(name="origin")
-    origin.fetch()
+    # NOTE: The option prune=True removes local references to branches that no longer exist on the remote repository.
+    #  Otherwise, this script might raise an error claiming that your proposed branch exists in remote, even if that
+    #  branch was already deleted.
+    origin.fetch(prune=True)
     # List all remote branches.
     remote_branches = [ref.name.split("origin/")[-1] for ref in origin.refs if ref.remote_head != "HEAD"]
 
@@ -178,6 +186,11 @@ def cli(
                 "or switch to the new branch and run this tool without specifying a new branch."
             )
             return
+
+        # Ensure the new branch does not already exist remotely.
+        if _branch_exists_remotely(new_branch=new_branch, remote_branches=remote_branches):
+            return
+
         try:
             log.info(
                 f"Switching to base branch '{base_branch}', creating new branch '{new_branch}' from there, and switching to it."
@@ -188,21 +201,12 @@ def cli(
             log.error(f"Failed to create a new branch from '{base_branch}':\n{e}")
             return
 
-    # Ensure the new branch does not already exist in remote.
-    if new_branch in remote_branches:
-        log.error(
-            f"New branch '{new_branch}' already exists in remote. "
-            "Either manually create a pull request from github, or use a different name for the new branch."
-        )
+    # Ensure the new branch does not already exist remotely.
+    if _branch_exists_remotely(new_branch=new_branch, remote_branches=remote_branches):
         return
 
     log.info("Creating an empty commit.")
     repo.git.commit("--allow-empty", "-m", title or f"Start a new staging server for branch '{new_branch}'")
-
-    if step_update:
-        log.info("Committing all files.")
-        repo.git.add(".")
-        repo.git.commit("-m", "Copy steps")
 
     log.info("Pushing the new branch to remote.")
     repo.git.push("origin", new_branch)
@@ -223,19 +227,6 @@ def cli(
     else:
         log.error(f"Failed to create draft pull request:\n{response.json()}")
         return
-
-    # modify the PR body to include the diff link
-    if step_update:
-        diff_link = f"{js['html_url']}/files/{repo.head.commit.hexsha}..HEAD"
-
-        # Update body of the pull request
-        requests.patch(
-            js["url"],
-            json={
-                "body": f"[View diff without step copy]({diff_link})",
-            },
-            headers=headers,
-        )
 
 
 def generate_pr_title(title: str | None, category: str | None, scope: str | None) -> None | str:

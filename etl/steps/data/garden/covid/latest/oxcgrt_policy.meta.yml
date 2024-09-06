@@ -3,6 +3,62 @@ definitions:
   year_is_day: &year_is_day
     yearIsDay: true
     zeroDay: "2020-01-01"
+  restriction_text_short: |-
+    <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
+    Public gatherings:
+    <% if restriction_degree == -1 %>
+     No data
+    <% else %>
+     (<< restriction_degree >>/4)
+    <% if restriction_degree == 0 %>
+     No restrictions
+    <% elif restriction_degree == 1 %>
+     ≥1000 people
+    <% elif restriction_degree == 2 %>
+     101-1000 people
+    <% elif restriction_degree == 3 %>
+     11-100 people
+    <% elif restriction_degree == 4 %>
+     ≤10 people
+    <%- endif -%>
+    <%- endif -%>
+    <% elif restriction_name == 'h6m_facial_coverings' %>
+     Face coverings:
+    <% if restriction_degree == -1 %>
+     No data
+    <% else %>
+     (<< restriction_degree >>/4)
+    <% if restriction_degree == 0 %>
+     No policy
+    <% elif restriction_degree == 1 %>
+     Recommended
+    <% elif restriction_degree == 2 %>
+     Required sometimes
+    <% elif restriction_degree == 3 %>
+     Required when around other people or social distancing is not possible
+    <% elif restriction_degree == 4 %>
+     Required outside the home at all times
+    <%- endif -%>
+    <%- endif -%>
+    <% elif restriction_name == 'c8ev_international_travel_controls' %>
+     International travels:
+    <% if restriction_degree == -1 %>
+     No data
+    <% else %>
+     (<< restriction_degree >>/4)
+    <% if restriction_degree == 0 %>
+     No restrictions
+    <% elif restriction_degree == 1 %>
+     Screening arrivals
+    <% elif restriction_degree == 2 %>
+     Quarantine arrivals from some or all regions
+    <% elif restriction_degree == 3 %>
+     Ban arrivals from some regions
+    <% elif restriction_degree == 4 %>
+     Ban on all regions or total border closure
+    <%- endif -%>
+    <%- endif -%>
+    <%- endif -%>
   common:
     unit: ""
     presentation:
@@ -28,87 +84,95 @@ tables:
         description_short: Record closings of schools and universities.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend closing or all schools open with alterations resulting in significant differences compared to non-Covid-19 operations
             - 2: require closing (only some levels or categories, eg just high school, or just public schools)
             - 3: require closing all levels
-            - Blank: no data
 
       c2m_workplace_closing:
         title: Workplace closing
         description_short: Record closings of workplaces.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend closing (or recommend work from home) or all businesses open with alterations resulting in significant differences compared to non-Covid-19 operation
             - 2: require closing (or work from home) for some sectors or categories of workers
             - 3: require closing (or work from home) for all-but-essential workplaces (eg grocery stores, doctors)
-            - Blank: no data
 
       c3m_cancel_public_events:
         title: Cancel public events
         description_short: Record cancelling public events.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend cancelling
             - 2: require cancelling
-            - Blank: no data
 
       c4m_restrictions_on_gatherings:
         title: Restrictions on gatherings
         description_short: Record the cut-off size for limits on gatherings.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no restrictions
             - 1: restrictions on very large gatherings (the limit is above 1000 people)
             - 2: restrictions on gatherings between 101-1000 people
             - 3: restrictions on gatherings between 11-100 people
             - 4: restrictions on gatherings of 10 people or less
-            - Blank: no data
 
       c5m_close_public_transport:
         title: Close public transport
         description_short: Record closing of public transport.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend closing (or significantly reduce volume/route/means of transport available)
             - 2: require closing (or prohibit most citizens from using it)
-            - Blank: no data
 
       c6m_stay_at_home_requirements:
         title: Stay at home requirements
         description_short: Record orders to "shelter-in-place" and otherwise confine to the home.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend not leaving house
             - 2: require not leaving house with exceptions for daily exercise, grocery shopping, and 'essential' trips
             - 3: require not leaving house with minimal exceptions (eg allowed to leave once a week, or only one person can leave at a time, etc)
-            - Blank: no data
 
       c7m_restrictions_on_internal_movement:
         title: Restrictions on internal movement
         description_short: Record restrictions on internal movement between cities/regions.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no measures
             - 1: recommend not to travel between regions/cities
             - 2: internal movement restrictions in place
-            - Blank: no data
 
       c8ev_international_travel_controls:
         title: International travel controls
         description_short: "Record restrictions on international travel. Note: this records policy for foreign travellers, not citizens."
         description_key:
           - |-
+            Possible categories:
+
             - 0: no restrictions
             - 1: screening arrivals
             - 2: quarantine arrivals from some or all regions
             - 3: ban arrivals from some regions
             - 4: ban on all regions or total border closure
-            - Blank: no data
 
       # E - economic policies
       e1_income_support:
@@ -116,16 +180,19 @@ tables:
         description_short: "Record if the government is providing direct cash payments to people who lose their jobs or cannot work. Note: only includes payments to firms if explicitly linked to payroll/salaries"
         description_key:
           - |-
+            Possible categories:
+
             - 0: no income support
             - 1: government is replacing less than 50% of lost salary (or if a flat sum, it is less than 50% median salary)
             - 2: government is replacing 50% or more of lost salary (or if a flat sum, it is greater than 50% median salary)
-            - Blank: no data
 
       e2_debt_contract_relief:
         title: Debt/contract relief
         description_short: "Record if the government is freezing financial obligations for households (eg stopping loan repayments, preventing services like water from stopping, or banning evictions)."
         description_key:
           - |-
+            Possible categories:
+
             - 0: no debt/contract relief
             - 1: narrow relief, specific to one kind of contract
             - 2: broad debt/contract relief
@@ -136,8 +203,9 @@ tables:
         description_key:
           - |-
             Record monetary value in USD of fiscal stimuli, includes any spending or tax cuts NOT included in `International support`, `Emergency investment in healthcare` or `Investment in vaccines`.
+            Possible categories:
+
             - 0: no new spending that day
-            - Blank: no data
         unit: "$"
         short_unit: "$"
         display:
@@ -150,8 +218,9 @@ tables:
         description_key:
           - |-
             Record monetary value in USD.
+            Possible categories:
+
             - 0: no new spending that day
-            - Blank: no data
         unit: "$"
         short_unit: "$"
         display:
@@ -164,27 +233,31 @@ tables:
         description_short: Record presence of public info campaigns.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no Covid-19 public information campaign
             - 1: public officials urging caution about Covid-19
             - 2: coordinated public information campaign (eg across traditional and social media)
-            - Blank: no data
 
       h2_testing_policy:
         title: Testing policy
         description_short: "Record government policy on who has access to testing. Note: this records policies about testing for current infection (PCR tests) not testing for immunity (antibody test)."
         description_key:
           - |-
+            Possible categories:
+
             - 0: no testing policy
             - 1: only those who both (a) have symptoms AND (b) meet specific criteria (eg key workers, admitted to hospital, came into contact with a known case, returned from overseas)
             - 2: testing of anyone showing Covid-19 symptoms
             - 3: open public testing (eg "drive through" testing available to asymptomatic people)
-            - Blank: no data
 
       h3_contact_tracing:
         title: Contact tracing
         description_short: Record government policy on contact tracing after a positive diagnosis.
         description_key:
           - |-
+            Possible categories:
+
             - 0: no contact tracing
             - 1: limited contact tracing; not done for all cases
             - 2: comprehensive contact tracing; done for all identified cases
@@ -195,8 +268,9 @@ tables:
         description_key:
           - |-
             Record monetary value in USD
+            Possible categories:
+
             - 0: no new spending that day
-            - Blank: no data
         unit: "$"
         short_unit: "$"
         display:
@@ -209,8 +283,9 @@ tables:
         description_key:
           - |-
             Record monetary value in USD
+            Possible categories:
+
             - 0: no new spending that day
-            - Blank: no data
 
         unit: "$"
         short_unit: "$"
@@ -223,6 +298,8 @@ tables:
         description_short: Record policies on the use of facial coverings outside the home.
         description_key:
           - |-
+            Possible categories:
+
             - 0: No policy
             - 1: Recommended
             - 2: Required in some specified shared/public spaces outside the home with other people present, or some situations when social distancing not possible
@@ -234,6 +311,8 @@ tables:
         description_short: Record policies for vaccine delivery for different groups.
         description_key:
           - |-
+            Possible categories:
+
             - 0: No availability
             - 1: Availability for ONE of following: key workers/ clinically vulnerable groups (non elderly) / elderly groups
             - 2: Availability for TWO of following: key workers/ clinically vulnerable groups (non elderly) / elderly groups
@@ -248,6 +327,8 @@ tables:
         description_key:
           - |-
             Blank – no data
+            Possible categories:
+
             - 0: vaccines are not being made available to this category
             - 1: vaccines are being made available to this category
 
@@ -257,6 +338,8 @@ tables:
         description_key:
           - |-
             Blank – no data
+            Possible categories:
+
             - 0: vaccines are not being made available to this category
             - 1: vaccines are being made available to this category
 
@@ -265,7 +348,8 @@ tables:
         description_short: Reports whether any categories of people are receiving vaccines.
         description_key:
           - |-
-            - Blank: no data
+            Possible categories:
+
             - 0: no categories are receiving vaccines
             - 1: vaccines are available to some categories
             - 2: vaccines are available to anyone over the age of 16 yrs
@@ -276,7 +360,8 @@ tables:
         description_short: Reports lowest age range of general population being vaccinated.
         description_key:
           - |-
-            - Blank: no data
+            Possible categories:
+
             - 0: no categories are receiving vaccines
             - numerical range: Lowest age range for 'General' category
         unit: ""
@@ -286,7 +371,8 @@ tables:
         description_short: Reports lowest age range of at risk population being vaccinated. Takes 'containment and closure policies'- and H1-indicators into account.
         description_key:
           - |-
-            - Blank: no data
+            Possible categories:
+
             - 0: no categories are receiving vaccines
             - numerical range: Lowest age range from either 'General' or 'At-risk' categories
 
@@ -343,3 +429,43 @@ tables:
         display:
           numDecimalPlaces: 2
           <<: *year_is_day
+
+  country_counts:
+    variables:
+      num_countries:
+        title: |-
+          Number of countries - Restriction: {definitions.restriction_text_short}
+        description_short: |-
+          <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
+          This indicator codes the most stringent COVID-19 policy relating to public gatherings, with the following ordered levels: 'no restrictions', '≥1000 people', '101-1000 people', '11-100 people', and '≤10 people'.
+          <% elif restriction_name == 'h6m_facial_coverings' %>
+          This indicator codes the most stringent COVID-19 policy relating to facial coverings, with the following ordered levels: 'no policy', 'recommended', 'required sometimes', 'required outside around other people', and 'required outside home'.
+          <% elif restriction_name == 'c8ev_international_travel_controls' %>
+          This indicator codes the most stringent COVID-19 policy relating to international travel arrivals, with the following ordered levels: 'no restrictions', 'screening for arrivals', 'quarantine on some arrivals', 'partial ban', and 'complete ban'.
+          <%- endif -%>
+        description_key:
+          - |-
+            <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
+            This indicator codes the most stringent COVID-19 policy relating to public gatherings, with the following ordered levels: 'no restrictions', '≥1000 people', '101-1000 people', '11-100 people', and '≤10 people'.
+            <% elif restriction_name == 'h6m_facial_coverings' %>
+            This indicator codes the most stringent COVID-19 policy relating to facial coverings, with the following ordered levels: 'no policy', 'recommended', 'required sometimes', 'required outside around other people', and 'required outside home'.
+            <% elif restriction_name == 'c8ev_international_travel_controls' %>
+            This indicator codes the most stringent COVID-19 policy relating to international travel arrivals, with the following ordered levels: 'no restrictions', 'screening for arrivals', 'quarantine on some arrivals', 'partial ban', and 'complete ban'.
+            <%- endif -%>
+          - |-
+            <% if restriction_name == 'c4m_restrictions_on_gatherings' %>
+            The authors explain that: when private gatherings of only 10 or less are permitted, this restriction would prevent public events from taking place, so they are recorded as required to cancel, unless there is a specific policy in place permitting public gatherings to go ahead. When all public gatherings are cancelled, but people can still go to church, we record this as a 2 (all gatherings cancelled), but make a note about the exception for religious gatherings. There is no explicit cut off point for a 'mass gathering'. If really large events, such as political protests, can go ahead, but with strict social distancing and hygiene measures in place, this could be reported as 'recommended'.
+
+            Further details can be found in the Oxford Covid-19 Government Response Tracker (OxCGRT)'s [documentation](https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/interpretation_guide.md).
+            <% elif restriction_name == 'h6m_facial_coverings' %>
+            The authors explain the difference between the 'required outside around other people' and the 'required outside home' levels is that at the 'required outside home' level, a mask is required at all times when leaving the house with no exception. Even if people are in a street and more than the recommended social distance from other people, a mask is still required. Further details can be found in the Oxford Covid-19 Government Response Tracker (OxCGRT)'s [documentation](https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/interpretation_guide.md).
+            <% elif restriction_name == 'c8ev_international_travel_controls' %>
+            The authors explain that if visitors can get a PCR test to avoid quarantine, this is recorded as 'screening for arrivals'. If quarantine is mandatory, and visitors cannot do a test to avoid this, this is recorded as 'quarantine on some arrivals'. Further details can be found in the Oxford Covid-19 Government Response Tracker (OxCGRT)'s [documentation](https://github.com/OxCGRT/covid-policy-tracker/blob/master/documentation/interpretation_guide.md).
+            <%- endif -%>
+        unit: "countries"
+        description_processing: |-
+          There is no data for:
+
+          Aland Islands, American Samoa, Anguilla, Antigua and Barbuda, Armenia, Bonaire Sint Eustatius and Saba, British Indian Ocean Territory, British Virgin Islands, Cayman Islands, Christmas Island, Cocos Islands, Comoros, Cook Islands, Curacao, Equatorial Guinea, Falkland Islands, French Guiana, French Polynesia, Gibraltar, Grenada, Guadeloupe, Guernsey, Guinea-Bissau, Isle of Man, Jersey, Maldives, Marshall Islands, Martinique, Mayotte, Micronesia (country), Montenegro, Montserrat, Nauru, New Caledonia, Norfolk Island, Northern Cyprus, Northern Mariana Islands, North Macedonia, North Korea, Niue, Palau, Pitcairn, Reunion, Saint Barthelemy, Saint Helena, Saint Kitts and Nevis, Saint Lucia, Saint Martin (French part), Saint Pierre and Miquelon, Saint Vincent and the Grenadines, Samoa, Sao Tome and Principe, Serbia excluding Kosovo, Sint Maarten (Dutch part), South Georgia and the South Sandwich Islands, Tokelau, Turks and Caicos Islands, Tuvalu, United States Minor Outlying Islands, Vatican, Wallis and Futuna, Western Sahara
+
+          Note that some of these are dependant states and might have adopted the same policy as their parent state.
