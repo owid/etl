@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import yaml
-
 from etl import multidim
 from etl.db import get_engine
 from etl.helpers import PathFinder
@@ -16,7 +14,6 @@ def run(dest_dir: str) -> None:
     engine = get_engine()
 
     # Load YAML file
-    with open(CURRENT_DIR / f"{paths.short_name}.yml") as istream:
-        config = yaml.safe_load(istream)
+    config = paths.load_mdim_config()
 
     multidim.upsert_multidim_data_page("mdd-covid-deaths", config, engine)
