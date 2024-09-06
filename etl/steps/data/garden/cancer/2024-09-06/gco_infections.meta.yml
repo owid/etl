@@ -70,9 +70,9 @@ tables:
                 {definitions.footnote}
        asr:
           title: |-
-            Age-standardized rates for the number of new << cancer.lower() >> cancer cases attributable to << agent.lower() >> among {definitions.sex}
+            Age-standardized rates for the number of << cancer.lower() >> cancer cases attributable to << agent.lower() >> among {definitions.sex}
           description_short: |-
-            The age-standardized rate for the number of new << cancer.lower() >> cancer cases attributable to << agent.lower() >> among {definitions.sex}
+            The age-standardized rate for the number of << cancer.lower() >> cancer cases attributable to << agent.lower() >> among {definitions.sex}
           unit: per 100,000 people
           presentation:
             grapher_config:
