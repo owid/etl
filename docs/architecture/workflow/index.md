@@ -341,9 +341,12 @@ views:
       y: "{definitions.table}#primary_energy_consumption_per_capita__kwh"
 ```
 
-`dimensions` field specifies selectors and `views` field specifies views for the selection. Since there are tons of possible configurations, `views` are usually generated programatically. You can also use a combination of manually defined views and generated views. See module `etl.multidim` for helper functions or examples from `etl/steps/export/multidim/`.
+The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically. However, it's a good idea to create a few of them manually to start.
 
-The export step loads the YAML file, adds `views` to the config and then calls function
+You can also combine manually defined views with generated ones. See the `etl.multidim` module for available helper functions or refer to examples from `etl/steps/export/multidim/`. Feel free to add or modify the helper functions as needed.
+
+The export step loads the YAML file, adds `views` to the config, and then calls the function.
+
 ```python
 def run(dest_dir: str) -> None:
     engine = get_engine()
@@ -352,16 +355,19 @@ def run(dest_dir: str) -> None:
     with open(CURRENT_DIR / "energy.yml") as istream:
         config = yaml.safe_load(istream)
 
+    # Programatically generate views
     config['views'] = ...
 
     multidim.upsert_multidim_data_page("mdd-energy", config, engine)
 ```
 
 To see the multi-dimensional indicator in Admin, run
+
 ```bash
-etlr export://explorers/multidim/latest/name --export
+etlr export://multidim/energy/latest/energy --export
 ```
-and see the preview at http://staging-site-my-branch/admin/grapher/mdd-name.
+
+and check out the preview at http://staging-site-my-branch/admin/grapher/mdd-name.
 
 
 ### Exporting data to GitHub
