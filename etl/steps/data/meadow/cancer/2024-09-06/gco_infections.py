@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Drop unnecessary columns.
-    tb = tb.drop(columns=["id", "code", "ncases_sites", "ncases_all", "cases", "ir_att", "ir", "asr"])
+    tb = tb.drop(columns=["id", "code", "ncases_sites", "ncases_all", "ir_att", "ir", "asr"])
 
     tb["sex"] = tb["sex"].replace({0: "both", 1: "males", 2: "females"})
 
