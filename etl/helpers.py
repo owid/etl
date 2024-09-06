@@ -478,7 +478,8 @@ class PathFinder:
 
     @property
     def mdim_path(self) -> Path:
-        return self.directory / (self.short_name + ".mdim.yml")
+        assert "multidim" in self.directory, "MDIM path is only available for multidim steps!"
+        return self.directory / (self.short_name + ".yml")
 
     @property
     def directory(self) -> Path:
@@ -737,8 +738,10 @@ class PathFinder:
         assert len(deps) == 1
         return deps[0].replace("etag://", "https://")
 
-    def load_mdim_config(self, path: Optional[str] = None) -> Dict[str, str]:
-        if path is None:
+    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str] = None) -> Dict[str, str]:
+        if filename is not None:
+            path = self.directory / Path(filename)
+        elif path is None:
             path = self.mdim_path
         config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
         return config

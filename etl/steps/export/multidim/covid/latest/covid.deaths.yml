@@ -1,11 +1,8 @@
 definitions:
   table: grapher/covid/latest/cases_deaths/cases_deaths
 
-dimensions_title: by interval (2)
-name: COVID-19 deaths (2)
-
 title:
-  title: COVID-19 deaths
+  title: COVID-19 confirmed deaths
   titleVariant: by interval
 defaultSelection:
   - World

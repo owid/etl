@@ -260,7 +260,7 @@ steps:
 
   ######################################
   # MULTIDIM
-  export://multidim/covid/latest/covid_deaths:
+  export://multidim/covid/latest/covid:
     - data://garden/covid/latest/cases_deaths
 
   ######################################
