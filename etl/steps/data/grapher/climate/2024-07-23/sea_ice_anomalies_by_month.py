@@ -13,8 +13,10 @@ paths = PathFinder(__file__)
 # NOTE: We could include 1979. But, for consistency between yearly and decadal data, we ignore this year.
 YEAR_MIN = 1980
 
-# Reference year. The monthly value of sea ice extent on this year will be subtracted from each data point.
-REFERENCE_YEAR = 2000
+# For each month's sea ice extent, subtract a certain baseline sea ice extent, calculated as an average value (for that month) between two reference years (defined above as REFERENCE_YEAR_MIN and REFERENCE_YEAR_MAX).
+# NOTE: Both min and max years are included.
+REFERENCE_YEAR_MIN = 1981
+REFERENCE_YEAR_MAX = 2010
 
 
 def improve_metadata(tb: Table) -> Table:
@@ -25,7 +27,7 @@ def improve_metadata(tb: Table) -> Table:
     for column in tb.drop(columns=["country", "year"]).columns:
         location = column.split("sea_ice_extent_")[-1].title()
         title = f"Sea ice anomaly in the {location} by month"
-        description_short_yearly = f"Each point represents the monthly average sea ice extent with respect to the same month in {REFERENCE_YEAR}, which is close to the midpoint of the series."
+        description_short_yearly = f"Each point represents the monthly average sea ice extent relative to a baseline, which is the average sea ice extent for the same month over the {REFERENCE_YEAR_MAX-REFERENCE_YEAR_MIN+1}-year period from {REFERENCE_YEAR_MIN} to {REFERENCE_YEAR_MAX}."
         footnote = (
             "All years have data for all 12 months, except 1987 and 1988 (each missing one month) and the current year."
         )
@@ -136,9 +138,12 @@ def run(dest_dir: str) -> None:
         .reset_index(drop=True)
     )
 
-    # Subtract the value of sea ice extent on a certain reference year.
-    tb_reference = tb[tb["year"] == REFERENCE_YEAR][["location", "month_name", "sea_ice_extent"]].rename(
-        columns={"sea_ice_extent": "sea_ice_extent_reference"}, errors="raise"
+    # For each month's sea ice extent, subtract a certain baseline sea ice extent, calculated as an average value (for that month) between two reference years (defined above as REFERENCE_YEAR_MIN and REFERENCE_YEAR_MAX)
+    tb_reference = (
+        tb[(tb["year"] >= REFERENCE_YEAR_MIN) & (tb["year"] >= REFERENCE_YEAR_MAX)]
+        .groupby(["location", "month_name"], as_index=False)
+        .agg({"sea_ice_extent": "mean"})
+        .rename(columns={"sea_ice_extent": "sea_ice_extent_reference"}, errors="raise")
     )
     tb = tb.merge(tb_reference, on=["location", "month_name"], how="left")
     tb["sea_ice_extent"] -= tb["sea_ice_extent_reference"]
