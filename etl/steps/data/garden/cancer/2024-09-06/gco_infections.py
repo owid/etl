@@ -22,8 +22,6 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    tb["asir_asir_att_share"] = (tb["asir_att"] / tb["asir"]) * 100
-
     tb = tb.format(["country", "year", "sex", "agent", "cancer"])
 
     #
