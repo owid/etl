@@ -232,7 +232,7 @@ def get_num_countries_per_region(tb: Table) -> Table:
     tb = tb.astype({"restriction_degree": "category"})
 
     # World
-    tb_world = tb.groupby(["date", "restriction_name", "restriction_degree"], as_index=False).size()
+    tb_world = tb.groupby(["date", "restriction_name", "restriction_degree"], as_index=False, observed=False).size()
     tb_world["country"] = "World"
 
     # Regions
@@ -243,7 +243,9 @@ def get_num_countries_per_region(tb: Table) -> Table:
         ]
     )
     ## Actual counting
-    tb = tb.groupby(["country", "date", "restriction_name", "restriction_degree"], as_index=False).size()
+    tb = tb.groupby(
+        ["country", "date", "restriction_name", "restriction_degree"], as_index=False, observed=False
+    ).size()
 
     # Concat regions + world
     tb = pr.concat([tb, tb_world], ignore_index=True)
