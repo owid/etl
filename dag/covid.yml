@@ -259,6 +259,11 @@ steps:
     - data://garden/excess_mortality/latest/excess_mortality_economist
 
   ######################################
+  # MULTIDIM
+  export://multidim/covid/latest/covid_deaths:
+    - data://garden/covid/latest/cases_deaths
+
+  ######################################
   # ECDC
   data://grapher/covid/latest/ecdc:
     - data://garden/covid/latest/ecdc

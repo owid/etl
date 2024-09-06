@@ -1,0 +1,72 @@
+definitions:
+  table: grapher/covid/latest/cases_deaths/cases_deaths
+
+dimensions_title: by interval (2)
+name: COVID-19 deaths (2)
+
+title:
+  title: COVID-19 deaths
+  titleVariant: by interval
+defaultSelection:
+  - World
+  - Europe
+  - Asia
+topicTags:
+  - COVID-19
+
+dimensions:
+  - slug: interval
+    name: Interval
+    choices:
+      - slug: weekly
+        name: Weekly
+        description: null
+      - slug: biweekly
+        name: Biweekly
+        description: null
+
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: absolute
+        name: Absolute
+        description: null
+      - slug: per_capita
+        name: Per million people
+        description: null
+      - slug: change
+        name: Change from previous interval
+        description: null
+
+views:
+  - dimensions:
+      interval: weekly
+      metric: absolute
+    indicators:
+      y: "{definitions.table}#weekly_deaths"
+  - dimensions:
+      interval: weekly
+      metric: per_capita
+    indicators:
+      y: "{definitions.table}#weekly_deaths_per_million"
+  - dimensions:
+      interval: weekly
+      metric: change
+    indicators:
+      y: "{definitions.table}#weekly_pct_growth_deaths"
+
+  - dimensions:
+      interval: biweekly
+      metric: absolute
+    indicators:
+      y: "{definitions.table}#biweekly_deaths"
+  - dimensions:
+      interval: biweekly
+      metric: per_capita
+    indicators:
+      y: "{definitions.table}#biweekly_deaths_per_million"
+  - dimensions:
+      interval: biweekly
+      metric: change
+    indicators:
+      y: "{definitions.table}#biweekly_pct_growth_deaths"
