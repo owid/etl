@@ -40,30 +40,30 @@ views:
       interval: weekly
       metric: absolute
     indicators:
-      y: grapher/covid/latest/cases_deaths/cases_deaths#weekly_deaths
+      y: "{definitions.table}#weekly_deaths"
   - dimensions:
       interval: weekly
       metric: per_capita
     indicators:
-      y: grapher/covid/latest/cases_deaths/cases_deaths#weekly_deaths_per_million
+      y: "{definitions.table}#weekly_deaths_per_million"
   - dimensions:
       interval: weekly
       metric: change
     indicators:
-      y: grapher/covid/latest/cases_deaths/cases_deaths#weekly_pct_growth_deaths
+      y: "{definitions.table}#weekly_pct_growth_deaths"
 
   - dimensions:
       interval: biweekly
       metric: absolute
     indicators:
-      y: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_deaths
+      y: "{definitions.table}#biweekly_deaths"
   - dimensions:
       interval: biweekly
       metric: per_capita
     indicators:
-      y: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_deaths_per_million
+      y: "{definitions.table}#biweekly_deaths_per_million"
   - dimensions:
       interval: biweekly
       metric: change
     indicators:
-      y: grapher/covid/latest/cases_deaths/cases_deaths#biweekly_pct_growth_deaths
+      y: "{definitions.table}#biweekly_pct_growth_deaths"

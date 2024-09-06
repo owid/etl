@@ -12,9 +12,20 @@ def run(dest_dir: str) -> None:
     filenames = [
         "covid.cases.yml",
         "covid.deaths.yml",
+        "covid.hospital.yml",
     ]
     # Load YAML file
     for fname in filenames:
         config = paths.load_mdim_config(fname)
-        slug = f"mdd-{fname.replace('.yml', '').replace('_', '-')}"
+        slug = f"mdd-{fname.replace('.yml', '').replace('.', '-')}"
         multidim.upsert_multidim_data_page(slug, config, engine)
+
+    #
+    fname = "covid.mobility.yml"
+    config = paths.load_mdim_config(fname)
+    slug = f"mdd-{fname.replace('.yml', '').replace('.', '-')}"
+    table = "grapher/covid/latest/google_mobility/google_mobility"
+    config["views"] += multidim.expand_views(config, {"place": "*"}, table, engine)
+    multidim.upsert_multidim_data_page(slug, config, engine)
+
+    print(1)

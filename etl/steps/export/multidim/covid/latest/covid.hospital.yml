@@ -1,0 +1,88 @@
+definitions:
+  table: grapher/covid/latest/hospital/hospital
+
+title:
+  title: COVID-19 hospitalisations
+  titleVariant: by type
+defaultSelection:
+  - Belgium
+  - Canada
+  - France
+  - Israel
+  - Italy
+  - Netherlands
+  - Spain
+  - United Kingdom
+  - United States
+topicTags:
+  - COVID-19
+
+dimensions:
+  - slug: type
+    name: Type
+    choices:
+      - slug: hospital
+        name: Hospitalisations
+        description: null
+      - slug: icu
+        name: Intensive care unit
+        description: null
+
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: patients
+        name: Patients
+        description: null
+      - slug: admissions
+        name: Admissions
+        description: null
+      - slug: patients_per_capita
+        name: Patients per million people
+        description: null
+      - slug: admissions_per_capita
+        name: Admissions per million people
+        description: null
+
+views:
+  - dimensions:
+      type: hospital
+      metric: patients
+    indicators:
+      y: "{definitions.table}#daily_occupancy_hosp"
+  - dimensions:
+      type: hospital
+      metric: patients_per_capita
+    indicators:
+      y: "{definitions.table}#daily_occupancy_hosp_per_1m"
+  - dimensions:
+      type: hospital
+      metric: admissions
+    indicators:
+      y: "{definitions.table}#weekly_admissions_hosp"
+  - dimensions:
+      type: hospital
+      metric: admissions_per_capita
+    indicators:
+      y: "{definitions.table}#weekly_admissions_hosp_per_1m"
+
+  - dimensions:
+      type: icu
+      metric: patients
+    indicators:
+      y: "{definitions.table}#daily_occupancy_icu"
+  - dimensions:
+      type: icu
+      metric: patients_per_capita
+    indicators:
+      y: "{definitions.table}#daily_occupancy_icu_per_1m"
+  - dimensions:
+      type: icu
+      metric: admissions
+    indicators:
+      y: "{definitions.table}#weekly_admissions_icu"
+  - dimensions:
+      type: icu
+      metric: admissions_per_capita
+    indicators:
+      y: "{definitions.table}#weekly_admissions_icu_per_1m"

@@ -1,0 +1,82 @@
+title:
+  title: Mobility during COVID-19 pandemic
+  titleVariant: by place
+defaultSelection:
+  - Belgium
+  - Canada
+  - France
+  - Israel
+  - Italy
+  - Netherlands
+  - Spain
+  - United Kingdom
+  - United States
+topicTags:
+  - COVID-19
+
+dimensions:
+  - slug: place
+    name: Place
+    choices:
+      - slug: Grocery and pharmacy
+        name: Grocery and pharmacy
+        description: null
+      - slug: Parks
+        name: Parks
+        description: null
+      - slug: Residential
+        name: Residential
+        description: null
+      - slug: Retail and recreation
+        name: Retail and recreation
+        description: null
+      - slug: Transit stations
+        name: Transit stations
+        description: null
+      - slug: Workplaces
+        name: Workplaces
+        description: null
+
+views: []
+# views:
+#   - dimensions:
+#       type: hospital
+#       metric: patients
+#     indicators:
+#       y: "{definitions.table}#daily_occupancy_hosp"
+#   - dimensions:
+#       type: hospital
+#       metric: patients_per_capita
+#     indicators:
+#       y: "{definitions.table}#daily_occupancy_hosp_per_1m"
+#   - dimensions:
+#       type: hospital
+#       metric: admissions
+#     indicators:
+#       y: "{definitions.table}#weekly_admissions_hosp"
+#   - dimensions:
+#       type: hospital
+#       metric: admissions_per_capita
+#     indicators:
+#       y: "{definitions.table}#weekly_admissions_hosp_per_1m"
+
+#   - dimensions:
+#       type: icu
+#       metric: patients
+#     indicators:
+#       y: "{definitions.table}#daily_occupancy_icu"
+#   - dimensions:
+#       type: icu
+#       metric: patients_per_capita
+#     indicators:
+#       y: "{definitions.table}#daily_occupancy_icu_per_1m"
+#   - dimensions:
+#       type: icu
+#       metric: admissions
+#     indicators:
+#       y: "{definitions.table}#weekly_admissions_icu"
+#   - dimensions:
+#       type: icu
+#       metric: admissions_per_capita
+#     indicators:
+#       y: "{definitions.table}#weekly_admissions_icu_per_1m"

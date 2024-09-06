@@ -262,6 +262,8 @@ steps:
   # MULTIDIM
   export://multidim/covid/latest/covid:
     - data://garden/covid/latest/cases_deaths
+    - data://garden/covid/latest/hospital
+    - data://garden/covid/latest/google_mobility
 
   ######################################
   # ECDC
