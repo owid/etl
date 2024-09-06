@@ -478,7 +478,7 @@ class PathFinder:
 
     @property
     def mdim_path(self) -> Path:
-        assert "multidim" in self.directory, "MDIM path is only available for multidim steps!"
+        assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
         return self.directory / (self.short_name + ".yml")
 
     @property
@@ -738,7 +738,7 @@ class PathFinder:
         assert len(deps) == 1
         return deps[0].replace("etag://", "https://")
 
-    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str] = None) -> Dict[str, str]:
+    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, str]:
         if filename is not None:
             path = self.directory / Path(filename)
         elif path is None:
