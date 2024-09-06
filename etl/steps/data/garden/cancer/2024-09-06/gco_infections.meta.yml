@@ -38,7 +38,7 @@ tables:
           title: |-
             Age-standardized incidence rate of << cancer.lower() >> cancer attributable to << agent.lower() >> among {definitions.sex}
           description_short: |-
-            The estimated age-standardized incidence rate of << cancer.lower() >> cancer attributable to << agent.lower() >> among {definitions.sex
+            The estimated age-standardized incidence rate of << cancer.lower() >> cancer attributable to << agent.lower() >> among {definitions.sex}
           unit: per 100,000 people
           presentation:
             grapher_config:
