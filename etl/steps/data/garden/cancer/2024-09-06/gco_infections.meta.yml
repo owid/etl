@@ -57,9 +57,9 @@ tables:
                 {definitions.footnote}
        attr_cases_share:
           title: |-
-            Share of << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>
+            Share of new << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>
           description_short: |-
-            Share of << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>
+            Share of new << cancer.lower() >> cases among {definitions.sex} attributable to << agent.lower() >>
           unit: '%'
           short_unit: '%'
        cases:
