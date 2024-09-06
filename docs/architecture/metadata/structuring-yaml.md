@@ -3,6 +3,11 @@ tags:
   - 👷 Staff
 ---
 
+!!! tip "Working with YAML files in VS Code"
+
+    Install the [YAML extension (by Red Hat)](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) for VS Code to get syntax highlighting and autocompletion for YAML files. This extension will validate your files and highlight any syntax errors.
+
+
 ## Creating YAML Files
 
 Metadata YAML files are typically stored within a garden step as `my_dataset.meta.yml`. Their content is applied **at the very end** of any ETL step. Therefore, YAML files have "the final word" on the metadata of any step. The conventional structure is as follows:
