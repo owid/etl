@@ -290,55 +290,76 @@ ds_explorer.save()
 
 Multi-dimensional indicators are powered by a configuration that is typically created from a YAML file. The structure of the YAML file looks like this:
 
-```yaml
+```yaml title="etl/steps/export/multidim/covid/latest/covid.deaths.yaml"
 definitions:
-  table: grapher/energy/2024-05-08/primary_energy_consumption/primary_energy_consumption
+  table: {definitions.table}
 
 title:
-  title: Energy use
-  titleVariant: by energy source
+  title: COVID-19 deaths
+  titleVariant: by interval
 defaultSelection:
   - World
   - Europe
-  - Mexico
+  - Asia
 topicTags:
-  - Energy
+  - COVID-19
+
 dimensions:
-  - slug: source
-    name: Energy source
+  - slug: interval
+    name: Interval
     choices:
-      - slug: all
-        name: All sources
-        group: Aggregates
-        description: Total energy use
-      - slug: fossil
-        name: Fossil fuels
-        group: Aggregates
-        description: The sum of coal, oil and gas
-      ...
+      - slug: weekly
+        name: Weekly
+        description: null
+      - slug: biweekly
+        name: Biweekly
+        description: null
+
   - slug: metric
     name: Metric
     choices:
-      - slug: total
-        name: Total consumption
-        description: The amount of energy consumed nationally per year
+      - slug: absolute
+        name: Absolute
+        description: null
       - slug: per_capita
-        name: Consumption per capita
-        description: The average amount of energy each person consumes per year
-      ...
+        name: Per million people
+        description: null
+      - slug: change
+        name: Change from previous interval
+        description: null
 
 views:
   - dimensions:
-      source: all
-      metric: total
+      interval: weekly
+      metric: absolute
     indicators:
-      y: "{definitions.table}#primary_energy_consumption__twh"
+      y: "{definitions.table}#weekly_deaths"
   - dimensions:
-      source: all
+      interval: weekly
       metric: per_capita
     indicators:
-      # This could be a list of indicators
-      y: "{definitions.table}#primary_energy_consumption_per_capita__kwh"
+      y: "{definitions.table}#weekly_deaths_per_million"
+  - dimensions:
+      interval: weekly
+      metric: change
+    indicators:
+      y: "{definitions.table}#weekly_pct_growth_deaths"
+
+  - dimensions:
+      interval: biweekly
+      metric: absolute
+    indicators:
+      y: "{definitions.table}#biweekly_deaths"
+  - dimensions:
+      interval: biweekly
+      metric: per_capita
+    indicators:
+      y: "{definitions.table}#biweekly_deaths_per_million"
+  - dimensions:
+      interval: biweekly
+      metric: change
+    indicators:
+      y: "{definitions.table}#biweekly_pct_growth_deaths"
 ```
 
 The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically. However, it's a good idea to create a few of them manually to start.
@@ -347,16 +368,12 @@ You can also combine manually defined views with generated ones. See the `etl.mu
 
 The export step loads the YAML file, adds `views` to the config, and then calls the function.
 
-```python
+```python title="etl/steps/export/multidim/covid/latest/covid.py"
 def run(dest_dir: str) -> None:
     engine = get_engine()
 
     # Load YAML file
-    with open(CURRENT_DIR / "energy.yml") as istream:
-        config = yaml.safe_load(istream)
-
-    # Programatically generate views
-    config['views'] = ...
+    config = paths.load_mdim_config("covid.deaths.yaml")
 
     multidim.upsert_multidim_data_page("mdd-energy", config, engine)
 ```
