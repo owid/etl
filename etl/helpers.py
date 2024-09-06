@@ -477,6 +477,10 @@ class PathFinder:
         return self.directory / (self.short_name + ".meta.yml")
 
     @property
+    def mdim_path(self) -> Path:
+        return self.directory / (self.short_name + ".mdim.yml")
+
+    @property
     def directory(self) -> Path:
         # If the current file is a directory, it's a step with multiple files.
         if self.f.is_dir():
@@ -732,6 +736,12 @@ class PathFinder:
         deps = [dep for dep in self.dependencies if dep.startswith("etag://")]
         assert len(deps) == 1
         return deps[0].replace("etag://", "https://")
+
+    def load_mdim_config(self, path: Optional[str] = None) -> Dict[str, str]:
+        if path is None:
+            path = self.mdim_path
+        config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
+        return config
 
 
 def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:
