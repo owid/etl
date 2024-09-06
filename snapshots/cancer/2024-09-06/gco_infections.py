@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import click
-import owid.catalog.processing as pr
 import pandas as pd
 import requests
 from owid.datautils.io import df_to_file
