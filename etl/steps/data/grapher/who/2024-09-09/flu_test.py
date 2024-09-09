@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["fluid"]
     tb["year"] = pd.to_datetime(tb["iso_weekstartdate"], format="%Y-%m-%d", utc=True).dt.date.astype(str)
 
-    tb_test = tb[["country", "date", "inf_tested"]].dropna(subset="inf_tested")
+    tb_test = tb[["country", "year", "inf_tested"]].dropna(subset="inf_tested")
     tb_test = tb_test.format(["country", "year"])
     #
     # Save outputs.
