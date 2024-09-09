@@ -40,7 +40,7 @@
   "Cura\u00e7ao": "Curacao",
   "Cyprus": "Cyprus",
   "Czechia": "Czechia",
-  "C\u00f4te d'Ivoire": "Cote d'Ivoire",
+  "Côte d’Ivoire": "Cote d'Ivoire",
   "Democratic People's Republic of Korea": "North Korea",
   "Democratic Republic of the Congo": "Democratic Republic of Congo",
   "Denmark": "Denmark",
@@ -177,5 +177,11 @@
   "Kosovo (in accordance with UN Security Council resolution 1244 (1999))": "Kosovo",
   "T\u00fcrkiye": "Turkey",
   "occupied Palestinian territory, including east Jerusalem": "Palestine",
-  "Netherlands (Kingdom of the)": "Netherlands"
+  "Netherlands (Kingdom of the)": "Netherlands",
+  "Brunei Darussalam": "Brunei",
+  "United Kingdom, England": "England",
+  "United Kingdom, Wales": "Wales",
+  "United Kingdom, Scotland": "Scotland",
+  "United Kingdom, Northern Ireland": "Northern Ireland",
+  "United Arab Emirates": "United Arab Emirates"
 }
