@@ -12,6 +12,14 @@ meta:
 
       Estimates for the prevalence and number of people unable to afford a healthy diet were imputed for countries with missing information based on their regional and global aggregates. Countries' income classifications at the aggregate reporting level follow the calendar year of 2022 standard (the fiscal year of 2024 of the World Bank).
 
+      Population data are sourced from the United Nations Department of Economic and Social Affairs (UN DESA) 2022 revision of the World Population Prospects and World Development Indicators (WDI) of the World Bank. The WDI source data from:
+      - The United Nations Population Division. World Population Prospects: 2022 Revision.
+      - Census reports and other statistical publications from national statistical offices.
+      - Eurostat: Demographic Statistics.
+      - United Nations Statistical Division. Population and Vital Statistics Report (various years).
+      - U.S. Census Bureau: International Database.
+      - Secretariat of the Pacific Community: Statistics and Demography Programme.
+
     citation_full: |-
       World Bank, adapted from Herforth, A., Venkat, A., Bai, Y., Costlow, L., Holleman, C. & Masters, W.A. (2022). Methods and options to monitor globally the cost and affordability of a healthy diet. Background paper for The State of Food Security and Nutrition in the World 2022. Rome, FAO.
     version_producer: '3.0'
