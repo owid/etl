@@ -15,15 +15,15 @@ definitions:
     - A value of zero indicates a null or a small number rounded down at the current precision level.
   description_key_number_of_population: &description_key_number_of_population
     - Population counts all residents regardless of legal status or citizenship.
-    - A value of zero indicates a null or a small number rounded down at the current precision level. Data available for 2017.
+    - A value of zero indicates a null or a small number rounded down at the current precision level.
   description_key_poverty_lines: &description_key_poverty_lines
     # Original description:
     # The ratio of the cost of an energy sufficient diet to the food poverty lines, defined as $1.35/day for low-income countries (63% of the international poverty line of $2.15/day in 2017 PPP$), $2.04/day for lower-middle-income countries (56% of the international poverty line of $3.65/day in 2017 PPP$), $3.15/day for upper-middle-income countries (46% of the international poverty line of $6.85/day in 2017 PPP$), and $11.2/day (46% of the international poverty line of $24.36/day in 2017 PPP$). The percentages (63%, 56%, and 46%) represent the average food expenditure shares in the second quintile of consumers in low-income and lower-middle-income countries, and the first quintile of consumers in upper-middle-and-high-income countries, according to household surveys compiled by the World Bank. Countries' income classifications follow the calendar year of 2021 standard (fiscal year of 2023 of the World Bank), which is the base year of the latest ICP cycle.
-    - "Poverty lines are defined as follows:
-      - For low-income countries, $1.35/day (63% of the international poverty line of $2.15/day in 2017 PPP$).
-      - For lower-middle-income countries, $2.04/day (56% of the international poverty line of $3.65/day in 2017 PPP$).
-      - For upper-middle-income countries, $3.15/day (46% of the international poverty line of $6.85/day in 2017 PPP$).
-      - For high-income countries, $11.2/day (46% of the international poverty line of $24.36/day in 2017 PPP$)."
+    - "Poverty lines are defined (in international-$ in 2017 prices) as follows:
+      - For low-income countries, $1.35/day (63% of the international poverty line of $2.15/day).
+      - For lower-middle-income countries, $2.04/day (56% of the international poverty line of $3.65/day).
+      - For upper-middle-income countries, $3.15/day (46% of the international poverty line of $6.85/day).
+      - For high-income countries, $11.2/day (46% of the international poverty line of $24.36/day)."
     - These percentages (63%, 56%, and 46%) represent the average food expenditure shares in the second quintile of consumers in low-income and lower-middle-income countries, and the first quintile of consumers in upper-middle-and-high-income countries, according to household surveys compiled by the World Bank.
 
 dataset:
@@ -195,7 +195,7 @@ tables:
         unit: people
         short_unit: ""
         description_short: |-
-          Total number of people who cannot afford a healthy diet in a given country and year. A diet is deemed unaffordable if it costs more than 52% of a household's income.
+          Total number of people who cannot afford a healthy diet in a given country and year.
         description_key:
           - "This indicator is calculated as follows: [Percentage of a country's population that is unable to afford a healthy diet] x [Country's population]"
           - *description_key_number_of_population
