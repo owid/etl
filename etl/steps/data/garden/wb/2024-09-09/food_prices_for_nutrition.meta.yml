@@ -79,49 +79,49 @@ tables:
         unit: current international-$ per person per day
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines (FBDGs),for a representative person within energy balance at 2330 kcal/day.
+          Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance at 2330 kcal/day.
       cost_of_a_healthy_diet_relative_to_the_cost_of_sufficient_energy_from_starchy_staples:
         title: Cost of a healthy diet relative to the cost of sufficient energy from starchy staples
         unit: ""
         short_unit: ""
         description_short: |-
-          Ratio between the cost of a healthy diet that meets requirements for energy and food-based dietary guidelines (FBDGs) and the cost of caloric adequacy that uses only starchy staples to meet energy requirements.
+          Ratio between the cost of a healthy diet that meets requirements for energy and food-based dietary guidelines and the cost of caloric adequacy that uses only starchy staples to meet energy requirements.
       cost_of_animal_source_foods:
         title: Cost of animal-source foods
         unit: international-$ per person per day in 2021 prices
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available animal-source foods to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Animal-source foods are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available animal-source foods to meet daily intake levels recommended in food-based dietary guidelines. Animal-source foods are one of the six food groups within the Healthy Diet Basket.
       cost_share_for_animal_sourced_foods_in_a_least_cost_healthy_diet:
         title: Cost share for animal-sourced foods in a least-cost healthy diet
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of costs for the least expensive animal-source foods to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+          Share of costs for the least expensive animal-source foods to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
       cost_of_animal_sourced_foods_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of animal-sourced foods relative to the starchy staples in a least-cost healthy diet
         unit: ""
         short_unit: ""
         description_short: |-
-          Cost of the least expensive animal-source foods as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs).
+          Cost of the least expensive animal-source foods as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
       cost_of_fruits:
         title: Cost of fruits
         unit: international-$ per person per day in 2021 prices
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Fruits are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines. Fruits are one of the six food groups within the Healthy Diet Basket.
       cost_share_for_fruits_in_a_least_cost_healthy_diet:
         title: Cost share for fruits in a least-cost healthy diet
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of costs for the least expensive fruits to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+          Share of costs for the least expensive fruits to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
       cost_of_fruits_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of fruits relative to the starchy staples in a least-cost healthy diet
         unit: ""
         short_unit: ""
         description_short: |-
-          Cost of the least expensive fruits as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs).
+          Cost of the least expensive fruits as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
       affordability_of_a_healthy_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of a healthy diet: ratio of cost to food expenditures"
         unit: "%"
@@ -140,37 +140,37 @@ tables:
         unit: international-$ per person per day in 2021 prices
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available legumes, nuts and seeds to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Legumes, nuts and seeds are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available legumes, nuts and seeds to meet daily intake levels recommended in food-based dietary guidelines. Legumes, nuts and seeds are one of the six food groups within the Healthy Diet Basket.
       cost_share_for_legumes__nuts_and_seeds_in_a_least_cost_healthy_diet:
         title: Cost share for legumes, nuts and seeds in a least-cost healthy diet
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of costs for the least expensive legumes, nuts or seeds to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+          Share of costs for the least expensive legumes, nuts or seeds to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
       cost_of_legumes__nuts_and_seeds_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of legumes, nuts and seeds relative to the starchy staples in a least-cost healthy diet
         unit: ""
         short_unit: ""
         description_short: |-
-          Cost of the least expensive legumes, nuts and seeds as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs).
+          Cost of the least expensive legumes, nuts and seeds as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
       cost_of_oils_and_fats:
         title: Cost of oils and fats
         unit: international-$ per person per day in 2021 prices
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available fats or oils to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Fats and oils are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available fats or oils to meet daily intake levels recommended in food-based dietary guidelines. Fats and oils are one of the six food groups within the Healthy Diet Basket.
       cost_share_for_oils_and_fats_in_a_least_cost_healthy_diet:
         title: Cost share for oils and fats in a least-cost healthy diet
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of costs for the least expensive oils or fats to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+          Share of costs for the least expensive oils or fats to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
       cost_of_oils_and_fats_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of oils and fats relative to the starchy staples in a least-cost healthy diet
         unit: ""
         short_unit: ""
         description_short: |-
-          Cost of the least expensive oils and fats as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs).
+          Cost of the least expensive oils and fats as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
       affordability_of_a_healthy_diet__ratio_of_cost_to_the_food_poverty_line:
         title: "Affordability of a healthy diet: ratio of cost to the food poverty line"
         unit: "%"
@@ -183,13 +183,13 @@ tables:
         unit: international-$ per person per day in 2021 prices
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available starchy staples to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Starchy staples are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available starchy staples to meet daily intake levels recommended in food-based dietary guidelines. Starchy staples are one of the six food groups within the Healthy Diet Basket.
       cost_share_for_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost share for starchy staples in a least-cost healthy diet
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of costs for the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+          Share of costs for the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
       people_who_cannot_afford_a_healthy_diet:
         title: Number of people who cannot afford a healthy diet
         unit: people
@@ -204,19 +204,19 @@ tables:
         unit: international-$ per person per day in 2021 prices
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available vegetables to meet daily intake levels recommended in food-based dietary guidelines (FBDGs). Vegetables are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available vegetables to meet daily intake levels recommended in food-based dietary guidelines. Vegetables are one of the six food groups within the Healthy Diet Basket.
       cost_share_for_vegetables_in_a_least_cost_healthy_diet:
         title: Cost share for vegetables in a least-cost healthy diet
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of costs for the least expensive vegetables to meet daily recommendations in food-based dietary guidelines (FBDGs), as a percentage of the total cost of a healthy diet.
+          Share of costs for the least expensive vegetables to meet daily recommendations in food-based dietary guidelines, as a percentage of the total cost of a healthy diet.
       cost_of_vegetables_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of vegetables relative to the starchy staples in a least-cost healthy diet
         unit: ""
         short_unit: ""
         description_short: |-
-          Cost of the least expensive vegetables as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines (FBDGs).
+          Cost of the least expensive vegetables as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
       cost_of_a_nutrient_adequate_diet:
         title: Cost of a nutrient adequate diet
         unit: international-$ per person per day in 2021 prices
