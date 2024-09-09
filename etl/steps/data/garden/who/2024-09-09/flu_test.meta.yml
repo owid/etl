@@ -11,7 +11,7 @@ definitions:
 
 
 tables:
-  mortality_database_cancer:
+  flu_test:
     variables:
       inf_tested:
         title: The number of influenza tests carried out

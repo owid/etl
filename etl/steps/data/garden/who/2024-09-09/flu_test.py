@@ -33,7 +33,7 @@ def run(dest_dir: str) -> None:
     tb = to_grapher_date(tb, ZERO_DATE)
     # Select out only variables that we care about
     tb_test = tb[["country", "year", "inf_tested", "case_info"]].dropna(subset="inf_tested").copy()
-    tb_test = tb_test.format(["country", "year", "case_info"])
+    tb_test = tb_test.format(["country", "year", "case_info"], short_name="flu_test")
     #
     # Save outputs.
     #
