@@ -19,7 +19,7 @@ def adapt_units(tb: Table) -> Table:
     # Change units from million people to people.
     for column in [column for column in tb.columns if column.startswith("millions_of_people")]:
         tb[column] *= 1e6
-        tb = tb.rename(columns={column: column.replace("millions_of_people", "people")})
+        tb = tb.rename(columns={column: column.replace("millions_of_people", "people")}, errors="raise")
 
     # Convert units expressed as fractions to percentages.
     for column in [column for column in tb.columns if column.startswith(("cost_share_", "affordability_"))]:
