@@ -1,0 +1,25 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Mpox (monkeypox)
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 1
+
+
+tables:
+  global_health_mpox:
+    variables:
+      reported_cases:
+        title: Reported suspected mpox cases
+        unit: cases
+      suspected_cases_cumulative:
+        title: Cumulative suspected mpox cases
+        unit: cases
+        description_processing: Data for 2024 is taken from Global.health, data for 2023 is taken from Africa CDC.
