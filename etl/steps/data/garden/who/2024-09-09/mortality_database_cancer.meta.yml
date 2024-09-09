@@ -1,0 +1,18 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Influenza
+    processing_level: minor
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+
+
+tables:
+  mortality_database_cancer:
+    variables:
+      inf_tested:
+        title: The number of influenza tests carried out
+        unit: tests
