@@ -10,7 +10,7 @@ paths = PathFinder(__file__)
 
 
 # Expected classifications, sorted from oldest to newest.
-EXPECTED_CLASSIFICATIONS = ["FPN 1.0", "FPN 1.1", "FPN 2.0", "FPN 2.1"]
+EXPECTED_CLASSIFICATIONS = ["FPN 1.0", "FPN 1.1", "FPN 2.0", "FPN 2.1", "FPN 3.0"]
 # Classification to adopt (by default, the latest one).
 CLASSIFICATION = EXPECTED_CLASSIFICATIONS[-1]
 
@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("food_prices_for_nutrition")
-    tb = ds_meadow["food_prices_for_nutrition"].reset_index()
+    tb = ds_meadow.read_table("food_prices_for_nutrition")
 
     #
     # Process data.
