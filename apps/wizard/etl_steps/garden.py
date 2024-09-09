@@ -211,7 +211,7 @@ def export_metadata() -> None:
 # MAIN ##################################################
 #########################################################
 # TITLE
-st.title("Create step  **:gray[Garden]**")
+st.title(":material/deceased: Garden **:gray[Create step]**")
 
 # SIDEBAR
 with st.sidebar:

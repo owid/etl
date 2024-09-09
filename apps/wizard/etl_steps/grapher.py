@@ -97,7 +97,7 @@ def update_state() -> None:
 # MAIN ##################################################
 #########################################################
 # TITLE
-st.title("Create step  **:gray[Grapher]**")
+st.title(":material/database: Grapher  **:gray[Create step]**")
 
 # SIDEBAR
 with st.sidebar:

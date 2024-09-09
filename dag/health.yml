@@ -708,6 +708,12 @@ steps:
   data://grapher/who/2024-08-06/mortality_database_cancer:
     - data://garden/who/2024-08-06/mortality_database_cancer
 
+  data://garden/who/2024-08-06/mortality_database_cancer_most_common:
+    - data://garden/who/2024-08-06/mortality_database_cancer
+  data://grapher/who/2024-08-06/mortality_database_cancer_most_common:
+    - data://garden/who/2024-08-06/mortality_database_cancer_most_common
+
+
   data://meadow/who/latest/monkeypox:
     - snapshot://who/latest/monkeypox.csv
   data://garden/who/latest/monkeypox:
@@ -721,6 +727,8 @@ steps:
     - data://garden/who/latest/monkeypox
   export://github/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
+
+   # Eurostat Cancer Screening
   data://meadow/health/2024-08-23/eurostat_cancer:
     - snapshot://health/2024-08-23/eurostat_cancer.csv
   data://garden/health/2024-08-23/eurostat_cancer:
@@ -742,3 +750,17 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2024-08-26/gbd_risk_cancer:
     - data-private://garden/ihme_gbd/2024-08-26/gbd_risk_cancer
+  data://meadow/health/2024-09-05/seattle_pathogens:
+    - snapshot://health/2024-09-05/seattle_pathogens.csv
+  data://garden/health/2024-09-05/seattle_pathogens:
+    - data://meadow/health/2024-09-05/seattle_pathogens
+  data://grapher/health/2024-09-05/seattle_pathogens:
+    - data://garden/health/2024-09-05/seattle_pathogens
+
+  # International Agency for Research on Cancer
+  data://meadow/cancer/2024-08-30/gco_alcohol:
+    - snapshot://cancer/2024-08-30/gco_alcohol.csv
+  data://garden/cancer/2024-08-30/gco_alcohol:
+    - data://meadow/cancer/2024-08-30/gco_alcohol
+  data://grapher/cancer/2024-08-30/gco_alcohol:
+    - data://garden/cancer/2024-08-30/gco_alcohol

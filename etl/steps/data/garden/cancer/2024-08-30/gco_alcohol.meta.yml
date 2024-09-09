@@ -1,0 +1,52 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Cancer
+
+    processing_level: minor
+    display:
+      numDecimalPlaces: 1
+  sex: |-
+    <% if sex == "both" %>all individuals<% elif sex == "male" %>males<% elif sex == "female" %>females<% endif %>
+  value:
+    unit: |-
+      <% if indicator == "asr" %>per 100,000 people<% elif indicator == "paf" %>%<% endif %>
+    short_unit: |-
+      <% if indicator == "asr" %> <% elif indicator == "paf" %>%<% endif %>
+    title: |-
+      <% if indicator == "asr" %>
+      Age-standardized rates for the number of new << cancer.lower() >> cancer cases attributable to alcohol drinking among {definitions.sex}
+      <% elif indicator == "paf" %>
+      Proportion of << cancer.lower() >> cancer deaths among {definitions.sex} attributable to alcohol consumption
+      <% endif %>
+    description_short: |-
+      <% if indicator == "asr" %>
+      The age-standardized rate for the number of new << cancer.lower() >> cancer cases attributable to alcohol drinking among {definitions.sex} per 100,000 people.
+      <% elif indicator == "paf" %>
+      Proportion of << cancer.lower() >> cancer deaths among {definitions.sex} attributable to alcohol consumption, relative to the total number of all cancer cases.
+      <% endif %>
+  footnote: |-
+    <% if indicator == "asr" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% endif %>
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  gco_alcohol:
+    variables:
+      value:
+        title: |-
+          {definitions.value.title}
+        unit: |-
+          {definitions.value.unit}
+        short_unit: |-
+          {definitions.value.short_unit}
+        description_short: |-
+          {definitions.value.description_short}
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}

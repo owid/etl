@@ -54,6 +54,7 @@ COLUMNS = {
     "coal_share_of_electricity__pct": "coal_share_elec",
     "coal__pct_equivalent_primary_energy": "coal_share_energy",
     "total_demand__twh": "electricity_demand",
+    "per_capita_total_demand__kwh": "electricity_demand_per_capita",
     "total_generation__twh": "electricity_generation",
     "total_electricity_share_of_primary_energy__pct": "electricity_share_energy",
     "annual_change_in_primary_energy_consumption__pct": "energy_cons_change_pct",
