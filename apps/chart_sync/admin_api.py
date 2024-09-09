@@ -81,6 +81,25 @@ class AdminAPI(object):
         assert js["success"]
         return js
 
+    def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
+        resp = requests.put(
+            self.base_url + f"/admin/api/variables/{variable_id}/grapherConfigETL",
+            cookies={"sessionid": self.session_id},
+            json=grapher_config,
+        )
+        js = self._json_from_response(resp)
+        assert js["success"]
+        return js
+
+    def delete_grapher_config(self, variable_id: int) -> dict:
+        resp = requests.delete(
+            self.base_url + f"/admin/api/variables/{variable_id}/grapherConfigETL",
+            cookies={"sessionid": self.session_id},
+        )
+        js = self._json_from_response(resp)
+        assert js["success"]
+        return js
+
 
 def _generate_random_string(length=32) -> str:
     letters_and_digits = string.ascii_letters + string.digits

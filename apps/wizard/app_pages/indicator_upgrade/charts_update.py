@@ -54,8 +54,8 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
                 # Build Series with slugs
                 slugs = pd.DataFrame(
                     {
-                        "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],
-                        "url": [OWID_ENV.chart_site(chart.slug) for chart in charts],
+                        "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # type: ignore
+                        "url": [OWID_ENV.chart_site(chart.slug) for chart in charts],  # type: ignore
                     }
                 )
                 st.dataframe(

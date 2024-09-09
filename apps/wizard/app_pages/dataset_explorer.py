@@ -25,7 +25,7 @@ st.set_page_config(
 )
 st.session_state.export_metadata = st.session_state.get("export_metadata", False)
 
-st.title("🕵️ Dataset Explorer")
+st.title(":material/search: Dataset Explorer")
 
 COLORS = {
     "snapshot": "#FC9090",

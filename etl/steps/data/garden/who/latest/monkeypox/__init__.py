@@ -4,10 +4,13 @@ import datetime
 
 import owid.catalog.processing as pr
 import pandas as pd
+import structlog
 from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+
+log = structlog.get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -46,9 +49,11 @@ def run(dest_dir: str) -> None:
         make_missing_countries_nan=True,
     )
 
-    missing_countries = set(tb_orig[tb.country.isnull()].country)
+    ix = tb.country.isnull()
+    missing_countries = set(tb_orig[ix].country)
     if missing_countries:
-        raise ValueError(f"Missing countries in monkeypox.meta.yml: {missing_countries}")
+        log.warning(f"Missing countries in monkeypox.countries.json: {missing_countries}")
+        tb.country = tb.country.astype(str).fillna(tb_orig.country)
 
     tb = (
         tb.pipe(clean_columns)
@@ -161,6 +166,10 @@ def add_regions(tb: Table) -> Table:
     )
     regions = regions[regions.date < str(datetime.date.today())]
     tb = tb.drop(columns="region")
+
+    # Add iso codes to regions
+    region_to_iso = ds_regions["regions"].reset_index().set_index("name").code
+    regions["iso_code"] = regions.country.map(region_to_iso)
 
     # Concatenate with tb
     return pr.concat([tb, regions])

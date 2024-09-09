@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Pathogens, SFA Study
+    description: |-
+      The mission of the Seattle Flu Alliance is to understand how respiratory viruses spread and evolve, sharing that knowledge to prevent illness and death. Studying these viruses helps researchers and public health organizations make decisions that protect the public’s health, like developing new vaccines or promoting social distancing. When we understand how viruses are transmitted, we can catch them earlier and slow their spread across the Seattle area. We envision our research contributing to healthier communities that are protected from the threat of new and evolving respiratory diseases.
+
+      The Seattle Flu Alliance is made up of leading researchers from The Brotman Baty Institute, UW Medicine, The Fred Hutchinson Cancer Center, Seattle Children’s, and the Fogarty International Center at the National Institutes of Health.
+
+      This dataset reports the percent of specimens with a detected respiratory pathogen, aggregated by week across Seattle Flu Study collection strategies. These results include both community and clinical samples, some of which are a part of contact testing. Proportions are not fully representative of what is happening across King County.
+    date_published: "2024-09-04"
+
+    # Citation
+    producer: Seattle Flu Alliance
+    citation_full: |-
+      Seattle Flu Alliance. (n.d.). Pathogens. Seattle Flu Study. From https://seattleflu.org/
+
+
+
+    # Files
+    url_main: https://seattleflu.org/pathogens
+    url_download: https://data.seattleflu.org/prevalence.csv
+    date_accessed: 2024-09-05
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+outs:
+  - md5: 2f93043de84e8a43058b16d93c0b79fd
+    size: 101608
+    path: seattle_pathogens.csv

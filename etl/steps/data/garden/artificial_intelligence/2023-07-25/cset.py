@@ -57,7 +57,7 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
     numeric_cols = [col for col in df_regions.columns if col not in ["country", "year", "field"]]
 
     # Group the filtered data by "year" and "field" and aggregate the data based on the defined rules
-    result = df_regions.groupby(["year", "field"])[numeric_cols].agg(sum_with_nan).reset_index()
+    result = df_regions.groupby(["year", "field"], observed=False)[numeric_cols].agg(sum_with_nan).reset_index()
 
     # Assign the aggregated data to a new country named "World"
     result["country"] = "World"

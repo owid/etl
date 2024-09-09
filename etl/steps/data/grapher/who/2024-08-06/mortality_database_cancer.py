@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
 # Get paths and naming conventions for current step.
@@ -13,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("mortality_database_cancer")
-    tables = [ds_garden[tab] for tab in sorted(ds_garden.table_names)]
+    tables = list(ds_garden)
 
     ds_grapher = create_dataset(dest_dir=dest_dir, tables=tables, default_metadata=ds_garden.metadata)
     # Checks.

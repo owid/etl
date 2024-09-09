@@ -607,7 +607,6 @@ The schema is provided in yaml below. The top level array represents the tables,
       - name: display
       - name: columnOrder
       - name: originalMetadata
-      - name: grapherConfigAdmin
       - name: shortName
       - name: catalogPath
       - name: dimensions

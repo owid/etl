@@ -8,7 +8,7 @@ from etl.config import ENV_IS_REMOTE
 
 # Page config
 st.set_page_config(page_title="Wizard: News", page_icon="🪄")
-st.title("News 🗞️")
+st.title(":material/newspaper: News")
 st.markdown("Find news and updates from the [etl project](https://github.com/owid/etl).")
 
 # Only run this on live!

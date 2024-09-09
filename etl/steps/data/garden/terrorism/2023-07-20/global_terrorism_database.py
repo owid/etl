@@ -117,9 +117,9 @@ def run(dest_dir: str) -> None:
         tb["country"].dtype.name == "category"
     ), "The 'country' column must be of type 'category for subsequent aggregations to be correct'"
 
-    total_df["total_killed"] = tb.groupby(["country", "year"])["nkill"].sum()
-    total_df["total_wounded"] = tb.groupby(["country", "year"])["nwound"].sum()
-    total_df["total_incident_counts"] = tb.groupby(["country", "year"]).size()
+    total_df["total_killed"] = tb.groupby(["country", "year"], observed=False)["nkill"].sum()
+    total_df["total_wounded"] = tb.groupby(["country", "year"], observed=False)["nwound"].sum()
+    total_df["total_incident_counts"] = tb.groupby(["country", "year"], observed=False).size()
 
     # Add GTD regions to number of deaths, attacks and wounded
     total_df = add_regions(tb, total_df)
@@ -349,7 +349,7 @@ def add_regions(df, total_df):
                       of killed, wounded, and incidents.
 
     """
-    grouped_regions_df = df.groupby(["region_txt", "year"])
+    grouped_regions_df = df.groupby(["region_txt", "year"], observed=False)
     summary_regions_df = pd.DataFrame()
 
     for column in ["nkill", "nwound"]:
@@ -384,9 +384,9 @@ def generate_summary_dataframe(df, group_column, target_columns):
                           summaries, and the index name "region_txt" is renamed to "country."
     """
     if group_column != "region_txt":
-        grouped_df = df.groupby(["country", "year", group_column])
+        grouped_df = df.groupby(["country", "year", group_column], observed=False)
     else:
-        grouped_df = df.groupby(["year", group_column])
+        grouped_df = df.groupby(["year", group_column], observed=False)
 
     summary_df = pd.DataFrame()
 
@@ -395,7 +395,7 @@ def generate_summary_dataframe(df, group_column, target_columns):
 
     summary_df["total_incident_counts"] = grouped_df.size()
     if group_column != "region_txt":
-        grouped_regions_df = df.groupby(["region_txt", "year", group_column])
+        grouped_regions_df = df.groupby(["region_txt", "year", group_column], observed=False)
         summary_regions_df = pd.DataFrame()
 
         for column in target_columns:
@@ -456,10 +456,14 @@ def severity(tb):
                           "severity," and "total_incident_severity."
     """
     total_severity_country = pd.DataFrame()
-    total_severity_country["total_incident_severity"] = tb.groupby(["country", "year", "severity"]).size()
+    total_severity_country["total_incident_severity"] = tb.groupby(
+        ["country", "year", "severity"], observed=False
+    ).size()
 
     total_severity_regions = pd.DataFrame()
-    total_severity_regions["total_incident_severity"] = tb.groupby(["region_txt", "year", "severity"]).size()
+    total_severity_regions["total_incident_severity"] = tb.groupby(
+        ["region_txt", "year", "severity"], observed=False
+    ).size()
 
     total_severity_regions = total_severity_regions.rename_axis(index={"region_txt": "country"})
     merge_GTD_regions = pd.concat([total_severity_country, total_severity_regions])

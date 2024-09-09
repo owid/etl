@@ -15,7 +15,7 @@
 # - description (str): Description of the app. This will be shown in the card of the app in the home page of Wizard.
 # - maintenaner (str): Slack handle of the person responsible for the app.
 # - entrypoint (str): Path to the main file of the app. This file should be the streamlit python script.
-# - icon (str): Emoji or material icon to show in the sidebar menu.
+# - icon (str): Emoji or material icon to show in the sidebar menu. Use from https://fonts.google.com/icons?icon.set=Material+Symbols&icon.style=Rounded
 # - image_url (str): Link to the image you want to show on the card in the home page of Wizard.
 # - disable (bool): Whether the app is disabled in certain settings. To detect if the app is running in a remote setting, it checks the value of the environment variable `ENV`.
 #     bool: Whether the app is disabled in all settings.
@@ -86,44 +86,49 @@ etl:
       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
 
 sections:
-
   - title: "Data tools"
     description: |-
       Updates, data edits, etc.
     apps:
-    - title: "Indicator Upgrader"
-      alias: indicator-upgrade
-      entrypoint: app_pages/indicator_upgrade/app.py
-      description: Migrate indicators in charts
-      maintainer: "@lucas"
-      icon: ":material/upgrade:"
-      image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
-      disable:
-        production: True
-    - title: "Chart Diff"
-      alias: chart-diff
-      entrypoint: app_pages/chart_diff/app.py
-      description: Compare charts in staging and prod
-      maintainer: "@mojmir"
-      icon: ":material/difference:"
-      image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
-      disable:
-        production: True
-    - title: "Harmonizer"
-      alias: harmonizer
-      description: "Harmonize a column of a table"
-      maintainer: "@lucas"
-      entrypoint: app_pages/harmonizer.py
-      icon: ":material/music_note:"
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
-    - title: "Map Bracketer"
-      alias: map_brackets
-      entrypoint: app_pages/map_brackets.py
-      description: Create optimal map brackets
-      maintainer: "@pablo"
-      icon: ":material/map:"
-      image_url: "https://upload.wikimedia.org/wikipedia/en/8/8c/Human_Language_Families_Map_%28Wikipedia_Colors_.PNG"
-
+      - title: "Indicator Upgrader"
+        alias: indicator-upgrade
+        entrypoint: app_pages/indicator_upgrade/app.py
+        description: Migrate indicators in charts
+        maintainer: "@lucas"
+        icon: ":material/upgrade:"
+        image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
+        disable:
+          production: True
+      - title: "Chart Diff"
+        alias: chart-diff
+        entrypoint: app_pages/chart_diff/app.py
+        description: Compare charts in staging and prod
+        maintainer: "@mojmir"
+        icon: ":material/difference:"
+        image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
+        disable:
+          production: True
+      - title: "Harmonizer"
+        alias: harmonizer
+        description: "Harmonize a column of a table"
+        maintainer: "@lucas"
+        entrypoint: app_pages/harmonizer.py
+        icon: ":material/music_note:"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
+      - title: "Map Bracketer"
+        alias: map_brackets
+        entrypoint: app_pages/map_brackets.py
+        description: Create optimal map brackets
+        maintainer: "@pablo"
+        icon: ":material/map:"
+        image_url: "https://upload.wikimedia.org/wikipedia/en/8/8c/Human_Language_Families_Map_%28Wikipedia_Colors_.PNG"
+      - title: "Explorer editor"
+        alias: explorer_editor
+        entrypoint: app_pages/explorer_edit.py
+        description: Edit explorer config
+        maintainer: "@lucas"
+        icon: ":material/explore:"
+        image_url: "https://upload.wikimedia.org/wikipedia/en/1/18/Dora_the_Explorer_2004_album_cover.jpg"
 
   - title: "Monitoring"
     description: |-
@@ -199,7 +204,6 @@ sections:
         disable:
           "production": True
           "staging": True
-
 # legacy:
 #   description: |-
 #     The pages below are legacy now. They are kept in case the new pages are not working properly.
