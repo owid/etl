@@ -28,9 +28,9 @@ def run(dest_dir: str) -> None:
 
     # Format date
     tb["date"] = pd.to_datetime(tb["iso_weekstartdate"], format="%Y-%m-%d", utc=True).dt.date.astype(str)
-    tb["year"] = tb["date"]
-    # ZERO_DATE = tb["date"].min()
-    # tb = to_grapher_date(tb, ZERO_DATE)
+    # tb["year"] = tb["date"]
+    ZERO_DATE = tb["date"].min()
+    tb = to_grapher_date(tb, ZERO_DATE)
     # Select out only variables that we care about
     tb_test = tb[["country", "year", "inf_tested", "case_info"]].dropna(subset="inf_tested").copy()
     tb_test = tb_test.format(["country", "year", "case_info"], short_name="flu_test")
