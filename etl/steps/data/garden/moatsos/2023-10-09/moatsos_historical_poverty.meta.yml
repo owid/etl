@@ -15,7 +15,26 @@ dataset:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
   moatsos_historical_poverty:
-    variables: {}
+    variables:
+      headcount_190_smooth:
+        presentation:
+          title_public: Number of people living in extreme poverty
+          title_variant: Long-run estimates
+
+      headcount_ratio_190_smooth:
+        presentation:
+          title_public: Share of population living in extreme poverty
+          title_variant: Long-run estimates
+
+      headcount_cbn:
+        presentation:
+          title_public: Number of people living in extreme poverty
+          title_variant: Long-run estimates - Cost of basic needs
+
+      headcount_ratio_cbn:
+        presentation:
+          title_public: Share of population living in extreme poverty
+          title_variant: Long-run estimates - Cost of basic needs
 
 
 
