@@ -10,7 +10,10 @@ paths = PathFinder(__file__)
 
 def prepare_data(tb: Table) -> Table:
     # Years are given in columns, like "YR2017". Make them integers.
-    tb = tb.rename(columns={column: int(column.replace("YR", "")) for column in tb.columns if column.startswith("YR")})
+    tb = tb.rename(
+        columns={column: int(column.replace("YR", "")) for column in tb.columns if column.startswith("YR")},
+        errors="raise",
+    )
 
     # Create a column for years.
     tb = tb.melt(id_vars=["classification", "economy", "id", "variable_title"], var_name="year")
@@ -19,17 +22,17 @@ def prepare_data(tb: Table) -> Table:
     variable_id_to_title = tb[["id", "variable_title"]].drop_duplicates().set_index(["id"])["variable_title"].to_dict()
 
     # Transpose the table to have a column per variable.
-    tb = tb.drop(columns=["variable_title"]).pivot(
+    tb = tb.drop(columns=["variable_title"], errors="raise").pivot(
         index=["classification", "economy", "year"], columns="id", join_column_levels_with="_"
     )
 
     # Columns now start with "value_", remove that prefix to recover the original names.
-    tb = tb.rename(columns={column: column.replace("value_", "") for column in tb.columns})
+    tb = tb.rename(columns={column: column.replace("value_", "") for column in tb.columns}, errors="raise")
 
     # Add titles to each variable metadata.
     for variable_id, variable_title in variable_id_to_title.items():
         tb[variable_id].metadata.title = variable_title
-        tb = tb.rename(columns={variable_id: variable_title})
+        tb = tb.rename(columns={variable_id: variable_title}, errors="raise")
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format(keys=["classification", "economy", "year"])

@@ -129,6 +129,18 @@ steps:
     - data://meadow/usda_ers/2024-05-23/food_availability
   data://grapher/agriculture/2024-05-23/daily_calories_per_person:
     - data://garden/agriculture/2024-05-23/daily_calories_per_person
-  ######################################################################################################################
-  # Older versions to be archived once they are not used by any other steps.
-  ######################################################################################################################
+  #
+  # Food prices for nutrition - World Bank based on FAO.
+  #
+  data://meadow/wb/2024-09-09/food_prices_for_nutrition:
+    - snapshot://wb/2024-09-09/food_prices_for_nutrition.csv
+  #
+  # Food prices for nutrition - World Bank based on FAO.
+  #
+  data://garden/wb/2024-09-09/food_prices_for_nutrition:
+    - data://meadow/wb/2024-09-09/food_prices_for_nutrition
+  #
+  # Food prices for nutrition - World Bank based on FAO.
+  #
+  data://grapher/wb/2024-09-09/food_prices_for_nutrition:
+    - data://garden/wb/2024-09-09/food_prices_for_nutrition

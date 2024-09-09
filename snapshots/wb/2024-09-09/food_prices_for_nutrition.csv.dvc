@@ -2,16 +2,23 @@ meta:
   origin:
     producer: Herforth et al. (2022), adapted by World Bank
     title: Food Prices for Nutrition
+    # NOTE: To find the World Bank's metadata description, go to
+    # https://databank.worldbank.org/Cost-and-Affordability-of-Healthy-Diets-2017-2022/id/f72a2851
+    # Then, on the left, click on "Database" and click on the (i) button on the left of "Food Prices for Nutrition".
     description: |-
       Food Prices for Nutrition provides indicators on the cost and affordability of healthy diets in each country, showing the population's physical and economic access to sufficient quantities of locally available items for an active and healthy life. It also provides indicators on the cost and affordability of an energy-sufficient diet and of a nutrient-adequate diet. These indicators are explained in detail in [the Food Prices for Nutrition DataHub](https://www.worldbank.org/foodpricesfornutrition).
 
-      Version 2.1 differs from Version 2.0 in that 2.1 reflects the latest income data from the World Bank's Poverty and Inequality Platform (PIP) that were updated in the fall of 2023, for the following diet affordability indicators: the share and volume of the population that cannot afford the diet, based on national income distributions expressed in 2017 PPP dollars. Furthermore, Version 2.1 updates and reports population data provided by World Development Indicators.
+      Version 3.0, estimated in July 2024, uses the 2021 global food retail price data from the International Comparison Program (ICP) and updates the methodology of calculating the affordability indicators, including indicators measuring the ratio between diet costs and international food poverty lines and indicators measuring the share and volume of the population unable to afford each diet, and they are based on the latest Poverty and Inequality Platform (PIP) data expressed in 2017 purchasing power parity dollars (PPP).
+
+      Estimates for the prevalence and number of people unable to afford a healthy diet were imputed for countries with missing information based on their regional and global aggregates. Countries' income classifications at the aggregate reporting level follow the calendar year of 2022 standard (the fiscal year of 2024 of the World Bank).
+
     citation_full: |-
       World Bank, adapted from Herforth, A., Venkat, A., Bai, Y., Costlow, L., Holleman, C. & Masters, W.A. (2022). Methods and options to monitor globally the cost and affordability of a healthy diet. Background paper for The State of Food Security and Nutrition in the World 2022. Rome, FAO.
-    version_producer: '2.1'
+    version_producer: '3.0'
     url_main: https://databank.worldbank.org/source/food-prices-for-nutrition
     date_accessed: '2024-09-09'
-    date_published: '2023-12-01'
+    # NOTE: The date of last update is at the bottom of the metadata text, next to "Last Updated".
+    date_published: '2024-07-24'
     license:
       name: CC BY 4.0
       url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets

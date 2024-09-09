@@ -34,20 +34,20 @@ def main(upload: bool) -> None:
     # Load data for each variable.
     # Get data for all variables one by one.
     data: list[pd.DataFrame] = []
-    # Note: This takes a few minutes and could possibly be parallelized.
+    # NOTE: This takes a few minutes and could possibly be parallelized.
     for variable in tqdm(variables.items):
         # Load data for current variable and add it to the list of all dataframes.
         variable_df = wb.data.DataFrame(db=WB_FOOD_PRICES_DATASET_ID, series=variable["id"])
         variable_df["id"] = variable["id"]
         data.append(variable_df)
 
-        # Note: In theory, metadata can also be fetched with the API, but if fails with JSONDecodeError.
+        # NOTE: In theory, metadata can also be fetched with the API, but if fails with JSONDecodeError.
         # variable_metadata = wb.series.metadata.get(variable["id"])
 
     # Combine all dataframes into one.
     df = pd.concat(data)
 
-    # Add variable titles to the datafrme as a new column.
+    # Add variable titles to the dataframe as a new column.
     df["variable_title"] = map_series(
         series=df["id"],
         mapping={variable["id"]: variable["value"] for variable in variables.items},
