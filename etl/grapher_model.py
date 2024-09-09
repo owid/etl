@@ -246,6 +246,7 @@ class ChartConfig(Base):
     id: Mapped[bytes] = mapped_column(CHAR(36), primary_key=True)
     patch: Mapped[dict] = mapped_column(JSON, nullable=False)
     full: Mapped[dict] = mapped_column(JSON, nullable=False)
+    fullMd5: Mapped[str] = mapped_column(CHAR(24), Computed("(to_base64(unhex(md5(full))))", persisted=True))
     slug: Mapped[Optional[str]] = mapped_column(
         String(255), Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True)
     )
