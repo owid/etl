@@ -25,12 +25,12 @@ definitions:
       - For upper-middle-income countries, $3.15/day (46% of the international poverty line of $6.85/day).
       - For high-income countries, $11.2/day (46% of the international poverty line of $24.36/day)."
     - These percentages (63%, 56%, and 46%) represent the average food expenditure shares in the second quintile of consumers in low-income and lower-middle-income countries, and the first quintile of consumers in upper-middle-and-high-income countries, according to household surveys compiled by the World Bank.
-  description_healthy_diet: &description_healthy_diet |-
-    A healthy diet is one that meets requirements for each food group specified in food-based dietary guidelines from governments and public health agencies.
-  description_nutrient_adequate_diet: &description_nutrient_adequate_diet |-
-    A nutrient adequate diet is one within the lower and upper bounds for dietary energy and all essential nutrients.
   description_energy_sufficient_diet: &description_energy_sufficient_diet |-
     A calorie sufficient diet is one that meets the energy requirement of 2330 kcal/day.
+  description_nutrient_adequate_diet: &description_nutrient_adequate_diet |-
+    A nutrient adequate diet is one within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2330 kcal/day.
+  description_healthy_diet: &description_healthy_diet |-
+    A healthy diet is one that meets requirements for each food group specified in food-based dietary guidelines from governments and public health agencies.
 
 dataset:
   update_period_days: 365
