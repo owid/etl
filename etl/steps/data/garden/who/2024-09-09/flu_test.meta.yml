@@ -16,3 +16,10 @@ tables:
       inf_tested:
         title: The number of influenza tests carried out
         unit: tests
+        origins:
+          - title: FluID, World Health Organization
+            date_published: "2024"
+            producer: WHO
+            citation_full: FluID, World Health Organization (2023)
+            url_main: https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/fluid
+            date_accessed: "2024-09-09"

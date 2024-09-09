@@ -21,7 +21,9 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden["fluid"]
     # Harmonize countries
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
     # Filter age-groups
     tb = tb[tb["agegroup_code"] == "All"]
 
