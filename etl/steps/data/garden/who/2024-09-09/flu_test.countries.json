@@ -42,7 +42,7 @@
   "Cuba": "Cuba",
   "Cyprus": "Cyprus",
   "Czechia": "Czechia",
-  "C\u00f4te d'Ivoire": "Cote d'Ivoire",
+  "Côte d’Ivoire": "Cote d'Ivoire",
   "Democratic People's Republic of Korea": "North Korea",
   "Democratic Republic of the Congo": "Democratic Republic of Congo",
   "Denmark": "Denmark",
@@ -181,5 +181,6 @@
   "United Kingdom, Northern Ireland": "Northern Ireland",
   "Liberia": "Liberia",
   "Liechtenstein": "Liechtenstein",
-  "Brunei Darussalam": "Brunei"
+  "Brunei Darussalam": "Brunei",
+  "Somalia": "Somalia"
 }

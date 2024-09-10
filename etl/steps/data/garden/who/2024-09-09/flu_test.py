@@ -33,7 +33,7 @@ def run(dest_dir: str) -> None:
         .copy()
     )
     tb_test["inf_tests"] = tb_test["inf_all"] + tb_test["inf_negative"]
-    tb_test = tb_test.drop(columns=["inf_pos", "inf_negative"])
+    tb_test = tb_test.drop(columns=["inf_all", "inf_negative"])
     tb_test = tb_test.format(["country", "date", "origin_source"], short_name="flu_test")
     #
     # Save outputs.
