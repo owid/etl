@@ -44,6 +44,7 @@ def run(dest_dir: str) -> None:
     # tb_test["inf_tests"] = tb_test["inf_all"] + tb_test["inf_negative"]
     # tb_test = tb_test.drop(columns=["inf_all", "inf_negative"])
     tb = tb[["country", "date", "pcnt_posCOMBINED", "denomCOMBINED"]]
+    tb = tb.dropna(subset="denomCOMBINED")
 
     tb = tb.format(["country", "date"], short_name="flu_test")
     #
@@ -205,11 +206,13 @@ def calculate_percent_positive(tb: Table, surveillance_cols: list[str]) -> Table
         tb["pcnt_pos" + col] = tb["pcnt_pos_1" + col]
         tb["denom" + col] = tb["denom_1" + col]
 
-        tb["pcnt_pos" + col] = tb["pcnt_pos" + col].fillna(tb["pcnt_pos_2" + col])
-        tb["denom" + col] = tb["pcnt_pos" + col].fillna(tb["denom_2" + col])
+        idx_2 = tb["pcnt_pos" + col].isna()
+        tb.loc[idx_2, "pcnt_pos" + col] = tb["pcnt_pos_2" + col]
+        tb.loc[idx_2, "denom" + col] = tb["denom_2" + col]
 
-        tb["pcnt_pos" + col] = tb["pcnt_pos" + col].fillna(tb["pcnt_pos_3" + col])
-        tb["denom" + col] = tb["pcnt_pos" + col].fillna(tb["denom_3" + col])
+        idx_3 = tb["pcnt_pos" + col].isna()
+        tb.loc[idx_3, "pcnt_pos" + col] = tb["pcnt_pos_2" + col]
+        tb.loc[idx_3, "denom" + col] = tb["denom_2" + col]
 
         tb = tb.drop(columns=["pcnt_pos_1" + col, "pcnt_pos_2" + col, "pcnt_pos_3" + col])
         tb = tb.drop(columns=["denom_1" + col, "denom_2" + col, "denom_3" + col])
