@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
         index_cols=["country", "year", "metric", "measure", "rei", "cause", "age"],
         regions=REGIONS,
         age_group_mapping=AGE_GROUPS_RANGES,
-        run_percent=True,
+        run_percent=False,
     )
 
     # Format the tables
