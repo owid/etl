@@ -5,7 +5,10 @@ title:
   title: COVID-19 vaccines
   titleVariant: "breakdowns"
 defaultSelection:
-  - Spain
+  - High-income countries
+  - Upper-middle-income countries
+  - Lower-middle-income countries
+  - Low-income countries
 topicTags:
   - COVID-19
 
@@ -29,9 +32,9 @@ views:
       title: Test
       selectedEntityNames:
         - High-income countries
-        - Upper-middle-income countries
+        - Upper-middle-countriesincome countries
         - Lower-middle-income countries
-        - Low-income countries
+        - Low-income
   - dimensions:
       breakdown: manufacturer
     indicators:
@@ -53,6 +56,5 @@ views:
     config:
       type: "StackedArea"
       selectedEntityNames:
-        - Pfizer/BioNTech
-        - Moderna
+        - European Union (27)
 
