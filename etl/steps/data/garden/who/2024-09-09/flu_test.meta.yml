@@ -21,8 +21,18 @@ dataset:
 tables:
   flu_test:
     variables:
-      spec_processed_nb:
-        title: The number of tests processed
+      pcnt_poscombined:
+        title: The share of positive tests
+        unit: '%'
+        origins:
+          - title: FluNet, World Health Organization
+            date_published: "2024"
+            producer: WHO
+            citation_full: FluNet, World Health Organization (2023)
+            url_main: https://www.who.int/tools/flunet/flunet-summary
+            date_accessed: "2024-09-09"
+      denomcombined:
+        title: The number of tests
         unit: tests
         origins:
           - title: FluNet, World Health Organization
@@ -31,23 +41,33 @@ tables:
             citation_full: FluNet, World Health Organization (2023)
             url_main: https://www.who.int/tools/flunet/flunet-summary
             date_accessed: "2024-09-09"
-      spec_received_nb:
-        title: The number of tests recieved
-        unit: tests
-        origins:
-          - title: FluNet, World Health Organization
-            date_published: "2024"
-            producer: WHO
-            citation_full: FluNet, World Health Organization (2023)
-            url_main: https://www.who.int/tools/flunet/flunet-summary
-            date_accessed: "2024-09-09"
-      inf_tests:
-        title: Sum of positive and negative tests
-        unit: tests
-        origins:
-          - title: FluNet, World Health Organization
-            date_published: "2024"
-            producer: WHO
-            citation_full: FluNet, World Health Organization (2023)
-            url_main: https://www.who.int/tools/flunet/flunet-summary
-            date_accessed: "2024-09-09"
+      #spec_processed_nb:
+      #  title: The number of tests processed
+      #  unit: tests
+      #  origins:
+      #    - title: FluNet, World Health Organization
+      #      date_published: "2024"
+      #      producer: WHO
+      #      citation_full: FluNet, World Health Organization (2023)
+      #      url_main: https://www.who.int/tools/flunet/flunet-summary
+      #      date_accessed: "2024-09-09"
+      #spec_received_nb:
+      #  title: The number of tests recieved
+      #  unit: tests
+      #  origins:
+      #    - title: FluNet, World Health Organization
+      #      date_published: "2024"
+      #      producer: WHO
+      #      citation_full: FluNet, World Health Organization (2023)
+      #      url_main: https://www.who.int/tools/flunet/flunet-summary
+      #      date_accessed: "2024-09-09"
+      #inf_tests:
+      #  title: Sum of positive and negative tests
+      #  unit: tests
+      #  origins:
+      #    - title: FluNet, World Health Organization
+      #      date_published: "2024"
+      #      producer: WHO
+      #      citation_full: FluNet, World Health Organization (2023)
+      #      url_main: https://www.who.int/tools/flunet/flunet-summary
+      #      date_accessed: "2024-09-09"
