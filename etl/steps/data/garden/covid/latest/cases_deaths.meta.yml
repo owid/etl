@@ -457,6 +457,7 @@ tables:
             title: Weekly confirmed COVID-19 deaths
             subtitle: Weekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
             hasMapTab: true
+            tab: map
             map:
               colorScale:
                 binningStrategy: manual
@@ -471,6 +472,7 @@ tables:
             title: Weekly confirmed COVID-19 deaths per million people
             subtitle: Weekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
             hasMapTab: true
+            tab: map
             map:
               colorScale:
                 binningStrategy: manual
@@ -489,6 +491,7 @@ tables:
             title: Week by week change of confirmed COVID-19 deaths
             subtitle: The weekly growth rate on any given date measures the percentage change in number of confirmed deaths over the last seven days relative to the number in the previous seven days. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
             hasMapTab: true
+            tab: map
             map:
               colorScale:
                 customNumericColorsActive: true

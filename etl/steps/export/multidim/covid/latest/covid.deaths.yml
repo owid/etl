@@ -1,5 +1,12 @@
 definitions:
   table: grapher/covid/latest/cases_deaths/cases_deaths
+  config: &config
+    tab: map
+    originUrl: ourworldindata.org/coronavirus
+    hideAnnotationFieldsInTitle:
+      entity: true
+      time: true
+      changeInPrefix: true
 
 title:
   title: COVID-19 confirmed deaths
@@ -41,29 +48,34 @@ views:
       metric: absolute
     indicators:
       y: "{definitions.table}#weekly_deaths"
+    config: *config
   - dimensions:
       interval: weekly
       metric: per_capita
     indicators:
       y: "{definitions.table}#weekly_deaths_per_million"
+    config: *config
   - dimensions:
       interval: weekly
       metric: change
     indicators:
       y: "{definitions.table}#weekly_pct_growth_deaths"
-
+    config: *config
   - dimensions:
       interval: biweekly
       metric: absolute
     indicators:
       y: "{definitions.table}#biweekly_deaths"
+    config: *config
   - dimensions:
       interval: biweekly
       metric: per_capita
     indicators:
       y: "{definitions.table}#biweekly_deaths_per_million"
+    config: *config
   - dimensions:
       interval: biweekly
       metric: change
     indicators:
       y: "{definitions.table}#biweekly_pct_growth_deaths"
+    config: *config

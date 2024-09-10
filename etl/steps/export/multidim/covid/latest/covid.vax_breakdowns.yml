@@ -16,12 +16,13 @@ dimensions:
   - slug: breakdown
     name: Breakdown
     choices:
-      - slug: manufacturer
-        name: Manufacturer
-        description: null
       - slug: income_group
         name: Income group
         description: null
+      - slug: manufacturer
+        name: Manufacturer
+        description: null
+
 
 views:
   - dimensions:

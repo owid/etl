@@ -1,16 +1,11 @@
+definitions:
+  table: grapher/covid/latest/google_mobility/google_mobility
+
 title:
   title: Mobility during COVID-19 pandemic
   titleVariant: by place
 defaultSelection:
-  - Belgium
-  - Canada
-  - France
-  - Israel
-  - Italy
-  - Netherlands
-  - Spain
   - United Kingdom
-  - United States
 topicTags:
   - COVID-19
 
@@ -18,6 +13,9 @@ dimensions:
   - slug: place
     name: Place
     choices:
+      - slug: all
+        name: All places
+        description: "See all places"
       - slug: Grocery and pharmacy
         name: Grocery and pharmacy
         description: null
@@ -37,13 +35,22 @@ dimensions:
         name: Workplaces
         description: null
 
-views: []
-# views:
-#   - dimensions:
-#       type: hospital
-#       metric: patients
-#     indicators:
-#       y: "{definitions.table}#daily_occupancy_hosp"
+views:
+  - dimensions:
+      place: all
+    indicators:
+      y:
+        - "{definitions.table}#trend__place_grocery_and_pharmacy"
+        - "{definitions.table}#trend__place_parks"
+        - "{definitions.table}#trend__place_residential"
+        - "{definitions.table}#trend__place_retail_and_recreation"
+        - "{definitions.table}#trend__place_workplaces"
+
+    config:
+      title: "How did the number of visitors change since the beginning of the pandemic?"
+      subtitle: This data shows how community movement in specific locations has changed relative to the period before the pandemic.
+      note: It's not recommended to compare levels across countries; local differences in categories could be misleading.
+      originUrl: ourworldindata.org/coronavirus
 #   - dimensions:
 #       type: hospital
 #       metric: patients_per_capita
