@@ -1595,11 +1595,6 @@
                           "default": false,
                           "description": "Whether to show year labels in bar charts"
                         },
-                        "hideLinesOutsideTolerance": {
-                          "type": "boolean",
-                          "default": false,
-                          "description": "Hide entities without data for full time span (within tolerance)"
-                        },
                         "hideTotalValueLabel": {
                           "type": "boolean",
                           "default": false,

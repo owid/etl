@@ -720,13 +720,20 @@ steps:
     - data://meadow/who/latest/monkeypox
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
-    - data://grapher/fasttrack/latest/africa_cdc
+    - data://garden/health/latest/global_health_mpox
   data://grapher/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
   data://explorers/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
   export://github/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
+# Mpox - Global.health
+  data://meadow/health/latest/global_health_mpox:
+    - snapshot://health/latest/global_health_mpox.csv
+  data://garden/health/latest/global_health_mpox:
+    - data://meadow/health/latest/global_health_mpox
+
+  # Eurostat cancer
 
    # Eurostat Cancer Screening
   data://meadow/health/2024-08-23/eurostat_cancer:
@@ -735,6 +742,7 @@ steps:
     - data://meadow/health/2024-08-23/eurostat_cancer
   data://grapher/health/2024-08-23/eurostat_cancer:
     - data://garden/health/2024-08-23/eurostat_cancer
+
 
   # Multi-dim indicators
   export://multidim/health/latest/causes_of_death:
@@ -764,3 +772,9 @@ steps:
     - data://meadow/cancer/2024-08-30/gco_alcohol
   data://grapher/cancer/2024-08-30/gco_alcohol:
     - data://garden/cancer/2024-08-30/gco_alcohol
+
+# Flu testing data
+  data://garden/who/2024-09-09/flu_test:
+    - data://meadow/who/latest/fluid
+  data://grapher/who/2024-09-09/flu_test:
+    - data://garden/who/2024-09-09/flu_test
