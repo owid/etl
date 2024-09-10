@@ -95,7 +95,6 @@ def find_max_label_and_concat(tb, column, label):
 
     max_rows = tb_filtered.loc[idx].copy()
     max_rows["system"] = f"Maximum {label}"
-    print(max_rows)
 
     tb = pr.concat([tb, max_rows], ignore_index=True)
 
