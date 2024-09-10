@@ -214,6 +214,10 @@ def calculate_percent_positive(tb: Table, surveillance_cols: list[str]) -> Table
         tb = tb.drop(columns=["pcnt_pos_1" + col, "pcnt_pos_2" + col, "pcnt_pos_3" + col])
         tb = tb.drop(columns=["denom_1" + col, "denom_2" + col, "denom_3" + col])
 
+        # Replace inf with NAs
+        tb["pcnt_pos" + col] = tb["pcnt_pos" + col].replace([np.inf, -np.inf], np.nan)
+        tb["denom" + col] = tb["denom" + col].replace([np.inf, -np.inf], np.nan)
+
         # Drop rows where pcnt_pos is >100
         tb.loc[tb["pcnt_pos" + col] > 100, "pcnt_pos" + col] = np.nan
 
