@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot and read its data.
     snap = paths.load_snapshot("food_prices_for_nutrition.csv")
-    tb = snap.read_csv()
+    tb = snap.read()
 
     #
     # Process data.

@@ -3,11 +3,11 @@ definitions:
     # Original description:
     # The indicator expresses the percentage of the total population unable to afford an energy sufficient diet in a given country and year. A diet is considered unaffordable when the diet cost plus expenditures for basic non-food needs exceed income per capita per day. The expenditures for basic non-food needs are calculated as average non-food expenditure shares of low-income consumer multipled by internaitonal poverty lines set by the World Bank. The non-food expenditure share is 37% and 44% in low-income and lower-middle-income countries for the second quintile of consumers, and 54% in upper-middle-and-high-income countries for the first quintile of consumers, according to household surveys compiled by the World Bank. The international poverty lines are $2.15/day for low-income countries, $3.65/day for lower-middle-income countries, $6.85/day for upper-middle-income countries, and $24.36/day for high-income countries, in 2017PPP$. Countries' income classifications follow the calendar year of 2021 standard (fiscal year of 2023 of the World Bank), which is the base year of the latest ICP cycle. Income data are provided by the World Bank’s Poverty and Inequality Platform. A value of zero indicates a null or a small number rounded down at the current precision level.
     - Non-food expenses are estimated by looking at how much low-income people typically spend on things like housing, clothing, and transportation.
-    - "This amount is calculated as: [Average share of non-food expenditure for a low-income consumer] x [International poverty line]."
+    - This amount is calculated as the average share of non-food expenditure for a low-income consumer, multiplied by the international poverty line.
     - "The average share of non-food expenditure is based on the spending habits of specific income groups (quintiles):
       - In upper-middle-income and high-income countries, the first quintile of consumers is considered (the poorest 20% of consumers), where people spend around 54% of their income on non-food needs.
       - In low-income and lower-middle-income countries, the second quintile is considered (the second lowest 20% of consumers), where people spend about 37% and 44% of their income on non-food needs, respectively."
-    - "The international poverty lines (in international dollars based on 2017 prices) are:
+    - "The international poverty lines (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) are:
       - For low-income countries: $2.15/day.
       - For lower-middle-income countries: $3.65/day.
       - For upper-middle-income countries: $6.85/day.
@@ -19,12 +19,12 @@ definitions:
   description_key_poverty_lines: &description_key_poverty_lines
     # Original description:
     # The ratio of the cost of an energy sufficient diet to the food poverty lines, defined as $1.35/day for low-income countries (63% of the international poverty line of $2.15/day in 2017 PPP$), $2.04/day for lower-middle-income countries (56% of the international poverty line of $3.65/day in 2017 PPP$), $3.15/day for upper-middle-income countries (46% of the international poverty line of $6.85/day in 2017 PPP$), and $11.2/day (46% of the international poverty line of $24.36/day in 2017 PPP$). The percentages (63%, 56%, and 46%) represent the average food expenditure shares in the second quintile of consumers in low-income and lower-middle-income countries, and the first quintile of consumers in upper-middle-and-high-income countries, according to household surveys compiled by the World Bank. Countries' income classifications follow the calendar year of 2021 standard (fiscal year of 2023 of the World Bank), which is the base year of the latest ICP cycle.
-    - "Poverty lines are defined (in international-$ in 2017 prices) as follows:
+    - "Poverty lines are defined (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) as follows:
       - For low-income countries, $1.35/day (63% of the international poverty line of $2.15/day).
       - For lower-middle-income countries, $2.04/day (56% of the international poverty line of $3.65/day).
       - For upper-middle-income countries, $3.15/day (46% of the international poverty line of $6.85/day).
       - For high-income countries, $11.2/day (46% of the international poverty line of $24.36/day)."
-    - These percentages (63%, 56%, and 46%) represent the average food expenditure shares in the second quintile of consumers in low-income and lower-middle-income countries, and the first quintile of consumers in upper-middle-and-high-income countries, according to household surveys compiled by the World Bank.
+    - These percentages (63%, 56%, and 46%) represent the average food expenditure shares in the first quintile (the poorest 20th of the population) of consumers in upper-middle-income and high-income countries, and the second quintile of consumers in low-income and lower-middle-income countries, according to household surveys compiled by the World Bank.
   # Original descriptions (from https://www.worldbank.org/en/programs/icp/brief/foodpricesfornutrition#3):
   # - Cost of a Healthy Diet: A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related diseases. To measure access and affordability, the cost of meeting food-based dietary guidelines is computed using the least expensive foods available in each category at each place and time (see "Methods and options to monitor the cost and affordability of a healthy diet globally" and "Brief note: Methods and data sources" (Herforth et al. 2022) ). The cost of a healthy diet is the preferred indicator of diet costs as it uses the most affordable foods available at local markets to meet dietary needs for an active and healthy life, using standards adopted by national governments around the world. Total cost per day can be disaggregated by food group, showing the cost per day of the least expensive locally available items in each food group (fruits; vegetables; starchy staples; animal-source foods; legumes, nuts, and seeds; and oils and fats)
   # - Cost of a Nutrient Adequate Diet: A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower bounds for total protein, fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity. Computation of the least-cost nutrient adequate diet requires linear programming optimization modeling, and is based on nutrient requirements only, rather than food groups specified in dietary guidelines.
@@ -38,7 +38,7 @@ definitions:
 
 dataset:
   update_period_days: 365
-  description: |
+  description: |-
     This dataset is based on the methodology developed in Herforth et al. (2022), which is a background paper for the UN agencies' annual report on The State of Food Security and Nutrition in the World 2022 (https://www.fao.org/publications/sofi). It is based on data on prices for locally available food items from the World Bank's International Comparison Program (ICP) (https://icp.worldbank.org/) matched to other data on food composition and dietary requirements.
 
     The nutritional requirements used in this study are in line with the WHO's recommendations for the median woman of reproductive age. The authors note two key two reasons for this:
@@ -51,7 +51,7 @@ tables:
     variables:
       cost_of_an_energy_sufficient_diet:
         title: Cost of an energy sufficient diet
-        unit: international-$ per person per day in 2021 prices
+        unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
           Cost of the least expensive starchy staple for energy balance for a representative person at 2,330 kcal/day.
@@ -111,7 +111,7 @@ tables:
           - *description_healthy_diet
       cost_of_animal_source_foods:
         title: Cost of animal-source foods
-        unit: international-$ per person per day in 2021 prices
+        unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
           Cost of purchasing the least expensive locally available animal-source foods to meet daily intake levels recommended in food-based dietary guidelines. Animal-source foods are one of the six food groups within the Healthy Diet Basket.
@@ -133,7 +133,7 @@ tables:
           - *description_healthy_diet
       cost_of_fruits:
         title: Cost of fruits
-        unit: international-$ per person per day in 2021 prices
+        unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
           Cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines. Fruits are one of the six food groups within the Healthy Diet Basket.
@@ -174,7 +174,7 @@ tables:
           - *description_key_pct_of_population
       cost_of_legumes__nuts_and_seeds:
         title: Cost of legumes, nuts and seeds
-        unit: international-$ per person per day in 2021 prices
+        unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
           Cost of purchasing the least expensive locally available legumes, nuts and seeds to meet daily intake levels recommended in food-based dietary guidelines. Legumes, nuts and seeds are one of the six food groups within the Healthy Diet Basket.
@@ -198,7 +198,7 @@ tables:
           - *description_healthy_diet
       cost_of_oils_and_fats:
         title: Cost of oils and fats
-        unit: international-$ per person per day in 2021 prices
+        unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
           Cost of purchasing the least expensive locally available fats or oils to meet daily intake levels recommended in food-based dietary guidelines. Fats and oils are one of the six food groups within the Healthy Diet Basket.
@@ -231,7 +231,7 @@ tables:
           - *description_key_poverty_lines
       cost_of_starchy_staples:
         title: Cost of starchy staples
-        unit: international-$ per person per day in 2021 prices
+        unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
           Cost of purchasing the least expensive locally available starchy staples to meet daily intake levels recommended in food-based dietary guidelines. Starchy staples are one of the six food groups within the Healthy Diet Basket.
@@ -257,7 +257,7 @@ tables:
           - *description_key_number_of_population
       cost_of_vegetables:
         title: Cost of vegetables
-        unit: international-$ per person per day in 2021 prices
+        unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
           Cost of purchasing the least expensive locally available vegetables to meet daily intake levels recommended in food-based dietary guidelines. Vegetables are one of the six food groups within the Healthy Diet Basket.
@@ -279,7 +279,7 @@ tables:
           - *description_healthy_diet
       cost_of_a_nutrient_adequate_diet:
         title: Cost of a nutrient adequate diet
-        unit: international-$ per person per day in 2021 prices
+        unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
           Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2,330 kcal/day.
