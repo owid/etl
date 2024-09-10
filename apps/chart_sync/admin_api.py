@@ -7,14 +7,21 @@ from typing import Any, Dict, List, Optional
 
 import requests
 import structlog
+from requests.exceptions import HTTPError
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_fixed
 
 from etl import grapher_model as gm
 from etl.config import GRAPHER_USER_ID, TAILSCALE_ADMIN_HOST
 from etl.db import Engine
 
 log = structlog.get_logger()
+
+
+def is_502_error(exception):
+    # Check if the exception is an HTTPError and if it's a 502 Bad Gateway error
+    return isinstance(exception, HTTPError) and exception.response.status_code == 502
 
 
 class AdminAPI(object):
@@ -81,6 +88,12 @@ class AdminAPI(object):
         assert js["success"]
         return js
 
+    # Retry in case we're restarting Admin on staging server
+    @retry(
+        retry=retry_if_exception(is_502_error),  # Retry only if it's a 502 error
+        stop=stop_after_attempt(5),  # Stop after 5 attempts
+        wait=wait_fixed(2),  # Wait 2 seconds between retries
+    )
     def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
         resp = requests.put(
             self.base_url + f"/admin/api/variables/{variable_id}/grapherConfigETL",
