@@ -140,7 +140,7 @@ def run(dest_dir: str) -> None:
 
     # For each month's sea ice extent, subtract a certain baseline sea ice extent, calculated as an average value (for that month) between two reference years (defined above as REFERENCE_YEAR_MIN and REFERENCE_YEAR_MAX)
     tb_reference = (
-        tb[(tb["year"] >= REFERENCE_YEAR_MIN) & (tb["year"] >= REFERENCE_YEAR_MAX)]
+        tb[(tb["year"] >= REFERENCE_YEAR_MIN) & (tb["year"] <= REFERENCE_YEAR_MAX)]
         .groupby(["location", "month_name"], as_index=False)
         .agg({"sea_ice_extent": "mean"})
         .rename(columns={"sea_ice_extent": "sea_ice_extent_reference"}, errors="raise")

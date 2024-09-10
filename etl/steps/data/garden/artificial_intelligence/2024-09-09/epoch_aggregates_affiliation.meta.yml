@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  desc_update: The 2024 data is incomplete and was last updated {date_accessed}.
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+    description_short: Describes the sector where the authors of a notable AI system have their primary affiliations. {definitions.desc_update}
+    description_from_producer: |-
+          The distinction is documented in [Academia and Industry](https://docs.google.com/document/d/1wyJmDOWDEKItg0QhO5cpsNAgHq4aHOxQQZnTfzm34gI/edit).
+          Systems are categorized as “Industry” if their authors are affiliated with private sector organizations, “Academia” if the authors are affiliated with universities or academic institutions, or “Industry - Academia Collaboration” when at least 30% of the authors are from each.
+          Possible values: Industry, Research Collective, Academia, Industry - Academia Collaboration (Industry leaning), Industry - Academia Collaboration (Academia leaning), Non-profit
+    unit: 'AI systems'
+    short_unit: ''
+    display:
+      numDecimalPlaces: 0
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 31
+  title: Notable AI systems by researcher affiliation
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch_aggregates_affiliation:
+    variables:
+      yearly_count:
+        title: Annual number of AI systems by researcher affiliation
+
+      cumulative_count:
+        title: Cumulative number of AI systems by researcher affiliation
