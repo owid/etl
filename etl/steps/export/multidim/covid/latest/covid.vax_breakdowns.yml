@@ -29,7 +29,6 @@ views:
     indicators:
       y: "grapher/covid/latest/vaccinations_global/vaccinations_global#total_vaccinations_per_hundred"
     config:
-      title: Test
       selectedEntityNames:
         - High-income countries
         - Upper-middle-countriesincome countries
