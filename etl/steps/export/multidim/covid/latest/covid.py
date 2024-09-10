@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
         slug = f"mdd-{fname.replace('.yml', '').replace('.', '-')}"
         multidim.upsert_multidim_data_page(slug, config, engine)
 
-    #
+    # Automatic ones (they have dimensions in the tables)
     fname = "covid.mobility.yml"
     config = paths.load_mdim_config(fname)
     slug = f"mdd-{fname.replace('.yml', '').replace('.', '-')}"
