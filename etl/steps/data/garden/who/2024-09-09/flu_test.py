@@ -2,7 +2,6 @@
 
 
 import pandas as pd
-from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -28,12 +27,10 @@ def run(dest_dir: str) -> None:
 
     # Format date
     tb["date"] = pd.to_datetime(tb["iso_weekstartdate"], format="%Y-%m-%d", utc=True).dt.date.astype(str)
-    # tb["year"] = tb["date"]
-    ZERO_DATE = tb["date"].min()
-    tb = to_grapher_date(tb, ZERO_DATE)
+
     # Select out only variables that we care about
-    tb_test = tb[["country", "year", "inf_tested", "case_info"]].dropna(subset="inf_tested").copy()
-    tb_test = tb_test.format(["country", "year", "case_info"], short_name="flu_test")
+    tb_test = tb[["country", "date", "inf_tested", "case_info"]].dropna(subset="inf_tested").copy()
+    tb_test = tb_test.format(["country", "date", "case_info"], short_name="flu_test")
     #
     # Save outputs.
     #
@@ -42,11 +39,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
-
-
-def to_grapher_date(tb: Table, zero_day: str) -> Table:
-    """Modify date so Grapher understands it."""
-    # Get new 'date', drop old date
-    tb["year"] = (pd.to_datetime(tb["date"].astype(str), format="%Y-%m-%d") - pd.to_datetime(zero_day)).dt.days
-    tb = tb.drop(columns=["date"])
-    return tb

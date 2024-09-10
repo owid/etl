@@ -1,15 +1,11 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
-  zero_day: &zero_day
-    zeroDay: "2020-01-01"
-    yearIsDay: true
   common:
     presentation:
       topic_tags:
         - Influenza
     display:
       numDecimalPlaces: 0
-      <<: *zero_day
     processing_level: minor
 
 # Learn more about the available fields:
