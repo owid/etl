@@ -54,7 +54,7 @@ tables:
         unit: international-$ per person per day in 2021 prices
         short_unit: $
         description_short: |-
-          Cost of the least expensive starchy staple for energy balance for a representative person at 2330 kcal/day.
+          Cost of the least expensive starchy staple for energy balance for a representative person at 2,330 kcal/day.
         description_key:
           - *description_energy_sufficient_diet
       affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures:
@@ -98,7 +98,7 @@ tables:
         unit: current international-$ per person per day
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance at 2330 kcal/day.
+          Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance at 2,330 kcal/day.
         description_key:
           - *description_healthy_diet
       cost_of_a_healthy_diet_relative_to_the_cost_of_sufficient_energy_from_starchy_staples:
@@ -282,7 +282,7 @@ tables:
         unit: international-$ per person per day in 2021 prices
         short_unit: $
         description_short: |-
-          Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2330 kcal/day.
+          Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2,330 kcal/day.
         description_key:
           - *description_nutrient_adequate_diet
       affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures:
