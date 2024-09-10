@@ -21,6 +21,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb["value"] = tb["value"].replace("<0.1", 0.05)
+
     tb = tb.format(["country", "year", "sex", "cancer", "indicator"])
     #
     # Save outputs.
