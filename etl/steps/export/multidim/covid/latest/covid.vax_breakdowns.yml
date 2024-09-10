@@ -5,10 +5,7 @@ title:
   title: COVID-19 vaccines
   titleVariant: "breakdowns"
 defaultSelection:
-  - High-income countries
-  - Upper-middle-income countries
-  - Lower-middle-income countries
-  - Low-income countries
+  - Spain
 topicTags:
   - COVID-19
 
@@ -30,6 +27,11 @@ views:
       y: "grapher/covid/latest/vaccinations_global/vaccinations_global#total_vaccinations_per_hundred"
     config:
       title: Test
+      selectedEntityNames:
+        - High-income countries
+        - Upper-middle-income countries
+        - Lower-middle-income countries
+        - Low-income countries
   - dimensions:
       breakdown: manufacturer
     indicators:
