@@ -11,7 +11,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  title: FLuID dataset
+  title: FLuNet dataset
   description: |-
     FluNet is a global web-based tool for influenza virological surveillance first launched in 1997. The virological data entered into FluNet, e.g. number of influenza viruses detected by subtype, are critical for tracking the movement of viruses globally and interpreting the epidemiological data. The data at country level are publically available and updated weekly. The results are presented in various formats including tables, maps and graphs.
 
