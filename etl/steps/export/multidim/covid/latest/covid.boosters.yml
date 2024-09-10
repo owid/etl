@@ -2,7 +2,7 @@ definitions:
   table: grapher/covid/latest/vaccinations_global/vaccinations_global
 
 title:
-  title: COVID-19 hospitalisations
+  title: COVID-19 vaccine boosters administered
   titleVariant: ""
 defaultSelection:
   - Belgium
