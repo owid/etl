@@ -7,10 +7,10 @@ from typing import Any, Dict, List, Optional
 
 import requests
 import structlog
+from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import HTTPError
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from tenacity import retry, retry_if_exception, stop_after_attempt, wait_fixed
 
 from etl import grapher_model as gm
 from etl.config import GRAPHER_USER_ID, TAILSCALE_ADMIN_HOST
@@ -88,14 +88,9 @@ class AdminAPI(object):
         assert js["success"]
         return js
 
-    # Retry in case we're restarting Admin on staging server
-    @retry(
-        retry=retry_if_exception(is_502_error),  # Retry only if it's a 502 error
-        stop=stop_after_attempt(5),  # Stop after 5 attempts
-        wait=wait_fixed(2),  # Wait 2 seconds between retries
-    )
     def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
-        resp = requests.put(
+        # Retry in case we're restarting Admin on staging server
+        resp = requests_with_retry().put(
             self.base_url + f"/admin/api/variables/{variable_id}/grapherConfigETL",
             cookies={"sessionid": self.session_id},
             json=grapher_config,
@@ -112,6 +107,14 @@ class AdminAPI(object):
         js = self._json_from_response(resp)
         assert js["success"]
         return js
+
+
+def requests_with_retry() -> requests.Session:
+    s = requests.Session()
+    retries = Retry(total=5, backoff_factor=1, status_forcelist=[502])
+    s.mount("http://", HTTPAdapter(max_retries=retries))
+    s.mount("https://", HTTPAdapter(max_retries=retries))
+    return s
 
 
 def _generate_random_string(length=32) -> str:
