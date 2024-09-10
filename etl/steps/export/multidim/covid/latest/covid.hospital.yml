@@ -28,8 +28,8 @@ dimensions:
         name: Intensive care unit
         description: null
 
-  - slug: metric
-    name: Metric
+  - slug: measure
+    name: Measure
     choices:
       - slug: patients
         name: Patients
@@ -37,52 +37,64 @@ dimensions:
       - slug: admissions
         name: Admissions
         description: null
-      - slug: patients_per_capita
-        name: Patients per million people
+
+  - slug: normalize
+    name: Normalization
+    choices:
+      - slug: absolute
+        name: None
         description: null
-      - slug: admissions_per_capita
-        name: Admissions per million people
+      - slug: per_capita
+        name: Per million people
         description: null
 
 views:
   - dimensions:
       type: hospital
-      metric: patients
+      measure: patients
+      normalize: absolute
     indicators:
       y: "{definitions.table}#daily_occupancy_hosp"
   - dimensions:
       type: hospital
-      metric: patients_per_capita
+      measure: patients
+      normalize: per_capita
     indicators:
       y: "{definitions.table}#daily_occupancy_hosp_per_1m"
   - dimensions:
       type: hospital
-      metric: admissions
+      measure: admissions
+      normalize: absolute
     indicators:
       y: "{definitions.table}#weekly_admissions_hosp"
   - dimensions:
       type: hospital
-      metric: admissions_per_capita
+      measure: admissions
+      normalize: per_capita
     indicators:
       y: "{definitions.table}#weekly_admissions_hosp_per_1m"
 
   - dimensions:
       type: icu
-      metric: patients
+      measure: patients
+      normalize: absolute
     indicators:
       y: "{definitions.table}#daily_occupancy_icu"
   - dimensions:
       type: icu
-      metric: patients_per_capita
+      measure: patients
+      normalize: per_capita
     indicators:
       y: "{definitions.table}#daily_occupancy_icu_per_1m"
   - dimensions:
       type: icu
-      metric: admissions
+      measure: admissions
+      normalize: absolute
     indicators:
       y: "{definitions.table}#weekly_admissions_icu"
   - dimensions:
       type: icu
-      metric: admissions_per_capita
+      measure: admissions
+      normalize: per_capita
     indicators:
       y: "{definitions.table}#weekly_admissions_icu_per_1m"
