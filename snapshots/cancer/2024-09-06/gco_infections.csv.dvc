@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Cancers Attributable to Infections
+    description: |-
+      The dataset includes data on cancers linked to ten infectious pathogens classified as carcinogenic by the International Agency for Research on Cancer (IARC), such as Helicobacter pylori, hepatitis B and C viruses, and human papillomavirus (HPV). It includes population attributable fractions (PAFs), which estimate the proportion of cancer cases associated with each infection, and age-standardized rates (ASRs), which adjust for age distribution differences to allow for comparisons across populations. 
+    date_published: "2020"
+
+    # Citation
+    producer: International Agency for Research on Cancer
+    citation_full: |-
+      Methodology described in “Global burden of cancer attributable to infections in 2018: a worldwide incidence analysis; de Martel C, Georges D, Bray F, Ferlay J, Clifford GM; Lancet Glob Health, 2020” applied to 2020 cancer incidence estimates.
+
+    # Files
+    url_main: https://gco.iarc.who.int/causes/infections/tools-map?mode=1&sex=0&continent=0&agent=0&cancer=0&key=asr&scale=quantile
+    url_download: https://gco.iarc.who.int/causes/infections/data/v2/
+    date_accessed: 2024-09-06
+
+    # License
+    license:
+      name: Protocol 2 of the Universal Copyright Convention
+      url: https://gco.iarc.who.int/causes/infections/tools-map?mode=1&sex=0&continent=0&agent=0&cancer=0&key=asr&scale=quantile
+
+outs:
+  - md5: b887915ac77455342184839de3b1eb0a
+    size: 2157512
+    path: gco_infections.csv
