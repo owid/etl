@@ -1,0 +1,33 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Influenza
+    display:
+      numDecimalPlaces: 0
+    processing_level: minor
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: FLuID dataset
+  description: |-
+    FluID is a global platform for data sharing that links regional influenza epidemiological data into a single global database. The platform provides connections between existing databases and can also be used to directly enter data by the national focal points through a web-based interface. It complements the existing virological data collection tool FluNet.
+
+    The platform accommodates both qualitative and quantitative data which facilitates the tracking of global trends, spread, intensity, and impact of influenza. These data are made freely available to health policy makers in order to assist them in making informed decisions regarding the management of influenza.
+  update_period_days: 0
+
+tables:
+  flu_test:
+    variables:
+      inf_tested:
+        title: The number of influenza tests carried out
+        unit: tests
+        origins:
+          - title: FluID, World Health Organization
+            date_published: "2024"
+            producer: WHO
+            citation_full: FluID, World Health Organization (2023)
+            url_main: https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/fluid
+            date_accessed: "2024-09-09"

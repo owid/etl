@@ -772,3 +772,9 @@ steps:
     - data://meadow/cancer/2024-08-30/gco_alcohol
   data://grapher/cancer/2024-08-30/gco_alcohol:
     - data://garden/cancer/2024-08-30/gco_alcohol
+
+# Flu testing data
+  data://garden/who/2024-09-09/flu_test:
+    - data://meadow/who/latest/fluid
+  data://grapher/who/2024-09-09/flu_test:
+    - data://garden/who/2024-09-09/flu_test
