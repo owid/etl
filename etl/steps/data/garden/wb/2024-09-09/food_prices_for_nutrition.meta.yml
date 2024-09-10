@@ -35,6 +35,8 @@ definitions:
     A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower bounds for total protein, fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity.
   description_energy_sufficient_diet: &description_energy_sufficient_diet |-
     An energy sufficient diet provides enough of a starchy staple food for day-to-day subsistence, without either nutrient adequacy or adherence to dietary guidelines.
+  description_key_international_dollars: &description_key_international_dollars |-
+    The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
 
 dataset:
   update_period_days: 365
@@ -54,9 +56,10 @@ tables:
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
-          Cost of the least expensive starchy staple for energy balance for a representative person at 2,330 kcal/day.
+          Cost of the least expensive starchy staple for energy balance for a representative person at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
           - *description_energy_sufficient_diet
+          - *description_key_international_dollars
       affordability_of_an_energy_sufficient_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of an energy sufficient diet: ratio of cost to food expenditures"
         unit: "%"
@@ -98,7 +101,7 @@ tables:
         unit: current international-$ per person per day
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance at 2,330 kcal/day.
+          Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
           - *description_healthy_diet
       cost_of_a_healthy_diet_relative_to_the_cost_of_sufficient_energy_from_starchy_staples:
@@ -114,7 +117,10 @@ tables:
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available animal-source foods to meet daily intake levels recommended in food-based dietary guidelines. Animal-source foods are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available animal-source foods to meet daily intake levels recommended in food-based dietary guidelines. Animal-source foods are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key:
+          - *description_healthy_diet
+          - *description_key_international_dollars
       cost_share_for_animal_sourced_foods_in_a_least_cost_healthy_diet:
         title: Cost share for animal-sourced foods in a least-cost healthy diet
         unit: "%"
@@ -136,9 +142,10 @@ tables:
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines. Fruits are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available fruits to meet daily intake levels recommended in food-based dietary guidelines. Fruits are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
           - *description_healthy_diet
+          - *description_key_international_dollars
       cost_share_for_fruits_in_a_least_cost_healthy_diet:
         title: Cost share for fruits in a least-cost healthy diet
         unit: "%"
@@ -177,9 +184,10 @@ tables:
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available legumes, nuts and seeds to meet daily intake levels recommended in food-based dietary guidelines. Legumes, nuts and seeds are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available legumes, nuts and seeds to meet daily intake levels recommended in food-based dietary guidelines. Legumes, nuts and seeds are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
           - *description_healthy_diet
+          - *description_key_international_dollars
       cost_share_for_legumes__nuts_and_seeds_in_a_least_cost_healthy_diet:
         title: Cost share for legumes, nuts and seeds in a least-cost healthy diet
         unit: "%"
@@ -201,9 +209,10 @@ tables:
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available fats or oils to meet daily intake levels recommended in food-based dietary guidelines. Fats and oils are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available fats or oils to meet daily intake levels recommended in food-based dietary guidelines. Fats and oils are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
           - *description_healthy_diet
+          - *description_key_international_dollars
       cost_share_for_oils_and_fats_in_a_least_cost_healthy_diet:
         title: Cost share for oils and fats in a least-cost healthy diet
         unit: "%"
@@ -234,9 +243,10 @@ tables:
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available starchy staples to meet daily intake levels recommended in food-based dietary guidelines. Starchy staples are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available starchy staples to meet daily intake levels recommended in food-based dietary guidelines. Starchy staples are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
           - *description_healthy_diet
+          - *description_key_international_dollars
       cost_share_for_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost share for starchy staples in a least-cost healthy diet
         unit: "%"
@@ -260,7 +270,10 @@ tables:
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
-          Cost of purchasing the least expensive locally available vegetables to meet daily intake levels recommended in food-based dietary guidelines. Vegetables are one of the six food groups within the Healthy Diet Basket.
+          Cost of purchasing the least expensive locally available vegetables to meet daily intake levels recommended in food-based dietary guidelines. Vegetables are one of the six food groups within the Healthy Diet Basket. This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_key:
+          - *description_healthy_diet
+          - *description_key_international_dollars
       cost_share_for_vegetables_in_a_least_cost_healthy_diet:
         title: Cost share for vegetables in a least-cost healthy diet
         unit: "%"
@@ -282,9 +295,10 @@ tables:
         unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
-          Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2,330 kcal/day.
+          Cost of the least expensive locally-available foods for nutrient adequacy for a representative person within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
           - *description_nutrient_adequate_diet
+          - *description_key_international_dollars
       affordability_of_a_nutrient_adequate_diet__ratio_of_cost_to_food_expenditures:
         title: "Affordability of a nutrient adequate diet: ratio of cost to food expenditures"
         unit: "%"
