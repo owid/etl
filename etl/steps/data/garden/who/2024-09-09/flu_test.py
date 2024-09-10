@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
     # tb_test["inf_tests"] = tb_test["inf_all"] + tb_test["inf_negative"]
     # tb_test = tb_test.drop(columns=["inf_all", "inf_negative"])
     tb = tb[["country", "date", "pcnt_posCOMBINED", "denomCOMBINED"]]
-    tb = tb.dropna(subset="denomCOMBINED")
+    tb = tb.dropna(subset=["denomCOMBINED", "pcnt_posCOMBINED"], how="any")
 
     tb = tb.format(["country", "date"], short_name="flu_test")
     #
