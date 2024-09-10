@@ -15,6 +15,7 @@ def run(dest_dir: str) -> None:
         "covid.hospital.yml",
         "covid.boosters.yml",
         "covid.vax_breakdowns.yml",
+        "covid.xm.yml",
     ]
     # Load YAML file
     for fname in filenames:
