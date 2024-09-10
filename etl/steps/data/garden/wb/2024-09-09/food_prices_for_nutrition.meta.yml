@@ -25,12 +25,16 @@ definitions:
       - For upper-middle-income countries, $3.15/day (46% of the international poverty line of $6.85/day).
       - For high-income countries, $11.2/day (46% of the international poverty line of $24.36/day)."
     - These percentages (63%, 56%, and 46%) represent the average food expenditure shares in the second quintile of consumers in low-income and lower-middle-income countries, and the first quintile of consumers in upper-middle-and-high-income countries, according to household surveys compiled by the World Bank.
-  description_energy_sufficient_diet: &description_energy_sufficient_diet |-
-    A calorie sufficient diet is one that meets the energy requirement of 2330 kcal/day.
-  description_nutrient_adequate_diet: &description_nutrient_adequate_diet |-
-    A nutrient adequate diet is one within upper and lower bounds for 23 essential macro- and micronutrients plus energy balance at 2330 kcal/day.
+  # Original descriptions (from https://www.worldbank.org/en/programs/icp/brief/foodpricesfornutrition#3):
+  # - Cost of a Healthy Diet: A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related diseases. To measure access and affordability, the cost of meeting food-based dietary guidelines is computed using the least expensive foods available in each category at each place and time (see "Methods and options to monitor the cost and affordability of a healthy diet globally" and "Brief note: Methods and data sources" (Herforth et al. 2022) ). The cost of a healthy diet is the preferred indicator of diet costs as it uses the most affordable foods available at local markets to meet dietary needs for an active and healthy life, using standards adopted by national governments around the world. Total cost per day can be disaggregated by food group, showing the cost per day of the least expensive locally available items in each food group (fruits; vegetables; starchy staples; animal-source foods; legumes, nuts, and seeds; and oils and fats)
+  # - Cost of a Nutrient Adequate Diet: A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower bounds for total protein, fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity. Computation of the least-cost nutrient adequate diet requires linear programming optimization modeling, and is based on nutrient requirements only, rather than food groups specified in dietary guidelines.
+  # - Cost of an Energy Sufficient Diet: An energy sufficient diet provides enough of a starchy staple food for day-to-day subsistence, without either nutrient adequacy or adherence to dietary guidelines. The least-cost version of this subsistence diet uses the most affordable locally available starchy staple, achieving energy balance but not nutrient adequacy or other dietary needs.
   description_healthy_diet: &description_healthy_diet |-
-    A healthy diet is one that meets requirements for each food group specified in food-based dietary guidelines from governments and public health agencies.
+    A healthy diet meets nutritional standards set by dietary guidelines, with sufficient diversity and quantity within and between food groups to achieve nutrient adequacy and protect against diet-related diseases.
+  description_nutrient_adequate_diet: &description_nutrient_adequate_diet |-
+    A nutrient adequate diet meets all essential nutrient requirements, with sufficient diversity and quantity of locally available foods to stay within the upper and lower bounds for total protein, fats, and carbohydrates as well as essential vitamins and minerals required to avoid nutrient deficiencies or toxicity.
+  description_energy_sufficient_diet: &description_energy_sufficient_diet |-
+    An energy sufficient diet provides enough of a starchy staple food for day-to-day subsistence, without either nutrient adequacy or adherence to dietary guidelines.
 
 dataset:
   update_period_days: 365
