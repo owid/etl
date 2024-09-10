@@ -1,6 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
 
@@ -76,13 +77,25 @@ def find_max_label_and_concat(tb, column, label):
     - Preserves original data and system names.
     - Adds new summary rows with "system" set to f"Maximum {label}".
     """
-    idx = tb[[column, "year"]].fillna(0).groupby("year")[column].idxmax()
+    tb = tb.sort_values(by=["year"])  # Ensure the DataFrame is sorted by year
+    max_value = -float("inf")
+    rows_to_keep = []
 
-    tb[f"max_{label}"] = "Other"
-    tb.loc[idx, f"max_{label}"] = f"Maximum {label}"
+    for _, row in tb.iterrows():
+        if row[column] > max_value:
+            max_value = row[column]
+            rows_to_keep.append(row)
 
-    max_rows = tb.loc[idx].copy()
+    tb_filtered = Table(rows_to_keep)
+
+    idx = tb_filtered[[column, "year"]].fillna(0).groupby("year")[column].idxmax()
+
+    tb_filtered[f"max_{label}"] = "Other"
+    tb_filtered.loc[idx, f"max_{label}"] = f"Maximum {label}"
+
+    max_rows = tb_filtered.loc[idx].copy()
     max_rows["system"] = f"Maximum {label}"
+    print(max_rows)
 
     tb = pr.concat([tb, max_rows], ignore_index=True)
 
