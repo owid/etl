@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("gbd_risk")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["gbd_risk"].reset_index()
+    tb = ds_meadow.read_table("gbd_risk", reset_index=True)
     ds_regions = paths.load_dataset("regions")
     #
     # Process data.
@@ -39,6 +39,7 @@ def run(dest_dir: str) -> None:
         index_cols=["country", "year", "metric", "measure", "rei", "cause", "age"],
         regions=REGIONS,
         age_group_mapping=AGE_GROUPS_RANGES,
+        run_percent=False,
     )
 
     # Format the tables

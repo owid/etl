@@ -222,3 +222,5 @@ steps:
     - snapshot://fasttrack/latest/co2_intensity_undp.csv
   data://grapher/fasttrack/latest/africa_cdc:
     - snapshot://fasttrack/latest/africa_cdc.csv
+  data://grapher/fasttrack/latest/elephant_populations:
+    - snapshot://fasttrack/latest/elephant_populations.csv

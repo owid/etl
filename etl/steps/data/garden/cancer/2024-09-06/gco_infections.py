@@ -12,20 +12,20 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("gco_alcohol")
+    ds_meadow = paths.load_dataset("gco_infections")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["gco_alcohol"].reset_index()
+    tb = ds_meadow["gco_infections"].reset_index()
 
     #
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # To display on grapher we need to replace "<0.1" with "0.05" and set the decimal places to 1 so that it shows up as <0.1 on the chart
-    tb["value"] = tb["value"].replace("<0.1", "0.05")
+    tb["attr_cases_share"] = (tb["attr_cases"] / tb["cases"]) * 100
 
-    tb = tb.format(["country", "year", "sex", "cancer", "indicator"])
+    tb = tb.format(["country", "year", "sex", "agent", "cancer"])
+
     #
     # Save outputs.
     #
