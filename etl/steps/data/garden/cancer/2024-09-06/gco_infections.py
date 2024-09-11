@@ -36,15 +36,19 @@ def run(dest_dir: str) -> None:
         ds_regions=ds_regions,
         min_num_values_per_year=1,
     )
-    # Create rows with sex = "Both" for the ncases column
-    tb_both = tb.groupby(["country", "year", "agent", "cancer"], as_index=False).agg(
+    # Create rows with sex = "both" for the ncases column and the attr_cases column for where the cancer is not "All cancers but non-melanoma skin cancer (C00-97, but C44)"
+    tb_filtered = tb[tb["cancer"] != "All cancers but non-melanoma skin cancer (C00-97, but C44)"]
+
+    # Group by the relevant columns and aggregate the cases and attr_cases
+    tb_both = tb_filtered.groupby(["country", "year", "agent", "cancer"], as_index=False).agg(
         {"cases": "sum", "attr_cases": "sum"}
     )
+
+    # Add the sex column with the value "Both"
     tb_both["sex"] = "both"
 
     # Append the new rows to the original DataFrame
     tb = pr.concat([tb, tb_both], ignore_index=True)
-
     tb["attr_cases_share"] = (tb["attr_cases"] / tb["cases"]) * 100
 
     tb = tb.format(["country", "year", "sex", "agent", "cancer"])
