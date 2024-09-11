@@ -40,6 +40,7 @@ from sqlalchemy import (
     SmallInteger,
     String,
     and_,
+    delete,
     func,
     or_,
     select,
@@ -54,6 +55,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # type: ignore
     DeclarativeBase,
@@ -191,9 +193,9 @@ class Tag(Base):
         return list(session.scalars(select(cls).where(cls.slug.isnot(None))).all())
 
     @classmethod
-    def load_tags_by_names(cls, session: Session, tag_names: List[str]) -> List["Tag"]:
+    async def load_tags_by_names(cls, session: AsyncSession, tag_names: List[str]) -> List["Tag"]:
         """Load topic tags by their names in the order given in `tag_names`."""
-        tags = session.scalars(select(Tag).where(Tag.name.in_(tag_names))).all()
+        tags = (await session.scalars(select(Tag).where(Tag.name.in_(tag_names)))).all()
 
         if len(tags) != len(tag_names):
             found_tags = [tag.name for tag in tags]
@@ -667,8 +669,8 @@ class Source(Base):
         ]
         return select(cls).where(*conds)
 
-    def upsert(self, session: Session) -> "Source":
-        ds = session.scalars(self._upsert_select).one_or_none()
+    async def upsert(self, session: AsyncSession) -> "Source":
+        ds = (await session.scalars(self._upsert_select)).one_or_none()
 
         if not ds:
             ds = self
@@ -679,7 +681,7 @@ class Source(Base):
         session.add(ds)
 
         # select added object to get its id
-        return session.scalars(self._upsert_select).one()
+        return (await session.scalars(self._upsert_select)).one()
 
     @classmethod
     def from_catalog_source(cls, source: catalog.Source, dataset_id: int) -> "Source":
@@ -790,10 +792,12 @@ class OriginsVariablesLink(Base):
     displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
 
     @classmethod
-    def link_with_variable(cls, session: Session, variable_id: int, new_origin_ids: List[int]) -> None:
+    async def link_with_variable(cls, session: AsyncSession, variable_id: int, new_origin_ids: List[int]) -> None:
         """Link the given Variable ID with the given Origin IDs."""
         # Fetch current linked Origins for the given Variable ID
-        existing_links = session.query(cls.originId, cls.displayOrder).filter(cls.variableId == variable_id).all()
+        existing_links = (
+            await session.execute(select(cls.originId, cls.displayOrder).filter_by(variableId=variable_id))
+        ).all()
 
         existing_origins = {(link.originId, link.displayOrder) for link in existing_links}
         new_origins = {(origin_id, i) for i, origin_id in enumerate(new_origin_ids)}
@@ -804,11 +808,19 @@ class OriginsVariablesLink(Base):
 
         # Delete the obsolete Origin-Variable links
         for origin_id, display_order in to_delete:
-            session.query(cls).filter(
+            # TODO: test that it works
+            stmt = delete(cls).where(
                 cls.variableId == variable_id,
                 cls.originId == origin_id,
                 cls.displayOrder == display_order,
-            ).delete(synchronize_session="fetch")
+            )
+            await session.execute(stmt)
+
+            # session.query(cls).filter(
+            #     cls.variableId == variable_id,
+            #     cls.originId == origin_id,
+            #     cls.displayOrder == display_order,
+            # ).delete(synchronize_session="fetch")
 
         # Add the new Origin-Variable links
         if to_add:
@@ -834,10 +846,10 @@ class PostsGdocsVariablesFaqsLink(Base):
     displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
 
     @classmethod
-    def link_with_variable(cls, session: Session, variable_id: int, new_faqs: List[catalog.FaqLink]) -> None:
+    async def link_with_variable(cls, session: AsyncSession, variable_id: int, new_faqs: List[catalog.FaqLink]) -> None:
         """Link the given Variable ID with Faqs"""
         # Fetch current linked Faqs for the given Variable ID
-        existing_faqs = session.query(cls).filter(cls.variableId == variable_id).all()
+        existing_faqs = (await session.execute(select(cls).filter_by(variableId=variable_id))).scalars().all()
 
         # Work with tuples instead
         existing_gdoc_fragment = {(f.gdocId, f.fragmentId, f.displayOrder) for f in existing_faqs}
@@ -848,12 +860,20 @@ class PostsGdocsVariablesFaqsLink(Base):
 
         # Delete the obsolete links
         for gdoc_id, fragment_id, display_order in to_delete:
-            session.query(cls).filter(
+            stmt = delete(cls).where(
                 cls.variableId == variable_id,
                 cls.gdocId == gdoc_id,
                 cls.fragmentId == fragment_id,
                 cls.displayOrder == display_order,
-            ).delete(synchronize_session="fetch")
+            )
+            await session.execute(stmt)
+
+            # session.query(cls).filter(
+            #     cls.variableId == variable_id,
+            #     cls.gdocId == gdoc_id,
+            #     cls.fragmentId == fragment_id,
+            #     cls.displayOrder == display_order,
+            # ).delete(synchronize_session="fetch")
 
         # Add the new links
         if to_add:
@@ -878,12 +898,14 @@ class TagsVariablesTopicTagsLink(Base):
     displayOrder: Mapped[int] = mapped_column(SmallInteger, server_default=text("'0'"))
 
     @classmethod
-    def link_with_variable(cls, session: Session, variable_id: int, new_tag_ids: List[int]) -> None:
+    async def link_with_variable(cls, session: AsyncSession, variable_id: int, new_tag_ids: List[int]) -> None:
         """Link the given Variable ID with the given Tag IDs."""
         assert len(new_tag_ids) == len(set(new_tag_ids)), "Tag IDs must be unique"
 
         # Fetch current linked tags for the given Variable ID
-        existing_links = session.query(cls.tagId, cls.displayOrder).filter(cls.variableId == variable_id).all()
+        existing_links = (
+            await session.execute(select(cls.tagId, cls.displayOrder).filter_by(variableId=variable_id))
+        ).all()
 
         existing_tags = {(link.tagId, link.displayOrder) for link in existing_links}
         new_tags = {(tag_id, i) for i, tag_id in enumerate(new_tag_ids)}
@@ -894,11 +916,17 @@ class TagsVariablesTopicTagsLink(Base):
 
         # Delete the obsolete links
         for tag_id, display_order in to_delete:
-            session.query(cls).filter(
+            stmt = delete(cls).where(
                 cls.variableId == variable_id,
                 cls.tagId == tag_id,
                 cls.displayOrder == display_order,
-            ).delete(synchronize_session="fetch")
+            )
+            await session.execute(stmt)
+            # session.query(cls).filter(
+            #     cls.variableId == variable_id,
+            #     cls.tagId == tag_id,
+            #     cls.displayOrder == display_order,
+            # ).delete(synchronize_session="fetch")
 
         # Add the new links
         if to_add:
@@ -995,7 +1023,7 @@ class Variable(Base):
     dataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
     metadataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
 
-    def upsert(self, session: Session) -> "Variable":
+    async def upsert(self, session: AsyncSession) -> "Variable":
         assert self.catalogPath
 
         cls = self.__class__
@@ -1005,7 +1033,7 @@ class Variable(Base):
             cls.catalogPath == self.catalogPath,
             cls.datasetId == self.datasetId,
         )
-        ds = session.scalars(q).one_or_none()
+        ds = (await session.scalars(q)).one_or_none()
 
         # there's a unique index on `name` which can cause conflict if we swap names of two variables
         # in that case, we append "(conflict)" to the name of the conflicting variable (it will be cleaned
@@ -1018,12 +1046,12 @@ class Variable(Base):
                 cls.shortName != self.shortName,
                 cls.datasetId == self.datasetId,
             )
-            conflict = session.scalars(q).one_or_none()
+            conflict = (await session.scalars(q)).one_or_none()
             if conflict:
                 # modify the conflicting variable name, it'll be cleaned up later
                 conflict.name = f"{conflict.name} (conflict {random.randint(0, 1000)})"
                 session.add(conflict)
-                session.commit()
+                await session.commit()
 
         if not ds:
             ds = self
@@ -1071,7 +1099,7 @@ class Variable(Base):
             cls.catalogPath == self.catalogPath,
             cls.datasetId == self.datasetId,
         )
-        return session.scalars(q).one()
+        return (await session.scalars(q)).one()
 
     @classmethod
     def from_variable_metadata(
@@ -1141,6 +1169,11 @@ class Variable(Base):
         return session.scalars(select(cls).where(cls.catalogPath == catalog_path)).one()
 
     @classmethod
+    async def load_from_catalog_path_async(cls, session: AsyncSession, catalog_path: str) -> "Variable":
+        assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+        return (await session.scalars(select(cls).where(cls.catalogPath == catalog_path))).one()
+
+    @classmethod
     def catalog_paths_to_variable_ids(cls, session: Session, catalog_paths: List[str]) -> Dict[str, int]:
         """Return a mapping from catalog paths to variable IDs."""
         query = select(Variable).where(Variable.catalogPath.in_(catalog_paths))
@@ -1150,8 +1183,21 @@ class Variable(Base):
         """Set type and sort fields based on indicator values."""
         return _infer_variable_type(values)
 
-    def update_links(
-        self, session: Session, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
+    async def _link_faqs(self, session: AsyncSession, faqs: List[catalog.FaqLink]) -> None:
+        # establish relationships between variables and posts
+        required_gdoc_ids = {faq.gdoc_id for faq in faqs}
+        query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))
+        gdoc_posts = (await session.scalars(query)).all()
+        existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
+        missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
+        if missing_gdoc_ids:
+            log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
+        await PostsGdocsVariablesFaqsLink.link_with_variable(
+            session, self.id, [faq for faq in faqs if faq.gdoc_id in existing_gdoc_ids]
+        )
+
+    async def update_links(
+        self, session: AsyncSession, db_origins: List["Origin"], faqs: List[catalog.FaqLink], tag_names: List[str]
     ) -> None:
         """
         Establishes relationships between the current variable and a list of origins and a list of posts.
@@ -1159,24 +1205,19 @@ class Variable(Base):
         assert self.id
 
         # establish relationships between variables and origins
-        OriginsVariablesLink.link_with_variable(session, self.id, [origin.id for origin in db_origins])
-
-        # establish relationships between variables and posts
-        required_gdoc_ids = {faq.gdoc_id for faq in faqs}
-        query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))
-        gdoc_posts = session.scalars(query).all()
-        existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
-        missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
-        if missing_gdoc_ids:
-            log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
-        PostsGdocsVariablesFaqsLink.link_with_variable(
-            session, self.id, [faq for faq in faqs if faq.gdoc_id in existing_gdoc_ids]
+        origins_variables_task = OriginsVariablesLink.link_with_variable(
+            session, self.id, [origin.id for origin in db_origins]
         )
 
-        # establish relationships between variables and tags
-        tags = Tag.load_tags_by_names(session, tag_names)
+        link_faqs_task = self._link_faqs(session, faqs)
 
-        TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])
+        # establish relationships between variables and tags
+        tags = await Tag.load_tags_by_names(session, tag_names)
+
+        await TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])
+
+        await origins_variables_task
+        await link_faqs_task
 
     def s3_data_path(self, typ: S3_PATH_TYP = "s3") -> str:
         """Path to S3 with data in JSON format for Grapher. Typically
@@ -1319,7 +1360,7 @@ class Origin(Base):
             cls.dateAccessed == self.dateAccessed,
         )
 
-    def upsert(self, session: Session) -> "Origin":
+    async def upsert(self, session: AsyncSession) -> "Origin":
         """
         # NOTE: this would be an ideal solution if we only stored unique rows in
         # origins table, but there are weird race conditions and we cannot have
@@ -1339,8 +1380,7 @@ class Origin(Base):
         # select added object to get its id
         return session.scalars(self._upsert_select).one()
         """
-
-        origins = session.scalars(self._upsert_select).all()
+        origins = (await session.scalars(self._upsert_select)).all()
         if not origins:
             # create new origin
             origin = self

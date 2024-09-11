@@ -2,6 +2,7 @@
 #  __init__.py
 #  steps
 #
+import asyncio
 import graphlib
 import hashlib
 import json
@@ -878,58 +879,21 @@ class GrapherStep(Step):
         # Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
         warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-        catalog_paths = []
+        # import yappi
 
-        with ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
-            futures = []
-            verbose = True
-            i = 0
+        # yappi.set_clock_type("wall")  # Use "cpu" for CPU time profiling
+        # yappi.start()
 
-            # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
-            # is fetching the whole dataset from data-api as they would receive all tables merged in a single
-            # table. This won't be a problem after we introduce the concept of "tables"
-            for table in dataset:
-                assert not table.empty, f"table {table.metadata.short_name} is empty"
+        catalog_paths = asyncio.run(
+            gi._upsert_tables_from_dataset_async(self.path, dataset, engine, admin_api, dataset_upsert_results)
+        )
 
-                # if GRAPHER_FILTER is set, only upsert matching columns
-                if config.GRAPHER_FILTER:
-                    cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
-                    if not cols:
-                        continue
-                    cols += [c for c in table.columns if c in {"year", "date", "country"} and c not in cols]
-                    table = table.loc[:, cols]
+        # # Stop profiling
+        # yappi.stop()
 
-                table = gh._adapt_table_for_grapher(table, engine)
+        # yappi.get_func_stats().print_all()
 
-                for t in gh._yield_wide_table(table, na_action="drop"):
-                    i += 1
-                    assert len(t.columns) == 1
-                    catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
-                    catalog_paths.append(catalog_path)
-
-                    # stop logging to stop cluttering logs
-                    if i > 20 and verbose:
-                        verbose = False
-                        thread_pool.submit(
-                            lambda: (time.sleep(10), log.info("upsert_dataset.continue_without_logging"))
-                        )
-
-                    # generate table with entity_id, year and value for every column
-                    futures.append(
-                        thread_pool.submit(
-                            gi.upsert_table,
-                            engine,
-                            admin_api,
-                            t,
-                            dataset_upsert_results,
-                            catalog_path=catalog_path,
-                            dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
-                            verbose=verbose,
-                        )
-                    )
-
-            # wait for all tables to be inserted
-            [future.result() for future in as_completed(futures)]
+        log.info(f"Upserted {self.path} into grapher")
 
         if not config.GRAPHER_FILTER and not config.SUBSET:
             # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable

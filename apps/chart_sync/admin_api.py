@@ -5,6 +5,7 @@ import random
 import string
 from typing import Any, Dict, List, Optional
 
+import aiohttp
 import requests
 import structlog
 from sqlalchemy import text
@@ -81,16 +82,17 @@ class AdminAPI(object):
         assert js["success"]
         return js
 
-    def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
-        resp = requests.put(
-            self.base_url + f"/admin/api/variables/{variable_id}/grapherConfigETL",
-            cookies={"sessionid": self.session_id},
-            json=grapher_config,
-        )
-        js = self._json_from_response(resp)
-        assert js["success"]
-        return js
+    async def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
+        async with aiohttp.ClientSession(cookies={"sessionid": self.session_id}) as session:
+            async with session.put(
+                self.base_url + f"/admin/api/variables/{variable_id}/grapherConfigETL", json=grapher_config
+            ) as resp:
+                # TODO: make _json_from_response async
+                js = await resp.json()
+                assert js["success"]
+                return js
 
+    # TODO: make it async
     def delete_grapher_config(self, variable_id: int) -> dict:
         resp = requests.delete(
             self.base_url + f"/admin/api/variables/{variable_id}/grapherConfigETL",

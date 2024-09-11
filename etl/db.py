@@ -10,6 +10,7 @@ import structlog
 import validators
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlalchemy.orm import Session
 
 from etl import config
@@ -58,6 +59,16 @@ def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
     # pid in memoization makes sure every process gets its own Engine
     pid = os.getpid()
     return _get_engine_cached(cf, pid)
+
+
+def get_engine_async(conf: Optional[Dict[str, Any]] = None) -> AsyncEngine:
+    cf: Any = dict_to_object(conf) if conf else config
+    engine = create_async_engine(
+        f"mysql+aiomysql://{cf.DB_USER}:{quote(cf.DB_PASS)}@{cf.DB_HOST}:{cf.DB_PORT}/{cf.DB_NAME}",
+        pool_size=30,  # Increase pool size
+        max_overflow=50,  # Increase overflow limit
+    )
+    return engine
 
 
 def get_dataset_id(

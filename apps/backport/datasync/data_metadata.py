@@ -10,6 +10,7 @@ import pandas as pd
 import requests
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 from structlog import get_logger
 from tenacity import Retrying
@@ -156,7 +157,7 @@ def variable_data(data_df: pd.DataFrame) -> Dict[str, Any]:
     return data  # type: ignore
 
 
-def _load_variable(session: Session, variable_id: int) -> Dict[str, Any]:
+async def _load_variable(session: AsyncSession, variable_id: int) -> Dict[str, Any]:
     sql = """
     SELECT
         variables.*,
@@ -173,14 +174,14 @@ def _load_variable(session: Session, variable_id: int) -> Dict[str, Any]:
     """
 
     # Using the session to execute raw SQL and fetching one row as a result
-    result = session.execute(text(sql), {"variable_id": variable_id}).fetchone()
+    result = (await session.execute(text(sql), {"variable_id": variable_id})).fetchone()
 
     # Ensure result exists and convert to dictionary
     assert result, f"variableId `{variable_id}` not found"
     return dict(result._mapping)
 
 
-def _load_topic_tags(session: Session, variable_id: int) -> List[str]:
+async def _load_topic_tags(session: AsyncSession, variable_id: int) -> List[str]:
     sql = """
     SELECT
         tags.name
@@ -191,13 +192,13 @@ def _load_topic_tags(session: Session, variable_id: int) -> List[str]:
     """
 
     # Using the session to execute raw SQL
-    result = session.execute(text(sql), {"variable_id": variable_id}).fetchall()
+    result = (await session.execute(text(sql), {"variable_id": variable_id})).fetchall()
 
     # Extract tag names from the result and return as a list
     return [row[0] for row in result]
 
 
-def _load_faqs(session: Session, variable_id: int) -> List[Dict[str, Any]]:
+async def _load_faqs(session: AsyncSession, variable_id: int) -> List[Dict[str, Any]]:
     sql = """
     SELECT
         gdocId,
@@ -208,13 +209,13 @@ def _load_faqs(session: Session, variable_id: int) -> List[Dict[str, Any]]:
     """
 
     # Using the session to execute raw SQL
-    result = session.execute(text(sql), {"variable_id": variable_id}).fetchall()
+    result = (await session.execute(text(sql), {"variable_id": variable_id})).fetchall()
 
     # Convert the result rows to a list of dictionaries
     return [dict(row._mapping) for row in result]
 
 
-def _load_origins_df(session: Session, variable_id: int) -> pd.DataFrame:
+async def _load_origins_df(session: AsyncSession, variable_id: int) -> pd.DataFrame:
     sql = """
     SELECT
         origins.*
@@ -225,7 +226,7 @@ def _load_origins_df(session: Session, variable_id: int) -> pd.DataFrame:
     """
 
     # Use the session to execute the raw SQL
-    result_proxy = session.execute(text(sql), {"variable_id": variable_id})
+    result_proxy = await session.execute(text(sql), {"variable_id": variable_id})
 
     # Fetch the results into a DataFrame
     df = pd.DataFrame(result_proxy.fetchall(), columns=result_proxy.keys())
@@ -358,17 +359,22 @@ def _move_population_origin_to_end(origins: List[Dict[str, Any]]) -> List[Dict[s
     return new_origins
 
 
-def variable_metadata(session: Session, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
+async def variable_metadata(session: AsyncSession, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
     """Fetch metadata for a single variable from database. This function was initially based on the
     one from owid-grapher repository and uses raw SQL commands. It'd be interesting to rewrite it
     using SQLAlchemy ORM in grapher_model.py.
     """
+    task_variable = _load_variable(session, variable_id)
+    task_origins = _load_origins_df(session, variable_id)
+    task_topic_tags = _load_topic_tags(session, variable_id)
+    task_faqs = _load_faqs(session, variable_id)
+
     return _variable_metadata(
-        db_variable_row=_load_variable(session, variable_id),
+        db_variable_row=await task_variable,
         variable_data=variable_data,
-        db_origins_df=_load_origins_df(session, variable_id),
-        db_topic_tags=_load_topic_tags(session, variable_id),
-        db_faqs=_load_faqs(session, variable_id),
+        db_origins_df=await task_origins,
+        db_topic_tags=await task_topic_tags,
+        db_faqs=await task_faqs,
     )
 
 
