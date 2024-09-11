@@ -12,12 +12,18 @@ definitions:
     - Non-food expenses are estimated by looking at how much low-income people typically spend on things like housing, clothing, and transportation.
     - This amount is calculated as the average share of non-food expenditure for a low-income consumer, multiplied by the international poverty line.
     - "The average share of non-food expenditure is based on the spending habits of specific income groups (quintiles):
+
       - In upper-middle-income and high-income countries, the first quintile of consumers is considered (the poorest 20% of consumers), where people spend around 54% of their income on non-food needs.
+
       - In low-income and lower-middle-income countries, the second quintile is considered (the second lowest 20% of consumers), where people spend about 37% and 44% of their income on non-food needs, respectively."
     - "The international poverty lines (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) are:
+
       - For low-income countries: $2.15/day.
+
       - For lower-middle-income countries: $3.65/day.
+
       - For upper-middle-income countries: $6.85/day.
+
       - For high-income countries: $24.36/day."
     - A value of zero indicates a null or a small number rounded down at the current precision level.
   description_key_number_of_population: &description_key_number_of_population
@@ -27,9 +33,13 @@ definitions:
     # Original description:
     # The ratio of the cost of an energy sufficient diet to the food poverty lines, defined as $1.35/day for low-income countries (63% of the international poverty line of $2.15/day in 2017 PPP$), $2.04/day for lower-middle-income countries (56% of the international poverty line of $3.65/day in 2017 PPP$), $3.15/day for upper-middle-income countries (46% of the international poverty line of $6.85/day in 2017 PPP$), and $11.2/day (46% of the international poverty line of $24.36/day in 2017 PPP$). The percentages (63%, 56%, and 46%) represent the average food expenditure shares in the second quintile of consumers in low-income and lower-middle-income countries, and the first quintile of consumers in upper-middle-and-high-income countries, according to household surveys compiled by the World Bank. Countries' income classifications follow the calendar year of 2021 standard (fiscal year of 2023 of the World Bank), which is the base year of the latest ICP cycle.
     - "Poverty lines are defined (in [international-$](#dod:int_dollar_abbreviation) at 2017 prices) as follows:
+
       - For low-income countries, $1.35/day (63% of the international poverty line of $2.15/day).
+
       - For lower-middle-income countries, $2.04/day (56% of the international poverty line of $3.65/day).
+
       - For upper-middle-income countries, $3.15/day (46% of the international poverty line of $6.85/day).
+
       - For high-income countries, $11.2/day (46% of the international poverty line of $24.36/day)."
     - These percentages (63%, 56%, and 46%) represent the average food expenditure shares in the first quintile (the poorest 20th of the population) of consumers in upper-middle-income and high-income countries, and the second quintile of consumers in low-income and lower-middle-income countries, according to household surveys compiled by the World Bank.
   # Original descriptions (from https://www.worldbank.org/en/programs/icp/brief/foodpricesfornutrition#3):
