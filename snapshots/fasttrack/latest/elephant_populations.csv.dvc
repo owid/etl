@@ -8,7 +8,7 @@ meta:
       African elephant population data was primarily gathered from the African Elephant Database. Available at: https://africanelephantdatabase.org/report/2016/Africa
 
       Prior to 2013, this data was collected and reported on the basis of the DPPS method, where estimates were given as 'Definite', 'Probable', 'Possible' and 'Speculative'. Here we have taken "Definitive" survey counts for all years. However, we also compared data based on "Definitive" + "Probable" estimates, and the overall trends are similar. However, these counts always come with uncertainty.
-      Longer historical estimates for 1979 come from the work of Milner-Gulland (1993). These estimates come with significant uncertainty, and may be overestimates.
+      Longer historical estimates for 1979 come from the work of Douglas-Hamilton (1979). These estimates come with significant uncertainty, and may be overestimates.
 
       Figures for some countries on 'carcass ratio' are also provided. The carcass ratio is the number of  dead elephants observed during
       the count, as a percentage of the total population. Carcass ratios of more than 8 percent are considered to indicate poaching at a high enough level to cause a declining population.
@@ -20,7 +20,7 @@ meta:
       https://africanelephantdatabase.org/; https://iucn.org/our-union/commissions/group/iucn-ssc-asian-elephant-specialist-group; https://peerj.com/articles/2354/
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRuiivxA47QYSDPX0bOynRbk1GeoMceKTnEQ6eam7S_4mZ07QjFutU6JoXO2p_U17i-o7vPty1GiFM8/pub?output=csv
-    date_accessed: '2024-09-10'
+    date_accessed: '2024-09-11'
   name: Elephant populations (African and Asian Elephant Specialist Group)
   description: ''
   license: {}
