@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -34,6 +36,15 @@ def run(dest_dir: str) -> None:
         ds_regions=ds_regions,
         min_num_values_per_year=1,
     )
+    # Create rows with sex = "Both" for the ncases column
+    tb_both = tb.groupby(["country", "year", "agent", "cancer"], as_index=False).agg(
+        {"cases": "sum", "attr_cases": "sum"}
+    )
+    tb_both["sex"] = "both"
+
+    # Append the new rows to the original DataFrame
+    tb = pr.concat([tb, tb_both], ignore_index=True)
+
     tb["attr_cases_share"] = (tb["attr_cases"] / tb["cases"]) * 100
 
     tb = tb.format(["country", "year", "sex", "agent", "cancer"])
