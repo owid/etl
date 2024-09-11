@@ -776,6 +776,7 @@ steps:
     - snapshot://cancer/2024-09-06/gco_infections.csv
   data://garden/cancer/2024-09-06/gco_infections:
     - data://meadow/cancer/2024-09-06/gco_infections
+    - data://garden/regions/2023-01-01/regions
   data://grapher/cancer/2024-09-06/gco_infections:
     - data://garden/cancer/2024-09-06/gco_infections
 
