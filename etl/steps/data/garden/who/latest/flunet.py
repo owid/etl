@@ -221,16 +221,16 @@ def calculate_percent_positive(df: pd.DataFrame, surveillance_cols: list[str]) -
             "inf_negative" + col,
         ] = np.nan
 
-        df["pcnt_pos_1" + col] = (df["inf_all" + col] / (df["inf_all" + col] + df["inf_negative" + col])) * 100
-        df["pcnt_pos_2" + col] = (df["inf_all" + col] / df["spec_processed_nb" + col]) * 100
-        df["pcnt_pos_3" + col] = (df["inf_all" + col] / df["spec_received_nb" + col]) * 100
+        df["pcnt_pos" + col] = (df["inf_all" + col] / (df["inf_all" + col] + df["inf_negative" + col])) * 100
+        # df["pcnt_pos_2" + col] = (df["inf_all" + col] / df["spec_processed_nb" + col]) * 100
+        # df["pcnt_pos_3" + col] = (df["inf_all" + col] / df["spec_received_nb" + col]) * 100
 
         # hierachically fill the 'pcnt_pos' column with values from the columns described above in order of preference: 1->2->3
-        df["pcnt_pos" + col] = df["pcnt_pos_1" + col]
-        df["pcnt_pos" + col] = df["pcnt_pos" + col].fillna(df["pcnt_pos_2" + col])
-        df["pcnt_pos" + col] = df["pcnt_pos" + col].fillna(df["pcnt_pos_3" + col])
+        df["pcnt_pos" + col] = df["pcnt_pos" + col]
+        # df["pcnt_pos" + col] = df["pcnt_pos" + col].fillna(df["pcnt_pos_2" + col])
+        # df["pcnt_pos" + col] = df["pcnt_pos" + col].fillna(df["pcnt_pos_3" + col])
 
-        df = df.drop(columns=["pcnt_pos_1" + col, "pcnt_pos_2" + col, "pcnt_pos_3" + col])
+        # df = df.drop(columns=["pcnt_pos_1" + col, "pcnt_pos_2" + col, "pcnt_pos_3" + col])
 
         # Drop rows where pcnt_pos is >100
         df.loc[df["pcnt_pos" + col] > 100, "pcnt_pos" + col] = np.nan
