@@ -1,4 +1,11 @@
 definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Food Prices
+        - Poverty
+        - Economic Inequality
   description_key_pct_of_population: &description_key_pct_of_population
     # Original description:
     # The indicator expresses the percentage of the total population unable to afford an energy sufficient diet in a given country and year. A diet is considered unaffordable when the diet cost plus expenditures for basic non-food needs exceed income per capita per day. The expenditures for basic non-food needs are calculated as average non-food expenditure shares of low-income consumer multipled by internaitonal poverty lines set by the World Bank. The non-food expenditure share is 37% and 44% in low-income and lower-middle-income countries for the second quintile of consumers, and 54% in upper-middle-and-high-income countries for the first quintile of consumers, according to household surveys compiled by the World Bank. The international poverty lines are $2.15/day for low-income countries, $3.65/day for lower-middle-income countries, $6.85/day for upper-middle-income countries, and $24.36/day for high-income countries, in 2017PPP$. Countries' income classifications follow the calendar year of 2021 standard (fiscal year of 2023 of the World Bank), which is the base year of the latest ICP cycle. Income data are provided by the World Bank’s Poverty and Inequality Platform. A value of zero indicates a null or a small number rounded down at the current precision level.
@@ -100,6 +107,9 @@ tables:
         title: Cost of a healthy diet
         unit: international-$ in 2021 prices per person per day
         short_unit: $
+        processing_level: major
+        description_processing: |-
+          - Costs have been adjusted for inflation by multiplying the cost for a given year by CPI(BASE_YEAR) / CPI(year), where CPI is the United States' Consumer Price Index and the base year is 2021.
         description_short: |-
           Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
