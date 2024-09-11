@@ -31,6 +31,11 @@ tables:
             citation_full: FluNet, World Health Organization (2023)
             url_main: https://www.who.int/tools/flunet/flunet-summary
             date_accessed: "2024-09-09"
+        presentation:
+          grapher_config:
+            note: "The number of tests is based on three possible sources based on data availability. If both are available, the sum of positive and negative tests is used. If not then the number of specimens processed is used. If neither are available, then the number of specimens received by the testing facility is used."
+
+
       denomcombined:
         title: The number of tests
         unit: tests
@@ -41,33 +46,7 @@ tables:
             citation_full: FluNet, World Health Organization (2023)
             url_main: https://www.who.int/tools/flunet/flunet-summary
             date_accessed: "2024-09-09"
-      #spec_processed_nb:
-      #  title: The number of tests processed
-      #  unit: tests
-      #  origins:
-      #    - title: FluNet, World Health Organization
-      #      date_published: "2024"
-      #      producer: WHO
-      #      citation_full: FluNet, World Health Organization (2023)
-      #      url_main: https://www.who.int/tools/flunet/flunet-summary
-      #      date_accessed: "2024-09-09"
-      #spec_received_nb:
-      #  title: The number of tests recieved
-      #  unit: tests
-      #  origins:
-      #    - title: FluNet, World Health Organization
-      #      date_published: "2024"
-      #      producer: WHO
-      #      citation_full: FluNet, World Health Organization (2023)
-      #      url_main: https://www.who.int/tools/flunet/flunet-summary
-      #      date_accessed: "2024-09-09"
-      #inf_tests:
-      #  title: Sum of positive and negative tests
-      #  unit: tests
-      #  origins:
-      #    - title: FluNet, World Health Organization
-      #      date_published: "2024"
-      #      producer: WHO
-      #      citation_full: FluNet, World Health Organization (2023)
-      #      url_main: https://www.who.int/tools/flunet/flunet-summary
-      #      date_accessed: "2024-09-09"
+        presentation:
+          grapher_config:
+            note: "The number of tests is based on three possible sources based on data availability. If both are available, the sum of positive and negative tests is used. If not then the number of specimens processed is used. If neither are available, then the number of specimens received by the testing facility is used."
+
