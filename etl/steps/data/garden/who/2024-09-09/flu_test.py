@@ -194,28 +194,28 @@ def calculate_percent_positive(tb: Table, surveillance_cols: list[str]) -> Table
             "inf_negative" + col,
         ] = np.nan
         # Calculating the denominator separately
-        tb["denom_1" + col] = tb["inf_all" + col] + tb["inf_negative" + col]
-        tb["denom_2" + col] = tb["spec_processed_nb" + col]
-        tb["denom_3" + col] = tb["spec_received_nb" + col]
+        tb["denom" + col] = tb["inf_all" + col] + tb["inf_negative" + col]
+        # tb["denom_2" + col] = tb["spec_processed_nb" + col]
+        # tb["denom_3" + col] = tb["spec_received_nb" + col]
 
-        tb["pcnt_pos_1" + col] = (tb["inf_all" + col] / (tb["denom_1" + col])) * 100
-        tb["pcnt_pos_2" + col] = (tb["inf_all" + col] / (tb["denom_2" + col])) * 100
-        tb["pcnt_pos_3" + col] = (tb["inf_all" + col] / (tb["denom_3" + col])) * 100
+        tb["pcnt_pos" + col] = (tb["inf_all" + col] / (tb["denom_1" + col])) * 100
+        # tb["pcnt_pos_2" + col] = (tb["inf_all" + col] / (tb["denom_2" + col])) * 100
+        # tb["pcnt_pos_3" + col] = (tb["inf_all" + col] / (tb["denom_3" + col])) * 100
 
         # hierachically fill the 'pcnt_pos' column with values from the columns described above in order of preference: 1->2->3
-        tb["pcnt_pos" + col] = tb["pcnt_pos_1" + col]
-        tb["denom" + col] = tb["denom_1" + col]
+        tb["pcnt_pos" + col] = tb["pcnt_pos" + col]
+        tb["denom" + col] = tb["denom" + col]
 
-        idx_2 = tb["pcnt_pos" + col].isna()
-        tb.loc[idx_2, "pcnt_pos" + col] = tb["pcnt_pos_2" + col]
-        tb.loc[idx_2, "denom" + col] = tb["denom_2" + col]
+        # idx_2 = tb["pcnt_pos" + col].isna()
+        # tb.loc[idx_2, "pcnt_pos" + col] = tb["pcnt_pos_2" + col]
+        # tb.loc[idx_2, "denom" + col] = tb["denom_2" + col]
 
-        idx_3 = tb["pcnt_pos" + col].isna()
-        tb.loc[idx_3, "pcnt_pos" + col] = tb["pcnt_pos_2" + col]
-        tb.loc[idx_3, "denom" + col] = tb["denom_2" + col]
+        # idx_3 = tb["pcnt_pos" + col].isna()
+        # tb.loc[idx_3, "pcnt_pos" + col] = tb["pcnt_pos_2" + col]
+        # tb.loc[idx_3, "denom" + col] = tb["denom_2" + col]
 
-        tb = tb.drop(columns=["pcnt_pos_1" + col, "pcnt_pos_2" + col, "pcnt_pos_3" + col])
-        tb = tb.drop(columns=["denom_1" + col, "denom_2" + col, "denom_3" + col])
+        # tb = tb.drop(columns=["pcnt_pos_1" + col, "pcnt_pos_2" + col, "pcnt_pos_3" + col])
+        # tb = tb.drop(columns=["denom_1" + col, "denom_2" + col, "denom_3" + col])
 
         # Replace inf with NAs
         tb["pcnt_pos" + col] = tb["pcnt_pos" + col].replace([np.inf, -np.inf], np.nan)
