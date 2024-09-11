@@ -198,7 +198,7 @@ def calculate_percent_positive(tb: Table, surveillance_cols: list[str]) -> Table
         # tb["denom_2" + col] = tb["spec_processed_nb" + col]
         # tb["denom_3" + col] = tb["spec_received_nb" + col]
 
-        tb["pcnt_pos" + col] = (tb["inf_all" + col] / (tb["denom_1" + col])) * 100
+        tb["pcnt_pos" + col] = (tb["inf_all" + col] / (tb["denom" + col])) * 100
         # tb["pcnt_pos_2" + col] = (tb["inf_all" + col] / (tb["denom_2" + col])) * 100
         # tb["pcnt_pos_3" + col] = (tb["inf_all" + col] / (tb["denom_3" + col])) * 100
 
