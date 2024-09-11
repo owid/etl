@@ -98,7 +98,7 @@ tables:
           - *description_key_number_of_population
       cost_of_a_healthy_diet:
         title: Cost of a healthy diet
-        unit: current international-$ per person per day
+        unit: international-$ in 2021 prices per person per day
         short_unit: $
         description_short: |-
           Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost of living between countries.
@@ -106,8 +106,8 @@ tables:
           - *description_healthy_diet
       cost_of_a_healthy_diet_relative_to_the_cost_of_sufficient_energy_from_starchy_staples:
         title: Cost of a healthy diet relative to the cost of sufficient energy from starchy staples
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: |-
           Ratio between the cost of a healthy diet that meets requirements for energy and food-based dietary guidelines and the cost of caloric adequacy that uses only starchy staples to meet energy requirements.
         description_key:
@@ -131,8 +131,8 @@ tables:
           - *description_healthy_diet
       cost_of_animal_sourced_foods_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of animal-sourced foods relative to the starchy staples in a least-cost healthy diet
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: |-
           Cost of the least expensive animal-source foods as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
@@ -156,8 +156,8 @@ tables:
           - *description_healthy_diet
       cost_of_fruits_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of fruits relative to the starchy staples in a least-cost healthy diet
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: |-
           Cost of the least expensive fruits as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
@@ -198,8 +198,8 @@ tables:
           - *description_healthy_diet
       cost_of_legumes__nuts_and_seeds_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of legumes, nuts and seeds relative to the starchy staples in a least-cost healthy diet
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: |-
           Cost of the least expensive legumes, nuts and seeds as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
@@ -223,8 +223,8 @@ tables:
           - *description_healthy_diet
       cost_of_oils_and_fats_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of oils and fats relative to the starchy staples in a least-cost healthy diet
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: |-
           Cost of the least expensive oils and fats as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:
@@ -284,8 +284,8 @@ tables:
           - *description_healthy_diet
       cost_of_vegetables_relative_to_the_starchy_staples_in_a_least_cost_healthy_diet:
         title: Cost of vegetables relative to the starchy staples in a least-cost healthy diet
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: |-
           Cost of the least expensive vegetables as a multiple of the least expensive starchy staples to meet daily recommendations in food-based dietary guidelines.
         description_key:

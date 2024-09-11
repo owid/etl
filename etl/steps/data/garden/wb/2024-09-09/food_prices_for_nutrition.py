@@ -14,16 +14,41 @@ EXPECTED_CLASSIFICATIONS = ["FPN 1.0", "FPN 1.1", "FPN 2.0", "FPN 2.1", "FPN 3.0
 # Classification to adopt (by default, the latest one).
 CLASSIFICATION = EXPECTED_CLASSIFICATIONS[-1]
 
+# All costs are given in constant 2021 PPP$ per person per day, except for the cost of a healthy diet,
+# which is reported in current PPP$ per person per day for each year.
+# To express the healthy diet costs in constant 2021 PPP$, we need to adjust for inflation.
+# This is done by multiplying the cost in a given YEAR by the ratio CPI(BASE_YEAR) / CPI(YEAR).
+# Base year for CPI corrections.
+CPI_BASE_YEAR = 2021
 
-def adapt_units(tb: Table) -> Table:
+
+def adapt_units(tb: Table, tb_wdi: Table) -> Table:
     # Change units from million people to people.
     for column in [column for column in tb.columns if column.startswith("millions_of_people")]:
         tb[column] *= 1e6
         tb = tb.rename(columns={column: column.replace("millions_of_people", "people")}, errors="raise")
 
     # Convert units expressed as fractions to percentages.
-    for column in [column for column in tb.columns if column.startswith(("cost_share_", "affordability_"))]:
+    for column in [
+        column
+        for column in tb.columns
+        if (column.startswith(("cost_share_", "affordability_")) or "relative_to_the_" in column)
+    ]:
         tb[column] *= 100
+
+    # Get CPI from WDI.
+    tb_cpi = tb_wdi[tb_wdi["country"] == "United States"][["year", "fp_cpi_totl"]].reset_index(drop=True)
+    # Get the value of CPI for the base year.
+    cpi_base_value = tb_cpi[tb_cpi["year"] == CPI_BASE_YEAR]["fp_cpi_totl"].item()
+    # Create an adjustment factor.
+    tb_cpi["cpi_adjustment_factor"] = cpi_base_value / tb_cpi["fp_cpi_totl"]
+    # Add CPI column to main table.
+    tb = tb.merge(tb_cpi[["year", "cpi_adjustment_factor"]], on=["year"], how="left")
+    # Multiply the cost of a healthy diet (given in current PPP$) by the adjustment factor, to correct for inflation
+    # and express the values in constant 2021 PPP$.
+    tb["cost_of_a_healthy_diet"] *= tb["cpi_adjustment_factor"]
+    # Drop unnecessary column.
+    tb = tb.drop(columns=["cpi_adjustment_factor"], errors="raise")
 
     return tb
 
@@ -35,6 +60,11 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("food_prices_for_nutrition")
     tb = ds_meadow.read_table("food_prices_for_nutrition")
+
+    # Load the World Development Indicators (WDI) dataset to get the U.S. Consumer Price Index (CPI),
+    # which will be used to correct for inflation and express costs in constant 2021 PPP$.
+    ds_wdi = paths.load_dataset("wdi")
+    tb_wdi = ds_wdi.read_table("wdi")
 
     #
     # Process data.
@@ -56,8 +86,8 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # Adapt units.
-    tb = adapt_units(tb=tb)
+    # Adapt units and correct for inflation.
+    tb = adapt_units(tb=tb, tb_wdi=tb_wdi)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format()
