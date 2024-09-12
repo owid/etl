@@ -11,22 +11,20 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
+    # Load garden dataset.
     ds_garden = paths.load_dataset("igme")
 
     # Read table from garden dataset.
     tb = ds_garden["igme"]
+    tb_youth = ds_garden["igme_under_fifteen_mortality"]
 
-    #
-    # Process data.
-    #
-
+    tb = tb.reorder_levels(["country", "year", "unit_of_measure", "indicator", "sex", "wealth_quintile"])
+    tb_youth = tb_youth.reorder_levels(["country", "year", "unit_of_measure", "indicator", "sex", "wealth_quintile"])
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
-    )
+    ds_grapher = create_dataset(dest_dir, tables=[tb, tb_youth], default_metadata=ds_garden.metadata)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

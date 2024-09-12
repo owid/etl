@@ -4,7 +4,7 @@ definitions:
       topic_tags:
         - Child & Infant Mortality
   sex: |-
-    <% if sex == "Both sexes" %><% elif sex == "Male" %>male <% elif sex == "Female" %>female <%- endif -%>
+    <% if sex == "Total" %><% elif sex == "Male" %>male <% elif sex == "Female" %>female <%- endif -%>
   wealth_quintile: |-
     <% if wealth_quintile == "All wealth quintiles" %>all wealth quintiles<% elif wealth_quintile == "Poorest quintile" %>the poorest 20% of the population<% elif wealth_quintile == "Second poorest quintile" %>the second poorest 20% of the population<% elif wealth_quintile == "Middle wealth quintile" %>the middle 20% of the population in terms of wealth<% elif wealth_quintile == "Fourth poorest quintile" %>the second richest 20% of the population<% elif wealth_quintile == "Richest quintile" %>the richest 20% of the population<%- endif -%>
   unit_of_measure:
