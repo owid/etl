@@ -61,6 +61,8 @@ steps:
     - data://meadow/climate/2024-09-11/total_precipitation
   data://grapher/climate/2024-09-11/total_precipitation:
     - data://garden/climate/2024-09-11/total_precipitation
+  data://grapher/climate/2024-09-11/total_precipitation_annual_average:
+    - data://garden/climate/2024-09-11/total_precipitation
   #
   # Climate change impacts data explorer.
   #

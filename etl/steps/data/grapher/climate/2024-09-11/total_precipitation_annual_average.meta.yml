@@ -44,7 +44,7 @@ tables:
             {definitions.common_processing}
             {definitions.precipitation_anomaly}
 
-      total_precipitation_anomaly_decadal:
+      precipitation_anomaly_decadal:
         title: Decadal average precipitation anomaly
         description_short: |-
           The deviation of a specific decade's average precipitation from the 1991-2020 mean, in centimeters. {definitions.desc_update}

@@ -26,7 +26,9 @@ def run(dest_dir: str) -> None:
 
     # Group by year and calculate the mean of the specified columns
     tb_annual_average = (
-        tb.groupby(["year", "country"]).agg({"temperature_2m": "mean", "temperature_anomaly": "mean"}).reset_index()
+        tb.groupby(["year", "country"])
+        .agg({"total_precipitation": "mean", "precipitation_anomaly": "mean"})
+        .reset_index()
     )
 
     # Convert the 'year' column to integer type
@@ -37,17 +39,21 @@ def run(dest_dir: str) -> None:
 
     # Group by decade and country, then calculate the mean for specified columns
     tb_decadal_average = (
-        tb_annual_average.groupby(["decade", "country"])[["temperature_anomaly", "temperature_2m"]].mean().reset_index()
+        tb_annual_average.groupby(["decade", "country"])[["total_precipitation", "precipitation_anomaly"]]
+        .mean()
+        .reset_index()
     )
     # Set the decadal values for 2020 to NaN
-    tb_decadal_average.loc[tb_decadal_average["decade"] == 2020, ["temperature_anomaly", "temperature_2m"]] = np.nan
+    tb_decadal_average.loc[tb_decadal_average["decade"] == 2020, ["total_precipitation", "precipitation_anomaly"]] = (
+        np.nan
+    )
     # Merge the decadal average Table with the original Table
     combined = pr.merge(
         tb_annual_average, tb_decadal_average, on=["decade", "country"], how="left", suffixes=("", "_decadal")
     )
 
     # Replace the decadal values with NaN for all years except the start of each decade
-    combined.loc[combined["year"] % 10 != 0, ["temperature_anomaly_decadal", "temperature_2m_decadal"]] = np.nan
+    combined.loc[combined["year"] % 10 != 0, ["total_precipitation", "precipitation_anomaly"]] = np.nan
     combined = combined.drop(columns=["decade"])
     # Filter rows where the year is less than or equal to 2024
     combined = combined.set_index(["year", "country"], verify_integrity=True)
