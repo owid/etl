@@ -58,10 +58,9 @@ def run(dest_dir: str) -> None:
     tb_com = tb_com.set_index(
         ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"], verify_integrity=True
     )
-
+    # Convert per 1000 live births to a percentage
     tb = convert_to_percentage(tb)
     # Calculate post neonatal deaths
-
     tb = add_post_neonatal_deaths(tb)
     # Save outputs.
     #
