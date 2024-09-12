@@ -35,7 +35,7 @@ class Explorer:
         # Configuration of the explorer (defined at the beginning of the file).
         self.config = {
             "explorerTitle": self.name,
-            "isPublished": "false",
+            "isPublished": False,
         }
         # Graphers table of the explorer.
         self.df_graphers = pd.DataFrame([], columns=["yVariableIds"])
@@ -210,6 +210,9 @@ class Explorer:
                 if isinstance(value, list):
                     # Special case that happens at least for the "selection" key, which is a list of strings.
                     config_part_row = f"{key}\t" + "\t".join(value)
+                elif isinstance(value, bool):
+                    # Convert True and False to "true" and "false".
+                    config_part_row = f"{key}\t{str(value).lower()}"
                 else:
                     # Normal case, where value is just one item.
                     config_part_row = f"{key}\t{value}"
