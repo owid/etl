@@ -43,19 +43,27 @@ def run(dest_dir: str) -> None:
         .mean()
         .reset_index()
     )
+
     # Set the decadal values for 2020 to NaN
     tb_decadal_average.loc[tb_decadal_average["decade"] == 2020, ["total_precipitation", "precipitation_anomaly"]] = (
         np.nan
     )
+
     # Merge the decadal average Table with the original Table
     combined = pr.merge(
         tb_annual_average, tb_decadal_average, on=["decade", "country"], how="left", suffixes=("", "_decadal")
     )
 
     # Replace the decadal values with NaN for all years except the start of each decade
-    combined.loc[combined["year"] % 10 != 0, ["total_precipitation", "precipitation_anomaly"]] = np.nan
+    combined.loc[combined["year"] % 10 != 0, ["total_precipitation_decadal", "precipitation_anomaly_decadal"]] = np.nan
+
+    # Drop the 'decade' column
     combined = combined.drop(columns=["decade"])
+
     # Filter rows where the year is less than or equal to 2024
+    combined = combined[combined["year"] <= 2024]
+
+    # Set the index to 'year' and 'country'
     combined = combined.set_index(["year", "country"], verify_integrity=True)
 
     # Save outputs.
