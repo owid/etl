@@ -781,6 +781,6 @@ steps:
 
 # Flu testing data
   data://garden/who/2024-09-09/flu_test:
-    - data://meadow/who/latest/fluid
+    - data://meadow/who/latest/flunet
   data://grapher/who/2024-09-09/flu_test:
     - data://garden/who/2024-09-09/flu_test
