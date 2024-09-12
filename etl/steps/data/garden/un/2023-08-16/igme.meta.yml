@@ -9,26 +9,12 @@ definitions:
     <% if wealth_quintile == "All wealth quintiles" %>all wealth quintiles<% elif wealth_quintile == "Poorest quintile" %>the poorest 20% of the population<% elif wealth_quintile == "Second poorest quintile" %>the second poorest 20% of the population<% elif wealth_quintile == "Middle wealth quintile" %>the middle 20% of the population in terms of wealth<% elif wealth_quintile == "Fourth poorest quintile" %>the second richest 20% of the population<% elif wealth_quintile == "Richest quintile" %>the richest 20% of the population<%- endif -%>
   unit_of_measure:
     unit: |-
-      <% if unit_of_measure == "Deaths per 100 live births" %>
-      deaths per 100 live births
-      <% elif unit_of_measure == "Deaths per 100 children aged 1 month"%>
-      deaths per 100 children aged 1 month
-      <% elif unit_of_measure == "Deaths per 100 children aged 10" %>
-      deaths per 100 children aged 10
-      <% elif unit_of_measure == "Deaths per 100 children aged 15" %>
-      deaths per 100 children aged 15
-      <% elif unit_of_measure == "Deaths per 100 children aged 1" %>
-      deaths per 100 children aged 1
-      <% elif unit_of_measure == "Deaths per 100 children aged 20" %>
-      deaths per 100 children aged 20
-      <% elif unit_of_measure == "Deaths per 100 children aged 5" %>
-      deaths per 100 children aged 5
-      <% elif unit_of_measure == "Number of stillbirths" %>
+      <% if unit_of_measure == "Number of stillbirths" %>
       stillbirths
-      <% elif unit_of_measure == "Stillbirths per 100 births" %>
-      stillbirths per 100 total births
       <% elif unit_of_measure == "Number of deaths" %>
       deaths
+      <% elif %>
+      <<unit_of_measure.lower()>>
       <%- endif -%>
   indicator:
     display_name: |-
@@ -128,16 +114,14 @@ tables:
   igme_under_fifteen_mortality:
     variables:
       obs_value:
-        title: Under fifteen mortality
+        title: Under fifteen mortality rate
         description_processing: This indicator is processed by OWID based on the original data source. It is a combination of the under-five mortality rate and the 5-14 mortality rate.
-        unit: |-
-          {definitions.unit_of_measure.unit}
-        short_unit: <% if 'rate' in indicator %>%<% else %><%- endif -%>
+        unit: deaths per 100 live births
         display:
-          name: |-
-            {definitions.indicator.display_name}
-          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
+          name: Under fifteen mortality rate
+
+          numDecimalPlaces: 1
         sources:
-          - name: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2023)
+          - name: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2024)
         presentation:
-          attribution: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2023)
+          attribution: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2024)
