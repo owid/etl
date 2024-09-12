@@ -162,6 +162,7 @@ def run(dest_dir: str) -> None:
         "explorerTitle": "Minerals",
         "explorerSubtitle": "Explore the production, reserves and value of minerals.",
         "selection": ["World", "Australia", "Chile", "China", "United States"],
+        "isPublished": True,
     }
 
     # To begin with, create linear map brackets between 0% and 100% for "share" columns.
