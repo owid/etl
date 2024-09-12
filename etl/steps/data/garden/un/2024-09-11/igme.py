@@ -88,6 +88,7 @@ def convert_to_percentage(tb: Table) -> Table:
     """
     rate_conversions = {
         "Deaths per 1,000 live births": "Deaths per 100 live births",
+        "Deaths per 1,000 children aged 1 month": "Deaths per 100 children aged 1 month",
         "Deaths per 1,000 children aged 1": "Deaths per 100 children aged 1",
         "Deaths per 1,000 children aged 5": "Deaths per 100 children aged 5",
         "Deaths per 1,000 children aged 10": "Deaths per 100 children aged 10",
@@ -105,7 +106,7 @@ def convert_to_percentage(tb: Table) -> Table:
         selected_rows, ["obs_value", "lower_bound", "upper_bound"]
     ].div(10)
 
-    tb = tb.replace({"unit_of_measure": rate_conversions}, errors="raise")
+    tb = tb.replace({"unit_of_measure": rate_conversions})
 
     return tb
 
