@@ -1188,6 +1188,19 @@ def run(dest_dir: str) -> None:
         "value",
     ] = None
 
+    # Chromium in Colombia has spurious jumps and zeros in the 1970s.
+    # Looking at the World Mineral Statistics:
+    # https://www.bgs.ac.uk/mineralsuk/statistics/world-mineral-statistics/world-mineral-statistics-archive/
+    # It seems that the zero may be spurious (not found in any of those PDFs) and all values are estimated.
+    # I'll remove them.
+    tb.loc[
+        (tb["commodity"] == "Chromium")
+        & (tb["sub_commodity"] == "Mine")
+        & (tb["country"] == "Colombia")
+        & (tb["year"] <= 1976),
+        "value",
+    ] = None
+
     ####################################################################################################################
 
     # Combine all subcommodities of coal production, and fix some issues.
