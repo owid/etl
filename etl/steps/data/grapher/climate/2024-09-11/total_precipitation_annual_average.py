@@ -60,9 +60,6 @@ def run(dest_dir: str) -> None:
     # Drop the 'decade' column
     combined = combined.drop(columns=["decade"])
 
-    # Filter rows where the year is less than or equal to 2024
-    combined = combined[combined["year"] <= 2024]
-
     # Set the index to 'year' and 'country'
     combined = combined.set_index(["year", "country"], verify_integrity=True)
 
