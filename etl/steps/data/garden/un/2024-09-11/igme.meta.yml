@@ -131,6 +131,7 @@ tables:
         title: Under fifteen mortality rate
         description_processing: This indicator is processed by OWID based on the original data source. It is a combination of the under-five mortality rate and the 5-14 mortality rate.
         unit: deaths per 100 live births
+        short_unit: "%"
         display:
           name: Under fifteen mortality rate
           numDecimalPlaces: 1
