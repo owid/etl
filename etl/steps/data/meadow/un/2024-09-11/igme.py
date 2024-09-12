@@ -1,7 +1,4 @@
 """Load a snapshot and create a meadow dataset."""
-import zipfile
-
-import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -17,9 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("igme.zip")
 
     # Load data from snapshot.
-    zf = zipfile.ZipFile(snap.path)
-    tb = pr.read_csv(zf.open("UN IGME 2023.csv"), low_memory=False, metadata=snap.to_table_metadata())
-
+    tb = snap.read_in_archive("UN IGME 2023.csv", low_memory=False)
     #
     # Process data.
     #
