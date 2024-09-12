@@ -24,9 +24,12 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year"])
     tb = tb.rename(columns={"Geographic area": "country", "REF_DATE": "year"}, errors="raise")
-    tb = tb.format(["country", "year", "indicator", "sex", "wealth_quintile", "series_name", "regional_group"])
+    # There are some duplicated values in the UNICEF regions - so let's remove those. I wrote to UN IGME to report this 2024-09-12.
+    tb = tb[tb["Regional group"] != "UNICEF"]
+    tb = tb.format(
+        ["country", "year", "indicator", "sex", "wealth_quintile", "series_name", "regional_group", "unit_of_measure"]
+    )
     #
     # Save outputs.
     #
