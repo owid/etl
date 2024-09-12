@@ -71,6 +71,19 @@ def get_chart_diffs():
         with st.spinner("Getting charts from database..."):
             st.session_state.chart_diffs = get_chart_diffs_from_grapher(SOURCE_ENGINE, TARGET_ENGINE)
 
+    ####################################################################################################################
+    # TODO: Remove this temporary patch.
+    # Newly created draft charts have latest_update None, which causes chart diff to crash.
+    #  For now, ignore draft charts.
+    if any([chart_diff for chart_diff in st.session_state.chart_diffs.items() if chart_diff[1].latest_update is None]):
+        st.warning("Ignoring draft charts, which cause chart diff to crash")
+        st.session_state.chart_diffs = {
+            chart_diff[0]: chart_diff[1]
+            for chart_diff in st.session_state.chart_diffs.items()
+            if chart_diff[1].latest_update is not None
+        }
+    ####################################################################################################################
+
     # Sort charts
     st.session_state.chart_diffs = dict(
         sorted(st.session_state.chart_diffs.items(), key=lambda item: item[1].latest_update, reverse=True)
