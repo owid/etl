@@ -1,4 +1,3 @@
-
 definitions:
   common:
     unit: centimeters
@@ -17,19 +16,21 @@ definitions:
     - The derived precipitation for each country is calculated based on administrative borders, encompassing all land surface types within these areas. As a result, precipitation over oceans and seas is not included in these averages, keeping the data focused on terrestrial environments.
     - Global precipitation averages and anomalies, however, are calculated over both land and ocean surfaces.
   precipitation_anomaly: |-
-    - The precipitation anomaly is calculated by comparing the average surface precipitation of a specific time period (e.g., a particular year or month) to the mean surface precipitation of the same period from 1991 to 2020.
-    - When calculating anomalies for each country, the average surface precipitation of a given year or month is compared to the 1991-2020 mean precipitation for that specific country.
+    - The precipitation anomaly is calculated by comparing the average precipitation of a specific time period (e.g., a particular year or month) to the mean surface precipitation of the same period from 1991 to 2020.
+    - When calculating anomalies for each country, the average precipitation of a given year or month is compared to the 1991-2020 mean precipitation for that specific country.
     - The reason for using the 1991-2020 period as the reference mean is that it is the standard reference period used by our data source, the Copernicus Climate Change Service. This period is also adopted by the UK Met Office. This approach ensures consistency in identifying climate variations over time.
 
+  desc_update: The 2024 data is incomplete and was last updated {TODAY}.
+
 dataset:
-  title: Monthly precipitation by country
+  title: Annual precipitation and anomalies by country
 
 tables:
   total_precipitation:
     variables:
       total_precipitation:
         title: Total precipitation
-        description_short: Total monthly amount of rain and snow that falls to the Earth's surface, reported as the depth of water over a given time period, excluding fog, dew, and evaporated precipitation.
+        description_short: Total annual amount of rain and snow that falls to the Earth's surface, reported as the depth of water over a given time period, excluding fog, dew, and evaporated precipitation.  {definitions.desc_update}
         description_processing: |-
             {definitions.common_processing}
             {definitions.precipitation_anomaly}
@@ -38,7 +39,26 @@ tables:
       precipitation_anomaly:
         title: Precipitation anomaly
         description_short: |-
-          The difference between the total precipitation in a specific month and the average total precipitation for that month, in centimeters.
+          The deviation of a specific year's average amount of rain and snow from the 1991-2020 mean, in centimeters. {definitions.desc_update}
         description_processing: |-
             {definitions.common_processing}
             {definitions.precipitation_anomaly}
+
+      total_precipitation_anomaly_decadal:
+        title: Decadal average precipitation anomaly
+        description_short: |-
+          The deviation of a specific decade's average precipitation from the 1991-2020 mean, in centimeters. {definitions.desc_update}
+
+        description_processing: |-
+            {definitions.common_processing}
+            {definitions.precipitation_anomaly}
+            - Decadal average precipitation anomaly is calculated by averaging the annual precipitation anomaly values for each decade.
+
+      total_precipitation_decadal:
+        title: Decadal average total precipitation
+        description_short: |-
+          Average decadal amount of rain and snow that falls to the Earth's surface, reported as the depth of water over a given time period, excluding fog, dew, and evaporated precipitation.
+        description_processing: |-
+            {definitions.common_processing}
+            {definitions.precipitation_anomaly}
+            - Decadal average total precipitation is calculated by averaging the annual total precipitation values for each decade.

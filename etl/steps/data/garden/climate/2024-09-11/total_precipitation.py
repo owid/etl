@@ -27,6 +27,7 @@ def run(dest_dir: str) -> None:
 
     tb["year"] = tb["time"].astype(str).str[0:4]
     tb["month"] = tb["time"].astype(str).str[5:7]
+    tb["total_precipitation"] = tb["total_precipitation"] * 100  # Convert from m to cm
     # Use the baseline from the Copernicus Climate Service https://climate.copernicus.eu/surface-air-temperature-january-2024
     tb_baseline = tb[(tb["year"].astype(int) > 1990) & (tb["year"].astype(int) < 2021)]
     tb_baseline = tb_baseline.groupby(["country", "month"], as_index=False)["total_precipitation"].mean()
