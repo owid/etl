@@ -18,12 +18,12 @@ def test_yield_wide_table():
     df = pd.DataFrame(
         {
             "year": [2019, 2020, 2021],
-            "entity_id": [1, 2, 3],
+            "entityId": [1, 2, 3],
             "_1": [1, 2, 3],
             "a__pct": [1, 2, 3],
         }
     )
-    table = Table(df.set_index(["entity_id", "year"]))
+    table = Table(df.set_index(["entityId", "year"]))
     table._1.metadata.unit = "kg"
     table.a__pct.metadata.unit = "pct"
 
@@ -31,7 +31,7 @@ def test_yield_wide_table():
 
     assert tables[0].reset_index().to_dict(orient="list") == {
         "_1": [1, 2, 3],
-        "entity_id": [1, 2, 3],
+        "entityId": [1, 2, 3],
         "year": [2019, 2020, 2021],
     }
     assert tables[0].metadata.short_name == "_1"
@@ -39,7 +39,7 @@ def test_yield_wide_table():
 
     assert tables[1].reset_index().to_dict(orient="list") == {
         "a__pct": [1, 2, 3],
-        "entity_id": [1, 2, 3],
+        "entityId": [1, 2, 3],
         "year": [2019, 2020, 2021],
     }
     assert tables[1].metadata.short_name == "a__pct"
@@ -50,12 +50,12 @@ def test_yield_wide_table_with_dimensions():
     df = pd.DataFrame(
         {
             "year": [2019, 2019, 2019, 2019],
-            "entity_id": [1, 1, 1, 1],
+            "entityId": [1, 1, 1, 1],
             "age": ["10-18", "19-25", "19-25", np.nan],
             "deaths": [1, 2, 3, 4],
         }
     )
-    table = Table(df.set_index(["entity_id", "year", "age"]))
+    table = Table(df.set_index(["entityId", "year", "age"]))
     table.deaths.metadata.unit = "people"
     table.deaths.metadata.title = "Deaths"
     grapher_tables = list(gh._yield_wide_table(table))
@@ -185,22 +185,32 @@ def _sample_table() -> Table:
 
 def test_adapt_table_for_grapher_multiindex():
     with mock.patch("etl.grapher_helpers._get_entities_from_db") as mock_get_entities_from_db:
-        mock_get_entities_from_db.return_value = {"Poland": 1, "France": 2}
+        with mock.patch("apps.backport.datasync.data_metadata._fetch_entities") as mock_fetch_entities:
+            mock_get_entities_from_db.return_value = {"Poland": 1, "France": 2}
+            mock_fetch_entities.return_value = pd.DataFrame(
+                {
+                    "entityId": [1, 2],
+                    "entityName": ["Poland", "France"],
+                    "entityCode": ["PL", "FR"],
+                }
+            )
 
-        table = _sample_table()
-        out_table = gh._adapt_table_for_grapher(table)
-        assert out_table.index.names == ["entity_id", "year"]
-        assert out_table.columns.tolist() == ["deaths", "sex"]
+            engine = mock.Mock()
 
-        table = _sample_table().set_index(["country", "year", "sex"])
-        out_table = gh._adapt_table_for_grapher(table)
-        assert out_table.index.names == ["entity_id", "year", "sex"]
-        assert out_table.columns.tolist() == ["deaths"]
+            table = _sample_table()
+            out_table = gh._adapt_table_for_grapher(table, engine)
+            assert out_table.index.names == ["entityId", "entityCode", "entityName", "year"]
+            assert out_table.columns.tolist() == ["deaths", "sex"]
 
-        table = _sample_table().set_index(["sex"])
-        out_table = gh._adapt_table_for_grapher(table)
-        assert out_table.index.names == ["entity_id", "year", "sex"]
-        assert out_table.columns.tolist() == ["deaths"]
+            table = _sample_table().set_index(["country", "year", "sex"])
+            out_table = gh._adapt_table_for_grapher(table, engine)
+            assert out_table.index.names == ["entityId", "entityCode", "entityName", "year", "sex"]
+            assert out_table.columns.tolist() == ["deaths"]
+
+            table = _sample_table().set_index(["sex"])
+            out_table = gh._adapt_table_for_grapher(table, engine)
+            assert out_table.index.names == ["entityId", "entityCode", "entityName", "year", "sex"]
+            assert out_table.columns.tolist() == ["deaths"]
 
 
 def test_expand_jinja():
