@@ -28,12 +28,12 @@ tables:
   diagnosis_routes_by_route:
     variables:
       count_by_route:
-        title: Number of stage.lower() site.lower() cancer diagnoses by route.lower()
+        title: Number of << stage.lower() >> << site.lower() >>cancer diagnoses by << route.lower() >>
         description_short: |-
           {definitions.route}
         unit: cases
       percentage_by_route:
-        title: Share of stage.lower() site.lower() cancer diagnoses by route.lower()
+        title: Share of << stage.lower() >> << site.lower() >> cancer diagnoses by << route.lower() >>
         description_short: |-
           {definitions.route}
         unit: '%'

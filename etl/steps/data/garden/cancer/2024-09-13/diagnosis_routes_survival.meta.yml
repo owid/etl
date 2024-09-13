@@ -28,12 +28,12 @@ tables:
   diagnosis_routes_survival:
     variables:
       patients:
-        title: Number of gender.lower() patients with site.lower() cancer diagnoses by route.lower() that are at stage.lower()
+        title: Number of << gender.lower() >> patients with << site.lower() >> cancer diagnoses by << route.lower() >> that are at << stage.lower() >>
         description_short: |-
           {definitions.route}
         unit: cases
       survival:
-        title: Age-standardized length.lower() rate of site.lower() cancer diagnoses by route.lower() that are at stage.lower() among gender.lower() patients
+        title: Age-standardized << length.lower() >> rate of << site.lower() >> cancer diagnoses by << route.lower() >> that are at << stage.lower() >> among << gender.lower() >> patients
         description_short: |-
           {definitions.route}
         unit: '%'
