@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Cancer
+      grapher_config:
+        note: The year represents the start of the 5-year age-standardised survival estimates by cancer site for 5-year rolling cohorts from 2006-2010 to 2016-2020.
 
   diag_route: &diag_route |-
     <% if route == "Screening" %>
@@ -11,11 +13,15 @@ definitions:
     <% elif route == "USC" %>
     USC (Urgent Suspected Cancer)refers to urgent GP referrals with a suspicion of cancer (previously known as two-week wait/TWW).
     <% elif route == "GP referral" %>
-    GP referral includes routine and urgent referrals where the patient was not referred under the USC (Urgent Suspected Cancer) route, meaning the referral was not made with an immediate suspicion of cancer.
+    Routine and urgent referrals where the patient was not referred under the USC (Urgent Suspected Cancer) referral route
     <% elif route == "Emergency presentation" %>
-    Emergency presentation is an emergency route via accident and emergency (A&E), emergency GP referral, emergency transfer, emergency admission, or attendance.
-    <% elif route == "Other route" %>
-    Other route is an elective route starting with an outpatient appointment that is either a self-referral, consultant to consultant referral, other or unknown referral (excludes patients originally referred under the USC referral route).
+    An emergency route via accident and emergency (A&E), emergency GP referral, emergency transfer, emergency admission or attendance.
+    <% elif route == "Other outpatient" %>
+    An elective route starting with an outpatient appointment that is either a self-referral, consultant to consultant referral, other or unknown referral (excludes patients originally referred under the USC referral route)
+    <% elif route == "Inpatient elective" %>
+    No earlier information can be found prior to admission from a waiting list, booked or planned.
+    <% elif route == "Unknown route" %>
+    No relevant data available from Inpatient or Outpatient HES, National Cancer Waiting Times or National Screening Programmes.
     <% endif %>
   sex: |-
     <% if gender == "Persons" %>all<% elif gender == "Male" %>male<% elif gender == "Female" %>female<% endif %>
@@ -33,14 +39,14 @@ tables:
       patients:
         title: Number of {definitions.sex} patients diagnosed via << route.lower() >> surviving at the end of the << length.lower() >> period
         description_short: |-
-          The number of {definitions.sex} patients diagnosed via << route.lower() >> route surviving at the end of the << length.lower() >> period. The year represents the start of the 5-year age-standardised survival estimates by cancer site for 5-year rolling cohorts from 2006-2010 to 2016-2020.
+          The number of {definitions.sex} patients diagnosed via << route.lower() >> route surviving at the end of the << length.lower() >> period.
         description_key:
           - *diag_route
         unit: cases
       survival:
         title: Age-standardized << length.lower() >> survival rate diagnosed via << route.lower() >> among {definitions.sex} patients
         description_short: |-
-          The age-standardized << length.lower() >> survival rate diagnosed via << route.lower() >> route among {definitions.sex} patients. The year represents the start of the 5-year age-standardised survival estimates by cancer site for 5-year rolling cohorts from 2006-2010 to 2016-2020.
+          The age-standardized << length.lower() >> survival rate diagnosed via << route.lower() >> route among {definitions.sex} patients.
         description_key:
           - *diag_route
         unit: '%'
