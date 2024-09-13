@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Unknown
+    title: Unknown
+    citation_full: Unknown
+    version_producer: Local CSV
+    url_main: https://unknown.com
+    url_download: pivot_uk_public_spending.csv
+    date_accessed: '2024-09-13'
+    date_published: '2024-09-13'
+  name: DRAFT pivot_uk_public_spending
+  description: ''
+outs:
+  - md5: d55d1a3683767a08925060412e79a1b1
+    size: 1511
+    path: pivot_uk_public_spending.csv

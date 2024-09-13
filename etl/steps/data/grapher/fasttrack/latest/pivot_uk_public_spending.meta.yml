@@ -1,0 +1,96 @@
+dataset:
+  title: DRAFT pivot_uk_public_spending
+  description: ''
+tables:
+  pivot_uk_public_spending:
+    variables:
+      expenditure_absolute__sector_business_and_industry:
+        title: expenditure_absolute__sector_Business and industry
+        unit: ''
+      expenditure_absolute__sector_culture:
+        title: expenditure_absolute__sector_Culture
+        unit: ''
+      expenditure_absolute__sector_defense:
+        title: expenditure_absolute__sector_Defense
+        unit: ''
+      expenditure_absolute__sector_education:
+        title: expenditure_absolute__sector_Education
+        unit: ''
+      expenditure_absolute__sector_environment:
+        title: expenditure_absolute__sector_Environment
+        unit: ''
+      expenditure_absolute__sector_foreign_aid:
+        title: expenditure_absolute__sector_Foreign aid
+        unit: ''
+      expenditure_absolute__sector_government_administration:
+        title: expenditure_absolute__sector_Government administration
+        unit: ''
+      expenditure_absolute__sector_health:
+        title: expenditure_absolute__sector_Health
+        unit: ''
+      expenditure_absolute__sector_housing_and_utilities:
+        title: expenditure_absolute__sector_Housing and utilities
+        unit: ''
+      expenditure_absolute__sector_national_debt_interest:
+        title: expenditure_absolute__sector_National debt interest
+        unit: ''
+      expenditure_absolute__sector_outstanding_payments_to_the_eu:
+        title: expenditure_absolute__sector_Outstanding payments to the EU
+        unit: ''
+      expenditure_absolute__sector_public_order_and_safety:
+        title: expenditure_absolute__sector_Public order and safety
+        unit: ''
+      expenditure_absolute__sector_state_pensions:
+        title: expenditure_absolute__sector_State pensions
+        unit: ''
+      expenditure_absolute__sector_transport:
+        title: expenditure_absolute__sector_Transport
+        unit: ''
+      expenditure_absolute__sector_welfare:
+        title: expenditure_absolute__sector_Welfare
+        unit: ''
+      expenditure_relative__sector_business_and_industry:
+        title: expenditure_relative__sector_Business and industry
+        unit: ''
+      expenditure_relative__sector_culture:
+        title: expenditure_relative__sector_Culture
+        unit: ''
+      expenditure_relative__sector_defense:
+        title: expenditure_relative__sector_Defense
+        unit: ''
+      expenditure_relative__sector_education:
+        title: expenditure_relative__sector_Education
+        unit: ''
+      expenditure_relative__sector_environment:
+        title: expenditure_relative__sector_Environment
+        unit: ''
+      expenditure_relative__sector_foreign_aid:
+        title: expenditure_relative__sector_Foreign aid
+        unit: ''
+      expenditure_relative__sector_government_administration:
+        title: expenditure_relative__sector_Government administration
+        unit: ''
+      expenditure_relative__sector_health:
+        title: expenditure_relative__sector_Health
+        unit: ''
+      expenditure_relative__sector_housing_and_utilities:
+        title: expenditure_relative__sector_Housing and utilities
+        unit: ''
+      expenditure_relative__sector_national_debt_interest:
+        title: expenditure_relative__sector_National debt interest
+        unit: ''
+      expenditure_relative__sector_outstanding_payments_to_the_eu:
+        title: expenditure_relative__sector_Outstanding payments to the EU
+        unit: ''
+      expenditure_relative__sector_public_order_and_safety:
+        title: expenditure_relative__sector_Public order and safety
+        unit: ''
+      expenditure_relative__sector_state_pensions:
+        title: expenditure_relative__sector_State pensions
+        unit: ''
+      expenditure_relative__sector_transport:
+        title: expenditure_relative__sector_Transport
+        unit: ''
+      expenditure_relative__sector_welfare:
+        title: expenditure_relative__sector_Welfare
+        unit: ''
