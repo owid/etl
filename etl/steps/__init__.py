@@ -598,7 +598,7 @@ class DataStep(Step):
         if sys.platform == "linux":
             args.extend(["prlimit", f"--as={config.MAX_VIRTUAL_MEMORY_LINUX}"])
 
-        args.extend(["poetry", "run", "etl", "d", "run-python-step"])
+        args.extend(["uv", "run", "etl", "d", "run-python-step"])
 
         if config.IPDB_ENABLED:
             args.append("--ipdb")
@@ -610,8 +610,12 @@ class DataStep(Step):
             ]
         )
 
+        # Add uv to the path, it causes problems in Buildkite
+        env = os.environ.copy()
+        env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
+
         try:
-            subprocess.check_call(args, env=os.environ.copy())
+            subprocess.check_call(args, env=env)
         except subprocess.CalledProcessError:
             # swallow this exception and just exit -- the important stack trace
             # will already have been printed to stderr

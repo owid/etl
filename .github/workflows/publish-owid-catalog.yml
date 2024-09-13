@@ -19,12 +19,14 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install Poetry
-      run: curl -sSL https://install.python-poetry.org | python3 -
+    - name: Install UV
+      run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
     - name: Publish
       env:
-        POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+        TWINE_USERNAME: ourworldindata
+        TWINE_PASSWORD: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
       run: |
         cd lib/catalog &&
-        poetry publish --build -u ourworldindata
+        uv build &&
+        uvx twine upload dist/*
