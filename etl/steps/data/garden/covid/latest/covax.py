@@ -55,7 +55,8 @@ def run(dest_dir: str) -> None:
 def extract_table(tb: Table, indicator_name: str) -> Table:
     tb = tb.loc[:, ["country", "year"] + list(tb.filter(regex=f"{indicator_name}.*").columns)]
 
-    rename = {col: col.replace(f"{indicator_name}_", "").replace(indicator_name, "absolute") for col in tb.columns}
+    # TODO: Can't have multiple columns (across different tables) with the same name!
+    # rename = {col: col.replace(f"{indicator_name}_", "").replace(indicator_name, "absolute") for col in tb.columns}
 
-    tb = tb.rename(columns=rename)
+    # tb = tb.rename(columns=rename)
     return tb
