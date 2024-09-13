@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -20,7 +19,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "date"])
 
     #
     # Save outputs.
