@@ -786,6 +786,13 @@ steps:
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
 
+  data://meadow/un/2024-09-11/igme:
+    - snapshot://un/2024-09-11/igme.zip
+  data://garden/un/2024-09-11/igme:
+    - data://meadow/un/2024-09-11/igme
+    - data://garden/un/2018/igme
+  data://grapher/un/2024-09-11/igme:
+    - data://garden/un/2024-09-11/igme
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
