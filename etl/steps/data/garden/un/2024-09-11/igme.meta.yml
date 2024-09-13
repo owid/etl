@@ -128,15 +128,15 @@ tables:
   igme_under_fifteen_mortality:
     variables:
       obs_value:
-        title: Under fifteen mortality rate
+        title: <<indicator>>
         description_processing: This indicator is processed by OWID based on the original data source. It is a combination of the under-five mortality rate and the 5-14 mortality rate.
-        unit: deaths per 100 live births
+        unit: <<unit_of_measure.lower()>>
         short_unit: "%"
         display:
-          name: Under fifteen mortality rate
-          numDecimalPlaces: 1
+          name: <<indicator>>
+          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
         sources:
           - name: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2024)
         presentation:
           attribution: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2024)
-          title_public: Under fifteen mortality rate
+          title_public: <<indicator>>
