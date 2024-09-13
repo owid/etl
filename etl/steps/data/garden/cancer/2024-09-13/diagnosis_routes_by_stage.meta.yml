@@ -4,7 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Cancer
-  route: &route |-
+  diag_route: &diag_route |-
     <% if route == "Screening" %>
     Screening is flagged by the cancer registry as detected via the breast, bowel, or cervical screening programmes.
     <% elif route == "USC" %>
@@ -27,13 +27,13 @@ tables:
   diagnosis_routes_by_stage:
     variables:
       count_by_stage:
-        title: Number of << site.lower() >> cancer diagnoses by << route.lower() >> that are at << stage.lower() >>
+        title: Number of << site.lower() >> cancer diagnoses via the << route.lower() >> route that are at << stage.lower() >>
         description_key:
-          - *route
+          - *diag_route
         unit: cases
       percentage_by_stage:
-        title: Share of << site.lower() >> cancer diagnoses by << route.lower() >>  that are at << stage.lower() >>
+        title: Share of << site.lower() >> cancer diagnoses via the << route.lower() >> route that are at << stage.lower() >>
         description_key:
-          - *route
+          - *diag_route
         unit: '%'
         short_unit: '%'
