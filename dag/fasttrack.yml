@@ -224,3 +224,5 @@ steps:
     - snapshot://fasttrack/latest/africa_cdc.csv
   data://grapher/fasttrack/latest/elephant_populations:
     - snapshot://fasttrack/latest/elephant_populations.csv
+  data://grapher/fasttrack/latest/pivot_uk_public_spending:
+    - snapshot://fasttrack/latest/pivot_uk_public_spending.csv

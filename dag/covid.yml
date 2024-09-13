@@ -249,3 +249,11 @@ steps:
     - data://meadow/excess_mortality/latest/excess_mortality_economist
   data-private://grapher/excess_mortality/latest/excess_mortality_economist:
     - data://garden/excess_mortality/latest/excess_mortality_economist
+
+  # COVAX
+  data://meadow/covid/latest/covax:
+    - snapshot://covid/latest/covax.csv
+  data://garden/covid/latest/covax:
+    - data://meadow/covid/latest/covax
+  data://grapher/covid/latest/covax:
+    - data://garden/covid/latest/covax
