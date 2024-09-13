@@ -286,11 +286,20 @@ class Chart(Base):
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
     isIndexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
-    updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
+    _updatedAt: Mapped[datetime] = mapped_column("updatedAt", DateTime, init=False)
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     publishedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
 
     chart_config: Mapped["ChartConfig"] = relationship("ChartConfig", back_populates="chartss", lazy="joined")
+
+    @hybrid_property
+    def updatedAt(self) -> datetime:  # type: ignore
+        # updatedAt is None if the chart is new, it only gets populated once we save it
+        return self._updatedAt or self.createdAt
+
+    @updatedAt.setter
+    def updatedAt(self, value: datetime):
+        self._updatedAt = value
 
     @hybrid_property
     def config(self) -> dict[str, Any]:  # type: ignore

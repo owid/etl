@@ -1,0 +1,12 @@
+dataset:
+  title: DRAFT pivot_uk_public_spending
+  description: ''
+tables:
+  pivot_uk_public_spending:
+    variables:
+      expenditure_absolute:
+        title: expenditure_absolute
+        unit: ''
+      expenditure_relative:
+        title: expenditure_relative
+        unit: ''
