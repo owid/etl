@@ -19,6 +19,9 @@ definitions:
     <% elif route == "Other route" %>
     Other route is an elective route starting with an outpatient appointment that is either a self-referral, consultant to consultant referral, other or unknown referral (excludes patients originally referred under the USC referral route).
     <% endif %>
+  sex: |-
+    <% if gender == "Persons" %>all individuals<% elif gender == "Male" %>men<% elif gender == "Female" %>women<% endif %>
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -30,16 +33,16 @@ tables:
   diagnosis_routes_survival:
     variables:
       patients:
-        title: Number of << gender.lower() >> patients with << site.lower() >> cancer diagnoses by << route.lower() >>
+        title: Number of {definitions.sex} patients with << site.lower() >> cancer diagnosed via << route.lower() >> surviving at the end of the  << length.lower() >> period
         description_short: |-
-          The number of patients diagnosed with << site.lower() >> cancer by << route.lower() >>
+          The number of {definitions.sex} patients diagnosed with << site.lower() >> cancer diagnosed via << route.lower() >> surviving at the end of the  << length.lower() >> period
         description_key:
           - *diag_route
         unit: cases
       survival:
-        title: Age-standardized << length.lower() >> rate of << site.lower() >> cancer survival diagnosed via << route.lower() >> among << gender.lower() >> patients
+        title: Age-standardized << length.lower() >> rate of << site.lower() >> cancer survival diagnosed via << route.lower() >> among {definitions.sex} patients
         description_short: |-
-          The age-standardized << length.lower() >> rate of << site.lower() >> cancer survival diagnosed via << route.lower() >> among << gender.lower() >> patients
+          The age-standardized << length.lower() >> rate of << site.lower() >> cancer survival diagnosed via << route.lower() >> among {definitions.sex} patients
         description_key:
           - *diag_route
         unit: '%'
