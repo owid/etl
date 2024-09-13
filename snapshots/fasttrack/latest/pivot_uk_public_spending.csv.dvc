@@ -11,6 +11,6 @@ meta:
   name: DRAFT pivot_uk_public_spending
   description: ''
 outs:
-  - md5: d55d1a3683767a08925060412e79a1b1
-    size: 1511
+  - md5: a3341fa6cf501441416410a96dd0190a
+    size: 746
     path: pivot_uk_public_spending.csv
