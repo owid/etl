@@ -42,6 +42,8 @@ def run(dest_dir: str) -> None:
     # Filter out just the bits of the data we want
     tb = filter_data(tb)
     tb = round_down_year(tb)
+    # Removing commas from the unit of measure
+    tb["unit_of_measure"] = tb["unit_of_measure"].str.replace(",", "", regex=False)
     tb["source"] = "igme (current)"
 
     # Separate out the variables needed to calculate the under-fifteen mortality rate.
@@ -87,14 +89,14 @@ def convert_to_percentage(tb: Table) -> Table:
     Convert the units which are given as 'per 1,000...' into percentages.
     """
     rate_conversions = {
-        "Deaths per 1,000 live births": "Deaths per 100 live births",
-        "Deaths per 1,000 children aged 1 month": "Deaths per 100 children aged 1 month",
-        "Deaths per 1,000 children aged 1": "Deaths per 100 children aged 1",
-        "Deaths per 1,000 children aged 5": "Deaths per 100 children aged 5",
-        "Deaths per 1,000 children aged 10": "Deaths per 100 children aged 10",
-        "Deaths per 1,000 youths aged 15": "Deaths per 100 children aged 15",
-        "Deaths per 1,000 children aged 20": "Deaths per 100 children aged 20",
-        "Stillbirths per 1,000 total births": "Stillbirths per 100 births",
+        "Deaths per 1000 live births": "Deaths per 100 live births",
+        "Deaths per 1000 children aged 1 month": "Deaths per 100 children aged 1 month",
+        "Deaths per 1000 children aged 1": "Deaths per 100 children aged 1",
+        "Deaths per 1000 children aged 5": "Deaths per 100 children aged 5",
+        "Deaths per 1000 children aged 10": "Deaths per 100 children aged 10",
+        "Deaths per 1000 youths aged 15": "Deaths per 100 children aged 15",
+        "Deaths per 1000 children aged 20": "Deaths per 100 children aged 20",
+        "Stillbirths per 1000 total births": "Stillbirths per 100 births",
     }
     # Dividing values of selected rows by 10
 
@@ -201,17 +203,17 @@ def calculate_under_fifteen_deaths(tb: Table) -> Table:
     return tb
 
 
-def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
+def calculate_under_fifteen_mortality_rates(tb_com: Table) -> Table:
     """
     Adjust and calculate the under-fifteen mortality rate by combining
     the under-five mortality rate with the mortality rate for ages 5-14.
     """
     # Filter common conditions in a single step
-    common_conditions = (tb["sex"] == "Total") & (tb["wealth_quintile"].isin(["All wealth quintiles", "Total"]))
+    common_conditions = (tb_com["sex"] == "Total") & (tb_com["wealth_quintile"].isin(["All wealth quintiles", "Total"]))
 
     # Filter and rename mortality data
-    u5_mortality = tb[(tb["indicator"] == "Under-five mortality rate") & common_conditions]
-    mortality_5_14 = tb[(tb["indicator"] == "Mortality rate age 5-14") & common_conditions]
+    u5_mortality = tb_com[(tb_com["indicator"] == "Under-five mortality rate") & common_conditions]
+    mortality_5_14 = tb_com[(tb_com["indicator"] == "Mortality rate age 5-14") & common_conditions]
 
     # Merge the two tables on common columns
     tb_merge = pr.merge(
@@ -230,13 +232,13 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
     result_tb = tb_merge[["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile", "obs_value"]]
 
     # Combine with the original youth mortality table
-    youth_mortality = tb[(tb["indicator"] == "Under-fifteen deaths") & common_conditions].drop(
+    youth_mortality = tb_com[(tb_com["indicator"] == "Under-fifteen deaths") & common_conditions].drop(
         columns=["source", "lower_bound", "upper_bound"]
     )
     result_tb = pr.concat([youth_mortality, result_tb])
 
     # Add metadata (if needed)
-    result_tb.metadata = tb.metadata  # Preserving metadata
+    result_tb.metadata = tb_com.metadata  # Preserving metadata
     result_tb.metadata.short_name = "igme_under_fifteen_mortality"
 
     return result_tb
@@ -257,7 +259,7 @@ def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -
 
     tb_duplicates_removed = tb_duplicates[tb_duplicates["source"] == preferred_source]
 
-    tb = pr.concat([tb_no_duplicates, tb_duplicates_removed])
+    tb = pr.concat([tb_no_duplicates, tb_duplicates_removed], ignore_index=True)
 
     assert len(tb[tb.duplicated(subset=dimensions, keep=False)]) == 0, "Duplicates still in table!"
 
@@ -268,7 +270,9 @@ def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source
     """
     Combine two tables with a preference for one source of data.
     """
-    tb_combined = pr.concat([tb_a, tb_b], short_name=table_name).sort_values(["country", "year", "source"])
+    tb_combined = pr.concat([tb_a, tb_b], short_name=table_name).sort_values(
+        ["country", "year", "source"], ignore_index=True
+    )
     assert any(tb_combined["source"] == preferred_source), "Preferred source not in table!"
     tb_combined = remove_duplicates(
         tb_combined,
