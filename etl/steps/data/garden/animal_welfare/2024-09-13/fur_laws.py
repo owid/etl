@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -124,11 +125,13 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("fur_laws")
+    tb = ds_meadow.read_table("fur_laws")
 
-    # Read table from meadow dataset.
-    tb = ds_meadow["fur_laws"].reset_index()
+    # Load regions dataset and read its main table.
+    ds_regions = paths.load_dataset("regions")
+    tb_regions = ds_regions.read_table("regions")
 
     #
     # Process data.
@@ -139,15 +142,22 @@ def run(dest_dir: str) -> None:
     # Remove empty rows.
     tb = tb.dropna(how="all").reset_index(drop=True)
 
+    # The first row is expected to say "All other countries are expected to be fur-free".
+    # Therefore, add all other countries and assume they do not have any active farms.
+    error = "Data has changed. Manually check this part of the code."
+    assert tb.loc[0, "country"] == "All other countries are expected to be fur-free", error
+    tb = tb.drop(0).reset_index(drop=True)
+
     # Harmonize country names.
-    # Remove spurious spaces in country names.
-    tb["country"] = tb["country"].str.strip()
     tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
+    # Add all other countries, assuming they have no active fur farms.
+    tb_added = tb_regions[(tb_regions["region_type"]=="country") & (tb_regions["defined_by"] == "owid")][["name"]].assign(**{"fur_farms_active": "NO"}).rename(columns={"name": "country"}, errors="raise")
+    tb = pr.concat([tb, tb_added], ignore_index=True)
 
     # Keep only years.
     tb["ban_effective_year"] = tb["ban_effective_date"].str.extract(r"(\d{4})")
     tb["ban_effective_year"] = tb["ban_effective_year"].copy_metadata(tb["ban_effective_date"])
-    tb = tb.drop(columns=["ban_effective_date"])
+    tb = tb.drop(columns=["ban_effective_date"], errors="raise")
 
     # Add a current year column.
     tb["year"] = CURRENT_YEAR
