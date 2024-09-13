@@ -17,6 +17,7 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["diagnosis_routes_by_route"].reset_index()
     tb = tb.drop(columns=["country"])
 
+    # Make cancer type appear as country.
     tb = tb.rename(columns={"site": "country"})
     tb = tb.format(["country", "year", "stage", "route"])
     #
