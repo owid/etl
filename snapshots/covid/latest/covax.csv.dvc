@@ -11,11 +11,10 @@ meta:
 
       Through this web site, which includes a global database and country-by-country data dashboards, the Task Force is tracking and monitoring specific global and country-level gaps to support faster and more targeted solutions to accelerate access to COVID-19 vaccines, treatments and tests in developing countries.
     date_published: "2022-03-23"
-
     # Citation
     producer: COVAX, ACT-Accelerator Hub
     citation_full: |-
-      COVID-19 Task Force (International Monetary Fund, World Bank, World Health Organization, World Trade Organization). March 2022.
+      Multilateral Leaders Task Force on COVID-19. A joint initiative from the International Monetary Fund, World Bank, World Health Organization, and World Trade Organization). March 2022.
 
     # Files
     url_main: https://data.covid19taskforce.com
@@ -25,4 +24,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0
-
+outs:
+  - md5: c1a4aa1083755294fe9231a10b864481
+    size: 2824
+    path: covax.csv
