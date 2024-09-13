@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     #
 
     # Extract the last year from the 'year' column which is in the format '2006-2010'.
-    tb["year"] = tb["year"].apply(lambda x: int(x.split("-")[0]))
+    tb["year"] = tb["year"].apply(lambda x: int(x.split("-")[0])).astype(int)
 
     tb = tb.format(["country", "year", "site", "gender", "route", "length"])
 

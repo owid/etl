@@ -29,11 +29,11 @@ tables:
       count_by_stage:
         title: Number of << site.lower() >> cancer diagnoses by << route.lower() >> that are at << stage.lower() >>
         description_key:
-          - *definitions.route
+          - *route
         unit: cases
       percentage_by_stage:
         title: Share of << site.lower() >> cancer diagnoses by << route.lower() >>  that are at << stage.lower() >>
         description_key:
-          - *definitions.route
+          - *route
         unit: '%'
         short_unit: '%'
