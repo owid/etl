@@ -16,11 +16,11 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 0
+  title: COVID-19, donations to COVAX
 
 tables:
   covax:
     variables:
-
       delivered:
         title: "COVID-19 doses shipped by COVAX"
         description_short: |-
