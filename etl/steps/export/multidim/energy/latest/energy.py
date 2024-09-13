@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 from owid.catalog import utils
 
@@ -75,12 +76,20 @@ def create_views() -> list[dict]:
             ):
                 indicator += "__equivalent"
 
+            grapher_config: dict[str, Any] = {
+                "hasMapTab": True,
+                "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+            }
+            if metric not in ("proportional_change", "absolute_change"):
+                grapher_config["yAxis"] = {"min": 0}
+
             views.append(
                 {
                     "dimensions": {"source": source, "metric": metric},
                     "indicators": {
                         "y": f"grapher/energy/2024-06-20/energy_mix/energy_mix#{indicator}",
                     },
+                    "config": grapher_config,
                 }
             )
 

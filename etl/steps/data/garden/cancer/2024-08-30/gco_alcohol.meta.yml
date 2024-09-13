@@ -30,6 +30,7 @@ definitions:
   footnote: |-
     <% if indicator == "asr" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% endif %>
 
+
 dataset:
   update_period_days: 365
 

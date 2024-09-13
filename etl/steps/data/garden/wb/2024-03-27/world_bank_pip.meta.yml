@@ -348,6 +348,56 @@ tables:
               - China
               - Ethiopia
 
+      headcount_215:
+        presentation:
+          title_public: Number of people living in extreme poverty
+          faqs:
+            - fragment_id: poverty-international-poverty-line
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-comparability
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: poverty-regional-estimates
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Number of people living in extreme poverty
+            subtitle: >-
+              Extreme poverty is defined as living below the International Poverty Line of
+              $2.15 per day. This data is adjusted for inflation and for differences in the
+              cost of living between countries.
+            note: >-
+              This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
+              2017 prices. Depending on the country and year, it relates to income measured
+              after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+            hasMapTab: true
+            tab: map
+            variantName: Line chart
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: Reds
+                customNumericValues:
+                  - 100000
+                  - 300000
+                  - 1000000
+                  - 3000000
+                  - 10000000
+                  - 30000000
+                  - 100000000
+                  - 300000000
+                  - 1000000000
+            selectedEntityNames:
+              - India
+              - China
+              - Madagascar
+              - Nigeria
+              - Bangladesh
+            originUrl: https://ourworldindata.org/poverty
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
+
       gini:
         presentation:
           title_public: Gini Coefficient

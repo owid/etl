@@ -31,10 +31,10 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("monkeypox")
-    ds_suspected = paths.load_dataset("africa_cdc")
+    ds_suspected = paths.load_dataset("global_health_mpox")
     # Read table from meadow dataset.
     tb = ds_meadow["monkeypox"].reset_index()
-    tb_suspected = ds_suspected["africa_cdc"].reset_index()
+    tb_suspected = ds_suspected["global_health_mpox"].reset_index()
     cols = ["country", "date", "suspected_cases_cumulative"]
     tb_suspected = tb_suspected[cols]
     assert tb_suspected.shape[1] == len(cols)
