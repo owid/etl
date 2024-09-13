@@ -4,14 +4,13 @@ definitions:
     presentation:
       topic_tags:
         - Cancer
-
-  route: |-
+  route: &route |-
     <% if route == "Screening" %>
     Screening is flagged by the cancer registry as detected via the breast, bowel, or cervical screening programmes.
     <% elif route == "USC" %>
-    USC refers to urgent GP referrals with a suspicion of cancer (previously known as Two-week wait/TWW).
+    USC (Urgent Suspected Cancer)refers to urgent GP referrals with a suspicion of cancer (previously known as two-week wait/TWW).
     <% elif route == "GP referral" %>
-    GP referral includes routine and urgent referrals where the patient was not referred under the USC referral route.
+    GP referral includes routine and urgent referrals where the patient was not referred under the USC (Urgent Suspected Cancer) route, meaning the referral was not made with an immediate suspicion of cancer.
     <% elif route == "Emergency presentation" %>
     Emergency presentation is an emergency route via accident and emergency (A&E), emergency GP referral, emergency transfer, emergency admission, or attendance.
     <% elif route == "Other route" %>
@@ -29,12 +28,12 @@ tables:
     variables:
       count_by_stage:
         title: Number of << site.lower() >> cancer diagnoses by << route.lower() >> that are at << stage.lower() >>
-        description_short: |-
-          {definitions.route}
+        description_key:
+          - *definitions.route
         unit: cases
       percentage_by_stage:
         title: Share of << site.lower() >> cancer diagnoses by << route.lower() >>  that are at << stage.lower() >>
-        description_short: |-
-          {definitions.route}
+        description_key:
+          - *definitions.route
         unit: '%'
         short_unit: '%'
