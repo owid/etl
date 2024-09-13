@@ -2,6 +2,7 @@
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
+from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -47,26 +48,26 @@ FUR_TRADING_BAN_STATUS = {
 FUR_FARMING_ACTIVE = {
     "YES": "Yes",
     "NO": "No",
-    # NOTE: We assume that if there is no information, then there are no fur farms.
-    # This is the case of Montenegro (Fur Free Alliance confirmed this case).
-    "": "No",
+    # There is a new status called "NO DATA". We will replace it by nan.
+    "NO DATA": "NO DATA",
 }
 
 
 def prepare_fur_farming_ban_status(tb: Table) -> Table:
     tb = tb.copy()
     # Fill missing values with "" and strip spaces.
-    tb["fur_farming_status"] = tb["fur_farming_status"].astype(object).fillna("").str.strip()
-
-    # Rename fur farming ban statuses.
-    # Find all status that start with "YES" and map them to "YES".
-    tb.loc[tb["fur_farming_status"].str.startswith("YES"), "fur_farming_status"] = "YES"
-    # Find all status that start with "PARTIAL" and map them to "PARTIAL".
-    tb.loc[tb["fur_farming_status"].str.startswith("PARTIAL"), "fur_farming_status"] = "PARTIAL"
+    tb["fur_farming_status"] = tb["fur_farming_status"].astype("string").fillna("").str.strip()
 
     # There is a column for the status of the ban, and another for those cases where there is no ban, but fur farming
     # has been phased out due to stricter regulations.
     # Check that when phase out is "YES", the ban status is empty.
+    ####################################################################################################################
+    # TODO: Contact data provider about this issue.
+    # For Belgium, both columns "Fur farming ban" and "Phase-out due to stricter regulations" are "YES".
+    # This happens in the google sheet, but not in the PDF (where only "Fur farming ban" is "YES").
+    # So I assume the PDF is correct.
+    tb.loc[tb["country"] == "Belgium", "phase_out_due_to_stricter_regulations"] = None
+    ####################################################################################################################
     error = "There are rows where phase out is 'YES' but the ban status was not empty."
     assert tb[(tb["phase_out_due_to_stricter_regulations"] == "YES") & (tb["fur_farming_status"] != "")].empty, error
 
@@ -76,35 +77,18 @@ def prepare_fur_farming_ban_status(tb: Table) -> Table:
     ] = PHASE_OUT_DUE_TO_STRICTER_REGULATIONS
 
     # Drop unnecessary column.
-    tb = tb.drop(columns=["phase_out_due_to_stricter_regulations"])
+    tb = tb.drop(columns=["phase_out_due_to_stricter_regulations"], errors="raise")
 
     # Map all fur farming statuses.
-    tb["fur_farming_status"] = tb["fur_farming_status"].map(FUR_FARMING_BAN_STATUS)
+    tb["fur_farming_status"] = map_series(
+        tb["fur_farming_status"],
+        mapping=FUR_FARMING_BAN_STATUS,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+    )
 
     # For those years years that are in the future, change the status.
     tb.loc[tb["ban_effective_year"].astype(float) > CURRENT_YEAR, "fur_farming_status"] = BANNED_NOT_EFFECTIVE
-
-    return tb
-
-
-def fix_inconsistencies(tb: Table) -> Table:
-    tb = tb.copy()
-
-    # China appears twice in the data, but with identical data.
-    error = "Expected duplicate row for China; remove temporary fix."
-    assert len(tb[(tb["country"] == "China") & (tb.duplicated(keep=False))]) == 2, error
-    # Simply remove one of the two duplicate rows.
-    tb = tb.drop_duplicates().reset_index(drop=True)
-
-    # Denmark appears twice: Once with partial farming ban and no trading ban, and once with partial trading ban and no
-    # farming ban.
-    error = "Expected duplicate rows for Denmark; remove temporary fix."
-    assert set(tb[(tb["country"] == "Denmark")]["fur_farming_status"]) == {"Not banned", "Partially banned"}
-    # Impose partial ban on both farming and trading.
-    tb.loc[tb["country"] == "Denmark", "fur_farming_status"] = "Partially banned"
-    tb.loc[tb["country"] == "Denmark", "fur_trading_status"] = "Partially banned"
-    # Drop duplicated rows.
-    tb = tb.drop_duplicates().reset_index(drop=True)
 
     return tb
 
@@ -150,8 +134,16 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names.
     tb = geo.harmonize_countries(tb, countries_file=paths.country_mapping_path)
-    # Add all other countries, assuming they have no active fur farms.
-    tb_added = tb_regions[(tb_regions["region_type"]=="country") & (tb_regions["defined_by"] == "owid")][["name"]].assign(**{"fur_farms_active": "NO"}).rename(columns={"name": "country"}, errors="raise")
+    # Add all countries that are not in the data, assuming they have no active fur farms.
+    tb_added = (
+        tb_regions[
+            (~tb_regions["name"].isin(tb["country"].unique()))
+            & (tb_regions["region_type"] == "country")
+            & (tb_regions["defined_by"] == "owid")
+        ][["name"]]
+        .assign(**{"fur_farms_active": "NO"})
+        .rename(columns={"name": "country"}, errors="raise")
+    )
     tb = pr.concat([tb, tb_added], ignore_index=True)
 
     # Keep only years.
@@ -166,40 +158,34 @@ def run(dest_dir: str) -> None:
     tb = prepare_fur_farming_ban_status(tb=tb)
 
     # Prepare fur trading ban statuses.
-    tb["fur_trading_status"] = tb["fur_trading_status"].astype(object).fillna("").map(FUR_TRADING_BAN_STATUS)
+    tb["fur_trading_status"] = map_series(
+        tb["fur_trading_status"].astype("string").fillna(""),
+        mapping=FUR_TRADING_BAN_STATUS,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+    )
 
     # Prepare fur farming activity statuses.
-    tb["fur_farms_active"] = tb["fur_farms_active"].astype(object).fillna("").map(FUR_FARMING_ACTIVE)
+    tb["fur_farms_active"] = map_series(
+        tb["fur_farms_active"].astype("string").fillna(""),
+        mapping=FUR_FARMING_ACTIVE,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+        show_full_warning=True,
+    )
 
-    # Fix inconsistent data points.
-    tb = fix_inconsistencies(tb=tb)
-
-    ####################################################################################################################
-    # Manually fix some issues pointed out by the Fur Free Alliance (by email).
-    # * Sweden should be labeled as "Partial" for fur farming ban.
-    # * New Zealand should be labeled as "Partial" for fur farming ban.
-    # First check that they are currently labeled as "Not banned" (in case it changes in an update).
-    error = "Expected Sweden to be labeled as 'Not banned'; remove temporary fix."
-    assert tb.loc[tb["country"] == "Sweden", "fur_farming_status"].item() == "Not banned", error
-    tb.loc[tb["country"] == "Sweden", "fur_farming_status"] = "Partially banned"
-    error = "Expected New Zealand to be labeled as 'Not banned'; remove temporary fix."
-    assert tb.loc[tb["country"] == "New Zealand", "fur_farming_status"].item() == "Not banned"
-    tb.loc[tb["country"] == "New Zealand", "fur_farming_status"] = "Partially banned"
-    ####################################################################################################################
+    # Sanity check.
+    assert tb[tb.duplicated(subset="country", keep=False)].empty, "Duplicated rows found."
 
     # Run sanity checks.
     run_sanity_checks(tb=tb)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format()
 
     #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
-
-    # Save changes in the new garden dataset.
+    # Create a new garden dataset.
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()
