@@ -58,14 +58,6 @@ steps:
   data://grapher/covid/latest/cases_deaths:
     - data://garden/covid/latest/cases_deaths
 
-  # JHU - cases and deaths
-  data://meadow/covid/latest/john_hopkins_university:
-    - snapshot://covid/latest/john_hopkins_university.csv
-  data://garden/covid/latest/john_hopkins_university:
-    - data://meadow/covid/latest/john_hopkins_university
-  data://grapher/covid/latest/john_hopkins_university:
-    - data://garden/covid/latest/john_hopkins_university
-
   # Decoupling
   data://meadow/covid/latest/decoupling:
     - snapshot://covid/latest/decoupling_usa.csv
