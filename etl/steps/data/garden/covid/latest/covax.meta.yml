@@ -18,8 +18,9 @@ dataset:
   update_period_days: 0
 
 tables:
-  delivered:
+  covax:
     variables:
+
       delivered:
         title: "COVID-19 doses shipped by COVAX"
         description_short: |-
@@ -41,8 +42,6 @@ tables:
           {definitions.others.description_delivered}, per person living in the donating country.
         unit: "doses per capita"
 
-  donated:
-    variables:
       only_donated:
         title: "COVID-19 doses donated to COVAX"
         description_short: |-
@@ -64,8 +63,6 @@ tables:
           {definitions.others.description_donated}, per person living in the donating country.
         unit: "doses per capita"
 
-  announced:
-    variables:
       only_announced:
         title: "COVID-19 doses donations to COVAX announced"
         description_short: |-

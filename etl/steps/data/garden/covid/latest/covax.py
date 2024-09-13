@@ -30,22 +30,28 @@ def run(dest_dir: str) -> None:
     )
 
     # Split into multiple tables
-    tb_donated = extract_table(tb, "only_donated")
-    tb_delivered = extract_table(tb, "delivered")
-    tb_announced = extract_table(tb, "only_announced")
+    # tb_donated = extract_table(tb, "only_donated")
+    # tb_delivered = extract_table(tb, "delivered")
+    # tb_announced = extract_table(tb, "only_announced")
 
-    # Format
-    tables = [
-        tb_donated.format(["country", "year"], short_name="donated"),
-        tb_delivered.format(["country", "year"], short_name="delivered"),
-        tb_announced.format(["country", "year"], short_name="announced"),
-    ]
+    # # Format
+    # tables = [
+    #     tb_donated.format(["country", "year"], short_name="donated"),
+    #     tb_delivered.format(["country", "year"], short_name="delivered"),
+    #     tb_announced.format(["country", "year"], short_name="announced"),
+    # ]
+
+    tables = [tb.format(["country", "year"], short_name="covax")]
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+        formats=["csv", "feather"],
     )
 
     # Save changes in the new garden dataset.
