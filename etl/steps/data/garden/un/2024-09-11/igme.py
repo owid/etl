@@ -207,7 +207,7 @@ def calculate_under_fifteen_mortality_rates(tb: Table) -> Table:
     the under-five mortality rate with the mortality rate for ages 5-14.
     """
     # Filter common conditions in a single step
-    common_conditions = (tb["sex"] == "Total") & (tb["wealth_quintile"] == "All wealth quintiles")
+    common_conditions = (tb["sex"] == "Total") & (tb["wealth_quintile"].isin(["All wealth quintiles", "Total"]))
 
     # Filter and rename mortality data
     u5_mortality = tb[(tb["indicator"] == "Under-five mortality rate") & common_conditions]
@@ -298,7 +298,7 @@ def process_vintage_data(tb_youth: Table) -> Table:
     ).drop(columns=["series_name_name"])
 
     # Assign new values to specific columns
-    tb_youth["wealth_quintile"] = "All wealth quintiles"
+    tb_youth["wealth_quintile"] = "Total"
     tb_youth["source"] = "igme (2018)"
 
     # Update the categories using cat.rename_categories for categorical columns
