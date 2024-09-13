@@ -11,16 +11,15 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("diagnosis_routes_by_route")
+    ds_meadow = paths.load_dataset("diagnosis_routes_survival")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["diagnosis_routes_by_route"].reset_index()
+    tb = ds_meadow["diagnosis_routes_survival"].reset_index()
 
     #
     # Process data.
     #
-    tb["route"] = tb["route"].str.replace(r"^\d+\s", "", regex=True)
-    tb = tb.format(["country", "year", "site", "stage", "route"])
+    tb = tb.format(["country", "year", "site", "gender", "route", "length"])
 
     #
     # Save outputs.
