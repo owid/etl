@@ -1,0 +1,88 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  others:
+    description_delivered: |-
+      Number of COVID-19 doses that were donated by countries to COVAX and have been delivered by COVAX to a recipient country.
+    description_donated: |-
+      Number of COVID-19 doses that have been donated by countries to COVAX. These doses have not yet been delivered by COVAX to a recipient country.
+    description_announced: |-
+      Number of COVID-19 doses that have been announced as donations by countries to COVAX. These doses have not yet been donated to COVAX.
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+
+tables:
+  delivered:
+    variables:
+      absolute:
+        title: "COVID-19 doses shipped by COVAX"
+        description_short: |-
+          {definitions.others.description_delivered}
+        unit: "doses"
+      per_gdp:
+        title: "COVID-19 doses shipped by COVAX, per GDP"
+        description_short: |-
+          {definitions.others.description_delivered}, per million dollars of GDP of the donating country.
+        unit: "doses per million dollars of GDP"
+      per_used:
+        title: "COVID-19 doses shipped by COVAX, per doses used"
+        description_short: |-
+          {definitions.others.description_delivered}, per dose administered domestically.
+        unit: ""
+      per_capita:
+        title: "COVID-19 doses shipped by COVAX, per capita"
+        description_short: |-
+          {definitions.others.description_delivered}, per person living in the donating country.
+        unit: "doses per capita"
+
+  donated:
+    variables:
+      absolute:
+        title: "COVID-19 doses donated to COVAX"
+        description_short: |-
+          {definitions.others.description_donated}
+        unit: "doses"
+      per_gdp:
+        title: "COVID-19 doses donated to COVAX, per GDP"
+        description_short: |-
+          {definitions.others.description_donated}, per million dollars of GDP of the donating country.
+        unit: "doses per million dollars of GDP"
+      per_used:
+        title: "COVID-19 doses donated to COVAX, per doses used"
+        description_short: |-
+          {definitions.others.description_donated}, per dose administered domestically.
+        unit: ""
+      per_capita:
+        title: "COVID-19 doses donated to COVAX, per capita"
+        description_short: |-
+          {definitions.others.description_donated}, per person living in the donating country.
+        unit: "doses per capita"
+
+  announced:
+    variables:
+      absolute:
+        title: "COVID-19 doses donations to COVAX announced"
+        description_short: |-
+          {definitions.others.description_announced}
+        unit: "doses"
+      per_gdp:
+        title: "COVID-19 doses donations to COVAX announced, per GDP"
+        description_short: |-
+          {definitions.others.description_announced}, per million dollars of GDP of the donating country.
+        unit: "doses per million dollars of GDP"
+      per_used:
+        title: "COVID-19 doses donations to COVAX announced, per doses used"
+        description_short: |-
+          {definitions.others.description_announced}, per dose administered domestically.
+        unit: ""
+      per_capita:
+        title: "COVID-19 doses donations to COVAX announced, per capita"
+        description_short: |-
+          {definitions.others.description_announced}, per person living in the donating country.
+        unit: "doses per capita"
