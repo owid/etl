@@ -24,7 +24,9 @@ def run(dest_dir: str) -> None:
         drop=True
     )
 
+    #
     # Improve format.
+    #
     tb_supply_by_country_flat = tb_supply_by_country_flat.format()
 
     #
