@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["igme"].reset_index()
     tb_vintage = ds_vintage["igme"].reset_index()
     tb_vintage = process_vintage_data(tb_vintage)
-
+    tb_vintage["unit_of_measure"] = tb_vintage["unit_of_measure"].str.replace(",", "", regex=False)
     # Appending the region to country where it exists
     tb["country"] = tb.apply(
         lambda row: f"{row['country']} ({row['regional_group']})"
