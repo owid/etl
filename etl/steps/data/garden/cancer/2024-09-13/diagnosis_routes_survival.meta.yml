@@ -33,16 +33,16 @@ tables:
   diagnosis_routes_survival:
     variables:
       patients:
-        title: Number of {definitions.sex} patients with << site.lower() >> cancer diagnosed via << route.lower() >> surviving at the end of the << length.lower() >> period
+        title: Number of {definitions.sex} patients diagnosed via << route.lower() >> surviving at the end of the << length.lower() >> period
         description_short: |-
-          The number of {definitions.sex} patients diagnosed with << site.lower() >> cancer diagnosed via << route.lower() >> route surviving at the end of the << length.lower() >> period
+          The number of {definitions.sex} patients diagnosed via << route.lower() >> route surviving at the end of the << length.lower() >> period
         description_key:
           - *diag_route
         unit: cases
       survival:
-        title: Age-standardized << length.lower() >> survival rate of << site.lower() >> cancer diagnosed via << route.lower() >> among {definitions.sex} patients
+        title: Age-standardized << length.lower() >> survival rate diagnosed via << route.lower() >> among {definitions.sex} patients
         description_short: |-
-          The age-standardized << length.lower() >> survival rate of << site.lower() >> cancer diagnosed via << route.lower() >> route among {definitions.sex} patients
+          The age-standardized << length.lower() >> survival rate diagnosed via << route.lower() >> route among {definitions.sex} patients
         description_key:
           - *diag_route
         unit: '%'

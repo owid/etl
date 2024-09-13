@@ -14,7 +14,10 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("diagnosis_routes_by_route")
 
     # Read table from garden dataset.
-    tb = ds_garden["diagnosis_routes_by_route"]
+    tb = ds_garden["diagnosis_routes_by_route"].reset_index()
+
+    tb = tb.rename(columns={"site": "country"})
+    tb = tb.format(["country", "year", "stage", "route"])
     #
     # Save outputs.
     #
