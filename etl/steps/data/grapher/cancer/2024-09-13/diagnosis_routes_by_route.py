@@ -17,21 +17,19 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["diagnosis_routes_by_route"].reset_index()
     tb = tb.drop(columns=["country"])
 
+    # Define mapping dictionary with only the first word capitalized
     cancer_mapping = {
+        "All Malignant Neoplasms (excl. NMSC)": "All malignant neoplasms (excl. NMSC)",
         "Bladder": "Bladder cancer",
-        "Brain": "Brain cancer",
         "Breast": "Breast cancer",
         "Cervix": "Cervical cancer",
         "Colorectal": "Colorectal cancer",
         "Kidney": "Kidney cancer",
-        "Liver": "Liver cancer",
-        "Lung": "Lung cancer",
-        "Oesophagus": "Oesophageal cancer",
+        "Lung - non-small cell": "Lung cancer (non-small cell)",
+        "Lung - small cell": "Lung cancer (small cell)",
         "Ovary": "Ovarian cancer",
         "Pancreas": "Pancreatic cancer",
         "Prostate": "Prostate cancer",
-        "Stomach": "Stomach cancer",
-        "Testis": "Testicular cancer",
         "Uterus": "Uterine cancer",
     }
 
