@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
     ]
 
     # Identify cancers to aggregate
-    cancers_to_aggregate = cancers_tb[cancers_tb["value"] < 500000]["cause"].drop_duplicates().tolist()
+    cancers_to_aggregate = cancers_tb[cancers_tb["value"] < 200000]["cause"].drop_duplicates().tolist()
     cancers_to_aggregate = cancers_to_aggregate + other_cancers
 
     # Log the cancers that were grouped]
@@ -102,7 +102,7 @@ def run(dest_dir: str) -> None:
     tb["share_of_cancer_deaths"] = (tb["total_deaths"] / tb["total_cancer_deaths"]) * 100
 
     # Drop the temporary 'total_cancer_deaths' column
-    tb = tb.drop(columns=["total_cancer_deaths"])
+    tb = tb.drop(columns=["total_cancer_deaths", "total_deaths"])
     tb = tb.format(["country", "year", "age", "cause"], short_name="gbd_cancers_deaths")
 
     #
