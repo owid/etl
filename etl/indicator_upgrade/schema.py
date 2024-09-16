@@ -1,43 +1,18 @@
 import copy
 from typing import Any, Dict, Optional
 
-import requests
 from jsonschema import Draft202012Validator, validate, validators
 from structlog import get_logger
 
-from etl.config import TLS_VERIFY
+from apps.wizard.utils import get_schema_from_url
 
-# Version of the schema
-SCHEMA_VERSION = "003"
 # Logger
 log = get_logger()
 
 
-def get_schema_chart_config() -> Dict[str, Any]:
-    """Get the schema of a chart configuration.
-
-    Version of the schema used is defined by variable `SCHEMA_VERSION`. More details on available versions can be found
-    at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema.
-
-    Returns
-    -------
-    Dict[str, Any]
-        Schema of a chart configuration.
-    """
-    # import json
-    # path = "~/repos/owid-grapher/packages/@ourworldindata/grapher/src/schema"
-    # path = f"{path}/grapher-schema.{SCHEMA_VERSION}.json"
-    # print(path)
-    # with open(path, "r") as f:
-    #     return json.load(f)
-    return requests.get(
-        f"https://files.ourworldindata.org/schemas/grapher-schema.{SCHEMA_VERSION}.json", timeout=20, verify=TLS_VERIFY
-    ).json()
-
-
 def validate_chart_config(config: Dict[str, Any]) -> None:
     """Validate the schema of a chart configuration."""
-    schema = get_schema_chart_config()
+    schema = get_schema_from_url(config["$schema"])
     validate(config, schema)
 
 
@@ -85,7 +60,7 @@ def validate_chart_config_and_set_defaults(
     DefaultSetterValidatingValidator = _extend_with_set_default(Draft202012Validator)
     # Get schema
     if schema is None:
-        schema = get_schema_chart_config()
+        schema = get_schema_from_url(config["$schema"])
     # Validate and update config with defaults
     config_new = copy.deepcopy(config)
     try:
@@ -158,7 +133,7 @@ def validate_chart_config_and_remove_defaults(
     DefaultDeleteValidatingValidator = _extend_with_remove_default(Draft202012Validator)
     # Get schema
     if schema is None:
-        schema = get_schema_chart_config()
+        schema = get_schema_from_url(config["$schema"])
     # Validate and update config with defaults
     config_new = copy.deepcopy(config)
     DefaultDeleteValidatingValidator(schema).validate(config_new)

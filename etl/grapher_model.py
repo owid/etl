@@ -1559,7 +1559,7 @@ def _json_is(json_field: Any, key: str, val: Any) -> Any:
         return json_field[key] == val
 
 
-def _remap_variable_ids(config: Union[List, Dict[str, Any]], remap_ids: Dict[int, int]) -> Any:
+def _remap_variable_ids(config: Union[List, Dict[str, Any], Any], remap_ids: Dict[int, int]) -> Any:
     """Replace variableIds from chart config using `remap_ids` mapping."""
     if isinstance(config, dict):
         out = {}
@@ -1567,7 +1567,14 @@ def _remap_variable_ids(config: Union[List, Dict[str, Any]], remap_ids: Dict[int
             if k == "variableId":
                 out[k] = remap_ids[int(v)]
             # columnSlug is actually a variable id, but stored as a string (it wasn't a great decision)
-            elif k == "columnSlug":
+            elif k in ("columnSlug", "sortColumnSlug"):
+                out[k] = str(remap_ids[int(v)])
+            # if new fields with variable ids are added, try to handle them and raise a warning
+            elif isinstance(v, int) and v in remap_ids:
+                log.warning("remap_variable_ids.new_field", field=k, value=v)
+                out[k] = remap_ids[v]
+            elif isinstance(v, str) and v.isdigit() and int(v) in remap_ids:
+                log.warning("remap_variable_ids.new_field", field=k, value=v)
                 out[k] = str(remap_ids[int(v)])
             else:
                 out[k] = _remap_variable_ids(v, remap_ids)
