@@ -11,21 +11,24 @@ paths = PathFinder(__file__)
 column_rename = {
     "Entity": "country",
     "Day": "date",
-    "Daily new estimated infections of COVID-19 (ICL, mean)": "icl_infections_mean",
-    "Daily new estimated infections of COVID-19 (ICL, lower)": "icl_infections_low",
-    "Daily new estimated infections of COVID-19 (ICL, upper)": "icl_infections_upper",
-    "Daily new estimated infections of COVID-19 (IHME, mean)": "ihme_infections_mean",
-    "Daily new estimated infections of COVID-19 (IHME, lower)": "ihme_infections_low",
-    "Daily new estimated infections of COVID-19 (IHME, upper)": "ihme_infections_upper",
-    "Daily new estimated infections of COVID-19 (LSHTM, mean)": "lshtm_infections_mean",
-    "Daily new estimated infections of COVID-19 (LSHTM, lower)": "lshtm_infections_low",
-    "Daily new estimated infections of COVID-19 (LSHTM, upper)": "lshtm_infections_upper",
-    "Daily new estimated infections of COVID-19 (LSHTM, median)": "lshtm_infections_median",
-    "Daily new estimated infections of COVID-19 (YYG, mean)": "yyg_infections_mean",
-    "Daily new estimated infections of COVID-19 (YYG, lower)": "yyg_infections_low",
-    "Daily new estimated infections of COVID-19 (YYG, upper)": "yyg_infections_upper",
+    "Daily new estimated infections of COVID-19 (ICL, mean)": "icl_infections__mean",
+    "Daily new estimated infections of COVID-19 (ICL, lower)": "icl_infections__low",
+    "Daily new estimated infections of COVID-19 (ICL, upper)": "icl_infections__upper",
+    "Daily new estimated infections of COVID-19 (IHME, mean)": "ihme_infections__mean",
+    "Daily new estimated infections of COVID-19 (IHME, lower)": "ihme_infections__low",
+    "Daily new estimated infections of COVID-19 (IHME, upper)": "ihme_infections__upper",
+    "Daily new estimated infections of COVID-19 (LSHTM, mean)": "lshtm_infections__mean",
+    "Daily new estimated infections of COVID-19 (LSHTM, lower)": "lshtm_infections__low",
+    "Daily new estimated infections of COVID-19 (LSHTM, upper)": "lshtm_infections__upper",
+    "Daily new estimated infections of COVID-19 (LSHTM, median)": "lshtm_infections__median",
+    "Daily new estimated infections of COVID-19 (YYG, mean)": "yyg_infections__mean",
+    "Daily new estimated infections of COVID-19 (YYG, lower)": "yyg_infections__low",
+    "Daily new estimated infections of COVID-19 (YYG, upper)": "yyg_infections__upper",
 }
-
+COLUMN_INDEX = [
+    "country",
+    "date",
+]
 
 def run(dest_dir: str) -> None:
     #
@@ -37,8 +40,9 @@ def run(dest_dir: str) -> None:
         "icl",
         "ihme",
         "lshtm",
-        "youyang",
+        "yyg",
     ]
+    origins = {}
     for name in names:
         # Read
         tb_ = paths.read_snap_table(f"infections_model_{name}.csv")
@@ -56,12 +60,23 @@ def run(dest_dir: str) -> None:
         # Add to list
         tables.append(tb_)
 
-    # Merge
-    tb = multi_merge(tables, on=["country", "date"], how="outer")
-    # Drop all-NaN rows
-    tb = tb.dropna(subset=[col for col in tb.columns if col not in {"country", "date"}], how="all")
+        # Save origins
+        colname = tb_.filter(regex=".*_upper").columns[0]
+        origins[name] = tb_[colname].metadata.origins
 
-    tb = tb.format(["country", "date"], short_name="infections_model")
+    # Merge
+    tb = multi_merge(tables, on=COLUMN_INDEX, how="outer")
+
+    # Add origins back
+    for name in names:
+        columns = tb.filter(regex=name).columns
+        for col in columns:
+            tb[col].metadata.origins = origins[name]
+
+    # Drop all-NaN rows
+    tb = tb.dropna(subset=[col for col in tb.columns if col not in COLUMN_INDEX], how="all")
+
+    tb = tb.format(COLUMN_INDEX, short_name="infections_model")
     #
     # Save outputs.
     #
