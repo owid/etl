@@ -8,15 +8,12 @@ More information on how to access the data is here: https://cds.climate.copernic
 The data is downloaded as a NetCDF file. Tutorials for using the Copernicus API are here and work with the NETCDF format are here: https://ecmwf-projects.github.io/copernicus-training-c3s/cds-tutorial.html
 """
 
-import gzip
-import shutil
 import tempfile
 from pathlib import Path
 
 # CDS API
 import cdsapi
 import click
-import xarray as xr
 
 from etl.snapshot import Snapshot
 
