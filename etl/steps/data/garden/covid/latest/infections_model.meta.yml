@@ -1,99 +1,63 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  others:
+    description: |-
+      <% if (estimate == 'low') %>
+      Lower estimates of the true number of COVID-19 infections by << model_name >> model. It shows the bound of a 95% uncertainty interval.
+      <% elif (estimate == 'high') %>
+      Upper estimates of the true number of COVID-19 infections << model_name >> model. It shows the bound of a 95% uncertainty interval.
+      <% elif (estimate == 'mean') %>
+      Mean estimates of the true number of COVID-19 infections << model_name >> model.
+      <% elif (estimate == 'point') %>
+      Median estimates of the true number of COVID-19 infections << model_name >> model.
+      <%- endif -%>
   common:
     presentation:
       topic_tags:
         - COVID-19
+    display:
+      numDecimalPlaces: 3
+      unit: estimated infections
+      name: |-
+        <% if (estimate == 'low') %>
+        Lower
+        <% elif (estimate == 'high') %>
+        Upper
+        <% elif (estimate == 'mean') %>
+        Mean estimate
+        <% elif (estimate == 'point') %>
+        Median estimate
+        <%- endif -%>
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  title: COVID-19, infection model estimates
 
 tables:
   infections_model:
     variables:
-      icl_infections_mean:
-        unit: ''
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - COVID-19
-      icl_infections_low:
-        unit: ''
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - COVID-19
-      icl_infections_upper:
-        unit: ''
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - COVID-19
-      ihme_infections_mean:
-        unit: ''
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - COVID-19
-      ihme_infections_low:
-        unit: ''
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - COVID-19
-      ihme_infections_upper:
-        unit: ''
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - COVID-19
-      lshtm_infections_median:
-        unit: ''
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - COVID-19
-      lshtm_infections_low:
-        unit: ''
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - COVID-19
-      lshtm_infections_upper:
-        unit: ''
-        display:
-          numDecimalPlaces: 3
-        presentation:
-          topic_tags:
-            - COVID-19
-      yyg_infections_mean:
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          topic_tags:
-            - COVID-19
-      yyg_infections_low:
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          topic_tags:
-            - COVID-19
-      yyg_infections_upper:
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          topic_tags:
-            - COVID-19
+      icl_infections:
+        title: Daily new estimated COVID-19 infections (ICL, <<estimate.title()>> estimate)
+        description: |-
+          < set model_name = "ICL" >
+          {definitions.others.description}
+
+      ihme_infections:
+        title: Daily new estimated COVID-19 infections (IHME, <<estimate.title()>> estimate)
+        description: |-
+          < set model_name = "IHME" >
+          {definitions.others.description}
+
+      lshtm_infections:
+        title: Daily new estimated COVID-19 infections (LSHTM, <<estimate.title()>> estimate)
+        description: |-
+          < set model_name = "LSHTM" >
+          {definitions.others.description}
+      yyg_infections:
+        title: Daily new estimated COVID-19 infections (Youyang Gu, <<estimate.title()>> estimate)
+        description: |-
+          < set model_name = "Youyang Gu" >
+          {definitions.others.description}

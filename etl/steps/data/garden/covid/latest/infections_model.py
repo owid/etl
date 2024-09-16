@@ -1,4 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
+from typing import Any, Dict
+
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -19,8 +22,25 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = tb.format(["country", "date"])
+    # Extract origins
+    origins = extract_origins_per_model(tb)
 
+    # Reshape columns
+    ## Unpivot
+    tb = tb.melt(["country", "date"]).dropna(subset="value")
+
+    ## Split column
+    tb[["indicator", "estimate"]] = tb["variable"].str.split("__", expand=True)
+
+    ## Pivot
+    tb = tb.pivot(index=["country", "date", "estimate"], columns="indicator", values="value").reset_index()
+
+    # Format
+    tb = tb.format(["country", "date", "estimate"])
+
+    # Insert origins
+    for name, origin in origins.items():
+        tb[f"{name}_infections"].metadata.origins = origin
     #
     # Save outputs.
     #
@@ -31,3 +51,18 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def extract_origins_per_model(tb: Table) -> Dict[str, Any]:
+    names = [
+        "icl",
+        "ihme",
+        "lshtm",
+        "yyg",
+    ]
+    origins = {}
+    for name in names:
+        columns = tb.filter(regex=name).columns
+        assert len(columns) == 3, f"Unexpected number of columns for {name}"
+        origins[name] = tb[columns[0]].metadata.origins
+    return origins
