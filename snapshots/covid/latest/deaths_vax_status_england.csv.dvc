@@ -1,0 +1,39 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, Deaths by vaccination status (England)
+    description: |-
+      Weekly age-standardized mortality rates and age-specific rates for deaths involving COVID-19 and all deaths by vaccination status.
+
+      Age and vaccination status are defined on the date of death where a death has occurred, and on the last day of the week if not.
+
+      These figures represent death occurrences, there can be a delay between the date a death occurred and the date a death was registered.
+
+      The data represents age-standardized mortality rates per 100,000 person-years, standardized to the 2013 European Standard Population using five-year age groups from those aged 10 years and over. "Person-years" take into account both the number of people and the amount of time spent in each vaccination status.
+
+      Deaths were defined using the International Classification of Diseases, tenth revision (ICD-10). Deaths involving the coronavirus (COVID-19) are defined as those with an underlying cause, or any mention of, ICD-10 codes U07.1 (COVID-19 virus identified) or U07.2 (COVID-19, virus not identified). The source notes that this differs from the definition used in the majority of mortality outputs.
+
+      Figures are based on provisional mortality data and the Public Health Data Asset (PHDA), a linked dataset of people resident in England who could be linked to the 2011 Census and GP Patient Register. Therefore, the number of deaths and related population differ from other ONS mortality publication.
+
+      Rates marked as unreliable due to small numbers of deaths have been removed.
+    date_published: "2023-08-05"
+
+    # Citation
+    producer: Office for National Statistics
+    citation_full: |-
+      Office for National Statistics, National Immunisation Management Service
+
+    # Files
+    url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/datasets/deathsbyvaccinationstatusengland
+    date_accessed: 2024-09-16
+
+    # License
+    license:
+      name: CC BY 4.0
+
+outs:
+  - md5: 209fd66d825210bbf39384e525d3db64
+    size: 1837
+    path: deaths_vax_status_england.csv
