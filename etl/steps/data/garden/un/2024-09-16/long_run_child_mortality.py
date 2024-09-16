@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -14,16 +14,17 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_igme = paths.load_dataset("igme")
-    ds_gapminder_v11: Dataset = paths.load_dependency("under_five_mortality", version="2023-09-21")
-    ds_gapminder_v7: Dataset = paths.load_dependency("under_five_mortality", version="2023-09-18")
+    ds_gapminder_v11 = paths.load_dataset("under_five_mortality", version="2023-09-21")
+    ds_gapminder_v7 = paths.load_dataset("under_five_mortality", version="2023-09-18")
 
     # Read table from meadow dataset and filter out the main indicator, under five mortality, central estimate, both sexes, all wealth quintiles.
     tb_igme = ds_igme["igme"].reset_index()
     tb_igme = tb_igme[
         (tb_igme["indicator"] == "Under-five mortality rate")
-        & (tb_igme["sex"] == "Both sexes")
-        & (tb_igme["wealth_quintile"] == "All wealth quintiles")
+        & (tb_igme["sex"] == "Total")
+        & (tb_igme["wealth_quintile"] == "Total")
     ]
+    assert len(tb_igme) > 0, "Check you are using the right terms to filter the data"
     tb_igme = tb_igme.rename(columns={"obs_value": "under_five_mortality"}).drop(
         columns=["lower_bound", "upper_bound", "sex", "wealth_quintile", "indicator", "unit_of_measure"]
     )

@@ -801,8 +801,9 @@ steps:
     - data://garden/un/2024-09-11/igme
     - data://garden/gapminder/2023-09-18/under_five_mortality
     - data://garden/gapminder/2023-09-21/under_five_mortality
-  data://grapher/un/2024-09-16//long_run_child_mortality:
+  data://grapher/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-16/long_run_child_mortality
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
