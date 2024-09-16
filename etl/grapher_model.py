@@ -1559,7 +1559,7 @@ def _json_is(json_field: Any, key: str, val: Any) -> Any:
         return json_field[key] == val
 
 
-def _remap_variable_ids(config: Union[List, Dict[str, Any]], remap_ids: Dict[int, int]) -> Any:
+def _remap_variable_ids(config: Union[List, Dict[str, Any], Any], remap_ids: Dict[int, int]) -> Any:
     """Replace variableIds from chart config using `remap_ids` mapping."""
     if isinstance(config, dict):
         out = {}
