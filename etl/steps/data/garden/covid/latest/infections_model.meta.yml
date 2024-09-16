@@ -4,11 +4,11 @@ definitions:
     description: |-
       <% if (estimate == 'low') %>
       Lower estimates of the true number of COVID-19 infections by << model_name >> model. It shows the bound of a 95% uncertainty interval.
-      <% elif (estimate == 'high') %>
+      <% elif (estimate == 'upper') %>
       Upper estimates of the true number of COVID-19 infections << model_name >> model. It shows the bound of a 95% uncertainty interval.
       <% elif (estimate == 'mean') %>
       Mean estimates of the true number of COVID-19 infections << model_name >> model.
-      <% elif (estimate == 'point') %>
+      <% elif (estimate == 'median') %>
       Median estimates of the true number of COVID-19 infections << model_name >> model.
       <%- endif -%>
   common:
@@ -42,22 +42,22 @@ tables:
       icl_infections:
         title: Daily new estimated COVID-19 infections (ICL, <<estimate.title()>> estimate)
         description: |-
-          < set model_name = "ICL" >
+          <% set model_name = "ICL" %>
           {definitions.others.description}
 
       ihme_infections:
         title: Daily new estimated COVID-19 infections (IHME, <<estimate.title()>> estimate)
         description: |-
-          < set model_name = "IHME" >
+          <% set model_name = "IHME" %>
           {definitions.others.description}
 
       lshtm_infections:
         title: Daily new estimated COVID-19 infections (LSHTM, <<estimate.title()>> estimate)
         description: |-
-          < set model_name = "LSHTM" >
+          <% set model_name = "LSHTM" %>
           {definitions.others.description}
       yyg_infections:
         title: Daily new estimated COVID-19 infections (Youyang Gu, <<estimate.title()>> estimate)
         description: |-
-          < set model_name = "Youyang Gu" >
+          <% set model_name = "Youyang Gu" %>
           {definitions.others.description}
