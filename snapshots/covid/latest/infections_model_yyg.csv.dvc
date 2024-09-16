@@ -21,6 +21,6 @@ meta:
     license:
       name: CC BY 4.0
 outs:
-  - md5: 78b23e16068fb7d5b1fd93bafc2af2c7
-    size: 15152259
-    path: infections_model_youyang.csv
+  - md5: 0c3d0f1d748f468f9619b6d374a35e94
+    size: 15259453
+    path: infections_model_yyg.csv

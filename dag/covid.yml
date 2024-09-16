@@ -263,7 +263,7 @@ steps:
     - snapshot://covid/latest/infections_model_icl.csv
     - snapshot://covid/latest/infections_model_ihme.csv
     - snapshot://covid/latest/infections_model_lshtm.csv
-    - snapshot://covid/latest/infections_model_youyang.csv
+    - snapshot://covid/latest/infections_model_yyg.csv
   data://garden/covid/latest/infections_model:
     - data://meadow/covid/latest/infections_model
   data://grapher/covid/latest/infections_model:

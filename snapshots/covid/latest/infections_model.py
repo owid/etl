@@ -15,13 +15,13 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--icl", default=None, type=str, help="Path to ICL local data file.")
 @click.option("--ihme", default=None, type=str, help="Path to IHME local data file.")
 @click.option("--lshtm", default=None, type=str, help="Path to LSHTM local data file.")
-@click.option("--youyang", default=None, type=str, help="Path to Youyang Gu local data file.")
-def main(icl: str, ihme: str, lshtm: str, youyang: str, upload: bool) -> None:
+@click.option("--yyg", default=None, type=str, help="Path to Youyang Gu local data file.")
+def main(icl: str, ihme: str, lshtm: str, yyg: str, upload: bool) -> None:
     estimates = [
         ("icl", icl),
         ("ihme", ihme),
         ("lshtm", lshtm),
-        ("youyang", youyang),
+        ("yyg", yyg),
     ]
     # Create a new snapshots.
     for estimate in estimates:
