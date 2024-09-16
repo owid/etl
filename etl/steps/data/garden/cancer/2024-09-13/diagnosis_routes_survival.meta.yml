@@ -5,13 +5,13 @@ definitions:
       topic_tags:
         - Cancer
       grapher_config:
-        note: The year represents the start of the 5-year age-standardised survival estimates by cancer site for 5-year rolling cohorts from 2006-2010 to 2016-2020.
+        note: The year represents the start of the 5-year age-standardized survival estimates by cancer site for 5-year rolling cohorts from 2006-2010 to 2016-2020.
 
   diag_route: &diag_route |-
     <% if route == "Screening" %>
     Screening is flagged by the cancer registry as detected via the breast, bowel, or cervical screening programmes.
     <% elif route == "USC" %>
-    USC (Urgent Suspected Cancer)refers to urgent GP referrals with a suspicion of cancer (previously known as two-week wait/TWW).
+    USC (Urgent Suspected Cancer) refers to urgent GP referrals with a suspicion of cancer (previously known as two-week wait/TWW).
     <% elif route == "GP referral" %>
     Routine and urgent referrals where the patient was not referred under the USC (Urgent Suspected Cancer) referral route
     <% elif route == "Emergency presentation" %>
@@ -21,7 +21,7 @@ definitions:
     <% elif route == "Inpatient elective" %>
     No earlier information can be found prior to admission from a waiting list, booked or planned.
     <% elif route == "Unknown route" %>
-    No relevant data available from Inpatient or Outpatient HES, National Cancer Waiting Times or National Screening Programmes.
+    No relevant data available from Inpatient or Outpatient Hospital Episode Statistics, National Cancer Waiting Times or National Screening Programmes.
     <% endif %>
   sex: |-
     <% if gender == "Persons" %>all<% elif gender == "Male" %>male<% elif gender == "Female" %>female<% endif %>
@@ -43,6 +43,12 @@ tables:
         description_key:
           - *diag_route
         unit: cases
+        display:
+          numDecimalPlaces: 0
+          name: << route >>
+        presentation:
+          title_public: Number of {definitions.sex} patients diagnosed via << route.lower() >> surviving at the end of the << length.lower() >> period
+
       survival:
         title: Age-standardized << length.lower() >> survival rate diagnosed via << route.lower() >> among {definitions.sex} patients
         description_short: |-
@@ -51,3 +57,8 @@ tables:
           - *diag_route
         unit: '%'
         short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          name: << route >>
+        presentation:
+          title_public: Age-standardized  << length.lower() >>  survival rate diagnosed via << route.lower() >> among {definitions.sex} patients

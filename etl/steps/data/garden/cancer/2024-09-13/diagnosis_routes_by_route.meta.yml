@@ -9,7 +9,7 @@ definitions:
     <% if route == "Screening" %>
     Screening is flagged by the cancer registry as detected via the breast, bowel, or cervical screening programmes.
     <% elif route == "USC" %>
-    USC (Urgent Suspected Cancer)refers to urgent GP referrals with a suspicion of cancer (previously known as two-week wait/TWW).
+    USC (Urgent Suspected Cancer) refers to urgent GP referrals with a suspicion of cancer (previously known as two-week wait/TWW).
     <% elif route == "GP referral" %>
     Routine and urgent referrals where the patient was not referred under the USC (Urgent Suspected Cancer) referral route
     <% elif route == "Emergency presentation" %>
@@ -19,7 +19,7 @@ definitions:
     <% elif route == "Inpatient elective" %>
     No earlier information can be found prior to admission from a waiting list, booked or planned.
     <% elif route == "Unknown route" %>
-    No relevant data available from Inpatient or Outpatient HES, National Cancer Waiting Times or National Screening Programmes.
+    No relevant data available from Inpatient or Outpatient Hospital Episode Statistics, National Cancer Waiting Times or National Screening Programmes.
     <% endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -36,9 +36,15 @@ tables:
         description_key:
           - *diag_route
         unit: cases
+        display:
+          numDecimalPlaces: 0
+          name: << route >>
       percentage_by_route:
         title: Share of << stage.lower() >>  cancer diagnoses via the << route.lower() >> route
         description_key:
          - *diag_route
         unit: '%'
         short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+          name: << route >>

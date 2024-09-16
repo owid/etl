@@ -16,6 +16,27 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden["diagnosis_routes_by_route"].reset_index()
     tb = tb.drop(columns=["country"])
+    # Define mapping with lowercase values
+    cancer_mapping = {
+        "Bladder": "Bladder",
+        "Brain": "Brain",
+        "Breast": "Breast",
+        "Cervix": "Cervical",
+        "Colorectal": "Colorectal",
+        "Kidney": "Kidney",
+        "Liver": "Liver",
+        "Lung": "Lung",
+        "Oesophagus": "Oesophageal",
+        "Ovary": "Ovarian",
+        "Pancreas": "Pancreatic",
+        "Prostate": "Prostate",
+        "Stomach": "Stomach",
+        "Testis": "Testicular",
+        "Uterus": "Uterine",
+    }
+
+    # Map cancer types to descriptive labels in lowercase
+    tb["site"] = tb["site"].map(cancer_mapping)
 
     # Make cancer type appear as country.
     tb = tb.rename(columns={"site": "country"})
