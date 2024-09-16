@@ -21,7 +21,7 @@ definitions:
       name: |-
         <% if (estimate == 'low') %>
         Lower
-        <% elif (estimate == 'high') %>
+        <% elif (estimate == 'upper') %>
         Upper
         <% elif (estimate == 'mean') %>
         Mean estimate
