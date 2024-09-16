@@ -41,23 +41,31 @@ tables:
     variables:
       icl_infections:
         title: Daily new estimated COVID-19 infections (ICL, <<estimate.title()>> estimate)
+        presentation:
+          title_public: Daily new estimated COVID-19 infections (ICL, <<estimate.title()>> estimate)
         description: |-
           <% set model_name = "ICL" %>
           {definitions.others.description}
 
       ihme_infections:
         title: Daily new estimated COVID-19 infections (IHME, <<estimate.title()>> estimate)
+        presentation:
+          title_public: Daily new estimated COVID-19 infections (IHME, <<estimate.title()>> estimate)
         description: |-
           <% set model_name = "IHME" %>
           {definitions.others.description}
 
       lshtm_infections:
         title: Daily new estimated COVID-19 infections (LSHTM, <<estimate.title()>> estimate)
+        presentation:
+          title_public: Daily new estimated COVID-19 infections (LSHTM, <<estimate.title()>> estimate)
         description: |-
           <% set model_name = "LSHTM" %>
           {definitions.others.description}
       yyg_infections:
         title: Daily new estimated COVID-19 infections (Youyang Gu, <<estimate.title()>> estimate)
+        presentation:
+          title_public: Daily new estimated COVID-19 infections (Youyang Gu, <<estimate.title()>> estimate)
         description: |-
           <% set model_name = "Youyang Gu" %>
           {definitions.others.description}
