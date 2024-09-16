@@ -22,6 +22,6 @@ meta:
       url: https://cds.climate.copernicus.eu/api/v2/terms/static/licence-to-use-copernicus-products.pdf
 
 outs:
-  - md5: baac47e1ecd42b57ee73163c0aba50d1
-    size: 2353412348
-    path: surface_temperature.gz
+  - md5: f60e6189ce2d2973495c229d4499fa90
+    size: 1453836884
+    path: surface_temperature.zip
