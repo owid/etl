@@ -12,12 +12,12 @@ definitions:
       Median estimates of the true number of COVID-19 infections << model_name >> model.
       <%- endif -%>
   common:
+    unit: estimated infections
     presentation:
       topic_tags:
         - COVID-19
     display:
       numDecimalPlaces: 3
-      unit: estimated infections
       name: |-
         <% if (estimate == 'low') %>
         Lower
@@ -25,7 +25,7 @@ definitions:
         Upper
         <% elif (estimate == 'mean') %>
         Mean estimate
-        <% elif (estimate == 'point') %>
+        <% elif (estimate == 'median') %>
         Median estimate
         <%- endif -%>
 
