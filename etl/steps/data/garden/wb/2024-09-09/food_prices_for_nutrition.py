@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import List
+
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -20,6 +22,9 @@ CLASSIFICATION = EXPECTED_CLASSIFICATIONS[-1]
 # This is done by multiplying the cost in a given YEAR by the ratio CPI(BASE_YEAR) / CPI(YEAR).
 # Base year for CPI corrections.
 CPI_BASE_YEAR = 2021
+
+# Alternative attribution for share and number who cannot afford a healthy diet.
+ATTRIBUTION_CANNOT_AFFORD = "FAO and World Bank (2024), using data and methods from Bai et al. (2024)"
 
 
 def adapt_units(tb: Table, tb_wdi: Table) -> Table:
@@ -49,6 +54,16 @@ def adapt_units(tb: Table, tb_wdi: Table) -> Table:
     tb["cost_of_a_healthy_diet"] *= tb["cpi_adjustment_factor"]
     # Drop unnecessary column.
     tb = tb.drop(columns=["cpi_adjustment_factor"], errors="raise")
+
+    return tb
+
+
+def change_attribution(tb: Table, columns: List[str], attribution_text: str) -> Table:
+    """
+    Change attribution for some indicators as suggested by authors.
+    """
+    for col in columns:
+        tb[col].m.origins[0].attribution = attribution_text
 
     return tb
 
@@ -88,6 +103,26 @@ def run(dest_dir: str) -> None:
 
     # Adapt units and correct for inflation.
     tb = adapt_units(tb=tb, tb_wdi=tb_wdi)
+
+    # Change attributions for share and number of people who cannot afford a healthy diet.
+    tb = change_attribution(
+        tb=tb,
+        columns=[
+            "people_who_cannot_afford_a_healthy_diet",
+            "percent_of_the_population_who_cannot_afford_a_healthy_diet",
+        ],
+        attribution_text=ATTRIBUTION_CANNOT_AFFORD,
+    )
+
+    # Remove attributions for cost_of_an_energy_sufficient_diet and cost_of_a_nutrient_adequate_diet
+    tb = change_attribution(
+        tb=tb,
+        columns=[
+            "cost_of_an_energy_sufficient_diet",
+            "cost_of_a_nutrient_adequate_diet",
+        ],
+        attribution_text=None,
+    )
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format()

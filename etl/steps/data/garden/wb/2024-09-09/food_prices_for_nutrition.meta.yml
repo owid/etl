@@ -54,6 +54,17 @@ definitions:
   description_key_international_dollars: &description_key_international_dollars |-
     The data is measured in international-$ at 2021 prices - this adjusts for inflation and for differences in the cost of living between countries.
 
+  description_from_producer_healthy_diet: &description_from_producer_healthy_diet |-
+    The Cost of a Healthy Diet indicator provides a globally standardized metric to monitor food environments,  measuring a population’s access to sufficient food for an active and healthy life. For this metric, access to healthy diets is measured using the least expensive locally available items in sufficient quantities to meet national governments’ food-based dietary guidelines.  For global monitoring, commonalities among those guidelines are represented by a Healthy Diet Basket, specifying a target number and quantity of eleven items balanced across six nutritionally defined food groups. The items selected in each country to meet the global Healthy Diet Basket standard generally also achieve nutrient adequacy, at a similar cost to meeting an individual country’s own national dietary guidelines.
+
+    _Limitations and exceptions_
+
+    Item prices for the global Cost of a Healthy Diet indicator are reported by each national statistical organization through the International Comparison Program, intending to show the country’s annual average cost for commonly consumed foods being sold in multiple countries. Food item availability and price at any one time and place could differ from this average. Also, prices are reported in local currency units, and then adjusted for inflation over time and price levels across countries using national Consumer Price Indexes and Purchasing Power Parity exchange rates that may not exactly match currency values used in any one time and place.
+
+    _Statistical concept and methodology_
+
+    The Cost of a Healthy Diet is a new kind of price index developed by the Food Prices for Nutrition project, based on matching item descriptions to food composition data then selecting the lowest cost options to meet dietary requirements. The initial methods were first published as a background paper for the UN agencies’ State of Food Security and Nutrition in the World Report 2020 and revised for the 2022 and 2024 editions of that same report.
+
 dataset:
   update_period_days: 365
   description: |-
@@ -123,6 +134,8 @@ tables:
           Cost of purchasing the least expensive locally available foods to meet requirements for energy and food-based dietary guidelines, for a representative person within energy balance at 2,330 kcal/day. This data is adjusted for inflation and for differences in the cost of living between countries.
         description_key:
           - *description_healthy_diet
+        description_from_producer: *description_from_producer_healthy_diet
+
       cost_of_a_healthy_diet_relative_to_the_cost_of_sufficient_energy_from_starchy_staples:
         title: Cost of a healthy diet relative to the cost of sufficient energy from starchy staples
         unit: "%"

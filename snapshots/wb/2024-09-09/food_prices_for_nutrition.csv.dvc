@@ -21,7 +21,9 @@ meta:
       - Secretariat of the Pacific Community: Statistics and Demography Programme.
 
     citation_full: |-
-      World Bank, adapted from Herforth, A., Venkat, A., Bai, Y., Costlow, L., Holleman, C. & Masters, W.A. (2022). Methods and options to monitor globally the cost and affordability of a healthy diet. Background paper for The State of Food Security and Nutrition in the World 2022. Rome, FAO.
+      - The World Bank (2024), Food Prices for Nutrition database, version 3.0, updated 24 July 2024. Washington, DC: The World Bank. https://doi.org/10.57966/41AN-KY81
+      - FAO (2024), Cost and Affordability of a Healthy Diet database, updated 24 July 2024. Rome, FAO. https://www.fao.org/faostat/en/#data/CAHD
+    attribution: FAO and World Bank (2024), using data and methods from Herforth et al. (2022)
     version_producer: '3.0'
     url_main: https://databank.worldbank.org/source/food-prices-for-nutrition
     date_accessed: '2024-09-09'
