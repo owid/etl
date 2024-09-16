@@ -7,7 +7,9 @@ definitions:
         - Causes of Death
     processing_level: minor
     description_processing: |-
-      Data for "Other cancers (OWID)" was calculated by summing deaths from all cancers that caused fewer than 50,000 deaths in the most recent year of data. These include eye cancer, Hodgkin lymphoma, mesothelioma, neuroblastoma and other peripheral nervous cell tumors, testicular cancer, thyroid cancer, other malignant neoplasms, other neoplasms.
+      <% if cause == "Other cancers (OWID)"%>
+      Data for "Other cancers (OWID)" was calculated by summing deaths from all cancers that caused fewer than 500,000 deaths in the most recent year of data. These include bladder cancer, brain and central nervous system cancer, cervical cancer, eye cancer, gallbladder and biliary tract cancer, Hodgkin lymphoma, kidney cancer, larynx cancer, leukemia, lip and oral cavity cancer, liver cancer, malignant neoplasm of bone and articular cartilage, malignant skin melanoma, mesothelioma, multiple myeloma, nasopharynx cancer, neuroblastoma and other peripheral nervous cell tumors, non-Hodgkin lymphoma, non-melanoma skin cancer, other malignant neoplasms, other neoplasms, other pharynx cancer, ovarian cancer, prostate cancer, soft tissue and other extraosseous sarcomas, testicular cancer, thyroid cancer, uterine cancer, other malignant neoplasms, other neoplasms.
+      <%- endif -%>
   footnote: |-
     <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
 dataset:
