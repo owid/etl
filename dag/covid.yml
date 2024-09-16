@@ -257,3 +257,14 @@ steps:
     - data://meadow/covid/latest/covax
   data://grapher/covid/latest/covax:
     - data://garden/covid/latest/covax
+
+  # Model estimates (ICL, IHME, LSHTM, YYG)
+  data://meadow/covid/latest/infections_model:
+    - snapshot://covid/latest/infections_model_icl.csv
+    - snapshot://covid/latest/infections_model_ihme.csv
+    - snapshot://covid/latest/infections_model_lshtm.csv
+    - snapshot://covid/latest/infections_model_yyg.csv
+  data://garden/covid/latest/infections_model:
+    - data://meadow/covid/latest/infections_model
+  data://grapher/covid/latest/infections_model:
+    - data://garden/covid/latest/infections_model
