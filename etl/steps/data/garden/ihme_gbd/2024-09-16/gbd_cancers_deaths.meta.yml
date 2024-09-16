@@ -3,15 +3,14 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Global Health
+        - Cancer
         - Causes of Death
     processing_level: minor
     description_processing: |-
       <% if cause == "Other cancers (OWID)"%>
       Data for "Other cancers (OWID)" was calculated by summing deaths from all cancers that caused fewer than 200,000 deaths in the most recent year of data.
       <%- endif -%>
-  footnote: |-
-    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+
 dataset:
   update_period_days: 1460
   non_redistributable: true
@@ -22,30 +21,22 @@ tables:
 
       share_of_cancer_deaths:
         title: |-
-          <% if age != 'Age-standardized' and age != 'All ages' %>
+          <% if age != 'All ages' %>
           Share of cancer deaths of individuals aged << age >> from << cause.lower() >>
-          <% elif age == 'Age-standardized' %>
-          Share of age-standardized cancer deaths that are from << cause.lower() >>
           <% elif age == 'All ages' %>
           Share of cancer deaths that are from << cause.lower() >>
           <%- endif -%>
 
         description_short: |-
-          <% if age != 'Age-standardized' and age != 'All ages' %>
+          <% if age != 'All ages' %>
             Share of cancer deaths of individuals aged << age >> from << cause.lower() >>
-          <% elif age == 'Age-standardized' %>
-            Share of age-standardized cancer deaths that are from << cause.lower() >>
-          <% elif age == 'All ages' %>
+          <% if age == 'All ages' %>
             Share of cancer deaths that are from << cause.lower() >>
           <%- endif -%>
         unit: "%"
         short_unit: "%"
 
 
-        presentation:
-          grapher_config:
-            note: |-
-              {definitions.footnote}
         display:
           numDecimalPlaces: 1
           name: << cause >>
