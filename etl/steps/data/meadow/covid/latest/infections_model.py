@@ -30,6 +30,7 @@ COLUMN_INDEX = [
     "date",
 ]
 
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
