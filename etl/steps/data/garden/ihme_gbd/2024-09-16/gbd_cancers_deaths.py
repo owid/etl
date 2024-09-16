@@ -85,7 +85,7 @@ def run(dest_dir: str) -> None:
     tb_cancer["cause"] = "Other cancers (OWID)"
 
     # Remove the grouped cancers from the original DataFrame but keep other relevant cancers
-    tb = tb[tb["cause"].isin(cancers) & ~tb["cause"].isin(cancers_to_aggregate)]
+    tb = tb[tb["cause"].isin(cancers + other_cancers) & ~tb["cause"].isin(cancers_to_aggregate)]
 
     # Concatenate the new "Other cancers (OWID)" row to the original DataFrame
     tb = pr.concat([tb, tb_cancer], ignore_index=True)
