@@ -91,7 +91,9 @@ def run(dest_dir: str) -> None:
     tb = pr.concat([tb, tb_cancer], ignore_index=True)
 
     # Calculate the total number of cancer deaths for each year
-    total_cancer_deaths = tb[tb["cause"].isin(cancers)].groupby(["country", "year", "age"])["value"].sum().reset_index()
+    total_cancer_deaths = (
+        tb[tb["cause"].isin(cancers + other_cancers)].groupby(["country", "year", "age"])["value"].sum().reset_index()
+    )
     total_cancer_deaths = total_cancer_deaths.rename(columns={"value": "total_cancer_deaths"})
 
     # Merge total cancer deaths with the original data
