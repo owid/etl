@@ -21,39 +21,39 @@ def run(dest_dir: str) -> None:
     #
     # US
     rename_cols = {
-        "Entity": "entity",
+        "Entity": "country",
         "Day": "date",
         "unvaccinated": "us_unvaccinated",
         "vaccinated_without": "us_vaccinated_no_biv_booster",
         "vaccinated_with": "us_vaccinated_with_biv_booster",
     }
     tb_us = tb_us.rename(columns=rename_cols)[rename_cols.values()]
-    tb_us = tb_us.format(["entity", "date"], short_name="us")
+    tb_us = tb_us.format(["country", "date"], short_name="us")
 
     # England
     rename_cols = {
-        "Entity": "entity",
+        "Entity": "country",
         "Day": "date",
         "Unvaccinated": "england_unvaccinated",
         "Fully vaccinated": "england_fully_vaccinated",
     }
     tb_en = tb_en.rename(columns=rename_cols)[rename_cols.values()]
-    tb_en = tb_en.format(["entity", "date"], short_name="england")
+    tb_en = tb_en.format(["country", "date"], short_name="england")
 
     # Switzerland
     rename_cols = {
-        "Entity": "entity",
+        "Entity": "country",
         "Day": "date",
         "Unvaccinated": "swi_unvaccinated",
         "Fully vaccinated, no booster": "swi_vaccinated_no_booster",
         "Fully vaccinated + booster": "swi_vaccinated_with_booster",
     }
     tb_swi = tb_swi.rename(columns=rename_cols)[rename_cols.values()]
-    tb_swi = tb_swi.format(["entity", "date"], short_name="switzerland")
+    tb_swi = tb_swi.format(["country", "date"], short_name="switzerland")
 
     # Chile
     rename_cols = {
-        "Entity": "entity",
+        "Entity": "country",
         "Day": "date",
         "0 or 1 dose": "chile_0_1_dose",
         "2 doses": "chile_2_doses",
@@ -61,7 +61,7 @@ def run(dest_dir: str) -> None:
         "4 doses": "chile_4_doses",
     }
     tb_cl = tb_cl.rename(columns=rename_cols)[rename_cols.values()]
-    tb_cl = tb_cl.format(["entity", "date"], short_name="chile")
+    tb_cl = tb_cl.format(["country", "date"], short_name="chile")
 
     # Table list
     tables = [
