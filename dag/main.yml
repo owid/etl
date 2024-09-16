@@ -786,6 +786,7 @@ steps:
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
 
+# Child Mortality Estimates - UN IGME
   data://meadow/un/2024-09-11/igme:
     - snapshot://un/2024-09-11/igme.zip
   data://garden/un/2024-09-11/igme:
@@ -793,6 +794,16 @@ steps:
     - data://garden/un/2018/igme
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
+
+
+# Long-run child mortality, Gapminder + UN IGME
+  data://garden/un/2024-09-16/long_run_child_mortality:
+    - data://garden/un/2024-09-11/igme
+    - data://garden/gapminder/2023-09-18/under_five_mortality
+    - data://garden/gapminder/2023-09-21/under_five_mortality
+  data://grapher/un/2024-09-16/long_run_child_mortality:
+    - data://garden/un/2024-09-16/long_run_child_mortality
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
