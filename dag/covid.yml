@@ -268,3 +268,14 @@ steps:
     - data://meadow/covid/latest/infections_model
   data://grapher/covid/latest/infections_model:
     - data://garden/covid/latest/infections_model
+
+  # Deaths by vaccination status
+  data://meadow/covid/latest/deaths_vax_status:
+    - snapshot://covid/latest/deaths_vax_status_england.csv
+    - snapshot://covid/latest/deaths_vax_status_us.csv
+    - snapshot://covid/latest/deaths_vax_status_chile.csv
+    - snapshot://covid/latest/deaths_vax_status_switzerland.csv
+  data://garden/covid/latest/deaths_vax_status:
+    - data://meadow/covid/latest/deaths_vax_status
+  data://grapher/covid/latest/deaths_vax_status:
+    - data://garden/covid/latest/deaths_vax_status
