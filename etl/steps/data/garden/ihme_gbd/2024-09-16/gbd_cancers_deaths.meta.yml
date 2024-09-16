@@ -41,9 +41,11 @@ tables:
         unit: "%"
         short_unit: "%"
 
+
         presentation:
           grapher_config:
             note: |-
               {definitions.footnote}
         display:
           numDecimalPlaces: 1
+          name: << cause >>
