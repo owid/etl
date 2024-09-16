@@ -85,15 +85,13 @@ def run(dest_dir: str) -> None:
     tb_cancer["cause"] = "Other cancers (OWID)"
 
     # Remove the grouped cancers from the original DataFrame but keep other relevant cancers
-    tb = tb[tb["cause"].isin(cancers + other_cancers) & ~tb["cause"].isin(cancers_to_aggregate)]
+    tb = tb[tb["cause"].isin(cancers) & ~tb["cause"].isin(cancers_to_aggregate)]
 
     # Concatenate the new "Other cancers (OWID)" row to the original DataFrame
     tb = pr.concat([tb, tb_cancer], ignore_index=True)
 
     # Calculate the total number of cancer deaths for each year
-    total_cancer_deaths = (
-        tb[tb["cause"].isin(cancers + other_cancers)].groupby(["country", "year", "age"])["value"].sum().reset_index()
-    )
+    total_cancer_deaths = tb.groupby(["country", "year", "age"])["value"].sum().reset_index()
     total_cancer_deaths = total_cancer_deaths.rename(columns={"value": "total_cancer_deaths"})
 
     # Merge total cancer deaths with the original data
