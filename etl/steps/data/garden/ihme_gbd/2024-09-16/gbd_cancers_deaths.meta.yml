@@ -1,0 +1,72 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Causes of Death
+    processing_level: minor
+    description_processing: |-
+      Data for "Other cancers (OWID)" was calculated by summing deaths from all cancers that caused fewer than 50,000 deaths in the most recent year of data. These include eye cancer, Hodgkin lymphoma, mesothelioma, neuroblastoma and other peripheral nervous cell tumors, testicular cancer, thyroid cancer, other malignant neoplasms, other neoplasms.
+  footnote: |-
+    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+dataset:
+  update_period_days: 1460
+  non_redistributable: true
+  title: Global Burden of Disease (GBD) - Causes of Death - Cancer
+tables:
+  gbd_cancers_deaths:
+    variables:
+      total_deaths:
+        title: |-
+          <% if age != 'Age-standardized' and age != 'All ages' %>
+          Total deaths of individuals aged << age >> from << cause.lower() >>
+          <% elif age == 'Age-standardized' %>
+          Total age-standardized deaths from << cause.lower() >>
+          <% elif age == 'All ages' %>
+          Total deaths from << cause.lower() >>
+          <%- endif -%>
+        description_short: |-
+          <% if age != 'Age-standardized' and age != 'All ages' %>
+            Total deaths of individuals aged << age >> from << cause.lower() >>
+          <% elif age == 'Age-standardized' %>
+            Total age-standardized deaths from << cause.lower() >>
+          <% elif age == 'All ages' %>
+            Total deaths from << cause.lower() >>
+          <%- endif -%>
+        unit: deaths
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: 0
+
+
+      share_of_cancer_deaths:
+        title: |-
+          <% if age != 'Age-standardized' and age != 'All ages' %>
+          Share of total deaths of individuals aged << age >> from << cause.lower() >>
+          <% elif age == 'Age-standardized' %>
+          Share of total age-standardized deaths that are from << cause.lower() >>
+          <% elif age == 'All ages' %>
+          Share of deaths that are from << cause.lower() >>
+          <%- endif -%>
+
+        description_short: |-
+          <% if age != 'Age-standardized' and age != 'All ages' %>
+            Share of total deaths of individuals aged << age >> from << cause.lower() >>
+          <% elif age == 'Age-standardized' %>
+            Share of total age-standardized deaths that are from << cause.lower() >>
+          <% elif age == 'All ages' %>
+            Share of deaths that are from << cause.lower() >>
+          <%- endif -%>
+        unit: "%"
+        short_unit: "%"
+
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote}
+        display:
+          numDecimalPlaces: 1
