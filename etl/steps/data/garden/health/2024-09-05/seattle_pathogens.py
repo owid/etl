@@ -58,7 +58,13 @@ def run(dest_dir: str) -> None:
     tb = process_table(tb)
     # Monthly data
     tb_month = process_table(tb_month)
-
+    tb_month = tb_month.rename(
+        columns={
+            "present": "present_month",
+            "tested": "tested_month",
+            "percentage": "percentage_month",
+        }
+    )
     # Format
     tables = [
         tb.format(["country", "date", "organism"]),
