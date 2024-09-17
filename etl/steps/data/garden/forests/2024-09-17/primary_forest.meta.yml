@@ -13,7 +13,7 @@ dataset:
 
 
 tables:
-  faostat_rl:
+  primary_forest:
     variables:
       value_primary_forest:
         title: Primary forest area
