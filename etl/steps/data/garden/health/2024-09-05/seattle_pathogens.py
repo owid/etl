@@ -1,6 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import List
+
 import pandas as pd
+from owid.catalog import Table
+from owid.catalog.processing import concat
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -54,6 +58,15 @@ def run(dest_dir: str) -> None:
     assert (tb["tested"] != 0).all(), "Some zeroes in tested column! This can lead to division by zero."
     tb["percentage"] = 100 * tb["present"] / tb["tested"]
 
+    # Add groupings
+    groups = {
+        "RSV": ["RSV A", "RSV B"],
+        "Influenza A": ["Influenza A (H3N2)", "Influenza A (H1N1)"],
+        # # "Influenza": ["Influenza A (H3N2)", "Influenza A (H1N1)", "Influenza B"],
+    }
+    for group_name, group_pathogens in groups.items():
+        tb = add_pathogen_group(tb, group_name, group_pathogens)
+
     # Add entity
     tb["country"] = "Seattle"
 
@@ -70,3 +83,13 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_pathogen_group(tb: Table, group_name: str, group_pathogens: List[str]):
+    tb_group = tb[tb["organism"].isin(group_pathogens)].copy()
+
+    tb_group = tb_group.groupby("date", as_index=False)[["present", "percentage"]].sum()
+    tb_group["organism"] = group_name
+
+    tb = concat([tb, tb_group])
+    return tb

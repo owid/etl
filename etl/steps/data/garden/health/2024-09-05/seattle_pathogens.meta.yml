@@ -1,5 +1,12 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  others:
+    group_notes: |-
+      <% if organism == 'RSV' %>
+      This includes RSV A and RSV B.
+      <% elif organism == 'Influenza A' %>
+      This includes Influenza A H1N1 and H3N2.
+      <% endif %>
   common:
     presentation:
       topic_tags:
@@ -21,12 +28,12 @@ tables:
         title: Number of specimens with pathogen <<organism>>
         unit: specimens
         description_short: |-
-          The number of specimens detected with respiratory pathogen << organism >>.
+          The number of specimens detected with respiratory pathogen << organism >>. {definitions.others.group_notes}
 
       percentage:
         title: Percentage of specimens with pathogen <<organism>>
         description_short: |-
-          The share of specimens detected with respiratory pathogen << organism >>.
+          The share of specimens detected with respiratory pathogen << organism >>. {definitions.others.group_notes}
         unit: "%"
         short_unit: "%"
         display:
@@ -36,5 +43,5 @@ tables:
       tested:
         title: Total number of specimens tested for pathogen <<organism>> present
         description_short: |-
-          The number of specimens tested to detect the respiratory pathogen << organism >>. Some of these specimens may have tested positive for the pathogen, while others (or all of them) may have tested negative.
+          The number of specimens tested to detect the respiratory pathogen << organism >>. Some of these specimens may have tested positive for the pathogen, while others (or all of them) may have tested negative. {definitions.others.group_notes}
         unit: specimens
