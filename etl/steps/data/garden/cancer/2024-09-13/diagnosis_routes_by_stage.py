@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -20,6 +22,15 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb["route"] = tb["route"].str.replace(r"^\d+\s", "", regex=True)
+
+    # Group by the relevant columns and sum the 'count_by_stage'
+    summed_tb = tb.groupby(["country", "year", "site", "route"], as_index=False)["count_by_stage"].sum()
+
+    # Add a new 'route' value to indicate these are summed rows
+    summed_tb["stage"] = "All stages of cancer"
+
+    # Append the summed rows to the original DataFrame
+    tb = pr.concat([tb, summed_tb], ignore_index=True)
     tb = tb.format(["country", "year", "site", "stage", "route"])
 
     #
