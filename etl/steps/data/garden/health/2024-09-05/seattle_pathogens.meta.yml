@@ -41,7 +41,32 @@ tables:
           name: << organism >>
 
       tested:
-        title: Total number of specimens tested for pathogen <<organism>> present
+        title: Total number of specimens tested for presence of pathogen <<organism>>
+        description_short: |-
+          The number of specimens tested to detect the respiratory pathogen << organism >>. Some of these specimens may have tested positive for the pathogen, while others (or all of them) may have tested negative. {definitions.others.group_notes}
+        unit: specimens
+
+
+  seattle_pathogens_month:
+    variables:
+      present:
+        title: Number of specimens with pathogen <<organism>> (monthly)
+        unit: specimens
+        description_short: |-
+          The number of specimens detected with respiratory pathogen << organism >>. {definitions.others.group_notes}
+
+      percentage:
+        title: Percentage of specimens with pathogen <<organism>> (monthly)
+        description_short: |-
+          The share of specimens detected with respiratory pathogen << organism >>. {definitions.others.group_notes}
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+          name: << organism >>
+
+      tested:
+        title: Total number of specimens tested for presence of pathogen <<organism>> (monthly)
         description_short: |-
           The number of specimens tested to detect the respiratory pathogen << organism >>. Some of these specimens may have tested positive for the pathogen, while others (or all of them) may have tested negative. {definitions.others.group_notes}
         unit: specimens
