@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import datetime
+from typing import List
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -31,20 +32,33 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("monkeypox")
-    ds_suspected = paths.load_dataset("global_health_mpox")
+    ds_meadow_shiny = paths.load_dataset("monkeypox_shiny")
+    # ds_suspected = paths.load_dataset("global_health_mpox")
     # Read table from meadow dataset.
     tb = ds_meadow["monkeypox"].reset_index()
-    tb_suspected = ds_suspected["global_health_mpox"].reset_index()
-    cols = ["country", "date", "suspected_cases_cumulative"]
-    tb_suspected = tb_suspected[cols]
-    assert tb_suspected.shape[1] == len(cols)
+    tb["source"] = "xmart"
+    tb_africa = ds_meadow_shiny["monkeypox_shiny"].reset_index()
+    tb_africa["source"] = "shiny"
+    rename_dict = {
+        "week_end_date": "date",
+        "total_confirmed_cases": "total_conf_cases",
+        "total_deaths": "total_conf_deaths",
+        "new_confirmed_cases": "new_conf_cases",
+        "new_deaths": "new_conf_deaths",
+    }
+    tb_africa = tb_africa.rename(columns=rename_dict, errors="raise")
+    # tb_suspected = ds_suspected["global_health_mpox"].reset_index()
+    # cols = ["country", "date", "suspected_cases_cumulative"]
+    # tb_suspected = tb_suspected[cols]
+    # assert tb_suspected.shape[1] == len(cols)
     origins = tb["total_conf_cases"].metadata.origins
     #
     # Process data.
     #
     tb_orig = tb.copy()
-    tb = geo.harmonize_countries(
-        df=tb,
+    tb_combine = pr.concat([tb, tb_africa], ignore_index=True)
+    tb_combine = geo.harmonize_countries(
+        df=tb_combine,
         countries_file=paths.country_mapping_path,
         make_missing_countries_nan=True,
     )
@@ -55,6 +69,8 @@ def run(dest_dir: str) -> None:
         log.warning(f"Missing countries in monkeypox.countries.json: {missing_countries}")
         tb.country = tb.country.astype(str).fillna(tb_orig.country)
 
+    # Removing duplicates and preferring shiny data
+    tb = remove_duplicates(tb=tb_combine, preferred_source="shiny", dimensions=["country", "date"])
     tb = (
         tb.pipe(clean_columns)
         .pipe(clean_date)
@@ -67,27 +83,49 @@ def run(dest_dir: str) -> None:
         .pipe(filter_dates)
     )
 
-    tb_both = pr.merge(tb, tb_suspected, on=["country", "date"], how="outer")
+    # tb_both = pr.merge(tb, tb_suspected, on=["country", "date"], how="outer")
 
     # For variables on deaths we should show that data reported by the WHO show _only_ confirmed cases, in an annotation
-    country_mask = tb_both["country"] == "Democratic Republic of Congo"
-    tb_both["annotation"] = ""
-    tb_both.loc[country_mask, "annotation"] = (
-        tb_both.loc[country_mask, "annotation"] + "Includes only confirmed deaths as reported by WHO"
+    country_mask = tb["country"] == "Democratic Republic of Congo"
+    tb["annotation"] = ""
+    tb.loc[country_mask, "annotation"] = (
+        tb.loc[country_mask, "annotation"] + "Includes only confirmed deaths as reported by WHO"
     )
-    tb_both["annotation"].metadata.origins = origins
-    tb_both = tb_both.format(["country", "date"])
+    tb["annotation"].metadata.origins = origins
+    tb = tb.format(["country", "date"])
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb_both], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -> Table:
+    """
+    Removing rows where there are overlapping years with a preference for IGME data.
+
+    """
+    assert any(tb["source"] == preferred_source)
+    tb = tb.copy(deep=True)
+    duplicate_rows = tb.duplicated(subset=dimensions, keep=False)
+
+    tb_no_duplicates = tb[~duplicate_rows]
+
+    tb_duplicates = tb[duplicate_rows]
+
+    tb_duplicates_removed = tb_duplicates[tb_duplicates["source"] == preferred_source]
+
+    tb = pr.concat([tb_no_duplicates, tb_duplicates_removed], ignore_index=True)
+
+    assert len(tb[tb.duplicated(subset=dimensions, keep=False)]) == 0, "Duplicates still in table!"
+
+    return tb
 
 
 def clean_columns(tb: Table) -> Table:

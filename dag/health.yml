@@ -713,11 +713,12 @@ steps:
   data://grapher/who/2024-08-06/mortality_database_cancer_most_common:
     - data://garden/who/2024-08-06/mortality_database_cancer_most_common
 
-
+  # Mpox - WHO
   data://meadow/who/latest/monkeypox:
     - snapshot://who/latest/monkeypox.csv
   data://garden/who/latest/monkeypox:
     - data://meadow/who/latest/monkeypox
+    - data://meadow/who/latest/monkeypox_shiny
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/health/latest/global_health_mpox
@@ -727,6 +728,9 @@ steps:
     - data://garden/who/latest/monkeypox
   export://github/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
+# Mpox Shiny app
+  data://meadow/who/latest/monkeypox_shiny:
+    - snapshot://who/latest/monkeypox_shiny.csv
 # Mpox - Global.health
   data://meadow/health/latest/global_health_mpox:
     - snapshot://health/latest/global_health_mpox.csv
