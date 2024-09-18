@@ -2,10 +2,6 @@
 #  Makefile
 #
 
-include ../../default.mk
-
-SRC = owid tests
-
 default:
 	@echo 'Available commands:'
 	@echo
