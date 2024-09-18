@@ -5,9 +5,10 @@ from urllib import parse
 
 import requests
 import streamlit as st
-from owid.catalog.charts import Chart, list_charts
+from owid.catalog.charts import Chart
 
 from apps.utils.gpt import OpenAIWrapper
+from etl.db import get_connection
 
 
 class DataError(Exception):
@@ -57,6 +58,12 @@ def get_trajectory_prompt(base_prompt: str, slug: str) -> str:
     subtitle = chart.config["subtitle"]
 
     return f"{base_prompt}\n\n---\n\n## {title}\n\n{subtitle}\n\n{df_s}"
+
+
+def list_charts(conn) -> list[str]:
+    with conn.cursor() as cur:
+        cur.execute("SELECT slug FROM chart_configs WHERE JSON_EXTRACT(config, '$.isPublished')")
+        return [slug for (slug,) in cur.fetchall()]
 
 
 (tab1, tab2) = st.tabs(["Insight from chart", "Explain raw data"])
@@ -156,11 +163,12 @@ Please write a data insight for the given chart. Use simple language and short p
             response = cast(str, st.write_stream(stream))
 
 with tab2:
+    conn = get_connection()
     default_prompt = """This is an indicator published by Our World In Data.
 
 Explain the core insights present in this data, in plain, educational language.
 """
-    all_charts = list_charts()
+    all_charts = list_charts(conn)
     slug = st.multiselect(
         label="Grapher slug",
         options=all_charts,
