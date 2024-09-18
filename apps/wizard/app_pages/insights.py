@@ -1,13 +1,13 @@
 import base64
 import datetime as dt
 import json
+from pathlib import Path
 from typing import Literal
+from urllib import parse
 
 import pandas as pd
 import requests
 from dateutil.parser import parse as date_parse
-
-from etl.db import get_connection
 
 
 def get_thumbnail_url(grapher_url: str) -> str:

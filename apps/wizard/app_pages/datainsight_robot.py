@@ -1,17 +1,11 @@
-import base64
-from pathlib import Path
 from typing import cast
-from urllib import parse
 
-import pandas as pd
-import requests
 import streamlit as st
 from owid.catalog.charts import Chart
 
 from apps.utils.gpt import OpenAIWrapper
 from apps.wizard.app_pages.insights import (
     fetch_chart_data,
-    fetch_data,
     get_grapher_thumbnail,
     get_thumbnail_url,
     list_charts,
@@ -169,7 +163,7 @@ Explain the core insights present in this data, in plain, educational language.
     all_charts = list_charts(conn)
     slugs = st.multiselect(
         label="Grapher slug",
-        options=[None] + all_charts,
+        options=all_charts,
         help="Introduce the URL to a Grapher URL. Query parameters work!",
         key="tab2_url",
     )
