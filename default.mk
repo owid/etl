@@ -28,20 +28,15 @@ test-default: check-formatting check-linting check-typing unittest
 	fi
 	touch .sanity-check
 
-install-uv-default:
-	@if ! command -v uv >/dev/null 2>&1; then \
-		echo '==> UV not found. Installing...'; \
-		curl -LsSf https://astral.sh/uv/install.sh | sh && source $$HOME/.cargo/env; \
-	fi
 
-.venv-default: install-uv .sanity-check
+.venv-default: .sanity-check
 	@echo '==> Installing packages'
 	@if [ -n "$(PYTHON_VERSION)" ]; then \
 		echo '==> Using Python version $(PYTHON_VERSION)'; \
 		poetry env use python$(PYTHON_VERSION); \
-		export UV_PYTHON=$(PYTHON_VERSION); \
 	fi
-	uv sync --all-extras
+	poetry install
+	touch .venv
 
 check-default:
 	@echo '==> Lint & Format & Typecheck changed files'
@@ -57,39 +52,39 @@ check-default:
 
 lint-default: .venv
 	@echo '==> Linting & Sorting imports'
-	@uv run ruff check --fix $(SRC)
+	@.venv/bin/ruff check --fix $(SRC)
 
 check-linting-default: .venv
 	@echo '==> Checking linting'
-	@uv run ruff check $(SRC)
+	@.venv/bin/ruff check $(SRC)
 
 check-formatting-default: .venv
 	@echo '==> Checking formatting'
-	@uv run ruff format --check $(SRC)
+	@.venv/bin/ruff format --check $(SRC)
 
 check-typing-default: .venv
 	@echo '==> Checking types'
-	uv run pyright $(SRC)
+	.venv/bin/pyright $(SRC)
 
 unittest-default: .venv
 	@echo '==> Running unit tests'
-	uv run pytest $(SRC)
+	.venv/bin/pytest $(SRC)
 
 format-default: .venv
 	@echo '==> Reformatting files'
-	@uv run ruff format $(SRC)
+	@.venv/bin/ruff format $(SRC)
 
 coverage-default: .venv
 	@echo '==> Unit testing with coverage'
-	uv run pytest --cov=owid --cov-report=term-missing tests
+	.venv/bin/pytest --cov=owid --cov-report=term-missing tests
 
 watch-default: .venv
 	@echo '==> Watching for changes and re-running checks'
-	uv run watchmedo shell-command -c 'clear; make check' --recursive --drop .
+	.venv/bin/watchmedo shell-command -c 'clear; make check' --recursive --drop .
 
 bump-default: .venv
 	@echo '==> Bumping version'
-	uv run bump2version --no-tag  --no-commit $(filter-out $@, $(MAKECMDGOALS))
+	.venv/bin/bump2version --no-tag  --no-commit $(filter-out $@, $(MAKECMDGOALS))
 
 
 # allow you to override a command, e.g. "watch", but if you do not, then use

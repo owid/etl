@@ -18,11 +18,11 @@ default:
 
 audit: .venv
 	@echo '==> Auditing JSON records'
-	uv run python owid/walden/audit.py
+	.venv/bin/python owid/walden/audit.py
 
 fetch: .venv
 	@echo '==> Fetching the full dataset'
-	@uv run python owid/walden/fetch.py
+	@.venv/bin/python owid/walden/fetch.py
 
 clean:
 	@echo '==> Deleting all downloaded data'
@@ -32,33 +32,30 @@ test: check-formatting lint check-typing unittest audit
 
 lint: .venv
 	@echo '==> Linting'
-	@uv run flake8 owid
+	@.venv/bin/flake8 owid
 
 check-formatting: .venv
 	@echo '==> Checking formatting'
-	@uv run black --check owid/walden
-	@uv run black --check ingests/
-	@uv run python -m owid.walden.format_json --check
+	@.venv/bin/black --check owid/walden
+	@.venv/bin/black --check ingests/
+	@.venv/bin/python -m owid.walden.format_json --check
 	@echo '==> Checking imports sorting'
-	@uv run isort --check-only owid/walden/
-	@uv run isort --check-only ingests/
+	@.venv/bin/isort --check-only owid/walden/
+	@.venv/bin/isort --check-only ingests/
 
 check-typing: .venv
 	@echo '==> Checking types'
-	@uv run pyright owid/walden
+	@.venv/bin/pyright owid/walden
 
 unittest: .venv
 	@echo '==> Running unit tests'
-	@PYTHONPATH=. uv run pytest
+	@PYTHONPATH=. .venv/bin/pytest
 
 format: .venv
 	@echo '==> Reformatting files'
-	@uv run black -q owid/walden/
-	@uv run black -q ingests/
-	@uv run python owid/walden/format_json.py
+	@.venv/bin/black -q owid/walden/
+	@.venv/bin/black -q ingests/
+	@.venv/bin/python owid/walden/format_json.py
 	@echo '==> Sorting imports'
-	@uv run isort -q owid/walden/
-	@uv run isort -q ingests/
-
-watch: .venv
-	uv run watchmedo shell-command -c 'clear; make test' --recursive --drop .
+	@.venv/bin/isort -q owid/walden/
+	@.venv/bin/isort -q ingests/
