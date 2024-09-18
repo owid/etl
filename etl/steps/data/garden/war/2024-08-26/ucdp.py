@@ -79,13 +79,13 @@ def run(dest_dir: str) -> None:
 
     # Read table from GW codes
     ds_gw = paths.load_dataset("gleditsch")
-    tb_regions = ds_gw["gleditsch_regions"].reset_index()
+    tb_regions = ds_gw.read_table("gleditsch_regions")
     tb_codes = ds_gw["gleditsch_countries"]
 
     # Load maps table
     short_name = "nat_earth_110"
     ds_maps = paths.load_dataset(short_name)
-    tb_maps = ds_maps[short_name].reset_index()
+    tb_maps = ds_maps.read_table(short_name)
 
     # Load population
     ds_population = paths.load_dataset("population")
@@ -98,7 +98,7 @@ def run(dest_dir: str) -> None:
 
     # Load relevant tables
     tb_ged = (
-        ds_meadow["ucdp_ged"]
+        ds_meadow.read_table("ucdp_ged")
         .reset_index()
         .astype(
             {
@@ -113,7 +113,7 @@ def run(dest_dir: str) -> None:
         )
     )
     tb_conflict = (
-        ds_meadow["ucdp_battle_related_conflict"]
+        ds_meadow.read_table("ucdp_battle_related_conflict")
         .reset_index()
         .astype(
             {
@@ -123,11 +123,11 @@ def run(dest_dir: str) -> None:
             }
         )
     )
-    tb_prio = ds_meadow["ucdp_prio_armed_conflict"].reset_index()
+    tb_prio = ds_meadow.read_table("ucdp_prio_armed_conflict")
 
     # Keep only active conflicts
     paths.log.info("keep active conflicts")
-    tb_ged = tb_ged[tb_ged["active_year"] == 1]
+    tb_ged = tb_ged.loc[tb_ged["active_year"] == 1]
 
     # Change region named "Asia" to "Asia and Oceania" (in GED)
     tb_ged["region"] = tb_ged["region"].cat.rename_categories({"Asia": "Asia and Oceania"})
@@ -139,6 +139,7 @@ def run(dest_dir: str) -> None:
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
     tb_participants = estimate_metrics_participants(tb, tb_prio, tb_codes)
+    # TODO: death_rate, break down by death_type
     tb_locations = estimate_metrics_locations(tb, tb_maps, tb_codes, ds_population)
 
     # Sanity check conflict_type transitions
@@ -200,6 +201,9 @@ def run(dest_dir: str) -> None:
             "number_deaths_ongoing_conflicts",
             "number_deaths_ongoing_conflicts_high",
             "number_deaths_ongoing_conflicts_low",
+            "number_deaths_ongoing_conflicts_civilians",
+            "number_deaths_ongoing_conflicts_unknown",
+            "number_deaths_ongoing_conflicts_combatants",
         ],
     )
 
@@ -430,45 +434,81 @@ def estimate_metrics(tb: Table) -> Table:
 
 
 def _get_ongoing_metrics(tb: Table) -> Table:
+    # Estimate combatant deaths per conflict
+    tb_ = tb.copy()
+    tb_["deaths_combatants"] = tb_["deaths_a"] + tb_["deaths_b"]
+
+    # Define aggregations
+    column_props = {
+        # Deaths (estimates)
+        "best": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts",
+        },
+        "high": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts_high",
+        },
+        "low": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts_low",
+        },
+        # Deaths by type
+        "deaths_civilians": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts_civilians",
+        },
+        "deaths_unknown": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts_unknown",
+        },
+        "deaths_combatants": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts_combatants",
+        },
+        # Number of conflicts
+        "conflict_new_id": {
+            "f": "nunique",
+            "rename": "number_ongoing_conflicts",
+        },
+    }
+    col_funcs = {k: v["f"] for k, v in column_props.items()}
+    col_renames = {k: v["rename"] for k, v in column_props.items()}
     # For each region
     columns_idx = ["year", "region", "conflict_type"]
-    tb_ongoing = (
-        tb.groupby(columns_idx)
-        .agg({"best": "sum", "high": "sum", "low": "sum", "conflict_new_id": "nunique"})
-        .reset_index()
-    )
-    tb_ongoing.columns = columns_idx + [
-        "number_deaths_ongoing_conflicts",
-        "number_deaths_ongoing_conflicts_high",
-        "number_deaths_ongoing_conflicts_low",
-        "number_ongoing_conflicts",
-    ]
+    tb_ongoing = tb_.groupby(columns_idx, as_index=False).agg(col_funcs)
+    tb_ongoing = tb_ongoing.rename(columns={n: n for n in columns_idx} | col_renames)
+
     # For the World
     columns_idx = ["year", "conflict_type"]
-    tb_ongoing_world = (
-        tb.groupby(columns_idx)
-        .agg({"best": "sum", "high": "sum", "low": "sum", "conflict_new_id": "nunique"})
-        .reset_index()
-    )
-    tb_ongoing_world.columns = columns_idx + [
-        "number_deaths_ongoing_conflicts",
-        "number_deaths_ongoing_conflicts_high",
-        "number_deaths_ongoing_conflicts_low",
-        "number_ongoing_conflicts",
-    ]
+    tb_ongoing_world = tb_.groupby(columns_idx, as_index=False).agg(col_funcs)
+    tb_ongoing_world = tb_ongoing_world.rename(columns={n: n for n in columns_idx} | col_renames)
     tb_ongoing_world["region"] = "World"
 
     # Combine
     tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
+
+    # Check that `deaths = deaths_combatants + deaths_civilians + deaths_unknown` holds
+    assert (
+        tb_ongoing["number_deaths_ongoing_conflicts"]
+        - tb_ongoing[
+            [
+                "number_deaths_ongoing_conflicts_civilians",
+                "number_deaths_ongoing_conflicts_unknown",
+                "number_deaths_ongoing_conflicts_combatants",
+            ]
+        ].sum(axis=1)
+        == 0
+    ).all(), "Sum of deaths from combatants, civilians and unknown should equal best estimate!"
     return tb_ongoing
 
 
 def _get_new_metrics(tb: Table) -> Table:
     # Reduce table to only preserve first appearing event
     tb = (
-        tb[["conflict_new_id", "year", "region", "conflict_type"]]
+        tb.loc[:, ["conflict_new_id", "year", "region", "conflict_type"]]
         .sort_values("year")
         .drop_duplicates(subset=["conflict_new_id", "region"], keep="first")
     )
@@ -554,7 +594,7 @@ def combine_tables(tb: Table, tb_prio: Table) -> Table:
 
 
 def fix_extrasystemic_entries(tb: Table) -> Table:
-    """Fix entries with conflict_type='extrasystemic.
+    """Fix entries with conflict_type='extrasystemic'.
 
     Basically means setting to zero null entries after 1989.
     """
@@ -586,6 +626,9 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
         "number_deaths_ongoing_conflicts",
         "number_deaths_ongoing_conflicts_high",
         "number_deaths_ongoing_conflicts_low",
+        "number_deaths_ongoing_conflicts_civilians",
+        "number_deaths_ongoing_conflicts_unknown",
+        "number_deaths_ongoing_conflicts_combatants",
     ]
     mask_1989 = tb_extra["year"] >= 1989
     tb_extra.loc[mask_1989, columns] = tb_extra.loc[mask_1989, columns].fillna(0)
@@ -692,6 +735,9 @@ def add_conflict_all(tb: Table) -> Table:
             "number_deaths_ongoing_conflicts",
             "number_deaths_ongoing_conflicts_high",
             "number_deaths_ongoing_conflicts_low",
+            "number_deaths_ongoing_conflicts_civilians",
+            "number_deaths_ongoing_conflicts_unknown",
+            "number_deaths_ongoing_conflicts_combatants",
             "number_ongoing_conflicts",
             "number_new_conflicts",
         ]
