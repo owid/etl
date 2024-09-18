@@ -804,6 +804,18 @@ steps:
   data://grapher/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-16/long_run_child_mortality
 
+# OECD Official Development Assistance (ODA)
+  data://meadow/oecd/2024-08-21/official_development_assistance:
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac1.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac2a.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac5.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_crs.zip
+  data://garden/oecd/2024-08-21/official_development_assistance:
+    - data://meadow/oecd/2024-08-21/official_development_assistance
+    - data://garden/demography/2024-07-15/population
+  data://grapher/oecd/2024-08-21/official_development_assistance:
+    - data://garden/oecd/2024-08-21/official_development_assistance
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

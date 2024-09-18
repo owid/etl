@@ -18,6 +18,7 @@ from .tables import (
     read_from_records,
     read_fwf,
     read_json,
+    read_parquet,
     read_rda,
     read_rds,
     read_stata,
@@ -43,6 +44,7 @@ __all__ = [
     "read_rda",
     "read_rds",
     "read_df",
+    "read_parquet",
     "to_numeric",
     "keep_metadata",
 ]
