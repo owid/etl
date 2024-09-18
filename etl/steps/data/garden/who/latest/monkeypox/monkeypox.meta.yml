@@ -78,6 +78,11 @@ tables:
         display:
           numDecimalPlaces: 3
           entityAnnotationsMap: "Democratic Republic of Congo: Includes only confirmed deaths as reported by WHO"
+      total_suspected_cases:
+        title: Total suspected cases
+        unit: cases
+        display:
+          numDecimalPlaces: 0
       iso_code:
         title: ISO code
         unit: ''
