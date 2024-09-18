@@ -27,8 +27,14 @@ def run(dest_dir: str) -> None:
         on=["country", "year", "element", "unit"],
     )
     tb["primary_forest_share"] = (tb["value_primary_forest"] / tb["value_land_area"]) * 100
-    tb = tb.drop(columns=["item_primary_forest", "item_land_area", "unit"])
-    tb = tb.format(["country", "year", "element"], short_name="primary_forest")
+    tb = tb.drop(columns=["item_primary_forest", "item_land_area", "unit", "element"])
+    tb = tb.format(
+        [
+            "country",
+            "year",
+        ],
+        short_name="primary_forest",
+    )
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     # Save changes in the new garden dataset.

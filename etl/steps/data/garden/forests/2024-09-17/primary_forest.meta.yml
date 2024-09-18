@@ -26,8 +26,9 @@ tables:
         unit:   1000 hectares
       primary_forest_share:
         title: Primary forest share
-        description_short: The share of primary forest in total forest area.
+        description_short: The share of primary forest out of total land area. Primary forest is defined as naturally regenerated forest of native species, where there are no clearly visible indications of human activities and the ecological processes are not significantly disturbed.
+        description_processing: This is calculated as the primary forest area divided by the total land area.
         display:
-          name: Primary forest share
+          name: Share of land that is primary forest
         unit: "%"
         short_unit: "%"
