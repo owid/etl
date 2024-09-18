@@ -1,0 +1,52 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Influenza
+    display:
+      numDecimalPlaces: 0
+    processing_level: minor
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: FLuNet dataset
+  description: |-
+    FluNet is a global web-based tool for influenza virological surveillance first launched in 1997. The virological data entered into FluNet, e.g. number of influenza viruses detected by subtype, are critical for tracking the movement of viruses globally and interpreting the epidemiological data. The data at country level are publically available and updated weekly. The results are presented in various formats including tables, maps and graphs.
+
+    The data are provided remotely by National Influenza Centres (NICs) of the Global Influenza Surveillance and Response System (GISRS) and other national influenza reference laboratories collaborating actively with GISRS, or are uploaded from WHO regional databases.
+  update_period_days: 0
+
+tables:
+  flu_test:
+    variables:
+      pcnt_poscombined:
+        title: The share of positive tests
+        unit: '%'
+        origins:
+          - title: FluNet, World Health Organization
+            date_published: "2024"
+            producer: WHO
+            citation_full: FluNet, World Health Organization (2023)
+            url_main: https://www.who.int/tools/flunet/flunet-summary
+            date_accessed: "2024-09-09"
+        presentation:
+          grapher_config:
+            note: "The number of tests is based on three possible sources based on data availability. If both are available, the sum of positive and negative tests is used. If not then the number of specimens processed is used. If neither are available, then the number of specimens received by the testing facility is used."
+
+
+      denomcombined:
+        title: The number of tests
+        unit: tests
+        origins:
+          - title: FluNet, World Health Organization
+            date_published: "2024"
+            producer: WHO
+            citation_full: FluNet, World Health Organization (2023)
+            url_main: https://www.who.int/tools/flunet/flunet-summary
+            date_accessed: "2024-09-09"
+        presentation:
+          grapher_config:
+            note: "The number of tests is based on three possible sources based on data availability. If both are available, the sum of positive and negative tests is used. If not then the number of specimens processed is used. If neither are available, then the number of specimens received by the testing facility is used."
+

@@ -41,7 +41,7 @@ def add_regional_aggregates(
         assert tb_percent["value"].max() <= 100 or tb_percent.shape[0] == 0
         assert tb_percent["value"].min() >= 0 or tb_percent.shape[0] == 0
         # Combine all the metrics back together
-        tb_out = pr.concat([tb_out, tb_percent], ignore_index=True)
+    tb_out = pr.concat([tb_out, tb_percent], ignore_index=True)
     assert tb_out.age.m.origins
     tb_out = tb_out.drop(columns="population")
     return tb_out

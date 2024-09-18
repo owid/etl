@@ -2,7 +2,6 @@ import json
 from copy import deepcopy
 from typing import cast
 
-import requests
 import streamlit as st
 import structlog
 from requests.exceptions import HTTPError
@@ -11,7 +10,7 @@ from sqlalchemy.orm import Session
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
-from apps.wizard.utils import as_list, as_valid_json
+from apps.wizard.utils import as_list, as_valid_json, get_schema_from_url
 from etl.indicator_upgrade.schema import validate_chart_config_and_set_defaults
 
 log = structlog.get_logger()
@@ -153,7 +152,7 @@ class ChartDiffConflictResolver:
                 config.pop(field, None)
 
             # Verify config
-            config_new = validate_chart_config_and_set_defaults(config, schema=get_schema("004"))
+            config_new = validate_chart_config_and_set_defaults(config, schema=get_schema_from_url(config["$schema"]))
 
             api = AdminAPI(SOURCE.engine, grapher_user_id=1)
             try:
@@ -207,13 +206,6 @@ def compare_chart_configs(c1, c2):
             )
 
     return diff_list
-
-
-def get_schema(schema_version: str = "004"):
-    return requests.get(
-        f"https://files.ourworldindata.org/schemas/grapher-schema.{schema_version}.json",
-        timeout=20,
-    ).json()
 
 
 def st_show_conflict_resolver(diff: ChartDiff, session: Session) -> None:

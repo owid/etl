@@ -29,7 +29,7 @@ from apps.wizard import utils
 from apps.wizard.app_pages.indicator_upgrade.charts_update import get_affected_charts_and_preview, push_new_charts
 from apps.wizard.app_pages.indicator_upgrade.dataset_selection import build_dataset_form
 from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import render_indicator_mapping
-from apps.wizard.app_pages.indicator_upgrade.utils import get_datasets, get_schema
+from apps.wizard.app_pages.indicator_upgrade.utils import get_datasets
 from etl.match_variables import SIMILARITY_NAMES
 
 # logger
@@ -57,8 +57,6 @@ st.markdown("Update indicators to their new versions.")  # Get datasets (might t
 
 # Get all datasets
 DATASETS = get_datasets()
-# Get schema
-SCHEMA_CHART_CONFIG = get_schema()
 # Session states
 utils.set_states(
     {
@@ -150,7 +148,7 @@ if st.session_state.submitted_datasets:
         if st.session_state.submitted_charts:
             if isinstance(charts, list) and len(charts) > 0:
                 st.toast("Updating charts...")
-                push_new_charts(charts, SCHEMA_CHART_CONFIG)
+                push_new_charts(charts)
 
 ##########################################################################################
 # 4 UPDATE CHARTS

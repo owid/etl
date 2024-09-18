@@ -1,0 +1,72 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  others:
+    group_notes: |-
+      <% if organism == 'RSV' %>
+      This includes RSV A and RSV B.
+      <% elif organism == 'Influenza A' %>
+      This includes Influenza A H1N1 and H3N2.
+      <% endif %>
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+    display:
+      numDecimalPlaces: 0
+      name: << organism >>
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Pathogens, SFA Study
+
+tables:
+  seattle_pathogens:
+    variables:
+      present:
+        title: Number of specimens with pathogen <<organism>>
+        unit: specimens
+        description_short: |-
+          The number of specimens detected with respiratory pathogen << organism >>. {definitions.others.group_notes}
+
+      percentage:
+        title: Percentage of specimens with pathogen <<organism>>
+        description_short: |-
+          The share of specimens detected with respiratory pathogen << organism >>. {definitions.others.group_notes}
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+          name: << organism >>
+
+      tested:
+        title: Total number of specimens tested for presence of pathogen <<organism>>
+        description_short: |-
+          The number of specimens tested to detect the respiratory pathogen << organism >>. Some of these specimens may have tested positive for the pathogen, while others (or all of them) may have tested negative. {definitions.others.group_notes}
+        unit: specimens
+
+
+  seattle_pathogens_month:
+    variables:
+      present_month:
+        title: Number of specimens with pathogen <<organism>> (monthly)
+        unit: specimens
+        description_short: |-
+          The number of specimens detected with respiratory pathogen << organism >>. {definitions.others.group_notes}
+
+      percentage_month:
+        title: Percentage of specimens with pathogen <<organism>> (monthly)
+        description_short: |-
+          The share of specimens detected with respiratory pathogen << organism >>. {definitions.others.group_notes}
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 2
+          name: << organism >>
+
+      tested_month:
+        title: Total number of specimens tested for presence of pathogen <<organism>> (monthly)
+        description_short: |-
+          The number of specimens tested to detect the respiratory pathogen << organism >>. Some of these specimens may have tested positive for the pathogen, while others (or all of them) may have tested negative. {definitions.others.group_notes}
+        unit: specimens

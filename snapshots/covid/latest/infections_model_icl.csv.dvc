@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global LMIC COVID-19 reports
+    description: |-
+      COVID-19 has caused large-scale outbreaks in many countries. Driven largely Variants of Concern, waves of infections have placed high burdens on healthcare systems. It is difficult to monitor the burden of COVID-19 globally as under-ascertainment of deaths disproportionately affects LMICs and LICs. However, many LMICs have successfully rolled out COVID-19 vaccinations and alleviated some of this burden.
+
+      The authors aim to provide each country with an indication of where they are in their epidemic and scenarios of how healthcare demand is likely to vary over the next 28 days. Changes in transmission from today will also shape the next 28 days so these estimates should not be viewed as predictions but scenarios to help countries understand how strategies today are likely to shape the next phase of the epidemic. Specifically, these reports will aim to help countries understand:
+
+      1. The total number of COVID-19 infections
+      2. The expected number of deaths within the next 28 days
+      3. The number of individuals requiring oxygen or mechanical ventilation in the next 28 days
+      4. The impact of changing their current intervention policy
+
+    date_published: "2022"
+
+    # Citation
+    producer: Imperial College London
+    citation_full: |-
+      MRC Centre for Global Infectious Disease Analysis, Imperial College London. 2022. Online at https://mrc-ide.github.io/global-lmic-reports/.
+    attribution_short: ICL
+    # Files
+    url_main: https://github.com/mrc-ide/global-lmic-reports/tree/master/data
+    date_accessed: 2023-02-17
+
+    # License
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 1990733efd24e97e1f1ad29ac578d770
+    size: 18331042
+    path: infections_model_icl.csv

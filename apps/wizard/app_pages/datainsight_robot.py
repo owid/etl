@@ -8,13 +8,15 @@ import streamlit as st
 
 from apps.utils.gpt import OpenAIWrapper
 
+MODEL = "gpt-4o"
+
 # CONFIG
 st.set_page_config(
     page_title="Data insight robot",
     page_icon="🪄",
 )
 st.title(":material/lightbulb: Data insighter")
-st.markdown("Generate data insights from a chart view.")
+st.markdown(f"Generate data insights from a chart view, using the `{MODEL}` model.")
 
 
 # FUNCTIONS
@@ -73,13 +75,18 @@ grapher_url = st.text_input(
     help="Introduce the URL to a Grapher URL. Query parameters work!",
     key="url",
 )
+if grapher_url != "" and not grapher_url.startswith("https://ourworldindata.org/grapher/"):
+    st.warning("Please introduce a valid Grapher URL")
+
 with st.expander("Edit the prompt"):
     prompt = st.text_area(
         label="Prompt",
         value=default_prompt,
         key="prompt",
     )
-confirmed = st.button("Generate insight")
+confirmed = st.button(
+    "Generate insight", disabled=grapher_url == "" or not grapher_url.startswith("https://ourworldindata.org/grapher/")
+)
 
 # Action if user clicks on 'generate'
 if confirmed:
@@ -115,7 +122,7 @@ if confirmed:
     with st.chat_message("assistant"):
         # Ask GPT (stream)
         stream = api.chat.completions.create(
-            model="gpt-4-turbo",
+            model=MODEL,
             messages=messages,  # type: ignore
             max_tokens=3000,
             stream=True,

@@ -1,0 +1,27 @@
+dataset:
+  title: Elephant populations (African and Asian Elephant Specialist Group)
+  description: ''
+  licenses:
+    - {}
+tables:
+  elephant_populations:
+    variables:
+      african_elephant_population_definite:
+        title: Number of African elephants
+        unit: ''
+        description: |-
+          The estimated number of African elephants. This is based on definitive population counts. Historical estimates come with significant uncertainty.
+      african_elephant_population_probable:
+        title: Number of African elephants, including probable estimates
+        unit: ''
+        description: |-
+          The estimated number of African elephants. This is based on definitive population counts, plus "probable" estimates. Historical estimates come with significant uncertainty.
+      african_elephant_carcass_ratio:
+        title: Carcass ratio
+        unit: ''
+        description: |-
+          Carcass ratio is the number of dead elephants observed during survey counts as a percentage of the total population. Carcass ratios greater than 8% are considered to be a strong indication of a declining population.
+      asian_elephant_population:
+        title: Number of Asian elephants
+        unit: ''
+        description: The estimated number of Asian elephants.

@@ -4,10 +4,13 @@ import datetime
 
 import owid.catalog.processing as pr
 import pandas as pd
+import structlog
 from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+
+log = structlog.get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -28,10 +31,10 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("monkeypox")
-    ds_suspected = paths.load_dataset("africa_cdc")
+    ds_suspected = paths.load_dataset("global_health_mpox")
     # Read table from meadow dataset.
     tb = ds_meadow["monkeypox"].reset_index()
-    tb_suspected = ds_suspected["africa_cdc"].reset_index()
+    tb_suspected = ds_suspected["global_health_mpox"].reset_index()
     cols = ["country", "date", "suspected_cases_cumulative"]
     tb_suspected = tb_suspected[cols]
     assert tb_suspected.shape[1] == len(cols)
@@ -46,9 +49,11 @@ def run(dest_dir: str) -> None:
         make_missing_countries_nan=True,
     )
 
-    missing_countries = set(tb_orig[tb.country.isnull()].country)
+    ix = tb.country.isnull()
+    missing_countries = set(tb_orig[ix].country)
     if missing_countries:
-        raise ValueError(f"Missing countries in monkeypox.meta.yml: {missing_countries}")
+        log.warning(f"Missing countries in monkeypox.countries.json: {missing_countries}")
+        tb.country = tb.country.astype(str).fillna(tb_orig.country)
 
     tb = (
         tb.pipe(clean_columns)

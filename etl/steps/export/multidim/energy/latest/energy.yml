@@ -6,14 +6,15 @@ title:
   titleVariant: by energy source
 defaultSelection:
   - World
-  - Europe
-  - Mexico
 topicTags:
   - Energy
 dimensions:
   - slug: source
     name: Energy source
     choices:
+      - slug: overview
+        name: Overview
+        group: Overview
       - slug: all
         name: All sources
         group: Aggregates
@@ -75,15 +76,56 @@ dimensions:
 
 views:
   - dimensions:
+      source: overview
+      metric: total
+    indicators:
+      y:
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#coal__twh"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#oil__twh"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#gas__twh"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#nuclear__twh__equivalent"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#hydro__twh__equivalent"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#solar__twh__equivalent"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#wind__twh__equivalent"
+    config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
+      type: StackedArea
+      tab: chart
+      title: Total consumed energy by source
+      subtitle: "[Primary energy](#dod:primaryenergy) consumption is measured in [terawatt-hours](#dod:watt-hours), using the [substitution method](#dod:substitutionmethod)."
+  - dimensions:
+      source: overview
+      metric: per_capita
+    indicators:
+      y:
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#coal_per_capita__kwh"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#oil_per_capita__kwh"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#gas_per_capita__kwh"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#nuclear_per_capita__kwh__equivalent"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#hydro_per_capita__kwh__equivalent"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#solar_per_capita__kwh__equivalent"
+        - "grapher/energy/2024-06-20/energy_mix/energy_mix#wind_per_capita__kwh__equivalent"
+    config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
+      type: StackedArea
+  - dimensions:
       source: all
       metric: total
     indicators:
       y: "{definitions.table}#primary_energy_consumption__twh"
+    config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
+      yAxis:
+        min: 0
   - dimensions:
       source: all
       metric: per_capita
     indicators:
       y: "{definitions.table}#primary_energy_consumption_per_capita__kwh"
+    config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
+      yAxis:
+        min: 0
   # this would be 100%
   # - dimensions:
   #       source: all

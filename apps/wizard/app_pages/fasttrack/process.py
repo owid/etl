@@ -66,6 +66,11 @@ def processing_part_1(import_method, dataset_uris, infer_metadata, is_private, _
         st.error(f"There are {len(unknown_countries)} unknown entities!")
         _status.update(state="error")
 
+    dims = [c for c in data.columns if c.startswith("dim_")]
+    if dims:
+        st.write(f"Using dimensions: {', '.join(dims)}...")
+        variables_meta_dict = {k: v for k, v in variables_meta_dict.items() if k not in dims}
+
     # Update dataset metadata
     dataset_meta.is_public = not is_private
 
@@ -84,6 +89,12 @@ def processing_part_2(data, dataset_meta, variables_meta_dict, origin, dataset_u
         tb = Table(data, short_name=dataset_meta.short_name)
         for short_name, var_meta in variables_meta_dict.items():
             tb[short_name].metadata = var_meta
+
+        # Set dimensions as index
+        dims = [c for c in data.columns if c.startswith("dim_")]
+        if dims:
+            tb = tb.set_index(dims, append=True)
+
         # Build dataset
         dataset_meta.channel = "grapher"
         dataset = Dataset.create_empty(DATA_DIR / dataset_meta.uri, dataset_meta)

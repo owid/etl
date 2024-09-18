@@ -458,13 +458,17 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
         if rows:
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
 
-            # show a warning
-            log.warning(
-                "Variables used in charts will not be deleted automatically",
-                rows=rows,
-                variables=variable_ids_to_delete,
-            )
-            return False
+            # raise an error if on staging server
+            if config.ENV == "staging":
+                raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
+            else:
+                # otherwise show a warning
+                log.warning(
+                    "Variables used in charts will not be deleted automatically",
+                    rows=rows,
+                    variables=variable_ids_to_delete,
+                )
+                return False
 
         # then variables themselves with related data in other tables
         con.execute(
