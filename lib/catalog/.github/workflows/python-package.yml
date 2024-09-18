@@ -30,7 +30,7 @@ jobs:
 
     - name: Install packages
       run: |
-        poetry install
+        make .venv
 
     - name: Check formatting
       run: |
