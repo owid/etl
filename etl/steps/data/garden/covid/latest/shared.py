@@ -114,7 +114,7 @@ def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: Op
         columns={"population": "population_2022"}
     )
 
-    # add hardcoded population
+    # Define hardcoded population
     country_population = {
         "England": 57_112_500,  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/enpop/pop
         "Wales": 3_132_700,  # https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/timeseries/wapop/pop
@@ -124,6 +124,14 @@ def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: Op
         "Pitcairn": 45,  # https://www.bbc.com/news/uk-56923016
     }
     tb_hc = Table.from_records([{"country": c, "population_2022": p} for c, p in country_population.items()])
+
+    # Fix some values
+    mask_cyprus = tb_pop["country"] == "Cyprus"
+    tb_pop.loc[mask_cyprus, "population_2022"] = (
+        tb_pop.loc[mask_cyprus, "population_2022"] - country_population["Northern Cyprus"]
+    )
+
+    # Combine both sources
     tb_pop = concat([tb_pop, tb_hc], ignore_index=True)
 
     # merge
