@@ -16,11 +16,14 @@ from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union, ove
 
 import pandas as pd
 import ruamel.yaml
+import structlog
 import yaml
 from ruamel.yaml import YAML
 from yaml.dumper import Dumper
 
 from etl.paths import BASE_DIR
+
+log = structlog.get_logger()
 
 
 class RuntimeCache:
@@ -315,7 +318,7 @@ def upload_file_to_server(local_file_path: Path, target: str) -> None:
 
         # Execute the command
         subprocess.run(scp_command, check=True, text=True, capture_output=True)
-        print(f"File {local_file_path} successfully uploaded to {target}")
+        log.info("file.uploaded", target=target, path=local_file_path)
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Failed to upload file {local_file_path} to {target}") from e
 
@@ -326,3 +329,62 @@ def create_folder(folder_path: str | Path) -> None:
         folder_path = Path(folder_path)
     if not folder_path.exists():
         folder_path.mkdir(parents=True, exist_ok=True)
+
+
+def download_file_from_server(
+    local_file_path: Path,
+    target: str,
+) -> None:
+    """
+    Download a remote file from a server to a local path using scp.
+
+    :param target: The source file on the remote server in the format 'user@host:/remote/path'.
+                   Example: 'user@example.com:/remote/path/to/file.txt'
+    :param local_file_path: Path where the downloaded file will be saved locally.
+    """
+    # Validate the target format (basic check)
+    if "@" not in target or ":" not in target:
+        raise ValueError(f"The target '{target}' is not properly formatted. Expected format: 'user@host:/remote/path'.")
+
+    # Ensure the parent directory of the local file path exists
+    if not local_file_path.parent.exists():
+        local_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        # Construct the scp command
+        scp_command = ["scp", target, str(local_file_path)]
+
+        # Execute the command
+        subprocess.run(scp_command, check=True, text=True, capture_output=True)
+        log.info("file.downloaded", target=target, path=local_file_path)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Failed to download file {target} to {local_file_path}") from e
+
+
+def run_command_on_server(
+    ssh_target: str,
+    command: str,
+) -> str:
+    """
+    Run a command on a remote server via SSH using subprocess.
+
+    :param ssh_target: The SSH target in the format 'user@hostname'.
+    :param command: The command to execute on the remote server.
+    :return: The stdout output from the command.
+    """
+    try:
+        # Construct the SSH command
+        ssh_command = ["ssh", ssh_target, command]
+
+        # Execute the command
+        result = subprocess.run(
+            ssh_command,
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+
+        log.info("command.executed", target=ssh_target, command=command)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"Failed to execute command on {ssh_target}:\n{e.stderr}") from e
