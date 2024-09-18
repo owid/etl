@@ -43,8 +43,9 @@ def run(dest_dir: str) -> None:
 
     # Add table of processed data to the new dataset.
     # add tables to dataset
-
     all_tables = []
+
+    unit_ls = []
 
     for var in ds_garden.table_names:
         if INCLUDE and not re.search(INCLUDE, var):
@@ -60,6 +61,9 @@ def run(dest_dir: str) -> None:
         tb["source_producer"] = clean_source_name(tb["source"], load_clean_source_mapping())
         tb["attribution_short"] = add_short_source_name(tb["source"], load_short_source_mapping())
         tb["source_title"] = get_source(tb["source"])
+
+        unit_ls.append(tb["long_unit"].iloc[0])
+        unit_ls.append(tb["short_unit"].iloc[0])
 
         tb_var_gr = tb.groupby("variable_name")
 
