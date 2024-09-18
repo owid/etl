@@ -1,0 +1,24 @@
+meta:
+  namespace: un
+  short_name: un_sdg_dimension
+  name: United Nations Sustainable Development Goals (2023)
+  version: 2023-08-16
+  publication_year: 2023
+  publication_date: 2023-08-16
+  source_name: United Nations (2023)
+  source_published_by: SDG Indicators Database, United Nations, Department of Economic
+    and Social Affairs (2023)
+  url: https://unstats.un.org/sdgs/dataportal/database
+  source_data_url: https://unstats.un.org/sdgapi
+  file_extension: json
+  license_url: https://www.un.org/en/about-us/terms-of-use
+  license_name:
+  date_accessed: 2023-08-16
+  is_public: true
+  description: |
+    "The dimensions of the data.
+wdir: ../../../data/snapshots/un/2023-08-16
+outs:
+- md5: 0a5d9a07d05dd8b0f0e3f713e6466404
+  size: 301893
+  path: un_sdg_dimension.json
