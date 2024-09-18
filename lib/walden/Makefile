@@ -2,6 +2,10 @@
 #  Makefile
 #
 
+include ../../default.mk
+
+SRC = owid tests
+
 default:
 	@echo 'Available commands:'
 	@echo
@@ -12,17 +16,13 @@ default:
 	@echo '  make clean     Delete any fetched data files'
 	@echo
 
-.venv: pyproject.toml poetry.toml poetry.lock
-	poetry install || poetry install
-	test -d .venv && touch $@
-
 audit: .venv
 	@echo '==> Auditing JSON records'
-	poetry run python owid/walden/audit.py
+	uv run python owid/walden/audit.py
 
 fetch: .venv
 	@echo '==> Fetching the full dataset'
-	@poetry run python owid/walden/fetch.py
+	@uv run python owid/walden/fetch.py
 
 clean:
 	@echo '==> Deleting all downloaded data'
@@ -32,33 +32,33 @@ test: check-formatting lint check-typing unittest audit
 
 lint: .venv
 	@echo '==> Linting'
-	@poetry run flake8 owid
+	@uv run flake8 owid
 
 check-formatting: .venv
 	@echo '==> Checking formatting'
-	@poetry run black --check owid/walden
-	@poetry run black --check ingests/
-	@poetry run python -m owid.walden.format_json --check
+	@uv run black --check owid/walden
+	@uv run black --check ingests/
+	@uv run python -m owid.walden.format_json --check
 	@echo '==> Checking imports sorting'
-	@poetry run isort --check-only owid/walden/
-	@poetry run isort --check-only ingests/
+	@uv run isort --check-only owid/walden/
+	@uv run isort --check-only ingests/
 
 check-typing: .venv
 	@echo '==> Checking types'
-	@poetry run pyright owid/walden
+	@uv run pyright owid/walden
 
 unittest: .venv
 	@echo '==> Running unit tests'
-	@PYTHONPATH=. poetry run pytest
+	@PYTHONPATH=. uv run pytest
 
 format: .venv
 	@echo '==> Reformatting files'
-	@poetry run black -q owid/walden/
-	@poetry run black -q ingests/
-	@poetry run python owid/walden/format_json.py
+	@uv run black -q owid/walden/
+	@uv run black -q ingests/
+	@uv run python owid/walden/format_json.py
 	@echo '==> Sorting imports'
-	@poetry run isort -q owid/walden/
-	@poetry run isort -q ingests/
+	@uv run isort -q owid/walden/
+	@uv run isort -q ingests/
 
 watch: .venv
-	poetry run watchmedo shell-command -c 'clear; make test' --recursive --drop .
+	uv run watchmedo shell-command -c 'clear; make test' --recursive --drop .
