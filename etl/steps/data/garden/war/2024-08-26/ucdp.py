@@ -200,9 +200,9 @@ def run(dest_dir: str) -> None:
             "number_deaths_ongoing_conflicts",
             "number_deaths_ongoing_conflicts_high",
             "number_deaths_ongoing_conflicts_low",
-            "number_deaths_ongoing_conflicts_civilians",
-            "number_deaths_ongoing_conflicts_unknown",
-            "number_deaths_ongoing_conflicts_combatants",
+            # "number_deaths_ongoing_conflicts_civilians",
+            # "number_deaths_ongoing_conflicts_unknown",
+            # "number_deaths_ongoing_conflicts_combatants",
         ],
     )
 
@@ -1126,6 +1126,7 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     # Divide and obtain rates
     factor = 100_000
     suffix = [c.replace(INDICATOR_BASE_NAME, "") for c in cols_num_deaths]
+    suffix = [suf for suf in suffix if suf not in {"_combatants", "_unknown", "_civilians"}]
     for suf in suffix:
         tb_locations_country[f"death_rate{suf}"] = (
             factor * tb_locations_country[f"{INDICATOR_BASE_NAME}{suf}"] / tb_locations_country["population"]
