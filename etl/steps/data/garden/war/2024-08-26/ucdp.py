@@ -139,7 +139,6 @@ def run(dest_dir: str) -> None:
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
     tb_participants = estimate_metrics_participants(tb, tb_prio, tb_codes)
-    # TODO: death_rate, break down by death_type
     tb_locations = estimate_metrics_locations(tb, tb_maps, tb_codes, ds_population)
 
     # Sanity check conflict_type transitions
@@ -994,29 +993,63 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     ###################
     paths.log.info("estimating country flag 'is_location_of_conflict'...")
 
+    # Check that number of deaths is all zero
+    assert (
+        tb_locations["best"] - tb_locations[["deaths_a", "deaths_b", "deaths_civilians", "deaths_unknown"]].sum(axis=1)
+        == 0
+    ).all(), "Sum of deaths from combatants, civilians and unknown should equal best estimate!"
+    tb_locations["deaths_combatants"] = tb_locations["deaths_a"] + tb_locations["deaths_b"]
+
     # Estimate if a conflict occured in a country, and the number of deaths in it
+    # Define aggregations
+    INDICATOR_BASE_NAME = "number_deaths"
+    column_props = {
+        # Deaths (estimates)
+        "best": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}",
+        },
+        "high": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}_high",
+        },
+        "low": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}_low",
+        },
+        # Deaths by type
+        "deaths_civilians": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}_civilians",
+        },
+        "deaths_unknown": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}_unknown",
+        },
+        "deaths_combatants": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}_combatants",
+        },
+        # Number of conflicts
+        "conflict_new_id": {
+            "f": "nunique",
+            "rename": "is_location_of_conflict",
+        },
+    }
+    col_funcs = {k: v["f"] for k, v in column_props.items()}
+    col_renames = {k: v["rename"] for k, v in column_props.items()}
     tb_locations_country = (
         tb_locations.groupby(["country_name_location", "year", "conflict_type"], as_index=False)
-        .agg(
-            {
-                "conflict_new_id": "nunique",
-                "best": "sum",
-                "low": "sum",
-                "high": "sum",
-            }
-        )
+        .agg(col_funcs)
         .rename(
             columns={
-                "conflict_new_id": "is_location_of_conflict",
                 "country_name_location": "country",
-                "best": "number_deaths",
-                "low": "number_deaths_low",
-                "high": "number_deaths_high",
             }
+            | col_renames
         )
     )
     assert tb_locations_country["is_location_of_conflict"].notna().all(), "Missing values in `is_location_of_conflict`!"
-    cols_num_deaths = ["number_deaths", "number_deaths_low", "number_deaths_high"]
+    cols_num_deaths = [v for v in col_renames.values() if v != "is_location_of_conflict"]
     for col in cols_num_deaths:
         assert tb_locations_country[col].notna().all(), f"Missing values in `{col}`!"
     # Convert into a binary indicator: 1 (if more than one conflict), 0 (otherwise)
@@ -1092,15 +1125,11 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     )
     # Divide and obtain rates
     factor = 100_000
-    tb_locations_country["death_rate"] = (
-        factor * tb_locations_country["number_deaths"] / tb_locations_country["population"]
-    )
-    tb_locations_country["death_rate_low"] = factor * (
-        tb_locations_country["number_deaths_low"] / tb_locations_country["population"]
-    )
-    tb_locations_country["death_rate_high"] = factor * (
-        tb_locations_country["number_deaths_high"] / tb_locations_country["population"]
-    )
+    suffix = [c.replace(INDICATOR_BASE_NAME, "") for c in cols_num_deaths]
+    for suf in suffix:
+        tb_locations_country[f"death_rate{suf}"] = (
+            factor * tb_locations_country[f"{INDICATOR_BASE_NAME}{suf}"] / tb_locations_country["population"]
+        )
 
     # Drop population column
     tb_locations_country = tb_locations_country.drop(columns=["population"])
