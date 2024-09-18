@@ -22,6 +22,6 @@ meta:
       url: https://global.health/terms-of-use/
 
 outs:
-  - md5: d6cadb7f4ed22fb6c35596e974bd1330
-    size: 9184033
+  - md5: d738a5e1ce54371f85897532d3ff9bdc
+    size: 9367241
     path: global_health_mpox.csv
