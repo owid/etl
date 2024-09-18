@@ -83,6 +83,11 @@ tables:
         unit: cases
         display:
           numDecimalPlaces: 0
+      total_suspected_deaths:
+        title: Total suspected deaths
+        unit: deaths
+        display:
+          numDecimalPlaces: 0
       iso_code:
         title: ISO code
         unit: ''
