@@ -64,7 +64,7 @@ check-formatting-default: .venv
 
 check-typing-default: .venv
 	@echo '==> Checking types'
-	.venv/bin/pyright $(SRC)
+	source .venv/bin/activate && .venv/bin/pyright $(SRC)
 
 unittest-default: .venv
 	@echo '==> Running unit tests'
