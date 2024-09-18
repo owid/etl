@@ -129,13 +129,25 @@ def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -
 
 
 def clean_columns(tb: Table) -> Table:
-    return tb.loc[:, ["country", "iso3", "date", "total_conf_cases", "total_conf_deaths"]].rename(
+    return tb.loc[
+        :,
+        [
+            "country",
+            "iso3",
+            "date",
+            "total_conf_cases",
+            "total_conf_deaths",
+            "total_suspected_cases",
+            "total_suspected_deaths",
+        ],
+    ].rename(
         columns={
             "date": "date",
             "total_conf_cases": "total_cases",
             "total_conf_deaths": "total_deaths",
             "iso3": "iso_code",
-        }
+        },
+        errors="raise",
     )
 
 
