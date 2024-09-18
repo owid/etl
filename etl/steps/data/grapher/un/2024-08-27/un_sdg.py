@@ -200,8 +200,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
         short_unit=tb["short_unit"].iloc[0],
     )
 
-    # hotfix for ind 14.2.1 - for some reason underscore function does not work as expected
-    # TODO: figure out why
+    # hotfix - for some reason underscore function does not work as expected
     var_name = underscore(tb["variable_name"].iloc[0][0:254], validate=False)
     special_chars = ["(", ")", "+", "!", ","]
     for char in special_chars:
