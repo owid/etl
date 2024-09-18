@@ -70,10 +70,6 @@ test-integration: .venv
 	@echo '==> Running integration tests'
 	.venv/bin/pytest -m integration tests
 
-check-typing: .venv
-	@echo '==> Checking types'
-	.venv/bin/pyright $(SRC)
-
 coverage: .venv
 	@echo '==> Unit testing with coverage'
 	.venv/bin/pytest --cov=etl --cov-report=term-missing tests
