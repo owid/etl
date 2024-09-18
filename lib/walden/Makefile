@@ -45,7 +45,7 @@ check-formatting: .venv
 
 check-typing: .venv
 	@echo '==> Checking types'
-	@.venv/bin/pyright owid/walden
+	. .venv/bin/activate && .venv/bin/pyright owid/walden
 
 unittest: .venv
 	@echo '==> Running unit tests'
