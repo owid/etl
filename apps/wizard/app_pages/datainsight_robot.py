@@ -3,11 +3,19 @@ from pathlib import Path
 from typing import cast
 from urllib import parse
 
+import pandas as pd
 import requests
 import streamlit as st
 from owid.catalog.charts import Chart
 
 from apps.utils.gpt import OpenAIWrapper
+from apps.wizard.app_pages.insights import (
+    fetch_chart_data,
+    fetch_data,
+    get_grapher_thumbnail,
+    get_thumbnail_url,
+    list_charts,
+)
 from etl.db import get_connection
 
 
@@ -23,36 +31,26 @@ st.set_page_config(
     page_icon="🪄",
 )
 st.title(":material/lightbulb: Data insighter")
-st.markdown(f"Generate data insights from a chart view, using the `{MODEL}` model.")
-
-
-# FUNCTIONS
-def get_thumbnail_url(grapher_url: str) -> str:
-    """
-    Turn https://ourworldindata.org/grapher/life-expectancy?country=~CHN"
-    Into https://ourworldindata.org/grapher/thumbnail/life-expectancy.png?country=~CHN
-    """
-    assert grapher_url.startswith("https://ourworldindata.org/grapher/")
-    parts = parse.urlparse(grapher_url)
-
-    return f"{parts.scheme}://{parts.netloc}/grapher/thumbnail/{Path(parts.path).name}.png?{parts.query}"
-
-
-def get_grapher_thumbnail(grapher_url: str) -> str:
-    url = get_thumbnail_url(grapher_url)
-    data = requests.get(url).content
-    return f"data:image/png;base64,{base64.b64encode(data).decode('utf8')}"
 
 
 def get_trajectory_prompt(base_prompt: str, slug: str) -> str:
     chart = Chart(slug)
     df = chart.get_data()
-    st.warning(f"Chart has {len(df)} rows and {len(df.columns)} columns")
-    if len(df.columns) > 3:
-        raise DataError("This chart has more than 3 columns, which is not supported.")
 
-    (value_col,) = df.columns.difference(["entities", "years"])
-    df_s = df.round(1).query("years >= 2000").pivot(index="entities", columns="years", values=value_col).to_csv()
+    date_col = "years" if "years" in df.columns else "dates"
+
+    # shrink it
+    df = df.round(1)
+    if "years" in df.columns:
+        st.warning("NOTE: We are only looking at data from the year 2000 onwards")
+        df = df.query("years >= 2000")
+
+    if len(df.columns) == 3:
+        # shrink more via a pivot
+        (value_col,) = df.columns.difference(["entities", date_col])
+        df = df.pivot(index="entities", columns=date_col, values=value_col)
+
+    df_s = df.to_csv()
 
     title = chart.config["title"]
     subtitle = chart.config["subtitle"]
@@ -60,15 +58,12 @@ def get_trajectory_prompt(base_prompt: str, slug: str) -> str:
     return f"{base_prompt}\n\n---\n\n## {title}\n\n{subtitle}\n\n{df_s}"
 
 
-def list_charts(conn) -> list[str]:
-    with conn.cursor() as cur:
-        cur.execute("SELECT slug FROM chart_configs WHERE JSON_EXTRACT(config, '$.isPublished')")
-        return [slug for (slug,) in cur.fetchall()]
-
-
 (tab1, tab2) = st.tabs(["Insight from chart", "Explain raw data"])
 
 with tab1:
+    st.markdown(
+        f"Generate data insights from a chart view, using the `{MODEL}` model. Choose what to describe by selecting the chart and the countries and years you care about, then paste the link in here."
+    )
     # PROMPT
     default_prompt = """This is a chart from Our World In Data.
 
@@ -163,18 +158,22 @@ Please write a data insight for the given chart. Use simple language and short p
             response = cast(str, st.write_stream(stream))
 
 with tab2:
+    st.markdown(
+        f"Generate insights from the raw data underlying a chart, using the `{MODEL}` model. In this case, ChatGPT is looking at all countries and all time periods at once."
+    )
     conn = get_connection()
     default_prompt = """This is an indicator published by Our World In Data.
 
 Explain the core insights present in this data, in plain, educational language.
 """
     all_charts = list_charts(conn)
-    slug = st.multiselect(
+    slugs = st.multiselect(
         label="Grapher slug",
-        options=all_charts,
+        options=[None] + all_charts,
         help="Introduce the URL to a Grapher URL. Query parameters work!",
         key="tab2_url",
     )
+    slug = None if len(slugs) == 0 else slugs[0]
 
     with st.expander("Edit the prompt"):
         prompt = st.text_area(
@@ -193,6 +192,7 @@ Explain the core insights present in this data, in plain, educational language.
         # Opena AI (do first to catch possible errors in ENV)
         api = OpenAIWrapper()
 
+        df = fetch_chart_data(conn, slug)
         prompt_with_data = get_trajectory_prompt(prompt, slug)  # type: ignore
 
         # Prepare messages for Insighter
