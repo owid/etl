@@ -47,9 +47,10 @@ def get_trajectory_prompt(base_prompt: str, slug: str) -> str:
     df_s = df.to_csv()
 
     title = chart.config["title"]
-    subtitle = chart.config["subtitle"]
+    subtitle = chart.config.get("subtitle")
+    context = f"## {title}\n\n{subtitle}\n\n" if subtitle else f"## {title}n\n"
 
-    return f"{base_prompt}\n\n---\n\n## {title}\n\n{subtitle}\n\n{df_s}"
+    return f"{base_prompt}\n\n---\n\n{context}{df_s}"
 
 
 (tab1, tab2) = st.tabs(["Insight from chart", "Explain raw data"])
@@ -167,6 +168,9 @@ Explain the core insights present in this data, in plain, educational language.
         help="Introduce the URL to a Grapher URL. Query parameters work!",
         key="tab2_url",
     )
+    if len(slugs) > 1:
+        st.warning("More than one slug selected, only the first one will be used")
+
     slug = None if len(slugs) == 0 else slugs[0]
 
     with st.expander("Edit the prompt"):
