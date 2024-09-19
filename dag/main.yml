@@ -408,7 +408,7 @@ steps:
     - snapshot://gapminder/2023-09-22/total_fertility_rate.xlsx
   data://garden/gapminder/2023-09-22/total_fertility_rate:
     - data://meadow/gapminder/2023-09-22/total_fertility_rate
-    - data://garden/un/2023-08-29/long_run_child_mortality
+    - data://garden/un/2024-09-16/long_run_child_mortality
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/gapminder/2023-09-22/total_fertility_rate:
     - data://garden/gapminder/2023-09-22/total_fertility_rate
