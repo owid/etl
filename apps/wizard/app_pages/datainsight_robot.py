@@ -1,10 +1,10 @@
-from typing import cast
+from typing import Tuple, cast
 
+import pandas as pd
 import streamlit as st
-from owid.catalog.charts import Chart
 
 from apps.utils.gpt import OpenAIWrapper
-from apps.wizard.app_pages.insights import (
+from apps.wizard.utils.insights import (
     fetch_chart_data,
     get_grapher_thumbnail,
     get_thumbnail_url,
@@ -27,9 +27,10 @@ st.set_page_config(
 st.title(":material/lightbulb: Data insighter")
 
 
-def get_trajectory_prompt(base_prompt: str, slug: str) -> str:
-    chart = Chart(slug)
-    df = chart.get_data()
+def get_trajectory_prompt(conn, base_prompt: str, slug: str, codes: bool = False) -> Tuple[str, pd.DataFrame]:
+    df = fetch_chart_data(slug, conn=conn, codes=codes)
+
+    config = df.attrs["config"]
 
     date_col = "years" if "years" in df.columns else "dates"
 
@@ -44,18 +45,23 @@ def get_trajectory_prompt(base_prompt: str, slug: str) -> str:
         (value_col,) = df.columns.difference(["entities", date_col])
         df = df.pivot(index="entities", columns=date_col, values=value_col)
 
+    # restore the attrs
+    df.attrs["config"] = config
+
     df_s = df.to_csv()
 
-    title = chart.config["title"]
-    subtitle = chart.config.get("subtitle")
+    title = config["title"]
+    subtitle = config.get("subtitle")
     context = f"## {title}\n\n{subtitle}\n\n" if subtitle else f"## {title}n\n"
 
-    return f"{base_prompt}\n\n---\n\n{context}{df_s}"
+    return f"{base_prompt}\n\n---\n\n{context}{df_s}", df
 
 
-(tab1, tab2) = st.tabs(["Insight from chart", "Explain raw data"])
+sections = ["Insight from chart", "Explain raw data", "Find interesting views"]
+tabs = st.tabs(sections)
+section_tab = dict(zip(sections, tabs))
 
-with tab1:
+with section_tab["Insight from chart"]:
     st.markdown(
         f"Generate data insights from a chart view, using the `{MODEL}` model. Choose what to describe by selecting the chart and the countries and years you care about, then paste the link in here."
     )
@@ -152,7 +158,8 @@ Please write a data insight for the given chart. Use simple language and short p
             )
             response = cast(str, st.write_stream(stream))
 
-with tab2:
+with section_tab["Explain raw data"]:
+    st.query_params["tab"] = "Explain raw data"
     st.markdown(
         f"Generate insights from the raw data underlying a chart, using the `{MODEL}` model. In this case, ChatGPT is looking at all countries and all time periods at once."
     )
@@ -190,8 +197,81 @@ Explain the core insights present in this data, in plain, educational language.
         # Opena AI (do first to catch possible errors in ENV)
         api = OpenAIWrapper()
 
-        df = fetch_chart_data(conn, slug)
-        prompt_with_data = get_trajectory_prompt(prompt, slug)  # type: ignore
+        prompt_with_data, _ = get_trajectory_prompt(conn, prompt, slug)  # type: ignore
+
+        # Prepare messages for Insighter
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt_with_data},
+                ],
+            },
+        ]
+
+        with st.chat_message("assistant"):
+            # Ask GPT (stream)
+            stream = api.chat.completions.create(
+                model=MODEL,
+                messages=messages,  # type: ignore
+                max_tokens=3000,
+                stream=True,
+            )
+            response = cast(str, st.write_stream(stream))
+
+with section_tab["Find interesting views"]:
+    "Find interesting views of this chart, and explain why they're interesting."
+
+    conn = get_connection()
+    default_prompt = """This is an indicator published by Our World In Data at {base_url}.
+
+Please find the five most interesting insights in this data, and summarize each with a h2 heading, one concise sentence, and a chart image, and the raw chart URL in full below it.
+
+The chart image should look like: ![]({base_png}country=~<entity_code>~<entity_code>~<entity_code>), using the relevant ISO alpha3 for the country, region or entity being used.
+
+The chart URL should match, and look like: {base_url}country=~<entity_code>~<entity_code>~<entity_code>">
+
+If making a point about a country, include its peers, region, income group or "World" in the chart to provide contrast.
+"""
+    all_charts = list_charts(conn)
+    slugs = st.multiselect(
+        label="Grapher slug",
+        options=all_charts,
+        help="Introduce the URL to a Grapher URL. Query parameters work!",
+        key="tab3_url",
+    )
+    if len(slugs) > 1:
+        st.warning("More than one slug selected, only the first one will be used")
+
+    slug = None if len(slugs) == 0 else slugs[0]
+
+    with st.expander("Edit the prompt"):
+        prompt = st.text_area(
+            label="Prompt",
+            value=default_prompt,
+            key="tab3_prompt",
+        )
+    confirmed = st.button(
+        "Generate insight",
+        disabled=slug is None,
+        key="tab3_button",
+    )
+
+    # Action if user clicks on 'generate'
+    if confirmed and slug is not None:
+        # Opena AI (do first to catch possible errors in ENV)
+        api = OpenAIWrapper()
+
+        prompt_with_data, df = get_trajectory_prompt(conn, prompt, slug, codes=True)  # type: ignore
+
+        if df.attrs["config"].get("tab") == "map":
+            base_url = f"https://ourworldindata.org/grapher/{slug}?tab=chart&time=2000..latest&"
+            base_png = f"https://ourworldindata.org/grapher/{slug}.png?tab=chart&time=2000..latest&"
+        else:
+            base_url = f"https://ourworldindata.org/grapher/{slug}?time=2000..latest&"
+            base_png = f"https://ourworldindata.org/grapher/{slug}.png?time=2000..latest&"
+
+        prompt_with_data = prompt_with_data.format(base_url=base_url, base_png=base_png)
 
         # Prepare messages for Insighter
         messages = [

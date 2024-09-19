@@ -9,6 +9,8 @@ import pandas as pd
 import requests
 from dateutil.parser import parse as date_parse
 
+from etl.db import get_connection
+
 
 def get_thumbnail_url(grapher_url: str) -> str:
     """
@@ -27,13 +29,20 @@ def get_grapher_thumbnail(grapher_url: str) -> str:
     return f"data:image/png;base64,{base64.b64encode(data).decode('utf8')}"
 
 
-def fetch_chart_data(conn, slug: str) -> pd.DataFrame:
+def fetch_chart_data(slug: str, conn=None, codes: bool = False) -> pd.DataFrame:
+    if conn is None:
+        conn = get_connection()
+
     # Use the DB for as much as we can, and the API just for data and metadata
     config = fetch_config(conn, slug)
-    return fetch_data(conn, config)
+    df = fetch_data(conn, config, codes=codes)
+    return df
 
 
-def list_charts(conn) -> list[str]:
+def list_charts(conn=None) -> list[str]:
+    if conn is None:
+        conn = get_connection()
+
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -67,14 +76,14 @@ def fetch_config(conn, slug: str) -> dict:
         return config
 
 
-def fetch_data(conn, config: dict) -> pd.DataFrame:
+def fetch_data(conn, config: dict, codes: bool = False) -> pd.DataFrame:
     dimensions = set(d["variableId"] for d in config["dimensions"])
     bundle = {dim: _fetch_dimension(dim) for dim in dimensions}
-    df = _bundle_to_frame(config, bundle)
+    df = _bundle_to_frame(config, bundle, codes=codes)
     return df
 
 
-def _indicator_to_frame(indicator: dict) -> pd.DataFrame:
+def _indicator_to_frame(indicator: dict, codes: bool = False) -> pd.DataFrame:
     data = indicator["data"]
     metadata = indicator["metadata"]
 
@@ -82,8 +91,14 @@ def _indicator_to_frame(indicator: dict) -> pd.DataFrame:
     df = pd.DataFrame.from_dict(data)
 
     # turning entity ids into entity names
-    entities = pd.DataFrame.from_records(metadata["dimensions"]["entities"]["values"])
-    id_to_name = entities.set_index("id").name.to_dict()
+    entities = pd.DataFrame.from_records(metadata["dimensions"]["entities"]["values"]).set_index("id")
+    if codes:
+        # map to codes the way Grapher uses in URLs
+        entities["code_with_fallback"] = entities.code.fillna(entities.name.apply(lambda e: e.replace(" ", "+")))
+        id_to_name = entities.code_with_fallback.to_dict()
+    else:
+        id_to_name = entities.name.to_dict()
+
     df["entities"] = df.entities.apply(id_to_name.__getitem__)
 
     # make the "values" column more interestingly named
@@ -119,12 +134,12 @@ def _fetch_dimension(id: int) -> dict:
     return {"data": data, "metadata": metadata}
 
 
-def _bundle_to_frame(config, bundle) -> pd.DataFrame:
+def _bundle_to_frame(config, bundle, codes: bool = False) -> pd.DataFrame:
     # combine all the indicators into a single data frame and one metadata dict
     metadata = {}
     df = None
     for dim in bundle.values():
-        to_merge = _indicator_to_frame(dim)
+        to_merge = _indicator_to_frame(dim, codes=codes)
         (value_col,) = to_merge.columns.difference(["entities", "years"])
         metadata[value_col] = dim["metadata"].copy()
 
