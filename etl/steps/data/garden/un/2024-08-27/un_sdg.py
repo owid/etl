@@ -46,8 +46,7 @@ def run(dest_dir: str) -> None:
 
     # Creating OMMs
     all_tables = create_omms(all_tables)
-    # Combine Paris Principles variables - already combines as of 2024
-    # all_tables = combine_paris_principles(all_tables)
+
     log.info("Saving data tables...")
 
     ds_garden = Dataset.create_empty(dest_dir)
@@ -329,49 +328,3 @@ def create_omms(all_tabs: List[pd.DataFrame]) -> List[pd.DataFrame]:
         new_tabs.append(table)
 
     return new_tabs
-
-
-def combine_paris_principles(all_tabs: List[Table]) -> List[Table]:
-    """
-    Combine the four variables regarding country's accreditation with the Paris Principles (having independent Human Rights Institutions)
-
-    Currently there are four variables, one variable for each level of accreditation, shown by the value of 1. We should combine these and instead set the value as the series description.
-
-    This is in a similar vain to the create_omms() function but in this case the variables each have their own variable code.
-
-    Tuna: I think this is deprecated as of 2024"""
-    # paris_principles_vars = ["SG_NHR_IMPLN", "SG_NHR_INTEXSTN", "SG_NHR_NOSTUSN", "SG_NHR_NOAPPLN"]
-    paris_principles_vars = ["SG_NHR_CMPLNC", "SG_NHR_IMPL", "SG_NHR_INTEXST"]
-    paris_principles_tables = []
-    for table in all_tabs:
-        if table.index[0][5] in (paris_principles_vars):
-            print(table.head())
-            table = table.copy(deep=False)
-            vc = table.groupby(["country", "year"]).value.sum().sort_values(ascending=False)
-            regions = set(vc[vc > 1].index.get_level_values(0))
-            table = table[~table.index.get_level_values("country").isin(regions)]
-            # table["value"] = table["seriesdescription"]
-            table["long_unit"] = ""
-            paris_principles_tables.append(table)
-    paris_principles_table = pd.concat(paris_principles_tables)
-    paris_principles_table = paris_principles_table.reset_index()
-    # Adding new variable name
-    paris_principles_table["seriescode"] = "SG_NHR_OWID"
-    paris_principles_table["seriesdescription"] = "The level to which countries are compliant with the Paris Principles"
-    paris_principles_table = paris_principles_table.set_index(
-        ["country", "year", "goal", "target", "indicator", "seriescode"], verify_integrity=True
-    )
-    # Shortening the values to improve the source tab
-    print(paris_principles_table.value.unique())
-    paris_principles_table.value = paris_principles_table.value.replace(
-        {
-            "Countries with National Human Rights Institutions in compliance with the Paris Principles, A status (1 = YES; 0 = NO)": "Compliant with Paris Principles",
-            "Countries with National Human Rights Institutions not fully compliant with the Paris Principles, B status (1 = YES; 0 = NO)": "Observer Status",
-            "Countries with no application for accreditation with the Paris Principles, D status  (1 = YES; 0 = NO)": "Not compliant with the Paris Principles",
-            "Countries with National Human Rights Institutions and no status with the Paris Principles, C status (1 = YES; 0 = NO)": "No status with the Paris Principles",
-        }
-    )
-
-    all_tabs.append(paris_principles_table)
-
-    return all_tabs
