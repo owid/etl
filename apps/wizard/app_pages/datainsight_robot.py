@@ -159,7 +159,6 @@ Please write a data insight for the given chart. Use simple language and short p
             response = cast(str, st.write_stream(stream))
 
 with section_tab["Explain raw data"]:
-    st.query_params["tab"] = "Explain raw data"
     st.markdown(
         f"Generate insights from the raw data underlying a chart, using the `{MODEL}` model. In this case, ChatGPT is looking at all countries and all time periods at once."
     )
