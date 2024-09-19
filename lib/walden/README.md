@@ -36,7 +36,7 @@ You need Python 3.8+ to use this repository, with `poetry` installed (`pip insta
 Then install the environment using
 
 ```
-poetry install
+make .venv
 ```
 
 ### The basics
