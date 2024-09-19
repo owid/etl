@@ -325,14 +325,7 @@ steps:
   data://grapher/terrorism/2023-07-20/global_terrorism_database:
     - data://garden/terrorism/2023-07-20/global_terrorism_database
 
-  # UN IGME Child Mortality
-  data://meadow/un/2023-08-16/igme:
-    - snapshot://un/2023-08-16/igme.zip
-  data://garden/un/2023-08-16/igme:
-    - data://meadow/un/2023-08-16/igme
-    - data://garden/un/2018/igme
-  data://grapher/un/2023-08-16/igme:
-    - data://garden/un/2023-08-16/igme
+
 
   # Colonial Dates Dataset (COLDAT)
   data://meadow/harvard/2023-09-18/colonial_dates_dataset:
@@ -366,13 +359,6 @@ steps:
   data://garden/gapminder/2023-09-21/under_five_mortality:
     - data://meadow/gapminder/2023-09-21/under_five_mortality
 
-  # Long-run child mortality, Gapminder + UN IGME
-  data://garden/un/2023-08-29/long_run_child_mortality:
-    - data://garden/un/2023-08-16/igme
-    - data://garden/gapminder/2023-09-18/under_five_mortality
-    - data://garden/gapminder/2023-09-21/under_five_mortality
-  data://grapher/un/2023-09-19/long_run_child_mortality:
-    - data://garden/un/2023-08-29/long_run_child_mortality
 
   # Older vintage UN IGME (with longer time-series)
   data://meadow/un/2018/igme:
