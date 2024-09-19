@@ -29,7 +29,7 @@ test-default: check-formatting check-linting check-typing unittest
 	touch .sanity-check
 
 
-.venv-default: .sanity-check
+.venv: .sanity-check
 	@echo '==> Installing packages'
 	@if [ -n "$(PYTHON_VERSION)" ]; then \
 		echo '==> Using Python version $(PYTHON_VERSION)'; \
