@@ -68,6 +68,7 @@ views:
       note: COVAX is a worldwide initiative aimed at equitable access to COVID-19 vaccines. It is directed by Gavi, CEPI, and the WHO.
       originUrl: ourworldindata.org/coronavirus
       type: StackedDiscreteBar
+      sortColumnSlug: "988130"
 
   - dimensions:
       normalize: per_capita
@@ -88,9 +89,9 @@ views:
       normalize: per_dose
     indicators:
       y:
-        - "{definitions.table}#delivered_per_capita"
-        - "{definitions.table}#only_donated_per_capita"
-        - "{definitions.table}#only_announced_per_capita"
+        - "{definitions.table}#delivered_per_used"
+        - "{definitions.table}#only_donated_per_used"
+        - "{definitions.table}#only_announced_per_used"
 
     config:
       title: "COVID-19 vaccine doses donated to COVAX, per dose administered"
@@ -103,9 +104,9 @@ views:
       normalize: per_gdp
     indicators:
       y:
-        - "{definitions.table}#delivered_per_capita"
-        - "{definitions.table}#only_donated_per_capita"
-        - "{definitions.table}#only_announced_per_capita"
+        - "{definitions.table}#delivered_per_gdp"
+        - "{definitions.table}#only_donated_per_gdp"
+        - "{definitions.table}#only_announced_per_gdp"
 
     config:
       title: "COVID-19 vaccine doses donated to COVAX, per million dollars of GDP"
