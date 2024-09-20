@@ -9,6 +9,7 @@ from pathlib import Path
 
 import pytest
 from jsonschema import Draft7Validator, ValidationError, validate
+
 from owid.walden.catalog import INDEX_DIR, Catalog, Dataset, iter_docs, load_schema
 
 
@@ -93,8 +94,8 @@ def test_default_dataset_version():
         url="test",
         file_extension="gzip",
     )
-    ds = Dataset(publication_date=dt.date(2022, 1, 1), **kwargs)
+    ds = Dataset(publication_date=dt.date(2022, 1, 1), **kwargs)  # type: ignore
     assert ds.version == "2022-01-01"
 
-    ds = Dataset(version="2023-01-01", publication_date=dt.date(2022, 1, 1), **kwargs)
+    ds = Dataset(version="2023-01-01", publication_date=dt.date(2022, 1, 1), **kwargs)  # type: ignore
     assert ds.version == "2023-01-01"

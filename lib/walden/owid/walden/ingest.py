@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Optional, Union
 
 import pandas as pd
-from owid.datautils import dataframes
 
+from owid.datautils import dataframes
 from owid.walden import files
 
 from .catalog import Dataset

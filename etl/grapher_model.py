@@ -246,6 +246,7 @@ class ChartConfig(Base):
     id: Mapped[bytes] = mapped_column(CHAR(36), primary_key=True)
     patch: Mapped[dict] = mapped_column(JSON, nullable=False)
     full: Mapped[dict] = mapped_column(JSON, nullable=False)
+    fullMd5: Mapped[str] = mapped_column(CHAR(24), Computed("(to_base64(unhex(md5(full))))", persisted=True))
     slug: Mapped[Optional[str]] = mapped_column(
         String(255), Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True)
     )
@@ -286,11 +287,20 @@ class Chart(Base):
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
     isIndexable: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'0'"))
-    updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
+    _updatedAt: Mapped[datetime] = mapped_column("updatedAt", DateTime, init=False)
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     publishedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
 
     chart_config: Mapped["ChartConfig"] = relationship("ChartConfig", back_populates="chartss", lazy="joined")
+
+    @hybrid_property
+    def updatedAt(self) -> datetime:  # type: ignore
+        # updatedAt is None if the chart is new, it only gets populated once we save it
+        return self._updatedAt or self.createdAt
+
+    @updatedAt.setter
+    def updatedAt(self, value: datetime):
+        self._updatedAt = value
 
     @hybrid_property
     def config(self) -> dict[str, Any]:  # type: ignore
@@ -1550,7 +1560,7 @@ def _json_is(json_field: Any, key: str, val: Any) -> Any:
         return json_field[key] == val
 
 
-def _remap_variable_ids(config: Union[List, Dict[str, Any]], remap_ids: Dict[int, int]) -> Any:
+def _remap_variable_ids(config: Union[List, Dict[str, Any], Any], remap_ids: Dict[int, int]) -> Any:
     """Replace variableIds from chart config using `remap_ids` mapping."""
     if isinstance(config, dict):
         out = {}
@@ -1558,7 +1568,14 @@ def _remap_variable_ids(config: Union[List, Dict[str, Any]], remap_ids: Dict[int
             if k == "variableId":
                 out[k] = remap_ids[int(v)]
             # columnSlug is actually a variable id, but stored as a string (it wasn't a great decision)
-            elif k == "columnSlug":
+            elif k in ("columnSlug", "sortColumnSlug"):
+                out[k] = str(remap_ids[int(v)])
+            # if new fields with variable ids are added, try to handle them and raise a warning
+            elif isinstance(v, int) and v in remap_ids:
+                log.warning("remap_variable_ids.new_field", field=k, value=v)
+                out[k] = remap_ids[v]
+            elif isinstance(v, str) and v.isdigit() and int(v) in remap_ids:
+                log.warning("remap_variable_ids.new_field", field=k, value=v)
                 out[k] = str(remap_ids[int(v)])
             else:
                 out[k] = _remap_variable_ids(v, remap_ids)

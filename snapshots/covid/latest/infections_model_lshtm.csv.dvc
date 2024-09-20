@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Using a delay-adjusted case fatality ratio to estimate under-reporting
+    description: |-
+      Estimate the percentage of symptomatic COVID-19 cases reported in different countries using case fatality ratio estimates based on data from the ECDC, correcting for delays between confirmation-and-death.
+
+    date_published: "2020"
+    # Citation
+    producer: London School of Hygiene & Tropical Medicine
+    citation_full: |-
+      Russell, T. W., Hellewell, J., Abbott, S., Golding, N., Gibbs, H., Jarvis, C. I., van Zandvoort, K., CMMID COVID-19 working group, Flasche, S., Eggo, R. M., Edmunds, W. J., & Kucharski, A. J. (2020). Using a delay-adjusted case fatality ratio to estimate under-reporting. BMC Medicine. Retrieved from https://cmmid.github.io/topics/covid19/global_cfr_estimates.html.
+    attribution_short: LSHTM
+    # Files
+    url_main: https://cmmid.github.io/topics/covid19/global_cfr_estimates.html
+    date_accessed: 2020-08-27
+
+    # License
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 59d6248b4af7a347898be4c9497f9e84
+    size: 15892167
+    path: infections_model_lshtm.csv

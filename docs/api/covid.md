@@ -55,6 +55,7 @@ In addition to our compact dataset, we provide individual datasets with all our 
 | **Google mobility** | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/google_mobility/google_mobility.csv)                                  | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/google_mobility/google_mobility.meta.json)                                  |
 | **Government response policy** | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/oxcgrt_policy/oxcgrt_policy.csv)                                      | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/oxcgrt_policy/oxcgrt_policy.meta.json)                                      |
 | **Attitudes (YouGov)** | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/yougov/yougov_composite.csv)                                          | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/yougov/yougov_composite.meta.json)                                          |
+| **Donations (COVAX)** | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/covax/covax.csv)                                          | [:material-download: download](https://catalog.ourworldindata.org/garden/covid/latest/covax/covax.meta.json)                                          |
 
 All our COVID-19 data pipelines are specified in [our DAG](https://github.com/owid/etl/blob/master/dag/covid.yml).
 

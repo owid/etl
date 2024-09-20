@@ -1,6 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-import gzip
 import io
 import zipfile
 
@@ -27,28 +26,21 @@ log = get_logger()
 def _load_data_array(snap: Snapshot) -> xr.DataArray:
     log.info("load_data_array.start")
     # Load data from snapshot.
-    with gzip.open(snap.path, "rb") as file:
-        file_content = file.read()
-
+    with zipfile.ZipFile(snap.path, "r") as zip_file:
+        # Iterate through all files in the zip archive
+        for file_info in zip_file.infolist():
+            with zip_file.open(file_info) as file:
+                file_content = file.read()
     # Create an in-memory bytes file and load the dataset
     with io.BytesIO(file_content) as memfile:
-        ds = xr.open_dataset(memfile).load()  # .load() ensures data is eagerly loaded
-
-    # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
-    # If a value is missing in the first dataset, it is filled with the value from the second dataset.
-    # Select the 't2m' variable from the combined dataset.
-    ds1 = ds.sel(expver=1)
-    ds5 = ds.sel(expver=5)
-    da = ds1.combine_first(ds5)["t2m"]
-    del ds1, ds5
+        da = xr.open_dataset(memfile).load()  # .load() ensures data is eagerly loaded
 
     # Convert temperature from Kelvin to Celsius.
-    da = da - 273.15
+    da = da["t2m"] - 273.15
 
     # Set the coordinate reference system for the temperature data to EPSG 4326.
     da = da.rio.write_crs("epsg:4326")
 
-    # Convert temperature from Kelvin to Celsius.
     return da
 
 
@@ -67,7 +59,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("surface_temperature.gz")
+    snap = paths.load_snapshot("surface_temperature.zip")
 
     # Read surface temperature data from snapshot
     da = _load_data_array(snap)
@@ -144,10 +136,12 @@ def run(dest_dir: str) -> None:
     log.info(
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
-
     # Define the start and end dates
-    start_time = da["time"].min().dt.date.astype(str).item()
-    end_time = da["time"].max().dt.date.astype(str).item()
+    da["date"] = pd.to_datetime(da["date"].astype(str), format="%Y%m%d")
+
+    # Now you can access the 'dt' accessor
+    start_time = da["date"].min().dt.date.astype(str).item()
+    end_time = da["date"].max().dt.date.astype(str).item()
 
     # Generate a date range from start_time to end_time with monthly frequency
     month_middles = pd.date_range(start=start_time, end=end_time, freq="MS") + pd.offsets.Day(14)

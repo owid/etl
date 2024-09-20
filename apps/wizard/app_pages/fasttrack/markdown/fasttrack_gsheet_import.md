@@ -30,12 +30,16 @@ Examples:
 
 5. Once you're happy with the dataset, rerun this form with `Make dataset private` unchecked.
 
+#### Adding dimensions
+
+If you want to add dimensions to your dataset (e.g. if you have "age group" or "sex" column), you can do so by prefixing the column name with `dim_`. Fast-track will automatically detect these columns, strip `dim_` prefix and create dimensions for them.
+
 
 ## Not implemented
 
 Features that are not implemented yet, but could be! Get in touch @mojmir
 
 - [ ] Updating dataset previously imported via Admin
-- [ ] Changing metadata via Admin
-- [ ] Automatic Google Sheets generation from existing datasets
+- [x] Changing metadata via Admin
+- [x] Automatic Google Sheets generation from existing datasets
 - [ ] Interactive country harmonisation

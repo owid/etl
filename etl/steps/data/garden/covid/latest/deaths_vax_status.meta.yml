@@ -1,0 +1,120 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    description_short: |-
+      Death rates are calculated as the number of deaths in each group, divided by the total number of people in this group. This is given per 100,000 people.
+    unit: doses
+    presentation:
+      topic_tags:
+        - COVID-19
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  title: COVID-19, deaths by vaccination status
+
+
+tables:
+  us:
+    common:
+      description_key:
+        - The mortality rate for the 'All ages' group is age-standardized to account for the different vaccination rates of older and younger people.
+    variables:
+      us_unvaccinated:
+        title: Death rate (weekly) of unvaccinated people - United States, by age
+        presentation:
+          title_public: Death rate (weekly) of unvaccinated people - United States, by age
+        display:
+          name: Unvaccinated
+      us_vaccinated_no_biv_booster:
+        title: Death rate (weekly) of fully vaccinated people (without bivalent booster) - United States, by age
+        presentation:
+          title_public: Death rate (weekly) of fully vaccinated people (without bivalent booster) - United States, by age
+        display:
+          name: Vaccinated without bivalent booster
+      us_vaccinated_with_biv_booster:
+        title: Death rate (weekly) of fully vaccinated people (with bivalent booster) - United States, by age
+        presentation:
+          title_public: Death rate (weekly) of fully vaccinated people (with bivalent booster) - United States, by age
+        display:
+          name: Vaccinated with bivalent booster
+
+  chile:
+    common:
+      description_key:
+        - The mortality rate for the 'All ages' group is age-standardized to account for the different vaccination rates of older and younger people.
+    variables:
+      chile_0_1_dose:
+        title: Death rate (weekly) of people with 0 or 1 dose - Chile, by age
+        presentation:
+          title_public: Death rate (weekly) of people with 0 or 1 dose - Chile, by age
+        display:
+          name: 0 or 1 dose
+      chile_2_doses:
+        title: Death rate (weekly) of people with 2 doses - Chile, by age
+        presentation:
+          title_public: Death rate (weekly) of people with 2 doses - Chile, by age
+        display:
+          name: 2 doses
+      chile_3_doses:
+        title: Death rate (weekly) of people with 3 doses - Chile, by age
+        presentation:
+          title_public: Death rate (weekly) of people with 3 doses - Chile, by age
+        display:
+          name: 3 doses
+      chile_4_doses:
+        title: Death rate (weekly) of people with 4 doses - Chile, by age
+        presentation:
+          title_public: Death rate (weekly) of people with 4 doses - Chile, by age
+        display:
+          name: 4 doses
+
+  england:
+    common:
+      description_key:
+        - Unvaccinated people have not received any dose.
+        - Partially-vaccinated people are excluded.
+        - Fully-vaccinated people have received all doses prescribed by the initial vaccination protocol.
+        - The mortality rate is age-standardized to account for the different vaccination rates of older and younger people.
+    variables:
+      england_unvaccinated:
+        title: Death rate (monthly) of unvaccinated people - England, by age
+        presentation:
+          title_public: Death rate (monthly) of unvaccinated people - England, by age
+        display:
+          name: Unvaccinated
+      england_fully_vaccinated:
+        title: Death rate (monthly) of fully vaccinated people - England, by age
+        presentation:
+          title_public: Death rate (monthly) of fully vaccinated people - England, by age
+        display:
+          name: Fully vaccinated
+
+  switzerland:
+    common:
+      description_key:
+        - Data coverage includes both Switzerland and Liechtenstein. Unvaccinated people have not received any dose. Partially-vaccinated people are excluded.
+        - Fully-vaccinated people have received all doses prescribed by the initial vaccination protocol.
+        - The mortality rate for the 'All ages' group is age-standardized to account for the different vaccination rates of older and younger people.
+    variables:
+      swi_unvaccinated:
+        title: Death rate (weekly) of unvaccinated people - Switzerland, by age
+        presentation:
+          title_public: Death rate (weekly) of unvaccinated people - Switzerland, by age
+        display:
+          name: Unvaccinated
+      swi_vaccinated_no_booster:
+        title: Death rate (weekly) of fully vaccinated people (without booster) - Switzerland, by age
+        presentation:
+          title_public: Death rate (weekly) of fully vaccinated people (without booster) - Switzerland, by age
+        display:
+          name: Fully vaccinated, no booster
+      swi_vaccinated_with_booster:
+        title: Death rate (weekly) of fully vaccinated people (with booster) - Switzerland, by age
+        presentation:
+          title_public: Death rate (weekly) of fully vaccinated people (with booster) - Switzerland, by age
+        display:
+          name: Fully vaccinated, with booster
+
