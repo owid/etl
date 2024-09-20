@@ -1,0 +1,70 @@
+definitions:
+  table: grapher/covid/latest/covax/covax
+
+title:
+  title: COVID-19 vaccine doses donated to COVAX
+  titleVariant: ""
+defaultSelection:
+  - France
+  - Spain
+  - Sweden
+  - United States
+  - Canada
+  - Norway
+  - New Zealand
+  - United Kingdom
+  - Denmark
+  - Switzerland
+  - Italy
+  - Germany
+  - Portugal
+  - Belgium
+  - European Union
+  - Japan
+  - Netherlands
+  - Finland
+  - Hong Kong
+  - Ireland
+  - Austria
+  - Brazil
+  - Slovakia
+  - Slovenia
+  - South Korea
+  - Mexico
+  - Greece
+  - European Union (27)
+topicTags:
+  - COVID-19
+
+dimensions:
+  - slug: normalize
+    name: Normalization
+    choices:
+      - slug: absolute
+        name: None
+        description: null
+      # - slug: per_capita
+      #   name: Per capita
+      #   description: null
+      # - slug: per_dose
+      #   name: Per dose administered
+      #   description: null
+      # - slug: per_gdp
+      #   name: Per million dollars of GDP
+      #   description: null
+
+views:
+  - dimensions:
+      normalize: absolute
+    indicators:
+      y:
+        - "{definitions.table}#delivered"
+        - "{definitions.table}#only_donated"
+        - "{definitions.table}#only_announced"
+
+    config:
+      title: "COVID-19 vaccine doses donated to COVAX"
+      subtitle: Doses donated to the COVAX initiative by each country.
+      note: COVAX is a worldwide initiative aimed at equitable access to COVID-19 vaccines. It is directed by Gavi, CEPI, and the WHO.
+      originUrl: ourworldindata.org/coronavirus
+      # type: StackedDiscreteBar
