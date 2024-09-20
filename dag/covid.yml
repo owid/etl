@@ -290,3 +290,4 @@ steps:
     - grapher://grapher/covid/latest/testing
     - grapher://grapher/covid/latest/google_mobility
     - grapher://grapher/excess_mortality/latest/excess_mortality
+    - grapher://grapher/covid/latest/covax/covax
