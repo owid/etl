@@ -68,7 +68,24 @@ views:
       note: COVAX is a worldwide initiative aimed at equitable access to COVID-19 vaccines. It is directed by Gavi, CEPI, and the WHO.
       originUrl: ourworldindata.org/coronavirus
       type: StackedDiscreteBar
-      sortColumnSlug: "988130"
+      sortBy: column
+      sortColumnSlug: "{definitions.table}#delivered"
+      dimensions:
+        - property: y
+          variableId: 988127
+          display:
+            includeInTable: true
+            color: "#3182bd"
+        - property: y
+          variableId: 988128
+          display:
+            includeInTable: true
+            color: "#9ecae1"
+        - property: y
+          variableId: 988129
+          display:
+            includeInTable: true
+            color: "#deebf7"
 
   - dimensions:
       normalize: per_capita

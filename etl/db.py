@@ -10,8 +10,10 @@ import structlog
 import validators
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
+import etl.grapher_model as gm
 from etl import config
 
 log = structlog.get_logger()
@@ -511,3 +513,16 @@ def get_dataset_charts(dataset_ids: List[str], db_conn: Optional[pymysql.Connect
     ]
 
     return df
+
+
+def map_indicator_path_to_id(catalog_path: str) -> str | int:
+    # Check if given path is actually an ID
+    if str(catalog_path).isdigit():
+        return catalog_path
+
+    # Get ID, assuming given path is a catalog path
+    engine = get_engine()
+    with Session(engine) as session:
+        db_indicator = gm.Variable.load_from_catalog_path(session, catalog_path)
+        assert db_indicator.id is not None
+        return db_indicator.id

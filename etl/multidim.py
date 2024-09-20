@@ -6,11 +6,29 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from etl import grapher_model as gm
-from etl.db import read_sql
+from etl.db import map_indicator_path_to_id, read_sql
 
 
 def upsert_multidim_data_page(slug: str, config: dict, engine: Engine) -> None:
     validate_multidim_config(config, engine)
+
+    # TODO: Improve this. Could also go into etl.helpers.load_mdim_config
+    # Change catalogPaths into variable IDs
+    if "views" in config:
+        views = config["views"]
+        for view in views:
+            if "config" in view:
+                if "sortColumnSlug" in view["config"]:
+                    # Check if catalogPath
+                    # Map to variable ID
+                    view["config"]["sortColumnSlug"] = str(map_indicator_path_to_id(view["config"]["sortColumnSlug"]))
+                if "dimensions" in view["config"]:
+                    dimensions = view["config"]["dimensions"]
+                    for dim in dimensions:
+                        if "variableId" in dim:
+                            # Check if catalogPath
+                            # Map to variable ID
+                            dim["variableId"] = map_indicator_path_to_id(dim["variableId"])
 
     with Session(engine) as session:
         mdd_page = gm.MultiDimDataPage(
