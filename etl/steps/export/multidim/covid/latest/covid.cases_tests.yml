@@ -1,6 +1,3 @@
-definitions:
-  table: grapher/covid/latest/excess_mortality/excess_mortality
-
 title:
   title: "COVID-19: Daily tests vs. daily new confirmed cases"
   titleVariant: ""

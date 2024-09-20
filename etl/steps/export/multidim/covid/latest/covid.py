@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
         "covid.boosters.yml",
         "covid.vax_breakdowns.yml",
         "covid.xm.yml",
-        "covid.cases_deaths.yml",
+        "covid.cases_tests.yml",
     ]
     # Load YAML file
     for fname in filenames:
@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     config = paths.load_mdim_config(fname)
     slug = fname_to_slug(fname)
     table = "grapher/covid/latest/google_mobility/google_mobility"
-    config["views"] += multidim.expand_views(config, {"place": "*"}, table, engine)
+    config["views"] += multidim.expand_views(config, {"place": "*"}, table, engine)  # type: ignore
     multidim.upsert_multidim_data_page(slug, config, engine)
 
     print(1)
