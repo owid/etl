@@ -162,10 +162,3 @@ def _fetch_bundle(slug: str) -> _GrapherBundle:
         if d.metadata.get("origins"):
             origins.append(d.metadata.pop("origins"))
     return _GrapherBundle(config, dimensions, origins)
-
-
-def _list_charts() -> List[str]:
-    content = requests.get("https://ourworldindata.org/charts").content.decode("utf-8")
-    links = re.findall('"(/grapher/[^"]+)"', content)
-    slugs = [link.strip('"').split("/")[-1] for link in links]
-    return sorted(set(slugs))
