@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: COVID-19, Switzerland and Liechtenstein
+    description: |-
+      The Federal Office of Public Health publishes data on mortality by vaccination status for Switzerland and Liechtenstein, broken down by age groups.
+
+      The information on incidence is per 100,000 population, with the corresponding vaccination status of "fully vaccinated" and "not vaccinated".
+
+      The mortality rate for the "All ages" group is age-standardized by Our World in Data, using single-year age estimates from the 2022 revision of the United Nations World Population Prospects for Chile. Rates for specific age groups are calculated as crude incidence rates.
+    date_published: "2022"
+
+    # Citation
+    producer: Federal Office of Public Health
+    citation_full: |-
+      Federal Office of Public Health (FOPH). (2023). COVID-19 Switzerland and Liechtenstein [Data set]. OpenData.swiss. Accessed online https://opendata.swiss/en/dataset/covid-19-schweiz
+
+    # Files
+    url_main: https://opendata.swiss/en/dataset/covid-19-schweiz
+    date_accessed: 2024-09-16
+
+    # License
+    license:
+      name: opendata.swis terms of use
+      url: https://opendata.swiss/en/terms-of-use#terms_by
+
+outs:
+  - md5: 3b6741095e7904c9843eec56b88a03fb
+    size: 32386
+    path: deaths_vax_status_switzerland.csv

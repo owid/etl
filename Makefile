@@ -36,10 +36,10 @@ help:
 	@echo
 
 docs: .venv
-	poetry run mkdocs serve
+	.venv/bin/mkdocs serve
 
 watch-all:
-	poetry run watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
+	.venv/bin/watchmedo shell-command -c 'clear; make unittest; for lib in $(LIBS); do (cd $$lib && make unittest); done' --recursive --drop .
 
 test-all:
 	@echo '================ etl ================='
@@ -58,49 +58,29 @@ format-all:
 	done
 
 watch: .venv
-	poetry run watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
-
-.sanity-check:
-	@echo '==> Checking your Python setup'
-
-	@if python -c "import sys; exit(0 if sys.platform.startswith('win32') else 1)"; then \
-		echo 'ERROR: you are using a non-WSL Python interpreter, please consult the'; \
-		echo '       docs on how to swich to WSL Python on windows'; \
-		echo '       https://github.com/owid/etl/'; \
-		exit 1; \
-	fi
-	touch .sanity-check
+	.venv/bin/watchmedo shell-command -c 'clear; make check-formatting lint check-typing coverage' --recursive --drop .
 
 unittest: .venv
 	@echo '==> Running unit tests'
-	poetry run pytest -m "not integration" tests
+	.venv/bin/pytest -m "not integration" tests
 
 test: check-formatting check-linting check-typing unittest version-tracker
 
 test-integration: .venv
 	@echo '==> Running integration tests'
-	poetry run pytest -m integration tests
-
-.venv: .sanity-check pyproject.toml poetry.toml poetry.lock
-	@echo '==> Installing packages'
-	poetry install --no-ansi || poetry install --no-ansi
-	touch $@
-
-check-typing: .venv
-	@echo '==> Checking types'
-	poetry run pyright $(SRC)
+	.venv/bin/pytest -m integration tests
 
 coverage: .venv
 	@echo '==> Unit testing with coverage'
-	poetry run pytest --cov=etl --cov-report=term-missing tests
+	.venv/bin/pytest --cov=etl --cov-report=term-missing tests
 
 etl: .venv
 	@echo '==> Running etl on garden'
-	poetry run etl run garden
+	.venv/bin/etl run garden
 
 full: .venv
 	@echo '==> Running full etl'
-	poetry run etl run
+	.venv/bin/etl run
 
 clean:
 	@echo '==> Cleaning data/ folder'
@@ -113,19 +93,19 @@ clobber: clean
 
 lab: .venv
 	@echo '==> Starting Jupyter server'
-	poetry run jupyter lab
+	.venv/bin/jupyter lab
 
 publish: etl reindex
 	@echo '==> Publishing the catalog'
-	poetry run etl d publish --private
+	.venv/bin/etl d publish --private
 
 reindex: .venv
 	@echo '==> Creating a catalog index'
-	poetry run etl d reindex
+	.venv/bin/etl d reindex
 
 prune: .venv
 	@echo '==> Prune datasets with no recipe from catalog'
-	poetry run etl d prune
+	.venv/bin/etl d prune
 
 # Syncing catalog is useful if you want to avoid rebuilding it locally from scratch
 # which could take a few hours. This will download ~10gb from the main channels
@@ -137,12 +117,12 @@ sync.catalog: .venv
 
 grapher: .venv
 	@echo '==> Running full etl with grapher upsert'
-	poetry run etl run --grapher
+	.venv/bin/etl run --grapher
 
 dot: dependencies.pdf
 
 dependencies.pdf: .venv dag/main.yml etl/to_graphviz.py
-	poetry run etl graphviz dependencies.dot
+	.venv/bin/etl graphviz dependencies.dot
 	dot -Tpdf dependencies.dot >$@.tmp
 	mv -f $@.tmp $@
 
@@ -152,16 +132,16 @@ deploy:
 
 version-tracker: .venv
 	@echo '==> Check that no archive dataset is used by an active dataset, and that all active datasets are used'
-	poetry run etl d version-tracker
+	.venv/bin/etl d version-tracker
 
 api: .venv
 	@echo '==> Starting ETL API on http://localhost:8081/api/v1/indicators'
-	poetry run uvicorn api.main:app --reload --port 8081 --host 0.0.0.0
+	.venv/bin/uvicorn api.main:app --reload --port 8081 --host 0.0.0.0
 
 fasttrack: .venv
 	@echo '==> Starting Fast-track on http://localhost:8082/'
-	poetry run fasttrack --skip-auto-open --port 8082
+	.venv/bin/fasttrack --skip-auto-open --port 8082
 
 wizard: .venv
 	@echo '==> Starting Wizard on http://localhost:8053/'
-	poetry run etlwiz
+	.venv/bin/etlwiz

@@ -5,7 +5,7 @@ These functions are used when there are updates on variables. They are used in t
 
 
 from copy import deepcopy
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Set
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -15,7 +15,6 @@ import etl.grapher_model as gm
 from etl.db import get_engine
 from etl.indicator_upgrade.schema import (
     fix_errors_in_schema,
-    get_schema_chart_config,
     validate_chart_config_and_remove_defaults,
     validate_chart_config_and_set_defaults,
 )
@@ -52,7 +51,7 @@ def find_charts_from_variable_ids(variable_ids: Set[int]) -> List[gm.Chart]:
 def update_chart_config(
     config: Dict[str, Any],
     indicator_mapping: Dict[int, int],
-    schema: Optional[Dict[str, Any]] = None,
+    schema: Dict[str, Any],
 ) -> Dict[str, Any]:
     """Update indicator references to the new ones.
 
@@ -69,7 +68,7 @@ class ChartIndicatorUpdater:
     def __init__(
         self,
         indicator_mapping: Dict[int, int],
-        schema: Optional[Dict[str, Any]] = None,
+        schema: Dict[str, Any],
     ) -> None:
         """Constructor.
 
@@ -82,8 +81,6 @@ class ChartIndicatorUpdater:
         """
         # Variable mapping dictionary: Old variable ID -> New variable ID
         self.indicator_mapping = indicator_mapping
-        if schema is None:
-            self.schema = get_schema_chart_config()
         self.schema = schema
 
     def run(self, config: Dict[str, Any]) -> Dict[str, Any]:

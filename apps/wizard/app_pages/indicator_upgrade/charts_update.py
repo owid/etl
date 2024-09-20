@@ -1,6 +1,6 @@
 """Handle submission of chart updates."""
 from http.client import RemoteDisconnected
-from typing import Any, Dict, List
+from typing import Dict, List
 from urllib.error import URLError
 
 import pandas as pd
@@ -9,7 +9,7 @@ from structlog import get_logger
 
 import etl.grapher_model as gm
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.utils import set_states, st_page_link, st_toast_error
+from apps.wizard.utils import get_schema_from_url, set_states, st_page_link, st_toast_error
 from etl.config import OWID_ENV
 from etl.db import get_engine
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
@@ -89,7 +89,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
     return charts
 
 
-def push_new_charts(charts: List[gm.Chart], schema_chart_config: Dict[str, Any]) -> None:
+def push_new_charts(charts: List[gm.Chart]) -> None:
     """Updating charts in the database."""
     # API to interact with the admin tool
     engine = get_engine()
@@ -105,7 +105,7 @@ def push_new_charts(charts: List[gm.Chart], schema_chart_config: Dict[str, Any])
             config_new = update_chart_config(
                 chart.config,
                 st.session_state.indicator_mapping,
-                schema_chart_config,
+                get_schema_from_url(chart.config["$schema"]),
             )
             # Push new chart to DB
             if chart.id:

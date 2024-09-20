@@ -10,7 +10,6 @@ from structlog import get_logger
 from apps.utils.map_datasets import get_grapher_changes
 from etl.db import config, get_all_datasets, get_connection, get_dataset_charts, get_variables_in_dataset
 from etl.git_helpers import get_changed_files
-from etl.indicator_upgrade.schema import get_schema_chart_config
 from etl.match_variables import find_mapping_suggestions, preliminary_mapping
 from etl.version_tracker import VersionTracker
 
@@ -124,20 +123,6 @@ def get_datasets_from_db() -> pd.DataFrame:
         )
     else:
         return datasets.sort_values("name")
-
-
-@st.cache_data(show_spinner=False)
-def get_schema() -> Dict[str, Any]:
-    """Load datasets."""
-    with st.spinner("Retrieving schema..."):
-        try:
-            schema = get_schema_chart_config()
-        except OperationalError as e:
-            raise OperationalError(
-                f"Could not retrieve the schema. Try reloading the page. If the error persists, please report an issue. Error: {e.__traceback__}"
-            )
-        else:
-            return schema
 
 
 @st.cache_data(max_entries=1, ttl=60 * 10)

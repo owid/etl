@@ -691,10 +691,17 @@
                 },
                 "processing_level": {
                   "title": "Indicator's processing level",
-                  "type": "string",
-                  "enum": [
-                    "minor",
-                    "major"
+                  "oneOf": [
+                    {
+                      "enum": [
+                        "minor",
+                        "major"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "<%"
+                    }
                   ],
                   "description": "Level of processing that the indicator values have experienced.",
                   "requirement_level": "required (in the future this could be automatic).",
@@ -1055,7 +1062,8 @@
                           "Neglected Tropical Diseases",
                           "Uncategorized",
                           "Wildfires",
-                          "Metals & Minerals"
+                          "Metals & Minerals",
+                          "Foreign Aid"
                         ]
                       }
                     },

@@ -23,6 +23,7 @@ from typing import Any, Callable, Dict, List, Literal, Optional, cast
 
 import bugsnag
 import numpy as np
+import requests
 import streamlit as st
 import streamlit.components.v1 as components
 from owid.catalog import Dataset
@@ -34,7 +35,7 @@ from typing_extensions import Self
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
 from apps.wizard.utils.step_form import StepForm
-from etl.config import OWID_ENV, OWIDEnv, enable_bugsnag
+from etl.config import OWID_ENV, TLS_VERIFY, OWIDEnv, enable_bugsnag
 from etl.db import get_connection, read_sql
 from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
@@ -889,3 +890,20 @@ def as_list(s):
         except (ValueError, SyntaxError):
             return s
     return s
+
+
+@st.cache_data(ttl=600)
+def get_schema_from_url(schema_url: str) -> dict:
+    """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
+
+    https://files.ourworldindata.org/schemas/grapher-schema.005.json
+
+    More details on available versions can be found
+    at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema.
+
+    Returns
+    -------
+    Dict[str, Any]
+        Schema of a chart configuration.
+    """
+    return requests.get(schema_url, timeout=20, verify=TLS_VERIFY).json()

@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Routes to Diagnosis
+    description: |-
+      The methodology for the Routes to Diagnosis dataset combines data from several administrative sources: Hospital Episode Statistics (HES), Cancer Waiting Times (CWT), national cancer screening programmes, and national cancer registration data. These datasets are used to categorize every cancer case diagnosed in England between 2006 and 2020 into one of eight distinct routes to diagnosis. The routes include GP referral, Urgent Suspected Cancer (USC), Emergency Presentation, Other Outpatient, Screen-Detected, Inpatient Elective, Diagnosis by Death Certificate Only (DCO), and Unknown Route. Each route has specific definitions depending on how the diagnosis was made, as outlined in the dataset.
+      This methodology allows for a comprehensive understanding of how cancer cases are diagnosed in England. The full methodology, including the details of how the routes are determined from routine datasets, is described in the British Journal of Cancer article, Routes to Diagnosis for Cancer - Determining the Patient Journey Using Multiple Routine Datasets, published in October 2012.
+    date_published: "2024-03-18"
+    title_snapshot: Routes to Diagnosis - Stage of Diagnosis by Stage
+    description_snapshot: |-
+      Data is provided on the stage at diagnosis, categorized by the route of diagnosis. This data is available for selected cancer types as a route-by-stage data.
+
+    # Citation
+    producer: National Disease Registration Service
+    citation_full: |-
+      Elliss-Brookes, L., McPhail, S., Ives, A. et al. Routes to diagnosis for cancer – determining the patient journey using multiple routine data sets. Br J Cancer 107, 1220–1226 (2012). https://doi.org/10.1038/bjc.2012.408
+
+    # Files
+    url_main: https://nhsd-ndrs.shinyapps.io/routes_to_diagnosis/
+    url_download: https://nhsd-ndrs.shinyapps.io/routes_to_diagnosis/_w_592045af/session/d3e78dff890c405dd2fdbcb86c3a9a7e/download/dataDownloadStage2?w=592045af
+    date_accessed: 2024-09-13
+
+    # License
+    license:
+      name: CC BY 4.0
+
+outs:
+  - md5: 74bf2bebecdac4d346dca7d0dfebed0d
+    size: 212477
+    path: diagnosis_routes_by_stage.csv
