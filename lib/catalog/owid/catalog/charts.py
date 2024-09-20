@@ -6,7 +6,7 @@
 #
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 
 import pandas as pd
 
@@ -15,7 +15,6 @@ from .internal import (
     LicenseError,  # noqa
     _fetch_bundle,
     _GrapherBundle,
-    _list_charts,
 )
 
 
@@ -51,14 +50,6 @@ class Chart:
 
     def __eq__(self, value: object) -> bool:
         return isinstance(value, Chart) and value.slug == self.slug
-
-
-def list_charts() -> List[str]:
-    """
-    List all available charts published on Our World in Data, representing each via
-    a short slug that you can use with `get_data()`.
-    """
-    return sorted(_list_charts())
 
 
 def get_data(slug_or_url: str) -> pd.DataFrame:

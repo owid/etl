@@ -45,17 +45,6 @@ Notice that the last part of the URL is the chart's slug, its identifier, in thi
 df = charts.get_data('life-expectancy')
 ```
 
-To see what charts are available, you can list them all.
-
-```python
->>> slugs = charts.list_charts()
->>> slugs[:5]
-['above-ground-biomass-in-forest-per-hectare',
- 'above-or-below-extreme-poverty-line-world-bank',
- 'abs-change-energy-consumption',
- 'absolute-change-co2',
- 'absolute-gains-in-mean-female-height']
-```
 
 ### Data science API
 
