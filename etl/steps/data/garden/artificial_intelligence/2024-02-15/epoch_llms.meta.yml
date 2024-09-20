@@ -22,9 +22,10 @@ tables:
 
       dataset_size__tokens:
         title: Training dataset size
-        unit: 'datapoints'
+        unit: 'tokens'
         description_key:
           - Training data size refers to the amount or quantity of data that is used to train an AI model, indicating the number of examples or instances available for the model to learn from.
+          - In the context of language models, this data size is often measured in tokens, which are chunks of text that the model processes. A 100 tokens is equivalent to around 75 words.
           - Imagine you're teaching a computer to recognize different types of fruits. The training data size would refer to the number of fruit images you show to the computer during the training process. If you show it 100 images of various fruits, then the training data size would be 100. The more training data you provide, the better the computer can learn to identify different fruits accurately.
           - The size of the datasets used to train Gemini Ultra, PaLM-2, GPT-4, GPT-3.5 and code-davinci-002 models are speculative and have not been officially disclosed.
         display:
