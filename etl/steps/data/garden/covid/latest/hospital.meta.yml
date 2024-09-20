@@ -37,6 +37,7 @@ tables:
           grapher_config:
             title: Number of COVID-19 patients in hospital
             hasMapTab: true
+            originUrl: ourworldindata.org/coronavirus
             map:
               colorScale:
                 customNumericColorsActive: true
@@ -55,6 +56,7 @@ tables:
           grapher_config:
             title: Number of COVID-19 patients in hospital per million people
             hasMapTab: true
+            originUrl: ourworldindata.org/coronavirus
             map:
               colorScale:
                 customNumericColorsActive: true
@@ -76,6 +78,7 @@ tables:
             title: Weekly new hospital admissions for COVID-19
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
             hasMapTab: true
+            originUrl: ourworldindata.org/coronavirus
             map:
               colorScale:
                 customNumericColorsActive: true
@@ -96,6 +99,7 @@ tables:
             title: Weekly new hospital admissions for COVID-19 per million people
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
             hasMapTab: true
+            originUrl: ourworldindata.org/coronavirus
             map:
               colorScale:
                 customNumericColorsActive: true
@@ -119,6 +123,7 @@ tables:
             title: Number of COVID-19 patients in intensive care (ICU)
             note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
             hasMapTab: true
+            originUrl: ourworldindata.org/coronavirus
             map:
               colorScale:
                 customNumericColorsActive: true
@@ -141,6 +146,7 @@ tables:
             title: Number of COVID-19 patients in intensive care (ICU) per million people
             note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
             hasMapTab: true
+            originUrl: ourworldindata.org/coronaviru
             map:
               colorScale:
                 customNumericColorsActive: true
@@ -165,6 +171,7 @@ tables:
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
             note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
             hasMapTab: true
+            originUrl: ourworldindata.org/coronavirus
             map:
               colorScale:
                 customNumericColorsActive: true
@@ -187,6 +194,7 @@ tables:
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
             note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
             hasMapTab: true
+            originUrl: ourworldindata.org/coronavirus
             map:
               colorScale:
                 customNumericColorsActive: true
