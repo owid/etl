@@ -613,6 +613,24 @@ def run(dest_dir: str) -> None:
     tb = fix_missing_nuclear_energy_data(tb=tb)
 
     ####################################################################################################################
+    # Similarly to missing nuclear data, hydropower is missing from year 2000 onwards, at least for Saudi Arabia.
+    # However, in the excel data file, those values are zero.
+    # Fill those missing points with zeros.
+    error = "Expected missing data for Arabia's hydropower from 2000 on. It may be fixed, so, remove this code."
+    assert (
+        tb.loc[
+            (tb["country"] == "Saudi Arabia") & (tb["year"] >= 2000),
+            ["hydro_consumption_equivalent_ej", "hydro_electricity_generation_twh"],
+        ]
+        .isnull()
+        .all()
+        .all()
+    ), error
+    tb.loc[
+        (tb["country"] == "Saudi Arabia") & (tb["year"] >= 2000),
+        ["hydro_consumption_equivalent_ej", "hydro_electricity_generation_twh"],
+    ] = 0
+
     # Wind generation for Saudi Arabia in 2022 and 2023 is possibly wrong.
     # It goes from 0.005678 TWh in 2021 to 1.45 TWh in 2022 and 2023.
     # According to IRENA, Saudi Arabia's wind capacity was 3MW in 2022:
