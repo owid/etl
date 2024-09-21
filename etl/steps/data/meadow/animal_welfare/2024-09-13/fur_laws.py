@@ -13,8 +13,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot and read data.
-    snap = paths.load_snapshot("fur_laws.csv")
-    tb = snap.read()
+    tb = paths.read_snap_table("fur_laws")
 
     #
     # Process data.

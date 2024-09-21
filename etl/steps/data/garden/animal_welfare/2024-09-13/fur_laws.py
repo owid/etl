@@ -59,66 +59,6 @@ FUR_FARMING_ACTIVE = {
 }
 
 
-def prepare_fur_farming_ban_status(tb: Table) -> Table:
-    tb = tb.copy()
-    # Fill missing values with "".
-    tb["fur_farming_status"] = tb["fur_farming_status"].astype("string").fillna("")
-
-    # There is a column for the status of the ban, and another for those cases where there is no ban, but fur farming
-    # has been phased out due to stricter regulations.
-    # Check that when phase out is "YES", the ban status is empty.
-    ####################################################################################################################
-    # For Belgium, both columns "Fur farming ban" and "Phase-out due to stricter regulations" are "YES".
-    # This happens in the google sheet, but not in the PDF (where only "Fur farming ban" is "YES").
-    # So I assume the PDF is correct.
-    # NOTE: I confirmed this with Fur Free Alliance.
-    error = (
-        "Expected Belgium to have both a fur farming ban and a phase out due to stricter regulations. "
-        "This known data issue is no longer there, so it may have been fixed. Remove this part of the code."
-    )
-    assert tb.loc[tb["country"] == "Belgium", "fur_farming_status"].item() == "YES", error
-    assert tb.loc[tb["country"] == "Belgium", "phase_out_due_to_stricter_regulations"].item() == "YES", error
-    tb.loc[tb["country"] == "Belgium", "phase_out_due_to_stricter_regulations"] = None
-    ####################################################################################################################
-    error = "There are rows where phase out is 'YES' but the ban status was not empty."
-    assert tb[(tb["phase_out_due_to_stricter_regulations"] == "YES") & (tb["fur_farming_status"] != "")].empty, error
-
-    # Fill those nans in ban status with the new status.
-    tb.loc[
-        (tb["phase_out_due_to_stricter_regulations"] == "YES") & (tb["fur_farming_status"] == ""), "fur_farming_status"
-    ] = PHASE_OUT_DUE_TO_STRICTER_REGULATIONS
-
-    # Drop unnecessary column.
-    tb = tb.drop(columns=["phase_out_due_to_stricter_regulations"], errors="raise")
-
-    # Map all fur farming statuses.
-    # NOTE: The data is ambiguous. There is "NO", "YES", missing data, and missing country.
-    # For now, assume that missing data means "NO", and missing country means "NO DATA".
-    tb["fur_farming_status"] = map_series(
-        tb["fur_farming_status"],
-        mapping=FUR_FARMING_BAN_STATUS,
-        warn_on_missing_mappings=True,
-        warn_on_unused_mappings=True,
-    )
-
-    # For those years years that are in the future, change the status.
-    tb.loc[tb["ban_effective_year"].astype(float) > CURRENT_YEAR, "fur_farming_status"] = BANNED_NOT_EFFECTIVE
-
-    return tb
-
-
-def run_sanity_checks(tb: Table) -> None:
-    error = "There were unknown fur farmed statuses."
-    assert tb[tb["fur_farming_status"].isna()].empty, error
-
-    error = "There were unknown fur trading statuses."
-    assert tb[tb["fur_trading_status"].isna()].empty, error
-
-    # Ensure all columns are informed (except the year of ban enforcement).
-    error = "There were missing values in some columns."
-    assert tb.drop(columns="ban_effective_year").isna().sum().sum() == 0, error
-
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -205,3 +145,63 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     ds_garden.save()
+
+
+def prepare_fur_farming_ban_status(tb: Table) -> Table:
+    tb = tb.copy()
+    # Fill missing values with "".
+    tb["fur_farming_status"] = tb["fur_farming_status"].astype("string").fillna("")
+
+    # There is a column for the status of the ban, and another for those cases where there is no ban, but fur farming
+    # has been phased out due to stricter regulations.
+    # Check that when phase out is "YES", the ban status is empty.
+    ####################################################################################################################
+    # For Belgium, both columns "Fur farming ban" and "Phase-out due to stricter regulations" are "YES".
+    # This happens in the google sheet, but not in the PDF (where only "Fur farming ban" is "YES").
+    # So I assume the PDF is correct.
+    # NOTE: I confirmed this with Fur Free Alliance.
+    error = (
+        "Expected Belgium to have both a fur farming ban and a phase out due to stricter regulations. "
+        "This known data issue is no longer there, so it may have been fixed. Remove this part of the code."
+    )
+    assert tb.loc[tb["country"] == "Belgium", "fur_farming_status"].item() == "YES", error
+    assert tb.loc[tb["country"] == "Belgium", "phase_out_due_to_stricter_regulations"].item() == "YES", error
+    tb.loc[tb["country"] == "Belgium", "phase_out_due_to_stricter_regulations"] = None
+    ####################################################################################################################
+    error = "There are rows where phase out is 'YES' but the ban status was not empty."
+    assert tb[(tb["phase_out_due_to_stricter_regulations"] == "YES") & (tb["fur_farming_status"] != "")].empty, error
+
+    # Fill those nans in ban status with the new status.
+    tb.loc[
+        (tb["phase_out_due_to_stricter_regulations"] == "YES") & (tb["fur_farming_status"] == ""), "fur_farming_status"
+    ] = PHASE_OUT_DUE_TO_STRICTER_REGULATIONS
+
+    # Drop unnecessary column.
+    tb = tb.drop(columns=["phase_out_due_to_stricter_regulations"], errors="raise")
+
+    # Map all fur farming statuses.
+    # NOTE: The data is ambiguous. There is "NO", "YES", missing data, and missing country.
+    # For now, assume that missing data means "NO", and missing country means "NO DATA".
+    tb["fur_farming_status"] = map_series(
+        tb["fur_farming_status"],
+        mapping=FUR_FARMING_BAN_STATUS,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+    )
+
+    # For those years years that are in the future, change the status.
+    tb.loc[tb["ban_effective_year"].astype(float) > CURRENT_YEAR, "fur_farming_status"] = BANNED_NOT_EFFECTIVE
+
+    return tb
+
+
+def run_sanity_checks(tb: Table) -> None:
+    error = "There were unknown fur farmed statuses."
+    assert tb[tb["fur_farming_status"].isna()].empty, error
+
+    error = "There were unknown fur trading statuses."
+    assert tb[tb["fur_trading_status"].isna()].empty, error
+
+    # Ensure all columns are informed (except the year of ban enforcement).
+    error = "There were missing values in some columns."
+    assert tb.drop(columns="ban_effective_year").isna().sum().sum() == 0, error
