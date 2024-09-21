@@ -626,9 +626,9 @@ def run(dest_dir: str) -> None:
     assert (
         tb[(tb["country"] == "Saudi Arabia") & (tb["year"] == 2022)]["wind_electricity_generation_twh"].item() > 1.45
     ), error
-    tb = tb.drop(tb[(tb["country"] == "Saudi Arabia") & (tb["year"].isin([2022, 2023]))].index.tolist()).reset_index(
-        drop=True
-    )
+    tb.loc[
+        (tb["country"] == "Saudi Arabia") & (tb["year"].isin([2022, 2023])), "wind_electricity_generation_twh"
+    ] = None
     ####################################################################################################################
 
     # Create additional variables, like primary energy consumption in TWh (both direct and in input-equivalents).
