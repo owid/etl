@@ -23,6 +23,10 @@ COLUMNS = {
     "operating_fur_farms": "fur_farms_active",
 }
 
+# Define label for missing data.
+# NOTE: This is a label used by us (which currently coincides with the one used in the original data).
+NO_DATA_LABEL = "NO DATA"
+
 # Define status for having no bans, but having phased out fur farming due to stricter regulations.
 PHASE_OUT_DUE_TO_STRICTER_REGULATIONS = "Phased out due to stricter regulations"
 # Rename fur farming status:
@@ -33,6 +37,7 @@ FUR_FARMING_BAN_STATUS = {
     "Parliamentary debate": "Not banned",
     "": "Not banned",
     PHASE_OUT_DUE_TO_STRICTER_REGULATIONS: PHASE_OUT_DUE_TO_STRICTER_REGULATIONS,
+    NO_DATA_LABEL: NO_DATA_LABEL,
 }
 # Define label for fur farming status that are not yet effective.
 BANNED_NOT_EFFECTIVE = "Banned (not yet effective)"
@@ -42,6 +47,7 @@ FUR_TRADING_BAN_STATUS = {
     "YES": "Banned",
     "PARTIAL": "Partially banned",
     "": "Not banned",
+    NO_DATA_LABEL: NO_DATA_LABEL,
 }
 
 # Rename fur farming activity status:
@@ -49,14 +55,14 @@ FUR_FARMING_ACTIVE = {
     "YES": "Yes",
     "NO": "No",
     # There is a new status called "NO DATA". We will replace it by nan.
-    "NO DATA": "NO DATA",
+    "NO DATA": NO_DATA_LABEL,
 }
 
 
 def prepare_fur_farming_ban_status(tb: Table) -> Table:
     tb = tb.copy()
-    # Fill missing values with "" and strip spaces.
-    tb["fur_farming_status"] = tb["fur_farming_status"].astype("string").fillna("").str.strip()
+    # Fill missing values with "".
+    tb["fur_farming_status"] = tb["fur_farming_status"].astype("string").fillna("")
 
     # There is a column for the status of the ban, and another for those cases where there is no ban, but fur farming
     # has been phased out due to stricter regulations.
@@ -86,6 +92,8 @@ def prepare_fur_farming_ban_status(tb: Table) -> Table:
     tb = tb.drop(columns=["phase_out_due_to_stricter_regulations"], errors="raise")
 
     # Map all fur farming statuses.
+    # NOTE: The data is ambiguous. There is "NO", "YES", missing data, and missing country.
+    # For now, assume that missing data means "NO", and missing country means "NO DATA".
     tb["fur_farming_status"] = map_series(
         tb["fur_farming_status"],
         mapping=FUR_FARMING_BAN_STATUS,
@@ -134,6 +142,7 @@ def run(dest_dir: str) -> None:
 
     # The first row is expected to say "All other countries are expected to be fur-free".
     # Therefore, add all other countries and assume they do not have any active farms.
+    # NOTE: We confirmed this assumption with Fur Free Alliance.
     error = "Data has changed. Manually check this part of the code."
     assert tb.loc[0, "country"] == "All other countries are expected to be fur-free", error
     tb = tb.drop(0).reset_index(drop=True)
@@ -147,7 +156,7 @@ def run(dest_dir: str) -> None:
             & (tb_regions["region_type"] == "country")
             & (tb_regions["defined_by"] == "owid")
         ][["name"]]
-        .assign(**{"fur_farms_active": "NO"})
+        .assign(**{"fur_farms_active": "NO", "fur_farming_status": NO_DATA_LABEL, "fur_trading_status": NO_DATA_LABEL})
         .rename(columns={"name": "country"}, errors="raise")
     )
     tb = pr.concat([tb, tb_added], ignore_index=True)
@@ -169,6 +178,7 @@ def run(dest_dir: str) -> None:
         mapping=FUR_TRADING_BAN_STATUS,
         warn_on_missing_mappings=True,
         warn_on_unused_mappings=True,
+        show_full_warning=True,
     )
 
     # Prepare fur farming activity statuses.

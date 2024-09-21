@@ -20,10 +20,11 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # There is a new category for active fur farms, "NO DATA".
+    # There is a new category, "NO DATA".
     # For better visualization, we will replace them with nan.
-    tb["fur_farms_active"] = tb["fur_farms_active"].astype("string")
-    tb.loc[tb["fur_farms_active"] == "NO DATA", "fur_farms_active"] = None
+    tb = tb.astype({"fur_farming_status": "string", "fur_trading_status": "string", "fur_farms_active": "string"})
+    for column in ["fur_farming_status", "fur_trading_status", "fur_farms_active"]:
+        tb.loc[tb[column] == "NO DATA", column] = None
 
     # Format table conveniently.
     tb = tb.format()
