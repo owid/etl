@@ -494,6 +494,10 @@ def get_dataset_charts(dataset_ids: List[str], db_conn: Optional[pymysql.Connect
         d.id ASC;
     """
 
+    # First, increase the GROUP_CONCAT limit, to avoid the list of chart ids to be truncated.
+    with db_conn.cursor() as cursor:
+        cursor.execute("SET SESSION group_concat_max_len = 10000;")
+
     if len(dataset_ids) == 0:
         return pd.DataFrame({"dataset_id": [], "dataset_name": [], "chart_ids": []})
 

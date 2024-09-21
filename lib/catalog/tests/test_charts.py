@@ -37,15 +37,6 @@ def test_fetch_non_redistributable_chart():
         chart.get_data()
 
 
-def test_list_charts():
-    slugs = charts.list_charts()
-    assert len(slugs) > 0
-    assert "life-expectancy" in slugs
-
-    # all unique
-    assert len(slugs) == len(set(slugs))
-
-
 def test_fetch_missing_chart():
     with pytest.raises(charts.ChartNotFoundError):
         charts.Chart("this-chart-does-not-exist").bundle

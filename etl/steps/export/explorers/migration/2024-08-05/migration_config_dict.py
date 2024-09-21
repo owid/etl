@@ -58,11 +58,11 @@ ADDITIONAL_DESCRIPTIONS = {
         "description": "The average [transaction cost](#dod:remittancecost) as a percentage of total [remittance](#dod:remittances) received from abroad. The cost is based on a single transaction of USD 200. ",
     },
     "emigrants_share_of_total_population": {
-        "title": "Share of the population that have left the country",
+        "title": "Share of the population that has left the country",
         "description": "",
     },
     "immigrant_share_of_dest_population_all": {
-        "title": "Share of the population that were born in another country",
+        "title": "Share of the population that was born in another country",
         "description": "",
     },
 }
