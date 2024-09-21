@@ -62,10 +62,16 @@ def prepare_fur_farming_ban_status(tb: Table) -> Table:
     # has been phased out due to stricter regulations.
     # Check that when phase out is "YES", the ban status is empty.
     ####################################################################################################################
-    # TODO: Contact data provider about this issue.
     # For Belgium, both columns "Fur farming ban" and "Phase-out due to stricter regulations" are "YES".
     # This happens in the google sheet, but not in the PDF (where only "Fur farming ban" is "YES").
     # So I assume the PDF is correct.
+    # NOTE: I confirmed this with Fur Free Alliance.
+    error = (
+        "Expected Belgium to have both a fur farming ban and a phase out due to stricter regulations. "
+        "This known data issue is no longer there, so it may have been fixed. Remove this part of the code."
+    )
+    assert tb.loc[tb["country"] == "Belgium", "fur_farming_status"].item() == "YES", error
+    assert tb.loc[tb["country"] == "Belgium", "phase_out_due_to_stricter_regulations"].item() == "YES", error
     tb.loc[tb["country"] == "Belgium", "phase_out_due_to_stricter_regulations"] = None
     ####################################################################################################################
     error = "There are rows where phase out is 'YES' but the ban status was not empty."
