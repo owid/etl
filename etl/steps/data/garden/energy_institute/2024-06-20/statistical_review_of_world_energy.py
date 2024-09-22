@@ -631,7 +631,7 @@ def run(dest_dir: str) -> None:
         ["hydro_consumption_equivalent_ej", "hydro_electricity_generation_twh"],
     ] = 0
 
-    # Wind generation for Saudi Arabia in 2022 and 2023 is possibly wrong.
+    # Wind generation (and consumption) for Saudi Arabia in 2022 and 2023 is possibly wrong.
     # It goes from 0.005678 TWh in 2021 to 1.45 TWh in 2022 and 2023.
     # According to IRENA, Saudi Arabia's wind capacity was 3MW in 2022:
     # https://www.irena.org/Publications/2023/Jul/Renewable-energy-statistics-2023
@@ -644,8 +644,15 @@ def run(dest_dir: str) -> None:
     assert (
         tb[(tb["country"] == "Saudi Arabia") & (tb["year"] == 2022)]["wind_electricity_generation_twh"].item() > 1.45
     ), error
+    assert (
+        tb[(tb["country"] == "Saudi Arabia") & (tb["year"] == 2021)]["wind_consumption_equivalent_ej"].item() < 0.00006
+    ), error
+    assert (
+        tb[(tb["country"] == "Saudi Arabia") & (tb["year"] == 2022)]["wind_consumption_equivalent_ej"].item() > 0.01
+    ), error
     tb.loc[
-        (tb["country"] == "Saudi Arabia") & (tb["year"].isin([2022, 2023])), "wind_electricity_generation_twh"
+        (tb["country"] == "Saudi Arabia") & (tb["year"].isin([2022, 2023])),
+        ["wind_consumption_equivalent_ej", "wind_electricity_generation_twh"],
     ] = None
     ####################################################################################################################
 
