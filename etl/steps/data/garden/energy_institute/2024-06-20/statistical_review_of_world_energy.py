@@ -630,30 +630,6 @@ def run(dest_dir: str) -> None:
         (tb["country"] == "Saudi Arabia") & (tb["year"] >= 2000),
         ["hydro_consumption_equivalent_ej", "hydro_electricity_generation_twh"],
     ] = 0
-
-    # Wind generation (and consumption) for Saudi Arabia in 2022 and 2023 is possibly wrong.
-    # It goes from 0.005678 TWh in 2021 to 1.45 TWh in 2022 and 2023.
-    # According to IRENA, Saudi Arabia's wind capacity was 3MW in 2022:
-    # https://www.irena.org/Publications/2023/Jul/Renewable-energy-statistics-2023
-    # Either generation or capacity must be wrong.
-    # For now, first assert that the (possibly spurious) jump is in the data, and then remove those points.
-    error = "Data for Saudi Arabia may have changed (possibly fixing a data issue). Remove this part of the code."
-    assert (
-        tb[(tb["country"] == "Saudi Arabia") & (tb["year"] == 2021)]["wind_electricity_generation_twh"].item() < 0.006
-    ), error
-    assert (
-        tb[(tb["country"] == "Saudi Arabia") & (tb["year"] == 2022)]["wind_electricity_generation_twh"].item() > 1.45
-    ), error
-    assert (
-        tb[(tb["country"] == "Saudi Arabia") & (tb["year"] == 2021)]["wind_consumption_equivalent_ej"].item() < 0.00006
-    ), error
-    assert (
-        tb[(tb["country"] == "Saudi Arabia") & (tb["year"] == 2022)]["wind_consumption_equivalent_ej"].item() > 0.01
-    ), error
-    tb.loc[
-        (tb["country"] == "Saudi Arabia") & (tb["year"].isin([2022, 2023])),
-        ["wind_consumption_equivalent_ej", "wind_electricity_generation_twh"],
-    ] = None
     ####################################################################################################################
 
     # Create additional variables, like primary energy consumption in TWh (both direct and in input-equivalents).
