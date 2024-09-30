@@ -18,20 +18,36 @@ log = get_logger()
 
 
 @st.spinner("Retrieving datasets...")
-def get_datasets() -> pd.DataFrame:
+def get_datasets(archived) -> pd.DataFrame:
     steps_df_grapher, grapher_changes = get_datasets_from_version_tracker()
 
     # Combine with datasets from database that are not present in ETL
     # Get datasets from Database
     try:
-        datasets_db = get_all_datasets(archived=False)
+        datasets_db = get_all_datasets(archived=archived)
     except OperationalError as e:
         raise OperationalError(
             f"Could not retrieve datasets. Try reloading the page. If the error persists, please report an issue. Error: {e}"
         )
 
-    steps_df_grapher = pd.concat([steps_df_grapher, datasets_db], ignore_index=True)
-    steps_df_grapher = steps_df_grapher.drop_duplicates(subset="id").drop(columns="updatedAt").astype({"id": int})
+    # TODO: replace concat with merge
+    # steps_df_grapher = pd.concat([steps_df_grapher, datasets_db], ignore_index=True)
+    # steps_df_grapher = steps_df_grapher.drop_duplicates(subset="id").drop(columns="updatedAt").astype({"id": int})
+
+    # Get table with all datasets (ETL + DB)
+    steps_df_grapher = (
+        steps_df_grapher.merge(datasets_db, on="id", how="outer", suffixes=("_etl", "_db"))
+        .sort_values(by="id")
+        .drop(columns="updatedAt")
+        .astype({"id": int})
+    )
+    columns = ["namespace", "name"]
+    for col in columns:
+        steps_df_grapher[col] = steps_df_grapher[f"{col}_etl"].fillna(steps_df_grapher[f"{col}_db"])
+        steps_df_grapher = steps_df_grapher.drop(columns=[f"{col}_etl", f"{col}_db"])
+
+    assert steps_df_grapher["name"].notna().all(), "NaNs found in `name`"
+    assert steps_df_grapher["namespace"].notna().all(), "NaNs found in `namespace`"
 
     # Add column marking migrations
     steps_df_grapher["migration_new"] = False
@@ -79,6 +95,10 @@ def get_datasets() -> pd.DataFrame:
             )
 
     st.session_state.is_any_migration = steps_df_grapher["migration_new"].any()
+
+    # Replace NaN with empty string in etl paths (otherwise dataset won't be shown if 'show step names' is chosen)
+    steps_df_grapher["step"] = steps_df_grapher["step"].fillna("")
+
     return steps_df_grapher
 
 
