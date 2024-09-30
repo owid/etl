@@ -1,0 +1,59 @@
+definitions:
+  table: grapher/covid/latest/covax/covax
+
+title:
+  title: Daily new estimated COVID-19 infections
+  titleVariant: ""
+defaultSelection:
+  - United States
+topicTags:
+  - COVID-19
+
+dimensions:
+  - slug: model
+    name: Model
+    choices:
+      - slug: icl
+        name: ICL
+        description: null
+      - slug: ihme
+        name: IHME
+        description: null
+      - slug: lshtm
+        name: LSHTM
+        description: null
+      - slug: yyg
+        name: YYG
+        description: null
+
+views:
+  - dimensions:
+      normalize: icl
+    indicators:
+      y:
+        - "{definitions.table}#icl_infections__estimate_mean"
+        - "{definitions.table}#icl_infections__estimate_low"
+        - "{definitions.table}#icl_infections__estimate_upper"
+        - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
+
+    config:
+      title: "Daily new estimated COVID-19 infections from the ICL model"
+      subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
+      note: This chart shows the model estimates dated 25 December 2022.
+      originUrl: ourworldindata.org/coronavirus
+      # dimensions:
+      #   - property: y
+      #     variableId: 988127
+      #     display:
+      #       includeInTable: true
+      #       color: "#3182bd"
+      #   - property: y
+      #     variableId: 988128
+      #     display:
+      #       includeInTable: true
+      #       color: "#9ecae1"
+      #   - property: y
+      #     variableId: 988129
+      #     display:
+      #       includeInTable: true
+      #       color: "#deebf7"
