@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    all_tbs = all_tbs.format(["country", "year"])
+    all_tbs = all_tbs.format(["country", "year"], short_name="living_planet_index")
 
     #
     # Save outputs.
