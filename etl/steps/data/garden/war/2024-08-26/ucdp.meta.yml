@@ -76,6 +76,35 @@ definitions:
     description_key: &description_key_deaths
       - "{definitions.all.conflict_type}"
 
+  number_deaths_type:
+    description_short: |-
+      <%- if conflict_type == "all" -%>
+      The best estimate of the number of deaths of << people_type >> in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "state-based" -%>
+      The best estimate of the number of deaths of << people_type >> in interstate, intrastate, and extrasystemic conflicts that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "intrastate (internationalized)" -%>
+      The best estimate of the number of deaths of << people_type >> in internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "intrastate (non-internationalized)" -%>
+      The best estimate of the number of deaths of << people_type >> in non-internationalized intrastate conflicts that were ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "one-sided violence" -%>
+      The << estimate >> estimate of the number of deaths of << people_type >> from one-sided violence that was ongoing that year<< per_capita >>.
+
+      <%- elif conflict_type == "non-state conflict" -%>
+      The best estimate of the number of deaths of << people_type >> in non-state conflicts that were ongoing that year<< per_capita >>.
+
+      <%- else -%>
+      The best estimate of the number of deaths of << people_type >> in << conflict_type >> conflicts that were ongoing that year<< per_capita >>.
+
+      <%- endif -%>
+    description_short_per_capita: <% set per_capita = ", per 100,000 people" %>
+      {definitions.number_deaths_type.description_short}
+    description_key: &description_key_deaths_type
+      - "{definitions.all.conflict_type}"
+
   number_ongoing_conflicts:
     description_short: |-
       <%- if conflict_type == "all" -%>
@@ -253,6 +282,27 @@ tables:
           <% set estimate = "high" %>
           {definitions.number_deaths.description_short}
 
+      number_deaths_combatants:
+        title: Deaths of combatants in ongoing conflicts in a country
+        unit: "deaths"
+        description_short: |-
+          <% set people_type = "combatants" %>
+          {definitions.number_deaths_type.description_short}
+
+      number_deaths_civilians:
+        title: Deaths of civilians in ongoing conflicts in a country
+        unit: "deaths"
+        description_short: |-
+          <% set people_type = "civilians" %>
+          {definitions.number_deaths_type.description_short}
+
+      number_deaths_unknown:
+        title: Deaths of unknown type in ongoing conflicts in a country
+        unit: "deaths"
+        description_short: |-
+          <% set people_type = "unknown type" %>
+          {definitions.number_deaths_type.description_short}
+
       death_rate:
         title: Death rate in ongoing conflicts in a country (best estimate)
         unit: "deaths per 100,000 people"
@@ -280,6 +330,33 @@ tables:
           <% set estimate = "high" %>
           {definitions.number_deaths.description_short_per_capita}
 
+      # death_rate_combatants:
+      #   title: Death rate of combatants in ongoing conflicts in a country
+      #   unit: "deaths per 100,000 people"
+      #   display:
+      #     numDecimalPlaces: 1
+      #   description_short: |-
+      #     <% set people_type = "combatants" %>
+      #     {definitions.number_deaths_type.description_short_per_capita}
+
+      # death_rate_civilians:
+      #   title: Death rate of civilians in ongoing conflicts in a country
+      #   unit: "deaths per 100,000 people"
+      #   display:
+      #     numDecimalPlaces: 1
+      #   description_short: |-
+      #     <% set people_type = "civilians" %>
+      #     {definitions.number_deaths_type.description_short_per_capita}
+
+      # death_rate_unknown:
+      #   title: Death rate of unknown type in ongoing conflicts in a country
+      #   unit: "deaths per 100,000 people"
+      #   display:
+      #     numDecimalPlaces: 1
+      #   description_short: |-
+      #     <% set people_type = "unknown type" %>
+      #     {definitions.number_deaths_type.description_short_per_capita}
+
   # MAIN INDICATORS
   ucdp:
     common:
@@ -295,6 +372,7 @@ tables:
       ##################
       # Ongoing deaths #
       ##################
+      ## Estimated deaths
       number_deaths_ongoing_conflicts:
         title: Deaths in ongoing conflicts (best estimate)
         unit: deaths
@@ -319,6 +397,32 @@ tables:
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
 
+      ## Deaths by type
+      number_deaths_ongoing_conflicts_civilians:
+        title: Deaths of civilians in ongoing conflicts
+        unit: deaths
+        description_short: |-
+          <% set people_type = "civilians" %>
+          {definitions.number_deaths_type.description_short}
+        description_key: *description_key_deaths_type
+
+      number_deaths_ongoing_conflicts_combatants:
+        title: Deaths of combatants in ongoing conflicts
+        unit: deaths
+        description_short: |-
+          <% set people_type = "combatants" %>
+          {definitions.number_deaths_type.description_short}
+        description_key: *description_key_deaths_type
+
+      number_deaths_ongoing_conflicts_unknown:
+        title: Deaths of unknown type in ongoing conflicts
+        unit: deaths
+        description_short: |-
+          <% set people_type = "unknown type" %>
+          {definitions.number_deaths_type.description_short}
+        description_key: *description_key_deaths_type
+
+      ## Deaths per capita
       number_deaths_ongoing_conflicts_per_capita:
         title: Death rate in ongoing conflicts (best estimate)
         unit: deaths per 100,000 people
@@ -347,9 +451,41 @@ tables:
         description_short: |-
           <% set estimate = "low" %>
           {definitions.number_deaths.description_short_per_capita}
-        description_key: *description_key_deaths
+        description_key: *description_key_deaths_type
         display:
           numDecimalPlaces: 1
+
+      # number_deaths_ongoing_conflicts_civilians_per_capita:
+      #   title: Death rate from civilians in ongoing conflicts
+      #   unit: deaths
+      #   description_short: |-
+      #     <% set people_type = "civilians" %>
+      #     {definitions.number_deaths_type.description_short_per_capita}
+      #   description_key: *description_key_deaths_type
+      #   display:
+      #     numDecimalPlaces: 1
+
+      # number_deaths_ongoing_conflicts_combatants_per_capita:
+      #   title: Death rate from combatants ongoing conflicts
+      #   unit: deaths
+      #   description_short: |-
+      #     <% set people_type = "combatants" %>
+      #     {definitions.number_deaths_type.description_short_per_capita}
+      #   description_key: *description_key_deaths_type
+      #   display:
+      #     numDecimalPlaces: 1
+
+
+      # number_deaths_ongoing_conflicts_unknown_per_capita:
+      #   title: Death rate from unknown type in ongoing conflicts
+      #   unit: deaths
+      #   description_short: |-
+      #     <% set people_type = "unknown type" %>
+      #     {definitions.number_deaths_type.description_short_per_capita}
+      #   description_key: *description_key_deaths
+      #   display:
+      #     numDecimalPlaces: 1
+
 
       #####################
       # Ongoing conflicts #

@@ -38,7 +38,7 @@ OK (0.0s)
 
     ```bash
     # Install the dependencies defined in pyproject.toml and poetry.lock
-    poetry install
+    make .venv
     ```
 
     Next you can use one of the following two methods:

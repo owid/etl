@@ -108,11 +108,6 @@ steps:
     - data://garden/faostat/2024-03-14/faostat_qcl
   data://grapher/animal_welfare/2024-05-20/animals_used_for_food:
     - data://garden/animal_welfare/2024-05-20/animals_used_for_food
-
-  ######################################################################################################################
-  # To be archived:
-
-  ######################################################################################################################
   #
   # Various sources - Bullfighting laws.
   #
@@ -122,3 +117,19 @@ steps:
     - data://meadow/animal_welfare/2024-06-04/bullfighting_laws
   data://grapher/animal_welfare/2024-06-04/bullfighting_laws:
     - data://garden/animal_welfare/2024-06-04/bullfighting_laws
+  #
+  # Fur laws (Fur Free Alliance).
+  #
+  data://meadow/animal_welfare/2024-09-13/fur_laws:
+    - snapshot://animal_welfare/2024-09-13/fur_laws.csv
+  #
+  # Fur laws (Fur Free Alliance).
+  #
+  data://garden/animal_welfare/2024-09-13/fur_laws:
+    - data://meadow/animal_welfare/2024-09-13/fur_laws
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Fur laws (Fur Free Alliance).
+  #
+  data://grapher/animal_welfare/2024-09-13/fur_laws:
+    - data://garden/animal_welfare/2024-09-13/fur_laws

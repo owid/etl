@@ -288,7 +288,104 @@ ds_explorer.save()
 
 ### Creating multi-dimensional indicators
 
-TODO
+Multi-dimensional indicators are powered by a configuration that is typically created from a YAML file. The structure of the YAML file looks like this:
+
+```yaml title="etl/steps/export/multidim/covid/latest/covid.deaths.yaml"
+definitions:
+  table: {definitions.table}
+
+title:
+  title: COVID-19 deaths
+  titleVariant: by interval
+defaultSelection:
+  - World
+  - Europe
+  - Asia
+topicTags:
+  - COVID-19
+
+dimensions:
+  - slug: interval
+    name: Interval
+    choices:
+      - slug: weekly
+        name: Weekly
+        description: null
+      - slug: biweekly
+        name: Biweekly
+        description: null
+
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: absolute
+        name: Absolute
+        description: null
+      - slug: per_capita
+        name: Per million people
+        description: null
+      - slug: change
+        name: Change from previous interval
+        description: null
+
+views:
+  - dimensions:
+      interval: weekly
+      metric: absolute
+    indicators:
+      y: "{definitions.table}#weekly_deaths"
+  - dimensions:
+      interval: weekly
+      metric: per_capita
+    indicators:
+      y: "{definitions.table}#weekly_deaths_per_million"
+  - dimensions:
+      interval: weekly
+      metric: change
+    indicators:
+      y: "{definitions.table}#weekly_pct_growth_deaths"
+
+  - dimensions:
+      interval: biweekly
+      metric: absolute
+    indicators:
+      y: "{definitions.table}#biweekly_deaths"
+  - dimensions:
+      interval: biweekly
+      metric: per_capita
+    indicators:
+      y: "{definitions.table}#biweekly_deaths_per_million"
+  - dimensions:
+      interval: biweekly
+      metric: change
+    indicators:
+      y: "{definitions.table}#biweekly_pct_growth_deaths"
+```
+
+The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically. However, it's a good idea to create a few of them manually to start.
+
+You can also combine manually defined views with generated ones. See the `etl.multidim` module for available helper functions or refer to examples from `etl/steps/export/multidim/`. Feel free to add or modify the helper functions as needed.
+
+The export step loads the YAML file, adds `views` to the config, and then calls the function.
+
+```python title="etl/steps/export/multidim/covid/latest/covid.py"
+def run(dest_dir: str) -> None:
+    engine = get_engine()
+
+    # Load YAML file
+    config = paths.load_mdim_config("covid.deaths.yaml")
+
+    multidim.upsert_multidim_data_page("mdd-energy", config, engine)
+```
+
+To see the multi-dimensional indicator in Admin, run
+
+```bash
+etlr export://multidim/energy/latest/energy --export
+```
+
+and check out the preview at http://staging-site-my-branch/admin/grapher/mdd-name.
+
 
 ### Exporting data to GitHub
 

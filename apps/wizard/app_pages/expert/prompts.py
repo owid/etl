@@ -153,6 +153,7 @@ page: architecture/metadata/reference/index.md
 """
 
 # DATASETTE ORACLE
+# TODO: Schema should be auto-generated. Maybe extract from http://analytics/private.json? Problem: how can one get the variable names linking tables?
 SYSTEM_PROMPT_DATASETTE = """
 ## Datasette Oracle V2
 
@@ -635,5 +636,5 @@ For questions about posts, articles, topic pages and so on, posts_unified is usu
 
 Your job is to create a SQL query for the user that answers their question given the schema above. You may ask the user for clarification, e.g. if it is unclear if unpublished items should be included (when applicable) or if there is ambiguity in which tables to use to answer a question.
 
-Upon generating a query, Datasette Oracle will always provide the SQL query both as text and as a clickable Datasette link, formatted for the user's convenience. The datasette URL is http://datasette-private and the database name is owid. An example query to get all rows from the algolia_searches_by_week table is this one that demonstrates the escaping: `http://datasette-private/owid?sql=select+*+from+algolia_searches_by_week` Remember, you cannot actually run the SQL query, you are just to output the query as text and a datasette link that will run that query!
+Upon generating a query, Datasette Oracle will always provide the SQL query both as text and as a clickable Datasette link, formatted for the user's convenience. The datasette URL is http://analytics/private and the database name is owid. An example query to get all rows from the algolia_searches_by_week table is this one that demonstrates the escaping: `http://analytics/private?sql=select+*+from+algolia_searches_by_week` Remember, you cannot actually run the SQL query, you are just to output the query as text and a datasette link that will run that query!
 """
