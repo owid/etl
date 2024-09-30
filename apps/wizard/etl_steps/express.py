@@ -509,7 +509,7 @@ if st.session_state.submit_form:
             ## Run step
             st.markdown("##### Run ETL meadow step")
             st.code(
-                f"poetry run etl run {form.meadow_step_uri} {'--private' if form.is_private else ''}",
+                f"uv run etl run {form.meadow_step_uri} {'--private' if form.is_private else ''}",
                 language="shellSession",
             )
 
@@ -519,7 +519,7 @@ if st.session_state.submit_form:
             st.markdown("##### Harmonize country names")
             st.markdown("Run it in your terminal:")
             st.code(
-                f"poetry run etl harmonize data/meadow/{form.base_step_name}/{form.short_name}.feather country etl/steps/data/garden/{form.base_step_name}.countries.json",
+                f"uv run etl harmonize data/meadow/{form.base_step_name}/{form.short_name}.feather country etl/steps/data/garden/{form.base_step_name}.countries.json",
                 "shellSession",
             )
             st.markdown("Or run it on Wizard")
@@ -533,7 +533,7 @@ if st.session_state.submit_form:
             st.markdown("##### Run ETL step")
             st.markdown("After editing the code of your Garden step, run the following command:")
             st.code(
-                f"poetry run etl run {form.garden_step_uri} {'--private' if form.is_private else ''}",
+                f"uv run etl run {form.garden_step_uri} {'--private' if form.is_private else ''}",
                 "shellSession",
             )
 

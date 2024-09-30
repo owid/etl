@@ -72,7 +72,7 @@ def format_etl_diff(lines: list[str]) -> Tuple[str, str]:
 
 def call_etl_diff(include: str) -> list[str]:
     cmd = [
-        "poetry",
+        "uv",
         "run",
         "etl",
         "diff",
