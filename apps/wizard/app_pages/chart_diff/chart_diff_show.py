@@ -28,16 +28,19 @@ DISPLAY_STATE_OPTIONS = {
     gm.ChartStatus.APPROVED.value: {
         "label": "Approve",
         "color": "green",
+        # "icon": ":material/done_outline:",
         "icon": "✅",
     },
     gm.ChartStatus.REJECTED.value: {
         "label": "Reject",
         "color": "red",
+        # "icon": ":material/delete:",
         "icon": "❌",
     },
     gm.ChartStatus.PENDING.value: {
         "label": "Pending",
         "color": "gray",
+        # "icon": ":material/schedule:",
         "icon": "⏳",
     },
 }
@@ -89,20 +92,20 @@ class ChartDiffShow:
 
         This contains the state of the approval (by means of an emoji), the slug of the chart, and any tags (like "NEW" or "DRAFT").
         """
-        label = self.diff.slug
+        label = f"{self.diff.slug}  "
         tags = []
         if self.diff.is_new:
-            tags.append(" :blue-background[**NEW**]")
+            tags.append(" :blue-background[:material/grade: **NEW**]")
         if self.diff.is_draft:
-            tags.append(" :gray-background[**DRAFT**]")
+            tags.append(" :gray-background[:material/draft: **DRAFT**]")
         for change in self.diff.change_types:
-            tags.append(f":red-background[**{change.upper()} CHANGE**]")
+            tags.append(f":red-background[:material/refresh: **{change.upper()} CHANGE**]")
 
         # Add TAG if modified and no change_types is provided
         if (self.diff.is_modified) and (tags == []):
-            label += ":break[:rainbow-background[**UNKNOWN -- REPORT THIS**]]"
+            label += ":rainbow-background[**UNKNOWN -- REPORT THIS**]"
         else:
-            label += f":break[{' '.join(tags)}]"
+            label += f"{' '.join(tags)}"
         return label
 
     @property
@@ -497,7 +500,7 @@ class ChartDiffShow:
 
         # SHOW MODIFIED CHART
         if self.diff.is_modified:
-            tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
+            tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Status log"])
             with tab1:
                 self._show_chart_comparison()
             with tab2:
@@ -507,7 +510,7 @@ class ChartDiffShow:
 
         # SHOW NEW CHART
         elif self.diff.is_new:
-            tab1, tab2 = st.tabs(["Chart", "Change history"])
+            tab1, tab2 = st.tabs(["Chart", "Status log"])
             with tab1:
                 self._show_chart_comparison()
             with tab2:
