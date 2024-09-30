@@ -40,6 +40,10 @@ def run(dest_dir: str) -> None:
     tb_flunet = flunet_garden["flunet"]
     tb_fluid = fluid_garden["fluid"]
 
+    # Convert numeric types to float64 for consistency
+    tb_flunet = convert_to_float(tb_flunet)
+    tb_fluid = convert_to_float(tb_fluid)
+
     tb_flu = pd.DataFrame(pd.merge(tb_fluid, tb_flunet, on=["country", "date", "hemisphere", "year"], how="outer"))
     assert tb_flu[["country", "date"]].duplicated().sum() == 0
 
@@ -70,6 +74,12 @@ def run(dest_dir: str) -> None:
         dest_dir, tables=[tb_flu, tb_flu_monthly], default_metadata=flunet_garden.metadata, formats=["csv"]
     )
     ds_explorer.save()
+
+
+def convert_to_float(df: pd.DataFrame) -> pd.DataFrame:
+    cols = df.select_dtypes(include=["number"]).columns
+    df = df.astype({col: "float64" for col in cols})
+    return df
 
 
 def hold_back_data(df: pd.DataFrame, days_held_back: int) -> pd.DataFrame:
@@ -120,7 +130,7 @@ def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
     especially important for the stacked bar charts which don't automatically fill missing dates with NAs
 
     """
-    filled_df = pd.DataFrame()
+    filled_dfs = []
     for country in df.country.drop_duplicates():
         country_df = df[df["country"] == country]
         min_date = country_df.date.min()
@@ -133,9 +143,9 @@ def create_full_time_series(df: pd.DataFrame) -> pd.DataFrame:
             assert len(date_series) == country_df.shape[0]
             assert country_df.country.isna().sum() == 0
 
-        filled_df = pd.concat([filled_df, country_df])
+        filled_dfs.append(country_df)
 
-    return filled_df
+    return pd.concat(filled_dfs)  # type: ignore
 
 
 def create_monthly_aggregates(df: pd.DataFrame, days_held_back: int) -> pd.DataFrame:
@@ -348,5 +358,5 @@ def remove_sparse_timeseries(
         cols = [x + type + "_zfilled" for x in strain_columns]
         for country in countries:
             if all(df.loc[(df["country"] == country), cols].fillna(0).sum() == 0):
-                df.loc[(df["country"] == country), cols] = np.NaN
+                df.loc[(df["country"] == country), cols] = np.nan
     return df
