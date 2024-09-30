@@ -3,7 +3,7 @@
 Usage:
 
 ```
-poetry run python -m ingests.worldbank_wdi
+uv run python -m ingests.worldbank_wdi
 ```
 """
 

@@ -16,8 +16,8 @@ cd /home/owid/etl
 exit_code_1=0
 exit_code_2=0
 
-poetry run python snapshots/who/latest/fluid.py || exit_code_1=$?
-poetry run python snapshots/who/latest/flunet.py || exit_code_2=$?
+uv run python snapshots/who/latest/fluid.py || exit_code_1=$?
+uv run python snapshots/who/latest/flunet.py || exit_code_2=$?
 
 if [ $exit_code_1 -eq 0 ] && [ $exit_code_2 -eq 0 ]
 then

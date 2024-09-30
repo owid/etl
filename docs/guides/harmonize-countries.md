@@ -74,7 +74,7 @@ If a mapping file already exists, it will resume where the mapping file left off
 As an example, start the harmonization interactive session for table `undp_hdr` from dataset `meadow/un/2024-04-09/undp_hdr`, which has `country` column with the raw country names:
 
 ```bash
-poetry run etl harmonize data/meadow/un/2024-04-09/undp_hdr/undp_hdr.feather country mapping.json
+uv run etl harmonize data/meadow/un/2024-04-09/undp_hdr/undp_hdr.feather country mapping.json
 206 countries/regions to harmonize
   └ 188 automatically matched
   └ 18 ambiguous countries/regions
