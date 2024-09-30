@@ -10,6 +10,10 @@ meta:
     url_main: https://nsidc.org/data/g02135/
     url_download: https://noaadata.apps.nsidc.org/NOAA/G02135/seaice_analysis/Sea_Ice_Index_Monthly_Data_by_Year_G02135_v3.0.xlsx
     date_accessed: '2024-09-30'
-    date_published: '2024-07-22'
+    date_published: '2024-09-29'
     license:
       name: CC BY 4.0
+outs:
+  - md5: 09225afbd376e58037d3b3bfcbe7df96
+    size: 25316
+    path: sea_ice_index.xlsx

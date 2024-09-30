@@ -19,3 +19,7 @@ meta:
     license:
       name: Public domain
       url: https://hahana.soest.hawaii.edu/hot/dataaccess.html
+outs:
+  - md5: fd502d28aa85a6f241e9507d85b8ca8b
+    size: 44820
+    path: hawaii_ocean_time_series.csv

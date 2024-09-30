@@ -321,10 +321,10 @@ steps:
   # NOAA National Centers for Environmental Information - Ocean Heat Content.
   #
   data://meadow/climate/2024-09-30/ocean_heat_content:
-    - snapshot://climate/2024-09-30/ocean_heat_content_monthly_world_700m.csv
-    - snapshot://climate/2024-09-30/ocean_heat_content_monthly_world_2000m.csv
-    - snapshot://climate/2024-09-30/ocean_heat_content_annual_world_700m.csv
-    - snapshot://climate/2024-09-30/ocean_heat_content_annual_world_2000m.csv
+    - snapshot://climate/2024-07-23/ocean_heat_content_monthly_world_700m.csv
+    - snapshot://climate/2024-07-23/ocean_heat_content_monthly_world_2000m.csv
+    - snapshot://climate/2024-07-23/ocean_heat_content_annual_world_700m.csv
+    - snapshot://climate/2024-07-23/ocean_heat_content_annual_world_2000m.csv
   #
   # NSIDC - Arctic sea ice extent.
   #
@@ -340,9 +340,9 @@ steps:
   # GISS - Surface temperature analysis.
   #
   data://meadow/climate/2024-09-30/surface_temperature_analysis:
-    - snapshot://climate/2024-09-30/surface_temperature_analysis_world.csv
-    - snapshot://climate/2024-09-30/surface_temperature_analysis_southern_hemisphere.csv
-    - snapshot://climate/2024-09-30/surface_temperature_analysis_northern_hemisphere.csv
+    - snapshot://climate/2024-07-23/surface_temperature_analysis_world.csv
+    - snapshot://climate/2024-07-23/surface_temperature_analysis_southern_hemisphere.csv
+    - snapshot://climate/2024-07-23/surface_temperature_analysis_northern_hemisphere.csv
   #
   #  School of Ocean and Earth Science and Technology - Hawaii Ocean Time-series (HOT).
   #

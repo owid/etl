@@ -3,6 +3,17 @@
 The publication date will be automatically extracted from the source website, if possible, and otherwise it will be
 assumed to be the same as the access date. These dates will be written to the metadata dvc files.
 
+NOTE: If any of the snapshots fails, first try to fix the issue. But, if that's not possible (e.g. because the data provider server is down, which happens relatively often) follow this steps:
+1. Remove the new .dvc file of that failing snapshot.
+2. Edit the climate.yml dag file, so that the new affected meadow steps use the latest working snapshot.
+3. Comment out the file names of the failing snapshots in the "FILES" list below.
+4. Execute this script.
+    * If another snapshot fails, go back to step 1.
+5. Uncomment the file names of the failing snapshots (so that on next update all snapshots will be executed).
+6. Commit the changes in the dag.
+
+If a certain snapshot has been failing multiple times (which you can see by looking at the date of the latest working snapshot) consider changing the data provider.
+
 """
 
 import re
