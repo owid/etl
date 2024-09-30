@@ -6,7 +6,8 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from etl import grapher_model as gm
-from etl.db import map_indicator_path_to_id, read_sql
+from etl.db import read_sql
+from etl.helpers import map_indicator_path_to_id
 
 
 def upsert_multidim_data_page(slug: str, config: dict, engine: Engine) -> None:
