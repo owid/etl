@@ -29,7 +29,7 @@ def main(upload: bool) -> None:
 
 def get_shiny_data():
     # URL of the webpage
-    url = "https://worldhealthorg.shinyapps.io/mpx_global/#26_Case_definitions"  # Replace with your actual URL
+    url = "https://worldhealthorg.shinyapps.io/mpx_global/#26_Case_definitions"
 
     # Fetch the page content
     response = requests.get(url)
