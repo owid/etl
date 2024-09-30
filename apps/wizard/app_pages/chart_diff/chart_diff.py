@@ -139,7 +139,9 @@ class ChartDiff:
         If slug of the chart miss-matches between target and source sessions, an error is displayed.
         """
         if self.target_chart:
-            assert self.source_chart.slug == self.target_chart.slug, "Slug mismatch!"
+            assert (
+                self.source_chart.slug == self.target_chart.slug
+            ), f"Slug mismatch! {self.source_chart.slug} != {self.target_chart.slug}"
         return self.source_chart.slug or "no-slug"
 
     @property
