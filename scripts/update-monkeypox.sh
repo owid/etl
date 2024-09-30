@@ -6,8 +6,8 @@ start_time=$(date +%s)
 
 echo '--- Update Monkeypox'
 cd /home/owid/etl
-poetry run python snapshots/who/latest/monkeypox.py
-poetry run python snapshots/health/latest/global_health_mpox.py
+uv run python snapshots/who/latest/monkeypox.py
+uv run python snapshots/health/latest/global_health_mpox.py
 
 # commit to master will trigger ETL which is gonna run the step
 echo '--- Commit and push changes'
@@ -17,7 +17,7 @@ git commit -m ":robot: update: monkeypox" || true
 git push origin master -q || true
 
 echo '--- Commit dataset to https://github.com/owid/monkeypox'
-MONKEYPOX_COMMIT=1 poetry run etlr github/who/latest/monkeypox --export
+MONKEYPOX_COMMIT=1 uv run etlr github/who/latest/monkeypox --export
 
 end_time=$(date +%s)
 

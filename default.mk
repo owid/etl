@@ -28,15 +28,20 @@ test-default: check-formatting check-linting check-typing unittest
 	fi
 	touch .sanity-check
 
+install-uv-default:
+	@if ! command -v uv >/dev/null 2>&1; then \
+		echo '==> UV not found. Installing...'; \
+		echo $$HOME; \
+		curl -LsSf https://astral.sh/uv/install.sh | sh && . $$HOME/.cargo/env; \
+	fi
 
-.venv: .sanity-check
+.venv-default: install-uv .sanity-check
 	@echo '==> Installing packages'
 	@if [ -n "$(PYTHON_VERSION)" ]; then \
 		echo '==> Using Python version $(PYTHON_VERSION)'; \
-		poetry env use python$(PYTHON_VERSION); \
+		export UV_PYTHON=$(PYTHON_VERSION); \
 	fi
-	poetry install
-	touch .venv
+	$(HOME)/.cargo/bin/uv sync --all-extras
 
 check-default:
 	@echo '==> Lint & Format & Typecheck changed files'

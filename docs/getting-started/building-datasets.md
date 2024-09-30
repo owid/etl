@@ -34,10 +34,10 @@ OK (0.0s)
 
     If you are not already, make sure to use these tools within your **virtual environment**.
 
-    Details can be found in the [Poetry docs](https://python-poetry.org/docs/basic-usage/#using-your-virtual-environment), but if you have never used the tool before here is a basic usage that will get you started (this assumes you have been [here](../working-environment/#install-dependencies) and installed Poetry):
+    Details can be found in the [UV docs](https://docs.astral.sh/uv/getting-started/), but if you have never used the tool before here is a basic usage that will get you started (this assumes you have been [here](../working-environment/#install-dependencies) and installed UV):
 
     ```bash
-    # Install the dependencies defined in pyproject.toml and poetry.lock
+    # Install the dependencies defined in pyproject.toml and uv.lock
     make .venv
     ```
 
@@ -45,7 +45,7 @@ OK (0.0s)
 
     ```bash
     # Activate virtual environment. Once activated, you can use the tools here as normal.
-    poetry shell
+    make activate
     etl run --dry-run data://garden/biodiversity/2024-01-25/cherry_blossom
     ```
 
@@ -53,7 +53,7 @@ OK (0.0s)
 
     ```bash
     # Run a specific command in virtual environment. This will not leave you in the virtual environment.
-    poetry run etl run --dry-run data://garden/biodiversity/2024-01-25/cherry_blossom
+    uv run etl run --dry-run data://garden/biodiversity/2024-01-25/cherry_blossom
     ```
 
 

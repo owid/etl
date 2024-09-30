@@ -1,57 +1,50 @@
-[tool.poetry]
+[project]
 name = "owid-datautils"
 version = "0.5.3"
 description = "Data utils library by the Data Team at Our World in Data"
-authors = ["Our World in Data <tech@ourworldindata.org>"]
+authors = [
+    {name = "Our World in Data", email = "tech@ourworldindata.org"},
+]
 license = "MIT"
-packages = [{ include = "owid" }]
-readme = "README.md"
-repository = "https://github.com/owid/owid-datautils-py"
-homepage = "https://github.com/owid/owid-datautils-py"
-keywords = [
-    "our world in data",
-    "data cleaning",
-    "data processing",
-    "data processing",
-    "data utils",
+requires-python = ">=3.9, <4.0"
+dependencies = [
+    "pandas==2.2.1",
+    "boto3>=1.21.16",
+    "structlog>=21.5.0",
+    "colorama>=0.4.4",
+    "gdown>=4.5.2",
+    "gsheets>=0.6.1",
+    "pydrive2>=1.15.0",
+    "pyarrow>=10.0.1",
+    "urllib3<2",
+    "click>=8.1.7"
 ]
 
-
-[tool.poetry.dependencies]
-python = ">=3.9,<4.0"
-pandas = "^2.2.1"
-boto3 = ">=1.21.16"
-structlog = ">=21.5.0"
-colorama = ">=0.4.4"
-gdown = ">=4.5.2"
-gsheets = ">=0.6.1"
-pydrive2 = ">=1.15.0"
-pyarrow = ">=10.0.1"
-# this is a hint for poetry to avoid a dependency conflict with boto3
-urllib3 = "<2"
-click = "^8.1.7"
-
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=6.2.5"
-pytest-cov = ">=2.12.1"
-Sphinx = "4.5.0"
-furo = ">=2022.4.7"
-bumpversion = ">=0.6.0"
-watchdog = ">=2.1.5"
-boto3-stubs = { extras = ["s3"], version = ">=1.21.16" }
-ipdb = ">=0.13.9"
-ipykernel = ">=6.13.0"
-openpyxl = ">=3.0.10"
-lxml = ">=4.9.1"
-pyright = "1.1.373"
-ruff = "0.1.6"
+[tool.uv]
+dev-dependencies = [
+    "pytest>=6.2.5",
+    "pytest-cov>=2.12.1",
+    "Sphinx==4.5.0",
+    "furo>=2022.4.7",
+    "bumpversion>=0.6.0",
+    "watchdog>=2.1.5",
+    "boto3-stubs[s3]>=1.21.16",
+    "ipdb>=0.13.9",
+    "ipykernel>=6.13.0",
+    "openpyxl>=3.0.10",
+    "lxml>=4.9.1",
+    "pyright==1.1.373",
+    "ruff==0.1.6"
+]
 
 [tool.ruff]
 extend = "../../pyproject.toml"
 
-[tool.pyright]
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["owid"]
+
+[tool.pyright]
