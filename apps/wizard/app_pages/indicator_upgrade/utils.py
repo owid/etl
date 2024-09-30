@@ -37,7 +37,7 @@ def get_datasets(archived) -> pd.DataFrame:
     # Get table with all datasets (ETL + DB)
     steps_df_grapher = (
         steps_df_grapher.merge(datasets_db, on="id", how="outer", suffixes=("_etl", "_db"))
-        .sort_values(by="id")
+        .sort_values(by="id", ascending=False)
         .drop(columns="updatedAt")
         .astype({"id": int})
     )
