@@ -300,3 +300,4 @@ steps:
     - grapher://grapher/excess_mortality/latest/excess_mortality
     - grapher://grapher/covid/latest/covax
     - grapher://grapher/covid/latest/infections_model
+    - grapher://grapher/covid/latest/xm_who
