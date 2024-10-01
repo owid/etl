@@ -2106,7 +2106,9 @@
     - "VNM"
 
 
-# World Bank regions
+# World Bank regions  aliases:
+    - "WPRO"
+
 - code: WB_NA
   name: "North America (WB)"
   region_type: "aggregate"
