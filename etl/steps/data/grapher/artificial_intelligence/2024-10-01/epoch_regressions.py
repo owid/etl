@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("epoch_regressions")
 
     # Read table from garden dataset.
-    tb = ds_garden["epoch"]
+    tb = ds_garden["epoch_regressions"]
     tb = tb.rename_index_names({"system": "country", "days_since_1949": "year"})
     #
     # Save outputs.

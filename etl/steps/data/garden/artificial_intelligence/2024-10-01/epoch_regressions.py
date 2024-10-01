@@ -1,7 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
+import owid.catalog.processing as pr
 import pandas as pd
+from owid.catalog import Table
 from sklearn.linear_model import LinearRegression
 
 from etl.helpers import PathFinder, create_dataset
@@ -11,9 +13,6 @@ paths = PathFinder(__file__)
 DL_ERA_START = 2010
 START_DATE = 1950
 END_DATE = 2025.2
-
-BOOTSTRAP_SAMPLE_SIZE = 1000
-BOOTSTRAP_CI_WIDTH = 90
 
 
 def run(dest_dir: str) -> None:
@@ -26,11 +25,16 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("epoch")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["epoch"]
-    tb = tb.reset_index()
-    tb = run_regression(tb)
+    tb = ds_meadow["epoch"].reset_index()
+
+    # Run regression analysis and concatenate results
+    tb_trend = run_regression(tb)
+    tb = tb.drop("frac_year", axis=1)
+    tb = pr.concat([tb_trend, tb])
+
+    # Format the table
     tb = tb.format(["days_since_1949", "system"])
-    tb = tb.drop("publication_date", axis=1)
+
     #
     # Save outputs.
     #
@@ -44,6 +48,7 @@ def run(dest_dir: str) -> None:
 
 
 def fit_exponential(models, metric):
+    """Fit an exponential model to the given metric data."""
     x = models["frac_year"].values.reshape(-1, 1)
     y = models[metric]
 
@@ -59,27 +64,14 @@ def fit_exponential(models, metric):
     finite_mask = np.isfinite(y) & (y < np.finfo(np.float32).max)
     x = x[finite_mask]
     y = y[finite_mask]
+
+    # Fit linear regression model
     reg = LinearRegression().fit(x, y)
     return reg.intercept_, reg.coef_[0]
 
 
-def bootstrap(models, metric):
-    rng = np.random.default_rng(42)
-
-    oom_per_year = []
-
-    for bootstrap_index in range(BOOTSTRAP_SAMPLE_SIZE):
-        sample = models.sample(len(models), replace=True, random_state=rng)
-        sample = sample.sort_values("frac_year")
-
-        fit = fit_exponential(sample, metric)
-        oom_per_year.append(fit[1])
-
-    low, high = np.percentile(oom_per_year, [50 - BOOTSTRAP_CI_WIDTH / 2, 50 + BOOTSTRAP_CI_WIDTH / 2])
-    return low, high
-
-
 def run_regression(tb):
+    """Run regression analysis on the given table and return the updated table."""
     publication_dates = tb["publication_date"]
     tb.loc[:, "frac_year"] = (
         publication_dates.dt.year + (publication_dates.dt.month - 1) / 12 + (publication_dates.dt.day - 1) / 365
@@ -87,57 +79,70 @@ def run_regression(tb):
     tb = tb.sort_values(by="frac_year")
 
     metrics = ["training_computation_petaflop", "parameters", "training_dataset_size__datapoints"]
-    # metrics = ["training_computation_petaflop"]
-    new_columns = []
-    for metric in metrics:
+    new_tables = []
+
+    for m, metric in enumerate(metrics):
         # Filter out models without the metric information
         tb_metric = tb[pd.notnull(tb[metric])]
 
+        # Fit exponential models for pre-DL and DL eras
         pre_dl_models = tb_metric[tb_metric["frac_year"] < DL_ERA_START]
         pre_dl_fit = fit_exponential(pre_dl_models, metric)
         pre_dl_oom_per_year = pre_dl_fit[1]
-        pre_dl_fit_ci = bootstrap(pre_dl_models, metric)
 
         dl_models = tb_metric[tb_metric["frac_year"] >= DL_ERA_START]
         dl_fit = fit_exponential(dl_models, metric)
         dl_oom_per_year = dl_fit[1]
-        dl_fit_ci = bootstrap(dl_models, metric)
 
-        paths.log.info(
-            f"Pre Deep Learning Era ({metric}): {10**pre_dl_oom_per_year:.1f}x/year ({10**pre_dl_fit_ci[0]:.1f} to {10**pre_dl_fit_ci[1]:.1f})"
-        )
-        paths.log.info(
-            f"Deep Learning Era ({metric}): {10**dl_oom_per_year:.1f}x/year ({10**dl_fit_ci[0]:.1f} to {10**dl_fit_ci[1]:.1f})"
-        )
+        # Log the results
+        pre_dl_info = f"{10**pre_dl_oom_per_year:.1f}x/year"
+        dl_info = f"{10**dl_oom_per_year:.1f}x/year"
+        paths.log.info(f"Pre Deep Learning Era ({metric}): {pre_dl_info}")
+        paths.log.info(f"Deep Learning Era ({metric}): {dl_info}")
 
-        pre_dl_year_grid = pre_dl_models["frac_year"]
+        # Define the year grids for the periods 1950 to 2010 and 2010 to 2025 with just two points
+        pre_dl_year_grid = np.array([1950, 2010])  # 1950 and 2010
+        dl_year_grid = np.array([2010, 2025])  # 2010 and 2025
+
+        # Calculate the lines for each period using the fitted exponential models
         pre_dl_line = 10 ** (pre_dl_fit[0] + pre_dl_year_grid * pre_dl_fit[1])
-
-        dl_year_grid = dl_models["frac_year"]
         dl_line = 10 ** (dl_fit[0] + dl_year_grid * dl_fit[1])
 
-        # Add the lines back into the table as separate columns
-        pre_dl_col_name = f"pre_dl_line_{metric}"
-        dl_col_name = f"dl_line_{metric}"
+        # Create new DataFrames for pre-DL and DL eras with only necessary columns
+        pre_dl_df = pd.DataFrame(
+            {
+                "days_since_1949": [
+                    tb_metric["days_since_1949"].min(),
+                    tb_metric[tb_metric["frac_year"] < DL_ERA_START]["days_since_1949"].max(),
+                ],
+                f"{metric}": [pre_dl_line[0], pre_dl_line[-1]],
+                "system": [f"{pre_dl_info}"] * 2,
+            }
+        )
 
-        tb.loc[tb["frac_year"] < DL_ERA_START, pre_dl_col_name] = pre_dl_line.reindex(
-            tb.index[tb["frac_year"] < DL_ERA_START]
-        ).values
-        tb.loc[tb["frac_year"] >= DL_ERA_START, dl_col_name] = dl_line.reindex(
-            tb.index[tb["frac_year"] >= DL_ERA_START]
-        ).values
+        dl_df = pd.DataFrame(
+            {
+                "days_since_1949": [
+                    tb_metric[tb_metric["frac_year"] >= DL_ERA_START]["days_since_1949"].min(),
+                    tb_metric["days_since_1949"].max(),
+                ],
+                f"{metric}": [dl_line[0], dl_line[-1]],
+                "system": [f"{dl_info}"] * 2,
+            }
+        )
 
-        # Append new column names to the list
-        new_columns.append(pre_dl_col_name)
-        new_columns.append(dl_col_name)
-    for column in new_columns:
-        # Add metadata to the publication date column
-        tb[column].metadata.origins = tb["domain"].metadata.origins
-    # Rename systems in the column 'system'
-    tb["system"] = tb.apply(
-        lambda row: "Pre-Deep Learning era" if row["frac_year"] < DL_ERA_START else "Deep Learning era", axis=1
-    )
+        # Combine the pre-DL and DL DataFrames
+        df_combined = pd.concat([pre_dl_df, dl_df], ignore_index=True)
+        new_tables.append(df_combined)
 
-    tb = tb.drop("frac_year", axis=1)
+    # Merge all the new DataFrames
+    tb_new = new_tables[0]
+    for tb_m in new_tables[1:]:
+        tb_new = pd.merge(tb_new, tb_m, on=["system", "days_since_1949"], how="outer")
 
-    return tb
+    # Convert to OWID Table and add metadata
+    tb_new = Table(tb_new, short_name=paths.short_name)
+    for column in tb_new.columns:
+        tb_new[column].metadata.origins = tb["publication_date"].metadata.origins
+
+    return tb_new
