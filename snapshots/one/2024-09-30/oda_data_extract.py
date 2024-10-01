@@ -17,6 +17,14 @@ Steps to extract the data:
     2. Run this code to extract the data.
         python snapshots/one/{version}/oda_data_extract.py
 
+
+How to run the snapshot on the staging server:
+
+1. sudo apt install libgl1-mesa-glx
+2. cd etl
+3. uv run pip install oda_data --upgrade
+4. uv run python snapshots/one/2024-09-30/oda_data_extract.py
+
 """
 
 
