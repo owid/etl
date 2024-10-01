@@ -1,0 +1,98 @@
+definitions:
+  table_econ: grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist
+  table_who: grapher/covid/latest/xm_who/xm_who
+  indicator_confirmed: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths
+
+title:
+  title: Estimated cumulative excess deaths during COVID-19
+  titleVariant: "by model"
+defaultSelection:
+  - World
+topicTags:
+  - COVID-19
+
+dimensions:
+  - slug: model
+    name: Model
+    choices:
+      - slug: all
+        name: All
+        description: Show estimates by the WHO and The Economist together
+      - slug: econ
+        name: The Economist
+        description: null
+      - slug: who
+        name: WHO
+        description: null
+
+views:
+  # The Economist
+  - dimensions:
+      model: econ
+    indicators:
+      y:
+        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths"
+        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_top"
+        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_bot"
+        - "{definitions.indicator_confirmed}"
+
+    config:
+      title: "Estimated cumulative excess deaths during COVID-19"
+      subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
+      originUrl: ourworldindata.org/coronavirus
+      hideAnnotationFieldsInTitle:
+        time: true
+
+  # # IHME
+  # - dimensions:
+  #     model: ihme
+  #   indicators:
+  #     y:
+  #       - "{definitions.table}#ihme_infections__estimate_mean"
+  #       - "{definitions.table}#ihme_infections__estimate_low"
+  #       - "{definitions.table}#ihme_infections__estimate_upper"
+  #       - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
+
+  #   config:
+  #     title: "Daily new estimated COVID-19 infections from the IHME model"
+  #     subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
+  #     note: This chart shows the model estimates dated 16 December 2022.
+  #     originUrl: ourworldindata.org/covid-models
+  #     hideAnnotationFieldsInTitle:
+  #       time: true
+
+  # # LSHTM
+  # - dimensions:
+  #     model: lshtm
+  #   indicators:
+  #     y:
+  #       - "{definitions.table}#lshtm_infections__estimate_median"
+  #       - "{definitions.table}#lshtm_infections__estimate_low"
+  #       - "{definitions.table}#lshtm_infections__estimate_upper"
+  #       - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
+
+  #   config:
+  #     title: "Daily new estimated COVID-19 infections from the LSHTM model"
+  #     subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
+  #     note: This chart shows the model estimates dated 25 August 2020.
+  #     originUrl: ourworldindata.org/covid-models
+  #     hideAnnotationFieldsInTitle:
+  #       time: true
+
+  # # YYG
+  # - dimensions:
+  #     model: yyg
+  #   indicators:
+  #     y:
+  #       - "{definitions.table}#yyg_infections__estimate_mean"
+  #       - "{definitions.table}#yyg_infections__estimate_low"
+  #       - "{definitions.table}#yyg_infections__estimate_upper"
+  #       - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
+
+  #   config:
+  #     title: "Daily new estimated COVID-19 infections from the YYG model"
+  #     subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
+  #     note: This chart shows the model estimates dated 4 October 2020. YYG announced that this is the final model update.
+  #     originUrl: ourworldindata.org/covid-models
+  #     hideAnnotationFieldsInTitle:
+  #       time: true
