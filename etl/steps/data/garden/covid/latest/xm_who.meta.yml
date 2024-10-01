@@ -29,9 +29,15 @@ tables:
       cumul_excess_mean:
         title: Cumulative excess deaths associated with COVID-19 pandemic (mean)
         unit: death
+        description_short: |-
+          Cumulative difference (mean estimate) between the number of reported or estimated deaths in 2020–2021 and the projected number of deaths for the same period based on previous years.
       cumul_excess_low:
-        title: Cumulative excess deaths associated with COVID-19 pandemic (lower 95% confidence interval)
+        title: Cumulative excess deaths associated with COVID-19 pandemic (low 95% CI)
         unit: deaths
+        description_short: |-
+          Cumulative difference (lower 95% confidence interval) between the number of reported or estimated deaths in 2020–2021 and the projected number of deaths for the same period based on previous years.
       cumul_excess_high:
-        title: Cumulative excess deaths associated with COVID-19 pandemic (upper 95% confidence interval)
+        title: Cumulative excess deaths associated with COVID-19 pandemic (upper 95% CI)
         unit: deaths
+        description_short: |-
+          Cumulative difference (upper 95% confidence interval) between the number of reported or estimated deaths in 2020–2021 and the projected number of deaths for the same period based on previous years.
