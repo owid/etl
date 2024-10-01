@@ -75,7 +75,7 @@ df = rc[path]
 
 ## Development
 
-You need Python 3.9+, `poetry` and `make` installed. Clone the repo, then you can simply run:
+You need Python 3.9+, `uv` and `make` installed. Clone the repo, then you can simply run:
 
 ```
 # run all unit tests and CI checks

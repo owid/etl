@@ -24,7 +24,7 @@ To run this code from scratch,
         - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the functions.
     - Run the code. You have two options to see the output, in the terminal or in the background:
         python snapshots/wb/{version}/pip_api.py
-        nohup poetry run python snapshots/wb/{version}/pip_api.py > output.log 2>&1 &
+        nohup uv run python snapshots/wb/{version}/pip_api.py > output.log 2>&1 &
 
 When the code finishes, you will have the following files in the cache folder:
     - world_bank_pip.csv: file with the results of the queries for key indicators (8 for countries and 8 for regions), plus some additional indicators (thresholds, relative poverty).

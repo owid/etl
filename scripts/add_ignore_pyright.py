@@ -3,7 +3,7 @@ import sys
 
 """Usage:
 
-poetry run pyright owid tests --outputjson | python ../../scripts/add_ignore_pyright.py
+uv run pyright owid tests --outputjson | python ../../scripts/add_ignore_pyright.py
 """
 
 

@@ -6,6 +6,9 @@ definitions:
       topic_tags:
         - Government Spending
 
+  entityAnnotationsMap: |-
+    France: Break in 1978 is due to changes in series definition
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -27,6 +30,7 @@ tables:
           name: Government revenue (% of GDP)
           numDecimalPlaces: 1
           tolerance: 5
+          entityAnnotationsMap: "{definitions.entityAnnotationsMap}"
 
       expenditure:
         title: Government expenditure (% of GDP)
@@ -39,6 +43,7 @@ tables:
           name: Government expenditure (% of GDP)
           numDecimalPlaces: 1
           tolerance: 5
+          entityAnnotationsMap: "{definitions.entityAnnotationsMap}"
 
       interest_exp:
         title: Government interest expense (% of GDP)
@@ -51,6 +56,7 @@ tables:
           name: Government interest expense (% of GDP)
           numDecimalPlaces: 1
           tolerance: 5
+          entityAnnotationsMap: "{definitions.entityAnnotationsMap}"
 
       prim_expenditure:
         title: Government primary expenditure (% of GDP)
@@ -63,6 +69,7 @@ tables:
           name: Government primary expenditure (% of GDP)
           numDecimalPlaces: 1
           tolerance: 5
+          entityAnnotationsMap: "{definitions.entityAnnotationsMap}"
 
       prim_balance:
         title: Government primary balance (% of GDP)

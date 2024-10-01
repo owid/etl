@@ -1,5 +1,7 @@
 import datetime as dt
+import hashlib
 import re
+from dataclasses import fields, is_dataclass
 from pathlib import Path
 from typing import Any, Optional, TypeVar, Union, overload
 
@@ -200,3 +202,69 @@ def dynamic_yaml_to_dict(yd: Any) -> dict:
     """Convert dynamic yaml to dict. Using dynamic yaml can cause problems when you
     try to run e.g. Origin(**yd). It's safer to run Origin(**dynamic_yaml_to_dict(yd)) instead."""
     return yaml.safe_load(dynamic_yaml.dump(yd))
+
+
+def hash_any(x: Any) -> int:
+    """Return a unique, deterministic hash for an arbitrary object.
+
+    This function is especially useful when working with mutable objects, such as dataclasses that
+    can't be made frozen, but where you still need to use operations like `set`, `dict` keys, or
+    deduplication with `unique`. A standard Python `hash()` is not suitable in such cases because Python's
+    `hash()` function for strings is randomized across different interpreter sessions for security reasons
+    (via `PYTHONHASHSEED`), which can result in non-deterministic hash values.
+
+    This function handles common Python data structures, such as dataclasses, lists, dicts, strings, and `None`,
+    and ensures that the returned hash is always deterministic across different runs. For strings, it uses an MD5
+    hash truncated to 64 bits to maintain consistent behavior across different runs of the program.
+
+    The function is recursive, so it can handle nested objects like lists of dataclasses, dicts with list values, etc.
+
+    Args:
+        x (Any): The object to be hashed. It can be of any type: dataclass, list, dict, string, or other.
+
+    Returns:
+        int: A deterministic integer hash value for the object.
+
+    Special cases:
+    - **Dataclasses**: It recursively hashes each field of the dataclass by generating a tuple of (field_name_hash, field_value_hash)
+      and then hashes that tuple.
+    - **Lists**: It recursively hashes each element in the list, converts the list to a tuple (because tuples are hashable),
+      and then hashes the tuple.
+    - **Dictionaries**: It hashes the keys and values of the dictionary, sorting them by key to ensure consistency, then
+      generates a tuple of (key_hash, value_hash) pairs and hashes that tuple.
+    - **Strings**: Instead of the built-in `hash()`, it uses the MD5 hash algorithm to generate a consistent 64-bit hash
+      (by truncating the result) that remains the same across interpreter runs.
+    - **None**: Always returns `0` as the hash for `None`.
+    - **Other types**: Falls back on Python's built-in `hash()` function for all other types of objects.
+
+    Example:
+    >>> @dataclass
+    ... class Person:
+    ...     name: str
+    ...     age: int
+    >>> p1 = Person(name="Alice", age=30)
+    >>> p2 = Person(name="Alice", age=30)
+    >>> hash_any(p1) == hash_any(p2)
+    True
+    """
+
+    if is_dataclass(x):
+        # Handle dataclass: sort fields by name and hash a tuple of (field_name_hash, field_value_hash) for each field
+        return hash(
+            tuple([(hash_any(f.name), hash_any(getattr(x, f.name))) for f in sorted(fields(x), key=lambda f: f.name)])
+        )
+    elif isinstance(x, list):
+        # Handle lists: recursively hash each element in the list and hash the result as a tuple
+        return hash(tuple([hash_any(y) for y in x]))
+    elif isinstance(x, dict):
+        # Handle dicts: sort by key, then recursively hash each key-value pair as a tuple of (key_hash, value_hash)
+        return hash(tuple([(hash_any(k), hash_any(v)) for k, v in sorted(x.items())]))
+    elif isinstance(x, str):
+        # Handle strings: compute the MD5 hash, truncate to 64 bits for consistent results across runs
+        return int(hashlib.md5(x.encode()).hexdigest(), 16) & ((1 << 64) - 1)
+    elif x is None:
+        # Handle None: return a fixed hash value for None
+        return 0
+    else:
+        # Fallback for other types: use the built-in hash() function
+        return hash(x)

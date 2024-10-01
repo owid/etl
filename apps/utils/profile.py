@@ -14,7 +14,7 @@ Usage:
 
 To profile grapher upserts, it is better to use cProfile and run something like this:
 ```
-ssh owid@staging-site-my-branch "cd etl && poetry run python -m cProfile -s cumtime etl/command.py grapher://grapher/biodiversity/2024-01-25/cherry_blossom --grapher --only --force --workers 1" | head -n 100
+ssh owid@staging-site-my-branch "cd etl && uv run python -m cProfile -s cumtime etl/command.py grapher://grapher/biodiversity/2024-01-25/cherry_blossom --grapher --only --force --workers 1" | head -n 100
 ```
 """
 
