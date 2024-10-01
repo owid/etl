@@ -52,11 +52,12 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     # Create a column to display the dataset by its dataset id followed by its title.
     df["display_name"] = "[" + df["id"].astype(str) + "] " + df["name"]
     version = df["step"].str.split("/").str[-2]
-    df["display_name"] = df["display_name"] + " [" + version.fillna("unknown version") + "]"
+    is_archived = df["isArchived"].replace({0: "", 1: " (ARCHIVED) "}).fillna("")
+    df["display_name"] = is_archived + df["display_name"] + " [" + version.fillna("unknown version") + "]"
     # Create a dictionary mapping from that display to dataset id.
     display_name_to_id_mapping = df.set_index("display_name")["id"].to_dict()
     # Create a column to display the dataset by its dataset id followed by its ETL step.
-    df["display_step"] = "[" + df["id"].astype(str) + "] " + df["step"]
+    df["display_step"] = is_archived + "[" + df["id"].astype(str) + "] " + df["step"]
     # Create a dictionary mapping from that display to dataset id.
     display_step_to_id_mapping = df.set_index("display_step")["id"].to_dict()
 
@@ -69,9 +70,15 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
     # View options
     with st.popover("View options"):
         st.markdown("Change the default dataset view.")
+        # st.toggle(
+        #     "Show archived datasets",
+        #     help="By default, archived datasets are not shown. Change this by checking this box.",
+        #     on_change=set_states_if_form_is_modified,
+        #     key="show_archived_datasets",
+        # )
         st.toggle(
-            "Show all datasets (manual mapping)",
-            help="Show all datasets, including those not detected by the grapher.",
+            "Show all datasets",
+            help="Show all datasets. By default, Indicator Upgrader will try to present only those datasets that are new. You can disable this by ckecking this box. You can also check this box to show archived datasets.",
             on_change=set_states_if_form_is_modified,
             key="show_all_datasets",
         )
@@ -88,6 +95,8 @@ def build_dataset_form(df: pd.DataFrame, similarity_names: Dict[str, Any]) -> "S
         # the dropdown of new datasets should only show the detected new datasets.
         options = df[df["migration_new"]].reset_index(drop=True)
     else:
+        if not st.session_state.show_all_datasets:
+            df = df.loc[df["isArchived"] == 0, :]
         # Otherwise, show all datasets in grapher.
         options = df.reset_index(drop=True)
 
