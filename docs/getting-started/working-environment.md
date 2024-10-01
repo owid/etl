@@ -254,8 +254,28 @@ We recommend using [Oh My Zsh](https://ohmyz.sh/). It comes with a lot of plugin
     load-py-venv
     ```
 
+    Some staff members also use [Nushell](https://www.nushell.sh/), which supports similar hooks. Edit your `$nu.config-path` file, find the `hooks` section, and add to it an `env_change` stanza:
 
-???  "Speed up navigation in terminal with autojump"
+    ```
+    hooks:
+      env_change: {
+        PWD: [
+          {
+            condition: {|before, after| ["pyproject.toml" "requirements.txt" "setup.py"] | any {|f| $f | path exists } }
+            code: "
+                if ('.venv/bin/python' | path exists) {
+                print -e 'Activating virtualenv'
+                $env.PATH = ($env.PATH | split row (char esep) | filter {|p| $p !~ '.venv' } | prepend $\"($env.PWD)/.venv/bin\")
+                } else {
+                $env.PATH = ($env.PATH | split row (char esep) | filter {|p| $p !~ '.venv' })
+                }
+              "
+          }
+        ]
+      }
+    ```
+
+??? "Speed up navigation in terminal with autojump"
 
     Instead of `cd ...` to a correct folder, you can add the following to your `~/.zshrc` or `~/.bashrc`:
 
