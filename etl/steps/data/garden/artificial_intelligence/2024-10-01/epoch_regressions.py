@@ -104,10 +104,10 @@ def run_regression(tb):
         dl_oom_per_year = dl_fit[1]
         dl_fit_ci = bootstrap(dl_models, metric)
 
-        print(
+        paths.log.info(
             f"Pre Deep Learning Era ({metric}): {10**pre_dl_oom_per_year:.1f}x/year ({10**pre_dl_fit_ci[0]:.1f} to {10**pre_dl_fit_ci[1]:.1f})"
         )
-        print(
+        paths.log.info(
             f"Deep Learning Era ({metric}): {10**dl_oom_per_year:.1f}x/year ({10**dl_fit_ci[0]:.1f} to {10**dl_fit_ci[1]:.1f})"
         )
 
