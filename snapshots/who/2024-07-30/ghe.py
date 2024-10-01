@@ -44,7 +44,7 @@ def main(upload: bool) -> None:
 
 
 def get_causes_list() -> List[str]:
-    url = "https://frontdoor-l4uikgap6gz3m.azurefd.net/DEX_CMS/GHE_FULL?$apply=groupby((DIM_GHECAUSE_TITLE))"
+    url = "https://xmart-api-public.who.int/DEX_CMS/GHE_FULL?$apply=groupby((DIM_GHECAUSE_TITLE))"
     res = requests.get(url)
     assert res.ok
     value_json = json.loads(res.content)["value"]
@@ -91,7 +91,7 @@ def download_cause_data(causes) -> pd.DataFrame:
         for year in years:
             log.info("Downloading...", cause=cause, year=year)
             # Use this url to download data for just the All Ages category and for the both sexes category
-            # url = f"https://frontdoor-l4uikgap6gz3m.azurefd.net/DEX_CMS/GHE_FULL?$filter=DIM_GHECAUSE_TITLE%20eq%20%27{cause}%27%20and%20DIM_SEX_CODE%20eq%20%27BTSX%27and%20DIM_AGEGROUP_CODE%20eq%20%27ALLAges%27&$select=DIM_GHECAUSE_TITLE,DIM_YEAR_CODE,DIM_COUNTRY_CODE,DIM_AGEGROUP_CODE,DIM_SEX_CODE,VAL_DALY_COUNT_NUMERIC,VAL_DALY_RATE100K_NUMERIC,VAL_DEATHS_COUNT_NUMERIC,VAL_DEATHS_RATE100K_NUMERIC,FLAG_LEVEL"
+            # url = f"https://xmart-api-public.who.int/DEX_CMS/GHE_FULL?$filter=DIM_GHECAUSE_TITLE%20eq%20%27{cause}%27%20and%20DIM_SEX_CODE%20eq%20%27BTSX%27and%20DIM_AGEGROUP_CODE%20eq%20%27ALLAges%27&$select=DIM_GHECAUSE_TITLE,DIM_YEAR_CODE,DIM_COUNTRY_CODE,DIM_AGEGROUP_CODE,DIM_SEX_CODE,VAL_DALY_COUNT_NUMERIC,VAL_DALY_RATE100K_NUMERIC,VAL_DEATHS_COUNT_NUMERIC,VAL_DEATHS_RATE100K_NUMERIC,FLAG_LEVEL"
             # Use this url to download data for all age groups and sexes
             select_cols = [
                 "DIM_GHECAUSE_TITLE",
@@ -105,7 +105,7 @@ def download_cause_data(causes) -> pd.DataFrame:
                 "VAL_DTHS_RATE100K_NUMERIC",
                 "FLAG_LEVEL",
             ]
-            url = f"https://frontdoor-l4uikgap6gz3m.azurefd.net/DEX_CMS/GHE_FULL?$filter=DIM_GHECAUSE_TITLE%20eq%20%27{cause}%27%20and%20DIM_YEAR_CODE%20eq%20{year}&$select={','.join(select_cols)}"
+            url = f"https://xmart-api-public.who.int/DEX_CMS/GHE_FULL?$filter=DIM_GHECAUSE_TITLE%20eq%20%27{cause}%27%20and%20DIM_YEAR_CODE%20eq%20{year}&$select={','.join(select_cols)}"
             df = get_cause_data_with_retry(url)
             all_data.append(df)
     # combine dataframes - repack them to make them smaller e.g. use categories where possible. Reset index necessary to save as feather.
