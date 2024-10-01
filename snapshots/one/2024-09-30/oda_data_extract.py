@@ -33,14 +33,9 @@ PARENT_DIR = Path(__file__).parent
 # Set path where ODA data is downloaded
 set_data_path(path=PARENT_DIR)
 
-# Save dictionaries of available donors and recipients
-AVAILABLE_DONORS = ODAData().available_donors()
-AVAILABLE_RECIPIENTS = ODAData().available_recipients()
-
+# Save dictionaries of groups of donors and recipients
 DONOR_GROUPINGS = donor_groupings()
 RECIPIENT_GROUPINGS = recipient_groupings()
-
-# print(DONOR_GROUPINGS)
 
 # Define parameters in ODAData class
 # Define years (remember ranges do not include the last element)
@@ -81,13 +76,25 @@ COLUMNS_TO_REMAP = {
     "channel": ["channel_code", "channel_name", "parent_channel_code", "channel_reported_name"],
 }
 
+# Define columns to extract in the csv
+FINAL_COLUMNS = [
+    "year",
+    "donor_name",
+    "recipient_name",
+    "sector_name",
+    "purpose_name",
+    "channel_name",
+    "channel_reported_name",
+    "value",
+]
+
 
 def main() -> None:
     df = get_the_data(columns_to_keep=COLUMNS_TO_KEEP)
 
-    df = aggregate_data(df=df)
+    df = rename_categories(df=df, columns_to_remap=COLUMNS_TO_REMAP, columns_to_keep=FINAL_COLUMNS)
 
-    df = rename_categories(df=df, columns_to_remap=COLUMNS_TO_REMAP)
+    df = aggregate_data(df=df, columns_to_keep=FINAL_COLUMNS)
 
     # Extract data as csv
     df.to_csv(f"{PARENT_DIR}/oda_by_sectors_oda.csv", index=False)
@@ -107,9 +114,6 @@ def get_the_data(columns_to_keep: List[str]) -> pd.DataFrame:
     # Get a DataFrame with all the data.
     df = oda.get_data("all")
 
-    for col in df.columns:
-        print(col)
-
     # Finally, group the DataFrame rows by year, currency, prices and indicator
     df = (
         df.groupby(
@@ -124,18 +128,100 @@ def get_the_data(columns_to_keep: List[str]) -> pd.DataFrame:
     return df
 
 
-def aggregate_data(df: pd.DataFrame) -> pd.DataFrame:
+def aggregate_data(df: pd.DataFrame, columns_to_keep: List[str]) -> pd.DataFrame:
     """
     Create aggregations from definitions of donor and recipient aggregations.
     """
-    # Create regional aggregations for this data
-    df_donors = df.copy()
-    df_recipients = df.copy()
+    df_donors_list = aggregate_donors(df=df, columns_to_keep=columns_to_keep)
+    df_recipients_list = aggregate_recipients(df=df, columns_to_keep=columns_to_keep)
+
+    df_aggregates = pd.concat(df_donors_list + df_recipients_list, ignore_index=True)
+
+    df = pd.concat([df, df_aggregates], ignore_index=True)
 
     return df
 
 
-def rename_categories(df: pd.DataFrame, columns_to_remap: Dict[str, List]) -> pd.DataFrame:
+def aggregate_donors(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.DataFrame]:
+    """
+    Create regional aggregations for donors.
+    """
+
+    df_donors = df.copy()
+
+    df_donors_list = []
+
+    for donor_group, donor_composition in DONOR_GROUPINGS.items():
+        df_donors_by_group = df_donors[df_donors["donor_code"].isin(donor_composition.keys())].copy()
+
+        df_donors_by_group = (
+            df_donors_by_group.groupby(
+                [col for col in columns_to_keep if col not in ["donor_name", "value"]],
+                observed=True,
+                dropna=False,
+            )["value"]
+            .sum()
+            .reset_index(drop=False)
+        )
+
+        df_donors_by_group["donor_name"] = donor_group
+
+        df_donors_list.append(df_donors_by_group)
+
+        for recipient_group, recipient_composition in RECIPIENT_GROUPINGS.items():
+            df_donors_by_recipient_group = df_donors_by_group[
+                df_donors_by_group["recipient_code"].isin(recipient_composition.keys())
+            ].copy()
+
+            df_donors_by_recipient_group = (
+                df_donors_by_recipient_group.groupby(
+                    [col for col in columns_to_keep if col not in ["recipient_name", "value"]],
+                    observed=True,
+                    dropna=False,
+                )["value"]
+                .sum()
+                .reset_index(drop=False)
+            )
+
+            df_donors_by_recipient_group["recipient_name"] = recipient_group
+
+            df_donors_list.append(df_donors_by_recipient_group)
+
+    return df_donors_list
+
+
+def aggregate_recipients(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.DataFrame]:
+    """
+    Create regional aggregations for recipients.
+    """
+
+    df_recipients = df.copy()
+
+    df_recipients_list = []
+
+    for recipient_group, recipient_composition in RECIPIENT_GROUPINGS.items():
+        df_recipients_by_group = df_recipients[
+            df_recipients["recipient_code"].isin(recipient_composition.keys())
+        ].copy()
+
+        df_recipients_by_group = (
+            df_recipients_by_group.groupby(
+                [col for col in columns_to_keep if col not in ["recipient_name", "value"]],
+                observed=True,
+                dropna=False,
+            )["value"]
+            .sum()
+            .reset_index(drop=False)
+        )
+
+        df_recipients_by_group["recipient_name"] = recipient_group
+
+        df_recipients_list.append(df_recipients_by_group)
+
+    return df_recipients_list
+
+
+def rename_categories(df: pd.DataFrame, columns_to_remap: Dict[str, List], columns_to_keep: List[str]) -> pd.DataFrame:
     """
     Rename all the categories from codes to names by using crs_codes.json
     """
@@ -149,9 +235,6 @@ def rename_categories(df: pd.DataFrame, columns_to_remap: Dict[str, List]) -> pd
 
         # Merge the dataframes
         df = pd.merge(df, df_crs_extract, how="left", on=columns[0])
-
-    for col in df_crs_full.columns:
-        print(col)
 
     return df
 
