@@ -108,7 +108,7 @@ def run_regression(tb):
         pre_dl_line = 10 ** (pre_dl_fit[0] + pre_dl_year_grid * pre_dl_fit[1])
         dl_line = 10 ** (dl_fit[0] + dl_year_grid * dl_fit[1])
 
-        # Create new DataFrames for pre-DL and DL eras with only necessary columns
+        # Create new DataFrames for pre-deep learning and deep learning era trends with only necessary columns
         pre_dl_df = pd.DataFrame(
             {
                 "days_since_1949": [
@@ -131,7 +131,7 @@ def run_regression(tb):
             }
         )
 
-        # Combine the pre-DL and DL DataFrames
+        # Combine the pre-deep learning and deep learning era DataFrames
         df_combined = pd.concat([pre_dl_df, dl_df], ignore_index=True)
         new_tables.append(df_combined)
 
