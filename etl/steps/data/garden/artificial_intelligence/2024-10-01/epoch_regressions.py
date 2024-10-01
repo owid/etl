@@ -133,6 +133,10 @@ def run_regression(tb):
     for column in new_columns:
         # Add metadata to the publication date column
         tb[column].metadata.origins = tb["domain"].metadata.origins
+    # Rename systems in the column 'system'
+    tb["system"] = tb.apply(
+        lambda row: "Pre-Deep Learning era" if row["frac_year"] < DL_ERA_START else "Deep Learning era", axis=1
+    )
 
     tb = tb.drop("frac_year", axis=1)
 
