@@ -2068,6 +2068,8 @@
 - code: WHO_WPAC
   name: "Western Pacific (WHO)"
   region_type: "aggregate"
+  aliases:
+    - "WPRO"
   defined_by: who
   members:
     - "AUS"
@@ -2104,10 +2106,6 @@
     - "TUV"
     - "VUT"
     - "VNM"
-
-
-# World Bank regions  aliases:
-    - "WPRO"
 
 - code: WB_NA
   name: "North America (WB)"
