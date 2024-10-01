@@ -64,6 +64,7 @@ dependencies = [
     "owid-datautils",
     "owid-repack",
     "walden",
+    "scikit-learn>=1.5.2",
 ]
 
 [tool.uv.sources]
