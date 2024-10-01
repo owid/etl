@@ -26,6 +26,27 @@ dimensions:
         description: null
 
 views:
+  # The Economist + WHO
+  - dimensions:
+      model: all
+    indicators:
+      y:
+        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths"
+        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_top"
+        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_bot"
+        - "{definitions.table_who}#cumul_excess_mean"
+        - "{definitions.table_who}#cumul_excess_high"
+        - "{definitions.table_who}#cumul_excess_low"
+        - "{definitions.indicator_confirmed}"
+
+    config:
+      title: "Estimated cumulative excess deaths during COVID-19"
+      subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
+      originUrl: ourworldindata.org/coronavirus
+      hideAnnotationFieldsInTitle:
+        time: true
+
+
   # The Economist
   - dimensions:
       model: econ
@@ -34,6 +55,23 @@ views:
         - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths"
         - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_top"
         - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_bot"
+        - "{definitions.indicator_confirmed}"
+
+    config:
+      title: "Estimated cumulative excess deaths during COVID-19"
+      subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
+      originUrl: ourworldindata.org/coronavirus
+      hideAnnotationFieldsInTitle:
+        time: true
+
+  # WHO
+  - dimensions:
+      model: who
+    indicators:
+      y:
+        - "{definitions.table_who}#cumul_excess_mean"
+        - "{definitions.table_who}#cumul_excess_high"
+        - "{definitions.table_who}#cumul_excess_low"
         - "{definitions.indicator_confirmed}"
 
     config:
