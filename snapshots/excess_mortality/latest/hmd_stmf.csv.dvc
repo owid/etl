@@ -33,6 +33,6 @@ meta:
     name: Creative Commons BY 4.0
     url: https://www.mortality.org/Data/UserAgreement
 outs:
-  - md5: e6d01f5dbb80c02d352095454466f22e
-    size: 21097231
+  - md5: 63069a522999934ab7a3285bfba1c59e
+    size: 21148259
     path: hmd_stmf.csv
