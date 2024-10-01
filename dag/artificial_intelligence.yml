@@ -5,8 +5,8 @@ steps:
     - snapshot://artificial_intelligence/2024-10-01/epoch.csv
   data://garden/artificial_intelligence/2024-10-01/epoch:
     - data://meadow/artificial_intelligence/2024-10-01/epoch
-  data://grapher/artificial_intelligence/2024-10-01/epoch:
-    - data://garden/artificial_intelligence/2024-10-01/epoch
+  #data://grapher/artificial_intelligence/2024-10-01/epoch:
+  #  - data://garden/artificial_intelligence/2024-10-01/epoch
 
   # EPOCH aggregates by domain
   data://garden/artificial_intelligence/2024-09-09/epoch_aggregates_domain:

@@ -106,13 +106,21 @@ steps:
   data://grapher/un/2023-08-16/un_sdg:
     - data://garden/un/2023-08-16/un_sdg
 
-  # IHME SDG
+  # IHME SDG - to archive
   data-private://meadow/ihme/2023-05-09/sdg:
     - snapshot-private://ihme/2023-05-05/sdg.csv
   data-private://garden/ihme/2023-05-09/sdg:
     - data-private://meadow/ihme/2023-05-09/sdg
   data-private://grapher/ihme/2023-05-09/sdg:
     - data-private://garden/ihme/2023-05-09/sdg
+
+  # IHME SDG - 2024
+  data-private://meadow/ihme/2024-10-01/sdg:
+    - snapshot-private://ihme/2024-10-01/sdg.csv
+  data-private://garden/ihme/2024-10-01/sdg:
+    - data-private://meadow/ihme/2024-10-01/sdg
+  data-private://grapher/ihme/2024-10-01/sdg:
+    - data-private://garden/ihme/2024-10-01/sdg
 
   # Internet
   data://garden/technology/2022/internet:
