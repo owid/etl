@@ -1,0 +1,36 @@
+definitions:
+   common:
+    presentation:
+      attribution_short: UN WPP
+      # title_variant: "{definitions.global.dimensions}"
+      grapher_config:
+        originUrl: "https://ourworldindata.org/population-growth"
+
+
+# this metadata file is not used in garden step, but in grapher step
+tables:
+  births_by_age:
+    variables:
+      births:
+        title: Number of births by mothers in their <<decadal_age.lower()>>
+        unit: births
+        description_processing: Values calculated by Our World in Data based on UN WPP data.
+        display:
+          name: <<decadal_age.lower()>>
+        presentation:
+          title_public: |-
+            Births by mothers in their <<decadal_age.lower()>>
+          grapher_config:
+            note: "Values as of 1 July of the indicated year."
+      share:
+        title: Share of births by mothers in their <<decadal_age.lower()>>
+        unit: "%"
+        short_unit: "%"
+        description_processing: Values calculated by Our World in Data based on UN WPP data.
+        display:
+          name: <<decadal_age.lower()>>
+        presentation:
+          title_public: |-
+            Share of births by mothers in their <<decadal_age.lower()>>
+          grapher_config:
+            note: "Values as of 1 July of the indicated year."
