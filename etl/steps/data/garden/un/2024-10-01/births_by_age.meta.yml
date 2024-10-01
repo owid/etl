@@ -2,7 +2,6 @@ definitions:
    common:
     presentation:
       attribution_short: UN WPP
-      # title_variant: "{definitions.global.dimensions}"
       grapher_config:
         originUrl: "https://ourworldindata.org/population-growth"
 
@@ -16,7 +15,7 @@ tables:
         unit: births
         description_processing: Values calculated by Our World in Data based on UN WPP data.
         display:
-          name: <<decadal_age.lower()>>
+          name: <<decadal_age>>
         presentation:
           title_public: |-
             Births by mothers in their <<decadal_age.lower()>>
@@ -28,7 +27,7 @@ tables:
         short_unit: "%"
         description_processing: Values calculated by Our World in Data based on UN WPP data.
         display:
-          name: <<decadal_age.lower()>>
+          name: <<decadal_age>>
         presentation:
           title_public: |-
             Share of births by mothers in their <<decadal_age.lower()>>

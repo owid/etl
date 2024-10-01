@@ -31,13 +31,13 @@ def run(dest_dir: str) -> None:
     dict_age = {
         "10-14": "Teens",
         "15-19": "Teens",
-        "20-24": "20s",
-        "25-29": "20s",
-        "30-34": "30s",
-        "35-39": "30s",
-        "40-44": "40s",
-        "45-49": "40s",
-        "50-54": "50s",
+        "20-24": "Twenties",
+        "25-29": "Twenties",
+        "30-34": "Thirties",
+        "35-39": "Thirties",
+        "40-44": "Forties",
+        "45-49": "Forties",
+        "50-54": "Fifties",
     }
     tb["decadal_age"] = tb["age"].map(dict_age)
     tb = tb.groupby(["country", "year", "decadal_age"])["births"].sum().reset_index()
