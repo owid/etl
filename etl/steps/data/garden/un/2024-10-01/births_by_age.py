@@ -29,8 +29,8 @@ def run(dest_dir: str) -> None:
     tb = tb[~msk]
     # Move each age-group to a decade
     dict_age = {
-        "10-14": "Teens",
-        "15-19": "Teens",
+        "10-14": "Teenage",
+        "15-19": "Teenage",
         "20-24": "Twenties",
         "25-29": "Twenties",
         "30-34": "Thirties",
