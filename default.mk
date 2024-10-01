@@ -41,7 +41,7 @@ install-uv-default:
 		echo '==> Using Python version $(PYTHON_VERSION)'; \
 		export UV_PYTHON=$(PYTHON_VERSION); \
 	fi
-	$(HOME)/.cargo/bin/uv sync --all-extras
+	uv sync --all-extras
 
 check-default:
 	@echo '==> Lint & Format & Typecheck changed files'
