@@ -20,9 +20,8 @@ Steps to extract the data:
 """
 
 
-import json
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 import pandas as pd
 from oda_data import ODAData, set_data_path
@@ -73,11 +72,22 @@ COLUMNS_TO_KEEP = [
     "value",
 ]
 
+# Define columns with codes and names to remap
+COLUMNS_TO_REMAP = {
+    "donor": ["donor_code", "donor_name"],
+    "recipient": ["recipient_code", "recipient_name"],
+    "sector": ["sector_code", "sector_name"],
+    "purpose": ["purpose_code", "purpose_name"],
+    "channel": ["channel_code", "channel_name", "parent_channel_code", "channel_reported_name"],
+}
+
 
 def main() -> None:
     df = get_the_data(columns_to_keep=COLUMNS_TO_KEEP)
 
-    df = aggregate_data(df)
+    df = aggregate_data(df=df)
+
+    df = rename_categories(df=df, columns_to_remap=COLUMNS_TO_REMAP)
 
     # Extract data as csv
     df.to_csv(f"{PARENT_DIR}/oda_by_sectors_oda.csv", index=False)
@@ -120,19 +130,30 @@ def aggregate_data(df: pd.DataFrame) -> pd.DataFrame:
     """
     # Create regional aggregations for this data
     df_donors = df.copy()
-    df_recipients = df.copy
+    df_recipients = df.copy()
 
     return df
 
 
-def rename_categories(df: pd.DataFrame) -> pd.DataFrame:
+def rename_categories(df: pd.DataFrame, columns_to_remap: Dict[str, List]) -> pd.DataFrame:
     """
     Rename all the categories from codes to names by using crs_codes.json
     """
 
-    # Open the crs_codes.json file generated from the extraction process
-    with open(PARENT_DIR / "crs_codes.json", "r") as f:
-        CRS_CODES = json.load(f)
+    # Open the CRS file to obtain the codes and names
+    df_crs_full = pd.read_parquet(f"{PARENT_DIR}/fullCRS.parquet")
+
+    for concept, columns in columns_to_remap.items():
+        # Keep only the columns we need and drop duplicates
+        df_crs_extract = df_crs_full[columns].drop_duplicates().copy()
+
+        # Merge the dataframes
+        df = pd.merge(df, df_crs_extract, how="left", on=columns[0])
+
+    for col in df_crs_full.columns:
+        print(col)
+
+    return df
 
 
 if __name__ == "__main__":
