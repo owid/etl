@@ -16,6 +16,7 @@ tables:
         description_processing: Values calculated by Our World in Data based on UN WPP data.
         display:
           name: <<decadal_age>>
+          numDecimalPlaces: 0
         presentation:
           title_public: |-
             Births by mothers in their <<decadal_age.lower()>>
@@ -28,6 +29,7 @@ tables:
         description_processing: Values calculated by Our World in Data based on UN WPP data.
         display:
           name: <<decadal_age>>
+          numDecimalPlaces: 1
         presentation:
           title_public: |-
             Share of births by mothers in their <<decadal_age.lower()>>
