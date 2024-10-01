@@ -5,7 +5,7 @@ steps:
     - snapshot://artificial_intelligence/2024-10-01/epoch.csv
   data://garden/artificial_intelligence/2024-10-01/epoch:
     - data://meadow/artificial_intelligence/2024-10-01/epoch
-  data://grapher/artificial_intelligence/22024-10-01/epoch:
+  data://grapher/artificial_intelligence/2024-10-01/epoch:
     - data://garden/artificial_intelligence/2024-10-01/epoch
 
   # Main EPOCH dataset regression lines
