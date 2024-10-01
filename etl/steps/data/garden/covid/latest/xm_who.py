@@ -20,10 +20,22 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Harmonize countries.
     tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+        df=tb,
+        countries_file=paths.country_mapping_path,
     )
-    tb = tb.format(["country", "year"])
+
+    # Drop unused columns
+    tb = tb.drop(
+        columns=[
+            "iso3",
+            "type",
+        ]
+    )
+
+    # Harmonize
+    tb = tb.format(["country", "date"])
 
     #
     # Save outputs.
