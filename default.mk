@@ -30,9 +30,8 @@ test-default: check-formatting check-linting check-typing unittest
 
 install-uv-default:
 	@if ! command -v uv >/dev/null 2>&1; then \
-		echo '==> UV not found. Installing...'; \
-		echo $$HOME; \
-		curl -LsSf https://astral.sh/uv/install.sh | sh && . $$HOME/.cargo/env; \
+		echo '==> UV not found, please run "brew install uv"'; \
+		exit 1; \
 	fi
 
 .venv-default: install-uv .sanity-check
@@ -41,7 +40,7 @@ install-uv-default:
 		echo '==> Using Python version $(PYTHON_VERSION)'; \
 		export UV_PYTHON=$(PYTHON_VERSION); \
 	fi
-	$(HOME)/.cargo/bin/uv sync --all-extras
+	uv sync --all-extras
 
 check-default:
 	@echo '==> Lint & Format & Typecheck changed files'
