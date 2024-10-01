@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = ds_garden["births"]
+    tb = ds_garden["births_by_age"]
     #
     # Save outputs.
     #
