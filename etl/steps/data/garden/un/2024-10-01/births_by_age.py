@@ -1,15 +1,5 @@
-from typing import Dict, List, Optional, Tuple, cast
-
-import numpy as np
 import owid.catalog.processing as pr
 
-# from deaths import process as process_deaths
-# from demographics import process as process_demographics
-# from dep_ratio import process as process_depratio
-# from fertility import process as process_fertility
-from owid.catalog import Table
-
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
