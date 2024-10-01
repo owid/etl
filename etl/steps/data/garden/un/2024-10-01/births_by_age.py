@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
     tb = pr.merge(tb, tb_all, on=["country", "year"])
     tb["share"] = (tb["births"] / tb["all_births"]) * 100
     tb = tb.drop(columns=["all_births"])
-    tb = tb.format(["country", "year", "decadal_age"])
+    tb = tb.format(["country", "year", "decadal_age"], short_name=paths.short_name)
     ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
     # Save changes in the new garden dataset.
     ds_garden.save()
