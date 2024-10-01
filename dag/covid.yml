@@ -250,6 +250,14 @@ steps:
   data-private://grapher/excess_mortality/latest/excess_mortality_economist:
     - data://garden/excess_mortality/latest/excess_mortality_economist
 
+  # Excess Mortality (WHO)
+  data://meadow/covid/latest/xm_who:
+    - snapshot://covid/latest/xm_who.zip
+  data://garden/covid/latest/xm_who:
+    - data://meadow/covid/latest/xm_who
+  data://grapher/covid/latest/xm_who:
+    - data://garden/covid/latest/xm_who
+
   # COVAX
   data://meadow/covid/latest/covax:
     - snapshot://covid/latest/covax.csv
