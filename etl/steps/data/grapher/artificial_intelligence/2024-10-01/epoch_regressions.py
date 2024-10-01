@@ -14,11 +14,11 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("epoch")
+    ds_garden = paths.load_dataset("epoch_regressions")
 
     # Read table from garden dataset.
     tb = ds_garden["epoch"]
-    tb = tb.rename_index(columns={"system": "country", "days_since_1949": "year"})
+    tb = tb.rename_index_names({"system": "country", "days_since_1949": "year"})
     #
     # Save outputs.
     #
