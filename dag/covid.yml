@@ -291,3 +291,4 @@ steps:
     - grapher://grapher/covid/latest/google_mobility
     - grapher://grapher/excess_mortality/latest/excess_mortality
     - grapher://grapher/covid/latest/covax
+    - grapher://grapher/covid/latest/infections_model
