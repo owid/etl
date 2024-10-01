@@ -7,8 +7,6 @@ build:
   commands:
     - git submodule init
     - git submodule update
-    - pip install -U uv
-    - uv install
     - uv run mkdocs build
     - mkdir -p _readthedocs
     - cp -r site/ _readthedocs/html/
