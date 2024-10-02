@@ -147,9 +147,9 @@ tables:
         description_key:
           - Stunting is when a child is significantly shorter than the average for their age.
           - Stunted growth is a consequence of poor nutrition and/or repeated infection.
+          - These values are survey estimates which come with levels of uncertainty due to both sampling error and non-sampling error (e.g., measurement technical error, recording error etc.,). None of the two sources of errors have been fully taken into account for deriving estimates neither at country nor at regional or worldwide levels.
         description_from_producer: |-
           Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two standard deviations below the median for the international reference population ages 0-59 months. For children up to two years old height is measured by recumbent length. For older children height is measured by stature while standing. The data are based on the WHO's new child growth standards released in 2006.
-
 
           [Text from World Bank World Development Indicators [metadata glossary](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SH.STA.STNT.ZS)]
         presentation:
@@ -181,7 +181,99 @@ tables:
               changeInPrefix: true
             hasMapTab: true
             tab: map
-            variantName: United Nations
+            variantName: UNICEF, World Health Organization and World Bank
+            originUrl: https://ourworldindata.org/hunger-and-undernourishment
+            yAxis:
+              min: 0
+            map:
+              timeTolerance: 5
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericMinValue: 0
+                customNumericValues:
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericColors:
+                  - null
+                  - null
+                legendDescription: Prevalence of stunting (% of children under 5)
+            selectedEntityNames:
+              - China
+              - Colombia
+              - Kenya
+              - Peru
+              - Bangladesh
+              - United States
+            relatedQuestions:
+              - url: >-
+                  https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
+                text: FAQs on this data
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+      sh_sta_stnt_me_zs:
+        sources: []
+        origins:
+          - *wdi_origin
+        title: Share of children who are stunted
+        unit: '% of children under 5'
+        short_unit: '%'
+        description_short: |-
+          The share of children younger than five years old whose growth is stunted.
+        description_key:
+          - Stunting is when a child is significantly shorter than the average for their age.
+          - Stunted growth is a consequence of poor nutrition and/or repeated infection.
+          - These values are model estimates which account for sampling error around survey estimates and the data producer has made efforts to ensure the data is comparable over countries and time.
+        description_from_producer: |-
+          Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two standard deviations below the median for the international reference population ages 0-59 months. For children up to two years old height is measured by recumbent length. For older children height is measured by stature while standing. The data are based on the WHO's new child growth standards released in 2006.
+
+          [Text from World Bank World Development Indicators [metadata glossary](https://databank.worldbank.org/metadataglossary/world-development-indicators/series/SH.STA.STNT.ZS)]
+        presentation:
+          title_public: Share of children who are stunted
+          # title_variant: UNICEF/WHO
+          attribution: UNICEF; World Health Organization; World Bank
+          attribution_short: UNICEF/WHO (via World Bank)
+          topic_tags:
+            - Hunger & Undernourishment
+            - Micronutrient Deficiency
+          faqs:
+            - fragment_id: stunting-definition
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-measurement
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-causes
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Malnutrition: Share of children who are stunted'
+            subtitle: >-
+              The share of children younger than five years old that are defined as stunted.
+              [Stunting](#dod:stunting) is when a child is significantly shorter than the
+              average for their age. It is a consequence of poor nutrition and/or repeated
+              infection.
+            sourceDesc: UNICEF, World Health Organization and World Bank; modeled estimates
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hasMapTab: true
+            tab: map
+            variantName: UNICEF, World Health Organization and World Bank
             originUrl: https://ourworldindata.org/hunger-and-undernourishment
             yAxis:
               min: 0
