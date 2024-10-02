@@ -56,6 +56,8 @@ steps:
     - data://garden/geography/2023-11-28/nat_earth_110
     - data://meadow/war/2024-08-26/ucdp
     - data://meadow/war/2024-10-02/ucdp_ced
+  data://grapher/war/2024-10-02/ucdp_monthly:
+    - data://garden/war/2024-10-02/ucdp_monthly
 
   # PRIO v3.1
   data://meadow/war/2023-09-21/prio_v31:
