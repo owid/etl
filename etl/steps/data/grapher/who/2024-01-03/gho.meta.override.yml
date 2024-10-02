@@ -3,3 +3,89 @@ tables:
     variables:
       prevalence_of_overweight_among_adults__bmi__gt__25__age_standardized_estimate__pct:
         title: Share of adults who are overweight (age-standardized)
+  stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates:
+    variables:
+      stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates:
+        title: Share of children who are stunted (modeled estimates)
+        unit: '% of children under 5'
+        short_unit: '%'
+        description_short: |-
+          The share of children younger than five years old whose growth is stunted.
+        description_key:
+          - Stunting is when a child is significantly shorter than the average for their age.
+          - Stunted growth is a consequence of poor nutrition and/or repeated infection.
+          - These values are model estimates which account for sampling error around survey estimates and the data producer has made efforts to ensure the data is comparable over countries and time.
+        presentation:
+          title_public: Share of children who are stunted
+          attribution: UNICEF; World Health Organization; World Bank
+          attribution_short: UNICEF/WHO
+          topic_tags:
+            - Hunger & Undernourishment
+            - Micronutrient Deficiency
+          faqs:
+            - fragment_id: stunting-definition
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-measurement
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+            - fragment_id: stunting-causes
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: 'Malnutrition: Share of children who are stunted'
+            subtitle: >-
+              The share of children younger than five years old that are defined as stunted.
+              [Stunting](#dod:stunting) is when a child is significantly shorter than the
+              average for their age. It is a consequence of poor nutrition and/or repeated
+              infection.
+            sourceDesc: UNICEF, World Health Organization and World Bank; modeled estimates
+            hideAnnotationFieldsInTitle:
+              time: true
+              entity: true
+              changeInPrefix: true
+            hasMapTab: true
+            tab: map
+            variantName: UNICEF, World Health Organization and World Bank
+            originUrl: https://ourworldindata.org/hunger-and-undernourishment
+            yAxis:
+              min: 0
+            map:
+              timeTolerance: 5
+              colorScale:
+                baseColorScheme: YlOrRd
+                binningStrategy: manual
+                customNumericMinValue: 0
+                customNumericValues:
+                  - 10
+                  - 20
+                  - 30
+                  - 40
+                  - 50
+                  - 60
+                  - 70
+                  - 80
+                customNumericLabels:
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                  - ''
+                customNumericColors:
+                  - null
+                  - null
+                legendDescription: Prevalence of stunting (% of children under 5)
+            selectedEntityNames:
+              - China
+              - Colombia
+              - Kenya
+              - Peru
+              - Bangladesh
+              - United States
+            relatedQuestions:
+              - url: >-
+                  https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
+                text: FAQs on this data
+            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
