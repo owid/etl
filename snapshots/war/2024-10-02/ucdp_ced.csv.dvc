@@ -20,7 +20,8 @@ meta:
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
+
 outs:
   - md5: aca92b024e3993a9f19f979a1a7cf03f
     size: 1705265
-    path: ucdp_ced.zip
+    path: ucdp_ced.csv

@@ -27,7 +27,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     help="Upload dataset to Snapshot",
 )
 def main(upload: bool) -> None:
-    snapshot_path = f"war/{SNAPSHOT_VERSION}/ucdp_ced.zip"
+    snapshot_path = f"war/{SNAPSHOT_VERSION}/ucdp_ced.csv"
     snap = Snapshot(snapshot_path)
     snap.download_from_source()
     snap.dvc_add(upload=upload)
