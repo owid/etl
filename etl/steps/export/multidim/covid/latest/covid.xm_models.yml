@@ -21,7 +21,7 @@ dimensions:
       - slug: econ
         name: The Economist
         description: null
-      - slug: econ
+      - slug: econ2
         name: The Economist (per 100k)
         description: null
       - slug: who
@@ -73,8 +73,8 @@ views:
     indicators:
       y:
         - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_per_100k"
-        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_tops_per_100k"
-        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_bots_per_100k"
+        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k"
+        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k"
         - "{definitions.indicator_confirmed}"
 
     config:
