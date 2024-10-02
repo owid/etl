@@ -131,6 +131,8 @@ tables:
           {definitions.value_deaths.title}
         unit: |-
           {definitions.value_deaths.unit}
+        short_unit: |-
+          {definitions.value_deaths.short_unit}
         description_short: |-
           {definitions.value_deaths.description_short}
         description_processing: |-
@@ -152,6 +154,8 @@ tables:
           {definitions.value_dalys.title}
         unit: |-
           {definitions.value_dalys.unit}
+        short_unit: |-
+          {definitions.value_dalys.short_unit}
         description_short: |-
           {definitions.value_dalys.description_short}
         description_key:
