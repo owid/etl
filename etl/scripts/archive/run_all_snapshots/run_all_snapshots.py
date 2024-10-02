@@ -17,7 +17,7 @@ log = get_logger()
 SNAPSHOT_SCRIPTS = sorted(list((BASE_DIR / "snapshots").glob("*/*/*.py")))
 # Kill a subprocess if it takes longer than this many seconds.
 TIMEOUT = 100
-OUTPUT_FILE = BASE_DIR / "etl" / "scripts" / "snapshot_execution_times.json"
+OUTPUT_FILE = BASE_DIR / "etl" / "scripts" / "archive" / "run_all_snapshots" / "snapshot_execution_times.json"
 
 
 def main():
@@ -56,7 +56,7 @@ def main():
 
         try:
             # Try to execute snapshot.
-            _ = subprocess.run(["python", snapshot_script, "--skip-upload"], check=True, timeout=TIMEOUT)
+            _ = subprocess.run(["python", snapshot_script, "--upload"], check=True, timeout=TIMEOUT)
             # Add duration time for successfully executed snapshot.
             duration = time.time() - start_time
             execution_results[snapshot_script_relative] = duration
