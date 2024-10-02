@@ -226,3 +226,5 @@ steps:
     - snapshot://fasttrack/latest/elephant_populations.csv
   data://grapher/fasttrack/latest/pivot_uk_public_spending:
     - snapshot://fasttrack/latest/pivot_uk_public_spending.csv
+  data://grapher/fasttrack/latest/population_immigrants_diff:
+    - snapshot://fasttrack/latest/population_immigrants_diff.csv
