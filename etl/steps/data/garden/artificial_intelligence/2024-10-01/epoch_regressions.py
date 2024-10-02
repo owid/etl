@@ -48,7 +48,7 @@ def run(dest_dir: str) -> None:
 
 
 def fit_exponential(models, metric):
-    """Fit an exponential model to the given metric data."""
+    """Fit an exponential model to the given metric data. Code provided by Epoch AI team."""
     x = models["frac_year"].values.reshape(-1, 1)
     y = models[metric]
 
@@ -101,8 +101,8 @@ def run_regression(tb):
         paths.log.info(f"Deep Learning Era ({metric}): {dl_info}")
 
         # Define the year grids for the periods 1950 to 2010 and 2010 to 2025 with just two points
-        pre_dl_year_grid = np.array([1950, 2010])  # 1950 and 2010
-        dl_year_grid = np.array([2010, 2025])  # 2010 and 2025
+        pre_dl_year_grid = np.array([START_DATE, DL_ERA_START])
+        dl_year_grid = np.array([DL_ERA_START, END_DATE])
 
         # Calculate the lines for each period using the fitted exponential models
         pre_dl_line = 10 ** (pre_dl_fit[0] + pre_dl_year_grid * pre_dl_fit[1])
