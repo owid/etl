@@ -149,7 +149,7 @@ definitions:
 
 tables:
   # PARTICIPANT INDICATORS
-  ucdp_country:
+  ucdp_monthly_country:
     common:
       presentation:
         attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
@@ -204,7 +204,7 @@ tables:
           <%- endif -%>
 
   # LOCATION INDICATORS
-  ucdp_locations:
+  ucdp_monthly_locations:
     common:
       description_processing: |-
         {definitions.all.location_conflicts_method}
@@ -358,7 +358,7 @@ tables:
       #     {definitions.number_deaths_type.description_short_per_capita}
 
   # MAIN INDICATORS
-  ucdp:
+  ucdp_monthly:
     common:
       presentation:
         grapher_config:
