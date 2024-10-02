@@ -36,7 +36,8 @@ tables:
               [Stunting](#dod:stunting) is when a child is significantly shorter than the
               average for their age. It is a consequence of poor nutrition and/or repeated
               infection.
-            sourceDesc: UNICEF, World Health Organization and World Bank; modeled estimates
+            sourceDesc: UNICEF, World Health Organization and World Bank
+            note: These values are model estimates which account for sampling error around survey data.
             hideAnnotationFieldsInTitle:
               time: true
               entity: true
