@@ -231,7 +231,7 @@ tables:
         sources: []
         origins:
           - *wdi_origin
-        title: Share of children who are stunted
+        title: Share of children who are stunted (modeled estimates)
         unit: '% of children under 5'
         short_unit: '%'
         description_short: |-
