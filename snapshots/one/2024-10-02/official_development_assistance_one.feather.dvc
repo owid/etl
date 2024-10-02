@@ -6,9 +6,9 @@ meta:
     title: Official Development Assistance (ODA) - ONE ODA data package
     description: |-
       This package contains key tools used by The ONE Campaign to analyse Official Development Assistance (ODA) data from the OECD DAC databases.
-      
+
       Interacting with the DAC databases can be a complex task. There are many databases, tables, and web interfaces which can be used to get the data you need. This means that getting the right ODA data can require expert knowledge not only of ODA, but also of how the DAC databases and tools are organised.
-      
+
       This package aims to simplify this process and make it easier for users to get the data they need.
     date_published: "2024-07-23"
     title_snapshot: Official Development Assistance (ODA) - ONE ODA data package - Data by sector, purpose and channel
@@ -29,4 +29,7 @@ meta:
       name: OECD Terms & Conditions
       url: https://www.oecd.org/en/about/terms-conditions.html
 
-  
+outs:
+  - md5: 32a33eea88f2f905c61f10b6567a13fa
+    size: 782435042
+    path: official_development_assistance_one.feather

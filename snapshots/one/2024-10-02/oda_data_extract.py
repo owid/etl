@@ -73,7 +73,6 @@ COLUMNS_TO_KEEP = [
     "year",
     "donor_code",
     "recipient_code",
-    "indicator",
     "sector_code",
     "purpose_code",
     "channel_code",
@@ -147,16 +146,17 @@ def get_the_data(columns_to_keep: List[str]) -> pd.DataFrame:
     log.info("Raw data loaded to a dataframe")
 
     # Finally, group the DataFrame rows by year, currency, prices and indicator
+    columns_to_group = [col for col in columns_to_keep if col not in ["value"]]
     df = (
         df.groupby(
-            [col for col in columns_to_keep if col != "value"],
+            columns_to_group,
             observed=True,
             dropna=False,
         )["value"]
         .sum(numeric_only=True)
         .reset_index(drop=False)
     )
-    log.info(f"Data grouped by {[col for col in columns_to_keep if col != 'value']}")
+    log.info(f"Data grouped by {columns_to_group}")
 
     # Export grouped data to csv
     df.to_feather(raw_data_file)
