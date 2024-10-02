@@ -802,6 +802,8 @@ steps:
   data://grapher/oecd/2024-08-21/official_development_assistance:
     - data://garden/oecd/2024-08-21/official_development_assistance
 
+  data://meadow/one/2024-10-02/official_development_assistance_one:
+    - snapshot://one/2024-10-02/official_development_assistance_one.feather
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
