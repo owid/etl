@@ -67,6 +67,13 @@ def update_metadata_from_yaml(
         if "description_key" in meta_dict:
             meta_dict["description_key"] = _flatten(meta_dict["description_key"])
 
+        # set default grapher config schema
+        if "presentation" in meta_dict:
+            if "grapher_config" in meta_dict["presentation"]:
+                meta_dict["presentation"]["grapher_config"][
+                    "$schema"
+                ] = "https://files.ourworldindata.org/schemas/grapher-schema.005.json"
+
         # convert to objects
         tb[v_short_name].metadata = VariableMeta.from_dict(meta_dict)
 
