@@ -92,7 +92,6 @@ class AdminAPI(object):
             json=grapher_config,
         )
         js = self._json_from_response(resp)
-        print(js)
         if not js["success"]:
             raise AdminAPIError({"error": js["error"], "variable_id": variable_id, "grapher_config": grapher_config})
         return js

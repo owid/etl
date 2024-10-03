@@ -1,5 +1,3 @@
-# grapher_config_schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
-
 dataset:
   update_period_days: 365
 
