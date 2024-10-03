@@ -804,6 +804,8 @@ steps:
 
   data://meadow/one/2024-10-02/official_development_assistance_one:
     - snapshot://one/2024-10-02/official_development_assistance_one.feather
+  data://garden/one/2024-10-02/official_development_assistance_one:
+    - data://meadow/one/2024-10-02/official_development_assistance_one
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
