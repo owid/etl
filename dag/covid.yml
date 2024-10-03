@@ -279,3 +279,15 @@ steps:
     - data://meadow/covid/latest/deaths_vax_status
   data://grapher/covid/latest/deaths_vax_status:
     - data://garden/covid/latest/deaths_vax_status
+
+  ######################################
+  # MULTIDIM
+  export://multidim/covid/latest/covid:
+    - grapher://grapher/covid/latest/cases_deaths
+    - grapher://grapher/covid/latest/hospital
+    - grapher://grapher/covid/latest/vaccinations_global
+    - grapher://grapher/covid/latest/vaccinations_manufacturer
+    - grapher://grapher/covid/latest/testing
+    - grapher://grapher/covid/latest/google_mobility
+    - grapher://grapher/excess_mortality/latest/excess_mortality
+    - grapher://grapher/covid/latest/covax

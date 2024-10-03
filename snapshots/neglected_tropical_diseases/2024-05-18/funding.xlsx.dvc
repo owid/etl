@@ -15,12 +15,12 @@ meta:
     date_published: "2023-12-01"
     title_snapshot: G-FINDER
     # Citation
-    producer: Policy Cures Research
+    producer: Impact Global Health
     citation_full: |-
-      Neglected Disease G-FINDER report, The Higher Cost of Lower Funding (2023), Policy Cures Research.
+      Neglected Disease G-FINDER report, The Higher Cost of Lower Funding (2023), Impact Global Health.
 
     # Files
-    url_main: https://gfinderdata.policycuresresearch.org/pages/data-visualisations/allNeglectedDiseases
+    url_main: https://gfinderdata.impactglobalhealth.org/pages/data-visualisations/allNeglectedDiseases
     date_accessed: 2024-05-18
 
     # License

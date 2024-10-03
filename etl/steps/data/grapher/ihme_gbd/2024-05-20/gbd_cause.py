@@ -15,8 +15,6 @@ def run(dest_dir: str) -> None:
     ds_garden.metadata.title = "Global Burden of Disease - Cause - Deaths"
     # Read table from garden dataset.
     tb_deaths = ds_garden["gbd_cause_deaths"]
-    # tb_dalys = ds_garden["gbd_cause_dalys"]
-
     #
     # Process data.
     #

@@ -10,15 +10,15 @@ Snapshots will be stored as:
 Usage:
 * To show available options:
 ```
-poetry run python -m create_new_snapshots -h
+uv run python -m create_new_snapshots -h
 ```
 * To simply check if any of the datasets needs to be updated (without actually creating snapshots):
 ```
-poetry run python -m create_new_snapshots -r
+uv run python -m create_new_snapshots -r
 ```
 * To check for updates and actually create new snapshots:
 ```
-poetry run python -m create_new_snapshots
+uv run python -m create_new_snapshots
 ```
 
 """

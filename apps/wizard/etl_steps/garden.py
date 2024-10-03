@@ -426,7 +426,7 @@ if submitted:
             st.markdown("####  1. Harmonize Country names")
             st.markdown("Run it in your terminal:")
             st.code(
-                f"poetry run etl harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json",
+                f"uv run etl harmonize data/meadow/{form.namespace}/{form.meadow_version}/{form.short_name}/{form.short_name}.feather country etl/steps/data/garden/{form.namespace}/{form.version}/{form.short_name}.countries.json",
                 "shellSession",
             )
             st.markdown("Or run it on Wizard")
@@ -440,7 +440,7 @@ if submitted:
             st.markdown("####  2. Run ETL step")
             st.markdown("After editing the code of your Garden step, run the following command:")
             st.code(
-                f"poetry run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
+                f"uv run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
                 "shellSession",
             )
             # 3/ Optional stuff
@@ -466,13 +466,13 @@ if submitted:
                 with st.container(border=True):
                     st.markdown("Alternitavely you can generate the metadata with the following command:")
                     st.code(
-                        f"poetry run etl metadata-export {st.session_state['garden.dataset_path']}",
+                        f"uv run etl metadata-export {st.session_state['garden.dataset_path']}",
                         "shellSession",
                     )
 
                 st.markdown("then manual edit it and rerun the step again with")
                 st.code(
-                    f"poetry run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
+                    f"uv run etl run data{private_suffix}://garden/{form.namespace}/{form.version}/{form.short_name} {'--private' if form.is_private else ''}",
                     "shellSession",
                 )
 

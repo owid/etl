@@ -1006,9 +1006,19 @@ class Variable(Base):
     metadataChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
 
     def upsert(self, session: Session) -> "Variable":
+        assert self.catalogPath
         assert self.shortName
 
         cls = self.__class__
+
+        # NOTE: matching on catalogPath would be better, but we still have
+        # index `variables.unique_short_name_per_dataset` in MySQL which
+        # doesn't let us do that
+        # q = select(cls).where(
+        #     cls.catalogPath == self.catalogPath,
+        #     cls.datasetId == self.datasetId,
+        # )
+        # ds = session.scalars(q).one_or_none()
 
         # try matching on shortName first
         q = select(cls).where(
@@ -1105,13 +1115,11 @@ class Variable(Base):
         timespan: str,
         dataset_id: int,
         source_id: Optional[int],
-        catalog_path: Optional[str],
+        catalog_path: str,
         dimensions: Optional[Dimensions],
     ) -> "Variable":
         # `unit` can be an empty string, but cannot be null
         assert metadata.unit is not None
-        if catalog_path:
-            assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
 
         if metadata.presentation:
             presentation_dict = metadata.presentation.to_dict()  # type: ignore
@@ -1165,6 +1173,12 @@ class Variable(Base):
     def load_from_catalog_path(cls, session: Session, catalog_path: str) -> "Variable":
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
         return session.scalars(select(cls).where(cls.catalogPath == catalog_path)).one()
+
+    @classmethod
+    def catalog_paths_to_variable_ids(cls, session: Session, catalog_paths: List[str]) -> Dict[str, int]:
+        """Return a mapping from catalog paths to variable IDs."""
+        query = select(Variable).where(Variable.catalogPath.in_(catalog_paths))
+        return {var.catalogPath: var.id for var in session.scalars(query).all()}  # type: ignore
 
     def infer_type(self, values: pd.Series) -> VARIABLE_TYPE:
         """Set type and sort fields based on indicator values."""

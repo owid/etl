@@ -58,7 +58,7 @@ def run_steps() -> None:
     """
     # env_path = paths.BASE_DIR / ".env.X"
     # subprocess.run(f"export $(cat {env_path} | xargs)", shell=True)
-    # subprocess.run(["poetry", "run", "etl", DUMMY, "--grapher"], env=dict(**os.environ, DEBUG="1"))
+    # subprocess.run(["uv", "run", "etl", DUMMY, "--grapher"], env=dict(**os.environ, DEBUG="1"))
     # setting DEBUG to true runs much faster
     config.DEBUG = True
     etl_main([DUMMY], grapher=True, workers=1)

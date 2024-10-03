@@ -18,7 +18,7 @@ The markdown files powering the documentation are in the same repository, under 
 First, make sure that you have all the development libraries installed
 
 ```bash
-poetry install --with dev
+make .venv
 ```
 
 ### Preview the documentation

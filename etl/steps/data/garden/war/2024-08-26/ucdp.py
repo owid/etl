@@ -79,13 +79,13 @@ def run(dest_dir: str) -> None:
 
     # Read table from GW codes
     ds_gw = paths.load_dataset("gleditsch")
-    tb_regions = ds_gw["gleditsch_regions"].reset_index()
+    tb_regions = ds_gw.read_table("gleditsch_regions")
     tb_codes = ds_gw["gleditsch_countries"]
 
     # Load maps table
     short_name = "nat_earth_110"
     ds_maps = paths.load_dataset(short_name)
-    tb_maps = ds_maps[short_name].reset_index()
+    tb_maps = ds_maps.read_table(short_name)
 
     # Load population
     ds_population = paths.load_dataset("population")
@@ -98,7 +98,7 @@ def run(dest_dir: str) -> None:
 
     # Load relevant tables
     tb_ged = (
-        ds_meadow["ucdp_ged"]
+        ds_meadow.read_table("ucdp_ged")
         .reset_index()
         .astype(
             {
@@ -113,7 +113,7 @@ def run(dest_dir: str) -> None:
         )
     )
     tb_conflict = (
-        ds_meadow["ucdp_battle_related_conflict"]
+        ds_meadow.read_table("ucdp_battle_related_conflict")
         .reset_index()
         .astype(
             {
@@ -123,11 +123,11 @@ def run(dest_dir: str) -> None:
             }
         )
     )
-    tb_prio = ds_meadow["ucdp_prio_armed_conflict"].reset_index()
+    tb_prio = ds_meadow.read_table("ucdp_prio_armed_conflict")
 
     # Keep only active conflicts
     paths.log.info("keep active conflicts")
-    tb_ged = tb_ged[tb_ged["active_year"] == 1]
+    tb_ged = tb_ged.loc[tb_ged["active_year"] == 1]
 
     # Change region named "Asia" to "Asia and Oceania" (in GED)
     tb_ged["region"] = tb_ged["region"].cat.rename_categories({"Asia": "Asia and Oceania"})
@@ -200,6 +200,9 @@ def run(dest_dir: str) -> None:
             "number_deaths_ongoing_conflicts",
             "number_deaths_ongoing_conflicts_high",
             "number_deaths_ongoing_conflicts_low",
+            # "number_deaths_ongoing_conflicts_civilians",
+            # "number_deaths_ongoing_conflicts_unknown",
+            # "number_deaths_ongoing_conflicts_combatants",
         ],
     )
 
@@ -430,45 +433,81 @@ def estimate_metrics(tb: Table) -> Table:
 
 
 def _get_ongoing_metrics(tb: Table) -> Table:
+    # Estimate combatant deaths per conflict
+    tb_ = tb.copy()
+    tb_["deaths_combatants"] = tb_["deaths_a"] + tb_["deaths_b"]
+
+    # Define aggregations
+    column_props = {
+        # Deaths (estimates)
+        "best": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts",
+        },
+        "high": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts_high",
+        },
+        "low": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts_low",
+        },
+        # Deaths by type
+        "deaths_civilians": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts_civilians",
+        },
+        "deaths_unknown": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts_unknown",
+        },
+        "deaths_combatants": {
+            "f": "sum",
+            "rename": "number_deaths_ongoing_conflicts_combatants",
+        },
+        # Number of conflicts
+        "conflict_new_id": {
+            "f": "nunique",
+            "rename": "number_ongoing_conflicts",
+        },
+    }
+    col_funcs = {k: v["f"] for k, v in column_props.items()}
+    col_renames = {k: v["rename"] for k, v in column_props.items()}
     # For each region
     columns_idx = ["year", "region", "conflict_type"]
-    tb_ongoing = (
-        tb.groupby(columns_idx)
-        .agg({"best": "sum", "high": "sum", "low": "sum", "conflict_new_id": "nunique"})
-        .reset_index()
-    )
-    tb_ongoing.columns = columns_idx + [
-        "number_deaths_ongoing_conflicts",
-        "number_deaths_ongoing_conflicts_high",
-        "number_deaths_ongoing_conflicts_low",
-        "number_ongoing_conflicts",
-    ]
+    tb_ongoing = tb_.groupby(columns_idx, as_index=False).agg(col_funcs)
+    tb_ongoing = tb_ongoing.rename(columns={n: n for n in columns_idx} | col_renames)
+
     # For the World
     columns_idx = ["year", "conflict_type"]
-    tb_ongoing_world = (
-        tb.groupby(columns_idx)
-        .agg({"best": "sum", "high": "sum", "low": "sum", "conflict_new_id": "nunique"})
-        .reset_index()
-    )
-    tb_ongoing_world.columns = columns_idx + [
-        "number_deaths_ongoing_conflicts",
-        "number_deaths_ongoing_conflicts_high",
-        "number_deaths_ongoing_conflicts_low",
-        "number_ongoing_conflicts",
-    ]
+    tb_ongoing_world = tb_.groupby(columns_idx, as_index=False).agg(col_funcs)
+    tb_ongoing_world = tb_ongoing_world.rename(columns={n: n for n in columns_idx} | col_renames)
     tb_ongoing_world["region"] = "World"
 
     # Combine
     tb_ongoing = pr.concat([tb_ongoing, tb_ongoing_world], ignore_index=True).sort_values(  # type: ignore
         by=["year", "region", "conflict_type"]
     )
+
+    # Check that `deaths = deaths_combatants + deaths_civilians + deaths_unknown` holds
+    assert (
+        tb_ongoing["number_deaths_ongoing_conflicts"]
+        - tb_ongoing[
+            [
+                "number_deaths_ongoing_conflicts_civilians",
+                "number_deaths_ongoing_conflicts_unknown",
+                "number_deaths_ongoing_conflicts_combatants",
+            ]
+        ].sum(axis=1)
+        == 0
+    ).all(), "Sum of deaths from combatants, civilians and unknown should equal best estimate!"
     return tb_ongoing
 
 
 def _get_new_metrics(tb: Table) -> Table:
     # Reduce table to only preserve first appearing event
     tb = (
-        tb[["conflict_new_id", "year", "region", "conflict_type"]]
+        tb.loc[:, ["conflict_new_id", "year", "region", "conflict_type"]]
         .sort_values("year")
         .drop_duplicates(subset=["conflict_new_id", "region"], keep="first")
     )
@@ -554,7 +593,7 @@ def combine_tables(tb: Table, tb_prio: Table) -> Table:
 
 
 def fix_extrasystemic_entries(tb: Table) -> Table:
-    """Fix entries with conflict_type='extrasystemic.
+    """Fix entries with conflict_type='extrasystemic'.
 
     Basically means setting to zero null entries after 1989.
     """
@@ -586,6 +625,9 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
         "number_deaths_ongoing_conflicts",
         "number_deaths_ongoing_conflicts_high",
         "number_deaths_ongoing_conflicts_low",
+        "number_deaths_ongoing_conflicts_civilians",
+        "number_deaths_ongoing_conflicts_unknown",
+        "number_deaths_ongoing_conflicts_combatants",
     ]
     mask_1989 = tb_extra["year"] >= 1989
     tb_extra.loc[mask_1989, columns] = tb_extra.loc[mask_1989, columns].fillna(0)
@@ -692,6 +734,9 @@ def add_conflict_all(tb: Table) -> Table:
             "number_deaths_ongoing_conflicts",
             "number_deaths_ongoing_conflicts_high",
             "number_deaths_ongoing_conflicts_low",
+            "number_deaths_ongoing_conflicts_civilians",
+            "number_deaths_ongoing_conflicts_unknown",
+            "number_deaths_ongoing_conflicts_combatants",
             "number_ongoing_conflicts",
             "number_new_conflicts",
         ]
@@ -948,29 +993,63 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     ###################
     paths.log.info("estimating country flag 'is_location_of_conflict'...")
 
+    # Check that number of deaths is all zero
+    assert (
+        tb_locations["best"] - tb_locations[["deaths_a", "deaths_b", "deaths_civilians", "deaths_unknown"]].sum(axis=1)
+        == 0
+    ).all(), "Sum of deaths from combatants, civilians and unknown should equal best estimate!"
+    tb_locations["deaths_combatants"] = tb_locations["deaths_a"] + tb_locations["deaths_b"]
+
     # Estimate if a conflict occured in a country, and the number of deaths in it
+    # Define aggregations
+    INDICATOR_BASE_NAME = "number_deaths"
+    column_props = {
+        # Deaths (estimates)
+        "best": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}",
+        },
+        "high": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}_high",
+        },
+        "low": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}_low",
+        },
+        # Deaths by type
+        "deaths_civilians": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}_civilians",
+        },
+        "deaths_unknown": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}_unknown",
+        },
+        "deaths_combatants": {
+            "f": "sum",
+            "rename": f"{INDICATOR_BASE_NAME}_combatants",
+        },
+        # Number of conflicts
+        "conflict_new_id": {
+            "f": "nunique",
+            "rename": "is_location_of_conflict",
+        },
+    }
+    col_funcs = {k: v["f"] for k, v in column_props.items()}
+    col_renames = {k: v["rename"] for k, v in column_props.items()}
     tb_locations_country = (
         tb_locations.groupby(["country_name_location", "year", "conflict_type"], as_index=False)
-        .agg(
-            {
-                "conflict_new_id": "nunique",
-                "best": "sum",
-                "low": "sum",
-                "high": "sum",
-            }
-        )
+        .agg(col_funcs)
         .rename(
             columns={
-                "conflict_new_id": "is_location_of_conflict",
                 "country_name_location": "country",
-                "best": "number_deaths",
-                "low": "number_deaths_low",
-                "high": "number_deaths_high",
             }
+            | col_renames
         )
     )
     assert tb_locations_country["is_location_of_conflict"].notna().all(), "Missing values in `is_location_of_conflict`!"
-    cols_num_deaths = ["number_deaths", "number_deaths_low", "number_deaths_high"]
+    cols_num_deaths = [v for v in col_renames.values() if v != "is_location_of_conflict"]
     for col in cols_num_deaths:
         assert tb_locations_country[col].notna().all(), f"Missing values in `{col}`!"
     # Convert into a binary indicator: 1 (if more than one conflict), 0 (otherwise)
@@ -1046,15 +1125,12 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     )
     # Divide and obtain rates
     factor = 100_000
-    tb_locations_country["death_rate"] = (
-        factor * tb_locations_country["number_deaths"] / tb_locations_country["population"]
-    )
-    tb_locations_country["death_rate_low"] = factor * (
-        tb_locations_country["number_deaths_low"] / tb_locations_country["population"]
-    )
-    tb_locations_country["death_rate_high"] = factor * (
-        tb_locations_country["number_deaths_high"] / tb_locations_country["population"]
-    )
+    suffix = [c.replace(INDICATOR_BASE_NAME, "") for c in cols_num_deaths]
+    suffix = [suf for suf in suffix if suf not in {"_combatants", "_unknown", "_civilians"}]
+    for suf in suffix:
+        tb_locations_country[f"death_rate{suf}"] = (
+            factor * tb_locations_country[f"{INDICATOR_BASE_NAME}{suf}"] / tb_locations_country["population"]
+        )
 
     # Drop population column
     tb_locations_country = tb_locations_country.drop(columns=["population"])

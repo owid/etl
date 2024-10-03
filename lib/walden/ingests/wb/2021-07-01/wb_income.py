@@ -3,7 +3,7 @@
 Example usage:
 
 ```
-poetry run python -m ingests.wb_income_groups
+uv run python -m ingests.wb_income_groups
 ```
 """
 

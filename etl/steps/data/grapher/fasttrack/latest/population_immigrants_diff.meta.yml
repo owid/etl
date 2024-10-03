@@ -1,0 +1,21 @@
+dataset:
+  title: DRAFT population_immigrants_diff
+  description: ''
+tables:
+  population_immigrants_diff:
+    variables:
+      code_x:
+        title: Code.x
+        unit: ''
+      total_immigrants:
+        title: total_immigrants
+        unit: ''
+      code_y:
+        title: Code.y
+        unit: ''
+      total_population:
+        title: total_population
+        unit: ''
+      diff_population_immigrants:
+        title: diff_population_immigrants
+        unit: ''

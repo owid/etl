@@ -53,24 +53,6 @@ class RuntimeCache:
 
 CACHE_CHECKSUM_FILE = RuntimeCache()
 
-TEXT_CHARS = bytes(range(32, 127)) + b"\n\r\t\f\b"
-DEFAULT_CHUNK_SIZE = 512
-
-
-def istextblock(block: bytes) -> bool:
-    if not block:
-        # An empty file is considered a valid text file
-        return True
-
-    if b"\x00" in block:
-        # Files with null bytes are binary
-        return False
-
-    # Use translate's 'deletechars' argument to efficiently remove all
-    # occurrences of TEXT_CHARS from the block
-    nontext = block.translate(None, TEXT_CHARS)
-    return float(len(nontext)) / len(block) <= 0.30
-
 
 def checksum_str(s: str) -> str:
     "Return the md5 hex digest of the string."
@@ -271,7 +253,16 @@ def apply_ruff_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
 
     """
     pyproject_path = BASE_DIR / "pyproject.toml"
-    subprocess.run(["ruff", "format", "--config", str(pyproject_path)] + [str(fp) for fp in file_paths], check=True)
+
+    # Add uv to the path, it causes problems in Buildkite
+    env = os.environ.copy()
+    env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
+
+    subprocess.run(
+        ["uv", "run", "ruff", "format", "--config", str(pyproject_path)] + [str(fp) for fp in file_paths],
+        check=True,
+        env=env,
+    )
 
 
 def _mtime_mapping(path: Path) -> Dict[Path, float]:

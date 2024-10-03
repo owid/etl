@@ -841,8 +841,8 @@ if st.session_state["run_step"]:
     script_path = f"{SNAPSHOTS_DIR}/{form.namespace}/{form.snapshot_version}/{form.short_name}.py"
 
     # Build command
-    command = f"poetry run python {script_path}"
-    commands = ["poetry", "run", "python", script_path]
+    command = f"uv run python {script_path}"
+    commands = ["uv", "run", "python", script_path]
     if form.dataset_manual_import:
         # Get snapshot local file
         commands.extend(["--path-to-file", st.session_state["snapshot_file"]])

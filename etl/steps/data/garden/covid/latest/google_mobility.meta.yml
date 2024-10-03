@@ -49,4 +49,6 @@ tables:
           <% elif place == 'Workplaces' %>
           Mobility trends for places of work.
           <% endif %>
+        display:
+          name: << place >>
 

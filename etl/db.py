@@ -239,7 +239,7 @@ def get_all_datasets(archived: bool = True, db_conn: Optional[pymysql.Connection
     if db_conn is None:
         db_conn = get_connection()
 
-    query = " SELECT namespace, name, id, updatedAt FROM datasets"
+    query = " SELECT namespace, name, id, updatedAt, isArchived FROM datasets"
     if not archived:
         query += " WHERE isArchived = 0"
     datasets = pd.read_sql(query, con=db_conn)
@@ -493,6 +493,10 @@ def get_dataset_charts(dataset_ids: List[str], db_conn: Optional[pymysql.Connect
     ORDER BY
         d.id ASC;
     """
+
+    # First, increase the GROUP_CONCAT limit, to avoid the list of chart ids to be truncated.
+    with db_conn.cursor() as cursor:
+        cursor.execute("SET SESSION group_concat_max_len = 10000;")
 
     if len(dataset_ids) == 0:
         return pd.DataFrame({"dataset_id": [], "dataset_name": [], "chart_ids": []})

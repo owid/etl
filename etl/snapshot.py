@@ -248,6 +248,12 @@ class Snapshot:
         """Return an Excel file object ready for parsing."""
         return pr.ExcelFile(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
+    def read_parquet(self, *args, **kwargs) -> Table:
+        """Read parquet file into a Table and populate it with metadata."""
+        return pr.read_parquet(
+            self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
+        )
+
     def extract(self, output_dir: Path | str):
         decompress_file(self.path, output_dir)
 
@@ -515,6 +521,8 @@ def read_table_from_snapshot(
         return pr.read_rds(*args, **kwargs)
     elif file_extension == "rda":
         return pr.read_rda(*args, **kwargs)
+    elif file_extension == "parquet":
+        return pr.read_parquet(*args, **kwargs)
     else:
         raise ValueError(f"Unknown extension {file_extension}")
 

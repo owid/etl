@@ -56,7 +56,7 @@ st.title(":material/upgrade: Indicator Upgrader")
 st.markdown("Update indicators to their new versions.")  # Get datasets (might take some time)
 
 # Get all datasets
-DATASETS = get_datasets()
+DATASETS = get_datasets(archived=True)
 # Session states
 utils.set_states(
     {

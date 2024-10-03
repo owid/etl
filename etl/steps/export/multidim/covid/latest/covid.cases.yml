@@ -1,0 +1,82 @@
+definitions:
+  table: grapher/covid/latest/cases_deaths/cases_deaths
+  config: &config
+    tab: map
+    originUrl: ourworldindata.org/coronavirus
+    hideAnnotationFieldsInTitle:
+      entity: true
+      time: true
+      changeInPrefix: true
+
+title:
+  title: COVID-19 confirmed cases
+  titleVariant: by interval
+defaultSelection:
+  - World
+  - Europe
+  - Asia
+topicTags:
+  - COVID-19
+
+dimensions:
+  - slug: interval
+    name: Interval
+    choices:
+      - slug: weekly
+        name: Weekly
+        description: null
+      - slug: biweekly
+        name: Biweekly
+        description: null
+
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: absolute
+        name: Absolute
+        description: null
+      - slug: per_capita
+        name: Per million people
+        description: null
+      - slug: change
+        name: Change from previous interval
+        description: null
+
+views:
+  - dimensions:
+      interval: weekly
+      metric: absolute
+    indicators:
+      y: "{definitions.table}#weekly_cases"
+    config: *config
+  - dimensions:
+      interval: weekly
+      metric: per_capita
+    indicators:
+      y: "{definitions.table}#weekly_cases_per_million"
+    config: *config
+  - dimensions:
+      interval: weekly
+      metric: change
+    indicators:
+      y: "{definitions.table}#weekly_pct_growth_cases"
+    config: *config
+
+  - dimensions:
+      interval: biweekly
+      metric: absolute
+    indicators:
+      y: "{definitions.table}#biweekly_cases"
+    config: *config
+  - dimensions:
+      interval: biweekly
+      metric: per_capita
+    indicators:
+      y: "{definitions.table}#biweekly_cases_per_million"
+    config: *config
+  - dimensions:
+      interval: biweekly
+      metric: change
+    indicators:
+      y: "{definitions.table}#biweekly_pct_growth_cases"
+    config: *config

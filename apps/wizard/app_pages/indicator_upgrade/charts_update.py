@@ -127,5 +127,7 @@ def push_new_charts(charts: List[gm.Chart]) -> None:
         )
         st.exception(e)
     else:
-        st.success("The charts were successfully updated! Review the changes with `chart diff`")
+        st.success(
+            "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
+        )
         st_page_link("chart-diff")

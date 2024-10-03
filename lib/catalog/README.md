@@ -45,17 +45,6 @@ Notice that the last part of the URL is the chart's slug, its identifier, in thi
 df = charts.get_data('life-expectancy')
 ```
 
-To see what charts are available, you can list them all.
-
-```python
->>> slugs = charts.list_charts()
->>> slugs[:5]
-['above-ground-biomass-in-forest-per-hectare',
- 'above-or-below-extreme-poverty-line-world-bank',
- 'abs-change-energy-consumption',
- 'absolute-change-co2',
- 'absolute-gains-in-mean-female-height']
-```
 
 ### Data science API
 
@@ -86,7 +75,7 @@ df = rc[path]
 
 ## Development
 
-You need Python 3.9+, `poetry` and `make` installed. Clone the repo, then you can simply run:
+You need Python 3.9+, `uv` and `make` installed. Clone the repo, then you can simply run:
 
 ```
 # run all unit tests and CI checks
