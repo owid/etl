@@ -171,7 +171,7 @@ def main(upload: bool) -> None:
     # Replace the full citation in the metadata.
     snap.metadata.origin.citation_full = sources_text  # type: ignore
     # Rewrite metadata to dvc file.
-    snap.metadata_path.write_text(snap.metadata.to_yaml())
+    snap.metadata.save()
 
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(data=tb, upload=upload)
