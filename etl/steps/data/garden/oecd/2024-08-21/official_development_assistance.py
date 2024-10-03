@@ -133,6 +133,16 @@ SECTORS_DAC5 = {
     "VIII.3. Disaster Prevention & Preparedness": "Disaster prevention and preparedness",
 }
 
+CHANNEL_CATEGORIES = {
+    "10000": "Public sector",
+    "20000": "Non-governmental organization (NGO) and civil society",
+    "30000": "Public-private partnerships (PPP) and networks",
+    "40000": "Multilateral organisations",
+    "51000": "University, college or other teaching institution, research institute or think-tank",
+    "60000": "Private sector institutions",
+    "90000": "Other",
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -140,12 +150,18 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("official_development_assistance")
+    ds_one = paths.load_dataset("official_development_assistance_one")
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb_dac1 = ds_meadow["dac1"].reset_index()
     tb_dac2a = ds_meadow["dac2a"].reset_index()
     tb_dac5 = ds_meadow["dac5"].reset_index()
+
+    tb_sectors_donor = ds_one["sectors_donor"].reset_index()
+    tb_sectors_recipient = ds_one["sectors_recipient"].reset_index()
+    tb_channels_donor = ds_one["channels_donor"].reset_index()
+    tb_channels_recipient = ds_one["channels_recipient"].reset_index()
 
     #
     # Process data.

@@ -798,10 +798,12 @@ steps:
     - snapshot://oecd/2024-08-21/official_development_assistance_crs.zip
   data://garden/oecd/2024-08-21/official_development_assistance:
     - data://meadow/oecd/2024-08-21/official_development_assistance
+    - data://garden/one/2024-10-02/official_development_assistance_one
     - data://garden/demography/2024-07-15/population
   data://grapher/oecd/2024-08-21/official_development_assistance:
     - data://garden/oecd/2024-08-21/official_development_assistance
 
+  # OECD Official Development Assistance (ODA) via ONE
   data://meadow/one/2024-10-02/official_development_assistance_one:
     - snapshot://one/2024-10-02/official_development_assistance_one.feather
   data://garden/one/2024-10-02/official_development_assistance_one:
