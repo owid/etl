@@ -60,6 +60,16 @@ st.divider()
 # FUNCTIONS
 ################################################
 
+
+@st.dialog("Cast your vote")
+def vote(item):
+    st.write(f"Why is {item} your favorite?")
+    reason = st.text_input("Because...")
+    if st.button("Submit"):
+        st.session_state.vote = {"item": item, "reason": reason}
+        st.rerun()
+
+
 # Block per dataset
 for dataset_index, d in enumerate(st.session_state.datasets):
     st.markdown(f'##### :material/dataset: {d["dataset"]}')
@@ -71,6 +81,8 @@ for dataset_index, d in enumerate(st.session_state.datasets):
             st.markdown(f"`{i['slug']}`")
             anomalies = i["anomalies"]
             st.markdown(f"{len(anomalies)} anomalies detected.")
+            if st.button("Plot indicator", icon=":material​/thumb_up:"):
+                vote("A")
 
             # Expander per anomaly
             for anomaly_index, a in enumerate(anomalies):
