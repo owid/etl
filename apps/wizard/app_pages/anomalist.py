@@ -1,5 +1,7 @@
 import streamlit as st
 
+from apps.wizard.utils.data import load_variable_data
+
 # PAGE CONFIG
 st.set_page_config(
     page_title="Wizard: Anomalist",
@@ -9,7 +11,7 @@ st.set_page_config(
 # INDICATOR SPECS (INPUT)
 DATASETS = [
     {
-        "dataset": "grapher/climate_watch/2023-10-31/emissions_by_sector/",
+        "dataset": "grapher/climate_watch/2023-10-31/emissions_by_sector",
         "indicators": [
             {
                 "slug": "greenhouse_gas_emissions_by_sector#land_use_change_and_forestry_ghg_emissions",
@@ -61,9 +63,19 @@ st.divider()
 ################################################
 
 
-@st.dialog("Cast your vote")
+@st.dialog("Vizualize the indicator", width="large")
 def show_indicator(indicator_uri):
-    st.write(f"{indicator_uri}")
+    st.markdown(f"`{indicator_uri}`")
+    print(indicator_uri)
+    data = load_variable_data(indicator_uri)
+    countries = list(data["entities"].unique())
+    countries = st.multiselect("Countries", countries, default=countries[:5])
+    st.write(countries)
+    data_ = data[data["entities"].isin(countries)]
+    # data_ = data_.pivot(index="years", columns="entities", values="values")
+    # columns = [col for col in data_.columns if col != "years"]
+    # st.dataframe(data_)
+    st.line_chart(data=data_, x="years", y="values", color="entities")
 
 
 # (s,) = st.columns(1)
@@ -80,13 +92,13 @@ for dataset_index, d in enumerate(st.session_state.datasets):
 
     # Block per indicator in dataset
     for indicator_index, i in enumerate(indicators):
-        indicator_uri = f"{d}/{i}"
+        indicator_uri = f"{d['dataset']}/{i['slug']}"
         with st.container(border=True):
             st.markdown(f"`{i['slug']}`")
             anomalies = i["anomalies"]
             st.markdown(f"{len(anomalies)} anomalies detected.")
             if st.button("Show chart", icon=":material/show_chart:", use_container_width=False):
-                show_indicator("A")
+                show_indicator(indicator_uri)
             # Expander per anomaly
             for anomaly_index, a in enumerate(anomalies):
                 if a["resolved"]:
