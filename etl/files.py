@@ -253,7 +253,16 @@ def apply_ruff_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
 
     """
     pyproject_path = BASE_DIR / "pyproject.toml"
-    subprocess.run(["ruff", "format", "--config", str(pyproject_path)] + [str(fp) for fp in file_paths], check=True)
+
+    # Add uv to the path, it causes problems in Buildkite
+    env = os.environ.copy()
+    env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
+
+    subprocess.run(
+        ["uv", "run", "ruff", "format", "--config", str(pyproject_path)] + [str(fp) for fp in file_paths],
+        check=True,
+        env=env,
+    )
 
 
 def _mtime_mapping(path: Path) -> Dict[Path, float]:
