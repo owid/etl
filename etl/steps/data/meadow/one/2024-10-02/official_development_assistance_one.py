@@ -18,8 +18,7 @@ COLUMNS_TO_KEEP_CHANNELS = [
     "year",
     "donor_name",
     "recipient_name",
-    "channel_name",
-    "parent_channel_code",
+    "channel_code",
     "value",
 ]
 

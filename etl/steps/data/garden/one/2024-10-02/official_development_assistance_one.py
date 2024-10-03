@@ -8,7 +8,7 @@ paths = PathFinder(__file__)
 
 # Define index columns
 INDEX_SECTORS = ["donor_name", "recipient_name", "year", "sector_name"]
-INDEX_CHANNELS = ["donor_name", "recipient_name", "year", "channel_name", "parent_channel_code"]
+INDEX_CHANNELS = ["donor_name", "recipient_name", "year", "channel_code"]
 
 
 def run(dest_dir: str) -> None:

@@ -4,6 +4,7 @@ from typing import List
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
+from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -133,14 +134,62 @@ SECTORS_DAC5 = {
     "VIII.3. Disaster Prevention & Preparedness": "Disaster prevention and preparedness",
 }
 
+SECTORS_ONE = [
+    "I.1.a. Education, Level Unspecified",
+    "I.1.b. Basic Education",
+    "I.1.c. Secondary Education",
+    "I.1.d. Post-Secondary Education",
+    "I.2.a. Health, General",
+    "I.2.b. Basic Health",
+    "I.2.c. Non-communicable diseases (NCDs)",
+    "I.3. Population Policies/Programmes & Reproductive Health",
+    "I.4. Water Supply & Sanitation",
+    "I.5.a. Government & Civil Society-general",
+    "I.5.b. Conflict, Peace & Security",
+    "I.6. Other Social Infrastructure & Services",
+    "II.1. Transport & Storage",
+    "II.2. Communications",
+    "II.3.a. Energy Policy",
+    "II.3.b. Energy generation, renewable sources",
+    "II.3.c. Energy generation, non-renewable sources",
+    "II.3.e. Nuclear energy plants",
+    "II.3.f. Energy distribution",
+    "II.4. Banking & Financial Services",
+    "III.1.c. Fishing",
+    "III.2.a. Industry",
+    "IV.2. Other Multisector",
+    "III.1.a. Agriculture",
+    "VI.2. Development Food Assistance",
+    "III.2.b. Mineral Resources & Mining",
+    "VIII.1. Emergency Response",
+    "IX. Unallocated / Unspecified",
+    "Sectors not specified",
+    "III.2.c. Construction",
+    "VI.3. Other Commodity Assistance",
+    "VI.1. General Budget Support",
+    "III.1.b. Forestry",
+    "III.3.b. Tourism",
+    "VII. Action Relating to Debt",
+    "III.3.a. Trade Policies & Regulations",
+    "IV.1. General Environment Protection",
+    "VIII.2. Reconstruction Relief & Rehabilitation",
+    "Administrative Costs of Donors",
+    "II.5. Business & Other Services",
+    "Refugees in Donor Countries",
+    "VIII.3. Disaster Prevention & Preparedness",
+    nan,
+    "II.3.d. Hybrid energy plants",
+]
+
+# Define channel categories coming from ONE
 CHANNEL_CATEGORIES = {
-    "10000": "Public sector",
-    "20000": "Non-governmental organization (NGO) and civil society",
-    "30000": "Public-private partnerships (PPP) and networks",
-    "40000": "Multilateral organisations",
-    "51000": "University, college or other teaching institution, research institute or think-tank",
-    "60000": "Private sector institutions",
-    "90000": "Other",
+    "10": "Public sector",
+    "20": "Non-governmental organization (NGO) and civil society",
+    "30": "Public-private partnerships (PPP) and networks",
+    "40": "Multilateral organisations",
+    "51": "University, college or other teaching institution, research institute or think-tank",
+    "60": "Private sector institutions",
+    "90": "Other",
 }
 
 
@@ -248,6 +297,9 @@ def run(dest_dir: str) -> None:
     )
 
     tb = add_aid_by_sector_donor_dataset(tb=tb, tb_sector=tb_dac5)
+
+    tb_sectors_donor = rename_sectors_in_one_data(tb=tb_sectors_donor)
+    tb_sectors_recipient = rename_sectors_in_one_data(tb=tb_sectors_recipient)
 
     tb = tb.format(["country", "year", "donor", "sector"], short_name=paths.short_name)
     tb_dac2a = tb_dac2a.format(["country", "year", "donor"])
@@ -521,6 +573,22 @@ def add_aid_by_sector_donor_dataset(tb: Table, tb_sector: Table) -> Table:
 
     # Merge tables
     tb = pr.merge(tb, tb_sector, on=["country", "year", "sector"], how="outer")
+
+    return tb
+
+
+def rename_sectors_in_one_data(tb: Table) -> Table:
+    """
+    Rename sector categories coming from ONE data wrapper
+    """
+    tb["sector_name"] = map_series(
+        series=tb["sector_name"],
+        mapping=SECTORS_DAC5,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=False,
+        show_full_warning=True,
+    )
+    tb["sector_name"] = tb["sector_name"].copy_metadata(tb["donor_name"])
 
     return tb
 
