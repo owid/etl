@@ -34,6 +34,7 @@ def load_variable_metadata(variable: Variable) -> Dict[str, Any]:
 
 @st.cache_data
 def load_variable_data(catalog_path: Optional[str] = None, variable: Optional[Variable] = None) -> pd.DataFrame:
+    """TODO: add country names. look into /home/lucas/repos/etl/apps/backport/datasync/data_metadata.py:add_entity_code_and_name"""
     if catalog_path is None and variable is None:
         raise ValueError("Either catalog_path or variable must be provided")
 
