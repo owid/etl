@@ -253,7 +253,9 @@ def apply_ruff_formatter_to_files(file_paths: List[Union[str, Path]]) -> None:
 
     """
     pyproject_path = BASE_DIR / "pyproject.toml"
-    subprocess.run(["ruff", "format", "--config", str(pyproject_path)] + [str(fp) for fp in file_paths], check=True)
+    subprocess.run(
+        ["uv", "run", "ruff", "format", "--config", str(pyproject_path)] + [str(fp) for fp in file_paths], check=True
+    )
 
 
 def _mtime_mapping(path: Path) -> Dict[Path, float]:
