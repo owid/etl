@@ -51,6 +51,6 @@ meta:
     (https://datatopics.worldbank.org/world-development-indicators/the-world-by-income-and-region.html).
 wdir: ../../../data/snapshots/wb/2023-04-30
 outs:
-- md5: bfdf219c089ae93abf8d160915b273ab
-  size: 103024
-  path: income_groups.xlsx
+  - md5: f878c6168f826a650f21477bea3bf904
+    size: 116890
+    path: income_groups.xlsx

@@ -26,6 +26,6 @@ meta:
 
 wdir: ../../../data/snapshots/war/2024-01-25
 outs:
-- md5: 32d32735f7f68d05bfa4bc9a11b78b07
-  size: 1623
-  path: nuclear_weapons_tests.csv
+  - md5: adfff25e98820e8998c2c92f6dc67a84
+    size: 1620
+    path: nuclear_weapons_tests.csv
