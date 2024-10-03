@@ -30,6 +30,6 @@ meta:
       url: https://www.oecd.org/en/about/terms-conditions.html
 
 outs:
-  - md5: 0e749e13667e78764b47e1711b05f2c7
-    size: 118517698
+  - md5: 995c9dd2f0b1c08e6c253e7ad3b3b7bf
+    size: 101115506
     path: official_development_assistance_one.feather
