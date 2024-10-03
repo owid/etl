@@ -1,8 +1,7 @@
 meta:
   namespace: artificial_intelligence
   short_name: papers_with_code_imagenet
-  name: Image Classification on ImageNet, Top - 1 and Top - 5 Accuracy (Papers With
-    Code, 2023)
+  name: Image Classification on ImageNet, Top - 1 and Top - 5 Accuracy (Papers With Code, 2023)
   version: '2023-06-14'
   publication_year: 2023
   source_name: Papers With Code (2023)
@@ -18,6 +17,6 @@ meta:
     ImageNet is one of the most widely used benchmarks for image classification. This dataset includes over 14 million images across 20,000 different object categories such as “strawberry” or “balloon.” Performance on ImageNet is measured through various accuracy metrics. Top-1 accuracy measures how often a system's single most probable label (out of 1000 possible labels) matches the target label. Top-5 accuracy measures how often any one of the system's five most probable labels (out of 1000 possible labels) matches the target label.
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
 outs:
-- md5: c71155745dd24693eeeb93fb3dd8078d
-  size: 1529527
-  path: papers_with_code_imagenet.html
+  - md5: 155110c42eb895d570ac7cc2af36356a
+    size: 1679937
+    path: papers_with_code_imagenet.html

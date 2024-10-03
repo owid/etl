@@ -24,6 +24,6 @@ meta:
       name: CC BY 4.0
       url: https://data.noaa.gov/metaview/page?xml=NOAA/NESDIS/NGDC/MGG/Hazards/iso/xml/G012153.xml&view=getDataView
 outs:
-  - md5: fbfe94cad45f5ceaea1d3a73b023a251
-    size: 387790
+  - md5: aad50267a5a9f09e24bc09be105a5238
+    size: 404915
     path: natural_hazards_tsunamis.csv

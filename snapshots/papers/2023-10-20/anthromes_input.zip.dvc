@@ -33,6 +33,6 @@ meta:
 
 wdir: ../../../data/snapshots/papers/2023-10-20
 outs:
-- md5: 280d577f448af13b0ba8453b2a0811f3
-  size: 119805929
-  path: anthromes_input.zip
+  - md5: d41d8cd98f00b204e9800998ecf8427e
+    size: 0
+    path: anthromes_input.zip

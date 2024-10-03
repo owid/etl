@@ -31,6 +31,6 @@ meta:
 
 wdir: ../../../data/snapshots/climate_watch/2023-10-31
 outs:
-- md5: e73609fb6ad7f9b502d2846a5d95cb4c
-  size: 3766559
-  path: emissions_by_sector.gz
+  - md5: 7ebfb5d6806deadd5d3449bf04e0383a
+    size: 3834428
+    path: emissions_by_sector.gz

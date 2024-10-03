@@ -6,14 +6,11 @@ meta:
   publication_year: 2023
   publication_date: '2023-03-20'
   source_name: NetBase Quid (2022) via AI Index (2023)
-  source_published_by: NetBase Quid (2022) via AI Index 2023 Annual Report, AI Index
-    Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford,
-    CA, April 2023
+  source_published_by: NetBase Quid (2022) via AI Index 2023 Annual Report, AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2023
   url: https://drive.google.com/drive/folders/1ma9WZJzKreS8f2It1rMy_KkkbX6XwDOK
   source_data_url: https://drive.google.com/uc?export=download&id=1jxlta9M0gYI-uaAFTQfg7edJG_7cXjaa
   file_extension: csv
-  license_url: 
-    https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
+  license_url: https://aiindex.stanford.edu/wp-content/uploads/2023/04/HAI_AI-Index-Report_2023.pdf
   license_name: Public domain
   date_accessed: 2023-06-28
   is_public: true
@@ -22,6 +19,6 @@ meta:
 
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
 outs:
-- md5: 6c50883d181e8d79130a6e60f5ca1424
-  size: 1436
-  path: ai_private_investment_total.csv
+  - md5: b47b25d90f32879f7e71acf4c5dc3f9a
+    size: 1436
+    path: ai_private_investment_total.csv

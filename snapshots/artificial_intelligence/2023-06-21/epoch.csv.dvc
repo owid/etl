@@ -32,6 +32,6 @@ meta:
         The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models.'"
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-21
 outs:
-  - md5: f7e94b8afdccd19e04d71664880cdb18
-    size: 609893
+  - md5: cd7e20788eadfef11b93fdc134013e34
+    size: 2831817
     path: epoch.csv

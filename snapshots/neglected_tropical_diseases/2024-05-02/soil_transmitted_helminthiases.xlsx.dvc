@@ -28,6 +28,6 @@ meta:
       url: https://www.who.int/about/policies/publishing/copyright
 
 outs:
-  - md5: ed7074d412dea543f937987eeeb62e0f
-    size: 328507
+  - md5: d04a07af6925da2e9de6c4bd594489d1
+    size: 328735
     path: soil_transmitted_helminthiases.xlsx

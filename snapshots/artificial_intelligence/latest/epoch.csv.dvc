@@ -31,6 +31,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: af44b116d7107981041c14c750a266a9
-    size: 1833003
+  - md5: 786b8ffed20c3e2503111cbbceed7aee
+    size: 2624415
     path: epoch.csv

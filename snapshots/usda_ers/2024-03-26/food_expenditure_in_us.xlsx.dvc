@@ -15,6 +15,6 @@ meta:
 
 wdir: ../../../data/snapshots/usda_ers/2024-03-26
 outs:
-  - md5: c690c0e8950975399aaa58b3229dbd20
-    size: 18433
+  - md5: b154a7ff5f3470636e4a1f50054e8659
+    size: 17124
     path: food_expenditure_in_us.xlsx

@@ -23,23 +23,19 @@ meta:
     attribution_short: Gapminder
 
     # Files
-    url_main:
-      https://docs.google.com/spreadsheets/d/1Av7eps_zEK73-AdbFYEmtTrwFKlfruBYXdrnXAOFVpM/edit#gid=501532268
-    url_download:
-      https://docs.google.com/spreadsheets/d/1Av7eps_zEK73-AdbFYEmtTrwFKlfruBYXdrnXAOFVpM/export?format=xlsx
+    url_main: https://docs.google.com/spreadsheets/d/1Av7eps_zEK73-AdbFYEmtTrwFKlfruBYXdrnXAOFVpM/edit#gid=501532268
+    url_download: https://docs.google.com/spreadsheets/d/1Av7eps_zEK73-AdbFYEmtTrwFKlfruBYXdrnXAOFVpM/export?format=xlsx
     date_accessed: 2023-09-21
 
     # License
     license:
-      url:
-        https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
+      url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
       name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
   license:
-    url:
-      https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
+    url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit
     name: CC BY 4.0
 wdir: ../../../data/snapshots/gapminder/2023-09-21
 outs:
-- md5: 8d8068bb4ee54de840510f47b34c281f
-  size: 1522912
-  path: under_five_mortality.xlsx
+  - md5: b618a78ae85ce70e14d3e01182d1de6e
+    size: 1522938
+    path: under_five_mortality.xlsx

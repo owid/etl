@@ -3,8 +3,7 @@ meta:
   publication_year: 2013
   publication_date: '2013-03-15'
   source_name: van Zanden, J., et al. (2014) via OECD
-  source_published_by: 'van Zanden, J., et al. (eds.) (2014), How Was Life?: Global
-    Well-being since 1820, OECD Publishing, Paris, https://doi.org/10.1787/9789264214262-en.'
+  source_published_by: 'van Zanden, J., et al. (eds.) (2014), How Was Life?: Global Well-being since 1820, OECD Publishing, Paris, https://doi.org/10.1787/9789264214262-en.'
   url: https://clio-infra.eu/Indicators/AverageYearsofEducation.html#
   source_data_url: https://clio-infra.eu/data/AverageYearsofEducation_Compact.xlsx
   license_url: https://www.oecd.org/termsandconditions/
@@ -15,6 +14,6 @@ meta:
     The average years of education in the total population aged 15 years and older is given for the period 1870-2010.
 wdir: ../../../data/snapshots/education/2023-08-09
 outs:
-- md5: 435ef211f3dcd437702b8036407cc9cf
-  size: 219444
-  path: years_of_education.xlsx
+  - md5: a6097d37d40416fc41d75ce45da4ed7e
+    size: 219443
+    path: years_of_education.xlsx

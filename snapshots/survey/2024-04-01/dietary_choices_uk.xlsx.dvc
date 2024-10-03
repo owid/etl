@@ -22,6 +22,6 @@ meta:
       url: https://yougov.co.uk/about/terms
 
 outs:
-  - md5: 0c6c04daa40179fe76d305f61f4ae4f0
-    size: 40107
+  - md5: fa20de2306bf4dad7d3dc8c2325a3f02
+    size: 24030
     path: dietary_choices_uk.xlsx

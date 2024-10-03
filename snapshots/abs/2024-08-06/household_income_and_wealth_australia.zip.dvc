@@ -26,6 +26,6 @@ meta:
       url: https://www.abs.gov.au/website-privacy-copyright-and-disclaimer#copyright-and-creative-commons
 
 outs:
-  - md5: 128cbc0d22d8015c7c1665c1049c5082
-    size: 7932166
+  - md5: 9d5c8f058d239e7b5cc69c91f7e0283c
+    size: 7930432
     path: household_income_and_wealth_australia.zip

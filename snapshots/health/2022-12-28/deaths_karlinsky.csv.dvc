@@ -2,8 +2,7 @@ meta:
   namespace: health
   short_name: deaths_karlinsky
   name: International Completeness of Death Registration 2015-2019 – Karlinsky (2021)
-  source_name: A. Karlinsky, International Completeness of Death Registration 2015-2019
-    (2021)
+  source_name: A. Karlinsky, International Completeness of Death Registration 2015-2019 (2021)
   publication_year: 2022
   publication_date: 2021-11-03
   url: https://github.com/akarlinsky/death_registration
@@ -31,6 +30,6 @@ meta:
     Ariel Karlinsky is also a co-producer of the World Mortality Dataset (WMD), which currently collects data on all-cause mortality from 2015–2022 for 117 countries and territories. The WMD is one of the primary data sources on excess mortality during the COVID-19 pandemic. You can find the WMD on GitHub here: https://github.com/akarlinsky/world_mortality.
 wdir: ../../../data/snapshots/health/2022-12-28
 outs:
-- md5: b02bc5a042e2bf7a629fd5063a39bbca
-  size: 80071
-  path: deaths_karlinsky.csv
+  - md5: c57e02b53008fb359f2099fc07216fa5
+    size: 62229
+    path: deaths_karlinsky.csv

@@ -19,6 +19,6 @@ meta:
     Biannual tracking of Americans' level of concern regarding job automation replacing their employment. Next update is in July.
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-08
 outs:
-- md5: 97e9f9506f600f8710cd442920f72483
-  size: 26582
-  path: yougov_job_automation.xlsx
+  - md5: 8d453fbb5773e95f27ae52525fedd36a
+    size: 26461
+    path: yougov_job_automation.xlsx

@@ -15,6 +15,6 @@ meta:
 
 wdir: ../../../data/snapshots/papers/2023-12-12
 outs:
-- md5: 3ad0ba878a3f06addac0d6bc75c92b74
-  size: 915
-  path: nemet_2009.csv
+  - md5: 79bd70859faa0807489bc98c52d49599
+    size: 945
+    path: nemet_2009.csv

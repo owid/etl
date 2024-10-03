@@ -24,6 +24,6 @@ meta:
       name: OECD Terms of Conditions
       url: https://www.oecd.org/en/about/terms-conditions.html
 outs:
-  - md5: 7c8806adc0c992ec21f68ce0950b07ee
-    size: 6883521
+  - md5: fe26264e1bb7968fa690c291b510dd13
+    size: 6883035
     path: ppp_exchange_rates.csv

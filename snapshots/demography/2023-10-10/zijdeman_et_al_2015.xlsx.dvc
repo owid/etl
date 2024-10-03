@@ -41,6 +41,6 @@ meta:
 
 wdir: ../../../data/snapshots/demography/2023-10-10
 outs:
-  - md5: 2f07837592cb3be6da56647b63b9a831
-    size: 557461
+  - md5: 0fb0818b009069caab5c3ed34d6aa972
+    size: 557460
     path: zijdeman_et_al_2015.xlsx

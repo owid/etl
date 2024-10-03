@@ -13,6 +13,6 @@ meta:
     Road accidents are measured in terms of the number of persons injured and deaths due to road accidents, whether immediate or within 30 days of the accident, and excluding suicides involving the use of road motor vehicles. A road motor vehicle is a road vehicle fitted with an engine as the sole means of propulsion and one that is normally used to carry people or goods, or for towing, on the road. This includes buses, coaches, trolleys, tramways (streetcars) and road vehicles used to transport goods and to transport passengers. Road motor vehicles are attributed to the countries where they are registered, while deaths are attributed to the countries in which they occur. This indicator is measured in number of accidents, number of persons, per million inhabitants and million vehicles.
 wdir: ../../../data/snapshots/oecd/2023-08-11
 outs:
-  - md5: 00adfc698c64133ed1332520bc1ffc8d
-    size: 531673
+  - md5: 107d9ec219ab67bb663615d780bd8880
+    size: 181684646
     path: road_accidents.csv

@@ -24,6 +24,6 @@ meta:
       name: CC BY 4.0
       url: https://data.noaa.gov/metaview/page?xml=NOAA/NESDIS/NGDC/MGG/Hazards/iso/xml/G012153.xml&view=getDataView
 outs:
-  - md5: 423fd14ec7088b513415c873e1cebb47
-    size: 959141
+  - md5: 065d72a03e3a2a905807dce9a225cc76
+    size: 962501
     path: natural_hazards_earthquakes.csv

@@ -25,6 +25,6 @@ meta:
       url: https://www.insee.fr/fr/information/2008466
 
 outs:
-  - md5: 2e902f9c80e05f52ac3b81931c8658b7
-    size: 18310
+  - md5: 75981fcd2c62f39ac47209c1aca2e0c7
+    size: 27698
     path: inequality_france.xlsx

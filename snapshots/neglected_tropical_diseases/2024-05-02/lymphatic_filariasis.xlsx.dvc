@@ -28,6 +28,6 @@ meta:
       url: https://www.who.int/about/policies/publishing/copyright
 
 outs:
-  - md5: 698b0341d985d5a568893f63dee4d5bd
-    size: 134496
+  - md5: a4c6dc9669b021509b859c56e233abbd
+    size: 141242
     path: lymphatic_filariasis.xlsx

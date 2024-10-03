@@ -45,6 +45,6 @@ meta:
     version_producer: '2024-01-04'
 wdir: ../../../data/snapshots/artificial_intelligence/2024-01-30
 outs:
-- md5: 49b1bfd0437d5b74725ef657ad12303a
-  size: 30370
-  path: yougov_robots.xlsx
+  - md5: a583bb5641dcedd8fd42ecc83a35e3f4
+    size: 28015
+    path: yougov_robots.xlsx

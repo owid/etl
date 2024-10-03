@@ -25,6 +25,6 @@ meta:
 
 wdir: ../../../data/snapshots/oecd/2023-10-11
 outs:
-  - md5: c6b660c01904ea745f02eeedb215fb6f
-    size: 381472
+  - md5: 107d9ec219ab67bb663615d780bd8880
+    size: 181684646
     path: life_expectancy_birth.csv

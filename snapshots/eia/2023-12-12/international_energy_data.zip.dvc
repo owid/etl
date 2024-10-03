@@ -17,6 +17,6 @@ meta:
 
 wdir: ../../../data/snapshots/eia/2023-12-12
 outs:
-- md5: 463051a13588ddd894cd5b3acffcd469
-  size: 22922325
-  path: international_energy_data.zip
+  - md5: c50186dc96ad4f331b749bed28d4d5aa
+    size: 23072453
+    path: international_energy_data.zip

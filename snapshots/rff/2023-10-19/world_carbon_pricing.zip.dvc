@@ -21,8 +21,7 @@ meta:
 
     # Files
     url_main: https://github.com/g-dolphin/WorldCarbonPricingDatabase/
-    url_download:
-      https://github.com/g-dolphin/WorldCarbonPricingDatabase/archive/refs/heads/master.zip
+    url_download: https://github.com/g-dolphin/WorldCarbonPricingDatabase/archive/refs/heads/master.zip
     date_accessed: 2023-10-19
 
     # License
@@ -32,6 +31,6 @@ meta:
 
 wdir: ../../../data/snapshots/rff/2023-10-19
 outs:
-- md5: 4426663dc1e81bd36b86968f374b4fea
-  size: 25858827
-  path: world_carbon_pricing.zip
+  - md5: b8afebfb7782d49b84def6858a8b11b3
+    size: 27118404
+    path: world_carbon_pricing.zip

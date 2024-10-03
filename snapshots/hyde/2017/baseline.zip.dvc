@@ -28,6 +28,6 @@ meta:
       url: https://public.yoda.uu.nl/geo/UU01/MO2FF3.html
 wdir: ../../../data/snapshots/hyde/2017
 outs:
-- md5: acdbbd3908a29fb8ae75f3e081c980ad
-  size: 5402335722
-  path: baseline.zip
+  - md5: 27691fdb532ca80a3d0017f0f6b0c4c3
+    size: 24023
+    path: baseline.zip

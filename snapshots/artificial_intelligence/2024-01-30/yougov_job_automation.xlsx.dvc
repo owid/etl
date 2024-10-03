@@ -1,8 +1,7 @@
 meta:
   origin:
     title: How worried are Americans about being automated out of a job?
-    description: Biannual tracking of Americans' level of concern regarding job automation
-      replacing their employment.
+    description: Biannual tracking of Americans' level of concern regarding job automation replacing their employment.
     producer: YouGov
     citation_full: YouGov (2024)
     url_main: https://today.yougov.com/topics/politics/trackers/worry-about-automation
@@ -15,6 +14,6 @@ meta:
     version_producer: '2024-01-11'
 wdir: ../../../data/snapshots/artificial_intelligence/2024-01-30
 outs:
-- md5: affa7ae852508559d6d5592da839d2a5
-  size: 28677
-  path: yougov_job_automation.xlsx
+  - md5: 8d453fbb5773e95f27ae52525fedd36a
+    size: 26461
+    path: yougov_job_automation.xlsx

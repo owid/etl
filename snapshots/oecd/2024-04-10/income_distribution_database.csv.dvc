@@ -29,6 +29,6 @@ meta:
       url: https://www.oecd.org/termsandconditions/
 
 outs:
-  - md5: 9af9f06e82449979cddd07e7b96c4acf
-    size: 7519474
+  - md5: 16f3d1487e1015618a2d3d6f2c11ed60
+    size: 7276711
     path: income_distribution_database.csv

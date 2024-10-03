@@ -14,8 +14,7 @@ meta:
 
     # Files
     url_main: https://www.gov.uk/government/statistical-data-sets/historical-electricity-data
-    url_download: 
-      https://assets.publishing.service.gov.uk/media/64c104811e10bf000d17cf1e/Electricity_since_1920.xlsx
+    url_download: https://assets.publishing.service.gov.uk/media/64c104811e10bf000d17cf1e/Electricity_since_1920.xlsx
     date_accessed: 2023-12-12
 
     # License
@@ -25,6 +24,6 @@ meta:
 
 wdir: ../../../data/snapshots/uk_beis/2023-12-12
 outs:
-- md5: fd9712290cc121d9e033f87465f20611
-  size: 139292
-  path: uk_historical_electricity.xls
+  - md5: 03108494f9ecee659d9e28be13f6d737
+    size: 245276
+    path: uk_historical_electricity.xls
