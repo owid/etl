@@ -62,13 +62,16 @@ st.divider()
 
 
 @st.dialog("Cast your vote")
-def vote(item):
-    st.write(f"Why is {item} your favorite?")
-    reason = st.text_input("Because...")
-    if st.button("Submit"):
-        st.session_state.vote = {"item": item, "reason": reason}
-        st.rerun()
+def show_indicator(indicator_uri):
+    st.write(f"{indicator_uri}")
 
+
+# (s,) = st.columns(1)
+# s.button("Material button", icon=":material/thumb_up:", use_container_width=True)
+
+
+# s = st.empty()
+# st.button("Material button", icon=":material/thumb_up:", use_container_width=True)
 
 # Block per dataset
 for dataset_index, d in enumerate(st.session_state.datasets):
@@ -77,13 +80,13 @@ for dataset_index, d in enumerate(st.session_state.datasets):
 
     # Block per indicator in dataset
     for indicator_index, i in enumerate(indicators):
+        indicator_uri = f"{d}/{i}"
         with st.container(border=True):
             st.markdown(f"`{i['slug']}`")
             anomalies = i["anomalies"]
             st.markdown(f"{len(anomalies)} anomalies detected.")
-            if st.button("Plot indicator", icon=":material​/thumb_up:"):
-                vote("A")
-
+            if st.button("Show chart", icon=":material/show_chart:", use_container_width=False):
+                show_indicator("A")
             # Expander per anomaly
             for anomaly_index, a in enumerate(anomalies):
                 if a["resolved"]:
