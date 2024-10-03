@@ -530,10 +530,9 @@ def _exec_step_job(
     with strictness_level(strict):
         try:
             execution_times[step_name] = timed_run(lambda: step.run())
+            print(f"--- Finished {step_name} ({execution_times[step_name]:.1f}s)")
         except Exception as e:
             click.echo(f"{click.style('ERROR', fg='red')}: {e}")
-
-    print(f"--- Finished {step_name} ({execution_times[step_name]:.1f}s)")
 
 
 def _write_execution_times(execution_times: Dict) -> None:
