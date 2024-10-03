@@ -3,6 +3,7 @@
 """
 
 import json
+import random
 import subprocess
 import time
 
@@ -15,6 +16,7 @@ from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 log = get_logger()
 
 SNAPSHOT_SCRIPTS = sorted(list((BASE_DIR / "snapshots").glob("*/*/*.py")))
+random.shuffle(SNAPSHOT_SCRIPTS)
 # Kill a subprocess if it takes longer than this many seconds.
 TIMEOUT = 100
 OUTPUT_FILE = BASE_DIR / "etl" / "scripts" / "archive" / "run_all_snapshots" / "snapshot_execution_times.json"

@@ -6,8 +6,7 @@ meta:
   publication_year: 2021
   publication_date: 2021-06-30
   source_name: Karlinsky and Kobak (2021)
-  source_published_by: Karlinsky & Kobak 2021, Tracking excess mortality across countries
-    during the COVID-19 pandemic with the World Mortality Dataset, eLife https://doi.org/10.7554/eLife.69336
+  source_published_by: Karlinsky & Kobak 2021, Tracking excess mortality across countries during the COVID-19 pandemic with the World Mortality Dataset, eLife https://doi.org/10.7554/eLife.69336
   url: https://github.com/akarlinsky/world_mortality/
   source_data_url: https://raw.githubusercontent.com/akarlinsky/world_mortality/main/world_mortality.csv
   file_extension: csv
@@ -27,6 +26,6 @@ meta:
     Published paper available at https://elifesciences.org/articles/69336.
 wdir: ../../../data/snapshots/excess_mortality/2023-02-17
 outs:
-- md5: a6debc07fe4d6f91202bb95b5e868175
-  size: 891257
-  path: wmd.csv
+  - md5: fd55d3cfa0638675e6ffd1fcd11319d9
+    size: 1069198
+    path: wmd.csv

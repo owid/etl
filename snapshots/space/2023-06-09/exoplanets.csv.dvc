@@ -5,12 +5,9 @@ meta:
   version: '2023-06-09'
   publication_year: 2023
   source_name: NASA Exoplanet Archive (2023)
-  source_published_by: NASA Exoplanet Archive, operated by the California Institute
-    of Technology, under contract with the National Aeronautics and Space Administration
-    under the Exoplanet Exploration Program
+  source_published_by: NASA Exoplanet Archive, operated by the California Institute of Technology, under contract with the National Aeronautics and Space Administration under the Exoplanet Exploration Program
   url: https://exoplanetarchive.ipac.caltech.edu/index.html
-  source_data_url: 
-    https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+distinct+pl_name,disc_year,discoverymethod+from+ps&format=csv
+  source_data_url: https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+distinct+pl_name,disc_year,discoverymethod+from+ps&format=csv
   file_extension: csv
   license_url: https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html
   license_name: Public domain
@@ -28,6 +25,6 @@ meta:
     Details on other methods of discovery are available on Wikipedia: https://en.wikipedia.org/wiki/Exoplanet#Detection_methods
 wdir: ../../../data/snapshots/space/2023-06-09
 outs:
-- md5: 6ee159e7da87b82ed177882d1158bb18
-  size: 170450
-  path: exoplanets.csv
+  - md5: afdc40aa60d4cb185db56177a7e01e64
+    size: 180482
+    path: exoplanets.csv

@@ -16,6 +16,6 @@ meta:
       name: © Energy Institute 2024
       url: https://www.energyinst.org/terms
 outs:
-  - md5: 1233b1b9be6fb7a34d138dafb2bf3fb1
-    size: 37605465
+  - md5: 0eccd34cc8c7867ea89615c2c4a26ee2
+    size: 3714369
     path: statistical_review_of_world_energy.xlsx

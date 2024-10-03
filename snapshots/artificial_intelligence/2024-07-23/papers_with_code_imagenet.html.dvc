@@ -34,6 +34,6 @@ meta:
 
 
 outs:
-  - md5: c60bcec86d9e998ca4011073c48f6af5
-    size: 1661410
+  - md5: 2cb7dbf1a1c6898270f3ae28a9fc8adb
+    size: 1679937
     path: papers_with_code_imagenet.html
