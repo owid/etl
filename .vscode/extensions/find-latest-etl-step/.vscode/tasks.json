@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "watch:esbuild",
+            "type": "npm",
+            "script": "esbuild-watch",
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "typescript",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^.*\\((\\d+,\\d+)\\):\\s*(error|warning)\\s+(TS\\d+):\\s*(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 3,
+                    "code": 4
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "Watching for changes...",
+                    "endsPattern": "Build completed."
+                }
+            }
+        }
+    ]
+}
