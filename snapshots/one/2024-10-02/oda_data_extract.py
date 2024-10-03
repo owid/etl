@@ -74,7 +74,6 @@ COLUMNS_TO_KEEP = [
     "donor_code",
     "recipient_code",
     "sector_code",
-    "purpose_code",
     "channel_code",
     "currency",
     "prices",
@@ -86,8 +85,7 @@ COLUMNS_TO_REMAP = {
     "donor": ["donor_code", "donor_name"],
     "recipient": ["recipient_code", "recipient_name"],
     "sector": ["sector_code", "sector_name"],
-    "purpose": ["purpose_code", "purpose_name"],
-    "channel": ["channel_code", "channel_name"],
+    "channel": ["channel_code", "channel_name", "parent_channel_code"],
 }
 
 # Define columns to extract in the csv
@@ -98,8 +96,8 @@ FINAL_COLUMNS = [
     "recipient_code",
     "recipient_name",
     "sector_name",
-    "purpose_name",
     "channel_name",
+    "parent_channel_code",
     "value",
 ]
 
