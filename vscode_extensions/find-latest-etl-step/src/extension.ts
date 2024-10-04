@@ -68,7 +68,6 @@ export function activate(context: vscode.ExtensionContext) {
                         return {
                             label: displayedPath,  // Show the modified path
                             description: '',  // Empty description to avoid redundancy
-                            detail: file.date === 'latest' ? 'Latest Version' : (file.date as Date).toDateString(),  // Date or 'latest' detail
                             originalPath: file.path,  // Store the original full path
                         };
                     });
