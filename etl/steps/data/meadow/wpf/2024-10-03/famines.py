@@ -77,7 +77,6 @@ def run(dest_dir: str) -> None:
 
     # Combine famines for the African Red Sea Region and Hungerplan as the mortality estimate exists for just the total rather than each entry
     tb = combine_entries(tb)
-    print(tb["Conventional title"].unique())
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["date", "conventional_title"])
@@ -152,6 +151,8 @@ def combine_entries(df):
 
     # Add new combined entry
     df = df._append(new_entry, ignore_index=True)
+    df = df.drop(rows_to_combine.index)
+
     # Additional logic to combine "Hungerplan" entries
     places = ["USSR (Russia)", "USSR (Ukraine)", "USSR (Russia and Western Soviet States)"]
     famine = "Hungerplan (German)"
@@ -177,5 +178,6 @@ def combine_entries(df):
 
         # Add new combined Hungerplan entry
         df = df._append(new_hungerplan_entry, ignore_index=True)
+        df = df.drop(hungerplan_rows.index)
 
     return df
