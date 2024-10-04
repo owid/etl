@@ -16,7 +16,6 @@ import json
 import os
 import re
 import sys
-from copy import deepcopy
 from datetime import date
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional, cast
@@ -25,7 +24,6 @@ import bugsnag
 import numpy as np
 import requests
 import streamlit as st
-import streamlit.components.v1 as components
 from owid.catalog import Dataset
 from pymysql import OperationalError
 from sqlalchemy.orm import Session
@@ -35,7 +33,7 @@ from typing_extensions import Self
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
 from apps.wizard.utils.step_form import StepForm
-from etl.config import OWID_ENV, TLS_VERIFY, OWIDEnv, enable_bugsnag
+from etl.config import OWID_ENV, TLS_VERIFY, enable_bugsnag
 from etl.db import get_connection, read_sql
 from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
@@ -677,58 +675,6 @@ def enable_bugsnag_for_streamlit():
         return original_handler(exception)
 
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
-
-
-def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
-    chart_config_tmp = deepcopy(chart_config)
-
-    chart_config_tmp["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
-    chart_config_tmp["adminBaseUrl"] = owid_env.base_site
-    chart_config_tmp["dataApiUrl"] = f"{owid_env.indicators_url}/"
-
-    # HTML = f"""
-    # <!DOCTYPE html>
-    # <html>
-    #     <head>
-    #         <meta name="viewport" content="width=device-width, initial-scale=1" />
-    #         <link
-    #         href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
-    #         rel="stylesheet"
-    #         />
-    #         <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
-    #     </head>
-    #     <body class="StandaloneGrapherOrExplorerPage">
-    #         <main>
-    #             <figure data-grapher-src></figure>
-    #         </main>
-    #         <div class="site-tools"></div>
-    #         <script>
-    #             document.cookie = "isAdmin=true;max-age=31536000"
-    #         </script>
-    #         <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
-    #         <script type="module">
-    #             var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
-    #         </script>
-    #     </body>
-    # </html>
-    # """
-
-    HTML = f"""
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
-    <div class="StandaloneGrapherOrExplorerPage">
-        <main>
-            <figure data-grapher-src></figure>
-        </main>
-        <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
-        <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
-        <script type="module">
-            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
-        </script>
-    </div>
-    """
-
-    components.html(HTML, height=height, **kwargs)
 
 
 class Pagination:
