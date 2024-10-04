@@ -16,7 +16,7 @@ INDEX_CHANNELS = ["donor_name", "recipient_name", "year", "channel_name"]
 SECTORS_MAPPING = {
     "I.1.a. Education, Level Unspecified": {
         "new_name": "I.1.a. Education, level unspecified",
-        "sub_sector": "I.1 Education",
+        "sub_sector": "I.1. Education",
         "sector": "I. Social infrastructure and services",
     },
     "I.1.b. Basic Education": {
