@@ -5,7 +5,7 @@ import { debounce } from 'lodash'; // Install lodash: npm install lodash
 import ignore from 'ignore'; // Install ignore: npm install ignore
 
 export function activate(context: vscode.ExtensionContext) {
-    let cachedFiles: { path: string, date: Date }[] = [];
+    let cachedFiles: { path: string, date: Date | 'latest' }[] = [];
 
     let disposable = vscode.commands.registerCommand('extension.findLatestETLStep', async () => {
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
@@ -45,24 +45,25 @@ export function activate(context: vscode.ExtensionContext) {
                 );
 
                 if (filteredFiles.length > 0) {
-                    // Find the latest date among the filtered files
+                    // Find the latest date and check for 'latest' versions among the filtered files
                     const latestDate = filteredFiles.reduce((maxDate, file) => {
+                        if (file.date === 'latest') return maxDate; // Ignore 'latest' for this comparison
                         return file.date > maxDate ? file.date : maxDate;
                     }, new Date(0)); // Start with a very old date
 
-                    // Filter files that have the latest date
+                    // Filter files that either have the latest date or contain 'latest'
                     const latestFiles = filteredFiles.filter(file =>
-                        file.date.getTime() === latestDate.getTime()
+                        (file.date instanceof Date && file.date.getTime() === latestDate.getTime()) || file.date === 'latest'
                     );
 
                     // Sort the files by path
                     const sortedFiles = latestFiles.sort((a, b) => a.path.localeCompare(b.path));
-                    
-                    // Display only files with the latest date
+
+                    // Display only files with the latest date or 'latest'
                     quickPick.items = sortedFiles.map(file => ({
                         label: path.relative(workspaceFolder, file.path),  // Show the relative path
                         description: '',  // Empty description to avoid redundancy
-                        detail: file.date.toDateString(),  // Date detail
+                        detail: file.date === 'latest' ? 'Latest Version' : (file.date as Date).toDateString(),  // Date or 'latest' detail
                     }));
                 } else {
                     quickPick.items = []; // Clear results if no files match the filter
@@ -98,8 +99,8 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // Find files and respect ignore patterns
-function findFiles(dir: string, ig: any): { path: string, date: Date }[] {
-    let results: { path: string, date: Date }[] = [];
+function findFiles(dir: string, ig: any): { path: string, date: Date | 'latest' }[] {
+    let results: { path: string, date: Date | 'latest' }[] = [];
     const list = fs.readdirSync(dir);
 
     list.forEach(file => {
@@ -121,6 +122,8 @@ function findFiles(dir: string, ig: any): { path: string, date: Date }[] {
                 if (dateMatch) {
                     const fileDate = new Date(dateMatch[1]);
                     results.push({ path: filePath, date: fileDate });
+                } else if (filePath.includes('latest')) {
+                    results.push({ path: filePath, date: 'latest' });
                 }
             }
         }
