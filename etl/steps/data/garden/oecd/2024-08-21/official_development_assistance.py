@@ -69,18 +69,12 @@ CATEGORIES = {
             "Technical Cooperation": {"new_name": "technical_cooperation"},
         },
     },
-    "dac5": {
-        "aid_type": {
-            "Total ODA": {"new_name": "oda_by_sector"},
-        },
-    },
 }
 
 # Define indices for pivot tables.
 INDICES = {
     "dac1": ["country", "year"],
     "dac2a": ["country", "year", "donor"],
-    "dac5": ["country", "year", "sector"],
 }
 
 # Define type of donors to include from the recipient dataset.
