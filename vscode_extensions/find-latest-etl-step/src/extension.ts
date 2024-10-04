@@ -5,7 +5,7 @@ import { debounce } from 'lodash'; // Install lodash: npm install lodash
 import ignore from 'ignore'; // Install ignore: npm install ignore
 
 export function activate(context: vscode.ExtensionContext) {
-    let cachedFiles: { path: string, date: Date | 'latest' }[] = [];
+    let cachedFiles: { path: string, date: Date | 'latest', originalPath: string }[] = [];
 
     let disposable = vscode.commands.registerCommand('extension.findLatestETLStep', async () => {
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
@@ -59,12 +59,19 @@ export function activate(context: vscode.ExtensionContext) {
                     // Sort the files by path
                     const sortedFiles = latestFiles.sort((a, b) => a.path.localeCompare(b.path));
 
-                    // Display only files with the latest date or 'latest'
-                    quickPick.items = sortedFiles.map(file => ({
-                        label: path.relative(workspaceFolder, file.path),  // Show the relative path
-                        description: '',  // Empty description to avoid redundancy
-                        detail: file.date === 'latest' ? 'Latest Version' : (file.date as Date).toDateString(),  // Date or 'latest' detail
-                    }));
+                    // Display only files with the latest date or 'latest', but hide 'etl/steps/data/' and 'etl/steps/export/' in the label
+                    quickPick.items = sortedFiles.map(file => {
+                        const relativePath = path.relative(workspaceFolder, file.path);
+                        const displayedPath = relativePath
+                            .replace(/^etl\/steps\/data\//, '')  // Hide 'etl/steps/data/'
+                            .replace(/^etl\/steps\/export\//, '');  // Hide 'etl/steps/export/'
+                        return {
+                            label: displayedPath,  // Show the modified path
+                            description: '',  // Empty description to avoid redundancy
+                            detail: file.date === 'latest' ? 'Latest Version' : (file.date as Date).toDateString(),  // Date or 'latest' detail
+                            originalPath: file.path,  // Store the original full path
+                        };
+                    });
                 } else {
                     quickPick.items = []; // Clear results if no files match the filter
                 }
@@ -78,8 +85,8 @@ export function activate(context: vscode.ExtensionContext) {
         });
 
         quickPick.onDidChangeSelection(async (selection) => {
-            if (selection[0] && selection[0].label) {
-                const selectedFilePath = path.join(workspaceFolder, selection[0].label);  // Ensure full path
+            if (selection[0] && selection[0].originalPath) {
+                const selectedFilePath = selection[0].originalPath;  // Use the full original path
                 if (selectedFilePath) {
                     try {
                         const document = await vscode.workspace.openTextDocument(selectedFilePath);
@@ -99,16 +106,16 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // Find files and respect ignore patterns
-function findFiles(dir: string, ig: any): { path: string, date: Date | 'latest' }[] {
-    let results: { path: string, date: Date | 'latest' }[] = [];
+function findFiles(dir: string, ig: any): { path: string, date: Date | 'latest', originalPath: string }[] {
+    let results: { path: string, date: Date | 'latest', originalPath: string }[] = [];
     const list = fs.readdirSync(dir);
 
     list.forEach(file => {
         const filePath = path.join(dir, file);
         const stat = fs.statSync(filePath);
 
-        // Exclude 'etl/data' folder explicitly and ignore '__pycache__' and other similar folders
-        if (filePath.includes(path.join('etl', 'data')) || filePath.includes('__pycache__')) {
+        // Exclude 'etl/data' and ignore '__pycache__' and other similar folders
+        if (filePath.includes(path.join('etl', 'data')) || filePath.includes(path.join('etl', 'export')) || filePath.includes('__pycache__')) {
             return;
         }
 
@@ -121,9 +128,9 @@ function findFiles(dir: string, ig: any): { path: string, date: Date | 'latest' 
                 const dateMatch = filePath.match(/(\d{4}-\d{2}-\d{2})/);
                 if (dateMatch) {
                     const fileDate = new Date(dateMatch[1]);
-                    results.push({ path: filePath, date: fileDate });
+                    results.push({ path: filePath, date: fileDate, originalPath: filePath });
                 } else if (filePath.includes('latest')) {
-                    results.push({ path: filePath, date: 'latest' });
+                    results.push({ path: filePath, date: 'latest', originalPath: filePath });
                 }
             }
         }
