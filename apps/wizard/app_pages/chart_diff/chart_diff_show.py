@@ -14,14 +14,14 @@ from sqlalchemy.orm import Session
 import etl.grapher_model as gm
 from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
+    variable_metadata_df_from_s3,
 )
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
-from apps.wizard.utils.components import grapher_chart
+from apps.wizard.utils.chart import grapher_chart
 from etl.config import OWID_ENV
-from etl.grapher_io import variable_metadata_df_from_s3
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {
