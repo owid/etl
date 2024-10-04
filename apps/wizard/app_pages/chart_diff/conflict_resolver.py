@@ -154,7 +154,7 @@ class ChartDiffConflictResolver:
             # Verify config
             config_new = validate_chart_config_and_set_defaults(config, schema=get_schema_from_url(config["$schema"]))
 
-            api = AdminAPI(SOURCE.engine, grapher_user_id=1)
+            api = AdminAPI(SOURCE, grapher_user_id=1)
             try:
                 # Push new chart to staging
                 api.update_chart(

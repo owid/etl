@@ -13,8 +13,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from etl import grapher_model as gm
-from etl.config import GRAPHER_USER_ID, TAILSCALE_ADMIN_HOST
-from etl.db import Engine
+from etl.config import GRAPHER_USER_ID, OWIDEnv
 
 log = structlog.get_logger()
 
@@ -25,7 +24,9 @@ def is_502_error(exception):
 
 
 class AdminAPI(object):
-    def __init__(self, engine: Engine, grapher_user_id: Optional[int] = None):
+    def __init__(self, owid_env: OWIDEnv, grapher_user_id: Optional[int] = None):
+        self.owid_env = owid_env
+        engine = owid_env.get_engine()
         with Session(engine) as session:
             if grapher_user_id:
                 user = session.get(gm.User, grapher_user_id)
@@ -34,11 +35,6 @@ class AdminAPI(object):
             assert user
             self.session_id = _create_user_session(session, user.email)
             session.commit()
-
-        if engine.url.database == "live_grapher" and "prod-db" in str(engine.url.host):
-            self.base_url = TAILSCALE_ADMIN_HOST
-        else:
-            self.base_url = f"http://{engine.url.host}.tail6e23.ts.net"
 
     def _json_from_response(self, resp: requests.Response) -> dict:
         if resp.status_code != 200:
@@ -52,7 +48,7 @@ class AdminAPI(object):
 
     def get_chart_config(self, chart_id: int) -> dict:
         resp = requests.get(
-            f"{self.base_url}/admin/api/charts/{chart_id}.config.json",
+            f"{self.owid_env.admin_api}/charts/{chart_id}.config.json",
             cookies={"sessionid": self.session_id},
         )
         js = self._json_from_response(resp)
@@ -60,7 +56,7 @@ class AdminAPI(object):
 
     def create_chart(self, chart_config: dict) -> dict:
         resp = requests.post(
-            self.base_url + "/admin/api/charts",
+            self.owid_env.admin_api + "/charts",
             cookies={"sessionid": self.session_id},
             json=chart_config,
         )
@@ -70,7 +66,7 @@ class AdminAPI(object):
 
     def update_chart(self, chart_id: int, chart_config: dict) -> dict:
         resp = requests.put(
-            f"{self.base_url}/admin/api/charts/{chart_id}",
+            f"{self.owid_env.admin_api}/charts/{chart_id}",
             cookies={"sessionid": self.session_id},
             json=chart_config,
         )
@@ -80,7 +76,7 @@ class AdminAPI(object):
 
     def set_tags(self, chart_id: int, tags: List[Dict[str, Any]]) -> dict:
         resp = requests.post(
-            f"{self.base_url}/admin/api/charts/{chart_id}/setTags",
+            f"{self.owid_env.admin_api}/charts/{chart_id}/setTags",
             cookies={"sessionid": self.session_id},
             json={"tags": tags},
         )
@@ -91,7 +87,7 @@ class AdminAPI(object):
     def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
         # Retry in case we're restarting Admin on staging server
         resp = requests_with_retry().put(
-            self.base_url + f"/admin/api/variables/{variable_id}/grapherConfigETL",
+            self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
             cookies={"sessionid": self.session_id},
             json=grapher_config,
         )
@@ -101,7 +97,7 @@ class AdminAPI(object):
 
     def delete_grapher_config(self, variable_id: int) -> dict:
         resp = requests.delete(
-            self.base_url + f"/admin/api/variables/{variable_id}/grapherConfigETL",
+            self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
             cookies={"sessionid": self.session_id},
         )
         js = self._json_from_response(resp)
