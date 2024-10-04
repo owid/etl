@@ -142,7 +142,7 @@ def _validate_grapher_config(tab: Table, col: str) -> None:
 
         # Load schema and remove properties that are not relevant for the validation
         schema = get_schema_from_url(grapher_config["$schema"])
-        schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version")]
+        schema["required"] = []
 
         validate(grapher_config, schema)
 
