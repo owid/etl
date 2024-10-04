@@ -48,7 +48,6 @@ tables:
             - fragment_id: deaths-estimation
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: share-of-deaths-registered
             title: Share of deaths that are registered
             subtitle: >-
               The number of deaths reported in a country's [vital registration

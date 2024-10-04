@@ -50,7 +50,6 @@ tables:
           numDecimalPlaces: 0
         presentation:
           grapher_config:
-            slug: yearly-number-of-objects-launched-into-outer-space
             title: Annual number of objects launched into space
             subtitle: |-
               This includes satellites, probes, landers, crewed spacecrafts, and space station flight elements launched into Earth orbit or beyond.
