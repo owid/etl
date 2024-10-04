@@ -19,7 +19,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
+    # Rename for plotting.
+    tb = tb.rename_index_names({"conventional_title": "country", "date": "year"})
     #
     # Save outputs.
     #
