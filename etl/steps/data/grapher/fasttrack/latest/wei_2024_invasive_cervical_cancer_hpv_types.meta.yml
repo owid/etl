@@ -7,7 +7,71 @@ dataset:
 tables:
   wei_2024_invasive_cervical_cancer_hpv_types:
     variables:
-      attributable_fraction_invasive_cervical_cancer:
-        title: Attributable_fraction_invasive_cervical_cancer
+      hpv_type_16:
+        title: HPV_type_16
         unit: '%'
-        description: The fraction of invasive cervical cancers that are estimated to be caused by a given type of HPV
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 16
+      hpv_type_18:
+        title: HPV_type_18
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 18
+      hpv_type_26:
+        title: HPV_type_26
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 26
+      hpv_type_31:
+        title: HPV_type_31
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 31
+      hpv_type_33:
+        title: HPV_type_33
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 33
+      hpv_type_35:
+        title: HPV_type_35
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 35
+      hpv_type_39:
+        title: HPV_type_39
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 39
+      hpv_type_45:
+        title: HPV_type_45
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 45
+      hpv_type_51:
+        title: HPV_type_51
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 51
+      hpv_type_52:
+        title: HPV_type_52
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 52
+      hpv_type_56:
+        title: HPV_type_56
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 56
+      hpv_type_58:
+        title: HPV_type_58
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 58
+      hpv_type_59:
+        title: HPV_type_59
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 59
+      hpv_type_68:
+        title: HPV_type_68
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 68
+      hpv_type_69:
+        title: HPV_type_69
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 69
+      hpv_type_73:
+        title: HPV_type_73
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 73
+      hpv_type_82:
+        title: HPV_type_82
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by HPV type 82

@@ -8,7 +8,7 @@ meta:
       Wei, F., Georges, D., Man, I., Baussano, I., & Clifford, G. M. (2024). Causal attribution of human papillomavirus genotypes to invasive cervical cancer worldwide: A systematic analysis of the global literature. The Lancet, 404(10451), 435–444. https://doi.org/10.1016/S0140-6736(24)01097-
     url_main: https://doi.org/10.1016/S0140-6736(24)01097-30.1016/S0140-6736(24)01097-3
     url_download: |-
-      gAAAAABnAB_IfjuWGNOm_9AW4XgkHEbtL-nPWCD80ML4s_qVXLDQk4l35fyuAINNzMKiIAe6bK4Ti4WHeUrf8Mr93C1dIryjQVJuSeGH_1zDrYgVjbZyL7ZCZVJrDi3cedBWRBioh3p6SxecXyNuvA0uCmFcfLUIR6mYYzBax_IKPopqYnnZJ2xG-HGzQLjhfUBY9UKhW1HiIZD4O56qLxXCg-Hf3RgIMwfaUxVDVtwRhEbKhZp5YHCbUKr0i_9FROL7RTTWPnJm
+      gAAAAABnACORvKdC75qJU2oLIafVnHmF_zmQoEnVHuQuGFAV9AclPSFiiFN6UADHeUOa6TsgMT_Efafd1nhob7s2H9__TjtM_PwF1QOrmxeYwLbN_M39uDyscYNHUAOeF72xON7yaZif8UdcqYAJsHgmVMMlOj_XgWif9XErJ43CjxgbXaBlj_5RllkNDUXeiYLMq5MR4baWiIEdspiaWQtdxed4_Pgvga1BH9h9_4ytcWG_MmkVeGakZdOqoYHbCxpRhYY5FdoW
     date_accessed: '2024-10-04'
     date_published: '2024'
   name: Causal attribution of HPV genotypes to invasive cervical cancer worldwide
@@ -17,6 +17,6 @@ meta:
   license: {}
   is_public: false
 outs:
-  - md5: 26d9e58663fc0acb5975dcf81e1aaeb3
-    size: 300
+  - md5: 29c933be1ba2aab8afdd58b8c8c109d0
+    size: 332
     path: wei_2024_invasive_cervical_cancer_hpv_types.csv
