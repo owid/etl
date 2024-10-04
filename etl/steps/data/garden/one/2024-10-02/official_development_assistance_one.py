@@ -192,7 +192,7 @@ SECTORS_MAPPING = {
     "VII. Action Relating to Debt": {
         "new_name": "VII. Action relating to debt",
         "sub_sector": "VII. Action relating to debt",
-        "sector": "VII. Humanitarian aid",
+        "sector": "VII. Action relating to debt",
     },
     "VIII.1. Emergency Response": {
         "new_name": "VIII.1. Emergency response",
@@ -418,8 +418,6 @@ def add_non_humanitarian_aid_and_total(tb: Table) -> Table:
     tb_non_humanitarian = pr.merge(
         tb_total, tb_humanitarian, on=INDEX_WITHOUT_SECTOR_NAME, how="left", suffixes=("_total", "_humanitarian")
     )
-
-    print(tb_non_humanitarian)
 
     # Calculate value as the difference between value_total and value_humanitarian
     tb_non_humanitarian["value"] = tb_non_humanitarian["value_total"] - tb_non_humanitarian["value_humanitarian"]
