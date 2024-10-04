@@ -1,6 +1,6 @@
 import streamlit as st
 
-from apps.wizard.utils.data import load_variable_data
+from apps.wizard.utils.data import load_variable_data, load_variable_metadata
 
 # PAGE CONFIG
 st.set_page_config(
@@ -65,25 +65,37 @@ st.divider()
 
 @st.dialog("Vizualize the indicator", width="large")
 def show_indicator(indicator_uri):
+    """Plot the indicator in a modal window."""
+    # Modal title
     st.markdown(f"`{indicator_uri}`")
-    print(indicator_uri)
+
+    # Get data and metadata from catalog
     data = load_variable_data(indicator_uri)
-    countries = list(data["entities"].unique())
-    countries = st.multiselect("Countries", countries, default=countries[:5])
-    st.write(countries)
-    data_ = data[data["entities"].isin(countries)]
+    # metadata = load_variable_metadata(indicator_uri)
+
+    # Get list of entities available
+    entities = list(data["entity"].unique())
+    entities_agg = {
+        "Africa",
+        "Asia",
+        "Europe",
+        "North America",
+        "Oceania",
+        "South America",
+        "World",
+    }
+    entities_default = [e for e in entities if e not in entities_agg][:5]
+    countries = st.multiselect("Entities", entities, default=entities_default)
+
+    # Filter data
+    data_ = data[data["entity"].isin(countries)]
     # data_ = data_.pivot(index="years", columns="entities", values="values")
     # columns = [col for col in data_.columns if col != "years"]
     # st.dataframe(data_)
-    st.line_chart(data=data_, x="years", y="values", color="entities")
 
+    # Plot data
+    st.line_chart(data=data_, x="years", y="values", color="entity")
 
-# (s,) = st.columns(1)
-# s.button("Material button", icon=":material/thumb_up:", use_container_width=True)
-
-
-# s = st.empty()
-# st.button("Material button", icon=":material/thumb_up:", use_container_width=True)
 
 # Block per dataset
 for dataset_index, d in enumerate(st.session_state.datasets):
