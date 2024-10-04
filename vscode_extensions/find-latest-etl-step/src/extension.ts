@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import ignore from 'ignore';
+import { debounce } from 'lodash'; // Install lodash: npm install lodash
+import ignore from 'ignore'; // Install ignore: npm install ignore
 
 export function activate(context: vscode.ExtensionContext) {
-    let cachedFiles: { path: string, date: Date | null }[] = [];
+    let cachedFiles: { path: string, date: Date }[] = [];
 
     let disposable = vscode.commands.registerCommand('extension.findLatestETLStep', async () => {
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
@@ -13,6 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
+        // Load .gitignore or other ignore files
         const ig = ignore();
         const gitignorePath = path.join(workspaceFolder, '.gitignore');
         if (fs.existsSync(gitignorePath)) {
@@ -20,39 +22,54 @@ export function activate(context: vscode.ExtensionContext) {
             ig.add(gitignoreContent);
         }
 
-        await vscode.window.withProgress(
+        vscode.window.withProgress(
             {
                 location: vscode.ProgressLocation.Notification,
-                title: "Indexing ETL files...",
+                title: "Indexing ETL files 5...",
                 cancellable: false
             },
             async () => {
-                cachedFiles = findFiles(workspaceFolder, ig, workspaceFolder);
+                cachedFiles = findFiles(workspaceFolder, ig);
             }
         );
 
         const quickPick = vscode.window.createQuickPick();
-        quickPick.placeholder = 'Type to filter files by name';
+        quickPick.placeholder = 'Type to filter files by name...';
+        quickPick.matchOnDescription = true;
+        quickPick.matchOnDetail = true;
 
-        // Sort files by date in descending order based on the extracted date from the file path
-        const sortedFiles = cachedFiles
-            .filter(file => file.date !== null)
-            .sort((a, b) => {
-                if (a.date && b.date) {
-                    return b.date.getTime() - a.date.getTime(); // Sort by descending order of date
+        const debouncedSearch = debounce((filter: string) => {
+            if (filter) {
+                const filteredFiles = cachedFiles.filter(file =>
+                    file.path.includes(filter)
+                );
+                const sortedFiles = filteredFiles.sort((a, b) => b.date.getTime() - a.date.getTime());
+                quickPick.items = sortedFiles.map(file => ({
+                    label: path.basename(file.path),
+                    description: file.path,
+                    detail: file.date.toDateString(),
+                }));
+            } else {
+                quickPick.items = []; // Clear results if no input
+            }
+        }, 300); // 300ms debounce delay
+
+        quickPick.onDidChangeValue((filter) => {
+            debouncedSearch(filter);
+        });
+
+        quickPick.onDidChangeSelection(async (selection) => {
+            if (selection[0] && selection[0].description) {
+                const selectedFilePath = selection[0].description;
+                if (selectedFilePath) {
+                    try {
+                        const document = await vscode.workspace.openTextDocument(selectedFilePath);
+                        vscode.window.showTextDocument(document);
+                        quickPick.hide();
+                    } catch (err) {
+                        vscode.window.showErrorMessage(`Failed to open the file: ${err}`);
+                    }
                 }
-                return 0;
-            });
-
-        quickPick.items = sortedFiles.map(file => ({
-            label: path.relative(workspaceFolder, file.path),
-            description: file.date ? file.date.toISOString().slice(0, 10) : ''
-        }));
-
-        quickPick.onDidChangeSelection(selection => {
-            if (selection[0]) {
-                const fileUri = vscode.Uri.file(path.join(workspaceFolder, selection[0].label));
-                vscode.workspace.openTextDocument(fileUri).then(doc => vscode.window.showTextDocument(doc));
             }
         });
 
@@ -62,39 +79,31 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(disposable);
 }
 
-function findFiles(dir: string, ig: ReturnType<typeof ignore>, baseDir: string): { path: string, date: Date | null }[] {
-    let results: { path: string, date: Date | null }[] = [];
+// Find files and respect ignore patterns
+function findFiles(dir: string, ig: any): { path: string, date: Date }[] {
+    let results: { path: string, date: Date }[] = [];
+    const list = fs.readdirSync(dir);
 
-    const files = fs.readdirSync(dir);
-    for (const file of files) {
-        const fullPath = path.join(dir, file);
+    list.forEach(file => {
+        const filePath = path.join(dir, file);
+        const stat = fs.statSync(filePath);
 
-        // Check if the file path is ignored by .gitignore
-        if (ig.ignores(path.relative(baseDir, fullPath))) {
-            continue;
-        }
-
-        const stat = fs.lstatSync(fullPath);
-
-        if (stat.isDirectory()) {
-            results = results.concat(findFiles(fullPath, ig, baseDir));
+        if (stat && stat.isDirectory()) {
+            results = results.concat(findFiles(filePath, ig));
         } else {
-            const extractedDate = extractDateFromPath(fullPath);
-            results.push({ path: fullPath, date: extractedDate });
+            // Check if the file is ignored based on the ignore rules
+            const relativePath = path.relative(dir, filePath);
+            if (!ig.ignores(relativePath)) {
+                const dateMatch = filePath.match(/(\d{4}-\d{2}-\d{2})/);
+                if (dateMatch) {
+                    const fileDate = new Date(dateMatch[1]);
+                    results.push({ path: filePath, date: fileDate });
+                }
+            }
         }
-    }
+    });
 
     return results;
 }
 
-function extractDateFromPath(filePath: string): Date | null {
-    // Regex to match date in format YYYY-MM-DD in the file path
-    const dateRegex = /(\d{4}-\d{2}-\d{2})/;
-    const match = filePath.match(dateRegex);
-
-    if (match) {
-        return new Date(match[1]); // Convert the matched date string to a Date object
-    }
-
-    return null;
-}
+export function deactivate() {}
