@@ -4,6 +4,11 @@ import * as path from 'path';
 import { debounce } from 'lodash'; // Install lodash: npm install lodash
 import ignore from 'ignore'; // Install ignore: npm install ignore
 
+// Define a custom QuickPickItem type that includes the originalPath
+interface ETLQuickPickItem extends vscode.QuickPickItem {
+    originalPath: string;
+}
+
 export function activate(context: vscode.ExtensionContext) {
     let cachedFiles: { path: string, date: Date | 'latest', originalPath: string }[] = [];
 
@@ -33,7 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
         );
 
-        const quickPick = vscode.window.createQuickPick();
+        const quickPick = vscode.window.createQuickPick<ETLQuickPickItem>();
         quickPick.placeholder = 'Type to filter files by name...';
         quickPick.matchOnDescription = true;
         quickPick.matchOnDetail = true;
@@ -45,47 +50,42 @@ export function activate(context: vscode.ExtensionContext) {
                 );
 
                 if (filteredFiles.length > 0) {
-                    // Find the latest date and check for 'latest' versions among the filtered files
                     const latestDate = filteredFiles.reduce((maxDate, file) => {
-                        if (file.date === 'latest') return maxDate; // Ignore 'latest' for this comparison
+                        if (file.date === 'latest') {return maxDate;}
                         return file.date > maxDate ? file.date : maxDate;
-                    }, new Date(0)); // Start with a very old date
+                    }, new Date(0));
 
-                    // Filter files that either have the latest date or contain 'latest'
                     const latestFiles = filteredFiles.filter(file =>
                         (file.date instanceof Date && file.date.getTime() === latestDate.getTime()) || file.date === 'latest'
                     );
 
-                    // Sort the files by path
-                    const sortedFiles = latestFiles.sort((a, b) => a.path.localeCompare(b.path));
-
-                    // Display only files with the latest date or 'latest', but hide certain parts of the path
-                    quickPick.items = sortedFiles.map(file => {
+                    quickPick.items = latestFiles.map(file => {
                         const relativePath = path.relative(workspaceFolder, file.path);
                         const displayedPath = relativePath
-                            .replace(/^etl\/steps\/data\//, '')  // Hide 'etl/steps/data/'
-                            .replace(/^etl\/steps\/export\//, '');  // Hide 'etl/steps/export/'
+                            .replace(/^etl\/steps\/data\//, '')
+                            .replace(/^etl\/steps\/export\//, '');
                         return {
-                            label: displayedPath,  // Show the modified path
-                            description: '',  // Empty description to avoid redundancy
-                            originalPath: file.path,  // Store the original full path
+                            label: displayedPath,
+                            description: '',
+                            originalPath: file.path, // Store the original full path
                         };
                     });
                 } else {
-                    quickPick.items = []; // Clear results if no files match the filter
+                    quickPick.items = [];
                 }
             } else {
-                quickPick.items = []; // Clear results if no input
+                quickPick.items = [];
             }
-        }, 300); // 300ms debounce delay
+        }, 300);
 
         quickPick.onDidChangeValue((filter) => {
             debouncedSearch(filter);
         });
 
         quickPick.onDidChangeSelection(async (selection) => {
-            if (selection[0] && selection[0].originalPath) {
-                const selectedFilePath = selection[0].originalPath;  // Use the full original path
+            const selectedItem = selection[0] as ETLQuickPickItem;  // Use the custom type
+            if (selectedItem && selectedItem.originalPath) {
+                const selectedFilePath = selectedItem.originalPath;  // Use the full original path
                 if (selectedFilePath) {
                     try {
                         const document = await vscode.workspace.openTextDocument(selectedFilePath);
@@ -104,7 +104,6 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(disposable);
 }
 
-// Find files and respect ignore patterns
 function findFiles(dir: string, ig: any): { path: string, date: Date | 'latest', originalPath: string }[] {
     let results: { path: string, date: Date | 'latest', originalPath: string }[] = [];
     const list = fs.readdirSync(dir);
@@ -113,7 +112,6 @@ function findFiles(dir: string, ig: any): { path: string, date: Date | 'latest',
         const filePath = path.join(dir, file);
         const stat = fs.statSync(filePath);
 
-        // Exclude certain folders explicitly
         const excludeFolders = [
             path.join('etl', 'data'),
             path.join('etl', 'export'),
@@ -129,7 +127,6 @@ function findFiles(dir: string, ig: any): { path: string, date: Date | 'latest',
         if (stat && stat.isDirectory()) {
             results = results.concat(findFiles(filePath, ig));
         } else {
-            // Check if the file is ignored based on the ignore rules
             const relativePath = path.relative(dir, filePath);
             if (!ig.ignores(relativePath)) {
                 const dateMatch = filePath.match(/(\d{4}-\d{2}-\d{2})/);
