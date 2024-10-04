@@ -25,7 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.withProgress(
             {
                 location: vscode.ProgressLocation.Notification,
-                title: "Indexing ETL files 5...",
+                title: "Indexing ETL files...",
                 cancellable: false
             },
             async () => {
@@ -87,6 +87,11 @@ function findFiles(dir: string, ig: any): { path: string, date: Date }[] {
     list.forEach(file => {
         const filePath = path.join(dir, file);
         const stat = fs.statSync(filePath);
+
+        // Exclude 'etl/data' folder explicitly
+        if (filePath.includes(path.join('etl', 'data'))) {
+            return;
+        }
 
         if (stat && stat.isDirectory()) {
             results = results.concat(findFiles(filePath, ig));
