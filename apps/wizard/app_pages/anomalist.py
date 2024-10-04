@@ -1,6 +1,7 @@
 import streamlit as st
 
-from apps.wizard.utils.data import load_variable_data, load_variable_metadata
+from apps.wizard.utils.chart import grapher_chart
+from etl.config import OWID_ENV
 
 # PAGE CONFIG
 st.set_page_config(
@@ -70,31 +71,10 @@ def show_indicator(indicator_uri):
     st.markdown(f"`{indicator_uri}`")
 
     # Get data and metadata from catalog
-    data = load_variable_data(indicator_uri)
-    # metadata = load_variable_metadata(indicator_uri)
-
+    # st.write(metadata)
     # Get list of entities available
-    entities = list(data["entity"].unique())
-    entities_agg = {
-        "Africa",
-        "Asia",
-        "Europe",
-        "North America",
-        "Oceania",
-        "South America",
-        "World",
-    }
-    entities_default = [e for e in entities if e not in entities_agg][:5]
-    countries = st.multiselect("Entities", entities, default=entities_default)
-
-    # Filter data
-    data_ = data[data["entity"].isin(countries)]
-    # data_ = data_.pivot(index="years", columns="entities", values="values")
-    # columns = [col for col in data_.columns if col != "years"]
-    # st.dataframe(data_)
-
-    # Plot data
-    st.line_chart(data=data_, x="years", y="values", color="entity")
+    grapher_chart(catalog_path=indicator_uri, owid_env=OWID_ENV)
+    # st.line_chart(data=data_, x="years", y="values", color="entity")
 
 
 # Block per dataset
