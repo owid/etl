@@ -232,3 +232,5 @@ steps:
     - snapshot://fasttrack/latest/lpi_distribution_wwf.csv
   data-private://grapher/fasttrack/latest/de_sanjose_2019_hpv_cancers:
     - snapshot-private://fasttrack/latest/de_sanjose_2019_hpv_cancers.csv
+  data-private://grapher/fasttrack/latest/wei_2024_invasive_cervical_cancer_hpv_types:
+    - snapshot-private://fasttrack/latest/wei_2024_invasive_cervical_cancer_hpv_types.csv

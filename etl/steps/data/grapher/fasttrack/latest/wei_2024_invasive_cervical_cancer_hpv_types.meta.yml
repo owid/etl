@@ -1,0 +1,13 @@
+dataset:
+  title: Causal attribution of HPV genotypes to invasive cervical cancer worldwide
+  description: |-
+    A systematic review of literature on the fraction of invasive cervical cancer cases that are attributed to each type of human papillomavirus, based on PCR tests of cervical cancer cells or biopsies in people with normal cervical cells or invasive cervical carcinoma.
+  licenses:
+    - {}
+tables:
+  wei_2024_invasive_cervical_cancer_hpv_types:
+    variables:
+      attributable_fraction_invasive_cervical_cancer:
+        title: Attributable_fraction_invasive_cervical_cancer
+        unit: '%'
+        description: The fraction of invasive cervical cancers that are estimated to be caused by a given type of HPV
