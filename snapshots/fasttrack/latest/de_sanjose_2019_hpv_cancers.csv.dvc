@@ -2,11 +2,15 @@ meta:
   origin:
     producer: De Sanjosé et al. (2019)
     title: Burden of Human Papillomavirus (HPV)-Related Cancers Attributable to HPVs 6/11/16/18/31/33/45/52 and 58
+    description: |-
+      A global study examining the fraction of cancers attributable to different types of HPV. The study analyzed 18,247 samples of cancers of the genitals, anus, and head and neck, from 50 countries. Researchers tested for HPV DNA, and for cancers other than cervical cancer, they also looked for specific biomarkers of HPV infection. This dataset shows the estimated fraction of global cancers of each type that is attributable to HPV DNA or biomarkers (in Table 2 and 3 of the study).
     citation_full: |-
       De Sanjosé, S., Serrano, B., Tous, S., Alejo, M., Lloveras, B., Quirós, B., Clavero, O., Vidal, A., Ferrándiz-Pulido, C., Pavón, M. Á., Holzinger, D., Halec, G., Tommasino, M., Quint, W., Pawlita, M., Muñoz, N., Bosch, F. X., Alemany, L., RIS HPV TT, VVAP and Head and Neck study groups, & Kulkarni, A. (2018). Burden of Human Papillomavirus (HPV)-Related Cancers Attributable to HPVs 6/11/16/18/31/33/45/52 and 58. JNCI Cancer Spectrum, 2(4), pky045. https://doi.org/10.1093/jncics/pky045
+    url_main: https://doi.org/10.1093/jncics/pky045
     url_download: |-
-      gAAAAABnAB1XR5962Cq6AaMDPVWeK2iyd3YNLH5yqDA2HRKFeGkcKJ7nKT2kRmQFIwz3xhWd7j8aOtsJH-C7JvTwdf2oVHnTku2M3dchIhDBVZMEUccpm5oPJMkt5Zz4TgV0RsrNmxzyP5dfu_otKl8nUdQ6H7LtaFDltHon3EHhem8ZaWxVU3VyeX5E6DhaS29d-wAYUom5yxE97eb6vf89OaN9hNV3XGzK3lxstovB0MsdvBL8V11V3MA8kT-GKi8dMf7VpvCv
+      gAAAAABnAB8MNS9AUbdJtL9HwRXrNZW3NFaxlRkcxeoVheaYaEhNzDNCNv_9MwFISAR1RaSBDibzO-LbzTy49yBgJpV4Pi1v_X_Ad7DppvP_iE5CAn_H9RWAeGazC6ztIk58K5qmYTa6PVdrv1KfMmzKYXMcMYJry7yU5Lzhd6_Tk1-mpxqH1oHnv0mAWrsp3WykN9E5yln615CI8-AOKJQI00RuUddUBj97DCKkLI_xEgbHIi9n9xTqxej5yThl4mo8OmEs8lsX
     date_accessed: '2024-10-04'
+    date_published: '2019'
   name: Burden of Human Papillomavirus (HPV)-Related Cancers Attributable to HPVs 6/11/16/18/31/33/45/52 and 58
   description: |-
     A global study examining the fraction of cancers attributable to different types of HPV. The study analyzed 18,247 samples of cancers of the genitals, anus, and head and neck, from 50 countries. Researchers tested for HPV DNA, and for cancers other than cervical cancer, they also looked for specific biomarkers of HPV infection. This dataset shows the estimated fraction of global cancers of each type that is attributable to HPV DNA or biomarkers (in Table 2 and 3 of the study).
