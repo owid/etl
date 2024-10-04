@@ -11,7 +11,6 @@ import structlog
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import HTTPError
 from sqlalchemy import text
-from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from etl import grapher_model as gm
