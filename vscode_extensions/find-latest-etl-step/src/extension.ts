@@ -43,12 +43,30 @@ export function activate(context: vscode.ExtensionContext) {
                 const filteredFiles = cachedFiles.filter(file =>
                     file.path.includes(filter)
                 );
-                const sortedFiles = filteredFiles.sort((a, b) => b.date.getTime() - a.date.getTime());
-                quickPick.items = sortedFiles.map(file => ({
-                    label: path.basename(file.path),
-                    description: path.relative(workspaceFolder, file.path),  // Relative path
-                    detail: file.date.toDateString(),
-                }));
+
+                if (filteredFiles.length > 0) {
+                    // Find the latest date among the filtered files
+                    const latestDate = filteredFiles.reduce((maxDate, file) => {
+                        return file.date > maxDate ? file.date : maxDate;
+                    }, new Date(0)); // Start with a very old date
+
+                    // Filter files that have the latest date
+                    const latestFiles = filteredFiles.filter(file =>
+                        file.date.getTime() === latestDate.getTime()
+                    );
+
+                    // Sort the files by path
+                    const sortedFiles = latestFiles.sort((a, b) => a.path.localeCompare(b.path));
+                    
+                    // Display only files with the latest date
+                    quickPick.items = sortedFiles.map(file => ({
+                        label: path.relative(workspaceFolder, file.path),  // Show the relative path
+                        description: '',  // Empty description to avoid redundancy
+                        detail: file.date.toDateString(),  // Date detail
+                    }));
+                } else {
+                    quickPick.items = []; // Clear results if no files match the filter
+                }
             } else {
                 quickPick.items = []; // Clear results if no input
             }
@@ -59,8 +77,8 @@ export function activate(context: vscode.ExtensionContext) {
         });
 
         quickPick.onDidChangeSelection(async (selection) => {
-            if (selection[0] && selection[0].description) {
-                const selectedFilePath = path.join(workspaceFolder, selection[0].description);  // Ensure full path
+            if (selection[0] && selection[0].label) {
+                const selectedFilePath = path.join(workspaceFolder, selection[0].label);  // Ensure full path
                 if (selectedFilePath) {
                     try {
                         const document = await vscode.workspace.openTextDocument(selectedFilePath);
@@ -88,8 +106,8 @@ function findFiles(dir: string, ig: any): { path: string, date: Date }[] {
         const filePath = path.join(dir, file);
         const stat = fs.statSync(filePath);
 
-        // Exclude 'etl/data' folder explicitly
-        if (filePath.includes(path.join('etl', 'data'))) {
+        // Exclude 'etl/data' folder explicitly and ignore '__pycache__' and other similar folders
+        if (filePath.includes(path.join('etl', 'data')) || filePath.includes('__pycache__')) {
             return;
         }
 
