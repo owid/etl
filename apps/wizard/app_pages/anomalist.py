@@ -106,25 +106,35 @@ for dataset_index, d in enumerate(st.session_state.datasets):
     for indicator_index, i in enumerate(indicators):
         indicator_uri = f"{d['dataset']}/{i['slug']}"
         with st.container(border=True):
+            # Title
             st.markdown(f"`{i['slug']}`")
-            anomalies = i["anomalies"]
-            st.markdown(f"{len(anomalies)} anomalies detected.")
+
+            # Show indicator button
             if st.button("Show chart", icon=":material/show_chart:", use_container_width=False):
                 show_indicator(indicator_uri)
-            # Expander per anomaly
+
+            # Anomalies detected
+            anomalies = i["anomalies"]
+            st.markdown(f"{len(anomalies)} anomalies detected.")
+
             for anomaly_index, a in enumerate(anomalies):
+                # Review icon
                 if a["resolved"]:
                     icon = "✅"
                 else:
                     icon = "⏳"
-                # print(f"{anomaly_index}/ {icon}")
+
+                # Anomaly explained (expander)
                 with st.expander(f'{anomaly_index+1}/ {a["title"]}', expanded=False, icon=icon):
                     # Check if resolved
                     key = f"resolved_{dataset_index}_{indicator_index}_{anomaly_index}"
+
+                    # Checkbox (if resolved)
                     st.checkbox(
                         "Mark as resolved",
                         value=a["resolved"],
                         key=key,
                     )
 
+                    # Anomaly description
                     st.markdown(a["description"])
