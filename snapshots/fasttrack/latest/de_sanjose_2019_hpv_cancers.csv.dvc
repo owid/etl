@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: De Sanjosé et al. (2019)
+    producer: De Sanjosé et al.
     title: Burden of Human Papillomavirus (HPV)-Related Cancers Attributable to HPVs 6/11/16/18/31/33/45/52 and 58
     description: |-
       A global study examining the fraction of cancers attributable to different types of HPV. The study analyzed 18,247 samples of cancers of the genitals, anus, and head and neck, from 50 countries. Researchers tested for HPV DNA, and for cancers other than cervical cancer, they also looked for specific biomarkers of HPV infection. This dataset shows the estimated fraction of global cancers of each type that is attributable to HPV DNA or biomarkers (in Table 2 and 3 of the study).
@@ -8,7 +8,7 @@ meta:
       De Sanjosé, S., Serrano, B., Tous, S., Alejo, M., Lloveras, B., Quirós, B., Clavero, O., Vidal, A., Ferrándiz-Pulido, C., Pavón, M. Á., Holzinger, D., Halec, G., Tommasino, M., Quint, W., Pawlita, M., Muñoz, N., Bosch, F. X., Alemany, L., RIS HPV TT, VVAP and Head and Neck study groups, & Kulkarni, A. (2018). Burden of Human Papillomavirus (HPV)-Related Cancers Attributable to HPVs 6/11/16/18/31/33/45/52 and 58. JNCI Cancer Spectrum, 2(4), pky045. https://doi.org/10.1093/jncics/pky045
     url_main: https://doi.org/10.1093/jncics/pky045
     url_download: |-
-      gAAAAABnAB8MNS9AUbdJtL9HwRXrNZW3NFaxlRkcxeoVheaYaEhNzDNCNv_9MwFISAR1RaSBDibzO-LbzTy49yBgJpV4Pi1v_X_Ad7DppvP_iE5CAn_H9RWAeGazC6ztIk58K5qmYTa6PVdrv1KfMmzKYXMcMYJry7yU5Lzhd6_Tk1-mpxqH1oHnv0mAWrsp3WykN9E5yln615CI8-AOKJQI00RuUddUBj97DCKkLI_xEgbHIi9n9xTqxej5yThl4mo8OmEs8lsX
+      gAAAAABnACFyO7L4GVC75YJM2F0s_mQXDyLaJhaE-QQOsMsCP90tfqvV8vlAQjAG8usL2iSWbs1DHVenYvpDkyb12_1bfbJIiK6Ca_-iXlhE2EiXLaabTNvwbwZkv1atiU-jEkgv31RVYBIODptnSTBaPT028U9m4N1GxN_2wCRekGQJqhpkqvT4UaQfjhlDxn5UhyGOutziO9kgPvlSt5xLP6o20uE7TKSoODyYFk6dgtcV_EjxNxsL1rsl1AT-BC43jWISmciO
     date_accessed: '2024-10-04'
     date_published: '2019'
   name: Burden of Human Papillomavirus (HPV)-Related Cancers Attributable to HPVs 6/11/16/18/31/33/45/52 and 58
@@ -17,6 +17,6 @@ meta:
   license: {}
   is_public: false
 outs:
-  - md5: 35238962e2fc0e85cc128dce3d408d3d
-    size: 207
+  - md5: 297013a4fb4e07982c3c07fba085225b
+    size: 141
     path: de_sanjose_2019_hpv_cancers.csv

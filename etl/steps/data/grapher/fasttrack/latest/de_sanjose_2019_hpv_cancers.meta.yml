@@ -7,8 +7,43 @@ dataset:
 tables:
   de_sanjose_2019_hpv_cancers:
     variables:
-      attributable_fraction_nine_hpv_types:
-        title: Attributable_fraction_nine_HPV_types
+      anus:
+        title: Anus
+        unit: '%'
+        description: |-
+          The fraction of cancers that are estimated to be caused by any of 9 pathogenic types of HPV (types 6, 11, 16, 18, 31, 33, 45, 52 and 58)
+      cervix:
+        title: Cervix
+        unit: '%'
+        description: |-
+          The fraction of cancers that are estimated to be caused by any of 9 pathogenic types of HPV (types 6, 11, 16, 18, 31, 33, 45, 52 and 58)
+      larynx:
+        title: Larynx
+        unit: '%'
+        description: |-
+          The fraction of cancers that are estimated to be caused by any of 9 pathogenic types of HPV (types 6, 11, 16, 18, 31, 33, 45, 52 and 58)
+      oral_cavity:
+        title: Oral cavity
+        unit: '%'
+        description: |-
+          The fraction of cancers that are estimated to be caused by any of 9 pathogenic types of HPV (types 6, 11, 16, 18, 31, 33, 45, 52 and 58)
+      oropharynx:
+        title: Oropharynx
+        unit: '%'
+        description: |-
+          The fraction of cancers that are estimated to be caused by any of 9 pathogenic types of HPV (types 6, 11, 16, 18, 31, 33, 45, 52 and 58)
+      penis:
+        title: Penis
+        unit: '%'
+        description: |-
+          The fraction of cancers that are estimated to be caused by any of 9 pathogenic types of HPV (types 6, 11, 16, 18, 31, 33, 45, 52 and 58)
+      vagina:
+        title: Vagina
+        unit: '%'
+        description: |-
+          The fraction of cancers that are estimated to be caused by any of 9 pathogenic types of HPV (types 6, 11, 16, 18, 31, 33, 45, 52 and 58)
+      vulva:
+        title: Vulva
         unit: '%'
         description: |-
           The fraction of cancers that are estimated to be caused by any of 9 pathogenic types of HPV (types 6, 11, 16, 18, 31, 33, 45, 52 and 58)
