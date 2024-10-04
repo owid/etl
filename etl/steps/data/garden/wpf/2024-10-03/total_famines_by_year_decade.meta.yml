@@ -32,7 +32,7 @@ tables:
           unit: 'deaths'
           short_unit: ''
           description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
-       decadal_famine_counts:
+       decadal_famine_count:
           title: Number of famines by decade
           description_short: The number of famines as estimated by the World Peace Foundation.
           unit: 'famines'
