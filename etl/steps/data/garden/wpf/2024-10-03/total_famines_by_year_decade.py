@@ -38,9 +38,10 @@ def run(dest_dir: str) -> None:
     tb = unravel_dates(tb)
     tb = tb.rename(columns={"date": "year"})
     tb["year"] = tb["year"].astype(int)
+    tb["global_region"] = tb["global_region"].astype("category")
 
     # Grouping by 'year', 'global_region', 'conflict', 'government_policy_overall', 'external_factors' and counting the occurrences
-    famine_counts = tb.groupby(["year", "global_region"]).size().reset_index(name="famine_count")
+    famine_counts = tb.groupby(["year", "global_region"], observed=False).size().reset_index(name="famine_count")
     # Creating a 'World' row by summing counts across unique regions for each group
     famine_counts_world_only = tb.groupby(["year"]).size().reset_index(name="famine_count")
     famine_counts_world_only["global_region"] = "World"
@@ -49,7 +50,7 @@ def run(dest_dir: str) -> None:
 
     # Grouping by relevant columns and summing the 'wpf_authoritative_mortality_estimate' for regional data
     deaths_counts = (
-        tb.groupby(["year", "global_region"])["wpf_authoritative_mortality_estimate"]
+        tb.groupby(["year", "global_region"], observed=False)["wpf_authoritative_mortality_estimate"]
         .sum()
         .reset_index(name="famine_deaths")
     )
