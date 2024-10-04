@@ -13,7 +13,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from etl import grapher_model as gm
-from etl.config import GRAPHER_USER_ID, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA, GRAPHER_USER_ID, OWIDEnv
 
 log = structlog.get_logger()
 
@@ -85,6 +85,9 @@ class AdminAPI(object):
         return js
 
     def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
+        # If schema is missing, use the default one
+        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
+
         # Retry in case we're restarting Admin on staging server
         resp = requests_with_retry().put(
             self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
