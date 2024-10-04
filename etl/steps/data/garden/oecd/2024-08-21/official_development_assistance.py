@@ -186,7 +186,7 @@ def run(dest_dir: str) -> None:
     tb = add_aid_by_sector(tb=tb, tb_sectors_donor=tb_sectors_donor, tb_sectors_recipient=tb_sectors_recipient)
     tb = add_aid_by_channel(tb=tb, tb_channels_donor=tb_channels_donor, tb_channels_recipient=tb_channels_recipient)
 
-    tb = tb.format(["country", "year", "donor", "sector_name", "channel_name"], short_name=paths.short_name)
+    tb = tb.format(["country", "year", "donor", "sector", "channel"], short_name=paths.short_name)
     tb_dac2a = tb_dac2a.format(["country", "year", "donor"])
 
     #
@@ -416,20 +416,22 @@ def add_aid_by_sector(tb: Table, tb_sectors_donor: Table, tb_sectors_recipient: 
 
     # For tb_sectors_donor, keep only the columns we need
     tb_sectors_donor = tb_sectors_donor[["donor_name", "sector_name", "year", "value"]]
-    tb_sectors_donor = tb_sectors_donor.rename(columns={"donor_name": "country", "value": "oda_by_sector_donor"})
+    tb_sectors_donor = tb_sectors_donor.rename(
+        columns={"donor_name": "country", "sector_name": "sector", "value": "oda_by_sector_donor"}
+    )
 
     # For tb_sectors_recipient, keep only the columns we need
     tb_sectors_recipient = tb_sectors_recipient[["recipient_name", "sector_name", "year", "value"]]
     tb_sectors_recipient = tb_sectors_recipient.rename(
-        columns={"recipient_name": "country", "value": "oda_by_sector_recipient"}
+        columns={"recipient_name": "country", "sector_name": "sector", "value": "oda_by_sector_recipient"}
     )
 
     # Create an empty sector column in tb
-    tb["sector_name"] = None
+    tb["sector"] = None
 
     # Merge tables
-    tb = pr.merge(tb, tb_sectors_donor, on=["country", "year", "sector_name"], how="outer")
-    tb = pr.merge(tb, tb_sectors_recipient, on=["country", "year", "sector_name"], how="outer")
+    tb = pr.merge(tb, tb_sectors_donor, on=["country", "year", "sector"], how="outer")
+    tb = pr.merge(tb, tb_sectors_recipient, on=["country", "year", "sector"], how="outer")
 
     return tb
 
@@ -442,20 +444,22 @@ def add_aid_by_channel(tb: Table, tb_channels_donor: Table, tb_channels_recipien
 
     # For tb_channels_donor, keep only the columns we need
     tb_channels_donor = tb_channels_donor[["donor_name", "channel_name", "year", "value"]]
-    tb_channels_donor = tb_channels_donor.rename(columns={"donor_name": "country", "value": "oda_by_channel_donor"})
+    tb_channels_donor = tb_channels_donor.rename(
+        columns={"donor_name": "country", "channel_name": "channel", "value": "oda_by_channel_donor"}
+    )
 
     # For tb_channels_recipient, keep only the columns we need
     tb_channels_recipient = tb_channels_recipient[["recipient_name", "channel_name", "year", "value"]]
     tb_channels_recipient = tb_channels_recipient.rename(
-        columns={"recipient_name": "country", "value": "oda_by_channel_recipient"}
+        columns={"recipient_name": "country", "channel_name": "channel", "value": "oda_by_channel_recipient"}
     )
 
     # Create an empty channel column in tb
-    tb["channel_name"] = None
+    tb["channel"] = None
 
     # Merge tables
-    tb = pr.merge(tb, tb_channels_donor, on=["country", "year", "channel_name"], how="outer")
-    tb = pr.merge(tb, tb_channels_recipient, on=["country", "year", "channel_name"], how="outer")
+    tb = pr.merge(tb, tb_channels_donor, on=["country", "year", "channel"], how="outer")
+    tb = pr.merge(tb, tb_channels_recipient, on=["country", "year", "channel"], how="outer")
 
     return tb
 
