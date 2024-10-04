@@ -12,6 +12,6 @@ meta:
   description: ''
   license: {}
 outs:
-  - md5: 4dbcad7664dca01568ebf80842ec8d2a
+  - md5: b69b441b5379d0c1457c4029ffdea27a
     size: 205
     path: lpi_distribution_wwf.csv
