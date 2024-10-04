@@ -91,6 +91,10 @@ class AnomalyModel(BaseModel):
     description: str
 
 
+class AnomaliesModel(BaseModel):
+    anomalies: list[AnomalyModel]
+
+
 def openai_structured_outputs_stream(api, **kwargs):
     with api.beta.chat.completions.stream(**kwargs, stream_options={"include_usage": True}) as stream:
         for chunk in stream:
@@ -143,23 +147,7 @@ for dataset_index, d in enumerate(st.session_state.datasets):
                         "content": [
                             {
                                 "type": "text",
-                                "text": """
-                                    Provide a list of 3 data anomalies in a given topic in different countries. Your output should be in format:
-                                    [
-                                        {
-                                            "title": "Title of anomaly 1",
-                                            "description": "Description of the anomaly."
-                                        },
-                                        {
-                                            "title": "Title of anomaly 2",
-                                            "description": "Description of the anomaly."
-                                        },
-                                        {
-                                            "title": "Title of anomaly 3",
-                                            "description": "Description of the anomaly."
-                                        }
-                                    ]
-                                """,
+                                "text": """Find three anomalies in the given topic for some countries.""",
                             },
                         ],
                     },
@@ -174,6 +162,7 @@ for dataset_index, d in enumerate(st.session_state.datasets):
                     },
                 ]
 
+                # Provide a list of 3 data anomalies in a given topic in different countries. Your output should be in format:
                 # {DIVIDER}
                 # title: Title of anomaly 1
                 # description: Description of the anomaly.
@@ -188,7 +177,7 @@ for dataset_index, d in enumerate(st.session_state.datasets):
                 }
                 # TODO: https://community.openai.com/t/streaming-using-structured-outputs/925799/13
                 for parsed_completion, *_ in openai_structured_outputs_stream(
-                    api, model="gpt-4o", temperature=0, messages=messages, response_format=AnomalyModel
+                    api, model="gpt-4o", temperature=0, messages=messages, response_format=AnomaliesModel
                 ):
                     st.write(parsed_completion)
 
