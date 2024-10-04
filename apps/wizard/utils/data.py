@@ -75,14 +75,12 @@ def load_variable_data_cached(
     catalog_path: Optional[str] = None,
     variable_id: Optional[int] = None,
     variable: Optional[Variable] = None,
-    col_entity_name: Optional[str] = "entity",
     _owid_env: OWIDEnv = OWID_ENV,
 ) -> pd.DataFrame:
     return load_variable_data(
         catalog_path=catalog_path,
         variable_id=variable_id,
         variable=variable,
-        col_entity_name=col_entity_name,
         owid_env=_owid_env,
     )
 
