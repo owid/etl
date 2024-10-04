@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import re
+
 import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
@@ -22,28 +24,11 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = process_causes(tb)
-
-    # Divide each row's 'wpf_authoritative_mortality_estimate' by the length of the corresponding 'Date' value to assume a uniform distribution of deaths over the period
-    tb["wpf_authoritative_mortality_estimate"] = tb.apply(
-        lambda row: row["wpf_authoritative_mortality_estimate"] / len(row["date"])
-        if pd.notna(row["date"])
-        else row["wpf_authoritative_mortality_estimate"],
-        axis=1,
-    )
-    # Convert 'wpf_authoritative_mortality_estimate' to integer
-    tb["wpf_authoritative_mortality_estimate"] = (
-        pd.to_numeric(tb["wpf_authoritative_mortality_estimate"], errors="coerce").fillna(0).astype(int)
-    )
-
-    # Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
-    tb = unravel_dates(tb)
-
-    # unique_titles = tb["conventional_title"].unique()
-    # for title in unique_titles:
-    #    print(title)
+    tb["conventional_title"] = tb["conventional_title"].apply(clean_title)
 
     for col in ["wpf_authoritative_mortality_estimate", "conflict", "government_policy_overall", "external_factors"]:
         tb[col].metadata.origins = tb["conventional_title"].metadata.origins
+
     tb = tb.format(["conventional_title", "date"])
 
     #
@@ -114,11 +99,7 @@ def process_causes(tb):
     return tb
 
 
-def unravel_dates(tb):
-    """
-    Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
-    """
-    # Split the 'date' column into multiple rows
-    tb = tb.assign(date=tb["date"].str.split(",")).explode("date").drop_duplicates().reset_index(drop=True)
-
-    return tb
+def clean_title(title):
+    # Function to clean up titles by simplifying date ranges only
+    title = re.sub(r"\((\d{4})(,\d{4})+\)", lambda m: f"({m.group(1)}–{m.group(2)[-4:]})", title)
+    return title.strip()
