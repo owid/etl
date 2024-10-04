@@ -10,7 +10,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
+  title:
 
 tables:
   total_famines_by_year_decade:
@@ -26,13 +26,13 @@ tables:
           unit: 'deaths'
           short_unit: ''
           description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
-       decadal_famine_count:
+       decadal_famine_deaths:
           title: Deaths from famines by decade
           description_short: The number of deaths from famines as estimated by the World Peace Foundation.
           unit: 'deaths'
           short_unit: ''
           description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
-       decadal_famine_deaths:
+       decadal_famine_counts:
           title: Number of famines by decade
           description_short: The number of famines as estimated by the World Peace Foundation.
           unit: 'famines'
