@@ -28,6 +28,8 @@ def run(dest_dir: str) -> None:
         else row["wpf_authoritative_mortality_estimate"],
         axis=1,
     )
+    # Remove rows where 'wpf_authoritative_mortality_estimate' is NaN
+    tb = tb.dropna(subset=["wpf_authoritative_mortality_estimate"])
 
     # Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
     tb = unravel_dates(tb)
