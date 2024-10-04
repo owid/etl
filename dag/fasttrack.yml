@@ -230,3 +230,5 @@ steps:
     - snapshot://fasttrack/latest/population_immigrants_diff.csv
   data://grapher/fasttrack/latest/lpi_distribution_wwf:
     - snapshot://fasttrack/latest/lpi_distribution_wwf.csv
+  data-private://grapher/fasttrack/latest/de_sanjose_2019_hpv_cancers:
+    - snapshot-private://fasttrack/latest/de_sanjose_2019_hpv_cancers.csv
