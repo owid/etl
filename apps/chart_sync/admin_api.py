@@ -3,6 +3,7 @@ import datetime as dt
 import json
 import random
 import string
+from functools import cache
 from typing import Any, Dict, List, Optional
 
 import requests
@@ -10,6 +11,7 @@ import structlog
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import HTTPError
 from sqlalchemy import text
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from etl import grapher_model as gm
@@ -26,15 +28,7 @@ def is_502_error(exception):
 class AdminAPI(object):
     def __init__(self, owid_env: OWIDEnv, grapher_user_id: Optional[int] = None):
         self.owid_env = owid_env
-        engine = owid_env.get_engine()
-        with Session(engine) as session:
-            if grapher_user_id:
-                user = session.get(gm.User, grapher_user_id)
-            else:
-                user = session.get(gm.User, GRAPHER_USER_ID)
-            assert user
-            self.session_id = _create_user_session(session, user.email)
-            session.commit()
+        self.session_id = create_session_id(owid_env, grapher_user_id)
 
     def _json_from_response(self, resp: requests.Response) -> dict:
         if resp.status_code != 200:
@@ -107,6 +101,21 @@ class AdminAPI(object):
         js = self._json_from_response(resp)
         assert js["success"]
         return js
+
+
+@cache
+def create_session_id(owid_env: OWIDEnv, grapher_user_id: Optional[int] = None) -> str:
+    engine = owid_env.get_engine()
+    with Session(engine) as session:
+        if grapher_user_id:
+            user = session.get(gm.User, grapher_user_id)
+        else:
+            user = session.get(gm.User, GRAPHER_USER_ID)
+        assert user
+        session_id = _create_user_session(session, user.email)
+        session.commit()
+
+    return session_id
 
 
 def requests_with_retry() -> requests.Session:
