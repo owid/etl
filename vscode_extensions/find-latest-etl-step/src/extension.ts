@@ -59,7 +59,7 @@ export function activate(context: vscode.ExtensionContext) {
                     // Sort the files by path
                     const sortedFiles = latestFiles.sort((a, b) => a.path.localeCompare(b.path));
 
-                    // Display only files with the latest date or 'latest', but hide 'etl/steps/data/' and 'etl/steps/export/' in the label
+                    // Display only files with the latest date or 'latest', but hide certain parts of the path
                     quickPick.items = sortedFiles.map(file => {
                         const relativePath = path.relative(workspaceFolder, file.path);
                         const displayedPath = relativePath
@@ -113,8 +113,16 @@ function findFiles(dir: string, ig: any): { path: string, date: Date | 'latest',
         const filePath = path.join(dir, file);
         const stat = fs.statSync(filePath);
 
-        // Exclude 'etl/data' and ignore '__pycache__' and other similar folders
-        if (filePath.includes(path.join('etl', 'data')) || filePath.includes(path.join('etl', 'export')) || filePath.includes('__pycache__')) {
+        // Exclude certain folders explicitly
+        const excludeFolders = [
+            path.join('etl', 'data'),
+            path.join('etl', 'export'),
+            path.join('snapshots', 'backport'),
+            'snapshots_archive',
+            path.join('etl', 'steps', 'archive')
+        ];
+
+        if (excludeFolders.some(excludeFolder => filePath.includes(excludeFolder)) || filePath.includes('__pycache__')) {
             return;
         }
 
