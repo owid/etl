@@ -475,6 +475,7 @@ def compare_tables(
     absolute_tolerance=1e-8,
     relative_tolerance=1e-8,
     max_num_charts=50,
+    only_coincident_rows=False,
 ) -> None:
     """Plot columns of two tables (usually an "old" and a "new" version) to compare them.
 
@@ -508,6 +509,8 @@ def compare_tables(
     relative_tolerance : float, optional
         Only relevant if skip_equal is True.
         Relative tolerance when comparing old and new data, by default 1e-8.
+    only_coincident_rows : bool, optional
+        True to only compare rows that are present in both tables (e.g. to ignore points for years that are only in new).
     max_num_charts : int, optional
         Maximum number of charts to show, by default 50. If exceeded, the user will be asked how to proceed.
 
@@ -557,6 +560,11 @@ def compare_tables(
             if skip_empty and (len(filtered) == 0):
                 # If there are no data points in the old or new tables for this country-column, skip this column.
                 continue
+
+            if only_coincident_rows:
+                # Select only years where there is data for both old and new.
+                filtered = filtered[filtered.groupby(x)["source"].transform("count") == 2].reset_index(drop=True)
+
             if skip_equal:
                 _old = filtered[filtered[legend] == old_label].reset_index()[[y_column]]
                 _new = filtered[filtered[legend] == new_label].reset_index()[[y_column]]
