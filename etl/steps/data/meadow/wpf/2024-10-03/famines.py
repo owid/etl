@@ -57,6 +57,8 @@ def run(dest_dir: str) -> None:
     tb["Conventional title"] = tb.apply(
         lambda row: f"{row['Place']} ({row['Date']})"
         if pd.isna(row["Conventional title"])
+        else f"{row['Place']} ({row['Date']})"
+        if row["Conventional title"] == "Famine"
         else f"{row['Conventional title']} ({row['Place']} {row['Date']})"
         if row["Conventional title"] == "Hungerplan (German)"
         else row["Conventional title"],
@@ -75,6 +77,7 @@ def run(dest_dir: str) -> None:
 
     # Combine famines for the African Red Sea Region and Hungerplan as the mortality estimate exists for just the total rather than each entry
     tb = combine_entries(tb)
+    print(tb["Conventional title"].unique())
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["date", "conventional_title"])
@@ -140,7 +143,7 @@ def combine_entries(df):
         "Place": rows_to_combine.iloc[0]["Place"],
         "Sub region": rows_to_combine.iloc[0]["Sub region"],
         "Global region": rows_to_combine.iloc[0]["Global region"],
-        "Conventional title": 'African Red Sea Region amd Haraame Cune ("the years of eating the unclean")',
+        "Conventional title": 'African Red Sea Region and Haraame Cune ("the years of eating the unclean")',
         "Cause: immediate trigger": rows_to_combine.iloc[0]["Cause: immediate trigger"],
         "Cause: contributing factors": rows_to_combine.iloc[0]["Cause: contributing factors"],
         "Cause: structural factors": rows_to_combine.iloc[0]["Cause: structural factors"],
@@ -165,7 +168,7 @@ def combine_entries(df):
             "Place": hungerplan_rows.iloc[0]["Place"],
             "Sub region": hungerplan_rows.iloc[0]["Sub region"],
             "Global region": hungerplan_rows.iloc[0]["Global region"],
-            "Conventional title": "Hungerplan (Combined)",
+            "Conventional title": "Hungerplan (Russia, Ukraine and Western Soviet States)",
             "Cause: immediate trigger": hungerplan_rows.iloc[0]["Cause: immediate trigger"],
             "Cause: contributing factors": hungerplan_rows.iloc[0]["Cause: contributing factors"],
             "Cause: structural factors": hungerplan_rows.iloc[0]["Cause: structural factors"],
