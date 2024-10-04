@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Literal, Optional, Union, get_args
 
 import humps
 import pandas as pd
+import requests
 import structlog
 from owid import catalog
 from owid.catalog.meta import VARIABLE_TYPE
@@ -1251,6 +1252,24 @@ class Variable(Base):
         """Return path to indicator YAML file."""
         return self.step_path.with_suffix(".meta.override.yml")
 
+    def get_data(self, session: Optional[Session] = None) -> pd.DataFrame:
+        """Get variable data from S3.
+
+        If session is given, entity codes are replaced with entity names.
+        """
+        data = requests.get(self.s3_data_path(typ="http")).json()
+        df = pd.DataFrame(data)
+
+        if session is not None:
+            df = add_entity_name(session=session, df=df, col_id="entities", col_name="entity")
+
+        return df
+
+    def get_metadata(self) -> Dict[str, Any]:
+        metadata = requests.get(self.s3_metadata_path(typ="http")).json()
+
+        return metadata
+
 
 class ChartDimensions(Base):
     __tablename__ = "chart_dimensions"
@@ -1629,3 +1648,73 @@ def _is_float(x):
         return False
     else:
         return True
+
+
+def add_entity_name(
+    session: Session,
+    df: pd.DataFrame,
+    col_id: str,
+    col_name: str = "entity",
+    col_code: Optional[str] = None,
+    remove_id: bool = True,
+) -> pd.DataFrame:
+    # Initialize
+    if df.empty:
+        df[col_name] = []
+        if col_code is not None:
+            df[col_code] = []
+        return df
+
+    # Get entity names
+    unique_entities = df[col_id].unique()
+    entities = _fetch_entities(session, list(unique_entities), col_id, col_name, col_code)
+
+    # Sanity check
+    if set(unique_entities) - set(entities[col_id]):
+        missing_entities = set(unique_entities) - set(entities[col_id])
+        raise ValueError(f"Missing entities in the database: {missing_entities}")
+
+    # Set dtypes
+    dtypes = {col_name: "category"}
+    if col_code is not None:
+        dtypes[col_code] = "category"
+    df = pd.merge(df, entities.astype(dtypes), on=col_id)
+
+    # Remove entity IDs
+    if remove_id:
+        df = df.drop(columns=[col_id])
+
+    return df
+
+
+def _fetch_entities(
+    session: Session,
+    entity_ids: List[int],
+    col_id: Optional[str] = None,
+    col_name: Optional[str] = None,
+    col_code: Optional[str] = None,
+) -> pd.DataFrame:
+    # Query entities from the database
+    q = """
+    SELECT
+        id AS entityId,
+        name AS entityName,
+        code AS entityCode
+    FROM entities
+    WHERE id in %(entity_ids)s
+    """
+    df = read_sql(q, session, params={"entity_ids": entity_ids})
+
+    # Rename columns
+    column_renames = {}
+    if col_id is not None:
+        column_renames["entityId"] = col_id
+    if col_name is not None:
+        column_renames["entityName"] = col_name
+    if col_code is not None:
+        column_renames["entityCode"] = col_code
+    else:
+        df = df.drop(columns=["entityCode"])
+
+    df = df.rename(columns=column_renames)
+    return df
