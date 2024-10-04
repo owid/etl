@@ -228,3 +228,5 @@ steps:
     - snapshot://fasttrack/latest/pivot_uk_public_spending.csv
   data://grapher/fasttrack/latest/population_immigrants_diff:
     - snapshot://fasttrack/latest/population_immigrants_diff.csv
+  data://grapher/fasttrack/latest/lpi_distribution_wwf:
+    - snapshot://fasttrack/latest/lpi_distribution_wwf.csv
