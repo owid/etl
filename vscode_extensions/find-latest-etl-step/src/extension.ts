@@ -46,7 +46,7 @@ export function activate(context: vscode.ExtensionContext) {
                 const sortedFiles = filteredFiles.sort((a, b) => b.date.getTime() - a.date.getTime());
                 quickPick.items = sortedFiles.map(file => ({
                     label: path.basename(file.path),
-                    description: file.path,
+                    description: path.relative(workspaceFolder, file.path),  // Relative path
                     detail: file.date.toDateString(),
                 }));
             } else {
@@ -60,7 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         quickPick.onDidChangeSelection(async (selection) => {
             if (selection[0] && selection[0].description) {
-                const selectedFilePath = selection[0].description;
+                const selectedFilePath = path.join(workspaceFolder, selection[0].description);  // Ensure full path
                 if (selectedFilePath) {
                     try {
                         const document = await vscode.workspace.openTextDocument(selectedFilePath);
