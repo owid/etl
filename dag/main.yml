@@ -819,6 +819,10 @@ steps:
     - data://meadow/wpf/2024-10-03/famines
   data://grapher/wpf/2024-10-03/famines:
     - data://garden/wpf/2024-10-03/famines
+  data://garden/wpf/2024-10-03/total_famines_by_year_decade:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/total_famines_by_year_decade:
+    - data://garden/wpf/2024-10-03/total_famines_by_year_decade
 
 include:
   - dag/open_numbers.yml
