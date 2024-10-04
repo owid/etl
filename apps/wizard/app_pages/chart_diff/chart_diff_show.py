@@ -20,7 +20,7 @@ from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
-from apps.wizard.utils import chart_html
+from apps.wizard.utils.chart import grapher_chart
 from etl.config import OWID_ENV
 
 # How to display the various chart review statuses
@@ -403,11 +403,11 @@ class ChartDiffShow:
             else:
                 st.markdown(self._header_production_chart)
             assert self.diff.target_chart is not None
-            chart_html(self.diff.target_chart.config, owid_env=TARGET)
+            grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
 
             # Chart staging
             st.markdown(self._header_staging_chart)
-            chart_html(self.diff.source_chart.config, owid_env=SOURCE)
+            grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
         def _show_charts_comparison_h():
             """Show charts next to each other."""
@@ -421,15 +421,15 @@ class ChartDiffShow:
                 else:
                     st.markdown(self._header_production_chart)
                 assert self.diff.target_chart is not None
-                chart_html(self.diff.target_chart.config, owid_env=TARGET)
+                grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
             with col2:
                 st.markdown(self._header_staging_chart)
-                chart_html(self.diff.source_chart.config, owid_env=SOURCE)
+                grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
         # Only one chart: new chart
         if self.diff.target_chart is None:
             st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
-            chart_html(self.diff.source_chart.config, owid_env=SOURCE)
+            grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
         # Two charts, actual diff
         else:
             # Detect arrangement type
