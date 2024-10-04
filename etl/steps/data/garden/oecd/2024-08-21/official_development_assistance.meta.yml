@@ -61,7 +61,7 @@ definitions:
   key_gross_sectors: |-
     Aid by sector is presented as gross disbursement data. Gross disbursements measure total new flows given/received before repayments are deducted. Net disbursements are not used because there is no evidence that the source of financing to reimburse loans in a sector is actually the sector itself.
   key_bilateral_imputed_multilateral: |-
-    Data includes both bilateral aid plus imputed multilateral aid, calculated by [the ONE campaign](https://data.one.org/topics/official-development-assistance/) from OECD data.
+    Data includes both bilateral aid plus imputed multilateral aid, calculated by [the ONE Campaign](https://data.one.org/topics/official-development-assistance/) from OECD data.
 
   key_gni: This indicator is divided by the gross national income (GNI) of the country. The GNI measures the total income earned by residents of a country, including income earned abroad.
 
@@ -157,10 +157,10 @@ definitions:
     We have combined net disbursements aid data from the [DAC1: Flows by donor (ODA+OOF+Private) dataset](https://data-explorer.oecd.org/vis?fs[0]=Topic%2C1%7CDevelopment%23DEV%23%7COfficial%20Development%20Assistance%20%28ODA%29%23DEV_ODA%23&pg=0&fc=Topic&bp=true&snb=20&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_DAC1%40DF_DAC1&df[ag]=OECD.DCD.FSD&df[vs]=1.2&dq=DAC...1140%2B1160..Q.&lom=LASTNPERIODS&lo=10&to[TIME_PERIOD]=false) with the [DAC2A: Aid (ODA) disbursements to countries and regions dataset](https://data-explorer.oecd.org/vis?fs[0]=Topic%2C1%7CDevelopment%23DEV%23%7COfficial%20Development%20Assistance%20%28ODA%29%23DEV_ODA%23&pg=0&fc=Topic&bp=true&snb=20&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_DAC2%40DF_DAC2A&df[ag]=OECD.DCD.FSD&df[vs]=1.1&dq=.DPGC.206.USD.Q&lom=LASTNPERIODS&lo=5&to[TIME_PERIOD]=false) to add aid given by multilateral organizations and grants given by private organizations.
 
   processing_oda_by_sector: |-
-    We calculated this indicator by aggregating the gross bilateral and imputed multilateral flows processed by the [ONE campaign](https://github.com/ONEcampaign/oda_data_package/) from the OECD data. We also aggregate sector categories to provide a more comprehensive view of aid given and received.
+    We calculated this indicator by aggregating the gross bilateral and imputed multilateral flows processed by the [ONE Campaign](https://github.com/ONEcampaign/oda_data_package/) from the OECD data. We also aggregate sector categories to provide a more comprehensive view of aid given and received.
 
   processing_oda_by_channel: |-
-    We calculated this indicator by aggregating the gross bilateral and imputed multilateral flows processed by the [ONE campaign](https://github.com/ONEcampaign/oda_data_package/) from the OECD data. We also aggregate channel categories to provide a more comprehensive view of aid given and received.
+    We calculated this indicator by aggregating the gross bilateral and imputed multilateral flows processed by the [ONE Campaign](https://github.com/ONEcampaign/oda_data_package/) from the OECD data. We also aggregate channel categories to provide a more comprehensive view of aid given and received.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
