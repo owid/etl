@@ -704,8 +704,8 @@ def generate_percentiles_raw(wb_api: WB_API):
             ]
             dfs = pool.starmap(get_query_country, tasks)
 
-    df_country = pd.concat(dfs, ignore_index=True)
-    log.info("Country files concatenated")
+        df_country = pd.concat(dfs, ignore_index=True)
+        log.info("Country files concatenated")
 
     with ThreadPool(MAX_WORKERS) as pool:
         tasks = [(povline, ppp_version) for ppp_version in PPP_VERSIONS for povline in POV_LINES_REGIONS]
@@ -715,29 +715,34 @@ def generate_percentiles_raw(wb_api: WB_API):
     log.info("Region files concatenated")
 
     # Create poverty_line_cents column, multiplying by 100, rounding and making it an integer
-    df_country["poverty_line_cents"] = round(df_country["poverty_line"] * 100).astype(int)
+    if list_missing_countries:
+        df_country["poverty_line_cents"] = round(df_country["poverty_line"] * 100).astype(int)
+
     df_region["poverty_line_cents"] = round(df_region["poverty_line"] * 100).astype(int)
 
     log.info("Checking if all the poverty lines are in the concatenated files")
 
     # Check if all the poverty lines are in the df in country and region df
-    assert set(df_country["poverty_line_cents"].unique()) == set(POV_LINES_COUNTRIES), log.fatal(
-        "Not all poverty lines are in the country file!"
-    )
+    if list_missing_countries:
+        assert set(df_country["poverty_line_cents"].unique()) == set(POV_LINES_COUNTRIES), log.fatal(
+            "Not all poverty lines are in the country file!"
+        )
     assert set(df_region["poverty_line_cents"].unique()) == set(POV_LINES_REGIONS), log.fatal(
         "Not all poverty lines are in the region file!"
     )
 
     # Drop poverty_line_cents column
-    df_country = df_country.drop(columns=["poverty_line_cents"])
+    if list_missing_countries:
+        df_country = df_country.drop(columns=["poverty_line_cents"])
     df_region = df_region.drop(columns=["poverty_line_cents"])
 
     log.info("Checking if the set of countries and regions is the same as in PIP")
 
     # I check if the set of countries is the same in the df and in the list of missing countries
-    assert set(df_country["country_code"].unique()) == set(list_missing_countries), log.fatal(
-        f"List of countries is different from the one we needed to extract! ({list_missing_countries})"
-    )
+    if list_missing_countries:
+        assert set(df_country["country_code"].unique()) == set(list_missing_countries), log.fatal(
+            f"List of countries is different from the one we needed to extract! ({list_missing_countries})"
+        )
 
     # I check if the set of regions is the same in the df and in the aux table (list of regions)
     aux_dict = pip_aux_tables(wb_api, table="regions")
@@ -748,7 +753,10 @@ def generate_percentiles_raw(wb_api: WB_API):
     log.info("Concatenating the raw percentile data for countries and regions")
 
     # Concatenate df_country and df_region
-    df = pd.concat([df_country, df_region], ignore_index=True)
+    if list_missing_countries:
+        df = pd.concat([df_country, df_region], ignore_index=True)
+    else:
+        df = df_region.copy()
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
