@@ -771,6 +771,13 @@ def calculate_percentile(p, df):
     """
     Calculates a single percentile and returns a DataFrame with the results.
     """
+    # If reporting_level and welfare_type columns do not exist, add them with NaNs
+    # This happens when only regional data is processed (missing countries are empty)
+    if "reporting_level" not in df.columns:
+        df["reporting_level"] = None
+    if "welfare_type" not in df.columns:
+        df["welfare_type"] = None
+
     df["distance_to_p"] = abs(df["headcount"] * 100 - p)
     df_closest = (
         df.sort_values("distance_to_p")
