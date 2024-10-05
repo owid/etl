@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
     for column in ["famine_count", "famine_deaths"]:
         mask = tb["global_region"] == "World"  # Filter for 'World'
         tb.loc[mask, "decadal_" + str(column)] = (
-            tb.loc[mask, column].groupby(tb.loc[mask, "year"] // 10 * 10).transform("mean")
+            tb.loc[mask, column].groupby(tb.loc[mask, "year"] // 10 * 10).transform("sum")
         )
         # set NaN everywhere except start of a decade
         tb.loc[mask, "decadal_" + str(column)] = tb.loc[mask, "decadal_" + str(column)].where(
