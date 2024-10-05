@@ -297,8 +297,8 @@ def _fetch_percentiles(version: int) -> pd.DataFrame:
 
     _df_percentiles = pd.read_csv(url)
 
-    # Drop  Unnamed: 0 column (it sometimes appears in the files)
-    _df_percentiles = _df_percentiles.drop(columns=["Unnamed: 0"])
+    # # Drop  Unnamed: 0 column (it sometimes appears in the files)
+    # _df_percentiles = _df_percentiles.drop(columns=["Unnamed: 0"])
 
     return _df_percentiles
 
