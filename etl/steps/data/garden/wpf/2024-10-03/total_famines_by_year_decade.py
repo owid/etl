@@ -69,16 +69,14 @@ def run(dest_dir: str) -> None:
         deaths_counts_combined,
         on=["year", "global_region"],
     )
-    # Group the data by decade
+    # Calculate the decade
+    tb["decade"] = (tb["year"] // 10) * 10
+
+    # Group the data by global_region and decade, then calculate the decadal sum
     for column in ["famine_count", "famine_deaths"]:
-        mask = tb["global_region"] == "World"  # Filter for 'World'
-        tb.loc[mask, "decadal_" + str(column)] = (
-            tb.loc[mask, column].groupby(tb.loc[mask, "year"] // 10 * 10).transform("sum")
-        )
-        # set NaN everywhere except start of a decade
-        tb.loc[mask, "decadal_" + str(column)] = tb.loc[mask, "decadal_" + str(column)].where(
-            tb.loc[mask, "year"] % 10 == 0, np.nan
-        )
+        tb["decadal_" + column] = tb.groupby(["global_region", "decade"])[column].transform("sum")
+        # Set NaN everywhere except the start of a decade
+        tb["decadal_" + column] = tb["decadal_" + column].where(tb["year"] % 10 == 0, np.nan)
 
     tb = tb.format(["year", "global_region"], short_name=paths.short_name)
     tb = Table(tb, short_name=paths.short_name)
