@@ -77,6 +77,7 @@ def run(dest_dir: str) -> None:
         tb["decadal_" + column] = tb.groupby(["global_region", "decade"])[column].transform("sum")
         # Set NaN everywhere except the start of a decade
         tb["decadal_" + column] = tb["decadal_" + column].where(tb["year"] % 10 == 0, np.nan)
+    tb = tb.drop(columns=["decade"])
 
     tb = tb.format(["year", "global_region"], short_name=paths.short_name)
     tb = Table(tb, short_name=paths.short_name)
