@@ -683,8 +683,13 @@ def generate_percentiles_raw(wb_api: WB_API):
         f"These countries are available in a common query but not in the percentile file: {list_missing_countries}"
     )
 
-    concurrent_percentiles_function(country_code=missing_countries)
-    log.info("Country files downloaded")
+    # Only run the function if there are missing countries
+    if list_missing_countries:
+        concurrent_percentiles_function(country_code=missing_countries)
+        log.info("Country files downloaded")
+    else:
+        log.info("All countries are in the percentile file. No need to extract them.")
+
     concurrent_percentiles_region_function()
     log.info("Region files downloaded")
 
