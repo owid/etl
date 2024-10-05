@@ -695,11 +695,14 @@ def generate_percentiles_raw(wb_api: WB_API):
 
     log.info("Now we are concatenating the files")
 
-    with ThreadPool(MAX_WORKERS) as pool:
-        tasks = [
-            (povline, ppp_version, missing_countries) for ppp_version in PPP_VERSIONS for povline in POV_LINES_COUNTRIES
-        ]
-        dfs = pool.starmap(get_query_country, tasks)
+    if list_missing_countries:
+        with ThreadPool(MAX_WORKERS) as pool:
+            tasks = [
+                (povline, ppp_version, missing_countries)
+                for ppp_version in PPP_VERSIONS
+                for povline in POV_LINES_COUNTRIES
+            ]
+            dfs = pool.starmap(get_query_country, tasks)
 
     df_country = pd.concat(dfs, ignore_index=True)
     log.info("Country files concatenated")
