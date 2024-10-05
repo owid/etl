@@ -69,12 +69,32 @@ def run(dest_dir: str) -> None:
         deaths_counts_combined,
         on=["year", "global_region"],
     )
+
+    # Create a DataFrame with all years from 1870 to 2023
+    all_years = pd.DataFrame({"year": range(1870, 2024)})
+
+    # Get all unique regions from the original data
+    all_regions = tb["global_region"].unique()
+
+    # Create a DataFrame with all combinations of years and regions - to ensure that where there are no data points for a year and region, the value is set to zero
+    all_years_regions = pd.MultiIndex.from_product(
+        [all_years["year"], all_regions], names=["year", "global_region"]
+    ).to_frame(index=False)
+    all_years_regions = Table(all_years_regions)
+
+    # Merge this DataFrame with the existing data to ensure all years are present
+    tb = pr.merge(tb, all_years_regions, on=["year", "global_region"], how="right")
+
+    # Fill NaN values in the 'famine_count' and 'famine_deaths' columns with zeros
+    tb["famine_count"] = tb["famine_count"].fillna(0)
+    tb["famine_deaths"] = tb["famine_deaths"].fillna(0)
+
     # Calculate the decade
     tb["decade"] = (tb["year"] // 10) * 10
 
     # Group the data by global_region and decade, then calculate the decadal sum
     for column in ["famine_count", "famine_deaths"]:
-        tb["decadal_" + column] = tb.groupby(["global_region", "decade"])[column].transform("sum")
+        tb["decadal_" + column] = tb.groupby(["global_region", "decade"], observed=False)[column].transform("sum")
         # Set NaN everywhere except the start of a decade
         tb["decadal_" + column] = tb["decadal_" + column].where(tb["year"] % 10 == 0, np.nan)
     tb = tb.drop(columns=["decade"])
