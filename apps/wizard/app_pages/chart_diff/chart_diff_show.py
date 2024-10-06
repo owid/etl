@@ -20,7 +20,7 @@ from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
-from apps.wizard.utils.chart import grapher_chart
+from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
 
 # How to display the various chart review statuses
