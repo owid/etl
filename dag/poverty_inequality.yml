@@ -7,7 +7,7 @@ steps:
 
   # Poverty and inequality file for Joe's PhD
   data://explorers/poverty_inequality/latest/poverty_inequality_export:
-    - data://garden/wb/2024-03-27/world_bank_pip
+    - data://garden/wb/2024-10-07/world_bank_pip
     - data://garden/wid/2024-05-24/world_inequality_database
     - data://garden/lis/2024-06-13/luxembourg_income_study
     - data://garden/wb/2024-01-22/thousand_bins_distribution
