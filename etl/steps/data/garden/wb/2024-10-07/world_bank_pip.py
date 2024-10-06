@@ -948,7 +948,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
                 tb_country = tb_country[tb_country["welfare_type"] == "consumption"].reset_index(drop=True)
 
         else:
-            if country in ["Albania", "Russia", "Ukraine"]:
+            if country in ["Albania", "Ukraine"]:
                 welfare_expected = ["consumption"]
                 assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
                     f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
@@ -1068,7 +1068,7 @@ def regional_headcount(tb: Table) -> Table:
 
     # Select needed columns and pivot
     tb_regions = tb_regions[["country", "year", "headcount_215"]]
-    tb_regions = tb_regions.pivot(index="year", columns="country", values="headcount_215")
+    tb_regions = tb_regions.pivot(index="year", columns="country", values="headcount_215").reset_index()
 
     # Drop rows with more than one region with null headcount
     tb_regions["check_total"] = tb_regions[tb_regions.columns].isnull().sum(axis=1)
