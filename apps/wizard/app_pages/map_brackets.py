@@ -15,7 +15,7 @@ from owid.datautils.common import ExceptionFromDocstring
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from apps.wizard.utils.chart import grapher_chart
+from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
 from etl.explorer_helpers import Explorer
