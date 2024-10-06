@@ -8,8 +8,8 @@ import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
 
+from apps.wizard.utils.indicator import load_variable, load_variable_data
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher_io import load_variable_data
 from etl.grapher_model import Variable
 
 HORIZONTAL_STYLE = """<style class="hide-element">
@@ -160,15 +160,16 @@ def grapher_chart(
 
     # Get data / metadata if no chart config is provided
     if chart_config is None:
-        # Get variable data
-        df = load_variable_data(
-            catalog_path=catalog_path, variable_id=variable_id, variable=variable, owid_env=owid_env
-        )
+        # Get variable
+        if variable is None:
+            variable = load_variable(catalog_path=catalog_path, variable_id=variable_id, owid_env=owid_env)
+        variable_id = variable.id
+        df = load_variable_data(variable=variable)
 
         # Define chart config
         chart_config = deepcopy(CONFIG_BASE)
         chart_config["dimensions"] = [{"property": "y", "variableId": variable_id}]
-
+        print(chart_config["dimensions"])
         ## Selected entities?
         if selected_entities is not None:
             chart_config["selectedEntityNames"] = selected_entities
