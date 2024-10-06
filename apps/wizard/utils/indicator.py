@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, List, Optional, cast
 
 import pandas as pd
 import streamlit as st
@@ -6,6 +6,15 @@ from sqlalchemy.orm import Session
 
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher_model import Variable
+
+
+def load_indicator_uris_from_db(dataset_uris: List[str]) -> List[Variable]:
+    with Session(OWID_ENV.engine) as session:
+        indicators = Variable.load_variables_in_datasets(session, dataset_uris)
+
+    # indicators = [i["catalogPath"] for i in indicators]
+    # return list(indicators)
+    return indicators
 
 
 @st.cache_data
