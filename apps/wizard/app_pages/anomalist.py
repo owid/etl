@@ -1,9 +1,17 @@
 from typing import cast
 
 import streamlit as st
+from pydantic import BaseModel, ValidationError
 
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
-from apps.wizard.utils.chart import grapher_chart
+from apps.wizard.utils.components import grapher_chart, st_horizontal
+from apps.wizard.utils.dataset import load_datasets_uri_from_db
+from apps.wizard.utils.indicator import (
+    load_indicator_uris_from_db,
+    load_variable_data_cached,
+)
+
+# load_variable_metadata_cached,
 from etl.config import OWID_ENV
 
 # PAGE CONFIG
@@ -12,78 +20,191 @@ st.set_page_config(
     page_icon="🪄",
 )
 
-# INDICATOR SPECS (INPUT)
-DATASETS = [
-    {
-        "dataset": "grapher/climate_watch/2023-10-31/emissions_by_sector",
-        "indicators": [
-            {
-                "slug": "greenhouse_gas_emissions_by_sector#land_use_change_and_forestry_ghg_emissions",
-                "anomalies": [
-                    {
-                        "title": "Afghanistan's Early Internet Usage",
-                        "description": "Between 2001 and 2006, Afghanistan showed extremely low internet usage, remaining at approximately 0% for several years before a gradual increase began.",
-                    },
-                    {
-                        "title": "Significant Jump in Angola's Internet Usage",
-                        "description": "In 2012, Angola witnessed a significant jump in the share of individuals using the internet from 4.7% in 2011 to 7.7%, indicating a rapid growth phase.",
-                    },
-                    {
-                        "title": "Explosive Growth in United Arab Emirates",
-                        "description": "From 2007 to 2008, the United Arab Emirates saw an explosive growth in internet usage, rising from 61% to 63%, continuing its trend towards universal access.",
-                    },
-                ],
-            },
-        ],
-    }
-]
-st.session_state.datasets = st.session_state.get("datasets", DATASETS)
+# SESSION STATE
+st.session_state.register = st.session_state.get("register", {"by_dataset": {}})
+st.session_state.datasets_selected = st.session_state.get("datasets_selected", [])
+st.session_state.anomaly_revision = st.session_state.get("anomaly_revision", {})
+
 
 # GPT
 MODEL = "gpt-4o"
-
-
-# ANOMALY STATUS
-# Initialise/update anomaly-review status
-for d_i, d in enumerate(st.session_state.datasets):
-    # print(f"dataset {d_i}")
-    for i_i, i in enumerate(d["indicators"]):
-        # print(f"indicator {i_i}")
-        for a_i, a in enumerate(i["anomalies"]):
-            print(f"anomaly {a_i}")
-            if "resolved" not in a:
-                # print("> initialising")
-                a["resolved"] = False
-            else:
-                # print("> updating")
-                a["resolved"] = st.session_state[f"resolved_{d_i}_{i_i}_{a_i}"]
-
+api = OpenAIWrapper()
 
 # PAGE TITLE
 st.title(":material/planner_review: Anomalist")
-st.markdown("Detect anomalies in your data!")
-# st.write(st.session_state.datasets)
-st.divider()
+# st.markdown("Detect anomalies in your data!")
+
+
+# SELECT DATASETS
+st.markdown(
+    """
+    <style>
+       .stMultiSelect [data-baseweb=select] span{
+            max-width: 1000px;
+        }
+    </style>""",
+    unsafe_allow_html=True,
+)
+st.session_state.datasets_selected = st.multiselect(
+    "Select datasets",
+    options=load_datasets_uri_from_db(),
+    max_selections=3,
+)
+
+for i in st.session_state:
+    if i.startswith("check_anomaly_resolved_"):
+        st.write(i, st.session_state[i])
+
+
+# GET INDICATORS
+if len(st.session_state.datasets_selected) > 0:
+    # Get indicator uris for all selected datasets
+    indicators = load_indicator_uris_from_db(st.session_state.datasets_selected)
+
+    for indicator in indicators:
+        catalog_path = cast(str, indicator.catalogPath)
+        dataset_uri, indicator_slug = catalog_path.rsplit("/", 1)
+        if dataset_uri not in st.session_state.register["by_dataset"]:
+            st.session_state.register["by_dataset"][dataset_uri] = {}
+        if indicator_slug in st.session_state.register["by_dataset"][dataset_uri]:
+            continue
+        st.session_state.register["by_dataset"][dataset_uri][indicator_slug] = {
+            "anomalies": [],
+            "id": indicator.id,
+        }
 
 ################################################
-# FUNCTIONS
+# FUNCTIONS / CLASSES
 ################################################
 
 
 @st.dialog("Vizualize the indicator", width="large")
-def show_indicator(indicator_uri):
+def show_indicator(indicator_uri, indicator_id):
     """Plot the indicator in a modal window."""
     # Modal title
-    st.markdown(f"`{indicator_uri}`")
+    st.markdown(f"[{indicator_slug}]({OWID_ENV.indicator_admin_site(indicator_id)})")
 
-    # Get data and metadata from catalog
-    # st.write(metadata)
-    # Get list of entities available
+    # Plot indicator
     grapher_chart(catalog_path=indicator_uri, owid_env=OWID_ENV)
-    # st.line_chart(data=data_, x="years", y="values", color="entity")
 
 
-from pydantic import BaseModel
+def show_anomaly(title, description, key):
+    # check_value = st.session_state.register["by_dataset"][dataset_name][indicator_slug].get("resolved", False)
+    check_value = st.session_state.get(key, False)
+
+    if check_value:
+        icon = "✅"
+    else:
+        icon = "⏳"
+
+    with st.expander(title, icon=icon):
+        st.checkbox(
+            "Mark as resolved",
+            value=check_value,
+            key=key,
+        )
+        st.write(description)
+
+
+def get_anomaly_gpt(indicator_id: str, dataset_name: str, indicator_slug: str):
+    # Open AI (do first to catch possible errors in ENV)
+    # Prepare messages for Insighter
+
+    data = load_variable_data_cached(variable_id=int(indicator_id))
+    data_1 = data.pivot(index="years", columns="entity", values="values")
+    data_1 = data_1.dropna(axis=1, how="all")
+
+    messages = [
+        {
+            "role": "system",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "Provide three anomalies in for the given time series.",
+                },
+            ],
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": str(data_1),
+                },
+            ],
+        },
+    ]
+    kwargs = {
+        "api": api,
+        "model": MODEL,
+        "messages": messages,
+        "max_tokens": 3000,
+        "response_format": AnomaliesModel,
+    }
+    latest_json = ""
+    for anomaly_count, (anomaly, _, latest_json) in enumerate(openai_structured_outputs_stream(**kwargs)):
+        # Show anomaly
+        key = f"check_anomaly_resolved_{indicator_id}_{anomaly_count}"
+        show_anomaly(anomaly.title, anomaly.description, key)
+
+        # Save anomaly
+        st.session_state.register["by_dataset"][dataset_name][indicator_slug]["anomalies"].append(anomaly.model_dump())
+
+    # Get cost and tokens
+    text_in = [mm["text"] for m in messages for mm in m["content"] if mm["type"] == "text"]
+    text_in = "\n".join(text_in)
+    cost, num_tokens = get_cost_and_tokens(text_in, latest_json, cast(str, MODEL))
+    cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
+    st.info(cost_msg)
+    st.write(messages)
+
+
+@st.fragment
+def my_fragment(indicator_uri):
+    st.button("Release the balloons", help="Fragment rerun", key=str(indicator_uri))
+    st.balloons()
+
+
+@st.fragment
+def show_indicator_block(dataset_name, indicator_slug):
+    indicator_uri = f"{dataset_name}/{indicator_slug}"
+
+    indicator_props = st.session_state.register["by_dataset"][dataset_name][indicator_slug]
+    indicator_id = indicator_props["id"]
+    indicator_anomalies = indicator_props["anomalies"]
+
+    with st.container(border=True):
+        # Title
+        st.markdown(f"[{indicator_slug}]({OWID_ENV.indicator_admin_site(indicator_id)})")
+
+        # Buttons
+        with st_horizontal():
+            # Find anomalies button
+            btn_gpt = st.button(
+                "Find anomalies",
+                icon=":material/robot:",
+                # use_container_width=True,
+                type="primary",
+                help="Use GPT to find anomalies in the indicator.",
+                key=f"btn_gpt_{indicator_id}",
+                # on_click=lambda: st.rerun(scope="fragment"),
+            )
+            # 'Plot indicator' button
+            if st.button(
+                "Plot indicator",
+                icon=":material/show_chart:",
+                # use_container_width=True,
+                key=f"btn_plot_{indicator_id}",
+            ):
+                show_indicator(indicator_uri, indicator_id)
+
+        # Show anomalies
+        if btn_gpt:
+            get_anomaly_gpt(indicator_id, dataset_name, indicator_slug)
+        else:
+            for anomaly_count, anomaly in enumerate(indicator_anomalies):
+                key = f"resolved_{indicator_id}_{anomaly_count}"
+                show_anomaly(anomaly["title"], anomaly["description"], key)
 
 
 class AnomalyModel(BaseModel):
@@ -96,138 +217,85 @@ class AnomaliesModel(BaseModel):
 
 
 def openai_structured_outputs_stream(api, **kwargs):
+    """Stream structured outputs from OpenAI API.
+
+    References:
+        - https://community.openai.com/t/streaming-using-structured-outputs/925799/13
+    """
+    parsed_latest = None
     with api.beta.chat.completions.stream(**kwargs, stream_options={"include_usage": True}) as stream:
+        # Check each chunk in stream (new chunk appears whenever a new character is added to the completion)
         for chunk in stream:
-            # st.write(chunk)
-            # st.write("---")
+            # Only consider those of type "chunk"
             if chunk.type == "chunk":
+                # Get latest snapshot
                 latest_snapshot = chunk.to_dict()["snapshot"]
-                # The first chunk doesn't have the 'parsed' key, so using .get to prevent raising an exception
-                latest_parsed = latest_snapshot["choices"][0]["message"].get("parsed", {})
+
+                # Get latest choice
+                choice = latest_snapshot["choices"][0]
+                parsed_cumulative = choice["message"].get("parsed", {})
+
                 # Note that usage is not available until the final chunk
                 latest_usage = latest_snapshot.get("usage", {})
-                latest_json = latest_snapshot["choices"][0]["message"]["content"]
+                latest_json = choice["message"]["content"]
 
-                yield latest_parsed, latest_usage, latest_json
+                # Checks:
+                # 1. Check if "anomalies" is in the returned object
+                # 2. Check if "anomalies" is a list
+                # 3. Check if "anomalies" is not empty
+                # 4. Check if the latest parsed object is different from the previous one
+                if "anomalies" in parsed_cumulative:
+                    anomalies = parsed_cumulative["anomalies"]
+                    if isinstance(anomalies, list) & (len(anomalies) > 0):
+                        parsed_latest_ = anomalies[-1]
+
+                        # Check if parsed_latest_ is a valid AnomalyModel (i.e. if it is a complete object!)
+                        try:
+                            anomaly = AnomalyModel(**parsed_latest_)
+                            if (parsed_latest is None) | (parsed_latest != parsed_latest_):
+                                parsed_latest = parsed_latest_
+                                yield anomaly, latest_usage, latest_json
+                        except ValidationError as _:
+                            continue
+                    # yield latest_parsed["anomalies"], latest_usage, latest_json
 
 
-# Block per dataset
-for dataset_index, d in enumerate(st.session_state.datasets):
-    st.markdown(f'##### :material/dataset: {d["dataset"]}')
-    indicators = d["indicators"]
+# SHOW INDICATORS
+if len(st.session_state.datasets_selected) > 0:
+    num_tabs = len(st.session_state.datasets_selected)
+    tabs = st.tabs(st.session_state.datasets_selected)
 
-    # Block per indicator in dataset
-    for indicator_index, i in enumerate(indicators):
-        indicator_uri = f"{d['dataset']}/{i['slug']}"
-        with st.container(border=True):
-            # Title
-            st.markdown(f"`{i['slug']}`")
+    # Block per dataset
+    for dataset_name, tab in zip(st.session_state.datasets_selected, tabs):
+        with tab:
+            # Block per indicator in dataset
+            for indicator_slug in st.session_state.register["by_dataset"][dataset_name].keys():
+                # Indicator block
+                show_indicator_block(dataset_name, indicator_slug)
 
-            col1, col2 = st.columns(2)
-
-            with col1:
-                btn_gpt = st.button(
-                    "Find anomalies", icon=":material/planner_review:", use_container_width=True, type="primary"
-                )
-
-            with col2:
-                # Show indicator button
-                if st.button("Plot indicator", icon=":material/show_chart:", use_container_width=True):
-                    show_indicator(indicator_uri)
-
-            if btn_gpt:
-                # Open AI (do first to catch possible errors in ENV)
-                api = OpenAIWrapper()
-
-                # Prepare messages for Insighter
-                DIVIDER = "---"
-                messages = [
-                    {
-                        "role": "system",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": """Find three anomalies in the given topic for some countries.""",
-                            },
-                        ],
-                    },
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": "life expectancy",
-                            },
-                        ],
-                    },
-                ]
-
-                # Provide a list of 3 data anomalies in a given topic in different countries. Your output should be in format:
-                # {DIVIDER}
-                # title: Title of anomaly 1
-                # description: Description of the anomaly.
-                # {DIVIDER}
-                # title: Title of anomaly 2
-                # description: Description of the anomaly.
-                kwargs = {
-                    "model": MODEL,
-                    "messages": messages,
-                    "max_tokens": 3000,
-                    # "response_format": {"type": "json_object"},
-                }
-                # TODO: https://community.openai.com/t/streaming-using-structured-outputs/925799/13
-                for parsed_completion, *_ in openai_structured_outputs_stream(
-                    api, model="gpt-4o", temperature=0, messages=messages, response_format=AnomaliesModel
-                ):
-                    st.write(parsed_completion)
-
-                # with st.chat_message("assistant"):
-                #     # Ask GPT (stream)
-                #     stream = api.chat.completions.create(
-                #         model=MODEL,
-                #         messages=messages,  # type: ignore
-                #         max_tokens=3000,
-                #         stream=True,
-                #         response_format={"type": "json_object"},
-                #         # stream_options={"include_usage": True},  # retrieving token usage for stream response
-                #     )
-                #     # chunks = [c for c in stream]
-                #     # st.write(chunks)
-                #     # st.write(chunks[-1])
-                #     for chunk in stream:
-                #         # st.write(chunk)
-                #         st.write(chunk.choices[0].delta)
-                #     # response = cast(str, st.write_stream(stream))
-                #     # st.write(response)
-
-                text_in = [mm["text"] for m in messages for mm in m["content"] if mm["type"] == "text"]
-                text_in = "\n".join(text_in)
-                cost, num_tokens = get_cost_and_tokens(text_in, response, cast(str, MODEL))
-                cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
-                st.info(cost_msg)
-
+                # my_fragment(indicator_uri)
             # Anomalies detected
-            anomalies = i["anomalies"]
-            st.markdown(f"{len(anomalies)} anomalies detected.")
+            # anomalies = indicator["anomalies"]
+            # st.markdown(f"{len(anomalies)} anomalies detected.")
 
-            for anomaly_index, a in enumerate(anomalies):
-                # Review icon
-                if a["resolved"]:
-                    icon = "✅"
-                else:
-                    icon = "⏳"
+            # for anomaly_index, a in enumerate(anomalies):
+            #     # Review icon
+            #     if a["resolved"]:
+            #         icon = "✅"
+            #     else:
+            #         icon = "⏳"
 
-                # Anomaly explained (expander)
-                with st.expander(f'{anomaly_index+1}/ {a["title"]}', expanded=False, icon=icon):
-                    # Check if resolved
-                    key = f"resolved_{dataset_index}_{indicator_index}_{anomaly_index}"
+            #     # Anomaly explained (expander)
+            #     with st.expander(f'{anomaly_index+1}/ {a["title"]}', expanded=False, icon=icon):
+            #         # Check if resolved
+            #         key = f"resolved_{dataset_index}_{indicator_index}_{anomaly_index}"
 
-                    # Checkbox (if resolved)
-                    st.checkbox(
-                        "Mark as resolved",
-                        value=a["resolved"],
-                        key=key,
-                    )
+            #         # Checkbox (if resolved)
+            #         st.checkbox(
+            #             "Mark as resolved",
+            #             value=a["resolved"],
+            #             key=key,
+            #         )
 
-                    # Anomaly description
-                    st.markdown(a["description"])
+            #         # Anomaly description
+            #         st.markdown(a["description"])
