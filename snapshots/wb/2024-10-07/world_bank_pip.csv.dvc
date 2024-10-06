@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: World Bank Poverty and Inequality Platform
+    title: World Bank Poverty and Inequality Platform (PIP)
+    description: |-
+      The Poverty and Inequality Platform (PIP) is an interactive computational tool that offers users quick access to the World Bank’s estimates of poverty, inequality, and shared prosperity. PIP provides a comprehensive view of global, regional, and country-level trends for more than 160 economies around the world.
+    title_snapshot: Key indicators
+    citation_full: |-
+      World Bank (2024). Poverty and Inequality Platform (version 20240326_2017 and 20240326_2011) [Data set]. World Bank Group. https://pip.worldbank.org/. Accessed 02 July 2024.
+    version_producer: 20240326_2017, 20240326_2011
+    url_main: https://pip.worldbank.org
+    date_accessed: '2024-10-06'
+    date_published: '2024-03-26'
+    license:
+      name: CC0
+      url: https://datacatalog.worldbank.org/search/dataset/0063646
