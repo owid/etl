@@ -623,6 +623,24 @@ class Dataset(Base):
         assert vars, f"Dataset {dataset_id} has no variables"
         return list(vars)
 
+    @classmethod
+    def load_datasets_uri(cls, session: Session):
+        query = """SELECT dataset_uri, createdAt
+        FROM (
+            SELECT
+                namespace,
+                version,
+                shortName,
+                createdAt,
+                CONCAT('grapher/', namespace, '/', version, '/', shortName) AS dataset_uri
+            FROM
+                datasets d
+        ) AS derived
+        WHERE dataset_uri IS NOT NULL
+        ORDER BY createdAt DESC;
+        """
+        return read_sql(query, session)
+
 
 class SourceDescription(TypedDict, total=False):
     link: Optional[str]
@@ -1161,6 +1179,13 @@ class Variable(Base):
             sort=metadata.sort,
             **presentation_dict,
         )
+
+    @classmethod
+    def load_variables_in_datasets(cls, session: Session, dataset_uris: List[str]) -> List["Variable"]:
+        conditions = [cls.catalogPath.startswith(uri) for uri in dataset_uris]
+        query = select(cls).where(or_(*conditions))
+        results = session.scalars(query).all()
+        return list(results)
 
     @classmethod
     def load_variable(cls, session: Session, variable_id: int) -> "Variable":
