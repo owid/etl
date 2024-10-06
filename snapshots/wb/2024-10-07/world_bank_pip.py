@@ -1,4 +1,7 @@
-"""Script to create a snapshot of dataset."""
+"""
+Script to create a snapshot of dataset.
+Follow the instructions to create a new snapshot in pip_api.py.
+"""
 
 from pathlib import Path
 
