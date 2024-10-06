@@ -1,14 +1,54 @@
 import json
+from contextlib import contextmanager
 from copy import deepcopy
 from random import sample
 from typing import Any, Dict, Optional
 
 import numpy as np
+import streamlit as st
 import streamlit.components.v1 as components
 
-from apps.wizard.utils.data import load_variable, load_variable_data
+from apps.wizard.utils.indicator import load_variable, load_variable_data
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher_model import Variable
+
+HORIZONTAL_STYLE = """<style class="hide-element">
+    /* Hides the style container and removes the extra spacing */
+    .element-container:has(.hide-element) {
+        display: none;
+    }
+    /*
+        The selector for >.element-container is necessary to avoid selecting the whole
+        body of the streamlit app, which is also a stVerticalBlock.
+    */
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) {
+        display: flex;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: baseline;
+    }
+    /* Buttons and their parent container all have a width of 704px, which we need to override */
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) div {
+        width: max-content !important;
+    }
+    /* Just an example of how you would style buttons, if desired */
+    /*
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) button {
+        border-color: red;
+    }
+    */
+</style>
+"""
+
+
+@contextmanager
+def st_horizontal():
+    st.markdown(HORIZONTAL_STYLE, unsafe_allow_html=True)
+    with st.container():
+        st.markdown('<span class="hide-element horizontal-marker"></span>', unsafe_allow_html=True)
+        yield
+
 
 CONFIG_BASE = {
     # "title": "Placeholder",
@@ -110,7 +150,7 @@ def grapher_chart(
     selected_entities : Optional[list], optional
         List of entities to plot, by default None. If None, a random sample of num_sample_selected_entities will be plotted.
     num_sample_selected_entities : int, optional
-        Number of entities to sample if selected_entities is None, by default 5
+        Number of entities to sample if selected_entities is None, by default 5. If there are less entities than this number, all will be plotted.
     height : int, optional
         Height of the chart, by default 600
     """
@@ -134,7 +174,8 @@ def grapher_chart(
         if selected_entities is not None:
             chart_config["selectedEntityNames"] = selected_entities
         else:
-            chart_config["selectedEntityNames"] = sample(list(df["entity"].unique()), num_sample_selected_entities)
+            entities = list(df["entity"].unique())
+            chart_config["selectedEntityNames"] = sample(entities, min(len(entities), num_sample_selected_entities))
 
     _chart_html(chart_config, owid_env, height=height, **kwargs)
 
