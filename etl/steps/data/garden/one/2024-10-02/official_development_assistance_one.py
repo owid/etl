@@ -350,6 +350,9 @@ def rename_sectors_and_add_parent_categories(tb: Table) -> Table:
     Rename sectors and add aggregations of the main and first level sub-sectors.
     """
 
+    # Make value float
+    tb["value"] = tb["value"].astype("float")
+
     # When sector_name is empty, set it to "Sectors not specified".
     tb["sector_name"] = tb["sector_name"].fillna("Sectors not specified")
 
@@ -438,6 +441,9 @@ def rename_and_aggregate_channels(tb: Table) -> Table:
     """
     Rename channels in main categories and aggregate them
     """
+
+    # Make value float
+    tb["value"] = tb["value"].astype("float")
 
     # Make channel_code string
     tb["channel_code"] = tb["channel_code"].astype("string")
