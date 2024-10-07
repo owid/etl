@@ -7,7 +7,7 @@ definitions:
         - Artificial Intelligence
 
       grapher_config:
-              note:  For example, the [Identifying Outputs of Generative Adversarial Networks Act](https://www.govinfo.gov/content/pkg/PLAW-116publ258/pdf/PLAW-116publ258.pdf) passed into law by the US Congress.
+        note:  For example, the [Identifying Outputs of Generative Adversarial Networks Act](https://www.govinfo.gov/content/pkg/PLAW-116publ258/pdf/PLAW-116publ258.pdf) passed into law by the US Congress.
     display:
       numDecimalPlaces: 0
 

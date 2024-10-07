@@ -1,0 +1,18 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+	  {
+		"name": "Run Extension",
+		"type": "node",
+		"request": "launch",
+		"program": "${workspaceFolder}/dist/extension.js",  // Launch the built extension
+		"args": ["--extensionDevelopmentPath=${workspaceFolder}"],  // Run in dev mode
+		"outFiles": ["${workspaceFolder}/dist/**/*.js"],  // The output files to track
+		"runtimeExecutable": "${execPath}",  // Use the current VSCode executable
+		"stopOnEntry": false,
+		"sourceMaps": true,
+		"smartStep": true,
+		"internalConsoleOptions": "openOnSessionStart"
+	  }
+	]
+  }

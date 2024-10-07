@@ -56,3 +56,5 @@ site/
 notebooks/
 
 zpop/
+node_modules/
+dist/

@@ -39,7 +39,7 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl import config, files, git_helpers, paths
 from etl import grapher_helpers as gh
 from etl import grapher_model as gm
-from etl.config import TLS_VERIFY
+from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.snapshot import Snapshot
 
@@ -868,7 +868,7 @@ class GrapherStep(Step):
         dataset.metadata = gh._adapt_dataset_metadata_for_grapher(dataset.metadata)
 
         engine = get_engine()
-        admin_api = AdminAPI(engine)
+        admin_api = AdminAPI(OWID_ENV)
 
         assert dataset.metadata.namespace
         dataset_upsert_results = gi.upsert_dataset(
