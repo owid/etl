@@ -24,6 +24,11 @@ dataset:
 tables:
   migrant_stock:
     variables:
+      total_population_born_in_country:
+        title: Total population born in this country
+        description_short: The total number of people living in the country who were born in the same country. Calculated as the total population minus the number of international immigrants.
+        processing_level: major
+        description_processing: We calculated the total population born in the country by subtracting the number of international immigrants from the total population.
       # Immigrant stock
       immigrants_all:
         title: Total number of international immigrants

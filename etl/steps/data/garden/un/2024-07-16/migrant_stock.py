@@ -203,6 +203,9 @@ def run(dest_dir: str) -> None:
     # share of emigrants in total population in home country
     tb["emigrants_share_of_total_population"] = tb["emigrants_all"] / (tb["total_population"]) * 100
 
+    # total population without immigrants:
+    tb["total_population_born_in_country"] = tb["total_population"] - tb["immigrants_all"]
+
     # drop total population columns
     tb = tb.drop(columns=["total_population", "male_population", "female_population"])
 
