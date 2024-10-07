@@ -33,6 +33,6 @@ meta:
 
 wdir: ../../../data/snapshots/papers/2023-10-20
 outs:
-  - md5: 6dcf2fc0657ef8c48e6aade8bc6f8da9
-    size: 332574523
+  - md5: d41d8cd98f00b204e9800998ecf8427e
+    size: 0
     path: anthromes.csv

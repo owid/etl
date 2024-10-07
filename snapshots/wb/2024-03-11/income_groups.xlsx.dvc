@@ -14,6 +14,6 @@ meta:
       url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
 wdir: ../../../data/snapshots/wb/2024-03-11
 outs:
-  - md5: 39b24a541ca085424b42795ed747948e
-    size: 115839
+  - md5: f878c6168f826a650f21477bea3bf904
+    size: 116890
     path: income_groups.xlsx

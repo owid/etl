@@ -18,6 +18,6 @@ meta:
 
 wdir: ../../../data/snapshots/wb/2024-03-26
 outs:
-  - md5: 25e2b0b99e91433c6b0265de576c5db0
-    size: 2300974
+  - md5: 42cfd561a858422ae98f0a0599d6ba2f
+    size: 2996354
     path: food_prices_for_nutrition.csv

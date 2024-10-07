@@ -26,6 +26,6 @@ meta:
       url: ttps://www.oecd.org/termsandconditions.html
 
 outs:
-  - md5: dee35364728c854813d407d792f5e74e
-    size: 1593548
+  - md5: 8ba56a775cef433a87fcb13518ee133a
+    size: 1734728
     path: passenger_travel.csv

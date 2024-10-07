@@ -27,6 +27,6 @@ meta:
       name: CC BY 4.0
       url: https://epochai.org/blog/how-much-does-it-cost-to-train-frontier-ai-models
 outs:
-  - md5: 8e02d8b9837c38766e230fc91dfd41ab
-    size: 410761
+  - md5: 588c715fada99c1e6f984cd2d5659dc1
+    size: 441545
     path: epoch_compute_intensive.csv

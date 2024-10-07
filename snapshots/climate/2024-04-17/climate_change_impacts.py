@@ -187,7 +187,7 @@ def main(upload: bool) -> None:
         )
 
         # Rewrite metadata to dvc file.
-        snap.metadata_path.write_text(snap.metadata.to_yaml())
+        snap.metadata.save()
 
     # Create the actual snapshots, download the data and upload them to S3.
     # NOTE: This cannot be done as part of the previous loop because, if the folder of dvc files has been manually

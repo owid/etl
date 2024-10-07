@@ -26,6 +26,6 @@ meta:
     HMD provides an online STMF visualization toolkit (https://mpidr.shinyapps.io/stmortality).
 wdir: ../../../data/snapshots/excess_mortality/2023-02-17
 outs:
-  - md5: ef38fe6e5c22b7ccbde7363c6d74d376
-    size: 19547690
+  - md5: 63069a522999934ab7a3285bfba1c59e
+    size: 21148259
     path: hmd_stmf.csv

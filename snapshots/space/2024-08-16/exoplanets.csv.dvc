@@ -33,6 +33,6 @@ meta:
     name: Public domain
     url: https://exoplanetarchive.ipac.caltech.edu/docs/acknowledge.html
 outs:
-  - md5: b987687752e529d6efcb1fdef008ae4d
-    size: 180014
+  - md5: afdc40aa60d4cb185db56177a7e01e64
+    size: 180482
     path: exoplanets.csv

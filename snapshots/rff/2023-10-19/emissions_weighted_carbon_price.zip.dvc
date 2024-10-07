@@ -31,6 +31,6 @@ meta:
 
 wdir: ../../../data/snapshots/rff/2023-10-19
 outs:
-- md5: b85ab4e356f3e06d8ddfc24b5fee6ee7
-  size: 42618106
-  path: emissions_weighted_carbon_price.zip
+  - md5: e2681f900d32a4c2b738197e8f1bec7e
+    size: 215073214
+    path: emissions_weighted_carbon_price.zip

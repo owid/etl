@@ -25,6 +25,6 @@ meta:
       url: https://data.noaa.gov/metaview/page?xml=NOAA/NESDIS/NGDC/MGG/Hazards/iso/xml/G012153.xml&view=getDataView
 
 outs:
-  - md5: c61a234fb7c36d9be67411e13200788b
-    size: 152076
+  - md5: f2d1cc11d082f023605d072a1d54fe44
+    size: 157783
     path: natural_hazards_volcanoes.csv

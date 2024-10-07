@@ -27,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/excess_mortality/2023-01-27
 outs:
-  - md5: bf4310ebf71e334c6a06f79d43b237a7
-    size: 19516305
+  - md5: 63069a522999934ab7a3285bfba1c59e
+    size: 21148259
     path: hmd_stmf.csv

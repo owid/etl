@@ -27,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/war/2024-01-23
 outs:
-- md5: 98ee3398178ac725ea452c2420d047b4
-  size: 17665
-  path: comprehensive_test_ban.csv
+  - md5: 69bd167607f05984af1a495f23205192
+    size: 17721
+    path: comprehensive_test_ban.csv

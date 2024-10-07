@@ -14,9 +14,7 @@ meta:
 
     # Citation
     producer: Various sources
-    citation_full: HLD. Human Life-Table Database. Max Planck Institute for Demographic
-      Research (Germany), University of California, Berkeley (USA), and French Institute
-      for Demographic Studies (France). Available at http://www.lifetable.de.
+    citation_full: HLD. Human Life-Table Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). Available at http://www.lifetable.de.
     attribution_short: HLD
 
     # Files
@@ -31,6 +29,6 @@ meta:
 
 wdir: ../../../data/snapshots/hmd/2023-09-19
 outs:
-- md5: edcd1b272c1e8a678e7e82bf622bcf1a
-  size: 46242186
-  path: hld.zip
+  - md5: d2ca3073caf9684c42f02a23e5c3966f
+    size: 49687474
+    path: hld.zip

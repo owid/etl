@@ -12,6 +12,6 @@ meta:
       name: CC BY 4.0
       url: https://www.furfreealliance.com/fur-bans/
 outs:
-  - md5: c81c08b397f7218c13d5046e6055a7f2
-    size: 44300
+  - md5: f28dc3f6e6b9dd4d92a3a1fc852939b9
+    size: 44015
     path: fur_laws.csv

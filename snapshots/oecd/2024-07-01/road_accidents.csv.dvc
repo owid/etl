@@ -26,6 +26,6 @@ meta:
       url: https://www.oecd.org/termsandconditions.html
 
 outs:
-  - md5: fe6a0df7389ec3fd698bba3a6253d8ee
-    size: 1643494
+  - md5: 58286989dba18dfbdfd65dcd0fe35d13
+    size: 1727300
     path: road_accidents.csv

@@ -32,6 +32,6 @@ meta:
       name: OECD Terms of Conditions
       url: https://www.oecd.org/en/about/terms-conditions.html
 outs:
-  - md5: 20bc7758e372f82872695ba4e7b5162f
-    size: 152006421
+  - md5: 683e4688bd0d902eebe3ad8c395e005e
+    size: 150788516
     path: co2_air_transport.csv

@@ -17,6 +17,6 @@ meta:
     WHO’s Global Health Estimates (GHE) provide the latest available data on death and disability globally, by region and country, and by age, sex and cause. The latest updates include global, regional and country trends from 2000 to 2019 inclusive. By providing key insights on mortality and morbidity trends, these estimates are a powerful tool to support informed decision-making on health policy and resource allocation.
 wdir: ../../../data/snapshots/who/2023-03-09
 outs:
-  - md5: e4fc91413fc9e988091dc1d0e10e265b
-    size: 5961517
+  - md5: c7d0dad5631db9abfe35da614ca43c43
+    size: 6608057
     path: gho_suicides.json

@@ -394,10 +394,14 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
 
         with strictness_level(strict):
             # Execute the step and measure the time taken
-            time_taken = timed_run(lambda: step.run())
-            execution_times[str(step)] = time_taken
+            # TODO: ignore errors, silence this
+            try:
+                time_taken = timed_run(lambda: step.run())
+                execution_times[str(step)] = time_taken
 
-            click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
+                click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
+            except Exception as e:
+                click.echo(f"{click.style('ERROR', fg='red')}: {e}")
             print()
 
         # Write the recorded execution times to the file after all steps have been executed
@@ -524,8 +528,11 @@ def _exec_step_job(
     step = parse_step(step_name, dag)
     strict = _detect_strictness_level(step, strict)
     with strictness_level(strict):
-        execution_times[step_name] = timed_run(lambda: step.run())
-    print(f"--- Finished {step_name} ({execution_times[step_name]:.1f}s)")
+        try:
+            execution_times[step_name] = timed_run(lambda: step.run())
+            print(f"--- Finished {step_name} ({execution_times[step_name]:.1f}s)")
+        except Exception as e:
+            click.echo(f"{click.style('ERROR', fg='red')}: {e}")
 
 
 def _write_execution_times(execution_times: Dict) -> None:

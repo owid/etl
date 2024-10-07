@@ -25,6 +25,6 @@ meta:
       url: https://www.insee.fr/fr/information/2008466
 
 outs:
-  - md5: 5cadaf8ff95502aa51f8947ccb567504
-    size: 33183
+  - md5: d07add7c883f0d036098d0732835351e
+    size: 33782
     path: relative_poverty_france.xlsx

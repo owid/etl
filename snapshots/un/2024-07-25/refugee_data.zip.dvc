@@ -28,6 +28,6 @@ meta:
       url: https://www.unhcr.org/what-we-do/reports-and-publications/data-and-statistics/terms-use-datasets
 
 outs:
-  - md5: 969822946407c5f4101b7291a8118762
+  - md5: e94e39d060e89b7a9766e337238ba2ef
     size: 924774
     path: refugee_data.zip

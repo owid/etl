@@ -18,11 +18,10 @@ meta:
 
     # License
     license:
-      url:
-        https://databank.worldbank.org/reports.aspx?source=2&type=metadata&series=FP.CPI.TOTL.ZG
+      url: https://databank.worldbank.org/reports.aspx?source=2&type=metadata&series=FP.CPI.TOTL.ZG
       name: CC BY 4.0# License (same as origin.license, for backwards compatibility)
 wdir: ../../../data/snapshots/wb/2023-09-19
 outs:
-- md5: c66f547b69d1bf43fc58d17702244ece
-  size: 1100
-  path: us_cpi.csv
+  - md5: 6777ba4fcf1d1aff1e8cf47c60712fcf
+    size: 1097
+    path: us_cpi.csv

@@ -18,6 +18,6 @@ meta:
 
 wdir: ../../../data/snapshots/artificial_intelligence/2023-06-14
 outs:
-- md5: 8093ea21e154974b57c322e36fdba577
-  size: 45675
-  path: papers_with_code_coding.html
+  - md5: 6b25292a17329967731b2fcd510bab91
+    size: 52560
+    path: papers_with_code_coding.html

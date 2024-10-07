@@ -30,6 +30,6 @@ meta:
       url: https://www.unhcr.org/what-we-do/reports-and-publications/data-and-statistics/terms-use-datasets
 
 outs:
-  - md5: f65a9223c4acdcbbe2979f38928564a8
+  - md5: f83f4a3d3828b13c868233c68e318486
     size: 120083
     path: resettlement.zip

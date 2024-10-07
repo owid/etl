@@ -27,6 +27,6 @@ meta:
       name: CC BY 4.0
 
 outs:
-  - md5: 652236ca88ced4c5cd73d832cc1c6259
-    size: 233819
+  - md5: a9c334cedfb5e9cfa4fbe6e89dfd7f26
+    size: 4452
     path: diagnosis_routes_by_route.csv

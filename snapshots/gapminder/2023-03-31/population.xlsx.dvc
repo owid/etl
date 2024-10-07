@@ -38,6 +38,6 @@ meta:
       url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing
 wdir: ../../../data/snapshots/gapminder/2023-03-31
 outs:
-- md5: 2ff20af19edba61e69956c2e306e54f7
-  size: 3773746
-  path: population.xlsx
+  - md5: 739e211af014fc732e0e2f7e79f90cd1
+    size: 3787335
+    path: population.xlsx

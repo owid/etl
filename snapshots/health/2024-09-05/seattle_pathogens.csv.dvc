@@ -30,6 +30,6 @@ meta:
       url: https://creativecommons.org/licenses/by/4.0/
 
 outs:
-  - md5: 2f93043de84e8a43058b16d93c0b79fd
-    size: 101608
+  - md5: 7501ee36d82ff8bc9b7e3329600a686b
+    size: 101511
     path: seattle_pathogens.csv
