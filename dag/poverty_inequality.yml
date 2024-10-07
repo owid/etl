@@ -14,17 +14,15 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
 
   # World Bank Poverty and Inequality Platform
-  data://meadow/wb/2024-03-27/world_bank_pip:
-    - snapshot://wb/2024-03-27/world_bank_pip.csv
-    - snapshot://wb/2024-03-27/world_bank_pip_percentiles.csv
-  data://garden/wb/2024-03-27/world_bank_pip:
-    - data://meadow/wb/2024-03-27/world_bank_pip
-  data://grapher/wb/2024-03-27/world_bank_pip_2011ppp:
-    - data://garden/wb/2024-03-27/world_bank_pip
-  data://grapher/wb/2024-03-27/world_bank_pip_2017ppp:
-    - data://garden/wb/2024-03-27/world_bank_pip
-  data://explorers/wb/latest/world_bank_pip:
-    - data://garden/wb/2024-03-27/world_bank_pip
+  data://meadow/wb/2024-10-07/world_bank_pip:
+    - snapshot://wb/2024-10-07/world_bank_pip_percentiles.csv
+    - snapshot://wb/2024-10-07/world_bank_pip.csv
+  data://garden/wb/2024-10-07/world_bank_pip:
+    - data://meadow/wb/2024-10-07/world_bank_pip
+  data://grapher/wb/2024-10-07/world_bank_pip_2011ppp:
+    - data://garden/wb/2024-10-07/world_bank_pip
+  data://grapher/wb/2024-10-07/world_bank_pip_2017ppp:
+    - data://garden/wb/2024-10-07/world_bank_pip
 
   # World Inequality Database
   data://meadow/wid/2024-05-24/world_inequality_database:
@@ -128,14 +126,3 @@ steps:
     - data://meadow/igh/2024-07-05/better_data_homelessness
   data://grapher/igh/2024-07-05/better_data_homelessness:
     - data://garden/igh/2024-07-05/better_data_homelessness
-
-  # World Bank Poverty and Inequality Platform
-  data://meadow/wb/2024-10-07/world_bank_pip:
-    - snapshot://wb/2024-10-07/world_bank_pip_percentiles.csv
-    - snapshot://wb/2024-10-07/world_bank_pip.csv
-  data://garden/wb/2024-10-07/world_bank_pip:
-    - data://meadow/wb/2024-10-07/world_bank_pip
-  data://grapher/wb/2024-10-07/world_bank_pip_2011ppp:
-    - data://garden/wb/2024-10-07/world_bank_pip
-  data://grapher/wb/2024-10-07/world_bank_pip_2017ppp:
-    - data://garden/wb/2024-10-07/world_bank_pip
