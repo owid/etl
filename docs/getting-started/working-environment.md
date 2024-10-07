@@ -210,12 +210,27 @@ If `make test` succeeds, then you should be able to build any dataset you like, 
 
 ## VSCode setup
 
-We highly recommended installing the following extension
+### Recommended extensions
+We highly recommended installing the following extensions:
 
 * [Ruff](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff)
 * [YAML](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
 
-And adding this to your User `settings.json` (View -> Command Palette -> Preferences: Open User Settings (JSON))
+### Custom extensions
+
+#### Find Latest ETL Step
+Navigating ETL steps using ++cmd+p++ can be cumbersome, since there are multiple versions and files for a given step.
+To simplify this, we created a custom extension that lets you find the latest version of a given ETL step.
+
+To install it, run ++cmd+shift+p++ to open the Command Palette, and select `Extensions: Install from VSIX...`.
+Select the latest version of the extension, e.g. `vscode_extensions/find-latest-etl-step/install/find-latest-etl-step-0.0.2.vsix`.
+You may need to restart extensions or VSCode afterwards.
+
+To use it, execute ++ctrl+shift+l++; a new text bar will appear at the top; type the name of the ETL step you want to open, and you'll see only the files corresponding to the latest version of that step.
+
+### Additional configuration
+
+Add this to your User `settings.json` (View -> Command Palette -> Preferences: Open User Settings (JSON)):
 
 ```json
   "files.associations": {
