@@ -9,8 +9,9 @@ from structlog import get_logger
 
 import etl.grapher_model as gm
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.utils import get_schema_from_url, set_states, st_page_link, st_toast_error
+from apps.wizard.utils import set_states, st_page_link, st_toast_error
 from etl.config import OWID_ENV
+from etl.helpers import get_schema_from_url
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
 
 # Logger

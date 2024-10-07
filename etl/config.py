@@ -221,6 +221,9 @@ GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 # Skip SSL verify
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
+# Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.005.json"
+
 
 def enable_bugsnag() -> None:
     if BUGSNAG_API_KEY:
