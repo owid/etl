@@ -13,6 +13,7 @@ paths = PathFinder(__file__)
 INDEX_SECTORS = ["donor_name", "recipient_name", "year", "sector_name"]
 INDEX_CHANNELS = ["donor_name", "recipient_name", "year", "channel_name"]
 
+# Define mapping for sectors, including new names, sub-sectors, and sectors.
 SECTORS_MAPPING = {
     "I.1.a. Education, Level Unspecified": {
         "new_name": "I.1.a. Education, level unspecified",
@@ -231,6 +232,20 @@ SECTORS_MAPPING = {
     },
 }
 
+# Define main categories for sectors
+SECTORS_MAIN_CATEGORIES = [
+    "I. Social infrastructure and services",
+    "II. Economic infrastructure and services",
+    "III. Production sectors",
+    "IV. Multisector/cross-cutting",
+    "VI. Commodity aid / General programme assistance",
+    "VII. Action relating to debt",
+    "VIII. Humanitarian aid",
+    "IX. Unallocated / unspecified",
+    "Administrative costs of donors",
+    "Refugees in donor countries",
+]
+
 # Define channel categories coming from ONE
 CHANNEL_CATEGORIES = {
     "1": "Public sector",
@@ -404,6 +419,9 @@ def add_non_humanitarian_aid_and_total(tb: Table) -> Table:
     # Create a copy of the table
     tb_total = tb.copy()
     tb_humanitarian = tb.copy()
+
+    # Filter tb_total by SECTORS_MAIN_CATEGORIES
+    tb_total = tb_total[tb_total["sector_name"].isin(SECTORS_MAIN_CATEGORIES)].reset_index(drop=True)
 
     # Define INDEX_SECTORS without sector_name
     INDEX_WITHOUT_SECTOR_NAME = [col for col in INDEX_SECTORS if col != "sector_name"]
