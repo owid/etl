@@ -1,7 +1,7 @@
 from typing import cast
 
 import streamlit as st
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.utils.components import grapher_chart, st_horizontal
@@ -77,18 +77,22 @@ if len(st.session_state.datasets_selected) > 0:
 # FUNCTIONS / CLASSES
 ################################################
 
+NUM_MAX_ENTITIES = 10
+
 
 @st.dialog("Vizualize the indicator", width="large")
-def show_indicator(indicator_uri, indicator_id):
+def show_indicator(indicator_uri, indicator_id, selected_entities=None):
     """Plot the indicator in a modal window."""
     # Modal title
     st.markdown(f"[{indicator_slug}]({OWID_ENV.indicator_admin_site(indicator_id)})")
 
     # Plot indicator
-    grapher_chart(catalog_path=indicator_uri, owid_env=OWID_ENV)
+    if (selected_entities is not None) and (len(selected_entities) > NUM_MAX_ENTITIES):
+        st.warning(f"Too many entities. Showing only the first {NUM_MAX_ENTITIES}.")
+    grapher_chart(catalog_path=indicator_uri, selected_entities=selected_entities, owid_env=OWID_ENV)
 
 
-def show_anomaly(title, description, key):
+def show_anomaly(title, description, entities, indicator_id, indicator_uri, key):
     # check_value = st.session_state.register["by_dataset"][dataset_name][indicator_slug].get("resolved", False)
     check_value = st.session_state.get(key, False)
 
@@ -101,18 +105,31 @@ def show_anomaly(title, description, key):
         st.checkbox(
             "Mark as resolved",
             value=check_value,
-            key=key,
+            key=f"check_anomaly_resolved_{key}",
         )
         st.write(description)
+        # st.write(entities)
+
+        if (entities is not None) & isinstance(entities, list) & (len(entities) > 0):
+            if st.button(
+                "Inspect anomaly",
+                icon=":material/show_chart:",
+                # use_container_width=True,
+                key=f"btn_plot_{key}",
+            ):
+                show_indicator(indicator_uri, indicator_id, entities)
 
 
-def get_anomaly_gpt(indicator_id: str, dataset_name: str, indicator_slug: str):
+def get_anomaly_gpt(indicator_id: str, indicator_uri: str, dataset_name: str, indicator_slug: str):
     # Open AI (do first to catch possible errors in ENV)
     # Prepare messages for Insighter
 
     data = load_variable_data_cached(variable_id=int(indicator_id))
-    data_1 = data.pivot(index="years", columns="entity", values="values")
+    data_1 = data.pivot(index="years", columns="entity", values="values")  # .head(20)
     data_1 = data_1.dropna(axis=1, how="all")
+    data_1_str = data_1.to_csv().replace(".0,", ",")
+
+    num_anomalies = 3
 
     messages = [
         {
@@ -120,7 +137,7 @@ def get_anomaly_gpt(indicator_id: str, dataset_name: str, indicator_slug: str):
             "content": [
                 {
                     "type": "text",
-                    "text": "Provide three anomalies in for the given time series.",
+                    "text": f"Provide {num_anomalies} anomalies in for the given time series.",
                 },
             ],
         },
@@ -129,7 +146,7 @@ def get_anomaly_gpt(indicator_id: str, dataset_name: str, indicator_slug: str):
             "content": [
                 {
                     "type": "text",
-                    "text": str(data_1),
+                    "text": data_1_str,
                 },
             ],
         },
@@ -144,8 +161,8 @@ def get_anomaly_gpt(indicator_id: str, dataset_name: str, indicator_slug: str):
     latest_json = ""
     for anomaly_count, (anomaly, _, latest_json) in enumerate(openai_structured_outputs_stream(**kwargs)):
         # Show anomaly
-        key = f"check_anomaly_resolved_{indicator_id}_{anomaly_count}"
-        show_anomaly(anomaly.title, anomaly.description, key)
+        key = f"{indicator_id}_{anomaly_count}"
+        show_anomaly(anomaly.title, anomaly.description, anomaly.entities, indicator_id, indicator_uri, key)
 
         # Save anomaly
         st.session_state.register["by_dataset"][dataset_name][indicator_slug]["anomalies"].append(anomaly.model_dump())
@@ -156,13 +173,6 @@ def get_anomaly_gpt(indicator_id: str, dataset_name: str, indicator_slug: str):
     cost, num_tokens = get_cost_and_tokens(text_in, latest_json, cast(str, MODEL))
     cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
     st.info(cost_msg)
-    st.write(messages)
-
-
-@st.fragment
-def my_fragment(indicator_uri):
-    st.button("Release the balloons", help="Fragment rerun", key=str(indicator_uri))
-    st.balloons()
 
 
 @st.fragment
@@ -200,20 +210,27 @@ def show_indicator_block(dataset_name, indicator_slug):
 
         # Show anomalies
         if btn_gpt:
-            get_anomaly_gpt(indicator_id, dataset_name, indicator_slug)
+            with st.spinner("Querying GPT for anomalies..."):
+                get_anomaly_gpt(indicator_id, indicator_uri, dataset_name, indicator_slug)
         else:
             for anomaly_count, anomaly in enumerate(indicator_anomalies):
                 key = f"resolved_{indicator_id}_{anomaly_count}"
-                show_anomaly(anomaly["title"], anomaly["description"], key)
+                show_anomaly(
+                    anomaly["title"], anomaly["description"], anomaly["entities"], indicator_id, indicator_uri, key
+                )
 
 
 class AnomalyModel(BaseModel):
-    title: str
-    description: str
+    title: str = Field(description="Title of the anomaly.")
+    description: str = Field(description="Short description of the anomaly.")
+    entities: list[str] = Field(
+        description="List of entities affected by the anomaly. Entities are given as columns in the input data (excluding column 'years' or 'date')."
+    )
+    finished: bool = Field(description="True if the obtention of a particular anomaly has been finalized.")
 
 
 class AnomaliesModel(BaseModel):
-    anomalies: list[AnomalyModel]
+    anomalies: list[AnomalyModel] = Field(description="List of anomalies detected in the data.")
 
 
 def openai_structured_outputs_stream(api, **kwargs):
@@ -253,6 +270,7 @@ def openai_structured_outputs_stream(api, **kwargs):
                         try:
                             anomaly = AnomalyModel(**parsed_latest_)
                             if (parsed_latest is None) | (parsed_latest != parsed_latest_):
+                                # st.write(choice)
                                 parsed_latest = parsed_latest_
                                 yield anomaly, latest_usage, latest_json
                         except ValidationError as _:
