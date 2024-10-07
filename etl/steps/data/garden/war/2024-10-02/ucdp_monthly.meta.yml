@@ -149,7 +149,7 @@ definitions:
 
 tables:
   # PARTICIPANT INDICATORS
-  ucdp_country:
+  ucdp_monthly_country:
     common:
       presentation:
         attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
@@ -204,7 +204,7 @@ tables:
           <%- endif -%>
 
   # LOCATION INDICATORS
-  ucdp_locations:
+  ucdp_monthly_locations:
     common:
       description_processing: |-
         {definitions.all.location_conflicts_method}
@@ -358,7 +358,7 @@ tables:
       #     {definitions.number_deaths_type.description_short_per_capita}
 
   # MAIN INDICATORS
-  ucdp:
+  ucdp_monthly:
     common:
       presentation:
         grapher_config:
@@ -559,9 +559,9 @@ tables:
           attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
 
 dataset:
-  title: UCDP, History of war
+  title: UCDP, History of war (monthly)
   description: |-
-    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 24.1), the UCDP/PRIO Armed Conflict Dataset (version 24.1), and the UCDP Battle-Related Deaths Dataset (version 24.1).
+    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 23.1), the UCDP/PRIO Armed Conflict Dataset (version 23.1), and the UCDP Battle-Related Deaths Dataset (version 23.1).
 
     We aggregate the UCDP Georeferenced Event Dataset up to the year and world (region) to identify all conflict deaths, non-state conflicts, and one-sided violence.
 
