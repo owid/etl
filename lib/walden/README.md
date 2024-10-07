@@ -31,9 +31,7 @@ To get the data locally, you can run "make fetch" to download everything to `dat
 
 ## Working with the catalog
 
-You need Python 3.8+ to use this repository, with `poetry` installed (`pip install poetry`).
-
-Then install the environment using
+You need Python 3.8+ to use this repository, with `uv` package manager. To install the dependencies, run:
 
 ```
 make .venv

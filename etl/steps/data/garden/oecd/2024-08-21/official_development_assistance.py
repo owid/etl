@@ -420,6 +420,23 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     ]
     tb_donor_categories_grouped["donor"] = "Total aid"
 
+    # From tb_official_donor extract GNI data, by dividing oda by oda_share_gni
+    tb_official_donor["gni"] = tb_official_donor["oda"] / (tb_official_donor["oda_share_gni"] / 100)
+
+    # Use this data in tb_donors_categories_grouped
+    tb_donor_categories_grouped = pr.merge(
+        tb_donor_categories_grouped, tb_official_donor[["country", "year", "gni"]], on=["country", "year"], how="left"
+    )
+
+    # Calculate oda_share_gni
+    tb_donor_categories_grouped["oda_share_gni"] = (
+        tb_donor_categories_grouped["oda"] / tb_donor_categories_grouped["gni"] * 100
+    )
+
+    # Remove gni in tb_official_donor and tb_donor_categories_grouped
+    tb_official_donor = tb_official_donor.drop(columns="gni")
+    tb_donor_categories_grouped = tb_donor_categories_grouped.drop(columns="gni")
+
     # Concatenate all the tables
     tb_recipient = pr.concat([tb_donor_categories, tb_official_donor, tb_donor_categories_grouped], ignore_index=True)
 

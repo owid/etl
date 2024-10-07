@@ -15,7 +15,7 @@ meta:
     attribution_short: WHO
 
     # Files
-    url_main: https://frontdoor-l4uikgap6gz3m.azurefd.net/MPX/V_MPX_VALIDATED_DAILY
+    url_main: https://xmart-api-public.who.int/MPX/V_MPX_VALIDATED_DAILY
     date_accessed: 2024-08-07
     date_published: "2024-08-07"
 

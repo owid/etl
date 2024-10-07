@@ -15,8 +15,10 @@ from urllib.parse import urljoin
 
 import jsonref
 import pandas as pd
+import requests
 import structlog
 import yaml
+from jsonschema import validate
 from owid import catalog
 from owid.catalog import CHANNEL, DatasetMeta, Table, warnings
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
@@ -33,7 +35,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
-from etl.config import TLS_VERIFY
+from etl.config import DEFAULT_GRAPHER_SCHEMA, TLS_VERIFY
 from etl.explorer import Explorer
 from etl.explorer_helpers import Explorer as ExplorerOld
 from etl.snapshot import Snapshot, SnapshotMeta
@@ -112,6 +114,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
 
             _validate_description_key(tab[col].m.description_key, col)
             _validate_ordinal_variables(tab, col)
+            _validate_grapher_config(tab, col)
 
             # Data Page title uses the following fallback
             # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
@@ -129,6 +132,20 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
                     f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
                     warnings.DisplayNameWarning,
                 )
+
+
+def _validate_grapher_config(tab: Table, col: str) -> None:
+    """Validate grapher config against given schema or against the default schema."""
+    grapher_config = getattr(tab[col].m.presentation, "grapher_config", None)
+    if grapher_config:
+        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
+
+        # Load schema and remove properties that are not relevant for the validation
+        schema = get_schema_from_url(grapher_config["$schema"])
+        # schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version", "title")]
+        schema["required"] = []
+
+        validate(grapher_config, schema)
 
 
 def _validate_description_key(description_key: list[str], col: str) -> None:
@@ -605,7 +622,7 @@ class PathFinder:
             self.is_private = True
             _step = self._create_current_step_name()
             if _step not in self.dag:
-                raise CurrentStepMustBeInDag
+                raise CurrentStepMustBeInDag(_step)
             else:
                 return _step
 
@@ -1167,3 +1184,20 @@ def create_explorer(
         explorer.df_columns = df_columns
 
     return explorer
+
+
+@cache
+def get_schema_from_url(schema_url: str) -> dict:
+    """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
+
+    https://files.ourworldindata.org/schemas/grapher-schema.005.json
+
+    More details on available versions can be found
+    at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema.
+
+    Returns
+    -------
+    Dict[str, Any]
+        Schema of a chart configuration.
+    """
+    return requests.get(schema_url, timeout=20, verify=TLS_VERIFY).json()

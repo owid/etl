@@ -19,12 +19,7 @@ pip install git+https://github.com/owid/owid-datautils-py
 
 ### Pre-requisites
 
-You need Python 3.8+, `poetry` and `make` installed.
-
-```
-# Install poetry
-pip install poetry
-```
+You need Python 3.8+, `UV` and `make` installed.
 
 ### Install in development mode
 

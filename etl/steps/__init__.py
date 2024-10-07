@@ -33,11 +33,13 @@ from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl import config, files, git_helpers, paths
 from etl import grapher_helpers as gh
-from etl.config import TLS_VERIFY
+from etl import grapher_model as gm
+from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.snapshot import Snapshot
 
@@ -596,7 +598,7 @@ class DataStep(Step):
         if sys.platform == "linux":
             args.extend(["prlimit", f"--as={config.MAX_VIRTUAL_MEMORY_LINUX}"])
 
-        args.extend(["poetry", "run", "etl", "d", "run-python-step"])
+        args.extend(["uv", "run", "etl", "d", "run-python-step"])
 
         if config.IPDB_ENABLED:
             args.append("--ipdb")
@@ -608,8 +610,12 @@ class DataStep(Step):
             ]
         )
 
+        # Add uv to the path, it causes problems in Buildkite
+        env = os.environ.copy()
+        env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
+
         try:
-            subprocess.check_call(args, env=os.environ.copy())
+            subprocess.check_call(args, env=env)
         except subprocess.CalledProcessError:
             # swallow this exception and just exit -- the important stack trace
             # will already have been printed to stderr
@@ -862,7 +868,7 @@ class GrapherStep(Step):
         dataset.metadata = gh._adapt_dataset_metadata_for_grapher(dataset.metadata)
 
         engine = get_engine()
-        admin_api = AdminAPI(engine)
+        admin_api = AdminAPI(OWID_ENV)
 
         assert dataset.metadata.namespace
         dataset_upsert_results = gi.upsert_dataset(
@@ -875,6 +881,8 @@ class GrapherStep(Step):
         # We sometimes get a warning, but it's unclear where it is coming from
         # Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
         warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+        catalog_paths = []
 
         with ThreadPoolExecutor(max_workers=config.GRAPHER_INSERT_WORKERS) as thread_pool:
             futures = []
@@ -890,6 +898,8 @@ class GrapherStep(Step):
                 # if GRAPHER_FILTER is set, only upsert matching columns
                 if config.GRAPHER_FILTER:
                     cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
+                    if not cols:
+                        continue
                     cols += [c for c in table.columns if c in {"year", "date", "country"} and c not in cols]
                     table = table.loc[:, cols]
 
@@ -899,6 +909,7 @@ class GrapherStep(Step):
                     i += 1
                     assert len(t.columns) == 1
                     catalog_path = f"{self.path}/{table.metadata.short_name}#{t.columns[0]}"
+                    catalog_paths.append(catalog_path)
 
                     # stop logging to stop cluttering logs
                     if i > 20 and verbose:
@@ -921,13 +932,16 @@ class GrapherStep(Step):
                         )
                     )
 
-            variable_upsert_results = [future.result() for future in as_completed(futures)]
+            # wait for all tables to be inserted
+            [future.result() for future in as_completed(futures)]
 
         if not config.GRAPHER_FILTER and not config.SUBSET:
             # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
             # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
             # needed for remapping. However, we can delete it on next ETL run
-            success = self._cleanup_ghost_resources(engine, dataset_upsert_results, variable_upsert_results)
+            success = self._cleanup_ghost_resources(
+                engine, dataset_upsert_results, catalog_paths, list(dataset_upsert_results.source_ids.values())
+            )
 
             # set checksum and updatedAt timestamps after all data got inserted
             if success:
@@ -947,10 +961,11 @@ class GrapherStep(Step):
         cls,
         engine: Engine,
         dataset_upsert_results,
-        variable_upsert_results: List[Any],
+        catalog_paths: List[str],
+        dataset_upserted_source_ids: List[int],
     ) -> bool:
         """
-        Cleanup all ghost variables and sources that weren't upserted
+        Cleanup all ghost variables that weren't upserted
         NOTE: we can't just remove all dataset variables before starting this step because
         there could be charts that use them and we can't remove and recreate with a new ID
 
@@ -958,11 +973,10 @@ class GrapherStep(Step):
         """
         import etl.grapher_import as gi
 
-        upserted_variable_ids = [r.variable_id for r in variable_upsert_results]
-        upserted_source_ids = list(dataset_upsert_results.source_ids.values()) + [
-            r.source_id for r in variable_upsert_results
-        ]
-        upserted_source_ids = [source_id for source_id in upserted_source_ids if source_id is not None]
+        # convert catalog_paths to variable_ids
+        with Session(engine) as session:
+            upserted_variable_ids = list(gm.Variable.catalog_paths_to_variable_ids(session, catalog_paths).values())
+
         # Try to cleanup ghost variables, but make sure to raise an error if they are used
         # in any chart
         success = gi.cleanup_ghost_variables(
@@ -970,9 +984,9 @@ class GrapherStep(Step):
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
         )
-        gi.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, upserted_source_ids)
-        # TODO: cleanup origins that are not used by any variable
 
+        gi.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, dataset_upserted_source_ids)
+        # TODO: cleanup origins that are not used by any variable. We can do it in batch
         return success
 
 

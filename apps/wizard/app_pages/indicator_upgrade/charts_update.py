@@ -9,9 +9,9 @@ from structlog import get_logger
 
 import etl.grapher_model as gm
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.utils import get_schema_from_url, set_states, st_page_link, st_toast_error
+from apps.wizard.utils import set_states, st_page_link, st_toast_error
 from etl.config import OWID_ENV
-from etl.db import get_engine
+from etl.helpers import get_schema_from_url
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
 
 # Logger
@@ -92,9 +92,8 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
 def push_new_charts(charts: List[gm.Chart]) -> None:
     """Updating charts in the database."""
     # API to interact with the admin tool
-    engine = get_engine()
     # HACK: Forcing grapher user to be Admin so that it is detected by chart sync.
-    api = AdminAPI(engine, grapher_user_id=1)
+    api = AdminAPI(OWID_ENV, grapher_user_id=1)
     # Update charts
     progress_text = "Updating charts..."
     bar = st.progress(0, progress_text)
@@ -127,5 +126,7 @@ def push_new_charts(charts: List[gm.Chart]) -> None:
         )
         st.exception(e)
     else:
-        st.success("The charts were successfully updated! Review the changes with `chart diff`")
+        st.success(
+            "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
+        )
         st_page_link("chart-diff")
