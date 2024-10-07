@@ -605,7 +605,7 @@ class PathFinder:
             self.is_private = True
             _step = self._create_current_step_name()
             if _step not in self.dag:
-                raise CurrentStepMustBeInDag
+                raise CurrentStepMustBeInDag(_step)
             else:
                 return _step
 
