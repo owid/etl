@@ -35,5 +35,3 @@ steps:
     - data://garden/wb/2024-03-27/world_bank_pip
   data://grapher/wb/2024-03-27/world_bank_pip_2017ppp:
     - data://garden/wb/2024-03-27/world_bank_pip
-  data://explorers/wb/latest/world_bank_pip:
-    - data://garden/wb/2024-03-27/world_bank_pip

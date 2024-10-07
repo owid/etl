@@ -23,6 +23,8 @@ steps:
     - data://garden/wb/2024-10-07/world_bank_pip
   data://grapher/wb/2024-10-07/world_bank_pip_2017ppp:
     - data://garden/wb/2024-10-07/world_bank_pip
+  data://explorers/wb/latest/world_bank_pip:
+    - data://garden/wb/2024-10-07/world_bank_pip
 
   # World Inequality Database
   data://meadow/wid/2024-05-24/world_inequality_database:
