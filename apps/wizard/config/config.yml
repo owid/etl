@@ -110,7 +110,7 @@ sections:
           production: True
       - title: "Anomalist"
         alias: anomalist
-        entrypoint: app_pages/anomalist.py
+        entrypoint: app_pages/anomalist_2.py
         description: List anomalies in data
         maintainer: "@lucas"
         icon: ":material/planner_review:"
