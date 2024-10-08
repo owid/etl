@@ -30,20 +30,45 @@ tables:
         title: Share of populations strongly increasing
         description_short: The share of native, vertebrate populations that are increasing on average by 2.81% or more per year.
         description_processing: Categories are based on [Burns et al. (2023)](https://stateofnature.org.uk/wp-content/uploads/2023/09/TP25999-State-of-Nature-main-report_2023_FULL-DOC-v12.pdf).
+        display:
+          name: Strong increase
+        presentation:
+          grapher_config:
+            note: "Categories are based on annual changes: +2.81% is a strong increase; +1.16% to +2.81% is a moderate increase; -2.73% to -1.14% is a moderate decrease; and greater than -2.73% is a strong decrease."
       share_moderate_increase:
         title: Share of populations moderately increasing
         description_short: The share of native, vertebrate populations that are increasing on average by 1.16% to 2.81% per year.
         description_processing: Categories are based on [Burns et al. (2023)](https://stateofnature.org.uk/wp-content/uploads/2023/09/TP25999-State-of-Nature-main-report_2023_FULL-DOC-v12.pdf).
+        display:
+          name: Moderate increase
+        presentation:
+          grapher_config:
+            note: "Categories are based on annual changes: +2.81% is a strong increase; +1.16% to +2.81% is a moderate increase; -2.73% to -1.14% is a moderate decrease; and greater than -2.73% is a strong decrease."
       share_little_change:
         title: Share of populations with little change
         description_short: The share of native, vertebrate populations that are decreasing by less than 1.14% per year and increasing by less than 1.16% per year.
         description_processing: Categories are based on [Burns et al. (2023)](https://stateofnature.org.uk/wp-content/uploads/2023/09/TP25999-State-of-Nature-main-report_2023_FULL-DOC-v12.pdf).
+        display:
+          name: No change
+        presentation:
+          grapher_config:
+            note: "Categories are based on annual changes: +2.81% is a strong increase; +1.16% to +2.81% is a moderate increase; -2.73% to -1.14% is a moderate decrease; and greater than -2.73% is a strong decrease."
       share_moderate_decrease:
         title: Share of populations moderately decreasing
         description_short: The share of native, vertebrate populations that are decreasing on average by 1.14% to 2.73% per year.
         description_processing: Categories are based on [Burns et al. (2023)](https://stateofnature.org.uk/wp-content/uploads/2023/09/TP25999-State-of-Nature-main-report_2023_FULL-DOC-v12.pdf).
+        display:
+          name: Moderate decrease
+        presentation:
+          grapher_config:
+            note: "Categories are based on annual changes: +2.81% is a strong increase; +1.16% to +2.81% is a moderate increase; -2.73% to -1.14% is a moderate decrease; and greater than -2.73% is a strong decrease."
       share_strong_decrease:
         title: Share of populations strongly decreasing
         description_short: The share of native, vertebrate populations that are decreasing on average by 2.73% or more per year.
         description_processing: Categories are based on [Burns et al. (2023)](https://stateofnature.org.uk/wp-content/uploads/2023/09/TP25999-State-of-Nature-main-report_2023_FULL-DOC-v12.pdf).
+        display:
+          name: Strong decrease
+        presentation:
+          grapher_config:
+            note: "Categories are based on annual changes: +2.81% is a strong increase; +1.16% to +2.81% is a moderate increase; -2.73% to -1.14% is a moderate decrease; and greater than -2.73% is a strong decrease."
 
