@@ -1,5 +1,5 @@
 import warnings
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 import pymysql
@@ -9,9 +9,19 @@ from sqlalchemy.orm import Session
 
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_connection
-from etl.grapher_model import Variable
+from etl.grapher_model import Dataset, Variable
 
 log = structlog.get_logger()
+
+
+def load_dataset_uris(
+    owid_env: OWIDEnv = OWID_ENV,
+) -> List[str]:
+    """Get list of dataset URIs from the database."""
+    with Session(owid_env.engine) as session:
+        datasets = Dataset.load_datasets_uri(session)
+
+    return list(datasets["dataset_uri"])
 
 
 def load_variables_in_dataset(
@@ -37,8 +47,6 @@ def load_variable(
             id_or_path=id_or_path,
         )
 
-    variable = cast(Variable, variable)
-
     return variable
 
 
@@ -61,7 +69,7 @@ def load_variable_metadata(
         The indicator object.
     """
     # Get variable
-    variable = ensure_variable(catalog_path, variable_id, variable, owid_env)
+    variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
 
     # Get metadata
     metadata = variable.get_metadata()
@@ -69,7 +77,6 @@ def load_variable_metadata(
     return metadata
 
 
-# Load variable data
 def load_variable_data(
     catalog_path: Optional[str] = None,
     variable_id: Optional[int] = None,
@@ -90,7 +97,7 @@ def load_variable_data(
     """
 
     # Get variable
-    variable = ensure_variable(catalog_path, variable_id, variable, owid_env)
+    variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
 
     # Get data
     with Session(owid_env.engine) as session:
@@ -99,7 +106,7 @@ def load_variable_data(
     return df
 
 
-def ensure_variable(
+def ensure_load_variable(
     catalog_path: Optional[str] = None,
     variable_id: Optional[int] = None,
     variable: Optional[Variable] = None,

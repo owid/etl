@@ -1,9 +1,8 @@
 import pandas as pd
 import streamlit as st
 
+from apps.wizard.utils import cached
 from apps.wizard.utils.components import grapher_chart, st_horizontal
-from apps.wizard.utils.dataset import load_datasets_uri_from_db
-from apps.wizard.utils.indicator import load_indicator_uris_from_db
 
 # PAGE CONFIG
 st.set_page_config(
@@ -39,7 +38,7 @@ st.markdown(
 with st.form(key="dataset_search"):
     st.session_state.datasets_selected = st.multiselect(
         "Select datasets",
-        options=load_datasets_uri_from_db(),
+        options=cached.load_dataset_uris(),
         max_selections=1,
     )
 
@@ -51,7 +50,7 @@ with st.container(border=True):
     st.markdown("##### Filter Parameters")
     options = []
     if len(st.session_state.datasets_selected) > 0:
-        st.session_state.indicators = load_indicator_uris_from_db(st.session_state.datasets_selected)
+        st.session_state.indicators = cached.load_variables_in_dataset(st.session_state.datasets_selected)
         options = [o.catalogPath for o in st.session_state.indicators]
 
     st.session_state.filter_indicators = st.multiselect(

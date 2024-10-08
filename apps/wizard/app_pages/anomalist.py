@@ -4,15 +4,10 @@ import streamlit as st
 from pydantic import BaseModel, Field, ValidationError
 
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
+from apps.wizard.utils import cached
 from apps.wizard.utils.components import grapher_chart, st_horizontal
-from apps.wizard.utils.dataset import load_datasets_uri_from_db
-from apps.wizard.utils.indicator import (
-    load_indicator_uris_from_db,
-    load_variable_data_cached,
-)
-
-# load_variable_metadata_cached,
 from etl.config import OWID_ENV
+from etl.grapher_io import load_variables_in_dataset
 
 # PAGE CONFIG
 st.set_page_config(
@@ -47,7 +42,7 @@ st.markdown(
 )
 st.session_state.datasets_selected = st.multiselect(
     "Select datasets",
-    options=load_datasets_uri_from_db(),
+    options=cached.load_dataset_uris(),
     max_selections=3,
 )
 
@@ -59,7 +54,7 @@ for i in st.session_state:
 # GET INDICATORS
 if len(st.session_state.datasets_selected) > 0:
     # Get indicator uris for all selected datasets
-    indicators = load_indicator_uris_from_db(st.session_state.datasets_selected)
+    indicators = load_variables_in_dataset(st.session_state.datasets_selected)
 
     for indicator in indicators:
         catalog_path = cast(str, indicator.catalogPath)
@@ -124,7 +119,7 @@ def get_anomaly_gpt(indicator_id: str, indicator_uri: str, dataset_name: str, in
     # Open AI (do first to catch possible errors in ENV)
     # Prepare messages for Insighter
 
-    data = load_variable_data_cached(variable_id=int(indicator_id))
+    data = cached.load_variable_data(variable_id=int(indicator_id))
     data_1 = data.pivot(index="years", columns="entity", values="values")  # .head(20)
     data_1 = data_1.dropna(axis=1, how="all")
     data_1_str = data_1.to_csv().replace(".0,", ",")

@@ -1189,45 +1189,15 @@ class Variable(Base):
         return list(results)
 
     @classmethod
-    @deprecated("Use from_db instead")
+    @deprecated("Use from_id_or_path instead")
     def load_variable(cls, session: Session, variable_id: int) -> "Variable":
         """D"""
         return session.scalars(select(cls).where(cls.id == variable_id)).one()
 
     @classmethod
-    @deprecated("Use from_db instead")
+    @deprecated("Use from_id_or_path instead")
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
         return session.scalars(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
-
-    # @overload
-    # @classmethod
-    # def from_db(
-    #     cls,
-    #     session: Session,
-    #     variable_id: None,
-    #     catalog_path: str,
-    # ) -> "Variable":
-    #     ...
-
-    # @overload
-    # @classmethod
-    # def from_db(
-    #     cls,
-    #     session: Session,
-    #     variable_id: None,
-    #     catalog_path: List[str],
-    # ) -> List["Variable"]:
-    #     ...
-
-    # @overload
-    # @classmethod
-    # def from_db(
-    #     cls,
-    #     session: Session,
-    #     variable_id: int,
-    #     catalog_path: None = None,
-    # ) -> "Variable":
-    #     ...
 
     @overload
     @classmethod
