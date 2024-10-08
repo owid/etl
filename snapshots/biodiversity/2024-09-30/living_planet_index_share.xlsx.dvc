@@ -25,3 +25,7 @@ meta:
     # License
     license:
       name: CC BY 4.0
+outs:
+  - md5: b2fe7154f4d62dc83329a0326921646e
+    size: 5370
+    path: living_planet_index_share.xlsx
