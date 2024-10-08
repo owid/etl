@@ -17,7 +17,7 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     df = pd.DataFrame(
         {
-            "taxon": ["total", "mammals", "fish", "birds", "herptiles"],
+            "taxon": ["total", "Mammals", "Fishes", "Birds", "Reptiles and amphibians"],
             "year": [2022, 2022, 2022, 2022, 2022],
             "share_increasing": [43.3, 44.9, 44.6, 41.5, 43.3],
             "share_decreasing": [50.0, 45.6, 51.0, 51.3, 51.6],
