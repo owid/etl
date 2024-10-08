@@ -1,0 +1,32 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0 #we only have whole numbers
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 9999 #not to be updated
+
+
+tables:
+  migration_perception:
+    variables:
+      actual_immigrant_share:
+        title: Actual immigrant share
+        unit: "%"
+        short_unit: "%"
+        description_short: "Actual share of immigrants (people born in another country) in the population. This data comes from the World Migration Report 2022 by the International Organisation for Migration (IOM)."
+      perceived_immigrant_share:
+        title: Perceived immigrant share
+        unit: "%"
+        short_unit: "%"
+        description_short: "Perceived share of immigrants (people born in another country) in the population. This data comes from an Ipsos survey conducted among 10,000 people in 2023."
+
