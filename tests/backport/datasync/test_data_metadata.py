@@ -32,10 +32,10 @@ def _call_variable_metadata(variable_id: int, variable_df: pd.DataFrame, variabl
     topic_tags = ["Population"]
 
     with Session(engine) as session:
-        with mock.patch("etl.grapher_io._load_variable", return_value=variable_meta):
-            with mock.patch("etl.grapher_io.data_metadata._load_origins_df", return_value=origins_df):
-                with mock.patch("etl.grapher_io.data_metadata._load_faqs", return_value=faqs):
-                    with mock.patch("etl.grapher_io.data_metadata._load_topic_tags", return_value=topic_tags):
+        with mock.patch("apps.backport.datasync.data_metadata._load_variable", return_value=variable_meta):
+            with mock.patch("apps.backport.datasync.data_metadata._load_origins_df", return_value=origins_df):
+                with mock.patch("apps.backport.datasync.data_metadata._load_faqs", return_value=faqs):
+                    with mock.patch("apps.backport.datasync.data_metadata._load_topic_tags", return_value=topic_tags):
                         return variable_metadata(session, variable_id, variable_df)
 
 
