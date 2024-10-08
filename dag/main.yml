@@ -802,6 +802,13 @@ steps:
   data://grapher/oecd/2024-08-21/official_development_assistance:
     - data://garden/oecd/2024-08-21/official_development_assistance
 
+# Migration perception of Ipsos Perils of Perception survey
+  data://garden/migration/2024-10-08/migration_perception:
+    - snapshot://migration/2024-10-08/migration_perception.csv
+  data://grapher/migration/2024-10-08/migration_perception:
+    - data://garden/migration/2024-10-08/migration_perception
+
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
