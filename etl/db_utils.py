@@ -1,7 +1,7 @@
 import functools
 import os
 import warnings
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 from urllib.parse import quote
 
 import pandas as pd
