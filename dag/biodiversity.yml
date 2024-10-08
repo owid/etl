@@ -30,9 +30,10 @@ steps:
     - data://meadow/biodiversity/2024-08-12/invasive_species
   data://grapher/biodiversity/2024-08-12/invasive_species:
     - data://garden/biodiversity/2024-08-12/invasive_species
-  data-private://meadow/biodiversity/2024-09-30/living_planet_index:
-    - snapshot-private://biodiversity/2024-09-30/living_planet_index.xlsx
-  data-private://garden/biodiversity/2024-09-30/living_planet_index:
-    - data-private://meadow/biodiversity/2024-09-30/living_planet_index
-  data-private://grapher/biodiversity/2024-09-30/living_planet_index:
-    - data-private://garden/biodiversity/2024-09-30/living_planet_index
+  # Living Planet Index
+  data://meadow/biodiversity/2024-09-30/living_planet_index:
+    - snapshot://biodiversity/2024-09-30/living_planet_index.xlsx
+  data://garden/biodiversity/2024-09-30/living_planet_index:
+    - data://meadow/biodiversity/2024-09-30/living_planet_index
+  data://grapher/biodiversity/2024-09-30/living_planet_index:
+    - data://garden/biodiversity/2024-09-30/living_planet_index

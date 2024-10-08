@@ -15,7 +15,7 @@ meta:
     # Citation
     producer: World Wildlife Fund and Zoological Society of London
     citation_full: |-
-      WWF (2024) Living Planet Report 2024 – A System in Peril. WWF, Gland, Switzerland.
+      Deinet S, Marconi V, Freeman R, Puleston H, McRae L. Living Planet Report 2024 Technical Supplement: Living Planet Index. ZSL, 2024. https://doi.org/10.17605/OSF.IO/6TE9H
     attribution_short: WWF & ZSL
 
     # Files
@@ -25,8 +25,3 @@ meta:
     # License
     license:
       name: CC BY 4.0
-
-outs:
-  - md5: 50f9fc7dc79419ed5ac6cbf9b3569ff5
-    size: 54805
-    path: living_planet_index.xlsx
