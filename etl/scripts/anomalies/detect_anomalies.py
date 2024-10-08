@@ -343,4 +343,4 @@ def inspect_anomalies(df_scores: pd.DataFrame, score_name: str, n_anomalies: int
             ).show()
 
 
-inspect_anomalies(df_scores=df_scores, score_name="time_change")
+inspect_anomalies(df_scores=df_scores, score_name="version_change")
