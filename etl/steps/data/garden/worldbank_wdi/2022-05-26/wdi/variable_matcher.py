@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, cast
 import pandas as pd
 from owid.repack import repack_frame
 
-from etl.db_utils import get_connection
+from etl.db import get_connection
 
 CURRENT_DIR = Path(__file__).parent
 GRAPHER_VARIABLES_PATH = CURRENT_DIR / "grapher_variables.feather"

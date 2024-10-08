@@ -1,5 +1,5 @@
 from etl import multidim
-from etl.db_utils import get_engine
+from etl.db import get_engine
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
