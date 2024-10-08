@@ -6,7 +6,7 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from etl.db_utils import get_variables_data
+from etl.db import get_variables_data
 from etl.paths import EXPLORERS_DIR
 from etl.version_tracker import VersionTracker
 

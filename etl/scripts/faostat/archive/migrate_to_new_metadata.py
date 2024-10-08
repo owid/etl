@@ -11,7 +11,7 @@ import json
 from owid import catalog
 from structlog import get_logger
 
-from etl import db_utils
+from etl.db import get_dataset_id, get_variables_in_dataset
 from etl.files import yaml_dump
 from etl.paths import DATA_DIR, STEP_DIR
 
@@ -44,14 +44,14 @@ def main():
             )
             continue
         try:
-            dataset_id = db_utils.get_dataset_id(dataset_name=dataset_name, version=VERSION)  # type: ignore[reportArgumentType]
+            dataset_id = get_dataset_id(dataset_name=dataset_name, version=VERSION)  # type: ignore[reportArgumentType]
         except AssertionError:
             log.error(
                 f"Grapher dataset for {domain} could not be found in the database. "
                 f"Run `etl run {domain} --grapher` and try again."
             )
             continue
-        variables = db_utils.get_variables_in_dataset(dataset_id=dataset_id, only_used_in_charts=True)
+        variables = get_variables_in_dataset(dataset_id=dataset_id, only_used_in_charts=True)
         if len(variables) > 0:
             # variables_in_charts[domain] = variables.set_index("shortName").T.to_dict()
             variables_dict = {}
