@@ -15,7 +15,7 @@ import requests
 from dotenv import load_dotenv
 from owid.catalog import Dataset
 
-from etl.db import get_connection
+from etl.db_utils import get_connection
 from etl.paths import DATA_DIR
 
 raise NotImplementedError("This script is not intended to be executed.")

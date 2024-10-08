@@ -20,7 +20,7 @@ from owid.catalog import Dataset
 from owid.datautils.dataframes import map_series
 from structlog import get_logger
 
-from etl import db
+from etl import db_utils
 
 # from etl.chart_revision.v2.core import create_and_submit_charts_revisions
 from etl.paths import DATA_DIR
@@ -93,10 +93,10 @@ def map_old_to_new_variable_names(variables_old: List[str], variables_new: List[
 def get_grapher_data_for_old_and_new_variables(
     dataset_old: Dataset, dataset_new: Dataset
 ) -> Tuple[Optional[pd.DataFrame], Optional[pd.DataFrame]]:
-    with db.get_connection() as db_conn:
+    with db_utils.get_connection() as db_conn:
         try:
             # Get old and new dataset ids.
-            dataset_id_old = db.get_dataset_id(
+            dataset_id_old = db_utils.get_dataset_id(
                 db_conn=db_conn,
                 dataset_name=dataset_old.metadata.title,  # type: ignore
                 version=dataset_old.metadata.version,  # type: ignore[reportArgumentType]
@@ -105,7 +105,7 @@ def get_grapher_data_for_old_and_new_variables(
             log.error(f"Dataset {dataset_old.metadata.title} not found in grapher DB.")
             return None, None
         try:
-            dataset_id_new = db.get_dataset_id(
+            dataset_id_new = db_utils.get_dataset_id(
                 db_conn=db_conn,
                 dataset_name=dataset_new.metadata.title,  # type: ignore
                 version=dataset_new.metadata.version,  # type: ignore[reportArgumentType]
@@ -115,11 +115,11 @@ def get_grapher_data_for_old_and_new_variables(
             return None, None
 
         # Get variables from old dataset that have been used in at least one chart.
-        grapher_variables_old = db.get_variables_in_dataset(
+        grapher_variables_old = db_utils.get_variables_in_dataset(
             db_conn=db_conn, dataset_id=dataset_id_old, only_used_in_charts=True
         )
         # Get all variables from new dataset.
-        grapher_variables_new = db.get_variables_in_dataset(
+        grapher_variables_new = db_utils.get_variables_in_dataset(
             db_conn=db_conn, dataset_id=dataset_id_new, only_used_in_charts=False
         )
 

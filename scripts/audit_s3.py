@@ -9,7 +9,7 @@ import structlog
 from owid.catalog.s3_utils import connect_r2
 
 from apps.backport.datasync.datasync import upload_gzip_dict
-from etl.db import get_engine
+from etl.db_utils import get_engine
 
 log = structlog.get_logger()
 

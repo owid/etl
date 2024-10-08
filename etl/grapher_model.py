@@ -69,7 +69,7 @@ from sqlalchemy.sql import Select
 from typing_extensions import Self, TypedDict
 
 from etl import config, paths
-from etl.db import read_sql
+from etl.db_utils import read_sql
 
 log = structlog.get_logger()
 
@@ -1199,73 +1199,92 @@ class Variable(Base):
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
         return session.scalars(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
+    # @overload
+    # @classmethod
+    # def from_db(
+    #     cls,
+    #     session: Session,
+    #     variable_id: None,
+    #     catalog_path: str,
+    # ) -> "Variable":
+    #     ...
+
+    # @overload
+    # @classmethod
+    # def from_db(
+    #     cls,
+    #     session: Session,
+    #     variable_id: None,
+    #     catalog_path: List[str],
+    # ) -> List["Variable"]:
+    #     ...
+
+    # @overload
+    # @classmethod
+    # def from_db(
+    #     cls,
+    #     session: Session,
+    #     variable_id: int,
+    #     catalog_path: None = None,
+    # ) -> "Variable":
+    #     ...
+
     @overload
     @classmethod
-    def from_db(
+    def from_id_or_path(
         cls,
         session: Session,
-        variable_id: None,
-        catalog_path: str,
+        id_or_path: str | int,
     ) -> "Variable":
         ...
 
     @overload
     @classmethod
-    def from_db(
+    def from_id_or_path(
         cls,
         session: Session,
-        variable_id: None,
-        catalog_path: List[str],
-    ) -> List["Variable"]:
-        ...
-
-    @overload
-    @classmethod
-    def from_db(
-        cls,
-        session: Session,
-        variable_id: int,
-        catalog_path: None = None,
-    ) -> "Variable":
-        ...
-
-    @overload
-    @classmethod
-    def from_db(
-        cls,
-        session: Session,
-        variable_id: List[int],
-        catalog_path: None = None,
+        id_or_path: List[str | int],
     ) -> List["Variable"]:
         ...
 
     @classmethod
-    def from_db(
+    def from_id_or_path(
         cls,
         session: Session,
         id_or_path: int | str | List[str | int],
-    ) -> Union["Variable", List["Variable"]]:
+    ) -> "Variable" | List["Variable"]:
         """Load a variable from the database by its catalog path or variable ID."""
+        # Single id
         if isinstance(id_or_path, int):
             return cls.from_id(session=session, variable_id=id_or_path)
+        # Single path
+        elif isinstance(id_or_path, str):
+            return cls.from_catalog_path(session=session, catalog_path=id_or_path)
+
+        # Multiple path or id
         elif isinstance(id_or_path, list):
             # Filter the list to ensure only integers are passed
             int_ids = [i for i in id_or_path if isinstance(i, int)]
-            if len(int_ids) == len(id_or_path):  # Ensures all elements were integers
+            str_ids = [i for i in id_or_path if isinstance(i, str)]
+            # Multiple IDs
+            if len(int_ids) == len(id_or_path):
                 return cls.from_id(session=session, variable_id=int_ids)
+            # Multiple paths
+            elif len(str_ids) == len(id_or_path):
+                return cls.from_catalog_path(session=session, catalog_path=str_ids)
             else:
                 raise TypeError("All elements in the list must be integers")
 
-        # Ensure mutual exclusivity of catalog_path and variable_id
-        if (catalog_path is not None) and (variable_id is not None):
-            raise ValueError("Only one of catalog_path or variable_id can be provided")
+        # # Ensure mutual exclusivity of catalog_path and variable_id
+        # if (catalog_path is not None) and (variable_id is not None):
+        #     raise ValueError("Only one of catalog_path or variable_id can be provided")
 
-        if (catalog_path is not None) & isinstance(catalog_path, (str, list)):
-            return cls.from_catalog_path(session=session, catalog_path=catalog_path)
-        elif isinstance(catalog_path, (int, list)):
-            return cls.from_id(session=session, variable_id=variable_id)
-        else:
-            raise ValueError("Either catalog_path or variable_id must be provided")
+        # if (catalog_path is not None) & isinstance(catalog_path, (str, list)):
+        #     return cls.from_catalog_path(session=session, catalog_path=catalog_path)
+        # elif isinstance(catalog_path, (int, list)):
+        #     return cls.from_id(session=session, variable_id=variable_id)
+        # else:
+        #     raise ValueError("Either catalog_path or variable_id must be provided")
 
     @classmethod
     def from_catalog_path(cls, session: Session, catalog_path: str | List[str]) -> "Variable" | List["Variable"]:

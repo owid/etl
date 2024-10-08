@@ -12,7 +12,7 @@ from structlog import get_logger
 
 from apps.step_update.cli import StepUpdater, UpdateState
 from etl.config import ADMIN_HOST, ENV
-from etl.db import can_connect
+from etl.db_utils import can_connect
 
 st.set_page_config(
     page_title="Wizard: ETL Dashboard",

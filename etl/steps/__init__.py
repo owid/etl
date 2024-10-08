@@ -40,7 +40,7 @@ from etl import config, files, git_helpers, paths
 from etl import grapher_helpers as gh
 from etl import grapher_model as gm
 from etl.config import OWID_ENV, TLS_VERIFY
-from etl.db import get_engine
+from etl.db_utils import get_engine
 from etl.snapshot import Snapshot
 
 log = structlog.get_logger()

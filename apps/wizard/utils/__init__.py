@@ -34,7 +34,7 @@ from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
 from apps.wizard.utils.step_form import StepForm
 from etl.config import OWID_ENV, TLS_VERIFY, enable_bugsnag
-from etl.db import get_connection, read_sql
+from etl.db_utils import get_connection, read_sql
 from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
 from etl.paths import (

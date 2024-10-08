@@ -16,7 +16,7 @@ from apps.wizard.app_pages.indicator_upgrade.utils import (
 )
 from apps.wizard.utils import Pagination, set_states
 from etl.config import OWID_ENV
-from etl.db import get_engine, read_sql
+from etl.db_utils import get_engine, read_sql
 
 # Logger
 log = get_logger()

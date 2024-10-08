@@ -366,14 +366,14 @@ class OWIDEnv:
 
         DEPRECATED: Use property `engine` property instead.
         """
-        from etl.db import get_engine
+        from etl.db_utils import get_engine
 
         return get_engine(self.conf.__dict__)
 
     @property
     def engine(self) -> Engine:
         """Get engine for env."""
-        from etl.db import get_engine
+        from etl.db_utils import get_engine
 
         if self._engine is None:
             self._engine = get_engine(self.conf.__dict__)

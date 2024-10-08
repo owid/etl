@@ -11,7 +11,7 @@ from apps.backport.datasync.data_metadata import (
     variable_data_df_from_s3,
     variable_metadata,
 )
-from etl.db import get_engine
+from etl.db_utils import get_engine
 from etl.grapher_model import _infer_variable_type
 
 

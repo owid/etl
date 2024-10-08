@@ -11,7 +11,7 @@ import pandas as pd
 from pymysql.connections import Connection
 from structlog import get_logger
 
-from etl import db
+from etl import db_utils
 from etl.scripts.faostat.create_new_steps import find_latest_version_for_step
 from etl.scripts.faostat.shared import NAMESPACE
 from etl.version_tracker import VersionTracker
@@ -203,7 +203,7 @@ def get_archivable_grapher_steps(db_conn: Connection, tracker: VersionTracker) -
 
 def main(execute: bool = False) -> None:
     # Initialize connection to DB.
-    db_conn = db.get_connection()
+    db_conn = db_utils.get_connection()
 
     # Initialise version tracker.
     tracker = VersionTracker()

@@ -9,7 +9,7 @@ import pandas as pd
 import requests
 from dateutil.parser import parse as date_parse
 
-from etl.db import get_connection
+from etl.db_utils import get_connection
 
 
 def get_thumbnail_url(grapher_url: str) -> str:

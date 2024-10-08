@@ -32,7 +32,7 @@ from apps.backport.datasync import data_metadata as dm
 from apps.backport.datasync.datasync import upload_gzip_string
 from apps.chart_sync.admin_api import AdminAPI
 from etl import config
-from etl.db import get_engine
+from etl.db_utils import get_engine
 
 from . import grapher_helpers as gh
 from . import grapher_model as gm

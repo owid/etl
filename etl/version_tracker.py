@@ -12,7 +12,7 @@ from rich_click.rich_command import RichCommand
 
 from etl import paths
 from etl.config import ADMIN_HOST
-from etl.db import can_connect, get_info_for_etl_datasets
+from etl.db_utils import can_connect, get_info_for_etl_datasets
 from etl.steps import extract_step_attributes, load_dag, reverse_graph
 
 log = structlog.get_logger()

@@ -8,50 +8,38 @@ from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher_model import Variable
 
 
-@st.cache_data
-def load_variable_metadata_cached(
-    catalog_path: Optional[str] = None,
-    variable_id: Optional[int] = None,
-    variable: Optional[Variable] = None,
-    _owid_env: OWIDEnv = OWID_ENV,
-) -> Dict[str, Any]:
-    return load_variable_metadata(
-        catalog_path=catalog_path,
-        variable_id=variable_id,
-        variable=variable,
-        owid_env=_owid_env,
-    )
-
-
-@st.cache_data
-def load_variable_data_cached(
-    catalog_path: Optional[str] = None,
-    variable_id: Optional[int] = None,
-    variable: Optional[Variable] = None,
-    _owid_env: OWIDEnv = OWID_ENV,
-) -> pd.DataFrame:
-    return load_variable_data(
-        catalog_path=catalog_path,
-        variable_id=variable_id,
-        variable=variable,
-        owid_env=_owid_env,
-    )
-
-
-def load_indicator_uris_from_db(dataset_uris: List[str]) -> List[Variable]:
+def load_variables_in_dataset(dataset_uris: List[str]) -> List[Variable]:
     with Session(OWID_ENV.engine) as session:
         indicators = Variable.load_variables_in_datasets(session, dataset_uris)
 
     return indicators
 
 
+# Load variable object
+def load_variable(
+    id_or_path: str | int,
+    owid_env: OWIDEnv = OWID_ENV,
+) -> Variable:
+    """Load variable"""
+    with Session(owid_env.engine) as session:
+        variable = Variable.from_id_or_path(
+            session=session,
+            id_or_path=id_or_path,
+        )
+
+    variable = cast(Variable, variable)
+
+    return variable
+
+
+# Load variable metadata
 def load_variable_metadata(
     catalog_path: Optional[str] = None,
     variable_id: Optional[int] = None,
     variable: Optional[Variable] = None,
     owid_env: OWIDEnv = OWID_ENV,
 ) -> Dict[str, Any]:
-    """Get metadata for an indicator based on its catalog path.
+    """Get metadata for an indicator based on its catalog path or variable id.
 
     Parameters
     ----------
@@ -71,13 +59,14 @@ def load_variable_metadata(
     return metadata
 
 
+# Load variable data
 def load_variable_data(
     catalog_path: Optional[str] = None,
     variable_id: Optional[int] = None,
     variable: Optional[Variable] = None,
     owid_env: OWIDEnv = OWID_ENV,
 ) -> pd.DataFrame:
-    """Get data for an indicator based on its catalog path.
+    """Get data for an indicator based on its catalog path or variable id.
 
     Parameters
     ----------
@@ -116,17 +105,25 @@ def ensure_variable(
     return variable
 
 
-def load_variable(
-    id_or_path: str | int,
-    owid_env: OWIDEnv = OWID_ENV,
-) -> Variable:
-    """Load variable"""
-    with Session(owid_env.engine) as session:
-        variable = Variable.from_id_or_path(
-            session=session,
-            id_or_path=id_or_path,
-        )
+def variable_data_df_from_s3(
+    engine: Engine,
+    variable_ids: List[int] = [],
+    workers: int = 1,
+    value_as_str: bool = True,
+) -> pd.DataFrame:
+    """Fetch data from S3 and add entity code and name from DB."""
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        results = list(executor.map(_fetch_data_df_from_s3, variable_ids))
 
-    variable = cast(Variable, variable)
+    if isinstance(results, list) and all(isinstance(df, pd.DataFrame) for df in results):
+        df = pd.concat(cast(List[pd.DataFrame], results))
+    else:
+        raise TypeError(f"results must be a list of pd.DataFrame, got {type(results)}")
 
-    return variable
+    # we work with strings and convert to specific types later
+    if value_as_str:
+        df["value"] = df["value"].astype("string")
+
+    with Session(engine) as session:
+        res = add_entity_code_and_name(session, df)
+        return res

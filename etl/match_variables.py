@@ -9,7 +9,7 @@ import rich_click as click
 from rapidfuzz import fuzz
 from structlog import get_logger
 
-from etl import db
+from etl import db_utils
 
 # If True, identical variables will be matched automatically (by string comparison).
 # If False, variables with identical names will appear in comparison.
@@ -124,17 +124,17 @@ def main(
     if Path(output_file).suffix != ".json":
         raise ValueError(f"`output_file` ({output_file}) should point to a JSON file ('*.json')!")
 
-    with db.get_connection() as db_conn:
+    with db_utils.get_connection() as db_conn:
         # Get old and new dataset ids.
-        old_dataset_id = db.get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)
-        new_dataset_id = db.get_dataset_id(db_conn=db_conn, dataset_name=new_dataset_name)
+        old_dataset_id = db_utils.get_dataset_id(db_conn=db_conn, dataset_name=old_dataset_name)
+        new_dataset_id = db_utils.get_dataset_id(db_conn=db_conn, dataset_name=new_dataset_name)
 
         # Get variables from old dataset that have been used in at least one chart.
-        old_indicators = db.get_variables_in_dataset(
+        old_indicators = db_utils.get_variables_in_dataset(
             db_conn=db_conn, dataset_id=old_dataset_id, only_used_in_charts=True
         )
         # Get all variables from new dataset.
-        new_indicators = db.get_variables_in_dataset(
+        new_indicators = db_utils.get_variables_in_dataset(
             db_conn=db_conn, dataset_id=new_dataset_id, only_used_in_charts=False
         )
 

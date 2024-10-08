@@ -13,7 +13,7 @@ from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.etl_steps.utils import TAGS_DEFAULT, remove_playground_notebook
 from etl.config import DB_HOST, DB_NAME
-from etl.db import get_session
+from etl.db_utils import get_session
 from etl.paths import DAG_DIR
 
 #########################################################

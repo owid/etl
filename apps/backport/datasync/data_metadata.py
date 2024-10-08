@@ -19,7 +19,7 @@ from tenacity.wait import wait_fixed
 
 from etl import config
 from etl.config import OWIDEnv
-from etl.db import read_sql
+from etl.db_utils import read_sql
 
 log = get_logger()
 
