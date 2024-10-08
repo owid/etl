@@ -30,7 +30,7 @@ def main(upload: bool) -> None:
             "share_strong_decrease": [pd.NA, 36.7, 44.2, 42, 44],
         }
     )
-    snap = Snapshot(f"biodiversity/{SNAPSHOT_VERSION}/living_planet_index_share.xlsx")
+    snap = Snapshot(f"biodiversity/{SNAPSHOT_VERSION}/living_planet_index_share.csv")
 
     # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
     snap.create_snapshot(data=df, upload=upload)
