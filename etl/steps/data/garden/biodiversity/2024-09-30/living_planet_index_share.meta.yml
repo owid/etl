@@ -6,6 +6,8 @@ definitions:
         - Biodiversity
     unit: "%"
     short_unit: "%"
+    display:
+      numDecimalPlaces: 1
 
 
 # Learn more about the available fields:
