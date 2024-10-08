@@ -242,7 +242,7 @@ class AnomalyDetector:
             _df_score = (
                 anomaly_df.melt(id_vars=["entity_id", "year"], var_name="variable_id", value_name="anomaly_score")
                 .fillna(0)
-                .assign(**{"score_name": score_name})
+                .assign(**{"anomaly_type": score_name})
             )
             # For now, keep only the latest year affected for each country-indicator.
             _df_score = (
@@ -289,7 +289,7 @@ class AnomalyDetector:
             variable_id = row["variable_id"]
             variable_name = self.metadata[variable_id]["shortName"]  # type: ignore
             country = row["country"]
-            score_name = row["score_name"]
+            score_name = row["anomaly_type"]
             anomaly_year = row["year"]
             anomaly_score = row["anomaly_score"]
             new = self.df[self.df["entity_id"] == row["entity_id"]][["entity_id", "year", variable_id]]
@@ -364,10 +364,9 @@ if __name__ == "__main__":
     detector.aggregate_anomalies()
 
     # Apply filters to select the most significant anomalies.
-    # TODO: Rename score_name -> anomaly_type
     anomalies = detector.df_scores.copy()
-    # anomalies = anomalies.loc[anomalies["score_name"] == "version_change"].reset_index(drop=True)
-    anomalies = anomalies.loc[anomalies["score_name"] == "time_change"].reset_index(drop=True)
+    anomalies = anomalies.loc[anomalies["anomaly_type"] == "version_change"].reset_index(drop=True)
+    # anomalies = anomalies.loc[anomalies["anomaly_type"] == "time_change"].reset_index(drop=True)
 
     # Inspect anomalies.
     detector.inspect_anomalies(anomalies=anomalies, n_anomalies=10)
