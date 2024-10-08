@@ -20,7 +20,7 @@ def main(upload: bool) -> None:
             "taxon": ["Mammals", "Amphibians", "Birds", "Reptiles", "Fishes"],
             "year": [2022, 2022, 2022, 2022, 2022],
             "species_in_lpi": [724, 307, 1496, 238, 2078],
-            "species_in_not_in_lpi": [4447, 7375, 7854, 11675, 32555],
+            "species_not_in_lpi": [4447, 7375, 7854, 11675, 32555],
             "species_total": [5171, 7682, 9350, 11913, 34633],
         }
     )

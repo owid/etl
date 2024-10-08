@@ -26,6 +26,6 @@ meta:
     license:
       name: CC BY 4.0
 outs:
-  - md5: 659345a8894595a5af599f9ae0c0c4de
-    size: 204
+  - md5: 1e206394510bf1840cf3fff8681b29a5
+    size: 201
     path: living_planet_index_completeness.csv
