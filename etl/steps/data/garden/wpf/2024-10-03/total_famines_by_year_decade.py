@@ -103,9 +103,19 @@ def run(dest_dir: str) -> None:
 
     tb = tb.rename(columns={"global_region": "country"})
 
+    # Reset the index of the 'population' DataFrame to access the 'country' column
+    countries = ds_population["population"].reset_index()["country"]
+
+    # Find entries that contain '(WB)'
+    africa_countries = countries[countries.str.contains("Africa")].unique()
+
+    # Print the entries
+    print(africa_countries)
     tb = geo.add_population_to_table(tb, ds_population)
 
-    tb["famine_deaths_per_100"] = tb["famine_deaths"] / (tb["population"] / 100)
+    tb["famine_deaths_per_rate"] = tb["famine_deaths"] / (tb["population"] / 100000)
+    tb["decadal_famine_deaths_rate"] = tb["decadal_famine_deaths"] / (tb["population"] / 100000)
+
     tb = tb.drop(columns=["population"])
 
     tb = tb.format(["year", "country"], short_name=paths.short_name)
@@ -115,7 +125,8 @@ def run(dest_dir: str) -> None:
         "famine_deaths",
         "decadal_famine_count",
         "decadal_famine_deaths",
-        "famine_deaths_per_100",
+        "famine_deaths_per_rate",
+        "decadal_famine_deaths_rate",
     ]:
         tb[col].metadata.origins = origins
 
