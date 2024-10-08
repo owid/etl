@@ -20,3 +20,6 @@ tables:
       species_in_taxon:
         title: Number of species in the taxonomic group
         unit: species
+      species_not_in_lpi:
+        title: Number of species not included in the LPI
+        unit: species
