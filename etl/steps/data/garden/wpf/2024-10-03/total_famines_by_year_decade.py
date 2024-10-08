@@ -6,6 +6,7 @@ import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -18,6 +19,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("famines")
+    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow["famines"].reset_index()
@@ -99,9 +101,22 @@ def run(dest_dir: str) -> None:
         tb["decadal_" + column] = tb["decadal_" + column].where(tb["year"] % 10 == 0, np.nan)
     tb = tb.drop(columns=["decade"])
 
-    tb = tb.format(["year", "global_region"], short_name=paths.short_name)
+    tb = tb.rename(columns={"global_region": "country"})
+
+    tb = geo.add_population_to_table(tb, ds_population)
+
+    tb["famine_deaths_per_100"] = tb["famine_deaths"] / (tb["population"] / 100)
+    tb = tb.drop(columns=["population"])
+
+    tb = tb.format(["year", "country"], short_name=paths.short_name)
     tb = Table(tb, short_name=paths.short_name)
-    for col in ["famine_count", "famine_deaths", "decadal_famine_count", "decadal_famine_deaths"]:
+    for col in [
+        "famine_count",
+        "famine_deaths",
+        "decadal_famine_count",
+        "decadal_famine_deaths",
+        "famine_deaths_per_100",
+    ]:
         tb[col].metadata.origins = origins
 
     #
