@@ -44,3 +44,9 @@ steps:
     - snapshot://biodiversity/2024-09-30/living_planet_index_share.csv
   data://grapher/biodiversity/2024-09-30/living_planet_index_share:
     - data://garden/biodiversity/2024-09-30/living_planet_index_share
+
+# LPI - Share of populations increasing or decreasing
+  data://garden/biodiversity/2024-09-30/living_planet_index_completeness:
+    - snapshot://biodiversity/2024-09-30/living_planet_index_completeness.csv
+  data://grapher/biodiversity/2024-09-30/living_planet_index_completeness:
+    - data://garden/biodiversity/2024-09-30/living_planet_index_completeness
