@@ -12,5 +12,5 @@ Only the steps corresponding to the latest existing version will be shown.
 ## Installation
 
 - Press `cmd+shift+p` and select "Extensions: Install from VSIX".
-- Select the latest version of the packaged extension, e.g. `find-latest-etl-step-0.0.2.vsix`.
+- Select the latest version of the packaged extension, e.g. `install/find-latest-etl-step-0.0.2.vsix`.
 - Restart VSCode to ensure the new version is installed (although it may not be necessary).
