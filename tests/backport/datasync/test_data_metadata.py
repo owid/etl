@@ -1,4 +1,3 @@
-import datetime as dt
 import json
 from unittest import mock
 
@@ -8,7 +7,6 @@ from sqlalchemy.orm import Session
 
 from apps.backport.datasync.data_metadata import (
     _convert_strings_to_numeric,
-    checksum_metadata,
     variable_data,
     variable_data_df_from_s3,
     variable_metadata,
@@ -236,15 +234,3 @@ def test_convert_strings_to_numeric():
 
     with pytest.raises(AssertionError):
         r = _convert_strings_to_numeric([None, "UK"])  # type: ignore
-
-
-def test_checksum_metadata():
-    meta = _variable_meta()
-    assert checksum_metadata(meta) == "367a0d273b3ba021f811259e0ef80b99"
-
-    # change id, checksums or updatedAt shouldn't change it
-    meta = _variable_meta()
-    meta["id"] = 999
-    meta["dataChecksum"] = 999
-    meta["updatedAt"] = dt.datetime.now()
-    assert checksum_metadata(meta) == "367a0d273b3ba021f811259e0ef80b99"

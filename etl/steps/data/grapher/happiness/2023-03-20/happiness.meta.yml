@@ -93,7 +93,6 @@ tables:
             - fragment_id: life-satisfaction-vs-happiness
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            slug: happiness-cantril-ladder
             title: Self-reported life satisfaction
             subtitle: >-
               “Please imagine a ladder, with steps numbered from 0 at the bottom to 10 at

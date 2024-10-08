@@ -221,6 +221,9 @@ GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 # Skip SSL verify
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
+# Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.005.json"
+
 
 def enable_bugsnag() -> None:
     if BUGSNAG_API_KEY:
@@ -291,21 +294,21 @@ class OWIDEnv:
         self._engine = None
 
     @property
-    def env(self):
+    def env(self) -> OWIDEnvType:
         """Environment one's in. Only works if remote and local environment are the same."""
         if self.env_remote == self.env_local:
             return self.env_remote
         raise ValueError(f"env_remote ({self.env_remote}) and env_local ({self.env_local}) are different.")
 
     @property
-    def env_local(self):
+    def env_local(self) -> OWIDEnvType:
         """Detect local environment."""
         if self._env_local is None:
             self._env_local = cast(OWIDEnvType, ENV)
         return self._env_local
 
     @property
-    def env_remote(self):
+    def env_remote(self) -> OWIDEnvType:
         """Detect remote environment."""
         if self._env_remote is None:
             # production
@@ -415,6 +418,21 @@ class OWIDEnv:
         """Get admin url."""
         if self.base_site:
             return f"{self.base_site}/admin"
+
+    @property
+    def admin_api(self) -> str:
+        """Get admin api url. This could be possibly merged with admin_site above.
+        We'd just have to test when to use suffix `.tail6e23.ts.net` because of
+        collisions with LXC addresses.
+        """
+        if self.env_remote == "production":
+            return TAILSCALE_ADMIN_HOST + "/admin/api"
+        elif self.env_remote == "staging":
+            return f"http://{self.conf.DB_HOST}.tail6e23.ts.net/admin/api"
+        elif self.env_remote == "dev":
+            return "http://localhost:3000/admin/api"
+        else:
+            raise ValueError(f"Unknown environment: {self.env}")
 
     @property
     def data_api_url(self) -> str:

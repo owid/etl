@@ -86,5 +86,5 @@ html_context = {
 ## API docs
 from sphinx.ext.apidoc import main
 
-# poetry run sphinx-apidoc --help
+# uv run sphinx-apidoc --help
 main(["-f", "-e", "-t", "apidoc-templates", "-P", "-o", "api", "../owid/"])

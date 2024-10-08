@@ -24,10 +24,10 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
     xcode-select --install
     ```
 
-    Then install Python 3.9+, MySQL client and [poetry](https://python-poetry.org/). Poetry is our preferred python packaging and dependency management tool.
+    Then install Python 3.9+ and MySQL client and [UV](https://docs.astral.sh/uv/). UV is our preferred python packaging and dependency management tool.
 
     ```bash
-    brew install python mysql-client poetry pkg-config
+    brew install python mysql-client uv pkg-config
     ```
 
     You then need to inform Python where to find MySQL by adding some lines to your `~/.zshrc` file (or `~/.bash_profile`, depends on your shell). Run `brew info mysql-client` to see what's needed. For example, on an M1/M2 Mac where Homebrew installs to `/opt/homebrew`, you would need to add:
@@ -56,13 +56,18 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
     sudo apt install python3-dev python3-virtualenv python3-setuptools mysql-client libmysqlclient-dev
     ```
 
-    However, the version of Poetry that ships with Ubuntu is too old, so we need to install a more recent version.
-
-    The [recommended method](https://python-poetry.org/docs/#installation) is to run:
+    Then install UV package manager with
 
     ```bash
-    curl -sSL https://install.python-poetry.org | python3 -
+    curl -LsSf https://astral.sh/uv/install.sh | sh
     ```
+
+    or
+
+    ```bash
+    pip install uv
+    ```
+
 
 === "Windows"
 
@@ -102,6 +107,10 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
 
 
 ## Install pyenv
+
+!!! tip
+
+    `pyenv` is not crucial now after switching to `uv` as a package manager. However, it is still recommended to use it to manage your Python versions.
 
 Even though it's not compulsory, it is **highly recommended** to install [pyenv](https://github.com/pyenv/pyenv#installation) to manage your Python versions. This will allow you to have multiple Python versions installed in your machine and switch between them easily. You will also avoid issues caused by updating system wide Python.
 
@@ -245,8 +254,28 @@ We recommend using [Oh My Zsh](https://ohmyz.sh/). It comes with a lot of plugin
     load-py-venv
     ```
 
+    Some staff members also use [Nushell](https://www.nushell.sh/), which supports similar hooks. Edit your `$nu.config-path` file, find the `hooks` section, and add to it an `env_change` stanza:
 
-???  "Speed up navigation in terminal with autojump"
+    ```
+    hooks:
+      env_change: {
+        PWD: [
+          {
+            condition: {|before, after| ["pyproject.toml" "requirements.txt" "setup.py"] | any {|f| $f | path exists } }
+            code: "
+                if ('.venv/bin/python' | path exists) {
+                print -e 'Activating virtualenv'
+                $env.PATH = ($env.PATH | split row (char esep) | filter {|p| $p !~ '.venv' } | prepend $\"($env.PWD)/.venv/bin\")
+                } else {
+                $env.PATH = ($env.PATH | split row (char esep) | filter {|p| $p !~ '.venv' })
+                }
+              "
+          }
+        ]
+      }
+    ```
+
+??? "Speed up navigation in terminal with autojump"
 
     Instead of `cd ...` to a correct folder, you can add the following to your `~/.zshrc` or `~/.bashrc`:
 

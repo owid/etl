@@ -63,6 +63,7 @@ tables:
         unit: US dollars
         short_unit: $
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       investment_estimated:
@@ -88,6 +89,7 @@ tables:
         unit: US dollars
         short_unit: $
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       disclosed_investment_summary:
@@ -112,6 +114,7 @@ tables:
         unit: US dollars
         short_unit: $
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       estimated_investment_summary:
@@ -137,6 +140,7 @@ tables:
         unit: US dollars
         short_unit: $
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       num_patent_applications:
@@ -144,6 +148,7 @@ tables:
         description: Yearly total number of patent applications.
         unit: applications
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       num_patent_granted:
@@ -151,6 +156,7 @@ tables:
         description: Yearly total number of patents granted.
         unit: granted applications
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       num_patent_applications_summary:
@@ -158,6 +164,7 @@ tables:
         description: Total number of patent applications between 2010-2020.
         unit: applications
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       num_patent_granted_summary:
@@ -165,6 +172,7 @@ tables:
         description: Total number of patents granted between 2010-2020.
         unit: granted applications
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       num_articles:
@@ -172,6 +180,7 @@ tables:
         description: Yearly number of articles published in AI fields.
         unit: articles
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       num_citations:
@@ -179,6 +188,7 @@ tables:
         description: Yearly number of citations in the AI field.
         unit: citations
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       num_articles_summary:
@@ -186,6 +196,7 @@ tables:
         description: Yearly total number of articles in the AI field between 2010-2022
         unit: articles
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       num_citations_summary:
@@ -193,6 +204,7 @@ tables:
         description: The total number of citations in the AI field between 2010-2022
         unit: citations
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       proportion_patents_granted:
@@ -201,6 +213,7 @@ tables:
         unit: '%'
         short_unit: '%'
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       citations_per_article:
@@ -209,6 +222,7 @@ tables:
         unit: 'citations per article'
         short_unit: ''
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       num_patent_applications_per_mil:
@@ -216,6 +230,7 @@ tables:
         description: Yearly total number of patent applications per 1 million people.
         unit: applications
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       num_patent_granted_per_mil:
@@ -223,6 +238,7 @@ tables:
         description: Yearly total number of patents granted per 1 million people.
         unit: granted applications
         display:
+          name: << field >>
           numDecimalPlaces: 0
 
       num_articles_per_mil:
@@ -230,4 +246,5 @@ tables:
         description: Yearly number of articles published in AI fields per 1 million people
         unit: articles
         display:
+          name: << field >>
           numDecimalPlaces: 0

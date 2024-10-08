@@ -1,0 +1,33 @@
+dataset:
+  title: Living Planet Index distributions (WWF, 2024)
+  description: ''
+  licenses:
+    - {}
+tables:
+  lpi_distribution_wwf:
+    variables:
+      strong_decline:
+        title: Strong decline
+        unit: '%'
+        short_unit: '%'
+        description: The share of populations that have been in strong decline.
+      moderate_decline:
+        title: Moderate decline
+        unit: '%'
+        short_unit: '%'
+        description: The share of populations that have been in moderate decline.
+      no_change:
+        title: No change
+        unit: '%'
+        short_unit: '%'
+        description: The share of populations that have been relatively stable.
+      moderate_increase:
+        title: Moderate increase
+        unit: '%'
+        short_unit: '%'
+        description: The share of populations that have seen a moderate increase.
+      strong_increase:
+        title: Strong increase
+        unit: '%'
+        short_unit: '%'
+        description: The share of populations that have seen a strong increase.

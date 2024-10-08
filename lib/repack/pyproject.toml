@@ -1,29 +1,32 @@
-[tool.poetry]
+[project]
 name = "owid-repack"
 version = "0.1.3"
 description = "Pack Pandas data frames into smaller, more memory-efficient data types."
-authors = ["Our World in Data <tech@ourworldindata.org>"]
+authors = [
+    {name = "Our World in Data", email = "tech@ourworldindata.org"},
+]
 license = "MIT"
-packages = [{ include = "owid" }]
-readme = "README.md"
-repository = "https://github.com/owid/owid-catalog-py"
-homepage = "https://github.com/owid/owid-catalog-py"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.24.0",
+    "pandas>=2.2.1"
+]
 
-[tool.poetry.dependencies]
-python = ">=3.9"
-numpy = ">=1.24.0"
-pandas = "^2.2.1"
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=7.2.0"
-pyright = "1.1.373"
-ruff = "0.1.6"
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.2.0",
+    "pyright==1.1.373",
+    "ruff==0.1.6",
+]
 
 [tool.ruff]
 extend = "../../pyproject.toml"
 
-[tool.pyright]
-
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["owid"]
+
+[tool.pyright]

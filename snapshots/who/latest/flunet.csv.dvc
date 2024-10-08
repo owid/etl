@@ -5,7 +5,7 @@ meta:
   source_name: FluNet, World Health Organization (2023)
   source_published_by: Global Influenza Surveillance and Response System, World Health Organization
   url: https://www.who.int/tools/flunet
-  source_data_url: https://frontdoor-l4uikgap6gz3m.azurefd.net/FLUMART/VIW_FNT?&$format=csv
+  source_data_url: https://xmart-api-public.who.int/FLUMART/VIW_FNT?&$format=csv
   license_url: https://www.who.int/about/policies/publishing/copyright
   license_name: CC BY-NC-SA 3.0 IGO
   date_accessed: 2023-02-16
@@ -16,6 +16,6 @@ meta:
     The data are provided remotely by National Influenza Centres (NICs) of the Global Influenza Surveillance and Response System (GISRS) and other national influenza reference laboratories collaborating actively with GISRS, or are uploaded from WHO regional databases.
 wdir: ../../../data/snapshots/who/latest
 outs:
-  - md5: 50dd3b6f4bd5aad369fba83894e497f8
-    size: 26653510
+  - md5: 33418b5fb23d02f3807d476bb9e81626
+    size: 26858508
     path: flunet.csv
