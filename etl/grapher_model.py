@@ -20,12 +20,13 @@ import random
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union, get_args
+from typing import Any, Dict, List, Literal, Optional, Union, cast, get_args, overload
 
 import humps
 import pandas as pd
 import requests
 import structlog
+from deprecated import deprecated
 from owid import catalog
 from owid.catalog.meta import VARIABLE_TYPE
 from sqlalchemy import (
@@ -428,7 +429,7 @@ class Chart(Base):
         for source_var_id, source_var in source_variables.items():
             if source_var.catalogPath:
                 try:
-                    target_var = Variable.load_from_catalog_path(target_session, source_var.catalogPath)
+                    target_var = Variable.from_catalog_path(target_session, source_var.catalogPath)
                 except NoResultFound:
                     raise ValueError(f"variables.catalogPath not found in target: {source_var.catalogPath}")
             # old style variable, match it on name and dataset id
@@ -1188,17 +1189,100 @@ class Variable(Base):
         return list(results)
 
     @classmethod
+    @deprecated("Use from_db instead")
     def load_variable(cls, session: Session, variable_id: int) -> "Variable":
+        """D"""
         return session.scalars(select(cls).where(cls.id == variable_id)).one()
 
     @classmethod
+    @deprecated("Use from_db instead")
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
         return session.scalars(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
+    @overload
     @classmethod
-    def load_from_catalog_path(cls, session: Session, catalog_path: str) -> "Variable":
+    def from_db(
+        cls,
+        session: Session,
+        variable_id: None,
+        catalog_path: str,
+    ) -> "Variable":
+        ...
+
+    @overload
+    @classmethod
+    def from_db(
+        cls,
+        session: Session,
+        variable_id: None,
+        catalog_path: List[str],
+    ) -> List["Variable"]:
+        ...
+
+    @overload
+    @classmethod
+    def from_db(
+        cls,
+        session: Session,
+        variable_id: int,
+        catalog_path: None = None,
+    ) -> "Variable":
+        ...
+
+    @overload
+    @classmethod
+    def from_db(
+        cls,
+        session: Session,
+        variable_id: List[int],
+        catalog_path: None = None,
+    ) -> List["Variable"]:
+        ...
+
+    @classmethod
+    def from_db(
+        cls,
+        session: Session,
+        id_or_path: int | str | List[str | int],
+    ) -> Union["Variable", List["Variable"]]:
+        """Load a variable from the database by its catalog path or variable ID."""
+        if isinstance(id_or_path, int):
+            return cls.from_id(session=session, variable_id=id_or_path)
+        elif isinstance(id_or_path, list):
+            # Filter the list to ensure only integers are passed
+            int_ids = [i for i in id_or_path if isinstance(i, int)]
+            if len(int_ids) == len(id_or_path):  # Ensures all elements were integers
+                return cls.from_id(session=session, variable_id=int_ids)
+            else:
+                raise TypeError("All elements in the list must be integers")
+
+        # Ensure mutual exclusivity of catalog_path and variable_id
+        if (catalog_path is not None) and (variable_id is not None):
+            raise ValueError("Only one of catalog_path or variable_id can be provided")
+
+        if (catalog_path is not None) & isinstance(catalog_path, (str, list)):
+            return cls.from_catalog_path(session=session, catalog_path=catalog_path)
+        elif isinstance(catalog_path, (int, list)):
+            return cls.from_id(session=session, variable_id=variable_id)
+        else:
+            raise ValueError("Either catalog_path or variable_id must be provided")
+
+    @classmethod
+    def from_catalog_path(cls, session: Session, catalog_path: str | List[str]) -> "Variable" | List["Variable"]:
+        """Load a variable from the DB by its catalog path."""
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
-        return session.scalars(select(cls).where(cls.catalogPath == catalog_path)).one()
+        if isinstance(catalog_path, str):
+            return session.scalars(select(cls).where(cls.catalogPath == catalog_path)).one()
+        elif isinstance(catalog_path, list):
+            return session.scalars(select(cls).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
+
+    @classmethod
+    def from_id(cls, session: Session, variable_id: int | List[int]) -> "Variable" | List["Variable"]:
+        """Load a variable (or list of variables) from the DB by its ID path."""
+        if isinstance(variable_id, int):
+            return session.scalars(select(cls).where(cls.id == variable_id)).one()
+        elif isinstance(variable_id, list):
+            return session.scalars(select(cls).where(cls.id.in_(variable_id))).all()  # type: ignore
 
     @classmethod
     def catalog_paths_to_variable_ids(cls, session: Session, catalog_paths: List[str]) -> Dict[str, int]:

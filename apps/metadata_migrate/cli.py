@@ -120,7 +120,7 @@ def cli(
         var_id = grapher_config["dimensions"][0]["variableId"]
 
         with Session(engine) as session:
-            variable = gm.Variable.load_variable(session, var_id)
+            variable = gm.Variable.from_db(session, variable_id=var_id)
 
         assert variable.catalogPath, f"Variable {var_id} does not come from ETL. Migrate it there first."
 

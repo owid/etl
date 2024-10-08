@@ -102,7 +102,7 @@ def _load_and_validate_indicator(catalog_path: str) -> gm.Variable:
     # update YAML file
     with Session(engine) as session:
         try:
-            db_indicator = gm.Variable.load_from_catalog_path(session, catalog_path)
+            db_indicator = gm.Variable.from_db(session=session, catalog_path=catalog_path)
         except NoResultFound:
             raise HTTPException(
                 404,

@@ -65,6 +65,7 @@ dependencies = [
     "owid-repack",
     "walden",
     "streamlit>=1.39.0",
+    "deprecated>=1.2.14",
 ]
 
 [tool.uv.sources]

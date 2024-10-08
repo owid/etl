@@ -8,31 +8,6 @@ from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher_model import Variable
 
 
-def load_indicator_uris_from_db(dataset_uris: List[str]) -> List[Variable]:
-    with Session(OWID_ENV.engine) as session:
-        indicators = Variable.load_variables_in_datasets(session, dataset_uris)
-
-    # indicators = [i["catalogPath"] for i in indicators]
-    # return list(indicators)
-    return indicators
-
-
-@st.cache_data
-def load_variable_from_id(variable_id: int, _owid_env: OWIDEnv = OWID_ENV):
-    with Session(_owid_env.engine) as session:
-        variable = Variable.load_variable(session=session, variable_id=variable_id)
-
-    return variable
-
-
-@st.cache_data
-def load_variable_from_catalog_path(catalog_path: str, _owid_env: OWIDEnv = OWID_ENV):
-    with Session(_owid_env.engine) as session:
-        variable = Variable.load_from_catalog_path(session=session, catalog_path=catalog_path)
-
-    return variable
-
-
 @st.cache_data
 def load_variable_metadata_cached(
     catalog_path: Optional[str] = None,
@@ -46,6 +21,30 @@ def load_variable_metadata_cached(
         variable=variable,
         owid_env=_owid_env,
     )
+
+
+@st.cache_data
+def load_variable_data_cached(
+    catalog_path: Optional[str] = None,
+    variable_id: Optional[int] = None,
+    variable: Optional[Variable] = None,
+    _owid_env: OWIDEnv = OWID_ENV,
+) -> pd.DataFrame:
+    return load_variable_data(
+        catalog_path=catalog_path,
+        variable_id=variable_id,
+        variable=variable,
+        owid_env=_owid_env,
+    )
+
+
+def load_indicator_uris_from_db(dataset_uris: List[str]) -> List[Variable]:
+    with Session(OWID_ENV.engine) as session:
+        indicators = Variable.load_variables_in_datasets(session, dataset_uris)
+
+    # indicators = [i["catalogPath"] for i in indicators]
+    # return list(indicators)
+    return indicators
 
 
 def load_variable_metadata(
@@ -72,26 +71,10 @@ def load_variable_metadata(
     if variable is None:
         variable = load_variable(catalog_path=catalog_path, variable_id=variable_id, owid_env=owid_env)
 
-    variable = cast(Variable, variable)
-
+    # Get metadata
     metadata = variable.get_metadata()
 
     return metadata
-
-
-@st.cache_data
-def load_variable_data_cached(
-    catalog_path: Optional[str] = None,
-    variable_id: Optional[int] = None,
-    variable: Optional[Variable] = None,
-    _owid_env: OWIDEnv = OWID_ENV,
-) -> pd.DataFrame:
-    return load_variable_data(
-        catalog_path=catalog_path,
-        variable_id=variable_id,
-        variable=variable,
-        owid_env=_owid_env,
-    )
 
 
 def load_variable_data(
@@ -126,12 +109,19 @@ def load_variable_data(
     return df
 
 
-def load_variable(catalog_path: Optional[str] = None, variable_id: Optional[int] = None, owid_env: OWIDEnv = OWID_ENV):
-    if catalog_path is not None:
-        variable = load_variable_from_catalog_path(catalog_path=catalog_path, _owid_env=owid_env)
-    else:
-        if variable_id is not None:
-            variable = load_variable_from_id(variable_id=variable_id, _owid_env=owid_env)
-        else:
-            raise ValueError("Either catalog_path or variable_id must be provided")
+def load_variable(
+    catalog_path: Optional[str] = None,
+    variable_id: Optional[int] = None,
+    owid_env: OWIDEnv = OWID_ENV,
+) -> Variable:
+    """Load variable"""
+    with Session(owid_env.engine) as session:
+        variable = Variable.from_db(
+            session=session,
+            catalog_path=catalog_path,
+            variable_id=variable_id,
+        )
+
+    variable = cast(Variable, variable)
+
     return variable
