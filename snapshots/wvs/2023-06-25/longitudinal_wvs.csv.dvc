@@ -1,7 +1,7 @@
 meta:
   name: World Values Survey time-series data (1981-2022)
   publication_year: 2022
-  source_name: World Values Survey (1981-2022)
+  source_name: World Values Survey (2022)
   source_published_by: 'Inglehart, R., C. Haerpfer, A. Moreno, C. Welzel, K. Kizilova, J. Diez-Medrano, M. Lagos, P. Norris, E. Ponarin & B. Puranen (eds.). 2022. World Values Survey: All Rounds - Country-Pooled Datafile. Madrid, Spain & Vienna, Austria: JD Systems Institute & WVSA Secretariat. Dataset Version 3.0.0. doi:10.14281/18241.17'
   url: https://www.worldvaluessurvey.org/WVSDocumentationWVL.jsp
   source_data_url:
