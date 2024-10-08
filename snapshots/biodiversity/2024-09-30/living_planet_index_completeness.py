@@ -17,7 +17,7 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     df = pd.DataFrame(
         {
-            "taxon": ["mammals", "amphibians", "birds", "reptiles", "fish"],
+            "taxon": ["Mammals", "Amphibians", "Birds", "Reptiles", "Fishes"],
             "year": [2022, 2022, 2022, 2022, 2022],
             "species_in_lpi": [724, 307, 1496, 238, 2078],
             "species_in_taxon": [5171, 7682, 9350, 11913, 34633],
