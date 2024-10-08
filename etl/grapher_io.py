@@ -14,9 +14,13 @@ from etl.grapher_model import Variable
 log = structlog.get_logger()
 
 
-def load_variables_in_dataset(dataset_uris: List[str]) -> List[Variable]:
-    with Session(OWID_ENV.engine) as session:
-        indicators = Variable.load_variables_in_datasets(session, dataset_uris)
+def load_variables_in_dataset(
+    dataset_uri: List[str],
+    owid_env: OWIDEnv = OWID_ENV,
+) -> List[Variable]:
+    """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
+    with Session(owid_env.engine) as session:
+        indicators = Variable.load_variables_in_datasets(session, dataset_uri)
 
     return indicators
 
