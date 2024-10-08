@@ -15,10 +15,6 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden["total_famines_by_year_decade"]
-    #
-    # Process data.
-    #
-    tb = tb.rename_index_names({"global_region": "country"})
 
     #
     # Save outputs.
@@ -30,13 +26,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
-
-
-def unravel_dates(tb):
-    """
-    Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
-    """
-    # Split the 'date' column into multiple rows
-    tb = tb.assign(date=tb["date"].str.split(",")).explode("date").drop_duplicates().reset_index(drop=True)
-
-    return tb
