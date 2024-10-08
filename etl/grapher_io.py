@@ -1,17 +1,32 @@
+import concurrent.futures
 import warnings
-from typing import Any, Dict, List, Optional
+from http.client import RemoteDisconnected
+from typing import Any, Dict, List, Optional, cast
+from urllib.error import HTTPError, URLError
 
 import pandas as pd
 import pymysql
+import requests
 import structlog
 import validators
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
+from tenacity import Retrying
+from tenacity.retry import retry_if_exception_type
+from tenacity.stop import stop_after_attempt
+from tenacity.wait import wait_fixed
 
+from etl import config
 from etl.config import OWID_ENV, OWIDEnv
-from etl.db import get_connection
+from etl.db import get_connection, read_sql
 from etl.grapher_model import Dataset, Variable
 
 log = structlog.get_logger()
+
+
+##############################################################################################
+# Load from DB
+##############################################################################################
 
 
 def load_dataset_uris(
@@ -50,6 +65,12 @@ def load_variable(
     return variable
 
 
+##############################################################################################
+# Load data/metadata (API)
+##############################################################################################
+
+
+# SINGLE INDICATOR
 # Load variable metadata
 def load_variable_metadata(
     catalog_path: Optional[str] = None,
@@ -122,28 +143,130 @@ def ensure_load_variable(
     return variable
 
 
-# def variable_data_df_from_s3(
-#     engine: Engine,
-#     variable_ids: List[int] = [],
-#     workers: int = 1,
-#     value_as_str: bool = True,
-# ) -> pd.DataFrame:
-#     """Fetch data from S3 and add entity code and name from DB."""
-#     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-#         results = list(executor.map(_fetch_data_df_from_s3, variable_ids))
+##############################################################################################
+# More optimized API access
+# Most useful for bulk operations
+# from apps.backport.datasync.data_metadata
+##############################################################################################
 
-#     if isinstance(results, list) and all(isinstance(df, pd.DataFrame) for df in results):
-#         df = pd.concat(cast(List[pd.DataFrame], results))
-#     else:
-#         raise TypeError(f"results must be a list of pd.DataFrame, got {type(results)}")
 
-#     # we work with strings and convert to specific types later
-#     if value_as_str:
-#         df["value"] = df["value"].astype("string")
+def variable_data_df_from_s3(
+    engine: Engine,
+    variable_ids: List[int] = [],
+    workers: int = 1,
+    value_as_str: bool = True,
+) -> pd.DataFrame:
+    """Fetch data from S3 and add entity code and name from DB."""
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        results = list(executor.map(_fetch_data_df_from_s3, variable_ids))
 
-#     with Session(engine) as session:
-#         res = add_entity_code_and_name(session, df)
-#         return res
+    if isinstance(results, list) and all(isinstance(df, pd.DataFrame) for df in results):
+        df = pd.concat(cast(List[pd.DataFrame], results))
+    else:
+        raise TypeError(f"results must be a list of pd.DataFrame, got {type(results)}")
+
+    # we work with strings and convert to specific types later
+    if value_as_str:
+        df["value"] = df["value"].astype("string")
+
+    with Session(engine) as session:
+        res = add_entity_code_and_name(session, df)
+        return res
+
+
+def _fetch_data_df_from_s3(variable_id: int):
+    try:
+        # Cloudflare limits us to 600 requests per minute, retry in case we hit the limit
+        # NOTE: increase wait time or attempts if we hit the limit too often
+        for attempt in Retrying(
+            wait=wait_fixed(2),
+            stop=stop_after_attempt(3),
+            retry=retry_if_exception_type((URLError, RemoteDisconnected)),
+        ):
+            with attempt:
+                return (
+                    pd.read_json(config.variable_data_url(variable_id))
+                    .rename(
+                        columns={
+                            "entities": "entityId",
+                            "values": "value",
+                            "years": "year",
+                        }
+                    )
+                    .assign(variableId=variable_id)
+                )
+    # no data on S3
+    except HTTPError:
+        return pd.DataFrame(columns=["variableId", "entityId", "year", "value"])
+
+
+def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty:
+        df["entityName"] = []
+        df["entityCode"] = []
+        return df
+
+    unique_entities = df["entityId"].unique()
+
+    entities = _fetch_entities(session, list(unique_entities))
+
+    if set(unique_entities) - set(entities.entityId):
+        missing_entities = set(unique_entities) - set(entities.entityId)
+        raise ValueError(f"Missing entities in the database: {missing_entities}")
+
+    return pd.merge(df, entities.astype({"entityName": "category", "entityCode": "category"}), on="entityId")
+
+
+def _fetch_entities(session: Session, entity_ids: List[int]) -> pd.DataFrame:
+    # Query entities from the database
+    q = """
+    SELECT
+        id AS entityId,
+        name AS entityName,
+        code AS entityCode
+    FROM entities
+    WHERE id in %(entity_ids)s
+    """
+    return read_sql(q, session, params={"entity_ids": entity_ids})
+
+
+def variable_metadata_df_from_s3(
+    variable_ids: List[int] = [],
+    workers: int = 1,
+    env: OWIDEnv | None = None,
+) -> List[Dict[str, Any]]:
+    """Fetch data from S3 and add entity code and name from DB."""
+    args = [variable_ids]
+    if env:
+        args += [[env for _ in range(len(variable_ids))]]
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        results = list(executor.map(_fetch_metadata_from_s3, *args))
+
+    if not (isinstance(results, list) and all(isinstance(res, dict) for res in results)):
+        raise TypeError(f"results must be a list of dictionaries, got {type(results)}")
+
+    return results  # type: ignore
+
+
+def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dict[str, Any] | None:
+    try:
+        # Cloudflare limits us to 600 requests per minute, retry in case we hit the limit
+        # NOTE: increase wait time or attempts if we hit the limit too often
+        for attempt in Retrying(
+            wait=wait_fixed(2),
+            stop=stop_after_attempt(3),
+            retry=retry_if_exception_type((URLError, RemoteDisconnected)),
+        ):
+            with attempt:
+                if env is not None:
+                    url = env.indicator_metadata_url(variable_id)
+                else:
+                    url = config.variable_metadata_url(variable_id)
+                return requests.get(url).json()
+    # no data on S3
+    except HTTPError:
+        return {}
 
 
 ##############################################################################################

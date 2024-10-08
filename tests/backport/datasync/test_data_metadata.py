@@ -8,10 +8,10 @@ from sqlalchemy.orm import Session
 from apps.backport.datasync.data_metadata import (
     _convert_strings_to_numeric,
     variable_data,
-    variable_data_df_from_s3,
     variable_metadata,
 )
 from etl.db import get_engine
+from etl.grapher_io import variable_data_df_from_s3
 from etl.grapher_model import _infer_variable_type
 
 
@@ -32,10 +32,10 @@ def _call_variable_metadata(variable_id: int, variable_df: pd.DataFrame, variabl
     topic_tags = ["Population"]
 
     with Session(engine) as session:
-        with mock.patch("apps.backport.datasync.data_metadata._load_variable", return_value=variable_meta):
-            with mock.patch("apps.backport.datasync.data_metadata._load_origins_df", return_value=origins_df):
-                with mock.patch("apps.backport.datasync.data_metadata._load_faqs", return_value=faqs):
-                    with mock.patch("apps.backport.datasync.data_metadata._load_topic_tags", return_value=topic_tags):
+        with mock.patch("etl.grapher_io._load_variable", return_value=variable_meta):
+            with mock.patch("etl.grapher_io.data_metadata._load_origins_df", return_value=origins_df):
+                with mock.patch("etl.grapher_io.data_metadata._load_faqs", return_value=faqs):
+                    with mock.patch("etl.grapher_io.data_metadata._load_topic_tags", return_value=topic_tags):
                         return variable_metadata(session, variable_id, variable_df)
 
 
@@ -206,7 +206,7 @@ def test_variable_data_df_from_s3():
     )
     s3_data = pd.DataFrame({"entities": [1, 1], "values": ["a", 2], "years": [2000, 2001]})
 
-    with mock.patch("apps.backport.datasync.data_metadata._fetch_entities", return_value=entities):
+    with mock.patch("etl.grapher_io._fetch_entities", return_value=entities):
         with mock.patch("pandas.read_json", return_value=s3_data):
             df = variable_data_df_from_s3(engine, [123])
 

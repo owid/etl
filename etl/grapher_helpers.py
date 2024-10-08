@@ -18,9 +18,9 @@ from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from apps.backport.datasync import data_metadata as dm
 from etl.db import get_engine, read_sql
 from etl.files import checksum_str
+from etl.grapher_io import add_entity_code_and_name
 
 log = structlog.get_logger()
 
@@ -549,7 +549,7 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
 
     # Add entity code and name
     with Session(engine) as session:
-        table = dm.add_entity_code_and_name(session, table).copy_metadata(table)
+        table = add_entity_code_and_name(session, table).copy_metadata(table)
 
     table = table.set_index(["entityId", "entityCode", "entityName", "year"] + dim_names)
 
