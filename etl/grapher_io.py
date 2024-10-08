@@ -150,6 +150,94 @@ def ensure_load_variable(
 ##############################################################################################
 
 
+def load_variables_data(
+    catalog_paths: Optional[List[str]] = None,
+    variable_ids: Optional[List[int]] = None,
+    variables: Optional[List[Variable]] = None,
+    owid_env: OWIDEnv = OWID_ENV,
+    workers: int = 1,
+    value_as_str: bool = True,
+) -> pd.DataFrame:
+    """Get data for a list of indicators based on their catalog path or variable id.
+
+    Priority: catalog_paths > variable_ids > variables
+
+    Parameters
+    ----------
+    cataslog_path : str, optional
+        The path to the indicator in the catalog.
+    variable_id : int, optional
+        The ID of the indicator.
+    variable : Variable, optional
+        The indicator object.
+
+    """
+    # Get variable IDs
+    variable_ids = _ensure_variable_ids(owid_env.engine, catalog_paths, variable_ids, variables)
+
+    # Get variable
+    df = variable_data_df_from_s3(
+        owid_env.engine,
+        variable_ids=variable_ids,
+        workers=workers,
+        value_as_str=value_as_str,
+    )
+
+    return df
+
+
+def load_variables_metadata(
+    catalog_paths: Optional[List[str]] = None,
+    variable_ids: Optional[List[int]] = None,
+    variables: Optional[List[Variable]] = None,
+    owid_env: OWIDEnv = OWID_ENV,
+    workers: int = 1,
+) -> List[Dict[str, Any]]:
+    """Get metadata for a list of indicators based on their catalog path or variable id.
+
+    Priority: catalog_paths > variable_ids > variables
+
+    Parameters
+    ----------
+    catalog_path : str, optional
+        The path to the indicator in the catalog.
+    variable_id : int, optional
+        The ID of the indicator.
+    variable : Variable, optional
+        The indicator object.
+    """
+
+    # Get variable IDs
+    variable_ids = _ensure_variable_ids(owid_env.engine, catalog_paths, variable_ids, variables)
+
+    metadata = variable_metadata_df_from_s3(
+        variable_ids=variable_ids,
+        workers=workers,
+        env=owid_env,
+    )
+
+    return metadata
+
+
+def _ensure_variable_ids(
+    engine: Engine,
+    catalog_paths: Optional[List[str]] = None,
+    variable_ids: Optional[List[int]] = None,
+    variables: Optional[List[Variable]] = None,
+) -> List[int]:
+    if catalog_paths is not None:
+        with Session(engine) as session:
+            mapping = Variable.catalog_paths_to_variable_ids(session, catalog_paths=catalog_paths)
+        variable_ids = [int(i) for i in mapping.values()]
+    elif (variable_ids is None) and (variables is not None):
+        variable_ids = [variable.id for variable in variables]
+
+    if variable_ids is None:
+        raise ValueError("Either catalog_paths, variable_ids or variables must be provided")
+
+    return variable_ids
+
+
 def variable_data_df_from_s3(
     engine: Engine,
     variable_ids: List[int] = [],
