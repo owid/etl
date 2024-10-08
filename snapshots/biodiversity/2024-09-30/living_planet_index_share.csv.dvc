@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Living Planet Index
+    title: Living Planet Index - Share of populations with increasing and decreasing trends
     description: |-
       The Living Planet Index (LPI) is a measure of the state of global biological diversity based on population trends of vertebrate species from around the world. The index represents 34,836 populations of 5,495 species. All indices are weighted by species richness, giving species-rich taxonomic groups in terrestrial, marine and freshwater systems more weight than groups with fewer species. Using a method developed by ZSL and WWF, these species population trends are aggregated to produce indices of the state of biodiversity.
 

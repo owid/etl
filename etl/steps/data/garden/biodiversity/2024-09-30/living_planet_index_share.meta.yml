@@ -15,7 +15,7 @@ dataset:
 
 
 tables:
-  living_planet_index:
+  living_planet_index_share:
     variables:
       share_increasing:
         title: Share of populations increasing
@@ -34,7 +34,7 @@ tables:
         title: Share of populations moderately increasing
         description_short: The share of native, vertebrate populations that are increasing on average by 1.16% to 2.81% per year.
         description_processing: Categories are based on [Burns et al. (2023)](https://stateofnature.org.uk/wp-content/uploads/2023/09/TP25999-State-of-Nature-main-report_2023_FULL-DOC-v12.pdf).
-      share_litte_change:
+      share_little_change:
         title: Share of populations with little change
         description_short: The share of native, vertebrate populations that are decreasing by less than 1.14% per year and increasing by less than 1.16% per year.
         description_processing: Categories are based on [Burns et al. (2023)](https://stateofnature.org.uk/wp-content/uploads/2023/09/TP25999-State-of-Nature-main-report_2023_FULL-DOC-v12.pdf).
