@@ -3,7 +3,7 @@
 """
 
 import concurrent.futures
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -145,23 +145,6 @@ class AnomalyDetector:
         self.df_zeros = pd.DataFrame(np.zeros_like(self.df), columns=self.df.columns)[INDEX_COLUMNS + variable_ids]
         self.df_zeros[INDEX_COLUMNS] = self.df[INDEX_COLUMNS].copy()
 
-    @staticmethod
-    def prepare_score(df: pd.DataFrame, score_name: str) -> pd.DataFrame:
-        # Create a score dataframe.
-        df_score = df.melt(
-            id_vars=["entity_id", "year"], var_name="variable_id", value_name=f"score_{score_name}"
-        ).fillna(0)
-
-        # For now, keep only the latest year affected for each country-indicator.
-        df_score = (
-            df_score.sort_values(f"score_{score_name}", ascending=False)
-            .drop_duplicates(subset=["variable_id", "entity_id"], keep="first")
-            .rename(columns={"year": f"year_{score_name}"})
-            .reset_index(drop=True)
-        )
-
-        return df_score
-
     ########################################################################################################################
 
     # ANOMALY TYPE "nan":
@@ -200,7 +183,7 @@ class AnomalyDetector:
         for variable_id_old, variable_id_new in self.variable_mapping.items():
             # Calculate the BARD epsilon for each variable.
             positive_values = abs(self.df[variable_id_new].dropna())
-            positive_values = positive_values[positive_values > 0]  # type: ignore
+            positive_values = positive_values.loc[positive_values > 0]
             # One way to calculate it would be to assume that the epsilon is the 10th percentile of each new indicator.
             # eps = np.percentile(positive_values, q=0.1)
             # Another way is to simply take the range of the positive values and divide it by 10.
@@ -255,17 +238,27 @@ class AnomalyDetector:
         # Prepare scores.
         df_scores = []
         for score_name, anomaly_df in self.anomaly_dfs.items():
-            _df_score = self.prepare_score(df=anomaly_df, score_name=score_name)
-            # Sanity checks.
+            # Create a score dataframe.
+            _df_score = (
+                anomaly_df.melt(id_vars=["entity_id", "year"], var_name="variable_id", value_name="anomaly_score")
+                .fillna(0)
+                .assign(**{"score_name": score_name})
+            )
+            # For now, keep only the latest year affected for each country-indicator.
+            _df_score = (
+                _df_score.sort_values("anomaly_score", ascending=False)
+                .drop_duplicates(subset=["variable_id", "entity_id"], keep="first")
+                .reset_index(drop=True)
+            )
+            # # Sanity checks.
             assert (_df_score.isnull().sum() == 0).all()
             assert len(_df_score) == len(self.df["entity_id"].unique()) * len(self.variable_ids)
             df_scores.append(_df_score)
 
         # Aggregate anomalies.
-        df_score = multi_merge(df_scores, how="outer", on=["entity_id", "variable_id"])
-        # TODO: It seems more convenient to have a dataframe with columns
-        # "entity_id", "variable_id", "anomaly_name" (the name of each score), "anomaly_score", "anomaly_year".
+        df_score = pd.concat(df_scores, ignore_index=True)
 
+        # For convenience, add country and indicator names.
         df_score["country"] = map_series(
             df_score["entity_id"], self.entity_id_to_name, warn_on_missing_mappings=True, warn_on_unused_mappings=True
         )
@@ -277,16 +270,16 @@ class AnomalyDetector:
         )
 
         # NOTE: Here, we could include population data, or analytics (e.g. number of views for charts of each indicator) and create a score based on those.
-
         self.df_scores = df_score
 
     ########################################################################################################################
 
     # Visually inspect the most significant anomalies on a certain scores dataframe.
-    # TODO: This function should take a dataframe that can contain scores for different types of anomalies.
-    def inspect_anomalies(self, df_scores: pd.DataFrame, score_name: str, n_anomalies: int = 10) -> None:
+    def inspect_anomalies(self, anomalies: Optional[pd.DataFrame] = None, n_anomalies: int = 10) -> None:
+        if anomalies is None:
+            anomalies = self.df_scores.copy()
         # Select the most significant anomalies.
-        anomalies = df_scores.sort_values(f"score_{score_name}", ascending=False).head(n_anomalies)
+        anomalies = anomalies.sort_values("anomaly_score", ascending=False).head(n_anomalies)
         # Reverse variable mapping.
         variable_id_new_to_old = {v: k for k, v in self.variable_mapping.items()}
         anomalies["variable_id_old"] = map_series(
@@ -296,8 +289,9 @@ class AnomalyDetector:
             variable_id = row["variable_id"]
             variable_name = self.metadata[variable_id]["shortName"]  # type: ignore
             country = row["country"]
-            anomaly_year = row[f"year_{score_name}"]
-            anomaly_score = row[f"score_{score_name}"]
+            score_name = row["score_name"]
+            anomaly_year = row["year"]
+            anomaly_score = row["anomaly_score"]
             new = self.df[self.df["entity_id"] == row["entity_id"]][["entity_id", "year", variable_id]]
             new["country"] = map_series(new["entity_id"], self.entity_id_to_name)
             new = new.drop(columns=["entity_id"]).rename(columns={row["variable_id"]: variable_name}, errors="raise")
@@ -369,8 +363,11 @@ if __name__ == "__main__":
     # Aggregate anomalies.
     detector.aggregate_anomalies()
 
+    # Apply filters to select the most significant anomalies.
+    # TODO: Rename score_name -> anomaly_type
+    anomalies = detector.df_scores.copy()
+    # anomalies = anomalies.loc[anomalies["score_name"] == "version_change"].reset_index(drop=True)
+    anomalies = anomalies.loc[anomalies["score_name"] == "time_change"].reset_index(drop=True)
+
     # Inspect anomalies.
-    detector.inspect_anomalies(df_scores=detector.df_scores, score_name="version_change", n_anomalies=10)
-    # detector.inspect_anomalies(df_scores=detector.df_scores, score_name="time_change", n_anomalies=10)
-    # detector.inspect_anomalies(df_scores=detector.df_scores, score_name="lost", n_anomalies=10)
-    # detector.inspect_anomalies(df_scores=detector.df_scores, score_name="nan", n_anomalies=10)
+    detector.inspect_anomalies(anomalies=anomalies, n_anomalies=10)
