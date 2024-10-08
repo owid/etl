@@ -1256,6 +1256,16 @@ class Variable(Base):
         # else:
         #     raise ValueError("Either catalog_path or variable_id must be provided")
 
+    @overload
+    @classmethod
+    def from_catalog_path(cls, session: Session, catalog_path: str) -> "Variable":
+        ...
+
+    @overload
+    @classmethod
+    def from_catalog_path(cls, session: Session, catalog_path: List[str]) -> List["Variable"]:
+        ...
+
     @classmethod
     def from_catalog_path(cls, session: Session, catalog_path: str | List[str]) -> "Variable" | List["Variable"]:
         """Load a variable from the DB by its catalog path."""
@@ -1264,6 +1274,16 @@ class Variable(Base):
             return session.scalars(select(cls).where(cls.catalogPath == catalog_path)).one()
         elif isinstance(catalog_path, list):
             return session.scalars(select(cls).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
+
+    @overload
+    @classmethod
+    def from_id(cls, session: Session, variable_id: int) -> "Variable":
+        ...
+
+    @overload
+    @classmethod
+    def from_id(cls, session: Session, variable_id: List[int]) -> List["Variable"]:
+        ...
 
     @classmethod
     def from_id(cls, session: Session, variable_id: int | List[int]) -> "Variable" | List["Variable"]:
