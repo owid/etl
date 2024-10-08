@@ -18,7 +18,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = tb.format(["country", "year", "taxon"])
+    tb = tb.rename(columns={"taxon": "country"})
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
