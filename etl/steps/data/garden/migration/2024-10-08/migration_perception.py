@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load snapshot (no meadow data set, since this needs minimal processing).
     snap = paths.load_snapshot("migration_perception.csv")
 
     # Load data from snapshot.

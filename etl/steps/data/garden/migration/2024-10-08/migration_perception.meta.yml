@@ -1,4 +1,4 @@
-# NOTE: To learn more about the fields, hover over their names.
+
 definitions:
   common:
     presentation:
@@ -10,8 +10,6 @@ definitions:
 
 
 
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 9999 #not to be updated
 
