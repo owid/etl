@@ -1,0 +1,3 @@
+{
+    "_COMMENT": "This json file contains HARDCODED sources for the UN SDG indicators which do currently not have a single source in the UN SDG. These sources are retrieved from the metadata pdf, under 1. Data reporter or 3.f. Data compilers. When doing the UN SDG data update it is VERY IMPORTANT to check whether these sources are still the same and update them if necessary!"
+}
