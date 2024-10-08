@@ -17,7 +17,7 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     df = pd.DataFrame(
         {
-            "country": ["global", "global", "global", "global", "global"],
+            "country": ["World", "World", "World", "World", "World"],
             "taxon": ["total", "mammals", "fish", "birds", "herptiles"],
             "year": [2022, 2022, 2022, 2022, 2022],
             "share_increasing": [43.3, 44.9, 44.6, 41.5, 43.3],
