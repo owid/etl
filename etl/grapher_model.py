@@ -34,6 +34,7 @@ from sqlalchemy import (
     Computed,
     Date,
     DateTime,
+    Float,
     ForeignKey,
     ForeignKeyConstraint,
     Index,
@@ -1608,6 +1609,26 @@ class MultiDimDataPage(Base):
         else:
             session.add(self)
             return self
+
+
+class Anomaly(Base):
+    __tablename__ = "anomalies"
+    __table_args__ = (Index("catalogPath", "catalogPath"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
+    entity: Mapped[str] = mapped_column(VARCHAR(255))
+    year: Mapped[int] = mapped_column(Integer)
+    rawScore: Mapped[float] = mapped_column(Float)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
+    catalogPath: Mapped[str] = mapped_column(VARCHAR(255), default=None)
+    anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
+    # NOTE: why do we need indicatorChecksum?
+    indicatorChecksum: Mapped[str] = mapped_column(VARCHAR(255), default=None)
+    globalScore: Mapped[float] = mapped_column(Float, default=None, nullable=True)
+    gptInfo: Mapped[Optional[dict]] = mapped_column(JSON, default=None, nullable=True)
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
