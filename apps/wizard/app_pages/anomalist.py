@@ -122,7 +122,7 @@ def get_anomaly_gpt(indicator_id: str, indicator_uri: str, dataset_name: str, in
     data = cached.load_variable_data(variable_id=int(indicator_id))
     data_1 = data.pivot(index="years", columns="entity", values="values")  # .head(20)
     data_1 = data_1.dropna(axis=1, how="all")
-    data_1_str = data_1.to_csv().replace(".0,", ",")
+    data_1_str = cast(str, data_1.to_csv()).replace(".0,", ",")
 
     num_anomalies = 3
 
