@@ -13,10 +13,10 @@ meta:
     date_published: "2024-10-10"
 
     # Citation
-    producer: World Wildlife Fund and Zoological Society of London
+    producer: Deinet et al.
     citation_full: |-
       Deinet S, Marconi V, Freeman R, Puleston H, McRae L. Living Planet Report 2024 Technical Supplement: Living Planet Index. ZSL, 2024. https://doi.org/10.17605/OSF.IO/6TE9H
-    attribution_short: WWF & ZSL
+    attribution_short: Deinet et al.
 
     # Files
     url_main: http://stats.livingplanetindex.org/
