@@ -10,7 +10,7 @@ from apps.wizard.utils.insights import (
     get_thumbnail_url,
     list_charts,
 )
-from etl.db_utils import get_connection
+from etl.db import get_connection
 
 
 class DataError(Exception):

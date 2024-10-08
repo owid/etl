@@ -9,7 +9,7 @@ import pandas as pd
 import structlog
 from deepdiff import DeepDiff
 
-from etl.db_utils import get_engine
+from etl.db import get_engine
 
 log = structlog.get_logger()
 

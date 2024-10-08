@@ -12,7 +12,7 @@ from apps.backport.backport import PotentialBackport
 from apps.utils.files import add_to_dag, generate_step
 from etl import config
 from etl.backport_helpers import create_dataset
-from etl.db_utils import get_engine
+from etl.db import get_engine
 from etl.files import yaml_dump
 from etl.metadata_export import metadata_export
 from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR

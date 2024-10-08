@@ -9,7 +9,7 @@ from structlog import get_logger
 
 from apps.wizard.utils import get_staging_creation_time
 from etl import grapher_model as gm
-from etl.db_utils import read_sql
+from etl.db import read_sql
 
 ADMIN_GRAPHER_USER_ID = 1
 log = get_logger()

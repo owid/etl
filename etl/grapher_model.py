@@ -69,7 +69,7 @@ from sqlalchemy.sql import Select
 from typing_extensions import Self, TypedDict
 
 from etl import config, paths
-from etl.db_utils import read_sql
+from etl.db import read_sql
 
 log = structlog.get_logger()
 

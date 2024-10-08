@@ -19,7 +19,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from apps.backport.datasync import data_metadata as dm
-from etl.db_utils import get_engine, read_sql
+from etl.db import get_engine, read_sql
 from etl.files import checksum_str
 
 log = structlog.get_logger()

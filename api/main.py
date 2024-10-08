@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.v1 import v1
 from etl import config
-from etl.db_utils import get_engine
+from etl.db import get_engine
 
 from . import utils
 

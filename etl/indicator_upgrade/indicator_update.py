@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 import etl.grapher_model as gm
-from etl.db_utils import get_engine
+from etl.db import get_engine
 from etl.indicator_upgrade.schema import (
     fix_errors_in_schema,
     validate_chart_config_and_remove_defaults,

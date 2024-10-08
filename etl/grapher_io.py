@@ -8,7 +8,7 @@ import validators
 from sqlalchemy.orm import Session
 
 from etl.config import OWID_ENV, OWIDEnv
-from etl.db_utils import get_connection
+from etl.db import get_connection
 from etl.grapher_model import Variable
 
 log = structlog.get_logger()

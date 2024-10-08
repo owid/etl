@@ -13,7 +13,7 @@ from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.etl_steps.utils import TAGS_DEFAULT
 from etl.config import DB_HOST, DB_NAME
-from etl.db_utils import get_session
+from etl.db import get_session
 from etl.files import ruamel_dump, ruamel_load
 from etl.paths import BASE_DIR, DAG_DIR, DATA_DIR
 

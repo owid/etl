@@ -9,7 +9,7 @@ from dotenv import dotenv_values
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 
-from etl.db_utils import read_sql
+from etl.db import read_sql
 
 log = structlog.get_logger()
 

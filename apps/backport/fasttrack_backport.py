@@ -11,7 +11,7 @@ from owid.catalog.utils import underscore
 
 from apps.backport.backport import PotentialBackport
 from etl.backport_helpers import create_dataset
-from etl.db_utils import get_engine
+from etl.db import get_engine
 from etl.metadata_export import metadata_export
 
 log = structlog.get_logger()

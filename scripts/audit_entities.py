@@ -3,7 +3,7 @@ import pandas as pd
 import structlog
 from owid.catalog import Dataset
 
-from etl.db_utils import get_engine
+from etl.db import get_engine
 from etl.paths import DATA_DIR
 
 log = structlog.get_logger()
