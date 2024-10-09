@@ -55,7 +55,7 @@ def run(dest_dir: str) -> None:
 
         tb = create_table(tb)
 
-        # clean source name - this uses source column and hardcoded mapping in un_sdg.sources.json/ un_sdg.sources_additional.json
+        # clean source name - this uses source column and hardcoded mapping in un_sdg.sources.json/ un_sdg.sources_additional.json - check whether this mapping is still up to date here: https://unstats.un.org/sdgs/iaeg-sdgs/tier-classification/.
         tb["source_producer"] = clean_source_name(tb, load_clean_source_mapping(), load_additional_source_mapping())
 
         # add short attribution, this uses mapping in un_sdg.sources_short.json
@@ -127,7 +127,7 @@ def get_source(raw_source: pd.Series) -> str:
     """Get source for origin title and citation. Lists up to 3 sources, more are combined into 'Multiple sources'."""
     sources = raw_source.drop_duplicates()
     if len(sources) == 1 and len(sources.iloc[0].strip()) <= 250:
-        title = sources.iloc[0].strip
+        title = sources.iloc[0].strip()
     elif len(sources) <= 3 and len(", ".join([source_name.strip() for _, source_name in sources.items()])) <= 250:
         title = ", ".join([source_name.strip() for _, source_name in sources.items()])
     else:
@@ -174,7 +174,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
     metadata_link = get_metadata_link(indicator)
     citation_for_indicator = f"{source_in_tb} via UN SDG Indicators Database (https://unstats.un.org/sdgs/dataportal), UN Department of Economic and Social Affairs (accessed {CURRENT_YEAR})."
     if metadata_link != "no metadata found":
-        citation_for_indicator += f"{metadata_link}."
+        citation_for_indicator += f" More information available at: {metadata_link}."
 
     origin = Origin(
         producer=source_in_tb,

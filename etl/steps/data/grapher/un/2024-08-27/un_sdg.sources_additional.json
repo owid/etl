@@ -1,5 +1,5 @@
 {
-    "_COMMENT": "This json file contains HARDCODED sources for the UN SDG indicators which do currently not have a single source in the UN SDG. These sources are retrieved from the metadata pdf, under 1. Data reporter or 3.f. Data compilers. When doing the UN SDG data update it is VERY IMPORTANT to check whether these sources are still the same and update them if necessary! Last update 09/2024",
+    "_COMMENT": "This json file contains HARDCODED sources for the UN SDG indicators which do currently not have a single source in the UN SDG. These sources are retrieved from the metadata pdf, under 1. Data reporter or 3.f. Data compilers. When doing the UN SDG data update it is VERY IMPORTANT to check whether these sources are still the same and update them if necessary! A mapping in an excel file can be found under https://unstats.un.org/sdgs/iaeg-sdgs/tier-classification/. Last update 09/2024",
     "10.3.1": "Office of the United Nations High Commissioner for Human Rights",
     "10.6.1": "Financing for Sustainable Development Office, United Nations Department of Economic and Social Affairs",
     "10.7.1": "International Labour Organization and World Bank",
