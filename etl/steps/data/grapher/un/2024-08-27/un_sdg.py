@@ -44,8 +44,6 @@ def run(dest_dir: str) -> None:
     # add tables to dataset
     all_tables = []
 
-    unit_ls = []
-
     for var in ds_garden.table_names:
         if INCLUDE and not re.search(INCLUDE, var):
             log.warning("un_sdg.skip", table_name=var)
@@ -57,12 +55,9 @@ def run(dest_dir: str) -> None:
         # meta = tb.metadata
 
         tb = create_table(tb)
-        tb["source_producer"] = clean_source_name(tb["source"], load_clean_source_mapping())
-        tb["attribution_short"] = add_short_source_name(tb["source"], load_short_source_mapping())
+        tb["source_producer"] = clean_source_name(tb, load_clean_source_mapping(), load_additional_source_mapping())
+        tb["attribution_short"] = add_short_source_name(tb["source_producer"], load_short_source_mapping())
         tb["source_title"] = get_source(tb["source"])
-
-        unit_ls.append(tb["long_unit"].iloc[0])
-        unit_ls.append(tb["short_unit"].iloc[0])
 
         tb_var_gr = tb.groupby("variable_name")
 
@@ -93,25 +88,23 @@ def run(dest_dir: str) -> None:
     ds_grapher.save()
 
 
-def clean_source_name(raw_source: pd.Series, clean_source_map: Dict[str, str]) -> str:
-    if len(raw_source.drop_duplicates()) > 1:
-        clean_source = "Data from multiple sources compiled by the UN"
+def clean_source_name(tb: Table, clean_source_map: Dict[str, str], additional_source_map: Dict[str, str]) -> str:
+    unique_srcs = tb["source"].drop_duplicates()
+    ind_code = tb["variable_name"].iloc[0].split("-")[0].strip()
+    if len(unique_srcs) > 1:
+        clean_source = additional_source_map[ind_code]
     else:
-        source_name = raw_source.drop_duplicates().iloc[0].strip()
+        source_name = unique_srcs.iloc[0].strip()
         assert source_name in clean_source_map, f"{repr(source_name)} not in un_sdg.sources.json - please add"
         clean_source = clean_source_map[source_name]
 
     return clean_source
 
 
-def add_short_source_name(raw_source: pd.Series, short_source_map: Dict[str, str]) -> str:
-    sources = raw_source.drop_duplicates()
-    if len(sources) > 1:
-        short_source = "Multiple sources via UN"
-    else:
-        source_name = sources.iloc[0].strip()
-        assert source_name in short_source_map, f"{repr(source_name)} not in un_sdg.sources_short.json - please add"
-        short_source = short_source_map[source_name]
+def add_short_source_name(clean_source: pd.Series, short_source_map: Dict[str, str]) -> str:
+    source_name = clean_source.iloc[0]
+    assert source_name in short_source_map, f"{repr(source_name)} not in un_sdg.sources_short.json - please add"
+    short_source = short_source_map[source_name]
 
     return short_source
 
@@ -207,7 +200,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
             var_name = var_name.replace(char, "_")
     tb["variable"] = var_name
 
-    tb = tb[["country", "year", "value", "variable", "meta"]]
+    tb = Table(tb[["country", "year", "value", "variable", "meta"]])
     # convert integer values to int but round float to 2 decimal places, string remain as string
     tb["value"] = tb["value"].apply(value_convert)
     tb = tb.set_index(["year", "country"])
@@ -252,12 +245,12 @@ def create_table(tb: Table) -> Table:
         cols_dim = cols + dim_cols
         tb["variable_name_meta"] = tb[cols_meta_dim].agg(" - ".join, axis=1)
         tb["variable_name"] = tb[cols_dim].agg(" - ".join, axis=1)
-        tb = tb[cols_keep]
+        tb = Table(tb[cols_keep])
         tb["seriescode"] = tb["seriescode"].str.lower()
     else:
         tb["variable_name_meta"] = tb[cols_meta].agg(" - ".join, axis=1)
         tb["variable_name"] = tb[cols].agg(" - ".join, axis=1)
-        tb = tb[cols_keep]
+        tb = Table(tb[cols_keep])
         tb["seriescode"] = tb["seriescode"].str.lower()
 
     return tb
@@ -268,6 +261,15 @@ def load_clean_source_mapping() -> Dict[str, str]:
     Load the existing json which maps the raw sources to a cleaner version of the sources.
     """
     with open(paths.directory / "un_sdg.sources.json", "r") as f:
+        sources = json.load(f)
+        return cast(Dict[str, str], sources)
+
+
+def load_additional_source_mapping() -> Dict[str, str]:
+    """
+    Load the existing json which maps the raw sources to a cleaner version of the sources.
+    """
+    with open(paths.directory / "un_sdg.sources_additional.json", "r") as f:
         sources = json.load(f)
         return cast(Dict[str, str], sources)
 
