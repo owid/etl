@@ -18,7 +18,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from apps.wizard.utils.paths import STREAMLIT_SECRETS, WIZARD_DB
-from etl.db import read_sql, to_sql
+from etl.db import get_engine, read_sql, to_sql
 
 # DB is set up
 DB_IS_SET_UP = STREAMLIT_SECRETS.exists() & WIZARD_DB.exists()
@@ -161,10 +161,22 @@ class WizardDB:
             )
 
     @classmethod
-    def add_variable_mapping(cls, mapping: Dict[int, int], upgrade_name: str) -> None:
+    def delete_variable_mapping(cls) -> None:
+        """Delete variable mapping."""
+        if cls.table_exists(TB_VARMAP):
+            query = f"DELETE FROM {TB_VARMAP};"
+            engine = get_engine()
+            with Session(engine) as s:
+                s.execute(text(query))
+                s.commit()
+
+    @classmethod
+    def add_variable_mapping(
+        cls, mapping: Dict[int, int], dataset_id_old: int, dataset_id_new: int, comments: str = ""
+    ) -> None:
         """Add a mapping to TB_VARMAP.
 
-        This table should have columns 'id_old' (key), 'id_new' (value), 'timestamp', and 'upgrade_name'.
+        This table should have columns 'id_old' (key), 'id_new' (value), 'timestamp', and 'dataset_id_old' and 'dataset_id_new'.
         """
         timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -174,7 +186,9 @@ class WizardDB:
                 "id_old": id_old,
                 "id_new": id_new,
                 "timestamp": timestamp,
-                "upgrade_name": upgrade_name,
+                "dataset_id_old": dataset_id_old,
+                "dataset_id_new": dataset_id_new,
+                "comments": comments,
             }
             for id_old, id_new in mapping.items()
         ]
@@ -184,13 +198,10 @@ class WizardDB:
         to_sql(df, TB_VARMAP, if_exists="append", index=False)
 
     @classmethod
-    def get_variable_mapping_raw(cls, upgrade_name: Optional[str] = None) -> pd.DataFrame:
-        """Get the mapping from TB_VARMAP. If upgrade_name is None, return all mappings."""
+    def get_variable_mapping_raw(cls) -> pd.DataFrame:
+        """Get the mapping from TB_VARMAP."""
         if cls.table_exists(TB_VARMAP):
-            if upgrade_name:
-                return read_sql(f"SELECT * FROM {TB_VARMAP} WHERE upgrade_name = '{upgrade_name}';")
-            else:
-                return read_sql(f"SELECT * FROM {TB_VARMAP};")
+            return read_sql(f"SELECT * FROM {TB_VARMAP};")
         return pd.DataFrame()
 
     @classmethod
@@ -212,32 +223,7 @@ class WizardDB:
         if df.empty:
             return {}
 
-        groups = df.groupby("timestamp")
-
-        mapping = {}
-        # Iterate over each 'submitted mapping'
-        for group in groups:
-            # Get mapping for a certain timestamp
-            mapping_ = group[1][["id_old", "id_new"]].set_index("id_old")["id_new"].to_dict()
-
-            # Initialize the mapping
-            if mapping == {}:
-                mapping = mapping_
-                continue
-
-            # Sanity check that: there is no key in mapping_ already present in mapping
-            if any(k in mapping for k in mapping_):
-                raise ValueError(
-                    "The variable mapping has an unexpected format. An indicator is being upgraded multiple times."
-                )
-
-            # Update the mapping sequentially
-            for k, v in mapping.items():
-                if v in mapping_:
-                    mapping[k] = mapping_[v]
-
-            # Update with new mappings
-            mapping = mapping | mapping_
+        mapping = simplify_varmap(df)
 
         return mapping
 
@@ -265,3 +251,37 @@ def _prepare_query_insert(tb_name: str, fields: Tuple[Any]) -> str:
     values = ":" + ", :".join(fields)
     query = f"INSERT INTO {tb_name} {fields} VALUES ({values});"
     return query
+
+
+def simplify_varmap(df):
+    groups = df.groupby("timestamp")
+
+    mapping = {}
+    # Iterate over each 'submitted mapping'
+    for group in groups:
+        # Get mapping for a certain timestamp
+        mapping_ = group[1][["id_old", "id_new"]].set_index("id_old")["id_new"].to_dict()
+
+        # Initialize the mapping
+        if mapping == {}:
+            mapping = mapping_
+            continue
+
+        # Sanity check that: there is no key in mapping_ already present in mapping
+        if any(k in mapping for k in mapping_):
+            raise ValueError(
+                "The variable mapping has an unexpected format. An indicator is being upgraded multiple times."
+            )
+
+        # Update the mapping sequentially
+        for k, v in mapping.items():
+            if v in mapping_:
+                mapping[k] = mapping_[v]
+
+        # Update with new mappings
+        mapping = mapping | mapping_
+
+    # Remove self-mappings
+    mapping_no_identical = {k: v for k, v in mapping.items() if k != v}
+
+    return mapping_no_identical
