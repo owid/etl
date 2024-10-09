@@ -10,6 +10,7 @@ from structlog import get_logger
 import etl.grapher_model as gm
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.utils import set_states, st_page_link, st_toast_error
+from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
 from etl.helpers import get_schema_from_url
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
@@ -130,3 +131,14 @@ def push_new_charts(charts: List[gm.Chart]) -> None:
             "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
         )
         st_page_link("chart-diff")
+
+
+def save_variable_mapping(
+    indicator_mapping: Dict[int, int], dataset_id_new: int, dataset_id_old: int, comments: str = ""
+) -> None:
+    WizardDB.add_variable_mapping(
+        mapping=indicator_mapping,
+        dataset_id_new=dataset_id_new,
+        dataset_id_old=dataset_id_old,
+        comments=comments,
+    )
