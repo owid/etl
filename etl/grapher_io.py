@@ -9,6 +9,7 @@ import pymysql
 import requests
 import structlog
 import validators
+from deprecated import deprecated
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from tenacity import Retrying
