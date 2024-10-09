@@ -122,10 +122,14 @@ def cli(
 
         # detect anomalies
         log.info("Detecting anomalies", variable_id=variable.id)
-        for anomaly in detector.get_anomalies(df, variable):
-            anomaly.anomalyType = detector.anomaly_type
-            anomaly.catalogPath = variable.catalogPath
-            anomaly.indicatorChecksum = "TBD"
+        for df_score in detector.get_score_df(df, variable):
+            anomaly = gm.Anomaly(
+                datasetId=variable.datasetId,
+                anomalyType=detector.anomaly_type,
+                catalogPath=variable.catalogPath,
+            )
+            __import__("ipdb").set_trace()
+            anomaly.dfScore = df_score
             anomalies.append(anomaly)
 
     if dry_run:

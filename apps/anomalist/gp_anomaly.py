@@ -23,20 +23,20 @@ class AnomalyDetector:
 class SampleAnomalyDetector(AnomalyDetector):
     anomaly_type = "sample"
 
-    def get_anomalies(self, df: pd.DataFrame, meta: gm.Variable) -> list[gm.Anomaly]:
-        return [
-            gm.Anomaly(
-                entity=random.choice(df.columns),
-                year=random.choice(df.index),
-                rawScore=9.99,
-            )
-        ]
+    def get_score_df(self, df: pd.DataFrame, meta: gm.Variable) -> pd.DataFrame:
+        return pd.DataFrame(
+            {
+                "entity": [random.choice(df.columns)],
+                "year": [random.choice(df.index)],
+                "rawScore": [9.99],
+            }
+        )
 
 
 class GPAnomalyDetector(AnomalyDetector):
     anomaly_type = "gp"
 
-    def get_anomalies(self, df: pd.DataFrame, meta: gm.Variable) -> list[gm.Anomaly]:
+    def get_score_df(self, df: pd.DataFrame, meta: gm.Variable) -> pd.DataFrame:
         anomalies = []
         for country in df.columns:
             series = df[country].dropna()
@@ -57,9 +57,9 @@ class GPAnomalyDetector(AnomalyDetector):
             # Return anomalies above threshold
             for i, z_score in enumerate(z):
                 if np.abs(z_score) > 3:
-                    anomalies.append(gm.Anomaly(entity=country, year=series.index[i], rawScore=z_score))
+                    anomalies.append({"entity": country, "year": series.index[i], "rawScore": z_score})
 
-        return anomalies
+        return pd.DataFrame(anomalies)
 
     def get_Xy(self, series: pd.Series) -> tuple[np.ndarray, np.ndarray]:
         X = series.index.values.reshape(-1, 1)
