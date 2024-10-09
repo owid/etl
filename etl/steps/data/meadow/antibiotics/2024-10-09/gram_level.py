@@ -18,9 +18,11 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
-    tb = tb.rename(columns={"Location": "country", "Year": "year"})
+    tb = tb.rename(columns={"Location": "country", "Year": "year"}, errors="raise")
+    # Some unexpected duplicates with different values - we'll drop both cases
+    tb = tb.drop_duplicates(subset=["country", "year", "ATC level 3 class"])
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year", "atc_level_3_class"])
 
     #
     # Save outputs.
