@@ -1,0 +1,43 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+    display:
+      numDecimalPlaces: 2
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Global excess deaths associated with COVID-19 (modelled estimates)
+
+tables:
+  xm_who:
+    variables:
+      expected_mean:
+        title: Expected deaths from all-causes by location, year and month (mean)
+        unit: deaths
+      acm_mean:
+        title: Estimated deaths from all-causes by location, year and month (mean)
+        unit: deaths
+      excess_mean:
+        title: Excess deaths associated with COVID-19 pandemic from all-causes by location, year and month (mean)
+        unit: deaths
+      cumul_excess_mean:
+        title: Cumulative excess deaths associated with COVID-19 pandemic (mean)
+        unit: death
+        description_short: |-
+          Cumulative difference (mean estimate) between the number of reported or estimated deaths in 2020–2021 and the projected number of deaths for the same period based on previous years.
+      cumul_excess_low:
+        title: Cumulative excess deaths associated with COVID-19 pandemic (low 95% CI)
+        unit: deaths
+        description_short: |-
+          Cumulative difference (lower 95% confidence interval) between the number of reported or estimated deaths in 2020–2021 and the projected number of deaths for the same period based on previous years.
+      cumul_excess_high:
+        title: Cumulative excess deaths associated with COVID-19 pandemic (upper 95% CI)
+        unit: deaths
+        description_short: |-
+          Cumulative difference (upper 95% confidence interval) between the number of reported or estimated deaths in 2020–2021 and the projected number of deaths for the same period based on previous years.

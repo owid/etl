@@ -1,0 +1,37 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global excess deaths associated with COVID-19 (modelled estimates)
+    description: |-
+      The World Health Organization has been tracking the impact of COVID-19 as the pandemic has evolved over time.
+
+      Aggregate case and death numbers are being reported to the WHO. These data do not always provide a complete picture of the health burden attributable to COVID-19 nor of how many lives have been lost due to the pandemic, and there are a number of reasons for this. Some deaths that are attributable to COVID-19 have not been certified as such because tests had not been conducted prior to death. There have also been variations in the death certification rules countries have applied in the presence of comorbidities and COVID-19.
+
+      The impact of the pandemic is far reaching. Beyond the deaths directly attributable to it are those that can be linked to the conditions that have prevailed since the pandemic began and have led to some health systems being overwhelmed or some patients avoiding healthcare. In light of the challenges posed by using reported COVID-19 data, excess mortality is considered a more objective and comparable measure. The WHO defines excess mortality as "the mortality above what would be expected based on the non-crisis mortality rate in the population of interest".
+
+      Disclaimer: The estimates presented here may differ from, and should not be regarded as, the official national statistics of individual WHO Member States.
+    date_published: "2023-05-19"
+
+    # Citation
+    producer: World Health Organization
+    citation_full: |-
+      Msemburi, W., Karlinsky, A., Knutson, V. et al (2023). The WHO estimates of excess
+      mortality associated with the COVID-19 pandemic. Nature 613, 130–137.
+    attribution_short: WHO
+
+    # Files
+    url_main: https://www.who.int/data/sets/global-excess-deaths-associated-with-covid-19-modelled-estimates
+    url_download: https://cdn.who.int/media/docs/default-source/world-health-data-platform/covid-19-excessmortality/2023-05-19_covid-19_gem.zip?sfvrsn=9a95fc1a_4
+    date_accessed: 2024-10-01
+
+    # License
+    license:
+      name: World Health Organization 2023, CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+
+outs:
+  - md5: f8608df836e8b25e3a10e27dd027f3c5
+    size: 3084119
+    path: xm_who.zip
