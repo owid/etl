@@ -9,7 +9,7 @@ meta:
     date_published: "2021-11-11"
     title_snapshot: Antibiotic usage and consumption
     description_snapshot: |-
-      For modeled estimates of total antibiotic consumption: IQVIA MIDASTM database, [European Center for Disease Control](https://www.ecdc.europa.eu/en/about-us/partnerships-and-networks/disease-and-laboratory-networks/esac-net), World Health Organization, and published literature. 
+      For modeled estimates of total antibiotic consumption: IQVIA MIDASTM database, [European Center for Disease Control](https://www.ecdc.europa.eu/en/about-us/partnerships-and-networks/disease-and-laboratory-networks/esac-net), World Health Organization, and published literature.
 
     # Citation
     producer: Browne, Annie J et al.
@@ -18,7 +18,6 @@ meta:
 
     # Files
     url_main: https://www.tropicalmedicine.ox.ac.uk/gram/research/visualisation-app-antibiotic-usage-and-consumption
-    url_download: https://livedataoxford.shinyapps.io/GRAM_antibiotic_consumption/_w_59524f59/session/c4df4585bfe080c0bf34698155a021e6/download/download_output?w=59524f59
     date_accessed: 2024-10-09
 
     # License
@@ -26,4 +25,7 @@ meta:
       name: © 2024 Global Research on Antimicrobial Resistance
       url: https://www.ox.ac.uk/legal
 
-  
+outs:
+  - md5: 22e65ee7cdad037135d4c28230170886
+    size: 117215
+    path: gram.csv
