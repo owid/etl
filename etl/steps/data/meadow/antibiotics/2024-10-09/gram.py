@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
-    #
+    tb = tb.rename(columns={"Location": "country", "Year": "year"})
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])
 

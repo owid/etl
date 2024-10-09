@@ -3,56 +3,29 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Global Health
+        - Antibiotics
 
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
+  update_period_days: 0
 
 
 tables:
   gram:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      antibiotic_consumption__ddd_1_000_day:
+        title: Antibiotic consumption (DDD per 1,000 inhabitants per day)
+        description_short: Defined daily doses (DDD) per 1,000 inhabitants per day
+        unit: DDD per 1,000 inhabitants per day
+        display:
+          numDecimalPlaces: 1
+      lower_uncertainty_interval:
+        title: Lower uncertainty interval
+        unit: DDD per 1,000 inhabitants per day
+      upper_uncertainty_interval:
+        title: Upper uncertainty interval
+        unit: DDD per 1,000 inhabitants per day
+
 
