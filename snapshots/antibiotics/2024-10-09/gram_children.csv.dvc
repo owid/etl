@@ -24,3 +24,7 @@ meta:
     license:
       name: © 2024 Global Research on Antimicrobial Resistance
       url: https://www.ox.ac.uk/legal
+outs:
+  - md5: c7ac03f111b1e0de60867dd6fef810b2
+    size: 78961
+    path: gram_children.csv
