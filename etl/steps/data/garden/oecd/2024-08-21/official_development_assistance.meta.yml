@@ -49,7 +49,7 @@ definitions:
   short_constant_usd: This data is expressed in US dollars. It is adjusted for inflation.
 
   key_oda: |-
-    Official development assistance (ODA) eligibility criteria are based on (i) country eligibility, (ii) concessionality, and (iii) the promotion of the economic development and welfare of developing countries as the main objective. This means that (i) only countries and territories included in the list of ODA recipients are eligible to receive this assistance, (ii) lending is defined by minimum requirements according to the income category of the recipient country, and (iii) reporting rules have been implemented to define what is "primarily developmental".
+    Official development assistance (ODA) eligibility criteria are based on (i) country eligibility, (ii) concessionality, and (iii) the promotion of the economic development and welfare of developing countries as the main objective. This means that (i) only countries and territories included in the list of ODA recipients are eligible to receive this assistance, (ii) lending is defined by minimum requirements according to the income category of the recipient country, and (iii) reporting rules have been implemented to define what is "primarily developmental". For more details about ODA, please refer to the [official OECD documentation](https://one.oecd.org/document/DCD/DAC/STAT(2023)9/FINAL/en/pdf).
 
   key_oda_target: A long-standing United Nations target is that developed countries should devote 0.7% of their GNI to ODA.
   key_oda_list_of_countries: The [OECD Development Assistance Committee (DAC)](https://www.oecd.org/en/about/committees/development-assistance-committee.html) mantains a list of territories where ODA can be provided. The countries and territories on the DAC list of ODA recipients consist of all low and middle income countries based on gross national income (GNI) per capita as published by the World Bank, with the exception of former G8 members, EU members, and countries with a firm date for entry into the EU. The list also includes all of the Least Developed Countries (LDCs) as defined by the United Nations. The list is updated every three years and is available in [the OECD website](https://www.oecd.org/en/topics/sub-issues/oda-eligibility-and-conditions/dac-list-of-oda-recipients.html).
@@ -146,7 +146,7 @@ definitions:
   processing_per_capita_2: |-
     We calculated this indicator by dividing by the population of the recipient country. We use a long-run population dataset [mantained by Our World in Data](https://ourworldindata.org/population-sources).
 
-  processing_share_gini: |-
+  processing_share_gni: |-
     We calculated this indicator by dividing by the gross national income (GNI) of the donor country regional aggregation. The GNI estimate is available in the OECD dataset.
 
     The OECD provides indicators as a share of GNI, but only until 2017 for net flows. We calculated this to have the entire series.
@@ -201,29 +201,8 @@ tables:
           <<: *common_display
 
       # From DAC1 dataset
-      # NOTE: I am keeping the following two series only because we wait for the OECD to clarify differences with the longer time series version.
-      i_oda_grant_equivalents:
-        title: Official development assistance (ODA) by donor - Grant equivalents (shorter time series)
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "{definitions.short_oda} {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
-          - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
-        description_from_producer: "{definitions.producer_oda}"
-        presentation:
-          title_public: Foreign aid given
-          title_variant: Grant equivalents
-        display:
-          name: Official development assistance (ODA) by donor - Grant equivalents
-          numDecimalPlaces: 0
-          entityAnnotationsMap: *entity_annotations_alternative
-          <<: *common_display
-
       ii_oof_net_disbursements:
-        title: Other official flows (OOF) by donor - Net disbursements (shorter time series)
+        title: Other official flows (OOF) by donor - Net disbursements
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
         description_short: "{definitions.short_oof} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
@@ -299,51 +278,8 @@ tables:
           entityAnnotationsMap: *entity_annotations_alternative
           <<: *common_display
 
-      # NOTE: I am keeping the following two series only because we wait for the OECD to clarify differences with the longer time series version.
-      oda_share_gni_net_disbursements:
-        title: ODA by donor (% of GNI) - Net disbursements (shorter time series)
-        unit: "% of GNI"
-        short_unit: "%"
-        description_short: Official development assistance (ODA) divided by gross national income, expressed as a percentage. {definitions.short_net_disbursements}
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_gni}"
-          - "{definitions.key_oda_target}"
-          - "{definitions.key_net_disbursements}"
-          - "{definitions.key_oda_list_of_countries}"
-        description_from_producer: "{definitions.producer_oda}"
-        presentation:
-          title_public: Foreign aid given as a share of national income
-          title_variant: Net disbursements
-        display:
-          name: ODA (% of GNI) by donor - Net disbursements
-          numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
-          <<: *common_display
-
-      oda_share_gni_grant_equivalents:
-        title: ODA by donor (% of GNI) - Grant equivalents (shorter time series)
-        unit: "% of GNI"
-        short_unit: "%"
-        description_short: Official development assistance (ODA) divided by gross national income, expressed as a percentage. {definitions.short_grant_equivalents}
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_gni}"
-          - "{definitions.key_oda_target}"
-          - "{definitions.key_grant_equivalents}"
-          - "{definitions.key_oda_list_of_countries}"
-        description_from_producer: "{definitions.producer_oda}"
-        presentation:
-          title_public: Foreign aid given as a share of national income
-          title_variant: Grant equivalents
-        display:
-          name: ODA by donor (% of GNI) - Grant equivalents
-          numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
-          <<: *common_display
-
-      i_oda_net_disbursements_share_gni_2:
-        title: ODA by donor (% of GNI) - Net disbursements (calculated)
+      i_oda_net_disbursements_share_gni:
+        title: ODA by donor (% of GNI) - Net disbursements
         unit: "% of GNI"
         short_unit: "%"
         description_short: Official development assistance (ODA) divided by gross national income, expressed as a percentage. {definitions.short_net_disbursements}
@@ -354,7 +290,7 @@ tables:
           - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
-        description_processing: "{definitions.processing_share_gini}"
+        description_processing: "{definitions.processing_share_gni}"
         presentation:
           title_public: Foreign aid given as a share of national income
           title_variant: Net disbursements
@@ -364,8 +300,8 @@ tables:
           entityAnnotationsMap: *entity_annotations_alternative
           <<: *common_display
 
-      oda_grant_equivalents_share_gni_2:
-        title: ODA by donor (% of GNI) - Grant equivalents (calculated)
+      oda_grant_equivalents_share_gni:
+        title: ODA by donor (% of GNI) - Grant equivalents
         unit: "% of GNI"
         short_unit: "%"
         description_short: Official development assistance (ODA) divided by gross national income, expressed as a percentage. {definitions.short_grant_equivalents}
@@ -376,7 +312,7 @@ tables:
           - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
-        description_processing: "{definitions.processing_share_gini}"
+        description_processing: "{definitions.processing_share_gni}"
         presentation:
           title_public: Foreign aid given as a share of national income
           title_variant: Grant equivalents
@@ -387,7 +323,7 @@ tables:
           <<: *common_display
 
       oda_bilateral_grant_equivalents:
-        title: Bilateral ODA by donor - Grant equivalents (longer time series)
+        title: Bilateral ODA by donor - Grant equivalents
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
         description_short: "{definitions.short_oda_bilateral} {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
@@ -408,49 +344,7 @@ tables:
           <<: *common_display
 
       oda_multilateral_grant_equivalents:
-        title: Multilateral ODA by donor - Grant equivalents (longer time series)
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "{definitions.short_oda_multilateral} {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
-          - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
-        description_from_producer: "{definitions.producer_oda}"
-        presentation:
-          title_public: Multilateral ODA by donor
-          title_variant: Grant equivalents
-        display:
-          name: Multilateral ODA by donor - Grant equivalents
-          numDecimalPlaces: 0
-          entityAnnotationsMap: *entity_annotations_alternative
-          <<: *common_display
-
-      # NOTE: I am keeping the following two series only because we wait for the OECD to clarify differences with the longer time series version.
-      oda_bilateral_2_grant_equivalents:
-        title: Bilateral ODA by donor - Grant equivalents (shorter time series)
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "{definitions.short_oda_bilateral} {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_oda_bilateral}"
-          - "{definitions.key_grant_equivalents}"
-          - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
-        description_from_producer: "{definitions.producer_oda}"
-        presentation:
-          title_public: Bilateral ODA by donor
-          title_variant: Grant equivalents
-        display:
-          name: Bilateral ODA by donor - Grant equivalents
-          numDecimalPlaces: 0
-          entityAnnotationsMap: *entity_annotations_alternative
-          <<: *common_display
-
-      oda_multilateral_2_grant_equivalents:
-        title: Multilateral ODA by donor - Grant equivalents (shorter time series)
+        title: Multilateral ODA by donor - Grant equivalents
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
         description_short: "{definitions.short_oda_multilateral} {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
@@ -511,7 +405,7 @@ tables:
           <<: *common_display
 
       oda_grant_equivalents:
-        title: Official development assistance (ODA) by donor - Grant equivalents (longer time series)
+        title: Official development assistance (ODA) by donor - Grant equivalents
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
         description_short: "{definitions.short_oda} {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
@@ -633,25 +527,6 @@ tables:
 
 
       # From DAC2A dataset, but "inverted" to show data by donor
-      oda_inverted:
-        title: Official development assistance (ODA) by donor - Net disbursements (from recipient dataset)
-        unit: "constant {definitions.inflation_year} US$"
-        short_unit: "$"
-        description_short: "{definitions.short_oda} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
-          - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
-        description_from_producer: "{definitions.producer_oda}"
-        presentation:
-          title_public: Foreign aid given
-          title_variant: Net disbursements
-        display:
-          name: Official development assistance (ODA) by donor - Net disbursements
-          numDecimalPlaces: 0
-          <<: *common_display
-
       grants:
         title: Grants by donor
         unit: "constant {definitions.inflation_year} US$"

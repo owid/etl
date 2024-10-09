@@ -3,6 +3,7 @@ import datetime as dt
 import json
 import random
 import string
+from functools import cache
 from typing import Any, Dict, List, Optional
 
 import requests
@@ -13,7 +14,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from etl import grapher_model as gm
-from etl.config import GRAPHER_USER_ID, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA, GRAPHER_USER_ID, OWIDEnv
 
 log = structlog.get_logger()
 
@@ -26,15 +27,7 @@ def is_502_error(exception):
 class AdminAPI(object):
     def __init__(self, owid_env: OWIDEnv, grapher_user_id: Optional[int] = None):
         self.owid_env = owid_env
-        engine = owid_env.get_engine()
-        with Session(engine) as session:
-            if grapher_user_id:
-                user = session.get(gm.User, grapher_user_id)
-            else:
-                user = session.get(gm.User, GRAPHER_USER_ID)
-            assert user
-            self.session_id = _create_user_session(session, user.email)
-            session.commit()
+        self.session_id = create_session_id(owid_env, grapher_user_id)
 
     def _json_from_response(self, resp: requests.Response) -> dict:
         if resp.status_code != 200:
@@ -85,6 +78,9 @@ class AdminAPI(object):
         return js
 
     def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
+        # If schema is missing, use the default one
+        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
+
         # Retry in case we're restarting Admin on staging server
         resp = requests_with_retry().put(
             self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
@@ -92,7 +88,8 @@ class AdminAPI(object):
             json=grapher_config,
         )
         js = self._json_from_response(resp)
-        assert js["success"]
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "variable_id": variable_id, "grapher_config": grapher_config})
         return js
 
     def delete_grapher_config(self, variable_id: int) -> dict:
@@ -103,6 +100,21 @@ class AdminAPI(object):
         js = self._json_from_response(resp)
         assert js["success"]
         return js
+
+
+@cache
+def create_session_id(owid_env: OWIDEnv, grapher_user_id: Optional[int] = None) -> str:
+    engine = owid_env.get_engine()
+    with Session(engine) as session:
+        if grapher_user_id:
+            user = session.get(gm.User, grapher_user_id)
+        else:
+            user = session.get(gm.User, GRAPHER_USER_ID)
+        assert user
+        session_id = _create_user_session(session, user.email)
+        session.commit()
+
+    return session_id
 
 
 def requests_with_retry() -> requests.Session:

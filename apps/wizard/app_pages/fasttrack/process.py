@@ -44,10 +44,12 @@ def processing_part_1(import_method, dataset_uris, infer_metadata, is_private, _
     else:
         raise ValueError(f"Unknown import method: {import_method}")
 
-    # PROCES
+    # PROCESS
     if infer_metadata:
         st.write("Inferring metadata...")
         data, variables_meta_dict = _infer_metadata(data, variables_meta_dict)
+
+    data = _convert_percentages(data, variables_meta_dict)
 
     # VALIDATION
     st.write("Validating data and metadata...")
@@ -143,6 +145,14 @@ def processing_part_2(data, dataset_meta, variables_meta_dict, origin, dataset_u
         set_states({"to_be_submitted_confirmed_2": True})
 
     return fast_import
+
+
+def _convert_percentages(data: pd.DataFrame, variables_meta_dict: Dict[str, VariableMeta]) -> pd.DataFrame:
+    """Convert percentages to numbers."""
+    for col in data.columns:
+        if getattr(variables_meta_dict.get(col, {}), "unit", "") == "%":
+            data[col] = data[col].str.replace("%", "").astype(float)
+    return data
 
 
 def _validate_data(df: pd.DataFrame, variables_meta_dict: Dict[str, VariableMeta]) -> bool:
