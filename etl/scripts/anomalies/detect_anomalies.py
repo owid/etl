@@ -238,6 +238,8 @@ class AnomalyDetector:
     # New data is nan (regardless of any possible old data).
 
     def score_nan(self) -> pd.DataFrame:
+        # TODO: Currently, when creating self.df, we merge many variables on the same entity-year.
+        #  Therefore, there are certainly going to be nans in the dataframe that were not necessarily in the original indicator data. This function should only show original nans, but this complicates things a bit at this stage (and this type of anomaly doesn't seem very useful).
         # Create a dataframe of zeros.
         df_nan = self.df[INDEX_COLUMNS + self.variable_ids].isnull().astype(float)
         df_nan[INDEX_COLUMNS] = self.df[INDEX_COLUMNS].copy()
@@ -395,13 +397,15 @@ class AnomalyDetector:
         # Focus on the following specific analytics column.
         analytics_column = "views_14d"
 
-        # Get the average number of views in charts for each variable id in the last 14 days.
+        # Get the sum of the number of views in charts for each variable id in the last 14 days.
+        # So, if an indicator is used in multiple charts, their views are summed.
+        # This rewards indicators that are used multiple times, and on popular charts.
         # NOTE: The analytics table often contains nans. Not sure why this happens, e.g. to coal-electricity-per-capita: https://admin.owid.io/admin/charts/4451/edit
         #  For now, for convenience, fill them with 1.1 views (to avoid zeros when calculating the log).
         df_score_analytics = (
             self.df_views.fillna(1.1)
             .groupby("variable_id")
-            .agg({analytics_column: "mean"})
+            .agg({analytics_column: "sum"})
             .reset_index()
             .rename(columns={analytics_column: "views"})
         )
@@ -439,7 +443,7 @@ class AnomalyDetector:
             variable_name = self.metadata[variable_id]["shortName"]  # type: ignore
             country = row["country"]
             score_name = row["anomaly_type"]
-            title = f'{country} ({row["year"]} - {row["anomaly_score"]:.0%}) {variable_name}'
+            title = f'{country} ({row["year"]} - {score_name} {row["anomaly_score"]:.0%}) {variable_name}'
             new = self.df[self.df["entity_id"] == row["entity_id"]][["entity_id", "year", variable_id]]
             new["country"] = map_series(new["entity_id"], self.entity_id_to_name)
             new = new.drop(columns=["entity_id"]).rename(columns={row["variable_id"]: variable_name}, errors="raise")
@@ -513,11 +517,12 @@ if __name__ == "__main__":
 
     # Apply filters to select the most significant anomalies.
     anomalies = detector.df_scores.copy()
-    # anomalies = anomalies.loc[anomalies["anomaly_type"] == "version_change"].reset_index(drop=True)
-    anomalies = anomalies.loc[anomalies["anomaly_type"] == "time_change"].reset_index(drop=True)
+    # Anomalies of type "lost" and "nan" should not be shown, but rather appear in a small warning.
+    # For now, remove them from the list of anomalies to inspect.
+    anomalies = anomalies.loc[~anomalies["anomaly_type"].isin(["lost", "nan"])].reset_index(drop=True)
     # Renormalize scores based on the average population and analytics scores.
     anomalies["anomaly_score"] *= (anomalies["population_score"] + anomalies["analytics_score"]) * 0.5
-    anomalies = anomalies.sort_values("anomaly_score", ascending=False).reset_index(drop=True)
+    # anomalies = anomalies.sort_values("anomaly_score", ascending=False).reset_index(drop=True)
 
     # Inspect anomalies.
     detector.inspect_anomalies(anomalies=anomalies, n_anomalies=10)
