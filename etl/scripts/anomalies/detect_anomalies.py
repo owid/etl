@@ -366,7 +366,8 @@ class AnomalyDetector:
         # Add population score.
         self.add_population_score()
 
-        # TODO: Consider adding analytics (e.g. number of views for charts of each indicator) and create a score based on those.
+        # Add analytics score.
+        self.add_analytics_score()
 
     def add_population_score(self) -> None:
         # NOTE: This is a special type of score that is added afterwards to help rank anomalies.
@@ -391,8 +392,34 @@ class AnomalyDetector:
         )
 
     def add_analytics_score(self) -> None:
-        # TODO: Add a score based on the number of views of the charts of each indicator.
-        pass
+        # Focus on the following specific analytics column.
+        analytics_column = "views_14d"
+
+        # Get the average number of views in charts for each variable id in the last 14 days.
+        # NOTE: The analytics table often contains nans. Not sure why this happens, e.g. to coal-electricity-per-capita: https://admin.owid.io/admin/charts/4451/edit
+        #  For now, for convenience, fill them with 1.1 views (to avoid zeros when calculating the log).
+        df_score_analytics = (
+            self.df_views.fillna(1.1)
+            .groupby("variable_id")
+            .agg({analytics_column: "mean"})
+            .reset_index()
+            .rename(columns={analytics_column: "views"})
+        )
+        # To normalize the analytics score to the range 0, 1, divide by an absolute maximum number of views.
+        absolute_maximum_views = 1e6
+        error = f"Expected a maximum number of views below {absolute_maximum_views}. Change this limit."
+        assert self.df_views[analytics_column].max() < absolute_maximum_views, error
+        # To have more convenient numbers, take the natural logarithm of the views.
+        df_score_analytics["analytics_score"] = np.log(df_score_analytics["views"]) / np.log(absolute_maximum_views)
+
+        # Add analytics score to the main scores dataframe.
+        self.df_scores = self.df_scores.merge(
+            df_score_analytics[["variable_id", "analytics_score"]], on=["variable_id"], how="left"
+        )
+
+        # NOTE: Variables that have do not have charts will have an analytics score nan.
+        #  Fill them with zeros.
+        self.df_scores["analytics_score"] = self.df_scores["analytics_score"].fillna(0)
 
     ########################################################################################################################
 
@@ -486,10 +513,11 @@ if __name__ == "__main__":
 
     # Apply filters to select the most significant anomalies.
     anomalies = detector.df_scores.copy()
-    # Renormalize scores based on population.
-    anomalies["anomaly_score"] *= anomalies["population_score"]
     # anomalies = anomalies.loc[anomalies["anomaly_type"] == "version_change"].reset_index(drop=True)
     anomalies = anomalies.loc[anomalies["anomaly_type"] == "time_change"].reset_index(drop=True)
+    # Renormalize scores based on the average population and analytics scores.
+    anomalies["anomaly_score"] *= (anomalies["population_score"] + anomalies["analytics_score"]) * 0.5
+    anomalies = anomalies.sort_values("anomaly_score", ascending=False).reset_index(drop=True)
 
     # Inspect anomalies.
     detector.inspect_anomalies(anomalies=anomalies, n_anomalies=10)
