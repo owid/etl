@@ -34,6 +34,11 @@ ANOMALY_TYPE = Literal["sample", "gp"]
     help="Generate anomalies for a specific dataset ID.",
 )
 @click.option(
+    "--previous-dataset-id",
+    type=int,
+    help="Dataset ID of the previous version.",
+)
+@click.option(
     "--variable-id",
     type=int,
     multiple=True,
@@ -54,6 +59,7 @@ ANOMALY_TYPE = Literal["sample", "gp"]
 def cli(
     type: Optional[ANOMALY_TYPE],
     dataset_id: Optional[int],
+    previous_dataset_id: Optional[int],
     variable_id: Optional[int],
     dry_run: bool,
     reset_db: bool,
@@ -72,6 +78,12 @@ def cli(
 
     ```
     $ etl anomalist --type gp --dataset-id 6369
+    ```
+
+    **Example 3:** Create anomalies by comparing dataset to its previous version
+
+    ```
+    $ etl anomalist --type gp --previous-dataset-id 6322 --dataset-id 6589
     ```
     """
     engine = get_engine()
