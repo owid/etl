@@ -81,7 +81,7 @@ definitions:
     Capital subscriptions are payments to multilateral agencies in the form of notes and similar instruments, unconditionally encashable at any time by the recipient institutions. They are assimilated to grants in DAC statistics.
 
   key_oda_coverage_limits: |-
-    Official development assistance does not consider military aid, except for the cost of using armed forces to deliver humanitarian aid. It also excludes most peacekeeping expenditures, except for those closely related to development. Nuclear energy is included only if it is for civilian purposes, and cultural programs are eligible only if they build the cultural capacities of recipient countries.
+    Official development assistance does not include military aid, except for the cost of using armed forces to deliver humanitarian aid. It also excludes most peacekeeping expenditures, except for those closely related to development. Nuclear energy is included only if it is for civilian purposes, and cultural programs are eligible only if they build the cultural capacities of recipient countries.
 
   key_sector: |-
     <% if sector == "Humanitarian aid" %>
