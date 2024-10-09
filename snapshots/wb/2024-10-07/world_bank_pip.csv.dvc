@@ -25,6 +25,6 @@ meta:
       url: https://datacatalog.worldbank.org/search/dataset/0063646
 
 outs:
-  - md5: 60265050fdd0e6abb1d3cf43d48a894f
-    size: 36546508
+  - md5: 4ad49a5a75fe3b31fcfa1eef37fffe51
+    size: 37485368
     path: world_bank_pip.csv

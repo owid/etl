@@ -48,57 +48,6 @@ REGIONS_LIST = [
     "World (excluding India)",
 ]
 
-# Define columns that are not poverty (mostly inequality)
-NON_POVERTY_COLS = [
-    "country",
-    "year",
-    "reporting_level",
-    "welfare_type",
-    "gini",
-    "mld",
-    "decile1_share",
-    "decile2_share",
-    "decile3_share",
-    "decile4_share",
-    "decile5_share",
-    "decile6_share",
-    "decile7_share",
-    "decile8_share",
-    "decile9_share",
-    "decile10_share",
-    "bottom50_share",
-    "middle40_share",
-    "headcount_40_median",
-    "headcount_50_median",
-    "headcount_60_median",
-    "headcount_ratio_40_median",
-    "headcount_ratio_50_median",
-    "headcount_ratio_60_median",
-    "income_gap_ratio_40_median",
-    "income_gap_ratio_50_median",
-    "income_gap_ratio_60_median",
-    "poverty_gap_index_40_median",
-    "poverty_gap_index_50_median",
-    "poverty_gap_index_60_median",
-    "avg_shortfall_40_median",
-    "avg_shortfall_50_median",
-    "avg_shortfall_60_median",
-    "total_shortfall_40_median",
-    "total_shortfall_50_median",
-    "total_shortfall_60_median",
-    "poverty_severity_40_median",
-    "poverty_severity_50_median",
-    "poverty_severity_60_median",
-    "waits_40_median",
-    "waits_50_median",
-    "waits_60_median",
-    "palma_ratio",
-    "s80_s20_ratio",
-    "p90_p10_ratio",
-    "p90_p50_ratio",
-    "p50_p10_ratio",
-]
-
 # Define countries expected to have both income and consumption data
 COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
     "Albania",
@@ -162,8 +111,10 @@ def run(dest_dir: str) -> None:
     tb = calculate_inequality(tb)
 
     # Harmonize country names
-    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb_percentiles: Table = geo.harmonize_countries(df=tb_percentiles, countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb_percentiles = geo.harmonize_countries(df=tb_percentiles, countries_file=paths.country_mapping_path)
+
+    tb = harmonize_region_name(tb=tb)
 
     # Show regional data from 1990 onwards
     tb = regional_data_from_1990(tb, REGIONS_LIST)
@@ -384,6 +335,7 @@ def process_data(tb: Table) -> Table:
             "year",
             "reporting_level",
             "welfare_type",
+            "region_name",
             "survey_comparability",
             "comparable_spell",
             "reporting_pop",
@@ -1364,4 +1316,19 @@ def regional_data_from_1990(tb: Table, regions_list: list) -> Table:
 
     # Concatenate both tables
     tb = pr.concat([tb, tb_regions], ignore_index=True)
+    return tb
+
+
+def harmonize_region_name(tb: Table) -> Table:
+    """
+    Harmonize names in region_name, using the harmonizing tool, but removing the (PIP) suffix
+    """
+
+    tb = geo.harmonize_countries(
+        df=tb, country_col="region_name", countries_file=paths.country_mapping_path, warn_on_unused_countries=False
+    )
+
+    # Remove (PIP) from region_name
+    tb["region_name"] = tb["region_name"].str.replace(" \(PIP\)", "", regex=True)
+
     return tb
