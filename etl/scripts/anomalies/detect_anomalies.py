@@ -106,6 +106,19 @@ def load_variables_data_and_metadata(variable_ids: List[int]) -> Tuple[pd.DataFr
 ########################################################################################################################
 
 
+def estimate_bard_epsilon(series: pd.Series) -> float:
+    # Make all values positive, and ignore zeros.
+    positive_values = abs(series.dropna())
+    # Ignore zeros, since they can lead to epsilon being zero, hence allowing division by zero in BARD.
+    positive_values = positive_values.loc[positive_values > 0]
+    # Estimate epsilon as the absolute range of values divided by 10.
+    # eps = (positive_values.max() - positive_values.min()) / 10
+    # Instead of just taking maximum and minimum, take 95th percentile and 5th percentile.
+    eps = (positive_values.quantile(0.95) - positive_values.quantile(0.05)) / 10
+
+    return eps
+
+
 class AnomalyDetector:
     def __init__(self, variable_ids: List[int], variable_mapping: Dict[int, int]) -> None:
         self.variable_ids = variable_ids
@@ -182,12 +195,7 @@ class AnomalyDetector:
         df_version_change = self.df_zeros.copy()
         for variable_id_old, variable_id_new in self.variable_mapping.items():
             # Calculate the BARD epsilon for each variable.
-            positive_values = abs(self.df[variable_id_new].dropna())
-            positive_values = positive_values.loc[positive_values > 0]
-            # One way to calculate it would be to assume that the epsilon is the 10th percentile of each new indicator.
-            # eps = np.percentile(positive_values, q=0.1)
-            # Another way is to simply take the range of the positive values and divide it by 10.
-            eps = (positive_values.max() - positive_values.min()) / 10
+            eps = estimate_bard_epsilon(series=self.df[variable_id_new])
             # Calculate the BARD for each variable.
             variable_bard = bard(a=self.df[variable_id_old], b=self.df[variable_id_new], eps=eps)
             # Add bard to the dataframe.
@@ -203,12 +211,21 @@ class AnomalyDetector:
     def score_time_change(self) -> pd.DataFrame:
         # Create a dataframe of zeros.
         df_time_change = self.df_zeros.copy()
-        for col in variable_ids:
-            # TODO: This is not very meaningful, but for now it's a placeholder.
-            # Compute the Z-score for each value in the column.
-            z_score = abs(self.df[col] - self.df[col].mean()) / self.df[col].std()
-            # Rescale the Z-scores to be between 0 and 1 using a min-max scaling.
-            df_time_change[col] = (z_score - z_score.min()) / (z_score.max() - z_score.min())
+        # Sanity check.
+        error = "The function that detects abrupt time changes assumes the data is sorted by entity_id and year. But this is not the case. Either ensure the data is sorted, or fix the function."
+        assert (self.df.sort_values(by=INDEX_COLUMNS).index == self.df.index).all(), error
+        for variable_id in variable_ids:
+            series = self.df[variable_id].copy()
+            # Calculate the BARD epsilon for this variable.
+            eps = estimate_bard_epsilon(series=series)
+            # Calculate the BARD for this variable.
+            _bard = bard(series, series.shift(), eps).fillna(0)
+
+            # Add bard to the dataframe.
+            df_time_change[variable_id] = _bard
+        # The previous procedure includes the calculation of the deviation between the last point of an entity and the first point of the next, which is meaningless, and can lead to a high BARD.
+        # Therefore, make zero the first point of each entity_id for all columns.
+        df_time_change.loc[df_time_change["entity_id"].diff().fillna(1) > 0, variable_ids] = 0
 
         return df_time_change
 
@@ -290,8 +307,7 @@ class AnomalyDetector:
             variable_name = self.metadata[variable_id]["shortName"]  # type: ignore
             country = row["country"]
             score_name = row["anomaly_type"]
-            anomaly_year = row["year"]
-            anomaly_score = row["anomaly_score"]
+            title = f'{country} ({row["year"]} - {row["anomaly_score"]:.0%}) {variable_name}'
             new = self.df[self.df["entity_id"] == row["entity_id"]][["entity_id", "year", variable_id]]
             new["country"] = map_series(new["entity_id"], self.entity_id_to_name)
             new = new.drop(columns=["entity_id"]).rename(columns={row["variable_id"]: variable_name}, errors="raise")
@@ -310,7 +326,7 @@ class AnomalyDetector:
                     x="year",
                     y=variable_name,
                     color="source",
-                    title=f"{variable_name} - {country} ({anomaly_year} - {anomaly_score:.0%})",
+                    title=title,
                     markers=True,
                     color_discrete_map={"old": "rgba(256,0,0,0.5)", "new": "rgba(0,256,0,0.5)"},
                 ).show()
@@ -319,7 +335,7 @@ class AnomalyDetector:
                     new,
                     x="year",
                     y=variable_name,
-                    title=f"{variable_name} - {country} ({anomaly_year} - {anomaly_score:.0%})",
+                    title=title,
                     markers=True,
                     color_discrete_map={"new": "rgba(0,256,0,0.5)"},
                 ).show()
@@ -365,8 +381,8 @@ if __name__ == "__main__":
 
     # Apply filters to select the most significant anomalies.
     anomalies = detector.df_scores.copy()
-    anomalies = anomalies.loc[anomalies["anomaly_type"] == "version_change"].reset_index(drop=True)
-    # anomalies = anomalies.loc[anomalies["anomaly_type"] == "time_change"].reset_index(drop=True)
+    # anomalies = anomalies.loc[anomalies["anomaly_type"] == "version_change"].reset_index(drop=True)
+    anomalies = anomalies.loc[anomalies["anomaly_type"] == "time_change"].reset_index(drop=True)
 
     # Inspect anomalies.
     detector.inspect_anomalies(anomalies=anomalies, n_anomalies=10)
