@@ -818,3 +818,9 @@ steps:
     - data://meadow/cancer/2024-09-13/diagnosis_routes_survival
   data://grapher/cancer/2024-09-13/diagnosis_routes_survival:
     - data://garden/cancer/2024-09-13/diagnosis_routes_survival
+  data://meadow/antibiotics/2024-10-09/gram:
+    - snapshot://antibiotics/2024-10-09/gram.csv
+  data://garden/antibiotics/2024-10-09/gram:
+    - data://meadow/antibiotics/2024-10-09/gram
+  data://grapher/antibiotics/2024-10-09/gram:
+    - data://garden/antibiotics/2024-10-09/gram

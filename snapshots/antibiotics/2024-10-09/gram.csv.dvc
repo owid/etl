@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Research on Antimicrobial Resistance (GRAM)
+    description: |-
+      The Global Research on Antimicrobial Resistance (GRAM) Project is a partnership between the University of Oxford and the Institute for Health Metrics and Evaluation (IHME) at the University of Washington, to provide rigorous quantitative estimates of antimicrobial resistance (AMR) burden; to increase global-, regional-, and country-level awareness of AMR; to boost surveillance efforts, particularly in low and middle income countries (LMICs); and, to promote the rational use of antimicrobials worldwide.
+    date_published: "2021-11-11"
+    title_snapshot: Antibiotic usage and consumption
+    description_snapshot: |-
+      For modeled estimates of total antibiotic consumption: IQVIA MIDASTM database, [European Center for Disease Control](https://www.ecdc.europa.eu/en/about-us/partnerships-and-networks/disease-and-laboratory-networks/esac-net), World Health Organization, and published literature. 
+
+    # Citation
+    producer: Browne, Annie J et al.
+    citation_full: |-
+      Global antibiotic consumption and usage in humans, 2000–18: a spatial modelling study (2021). Browne, Annie J et al. The Lancet Planetary Health, Volume 5, Issue 12, e893 - e904
+
+    # Files
+    url_main: https://www.tropicalmedicine.ox.ac.uk/gram/research/visualisation-app-antibiotic-usage-and-consumption
+    url_download: https://livedataoxford.shinyapps.io/GRAM_antibiotic_consumption/_w_59524f59/session/c4df4585bfe080c0bf34698155a021e6/download/download_output?w=59524f59
+    date_accessed: 2024-10-09
+
+    # License
+    license:
+      name: © 2024 Global Research on Antimicrobial Resistance
+      url: https://www.ox.ac.uk/legal
+
+  
