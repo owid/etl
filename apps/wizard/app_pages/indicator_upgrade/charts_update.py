@@ -142,3 +142,48 @@ def save_variable_mapping(
         dataset_id_old=dataset_id_old,
         comments=comments,
     )
+
+
+def undo_indicator_upgrade(indicator_mapping):
+    mapping_inverted = {v: k for k, v in indicator_mapping.items()}
+    with st.spinner("Undoing upgrade..."):
+        # Get affected charts
+        charts = get_affected_charts_and_preview(
+            mapping_inverted,
+        )
+
+        # TODO: instead of pushing new charts, we should revert the changes!
+        # To do this, we should have kept a copy or reference to the original revision.
+        # Idea: when 'push_new_charts' is called, store in a table the original revision of the chart.
+        push_new_charts(charts)
+
+        # Reset variable mapping
+        WizardDB.delete_variable_mapping()
+
+
+@st.dialog("Undo upgrade", width="large")
+def undo_upgrade_dialog():
+    mapping = WizardDB.get_variable_mapping()
+
+    if mapping != {}:
+        st.markdown(
+            "The following table shows the indicator mapping that has been applied to the charts. Undoing means inverting this mapping."
+        )
+        data = {
+            "id_old": list(mapping.keys()),
+            "id_new": list(mapping.values()),
+        }
+        st.dataframe(data)
+        st.button(
+            "Undo upgrade",
+            on_click=lambda m=mapping: undo_indicator_upgrade(m),
+            icon=":material/undo:",
+            help="Undo all indicator upgrades",
+            type="primary",
+            key="btn_undo_upgrade_2",
+        )
+        st.warning(
+            "Charts will still appear in chart-diff. This is because the chart configs have actually changed (their version has beem bumped). In the future, we do not want to show these charts in chart-diff. For the time being, you should reject these chart diffs."
+        )
+    else:
+        st.markdown("No indicator mapping found. Nothing to undo.")
