@@ -71,7 +71,7 @@ def get_data_page_url() -> str:
         # The following port is defined in one of owid-grapher's config files.
         HOST = "localhost:3030"
     with get_session() as session:
-        VARIABLE_ID = gm.Variable.load_from_catalog_path(session, CATALOG_PATH).id
+        VARIABLE_ID = gm.Variable.from_catalog_path(session, CATALOG_PATH).id
     url = f"http://{HOST}/admin/datapage-preview/{VARIABLE_ID}"
     return url
 

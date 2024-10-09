@@ -259,7 +259,7 @@ def upsert_table(
     with Session(engine) as session:
         # compare checksums
         try:
-            db_variable = gm.Variable.load_from_catalog_path(session, catalog_path)
+            db_variable = gm.Variable.from_catalog_path(session, catalog_path)
         except NoResultFound:
             db_variable = None
 

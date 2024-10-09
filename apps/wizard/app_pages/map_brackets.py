@@ -15,7 +15,7 @@ from owid.datautils.common import ExceptionFromDocstring
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from apps.wizard.utils import chart_html
+from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
 from etl.explorer_helpers import Explorer
@@ -113,7 +113,7 @@ def load_variable_from_id(variable_id: int):
 @st.cache_data
 def load_variable_from_catalog_path(catalog_path: str):
     with Session(OWID_ENV.engine) as session:
-        variable = Variable.load_from_catalog_path(session=session, catalog_path=catalog_path)
+        variable = Variable.from_catalog_path(session=session, catalog_path=catalog_path)
 
     return variable
 
@@ -1040,7 +1040,7 @@ elif use_type == USE_TYPE_EXPLORERS:
         st.info(_create_maximum_instances_message(mb))
 
     # Display the chart.
-    chart_html(chart_config=mb.chart_config, owid_env=OWID_ENV, height=540)
+    grapher_chart(chart_config=mb.chart_config, owid_env=OWID_ENV, height=540)
 
     with st.sidebar:
         if edit_brackets and st.button("Save brackets in explorer file", type="primary"):

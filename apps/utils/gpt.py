@@ -24,7 +24,9 @@ MODEL_EQUIVALENCES = {
     "gpt-3.5-turbo": "gpt-3.5-turbo-0125",
     "gpt-4-turbo-preview": "gpt-4-0125-preview",
     "gpt-4-turbo": "gpt-4-turbo-2024-04-09",
-    "gpt-4o": "gpt-4o-2024-05-13",
+    "gpt-4o": "gpt-4o-2024-08-06",
+    "o1-preview": "o1-preview-2024-09-12",
+    "gpt-4o-mini": "gpt-4o-mini-2024-07-18",
 }
 MODEL_RATES_1000_TOKEN = {
     # GPT 3.5
@@ -58,6 +60,20 @@ MODEL_RATES_1000_TOKEN = {
     "gpt-4o-2024-05-13": {
         "in": 5 / 1000,
         "out": 15 / 1000,
+    },
+    "gpt-4o-2024-08-06": {
+        "in": 2.5 / 1000,
+        "out": 10 / 1000,
+    },
+    # GPTO 4o mini
+    "gpt-4o-mini-2024-07-18": {
+        "in": 0.150 / 1000,
+        "out": 0.600 / 1000,
+    },
+    # GPT o1
+    "o1-preview-2024-09-12": {
+        "in": 15 / 1000,
+        "out": 60 / 1000,
     },
 }
 MODEL_RATES_1000_TOKEN = {
