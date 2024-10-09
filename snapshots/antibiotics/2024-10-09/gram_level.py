@@ -3,7 +3,7 @@ Script to create a snapshot of dataset.
 To access the data go here:
 - https://www.tropicalmedicine.ox.ac.uk/gram/research/visualisation-app-antibiotic-usage-and-consumption
 - Click on the model estimates tab
-- Select the desired data slice, so Indicator = Total Antibiotic Consumption, Antibiotic grouping = All Antibiotics
+- Select the desired data slice, so Indicator = Total Antibiotic Consumption, Antibiotic grouping = ATC Level 3
 - Download the data
 
 """
