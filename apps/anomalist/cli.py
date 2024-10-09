@@ -13,19 +13,21 @@ from etl import grapher_model as gm
 from etl.db import get_engine, read_sql
 from etl.paths import CACHE_DIR
 
+from .bard_anomaly import NaNAnomalyDetector
 from .gp_anomaly import GPAnomalyDetector, SampleAnomalyDetector
 
 log = structlog.get_logger()
 
 memory = Memory(CACHE_DIR, verbose=0)
 
-ANOMALY_TYPE = Literal["sample", "gp"]
+ANOMALY_TYPE = Literal["sample", "gp", "nan"]
 
 
 @click.command(name="anomalist", cls=RichCommand, help=__doc__)
 @click.option(
     "--type",
     type=click.Choice(get_args(ANOMALY_TYPE)),
+    multiple=True,
     help="Type of anomaly detection algorithm to use.",
 )
 @click.option(
@@ -60,7 +62,7 @@ def cli(
     type: Optional[ANOMALY_TYPE],
     dataset_id: Optional[int],
     previous_dataset_id: Optional[int],
-    variable_id: Optional[int],
+    variable_id: Optional[list[int]],
     dry_run: bool,
     reset_db: bool,
 ) -> None:
@@ -101,36 +103,45 @@ def cli(
     # load metadata
     variables = _load_variables_meta(engine, dataset_id, variable_id)
 
-    assert len(variables) < 10, "Too many indicators to process."
+    # set dataset_id if we're using variables
+    if not dataset_id:
+        assert set(v.datasetId for v in variables) == {variables[0].datasetId}
+        dataset_id = variables[0].datasetId
 
     log.info("Detecting anomalies")
     anomalies = []
 
-    if type == "gp":
-        detector = GPAnomalyDetector()
-    elif type == "sample":
-        detector = SampleAnomalyDetector()
-    else:
-        raise ValueError(f"Unsupported anomaly type: {type}")
+    for typ in type:
+        if typ == "gp":
+            detector = GPAnomalyDetector()
+        elif typ == "sample":
+            detector = SampleAnomalyDetector()
+        elif typ == "nan":
+            detector = NaNAnomalyDetector()
+        else:
+            raise ValueError(f"Unsupported anomaly type: {typ}")
 
-    for variable in variables:
-        assert variable.catalogPath
-
-        # load dataframe
-        log.info("Loading data from S3", variable_id=variable.id)
-        df = load_data_for_variable(engine, variable)
+        # dataframe with (entityName, year) as index and variableId as columns
+        log.info("Loading data from S3")
+        df = load_data_for_variables(engine, variables)
 
         # detect anomalies
-        log.info("Detecting anomalies", variable_id=variable.id)
-        for df_score in detector.get_score_df(df, variable):
-            anomaly = gm.Anomaly(
-                datasetId=variable.datasetId,
-                anomalyType=detector.anomaly_type,
-                catalogPath=variable.catalogPath,
-            )
-            __import__("ipdb").set_trace()
-            anomaly.dfScore = df_score
-            anomalies.append(anomaly)
+        log.info("Detecting anomalies")
+        # the output has the same shape as the input dataframe, but we should make
+        # it possible to return anomalies in a long format (for detectors that return
+        # just a few anomalies)
+        df_score = detector.get_score_df(df, variables)
+
+        # validate format of the output dataframe
+        # TODO
+
+        anomaly = gm.Anomaly(
+            datasetId=dataset_id,
+            anomalyType=detector.anomaly_type,
+        )
+        anomaly.dfScore = df_score
+
+        anomalies.append(anomaly)
 
     if dry_run:
         for anomaly in anomalies:
@@ -139,8 +150,8 @@ def cli(
         with Session(engine) as session:
             log.info("Deleting existing anomalies")
             session.query(gm.Anomaly).filter(
-                gm.Anomaly.anomalyType == detector.anomaly_type,
-                gm.Anomaly.catalogPath.in_([v.catalogPath for v in variables]),
+                gm.Anomaly.datasetId == dataset_id,
+                gm.Anomaly.anomalyType.in_([a.anomalyType for a in anomalies]),
             ).delete(synchronize_session=False)
             session.commit()
 
@@ -151,27 +162,30 @@ def cli(
 
 
 # @memory.cache
-def load_data_for_variable(engine: Engine, variable: gm.Variable) -> pd.DataFrame:
+def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.DataFrame:
     # TODO: cache this on disk & re-validate with etags
-    df_long = variable_data_df_from_s3(engine, [variable.id])
+    df_long = variable_data_df_from_s3(engine, [v.id for v in variables])
 
     # pivot dataframe
-    df = df_long.pivot(index=["variableId", "year"], columns="entityName", values="value")
+    df = df_long.pivot(index=["entityName", "year"], columns="variableId", values="value")
 
-    # extract data for a single variable
-    df = df_long[df_long.variableId == variable.id].pivot(index="year", columns="entityName", values="value")
+    # reorder in the same order as variables
+    df = df[[v.id for v in variables]]
 
     # try converting to numeric
     df = df.astype(float)
 
+    # TODO:
     # remove countries with all nulls or all zeros or constant values
-    df = df.loc[:, df.fillna(0).std(axis=0) != 0]
+    # df = df.loc[:, df.fillna(0).std(axis=0) != 0]
 
     return df
 
 
 @memory.cache
-def _load_variables_meta(engine: Engine, dataset_id: Optional[int], variable_ids: Optional[int]) -> list[gm.Variable]:
+def _load_variables_meta(
+    engine: Engine, dataset_id: Optional[int], variable_ids: Optional[list[int]]
+) -> list[gm.Variable]:
     if dataset_id and variable_ids:
         raise ValueError("Cannot specify both dataset ID and variable IDs.")
 

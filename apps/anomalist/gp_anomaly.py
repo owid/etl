@@ -23,43 +23,40 @@ class AnomalyDetector:
 class SampleAnomalyDetector(AnomalyDetector):
     anomaly_type = "sample"
 
-    def get_score_df(self, df: pd.DataFrame, meta: gm.Variable) -> pd.DataFrame:
-        return pd.DataFrame(
-            {
-                "entity": [random.choice(df.columns)],
-                "year": [random.choice(df.index)],
-                "rawScore": [9.99],
-            }
-        )
+    def get_score_df(self, df: pd.DataFrame, variables: list[gm.Variable]) -> pd.DataFrame:
+        score_df = df.sample(1)
+        score_df.iloc[0, :] = [random.normalvariate(0, 1) for _ in range(df.shape[1])]
+        return score_df
 
 
 class GPAnomalyDetector(AnomalyDetector):
     anomaly_type = "gp"
 
-    def get_score_df(self, df: pd.DataFrame, meta: gm.Variable) -> pd.DataFrame:
-        anomalies = []
-        for country in df.columns:
-            series = df[country].dropna()
+    def get_score_df(self, df: pd.DataFrame, variables: list[gm.Variable]) -> pd.DataFrame:
+        score_df = df * np.nan
+        for variable_id in df.columns:
+            for _, group in df[variable_id].groupby("entityName", observed=True):
+                group = group.dropna()
 
-            if len(series) <= 1:
-                log.warning(f"Insufficient data for {country}")
-                continue
+                country = group.index.get_level_values("entityName")[0]
+                series = pd.Series(group.values, index=group.index.get_level_values("year"))
 
-            X, y = self.get_Xy(series)
+                if len(series) <= 1:
+                    log.warning(f"Insufficient data for {country}")
+                    continue
 
-            t = time.time()
-            mean_pred, std_pred = self.fit_predict(X, y)
-            log.info("Fitted GP", country=country, n_samples=len(X), elapsed=round(time.time() - t, 2))
+                X, y = self.get_Xy(series)
 
-            # Calculate Z-score for all points
-            z = (y - mean_pred) / std_pred
+                t = time.time()
+                mean_pred, std_pred = self.fit_predict(X, y)
+                log.info("Fitted GP", country=country, n_samples=len(X), elapsed=round(time.time() - t, 2))
 
-            # Return anomalies above threshold
-            for i, z_score in enumerate(z):
-                if np.abs(z_score) > 3:
-                    anomalies.append({"entity": country, "year": series.index[i], "rawScore": z_score})
+                # Calculate Z-score for all points
+                z = (y - mean_pred) / std_pred
 
-        return pd.DataFrame(anomalies)
+                score_df.loc[group.index, variable_id] = z
+
+        return score_df.abs()
 
     def get_Xy(self, series: pd.Series) -> tuple[np.ndarray, np.ndarray]:
         X = series.index.values.reshape(-1, 1)

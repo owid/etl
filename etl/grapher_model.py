@@ -1616,7 +1616,7 @@ class MultiDimDataPage(Base):
 
 class Anomaly(Base):
     __tablename__ = "anomalies"
-    __table_args__ = (Index("catalogPath", "catalogPath"),)
+    # __table_args__ = (Index("catalogPath", "catalogPath"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
@@ -1624,9 +1624,9 @@ class Anomaly(Base):
         DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
     )
     datasetId: Mapped[int] = mapped_column(Integer)
-    _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LargeBinary, default=None)
-    catalogPath: Mapped[str] = mapped_column(VARCHAR(255), default=None)
     anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
+    _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LargeBinary, default=None)
+    # catalogPath: Mapped[str] = mapped_column(VARCHAR(255), default=None)
     # NOTE: why do we need indicatorChecksum?
     # indicatorChecksum: Mapped[str] = mapped_column(VARCHAR(255), default=None)
     # globalScore: Mapped[float] = mapped_column(Float, default=None, nullable=True)
