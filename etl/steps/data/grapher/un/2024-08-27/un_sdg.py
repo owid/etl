@@ -52,11 +52,16 @@ def run(dest_dir: str) -> None:
         log.info("un_sdg.process", table_name=var)
 
         tb = ds_garden.read_table(var)
-        # meta = tb.metadata
 
         tb = create_table(tb)
+
+        # clean source name - this uses source column and hardcoded mapping in un_sdg.sources.json/ un_sdg.sources_additional.json
         tb["source_producer"] = clean_source_name(tb, load_clean_source_mapping(), load_additional_source_mapping())
+
+        # add short attribution, this uses mapping in un_sdg.sources_short.json
         tb["attribution_short"] = add_short_source_name(tb["source_producer"], load_short_source_mapping())
+
+        # add title of data product where applicable, otherwise this defaults to "multiple sources"
         tb["source_title"] = get_source(tb["source"])
 
         tb_var_gr = tb.groupby("variable_name")
@@ -109,23 +114,6 @@ def add_short_source_name(clean_source: pd.Series, short_source_map: Dict[str, s
     return short_source
 
 
-def get_source(raw_source: pd.Series) -> str:
-    """Get source for origin title and citation. Lists up to 3 sources, more are combined into 'multiple sources'.
-    Shortens title if it is too long."""
-    sources = raw_source.drop_duplicates()
-    if len(sources) == 1:
-        title = sources.iloc[0].strip()
-        if len(title) > 250:
-            title = title[:250] + "..."
-    elif len(sources) <= 3:
-        title = ", ".join([source_name for _, source_name in sources.items()])
-        if len(title) > 250:
-            title = "Data from multiple sources"
-    else:
-        title = "Data from multiple sources"
-    return title
-
-
 def load_source_description() -> dict:
     """
     Load the existing json which loads a more detailed source description for a selection of sources.
@@ -133,6 +121,18 @@ def load_source_description() -> dict:
     with open(paths.directory / "un_sdg.source_description.json", "r") as f:
         sources = json.load(f)
         return cast(Dict[str, str], sources)
+
+
+def get_source(raw_source: pd.Series) -> str:
+    """Get source for origin title and citation. Lists up to 3 sources, more are combined into 'Multiple sources'."""
+    sources = raw_source.drop_duplicates()
+    if len(sources) == 1 and len(sources.iloc[0].strip()) <= 250:
+        title = sources.iloc[0].strip
+    elif len(sources) <= 3 and len(", ".join([source_name.strip() for _, source_name in sources.items()])) <= 250:
+        title = ", ".join([source_name.strip() for _, source_name in sources.items()])
+    else:
+        title = "Data from multiple sources"
+    return title
 
 
 def create_metadata_desc(indicator: str, series_code: str, source_desc: dict, series_description: str) -> str:
@@ -167,15 +167,20 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
         indicator=indicator, series_code=series_code, source_desc=source_desc, series_description=series_description
     )
     tb.short_name = tb["variable_name"].iloc[0]
-
     source_in_tb = tb["source_producer"].iloc[0]
-    title_in_tb = tb["source_title"].iloc[0]
+    title_in_tb = get_source(tb["source_title"])
+
+    # construct citation including link to metadata pdf
+    metadata_link = get_metadata_link(indicator)
+    citation_for_indicator = f"{source_in_tb} via UN SDG Indicators Database (https://unstats.un.org/sdgs/dataportal), UN Department of Economic and Social Affairs (accessed {CURRENT_YEAR})."
+    if metadata_link != "no metadata found":
+        citation_for_indicator += f"{metadata_link}."
 
     origin = Origin(
         producer=source_in_tb,
         title=title_in_tb,
         description="The United Nations Sustainable Development Goal (SDG) dataset is the primary collection of data tracking progress towards the SDG indicators, compiled from officially-recognized international sources.",
-        citation_full=f"{title_in_tb} via UN SDG Indicators Database, UN Department of Economic and Social Affairs ({CURRENT_YEAR})",
+        citation_full=citation_for_indicator,
         date_accessed=DATE_ACCESSED,
         url_main="https://unstats.un.org/sdgs/dataportal",
         url_download="https://unstats.un.org/sdgapi",
