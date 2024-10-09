@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import requests
+from owid.catalog import find
 from owid.datautils.dataframes import map_series, multi_merge
 from sqlalchemy.orm import Session
 from tqdm.auto import tqdm
@@ -106,6 +107,21 @@ def load_variables_data_and_metadata(variable_ids: List[int]) -> Tuple[pd.DataFr
 ########################################################################################################################
 
 
+def load_latest_population():
+    # NOTE: The "channels" parameter of the find function is not working well.
+    candidates = find("population", channels=("grapher",), dataset="population", namespace="demography").sort_values(
+        "version", ascending=False
+    )
+    population = (
+        candidates[(candidates["table"] == "population") & (candidates["channel"] == "grapher")]
+        .iloc[0]
+        .load()
+        .reset_index()[["country", "year", "population"]]
+    )
+
+    return population
+
+
 def estimate_bard_epsilon(series: pd.Series) -> float:
     # Make all values positive, and ignore zeros.
     positive_values = abs(series.dropna())
@@ -157,6 +173,9 @@ class AnomalyDetector:
         # Create a dataframe of zeros, that will be used for each data anomaly type.
         self.df_zeros = pd.DataFrame(np.zeros_like(self.df), columns=self.df.columns)[INDEX_COLUMNS + variable_ids]
         self.df_zeros[INDEX_COLUMNS] = self.df[INDEX_COLUMNS].copy()
+
+        # Load the latest population data from the catalog.
+        self.df_population = load_latest_population()
 
     ########################################################################################################################
 
@@ -273,21 +292,48 @@ class AnomalyDetector:
             df_scores.append(_df_score)
 
         # Aggregate anomalies.
-        df_score = pd.concat(df_scores, ignore_index=True)
+        df_scores = pd.concat(df_scores, ignore_index=True)
 
-        # For convenience, add country and indicator names.
-        df_score["country"] = map_series(
-            df_score["entity_id"], self.entity_id_to_name, warn_on_missing_mappings=True, warn_on_unused_mappings=True
+        # Add country and indicator names.
+        df_scores["country"] = map_series(
+            df_scores["entity_id"], self.entity_id_to_name, warn_on_missing_mappings=True, warn_on_unused_mappings=True
         )
-        df_score["variable"] = map_series(
-            df_score["variable_id"],
+        df_scores["variable"] = map_series(
+            df_scores["variable_id"],
             {variable_id: self.metadata[variable_id]["shortName"] for variable_id in self.metadata},  # type: ignore
             warn_on_missing_mappings=True,
             warn_on_unused_mappings=False,
         )
 
-        # NOTE: Here, we could include population data, or analytics (e.g. number of views for charts of each indicator) and create a score based on those.
-        self.df_scores = df_score
+        # Update the scores dataframe.
+        self.df_scores = df_scores
+
+        # Add population score.
+        self.add_population_score()
+
+        # TODO: Consider adding analytics (e.g. number of views for charts of each indicator) and create a score based on those.
+
+    def add_population_score(self) -> None:
+        # NOTE: This is a special type of score that is added afterwards to help rank anomalies.
+        #  It would not make sense to calculate a population score at the beginning and select the largest anomalies based on it (which would trivially pick the most populated countries).
+
+        # First, get the unique combinations of country-years in the scores dataframe, and add population to it.
+        df_score_population = (
+            self.df_scores[["country", "year"]]
+            .drop_duplicates()
+            .merge(self.df_population, on=["country", "year"], how="left")
+        )
+        # To normalize the population score to the range 0, 1, divide by an absolute maximum population of 10 billion.
+        # To have more convenient numbers, take the natural logarithm of the population.
+        df_score_population["population_score"] = np.log(df_score_population["population"]) / np.log(10e9)
+        # It's unclear what to do with entities that do not have a population (e.g. "Middle East").
+        # For now, add a score of 0.5 to them.
+        df_score_population["population_score"] = df_score_population["population_score"].fillna(0.5)
+
+        # Add population score to the main scores dataframe.
+        self.df_scores = self.df_scores.merge(
+            df_score_population[["country", "year", "population_score"]], on=["country", "year"], how="left"
+        )
 
     ########################################################################################################################
 
@@ -381,6 +427,8 @@ if __name__ == "__main__":
 
     # Apply filters to select the most significant anomalies.
     anomalies = detector.df_scores.copy()
+    # Renormalize scores based on population.
+    anomalies["anomaly_score"] *= anomalies["population_score"]
     # anomalies = anomalies.loc[anomalies["anomaly_type"] == "version_change"].reset_index(drop=True)
     anomalies = anomalies.loc[anomalies["anomaly_type"] == "time_change"].reset_index(drop=True)
 
