@@ -64,6 +64,7 @@ dependencies = [
     "owid-datautils",
     "owid-repack",
     "walden",
+    "deprecated>=1.2.14",
     "scikit-learn>=1.5.2",
 ]
 

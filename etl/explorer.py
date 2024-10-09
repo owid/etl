@@ -15,8 +15,8 @@ import pandas as pd
 from structlog import get_logger
 
 from etl import config
-from etl.db import get_variables_data
 from etl.files import upload_file_to_server
+from etl.grapher_io import get_variables_data
 from etl.paths import EXPLORERS_DIR
 
 # Initialize logger.

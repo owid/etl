@@ -113,7 +113,7 @@ def load_variable_from_id(variable_id: int):
 @st.cache_data
 def load_variable_from_catalog_path(catalog_path: str):
     with Session(OWID_ENV.engine) as session:
-        variable = Variable.load_from_catalog_path(session=session, catalog_path=catalog_path)
+        variable = Variable.from_catalog_path(session=session, catalog_path=catalog_path)
 
     return variable
 

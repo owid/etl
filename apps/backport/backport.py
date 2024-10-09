@@ -14,7 +14,6 @@ from sqlalchemy.orm import Session
 from apps.backport.datasync.data_metadata import (
     _variable_metadata,
     variable_data,
-    variable_data_df_from_s3,
 )
 from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config, paths
@@ -22,6 +21,7 @@ from etl import grapher_model as gm
 from etl.backport_helpers import GrapherConfig
 from etl.db import get_engine, read_sql
 from etl.files import checksum_str
+from etl.grapher_io import variable_data_df_from_s3
 from etl.snapshot import Snapshot, SnapshotMeta
 
 from . import utils
