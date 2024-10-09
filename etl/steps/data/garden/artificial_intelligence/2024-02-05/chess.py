@@ -19,6 +19,12 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Filter Elo_rating to keep only values higher than the previous one
+    def assign_previous_if_lower(group):
+        group["Elo_rating"] = group["Elo_rating"].cummax()
+        return group
+
+    tb = tb.groupby("Entity").apply(assign_previous_if_lower)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["entity", "year"], verify_integrity=True).sort_index()

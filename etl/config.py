@@ -221,6 +221,9 @@ GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 # Skip SSL verify
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
+# Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.005.json"
+
 
 def enable_bugsnag() -> None:
     if BUGSNAG_API_KEY:
@@ -422,11 +425,11 @@ class OWIDEnv:
         We'd just have to test when to use suffix `.tail6e23.ts.net` because of
         collisions with LXC addresses.
         """
-        if self.env == "production":
+        if self.env_remote == "production":
             return TAILSCALE_ADMIN_HOST + "/admin/api"
-        elif self.env == "staging":
+        elif self.env_remote == "staging":
             return f"http://{self.conf.DB_HOST}.tail6e23.ts.net/admin/api"
-        elif self.env == "dev":
+        elif self.env_remote == "dev":
             return "http://localhost:3000/admin/api"
         else:
             raise ValueError(f"Unknown environment: {self.env}")
