@@ -12,9 +12,9 @@ meta:
       For modeled estimates of total antibiotic consumption: IQVIA MIDASTM database, [European Center for Disease Control](https://www.ecdc.europa.eu/en/about-us/partnerships-and-networks/disease-and-laboratory-networks/esac-net), World Health Organization, and published literature.
 
     # Citation
-    producer: Browne, Annie J et al.
+    producer: Browne AJ et al.
     citation_full: |-
-      Global antibiotic consumption and usage in humans, 2000–18: a spatial modelling study (2021). Browne, Annie J et al. The Lancet Planetary Health, Volume 5, Issue 12, e893 - e904
+      Browne AJ, Chipeta MG, Haines-Woodhouse G, et al. Global antibiotic consumption and usage in humans, 2000 to 2018: a spatial modelling study. Lancet Planetary Health 2021.
 
     # Files
     url_main: https://www.tropicalmedicine.ox.ac.uk/gram/research/visualisation-app-antibiotic-usage-and-consumption
@@ -26,6 +26,6 @@ meta:
       url: https://www.ox.ac.uk/legal
 
 outs:
-  - md5: 22e65ee7cdad037135d4c28230170886
-    size: 117215
+  - md5: cba36cfb97bf8f7c10784f828ab02815
+    size: 122715
     path: gram.csv
