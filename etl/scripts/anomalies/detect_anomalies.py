@@ -54,6 +54,57 @@ def load_entity_mapping(entity_ids: List[int]) -> Dict[int, str]:
 
 ########################################################################################################################
 
+# TODO: Move to etl.db or elsewhere after refactoring.
+import warnings
+
+import pymysql
+
+from etl.db import get_connection
+
+
+def get_variables_views_in_charts(
+    variable_ids: List[int], db_conn: Optional[pymysql.Connection] = None
+) -> pd.DataFrame:
+    if db_conn is None:
+        db_conn = get_connection()
+
+    # Assumed base url for all charts.
+    base_url = "https://ourworldindata.org/grapher/"
+
+    # SQL query to join variables, charts, and analytics pageviews data
+    query = f"""\
+    SELECT
+        v.id AS variable_id,
+        c.id AS chart_id,
+        cc.slug AS chart_slug,
+        ap.views_7d,
+        ap.views_14d,
+        ap.views_365d
+    FROM
+        charts c
+    JOIN
+        chart_dimensions cd ON c.id = cd.chartId
+    JOIN
+        variables v ON cd.variableId = v.id
+    JOIN
+        chart_configs cc ON c.configId = cc.id
+    LEFT JOIN
+        analytics_pageviews ap ON ap.url = CONCAT('{base_url}', cc.slug)
+    WHERE
+        v.id IN ({', '.join([str(v_id) for v_id in variable_ids])})
+    ORDER BY
+        v.id ASC;
+    """
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        df = pd.read_sql(query, con=db_conn)
+
+    # Handle potential duplicated rows
+    df = df.drop_duplicates().reset_index(drop=True)
+
+    return df
+
 
 def _load_variable_data_and_metadata(variable_id: int) -> Tuple[pd.DataFrame, Dict[str, Any]]:
     # Load variable for the current variable id.
@@ -176,6 +227,10 @@ class AnomalyDetector:
 
         # Load the latest population data from the catalog.
         self.df_population = load_latest_population()
+
+        # Get variable views in charts.
+        # TODO: How should the connection be handled here?
+        self.df_views = get_variables_views_in_charts(variable_ids=self.variable_ids)
 
     ########################################################################################################################
 
@@ -334,6 +389,10 @@ class AnomalyDetector:
         self.df_scores = self.df_scores.merge(
             df_score_population[["country", "year", "population_score"]], on=["country", "year"], how="left"
         )
+
+    def add_analytics_score(self) -> None:
+        # TODO: Add a score based on the number of views of the charts of each indicator.
+        pass
 
     ########################################################################################################################
 
