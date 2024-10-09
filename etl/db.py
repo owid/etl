@@ -7,6 +7,7 @@ from urllib.parse import quote
 import pandas as pd
 import pymysql
 import structlog
+from deprecated import deprecated
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
@@ -24,6 +25,7 @@ def can_connect(conf: Optional[Dict[str, Any]] = None) -> bool:
         return False
 
 
+@deprecated("This function is deprecated. Instead, look at using etl.db.read_sql function.")
 def get_connection(conf: Optional[Dict[str, Any]] = None) -> pymysql.Connection:
     "Connect to the Grapher database."
     cf: Any = dict_to_object(conf) if conf else config
