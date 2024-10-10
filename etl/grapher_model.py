@@ -57,6 +57,7 @@ from sqlalchemy.dialects.mysql import (
     TINYINT,
     VARCHAR,
 )
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # type: ignore
@@ -108,6 +109,14 @@ class Base(MappedAsDataclass, DeclarativeBase):
             setattr(x, k, v)
 
         return x
+
+    @classmethod
+    def create_table(cls, engine: Engine):
+        # Drop the table if it exists
+        cls.__table__.drop(engine, checkfirst=True)  # type: ignore
+
+        # Create table
+        cls.__table__.create(engine)  # type: ignore
 
 
 class Entity(Base):
@@ -1717,8 +1726,10 @@ class Anomaly(Base):
     datasetId: Mapped[int] = mapped_column(Integer)
     anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
     _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LargeBinary, default=None)
+    path_file: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     # catalogPath: Mapped[str] = mapped_column(VARCHAR(255), default=None)
     # NOTE: why do we need indicatorChecksum?
+    # Answer: This can be useful to assign an anomaly to a specific snapshot of the indicator. Unclear if we need it atm, but maybe in the future...
     # indicatorChecksum: Mapped[str] = mapped_column(VARCHAR(255), default=None)
     # globalScore: Mapped[float] = mapped_column(Float, default=None, nullable=True)
     # gptInfo: Mapped[Optional[dict]] = mapped_column(JSON, default=None, nullable=True)
@@ -1742,6 +1753,10 @@ class Anomaly(Base):
             feather.write_feather(value, buffer, compression="zstd")
             buffer.seek(0)
             self._dfScore = buffer.read()
+
+    @classmethod
+    def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
+        return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
