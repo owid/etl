@@ -1,3 +1,5 @@
+import time
+from pathlib import Path
 from typing import Literal, Optional, get_args
 
 import click
@@ -8,8 +10,11 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
+from apps.wizard.utils.paths import WIZARD_ANOMALIES_RELATIVE
 from etl import grapher_model as gm
+from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
+from etl.files import create_folder, upload_file_to_server
 from etl.grapher_io import variable_data_df_from_s3
 from etl.paths import CACHE_DIR
 
@@ -92,10 +97,7 @@ def cli(
 
     if reset_db:
         # Drop the 'anomalies' table if it exists
-        gm.Anomaly.__table__.drop(engine, checkfirst=True)  # type: ignore
-
-        # Create the 'anomalies' table
-        gm.Anomaly.__table__.create(engine)  # type: ignore
+        gm.Anomaly.create_table(engine)
         return
 
     assert type, "Anomaly type must be specified."
@@ -139,7 +141,10 @@ def cli(
             datasetId=dataset_id,
             anomalyType=detector.anomaly_type,
         )
-        anomaly.dfScore = df_score
+        anomaly.dfScore = None
+
+        # Export anomaly file
+        anomaly.path_file = export_anomalies_file(df_score, dataset_id)
 
         anomalies.append(anomaly)
 
@@ -159,6 +164,26 @@ def cli(
             log.info("Writing anomalies to database")
             session.add_all(anomalies)
             session.commit()
+
+
+def export_anomalies_file(df: pd.DataFrame, dataset_id: int) -> str:
+    """Export anomaly df to local file (and upload to staging server if applicable)."""
+    filename = f"{dataset_id}_{int(time.time())}.feather"
+    path = Path(f".anomalies/{filename}")
+    path_str = str(path)
+    if OWID_ENV.env_local == "staging":
+        create_folder(path.parent)
+        df.to_feather(path_str)
+    elif OWID_ENV.env_local == "dev":
+        # tmp_filename = Path("tmp.feather")
+        create_folder(path.parent)
+        df.to_feather(path)
+        upload_file_to_server(path, f"owid@{OWID_ENV.name}:/home/owid/etl/{WIZARD_ANOMALIES_RELATIVE}")
+    else:
+        raise ValueError(
+            f"Unsupported environment: {OWID_ENV.env_local}. Did you try production? That's not supported!"
+        )
+    return path_str
 
 
 # @memory.cache

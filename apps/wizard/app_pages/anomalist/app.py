@@ -75,7 +75,7 @@ ANOMALIES = [
     },
 ]
 ANOMALIES = ANOMALIES + ANOMALIES + ANOMALIES + ANOMALIES
-DATASETS_DEBUG = ["grapher/energy/2024-06-20/energy_mix"]
+DATASETS_DEBUG = ["grapher/energy/2024-06-20/energy_mix"]  # 6590
 
 # PAGE TITLE
 st.title(":material/planner_review: Anomalist")
@@ -109,6 +109,8 @@ with st.container(border=True):
     st.markdown("##### Select filters")
     indicator_uris = []
     if len(st.session_state.datasets_selected) > 0:
+        # Load anomalies
+        anomalies = cached.load_anomalies_in_dataset([6590])
         st.session_state.indicators = cached.load_variables_in_dataset(
             st.session_state.datasets_selected,
         )
