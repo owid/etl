@@ -15,6 +15,7 @@ log = get_logger()
 
 
 # TODO: Consider refactoring the following function, which does too many things.
+@st.cache_data(show_spinner=False)
 @st.spinner("Retrieving datasets...")
 def get_datasets_and_mapping_inputs() -> Tuple[pd.DataFrame, List[Dict[str, Dict[str, Any]]], Dict[int, int]]:
     # NOTE: The following ignores DB datasets that are archived (which is a bit unexpected).
