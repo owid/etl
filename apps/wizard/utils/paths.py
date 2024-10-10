@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from etl.paths import BASE_DIR
 
 WIZARD_CFG_NAME = ".wizardcfg"
@@ -12,6 +14,8 @@ WIZARD_VARIABLES_DEFAULTS_OLD = BASE_DIR / ".wizard"
 # PATH WIZARD DEFAULTS (new)
 WIZARD_VARIABLES_DEFAULTS = WIZARD_CFG / "defaults.json"
 WIZARD_DB = WIZARD_CFG / WIZARD_DB_NAME
+WIZARD_ANOMALIES_RELATIVE = Path(WIZARD_CFG_NAME) / "anomalies"
+WIZARD_ANOMALIES = WIZARD_CFG / "anomalies"
 
 # STREAMLIT SECRETS
 STREAMLIT_SECRETS = BASE_DIR / ".streamlit" / "secrets.toml"

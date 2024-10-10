@@ -160,8 +160,8 @@ if st.session_state.submitted_datasets:
                 # Save variable mapping
                 save_variable_mapping(
                     indicator_mapping,
-                    int(search_form.dataset_old_id),
                     int(search_form.dataset_new_id),
+                    int(search_form.dataset_old_id),
                     comments="Done with indicator-upgrader",
                 )
 

@@ -2,10 +2,11 @@ from typing import Any, Dict, List, Optional
 
 import pandas as pd
 import streamlit as st
+from sqlalchemy.orm import Session
 
 from etl import grapher_io as gio
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher_model import Variable
+from etl.grapher_model import Anomaly, Variable
 
 
 @st.cache_data
@@ -64,3 +65,13 @@ def load_variable_data(
         variable=variable,
         owid_env=_owid_env,
     )
+
+
+@st.cache_data
+def load_anomalies_in_dataset(
+    dataset_ids: List[int],
+    _owid_env: OWIDEnv = OWID_ENV,
+) -> List[Anomaly]:
+    """Load Anomaly objects that belong to a dataset with URI `dataset_uri`."""
+    with Session(_owid_env.engine) as session:
+        return Anomaly.load_anomalies(session, dataset_ids)
