@@ -11,14 +11,14 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("gram.csv")
+    snap = paths.load_snapshot("gram_children.csv")
 
     # Load data from snapshot.
     tb = snap.read()
 
     #
     # Process data.
-    tb = tb.rename(columns={"Location": "country", "Year": "year"}, errors="raise")
+    tb = tb.rename(columns={"Country": "country", "Year": "year"}, errors="raise")
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])
 

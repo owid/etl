@@ -826,3 +826,19 @@ steps:
     - data://meadow/antibiotics/2024-10-09/gram
   data://grapher/antibiotics/2024-10-09/gram:
     - data://garden/antibiotics/2024-10-09/gram
+
+  #Antibiotics data - by level
+  data://meadow/antibiotics/2024-10-09/gram_level:
+    - snapshot://antibiotics/2024-10-09/gram_level.csv
+  data://garden/antibiotics/2024-10-09/gram_level:
+    - data://meadow/antibiotics/2024-10-09/gram_level
+  data://grapher/antibiotics/2024-10-09/gram_level:
+    - data://garden/antibiotics/2024-10-09/gram_level
+
+  #Antibiotics data - children
+  data://meadow/antibiotics/2024-10-09/gram_children:
+    - snapshot://antibiotics/2024-10-09/gram_children.csv
+  data://garden/antibiotics/2024-10-09/gram_children:
+    - data://meadow/antibiotics/2024-10-09/gram_children
+  data://grapher/antibiotics/2024-10-09/gram_children:
+    - data://garden/antibiotics/2024-10-09/gram_children

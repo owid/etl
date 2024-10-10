@@ -3,7 +3,7 @@ Script to create a snapshot of dataset.
 To access the data go here:
 - https://www.tropicalmedicine.ox.ac.uk/gram/research/visualisation-app-antibiotic-usage-and-consumption
 - Click on the model estimates tab
-- Select the desired data slice, so Indicator = Total Antibiotic Consumption, Antibiotic grouping = All Antibiotics
+- Select the desired data slice, so Indicator = Total Antibiotic Consumption, Antibiotic grouping = ATC Level 3
 - Download the data
 
 """
@@ -23,7 +23,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"antibiotics/{SNAPSHOT_VERSION}/gram.csv")
+    snap = Snapshot(f"antibiotics/{SNAPSHOT_VERSION}/gram_level.csv")
 
     snap.create_snapshot(filename=path_to_file, upload=upload)
 
