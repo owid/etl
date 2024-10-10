@@ -202,7 +202,7 @@ class AnomalyDetector:
 
         # Anomaly methods to use.
         self.anomaly_methods = {
-            "nan": self.score_nan,
+            # "nan": self.score_nan,
             "lost": self.score_lost,
             "version_change": self.score_version_change,
             "time_change": self.score_time_change,
@@ -222,7 +222,7 @@ class AnomalyDetector:
         self.entity_id_to_name = load_entity_mapping(entity_ids=list(set(self.df["entity_id"])))
 
         # Create a dataframe of zeros, that will be used for each data anomaly type.
-        self.df_zeros = pd.DataFrame(np.zeros_like(self.df), columns=self.df.columns)[INDEX_COLUMNS + variable_ids]
+        self.df_zeros = pd.DataFrame(np.zeros_like(self.df), columns=self.df.columns)[INDEX_COLUMNS + self.variable_ids]
         self.df_zeros[INDEX_COLUMNS] = self.df[INDEX_COLUMNS].copy()
 
         # Load the latest population data from the catalog.
