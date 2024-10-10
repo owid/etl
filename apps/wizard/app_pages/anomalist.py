@@ -28,7 +28,7 @@ ANOMALY_TYPES = [
         "icon": ":material/hide_source",
     },
     {
-        "title": "LLM detections",
+        "title": "AI",
         "color": "rainbow",
         "icon": ":material/lightbulb",
     },
@@ -53,10 +53,10 @@ YEAR_MIN = 1950
 YEAR_MAX = 2021
 ANOMALIES = [
     {
-        "title": "Coal consumption - Angola - 1983",
+        "title": "Coal consumption - Malaysia - 1983",
         "description": "There are 12 missing points that used to be informed in the previous version",
         "category": "Missing point",
-        "country": "Angola",
+        "country": "Malaysia",
         "year": 1983,
     },
     {
@@ -67,14 +67,15 @@ ANOMALIES = [
         "year": 2000,
     },
     {
-        "title": "Gas production - Ireland - 2000",
-        "description": "There are 2 abrupt changes in the time series.",
-        "category": "LLM detections",
-        "country": "Ireland",
-        "year": 2000,
+        "title": "Nuclear production - France - 2010",
+        "description": "There is 1 abrupt changes in the time series.",
+        "category": "AI",
+        "country": "France",
+        "year": 2010,
     },
 ]
-DATASETS_DEBUG = ["grapher/biodiversity/2024-09-30/living_planet_index"]
+ANOMALIES = ANOMALIES + ANOMALIES + ANOMALIES + ANOMALIES
+DATASETS_DEBUG = ["grapher/energy/2024-06-20/energy_mix"]
 
 # PAGE TITLE
 st.title(":material/planner_review: Anomalist")
@@ -140,7 +141,7 @@ with st.container(border=True):
         # Anomaly sorting
         st.multiselect(
             label="Anomaly type",
-            options=ANOMALY_TYPES,
+            options=ANOMALY_TYPE_NAMES,
             # default=ANOMALY_TYPES,
         )
 
@@ -173,7 +174,8 @@ def show_anomaly(anomaly, indicator):
             st.markdown(f"##### {anomaly['title']}")
             st.markdown(f"{anomaly['description']}")
         with col2:
-            grapher_chart(variable_id=indicator.id)
+            # st.write(indicator.id)
+            grapher_chart(variable_id=indicator.id, selected_entities=[anomaly["country"]])
 
 
 def trigger_dialog_for_df_selection(df: pd.DataFrame):
