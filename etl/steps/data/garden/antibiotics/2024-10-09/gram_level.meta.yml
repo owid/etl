@@ -21,11 +21,5 @@ tables:
         unit: DDD per 1,000 people per day
         display:
           numDecimalPlaces: 1
-      lower_uncertainty_interval:
-        title: Lower uncertainty interval for << atc_level_3_class >>
-        unit: DDD per 1,000 people per day
-      upper_uncertainty_interval:
-        title: Upper uncertainty interval for << atc_level_3_class >>
-        unit: DDD per 1,000 people per day
 
 

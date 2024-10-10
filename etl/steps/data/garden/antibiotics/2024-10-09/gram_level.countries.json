@@ -41,12 +41,10 @@
   "Congo": "Congo",
   "Cook Islands": "Cook Islands",
   "Costa Rica": "Costa Rica",
-  "Cote d'Ivoire": "Cote d'Ivoire",
   "Croatia": "Croatia",
   "Cuba": "Cuba",
   "Cyprus": "Cyprus",
   "Czech Republic": "Czechia",
-  "Democratic Republic of the Congo": "Democratic Republic of Congo",
   "Denmark": "Denmark",
   "Djibouti": "Djibouti",
   "Dominica": "Dominica",
@@ -149,7 +147,6 @@
   "Rwanda": "Rwanda",
   "Saint Kitts and Nevis": "Saint Kitts and Nevis",
   "Saint Lucia": "Saint Lucia",
-  "Saint Vincent and the Grenadines": "Saint Vincent and the Grenadines",
   "Samoa": "Samoa",
   "San Marino": "San Marino",
   "Sao Tome and Principe": "Sao Tome and Principe",
@@ -202,5 +199,9 @@
   "Yemen": "Yemen",
   "Zambia": "Zambia",
   "Zimbabwe": "Zimbabwe",
-  "The Gambia": "Gambia"
+  "The Gambia": "Gambia",
+  "Cote D'Ivoire": "Cote d'Ivoire",
+  "Saint Vincent and The Grenadines": "Saint Vincent and the Grenadines",
+  "Democratic Republic Of The Congo": "Democratic Republic of Congo",
+  "Federated States Of Micronesia": "Micronesia (country)"
 }

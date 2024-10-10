@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year", "atc_level_3_class"])
 
     #
     # Save outputs.

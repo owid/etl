@@ -4,10 +4,10 @@ definitions:
     presentation:
       topic_tags:
         - Antibiotics
-  unit: "%"
-  short_unit: "%"
-  display:
-          numDecimalPlaces: 1
+    unit: "%"
+    short_unit: "%"
+    display:
+      numDecimalPlaces: 1
 
 
 # Learn more about the available fields:
@@ -22,9 +22,9 @@ tables:
       antibiotic_usage__pct:
         title: Antibiotic usage
 
-      lower_uncertainty_interval:
+      lower_uncertainty_interval__pct:
         title: Lower uncertainty interval
-      upper_uncertainty_interval:
+      upper_uncertainty_interval__pct:
         title: Upper uncertainty interval
 
 

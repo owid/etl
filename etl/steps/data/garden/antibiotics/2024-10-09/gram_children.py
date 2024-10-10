@@ -15,14 +15,12 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("gram_children")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["gram"].reset_index()
+    tb = ds_meadow["gram_children"].reset_index()
 
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.format(["country", "year"])
 
     #
