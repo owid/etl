@@ -108,15 +108,15 @@ sections:
         image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
         disable:
           production: True
-      # - title: "Anomalist"
-      #   alias: anomalist
-      #   entrypoint: app_pages/anomalist_2.py
-      #   description: List anomalies in data
-      #   maintainer: "@lucas"
-      #   icon: ":material/planner_review:"
-      #   image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
-      #   disable:
-      #     production: True
+      - title: "Anomalist"
+        alias: anomalist
+        entrypoint: app_pages/anomalist_2.py
+        description: List anomalies in data
+        maintainer: "@lucas"
+        icon: ":material/planner_review:"
+        image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
+        disable:
+          production: True
       - title: "Harmonizer"
         alias: harmonizer
         description: "Harmonize a column of a table"
