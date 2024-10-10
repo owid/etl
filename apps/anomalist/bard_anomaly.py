@@ -1,7 +1,6 @@
 import pandas as pd
 
 from etl import grapher_model as gm
-from etl.scripts.anomalies.detect_anomalies import AnomalyDetector as ADetector
 
 from .gp_anomaly import AnomalyDetector
 

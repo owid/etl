@@ -13,7 +13,6 @@ Another option is to run `show create table mytable;` in MySQL and then ask Chat
 
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
 """
-
 import copy
 import io
 import json
@@ -30,13 +29,13 @@ import structlog
 from deprecated import deprecated
 from owid import catalog
 from owid.catalog.meta import VARIABLE_TYPE
+from pyarrow import feather
 from sqlalchemy import (
     CHAR,
     BigInteger,
     Computed,
     Date,
     DateTime,
-    Float,
     ForeignKey,
     ForeignKeyConstraint,
     Index,

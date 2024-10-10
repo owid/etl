@@ -1,7 +1,7 @@
 import random
 import time
 import warnings
-from typing import Optional
+from typing import Optional, cast
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,7 +24,7 @@ class SampleAnomalyDetector(AnomalyDetector):
     anomaly_type = "sample"
 
     def get_score_df(self, df: pd.DataFrame, variables: list[gm.Variable]) -> pd.DataFrame:
-        score_df = df.sample(1)
+        score_df = cast(pd.DataFrame, df.sample(1))
         score_df.iloc[0, :] = [random.normalvariate(0, 1) for _ in range(df.shape[1])]
         return score_df
 
@@ -56,7 +56,9 @@ class GPAnomalyDetector(AnomalyDetector):
 
                 score_df.loc[group.index, variable_id] = z
 
-        return score_df.abs()
+        score_df = cast(pd.DataFrame, score_df)
+
+        return score_df.abs()  # type: ignore
 
     def get_Xy(self, series: pd.Series) -> tuple[np.ndarray, np.ndarray]:
         X = series.index.values.reshape(-1, 1)
@@ -95,7 +97,7 @@ class GPAnomalyDetector(AnomalyDetector):
 
         # Denormalize
         mean_pred = mean_pred * y_std + y_mean
-        std_pred = std_pred * y_std
+        std_pred = std_pred * y_std  # type: ignore
 
         return mean_pred, std_pred
 

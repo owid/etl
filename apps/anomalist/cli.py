@@ -8,9 +8,9 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from apps.backport.datasync.data_metadata import variable_data_df_from_s3
 from etl import grapher_model as gm
 from etl.db import get_engine, read_sql
+from etl.grapher_io import variable_data_df_from_s3
 from etl.paths import CACHE_DIR
 
 from .bard_anomaly import NaNAnomalyDetector
