@@ -1,0 +1,63 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ons_migration_estimates:
+    variables:
+      emigration_estimate:
+        title: Estimate of the annual number of emigrants
+        description_short: The number of people who are estimated to have emigrated from the UK in a given year.
+        unit: people
+        short_unit: ""
+      emigration_lower_bound:
+        title: Lower bound of the estimate of the annual number of emigrants
+        description_short: The lower bound (95% confidence interval) of the number of people who are estimated to have emigrated from the UK in a given year.
+        unit: people
+        short_unit: ""
+      emigration_upper_bound:
+        title: Upper bound of the estimate of the annual number of emigrants
+        description_short: The upper bound (95% confidence interval) of the number of people who are estimated to have emigrated from the UK in a given year.
+        unit: people
+        short_unit: ""
+      immigration_estimate:
+        title: Estimate of the annual number of immigrants
+        description_short: The number of people who are estimated to have immigrated to the UK in a given year.
+        unit: people
+        short_unit: ""
+      immigration_lower_bound:
+        title: Lower bound of the estimate of the annual number
+        description_short: The lower bound (95% confidence interval) of the number of people who are estimated to have immigrated to the UK in a given year.
+        unit: people
+        short_unit: ""
+      immigration_upper_bound:
+        title: Upper bound of the estimate of the annual number
+        description_short: The upper bound (95% confidence interval) of the number of people who are estimated to have immigrated to the UK in a given year.
+        unit: people
+        short_unit: ""
+      net_estimate:
+        title: Estimate of the annual net migration
+        description_short: The difference between the number of people who are estimated to have immigrated to the UK and the number of people who are estimated to have emigrated from the UK in a given year.
+        unit: people
+        short_unit: ""
+      net_lower_bound:
+        title: Lower bound of the estimate of the annual net migration
+        description_short: The lower bound (95% confidence interval) of the difference between the number of people who are estimated to have immigrated to the UK and the number of people who are estimated to have emigrated from the UK in a given year.
+        unit: people
+        short_unit: ""
+      net_upper_bound:
+        title: Upper bound of the estimate of the annual net migration
+        description_short: The upper bound (95% confidence interval) of the difference between the number of people who are estimated to have immigrated to the UK and the number of people who are estimated to have emigrated from the UK in a given year.
+        unit: people
+        short_unit: ""
+
