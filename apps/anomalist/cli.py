@@ -1,3 +1,4 @@
+import tempfile
 from pathlib import Path
 from typing import Literal, Optional, get_args
 
@@ -175,9 +176,10 @@ def export_anomalies_file(df: pd.DataFrame, dataset_id: int, anomaly_type: str) 
         df.to_feather(path_str)
     elif OWID_ENV.env_local == "dev":
         # tmp_filename = Path("tmp.feather")
-        create_folder(path.parent)
-        df.to_feather(path)
-        upload_file_to_server(path, f"owid@{OWID_ENV.name}:/home/owid/etl/{WIZARD_ANOMALIES_RELATIVE}")
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_file_path = Path(tmp_dir) / filename
+            df.to_feather(tmp_file_path)
+            upload_file_to_server(tmp_file_path, f"owid@{OWID_ENV.name}:/home/owid/etl/{WIZARD_ANOMALIES_RELATIVE}")
     else:
         raise ValueError(
             f"Unsupported environment: {OWID_ENV.env_local}. Did you try production? That's not supported!"
