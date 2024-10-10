@@ -14,6 +14,8 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("energy_mix")
     tb_garden = ds_garden["energy_mix"]
 
+    tb_garden.metadata.title = "Energy Mix TEST"
+
     #
     # Save outputs.
     #
