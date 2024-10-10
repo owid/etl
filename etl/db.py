@@ -79,3 +79,19 @@ def read_sql(sql: str, engine: Optional[Engine | Session] = None, *args, **kwarg
             return pd.read_sql(sql, engine.bind, *args, **kwargs)
         else:
             raise ValueError(f"Unsupported engine type {type(engine)}")
+
+
+def to_sql(df: pd.DataFrame, name: str, engine: Optional[Engine | Session] = None, *args, **kwargs):
+    """Wrapper around pd.to_sql that creates a connection and closes it after reading the data.
+    This adds overhead, so if you need performance, reuse the same connection and cursor.
+    """
+    engine = engine or get_engine()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        if isinstance(engine, Engine):
+            with engine.connect() as con:
+                return df.to_sql(name, con, *args, **kwargs)
+        elif isinstance(engine, Session):
+            return df.to_sql(name, engine.bind, *args, **kwargs)
+        else:
+            raise ValueError(f"Unsupported engine type {type(engine)}")

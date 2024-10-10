@@ -56,7 +56,16 @@ def load_variable(
     id_or_path: str | int,
     owid_env: OWIDEnv = OWID_ENV,
 ) -> Variable:
-    """Load variable"""
+    """Load variable.
+
+    If id_or_path is str, it'll be used as catalog path.
+    """
+    if not isinstance(id_or_path, str):
+        try:
+            id_or_path = int(id_or_path)
+        except Exception:
+            pass
+
     with Session(owid_env.engine) as session:
         variable = Variable.from_id_or_path(
             session=session,
