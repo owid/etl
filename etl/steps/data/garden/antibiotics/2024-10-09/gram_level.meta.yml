@@ -21,5 +21,6 @@ tables:
         unit: DDD per 1,000 people per day
         display:
           numDecimalPlaces: 1
+          name: << atc_level_3_class >>
 
 
