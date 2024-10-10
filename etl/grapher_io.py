@@ -581,12 +581,6 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
             f"but other channels were found: {unknown_channels}"
         )
 
-    # Create a column with the step name.
-    # First assume all steps are public (hence starting with "data://").
-    # Then edit private steps so they start with "data-private://".
-    df["step"] = ["data://" + "/".join(etl_path.split("#")[0].split("/")[:-1]) for etl_path in df["etl_path"]]
-    df.loc[df["is_private"], "step"] = df[df["is_private"]]["step"].str.replace("data://", "data-private://")
-
     return df
 
 
