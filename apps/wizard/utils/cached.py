@@ -10,7 +10,7 @@ from etl.grapher_model import Variable
 
 @st.cache_data
 def load_dataset_uris() -> List[str]:
-    return load_dataset_uris()
+    return io.load_dataset_uris()
 
 
 @st.cache_data
@@ -19,7 +19,7 @@ def load_variables_in_dataset(
     _owid_env: OWIDEnv = OWID_ENV,
 ) -> List[Variable]:
     """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
-    return load_variables_in_dataset(dataset_uri, _owid_env)
+    return io.load_variables_in_dataset(dataset_uri, _owid_env)
 
 
 @st.cache_data

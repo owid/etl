@@ -10,6 +10,7 @@ from structlog import get_logger
 import etl.grapher_model as gm
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.utils import set_states, st_page_link, st_toast_error
+from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
 from etl.helpers import get_schema_from_url
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
@@ -130,3 +131,59 @@ def push_new_charts(charts: List[gm.Chart]) -> None:
             "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
         )
         st_page_link("chart-diff")
+
+
+def save_variable_mapping(
+    indicator_mapping: Dict[int, int], dataset_id_new: int, dataset_id_old: int, comments: str = ""
+) -> None:
+    WizardDB.add_variable_mapping(
+        mapping=indicator_mapping,
+        dataset_id_new=dataset_id_new,
+        dataset_id_old=dataset_id_old,
+        comments=comments,
+    )
+
+
+def undo_indicator_upgrade(indicator_mapping):
+    mapping_inverted = {v: k for k, v in indicator_mapping.items()}
+    with st.spinner("Undoing upgrade..."):
+        # Get affected charts
+        charts = get_affected_charts_and_preview(
+            mapping_inverted,
+        )
+
+        # TODO: instead of pushing new charts, we should revert the changes!
+        # To do this, we should have kept a copy or reference to the original revision.
+        # Idea: when 'push_new_charts' is called, store in a table the original revision of the chart.
+        push_new_charts(charts)
+
+        # Reset variable mapping
+        WizardDB.delete_variable_mapping()
+
+
+@st.dialog("Undo upgrade", width="large")
+def undo_upgrade_dialog():
+    mapping = WizardDB.get_variable_mapping()
+
+    if mapping != {}:
+        st.markdown(
+            "The following table shows the indicator mapping that has been applied to the charts. Undoing means inverting this mapping."
+        )
+        data = {
+            "id_old": list(mapping.keys()),
+            "id_new": list(mapping.values()),
+        }
+        st.dataframe(data)
+        st.button(
+            "Undo upgrade",
+            on_click=lambda m=mapping: undo_indicator_upgrade(m),
+            icon=":material/undo:",
+            help="Undo all indicator upgrades",
+            type="primary",
+            key="btn_undo_upgrade_2",
+        )
+        st.warning(
+            "Charts will still appear in chart-diff. This is because the chart configs have actually changed (their version has beem bumped). In the future, we do not want to show these charts in chart-diff. For the time being, you should reject these chart diffs."
+        )
+    else:
+        st.markdown("No indicator mapping found. Nothing to undo.")
