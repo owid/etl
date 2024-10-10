@@ -1,4 +1,3 @@
-import time
 from pathlib import Path
 from typing import Literal, Optional, get_args
 
@@ -144,7 +143,7 @@ def cli(
         anomaly.dfScore = None
 
         # Export anomaly file
-        anomaly.path_file = export_anomalies_file(df_score, dataset_id)
+        anomaly.path_file = export_anomalies_file(df_score, dataset_id, detector.anomaly_type)
 
         anomalies.append(anomaly)
 
@@ -166,9 +165,9 @@ def cli(
             session.commit()
 
 
-def export_anomalies_file(df: pd.DataFrame, dataset_id: int) -> str:
+def export_anomalies_file(df: pd.DataFrame, dataset_id: int, anomaly_type: str) -> str:
     """Export anomaly df to local file (and upload to staging server if applicable)."""
-    filename = f"{dataset_id}_{int(time.time())}.feather"
+    filename = f"{dataset_id}_{anomaly_type}.feather"
     path = Path(f".anomalies/{filename}")
     path_str = str(path)
     if OWID_ENV.env_local == "staging":
