@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 
 from apps.wizard.utils import cached
-from apps.wizard.utils.components import grapher_chart, st_horizontal
+from apps.wizard.utils.components import grapher_chart
 
 # PAGE CONFIG
 st.set_page_config(
