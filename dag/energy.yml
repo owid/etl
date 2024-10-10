@@ -210,3 +210,11 @@ steps:
   #
   export://multidim/energy/latest/energy:
     - grapher://grapher/energy/2024-06-20/primary_energy_consumption
+
+########################################################################################################################
+  # TODO: REMOVE, THESE ARE TEMPORARY DUPLICATES FOR TESTING PURPOSES.
+  data://grapher/energy/2024-10-09/energy_mix:
+    - data://garden/energy/2024-06-20/energy_mix
+  data://grapher/energy/2024-10-10/electricity_mix:
+    - data://garden/energy/2024-06-20/electricity_mix
+########################################################################################################################
