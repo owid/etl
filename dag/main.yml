@@ -812,9 +812,17 @@ steps:
   data://garden/migration/2024-10-09/important_issues:
     - snapshot://migration/2024-10-09/important_issues.csv
 
-
+# Office of national statistics, UK migration estimates
   data://grapher/migration/2024-10-09/important_issues:
     - data://garden/migration/2024-10-09/important_issues
+  data://meadow/migration/2024-10-10/ons_migration_estimates:
+    - snapshot://migration/2024-10-10/ons_migration_estimates.xlsx
+
+
+  data://garden/migration/2024-10-10/ons_migration_estimates:
+    - data://meadow/migration/2024-10-10/ons_migration_estimates
+  data://grapher/migration/2024-10-10/ons_migration_estimates:
+    - data://garden/migration/2024-10-10/ons_migration_estimates
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
