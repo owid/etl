@@ -114,46 +114,52 @@ with st.container(border=True):
         )
         indicator_uris = cached.get_variable_uris(st.session_state.indicators, True)
 
-    # Entity
-    st.session_state.anomalist_filter_entities = st.multiselect(
-        label="Entities",
-        options=ENTITIES,
-        help="Show anomalies affecting only a selection of entities.",
-    )
+    col1, col2 = st.columns([10, 2])
     # Indicator
-    st.session_state.anomalist_filter_indicators = st.multiselect(
-        label="Indicators",
-        options=indicator_uris,
-        help="Show anomalies affecting only a selection of indicators.",
-    )
-    # Years
-    st.slider(
-        label="Years",
-        min_value=YEAR_MIN,
-        max_value=YEAR_MAX,
-        value=(YEAR_MIN, YEAR_MAX),
-        help="Show anomalies occuring in a particular time range.",
-    )
+    with col1:
+        st.session_state.anomalist_filter_indicators = st.multiselect(
+            label="Indicators",
+            options=indicator_uris,
+            help="Show anomalies affecting only a selection of indicators.",
+        )
+
+    with col2:
+        # Entity
+        st.session_state.anomalist_filter_entities = st.multiselect(
+            label="Entities",
+            options=ENTITIES,
+            help="Show anomalies affecting only a selection of entities.",
+        )
 
     # Anomaly type
-
-    with st_horizontal():
-        # Anomaly sorting
-        st.multiselect(
-            label="Anomaly type",
-            options=ANOMALY_TYPE_NAMES,
-            # default=ANOMALY_TYPES,
+    col1, col2 = st.columns([10, 3])
+    with col1:
+        st.slider(
+            label="Years",
+            min_value=YEAR_MIN,
+            max_value=YEAR_MAX,
+            value=(YEAR_MIN, YEAR_MAX),
+            help="Show anomalies occuring in a particular time range.",
         )
-
-        # Anomaly sorting
-        st.multiselect(
-            label="Sort by",
-            options=[
-                "Anomaly score",
-                "Population",
-                "Chart views",
-            ],
-        )
+    with col2:
+        col21, col22 = st.columns(2)
+        with col21:
+            # Anomaly sorting
+            st.multiselect(
+                label="Anomaly type",
+                options=ANOMALY_TYPE_NAMES,
+                # default=ANOMALY_TYPES,
+            )
+        with col22:
+            # Anomaly sorting
+            st.multiselect(
+                label="Sort by",
+                options=[
+                    "Anomaly score",
+                    "Population",
+                    "Chart views",
+                ],
+            )
 
     # st.multiselect("Anomaly type", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
     # st.number_input("Minimum score", min_value=0.0, max_value=1.0, value=0.5, step=0.01)

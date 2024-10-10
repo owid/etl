@@ -17,6 +17,12 @@ def get_variable_uris(indicators: List[Variable], only_slug: Optional[bool] = Fa
 
 
 @st.cache_data
+def load_dataset_uris_new_in_server() -> List[str]:
+    """Load URIs of datasets that are new in staging server."""
+    return gio.load_dataset_uris()
+
+
+@st.cache_data
 def load_dataset_uris() -> List[str]:
     return gio.load_dataset_uris()
 
