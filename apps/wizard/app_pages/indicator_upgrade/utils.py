@@ -1,5 +1,5 @@
 """Utils for chart revision tool."""
-from typing import Any, Dict, List, Tuple, cast
+from typing import Dict, Tuple, cast
 
 import pandas as pd
 import streamlit as st
@@ -7,13 +7,11 @@ from pymysql import OperationalError
 from rapidfuzz import fuzz
 from structlog import get_logger
 
-from apps.utils.map_datasets import get_grapher_changes
+from apps.wizard.utils.cached import get_datasets_from_version_tracker
 from etl import config
 from etl.db import get_connection
-from etl.git_helpers import get_changed_files
 from etl.grapher_io import get_all_datasets, get_dataset_charts, get_variables_in_dataset
 from etl.match_variables import find_mapping_suggestions, preliminary_mapping
-from etl.version_tracker import VersionTracker
 
 # Logger
 log = get_logger()
@@ -102,37 +100,6 @@ def get_datasets(archived) -> pd.DataFrame:
     steps_df_grapher["step"] = steps_df_grapher["step"].fillna("")
 
     return steps_df_grapher
-
-
-@st.cache_data(show_spinner=False)
-def get_datasets_from_version_tracker() -> Tuple[pd.DataFrame, List[Dict[str, Any]]]:
-    # Get steps_df
-    vt = VersionTracker()
-    assert vt.connect_to_db, "Can't connnect to database! You need to be connected to run indicator upgrader"
-    steps_df = vt.steps_df
-
-    # Get file changes -> Infer dataset migrations
-    files_changed = get_changed_files()
-    grapher_changes = get_grapher_changes(files_changed, steps_df)
-
-    # Only keep grapher steps
-    steps_df_grapher = steps_df.loc[
-        steps_df["channel"] == "grapher", ["namespace", "identifier", "step", "db_dataset_name", "db_dataset_id"]
-    ]
-    # Remove unneded text from 'step' (e.g. '*/grapher/'), no need for fuzzymatch!
-    steps_df_grapher["step_reduced"] = steps_df_grapher["step"].str.split("grapher/").str[-1]
-
-    ## Keep only those that are in DB (we need them to be in DB, otherwise indicator upgrade won't work since charts wouldn't be able to reference to non-db-existing indicator IDs)
-    steps_df_grapher = steps_df_grapher.dropna(subset="db_dataset_id")
-    assert steps_df_grapher.isna().sum().sum() == 0
-    ## Column rename
-    steps_df_grapher = steps_df_grapher.rename(
-        columns={
-            "db_dataset_name": "name",
-            "db_dataset_id": "id",
-        }
-    )
-    return steps_df_grapher, grapher_changes
 
 
 def get_datasets_from_db() -> pd.DataFrame:
