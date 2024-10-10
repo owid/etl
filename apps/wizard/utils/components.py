@@ -9,7 +9,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher_io import load_variable_data
+from etl.grapher_io import ensure_load_variable, load_variable_data
 from etl.grapher_model import Variable
 
 HORIZONTAL_STYLE = """<style class="hide-element">
@@ -154,25 +154,28 @@ def grapher_chart(
     height : int, optional
         Height of the chart, by default 600
     """
-    # Check we have all needed to plot the chart
-    if (catalog_path is None) and (variable_id is None) and (variable is None) and (chart_config is None):
-        raise ValueError("Either catalog_path, variable_id, variable or chart_config must be provided")
-
     # Get data / metadata if no chart config is provided
     if chart_config is None:
-        # Get variable data
-        df = load_variable_data(
-            catalog_path=catalog_path, variable_id=variable_id, variable=variable, owid_env=owid_env
-        )
-
         # Define chart config
         chart_config = deepcopy(CONFIG_BASE)
-        chart_config["dimensions"] = [{"property": "y", "variableId": variable_id}]
+
+        # Tweak config
+        if variable_id is not None:
+            chart_config["dimensions"] = [{"property": "y", "variableId": variable_id}]
+        else:
+            variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
+            chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
 
         ## Selected entities?
         if selected_entities is not None:
             chart_config["selectedEntityNames"] = selected_entities
         else:
+            # Get variable data
+            if variable_id is not None:
+                df = load_variable_data(variable_id=variable_id, owid_env=owid_env)
+            else:
+                df = load_variable_data(variable=variable, owid_env=owid_env)
+            # Pick selected entities
             entities = list(df["entity"].unique())
             chart_config["selectedEntityNames"] = sample(entities, min(len(entities), num_sample_selected_entities))
 

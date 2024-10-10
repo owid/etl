@@ -3,14 +3,28 @@ from typing import Any, Dict, List, Optional
 import pandas as pd
 import streamlit as st
 
-from etl import grapher_io as io
+from etl import grapher_io as gio
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher_model import Variable
 
 
 @st.cache_data
+def get_variable_uris(indicators: List[Variable], only_slug: Optional[bool] = False) -> List[str]:
+    options = [o.catalogPath for o in indicators]
+    if only_slug:
+        options = [o.rsplit("/", 1)[-1] if isinstance(o, str) else "" for o in options]
+    return options  # type: ignore
+
+
+@st.cache_data
+def load_dataset_uris_new_in_server() -> List[str]:
+    """Load URIs of datasets that are new in staging server."""
+    return gio.load_dataset_uris()
+
+
+@st.cache_data
 def load_dataset_uris() -> List[str]:
-    return io.load_dataset_uris()
+    return gio.load_dataset_uris()
 
 
 @st.cache_data
@@ -19,7 +33,7 @@ def load_variables_in_dataset(
     _owid_env: OWIDEnv = OWID_ENV,
 ) -> List[Variable]:
     """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
-    return io.load_variables_in_dataset(dataset_uri, _owid_env)
+    return gio.load_variables_in_dataset(dataset_uri, _owid_env)
 
 
 @st.cache_data
@@ -29,7 +43,7 @@ def load_variable_metadata(
     variable: Optional[Variable] = None,
     _owid_env: OWIDEnv = OWID_ENV,
 ) -> Dict[str, Any]:
-    return io.load_variable_metadata(
+    return gio.load_variable_metadata(
         catalog_path=catalog_path,
         variable_id=variable_id,
         variable=variable,
@@ -44,7 +58,7 @@ def load_variable_data(
     variable: Optional[Variable] = None,
     _owid_env: OWIDEnv = OWID_ENV,
 ) -> pd.DataFrame:
-    return io.load_variable_data(
+    return gio.load_variable_data(
         catalog_path=catalog_path,
         variable_id=variable_id,
         variable=variable,
