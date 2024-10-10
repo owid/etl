@@ -13,8 +13,8 @@ Another option is to run `show create table mytable;` in MySQL and then ask Chat
 
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
 """
-
 import copy
+import io
 import json
 import random
 from datetime import date, datetime
@@ -29,6 +29,7 @@ import structlog
 from deprecated import deprecated
 from owid import catalog
 from owid.catalog.meta import VARIABLE_TYPE
+from pyarrow import feather
 from sqlalchemy import (
     CHAR,
     BigInteger,
@@ -39,6 +40,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Integer,
+    LargeBinary,
     SmallInteger,
     String,
     and_,
@@ -1701,6 +1703,45 @@ class MultiDimDataPage(Base):
         else:
             session.add(self)
             return self
+
+
+class Anomaly(Base):
+    __tablename__ = "anomalies"
+    # __table_args__ = (Index("catalogPath", "catalogPath"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
+    datasetId: Mapped[int] = mapped_column(Integer)
+    anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
+    _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LargeBinary, default=None)
+    # catalogPath: Mapped[str] = mapped_column(VARCHAR(255), default=None)
+    # NOTE: why do we need indicatorChecksum?
+    # indicatorChecksum: Mapped[str] = mapped_column(VARCHAR(255), default=None)
+    # globalScore: Mapped[float] = mapped_column(Float, default=None, nullable=True)
+    # gptInfo: Mapped[Optional[dict]] = mapped_column(JSON, default=None, nullable=True)
+    # entity: Mapped[str] = mapped_column(VARCHAR(255))
+    # year: Mapped[int] = mapped_column(Integer)
+    # rawScore: Mapped[float] = mapped_column(Float)
+
+    @hybrid_property
+    def dfScore(self) -> Optional[pd.DataFrame]:  # type: ignore
+        if self._dfScore is None:
+            return None
+        buffer = io.BytesIO(self._dfScore)
+        return feather.read_feather(buffer)
+
+    @dfScore.setter
+    def dfScore(self, value: Optional[pd.DataFrame]) -> None:
+        if value is None:
+            self._dfScore = None
+        else:
+            buffer = io.BytesIO()
+            feather.write_feather(value, buffer, compression="zstd")
+            buffer.seek(0)
+            self._dfScore = buffer.read()
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
