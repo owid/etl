@@ -720,6 +720,15 @@ class VersionTracker:
             },
             errors="raise",
         )
+        # Combine steps_df with info_df.
+        # To do that, note that info_df contains an "etl_path", e.g.
+        # 'grapher/ggdc/2020-10-01/ggdc_maddison/maddison_gdp#gdp'
+        # while steps_df contains a dataset "step", e.g. 'data://grapher/ggdc/2020-10-01/ggdc_maddison'.
+        # So, first, create a temporary merge key to both dataframes.
+        # Note that info_df only contains data steps (that should start with either "data://" or "data-private://").
+        steps_df["merge_key"] = steps_df["step"].str.replace("data://", "").str.replace("data-private://", "")
+        info_df["merge_key"] = ["/".join(etl_path.split("#")[0].split("/")[:-1]) for etl_path in info_df["etl_path"]]
+
         # NOTE: This dataframe may have more steps than steps_df, for different reasons:
         #  * A grapher dataset was created by ETL, but the ETL step has been removed from the dag, while the
         #    grapher dataset still exists. This shouldn't happen, but it does happen (mostly for fasttrack drafts).
@@ -727,7 +736,7 @@ class VersionTracker:
         #    again, should not happen, but it does happen every now and then, exceptionally.
         # Identify these steps (and ignore archive DB datasets).
         self.unknown_steps_with_grapher_dataset_df = info_df[
-            (~info_df["step"].isin(steps_df["step"])) & (~info_df["db_archived"])
+            (~info_df["merge_key"].isin(steps_df["merge_key"])) & (~info_df["db_archived"])
         ].reset_index(drop=True)
 
         # Add info from db to steps dataframe.
@@ -735,7 +744,7 @@ class VersionTracker:
             steps_df,
             info_df[
                 [
-                    "step",
+                    "merge_key",
                     "chart_ids",
                     "chart_slugs",
                     "db_dataset_id",
@@ -746,9 +755,9 @@ class VersionTracker:
                 ]
                 + [f"chart_{metric}" for metric in self.ANALYTICS_COLUMNS]
             ],
-            on="step",
+            on="merge_key",
             how="left",
-        )
+        ).drop(columns=["merge_key"])
         # Fill missing values (e.g. "chart_ids" for steps that are not grapher steps).
         for column in ["chart_ids", "chart_slugs", "all_usages"] + [
             f"chart_{metric}" for metric in self.ANALYTICS_COLUMNS
