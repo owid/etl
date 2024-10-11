@@ -405,8 +405,6 @@ class AppState:
                     key=f"{key}_custom",
                     default_last=default_value,
                 )
-            # else:
-            #     st.session_state[f"{self.step}.{key}_custom"] = "nana"
 
     @classproperty
     def args(cls: "AppState") -> argparse.Namespace:
@@ -475,22 +473,6 @@ def _check_env() -> bool:
     if ok:
         st.success(("`.env` configured correctly"))
     return ok
-
-
-def _check_db() -> bool:
-    try:
-        with st.spinner():
-            _ = get_connection()
-    except OperationalError as e:
-        st.error(
-            "We could not connect to the database. If connecting to a remote database, remember to"
-            f" ssh-tunel into it using the appropriate ports and then try again.\n\nError:\n{e}"
-        )
-        return False
-    except Exception as e:
-        raise e
-    st.success("Connection to the Grapher database was successfull!")
-    return True
 
 
 def _show_environment():
@@ -633,9 +615,6 @@ def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
             st.page_link(**kwargs)
     else:
         st.page_link(**kwargs)
-
-
-st.cache_data
 
 
 def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None, output: str = "") -> str:
