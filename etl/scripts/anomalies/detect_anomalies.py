@@ -3,13 +3,11 @@
 """
 
 import concurrent.futures
-import warnings
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import plotly.express as px
-import pymysql
 from owid.catalog import find
 from owid.datautils.dataframes import map_series, multi_merge
 from sqlalchemy.orm import Session
@@ -334,7 +332,7 @@ class AnomalyDetector:
 
         # First, get the unique combinations of country-years in the scores dataframe, and add population to it.
         df_score_population = (
-            self.df_scores[["country", "year"]]
+            self.df_scores[["country", "year"]]  # type: ignore
             .drop_duplicates()
             .merge(self.df_population, on=["country", "year"], how="left")
         )
@@ -387,15 +385,17 @@ class AnomalyDetector:
     # Visually inspect the most significant anomalies on a certain scores dataframe.
     def inspect_anomalies(self, anomalies: Optional[pd.DataFrame] = None, n_anomalies: int = 10) -> None:
         if anomalies is None:
-            anomalies = self.df_scores.copy()
+            anomalies = self.df_scores.copy()  # type: ignore
         # Select the most significant anomalies.
-        anomalies = anomalies.sort_values("anomaly_score", ascending=False).head(n_anomalies)
+        anomalies = anomalies.sort_values("anomaly_score", ascending=False).head(n_anomalies)  # type: ignore
         # Reverse variable mapping.
         variable_id_new_to_old = {v: k for k, v in self.variable_mapping.items()}
-        anomalies["variable_id_old"] = map_series(
-            anomalies["variable_id"], variable_id_new_to_old, warn_on_missing_mappings=False
+        anomalies["variable_id_old"] = map_series(  # type: ignore
+            anomalies["variable_id"],  # type: ignore
+            variable_id_new_to_old,
+            warn_on_missing_mappings=False,  # type: ignore
         )
-        for _, row in anomalies.iterrows():
+        for _, row in anomalies.iterrows():  # type: ignore
             variable_id = row["variable_id"]
             variable_name = self.metadata[variable_id]["shortName"]  # type: ignore
             country = row["country"]
