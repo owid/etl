@@ -13,16 +13,13 @@ from owid.datautils.dataframes import map_series, multi_merge
 from sqlalchemy.orm import Session
 from tqdm.auto import tqdm
 
+import etl.grapher_io as io
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import bard
-from etl.grapher_io import load_entity_mapping, load_variable_data, load_variable_metadata
 from etl.grapher_model import Dataset
 
 # Name of index columns for dataframe.
 INDEX_COLUMNS = ["entity_id", "year"]
-
-
-########################################################################################################################
 
 # TODO: Move to etl.db or elsewhere after refactoring.
 import warnings
@@ -78,14 +75,16 @@ def get_variables_views_in_charts(
 
 def _load_variable_data_and_metadata(variable_id: int) -> Tuple[pd.DataFrame, Dict[str, Any]]:
     # Load variable data.
-    variable_df = load_variable_data(variable_id=variable_id)
+    variable_df = io.load_variable_data(variable_id=variable_id, set_entity_names=False)
+
     # Rename columns appropriately.
     variable_df = variable_df.rename(
         columns={"entities": "entity_id", "years": "year", "values": variable_id}, errors="raise"
     )
+    variable_df = variable_df.astype({"entity_id": int})
 
     # Load variable metadata.
-    variable_metadata = load_variable_metadata(variable_id=variable_id)
+    variable_metadata = io.load_variable_metadata(variable_id=variable_id)
 
     return variable_df, variable_metadata
 
@@ -186,7 +185,7 @@ class AnomalyDetector:
         self.df, self.metadata = load_variables_data_and_metadata(variable_ids=variable_ids_all)
 
         # Load mapping of entity ids to entity names.
-        self.entity_id_to_name = load_entity_mapping(entity_ids=list(set(self.df["entity_id"])))
+        self.entity_id_to_name = io.load_entity_mapping(entity_ids=list(set(self.df["entity_id"])))
 
         # Create a dataframe of zeros, that will be used for each data anomaly type.
         self.df_zeros = pd.DataFrame(np.zeros_like(self.df), columns=self.df.columns)[INDEX_COLUMNS + self.variable_ids]
