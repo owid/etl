@@ -13,6 +13,31 @@ from etl.version_tracker import VersionTracker
 
 
 @st.cache_data
+def load_variables_display_in_dataset(
+    dataset_uri: Optional[List[str]] = None,
+    dataset_id: Optional[List[int]] = None,
+    only_slug: Optional[bool] = False,
+    _owid_env: OWIDEnv = OWID_ENV,
+) -> Dict[int, str]:
+    """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
+    indicators = gio.load_variables_in_dataset(
+        dataset_uri=dataset_uri,
+        dataset_id=dataset_id,
+        owid_env=_owid_env,
+    )
+
+    def _display_slug(o) -> str:
+        p = o.catalogPath
+        if only_slug:
+            return p.rsplit("/", 1)[-1] if isinstance(p, str) else ""
+        return p
+
+    indicators_display = {i.id: _display_slug(i) for i in indicators}
+
+    return indicators_display
+
+
+@st.cache_data
 def get_variable_uris(indicators: List[Variable], only_slug: Optional[bool] = False) -> List[str]:
     options = [o.catalogPath for o in indicators]
     if only_slug:

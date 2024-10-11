@@ -10,7 +10,7 @@ import hashlib
 import os
 import time
 from contextlib import contextmanager
-from typing import Any, Dict, Generator, Literal, Optional, Tuple
+from typing import Any, Dict, Generator, List, Literal, Optional, Tuple
 
 import pandas as pd
 import streamlit as st
@@ -18,7 +18,9 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from apps.wizard.utils.paths import STREAMLIT_SECRETS, WIZARD_DB
+from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_engine, read_sql, to_sql
+from etl.grapher_model import Anomaly
 
 # DB is set up
 DB_IS_SET_UP = STREAMLIT_SECRETS.exists() & WIZARD_DB.exists()
@@ -237,6 +239,12 @@ class WizardDB:
         """
         df = read_sql(query)
         return tb_name in set(df["TABLE_NAME"])
+
+    @classmethod
+    def load_anomalies(cls, dataset_ids: List[int], _owid_env: OWIDEnv = OWID_ENV) -> List[Anomaly]:
+        with Session(_owid_env.engine) as s:
+            anomalies = Anomaly.load_anomalies(s, dataset_ids)
+        return anomalies
 
 
 @contextmanager
