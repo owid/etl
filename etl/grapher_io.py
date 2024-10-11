@@ -122,6 +122,7 @@ def load_variable_data(
     variable_id: Optional[int] = None,
     variable: Optional[Variable] = None,
     owid_env: OWIDEnv = OWID_ENV,
+    set_entity_names: bool = True,
 ) -> pd.DataFrame:
     """Get data for an indicator based on its catalog path or variable id.
 
@@ -139,9 +140,12 @@ def load_variable_data(
     # Get variable
     variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
 
-    # Get data
-    with Session(owid_env.engine) as session:
-        df = variable.get_data(session=session)
+    if set_entity_names:
+        # Get data
+        with Session(owid_env.engine) as session:
+            df = variable.get_data(session=session)
+    else:
+        df = variable.get_data()
 
     return df
 

@@ -1834,7 +1834,7 @@ def add_entity_name(
         raise ValueError(f"Missing entities in the database: {missing_entities}")
 
     # Set dtypes
-    dtypes = {col_name: "category"}
+    dtypes = {col_name: "category", col_id: int}
     if col_code is not None:
         dtypes[col_code] = "category"
     df = pd.merge(df, entities.astype(dtypes), on=col_id)
