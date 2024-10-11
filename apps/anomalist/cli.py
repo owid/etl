@@ -1,4 +1,5 @@
-from typing import Literal, Optional, get_args
+import json
+from typing import Dict, Literal, Optional, Tuple, get_args
 
 import click
 import pandas as pd
@@ -8,13 +9,12 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
+from apps.anomalist.bard_anomaly import NaNAnomalyDetector
+from apps.anomalist.gp_anomaly import GPAnomalyDetector, SampleAnomalyDetector
 from etl import grapher_model as gm
 from etl.db import get_engine, read_sql
 from etl.grapher_io import variable_data_df_from_s3
 from etl.paths import CACHE_DIR
-
-from .bard_anomaly import NaNAnomalyDetector
-from .gp_anomaly import GPAnomalyDetector, SampleAnomalyDetector
 
 log = structlog.get_logger()
 
@@ -25,26 +25,31 @@ ANOMALY_TYPE = Literal["sample", "gp", "nan"]
 
 @click.command(name="anomalist", cls=RichCommand, help=__doc__)
 @click.option(
-    "--type",
+    "--anomaly-types",
     type=click.Choice(get_args(ANOMALY_TYPE)),
     multiple=True,
-    help="Type of anomaly detection algorithm to use.",
+    default=None,
+    help="Type (or types) of anomaly detection algorithm to use.",
 )
 @click.option(
-    "--dataset-id",
-    type=int,
-    help="Generate anomalies for a specific dataset ID.",
-)
-@click.option(
-    "--previous-dataset-id",
-    type=int,
-    help="Dataset ID of the previous version.",
-)
-@click.option(
-    "--variable-id",
+    "--dataset-ids",
     type=int,
     multiple=True,
-    help="Generate anomalies for a list of variable IDs.",
+    default=None,
+    help="Generate anomalies for the variables of a specific dataset ID (or multiple dataset IDs).",
+)
+@click.option(
+    "--variable-mapping",
+    type=str,
+    default=None,
+    help="Optional JSON dictionary mapping variable IDs from a previous to a new version (where at least some of the new variable IDs must belong to the datasets whose IDs were given).",
+)
+@click.option(
+    "--variable-ids",
+    type=int,
+    multiple=True,
+    default=None,
+    help="Generate anomalies for a list of variable IDs (in addition to the ones from dataset ID, if any dataset was given).",
 )
 @click.option(
     "--dry-run/--no-dry-run",
@@ -59,10 +64,10 @@ ANOMALY_TYPE = Literal["sample", "gp", "nan"]
     help="Drop anomalies table and recreate it. This is useful for development when the schema changes.",
 )
 def cli(
-    type: Optional[ANOMALY_TYPE],
-    dataset_id: Optional[int],
-    previous_dataset_id: Optional[int],
-    variable_id: Optional[list[int]],
+    anomaly_types: Optional[Tuple[str, ...]],
+    dataset_ids: Optional[list[int]],
+    variable_mapping: Optional[str],  # type: ignore
+    variable_ids: Optional[list[int]],
     dry_run: bool,
     reset_db: bool,
 ) -> None:
@@ -98,67 +103,87 @@ def cli(
         gm.Anomaly.__table__.create(engine)  # type: ignore
         return
 
-    assert type, "Anomaly type must be specified."
+    # If no anomaly types are provided, default to all available types
+    if not anomaly_types:
+        anomaly_types = get_args(ANOMALY_TYPE)
 
-    # load metadata
-    variables = _load_variables_meta(engine, dataset_id, variable_id)
+    # Parse the variable_mapping if any provided.
+    if variable_mapping:
+        try:
+            variable_mapping: Dict[int, int] = json.loads(variable_mapping)
+            if not isinstance(variable_mapping, dict):
+                raise ValueError("variable_mapping must be a dictionary.")
+        except json.JSONDecodeError:
+            raise ValueError("Invalid JSON format for variable_mapping.")
+    else:
+        variable_mapping = dict()
 
-    # set dataset_id if we're using variables
-    if not dataset_id:
-        assert set(v.datasetId for v in variables) == {variables[0].datasetId}
-        dataset_id = variables[0].datasetId
+    # Load metadata for all variables in dataset_ids (if any given) and variable_ids, and new variables in variable_mapping.
+    variable_ids_all = (
+        list(variable_mapping.values()) if variable_mapping else [] + list(variable_ids) if variable_ids else []
+    )
+    if dataset_ids is None:
+        dataset_ids = []
+    variables = _load_variables_meta(engine, dataset_ids, variable_ids_all)
+
+    # Create a dictionary of all variable_ids for each dataset_id.
+    dataset_variable_ids = {}
+    for variable in variables:
+        if variable.datasetId not in dataset_variable_ids:
+            dataset_variable_ids[variable.datasetId] = []
+        dataset_variable_ids[variable.datasetId].append(variable)
 
     log.info("Detecting anomalies")
     anomalies = []
 
-    for typ in type:
-        if typ == "gp":
-            detector = GPAnomalyDetector()
-        elif typ == "sample":
-            detector = SampleAnomalyDetector()
-        elif typ == "nan":
-            detector = NaNAnomalyDetector()
-        else:
-            raise ValueError(f"Unsupported anomaly type: {typ}")
+    for dataset_id, variables_in_dataset in dataset_variable_ids.items():
+        for anomaly_type in anomaly_types:
+            if anomaly_type == "gp":
+                detector = GPAnomalyDetector()
+            elif anomaly_type == "sample":
+                detector = SampleAnomalyDetector()
+            elif anomaly_type == "nan":
+                detector = NaNAnomalyDetector()
+            else:
+                raise ValueError(f"Unsupported anomaly type: {anomaly_type}")
 
-        # dataframe with (entityName, year) as index and variableId as columns
-        log.info("Loading data from S3")
-        df = load_data_for_variables(engine, variables)
+            # dataframe with (entityName, year) as index and variableId as columns
+            log.info("Loading data from S3")
+            df = load_data_for_variables(engine, variables_in_dataset)
 
-        # detect anomalies
-        log.info("Detecting anomalies")
-        # the output has the same shape as the input dataframe, but we should make
-        # it possible to return anomalies in a long format (for detectors that return
-        # just a few anomalies)
-        df_score = detector.get_score_df(df, variables)
+            # TODO: If any of the variables are in variable_mapping, load df_old as well.
 
-        # validate format of the output dataframe
-        # TODO
+            # detect anomalies
+            log.info("Detecting anomalies")
+            # the output has the same shape as the input dataframe, but we should make
+            # it possible to return anomalies in a long format (for detectors that return
+            # just a few anomalies)
+            df_score = detector.get_score_df(df, variables_in_dataset)
 
-        anomaly = gm.Anomaly(
-            datasetId=dataset_id,
-            anomalyType=detector.anomaly_type,
-        )
-        anomaly.dfScore = df_score
+            # TODO: validate format of the output dataframe
 
-        anomalies.append(anomaly)
+            anomaly = gm.Anomaly(
+                datasetId=dataset_id,
+                anomalyType=detector.anomaly_type,
+            )
+            anomaly.dfScore = df_score
 
-    if dry_run:
-        for anomaly in anomalies:
-            log.info(anomaly)
-    else:
-        with Session(engine) as session:
-            log.info("Deleting existing anomalies")
-            session.query(gm.Anomaly).filter(
-                gm.Anomaly.datasetId == dataset_id,
-                gm.Anomaly.anomalyType.in_([a.anomalyType for a in anomalies]),
-            ).delete(synchronize_session=False)
-            session.commit()
+            if dry_run:
+                log.info(anomaly)
+            else:
+                with Session(engine) as session:
+                    # TODO: Is this right? I suppose it should also delete if already existing.
+                    log.info("Deleting existing anomalies")
+                    session.query(gm.Anomaly).filter(
+                        gm.Anomaly.datasetId == dataset_id,
+                        gm.Anomaly.anomalyType.in_([a.anomalyType for a in anomalies]),
+                    ).delete(synchronize_session=False)
+                    session.commit()
 
-            # Insert new anomalies
-            log.info("Writing anomalies to database")
-            session.add_all(anomalies)
-            session.commit()
+                    # Insert new anomalies
+                    log.info("Writing anomalies to database")
+                    session.add_all(anomalies)
+                    session.commit()
 
 
 # @memory.cache
@@ -184,23 +209,31 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
 
 @memory.cache
 def _load_variables_meta(
-    engine: Engine, dataset_id: Optional[int], variable_ids: Optional[list[int]]
+    engine: Engine, dataset_ids: Optional[list[int]], variable_ids: Optional[list[int]]
 ) -> list[gm.Variable]:
-    if dataset_id and variable_ids:
-        raise ValueError("Cannot specify both dataset ID and variable IDs.")
+    if dataset_ids:
+        q = """
+        select id from variables
+        where datasetId in %(dataset_ids)s
+        """
+        df_from_dataset_ids = read_sql(q, engine, params={"dataset_ids": dataset_ids})
+    else:
+        df_from_dataset_ids = pd.DataFrame()
 
     if variable_ids:
         q = """
         select id from variables
         where id in %(variable_ids)s
         """
-    elif dataset_id:
-        q = """
-        select id from variables
-        where datasetId = %(dataset_id)s
-        """
-    # load all variables from a random dataset
+        df_from_variable_ids = read_sql(q, engine, params={"variable_ids": variable_ids})
     else:
+        df_from_variable_ids = pd.DataFrame()
+
+    # Combine both dataframes to get all possible variables required.
+    df = pd.concat([df_from_dataset_ids, df_from_variable_ids]).drop_duplicates()
+
+    # load all variables from a random dataset
+    if df.empty:
         q = """
         with t as (
             select id from datasets order by rand() limit 1
@@ -208,8 +241,7 @@ def _load_variables_meta(
         select id from variables
         where datasetId in (select id from t)
         """
-
-    df = read_sql(q, engine, params={"variable_ids": variable_ids, "dataset_id": dataset_id})
+        df = read_sql(q, engine)
 
     # select all variables using SQLAlchemy
     with Session(engine) as session:
