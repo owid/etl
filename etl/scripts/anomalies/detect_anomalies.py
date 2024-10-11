@@ -8,7 +8,6 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 import plotly.express as px
-import requests
 from owid.catalog import find
 from owid.datautils.dataframes import map_series, multi_merge
 from sqlalchemy.orm import Session
@@ -16,40 +15,11 @@ from tqdm.auto import tqdm
 
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import bard
-from etl.grapher_model import Dataset, Entity, Variable
+from etl.grapher_io import load_entity_mapping, load_variable_data, load_variable_metadata
+from etl.grapher_model import Dataset
 
 # Name of index columns for dataframe.
 INDEX_COLUMNS = ["entity_id", "year"]
-
-########################################################################################################################
-
-
-def load_variable_from_id(variable_id: int):
-    with Session(OWID_ENV.engine) as session:
-        variable = Variable.load_variable(session=session, variable_id=variable_id)
-
-    return variable
-
-
-def load_variable_metadata(variable: Variable) -> Dict[str, Any]:
-    metadata = requests.get(variable.s3_metadata_path(typ="http")).json()
-
-    return metadata
-
-
-def load_variable_data(variable: Variable) -> pd.DataFrame:
-    data = requests.get(variable.s3_data_path(typ="http")).json()
-    df = pd.DataFrame(data)
-
-    return df
-
-
-def load_entity_mapping(entity_ids: List[int]) -> Dict[int, str]:
-    # Fetch the mapping of entity ids to names.
-    with Session(OWID_ENV.engine) as session:
-        entity_id_to_name = Entity.load_entity_mapping(session=session, entity_ids=entity_ids)
-
-    return entity_id_to_name
 
 
 ########################################################################################################################
@@ -107,18 +77,15 @@ def get_variables_views_in_charts(
 
 
 def _load_variable_data_and_metadata(variable_id: int) -> Tuple[pd.DataFrame, Dict[str, Any]]:
-    # Load variable for the current variable id.
-    variable = load_variable_from_id(variable_id=variable_id)
-
     # Load variable data.
-    variable_df = load_variable_data(variable=variable)
+    variable_df = load_variable_data(variable_id=variable_id)
     # Rename columns appropriately.
     variable_df = variable_df.rename(
-        columns={"entities": "entity_id", "years": "year", "values": variable.id}, errors="raise"
+        columns={"entities": "entity_id", "years": "year", "values": variable_id}, errors="raise"
     )
 
     # Load variable metadata.
-    variable_metadata = load_variable_metadata(variable=variable)
+    variable_metadata = load_variable_metadata(variable_id=variable_id)
 
     return variable_df, variable_metadata
 
