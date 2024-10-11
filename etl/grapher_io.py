@@ -1,4 +1,14 @@
+"""Functions to interact with our Grapher data. This includes accessing our database and our API.
+
+TODO: This file contains some code that needs some revision:
+
+- Code dealing with entity codes and names:
+    - There are different ways that we are getting code-to-name mappings. We should standardize this.
+- Code using db_conn (pymysql.Connection objects). We should instead use sessions, or engines (or OWIDEnv)
+
+"""
 import concurrent.futures
+import io
 import warnings
 from http.client import RemoteDisconnected
 from typing import Any, Dict, List, Optional, cast
@@ -20,7 +30,8 @@ from tenacity.wait import wait_fixed
 from etl import config
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_connection, read_sql
-from etl.grapher_model import Dataset, Variable
+from etl.grapher_model import Dataset, Entity, Variable
+from etl.paths import CACHE_DIR
 
 log = structlog.get_logger()
 
@@ -113,6 +124,7 @@ def load_variable_data(
     variable_id: Optional[int] = None,
     variable: Optional[Variable] = None,
     owid_env: OWIDEnv = OWID_ENV,
+    set_entity_names: bool = True,
 ) -> pd.DataFrame:
     """Get data for an indicator based on its catalog path or variable id.
 
@@ -130,9 +142,12 @@ def load_variable_data(
     # Get variable
     variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
 
-    # Get data
-    with Session(owid_env.engine) as session:
-        df = variable.get_data(session=session)
+    if set_entity_names:
+        # Get data
+        with Session(owid_env.engine) as session:
+            df = variable.get_data(session=session)
+    else:
+        df = variable.get_data()
 
     return df
 
@@ -272,30 +287,76 @@ def variable_data_df_from_s3(
         return res
 
 
-def _fetch_data_df_from_s3(variable_id: int):
+def _fetch_response(method: str, url: str):
+    """Helper function to perform HTTP requests with retries and centralized exception handling."""
     try:
-        # Cloudflare limits us to 600 requests per minute, retry in case we hit the limit
-        # NOTE: increase wait time or attempts if we hit the limit too often
         for attempt in Retrying(
             wait=wait_fixed(2),
             stop=stop_after_attempt(3),
-            retry=retry_if_exception_type((URLError, RemoteDisconnected)),
+            retry=retry_if_exception_type((URLError, RemoteDisconnected, requests.exceptions.RequestException)),
         ):
             with attempt:
-                return (
-                    pd.read_json(config.variable_data_url(variable_id))
-                    .rename(
-                        columns={
-                            "entities": "entityId",
-                            "values": "value",
-                            "years": "year",
-                        }
-                    )
-                    .assign(variableId=variable_id)
-                )
-    # no data on S3
-    except HTTPError:
+                response = requests.request(method, url)
+                response.raise_for_status()
+                return response
+    except HTTPError as e:
+        # No data on S3
+        if e.response.status_code == 404:
+            return None
+        else:
+            raise
+    except (URLError, RemoteDisconnected, requests.exceptions.RequestException):
+        raise
+
+
+def _fetch_data_df_from_s3(variable_id: int):
+    cache_dir = CACHE_DIR / "variable_data"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_filename = cache_dir / f"{variable_id}.json"
+    etag_filename = cache_dir / f"{variable_id}.etag"
+
+    url = config.variable_data_url(variable_id)
+
+    # Check if cached data exists
+    if cache_filename.exists() and etag_filename.exists():
+        # Read stored ETag
+        stored_etag = etag_filename.read_text()
+    else:
+        stored_etag = None
+
+    # Get current ETag from server
+    response = _fetch_response("HEAD", url)
+    if response is None:
         return pd.DataFrame(columns=["variableId", "entityId", "year", "value"])
+    current_etag = response.headers.get("ETag")
+
+    # Compare ETags
+    if stored_etag and current_etag and stored_etag == current_etag:
+        # ETag matches, load from cache
+        data_df = pd.read_json(cache_filename)
+    else:
+        # Fetch new data
+        response = _fetch_response("GET", url)
+        if response is None:
+            return pd.DataFrame(columns=["variableId", "entityId", "year", "value"])
+        # Save response text to cache
+        cache_filename.write_text(response.text, encoding="utf-8")
+        # Save new ETag
+        if current_etag:
+            etag_filename.write_text(current_etag)
+        elif etag_filename.exists():
+            etag_filename.unlink()
+        data_df = pd.read_json(io.StringIO(response.text))
+
+    # Process DataFrame
+    data_df = data_df.rename(
+        columns={
+            "entities": "entityId",
+            "values": "value",
+            "years": "year",
+        }
+    ).assign(variableId=variable_id)
+    return data_df
 
 
 def add_entity_code_and_name(session: Session, df: pd.DataFrame) -> pd.DataFrame:
@@ -347,27 +408,29 @@ def variable_metadata_df_from_s3(
     return results  # type: ignore
 
 
-def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dict[str, Any] | None:
-    try:
-        # Cloudflare limits us to 600 requests per minute, retry in case we hit the limit
-        # NOTE: increase wait time or attempts if we hit the limit too often
-        for attempt in Retrying(
-            wait=wait_fixed(2),
-            stop=stop_after_attempt(3),
-            retry=retry_if_exception_type((URLError, RemoteDisconnected)),
-        ):
-            with attempt:
-                if env is not None:
-                    url = env.indicator_metadata_url(variable_id)
-                else:
-                    url = config.variable_metadata_url(variable_id)
-                return requests.get(url).json()
-    # no data on S3
-    except HTTPError:
+def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dict[str, Any]:
+    if env is not None:
+        url = env.indicator_metadata_url(variable_id)
+    else:
+        url = config.variable_metadata_url(variable_id)
+
+    response = _fetch_response("GET", url)
+    if response is None:
         return {}
+    else:
+        return response.json()
+
+
+def load_entity_mapping(entity_ids: List[int], owid_env: OWIDEnv = OWID_ENV) -> Dict[int, str]:
+    # Fetch the mapping of entity ids to names.
+    with Session(owid_env.engine) as session:
+        entity_id_to_name = Entity.load_entity_mapping(session=session, entity_ids=entity_ids)
+
+    return entity_id_to_name
 
 
 #######################################################################################################
+
 # TO BE REVIEWED:
 # This is code that could be deprecated / removed?
 # TODO: replace usage of db_conn (pymysql.Connection) with engine (sqlalchemy.engine.Engine) or OWIDEnv
