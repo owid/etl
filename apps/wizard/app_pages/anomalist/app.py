@@ -3,7 +3,7 @@ import streamlit as st
 
 from apps.wizard.app_pages.anomalist.utils import get_datasets_and_mapping_inputs
 from apps.wizard.utils import cached
-from apps.wizard.utils.components import grapher_chart, st_tag
+from apps.wizard.utils.components import grapher_chart, st_horizontal, st_tag
 
 # PAGE CONFIG
 st.set_page_config(
@@ -107,10 +107,12 @@ with st.form(key="dataset_search"):
         default=DATASETS_NEW,
     )
 
-    st.form_submit_button("Detect anomalies", type="primary")
+    st.form_submit_button(
+        "Load and scan data",
+        type="primary",
+        help="This will load the indicators from the selected datasets and scan for anomalies. This can take some time.",
+    )
 
-# TODO: Replace with the selected datasets, once the loading is fixed to accept dataset ids.
-st.session_state.datasets_selected = ["grapher/energy/2024-06-20/energy_mix"]
 
 # FILTER PARAMS
 with st.container(border=True):
@@ -118,19 +120,21 @@ with st.container(border=True):
     indicator_uris = []
     if len(st.session_state.datasets_selected) > 0:
         # Load anomalies
-        anomalies = cached.load_anomalies_in_dataset([6590])
+        # anomalies = cached.load_anomalies_in_dataset([6590])
         st.session_state.indicators = cached.load_variables_in_dataset(
             st.session_state.datasets_selected,
         )
         indicator_uris = cached.get_variable_uris(st.session_state.indicators, True)
 
-    col1, col2 = st.columns([10, 2])
+    st.write(st.session_state.datasets_selected)
+    col1, col2 = st.columns([10, 4])
     # Indicator
     with col1:
         st.session_state.anomalist_filter_indicators = st.multiselect(
             label="Indicators",
             options=indicator_uris,
             help="Show anomalies affecting only a selection of indicators.",
+            placeholder="Select indicators",
         )
 
     with col2:
@@ -139,36 +143,37 @@ with st.container(border=True):
             label="Entities",
             options=ENTITIES,
             help="Show anomalies affecting only a selection of entities.",
+            placeholder="Select entities",
         )
 
     # Anomaly type
-    col1, col2 = st.columns([10, 3])
-    with col1:
-        st.slider(
-            label="Years",
+    with st_horizontal():
+        st.multiselect(
+            label="Sort by",
+            options=[
+                "Anomaly score",
+                "Population",
+                "Chart views",
+            ],
+        )
+
+        st.multiselect(
+            label="Anomaly type",
+            options=ANOMALY_TYPE_NAMES,
+        )
+
+        st.number_input(
+            "Min year",
             min_value=YEAR_MIN,
             max_value=YEAR_MAX,
-            value=(YEAR_MIN, YEAR_MAX),
-            help="Show anomalies occuring in a particular time range.",
+            step=1,
         )
-    with col2:
-        col21, col22 = st.columns(2)
-        with col21:
-            # Anomaly sorting
-            st.multiselect(
-                label="Anomaly type",
-                options=ANOMALY_TYPE_NAMES,
-            )
-        with col22:
-            # Anomaly sorting
-            st.multiselect(
-                label="Sort by",
-                options=[
-                    "Anomaly score",
-                    "Population",
-                    "Chart views",
-                ],
-            )
+        st.number_input(
+            "Max year",
+            min_value=YEAR_MIN,
+            max_value=YEAR_MAX,
+            step=1,
+        )
 
     # st.multiselect("Anomaly type", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
     # st.number_input("Minimum score", min_value=0.0, max_value=1.0, value=0.5, step=0.01)
