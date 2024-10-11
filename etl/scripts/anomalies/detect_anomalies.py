@@ -3,11 +3,13 @@
 """
 
 import concurrent.futures
+import warnings
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import pymysql
 from owid.catalog import find
 from owid.datautils.dataframes import map_series, multi_merge
 from sqlalchemy.orm import Session
@@ -16,25 +18,18 @@ from tqdm.auto import tqdm
 import etl.grapher_io as io
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import bard
+from etl.db import read_sql
 from etl.grapher_model import Dataset
 
 # Name of index columns for dataframe.
 INDEX_COLUMNS = ["entity_id", "year"]
 
 # TODO: Move to etl.db or elsewhere after refactoring.
-import warnings
-
-import pymysql
-
-from etl.db import get_connection
 
 
 def get_variables_views_in_charts(
-    variable_ids: List[int], db_conn: Optional[pymysql.Connection] = None
+    variable_ids: List[int],
 ) -> pd.DataFrame:
-    if db_conn is None:
-        db_conn = get_connection()
-
     # Assumed base url for all charts.
     base_url = "https://ourworldindata.org/grapher/"
 
@@ -62,11 +57,7 @@ def get_variables_views_in_charts(
     ORDER BY
         v.id ASC;
     """
-
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", UserWarning)
-        df = pd.read_sql(query, con=db_conn)
-
+    df = read_sql(query)
     # Handle potential duplicated rows
     df = df.drop_duplicates().reset_index(drop=True)
 
