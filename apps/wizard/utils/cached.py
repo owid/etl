@@ -71,6 +71,7 @@ def load_variable_data(
 
 @st.cache_data(show_spinner=False)
 def get_datasets_from_version_tracker() -> Tuple[pd.DataFrame, List[Dict[str, Any]]]:
+    """Get dataset info from version tracker (ETL)."""
     # Get steps_df
     vt = VersionTracker()
     assert vt.connect_to_db, "Can't connect to database! You need to be connected to run this tool."
