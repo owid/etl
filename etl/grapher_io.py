@@ -1,3 +1,12 @@
+"""Functions to interact with our Grapher data. This includes accessing our database and our API.
+
+TODO: This file contains some code that needs some revision:
+
+- Code dealing with entity codes and names:
+    - There are different ways that we are getting code-to-name mappings. We should standardize this.
+- Code using db_conn (pymysql.Connection objects). We should instead use sessions, or engines (or OWIDEnv)
+
+"""
 import concurrent.futures
 import warnings
 from http.client import RemoteDisconnected
@@ -20,7 +29,7 @@ from tenacity.wait import wait_fixed
 from etl import config
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_connection, read_sql
-from etl.grapher_model import Dataset, Variable
+from etl.grapher_model import Dataset, Entity, Variable
 
 log = structlog.get_logger()
 
@@ -113,6 +122,7 @@ def load_variable_data(
     variable_id: Optional[int] = None,
     variable: Optional[Variable] = None,
     owid_env: OWIDEnv = OWID_ENV,
+    set_entity_names: bool = True,
 ) -> pd.DataFrame:
     """Get data for an indicator based on its catalog path or variable id.
 
@@ -130,9 +140,12 @@ def load_variable_data(
     # Get variable
     variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
 
-    # Get data
-    with Session(owid_env.engine) as session:
-        df = variable.get_data(session=session)
+    if set_entity_names:
+        # Get data
+        with Session(owid_env.engine) as session:
+            df = variable.get_data(session=session)
+    else:
+        df = variable.get_data()
 
     return df
 
@@ -367,7 +380,16 @@ def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dic
         return {}
 
 
+def load_entity_mapping(entity_ids: List[int], owid_env: OWIDEnv = OWID_ENV) -> Dict[int, str]:
+    # Fetch the mapping of entity ids to names.
+    with Session(owid_env.engine) as session:
+        entity_id_to_name = Entity.load_entity_mapping(session=session, entity_ids=entity_ids)
+
+    return entity_id_to_name
+
+
 #######################################################################################################
+
 # TO BE REVIEWED:
 # This is code that could be deprecated / removed?
 # TODO: replace usage of db_conn (pymysql.Connection) with engine (sqlalchemy.engine.Engine) or OWIDEnv
