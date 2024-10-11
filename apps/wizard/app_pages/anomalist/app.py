@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 
 from apps.wizard.utils import cached
-from apps.wizard.utils.components import grapher_chart
+from apps.wizard.utils.components import grapher_chart, st_tag
 
 # PAGE CONFIG
 st.set_page_config(
@@ -11,30 +11,30 @@ st.set_page_config(
     layout="wide",
 )
 # OTHER CONFIG
-ANOMALY_TYPES = [
-    {
-        "title": "Time change",
+ANOMALY_TYPES = {
+    "time_change": {
+        "tag_name": "Time change",
         "color": "orange",
         "icon": ":material/timeline",
     },
-    {
-        "title": "Version change",
+    "version_change": {
+        "tag_name": "Version change",
         "color": "blue",
         "icon": ":material/upgrade",
     },
-    {
-        "title": "Missing point",
+    "missing_point": {
+        "tag_name": "Missing point",
         "color": "red",
         "icon": ":material/hide_source",
     },
-    {
-        "title": "AI",
+    "ai": {
+        "tag_name": "AI",
         "color": "rainbow",
         "icon": ":material/lightbulb",
     },
-]
-ANOMALY_TYPE_NAMES = [a["title"] for a in ANOMALY_TYPES]
-ANOMALY_TYPE_DISPLAY = {a["title"]: f":{a['color']}-background[{a['icon']}: {a['title']}]" for a in ANOMALY_TYPES}
+}
+ANOMALY_TYPE_NAMES = [a["tag_name"] for a in ANOMALY_TYPES.values()]
+
 #
 # SESSION STATE
 st.session_state.datasets_selected = st.session_state.get("datasets_selected", [])
@@ -55,21 +55,21 @@ ANOMALIES = [
     {
         "title": "Coal consumption - Malaysia - 1983",
         "description": "There are 12 missing points that used to be informed in the previous version",
-        "category": "Missing point",
+        "category": "missing_point",
         "country": "Malaysia",
         "year": 1983,
     },
     {
         "title": "Gas production - Ireland - 2000",
         "description": "There are 2 abrupt changes in the time series.",
-        "category": "Time change",
+        "category": "time_change",
         "country": "Ireland",
         "year": 2000,
     },
     {
         "title": "Nuclear production - France - 2010",
         "description": "There is 1 abrupt changes in the time series.",
-        "category": "AI",
+        "category": "ai",
         "country": "France",
         "year": 2010,
     },
@@ -150,7 +150,6 @@ with st.container(border=True):
             st.multiselect(
                 label="Anomaly type",
                 options=ANOMALY_TYPE_NAMES,
-                # default=ANOMALY_TYPES,
             )
         with col22:
             # Anomaly sorting
@@ -178,7 +177,7 @@ def show_anomaly(anomaly, indicator):
     with st.container(border=True):
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown(ANOMALY_TYPE_DISPLAY[anomaly["category"]])
+            st_tag(**ANOMALY_TYPES[anomaly["category"]])
             st.markdown(f"##### {anomaly['title']}")
             st.markdown(f"{anomaly['description']}")
         with col2:
