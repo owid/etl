@@ -1,6 +1,5 @@
 from typing import Optional, Tuple
 
-import pandas as pd
 import streamlit as st
 
 from apps.wizard.app_pages.anomalist.utils import get_datasets_and_mapping_inputs

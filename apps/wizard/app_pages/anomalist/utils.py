@@ -1,7 +1,6 @@
 """Utils for chart revision tool."""
-from typing import Any, Dict, List, Tuple
+from typing import Dict, Tuple
 
-import pandas as pd
 import streamlit as st
 from structlog import get_logger
 

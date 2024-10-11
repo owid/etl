@@ -8,7 +8,6 @@ from rapidfuzz import fuzz
 from structlog import get_logger
 
 from apps.wizard.utils.io import get_steps_df
-from etl import config
 from etl.db import get_connection
 from etl.grapher_io import get_all_datasets, get_dataset_charts, get_variables_in_dataset
 from etl.match_variables import find_mapping_suggestions, preliminary_mapping

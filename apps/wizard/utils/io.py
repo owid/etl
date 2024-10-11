@@ -3,7 +3,6 @@
 Together with utils.db and utils.cached, it might need some rethinking on where it goes.
 """
 from pymysql import OperationalError
-from sqlalchemy.orm import Session
 
 from apps.wizard.utils.cached import get_datasets_from_version_tracker
 from etl.grapher_io import get_all_datasets
