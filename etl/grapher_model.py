@@ -1193,9 +1193,19 @@ class Variable(Base):
         )
 
     @classmethod
-    def load_variables_in_datasets(cls, session: Session, dataset_uris: List[str]) -> List["Variable"]:
-        conditions = [cls.catalogPath.startswith(uri) for uri in dataset_uris]
-        query = select(cls).where(or_(*conditions))
+    def load_variables_in_datasets(
+        cls,
+        session: Session,
+        dataset_uris: Optional[List[str]] = None,
+        dataset_ids: Optional[List[int]] = None,
+    ) -> List["Variable"]:
+        if dataset_uris is not None:
+            conditions = [cls.catalogPath.startswith(uri) for uri in dataset_uris]
+            query = select(cls).where(or_(*conditions))
+        elif dataset_ids is not None:
+            query = select(cls).where(cls.datasetId.in_(dataset_ids))
+        else:
+            raise ValueError("Either dataset_uris or dataset_ids must be provided")
         results = session.scalars(query).all()
         return list(results)
 

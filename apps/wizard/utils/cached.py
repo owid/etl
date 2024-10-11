@@ -33,11 +33,16 @@ def load_dataset_uris() -> List[str]:
 
 @st.cache_data
 def load_variables_in_dataset(
-    dataset_uri: List[str],
+    dataset_uri: Optional[List[str]] = None,
+    dataset_id: Optional[List[int]] = None,
     _owid_env: OWIDEnv = OWID_ENV,
 ) -> List[Variable]:
     """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
-    return gio.load_variables_in_dataset(dataset_uri, _owid_env)
+    return gio.load_variables_in_dataset(
+        dataset_uri=dataset_uri,
+        dataset_id=dataset_id,
+        owid_env=_owid_env,
+    )
 
 
 @st.cache_data

@@ -52,12 +52,17 @@ def load_dataset_uris(
 
 
 def load_variables_in_dataset(
-    dataset_uri: List[str],
+    dataset_uri: Optional[List[str]] = None,
+    dataset_id: Optional[List[int]] = None,
     owid_env: OWIDEnv = OWID_ENV,
 ) -> List[Variable]:
     """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
     with Session(owid_env.engine) as session:
-        indicators = Variable.load_variables_in_datasets(session, dataset_uri)
+        indicators = Variable.load_variables_in_datasets(
+            session=session,
+            dataset_uris=dataset_uri,
+            dataset_ids=dataset_id,
+        )
 
     return indicators
 
