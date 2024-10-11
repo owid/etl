@@ -4,6 +4,7 @@ import streamlit as st
 from apps.wizard.app_pages.anomalist.utils import get_datasets_and_mapping_inputs
 from apps.wizard.utils import cached
 from apps.wizard.utils.components import grapher_chart, st_horizontal, st_tag
+from apps.wizard.utils.db import WizardDB
 
 # PAGE CONFIG
 st.set_page_config(
@@ -98,13 +99,15 @@ st.markdown(
     </style>""",
     unsafe_allow_html=True,
 )
+
 with st.form(key="dataset_search"):
     st.session_state.datasets_selected = st.multiselect(
         "Select datasets",
         # options=cached.load_dataset_uris(),
-        options=DATASETS_ALL,
+        options=DATASETS_ALL.keys(),
         # max_selections=1,
-        default=DATASETS_NEW,
+        default=DATASETS_NEW.keys(),
+        format_func=DATASETS_ALL.get,
     )
 
     st.form_submit_button(
@@ -121,8 +124,11 @@ with st.container(border=True):
     if len(st.session_state.datasets_selected) > 0:
         # Load anomalies
         # anomalies = cached.load_anomalies_in_dataset([6590])
+
+        # Get variable mapping, if exists
+        mapping = WizardDB.get_variable_mapping()
         st.session_state.indicators = cached.load_variables_in_dataset(
-            st.session_state.datasets_selected,
+            dataset_id=st.session_state.datasets_selected,
         )
         indicator_uris = cached.get_variable_uris(st.session_state.indicators, True)
 

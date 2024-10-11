@@ -15,7 +15,8 @@ log = get_logger()
 # TODO: Consider refactoring the following function, which does too many things.
 @st.cache_data(show_spinner=False)
 @st.spinner("Retrieving datasets...")
-def get_datasets_and_mapping_inputs() -> Tuple[pd.DataFrame, List[Dict[str, Dict[str, Any]]], Dict[int, int]]:
+def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], Dict[int, int]]:
+    # Tuple[pd.DataFrame, List[Dict[str, Dict[str, Any]]], Dict[int, int]]:
     # NOTE: The following ignores DB datasets that are archived (which is a bit unexpected).
     # I had to manually un-archive the testing datasets from the database manually to make things work.
     # This could be fixed, but maybe it's not necessary (since we won't archive an old version of a dataset until the
@@ -55,10 +56,9 @@ def get_datasets_and_mapping_inputs() -> Tuple[pd.DataFrame, List[Dict[str, Dict
 
     # List all grapher datasets.
     datasets_all = steps_df_grapher["id_name"].to_list()
+    datasets_all = steps_df_grapher[["id", "id_name"]].set_index("id").squeeze().to_dict()
 
     # List new datasets.
-    datasets_new = [
-        ds_id_name for ds_id_name in datasets_all if int(ds_id_name[1 : ds_id_name.index("]")]) in datasets_new_ids
-    ]
+    datasets_new = {k: v for k, v in datasets_all.items() if k in datasets_new_ids}
 
     return datasets_all, datasets_new, variable_mapping  # type: ignore
