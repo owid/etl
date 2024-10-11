@@ -67,7 +67,11 @@ def get_grapher_changes(files_changed: Dict[str, Dict[str, str]], steps_df: pd.D
             steps_affected.append(candidate["step"].item())
             steps_affected.extend(candidate["all_usages"].item())
 
-            if (candidate["channel"].item() == "grapher") & (file_status == "A"):
+            # NOTE: I'm not sure why I originally imposed that file_status needed to be "A".
+            #  I think it's possible that one commits changes to a new grapher dataset, and therefore they would appear as "M".
+            #  So, I'll remove this condition for now. But if we detect issues, we may need to add it back.
+            # if (candidate["channel"].item() == "grapher") & (file_status == "A"):
+            if candidate["channel"].item() == "grapher":
                 current_grapher_step = candidate["step"].item()
 
                 ## Get grapher dataset id and name of the new dataset.
