@@ -367,10 +367,11 @@ def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dic
         return {}
 
 
-##############################################################################################
+#######################################################################################################
 # TO BE REVIEWED:
 # This is code that could be deprecated / removed?
-##############################################################################################
+# TODO: replace usage of db_conn (pymysql.Connection) with engine (sqlalchemy.engine.Engine) or OWIDEnv
+#######################################################################################################
 
 
 def get_dataset_id(
@@ -483,6 +484,21 @@ def get_all_datasets(archived: bool = True, db_conn: Optional[pymysql.Connection
 
 
 def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
+    """Get information for datasets that have variables with an ETL path.
+
+    This function returns a dataframe with the following columns:
+    - dataset_id: ID of the dataset.
+    - dataset_name: Name of the dataset.
+    - etl_path: ETL path of the dataset.
+    - is_archived: Whether the dataset is archived.
+    - is_private: Whether the dataset is private.
+    - chart_ids: List of chart ids that use variables from the dataset.
+    - chart_slugs: List of tuples (chart_id, chart_slug) that use variables from the dataset.
+    - views_7d: List of tuples (chart_id, views_7d) for the last 7 days.
+    - views_14d: List of tuples (chart_id, views_14d) for the last 14 days.
+    - views_365d: List of tuples (chart_id, views_365d) for the last 365 days.
+    - update_period_days: Update period of the dataset.
+    """
     if db_conn is None:
         db_conn = get_connection()
 
@@ -589,12 +605,6 @@ def get_info_for_etl_datasets(db_conn: Optional[pymysql.Connection] = None) -> p
             "Variables in grapher DB are expected to come only from ETL grapher channel, "
             f"but other channels were found: {unknown_channels}"
         )
-
-    # Create a column with the step name.
-    # First assume all steps are public (hence starting with "data://").
-    # Then edit private steps so they start with "data-private://".
-    df["step"] = ["data://" + "/".join(etl_path.split("#")[0].split("/")[:-1]) for etl_path in df["etl_path"]]
-    df.loc[df["is_private"], "step"] = df[df["is_private"]]["step"].str.replace("data://", "data-private://")
 
     return df
 
