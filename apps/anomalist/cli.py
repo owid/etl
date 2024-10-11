@@ -110,17 +110,18 @@ def cli(
     # Parse the variable_mapping if any provided.
     if variable_mapping:
         try:
-            variable_mapping: Dict[int, int] = json.loads(variable_mapping)
-            if not isinstance(variable_mapping, dict):
-                raise ValueError("variable_mapping must be a dictionary.")
+            variable_mapping: Dict[int, int] = {
+                int(variable_old): int(variable_new)
+                for variable_old, variable_new in json.loads(variable_mapping).items()
+            }
         except json.JSONDecodeError:
             raise ValueError("Invalid JSON format for variable_mapping.")
     else:
         variable_mapping = dict()
 
     # Load metadata for all variables in dataset_ids (if any given) and variable_ids, and new variables in variable_mapping.
-    variable_ids_all = (
-        list(variable_mapping.values()) if variable_mapping else [] + list(variable_ids) if variable_ids else []
+    variable_ids_all = (list(variable_mapping.values()) if variable_mapping else []) + (
+        list(variable_ids) if variable_ids else []
     )
     if dataset_ids is None:
         dataset_ids = []
@@ -168,9 +169,7 @@ def cli(
             )
             anomaly.dfScore = df_score
 
-            if dry_run:
-                log.info(anomaly)
-            else:
+            if not dry_run:
                 with Session(engine) as session:
                     # TODO: Is this right? I suppose it should also delete if already existing.
                     log.info("Deleting existing anomalies")
@@ -189,7 +188,7 @@ def cli(
 # @memory.cache
 def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.DataFrame:
     # TODO: cache this on disk & re-validate with etags
-    df_long = variable_data_df_from_s3(engine, [v.id for v in variables])
+    df_long = variable_data_df_from_s3(engine, [v.id for v in variables], workers=None)
 
     # pivot dataframe
     df = df_long.pivot(index=["entityName", "year"], columns="variableId", values="value")

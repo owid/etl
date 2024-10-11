@@ -264,7 +264,7 @@ def _ensure_variable_ids(
 def variable_data_df_from_s3(
     engine: Engine,
     variable_ids: List[int] = [],
-    workers: int = 1,
+    workers: Optional[int] = 1,
     value_as_str: bool = True,
 ) -> pd.DataFrame:
     """Fetch data from S3 and add entity code and name from DB."""
