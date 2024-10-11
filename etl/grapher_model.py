@@ -40,7 +40,6 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Integer,
-    LargeBinary,
     SmallInteger,
     String,
     and_,
@@ -52,6 +51,7 @@ from sqlalchemy import (
 from sqlalchemy import JSON as _JSON
 from sqlalchemy.dialects.mysql import (
     ENUM,
+    LONGBLOB,
     LONGTEXT,
     TEXT,
     TINYINT,
@@ -1725,8 +1725,8 @@ class Anomaly(Base):
     )
     datasetId: Mapped[int] = mapped_column(Integer)
     anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
-    _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LargeBinary, default=None)
     path_file: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
+    _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LONGBLOB, default=None)
     # catalogPath: Mapped[str] = mapped_column(VARCHAR(255), default=None)
     # NOTE: why do we need indicatorChecksum?
     # Answer: This can be useful to assign an anomaly to a specific snapshot of the indicator. Unclear if we need it atm, but maybe in the future...
