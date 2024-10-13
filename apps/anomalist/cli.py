@@ -83,6 +83,46 @@ def cli(
     **Example 1:** Create random anomaly for a dataset
 
     ```
+    $ etl anomalist --anomaly-type sample --dataset-ids 6369
+    ```
+
+    **Example 2:** Create GP anomalies
+
+    ```
+    $ etl anomalist --anomal-_type gp --dataset-ids 6369
+    ```
+
+    **Example 3:** Create anomalies by comparing dataset to its previous version
+
+    ```
+    $ etl anomalist --anomaly-type gp --dataset-ids 6589
+    ```
+    """
+    anomaly_detection(
+        anomaly_types=anomaly_types,
+        dataset_ids=dataset_ids,
+        variable_mapping=variable_mapping,
+        variable_ids=variable_ids,
+        dry_run=dry_run,
+        reset_db=reset_db,
+    )
+
+
+def anomaly_detection(
+    anomaly_types: Optional[Tuple[str, ...]],
+    dataset_ids: Optional[list[int]],
+    variable_mapping: Optional[str],  # type: ignore
+    variable_ids: Optional[list[int]],
+    dry_run: bool,
+    reset_db: bool,
+) -> None:
+    """TBD
+
+    TBD
+
+    **Example 1:** Create random anomaly for a dataset
+
+    ```
     $ etl anomalist --type sample --dataset-id 6369
     ```
 
@@ -180,20 +220,22 @@ def cli(
             # # Export anomaly file
             # anomaly.path_file = export_anomalies_file(df_score, dataset_id, detector.anomaly_type)
 
-            if not dry_run:
-                with Session(engine) as session:
-                    # TODO: Is this right? I suppose it should also delete if already existing.
-                    log.info("Deleting existing anomalies")
-                    session.query(gm.Anomaly).filter(
-                        gm.Anomaly.datasetId == dataset_id,
-                        gm.Anomaly.anomalyType.in_([a.anomalyType for a in anomalies]),
-                    ).delete(synchronize_session=False)
-                    session.commit()
+            anomalies.append(anomaly)
 
-                    # Insert new anomalies
-                    log.info("Writing anomalies to database")
-                    session.add_all(anomalies)
-                    session.commit()
+        if not dry_run:
+            with Session(engine) as session:
+                # TODO: Is this right? I suppose it should also delete if already existing.
+                log.info("Deleting existing anomalies")
+                session.query(gm.Anomaly).filter(
+                    gm.Anomaly.datasetId == dataset_id,
+                    gm.Anomaly.anomalyType.in_([a.anomalyType for a in anomalies]),
+                ).delete(synchronize_session=False)
+                session.commit()
+
+                # Insert new anomalies
+                log.info("Writing anomalies to database")
+                session.add_all(anomalies)
+                session.commit()
 
 
 def export_anomalies_file(df: pd.DataFrame, dataset_id: int, anomaly_type: str) -> str:
@@ -238,7 +280,7 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     return df
 
 
-@memory.cache
+# @memory.cache
 def _load_variables_meta(
     engine: Engine, dataset_ids: Optional[list[int]], variable_ids: Optional[list[int]]
 ) -> list[gm.Variable]:
