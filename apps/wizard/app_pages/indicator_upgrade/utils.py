@@ -8,7 +8,6 @@ from rapidfuzz import fuzz
 from structlog import get_logger
 
 from apps.wizard.utils.io import get_steps_df
-from etl import config
 from etl.db import get_connection
 from etl.grapher_io import get_all_datasets, get_dataset_charts, get_variables_in_dataset
 from etl.match_variables import find_mapping_suggestions, preliminary_mapping
@@ -103,56 +102,6 @@ def get_indicators_from_datasets(
             # This can happen if we are matching a dataset to itself in case of renaming variables.
             new_indictors = new_indictors[~new_indictors["id"].isin(old_indictors["id"])]
     return old_indictors, new_indictors
-
-
-def _check_env() -> bool:
-    """Check if environment indicators are set correctly."""
-    ok = True
-    for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
-        if getattr(config, env_name) is None:
-            ok = False
-            st.warning(st.markdown(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?"))
-
-    if ok:
-        st.success("`.env` configured correctly")
-    return ok
-
-
-def _show_environment() -> None:
-    """Show environment indicators (streamlit)."""
-    # show indicators (from .env)
-    st.info(
-        f"""
-    * **GRAPHER_USER_ID**: `{config.GRAPHER_USER_ID}`
-    * **DB_USER**: `{config.DB_USER}`
-    * **DB_NAME**: `{config.DB_NAME}`
-    * **DB_HOST**: `{config.DB_HOST}`
-    """
-    )
-
-
-@st.cache_resource
-def _check_env_and_environment() -> None:
-    """Check if environment indicators are set correctly."""
-    ok = _check_env()
-    if ok:
-        # check that you can connect to DB
-        try:
-            with st.spinner():
-                _ = get_connection()
-        except OperationalError as e:
-            st.error(
-                "We could not connect to the database. If connecting to a remote database, remember to"
-                f" ssh-tunel into it using the appropriate ports and then try again.\n\nError:\n{e}"
-            )
-            ok = False
-        except Exception as e:
-            raise e
-        else:
-            msg = "Connection to the Grapher database was successfull!"
-            st.success(msg)
-            st.subheader("Environment")
-            _show_environment()
 
 
 @st.cache_data(show_spinner=False)

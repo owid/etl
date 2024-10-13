@@ -57,6 +57,7 @@ from sqlalchemy.dialects.mysql import (
     TINYINT,
     VARCHAR,
 )
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # type: ignore
@@ -108,6 +109,14 @@ class Base(MappedAsDataclass, DeclarativeBase):
             setattr(x, k, v)
 
         return x
+
+    @classmethod
+    def create_table(cls, engine: Engine):
+        # Drop the table if it exists
+        cls.__table__.drop(engine, checkfirst=True)  # type: ignore
+
+        # Create table
+        cls.__table__.create(engine)  # type: ignore
 
 
 class Entity(Base):
@@ -1184,9 +1193,19 @@ class Variable(Base):
         )
 
     @classmethod
-    def load_variables_in_datasets(cls, session: Session, dataset_uris: List[str]) -> List["Variable"]:
-        conditions = [cls.catalogPath.startswith(uri) for uri in dataset_uris]
-        query = select(cls).where(or_(*conditions))
+    def load_variables_in_datasets(
+        cls,
+        session: Session,
+        dataset_uris: Optional[List[str]] = None,
+        dataset_ids: Optional[List[int]] = None,
+    ) -> List["Variable"]:
+        if dataset_uris is not None:
+            conditions = [cls.catalogPath.startswith(uri) for uri in dataset_uris]
+            query = select(cls).where(or_(*conditions))
+        elif dataset_ids is not None:
+            query = select(cls).where(cls.datasetId.in_(dataset_ids))
+        else:
+            raise ValueError("Either dataset_uris or dataset_ids must be provided")
         results = session.scalars(query).all()
         return list(results)
 
@@ -1716,9 +1735,11 @@ class Anomaly(Base):
     )
     datasetId: Mapped[int] = mapped_column(Integer)
     anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
+    path_file: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LONGBLOB, default=None)
     # catalogPath: Mapped[str] = mapped_column(VARCHAR(255), default=None)
     # NOTE: why do we need indicatorChecksum?
+    # Answer: This can be useful to assign an anomaly to a specific snapshot of the indicator. Unclear if we need it atm, but maybe in the future...
     # indicatorChecksum: Mapped[str] = mapped_column(VARCHAR(255), default=None)
     # globalScore: Mapped[float] = mapped_column(Float, default=None, nullable=True)
     # gptInfo: Mapped[Optional[dict]] = mapped_column(JSON, default=None, nullable=True)
@@ -1742,6 +1763,10 @@ class Anomaly(Base):
             feather.write_feather(value, buffer, compression="zstd")
             buffer.seek(0)
             self._dfScore = buffer.read()
+
+    @classmethod
+    def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
+        return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:

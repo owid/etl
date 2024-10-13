@@ -2,13 +2,39 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 import streamlit as st
+from sqlalchemy.orm import Session
 
 from apps.utils.map_datasets import get_grapher_changes
 from etl import grapher_io as gio
 from etl.config import OWID_ENV, OWIDEnv
 from etl.git_helpers import get_changed_files
-from etl.grapher_model import Variable
+from etl.grapher_model import Anomaly, Variable
 from etl.version_tracker import VersionTracker
+
+
+@st.cache_data
+def load_variables_display_in_dataset(
+    dataset_uri: Optional[List[str]] = None,
+    dataset_id: Optional[List[int]] = None,
+    only_slug: Optional[bool] = False,
+    _owid_env: OWIDEnv = OWID_ENV,
+) -> Dict[int, str]:
+    """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
+    indicators = gio.load_variables_in_dataset(
+        dataset_uri=dataset_uri,
+        dataset_id=dataset_id,
+        owid_env=_owid_env,
+    )
+
+    def _display_slug(o) -> str:
+        p = o.catalogPath
+        if only_slug:
+            return p.rsplit("/", 1)[-1] if isinstance(p, str) else ""
+        return p
+
+    indicators_display = {i.id: _display_slug(i) for i in indicators}
+
+    return indicators_display
 
 
 @st.cache_data
@@ -32,11 +58,16 @@ def load_dataset_uris() -> List[str]:
 
 @st.cache_data
 def load_variables_in_dataset(
-    dataset_uri: List[str],
+    dataset_uri: Optional[List[str]] = None,
+    dataset_id: Optional[List[int]] = None,
     _owid_env: OWIDEnv = OWID_ENV,
 ) -> List[Variable]:
     """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
-    return gio.load_variables_in_dataset(dataset_uri, _owid_env)
+    return gio.load_variables_in_dataset(
+        dataset_uri=dataset_uri,
+        dataset_id=dataset_id,
+        owid_env=_owid_env,
+    )
 
 
 @st.cache_data
@@ -67,6 +98,16 @@ def load_variable_data(
         variable=variable,
         owid_env=_owid_env,
     )
+
+
+@st.cache_data
+def load_anomalies_in_dataset(
+    dataset_ids: List[int],
+    _owid_env: OWIDEnv = OWID_ENV,
+) -> List[Anomaly]:
+    """Load Anomaly objects that belong to a dataset with URI `dataset_uri`."""
+    with Session(_owid_env.engine) as session:
+        return Anomaly.load_anomalies(session, dataset_ids)
 
 
 @st.cache_data(show_spinner=False)

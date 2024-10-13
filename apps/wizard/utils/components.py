@@ -214,3 +214,19 @@ def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **k
     """
 
     components.html(HTML, height=height, **kwargs)
+
+
+def st_tag(tag_name: str, color: str, icon: str):
+    """Create a custom HTML tag.
+
+    Parameters
+    ----------
+    tag_name : str
+        Tag name.
+    color : str
+        Color of the tag. Must be replaced with any of the following supported colors: blue, green, orange, red, violet, gray/grey, rainbow
+    icon: str
+        Icon of the tag. Can be material (e.g. ':material/upgrade:') or emoji (e.g. '🪄').
+    """
+    tag_raw = f":{color}-background[{icon}: {tag_name}]"
+    st.markdown(tag_raw)

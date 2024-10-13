@@ -1,4 +1,6 @@
 import json
+import tempfile
+from pathlib import Path
 from typing import Dict, Literal, Optional, Tuple, get_args
 
 import click
@@ -11,8 +13,11 @@ from sqlalchemy.orm import Session
 
 from apps.anomalist.bard_anomaly import NaNAnomalyDetector
 from apps.anomalist.gp_anomaly import GPAnomalyDetector, SampleAnomalyDetector
+from apps.wizard.utils.paths import WIZARD_ANOMALIES_RELATIVE
 from etl import grapher_model as gm
+from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
+from etl.files import create_folder, upload_file_to_server
 from etl.grapher_io import variable_data_df_from_s3
 from etl.paths import CACHE_DIR
 
@@ -78,6 +83,46 @@ def cli(
     **Example 1:** Create random anomaly for a dataset
 
     ```
+    $ etl anomalist --anomaly-type sample --dataset-ids 6369
+    ```
+
+    **Example 2:** Create GP anomalies
+
+    ```
+    $ etl anomalist --anomal-_type gp --dataset-ids 6369
+    ```
+
+    **Example 3:** Create anomalies by comparing dataset to its previous version
+
+    ```
+    $ etl anomalist --anomaly-type gp --dataset-ids 6589
+    ```
+    """
+    anomaly_detection(
+        anomaly_types=anomaly_types,
+        dataset_ids=dataset_ids,
+        variable_mapping=variable_mapping,
+        variable_ids=variable_ids,
+        dry_run=dry_run,
+        reset_db=reset_db,
+    )
+
+
+def anomaly_detection(
+    anomaly_types: Optional[Tuple[str, ...]],
+    dataset_ids: Optional[list[int]],
+    variable_mapping: Optional[str],  # type: ignore
+    variable_ids: Optional[list[int]],
+    dry_run: bool,
+    reset_db: bool,
+) -> None:
+    """TBD
+
+    TBD
+
+    **Example 1:** Create random anomaly for a dataset
+
+    ```
     $ etl anomalist --type sample --dataset-id 6369
     ```
 
@@ -97,10 +142,7 @@ def cli(
 
     if reset_db:
         # Drop the 'anomalies' table if it exists
-        gm.Anomaly.__table__.drop(engine, checkfirst=True)  # type: ignore
-
-        # Create the 'anomalies' table
-        gm.Anomaly.__table__.create(engine)  # type: ignore
+        gm.Anomaly.create_table(engine)
         return
 
     # If no anomaly types are provided, default to all available types
@@ -120,9 +162,9 @@ def cli(
         variable_mapping = dict()
 
     # Load metadata for all variables in dataset_ids (if any given) and variable_ids, and new variables in variable_mapping.
-    variable_ids_all = (list(variable_mapping.values()) if variable_mapping else []) + (
-        list(variable_ids) if variable_ids else []
-    )
+    variable_ids_mapping = set(variable_mapping.values()) if variable_mapping else set()
+    variable_ids_list = set((variable_ids)) if variable_ids else set()
+    variable_ids_all = list(variable_ids_mapping | variable_ids_list)
     if dataset_ids is None:
         dataset_ids = []
     variables = _load_variables_meta(engine, dataset_ids, variable_ids_all)
@@ -162,27 +204,59 @@ def cli(
             df_score = detector.get_score_df(df, variables_in_dataset)
 
             # TODO: validate format of the output dataframe
-
             anomaly = gm.Anomaly(
                 datasetId=dataset_id,
                 anomalyType=detector.anomaly_type,
             )
             anomaly.dfScore = df_score
 
-            if not dry_run:
-                with Session(engine) as session:
-                    # TODO: Is this right? I suppose it should also delete if already existing.
-                    log.info("Deleting existing anomalies")
-                    session.query(gm.Anomaly).filter(
-                        gm.Anomaly.datasetId == dataset_id,
-                        gm.Anomaly.anomalyType.in_([a.anomalyType for a in anomalies]),
-                    ).delete(synchronize_session=False)
-                    session.commit()
+            # TODO: Use this as an alternative to storing binary files in the DB
+            # anomaly = gm.Anomaly(
+            #     datasetId=dataset_id,
+            #     anomalyType=detector.anomaly_type,
+            # )
+            # anomaly.dfScore = None
 
-                    # Insert new anomalies
-                    log.info("Writing anomalies to database")
-                    session.add_all(anomalies)
-                    session.commit()
+            # # Export anomaly file
+            # anomaly.path_file = export_anomalies_file(df_score, dataset_id, detector.anomaly_type)
+
+            anomalies.append(anomaly)
+
+        if not dry_run:
+            with Session(engine) as session:
+                # TODO: Is this right? I suppose it should also delete if already existing.
+                log.info("Deleting existing anomalies")
+                session.query(gm.Anomaly).filter(
+                    gm.Anomaly.datasetId == dataset_id,
+                    gm.Anomaly.anomalyType.in_([a.anomalyType for a in anomalies]),
+                ).delete(synchronize_session=False)
+                session.commit()
+
+                # Insert new anomalies
+                log.info("Writing anomalies to database")
+                session.add_all(anomalies)
+                session.commit()
+
+
+def export_anomalies_file(df: pd.DataFrame, dataset_id: int, anomaly_type: str) -> str:
+    """Export anomaly df to local file (and upload to staging server if applicable)."""
+    filename = f"{dataset_id}_{anomaly_type}.feather"
+    path = Path(f".anomalies/{filename}")
+    path_str = str(path)
+    if OWID_ENV.env_local == "staging":
+        create_folder(path.parent)
+        df.to_feather(path_str)
+    elif OWID_ENV.env_local == "dev":
+        # tmp_filename = Path("tmp.feather")
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_file_path = Path(tmp_dir) / filename
+            df.to_feather(tmp_file_path)
+            upload_file_to_server(tmp_file_path, f"owid@{OWID_ENV.name}:/home/owid/etl/{WIZARD_ANOMALIES_RELATIVE}")
+    else:
+        raise ValueError(
+            f"Unsupported environment: {OWID_ENV.env_local}. Did you try production? That's not supported!"
+        )
+    return path_str
 
 
 # @memory.cache
@@ -206,7 +280,7 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     return df
 
 
-@memory.cache
+# @memory.cache
 def _load_variables_meta(
     engine: Engine, dataset_ids: Optional[list[int]], variable_ids: Optional[list[int]]
 ) -> list[gm.Variable]:

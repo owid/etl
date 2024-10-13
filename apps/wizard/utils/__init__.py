@@ -24,7 +24,6 @@ import bugsnag
 import numpy as np
 import streamlit as st
 from owid.catalog import Dataset
-from pymysql import OperationalError
 from sqlalchemy.orm import Session
 from structlog import get_logger
 from typing_extensions import Self
@@ -33,7 +32,7 @@ from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
 from apps.wizard.utils.step_form import StepForm
 from etl.config import OWID_ENV, enable_bugsnag
-from etl.db import get_connection, read_sql
+from etl.db import read_sql
 from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
 from etl.paths import (
@@ -405,8 +404,6 @@ class AppState:
                     key=f"{key}_custom",
                     default_last=default_value,
                 )
-            # else:
-            #     st.session_state[f"{self.step}.{key}_custom"] = "nana"
 
     @classproperty
     def args(cls: "AppState") -> argparse.Namespace:
@@ -475,22 +472,6 @@ def _check_env() -> bool:
     if ok:
         st.success(("`.env` configured correctly"))
     return ok
-
-
-def _check_db() -> bool:
-    try:
-        with st.spinner():
-            _ = get_connection()
-    except OperationalError as e:
-        st.error(
-            "We could not connect to the database. If connecting to a remote database, remember to"
-            f" ssh-tunel into it using the appropriate ports and then try again.\n\nError:\n{e}"
-        )
-        return False
-    except Exception as e:
-        raise e
-    st.success("Connection to the Grapher database was successfull!")
-    return True
 
 
 def _show_environment():
@@ -633,9 +614,6 @@ def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
             st.page_link(**kwargs)
     else:
         st.page_link(**kwargs)
-
-
-st.cache_data
 
 
 def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None, output: str = "") -> str:

@@ -271,10 +271,7 @@ class UnknownOWIDEnv(Exception):
 
 
 class OWIDEnv:
-    """OWID environment.
-
-    TODO: maybe worth moving to etl.config
-    """
+    """OWID environment."""
 
     _env_remote: OWIDEnvType | None
     _env_local: OWIDEnvType | None
