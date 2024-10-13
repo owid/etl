@@ -122,9 +122,9 @@ def cli(
         variable_mapping = dict()
 
     # Load metadata for all variables in dataset_ids (if any given) and variable_ids, and new variables in variable_mapping.
-    variable_ids_all = (list(variable_mapping.values()) if variable_mapping else []) + (
-        list(variable_ids) if variable_ids else []
-    )
+    variable_ids_mapping = set(variable_mapping.values()) if variable_mapping else set()
+    variable_ids_list = set((variable_ids)) if variable_ids else set()
+    variable_ids_all = list(variable_ids_mapping | variable_ids_list)
     if dataset_ids is None:
         dataset_ids = []
     variables = _load_variables_meta(engine, dataset_ids, variable_ids_all)
