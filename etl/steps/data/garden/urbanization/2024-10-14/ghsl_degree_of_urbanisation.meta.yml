@@ -1,0 +1,60 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ghsl_degree_of_urbanisation:
+    variables:
+      value:
+          title: |-
+            <% if indicator.include?("share") and indicator.include?("rural") and indicator.include?("population") %>
+            Share of population living in rural areas
+            <% elsif indicator.include?("share") and indicator.include?("urban") and indicator.include?("population") and indicator.include?"cluster" %>
+            Share of population living in towns and suburbs
+            <% elsif indicator.include?("share") and indicator.include?("urban") and indicator.include?("population") and not indicator.include?("cluster") %>
+            Share of population living in cities
+            <% elsif indicator.include?("share") and indicator.include?("urban") and indicator.include?("population") and indicator.include?"area" %>
+            Share of population living in urban areas
+            <% if indicator.include?("rural") and indicator.include?("population") and not indicator.include?("share") %>
+            Population living in rural areas
+            <% elsif indicator.include?("urban") and indicator.include?("population") and indicator.include?("cluster")  and not indicator.include?("share") %>
+            Population living in towns and suburbs
+            <% elsif indicator.include?("urban") and indicator.include?("population") and not indicator.include?("cluster") and not indicator.include?("share") %>
+            Population living in cities
+            <% elsif indicator.include?("urban") and indicator.include?("area") and not indicator.include?("share") %>
+            Population living in urban areas
+            <% if indicator.include?("share") and indicator.include?("rural") and indicator.include?("area") %>
+            Share of area in rural regions
+            <% elsif indicator.include?("share") and indicator.include?("urban") and indicator.include?("area") and indicator.include?("cluster") %>
+            Share of area in towns and suburbs
+            <% elsif indicator.include?("share") and indicator.include?("urban") and indicator.include?("area") and not indicator.include?("cluster") %>
+            Share of area in cities
+            <% elsif indicator.include?("share") and indicator.include?("urban") and indicator.include?("area") %>
+            Share of area in urban regions
+            <% if indicator.include?("rural") and indicator.include?("area") and not indicator.include?("share") %>
+            Area covered by rural regions
+            <% elsif indicator.include?("urban") and indicator.include?("area") and indicator.include?("cluster") and not indicator.include?("share") %>
+            Area covered by towns and suburbs
+            <% elsif indicator.include?("urban") and indicator.include?("area") and not indicator.include?("cluster") and not indicator.include?("share") %>
+            Area covered by cities
+            <% elsif indicator.include?("urban") and indicator.include?("area") and not indicator.include?("share") %>
+            Area covered by urban areas
+            <%- endif -%>
+          unit:
+            <% if indicator.include?("share") %>
+            "%"
+            <% elsif indicator.include?("population") %>
+            "people"
+            <% elsif indicator.include?("area") %>
+            "km²"
+            <%- endif -%>
