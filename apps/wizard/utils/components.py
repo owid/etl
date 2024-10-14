@@ -25,8 +25,13 @@ HORIZONTAL_STYLE = """<style class="hide-element">
         display: flex;
         flex-direction: row !important;
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 1rem;
         align-items: baseline;
+    }
+    /* Override the default width of selectboxes in horizontal layout */
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) select {
+        min-width: 200px;  /* Set a minimum width for selectboxes */
+        max-width: 400px;  /* Optional: Set a max-width to avoid overly wide selectboxes */
     }
     /* Buttons and their parent container all have a width of 704px, which we need to override */
     div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) div {
