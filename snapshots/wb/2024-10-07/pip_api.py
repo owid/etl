@@ -429,7 +429,7 @@ def pip_query_country(
 
     # Replace names of columns and drop redundancies
     df = df.rename(columns={"country_name": "country", "reporting_year": "year"})
-    df = df.drop(columns=["region_code"])
+    df = df.drop(columns=["region_code", "region_name"])
 
     # Reorder columns: ppp_version, country, year, povline and the rest
     first_columns = ["ppp_version", "country", "year", "poverty_line"]
@@ -1651,7 +1651,7 @@ def median_patch(df, country_or_region):
     return df
 
 
-def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles,wb_api:WB_API):
+def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles, wb_api: WB_API):
     """
     Add relative poverty indicators and decile thresholds to the key indicators file.
     """
@@ -1727,11 +1727,14 @@ def add_regional_definitions(wb_api: WB_API, df: pd.DataFrame) -> pd.DataFrame:
     This is a more complete version of the regional definitions that are already in the PIP dataset (Saudi Arabia, for example, is missing).
     """
 
+    # Remove region_name column
+    df = df.drop(columns=["region_name"])
+
     # Get regional definitions
     df_regional_definitions = pip_aux_tables(wb_api, table="country_list")
 
     # Make it a dataframe
-    df_regional_definitions = pd.DataFrame.from_dict(df_regional_definitions['country_list'])
+    df_regional_definitions = pd.DataFrame.from_dict(df_regional_definitions["country_list"])
 
     # Rename country_name to country
     df_regional_definitions = df_regional_definitions.rename(
