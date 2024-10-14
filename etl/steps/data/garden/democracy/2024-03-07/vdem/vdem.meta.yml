@@ -302,11 +302,11 @@ tables:
   vdem_multi_with_regions:
     common:
       description_processing: |-
-        <% if aggregate_method == 'average' %>
+        <%- if aggregate_method == 'average' -%>
         The regional aggregates (including values for the World) have been estimated by averaging the country values.
-        <% elif aggregate_method < 'population-weighted average' %>
+        <%- elif aggregate_method < 'population-weighted average' -%>
         The regional aggregates (including values for World) have been estimated by averaging the country values weighed by popupalation. $\alpha$. The population values are from the UN WPP 2022 revision dataset.
-        <% endif %>
+        <%- endif -%>
       display:
         numDecimalPlaces: 2
       presentation: &common_ppt
@@ -1538,65 +1538,65 @@ tables:
     variables:
       num_countries_regime:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of countries with unknown regime
-          <% else %>
+          <%- else -%>
           Number of << category.replace('cracy', 'cracies') >>
-          <% endif %>
+          <%- endif -%>
       num_countries_regime_amb:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of countries with unknown (ambiguous) regime
-          <% else %>
+          <%- else -%>
           Number of << category.replace('cracy', 'cracies') >> (ambiguous)
-          <% endif %>
+          <%- endif -%>
 
       num_countries_hoe:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of countries in which chief executive's gender is unknown
-          <% else %>
+          <%- else -%>
           Number of countries in which chief executive is a << category.lower() >>
-          <% endif %>
+          <%- endif -%>
       num_countries_hog:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of countries in which head of government's gender is unknown
-          <% else %>
+          <%- else -%>
           Number of countries in which head of government is a << category.lower() >>
-          <% endif %>
+          <%- endif -%>
       num_countries_hos:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of countries in which head of state's gender is unknown
-          <% else %>
+          <%- else -%>
           Number of countries in which head of state is a << category.lower() >>
-          <% endif %>
+          <%- endif -%>
       num_countries_wom_parl:
         title: |
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of countries with an unknown number of women in parliament
-          <% elif category == '0% women' %>
+          <%- elif category == '0% women' -%>
           Number of countries with no women in parliament
-          <% else %>
+          <%- else -%>
           Number of countries with << category >> in parliament
-          <% endif %>
+          <%- endif -%>
         unit: "countries"
 
       num_countries_years_in_electdem:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of electoral democracies with an unknown age
-          <% else %>
+          <%- else -%>
           Number of electoral democracies aged << category >>
-          <% endif %>
+          <%- endif -%>
       num_countries_years_in_libdem:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of liberal democracies with an unknown age
-          <% else %>
+          <%- else -%>
           Number of liberal democracies aged << category >>
-          <% endif %>
+          <%- endif -%>
 
   ##################################################################################################
   ##################################################################################################
@@ -1607,63 +1607,63 @@ tables:
     variables:
       population_regime:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           People living in countries without regime data
-          <% else %>
+          <%- else -%>
           People living in << category.replace('cracy', 'cracies') >>
-          <% endif %>
+          <%- endif -%>
       population_regime_amb:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           People living in countries without regime (ambiguous) data
-          <% else %>
+          <%- else -%>
           People living in << category.replace('cracy', 'cracies') >> (ambiguous)
-          <% endif %>
+          <%- endif -%>
 
       population_hoe:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           People living in countries in which chief executive's gender is unknown
-          <% else %>
+          <%- else -%>
           People living in countries in which chief executive is a << category.lower() >>
-          <% endif %>
+          <%- endif -%>
       population_hog:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           People living in countries in which head of government's gender is unknown
-          <% else %>
+          <%- else -%>
           People living in countries in which head of government is a << category.lower() >>
-          <% endif %>
+          <%- endif -%>
       population_hos:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           People living in countries in which head of state's gender is unknown
-          <% else %>
+          <%- else -%>
           People living in countries in which head of state is a << category.lower() >>
-          <% endif %>
+          <%- endif -%>
 
       population_wom_parl:
         title: |
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           People living in countries with an unknown number of women in parliament
-          <% elif category == '0% women' %>
+          <%- elif category == '0% women' -%>
           People living in countries with no women in parliament
-          <% else %>
+          <%- else -%>
           People living in countries with << category >> in parliament
-          <% endif %>
+          <%- endif -%>
         unit: "countries"
 
       population_years_in_electdem:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           People living in electoral democracies with an unknown age
-          <% else %>
+          <%- else -%>
           People living in electoral democracies aged << category >>
-          <% endif %>
+          <%- endif -%>
       population_years_in_libdem:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           People living in liberal democracies with an unknown age
-          <% else %>
+          <%- else -%>
           People living in liberal democracies aged << category >>
-          <% endif %>
+          <%- endif -%>
