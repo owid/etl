@@ -1750,6 +1750,13 @@ def add_regional_definitions(wb_api: WB_API, df: pd.DataFrame) -> pd.DataFrame:
     # Add year = MAX_YEAR to the regional definitions
     df_regional_definitions["year"] = MAX_YEAR
 
+    # For each year in PPP_VERSIONS, add ppp_version
+    for ppp_year in PPP_VERSIONS:
+        df_regional_definitions["ppp_version"] = ppp_year
+
+        # Merge df with regional definitions
+        df = pd.merge(df, df_regional_definitions, on=["country", "year", "ppp_version"], how="outer")
+
     # Merge df with regional definitions
     df = pd.merge(df, df_regional_definitions, on=["country", "year"], how="outer")
 
