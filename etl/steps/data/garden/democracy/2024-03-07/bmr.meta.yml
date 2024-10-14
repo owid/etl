@@ -115,38 +115,38 @@ tables:
     variables:
       num_countries_regime:
         title: |-
-          <% if category == 0 %>
+          <%- if category == 0 -%>
           Number of non-democracies
-          <% elif category == 1 %>
+          <%- elif category == 1 -%>
           Number of democracies
-          <% else %>
+          <%- else -%>
           Number of countries in an unknown regime
-          <% endif %>
+          <%- endif -%>
         unit: "countries"
         description_short: |-
-          <% if category == 0 %>
+          <%- if category == 0 -%>
           The number of countries that are not democracies in a given year.
-          <% elif category == 1 %>
+          <%- elif category == 1 -%>
           The number of countries that are democracies in a given year.
-          <% else %>
+          <%- else -%>
           The number of countries in the region that are in an unknown regime in a given year.
-          <% endif %>
+          <%- endif -%>
         description_key:
           - *dk_democracy_1
       num_countries_regime_ws:
         title: |-
-          <% if category == 0 %>
+          <%- if category == 0 -%>
           Number of non-democracies, including women's suffrage
-          <% elif category == 1 %>
+          <%- elif category == 1 -%>
           Number of democracies, including women's suffrage
-          <% endif %>
+          <%- endif -%>
         unit: "countries"
         description_short: |-
-          <% if category == 0 %>
+          <%- if category == 0 -%>
           The number of countries that are not democracies with women's suffrage in a given year.
-          <% elif category == 1 %>
+          <%- elif category == 1 -%>
           The number of countries in the region that are democracies with women's suffrage in a given year.
-          <% endif %>
+          <%- endif -%>
         description_key:
           - *dk_democracy_ws_1
 
@@ -165,34 +165,34 @@ tables:
     variables:
       num_countries_years_in_democracy_consec:
         title: |-
-          <% if category == '91+' %>
+          <%- if category == '91+' -%>
           Number of democracies aged 91 or older
-          <% else %>
+          <%- else -%>
           Number of democracies aged << category >> years
-          <% endif %>
+          <%- endif -%>
         unit: "countries"
         description_short: |-
-          <% if category == '91+' %>
+          <%- if category == '91+' -%>
           The number of countries that have been democracies for 91 or more years straight.
-          <% else %>
+          <%- else -%>
           The number of countries that have been democracies for << category >> years straight.
-          <% endif %>
+          <%- endif -%>
         description_key:
           - *dk_democracy_1
       num_countries_years_in_democracy_ws_consec:
         title: |-
-          <% if category == '91+' %>
+          <%- if category == '91+' -%>
           Number of democracies (incl. women's suffrage) aged 91 or older
-          <% else %>
+          <%- else -%>
           Number of democracies (incl. women's suffrage) aged << category >> years
-          <% endif %>
+          <%- endif -%>
         unit: "countries"
         description_short: |-
-          <% if category == '91+' %>
+          <%- if category == '91+' -%>
           The number of countries that have been democracies (including women's suffrage) for 91 or more years straight.
-          <% else %>
+          <%- else -%>
           The number of countries that have been democracies (including women's suffrage) for << category >> years straight.
-          <% endif %>
+          <%- endif -%>
         description_key:
           - *dk_democracy_ws_1
 
@@ -211,38 +211,38 @@ tables:
     variables:
       population_regime:
         title: |-
-          <% if category == 0 %>
+          <%- if category == 0 -%>
           People living in non-democracies
-          <% elif category == 1 %>
+          <%- elif category == 1 -%>
           People living in democracies
-          <% else %>
+          <%- else -%>
           People living in countries without regime data
-          <% endif %>
+          <%- endif -%>
         unit: "people"
         description_short: |-
-          <% if category == 0 %>
+          <%- if category == 0 -%>
           The number of people that live in countries that are not democracies.
-          <% elif category == 1 %>
+          <%- elif category == 1 -%>
           The number of people that live in countries that are democracies.
-          <% else %>
+          <%- else -%>
           The number of people that live in countries for which there is no data.
-          <% endif %>
+          <%- endif -%>
         description_key:
           - *dk_democracy_1
       population_regime_ws:
         title: |-
-          <% if category == 0 %>
+          <%- if category == 0 -%>
           People living in non-democracies, including women's suffrage
-          <% elif category == 1 %>
+          <%- elif category == 1 -%>
           People living in democracies, including women's suffrage
-          <% endif %>
+          <%- endif -%>
         unit: "people"
         description_short: |-
-          <% if category == 0 %>
+          <%- if category == 0 -%>
           The number of people that live in countries that are not democracies with women's suffrage.
-          <% elif category == 1 %>
+          <%- elif category == 1 -%>
           The number of people that live in countries that are democracies with women's suffrage.
-          <% endif %>
+          <%- endif -%>
         description_key:
           - *dk_democracy_ws_1
 
@@ -261,33 +261,33 @@ tables:
     variables:
       population_years_in_democracy_consec:
         title: |-
-          <% if category == '91+' %>
+          <%- if category == '91+' -%>
           People living in 91-year-old (or older) democracies
-          <% else %>
+          <%- else -%>
           People living in (<< category >>)-year-old democracies
-          <% endif %>
+          <%- endif -%>
         unit: "people"
         description_short: |-
-          <% if category == '91+' %>
+          <%- if category == '91+' -%>
           The number of people that live in countries with 91-year-old democracies.
-          <% else %>
+          <%- else -%>
           The number of people that live in countries with democracies aged << category >> years.
-          <% endif %>
+          <%- endif -%>
         description_key:
           - *dk_democracy_1
       population_years_in_democracy_ws_consec:
         title: |-
-          <% if category == '91+' %>
+          <%- if category == '91+' -%>
           People living in 91-year-old (or older) democracies (incl. women's suffrage)
-          <% else %>
+          <%- else -%>
           People living in (<< category >>)-year-old democracies (incl. women's suffrage)
-          <% endif %>
+          <%- endif -%>
         unit: "people"
         description_short: |-
-          <% if category == '91+' %>
+          <%- if category == '91+' -%>
           The number of people that live in countries with 91-year-old democracies with women's suffrage.
-          <% else %>
+          <%- else -%>
           The number of people that live in countries with democracies with women's suffrage aged << category >> years.
-          <% endif %>
+          <%- endif -%>
         description_key:
           - *dk_democracy_ws_1

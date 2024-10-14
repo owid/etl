@@ -2,11 +2,11 @@
 definitions:
   others:
     group_notes: |-
-      <% if organism == 'RSV' %>
+      <%- if organism == 'RSV' -%>
       This includes RSV A and RSV B.
-      <% elif organism == 'Influenza A' %>
+      <%- elif organism == 'Influenza A' -%>
       This includes Influenza A H1N1 and H3N2.
-      <% endif %>
+      <%- endif -%>
   common:
     presentation:
       topic_tags:
