@@ -1,4 +1,5 @@
 # TODO: Extract data in arrow files, for faster processing.
+# NOTE: Check if we can modify the functions to extract missing percentile series for countries in specific years (Cote d'Ivoire 1998 2008, Montenegro 2013 for example).
 """
 DATA EXTRACTION FOR THE WORLD BANK POVERTY AND INEQUALITY PLATFORM (PIP) API
 
@@ -196,7 +197,7 @@ def run(live_api: bool) -> None:
     df = median_patch(df, country_or_region="country")
 
     # Add relative poverty indicators and decile thresholds to the key indicators file
-    df = add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles)
+    df = add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles)
 
 
 class WB_API:
@@ -1648,7 +1649,7 @@ def median_patch(df, country_or_region):
     return df
 
 
-def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
+def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles):
     """
     Add relative poverty indicators and decile thresholds to the key indicators file.
     """
