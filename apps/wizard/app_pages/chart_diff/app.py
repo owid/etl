@@ -11,7 +11,8 @@ from structlog import get_logger
 from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_grapher
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
-from apps.wizard.utils import Pagination, set_states
+from apps.wizard.utils import set_states
+from apps.wizard.utils.components import Pagination
 from etl import config
 from etl.config import OWID_ENV
 
