@@ -33,6 +33,7 @@ st.set_page_config(
     page_icon="🪄",
     layout="wide",
 )
+
 # OTHER CONFIG
 ANOMALY_TYPES = {
     "time_change": {
@@ -72,7 +73,7 @@ st.session_state.anomalist_datasets_submitted = st.session_state.get("anomalist_
 # List with anomalies found in the selected datasets (dataset last submitted in the form by the user)
 st.session_state.anomalist_anomalies = st.session_state.get("anomalist_anomalies", [])
 # FLAG: True if the anomalies were directly loaded from DB (not estimated)
-st.session_state.anomalist_anomalies_from_cache = st.session_state.get("anomalist_anomalies_from_cache", False)
+st.session_state.anomalist_anomalies_already_in_db = st.session_state.get("anomalist_anomalies_already_in_db", False)
 
 # Filter: Entities and indicators
 st.session_state.anomalist_filter_entities = st.session_state.get("anomalist_filter_entities", [])
@@ -179,15 +180,16 @@ with st.form(key="dataset_search"):
 
 
 # 3/ SCAN FOR ANOMALIES (if user submits datasets)
-# If anomalies for dataset already exist in DB, load them. Warn user that these are being
+# If anomalies for dataset already exist in DB, load them. Warn user that these are being loaded from DB
 if st.session_state.anomalist_datasets_submitted:
     # Check if anomalies are already there
     st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.datasets_selected)
 
     # No anomaly found in DB, estimate them
+    # TODO
     if len(st.session_state.anomalist_anomalies) == 0:
         # Reset flag
-        st.session_state.anomalist_anomalies_from_cache = False
+        st.session_state.anomalist_anomalies_already_in_db = False
 
         # Load indicators in selected datasets
         st.session_state.indicators = cached.load_variables_display_in_dataset(
@@ -230,14 +232,15 @@ if st.session_state.anomalist_datasets_submitted:
 
     else:
         # Set flag
-        st.session_state.anomalist_anomalies_from_cache = True
+        st.session_state.anomalist_anomalies_already_in_db = True
 
 
 # 4/ SHOW ANOMALIES
 # Show anomalies if any are found in database
 if len(st.session_state.anomalist_anomalies) > 0:
-    # 4.0/ WARNING: Show warning if anomalies are loaded from cache
-    if st.session_state.anomalist_anomalies_from_cache:
+    # 4.0/ WARNING: Show warning if anomalies are loaded from DB without re-computing
+    # TODO: we could actually know if anomalies are out of sync from dataset/indicators. Maybe based on dataset/indicator checksums?
+    if st.session_state.anomalist_anomalies_already_in_db:
         st.caption(
             "Anomalies are being loaded from the database. This might be out of sync with current dataset. Click on button below to run the anomaly-detection algorithm again."
         )
@@ -317,8 +320,13 @@ if len(st.session_state.anomalist_anomalies) > 0:
 
         # Display if anomaly is 'nan'
         if anomaly.anomalyType == "nan":
-            x = df.drop(columns=["year"]).groupby("entityName", as_index=False).sum()
+            x = df  # .drop(columns=["year"]).groupby("entityName", as_index=False).sum()
             st.dataframe(x)
+
+    # l = list(st.session_state.indicators.keys())
+    # for index, anomaly in enumerate(ANOMALY_TYPES):
+    #     # Get score dataframe
+    #     show_anomaly(ANOMALIES[index], l[index])
 
 # Reset state
 set_states({"anomalist_datasets_submitted": False})
