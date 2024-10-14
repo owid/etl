@@ -2,7 +2,7 @@ import json
 from contextlib import contextmanager
 from copy import deepcopy
 from random import sample
-from typing import Any, Callable, Dict, Literal, Optional
+from typing import Any, Callable, Dict, List, Literal, Optional
 
 import numpy as np
 import streamlit as st
@@ -127,11 +127,12 @@ def default_converter(o):
 
 def grapher_chart(
     catalog_path: Optional[str] = None,
-    variable_id: Optional[int] = None,
-    variable: Optional[Variable] = None,
+    variable_id: Optional[int | List[int]] = None,
+    variable: Optional[Variable | List[Variable]] = None,
     chart_config: Optional[Dict[str, Any]] = None,
     owid_env: OWIDEnv = OWID_ENV,
     selected_entities: Optional[list] = None,
+    included_entities: Optional[list] = None,
     num_sample_selected_entities: int = 5,
     height=600,
     **kwargs,
@@ -153,7 +154,9 @@ def grapher_chart(
     owid_env : OWIDEnv, optional
         Environment configuration, by default OWID_ENV
     selected_entities : Optional[list], optional
-        List of entities to plot, by default None. If None, a random sample of num_sample_selected_entities will be plotted.
+        List of entities to plot, by default None. If None, a random sample of num_sample_selected_entities will be plotted. Use entity names!
+    included_entities : Optional[list], optional
+        List of entities to include in chart. The rest are excluded! This is equivalent to `includedEntities` in Grapher. Use entity IDs!
     num_sample_selected_entities : int, optional
         Number of entities to sample if selected_entities is None, by default 5. If there are less entities than this number, all will be plotted.
     height : int, optional
@@ -165,24 +168,29 @@ def grapher_chart(
         chart_config = deepcopy(CONFIG_BASE)
 
         # Tweak config
-        if variable_id is not None:
+        if isinstance(variable_id, int):
             chart_config["dimensions"] = [{"property": "y", "variableId": variable_id}]
-        else:
+        elif isinstance(variable_id, list):
+            chart_config["dimensions"] = [{"property": "y", "variableId": v} for v in variable_id]
+        elif isinstance(catalog_path, str):
+            variable = ensure_load_variable(catalog_path, owid_env=owid_env)
+            chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
+        elif isinstance(variable, Variable):
             variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
             chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
+        elif isinstance(variable, list):
+            variables = [ensure_load_variable(catalog_path, variable_id, v, owid_env) for v in variable]
+            chart_config["dimensions"] = [{"property": "y", "variableId": v.id} for v in variables]
 
         ## Selected entities?
         if selected_entities is not None:
             chart_config["selectedEntityNames"] = selected_entities
-        else:
-            # Get variable data
-            if variable_id is not None:
-                df = load_variable_data(variable_id=variable_id, owid_env=owid_env)
-            else:
-                df = load_variable_data(variable=variable, owid_env=owid_env)
-            # Pick selected entities
-            entities = list(df["entity"].unique())
-            chart_config["selectedEntityNames"] = sample(entities, min(len(entities), num_sample_selected_entities))
+
+        # Included entities
+        print(included_entities)
+        if included_entities is not None:
+            included_entities = [str(entity) for entity in included_entities]
+            chart_config["includedEntities"] = included_entities
 
     _chart_html(chart_config, owid_env, height=height, **kwargs)
 
@@ -221,6 +229,21 @@ def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **k
     components.html(HTML, height=height, **kwargs)
 
 
+def tag_in_md(tag_name: str, color: str, icon: str):
+    """Create a custom HTML tag.
+
+    Parameters
+    ----------
+    tag_name : str
+        Tag name.
+    color : str
+        Color of the tag. Must be replaced with any of the following supported colors: blue, green, orange, red, violet, gray/grey, rainbow
+    icon: str
+        Icon of the tag. Can be material (e.g. ':material/upgrade:') or emoji (e.g. '🪄').
+    """
+    return f":{color}-background[{icon}: {tag_name}]"
+
+
 def st_tag(tag_name: str, color: str, icon: str):
     """Create a custom HTML tag.
 
@@ -233,8 +256,7 @@ def st_tag(tag_name: str, color: str, icon: str):
     icon: str
         Icon of the tag. Can be material (e.g. ':material/upgrade:') or emoji (e.g. '🪄').
     """
-    tag_raw = f":{color}-background[{icon}: {tag_name}]"
-    st.markdown(tag_raw)
+    st.markdown(tag_in_md(tag_name, color, icon))
 
 
 class Pagination:
@@ -254,7 +276,7 @@ class Pagination:
     pagination = Pagination(
         items=items,
         items_per_page=items_per_page,
-        pagination_key="pagination-demo,
+        pagination_key="pagination-demo",
     )
 
     # Show controls only if needed
