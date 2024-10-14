@@ -1,7 +1,6 @@
 import json
 from contextlib import contextmanager
 from copy import deepcopy
-from random import sample
 from typing import Any, Callable, Dict, List, Literal, Optional
 
 import numpy as np
@@ -9,7 +8,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher_io import ensure_load_variable, load_variable_data
+from etl.grapher_io import ensure_load_variable
 from etl.grapher_model import Variable
 
 HORIZONTAL_STYLE = """<style class="hide-element">
@@ -168,19 +167,20 @@ def grapher_chart(
         chart_config = deepcopy(CONFIG_BASE)
 
         # Tweak config
-        if isinstance(variable_id, int):
+        if isinstance(variable_id, (int, np.integer)):
             chart_config["dimensions"] = [{"property": "y", "variableId": variable_id}]
         elif isinstance(variable_id, list):
             chart_config["dimensions"] = [{"property": "y", "variableId": v} for v in variable_id]
         elif isinstance(catalog_path, str):
-            variable = ensure_load_variable(catalog_path, owid_env=owid_env)
+            variable = ensure_load_variable(catalog_path=catalog_path, owid_env=owid_env)
             chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
         elif isinstance(variable, Variable):
-            variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
             chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
         elif isinstance(variable, list):
-            variables = [ensure_load_variable(catalog_path, variable_id, v, owid_env) for v in variable]
-            chart_config["dimensions"] = [{"property": "y", "variableId": v.id} for v in variables]
+            chart_config["dimensions"] = [{"property": "y", "variableId": v.id} for v in variable]
+        else:
+            variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
+            chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
 
         ## Selected entities?
         if selected_entities is not None:
