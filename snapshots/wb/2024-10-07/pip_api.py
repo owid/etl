@@ -429,7 +429,7 @@ def pip_query_country(
 
     # Replace names of columns and drop redundancies
     df = df.rename(columns={"country_name": "country", "reporting_year": "year"})
-    df = df.drop(columns=["region_code", "region_name"])
+    df = df.drop(columns=["region_code"])
 
     # Reorder columns: ppp_version, country, year, povline and the rest
     first_columns = ["ppp_version", "country", "year", "poverty_line"]
