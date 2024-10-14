@@ -27,7 +27,7 @@ import streamlit as st
 from apps.anomalist.cli import anomaly_detection
 from apps.wizard.app_pages.anomalist.utils import get_datasets_and_mapping_inputs
 from apps.wizard.utils import cached, set_states
-from apps.wizard.utils.components import grapher_chart, st_horizontal, st_tag
+from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
 from apps.wizard.utils.db import WizardDB
 
 # PAGE CONFIG
@@ -89,6 +89,9 @@ st.session_state.anomalist_anomalies_already_in_db = st.session_state.get("anoma
 st.session_state.anomalist_filter_entities = st.session_state.get("anomalist_filter_entities", [])
 st.session_state.anomalist_filter_indicators = st.session_state.get("anomalist_filter_indicators", [])
 
+# Sorting
+st.session_state.anomalist_sorting_columns = st.session_state.get("anomalist_sorting_columns", [])
+
 # DEBUGGING
 # This should be removed and replaced with dynamic fields
 ENTITIES = [
@@ -124,9 +127,6 @@ ANOMALIES = [
 ANOMALIES = ANOMALIES + ANOMALIES + ANOMALIES + ANOMALIES
 DATASETS_DEBUG = ["grapher/energy/2024-06-20/energy_mix"]  # 6590
 ENTITIES_DEFAULT = [
-    "Afghanistan",
-    "Albania",
-    "Algeria",
     "Spain",
     "France",
     "Germany",
@@ -139,14 +139,11 @@ ENTITIES_DEFAULT = [
     "Brazil",
     "Russia",
     "Canada",
-    "Botswana",
     "South Africa",
     "Australia",
-    "Bhutan",
     "Venezuela",
-    "Bosnia and Herzegovina",
     "Croatia",
-    "Serbia",
+    "Azerbaijan",
 ]
 
 
@@ -217,6 +214,12 @@ def mock_anomalies_df(indicators_id, n=5):
     # Ensure there is only one row per entity, anomaly type and indicator
     df = df.sort_values("score", ascending=False).drop_duplicates(["entity", "type", "indicator_id"])
 
+    # Replace entity name with entity ID
+    entity_mapping = cached.load_entity_ids()
+    entity_mapping_inv = {v: k for k, v in entity_mapping.items()}
+    df["entity_id"] = df["entity"].map(entity_mapping_inv)
+    # st.write(entity_mapping)
+
     # 3/ Add meta scores
     num_scores = len(df)
     df["score_population"] = [random.random() for i in range(num_scores)]
@@ -236,27 +239,49 @@ def mock_anomalies_df(indicators_id, n=5):
 ######################################################################
 # FUNCTIONS
 ######################################################################
+def _toast(indicator_id):
+    """Demo action when clicked on table"""
+    st.toast(f"Changing entity in indicator {indicator_id}")
+
+
 @st.fragment
 def show_anomaly_compact(index, df):
     indicator_id, an_type = index
     row = 0
 
+    # Get relevant metadata for this view
     entity = df.iloc[row]["entity"]
+    entities = df["entity_id"].tolist()
     year = df.iloc[row]["year"]
-    title = f"{indicator_id} - {entity} - {year}"
+    indicator_uri = st.session_state.indicators.get(indicator_id)
+
+    if an_type == "time_change":
+        text = f"There are significant changes for {entity} in {year} compared to the old version of the indicator. There might be other data points affected."
+    elif an_type == "upgrade_change":
+        text = f"There are abrupt changes for {entity} in {year}! There might be other data points affected."
+    else:
+        raise ValueError(f"Unknown anomaly type: {an_type}")
+
     with st.container(border=True):
+        st.markdown(f"{tag_in_md(**ANOMALY_TYPES[an_type])} **{indicator_uri}**")
         col1, col2 = st.columns(2)
         # Overview, description, others
         with col1:
-            st_tag(**ANOMALY_TYPES[an_type])
-            st.markdown(f"##### {title}")
-        # Chart
+            # Chart
+            grapher_chart(variable_id=indicator_id, selected_entities=[entity], included_entities=entities)
         with col2:
-            # st.write(indicator.id)
-            grapher_chart(variable_id=indicator_id, selected_entities=[entity])
-
-        st_tag(**ANOMALY_TYPES[an_type])
-        st.dataframe(df)
+            # Description
+            st.markdown(text)
+            # Others
+            st.divider()
+            st.markdown("View other affected entities")
+            st.dataframe(
+                df[["entity"] + st.session_state.anomalist_sorting_columns],
+                selection_mode=["multi-row"],
+                key=f"anomaly_table_{indicator_id}_{an_type}",
+                on_select=lambda indicator_id=indicator_id: _toast(indicator_id),
+                hide_index=True,
+            )
 
 
 def show_anomaly(anomaly, indicator_id):
@@ -267,7 +292,6 @@ def show_anomaly(anomaly, indicator_id):
     with st.container(border=True):
         col1, col2 = st.columns(2)
         with col1:
-            st_tag(**ANOMALY_TYPES[anomaly["category"]])
             st.markdown(f"##### {anomaly['title']}")
             st.markdown(f"{anomaly['description']}")
         with col2:
@@ -287,19 +311,22 @@ def filter_df(df: pd.DataFrame):
     if len(st.session_state.anomalist_filter_indicators) > 0:
         df = df[df["indicator_id"].isin(st.session_state.anomalist_filter_indicators)]
     ## Sort
+    st.session_state.anomalist_sorting_columns = []
     match st.session_state.anomalist_sorting_strategy:
         case "relevance":
-            df = df.sort_values(["score_weighed"], ascending=False)
+            st.session_state.anomalist_sorting_columns = ["score_weighed"]
         case "score":
-            df = df.sort_values(["score"], ascending=False)
+            st.session_state.anomalist_sorting_columns = ["score"]
         case "population":
-            df = df.sort_values(["score_population"], ascending=False)
+            st.session_state.anomalist_sorting_columns = ["score_population"]
         case "views":
-            df = df.sort_values(["score_views"], ascending=False)
+            st.session_state.anomalist_sorting_columns = ["score_views"]
         case "population+views":
-            df = df.sort_values(["score_population", "score_views"], ascending=False)
+            st.session_state.anomalist_sorting_columns = ["score_population", "score_views"]
         case _:
             pass
+    if st.session_state.anomalist_sorting_columns != []:
+        df = df.sort_values(st.session_state.anomalist_sorting_columns, ascending=False)
     return df
 
 
@@ -514,9 +541,23 @@ if len(st.session_state.anomalist_anomalies) > 0:
     if not df_change.empty:
         # st.dataframe(df_change)
         groups = df_change.groupby(["indicator_id", "type"], sort=False)
-        for group in groups:
-            show_anomaly_compact(group[0], group[1])
-            st.divider()
+        items = list(groups)
+        items_per_page = 10
+
+        # Define pagination
+        pagination = Pagination(
+            items=items,
+            items_per_page=items_per_page,
+            pagination_key="pagination-demo",
+        )
+
+        # Show controls only if needed
+        if len(items) > items_per_page:
+            pagination.show_controls(mode="bar")
+
+        # Show items (only current page)
+        for item in pagination.get_page_items():
+            show_anomaly_compact(item[0], item[1])
 
     # st.divider()
     # if not df_missing.empty:
