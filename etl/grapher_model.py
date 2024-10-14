@@ -131,7 +131,7 @@ class Entity(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
     @classmethod
-    def load_entity_mapping(cls, session: Session, entity_ids: List[int]) -> Dict[int, str]:
+    def load_entity_mapping(cls, session: Session, entity_ids: Optional[List[int]] = None) -> Dict[int, str]:
         q = text(
             """
         select
@@ -140,8 +140,26 @@ class Entity(Base):
         where id in :entity_ids
         """
         )
-        # Use a dictionary to pass parameters
-        stm = select(Entity).from_statement(q).params(entity_ids=entity_ids)
+        if entity_ids is not None:
+            q = text(
+                """
+            select
+                *
+            from entities
+            where id in :entity_ids
+            """
+            )
+            # Use a dictionary to pass parameters
+            stm = select(Entity).from_statement(q).params(entity_ids=entity_ids)
+        else:
+            q = text(
+                """
+            select
+                *
+            from entities
+            """
+            )
+            stm = select(Entity).from_statement(q)
         rows = session.execute(stm).scalars().all()
 
         # Convert the list of rows to a dictionary with id as key

@@ -426,7 +426,7 @@ def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dic
         return response.json()
 
 
-def load_entity_mapping(entity_ids: List[int], owid_env: OWIDEnv = OWID_ENV) -> Dict[int, str]:
+def load_entity_mapping(entity_ids: Optional[List[int]] = None, owid_env: OWIDEnv = OWID_ENV) -> Dict[int, str]:
     # Fetch the mapping of entity ids to names.
     with Session(owid_env.engine) as session:
         entity_id_to_name = Entity.load_entity_mapping(session=session, entity_ids=entity_ids)

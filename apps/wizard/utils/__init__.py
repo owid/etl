@@ -18,7 +18,7 @@ import re
 import sys
 from datetime import date
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional, cast
+from typing import Any, Callable, Dict, List, Optional, cast
 
 import bugsnag
 import numpy as np
