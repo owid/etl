@@ -2,7 +2,7 @@ import json
 from contextlib import contextmanager
 from copy import deepcopy
 from random import sample
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Literal, Optional
 
 import numpy as np
 import streamlit as st
@@ -230,3 +230,134 @@ def st_tag(tag_name: str, color: str, icon: str):
     """
     tag_raw = f":{color}-background[{icon}: {tag_name}]"
     st.markdown(tag_raw)
+
+
+class Pagination:
+    """Use pagination to show a list of items in Streamlit.
+
+    Example:
+
+    def st_show(item):
+        # Function to render item
+        ...
+
+    # Parameters
+    items = []
+    items_per_page = 10
+
+    # Define pagination
+    pagination = Pagination(
+        items=items,
+        items_per_page=items_per_page,
+        pagination_key="pagination-demo,
+    )
+
+    # Show controls only if needed
+    if len(items) > items_per_page:
+        pagination.show_controls(mode="bar")
+
+    # Show items (only current page)
+    for item in pagination.get_page_items():
+        st_show(item)
+
+    """
+
+    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str, on_click: Optional[Callable] = None):
+        """Construct Pagination.
+
+        Parameters
+        ----------
+        items : list[Any]
+            List of items to paginate.
+        items_per_page : int
+            Number of items per page.
+        pagination_key : str
+            Key to store the current page in session state.
+        on_click : Optional[Callable], optional
+            Action to perform when interacting with any of the buttons, by default None
+        """
+        self.items = items
+        self.items_per_page = items_per_page
+        self.pagination_key = pagination_key
+        # Action to perform when interacting with any of the buttons.
+        ## Example: Change the value of certain state in session_state
+        self.on_click = on_click
+        # Initialize session state for the current page
+        if self.pagination_key not in st.session_state:
+            self.page = 1
+
+    @property
+    def page(self):
+        value = st.session_state[self.pagination_key]
+        return value
+
+    @page.setter
+    def page(self, value):
+        st.session_state[self.pagination_key] = value
+
+    @property
+    def total_pages(self) -> int:
+        return (len(self.items) - 1) // self.items_per_page + 1
+
+    def get_page_items(self) -> list[Any]:
+        page = self.page
+        start_idx = (page - 1) * self.items_per_page
+        end_idx = start_idx + self.items_per_page
+        return self.items[start_idx:end_idx]
+
+    def show_controls(self, mode: Literal["buttons", "bar"] = "buttons") -> None:
+        if mode == "bar":
+            self.show_controls_bar()
+        elif mode == "buttons":
+            self.show_controls_buttons()
+        else:
+            raise ValueError("Mode must be either 'buttons' or 'bar'.")
+
+    def show_controls_buttons(self):
+        # Pagination controls
+        col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
+
+        with st.container(border=True):
+            with col1:
+                key = f"previous-{self.pagination_key}"
+                if self.page > 1:
+                    if st.button("⏮️ Previous", key=key):
+                        self.page -= 1
+                        if self.on_click is not None:
+                            self.on_click()
+                        st.rerun()
+                else:
+                    st.button("⏮️ Previous", disabled=True, key=key)
+
+            with col3:
+                key = f"next-{self.pagination_key}"
+                if self.page < self.total_pages:
+                    if st.button("Next ⏭️", key=key):
+                        self.page += 1
+                        if self.on_click is not None:
+                            self.on_click()
+                        st.rerun()
+                else:
+                    st.button("Next ⏭️", disabled=True, key=key)
+
+            with col2:
+                st.text(f"Page {self.page} of {self.total_pages}")
+
+    def show_controls_bar(self) -> None:
+        def _change_page():
+            # Internal action
+
+            # External action
+            if self.on_click is not None:
+                self.on_click()
+
+        col, _ = st.columns([1, 3])
+        with col:
+            st.number_input(
+                label=f"**Go to page** (total: {self.total_pages})",
+                min_value=1,
+                max_value=self.total_pages,
+                # value=self.page,
+                on_change=_change_page,
+                key=self.pagination_key,
+            )
