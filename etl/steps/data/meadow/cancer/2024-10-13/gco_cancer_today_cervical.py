@@ -20,7 +20,10 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    tb = tb["Cancer label", "Population"]
+    tb = tb[["Population", "ASR (World) per 100 000"]]
+    tb = tb.rename(columns={"Population": "country", "ASR (World) per 100 000": "asr"})
+    tb["year"] = 2022
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])
 

@@ -20,3 +20,7 @@ meta:
     license:
       name: Protocol 2 of the Universal Copyright Convention
       url: https://gco.iarc.fr/today/en/about#references
+outs:
+  - md5: ac4a4ed8b7555f3e8e30dde0b5dee640
+    size: 8302
+    path: gco_cancer_today_cervical.csv

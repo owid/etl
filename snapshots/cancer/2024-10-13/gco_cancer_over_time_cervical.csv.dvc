@@ -13,10 +13,14 @@ meta:
     citation_full: |-
       Ervik M, Lam F, Laversanne M, Colombet M, Ferlay J, Miranda-Filho A, Bray F (2024). Global Cancer Observatory: Cancer Over Time. Lyon, France: International Agency for Research on Cancer. Available from: https://gco.iarc.who.int/overtime , accessed [13 October 2024]
     # Files
-    url_main: https://gco.iarc.fr/today/en/dataviz/maps-heatmap?mode=population&cancers=23&sexes=2
+    url_main: https://gco.iarc.fr/overtime/en/dataviz/trends?populations=752_32_36_40_48_112_124_152_156_170_188_191_196_203_208_218_233_246_250_276_352_356_372_380_376_392_414_428_410_440_470_474_528_554_578_608_616_630_634_705_724_756_764_792_800_840_8260_8261_8262_8263_8401_8402&sexes=2&types=0&multiple_populations=1&group_populations=0&cancers=16
     date_accessed: 2024-10-13
 
     # License
     license:
       name: Protocol 2 of the Universal Copyright Convention
       url: https://gco.iarc.fr/overtime/en/about#web-reference
+outs:
+  - md5: 538a14fa88a1ea1ae92c54bd9fdef131
+    size: 108572
+    path: gco_cancer_over_time_cervical.csv
