@@ -1729,7 +1729,12 @@ def add_regional_definitions(wb_api: WB_API, df: pd.DataFrame) -> pd.DataFrame:
     df_regional_definitions = pip_aux_tables(wb_api=WB_API, table="country_list")
 
     # Rename country_name to country
-    df_regional_definitions = df_regional_definitions.rename(columns={"country_name": "country"})
+    df_regional_definitions = df_regional_definitions.rename(
+        columns={"country_name": "country", "region": "region_name"}
+    )
+
+    # Keep the relevant columns
+    df_regional_definitions = df_regional_definitions[["country", "region_name"]]
 
     # Define MAX_YEAR as the maximum year in the df
     MAX_YEAR = df["year"].max()
