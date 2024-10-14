@@ -27,23 +27,23 @@ dataset:
 
 definitions:
   fatalities: |-
-    <% if fatality == "No deaths" %>
+    <%- if fatality == "No deaths" -%>
     The number of ongoing interstate conflicts in each year in which ultimately no combatant dies.
-    <% elif fatality == "1-25 deaths" %>
+    <%- elif fatality == "1-25 deaths" -%>
     The number of ongoing interstate conflicts in each year in which ultimately 1-25 combatants dies.
-    <% elif fatality == "26-100 deaths" %>
+    <%- elif fatality == "26-100 deaths" -%>
     The number of ongoing interstate conflicts in each year in which ultimately 26-100 combatants dies.
-    <% elif fatality == "101-250 deaths" %>
+    <%- elif fatality == "101-250 deaths" -%>
     The number of ongoing interstate conflicts in each year in which ultimately 101-250 combatants dies.
-    <% elif fatality == "251-500 deaths" %>
+    <%- elif fatality == "251-500 deaths" -%>
     The number of ongoing interstate conflicts in each year in which ultimately 251-500 combatants dies.
-    <% elif fatality == "501-999 deaths" %>
+    <%- elif fatality == "501-999 deaths" -%>
     The number of ongoing interstate conflicts in each year in which ultimately 501-999 combatants dies.
-    <% elif fatality == "> 999 deaths" %>
+    <%- elif fatality == "> 999 deaths" -%>
     The number of ongoing interstate conflicts in each year in which ultimately at least 1,000 combatants dies.
-    <% elif fatality == "Unknown" %>
+    <%- elif fatality == "Unknown" -%>
     The number of ongoing interstate conflicts in each year for which there was no ultimate number of deaths given.
-    <% endif %>
+    <%- endif -%>
 
 tables:
   cow_mid:
@@ -63,13 +63,13 @@ tables:
         unit: disputes
         description_short: The annual number of ongoing disputes
         description: |-
-          <% if hostility == "all" and fatality == "all" %>
+          <%- if hostility == "all" and fatality == "all" -%>
           The number of all ongoing interstate conflicts in each year.
 
           An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
 
           We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflict.
-          <% elif hostility == "Threat to use force" %>
+          <%- elif hostility == "Threat to use force" -%>
           The number of interstate conflicts in each year where at most the use of force is threatened over the conflict's duration.
 
           An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
@@ -77,7 +77,7 @@ tables:
           We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflict.
 
           The hostility level for a conflict overall is the highest level across all world regions.
-          <% elif hostility == "Display of force" %>
+          <%- elif hostility == "Display of force" -%>
           The number of interstate conflicts in each year where at most force is displayed over the conflict's duration.
 
           An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
@@ -85,7 +85,7 @@ tables:
           We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflict.
 
           The hostility level for a conflict overall is the highest level across all world regions.
-          <% elif hostility == "Use of force" %>
+          <%- elif hostility == "Use of force" -%>
           The number of interstate conflicts in each year where force is used, but causes fewer than 1,000 combatant deaths due to fighting over the conflict's duration.
 
           An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
@@ -93,7 +93,7 @@ tables:
           We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflict.
 
           The hostility level for a conflict overall is the highest level across all world regions.
-          <% elif hostility == "War" %>
+          <%- elif hostility == "War" -%>
           The number of interstate conflicts in each year where the use of force causes at least 1,000 combatant deaths due to fighting over the conflict's duration.
 
           An interstate conflict is a disagreement between states where force is threatened, displayed, or used.
@@ -101,13 +101,13 @@ tables:
           We count a conflict as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing conflict.
 
           The hostility level for a conflict overall is the highest level across all world regions.
-          <% elif hostility == "all" %>
+          <%- elif hostility == "all" -%>
           {definitions.fatalities}
 
           An ongoing interstate conflict is a disagreement between states where force is threatened, displayed, or used.
 
           Deaths of combatants due to fighting are included.
-          <% endif %>
+          <%- endif -%>
         processing_level: major
         display:
           numDecimalPlaces: 0
@@ -124,7 +124,7 @@ tables:
         unit: disputes
         description_short: The annual number of new disputes
         description: |-
-          <% if hostility == "all" %>
+          <%- if hostility == "all" -%>
           The number of all new interstate conflicts in each year.
 
           A new interstate conflict is a disagreement between states where force is threatened, displayed, or used for the first time.
@@ -132,7 +132,7 @@ tables:
           We only count a conflict as new when the conflict overall started that year, not if it restarted or changed its hostility level (i.e. escalated or deescalated).
 
           We count a conflict as new in a region even if the conflict started at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
-          <% elif hostility == "Threat to use force" %>
+          <%- elif hostility == "Threat to use force" -%>
           The number of new interstate conflicts in each year where at most the use of force is threatened over the conflict's duration.
 
           A new interstate conflict is a disagreement between states where force is threatened, displayed, or used for the first time.
@@ -142,7 +142,7 @@ tables:
           We count a conflict as new in a region even if the conflict started at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
 
           The hostility level for a conflict overall is the highest level across all world regions.
-          <% elif hostility == "Display of force" %>
+          <%- elif hostility == "Display of force" -%>
           The number of new interstate conflicts in each year where at most force is displayed over the conflict's duration.
 
           A new interstate conflict is a disagreement between states where force is threatened, displayed, or used for the first time.
@@ -152,7 +152,7 @@ tables:
           We count a conflict as new in a region even if the conflict started at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
 
           The hostility level for a conflict overall is the highest level across all world regions.
-          <% elif hostility == "Use of force" %>
+          <%- elif hostility == "Use of force" -%>
           The number of new interstate conflicts in each year where force is used, but causes fewer than 1,000 combatant deaths due to fighting over the conflict's duration.
 
           An interstate conflict is a disagreement between states where force is threatened, displayed, or used for the first time.
@@ -162,7 +162,7 @@ tables:
           We count a conflict as new in a region even if the conflict started at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
 
           The hostility level for a conflict overall is the highest level across all world regions.
-          <% elif hostility == "War" %>
+          <%- elif hostility == "War" -%>
           The number of new interstate conflicts in each year where the use of force causes at least 1,000 combatant deaths due to fighting over the conflict's duration.
 
           A new interstate conflict is a disagreement between states where force is threatened, displayed, or used for the first time.
@@ -172,7 +172,7 @@ tables:
           We count a conflict as new in a region even if the conflict started at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
 
           The hostility level for a conflict overall is the highest level across all world regions.
-          <% endif %>
+          <%- endif -%>
 
         processing_level: major
         display:
