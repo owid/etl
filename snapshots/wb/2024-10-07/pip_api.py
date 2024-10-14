@@ -199,7 +199,7 @@ def run(live_api: bool) -> None:
     df = median_patch(df, country_or_region="country")
 
     # Add relative poverty indicators and decile thresholds to the key indicators file
-    df = add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles)
+    df = add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles, wb_api)
 
 
 class WB_API:
@@ -1651,7 +1651,7 @@ def median_patch(df, country_or_region):
     return df
 
 
-def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles):
+def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles,wb_api:WB_API):
     """
     Add relative poverty indicators and decile thresholds to the key indicators file.
     """
@@ -1711,7 +1711,7 @@ def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles):
     )
 
     # Add regional definitions
-    df = add_regional_definitions(wb_api=WB_API, df=df)
+    df = add_regional_definitions(wb_api, df=df)
 
     # Save key indicators file
     df.to_csv(f"{CACHE_DIR}/world_bank_pip.csv", index=False)
@@ -1728,7 +1728,10 @@ def add_regional_definitions(wb_api: WB_API, df: pd.DataFrame) -> pd.DataFrame:
     """
 
     # Get regional definitions
-    df_regional_definitions = pip_aux_tables(wb_api=WB_API, table="country_list")
+    df_regional_definitions = pip_aux_tables(wb_api, table="country_list")
+
+    # Make it a dataframe
+    df_regional_definitions = pd.DataFrame.from_dict(df_regional_definitions['country_list'])
 
     # Rename country_name to country
     df_regional_definitions = df_regional_definitions.rename(
