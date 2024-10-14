@@ -33,6 +33,8 @@ def run(dest_dir: str) -> None:
     for col in [col for col in tb.columns if col not in ["country", "year", "period"]]:
         tb[col] = tb[col].replace("Not available", pd.NA)
         tb[col] = tb[col].astype("Int64")
+        if "Emigration" in col:
+            tb[col] = tb[col].apply(lambda x: -x if x is not pd.NA else x)
 
     # remove rows with years ending in june:
     tb = tb[~tb.period.str.contains("June")]
