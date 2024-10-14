@@ -6,7 +6,7 @@ meta:
     title: Global Human Settlement Layer Dataset
     description: |-
       This dataset provides a comprehensive classification of urbanization levels for administrative regions worldwide, using the Global ADMinistrative layer version 4.1 (GADM4.1) as the source of administrative units. The classification is derived from the application of the Degree of Urbanisation model's Stage II, which evaluates each unit based on urbanization criteria. It utilizes the Global Human Settlement Layer (GHSL) data, specifically the Settlement Classification (GHS-SMOD_GLOBE_R2023A) that categorizes areas as urban, suburban, or rural, and the Population Grid (GHS-POP_GLOBE_R2023A) that provides detailed population information.
-    date_published: 2024
+    date_published: '2024'
 
     # Citation
     producer: European Commission, Joint Research Centre (JRC)
