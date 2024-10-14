@@ -1708,10 +1708,37 @@ def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles):
         how="left",
     )
 
+    # Add regional definitions
+    df = add_regional_definitions(wb_api=WB_API, df=df)
+
     # Save key indicators file
     df.to_csv(f"{CACHE_DIR}/world_bank_pip.csv", index=False)
 
     log.info("Relative poverty indicators and decile thresholds added. Key indicators file done :)")
+
+    return df
+
+
+def add_regional_definitions(wb_api: WB_API, df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Extract the complete definitions of regions and their countries from the World Bank API.
+    This is a more complete version of the regional definitions that are already in the PIP dataset (Saudi Arabia, for example, is missing).
+    """
+
+    # Get regional definitions
+    df_regional_definitions = pip_aux_tables(wb_api=WB_API, table="country_list")
+
+    # Rename country_name to country
+    df_regional_definitions = df_regional_definitions.rename(columns={"country_name": "country"})
+
+    # Define MAX_YEAR as the maximum year in the df
+    MAX_YEAR = df["year"].max()
+
+    # Add year = MAX_YEAR to the regional definitions
+    df_regional_definitions["year"] = MAX_YEAR
+
+    # Merge df with regional definitions
+    df = pd.merge(df, df_regional_definitions, on=["country", "year"], how="outer")
 
     return df
 
