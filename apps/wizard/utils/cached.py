@@ -13,6 +13,11 @@ from etl.version_tracker import VersionTracker
 
 
 @st.cache_data
+def load_entity_ids(entity_ids: Optional[List[int]] = None):
+    return gio.load_entity_mapping(entity_ids)
+
+
+@st.cache_data
 def load_variables_display_in_dataset(
     dataset_uri: Optional[List[str]] = None,
     dataset_id: Optional[List[int]] = None,
