@@ -1,4 +1,5 @@
 """Utils for chart revision tool."""
+from enum import Enum
 from typing import Dict, Tuple
 
 import streamlit as st
@@ -11,6 +12,13 @@ from etl.config import OWID_ENV, OWIDEnv
 
 # Logger
 log = get_logger()
+
+
+class AnomalyTypeEnum(Enum):
+    TIME_CHANGE = "time_change"
+    UPGRADE_CHANGE = "upgrade_change"
+    UPGRADE_MISSING = "upgrade_missing"
+    # AI = "ai"  # Uncomment if needed
 
 
 # TODO: Consider refactoring the following function, which does too many things.
