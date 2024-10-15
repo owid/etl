@@ -9,7 +9,7 @@ from owid.catalog import Table, VariableMeta, VariablePresentationMeta
 
 non_market_income_description = "Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account."
 
-nowcast_regions_description = "Regional and global estimates are extrapolated up until the year of the data release by using GDP growth estimates and forecasts available at World Bank's Macro and Poverty Outlook or Global Economic Prospects and also IMF's World Economic Outlook. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts)."
+nowcast_regions_description = "Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts available at the World Bank's Macro and Poverty Outlook or Global Economic Prospects and the IMF's World Economic Outlook. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts)."
 
 relative_poverty_description = "This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country."
 
