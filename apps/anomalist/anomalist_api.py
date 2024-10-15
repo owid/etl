@@ -16,6 +16,7 @@ from apps.anomalist.detectors import (
     AnomalyUpgradeMissing,
     get_long_format_score_df,
 )
+from apps.anomalist.gp_detector import AnomalyGaussianProcessOutlier
 from apps.wizard.utils.paths import WIZARD_ANOMALIES_RELATIVE
 from etl import grapher_model as gm
 from etl.config import OWID_ENV
@@ -28,15 +29,19 @@ log = structlog.get_logger()
 # Name of index columns for dataframe.
 INDEX_COLUMNS = ["entity_name", "year"]
 
-# Define anomaly types.
-ANOMALY_TYPE = Literal["upgrade_change", "time_change", "upgrade_missing"]
-
 # Define mapping of available anomaly types to anomaly detectors.
 ANOMALY_DETECTORS = {
-    "time_change": AnomalyTimeChange,
-    "upgrade_change": AnomalyUpgradeChange,
-    "upgrade_missing": AnomalyUpgradeMissing,
+    detector.anomaly_type: detector
+    for detector in [
+        AnomalyTimeChange,
+        AnomalyUpgradeChange,
+        AnomalyUpgradeMissing,
+        AnomalyGaussianProcessOutlier,
+    ]
 }
+
+# Define anomaly types.
+ANOMALY_TYPE = Literal[tuple(ANOMALY_DETECTORS.keys())]
 
 ########################################################################################################################
 
@@ -181,7 +186,6 @@ def get_analytics_score(df_aggregated: pd.DataFrame, df_views: pd.DataFrame) -> 
 
 def anomaly_detection(
     anomaly_types: Optional[Tuple[str, ...]] = None,
-    dataset_ids: Optional[list[int]] = None,
     variable_mapping: Optional[dict[int, int]] = None,
     variable_ids: Optional[list[int]] = None,
     dry_run: bool = False,
@@ -212,12 +216,9 @@ def anomaly_detection(
         (set(variable_mapping.keys()) | set(variable_mapping.values())) if variable_mapping else set()
     )
     variable_ids_all = list(variable_ids_mapping | set(variable_ids or []))
-    if dataset_ids is None:
-        dataset_ids = []
     # Dictionary variable_id: Variable object, for all variables (old and new).
     variables = {
-        variable.id: variable
-        for variable in _load_variables_meta(engine=engine, dataset_ids=dataset_ids, variable_ids=variable_ids_all)
+        variable.id: variable for variable in _load_variables_meta(engine=engine, variable_ids=variable_ids_all)
     }
 
     # Create a dictionary of all variable_ids for each dataset_id (only for new variables).
@@ -267,7 +268,7 @@ def anomaly_detection(
             # TODO: validate format of the output dataframe
             anomaly = gm.Anomaly(
                 datasetId=dataset_id,
-                anomalyType=detector.anomaly_type,
+                anomalyType=anomaly_type,
             )
             anomaly.dfScore = df_score_long
 
@@ -339,40 +340,12 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
 
 
 # @memory.cache
-def _load_variables_meta(
-    engine: Engine, dataset_ids: Optional[list[int]], variable_ids: Optional[list[int]]
-) -> list[gm.Variable]:
-    if dataset_ids:
-        q = """
-        select id from variables
-        where datasetId in %(dataset_ids)s
-        """
-        df_from_dataset_ids = read_sql(q, engine, params={"dataset_ids": dataset_ids})
-    else:
-        df_from_dataset_ids = pd.DataFrame()
-
-    if variable_ids:
-        q = """
-        select id from variables
-        where id in %(variable_ids)s
-        """
-        df_from_variable_ids = read_sql(q, engine, params={"variable_ids": variable_ids})
-    else:
-        df_from_variable_ids = pd.DataFrame()
-
-    # Combine both dataframes to get all possible variables required.
-    df = pd.concat([df_from_dataset_ids, df_from_variable_ids]).drop_duplicates()
-
-    # load all variables from a random dataset
-    if df.empty:
-        q = """
-        with t as (
-            select id from datasets order by rand() limit 1
-        )
-        select id from variables
-        where datasetId in (select id from t)
-        """
-        df = read_sql(q, engine)
+def _load_variables_meta(engine: Engine, variable_ids: list[int]) -> list[gm.Variable]:
+    q = """
+    select id from variables
+    where id in %(variable_ids)s
+    """
+    df = read_sql(q, engine, params={"variable_ids": variable_ids})
 
     # select all variables using SQLAlchemy
     with Session(engine) as session:
