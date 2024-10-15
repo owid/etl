@@ -1,7 +1,30 @@
+"""TBD
+
+TBD
+
+**Example 1:** Create random anomaly for a dataset
+
+```
+$ etl anomalist --anomaly-type sample --dataset-ids 6369
+```
+
+**Example 2:** Create GP anomalies
+
+```
+$ etl anomalist --anomal-_type gp --dataset-ids 6369
+```
+
+**Example 3:** Create anomalies by comparing dataset to its previous version
+
+```
+$ etl anomalist --anomaly-type gp --dataset-ids 6589
+```
+"""
+
 import json
 import tempfile
 from pathlib import Path
-from typing import Dict, Literal, Optional, Tuple, get_args
+from typing import Literal, Optional, Tuple, get_args
 
 import click
 import pandas as pd
@@ -31,7 +54,7 @@ ANOMALY_TYPE = Literal["sample", "gp", "nan"]
 @click.command(name="anomalist", cls=RichCommand, help=__doc__)
 @click.option(
     "--anomaly-types",
-    type=click.Choice(get_args(ANOMALY_TYPE)),
+    type=click.Choice(list(get_args(ANOMALY_TYPE))),
     multiple=True,
     default=None,
     help="Type (or types) of anomaly detection algorithm to use.",
@@ -46,7 +69,7 @@ ANOMALY_TYPE = Literal["sample", "gp", "nan"]
 @click.option(
     "--variable-mapping",
     type=str,
-    default=None,
+    default="",
     help="Optional JSON dictionary mapping variable IDs from a previous to a new version (where at least some of the new variable IDs must belong to the datasets whose IDs were given).",
 )
 @click.option(
@@ -71,37 +94,27 @@ ANOMALY_TYPE = Literal["sample", "gp", "nan"]
 def cli(
     anomaly_types: Optional[Tuple[str, ...]],
     dataset_ids: Optional[list[int]],
-    variable_mapping: Optional[str],  # type: ignore
+    variable_mapping: str,
     variable_ids: Optional[list[int]],
     dry_run: bool,
     reset_db: bool,
 ) -> None:
-    """TBD
+    # Convert variable mapping from JSON to dictionary.
+    if variable_mapping:
+        try:
+            variable_mapping_dict = {
+                int(variable_old): int(variable_new)
+                for variable_old, variable_new in json.loads(variable_mapping).items()
+            }
+        except json.JSONDecodeError:
+            raise ValueError("Invalid JSON format for variable_mapping.")
+    else:
+        variable_mapping_dict = {}
 
-    TBD
-
-    **Example 1:** Create random anomaly for a dataset
-
-    ```
-    $ etl anomalist --anomaly-type sample --dataset-ids 6369
-    ```
-
-    **Example 2:** Create GP anomalies
-
-    ```
-    $ etl anomalist --anomal-_type gp --dataset-ids 6369
-    ```
-
-    **Example 3:** Create anomalies by comparing dataset to its previous version
-
-    ```
-    $ etl anomalist --anomaly-type gp --dataset-ids 6589
-    ```
-    """
     anomaly_detection(
         anomaly_types=anomaly_types,
         dataset_ids=dataset_ids,
-        variable_mapping=variable_mapping,
+        variable_mapping=variable_mapping_dict,
         variable_ids=variable_ids,
         dry_run=dry_run,
         reset_db=reset_db,
@@ -109,35 +122,13 @@ def cli(
 
 
 def anomaly_detection(
-    anomaly_types: Optional[Tuple[str, ...]],
-    dataset_ids: Optional[list[int]],
-    variable_mapping: Optional[str],  # type: ignore
-    variable_ids: Optional[list[int]],
-    dry_run: bool,
-    reset_db: bool,
+    anomaly_types: Optional[Tuple[str, ...]] = None,
+    dataset_ids: Optional[list[int]] = None,
+    variable_mapping: Optional[dict[int, int]] = None,
+    variable_ids: Optional[list[int]] = None,
+    dry_run: bool = False,
+    reset_db: bool = False,
 ) -> None:
-    """TBD
-
-    TBD
-
-    **Example 1:** Create random anomaly for a dataset
-
-    ```
-    $ etl anomalist --type sample --dataset-id 6369
-    ```
-
-    **Example 2:** Create GP anomalies
-
-    ```
-    $ etl anomalist --type gp --dataset-id 6369
-    ```
-
-    **Example 3:** Create anomalies by comparing dataset to its previous version
-
-    ```
-    $ etl anomalist --type gp --previous-dataset-id 6322 --dataset-id 6589
-    ```
-    """
     engine = get_engine()
 
     if reset_db:
@@ -150,20 +141,12 @@ def anomaly_detection(
         anomaly_types = get_args(ANOMALY_TYPE)
 
     # Parse the variable_mapping if any provided.
-    if variable_mapping:
-        try:
-            variable_mapping: Dict[int, int] = {
-                int(variable_old): int(variable_new)
-                for variable_old, variable_new in json.loads(variable_mapping).items()
-            }
-        except json.JSONDecodeError:
-            raise ValueError("Invalid JSON format for variable_mapping.")
-    else:
+    if not variable_mapping:
         variable_mapping = dict()
 
     # Load metadata for all variables in dataset_ids (if any given) and variable_ids, and new variables in variable_mapping.
     variable_ids_mapping = set(variable_mapping.values()) if variable_mapping else set()
-    variable_ids_list = set((variable_ids)) if variable_ids else set()
+    variable_ids_list = set(variable_ids or [])
     variable_ids_all = list(variable_ids_mapping | variable_ids_list)
     if dataset_ids is None:
         dataset_ids = []
@@ -224,7 +207,7 @@ def anomaly_detection(
 
         if not dry_run:
             with Session(engine) as session:
-                # TODO: Is this right? I suppose it should also delete if already existing.
+                # TODO: Is this message right? I suppose it should only delete if already existing.
                 log.info("Deleting existing anomalies")
                 session.query(gm.Anomaly).filter(
                     gm.Anomaly.datasetId == dataset_id,

@@ -408,7 +408,7 @@ if st.session_state.anomalist_datasets_submitted:
                     anomaly_types=("nan",),
                     variable_ids=variable_ids,
                     dataset_ids=[],
-                    variable_mapping=str(mapping),
+                    variable_mapping=mapping,
                     dry_run=False,
                     reset_db=False,
                 )
