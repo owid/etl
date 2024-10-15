@@ -117,7 +117,7 @@ class Base(MappedAsDataclass, DeclarativeBase):
             cls.__table__.drop(engine, checkfirst=True)  # type: ignore
 
         # Create table
-        cls.__table__.create(engine)  # type: ignore
+        cls.__table__.create(engine, checkfirst=True)  # type: ignore
 
 
 class Entity(Base):
