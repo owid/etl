@@ -18,8 +18,8 @@ def run(dest_dir: str) -> None:
     ds_meadow_today = paths.load_dataset("gco_cancer_today_cervical")
 
     # Read tables from meadow datasets.
-    tb_today = ds_meadow_over_time["gco_cancer_over_time_cervical"].reset_index()
-    tb_over_time = ds_meadow_today["gco_cancer_today_cervical"].reset_index()
+    tb_over_time = ds_meadow_over_time["gco_cancer_over_time_cervical"].reset_index()
+    tb_today = ds_meadow_today["gco_cancer_today_cervical"].reset_index()
     #
     # Process data.
     #
