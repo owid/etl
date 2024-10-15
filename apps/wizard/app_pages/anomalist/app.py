@@ -95,6 +95,9 @@ st.session_state.anomalist_filter_indicators = st.session_state.get("anomalist_f
 # Sorting
 st.session_state.anomalist_sorting_columns = st.session_state.get("anomalist_sorting_columns", [])
 
+# FLAG: True to trigger anomaly detection manually
+st.session_state.anomalist_trigger_detection = st.session_state.get("anomalist_trigger_detection", False)
+
 ######################################################################
 # MOCK VARIABLES AND FUNCTIONS
 ######################################################################
@@ -470,7 +473,7 @@ if st.session_state.anomalist_datasets_submitted:
     st.session_state.anomalist_mapping_inv = {v: k for k, v in st.session_state.anomalist_mapping.items()}
 
     # 3.2/ No anomaly found in DB, estimate them
-    if len(st.session_state.anomalist_anomalies) == 0:
+    if (len(st.session_state.anomalist_anomalies) == 0) | (st.session_state.anomalist_trigger_detection):
         # Reset flag
         st.session_state.anomalist_anomalies_out_of_date = False
 
@@ -499,6 +502,9 @@ if st.session_state.anomalist_datasets_submitted:
 
         # Fill list of anomalies...
         st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
+
+        # Reset manual trigger
+        st.session_state.anomalist_trigger_detection = False
 
     # 3.3/ Anomalies found in DB. If outdated, set FLAG to True, so we can show a warning later on.
     else:
@@ -535,7 +541,16 @@ if st.session_state.anomalist_df is not None:
         st.caption(
             "Anomalies are being loaded from the database. This might be out of sync with current dataset. Click on button below to run the anomaly-detection algorithm again."
         )
-        st.button("Re-scan datasets for anomalies", icon="🔄")
+        st.button(
+            "Re-scan datasets for anomalies",
+            icon="🔄",
+            on_click=lambda: set_states(
+                {
+                    "anomalist_trigger_detection": True,
+                    "anomalist_datasets_submitted": True,
+                }
+            ),
+        )
 
     # 4.1/ ASK FOR FILTER PARAMS
     # User can customize which anomalies are shown to them
