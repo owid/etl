@@ -7,8 +7,8 @@ import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
 
+from apps.wizard.utils.chart_config import bake_chart_config
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher_io import ensure_load_variable
 from etl.grapher_model import Variable
 
 HORIZONTAL_STYLE = """<style class="hide-element">
@@ -54,69 +54,6 @@ def st_horizontal():
         yield
 
 
-CONFIG_BASE = {
-    # "title": "Placeholder",
-    # "subtitle": "Placeholder.",
-    # "originUrl": "placeholder",
-    # "slug": "placeholder",
-    # "selectedEntityNames": ["placeholder"],
-    "entityType": "entity",
-    "entityTypePlural": "entities",
-    "facettingLabelByYVariables": "metric",
-    "invertColorScheme": False,
-    "yAxis": {
-        "canChangeScaleType": False,
-        "min": 0,
-        "max": "auto",
-        "facetDomain": "shared",
-        "removePointsOutsideDomain": False,
-        "scaleType": "linear",
-    },
-    "hideTotalValueLabel": False,
-    "hideTimeline": False,
-    "hideLegend": False,
-    "tab": "chart",
-    "logo": "owid",
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-    "showYearLabels": False,
-    "id": 807,
-    "selectedFacetStrategy": "none",
-    "stackMode": "absolute",
-    "minTime": "earliest",
-    "compareEndPointsOnly": False,
-    "version": 14,
-    "sortOrder": "desc",
-    "maxTime": "latest",
-    "type": "LineChart",
-    "hideRelativeToggle": True,
-    "addCountryMode": "add-country",
-    "hideAnnotationFieldsInTitle": {"entity": False, "changeInPrefix": False, "time": False},
-    "matchingEntitiesOnly": False,
-    "showNoDataArea": True,
-    "scatterPointLabelStrategy": "year",
-    "hideLogo": False,
-    "xAxis": {
-        "canChangeScaleType": False,
-        "min": "auto",
-        "max": "auto",
-        "facetDomain": "shared",
-        "removePointsOutsideDomain": False,
-        "scaleType": "linear",
-    },
-    "hideConnectedScatterLines": False,
-    "zoomToSelection": False,
-    "hideFacetControl": True,
-    "hasMapTab": True,
-    "hideScatterLabels": False,
-    "missingDataStrategy": "auto",
-    "isPublished": False,
-    "timelineMinTime": "earliest",
-    "hasChartTab": True,
-    "timelineMaxTime": "latest",
-    "sortBy": "total",
-}
-
-
 def default_converter(o):
     if isinstance(o, np.integer):  # ignore
         return int(o)
@@ -132,13 +69,14 @@ def grapher_chart(
     owid_env: OWIDEnv = OWID_ENV,
     selected_entities: Optional[list] = None,
     included_entities: Optional[list] = None,
-    num_sample_selected_entities: int = 5,
     height=600,
     **kwargs,
 ):
     """Plot a Grapher chart using the Grapher API.
 
     You can either plot a given chart config (using chart_config) or plot an indicator with its default metadata using either catalog_path, variable_id or variable.
+
+    Note: You can find more details on our Grapher API at https://files.ourworldindata.org/schemas/grapher-schema.005.json.
 
     Parameters
     ----------
@@ -156,8 +94,6 @@ def grapher_chart(
         List of entities to plot, by default None. If None, a random sample of num_sample_selected_entities will be plotted. Use entity names!
     included_entities : Optional[list], optional
         NOT WORKING ATM AS EXPECTED ATM. List of entities to include in chart. The rest are excluded! This is equivalent to `includedEntities` in Grapher. Use entity IDs!
-    num_sample_selected_entities : int, optional
-        Number of entities to sample if selected_entities is None, by default 5. If there are less entities than this number, all will be plotted.
     height : int, optional
         Height of the chart, by default 600
     """
@@ -173,50 +109,6 @@ def grapher_chart(
         )
 
     _chart_html(chart_config, owid_env, height=height, **kwargs)
-
-
-def bake_chart_config(
-    catalog_path: Optional[str] = None,
-    variable_id: Optional[int | List[int]] = None,
-    variable: Optional[Variable | List[Variable]] = None,
-    selected_entities: Optional[list] = None,
-    included_entities: Optional[list] = None,
-    owid_env: OWIDEnv = OWID_ENV,
-) -> Dict[str, Any]:
-    """Bake a Grapher chart configuration.
-
-    Bakes a very basic config, which will be enough most of the times. If you want a more complex
-     config, use this as a baseline to adjust to your needs.
-    """
-    # Define chart config
-    chart_config = deepcopy(CONFIG_BASE)
-
-    # Tweak config
-    if isinstance(variable_id, (int, np.integer)):
-        chart_config["dimensions"] = [{"property": "y", "variableId": variable_id}]
-    elif isinstance(variable_id, list):
-        chart_config["dimensions"] = [{"property": "y", "variableId": v} for v in variable_id]
-    elif isinstance(catalog_path, str):
-        variable = ensure_load_variable(catalog_path=catalog_path, owid_env=owid_env)
-        chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
-    elif isinstance(variable, Variable):
-        chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
-    elif isinstance(variable, list):
-        chart_config["dimensions"] = [{"property": "y", "variableId": v.id} for v in variable]
-    else:
-        variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
-        chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
-
-    ## Selected entities?
-    if selected_entities is not None:
-        chart_config["selectedEntityNames"] = selected_entities
-
-    # Included entities
-    if included_entities is not None:
-        included_entities = [str(entity) for entity in included_entities]
-        chart_config["includedEntities"] = included_entities
-
-    return chart_config
 
 
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
