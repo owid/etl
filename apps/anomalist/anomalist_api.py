@@ -10,7 +10,6 @@ from owid.datautils.dataframes import map_series
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-import etl.grapher_io as io
 from apps.anomalist.detectors import AnomalyTimeChange, AnomalyUpgradeChange, AnomalyUpgradeMissing
 from apps.wizard.utils.paths import WIZARD_ANOMALIES_RELATIVE
 from etl import grapher_model as gm
@@ -22,7 +21,7 @@ from etl.grapher_io import variable_data_df_from_s3
 log = structlog.get_logger()
 
 # Name of index columns for dataframe.
-INDEX_COLUMNS = ["entity_id", "year"]
+INDEX_COLUMNS = ["entity_name", "year"]
 
 # Define anomaly types.
 ANOMALY_TYPE = Literal["upgrade_change", "time_change", "upgrade_missing"]
@@ -49,7 +48,7 @@ def load_latest_population():
         .iloc[0]
         .load()
         .reset_index()[["country", "year", "population"]]
-    )
+    ).rename(columns={"country": "entity_name"}, errors="raise")
 
     return population
 
@@ -96,15 +95,10 @@ def aggregate_anomalies(
     df_population: pd.DataFrame,
     df_views: pd.DataFrame,
     metadata: Dict[int, gm.Variable],
-    entity_id_to_name: Dict[int, str],
 ) -> pd.DataFrame:
     # Create a dataframe of zeros.
     df_aggregated = df_scores.copy()
 
-    # Add country and indicator names.
-    df_aggregated["country"] = map_series(
-        df_aggregated["entity_id"], entity_id_to_name, warn_on_missing_mappings=True, warn_on_unused_mappings=True
-    )
     df_aggregated["variable"] = map_series(
         df_aggregated["variable_id"],
         {variable_id: metadata[variable_id]["shortName"] for variable_id in metadata},  # type: ignore
@@ -114,7 +108,7 @@ def aggregate_anomalies(
 
     # Add population score to the aggregated scores dataframe.
     df_aggregated = df_aggregated.merge(
-        get_population_score(df_aggregated, df_population), on=["country", "year"], how="left"
+        get_population_score(df_aggregated, df_population), on=["entity_name", "year"], how="left"
     )
 
     # Add analytics score to the main scores dataframe.
@@ -135,9 +129,9 @@ def get_population_score(df_aggregated: pd.DataFrame, df_population: pd.DataFram
 
     # First, get the unique combinations of country-years in the scores dataframe, and add population to it.
     df_score_population = (
-        df_aggregated[["country", "year"]]  # type: ignore
+        df_aggregated[["entity_name", "year"]]  # type: ignore
         .drop_duplicates()
-        .merge(df_population, on=["country", "year"], how="left")
+        .merge(df_population, on=["entity_name", "year"], how="left")
     )
     # To normalize the population score to the range 0, 1, divide by an absolute maximum population of 10 billion.
     # To have more convenient numbers, take the natural logarithm of the population.
@@ -146,7 +140,7 @@ def get_population_score(df_aggregated: pd.DataFrame, df_population: pd.DataFram
     # For now, add a score of 0.5 to them.
     df_score_population["population_score"] = df_score_population["population_score"].fillna(0.5)
 
-    df_score_population = df_score_population[["country", "year", "population_score"]]
+    df_score_population = df_score_population[["entity_name", "year", "population_score"]]
 
     return df_score_population
 
@@ -264,12 +258,10 @@ def anomaly_detection(
         df = (
             load_data_for_variables(engine=engine, variables=variables_old_and_new)
             .reset_index()
-            .rename(columns={"entityId": "entity_id"}, errors="raise")
+            .rename(columns={"entityName": "entity_name"}, errors="raise")
+            .astype({"entity_name": str})
         )
 
-        # Load mapping of entity ids to entity names.
-        # NOTE: Ideally, entities should be loaded earlier.
-        entity_id_to_name = io.load_entity_mapping(entity_ids=list(set(df["entity_id"])))
         for anomaly_type in anomaly_types:
             # Instantiate the anomaly detector.
             if anomaly_type not in ANOMALY_DETECTORS:
@@ -281,7 +273,6 @@ def anomaly_detection(
                 df=df,
                 metadata=variables,
                 variable_mapping=variable_mapping,
-                entity_id_to_name=entity_id_to_name,
             )
 
             # detect anomalies
@@ -350,7 +341,7 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     df_long = variable_data_df_from_s3(engine, [v.id for v in variables], workers=None)
 
     # pivot dataframe
-    df = df_long.pivot(index=["entityId", "entityName", "year"], columns="variableId", values="value")
+    df = df_long.pivot(index=["entityName", "year"], columns="variableId", values="value")
 
     # reorder in the same order as variables
     df = df[[v.id for v in variables]]
