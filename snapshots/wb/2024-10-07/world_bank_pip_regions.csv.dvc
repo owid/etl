@@ -3,9 +3,9 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: World Bank Poverty and Inequality Platform (PIP)
+    title: "World Bank Poverty and Inequality Platform (PIP): Regional definitions"
     description: |-
-      The Poverty and Inequality Platform (PIP) is an interactive computational tool that offers users quick access to the World Bank’s estimates of poverty, inequality, and shared prosperity. PIP provides a comprehensive view of global, regional, and country-level trends for 170 economies around the world.
+      This is a dataset of the complete set of regions and their countries as defined by the World Bank Poverty and Inequality Platform (PIP). This is extracted separately from the main dataset using the `country_list` module in the auxiliary tables available at the API.
     date_published: 2024-09-20
     version_producer: 20240627_2017, 20240627_2011
 
@@ -22,8 +22,7 @@ meta:
     license:
       name: CC0
       url: https://datacatalog.worldbank.org/search/dataset/0063646
-
 outs:
-  - md5: 5c3c02cc1574db3e704bec5714fed064
-    size: 36540884
-    path: world_bank_pip.csv
+  - md5: a6aaf4dd35424f675665c079c226d153
+    size: 8532
+    path: world_bank_pip_regions.csv

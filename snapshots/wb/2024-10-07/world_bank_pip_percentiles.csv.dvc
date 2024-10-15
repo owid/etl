@@ -27,6 +27,6 @@ meta:
       url: https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
 
 outs:
-  - md5: 45cfbcf23f1c12ecce40447650112a6c
-    size: 58006821
+  - md5: 8fcc73375ccd4aa69cbb01d97bdbb1d8
+    size: 57971581
     path: world_bank_pip_percentiles.csv
