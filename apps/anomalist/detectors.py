@@ -129,10 +129,7 @@ class AnomalyUpgradeMissing(AnomalyDetector):
             affected_rows = self.df[(self.df[variable_id_old].notnull()) & (self.df[variable_id_new].isnull())].index
             df_lost.loc[affected_rows, variable_id_new] = 1
 
-        # Get long format of the score dataframe.
-        df_score = get_long_format_score_df(df_lost)
-
-        return df_score
+        return df_lost
 
 
 class AnomalyUpgradeChange(AnomalyDetector):
@@ -151,10 +148,7 @@ class AnomalyUpgradeChange(AnomalyDetector):
             # Add bard to the dataframe.
             df_version_change[variable_id_new] = variable_bard
 
-        # Get long format of the score dataframe.
-        df_score = get_long_format_score_df(df_version_change)
-
-        return df_score
+        return df_version_change
 
 
 class AnomalyTimeChange(AnomalyDetector):
@@ -184,7 +178,4 @@ class AnomalyTimeChange(AnomalyDetector):
             df_time_change["entity_name"] != df_time_change["entity_name"].shift(), self.variable_ids
         ] = 0
 
-        # Get long format of the score dataframe.
-        df_score = get_long_format_score_df(df_time_change)
-
-        return df_score
+        return df_time_change

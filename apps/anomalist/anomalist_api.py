@@ -10,7 +10,12 @@ from owid.datautils.dataframes import map_series
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from apps.anomalist.detectors import AnomalyTimeChange, AnomalyUpgradeChange, AnomalyUpgradeMissing
+from apps.anomalist.detectors import (
+    AnomalyTimeChange,
+    AnomalyUpgradeChange,
+    AnomalyUpgradeMissing,
+    get_long_format_score_df,
+)
 from apps.wizard.utils.paths import WIZARD_ANOMALIES_RELATIVE
 from etl import grapher_model as gm
 from etl.config import OWID_ENV
@@ -282,12 +287,15 @@ def anomaly_detection(
             # just a few anomalies)
             df_score = detector.get_score_df()
 
+            # Create a long format score dataframe.
+            df_score_long = get_long_format_score_df(df_score)
+
             # TODO: validate format of the output dataframe
             anomaly = gm.Anomaly(
                 datasetId=dataset_id,
                 anomalyType=detector.anomaly_type,
             )
-            anomaly.dfScore = df_score
+            anomaly.dfScore = df_score_long
 
             # TODO: Use this as an alternative to storing binary files in the DB
             # anomaly = gm.Anomaly(
