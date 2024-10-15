@@ -31,7 +31,7 @@ tables:
         title: Number of battle-related deaths in ongoing conflicts
         unit: deaths
         description: |-
-          <% if conflict_type == "all" %>
+          <%- if conflict_type == "all" -%>
           The estimated number of deaths in all ongoing wars in each year. This includes interstate, intrastate, extrastate, and non-state wars.
 
           An ongoing interstate war is a conflict between states that causes at least 1,000 deaths during a year.
@@ -41,7 +41,7 @@ tables:
           If a war lasted more than one year, we distributed its deaths evenly across years. If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
 
           For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
-          <% elif conflict_type == "inter-state" %>
+          <%- elif conflict_type == "inter-state" -%>
           The estimated number of deaths in ongoing interstate wars in each year.
 
           An ongoing interstate war is a conflict between states that causes at least 1,000 deaths during a year.
@@ -53,7 +53,7 @@ tables:
           For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
 
           We extend the time-series to 2010, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no wars for the years since 2003.
-          <% elif conflict_type == "intra-state" %>
+          <%- elif conflict_type == "intra-state" -%>
           The estimated number of deaths in ongoing intrastate wars in each year.
 
           An ongoing intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups that causes at least 1,000 deaths during a year.
@@ -63,7 +63,7 @@ tables:
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
           For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
-          <% elif conflict_type == "intra-state (internationalized)" %>
+          <%- elif conflict_type == "intra-state (internationalized)" -%>
           The estimated number of deaths in ongoing internationalized intrastate wars in each year.
 
           An ongoing internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, with involvement of a foreign state, that causes at least 1,000 deaths during a year.
@@ -73,7 +73,7 @@ tables:
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
           For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
-          <% elif conflict_type == "intra-state (non-internationalized)" %>
+          <%- elif conflict_type == "intra-state (non-internationalized)" -%>
           The estimated number of deaths in ongoing non-internationalized intrastate wars in each year.
 
           An ongoing non-internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, without involvement of a foreign state, that causes at least 1,000 deaths during a year.
@@ -83,7 +83,7 @@ tables:
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
           For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
-          <% elif conflict_type == "extra-state" %>
+          <%- elif conflict_type == "extra-state" -%>
           The estimated number of deaths in ongoing extrastate wars in each year.
 
           An ongoing extrastate war is a conflict between a state and a non-state region it seeks to control, or between a state and a colony that seeks policy change or independence, and that causes at least 1,000 deaths during a year.
@@ -93,7 +93,7 @@ tables:
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
           For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
-          <% elif conflict_type == "non-state" %>
+          <%- elif conflict_type == "non-state" -%>
           The estimated number of deaths in ongoing non-state wars in each year.
 
           An ongoing non-state war is a conflict between non-state armed groups within a region without a state or across state broders, that causes at least 1,000 deaths during a year.
@@ -103,7 +103,7 @@ tables:
           If a war lasted more than one year, we distributed its deaths evenly across years.
 
           For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
-          <% endif %>
+          <%- endif -%>
 
         display:
           numDecimalPlaces: 0
@@ -121,7 +121,7 @@ tables:
         title: Number of ongoing conflicts
         unit: conflicts
         description: |-
-          <% if conflict_type == "all" %>
+          <%- if conflict_type == "all" -%>
           The number of all ongoing wars in each year. This includes interstate, intrastate, extrastate, and non-state wars.
 
           An ongoing war is a conflict between organized armed groups that causes at least 1,000 deaths during a year.
@@ -130,7 +130,7 @@ tables:
 
           We extend the time-series to 2007, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no interstate wars for the years since 2003.
 
-          <% elif conflict_type == "inter-state" %>
+          <%- elif conflict_type == "inter-state" -%>
           The number of ongoing interstate wars in each year.
 
           An ongoing interstate war is a conflict between states that causes at least 1,000 deaths during a year.
@@ -138,37 +138,37 @@ tables:
           We count a war as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing wars.
 
           We extend the time-series to 2010, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no wars for the years since 2003.
-          <% elif conflict_type == "intra-state" %>
+          <%- elif conflict_type == "intra-state" -%>
           The number of ongoing intrastate wars in each year.
 
           An ongoing intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups that causes at least 1,000 deaths during a year.
 
           We count a war as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing wars.
-          <% elif conflict_type == "intra-state (internationalized)" %>
+          <%- elif conflict_type == "intra-state (internationalized)" -%>
           The number of ongoing internationalized intrastate wars in each year.
 
           An ongoing internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, with involvement of a foreign state, that causes at least 1,000 deaths during a year.
 
           We count a war as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing wars.
-          <% elif conflict_type == "intra-state (non-internationalized)" %>
+          <%- elif conflict_type == "intra-state (non-internationalized)" -%>
           The number of ongoing non-internationalized intrastate wars in each year.
 
           An ongoing non-internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, without involvement of a foreign state, that causes at least 1,000 deaths during a year.
 
           We count a war as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing wars.
-          <% elif conflict_type == "extra-state" %>
+          <%- elif conflict_type == "extra-state" -%>
           The number of ongoing extrastate wars in each year.
 
           An ongoing extrastate war is a conflict between a state and a non-state region it seeks to control, or between a state and a colony that seeks policy change or independence, and that causes at least 1,000 deaths during a year.
 
           We count a war as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing wars.
-          <% elif conflict_type == "non-state" %>
+          <%- elif conflict_type == "non-state" -%>
           The number of ongoing non-state wars in each year.
 
           An ongoing non-state war is a conflict between non-state armed groups within a region without a state or across state broders, that causes at least 1,000 deaths during a year.
 
           We count a war as ongoing in a region even if the conflict is also ongoing in other regions. The sum across all regions can therefore be higher than the total number of ongoing wars.
-          <% endif %>
+          <%- endif -%>
 
         display:
           numDecimalPlaces: 0
@@ -185,7 +185,7 @@ tables:
         title: Number of new conflicts
         unit: conflicts
         description: |-
-          <% if conflict_type == "all" %>
+          <%- if conflict_type == "all" -%>
           The number of new wars in each year. This includes interstate, intrastate, extrastate, and non-state wars.
 
           A new war is a conflict between organized armed groups that causes at least 1,000 deaths during a year for the first time.
@@ -195,7 +195,7 @@ tables:
           We count a war as new in a region even if the war started at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
 
           We extend the time-series to 2007, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no interstate wars for the years since 2003.
-          <% elif conflict_type == "inter-state" %>
+          <%- elif conflict_type == "inter-state" -%>
           The number of new interstate wars in each year.
 
           A new interstate war is a conflict between states that causes at least 1,000 deaths during a year for the first time.
@@ -205,7 +205,7 @@ tables:
           We count a war as new in a region even if the war started at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
 
           We extend the time-series to 2010, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no wars for the years since 2003.
-          <% elif conflict_type == "intra-state" %>
+          <%- elif conflict_type == "intra-state" -%>
           The number of new intrastate wars in each year.
 
           A new intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups that causes at least 1,000 deaths during a year for the first time.
@@ -213,7 +213,7 @@ tables:
           We only count a war as new when the war overall started that year, not if it restarted.
 
           We count a war as new in a region even if the war started at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
-          <% elif conflict_type == "intra-state (internationalized)" %>
+          <%- elif conflict_type == "intra-state (internationalized)" -%>
           The number of new internationalized intrastate wars in each year.
 
           A new internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, with involvement of a foreign state, that causes at least 1,000 deaths during a year for the first time.
@@ -221,7 +221,7 @@ tables:
           We only count a war as new when the war overall started that year, not if it restarted. We also only count an internationalized intrastate war as new when the war overall started that year, not if it became internationalized.
 
           We count a war as new in a region even if the war started at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
-          <% elif conflict_type == "intra-state (non-internationalized)" %>
+          <%- elif conflict_type == "intra-state (non-internationalized)" -%>
           The number of new non-internationalized intrastate wars in each year.
 
           A new non-internationalized intrastate war is a conflict between a state and a non-state armed group or between non-state armed groups, without involvement of a foreign state, that causes at least 1,000 deaths during a year for the first time.
@@ -229,7 +229,7 @@ tables:
           We only count a war as new when the war overall started that year, not if it restarted. We also only count a non-internationalized intrastate war as new when the war overall started that year, not if it stopped being internationalized.
 
           We count a war as new in a region even if the war started at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
-          <% elif conflict_type == "extra-state" %>
+          <%- elif conflict_type == "extra-state" -%>
           The number of new extrastate wars in each year.
 
           A new extrastate war is a conflict between a state and a non-state region it seeks to control, or between a state and a colony that seeks policy change or independence, and that causes at least 1,000 deaths during a year for the first time.
@@ -237,7 +237,7 @@ tables:
           We only count a war as new when the war overall started that year, not if it restarted.
 
           We count a war as new in a region even if the war started at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
-          <% elif conflict_type == "non-state" %>
+          <%- elif conflict_type == "non-state" -%>
           The number of new non-state wars in each year.
 
           A new non-state war is a conflict between non-state armed groups within a region without a state or across state broders, that causes at least 1,000 deaths during a year for the first time.
@@ -245,7 +245,7 @@ tables:
           We only count a war as new when the war overall started that year, not if it restarted.
 
           We count a war as new in a region even if the war started at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
-          <% endif %>
+          <%- endif -%>
 
         display:
           numDecimalPlaces: 0

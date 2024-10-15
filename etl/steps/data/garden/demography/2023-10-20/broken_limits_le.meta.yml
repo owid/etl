@@ -22,16 +22,16 @@ tables:
         title: &le_name Maximum life expectancy
         unit: years
         description_short: |-
-          <% if (sex == 'female') %>
+          <%- if (sex == 'female') -%>
           Maximum life expectancy recorded in a given year (among females).
-          <% elif (sex == 'male') %>
+          <%- elif (sex == 'male') -%>
           Maximum life expectancy recorded in a given year (among males).
-          <% elif (sex == 'all') %>
+          <%- elif (sex == 'all') -%>
           Maximum life expectancy recorded in a given year.
-          <% endif %>
+          <%- endif -%>
         description_key:
           - Period life expectancy is a metric that summarizes death rates across all age groups in one particular year. For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their lives as the age-specific death rates seen in that particular year.
-          - Records are only shown for countries in the Human Mortality Database. Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data. 
+          - Records are only shown for countries in the Human Mortality Database. Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
         display:
           name: *le_name
         presentation:
@@ -47,5 +47,5 @@ tables:
         title: Country with yearly maximum life expectancy
         unit: ""
         description_short: |-
-          Name of the country with the yearly maximum life expectancy registered<% if (sex == 'female') %> among females<% elif (sex == 'male') %> among males<% endif %>.
+          Name of the country with the yearly maximum life expectancy registered<%- if (sex == 'female') %> among females<% elif (sex == 'male') %> among males<% endif -%>.
         description_processing: This indicator is meant to be used as an auxiliary indicator.

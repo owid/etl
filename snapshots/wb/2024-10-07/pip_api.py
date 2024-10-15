@@ -1,4 +1,5 @@
 # TODO: Extract data in arrow files, for faster processing.
+# NOTE: Check if we can modify the functions to extract missing percentile series for countries in specific years (Cote d'Ivoire 1998 2008, Montenegro 2013 for example).
 """
 DATA EXTRACTION FOR THE WORLD BANK POVERTY AND INEQUALITY PLATFORM (PIP) API
 
@@ -25,15 +26,19 @@ To run this code from scratch,
         - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the functions.
     - Run the code. You have two options to see the output, in the terminal or in the background:
         python snapshots/wb/{version}/pip_api.py
-        nohup poetry run python snapshots/wb/{version}/pip_api.py > output.log 2>&1 &
+        nohup uv run python snapshots/wb/{version}/pip_api.py > output.log 2>&1 &
+    - You can kill the process with:
+        pkill -f pip_api
 
 When the code finishes, you will have the following files in the cache folder:
     - world_bank_pip.csv: file with the results of the queries for key indicators (8 for countries and 8 for regions), plus some additional indicators (thresholds, relative poverty).
     - pip_percentiles.csv: file with the percentiles taken from WB Databank and the ones constructed from the API.
+    - pip_regional_definitions.csv: file with the definitions of the regions used in the API.
 
 Copy these files to this folder and run in the terminal:
     python snapshots/wb/{version}/world_bank_pip.py --path-to-file snapshots/wb/{version}/world_bank_pip.csv
     python snapshots/wb/{version}/world_bank_pip_percentiles.py --path-to-file snapshots/wb/{version}/pip_percentiles.csv
+    python snapshots/wb/{version}/world_bank_pip_regions.py --path-to-file snapshots/wb/{version}/pip_regional_definitions.csv
 
 You can delete the files after this.
 
@@ -196,7 +201,7 @@ def run(live_api: bool) -> None:
     df = median_patch(df, country_or_region="country")
 
     # Add relative poverty indicators and decile thresholds to the key indicators file
-    df = add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles)
+    df = add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles, wb_api)
 
 
 class WB_API:
@@ -1648,7 +1653,7 @@ def median_patch(df, country_or_region):
     return df
 
 
-def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
+def add_relative_poverty_and_decile_thresholds(df, df_relative, df_percentiles, wb_api: WB_API):
     """
     Add relative poverty indicators and decile thresholds to the key indicators file.
     """
@@ -1707,10 +1712,50 @@ def add_relative_poverty_and_decile_threholds(df, df_relative, df_percentiles):
         how="left",
     )
 
+    # Add regional definitions
+    df = add_regional_definitions(wb_api, df=df)
+
     # Save key indicators file
     df.to_csv(f"{CACHE_DIR}/world_bank_pip.csv", index=False)
 
     log.info("Relative poverty indicators and decile thresholds added. Key indicators file done :)")
+
+    return df
+
+
+def add_regional_definitions(wb_api: WB_API, df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Extract the complete definitions of regions and their countries from the World Bank API.
+    This is a more complete version of the regional definitions that are already in the PIP dataset (Saudi Arabia, for example, is missing).
+    """
+
+    # Remove region_name column
+    df = df.drop(columns=["region_name"])
+
+    # Get regional definitions
+    df_regional_definitions = pip_aux_tables(wb_api, table="country_list")
+
+    # Make it a dataframe
+    df_regional_definitions = pd.DataFrame.from_dict(df_regional_definitions["country_list"])
+
+    # Rename country_name to country
+    df_regional_definitions = df_regional_definitions.rename(
+        columns={"country_name": "country", "region": "region_name"}
+    )
+
+    # Keep the relevant columns
+    df_regional_definitions = df_regional_definitions[["country", "region_name"]]
+
+    # Define MAX_YEAR as the maximum year in the df
+    MAX_YEAR = df["year"].max()
+
+    # Add year = MAX_YEAR to the regional definitions
+    df_regional_definitions["year"] = MAX_YEAR
+
+    # Save to csv
+    df_regional_definitions.to_csv(f"{CACHE_DIR}/pip_regional_definitions.csv", index=False)
+
+    log.info("Regional definitions generated from API.")
 
     return df
 
