@@ -20,6 +20,7 @@ TODO:
 """
 
 import random
+from typing import List, Tuple
 
 import pandas as pd
 import streamlit as st
@@ -71,11 +72,11 @@ SORTING_STRATEGIES = {
 }
 # SESSION STATE
 # Datasets selected by the user in first multiselect
-st.session_state.datasets_selected = st.session_state.get("datasets_selected", [])
+st.session_state.anomalist_datasets_selected = st.session_state.get("anomalist_datasets_selected", [])
 
-# Indicators corresponding to datasets selected by the user
-st.session_state.indicators = st.session_state.get("indicators", {})
-
+# Indicators corresponding to datasets selected by the user (plus variable mapping)
+st.session_state.anomalist_indicators = st.session_state.get("anomalist_indicators", {})
+st.session_state.anomalist_mapping = st.session_state.get("anomalist_mapping", {})
 
 # FLAG: True when user clicks submits form with datasets. Set to false by the end of the execution.
 st.session_state.anomalist_datasets_submitted = st.session_state.get("anomalist_datasets_submitted", False)
@@ -98,8 +99,6 @@ st.session_state.anomalist_sorting_columns = st.session_state.get("anomalist_sor
 ######################################################################
 # DEBUGGING
 # This should be removed and replaced with dynamic fields
-YEAR_MIN = 1950
-YEAR_MAX = 2021
 ENTITIES_DEFAULT = [
     "Spain",
     "France",
@@ -212,6 +211,15 @@ def mock_anomalies_df(indicators_id, n=5):
 ######################################################################
 
 
+@st.cache_data
+def get_variable_mapping(variable_ids):
+    # Get variable mapping, if exists. Then keep only 'relevant' variables
+    mapping = WizardDB.get_variable_mapping()
+    mapping = {k: v for k, v in mapping.items() if k in variable_ids}
+
+    return mapping
+
+
 def _change_chart_selection(indicator_id):
     """Change selection in grapher chart."""
     st.toast(f"Changing entity in indicator {indicator_id}")
@@ -230,7 +238,7 @@ def show_anomaly_compact(index, df):
     entity = df.iloc[row]["entity"]
     entities = df["entity_id"].tolist()
     year = df.iloc[row]["year"]
-    indicator_uri = st.session_state.indicators.get(indicator_id)
+    indicator_uri = st.session_state.anomalist_indicators.get(indicator_id)
 
     if an_type == "time_change":
         text = f"There are significant changes for {entity} in {year} compared to the old version of the indicator. There might be other data points affected."
@@ -290,34 +298,57 @@ def filter_df(df: pd.DataFrame):
         - `anomalist_max_year`: maximum year to filter.
         - `anomalist_sorting_strategy`: sorting strategy.
     """
+    # Filter dataframe
+    df = _filter_df(
+        df=df,
+        year_min=st.session_state.anomalist_min_year,
+        year_max=st.session_state.anomalist_max_year,
+        anomaly_types=st.session_state.anomalist_filter_anomaly_types,
+        entities=st.session_state.anomalist_filter_entities,
+        indicators=st.session_state.anomalist_filter_indicators,
+    )
+    ## Sort dataframe
+    df, st.session_state.anomalist_sorting_columns = _sort_df(df, st.session_state.anomalist_sorting_strategy)
+    return df
+
+
+@st.cache_data
+def _filter_df(df: pd.DataFrame, year_min, year_max, anomaly_types, entities, indicators) -> pd.DataFrame:
     ## Year
-    df = df[(df["year"] >= st.session_state.anomalist_min_year) & (df["year"] <= st.session_state.anomalist_max_year)]
+    df = df[(df["year"] >= year_min) & (df["year"] <= year_max)]
     ## Anomaly type
-    df = df[~df["type"].isin(st.session_state.anomalist_filter_anomaly_types)]
+    df = df[~df["type"].isin(anomaly_types)]
     ## Entities
-    if len(st.session_state.anomalist_filter_entities) > 0:
-        df = df[df["entity"].isin(st.session_state.anomalist_filter_entities)]
+    if len(entities) > 0:
+        df = df[df["entity"].isin(entities)]
     # Indicators
-    if len(st.session_state.anomalist_filter_indicators) > 0:
-        df = df[df["indicator_id"].isin(st.session_state.anomalist_filter_indicators)]
+    if len(indicators) > 0:
+        df = df[df["indicator_id"].isin(indicators)]
+
+    return df
+
+
+@st.cache_data
+def _sort_df(df: pd.DataFrame, sort_strategy: str) -> Tuple[pd.DataFrame, List[str]]:
     ## Sort
-    st.session_state.anomalist_sorting_columns = []
-    match st.session_state.anomalist_sorting_strategy:
+    columns_sort = []
+    match sort_strategy:
         case "relevance":
-            st.session_state.anomalist_sorting_columns = ["score_weighed"]
+            columns_sort = ["score_weighed"]
         case "score":
-            st.session_state.anomalist_sorting_columns = ["score"]
+            columns_sort = ["score"]
         case "population":
-            st.session_state.anomalist_sorting_columns = ["score_population"]
+            columns_sort = ["score_population"]
         case "views":
-            st.session_state.anomalist_sorting_columns = ["score_views"]
+            columns_sort = ["score_views"]
         case "population+views":
-            st.session_state.anomalist_sorting_columns = ["score_population", "score_views"]
+            columns_sort = ["score_population", "score_views"]
         case _:
             pass
-    if st.session_state.anomalist_sorting_columns != []:
-        df = df.sort_values(st.session_state.anomalist_sorting_columns, ascending=False)
-    return df
+    if columns_sort != []:
+        df = df.sort_values(columns_sort, ascending=False)
+
+    return df, columns_sort
 
 
 # Load the main inputs:
@@ -352,7 +383,7 @@ st.markdown(
 )
 
 with st.form(key="dataset_search"):
-    st.session_state.datasets_selected = st.multiselect(
+    st.session_state.anomalist_datasets_selected = st.multiselect(
         "Select datasets",
         # options=cached.load_dataset_uris(),
         options=DATASETS_ALL.keys(),
@@ -373,34 +404,31 @@ with st.form(key="dataset_search"):
 # If anomalies for dataset already exist in DB, load them. Warn user that these are being loaded from DB
 if st.session_state.anomalist_datasets_submitted:
     # 3.1/ Check if anomalies are already there in DB
-    st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.datasets_selected)
+    st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
+
+    # Load indicators in selected datasets
+    st.session_state.anomalist_indicators = cached.load_variables_display_in_dataset(
+        dataset_id=st.session_state.anomalist_datasets_selected,
+        only_slug=True,
+    )
+
+    # Get indicator IDs
+    variable_ids = list(st.session_state.anomalist_indicators.keys())
+    st.session_state.anomalist_mapping = get_variable_mapping(variable_ids)
 
     # 3.2/ No anomaly found in DB, estimate them
     if len(st.session_state.anomalist_anomalies) == 0:
         # Reset flag
         st.session_state.anomalist_anomalies_out_of_date = False
 
-        # Load indicators in selected datasets
-        st.session_state.indicators = cached.load_variables_display_in_dataset(
-            dataset_id=st.session_state.datasets_selected,
-            only_slug=True,
-        )
-
-        # Get indicator IDs
-        variable_ids = list(st.session_state.indicators.keys())
-
-        # Get variable mapping, if exists. Then keep only 'relevant' variables
-        mapping = WizardDB.get_variable_mapping()
-        mapping = {k: v for k, v in mapping.items() if k in variable_ids}
-
         with st.spinner("Scanning for anomalies... This can take some time."):
             # If there is mapping, estimate anomalies in 'upgrade mode'
-            if len(mapping) > 0:
+            if len(st.session_state.anomalist_mapping) > 0:
                 anomaly_detection(
                     anomaly_types=("nan",),
                     variable_ids=variable_ids,
                     dataset_ids=[],
-                    variable_mapping=str(mapping),
+                    variable_mapping=str(st.session_state.anomalist_mapping),
                     dry_run=False,
                     reset_db=False,
                 )
@@ -417,7 +445,7 @@ if st.session_state.anomalist_datasets_submitted:
                 )
 
         # Fill list of anomalies...
-        st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.datasets_selected)
+        st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
 
     # 3.3/ Anomalies found in DB. If outdated, set FLAG to True, so we can show a warning later on.
     else:
@@ -435,7 +463,7 @@ if st.session_state.anomalist_datasets_submitted:
         ###############################################################################################################
         # DEMO
         # The following code loads a mock dataframe. Instead, we should retrieve this from the database.
-        indicators_id = list(st.session_state.indicators.keys())
+        indicators_id = list(st.session_state.anomalist_indicators.keys())
         st.session_state.anomalist_df = mock_anomalies_df(indicators_id, n=1000)
         ###############################################################################################################
     else:
@@ -443,6 +471,11 @@ if st.session_state.anomalist_datasets_submitted:
 
 # 4/ SHOW ANOMALIES (only if any are found)
 if st.session_state.anomalist_df is not None:
+    ENTITIES_AVAILABLE = st.session_state.anomalist_df["entity"].unique()
+    YEAR_MIN = st.session_state.anomalist_df["year"].min()
+    YEAR_MAX = st.session_state.anomalist_df["year"].max()
+    INDICATORS_AVAILABLE = st.session_state.anomalist_df["indicator_id"].unique()
+
     # 4.0/ WARNING: Show warning if anomalies are loaded from DB without re-computing
     # TODO: we could actually know if anomalies are out of sync from dataset/indicators. Maybe based on dataset/indicator checksums? Starting to implement this idea with data_out_of_date
     if st.session_state.anomalist_anomalies_out_of_date:
@@ -457,10 +490,10 @@ if st.session_state.anomalist_df is not None:
         st.markdown("##### Select filters")
 
         # If there is a dataset selected, load the indicators
-        if len(st.session_state.datasets_selected) > 0:
+        if len(st.session_state.anomalist_datasets_selected) > 0:
             # Load anomalies
-            st.session_state.indicators = cached.load_variables_display_in_dataset(
-                dataset_id=st.session_state.datasets_selected,
+            st.session_state.anomalist_indicators = cached.load_variables_display_in_dataset(
+                dataset_id=st.session_state.anomalist_datasets_selected,
                 only_slug=True,
             )
 
@@ -469,8 +502,8 @@ if st.session_state.anomalist_df is not None:
         with col1:
             st.multiselect(
                 label="Indicators",
-                options=st.session_state.indicators,
-                format_func=st.session_state.indicators.get,
+                options=INDICATORS_AVAILABLE,
+                format_func=st.session_state.anomalist_indicators.get,
                 help="Show anomalies affecting only a selection of indicators.",
                 placeholder="Select indicators",
                 key="anomalist_filter_indicators",
@@ -480,7 +513,7 @@ if st.session_state.anomalist_df is not None:
             # Entity
             st.multiselect(
                 label="Entities",
-                options=ENTITIES_DEFAULT,
+                options=ENTITIES_AVAILABLE,
                 help="Show anomalies affecting only a selection of entities.",
                 placeholder="Select entities",
                 key="anomalist_filter_entities",
@@ -527,17 +560,9 @@ if st.session_state.anomalist_df is not None:
                 )
 
     # 4.3/ APPLY FILTERS
-    ###############################################################################################################
-    # DEMO
-    # The following code loads a mock dataframe. Instead, we should retrieve this from the database.
-    indicators_id = list(st.session_state.indicators.keys())
-    df = mock_anomalies_df(indicators_id, n=1000)
-    ###############################################################################################################
+    df = filter_df(st.session_state.anomalist_df)
 
-    # Filter dataframe
-    df = filter_df(df)
-
-    # 4.4/ SHOW ANOMALIES
+    # 5/ SHOW ANOMALIES
     # Different types need formatting
     mask = df["type"] == "upgrade_missing"
     df_missing = df[mask]
