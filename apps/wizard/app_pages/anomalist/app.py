@@ -82,6 +82,7 @@ st.session_state.anomalist_datasets_submitted = st.session_state.get("anomalist_
 
 # List with anomalies found in the selected datasets (dataset last submitted in the form by the user)
 st.session_state.anomalist_anomalies = st.session_state.get("anomalist_anomalies", [])
+st.session_state.anomalist_df = st.session_state.get("anomalist_df", None)
 # FLAG: True if the anomalies were directly loaded from DB (not estimated)
 st.session_state.anomalist_anomalies_out_of_date = st.session_state.get("anomalist_anomalies_out_of_date", False)
 
@@ -429,9 +430,19 @@ if st.session_state.anomalist_datasets_submitted:
         else:
             st.session_state.anomalist_anomalies_out_of_date = False
 
+    # 3.4/ Parse obtained anomalist into dataframe
+    if len(st.session_state.anomalist_anomalies) > 0:
+        ###############################################################################################################
+        # DEMO
+        # The following code loads a mock dataframe. Instead, we should retrieve this from the database.
+        indicators_id = list(st.session_state.indicators.keys())
+        st.session_state.anomalist_df = mock_anomalies_df(indicators_id, n=1000)
+        ###############################################################################################################
+    else:
+        st.session_state.anomalist_df = None
 
 # 4/ SHOW ANOMALIES (only if any are found)
-if len(st.session_state.anomalist_anomalies) > 0:
+if st.session_state.anomalist_df is not None:
     # 4.0/ WARNING: Show warning if anomalies are loaded from DB without re-computing
     # TODO: we could actually know if anomalies are out of sync from dataset/indicators. Maybe based on dataset/indicator checksums? Starting to implement this idea with data_out_of_date
     if st.session_state.anomalist_anomalies_out_of_date:
