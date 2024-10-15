@@ -121,7 +121,7 @@ tables:
             <% elif attribute == 'population' %>
             people
             <% elif attribute == 'share' or attribute == 'popshare' %>
-            '%'
+            %
             <%- endif -%>
 
           short_unit:
@@ -130,7 +130,7 @@ tables:
             <% elif attribute == 'population' %>
             ''
             <% elif attribute == 'share' or attribute == 'popshare' %>
-            '%'
+            %
             <%- endif -%>
           display:
             numDecimalPlaces:
