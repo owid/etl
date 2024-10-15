@@ -4,8 +4,10 @@ from typing import Dict, Tuple
 import streamlit as st
 from structlog import get_logger
 
+import etl.grapher_model as gm
 from apps.wizard.utils.db import WizardDB
 from apps.wizard.utils.io import get_steps_df
+from etl.config import OWID_ENV, OWIDEnv
 
 # Logger
 log = get_logger()
@@ -61,3 +63,11 @@ def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], D
     datasets_new = {k: v for k, v in datasets_all.items() if k in datasets_new_ids}
 
     return datasets_all, datasets_new, variable_mapping  # type: ignore
+
+
+def create_tables(_owid_env: OWIDEnv = OWID_ENV):
+    """Create all required tables.
+
+    If exist, nothing is created.
+    """
+    gm.Anomaly.create_table(_owid_env.engine)

@@ -62,6 +62,28 @@ def cli(
     dry_run: bool,
     reset_db: bool,
 ) -> None:
+    """TBD
+
+    TBD
+
+    **Example 1:** Create random anomaly for a dataset
+
+    ```
+    $ etl anomalist --anomaly-type sample --dataset-ids 6369
+    ```
+
+    **Example 2:** Create GP anomalies
+
+    ```
+    $ etl anomalist --anomaly-type gp --dataset-ids 6369
+    ```
+
+    **Example 3:** Create anomalies by comparing dataset to its previous version
+
+    ```
+    $ etl anomalist --anomaly-type gp --dataset-ids 6589
+    ```
+    """
     # Convert variable mapping from JSON to dictionary.
     if variable_mapping:
         try:

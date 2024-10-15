@@ -187,28 +187,7 @@ def anomaly_detection(
     dry_run: bool = False,
     reset_db: bool = False,
 ) -> None:
-    """TBD
-
-    TBD
-
-    **Example 1:** Create random anomaly for a dataset
-
-    ```
-    $ etl anomalist --anomaly-type sample --dataset-ids 6369
-    ```
-
-    **Example 2:** Create GP anomalies
-
-    ```
-    $ etl anomalist --anomal-_type gp --dataset-ids 6369
-    ```
-
-    **Example 3:** Create anomalies by comparing dataset to its previous version
-
-    ```
-    $ etl anomalist --anomaly-type gp --dataset-ids 6589
-    ```
-    """
+    """Detect anomalies."""
     engine = get_engine()
 
     # Ensure the 'anomalies' table exists. Optionally reset it if reset_db is True.
