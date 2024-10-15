@@ -24,6 +24,6 @@ meta:
       name: CC BY 4.0
 
 outs:
-  - md5: e1538bed80e3cc60d9aa71c3879846b0
-    size: 67199
+  - md5: e268d82e35fed99e41a75711bc26232f
+    size: 69014
     path: monkeypox_shiny.csv
