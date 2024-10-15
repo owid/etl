@@ -111,9 +111,10 @@ class Base(MappedAsDataclass, DeclarativeBase):
         return x
 
     @classmethod
-    def create_table(cls, engine: Engine):
-        # Drop the table if it exists
-        cls.__table__.drop(engine, checkfirst=True)  # type: ignore
+    def create_table(cls, engine: Engine, reset: bool = False):
+        if reset:
+            # Drop the table if it exists
+            cls.__table__.drop(engine, checkfirst=True)  # type: ignore
 
         # Create table
         cls.__table__.create(engine)  # type: ignore
