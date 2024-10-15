@@ -1,6 +1,7 @@
 import random
 
 import pandas as pd
+import streamlit as st
 
 from apps.wizard.app_pages.anomalist.utils import AnomalyTypeEnum
 from apps.wizard.utils import cached

@@ -19,7 +19,7 @@ TODO:
 
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, cast
 
 import pandas as pd
 import streamlit as st
@@ -118,7 +118,7 @@ def _change_chart_selection(df, key_table, key_selection):
     rows = st.session_state[key_table]["selection"]["rows"]
 
     # Update entities in chart
-    st.session_state[key_selection] = df.iloc[rows]["entity"].tolist()
+    st.session_state[key_selection] = df.iloc[rows]["entity_name"].tolist()
 
 
 @st.fragment
@@ -136,7 +136,7 @@ def show_anomaly_compact(index, df):
 
     # Get relevant metadata for this view
     # By default, the entity with highest score, but user may have selected other ones!
-    entity_default = df.iloc[row]["entity"]
+    entity_default = df.iloc[row]["entity_name"]
     entities = st.session_state.get(f"selected_entities_{key}", entity_default)
     entities = entities if entities != [] else [entity_default]
 
@@ -201,7 +201,7 @@ def show_anomaly_compact(index, df):
             with st.container(border=False):
                 st.markdown("**Select** other affected entities")
                 st.dataframe(
-                    df[["entity"] + st.session_state.anomalist_sorting_columns],
+                    df[["entity_name"] + st.session_state.anomalist_sorting_columns],
                     selection_mode=["multi-row"],
                     key=key_table,
                     on_select=lambda df=df, key_table=key_table, key_selection=key_selection: _change_chart_selection(
@@ -266,7 +266,7 @@ def _filter_df(df: pd.DataFrame, year_min, year_max, anomaly_types, entities, in
     df = df[~df["type"].isin(anomaly_types)]
     ## Entities
     if len(entities) > 0:
-        df = df[df["entity"].isin(entities)]
+        df = df[df["entity_name"].isin(entities)]
     # Indicators
     if len(indicators) > 0:
         df = df[df["indicator_id"].isin(indicators)]
@@ -404,19 +404,41 @@ if st.session_state.anomalist_datasets_submitted:
             # Load
             df = anomaly.dfScore
             if isinstance(df, pd.DataFrame):
+                # Reduce df
+                st.write(df)
+                df = df.sort_values("anomaly_score", ascending=False)
+                df = df.drop_duplicates(subset=["entity_name", "variable_id"], keep="first")
                 # Assign anomaly type in df
                 df["type"] = anomaly.anomalyType
-                # Reduce df
-                df = df.loc[df.groupby(["entity_name", "variable_id"])["anomaly_score"].idxmax()]
                 # Add to list
                 dfs.append(df)
+            else:
+                raise ValueError(f"Anomaly {anomaly} has no dfScore attribute.")
+
         # Concatenate all dfs
-        st.session_state.anomalist_df = pd.concat(dfs, ignore_index=True)
+        df = cast(pd.DataFrame, pd.concat(dfs, ignore_index=True))
+
+        # Rename columns
+        df = df.rename(
+            columns={
+                "variable_id": "indicator_id",
+                "anomaly_score": "score",
+            }
+        )
 
         # Add population and analytics score:
-        st.session_state.anomalist_df["score_population"] = 1
-        st.session_state.anomalist_df["score_analytics"] = 1
+        df["score_population"] = 1
+        df["score_analytics"] = 1
 
+        # Weighed combined score
+        w_score = 1
+        w_pop = 1
+        w_views = 1
+        df["score_weighed"] = (
+            w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]
+        ) / (w_score + w_pop + w_views)
+
+        st.session_state.anomalist_df = df
         # Former mock data
         # st.session_state.anomalist_df = mock_anomalies_df(
         #     indicators_id,
@@ -429,7 +451,7 @@ if st.session_state.anomalist_datasets_submitted:
 
 # 4/ SHOW ANOMALIES (only if any are found)
 if st.session_state.anomalist_df is not None:
-    ENTITIES_AVAILABLE = st.session_state.anomalist_df["entity"].unique()
+    ENTITIES_AVAILABLE = st.session_state.anomalist_df["entity_name"].unique()
     YEAR_MIN = st.session_state.anomalist_df["year"].min()
     YEAR_MAX = st.session_state.anomalist_df["year"].max()
     INDICATORS_AVAILABLE = st.session_state.anomalist_df["indicator_id"].unique()
