@@ -211,8 +211,9 @@ def mock_anomalies_df(indicators_id, n=5):
 ######################################################################
 
 
-@st.cache_data
+@st.cache_data(ttl=60)
 def get_variable_mapping(variable_ids):
+    """Get variable mapping for specific variable IDs."""
     # Get variable mapping, if exists. Then keep only 'relevant' variables
     mapping = WizardDB.get_variable_mapping()
     mapping = {k: v for k, v in mapping.items() if k in variable_ids}
@@ -220,9 +221,14 @@ def get_variable_mapping(variable_ids):
     return mapping
 
 
-def _change_chart_selection(indicator_id):
+def _change_chart_selection(df, key_table, key_selection):
     """Change selection in grapher chart."""
-    st.toast(f"Changing entity in indicator {indicator_id}")
+    # st.toast(f"Changing entity in indicator {indicator_id}")
+    # Get selected row number
+    rows = st.session_state[key_table]["selection"]["rows"]
+
+    # Update entities in chart
+    st.session_state[key_selection] = df.iloc[rows]["entity"].tolist()
 
 
 @st.fragment
@@ -234,39 +240,56 @@ def show_anomaly_compact(index, df):
     indicator_id, an_type = index
     row = 0
 
+    key = f"{indicator_id}_{an_type}"
+    key_table = f"anomaly_table_{key}"
+    key_selection = f"selected_entities_{key}"
+
     # Get relevant metadata for this view
-    entity = df.iloc[row]["entity"]
-    entities = df["entity_id"].tolist()
+    # By default, the entity with highest score, but user may have selected other ones!
+    entity_default = df.iloc[row]["entity"]
+    entities = st.session_state.get(f"selected_entities_{key}", entity_default)
+    entities = entities if entities != [] else [entity_default]
+
+    # entities = df["entity_id"].tolist()
     year = df.iloc[row]["year"]
     indicator_uri = st.session_state.anomalist_indicators.get(indicator_id)
 
+    # Generate descriptive text. Only contains information about top-scoring entity.
     if an_type == "time_change":
-        text = f"There are significant changes for {entity} in {year} compared to the old version of the indicator. There might be other data points affected."
+        text = f"There are significant changes for {entity_default} in {year} compared to the old version of the indicator. There might be other data points affected."
     elif an_type == "upgrade_change":
-        text = f"There are abrupt changes for {entity} in {year}! There might be other data points affected."
+        text = f"There are abrupt changes for {entity_default} in {year}! There might be other data points affected."
     else:
         raise ValueError(f"Unknown anomaly type: {an_type}")
 
+    # Render
     with st.container(border=True):
+        # Title
         st.markdown(f"{tag_in_md(**ANOMALY_TYPES[an_type])} **{indicator_uri}**")
         col1, col2 = st.columns(2)
-        # Overview, description, others
+        # Chart
         with col1:
             # Chart
-            grapher_chart(variable_id=indicator_id, selected_entities=[entity], included_entities=entities)
+            grapher_chart(
+                variable_id=[indicator_id],
+                selected_entities=entities,
+            )
+        # Description and other entities
         with col2:
             # Description
-            st.markdown(text)
-            # Others
-            st.divider()
-            st.markdown("View other affected entities")
-            st.dataframe(
-                df[["entity"] + st.session_state.anomalist_sorting_columns],
-                selection_mode=["multi-row"],
-                key=f"anomaly_table_{indicator_id}_{an_type}",
-                on_select=lambda indicator_id=indicator_id: _change_chart_selection(indicator_id),
-                hide_index=True,
-            )
+            st.info(text)
+            # Other entities
+            with st.container(border=False):
+                st.markdown("**Select** other affected entities")
+                st.dataframe(
+                    df[["entity"] + st.session_state.anomalist_sorting_columns],
+                    selection_mode=["multi-row"],
+                    key=key_table,
+                    on_select=lambda df=df, key_table=key_table, key_selection=key_selection: _change_chart_selection(
+                        df, key_table, key_selection
+                    ),
+                    hide_index=True,
+                )
 
 
 def show_anomaly(anomaly, indicator_id):
