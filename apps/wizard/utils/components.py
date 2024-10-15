@@ -155,7 +155,7 @@ def grapher_chart(
     selected_entities : Optional[list], optional
         List of entities to plot, by default None. If None, a random sample of num_sample_selected_entities will be plotted. Use entity names!
     included_entities : Optional[list], optional
-        List of entities to include in chart. The rest are excluded! This is equivalent to `includedEntities` in Grapher. Use entity IDs!
+        NOT WORKING ATM AS EXPECTED ATM. List of entities to include in chart. The rest are excluded! This is equivalent to `includedEntities` in Grapher. Use entity IDs!
     num_sample_selected_entities : int, optional
         Number of entities to sample if selected_entities is None, by default 5. If there are less entities than this number, all will be plotted.
     height : int, optional
@@ -163,36 +163,60 @@ def grapher_chart(
     """
     # Get data / metadata if no chart config is provided
     if chart_config is None:
-        # Define chart config
-        chart_config = deepcopy(CONFIG_BASE)
-
-        # Tweak config
-        if isinstance(variable_id, (int, np.integer)):
-            chart_config["dimensions"] = [{"property": "y", "variableId": variable_id}]
-        elif isinstance(variable_id, list):
-            chart_config["dimensions"] = [{"property": "y", "variableId": v} for v in variable_id]
-        elif isinstance(catalog_path, str):
-            variable = ensure_load_variable(catalog_path=catalog_path, owid_env=owid_env)
-            chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
-        elif isinstance(variable, Variable):
-            chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
-        elif isinstance(variable, list):
-            chart_config["dimensions"] = [{"property": "y", "variableId": v.id} for v in variable]
-        else:
-            variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
-            chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
-
-        ## Selected entities?
-        if selected_entities is not None:
-            chart_config["selectedEntityNames"] = selected_entities
-
-        # Included entities
-        print(included_entities)
-        if included_entities is not None:
-            included_entities = [str(entity) for entity in included_entities]
-            chart_config["includedEntities"] = included_entities
+        chart_config = bake_chart_config(
+            catalog_path=catalog_path,
+            variable_id=variable_id,
+            variable=variable,
+            selected_entities=selected_entities,
+            included_entities=included_entities,
+            owid_env=owid_env,
+        )
 
     _chart_html(chart_config, owid_env, height=height, **kwargs)
+
+
+def bake_chart_config(
+    catalog_path: Optional[str] = None,
+    variable_id: Optional[int | List[int]] = None,
+    variable: Optional[Variable | List[Variable]] = None,
+    selected_entities: Optional[list] = None,
+    included_entities: Optional[list] = None,
+    owid_env: OWIDEnv = OWID_ENV,
+) -> Dict[str, Any]:
+    """Bake a Grapher chart configuration.
+
+    Bakes a very basic config, which will be enough most of the times. If you want a more complex
+     config, use this as a baseline to adjust to your needs.
+    """
+    # Define chart config
+    chart_config = deepcopy(CONFIG_BASE)
+
+    # Tweak config
+    if isinstance(variable_id, (int, np.integer)):
+        chart_config["dimensions"] = [{"property": "y", "variableId": variable_id}]
+    elif isinstance(variable_id, list):
+        chart_config["dimensions"] = [{"property": "y", "variableId": v} for v in variable_id]
+    elif isinstance(catalog_path, str):
+        variable = ensure_load_variable(catalog_path=catalog_path, owid_env=owid_env)
+        chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
+    elif isinstance(variable, Variable):
+        chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
+    elif isinstance(variable, list):
+        chart_config["dimensions"] = [{"property": "y", "variableId": v.id} for v in variable]
+    else:
+        variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
+        chart_config["dimensions"] = [{"property": "y", "variableId": variable.id}]
+
+    ## Selected entities?
+    if selected_entities is not None:
+        chart_config["selectedEntityNames"] = selected_entities
+
+    # Included entities
+    if included_entities is not None:
+        included_entities = [str(entity) for entity in included_entities]
+        chart_config["includedEntities"] = included_entities
+
+    return chart_config
 
 
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
@@ -383,7 +407,7 @@ class Pagination:
 
         with st_horizontal():
             st.number_input(
-                label=f"**Go to page** (total: {self.total_pages})",
+                label=f"**Go to page** (results per page: {self.items_per_page}; total pages: {self.total_pages})",
                 min_value=1,
                 max_value=self.total_pages,
                 # value=self.page,
