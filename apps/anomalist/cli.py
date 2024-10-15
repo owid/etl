@@ -142,7 +142,7 @@ def anomaly_detection(
 
     if reset_db:
         # Drop the 'anomalies' table if it exists
-        gm.Anomaly.create_table(engine)
+        gm.Anomaly.create_table(engine, reset=True)
         return
 
     # If no anomaly types are provided, default to all available types
