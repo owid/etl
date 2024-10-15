@@ -24,7 +24,7 @@ import random
 import pandas as pd
 import streamlit as st
 
-from apps.anomalist.cli import anomaly_detection
+from apps.anomalist.anomalist_api import anomaly_detection
 from apps.wizard.app_pages.anomalist.utils import get_datasets_and_mapping_inputs
 from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
