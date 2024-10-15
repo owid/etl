@@ -29,16 +29,16 @@ def run(dest_dir: str) -> None:
     tb_area = tb_area.drop(columns=columns_to_drop)
     tb_population = tb_population.drop(columns=columns_to_drop)
 
-    # Melt the dataframe to get 'Area' and 'Year' in a single column, keeping the 'country' column intact
+    # Melt to get 'area' and 'year' in a single column, keeping the 'country' column intact
     tb_area = tb_area.melt(id_vars=["GADM_Name"], var_name="area_year", value_name="value")
-    # Extract 'Area' and 'Year' from the combined 'Area_Year' column
+    # Extract 'area' and 'year' from the combined 'area_year' column
     tb_area["indicator"] = tb_area["area_year"].str.extract(r"([A-Za-z_]+)")
     tb_area["year"] = tb_area["area_year"].str.extract(r"(\d{4})")
     tb_area = tb_area.drop(columns=["area_year"])
 
-    # Melt the dataframe to get 'Population' and 'Year' in a single column, keeping the 'country' column intact
+    # Melt to get 'population' and 'year' in a single column, keeping the GADM_Name (country) column intact
     tb_population = tb_population.melt(id_vars=["GADM_Name"], var_name="population_year", value_name="value")
-    # Extract 'Population' and 'Year' from the combined 'Population_Year' column
+    # Extract 'population' and 'yar' from the combined 'population_year' column
     tb_population["indicator"] = tb_population["population_year"].str.extract(r"([A-Za-z_]+)")
     tb_population["year"] = tb_population["population_year"].str.extract(r"(\d{4})")
     tb_population = tb_population.drop(columns=["population_year"])
@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
         "RUR_POP_": "rural_total_population",
     }
 
-    # Apply the renaming by replacing the entries in the 'indicator' column
+    # Apply the renaming by replacing the entries in the 'indicator' column to be more interpertable
     tb["indicator"] = tb["indicator"].replace(renaming_dict, regex=True)
 
     tb = tb.rename(columns={"GADM_Name": "country"})

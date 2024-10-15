@@ -66,7 +66,7 @@ def run(dest_dir: str) -> None:
         min_num_values_per_year=1,
     )
 
-    # Ensure the column names are correctly specified
+    # Calculate "share of" indicators
     tb["total_population"] = tb[["rural_total_population", "urban_centre_population", "urban_cluster_population"]].sum(
         axis=1
     )
@@ -103,10 +103,10 @@ def run(dest_dir: str) -> None:
 
     tb = pr.merge(past_estimates, future_projections, on=["country", "year"], how="outer")
 
-    # Melt the DataFrame to make the metadata easier to generate
+    # Melt to make the metadata easier to generate
     tb = tb.melt(id_vars=["country", "year"], var_name="indicator", value_name="value")
 
-    # Split the column into three parts: location, attribute, type
+    # Split the column into three parts: location, attribute, type for metadata generation
     tb[["location_type", "attribute", "type"]] = tb["indicator"].str.extract(
         r"(rural_total|urban_[\w]+)_(\w+?)_(estimates|projections)"
     )
