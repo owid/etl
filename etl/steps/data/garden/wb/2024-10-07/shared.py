@@ -9,6 +9,14 @@ from owid.catalog import Table, VariableMeta, VariablePresentationMeta
 
 non_market_income_description = "Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account."
 
+nowcast_regions_description = "Regional and global estimates are extrapolated up until the year of the data release by using GDP growth estimates and forecasts available at World Bank's Macro and Poverty Outlook or Global Economic Prospects and also IMF's World Economic Outlook. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts)."
+
+relative_poverty_description = "This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country."
+
+ppp_description = "The data is measured in international-$ at {ppp} prices – this adjusts for inflation and for differences in the cost of living between countries."
+
+prosperity_gap_description = "The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone in the world reaches a standard of prosperity, which is defined as $25 per person per day. This gives a sense of how far global incomes are from a basic prosperity standard."
+
 processing_description_relative_poverty = "Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year, calculate a relative poverty line – in this case {povline} of the median – and then run a specific query on the PIP API to return the share of population below that line."
 
 processing_description_thr = "Income and consumption thresholds by decile are not directly available in the World Bank PIP API. We extract the metric primarily from [auxiliary percentiles data provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646). Missing country values and regional aggregations of the indicator are calculated by running multiple queries on the API to obtain the closest poverty line to each threshold."
@@ -18,10 +26,6 @@ processing_description_thr_percentiles = "Missing country values and regional ag
 processing_description_share_90_99 = "The income share of the population between the 90th and 99th percentiles is not directly available in the World Bank PIP API. We calculate the metric by subtracting the share of the population in the 99th percentile (available in the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles)) from the share of the population in the 90th percentile (available in the API)."
 
 processing_description_avg = "Income and consumption averages by decile are not directly available in the World Bank PIP API. We calculate the metric by multiplying the share of each decile by the mean income or consumption of the distribution and dividing by the population share of the decile (10%)."
-
-relative_poverty_description = "This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country."
-
-ppp_description = "The data is measured in international-$ at {ppp} prices – this adjusts for inflation and for differences in the cost of living between countries."
 
 
 # Define default tolerance for each variable
@@ -581,6 +585,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
                 ppp_description,
                 inc_cons_dict[welfare_type]["description"],
                 non_market_income_description,
+                nowcast_regions_description,
             ],
             description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
             unit=var_dict[var]["unit"],
@@ -595,7 +600,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
 
         meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
-    elif var in ["top1_thr", "top1_avg", "spl", "spr", "pg"]:
+    elif var in ["top1_thr", "top1_avg", "spl", "spr"]:
         meta = VariableMeta(
             title=f"{var_dict[var]['title']}",
             description_short=var_dict[var]["description"],
@@ -603,6 +608,32 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
                 ppp_description,
                 inc_cons_dict[welfare_type]["description"],
                 non_market_income_description,
+                nowcast_regions_description,
+            ],
+            description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
+            unit=var_dict[var]["unit"],
+            short_unit=var_dict[var]["short_unit"],
+            origins=origins,
+        )
+
+        meta.display = {
+            "name": meta.title,
+            "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
+            "tolerance": TOLERANCE,
+        }
+
+        meta.presentation = VariablePresentationMeta(title_public=meta.title)
+
+    elif var in ["pg"]:
+        meta = VariableMeta(
+            title=f"{var_dict[var]['title']}",
+            description_short=var_dict[var]["description"],
+            description_key=[
+                prosperity_gap_description,
+                ppp_description,
+                inc_cons_dict[welfare_type]["description"],
+                non_market_income_description,
+                nowcast_regions_description,
             ],
             description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
             unit=var_dict[var]["unit"],
@@ -676,6 +707,7 @@ def var_metadata_absolute_povlines(var, povline, origins, ppp_version, welfare_t
         ppp_description,
         inc_cons_dict[welfare_type]["description"],
         non_market_income_description,
+        nowcast_regions_description,
     ]
 
     # Remove empty strings from the list
@@ -713,6 +745,7 @@ def var_metadata_between_absolute_povlines(var, povline1, povline2, origins, ppp
             ppp_description,
             inc_cons_dict[welfare_type]["description"],
             non_market_income_description,
+            nowcast_regions_description,
         ],
         description_processing=f"""{inc_cons_dict[welfare_type]['processing_description']}""",
         unit=var_dict[var]["unit"].replace("{ppp}", str(ppp_version)),
@@ -751,6 +784,7 @@ def var_metadata_relative_povlines(var, rel, origins, welfare_type) -> VariableM
             relative_poverty_description,
             inc_cons_dict[welfare_type]["description"],
             non_market_income_description,
+            nowcast_regions_description,
         ],
         description_processing=f"""{processing_description_relative_poverty}
 
@@ -783,6 +817,7 @@ def var_metadata_percentiles(var, pct, origins, ppp_version, welfare_type) -> Va
                 ppp_description,
                 inc_cons_dict[welfare_type]["description"],
                 non_market_income_description,
+                nowcast_regions_description,
             ],
             description_processing=f"""{processing_description_thr}
 
