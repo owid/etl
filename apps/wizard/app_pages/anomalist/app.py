@@ -26,7 +26,7 @@ from typing import List, Tuple
 import pandas as pd
 import streamlit as st
 
-from apps.anomalist.cli import anomaly_detection
+from apps.anomalist.anomalist_api import anomaly_detection
 from apps.wizard.app_pages.anomalist.utils import create_tables, get_datasets_and_mapping_inputs
 from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.chart_config import bake_chart_config
@@ -486,27 +486,14 @@ if st.session_state.anomalist_datasets_submitted:
         st.session_state.anomalist_anomalies_out_of_date = False
 
         with st.spinner("Scanning for anomalies... This can take some time."):
-            # If there is mapping, estimate anomalies in 'upgrade mode'
-            if len(st.session_state.anomalist_mapping) > 0:
-                anomaly_detection(
-                    anomaly_types=("nan",),
-                    variable_ids=variable_ids,
-                    dataset_ids=[],
-                    variable_mapping=str(st.session_state.anomalist_mapping),
-                    dry_run=False,
-                    reset_db=False,
-                )
-            # Otherwise, estimate anomalies in 'normal mode'
-            else:
-                # Scan for anomalies
-                anomaly_detection(
-                    anomaly_types=("nan",),
-                    variable_ids=variable_ids,
-                    dataset_ids=[],
-                    variable_mapping=None,
-                    dry_run=False,
-                    reset_db=False,
-                )
+            anomaly_detection(
+                anomaly_types=tuple(ANOMALY_TYPE_NAMES.keys()),
+                variable_ids=variable_ids,
+                dataset_ids=[],
+                variable_mapping=st.session_state.anomalist_mapping,
+                dry_run=False,
+                reset_db=False,
+            )
 
         # Fill list of anomalies...
         st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
