@@ -28,6 +28,7 @@ import streamlit as st
 from apps.anomalist.cli import anomaly_detection
 from apps.wizard.app_pages.anomalist.utils import create_tables, get_datasets_and_mapping_inputs
 from apps.wizard.utils import cached, set_states
+from apps.wizard.utils.chart_config import bake_chart_config
 from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
 from apps.wizard.utils.db import WizardDB
 
@@ -269,11 +270,39 @@ def show_anomaly_compact(index, df):
         col1, col2 = st.columns(2)
         # Chart
         with col1:
-            # Chart
-            grapher_chart(
-                variable_id=[indicator_id],
-                selected_entities=entities,
-            )
+            # Bake chart config
+            # If the anomaly is compared to previous indicator, then we need to show two indicators (old and new)!
+            if an_type == "upgrade_change":
+                # TODO: Uncomment the following code to show comparison between old and new indicator versions.
+                # display = [
+                #     {
+                #         "name": "New",
+                #     },
+                #     {
+                #         "name": "Old",
+                #     },
+                # ]
+                # assert indicator_id in st.session_state.anomalist_mapping_inv, "Indicator ID not found in mapping!"
+                # indicator_id_old = st.session_state.anomalist_mapping_inv[indicator_id]
+                # indicator_id_old = indicator_id + 1
+                # config = bake_chart_config(
+                #     variable_id=[indicator_id, indicator_id_old],
+                #     selected_entities=entities,
+                #     display=display,
+                # )
+                # config["title"] = indicator_uri
+                # config["subtitle"] = "Comparison of old and new indicator versions."
+
+                config = bake_chart_config(
+                    variable_id=[indicator_id],
+                    selected_entities=entities,
+                )
+            else:
+                config = bake_chart_config(variable_id=indicator_id, selected_entities=entities)
+            config["hideAnnotationFieldsInTitle"]["time"] = True
+            # Actually plot
+            grapher_chart(chart_config=config)
+
         # Description and other entities
         with col2:
             # Description
@@ -438,6 +467,7 @@ if st.session_state.anomalist_datasets_submitted:
     # Get indicator IDs
     variable_ids = list(st.session_state.anomalist_indicators.keys())
     st.session_state.anomalist_mapping = get_variable_mapping(variable_ids)
+    st.session_state.anomalist_mapping_inv = {v: k for k, v in st.session_state.anomalist_mapping.items()}
 
     # 3.2/ No anomaly found in DB, estimate them
     if len(st.session_state.anomalist_anomalies) == 0:
