@@ -106,16 +106,10 @@ def run(dest_dir: str) -> None:
     # Melt the DataFrame to make the metadata easier to generate
     tb = tb.melt(id_vars=["country", "year"], var_name="indicator", value_name="value")
 
-    print(tb["indicator"].unique())
-
     # Split the column into three parts: location, attribute, type
     tb[["location_type", "attribute", "type"]] = tb["indicator"].str.extract(
         r"(rural_total|urban_[\w]+)_(\w+?)_(estimates|projections)"
     )
-
-    print(tb["location_type"].unique())
-    print(tb["attribute"].unique())
-    print(tb["type"].unique())
     # Drop the original indicator column
     tb = tb.drop(columns=["indicator"])
     tb = tb.format(["country", "year", "location_type", "attribute", "type"])

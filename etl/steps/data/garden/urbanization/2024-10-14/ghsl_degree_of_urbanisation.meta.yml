@@ -120,27 +120,24 @@ tables:
             km²
             <% elif attribute == 'population' %>
             people
-            <% elif attribute == 'share' %>
-            |-
-            %
-            <% elif attribute == 'area_share' %>
-            |-
-            %
-            <% elif attribute == 'population_share' %>
-            |-
-            %
+            <% elif attribute == 'share' or attribute == 'popshare' %>
+            '%'
             <%- endif -%>
 
           short_unit:
             <% if attribute == 'area' %>
             km²
-            <% elif attribute == 'share' %>
-            |-
-            %
-            <% elif attribute == 'area_share' %>
-            |-
-            %
-            <% elif attribute == 'population_share' %>
-            |-
-            %
+            <% elif attribute == 'population' %>
+            ''
+            <% elif attribute == 'share' or attribute == 'popshare' %>
+            '%'
             <%- endif -%>
+          display:
+            numDecimalPlaces:
+                <% if attribute == 'area' %>
+                0
+                <% elif attribute == 'population' %>
+                0
+                <% elif attribute == 'share' or attribute == 'popshare' %>
+                1
+                <%- endif -%>
