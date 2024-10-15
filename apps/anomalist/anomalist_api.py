@@ -273,19 +273,14 @@ def anomaly_detection(
                 raise ValueError(f"Unsupported anomaly type: {anomaly_type}")
 
             # Instantiate the anomaly detector.
-            detector = ANOMALY_DETECTORS[anomaly_type](
-                variable_ids=variable_ids,
-                df=df,
-                metadata=variables,
-                variable_mapping=variable_mapping,
-            )
+            detector = ANOMALY_DETECTORS[anomaly_type]()
 
             # detect anomalies
             log.info(f"Detecting anomaly type {anomaly_type} for dataset {dataset_id}")
             # the output has the same shape as the input dataframe, but we should make
             # it possible to return anomalies in a long format (for detectors that return
             # just a few anomalies)
-            df_score = detector.get_score_df()
+            df_score = detector.get_score_df(df=df, variable_ids=variable_ids, variable_mapping=variable_mapping)
 
             # Create a long format score dataframe.
             df_score_long = get_long_format_score_df(df_score)
