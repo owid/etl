@@ -50,6 +50,13 @@ memory = Memory(CACHE_DIR, verbose=0)
 
 ANOMALY_TYPE = Literal["sample", "gp", "nan"]
 
+# Define mapping of available anomaly types to anomaly detectors.
+ANOMALY_DETECTORS = {
+    "gp": GPAnomalyDetector,
+    "sample": SampleAnomalyDetector,
+    "nan": NaNAnomalyDetector,
+}
+
 
 @click.command(name="anomalist", cls=RichCommand, help=__doc__)
 @click.option(
@@ -159,19 +166,13 @@ def anomaly_detection(
             dataset_variable_ids[variable.datasetId] = []
         dataset_variable_ids[variable.datasetId].append(variable)
 
-    log.info("Detecting anomalies")
     anomalies = []
-
     for dataset_id, variables_in_dataset in dataset_variable_ids.items():
         for anomaly_type in anomaly_types:
-            if anomaly_type == "gp":
-                detector = GPAnomalyDetector()
-            elif anomaly_type == "sample":
-                detector = SampleAnomalyDetector()
-            elif anomaly_type == "nan":
-                detector = NaNAnomalyDetector()
-            else:
+            # Instantiate the anomaly detector.
+            if anomaly_type not in ANOMALY_DETECTORS:
                 raise ValueError(f"Unsupported anomaly type: {anomaly_type}")
+            detector = ANOMALY_DETECTORS[anomaly_type]()
 
             # dataframe with (entityName, year) as index and variableId as columns
             log.info("Loading data from S3")
@@ -180,7 +181,7 @@ def anomaly_detection(
             # TODO: If any of the variables are in variable_mapping, load df_old as well.
 
             # detect anomalies
-            log.info("Detecting anomalies")
+            log.info(f"Detecting anomaly type {anomaly_type} for dataset {dataset_id}")
             # the output has the same shape as the input dataframe, but we should make
             # it possible to return anomalies in a long format (for detectors that return
             # just a few anomalies)
@@ -207,7 +208,6 @@ def anomaly_detection(
 
         if not dry_run:
             with Session(engine) as session:
-                # TODO: Is this message right? I suppose it should only delete if already existing.
                 log.info("Deleting existing anomalies")
                 session.query(gm.Anomaly).filter(
                     gm.Anomaly.datasetId == dataset_id,
