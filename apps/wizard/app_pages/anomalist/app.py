@@ -519,7 +519,11 @@ if st.session_state.anomalist_datasets_submitted:
         # The following code loads a mock dataframe. Instead, we should retrieve this from the database.
         indicators_id = list(st.session_state.anomalist_indicators.keys())
         indicators_id_upgrade = list(st.session_state.anomalist_mapping.values())
-        st.session_state.anomalist_df = mock_anomalies_df(indicators_id, indicators_id_upgrade, n=1000)
+        st.session_state.anomalist_df = mock_anomalies_df(
+            indicators_id,
+            indicators_id_upgrade,
+            n=1000,
+        )
         ###############################################################################################################
     else:
         st.session_state.anomalist_df = None
