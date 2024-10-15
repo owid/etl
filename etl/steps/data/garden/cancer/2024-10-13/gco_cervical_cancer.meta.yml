@@ -13,7 +13,7 @@ dataset:
 
 
 tables:
-  gco_cancer_over_time_cervical:
+  gco_cancer_today_cervical:
     variables:
       asr:
         title: Age-standardized cervical cancer incidence rate per 100,000 women

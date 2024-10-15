@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("gco_cervical_cancer")
 
     # Read table from garden dataset.
-    tb = ds_garden["gco_cancer_over_time_cervical"]
+    tb = ds_garden["gco_cancer_today_cervical"]
 
     #
     # Save outputs.
