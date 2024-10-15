@@ -30,6 +30,7 @@ views:
     indicators:
       y: "grapher/covid/latest/vaccinations_global/vaccinations_global#total_vaccinations_per_hundred"
     config:
+      addCountryMode: "disabled"
       selectedEntityNames:
         - High-income countries
         - Upper-middle-countriesincome countries

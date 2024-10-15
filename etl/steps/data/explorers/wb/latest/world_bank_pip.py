@@ -1,7 +1,7 @@
 """
 World Bank PIP explorer data step.
 
-Loads the latest PIP data from garden and stores multiple tables as csv diles.
+Loads the latest PIP data from garden and stores multiple tables as csv files.
 
 """
 
@@ -33,6 +33,7 @@ def run(dest_dir: str) -> None:
             "surveys_past_decade",
             "reporting_level",
             "welfare_type",
+            "region_name",
         ],
     )
 

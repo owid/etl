@@ -158,11 +158,11 @@ tables:
     variables:
       num_regime_bti:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of countries with unknown regime
-          <% else %>
+          <%- else -%>
           Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
-          <% endif %>
+          <%- endif -%>
         unit: "countries"
 
 
@@ -170,11 +170,11 @@ tables:
     variables:
       pop_regime_bti:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of people living in countries with unknown regime
-          <% else %>
+          <%- else -%>
           Number of people living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
-          <% endif %>
+          <%- endif -%>
         description_short: "Number of countries with available data."
         unit: "people"
 
