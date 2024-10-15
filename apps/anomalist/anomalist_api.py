@@ -26,7 +26,7 @@ log = structlog.get_logger()
 INDEX_COLUMNS = ["entity_id", "year"]
 
 # Define anomaly types.
-ANOMALY_TYPE = Literal["version_change", "time_change", "lost"]
+ANOMALY_TYPE = Literal["upgrade_change", "time_change", "upgrade_missing"]
 
 
 def load_latest_population():
@@ -118,7 +118,7 @@ class AnomalyDetector:
             new = self.df[self.df["entity_id"] == row["entity_id"]][["entity_id", "year", variable_id]]
             new["country"] = map_series(new["entity_id"], self.entity_id_to_name)
             new = new.drop(columns=["entity_id"]).rename(columns={row["variable_id"]: variable_name}, errors="raise")
-            if score_name == "version_change":
+            if score_name == "upgrade_change":
                 variable_id_old = row["variable_id_old"]
                 old = self.df[self.df["entity_id"] == row["entity_id"]][["entity_id", "year", variable_id_old]]
                 old["country"] = map_series(old["entity_id"], self.entity_id_to_name)
@@ -148,10 +148,10 @@ class AnomalyDetector:
                 ).show()
 
 
-class AnomalyLostData(AnomalyDetector):
+class AnomalyUpgradeMissing(AnomalyDetector):
     """New data misses entity-years that used to exist in old version."""
 
-    anomaly_type = "lost"
+    anomaly_type = "upgrade_missing"
 
     def get_score_df(self) -> pd.DataFrame:
         # Create a dataframe of zeros.
@@ -167,10 +167,10 @@ class AnomalyLostData(AnomalyDetector):
         return df_score
 
 
-class AnomalyVersionChange(AnomalyDetector):
+class AnomalyUpgradeChange(AnomalyDetector):
     """New dataframe has changed abruptly with respect to the old version."""
 
-    anomaly_type = "version_change"
+    anomaly_type = "upgrade_change"
 
     def get_score_df(self) -> pd.DataFrame:
         # Create a dataframe of zeros.
@@ -222,8 +222,8 @@ class AnomalyTimeChange(AnomalyDetector):
 # Define mapping of available anomaly types to anomaly detectors.
 ANOMALY_DETECTORS = {
     "time_change": AnomalyTimeChange,
-    "version_change": AnomalyVersionChange,
-    "lost": AnomalyLostData,
+    "upgrade_change": AnomalyUpgradeChange,
+    "upgrade_missing": AnomalyUpgradeMissing,
 }
 
 ########################################################################################################################

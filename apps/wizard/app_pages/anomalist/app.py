@@ -402,27 +402,14 @@ if st.session_state.anomalist_datasets_submitted:
         mapping = {k: v for k, v in mapping.items() if k in variable_ids}
 
         with st.spinner("Scanning for anomalies... This can take some time."):
-            # If there is mapping, estimate anomalies in 'upgrade mode'
-            if len(mapping) > 0:
-                anomaly_detection(
-                    anomaly_types=("nan",),
-                    variable_ids=variable_ids,
-                    dataset_ids=[],
-                    variable_mapping=mapping,
-                    dry_run=False,
-                    reset_db=False,
-                )
-            # Otherwise, estimate anomalies in 'normal mode'
-            else:
-                # Scan for anomalies
-                anomaly_detection(
-                    anomaly_types=("nan",),
-                    variable_ids=variable_ids,
-                    dataset_ids=[],
-                    variable_mapping=None,
-                    dry_run=False,
-                    reset_db=False,
-                )
+            anomaly_detection(
+                anomaly_types=tuple(ANOMALY_TYPE_NAMES.keys()),
+                variable_ids=variable_ids,
+                dataset_ids=[],
+                variable_mapping=mapping,
+                dry_run=False,
+                reset_db=False,
+            )
 
         # Fill list of anomalies...
         st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.datasets_selected)
