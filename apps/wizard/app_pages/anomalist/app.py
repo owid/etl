@@ -24,7 +24,7 @@ import random
 import pandas as pd
 import streamlit as st
 
-from apps.anomalist.cli import anomaly_detection
+from apps.anomalist.anomalist_api import anomaly_detection
 from apps.wizard.app_pages.anomalist.utils import get_datasets_and_mapping_inputs
 from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
@@ -402,27 +402,14 @@ if st.session_state.anomalist_datasets_submitted:
         mapping = {k: v for k, v in mapping.items() if k in variable_ids}
 
         with st.spinner("Scanning for anomalies... This can take some time."):
-            # If there is mapping, estimate anomalies in 'upgrade mode'
-            if len(mapping) > 0:
-                anomaly_detection(
-                    anomaly_types=("nan",),
-                    variable_ids=variable_ids,
-                    dataset_ids=[],
-                    variable_mapping=str(mapping),
-                    dry_run=False,
-                    reset_db=False,
-                )
-            # Otherwise, estimate anomalies in 'normal mode'
-            else:
-                # Scan for anomalies
-                anomaly_detection(
-                    anomaly_types=("nan",),
-                    variable_ids=variable_ids,
-                    dataset_ids=[],
-                    variable_mapping=None,
-                    dry_run=False,
-                    reset_db=False,
-                )
+            anomaly_detection(
+                anomaly_types=tuple(ANOMALY_TYPE_NAMES.keys()),
+                variable_ids=variable_ids,
+                dataset_ids=[],
+                variable_mapping=mapping,
+                dry_run=False,
+                reset_db=False,
+            )
 
         # Fill list of anomalies...
         st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.datasets_selected)
