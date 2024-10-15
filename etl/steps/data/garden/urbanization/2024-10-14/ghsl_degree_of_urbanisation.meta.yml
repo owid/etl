@@ -127,8 +127,6 @@ tables:
           short_unit:
             <% if attribute == 'area' %>
             km²
-            <% elif attribute == 'population' %>
-            ''
             <% elif attribute == 'share' or attribute == 'popshare' %>
             %
             <%- endif -%>
