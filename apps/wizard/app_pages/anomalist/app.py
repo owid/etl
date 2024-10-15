@@ -20,6 +20,7 @@ TODO:
 """
 
 import random
+from enum import Enum
 from typing import List, Tuple
 
 import pandas as pd
@@ -39,28 +40,31 @@ st.set_page_config(
     layout="wide",
 )
 
+
 # OTHER CONFIG
+class AnomalyTypeEnum(Enum):
+    TIME_CHANGE = "time_change"
+    UPGRADE_CHANGE = "upgrade_change"
+    UPGRADE_MISSING = "upgrade_missing"
+    # AI = "ai"  # Uncomment if needed
+
+
 ANOMALY_TYPES = {
-    "time_change": {
+    AnomalyTypeEnum.TIME_CHANGE.value: {
         "tag_name": "Time change",
-        "color": "orange",
+        "color": "gray",
         "icon": ":material/timeline",
     },
-    "upgrade_change": {
+    AnomalyTypeEnum.UPGRADE_CHANGE.value: {
         "tag_name": "Version change",
-        "color": "blue",
+        "color": "orange",
         "icon": ":material/upgrade",
     },
-    "upgrade_missing": {
+    AnomalyTypeEnum.UPGRADE_MISSING.value: {
         "tag_name": "Missing point",
         "color": "red",
         "icon": ":material/hide_source",
     },
-    # "ai": {
-    #     "tag_name": "AI",
-    #     "color": "rainbow",
-    #     "icon": ":material/lightbulb",
-    # },
 }
 ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
 
@@ -139,13 +143,13 @@ def mock_anomalies_df_time_change(indicators_id, n=5):
     return df
 
 
-def mock_anomalies_df_upgrade_change(indicators_id, n=5):
+def mock_anomalies_df_upgrade_change(indicators_id_upgrade, n=5):
     records = [
         {
             "entity": random.sample(ENTITIES_DEFAULT, 1)[0],
             "year": random.randint(1950, 2020),
             "score": round(random.random(), 2),
-            "indicator_id": random.sample(indicators_id, 1)[0],
+            "indicator_id": random.sample(indicators_id_upgrade, 1)[0],
         }
         for i in range(n)
     ]
@@ -154,13 +158,13 @@ def mock_anomalies_df_upgrade_change(indicators_id, n=5):
     return df
 
 
-def mock_anomalies_df_upgrade_missing(indicators_id, n=5):
+def mock_anomalies_df_upgrade_missing(indicators_id_upgrade, n=5):
     records = [
         {
             "entity": random.sample(ENTITIES_DEFAULT, 1)[0],
             "year": random.randint(1950, 2020),
-            "score": random.randint(0, 50),
-            "indicator_id": random.sample(indicators_id, 1)[0],
+            "score": random.randint(0, 1),
+            "indicator_id": random.sample(indicators_id_upgrade, 1)[0],
         }
         for i in range(n)
     ]
@@ -170,17 +174,17 @@ def mock_anomalies_df_upgrade_missing(indicators_id, n=5):
 
 
 @st.cache_data(ttl=60 * 60)
-def mock_anomalies_df(indicators_id, n=5):
+def mock_anomalies_df(indicators_id, indicators_id_upgrade, n=5):
     # 1/ Get anomalies df
     ## Time change
     df_change = mock_anomalies_df_time_change(indicators_id, n)
-    df_change["type"] = "time_change"
+    df_change["type"] = AnomalyTypeEnum.TIME_CHANGE.value
     ## Upgrade: value change
-    df_upgrade_change = mock_anomalies_df_upgrade_change(indicators_id, n)
-    df_upgrade_change["type"] = "upgrade_change"
+    df_upgrade_change = mock_anomalies_df_upgrade_change(indicators_id_upgrade, n)
+    df_upgrade_change["type"] = AnomalyTypeEnum.UPGRADE_CHANGE.value
     ## Upgrade: Missing data point
-    df_upgrade_miss = mock_anomalies_df_upgrade_missing(indicators_id, n)
-    df_upgrade_miss["type"] = "upgrade_missing"
+    df_upgrade_miss = mock_anomalies_df_upgrade_missing(indicators_id_upgrade, n)
+    df_upgrade_miss["type"] = AnomalyTypeEnum.UPGRADE_MISSING.value
 
     # 2/ Combine
     df = pd.concat([df_change, df_upgrade_change, df_upgrade_miss])
@@ -220,8 +224,7 @@ def get_variable_mapping(variable_ids):
     """Get variable mapping for specific variable IDs."""
     # Get variable mapping, if exists. Then keep only 'relevant' variables
     mapping = WizardDB.get_variable_mapping()
-    mapping = {k: v for k, v in mapping.items() if k in variable_ids}
-
+    mapping = {k: v for k, v in mapping.items() if v in variable_ids}
     return mapping
 
 
@@ -255,14 +258,16 @@ def show_anomaly_compact(index, df):
     entities = entities if entities != [] else [entity_default]
 
     # entities = df["entity_id"].tolist()
-    year = df.iloc[row]["year"]
+    year_default = df.iloc[row]["year"]
     indicator_uri = st.session_state.anomalist_indicators.get(indicator_id)
 
     # Generate descriptive text. Only contains information about top-scoring entity.
-    if an_type == "time_change":
-        text = f"There are significant changes for {entity_default} in {year} compared to the old version of the indicator. There might be other data points affected."
-    elif an_type == "upgrade_change":
-        text = f"There are abrupt changes for {entity_default} in {year}! There might be other data points affected."
+    if an_type == AnomalyTypeEnum.TIME_CHANGE.value:
+        text = f"There are significant changes for {entity_default} in {year_default} compared to the old version of the indicator. There might be other data points affected."
+    elif an_type == AnomalyTypeEnum.UPGRADE_CHANGE.value:
+        text = f"There are abrupt changes for {entity_default} in {year_default}! There might be other data points affected."
+    elif an_type == AnomalyTypeEnum.UPGRADE_MISSING.value:
+        text = f"There are missing values for {entity_default}! There might be other data points affected."
     else:
         raise ValueError(f"Unknown anomaly type: {an_type}")
 
@@ -275,31 +280,30 @@ def show_anomaly_compact(index, df):
         with col1:
             # Bake chart config
             # If the anomaly is compared to previous indicator, then we need to show two indicators (old and new)!
-            if an_type == "upgrade_change":
+            if an_type in {AnomalyTypeEnum.UPGRADE_CHANGE.value, AnomalyTypeEnum.UPGRADE_MISSING.value}:
                 # TODO: Uncomment the following code to show comparison between old and new indicator versions.
-                # display = [
-                #     {
-                #         "name": "New",
-                #     },
-                #     {
-                #         "name": "Old",
-                #     },
-                # ]
-                # assert indicator_id in st.session_state.anomalist_mapping_inv, "Indicator ID not found in mapping!"
-                # indicator_id_old = st.session_state.anomalist_mapping_inv[indicator_id]
-                # indicator_id_old = indicator_id + 1
-                # config = bake_chart_config(
-                #     variable_id=[indicator_id, indicator_id_old],
-                #     selected_entities=entities,
-                #     display=display,
-                # )
-                # config["title"] = indicator_uri
-                # config["subtitle"] = "Comparison of old and new indicator versions."
-
+                display = [
+                    {
+                        "name": "New",
+                    },
+                    {
+                        "name": "Old",
+                    },
+                ]
+                assert indicator_id in st.session_state.anomalist_mapping_inv, "Indicator ID not found in mapping!"
+                indicator_id_old = st.session_state.anomalist_mapping_inv[indicator_id]
                 config = bake_chart_config(
-                    variable_id=[indicator_id],
+                    variable_id=[indicator_id, indicator_id_old],
                     selected_entities=entities,
+                    display=display,
                 )
+                config["title"] = indicator_uri
+                config["subtitle"] = "Comparison of old and new indicator versions."
+
+                # config = bake_chart_config(
+                #     variable_id=[indicator_id],
+                #     selected_entities=entities,
+                # )
             else:
                 config = bake_chart_config(variable_id=indicator_id, selected_entities=entities)
             config["hideAnnotationFieldsInTitle"]["time"] = True
@@ -322,6 +326,10 @@ def show_anomaly_compact(index, df):
                     ),
                     hide_index=True,
                 )
+
+            # TODO: Enable anomaly-specific hiding
+            # key_btn = f"button_{key}"
+            # st.button("Hide anomaly", key=key_btn, icon=":material/hide:")
 
 
 def show_anomaly(anomaly, indicator_id):
@@ -523,7 +531,8 @@ if st.session_state.anomalist_datasets_submitted:
         # DEMO
         # The following code loads a mock dataframe. Instead, we should retrieve this from the database.
         indicators_id = list(st.session_state.anomalist_indicators.keys())
-        st.session_state.anomalist_df = mock_anomalies_df(indicators_id, n=1000)
+        indicators_id_upgrade = list(st.session_state.anomalist_mapping.values())
+        st.session_state.anomalist_df = mock_anomalies_df(indicators_id, indicators_id_upgrade, n=1000)
         ###############################################################################################################
     else:
         st.session_state.anomalist_df = None
@@ -596,12 +605,22 @@ if st.session_state.anomalist_df is not None:
                     label="Sort by",
                     options=SORTING_STRATEGIES.keys(),
                     format_func=SORTING_STRATEGIES.get,
-                    help="Sort anomalies by a certain criteria.",
+                    help=(
+                        """
+                        Sort anomalies by a certain criteria.
+
+                        - **Relevance**: This is a combined score based on population in country, views of charts using this indicator, and anomaly-algorithm error score. The higher this score, the more relevant the anomaly.
+                        - **Anomaly score**: The anomaly detection algorithm assigns a score to each anomaly based on its significance.
+                        - **Population**: Population score, based on the population in the affected country.
+                        - **Views**: Views of charts using this indicator.
+                        - **Population+views**: Combined population and chart views to rank.
+                        """
+                    ),
                     key="anomalist_sorting_strategy",
                 )
             with cols[1]:
                 st.multiselect(
-                    label="Exclude types",
+                    label="Hide types",
                     options=ANOMALY_TYPE_NAMES.keys(),
                     format_func=ANOMALY_TYPE_NAMES.get,
                     help="Exclude anomalies of a certain type.",
@@ -632,14 +651,14 @@ if st.session_state.anomalist_df is not None:
 
     # 5/ SHOW ANOMALIES
     # Different types need formatting
-    mask = df["type"] == "upgrade_missing"
-    df_missing = df[mask]
-    df_change = df[~mask]
+    # mask = df["type"] == "upgrade_missing"
+    # df_missing = df[mask]
+    # df_change = df[~mask]
 
     # Show anomalies with time and version changes
-    if not df_change.empty:
+    if not df.empty:
         # st.dataframe(df_change)
-        groups = df_change.groupby(["indicator_id", "type"], sort=False)
+        groups = df.groupby(["indicator_id", "type"], sort=False)
         items = list(groups)
         items_per_page = 10
 
