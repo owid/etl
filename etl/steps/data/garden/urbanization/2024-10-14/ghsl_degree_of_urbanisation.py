@@ -47,10 +47,10 @@ def run(dest_dir: str) -> None:
     # Pivot the table to each indicator as a column.
     tb = tb.pivot(index=["country", "year"], columns="indicator", values="value").reset_index()
     columns_to_aggregate = [
-        "rural_population",
+        "rural_total_population",
         "urban_centre_population",
         "urban_cluster_population",
-        "rural_area",
+        "rural_total_area",
         "urban_centre_area",
         "urban_cluster_area",
     ]
@@ -67,23 +67,25 @@ def run(dest_dir: str) -> None:
     )
 
     # Ensure the column names are correctly specified
-    tb["total_population"] = tb[["rural_population", "urban_centre_population", "urban_cluster_population"]].sum(axis=1)
-    tb["total_area"] = tb[["rural_area", "urban_centre_area", "urban_cluster_area"]].sum(axis=1)
+    tb["total_population"] = tb[["rural_total_population", "urban_centre_population", "urban_cluster_population"]].sum(
+        axis=1
+    )
+    tb["total_area"] = tb[["rural_total_area", "urban_centre_area", "urban_cluster_area"]].sum(axis=1)
 
-    tb["share_of_urban_population"] = (
+    tb["urban_total_popshare"] = (
         (tb["urban_centre_population"] + tb["urban_cluster_population"]) / tb["total_population"]
     ) * 100
 
-    tb["share_of_urban_area"] = (tb["urban_centre_area"] + tb["urban_cluster_area"]) / tb["total_area"] * 100
+    tb["urban_total_share"] = (tb["urban_centre_area"] + tb["urban_cluster_area"]) / tb["total_area"] * 100
 
-    tb["share_of_rural_area"] = tb["rural_area"] / tb["total_area"] * 100
-    tb["share_of_rural_population"] = tb["rural_population"] / tb["total_population"] * 100
+    tb["rural_total_share"] = tb["rural_total_area"] / tb["total_area"] * 100
+    tb["rural_total_popshare"] = tb["rural_total_population"] / tb["total_population"] * 100
 
-    tb["share_of_urban_cluster_population"] = tb["urban_cluster_population"] / tb["total_population"] * 100
-    tb["share_of_urban_centre_population"] = tb["urban_centre_population"] / tb["total_population"] * 100
+    tb["urban_cluster_popshare"] = tb["urban_cluster_population"] / tb["total_population"] * 100
+    tb["urban_centre_popshare"] = tb["urban_centre_population"] / tb["total_population"] * 100
 
-    tb["share_of_urban_cluster_area"] = tb["urban_cluster_area"] / tb["total_area"] * 100
-    tb["share_of_urban_centre_area"] = tb["urban_centre_area"] / tb["total_area"] * 100
+    tb["urban_cluster_share"] = tb["urban_cluster_area"] / tb["total_area"] * 100
+    tb["urban_centre_share"] = tb["urban_centre_area"] / tb["total_area"] * 100
 
     tb = tb.drop(columns=["total_population", "total_area"])
 
@@ -104,7 +106,19 @@ def run(dest_dir: str) -> None:
     # Melt the DataFrame to make the metadata easier to generate
     tb = tb.melt(id_vars=["country", "year"], var_name="indicator", value_name="value")
 
-    tb = tb.format(["country", "year", "indicator"])
+    print(tb["indicator"].unique())
+
+    # Split the column into three parts: location, attribute, type
+    tb[["location_type", "attribute", "type"]] = tb["indicator"].str.extract(
+        r"(rural_total|urban_[\w]+)_(\w+?)_(estimates|projections)"
+    )
+
+    print(tb["location_type"].unique())
+    print(tb["attribute"].unique())
+    print(tb["type"].unique())
+    # Drop the original indicator column
+    tb = tb.drop(columns=["indicator"])
+    tb = tb.format(["country", "year", "location_type", "attribute", "type"])
 
     #
     # Save outputs.

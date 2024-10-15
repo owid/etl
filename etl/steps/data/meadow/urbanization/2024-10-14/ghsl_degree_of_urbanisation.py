@@ -48,10 +48,10 @@ def run(dest_dir: str) -> None:
     renaming_dict = {
         "UC_AREA_": "urban_centre_area",
         "UCL_AREA_": "urban_cluster_area",
-        "RUR_AREA_": "rural_area",
+        "RUR_AREA_": "rural_total_area",
         "UC_POP_": "urban_centre_population",
         "UCL_POP_": "urban_cluster_population",
-        "RUR_POP_": "rural_population",
+        "RUR_POP_": "rural_total_population",
     }
 
     # Apply the renaming by replacing the entries in the 'indicator' column
