@@ -342,10 +342,11 @@ class Pagination:
 
     def show_controls_buttons(self):
         # Pagination controls
-        col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
+        # col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
 
         with st.container(border=True):
-            with col1:
+            with st_horizontal():
+                # with col1:
                 key = f"previous-{self.pagination_key}"
                 if self.page > 1:
                     if st.button("⏮️ Previous", key=key):
@@ -356,7 +357,9 @@ class Pagination:
                 else:
                     st.button("⏮️ Previous", disabled=True, key=key)
 
-            with col3:
+                s = st.empty()
+
+                # with col3:
                 key = f"next-{self.pagination_key}"
                 if self.page < self.total_pages:
                     if st.button("Next ⏭️", key=key):
@@ -367,8 +370,8 @@ class Pagination:
                 else:
                     st.button("Next ⏭️", disabled=True, key=key)
 
-            with col2:
-                st.text(f"Page {self.page} of {self.total_pages}")
+                # with col2:
+                s.text(f"Page {self.page} of {self.total_pages}")
 
     def show_controls_bar(self) -> None:
         def _change_page():
@@ -378,8 +381,7 @@ class Pagination:
             if self.on_click is not None:
                 self.on_click()
 
-        col, _ = st.columns([1, 3])
-        with col:
+        with st_horizontal():
             st.number_input(
                 label=f"**Go to page** (total: {self.total_pages})",
                 min_value=1,
