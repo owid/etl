@@ -33,21 +33,48 @@ def estimate_bard_epsilon(series: pd.Series) -> float:
 
 def get_long_format_score_df(df_score: pd.DataFrame) -> pd.DataFrame:
     # Create a reduced score dataframe.
-    df_score_long = df_score.melt(
-        id_vars=["entity_name", "year"], var_name="variable_id", value_name="anomaly_score"
-    ).fillna(0)
-    # For now, keep only the latest year affected for each country-indicator.
+    df_score_long = df_score.melt(id_vars=["entity_name", "year"], var_name="variable_id", value_name="anomaly_score")
+
+    # Drop NaN anomalies.
+    df_score_long = df_score_long.dropna(subset=["anomaly_score"])
+
+    # Drop zero anomalies.
+    df_score_long = df_score_long[df_score_long["anomaly_score"] != 0]
+
+    # For now, keep only the highest anomaly score for each country-indicator.
     df_score_long = (
         df_score_long.sort_values("anomaly_score", ascending=False)
         .drop_duplicates(subset=["variable_id", "entity_name"], keep="first")
         .reset_index(drop=True)
     )
 
+    # Save memory by converting to categoricals.
+    df_score_long = df_score_long.astype({"entity_name": "category", "year": "category", "variable_id": "category"})
+
     return df_score_long
 
 
 class AnomalyDetector:
     anomaly_type: str
+
+    def get_text(self, entity: str, year: int) -> str:
+        return f"Anomaly happened in {entity} in {year}!"
+
+    def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+        raise NotImplementedError
+
+    def get_zeros_df(self, df: pd.DataFrame, variable_ids: List[int]) -> pd.DataFrame:
+        # Create a dataframe of zeros.
+        df_zeros = pd.DataFrame(np.zeros_like(df), columns=df.columns)[INDEX_COLUMNS + variable_ids]
+        df_zeros[INDEX_COLUMNS] = df[INDEX_COLUMNS].copy()
+        return df_zeros
+
+    def get_nans_df(self, df: pd.DataFrame, variable_ids: List[int]) -> pd.DataFrame:
+        # Create a dataframe of nans.
+        df_nans = pd.DataFrame(np.empty_like(df), columns=df.columns)[INDEX_COLUMNS + variable_ids]
+        df_nans[variable_ids] = np.nan
+        df_nans[INDEX_COLUMNS] = df[INDEX_COLUMNS].copy()
+        return df_nans
 
     # Visually inspect the most significant anomalies on a certain scores dataframe.
     def inspect_anomalies(
@@ -109,8 +136,7 @@ class AnomalyUpgradeMissing(AnomalyDetector):
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
-        df_lost = pd.DataFrame(np.zeros_like(df), columns=df.columns)[INDEX_COLUMNS + variable_ids]
-        df_lost[INDEX_COLUMNS] = df[INDEX_COLUMNS].copy()
+        df_lost = self.get_zeros_df(df, variable_ids)
 
         # Make 1 all cells that used to have data in the old version, but are missing in the new version.
         for variable_id_old, variable_id_new in variable_mapping.items():
@@ -127,8 +153,7 @@ class AnomalyUpgradeChange(AnomalyDetector):
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
-        df_version_change = pd.DataFrame(np.zeros_like(df), columns=df.columns)[INDEX_COLUMNS + variable_ids]
-        df_version_change[INDEX_COLUMNS] = df[INDEX_COLUMNS].copy()
+        df_version_change = self.get_zeros_df(df, variable_ids)
 
         for variable_id_old, variable_id_new in variable_mapping.items():
             # Calculate the BARD epsilon for each variable.
@@ -148,8 +173,7 @@ class AnomalyTimeChange(AnomalyDetector):
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
-        df_time_change = pd.DataFrame(np.zeros_like(df), columns=df.columns)[INDEX_COLUMNS + variable_ids]
-        df_time_change[INDEX_COLUMNS] = df[INDEX_COLUMNS].copy()
+        df_time_change = self.get_zeros_df(df, variable_ids)
 
         # Sanity check.
         error = "The function that detects abrupt time changes assumes the data is sorted by entity_name and year. But this is not the case. Either ensure the data is sorted, or fix the function."

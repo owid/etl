@@ -683,7 +683,6 @@ class PathFinder:
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         if len(matches) == 0:
-            __import__("ipdb").set_trace()
             raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
         elif len(matches) > 1:
             raise MultipleMatchingStepsAmongDependencies(step_name=self.step_name)

@@ -7,6 +7,7 @@ from joblib import Memory
 from rich_click.rich_command import RichCommand
 
 from apps.anomalist.anomalist_api import ANOMALY_TYPE, anomaly_detection
+from etl.db import get_engine, read_sql
 from etl.paths import CACHE_DIR
 
 log = structlog.get_logger()
@@ -96,11 +97,19 @@ def cli(
     else:
         variable_mapping_dict = {}
 
+    # Load all variables from given datasets
+    if dataset_ids:
+        assert not variable_ids, "Cannot specify both dataset IDs and variable IDs."
+        q = """
+        select id from variables
+        where datasetId in %(dataset_ids)s
+        """
+        variable_ids = list(read_sql(q, get_engine(), params={"dataset_ids": dataset_ids})["id"])
+
     anomaly_detection(
         anomaly_types=anomaly_types,
-        dataset_ids=dataset_ids,
         variable_mapping=variable_mapping_dict,
-        variable_ids=variable_ids,
+        variable_ids=list(variable_ids) if variable_ids else None,
         dry_run=dry_run,
         reset_db=reset_db,
     )
