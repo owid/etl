@@ -19,7 +19,7 @@ TODO:
 
 """
 
-from typing import List, Tuple, cast
+from typing import List, Tuple
 
 import pandas as pd
 import streamlit as st
@@ -396,37 +396,11 @@ if st.session_state.anomalist_datasets_submitted:
 
     # 3.4/ Parse obtained anomalist into dataframe
     if len(st.session_state.anomalist_anomalies) > 0:
+        # Combine the score dataframes for all anomalies, and reduce the result to keep only the largest anomaly per indicator-entity.
+        df = cached.get_reduced_scores(anomalies=st.session_state.anomalist_anomalies)
+
         ###############################################################################################################
         # TODO: Encapsulate this code in a function, add real population and analytics scores
-        dfs = []
-        for anomaly in st.session_state.anomalist_anomalies:
-            # Load
-            df = anomaly.dfScore
-            if isinstance(df, pd.DataFrame):
-                # TODO: We should not store all-zero dataframes in table if there is no variable mapping!
-                if (df["anomaly_score"] == 0).all():
-                    continue
-                # Reduce df
-                # st.write(df)
-                df = df.sort_values("anomaly_score", ascending=False)
-                df = df.drop_duplicates(subset=["entity_name", "variable_id"], keep="first")
-                # Assign anomaly type in df
-                df["type"] = anomaly.anomalyType
-                # Add to list
-                dfs.append(df)
-            else:
-                raise ValueError(f"Anomaly {anomaly} has no dfScore attribute.")
-
-        # Concatenate all dfs
-        df = cast(pd.DataFrame, pd.concat(dfs, ignore_index=True))
-
-        # Rename columns
-        df = df.rename(
-            columns={
-                "variable_id": "indicator_id",
-                "anomaly_score": "score",
-            }
-        )
 
         # Add population and analytics score:
         df["score_population"] = 1

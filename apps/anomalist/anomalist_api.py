@@ -1,6 +1,6 @@
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Tuple, get_args
+from typing import Dict, List, Literal, Optional, Tuple, cast, get_args
 
 import numpy as np
 import pandas as pd
@@ -366,3 +366,28 @@ def _load_variables_meta(engine: Engine, variable_ids: list[int]) -> list[gm.Var
     # select all variables using SQLAlchemy
     with Session(engine) as session:
         return gm.Variable.load_variables(session, list(df["id"]))
+
+
+def combine_and_reduce_scores_df(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
+    """Get the combined dataframe with scores for all anomalies, and reduce it to include only the largest anomaly for each contry-indicator."""
+    dfs = []
+    for anomaly in anomalies:
+        # Load
+        df = cast(pd.DataFrame, anomaly.dfScore)
+
+        # NOTE: We could separate the combination from the reduction, but doing both at once reduces memory use.
+        # For each country-indicator, keep only the anomaly of the year with the highest anomaly score.
+        df_reduced = (
+            df.sort_values("anomaly_score", ascending=False)
+            .drop_duplicates(subset=["variable_id", "entity_name"], keep="first")
+            .reset_index(drop=True)
+            .assign(type=anomaly.anomalyType)
+        )
+
+        # Add to list
+        dfs.append(df_reduced)
+
+    # Concatenate all dfs
+    df_reduced = cast(pd.DataFrame, pd.concat(dfs, ignore_index=True))
+
+    return df_reduced

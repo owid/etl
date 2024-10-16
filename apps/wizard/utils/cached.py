@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy.orm import Session
 
+from apps.anomalist.anomalist_api import combine_and_reduce_scores_df
 from apps.utils.map_datasets import get_grapher_changes
 from etl import grapher_io as gio
 from etl.config import OWID_ENV, OWIDEnv
@@ -145,3 +146,14 @@ def get_datasets_from_version_tracker() -> Tuple[pd.DataFrame, List[Dict[str, An
         }
     )
     return steps_df_grapher, grapher_changes
+
+
+@st.cache_data(show_spinner=False)
+def get_reduced_scores(anomalies: List[Anomaly]):
+    """Combine and reduce scores dataframe."""
+    df = combine_and_reduce_scores_df(anomalies)
+
+    # Rename columns for convenience.
+    df = df.rename(columns={"variable_id": "indicator_id", "anomaly_score": "score"}, errors="raise")
+
+    return df
