@@ -111,6 +111,80 @@ def get_variable_mapping(variable_ids):
     return mapping
 
 
+@st.cache_data
+def _reduce_df(df: pd.DataFrame):
+    """Reduce dataframe and keep only one entry per entity-anomaly type.
+
+    TODO: This should already be stored in the DB, to save us some time and memory when loading the anomalies.
+    """
+    df = df.sort_values("anomaly_score", ascending=False)
+    df = df.drop_duplicates(subset=["entity_name", "variable_id"], keep="first")
+    return df
+
+
+def parse_anomalies_to_df() -> pd.DataFrame | None:
+    """Given a list of anomalies, parse them into a dataframe.
+
+    This function takes the anomalies stored in st.session_state.anomalist_anomalies and parses them into a single dataframe.
+
+        - It loads dfScore from each anomaly.
+        - It keeps only one row per entity and anomaly type, based on the highest anomaly score.
+        - Concatenates all dataframes.
+        - Renames columns to appropriate names.
+        - Adjusts dtypes.
+        - Adds population and analytics scores.
+        - Calculates weighed combined score
+
+    """
+    # Only return dataframe if there are anomalies!
+    if len(st.session_state.anomalist_anomalies) > 0:
+        dfs = []
+        for anomaly in st.session_state.anomalist_anomalies:
+            # Load
+            df = anomaly.dfScore
+            if isinstance(df, pd.DataFrame):
+                # Reduce df
+                df = _reduce_df(df)
+                # Assign anomaly type in df
+                df["type"] = anomaly.anomalyType
+                # Add to list
+                dfs.append(df)
+            else:
+                raise ValueError(f"Anomaly {anomaly} has no dfScore attribute.")
+
+        # Concatenate all dfs
+        df = cast(pd.DataFrame, pd.concat(dfs, ignore_index=True))
+
+        # Rename columns
+        df = df.rename(
+            columns={
+                "variable_id": "indicator_id",
+                "anomaly_score": "score",
+            }
+        )
+
+        # Dtypes
+        df = df.astype(
+            {
+                "year": int,
+            }
+        )
+
+        # Add population and analytics score:
+        df["score_population"] = 1
+        df["score_analytics"] = 1
+
+        # Weighed combined score
+        w_score = 1
+        w_pop = 1
+        w_views = 1
+        df["score_weighed"] = (
+            w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]
+        ) / (w_score + w_pop + w_views)
+
+        return df
+
+
 def _change_chart_selection(df, key_table, key_selection):
     """Change selection in grapher chart."""
     # st.toast(f"Changing entity in indicator {indicator_id}")
@@ -260,6 +334,7 @@ def filter_df(df: pd.DataFrame):
 
 @st.cache_data
 def _filter_df(df: pd.DataFrame, year_min, year_max, anomaly_types, entities, indicators) -> pd.DataFrame:
+    """Used in filter_df."""
     ## Year
     df = df[(df["year"] >= year_min) & (df["year"] <= year_max)]
     ## Anomaly type
@@ -276,6 +351,7 @@ def _filter_df(df: pd.DataFrame, year_min, year_max, anomaly_types, entities, in
 
 @st.cache_data
 def _sort_df(df: pd.DataFrame, sort_strategy: str) -> Tuple[pd.DataFrame, List[str]]:
+    """Used in filter_df."""
     ## Sort
     columns_sort = []
     match sort_strategy:
@@ -395,68 +471,7 @@ if st.session_state.anomalist_datasets_submitted:
             st.session_state.anomalist_anomalies_out_of_date = False
 
     # 3.4/ Parse obtained anomalist into dataframe
-    if len(st.session_state.anomalist_anomalies) > 0:
-        ###############################################################################################################
-        # TODO: Encapsulate this code in a function, add real population and analytics scores
-        dfs = []
-        for anomaly in st.session_state.anomalist_anomalies:
-            # Load
-            df = anomaly.dfScore
-            if isinstance(df, pd.DataFrame):
-                # TODO: We should not store all-zero dataframes in table if there is no variable mapping!
-                # if (df["anomaly_score"] == 0).all():
-                #     continue
-                # Reduce df
-                # st.write(df)
-                df = df.sort_values("anomaly_score", ascending=False)
-                df = df.drop_duplicates(subset=["entity_name", "variable_id"], keep="first")
-                # Assign anomaly type in df
-                df["type"] = anomaly.anomalyType
-                # Add to list
-                dfs.append(df)
-            else:
-                raise ValueError(f"Anomaly {anomaly} has no dfScore attribute.")
-
-        # Concatenate all dfs
-        df = cast(pd.DataFrame, pd.concat(dfs, ignore_index=True))
-
-        # Rename columns
-        df = df.rename(
-            columns={
-                "variable_id": "indicator_id",
-                "anomaly_score": "score",
-            }
-        )
-
-        # Add population and analytics score:
-        df["score_population"] = 1
-        df["score_analytics"] = 1
-
-        # Dtypes
-        df = df.astype(
-            {
-                "year": int,
-            }
-        )
-
-        # Weighed combined score
-        w_score = 1
-        w_pop = 1
-        w_views = 1
-        df["score_weighed"] = (
-            w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]
-        ) / (w_score + w_pop + w_views)
-
-        st.session_state.anomalist_df = df
-        # Former mock data
-        # st.session_state.anomalist_df = mock_anomalies_df(
-        #     indicators_id,
-        #     indicators_id_upgrade,
-        #     n=1000,
-        # )
-        ###############################################################################################################
-    else:
-        st.session_state.anomalist_df = None
+    st.session_state.anomalist_df = parse_anomalies_to_df()
 
 # 4/ SHOW ANOMALIES (only if any are found)
 if st.session_state.anomalist_df is not None:
