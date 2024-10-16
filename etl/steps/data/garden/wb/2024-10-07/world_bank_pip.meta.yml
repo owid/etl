@@ -527,7 +527,5 @@ tables:
         description_key:
           - The regions employed by the World Bank PIP differ from the regional groupings used by the World Bank in other contexts.
           - Some economies, mostly high-income economies, are excluded from the geographical regions and are included as a separate group referred to as “other high income” (or “industrialized economies” or “rest of the world” in earlier publications).
-        display:
-          tolerance: 40
         presentation:
           title_public: World regions according to World Bank Poverty and Inequality Platform

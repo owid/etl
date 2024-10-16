@@ -18,6 +18,7 @@ class AnomalyTypeEnum(Enum):
     TIME_CHANGE = "time_change"
     UPGRADE_CHANGE = "upgrade_change"
     UPGRADE_MISSING = "upgrade_missing"
+    GP_OUTLIER = "gp_outlier"
     # AI = "ai"  # Uncomment if needed
 
 

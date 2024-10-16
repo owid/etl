@@ -210,6 +210,8 @@ def run(dest_dir: str) -> None:
 
     tb_dac1 = remove_jumps_in_the_data_and_unneeded_cols(tb=tb_dac1)
 
+    tb_dac1 = limit_grant_equivalents_from_2018_only(tb=tb_dac1)
+
     tb = add_donor_data_from_recipient_dataset(tb_donor=tb_dac1, tb_recipient=tb_dac2a)
 
     tb = add_recipient_dataset(tb=tb, tb_recipient=tb_dac2a)
@@ -525,7 +527,7 @@ def remove_jumps_in_the_data_and_unneeded_cols(tb: Table) -> Table:
     This is most likely because of aggregations of population and GNI not properly done by the source.
     This is a temporary solution until the source fixes the data. It is already reported.
 
-    # Also, remove redundant columns.
+    Also, remove redundant columns.
     """
 
     # For i_oda_net_disbursements_share_gni
@@ -543,5 +545,20 @@ def remove_jumps_in_the_data_and_unneeded_cols(tb: Table) -> Table:
     tb = tb.drop(
         columns=["oda_bilateral_2_grant_equivalents", "oda_multilateral_2_grant_equivalents", "i_oda_grant_equivalents"]
     )
+
+    return tb
+
+
+def limit_grant_equivalents_from_2018_only(tb: Table) -> Table:
+    """
+    Limit grant equivalent indicators from year 2018 onwards.
+    """
+
+    tb = tb.copy()
+
+    # Define grant equivalent indicators by looking at all the columns containing the word "grant_equivalents"
+    grant_equivalent_indicators = [col for col in tb.columns if "grant_equivalents" in col]
+
+    tb.loc[tb["year"] < 2018, grant_equivalent_indicators] = None
 
     return tb

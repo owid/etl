@@ -279,6 +279,15 @@ def anomaly_detection(
             )
             anomaly.dfScore = df_score_long
 
+            # Reduce dataframe
+            df_score_long_reduced = (
+                df_score_long.sort_values("anomaly_score", ascending=False)
+                .drop_duplicates(subset=["entity_name", "variable_id"], keep="first")
+                .reset_index(drop=True)
+            )
+            anomaly.dfReduced = df_score_long_reduced
+
+            ##################################################################
             # TODO: Use this as an alternative to storing binary files in the DB
             # anomaly = gm.Anomaly(
             #     datasetId=dataset_id,
@@ -288,6 +297,7 @@ def anomaly_detection(
 
             # # Export anomaly file
             # anomaly.path_file = export_anomalies_file(df_score, dataset_id, detector.anomaly_type)
+            ##################################################################
 
             if not dry_run:
                 with Session(engine) as session:
@@ -365,24 +375,10 @@ def _load_variables_meta(engine: Engine, variable_ids: list[int]) -> list[gm.Var
 
 def combine_and_reduce_scores_df(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
     """Get the combined dataframe with scores for all anomalies, and reduce it to include only the largest anomaly for each contry-indicator."""
-    dfs = []
-    for anomaly in anomalies:
-        # Load
-        df = cast(pd.DataFrame, anomaly.dfScore)
-
-        # NOTE: We could separate the combination from the reduction, but doing both at once reduces memory use.
-        # For each country-indicator, keep only the anomaly of the year with the highest anomaly score.
-        df = (
-            df.sort_values("anomaly_score", ascending=False)
-            .drop_duplicates(subset=["variable_id", "entity_name"], keep="first")
-            .reset_index(drop=True)
-            .assign(type=anomaly.anomalyType)
-        )
-
-        # Add to list
-        dfs.append(df)
-
-    # Concatenate all dfs
+    # Combine the reduced dataframes for all anomalies into a single dataframe.
+    dfs = [cast(pd.DataFrame, anomaly.dfReduced).assign(**{"type": anomaly.anomalyType}) for anomaly in anomalies]
     df_reduced = cast(pd.DataFrame, pd.concat(dfs, ignore_index=True))
+    # Dtypes
+    # df = df.astype({"year": int})
 
     return df_reduced
