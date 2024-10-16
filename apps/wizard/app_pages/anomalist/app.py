@@ -10,12 +10,13 @@ The main structure of the app is implemented. Its main logic is:
 4. The app shows the anomalies, along with filters to sort / re-order them.
 
 TODO:
-- how to display missing-points-type 'anomalies'?
-    - idea: have special 'anomaly box'
-        - works at dataset level (multiple indincators may behave similarly)
-        - have LLMs summarise this?
-- have this working with upgrades
-- have filters working
+- Test with upgrade flow more extensively.
+- What happens with data that do not have years (e.g. dates)?
+- We can infer if the anomalies are out of sync (because user has updated the data) by checking the dataset checksum. NOTE: checksum might change bc of metadata changes, so might show several false positives.
+- Further explore LLM summary:
+    - We should store the LLM summary in the DB. We need a new table for this. Each summary is associated with a set of anomalies (Anomaly table), at a precise moment. We should detect out-of-sync here too.
+- Hiding capabilities. Option to hide anomalies would be great. Idea: have a button in each anomaly box to hide it. We need a register of the hidden anomalies. We then could have a st.popover element in the filter section which only appears if there are anomalies hidden. Then, we can list them there, in case the user wants to unhide some.
+- New dataset detection. We should explore if this can be done quicker.
 
 """
 
@@ -25,13 +26,14 @@ import pandas as pd
 import streamlit as st
 
 from apps.anomalist.anomalist_api import anomaly_detection
-from apps.utils.gpt import OpenAIWrapper
+from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens, get_number_tokens
 from apps.wizard.app_pages.anomalist.utils import AnomalyTypeEnum, create_tables, get_datasets_and_mapping_inputs
 from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.chart_config import bake_chart_config
 from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
+from etl.grapher_io import load_variables
 
 # PAGE CONFIG
 st.set_page_config(
@@ -68,6 +70,8 @@ ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
 # TODO: Remove the `t != AnomalyTypeEnum.GP_OUTLIER.value` bit to also query for GP outliers.
 ANOMALY_TYPES_TO_DETECT = tuple(t for t in ANOMALY_TYPES.keys() if t != AnomalyTypeEnum.GP_OUTLIER.value)
 
+# GPT
+MODEL_NAME = "gpt-4o"
 
 SORTING_STRATEGIES = {
     "relevance": "Relevance",
@@ -183,31 +187,54 @@ def parse_anomalies_to_df() -> pd.DataFrame | None:
 @st.fragment()
 def llm_ask(df: pd.DataFrame):
     st.button(
-        "Ask LLM for summary",
+        "AI Summary",
         on_click=lambda: llm_dialog(df),
         icon=":material/robot:",
+        help=f"Ask GPT {MODEL_NAME} to summarize the anomalies. This is experimental.",
     )
 
 
 @st.dialog("AI summary of anomalies", width="large")
 def llm_dialog(df: pd.DataFrame):
     """Ask LLM for summary of the anomalies."""
-    st.write("Eventually this will be an LLM summary.")
+    ask_llm_for_summary(df)
 
 
+@st.cache_data
 def ask_llm_for_summary(df: pd.DataFrame):
-    variable_ids = df["indicator_id"].unique()
+    NUM_ANOMALIES_PER_TYPE = 2_000
 
+    variable_ids = list(df["indicator_id"].unique())
+    metadata = load_variables(variable_ids)
     # Get metadata summary
     metadata_summary = ""
+    for m in metadata:
+        _summary = f"- {m.name}\n" f"- {m.descriptionShort}\n" f"- {m.unit}"
+        metadata_summary += f"{_summary}\n-------------\n"
 
+    # df = st.session_state.anomalist_df
     # Get dataframe
-    df = df[["entity_name", "year", "type", "indicator_id", "weighed_score"]]
-    # Reshape, pivot indicator_score to have one score column per id
-    df = df.pivot_table(index=["entity_name", "year", "type"], columns="indicator_id", values="weighed_score")
+    df = df[["entity_name", "year", "type", "indicator_id", "score_weighed"]]
+    # Keep top anomalies based on weighed score
+    df = df.sort_values("score_weighed", ascending=False)
+    df = cast(pd.DataFrame, df.head(NUM_ANOMALIES_PER_TYPE))
 
-    # Dataframe as string
-    df_str = cast(str, df.to_csv()).replace(".0,", ",")
+    # Round score (reduce token number)
+    df["score_weighed"] = df["score_weighed"].apply(lambda x: int(round(100 * x)))
+    # Reshape, pivot indicator_score to have one score column per id
+    df = df.pivot_table(
+        index=["entity_name", "year", "type"], columns="indicator_id", values="score_weighed"
+    ).reset_index()
+    # As string (one per anomaly type)
+    groups = df.groupby("type")
+    df_str = ""
+    for group in groups:
+        _text = group[0]
+        _df = group[1].set_index(["entity_name", "year"]).drop(columns="type")
+        # Dataframe as string
+        _df_str = cast(str, _df.to_csv()).replace(".0,", ",")
+        text = f"### Anomalies of type '{_text}'\n\n{_df_str}\n\n-------------------\n\n"
+        df_str += text
 
     # Ask LLM for summary
     client = OpenAIWrapper()
@@ -240,7 +267,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
                             - Try to remove redundant information as much as possible. For instance: if the same entity has multiple anomalies of the same type, you can group them together. Or if the same entity has multiple anomalies of different types, you can group them together.
                             - Try to find the most relevant anomalies. Either because these affect multiple entities or because they have a high weighed score.
 
-                        Indicators are identified by column 'indicator_id'. To do a better judgement, find below the metadata details for each indicator. Use this information to provide a more insightful summary.
+                        Indicators are identified by column 'indicator_id'. To do a better judgement, find below the name, description and units details for each indicator. Use this information to provide a more insightful summary.
 
                         {metadata_summary}
                         """
@@ -259,15 +286,27 @@ def ask_llm_for_summary(df: pd.DataFrame):
         },
     ]
 
-    with st.chat_message("assistant"):
+    text_in = "\n".join([m["content"][0]["text"] for m in messages])
+    num_tokens = get_number_tokens(text_in, MODEL_NAME)
+
+    # Check if the number of tokens is within limits
+    if num_tokens > 128_000:
+        st.warning(
+            f"There are too many tokens in the GPT query to model {MODEL_NAME}. The query has {num_tokens} tokens, while the maximum allowed is 128,000. We will support this in the future. Raise this issue to re-prioritize it."
+        )
+    else:
         # Ask GPT (stream)
         stream = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=MODEL_NAME,
             messages=messages,  # type: ignore
             max_tokens=3000,
             stream=True,
         )
-        cast(str, st.write_stream(stream))
+        response = cast(str, st.write_stream(stream))
+
+        cost, num_tokens = get_cost_and_tokens(text_in, response, cast(str, MODEL_NAME))
+        cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
+        st.info(cost_msg)
 
 
 # Functions to filter the results
