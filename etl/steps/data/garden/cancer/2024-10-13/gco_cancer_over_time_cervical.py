@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -13,10 +12,10 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow datasets for Cancer Today and Cancer Over Time datasets.
+    # Load meadow dataset.
     ds_meadow = paths.load_dataset("gco_cancer_over_time_cervical")
 
-    # Read tables from meadow datasets.
+    # Read table.
     tb = ds_meadow["gco_cancer_over_time_cervical"].reset_index()
 
     #
