@@ -27,7 +27,12 @@ import streamlit as st
 
 from apps.anomalist.anomalist_api import anomaly_detection
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens, get_number_tokens
-from apps.wizard.app_pages.anomalist.utils import AnomalyTypeEnum, create_tables, get_datasets_and_mapping_inputs
+from apps.wizard.app_pages.anomalist.utils import (
+    AnomalyTypeEnum,
+    create_tables,
+    get_datasets_and_mapping_inputs,
+    get_scores,
+)
 from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.chart_config import bake_chart_config
 from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
@@ -121,67 +126,6 @@ def get_variable_mapping(variable_ids):
     mapping = WizardDB.get_variable_mapping()
     mapping = {k: v for k, v in mapping.items() if v in variable_ids}
     return mapping
-
-
-def parse_anomalies_to_df() -> pd.DataFrame | None:
-    """Given a list of anomalies, parse them into a dataframe.
-
-    This function takes the anomalies stored in st.session_state.anomalist_anomalies and parses them into a single dataframe.
-
-        - It loads dfScore from each anomaly.
-        - It keeps only one row per entity and anomaly type, based on the highest anomaly score.
-        - Concatenates all dataframes.
-        - Renames columns to appropriate names.
-        - Adjusts dtypes.
-        - Adds population and analytics scores.
-        - Calculates weighed combined score
-
-    """
-    # Only return dataframe if there are anomalies!
-    if len(st.session_state.anomalist_anomalies) > 0:
-        dfs = []
-        for anomaly in st.session_state.anomalist_anomalies:
-            # Load
-            df = anomaly.dfReduced
-            if isinstance(df, pd.DataFrame):
-                # Assign anomaly type in df
-                df["type"] = anomaly.anomalyType
-                # Add to list
-                dfs.append(df)
-            else:
-                raise ValueError(f"Anomaly {anomaly} has no dfScore attribute.")
-
-        # Concatenate all dfs
-        df = cast(pd.DataFrame, pd.concat(dfs, ignore_index=True))
-
-        # Rename columns
-        df = df.rename(
-            columns={
-                "variable_id": "indicator_id",
-                "anomaly_score": "score",
-            }
-        )
-
-        # Dtypes
-        df = df.astype(
-            {
-                "year": int,
-            }
-        )
-
-        # Add population and analytics score:
-        df["score_population"] = 1
-        df["score_analytics"] = 1
-
-        # Weighed combined score
-        w_score = 1
-        w_pop = 1
-        w_views = 1
-        df["score_weighed"] = (
-            w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]
-        ) / (w_score + w_pop + w_views)
-
-        return df
 
 
 @st.fragment()
@@ -585,7 +529,14 @@ if st.session_state.anomalist_datasets_submitted:
             st.session_state.anomalist_anomalies_out_of_date = False
 
     # 3.4/ Parse obtained anomalist into dataframe
-    st.session_state.anomalist_df = parse_anomalies_to_df()
+    if len(st.session_state.anomalist_anomalies) > 0:
+        # Combine scores from all anomalies, reduce them (to get the maximum anomaly score for each entity-indicator),
+        # and add population and analytics scores.
+        df = get_scores(anomalies=st.session_state.anomalist_anomalies)
+
+        st.session_state.anomalist_df = df
+    else:
+        st.session_state.anomalist_df = None
 
 # 4/ SHOW ANOMALIES (only if any are found)
 if st.session_state.anomalist_df is not None:
