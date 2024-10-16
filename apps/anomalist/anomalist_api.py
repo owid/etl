@@ -253,14 +253,10 @@ def anomaly_detection(
             if anomaly_type not in ANOMALY_DETECTORS:
                 raise ValueError(f"Unsupported anomaly type: {anomaly_type}")
 
+            log.info(f"Detecting anomaly type {anomaly_type} for dataset {dataset_id}")
+
             # Instantiate the anomaly detector.
             detector = ANOMALY_DETECTORS[anomaly_type]()
-
-            # detect anomalies
-            log.info(f"Detecting anomaly type {anomaly_type} for dataset {dataset_id}")
-            # the output has the same shape as the input dataframe, but we should make
-            # it possible to return anomalies in a long format (for detectors that return
-            # just a few anomalies)
 
             # Select the variable ids that are included in the current dataset.
             variable_ids_for_current_dataset = [variable.id for variable in variables_in_dataset]
