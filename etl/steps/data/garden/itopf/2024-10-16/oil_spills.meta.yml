@@ -1,0 +1,138 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Oil Spills
+    processing_level: minor
+    display:
+      numDecimalPlaces: 0
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  oil_spills:
+    variables:
+      bel_700t:
+        title: Medium oil spills (7-700 tonnes)
+        unit: spills
+
+      ab_700t:
+        title: Large oil spills (>700 tonnes)
+        unit: spills
+
+      oil_spilled:
+        title: Quantity of oil spilled
+        unit: tonnes
+        short_unit: t
+
+      allision_collision_causes:
+        title: Allision/collision causes
+        unit: causes
+        display:
+          name: Collision
+
+      equipment_failure_causes:
+        title: Equipment failure causes
+        unit: causes
+        display:
+          name: Equipment failure
+
+      fire_explosion_causes:
+        title: Fire/explosion causes
+        unit: causes
+        display:
+          name: Fire/explosion
+
+      grounding_causes:
+        title: Grounding causes
+        unit: causes
+        display:
+          name: Grounding
+
+      hull_failure_causes:
+        title: Hull failure causes
+        unit: causes
+        display:
+          name: Hull failure
+
+      other_causes:
+        title: Other causes
+        description_short: Events such as heavy weather damage and human error have been categorised as 'Other'.
+        unit: causes
+        display:
+          name: Other
+
+      unknown_causes:
+        title: Unknown causes
+        description_short: Spills where the relevant information is not available have been designated as 'Unknown'
+        display:
+          name: Unknown
+        unit: causes
+
+      loading_discharing_ops:
+        title: Loading/discharging operations
+        display:
+          name: Loading/discharging
+        unit: operations
+
+      bunkering_ops:
+        title: Bunkering operations
+        display:
+          name: Refueling
+        unit: operations
+
+      other_operations_ops:
+        title: Other operations
+        description_short: Other include operations such as ballisting, de-ballasting, tank cleaning and when the vessel is underway.
+        display:
+          name: Other
+        unit: operations
+
+      uknown_ops:
+        title: Unknown operations
+        display:
+          name: Unknown
+        unit: operations
+
+      at_anchor_inland_ops:
+        title: At anchor (inland) operations
+        display:
+          name: At anchor (inland)
+        unit: operations
+
+      at_anchor_open_water_ops:
+        title: At anchor (open water) operations
+        display:
+          name: At anchor (open water)
+        unit: operations
+
+      underway_inland_ops:
+        title: Underway (inland) operations
+        display:
+          name: Underway (inland)
+        unit: operations
+
+      underway_open_water_ops:
+        title: Underway (open water) operations
+        display:
+          name: Underway (open water)
+        unit: operations
+
+      decadal_bel_700t:
+        title: Decadal medium oil spills (7-700 tonnes)
+        unit: spills
+
+      decadal_ab_700t:
+        title: Decadal large oil spills (>700 tonnes)
+        unit: spills
+
+      decadal_oil_spilled:
+        title: Decadal quantity of oil spilled
+        unit: tonnes
+        short_unit: t
