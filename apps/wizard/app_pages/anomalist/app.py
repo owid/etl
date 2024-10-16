@@ -56,7 +56,7 @@ ANOMALY_TYPES = {
         "color": "red",
         "icon": ":material/hide_source",
     },
-    AnomalyTypeEnum.UPGRADE_MISSING.value: {
+    AnomalyTypeEnum.GP_OUTLIER.value: {
         "tag_name": "Gaussian Process",
         "color": "blue",
         "icon": ":material/notifications",
@@ -217,6 +217,8 @@ def show_anomaly_compact(index, df):
         text = f"There are abrupt changes for {entity_default} in {year_default}! There might be other data points affected."
     elif an_type == AnomalyTypeEnum.UPGRADE_MISSING.value:
         text = f"There are missing values for {entity_default}! There might be other data points affected."
+    elif an_type == AnomalyTypeEnum.GP_OUTLIER.value:
+        text = f"There are some outliers for {entity_default}! These were detected using Gaussian processes. There might be other data points affected."
     else:
         raise ValueError(f"Unknown anomaly type: {an_type}")
 
