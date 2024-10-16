@@ -1756,6 +1756,7 @@ class Anomaly(Base):
     anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
     path_file: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LONGBLOB, default=None)
+    _dfReduced: Mapped[Optional[bytes]] = mapped_column("dfReduced", LONGBLOB, default=None)
     # catalogPath: Mapped[str] = mapped_column(VARCHAR(255), default=None)
     # NOTE: why do we need indicatorChecksum?
     # Answer: This can be useful to assign an anomaly to a specific snapshot of the indicator. Unclear if we need it atm, but maybe in the future...
@@ -1782,6 +1783,23 @@ class Anomaly(Base):
             feather.write_feather(value, buffer, compression="zstd")
             buffer.seek(0)
             self._dfScore = buffer.read()
+
+    @hybrid_property
+    def dfReduced(self) -> Optional[pd.DataFrame]:  # type: ignore
+        if self._dfReduced is None:
+            return None
+        buffer = io.BytesIO(self._dfReduced)
+        return feather.read_feather(buffer)
+
+    @dfReduced.setter
+    def dfReduced(self, value: Optional[pd.DataFrame]) -> None:
+        if value is None:
+            self._dfReduced = None
+        else:
+            buffer = io.BytesIO()
+            feather.write_feather(value, buffer, compression="zstd")
+            buffer.seek(0)
+            self._dfReduced = buffer.read()
 
     @classmethod
     def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
