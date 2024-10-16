@@ -25,6 +25,7 @@ import pandas as pd
 import streamlit as st
 
 from apps.anomalist.anomalist_api import anomaly_detection
+from apps.utils.gpt import OpenAIWrapper
 from apps.wizard.app_pages.anomalist.utils import AnomalyTypeEnum, create_tables, get_datasets_and_mapping_inputs
 from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.chart_config import bake_chart_config
@@ -180,7 +181,78 @@ def parse_anomalies_to_df() -> pd.DataFrame | None:
 
 
 def ask_llm_for_summary(df: pd.DataFrame):
-    pass
+    variable_ids = df["indicator_id"].unique()
+
+    # Get metadata summary
+    metadata_summary = ""
+
+    # Get dataframe
+    df = df[["entity_name", "year", "type", "indicator_id", "weighed_score"]]
+    # Reshape, pivot indicator_score to have one score column per id
+    df = df.pivot_table(index=["entity_name", "year", "type"], columns="indicator_id", values="weighed_score")
+
+    # Dataframe as string
+    df_str = cast(str, df.to_csv()).replace(".0,", ",")
+
+    # Ask LLM for summary
+    client = OpenAIWrapper()
+
+    # Prepare messages for Insighter
+    messages = [
+        {
+            "role": "system",
+            "content": [
+                {
+                    "type": "text",
+                    "text": (
+                        f"""
+                        The user has obtained anomalies for a list of indicators. This list comes in the format of a dataframe with columns:
+                            - 'entity_name': Typically a country name.
+                            - 'year': The year in which the anomaly was detected.
+                            - 'type': The type of anomaly detected. Allowed types are:
+                                - 'time_change': A significant change in the indicator over time.
+                                - 'upgrade_change': A significant change in the indicator after an upgrade.
+                                - 'upgrade_missing': A missing value in the indicator after an upgrade.
+                                - 'gp_outlier': An outlier detected using Gaussian processes.
+
+                            Additionally, there is a column per indicator (identified by the indicator ID), with the weighed score of the anomaly. The weighed score is an estimate on how relevant the anomaly is, based on the anomaly score, population in the country, and views of charts using this indicator.
+
+                        The user will provide this dataframe.
+
+                        You should try to summarise this list of anomalies, so that the information is more digestable. Some ideas:
+
+                            - Try to find if there are common patterns across entities or years.
+                            - Try to remove redundant information as much as possible. For instance: if the same entity has multiple anomalies of the same type, you can group them together. Or if the same entity has multiple anomalies of different types, you can group them together.
+                            - Try to find the most relevant anomalies. Either because these affect multiple entities or because they have a high weighed score.
+
+                        Indicators are identified by column 'indicator_id'. To do a better judgement, find below the metadata details for each indicator. Use this information to provide a more insightful summary.
+
+                        {metadata_summary}
+                        """
+                    ),
+                },
+            ],
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": df_str,
+                },
+            ],
+        },
+    ]
+
+    with st.chat_message("assistant"):
+        # Ask GPT (stream)
+        stream = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages,  # type: ignore
+            max_tokens=3000,
+            stream=True,
+        )
+        response = cast(str, st.write_stream(stream))
 
 
 # Functions to filter the results
