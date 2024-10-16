@@ -22,7 +22,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
     anomaly_type = "gp_outlier"
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
-        # Create a dataframe of zeros.
+        # Create a dataframe of nans.
         df_score = self.get_nans_df(df, variable_ids)
 
         # Filter to only a couple of countries

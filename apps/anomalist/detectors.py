@@ -38,6 +38,9 @@ def get_long_format_score_df(df_score: pd.DataFrame) -> pd.DataFrame:
     # Drop NaN anomalies.
     df_score_long = df_score_long.dropna(subset=["anomaly_score"])
 
+    # Drop zero anomalies.
+    df_score_long = df_score_long[df_score_long["anomaly_score"] != 0]
+
     # For now, keep only the highest anomaly score for each country-indicator.
     df_score_long = (
         df_score_long.sort_values("anomaly_score", ascending=False)
@@ -139,8 +142,6 @@ class AnomalyUpgradeMissing(AnomalyDetector):
         for variable_id_old, variable_id_new in variable_mapping.items():
             affected_rows = df[(df[variable_id_old].notnull()) & (df[variable_id_new].isnull())].index
             df_lost.loc[affected_rows, variable_id_new] = 1
-
-        __import__("ipdb").set_trace()
 
         return df_lost
 

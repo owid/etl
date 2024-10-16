@@ -291,10 +291,14 @@ def anomaly_detection(
                     ).delete(synchronize_session=False)
                     session.commit()
 
-                    # Insert new anomalies
-                    log.info("Writing anomaly to database")
-                    session.add(anomaly)
-                    session.commit()
+                    # Don't save anomalies if there are none
+                    if df_score_long.empty:
+                        log.info(f"No anomalies found for anomaly type {anomaly_type} in dataset {dataset_id}")
+                    else:
+                        # Insert new anomalies
+                        log.info("Writing anomaly to database")
+                        session.add(anomaly)
+                        session.commit()
 
 
 def export_anomalies_file(df: pd.DataFrame, dataset_id: int, anomaly_type: str) -> str:
