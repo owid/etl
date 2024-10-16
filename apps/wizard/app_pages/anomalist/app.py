@@ -404,8 +404,8 @@ if st.session_state.anomalist_datasets_submitted:
             df = anomaly.dfScore
             if isinstance(df, pd.DataFrame):
                 # TODO: We should not store all-zero dataframes in table if there is no variable mapping!
-                if (df["anomaly_score"] == 0).all():
-                    continue
+                # if (df["anomaly_score"] == 0).all():
+                #     continue
                 # Reduce df
                 # st.write(df)
                 df = df.sort_values("anomaly_score", ascending=False)
@@ -431,6 +431,13 @@ if st.session_state.anomalist_datasets_submitted:
         # Add population and analytics score:
         df["score_population"] = 1
         df["score_analytics"] = 1
+
+        # Dtypes
+        df = df.astype(
+            {
+                "year": int,
+            }
+        )
 
         # Weighed combined score
         w_score = 1
