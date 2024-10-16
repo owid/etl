@@ -24,13 +24,4 @@ tables:
           An age-standardized rate (ASR) is a summary measure of the rate that would have been observed if the population had a standard age structure. Standardization is necessary when comparing several populations that differ with respect to age, because age has a strong influence on the risk of cancer. An ASR is a weighted mean of the age-specific rates; the weighting is based on the population distribution of a standard population. The most frequently used standard population is the World (W) Standard Population. The calculated incidence rate is then called the age-standardized incidence or mortality rate (W), and is expressed per 100 000 person-years. The World Standard Population used in GLOBOCAN was first proposed by Segi (1960)a and later modified by Doll et al. (1966)b.
         presentation:
             grapher_config:
-              note: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
-
-      crude_rate:
-        title: Crude cervical cancer incidence rate per 100,000 women
-        unit: 'per 100,000 women'
-        description_from_producer: |-
-          For a specific tumour in a given population, crude rates are calculated simply by dividing the number of new cancers or cancer deaths observed during a given time period by the corresponding number of individuals in the population at risk. For cancer, the result is commonly expressed as an annual rate per 100 000 individuals at risk.
-      total:
-       title: Total number of cervical cancer cases
-       unit: 'cases'
+              note: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized). The methods of estimation are country-specific, and the quality of the national estimates depends on the coverage, accuracy, and timeliness of the recorded incidence and mortality data in a given country.
