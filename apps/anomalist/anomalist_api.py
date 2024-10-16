@@ -284,6 +284,14 @@ def anomaly_detection(
             )
             anomaly.dfScore = df_score_long
 
+            # Reduce dataframe
+            df_score_long_reduced = df_score_long.sort_values("anomaly_score", ascending=False)
+            df_score_long_reduced = df_score_long_reduced.drop_duplicates(
+                subset=["entity_name", "variable_id"], keep="first"
+            )
+            anomaly.dfReduced = df_score_long_reduced
+
+            ##################################################################
             # TODO: Use this as an alternative to storing binary files in the DB
             # anomaly = gm.Anomaly(
             #     datasetId=dataset_id,
@@ -293,6 +301,7 @@ def anomaly_detection(
 
             # # Export anomaly file
             # anomaly.path_file = export_anomalies_file(df_score, dataset_id, detector.anomaly_type)
+            ##################################################################
 
             if not dry_run:
                 with Session(engine) as session:

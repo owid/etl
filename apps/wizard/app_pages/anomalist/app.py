@@ -116,17 +116,6 @@ def get_variable_mapping(variable_ids):
     return mapping
 
 
-@st.cache_data
-def _reduce_df(df: pd.DataFrame):
-    """Reduce dataframe and keep only one entry per entity-anomaly type.
-
-    TODO: This should already be stored in the DB, to save us some time and memory when loading the anomalies.
-    """
-    df = df.sort_values("anomaly_score", ascending=False)
-    df = df.drop_duplicates(subset=["entity_name", "variable_id"], keep="first")
-    return df
-
-
 def parse_anomalies_to_df() -> pd.DataFrame | None:
     """Given a list of anomalies, parse them into a dataframe.
 
@@ -146,10 +135,8 @@ def parse_anomalies_to_df() -> pd.DataFrame | None:
         dfs = []
         for anomaly in st.session_state.anomalist_anomalies:
             # Load
-            df = anomaly.dfScore
+            df = anomaly.dfReduced
             if isinstance(df, pd.DataFrame):
-                # Reduce df
-                df = _reduce_df(df)
                 # Assign anomaly type in df
                 df["type"] = anomaly.anomalyType
                 # Add to list
