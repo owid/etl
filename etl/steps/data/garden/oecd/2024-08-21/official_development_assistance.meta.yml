@@ -290,6 +290,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_gni}"
+          - "{definitions.key_oda_target}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_oda_list_of_countries}"
@@ -313,6 +314,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_gni}"
+          - "{definitions.key_oda_target}"
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_oda_list_of_countries}"
