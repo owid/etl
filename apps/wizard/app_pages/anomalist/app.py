@@ -403,8 +403,11 @@ if st.session_state.anomalist_datasets_submitted:
             # Load
             df = anomaly.dfScore
             if isinstance(df, pd.DataFrame):
+                # TODO: We should not store all-zero dataframes in table if there is no variable mapping!
+                if (df["anomaly_score"] == 0).all():
+                    continue
                 # Reduce df
-                st.write(df)
+                # st.write(df)
                 df = df.sort_values("anomaly_score", ascending=False)
                 df = df.drop_duplicates(subset=["entity_name", "variable_id"], keep="first")
                 # Assign anomaly type in df
@@ -454,6 +457,7 @@ if st.session_state.anomalist_df is not None:
     YEAR_MIN = st.session_state.anomalist_df["year"].min()
     YEAR_MAX = st.session_state.anomalist_df["year"].max()
     INDICATORS_AVAILABLE = st.session_state.anomalist_df["indicator_id"].unique()
+    ANOMALY_TYPES_AVAILABLE = st.session_state.anomalist_df["type"].unique()
 
     # 4.0/ WARNING: Show warning if anomalies are loaded from DB without re-computing
     # TODO: we could actually know if anomalies are out of sync from dataset/indicators. Maybe based on dataset/indicator checksums? Starting to implement this idea with data_out_of_date
@@ -532,7 +536,7 @@ if st.session_state.anomalist_df is not None:
             with cols[1]:
                 st.multiselect(
                     label="Hide types",
-                    options=ANOMALY_TYPE_NAMES.keys(),
+                    options=ANOMALY_TYPES_AVAILABLE,
                     format_func=ANOMALY_TYPE_NAMES.get,
                     help="Exclude anomalies of a certain type.",
                     placeholder="Select anomaly types",
