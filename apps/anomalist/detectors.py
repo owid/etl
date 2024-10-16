@@ -41,13 +41,6 @@ def get_long_format_score_df(df_score: pd.DataFrame) -> pd.DataFrame:
     # Drop zero anomalies.
     df_score_long = df_score_long[df_score_long["anomaly_score"] != 0]
 
-    # For now, keep only the highest anomaly score for each country-indicator.
-    df_score_long = (
-        df_score_long.sort_values("anomaly_score", ascending=False)
-        .drop_duplicates(subset=["variable_id", "entity_name"], keep="first")
-        .reset_index(drop=True)
-    )
-
     # Save memory by converting to categoricals.
     df_score_long = df_score_long.astype({"entity_name": "category", "year": "category", "variable_id": "category"})
 
