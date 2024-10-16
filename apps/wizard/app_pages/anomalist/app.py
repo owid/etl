@@ -180,6 +180,7 @@ def parse_anomalies_to_df() -> pd.DataFrame | None:
         return df
 
 
+@st.dialog("LLM summary")
 def ask_llm_for_summary(df: pd.DataFrame):
     variable_ids = df["indicator_id"].unique()
 
@@ -252,7 +253,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
             max_tokens=3000,
             stream=True,
         )
-        response = cast(str, st.write_stream(stream))
+        cast(str, st.write_stream(stream))
 
 
 # Functions to filter the results
