@@ -396,32 +396,11 @@ if st.session_state.anomalist_datasets_submitted:
 
     # 3.4/ Parse obtained anomalist into dataframe
     if len(st.session_state.anomalist_anomalies) > 0:
-        # Combine the score dataframes for all anomalies, and reduce the result to keep only the largest anomaly per indicator-entity.
-        df = cached.get_reduced_scores(anomalies=st.session_state.anomalist_anomalies)
-
-        ###############################################################################################################
-        # TODO: Encapsulate this code in a function, add real population and analytics scores
-
-        # Add population and analytics score:
-        df["score_population"] = 1
-        df["score_analytics"] = 1
-
-        # Weighed combined score
-        w_score = 1
-        w_pop = 1
-        w_views = 1
-        df["score_weighed"] = (
-            w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]
-        ) / (w_score + w_pop + w_views)
+        # Combine scores from all anomalies, reduce them (to get the maximum anomaly score for each entity-indicator),
+        # and add population and analytics scores.
+        df = cached.get_scores(anomalies=st.session_state.anomalist_anomalies)
 
         st.session_state.anomalist_df = df
-        # Former mock data
-        # st.session_state.anomalist_df = mock_anomalies_df(
-        #     indicators_id,
-        #     indicators_id_upgrade,
-        #     n=1000,
-        # )
-        ###############################################################################################################
     else:
         st.session_state.anomalist_df = None
 

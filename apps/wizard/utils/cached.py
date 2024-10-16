@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 from sqlalchemy.orm import Session
 
-from apps.anomalist.anomalist_api import combine_and_reduce_scores_df
+from apps.anomalist.anomalist_api import add_analytics_score, add_population_score, combine_and_reduce_scores_df
 from apps.utils.map_datasets import get_grapher_changes
 from etl import grapher_io as gio
 from etl.config import OWID_ENV, OWIDEnv
@@ -149,11 +149,25 @@ def get_datasets_from_version_tracker() -> Tuple[pd.DataFrame, List[Dict[str, An
 
 
 @st.cache_data(show_spinner=False)
-def get_reduced_scores(anomalies: List[Anomaly]):
+def get_scores(anomalies: List[Anomaly]) -> pd.DataFrame:
     """Combine and reduce scores dataframe."""
     df = combine_and_reduce_scores_df(anomalies)
 
+    # Add a population score.
+    df = add_population_score(df_reduced=df)
+
+    # Add an analytics score.
+    df = add_analytics_score(df_reduced=df)
+
     # Rename columns for convenience.
     df = df.rename(columns={"variable_id": "indicator_id", "anomaly_score": "score"}, errors="raise")
+
+    # Create a weighed combined score.
+    w_score = 1
+    w_pop = 1
+    w_views = 1
+    df["score_weighed"] = (w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]) / (
+        w_score + w_pop + w_views
+    )
 
     return df

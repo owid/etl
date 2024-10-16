@@ -1,12 +1,11 @@
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Literal, Optional, Tuple, cast, get_args
+from typing import List, Literal, Optional, Tuple, cast, get_args
 
 import numpy as np
 import pandas as pd
 import structlog
 from owid.catalog import find
-from owid.datautils.dataframes import map_series
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
@@ -98,88 +97,84 @@ def get_variables_views_in_charts(
     # Handle potential duplicated rows
     df = df.drop_duplicates().reset_index(drop=True)
 
+    if len(df) == 0:
+        df = pd.DataFrame(columns=["variable_id", "chart_id", "chart_slug", "views_7d", "views_14d", "views_365d"])
+
     return df
 
 
-def aggregate_anomalies(
-    df_scores: pd.DataFrame,
-    df_population: pd.DataFrame,
-    df_views: pd.DataFrame,
-    metadata: Dict[int, gm.Variable],
-) -> pd.DataFrame:
-    # Create a dataframe of zeros.
-    df_aggregated = df_scores.copy()
+def add_population_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
+    # To normalize the analytics score to the range 0, 1, divide by an absolute maximum number of people.
+    # NOTE: This should a safe assumption before ~2060.
+    absolute_maximum_population = 1e10
+    # Value to use to fill missing values in the population score (e.g. for regions like "Middle East" that are not included in our population dataset).
+    fillna_value = 0.5
 
-    df_aggregated["variable"] = map_series(
-        df_aggregated["variable_id"],
-        {variable_id: metadata[variable_id]["shortName"] for variable_id in metadata},  # type: ignore
-        warn_on_missing_mappings=True,
-        warn_on_unused_mappings=False,
-    )
-
-    # Add population score to the aggregated scores dataframe.
-    df_aggregated = df_aggregated.merge(
-        get_population_score(df_aggregated, df_population), on=["entity_name", "year"], how="left"
-    )
-
-    # Add analytics score to the main scores dataframe.
-    # TODO: Improve this, currently df_aggregated is not used.
-    df_score_analytics = get_analytics_score(df_aggregated, df_views)
-    df_aggregated = df_aggregated.merge(df_score_analytics, on=["variable_id"], how="left")
-
-    # NOTE: Variables that have do not have charts will have an analytics score nan.
-    #  Fill them with zeros.
-    df_aggregated["analytics_score"] = df_score_analytics["analytics_score"].fillna(0)
-
-    return df_aggregated
-
-
-def get_population_score(df_aggregated: pd.DataFrame, df_population: pd.DataFrame) -> pd.DataFrame:
-    # NOTE: This is a special type of score that is added afterwards to help rank anomalies.
-    #  It would not make sense to calculate a population score at the beginning and select the largest anomalies based on it (which would trivially pick the most populated countries).
+    # Load the latest population data.
+    df_population = load_latest_population()
+    error = f"Expected a maximum population below {absolute_maximum_population}."
+    assert df_population[df_population["year"] < 2040]["population"].max() < absolute_maximum_population, error
 
     # First, get the unique combinations of country-years in the scores dataframe, and add population to it.
     df_score_population = (
-        df_aggregated[["entity_name", "year"]]  # type: ignore
+        df_reduced[["entity_name", "year"]]  # type: ignore
         .drop_duplicates()
         .merge(df_population, on=["entity_name", "year"], how="left")
     )
-    # To normalize the population score to the range 0, 1, divide by an absolute maximum population of 10 billion.
+
+    # To normalize the population score to the range 0, 1, divide by an absolute maximum population.
     # To have more convenient numbers, take the natural logarithm of the population.
-    df_score_population["population_score"] = np.log(df_score_population["population"]) / np.log(10e9)
-    # It's unclear what to do with entities that do not have a population (e.g. "Middle East").
-    # For now, add a score of 0.5 to them.
-    df_score_population["population_score"] = df_score_population["population_score"].fillna(0.5)
+    df_score_population["score_population"] = np.log(df_score_population["population"]) / np.log(
+        absolute_maximum_population
+    )
 
-    df_score_population = df_score_population[["entity_name", "year", "population_score"]]
+    # Add the population score to the scores dataframe.
+    df_reduced = df_reduced.merge(df_score_population, on=["entity_name", "year"], how="left").drop(
+        columns="population", errors="raise"
+    )
 
-    return df_score_population
+    # Variables that do not have population data will have a population score nan. Fill them with a low value.
+    df_reduced["score_population"] = df_reduced["score_population"].fillna(fillna_value)
+
+    return df_reduced
 
 
-def get_analytics_score(df_aggregated: pd.DataFrame, df_views: pd.DataFrame) -> pd.DataFrame:
+def add_analytics_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     # Focus on the following specific analytics column.
     analytics_column = "views_14d"
+    # To normalize the analytics score to the range 0, 1, divide by an absolute maximum number of views.
+    absolute_maximum_views = 1e6
+    # Value to use to fill missing values in the analytics score (e.g. for variables that are not used in charts).
+    fillna_value = 0.1
+
+    # Get number of views in charts for each variable id.
+    df_views = get_variables_views_in_charts(list(df_reduced["variable_id"].unique()))
+    # Sanity check.
+    if not df_views.empty:
+        error = f"Expected a maximum number of views below {absolute_maximum_views}. Change this limit."
+        assert df_views[analytics_column].max() < absolute_maximum_views, error
 
     # Get the sum of the number of views in charts for each variable id in the last 14 days.
     # So, if an indicator is used in multiple charts, their views are summed.
     # This rewards indicators that are used multiple times, and on popular charts.
-    # NOTE: The analytics table often contains nans. Not sure why this happens, e.g. to coal-electricity-per-capita: https://admin.owid.io/admin/charts/4451/edit
-    #  For now, for convenience, fill them with 1.1 views (to avoid zeros when calculating the log).
+    # NOTE: The analytics table often contains nans. For now, for convenience, fill them with 1.1 views (to avoid zeros when calculating the log).
     df_score_analytics = (
-        df_views.fillna(1.1)
-        .groupby("variable_id")
+        df_views.groupby("variable_id")
         .agg({analytics_column: "sum"})
         .reset_index()
         .rename(columns={analytics_column: "views"})
     )
-    # To normalize the analytics score to the range 0, 1, divide by an absolute maximum number of views.
-    absolute_maximum_views = 1e6
-    error = f"Expected a maximum number of views below {absolute_maximum_views}. Change this limit."
-    assert df_views[analytics_column].max() < absolute_maximum_views, error
     # To have more convenient numbers, take the natural logarithm of the views.
-    df_score_analytics["analytics_score"] = np.log(df_score_analytics["views"]) / np.log(absolute_maximum_views)
+    df_score_analytics["score_analytics"] = np.log(df_score_analytics["views"]) / np.log(absolute_maximum_views)
 
-    return df_score_analytics
+    # Add the analytics score to the scores dataframe.
+    df_reduced = df_reduced.merge(df_score_analytics, on=["variable_id"], how="left")
+
+    # Variables that do not have charts will have an analytics score nan.
+    # Fill them with a low value (e.g. 0.1) to avoid zeros when calculating the final score.
+    df_reduced["score_analytics"] = df_reduced["score_analytics"].fillna(fillna_value)
+
+    return df_reduced
 
 
 ########################################################################################################################
@@ -377,7 +372,7 @@ def combine_and_reduce_scores_df(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
 
         # NOTE: We could separate the combination from the reduction, but doing both at once reduces memory use.
         # For each country-indicator, keep only the anomaly of the year with the highest anomaly score.
-        df_reduced = (
+        df = (
             df.sort_values("anomaly_score", ascending=False)
             .drop_duplicates(subset=["variable_id", "entity_name"], keep="first")
             .reset_index(drop=True)
@@ -385,7 +380,7 @@ def combine_and_reduce_scores_df(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
         )
 
         # Add to list
-        dfs.append(df_reduced)
+        dfs.append(df)
 
     # Concatenate all dfs
     df_reduced = cast(pd.DataFrame, pd.concat(dfs, ignore_index=True))
