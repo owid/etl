@@ -48,27 +48,24 @@ def _processing_queue(items: list[tuple[str, int]]) -> List[tuple]:
     probs = np.array([population.get(entity, np.nan) for entity, variable_id in items])
 
     # Fill any missing values with the mean probability
-    probs = np.nan_to_num(probs, nan=np.nanmean(probs))
-
-    # Normalize the probabilities to sum to 1
-    probs = probs / probs.sum()
+    probs = np.nan_to_num(probs, nan=np.nanmean(probs))  # type: ignore
 
     # Randomly shuffle the items based on their probabilities
     items_index = np.random.choice(
         len(items),
         size=len(items),
         replace=False,
-        p=probs,
+        p=probs / probs.sum(),
     )
 
     # Return the shuffled list of items
-    return np.array(items, dtype=object)[items_index]
+    return np.array(items, dtype=object)[items_index]  # type: ignore
 
 
 class AnomalyGaussianProcessOutlier(AnomalyDetector):
     anomaly_type = "gp_outlier"
 
-    def __init__(self, max_time: Optional[float] = None, n_jobs: int = 4):
+    def __init__(self, max_time: Optional[float] = None, n_jobs: int = 1):
         self.max_time = max_time
         self.n_jobs = n_jobs
 
