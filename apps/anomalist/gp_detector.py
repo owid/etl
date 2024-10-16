@@ -84,8 +84,6 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         results = []
 
-        items = items[:1000]
-
         # Iterate through each (entity_name, variable_id) pair in the processing queue
         for entity_name, variable_id in tqdm(items):
             # Stop processing if the maximum time is reached

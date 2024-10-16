@@ -235,7 +235,6 @@ def anomaly_detection(
             if variable_mapping[variable_id_old] in [variable.id for variable in variables_in_dataset]
         ]
         variables_old_and_new = variables_in_dataset + variables_old
-        # TODO: It would be more convenient if df had a dummy index, instead of resetting here.
         df = load_data_for_variables(engine=engine, variables=variables_old_and_new)
 
         for anomaly_type in anomaly_types:
