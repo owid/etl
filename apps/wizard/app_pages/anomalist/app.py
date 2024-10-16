@@ -30,6 +30,7 @@ from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.chart_config import bake_chart_config
 from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
 from apps.wizard.utils.db import WizardDB
+from etl.config import OWID_ENV
 
 # PAGE CONFIG
 st.set_page_config(
@@ -63,6 +64,9 @@ ANOMALY_TYPES = {
     },
 }
 ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
+# TODO: Remove the `t != AnomalyTypeEnum.GP_OUTLIER.value` bit to also query for GP outliers.
+ANOMALY_TYPES_TO_DETECT = tuple(t for t in ANOMALY_TYPES.keys() if t != AnomalyTypeEnum.GP_OUTLIER.value)
+
 
 SORTING_STRATEGIES = {
     "relevance": "Relevance",
@@ -71,6 +75,7 @@ SORTING_STRATEGIES = {
     "views": "Chart views",
     "population+views": "Population+views",
 }
+
 # SESSION STATE
 # Datasets selected by the user in first multiselect
 st.session_state.anomalist_datasets_selected = st.session_state.get("anomalist_datasets_selected", [])
@@ -98,10 +103,7 @@ st.session_state.anomalist_sorting_columns = st.session_state.get("anomalist_sor
 # FLAG: True to trigger anomaly detection manually
 st.session_state.anomalist_trigger_detection = st.session_state.get("anomalist_trigger_detection", False)
 
-######################################################################
-# MOCK VARIABLES AND FUNCTIONS
-######################################################################
-# DEBUGGING
+
 ######################################################################
 # FUNCTIONS
 ######################################################################
@@ -177,129 +179,11 @@ def parse_anomalies_to_df() -> pd.DataFrame | None:
         return df
 
 
-def _change_chart_selection(df, key_table, key_selection):
-    """Change selection in grapher chart."""
-    # st.toast(f"Changing entity in indicator {indicator_id}")
-    # Get selected row number
-    rows = st.session_state[key_table]["selection"]["rows"]
-
-    # Update entities in chart
-    st.session_state[key_selection] = df.iloc[rows]["entity_name"].tolist()
+def ask_llm_for_summary(df: pd.DataFrame):
+    pass
 
 
-@st.fragment
-def show_anomaly_compact(index, df):
-    """Show anomaly compactly.
-
-    Container with all anomalies of a certain type and for a concrete indicator.
-    """
-    indicator_id, an_type = index
-    row = 0
-
-    key = f"{indicator_id}_{an_type}"
-    key_table = f"anomaly_table_{key}"
-    key_selection = f"selected_entities_{key}"
-
-    # Get relevant metadata for this view
-    # By default, the entity with highest score, but user may have selected other ones!
-    entity_default = df.iloc[row]["entity_name"]
-    entities = st.session_state.get(f"selected_entities_{key}", entity_default)
-    entities = entities if entities != [] else [entity_default]
-
-    # entities = df["entity_id"].tolist()
-    year_default = df.iloc[row]["year"]
-    indicator_uri = st.session_state.anomalist_indicators.get(indicator_id)
-
-    # Generate descriptive text. Only contains information about top-scoring entity.
-    if an_type == AnomalyTypeEnum.TIME_CHANGE.value:
-        text = f"There are significant changes for {entity_default} in {year_default} compared to the old version of the indicator. There might be other data points affected."
-    elif an_type == AnomalyTypeEnum.UPGRADE_CHANGE.value:
-        text = f"There are abrupt changes for {entity_default} in {year_default}! There might be other data points affected."
-    elif an_type == AnomalyTypeEnum.UPGRADE_MISSING.value:
-        text = f"There are missing values for {entity_default}! There might be other data points affected."
-    elif an_type == AnomalyTypeEnum.GP_OUTLIER.value:
-        text = f"There are some outliers for {entity_default}! These were detected using Gaussian processes. There might be other data points affected."
-    else:
-        raise ValueError(f"Unknown anomaly type: {an_type}")
-
-    # Render
-    with st.container(border=True):
-        # Title
-        st.markdown(f"{tag_in_md(**ANOMALY_TYPES[an_type])} **{indicator_uri}**")
-        col1, col2 = st.columns(2)
-        # Chart
-        with col1:
-            # Bake chart config
-            # If the anomaly is compared to previous indicator, then we need to show two indicators (old and new)!
-            if an_type in {AnomalyTypeEnum.UPGRADE_CHANGE.value, AnomalyTypeEnum.UPGRADE_MISSING.value}:
-                # TODO: Uncomment the following code to show comparison between old and new indicator versions.
-                display = [
-                    {
-                        "name": "New",
-                    },
-                    {
-                        "name": "Old",
-                    },
-                ]
-                assert indicator_id in st.session_state.anomalist_mapping_inv, "Indicator ID not found in mapping!"
-                indicator_id_old = st.session_state.anomalist_mapping_inv[indicator_id]
-                config = bake_chart_config(
-                    variable_id=[indicator_id, indicator_id_old],
-                    selected_entities=entities,
-                    display=display,
-                )
-                config["title"] = indicator_uri
-                config["subtitle"] = "Comparison of old and new indicator versions."
-
-                # config = bake_chart_config(
-                #     variable_id=[indicator_id],
-                #     selected_entities=entities,
-                # )
-            else:
-                config = bake_chart_config(variable_id=indicator_id, selected_entities=entities)
-            config["hideAnnotationFieldsInTitle"]["time"] = True
-            # Actually plot
-            grapher_chart(chart_config=config)
-
-        # Description and other entities
-        with col2:
-            # Description
-            st.info(text)
-            # Other entities
-            with st.container(border=False):
-                st.markdown("**Select** other affected entities")
-                st.dataframe(
-                    df[["entity_name"] + st.session_state.anomalist_sorting_columns],
-                    selection_mode=["multi-row"],
-                    key=key_table,
-                    on_select=lambda df=df, key_table=key_table, key_selection=key_selection: _change_chart_selection(
-                        df, key_table, key_selection
-                    ),
-                    hide_index=True,
-                )
-
-            # TODO: Enable anomaly-specific hiding
-            # key_btn = f"button_{key}"
-            # st.button("Hide anomaly", key=key_btn, icon=":material/hide:")
-
-
-def show_anomaly(anomaly, indicator_id):
-    """Show anomaly details.
-
-    Renders an anomaly. Title, description and possibly a chart.
-
-    TODO: use if we want to expand anomalies to have one box per entity too.
-    """
-    with st.container(border=True):
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown(f"##### {anomaly['title']}")
-            st.markdown(f"{anomaly['description']}")
-        with col2:
-            # st.write(indicator.id)
-            grapher_chart(variable_id=indicator_id, selected_entities=[anomaly["country"]])
-
-
+# Functions to filter the results
 def filter_df(df: pd.DataFrame):
     """Apply filters from user to the dataframe.
 
@@ -365,6 +249,116 @@ def _sort_df(df: pd.DataFrame, sort_strategy: str) -> Tuple[pd.DataFrame, List[s
         df = df.sort_values(columns_sort, ascending=False)
 
     return df, columns_sort
+
+
+# Functions to show the anomalies
+@st.fragment
+def show_anomaly_compact(index, df):
+    """Show anomaly compactly.
+
+    Container with all anomalies of a certain type and for a concrete indicator.
+    """
+    indicator_id, an_type = index
+    row = 0
+
+    key = f"{indicator_id}_{an_type}"
+    key_table = f"anomaly_table_{key}"
+    key_selection = f"selected_entities_{key}"
+
+    # Get relevant metadata for this view
+    # By default, the entity with highest score, but user may have selected other ones!
+    entity_default = df.iloc[row]["entity_name"]
+    entities = st.session_state.get(f"selected_entities_{key}", entity_default)
+    entities = entities if entities != [] else [entity_default]
+
+    # entities = df["entity_id"].tolist()
+    year_default = df.iloc[row]["year"]
+    indicator_uri = st.session_state.anomalist_indicators.get(indicator_id)
+
+    # Generate descriptive text. Only contains information about top-scoring entity.
+    if an_type == AnomalyTypeEnum.TIME_CHANGE.value:
+        text = f"There are significant changes for {entity_default} in {year_default} compared to the old version of the indicator. There might be other data points affected."
+    elif an_type == AnomalyTypeEnum.UPGRADE_CHANGE.value:
+        text = f"There are abrupt changes for {entity_default} in {year_default}! There might be other data points affected."
+    elif an_type == AnomalyTypeEnum.UPGRADE_MISSING.value:
+        text = f"There are missing values for {entity_default}! There might be other data points affected."
+    elif an_type == AnomalyTypeEnum.GP_OUTLIER.value:
+        text = f"There are some outliers for {entity_default}! These were detected using Gaussian processes. There might be other data points affected."
+    else:
+        raise ValueError(f"Unknown anomaly type: {an_type}")
+
+    # Render
+    with st.container(border=True):
+        # Title
+        link = OWID_ENV.indicator_admin_site(indicator_id)
+        st.markdown(f"{tag_in_md(**ANOMALY_TYPES[an_type])} **[{indicator_uri}]({link})**")
+        col1, col2 = st.columns(2)
+        # Chart
+        with col1:
+            # Bake chart config
+            # If the anomaly is compared to previous indicator, then we need to show two indicators (old and new)!
+            if an_type in {AnomalyTypeEnum.UPGRADE_CHANGE.value, AnomalyTypeEnum.UPGRADE_MISSING.value}:
+                display = [
+                    {
+                        "name": "New",
+                    },
+                    {
+                        "name": "Old",
+                    },
+                ]
+                assert indicator_id in st.session_state.anomalist_mapping_inv, "Indicator ID not found in mapping!"
+                indicator_id_old = st.session_state.anomalist_mapping_inv[indicator_id]
+                config = bake_chart_config(
+                    variable_id=[indicator_id, indicator_id_old],
+                    selected_entities=entities,
+                    display=display,
+                )
+                config["title"] = indicator_uri
+                config["subtitle"] = "Comparison of old and new indicator versions."
+
+                # config = bake_chart_config(
+                #     variable_id=[indicator_id],
+                #     selected_entities=entities,
+                # )
+            else:
+                config = bake_chart_config(variable_id=indicator_id, selected_entities=entities)
+            config["hideAnnotationFieldsInTitle"]["time"] = True
+            # Actually plot
+            grapher_chart(chart_config=config, owid_env=OWID_ENV)
+
+        # Description and other entities
+        with col2:
+            # Description
+            st.info(text)
+            # Other entities
+            with st.container(border=False):
+                st.markdown("**Select** other affected entities")
+                st.dataframe(
+                    df[["entity_name"] + st.session_state.anomalist_sorting_columns],
+                    selection_mode=["multi-row"],
+                    key=key_table,
+                    on_select=lambda df=df, key_table=key_table, key_selection=key_selection: _change_chart_selection(
+                        df, key_table, key_selection
+                    ),
+                    hide_index=True,
+                )
+
+            # TODO: Enable anomaly-specific hiding
+            # key_btn = f"button_{key}"
+            # st.button("Hide anomaly", key=key_btn, icon=":material/hide:")
+
+
+def _change_chart_selection(df, key_table, key_selection):
+    """Change selection in grapher chart."""
+    # st.toast(f"Changing entity in indicator {indicator_id}")
+    # Get selected row number
+    rows = st.session_state[key_table]["selection"]["rows"]
+
+    # Update entities in chart
+    st.session_state[key_selection] = df.iloc[rows]["entity_name"].tolist()
+
+
+######################################################################
 
 
 # Load the main inputs:
@@ -440,7 +434,7 @@ if st.session_state.anomalist_datasets_submitted:
 
         with st.spinner("Scanning for anomalies... This can take some time."):
             anomaly_detection(
-                anomaly_types=tuple(ANOMALY_TYPE_NAMES.keys()),
+                anomaly_types=ANOMALY_TYPES_TO_DETECT,
                 variable_ids=variable_ids,
                 variable_mapping=st.session_state.anomalist_mapping,
                 dry_run=False,
