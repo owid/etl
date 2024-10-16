@@ -124,13 +124,13 @@ def calculate_shares(tb):
 def split_estimates_projections(tb):
     # Split data into estimates and projections.
     past_estimates = tb[tb["year"] < START_OF_PROJECTIONS].copy()
-    future_projections = tb[tb["year"] >= START_OF_PROJECTIONS - 1].copy()
+    future_projections = tb[tb["year"] >= START_OF_PROJECTIONS - 5].copy()
 
     # Now, for each column, split it into two (projections and estimates).
     for col in tb.columns:
         if col not in ["country", "year"]:
             past_estimates[f"{col}_estimates"] = tb.loc[tb["year"] < START_OF_PROJECTIONS, col]
-            future_projections[f"{col}_projections"] = tb.loc[tb["year"] >= START_OF_PROJECTIONS - 1, col]
+            future_projections[f"{col}_projections"] = tb.loc[tb["year"] >= START_OF_PROJECTIONS - 5, col]
             past_estimates = past_estimates.drop(columns=[col])
             future_projections = future_projections.drop(columns=[col])
 
