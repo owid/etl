@@ -372,7 +372,6 @@ if st.session_state.anomalist_datasets_submitted:
             anomaly_detection(
                 anomaly_types=tuple(ANOMALY_TYPE_NAMES.keys()),
                 variable_ids=variable_ids,
-                dataset_ids=[],
                 variable_mapping=st.session_state.anomalist_mapping,
                 dry_run=False,
                 reset_db=False,

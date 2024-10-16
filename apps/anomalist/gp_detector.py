@@ -1,7 +1,7 @@
 import random
 import time
 import warnings
-from typing import Optional, cast
+from typing import Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,52 +13,54 @@ from sklearn.gaussian_process.kernels import RBF, WhiteKernel
 
 from etl import grapher_model as gm
 
+from .detectors import AnomalyDetector
+
 log = structlog.get_logger()
 
 
-class AnomalyDetector:
-    anomaly_type: str
+class AnomalyGaussianProcessOutlier(AnomalyDetector):
+    anomaly_type = "gp_outlier"
 
+    def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+        # Create a dataframe of nans.
+        df_score = self.get_nans_df(df, variable_ids)
 
-class SampleAnomalyDetector(AnomalyDetector):
-    anomaly_type = "sample"
+        # Filter to only a couple of countries
+        # TODO: make this fast enough or process only the most populous countries
+        df = df.loc[df.entity_name.isin(["France", "Japan", "Spain"]), :]
 
-    def get_score_df(self, df: pd.DataFrame, variables: list[gm.Variable]) -> pd.DataFrame:
-        score_df = cast(pd.DataFrame, df.sample(1))
-        score_df.iloc[0, :] = [random.normalvariate(0, 1) for _ in range(df.shape[1])]
-        return score_df
+        for entity_name, group_variables in df.groupby("entity_name", observed=True):
+            for variable_id in variable_ids:
+                group = group_variables[["year", variable_id]].dropna()
+                if group.empty:
+                    continue
 
-
-class GPAnomalyDetector(AnomalyDetector):
-    anomaly_type = "gp"
-
-    def get_score_df(self, df: pd.DataFrame, variables: list[gm.Variable]) -> pd.DataFrame:
-        score_df = df * np.nan
-        for variable_id in df.columns:
-            for _, group in df[variable_id].groupby("entityName", observed=True):
-                group = group.dropna()
-
-                country = group.index.get_level_values("entityName")[0]
-                series = pd.Series(group.values, index=group.index.get_level_values("year"))
+                series = pd.Series(group[variable_id].values, index=group["year"])
 
                 if len(series) <= 1:
-                    log.warning(f"Insufficient data for {country}")
                     continue
 
                 X, y = self.get_Xy(series)
 
+                if y.std() == 0:
+                    continue
+
                 t = time.time()
                 mean_pred, std_pred = self.fit_predict(X, y)
-                log.info("Fitted GP", country=country, n_samples=len(X), elapsed=round(time.time() - t, 2))
+                log.info(
+                    "Fitted GP",
+                    variable_id=variable_id,
+                    entity_name=entity_name,
+                    n_samples=len(X),
+                    elapsed=round(time.time() - t, 2),
+                )
 
                 # Calculate Z-score for all points
                 z = (y - mean_pred) / std_pred
 
-                score_df.loc[group.index, variable_id] = z
+                df_score.loc[group.index, variable_id] = np.abs(z)
 
-        score_df = cast(pd.DataFrame, score_df)
-
-        return score_df.abs()  # type: ignore
+        return df_score
 
     def get_Xy(self, series: pd.Series) -> tuple[np.ndarray, np.ndarray]:
         X = series.index.values.reshape(-1, 1)
@@ -70,6 +72,8 @@ class GPAnomalyDetector(AnomalyDetector):
         X_mean = np.mean(X)
         y_mean = np.mean(y)
         y_std = np.std(y)
+        assert y_std > 0, "Standard deviation of y is zero"
+
         X_normalized = X - X_mean
         y_normalized = (y - y_mean) / y_std
 
