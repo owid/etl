@@ -15,7 +15,7 @@ relative_poverty_description = "This is a measure of _relative_ poverty – it c
 
 ppp_description = "The data is measured in international-$ at {ppp} prices – this adjusts for inflation and for differences in the cost of living between countries."
 
-prosperity_gap_description = "The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone in the world reaches a standard of prosperity, which is defined as $25 per person per day. This gives a sense of how far global incomes are from a basic prosperity standard."
+prosperity_gap_description = "The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone reaches a standard of prosperity, which is defined as $25 per person per day. This gives a sense of how far global incomes are from a basic prosperity standard."
 
 processing_description_relative_poverty = "Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year, calculate a relative poverty line – in this case {povline} of the median – and then run a specific query on the PIP API to return the share of population below that line."
 
@@ -106,7 +106,7 @@ var_dict = {
     },
     "pg": {
         "title": "Prosperity gap",
-        "description": "Average factor by which incomes need to be multiplied to bring everyone in the world to the prosperity standard of $25 per person per day.",
+        "description": "Average factor by which incomes need to be multiplied to bring everyone to the prosperity standard of $25 per person per day.",
         "unit": "",
         "short_unit": "",
         "numDecimalPlaces": 1,
