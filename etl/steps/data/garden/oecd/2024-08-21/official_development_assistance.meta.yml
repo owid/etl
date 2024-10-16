@@ -37,7 +37,7 @@ definitions:
   short_oof: Other official flows (OOF) are official sector transactions that do not meet [official development assistance (ODA)](#dod:oda) criteria.
   short_officially_supported_export_credits: Officially supported export credits are credits that governments provide to support national exporters competing for overseas sales.
   short_private_flows_market_terms: Private flows are defined as financial flows at market terms financed out of private sector resources and private grants.
-  short_net_private_grants: Grants by private voluntary agencies and non-government organisations (NGOs) are defined as transfers for development made by private voluntary agencies and NGOs in cash, goods or services for which no payment is required.
+  short_net_private_grants: Grants by private voluntary agencies and non-government organizations (NGOs) are defined as transfers for development made by private voluntary agencies and NGOs in cash, goods or services for which no payment is required.
 
   short_flows: Total official and private flows are defined as the sum of official development assistance, other official flows and private flows. This represents the total net disbursements by the official and private sector of the creditor country to the recipient country.
 
@@ -52,7 +52,7 @@ definitions:
     Official development assistance (ODA) eligibility criteria are based on (i) country eligibility, (ii) concessionality, and (iii) the promotion of the economic development and welfare of developing countries as the main objective. This means that (i) only countries and territories included in the list of ODA recipients are eligible to receive this assistance, (ii) lending is defined by minimum requirements according to the income category of the recipient country, and (iii) reporting rules have been implemented to define what is "primarily developmental". For more details about ODA, please refer to the [official OECD documentation](https://one.oecd.org/document/DCD/DAC/STAT(2023)9/FINAL/en/pdf).
 
   key_oda_target: A long-standing United Nations target is that developed countries should devote 0.7% of their GNI to ODA.
-  key_oda_list_of_countries: The [OECD Development Assistance Committee (DAC)](https://www.oecd.org/en/about/committees/development-assistance-committee.html) mantains a list of territories where ODA can be provided. The countries and territories on the DAC list of ODA recipients consist of all low and middle income countries based on gross national income (GNI) per capita as published by the World Bank, with the exception of former G8 members, EU members, and countries with a firm date for entry into the EU. The list also includes all of the Least Developed Countries (LDCs) as defined by the United Nations. The list is updated every three years and is available in [the OECD website](https://www.oecd.org/en/topics/sub-issues/oda-eligibility-and-conditions/dac-list-of-oda-recipients.html).
+  key_oda_list_of_countries: The [OECD Development Assistance Committee (DAC)](https://www.oecd.org/en/about/committees/development-assistance-committee.html) maintains a list of territories where ODA can be provided. The countries and territories on the DAC list of ODA recipients consist of all low and middle income countries based on gross national income (GNI) per capita as published by the World Bank, with the exception of former G8 members, EU members, and countries with a firm date for entry into the EU. The list also includes all of the Least Developed Countries (LDCs) as defined by the United Nations. The list is updated every three years and is available in [the OECD website](https://www.oecd.org/en/topics/sub-issues/oda-eligibility-and-conditions/dac-list-of-oda-recipients.html).
 
   key_grant_equivalents: |-
     "[Grant equivalent](#dod:grant-equivalents)" is a methodology to estimate the value of loans compared to a grant. It is an estimate, at today’s value of money, of how much is being given away over the life of a financial transaction, compared with a transaction at market terms.
@@ -68,14 +68,14 @@ definitions:
   key_officially_supported_export_credits_2: Such support can take the form either of “official financing support”, such as direct credits to foreign buyers, refinancing or interest-rate support, or of “pure cover support”, such as export credits insurance or guarantee to cover credits provided by private financial institutions.
   key_private_flows_market_terms: |-
     Private flows are financed out of private sector resources (changes in holdings of private, long-term assets held by residents of the reporting country) and private grants (grants by non-government organizations, net of subsidies received from the official sector). Private capital flows can be divided into: foreign direct investment; portfolio equity (the buying and selling of stocks and shares); remittances sent home by migrants; and private sector borrowing.
-  key_net_private_grants: The private sector comprises private corporations, households and non-profit institutions serving households. Development funding from the private sector is becoming more significant. This includes private foundations, which play an increasing role in funding development and in finding innovative ways to promote it; non-government organisations; and the for-profit private sector.
+  key_net_private_grants: The private sector comprises private corporations, households and non-profit institutions serving households. Development funding from the private sector is becoming more significant. This includes private foundations, which play an increasing role in funding development and in finding innovative ways to promote it; non-government organizations; and the for-profit private sector.
 
   key_flows: Total official flows incorporate the sum of concessional and non-concessional flows to developing countries, including export credits, which have a primarily commercial motive. Private flows are defined as flows at market terms and financed out of private sector resources and private grants.
 
   key_oda_bilateral: Bilateral ODA also includes cases where a donor contracts a multilateral agency to deliver a program or project on its behalf. This is often referred to as “Bi/Multi” flows. Donor funds channeled through NGOs are also typically counted as bilateral flows.
 
   key_food_aid: |-
-    In terms of its use, food aid can be subdivided into three categories: program food aid (budgetary support), project food aid (targeted poverty alleviation and disaster prevention) and relief food aid (targeted to victims of disasters). It can also be classified by modes of suppply in direct transfers, food aid purchases or local purchases.
+    In terms of its use, food aid can be subdivided into three categories: program food aid (budgetary support), project food aid (targeted poverty alleviation and disaster prevention) and relief food aid (targeted to victims of disasters). It can also be classified by modes of supply in direct transfers, food aid purchases or local purchases.
 
   key_capital_subscriptions_deposits: |-
     Capital subscriptions are payments to multilateral agencies in the form of notes and similar instruments, unconditionally encashable at any time by the recipient institutions. They are assimilated to grants in DAC statistics.
@@ -122,14 +122,14 @@ definitions:
   producer_private_flows_market_terms: |-
     _[From OECD's indicator explainer](https://www.oecd.org/en/data/indicators/total-official-and-private-flows.html)_
 
-    Private flows are financial flows for development at market terms financed out of private sector resources (changes in holdings of private, long-term assets held by residents of the reporting country) and private grants (grants by non-government organisations, net of subsidies received from the official sector). Private capital flows can be divided into: foreign direct investment; portfolio equity (the buying and selling of stocks and shares); remittances sent home by migrants; and private sector borrowing.
+    Private flows are financial flows for development at market terms financed out of private sector resources (changes in holdings of private, long-term assets held by residents of the reporting country) and private grants (grants by non-government organizations, net of subsidies received from the official sector). Private capital flows can be divided into: foreign direct investment; portfolio equity (the buying and selling of stocks and shares); remittances sent home by migrants; and private sector borrowing.
 
   producer_net_private_grants: |-
     _[From OECD's indicator explainer](https://www.oecd.org/en/data/indicators/grants-by-private-agencies-and-ngos.html)_
 
-    Grants by private voluntary agencies and non-government organisations (NGOs) are defined as transfers for development made by private voluntary agencies and NGOs in cash, goods or services for which no payment is required.
+    Grants by private voluntary agencies and non-government organizations (NGOs) are defined as transfers for development made by private voluntary agencies and NGOs in cash, goods or services for which no payment is required.
 
-    The private sector comprises private corporations, households and non-profit institutions serving households. Development funding from the private sector is becoming more significant. This includes private foundations, which play an increasing role in funding development and in finding innovative ways to promote it; non-government organisations; and the for-profit private sector.
+    The private sector comprises private corporations, households and non-profit institutions serving households. Development funding from the private sector is becoming more significant. This includes private foundations, which play an increasing role in funding development and in finding innovative ways to promote it; non-government organizations; and the for-profit private sector.
 
   producer_net_flows: |-
     _[From OECD's indicator explainer](https://www.oecd.org/en/data/indicators/total-official-and-private-flows.html)_
@@ -141,13 +141,13 @@ definitions:
 
     Food aid are grants and concessional loans that conform to official development assistance (ODA).
 
-    Food aid is categorised and reported in terms of its uses and modes of supply. In terms of the use of food aid, three categories are distinguished: programme food aid is supplied as a resource transfer providing balance of payments (BoP) or budgetary support; project food aid is usually provided to support specific poverty alleviation and disaster prevention activities, targeted on specific beneficiary groups or areas; relief food aid is targeted on, and freely distributed to, victims of natural or man-made disasters. In practice, there has been a blurring of the distinctions between different categories of use, especially in an emergency, crisis situation. The other main approach to distinguish food aid is by looking at its sources or modes of supply: direct transfers, including all food aid originating from a donor country; food aid purchases or exchanges in one developing country for use as food aid in another country; and, local purchases, procured in a country and used as food aid in the same country.
+    Food aid is categorized and reported in terms of its uses and modes of supply. In terms of the use of food aid, three categories are distinguished: programme food aid is supplied as a resource transfer providing balance of payments (BoP) or budgetary support; project food aid is usually provided to support specific poverty alleviation and disaster prevention activities, targeted on specific beneficiary groups or areas; relief food aid is targeted on, and freely distributed to, victims of natural or man-made disasters. In practice, there has been a blurring of the distinctions between different categories of use, especially in an emergency, crisis situation. The other main approach to distinguish food aid is by looking at its sources or modes of supply: direct transfers, including all food aid originating from a donor country; food aid purchases or exchanges in one developing country for use as food aid in another country; and, local purchases, procured in a country and used as food aid in the same country.
 
   processing_per_capita: |-
     We calculated this indicator by dividing by the population of the donor country or regional aggregation. The population estimate is available in the OECD dataset.
 
   processing_per_capita_2: |-
-    We calculated this indicator by dividing by the population of the recipient country. We use a long-run population dataset [mantained by Our World in Data](https://ourworldindata.org/population-sources).
+    We calculated this indicator by dividing by the population of the recipient country. We use a long-run population dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
 
   processing_share_gni: |-
     We calculated this indicator by dividing by the gross national income (GNI) of the donor country regional aggregation. The GNI estimate is available in the OECD dataset.
