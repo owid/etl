@@ -7,27 +7,13 @@ definitions:
     processing_level: major
     description_key:
     - |-
-      **The Degree of Urbanisation (DEGURBA)** is a  method designed for capturing the urban-rural continuum and facilitating international comparisons. Developed by six international organizations and endorsed by the UN Statistical Commission, it employs a two-level classification system.
+      **The Degree of Urbanisation (DEGURBA)**  is a method for capturing the urban-rural divide, designed for international comparisons. Developed by six organizations and endorsed by the UN, it uses a two-level classification.
 
-      The first level categorizes territories into three classes: 1) cities, 2) towns and suburbs, and 3) rural areas. This classification helps distinguish urban areas (cities plus towns and suburbs) from rural areas, emphasizing the distinct differences between towns, semi-dense areas, cities, and rural regions.
+      The first level divides areas into cities, towns and suburbs, and rural areas, distinguishing between urban (cities, towns, suburbs) and rural regions. The second level adds detail, splitting towns and rural areas further.
 
-      The second level adds granularity by further dividing towns and semi-dense areas into towns and suburban or peri-urban areas, and splitting rural areas into villages, dispersed rural areas, and mostly uninhabited areas.
+      This classification is based on 1 km² grid cells, grouped into urban centers, urban clusters, and rural cells. These grids are then used to classify smaller areas, typically using residential population grids from censuses or registers. If detailed data isn't available, a disaggregation grid estimates population distribution.
 
-      The classification process involves two steps. Initially, all 1 km² grid cells are categorized into one of three types: urban centers (contiguous grid cells with a density of at least 1500 inhabitants per km² and a total population of 50,000 or more, defining a city), urban clusters (contiguous grid cells with a density of at least 300 inhabitants per km² and a total population of 5,000 or more, defining a town and suburb), and rural grid cells (defining rural areas). These grid cell types are then used to classify smaller administrative or statistical spatial units.
-
-      This method is used with a residential population grid derived from household point locations, typically from geo-coded censuses or registers. Over 30 countries have published such data, and others are collecting it. When this precise household location data (point data) is not available, an alternative approach called a disaggregation grid is used. This method involves dividing a larger area into smaller sections to estimate where people might live within that area. The effectiveness and accuracy of this disaggregation grid depend greatly on the size of these sections or spatial units. Smaller units typically lead to more accurate population estimates, while larger units might result in less precise estimates.
-
-      For future predictions (2025 and 2030), a special method is used to estimate how built-up areas (like cities and towns) have grown or changed. This method involves two main steps:
-
-      **Static Component:** It looks at how certain features of the land (like hills, height above sea level, and water bodies) are related to where people build settlements. This is done by studying data from satellites and seeing where people tend to live in relation to these land features.
-
-      **Dynamic Component:** This part examines how the built-up areas have been changing over the years, based on past satellite images. It identifies which areas have grown, which have shrunk, and which have stayed the same.
-
-      By combining these two approaches, the researchers can make educated guesses about how built-up areas might develop over time, even for the years when there’s no direct satellite data
-
-      Key benefits of the method include defining cities based on population characteristics rather than administrative borders, aligning with the UN's recommendation. It also considers factors beyond population size, recognizing the complexity of urbanization across various fields. For instance, a small, service-rich settlement may be deemed urban, while a larger, agriculture-focused one could be rural.
-
-      The method uses fixed population size and density thresholds for consistency and simplicity, though this may not always accurately reflect local urban characteristics.
+      To predict future urbanization (2025 and 2030), both static (land features) and dynamic (past satellite images) components are used to project growth. DEGURBA defines cities by population, not administrative borders, aligning with UN guidelines, though fixed thresholds may not always capture local differences.
 
     description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-suburbs-degurba), and [rural areas](#dod:rural-areas-degurba) and estimate their respective populations.
 
@@ -130,6 +116,10 @@ tables:
             <% elif attribute == 'share' or attribute == 'popshare' %>
             %
             <%- endif -%>
+          description_processing:
+            <% if attribute == 'share' or attribute == 'popshare' %>
+            The share of total area or population for each urbanization level was calculated by dividing the area or population of each level (cities, towns and suburbs, rural areas) by the overall total, providing a percentage representation for each category.
+           <%- endif -%>
           display:
             numDecimalPlaces:
                 <% if attribute == 'area' %>

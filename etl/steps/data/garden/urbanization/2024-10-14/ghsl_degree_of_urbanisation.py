@@ -21,6 +21,7 @@ REGIONS = [
     "Lower-middle-income countries",
     "High-income countries",
 ]
+START_OF_PROJECTIONS = 2025
 
 
 def run(dest_dir: str) -> None:
@@ -65,43 +66,11 @@ def run(dest_dir: str) -> None:
         ds_income_groups=ds_income_groups,
         min_num_values_per_year=1,
     )
+    # Calculate population and area share from total within each urbanization level
+    tb = calculate_shares(tb)
 
-    # Calculate "share of" indicators
-    tb["total_population"] = tb[["rural_total_population", "urban_centre_population", "urban_cluster_population"]].sum(
-        axis=1
-    )
-    tb["total_area"] = tb[["rural_total_area", "urban_centre_area", "urban_cluster_area"]].sum(axis=1)
-
-    tb["urban_total_popshare"] = (
-        (tb["urban_centre_population"] + tb["urban_cluster_population"]) / tb["total_population"]
-    ) * 100
-
-    tb["urban_total_share"] = (tb["urban_centre_area"] + tb["urban_cluster_area"]) / tb["total_area"] * 100
-
-    tb["rural_total_share"] = tb["rural_total_area"] / tb["total_area"] * 100
-    tb["rural_total_popshare"] = tb["rural_total_population"] / tb["total_population"] * 100
-
-    tb["urban_cluster_popshare"] = tb["urban_cluster_population"] / tb["total_population"] * 100
-    tb["urban_centre_popshare"] = tb["urban_centre_population"] / tb["total_population"] * 100
-
-    tb["urban_cluster_share"] = tb["urban_cluster_area"] / tb["total_area"] * 100
-    tb["urban_centre_share"] = tb["urban_centre_area"] / tb["total_area"] * 100
-
-    tb = tb.drop(columns=["total_population", "total_area"])
-
-    # Create two new dataframes to separate data into estimates and projections (pre-2025 and post-2025 (five year intervals)))
-    past_estimates = tb[tb["year"] < 2025].copy()
-    future_projections = tb[tb["year"] >= 2025].copy()
-
-    # Now, for each column in the original dataframe, split it into two (projections and estimates)
-    for col in tb.columns:
-        if col not in ["country", "year"]:
-            past_estimates[f"{col}_estimates"] = tb.loc[tb["year"] < 2025, col]
-            future_projections[f"{col}_projections"] = tb.loc[tb["year"] >= 2025, col]
-            past_estimates = past_estimates.drop(columns=[col])
-            future_projections = future_projections.drop(columns=[col])
-
-    tb = pr.merge(past_estimates, future_projections, on=["country", "year"], how="outer")
+    # Split data into estimates and projections.
+    tb = split_estimates_projections(tb)
 
     # Melt to make the metadata easier to generate
     tb = tb.melt(id_vars=["country", "year"], var_name="indicator", value_name="value")
@@ -124,3 +93,48 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def calculate_shares(tb):
+    # Calculate "share of" indicators
+    tb["total_population"] = tb[["rural_total_population", "urban_centre_population", "urban_cluster_population"]].sum(
+        axis=1
+    )
+    tb["total_area"] = tb[["rural_total_area", "urban_centre_area", "urban_cluster_area"]].sum(axis=1)
+
+    tb["urban_total_popshare"] = (
+        (tb["urban_centre_population"] + tb["urban_cluster_population"]) / tb["total_population"]
+    ) * 100
+
+    tb["urban_total_share"] = (tb["urban_centre_area"] + tb["urban_cluster_area"]) / tb["total_area"] * 100
+
+    tb["rural_total_share"] = tb["rural_total_area"] / tb["total_area"] * 100
+    tb["rural_total_popshare"] = tb["rural_total_population"] / tb["total_population"] * 100
+
+    tb["urban_cluster_popshare"] = tb["urban_cluster_population"] / tb["total_population"] * 100
+    tb["urban_centre_popshare"] = tb["urban_centre_population"] / tb["total_population"] * 100
+
+    tb["urban_cluster_share"] = tb["urban_cluster_area"] / tb["total_area"] * 100
+    tb["urban_centre_share"] = tb["urban_centre_area"] / tb["total_area"] * 100
+
+    tb = tb.drop(columns=["total_population", "total_area"])
+    return tb
+
+
+def split_estimates_projections(tb):
+    # Split data into estimates and projections.
+    past_estimates = tb[tb["year"] < START_OF_PROJECTIONS].copy()
+    future_projections = tb[tb["year"] >= START_OF_PROJECTIONS - 1].copy()
+
+    # Now, for each column, split it into two (projections and estimates).
+    for col in tb.columns:
+        if col not in ["country", "year"]:
+            past_estimates[f"{col}_estimates"] = tb.loc[tb["year"] < START_OF_PROJECTIONS, col]
+            future_projections[f"{col}_projections"] = tb.loc[tb["year"] >= START_OF_PROJECTIONS - 1, col]
+            past_estimates = past_estimates.drop(columns=[col])
+            future_projections = future_projections.drop(columns=[col])
+
+    # Merge past estimates and future projections
+    tb = pr.merge(past_estimates, future_projections, on=["country", "year"], how="outer")
+
+    return tb

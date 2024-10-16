@@ -5,13 +5,13 @@ meta:
     # Data product / Snapshot
     title: Global Human Settlement Layer Dataset
     description: |-
-      This dataset provides a comprehensive classification of urbanization levels for administrative regions worldwide, using the Global ADMinistrative layer version 4.1 (GADM4.1) as the source of administrative units. The classification is derived from the application of the Degree of Urbanisation model's Stage II, which evaluates each unit based on urbanization criteria. It utilizes the Global Human Settlement Layer (GHSL) data, specifically the Settlement Classification (GHS-SMOD_GLOBE_R2023A) that categorizes areas as urban, suburban, or rural, and the Population Grid (GHS-POP_GLOBE_R2023A) that provides detailed population information.
-    date_published: '2024'
+      This dataset provides a comprehensive classification of urbanization levels for administrative regions worldwide, using the Global ADMinistrative layer version 4.1 (GADM4.1) as the source of administrative units. The classification is derived from the application of the Degree of Urbanization model's Stage II, which evaluates each unit based on urbanization criteria. It utilizes the Global Human Settlement Layer (GHSL) data, specifically the Settlement Classification (GHS-SMOD_GLOBE_R2023A) that categorizes areas as urban, suburban, or rural, and the Population Grid (GHS-POP_GLOBE_R2023A) that provides detailed population information.
+    date_published: 2024-09-10
 
     # Citation
     producer: European Commission, Joint Research Centre (JRC)
     citation_full: |-
-      Schiavina, Marcello; Melchiorri, Michele; Freire, Sergio (2023): GHS-DUC R2023A - GHS Degree of Urbanisation Classification, application of the Degree of Urbanisation methodology (stage II) to GADM 4.1 layer, multitemporal (1975-2030). European Commission, Joint Research Centre (JRC) [Dataset] doi: 10.2905/DC0EB21D-472C-4F5A-8846-823C50836305 PID: http://data.europa.eu/89h/dc0eb21d-472c-4f5a-8846-823c50836305
+      Schiavina, Marcello; Melchiorri, Michele; Freire, Sergio (2023): GHS-DUC R2023A - GHS Degree of Urbanization Classification, application of the Degree of Urbanization methodology (stage II) to GADM 4.1 layer, multitemporal (1975-2030). European Commission, Joint Research Centre (JRC) [Dataset] doi: 10.2905/DC0EB21D-472C-4F5A-8846-823C50836305 PID: http://data.europa.eu/89h/dc0eb21d-472c-4f5a-8846-823c50836305
     attribution_short: European Commission, JRC
 
     # Files
