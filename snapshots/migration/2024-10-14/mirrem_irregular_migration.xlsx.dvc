@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: MIrreM - Public Database on Irregular Migration Stock Estimates
+    description: |-
+      The Public Database on Irregular Migration Stock Estimates (the Database) provides an inventory and critical appraisal of country-level estimates of irregular migration stocks in 13 European countries, the United States and Canada for the period 2008 to 2023.
+    date_published: "2024-10-03"
+    version_producer: Version 2
+
+    # Citation
+    producer: Kieran et al.
+    citation_full: |-
+      Kierans, D., Vargas-Silva, C., Ahmad-Yar, A. W., Bircan, T., Cacciapaglia, M., Carvalho, J., Cassain, L., Cyrus, N., Desmond, A., Fihel, A., Finotelli, C., Gonzalez Ramos, M. P., Heylin, R., Jauhiainen, J., Kraler, A., Leerkes, A., Nikolova, M., Rössl, L., Santos, S., … Sohst, R. R. (2024). MIrreM Public Database on Irregular Migration Stock Estimates (Version 2) [Data set]. Krems: University for Continuing Education Krems (Danube University Krems). https://doi.org/10.5281/zenodo.13856861
+    attribution_short: Kieran et al.
+
+    # Files
+    url_main: https://zenodo.org/records/13856861
+    url_download: https://zenodo.org/records/13856861/files/MIRREM-Kierans%20et%20al-2024-Public%20Database%20on%20Irregular%20Stocks-v2.xlsx?download=1
+    date_accessed: 2024-10-14
+
+    # License
+    license:
+      name: CC BY-SA 4.0
+      url: https://zenodo.org/records/13856861
+
+outs:
+  - md5: f9088c84f1aa35036e29b78c2419bce4
+    size: 369420
+    path: mirrem_irregular_migration.xlsx

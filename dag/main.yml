@@ -781,7 +781,6 @@ steps:
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
 
-
 # Long-run child mortality, Gapminder + UN IGME
   data://garden/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-11/igme
@@ -817,12 +816,21 @@ steps:
     - data://garden/migration/2024-10-09/important_issues
   data://meadow/migration/2024-10-10/ons_migration_estimates:
     - snapshot://migration/2024-10-10/ons_migration_estimates.xlsx
-
-
   data://garden/migration/2024-10-10/ons_migration_estimates:
     - data://meadow/migration/2024-10-10/ons_migration_estimates
   data://grapher/migration/2024-10-10/ons_migration_estimates:
     - data://garden/migration/2024-10-10/ons_migration_estimates
+
+  # MIrreM irregular migration estimates
+  data://meadow/migration/2024-10-14/mirrem_irregular_migration:
+    - snapshot://migration/2024-10-14/mirrem_irregular_migration.xlsx
+  data://garden/migration/2024-10-14/mirrem_irregular_migration:
+    - data://meadow/migration/2024-10-14/mirrem_irregular_migration
+  data://grapher/migration/2024-10-14/mirrem_irregular_migration:
+    - data://garden/migration/2024-10-14/mirrem_irregular_migration
+
+
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
