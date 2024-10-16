@@ -56,6 +56,11 @@ ANOMALY_TYPES = {
         "color": "red",
         "icon": ":material/hide_source",
     },
+    AnomalyTypeEnum.UPGRADE_MISSING.value: {
+        "tag_name": "Gaussian Process",
+        "color": "blue",
+        "icon": ":material/notifications",
+    },
 }
 ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
 
