@@ -180,7 +180,21 @@ def parse_anomalies_to_df() -> pd.DataFrame | None:
         return df
 
 
-@st.dialog("LLM summary")
+@st.fragment()
+def llm_ask(df: pd.DataFrame):
+    st.button(
+        "Ask LLM for summary",
+        on_click=lambda: llm_dialog(df),
+        icon=":material/robot:",
+    )
+
+
+@st.dialog("AI summary of anomalies", width="large")
+def llm_dialog(df: pd.DataFrame):
+    """Ask LLM for summary of the anomalies."""
+    st.write("Eventually this will be an LLM summary.")
+
+
 def ask_llm_for_summary(df: pd.DataFrame):
     variable_ids = df["indicator_id"].unique()
 
@@ -655,6 +669,9 @@ if st.session_state.anomalist_df is not None:
 
     # Show anomalies with time and version changes
     if not df.empty:
+        # LLM summary option
+        llm_ask(df)
+
         # st.dataframe(df_change)
         groups = df.groupby(["indicator_id", "type"], sort=False)
         items = list(groups)
