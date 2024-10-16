@@ -19,15 +19,13 @@ TODO:
 
 """
 
-import random
-from enum import Enum
-from typing import List, Tuple
+from typing import List, Tuple, cast
 
 import pandas as pd
 import streamlit as st
 
 from apps.anomalist.anomalist_api import anomaly_detection
-from apps.wizard.app_pages.anomalist.utils import create_tables, get_datasets_and_mapping_inputs
+from apps.wizard.app_pages.anomalist.utils import AnomalyTypeEnum, create_tables, get_datasets_and_mapping_inputs
 from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.chart_config import bake_chart_config
 from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
@@ -42,13 +40,6 @@ st.set_page_config(
 
 
 # OTHER CONFIG
-class AnomalyTypeEnum(Enum):
-    TIME_CHANGE = "time_change"
-    UPGRADE_CHANGE = "upgrade_change"
-    UPGRADE_MISSING = "upgrade_missing"
-    # AI = "ai"  # Uncomment if needed
-
-
 ANOMALY_TYPES = {
     AnomalyTypeEnum.TIME_CHANGE.value: {
         "tag_name": "Time change",
@@ -106,114 +97,6 @@ st.session_state.anomalist_trigger_detection = st.session_state.get("anomalist_t
 # MOCK VARIABLES AND FUNCTIONS
 ######################################################################
 # DEBUGGING
-# This should be removed and replaced with dynamic fields
-ENTITIES_DEFAULT = [
-    "Spain",
-    "France",
-    "Germany",
-    "Italy",
-    "United Kingdom",
-    "United States",
-    "China",
-    "India",
-    "Japan",
-    "Brazil",
-    "Russia",
-    "Canada",
-    "South Africa",
-    "Australia",
-    "Venezuela",
-    "Croatia",
-    "Azerbaijan",
-]
-
-
-def mock_anomalies_df_time_change(indicators_id, n=5):
-    records = [
-        {
-            "entity": random.sample(ENTITIES_DEFAULT, 1)[0],
-            "year": random.randint(1950, 2020),
-            "score": round(random.random(), 2),
-            "indicator_id": random.sample(indicators_id, 1)[0],
-        }
-        for i in range(n)
-    ]
-
-    df = pd.DataFrame(records)
-    return df
-
-
-def mock_anomalies_df_upgrade_change(indicators_id_upgrade, n=5):
-    records = [
-        {
-            "entity": random.sample(ENTITIES_DEFAULT, 1)[0],
-            "year": random.randint(1950, 2020),
-            "score": round(random.random(), 2),
-            "indicator_id": random.sample(indicators_id_upgrade, 1)[0],
-        }
-        for i in range(n)
-    ]
-
-    df = pd.DataFrame(records)
-    return df
-
-
-def mock_anomalies_df_upgrade_missing(indicators_id_upgrade, n=5):
-    records = [
-        {
-            "entity": random.sample(ENTITIES_DEFAULT, 1)[0],
-            "year": random.randint(1950, 2020),
-            "score": random.randint(0, 1),
-            "indicator_id": random.sample(indicators_id_upgrade, 1)[0],
-        }
-        for i in range(n)
-    ]
-
-    df = pd.DataFrame(records)
-    return df
-
-
-@st.cache_data(ttl=60 * 60)
-def mock_anomalies_df(indicators_id, indicators_id_upgrade, n=5):
-    # 1/ Get anomalies df
-    ## Time change
-    df_change = mock_anomalies_df_time_change(indicators_id, n)
-    df_change["type"] = AnomalyTypeEnum.TIME_CHANGE.value
-    ## Upgrade: value change
-    df_upgrade_change = mock_anomalies_df_upgrade_change(indicators_id_upgrade, n)
-    df_upgrade_change["type"] = AnomalyTypeEnum.UPGRADE_CHANGE.value
-    ## Upgrade: Missing data point
-    df_upgrade_miss = mock_anomalies_df_upgrade_missing(indicators_id_upgrade, n)
-    df_upgrade_miss["type"] = AnomalyTypeEnum.UPGRADE_MISSING.value
-
-    # 2/ Combine
-    df = pd.concat([df_change, df_upgrade_change, df_upgrade_miss])
-
-    # Ensure there is only one row per entity, anomaly type and indicator
-    df = df.sort_values("score", ascending=False).drop_duplicates(["entity", "type", "indicator_id"])
-
-    # Replace entity name with entity ID
-    entity_mapping = cached.load_entity_ids()
-    entity_mapping_inv = {v: k for k, v in entity_mapping.items()}
-    df["entity_id"] = df["entity"].map(entity_mapping_inv)
-    # st.write(entity_mapping)
-
-    # 3/ Add meta scores
-    num_scores = len(df)
-    df["score_population"] = [random.random() for i in range(num_scores)]
-    df["score_views"] = [random.random() for i in range(num_scores)]
-
-    # 4/ Weighed combined score
-    # Weighed combined score
-    w_score = 1
-    w_pop = 1
-    w_views = 1
-    df["score_weighed"] = (w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_views"]) / (
-        w_score + w_pop + w_views
-    )
-    return df
-
-
 ######################################################################
 # FUNCTIONS
 ######################################################################
@@ -235,7 +118,7 @@ def _change_chart_selection(df, key_table, key_selection):
     rows = st.session_state[key_table]["selection"]["rows"]
 
     # Update entities in chart
-    st.session_state[key_selection] = df.iloc[rows]["entity"].tolist()
+    st.session_state[key_selection] = df.iloc[rows]["entity_name"].tolist()
 
 
 @st.fragment
@@ -253,7 +136,7 @@ def show_anomaly_compact(index, df):
 
     # Get relevant metadata for this view
     # By default, the entity with highest score, but user may have selected other ones!
-    entity_default = df.iloc[row]["entity"]
+    entity_default = df.iloc[row]["entity_name"]
     entities = st.session_state.get(f"selected_entities_{key}", entity_default)
     entities = entities if entities != [] else [entity_default]
 
@@ -318,7 +201,7 @@ def show_anomaly_compact(index, df):
             with st.container(border=False):
                 st.markdown("**Select** other affected entities")
                 st.dataframe(
-                    df[["entity"] + st.session_state.anomalist_sorting_columns],
+                    df[["entity_name"] + st.session_state.anomalist_sorting_columns],
                     selection_mode=["multi-row"],
                     key=key_table,
                     on_select=lambda df=df, key_table=key_table, key_selection=key_selection: _change_chart_selection(
@@ -383,7 +266,7 @@ def _filter_df(df: pd.DataFrame, year_min, year_max, anomaly_types, entities, in
     df = df[~df["type"].isin(anomaly_types)]
     ## Entities
     if len(entities) > 0:
-        df = df[df["entity"].isin(entities)]
+        df = df[df["entity_name"].isin(entities)]
     # Indicators
     if len(indicators) > 0:
         df = df[df["indicator_id"].isin(indicators)]
@@ -403,9 +286,9 @@ def _sort_df(df: pd.DataFrame, sort_strategy: str) -> Tuple[pd.DataFrame, List[s
         case "population":
             columns_sort = ["score_population"]
         case "views":
-            columns_sort = ["score_views"]
+            columns_sort = ["score_analytics"]
         case "population+views":
-            columns_sort = ["score_population", "score_views"]
+            columns_sort = ["score_population", "score_analytics"]
         case _:
             pass
     if columns_sort != []:
@@ -514,21 +397,67 @@ if st.session_state.anomalist_datasets_submitted:
     # 3.4/ Parse obtained anomalist into dataframe
     if len(st.session_state.anomalist_anomalies) > 0:
         ###############################################################################################################
-        # DEMO
-        # The following code loads a mock dataframe. Instead, we should retrieve this from the database.
-        indicators_id = list(st.session_state.anomalist_indicators.keys())
-        indicators_id_upgrade = list(st.session_state.anomalist_mapping.values())
-        st.session_state.anomalist_df = mock_anomalies_df(indicators_id, indicators_id_upgrade, n=1000)
+        # TODO: Encapsulate this code in a function, add real population and analytics scores
+        dfs = []
+        for anomaly in st.session_state.anomalist_anomalies:
+            # Load
+            df = anomaly.dfScore
+            if isinstance(df, pd.DataFrame):
+                # TODO: We should not store all-zero dataframes in table if there is no variable mapping!
+                if (df["anomaly_score"] == 0).all():
+                    continue
+                # Reduce df
+                # st.write(df)
+                df = df.sort_values("anomaly_score", ascending=False)
+                df = df.drop_duplicates(subset=["entity_name", "variable_id"], keep="first")
+                # Assign anomaly type in df
+                df["type"] = anomaly.anomalyType
+                # Add to list
+                dfs.append(df)
+            else:
+                raise ValueError(f"Anomaly {anomaly} has no dfScore attribute.")
+
+        # Concatenate all dfs
+        df = cast(pd.DataFrame, pd.concat(dfs, ignore_index=True))
+
+        # Rename columns
+        df = df.rename(
+            columns={
+                "variable_id": "indicator_id",
+                "anomaly_score": "score",
+            }
+        )
+
+        # Add population and analytics score:
+        df["score_population"] = 1
+        df["score_analytics"] = 1
+
+        # Weighed combined score
+        w_score = 1
+        w_pop = 1
+        w_views = 1
+        df["score_weighed"] = (
+            w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]
+        ) / (w_score + w_pop + w_views)
+
+        st.session_state.anomalist_df = df
+        # Former mock data
+        # st.session_state.anomalist_df = mock_anomalies_df(
+        #     indicators_id,
+        #     indicators_id_upgrade,
+        #     n=1000,
+        # )
         ###############################################################################################################
     else:
         st.session_state.anomalist_df = None
 
 # 4/ SHOW ANOMALIES (only if any are found)
 if st.session_state.anomalist_df is not None:
-    ENTITIES_AVAILABLE = st.session_state.anomalist_df["entity"].unique()
+    ENTITIES_AVAILABLE = st.session_state.anomalist_df["entity_name"].unique()
     YEAR_MIN = st.session_state.anomalist_df["year"].min()
     YEAR_MAX = st.session_state.anomalist_df["year"].max()
     INDICATORS_AVAILABLE = st.session_state.anomalist_df["indicator_id"].unique()
+    ANOMALY_TYPES_AVAILABLE = st.session_state.anomalist_df["type"].unique()
 
     # 4.0/ WARNING: Show warning if anomalies are loaded from DB without re-computing
     # TODO: we could actually know if anomalies are out of sync from dataset/indicators. Maybe based on dataset/indicator checksums? Starting to implement this idea with data_out_of_date
@@ -607,7 +536,7 @@ if st.session_state.anomalist_df is not None:
             with cols[1]:
                 st.multiselect(
                     label="Hide types",
-                    options=ANOMALY_TYPE_NAMES.keys(),
+                    options=ANOMALY_TYPES_AVAILABLE,
                     format_func=ANOMALY_TYPE_NAMES.get,
                     help="Exclude anomalies of a certain type.",
                     placeholder="Select anomaly types",
