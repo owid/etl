@@ -29,6 +29,9 @@ log = structlog.get_logger()
 # Name of index columns for dataframe.
 INDEX_COLUMNS = ["entity_name", "year"]
 
+# TODO: this is repeated in detector classes, is there a way to DRY this?
+ANOMALY_TYPE = Literal["time_change", "upgrade_change", "upgrade_missing", "gp_outlier"]
+
 # Define mapping of available anomaly types to anomaly detectors.
 ANOMALY_DETECTORS = {
     detector.anomaly_type: detector
@@ -40,8 +43,6 @@ ANOMALY_DETECTORS = {
     ]
 }
 
-# Define anomaly types.
-ANOMALY_TYPE = Literal[tuple(ANOMALY_DETECTORS.keys())]
 
 ########################################################################################################################
 
