@@ -25,7 +25,12 @@ import pandas as pd
 import streamlit as st
 
 from apps.anomalist.anomalist_api import anomaly_detection
-from apps.wizard.app_pages.anomalist.utils import AnomalyTypeEnum, create_tables, get_datasets_and_mapping_inputs
+from apps.wizard.app_pages.anomalist.utils import (
+    AnomalyTypeEnum,
+    create_tables,
+    get_datasets_and_mapping_inputs,
+    get_scores,
+)
 from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.chart_config import bake_chart_config
 from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
@@ -401,7 +406,7 @@ if st.session_state.anomalist_datasets_submitted:
     if len(st.session_state.anomalist_anomalies) > 0:
         # Combine scores from all anomalies, reduce them (to get the maximum anomaly score for each entity-indicator),
         # and add population and analytics scores.
-        df = cached.get_scores(anomalies=st.session_state.anomalist_anomalies)
+        df = get_scores(anomalies=st.session_state.anomalist_anomalies)
 
         st.session_state.anomalist_df = df
     else:
