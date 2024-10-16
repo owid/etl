@@ -32,8 +32,14 @@ def estimate_bard_epsilon(series: pd.Series) -> float:
 
 
 def get_long_format_score_df(df_score: pd.DataFrame) -> pd.DataFrame:
-    # Create a reduced score dataframe.
-    df_score_long = df_score.melt(id_vars=["entity_name", "year"], var_name="variable_id", value_name="anomaly_score")
+    # Output is already in long format
+    if set(df_score.columns) == {"entity_name", "year", "variable_id", "anomaly_score"}:
+        df_score_long = df_score
+    else:
+        # Create a reduced score dataframe.
+        df_score_long = df_score.melt(
+            id_vars=["entity_name", "year"], var_name="variable_id", value_name="anomaly_score"
+        )
 
     # Drop NaN anomalies.
     df_score_long = df_score_long.dropna(subset=["anomaly_score"])

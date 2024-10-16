@@ -236,12 +236,7 @@ def anomaly_detection(
         ]
         variables_old_and_new = variables_in_dataset + variables_old
         # TODO: It would be more convenient if df had a dummy index, instead of resetting here.
-        df = (
-            load_data_for_variables(engine=engine, variables=variables_old_and_new)
-            .reset_index()
-            .rename(columns={"entityName": "entity_name"}, errors="raise")
-            .astype({"entity_name": str})
-        )
+        df = load_data_for_variables(engine=engine, variables=variables_old_and_new)
 
         for anomaly_type in anomaly_types:
             # Instantiate the anomaly detector.
@@ -344,8 +339,10 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     # TODO: cache this on disk & re-validate with etags
     df_long = variable_data_df_from_s3(engine, [v.id for v in variables], workers=None)
 
+    df_long = df_long.rename(columns={"variableId": "variable_id", "entityName": "entity_name"})
+
     # pivot dataframe
-    df = df_long.pivot(index=["entityName", "year"], columns="variableId", values="value")
+    df = df_long.pivot(index=["entity_name", "year"], columns="variable_id", values="value")
 
     # reorder in the same order as variables
     df = df[[v.id for v in variables]]
@@ -356,6 +353,8 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     # TODO:
     # remove countries with all nulls or all zeros or constant values
     # df = df.loc[:, df.fillna(0).std(axis=0) != 0]
+
+    df = df.reset_index().astype({"entity_name": str})
 
     return df
 

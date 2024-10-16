@@ -1,71 +1,165 @@
 import random
 import time
 import warnings
+from multiprocessing import Pool
 from typing import Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import structlog
+from joblib import Memory
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, WhiteKernel
+from tqdm.auto import tqdm
 
 from etl import grapher_model as gm
+from etl.paths import CACHE_DIR
 
 from .detectors import AnomalyDetector
 
 log = structlog.get_logger()
 
 
+memory = Memory(CACHE_DIR, verbose=0)
+
+
+@memory.cache
+def _load_population():
+    from .anomalist_api import load_latest_population
+
+    # Load the latest population data from the API
+    pop = load_latest_population()
+    # Filter the population data to only include the year 2024
+    pop = pop[pop.year == 2024]
+    # Set 'entity_name' as the index and return the population series
+    return pop.set_index("entity_name")["population"]
+
+
+def _processing_queue(items: list[tuple[str, int]]) -> List[tuple]:
+    """
+    Create a processing queue of (entity, variable_id) pairs, weighted by population probability.
+    """
+    # Load the population data (cached for efficiency)
+    population = _load_population().to_dict()
+
+    # Create a probability array for each (entity, variable_id) pair based on the entity probability
+    probs = np.array([population.get(entity, np.nan) for entity, variable_id in items])
+
+    # Fill any missing values with the mean probability
+    probs = np.nan_to_num(probs, nan=np.nanmean(probs))
+
+    # Normalize the probabilities to sum to 1
+    probs = probs / probs.sum()
+
+    # Randomly shuffle the items based on their probabilities
+    items_index = np.random.choice(
+        len(items),
+        size=len(items),
+        replace=False,
+        p=probs,
+    )
+
+    # Return the shuffled list of items
+    return np.array(items, dtype=object)[items_index]
+
+
 class AnomalyGaussianProcessOutlier(AnomalyDetector):
     anomaly_type = "gp_outlier"
 
+    def __init__(self, max_time: Optional[float] = None, n_jobs: int = 4):
+        self.max_time = max_time
+        self.n_jobs = n_jobs
+
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
-        # Create a dataframe of nans.
-        df_score = self.get_nans_df(df, variable_ids)
+        # Convert to long format
+        df_wide = (
+            df.melt(id_vars=["entity_name", "year"]).set_index(["entity_name", "variable_id"]).dropna().sort_index()
+        )
 
-        # Filter to only a couple of countries
-        # TODO: make this fast enough or process only the most populous countries
-        df = df.loc[df.entity_name.isin(["France", "Japan", "Spain"]), :]
+        # Create a processing queue with (entity_name, variable_id) pairs
+        items = _processing_queue(
+            list(df_wide.index.unique()),
+        )
 
-        for entity_name, group_variables in df.groupby("entity_name", observed=True):
-            for variable_id in variable_ids:
-                group = group_variables[["year", variable_id]].dropna()
-                if group.empty:
-                    continue
+        start_time = time.time()
 
-                series = pd.Series(group[variable_id].values, index=group["year"])
+        results = []
 
-                if len(series) <= 1:
-                    continue
+        items = items[:1000]
 
-                X, y = self.get_Xy(series)
+        # Iterate through each (entity_name, variable_id) pair in the processing queue
+        for entity_name, variable_id in tqdm(items):
+            # Stop processing if the maximum time is reached
+            if self.max_time is not None and (time.time() - start_time) > self.max_time:
+                log.info("Max processing time reached, stopping further processing.")
+                break
 
-                if y.std() == 0:
-                    continue
+            # Get the data for the current entity and variable
+            group = df_wide.loc[(entity_name, variable_id)]
 
-                t = time.time()
-                mean_pred, std_pred = self.fit_predict(X, y)
-                log.info(
-                    "Fitted GP",
-                    variable_id=variable_id,
-                    entity_name=entity_name,
-                    n_samples=len(X),
-                    elapsed=round(time.time() - t, 2),
-                )
+            # Skip if the series has only one or fewer data points
+            if len(group) <= 1:
+                continue
 
-                # Calculate Z-score for all points
-                z = (y - mean_pred) / std_pred
+            # Prepare the input features (X) and target values (y) for Gaussian Process
+            X, y = self.get_Xy(pd.Series(group["value"].values, index=group["year"]))
 
-                df_score.loc[group.index, variable_id] = np.abs(z)
+            # Skip if the target values have zero standard deviation (i.e., all values are identical)
+            if y.std() == 0:
+                continue
 
-        return df_score
+            if self.n_jobs == 1:
+                # Fit the Gaussian Process model and make predictions
+                z = self.fit_predict_z(X, y)
+                z = pd.DataFrame({"anomaly_score": np.abs(z), "year": group["year"].values}, index=group.index)
+                results.append(z)
+            else:
+                # Add it to a list for parallel processing
+                results.append((self, X, y, group, start_time))
+
+        # Process results in parallel
+        # NOTE: There's a lot of overhead in parallelizing this, so the gains are minimal on my laptop. It could be
+        #  better on a staging server.
+        if self.n_jobs != 1:
+            with Pool(self.n_jobs) as pool:
+                # Split the workload evenly across the number of jobs
+                chunksize = len(items) // self.n_jobs + 1
+                results = pool.starmap(self._fit_parallel, results, chunksize=chunksize)
+
+        log.info("Finished processing", elapsed=round(time.time() - start_time, 2))
+
+        df_score_long = pd.concat(results).reset_index()
+        return df_score_long
+
+    @staticmethod
+    def _fit_parallel(obj: "AnomalyGaussianProcessOutlier", X, y, group, start_time):
+        # Stop early
+        if obj.max_time and (time.time() - start_time) > obj.max_time:
+            return pd.DataFrame()
+        z = obj.fit_predict_z(X, y)
+        z = pd.DataFrame({"anomaly_score": np.abs(z), "year": group["year"].values}, index=group.index)
+        return z
 
     def get_Xy(self, series: pd.Series) -> tuple[np.ndarray, np.ndarray]:
         X = series.index.values.reshape(-1, 1)
         y = series.values
         return X, y  # type: ignore
+
+    def fit_predict_z(self, X, y) -> np.ndarray:
+        # t = time.time()
+        mean_pred, std_pred = self.fit_predict(X, y)
+        # Calculate the Z-score for each point (standard score)
+        z = (y - mean_pred) / std_pred
+        # log.info(
+        #     "Fitted GP",
+        #     variable_id=variable_id,
+        #     entity_name=entity_name,
+        #     n_samples=len(X),
+        #     elapsed=round(time.time() - t, 2),
+        # )
+        return z
 
     def fit_predict(self, X, y):
         # normalize data... but is it necessary?
@@ -95,6 +189,9 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", ConvergenceWarning)
             gp.fit(X_normalized, y_normalized)
+
+        # print kernel
+        # log.info(f"Optimized Kernel: {gp.kernel_}")
 
         # Make predictions with confidence intervals
         mean_pred, std_pred = gp.predict(X_normalized, return_std=True)  # type: ignore
