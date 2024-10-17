@@ -312,6 +312,7 @@ def extract_operations(df_above_7000, df_7_7000):
         if column not in ["year", "spill_type"]:
             operations_total = operations_total.rename(columns={column: column + " ops"})
 
+    operations_total = operations_total.drop("Cause ops", axis=1)
     return operations_total
 
 
