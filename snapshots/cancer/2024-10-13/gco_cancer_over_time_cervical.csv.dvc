@@ -5,7 +5,20 @@ meta:
     # Data product / Snapshot
     title: Cancer over time - Cervical cancer
     description: |-
-      The dataset includes data on age-standardized incidence rates of cervical cancer amongst women between 1943 and 2020 for 52 countries.
+      Cancer Over Time presents international trends in cancer-specific incidence and mortality rates. The incidence data are based on high-quality cancer incidence data, as recorded by one or more subnational or national population-based cancer registries that are included in the Cancer Incidence in Five Continents (CI5) CI5plus database. National cancer mortality data were extracted from the World Health Organization (WHO) Mortality Database.
+
+      These trends are presented for 33 cancer sites, by year, sex, and age group, and for the longest possible period with reasonably representative data. In addition to the incidence data extracted from CI5 volumes, Cancer Over Time also updates the national incidence data as published on national websites or via collaborative studies with prior agreement, for example NORDCAN.
+
+      Depending on the data source, some cancer incidence and/or mortality data may not be available for the entire period or for some specific cancer site.
+      When incidence data are available from subnational population-based cancer registries, these have been pooled to obtain a sample of the country for the longest possible common period. The coverage of the group is given in the “Population” menu option.
+      Vital registration data may cover 100% of the population within a country but not include complete coverage of deaths in the country. Caution in interpretation is therefore advised.
+      Changes in certification and coding of cause of death (introduction of a new revision of the International Classification of Diseases [ICD]) could affect the comparability of the mortality data over time.
+      The demographic information (population) used to compute the national mortality rates is provided by the United Nations (UN),World Population Prospects, the 2019 revision, except for Singapore, Cyprus, Serbia, UK (England and Wales, Northern Ireland and Scotland). Data source - WHO database. The UN population estimates may differ slightly from those prepared by national authorities and from those prepared by WHO, in particular for the countries with incomplete vital registration systems.
+      The age-standardized rates are adjusted to the World Standard Population (1966); see the “Glossary” menu option.
+
+      Linear interpolation was applied to fill in missing mortality data under certain conditions. It was used when fewer than four consecutive years of data were missing, and if the missing data occurred after 1975 for medium- and high-quality mortality data, or after 2010 for low-quality mortality data.
+
+      This specific dataset includes data on age-standardized incidence rates of cervical cancer amongst women between 1943 and 2020 for 52 countries.
     date_published: "2024"
 
     # Citation

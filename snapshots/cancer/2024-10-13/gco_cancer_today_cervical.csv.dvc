@@ -5,7 +5,13 @@ meta:
     # Data product / Snapshot
     title: Cancer Today - Cervical cancer
     description: |-
-      The dataset includes data on age-standardized incidence rates of cervical cancer amongst women in 2022.
+      Cancer Today enables a comprehensive assessment of the cancer burden worldwide in 2022, based on the GLOBOCAN estimates of incidence, mortality and prevalence for year 2022 in 185 countries or territories for 36 cancer types by sex and age group.
+
+      Caution must be exercised when interpreting these estimates, given the limited quality and coverage of cancer data worldwide at present, particularly in low- and middle-income countries. IARC’s approach is not only to evaluate, compile, and use the data from the Agency’s collaborators in these estimates but also to work alongside national staff to improve local data quality, registry coverage, and analytical capacity. The clear need for investment in population-based cancer registration in low- and middle-income countries led to the launch of the Global Initiative for Cancer Registry Development (GICR), coordinated by IARC. The goal of the GICR is to inform cancer control through defined improvements in the coverage, quality, and use of population-based cancer registration data worldwide. You can read more about these global efforts here.
+
+      The methods of estimation are country-specific, and the quality of the national estimates depends on the coverage, accuracy, and timeliness of the recorded incidence and mortality data in a given country.
+
+      This specific dataset includes data on age-standardized incidence rates of cervical cancer amongst women in 2022.
     date_published: "2024-02-08"
 
     # Citation
