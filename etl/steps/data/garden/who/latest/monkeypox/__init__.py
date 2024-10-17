@@ -47,15 +47,6 @@ def run(dest_dir: str) -> None:
         "new_deaths": "new_conf_deaths",
     }
     tb_africa = tb_africa.rename(columns=rename_dict, errors="raise")
-    # Suspected cases are the sum of confirmed and suspected cases
-    tb_africa["total_suspected_cases"] = tb_africa["total_suspected_cases"] - tb_africa["total_conf_cases"]
-    tb_africa["total_suspected_deaths"] = tb_africa["total_suspected_deaths"] - tb_africa["total_conf_deaths"]
-    tb_africa["new_suspected_cases"] = tb_africa["new_suspected_cases"] - tb_africa["new_conf_cases"]
-    tb_africa["new_suspected_deaths"] = tb_africa["new_suspected_deaths"] - tb_africa["new_conf_deaths"]
-    assert tb_africa["total_suspected_cases"].min() >= 0
-    assert tb_africa["total_suspected_deaths"].min() >= 0
-    assert tb_africa["new_suspected_cases"].min() >= 0
-    assert tb_africa["new_suspected_deaths"].min() >= 0
 
     # Grab origins metadata
     origins = tb["total_conf_cases"].metadata.origins
@@ -109,6 +100,33 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def format_africa(tb: Table) -> Table:
+    # Adding total suspected cases for 2023
+    tb_2023 = Table(
+        {
+            "country": ["Cameroon", "Congo", "Democratic Republic of Congo"],
+            "date": ["2023-12-24", "2023-12-24", "2023-12-24"],
+            "new_suspected_cases": ["113", "74", "12985"],
+        }
+    )
+    # Adding total suspected deaths for 2023
+    tb = pr.concat([tb, tb_2023], ignore_index=True).sort_values(["country", "date"])
+    tb["new_suspected_cases"] = pr.to_numeric(tb["new_suspected_cases"], errors="coerce")
+    tb["total_suspected_cases"] = tb["new_suspected_cases"].groupby(tb["country"]).cumsum()
+    # Suspected cases are the sum of confirmed and suspected cases
+
+    tb["total_suspected_cases"] = tb["total_suspected_cases"] - tb["total_conf_cases"]
+    tb["total_suspected_deaths"] = tb["total_suspected_deaths"] - tb["total_conf_deaths"]
+    tb["new_suspected_cases"] = tb["new_suspected_cases"] - tb["new_conf_cases"]
+    tb["new_suspected_deaths"] = tb["new_suspected_deaths"] - tb["new_conf_deaths"]
+    assert tb["total_suspected_cases"].min() >= 0
+    assert tb["total_suspected_deaths"].min() >= 0
+    assert tb["new_suspected_cases"].min() >= 0
+    assert tb["new_suspected_deaths"].min() >= 0
+
+    return tb
 
 
 def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -> Table:
