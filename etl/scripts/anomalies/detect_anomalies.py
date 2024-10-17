@@ -12,6 +12,7 @@ from structlog import get_logger
 import etl.grapher_io as io
 import etl.grapher_model as gm
 from apps.anomalist import detectors
+from apps.anomalist.gp_detector import AnomalyGaussianProcessOutlier
 from apps.wizard.app_pages.anomalist.utils import add_analytics_score, add_population_score
 from etl.db import get_engine
 
@@ -19,6 +20,9 @@ detectors_classes = {
     "upgrade_missing": detectors.AnomalyUpgradeMissing,
     "upgrade_change": detectors.AnomalyUpgradeChange,
     "time_change": detectors.AnomalyTimeChange,
+    "one_class_svm": detectors.AnomalyOneClassSVM,
+    "isolation_forest": detectors.AnomalyIsolationForest,
+    "gp": AnomalyGaussianProcessOutlier,
 }
 
 # Initialize logger.
@@ -100,7 +104,8 @@ def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Var
 
         # Switch from long to wide format dataframe.
         df = (
-            df_long.pivot(index=["entityName", "year"], columns="variableId", values="value")
+            df_long.rename(columns={"variableId": "variable_id"})
+            .pivot(index=["entityName", "year"], columns="variable_id", values="value")
             .reset_index()
             .rename(columns={"entityName": "entity_name"}, errors="raise")
         )
@@ -143,7 +148,6 @@ def get_all_necessary_data(dataset_id: int):
     return df, metadata, variable_ids, variable_mapping
 
 
-# Visually inspect the most significant anomalies on a certain scores dataframe.
 def inspect_anomalies(
     df: pd.DataFrame,
     df_data: pd.DataFrame,
@@ -164,7 +168,6 @@ def inspect_anomalies(
     )
     for _, row in df_show.iterrows():
         variable_id = row["indicator_id"]
-        variable_id_old = row["indicator_id_old"]
         variable_name = metadata[variable_id].shortName
         variable_title = metadata[variable_id].titlePublic
         country = row["entity_name"]
@@ -174,7 +177,8 @@ def inspect_anomalies(
         title += f'{anomaly_type} - weighted score: {row["score_weighted"]:.0%} | score: {row["score"]:.0%} | population: {row["score_population"]:.0%} | views: {row["score_analytics"]:.0%}'
         new = df_data[df_data["entity_name"] == row["entity_name"]][["entity_name", "year", variable_id]]
         new = new.rename(columns={row["indicator_id"]: variable_name}, errors="raise")
-        if pd.notnull(variable_id_old):
+        if anomaly_type in ["upgrade_change", "upgrade_missing"]:
+            variable_id_old = row["indicator_id_old"]
             old = df_data[df_data["entity_name"] == row["entity_name"]][["entity_name", "year", variable_id_old]]
             old = old.rename(columns={row["indicator_id_old"]: variable_name}, errors="raise")
             compare = pd.concat([old.assign(**{"source": "old"}), new.assign(**{"source": "new"})], ignore_index=True)
@@ -254,4 +258,10 @@ def main(dataset_id: int, anomaly_type: str) -> None:
     df["anomaly_type"] = detector.anomaly_type
 
     # Inspect anomalies.
-    inspect_anomalies(df=df, df_data=df_data, metadata=metadata, variable_mapping=variable_mapping, n_anomalies_max=10)
+    inspect_anomalies(
+        df=df.sort_values("score_weighted", ascending=False),
+        df_data=df_data,
+        metadata=metadata,
+        variable_mapping=variable_mapping,
+        n_anomalies_max=100,
+    )
