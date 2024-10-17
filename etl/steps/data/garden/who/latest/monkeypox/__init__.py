@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
         "new_deaths": "new_conf_deaths",
     }
     tb_africa = tb_africa.rename(columns=rename_dict, errors="raise")
-
+    tb_africa = format_africa(tb_africa)
     # Grab origins metadata
     origins = tb["total_conf_cases"].metadata.origins
     #
@@ -115,6 +115,8 @@ def format_africa(tb: Table) -> Table:
     tb = pr.concat([tb, tb_2023], ignore_index=True).sort_values(["country", "date"])
     tb["new_suspected_cases"] = pr.to_numeric(tb["new_suspected_cases"], errors="coerce")
     tb["total_suspected_cases"] = tb["new_suspected_cases"].groupby(tb["country"]).cumsum()
+    # Check it's worked
+    assert tb.loc[tb["country"] == "Congo", "total_suspected_cases"].min() >= 74
     # Suspected cases are the sum of confirmed and suspected cases
 
     tb["total_suspected_cases"] = tb["total_suspected_cases"] - tb["total_conf_cases"]
