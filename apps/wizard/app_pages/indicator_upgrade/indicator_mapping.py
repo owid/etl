@@ -362,7 +362,7 @@ class IndicatorUpgradeShow:
     @st.fragment
     def render(self, indicator_id_to_display, df_data=None):
         with st.container(border=True):
-            cols = [100, 10, 10]
+            cols = [100, 5, 10]
             cols = st.columns(cols, vertical_alignment="bottom")
 
             # Indicators (old, new)
@@ -451,7 +451,7 @@ class IndicatorUpgradeShow:
             st.session_state[k][self.iu.key] = not st.session_state[k][self.iu.key]
 
         st.checkbox(
-            label="Ignore",
+            label="Skip",
             key=self.iu.key_ignore,
             # label_visibility="collapsed",
             value=self.iu.skip,

@@ -15,7 +15,9 @@ from rich_click.rich_command import RichCommand
 from apps.utils.style import set_rich_click_style
 from apps.wizard.config import WIZARD_PHASES
 from apps.wizard.utils import CURRENT_DIR
+from apps.wizard.utils.paths import WIZARD_ANOMALIES
 from etl.config import WIZARD_PORT
+from etl.files import create_folder
 
 # Disable streamlit cache data API logging
 # ref: @kajarenc from https://github.com/streamlit/streamlit/issues/6620#issuecomment-1564735996
@@ -72,6 +74,10 @@ def cli(
     **Note:** Alternatively, you can run it as `streamlit run apps/wizard/app.py`.
     """
     script_path = CURRENT_DIR / "app.py"
+
+    # Create folder for anomalies
+    # TODO: this should be created elsewhere
+    create_folder(WIZARD_ANOMALIES)
 
     # Define command with arguments
     args = [

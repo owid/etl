@@ -1,3 +1,7 @@
+"""This code contains the first demo for Anomalist.
+
+This will be removed, but is kept alive since it may contain useful code snippets (e.g. streaming structured LLM outputs).
+"""
 from typing import cast
 
 import streamlit as st

@@ -460,6 +460,51 @@ def add_origins_to_global_burden_of_disease(tb_gbd: Table) -> Table:
 ########################################################################################################################
 
 
+def bard(a, b, eps=1e-8):
+    """Bounded Adjusted Relative Deviation (BARD) between two values or two series.
+
+    Given a and b (that can be either single real values or series), the BARD is defined as:
+    BARD(a, b) = |a - b| / (|a| + |b| + eps)
+    where epsilon (or eps) is a small positive constant to avoid large deviations on small numbers.
+
+    Common error metrics, like the absolute percentage error, have some important drawbacks:
+    - They are not bounded, so they can be arbitrarily large.
+    - They are not symmetric, so they can be misleading when comparing two values.
+    - They can become very large (or even undefined) when comparing very small numbers (which are usually irrelevant).
+
+    The BARD is a bounded, symmetric, and well-behaved error metric that can be used to compare two values.
+    To have a sense of its meaning, notice that:
+    - The BARD is always bounded between 0 and 1, which makes it a convenient metric.
+    - BARD(a, b) = 0 if and only if a and b are equal.
+    - BARD(a, b) tends to 1 when one of the two values is much larger than the other (and much larger than eps).
+    - BARD(a, b) is symmetric, so BARD(a, b) = BARD(b, a).
+    - BARD(a, b) is well-behaved for small numbers, as tends to 0 when a and b are small (with respect to eps).
+    - When a and b are much larger than eps (the most common case):
+        - When BARD(a, b) = 0.5, |a - b| = (|a| + |b|) / 2. In other words, a BARD of 50% means that the absolute deviation is similar to the absolute mean value of a and b.
+        - And, when BARD >> 0.5, the absolute deviation is much larger than the absolute mean value of a and b.
+        - When BARD ~ 0, the absolute deviation between a and b is much smaller than a (and hence also b).
+    - When a and b are of a similar magnitude than eps, we enter a regime where we don't care about big deviations. The additional eps term in the denominator makes the BARD insensitive to large deviations when a and b are small.
+        - For example, when |a| + |b| ~ eps, BARD becomes 1/2 of the BARD we would have if eps was 0.
+        - Even if a >> b, BARD(a, b) ~ |a| / (|a| + eps). So, if eps >= |a|, this means that BARD <= 1/2 (and a similar thing happens for b >> a). In other words, even when there are big deviations of small numbers, BARD is at most 50%.
+
+    Parameters
+    ----------
+    a : float or pd.Series
+        One of the quantities to compare.
+    b : float or pd.Series
+        One of the quantities to compare.
+    eps : float, optional
+        Small constant to avoid big deviations of small numbers (or divisions by zero).
+
+    Returns
+    -------
+    bard : float or pd.Series
+        Bounded Adjusted Relative Deviation (BARD) between a and b, given a small constant eps.
+
+    """
+    return abs(a - b) / (abs(a) + abs(b) + eps)
+
+
 def compare_tables(
     old,
     new,
@@ -472,9 +517,13 @@ def compare_tables(
     new_label="new",
     skip_empty=True,
     skip_equal=True,
+    metric="bard_max",
+    bard_eps=1e-8,
+    bard_max=0.1,
     absolute_tolerance=1e-8,
     relative_tolerance=1e-8,
     max_num_charts=50,
+    only_coincident_rows=False,
 ) -> None:
     """Plot columns of two tables (usually an "old" and a "new" version) to compare them.
 
@@ -502,12 +551,24 @@ def compare_tables(
         True to skip plots that have no data, by default True.
     skip_equal : bool, optional
         True to skip plots where old and new data are equal (within a certain absolute and relative tolerance), by default True.
+    metric : str or callable, optional
+        Only relevant if skip_equal is True. Metric to use to compare old and new data. It can be a string with the following options:
+        - "are_equal": Check if old and new data are equal (within a certain absolute_tolerance and relative_tolerance).
+        - "bard_max": Check if the maximum BARD between old and new data is below a certain threshold (given by bard_max), and assuming an epsilon value of bard_eps. See bard function for more details.
+
+        It can also be a custom function that takes two pandas Series and returns a boolean, which should be True if the two Series are considered equal. For example: metric=lambda a,b: (mean(bard(a, b, eps=0.01))<0.1)
+    bard_eps : float, optional
+        Only relevant if skip_equal is True and metric is "bard_max". Small constant to avoid big deviations of small numbers (or divisions by zero).
+    bard_max : float, optional
+        Only relevant if skip_equal is True and metric is "bard_max". Maximum BARD value to consider old and new data as equal.
     absolute_tolerance : float, optional
-        Only relevant if skip_equal is True.
+        Only relevant if skip_equal is True and metric is "are_equal".
         Absolute tolerance when comparing old and new data, by default 1e-8.
     relative_tolerance : float, optional
-        Only relevant if skip_equal is True.
+        Only relevant if skip_equal is True and metric is "are_equal".
         Relative tolerance when comparing old and new data, by default 1e-8.
+    only_coincident_rows : bool, optional
+        True to only compare rows that are present in both tables (e.g. to ignore points for years that are only in new).
     max_num_charts : int, optional
         Maximum number of charts to show, by default 50. If exceeded, the user will be asked how to proceed.
 
@@ -557,18 +618,36 @@ def compare_tables(
             if skip_empty and (len(filtered) == 0):
                 # If there are no data points in the old or new tables for this country-column, skip this column.
                 continue
+
+            if only_coincident_rows:
+                # Select only years where there is data for both old and new.
+                filtered = filtered[filtered.groupby(x)["source"].transform("count") == 2].reset_index(drop=True)
+
             if skip_equal:
-                _old = filtered[filtered[legend] == old_label].reset_index()[[y_column]]
-                _new = filtered[filtered[legend] == new_label].reset_index()[[y_column]]
-                if dataframes.are_equal(
-                    _old,
-                    _new,
-                    verbose=False,
-                    absolute_tolerance=absolute_tolerance,
-                    relative_tolerance=relative_tolerance,
-                )[0]:
+                _old = filtered[filtered[legend] == old_label].reset_index()[y_column]
+                _new = filtered[filtered[legend] == new_label].reset_index()[y_column]
+
+                if (len(_old) == 0) and (len(_new) == 0):
+                    # If there are no data points in the old or new tables for this country-column, skip this column.
+                    continue
+
+                if metric == "are_equal":
+                    condition = dataframes.are_equal(
+                        df1=_old.to_frame(),
+                        df2=_new.to_frame(),
+                        verbose=False,
+                        absolute_tolerance=absolute_tolerance,
+                        relative_tolerance=relative_tolerance,
+                    )[0]
+                elif metric == "bard_max":
+                    condition = max(bard(a=_old, b=_new, eps=bard_eps)) < bard_max
+                else:
+                    condition = metric(_old, _new)  # type: ignore
+
+                if condition:  # type: ignore
                     # If the old and new tables are equal for this country-column, skip this column.
                     continue
+
             # Prepare plot.
             fig = px.line(
                 filtered,
