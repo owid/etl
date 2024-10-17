@@ -30,24 +30,25 @@ def run(dest_dir: str) -> None:
         df_oil_spilled = extract_spill_quantity(quantity_text)
 
         assert df_oil_spilled.index.is_unique, "Index is not unique' for quantity of oil spilled."
-        df_oil_spilled.reset_index(inplace=True)
+        df_oil_spilled = df_oil_spilled.reset_index()
 
         # extract number of spills
         number_text = pdf.pages[5].extract_text()
         df_nspills = extract_spill_number(number_text)
         assert df_nspills.index.is_unique, "Index is not unique for oil spills'."
-        df_nspills.reset_index(inplace=True)
+        df_nspills = df_nspills.reset_index()
 
         # extract number of spills
         text_cause = pdf.pages[15].extract_text()
         df_7_7000, df_above_7000 = extract_cause_data(text_cause)
 
-    # Extract and merge oil spilled and number of spills
+    # Merge oil spilled and number of spills
     nsp_quant = pd.merge(df_nspills, df_oil_spilled, on="year", how="outer")
     nsp_quant["spill_type"] = "World"  #  World
 
     df_above_7000_cause_totals_pv = extract_cause_totals(df_above_7000, 2023, "Large (>700t)")
     df_below_7000_cause_totals_pv = extract_cause_totals(df_7_7000, 2023, "Medium (7-700t)")
+
     # Concatenate the two pivoted DataFrames along the row axis
     merged_causes = pd.concat([df_above_7000_cause_totals_pv, df_below_7000_cause_totals_pv], axis=0)
     # Append suffix '_causes' to non 'year' and 'spill_type' columns
@@ -55,7 +56,8 @@ def run(dest_dir: str) -> None:
         if column not in ["year", "spill_type"]:
             merged_causes = merged_causes.rename(columns={column: column + " causes"})
 
-    ops_df = extract_operations(df_above_7000, df_7_7000)  # Extract operationd during which oil spills
+    # Extract operations type during the oil spill
+    ops_df = extract_operations(df_above_7000, df_7_7000)
     # Merge operations_total with merged_causes on 'year' and 'spill_type'
     merge_cause_op = pd.merge(merged_causes, ops_df, on=["year", "spill_type"])
     # Merge nsp_quant (oil spilled and number of spills) with merge_cause_op (causes and operation type of indcidents) on 'year' and 'spill_type'
@@ -212,7 +214,8 @@ def extract_cause_data(text):
         ],
     )
     df_7_7000 = pd.DataFrame(
-        name_number_pairs_5, columns=["Cause", "Loading/Discharing", "Bunkering", "Other Operations", "Uknown", "Total"]
+        name_number_pairs_5,
+        columns=["Cause", "Loading/Discharing", "Bunkering", "Other Operations", "Unknown", "Total"],
     )
     # Updated cause names
     cause_mapping = {
@@ -261,6 +264,7 @@ def prepare_ops_dataframe(df, spill_type):
     ----
     The function assigns a constant year (2023) for all operations.
     """
+
     # Convert columns from the second one onwards to integers
     df[df.columns[1:]] = df[df.columns[1:]].astype(int)
 
@@ -341,14 +345,13 @@ def extract_cause_totals(df, year, spill_type):
         The processed DataFrame, which includes the total causes data, now reshaped and assigned with
         a 'year' and 'spill_type'.
     """
-    # Copy specific columns from DataFrame
-    df_cause_totals = df[["Cause", df.columns[-1]]].copy()
+    # Copy "Total" column from DataFrame
+    df_cause_totals = df[["Cause", "Total"]].copy()
     # Assign a constant year value to the 'year' column for DataFrame
     df_cause_totals["year"] = year
     # Pivot DataFrame to reshape it, setting 'year' as the index, 'Cause' as the columns, and 'Total' as the values
-    df_cause_totals_pv = df_cause_totals.pivot(index="year", columns="Cause", values="Total")
-    # Reset index
-    df_cause_totals_pv.reset_index(inplace=True)
+    df_cause_totals_pv = df_cause_totals.pivot(index="year", columns="Cause", values="Total").reset_index()
+
     # Assign a constant spill_type value to the 'spill_type' column for pivoted DataFrame
     df_cause_totals_pv["spill_type"] = spill_type
     return df_cause_totals_pv
