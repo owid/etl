@@ -7,7 +7,8 @@ definitions:
     processing_level: minor
     display:
       numDecimalPlaces: 0
-
+  footnote_decadal: |-
+   Decadal figures are measured as the annual average over the subsequent ten-year period. For example, the figures for the 1990s is the average from 1990 (inclusive) to 1999.
 
 
 # Learn more about the available fields:
@@ -21,118 +22,123 @@ tables:
       bel_700t:
         title: Medium oil spills (7-700 tonnes)
         unit: spills
+        description_short: Spills of 7-700 tonnes of oil.
 
       ab_700t:
         title: Large oil spills (>700 tonnes)
         unit: spills
+        description_short: Spills of more than 700 tonnes of oil.
 
       oil_spilled:
         title: Quantity of oil spilled
         unit: tonnes
         short_unit: t
+        description_short: Total quantity of oil spilled.
 
       allision_collision_causes:
-        title: Allision/collision causes
-        unit: causes
-        display:
-          name: Collision
+        title: Collision
+        unit: spills
 
       equipment_failure_causes:
-        title: Equipment failure causes
-        unit: causes
-        display:
-          name: Equipment failure
+        title: Equipment failure
+        unit: spills
 
       fire_explosion_causes:
-        title: Fire/explosion causes
-        unit: causes
-        display:
-          name: Fire/explosion
+        title: Fire/explosion
+        unit: spills
 
       grounding_causes:
-        title: Grounding causes
-        unit: causes
-        display:
-          name: Grounding
+        title: Grounding
+        unit: spills
 
       hull_failure_causes:
-        title: Hull failure causes
-        unit: causes
-        display:
-          name: Hull failure
+        title: Hull failure
+        unit: spills
 
       other_causes:
         title: Other causes
         description_short: Events such as heavy weather damage and human error have been categorised as 'Other'.
-        unit: causes
+        unit: spills
+        presentation:
+          title_public: Other
         display:
           name: Other
 
       unknown_causes:
         title: Unknown causes
         description_short: Spills where the relevant information is not available have been designated as 'Unknown'
+        unit: spills
+        presentation:
+          title_public: Unknown
         display:
           name: Unknown
-        unit: causes
 
       loading_discharing_ops:
-        title: Loading/discharging operations
-        display:
-          name: Loading/discharging
-        unit: operations
+        title: Loading/discharging
+        unit: spills
 
       bunkering_ops:
-        title: Bunkering operations
-        display:
-          name: Refueling
-        unit: operations
+        title: Refueling
+        unit: spills
 
       other_operations_ops:
         title: Other operations
+        unit: spills
         description_short: Other include operations such as ballisting, de-ballasting, tank cleaning and when the vessel is underway.
+        presentation:
+          title_public: Other
         display:
           name: Other
-        unit: operations
 
       uknown_ops:
         title: Unknown operations
+        unit: spills
+        presentation:
+          title_public: Unknown
         display:
           name: Unknown
-        unit: operations
 
       at_anchor_inland_ops:
-        title: At anchor (inland) operations
-        display:
-          name: At anchor (inland)
-        unit: operations
+        title: At anchor (inland)
+        unit: spills
 
       at_anchor_open_water_ops:
-        title: At anchor (open water) operations
-        display:
-          name: At anchor (open water)
-        unit: operations
+        title: At anchor (open water)
+        unit: spills
 
       underway_inland_ops:
-        title: Underway (inland) operations
-        display:
-          name: Underway (inland)
-        unit: operations
+        title: Underway (inland)
+        unit: spills
 
       underway_open_water_ops:
-        title: Underway (open water) operations
-        display:
-          name: Underway (open water)
-        unit: operations
+        title: Underway (open water)
+        unit: spills
+
+      total_ops:
+        title: Total operations
+        unit: spills
 
       decadal_bel_700t:
         title: Decadal medium oil spills (7-700 tonnes)
         unit: spills
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote_decadal}
 
       decadal_ab_700t:
         title: Decadal large oil spills (>700 tonnes)
         unit: spills
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote_decadal}
 
       decadal_oil_spilled:
         title: Decadal quantity of oil spilled
         unit: tonnes
         short_unit: t
+        presentation:
+          grapher_config:
+            note: |-
+              {definitions.footnote_decadal}
