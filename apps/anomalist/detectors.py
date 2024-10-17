@@ -1,12 +1,14 @@
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List, Literal
 
 import numpy as np
 import pandas as pd
-import plotly.express as px
 import structlog
-from owid.datautils.dataframes import map_series
+from sklearn.ensemble import IsolationForest
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import OneClassSVM
+from tqdm.auto import tqdm
 
-from etl import grapher_model as gm
 from etl.data_helpers.misc import bard
 
 log = structlog.get_logger()
@@ -75,58 +77,6 @@ class AnomalyDetector:
         df_nans[INDEX_COLUMNS] = df[INDEX_COLUMNS].copy()
         return df_nans
 
-    # Visually inspect the most significant anomalies on a certain scores dataframe.
-    def inspect_anomalies(
-        self,
-        df: pd.DataFrame,
-        variable_mapping: Dict[int, int],
-        metadata: Dict[int, gm.Variable],
-        anomalies: Optional[pd.DataFrame] = None,
-        n_anomalies: int = 10,
-    ) -> None:
-        # Select the most significant anomalies.
-        anomalies = anomalies.sort_values("anomaly_score", ascending=False).head(n_anomalies)  # type: ignore
-        # Reverse variable mapping.
-        variable_id_new_to_old = {v: k for k, v in variable_mapping.items()}
-        anomalies["variable_id_old"] = map_series(  # type: ignore
-            anomalies["variable_id"],  # type: ignore
-            variable_id_new_to_old,
-            warn_on_missing_mappings=False,  # type: ignore
-        )
-        for _, row in anomalies.iterrows():  # type: ignore
-            variable_id = row["variable_id"]
-            variable_name = metadata[variable_id].shortName  # type: ignore
-            country = row["country"]
-            score_name = row["anomaly_type"]
-            title = f'{country} ({row["year"]} - {score_name} {row["anomaly_score"]:.0%}) {variable_name}'
-            new = df[df["entity_name"] == row["entity_name"]][["entity_name", "year", variable_id]]
-            new = new.rename(columns={row["variable_id"]: variable_name}, errors="raise")
-            if score_name == "upgrade_change":
-                variable_id_old = row["variable_id_old"]
-                old = df[df["entity_name"] == row["entity_name"]][["entity_name", "year", variable_id_old]]
-                old = old.rename(columns={row["variable_id_old"]: variable_name}, errors="raise")
-                compare = pd.concat(
-                    [old.assign(**{"source": "old"}), new.assign(**{"source": "new"})], ignore_index=True
-                )
-                px.line(
-                    compare,
-                    x="year",
-                    y=variable_name,
-                    color="source",
-                    title=title,
-                    markers=True,
-                    color_discrete_map={"old": "rgba(256,0,0,0.5)", "new": "rgba(0,256,0,0.5)"},
-                ).show()
-            else:
-                px.line(
-                    new,
-                    x="year",
-                    y=variable_name,
-                    title=title,
-                    markers=True,
-                    color_discrete_map={"new": "rgba(0,256,0,0.5)"},
-                ).show()
-
 
 class AnomalyUpgradeMissing(AnomalyDetector):
     """New data misses entity-years that used to exist in old version."""
@@ -192,3 +142,81 @@ class AnomalyTimeChange(AnomalyDetector):
         df_time_change.loc[df_time_change["entity_name"] != df_time_change["entity_name"].shift(), variable_ids] = 0
 
         return df_time_change
+
+
+class AnomalyIsolationForest(AnomalyDetector):
+    """Anomaly detection using Isolation Forest, applied separately to each country-variable time series."""
+
+    anomaly_type = "isolation_forest"
+
+    def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+        # Initialize a dataframe of zeros.
+        df_anomalies = self.get_zeros_df(df, variable_ids)
+
+        # Initialize an imputer to handle missing values.
+        imputer = SimpleImputer(strategy="mean")
+
+        for variable_id in tqdm(variable_ids):
+            for country, group in df.groupby("entity_name", observed=True):
+                # Get the time series for the current country and variable.
+                series = group[[variable_id]].copy()
+
+                # Skip if the series is all zeros or nans.
+                if ((series == 0).all().values) or (series.dropna().shape[0] == 0):
+                    continue
+
+                # Impute missing values for this country's time series.
+                series_imputed = imputer.fit_transform(series)
+
+                # Scale the data.
+                scaler = StandardScaler()
+                series_scaled = scaler.fit_transform(series_imputed)
+
+                # Initialize the Isolation Forest model.
+                isolation_forest = IsolationForest(contamination=0.05, random_state=1)  # type: ignore
+
+                # Fit the model and calculate anomaly scores.
+                isolation_forest.fit(series_scaled)
+                scores = isolation_forest.decision_function(series_scaled)
+                df_anomalies.loc[df["entity_name"] == country, variable_id] = scores
+
+        return df_anomalies
+
+
+class AnomalyOneClassSVM(AnomalyDetector):
+    """Anomaly detection using One-Class SVM, applied separately to each country-variable time series."""
+
+    anomaly_type = "one_class_svm"
+
+    def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+        # Initialize a dataframe of zeros.
+        df_anomalies = self.get_zeros_df(df, variable_ids)
+
+        # Initialize an imputer to handle missing values.
+        imputer = SimpleImputer(strategy="mean")
+
+        for variable_id in tqdm(variable_ids):
+            for country, group in df.groupby("entity_name", observed=True):
+                # Get the time series for the current country and variable.
+                series = group[[variable_id]].copy()
+
+                # Skip if the series is all zeros or nans.
+                if ((series == 0).all().values) or (series.dropna().shape[0] == 0):
+                    continue
+
+                # Impute missing values for this country's time series.
+                series_imputed = imputer.fit_transform(series)
+
+                # Scale the data for better performance.
+                scaler = StandardScaler()
+                series_scaled = scaler.fit_transform(series_imputed)
+
+                # Initialize the One-Class SVM model for this country's time series.
+                svm = OneClassSVM(kernel="rbf", gamma="scale", nu=0.05)
+
+                # Fit the model and calculate anomaly scores.
+                svm.fit(series_scaled)
+                scores = svm.decision_function(series_scaled)
+                df_anomalies.loc[df["entity_name"] == country, variable_id] = scores
+
+        return df_anomalies
