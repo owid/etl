@@ -1,11 +1,13 @@
-"""Load two consecutive versions of an ETL grapher dataset, and identify the most significant changes.
+"""Detect anomalies in a given grapher dataset.
 
 """
 from typing import Dict, List, Optional, Tuple
 
+import click
 import pandas as pd
 import plotly.express as px
 from owid.datautils.dataframes import map_series
+from rich_click.rich_command import RichCommand
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
@@ -218,7 +220,28 @@ def inspect_anomalies(
         fig.show()
 
 
-def main(dataset_id: int, anomaly_type: str) -> None:
+@click.command(name="test_anomaly_detectors", cls=RichCommand, help=__doc__)
+@click.option(
+    "--dataset-id",
+    type=int,
+    # multiple=True,
+    # default=None,
+    help="Generate anomalies for the variables of a specific dataset ID.",
+)
+@click.option(
+    "--anomaly-type",
+    type=click.Choice(list(detectors_classes)),
+    # multiple=True,
+    default="upgrade_change",
+    help="Type of anomaly detection algorithm to use.",
+)
+@click.option(
+    "--n-anomalies",
+    type=int,
+    default=10,
+    help="Number of anomalies to plot.",
+)
+def main(dataset_id: int, anomaly_type: str, n_anomalies: int = 10) -> None:
     # Load all necessary data.
     df_data, metadata, variable_ids, variable_mapping = get_all_necessary_data(dataset_id=dataset_id)
 
@@ -263,5 +286,9 @@ def main(dataset_id: int, anomaly_type: str) -> None:
         df_data=df_data,
         metadata=metadata,
         variable_mapping=variable_mapping,
-        n_anomalies_max=100,
+        n_anomalies_max=n_anomalies,
     )
+
+
+if __name__ == "__main__":
+    main()
