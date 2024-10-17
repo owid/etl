@@ -478,9 +478,13 @@ class OWIDEnv:
         """Get dataset admin url."""
         return f"{self.admin_site}/datasets/{dataset_id}/"
 
+    def indicator_admin_site(self, variable_id: str | int) -> str:
+        """Get indicator admin url."""
+        return f"{self.admin_site}/variables/{variable_id}/"
+
     def variable_admin_site(self, variable_id: str | int) -> str:
         """Get variable admin url."""
-        return f"{self.admin_site}/variables/{variable_id}/"
+        return self.indicator_admin_site(variable_id)
 
     def chart_admin_site(self, chart_id: str | int) -> str:
         """Get chart admin url."""

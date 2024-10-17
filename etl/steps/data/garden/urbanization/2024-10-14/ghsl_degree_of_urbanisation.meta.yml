@@ -1,0 +1,131 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+    description_key:
+    - |-
+      **The Degree of Urbanisation (DEGURBA)**  is a method for capturing the urban-rural divide, designed for international comparisons. Developed by six organizations and endorsed by the UN, it uses a two-level classification.
+
+      The first level divides areas into cities, towns and suburbs, and rural areas, distinguishing between urban (cities, towns, suburbs) and rural regions. The second level adds detail, splitting towns and rural areas further.
+
+      This classification is based on 1 km² grid cells, grouped into urban centers, urban clusters, and rural cells. These grids are then used to classify smaller areas, typically using residential population grids from censuses or registers. If detailed data isn't available, a disaggregation grid estimates population distribution.
+
+      To predict future urbanization (2025 and 2030), both static (land features) and dynamic (past satellite images) components are used to project growth. DEGURBA defines cities by population, not administrative borders, aligning with UN guidelines, though fixed thresholds may not always capture local differences.
+
+    description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba), [towns and suburbs](#dod:towns-suburbs-degurba), and [rural areas](#dod:rural-areas-degurba) and estimate their respective populations.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ghsl_degree_of_urbanisation:
+    variables:
+      value:
+          title: |-
+            <% if location_type == "rural_total" and attribute == 'area' and type == 'estimates' %>
+            Land covered by rural areas (estimates)
+            <% elif location_type == "rural_total" and attribute == 'population' and type == 'estimates' %>
+            Population living in rural areas (estimates)
+            <% elif location_type == "rural_total" and attribute == 'share' and type == 'estimates' %>
+            Share of land covered by rural areas (estimates)
+            <% elif location_type == "rural_total" and attribute == 'popshare' and type == 'estimates' %>
+            Share of population living in rural areas (estimates)
+
+            <% elif location_type == "urban_centre" and attribute == 'area' and type == 'estimates' %>
+            Land covered by cities (estimates)
+            <% elif location_type == "urban_centre" and attribute == 'population' and type == 'estimates' %>
+            Population living in cities (estimates)
+            <% elif location_type == "urban_centre" and attribute == 'share' and type == 'estimates' %>
+            Share of land covered by cities (estimates)
+            <% elif location_type == "urban_centre" and attribute == 'popshare' and type == 'estimates' %>
+            Share of population living in cities (estimates)
+
+            <% elif location_type == "urban_cluster" and attribute == 'area' and type == 'estimates' %>
+            Land covered by towns and suburbs (estimates)
+            <% elif location_type == "urban_cluster" and attribute == 'population' and type == 'estimates' %>
+            Population living in towns and suburbs (estimates)
+            <% elif location_type == "urban_cluster" and attribute == 'share' and type == 'estimates' %>
+            Share of land covered by towns and suburbs (estimates)
+            <% elif location_type == "urban_cluster" and attribute == 'popshare' and type == 'estimates' %>
+            Share of population living in towns and suburbs (estimates)
+
+            <% elif location_type == "urban_total" and attribute == 'area' and type == 'estimates' %>
+            Land covered by urban areas (estimates)
+            <% elif location_type == "urban_total" and attribute == 'population' and type == 'estimates' %>
+            Population living in urban areas (estimates)
+            <% elif location_type == "urban_total" and attribute == 'share' and type == 'estimates' %>
+            Share of land covered by urban areas (estimates)
+            <% elif location_type == "urban_total" and attribute == 'popshare' and type == 'estimates' %>
+            Share of population living in urban areas (estimates)
+
+            <% elif location_type == "rural_total" and attribute == 'area' and type == 'projections' %>
+            Projected land covered by rural areas
+            <% elif location_type == "rural_total" and attribute == 'population' and type == 'projections' %>
+            Projected population living in rural areas
+            <% elif location_type == "rural_total" and attribute == 'share' and type == 'projections' %>
+            Projected share of land covered by rural areas
+            <% elif location_type == "rural_total" and attribute == 'popshare' and type == 'projections' %>
+            Projected share of population living in rural areas
+
+            <% elif location_type == "urban_centre" and attribute == 'area' and type == 'projections' %>
+            Projected land covered by cities
+            <% elif location_type == "urban_centre" and attribute == 'population' and type == 'projections' %>
+            Projected population living in cities
+            <% elif location_type == "urban_centre" and attribute == 'share' and type == 'projections' %>
+            Projected share of land covered by cities
+            <% elif location_type == "urban_centre" and attribute == 'popshare' and type == 'projections' %>
+            Projected share of population living in cities
+
+            <% elif location_type == "urban_cluster" and attribute == 'area' and type == 'projections' %>
+            Projected land covered by towns and suburbs
+            <% elif location_type == "urban_cluster" and attribute == 'population' and type == 'projections' %>
+            Projected population living in towns and suburbs
+            <% elif location_type == "urban_cluster" and attribute == 'share' and type == 'projections' %>
+            Projected share of land covered by towns and suburbs
+            <% elif location_type == "urban_cluster" and attribute == 'popshare' and type == 'projections' %>
+            Projected share of population living in towns and suburbs
+
+            <% elif location_type == "urban_total" and attribute == 'area' and type == 'projections' %>
+            Projected land covered by urban areas
+            <% elif location_type == "urban_total" and attribute == 'population' and type == 'projections' %>
+            Projected population living in urban areas
+            <% elif location_type == "urban_total" and attribute == 'share' and type == 'projections' %>
+            Projected share of land covered by urban areas
+            <% elif location_type == "urban_total" and attribute == 'popshare' and type == 'projections' %>
+            Projected share of population living in urban areas
+            <% endif %>
+          unit:
+            <% if attribute == 'area' %>
+            km²
+            <% elif attribute == 'population' %>
+            people
+            <% elif attribute == 'share' or attribute == 'popshare' %>
+            %
+            <%- endif -%>
+
+          short_unit:
+            <% if attribute == 'area' %>
+            km²
+            <% elif attribute == 'share' or attribute == 'popshare' %>
+            %
+            <%- endif -%>
+          description_processing:
+            <% if attribute == 'share' or attribute == 'popshare' %>
+            The share of total area or population for each urbanization level was calculated by dividing the area or population of each level (cities, towns and suburbs, rural areas) by the overall total, providing a percentage representation for each category.
+           <%- endif -%>
+          display:
+            numDecimalPlaces:
+                <% if attribute == 'area' %>
+                0
+                <% elif attribute == 'population' %>
+                0
+                <% elif attribute == 'share' or attribute == 'popshare' %>
+                1
+                <%- endif -%>

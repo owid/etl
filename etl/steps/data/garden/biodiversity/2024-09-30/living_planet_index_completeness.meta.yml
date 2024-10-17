@@ -1,0 +1,25 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Biodiversity
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 730
+
+
+tables:
+  living_planet_index_completeness:
+    variables:
+      species_in_lpi:
+        title: Number of species included in the LPI
+        unit: species
+      species_total:
+        title: Number of species in the taxonomic group
+        unit: species
+      species_not_in_lpi:
+        title: Number of species not included in the LPI
+        unit: species

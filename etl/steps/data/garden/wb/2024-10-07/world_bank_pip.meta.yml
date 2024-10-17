@@ -29,6 +29,8 @@ tables:
       headcount_ratio_215:
         presentation:
           title_public: Share of population living in extreme poverty
+          topic_tags:
+            - Poverty
           faqs:
             - fragment_id: poverty-international-poverty-line
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -80,6 +82,8 @@ tables:
       headcount_ratio_365:
         presentation:
           title_public: "Poverty: Share of population living on less than $3.65 a day"
+          topic_tags:
+            - Poverty
           faqs:
             - fragment_id: poverty-international-poverty-line
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -128,6 +132,8 @@ tables:
       headcount_ratio_685:
         presentation:
           title_public: "Poverty: Share of population living on less than $6.85 a day"
+          topic_tags:
+            - Poverty
           faqs:
             - fragment_id: poverty-international-poverty-line
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -177,6 +183,8 @@ tables:
       headcount_ratio_3000:
         presentation:
           title_public: Share of population living on less than $30 a day
+          topic_tags:
+            - Poverty
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -351,6 +359,8 @@ tables:
       headcount_215:
         presentation:
           title_public: Number of people living in extreme poverty
+          topic_tags:
+            - Poverty
           faqs:
             - fragment_id: poverty-international-poverty-line
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -402,7 +412,6 @@ tables:
         presentation:
           title_public: Gini Coefficient
           topic_tags:
-            - Poverty
             - Economic Inequality
           faqs:
             - fragment_id: poverty-comparability
@@ -464,10 +473,6 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: Total of population living in extreme poverty by world region
-          topic_tags:
-            - Poverty
-            - Economic Growth
-            - Economic Inequality
           faqs:
             - fragment_id: poverty-international-poverty-line
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -513,3 +518,14 @@ tables:
           For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only the consumption estimate in order to obtain a single series for each country. This means the indicator is estimating the number of years at least one survey was conducted in the past decade, rather than the number of surveys.
         display:
           numDecimalPlaces: 0
+
+      region_name:
+        title: World Bank PIP region
+        unit: ""
+        short_unit: ""
+        description_short: Regions of the world as defined by the World Bank Poverty and Inequality Platform (PIP).
+        description_key:
+          - The regions employed by the World Bank PIP differ from the regional groupings used by the World Bank in other contexts.
+          - Some economies, mostly high-income economies, are excluded from the geographical regions and are included as a separate group referred to as “other high income” (or “industrialized economies” or “rest of the world” in earlier publications).
+        presentation:
+          title_public: World regions according to World Bank Poverty and Inequality Platform

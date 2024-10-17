@@ -18,13 +18,13 @@ meta:
       - Primary and Secondary Outcome Measures: Statin utilization, measured using defined daily doses (DDDs) per 1000 population ≥40 years per day (TPD).
 
     # Citation
-    producer: Guadamuz , Shooshtari and Qato
+    producer: Guadamuz, Shooshtari and Qato
     citation_full: |-
       Guadamuz JS, Shooshtari A, Qato DM. Global, regional and national trends in statin utilisation in high-income and low/middle-income countries, 2015-2020.
 
     # Files
     url_main: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9462115/
-    url_download: 
+    url_download:
       https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9462115/bin/bmjopen-2022-061350supp001.pdf
     date_accessed: 2023-10-05
 
