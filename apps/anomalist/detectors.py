@@ -1,4 +1,4 @@
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -13,9 +13,6 @@ log = structlog.get_logger()
 
 # Name of index columns for dataframe.
 INDEX_COLUMNS = ["entity_name", "year"]
-
-# Define anomaly types.
-ANOMALY_TYPE = Literal["upgrade_change", "time_change", "upgrade_missing"]
 
 
 def estimate_bard_epsilon(series: pd.Series) -> float:
@@ -56,7 +53,8 @@ def get_long_format_score_df(df_score: pd.DataFrame) -> pd.DataFrame:
 class AnomalyDetector:
     anomaly_type: str
 
-    def get_text(self, entity: str, year: int) -> str:
+    @staticmethod
+    def get_text(entity: str, year: int) -> str:
         return f"Anomaly happened in {entity} in {year}!"
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
@@ -133,6 +131,10 @@ class AnomalyUpgradeMissing(AnomalyDetector):
 
     anomaly_type = "upgrade_missing"
 
+    @staticmethod
+    def get_text(entity: str, year: int) -> str:
+        return f"There are missing values for {entity}! There might be other data points affected."
+
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
         df_lost = self.get_zeros_df(df, variable_ids)
@@ -149,6 +151,10 @@ class AnomalyUpgradeChange(AnomalyDetector):
     """New dataframe has changed abruptly with respect to the old version."""
 
     anomaly_type = "upgrade_change"
+
+    @staticmethod
+    def get_text(entity: str, year: int) -> str:
+        return f"There are abrupt changes for {entity} in {year}! There might be other data points affected."
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
@@ -169,6 +175,10 @@ class AnomalyTimeChange(AnomalyDetector):
     """New dataframe has abrupt changes in time series."""
 
     anomaly_type = "time_change"
+
+    @staticmethod
+    def get_text(entity: str, year: int) -> str:
+        return f"There are significant changes for {entity} in {year} compared to the old version of the indicator. There might be other data points affected."
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.

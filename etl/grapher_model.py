@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Union, get_args, overload
 
 import humps
+import numpy as np
 import pandas as pd
 import requests
 import structlog
@@ -1274,7 +1275,7 @@ class Variable(Base):
         # Multiple path or id
         elif isinstance(id_or_path, list):
             # Filter the list to ensure only integers are passed
-            int_ids = [i for i in id_or_path if isinstance(i, int)]
+            int_ids = [i for i in id_or_path if isinstance(i, (int, np.integer))]
             str_ids = [i for i in id_or_path if isinstance(i, str)]
             # Multiple IDs
             if len(int_ids) == len(id_or_path):
@@ -1766,6 +1767,12 @@ class Anomaly(Base):
     # entity: Mapped[str] = mapped_column(VARCHAR(255))
     # year: Mapped[int] = mapped_column(Integer)
     # rawScore: Mapped[float] = mapped_column(Float)
+
+    def __repr__(self) -> str:
+        return (
+            f"<Anomaly(id={self.id}, createdAt={self.createdAt}, updatedAt={self.updatedAt}, "
+            f"datasetId={self.datasetId}, anomalyType={self.anomalyType})>"
+        )
 
     @hybrid_property
     def dfScore(self) -> Optional[pd.DataFrame]:  # type: ignore

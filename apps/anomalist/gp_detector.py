@@ -65,9 +65,14 @@ def _processing_queue(items: list[tuple[str, int]]) -> List[tuple]:
 class AnomalyGaussianProcessOutlier(AnomalyDetector):
     anomaly_type = "gp_outlier"
 
-    def __init__(self, max_time: Optional[float] = None, n_jobs: int = 1):
+    # TODO: max_time is hard-coded to 100, but it should be configurable in production
+    def __init__(self, max_time: Optional[float] = 100, n_jobs: int = 1):
         self.max_time = max_time
         self.n_jobs = n_jobs
+
+    @staticmethod
+    def get_text(entity: str, year: int) -> str:
+        return f"There are some outliers for {entity}! These were detected using Gaussian processes. There might be other data points affected."
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Convert to long format
@@ -126,6 +131,10 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         log.info("Finished processing", elapsed=round(time.time() - start_time, 2))
 
         df_score_long = pd.concat(results).reset_index()
+
+        # Normalize the anomaly scores by mapping interval (0, 3+) to (0, 1)
+        df_score_long["anomaly_score"] = np.minimum(df_score_long["anomaly_score"] / 3, 1)
+
         return df_score_long
 
     @staticmethod
