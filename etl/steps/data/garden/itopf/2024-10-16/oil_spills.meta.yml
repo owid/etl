@@ -90,7 +90,7 @@ tables:
         display:
           name: Other
 
-      uknown_ops:
+      unknown_ops:
         title: Unknown operations
         unit: spills
         presentation:
