@@ -91,6 +91,26 @@ def load_variable(
     return variable
 
 
+# Load variable object
+def load_variables(
+    ids_or_paths: List[str | int],
+    owid_env: OWIDEnv = OWID_ENV,
+) -> List[Variable]:
+    """Load variable.
+
+    If id_or_path is str, it'll be used as catalog path.
+
+    TODO: this should be merged with load_variable!
+    """
+    with Session(owid_env.engine) as session:
+        variable = Variable.from_id_or_path(
+            session=session,
+            id_or_path=ids_or_paths,
+        )
+
+    return variable
+
+
 ##############################################################################################
 # Load data/metadata (API)
 ##############################################################################################

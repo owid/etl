@@ -145,7 +145,7 @@ def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **k
     components.html(HTML, height=height, **kwargs)
 
 
-def tag_in_md(tag_name: str, color: str, icon: str):
+def tag_in_md(tag_name: str, color: str, icon: Optional[str] = None):
     """Create a custom HTML tag.
 
     Parameters
@@ -157,7 +157,10 @@ def tag_in_md(tag_name: str, color: str, icon: str):
     icon: str
         Icon of the tag. Can be material (e.g. ':material/upgrade:') or emoji (e.g. '🪄').
     """
-    return f":{color}-background[{icon}: {tag_name}]"
+    if icon is not None:
+        return f":{color}-background[{icon}: {tag_name}]"
+    else:
+        return f":{color}-background[{tag_name}]"
 
 
 def st_tag(tag_name: str, color: str, icon: str):
