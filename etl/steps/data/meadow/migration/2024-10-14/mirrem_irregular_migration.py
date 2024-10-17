@@ -9,17 +9,17 @@ paths = PathFinder(__file__)
 
 
 POP_GROUPS = {
-    "All irregular migrants": "All irregular migrants",
-    "Non-registered people resident for more than 12 months in Austria": "All irregular migrants",
-    "All irregular migrants (including asylum-seekers)": "All irregular migrants (including asylum-seekers)",
-    "All irregular migrants (excluding asylum-seekers)": "All irregular migrants",
-    "All irregular migrants of non-Schengen nationality": "All irregular migrants",
-    "Undocumented migrants": "All irregular migrants",
-    "Third-country nationals without required permissions and unknown to authorities": "All irregular migrants",
-    "Irregular migrants eligible for regularisation": "Irregular migrants eligible for regularisation",
-    "Total undocumented population in the US": "All irregular migrants",
-    "Total irregular migrant population": "All irregular migrants",
-    "Total unauthorised immigrant population in the US ": "All irregular migrants",
+    "All irregular migrants": "all_irregular",
+    "Non-registered people resident for more than 12 months in Austria": "all_irregular",
+    "All irregular migrants (including asylum-seekers)": "all_irregular_incl_asylum",
+    "All irregular migrants (excluding asylum-seekers)": "all_irregular",
+    "All irregular migrants of non-Schengen nationality": "all_irregular",
+    "Undocumented migrants": "all_irregular",
+    "Third-country nationals without required permissions and unknown to authorities": "all_irregular",
+    "Total undocumented population in the US": "all_irregular",
+    "Total irregular migrant population": "all_irregular",
+    "Total unauthorised immigrant population in the US ": "all_irregular",
+    "Irregular migrants eligible for regularisation": "all_irregular",
 }
 
 COLS_TO_KEEP = [
@@ -48,15 +48,15 @@ def run(dest_dir: str) -> None:
     tb["population"] = tb["PopulationGroup"].apply(lambda x: POP_GROUPS[x])
 
     # remove identical data points
-    tb = tb.drop_duplicates(subset=["Country", "Year", "LowEstimate", "CentralEstimate", "HighEstimate"], keep="first")
+    tb = tb.drop_duplicates(
+        subset=["Country", "Year", "population", "LowEstimate", "CentralEstimate", "HighEstimate"], keep="first"
+    )
 
     # replace timeframes with midpoints
     tb["Year"] = tb["Year"].apply(fix_timeframes)
 
     # choose one data point per country and year
     tb = remove_duplicates(tb)
-
-    tb.m.short_name = "mirrem_irregular_migration"
 
     # Keep only the columns we need
     tb = tb.drop(columns=[col for col in tb.columns if col not in COLS_TO_KEEP])
@@ -89,10 +89,10 @@ def remove_duplicates(tb):
             these_dupl = duplicates[
                 (duplicates["Country"] == country)
                 & (duplicates["Year"] == year)
-                & (duplicates["population"] == "All irregular migrants")
+                & (duplicates["population"] == "all_irregular")
             ]
             row = these_dupl
-            if len(these_dupl) > 0:
+            if len(these_dupl) > 1:
                 tb = tb.drop(these_dupl.index)
                 if country == "Austria":
                     row = these_dupl[
@@ -135,9 +135,9 @@ def remove_duplicates(tb):
                     row = these_dupl[these_dupl["AggregateScore"] == "High"]
                     if len(row) > 1:
                         row = these_dupl[these_dupl["AggregateNum"] == 11.5]
-                    if len(row) == 0:
+                    elif len(row) == 0:
                         row = these_dupl[these_dupl["AccessScore"] == "High"]
-                assert len(row) == 1, f"Multiple rows found for {country} in {year}"
+                assert len(row) == 1, f"Multiple or no rows found for {country} in {year}: {row}"
                 tb = pd.concat([tb, row]).copy_metadata(tb)
     return tb
 
