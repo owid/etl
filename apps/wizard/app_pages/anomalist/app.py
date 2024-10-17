@@ -25,7 +25,7 @@ from typing import List, Tuple, cast
 import pandas as pd
 import streamlit as st
 
-from apps.anomalist.anomalist_api import anomaly_detection
+from apps.anomalist.anomalist_api import anomaly_detection, load_detector
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens, get_number_tokens
 from apps.wizard.app_pages.anomalist.utils import (
     AnomalyTypeEnum,
@@ -72,8 +72,7 @@ ANOMALY_TYPES = {
     },
 }
 ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
-# TODO: Remove the `t != AnomalyTypeEnum.GP_OUTLIER.value` bit to also query for GP outliers.
-ANOMALY_TYPES_TO_DETECT = tuple(t for t in ANOMALY_TYPES.keys() if t != AnomalyTypeEnum.GP_OUTLIER.value)
+ANOMALY_TYPES_TO_DETECT = tuple(ANOMALY_TYPES.keys())
 
 # GPT
 MODEL_NAME = "gpt-4o"
@@ -346,16 +345,7 @@ def show_anomaly_compact(index, df):
     indicator_uri = st.session_state.anomalist_indicators.get(indicator_id)
 
     # Generate descriptive text. Only contains information about top-scoring entity.
-    if an_type == AnomalyTypeEnum.TIME_CHANGE.value:
-        text = f"There are significant changes for {entity_default} in {year_default} compared to the old version of the indicator. There might be other data points affected."
-    elif an_type == AnomalyTypeEnum.UPGRADE_CHANGE.value:
-        text = f"There are abrupt changes for {entity_default} in {year_default}! There might be other data points affected."
-    elif an_type == AnomalyTypeEnum.UPGRADE_MISSING.value:
-        text = f"There are missing values for {entity_default}! There might be other data points affected."
-    elif an_type == AnomalyTypeEnum.GP_OUTLIER.value:
-        text = f"There are some outliers for {entity_default}! These were detected using Gaussian processes. There might be other data points affected."
-    else:
-        raise ValueError(f"Unknown anomaly type: {an_type}")
+    text = load_detector(an_type).get_text(entity_default, year_default)
 
     # Render
     with st.container(border=True):
