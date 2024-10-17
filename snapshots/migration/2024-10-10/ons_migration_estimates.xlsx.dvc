@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Long-term international immigration, emigration and net migration flows, provisional
+    description: |-
+      Estimates for UK immigration, emigration and net migration, year ending June 2012 to year ending December 2023. These are official statistics in development. 
+    date_published: "2024-05-23"
+    version_producer: Year ending Decemder 2023
+
+    # Citation
+    producer: Office for National Statistics
+    citation_full: |-
+      Office for National Statistics (ONS), released 23 March 2024, ONS website, dataset, Long-term international immigration, emigration and net migration flows, provisional (2024)
+    attribution_short: ONS
+
+    # Files
+    url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/internationalmigration/datasets/longterminternationalimmigrationemigrationandnetmigrationflowsprovisional
+    url_download: https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/populationandmigration/internationalmigration/datasets/longterminternationalimmigrationemigrationandnetmigrationflowsprovisional/yearendingdecember2023/december23ltimaccessible.xlsx
+    date_accessed: 2024-10-10
+
+    # License
+    license:
+      name: OGLv3.0
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+
+outs:
+  - md5: b3fab8a419227ba79c5373cf8940f820
+    size: 1547429
+    path: ons_migration_estimates.xlsx

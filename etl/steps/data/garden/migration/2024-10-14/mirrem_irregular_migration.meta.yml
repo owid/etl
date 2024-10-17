@@ -1,0 +1,50 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+    short_unit: ""
+    processing_level: major
+    description_processing: |-
+      - The MIrreM data base often includes multiple estimates for the same country and year. In these cases, we chose the estimate with the highest "Aggregate Score" (a measure of the transparency and data availability of the estimate) as the estimate we use.
+      - If only a range of estimates was available, the central estimate refers to the midpoint of that range. The lower and upper estimates are the lower and upper bounds of the range, respectively.
+      - Some estimates where only given as an upper bound (e.g. <100,000). In that case we used the upper bound (e.g. 100,000) as the higher bound of the estimate and 0 as the lower bound. In this example this leads to a midpoint estimate of 50,000.
+    description_key:
+      - These estimates are collected from a variety of sources, including government statistics, academic studies or other publications. They differ in terms of methodology, data sources, and definitions of "irregular migration".
+      - Since different countries use different definitions of "irregular migration", the estimates in this data set are not directly comparable across countries.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  mirrem_irregular_migration:
+    variables:
+      low_est_all_irregular:
+        title: Irregular migrants living in this country - lower bound estimate
+        description_short: The lower bound estimate of irregular migrants currently living in this country.
+        unit: migrants
+      centr_est_all_irregular:
+        title: Irregular migrants living in this country
+        description_short: Estimation of irregular migrants currently living in this country. Where only a range of estimates is available, this is the midpoint of that range.
+        unit: migrants
+      high_est_all_irregular:
+        title: Irregular migrants living in this country - higher bound estimate
+        description_short: The upper bound estimate of irregular migrants currently living in this country.
+        unit: migrants
+      low_est_all_irregular_incl_asylum:
+        title: Irregular migrants living in this country, including asylum seekers - lower bound estimate
+        description_short: The lower bound estimate of irregular migrants currently living in this country, including asylum seekers.
+        unit: migrants
+      centr_est_all_irregular_incl_asylum:
+        title: Irregular migrants living in this country, including asylum seekers
+        description_short: Estimation of irregular migrants currently living in this country, including asylum seekers. Where only a range of estimates is available, this is the midpoint of that range.
+        unit: migrants
+      high_est_all_irregular_incl_asylum:
+        title: Irregular migrants living in this country, including asylum seekers - higher bound estimate
+        description_short: The upper bound estimate of irregular migrants currently living in this country, including asylum seekers.
+        unit: migrants
