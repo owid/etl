@@ -47,10 +47,17 @@ def run(dest_dir: str) -> None:
         "new_deaths": "new_conf_deaths",
     }
     tb_africa = tb_africa.rename(columns=rename_dict, errors="raise")
-    # tb_suspected = ds_suspected["global_health_mpox"].reset_index()
-    # cols = ["country", "date", "suspected_cases_cumulative"]
-    # tb_suspected = tb_suspected[cols]
-    # assert tb_suspected.shape[1] == len(cols)
+    # Suspected cases are the sum of confirmed and suspected cases
+    tb_africa["total_suspected_cases"] = tb_africa["total_suspected_cases"] - tb_africa["total_conf_cases"]
+    tb_africa["total_suspected_deaths"] = tb_africa["total_suspected_deaths"] - tb_africa["total_conf_deaths"]
+    tb_africa["new_suspected_cases"] = tb_africa["new_suspected_cases"] - tb_africa["new_conf_cases"]
+    tb_africa["new_suspected_deaths"] = tb_africa["new_suspected_deaths"] - tb_africa["new_conf_deaths"]
+    assert tb_africa["total_suspected_cases"].min() >= 0
+    assert tb_africa["total_suspected_deaths"].min() >= 0
+    assert tb_africa["new_suspected_cases"].min() >= 0
+    assert tb_africa["new_suspected_deaths"].min() >= 0
+
+    # Grab origins metadata
     origins = tb["total_conf_cases"].metadata.origins
     #
     # Process data.
@@ -82,8 +89,6 @@ def run(dest_dir: str) -> None:
         .pipe(derive_metrics)
         .pipe(filter_dates)
     )
-
-    # tb_both = pr.merge(tb, tb_suspected, on=["country", "date"], how="outer")
 
     # For variables on deaths we should show that data reported by the WHO show _only_ confirmed cases, in an annotation
     country_mask = tb["country"] == "Democratic Republic of Congo"
