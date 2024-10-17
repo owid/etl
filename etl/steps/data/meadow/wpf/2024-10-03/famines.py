@@ -78,6 +78,8 @@ def run(dest_dir: str) -> None:
     # Combine famines for the African Red Sea Region and Hungerplan as the mortality estimate exists for just the total rather than each entry
     tb = combine_entries(tb)
 
+    tb = tb.rename(columns={"Place": "country"})
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["date", "conventional_title"])
 
