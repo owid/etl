@@ -37,11 +37,11 @@ definitions:
 
       <%- endif -%>
     time_filling_processing: |-
-      <% if conflict_type == "all" %>
+      <%-if conflict_type == "all" -%>
       We extend the time-series to 2007, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no interstate wars for the years since 2003.
-      <% elif conflict_type == "inter-state" %>
+      <%-elif conflict_type == "inter-state" -%>
       We extend the time-series to 2010, by drawing on Correlates of War's Directed Dyadic Interstate War Dataset (version 4.01), which identifies no wars for the years since 2003.
-      <% endif %>
+      <%-endif -%>
 
   number_ongoing_conflicts:
     description_short: |-
@@ -73,13 +73,13 @@ definitions:
       - "{definitions.all.conflict_type}"
       - We count a war as new in a region even if the war started at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
       - |-
-        <% if conflict_type == "all" %>
+        <%- if conflict_type == "all" -%>
         We only count a war as new when the war overall started that year, not if it restarted.
-        <% elif conflict_type == "intra-state (internationalized)" %>
+        <%- elif conflict_type == "intra-state (internationalized)" -%>
         We also only count an internationalized intrastate war as new when the war overall started that year, not if it became internationalized.
-        <% elif conflict_type == "intra-state (non-internationalized)" %>
+        <%- elif conflict_type == "intra-state (non-internationalized)" -%>
         We also only count a non-internationalized intrastate war as new when the war overall started that year, not if it stopped being internationalized.
-        <% endif %>
+        <%- endif -%>
       - "{definitions.all.time_filling_processing}"
 
   number_deaths:
@@ -107,11 +107,11 @@ definitions:
       - "{definitions.all.conflict_type}"
       - For wars without any deaths estimate, we conservatively coded Correlates of War's lower bound for including a war, 1,000 deaths each year.
       # - |-
-      #   <% if conflict_type == "all" %>
+      #   <%-if conflict_type == "all" -%>
       #   If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
-      #   <% elif conflict_type == "inter-state" %>
+      #   <%-elif conflict_type == "inter-state" -%>
       #   If a war was ongoing in more than one world region, we distributed its deaths across the regions of the participants.
-      #   <% endif %>
+      #   <%-endif -%>
       - "{definitions.all.time_filling_processing}"
       - If a war lasted more than one year, we distributed its deaths evenly across years.
 
@@ -138,7 +138,7 @@ tables:
           <%- elif conflict_type == "intra-state (non-internationalized)" -%>
           State participated in at least one non-internationalized intrastate war that year.
 
-          <% else -%>
+          <%-else -%>
           State participated in at least one << conflict_type.replace("-", "") >> war that year.
 
           <%- endif -%>
@@ -159,7 +159,7 @@ tables:
           <%- elif conflict_type == "intra-state (non-internationalized)" -%>
           Included are states that were primary participants in at least one non-internationalized intrastate war that year.
 
-          <% else -%>
+          <%- else -%>
           Included are states that were primary participants in at least one << conflict_type >> war that year.
 
           <%- endif -%>
@@ -186,7 +186,7 @@ tables:
           <%- elif conflict_type == "intra-state (non-internationalized)" -%>
           At least one non-internationalized intrastate war event took place in this country in a given year.
 
-          <% else -%>
+          <%-else -%>
           At least one << conflict_type >> war event took place in this country in a given year.
 
           <%- endif -%>
@@ -211,7 +211,7 @@ tables:
           <%- elif conflict_type == "intra-state (non-internationalized)" -%>
           Included are non-internationalized wars that caused at least one death in the country that year.
 
-          <% else -%>
+          <%- else -%>
           Included are << conflict_type >> wars that caused at least one death in the country that year.
 
           <%- endif -%>

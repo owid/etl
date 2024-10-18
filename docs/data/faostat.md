@@ -209,10 +209,10 @@ Using data from garden, we create an additional dataset in the `explorers` chann
 These are the steps OWID follows to ensure that FAOSTAT data is up-to-date, or to update one or more datasets for
 which there is new data (let us call the new dataset version to be created `YYYY-MM-DD`):
 
-0. Activate the etl poetry environment (from the root folder of the etl repository):
+0. Activate the etl virtual environment (from the root folder of the etl repository):
 
 ```bash
-  poetry shell
+  . .venv/bin/activate
 ```
 
 1.  Execute the ingestion script, to fetch data for any dataset that may have been updated in FAOSTAT.

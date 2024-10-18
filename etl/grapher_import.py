@@ -21,9 +21,11 @@ from typing import Dict, List, Optional, cast
 import pandas as pd
 import structlog
 from owid import catalog
-from owid.catalog import utils
+from owid.catalog import Table, VariableMeta, utils
+from owid.catalog.utils import hash_any
 from sqlalchemy import select, text, update
 from sqlalchemy.engine.base import Engine
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from apps.backport.datasync import data_metadata as dm
@@ -49,12 +51,6 @@ CURRENT_DIR = os.path.dirname(__file__)
 class DatasetUpsertResult:
     dataset_id: int
     source_ids: Dict[int, int]
-
-
-@dataclass
-class VariableUpsertResult:
-    variable_id: int
-    source_id: int
 
 
 def upsert_dataset(
@@ -193,26 +189,10 @@ def _update_variables_metadata(table: catalog.Table) -> None:
             meta.description_key = [k for k in meta.description_key if k.strip()]
 
 
-def upsert_table(
-    engine: Engine,
-    admin_api: AdminAPI,
-    table: catalog.Table,
-    dataset_upsert_result: DatasetUpsertResult,
-    catalog_path: Optional[str] = None,
-    dimensions: Optional[gm.Dimensions] = None,
-    verbose: bool = True,
-) -> VariableUpsertResult:
-    """This function is used to put one ready to go formatted Table (i.e.
-    in the format (year, entityId, value)) into mysql. The metadata
-    of the variable is used to fill the required fields.
-    """
-
-    # We sometimes get a warning, but it's unclear where it is coming from
-    # Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
-    warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-    assert set(table.index.names) == {"year", "entity_id"}, (
-        "Tables to be upserted must have only 2 indices: year and entity_id. Instead" f" they have: {table.index.names}"
+def _check_upserted_table(table: Table) -> None:
+    assert set(table.index.names) == {"year", "entityId", "entityCode", "entityName"}, (
+        "Tables to be upserted must have 4 indices: year, entityId, entityCode, entityName. Instead"
+        f" they have: {table.index.names}"
     )
     assert len(table.columns) == 1, (
         "Tables to be upserted must have only 1 column. Instead they have:" f" {table.columns.names}"
@@ -221,24 +201,15 @@ def upsert_table(
     assert table.iloc[:, 0].notnull().all(), (
         "Tables to be upserted must have no null values. Instead they" f" have:\n{table.loc[table.iloc[:, 0].isnull()]}"
     )
-    table = table.reorder_levels(["year", "entity_id"])
-    assert (
-        table.index.dtypes.iloc[0] in gh.INT_TYPES  # type: ignore[reportAttributeAccessIssue]
-    ), f"year must be of an integer type but was: {table.index.dtypes.iloc[0]}"  # type: ignore[reportAttributeAccessIssue]
-    assert (
-        table.index.dtypes.iloc[1] in gh.INT_TYPES  # type: ignore[reportAttributeAccessIssue]
-    ), f"entity_id must be of an integer type but was: {table.index.dtypes.iloc[1]}"  # type: ignore[reportAttributeAccessIssue]
     utils.validate_underscore(table.metadata.short_name, "Table's short_name")
     utils.validate_underscore(table.columns[0], "Variable's name")
 
     # make sure we have unique (year, entity_id) pairs
-    vc = table.index.value_counts()
+    pairs = table.index.get_level_values("entityName").astype(str) + table.index.get_level_values("year").astype(str)
+    vc = pairs.value_counts()
     if (vc > 1).any():
-        with Session(engine) as session:
-            duplicates = [
-                (year, entity_id, _get_entity_name(session, entity_id)) for year, entity_id in vc[vc > 1].index.tolist()
-            ]
-        raise AssertionError(f"Duplicates (year, entity_id, entity_name):\n {duplicates}")
+        duplicates = vc[vc > 1].index.tolist()
+        raise AssertionError(f"Duplicates (entityName, year):\n {duplicates}")
 
     if len(table.iloc[:, 0].metadata.sources) > 1:
         raise NotImplementedError(
@@ -249,137 +220,202 @@ def upsert_table(
 
     assert not gh.contains_inf(table.iloc[:, 0]), f"Column `{table.columns[0]}` has inf values"
 
+
+def upsert_table(
+    engine: Engine,
+    admin_api: AdminAPI,
+    table: Table,
+    dataset_upsert_result: DatasetUpsertResult,
+    catalog_path: str,
+    dimensions: Optional[gm.Dimensions] = None,
+    verbose: bool = True,
+) -> None:
+    """This function is used to put one ready to go formatted Table (i.e.
+    in the format (year, entityId, value)) into mysql. The metadata
+    of the variable is used to fill the required fields.
+    """
+
+    # We sometimes get a warning, but it's unclear where it is coming from
+    # Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+    _check_upserted_table(table)
+
     _update_variables_metadata(table)
 
+    # For easy retrieveal of the value series we store the name
+    column_name = table.columns[0]
+    variable_meta: VariableMeta = table[column_name].metadata
+
+    # All following functions assume that `value` is string
+    # NOTE: we could make the code more efficient if we didn't convert `value` to string
+    # TODO: can we avoid setting & resetting index back and forth?
+    df = table.reset_index().rename(columns={column_name: "value"})
+    df["value"] = df["value"].astype("string")
+
+    checksum_data = calculate_checksum_data(df)
+    checksum_metadata = calculate_checksum_metadata(variable_meta, df)
+
     with Session(engine) as session:
-        # For easy retrieveal of the value series we store the name
-        column_name = table.columns[0]
-        variable_meta: catalog.VariableMeta = table[column_name].metadata
+        # compare checksums
+        try:
+            db_variable = gm.Variable.from_catalog_path(session, catalog_path)
+        except NoResultFound:
+            db_variable = None
 
-        # Timespan does not work for yearIsDay variables
-        if (variable_meta.display or {}).get("yearIsDay"):
-            timespan = ""
-        else:
-            years = table.index.unique(level="year").values
-            if len(years) == 0:
-                timespan = ""
-            else:
-                min_year = min(years)
-                max_year = max(years)
-                timespan = f"{min_year}-{max_year}"
-
-        # sort table to get deterministic checksum later on
-        table = table.sort_index()
-
-        table.reset_index(inplace=True)
-
-        source_id = _add_or_update_source(session, variable_meta, column_name, dataset_upsert_result)
-
-        with origins_table_lock:
-            db_origins = _add_or_update_origins(session, variable_meta.origins)
-            # commit within the lock to make sure other threads get the latest sources
-            session.commit()
-
-        # pop grapher_config from variable metadata, later we send it to Admin API
-        if variable_meta.presentation and variable_meta.presentation.grapher_config:
-            grapher_config = variable_meta.presentation.grapher_config
-            variable_meta.presentation.grapher_config = None
-        else:
-            grapher_config = None
-
-        db_variable = gm.Variable.from_variable_metadata(
-            variable_meta,
-            short_name=column_name,
-            timespan=timespan,
-            dataset_id=dataset_upsert_result.dataset_id,
-            source_id=source_id,
+        upsert_metadata_kwargs = dict(
+            session=session,
+            df=df,
+            variable_meta=variable_meta,
+            column_name=column_name,
+            dataset_upsert_result=dataset_upsert_result,
             catalog_path=catalog_path,
             dimensions=dimensions,
-        ).upsert(session)
-        db_variable_id = db_variable.id
-        assert db_variable_id
-
-        df = table.rename(columns={column_name: "value", "entity_id": "entityId"})
-
-        # following functions assume that `value` is string
-        # NOTE: we could make the code more efficient if we didn't convert `value` to string
-        df["value"] = df["value"].astype(str)
-
-        if not db_variable.type:
-            db_variable.type = db_variable.infer_type(df["value"])
-
-        # NOTE: we could prefetch all entities in advance, but it's not a bottleneck as it takes
-        # less than 10ms per variable
-        df = dm.add_entity_code_and_name(session, df)
-
-        # update links, we need to do it after we commit deleted relationships above
-        db_variable.update_links(
-            session,
-            db_origins,
-            faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],
-            tag_names=variable_meta.presentation.topic_tags if variable_meta.presentation else [],
+            admin_api=admin_api,
         )
-        session.add(db_variable)
 
-        # we need to commit changes because `upload_data_and_metadata_to_r2` pulls all data from MySQL
-        # and sends it to R2
-        # NOTE: we could optimize this by evading pulling from MySQL and instead constructing JSON files from objects
-        #   we have available
+        # create variable if it doesn't exist
+        if not db_variable:
+            db_variable = upsert_metadata(**upsert_metadata_kwargs)
+            upsert_data(df, db_variable.s3_data_path())
+
+        # variable exists
+        else:
+            if db_variable.dataChecksum == checksum_data and db_variable.metadataChecksum == checksum_metadata:
+                if verbose:
+                    log.info("upsert_table.skipped_no_changes", size=len(df), variable_id=db_variable.id)
+                return
+
+            # NOTE: sequantial upserts are slower than parallel, but they will be useful once we switch to asyncio
+            # if db_variable.dataChecksum != checksum_data:
+            #     upsert_data(df, db_variable.s3_data_path())
+            # if db_variable.metadataChecksum != checksum_metadata:
+            #     db_variable = upsert_metadata(**upsert_metadata_kwargs)
+
+            futures = {}
+            with ThreadPoolExecutor() as executor:
+                if db_variable.dataChecksum != checksum_data:
+                    futures["data"] = executor.submit(upsert_data, df, db_variable.s3_data_path())
+
+                if db_variable.metadataChecksum != checksum_metadata:
+                    futures["metadata"] = executor.submit(upsert_metadata, **upsert_metadata_kwargs)
+
+            if futures:
+                # Wait for futures to complete in case exceptions are raised
+                if "data" in futures:
+                    futures["data"].result()
+                if "metadata" in futures:
+                    db_variable = futures["metadata"].result()
+
+        # Update checksums
+        db_variable.dataChecksum = checksum_data
+        db_variable.metadataChecksum = checksum_metadata
+
+        # Commit new checksums
+        session.add(db_variable)
         session.commit()
 
-        # grapher_config needs to be sent to Admin API because it has side effects
-        if grapher_config:
-            admin_api.put_grapher_config(db_variable_id, grapher_config)
-        # grapher_config does not exist, but it's still in the database -> delete it
-        elif not grapher_config and db_variable.grapherConfigIdETL:
-            admin_api.delete_grapher_config(db_variable_id)
-
-        # upload data and metadata to R2
-        upload_data_and_metadata_to_r2(session, df, db_variable, verbose=verbose)
-
-        return VariableUpsertResult(db_variable_id, source_id)  # type: ignore
+        if verbose:
+            log.info("upsert_table.uploaded_to_s3", size=len(df), variable_id=db_variable.id)
 
 
-def upload_data_and_metadata_to_r2(
-    session: Session, df: pd.DataFrame, db_variable: gm.Variable, verbose: bool = False
-) -> None:
-    """Uploads variable data and metadata as JSONs to R2."""
-    # process data and metadata
+def upsert_data(df: pd.DataFrame, s3_data_path: str):
+    # upload data to R2
     var_data = dm.variable_data(df)
-    var_metadata = dm.variable_metadata(session, db_variable.id, df)
-
     var_data_str = json.dumps(var_data, default=str)
+    upload_gzip_string(var_data_str, s3_data_path)
+
+
+def upsert_metadata(
+    session: Session,
+    df: pd.DataFrame,
+    variable_meta: VariableMeta,
+    column_name: str,
+    dataset_upsert_result: DatasetUpsertResult,
+    catalog_path: str,
+    dimensions: Optional[gm.Dimensions],
+    admin_api: AdminAPI,
+) -> gm.Variable:
+    timespan = _get_timespan(df, variable_meta)
+
+    source_id = _add_or_update_source(session, variable_meta, column_name, dataset_upsert_result)
+
+    with origins_table_lock:
+        db_origins = _add_or_update_origins(session, variable_meta.origins)
+        # commit within the lock to make sure other threads get the latest sources
+        session.commit()
+
+    # pop grapher_config from variable metadata, later we send it to Admin API
+    if variable_meta.presentation and variable_meta.presentation.grapher_config:
+        grapher_config = variable_meta.presentation.grapher_config
+        variable_meta.presentation.grapher_config = None
+    else:
+        grapher_config = None
+
+    db_variable = gm.Variable.from_variable_metadata(
+        variable_meta,
+        short_name=column_name,
+        timespan=timespan,
+        dataset_id=dataset_upsert_result.dataset_id,
+        source_id=source_id,
+        catalog_path=catalog_path,
+        dimensions=dimensions,
+    ).upsert(session)
+    db_variable_id = db_variable.id
+    assert db_variable_id
+
+    # TODO: `type` is part of metadata, but not part of checksum!
+    if not db_variable.type:
+        db_variable.type = db_variable.infer_type(df["value"])
+
+    # update links, we need to do it after we commit deleted relationships above
+    db_variable.update_links(
+        session,
+        db_origins,
+        faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],
+        tag_names=variable_meta.presentation.topic_tags if variable_meta.presentation else [],
+    )
+    session.add(db_variable)
+
+    # we need to commit changes because `dm.variable_metadata` pulls all data from MySQL
+    # and sends it to R2
+    # NOTE: we could optimize this by evading pulling from MySQL and instead constructing JSON files from objects
+    #   we have available
+    session.commit()
+
+    # grapher_config needs to be sent to Admin API because it has side effects
+    if grapher_config:
+        admin_api.put_grapher_config(db_variable_id, grapher_config)
+    # grapher_config does not exist, but it's still in the database -> delete it
+    elif not grapher_config and db_variable.grapherConfigIdETL:
+        admin_api.delete_grapher_config(db_variable_id)
+
+    # upload metadata to R2
+    var_metadata = dm.variable_metadata(session, db_variable.id, df)
     var_metadata_str = json.dumps(var_metadata, default=str)
 
-    checksum_data = dm.checksum_data_str(var_data_str)
-    # NOTE: _checksum_metadata modifies `var_metadata` object, but we have it as a string already
-    checksum_metadata = dm.checksum_metadata(var_metadata)
-
     # upload them to R2
-    with ThreadPoolExecutor() as executor:
-        futures = []
+    upload_gzip_string(var_metadata_str, db_variable.s3_metadata_path())
 
-        if db_variable.dataChecksum != checksum_data:
-            db_variable.dataChecksum = checksum_data
-            futures.append(executor.submit(upload_gzip_string, var_data_str, db_variable.s3_data_path()))
+    return db_variable
 
-        if db_variable.metadataChecksum != checksum_metadata:
-            db_variable.metadataChecksum = checksum_metadata
-            futures.append(executor.submit(upload_gzip_string, var_metadata_str, db_variable.s3_metadata_path()))
 
-        # commit new checksums
-        if futures:
-            # Wait for futures to complete in case exceptions are raised
-            [f.result() for f in futures]
+def calculate_checksum_metadata(variable_meta: VariableMeta, df: pd.DataFrame) -> str:
+    # entities and years are also part of the metadata checksum
+    return str(
+        hash_any(
+            (
+                hash_any(sorted(df.entityId.unique())),
+                hash_any(sorted(df.year.unique())),
+                hash_any(variable_meta),
+            )
+        )
+    )
 
-            session.add(db_variable)
-            session.commit()
 
-    if verbose:
-        if futures:
-            log.info("upsert_table.uploaded_to_s3", size=len(df), variable_id=db_variable.id)
-        else:
-            log.info("upsert_table.skipped_upload_to_s3", size=len(df), variable_id=db_variable.id)
+def calculate_checksum_data(df: pd.DataFrame) -> str:
+    # checksum that is invariant to sorting or index reset
+    return str(pd.util.hash_pandas_object(df).sum())
 
 
 def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
@@ -537,29 +573,42 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
         return True
 
 
-def cleanup_ghost_sources(engine: Engine, dataset_id: int, upserted_source_ids: List[int]) -> None:
+def cleanup_ghost_sources(engine: Engine, dataset_id: int, dataset_upserted_source_ids: List[int]) -> None:
     """Remove all leftover sources that didn't get upserted into DB during grapher step.
     This could happen when you rename or delete sources.
     :param dataset_id: ID of the dataset
-    :param upserted_source_ids: sources upserted in grapher step
+    :param dataset_upserted_source_ids: upserted dataset sources, we combine them with variable sources
     """
     with engine.connect() as con:
-        if upserted_source_ids:
-            result = con.execute(
-                text("""DELETE FROM sources WHERE datasetId = :dataset_id AND id NOT IN :source_ids"""),
-                {"dataset_id": dataset_id, "source_ids": upserted_source_ids},
-            )
-        else:
-            result = con.execute(
-                text("""DELETE FROM sources WHERE datasetId = :dataset_id"""),
-                {"dataset_id": dataset_id},
-            )
+        where = " AND id NOT IN :dataset_source_ids" if dataset_upserted_source_ids else ""
+
+        result = con.execute(
+            text(
+                f"""
+            DELETE FROM sources
+            WHERE datasetId = :dataset_id
+                AND id NOT IN (
+                    select distinct sourceId from variables where datasetId = :dataset_id
+                )
+                {where}
+                """
+            ),
+            {"dataset_id": dataset_id, "dataset_source_ids": dataset_upserted_source_ids},
+        )
         if result.rowcount > 0:
             con.commit()
             log.warning(f"Deleted {result.rowcount} ghost sources")
 
 
-def _get_entity_name(session: Session, entity_id: int) -> str:
-    q = select(gm.Entity).where(gm.Entity.id == entity_id)
-    entity = session.scalars(q).one_or_none()
-    return entity.name if entity else ""
+def _get_timespan(table: pd.DataFrame, variable_meta: VariableMeta) -> str:
+    # Timespan does not work for yearIsDay variables
+    if (variable_meta.display or {}).get("yearIsDay"):
+        return ""
+    else:
+        years = table.year.unique()
+        if len(years) == 0:
+            return ""
+        else:
+            min_year = min(years)
+            max_year = max(years)
+            return f"{min_year}-{max_year}"

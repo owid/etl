@@ -82,11 +82,11 @@ tables:
     variables:
       num_regime_eiu:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of countries with unknown regime
-          <% else %>
+          <%- else -%>
           Number of << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>
-          <% endif %>
+          <%- endif -%>
         unit: "countries"
 
   num_people:
@@ -96,11 +96,11 @@ tables:
     variables:
       pop_regime_eiu:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of people living in countries with unknown regime
-          <% else %>
+          <%- else -%>
           Number of people living in << category.replace('cracy', 'cracies').replace('regime', 'regimes') >>
-          <% endif %>
+          <%- endif -%>
         description_short: "Number of countries with available data."
         unit: "people"
 

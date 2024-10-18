@@ -23,10 +23,7 @@
           "type": "string",
           "description": "Toggle linear/logarithmic",
           "default": "linear",
-          "enum": [
-            "linear",
-            "log"
-          ]
+          "enum": ["linear", "log"]
         },
         "max": {
           "type": "number",
@@ -40,10 +37,7 @@
         "facetDomain": {
           "type": "string",
           "description": "Whether the axis domain should be the same across faceted charts (if possible)",
-          "enum": [
-            "independent",
-            "shared"
-          ]
+          "enum": ["independent", "shared"]
         }
       },
       "additionalProperties": false
@@ -56,10 +50,7 @@
           "type": "array",
           "description": "Custom labels for each numeric bin. Only applied when strategy is `manual`.\n`null` falls back to default label.\n",
           "items": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           }
         },
         "customCategoryColors": {
@@ -165,12 +156,7 @@
           "type": "string",
           "description": "The strategy for generating the bin boundaries",
           "default": "ckmeans",
-          "enum": [
-            "equalInterval",
-            "quantiles",
-            "ckmeans",
-            "manual"
-          ]
+          "enum": ["equalInterval", "quantiles", "ckmeans", "manual"]
         },
         "legendDescription": {
           "type": "string",
@@ -180,10 +166,7 @@
           "type": "array",
           "description": "Override some or all colors for the numerical color legend.\nColors are CSS colors, usually in the form `#aa9944`\n`null` falls back the color scheme color.\n",
           "items": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           }
         },
         "customNumericValues": {
@@ -250,12 +233,8 @@
           "description": "Title of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one-line description of the dataset.",
           "requirement_level": "required (often automatic)",
           "guidelines": [
-            [
-              "Must start with a capital letter."
-            ],
-            [
-              "Must not end with a period."
-            ],
+            ["Must start with a capital letter."],
+            ["Must not end with a period."],
             [
               "Should identify the dataset (i.e. the collection of tables resulting from one or more original data products)."
             ],
@@ -270,12 +249,8 @@
           "description": "Description of the dataset (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the content of the tables.",
           "requirement_level": "recommended (often automatic)",
           "guidelines": [
-            [
-              "Must start with a capital letter."
-            ],
-            [
-              "Must end with a period."
-            ],
+            ["Must start with a capital letter."],
+            ["Must end with a period."],
             [
               "Should not mention other metadata fields (e.g. `producer` or `date_published`).",
               {
@@ -301,36 +276,14 @@
           "title": "Number of days between OWID updates",
           "description": "Expected number of days between consecutive updates of this dataset by OWID, typically `30`, `90` or `365`. Set to `0` if we do not have the intention to update it.",
           "guidelines": [
-            [
-              "Must be defined in the garden step."
-            ],
-            [
-              "Must be an integer."
-            ],
+            ["Must be defined in the garden step."],
+            ["Must be an integer."],
             [
               "Must specify the update period of OWID's data, not the producer's data (although they may often coincide, e.g. `365`)."
             ]
           ],
-          "examples": [
-            "7",
-            "30",
-            "90",
-            "365"
-          ],
-          "examples_bad": [
-            [
-              "2023-01-07"
-            ],
-            [
-              "monthly"
-            ],
-            [
-              "0.2"
-            ],
-            [
-              "1/365"
-            ]
-          ],
+          "examples": ["7", "30", "90", "365"],
+          "examples_bad": [["2023-01-07"], ["monthly"], ["0.2"], ["1/365"]],
           "requirement_level": "required"
         },
         "non_redistributable": {
@@ -377,15 +330,9 @@
             "description": "Title of the table (mostly for internal purposes, or for users of our data catalog) which is a few words description of the table.",
             "requirement_level": "required (often automatic)",
             "guidelines": [
-              [
-                "Must start with a capital letter."
-              ],
-              [
-                "Must not end with a period."
-              ],
-              [
-                "Should identify the table."
-              ],
+              ["Must start with a capital letter."],
+              ["Must not end with a period."],
+              ["Should identify the table."],
               [
                 "Should be used only to override the automatic title (which usually is the title of the origin). For example, use it when the table has multiple origins."
               ]
@@ -397,12 +344,8 @@
             "description": "Description of the table (mostly for internal purposes, or for users of our data catalog) which is a one- (or a few) paragraph description of the table.",
             "requirement_level": "recommended (often automatic)",
             "guidelines": [
-              [
-                "Must start with a capital letter."
-              ],
-              [
-                "Must end with a period."
-              ],
+              ["Must start with a capital letter."],
+              ["Must end with a period."],
               [
                 "Should not mention other metadata fields (e.g. `producer` or `date_published`).",
                 {
@@ -440,27 +383,17 @@
                     "Barley | 00000044 || Area harvested | 005312 || hectares"
                   ],
                   "examples_bad": [
-                    [
-                      "Number of neutron stars (NASA)"
-                    ],
+                    ["Number of neutron stars (NASA)"],
                     [
                       "Share of neutron star mergers that happen in the Milky Way (2023)"
                     ],
-                    [
-                      "Barley"
-                    ]
+                    ["Barley"]
                   ],
                   "requirement_level": "required",
                   "guidelines": [
-                    [
-                      "Must start with a capital letter."
-                    ],
-                    [
-                      "Must not end with a period."
-                    ],
-                    [
-                      "Must be one short sentence (a few words)."
-                    ],
+                    ["Must start with a capital letter."],
+                    ["Must not end with a period."],
+                    ["Must be one short sentence (a few words)."],
                     [
                       "For 'small datasets', this should be the publicly displayed title. For 'big datasets' (like FAOSTAT, with many dimensions), it can be less human-readable, optimized for internal searches (then, use `presentation.title_public` for the public title)."
                     ],
@@ -476,12 +409,8 @@
                   "description": "One or a few lines that complement the title to have a short description of the indicator.",
                   "requirement_level": "required",
                   "guidelines": [
-                    [
-                      "Must start with a capital letter."
-                    ],
-                    [
-                      "Must end with a period."
-                    ],
+                    ["Must start with a capital letter."],
+                    ["Must end with a period."],
                     [
                       "Must be one short paragraph (for example suitable to fit in a chart subtitle)."
                     ],
@@ -556,12 +485,8 @@
                   "description": "Relevant information about the processing of the indicator done by OWID.",
                   "requirement_level": "required (if applicable)",
                   "guidelines": [
-                    [
-                      "Must start with a capital letter."
-                    ],
-                    [
-                      "Must end with a period."
-                    ],
+                    ["Must start with a capital letter."],
+                    ["Must end with a period."],
                     [
                       "Must be used if important editorial decisions have been taken during data processing."
                     ],
@@ -586,12 +511,8 @@
                   "description": "Description of the indicator written by the producer, if any was given.",
                   "requirement_level": "recommended (if existing)",
                   "guidelines": [
-                    [
-                      "Must start with a capital letter."
-                    ],
-                    [
-                      "Must end with a period."
-                    ],
+                    ["Must start with a capital letter."],
+                    ["Must end with a period."],
                     [
                       "Should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits."
                     ],
@@ -605,35 +526,18 @@
                   "title": "Indicator's unit",
                   "type": "string",
                   "description": "Very concise name of the unit we use to measure the indicator values.",
-                  "examples": [
-                    "tonnes per hectare",
-                    "kilowatts per person"
-                  ],
+                  "examples": ["tonnes per hectare", "kilowatts per person"],
                   "examples_bad": [
-                    [
-                      "tonnes/hectare"
-                    ],
-                    [
-                      "kilowatts per capita"
-                    ]
+                    ["tonnes/hectare"],
+                    ["kilowatts per capita"]
                   ],
                   "requirement_level": "required",
                   "guidelines": [
-                    [
-                      "Must not start with a capital letter."
-                    ],
-                    [
-                      "Must not end with a period."
-                    ],
-                    [
-                      "Must be empty if the indicator has no units."
-                    ],
-                    [
-                      "Must be in plural."
-                    ],
-                    [
-                      "Must be a metric unit when applicable."
-                    ],
+                    ["Must not start with a capital letter."],
+                    ["Must not end with a period."],
+                    ["Must be empty if the indicator has no units."],
+                    ["Must be in plural."],
+                    ["Must be a metric unit when applicable."],
                     [
                       "Should not use symbols like “/”.",
                       {
@@ -643,9 +547,7 @@
                         ]
                       }
                     ],
-                    [
-                      "Should be '%' for percentages."
-                    ]
+                    ["Should be '%' for percentages."]
                   ],
                   "category": "metadata"
                 },
@@ -653,36 +555,16 @@
                   "title": "Indicator's unit (short version)",
                   "type": "string",
                   "description": "Characters that represent the unit we use to measure the indicator value.",
-                  "examples": [
-                    "t/ha",
-                    "%",
-                    "kWh/person"
-                  ],
-                  "examples_bad": [
-                    [
-                      "t / ha"
-                    ],
-                    [
-                      "pct"
-                    ],
-                    [
-                      "pc"
-                    ]
-                  ],
+                  "examples": ["t/ha", "%", "kWh/person"],
+                  "examples_bad": [["t / ha"], ["pct"], ["pc"]],
                   "requirement_level": "required",
                   "guidelines": [
                     [
                       "Must follow the rules of capitalization of the International System of Units, when applicable."
                     ],
-                    [
-                      "Must not end with a period."
-                    ],
-                    [
-                      "Must be empty if the indicator has no units."
-                    ],
-                    [
-                      "Should not contain spaces."
-                    ],
+                    ["Must not end with a period."],
+                    ["Must be empty if the indicator has no units."],
+                    ["Should not contain spaces."],
                     [
                       "If, for clarity, we prefer to simplify the units in a chart, e.g. to show `kWh` instead of `kWh/person`, use `display.short_unit` for the simplified units, and keep the correct one in `indicator.short_unit` (and ensure there is no ambiguity in the chart)."
                     ]
@@ -691,10 +573,14 @@
                 },
                 "processing_level": {
                   "title": "Indicator's processing level",
-                  "type": "string",
-                  "enum": [
-                    "minor",
-                    "major"
+                  "oneOf": [
+                    {
+                      "enum": ["minor", "major"]
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "<%"
+                    }
                   ],
                   "description": "Level of processing that the indicator values have experienced.",
                   "requirement_level": "required (in the future this could be automatic).",
@@ -784,15 +670,9 @@
                       "description": "Indicator title to be shown in public places like data pages, that overrides the indicator's title.",
                       "requirement_level": "optional",
                       "guidelines": [
-                        [
-                          "Must start with a capital letter."
-                        ],
-                        [
-                          "Must not end with a period."
-                        ],
-                        [
-                          "Must be one short sentence (a few words)."
-                        ],
+                        ["Must start with a capital letter."],
+                        ["Must not end with a period."],
+                        ["Must be one short sentence (a few words)."],
                         [
                           "Should not mention other metadata fields like `producer` or `version`."
                         ],
@@ -813,15 +693,9 @@
                       "description": "Short disambiguation of the title that references a special feature of the methods or nature of the data.",
                       "requirement_level": "optional",
                       "guidelines": [
-                        [
-                          "Must start with a capital letter."
-                        ],
-                        [
-                          "Must not end in a period."
-                        ],
-                        [
-                          "Should be very short."
-                        ],
+                        ["Must start with a capital letter."],
+                        ["Must not end in a period."],
+                        ["Should be very short."],
                         [
                           "Should only be used if the indicator's title is ambiguous (e.g. if there are multiple indicators with the same title)."
                         ],
@@ -829,17 +703,10 @@
                           "Should not reference the data provider. For that, instead, use `attribution_short`."
                         ]
                       ],
-                      "examples": [
-                        "Age-standardized",
-                        "Historical data"
-                      ],
+                      "examples": ["Age-standardized", "Historical data"],
                       "examples_bad": [
-                        [
-                          "The data is age-standardized"
-                        ],
-                        [
-                          "Historical data from 1800 to 2010"
-                        ]
+                        ["The data is age-standardized"],
+                        ["Historical data from 1800 to 2010"]
                       ]
                     },
                     "attribution": {
@@ -856,9 +723,7 @@
                             ]
                           }
                         ],
-                        [
-                          "Must join multiple attributions by a `;`."
-                        ],
+                        ["Must join multiple attributions by a `;`."],
                         [
                           "Must not end in a period (and must **not** end in `;`)."
                         ],
@@ -873,11 +738,7 @@
                       "examples": [
                         "Energy Institute - Statistical Review of World Energy (2023); Ember (2022)"
                       ],
-                      "examples_bad": [
-                        [
-                          "UN (2023), WHO (2023)"
-                        ]
-                      ]
+                      "examples_bad": [["UN (2023), WHO (2023)"]]
                     },
                     "attribution_short": {
                       "type": "string",
@@ -894,12 +755,8 @@
                             ]
                           }
                         ],
-                        [
-                          "Must not end in a period."
-                        ],
-                        [
-                          "Should be very short."
-                        ],
+                        ["Must not end in a period."],
+                        ["Should be very short."],
                         [
                           "Should be used if the automatic concatenation of origin's `attribution_short` are too long. In those cases, choose the most important `attribution` (e.g. the main producer of the data)."
                         ]
@@ -917,9 +774,7 @@
                         [
                           "The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator)."
                         ],
-                        [
-                          "Should contain 1, 2, or at most 3 tags."
-                        ]
+                        ["Should contain 1, 2, or at most 3 tags."]
                       ],
                       "items": {
                         "type": "string",
@@ -1055,7 +910,9 @@
                           "Neglected Tropical Diseases",
                           "Uncategorized",
                           "Wildfires",
-                          "Metals & Minerals"
+                          "Metals & Minerals",
+                          "Foreign Aid",
+                          "Antibiotics"
                         ]
                       }
                     },
@@ -1080,9 +937,7 @@
                           },
                           "fragment_id": {
                             "type": "string",
-                            "examples": [
-                              "fragment_id: cherries"
-                            ]
+                            "examples": ["fragment_id: cherries"]
                           }
                         }
                       }
@@ -1137,11 +992,7 @@
                             "toleranceStrategy": {
                               "type": "string",
                               "description": "Tolerance strategy to use. Options include accepting matches that are \"closest\" to the time point in question\n(going forwards and backwards in time), and accepting matches that lie in the past (\"backwards\") or\nthe future (\"forwards\").\n",
-                              "enum": [
-                                "closest",
-                                "forwards",
-                                "backwards"
-                              ],
+                              "enum": ["closest", "forwards", "backwards"],
                               "default": "closest"
                             },
                             "tooltipUseCustomLabels": {
@@ -1158,9 +1009,7 @@
                                 },
                                 {
                                   "type": "string",
-                                  "enum": [
-                                    "latest"
-                                  ]
+                                  "enum": ["latest"]
                                 }
                               ]
                             },
@@ -1182,10 +1031,7 @@
                             },
                             {
                               "type": "string",
-                              "enum": [
-                                "latest",
-                                "earliest"
-                              ]
+                              "enum": ["latest", "earliest"]
                             }
                           ]
                         },
@@ -1193,12 +1039,8 @@
                           "type": "string",
                           "description": "Default subtitle to use in charts for the indicator. NOTE: Use this field to override an indicator's `description_short` with information that is more suitable for a chart subtitle.",
                           "guidelines": [
-                            [
-                              "Must start with a capital letter."
-                            ],
-                            [
-                              "Must end with a period."
-                            ],
+                            ["Must start with a capital letter."],
+                            ["Must end with a period."],
                             [
                               "Must be one short paragraph, suitable to fit in a chart subtitle."
                             ]
@@ -1208,9 +1050,7 @@
                           "type": "array",
                           "description": "List of entities (e.g. harmonized country names) to use by default in charts for the indicator.",
                           "items": {
-                            "type": [
-                              "string"
-                            ]
+                            "type": ["string"]
                           }
                         },
                         "baseColorScheme": {
@@ -1225,11 +1065,7 @@
                           "type": "string",
                           "description": "The tab that is shown initially",
                           "default": "chart",
-                          "enum": [
-                            "chart",
-                            "map",
-                            "table"
-                          ]
+                          "enum": ["chart", "map", "table"]
                         },
                         "matchingEntitiesOnly": {
                           "type": "boolean",
@@ -1289,21 +1125,13 @@
                           "type": "string",
                           "default": "year",
                           "description": "When a user hovers over a connected series line in a ScatterPlot we show\na label for each point. By default that value will be from the \"year\" column\nbut by changing this option the column used for the x or y axis could be used instead.\n",
-                          "enum": [
-                            "x",
-                            "y",
-                            "year"
-                          ]
+                          "enum": ["x", "y", "year"]
                         },
                         "selectedFacetStrategy": {
                           "type": "string",
                           "default": "none",
                           "description": "The desired facetting strategy (none for no facetting)",
-                          "enum": [
-                            "none",
-                            "entity",
-                            "metric"
-                          ]
+                          "enum": ["none", "entity", "metric"]
                         },
                         "sourceDesc": {
                           "type": "string",
@@ -1353,11 +1181,7 @@
                           "type": "string",
                           "description": "Which logo to show on the upper right side",
                           "default": "owid",
-                          "enum": [
-                            "owid",
-                            "core+owid",
-                            "gv+owid"
-                          ]
+                          "enum": ["owid", "core+owid", "gv+owid"]
                         },
                         "entityType": {
                           "type": "string",
@@ -1373,21 +1197,15 @@
                           "type": "string",
                           "description": "Default footer note to use in charts for the indicator.",
                           "guidelines": [
-                            [
-                              "Must start with a capital letter."
-                            ],
-                            [
-                              "Must end with a period."
-                            ],
+                            ["Must start with a capital letter."],
+                            ["Must end with a period."],
                             [
                               "Must not include 'Note:' at the beginning (this is added automatically)."
                             ],
                             [
                               "Must be one short paragraph, usually one sentence, suitable to fit in a chart footer note."
                             ],
-                            [
-                              "Should not mention any other metadata fields."
-                            ]
+                            ["Should not mention any other metadata fields."]
                           ]
                         },
                         "dimensions": {
@@ -1395,10 +1213,7 @@
                           "description": "List of dimensions and their mapping to variables",
                           "items": {
                             "type": "object",
-                            "required": [
-                              "property",
-                              "variableId"
-                            ],
+                            "required": ["property", "variableId"],
                             "properties": {
                               "targetYear": {
                                 "type": "integer",
@@ -1407,13 +1222,7 @@
                               "property": {
                                 "type": "string",
                                 "description": "Which dimension this property maps to",
-                                "enum": [
-                                  "y",
-                                  "x",
-                                  "size",
-                                  "color",
-                                  "table"
-                                ]
+                                "enum": ["y", "x", "size", "color", "table"]
                               },
                               "display": {
                                 "$ref": "definitions.json#/display"
@@ -1431,11 +1240,7 @@
                           "type": "string",
                           "description": "Whether the user can change countries, add additional ones or neither",
                           "default": "add-country",
-                          "enum": [
-                            "add-country",
-                            "change-country",
-                            "disabled"
-                          ]
+                          "enum": ["add-country", "change-country", "disabled"]
                         },
                         "compareEndPointsOnly": {
                           "type": "boolean",
@@ -1471,15 +1276,9 @@
                           "type": "string",
                           "description": "Default title to use in charts for the indicator, overriding the indicator's `title`.",
                           "guidelines": [
-                            [
-                              "Must start with a capital letter."
-                            ],
-                            [
-                              "Must not end with a period."
-                            ],
-                            [
-                              "Must be one short sentence (a few words)."
-                            ],
+                            ["Must start with a capital letter."],
+                            ["Must not end with a period."],
+                            ["Must be one short sentence (a few words)."],
                             [
                               "Must fit and be an appropriate choice for a chart's public title."
                             ],
@@ -1510,10 +1309,7 @@
                           "description": "Whether the default chart for the indicator should include a map tab."
                         },
                         "stackMode": {
-                          "type": [
-                            "string",
-                            "null"
-                          ],
+                          "type": ["string", "null"],
                           "description": "Stack mode. Only absolute and relative are actively used.",
                           "enum": [
                             "absolute",
@@ -1532,10 +1328,7 @@
                             },
                             {
                               "type": "string",
-                              "enum": [
-                                "latest",
-                                "earliest"
-                              ]
+                              "enum": ["latest", "earliest"]
                             }
                           ]
                         },
@@ -1609,21 +1402,13 @@
                           "type": "string",
                           "description": "Sort criterium (used by stacked bar charts and marimekko)",
                           "default": "total",
-                          "enum": [
-                            "column",
-                            "total",
-                            "entityName",
-                            "custom"
-                          ]
+                          "enum": ["column", "total", "entityName", "custom"]
                         },
                         "sortOrder": {
                           "type": "string",
                           "description": "Sort order (used by stacked bar charts and marimekko)",
                           "default": "desc",
-                          "enum": [
-                            "desc",
-                            "asc"
-                          ]
+                          "enum": ["desc", "asc"]
                         },
                         "sortColumnSlug": {
                           "description": "Sort column if sortBy is column (used by stacked bar charts and marimekko)",
@@ -1650,11 +1435,7 @@
                           "type": "string",
                           "default": "auto",
                           "description": "The desired strategy for handling entities with missing data",
-                          "enum": [
-                            "auto",
-                            "hide",
-                            "show"
-                          ]
+                          "enum": ["auto", "hide", "show"]
                         }
                       },
                       "additionalProperties": false

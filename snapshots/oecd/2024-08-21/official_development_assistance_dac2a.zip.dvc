@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "OECD Official Development Assistance (ODA) - DAC2A: Aid (ODA) disbursements to countries and regions"
+    description: |-
+      Destination of Official Development Assistance Disbursements. Geographical breakdown by donor, recipient and for some types of aid (e.g. grant, loan, technical co-operation) on a disbursement basis (i.e. actual expenditures). The data cover flows from all bilateral and multilateral donors and philanthropic foundations.
+    date_published: "2024-07-20"
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2024). OECD Official Development Assistance (ODA) - DAC2A: Aid (ODA) disbursements to countries and regions. OECD Data Explorer.
+
+    # Files
+    url_main: https://www.oecd.org/en/topics/policy-issues/official-development-assistance-oda.html
+    url_download: https://stats.oecd.org/wbos/fileview2.aspx?IDFile=87917fc3-d015-4c13-8605-dfcf5211802f
+    date_accessed: 2024-08-21
+
+    # License
+    license:
+      name: OECD Terms & conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: e19c4dcdbaf358492fe8b6d23b38c7dc
+    size: 65234543
+    path: official_development_assistance_dac2a.zip

@@ -8,7 +8,7 @@ import dataclasses
 import datetime as dt
 import json
 import re
-from dataclasses import dataclass, field, fields, is_dataclass
+from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Literal, NewType, Optional, Type, TypeVar, Union
 
@@ -18,7 +18,7 @@ from dataclasses_json import dataclass_json
 from typing_extensions import Self
 
 from .processing_log import ProcessingLog
-from .utils import pruned_json
+from .utils import hash_any, pruned_json
 
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 
@@ -33,7 +33,7 @@ T = TypeVar("T")
 class MetaBase:
     def __hash__(self):
         """Hash that uniquely identifies an object (without needing frozen dataclass)."""
-        return _hash_any(self)
+        return hash_any(self)
 
     def __eq__(self, other: Self) -> bool:  # type: ignore
         if not isinstance(other, self.__class__):
@@ -452,19 +452,6 @@ def is_year_or_date(s: str) -> bool:
         return True
     else:
         return False
-
-
-def _hash_any(x: Any) -> int:
-    """Return unique hash for an arbitrary object. This is useful if you can't make your dataclasses
-    frozen but still want to use operations such as `set` or `unique`."""
-    if is_dataclass(x):
-        return hash(tuple([(f.name, _hash_any(getattr(x, f.name))) for f in fields(x)]))
-    elif isinstance(x, list):
-        return hash(tuple([_hash_any(y) for y in x]))
-    elif isinstance(x, dict):
-        return hash(tuple([(k, _hash_any(v)) for k, v in x.items()]))
-    else:
-        return hash(x)
 
 
 def _deepcopy_dataclass(dc) -> Any:

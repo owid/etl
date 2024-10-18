@@ -97,11 +97,12 @@ def cli(
         log.info("chart_sync.use_branch", branch=source)
 
     source_engine = OWIDEnv.from_staging_or_env_file(source).get_engine()
-    target_engine = OWIDEnv.from_staging_or_env_file(target).get_engine()
+    target_env = OWIDEnv.from_staging_or_env_file(target)
+    target_engine = target_env.get_engine()
 
     # go through Admin API as creating / updating chart has side effects like
     # adding entries to chart_dimensions. We can't directly update it in MySQL
-    target_api: AdminAPI = AdminAPI(target_engine) if not dry_run else None  # type: ignore
+    target_api: AdminAPI = AdminAPI(target_env) if not dry_run else None  # type: ignore
 
     with Session(source_engine) as source_session:
         with Session(target_engine) as target_session:

@@ -290,6 +290,32 @@ steps:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
 
+
+    # UN IGME Child Mortality
+  data://meadow/un/2023-08-16/igme:
+    - snapshot://un/2023-08-16/igme.zip
+  data://garden/un/2023-08-16/igme:
+    - data://meadow/un/2023-08-16/igme
+    - data://garden/un/2018/igme
+  data://grapher/un/2023-08-16/igme:
+    - data://garden/un/2023-08-16/igme
+
+    # Long-run child mortality, Gapminder + UN IGME
+  data://garden/un/2023-08-29/long_run_child_mortality:
+    - data://garden/un/2023-08-16/igme
+    - data://garden/gapminder/2023-09-18/under_five_mortality
+    - data://garden/gapminder/2023-09-21/under_five_mortality
+  data://grapher/un/2023-09-19/long_run_child_mortality:
+    - data://garden/un/2023-08-29/long_run_child_mortality
+
+  # Oil Spills
+  data://meadow/itopf/2023-05-18/oil_spills:
+    - snapshot://itopf/2023-05-18/oil_spills.pdf
+  data://garden/itopf/2023-05-18/oil_spills:
+    - data://meadow/itopf/2023-05-18/oil_spills
+  data://grapher/itopf/2023-05-18/oil_spills:
+    - data://garden/itopf/2023-05-18/oil_spills
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

@@ -17,10 +17,30 @@ help-default:
 # check formatting before lint, since an autoformat might fix linting issues
 test-default: check-formatting check-linting check-typing unittest
 
-.venv-default:
+.sanity-check:
+	@echo '==> Checking your Python setup'
+
+	@if python -c "import sys; exit(0 if sys.platform.startswith('win32') else 1)"; then \
+		echo 'ERROR: you are using a non-WSL Python interpreter, please consult the'; \
+		echo '       docs on how to swich to WSL Python on windows'; \
+		echo '       https://github.com/owid/etl/'; \
+		exit 1; \
+	fi
+	touch .sanity-check
+
+install-uv-default:
+	@if ! command -v uv >/dev/null 2>&1; then \
+		echo '==> UV not found. Installing...'; \
+		curl -LsSf https://astral.sh/uv/install.sh | sh; \
+	fi
+
+.venv-default: install-uv .sanity-check
 	@echo '==> Installing packages'
-	poetry install
-	touch .venv
+	@if [ -n "$(PYTHON_VERSION)" ]; then \
+		echo '==> Using Python version $(PYTHON_VERSION)'; \
+		export UV_PYTHON=$(PYTHON_VERSION); \
+	fi
+	[ -f $$HOME/.cargo/env ] && . $$HOME/.cargo/env || true && uv sync --all-extras
 
 check-default:
 	@echo '==> Lint & Format & Typecheck changed files'
@@ -36,30 +56,40 @@ check-default:
 
 lint-default: .venv
 	@echo '==> Linting & Sorting imports'
-	@poetry run ruff check --fix $(SRC)
+	@.venv/bin/ruff check --fix $(SRC)
 
 check-linting-default: .venv
 	@echo '==> Checking linting'
-	@poetry run ruff check $(SRC)
+	@.venv/bin/ruff check $(SRC)
 
 check-formatting-default: .venv
 	@echo '==> Checking formatting'
-	@poetry run ruff format --check $(SRC)
+	@.venv/bin/ruff format --check $(SRC)
 
 check-typing-default: .venv
 	@echo '==> Checking types'
-	poetry run pyright $(SRC)
+	. .venv/bin/activate && .venv/bin/pyright $(SRC)
 
 unittest-default: .venv
 	@echo '==> Running unit tests'
-	poetry run pytest $(SRC)
+	.venv/bin/pytest $(SRC)
 
 format-default: .venv
 	@echo '==> Reformatting files'
-	@poetry run ruff format $(SRC)
+	@.venv/bin/ruff format $(SRC)
+
+coverage-default: .venv
+	@echo '==> Unit testing with coverage'
+	.venv/bin/pytest --cov=owid --cov-report=term-missing tests
 
 watch-default: .venv
-	poetry run watchmedo shell-command -c 'clear; make test' --recursive --drop .
+	@echo '==> Watching for changes and re-running checks'
+	.venv/bin/watchmedo shell-command -c 'clear; make check' --recursive --drop .
+
+bump-default: .venv
+	@echo '==> Bumping version'
+	.venv/bin/bump2version --no-tag  --no-commit $(filter-out $@, $(MAKECMDGOALS))
+
 
 # allow you to override a command, e.g. "watch", but if you do not, then use
 # the default

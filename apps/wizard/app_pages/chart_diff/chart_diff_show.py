@@ -14,30 +14,33 @@ from sqlalchemy.orm import Session
 import etl.grapher_model as gm
 from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
-    variable_metadata_df_from_s3,
 )
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
-from apps.wizard.utils import chart_html
+from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
+from etl.grapher_io import variable_metadata_df_from_s3
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {
     gm.ChartStatus.APPROVED.value: {
         "label": "Approve",
         "color": "green",
+        # "icon": ":material/done_outline:",
         "icon": "✅",
     },
     gm.ChartStatus.REJECTED.value: {
         "label": "Reject",
         "color": "red",
+        # "icon": ":material/delete:",
         "icon": "❌",
     },
     gm.ChartStatus.PENDING.value: {
         "label": "Pending",
         "color": "gray",
+        # "icon": ":material/schedule:",
         "icon": "⏳",
     },
 }
@@ -89,20 +92,20 @@ class ChartDiffShow:
 
         This contains the state of the approval (by means of an emoji), the slug of the chart, and any tags (like "NEW" or "DRAFT").
         """
-        label = self.diff.slug
+        label = f"{self.diff.slug}  "
         tags = []
         if self.diff.is_new:
-            tags.append(" :blue-background[**NEW**]")
+            tags.append(" :blue-background[:material/grade: **NEW**]")
         if self.diff.is_draft:
-            tags.append(" :gray-background[**DRAFT**]")
+            tags.append(" :gray-background[:material/draft: **DRAFT**]")
         for change in self.diff.change_types:
-            tags.append(f":red-background[**{change.upper()} CHANGE**]")
+            tags.append(f":red-background[:material/refresh: **{change.upper()} CHANGE**]")
 
         # Add TAG if modified and no change_types is provided
         if (self.diff.is_modified) and (tags == []):
-            label += ":break[:rainbow-background[**UNKNOWN -- REPORT THIS**]]"
+            label += ":rainbow-background[**UNKNOWN -- REPORT THIS**]"
         else:
-            label += f":break[{' '.join(tags)}]"
+            label += f"{' '.join(tags)}"
         return label
 
     @property
@@ -400,11 +403,11 @@ class ChartDiffShow:
             else:
                 st.markdown(self._header_production_chart)
             assert self.diff.target_chart is not None
-            chart_html(self.diff.target_chart.config, owid_env=TARGET)
+            grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
 
             # Chart staging
             st.markdown(self._header_staging_chart)
-            chart_html(self.diff.source_chart.config, owid_env=SOURCE)
+            grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
         def _show_charts_comparison_h():
             """Show charts next to each other."""
@@ -418,15 +421,15 @@ class ChartDiffShow:
                 else:
                     st.markdown(self._header_production_chart)
                 assert self.diff.target_chart is not None
-                chart_html(self.diff.target_chart.config, owid_env=TARGET)
+                grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
             with col2:
                 st.markdown(self._header_staging_chart)
-                chart_html(self.diff.source_chart.config, owid_env=SOURCE)
+                grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
         # Only one chart: new chart
         if self.diff.target_chart is None:
             st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
-            chart_html(self.diff.source_chart.config, owid_env=SOURCE)
+            grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
         # Two charts, actual diff
         else:
             # Detect arrangement type
@@ -497,7 +500,7 @@ class ChartDiffShow:
 
         # SHOW MODIFIED CHART
         if self.diff.is_modified:
-            tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Change history"])
+            tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Status log"])
             with tab1:
                 self._show_chart_comparison()
             with tab2:
@@ -507,7 +510,7 @@ class ChartDiffShow:
 
         # SHOW NEW CHART
         elif self.diff.is_new:
-            tab1, tab2 = st.tabs(["Chart", "Change history"])
+            tab1, tab2 = st.tabs(["Chart", "Status log"])
             with tab1:
                 self._show_chart_comparison()
             with tab2:

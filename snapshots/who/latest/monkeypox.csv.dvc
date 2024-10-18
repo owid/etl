@@ -15,7 +15,7 @@ meta:
     attribution_short: WHO
 
     # Files
-    url_main: https://frontdoor-l4uikgap6gz3m.azurefd.net/MPX/V_MPX_VALIDATED_DAILY
+    url_main: https://xmart-api-public.who.int/MPX/V_MPX_VALIDATED_DAILY
     date_accessed: 2024-08-07
     date_published: "2024-08-07"
 
@@ -24,6 +24,6 @@ meta:
       name: CC BY 4.0
 
 outs:
-  - md5: 579f2dcf03a03c7e4fccde0f1be13255
-    size: 578268
+  - md5: 0c2f431c2fa1b70422aaf65a0e334844
+    size: 591690
     path: monkeypox.csv

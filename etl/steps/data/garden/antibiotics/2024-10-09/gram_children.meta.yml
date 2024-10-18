@@ -1,0 +1,29 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Antibiotics
+    unit: "%"
+    short_unit: "%"
+    display:
+      numDecimalPlaces: 1
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+
+
+tables:
+  gram_children:
+    variables:
+      antibiotic_usage__pct:
+        title: Antibiotic usage in children
+      lower_uncertainty_interval__pct:
+        title: Antibiotic usage in children, lower uncertainty interval
+      upper_uncertainty_interval__pct:
+        title: Antibiotic usage in children, upper uncertainty interval
+
+

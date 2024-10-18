@@ -1,0 +1,115 @@
+definitions:
+  table: grapher/covid/latest/hospital/hospital
+  config: &config
+    hideAnnotationFieldsInTitle:
+      entity: true
+      time: true
+      changeInPrefix: true
+    originUrl: ourworldindata.org/coronavirus
+
+
+title:
+  title: COVID-19 hospitalisations
+  titleVariant: by type
+defaultSelection:
+  - Belgium
+  - Canada
+  - France
+  - Israel
+  - Italy
+  - Netherlands
+  - Spain
+  - United Kingdom
+  - United States
+topicTags:
+  - COVID-19
+
+dimensions:
+  - slug: type
+    name: Type
+    choices:
+      - slug: hospital
+        name: Hospitalisations
+        description: null
+      - slug: icu
+        name: Intensive care unit (ICU)
+        description: null
+
+  - slug: measure
+    name: Measure
+    choices:
+      - slug: patients
+        name: Patients
+        description: null
+      - slug: admissions
+        name: Weekly admissions
+        description: null
+
+  - slug: normalize
+    name: Normalization
+    choices:
+      - slug: absolute
+        name: None
+        description: null
+      - slug: per_capita
+        name: Per million people
+        description: null
+
+views:
+  - dimensions:
+      type: hospital
+      measure: patients
+      normalize: absolute
+    indicators:
+      y: "{definitions.table}#daily_occupancy_hosp"
+    config: *config
+  - dimensions:
+      type: hospital
+      measure: patients
+      normalize: per_capita
+    indicators:
+      y: "{definitions.table}#daily_occupancy_hosp_per_1m"
+    config: *config
+  - dimensions:
+      type: hospital
+      measure: admissions
+      normalize: absolute
+    indicators:
+      y: "{definitions.table}#weekly_admissions_hosp"
+    config: *config
+  - dimensions:
+      type: hospital
+      measure: admissions
+      normalize: per_capita
+    indicators:
+      y: "{definitions.table}#weekly_admissions_hosp_per_1m"
+    config: *config
+
+  - dimensions:
+      type: icu
+      measure: patients
+      normalize: absolute
+    indicators:
+      y: "{definitions.table}#daily_occupancy_icu"
+    config: *config
+  - dimensions:
+      type: icu
+      measure: patients
+      normalize: per_capita
+    indicators:
+      y: "{definitions.table}#daily_occupancy_icu_per_1m"
+    config: *config
+  - dimensions:
+      type: icu
+      measure: admissions
+      normalize: absolute
+    indicators:
+      y: "{definitions.table}#weekly_admissions_icu"
+    config: *config
+  - dimensions:
+      type: icu
+      measure: admissions
+      normalize: per_capita
+    indicators:
+      y: "{definitions.table}#weekly_admissions_icu_per_1m"
+    config: *config

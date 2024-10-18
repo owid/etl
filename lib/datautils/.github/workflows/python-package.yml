@@ -23,14 +23,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install Poetry
-      run: |
-        pip install poetry
-        poetry --version
-
     - name: Install packages
       run: |
-        poetry install
+        make .venv
 
     - name: Check formatting
       run: |

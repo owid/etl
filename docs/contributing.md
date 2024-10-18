@@ -16,7 +16,7 @@ All our data work is public and open-source. Our ETL work is available on GitHub
 To build any of our datasets, you first need [to install the ETL](../getting-started/working-environment/) and then execute any step you want to build:
 
 ```
-poetry run etl run <step>
+uv run etl run <step>
 ```
 
 ## Report issues

@@ -1,7 +1,7 @@
 # owid-datautils
 
 ![version](https://img.shields.io/badge/version-0.5.3-blue)
-![version](https://img.shields.io/badge/python-3.8|3.9|3.10-blue.svg?&logo=python&logoColor=yellow) 
+![version](https://img.shields.io/badge/python-3.8|3.9|3.10-blue.svg?&logo=python&logoColor=yellow)
 [![Build status](https://badge.buildkite.com/caba621fb64f2c7dcc692a474e68f4ead21e6ba6ee151fe3b6.svg)](https://buildkite.com/our-world-in-data/owid-datautils-unit-tests)
 [![Documentation Status](https://readthedocs.org/projects/owid-datautils/badge/?version=latest)](https://docs.owid.io/projects/owid-datautils/en/latest/?badge=latest)
 
@@ -19,17 +19,12 @@ pip install git+https://github.com/owid/owid-datautils-py
 
 ### Pre-requisites
 
-You need Python 3.8+, `poetry` and `make` installed.
-
-```
-# Install poetry
-pip install poetry
-```
+You need Python 3.8+, `UV` and `make` installed.
 
 ### Install in development mode
 
 ```
-poetry install
+make .venv
 ```
 
 ### Test the code

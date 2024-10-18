@@ -1,3 +1,4 @@
+import os
 import re
 import subprocess
 from typing import Tuple
@@ -72,7 +73,7 @@ def format_etl_diff(lines: list[str]) -> Tuple[str, str]:
 
 def call_etl_diff(include: str) -> list[str]:
     cmd = [
-        "poetry",
+        "uv",
         "run",
         "etl",
         "diff",
@@ -89,7 +90,10 @@ def call_etl_diff(include: str) -> list[str]:
 
     print(" ".join(cmd))
 
-    result = subprocess.Popen(cmd, cwd=BASE_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    env = os.environ.copy()
+    env["PATH"] = os.path.expanduser("~/.cargo/bin") + ":" + env["PATH"]
+
+    result = subprocess.Popen(cmd, cwd=BASE_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     stdout, stderr = result.communicate()
 
     stdout = stdout.decode()

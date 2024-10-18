@@ -7,16 +7,17 @@ import pandas as pd
 import streamlit as st
 from structlog import get_logger
 
-from apps.backport.datasync.data_metadata import variable_data_df_from_s3
 from apps.wizard.app_pages.indicator_upgrade.explore_mode import st_explore_indicator
 from apps.wizard.app_pages.indicator_upgrade.utils import (
     find_mapping_suggestions_cached,
     get_indicators_from_datasets,
     preliminary_mapping_cached,
 )
-from apps.wizard.utils import Pagination, set_states
+from apps.wizard.utils import set_states
+from apps.wizard.utils.components import Pagination
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
+from etl.grapher_io import variable_data_df_from_s3
 
 # Logger
 log = get_logger()

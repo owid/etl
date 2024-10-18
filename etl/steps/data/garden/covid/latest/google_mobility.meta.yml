@@ -36,17 +36,19 @@ tables:
         unit: '%'
         short_unit: '%'
         description_short: |-
-          <% if place == 'Grocery & pharmacy' %>
+          <%- if place == 'Grocery & pharmacy' -%>
           Mobility trends for places like grocery markets, food warehouses, farmers markets, specialty food shops, drug stores, and pharmacies.
-          <% elif place == 'Parks' %>
+          <%- elif place == 'Parks' -%>
           Mobility trends for places like local parks, national parks, public beaches, marinas, dog parks, plazas, and public gardens.
-          <% elif place == 'Transit stations' %>
+          <%- elif place == 'Transit stations' -%>
           Mobility trends for places like public transport hubs such as subway, bus, and train stations.
-          <% elif place == 'Retail & recreation' %>
+          <%- elif place == 'Retail & recreation' -%>
           Mobility trends for places like restaurants, cafes, shopping centers, theme parks, museums, libraries, and movie theaters.
-          <% elif place == 'Residential' %>
+          <%- elif place == 'Residential' -%>
           Mobility trends for places of residence.
-          <% elif place == 'Workplaces' %>
+          <%- elif place == 'Workplaces' -%>
           Mobility trends for places of work.
-          <% endif %>
+          <%- endif -%>
+        display:
+          name: << place >>
 

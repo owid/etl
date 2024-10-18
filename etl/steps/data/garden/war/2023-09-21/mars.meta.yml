@@ -9,24 +9,24 @@ definitions:
 
   all:
     conflict_type: |-
-      <% if conflict_type == "all" %>
+      <%- if conflict_type == "all" -%>
       A conventional war is a conflict between combatants with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
 
-      <% elif conflict_type == "others (non-civil)" %>
+      <%- elif conflict_type == "others (non-civil)" -%>
       A conventional interstate war is a conflict between states with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
 
-      <% elif conflict_type == "civil war" %>
+      <%- elif conflict_type == "civil war" -%>
       A civil war is a conflict between combatants that were previously part of the same state, but now at least one seeks control or secession. It is fought with differentiated militaries and clear frontlines and causes at least 500 deaths over its duration.
 
-      <% endif %>
+      <%- endif -%>
     conflict_type_noncivil: |-
-      <% if conflict_type == "others (non-civil)" %>
+      <%- if conflict_type == "others (non-civil)" -%>
       We identify conventional interstate wars as those wars that are not coded civil wars by Project Mars.
-      <% endif %>
+      <%- endif -%>
     conflict_types_additional: |-
-      <% if (conflict_type == "others (non-civil)" or conflict_type == "civil war") %>
+      <%- if (conflict_type == "others (non-civil)" or conflict_type == "civil war") -%>
       For the two wars that had campaigns within it that were a civil war and an interstate war, we coded them as interstate wars.
-      <% endif %>
+      <%- endif -%>
     conflicts_description: |-
       <%- if conflict_type == "all" -%>
       Included are conventional wars that were ongoing that year
@@ -60,13 +60,13 @@ definitions:
       - "{definitions.all.conflict_types_additional}"
       - Deaths of combatants due to fighting are included.
       - |-
-        <% if conflict_type == "civil war" %>
+        <%- if conflict_type == "civil war" -%>
         If a war lasted more than one year, we distributed its deaths evenly across years.
 
-        <% else %>
+        <%- else -%>
         If a war lasted more than one year, we distributed its deaths evenly across years. If a war was ongoing in more than one world region, we also evenly distributed its deaths across the regions of the participants.
 
-        <% endif %>
+        <%- endif -%>
 
   number_ongoing_conflicts:
     description_short: |-
@@ -85,16 +85,16 @@ definitions:
       - "{definitions.all.conflict_type_noncivil}"
       - "{definitions.all.conflict_types_additional}"
       - |-
-        <% if conflict_type == "all" %>
+        <%- if conflict_type == "all" -%>
         We only count a war as new when the war overall started that year, not if it restarted or a new campaign within it begins.
 
-        <% elif conflict_type == "others (non-civil)" %>
+        <%- elif conflict_type == "others (non-civil)" -%>
         We only count a conventional interstate war as new when the war overall started that year, not if a civil war became internationalized.
 
-        <% elif conflict_type == "civil war" %>
+        <%- elif conflict_type == "civil war" -%>
         We only count a civil war as new when the war overall started that year, not if the war became a civil war.
 
-        <% endif %>
+        <%- endif -%>
       - We count a war as new in a region even if the war started earlier or at the same time in another region. The sum across all regions can therefore be higher than the total number of new wars.
 
 
@@ -114,16 +114,16 @@ tables:
         title: State involved in war
         unit: ""
         description_short: |-
-          <% if conflict_type == "all" %>
+          <%- if conflict_type == "all" -%>
           State was a major participant in at least one conventional war that year.
 
-          <% elif conflict_type == "others (non-civil)" %>
+          <%- elif conflict_type == "others (non-civil)" -%>
           State was a major participant in at least one conventional interstate war that year.
 
-          <% elif conflict_type == "civil war" %>
+          <%- elif conflict_type == "civil war" -%>
           State was a major participant in at least one conventional civil war that year.
 
-          <% endif %>
+          <%- endif -%>
         description_key:
           - |-
             '1' indicates that the state participated in a war. '0' indicates that the state did not participate in a war.
@@ -132,16 +132,16 @@ tables:
         title: Number of states involved in war
         unit: "states"
         description_short: |-
-          <% if conflict_type == "all" %>
+          <%- if conflict_type == "all" -%>
           Included are states that were major participants in at least one conventional war that year.
 
-          <% elif conflict_type == "others (non-civil)" %>
+          <%- elif conflict_type == "others (non-civil)" -%>
           Included are states that were major participants in at least one conventional interstate war that year.
 
-          <% elif conflict_type == "civil war" %>
+          <%- elif conflict_type == "civil war" -%>
           Included are states that were major participants in at least one conventional civil war that year.
 
-          <% endif %>
+          <%- endif -%>
 
   # MAIN INDICATORS
   mars:

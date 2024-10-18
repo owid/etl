@@ -15,8 +15,10 @@ from urllib.parse import urljoin
 
 import jsonref
 import pandas as pd
+import requests
 import structlog
 import yaml
+from jsonschema import validate
 from owid import catalog
 from owid.catalog import CHANNEL, DatasetMeta, Table, warnings
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
@@ -31,9 +33,12 @@ from owid.catalog.tables import (
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
+from sqlalchemy.orm import Session
 
+import etl.grapher_model as gm
 from etl import paths
-from etl.config import TLS_VERIFY
+from etl.config import DEFAULT_GRAPHER_SCHEMA, TLS_VERIFY
+from etl.db import get_engine
 from etl.explorer import Explorer
 from etl.explorer_helpers import Explorer as ExplorerOld
 from etl.snapshot import Snapshot, SnapshotMeta
@@ -112,6 +117,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
 
             _validate_description_key(tab[col].m.description_key, col)
             _validate_ordinal_variables(tab, col)
+            _validate_grapher_config(tab, col)
 
             # Data Page title uses the following fallback
             # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
@@ -129,6 +135,20 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
                     f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
                     warnings.DisplayNameWarning,
                 )
+
+
+def _validate_grapher_config(tab: Table, col: str) -> None:
+    """Validate grapher config against given schema or against the default schema."""
+    grapher_config = getattr(tab[col].m.presentation, "grapher_config", None)
+    if grapher_config:
+        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
+
+        # Load schema and remove properties that are not relevant for the validation
+        schema = get_schema_from_url(grapher_config["$schema"])
+        # schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version", "title")]
+        schema["required"] = []
+
+        validate(grapher_config, schema)
 
 
 def _validate_description_key(description_key: list[str], col: str) -> None:
@@ -477,6 +497,11 @@ class PathFinder:
         return self.directory / (self.short_name + ".meta.yml")
 
     @property
+    def mdim_path(self) -> Path:
+        assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
+        return self.directory / (self.short_name + ".yml")
+
+    @property
     def directory(self) -> Path:
         # If the current file is a directory, it's a step with multiple files.
         if self.f.is_dir():
@@ -600,7 +625,7 @@ class PathFinder:
             self.is_private = True
             _step = self._create_current_step_name()
             if _step not in self.dag:
-                raise CurrentStepMustBeInDag
+                raise CurrentStepMustBeInDag(_step)
             else:
                 return _step
 
@@ -732,6 +757,14 @@ class PathFinder:
         deps = [dep for dep in self.dependencies if dep.startswith("etag://")]
         assert len(deps) == 1
         return deps[0].replace("etag://", "https://")
+
+    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, str]:
+        if filename is not None:
+            path = self.directory / Path(filename)
+        elif path is None:
+            path = self.mdim_path
+        config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
+        return config
 
 
 def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:
@@ -1154,3 +1187,33 @@ def create_explorer(
         explorer.df_columns = df_columns
 
     return explorer
+
+
+def map_indicator_path_to_id(catalog_path: str) -> str | int:
+    # Check if given path is actually an ID
+    if str(catalog_path).isdigit():
+        return catalog_path
+
+    # Get ID, assuming given path is a catalog path
+    engine = get_engine()
+    with Session(engine) as session:
+        db_indicator = gm.Variable.from_id_or_path(session, catalog_path)
+        assert db_indicator.id is not None
+        return db_indicator.id
+
+
+@cache
+def get_schema_from_url(schema_url: str) -> dict:
+    """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
+
+    https://files.ourworldindata.org/schemas/grapher-schema.005.json
+
+    More details on available versions can be found
+    at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema.
+
+    Returns
+    -------
+    Dict[str, Any]
+        Schema of a chart configuration.
+    """
+    return requests.get(schema_url, timeout=20, verify=TLS_VERIFY).json()

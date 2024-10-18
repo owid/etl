@@ -16,16 +16,13 @@ import json
 import os
 import re
 import sys
-from copy import deepcopy
 from datetime import date
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Literal, Optional, cast
+from typing import Any, Callable, Dict, List, Optional, cast
 
 import bugsnag
 import numpy as np
-import requests
 import streamlit as st
-import streamlit.components.v1 as components
 from owid.catalog import Dataset
 from pymysql import OperationalError
 from sqlalchemy.orm import Session
@@ -35,7 +32,7 @@ from typing_extensions import Self
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
 from apps.wizard.utils.step_form import StepForm
-from etl.config import OWID_ENV, TLS_VERIFY, OWIDEnv, enable_bugsnag
+from etl.config import OWID_ENV, enable_bugsnag
 from etl.db import get_connection, read_sql
 from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
@@ -679,147 +676,6 @@ def enable_bugsnag_for_streamlit():
     error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
 
 
-def chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
-    chart_config_tmp = deepcopy(chart_config)
-
-    chart_config_tmp["bakedGrapherURL"] = f"{owid_env.base_site}/grapher"
-    chart_config_tmp["adminBaseUrl"] = owid_env.base_site
-    chart_config_tmp["dataApiUrl"] = f"{owid_env.indicators_url}/"
-
-    # HTML = f"""
-    # <!DOCTYPE html>
-    # <html>
-    #     <head>
-    #         <meta name="viewport" content="width=device-width, initial-scale=1" />
-    #         <link
-    #         href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap"
-    #         rel="stylesheet"
-    #         />
-    #         <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
-    #     </head>
-    #     <body class="StandaloneGrapherOrExplorerPage">
-    #         <main>
-    #             <figure data-grapher-src></figure>
-    #         </main>
-    #         <div class="site-tools"></div>
-    #         <script>
-    #             document.cookie = "isAdmin=true;max-age=31536000"
-    #         </script>
-    #         <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
-    #         <script type="module">
-    #             var jsonConfig = {json.dumps(chart_config_tmp)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
-    #         </script>
-    #     </body>
-    # </html>
-    # """
-
-    HTML = f"""
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700,700i|Playfair+Display:400,700&amp;display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://ourworldindata.org/assets/owid.css" />
-    <div class="StandaloneGrapherOrExplorerPage">
-        <main>
-            <figure data-grapher-src></figure>
-        </main>
-        <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
-        <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
-        <script type="module">
-            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
-        </script>
-    </div>
-    """
-
-    components.html(HTML, height=height, **kwargs)
-
-
-class Pagination:
-    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str, on_click: Optional[Callable] = None):
-        self.items = items
-        self.items_per_page = items_per_page
-        self.pagination_key = pagination_key
-        # Action to perform when interacting with any of the buttons.
-        ## Example: Change the value of certain state in session_state
-        self.on_click = on_click
-        # Initialize session state for the current page
-        if self.pagination_key not in st.session_state:
-            self.page = 1
-
-    @property
-    def page(self):
-        value = st.session_state[self.pagination_key]
-        return value
-
-    @page.setter
-    def page(self, value):
-        st.session_state[self.pagination_key] = value
-
-    @property
-    def total_pages(self) -> int:
-        return (len(self.items) - 1) // self.items_per_page + 1
-
-    def get_page_items(self) -> list[Any]:
-        page = self.page
-        start_idx = (page - 1) * self.items_per_page
-        end_idx = start_idx + self.items_per_page
-        return self.items[start_idx:end_idx]
-
-    def show_controls(self, mode: Literal["buttons", "bar"] = "buttons") -> None:
-        if mode == "bar":
-            self.show_controls_bar()
-        elif mode == "buttons":
-            self.show_controls_buttons()
-        else:
-            raise ValueError("Mode must be either 'buttons' or 'bar'.")
-
-    def show_controls_buttons(self):
-        # Pagination controls
-        col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
-
-        with st.container(border=True):
-            with col1:
-                key = f"previous-{self.pagination_key}"
-                if self.page > 1:
-                    if st.button("⏮️ Previous", key=key):
-                        self.page -= 1
-                        if self.on_click is not None:
-                            self.on_click()
-                        st.rerun()
-                else:
-                    st.button("⏮️ Previous", disabled=True, key=key)
-
-            with col3:
-                key = f"next-{self.pagination_key}"
-                if self.page < self.total_pages:
-                    if st.button("Next ⏭️", key=key):
-                        self.page += 1
-                        if self.on_click is not None:
-                            self.on_click()
-                        st.rerun()
-                else:
-                    st.button("Next ⏭️", disabled=True, key=key)
-
-            with col2:
-                st.text(f"Page {self.page} of {self.total_pages}")
-
-    def show_controls_bar(self) -> None:
-        def _change_page():
-            # Internal action
-
-            # External action
-            if self.on_click is not None:
-                self.on_click()
-
-        col, _ = st.columns([1, 3])
-        with col:
-            st.number_input(
-                label=f"**Go to page** (total: {self.total_pages})",
-                min_value=1,
-                max_value=self.total_pages,
-                # value=self.page,
-                on_change=_change_page,
-                key=self.pagination_key,
-            )
-
-
 def _get_staging_creation_time(session: Session):
     """Get staging server creation time."""
     query_ts = "show table status like 'charts'"
@@ -890,20 +746,3 @@ def as_list(s):
         except (ValueError, SyntaxError):
             return s
     return s
-
-
-@st.cache_data(ttl=600)
-def get_schema_from_url(schema_url: str) -> dict:
-    """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
-
-    https://files.ourworldindata.org/schemas/grapher-schema.005.json
-
-    More details on available versions can be found
-    at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema.
-
-    Returns
-    -------
-    Dict[str, Any]
-        Schema of a chart configuration.
-    """
-    return requests.get(schema_url, timeout=20, verify=TLS_VERIFY).json()

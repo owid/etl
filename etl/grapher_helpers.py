@@ -20,6 +20,7 @@ from sqlalchemy.orm import Session
 
 from etl.db import get_engine, read_sql
 from etl.files import checksum_str
+from etl.grapher_io import add_entity_code_and_name
 
 log = structlog.get_logger()
 
@@ -92,8 +93,8 @@ def _yield_wide_table(
     # Validation
     if "year" not in table.primary_key:
         raise Exception("Table is missing `year` primary key")
-    if "entity_id" not in table.primary_key:
-        raise Exception("Table is missing `entity_id` primary key")
+    if "entityId" not in table.primary_key:
+        raise Exception("Table is missing `entityId` primary key")
     if na_action == "raise":
         for col in table.columns:
             if table[col].isna().any():
@@ -102,7 +103,7 @@ def _yield_wide_table(
     if cols_with_none_units:
         raise Exception("Columns with missing units: " + ", ".join(cols_with_none_units))
 
-    dim_names = [k for k in table.primary_key if k not in ("year", "entity_id")]
+    dim_names = [k for k in table.primary_key if k not in ("year", "entityId", "entityCode", "entityName")]
 
     # Keep only entity_id and year in index
     table = table.reset_index(level=dim_names)
@@ -188,7 +189,6 @@ def _yield_wide_table(
             # traverse metadata and expand Jinja
             tab[short_name].metadata = _expand_jinja(tab[short_name].metadata, dim_dict)
 
-            # Keep only entity_id and year in index
             yield tab
 
 
@@ -504,9 +504,7 @@ def _adapt_dataset_metadata_for_grapher(
     return metadata
 
 
-def _adapt_table_for_grapher(
-    table: catalog.Table, engine: Engine | None = None, country_col: str = "country", year_col: str = "year"
-) -> catalog.Table:
+def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Table:
     """Adapt table (from a garden dataset) to be used in a grapher step. This function
     is not meant to be run explicitly, but by default in the grapher step.
 
@@ -514,10 +512,6 @@ def _adapt_table_for_grapher(
     ----------
     table : catalog.Table
         Table from garden dataset.
-    country_col : str
-        Name of country column in table.
-    year_col : str
-        Name of year column in table.
 
     Returns
     -------
@@ -534,7 +528,7 @@ def _adapt_table_for_grapher(
     ), f"Variable titles are not unique ({variable_titles_counts[variable_titles_counts > 1].index})."
 
     # Remember original dimensions
-    dim_names = [n for n in table.index.names if n and n not in ("year", "date", "entity_id", country_col)]
+    dim_names = [n for n in table.index.names if n and n not in ("year", "date", "entity_id", "country")]
 
     # Reset index unless we have default index
     if table.index.names != [None]:
@@ -546,14 +540,18 @@ def _adapt_table_for_grapher(
         assert "year" not in table.columns, "Table cannot have both `date` and `year` columns."
         table = adapt_table_with_dates_to_grapher(table)
 
-    assert {"year", country_col} <= set(table.columns), f"Table must have columns {country_col} and year."
+    assert {"year", "country"} <= set(table.columns), "Table must have columns country and year."
     assert "entity_id" not in table.columns, "Table must not have column entity_id."
 
     # Grapher needs a column entity id, that is constructed based on the unique entity names in the database.
-    table["entity_id"] = country_to_entity_id(table[country_col], create_entities=True, engine=engine)
-    table = table.drop(columns=[country_col]).rename(columns={year_col: "year"})
+    table["entityId"] = country_to_entity_id(table["country"], create_entities=True, engine=engine)
+    table = table.drop(columns=["country"])
 
-    table = table.set_index(["entity_id", "year"] + dim_names)
+    # Add entity code and name
+    with Session(engine) as session:
+        table = add_entity_code_and_name(session, table).copy_metadata(table)
+
+    table = table.set_index(["entityId", "entityCode", "entityName", "year"] + dim_names)
 
     # Ensure the default source of each column includes the description of the table (since that is the description that
     # will appear in grapher on the SOURCES tab).
