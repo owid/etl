@@ -29,10 +29,10 @@ tables:
         presentation:
           title_public: Total specimen isolates of <<syndrome.lower()>> infections
       isolspermillion:
-        title: Isolates of <<syndrome.lower()>> per million population
+        title: Isolates of <<syndrome.lower()>> infections per million population
         unit: "isolates per million"
         presentation:
-          title_public: Isolates of <<syndrome.lower()>> per million population
+          title_public: Isolates of <<syndrome.lower()>> infections per million population
       totalspecimenisolateswithast:
         title: Bacterially confirmed <<syndrome.lower()>> infections per million population with antibiotic susceptibility test results
         unit: "confirmed infections per million"
