@@ -673,6 +673,11 @@ class Dataset(Base):
         """
         return read_sql(query, session)
 
+    @classmethod
+    def load_all_datasets(cls) -> pd.DataFrame:
+        """Get all the content of the grapher `datasets` table in DB as a dataframe."""
+        return read_sql("select * from datasets")
+
 
 class SourceDescription(TypedDict, total=False):
     link: Optional[str]

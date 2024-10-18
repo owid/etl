@@ -26,18 +26,6 @@ class AnomalyTypeEnum(Enum):
     # AI = "ai"  # Uncomment if needed
 
 
-# TODO: Move elsewhere. Note that there is get_all_datasets in grapher_io, but it doesn't return all necessary columns.
-def get_all_grapher_datasets():
-    # Initialize database engine.
-    engine = get_engine()
-    # Load all relevant grapher datasets from DB.
-    with Session(engine) as session:
-        datasets = session.query(gm.Dataset).all()
-    df_datasets = pd.DataFrame(datasets)
-
-    return df_datasets
-
-
 def infer_variable_mapping(dataset_id_new: int, dataset_id_old: int) -> Dict[int, int]:
     engine = get_engine()
     with Session(engine) as session:
@@ -57,8 +45,7 @@ def infer_variable_mapping(dataset_id_new: int, dataset_id_old: int) -> Dict[int
 @st.spinner("Retrieving datasets...")
 def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], Dict[int, int]]:
     # Get all datasets from DB.
-    # NOTE: Currently, we are including archived datasets, but I think that may be good.
-    df_datasets = get_all_grapher_datasets()
+    df_datasets = gm.Dataset.load_all_datasets()
 
     # Detect local files that correspond to new or modified grapher steps, identify their corresponding grapher dataset ids, and the grapher dataset id of the previous version (if any).
     dataset_new_and_old = get_new_grapher_datasets_and_their_previous_versions()
