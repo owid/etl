@@ -124,7 +124,7 @@ def load_source_description() -> dict:
 
 
 def get_source(raw_source: pd.Series) -> str:
-    """Get source for origin title and citation. Lists up to 3 sources, more are combined into 'Multiple sources'."""
+    """Get source for origin title (not producer!) and citation. Lists up to 3 sources, more are combined into 'Multiple sources'."""
     sources = raw_source.drop_duplicates()
     if len(sources) == 1 and len(sources.iloc[0].strip()) <= 250:
         title = sources.iloc[0].strip()
