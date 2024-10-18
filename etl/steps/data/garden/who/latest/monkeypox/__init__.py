@@ -38,14 +38,7 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["monkeypox"].reset_index()
     tb["source"] = "xmart"
     tb_africa = ds_meadow_shiny["monkeypox_shiny"].reset_index()
-    tb_africa["source"] = "shiny"
-    rename_dict = {
-        "week_end_date": "date",
-        "total_confirmed_cases": "total_conf_cases",
-        "total_deaths": "total_conf_deaths",
-        "new_confirmed_cases": "new_conf_cases",
-        "new_deaths": "new_conf_deaths",
-    }
+    rename_dict = {"week_end_date": "date"}
     tb_africa = tb_africa.rename(columns=rename_dict, errors="raise")
     tb_africa = format_africa(tb_africa)
     # Grab origins metadata
@@ -102,27 +95,16 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def format_africa(tb: Table) -> Table:
-    # Adding total suspected cases for 2023
-    tb_2023 = Table(
-        {
-            "country": ["Cameroon", "Congo", "Democratic Republic of Congo"],
-            "date": ["2023-12-24", "2023-12-24", "2023-12-24"],
-            "new_suspected_cases": ["113", "74", "12985"],
-        }
-    )
-    # Adding total suspected deaths for 2023
-    tb = pr.concat([tb, tb_2023], ignore_index=True).sort_values(["country", "date"])
-    tb["new_suspected_cases"] = pr.to_numeric(tb["new_suspected_cases"], errors="coerce")
-    tb["total_suspected_cases"] = tb["new_suspected_cases"].groupby(tb["country"]).cumsum()
-    # Check it's worked
-    assert tb.loc[tb["country"] == "Congo", "total_suspected_cases"].min() >= 74
-    # Suspected cases are the sum of confirmed and suspected cases
+def fix_suspected_cases(tb: Table) -> Table:
+    # The WHO reports *both* confirmed and suspected cases, as total suspected cases.
+    # We need to subtract the confirmed cases from the suspected cases to get the true suspected cases.
+    # tb["total_suspected_cases"] = tb["total_suspected_cases"].astype(int) - tb["total_confirmed_cases"].astype(int)
+    # tb["total_suspected_deaths"] = tb["total_suspected_deaths"].astype(int) - tb["total_deaths"].astype(int)
+    tb["new_suspected_cases"] = tb["new_suspected_cases"].astype(int) - tb["new_confirmed_cases"].astype(int)
+    tb["new_suspected_deaths"] = tb["new_suspected_deaths"].astype(int) - tb["new_deaths"].astype(int)
+    tb["total_suspected_cases"] = tb.groupby("country").new_suspected_cases.cumsum()
+    tb["total_suspected_deaths"] = tb.groupby("country").new_suspected_deaths.cumsum()
 
-    tb["total_suspected_cases"] = tb["total_suspected_cases"] - tb["total_conf_cases"]
-    tb["total_suspected_deaths"] = tb["total_suspected_deaths"] - tb["total_conf_deaths"]
-    tb["new_suspected_cases"] = tb["new_suspected_cases"] - tb["new_conf_cases"]
-    tb["new_suspected_deaths"] = tb["new_suspected_deaths"] - tb["new_conf_deaths"]
     assert tb["total_suspected_cases"].min() >= 0
     assert tb["total_suspected_deaths"].min() >= 0
     assert tb["new_suspected_cases"].min() >= 0
@@ -131,10 +113,45 @@ def format_africa(tb: Table) -> Table:
     return tb
 
 
+def format_africa(tb: Table) -> Table:
+    # Adding total suspected cases for 2023 and removing the confirmed cases from the suspected cases.
+    tb["date"] = pd.to_datetime(tb["date"], errors="coerce")  # Converts to datetime, invalid parsing will result in Na
+    tb = tb[tb["date"] > "2023-12-24"]
+    tb = fix_suspected_cases(tb)
+    tb = tb[
+        [
+            "country",
+            "date",
+            "total_suspected_cases",
+            "total_suspected_deaths",
+            "new_suspected_cases",
+            "new_suspected_deaths",
+        ]
+    ].copy(deep=True)
+    # Check there are no suspected cases before 2023
+    assert tb[tb["date"] <= "2023-12-24"]["total_suspected_cases"].sum() == 0
+
+    tb_2023 = Table(
+        {
+            "country": ["Cameroon", "Congo", "Democratic Republic of Congo"],
+            "date": ["2023-12-24", "2023-12-24", "2023-12-24"],
+            "new_suspected_cases": ["113", "74", "12985"],
+        }
+    )
+
+    tb = pr.concat([tb, tb_2023], ignore_index=True).sort_values(["country", "date"])
+    tb["new_suspected_cases"] = pr.to_numeric(tb["new_suspected_cases"], errors="coerce")
+    tb["total_suspected_cases"] = tb["new_suspected_cases"].groupby(tb["country"]).cumsum()
+    # Check it's worked
+    assert tb.loc[(tb["country"] == "Congo") & (tb["date"] == "2023-12-24"), "total_suspected_cases"].min() >= 74
+    # Suspected cases are the sum of confirmed and suspected cases
+
+    return tb
+
+
 def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -> Table:
     """
-    Removing rows where there are overlapping years with a preference for IGME data.
-
+    Removing rows where there are overlapping years with a preference for `preferred_source`
     """
     assert any(tb["source"] == preferred_source)
     tb = tb.copy(deep=True)
