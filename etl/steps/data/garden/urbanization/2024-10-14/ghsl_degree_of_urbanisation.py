@@ -101,7 +101,7 @@ def run(dest_dir: str) -> None:
 
 
 def calculate_shares(tb):
-    # Calculate "share of" indicators
+    # Calculate "share of" indicators and densites
     tb["total_population"] = tb[["rural_total_population", "urban_centre_population", "urban_cluster_population"]].sum(
         axis=1
     )
@@ -121,7 +121,10 @@ def calculate_shares(tb):
 
     tb["urban_cluster_share"] = tb["urban_cluster_area"] / tb["total_area"] * 100
     tb["urban_centre_share"] = tb["urban_centre_area"] / tb["total_area"] * 100
+
     tb["urban_center_density"] = tb["urban_centre_population"] / tb["urban_centre_area"]
+    tb["urban_cluster_density"] = tb["urban_cluster_population"] / tb["urban_cluster_area"]
+    tb["rural_total_density"] = tb["rural_total_population"] / tb["rural_total_area"]
 
     tb = tb.drop(columns=["total_population", "total_area"])
     return tb

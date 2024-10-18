@@ -126,6 +126,15 @@ tables:
             <% elif location_type == "urban_center" and attribute == 'density' and type == 'projections' %>
             Projected population density in cities
 
+            <% elif location_type == "urban_cluster" and attribute == 'density' and type == 'estimates' %>
+            Population density in towns and semi-dense areas
+            <% elif location_type == "urban_cluster" and attribute == 'density' and type == 'projections' %>
+            Projected population density in towns and semi-dense areas
+
+            <% elif location_type == "rural_total" and attribute == 'density' and type == 'estimates' %>
+            Population density in rural areas
+            <% elif location_type == "rural_total" and attribute == 'density' and type == 'projections' %>
+            Projected population density in rural areas
 
             <% endif %>
           unit:
@@ -164,7 +173,7 @@ tables:
                 <% elif attribute == 'share' or attribute == 'popshare' %>
                 1
                 <% elif attribute == 'density' %>
-                1
+                0
                 <% elif attribute == 'number' %>
                 0
                 <%- endif -%>
