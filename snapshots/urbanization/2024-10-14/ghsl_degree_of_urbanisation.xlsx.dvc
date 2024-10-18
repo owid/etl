@@ -11,8 +11,7 @@ meta:
     # Citation
     producer: European Commission, Joint Research Centre (JRC)
     citation_full: |-
-      Schiavina, Marcello; Melchiorri, Michele; Freire, Sergio (2023): GHS-DUC R2023A - GHS Degree of Urbanization Classification, application of the Degree of Urbanization methodology (stage II) to GADM 4.1 layer, multitemporal (1975-2030). European Commission, Joint Research Centre (JRC) [Dataset] doi: 10.2905/DC0EB21D-472C-4F5A-8846-823C50836305 PID: http://data.europa.eu/89h/dc0eb21d-472c-4f5a-8846-823c50836305
-    attribution_short: European Commission, JRC
+      Carioli A., Schiavina M., Melchiorri M. (2024): GHS-COUNTRY-STATS R2024A - GHSL Country Statistics by Degree of Urbanization, multitemporal (1975-2030). European Commission, Joint Research Centre (JRC) [Dataset] doi:10.2905/341c0608-5ca5-4ddb-b068-a412e35a3326 PID: http://data.europa.eu/89h/341c0608-5ca5-4ddb-b068-a412e35a3326
 
     # Files
     url_main: https://ghsl.jrc.ec.europa.eu/CFS.php
@@ -23,6 +22,6 @@ meta:
       name: CC BY 4.0
       url: https://commission.europa.eu/legal-notice_en
 outs:
-  - md5: 676bb8133867e7cd59cd3360353ff278
-    size: 210894
+  - md5: a19fe39e4574715d843238471d454dda
+    size: 297902
     path: ghsl_degree_of_urbanisation.xlsx

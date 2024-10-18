@@ -100,6 +100,33 @@ tables:
             Projected share of land covered by urban areas
             <% elif location_type == "urban_total" and attribute == 'popshare' and type == 'projections' %>
             Projected share of population living in urban areas
+
+
+            <% elif location_type == "towns_total" and attribute == 'number' and type == 'estimates' %>
+            Number of towns
+            <% elif location_type == "semi_dense" and attribute == 'number' and type == 'estimates' %>
+            Number of semi-dense areas
+            <% elif location_type == "rural_total" and attribute == 'number' and type == 'estimates' %>
+            Number of rural areas
+            <% elif location_type == "urban_centre" and attribute == 'number' and type == 'estimates' %>
+            Number of cities
+
+
+            <% elif location_type == "towns_total" and attribute == 'number' and type == 'projections' %>
+            Projected number of towns
+            <% elif location_type == "semi_dense" and attribute == 'number' and type == 'projections' %>
+            Projected number of semi-dense areas
+            <% elif location_type == "rural_total" and attribute == 'number' and type == 'projections' %>
+            Projected number of rural areas
+            <% elif location_type == "urban_centre" and attribute == 'number' and type == 'projections' %>
+            Projected number of cities
+
+            <% elif location_type == "urban_center" and attribute == 'density' and type == 'estimates' %>
+            Population density in cities
+            <% elif location_type == "urban_center" and attribute == 'density' and type == 'projections' %>
+            Projected population density in cities
+
+
             <% endif %>
           unit:
             <% if attribute == 'area' %>
