@@ -44,15 +44,9 @@ ANOMALY_DETECTORS = {
 }
 
 
-########################################################################################################################
-
-
 def load_detector(anomaly_type: ANOMALY_TYPE) -> AnomalyDetector:
     """Load detector."""
     return ANOMALY_DETECTORS[anomaly_type]
-
-
-# AGGREGATE ANOMALIES:
 
 
 def load_latest_population():
@@ -184,7 +178,32 @@ def add_analytics_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     return df_reduced
 
 
-########################################################################################################################
+def add_weighted_score(df: pd.DataFrame) -> pd.DataFrame:
+    """Add a weighted combined score."""
+    w_score = 1
+    w_pop = 1
+    w_views = 1
+    df["score_weighted"] = (
+        w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]
+    ) / (w_score + w_pop + w_views)
+
+    return df
+
+
+def add_auxiliary_scores(df: pd.DataFrame) -> pd.DataFrame:
+    # Add a population score.
+    df = add_population_score(df_reduced=df)
+
+    # Add an analytics score.
+    df = add_analytics_score(df_reduced=df)
+
+    # Rename columns for convenience.
+    df = df.rename(columns={"variable_id": "indicator_id", "anomaly_score": "score"}, errors="raise")
+
+    # Create a weighted combined score.
+    df = add_weighted_score(df)
+
+    return df
 
 
 def anomaly_detection(

@@ -108,7 +108,7 @@ def mock_anomalies_df(indicators_id, indicators_id_upgrade, n=5):
     w_score = 1
     w_pop = 1
     w_views = 1
-    df["score_weighed"] = (w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]) / (
-        w_score + w_pop + w_views
-    )
+    df["score_weighted"] = (
+        w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]
+    ) / (w_score + w_pop + w_views)
     return df

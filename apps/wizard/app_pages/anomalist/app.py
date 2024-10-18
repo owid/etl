@@ -157,16 +157,16 @@ def ask_llm_for_summary(df: pd.DataFrame):
 
     # df = st.session_state.anomalist_df
     # Get dataframe
-    df = df[["entity_name", "year", "type", "indicator_id", "score_weighed"]]
+    df = df[["entity_name", "year", "type", "indicator_id", "score_weighted"]]
     # Keep top anomalies based on weighed score
-    df = df.sort_values("score_weighed", ascending=False)
+    df = df.sort_values("score_weighted", ascending=False)
     df = cast(pd.DataFrame, df.head(NUM_ANOMALIES_PER_TYPE))
 
     # Round score (reduce token number)
-    df["score_weighed"] = df["score_weighed"].apply(lambda x: int(round(100 * x)))
+    df["score_weighted"] = df["score_weighted"].apply(lambda x: int(round(100 * x)))
     # Reshape, pivot indicator_score to have one score column per id
     df = df.pivot_table(
-        index=["entity_name", "year", "type"], columns="indicator_id", values="score_weighed"
+        index=["entity_name", "year", "type"], columns="indicator_id", values="score_weighted"
     ).reset_index()
     # As string (one per anomaly type)
     groups = df.groupby("type")
@@ -303,7 +303,7 @@ def _sort_df(df: pd.DataFrame, sort_strategy: str) -> Tuple[pd.DataFrame, List[s
     columns_sort = []
     match sort_strategy:
         case "relevance":
-            columns_sort = ["score_weighed"]
+            columns_sort = ["score_weighted"]
         case "score":
             columns_sort = ["score"]
         case "population":
@@ -474,7 +474,8 @@ with st.form(key="dataset_search"):
 # If anomalies for dataset already exist in DB, load them. Warn user that these are being loaded from DB
 if st.session_state.anomalist_datasets_submitted:
     # 3.1/ Check if anomalies are already there in DB
-    st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
+    with st.spinner("Loading anomalies (already detected) from database..."):
+        st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
 
     # Load indicators in selected datasets
     st.session_state.anomalist_indicators = cached.load_variables_display_in_dataset(
@@ -484,7 +485,7 @@ if st.session_state.anomalist_datasets_submitted:
 
     # Get indicator IDs
     variable_ids = list(st.session_state.anomalist_indicators.keys())
-    st.session_state.anomalist_mapping = get_variable_mapping(variable_ids)
+    st.session_state.anomalist_mapping = {k: v for k, v in VARIABLE_MAPPING.items() if v in variable_ids}
     st.session_state.anomalist_mapping_inv = {v: k for k, v in st.session_state.anomalist_mapping.items()}
 
     # 3.2/ No anomaly found in DB, estimate them
