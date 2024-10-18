@@ -8,7 +8,7 @@ import structlog
 from rich import print
 from rich_click.rich_command import RichCommand
 
-from apps.owidbot import chart_diff, data_diff, grapher
+from apps.owidbot import anomalist, chart_diff, data_diff, grapher
 from etl.config import get_container_name
 
 from . import github_utils as gh_utils
@@ -16,7 +16,7 @@ from . import github_utils as gh_utils
 log = structlog.get_logger()
 
 REPOS = Literal["etl", "owid-grapher"]
-SERVICES = Literal["data-diff", "chart-diff", "grapher"]
+SERVICES = Literal["data-diff", "chart-diff", "grapher", "anomalist"]
 
 
 @click.command("owidbot", cls=RichCommand, help=__doc__)
@@ -76,6 +76,11 @@ def cli(
 
         elif service == "grapher":
             services_body["grapher"] = grapher.run(branch)
+
+        elif service == "anomalist":
+            # TODO: anomalist could post a summary of anomalies to the PR
+            anomalist.run(branch)
+
         else:
             raise AssertionError("Invalid service")
 
