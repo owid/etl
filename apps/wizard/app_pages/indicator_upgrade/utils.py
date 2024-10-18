@@ -1,5 +1,5 @@
 """Utils for chart revision tool."""
-from typing import Any, Dict, List, Tuple, cast
+from typing import Dict, Tuple, cast
 
 import pandas as pd
 import streamlit as st
@@ -7,49 +7,19 @@ from pymysql import OperationalError
 from rapidfuzz import fuzz
 from structlog import get_logger
 
-from apps.utils.map_datasets import get_grapher_changes
-from etl import config
+from apps.wizard.utils.io import get_steps_df
 from etl.db import get_connection
-from etl.git_helpers import get_changed_files
 from etl.grapher_io import get_all_datasets, get_dataset_charts, get_variables_in_dataset
 from etl.match_variables import find_mapping_suggestions, preliminary_mapping
-from etl.version_tracker import VersionTracker
 
 # Logger
 log = get_logger()
 
 
 @st.spinner("Retrieving datasets...")
-def get_datasets(archived) -> pd.DataFrame:
-    steps_df_grapher, grapher_changes = get_datasets_from_version_tracker()
-
-    # Combine with datasets from database that are not present in ETL
-    # Get datasets from Database
-    try:
-        datasets_db = get_all_datasets(archived=archived)
-    except OperationalError as e:
-        raise OperationalError(
-            f"Could not retrieve datasets. Try reloading the page. If the error persists, please report an issue. Error: {e}"
-        )
-
-    # TODO: replace concat with merge
-    # steps_df_grapher = pd.concat([steps_df_grapher, datasets_db], ignore_index=True)
-    # steps_df_grapher = steps_df_grapher.drop_duplicates(subset="id").drop(columns="updatedAt").astype({"id": int})
-
-    # Get table with all datasets (ETL + DB)
-    steps_df_grapher = (
-        steps_df_grapher.merge(datasets_db, on="id", how="outer", suffixes=("_etl", "_db"))
-        .sort_values(by="id", ascending=False)
-        .drop(columns="updatedAt")
-        .astype({"id": int})
-    )
-    columns = ["namespace", "name"]
-    for col in columns:
-        steps_df_grapher[col] = steps_df_grapher[f"{col}_etl"].fillna(steps_df_grapher[f"{col}_db"])
-        steps_df_grapher = steps_df_grapher.drop(columns=[f"{col}_etl", f"{col}_db"])
-
-    assert steps_df_grapher["name"].notna().all(), "NaNs found in `name`"
-    assert steps_df_grapher["namespace"].notna().all(), "NaNs found in `namespace`"
+def get_datasets(archived: bool) -> pd.DataFrame:
+    # Get steps_df and grapher_changes
+    steps_df_grapher, grapher_changes = get_steps_df(archived=archived)
 
     # Add column marking migrations
     steps_df_grapher["migration_new"] = False
@@ -104,37 +74,6 @@ def get_datasets(archived) -> pd.DataFrame:
     return steps_df_grapher
 
 
-@st.cache_data(show_spinner=False)
-def get_datasets_from_version_tracker() -> Tuple[pd.DataFrame, List[Dict[str, Any]]]:
-    # Get steps_df
-    vt = VersionTracker()
-    assert vt.connect_to_db, "Can't connnect to database! You need to be connected to run indicator upgrader"
-    steps_df = vt.steps_df
-
-    # Get file changes -> Infer dataset migrations
-    files_changed = get_changed_files()
-    grapher_changes = get_grapher_changes(files_changed, steps_df)
-
-    # Only keep grapher steps
-    steps_df_grapher = steps_df.loc[
-        steps_df["channel"] == "grapher", ["namespace", "identifier", "step", "db_dataset_name", "db_dataset_id"]
-    ]
-    # Remove unneded text from 'step' (e.g. '*/grapher/'), no need for fuzzymatch!
-    steps_df_grapher["step_reduced"] = steps_df_grapher["step"].str.split("grapher/").str[-1]
-
-    ## Keep only those that are in DB (we need them to be in DB, otherwise indicator upgrade won't work since charts wouldn't be able to reference to non-db-existing indicator IDs)
-    steps_df_grapher = steps_df_grapher.dropna(subset="db_dataset_id")
-    assert steps_df_grapher.isna().sum().sum() == 0
-    ## Column rename
-    steps_df_grapher = steps_df_grapher.rename(
-        columns={
-            "db_dataset_name": "name",
-            "db_dataset_id": "id",
-        }
-    )
-    return steps_df_grapher, grapher_changes
-
-
 def get_datasets_from_db() -> pd.DataFrame:
     """Load datasets."""
     try:
@@ -163,56 +102,6 @@ def get_indicators_from_datasets(
             # This can happen if we are matching a dataset to itself in case of renaming variables.
             new_indictors = new_indictors[~new_indictors["id"].isin(old_indictors["id"])]
     return old_indictors, new_indictors
-
-
-def _check_env() -> bool:
-    """Check if environment indicators are set correctly."""
-    ok = True
-    for env_name in ("GRAPHER_USER_ID", "DB_USER", "DB_NAME", "DB_HOST"):
-        if getattr(config, env_name) is None:
-            ok = False
-            st.warning(st.markdown(f"Environment variable `{env_name}` not found, do you have it in your `.env` file?"))
-
-    if ok:
-        st.success("`.env` configured correctly")
-    return ok
-
-
-def _show_environment() -> None:
-    """Show environment indicators (streamlit)."""
-    # show indicators (from .env)
-    st.info(
-        f"""
-    * **GRAPHER_USER_ID**: `{config.GRAPHER_USER_ID}`
-    * **DB_USER**: `{config.DB_USER}`
-    * **DB_NAME**: `{config.DB_NAME}`
-    * **DB_HOST**: `{config.DB_HOST}`
-    """
-    )
-
-
-@st.cache_resource
-def _check_env_and_environment() -> None:
-    """Check if environment indicators are set correctly."""
-    ok = _check_env()
-    if ok:
-        # check that you can connect to DB
-        try:
-            with st.spinner():
-                _ = get_connection()
-        except OperationalError as e:
-            st.error(
-                "We could not connect to the database. If connecting to a remote database, remember to"
-                f" ssh-tunel into it using the appropriate ports and then try again.\n\nError:\n{e}"
-            )
-            ok = False
-        except Exception as e:
-            raise e
-        else:
-            msg = "Connection to the Grapher database was successfull!"
-            st.success(msg)
-            st.subheader("Environment")
-            _show_environment()
 
 
 @st.cache_data(show_spinner=False)

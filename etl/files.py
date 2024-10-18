@@ -309,12 +309,20 @@ def upload_file_to_server(local_file_path: Path, target: str) -> None:
     if "@" not in target or ":" not in target:
         raise ValueError(f"The target '{target}' is not properly formatted. Expected format: 'user@host:/remote/path'.")
 
-    try:
-        # Construct the scp command
-        scp_command = ["scp", str(local_file_path), target]
+    # try:
+    # Construct the scp command
+    scp_command = ["scp", str(local_file_path), target]
 
-        # Execute the command
-        subprocess.run(scp_command, check=True, text=True, capture_output=True)
-        print(f"File {local_file_path} successfully uploaded to {target}")
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"Failed to upload file {local_file_path} to {target}") from e
+    # Execute the command
+    subprocess.run(scp_command, check=True, text=True, capture_output=True)
+    print(f"File {local_file_path} successfully uploaded to {target}")
+    # except subprocess.CalledProcessError as e:
+    #     raise RuntimeError(f"Failed to upload file {local_file_path} to {target}") from e
+
+
+def create_folder(folder_path: str | Path) -> None:
+    """Create a folder if it does not exist."""
+    if isinstance(folder_path, str):
+        folder_path = Path(folder_path)
+    if not folder_path.exists():
+        folder_path.mkdir(parents=True, exist_ok=True)
