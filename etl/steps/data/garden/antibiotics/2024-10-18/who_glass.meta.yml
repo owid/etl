@@ -1,0 +1,34 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Antibiotics
+    display:
+      name: << syndrome.capitalize >>
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  who_glass:
+    variables:
+      bcispermillion:
+        title: Bacteriologically confirmed <<syndrome.lower()>> infections per million population
+      total_specimentisolates:
+        title: Total specimen isolates of <<syndrome.lower()>> infections
+      isolspermillion:
+        title: Isolates of <<syndrome.lower()>> per million population
+      totalspecimenisolateswithast:
+        title: Bacterially confirmed <<syndrome.lower()>> infections per million population with antibiotic susceptibility test results
+      astresult:
+        title: Share of bacterial confirmed <<syndrome.lower()>> infections with antibiotic susceptibility test results
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
