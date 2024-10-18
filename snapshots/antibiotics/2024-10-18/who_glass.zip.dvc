@@ -15,7 +15,7 @@ meta:
     producer: World Health Organization
     citation_full: |-
       Global AMR data - Global Antimicrobial Resitsance and Use Surveillance System (GLASS), World Health Organization (2024)
-      
+
     attribution_short: WHO
 
     # Files
@@ -27,4 +27,7 @@ meta:
       name: © 2024 WHO
       url: https://www.who.int/about/policies/terms-of-use
 
-  
+outs:
+  - md5: 12d197f03c1dc917f7e27662bd2e581b
+    size: 55169
+    path: who_glass.zip
