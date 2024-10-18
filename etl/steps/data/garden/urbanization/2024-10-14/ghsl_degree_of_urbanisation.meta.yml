@@ -135,6 +135,10 @@ tables:
             people
             <% elif attribute == 'share' or attribute == 'popshare' %>
             %
+            <% elif attribute == 'desnity' %>
+            people/km²
+            <% elif attribute == 'number' %>
+            number
             <%- endif -%>
 
           short_unit:
@@ -142,6 +146,8 @@ tables:
             km²
             <% elif attribute == 'share' or attribute == 'popshare' %>
             %
+            <% elif attribute == 'desnity' %>
+            people/km²
             <%- endif -%>
           description_processing:
             <% if attribute == 'share' or attribute == 'popshare' %>
@@ -155,4 +161,8 @@ tables:
                 0
                 <% elif attribute == 'share' or attribute == 'popshare' %>
                 1
+                <% elif attribute == 'density' %>
+                1
+                <% elif attribute == 'number' %>
+                0
                 <%- endif -%>
