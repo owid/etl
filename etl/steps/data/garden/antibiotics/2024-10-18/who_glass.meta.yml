@@ -20,7 +20,7 @@ tables:
     variables:
       bcispermillion:
         title: Bacteriologically confirmed <<syndrome.lower()>> infections per million population
-      total_specimentisolates:
+      total_specimenisolates:
         title: Total specimen isolates of <<syndrome.lower()>> infections
       isolspermillion:
         title: Isolates of <<syndrome.lower()>> per million population
