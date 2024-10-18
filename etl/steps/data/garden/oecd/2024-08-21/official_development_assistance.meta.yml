@@ -13,7 +13,7 @@ definitions:
         Non-DAC countries (OECD): Qatar, Saudi Arabia, Turkey, UAE, among others
         G7 countries (OECD): Canada, France, Germany, Italy, Japan, UK and US
         Multilateral organizations (OECD): e.g. World Bank and UN agencies
-        Official donors: DAC countries, Non-DAC countries and multilateral organizations
+        Official donors: DAC countries, non-DAC countries and multilateral organizations
         Private donors: Private foundations reporting aid data
 
   # NOTE: Modify this year in future updates.
@@ -25,8 +25,15 @@ definitions:
     Non-DAC countries (OECD): Qatar, Saudi Arabia, Turkey, UAE, among others
     G7 countries (OECD): Canada, France, Germany, Italy, Japan, UK and US
     Multilateral organizations (OECD): EU institutions
-    Official donors: DAC countries, Non-DAC countries and multilateral organizations
+    Official donors: DAC countries, non-DAC countries and multilateral organizations
     Private donors: Private foundations reporting aid data
+
+  # NOTE: These annotations exclude EU institutions from the definition of DAC countries, because we use it for per capita and as a share of GNI calculations.
+  entity_annotations_alternative_2: &entity_annotations_alternative_2 |-
+    DAC countries (OECD): Major aid donors in the OECD
+    Non-DAC countries (OECD): Qatar, Saudi Arabia, Turkey, UAE, among others
+    G7 countries (OECD): Canada, France, Germany, Italy, Japan, UK and US
+    Official donors: DAC countries and non-DAC countries
 
   short_oda: "[Official development assistance (ODA)](#dod:oda) is defined as government aid designed to promote the economic development and welfare of developing countries."
 
@@ -305,7 +312,7 @@ tables:
         display:
           name: ODA by donor (% of GNI) - Net disbursements
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
       oda_grant_equivalents_share_gni:
@@ -329,7 +336,7 @@ tables:
         display:
           name: ODA by donor (% of GNI) - Grant equivalents
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
       oda_official_estimate_share_gni:
@@ -353,7 +360,7 @@ tables:
         display:
           name: ODA by donor (% of GNI) - Official estimate
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
       oda_bilateral_grant_equivalents:
@@ -478,7 +485,7 @@ tables:
         display:
           name: Official and private flows by donor (% of GNI) - Net disbursements
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
       flows_net_disbursements:
@@ -516,7 +523,7 @@ tables:
         display:
           name: Official and private flows by donor (% of GNI) - Grant equivalents
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
       i_oda_net_disbursements_per_capita:
@@ -539,7 +546,7 @@ tables:
         display:
           name: ODA per capita by donor - Net disbursements
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
       oda_grant_equivalents_per_capita:
@@ -562,7 +569,7 @@ tables:
         display:
           name: ODA per capita by donor - Grant equivalents
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
 
