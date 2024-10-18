@@ -7,7 +7,7 @@ import streamlit as st
 from structlog import get_logger
 
 import etl.grapher_model as gm
-from apps.anomalist.anomalist_api import add_analytics_score, add_population_score, combine_and_reduce_scores_df
+from apps.anomalist.anomalist_api import add_auxiliary_scores, combine_and_reduce_scores_df
 from apps.wizard.utils.db import WizardDB
 from apps.wizard.utils.io import get_steps_df
 from etl.config import OWID_ENV, OWIDEnv
@@ -89,21 +89,7 @@ def get_scores(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
     """Combine and reduce scores dataframe."""
     df = combine_and_reduce_scores_df(anomalies)
 
-    # Add a population score.
-    df = add_population_score(df_reduced=df)
-
-    # Add an analytics score.
-    df = add_analytics_score(df_reduced=df)
-
-    # Rename columns for convenience.
-    df = df.rename(columns={"variable_id": "indicator_id", "anomaly_score": "score"}, errors="raise")
-
-    # Create a weighed combined score.
-    w_score = 1
-    w_pop = 1
-    w_views = 1
-    df["score_weighed"] = (w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]) / (
-        w_score + w_pop + w_views
-    )
+    # Add a population score, an analytics score, and a weighted score.
+    df = add_auxiliary_scores(df=df)
 
     return df

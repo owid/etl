@@ -158,16 +158,16 @@ def ask_llm_for_summary(df: pd.DataFrame):
 
     # df = st.session_state.anomalist_df
     # Get dataframe
-    df = df[["entity_name", "year", "type", "indicator_id", "score_weighed"]]
+    df = df[["entity_name", "year", "type", "indicator_id", "score_weighted"]]
     # Keep top anomalies based on weighed score
-    df = df.sort_values("score_weighed", ascending=False)
+    df = df.sort_values("score_weighted", ascending=False)
     df = cast(pd.DataFrame, df.head(NUM_ANOMALIES_PER_TYPE))
 
     # Round score (reduce token number)
-    df["score_weighed"] = df["score_weighed"].apply(lambda x: int(round(100 * x)))
+    df["score_weighted"] = df["score_weighted"].apply(lambda x: int(round(100 * x)))
     # Reshape, pivot indicator_score to have one score column per id
     df = df.pivot_table(
-        index=["entity_name", "year", "type"], columns="indicator_id", values="score_weighed"
+        index=["entity_name", "year", "type"], columns="indicator_id", values="score_weighted"
     ).reset_index()
     # As string (one per anomaly type)
     groups = df.groupby("type")
@@ -304,7 +304,7 @@ def _sort_df(df: pd.DataFrame, sort_strategy: str) -> Tuple[pd.DataFrame, List[s
     columns_sort = []
     match sort_strategy:
         case "relevance":
-            columns_sort = ["score_weighed"]
+            columns_sort = ["score_weighted"]
         case "score":
             columns_sort = ["score"]
         case "population":

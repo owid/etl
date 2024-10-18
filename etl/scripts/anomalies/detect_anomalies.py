@@ -14,8 +14,8 @@ from structlog import get_logger
 import etl.grapher_io as io
 import etl.grapher_model as gm
 from apps.anomalist import detectors
+from apps.anomalist.anomalist_api import add_auxiliary_scores
 from apps.anomalist.gp_detector import AnomalyGaussianProcessOutlier
-from apps.wizard.app_pages.anomalist.utils import add_analytics_score, add_population_score
 from etl.db import get_engine
 
 detectors_classes = {
@@ -256,33 +256,14 @@ def main(dataset_id: int, anomaly_type: str, n_anomalies: int = 10) -> None:
     )
 
     # Add population and analytics scores.
-    ####################################################################################################################
-    # TODO: Refactor to avoid repeating this code.
-    # Add a population score.
-    df = add_population_score(df_reduced=df)
-
-    # Add an analytics score.
-    df = add_analytics_score(df_reduced=df)
-
-    # Rename columns for convenience.
-    df = df.rename(columns={"variable_id": "indicator_id", "anomaly_score": "score"}, errors="raise")
-
-    # Create a weighed combined score.
-    w_score = 1
-    w_pop = 1
-    w_views = 1
-    # TODO: Fix typo in app, it should be "score_weighted" instead of "score_weighed".
-    df["score_weighted"] = (
-        w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]
-    ) / (w_score + w_pop + w_views)
-    ####################################################################################################################
+    df = add_auxiliary_scores(df=df)
 
     # Add anomaly type.
     df["anomaly_type"] = detector.anomaly_type
 
     # Inspect anomalies.
     inspect_anomalies(
-        df=df.sort_values("score_weighted", ascending=False),
+        df=df.sort_values("score", ascending=False),
         df_data=df_data,
         metadata=metadata,
         variable_mapping=variable_mapping,
