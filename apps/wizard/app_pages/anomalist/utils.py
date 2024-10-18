@@ -79,6 +79,8 @@ def load_variable_mapping(datasets_new_ids: List[int]) -> Dict[int, int]:
         #  This could be useful if a user wants to compare two arbitrary versions of existing grapher datasets.
         variable_mapping = dict()
 
+    return variable_mapping  # type: ignore
+
 
 def create_tables(_owid_env: OWIDEnv = OWID_ENV):
     """Create all required tables.

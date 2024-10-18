@@ -381,8 +381,13 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     # reorder in the same order as variables
     df = df[[v.id for v in variables]]
 
-    # try converting to numeric
-    df = df.astype(float)
+    # TODO: how should we treat non-numeric variables? We can exclude it here, but then we need to
+    # fix it in detectors
+    # HACK: set non-numeric variables to zero
+    numeric_cols = df.select_dtypes(include="number").columns
+    for col in df.columns:
+        if col not in numeric_cols:
+            df[col] = 0
 
     # TODO:
     # remove countries with all nulls or all zeros or constant values
