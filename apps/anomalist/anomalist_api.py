@@ -10,6 +10,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from apps.anomalist.detectors import (
+    AnomalyDetector,
     AnomalyTimeChange,
     AnomalyUpgradeChange,
     AnomalyUpgradeMissing,
@@ -41,6 +42,11 @@ ANOMALY_DETECTORS = {
         AnomalyGaussianProcessOutlier,
     ]
 }
+
+
+def load_detector(anomaly_type: ANOMALY_TYPE) -> AnomalyDetector:
+    """Load detector."""
+    return ANOMALY_DETECTORS[anomaly_type]
 
 
 def load_latest_population():
@@ -394,7 +400,15 @@ def _load_variables_meta(engine: Engine, variable_ids: list[int]) -> list[gm.Var
 def combine_and_reduce_scores_df(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
     """Get the combined dataframe with scores for all anomalies, and reduce it to include only the largest anomaly for each contry-indicator."""
     # Combine the reduced dataframes for all anomalies into a single dataframe.
-    dfs = [cast(pd.DataFrame, anomaly.dfReduced).assign(**{"type": anomaly.anomalyType}) for anomaly in anomalies]
+    dfs = []
+    for anomaly in anomalies:
+        df = anomaly.dfReduced
+        if df is None:
+            log.warning(f"Anomaly {anomaly} has no reduced dataframe.")
+            continue
+        df["type"] = anomaly.anomalyType
+        dfs.append(df)
+
     df_reduced = cast(pd.DataFrame, pd.concat(dfs, ignore_index=True))
     # Dtypes
     # df = df.astype({"year": int})
