@@ -664,13 +664,13 @@ if st.session_state.anomalist_df is not None:
             pagination_key="pagination-demo",
         )
 
-        # Show controls only if needed
-        if len(items) > items_per_page:
-            pagination.show_controls(mode="bar")
-
         # Show items (only current page)
         for item in pagination.get_page_items():
             show_anomaly_compact(item[0], item[1])
+
+        # Show controls only if needed
+        if len(items) > items_per_page:
+            pagination.show_controls(mode="bar")
 
 # Reset state
 set_states({"anomalist_datasets_submitted": False})
