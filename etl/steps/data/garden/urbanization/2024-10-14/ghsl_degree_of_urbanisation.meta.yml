@@ -173,7 +173,7 @@ tables:
                 <% elif attribute == 'share' or attribute == 'popshare' %>
                 1
                 <% elif attribute == 'density' %>
-                1
+                0
                 <% elif attribute == 'number' %>
                 0
                 <%- endif -%>
