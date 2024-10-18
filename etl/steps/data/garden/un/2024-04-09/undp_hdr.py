@@ -13,6 +13,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("undp_hdr")
+    ds_regions = paths.load_dataset("regions")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     # Read table from meadow dataset.
     tb = ds_meadow["undp_hdr"].reset_index()
@@ -48,6 +50,8 @@ def run(dest_dir: str) -> None:
         }
     )
 
+    tb = region_avg(tb, ds_regions, ds_income_groups)
+
     tb = tb.format(["country", "year"])
 
     #
@@ -60,3 +64,28 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def region_avg(tb, ds_regions, ds_income_groups):
+    """Calculate regional averages for the table, this includes continents and WB income groups"""
+    # remove columns where regional average does not make sense
+    tb_cols = tb.columns
+    ind_wo_avg = ["country", "year", "gii_rank", "hdi_rank", "loss", "rankdiff_hdi_phdi"]
+    rel_cols = [col for col in tb.columns if col not in ind_wo_avg]
+
+    # calculate population weighted columns (helper columns)
+    for col in rel_cols:
+        tb[col + "_pop"] = tb[col] * tb["pop_total"]
+
+    tb = geo.add_regions_to_table(
+        tb,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        frac_allowed_nans_per_year=0.2,
+    )
+
+    # calculate regional averages
+    for col in rel_cols:
+        tb[col] = tb[col + "_pop"] / tb["pop_total"]
+
+    return tb[tb_cols]
