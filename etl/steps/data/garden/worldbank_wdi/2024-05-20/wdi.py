@@ -27,6 +27,8 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset()
     ds_population = paths.load_dataset("population")
+    ds_regions = paths.load_dataset("regions")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     #
     # Process data.
@@ -63,6 +65,9 @@ def run(dest_dir: str) -> None:
     # add armed personnel as share of population
     tb_garden = add_armed_personnel_as_share_of_population(tb_garden, ds_population)
 
+    # add regions to remittance data
+    tb_garden = add_regions_to_remittance_data(tb_garden, ds_regions, ds_income_groups)
+
     ####################################################################################################################
 
     #
@@ -75,6 +80,33 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("wdi.end")
+
+
+def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    """
+    Add regions to remittance data.
+    """
+
+    # calculate total cost of remittance for each country
+    tb["total_cost_of_receiving_remittances"] = tb["si_rmt_cost_ib_zs"] * tb["bx_trf_pwkr_cd_dt"]
+    tb["total_cost_of_sending_remittances"] = tb["si_rmt_cost_ob_zs"] * tb["bm_trf_pwkr_cd_dt"]
+
+    agg = {
+        "total_cost_of_receiving_remittances": "sum",
+        "total_cost_of_sending_remittances": "sum",
+        "bx_trf_pwkr_cd_dt": "sum",
+        "bm_trf_pwkr_cd_dt": "sum",
+    }
+
+    # add regions to table
+    tb = geo.add_regions_to_table(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations=agg)
+
+    tb["si_rmt_cost_ib_zs"] = tb["total_cost_of_receiving_remittances"] / tb["bx_trf_pwkr_cd_dt"]
+    tb["si_rmt_cost_ob_zs"] = tb["total_cost_of_sending_remittances"] / tb["bm_trf_pwkr_cd_dt"]
+
+    tb = tb.drop(columns=["total_cost_of_receiving_remittances", "total_cost_of_sending_remittances"])
+
+    return tb
 
 
 def mk_omms(table: Table) -> Table:
