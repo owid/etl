@@ -7,6 +7,7 @@ import pandas as pd
 import structlog
 from owid.catalog import find
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from apps.anomalist.detectors import (
@@ -192,13 +193,14 @@ def anomaly_detection(
     variable_mapping: Optional[dict[int, int]] = None,
     variable_ids: Optional[list[int]] = None,
     dry_run: bool = False,
+    force: bool = False,
     reset_db: bool = False,
 ) -> None:
     """Detect anomalies."""
     engine = get_engine()
 
     # Ensure the 'anomalies' table exists. Optionally reset it if reset_db is True.
-    gm.Anomaly.create_table(engine, reset=reset_db)
+    gm.Anomaly.create_table(engine, if_exists="replace" if reset_db else "skip")
 
     # If no anomaly types are provided, default to all available types
     if not anomaly_types:
@@ -235,6 +237,10 @@ def anomaly_detection(
         dataset_variable_ids[variable.datasetId].append(variable)
 
     for dataset_id, variables_in_dataset in dataset_variable_ids.items():
+        # Get dataset's checksum
+        with Session(engine) as session:
+            dataset = gm.Dataset.load_dataset(session, dataset_id)
+
         log.info("Loading data from S3")
         variables_old = [
             variables[variable_id_old]
@@ -248,6 +254,11 @@ def anomaly_detection(
             # Instantiate the anomaly detector.
             if anomaly_type not in ANOMALY_DETECTORS:
                 raise ValueError(f"Unsupported anomaly type: {anomaly_type}")
+
+            if not force:
+                if not needs_update(engine, dataset, anomaly_type):
+                    log.info(f"Anomaly type {anomaly_type} for dataset {dataset_id} already exists in the database.")
+                    continue
 
             log.info(f"Detecting anomaly type {anomaly_type} for dataset {dataset_id}")
 
@@ -276,6 +287,7 @@ def anomaly_detection(
             # TODO: validate format of the output dataframe
             anomaly = gm.Anomaly(
                 datasetId=dataset_id,
+                datasetSourceChecksum=dataset.sourceChecksum,
                 anomalyType=anomaly_type,
             )
             anomaly.dfScore = df_score_long
@@ -317,6 +329,22 @@ def anomaly_detection(
                         log.info("Writing anomaly to database")
                         session.add(anomaly)
                         session.commit()
+
+
+def needs_update(engine: Engine, dataset: gm.Dataset, anomaly_type: str) -> bool:
+    """If there's an anomaly with the dataset checksum in DB, it doesn't need
+    to be updated."""
+    with Session(engine) as session:
+        try:
+            anomaly = gm.Anomaly.load(
+                session,
+                dataset_id=dataset.id,
+                anomaly_type=anomaly_type,
+            )
+        except NoResultFound:
+            return True
+
+        return anomaly.datasetSourceChecksum != dataset.sourceChecksum
 
 
 def export_anomalies_file(df: pd.DataFrame, dataset_id: int, anomaly_type: str) -> str:
