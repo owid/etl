@@ -20,12 +20,16 @@ tables:
     variables:
       bcispermillion:
         title: Bacteriologically confirmed <<syndrome.lower()>> infections per million population
-      total_specimenisolates:
+        unit: "confirmed infections per million"
+      totalspecimenisolates:
         title: Total specimen isolates of <<syndrome.lower()>> infections
+        unit: "isolates"
       isolspermillion:
         title: Isolates of <<syndrome.lower()>> per million population
+        unit: "isolates per million"
       totalspecimenisolateswithast:
         title: Bacterially confirmed <<syndrome.lower()>> infections per million population with antibiotic susceptibility test results
+        unit: "confirmed infections per million"
       astresult:
         title: Share of bacterial confirmed <<syndrome.lower()>> infections with antibiotic susceptibility test results
         unit: "%"
