@@ -285,7 +285,8 @@ def _filter_df(df: pd.DataFrame, year_min, year_max, anomaly_types, entities, in
     ## Year
     df = df[(df["year"] >= year_min) & (df["year"] <= year_max)]
     ## Anomaly type
-    df = df[~df["type"].isin(anomaly_types)]
+    if len(anomaly_types) > 0:
+        df = df[df["type"].isin(anomaly_types)]
     ## Entities
     if len(entities) > 0:
         df = df[df["entity_name"].isin(entities)]
@@ -613,10 +614,10 @@ if st.session_state.anomalist_df is not None:
                 )
             with cols[1]:
                 st.multiselect(
-                    label="Hide types",
+                    label="Detectors",
                     options=ANOMALY_TYPES_AVAILABLE,
                     format_func=ANOMALY_TYPE_NAMES.get,
-                    help="Exclude anomalies of a certain type.",
+                    help="Show anomalies of a certain type.",
                     placeholder="Select anomaly types",
                     key="anomalist_filter_anomaly_types",
                 )
