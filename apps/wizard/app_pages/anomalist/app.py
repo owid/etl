@@ -474,7 +474,8 @@ with st.form(key="dataset_search"):
 # If anomalies for dataset already exist in DB, load them. Warn user that these are being loaded from DB
 if st.session_state.anomalist_datasets_submitted:
     # 3.1/ Check if anomalies are already there in DB
-    st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
+    with st.spinner("Loading anomalies (already detected) from database..."):
+        st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
 
     # Load indicators in selected datasets
     st.session_state.anomalist_indicators = cached.load_variables_display_in_dataset(
@@ -484,7 +485,7 @@ if st.session_state.anomalist_datasets_submitted:
 
     # Get indicator IDs
     variable_ids = list(st.session_state.anomalist_indicators.keys())
-    st.session_state.anomalist_mapping = get_variable_mapping(variable_ids)
+    st.session_state.anomalist_mapping = {k: v for k, v in VARIABLE_MAPPING.items() if v in variable_ids}
     st.session_state.anomalist_mapping_inv = {v: k for k, v in st.session_state.anomalist_mapping.items()}
 
     # 3.2/ No anomaly found in DB, estimate them
