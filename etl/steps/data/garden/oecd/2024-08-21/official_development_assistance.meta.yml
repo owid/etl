@@ -147,7 +147,7 @@ definitions:
     We calculated this indicator by dividing by the population of the donor country or regional aggregation. The population estimate is available in the OECD dataset.
 
   processing_per_capita_2: |-
-    We calculated this indicator by dividing by the population of the recipient country. We use a long-run population dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
+    We calculated this indicator by dividing by the population of each country. We use a long-run population dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
 
   processing_share_gni: |-
     We calculated this indicator by dividing by the gross national income (GNI) of the donor country regional aggregation. The GNI estimate is available in the OECD dataset.
@@ -920,5 +920,29 @@ tables:
         display:
           name: ODA by donor and sector (<<sector>>)
           numDecimalPlaces: 0
+          <<: *common_display
+
+      oda_by_sector_per_capita:
+        title: ODA per capita by donor and sector (<<sector>>)
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) given that is <<sector.lower()>>, divided by population. {definitions.short_commitments_sectors} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_sector}"
+          - "{definitions.key_commitments_sectors}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+          - "{definitions.key_oda_list_of_countries}"
+        processing_level: *processing_level_by_sector
+        description_processing: |-
+          {definitions.processing_per_capita_2}
+
+          {definitions.processing_oda_by_sector}
+        presentation:
+          title_public: ODA per capita by donor and sector (<<sector>>)
+        display:
+          name: ODA per capita by donor and sector (<<sector>>)
+          numDecimalPlaces: 2
           <<: *common_display
 

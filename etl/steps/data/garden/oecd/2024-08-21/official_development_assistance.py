@@ -216,7 +216,9 @@ def run(dest_dir: str) -> None:
 
     tb = add_recipient_dataset(tb=tb, tb_recipient=tb_dac2a)
 
-    tb = create_indicators_per_capita_recipient(
+    tb = add_aid_by_sector_donor_dataset(tb=tb, tb_sector=tb_dac5)
+
+    tb = create_indicators_per_capita_owid_population(
         tb=tb,
         indicator_list=[
             "oda_recipient",
@@ -225,11 +227,10 @@ def run(dest_dir: str) -> None:
             "technical_cooperation_recipient",
             "development_food_aid_recipient",
             "humanitarian_aid_recipient",
+            "oda_by_sector",
         ],
         ds_population=ds_population,
     )
-
-    tb = add_aid_by_sector_donor_dataset(tb=tb, tb_sector=tb_dac5)
 
     tb = tb.format(["country", "year", "donor", "sector"], short_name=paths.short_name)
     tb_dac2a = tb_dac2a.format(["country", "year", "donor"])
@@ -301,6 +302,7 @@ def reformat_table_and_make_it_wide(
 def create_indicators_per_capita(tb: Table, indicator_list: List[str]) -> Table:
     """
     Create indicators per capita for ODA (flows and grant equivalent).
+    This function uses the population data from the OECD Data Explorer.
     """
 
     for indicator in indicator_list:
@@ -447,7 +449,7 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     return tb
 
 
-def create_indicators_per_capita_recipient(tb: Table, indicator_list: List[str], ds_population: Dataset) -> Table:
+def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List[str], ds_population: Dataset) -> Table:
     """
     Create indicators per capita for the recipient indicators.
     The per capita values available in the OECD Data Explorer are in current prices, so we want to use the constant values.

@@ -54,6 +54,10 @@ def run(dest_dir: str) -> None:
         "rural_total_area",
         "urban_centre_area",
         "urban_cluster_area",
+        "urban_centre_number",
+        "towns_total_number",
+        "semi_dense_number",
+        "rural_total_number",
     ]
 
     aggr_dict = {col: "sum" for col in columns_to_aggregate}
@@ -77,10 +81,11 @@ def run(dest_dir: str) -> None:
 
     # Split the column into three parts: location, attribute, type for metadata generation
     tb[["location_type", "attribute", "type"]] = tb["indicator"].str.extract(
-        r"(rural_total|urban_[\w]+)_(\w+?)_(estimates|projections)"
+        r"(towns_total|semi_dense|rural_total|urban_[\w]+)_(\w+?)_(estimates|projections)"
     )
     # Drop the original indicator column
     tb = tb.drop(columns=["indicator"])
+
     tb = tb.format(["country", "year", "location_type", "attribute", "type"])
 
     #
@@ -116,6 +121,7 @@ def calculate_shares(tb):
 
     tb["urban_cluster_share"] = tb["urban_cluster_area"] / tb["total_area"] * 100
     tb["urban_centre_share"] = tb["urban_centre_area"] / tb["total_area"] * 100
+    tb["urban_center_density"] = tb["urban_centre_population"] / tb["urban_centre_area"]
 
     tb = tb.drop(columns=["total_population", "total_area"])
     return tb
