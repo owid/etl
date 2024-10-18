@@ -270,6 +270,14 @@ def main(dataset_id: int, anomaly_type: str, n_anomalies: int = 10) -> None:
         n_anomalies_max=n_anomalies,
     )
 
+    # # Useful for debugging, to compare old and new series for different countries.
+    # i = 0
+    # old = list(variable_mapping)[i]
+    # new = variable_mapping[old]
+    # d = df_data[["entity_name", "year", old, new]].rename(columns={old: "old", new: "new"}).dropna().melt(id_vars=["entity_name", "year"])
+    # for c in d["entity_name"].unique():
+    #     px.line(d[d["entity_name"]==c],x="year", y="value", color="variable_id", markers=True, title=f"{c}", color_discrete_map={"old": "rgba(256,0,0,0.5)", "new": "rgba(0,256,0,0.5)"}).show()
+
 
 if __name__ == "__main__":
     main()
