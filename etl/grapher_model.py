@@ -112,13 +112,19 @@ class Base(MappedAsDataclass, DeclarativeBase):
         return x
 
     @classmethod
-    def create_table(cls, engine: Engine, reset: bool = False) -> None:
-        if reset:
-            # Drop the table if it exists
+    def create_table(cls, engine: Engine, if_exists: Literal["fail", "replace", "skip"] = "fail") -> None:
+        if if_exists == "replace":
+            # Drop the table if it exists and create a new one
             cls.__table__.drop(engine, checkfirst=True)  # type: ignore
-
-        # Create table
-        cls.__table__.create(engine, checkfirst=True)  # type: ignore
+            cls.__table__.create(engine, checkfirst=False)  # type: ignore
+        elif if_exists == "skip":
+            # Create the table only if it doesn't already exist
+            cls.__table__.create(engine, checkfirst=True)  # type: ignore
+        elif if_exists == "fail":
+            # Attempt to create the table; fail if it already exists
+            cls.__table__.create(engine, checkfirst=False)  # type: ignore
+        else:
+            raise ValueError(f"Unrecognized value for if_exists: {if_exists}")
 
 
 class Entity(Base):
@@ -1759,6 +1765,7 @@ class Anomaly(Base):
         DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
     )
     datasetId: Mapped[int] = mapped_column(Integer)
+    datasetSourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
     anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
     path_file: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
     _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LONGBLOB, default=None)
@@ -1778,6 +1785,10 @@ class Anomaly(Base):
             f"<Anomaly(id={self.id}, createdAt={self.createdAt}, updatedAt={self.updatedAt}, "
             f"datasetId={self.datasetId}, anomalyType={self.anomalyType})>"
         )
+
+    @classmethod
+    def load(cls, session: Session, dataset_id: int, anomaly_type: str) -> "Anomaly":
+        return session.scalars(select(cls).where(cls.datasetId == dataset_id, cls.anomalyType == anomaly_type)).one()
 
     @hybrid_property
     def dfScore(self) -> Optional[pd.DataFrame]:  # type: ignore

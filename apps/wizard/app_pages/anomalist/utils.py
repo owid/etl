@@ -54,6 +54,19 @@ def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], D
     datasets_new_ids = list(dataset_new_and_old)
 
     # Load mapping created by indicator upgrader (if any).
+    variable_mapping = load_variable_mapping(datasets_new_ids)
+
+    # List all grapher datasets.
+    datasets_all = steps_df_grapher["id_name"].to_list()
+    datasets_all = steps_df_grapher[["id", "id_name"]].set_index("id").squeeze().to_dict()
+
+    # List new datasets.
+    datasets_new = {k: v for k, v in datasets_all.items() if k in datasets_new_ids}
+
+    return datasets_all, datasets_new, variable_mapping  # type: ignore
+
+
+def load_variable_mapping(datasets_new_ids: List[int]) -> Dict[int, int]:
     mapping = WizardDB.get_variable_mapping_raw()
     if len(mapping) > 0:
         log.info("Using variable mapping created by indicator upgrader.")
@@ -87,6 +100,7 @@ def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], D
     datasets_new = {k: v for k, v in datasets_all.items() if k in datasets_new_ids}
 
     return datasets_all, datasets_new, variable_mapping  # type: ignore
+    return variable_mapping  # type: ignore
 
 
 def create_tables(_owid_env: OWIDEnv = OWID_ENV):
@@ -94,7 +108,7 @@ def create_tables(_owid_env: OWIDEnv = OWID_ENV):
 
     If exist, nothing is created.
     """
-    gm.Anomaly.create_table(_owid_env.engine)
+    gm.Anomaly.create_table(_owid_env.engine, if_exists="skip")
 
 
 @st.cache_data(show_spinner=False)
