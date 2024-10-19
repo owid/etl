@@ -87,6 +87,8 @@ def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_gro
     Add regions to remittance data.
     """
 
+    tb = tb.reset_index()
+
     # calculate total cost of remittance for each country
     tb["total_cost_of_receiving_remittances"] = tb["si_rmt_cost_ib_zs"] * tb["bx_trf_pwkr_cd_dt"]
     tb["total_cost_of_sending_remittances"] = tb["si_rmt_cost_ob_zs"] * tb["bm_trf_pwkr_cd_dt"]
@@ -99,12 +101,16 @@ def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_gro
     }
 
     # add regions to table
-    tb = geo.add_regions_to_table(tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations=agg)
+    tb = geo.add_regions_to_table(
+        tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations=agg, min_num_values_per_year=1
+    )
 
     tb["si_rmt_cost_ib_zs"] = tb["total_cost_of_receiving_remittances"] / tb["bx_trf_pwkr_cd_dt"]
     tb["si_rmt_cost_ob_zs"] = tb["total_cost_of_sending_remittances"] / tb["bm_trf_pwkr_cd_dt"]
 
     tb = tb.drop(columns=["total_cost_of_receiving_remittances", "total_cost_of_sending_remittances"])
+
+    tb = tb.format(["country", "year"])
 
     return tb
 
