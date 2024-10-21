@@ -1,3 +1,4 @@
+import os
 import random
 import time
 import warnings
@@ -23,6 +24,11 @@ log = structlog.get_logger()
 
 
 memory = Memory(CACHE_DIR, verbose=0)
+
+# Maximum time for processing in seconds
+ANOMALIST_MAX_TIME = int(os.environ.get("ANOMALIST_MAX_TIME", 10))
+# Number of jobs for parallel processing
+ANOMALIST_N_JOBS = int(os.environ.get("ANOMALIST_N_JOBS", 1))
 
 
 @memory.cache
@@ -65,8 +71,7 @@ def _processing_queue(items: list[tuple[str, int]]) -> List[tuple]:
 class AnomalyGaussianProcessOutlier(AnomalyDetector):
     anomaly_type = "gp_outlier"
 
-    # TODO: max_time is hard-coded to 10, but it should be configurable in production
-    def __init__(self, max_time: Optional[float] = 10, n_jobs: int = 1):
+    def __init__(self, max_time: Optional[float] = ANOMALIST_MAX_TIME, n_jobs: int = ANOMALIST_N_JOBS):
         self.max_time = max_time
         self.n_jobs = n_jobs
 

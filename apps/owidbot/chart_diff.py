@@ -2,7 +2,7 @@ import pandas as pd
 from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
-from etl.config import OWID_ENV, OWIDEnv, get_container_name
+from etl.config import ENV_FILE_PROD, OWID_ENV, OWIDEnv, get_container_name
 from etl.db import Engine
 
 from . import github_utils as gh_utils
@@ -71,6 +71,8 @@ def production_or_master_engine() -> Engine:
     """Return the production engine if available, otherwise connect to staging-site-master."""
     if OWID_ENV.env_remote == "production":
         return OWID_ENV.get_engine()
+    elif ENV_FILE_PROD:
+        return OWIDEnv.from_env_file(ENV_FILE_PROD).get_engine()
     else:
         log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
         return OWIDEnv.from_staging("master").get_engine()
