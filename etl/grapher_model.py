@@ -1353,7 +1353,8 @@ class Variable(Base):
         query = select(Variable).where(Variable.catalogPath.in_(catalog_paths))
         return {var.catalogPath: var.id for var in session.scalars(query).all()}  # type: ignore
 
-    def infer_type(self, values: pd.Series) -> VARIABLE_TYPE:
+    @classmethod
+    def infer_type(cls, values: pd.Series) -> VARIABLE_TYPE:
         """Set type and sort fields based on indicator values."""
         return _infer_variable_type(values)
 
