@@ -33,7 +33,7 @@ TOLERANCE = 5
 
 # Define entity annotations
 ENTITY_ANNOTATIONS = (
-    """Other high income countries (PIP): e.g. US, Western Europe, Australia, Japan, South Korea and Saudi Arabia""",
+    """Other high income countries (PIP): e.g. US, Western Europe, Australia, Japan, South Korea and Saudi Arabia"""
 )
 
 # These are parameters specifically defined for each type of variable
