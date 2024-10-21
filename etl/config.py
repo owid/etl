@@ -427,7 +427,7 @@ class OWIDEnv:
         elif self.env_remote == "staging":
             return f"http://{self.conf.DB_HOST}.tail6e23.ts.net/admin/api"
         elif self.env_remote == "dev":
-            return "http://localhost:3000/admin/api"
+            return "http://localhost:3030/admin/api"
         else:
             raise ValueError(f"Unknown environment: {self.env}")
 

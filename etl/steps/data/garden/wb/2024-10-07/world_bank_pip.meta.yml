@@ -463,6 +463,7 @@ tables:
           - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
           - Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
           - Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+          - Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
         description_processing: |-
           PIP provides regional aggregate figures for the number of people living below the International Poverty Line. Unfortunately, for certain regions and years the data survey coverage is too low and the results are suppressed. From 1990 onwards, it is only for South Asia and Sub-Saharan Africa (on different years) that regional estimates are sometimes missing.
 

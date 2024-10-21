@@ -13,7 +13,7 @@ definitions:
         Non-DAC countries (OECD): Qatar, Saudi Arabia, Turkey, UAE, among others
         G7 countries (OECD): Canada, France, Germany, Italy, Japan, UK and US
         Multilateral organizations (OECD): e.g. World Bank and UN agencies
-        Official donors: DAC countries, Non-DAC countries and multilateral organizations
+        Official donors: DAC countries, non-DAC countries and multilateral organizations
         Private donors: Private foundations reporting aid data
 
   # NOTE: Modify this year in future updates.
@@ -25,8 +25,15 @@ definitions:
     Non-DAC countries (OECD): Qatar, Saudi Arabia, Turkey, UAE, among others
     G7 countries (OECD): Canada, France, Germany, Italy, Japan, UK and US
     Multilateral organizations (OECD): EU institutions
-    Official donors: DAC countries, Non-DAC countries and multilateral organizations
+    Official donors: DAC countries, non-DAC countries and multilateral organizations
     Private donors: Private foundations reporting aid data
+
+  # NOTE: These annotations exclude EU institutions from the definition of DAC countries, because we use it for per capita and as a share of GNI calculations.
+  entity_annotations_alternative_2: &entity_annotations_alternative_2 |-
+    DAC countries (OECD): Major aid donors in the OECD
+    Non-DAC countries (OECD): Qatar, Saudi Arabia, Turkey, UAE, among others
+    G7 countries (OECD): Canada, France, Germany, Italy, Japan, UK and US
+    Official donors: DAC countries and non-DAC countries
 
   short_oda: "[Official development assistance (ODA)](#dod:oda) is defined as government aid designed to promote the economic development and welfare of developing countries."
 
@@ -58,6 +65,8 @@ definitions:
     "[Grant equivalent](#dod:grant-equivalents)" is a methodology to estimate the value of loans compared to a grant. It is an estimate, at today’s value of money, of how much is being given away over the life of a financial transaction, compared with a transaction at market terms.
   key_net_disbursements: |-
     Disbursements refer to money actually given/received, which can differ from what was originally pledged. These are also net disbursements: grants and loans are valued in the same way by recording the flows of cash that were granted, or the face value of loans that were lent to developing countries, deducting any loan repayments. The method does not reflect actual efforts by donor countries, given that grants and loans themselves represent different efforts from donors. From 2018, headline figures from the OECD are based on the [grant-equivalent methodology](#dod:grant-equivalents), which is a more accurate reflection of the effort made by donor countries.
+  key_official_estimate: |-
+    Official estimates of ODA combine net disbursements in data until 2017 with grant equivalents from 2018 onwards.
   key_commitments_sectors: |-
     Aid by sector is presented as commitment or gross disbursement data. Commitments refer to money pledged, and may be different from how much and how it is ultimately given/received. Gross disbursements measure total new flows given/received before repayments are deducted. Net disbursements are not used because there is no evidence that the source of financing to reimburse loans in a sector is actually the sector itself.
 
@@ -147,7 +156,7 @@ definitions:
     We calculated this indicator by dividing by the population of the donor country or regional aggregation. The population estimate is available in the OECD dataset.
 
   processing_per_capita_2: |-
-    We calculated this indicator by dividing by the population of the recipient country. We use a long-run population dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
+    We calculated this indicator by dividing by the population of each country. We use a long-run population dataset [maintained by Our World in Data](https://ourworldindata.org/population-sources).
 
   processing_share_gni: |-
     We calculated this indicator by dividing by the gross national income (GNI) of the donor country regional aggregation. The GNI estimate is available in the OECD dataset.
@@ -290,6 +299,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_gni}"
+          - "{definitions.key_oda_target}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_oda_list_of_countries}"
@@ -302,7 +312,7 @@ tables:
         display:
           name: ODA by donor (% of GNI) - Net disbursements
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
       oda_grant_equivalents_share_gni:
@@ -313,6 +323,7 @@ tables:
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_gni}"
+          - "{definitions.key_oda_target}"
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_oda_list_of_countries}"
@@ -325,7 +336,31 @@ tables:
         display:
           name: ODA by donor (% of GNI) - Grant equivalents
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
+          <<: *common_display
+
+      oda_official_estimate_share_gni:
+        title: ODA by donor (% of GNI) - Official estimate
+        unit: "% of GNI"
+        short_unit: "%"
+        description_short: Official development assistance (ODA) divided by gross national income, expressed as a percentage. This is the official estimate that combines net disbursements with grant equivalents from 2018.
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_gni}"
+          - "{definitions.key_oda_target}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_official_estimate}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_oda_list_of_countries}"
+        description_from_producer: "{definitions.producer_oda}"
+        presentation:
+          title_public: Foreign aid given as a share of national income
+          title_variant: Official estimate
+        display:
+          name: ODA by donor (% of GNI) - Official estimate
+          numDecimalPlaces: 2
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
       oda_bilateral_grant_equivalents:
@@ -450,7 +485,7 @@ tables:
         display:
           name: Official and private flows by donor (% of GNI) - Net disbursements
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
       flows_net_disbursements:
@@ -488,7 +523,7 @@ tables:
         display:
           name: Official and private flows by donor (% of GNI) - Grant equivalents
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
       i_oda_net_disbursements_per_capita:
@@ -511,7 +546,7 @@ tables:
         display:
           name: ODA per capita by donor - Net disbursements
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
       oda_grant_equivalents_per_capita:
@@ -534,7 +569,7 @@ tables:
         display:
           name: ODA per capita by donor - Grant equivalents
           numDecimalPlaces: 2
-          entityAnnotationsMap: *entity_annotations_alternative
+          entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
 
@@ -918,5 +953,29 @@ tables:
         display:
           name: ODA by donor and sector (<<sector>>)
           numDecimalPlaces: 0
+          <<: *common_display
+
+      oda_by_sector_per_capita:
+        title: ODA per capita by donor and sector (<<sector>>)
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) given that is <<sector.lower()>>, divided by population. {definitions.short_commitments_sectors} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_sector}"
+          - "{definitions.key_commitments_sectors}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+          - "{definitions.key_oda_list_of_countries}"
+        processing_level: *processing_level_by_sector
+        description_processing: |-
+          {definitions.processing_per_capita_2}
+
+          {definitions.processing_oda_by_sector}
+        presentation:
+          title_public: ODA per capita by donor and sector (<<sector>>)
+        display:
+          name: ODA per capita by donor and sector (<<sector>>)
+          numDecimalPlaces: 2
           <<: *common_display
 
