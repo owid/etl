@@ -7,6 +7,7 @@ import pandas as pd
 import structlog
 from owid.catalog import find
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from apps.anomalist.detectors import (
@@ -211,13 +212,14 @@ def anomaly_detection(
     variable_mapping: Optional[dict[int, int]] = None,
     variable_ids: Optional[list[int]] = None,
     dry_run: bool = False,
+    force: bool = False,
     reset_db: bool = False,
 ) -> None:
     """Detect anomalies."""
     engine = get_engine()
 
     # Ensure the 'anomalies' table exists. Optionally reset it if reset_db is True.
-    gm.Anomaly.create_table(engine, reset=reset_db)
+    gm.Anomaly.create_table(engine, if_exists="replace" if reset_db else "skip")
 
     # If no anomaly types are provided, default to all available types
     if not anomaly_types:
@@ -254,6 +256,10 @@ def anomaly_detection(
         dataset_variable_ids[variable.datasetId].append(variable)
 
     for dataset_id, variables_in_dataset in dataset_variable_ids.items():
+        # Get dataset's checksum
+        with Session(engine) as session:
+            dataset = gm.Dataset.load_dataset(session, dataset_id)
+
         log.info("Loading data from S3")
         variables_old = [
             variables[variable_id_old]
@@ -267,6 +273,11 @@ def anomaly_detection(
             # Instantiate the anomaly detector.
             if anomaly_type not in ANOMALY_DETECTORS:
                 raise ValueError(f"Unsupported anomaly type: {anomaly_type}")
+
+            if not force:
+                if not needs_update(engine, dataset, anomaly_type):
+                    log.info(f"Anomaly type {anomaly_type} for dataset {dataset_id} already exists in the database.")
+                    continue
 
             log.info(f"Detecting anomaly type {anomaly_type} for dataset {dataset_id}")
 
@@ -289,12 +300,17 @@ def anomaly_detection(
                 variable_mapping=variable_mapping_for_current_dataset,
             )
 
+            if df_score.empty:
+                log.info("No anomalies detected.`")
+                continue
+
             # Create a long format score dataframe.
             df_score_long = get_long_format_score_df(df_score)
 
             # TODO: validate format of the output dataframe
             anomaly = gm.Anomaly(
                 datasetId=dataset_id,
+                datasetSourceChecksum=dataset.sourceChecksum,
                 anomalyType=anomaly_type,
             )
             anomaly.dfScore = df_score_long
@@ -338,6 +354,22 @@ def anomaly_detection(
                         session.commit()
 
 
+def needs_update(engine: Engine, dataset: gm.Dataset, anomaly_type: str) -> bool:
+    """If there's an anomaly with the dataset checksum in DB, it doesn't need
+    to be updated."""
+    with Session(engine) as session:
+        try:
+            anomaly = gm.Anomaly.load(
+                session,
+                dataset_id=dataset.id,
+                anomaly_type=anomaly_type,
+            )
+        except NoResultFound:
+            return True
+
+        return anomaly.datasetSourceChecksum != dataset.sourceChecksum
+
+
 def export_anomalies_file(df: pd.DataFrame, dataset_id: int, anomaly_type: str) -> str:
     """Export anomaly df to local file (and upload to staging server if applicable)."""
     filename = f"{dataset_id}_{anomaly_type}.feather"
@@ -372,8 +404,11 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     # reorder in the same order as variables
     df = df[[v.id for v in variables]]
 
-    # try converting to numeric
-    df = df.astype(float)
+    # TODO: how should we treat non-numeric variables? We can exclude it here, but then we need to
+    # fix it in detectors
+    # HACK: set non-numeric variables to zero
+    df = df.apply(pd.to_numeric, errors="coerce")
+    df = df.fillna(0)
 
     # TODO:
     # remove countries with all nulls or all zeros or constant values
@@ -381,7 +416,7 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
 
     df = df.reset_index().astype({"entity_name": str})
 
-    return df
+    return df  # type: ignore
 
 
 # @memory.cache

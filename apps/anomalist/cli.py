@@ -50,6 +50,12 @@ memory = Memory(CACHE_DIR, verbose=0)
     help="Do not write to target database.",
 )
 @click.option(
+    "--force",
+    "-f",
+    is_flag=True,
+    help="TBD",
+)
+@click.option(
     "--reset-db/--no-reset-db",
     default=False,
     type=bool,
@@ -61,6 +67,7 @@ def cli(
     variable_mapping: str,
     variable_ids: Optional[list[int]],
     dry_run: bool,
+    force: bool,
     reset_db: bool,
 ) -> None:
     """TBD
@@ -111,6 +118,7 @@ def cli(
         variable_mapping=variable_mapping_dict,
         variable_ids=list(variable_ids) if variable_ids else None,
         dry_run=dry_run,
+        force=force,
         reset_db=reset_db,
     )
 
