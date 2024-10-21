@@ -66,18 +66,12 @@ CATEGORIES = {
             "Technical Cooperation": {"new_name": "technical_cooperation"},
         },
     },
-    "dac5": {
-        "aid_type": {
-            "Total ODA": {"new_name": "oda_by_sector"},
-        },
-    },
 }
 
 # Define indices for pivot tables.
 INDICES = {
     "dac1": ["country", "year"],
     "dac2a": ["country", "year", "donor"],
-    "dac5": ["country", "year", "sector"],
 }
 
 # Define type of donors to include from the recipient dataset.
@@ -91,45 +85,6 @@ DONORS_TOTALS = {
 # Define official donors aggregation
 OFFICIAL_DONORS = {"Official donors (OECD)": "Official donors"}
 
-# Define sectors to include from the DAC5 dataset.
-SECTORS_DAC5 = {
-    "I. Social Infrastructure & Services": "Social infrastructure and services",
-    "II. Economic Infrastructure & Services": "Economic infrastructure and services",
-    "III. Production Sectors": "Production sectors",
-    "IV. Multi-Sector / Cross-Cutting": "Multi-sector / Cross-cutting",
-    "V. Total Sector Allocable (I+II+III+IV)": "Total sector allocable",
-    "VI. Commodity Aid / General Programme Assistance": "Commodity aid / General programme assistance",
-    "VII. Action Relating to Debt": "Action relating to debt",
-    "VIII. Humanitarian Aid": "Humanitarian aid",
-    "IX. Unallocated / Unspecified": "Unallocated / Unspecified",
-    "Total (V+VI+VII+VIII+IX)": "Total",
-    "I.1. Education": "Education",
-    "I.2. Health": "Health",
-    "I.3. Population Policies/Programmes & Reproductive Health": "Population policies/programmes and reproductive health",
-    "I.4. Water Supply & Sanitation": "Water supply and sanitation",
-    "I.5. Government & Civil Society": "Government and civil society",
-    "I.5.a. Government & Civil Society-general": "Government and civil society (subcategory)",
-    "I.5.b. Conflict, Peace & Security": "Conflict, peace and security",
-    "I.6. Other Social Infrastructure & Services": "Other social infrastructure and services",
-    "II.1. Transport & Storage": "Transport and storage",
-    "II.2. Communications": "Communications",
-    "II.3. Energy": "Energy",
-    "II.4. Banking & Financial Services": "Banking and financial services",
-    "II.5. Business & Other Services": "Business and other services",
-    "III.1. Agriculture, Forestry, Fishing": "Agriculture, forestry, fishing",
-    "III.2. Industry, Mining, Construction": "Industry, mining, construction",
-    "III.3.a. Trade Policies & Regulations": "Trade policies and regulations",
-    "III.3.b. Tourism": "Tourism",
-    "IV.1. General Environment Protection": "General environment protection",
-    "IV.2. Other Multisector": "Other multisector",
-    "VI.1. General Budget Support": "General budget support",
-    "VI.2. Development Food Assistance": "Development food assistance",
-    "VI.3. Other Commodity Assistance": "Other commodity assistance",
-    "VIII.1. Emergency Response": "Emergency response",
-    "VIII.2. Reconstruction Relief & Rehabilitation": "Reconstruction relief and rehabilitation",
-    "VIII.3. Disaster Prevention & Preparedness": "Disaster prevention and preparedness",
-}
-
 
 def run(dest_dir: str) -> None:
     #
@@ -137,12 +92,17 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("official_development_assistance")
+    ds_one = paths.load_dataset("official_development_assistance_one")
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb_dac1 = ds_meadow["dac1"].reset_index()
     tb_dac2a = ds_meadow["dac2a"].reset_index()
-    tb_dac5 = ds_meadow["dac5"].reset_index()
+
+    tb_sectors_donor = ds_one["sectors_donor"].reset_index()
+    tb_sectors_recipient = ds_one["sectors_recipient"].reset_index()
+    tb_channels_donor = ds_one["channels_donor"].reset_index()
+    tb_channels_recipient = ds_one["channels_recipient"].reset_index()
 
     #
     # Process data.
@@ -158,14 +118,6 @@ def run(dest_dir: str) -> None:
     tb_dac2a = geo.harmonize_countries(
         df=tb_dac2a,
         country_col="recipient",
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-        warn_on_unused_countries=False,
-        warn_on_unknown_excluded_countries=False,
-    )
-    tb_dac5 = geo.harmonize_countries(
-        df=tb_dac5,
-        country_col="donor",
         countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
         warn_on_unused_countries=False,
@@ -193,12 +145,6 @@ def run(dest_dir: str) -> None:
         short_name="dac2a",
         columns_in_current_prices=["oda_share_gni"],
         recipient_or_donor="recipient",
-    )
-    tb_dac5 = reformat_table_and_make_it_wide(
-        tb=tb_dac5,
-        short_name="dac5",
-        columns_in_current_prices=[],
-        recipient_or_donor="donor",
     )
 
     tb_dac1 = create_indicators_per_capita(
@@ -472,56 +418,58 @@ def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List
     return tb
 
 
-def add_aid_by_sector_donor_dataset(tb: Table, tb_sector: Table) -> Table:
+def add_aid_by_sector(tb: Table, tb_sectors_donor: Table, tb_sectors_recipient: Table) -> Table:
     """
-    Add sector data to the main dataset.
-    This data comes from donor data in the DAC5 dataset.
+    Add sector data to the main dataset (both for donors and recipients)
+    This data comes from the ONE data package that processes OECD data.
     """
 
-    tb_sector = tb_sector.copy()
-
-    # Assert if the sectors are in the sector dataset
-    assert set(SECTORS_DAC5.keys()).issubset(
-        set(tb_sector["sector"].unique())
-    ), f"There are missing sectors in the sector dataset: {set(SECTORS_DAC5) - set(tb_sector['sector'].unique())}"
-
-    # Filter categories
-    tb_sector = tb_sector[tb_sector["sector"].isin(SECTORS_DAC5.keys())].reset_index(drop=True)
-
-    # Rename sectors set in SECTORS_DAC5
-    tb_sector["sector"] = tb_sector["sector"].cat.rename_categories(SECTORS_DAC5)
-
-    # Create a new table with "Total", "Emergency response", "Reconstruction relief and rehabilitation"
-    tb_sector_humanitarian_aid = (
-        tb_sector[tb_sector["sector"].isin(["Total", "Humanitarian aid"])].reset_index(drop=True).copy()
+    # For tb_sectors_donor, keep only the columns we need
+    tb_sectors_donor = tb_sectors_donor[["donor_name", "sector_name", "year", "value"]]
+    tb_sectors_donor = tb_sectors_donor.rename(
+        columns={"donor_name": "country", "sector_name": "sector", "value": "oda_by_sector_donor"}
     )
 
-    # Make the table wide
-    tb_sector_humanitarian_aid = tb_sector_humanitarian_aid.pivot(
-        index=["country", "year"], columns="sector", values="oda_by_sector", join_column_levels_with="_"
-    ).reset_index(drop=True)
-
-    # Create the column "Non-humanitarian aid" as the difference between "Total" and "Humanitarian aid"
-    tb_sector_humanitarian_aid["Non-humanitarian aid"] = (
-        tb_sector_humanitarian_aid["Total"] - tb_sector_humanitarian_aid["Humanitarian aid"]
+    # For tb_sectors_recipient, keep only the columns we need
+    tb_sectors_recipient = tb_sectors_recipient[["recipient_name", "sector_name", "year", "value"]]
+    tb_sectors_recipient = tb_sectors_recipient.rename(
+        columns={"recipient_name": "country", "sector_name": "sector", "value": "oda_by_sector_recipient"}
     )
-
-    # Make the table long again only using the columns "country", "year", "Emergency humanitarian aid" and "Non-emergency aid"
-    tb_sector_humanitarian_aid = tb_sector_humanitarian_aid.melt(
-        id_vars=["country", "year"],
-        value_vars=["Non-humanitarian aid"],
-        var_name="sector",
-        value_name="oda_by_sector",
-    )
-
-    # Concatenate the sector tables
-    tb_sector = pr.concat([tb_sector, tb_sector_humanitarian_aid], ignore_index=True)
 
     # Create an empty sector column in tb
     tb["sector"] = None
 
     # Merge tables
-    tb = pr.merge(tb, tb_sector, on=["country", "year", "sector"], how="outer")
+    tb = pr.merge(tb, tb_sectors_donor, on=["country", "year", "sector"], how="outer")
+    tb = pr.merge(tb, tb_sectors_recipient, on=["country", "year", "sector"], how="outer")
+
+    return tb
+
+
+def add_aid_by_channel(tb: Table, tb_channels_donor: Table, tb_channels_recipient: Table) -> Table:
+    """
+    Add channel data to the main dataset (both for donors and recipients)
+    This data comes from the ONE data package that processes OECD data.
+    """
+
+    # For tb_channels_donor, keep only the columns we need
+    tb_channels_donor = tb_channels_donor[["donor_name", "channel_name", "year", "value"]]
+    tb_channels_donor = tb_channels_donor.rename(
+        columns={"donor_name": "country", "channel_name": "channel", "value": "oda_by_channel_donor"}
+    )
+
+    # For tb_channels_recipient, keep only the columns we need
+    tb_channels_recipient = tb_channels_recipient[["recipient_name", "channel_name", "year", "value"]]
+    tb_channels_recipient = tb_channels_recipient.rename(
+        columns={"recipient_name": "country", "channel_name": "channel", "value": "oda_by_channel_recipient"}
+    )
+
+    # Create an empty channel column in tb
+    tb["channel"] = None
+
+    # Merge tables
+    tb = pr.merge(tb, tb_channels_donor, on=["country", "year", "channel"], how="outer")
+    tb = pr.merge(tb, tb_channels_recipient, on=["country", "year", "channel"], how="outer")
 
     return tb
 

@@ -39,7 +39,7 @@ definitions:
 
   short_grant_equivalents: Monetary aid is estimated as [grant equivalents](#dod:grant-equivalents).
   short_net_disbursements: Monetary aid is estimated as net disbursements.
-  short_commitments_sectors: Monetary aid is estimated using commitment or gross disbursement data.
+  short_gross_sectors: Monetary aid is estimated using gross disbursement data.
 
   short_oof: Other official flows (OOF) are official sector transactions that do not meet [official development assistance (ODA)](#dod:oda) criteria.
   short_officially_supported_export_credits: Officially supported export credits are credits that governments provide to support national exporters competing for overseas sales.
@@ -93,19 +93,19 @@ definitions:
     Official development assistance does not include military aid, except for the cost of using armed forces to deliver humanitarian aid. It also excludes most peacekeeping expenditures, except for those closely related to development. Nuclear energy is included only if it is for civilian purposes, and cultural programs are eligible only if they build the cultural capacities of recipient countries.
 
   key_sector: |-
-    <% if sector == "Humanitarian aid" %>
+    <% if sector == "VIII. Humanitarian aid" %>
     <<sector>> is assistance designed to save lives, alleviate suffering and maintain and protect human dignity during and in the aftermath of emergencies. To be classified as humanitarian, aid should be consistent with the humanitarian principles of humanity, impartiality, neutrality and independence. It broadly includes aid given for emergencies, such as natural disasters and wars, reconstruction in their aftermath, but also prevention and preparation for future emergencies.
     <% elif sector == "Non-humanitarian aid" %>
     <<sector>> broadly is aid for longer-term development, such as social and economic infrastructure.
-    <% elif sector == "Social infrastructure and services" %>
+    <% elif sector == "I. Social infrastructure and services" %>
     <<sector>> aid relates essentially to efforts to develop the human resource potential of developing countries. Includes education, health, population and reproductive health policies, water supply and sanitation, government and sanitation and other social services.
-    <% elif sector == "Economic infrastructure and services" %>
+    <% elif sector == "II. Economic infrastructure and services" %>
     <<sector>> aid groups assistance for networks, utilities and services that facilitate economic activity. Includes transport and storage, communications, energy, banking and financial services, and business and other services.
-    <% elif sector == "Production sectors" %>
+    <% elif sector == "III. Production sectors" %>
     <<sector>> aid groups contributions to all directly productive sectors. Includes agriculture, forestry, fishing, industry, mineral resources and mining, construction, trade and tourism.
-    <% elif sector == "Multi-sector / Cross-cutting" %>
+    <% elif sector == "IV. Multisector/cross-cutting" %>
     <<sector>> aid includes aid that is not sector-specific, such as aid for general environmental protection not allocable by sector.
-    <% elif sector == "Commodity aid / General programme assistance" %>
+    <% elif sector == "VI. Commodity aid / General programme assistance" %>
     <<sector>> aid includes general budget support, development food assistance and other commodity assistance.
     <%- endif -%>
 
@@ -167,16 +167,10 @@ definitions:
     We have combined net disbursements aid data from the [DAC1: Flows by donor (ODA+OOF+Private) dataset](https://data-explorer.oecd.org/vis?fs[0]=Topic%2C1%7CDevelopment%23DEV%23%7COfficial%20Development%20Assistance%20%28ODA%29%23DEV_ODA%23&pg=0&fc=Topic&bp=true&snb=20&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_DAC1%40DF_DAC1&df[ag]=OECD.DCD.FSD&df[vs]=1.2&dq=DAC...1140%2B1160..Q.&lom=LASTNPERIODS&lo=10&to[TIME_PERIOD]=false) with the [DAC2A: Aid (ODA) disbursements to countries and regions dataset](https://data-explorer.oecd.org/vis?fs[0]=Topic%2C1%7CDevelopment%23DEV%23%7COfficial%20Development%20Assistance%20%28ODA%29%23DEV_ODA%23&pg=0&fc=Topic&bp=true&snb=20&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_DAC2%40DF_DAC2A&df[ag]=OECD.DCD.FSD&df[vs]=1.1&dq=.DPGC.206.USD.Q&lom=LASTNPERIODS&lo=5&to[TIME_PERIOD]=false) to add aid given by multilateral organizations and grants given by private foundations.
 
   processing_oda_by_sector: |-
-    <% if sector == "Non-humanitarian aid" %>
-    We calculate non-humanitarian aid as the difference between total aid and humanitarian aid.
-    <%- endif -%>
+    We calculated this indicator by aggregating the gross bilateral and imputed multilateral flows processed by the [ONE Campaign](https://github.com/ONEcampaign/oda_data_package/) from the OECD data. We also aggregate sector categories to provide a more comprehensive view of aid given and received.
 
-  processing_level_by_sector: &processing_level_by_sector |-
-    <% if sector == "Non-humanitarian aid" %>
-    major
-    <% else %>
-    minor
-    <%- endif -%>
+  processing_oda_by_channel: |-
+    We calculated this indicator by aggregating the gross bilateral and imputed multilateral flows processed by the [ONE Campaign](https://github.com/ONEcampaign/oda_data_package/) from the OECD data. We also aggregate channel categories to provide a more comprehensive view of aid given and received.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -956,12 +950,12 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
 
-      # From DAC5 dataset
-      oda_by_sector:
+      # From ONE dataset, which processes CRS data from OECD
+      oda_by_sector_donor:
         title: ODA by donor and sector (<<sector>>)
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
-        description_short: "[Official development assistance](#dod:oda) given that is <<sector.lower()>>. {definitions.short_commitments_sectors} {definitions.short_constant_usd}"
+        description_short: "[Official development assistance](#dod:oda) given that is <<sector.lower()>>. {definitions.short_gross_sectors} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_sector}"
@@ -969,7 +963,7 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_constant_usd}"
           - "{definitions.key_oda_list_of_countries}"
-        processing_level: *processing_level_by_sector
+        processing_level: major
         description_processing: "{definitions.processing_oda_by_sector}"
         presentation:
           title_public: ODA by donor and sector (<<sector>>)
