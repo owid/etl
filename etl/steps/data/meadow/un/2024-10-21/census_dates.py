@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     tb = tb.drop_duplicates()
-    tb = tb[len(tb["Date"]) > 2]
+    tb = tb[tb["Date"].apply(len) > 3]
 
     tb = tb.format(["country", "date"])
 

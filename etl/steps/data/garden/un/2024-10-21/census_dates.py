@@ -32,6 +32,20 @@ COMMENTS_DICT = {
     "(19)": "Cancelled.",
 }
 
+MONTHS_DICT = {
+    "Jan.": "January",
+    "Feb.": "February",
+    "Mar.": "March",
+    "Apr.": "April",
+    "Jun.": "June",
+    "Jul.": "July",
+    "Aug.": "August",
+    "Sep.": "September",
+    "Oct.": "October",
+    "Nov.": "November",
+    "Dec.": "December",
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -51,10 +65,11 @@ def run(dest_dir: str) -> None:
 
     # clean date and country columns
     tb["date"] = tb["date"].apply(clean_date)
+    tb["date"] = tb["date"].replace(MONTHS_DICT)
     tb["country"] = tb["country"].apply(clean_country)
 
     # convert date to datetime
-    tb["date_as_datetime"] = pd.to_datetime(tb["date"], errors="coerce")
+    tb["date_as_year"] = tb["date"].apply(date_as_year)
 
     #
     # Process data.
@@ -106,3 +121,15 @@ def clean_country(country: str) -> str:
         return " ".join(country.split(" ")[:-1])
     else:
         return country
+
+
+def date_as_year(date: str) -> int:
+    """Extract year from date."""
+    if " " in date and date.split(" ")[-1].isdigit():
+        return int(date.split(" ")[-1])
+    elif "." in date:
+        return int(date.split(".")[-1])
+    elif date.startswith("[") and date.endswith("]"):
+        return int(date[1:-1])
+    else:
+        return int(date)
