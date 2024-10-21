@@ -21,7 +21,8 @@ SERVICES = Literal["data-diff", "chart-diff", "grapher", "anomalist"]
 
 @click.command("owidbot", cls=RichCommand, help=__doc__)
 @click.argument("repo_branch", type=str)
-@click.option("--services", type=click.Choice(get_args(SERVICES)), multiple=True)
+# @click.option("--services", type=click.Choice(get_args(SERVICES)), multiple=True)
+@click.option("--services", type=str, multiple=True)
 @click.option(
     "--include",
     type=str,
@@ -36,7 +37,7 @@ SERVICES = Literal["data-diff", "chart-diff", "grapher", "anomalist"]
 )
 def cli(
     repo_branch: str,
-    services: List[Literal[SERVICES]],
+    services: List[str],
     include: str,
     dry_run: bool,
 ) -> None:
@@ -82,7 +83,10 @@ def cli(
             anomalist.run(branch)
 
         else:
-            raise AssertionError("Invalid service")
+            # We raise a warning instead of an error to make it backward compatible on old
+            # staging servers when adding a new service.
+            log.warning("Invalid service", service=service)
+            continue
 
     # get existing comment (do this as late as possible to avoid race conditions)
     comment = gh_utils.get_comment_from_pr(pr)

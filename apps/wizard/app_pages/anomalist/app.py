@@ -33,7 +33,7 @@ from apps.wizard.app_pages.anomalist.utils import (
     get_datasets_and_mapping_inputs,
     get_scores,
 )
-from apps.wizard.utils import cached, set_states
+from apps.wizard.utils import cached, set_states, url_persist
 from apps.wizard.utils.chart_config import bake_chart_config
 from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
 from apps.wizard.utils.db import WizardDB
@@ -454,14 +454,17 @@ st.markdown(
 )
 
 with st.form(key="dataset_search"):
+    query_dataset_ids = [int(v) for v in st.query_params.get_all("anomalist_datasets_selected")]
+
     st.session_state.anomalist_datasets_selected = st.multiselect(
         "Select datasets",
         # options=cached.load_dataset_uris(),
         options=DATASETS_ALL.keys(),
         # max_selections=1,
-        default=DATASETS_NEW.keys(),
+        default=query_dataset_ids or DATASETS_NEW.keys(),
         format_func=DATASETS_ALL.get,
     )
+    st.query_params["anomalist_datasets_selected"] = st.session_state.anomalist_datasets_selected  # type: ignore
 
     st.form_submit_button(
         "Detect anomalies",
@@ -473,7 +476,7 @@ with st.form(key="dataset_search"):
 
 # 3/ SCAN FOR ANOMALIES
 # If anomalies for dataset already exist in DB, load them. Warn user that these are being loaded from DB
-if st.session_state.anomalist_datasets_submitted:
+if not st.session_state.anomalist_anomalies or st.session_state.anomalist_datasets_submitted:
     # 3.1/ Check if anomalies are already there in DB
     with st.spinner("Loading anomalies (already detected) from database..."):
         st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
@@ -571,9 +574,13 @@ if st.session_state.anomalist_df is not None:
         col1, col2 = st.columns([10, 4])
         # Indicator
         with col1:
-            st.multiselect(
+            options = [
+                indicator for indicator in INDICATORS_AVAILABLE if indicator in st.session_state.anomalist_indicators
+            ]
+
+            url_persist(st.multiselect)(
                 label="Indicators",
-                options=INDICATORS_AVAILABLE,
+                options=options,
                 format_func=st.session_state.anomalist_indicators.get,
                 help="Show anomalies affecting only a selection of indicators.",
                 placeholder="Select indicators",
@@ -582,7 +589,7 @@ if st.session_state.anomalist_df is not None:
 
         with col2:
             # Entity
-            st.multiselect(
+            url_persist(st.multiselect)(
                 label="Entities",
                 options=ENTITIES_AVAILABLE,
                 help="Show anomalies affecting only a selection of entities.",
@@ -613,7 +620,7 @@ if st.session_state.anomalist_df is not None:
                     key="anomalist_sorting_strategy",
                 )
             with cols[1]:
-                st.multiselect(
+                url_persist(st.multiselect)(
                     label="Detectors",
                     options=ANOMALY_TYPES_AVAILABLE,
                     format_func=ANOMALY_TYPE_NAMES.get,
@@ -623,7 +630,7 @@ if st.session_state.anomalist_df is not None:
                 )
         with col2:
             with st_horizontal():
-                st.number_input(
+                url_persist(st.number_input)(
                     "Min year",
                     value=YEAR_MIN,
                     min_value=YEAR_MIN,
@@ -631,7 +638,7 @@ if st.session_state.anomalist_df is not None:
                     step=1,
                     key="anomalist_min_year",
                 )
-                st.number_input(
+                url_persist(st.number_input)(
                     "Max year",
                     value=YEAR_MAX,
                     min_value=YEAR_MIN,

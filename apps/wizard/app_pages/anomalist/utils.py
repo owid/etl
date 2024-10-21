@@ -1,4 +1,5 @@
 """Utils for chart revision tool."""
+import time
 from enum import Enum
 from typing import Dict, List, Optional, Tuple
 
@@ -44,10 +45,12 @@ def infer_variable_mapping(dataset_id_new: int, dataset_id_old: int) -> Dict[int
 @st.cache_data(show_spinner=False)
 @st.spinner("Retrieving datasets...")
 def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], Dict[int, int]]:
+    t = time.time()
     # Get all datasets from DB.
-    df_datasets = gm.Dataset.load_all_datasets()
+    df_datasets = gm.Dataset.load_all_datasets(columns=["id", "name"])
 
     # Detect local files that correspond to new or modified grapher steps, identify their corresponding grapher dataset ids, and the grapher dataset id of the previous version (if any).
+    # NOTE: this is quite slow taking ~4s, it would be faster to reuse function `_load_datasets_new_ids` from owidbot/anomalist.py
     dataset_new_and_old = get_new_grapher_datasets_and_their_previous_versions()
 
     # List new dataset ids.
@@ -62,6 +65,8 @@ def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], D
     datasets_all = df_datasets[["id", "id_name"]].set_index("id").squeeze().to_dict()
     # List new datasets.
     datasets_new = {k: v for k, v in datasets_all.items() if k in datasets_new_ids}
+
+    log.info("get_datasets_and_mapping_inputs", t=time.time() - t)
 
     return datasets_all, datasets_new, variable_mapping  # type: ignore
 

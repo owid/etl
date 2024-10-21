@@ -1,4 +1,5 @@
 import tempfile
+import time
 from pathlib import Path
 from typing import List, Literal, Optional, Tuple, cast, get_args
 
@@ -260,14 +261,16 @@ def anomaly_detection(
         with Session(engine) as session:
             dataset = gm.Dataset.load_dataset(session, dataset_id)
 
-        log.info("Loading data from S3")
+        log.info("loading_data_from_s3.start")
         variables_old = [
             variables[variable_id_old]
             for variable_id_old in variable_mapping.keys()
             if variable_mapping[variable_id_old] in [variable.id for variable in variables_in_dataset]
         ]
         variables_old_and_new = variables_in_dataset + variables_old
+        t = time.time()
         df = load_data_for_variables(engine=engine, variables=variables_old_and_new)
+        log.info("loading_data_from_s3.end", t=time.time() - t)
 
         for anomaly_type in anomaly_types:
             # Instantiate the anomaly detector.
@@ -406,15 +409,11 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     # reorder in the same order as variables
     df = df[[v.id for v in variables]]
 
-    # TODO: how should we treat non-numeric variables? We can exclude it here, but then we need to
-    # fix it in detectors
-    # HACK: set non-numeric variables to zero
+    # set non-numeric values to NaN
     df = df.apply(pd.to_numeric, errors="coerce")
-    df = df.fillna(0)
 
-    # TODO:
-    # remove countries with all nulls or all zeros or constant values
-    # df = df.loc[:, df.fillna(0).std(axis=0) != 0]
+    # remove variables with all nulls or all zeros or constant values
+    df = df.loc[:, df.fillna(0).std(axis=0) != 0]
 
     df = df.reset_index().astype({"entity_name": str})
 
