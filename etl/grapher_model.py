@@ -680,9 +680,11 @@ class Dataset(Base):
         return read_sql(query, session)
 
     @classmethod
-    def load_all_datasets(cls) -> pd.DataFrame:
+    def load_all_datasets(cls, columns: Optional[list[str]] = None) -> pd.DataFrame:
         """Get all the content of the grapher `datasets` table in DB as a dataframe."""
-        return read_sql("select * from datasets")
+        if not columns:
+            columns = ["*"]
+        return read_sql(f"select {','.join(columns)} from datasets")
 
 
 class SourceDescription(TypedDict, total=False):

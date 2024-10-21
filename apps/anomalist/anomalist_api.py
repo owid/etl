@@ -1,4 +1,5 @@
 import tempfile
+import time
 from pathlib import Path
 from typing import List, Literal, Optional, Tuple, cast, get_args
 
@@ -260,14 +261,16 @@ def anomaly_detection(
         with Session(engine) as session:
             dataset = gm.Dataset.load_dataset(session, dataset_id)
 
-        log.info("Loading data from S3")
+        log.info("loading_data_from_s3.start")
         variables_old = [
             variables[variable_id_old]
             for variable_id_old in variable_mapping.keys()
             if variable_mapping[variable_id_old] in [variable.id for variable in variables_in_dataset]
         ]
         variables_old_and_new = variables_in_dataset + variables_old
+        t = time.time()
         df = load_data_for_variables(engine=engine, variables=variables_old_and_new)
+        log.info("loading_data_from_s3.end", t=time.time() - t)
 
         for anomaly_type in anomaly_types:
             # Instantiate the anomaly detector.

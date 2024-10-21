@@ -14,6 +14,7 @@ from typing import Any, Dict, Generator, List, Literal, Optional, Tuple
 
 import pandas as pd
 import streamlit as st
+import structlog
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -21,6 +22,8 @@ from apps.wizard.utils.paths import STREAMLIT_SECRETS, WIZARD_DB
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_engine, read_sql, to_sql
 from etl.grapher_model import Anomaly
+
+log = structlog.get_logger()
 
 # DB is set up
 DB_IS_SET_UP = STREAMLIT_SECRETS.exists() & WIZARD_DB.exists()
@@ -242,8 +245,10 @@ class WizardDB:
 
     @classmethod
     def load_anomalies(cls, dataset_ids: List[int], _owid_env: OWIDEnv = OWID_ENV) -> List[Anomaly]:
+        t = time.time()
         with Session(_owid_env.engine) as s:
             anomalies = Anomaly.load_anomalies(s, dataset_ids)
+        log.info("load_anomalies", t=time.time() - t)
         return anomalies
 
 

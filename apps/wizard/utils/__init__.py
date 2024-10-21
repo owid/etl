@@ -724,3 +724,59 @@ def as_list(s):
         except (ValueError, SyntaxError):
             return s
     return s
+
+
+def update_query_params(key):
+    def _update_query_params():
+        value = st.session_state[key]
+        if value:
+            st.query_params.update({key: value})
+        else:
+            st.query_params.pop(key, None)
+
+    return _update_query_params
+
+
+def url_persist(component: Any) -> Any:
+    """Wrapper around streamlit components that persist values in the URL query string.
+
+    Usage:
+        url_persist(st.multiselect)(
+          key="abc",
+          ...
+        )
+    """
+    # Component uses list of values
+    if component == st.multiselect:
+        repeated = True
+    else:
+        repeated = False
+
+    def _persist(*args, **kwargs):
+        assert "key" in kwargs, "key should be passed to persist"
+        # TODO: we could wrap on_change too to make it work
+        assert "on_change" not in kwargs, "on_change should not be passed to persist"
+
+        key = kwargs["key"]
+
+        if not st.session_state.get(key):
+            if repeated:
+                params = st.query_params.get_all(key)
+                # convert to int if digit
+                params = [int(q) if q.isdigit() else q for q in params]
+            else:
+                params = st.query_params.get(key)
+                if params and params.isdigit():
+                    params = int(params)
+
+            # Use `value` from the component as a default value if available
+            if not params and "value" in kwargs:
+                params = kwargs.pop("value")
+
+            st.session_state[key] = params
+
+        kwargs["on_change"] = update_query_params(key)
+
+        return component(*args, **kwargs)
+
+    return _persist
