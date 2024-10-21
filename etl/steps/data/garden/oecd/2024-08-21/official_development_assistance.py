@@ -1,3 +1,4 @@
+# NOTE: After December 2024 update, check the steps in `remove_jumps_in_the_data_and_unneeded_cols`
 """Load a meadow dataset and create a garden dataset."""
 
 from typing import List
@@ -212,11 +213,15 @@ def run(dest_dir: str) -> None:
 
     tb_dac1 = limit_grant_equivalents_from_2018_only(tb=tb_dac1)
 
+    tb_dac1 = combine_net_and_grant_equivalents(tb=tb_dac1)
+
     tb = add_donor_data_from_recipient_dataset(tb_donor=tb_dac1, tb_recipient=tb_dac2a)
 
     tb = add_recipient_dataset(tb=tb, tb_recipient=tb_dac2a)
 
-    tb = create_indicators_per_capita_recipient(
+    tb = add_aid_by_sector_donor_dataset(tb=tb, tb_sector=tb_dac5)
+
+    tb = create_indicators_per_capita_owid_population(
         tb=tb,
         indicator_list=[
             "oda_recipient",
@@ -225,11 +230,10 @@ def run(dest_dir: str) -> None:
             "technical_cooperation_recipient",
             "development_food_aid_recipient",
             "humanitarian_aid_recipient",
+            "oda_by_sector",
         ],
         ds_population=ds_population,
     )
-
-    tb = add_aid_by_sector_donor_dataset(tb=tb, tb_sector=tb_dac5)
 
     tb = tb.format(["country", "year", "donor", "sector"], short_name=paths.short_name)
     tb_dac2a = tb_dac2a.format(["country", "year", "donor"])
@@ -301,6 +305,7 @@ def reformat_table_and_make_it_wide(
 def create_indicators_per_capita(tb: Table, indicator_list: List[str]) -> Table:
     """
     Create indicators per capita for ODA (flows and grant equivalent).
+    This function uses the population data from the OECD Data Explorer.
     """
 
     for indicator in indicator_list:
@@ -447,7 +452,7 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     return tb
 
 
-def create_indicators_per_capita_recipient(tb: Table, indicator_list: List[str], ds_population: Dataset) -> Table:
+def create_indicators_per_capita_owid_population(tb: Table, indicator_list: List[str], ds_population: Dataset) -> Table:
     """
     Create indicators per capita for the recipient indicators.
     The per capita values available in the OECD Data Explorer are in current prices, so we want to use the constant values.
@@ -541,6 +546,10 @@ def remove_jumps_in_the_data_and_unneeded_cols(tb: Table) -> Table:
         (tb["country"] == "Non-DAC countries (OECD)") & (tb["year"] == 2007), "i_oda_net_disbursements_per_capita"
     ] = None
 
+    # Remove rows where country = Non-DAC countries (OECD) and year 2023
+    # This is because the data is not complete until December 2024
+    tb = tb[~((tb["country"] == "Non-DAC countries (OECD)") & (tb["year"] == 2023))].reset_index(drop=True)
+
     # Remove columns
     tb = tb.drop(
         columns=["oda_bilateral_2_grant_equivalents", "oda_multilateral_2_grant_equivalents", "i_oda_grant_equivalents"]
@@ -560,5 +569,22 @@ def limit_grant_equivalents_from_2018_only(tb: Table) -> Table:
     grant_equivalent_indicators = [col for col in tb.columns if "grant_equivalents" in col]
 
     tb.loc[tb["year"] < 2018, grant_equivalent_indicators] = None
+
+    return tb
+
+
+def combine_net_and_grant_equivalents(tb: Table) -> Table:
+    """
+    Combine net disbursements and grant equivalent estimates into a single column.
+    This is because the official figures consider net disbursements until 2017 and grant equivalents from 2018.
+    """
+
+    tb = tb.copy()
+
+    # Start with grant equivalents
+    tb["oda_official_estimate_share_gni"] = tb["oda_grant_equivalents_share_gni"]
+
+    # Fill with net disbursements before 2018
+    tb.loc[tb["year"] < 2018, "oda_official_estimate_share_gni"] = tb["i_oda_net_disbursements_share_gni"]
 
     return tb

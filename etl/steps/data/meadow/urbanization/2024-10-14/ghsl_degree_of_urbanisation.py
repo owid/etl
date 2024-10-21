@@ -20,8 +20,17 @@ def run(dest_dir: str) -> None:
     tb_area = load_and_process_sheet(snap, "AREA_km2_L1", columns_to_drop)
     tb_population = load_and_process_sheet(snap, "POP_L1", columns_to_drop)
 
+    tb_number_uc = load_and_process_sheet(snap, "UC_n", columns_to_drop)
+    tb_number_towns = load_and_process_sheet(snap, "DUC_n", columns_to_drop)
+    tb_number_semi_dense = load_and_process_sheet(snap, "SDUC_n", columns_to_drop)
+    tb_number_rural = load_and_process_sheet(snap, "RC_n", columns_to_drop)
+
     # Concatenate area and population data.
-    tb = pr.concat([tb_area, tb_population], axis=0, ignore_index=True)
+    tb = pr.concat(
+        [tb_area, tb_population, tb_number_uc, tb_number_towns, tb_number_semi_dense, tb_number_rural],
+        axis=0,
+        ignore_index=True,
+    )
 
     # Define the renaming dictionary.
     renaming_dict = {
@@ -31,10 +40,14 @@ def run(dest_dir: str) -> None:
         "UC_POP_": "urban_centre_population",
         "UCL_POP_": "urban_cluster_population",
         "RUR_POP_": "rural_total_population",
+        "UC_n": "urban_centre_number",
+        "DUC_n": "towns_total_number",
+        "SDUC_n": "semi_dense_number",
+        "RC_n": "rural_total_number",
     }
 
     # Apply the renaming by replacing the entries in the 'indicator' column to be more interpretable.
-    tb["indicator"] = tb["indicator"].replace(renaming_dict, regex=True)
+    tb["indicator"] = tb["indicator"].replace(renaming_dict)
 
     # Rename columns.
     tb = tb.rename(columns={"GADM_Name": "country"})
@@ -59,10 +72,12 @@ def load_and_process_sheet(snap, sheet_name: str, columns_to_drop: list) -> Tabl
 
     # Melt to get 'value' and 'year' in a single column, keeping the 'country' column intact.
     tb = tb.melt(id_vars=["GADM_Name"], var_name="indicator_year", value_name="value")
-
-    # Extract 'indicator' and 'year' from the combined 'indicator_year' column.
-    tb["indicator"] = tb["indicator_year"].str.extract(r"([A-Za-z_]+)")
-    tb["year"] = tb["indicator_year"].str.extract(r"(\d{4})")
-    tb = tb.drop(columns=["indicator_year"])
-
+    if sheet_name in ["AREA_km2_L1", "POP_L1"]:
+        # Extract 'indicator' and 'year' from the combined 'indicator_year' column.
+        tb["indicator"] = tb["indicator_year"].str.extract(r"([A-Za-z_]+)")
+        tb["year"] = tb["indicator_year"].str.extract(r"(\d{4})")
+        tb = tb.drop(columns=["indicator_year"])
+    else:  # Other sheets just have the year in column names
+        tb = tb.rename(columns={"indicator_year": "year"})
+        tb["indicator"] = sheet_name
     return tb
