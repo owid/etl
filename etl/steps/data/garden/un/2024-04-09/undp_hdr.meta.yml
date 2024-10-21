@@ -562,6 +562,8 @@ tables:
 
       pop_total:
         title: Total population
-        unit: "millions of people"
+        unit: "people"
         description_short: |-
           The total number of people living in a country.
+        display:
+          numDecimalPlaces: 0

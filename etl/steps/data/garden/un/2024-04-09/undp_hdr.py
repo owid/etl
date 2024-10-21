@@ -50,6 +50,9 @@ def run(dest_dir: str) -> None:
         }
     )
 
+    # Convert population data from millions
+    tb["pop_total"] *= 1e6
+
     tb = region_avg(tb, ds_regions, ds_income_groups)
 
     tb = tb.format(["country", "year"])
