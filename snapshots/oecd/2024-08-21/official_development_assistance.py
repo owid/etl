@@ -15,7 +15,7 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
 # Define the list of OECD datasets to upload, and the file format.
-DATASETS = {"dac1": "zip", "dac2a": "zip", "dac5": "zip", "crs": "zip"}
+DATASETS = {"dac1": "zip", "dac2a": "zip"}
 
 
 @click.command()
