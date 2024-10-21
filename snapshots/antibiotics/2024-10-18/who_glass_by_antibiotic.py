@@ -111,7 +111,7 @@ def get_shiny_data() -> str:
                 option_pathogen = wait.until(EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{pathogen}"]')))
                 driver.execute_script("arguments[0].click();", option_pathogen)
                 time.sleep(1)
-                for antibiotic_group in drop_down_dict[syndrome][syndrome]:
+                for antibiotic_group in drop_down_dict[syndrome][pathogen]:
                     log.info(f"Downloading data for antibiotic group: {antibiotic_group}")
 
                     # Click on the antibiotic group dropdown and select the antibiotic group
