@@ -26,19 +26,22 @@ How to run the snapshot on the staging server:
 1. sudo apt install libgl1-mesa-glx
 2. cd etl
 3. uv run pip install oda_data --upgrade
-4. uv run python snapshots/one/2024-10-02/oda_data_extract.py
+4. uv run python "snapshots/one/2024-10-02/oda_data_extract copy.py"
 
 """
 
 
 import pandas as pd
+from pathlib import Path
+
 from oda_data import read_crs, set_data_path
 
-from scripts import config
 
-# Set the path to the raw data folder. Using the config module, we can access the "raw_data" folder
-# inside this project's root folder.
-set_data_path(config.Paths.raw_data)
+# Set path of this script
+PARENT_DIR = Path(__file__).parent
+
+# Set path where ODA data is downloaded
+set_data_path(path=PARENT_DIR)
 
 # Define start and end years for the data
 START_YEAR = 1973
@@ -54,23 +57,23 @@ def main() -> None:
     print(data)
 
     # Save the data to a feather file
-    data.to_feather(config.Paths.oda_by_sectors_one)
+    data.to_feather(f"{PARENT_DIR}/oda_by_sectors_one.feather")
 
 
 def get_data_by_sector(
     start_year: int,
     end_year: int,
     flow_column: str = "usd_disbursement",
-    by_donor: bool = False,
-    by_recipient: bool = False,
+    by_donor: bool = True,
+    by_recipient: bool = True,
 ) -> pd.DataFrame:
     """Get the data by sector.
     Args:
         start_year (int): The start year for the data.
         end_year (int): The end year for the data.
         flow_column (str): The flow column to aggregate (e.g usd_disbursement, usd_commitment).
-        by_donor (bool): Whether to show the data by donor country. The default is False,
-        by_recipient (bool): Whether to show the data by recipient country. The default is False,
+        by_donor (bool): Whether to show the data by donor country. The default is True,
+        by_recipient (bool): Whether to show the data by recipient country. The default is True,
         which means the data will be shown for all recipients, total.
     Returns:
         pd.DataFrame: A DataFrame with data by sector.
