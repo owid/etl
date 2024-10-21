@@ -409,15 +409,11 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     # reorder in the same order as variables
     df = df[[v.id for v in variables]]
 
-    # TODO: how should we treat non-numeric variables? We can exclude it here, but then we need to
-    # fix it in detectors
-    # HACK: set non-numeric variables to zero
+    # set non-numeric values to NaN
     df = df.apply(pd.to_numeric, errors="coerce")
-    df = df.fillna(0)
 
-    # TODO:
-    # remove countries with all nulls or all zeros or constant values
-    # df = df.loc[:, df.fillna(0).std(axis=0) != 0]
+    # remove variables with all nulls or all zeros or constant values
+    df = df.loc[:, df.fillna(0).std(axis=0) != 0]
 
     df = df.reset_index().astype({"entity_name": str})
 

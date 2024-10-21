@@ -464,7 +464,7 @@ with st.form(key="dataset_search"):
         default=query_dataset_ids or DATASETS_NEW.keys(),
         format_func=DATASETS_ALL.get,
     )
-    st.query_params["anomalist_datasets_selected"] = st.session_state.anomalist_datasets_selected
+    st.query_params["anomalist_datasets_selected"] = st.session_state.anomalist_datasets_selected  # type: ignore
 
     st.form_submit_button(
         "Detect anomalies",
