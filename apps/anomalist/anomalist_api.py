@@ -313,7 +313,9 @@ def anomaly_detection(
                 datasetSourceChecksum=dataset.sourceChecksum,
                 anomalyType=anomaly_type,
             )
-            anomaly.dfScore = df_score_long
+            # We could store the full dataframe in the database, but it ends up making the load quite slow.
+            # Since we are not using it for now, we will store only the reduced dataframe.
+            # anomaly.dfScore = df_score_long
 
             # Reduce dataframe
             df_score_long_reduced = (

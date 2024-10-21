@@ -76,8 +76,13 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Convert to long format
+        df_wide = df.melt(id_vars=["entity_name", "year"])
+        # Filter to only include the specified variable IDs.
         df_wide = (
-            df.melt(id_vars=["entity_name", "year"]).set_index(["entity_name", "variable_id"]).dropna().sort_index()
+            df_wide[df_wide["variable_id"].isin(variable_ids)]
+            .set_index(["entity_name", "variable_id"])
+            .dropna()
+            .sort_index()
         )
 
         # Create a processing queue with (entity_name, variable_id) pairs
