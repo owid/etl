@@ -9,7 +9,6 @@ from pathlib import Path
 import click
 import requests
 from selenium import webdriver
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -44,30 +43,36 @@ def get_shiny_data() -> str:
     years = range(2016, 2023)
     drop_down_dict = {
         "BLOOD": {
-            "Carbapenems": ["Klebsiella pneumoniae", "Escherichia coli", "Acinetobacter spp."],
-            "Fluoroquinolones": ["Salmonella spp."],
-            "Methicillin-resistance": ["Staphylococcus aureus"],
-            "Penicillins": ["Streptococcus pneumoniae"],
+            "Acinetobacter spp.": ["Carbapenems"],
+            "Escerichia coli": ["Carbapenems", "Third-generation cephalosporins"],
+            "Klebsiella pneumoniae": ["Carbapenems", "Third-generation cephalosporins"],
+            "Staphylococcus aureus": ["Methicillin-resistance"],
+            "Streptococcus pneumoniae": ["Penicillins"],
         },
         "STOOL": {
-            "Fluoroquinolones": ["Salmonella spp."],
-            "Third-generation cephalosporins": ["Shigella spp."],
+            "Salmonella spp.": ["Fluoroquinolones"],
+            "Shigella spp.": ["Third-generation cephalosporins"],
         },
         "UROGENITAL": {
-            "Macrolides": ["Neisseria gonorrhoeae"],
-            "Third-generation cephalosporins": ["Neisseria gonorrhoeae"],
+            "Neisseria gonorrhoeae": ["Macrolides", "Third-generation cephalosporins"],
         },
         "URINE": {
-            "Fluoroquinolones": ["Escherichia coli", "Klebsiella pneumoniae"],
-            "Sulfonamides and trimethoprim": ["Escherichia coli", "Klebsiella pneumoniae"],
-            "Third-generation cephalosporins": ["Escherichia coli", "Klebsiella pneumoniae"],
+            "Escherichia coli": [
+                "Fluoroquinolones",
+                "Sulfonamides and trimethoprim",
+                "Third-generation cephalosporins",
+            ],
+            "Klebsiella pneumoniae": [
+                "Fluoroquinolones",
+                "Sulfonamides and trimethoprim",
+                "Third-generation cephalosporins",
+            ],
         },
     }
 
     # Set up the driver (ensure you have ChromeDriver or another driver installed)
     driver = webdriver.Chrome()
     wait = WebDriverWait(driver, 20)
-    actions = ActionChains(driver)  # Initialize ActionChains
 
     with tempfile.TemporaryDirectory() as temp_dir:
         # Open the webpage
@@ -78,89 +83,61 @@ def get_shiny_data() -> str:
         time.sleep(1)
         driver.execute_script("arguments[0].scrollIntoView(true);", section)
         time.sleep(1)
-        for syndrome in drop_down_dict.keys():
-            # log.info(f"Downloading data for syndrome: {syndrome}")
 
+        for syndrome in drop_down_dict.keys():
             log.info(f"Downloading data for syndrome: {syndrome}")
-            # Wait for the syndrome dropdown to become visible and interactable
 
             # Scroll to the dropdown section first
-            section = wait.until(EC.presence_of_element_located((By.ID, "plot-amr-6")))
             driver.execute_script("arguments[0].scrollIntoView(true);", section)
 
-            # Wait for the dropdown to become visible for URINE
-            dropdown = wait.until(
-                EC.presence_of_element_located(
-                    (
-                        By.XPATH,
-                        f'//input[@id="amr-gc_pathogen_anti-infsys-select-selectized"]/preceding-sibling::div[@data-value="{syndrome}"]',
-                    )
-                )
+            # Click on the syndrome dropdown and select the syndrome
+            syndrome_dropdown = wait.until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="amr-gc_pathogen_anti-infsys-select-selectized"]'))
             )
+            driver.execute_script("arguments[0].click();", syndrome_dropdown)
+            option_syndrome = wait.until(EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{syndrome}"]')))
+            driver.execute_script("arguments[0].click();", option_syndrome)
+            time.sleep(1)
+            for pathogen in drop_down_dict[syndrome].keys():
+                log.info(f"Downloading data for pathogen: {pathogen}")
 
-            # Use ActionChains to interact with the element
-            actions = ActionChains(driver)
-            actions.move_to_element(dropdown).click().perform()
-
-            # Debugging: Ensure the element was clicked
-            for antibiotic_group in drop_down_dict[syndrome].keys():
-                log.info(f"Downloading data for antibiotic group: {antibiotic_group}")
-                group_dropdown = wait.until(
+                # Click on the pathogen dropdown and select the pathogen
+                pathogen_dropdown = wait.until(
                     EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="amr-gc_pathogen_anti-antibiotic-select-selectized"]')
+                        (By.XPATH, '//*[@id="amr-gc_pathogen_anti-pathogen-select-selectized"]')
                     )
                 )
-                actions.move_to_element(group_dropdown).click().perform()
+                driver.execute_script("arguments[0].click();", pathogen_dropdown)
+                option_pathogen = wait.until(EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{pathogen}"]')))
+                driver.execute_script("arguments[0].click();", option_pathogen)
                 time.sleep(1)
+                for antibiotic_group in drop_down_dict[syndrome][syndrome]:
+                    log.info(f"Downloading data for antibiotic group: {antibiotic_group}")
 
-                # Select the antibiotic group
-                option_group = wait.until(
-                    EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{antibiotic_group}"]'))
-                )
-                actions.move_to_element(option_group).click().perform()
-                time.sleep(1)
-
-                for pathogen in drop_down_dict[syndrome][antibiotic_group]:
-                    time.sleep(3)
-                    log.info(f"Downloading data for pathogen: {pathogen}")
-
-                    # Scroll to the pathogen dropdown if necessary
-                    pathogen_dropdown = wait.until(
-                        EC.visibility_of_element_located(
-                            (By.XPATH, '//*[@id="amr-gc_pathogen_anti-pathogen-select-selectized"]')
+                    # Click on the antibiotic group dropdown and select the antibiotic group
+                    group_dropdown = wait.until(
+                        EC.presence_of_element_located(
+                            (By.XPATH, '//*[@id="amr-gc_pathogen_anti-antibiotic-select-selectized"]')
                         )
                     )
-                    driver.execute_script("arguments[0].scrollIntoView(true);", pathogen_dropdown)
-
-                    # Use JavaScript to click on the pathogen dropdown
-                    driver.execute_script("arguments[0].click();", pathogen_dropdown)
-                    time.sleep(1)  # Give time for the dropdown options to load
-
-                    # Select the pathogen
-                    option_pathogen = wait.until(
-                        EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{pathogen}"]'))
+                    driver.execute_script("arguments[0].click();", group_dropdown)
+                    option_group = wait.until(
+                        EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{antibiotic_group}"]'))
                     )
-                    driver.execute_script("arguments[0].scrollIntoView(true);", option_pathogen)  # Ensure visibility
-                    driver.execute_script(
-                        "arguments[0].click();", option_pathogen
-                    )  # Click using JS to avoid any click interception issues
+                    driver.execute_script("arguments[0].click();", option_group)
                     time.sleep(1)
-
                     for year in years:
                         log.info(f"Downloading data for year: {year}")
 
-                        # Wait for the year dropdown to become visible and interactable
+                        # Click on the year dropdown and select the year
                         year_dropdown = wait.until(
                             EC.presence_of_element_located(
                                 (By.XPATH, '//*[@id="amr-gc_pathogen_anti-year-select-label"]')
                             )
                         )
-                        actions.move_to_element(year_dropdown).click().perform()
-                        time.sleep(1)
-
-                        # Select the year
+                        driver.execute_script("arguments[0].click();", year_dropdown)
                         option_year = wait.until(EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{year}"]')))
-                        actions.move_to_element(option_year).click().perform()
+                        driver.execute_script("arguments[0].click();", option_year)
                         time.sleep(1)
 
                         # Trigger the download button
@@ -180,6 +157,9 @@ def get_shiny_data() -> str:
                             log.info(f"Downloaded {syndrome}_{antibiotic_group}_{pathogen}_{year}.csv to {file_path}")
                         else:
                             log.error(f"No download link found for {syndrome}, {antibiotic_group}, {pathogen}, {year}.")
+                        # Trying this to see if it helps with the download issue
+                        driver.refresh()
+                        time.sleep(5)
 
         # Zip all downloaded files
         zip_file_path = "downloaded_data.zip"
