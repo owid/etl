@@ -65,8 +65,8 @@ def _processing_queue(items: list[tuple[str, int]]) -> List[tuple]:
 class AnomalyGaussianProcessOutlier(AnomalyDetector):
     anomaly_type = "gp_outlier"
 
-    # TODO: max_time is hard-coded to 100, but it should be configurable in production
-    def __init__(self, max_time: Optional[float] = 100, n_jobs: int = 1):
+    # TODO: max_time is hard-coded to 10, but it should be configurable in production
+    def __init__(self, max_time: Optional[float] = 10, n_jobs: int = 1):
         self.max_time = max_time
         self.n_jobs = n_jobs
 
@@ -100,7 +100,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             group = df_wide.loc[(entity_name, variable_id)]
 
             # Skip if the series has only one or fewer data points
-            if len(group) <= 1:
+            if isinstance(group, pd.Series) or len(group) <= 1:
                 continue
 
             # Prepare the input features (X) and target values (y) for Gaussian Process

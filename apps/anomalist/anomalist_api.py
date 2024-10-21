@@ -300,6 +300,10 @@ def anomaly_detection(
                 variable_mapping=variable_mapping_for_current_dataset,
             )
 
+            if df_score.empty:
+                log.info("No anomalies detected.`")
+                continue
+
             # Create a long format score dataframe.
             df_score_long = get_long_format_score_df(df_score)
 
@@ -412,7 +416,7 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
 
     df = df.reset_index().astype({"entity_name": str})
 
-    return df
+    return df  # type: ignore
 
 
 # @memory.cache
