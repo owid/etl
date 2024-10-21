@@ -66,7 +66,9 @@ def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], D
     return datasets_all, datasets_new, variable_mapping  # type: ignore
 
 
-def load_variable_mapping(datasets_new_ids: List[int], dataset_new_and_old: Dict[int, Optional[int]]) -> Dict[int, int]:
+def load_variable_mapping(
+    datasets_new_ids: List[int], dataset_new_and_old: Optional[Dict[int, Optional[int]]] = None
+) -> Dict[int, int]:
     mapping = WizardDB.get_variable_mapping_raw()
     if len(mapping) > 0:
         log.info("Using variable mapping created by indicator upgrader.")
@@ -81,7 +83,7 @@ def load_variable_mapping(datasets_new_ids: List[int], dataset_new_and_old: Dict
             )
         # Create a mapping dictionary.
         variable_mapping = mapping.set_index("id_old")["id_new"].to_dict()
-    else:
+    elif dataset_new_and_old:
         log.info("Inferring variable mapping (since no mapping was created by indicator upgrader).")
         # Infer the mapping of the new datasets (assuming no names have changed).
         variable_mapping = dict()
@@ -90,6 +92,9 @@ def load_variable_mapping(datasets_new_ids: List[int], dataset_new_and_old: Dict
                 continue
             # Infer
             variable_mapping.update(infer_variable_mapping(dataset_id_new, dataset_id_old))
+    else:
+        # No mapping available.
+        variable_mapping = dict()
 
     return variable_mapping  # type: ignore
 

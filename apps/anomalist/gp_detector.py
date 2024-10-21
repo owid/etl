@@ -130,6 +130,9 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         log.info("Finished processing", elapsed=round(time.time() - start_time, 2))
 
+        if not results:
+            return pd.DataFrame()
+
         df_score_long = pd.concat(results).reset_index()
 
         # Normalize the anomaly scores by mapping interval (0, 3+) to (0, 1)

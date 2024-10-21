@@ -403,10 +403,8 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     # TODO: how should we treat non-numeric variables? We can exclude it here, but then we need to
     # fix it in detectors
     # HACK: set non-numeric variables to zero
-    numeric_cols = df.select_dtypes(include="number").columns
-    for col in df.columns:
-        if col not in numeric_cols:
-            df[col] = 0
+    df = df.apply(pd.to_numeric, errors="coerce")
+    df = df.fillna(0)
 
     # TODO:
     # remove countries with all nulls or all zeros or constant values
