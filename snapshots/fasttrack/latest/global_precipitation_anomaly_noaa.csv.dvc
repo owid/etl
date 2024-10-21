@@ -1,8 +1,9 @@
 meta:
   origin:
-    producer: National Oceanic and Atmospheric Administration via the US EPA
+    producer: National Oceanic and Atmospheric Administration (NOAA)
+    attribution: NOAA via the US EPA (2024)
     title: global_precipitation_anomaly_noaa
-    citation_full: National Oceanic and Atmospheric Administration via the US EPA
+    citation_full: National Oceanic and Atmospheric Administration (NOAA) via the United States Environmental Protection Agency (EPA) (2024).
     url_main: https://www.epa.gov/climate-indicators/view-indicators
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vR4Ew8HBLdaUXRWpXdhgzJSNqXB-9nyzjtkBoshLMMoQOWKV1N60v0rWwA1aGztD76x4hSBRDy5n8Eu/pub?output=csv
