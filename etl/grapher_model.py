@@ -13,8 +13,8 @@ Another option is to run `show create table mytable;` in MySQL and then ask Chat
 
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
 """
-
 import copy
+import io
 import json
 import random
 from datetime import date, datetime
@@ -23,12 +23,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Union, get_args, overload
 
 import humps
+import numpy as np
 import pandas as pd
 import requests
 import structlog
 from deprecated import deprecated
 from owid import catalog
 from owid.catalog.meta import VARIABLE_TYPE
+from pyarrow import feather
 from sqlalchemy import (
     CHAR,
     BigInteger,
@@ -50,11 +52,13 @@ from sqlalchemy import (
 from sqlalchemy import JSON as _JSON
 from sqlalchemy.dialects.mysql import (
     ENUM,
+    LONGBLOB,
     LONGTEXT,
     TEXT,
     TINYINT,
     VARCHAR,
 )
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # type: ignore
@@ -107,6 +111,21 @@ class Base(MappedAsDataclass, DeclarativeBase):
 
         return x
 
+    @classmethod
+    def create_table(cls, engine: Engine, if_exists: Literal["fail", "replace", "skip"] = "fail") -> None:
+        if if_exists == "replace":
+            # Drop the table if it exists and create a new one
+            cls.__table__.drop(engine, checkfirst=True)  # type: ignore
+            cls.__table__.create(engine, checkfirst=False)  # type: ignore
+        elif if_exists == "skip":
+            # Create the table only if it doesn't already exist
+            cls.__table__.create(engine, checkfirst=True)  # type: ignore
+        elif if_exists == "fail":
+            # Attempt to create the table; fail if it already exists
+            cls.__table__.create(engine, checkfirst=False)  # type: ignore
+        else:
+            raise ValueError(f"Unrecognized value for if_exists: {if_exists}")
+
 
 class Entity(Base):
     __tablename__ = "entities"
@@ -120,7 +139,7 @@ class Entity(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
     @classmethod
-    def load_entity_mapping(cls, session: Session, entity_ids: List[int]) -> Dict[int, str]:
+    def load_entity_mapping(cls, session: Session, entity_ids: Optional[List[int]] = None) -> Dict[int, str]:
         q = text(
             """
         select
@@ -129,8 +148,26 @@ class Entity(Base):
         where id in :entity_ids
         """
         )
-        # Use a dictionary to pass parameters
-        stm = select(Entity).from_statement(q).params(entity_ids=entity_ids)
+        if entity_ids is not None:
+            q = text(
+                """
+            select
+                *
+            from entities
+            where id in :entity_ids
+            """
+            )
+            # Use a dictionary to pass parameters
+            stm = select(Entity).from_statement(q).params(entity_ids=entity_ids)
+        else:
+            q = text(
+                """
+            select
+                *
+            from entities
+            """
+            )
+            stm = select(Entity).from_statement(q)
         rows = session.execute(stm).scalars().all()
 
         # Convert the list of rows to a dictionary with id as key
@@ -641,6 +678,13 @@ class Dataset(Base):
         ORDER BY createdAt DESC;
         """
         return read_sql(query, session)
+
+    @classmethod
+    def load_all_datasets(cls, columns: Optional[list[str]] = None) -> pd.DataFrame:
+        """Get all the content of the grapher `datasets` table in DB as a dataframe."""
+        if not columns:
+            columns = ["*"]
+        return read_sql(f"select {','.join(columns)} from datasets")
 
 
 class SourceDescription(TypedDict, total=False):
@@ -1182,9 +1226,19 @@ class Variable(Base):
         )
 
     @classmethod
-    def load_variables_in_datasets(cls, session: Session, dataset_uris: List[str]) -> List["Variable"]:
-        conditions = [cls.catalogPath.startswith(uri) for uri in dataset_uris]
-        query = select(cls).where(or_(*conditions))
+    def load_variables_in_datasets(
+        cls,
+        session: Session,
+        dataset_uris: Optional[List[str]] = None,
+        dataset_ids: Optional[List[int]] = None,
+    ) -> List["Variable"]:
+        if dataset_uris is not None:
+            conditions = [cls.catalogPath.startswith(uri) for uri in dataset_uris]
+            query = select(cls).where(or_(*conditions))
+        elif dataset_ids is not None:
+            query = select(cls).where(cls.datasetId.in_(dataset_ids))
+        else:
+            raise ValueError("Either dataset_uris or dataset_ids must be provided")
         results = session.scalars(query).all()
         return list(results)
 
@@ -1234,7 +1288,7 @@ class Variable(Base):
         # Multiple path or id
         elif isinstance(id_or_path, list):
             # Filter the list to ensure only integers are passed
-            int_ids = [i for i in id_or_path if isinstance(i, int)]
+            int_ids = [i for i in id_or_path if isinstance(i, (int, np.integer))]
             str_ids = [i for i in id_or_path if isinstance(i, str)]
             # Multiple IDs
             if len(int_ids) == len(id_or_path):
@@ -1703,6 +1757,80 @@ class MultiDimDataPage(Base):
             return self
 
 
+class Anomaly(Base):
+    __tablename__ = "anomalies"
+    # __table_args__ = (Index("catalogPath", "catalogPath"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
+    datasetId: Mapped[int] = mapped_column(Integer)
+    datasetSourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
+    anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
+    path_file: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
+    _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LONGBLOB, default=None)
+    _dfReduced: Mapped[Optional[bytes]] = mapped_column("dfReduced", LONGBLOB, default=None)
+    # catalogPath: Mapped[str] = mapped_column(VARCHAR(255), default=None)
+    # NOTE: why do we need indicatorChecksum?
+    # Answer: This can be useful to assign an anomaly to a specific snapshot of the indicator. Unclear if we need it atm, but maybe in the future...
+    # indicatorChecksum: Mapped[str] = mapped_column(VARCHAR(255), default=None)
+    # globalScore: Mapped[float] = mapped_column(Float, default=None, nullable=True)
+    # gptInfo: Mapped[Optional[dict]] = mapped_column(JSON, default=None, nullable=True)
+    # entity: Mapped[str] = mapped_column(VARCHAR(255))
+    # year: Mapped[int] = mapped_column(Integer)
+    # rawScore: Mapped[float] = mapped_column(Float)
+
+    def __repr__(self) -> str:
+        return (
+            f"<Anomaly(id={self.id}, createdAt={self.createdAt}, updatedAt={self.updatedAt}, "
+            f"datasetId={self.datasetId}, anomalyType={self.anomalyType})>"
+        )
+
+    @classmethod
+    def load(cls, session: Session, dataset_id: int, anomaly_type: str) -> "Anomaly":
+        return session.scalars(select(cls).where(cls.datasetId == dataset_id, cls.anomalyType == anomaly_type)).one()
+
+    @hybrid_property
+    def dfScore(self) -> Optional[pd.DataFrame]:  # type: ignore
+        if self._dfScore is None:
+            return None
+        buffer = io.BytesIO(self._dfScore)
+        return feather.read_feather(buffer)
+
+    @dfScore.setter
+    def dfScore(self, value: Optional[pd.DataFrame]) -> None:
+        if value is None:
+            self._dfScore = None
+        else:
+            buffer = io.BytesIO()
+            feather.write_feather(value, buffer, compression="zstd")
+            buffer.seek(0)
+            self._dfScore = buffer.read()
+
+    @hybrid_property
+    def dfReduced(self) -> Optional[pd.DataFrame]:  # type: ignore
+        if self._dfReduced is None:
+            return None
+        buffer = io.BytesIO(self._dfReduced)
+        return feather.read_feather(buffer)
+
+    @dfReduced.setter
+    def dfReduced(self, value: Optional[pd.DataFrame]) -> None:
+        if value is None:
+            self._dfReduced = None
+        else:
+            buffer = io.BytesIO()
+            feather.write_feather(value, buffer, compression="zstd")
+            buffer.seek(0)
+            self._dfReduced = buffer.read()
+
+    @classmethod
+    def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
+        return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+
+
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
     """SQLAlchemy condition for checking if a JSON field has a key with a given value. Works for null."""
     if val is None:
@@ -1793,7 +1921,7 @@ def add_entity_name(
         raise ValueError(f"Missing entities in the database: {missing_entities}")
 
     # Set dtypes
-    dtypes = {col_name: "category"}
+    dtypes = {col_name: "category", col_id: int}
     if col_code is not None:
         dtypes[col_code] = "category"
     df = pd.merge(df, entities.astype(dtypes), on=col_id)

@@ -1,3 +1,12 @@
+"""Functions to interact with our Grapher data. This includes accessing our database and our API.
+
+TODO: This file contains some code that needs some revision:
+
+- Code dealing with entity codes and names:
+    - There are different ways that we are getting code-to-name mappings. We should standardize this.
+- Code using db_conn (pymysql.Connection objects). We should instead use sessions, or engines (or OWIDEnv)
+
+"""
 import concurrent.futures
 import io
 import warnings
@@ -21,7 +30,7 @@ from tenacity.wait import wait_fixed
 from etl import config
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_connection, read_sql
-from etl.grapher_model import Dataset, Variable
+from etl.grapher_model import Dataset, Entity, Variable
 from etl.paths import CACHE_DIR
 
 log = structlog.get_logger()
@@ -43,12 +52,17 @@ def load_dataset_uris(
 
 
 def load_variables_in_dataset(
-    dataset_uri: List[str],
+    dataset_uri: Optional[List[str]] = None,
+    dataset_id: Optional[List[int]] = None,
     owid_env: OWIDEnv = OWID_ENV,
 ) -> List[Variable]:
     """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
     with Session(owid_env.engine) as session:
-        indicators = Variable.load_variables_in_datasets(session, dataset_uri)
+        indicators = Variable.load_variables_in_datasets(
+            session=session,
+            dataset_uris=dataset_uri,
+            dataset_ids=dataset_id,
+        )
 
     return indicators
 
@@ -58,11 +72,40 @@ def load_variable(
     id_or_path: str | int,
     owid_env: OWIDEnv = OWID_ENV,
 ) -> Variable:
-    """Load variable"""
+    """Load variable.
+
+    If id_or_path is str, it'll be used as catalog path.
+    """
+    if not isinstance(id_or_path, str):
+        try:
+            id_or_path = int(id_or_path)
+        except Exception:
+            pass
+
     with Session(owid_env.engine) as session:
         variable = Variable.from_id_or_path(
             session=session,
             id_or_path=id_or_path,
+        )
+
+    return variable
+
+
+# Load variable object
+def load_variables(
+    ids_or_paths: List[str | int],
+    owid_env: OWIDEnv = OWID_ENV,
+) -> List[Variable]:
+    """Load variable.
+
+    If id_or_path is str, it'll be used as catalog path.
+
+    TODO: this should be merged with load_variable!
+    """
+    with Session(owid_env.engine) as session:
+        variable = Variable.from_id_or_path(
+            session=session,
+            id_or_path=ids_or_paths,
         )
 
     return variable
@@ -106,6 +149,7 @@ def load_variable_data(
     variable_id: Optional[int] = None,
     variable: Optional[Variable] = None,
     owid_env: OWIDEnv = OWID_ENV,
+    set_entity_names: bool = True,
 ) -> pd.DataFrame:
     """Get data for an indicator based on its catalog path or variable id.
 
@@ -123,9 +167,12 @@ def load_variable_data(
     # Get variable
     variable = ensure_load_variable(catalog_path, variable_id, variable, owid_env)
 
-    # Get data
-    with Session(owid_env.engine) as session:
-        df = variable.get_data(session=session)
+    if set_entity_names:
+        # Get data
+        with Session(owid_env.engine) as session:
+            df = variable.get_data(session=session)
+    else:
+        df = variable.get_data()
 
     return df
 
@@ -244,7 +291,7 @@ def _ensure_variable_ids(
 def variable_data_df_from_s3(
     engine: Engine,
     variable_ids: List[int] = [],
-    workers: int = 1,
+    workers: Optional[int] = 1,
     value_as_str: bool = True,
 ) -> pd.DataFrame:
     """Fetch data from S3 and add entity code and name from DB."""
@@ -399,7 +446,16 @@ def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dic
         return response.json()
 
 
+def load_entity_mapping(entity_ids: Optional[List[int]] = None, owid_env: OWIDEnv = OWID_ENV) -> Dict[int, str]:
+    # Fetch the mapping of entity ids to names.
+    with Session(owid_env.engine) as session:
+        entity_id_to_name = Entity.load_entity_mapping(session=session, entity_ids=entity_ids)
+
+    return entity_id_to_name
+
+
 #######################################################################################################
+
 # TO BE REVIEWED:
 # This is code that could be deprecated / removed?
 # TODO: replace usage of db_conn (pymysql.Connection) with engine (sqlalchemy.engine.Engine) or OWIDEnv
