@@ -368,11 +368,11 @@ def rename_sectors_and_add_parent_categories(tb: Table) -> Table:
     # Make value float
     tb["value"] = tb["value"].astype("float")
 
-    # When sector_name is empty, set it to "Sectors not specified".
-    tb["sector_name"] = tb["sector_name"].fillna("Sectors not specified")
-
     # Make sector_name string
     tb["sector_name"] = tb["sector_name"].astype("string")
+
+    # When sector_name is empty, set it to "Sectors not specified".
+    tb["sector_name"] = tb["sector_name"].fillna("Sectors not specified")
 
     # Assert that all sector names are in the mapping
     assert set(tb["sector_name"].unique()).issubset(
