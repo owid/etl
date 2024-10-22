@@ -165,7 +165,9 @@ def run(dest_dir: str) -> None:
 
     tb = add_recipient_dataset(tb=tb, tb_recipient=tb_dac2a)
 
-    tb = add_aid_by_sector_donor_dataset(tb=tb, tb_sector=tb_dac5)
+    tb = add_aid_by_sector(tb=tb, tb_sectors_donor=tb_sectors_donor, tb_sectors_recipient=tb_sectors_recipient)
+
+    tb = add_aid_by_channel(tb=tb, tb_channels_donor=tb_channels_donor, tb_channels_recipient=tb_channels_recipient)
 
     tb = create_indicators_per_capita_owid_population(
         tb=tb,
@@ -176,12 +178,15 @@ def run(dest_dir: str) -> None:
             "technical_cooperation_recipient",
             "development_food_aid_recipient",
             "humanitarian_aid_recipient",
-            "oda_by_sector",
+            "oda_by_sector_donor",
+            "oda_by_sector_recipient",
+            "oda_by_channel_donor",
+            "oda_by_channel_recipient",
         ],
         ds_population=ds_population,
     )
 
-    tb = tb.format(["country", "year", "donor", "sector"], short_name=paths.short_name)
+    tb = tb.format(["country", "year", "donor", "sector", "channel"], short_name=paths.short_name)
     tb_dac2a = tb_dac2a.format(["country", "year", "donor"])
 
     #
