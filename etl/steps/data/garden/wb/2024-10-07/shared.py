@@ -31,6 +31,11 @@ processing_description_avg = "Income and consumption averages by decile are not 
 # Define default tolerance for each variable
 TOLERANCE = 5
 
+# Define entity annotations
+ENTITY_ANNOTATIONS = (
+    """Other high income countries (PIP): e.g. US, Western Europe, Australia, Japan, South Korea and Saudi Arabia"""
+)
+
 # These are parameters specifically defined for each type of variable
 var_dict = {
     # POVERTY
@@ -596,6 +601,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "name": meta.title,
             "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
             "tolerance": TOLERANCE,
+            "entityAnnotationsMap": ENTITY_ANNOTATIONS,
         }
 
         meta.presentation = VariablePresentationMeta(title_public=meta.title)
@@ -620,6 +626,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "name": meta.title,
             "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
             "tolerance": TOLERANCE,
+            "entityAnnotationsMap": ENTITY_ANNOTATIONS,
         }
 
         meta.presentation = VariablePresentationMeta(title_public=meta.title)
@@ -645,6 +652,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "name": meta.title,
             "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
             "tolerance": TOLERANCE,
+            "entityAnnotationsMap": ENTITY_ANNOTATIONS,
         }
 
         meta.presentation = VariablePresentationMeta(title_public=meta.title)
@@ -669,6 +677,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "name": meta.title,
             "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
             "tolerance": TOLERANCE,
+            "entityAnnotationsMap": ENTITY_ANNOTATIONS,
         }
 
         meta.presentation = VariablePresentationMeta(title_public=meta.title)
@@ -690,6 +699,7 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "name": meta.title,
             "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
             "tolerance": TOLERANCE,
+            "entityAnnotationsMap": ENTITY_ANNOTATIONS,
         }
 
         meta.presentation = VariablePresentationMeta(title_public=meta.title)
@@ -726,6 +736,7 @@ def var_metadata_absolute_povlines(var, povline, origins, ppp_version, welfare_t
         "name": meta.title,
         "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
         "tolerance": TOLERANCE,
+        "entityAnnotationsMap": ENTITY_ANNOTATIONS,
     }
 
     meta.presentation = VariablePresentationMeta(title_public=meta.title)
@@ -756,6 +767,7 @@ def var_metadata_between_absolute_povlines(var, povline1, povline2, origins, ppp
         "name": meta.title,
         "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
         "tolerance": TOLERANCE,
+        "entityAnnotationsMap": ENTITY_ANNOTATIONS,
     }
 
     meta.presentation = VariablePresentationMeta(title_public=meta.title)
@@ -797,6 +809,7 @@ def var_metadata_relative_povlines(var, rel, origins, welfare_type) -> VariableM
         "name": meta.title,
         "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
         "tolerance": TOLERANCE,
+        "entityAnnotationsMap": ENTITY_ANNOTATIONS,
     }
 
     meta.presentation = VariablePresentationMeta(title_public=meta.title)
@@ -863,6 +876,7 @@ def var_metadata_percentiles(var, pct, origins, ppp_version, welfare_type) -> Va
         "name": meta.title,
         "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
         "tolerance": TOLERANCE,
+        "entityAnnotationsMap": ENTITY_ANNOTATIONS,
     }
 
     meta.presentation = VariablePresentationMeta(title_public=meta.title)
@@ -971,6 +985,7 @@ def var_metadata_percentile_table(var, origins, welfare_type) -> VariableMeta:
         "name": meta.title,
         "numDecimalPlaces": var_dict[var]["numDecimalPlaces"],
         "tolerance": TOLERANCE,
+        "entityAnnotationsMap": ENTITY_ANNOTATIONS,
     }
 
     meta.presentation = VariablePresentationMeta(title_public=meta.title)

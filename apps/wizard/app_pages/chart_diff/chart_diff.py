@@ -141,9 +141,14 @@ class ChartDiff:
         if self.target_chart:
             # Only published charts have slugs
             if self.target_chart.publishedAt is not None:
-                assert (
-                    self.source_chart.slug == self.target_chart.slug
-                ), f"Slug mismatch! {self.source_chart.slug} != {self.target_chart.slug}"
+                if self.source_chart.slug != self.target_chart.slug:
+                    # This happens only when someone renames a slug in the target environment
+                    log.error(
+                        "Slug mismatch!",
+                        source_chart_slug=self.source_chart.slug,
+                        target_chart_slug=self.target_chart.slug,
+                        chart_id=self.chart_id,
+                    )
         return self.source_chart.slug or "no-slug"
 
     @property

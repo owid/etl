@@ -318,3 +318,11 @@ def upload_file_to_server(local_file_path: Path, target: str) -> None:
         print(f"File {local_file_path} successfully uploaded to {target}")
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Failed to upload file {local_file_path} to {target}") from e
+
+
+def create_folder(folder_path: str | Path) -> None:
+    """Create a folder if it does not exist."""
+    if isinstance(folder_path, str):
+        folder_path = Path(folder_path)
+    if not folder_path.exists():
+        folder_path.mkdir(parents=True, exist_ok=True)

@@ -15,6 +15,7 @@ meta:
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vTDPiNpIyEFu5UIu-FsD31SX8HVW2LKFZUr9QOovfV4irJxRrGNTHN5-fLZRcgvXqwVQ88cpdpJ8kVy/pub?output=csv
     date_accessed: '2024-04-05'
+    date_published: "2024"
   name: USA Hurricanes by category (HURDAT, NOAA 2024)
   description: The number of landfalling hurricanes in the United States, by category.
   license: {}
