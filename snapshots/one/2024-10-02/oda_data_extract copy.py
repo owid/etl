@@ -31,11 +31,10 @@ How to run the snapshot on the staging server:
 """
 
 
-import pandas as pd
 from pathlib import Path
 
+import pandas as pd
 from oda_data import read_crs, set_data_path
-
 
 # Set path of this script
 PARENT_DIR = Path(__file__).parent
