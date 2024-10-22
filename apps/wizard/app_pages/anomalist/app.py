@@ -108,6 +108,7 @@ st.session_state.anomalist_filter_indicators = st.session_state.get("anomalist_f
 
 # Sorting
 st.session_state.anomalist_sorting_columns = st.session_state.get("anomalist_sorting_columns", [])
+st.session_state.anomalist_sorting_strategy = st.session_state.get("anomalist_sorting_strategy", "relevance")
 
 # FLAG: True to trigger anomaly detection manually
 st.session_state.anomalist_trigger_detection = st.session_state.get("anomalist_trigger_detection", False)
