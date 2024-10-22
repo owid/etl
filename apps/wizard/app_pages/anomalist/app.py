@@ -684,15 +684,7 @@ if st.session_state.anomalist_df is not None:
                     key="anomalist_max_year",
                 )
 
-        # Use the expander and store its state when user interacts with it
-        # NOTE: The following feels convoluted, but I couldn't figure out how to keep the state of the expander.
-        #  Just doing with st.expander(...) didn't work.
-        expander_open = st.expander("Advanced options", expanded=st.session_state.anomalist_expander_advanced_options)
-        if expander_open:
-            st.session_state.anomalist_expander_advanced_options = True
-        else:
-            st.session_state.anomalist_expander_advanced_options = False
-        with expander_open:
+        with st.expander("Advanced options", expanded=st.session_state.anomalist_expander_advanced_options):
             for score_name in ["weighted", "anomaly", "population", "analytics"]:
                 # For some reason, if the slider minimum value is zero, streamlit raises an error when the slider is
                 # dragged to the minimum. Set it to a small, non-zero number.
