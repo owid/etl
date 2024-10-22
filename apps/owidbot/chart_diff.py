@@ -103,7 +103,7 @@ def format_chart_diff(df: pd.DataFrame) -> str:
 
     # Errors
     if df.error.any():
-        errors = f"<li>Errors: {df.errors.notnull().sum()}</li>"
+        errors = f"<li>Errors: {df.error.notnull().sum()}</li>"
     else:
         errors = ""
 
