@@ -234,7 +234,6 @@ def anomaly_detection(
         variable_ids = []
 
     # Load metadata for:
-    # * All variables in dataset_ids (if any dataset_id is given).
     # * All variables in variable_ids.
     # * All variables in variable_mapping (both old and new).
     variable_ids_mapping = (
@@ -422,6 +421,10 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
 
 # @memory.cache
 def _load_variables_meta(engine: Engine, variable_ids: list[int]) -> list[gm.Variable]:
+    if len(variable_ids) == 0:
+        # If no variable ids are given, return an empty list of variables.
+        return []
+
     q = """
     select id from variables
     where id in %(variable_ids)s
