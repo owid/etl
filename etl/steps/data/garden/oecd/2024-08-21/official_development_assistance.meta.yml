@@ -972,19 +972,40 @@ tables:
           numDecimalPlaces: 0
           <<: *common_display
 
-      oda_by_sector_per_capita:
-        title: ODA per capita by donor and sector (<<sector>>)
+      oda_by_sector_recipient:
+        title: ODA by recipient and sector (<<sector>>)
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
-        description_short: "[Official development assistance](#dod:oda) given that is <<sector.lower()>>, divided by population. {definitions.short_commitments_sectors} {definitions.short_constant_usd}"
+        description_short: "[Official development assistance](#dod:oda) received that is <<sector.lower()>>. {definitions.short_gross_sectors} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
           - "{definitions.key_sector}"
-          - "{definitions.key_commitments_sectors}"
+          # - "{definitions.key_commitments_sectors}"
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_constant_usd}"
           - "{definitions.key_oda_list_of_countries}"
-        processing_level: *processing_level_by_sector
+        processing_level: major
+        description_processing: "{definitions.processing_oda_by_sector}"
+        presentation:
+          title_public: ODA by recipient and sector (<<sector>>)
+        display:
+          name: ODA by recipient and sector (<<sector>>)
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      oda_by_sector_donor_per_capita:
+        title: ODA per capita by donor and sector (<<sector>>)
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) given that is <<sector.lower()>>, divided by population. {definitions.short_gross_sectors} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_sector}"
+          # - "{definitions.key_commitments_sectors}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+          - "{definitions.key_oda_list_of_countries}"
+        processing_level: major
         description_processing: |-
           {definitions.processing_per_capita_2}
 
@@ -993,6 +1014,120 @@ tables:
           title_public: ODA per capita by donor and sector (<<sector>>)
         display:
           name: ODA per capita by donor and sector (<<sector>>)
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      oda_by_sector_recipient_per_capita:
+        title: ODA per capita by recipient and sector (<<sector>>)
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) received that is <<sector.lower()>>, divided by population. {definitions.short_gross_sectors} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_sector}"
+          # - "{definitions.key_commitments_sectors}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+          - "{definitions.key_oda_list_of_countries}"
+        processing_level: major
+        description_processing: |-
+          {definitions.processing_per_capita_2}
+
+          {definitions.processing_oda_by_sector}
+        presentation:
+          title_public: ODA per capita by recipient and sector (<<sector>>)
+        display:
+          name: ODA per capita by recipient and sector (<<sector>>)
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      oda_by_channel_donor:
+        title: ODA by donor and channel (<<channel>>)
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) given through <<channel.lower()>>. {definitions.short_gross_sectors} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          # - "{definitions.key_channel}"
+          # - "{definitions.key_commitments_channels}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+          - "{definitions.key_oda_list_of_countries}"
+        processing_level: major
+        description_processing: "{definitions.processing_oda_by_channel}"
+        presentation:
+          title_public: ODA by donor and channel (<<channel>>)
+        display:
+          name: ODA by donor and channel (<<channel>>)
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      oda_by_channel_recipient:
+        title: ODA by recipient and channel (<<channel>>)
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) received through <<channel.lower()>>. {definitions.short_gross_sectors} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          # - "{definitions.key_channel}"
+          # - "{definitions.key_commitments_channels}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+          - "{definitions.key_oda_list_of_countries}"
+        processing_level: major
+        description_processing: "{definitions.processing_oda_by_channel}"
+        presentation:
+          title_public: ODA by recipient and channel (<<channel>>)
+        display:
+          name: ODA by recipient and channel (<<channel>>)
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      oda_by_channel_donor_per_capita:
+        title: ODA per capita by donor and channel (<<channel>>)
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) given through <<channel.lower()>>, divided by population. {definitions.short_gross_sectors} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          # - "{definitions.key_channel}"
+          # - "{definitions.key_commitments_channels}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+          - "{definitions.key_oda_list_of_countries}"
+        processing_level: major
+        description_processing: |-
+          {definitions.processing_per_capita_2}
+
+          {definitions.processing_oda_by_channel}
+        presentation:
+          title_public: ODA per capita by donor and channel (<<channel>>)
+        display:
+          name: ODA per capita by donor and channel (<<channel>>)
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      oda_by_channel_recipient_per_capita:
+        title: ODA per capita by recipient and channel (<<channel>>)
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) received through <<channel.lower()>>, divided by population. {definitions.short_gross_sectors} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          # - "{definitions.key_channel}"
+          # - "{definitions.key_commitments_channels}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+          - "{definitions.key_oda_list_of_countries}"
+        processing_level: major
+        description_processing: |-
+          {definitions.processing_per_capita_2}
+
+          {definitions.processing_oda_by_channel}
+        presentation:
+          title_public: ODA per capita by recipient and channel (<<channel>>)
+        display:
+          name: ODA per capita by recipient and channel (<<channel>>)
           numDecimalPlaces: 2
           <<: *common_display
 

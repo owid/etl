@@ -40,6 +40,9 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Make year integer.
+    tb["year"] = tb["year"].astype(int)
+
     # Create tb_sectors and tb_channels, aggregating by the index columns.
     tb_sectors = tb.groupby(INDEX_COLUMNS_SECTORS, observed=True, dropna=False)["value"].sum().reset_index()
     tb_channels = tb.groupby(INDEX_COLUMNS_CHANNELS, observed=True, dropna=False)["value"].sum().reset_index()
