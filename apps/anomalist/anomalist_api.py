@@ -24,7 +24,7 @@ from etl import grapher_model as gm
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
 from etl.files import create_folder, upload_file_to_server
-from etl.grapher_io import variable_data_df_from_s3
+from etl.grapher_io import variable_data_df_from_catalog
 
 log = structlog.get_logger()
 
@@ -261,7 +261,7 @@ def anomaly_detection(
         with Session(engine) as session:
             dataset = gm.Dataset.load_dataset(session, dataset_id)
 
-        log.info("loading_data_from_s3.start")
+        log.info("loading_data.start")
         variables_old = [
             variables[variable_id_old]
             for variable_id_old in variable_mapping.keys()
@@ -270,7 +270,7 @@ def anomaly_detection(
         variables_old_and_new = variables_in_dataset + variables_old
         t = time.time()
         df = load_data_for_variables(engine=engine, variables=variables_old_and_new)
-        log.info("loading_data_from_s3.end", t=time.time() - t)
+        log.info("loading_data.end", t=time.time() - t)
 
         for anomaly_type in anomaly_types:
             # Instantiate the anomaly detector.
@@ -396,15 +396,10 @@ def export_anomalies_file(df: pd.DataFrame, dataset_id: int, anomaly_type: str) 
     return path_str
 
 
-# @memory.cache
 def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.DataFrame:
-    # TODO: cache this on disk & re-validate with etags
-    df_long = variable_data_df_from_s3(engine, [v.id for v in variables], workers=None)
-
-    df_long = df_long.rename(columns={"variableId": "variable_id", "entityName": "entity_name"})
-
-    # pivot dataframe
-    df = df_long.pivot(index=["entity_name", "year"], columns="variable_id", values="value")
+    # Load data from local catalog
+    df = variable_data_df_from_catalog(engine, variables=variables)
+    df = df.rename(columns={"country": "entity_name"}).set_index(["entity_name", "year"])
 
     # reorder in the same order as variables
     df = df[[v.id for v in variables]]

@@ -81,7 +81,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Convert to long format
-        df_wide = df.melt(id_vars=["entity_name", "year"])
+        df_wide = df.melt(id_vars=["entity_name", "year"], var_name="variable_id")
         # Filter to only include the specified variable IDs.
         df_wide = (
             df_wide[df_wide["variable_id"].isin(variable_ids)]

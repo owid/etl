@@ -1,3 +1,5 @@
+import time
+
 from structlog import get_logger
 
 from apps.anomalist.anomalist_api import anomaly_detection
@@ -36,11 +38,16 @@ def run(branch: str) -> None:
     # Load variable mapping
     variable_mapping_dict = load_variable_mapping(datasets_new_ids)
 
+    log.info("owidbot.anomalist.start", n_variables=len(variable_ids))
+    t = time.time()
+
     # Run anomalist
     anomaly_detection(
         variable_mapping=variable_mapping_dict,
         variable_ids=variable_ids,
     )
+
+    log.info("owidbot.anomalist.end", n_variables=len(variable_ids), t=time.time() - t)
 
 
 def _load_datasets_new_ids(source_engine: Engine, target_engine: Engine) -> list[int]:

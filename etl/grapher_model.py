@@ -1256,18 +1256,14 @@ class Variable(Base):
     @overload
     @classmethod
     def from_id_or_path(
-        cls,
-        session: Session,
-        id_or_path: str | int,
+        cls, session: Session, id_or_path: str | int, columns: Optional[List[str]] = None
     ) -> "Variable":
         ...
 
     @overload
     @classmethod
     def from_id_or_path(
-        cls,
-        session: Session,
-        id_or_path: List[str | int],
+        cls, session: Session, id_or_path: List[str | int], columns: Optional[List[str]] = None
     ) -> List["Variable"]:
         ...
 
@@ -1276,14 +1272,15 @@ class Variable(Base):
         cls,
         session: Session,
         id_or_path: int | str | List[str | int],
+        columns: Optional[List[str]] = None,
     ) -> "Variable" | List["Variable"]:
         """Load a variable from the database by its catalog path or variable ID."""
         # Single id
         if isinstance(id_or_path, int):
-            return cls.from_id(session=session, variable_id=id_or_path)
+            return cls.from_id(session=session, variable_id=id_or_path, columns=columns)
         # Single path
         elif isinstance(id_or_path, str):
-            return cls.from_catalog_path(session=session, catalog_path=id_or_path)
+            return cls.from_catalog_path(session=session, catalog_path=id_or_path, columns=columns)
 
         # Multiple path or id
         elif isinstance(id_or_path, list):
@@ -1292,10 +1289,10 @@ class Variable(Base):
             str_ids = [i for i in id_or_path if isinstance(i, str)]
             # Multiple IDs
             if len(int_ids) == len(id_or_path):
-                return cls.from_id(session=session, variable_id=int_ids)
+                return cls.from_id(session=session, variable_id=int_ids, columns=columns)
             # Multiple paths
             elif len(str_ids) == len(id_or_path):
-                return cls.from_catalog_path(session=session, catalog_path=str_ids)
+                return cls.from_catalog_path(session=session, catalog_path=str_ids, columns=columns)
             else:
                 raise TypeError("All elements in the list must be integers")
 
@@ -1312,40 +1309,46 @@ class Variable(Base):
 
     @overload
     @classmethod
-    def from_catalog_path(cls, session: Session, catalog_path: str) -> "Variable":
+    def from_catalog_path(cls, session: Session, catalog_path: str, columns: Optional[List[str]] = None) -> "Variable":
         ...
 
     @overload
     @classmethod
-    def from_catalog_path(cls, session: Session, catalog_path: List[str]) -> List["Variable"]:
+    def from_catalog_path(
+        cls, session: Session, catalog_path: List[str], columns: Optional[List[str]] = None
+    ) -> List["Variable"]:
         ...
 
     @classmethod
-    def from_catalog_path(cls, session: Session, catalog_path: str | List[str]) -> "Variable" | List["Variable"]:
+    def from_catalog_path(
+        cls, session: Session, catalog_path: str | List[str], columns: Optional[List[str]] = None
+    ) -> "Variable" | List["Variable"]:
         """Load a variable from the DB by its catalog path."""
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
         if isinstance(catalog_path, str):
-            return session.scalars(select(cls).where(cls.catalogPath == catalog_path)).one()
+            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath == catalog_path)).one()
         elif isinstance(catalog_path, list):
-            return session.scalars(select(cls).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
+            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
 
     @overload
     @classmethod
-    def from_id(cls, session: Session, variable_id: int) -> "Variable":
+    def from_id(cls, session: Session, variable_id: int, columns: Optional[List[str]] = None) -> "Variable":
         ...
 
     @overload
     @classmethod
-    def from_id(cls, session: Session, variable_id: List[int]) -> List["Variable"]:
+    def from_id(cls, session: Session, variable_id: List[int], columns: Optional[List[str]] = None) -> List["Variable"]:
         ...
 
     @classmethod
-    def from_id(cls, session: Session, variable_id: int | List[int]) -> "Variable" | List["Variable"]:
+    def from_id(
+        cls, session: Session, variable_id: int | List[int], columns: Optional[List[str]] = None
+    ) -> "Variable" | List["Variable"]:
         """Load a variable (or list of variables) from the DB by its ID path."""
         if isinstance(variable_id, int):
-            return session.scalars(select(cls).where(cls.id == variable_id)).one()
+            return session.scalars(_select_columns(cls, columns).where(cls.id == variable_id)).one()
         elif isinstance(variable_id, list):
-            return session.scalars(select(cls).where(cls.id.in_(variable_id))).all()  # type: ignore
+            return session.scalars(_select_columns(cls, columns).where(cls.id.in_(variable_id))).all()  # type: ignore
 
     @classmethod
     def catalog_paths_to_variable_ids(cls, session: Session, catalog_paths: List[str]) -> Dict[str, int]:
@@ -1964,3 +1967,13 @@ def _fetch_entities(
 
     df = df.rename(columns=column_renames)
     return df
+
+
+def _select_columns(cls, columns: Optional[list[str]] = None) -> Select:
+    # Select only the specified columns, or all if not specified
+    if columns:
+        # Use getattr to dynamically select the columns
+        columns_to_select = [getattr(cls, col) for col in columns]
+        return select(*columns_to_select)
+    else:
+        return select(cls)
