@@ -50,6 +50,8 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 
     chart_diff = format_chart_diff(charts_df)
 
+    if charts_df.errors.any():
+        status = "⚠️"
     if charts_df.empty or charts_df.is_reviewed.all():
         status = "✅"
     else:
@@ -99,12 +101,19 @@ def format_chart_diff(df: pd.DataFrame) -> str:
     num_charts_new = len(new)
     num_charts_new_reviewed = new.is_reviewed.sum()
 
+    # Errors
+    if df.errors.any():
+        errors = f"<li>Errors: {df.errors.notnull().sum()}</li>"
+    else:
+        errors = ""
+
     return f"""
 <ul>
     <li>{num_charts_reviewed}/{num_charts} reviewed charts</li>
     <ul>
         <li>Modified: {num_charts_modified_reviewed}/{num_charts_modified}</li>
         <li>New: {num_charts_new_reviewed}/{num_charts_new}</li>
+        {errors}
     </ul>
 </ul>
     """.strip()

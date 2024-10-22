@@ -54,7 +54,8 @@ class AdminAPI(object):
             json=chart_config,
         )
         js = self._json_from_response(resp)
-        assert js["success"]
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "chart_config": chart_config})
         return js
 
     def update_chart(self, chart_id: int, chart_config: dict) -> dict:
@@ -64,7 +65,8 @@ class AdminAPI(object):
             json=chart_config,
         )
         js = self._json_from_response(resp)
-        assert js["success"]
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "chart_config": chart_config})
         return js
 
     def set_tags(self, chart_id: int, tags: List[Dict[str, Any]]) -> dict:
@@ -74,7 +76,8 @@ class AdminAPI(object):
             json={"tags": tags},
         )
         js = self._json_from_response(resp)
-        assert js["success"]
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "tags": tags})
         return js
 
     def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
@@ -90,6 +93,7 @@ class AdminAPI(object):
         js = self._json_from_response(resp)
         if not js["success"]:
             raise AdminAPIError({"error": js["error"], "variable_id": variable_id, "grapher_config": grapher_config})
+<<<<<<< Updated upstream
         return js
 
     def delete_grapher_config(self, variable_id: int) -> dict:
@@ -115,6 +119,19 @@ def create_session_id(owid_env: OWIDEnv, grapher_user_id: Optional[int] = None) 
         session.commit()
 
     return session_id
+=======
+        return js
+
+    def delete_grapher_config(self, variable_id: int) -> dict:
+        resp = requests.delete(
+            self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
+            cookies={"sessionid": self.session_id},
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "variable_id": variable_id})
+        return js
+>>>>>>> Stashed changes
 
 
 def requests_with_retry() -> requests.Session:

@@ -1,5 +1,7 @@
 import datetime as dt
-from typing import Dict, List, Optional
+import difflib
+import pprint
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 from sqlalchemy.engine.base import Engine
@@ -35,6 +37,8 @@ class ChartDiff:
     modified_checksum: Optional[pd.DataFrame]
     # Whether the chart has been edited in staging
     edited_in_staging: Optional[bool]
+    # Any errors preventing the chart from being synced
+    errors: List[str]
 
     def __init__(
         self,
@@ -45,11 +49,13 @@ class ChartDiff:
         # approval_status: gm.CHART_DIFF_STATUS | str,
         modified_checksum: Optional[pd.DataFrame] = None,
         edited_in_staging: Optional[bool] = None,
+        errors: List[str] = [],
     ):
         self.source_chart = source_chart
         self.target_chart = target_chart
         self.approval = approval
         self.conflict = conflict
+        self.errors = errors
         if target_chart:
             assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
         self.chart_id = source_chart.id
@@ -268,8 +274,17 @@ class ChartDiff:
             else:
                 edited_in_staging = None
 
+            # Are there any errors?
+            # TODO: real errors
+            # errors = []
+            errors = [
+                "This chart slug was previously used by another chart: official-development-assistance-as-a-share-of-donor-gross-national-income'"
+            ]
+
             # Build Chart Diff object
-            chart_diff = cls(source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging)
+            chart_diff = cls(
+                source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging, errors
+            )
             chart_diffs.append(chart_diff)
 
         return chart_diffs
@@ -340,10 +355,7 @@ class ChartDiff:
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
         assert self.target_chart is not None, "Target chart is None!"
-        exclude_keys = ("id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl")
-        config_1 = {k: v for k, v in self.source_chart.config.items() if k not in exclude_keys}
-        config_2 = {k: v for k, v in self.target_chart.config.items() if k not in exclude_keys}
-        return config_1 == config_2
+        return configs_are_equal(self.source_chart.config, self.target_chart.config)
 
     @property
     def details(self):
@@ -354,6 +366,7 @@ class ChartDiff:
             "is_rejected": self.is_rejected,
             "is_reviewed": self.is_reviewed,
             "is_new": self.is_new,
+            "errors": self.errors,
         }
 
     @staticmethod
@@ -489,6 +502,8 @@ class ChartDiffsLoader:
             self.df = self.load_df(chart_ids=chart_ids)
         # Get ids of charts with relevant changes
         df_charts = self.get_charts_df(config, data, metadata)
+
+        df_charts = df_charts.loc[[2111]]
 
         if source_session and target_session:
             chart_diffs = ChartDiff.from_charts_df(df_charts, source_session, target_session)
@@ -730,3 +745,28 @@ def get_chart_diffs_from_grapher(
     chart_diffs = {chart.chart_id: chart for chart in chart_diffs}
 
     return chart_diffs
+
+
+def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbose=False) -> bool:
+    """Compare two chart configs, ignoring certain fields."""
+    exclude_keys = ("id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl", "version")
+    config_1 = {k: v for k, v in config_1.items() if k not in exclude_keys}
+    config_2 = {k: v for k, v in config_2.items() if k not in exclude_keys}
+
+    # Use pretty print to convert dicts to strings for comparison
+    config_1_str = pprint.pformat(config_1, sort_dicts=True)
+    config_2_str = pprint.pformat(config_2, sort_dicts=True)
+
+    # Compare the string representations using difflib
+    if config_1_str == config_2_str:
+        return True
+
+    if verbose:
+        log.warning("Configurations differ")
+        diff = difflib.unified_diff(config_1_str.splitlines(), config_2_str.splitlines(), lineterm="")
+
+        # Print the diff
+        for line in diff:
+            print(line)
+
+    return False
