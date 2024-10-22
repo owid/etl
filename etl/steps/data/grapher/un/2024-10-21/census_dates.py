@@ -14,11 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("census_dates")
 
     # Read table from garden dataset.
-    tb = ds_garden["census_dates"]
-
-    #
-    # Process data.
-    #
+    tb = ds_garden["years_since_last_census"]
 
     #
     # Save outputs.

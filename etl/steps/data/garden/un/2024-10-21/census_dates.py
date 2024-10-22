@@ -1,6 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
+from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -77,14 +79,18 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    tb = tb.format(["country", "date"])
 
+    tb_census = years_since_last_census(tb)
+    tb_census = add_uk(tb_census)
+    tb_census = tb_census.format(["country", "year"])
+
+    tb = tb.format(["country", "date"])
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb, tb_census], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -133,3 +139,56 @@ def date_as_year(date: str) -> int:
         return int(date[1:-1])
     else:
         return int(date)
+
+
+def years_since_last_census(tb: Table) -> Table:
+    countries = tb["country"].unique()
+    years = [int(x) for x in range(1985, 2024)]
+    rows = []
+    for country in countries:
+        country_df = tb[tb["country"] == country].sort_values("date_as_year", ascending=True)
+        census_years = country_df["date_as_year"].tolist()
+        for year in years:
+            prev_census = [x for x in census_years if x <= year]
+            if prev_census:
+                last_census = max([x for x in census_years if x <= year])
+                years_since_last_census = year - last_census
+            else:
+                last_census = None
+                years_since_last_census = None
+            rows.append(
+                {
+                    "country": country,
+                    "year": year,
+                    "last_census": last_census,
+                    "years_since_last_census": years_since_last_census,
+                }
+            )
+    tb_census = Table(pd.DataFrame(rows)).copy_metadata(tb)
+    tb_census.m.short_name = "years_since_last_census"
+
+    for col in tb_census.columns:
+        tb_census[col].metadata = tb["date"].m
+        tb_census[col].metadata.origins = tb["date"].m.origins
+    return tb_census
+
+
+def add_uk(tb_census):
+    years = [int(x) for x in range(1985, 2024)]
+    uk_rows = []
+    uk_countries = ["England and Wales", "Scotland", "Northern Ireland"]
+    for year in years:
+        uk_tb = tb_census[tb_census["country"].isin(uk_countries) & (tb_census["year"] == year)]
+        uk_last_census = uk_tb["last_census"].max()
+        uk_years_since_last_census = year - uk_last_census
+        uk_rows.append(
+            {
+                "country": "United Kingdom",
+                "year": year,
+                "last_census": uk_last_census,
+                "years_since_last_census": uk_years_since_last_census,
+            }
+        )
+    uk_tb_census = Table(pd.DataFrame(uk_rows)).copy_metadata(tb_census)
+    tb_census = pr.concat([tb_census, uk_tb_census], axis=0)
+    return tb_census
