@@ -4,6 +4,7 @@ import zipfile
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+import owid.catalog.processing as pr
 import pandas as pd
 import structlog
 from owid.catalog import Dataset, Table, VariableMeta
@@ -89,13 +90,24 @@ def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_gro
 
     tb = tb.reset_index()
 
+    # create a copy so other indicators are not affected
+    regions_tb = tb.copy()
+
     # create new columns for total remittances (only for countries where remittance cost is available)
-    tb["total_received_remittances"] = tb["bx_trf_pwkr_cd_dt"].where(tb["si_rmt_cost_ib_zs"].notna())
-    tb["total_sent_remittances"] = tb["bm_trf_pwkr_cd_dt"].where(tb["si_rmt_cost_ob_zs"].notna())
+    regions_tb["total_received_remittances"] = regions_tb["bx_trf_pwkr_cd_dt"].where(
+        regions_tb["si_rmt_cost_ib_zs"].notna()
+    )
+    regions_tb["total_sent_remittances"] = regions_tb["bm_trf_pwkr_cd_dt"].where(
+        regions_tb["si_rmt_cost_ob_zs"].notna()
+    )
 
     # calculate total cost of remittance for each country
-    tb["total_cost_of_receiving_remittances"] = tb["si_rmt_cost_ib_zs"] * tb["total_received_remittances"]
-    tb["total_cost_of_sending_remittances"] = tb["si_rmt_cost_ob_zs"] * tb["total_sent_remittances"]
+    regions_tb["total_cost_of_receiving_remittances"] = (
+        regions_tb["si_rmt_cost_ib_zs"] * regions_tb["total_received_remittances"]
+    )
+    regions_tb["total_cost_of_sending_remittances"] = (
+        regions_tb["si_rmt_cost_ob_zs"] * regions_tb["total_sent_remittances"]
+    )
 
     agg = {
         "total_cost_of_receiving_remittances": "sum",
@@ -107,21 +119,31 @@ def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_gro
     }
 
     # add regions to table
-    tb = geo.add_regions_to_table(
-        tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, aggregations=agg, min_num_values_per_year=1
+    regions_tb = geo.add_regions_to_table(
+        regions_tb,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        aggregations=agg,
+        min_num_values_per_year=1,
     )
 
-    tb["si_rmt_cost_ib_zs"] = tb["total_cost_of_receiving_remittances"] / tb["total_received_remittances"]
-    tb["si_rmt_cost_ob_zs"] = tb["total_cost_of_sending_remittances"] / tb["total_sent_remittances"]
-
-    tb = tb.drop(
-        columns=[
-            "total_cost_of_receiving_remittances",
-            "total_cost_of_sending_remittances",
-            "total_received_remittances",
-            "total_sent_remittances",
-        ]
+    regions_tb["si_rmt_cost_ib_zs"] = (
+        regions_tb["total_cost_of_receiving_remittances"] / regions_tb["total_received_remittances"]
     )
+    regions_tb["si_rmt_cost_ob_zs"] = (
+        regions_tb["total_cost_of_sending_remittances"] / regions_tb["total_sent_remittances"]
+    )
+
+    col_to_replace = [
+        "si_rmt_cost_ib_zs",
+        "si_rmt_cost_ob_zs",
+        "bx_trf_pwkr_cd_dt",
+        "bm_trf_pwkr_cd_dt",
+    ]
+
+    col_rest = [col for col in tb.columns if col not in col_to_replace]
+
+    tb = pr.merge(tb[col_rest], regions_tb[col_to_replace + ["country", "year"]], on=["country", "year"], how="outer")
 
     tb = tb.format(["country", "year"])
 
