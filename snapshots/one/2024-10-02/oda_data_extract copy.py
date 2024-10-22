@@ -16,9 +16,10 @@ Steps to extract the data:
         - pandas
     2. Run this code to extract the data.
         python snapshots/one/{version}/oda_data_extract.py
-    3. Use the file oda_by_sectors_one.feather as the snapshot, by running the following code:
-        python snapshots/one/{version}/official_development_assistance_one.py --path-to-file snapshots/one/{version}/oda_by_sectors_one.feather
-    4. Delete oda_by_sectors_one.feather and fullCRS.parquet files.
+    3. Use the file oda_by_sectors_one.feather as the snapshot, by running the following codes:
+        python snapshots/one/{version}/oda_one_sectors.py --path-to-file snapshots/one/{version}/oda_one_sectors.feather
+        python snapshots/one/{version}/oda_one_channels.py --path-to-file snapshots/one/{version}/oda_one_channels.feather
+    4. Delete oda_one_sectors.feather, oda_one_channels.feather and fullCRS.parquet files.
 
 
 How to run the snapshot on the staging server:
@@ -56,15 +57,13 @@ END_YEAR = 2024
 DONOR_GROUPINGS = donor_groupings()
 RECIPIENT_GROUPINGS = recipient_groupings()
 
-# Define columns to extract in the csv
-FINAL_COLUMNS = [
+# Define index + value columns
+BASIC_COLUMNS = [
     "year",
     "donor_code",
     "donor_name",
     "recipient_code",
     "recipient_name",
-    "sector_name",
-    "channel_code",
     "value",
 ]
 
@@ -72,27 +71,32 @@ FINAL_COLUMNS = [
 def main() -> None:
     # Define the start and end years for the data
 
-    # Get the data by sector
-    df = get_data_by_sector(START_YEAR, END_YEAR)
+    # Get the data by sector and channels
+    df_sector = get_data_by_sector_or_channel(
+        start_year=START_YEAR, end_year=END_YEAR, flow_column="usd_commitment_constant", sector_or_channel="sector"
+    )
+    df_channel = get_data_by_sector_or_channel(
+        start_year=START_YEAR, end_year=END_YEAR, flow_column="usd_disbursement_constant", sector_or_channel="channel"
+    )
 
-    df = aggregate_data(df=df, columns_to_keep=FINAL_COLUMNS)
+    # Save the data to feather files
+    df_sector.to_feather(f"{PARENT_DIR}/oda_one_sectors.feather")
+    df_channel.to_feather(f"{PARENT_DIR}/oda_one_channels.feather")
 
-    # Save the data to a feather file
-    df.to_feather(f"{PARENT_DIR}/oda_by_sectors_one.feather")
 
-
-def get_data_by_sector(
+def get_data_by_sector_or_channel(
     start_year: int,
     end_year: int,
-    flow_column: str = "usd_disbursement_constant",
+    flow_column: str = "usd_commitment_constant",
     by_donor: bool = True,
     by_recipient: bool = True,
+    sector_or_channel: str = "sector",
 ) -> pd.DataFrame:
     """Get the data by sector.
     Args:
         start_year (int): The start year for the data.
         end_year (int): The end year for the data.
-        flow_column (str): The flow column to aggregate (e.g usd_disbursement, usd_commitment).
+        flow_column (str): The flow column to aggregate (e.g usd_disbursement_constant, usd_commitment_constant).
         by_donor (bool): Whether to show the data by donor country. The default is True,
         by_recipient (bool): Whether to show the data by recipient country. The default is True,
         which means the data will be shown for all recipients, total.
@@ -107,27 +111,32 @@ def get_data_by_sector(
     # filter for ODA
     crs = crs.loc[lambda d: d.category == 10]
 
-    # Get the spending data
-    spending = crs.filter(
+    # Select columns depending on sector_or_channel
+    if sector_or_channel == "sector":
+        extra_columns = ["sector_name"]
+    elif sector_or_channel == "channel":
+        extra_columns = ["channel_code"]
+
+    # Define columns to keep
+    columns_to_keep = (
         [
             "year",
-            "indicator",
             "donor_code",
             "donor_name",
             "recipient_code",
             "recipient_name",
-            "sector_name",
-            "channel_code",
-            "prices",
-            "currency",
-            flow_column,
         ]
+        + [flow_column]
+        + extra_columns
     )
+
+    # Get the spending data
+    spending = crs.filter(columns_to_keep)
 
     # group data
     grouper = [
         c
-        for c in spending.columns
+        for c in columns_to_keep
         if c
         not in [
             "donor_code",
@@ -148,6 +157,11 @@ def get_data_by_sector(
 
     # Rename flow_column by value
     spending = spending.rename(columns={flow_column: "value"})
+
+    # Replace flow_column by value in columns_to_keep
+    columns_to_keep = [col if col != flow_column else "value" for col in columns_to_keep]
+
+    spending = aggregate_data(df=spending, columns_to_keep=columns_to_keep)
 
     return spending
 

@@ -32,20 +32,19 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("official_development_assistance_one.feather")
+    snap_sectors = paths.load_snapshot("oda_one_sectors.feather")
+    snap_channels = paths.load_snapshot("oda_one_channels.feather")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb_sectors = snap_sectors.read()
+    tb_channels = snap_channels.read()
 
     #
     # Process data.
     #
     # Make year integer.
-    tb["year"] = tb["year"].astype(int)
-
-    # Create tb_sectors and tb_channels, aggregating by the index columns.
-    tb_sectors = tb.groupby(INDEX_COLUMNS_SECTORS, observed=True, dropna=False)["value"].sum().reset_index()
-    tb_channels = tb.groupby(INDEX_COLUMNS_CHANNELS, observed=True, dropna=False)["value"].sum().reset_index()
+    tb_sectors["year"] = tb_sectors["year"].astype(int)
+    tb_channels["year"] = tb_channels["year"].astype(int)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb_sectors = tb_sectors.format(INDEX_COLUMNS_SECTORS, short_name="sectors")
@@ -56,7 +55,10 @@ def run(dest_dir: str) -> None:
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
     ds_meadow = create_dataset(
-        dest_dir, tables=[tb_sectors, tb_channels], check_variables_metadata=True, default_metadata=snap.metadata
+        dest_dir,
+        tables=[tb_sectors, tb_channels],
+        check_variables_metadata=True,
+        default_metadata=snap_sectors.metadata,
     )
 
     # Save changes in the new meadow dataset.

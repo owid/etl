@@ -814,7 +814,8 @@ steps:
 
 # OECD Official Development Assistance (ODA) via ONE
   data://meadow/one/2024-10-02/official_development_assistance_one:
-    - snapshot://one/2024-10-02/official_development_assistance_one.feather
+    - snapshot://one/2024-10-02/oda_one_sectors.feather
+    - snapshot://one/2024-10-02/oda_one_channels.feather
   data://garden/one/2024-10-02/official_development_assistance_one:
     - data://meadow/one/2024-10-02/official_development_assistance_one
 
