@@ -44,7 +44,7 @@ PARENT_DIR = Path(__file__).parent
 set_data_path(path=PARENT_DIR)
 
 # Define start and end years for the data
-START_YEAR = 1973
+START_YEAR = 1960
 END_YEAR = 2024
 
 
@@ -63,7 +63,7 @@ def main() -> None:
 def get_data_by_sector(
     start_year: int,
     end_year: int,
-    flow_column: str = "usd_disbursement",
+    flow_column: str = "usd_disbursement_constant",
     by_donor: bool = True,
     by_recipient: bool = True,
 ) -> pd.DataFrame:
@@ -95,7 +95,8 @@ def get_data_by_sector(
             "donor_name",
             "recipient_code",
             "recipient_name",
-            "purpose_code",
+            "sector_name",
+            "channel_code",
             "prices",
             "currency",
             flow_column,
@@ -123,6 +124,9 @@ def get_data_by_sector(
         grouper.extend(["recipient_code", "recipient_name"])
 
     spending = spending.groupby(grouper, observed=True, dropna=False)[flow_column].sum().reset_index()
+
+    # Rename flow_column by value
+    spending = spending.rename(columns={flow_column: "value"})
 
     return spending
 
