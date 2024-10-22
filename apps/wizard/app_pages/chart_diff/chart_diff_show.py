@@ -492,6 +492,11 @@ class ChartDiffShow:
         else:
             st.empty()
 
+        if self.diff.error:
+            st.error(f"⚠️ Error: {self.diff.error}")
+        else:
+            st.empty()
+
         # Show controls: status approval, refresh, link
         self._show_chart_diff_controls()
 

@@ -37,8 +37,8 @@ class ChartDiff:
     modified_checksum: Optional[pd.DataFrame]
     # Whether the chart has been edited in staging
     edited_in_staging: Optional[bool]
-    # Any errors preventing the chart from being synced
-    errors: List[str]
+    # Error preventing the chart from being synced
+    error: Optional[str]
 
     def __init__(
         self,
@@ -49,13 +49,13 @@ class ChartDiff:
         # approval_status: gm.CHART_DIFF_STATUS | str,
         modified_checksum: Optional[pd.DataFrame] = None,
         edited_in_staging: Optional[bool] = None,
-        errors: List[str] = [],
+        error: Optional[str] = None,
     ):
         self.source_chart = source_chart
         self.target_chart = target_chart
         self.approval = approval
         self.conflict = conflict
-        self.errors = errors
+        self.error = error
         if target_chart:
             assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
         self.chart_id = source_chart.id
@@ -247,6 +247,9 @@ class ChartDiff:
         # Get checksums
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
 
+        # Get all slugs from target
+        slugs_in_target = set(read_sql("SELECT slug FROM chart_slug_redirects", target_session)["slug"]) | {"blablabla"}
+
         # Build chart diffs
         chart_diffs = []
         for chart_id, source_chart in source_charts.items():
@@ -275,15 +278,15 @@ class ChartDiff:
                 edited_in_staging = None
 
             # Are there any errors?
-            # TODO: real errors
-            # errors = []
-            errors = [
-                "This chart slug was previously used by another chart: official-development-assistance-as-a-share-of-donor-gross-national-income'"
-            ]
+            # Creating new chart, but slug already exists in target
+            if not target_chart and source_chart.slug in slugs_in_target:
+                error = f"Slug '{source_chart.slug}' already exists in target environment."
+            else:
+                error = None
 
             # Build Chart Diff object
             chart_diff = cls(
-                source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging, errors
+                source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging, error
             )
             chart_diffs.append(chart_diff)
 
@@ -366,7 +369,7 @@ class ChartDiff:
             "is_rejected": self.is_rejected,
             "is_reviewed": self.is_reviewed,
             "is_new": self.is_new,
-            "errors": self.errors,
+            "error": self.error,
         }
 
     @staticmethod
@@ -502,8 +505,6 @@ class ChartDiffsLoader:
             self.df = self.load_df(chart_ids=chart_ids)
         # Get ids of charts with relevant changes
         df_charts = self.get_charts_df(config, data, metadata)
-
-        df_charts = df_charts.loc[[2111]]
 
         if source_session and target_session:
             chart_diffs = ChartDiff.from_charts_df(df_charts, source_session, target_session)
