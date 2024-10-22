@@ -86,8 +86,9 @@ def format_chart_diff(df: pd.DataFrame) -> str:
     if df.empty:
         return "No charts for review."
 
-    new = df[df.is_new]
-    modified = df[~df.is_new]
+    rejected = df[df.is_rejected]
+    new = df[df.is_new & ~df.is_rejected]
+    modified = df[~df.is_new & ~df.is_rejected]
 
     # Total charts
     num_charts = len(df)
@@ -101,6 +102,9 @@ def format_chart_diff(df: pd.DataFrame) -> str:
     num_charts_new = len(new)
     num_charts_new_reviewed = new.is_reviewed.sum()
 
+    # Rejected charts
+    num_charts_rejected = len(rejected)
+
     # Errors
     if df.error.any():
         errors = f"<li>Errors: {df.error.notnull().sum()}</li>"
@@ -113,6 +117,7 @@ def format_chart_diff(df: pd.DataFrame) -> str:
     <ul>
         <li>Modified: {num_charts_modified_reviewed}/{num_charts_modified}</li>
         <li>New: {num_charts_new_reviewed}/{num_charts_new}</li>
+        <li>Rejected: {num_charts_rejected}</li>
         {errors}
     </ul>
 </ul>
