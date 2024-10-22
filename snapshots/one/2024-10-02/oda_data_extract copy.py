@@ -18,7 +18,7 @@ Steps to extract the data:
         python snapshots/one/{version}/oda_data_extract.py
     3. Use the file oda_by_sectors_one.feather as the snapshot, by running the following code:
         python snapshots/one/{version}/official_development_assistance_one.py --path-to-file snapshots/one/{version}/oda_by_sectors_one.feather
-    4. Delete all the files that are _not_ oda_by_sectors_one.feather or oda_data_extract.py.
+    4. Delete oda_by_sectors_one.feather and fullCRS.parquet files.
 
 
 How to run the snapshot on the staging server:
@@ -26,7 +26,7 @@ How to run the snapshot on the staging server:
 1. sudo apt install libgl1-mesa-glx
 2. cd etl
 3. uv run pip install oda_data --upgrade
-4. uv run python "snapshots/one/2024-10-02/oda_data_extract copy.py"
+4. uv run python "snapshots/one/2024-10-02/oda_data_extract.py"
 
 """
 
