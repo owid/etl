@@ -95,3 +95,14 @@ def to_sql(df: pd.DataFrame, name: str, engine: Optional[Engine | Session] = Non
             return df.to_sql(name, engine.bind, *args, **kwargs)
         else:
             raise ValueError(f"Unsupported engine type {type(engine)}")
+
+
+def production_or_master_engine() -> Engine:
+    """Return the production engine if available, otherwise connect to staging-site-master."""
+    if config.OWID_ENV.env_remote == "production":
+        return config.OWID_ENV.get_engine()
+    elif config.ENV_FILE_PROD:
+        return config.OWIDEnv.from_env_file(config.ENV_FILE_PROD).get_engine()
+    else:
+        log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
+        return config.OWIDEnv.from_staging("master").get_engine()

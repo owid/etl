@@ -8,8 +8,10 @@ TODO: This file contains some code that needs some revision:
 
 """
 import concurrent.futures
+import functools as ft
 import io
 import warnings
+from collections import defaultdict
 from http.client import RemoteDisconnected
 from typing import Any, Dict, List, Optional, cast
 from urllib.error import HTTPError, URLError
@@ -20,6 +22,7 @@ import requests
 import structlog
 import validators
 from deprecated import deprecated
+from owid.catalog import Dataset
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from tenacity import Retrying
@@ -28,10 +31,10 @@ from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
 from etl import config
+from etl import grapher_model as gm
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_connection, read_sql
-from etl.grapher_model import Dataset, Entity, Variable
-from etl.paths import CACHE_DIR
+from etl.paths import CACHE_DIR, DATA_DIR
 
 log = structlog.get_logger()
 
@@ -46,7 +49,7 @@ def load_dataset_uris(
 ) -> List[str]:
     """Get list of dataset URIs from the database."""
     with Session(owid_env.engine) as session:
-        datasets = Dataset.load_datasets_uri(session)
+        datasets = gm.Dataset.load_datasets_uri(session)
 
     return list(datasets["dataset_uri"])
 
@@ -55,10 +58,10 @@ def load_variables_in_dataset(
     dataset_uri: Optional[List[str]] = None,
     dataset_id: Optional[List[int]] = None,
     owid_env: OWIDEnv = OWID_ENV,
-) -> List[Variable]:
+) -> List[gm.Variable]:
     """Load Variable objects that belong to a dataset with URI `dataset_uri`."""
     with Session(owid_env.engine) as session:
-        indicators = Variable.load_variables_in_datasets(
+        indicators = gm.Variable.load_variables_in_datasets(
             session=session,
             dataset_uris=dataset_uri,
             dataset_ids=dataset_id,
@@ -71,7 +74,7 @@ def load_variables_in_dataset(
 def load_variable(
     id_or_path: str | int,
     owid_env: OWIDEnv = OWID_ENV,
-) -> Variable:
+) -> gm.Variable:
     """Load variable.
 
     If id_or_path is str, it'll be used as catalog path.
@@ -83,7 +86,7 @@ def load_variable(
             pass
 
     with Session(owid_env.engine) as session:
-        variable = Variable.from_id_or_path(
+        variable = gm.Variable.from_id_or_path(
             session=session,
             id_or_path=id_or_path,
         )
@@ -95,7 +98,7 @@ def load_variable(
 def load_variables(
     ids_or_paths: List[str | int],
     owid_env: OWIDEnv = OWID_ENV,
-) -> List[Variable]:
+) -> List[gm.Variable]:
     """Load variable.
 
     If id_or_path is str, it'll be used as catalog path.
@@ -103,7 +106,7 @@ def load_variables(
     TODO: this should be merged with load_variable!
     """
     with Session(owid_env.engine) as session:
-        variable = Variable.from_id_or_path(
+        variable = gm.Variable.from_id_or_path(
             session=session,
             id_or_path=ids_or_paths,
         )
@@ -121,7 +124,7 @@ def load_variables(
 def load_variable_metadata(
     catalog_path: Optional[str] = None,
     variable_id: Optional[int] = None,
-    variable: Optional[Variable] = None,
+    variable: Optional[gm.Variable] = None,
     owid_env: OWIDEnv = OWID_ENV,
 ) -> Dict[str, Any]:
     """Get metadata for an indicator based on its catalog path or variable id.
@@ -147,7 +150,7 @@ def load_variable_metadata(
 def load_variable_data(
     catalog_path: Optional[str] = None,
     variable_id: Optional[int] = None,
-    variable: Optional[Variable] = None,
+    variable: Optional[gm.Variable] = None,
     owid_env: OWIDEnv = OWID_ENV,
     set_entity_names: bool = True,
 ) -> pd.DataFrame:
@@ -180,9 +183,9 @@ def load_variable_data(
 def ensure_load_variable(
     catalog_path: Optional[str] = None,
     variable_id: Optional[int] = None,
-    variable: Optional[Variable] = None,
+    variable: Optional[gm.Variable] = None,
     owid_env: OWIDEnv = OWID_ENV,
-) -> Variable:
+) -> gm.Variable:
     if variable is None:
         if catalog_path is not None:
             variable = load_variable(id_or_path=catalog_path, owid_env=owid_env)
@@ -203,7 +206,7 @@ def ensure_load_variable(
 def load_variables_data(
     catalog_paths: Optional[List[str]] = None,
     variable_ids: Optional[List[int]] = None,
-    variables: Optional[List[Variable]] = None,
+    variables: Optional[List[gm.Variable]] = None,
     owid_env: OWIDEnv = OWID_ENV,
     workers: int = 1,
     value_as_str: bool = True,
@@ -239,7 +242,7 @@ def load_variables_data(
 def load_variables_metadata(
     catalog_paths: Optional[List[str]] = None,
     variable_ids: Optional[List[int]] = None,
-    variables: Optional[List[Variable]] = None,
+    variables: Optional[List[gm.Variable]] = None,
     owid_env: OWIDEnv = OWID_ENV,
     workers: int = 1,
 ) -> List[Dict[str, Any]]:
@@ -273,11 +276,11 @@ def _ensure_variable_ids(
     engine: Engine,
     catalog_paths: Optional[List[str]] = None,
     variable_ids: Optional[List[int]] = None,
-    variables: Optional[List[Variable]] = None,
+    variables: Optional[List[gm.Variable]] = None,
 ) -> List[int]:
     if catalog_paths is not None:
         with Session(engine) as session:
-            mapping = Variable.catalog_paths_to_variable_ids(session, catalog_paths=catalog_paths)
+            mapping = gm.Variable.catalog_paths_to_variable_ids(session, catalog_paths=catalog_paths)
         variable_ids = [int(i) for i in mapping.values()]
     elif (variable_ids is None) and (variables is not None):
         variable_ids = [variable.id for variable in variables]
@@ -449,9 +452,81 @@ def _fetch_metadata_from_s3(variable_id: int, env: OWIDEnv | None = None) -> Dic
 def load_entity_mapping(entity_ids: Optional[List[int]] = None, owid_env: OWIDEnv = OWID_ENV) -> Dict[int, str]:
     # Fetch the mapping of entity ids to names.
     with Session(owid_env.engine) as session:
-        entity_id_to_name = Entity.load_entity_mapping(session=session, entity_ids=entity_ids)
+        entity_id_to_name = gm.Entity.load_entity_mapping(session=session, entity_ids=entity_ids)
 
     return entity_id_to_name
+
+
+def variable_data_df_from_catalog(
+    engine: Engine, variables: Optional[List[gm.Variable]] = None, variable_ids: Optional[List[int | str]] = None
+) -> pd.DataFrame:
+    """Load all variables for a given dataset from local catalog."""
+    if variable_ids:
+        assert not variables, "Only one of variables or variable_ids must be provided"
+        with Session(engine) as session:
+            variables = gm.Variable.from_id_or_path(session, variable_ids, columns=["id", "shortName", "dimensions"])
+    elif variables:
+        assert not variable_ids, "Only one of variables or variable_ids must be provided"
+    else:
+        raise ValueError("Either variables or variable_ids must be provided")
+
+    to_read = defaultdict(list)
+
+    # Group variables by dataset and table
+    # TODO: use CatalogPath object
+    for variable in variables:
+        assert variable.catalogPath, f"Variable {variable.id} has no catalogPath"
+        path, short_name = variable.catalogPath.split("#")
+        ds_path, table_name = path.rsplit("/", 1)
+        to_read[(ds_path, table_name)].append(variable)
+
+    # Read the table and load all its variables
+    tbs = []
+    for (ds_path, table_name), variables in to_read.items():
+        try:
+            tb = Dataset(DATA_DIR / ds_path).read_table(table_name)
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"Dataset {ds_path} not found in local catalog.") from e
+
+        # Simple case with no dimensions
+        if not variables[0].dimensions:
+            variable_names = [variable.shortName for variable in variables]
+            tb = tb[["country", "year"] + variable_names]
+
+            # Rename from shortName to id
+            tb = tb.rename(columns={variable.shortName: variable.id for variable in variables})
+            tbs.append(tb)
+
+        # Dimensional case
+        else:
+            # NOTE: example of `filters`
+            # [
+            #     {'name': 'question', 'value': 'mh1 - Importance of mental health for well-being'},
+            #     {'name': 'answer', 'value': 'As important'},
+            #     {'name': 'gender', 'value': 'all'},
+            #     {'name': 'age_group', 'value': '15-29'}
+            # ]
+            filters = variables[0].dimensions["filters"]
+            dim_names = [f["name"] for f in filters]
+            tb_pivoted = tb.pivot(index=["country", "year"], columns=dim_names)
+
+            labels = []
+            for variable in variables:
+                assert variable.dimensions, f"Variable {variable.id} has no dimensions"
+                labels.append(
+                    tuple(
+                        [variable.dimensions["originalShortName"]]
+                        + [f["value"] for f in variable.dimensions["filters"]]
+                    )
+                )
+
+            tb = tb_pivoted.loc[:, labels]
+
+            tb.columns = [variable.id for variable in variables]
+            tbs.append(tb.reset_index())
+
+    # TODO: this could be slow for datasets with a lot of tables
+    return ft.reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), tbs)
 
 
 #######################################################################################################
