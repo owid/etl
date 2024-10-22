@@ -217,95 +217,95 @@ tables:
     variables:
       num_democracy_lied:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of countries with unknown regime (democracy/autocracy)
-          <% else %>
+          <%- else -%>
           Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
-          <% endif %>
+          <%- endif -%>
         # description_short:
         unit: "countries"
       num_group_age_electdem_lied:
         title: |-
-          <% if 'years' in category %>
+          <%- if 'years' in category -%>
           Number of electoral democracies aged << category >>
-          <% elif category == '-1' %>
+          <%- elif category == '-1' -%>
           Number of countries with unknown regime (age groups electoral)
-          <% else %>
+          <%- else -%>
           Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >> (age groups electoral)
-          <% endif %>
+          <%- endif -%>
         unit: "countries"
       num_group_age_polyarchy_lied:
         title: |-
-          <% if 'years' in category %>
+          <%- if 'years' in category -%>
           Number of polyarchies aged << category >>
-          <% elif category == '-1' %>
+          <%- elif category == '-1' -%>
           Number of countries with unknown regime (age groups polyarchy)
-          <% else %>
+          <%- else -%>
           Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >> (age groups polyarchy)
-          <% endif %>
+          <%- endif -%>
         # description_short:
         unit: "countries"
       num_regime_lied:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of countries with unknown regime
-          <% else %>
+          <%- else -%>
           Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
-          <% endif %>
+          <%- endif -%>
         # description_short:
         unit: "countries"
       num_suffrage_lied:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           Number of countries with unknown suffrage
-          <% else %>
+          <%- else -%>
           Number of countries with << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
-          <% endif %>
+          <%- endif -%>
         # description_short:
         unit: "countries"
 
       pop_democracy_lied:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           People living in countries with unknown regime (autocracy/democracy)
-          <% else %>
+          <%- else -%>
           People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
-          <% endif %>
+          <%- endif -%>
         # description_short:
         unit: "people"
       pop_group_age_electdem_lied:
         title: |-
-          <% if 'years' in category %>
+          <%- if 'years' in category -%>
           People living in electoral democracies aged << category >>
-          <% else %>
+          <%- else -%>
           People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>  (age groups electoral)
-          <% endif %>
+          <%- endif -%>
         # description_short:
         unit: "people"
       pop_group_age_polyarchy_lied:
         title: |-
-          <% if 'years' in category %>
+          <%- if 'years' in category -%>
           People living in polyarchies aged << category >>
-          <% else %>
+          <%- else -%>
           People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>  (age groups polyarchy)
-          <% endif %>
+          <%- endif -%>
         # description_short:
         unit: "people"
       pop_regime_lied:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           People living in countries with unknown regime
-          <% else %>
+          <%- else -%>
           People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
-          <% endif %>
+          <%- endif -%>
         # description_short:
         unit: "people"
       pop_suffrage_lied:
         title: |-
-          <% if category == '-1' %>
+          <%- if category == '-1' -%>
           People living in countries with unknown suffrage
-          <% else %>
+          <%- else -%>
           People living in countries with << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
-          <% endif %>
+          <%- endif -%>
         # description_short:
         unit: "people"

@@ -17,20 +17,20 @@ definitions:
 
   all:
     conflict_type: |-
-      <% if conflict_type == "all" %>
+      <%- if conflict_type == "all" -%>
       Brecke seeks to include only political disagreements between organized groups, or between an organized group and civilians, that cause at least 32 deaths during a year. This definition tries to exclude interpersonal and criminal violence.
 
-      <% elif conflict_type == "interstate" %>
+      <%- elif conflict_type == "interstate" -%>
       An interstate conflict is a conflict between states that causes at least 32 deaths during a year.
 
-      <% elif conflict_type == "internal" %>
+      <%- elif conflict_type == "internal" -%>
       An internal conflict is a conflict between a state and a non-state armed groups, between non-state armed groups, or between an armed group and civilians, that causes at least 32 deaths during a year.
 
-      <% endif %>
+      <%- endif -%>
     interstate_conflicts: |-
-      <% if (conflict_type == "interstate" or conflict_type == "internal") %>
+      <%- if (conflict_type == "interstate" or conflict_type == "internal") -%>
       We identify interstate conflicts in the Conflict Catalog using the approach by Seshat (while correcting any mistakes for the 200 deadliest conflicts): https://web.archive.org/web/20230606184656/https://seshatdatabank.info/cleaning-history-data-the-conflict-catalogue/
-      <% endif %>
+      <%- endif -%>
 
   number_deaths:
     description_short: |-
@@ -76,11 +76,11 @@ definitions:
       - "{definitions.all.conflict_type}"
       - "{definitions.all.interstate_conflicts}"
       - |-
-        <% if (conflict_type == "interstate" or conflict_type == "internal") %>
+        <%- if (conflict_type == "interstate" or conflict_type == "internal") -%>
         We count a conflict as new in a region even if the conflict started at the same time in another region. The sum across all regions can therefore be higher than the total number of new conflicts.
-        <% else %>
+        <%- else -%>
         We count a conflict as new in a region even if the conflict also starts in other regions. The sum across all regions can therefore be higher than the total number of new conflicts.
-        <% endif %>
+        <%- endif -%>
 
 
 tables:

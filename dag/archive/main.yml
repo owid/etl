@@ -308,6 +308,14 @@ steps:
   data://grapher/un/2023-09-19/long_run_child_mortality:
     - data://garden/un/2023-08-29/long_run_child_mortality
 
+  # Oil Spills
+  data://meadow/itopf/2023-05-18/oil_spills:
+    - snapshot://itopf/2023-05-18/oil_spills.pdf
+  data://garden/itopf/2023-05-18/oil_spills:
+    - data://meadow/itopf/2023-05-18/oil_spills
+  data://grapher/itopf/2023-05-18/oil_spills:
+    - data://garden/itopf/2023-05-18/oil_spills
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

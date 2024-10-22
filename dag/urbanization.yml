@@ -64,3 +64,15 @@ steps:
     - data://meadow/un/2024-02-14/sdgs_urbanization
   data://grapher/un/2024-02-14/sdgs_urbanization:
     - data://garden/un/2024-02-14/sdgs_urbanization
+
+  #
+  # GHSL degree of urbanization.
+  #
+  data://meadow/urbanization/2024-10-14/ghsl_degree_of_urbanisation:
+    - snapshot://urbanization/2024-10-14/ghsl_degree_of_urbanisation.xlsx
+  data://garden/urbanization/2024-10-14/ghsl_degree_of_urbanisation:
+    - data://meadow/urbanization/2024-10-14/ghsl_degree_of_urbanisation
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/urbanization/2024-10-14/ghsl_degree_of_urbanisation:
+    - data://garden/urbanization/2024-10-14/ghsl_degree_of_urbanisation

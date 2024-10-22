@@ -48,57 +48,6 @@ REGIONS_LIST = [
     "World (excluding India)",
 ]
 
-# Define columns that are not poverty (mostly inequality)
-NON_POVERTY_COLS = [
-    "country",
-    "year",
-    "reporting_level",
-    "welfare_type",
-    "gini",
-    "mld",
-    "decile1_share",
-    "decile2_share",
-    "decile3_share",
-    "decile4_share",
-    "decile5_share",
-    "decile6_share",
-    "decile7_share",
-    "decile8_share",
-    "decile9_share",
-    "decile10_share",
-    "bottom50_share",
-    "middle40_share",
-    "headcount_40_median",
-    "headcount_50_median",
-    "headcount_60_median",
-    "headcount_ratio_40_median",
-    "headcount_ratio_50_median",
-    "headcount_ratio_60_median",
-    "income_gap_ratio_40_median",
-    "income_gap_ratio_50_median",
-    "income_gap_ratio_60_median",
-    "poverty_gap_index_40_median",
-    "poverty_gap_index_50_median",
-    "poverty_gap_index_60_median",
-    "avg_shortfall_40_median",
-    "avg_shortfall_50_median",
-    "avg_shortfall_60_median",
-    "total_shortfall_40_median",
-    "total_shortfall_50_median",
-    "total_shortfall_60_median",
-    "poverty_severity_40_median",
-    "poverty_severity_50_median",
-    "poverty_severity_60_median",
-    "waits_40_median",
-    "waits_50_median",
-    "waits_60_median",
-    "palma_ratio",
-    "s80_s20_ratio",
-    "p90_p10_ratio",
-    "p90_p50_ratio",
-    "p50_p10_ratio",
-]
-
 # Define countries expected to have both income and consumption data
 COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
     "Albania",
@@ -154,6 +103,9 @@ def run(dest_dir: str) -> None:
     # Percentiles
     tb_percentiles = ds_meadow["world_bank_pip_percentiles"].reset_index()
 
+    # Region definitions
+    tb_region_definitions = ds_meadow["world_bank_pip_regions"].reset_index()
+
     # Process data
     # Make table wide and change column names
     tb = process_data(tb)
@@ -162,8 +114,17 @@ def run(dest_dir: str) -> None:
     tb = calculate_inequality(tb)
 
     # Harmonize country names
-    tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb_percentiles: Table = geo.harmonize_countries(df=tb_percentiles, countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, warn_on_unused_countries=False)
+    tb_percentiles = geo.harmonize_countries(
+        df=tb_percentiles, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
+    )
+    tb_region_definitions = harmonize_region_name(tb=tb_region_definitions)
+
+    # Make share a percentage in tb_percentiles
+    tb_percentiles["share"] *= 100
+
+    # Add top 1 percentile to the table
+    tb = add_top_1_percentile(tb=tb, tb_percentiles=tb_percentiles)
 
     # Show regional data from 1990 onwards
     tb = regional_data_from_1990(tb, REGIONS_LIST)
@@ -186,10 +147,18 @@ def run(dest_dir: str) -> None:
 
     # Sanity checks. I don't run for percentile tables because that process was done in the extraction
     tb_2011 = sanity_checks(
-        tb_2011, POVLINES_DICT, ppp_version=2011, col_stacked_n=col_stacked_n_2011, col_stacked_pct=col_stacked_pct_2011
+        tb_2011,
+        POVLINES_DICT,
+        ppp_version=2011,
+        col_stacked_n=col_stacked_n_2011,
+        col_stacked_pct=col_stacked_pct_2011,
     )
     tb_2017 = sanity_checks(
-        tb_2017, POVLINES_DICT, ppp_version=2017, col_stacked_n=col_stacked_n_2017, col_stacked_pct=col_stacked_pct_2017
+        tb_2017,
+        POVLINES_DICT,
+        ppp_version=2017,
+        col_stacked_n=col_stacked_n_2017,
+        col_stacked_pct=col_stacked_pct_2017,
     )
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
@@ -201,6 +170,9 @@ def run(dest_dir: str) -> None:
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
     tb_inc_or_cons_2017 = survey_count(tb_inc_or_cons_2017)
+
+    # Add region definitions
+    tb_inc_or_cons_2017 = add_region_definitions(tb=tb_inc_or_cons_2017, tb_region_definitions=tb_region_definitions)
 
     # Add metadata by code
     tb_inc_2011 = add_metadata_vars(tb_garden=tb_inc_2011, ppp_version=2011, welfare_type="income")
@@ -438,6 +410,9 @@ def process_data(tb: Table) -> Table:
             "watts_40_median",
             "watts_50_median",
             "watts_60_median",
+            "spl",
+            "spr",
+            "pg",
         ],
         columns="poverty_line_cents",
         values=[
@@ -605,7 +580,11 @@ def identify_rural_urban(tb: Table) -> Table:
 
 
 def sanity_checks(
-    tb: Table, povlines_dict: dict, ppp_version: int, col_stacked_n: list, col_stacked_pct: list
+    tb: Table,
+    povlines_dict: dict,
+    ppp_version: int,
+    col_stacked_n: list,
+    col_stacked_pct: list,
 ) -> Table:
     """
     Sanity checks for the table
@@ -819,6 +798,26 @@ def sanity_checks(
             {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
         )
         tb = tb[~mask].reset_index(drop=True)
+
+    ############################
+    # Shares not adding up to 100% (top 1%)
+
+    # Define columns to add up to 100%
+    col_decile_share_top = ["bottom50_share", "middle40_share", "top90_99_share", "top1_share"]
+
+    tb["sum_pct"] = tb[col_decile_share_top].sum(axis=1)
+
+    # Drop rows if columns in col_decile_share_top are all null. Keep if some are null
+    mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9) & (tb[col_decile_share_top].notnull().any(axis=1))
+    tb_error = tb[mask].reset_index(drop=True).copy()
+
+    if not tb_error.empty:
+        log.warning(
+            f"""{len(tb_error)} observations of shares (with top 1%) are not adding up to 100% and will be converted to null:
+            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+        )
+        # Make columns None if mask is True
+        tb.loc[mask, ["top90_99_share", "top1_share"]] = None
 
     ############################
     # delete columns created for the checks
@@ -1092,7 +1091,8 @@ def regional_headcount(tb: Table) -> Table:
             {list(tb_out.year.unique())}"""
         )
         tb_regions = tb_regions[~mask].reset_index()
-        tb_regions = tb_regions.drop(columns="check_total")
+
+    tb_regions = tb_regions.drop(columns="check_total")
 
     # Get difference between world and (total) regional headcount, to patch rows with one missing value
     cols_to_sum = [e for e in list(tb_regions.columns) if e not in ["year", "World"]]
@@ -1364,4 +1364,74 @@ def regional_data_from_1990(tb: Table, regions_list: list) -> Table:
 
     # Concatenate both tables
     tb = pr.concat([tb, tb_regions], ignore_index=True)
+    return tb
+
+
+def harmonize_region_name(tb: Table) -> Table:
+    """
+    Harmonize country and region_name in tb_region_definitions, using the harmonizing tool, but removing the (PIP) suffix
+    """
+
+    tb = tb.copy()
+
+    for country_col in ["country", "region_name"]:
+        tb = geo.harmonize_countries(
+            df=tb, country_col=country_col, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
+        )
+
+    # Remove (PIP) from region_name
+    tb["region_name"] = tb["region_name"].str.replace(" \(PIP\)", "", regex=True)
+
+    return tb
+
+
+def add_top_1_percentile(tb: Table, tb_percentiles: Table) -> Table:
+    """
+    Add top 1% data (share, average, threshold) to the main indicators
+    Also, calculate the share of the top 90-99%
+    """
+
+    tb = tb.copy()
+    tb_percentiles = tb_percentiles.copy()
+
+    # Create different tables for thresholds and shares/averages
+    tb_percentiles_thr = tb_percentiles[tb_percentiles["percentile"] == 99].copy()
+    tb_percentiles_share = tb_percentiles[tb_percentiles["percentile"] == 100].copy()
+
+    # Select appropriate columns and rename
+    tb_percentiles_thr = tb_percentiles_thr[
+        ["ppp_version", "country", "year", "reporting_level", "welfare_type", "thr"]
+    ]
+    tb_percentiles_thr = tb_percentiles_thr.rename(columns={"thr": "top1_thr"})
+
+    tb_percentiles_share = tb_percentiles_share[
+        ["ppp_version", "country", "year", "reporting_level", "welfare_type", "share", "avg"]
+    ]
+    tb_percentiles_share = tb_percentiles_share.rename(columns={"share": "top1_share", "avg": "top1_avg"})
+
+    # Merge with the main table
+    tb = pr.merge(
+        tb, tb_percentiles_thr, on=["ppp_version", "country", "year", "reporting_level", "welfare_type"], how="left"
+    )
+    tb = pr.merge(
+        tb, tb_percentiles_share, on=["ppp_version", "country", "year", "reporting_level", "welfare_type"], how="left"
+    )
+
+    # Now I can calculate the share of the top 90-99%
+    tb["top90_99_share"] = tb["decile10_share"] - tb["top1_share"]
+
+    return tb
+
+
+def add_region_definitions(tb: Table, tb_region_definitions: Table) -> Table:
+    """
+    Add region definitions to the main table
+    """
+
+    tb = tb.copy()
+    tb_region_definitions = tb_region_definitions.copy()
+
+    # Merge with the main table
+    tb = pr.merge(tb, tb_region_definitions, on=["country", "year"], how="outer")
+
     return tb

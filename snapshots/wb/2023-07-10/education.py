@@ -9,7 +9,7 @@ import world_bank_data as wb
 from owid.datautils.io import df_to_file
 from tqdm import tqdm
 
-from etl.db import get_engine
+from etl.db_utils import get_engine
 from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.

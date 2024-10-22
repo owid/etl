@@ -15,9 +15,9 @@ def test_health():
     assert response.json() == {"status": "ok"}
 
 
-@patch("etl.grapher_model.Variable.load_from_catalog_path")
-def test_update_indicator(mock_load_from_catalog_path):
-    mock_load_from_catalog_path.return_value = gm.Variable(
+@patch("etl.grapher_model.Variable.from_catalog_path")
+def test_update_indicator(mock_from_catalog_path):
+    mock_from_catalog_path.return_value = gm.Variable(
         datasetId=1,
         description="",
         timespan="",
@@ -29,7 +29,7 @@ def test_update_indicator(mock_load_from_catalog_path):
         dimensions=None,
         sourceId=None,
     )
-    mock_load_from_catalog_path.id = 1
+    mock_from_catalog_path.id = 1
     response = client.put(
         "/api/v1/indicators",
         json={

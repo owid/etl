@@ -23,11 +23,11 @@ tables:
         short_unit: years
         processing_level: minor
         description_short: |-
-          <% if sex == 'all' %>
+          <%- if sex == 'all' -%>
           The period life expectancy at birth, in a given year.
-          <% else %>
+          <%- else -%>
           The period life expectancy at birth among << sex + 's' >>, in a given year.
-          <% endif %>
+          <%- endif -%>
         description_key:
           - Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
           - For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their lives as the age-specific death rates seen in that particular year.

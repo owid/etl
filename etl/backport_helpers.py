@@ -22,7 +22,7 @@ class GrapherConfig(dict):
     # sources: list[gm.Source]
 
     def to_json(self) -> str:
-        return json.dumps(self, sort_keys=True, indent=0)
+        return json.dumps(self, sort_keys=True, indent=0, default=str)
 
     @classmethod
     def from_json(cls, str) -> "GrapherConfig":

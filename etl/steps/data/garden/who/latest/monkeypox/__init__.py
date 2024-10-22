@@ -33,7 +33,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("monkeypox")
     ds_suspected = paths.load_dataset("global_health_mpox")
     # Read table from meadow dataset.
-    tb = ds_meadow["monkeypox"].reset_index()
+    tb = ds_meadow["monkeypox"].reset_index().astype({"country": str})
     tb_suspected = ds_suspected["global_health_mpox"].reset_index()
     cols = ["country", "date", "suspected_cases_cumulative"]
     tb_suspected = tb_suspected[cols]
@@ -53,7 +53,7 @@ def run(dest_dir: str) -> None:
     missing_countries = set(tb_orig[ix].country)
     if missing_countries:
         log.warning(f"Missing countries in monkeypox.countries.json: {missing_countries}")
-        tb.country = tb.country.astype(str).fillna(tb_orig.country)
+        tb.country = tb.country.fillna(tb_orig.country)
 
     tb = (
         tb.pipe(clean_columns)

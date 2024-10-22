@@ -13,20 +13,24 @@ Another option is to run `show create table mytable;` in MySQL and then ask Chat
 
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
 """
-
 import copy
+import io
 import json
 import random
 from datetime import date, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union, get_args
+from typing import Any, Dict, List, Literal, Optional, Union, get_args, overload
 
 import humps
+import numpy as np
 import pandas as pd
+import requests
 import structlog
+from deprecated import deprecated
 from owid import catalog
 from owid.catalog.meta import VARIABLE_TYPE
+from pyarrow import feather
 from sqlalchemy import (
     CHAR,
     BigInteger,
@@ -48,11 +52,13 @@ from sqlalchemy import (
 from sqlalchemy import JSON as _JSON
 from sqlalchemy.dialects.mysql import (
     ENUM,
+    LONGBLOB,
     LONGTEXT,
     TEXT,
     TINYINT,
     VARCHAR,
 )
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # type: ignore
@@ -105,6 +111,21 @@ class Base(MappedAsDataclass, DeclarativeBase):
 
         return x
 
+    @classmethod
+    def create_table(cls, engine: Engine, if_exists: Literal["fail", "replace", "skip"] = "fail") -> None:
+        if if_exists == "replace":
+            # Drop the table if it exists and create a new one
+            cls.__table__.drop(engine, checkfirst=True)  # type: ignore
+            cls.__table__.create(engine, checkfirst=False)  # type: ignore
+        elif if_exists == "skip":
+            # Create the table only if it doesn't already exist
+            cls.__table__.create(engine, checkfirst=True)  # type: ignore
+        elif if_exists == "fail":
+            # Attempt to create the table; fail if it already exists
+            cls.__table__.create(engine, checkfirst=False)  # type: ignore
+        else:
+            raise ValueError(f"Unrecognized value for if_exists: {if_exists}")
+
 
 class Entity(Base):
     __tablename__ = "entities"
@@ -118,7 +139,7 @@ class Entity(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
     @classmethod
-    def load_entity_mapping(cls, session: Session, entity_ids: List[int]) -> Dict[int, str]:
+    def load_entity_mapping(cls, session: Session, entity_ids: Optional[List[int]] = None) -> Dict[int, str]:
         q = text(
             """
         select
@@ -127,8 +148,26 @@ class Entity(Base):
         where id in :entity_ids
         """
         )
-        # Use a dictionary to pass parameters
-        stm = select(Entity).from_statement(q).params(entity_ids=entity_ids)
+        if entity_ids is not None:
+            q = text(
+                """
+            select
+                *
+            from entities
+            where id in :entity_ids
+            """
+            )
+            # Use a dictionary to pass parameters
+            stm = select(Entity).from_statement(q).params(entity_ids=entity_ids)
+        else:
+            q = text(
+                """
+            select
+                *
+            from entities
+            """
+            )
+            stm = select(Entity).from_statement(q)
         rows = session.execute(stm).scalars().all()
 
         # Convert the list of rows to a dictionary with id as key
@@ -427,7 +466,7 @@ class Chart(Base):
         for source_var_id, source_var in source_variables.items():
             if source_var.catalogPath:
                 try:
-                    target_var = Variable.load_from_catalog_path(target_session, source_var.catalogPath)
+                    target_var = Variable.from_catalog_path(target_session, source_var.catalogPath)
                 except NoResultFound:
                     raise ValueError(f"variables.catalogPath not found in target: {source_var.catalogPath}")
             # old style variable, match it on name and dataset id
@@ -621,6 +660,31 @@ class Dataset(Base):
         vars = session.scalars(select(Variable).where(Variable.datasetId == dataset_id)).all()
         assert vars, f"Dataset {dataset_id} has no variables"
         return list(vars)
+
+    @classmethod
+    def load_datasets_uri(cls, session: Session):
+        query = """SELECT dataset_uri, createdAt
+        FROM (
+            SELECT
+                namespace,
+                version,
+                shortName,
+                createdAt,
+                CONCAT('grapher/', namespace, '/', version, '/', shortName) AS dataset_uri
+            FROM
+                datasets d
+        ) AS derived
+        WHERE dataset_uri IS NOT NULL
+        ORDER BY createdAt DESC;
+        """
+        return read_sql(query, session)
+
+    @classmethod
+    def load_all_datasets(cls, columns: Optional[list[str]] = None) -> pd.DataFrame:
+        """Get all the content of the grapher `datasets` table in DB as a dataframe."""
+        if not columns:
+            columns = ["*"]
+        return read_sql(f"select {','.join(columns)} from datasets")
 
 
 class SourceDescription(TypedDict, total=False):
@@ -1162,17 +1226,129 @@ class Variable(Base):
         )
 
     @classmethod
+    def load_variables_in_datasets(
+        cls,
+        session: Session,
+        dataset_uris: Optional[List[str]] = None,
+        dataset_ids: Optional[List[int]] = None,
+    ) -> List["Variable"]:
+        if dataset_uris is not None:
+            conditions = [cls.catalogPath.startswith(uri) for uri in dataset_uris]
+            query = select(cls).where(or_(*conditions))
+        elif dataset_ids is not None:
+            query = select(cls).where(cls.datasetId.in_(dataset_ids))
+        else:
+            raise ValueError("Either dataset_uris or dataset_ids must be provided")
+        results = session.scalars(query).all()
+        return list(results)
+
+    @classmethod
+    @deprecated("Use from_id_or_path instead")
     def load_variable(cls, session: Session, variable_id: int) -> "Variable":
+        """D"""
         return session.scalars(select(cls).where(cls.id == variable_id)).one()
 
     @classmethod
+    @deprecated("Use from_id_or_path instead")
     def load_variables(cls, session: Session, variables_id: List[int]) -> List["Variable"]:
         return session.scalars(select(cls).where(cls.id.in_(variables_id))).all()  # type: ignore
 
+    @overload
     @classmethod
-    def load_from_catalog_path(cls, session: Session, catalog_path: str) -> "Variable":
+    def from_id_or_path(
+        cls, session: Session, id_or_path: str | int, columns: Optional[List[str]] = None
+    ) -> "Variable":
+        ...
+
+    @overload
+    @classmethod
+    def from_id_or_path(
+        cls, session: Session, id_or_path: List[str | int], columns: Optional[List[str]] = None
+    ) -> List["Variable"]:
+        ...
+
+    @classmethod
+    def from_id_or_path(
+        cls,
+        session: Session,
+        id_or_path: int | str | List[str | int],
+        columns: Optional[List[str]] = None,
+    ) -> "Variable" | List["Variable"]:
+        """Load a variable from the database by its catalog path or variable ID."""
+        # Single id
+        if isinstance(id_or_path, int):
+            return cls.from_id(session=session, variable_id=id_or_path, columns=columns)
+        # Single path
+        elif isinstance(id_or_path, str):
+            return cls.from_catalog_path(session=session, catalog_path=id_or_path, columns=columns)
+
+        # Multiple path or id
+        elif isinstance(id_or_path, list):
+            # Filter the list to ensure only integers are passed
+            int_ids = [i for i in id_or_path if isinstance(i, (int, np.integer))]
+            str_ids = [i for i in id_or_path if isinstance(i, str)]
+            # Multiple IDs
+            if len(int_ids) == len(id_or_path):
+                return cls.from_id(session=session, variable_id=int_ids, columns=columns)
+            # Multiple paths
+            elif len(str_ids) == len(id_or_path):
+                return cls.from_catalog_path(session=session, catalog_path=str_ids, columns=columns)
+            else:
+                raise TypeError("All elements in the list must be integers")
+
+        # # Ensure mutual exclusivity of catalog_path and variable_id
+        # if (catalog_path is not None) and (variable_id is not None):
+        #     raise ValueError("Only one of catalog_path or variable_id can be provided")
+
+        # if (catalog_path is not None) & isinstance(catalog_path, (str, list)):
+        #     return cls.from_catalog_path(session=session, catalog_path=catalog_path)
+        # elif isinstance(catalog_path, (int, list)):
+        #     return cls.from_id(session=session, variable_id=variable_id)
+        # else:
+        #     raise ValueError("Either catalog_path or variable_id must be provided")
+
+    @overload
+    @classmethod
+    def from_catalog_path(cls, session: Session, catalog_path: str, columns: Optional[List[str]] = None) -> "Variable":
+        ...
+
+    @overload
+    @classmethod
+    def from_catalog_path(
+        cls, session: Session, catalog_path: List[str], columns: Optional[List[str]] = None
+    ) -> List["Variable"]:
+        ...
+
+    @classmethod
+    def from_catalog_path(
+        cls, session: Session, catalog_path: str | List[str], columns: Optional[List[str]] = None
+    ) -> "Variable" | List["Variable"]:
+        """Load a variable from the DB by its catalog path."""
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
-        return session.scalars(select(cls).where(cls.catalogPath == catalog_path)).one()
+        if isinstance(catalog_path, str):
+            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath == catalog_path)).one()
+        elif isinstance(catalog_path, list):
+            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
+
+    @overload
+    @classmethod
+    def from_id(cls, session: Session, variable_id: int, columns: Optional[List[str]] = None) -> "Variable":
+        ...
+
+    @overload
+    @classmethod
+    def from_id(cls, session: Session, variable_id: List[int], columns: Optional[List[str]] = None) -> List["Variable"]:
+        ...
+
+    @classmethod
+    def from_id(
+        cls, session: Session, variable_id: int | List[int], columns: Optional[List[str]] = None
+    ) -> "Variable" | List["Variable"]:
+        """Load a variable (or list of variables) from the DB by its ID path."""
+        if isinstance(variable_id, int):
+            return session.scalars(_select_columns(cls, columns).where(cls.id == variable_id)).one()
+        elif isinstance(variable_id, list):
+            return session.scalars(_select_columns(cls, columns).where(cls.id.in_(variable_id))).all()  # type: ignore
 
     @classmethod
     def catalog_paths_to_variable_ids(cls, session: Session, catalog_paths: List[str]) -> Dict[str, int]:
@@ -1180,7 +1356,8 @@ class Variable(Base):
         query = select(Variable).where(Variable.catalogPath.in_(catalog_paths))
         return {var.catalogPath: var.id for var in session.scalars(query).all()}  # type: ignore
 
-    def infer_type(self, values: pd.Series) -> VARIABLE_TYPE:
+    @classmethod
+    def infer_type(cls, values: pd.Series) -> VARIABLE_TYPE:
         """Set type and sort fields based on indicator values."""
         return _infer_variable_type(values)
 
@@ -1250,6 +1427,24 @@ class Variable(Base):
     def override_yaml_path(self) -> Path:
         """Return path to indicator YAML file."""
         return self.step_path.with_suffix(".meta.override.yml")
+
+    def get_data(self, session: Optional[Session] = None) -> pd.DataFrame:
+        """Get variable data from S3.
+
+        If session is given, entity codes are replaced with entity names.
+        """
+        data = requests.get(self.s3_data_path(typ="http")).json()
+        df = pd.DataFrame(data)
+
+        if session is not None:
+            df = add_entity_name(session=session, df=df, col_id="entities", col_name="entity")
+
+        return df
+
+    def get_metadata(self) -> Dict[str, Any]:
+        metadata = requests.get(self.s3_metadata_path(typ="http")).json()
+
+        return metadata
 
 
 class ChartDimensions(Base):
@@ -1566,6 +1761,80 @@ class MultiDimDataPage(Base):
             return self
 
 
+class Anomaly(Base):
+    __tablename__ = "anomalies"
+    # __table_args__ = (Index("catalogPath", "catalogPath"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    )
+    datasetId: Mapped[int] = mapped_column(Integer)
+    datasetSourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
+    anomalyType: Mapped[str] = mapped_column(VARCHAR(255), default=str)
+    path_file: Mapped[Optional[str]] = mapped_column(VARCHAR(255), default=None)
+    _dfScore: Mapped[Optional[bytes]] = mapped_column("dfScore", LONGBLOB, default=None)
+    _dfReduced: Mapped[Optional[bytes]] = mapped_column("dfReduced", LONGBLOB, default=None)
+    # catalogPath: Mapped[str] = mapped_column(VARCHAR(255), default=None)
+    # NOTE: why do we need indicatorChecksum?
+    # Answer: This can be useful to assign an anomaly to a specific snapshot of the indicator. Unclear if we need it atm, but maybe in the future...
+    # indicatorChecksum: Mapped[str] = mapped_column(VARCHAR(255), default=None)
+    # globalScore: Mapped[float] = mapped_column(Float, default=None, nullable=True)
+    # gptInfo: Mapped[Optional[dict]] = mapped_column(JSON, default=None, nullable=True)
+    # entity: Mapped[str] = mapped_column(VARCHAR(255))
+    # year: Mapped[int] = mapped_column(Integer)
+    # rawScore: Mapped[float] = mapped_column(Float)
+
+    def __repr__(self) -> str:
+        return (
+            f"<Anomaly(id={self.id}, createdAt={self.createdAt}, updatedAt={self.updatedAt}, "
+            f"datasetId={self.datasetId}, anomalyType={self.anomalyType})>"
+        )
+
+    @classmethod
+    def load(cls, session: Session, dataset_id: int, anomaly_type: str) -> "Anomaly":
+        return session.scalars(select(cls).where(cls.datasetId == dataset_id, cls.anomalyType == anomaly_type)).one()
+
+    @hybrid_property
+    def dfScore(self) -> Optional[pd.DataFrame]:  # type: ignore
+        if self._dfScore is None:
+            return None
+        buffer = io.BytesIO(self._dfScore)
+        return feather.read_feather(buffer)
+
+    @dfScore.setter
+    def dfScore(self, value: Optional[pd.DataFrame]) -> None:
+        if value is None:
+            self._dfScore = None
+        else:
+            buffer = io.BytesIO()
+            feather.write_feather(value, buffer, compression="zstd")
+            buffer.seek(0)
+            self._dfScore = buffer.read()
+
+    @hybrid_property
+    def dfReduced(self) -> Optional[pd.DataFrame]:  # type: ignore
+        if self._dfReduced is None:
+            return None
+        buffer = io.BytesIO(self._dfReduced)
+        return feather.read_feather(buffer)
+
+    @dfReduced.setter
+    def dfReduced(self, value: Optional[pd.DataFrame]) -> None:
+        if value is None:
+            self._dfReduced = None
+        else:
+            buffer = io.BytesIO()
+            feather.write_feather(value, buffer, compression="zstd")
+            buffer.seek(0)
+            self._dfReduced = buffer.read()
+
+    @classmethod
+    def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
+        return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+
+
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
     """SQLAlchemy condition for checking if a JSON field has a key with a given value. Works for null."""
     if val is None:
@@ -1629,3 +1898,83 @@ def _is_float(x):
         return False
     else:
         return True
+
+
+def add_entity_name(
+    session: Session,
+    df: pd.DataFrame,
+    col_id: str,
+    col_name: str = "entity",
+    col_code: Optional[str] = None,
+    remove_id: bool = True,
+) -> pd.DataFrame:
+    # Initialize
+    if df.empty:
+        df[col_name] = []
+        if col_code is not None:
+            df[col_code] = []
+        return df
+
+    # Get entity names
+    unique_entities = df[col_id].unique()
+    entities = _fetch_entities(session, list(unique_entities), col_id, col_name, col_code)
+
+    # Sanity check
+    if set(unique_entities) - set(entities[col_id]):
+        missing_entities = set(unique_entities) - set(entities[col_id])
+        raise ValueError(f"Missing entities in the database: {missing_entities}")
+
+    # Set dtypes
+    dtypes = {col_name: "category", col_id: int}
+    if col_code is not None:
+        dtypes[col_code] = "category"
+    df = pd.merge(df, entities.astype(dtypes), on=col_id)
+
+    # Remove entity IDs
+    if remove_id:
+        df = df.drop(columns=[col_id])
+
+    return df
+
+
+def _fetch_entities(
+    session: Session,
+    entity_ids: List[int],
+    col_id: Optional[str] = None,
+    col_name: Optional[str] = None,
+    col_code: Optional[str] = None,
+) -> pd.DataFrame:
+    # Query entities from the database
+    q = """
+    SELECT
+        id AS entityId,
+        name AS entityName,
+        code AS entityCode
+    FROM entities
+    WHERE id in %(entity_ids)s
+    """
+    df = read_sql(q, session, params={"entity_ids": entity_ids})
+
+    # Rename columns
+    column_renames = {}
+    if col_id is not None:
+        column_renames["entityId"] = col_id
+    if col_name is not None:
+        column_renames["entityName"] = col_name
+    if col_code is not None:
+        column_renames["entityCode"] = col_code
+    else:
+        df = df.drop(columns=["entityCode"])
+
+    df = df.rename(columns=column_renames)
+    return df
+
+
+def _select_columns(cls, columns: Optional[list[str]] = None) -> Select:
+    # Select only the specified columns, or all if not specified
+    if columns:
+        # Use getattr to dynamically select the columns
+        columns_to_select = [getattr(cls, col) for col in columns]
+        return select(*columns_to_select)
+    else:
+        return select(cls)

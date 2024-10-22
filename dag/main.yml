@@ -268,14 +268,6 @@ steps:
   data://grapher/eth/2023-03-15/ethnic_power_relations:
     - data://garden/eth/2023-03-15/ethnic_power_relations
 
-  # Oil Spills
-  data://meadow/itopf/2023-05-18/oil_spills:
-    - snapshot://itopf/2023-05-18/oil_spills.pdf
-  data://garden/itopf/2023-05-18/oil_spills:
-    - data://meadow/itopf/2023-05-18/oil_spills
-  data://grapher/itopf/2023-05-18/oil_spills:
-    - data://garden/itopf/2023-05-18/oil_spills
-
   # International Monetary Fund, World Economic Outlook
   data://meadow/imf/2024-05-02/world_economic_outlook:
     - snapshot://imf/2024-05-02/world_economic_outlook.xls
@@ -789,6 +781,17 @@ steps:
   data://grapher/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-16/long_run_child_mortality
 
+
+# UN SDG (2024)
+  data://meadow/un/2024-08-27/un_sdg:
+    - snapshot://un/2024-08-27/un_sdg.feather
+  data://garden/un/2024-08-27/un_sdg:
+    - data://meadow/un/2024-08-27/un_sdg
+    - snapshot://un/2024-08-27/un_sdg_unit.csv
+    - snapshot://un/2024-08-27/un_sdg_dimension.json
+  data://grapher/un/2024-08-27/un_sdg:
+    - data://garden/un/2024-08-27/un_sdg
+
 # OECD Official Development Assistance (ODA)
   data://meadow/oecd/2024-08-21/official_development_assistance:
     - snapshot://oecd/2024-08-21/official_development_assistance_dac1.zip
@@ -829,6 +832,13 @@ steps:
   data://grapher/migration/2024-10-14/mirrem_irregular_migration:
     - data://garden/migration/2024-10-14/mirrem_irregular_migration
 
+# Oil Spills
+  data://meadow/itopf/2024-10-16/oil_spills:
+    - snapshot://itopf/2024-10-16/oil_spills.pdf
+  data://garden/itopf/2024-10-16/oil_spills:
+    - data://meadow/itopf/2024-10-16/oil_spills
+  data://grapher/itopf/2024-10-16/oil_spills:
+    - data://garden/itopf/2024-10-16/oil_spills
 
 
 include:

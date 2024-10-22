@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Cancer Today - Cervical cancer
+    description: |-
+      Cancer Today enables a comprehensive assessment of the cancer burden worldwide in 2022, based on the GLOBOCAN estimates of incidence, mortality and prevalence for year 2022 in 185 countries or territories for 36 cancer types by sex and age group.
+
+      Caution must be exercised when interpreting these estimates, given the limited quality and coverage of cancer data worldwide at present, particularly in low- and middle-income countries. IARC’s approach is not only to evaluate, compile, and use the data from the Agency’s collaborators in these estimates but also to work alongside national staff to improve local data quality, registry coverage, and analytical capacity. The clear need for investment in population-based cancer registration in low- and middle-income countries led to the launch of the Global Initiative for Cancer Registry Development (GICR), coordinated by IARC. The goal of the GICR is to inform cancer control through defined improvements in the coverage, quality, and use of population-based cancer registration data worldwide. You can read more about these global efforts here.
+
+      The methods of estimation are country-specific, and the quality of the national estimates depends on the coverage, accuracy, and timeliness of the recorded incidence and mortality data in a given country.
+
+      This specific dataset includes data on age-standardized incidence rates of cervical cancer amongst women in 2022.
+    date_published: "2024-02-08"
+
+    # Citation
+    producer: Global Cancer Observatory
+    citation_full: |-
+      Bray F, Laversanne M, Sung H, Ferlay J, Siegel RL, Soerjomataram I, Jemal A. Global cancer statistics 2022: GLOBOCAN estimates of incidence and mortality worldwide for 36 cancers in 185 countries. CA Cancer J Clin. 2024 May-Jun;74(3):229-263. doi: 10.3322/caac.21834. Epub 2024 Apr 4. PMID: 38572751.
+    # Files
+    url_main: https://gco.iarc.fr/today/en/dataviz/maps-heatmap?mode=population&cancers=23&sexes=2
+    date_accessed: 2024-10-13
+
+    # License
+    license:
+      name: Protocol 2 of the Universal Copyright Convention
+      url: https://gco.iarc.fr/today/en/about#references
+outs:
+  - md5: ac4a4ed8b7555f3e8e30dde0b5dee640
+    size: 8302
+    path: gco_cancer_today_cervical.csv

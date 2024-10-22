@@ -2,17 +2,17 @@
 definitions:
   life_expectancy:
     description_short: |-
-      <% if type == "period" %>
+      <%- if type == "period" -%>
       Period life expectancy is the average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
-      <% elif type == "cohort" %>
+      <%- elif type == "cohort" -%>
       Cohort life expectancy is the average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
-      <% endif %>
+      <%- endif -%>
     point_1: |-
-      <% if type == "period" %>
+      <%- if type == "period" -%>
       This is based on a synthetic cohort created using mortality rates across age groups in a given year.
-      <% elif type == "cohort" %>
+      <%- elif type == "cohort" -%>
       Rather than waiting for the entire cohort to have died before calculating the cohort life expectancy, researchers may use data from birth cohorts that are 'almost extinct'.
-      <% endif %>
+      <%- endif -%>
 
 
 # Learn more about the available fields:
@@ -92,15 +92,15 @@ tables:
         short_unit: years
         unit: years
         description_short: |-
-          <% if type == "period" %>
+          <%- if type == "period" -%>
           The average number of years a person is expected to live, based on mortality rates seen across all age groups in a given interval.
-          <% elif type == "cohort" %>
+          <%- elif type == "cohort" -%>
           The average number of years that individuals born in a given interval actually lived, based on tracking that birth cohort over time.
-          <% endif %>
+          <%- endif -%>
         description_key:
           - |-
-            <% if type == "period" %>
+            <%- if type == "period" -%>
             Life expectancy at age 0 refers to life expectancy at birth.
-            <% else %>
+            <%- else -%>
             It refers to the remaining life expectancy for people who have already survived to the given age.
-            <% endif %>
+            <%- endif -%>

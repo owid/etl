@@ -1,13 +1,13 @@
 meta:
-  source:
-    name: Google Sheet
-    url: https://welfarefootprint.org/broilers/
-    source_data_url: 
-      https://docs.google.com/spreadsheets/d/e/2PACX-1vTdcKM1J1ylX5h8COUP44843CA41bZu4M2I4YIiQ9yVSwrrlW0KcjBWCBH2NmGJtY_WMxa94sFzP5Nt/pub?output=csv
+  origin:
+    producer: Welfare Footprint Project
+    title: Quantifying pain in broiler chickens
+    citation_full: Welfare Footprint Project - Quantifying pain in broiler chickens (2022).
+    url_main: https://welfarefootprint.org/broilers/
+    url_download: https://docs.google.com/spreadsheets/d/e/2PACX-1vTdcKM1J1ylX5h8COUP44843CA41bZu4M2I4YIiQ9yVSwrrlW0KcjBWCBH2NmGJtY_WMxa94sFzP5Nt/pub?output=csv
     date_accessed: '2023-08-18'
-    publication_year: '2022'
-    published_by: Google Sheet
-  name: Welfare of broiler chickens (Welfare Footprint)
+    date_published: "2022"
+  name: Welfare of broiler chickens (Welfare Footprint Project)
   description: ''
   license: {}
   is_public: false

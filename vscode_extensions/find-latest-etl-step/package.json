@@ -21,8 +21,7 @@
     "keybindings": [
       {
         "command": "extension.findLatestETLStep",
-        "key": "ctrl+shift+l",
-        "when": "editorTextFocus"
+        "key": "ctrl+shift+l"
       }
     ]
   },

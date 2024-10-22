@@ -33,9 +33,12 @@ from owid.catalog.tables import (
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
+from sqlalchemy.orm import Session
 
+import etl.grapher_model as gm
 from etl import paths
 from etl.config import DEFAULT_GRAPHER_SCHEMA, TLS_VERIFY
+from etl.db import get_engine
 from etl.explorer import Explorer
 from etl.explorer_helpers import Explorer as ExplorerOld
 from etl.snapshot import Snapshot, SnapshotMeta
@@ -680,7 +683,6 @@ class PathFinder:
             matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
 
         if len(matches) == 0:
-            __import__("ipdb").set_trace()
             raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
         elif len(matches) > 1:
             raise MultipleMatchingStepsAmongDependencies(step_name=self.step_name)
@@ -1184,6 +1186,19 @@ def create_explorer(
         explorer.df_columns = df_columns
 
     return explorer
+
+
+def map_indicator_path_to_id(catalog_path: str) -> str | int:
+    # Check if given path is actually an ID
+    if str(catalog_path).isdigit():
+        return catalog_path
+
+    # Get ID, assuming given path is a catalog path
+    engine = get_engine()
+    with Session(engine) as session:
+        db_indicator = gm.Variable.from_id_or_path(session, catalog_path)
+        assert db_indicator.id is not None
+        return db_indicator.id
 
 
 @cache
