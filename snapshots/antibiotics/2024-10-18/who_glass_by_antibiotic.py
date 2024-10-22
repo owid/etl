@@ -44,8 +44,8 @@ def get_shiny_data() -> str:
     drop_down_dict = {
         "BLOOD": {
             "Acinetobacter spp.": ["Carbapenems"],
-            "Escerichia coli": ["Carbapenems", "Third-generation cephalosporins"],
-            "Klebsiella pneumoniae": ["Carbapenems", "Third-generation cephalosporins"],
+            "Escherichia coli": ["Carbapenems", "Third-generation cephalosporins"],
+            "Klebsiella pneumoniae": ["Third-generation cephalosporins", "Carbapenems"],
             "Staphylococcus aureus": ["Methicillin-resistance"],
             "Streptococcus pneumoniae": ["Penicillins"],
         },
@@ -98,6 +98,7 @@ def get_shiny_data() -> str:
             option_syndrome = wait.until(EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{syndrome}"]')))
             driver.execute_script("arguments[0].click();", option_syndrome)
             time.sleep(1)
+
             for pathogen in drop_down_dict[syndrome].keys():
                 log.info(f"Downloading data for pathogen: {pathogen}")
 
@@ -107,10 +108,12 @@ def get_shiny_data() -> str:
                         (By.XPATH, '//*[@id="amr-gc_pathogen_anti-pathogen-select-selectized"]')
                     )
                 )
+                # Reset any previous selection in the dropdown
                 driver.execute_script("arguments[0].click();", pathogen_dropdown)
                 option_pathogen = wait.until(EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{pathogen}"]')))
                 driver.execute_script("arguments[0].click();", option_pathogen)
-                time.sleep(1)
+                time.sleep(1)  # Wait to ensure the UI has updated
+
                 for antibiotic_group in drop_down_dict[syndrome][pathogen]:
                     log.info(f"Downloading data for antibiotic group: {antibiotic_group}")
 
@@ -125,7 +128,8 @@ def get_shiny_data() -> str:
                         EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{antibiotic_group}"]'))
                     )
                     driver.execute_script("arguments[0].click();", option_group)
-                    time.sleep(1)
+                    time.sleep(1)  # Ensure the dropdown has reset before next iteration
+
                     for year in years:
                         log.info(f"Downloading data for year: {year}")
 
@@ -157,9 +161,8 @@ def get_shiny_data() -> str:
                             log.info(f"Downloaded {syndrome}_{antibiotic_group}_{pathogen}_{year}.csv to {file_path}")
                         else:
                             log.error(f"No download link found for {syndrome}, {antibiotic_group}, {pathogen}, {year}.")
-                        # Trying this to see if it helps with the download issue
-                        driver.refresh()
-                        time.sleep(5)
+                    # driver.refresh()
+                    # time.sleep(3)
 
         # Zip all downloaded files
         zip_file_path = "downloaded_data.zip"
