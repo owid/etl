@@ -32,12 +32,18 @@ How to run the snapshot on the staging server:
 
 
 from pathlib import Path
+from typing import List
 
 import pandas as pd
 from oda_data import read_crs, set_data_path
+from oda_data.tools.groupings import donor_groupings, recipient_groupings
+from structlog import get_logger
 
 # Set path of this script
 PARENT_DIR = Path(__file__).parent
+
+# Initialize logger.
+log = get_logger()
 
 # Set path where ODA data is downloaded
 set_data_path(path=PARENT_DIR)
@@ -46,17 +52,33 @@ set_data_path(path=PARENT_DIR)
 START_YEAR = 1960
 END_YEAR = 2024
 
+# Save dictionaries of groups of donors and recipients
+DONOR_GROUPINGS = donor_groupings()
+RECIPIENT_GROUPINGS = recipient_groupings()
+
+# Define columns to extract in the csv
+FINAL_COLUMNS = [
+    "year",
+    "donor_code",
+    "donor_name",
+    "recipient_code",
+    "recipient_name",
+    "sector_name",
+    "channel_code",
+    "value",
+]
+
 
 def main() -> None:
     # Define the start and end years for the data
 
     # Get the data by sector
-    data = get_data_by_sector(START_YEAR, END_YEAR)
+    df = get_data_by_sector(START_YEAR, END_YEAR)
 
-    print(data)
+    df = aggregate_data(df=df, columns_to_keep=FINAL_COLUMNS)
 
     # Save the data to a feather file
-    data.to_feather(f"{PARENT_DIR}/oda_by_sectors_one.feather")
+    df.to_feather(f"{PARENT_DIR}/oda_by_sectors_one.feather")
 
 
 def get_data_by_sector(
@@ -128,6 +150,107 @@ def get_data_by_sector(
     spending = spending.rename(columns={flow_column: "value"})
 
     return spending
+
+
+def aggregate_data(df: pd.DataFrame, columns_to_keep: List[str]) -> pd.DataFrame:
+    """
+    Create aggregations from definitions of donor and recipient aggregations.
+    """
+    log.info("Aggregating data...")
+    df_donors_list = aggregate_donors(df=df, columns_to_keep=columns_to_keep)
+    df_recipients_list = aggregate_recipients(df=df, columns_to_keep=columns_to_keep)
+
+    df_aggregates = pd.concat(df_donors_list + df_recipients_list, ignore_index=True)
+
+    df = pd.concat([df, df_aggregates], ignore_index=True)
+
+    return df
+
+
+def aggregate_donors(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.DataFrame]:
+    """
+    Create regional aggregations for donors.
+    """
+
+    df_donors = df.copy()
+
+    df_donors_list = []
+
+    for donor_group, donor_composition in DONOR_GROUPINGS.items():
+        log.info(f"Aggregating {donor_group} donors...")
+        df_donors_by_group = df_donors[df_donors["donor_code"].isin(donor_composition.keys())].copy()
+
+        df_donors_by_group = (
+            df_donors_by_group.groupby(
+                [col for col in columns_to_keep if col not in ["donor_code", "donor_name", "value"]],
+                observed=True,
+                dropna=False,
+            )["value"]
+            .sum()
+            .reset_index(drop=False)
+        )
+
+        df_donors_by_group["donor_name"] = donor_group
+
+        df_donors_list.append(df_donors_by_group)
+
+        for recipient_group, recipient_composition in RECIPIENT_GROUPINGS.items():
+            log.info(f"Aggregating {donor_group} donors to {recipient_group} recipients...")
+            df_donors_by_recipient_group = df_donors_by_group[
+                df_donors_by_group["recipient_code"].isin(recipient_composition.keys())
+            ].copy()
+
+            df_donors_by_recipient_group = (
+                df_donors_by_recipient_group.groupby(
+                    [
+                        col
+                        for col in columns_to_keep
+                        if col not in ["donor_code", "recipient_code", "recipient_name", "value"]
+                    ],
+                    observed=True,
+                    dropna=False,
+                )["value"]
+                .sum()
+                .reset_index(drop=False)
+            )
+
+            df_donors_by_recipient_group["recipient_name"] = recipient_group
+
+            df_donors_list.append(df_donors_by_recipient_group)
+
+    return df_donors_list
+
+
+def aggregate_recipients(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.DataFrame]:
+    """
+    Create regional aggregations for recipients.
+    """
+
+    df_recipients = df.copy()
+
+    df_recipients_list = []
+
+    for recipient_group, recipient_composition in RECIPIENT_GROUPINGS.items():
+        log.info(f"Aggregating {recipient_group} recipients...")
+        df_recipients_by_group = df_recipients[
+            df_recipients["recipient_code"].isin(recipient_composition.keys())
+        ].copy()
+
+        df_recipients_by_group = (
+            df_recipients_by_group.groupby(
+                [col for col in columns_to_keep if col not in ["recipient_code", "recipient_name", "value"]],
+                observed=True,
+                dropna=False,
+            )["value"]
+            .sum()
+            .reset_index(drop=False)
+        )
+
+        df_recipients_by_group["recipient_name"] = recipient_group
+
+        df_recipients_list.append(df_recipients_by_group)
+
+    return df_recipients_list
 
 
 if __name__ == "__main__":
