@@ -113,6 +113,20 @@ st.session_state.anomalist_sorting_strategy = st.session_state.get("anomalist_so
 # FLAG: True to trigger anomaly detection manually
 st.session_state.anomalist_trigger_detection = st.session_state.get("anomalist_trigger_detection", False)
 
+# Scores.
+# These are the default thresholds for the different scores.
+# Only anomalies with scores above the following thresholds will be shown by default.
+# NOTE: For some reason, streamlit raises an error when the minimum is zero.
+#  To avoid this, set it to a positive number (above, e.g. 1e-9).
+st.session_state.anomalist_min_anomaly_score = st.session_state.get("anomalist_min_anomaly_score", 0.3)
+st.session_state.anomalist_min_weighted_score = st.session_state.get("anomalist_min_weighted_score", 0.1)
+st.session_state.anomalist_min_population_score = st.session_state.get("anomalist_min_population_score", 1e-9)
+st.session_state.anomalist_min_analytics_score = st.session_state.get("anomalist_min_analytics_score", 1e-9)
+
+# Advanced expander.
+st.session_state.anomalist_expander_advanced_options = st.session_state.get(
+    "anomalist_expander_advanced_options", False
+)
 
 ######################################################################
 # FUNCTIONS
@@ -274,6 +288,10 @@ def filter_df(df: pd.DataFrame):
         anomaly_types=st.session_state.anomalist_filter_anomaly_types,
         entities=st.session_state.anomalist_filter_entities,
         indicators=st.session_state.anomalist_filter_indicators,
+        min_weighted_score=st.session_state.anomalist_min_weighted_score,
+        min_anomaly_score=st.session_state.anomalist_min_anomaly_score,
+        min_population_score=st.session_state.anomalist_min_population_score,
+        min_analytics_score=st.session_state.anomalist_min_analytics_score,
     )
     ## Sort dataframe
     df, st.session_state.anomalist_sorting_columns = _sort_df(df, st.session_state.anomalist_sorting_strategy)
@@ -281,10 +299,28 @@ def filter_df(df: pd.DataFrame):
 
 
 @st.cache_data
-def _filter_df(df: pd.DataFrame, year_min, year_max, anomaly_types, entities, indicators) -> pd.DataFrame:
+def _filter_df(
+    df: pd.DataFrame,
+    year_min,
+    year_max,
+    anomaly_types,
+    entities,
+    indicators,
+    min_weighted_score,
+    min_anomaly_score,
+    min_population_score,
+    min_analytics_score,
+) -> pd.DataFrame:
     """Used in filter_df."""
-    ## Year
-    df = df[(df["year"] >= year_min) & (df["year"] <= year_max)]
+    ## Year and scores
+    df = df[
+        (df["year"] >= year_min)
+        & (df["year"] <= year_max)
+        & (df["score_weighted"] >= min_weighted_score)
+        & (df["score"] >= min_anomaly_score)
+        & (df["score_population"] >= min_population_score)
+        & (df["score_analytics"] >= min_analytics_score)
+    ]
     ## Anomaly type
     if len(anomaly_types) > 0:
         df = df[df["type"].isin(anomaly_types)]
@@ -646,6 +682,26 @@ if st.session_state.anomalist_df is not None:
                     max_value=YEAR_MAX,
                     step=1,
                     key="anomalist_max_year",
+                )
+
+        # Use the expander and store its state when user interacts with it
+        # NOTE: The following feels convoluted, but I couldn't figure out how to keep the state of the expander.
+        #  Just doing with st.expander(...) didn't work.
+        expander_open = st.expander("Advanced options", expanded=st.session_state.anomalist_expander_advanced_options)
+        if expander_open:
+            st.session_state.anomalist_expander_advanced_options = True
+        else:
+            st.session_state.anomalist_expander_advanced_options = False
+        with expander_open:
+            for score_name in ["weighted", "anomaly", "population", "analytics"]:
+                # For some reason, if the slider minimum value is zero, streamlit raises an error when the slider is
+                # dragged to the minimum. Set it to a small, non-zero number.
+                url_persist(st.slider)(
+                    f"Minimum {score_name} score",
+                    min_value=1e-9,
+                    max_value=1.0,
+                    # step=0.001,
+                    key=f"anomalist_min_{score_name}_score",
                 )
 
     # 4.3/ APPLY FILTERS
