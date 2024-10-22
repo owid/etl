@@ -40,15 +40,8 @@ def get_shiny_data() -> str:
     This script downloads data for multiple years and syndromes and stores them in a zip file.
     """
 
-    years = range(2016, 2023)
+    years = range(2016, 2022)
     drop_down_dict = {
-        "BLOOD": {
-            "Acinetobacter spp.": ["Carbapenems"],
-            "Escherichia coli": ["Carbapenems", "Third-generation cephalosporins"],
-            "Klebsiella pneumoniae": ["Third-generation cephalosporins", "Carbapenems"],
-            "Staphylococcus aureus": ["Methicillin-resistance"],
-            "Streptococcus pneumoniae": ["Penicillins"],
-        },
         "STOOL": {
             "Salmonella spp.": ["Fluoroquinolones"],
             "Shigella spp.": ["Third-generation cephalosporins"],
@@ -68,6 +61,13 @@ def get_shiny_data() -> str:
                 "Third-generation cephalosporins",
             ],
         },
+        "BLOOD": {
+            "Acinetobacter spp.": ["Carbapenems"],
+            "Escherichia coli": ["Carbapenems", "Third-generation cephalosporins"],
+            "Klebsiella pneumoniae": ["Third-generation cephalosporins", "Carbapenems"],
+            "Staphylococcus aureus": ["Methicillin-resistance"],
+            "Streptococcus pneumoniae": ["Penicillins"],
+        },
     }
 
     # Set up the driver (ensure you have ChromeDriver or another driver installed)
@@ -78,24 +78,23 @@ def get_shiny_data() -> str:
         # Open the webpage
         driver.get("https://worldhealthorg.shinyapps.io/glass-dashboard/_w_679389fb/#!/amr")
 
-        # Scroll to the section where the dropdowns are located
-        section = wait.until(EC.presence_of_element_located((By.ID, "plot-amr-6")))
-        time.sleep(1)
-        driver.execute_script("arguments[0].scrollIntoView(true);", section)
-        time.sleep(1)
-
         for syndrome in drop_down_dict.keys():
+            section = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, "plot-amr-6")))
+            driver.execute_script("arguments[0].scrollIntoView(true);", section)
             log.info(f"Downloading data for syndrome: {syndrome}")
 
-            # Scroll to the dropdown section first
-            driver.execute_script("arguments[0].scrollIntoView(true);", section)
-
-            # Click on the syndrome dropdown and select the syndrome
-            syndrome_dropdown = wait.until(
+            # Wait for the syndrome dropdown within the specific section
+            syndrome_dropdown = WebDriverWait(section, 20).until(
                 EC.presence_of_element_located((By.XPATH, '//*[@id="amr-gc_pathogen_anti-infsys-select-selectized"]'))
             )
+
+            # Click on the syndrome dropdown
             driver.execute_script("arguments[0].click();", syndrome_dropdown)
-            option_syndrome = wait.until(EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{syndrome}"]')))
+
+            # Wait for the option to become clickable and select it
+            option_syndrome = WebDriverWait(driver, 20).until(
+                EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{syndrome}"]'))
+            )
             driver.execute_script("arguments[0].click();", option_syndrome)
             time.sleep(1)
 
@@ -103,17 +102,13 @@ def get_shiny_data() -> str:
                 log.info(f"Downloading data for pathogen: {pathogen}")
 
                 # Click on the pathogen dropdown and select the pathogen
-                pathogen_dropdown = wait.until(
-                    EC.presence_of_element_located(
-                        (By.XPATH, '//*[@id="amr-gc_pathogen_anti-pathogen-select-selectized"]')
-                    )
+                pathogen_dropdown = section.find_element(
+                    By.XPATH, '//*[@id="amr-gc_pathogen_anti-pathogen-select-selectized"]'
                 )
                 # Reset any previous selection in the dropdown
                 driver.execute_script("arguments[0].click();", pathogen_dropdown)
                 option_pathogen = wait.until(EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{pathogen}"]')))
                 driver.execute_script("arguments[0].click();", option_pathogen)
-                time.sleep(1)  # Wait to ensure the UI has updated
-
                 for antibiotic_group in drop_down_dict[syndrome][pathogen]:
                     log.info(f"Downloading data for antibiotic group: {antibiotic_group}")
 
@@ -128,11 +123,9 @@ def get_shiny_data() -> str:
                         EC.element_to_be_clickable((By.XPATH, f'//div[@data-value="{antibiotic_group}"]'))
                     )
                     driver.execute_script("arguments[0].click();", option_group)
-                    time.sleep(1)  # Ensure the dropdown has reset before next iteration
-
                     for year in years:
                         log.info(f"Downloading data for year: {year}")
-
+                        driver.execute_script("arguments[0].scrollIntoView(true);", section)
                         # Click on the year dropdown and select the year
                         year_dropdown = wait.until(
                             EC.presence_of_element_located(
