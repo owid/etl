@@ -87,6 +87,13 @@ class ChartDiffShow:
             self.openai_api = None
 
     @property
+    def box_icon(self) -> str:
+        """Icon of the expander box."""
+        if self.diff.error:
+            return "⚠️"
+        return DISPLAY_STATE_OPTIONS[cast(str, self.diff.approval_status)]["icon"]
+
+    @property
     def box_label(self):
         """Label of the expander box.
 
@@ -98,6 +105,8 @@ class ChartDiffShow:
             tags.append(" :blue-background[:material/grade: **NEW**]")
         if self.diff.is_draft:
             tags.append(" :gray-background[:material/draft: **DRAFT**]")
+        if self.diff.error:
+            tags.append(" :red-background[:material/error: **ERROR**]")
         for change in self.diff.change_types:
             tags.append(f":red-background[:material/refresh: **{change.upper()} CHANGE**]")
 
@@ -528,7 +537,7 @@ class ChartDiffShow:
         if self.expander:
             with st.expander(
                 label=self.box_label,
-                icon=DISPLAY_STATE_OPTIONS[cast(str, self.diff.approval_status)]["icon"],
+                icon=self.box_icon,
                 expanded=not self.diff.is_reviewed,
             ):
                 self._show()

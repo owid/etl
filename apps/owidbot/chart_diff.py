@@ -50,9 +50,9 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 
     chart_diff = format_chart_diff(charts_df)
 
-    if charts_df.errors.any():
+    if charts_df.error.any():
         status = "⚠️"
-    if charts_df.empty or charts_df.is_reviewed.all():
+    elif charts_df.empty or charts_df.is_reviewed.all():
         status = "✅"
     else:
         status = "❌"
