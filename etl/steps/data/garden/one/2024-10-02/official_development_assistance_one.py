@@ -1,3 +1,4 @@
+# NOTE: After December 2024 update, check the steps in `remove_data_for_most_recent_year`
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
@@ -12,6 +13,9 @@ paths = PathFinder(__file__)
 # Define index columns
 INDEX_SECTORS = ["donor_name", "recipient_name", "year", "sector_name"]
 INDEX_CHANNELS = ["donor_name", "recipient_name", "year", "channel_name"]
+
+# Define most recent year in the data
+MOST_RECENT_YEAR = 2023
 
 # Define mapping for sectors, including new names, sub-sectors, and sectors.
 SECTORS_MAPPING = {
@@ -254,7 +258,7 @@ CHANNEL_CATEGORIES = {
     "4": "Multilateral organizations",
     "5": "University, college or other teaching institution, research institute or think-tank",
     "6": "Private sector institutions",
-    "9": "Other",
+    "9": "Unspecified",
 }
 
 # Define multiplier for values
@@ -275,6 +279,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Remove data for the most recent year.
+    tb_sectors = remove_data_for_most_recent_year(tb=tb_sectors, year=MOST_RECENT_YEAR)
+    tb_channels = remove_data_for_most_recent_year(tb=tb_channels, year=MOST_RECENT_YEAR)
+
     tb_sectors = geo.harmonize_countries(
         df=tb_sectors,
         country_col="donor_name",
@@ -484,5 +492,16 @@ def rename_and_aggregate_channels(tb: Table) -> Table:
 
     # Aggregate tb by donor_name, recipient_name, year and channel_name.
     tb = tb.groupby(INDEX_CHANNELS, observed=True, dropna=False)["value"].sum().reset_index()
+
+    return tb
+
+
+def remove_data_for_most_recent_year(tb: Table, year: int) -> Table:
+    """
+    Remove data for the most recent year.
+    """
+
+    # Filter the table to remove the most recent year
+    tb = tb[tb["year"] != year].reset_index(drop=True)
 
     return tb
