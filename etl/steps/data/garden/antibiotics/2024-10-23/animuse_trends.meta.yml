@@ -17,6 +17,7 @@ tables:
   animuse_trends:
     variables:
       kilograms:
-        title: Quantity of << antimicrobial_classes >> used
+        title: Quantity of antimicrobials used in animals
+        description_short: Reported quantity of antimicrobials used in animals.
         unit: kilograms
         short_unit: kg

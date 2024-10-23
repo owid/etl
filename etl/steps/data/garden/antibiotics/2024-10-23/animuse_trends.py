@@ -21,7 +21,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.format(["country", "year", "antimicrobial_classes"])
+    tb = tb.groupby(["country", "year"])["kilograms"].sum().reset_index()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
