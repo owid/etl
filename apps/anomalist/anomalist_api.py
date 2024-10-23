@@ -6,7 +6,6 @@ from typing import List, Literal, Optional, Tuple, cast, get_args
 import numpy as np
 import pandas as pd
 import structlog
-from owid.catalog import find
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
@@ -19,6 +18,7 @@ from apps.anomalist.detectors import (
     get_long_format_score_df,
 )
 from apps.anomalist.gp_detector import AnomalyGaussianProcessOutlier
+from apps.wizard.utils.cached import load_latest_population
 from apps.wizard.utils.paths import WIZARD_ANOMALIES_RELATIVE
 from etl import grapher_model as gm
 from etl.config import OWID_ENV
@@ -49,21 +49,6 @@ ANOMALY_DETECTORS = {
 def load_detector(anomaly_type: ANOMALY_TYPE) -> AnomalyDetector:
     """Load detector."""
     return ANOMALY_DETECTORS[anomaly_type]
-
-
-def load_latest_population():
-    # NOTE: The "channels" parameter of the find function is not working well.
-    candidates = find("population", channels=("grapher",), dataset="population", namespace="demography").sort_values(
-        "version", ascending=False
-    )
-    population = (
-        candidates[(candidates["table"] == "population") & (candidates["channel"] == "grapher")]
-        .iloc[0]
-        .load()
-        .reset_index()[["country", "year", "population"]]
-    ).rename(columns={"country": "entity_name"}, errors="raise")
-
-    return population
 
 
 def get_variables_views_in_charts(
@@ -118,11 +103,17 @@ def add_population_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     error = f"Expected a maximum population below {absolute_maximum_population}."
     assert df_population[df_population["year"] < 2040]["population"].max() < absolute_maximum_population, error
 
+    # Convert to strings
+    df_population = df_population.astype({"entity_name": str, "year": int}).sort_values(["year", "entity_name"])
+    df_reduced = df_reduced.astype({"entity_name": str, "year": int}).sort_values(["year", "entity_name"])
+
     # First, get the unique combinations of country-years in the scores dataframe, and add population to it.
-    df_score_population = (
-        df_reduced[["entity_name", "year"]]  # type: ignore
-        .drop_duplicates()
-        .merge(df_population, on=["entity_name", "year"], how="left")
+    df_score_population = pd.merge_asof(
+        df_reduced[["entity_name", "year"]].drop_duplicates(),
+        df_population,
+        on="year",
+        by="entity_name",
+        direction="nearest",
     )
 
     # To normalize the population score to the range 0, 1, divide by an absolute maximum population.
@@ -132,9 +123,7 @@ def add_population_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Add the population score to the scores dataframe.
-    df_reduced = df_reduced.merge(df_score_population, on=["entity_name", "year"], how="left").drop(
-        columns="population", errors="raise"
-    )
+    df_reduced = df_reduced.merge(df_score_population, on=["entity_name", "year"], how="left")
 
     # Variables that do not have population data will have a population score nan. Fill them with a low value.
     df_reduced["score_population"] = df_reduced["score_population"].fillna(fillna_value)
