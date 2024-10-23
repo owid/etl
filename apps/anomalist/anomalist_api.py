@@ -106,17 +106,120 @@ def get_variables_views_in_charts(
     return df
 
 
+def print_population_score_examples(df_score_population: pd.DataFrame) -> None:
+    # Prepare an empty list to store the output.
+    output_list = []
+
+    # Function to format population numbers.
+    def format_population(population):
+        if population >= 1e9:
+            return f"~{population/1e9:.1f}B"
+        elif population >= 1e6:
+            return f"~{population/1e6:.1f}M"
+        elif population >= 1e3:
+            return f"~{population/1e3:.1f}k"
+        else:
+            return f"~{int(population)}"
+
+    # For each target score, find the closest entity (for a given reference year).
+    reference_year = 2023
+    _df = df_score_population[df_score_population["year"] == reference_year].copy()
+    for target_score in [round(0.1 * i, 1) for i in range(1, 11)]:
+        # No exact matches, find entities closest to the target score
+        _df["score_diff"] = (_df["score_population"] - target_score).abs()
+        # Sort by score_diff ascending and population descending
+        sorted_df = _df.sort_values(by=["score_diff", "population"], ascending=[True, False])
+        closest_row = sorted_df.iloc[0]
+        score_str = f"{closest_row['score_population']:.1f}"
+        population_str = format_population(closest_row["population"])
+        output_list.append(f"* {closest_row['entity_name']} (population {population_str}): ~{score_str}")
+
+    # Also, for reference, include some important reference regions.
+    output_list.append("\nOther references:")
+    for region in [
+        "Africa",
+        "Asia",
+        "Europe",
+        "North America",
+        "South America",
+        "Oceania",
+        "Brazil",
+        "China",
+        "India",
+        "Russia",
+        "United States",
+    ]:
+        _df_country = _df[_df["entity_name"] == region]
+        score_str = f"{_df_country['score_population'].item():.2f}"
+        output_list.append(
+            f"* {region} (population {format_population(_df_country['population'].item())}): ~{score_str}"
+        )
+
+    # Print the output list.
+    for line in output_list:
+        print(line)
+
+
 def add_population_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
-    # To normalize the analytics score to the range 0, 1, divide by an absolute maximum number of people.
-    # NOTE: This should a safe assumption before ~2060.
-    absolute_maximum_population = 1e10
-    # Value to use to fill missing values in the population score (e.g. for regions like "Middle East" that are not included in our population dataset).
-    fillna_value = 0.5
+    """Add a population score to the scores dataframe.
+
+    The population score is defined under the following premises:
+    NOTE: The following values are defined below inside the function, double check in case they change in the future.
+    * The score should be around 0.1 for a population <= 1M.
+    * The score should be close to 1 for a population of >=8B.
+    * The score should be 0.5 for regions that are not included in our population dataset (e.g. "Middle East").
+
+    For reference, the result assigns the following scores (with population calculated on year 2023):
+    NOTE: The following lines can be recalculated using print_population_score_examples.
+    * Fiji (population ~924.1k): ~0.1
+    * Gambia (population ~2.7M): ~0.2
+    * Turkmenistan (population ~7.4M): ~0.3
+    * Kazakhstan (population ~20.3M): ~0.4
+    * Myanmar (population ~54.1M): ~0.5
+    * Russia (population ~145.4M): ~0.6
+    * Northern America (UN) (population ~382.9M): ~0.7
+    * Americas (UN) (population ~1.0B): ~0.8
+    * Upper-middle-income countries (population ~2.8B): ~0.9
+    * World (population ~8.1B): ~1.0
+
+    Other references:
+    * Africa (population ~1.5B): ~0.83
+    * Asia (population ~4.8B): ~0.95
+    * Europe (population ~746.9M): ~0.76
+    * North America (population ~608.8M): ~0.74
+    * South America (population ~433.0M): ~0.71
+    * Oceania (population ~45.6M): ~0.48
+    * Brazil (population ~211.1M): ~0.64
+    * China (population ~1.4B): ~0.83
+    * India (population ~1.4B): ~0.83
+    * Russia (population ~145.4M): ~0.60
+    * United States (population ~343.5M): ~0.68
+
+    Parameters
+    ----------
+    df_reduced : pd.DataFrame
+        Scores data (with a column "entity_name", "year", and different "score*" columns).
+
+    Returns
+    -------
+    df_reduced : pd.DataFrame
+        Scores data after including a "score_population" column.
+
+    """
+    # Main parameters:
+    # Minimum score assigned to any country.
+    min_population_score = 0.1
+    # Minimum population to assign a score (any population below this value will be assigned the minimum score).
+    min_population = 1e6
+    # Maximum score assigned to any region.
+    max_population_score = 1.0
+    # Maximum population to assign a score (any population above this value will be assigned the maximum score).
+    max_population = 8e9
+    # Score to assign to all entities for which we don't have population data.
+    missing_population_score = 0.5
 
     # Load the latest population data.
     df_population = load_latest_population()
-    error = f"Expected a maximum population below {absolute_maximum_population}."
-    assert df_population[df_population["year"] < 2040]["population"].max() < absolute_maximum_population, error
 
     # First, get the unique combinations of country-years in the scores dataframe, and add population to it.
     df_score_population = (
@@ -125,11 +228,19 @@ def add_population_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
         .merge(df_population, on=["entity_name", "year"], how="left")
     )
 
-    # To normalize the population score to the range 0, 1, divide by an absolute maximum population.
-    # To have more convenient numbers, take the natural logarithm of the population.
-    df_score_population["score_population"] = np.log(df_score_population["population"]) / np.log(
-        absolute_maximum_population
-    )
+    # FOR DEBUGGING: Construct the population score using all countries (not just the ones in df_reduced).
+    # df_score_population = df_population.rename(columns={"country": "entity_name"}).copy()
+
+    # Normalize the population score to the range 0, 1.
+    _factor = (max_population_score - min_population_score) / (np.log(max_population) - np.log(min_population))
+    _constant = min_population_score - _factor * np.log(min_population)
+    # Clip population between the minimum and maximum defined above.
+    population_clipped = df_score_population["population"].clip(lower=min_population, upper=max_population)
+    df_score_population["score_population"] = _factor * np.log(population_clipped) + _constant  # type: ignore
+    assert df_score_population["score_population"].min() >= 0, "Expected a minimum population score of 0."
+    assert np.float32(df_score_population["score_population"].max()) <= 1, "Expected a maximum population score of 1."
+    # FOR DEBUGGING: Uncomment to print examples for different scores and for reference countries.
+    # print_population_score_examples(df_score_population=df_score_population)
 
     # Add the population score to the scores dataframe.
     df_reduced = df_reduced.merge(df_score_population, on=["entity_name", "year"], how="left").drop(
@@ -137,7 +248,7 @@ def add_population_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     )
 
     # Variables that do not have population data will have a population score nan. Fill them with a low value.
-    df_reduced["score_population"] = df_reduced["score_population"].fillna(fillna_value)
+    df_reduced["score_population"] = df_reduced["score_population"].fillna(missing_population_score)
 
     return df_reduced
 
