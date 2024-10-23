@@ -1,4 +1,17 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+To get this data you must follow these steps:
+
+- Go here: https://amu.woah.org/amu-system-portal/amu-data
+- Click 'HOME'
+- In the Interactive Report click 'Year analysis'
+- Click 'mg/kg'
+- I compiled each separately and then manually combined them
+Then:
+- Click 'Covered Animal Biomass'
+- In the same sheet as above, - I compiled each region separately and then manually combined them
+- Upload this file
+"""
 
 from pathlib import Path
 

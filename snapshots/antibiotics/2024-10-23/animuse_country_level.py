@@ -3,12 +3,14 @@
 To get this data you must follow these steps:
 
 - Go here: https://amu.woah.org/amu-system-portal/amu-data
-- Click 'HOME'
-- In the Interactive Report click 'Trends'
-- Click 'Antimicrobial quanitities'
-- Select 2014-2021 on the bottom right
-- I downloaded each region separately and then manually combined them
-- Upload this file
+- Click 'COUNTRY DATA'
+- Navigate to the 'mg per kg' tab
+- Click 'Select all' for the years
+- Hover over the top right of the graph area to find the download button (...)
+- Click this and select 'Export data'
+- Select as a csv
+- Click 'Export'
+
 """
 
 from pathlib import Path
@@ -26,7 +28,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"antibiotics/{SNAPSHOT_VERSION}/animuse_trends.csv")
+    snap = Snapshot(f"antibiotics/{SNAPSHOT_VERSION}/animuse_country_level.csv")
 
     # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
     snap.create_snapshot(filename=path_to_file, upload=upload)
