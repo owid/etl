@@ -248,7 +248,7 @@ class ChartDiff:
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
 
         # Get all slugs from target
-        slugs_in_target = set(read_sql("SELECT slug FROM chart_slug_redirects", target_session)["slug"])
+        slugs_in_target = cls._get_chart_slugs(target_session)
 
         # Build chart diffs
         chart_diffs = []
@@ -371,6 +371,12 @@ class ChartDiff:
             "is_new": self.is_new,
             "error": self.error,
         }
+
+    @staticmethod
+    def _get_chart_slugs(target_session: Session) -> set[str]:
+        slugs_redirects = set(read_sql("SELECT slug FROM chart_slug_redirects", target_session)["slug"])
+        slugs = set(read_sql("SELECT slug FROM chart_configs", target_session)["slug"])
+        return slugs | slugs_redirects
 
     @staticmethod
     def _get_target_charts(target_session, source_charts):
