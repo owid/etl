@@ -10,6 +10,66 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
+NAMES = {
+    "Persia (Iran)": "Persia",
+    "China": "China",
+    "India": "India",
+    "Brazil": "Brazil",
+    "Congo Free State (Democratic Republic of Congo)": "Congo Free State",
+    "Sudan and Ethiopia": "Sudan, Ethiopia",
+    "Russia": "Russia",
+    "Ottoman Empire (Turkey)": "Ottoman Empire",
+    "Cuba": "Cuba",
+    "East Africa (Kenya, Uganda, Tanzania)": "East Africa",
+    "Philippines": "Philippines",
+    "Tanganyika (German East Africa, Tanzania)": "Tanzania",
+    "British Somaliland": "Somaliland",
+    "African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, Djibouti)": "African Red Sea Region",
+    "Ottoman Empire (Turkey, Iraq, Iran, Syria)": "Ottoman Empire",
+    "Sahel (Upper Senegal and Niger (contemporary Burkina Faso and Mali), the Military Territory of Niger, and Chad)": "Sahel",
+    "German East Africa (Tanzania, Mozambique, Rwanda, Burundi)": "German East Africa",
+    "Serbia and the Balkans": "Serbia, Balkans",
+    "Ottoman Empire (Turkey, Armenians)": "Ottoman Empire",
+    "Austria-Hungary (Poland)": "Poland",
+    "Greater Syria": "Greater Syria",
+    "Russia and Ukraine": "Russia, Ukraine",
+    "Germany": "Germany",
+    "Persia": "Persia",
+    "Armenia": "Armenia",
+    "USSR (Ukraine)": "Ukraine",
+    "USSR (Russia, Kazakhstan)": "Russia, Kazakhstan",
+    "Germany/USSR": "Germany, USSR",
+    "USSR (Russia)": "Russia",
+    "USSR (Russia and Western Soviet States)": "USSR",
+    "Greece": "Greece",
+    "East Asia": "East Asia",
+    "Indonesia": "Indonesia",
+    "India (India, West Bengal, Bangladesh)": "India, Bangladesh",
+    "Vietnam": "Vietnam",
+    "Eastern Europe": "Eastern Europe",
+    "USSR (Moldova, Ukraine, Russia, Belarus)": "USSR",
+    "Ethiopia": "Ethiopia",
+    "Nigeria (Biafra)": "Nigeria",
+    "Sahel (Mauritania, Mali, Niger)": "Sahel",
+    "Bangladesh": "Bangladesh",
+    "East Timor": "East Timor",
+    "Cambodia": "Cambodia",
+    "Mozambique": "Mozambique",
+    "Sudan": "Sudan",
+    "Sudan\n(South Sudan)": "South Sudan",
+    "Somalia": "Somalia",
+    "Sudan\n(including South Sudan)": "Sudan",
+    "North Korea": "North Korea",
+    "DRC": "Democratic Republic of Congo",
+    "Uganda": "Uganda",
+    "Syria": "Syria",
+    "South Sudan": "South Sudan",
+    "Nigeria": "Nigeria",
+    "Yemen": "Yemen",
+    "CAR": "Central African Republic",
+}
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -77,6 +137,9 @@ def run(dest_dir: str) -> None:
 
     # Combine famines for the African Red Sea Region and Hungerplan as the mortality estimate exists for just the total rather than each entry
     tb = combine_entries(tb)
+
+    # Simplify names - will later use it for titles with years combined
+    tb["simplified_place"] = tb["Place"].replace(NAMES, regex=False)
 
     tb = tb.rename(columns={"Place": "country"})
 

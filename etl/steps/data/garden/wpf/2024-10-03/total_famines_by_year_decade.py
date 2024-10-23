@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["famines"].reset_index()
-    origins = tb["conventional_title"].metadata.origins
+    origins = tb["famine_name"].metadata.origins
 
     #
     # Process data.
@@ -40,19 +40,19 @@ def run(dest_dir: str) -> None:
     tb = unravel_dates(tb)
     tb = tb.rename(columns={"date": "year"})
     tb["year"] = tb["year"].astype(int)
-    tb["global_region"] = tb["global_region"].astype("category")
+    tb["region"] = tb["region"].astype("category")
 
-    # Grouping by 'year', 'global_region', 'conflict', 'government_policy_overall', 'external_factors' and counting the occurrences
-    famine_counts = tb.groupby(["year", "global_region"], observed=False).size().reset_index(name="famine_count")
+    # Grouping by 'year', 'region', 'conflict', 'government_policy_overall', 'external_factors' and counting the occurrences
+    famine_counts = tb.groupby(["year", "region"], observed=False).size().reset_index(name="famine_count")
     # Creating a 'World' row by summing counts across unique regions for each group
     famine_counts_world_only = tb.groupby(["year"]).size().reset_index(name="famine_count")
-    famine_counts_world_only["global_region"] = "World"
+    famine_counts_world_only["region"] = "World"
     # Concatenating the world row data with the regional data
     famine_counts_combined = pr.concat([famine_counts, famine_counts_world_only], ignore_index=True)
 
     # Grouping by relevant columns and summing the 'wpf_authoritative_mortality_estimate' for regional data
     deaths_counts = (
-        tb.groupby(["year", "global_region"], observed=False)["wpf_authoritative_mortality_estimate"]
+        tb.groupby(["year", "region"], observed=False)["wpf_authoritative_mortality_estimate"]
         .sum()
         .reset_index(name="famine_deaths")
     )
@@ -61,7 +61,7 @@ def run(dest_dir: str) -> None:
     deaths_counts_world_only = (
         tb.groupby(["year"])["wpf_authoritative_mortality_estimate"].sum().reset_index(name="famine_deaths")
     )
-    deaths_counts_world_only["global_region"] = "World"
+    deaths_counts_world_only["region"] = "World"
 
     # Concatenating the world row data with the regional data
     deaths_counts_combined = pr.concat([deaths_counts, deaths_counts_world_only], ignore_index=True)
@@ -69,23 +69,23 @@ def run(dest_dir: str) -> None:
     tb = pr.merge(
         famine_counts_combined,
         deaths_counts_combined,
-        on=["year", "global_region"],
+        on=["year", "region"],
     )
 
     # Create a DataFrame with all years from 1870 to 2023
     all_years = pd.DataFrame({"year": range(1870, 2024)})
 
     # Get all unique regions from the original data
-    all_regions = tb["global_region"].unique()
+    all_regions = tb["region"].unique()
 
     # Create a DataFrame with all combinations of years and regions - to ensure that where there are no data points for a year and region, the value is set to zero
-    all_years_regions = pd.MultiIndex.from_product(
-        [all_years["year"], all_regions], names=["year", "global_region"]
-    ).to_frame(index=False)
+    all_years_regions = pd.MultiIndex.from_product([all_years["year"], all_regions], names=["year", "region"]).to_frame(
+        index=False
+    )
     all_years_regions = Table(all_years_regions)
 
     # Merge this DataFrame with the existing data to ensure all years are present
-    tb = pr.merge(tb, all_years_regions, on=["year", "global_region"], how="right")
+    tb = pr.merge(tb, all_years_regions, on=["year", "region"], how="right")
 
     # Fill NaN values in the 'famine_count' and 'famine_deaths' columns with zeros
     tb["famine_count"] = tb["famine_count"].fillna(0)
@@ -94,23 +94,15 @@ def run(dest_dir: str) -> None:
     # Calculate the decade
     tb["decade"] = (tb["year"] // 10) * 10
 
-    # Group the data by global_region and decade, then calculate the decadal sum
+    # Group the data by region and decade, then calculate the decadal sum
     for column in ["famine_count", "famine_deaths"]:
-        tb["decadal_" + column] = tb.groupby(["global_region", "decade"], observed=False)[column].transform("sum")
+        tb["decadal_" + column] = tb.groupby(["region", "decade"], observed=False)[column].transform("sum")
         # Set NaN everywhere except the start of a decade
         tb["decadal_" + column] = tb["decadal_" + column].where(tb["year"] % 10 == 0, np.nan)
     tb = tb.drop(columns=["decade"])
 
-    tb = tb.rename(columns={"global_region": "country"})
+    tb = tb.rename(columns={"region": "country"})
 
-    # Reset the index of the 'population' DataFrame to access the 'country' column
-    countries = ds_population["population"].reset_index()["country"]
-
-    # Find entries that contain '(WB)'
-    africa_countries = countries[countries.str.contains("Africa")].unique()
-
-    # Print the entries
-    print(africa_countries)
     tb = geo.add_population_to_table(tb, ds_population)
 
     tb["famine_deaths_per_rate"] = tb["famine_deaths"] / (tb["population"] / 100000)
