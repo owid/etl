@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import structlog
 from joblib import Memory
+from scipy.stats import norm
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, WhiteKernel
@@ -126,7 +127,9 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             if self.n_jobs == 1:
                 # Fit the Gaussian Process model and make predictions
                 z = self.fit_predict_z(X, y)
-                z = pd.DataFrame({"anomaly_score": np.abs(z), "year": group["year"].values}, index=group.index)
+                # Normalize score between 0 and 1.
+                z_normalized = 2 * norm.cdf(abs(z)) - 1
+                z = pd.DataFrame({"anomaly_score": z_normalized, "year": group["year"].values}, index=group.index)
                 results.append(z)
             else:
                 # Add it to a list for parallel processing
@@ -147,9 +150,6 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             return pd.DataFrame()
 
         df_score_long = pd.concat(results).reset_index()
-
-        # Normalize the anomaly scores by mapping interval (0, 3+) to (0, 1)
-        df_score_long["anomaly_score"] = np.minimum(df_score_long["anomaly_score"] / 3, 1)
 
         return df_score_long
 
