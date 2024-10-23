@@ -11,12 +11,14 @@ from slack_sdk import WebClient
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader, configs_are_equal
 from apps.wizard.utils import get_staging_creation_time
 from etl import config
 from etl import grapher_model as gm
 from etl.config import OWIDEnv, get_container_name
 from etl.datadiff import _dict_diff
+
+config.enable_bugsnag()
 
 log = structlog.get_logger()
 
@@ -158,7 +160,7 @@ def cli(
                 # Chart in target exists, update it
                 if diff.target_chart:
                     # Configs are equal, no need to update
-                    if diff.configs_are_equal():
+                    if configs_are_equal(migrated_config, diff.target_chart.config):
                         log.info(
                             "chart_sync.skip",
                             slug=diff.target_chart.slug,
