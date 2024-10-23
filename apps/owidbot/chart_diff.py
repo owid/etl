@@ -24,6 +24,9 @@ def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_r
     if charts_df.empty:
         conclusion = "neutral"
         title = "No charts for review"
+    elif charts_df[~charts_df.is_rejected].error.any():
+        conclusion = "failure"
+        title = "Some charts have errors"
     elif charts_df.is_reviewed.all():
         conclusion = "success"
         title = "All charts are reviewed"
@@ -50,7 +53,7 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 
     chart_diff = format_chart_diff(charts_df)
 
-    if charts_df.error.any():
+    if charts_df[~charts_df.is_rejected].error.any():
         status = "⚠️"
     elif charts_df.empty or charts_df.is_reviewed.all():
         status = "✅"
