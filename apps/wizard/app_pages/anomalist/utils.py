@@ -120,7 +120,7 @@ def create_tables(_owid_env: OWIDEnv = OWID_ENV):
     gm.Anomaly.create_table(_owid_env.engine, if_exists="skip")
 
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def get_scores(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
     """Combine and reduce scores dataframe."""
     df = combine_and_reduce_scores_df(anomalies)

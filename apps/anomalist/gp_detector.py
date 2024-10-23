@@ -80,7 +80,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
     @staticmethod
     def get_text(entity: str, year: int) -> str:
-        return f"There are some outliers for {entity}! These were detected using Gaussian processes. There might be other data points affected."
+        return f"There are some outliers for {entity} in year {year}! These were detected using Gaussian processes. There might be other data points affected."
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Convert to long format
@@ -205,7 +205,9 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         kernel = 1.0 * RBF(length_scale_bounds=length_scale_bounds) + WhiteKernel(noise_level_bounds=noise_level_bounds)
 
-        self.gp = gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=0)
+        # NOTE: using zero restarts speed it up, but may not find the best solution. Running it
+        # again with different random_state might give different results.
+        self.gp = gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=0, random_state=0)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", ConvergenceWarning)
             gp.fit(X_normalized, y_normalized)
@@ -222,13 +224,14 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         return mean_pred, std_pred
 
-    def viz(self, df: pd.DataFrame, meta: gm.Variable, country: Optional[str] = None):
+    def viz(self, df: pd.DataFrame, variable: gm.Variable, country: Optional[str] = None):
+        assert {"country", "year", variable.id} <= set(df.columns)
         if df.empty:
             log.warning("No data to visualize")
             return
 
-        country = country or random.choice(df.columns)
-        series = df[country].dropna()
+        country = country or random.choice(df["country"])
+        series = df[df.country == country].set_index("year")[variable.id]
 
         if len(series) <= 1:
             log.warning(f"Insufficient data for {country}")
@@ -253,7 +256,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             label=r"95% Confidence Interval",
         )
         plt.legend()
-        plt.title(f"{meta.name}: {country}")
+        plt.title(f"{variable.name}: {country}")
 
         z = (y - mean_prediction) / std_prediction
         print("Max Z-score: ", np.abs(z).max())
