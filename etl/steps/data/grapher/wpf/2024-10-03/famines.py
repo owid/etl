@@ -35,7 +35,7 @@ def run(dest_dir: str) -> None:
     tb = unravel_dates(tb)
 
     tb = tb.rename({"country": "place", "famine_name": "country", "date": "year"}, axis=1)
-    tb = tb.drop(columns=["place", "simplified_place"])
+    tb = tb.drop(columns=["place"])
     tb = tb.format(["country", "year"])
 
     #

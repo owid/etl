@@ -82,7 +82,9 @@ def run(dest_dir: str) -> None:
     ]:
         tb[col].metadata.origins = tb["conventional_title"].metadata.origins
 
-    tb = tb.drop(columns=["date_list", "date_range", "sub_region", "global_region", "conventional_title"])
+    tb = tb.drop(
+        columns=["date_list", "date_range", "sub_region", "global_region", "conventional_title", "simplified_place"]
+    )
     tb = tb.format(["famine_name", "date"])
 
     #
