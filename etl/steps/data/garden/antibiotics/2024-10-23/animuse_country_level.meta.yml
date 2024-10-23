@@ -14,7 +14,7 @@ dataset:
 
 
 tables:
-  animuse_trends:
+  animuse_country_level:
     variables:
       mg_kg__non_adjusted_by_reported_coverage:
         title: Antimicrobial quantities adjusted for animal biomass (non-adjusted for reporting coverage)

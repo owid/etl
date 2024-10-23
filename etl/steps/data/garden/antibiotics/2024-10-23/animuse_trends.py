@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.groupby(["country", "year"])["kilograms"].sum().reset_index()
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name="animuse_trends")
 
     #
     # Save outputs.
