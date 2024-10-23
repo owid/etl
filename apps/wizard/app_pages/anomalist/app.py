@@ -438,7 +438,7 @@ def show_anomaly_compact(index, df, df_all):
 
                 st.dataframe(
                     # df[["entity_name"] + st.session_state.anomalist_sorting_columns],
-                    _scores_table(df, df_all, indicator_id),
+                    _score_table(df, df_all, indicator_id),
                     selection_mode=["multi-row"],
                     key=key_table,
                     on_select=lambda df=df, key_table=key_table, key_selection=key_selection: _change_chart_selection(
