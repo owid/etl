@@ -15,10 +15,9 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, WhiteKernel
 from tqdm.auto import tqdm
 
+from apps.anomalist.detectors import AnomalyDetector
 from etl import grapher_model as gm
 from etl.paths import CACHE_DIR
-
-from .detectors import AnomalyDetector
 
 log = structlog.get_logger()
 
@@ -33,7 +32,7 @@ ANOMALIST_N_JOBS = int(os.environ.get("ANOMALIST_N_JOBS", 1))
 
 @memory.cache
 def _load_population():
-    from .anomalist_api import load_latest_population
+    from apps.anomalist.anomalist_api import load_latest_population
 
     # Load the latest population data from the API
     pop = load_latest_population()
@@ -53,8 +52,12 @@ def _processing_queue(items: list[tuple[str, int]]) -> List[tuple]:
     # Create a probability array for each (entity, variable_id) pair based on the entity probability
     probs = np.array([population.get(entity, np.nan) for entity, variable_id in items])
 
-    # Fill any missing values with the mean probability
-    probs = np.nan_to_num(probs, nan=np.nanmean(probs))  # type: ignore
+    if np.isnan(probs).all():
+        # If none of the entities have population, assign a fixed value to all of them.
+        probs = np.full_like(probs, 0.5)
+    else:
+        # Otherwise, fill any missing values with the mean probability.
+        probs = np.nan_to_num(probs, nan=np.nanmean(probs))  # type: ignore
 
     # Randomly shuffle the items based on their probabilities
     items_index = np.random.choice(
@@ -92,7 +95,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         # Create a processing queue with (entity_name, variable_id) pairs
         items = _processing_queue(
-            list(df_wide.index.unique()),
+            items=list(df_wide.index.unique()),
         )
 
         start_time = time.time()
