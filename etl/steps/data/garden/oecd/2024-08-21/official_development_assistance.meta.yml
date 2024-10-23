@@ -180,6 +180,19 @@ definitions:
     minor
     <%- endif -%>
 
+  description_short_oda_net_disbursements: &description_short_oda_net_disbursements |-
+    "{definitions.short_oda} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+
+  description_short_private_grants: &description_short_private_grants |-
+    "{definitions.short_net_private_grants} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+
+  description_short_by_donor: &description_short_by_donor |-
+    <% if donor == "Private donors" %>
+    *description_short_private_grants
+    <% else %>
+    *description_short_oda_net_disbursements
+    <%- endif -%>
+
   description_key_oda_net_disbursements: &description_key_oda_net_disbursements
     - "{definitions.key_oda}"
     - "{definitions.key_net_disbursements}"
@@ -239,7 +252,7 @@ tables:
         title: Official development assistance (ODA) by donor - Net disbursements
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
-        description_short: "{definitions.short_oda} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_short: *description_short_oda_net_disbursements
         description_key: *description_key_oda_net_disbursements
         description_from_producer: |-
           {definitions.producer_oda}
@@ -315,12 +328,8 @@ tables:
         title: Net private grants by donor - Net disbursements
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
-        description_short: "{definitions.short_net_private_grants} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
-        description_key:
-          - "{definitions.key_net_private_grants}"
-          - "{definitions.key_private_reporting}"
-          - "{definitions.key_net_disbursements}"
-          - "{definitions.key_constant_usd}"
+        description_short: *description_short_private_grants
+        description_key: *description_key_private_grants
         description_from_producer: "{definitions.producer_net_private_grants}"
         presentation:
           title_public: Net private grants by donor
@@ -692,7 +701,7 @@ tables:
         title: Official development assistance (ODA) by recipient (<<donor>>)
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
-        description_short: "{definitions.short_oda} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_short: *description_short_by_donor
         description_key: *description_key_by_donor
         description_from_producer: "{definitions.producer_oda}"
         presentation:
