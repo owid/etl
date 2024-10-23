@@ -33,7 +33,9 @@ def run(dest_dir: str) -> None:
 
     # Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
     tb = unravel_dates(tb)
-    tb = tb.rename({"conventional_title": "country", "date": "year"}, axis=1)
+
+    tb = tb.rename({"country": "place", "famine_name": "country", "date": "year"}, axis=1)
+    tb = tb.drop(columns=["place", "simplified_place"])
     tb = tb.format(["country", "year"])
 
     #
