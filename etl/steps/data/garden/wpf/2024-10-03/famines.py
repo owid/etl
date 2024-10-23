@@ -2,12 +2,41 @@
 
 import re
 
+import owid.catalog.processing as pr
 import pandas as pd
+from owid.catalog import Dataset, Table
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Regions
+# Regions for which aggregates will be created.
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
+
+# Custom regions for specific places where famines occured
+CUSTOM_REGION_DICT = {
+    "Persia": "Asia",
+    "Congo Free State": "Africa",
+    "Sudan, Ethiopia": "Africa",
+    "Ottoman Empire": "Asia",
+    "East Africa": "Africa",
+    "Somaliland": "Africa",
+    "African Red Sea Region": "Africa",
+    "Sahel": "Africa",
+    "German East Africa": "Africa",
+    "Serbia, Balkans": "Europe",
+    "Greater Syria": "Asia",
+    "Russia, Ukraine": "Asia",
+    "Persia": "Asia",
+    "Russia, Kazakhstan": "Asia",
+    "Germany, USSR": "Asia",
+    "East Asia": "Asia",
+    "India, Bangladesh": "Asia",
+    "Eastern Europe": "Europe",
+}
 
 
 def run(dest_dir: str) -> None:
@@ -16,6 +45,9 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("famines")
+
+    # Read regions
+    ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
     tb = ds_meadow["famines"].reset_index()
@@ -26,10 +58,29 @@ def run(dest_dir: str) -> None:
     tb = process_causes(tb)
     tb["conventional_title"] = tb["conventional_title"].apply(clean_title)
 
-    for col in ["wpf_authoritative_mortality_estimate", "conflict", "government_policy_overall", "external_factors"]:
+    tb = add_regions(tb, ds_regions)
+
+    tb["date"] = tb["date"].astype(str)
+
+    #  Split and convert the 'date' column to lists of integers
+    tb["date_list"] = tb["date"].apply(lambda x: [int(year) for year in x.split(",")])
+
+    # Create a new column 'date_range' with the minimum and maximum years
+    tb["date_range"] = tb["date_list"].apply(lambda x: f"{min(x)}-{max(x)}")
+    tb["simplified_place"] = tb["simplified_place"].astype(str)
+    tb["famine_name"] = tb["simplified_place"] + " " + tb["date_range"]
+
+    for col in [
+        "wpf_authoritative_mortality_estimate",
+        "conflict",
+        "government_policy_overall",
+        "external_factors",
+        "famine_name",
+    ]:
         tb[col].metadata.origins = tb["conventional_title"].metadata.origins
 
-    tb = tb.format(["conventional_title", "date"])
+    tb = tb.drop(columns=["date_list", "date_range", "sub_region", "global_region", "conventional_title"])
+    tb = tb.format(["famine_name", "date"])
 
     #
     # Save outputs.
@@ -103,3 +154,20 @@ def clean_title(title):
     # Function to clean up titles by simplifying date ranges only
     title = re.sub(r"\((\d{4})(,\d{4})+\)", lambda m: f"({m.group(1)}–{m.group(2)[-4:]})", title)
     return title.strip()
+
+
+def add_regions(tb: Table, ds_regions: Dataset) -> Table:
+    "Add regions to the table."
+
+    # First assign custom regions
+    tb["region"] = tb["simplified_place"].map(CUSTOM_REGION_DICT)
+
+    # Add the rest as usual
+    for region in REGIONS:
+        # List of countries in region.
+        countries_in_region = geo.list_members_of_region(region=region, ds_regions=ds_regions)
+
+        # Add region to the table.
+        tb.loc[tb["simplified_place"].isin(countries_in_region), "region"] = region
+
+    return tb

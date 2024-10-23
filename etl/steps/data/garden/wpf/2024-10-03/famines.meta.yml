@@ -15,20 +15,9 @@ dataset:
 tables:
   famines:
     variables:
-       place:
-         title: Location where the famine occured
-         unit: ''
-         short_unit: ''
-
-       sub_region:
-          title: Sub-region where the famine occured
-          unit: ''
-          short_unit: ''
-
-       global_region:
-          title: Global region where the famine occured
-          unit: ''
-          short_unit: ''
+       region:
+        title: Region
+        unit: ''
 
        wpf_authoritative_mortality_estimate:
           title: Deaths from famines

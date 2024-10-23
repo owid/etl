@@ -818,6 +818,8 @@ steps:
     - snapshot://wpf/2024-10-03/famines.xlsx
   data://garden/wpf/2024-10-03/famines:
     - data://meadow/wpf/2024-10-03/famines
+    - data://garden/regions/2023-01-01/regions
+
   data://grapher/wpf/2024-10-03/famines:
     - data://garden/wpf/2024-10-03/famines
   data://garden/wpf/2024-10-03/total_famines_by_year_decade:
