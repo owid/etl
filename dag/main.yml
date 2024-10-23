@@ -828,6 +828,10 @@ steps:
   data://grapher/wpf/2024-10-03/total_famines_by_year_decade:
     - data://garden/wpf/2024-10-03/total_famines_by_year_decade
 
+  data://garden/wpf/2024-10-03/famines_by_regime_gdp:
+    - data://garden/wpf/2024-10-03/famines
+    - data://garden/democracy/2024-03-07/vdem
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
