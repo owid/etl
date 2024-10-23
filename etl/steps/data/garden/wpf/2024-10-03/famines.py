@@ -2,7 +2,6 @@
 
 import re
 
-import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
 
@@ -30,7 +29,6 @@ CUSTOM_REGION_DICT = {
     "Serbia, Balkans": "Europe",
     "Greater Syria": "Asia",
     "Russia, Ukraine": "Asia",
-    "Persia": "Asia",
     "Russia, Kazakhstan": "Asia",
     "Germany, USSR": "Asia",
     "East Asia": "Asia",
@@ -55,19 +53,24 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
     tb = process_causes(tb)
     tb["conventional_title"] = tb["conventional_title"].apply(clean_title)
 
     tb = add_regions(tb, ds_regions)
-
-    tb["date"] = tb["date"].astype(str)
+    # Ensure there are no NaNs in the 'region' column
+    assert not tb["region"].isna().any(), "There are NaN values in the 'region' column"
 
     #  Split and convert the 'date' column to lists of integers
+    tb["date"] = tb["date"].astype(str)
     tb["date_list"] = tb["date"].apply(lambda x: [int(year) for year in x.split(",")])
 
     # Create a new column 'date_range' with the minimum and maximum years
-    tb["date_range"] = tb["date_list"].apply(lambda x: f"{min(x)}-{max(x)}")
+    tb["date_range"] = tb["date_list"].apply(lambda x: f"{min(x)}" if min(x) == max(x) else f"{min(x)}-{max(x)}")
     tb["simplified_place"] = tb["simplified_place"].astype(str)
+
+    # Create a new column with famine names that combines dates and simplified places
     tb["famine_name"] = tb["simplified_place"] + " " + tb["date_range"]
 
     for col in [
