@@ -18,16 +18,13 @@ INDEX_COLUMNS = ["entity_name", "year"]
 
 
 def estimate_bard_epsilon(series: pd.Series) -> float:
-    # Make all values positive, and ignore zeros.
-    positive_values = abs(series.dropna())
-    # Ignore zeros, since they can lead to epsilon being zero, hence allowing division by zero in BARD.
-    positive_values = positive_values.loc[positive_values > 0]
-    # Estimate epsilon as the absolute range of values divided by 10.
-    # eps = (positive_values.max() - positive_values.min()) / 10
+    # Ignore missing values.
+    real_values = series.dropna()
+    # Estimate epsilon as the range of values divided by 10.
     # Instead of just taking maximum and minimum, take 95th percentile and 5th percentile.
-    eps = (positive_values.quantile(0.95) - positive_values.quantile(0.05)) / 10
+    eps = (real_values.quantile(0.95) - real_values.quantile(0.05)) / 10
 
-    return eps
+    return eps  # type: ignore
 
 
 def get_long_format_score_df(df_score: pd.DataFrame) -> pd.DataFrame:
