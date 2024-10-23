@@ -67,7 +67,7 @@ def load_latest_population():
 
 
 def get_variables_views_in_charts(
-    variable_ids: List[int],
+    variable_ids: Optional[List[int]] = None,
 ) -> pd.DataFrame:
     # Assumed base url for all charts.
     base_url = "https://ourworldindata.org/grapher/"
@@ -91,9 +91,11 @@ def get_variables_views_in_charts(
         chart_configs cc ON c.configId = cc.id
     LEFT JOIN
         analytics_pageviews ap ON ap.url = CONCAT('{base_url}', cc.slug)
-    WHERE
-        v.id IN ({', '.join([str(v_id) for v_id in variable_ids])})
-    ORDER BY
+    """
+    if variable_ids is not None:
+        query += f"WHERE v.id IN ({', '.join([str(v_id) for v_id in variable_ids])})"
+    query += """\
+        ORDER BY
         v.id ASC;
     """
     df = read_sql(query)
@@ -106,20 +108,38 @@ def get_variables_views_in_charts(
     return df
 
 
+def renormalize_score(
+    score: pd.Series, min_value: float, min_score: float, max_value: float, max_score: float
+) -> pd.Series:
+    # Normalize the population score to the range 0, 1.
+    factor = (max_score - min_score) / (np.log(max_value) - np.log(min_value))
+    constant = min_score - factor * np.log(min_value)
+    # Clip population between the minimum and maximum defined above.
+    score_clipped = score.clip(lower=min_value, upper=max_value)
+    # Renormalize score.
+    score_renormalized = factor * np.log(score_clipped) + constant  # type: ignore
+    # Sanity checks.
+    assert np.float32(score_renormalized.min()) >= min_score, f"Expected a minimum score >= {min_score}."
+    assert np.float32(score_renormalized.max()) <= max_score, f"Expected a maximum score <= {max_score}."
+
+    return score_renormalized
+
+
+# Function to format population numbers.
+def _pretty_print(number):
+    if number >= 1e9:
+        return f"~{number/1e9:.1f}B"
+    elif number >= 1e6:
+        return f"~{number/1e6:.1f}M"
+    elif number >= 1e3:
+        return f"~{number/1e3:.1f}k"
+    else:
+        return f"~{int(number)}"
+
+
 def print_population_score_examples(df_score_population: pd.DataFrame) -> None:
     # Prepare an empty list to store the output.
     output_list = []
-
-    # Function to format population numbers.
-    def format_population(population):
-        if population >= 1e9:
-            return f"~{population/1e9:.1f}B"
-        elif population >= 1e6:
-            return f"~{population/1e6:.1f}M"
-        elif population >= 1e3:
-            return f"~{population/1e3:.1f}k"
-        else:
-            return f"~{int(population)}"
 
     # For each target score, find the closest entity (for a given reference year).
     reference_year = 2023
@@ -131,7 +151,7 @@ def print_population_score_examples(df_score_population: pd.DataFrame) -> None:
         sorted_df = _df.sort_values(by=["score_diff", "population"], ascending=[True, False])
         closest_row = sorted_df.iloc[0]
         score_str = f"{closest_row['score_population']:.1f}"
-        population_str = format_population(closest_row["population"])
+        population_str = _pretty_print(closest_row["population"])
         output_list.append(f"* {closest_row['entity_name']} (population {population_str}): ~{score_str}")
 
     # Also, for reference, include some important reference regions.
@@ -151,9 +171,7 @@ def print_population_score_examples(df_score_population: pd.DataFrame) -> None:
     ]:
         _df_country = _df[_df["entity_name"] == region]
         score_str = f"{_df_country['score_population'].item():.2f}"
-        output_list.append(
-            f"* {region} (population {format_population(_df_country['population'].item())}): ~{score_str}"
-        )
+        output_list.append(f"* {region} (population {_pretty_print(_df_country['population'].item())}): ~{score_str}")
 
     # Print the output list.
     for line in output_list:
@@ -232,13 +250,13 @@ def add_population_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     # df_score_population = df_population.rename(columns={"country": "entity_name"}).copy()
 
     # Normalize the population score to the range 0, 1.
-    _factor = (max_population_score - min_population_score) / (np.log(max_population) - np.log(min_population))
-    _constant = min_population_score - _factor * np.log(min_population)
-    # Clip population between the minimum and maximum defined above.
-    population_clipped = df_score_population["population"].clip(lower=min_population, upper=max_population)
-    df_score_population["score_population"] = _factor * np.log(population_clipped) + _constant  # type: ignore
-    assert df_score_population["score_population"].min() >= 0, "Expected a minimum population score of 0."
-    assert np.float32(df_score_population["score_population"].max()) <= 1, "Expected a maximum population score of 1."
+    df_score_population["score_population"] = renormalize_score(
+        score=df_score_population["population"],
+        min_value=min_population,
+        min_score=min_population_score,
+        max_value=max_population,
+        max_score=max_population_score,
+    )
     # FOR DEBUGGING: Uncomment to print examples for different scores and for reference countries.
     # print_population_score_examples(df_score_population=df_score_population)
 
@@ -253,20 +271,104 @@ def add_population_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     return df_reduced
 
 
+def print_views_score_examples(df_score_analytics: pd.DataFrame) -> None:
+    # Prepare an empty list to store the output.
+    output_list = []
+
+    # Create a copy of the DataFrame to avoid modifying the original data.
+    _df = df_score_analytics.copy()
+
+    # For each interval, calculate the number of unique variable_ids and maximum views within that interval.
+    for lower_bound, upper_bound in [(0.0, 0.1)] + [(round(0.1 * i, 1), round(0.1 * (i + 1), 1)) for i in range(1, 10)]:
+        if lower_bound == 0.0:
+            # First interval includes scores less than or equal to 0.1
+            filtered_df = _df[(_df["score_analytics"] <= upper_bound)]
+            interval_str = f"less than or equal to {upper_bound}"
+        else:
+            # Other intervals include scores greater than lower_bound up to upper_bound inclusive
+            filtered_df = _df[(_df["score_analytics"] > lower_bound) & (_df["score_analytics"] <= upper_bound)]
+            interval_str = f"between {lower_bound} and {upper_bound}"
+
+        # Count the number of unique variable_ids.
+        unique_variables_count = filtered_df["variable_id"].nunique()
+
+        # Find the maximum views among these variables.
+        if not filtered_df.empty:
+            max_views = filtered_df["views"].max()
+        else:
+            max_views = 0
+
+        # Append the formatted string to the output list.
+        output_list.append(
+            f"* {_pretty_print(unique_variables_count)} variables with maximum views {_pretty_print(max_views)} have a score {interval_str}"
+        )
+
+    # Print the output list.
+    for line in output_list:
+        print(line)
+
+
 def add_analytics_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
+    """Add an analytics score to the scores dataframe.
+
+    The analytics score is defined under the following premises:
+    NOTE: The following values are defined below inside the function, double check in case they change in the future.
+    * We rely on the number of views in the last 14 days.
+    * The number of views of a given variable is the sum of the views of all charts where the variable is used.
+    * The score should be around 0.1 for a number of chart views <= 14.
+    * The score should be close to 1 for a number of chart views >=1e4.
+    * The score should be 0.5 for variables that are not used in any charts.
+    NOTE: One could argue that we should rather use 0.1 for such variables. But variables that are not used in charts may be used in explorers, and we currently have no way to properly quantify those views.
+
+    For reference, the result assigns the following scores:
+    NOTE: The following lines can be recalculated using print_views_score_examples.
+    * ~1.8k variables with maximum views ~14 have a score less than or equal to 0.1
+    * ~1.3k variables with maximum views ~31 have a score between 0.1 and 0.2
+    * ~1.8k variables with maximum views ~70 have a score between 0.2 and 0.3
+    * ~1.7k variables with maximum views ~157 have a score between 0.3 and 0.4
+    * ~1.0k variables with maximum views ~353 have a score between 0.4 and 0.5
+    * ~631 variables with maximum views ~790 have a score between 0.5 and 0.6
+    * ~372 variables with maximum views ~1.8k have a score between 0.6 and 0.7
+    * ~242 variables with maximum views ~3.9k have a score between 0.7 and 0.8
+    * ~63 variables with maximum views ~8.5k have a score between 0.8 and 0.9
+    * ~54 variables with maximum views ~118.7k have a score between 0.9 and 1.0
+
+    Parameters
+    ----------
+    df_reduced : pd.DataFrame
+        Scores data (with a column "entity_name", "year", and different "score*" columns).
+
+    Returns
+    -------
+    df_reduced : pd.DataFrame
+        Scores data after including a "score_analytics" column.
+
+    """
+    # Main parameters:
     # Focus on the following specific analytics column.
     analytics_column = "views_14d"
-    # To normalize the analytics score to the range 0, 1, divide by an absolute maximum number of views.
-    absolute_maximum_views = 1e6
+    # Minimum score assigned to any indicator.
+    min_views_score = 0.1
+    # Minimum number of views per chart to assign a score (any number of views below this value will be assigned the minimum score).
+    min_views = 14
+    # Maximum score assigned to any indicator.
+    max_views_score = 1.0
+    # Maximum number of views per chart to assign a score (any number of views above this value will be assigned the maximum score).
+    # NOTE: In the last 14 days, our most viewed chart had 60k views.
+    #  The variables with the largest number of views (summed over all charts) are countries-continents, with ~120k views, and population, with 108k.
+    #  After those, the next variable is from GBD, and has over 60k views.
+    #  After the first 23 variables (with over 50k views) it drops to <20k.
+    #  So, it makes sense to ignore the views of countries-continents and population, and therefore set the maximum number of views on 60k.
+    #  But we could look into it more deeply.
+    max_views = 2e4
     # Value to use to fill missing values in the analytics score (e.g. for variables that are not used in charts).
     fillna_value = 0.1
 
     # Get number of views in charts for each variable id.
-    df_views = get_variables_views_in_charts(list(df_reduced["variable_id"].unique()))
-    # Sanity check.
-    if not df_views.empty:
-        error = f"Expected a maximum number of views below {absolute_maximum_views}. Change this limit."
-        assert df_views[analytics_column].max() < absolute_maximum_views, error
+    df_views = get_variables_views_in_charts(variable_ids=list(df_reduced["variable_id"].unique()))
+
+    # FOR DEBUGGING: Load views of all variables in charts.
+    # df_views = get_variables_views_in_charts(variable_ids=None)
 
     # Get the sum of the number of views in charts for each variable id in the last 14 days.
     # So, if an indicator is used in multiple charts, their views are summed.
@@ -279,7 +381,16 @@ def add_analytics_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
         .rename(columns={analytics_column: "views"})
     )
     # To have more convenient numbers, take the natural logarithm of the views.
-    df_score_analytics["score_analytics"] = np.log(df_score_analytics["views"]) / np.log(absolute_maximum_views)
+    df_score_analytics["score_analytics"] = renormalize_score(
+        score=df_score_analytics["views"],
+        min_value=min_views,
+        min_score=min_views_score,
+        max_value=max_views,
+        max_score=max_views_score,
+    )
+
+    # FOR DEBUGGING: Uncomment to print examples for different scores and for reference countries.
+    # print_views_score_examples(df_score_analytics=df_score_analytics)
 
     # Add the analytics score to the scores dataframe.
     df_reduced = df_reduced.merge(df_score_analytics, on=["variable_id"], how="left")
