@@ -119,8 +119,10 @@ def renormalize_score(
     # Renormalize score.
     score_renormalized = factor * np.log(score_clipped) + constant  # type: ignore
     # Sanity checks.
-    assert np.float32(score_renormalized.min()) >= min_score, f"Expected a minimum score >= {min_score}."
-    assert np.float32(score_renormalized.max()) <= max_score, f"Expected a maximum score <= {max_score}."
+    if len(score_renormalized[score_renormalized.notnull()]) > 0:
+        # NOTE: Sometimes the input score may be empty (e.g. because indicators don't have analytics data, or are not used in charts) or nan (e.g. when renormalizing the population score on an array of entities with no population data, like "Northern Hemisphere").
+        assert np.float32(score_renormalized.min()) >= min_score, f"Expected a minimum score >= {min_score}."
+        assert np.float32(score_renormalized.max()) <= max_score, f"Expected a maximum score <= {max_score}."
 
     return score_renormalized
 
