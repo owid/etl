@@ -235,6 +235,12 @@ steps:
   data://garden/chartbook/2024-10-24/atkinson_2008_germany:
     - data://meadow/chartbook/2024-10-24/atkinson_2008_germany
 
+  # Relative poverty in West Germany (Becker, 1997)
+  data://meadow/chartbook/2024-10-24/becker_1997_germany_relative_poverty:
+    - snapshot://chartbook/2024-10-24/becker_1997_germany_relative_poverty.csv
+  data://garden/chartbook/2024-10-24/becker_1997_germany_relative_poverty:
+    - data://meadow/chartbook/2024-10-24/becker_1997_germany_relative_poverty
+
   ################################################################################################
   # UNITED KINGDOM
   ################################################################################################
