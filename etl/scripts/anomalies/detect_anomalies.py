@@ -170,7 +170,7 @@ def inspect_anomalies(
     )
     for _, row in df_show.iterrows():
         variable_id = row["indicator_id"]
-        variable_name = metadata[variable_id].shortName
+        variable_name = f"{metadata[variable_id].shortName} ({variable_id})"
         variable_title = metadata[variable_id].titlePublic
         country = row["entity_name"]
         anomaly_type = row["anomaly_type"]
@@ -261,9 +261,19 @@ def main(dataset_id: int, anomaly_type: str, n_anomalies: int = 10) -> None:
     # Add anomaly type.
     df["anomaly_type"] = detector.anomaly_type
 
+    SCORE_ANOMALY_THRESHOLD = 0.3
+    SCORE_POPULATION_THRESHOLD = 0.3
+    SCORE_ANALYTICS_THRESHOLD = 0.3
+    SCORE_WEIGHTED_THRESHOLD = 0.3
     # Inspect anomalies.
+    df_candidates = df[
+        (df["score"] > SCORE_ANOMALY_THRESHOLD)
+        & (df["score_population"] > SCORE_POPULATION_THRESHOLD)
+        & (df["score_analytics"] > SCORE_ANALYTICS_THRESHOLD)
+        & (df["score_weighted"] > SCORE_WEIGHTED_THRESHOLD)
+    ].sort_values("score_weighted", ascending=False)
     inspect_anomalies(
-        df=df.sort_values("score", ascending=False),
+        df=df_candidates,
         df_data=df_data,
         metadata=metadata,
         variable_mapping=variable_mapping,

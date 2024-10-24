@@ -135,17 +135,19 @@ class AnomalyTimeChange(AnomalyDetector):
         error = "The function that detects abrupt time changes assumes the data is sorted by entity_name and year. But this is not the case. Either ensure the data is sorted, or fix the function."
         assert (df.sort_values(by=INDEX_COLUMNS).index == df.index).all(), error
         for variable_id in variable_ids:
+            # Calculate the BARD score for this variable.
             series = df[variable_id].copy()
-            # Calculate the BARD epsilon for this variable.
             eps = estimate_bard_epsilon(series=series)
-            # Calculate the BARD for this variable.
-            _bard = bard(series, series.shift(), eps).fillna(0)
+            score = bard(series, series.shift(), eps).fillna(0)
 
-            # Add bard to the dataframe.
-            df_time_change[variable_id] = _bard
+            # An alternative score, which may be easier to interpret, is the size of changes in consecutive points (for a given country), as a fraction of the maximum range of values of that variable.
+            # score = series.diff().fillna(0) / (series.max() - series.min())
+
+            # Add score to the dataframe.
+            df_time_change[variable_id] = score
+
         # The previous procedure includes the calculation of the deviation between the last point of an entity and the first point of the next, which is meaningless, and can lead to a high BARD.
         # Therefore, make zero the first point of each entity_name for all columns.
-        # df_time_change.loc[df_time_change["entity_name"].diff().fillna(1) > 0, self.variable_ids] = 0
         df_time_change.loc[df_time_change["entity_name"] != df_time_change["entity_name"].shift(), variable_ids] = 0
 
         return df_time_change
