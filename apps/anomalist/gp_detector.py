@@ -10,9 +10,11 @@ import numpy as np
 import pandas as pd
 import structlog
 from joblib import Memory
+from scipy.stats import norm
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, WhiteKernel
+from statsmodels.stats.multitest import multipletests
 from tqdm.auto import tqdm
 
 from apps.anomalist.detectors import AnomalyDetector
@@ -149,9 +151,20 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         df_score_long = pd.concat(results).reset_index()
 
         # Normalize the anomaly scores by mapping interval (0, 3+) to (0, 1)
-        df_score_long["anomaly_score"] = np.minimum(df_score_long["anomaly_score"] / 3, 1)
+        # df_score_long["anomaly_score"] = np.minimum(df_score_long["anomaly_score"] / 3, 1)
 
-        return df_score_long
+        # Convert z-score into p-value
+        df_score_long["p_value"] = 2 * (1 - norm.cdf(np.abs(df_score_long["anomaly_score"])))
+
+        # Adjust p-values for multiple testing
+        df_score_long["adj_p_value"] = df_score_long.groupby(["entity_name", "variable_id"]).p_value.transform(
+            lambda p: multipletests(p, method="fdr_bh")[1]
+        )
+
+        # Final score is 1 - p-value
+        df_score_long["anomaly_score"] = 1 - df_score_long["adj_p_value"]
+
+        return df_score_long.drop(columns=["p_value", "adj_p_value"])
 
     @staticmethod
     def _fit_parallel(obj: "AnomalyGaussianProcessOutlier", X, y, group, start_time):
@@ -262,3 +275,5 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         print("Max Z-score: ", np.abs(z).max())
 
         plt.show()
+
+        return z

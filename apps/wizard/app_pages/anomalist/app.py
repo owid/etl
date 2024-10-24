@@ -478,10 +478,14 @@ def _score_table(df: pd.DataFrame, df_all: pd.DataFrame, indicator_id: int) -> p
     df_show = df_show[[c for c in df_show.columns if c != "views"] + ["views"]]
 
     score_cols = [c for c in df_show if "score" in c]
-    df_style = df_show.style.format("{:.2f}", subset=score_cols).background_gradient(
-        subset=score_cols,
-        vmin=0,
-        vmax=1,
+    df_style = (
+        df_show.style.format("{:.2f}", subset=score_cols)
+        .format("{:,.0f}", subset=["views"])
+        .background_gradient(
+            subset=score_cols,
+            vmin=0,
+            vmax=1,
+        )
     )
 
     return df_style
