@@ -703,8 +703,7 @@ tables:
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
         description_short: *description_short_by_donor
-        description_key:
-          - *description_key_by_donor
+        description_key: *description_key_by_donor
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Foreign aid received
