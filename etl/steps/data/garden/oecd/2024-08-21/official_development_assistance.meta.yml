@@ -181,10 +181,10 @@ definitions:
     <%- endif -%>
 
   description_short_oda_net_disbursements: &description_short_oda_net_disbursements |-
-    "{definitions.short_oda} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+    {definitions.short_oda} {definitions.short_net_disbursements} {definitions.short_constant_usd}
 
   description_short_private_grants: &description_short_private_grants |-
-    "{definitions.short_net_private_grants} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+    {definitions.short_net_private_grants} {definitions.short_net_disbursements} {definitions.short_constant_usd}
 
   description_short_by_donor: &description_short_by_donor |-
     <% if donor == "Private donors" %>
