@@ -20,13 +20,16 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["tracss"].reset_index()
-
+    origins = tb["laws_antimicrobials_terrestrial_2_8_2"].metadata.origins
     #
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = shorten_survey_responses(tb)
     tb = tb.format(["country", "year"])
+    # Adding origins back in to the columns
+    for col in tb.columns:
+        tb[col].metadata.origins = origins
 
     #
     # Save outputs.
