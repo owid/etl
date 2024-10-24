@@ -2,6 +2,7 @@
 
 from typing import Dict
 
+import pandas as pd
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -26,6 +27,7 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = shorten_survey_responses(tb)
+    tb = replace_blanks_with_na(tb)
     tb = tb.format(["country", "year"])
     # Adding origins back in to the columns
     for col in tb.columns:
@@ -113,3 +115,8 @@ def check_keys_exist(tb: Table, dict: Dict, col: str) -> None:
 
     if missing_keys:
         raise ValueError(f"Some categories in the dictionary do not exist in the Series: {missing_keys}")
+
+
+def replace_blanks_with_na(tb: Table) -> Table:
+    # Some columns have blanks, replace them with 'NA'
+    return tb.cat.rename_categories(" ", pd.NA)
