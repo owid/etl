@@ -21,3 +21,7 @@ tables:
           unit: 'deaths'
           short_unit: ''
           description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
+       region:
+          title: Region
+          unit: ''
+

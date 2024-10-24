@@ -61,15 +61,6 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb_famines = ds_garden["famines"].reset_index()
 
-    tb_famines["wpf_authoritative_mortality_estimate"] = tb_famines.apply(
-        lambda row: row["wpf_authoritative_mortality_estimate"] / len(row["date"].split(","))
-        if pd.notna(row["date"])
-        else row["wpf_authoritative_mortality_estimate"],
-        axis=1,
-    )
-
-    # Remove rows where 'wpf_authoritative_mortality_estimate' is NaN
-    tb_famines = tb_famines.dropna(subset=["wpf_authoritative_mortality_estimate"])
     tb_famines = (
         tb_famines.assign(date=tb_famines["date"].str.split(","))
         .explode("date")
@@ -83,7 +74,7 @@ def run(dest_dir: str) -> None:
     tb = add_regime(tb_famines, ds_regime)
 
     tb = add_gdp(tb, tb_gdp)
-    tb = tb.drop(columns=["country", "region", "conflict", "government_policy_overall", "external_factors"])
+    tb = tb.drop(columns=["country", "conflict", "government_policy_overall", "external_factors"])
     tb = tb.format(["famine_name", "year"])
 
     #
@@ -102,8 +93,12 @@ def add_regime(tb_famines, ds_regime):
     tb_regime = ds_regime["vdem"].reset_index()
 
     reduced_regime = tb_regime[["country", "year", "regime_redux_row_owid"]]
+    reduced_regime["regime_redux_row_owid"] = reduced_regime["regime_redux_row_owid"].astype(str)
     # Combine autocracies
-    reduced_regime.loc[reduced_regime["regime_redux_row_owid"].isin([0, 1]), "regime_redux_row_owid"] = 3
+    reduced_regime.loc[
+        reduced_regime["regime_redux_row_owid"].isin(["0", "1"]), "regime_redux_row_owid"
+    ] = "Autocracies"
+    reduced_regime.loc[reduced_regime["regime_redux_row_owid"] == "2", "regime_redux_row_owid"] = "Democracies"
 
     tb = pr.merge(tb_famines, reduced_regime, on=["country", "year"], how="left")
 
@@ -124,6 +119,7 @@ def add_regime(tb_famines, ds_regime):
     # Ensure there are no NaNs in the 'region' column
     assert not tb["regime_redux_row_owid"].isna().any(), "There are NaN values in the 'regime_redux_row_owid' column"
 
+    tb["regime_redux_row_owid"] = tb["regime_redux_row_owid"].astype(str)
     return tb
 
 
