@@ -125,7 +125,7 @@ class AnomalyTimeChange(AnomalyDetector):
 
     @staticmethod
     def get_text(entity: str, year: int) -> str:
-        return f"There are significant changes for {entity} in {year} compared to the old version of the indicator. There might be other data points affected."
+        return f"There are significant changes for {entity} in {year} compared to the previous point. There might be other data points affected."
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
