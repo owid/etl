@@ -101,7 +101,7 @@ class AnomalyUpgradeChange(AnomalyDetector):
 
     @staticmethod
     def get_text(entity: str, year: int) -> str:
-        return f"There are abrupt changes for {entity} in {year}! There might be other data points affected."
+        return f"There are significant changes for {entity} in {year} with respect to the previous version. There might be other data points affected."
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
