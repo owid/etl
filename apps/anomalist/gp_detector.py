@@ -259,3 +259,13 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         print("Max Z-score: ", np.abs(z).max())
 
         plt.show()
+
+    def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+        # Create a dataframe of ones.
+        df_scale = df.copy()
+        # NOTE: Ideally, instead of 1, it should be the difference between a value and the mean, divided by the range of values of the variable. But that may be hard to implement in an efficient way.
+        df_scale[df.columns.difference(["entity_name", "year"])] = 1
+        # Since this anomaly detector return a long dataframe, we need to melt it.
+        df_scale = df_scale.melt(id_vars=["entity_name", "year"], var_name="variable_id", value_name="score_scale")
+
+        return df_scale

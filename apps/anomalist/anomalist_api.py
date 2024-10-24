@@ -409,9 +409,13 @@ def add_weighted_score(df: pd.DataFrame) -> pd.DataFrame:
     w_score = 1
     w_pop = 1
     w_views = 1
+    w_scale = 1
     df["score_weighted"] = (
-        w_score * df["score"] + w_pop * df["score_population"] + w_views * df["score_analytics"]
-    ) / (w_score + w_pop + w_views)
+        w_score * df["score"]
+        + w_pop * df["score_population"]
+        + w_views * df["score_analytics"]
+        + w_scale * df["score_scale"]
+    ) / (w_score + w_pop + w_views + w_scale)
 
     return df
 
@@ -428,6 +432,10 @@ def add_auxiliary_scores(df: pd.DataFrame) -> pd.DataFrame:
 
     # Create a weighted combined score.
     df = add_weighted_score(df)
+
+    # Create an emergency score: the product of all scores.
+    # This score should catch the most urgent cases (with low recall).
+    df["score_emergency"] = df["score"] * df["score_population"] * df["score_analytics"] * df["score_scale"]
 
     return df
 
@@ -530,8 +538,15 @@ def anomaly_detection(
                 log.info("No anomalies detected.`")
                 continue
 
+            # Get the anomaly scale dataframe for the current dataset and anomaly type.
+            df_scale = detector.get_scale_df(
+                df=df,
+                variable_ids=variable_ids_for_current_dataset,
+                variable_mapping=variable_mapping_for_current_dataset,
+            )
+
             # Create a long format score dataframe.
-            df_score_long = get_long_format_score_df(df_score)
+            df_score_long = get_long_format_score_df(df_score=df_score, df_scale=df_scale)
 
             # TODO: validate format of the output dataframe
             anomaly = gm.Anomaly(
