@@ -119,4 +119,6 @@ def check_keys_exist(tb: Table, dict: Dict, col: str) -> None:
 
 def replace_blanks_with_na(tb: Table) -> Table:
     # Some columns have blanks, replace them with 'NA'
-    return tb.cat.rename_categories(" ", pd.NA)
+    for col in tb.columns:
+        tb[col] = tb[col].cat.rename_categories(" ", pd.NA)
+    return tb
