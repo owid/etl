@@ -1,0 +1,28 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Antibiotics
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  animuse_country_level:
+    variables:
+      mg_kg__non_adjusted_by_reported_coverage:
+        title: Antimicrobial quantities adjusted for animal biomass (non-adjusted for reporting coverage)
+        description_short: Milligrams of antimicrobials used in animals per kilogram of biomass
+        unit: milligrams per kilogram
+        short_unit: mg/kg
+      mg_kg__adjusted_by_reported_coverage:
+        title: Antimicrobial quantities adjusted for animal biomass (adjusted for reporting coverage)
+        description_short: Milligrams of antimicrobials used in animals per kilogram of biomass (adjusted for reporting coverage)
+        unit: milligrams per kilogram
+        short_unit: mg/kg

@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: ANIMUSE
+    description: |-
+      The World Organisation for Animal Health (WOAH) has been collecting data on the amounts and reasons for antimicrobial use in animals since 2015. This information is an essential asset to reduce the overuse and misuse of medication and to curb the spread of antimicrobial resistance (AMR). ANIMUSE, the global database on ANImal antiMicrobial USE, facilitates access to this crucial and growing set of information.
+    date_published: "2022-09-01"
+    title_snapshot: ANIMUSE - Year Analysis
+
+    # Citation
+    producer: World Organisation for Animal Health
+    citation_full: |-
+      ANIMUSE Interactive Report (2024), World Organisation for Animal Health.
+    attribution_short: WOAH
+
+    # Files
+    url_main: https://amu.woah.org/amu-system-portal/home
+    date_accessed: 2024-10-23
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://amu.woah.org/amu-system-portal/cms/view/bef2f483-36e3-4671-a791-ace982958c7d/846dd494-0007-4d31-aa80-fb61273d9c06/public
+
+outs:
+  - md5: fd92ff494c924b32dc19e5dde9864808
+    size: 1390
+    path: animuse_year.csv
