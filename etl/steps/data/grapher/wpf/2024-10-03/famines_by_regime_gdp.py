@@ -19,7 +19,11 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+
     tb = tb.rename({"famine_name": "country"}, axis=1)
+
+    # Keep the first year for each famine (country)
+    tb = tb.sort_values(by="year").drop_duplicates(subset="country", keep="first")
     tb = tb.format(["country", "year"])
 
     #
