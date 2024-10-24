@@ -1,7 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import pandas as pd
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -21,7 +19,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
     tb = tb.rename({"famine_name": "country"}, axis=1)
     tb = tb.format(["country", "year"])
 
