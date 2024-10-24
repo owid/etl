@@ -2,7 +2,6 @@
 
 from typing import Dict
 
-import pandas as pd
 from owid.catalog import Table
 
 from etl.data_helpers import geo
