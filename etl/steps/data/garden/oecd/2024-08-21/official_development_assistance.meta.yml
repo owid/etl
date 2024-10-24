@@ -188,9 +188,9 @@ definitions:
 
   description_short_by_donor: &description_short_by_donor |-
     <% if donor == "Private donors" %>
-    *description_short_private_grants
+    {definitions.description_short_private_grants}
     <% else %>
-    *description_short_oda_net_disbursements
+    {definitions.description_short_oda_net_disbursements}
     <%- endif -%>
 
   description_key_oda_net_disbursements: &description_key_oda_net_disbursements
@@ -207,10 +207,11 @@ definitions:
     - "{definitions.key_constant_usd}"
 
   description_key_by_donor: &description_key_by_donor
-    <% if donor == "Private donors" %>
-    *description_key_private_grants
-    <% else %>
-    *description_key_oda_net_disbursements
+    - <% if donor == "Private donors" %>{definitions.key_net_private_grants}<% else %>{definitions.key_oda}<% endif %>
+    - <% if donor == "Private donors" %>{definitions.key_private_reporting}<% else %>{definitions.key_net_disbursements}<% endif %>
+    - <% if donor == "Private donors" %>{definitions.key_net_disbursements}<% else %>{definitions.key_oda_coverage_limits}<% endif %>
+    - <% if donor == "Private donors" %>{definitions.key_constant_usd}<% else %>{definitions.key_constant_usd}<% endif %>
+    - <% if donor == "Private donors" %><% else %>{definitions.key_oda_list_of_countries}<% endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -702,7 +703,8 @@ tables:
         unit: "constant {definitions.inflation_year} US$"
         short_unit: "$"
         description_short: *description_short_by_donor
-        description_key: *description_key_by_donor
+        description_key:
+          - *description_key_by_donor
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Foreign aid received
