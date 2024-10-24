@@ -41,16 +41,9 @@ def get_shiny_data() -> str:
     """
 
     years = range(
-        2016, 2023
+        2016, 2022
     )  # Should change this to 2016,2023 but currently having some issues grabbing 2022 data as that is selected earlier in the page
     drop_down_dict = {
-        "BLOOD": {
-            "Acinetobacter spp.": ["Carbapenems"],
-            "Escherichia coli": ["Carbapenems", "Third-generation cephalosporins"],
-            "Klebsiella pneumoniae": ["Third-generation cephalosporins", "Carbapenems"],
-            "Staphylococcus aureus": ["Methicillin-resistance"],
-            "Streptococcus pneumoniae": ["Penicillins"],
-        },
         "STOOL": {
             "Salmonella spp.": ["Fluoroquinolones"],
             "Shigella spp.": ["Third-generation cephalosporins"],
@@ -69,6 +62,13 @@ def get_shiny_data() -> str:
                 "Sulfonamides and trimethoprim",
                 "Third-generation cephalosporins",
             ],
+        },
+        "BLOOD": {
+            "Acinetobacter spp.": ["Carbapenems"],
+            "Escherichia coli": ["Carbapenems", "Third-generation cephalosporins"],
+            "Klebsiella pneumoniae": ["Third-generation cephalosporins", "Carbapenems"],
+            "Staphylococcus aureus": ["Methicillin-resistance"],
+            "Streptococcus pneumoniae": ["Penicillins"],
         },
     }
 
