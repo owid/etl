@@ -49,5 +49,5 @@ tables:
         title: National surveillance system for antimicrobial resistance (AMR) in food (terrestrial and aquatic animal and plant origin)
         unit: ""
       monitoring_amr_water_6_3:
-        title: 6.3 Is there a system for regular monitoring (passive surveillance) of antimicrobial compounds and their metabolites (or residues) and resistant bacteria or antimicrobial resistance genes (ARGs) in water quality?
+        title: Is there a system for regular monitoring (passive surveillance) of antimicrobial compounds and their metabolites (or residues) and resistant bacteria or antimicrobial resistance genes (ARGs) in water quality?
         unit: ""
