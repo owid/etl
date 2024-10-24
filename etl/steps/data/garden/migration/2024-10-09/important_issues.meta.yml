@@ -1,0 +1,29 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  important_issues:
+    variables:
+      share_issue_personal:
+        title: Share of people in Britain for whom this is an important issue they personally face
+        unit: "%"
+        short_unit: "%"
+        description_short: 'Share of people who name this issue when asked "What do you see as the main or other important issues facing you personally today?"'
+      share_issue_britain:
+        title: Share of people in Britain for whom this is an important issue Britain faces
+        unit: "%"
+        short_unit: "%"
+        description_short: 'Share of people who name this issue when asked "What do you see as the main or other important issues facing Britain today?"'
+
+

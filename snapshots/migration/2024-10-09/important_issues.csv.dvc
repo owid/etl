@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Ipsos Issues Index
+    description: |-
+      The Ipsos Issues Index is a survey, which aims to identify the concerns of the British people since 1974. It usually includes a panel of ~1000 people and asks them to name the most important issues to Britain at that point in time.
+    date_published: "2024-10-08"
+    version_producer: September 2024
+
+    # Citation
+    producer: Ipsos
+    citation_full: |-
+      Ipsos Issues Index, September 2024, Ipsos, https://www.ipsos.com/en-uk/nhs-has-been-biggest-issue-britain-over-past-50-years (2024)
+    attribution_short: Ipsos
+
+    # Files
+    url_main: https://www.ipsos.com/en-uk/nhs-has-been-biggest-issue-britain-over-past-50-years
+    date_accessed: 2024-10-09
+
+    # License
+    license:
+      name: © 2016 - 2024 Ipsos
+      url: https://www.ipsos.com/en-uk/nhs-has-been-biggest-issue-britain-over-past-50-years
+
+outs:
+  - md5: d787a35494986c7c12340118d3d9b47d
+    size: 261
+    path: important_issues.csv
