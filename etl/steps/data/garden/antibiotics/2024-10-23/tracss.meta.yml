@@ -28,6 +28,13 @@ tables:
       monitoring_consumption_human_3_2:
         title: National monitoring system for consumption and rational use of antimicrobials in human health
         unit: ""
+        type: ordinal
+        sort:
+            - No monitoring system
+            - National monitoring of antimicrobial sales and antibiotic use in health services
+            - National monitoring of antimicrobial sales and some monitoring of antibiotic use at sub-national level
+            - Prescribing practices and appropriate antibiotic use monitored in a sample of healthcare settings
+            - Regular data collection and reporting
       amr_surveillance_human_3_3:
         title: National surveillance system for antimicrobial resistance (AMR) in humans
         unit: ""
@@ -49,12 +56,33 @@ tables:
       surveillance_amr_terrestrial_4_7:
         title: National surveillance system for antimicrobial resistance (AMR) in live terrestrial animals
         unit: ""
+        type: ordinal
+        sort:
+            - No national plan for AMR surveillance system
+            - National plan for AMR surveillance but lacking capacities
+            - AMR data collected at local levels but no standardized approach
+            - Priority bacterial species identified for surveillance
+            - National system of AMR surveillance established for priority animal pathogens, high quality assurance processes
       surveillance_amr_aquatic_4_8:
         title: National surveillance system for antimicrobial resistance (AMR) in live aquatic animals
         unit: ""
+        type: ordinal
+        sort:
+            - No national plan for AMR surveillance system
+            - National plan for AMR surveillance but lacking capacities
+            - AMR data collected at local levels but no standardized approach
+            - Priority bacterial species identified for surveillance
+            - National system of AMR surveillance established for priority animal pathogens, high quality assurance processes
       surveillance_amr_food_5_3:
         title: National surveillance system for antimicrobial resistance (AMR) in food (terrestrial and aquatic animal and plant origin)
         unit: ""
+        type: ordinal
+        sort:
+            - No national plan for AMR surveillance system
+            - National plan for AMR surveillance but lacking capacities
+            - AMR data collected but no standardized approach
+            - Priority foodborne pathogens identified for surveillance
+            - National system of AMR surveillance established for priority foodborne pathogens, high quality assurance processes
       monitoring_amr_water_6_3:
         title: Is there a system for regular monitoring (passive surveillance) of antimicrobial compounds and their metabolites (or residues) and resistant bacteria or antimicrobial resistance genes (ARGs) in water quality?
         unit: ""
