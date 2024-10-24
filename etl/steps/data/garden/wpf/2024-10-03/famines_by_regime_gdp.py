@@ -2,7 +2,6 @@
 
 
 import owid.catalog.processing as pr
-import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
 
