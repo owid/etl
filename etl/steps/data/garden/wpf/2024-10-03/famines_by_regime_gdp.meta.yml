@@ -1,0 +1,23 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Famines
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  famines:
+    variables:
+
+       wpf_authoritative_mortality_estimate:
+          title: Deaths from famines
+          description_short: The number of deaths from famines as estimated by the World Peace Foundation.
+          unit: 'deaths'
+          short_unit: ''
+          description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
