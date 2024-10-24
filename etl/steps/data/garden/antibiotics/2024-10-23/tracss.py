@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = shorten_survey_responses(tb)
-    tb = replace_blanks_with_na(tb)
+    tb = remove_spaces(tb)
     tb = tb.format(["country", "year"])
     # Adding origins back in to the columns
     for col in tb.columns:
@@ -117,7 +117,7 @@ def check_keys_exist(tb: Table, dict: Dict, col: str) -> None:
         raise ValueError(f"Some categories in the dictionary do not exist in the Series: {missing_keys}")
 
 
-def replace_blanks_with_na(tb: Table) -> Table:
+def remove_spaces(tb: Table) -> Table:
     # Some columns have blank spaces, remove the additional spaces
     # Skip country and year
 
