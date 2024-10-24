@@ -873,8 +873,7 @@ steps:
     - snapshot://antibiotics/2024-10-23/animuse_trends.csv
   data://garden/antibiotics/2024-10-23/animuse_trends:
     - data://meadow/antibiotics/2024-10-23/animuse_trends
-  data://grapher/antibiotics/2024-10-23/animuse_trends:
-    - data://garden/antibiotics/2024-10-23/animuse_trends
+  # Removing the grapher step as the data looks erroneous
   # Country level quanitities
   data://meadow/antibiotics/2024-10-23/animuse_country_level:
     - snapshot://antibiotics/2024-10-23/animuse_country_level.csv
