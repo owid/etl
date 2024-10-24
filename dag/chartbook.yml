@@ -229,6 +229,12 @@ steps:
   data://garden/chartbook/2024-08-20/soepmonitor_1984_2013_germany:
     - data://meadow/chartbook/2024-08-20/soepmonitor_1984_2013_germany
 
+  # Atkinson data from The Changing Distribution of Earnings in OECD Countries (2008)
+  data://meadow/chartbook/2024-10-24/atkinson_2008_germany:
+    - snapshot://chartbook/2024-10-24/atkinson_2008_germany.xls
+  data://garden/chartbook/2024-10-24/atkinson_2008_germany:
+    - data://meadow/chartbook/2024-10-24/atkinson_2008_germany
+
   ################################################################################################
   # UNITED KINGDOM
   ################################################################################################
