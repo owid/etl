@@ -4,7 +4,14 @@ tags:
 ---
 ## Sharing work with external people
 
-Sometimes it's useful to share our work with external people to get feedback before publishing it to the public. Staging servers can be made available to public by creating a branch with `-public` suffix. This will make the staging site available at https://staging-site-my-branch.tail6e23.ts.net.
+Sometimes it's useful to share our work with external people to get feedback before publishing it to the public. Staging servers can be made available to public by creating a branch with `-public` suffix. This will make the staging site available at **https://staging-site-my-branch.tail6e23.ts.net**.
+
+If you work on `my-branch` and create a `my-branch-public` branch, you'll have to sync your charts there with
+```bash
+etl chart-sync my-branch my-branch-public
+```
+If your charts don't appear on `https://staging-site-my-branch-public.tail6e23.ts.net/grapher/xyz`, try triggering manual deploy.
+
 
 ### Sharing explorers
 
