@@ -128,7 +128,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             if self.n_jobs == 1:
                 # Fit the Gaussian Process model and make predictions
                 z = self.fit_predict_z(X, y)
-                z = pd.DataFrame({"anomaly_score": np.abs(z), "year": group["year"].values}, index=group.index)
+                z = pd.DataFrame({"z": np.abs(z), "year": group["year"].values}, index=group.index)
                 results.append(z)
             else:
                 # Add it to a list for parallel processing
@@ -151,10 +151,10 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         df_score_long = pd.concat(results).reset_index()
 
         # Normalize the anomaly scores by mapping interval (0, 3+) to (0, 1)
-        # df_score_long["anomaly_score"] = np.minimum(df_score_long["anomaly_score"] / 3, 1)
+        # df_score_long["anomaly_score"] = np.minimum(df_score_long["z"] / 3, 1)
 
         # Convert z-score into p-value
-        df_score_long["p_value"] = 2 * (1 - norm.cdf(np.abs(df_score_long["anomaly_score"])))
+        df_score_long["p_value"] = 2 * (1 - norm.cdf(np.abs(df_score_long["z"])))
 
         # Adjust p-values for multiple testing
         df_score_long["adj_p_value"] = df_score_long.groupby(["entity_name", "variable_id"]).p_value.transform(
@@ -164,7 +164,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         # Final score is 1 - p-value
         df_score_long["anomaly_score"] = 1 - df_score_long["adj_p_value"]
 
-        return df_score_long.drop(columns=["p_value", "adj_p_value"])
+        return df_score_long.drop(columns=["p_value", "adj_p_value", "z"])
 
     @staticmethod
     def _fit_parallel(obj: "AnomalyGaussianProcessOutlier", X, y, group, start_time):
@@ -172,7 +172,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         if obj.max_time and (time.time() - start_time) > obj.max_time:
             return pd.DataFrame()
         z = obj.fit_predict_z(X, y)
-        z = pd.DataFrame({"anomaly_score": np.abs(z), "year": group["year"].values}, index=group.index)
+        z = pd.DataFrame({"z": np.abs(z), "year": group["year"].values}, index=group.index)
         return z
 
     def get_Xy(self, series: pd.Series) -> tuple[np.ndarray, np.ndarray]:
