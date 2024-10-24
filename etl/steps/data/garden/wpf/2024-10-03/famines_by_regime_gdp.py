@@ -51,6 +51,12 @@ def run(dest_dir: str) -> None:
     # Read regions
     ds_regime = paths.load_dataset("vdem")
 
+    # Read GDP
+    ds_gdp = paths.load_dataset("maddison_project_database")
+    tb_gdp = ds_gdp["maddison_project_database"].reset_index()
+
+    tb_gdp = tb_gdp[["year", "country", "gdp_per_capita"]]
+
     # Read table from meadow dataset.
     tb_famines = ds_garden["famines"].reset_index()
 
@@ -71,7 +77,7 @@ def run(dest_dir: str) -> None:
 
     tb = pr.merge(tb_famines, reduced_regime, on=["country", "year"], how="left")
 
-    # Function to match rows based on Country and Year, and assign "Autocracy"
+    # Assign regime values based on the CUSTOM_REGIMES dictionary
     def assign_regime(row):
         for (countries, years), regime in CUSTOM_REGIMES.items():
             # Ensure years is always iterable
@@ -87,6 +93,12 @@ def run(dest_dir: str) -> None:
 
     # Ensure there are no NaNs in the 'region' column
     assert not tb["regime_redux_row_owid"].isna().any(), "There are NaN values in the 'regime_redux_row_owid' column"
+
+    tb = pr.merge(tb, tb_gdp, on=["country", "year"], how="left")
+    print(tb)
+    # Identify rows where 'regime_redux_row_owid' is still NaN
+    nan_rows = tb[tb["gdp_per_capita"].isna()]
+    print(nan_rows)
 
     tb = tb.format(["famine_name", "year"])
 

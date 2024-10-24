@@ -831,6 +831,7 @@ steps:
   data://garden/wpf/2024-10-03/famines_by_regime_gdp:
     - data://garden/wpf/2024-10-03/famines
     - data://garden/democracy/2024-03-07/vdem
+    - data://garden/ggdc/2024-04-26/maddison_project_database
 
 include:
   - dag/open_numbers.yml
