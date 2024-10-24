@@ -92,12 +92,9 @@ def add_regime(tb_famines, ds_regime):
     tb_regime = ds_regime["vdem"].reset_index()
 
     reduced_regime = tb_regime[["country", "year", "regime_redux_row_owid"]]
-    reduced_regime["regime_redux_row_owid"] = reduced_regime["regime_redux_row_owid"].astype(str)
+
     # Combine autocracies
-    reduced_regime.loc[
-        reduced_regime["regime_redux_row_owid"].isin(["0", "1"]), "regime_redux_row_owid"
-    ] = "Autocracies"
-    reduced_regime.loc[reduced_regime["regime_redux_row_owid"] == "2", "regime_redux_row_owid"] = "Democracies"
+    reduced_regime.loc[reduced_regime["regime_redux_row_owid"].isin([0, 1]), "regime_redux_row_owid"] = 3
 
     tb = pr.merge(tb_famines, reduced_regime, on=["country", "year"], how="left")
 
@@ -118,7 +115,6 @@ def add_regime(tb_famines, ds_regime):
     # Ensure there are no NaNs in the 'region' column
     assert not tb["regime_redux_row_owid"].isna().any(), "There are NaN values in the 'regime_redux_row_owid' column"
 
-    tb["regime_redux_row_owid"] = tb["regime_redux_row_owid"].astype(str)
     return tb
 
 
