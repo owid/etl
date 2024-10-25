@@ -11,12 +11,11 @@ The main structure of the app is implemented. Its main logic is:
 
 TODO:
 - Test with upgrade flow more extensively.
-- What happens with data that do not have years (e.g. dates)?
+- For datasets that use dates instead of years, Anomalist works, but it still shows "year". It would be good to show the correct dates instead.
 - We can infer if the anomalies are out of sync (because user has updated the data) by checking the dataset checksum. NOTE: checksum might change bc of metadata changes, so might show several false positives.
 - Further explore LLM summary:
     - We should store the LLM summary in the DB. We need a new table for this. Each summary is associated with a set of anomalies (Anomaly table), at a precise moment. We should detect out-of-sync here too.
 - Hiding capabilities. Option to hide anomalies would be great. Idea: have a button in each anomaly box to hide it. We need a register of the hidden anomalies. We then could have a st.popover element in the filter section which only appears if there are anomalies hidden. Then, we can list them there, in case the user wants to unhide some.
-- New dataset detection. We should explore if this can be done quicker.
 
 """
 
