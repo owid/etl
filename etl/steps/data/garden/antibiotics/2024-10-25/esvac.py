@@ -23,6 +23,8 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+    # Multiply share columns by 100 to convert them to percentages.
+    tb.loc[:, tb.columns.str.contains("share")] *= 100
     tb = tb.format(["country", "year"])
 
     #

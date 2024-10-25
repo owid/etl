@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tables.format(["country", "year"])
+    tb = tables.format(["country", "year"], short_name="esvac")
 
     #
     # Save outputs.
