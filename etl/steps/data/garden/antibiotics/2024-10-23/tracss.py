@@ -2,6 +2,7 @@
 
 from typing import Dict
 
+import pandas as pd
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -121,5 +122,6 @@ def remove_spaces(tb: Table) -> Table:
     # Skip country and year
 
     for col in tb.columns[2:]:
-        tb[col] = tb[col].cat.rename_categories({" ": ""})
+        tb[col] = tb[col].astype(str)
+        tb[col] = tb[col].replace(r"^\s*$", pd.NA, regex=True)
     return tb
