@@ -468,75 +468,63 @@ def _change_chart_selection(df, key_table, key_selection):
 def _score_table(df: pd.DataFrame, df_all: pd.DataFrame, indicator_id: int) -> pd.DataFrame:
     """Return a table of scores and other useful columns for a given indicator. Return styled dataframe."""
     # Filter df_all for the given indicator
-    gf = df_all[df_all.indicator_id == indicator_id]
+    df_show = df_all[df_all.indicator_id == indicator_id]
+    # Columns in df_all:
+    # ['entity_name', 'year', 'indicator_id', 'score', 'score_scale', 'type', 'population', 'score_population', 'views', 'score_analytics', 'score_weighted']
 
-    # Pivot to get score columns, but exclude score_population and score_analytics for now
-    gf_pivot = gf.pivot(index=["entity_name", "year"], columns=["type"], values="score").add_prefix("score_")
-    gf_pivot = gf_pivot.groupby("entity_name").max().reset_index()
+    # Select certain columns, and rename them.
+    df_show = df_show.drop(columns=["type", "indicator_id"]).rename(
+        columns={"score": "score_anomaly", "score_weighted": "score_relevance", "entity_name": "entity"}
+    )
 
-    # Merge the additional columns like score_population and score_analytics directly
-    gf_extra = gf[["entity_name", "score_population", "score_analytics"]].drop_duplicates()
-    gf = gf_pivot.merge(gf_extra, on="entity_name", how="left")
+    # Store population and analytics scores for later use.
+    score_population = df_show["score_population"].copy()
+    score_analytics = df_show["score_analytics"].copy()
 
-    # Select columns to display and add scores of all detectors
-    cols = ["entity_name", "score_weighted", "views", "population"]
-    df_show = df[cols].merge(gf, on="entity_name", how="left").rename(columns={"entity_name": "entity"})
-
-    # Add columns that show both population and score.
+    # Create a column that shows both population and population score, and another one for views and analytics score.
     df_show["population_and_score"] = df_show.apply(
         lambda row: f"{row['score_population']:.0%} ({pretty_print_number(row['population'])})", axis=1
     )
-    df_show = df_show.drop(columns=["population"])
     df_show["analytics_and_score"] = df_show.apply(
         lambda row: f"{row['score_analytics']:.0%} ({pretty_print_number(row['views'])})", axis=1
     )
-    df_show = df_show.drop(columns=["views"])
+    df_show = df_show.drop(columns=["population", "score_population", "views", "score_analytics"])
 
-    # Arrange columns to put views and population at the end
+    # Rearrange and rename columns more conveniently.
     df_show = df_show[
-        [c for c in df_show.columns if c not in ("analytics_and_score", "population_and_score")]
-        + ["analytics_and_score", "population_and_score"]
+        [
+            "entity",
+            "year",
+            "score_relevance",
+            "score_anomaly",
+            "score_scale",
+            "population_and_score",
+            "analytics_and_score",
+        ]
     ]
-
-    # Identify score columns for background gradient
-    score_cols = [
-        c.replace("score_", "")
-        for c in df_show.columns
-        if c.startswith("score")
-        if c not in ["score_analytics", "score_population"]
-    ]
-
-    # Final touches.
     df_show = df_show.rename(columns={column: column.replace("score_", "") for column in df_show.columns})
-    score_population = df_show["population"].copy()
-    score_analytics = df_show["analytics"].copy()
-    df_show = df_show.drop(columns=["analytics", "population"]).rename(
-        columns={"population_and_score": "population", "analytics_and_score": "views"}
-    )
+    df_show = df_show.rename(columns={"population_and_score": "population", "analytics_and_score": "views"})
 
-    # Apply styling
-    df_style = df_show.style.format("{:.0%}", subset=score_cols).background_gradient(
-        subset=score_cols,
+    # Apply styling to columns that only show percentages.
+    df_style = df_show.style.format("{:.0%}", subset=["relevance", "anomaly", "scale"]).background_gradient(
+        subset=["relevance", "anomaly", "scale"],
         vmin=0,
         vmax=1,
     )
 
-    # Apply background gradient to "views" based on "score_analytics" and "population" based on "score_population"
-    if "views" in df_show.columns:
-        df_style = df_style.background_gradient(
-            subset=["views"],
-            gmap=score_analytics,
-            vmin=0,
-            vmax=1,
-        )
-
-    if "population" in df_show.columns:
-        df_style = df_style.background_gradient(
-            subset=["population"],
-            gmap=score_population,
-            vmin=0,
-            vmax=1,
-        )
+    # Apply styling to special columns population and views.
+    df_style = df_style.background_gradient(
+        subset=["population"],
+        gmap=score_population,
+        vmin=0,
+        vmax=1,
+    )
+    df_style = df_style.background_gradient(
+        subset=["views"],
+        gmap=score_analytics,
+        vmin=0,
+        vmax=1,
+    )
 
     return df_style
 
