@@ -25,7 +25,7 @@ from typing import List, Tuple, Union, cast
 import pandas as pd
 import streamlit as st
 
-from apps.anomalist.anomalist_api import anomaly_detection, load_detector
+from apps.anomalist.anomalist_api import anomaly_detection, load_detector, pretty_print_number
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens, get_number_tokens
 from apps.wizard.app_pages.anomalist.utils import (
     AnomalyTypeEnum,
@@ -466,31 +466,68 @@ def _change_chart_selection(df, key_table, key_selection):
 
 
 def _score_table(df: pd.DataFrame, df_all: pd.DataFrame, indicator_id: int) -> pd.DataFrame:
-    """Return a table of scores and other useful columns for a given indicator. Return
-    styled dataframe."""
-    # Get scores of anomalies for the same indicator
+    """Return a table of scores and other useful columns for a given indicator. Return styled dataframe."""
+    # Filter df_all for the given indicator
     gf = df_all[df_all.indicator_id == indicator_id]
-    gf = gf.pivot(index=["entity_name", "year"], columns=["type"], values=["score"])["score"].add_prefix("score_")
-    gf = gf.groupby(["entity_name"]).max().reset_index()
+
+    # Pivot to get score columns, but exclude score_population and score_analytics for now
+    gf_pivot = gf.pivot(index=["entity_name", "year"], columns=["type"], values="score").add_prefix("score_")
+    gf_pivot = gf_pivot.groupby("entity_name").max().reset_index()
+
+    # Merge the additional columns like score_population and score_analytics directly
+    gf_extra = gf[["entity_name", "score_population", "score_analytics"]].drop_duplicates()
+    gf = gf_pivot.merge(gf_extra, on="entity_name", how="left")
 
     # Select columns to display and add scores of all detectors
     cols = ["entity_name", "score_weighted", "views", "population"]
-    df_show = df[cols].merge(gf, on=["entity_name"], how="left")
+    df_show = df[cols].merge(gf, on="entity_name", how="left")
 
-    # Put views and population columns at the end
-    df_show = df_show[[c for c in df_show.columns if c not in ("views", "population")] + ["views", "population"]]
+    # Add columns that show both population and score.
+    df_show["population_and_score"] = df_show.apply(
+        lambda row: f"{row['score_population']:.0%} ({pretty_print_number(row['population'])})", axis=1
+    )
+    df_show = df_show.drop(columns=["population"])
 
-    score_cols = [c for c in df_show if "score" in c]
+    # Arrange columns to put views and population at the end
+    df_show = df_show[
+        [c for c in df_show.columns if c not in ("views", "population_and_score")] + ["views", "population_and_score"]
+    ]
+
+    # Identify score columns for background gradient
+    score_cols = [c.replace("score_", "") for c in df_show.columns if c.startswith("score") if c != "score_population"]
+
+    # Final touches.
+    df_show = df_show.rename(columns={column: column.replace("score_", "") for column in df_show.columns})
+    score_population = df_show["population"].copy()
+    df_show = df_show.drop(columns=["population"]).rename(columns={"population_and_score": "population"})
+
+    # Apply styling
     df_style = (
         df_show.style.format("{:.2f}", subset=score_cols)
         .format("{:,.0f}", subset=["views"])
-        .format(subset=["population"], formatter=lambda x: f"{x / 1_000_000:,.1f}M")
         .background_gradient(
             subset=score_cols,
             vmin=0,
             vmax=1,
         )
     )
+
+    # Apply background gradient to "views" based on "score_analytics" and "population" based on "score_population"
+    if "analytics" in df_show.columns:
+        df_style = df_style.background_gradient(
+            subset=["views"],
+            gmap=df_show["analytics"],
+            vmin=0,
+            vmax=1,
+        )
+
+    if "population" in df_show.columns:
+        df_style = df_style.background_gradient(
+            subset=["population"],
+            gmap=score_population,
+            vmin=0,
+            vmax=1,
+        )
 
     return df_style
 

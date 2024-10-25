@@ -113,15 +113,17 @@ def renormalize_score(
 
 
 # Function to format population numbers.
-def _pretty_print(number):
+def pretty_print_number(number):
     if number >= 1e9:
-        return f"~{number/1e9:.1f}B"
+        return f"{number/1e9:.1f}B"
     elif number >= 1e6:
-        return f"~{number/1e6:.1f}M"
+        return f"{number/1e6:.1f}M"
     elif number >= 1e3:
-        return f"~{number/1e3:.1f}k"
+        return f"{number/1e3:.1f}k"
+    elif pd.isna(number):
+        return "?"
     else:
-        return f"~{int(number)}"
+        return f"{int(number)}"
 
 
 def print_population_score_examples(df_score_population: pd.DataFrame) -> None:
@@ -138,7 +140,7 @@ def print_population_score_examples(df_score_population: pd.DataFrame) -> None:
         sorted_df = _df.sort_values(by=["score_diff", "population"], ascending=[True, False])
         closest_row = sorted_df.iloc[0]
         score_str = f"{closest_row['score_population']:.1f}"
-        population_str = _pretty_print(closest_row["population"])
+        population_str = pretty_print_number(closest_row["population"])
         output_list.append(f"* {closest_row['entity_name']} (population {population_str}): ~{score_str}")
 
     # Also, for reference, include some important reference regions.
@@ -158,7 +160,9 @@ def print_population_score_examples(df_score_population: pd.DataFrame) -> None:
     ]:
         _df_country = _df[_df["entity_name"] == region]
         score_str = f"{_df_country['score_population'].item():.2f}"
-        output_list.append(f"* {region} (population {_pretty_print(_df_country['population'].item())}): ~{score_str}")
+        output_list.append(
+            f"* {region} (population {pretty_print_number(_df_country['population'].item())}): ~{score_str}"
+        )
 
     # Print the output list.
     for line in output_list:
@@ -291,7 +295,7 @@ def print_views_score_examples(df_score_analytics: pd.DataFrame) -> None:
 
         # Append the formatted string to the output list.
         output_list.append(
-            f"* {_pretty_print(unique_variables_count)} variables with maximum views {_pretty_print(max_views)} have a score {interval_str}"
+            f"* {pretty_print_number(unique_variables_count)} variables with maximum views {pretty_print_number(max_views)} have a score {interval_str}"
         )
 
     # Print the output list.
