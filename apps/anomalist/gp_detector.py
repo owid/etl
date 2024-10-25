@@ -261,10 +261,19 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         plt.show()
 
     def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
-        # Create a dataframe of ones.
-        df_scale = df.copy()
-        # NOTE: Ideally, instead of 1, it should be the difference between a value and the mean, divided by the range of values of the variable. But that may be hard to implement in an efficient way.
-        df_scale[df.columns.difference(["entity_name", "year"])] = 1
+        # NOTE: Ideally, for this detector, the scale should be the difference between a value and the mean, divided by the range of values of the variable. But calculating that may be hard to implement in an efficient way.
+
+        # Create a dataframe of zeros.
+        df_scale = self.get_zeros_df(df, variable_ids)
+
+        for variable_id in variable_ids:
+            # The scale is given by the size of changes in consecutive points (for a given country), as a fraction of the maximum range of values of that variable.
+            df_scale[variable_id] = df[variable_id].diff().fillna(0) / (df[variable_id].max() - df[variable_id].min())
+
+        # The previous procedure includes the calculation of the deviation between the last point of an entity and the first point of the next, which is meaningless.
+        # Therefore, make zero the first point of each entity_name for all columns.
+        df_scale.loc[df_scale["entity_name"] != df_scale["entity_name"].shift(), variable_ids] = 0
+
         # Since this anomaly detector return a long dataframe, we need to melt it.
         df_scale = df_scale.melt(id_vars=["entity_name", "year"], var_name="variable_id", value_name="score_scale")
 
