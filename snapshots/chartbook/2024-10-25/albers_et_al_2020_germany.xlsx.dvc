@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The Distribution of Wealth in Germany, 1895-2018
+    description: |-
+      This paper presents the first comprehensive study of the long-run evolution of wealth inequality in Germany. We combine tax data, surveys, national accounts and rich lists to study the distribution of wealth in Germany from 1895 to 2018. We show that the concentration of wealth in the hands of the top 1% has fallen by half, from close to 50% in 1895 to less than 25% today. The interwar period, as well as World War II and its aftermath, stand out as the great equalizers in 20th century German history. Since unification, two off-setting trends have shaped the German wealth distribution. Households at the top made substantial capital gains from rising equity valuations that were counterbalanced by large middle-class capital gains from rising house prices. Since 1993, wealth of the top 10% and of the middle class(50-90%) approximately doubled in real terms. However, these asset price-induced gains in business and housing wealth almost entirely by-passed households in the bottom half of the wealth distribution who do not own these assets. Wealth of the bottom 50% of the population has stagnated since 1993 and their share in total wealth has nearly halved. The wealth gap between households in the bottom and the upper half has widened significantly. In 1993, households in the top 10% were about 50 times richer than households in the bottom half. Today, they are 100 times richer. Finally, we also show that official statistics underestimate privately held German business wealth and real estate wealth.
+    date_published: "2020"
+
+    # Citation
+    producer: Albers et al.
+    citation_full: |-
+      Albers, T. N., Bartels, C., & Schularick, M. (2020). The distribution of wealth in Germany, 1895-2018 (No. 001). ECONtribute Policy Brief.
+
+    # Files
+    url_main: https://www.econstor.eu/handle/10419/268554
+    date_accessed: 2024-10-25
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.econstor.eu/handle/10419/268554
+
+outs:
+  - md5: 9cab83d78d4a79dd1e6d2f2f41a89998
+    size: 13266
+    path: albers_et_al_2020_germany.xlsx

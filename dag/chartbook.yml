@@ -241,6 +241,12 @@ steps:
   data://garden/chartbook/2024-10-24/becker_1997_germany_relative_poverty:
     - data://meadow/chartbook/2024-10-24/becker_1997_germany_relative_poverty
 
+  # Wealth inequality data from Albers et al. (2020)
+  data://meadow/chartbook/2024-10-25/albers_et_al_2020_germany:
+    - snapshot://chartbook/2024-10-25/albers_et_al_2020_germany.xlsx
+  data://garden/chartbook/2024-10-25/albers_et_al_2020_germany:
+    - data://meadow/chartbook/2024-10-25/albers_et_al_2020_germany
+
   ################################################################################################
   # UNITED KINGDOM
   ################################################################################################
