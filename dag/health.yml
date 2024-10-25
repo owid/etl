@@ -859,3 +859,9 @@ steps:
     - data://meadow/cancer/2024-10-13/gco_cancer_today_cervical
   data://grapher/cancer/2024-10-13/gco_cancer_today_cervical:
     - data://garden/cancer/2024-10-13/gco_cancer_today_cervical
+  data://meadow/antibiotics/2024-10-25/esvac:
+    - snapshot://antibiotics/2024-10-25/esvac.zip
+  data://garden/antibiotics/2024-10-25/esvac:
+    - data://meadow/antibiotics/2024-10-25/esvac
+  data://grapher/antibiotics/2024-10-25/esvac:
+    - data://garden/antibiotics/2024-10-25/esvac
