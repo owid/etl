@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("esvac.zip")
+    snap = paths.load_snapshot("esvac_sales.zip")
 
     tables = Table()
     for year in range(2010, 2023):
@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tables.format(["country", "year"], short_name="esvac")
+    tb = tables.format(["country", "year"], short_name="esvac_sales")
 
     #
     # Save outputs.

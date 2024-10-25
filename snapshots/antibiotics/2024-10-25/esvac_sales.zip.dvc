@@ -25,4 +25,4 @@ meta:
 outs:
   - md5: b589523c0502adab3e9ffeb781712bb5
     size: 5750633
-    path: esvac.zip
+    path: esvac_sales.zip

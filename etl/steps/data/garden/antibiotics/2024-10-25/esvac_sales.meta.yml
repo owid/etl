@@ -13,7 +13,7 @@ dataset:
 
 
 tables:
-  esvac:
+  esvac_sales:
     variables:
       tablets_tonnes:
         title: Total sales of antimicrobial tablets

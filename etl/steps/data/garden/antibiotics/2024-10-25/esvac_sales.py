@@ -12,10 +12,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("esvac")
+    ds_meadow = paths.load_dataset("esvac_sales")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["esvac"].reset_index()
+    tb = ds_meadow["esvac_sales"].reset_index()
 
     #
     # Process data.
