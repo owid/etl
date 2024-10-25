@@ -176,8 +176,7 @@ def inspect_anomalies(
         anomaly_type = row["anomaly_type"]
         year = row["year"]
         title = f"{variable_title}<br>{variable_name}<br>{country}-{year}<br>"
-        title += f'{anomaly_type} - weighted score: {row["score_weighted"]:.0%} [emergency score: {row["score_emergency"]:.0%}] <br>'
-        title += f'anomaly: {row["score"]:.0%} | population: {row["score_population"]:.0%} | views: {row["score_analytics"]:.0%} | scale: {row["score_scale"]:.0%}<br>'
+        title += f'{anomaly_type} - weighted score: {row["score_weighted"]:.0%} | anomaly: {row["score"]:.0%} | scale: {row["score_scale"]:.0%} | population: {row["score_population"]:.0%} | views: {row["score_analytics"]:.0%}<br>'
         new = df_data[df_data["entity_name"] == row["entity_name"]][["entity_name", "year", variable_id]]
         new = new.rename(columns={row["indicator_id"]: variable_name}, errors="raise")
         if anomaly_type in ["upgrade_change", "upgrade_missing"]:
@@ -275,7 +274,7 @@ def main(dataset_id: int, anomaly_type: str, n_anomalies: int = 10) -> None:
         & (df["score_analytics"] > SCORE_ANALYTICS_THRESHOLD)
         & (df["score_scale"] > SCORE_SCALE_THRESHOLD)
         & (df["score_weighted"] > SCORE_WEIGHTED_THRESHOLD)
-    ].sort_values("score_emergency", ascending=False)
+    ].sort_values("score_weighted", ascending=False)
     inspect_anomalies(
         df=df_candidates,
         df_data=df_data,

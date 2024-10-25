@@ -433,10 +433,6 @@ def add_auxiliary_scores(df: pd.DataFrame) -> pd.DataFrame:
     # Create a weighted combined score.
     df = add_weighted_score(df)
 
-    # Create an emergency score: the product of all scores.
-    # This score should catch the most urgent cases (with low recall).
-    df["score_emergency"] = df["score"] * df["score_population"] * df["score_analytics"] * df["score_scale"]
-
     return df
 
 
