@@ -471,16 +471,17 @@ def _score_table(df: pd.DataFrame, df_all: pd.DataFrame, indicator_id: int) -> p
     gf = gf.groupby(["entity_name"]).max().reset_index()
 
     # Select columns to display and add scores of all detectors
-    cols = ["entity_name", "score_weighted", "views"]
+    cols = ["entity_name", "score_weighted", "views", "population"]
     df_show = df[cols].merge(gf, on=["entity_name"], how="left")
 
-    # Put views column at the end
-    df_show = df_show[[c for c in df_show.columns if c != "views"] + ["views"]]
+    # Put views and population columns at the end
+    df_show = df_show[[c for c in df_show.columns if c not in ("views", "population")] + ["views", "population"]]
 
     score_cols = [c for c in df_show if "score" in c]
     df_style = (
         df_show.style.format("{:.2f}", subset=score_cols)
         .format("{:,.0f}", subset=["views"])
+        .format(subset=["population"], formatter=lambda x: f"{x / 1_000_000:,.1f}M")
         .background_gradient(
             subset=score_cols,
             vmin=0,
@@ -754,7 +755,7 @@ if st.session_state.anomalist_df is not None:
         llm_ask(df)
 
         # st.dataframe(df_change)
-        groups = df.groupby(["indicator_id", "type"], sort=False)
+        groups = df.groupby(["indicator_id", "type"], sort=False, observed=True)
         items = list(groups)
         items_per_page = 10
 

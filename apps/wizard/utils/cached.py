@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 import streamlit as st
+from owid.catalog import find
 from sqlalchemy.orm import Session
 
 from apps.utils.map_datasets import get_grapher_changes
@@ -145,3 +146,19 @@ def get_datasets_from_version_tracker() -> Tuple[pd.DataFrame, List[Dict[str, An
         }
     )
     return steps_df_grapher, grapher_changes
+
+
+@st.cache_data(show_spinner=False)
+def load_latest_population():
+    # NOTE: The "channels" parameter of the find function is not working well.
+    candidates = find("population", channels=("grapher",), dataset="population", namespace="demography").sort_values(
+        "version", ascending=False
+    )
+    population = (
+        candidates[(candidates["table"] == "population") & (candidates["channel"] == "grapher")]
+        .iloc[0]
+        .load()
+        .reset_index()[["country", "year", "population"]]
+    ).rename(columns={"country": "entity_name"}, errors="raise")
+
+    return population
