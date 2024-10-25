@@ -1,9 +1,12 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    display:
+      numDecimalPlaces: 0
     presentation:
       topic_tags:
         - Famines
+
 
 
 # Learn more about the available fields:

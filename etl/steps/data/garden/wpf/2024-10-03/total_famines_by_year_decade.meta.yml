@@ -21,6 +21,8 @@ tables:
           description_short: The number of deaths from famines as estimated by the World Peace Foundation.
           unit: 'deaths'
           short_unit: ''
+          display:
+            numDecimalPlaces: 0
 
        decadal_famine_deaths:
           title: Deaths from famines by decade
@@ -28,13 +30,35 @@ tables:
           unit: 'deaths'
           short_unit: ''
           description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
+          display:
+            numDecimalPlaces: 0
 
        famine_deaths_per_rate:
           title: Death rates from famines
           description_short: The number of deaths from famines per 100,000 people as estimated by the World Peace Foundation.
           unit: 'deaths per 100,000 people'
+          display:
+            numDecimalPlaces: 0
 
        decadal_famine_deaths_rate:
           title: Death rates from famines by decade
           description_short: The number of deaths from famines per 100,000 people as estimated by the World Peace Foundation.
           unit: 'deaths per 100,000 people'
+          display:
+            numDecimalPlaces: 1
+
+       famine_count:
+        title: Number of famines
+        description_short: The number of famines as estimated by the World Peace Foundation.
+        unit: ''
+        short_unit: ''
+        display:
+          numDecimalPlaces: 0
+
+       decadal_famine_count:
+         title: Number of famines by decade
+         description_short: The number of famines as estimated by the World Peace Foundation.
+         unit: ''
+         short_unit: ''
+         display:
+            numDecimalPlaces: 0

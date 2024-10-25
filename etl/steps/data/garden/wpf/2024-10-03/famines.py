@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import re
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -11,7 +10,6 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Regions
 # Regions for which aggregates will be created.
 REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
 
@@ -55,14 +53,16 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # Process the cause columns to create new columns for Conflict, Government policy overall, and External factors.
     tb = process_causes(tb)
-    tb["conventional_title"] = tb["conventional_title"].apply(clean_title)
 
+    # Add regions to the table.
     tb = add_regions(tb, ds_regions)
+
     # Ensure there are no NaNs in the 'region' column
     assert not tb["region"].isna().any(), "There are NaN values in the 'region' column"
 
-    #  Split and convert the 'date' column to lists of integers
+    # Split and convert the 'date' column to lists of integers
     tb["date"] = tb["date"].astype(str)
     tb["date_list"] = tb["date"].apply(lambda x: [int(year) for year in x.split(",")])
 
@@ -73,6 +73,7 @@ def run(dest_dir: str) -> None:
     # Create a new column with famine names that combines dates and simplified places
     tb["famine_name"] = tb["simplified_place"] + " " + tb["date_range"]
 
+    # Add origins metadata to new columns.
     for col in [
         "wpf_authoritative_mortality_estimate",
         "conflict",
@@ -82,6 +83,7 @@ def run(dest_dir: str) -> None:
     ]:
         tb[col].metadata.origins = tb["conventional_title"].metadata.origins
 
+    # Drop columns that are not needed.
     tb = tb.drop(
         columns=["date_list", "date_range", "sub_region", "global_region", "conventional_title", "simplified_place"]
     )
@@ -155,15 +157,10 @@ def process_causes(tb):
     return tb
 
 
-def clean_title(title):
-    # Function to clean up titles by simplifying date ranges only
-    title = re.sub(r"\((\d{4})(,\d{4})+\)", lambda m: f"({m.group(1)}–{m.group(2)[-4:]})", title)
-    return title.strip()
-
-
 def add_regions(tb: Table, ds_regions: Dataset) -> Table:
-    "Add regions to the table."
-
+    """
+    Add regions to the famine data table.
+    """
     # First assign custom regions
     tb["region"] = tb["simplified_place"].map(CUSTOM_REGION_DICT)
 

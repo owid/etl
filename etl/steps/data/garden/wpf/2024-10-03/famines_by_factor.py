@@ -1,12 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
 
-import numpy as np
-import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Table
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -27,6 +23,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Select relevant columns.
     tb = tb[
         [
             "date",
@@ -37,7 +34,7 @@ def run(dest_dir: str) -> None:
             "region",
         ]
     ]
-
+    # Divide each row's 'wpf_authoritative_mortality_estimate' by the length of the corresponding 'Date' value to assume a uniform distribution of deaths over the period.
     tb["wpf_authoritative_mortality_estimate"] = tb.apply(
         lambda row: row["wpf_authoritative_mortality_estimate"] / len(row["date"].split(","))
         if pd.notna(row["date"])
@@ -45,13 +42,14 @@ def run(dest_dir: str) -> None:
         axis=1,
     )
 
+    # Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
     tb = tb.assign(date=tb["date"].str.split(",")).explode("date").drop_duplicates().reset_index(drop=True)
 
     tb = tb.rename(columns={"date": "year"})
     tb["year"] = tb["year"].astype(int)
-
     tb["region"] = tb["region"].astype("category")
 
+    # Create new columns for the sum of mortality estimates for where each cause was not (0) a factor.
     for factor in ["conflict", "government_policy_overall", "external_factors"]:
         new_column_name = f"sum_{factor}_mortality"
         tb[new_column_name] = tb.apply(

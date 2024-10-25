@@ -2,6 +2,7 @@
 
 
 import owid.catalog.processing as pr
+from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -47,32 +48,34 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_garden = paths.load_dataset("famines")
-
-    # Read regions
-    ds_regime = paths.load_dataset("vdem")
-
-    # Read GDP
-    ds_gdp = paths.load_dataset("maddison_project_database")
-    tb_gdp = ds_gdp["maddison_project_database"].reset_index()
-
-    tb_gdp = tb_gdp[["year", "country", "gdp_per_capita"]]
-
-    # Read table from meadow dataset.
     tb_famines = ds_garden["famines"].reset_index()
 
+    # Load regimes.
+    ds_regime = paths.load_dataset("vdem")
+
+    # Load GDP.
+    ds_gdp = paths.load_dataset("maddison_project_database")
+    tb_gdp = ds_gdp["maddison_project_database"].reset_index()
+    tb_gdp = tb_gdp[["year", "country", "gdp_per_capita"]]
+
+    # Split the 'date' column into separate rows for each year.
     tb_famines = (
         tb_famines.assign(date=tb_famines["date"].str.split(","))
         .explode("date")
         .drop_duplicates()
         .reset_index(drop=True)
     )
-
+    # Rename date to year.
     tb_famines = tb_famines.rename(columns={"date": "year"})
     tb_famines["year"] = tb_famines["year"].astype(int)
 
+    # Add regime data.
     tb = add_regime(tb_famines, ds_regime)
 
+    # Add GDP data.
     tb = add_gdp(tb, tb_gdp)
+
+    # Drop unused in this dataset columns columns.
     tb = tb.drop(columns=["country", "conflict", "government_policy_overall", "external_factors"])
     tb = tb.format(["famine_name", "year"])
 
@@ -88,7 +91,25 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_regime(tb_famines, ds_regime):
+def add_regime(tb_famines: Table, ds_regime: Dataset) -> Table:
+    """
+    Add regime information to the famines table by merging it with the regime dataset and applying custom regime rules.
+
+    Parameters:
+    tb_famines (Table): Table containing famine data.
+    ds_regime (Dataset): Dataset containing regime data, expected to have a key "vdem" with a DataFrame value.
+
+    Returns:
+    Table: The updated Table with regime information added.
+
+    The function performs the following steps:
+    1. Extracts the "vdem" DataFrame from the ds_regime dictionary and resets its index.
+    2. Reduces the regime DataFrame to only include the columns "country", "year", and "regime_redux_row_owid".
+    3. Combines autocracies by setting the "regime_redux_row_owid" value to 3 for rows where it is 0 or 1.
+    4. Merges the reduced regime DataFrame with the famines DataFrame on "country" and "year".
+    5. Applies custom regime rules defined in the CUSTOM_REGIMES dictionary to assign regime values.
+    6. Ensures there are no NaN values in the "regime_redux_row_owid" column.
+    """
     tb_regime = ds_regime["vdem"].reset_index()
 
     reduced_regime = tb_regime[["country", "year", "regime_redux_row_owid"]]
@@ -112,13 +133,43 @@ def add_regime(tb_famines, ds_regime):
     # Apply the function to assign regime values
     tb["regime_redux_row_owid"] = tb.apply(assign_regime, axis=1)
 
-    # Ensure there are no NaNs in the 'region' column
+    # Ensure there are no NaNs in the 'regime_redux_row_owid' column
     assert not tb["regime_redux_row_owid"].isna().any(), "There are NaN values in the 'regime_redux_row_owid' column"
 
     return tb
 
 
-def add_gdp(tb, tb_gdp):
+def add_gdp(tb: Table, tb_gdp: Table) -> Table:
+    """
+    Add GDP information to the famines table by merging it with the GDP dataset and applying custom GDP replacement rules.
+
+    Parameters:
+    tb (Table): Table containing famine data.
+    tb_gdp (Table): Table containing GDP data.
+
+    Returns:
+    Table: The updated Table with GDP information added.
+
+    The function performs the following steps:
+    1. Replaces 'Former Sudan' with 'Sudan' in the 'country' column of tb_gdp.
+    2. Merges the famine table (tb) with the GDP table (tb_gdp) on 'country' and 'year'.
+    3. Defines and applies replacement rules for specific countries and years, using either a reference year or an average GDP over a range of years.
+    4. Handles special cases for multiple countries, replacing GDP values for specified years with either a specific year's GDP or an average GDP.
+    5. Handles special cases for individual countries, replacing GDP values for the year 2023 with the GDP value from 2022.
+
+    Replacement Rules:
+    - For each country and specified years, replace the GDP value with the GDP from a reference year or the average GDP over a specified range of years.
+    - Special cases handle multiple countries and individual countries separately, ensuring accurate and consistent GDP data.
+
+    Example:
+    - For Cuba, the GDP values for the years 1895 to 1898 are replaced with the GDP value from 1892.
+    - For China, the GDP values for the years 1876 to 1879 are replaced with the average GDP from 1870 to 1887.
+    - Special cases include handling GDP values for "Russia, Kazakhstan" for the years 1932 to 1934 with the average GDP of the USSR from 1940 to 1946.
+
+    Returns:
+    - The updated famine table with the added and replaced GDP information.
+    """
+
     # Replace 'former Sudan' with 'Sudan' in the 'country' column of tb_gdp
     tb_gdp["country"] = tb_gdp["country"].replace("Former Sudan", "Sudan")
 
@@ -170,7 +221,7 @@ def add_gdp(tb, tb_gdp):
                 gdp_value = tb_gdp[(tb_gdp["country"] == "USSR") & (tb_gdp["year"] == year)]["gdp_per_capita"].values[0]
             replace_gdp(tb, tb_gdp, countries, [year], gdp_value)
 
-    # Special cases for individual countries
+    # Special cases for individual countries with GDP values for 2023 replaced with GDP values from 2022
     special_individual_cases = [
         {"country": "Central African Republic", "year": 2023, "ref_year": 2022},
         {"country": "Ethiopia", "year": 2023, "ref_year": 2022},
