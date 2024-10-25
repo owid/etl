@@ -24,7 +24,7 @@ from etl import grapher_model as gm
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
 from etl.files import create_folder, upload_file_to_server
-from etl.grapher_io import variable_data_df_from_catalog
+from etl.grapher_io import variable_data_table_from_catalog
 
 log = structlog.get_logger()
 
@@ -624,8 +624,10 @@ def export_anomalies_file(df: pd.DataFrame, dataset_id: int, anomaly_type: str) 
 
 
 def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.DataFrame:
-    # Load data from local catalog
-    df = variable_data_df_from_catalog(engine, variables=variables)
+    # Load data from local catalog.
+    # NOTE: Data is returned as a Table, which raises some warnings about units.
+    # For now, we do not need the metadata, so, convert to dataframe.
+    df = pd.DataFrame(variable_data_table_from_catalog(engine, variables=variables))
     df = df.rename(columns={"country": "entity_name"})
 
     # Define the list of columns that are not index columns.
@@ -635,8 +637,10 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     # NOTE: I'm not sure if this is necessary.
     df = df[INDEX_COLUMNS + data_columns]
 
-    # set non-numeric values to NaN
-    df[data_columns] = df[data_columns].apply(pd.to_numeric, errors="coerce")
+    # Set non-numeric values to NaN.
+    # Sometimes the dtypes include, e.g. UInt32, which can cause issues for the detectors.
+    # Convert all data columns to float.
+    df[data_columns] = df[data_columns].apply(pd.to_numeric, errors="coerce").astype(float)
 
     # remove variables with all nulls or all zeros or constant values
     # TODO: Is this necessary? It cases issues later, because certain variable ids are not found in df.
