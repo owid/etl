@@ -1,0 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Famines
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  famines_by_factor:
+    variables:
+     sum_conflict_mortality:
+       title: Deaths from famines where conflict was not a factor
+       unit: 'deaths'
+
+     sum_government_policy_overall_mortality:
+        title: Deaths from famines where government policy was not a factor
+        unit: 'deaths'
+
+     sum_external_factors_mortality:
+        title: Deaths from famines where external factors was not a factor
+        unit: 'deaths'
