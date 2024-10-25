@@ -3,6 +3,7 @@ definitions:
   common:
     display:
       numDecimalPlaces: 0
+    description_short: Famines that are estimated to have killed 100,000 people or more.
     presentation:
       topic_tags:
         - Famines

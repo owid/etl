@@ -1,6 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    description_short: Famines that are estimated to have killed 100,000 people or more.
     presentation:
       topic_tags:
         - Famines
@@ -17,10 +18,11 @@ tables:
 
        wpf_authoritative_mortality_estimate:
           title: Deaths from famines
-          description_short: The number of deaths from famines as estimated by the World Peace Foundation.
           unit: 'deaths'
           short_unit: ''
           description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
+          display:
+            numDecimalPlaces: 0
 
        region:
           title: Region
