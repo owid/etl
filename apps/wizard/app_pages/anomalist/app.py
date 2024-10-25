@@ -20,7 +20,7 @@ TODO:
 
 """
 
-from typing import List, Tuple, cast
+from typing import List, Tuple, Union, cast
 
 import pandas as pd
 import streamlit as st
@@ -77,15 +77,21 @@ ANOMALY_TYPES_TO_DETECT = tuple(ANOMALY_TYPES.keys())
 # GPT
 MODEL_NAME = "gpt-4o"
 
+# Map sorting strategy to name to show in UI.
 SORTING_STRATEGIES = {
     "relevance": "Relevance",
     "score": "Anomaly score",
     "scale": "Scale",
     "population": "Population",
     "views": "Chart views",
-    "scale+population": "Scale+population",
-    "scale+views": "Scale+views",
-    "population+views": "Population+views",
+}
+# Map sorting strategy to columns in the reduced scores dataframe.
+SORTING_COLUMNS = {
+    "relevance": "score_weighted",
+    "score": "score",
+    "scale": "score_scale",
+    "population": "score_population",
+    "views": "score_analytics",
 }
 
 # SESSION STATE
@@ -110,8 +116,8 @@ st.session_state.anomalist_filter_entities = st.session_state.get("anomalist_fil
 st.session_state.anomalist_filter_indicators = st.session_state.get("anomalist_filter_indicators", [])
 
 # Sorting
-st.session_state.anomalist_sorting_columns = st.session_state.get("anomalist_sorting_columns", [])
-st.session_state.anomalist_sorting_strategy = st.session_state.get("anomalist_sorting_strategy", "relevance")
+st.session_state.anomalist_sorting_columns = st.session_state.get("anomalist_sorting_columns", SORTING_COLUMNS.values())
+st.session_state.anomalist_sorting_strategy = st.session_state.get("anomalist_sorting_strategy", [])
 
 # FLAG: True to trigger anomaly detection manually
 st.session_state.anomalist_trigger_detection = st.session_state.get("anomalist_trigger_detection", False)
@@ -342,31 +348,15 @@ def _filter_df(
 
 
 @st.cache_data
-def _sort_df(df: pd.DataFrame, sort_strategy: str) -> Tuple[pd.DataFrame, List[str]]:
+def _sort_df(df: pd.DataFrame, sort_strategy: Union[str, List[str]]) -> Tuple[pd.DataFrame, list[str]]:
     """Used in filter_df."""
-    ## Sort
-    columns_sort = []
-    match sort_strategy:
-        case "relevance":
-            columns_sort = ["score_weighted"]
-        case "score":
-            columns_sort = ["score"]
-        case "scale":
-            columns_sort = ["score_scale"]
-        case "population":
-            columns_sort = ["score_population"]
-        case "views":
-            columns_sort = ["score_analytics"]
-        case "scale+population":
-            columns_sort = ["score_scale", "score_population"]
-        case "scale+views":
-            columns_sort = ["score_scale", "score_analytics"]
-        case "population+views":
-            columns_sort = ["score_population", "score_analytics"]
-        case _:
-            pass
-    if columns_sort != []:
-        df = df.sort_values(columns_sort, ascending=False)
+    if not sort_strategy:
+        columns_sort = list(SORTING_COLUMNS.values())
+    elif isinstance(sort_strategy, str):
+        columns_sort = [SORTING_COLUMNS[sort_strategy]]
+    else:
+        columns_sort = [SORTING_COLUMNS[_sort_strategy] for _sort_strategy in sort_strategy]
+    df = df.sort_values(columns_sort, ascending=False)
 
     return df, columns_sort
 
@@ -652,22 +642,20 @@ if st.session_state.anomalist_df is not None:
         with col1:
             cols = st.columns(2)
             with cols[0]:
-                st.selectbox(
+                url_persist(st.multiselect)(
                     label="Sort by",
                     options=SORTING_STRATEGIES.keys(),
                     format_func=SORTING_STRATEGIES.get,
+                    placeholder="Select sorting strategy",
                     help=(
                         """
                         Sort anomalies by a certain criteria.
 
-                        - **Relevance**: This is a combined score based on population in country, views of charts using this indicator, and anomaly-algorithm error score. The higher this score, the more relevant the anomaly.
+                        - **Relevance**: This is a combined score based on the anomaly score, the scale of the anomaly, the population in the country, and the views of charts using this indicator.
                         - **Anomaly score**: The anomaly detection algorithm assigns a score to each anomaly based on its significance.
                         - **Scale**: Scale score, based on how big the anomaly as a share of the range of values of the indicator.
                         - **Population**: Population score, based on the population in the affected country.
                         - **Views**: Views of charts using this indicator.
-                        - **Scale+Population**: Combined population and scale to rank.
-                        - **Scale+Views**: Combined scale and views to rank.
-                        - **Population+Views**: Combined population and views to rank.
                         """
                     ),
                     key="anomalist_sorting_strategy",
