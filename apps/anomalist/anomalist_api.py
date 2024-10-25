@@ -626,20 +626,27 @@ def export_anomalies_file(df: pd.DataFrame, dataset_id: int, anomaly_type: str) 
 def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.DataFrame:
     # Load data from local catalog
     df = variable_data_df_from_catalog(engine, variables=variables)
-    df = df.rename(columns={"country": "entity_name"}).set_index(["entity_name", "year"])
+    df = df.rename(columns={"country": "entity_name"})
 
-    # reorder in the same order as variables
-    df = df[[v.id for v in variables]]
+    # Define the list of columns that are not index columns.
+    data_columns = [v.id for v in variables]
+
+    # Reorder dataframe so that data columns are in the same order as the list of variables.
+    # NOTE: I'm not sure if this is necessary.
+    df = df[INDEX_COLUMNS + data_columns]
 
     # set non-numeric values to NaN
-    df = df.apply(pd.to_numeric, errors="coerce")
+    df[data_columns] = df[data_columns].apply(pd.to_numeric, errors="coerce")
 
     # remove variables with all nulls or all zeros or constant values
-    df = df.loc[:, df.fillna(0).std(axis=0) != 0]
+    # TODO: Is this necessary? It cases issues later, because certain variable ids are not found in df.
+    #  It may be better to leave columns of only nans.
+    # df = df.loc[:, df.fillna(0).std(axis=0) != 0]
 
-    df = df.reset_index().astype({"entity_name": str})
+    # Sort data (which may be needed for some detectors).
+    df = df.sort_values(INDEX_COLUMNS).reset_index(drop=True).astype({"entity_name": str})
 
-    return df  # type: ignore
+    return df
 
 
 # @memory.cache

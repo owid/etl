@@ -24,7 +24,7 @@ detectors_classes = {
     "time_change": detectors.AnomalyTimeChange,
     "one_class_svm": detectors.AnomalyOneClassSVM,
     "isolation_forest": detectors.AnomalyIsolationForest,
-    "gp": AnomalyGaussianProcessOutlier,
+    "gp_outlier": AnomalyGaussianProcessOutlier,
 }
 
 # Initialize logger.
@@ -112,6 +112,9 @@ def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Var
             .rename(columns={"entityName": "entity_name"}, errors="raise")
         )
 
+        # Sort rows (which may be necessary for some anomaly detectors).
+        df = df.sort_values(["entity_name", "year"]).reset_index(drop=True)
+
     return df, ds_variables
 
 
@@ -134,7 +137,7 @@ def get_all_necessary_data(dataset_id: int):
         }
     else:
         # Otherwise, create an empty dataframe.
-        df_old = pd.DataFrame()
+        df_old = pd.DataFrame(columns=["entity_name", "year"])
         variables_old = []
         variable_mapping = {}
 

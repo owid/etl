@@ -166,7 +166,7 @@ class AnomalyTimeChange(AnomalyDetector):
         assert (df.sort_values(by=INDEX_COLUMNS).index == df.index).all(), error
         for variable_id in variable_ids:
             # Calculate the BARD score for this variable.
-            series = df[variable_id].copy()
+            series = pd.to_numeric(df[variable_id], errors="coerce")
             eps = estimate_bard_epsilon(series=series)
             score = bard(series, series.shift(), eps).fillna(0)
 
@@ -184,8 +184,9 @@ class AnomalyTimeChange(AnomalyDetector):
         df_scale = self.get_zeros_df(df, variable_ids)
 
         for variable_id in variable_ids:
+            series = pd.to_numeric(df[variable_id], errors="coerce")
             # The scale is given by the size of changes in consecutive points (for a given country), as a fraction of the maximum range of values of that variable.
-            df_scale[variable_id] = df[variable_id].diff().fillna(0) / (df[variable_id].max() - df[variable_id].min())
+            df_scale[variable_id] = series.diff().fillna(0) / (series.max() - series.min())
 
         # The previous procedure includes the calculation of the deviation between the last point of an entity and the first point of the next, which is meaningless.
         # Therefore, make zero the first point of each entity_name for all columns.
