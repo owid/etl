@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
 
     for col in ["sum_conflict_mortality", "sum_government_policy_overall_mortality", "sum_external_factors_mortality"]:
         grouped_tb[col].metadata.origins = origins
-    print(grouped_tb)
+
     #
     # Save outputs.
     #

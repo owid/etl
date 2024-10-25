@@ -32,8 +32,9 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(subset=["wpf_authoritative_mortality_estimate"])
 
     # Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
-    tb = unravel_dates(tb)
+    tb = tb.assign(date=tb["date"].str.split(",")).explode("date").drop_duplicates().reset_index(drop=True)
 
+    # Rename columns for plotting
     tb = tb.rename({"country": "place", "famine_name": "country", "date": "year"}, axis=1)
     tb = tb.drop(columns=["place"])
     tb = tb.format(["country", "year"])
@@ -48,13 +49,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
-
-
-def unravel_dates(tb):
-    """
-    Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
-    """
-    # Split the 'date' column into multiple rows
-    tb = tb.assign(date=tb["date"].str.split(",")).explode("date").drop_duplicates().reset_index(drop=True)
-
-    return tb

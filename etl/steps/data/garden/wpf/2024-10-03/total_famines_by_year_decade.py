@@ -37,18 +37,11 @@ def run(dest_dir: str) -> None:
     )
 
     # Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
-    tb = unravel_dates(tb)
+    tb = tb.assign(date=tb["date"].str.split(",")).explode("date").drop_duplicates().reset_index(drop=True)
+
     tb = tb.rename(columns={"date": "year"})
     tb["year"] = tb["year"].astype(int)
     tb["region"] = tb["region"].astype("category")
-
-    # Grouping by 'year', 'region', 'conflict', 'government_policy_overall', 'external_factors' and counting the occurrences
-    famine_counts = tb.groupby(["year", "region"], observed=False).size().reset_index(name="famine_count")
-    # Creating a 'World' row by summing counts across unique regions for each group
-    famine_counts_world_only = tb.groupby(["year"]).size().reset_index(name="famine_count")
-    famine_counts_world_only["region"] = "World"
-    # Concatenating the world row data with the regional data
-    famine_counts_combined = pr.concat([famine_counts, famine_counts_world_only], ignore_index=True)
 
     # Grouping by relevant columns and summing the 'wpf_authoritative_mortality_estimate' for regional data
     deaths_counts = (
@@ -64,13 +57,7 @@ def run(dest_dir: str) -> None:
     deaths_counts_world_only["region"] = "World"
 
     # Concatenating the world row data with the regional data
-    deaths_counts_combined = pr.concat([deaths_counts, deaths_counts_world_only], ignore_index=True)
-
-    tb = pr.merge(
-        famine_counts_combined,
-        deaths_counts_combined,
-        on=["year", "region"],
-    )
+    tb = pr.concat([deaths_counts, deaths_counts_world_only], ignore_index=True)
 
     # Create a DataFrame with all years from 1870 to 2023
     all_years = pd.DataFrame({"year": range(1870, 2024)})
@@ -87,18 +74,16 @@ def run(dest_dir: str) -> None:
     # Merge this DataFrame with the existing data to ensure all years are present
     tb = pr.merge(tb, all_years_regions, on=["year", "region"], how="right")
 
-    # Fill NaN values in the 'famine_count' and 'famine_deaths' columns with zeros
-    tb["famine_count"] = tb["famine_count"].fillna(0)
+    # Fill NaN values in the 'famine_deaths' columns with zeros
     tb["famine_deaths"] = tb["famine_deaths"].fillna(0)
 
     # Calculate the decade
     tb["decade"] = (tb["year"] // 10) * 10
 
     # Group the data by region and decade, then calculate the decadal sum
-    for column in ["famine_count", "famine_deaths"]:
-        tb["decadal_" + column] = tb.groupby(["region", "decade"], observed=False)[column].transform("sum")
-        # Set NaN everywhere except the start of a decade
-        tb["decadal_" + column] = tb["decadal_" + column].where(tb["year"] % 10 == 0, np.nan)
+    tb["decadal_famine_deaths"] = tb.groupby(["region", "decade"], observed=False)["famine_deaths"].transform("sum")
+    # Set NaN everywhere except the start of a decade
+    tb["decadal_famine_deaths"] = tb["decadal_famine_deaths"].where(tb["year"] % 10 == 0, np.nan)
     tb = tb.drop(columns=["decade"])
 
     tb = tb.rename(columns={"region": "country"})
@@ -113,9 +98,7 @@ def run(dest_dir: str) -> None:
     tb = tb.format(["year", "country"], short_name=paths.short_name)
     tb = Table(tb, short_name=paths.short_name)
     for col in [
-        "famine_count",
         "famine_deaths",
-        "decadal_famine_count",
         "decadal_famine_deaths",
         "famine_deaths_per_rate",
         "decadal_famine_deaths_rate",
@@ -132,13 +115,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-
-def unravel_dates(tb):
-    """
-    Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
-    """
-    # Split the 'date' column into multiple rows
-    tb = tb.assign(date=tb["date"].str.split(",")).explode("date").drop_duplicates().reset_index(drop=True)
-
-    return tb

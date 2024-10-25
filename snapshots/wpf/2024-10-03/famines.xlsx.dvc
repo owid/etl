@@ -10,9 +10,9 @@ meta:
     date_published: "2024"
 
     # Citation
-    producer: World Peace Foundation.
+    producer: World Peace Foundation
     citation_full: |-
-      Historic Famines dataset. World Peace Foundation (2024). 
+      Historic Famines dataset. World Peace Foundation (2024).
 
     # Files
     url_main: https://worldpeacefoundation.org/

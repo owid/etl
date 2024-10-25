@@ -1,6 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
     presentation:
       topic_tags:
         - Famines
@@ -14,32 +15,25 @@ dataset:
 tables:
   total_famines_by_year_decade:
     variables:
-       famine_count:
-          title: Number of famines
-          description_short: The number of famines as estimated by the World Peace Foundation.
-          unit: 'famines'
-          short_unit: ''
+
        famine_deaths:
           title: Deaths from famines
           description_short: The number of deaths from famines as estimated by the World Peace Foundation.
           unit: 'deaths'
           short_unit: ''
-          description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
+
        decadal_famine_deaths:
           title: Deaths from famines by decade
           description_short: The number of deaths from famines as estimated by the World Peace Foundation.
           unit: 'deaths'
           short_unit: ''
           description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
-       decadal_famine_count:
-          title: Number of famines by decade
-          description_short: The number of famines as estimated by the World Peace Foundation.
-          unit: 'famines'
-          short_unit: ''
+
        famine_deaths_per_rate:
           title: Death rates from famines
           description_short: The number of deaths from famines per 100,000 people as estimated by the World Peace Foundation.
           unit: 'deaths per 100,000 people'
+
        decadal_famine_deaths_rate:
           title: Death rates from famines by decade
           description_short: The number of deaths from famines per 100,000 people as estimated by the World Peace Foundation.
