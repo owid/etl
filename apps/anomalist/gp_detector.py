@@ -14,6 +14,7 @@ from scipy.stats import norm
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, WhiteKernel
+from statsmodels.stats.multitest import multipletests
 from tqdm.auto import tqdm
 
 from apps.anomalist.detectors import AnomalyDetector
@@ -81,7 +82,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
     @staticmethod
     def get_text(entity: str, year: int) -> str:
-        return f"There are some outliers for {entity}! These were detected using Gaussian processes. There might be other data points affected."
+        return f"There are some outliers for {entity} in year {year}! These were detected using Gaussian processes. There might be other data points affected."
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Convert to long format
@@ -127,9 +128,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             if self.n_jobs == 1:
                 # Fit the Gaussian Process model and make predictions
                 z = self.fit_predict_z(X, y)
-                # Normalize score between 0 and 1.
-                z_normalized = 2 * norm.cdf(abs(z)) - 1
-                z = pd.DataFrame({"anomaly_score": z_normalized, "year": group["year"].values}, index=group.index)
+                z = pd.DataFrame({"z": np.abs(z), "year": group["year"].values}, index=group.index)
                 results.append(z)
             else:
                 # Add it to a list for parallel processing
@@ -151,7 +150,21 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         df_score_long = pd.concat(results).reset_index()
 
-        return df_score_long
+        # Normalize the anomaly scores by mapping interval (0, 3+) to (0, 1)
+        # df_score_long["anomaly_score"] = np.minimum(df_score_long["z"] / 3, 1)
+
+        # Convert z-score into p-value
+        df_score_long["p_value"] = 2 * (1 - norm.cdf(np.abs(df_score_long["z"])))
+
+        # Adjust p-values for multiple testing
+        df_score_long["adj_p_value"] = df_score_long.groupby(["entity_name", "variable_id"]).p_value.transform(
+            lambda p: multipletests(p, method="fdr_bh")[1]
+        )
+
+        # Final score is 1 - p-value
+        df_score_long["anomaly_score"] = 1 - df_score_long["adj_p_value"]
+
+        return df_score_long.drop(columns=["p_value", "adj_p_value", "z"])
 
     @staticmethod
     def _fit_parallel(obj: "AnomalyGaussianProcessOutlier", X, y, group, start_time):
@@ -159,7 +172,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         if obj.max_time and (time.time() - start_time) > obj.max_time:
             return pd.DataFrame()
         z = obj.fit_predict_z(X, y)
-        z = pd.DataFrame({"anomaly_score": np.abs(z), "year": group["year"].values}, index=group.index)
+        z = pd.DataFrame({"z": np.abs(z), "year": group["year"].values}, index=group.index)
         return z
 
     def get_Xy(self, series: pd.Series) -> tuple[np.ndarray, np.ndarray]:
@@ -205,7 +218,9 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         kernel = 1.0 * RBF(length_scale_bounds=length_scale_bounds) + WhiteKernel(noise_level_bounds=noise_level_bounds)
 
-        self.gp = gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=0)
+        # NOTE: using zero restarts speed it up, but may not find the best solution. Running it
+        # again with different random_state might give different results.
+        self.gp = gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=0, random_state=0)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", ConvergenceWarning)
             gp.fit(X_normalized, y_normalized)
@@ -222,13 +237,14 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         return mean_pred, std_pred
 
-    def viz(self, df: pd.DataFrame, meta: gm.Variable, country: Optional[str] = None):
+    def viz(self, df: pd.DataFrame, variable: gm.Variable, country: Optional[str] = None):
+        assert {"country", "year", variable.id} <= set(df.columns)
         if df.empty:
             log.warning("No data to visualize")
             return
 
-        country = country or random.choice(df.columns)
-        series = df[country].dropna()
+        country = country or random.choice(df["country"])
+        series = df[df.country == country].set_index("year")[variable.id]
 
         if len(series) <= 1:
             log.warning(f"Insufficient data for {country}")
@@ -253,12 +269,14 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             label=r"95% Confidence Interval",
         )
         plt.legend()
-        plt.title(f"{meta.name}: {country}")
+        plt.title(f"{variable.name}: {country}")
 
         z = (y - mean_prediction) / std_prediction
         print("Max Z-score: ", np.abs(z).max())
 
         plt.show()
+
+        return z
 
     def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # NOTE: Ideally, for this detector, the scale should be the difference between a value and the mean, divided by the range of values of the variable. But calculating that may be hard to implement in an efficient way.

@@ -363,10 +363,14 @@ def _sort_df(df: pd.DataFrame, sort_strategy: Union[str, List[str]]) -> Tuple[pd
 
 # Functions to show the anomalies
 @st.fragment
-def show_anomaly_compact(index, df):
+def show_anomaly_compact(index, df, df_all):
     """Show anomaly compactly.
 
     Container with all anomalies of a certain type and for a concrete indicator.
+
+    :param df: DataFrame with a single anomaly type and indicator
+    :param df_all: DataFrame containing all anomalies and indicators. Could be used to enhance
+        the output.
     """
     indicator_id, an_type = index
     row = 0
@@ -434,8 +438,10 @@ def show_anomaly_compact(index, df):
             # Other entities
             with st.container(border=False):
                 st.markdown("**Select** other affected entities")
+
                 st.dataframe(
-                    df[["entity_name"] + st.session_state.anomalist_sorting_columns],
+                    # df[["entity_name"] + st.session_state.anomalist_sorting_columns],
+                    _score_table(df, df_all, indicator_id),
                     selection_mode=["multi-row"],
                     key=key_table,
                     on_select=lambda df=df, key_table=key_table, key_selection=key_selection: _change_chart_selection(
@@ -457,6 +463,36 @@ def _change_chart_selection(df, key_table, key_selection):
 
     # Update entities in chart
     st.session_state[key_selection] = df.iloc[rows]["entity_name"].tolist()
+
+
+def _score_table(df: pd.DataFrame, df_all: pd.DataFrame, indicator_id: int) -> pd.DataFrame:
+    """Return a table of scores and other useful columns for a given indicator. Return
+    styled dataframe."""
+    # Get scores of anomalies for the same indicator
+    gf = df_all[df_all.indicator_id == indicator_id]
+    gf = gf.pivot(index=["entity_name", "year"], columns=["type"], values=["score"])["score"].add_prefix("score_")
+    gf = gf.groupby(["entity_name"]).max().reset_index()
+
+    # Select columns to display and add scores of all detectors
+    cols = ["entity_name", "score_weighted", "views", "population"]
+    df_show = df[cols].merge(gf, on=["entity_name"], how="left")
+
+    # Put views and population columns at the end
+    df_show = df_show[[c for c in df_show.columns if c not in ("views", "population")] + ["views", "population"]]
+
+    score_cols = [c for c in df_show if "score" in c]
+    df_style = (
+        df_show.style.format("{:.2f}", subset=score_cols)
+        .format("{:,.0f}", subset=["views"])
+        .format(subset=["population"], formatter=lambda x: f"{x / 1_000_000:,.1f}M")
+        .background_gradient(
+            subset=score_cols,
+            vmin=0,
+            vmax=1,
+        )
+    )
+
+    return df_style
 
 
 ######################################################################
@@ -715,7 +751,7 @@ if st.session_state.anomalist_df is not None:
         llm_ask(df)
 
         # st.dataframe(df_change)
-        groups = df.groupby(["indicator_id", "type"], sort=False)
+        groups = df.groupby(["indicator_id", "type"], sort=False, observed=True)
         items = list(groups)
         items_per_page = 10
 
@@ -728,7 +764,7 @@ if st.session_state.anomalist_df is not None:
 
         # Show items (only current page)
         for item in pagination.get_page_items():
-            show_anomaly_compact(item[0], item[1])
+            show_anomaly_compact(item[0], item[1], df_all=df)
 
         # Show controls only if needed
         if len(items) > items_per_page:
