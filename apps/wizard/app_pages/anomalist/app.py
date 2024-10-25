@@ -480,43 +480,52 @@ def _score_table(df: pd.DataFrame, df_all: pd.DataFrame, indicator_id: int) -> p
 
     # Select columns to display and add scores of all detectors
     cols = ["entity_name", "score_weighted", "views", "population"]
-    df_show = df[cols].merge(gf, on="entity_name", how="left")
+    df_show = df[cols].merge(gf, on="entity_name", how="left").rename(columns={"entity_name": "entity"})
 
     # Add columns that show both population and score.
     df_show["population_and_score"] = df_show.apply(
         lambda row: f"{row['score_population']:.0%} ({pretty_print_number(row['population'])})", axis=1
     )
     df_show = df_show.drop(columns=["population"])
+    df_show["analytics_and_score"] = df_show.apply(
+        lambda row: f"{row['score_analytics']:.0%} ({pretty_print_number(row['views'])})", axis=1
+    )
+    df_show = df_show.drop(columns=["views"])
 
     # Arrange columns to put views and population at the end
     df_show = df_show[
-        [c for c in df_show.columns if c not in ("views", "population_and_score")] + ["views", "population_and_score"]
+        [c for c in df_show.columns if c not in ("analytics_and_score", "population_and_score")]
+        + ["analytics_and_score", "population_and_score"]
     ]
 
     # Identify score columns for background gradient
-    score_cols = [c.replace("score_", "") for c in df_show.columns if c.startswith("score") if c != "score_population"]
+    score_cols = [
+        c.replace("score_", "")
+        for c in df_show.columns
+        if c.startswith("score")
+        if c not in ["score_analytics", "score_population"]
+    ]
 
     # Final touches.
     df_show = df_show.rename(columns={column: column.replace("score_", "") for column in df_show.columns})
     score_population = df_show["population"].copy()
-    df_show = df_show.drop(columns=["population"]).rename(columns={"population_and_score": "population"})
+    score_analytics = df_show["analytics"].copy()
+    df_show = df_show.drop(columns=["analytics", "population"]).rename(
+        columns={"population_and_score": "population", "analytics_and_score": "views"}
+    )
 
     # Apply styling
-    df_style = (
-        df_show.style.format("{:.2f}", subset=score_cols)
-        .format("{:,.0f}", subset=["views"])
-        .background_gradient(
-            subset=score_cols,
-            vmin=0,
-            vmax=1,
-        )
+    df_style = df_show.style.format("{:.0%}", subset=score_cols).background_gradient(
+        subset=score_cols,
+        vmin=0,
+        vmax=1,
     )
 
     # Apply background gradient to "views" based on "score_analytics" and "population" based on "score_population"
-    if "analytics" in df_show.columns:
+    if "views" in df_show.columns:
         df_style = df_style.background_gradient(
             subset=["views"],
-            gmap=df_show["analytics"],
+            gmap=score_analytics,
             vmin=0,
             vmax=1,
         )
