@@ -30,6 +30,7 @@ tables:
         unit: ""
         type: ordinal
         sort:
+            - ""
             - "No monitoring system"
             - "National monitoring of antimicrobial sales and antibiotic use in health services"
             - "National monitoring of antimicrobial sales and some monitoring of antibiotic use at sub-national level"
@@ -58,6 +59,7 @@ tables:
         unit: ""
         type: ordinal
         sort:
+            - ""
             - "No national plan for AMR surveillance system"
             - "National plan for AMR surveillance but lacking capacities"
             - "AMR data collected at local levels but no standardized approach"
@@ -68,6 +70,7 @@ tables:
         unit: ""
         type: ordinal
         sort:
+            - ""
             - "No national plan for AMR surveillance system"
             - "National plan for AMR surveillance but lacking capacities"
             - "AMR data collected at local levels but no standardized approach"
@@ -78,6 +81,7 @@ tables:
         unit: ""
         type: ordinal
         sort:
+            - ""
             - "No national plan for AMR surveillance system"
             - "National plan for AMR surveillance but lacking capacities"
             - "AMR data collected but no standardized approach"
