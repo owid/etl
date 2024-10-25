@@ -52,6 +52,9 @@ tables:
       amu_data_submission_whoah_4_5_b:
         title: 4.5b - Does the country submit AMU data to the WOAH Database on Antimicrobial agents intended for use in animals?
         unit: ""
+      woah_reporting_options_4_6:
+        title: 4.6 WOAH Reporting Options for the antimicrobial use database
+        unit: ""
       surveillance_amr_terrestrial_4_7:
         title: 4.7 - National surveillance system for antimicrobial resistance (AMR) in live terrestrial animals
         unit: ""

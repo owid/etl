@@ -29,6 +29,7 @@ def run(dest_dir: str) -> None:
         "3.3 National surveillance system for antimicrobial resistance (AMR) in humans": "amr_surveillance_human_3_3",
         "4.5 a Do you have a national plan or system in place for monitoring sales/use of antimicrobials in animals?": "monitoring_sales_use_animals_4_5_a",
         "4.5 b  Do you submit AMU data to the WOAH Database on Antimicrobial agents intended for use in animals?": "amu_data_submission_whoah_4_5_b",
+        "4.6 WOAH Reporting Options for the antimicrobial use database": "woah_reporting_options_4_6",
         "4.7 National surveillance system for antimicrobial resistance (AMR) in live terrestrial animals": "surveillance_amr_terrestrial_4_7",
         "4.8 National surveillance system for antimicrobial resistance (AMR) in live aquatic animals": "surveillance_amr_aquatic_4_8",
         "5.3 National surveillance system for antimicrobial resistance (AMR) in food (terrestrial and aquatic animal and plant origin)": "surveillance_amr_food_5_3",

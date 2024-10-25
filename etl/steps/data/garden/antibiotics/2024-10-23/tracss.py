@@ -70,6 +70,18 @@ def shorten_survey_responses(tb: Table) -> Table:
         amr_surveillance_human_3_3_responses
     )
 
+    woah_reporting_options_4_6_responses = {
+        "A - WOAH Reporting Option: Baseline information: On a regular basis, only baseline information is reported to the WOAH ": "Baseline information only",
+        "B - WOAH Reporting option 1:  On a regular basis, data is collected and reported to the WOAH on the overall amount sold for use/used in animals by antimicrobial class, with the possibility to separate by type of use.   ": "Information on amount sold for use/used in animals by antimicrobial class and type of use",
+        "C - WOAH Reporting option 2:  On a regular basis, data is collected and reported to the WOAH on the overall amount sold for use/used in animals by antimicrobial class, with the possibility to separate by type of use and animal group.   ": "Information on amount sold for use/used in animals by antimicrobial class, type of use and animal group",
+        "D - WOAH Reporting option 3:  On a regular basis, data is collected and reported to the WOAH on the overall amount sold for use/used in animals by antimicrobial class, with the possibility to separate by type of use, animal group and route of administration.   ": "Information on amount sold for use/used in animals by antimicrobial class, type of use, animal group and route of administration",
+        "E - Data on antimicrobials used under veterinary supervision in animals are available for individual animal species. ": "Antimicrobials used under veterinary supervision in animals are available for individual animal species",
+    }
+    check_keys_exist(tb, woah_reporting_options_4_6_responses, "woah_reporting_options_4_6")
+    tb["woah_reporting_options_4_6"] = tb["woah_reporting_options_4_6"].cat.rename_categories(
+        woah_reporting_options_4_6_responses
+    )
+
     surveillance_amr_terrestrial_4_7_responses = {
         "A - There are no local or national strategies/plans for generating AMR surveillance data from animals for an AMR surveillance system.  ": "No national plan for AMR surveillance system",
         "B - National plan for AMR surveillance in place but laboratory and epidemiology capacities for generating, analysing and reporting data are lacking.  ": "National plan for AMR surveillance but lacking capacities",
