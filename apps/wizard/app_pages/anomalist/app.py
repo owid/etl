@@ -80,8 +80,11 @@ MODEL_NAME = "gpt-4o"
 SORTING_STRATEGIES = {
     "relevance": "Relevance",
     "score": "Anomaly score",
+    "scale": "Scale",
     "population": "Population",
     "views": "Chart views",
+    "scale+population": "Scale+population",
+    "scale+views": "Scale+views",
     "population+views": "Population+views",
 }
 
@@ -122,6 +125,7 @@ st.session_state.anomalist_min_anomaly_score = st.session_state.get("anomalist_m
 st.session_state.anomalist_min_weighted_score = st.session_state.get("anomalist_min_weighted_score", 0.1)
 st.session_state.anomalist_min_population_score = st.session_state.get("anomalist_min_population_score", 1e-9)
 st.session_state.anomalist_min_analytics_score = st.session_state.get("anomalist_min_analytics_score", 1e-9)
+st.session_state.anomalist_min_scale_score = st.session_state.get("anomalist_min_scale_score", 1e-9)
 
 # Advanced expander.
 st.session_state.anomalist_expander_advanced_options = st.session_state.get(
@@ -292,6 +296,7 @@ def filter_df(df: pd.DataFrame):
         min_anomaly_score=st.session_state.anomalist_min_anomaly_score,
         min_population_score=st.session_state.anomalist_min_population_score,
         min_analytics_score=st.session_state.anomalist_min_analytics_score,
+        min_scale_score=st.session_state.anomalist_min_scale_score,
     )
     ## Sort dataframe
     df, st.session_state.anomalist_sorting_columns = _sort_df(df, st.session_state.anomalist_sorting_strategy)
@@ -310,6 +315,7 @@ def _filter_df(
     min_anomaly_score,
     min_population_score,
     min_analytics_score,
+    min_scale_score,
 ) -> pd.DataFrame:
     """Used in filter_df."""
     ## Year and scores
@@ -320,6 +326,7 @@ def _filter_df(
         & (df["score"] >= min_anomaly_score)
         & (df["score_population"] >= min_population_score)
         & (df["score_analytics"] >= min_analytics_score)
+        & (df["score_scale"] >= min_scale_score)
     ]
     ## Anomaly type
     if len(anomaly_types) > 0:
@@ -344,10 +351,16 @@ def _sort_df(df: pd.DataFrame, sort_strategy: str) -> Tuple[pd.DataFrame, List[s
             columns_sort = ["score_weighted"]
         case "score":
             columns_sort = ["score"]
+        case "scale":
+            columns_sort = ["score_scale"]
         case "population":
             columns_sort = ["score_population"]
         case "views":
             columns_sort = ["score_analytics"]
+        case "scale+population":
+            columns_sort = ["score_scale", "score_population"]
+        case "scale+views":
+            columns_sort = ["score_scale", "score_analytics"]
         case "population+views":
             columns_sort = ["score_population", "score_analytics"]
         case _:
@@ -649,9 +662,12 @@ if st.session_state.anomalist_df is not None:
 
                         - **Relevance**: This is a combined score based on population in country, views of charts using this indicator, and anomaly-algorithm error score. The higher this score, the more relevant the anomaly.
                         - **Anomaly score**: The anomaly detection algorithm assigns a score to each anomaly based on its significance.
+                        - **Scale**: Scale score, based on how big the anomaly as a share of the range of values of the indicator.
                         - **Population**: Population score, based on the population in the affected country.
                         - **Views**: Views of charts using this indicator.
-                        - **Population+views**: Combined population and chart views to rank.
+                        - **Scale+Population**: Combined population and scale to rank.
+                        - **Scale+Views**: Combined scale and views to rank.
+                        - **Population+Views**: Combined population and views to rank.
                         """
                     ),
                     key="anomalist_sorting_strategy",
@@ -685,7 +701,7 @@ if st.session_state.anomalist_df is not None:
                 )
 
         with st.expander("Advanced options", expanded=st.session_state.anomalist_expander_advanced_options):
-            for score_name in ["weighted", "anomaly", "population", "analytics"]:
+            for score_name in ["weighted", "anomaly", "scale", "population", "analytics"]:
                 # For some reason, if the slider minimum value is zero, streamlit raises an error when the slider is
                 # dragged to the minimum. Set it to a small, non-zero number.
                 url_persist(st.slider)(
