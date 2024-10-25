@@ -17,16 +17,16 @@ tables:
   tracss:
     variables:
       laws_antimicrobials_terrestrial_2_8_2:
-        title: Does the country have laws or regulations on prescription and sale of antimicrobials for terrestrial animal use?
+        title: 2.8.2 - Does the country have laws or regulations on prescription and sale of antimicrobials for terrestrial animal use?
         unit: ""
       law_antimicrobials_aquatic_2_8_3:
-        title: Does the country have laws or regulations on prescription and sale of antimicrobials for aquatic animals?
+        title: 2.8.3 - Does the country have laws or regulations on prescription and sale of antimicrobials for aquatic animals?
         unit: ""
       law_antimicrobials_terrestrial_growth_promotion_2_8_5:
-        title: Does the country have laws or regulations that prohibits the use of antibiotics for growth promotion in terrestrial animals in the absence of risk analysis?
+        title: 2.8.5 - Does the country have laws or regulations that prohibits the use of antibiotics for growth promotion in terrestrial animals in the absence of risk analysis?
         unit: ""
       monitoring_consumption_human_3_2:
-        title: National monitoring system for consumption and rational use of antimicrobials in human health
+        title: 3.2 - National monitoring system for consumption and rational use of antimicrobials in human health
         unit: ""
         type: ordinal
         sort:
@@ -37,7 +37,7 @@ tables:
             - "Prescribing practices and appropriate antibiotic use monitored in a sample of healthcare settings"
             - "Regular data collection and reporting"
       amr_surveillance_human_3_3:
-        title: National surveillance system for antimicrobial resistance (AMR) in humans
+        title: 3.3 - National surveillance system for antimicrobial resistance (AMR) in humans
         unit: ""
         description_key: ["'Common' in this context refers to infections that occur most frequently in both hospitalized and community patients and constitute a majority of indications for antimicrobial treatment (such as urinary tract infections, enteric infections, bloodstream infections, respiratory infections etc). Also indicates that the spectrum is broader than e.g. epidemic-prone (notifiable) infections. Bacterial pathogens causing these infections could be called common pathogens, but just because they cause common infections and so isolated most frequently.‡ Community patients would be in many instances outpatients or those patients within 48 hours of admission in line with GLASS definition§ The term consumption refers to estimates that are derived from aggregated data sources, mainly sales data, and serves as proxy for actual use of antibiotics. Data on antibiotic use refers to estimates derived from individual level data, and may be accompanied by information on patient characteristics and indication of treatment."]
         type: ordinal
@@ -48,13 +48,13 @@ tables:
             - "Standardized national AMR surveillance system"
             - "National AMR surveillance system linked with antimicrobial consumption data"
       monitoring_sales_use_animals_4_5_a:
-        title: Does the country have a national plan or system in place for monitoring sales/use of antimicrobials in animals?
+        title: 4.5a - Does the country have a national plan or system in place for monitoring sales/use of antimicrobials in animals?
         unit: ""
       amu_data_submission_whoah_4_5_b:
-        title: Does the country submit AMU data to the WOAH Database on Antimicrobial agents intended for use in animals?
+        title: 4.5b - Does the country submit AMU data to the WOAH Database on Antimicrobial agents intended for use in animals?
         unit: ""
       surveillance_amr_terrestrial_4_7:
-        title: National surveillance system for antimicrobial resistance (AMR) in live terrestrial animals
+        title: 4.7 - National surveillance system for antimicrobial resistance (AMR) in live terrestrial animals
         unit: ""
         type: ordinal
         sort:
@@ -65,7 +65,7 @@ tables:
             - "Priority bacterial species identified for surveillance"
             - "National system of AMR surveillance established for priority animal pathogens, high quality assurance processes"
       surveillance_amr_aquatic_4_8:
-        title: National surveillance system for antimicrobial resistance (AMR) in live aquatic animals
+        title: 4.8 - National surveillance system for antimicrobial resistance (AMR) in live aquatic animals
         unit: ""
         type: ordinal
         sort:
@@ -76,7 +76,7 @@ tables:
             - "Priority bacterial species identified for surveillance"
             - "National system of AMR surveillance established for priority animal pathogens, high quality assurance processes"
       surveillance_amr_food_5_3:
-        title: National surveillance system for antimicrobial resistance (AMR) in food (terrestrial and aquatic animal and plant origin)
+        title: 5.3 - National surveillance system for antimicrobial resistance (AMR) in food (terrestrial and aquatic animal and plant origin)
         unit: ""
         type: ordinal
         sort:
@@ -87,5 +87,5 @@ tables:
             - "Priority foodborne pathogens identified for surveillance"
             - "National system of AMR surveillance established for priority foodborne pathogens, high quality assurance processes"
       monitoring_amr_water_6_3:
-        title: Is there a system for regular monitoring (passive surveillance) of antimicrobial compounds and their metabolites (or residues) and resistant bacteria or antimicrobial resistance genes (ARGs) in water quality?
+        title: 6.3 - Is there a system for regular monitoring (passive surveillance) of antimicrobial compounds and their metabolites (or residues) and resistant bacteria or antimicrobial resistance genes (ARGs) in water quality?
         unit: ""
