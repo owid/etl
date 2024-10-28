@@ -17,8 +17,13 @@ definitions:
     description_short: Includes companies that received more than $1.5 million in investment (not adjusted for inflation). This data is expressed in US dollars, adjusted for inflation.
 
     description_key:
+          - Annual data points can be skewed by one-time events like major acquisitions, making trends hard to interpret.
+          - Year-to-year changes likely reflect broader economic conditions like interest rates and market sentiment rather than AI-specific trends.
+          - The data's methodology isn't fully clear about whether and how it captures important aspects of AI investment, including the activities of public AI-related companies (e.g., NVIDIA, TSMC), corporate internal R&D investments in AI, government funding and public sector investments, data center and infrastructure spending, hardware deployment and semiconductor manufacturing, and research and talent costs.
+          - The categories shown (mergers, private investment, public offerings, minority stakes) suggest a focus on traditional corporate finance deals, but without a detailed methodology, we can't be certain about what's included or excluded.
           - The source is not clear about the extent to which investment figures cover infrastructure, computational power, and support services required to develop, deploy, and operationalize AI applications
           - For more information on how the costs to train frontier AI models are distributed refer to the article [How Much Does It Cost to Train Frontier AI Models?](https://epochai.org/blog/how-much-does-it-cost-to-train-frontier-ai-models) by EPOCH.
+          - The total scale of AI investment across all possible channels may be significantly different from what's captured in this specific dataset.
 
     unit: 'constant 2021 US$'
     short_unit: '$'
