@@ -371,10 +371,10 @@ def show_anomaly_compact(index, df, df_all):
     :param df_all: DataFrame containing all anomalies and indicators. Could be used to enhance
         the output.
     """
-    indicator_id, an_type = index
+    indicator_id, anomaly_type = index
     row = 0
 
-    key = f"{indicator_id}_{an_type}"
+    key = f"{indicator_id}_{anomaly_type}"
     key_table = f"anomaly_table_{key}"
     key_selection = f"selected_entities_{key}"
 
@@ -389,19 +389,19 @@ def show_anomaly_compact(index, df, df_all):
     indicator_uri = st.session_state.anomalist_indicators.get(indicator_id)
 
     # Generate descriptive text. Only contains information about top-scoring entity.
-    text = load_detector(an_type).get_text(entity_default, year_default)
+    text = load_detector(anomaly_type).get_text(entity_default, year_default)
 
     # Render
     with st.container(border=True):
         # Title
         link = OWID_ENV.indicator_admin_site(indicator_id)
-        st.markdown(f"{tag_in_md(**ANOMALY_TYPES[an_type])} **[{indicator_uri}]({link})**")
+        st.markdown(f"{tag_in_md(**ANOMALY_TYPES[anomaly_type])} **[{indicator_uri}]({link})**")
         col1, col2 = st.columns(2)
         # Chart
         with col1:
             # Bake chart config
             # If the anomaly is compared to previous indicator, then we need to show two indicators (old and new)!
-            if an_type in {AnomalyTypeEnum.UPGRADE_CHANGE.value, AnomalyTypeEnum.UPGRADE_MISSING.value}:
+            if anomaly_type in {AnomalyTypeEnum.UPGRADE_CHANGE.value, AnomalyTypeEnum.UPGRADE_MISSING.value}:
                 display = [
                     {
                         "name": "New",
@@ -437,10 +437,9 @@ def show_anomaly_compact(index, df, df_all):
             # Other entities
             with st.container(border=False):
                 st.markdown("**Select** other affected entities")
-
                 st.dataframe(
                     # df[["entity_name"] + st.session_state.anomalist_sorting_columns],
-                    _score_table(df, df_all, indicator_id),
+                    _score_table(df_all=df_all, indicator_id=indicator_id, anomaly_type=anomaly_type),
                     selection_mode=["multi-row"],
                     key=key_table,
                     on_select=lambda df=df, key_table=key_table, key_selection=key_selection: _change_chart_selection(
@@ -464,10 +463,10 @@ def _change_chart_selection(df, key_table, key_selection):
     st.session_state[key_selection] = df.iloc[rows]["entity_name"].tolist()
 
 
-def _score_table(df: pd.DataFrame, df_all: pd.DataFrame, indicator_id: int) -> pd.DataFrame:
+def _score_table(df_all: pd.DataFrame, indicator_id: int, anomaly_type: str) -> pd.DataFrame:
     """Return a table of scores and other useful columns for a given indicator. Return styled dataframe."""
-    # Filter df_all for the given indicator
-    df_show = df_all[df_all.indicator_id == indicator_id]
+    # Filter df_all for the indicator and anomaly type currently displayed.
+    df_show = df_all[(df_all.indicator_id == indicator_id) & (df_all.type == anomaly_type)]
     # Columns in df_all:
     # ['entity_name', 'year', 'indicator_id', 'score', 'score_scale', 'type', 'population', 'score_population', 'views', 'score_analytics', 'score_weighted']
 
@@ -797,7 +796,7 @@ if st.session_state.anomalist_df is not None:
 
         # Show items (only current page)
         for item in pagination.get_page_items():
-            show_anomaly_compact(item[0], item[1], df_all=df)
+            show_anomaly_compact(index=item[0], df=item[1], df_all=df)
 
         # Show controls only if needed
         if len(items) > items_per_page:
