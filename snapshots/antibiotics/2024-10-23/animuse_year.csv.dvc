@@ -6,6 +6,8 @@ meta:
     title: ANIMUSE
     description: |-
       The World Organisation for Animal Health (WOAH) has been collecting data on the amounts and reasons for antimicrobial use in animals since 2015. This information is an essential asset to reduce the overuse and misuse of medication and to curb the spread of antimicrobial resistance (AMR). ANIMUSE, the global database on ANImal antiMicrobial USE, facilitates access to this crucial and growing set of information.
+
+      Antimicrobials are naturally occurring, semi-synthetic or synthetic substance that exhibits antimicrobial activity (kill or inhibit the growth of micro-organisms) at concentrations attainable in vivo. Anthelmintics and substances classed as disinfectants or antiseptics are excluded from this definition.
     date_published: "2022-09-01"
     title_snapshot: ANIMUSE - Year Analysis
 

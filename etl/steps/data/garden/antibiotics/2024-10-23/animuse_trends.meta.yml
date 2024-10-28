@@ -18,6 +18,6 @@ tables:
     variables:
       kilograms:
         title: Quantity of antimicrobials used in animals
-        description_short: Reported quantity of antimicrobials used in animals.
+        description_short: "Reported quantity of [antimicrobial](#dod:antimicrobial) used in animals."
         unit: kilograms
         short_unit: kg
