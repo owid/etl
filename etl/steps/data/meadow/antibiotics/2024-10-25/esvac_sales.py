@@ -21,6 +21,7 @@ def run(dest_dir: str) -> None:
         # Load data from snapshot.
         tb = snap.read_in_archive(filename=f"esvac/esvac_{year}.xlsx", sheet_name="Overall sales", skiprows=5)
         tb["year"] = year
+        assert tb.columns[2] == str(year), f"Year {year} not found in the table"
         cols = [
             "country",
             "tablets_tonnes",
@@ -31,6 +32,7 @@ def run(dest_dir: str) -> None:
             "total_share_of_sales",
             "year",
         ]
+        assert len(tb.columns) == len(cols)
         tb.columns = cols
         tb = tb.dropna(
             subset=[
