@@ -48,10 +48,11 @@ def run(dest_dir: str) -> None:
                 sheet_name="Population corrected sales by c",
                 skiprows=5,
             )
+            tb_uk["year"] = year
             assert tb_uk.columns[2] == str(year), f"Year {year} not found in the table"
             # Check the right year is being processed
             assert tb_uk.columns[2] == str(year), f"Year {year} not found in the table"
-            assert len(tb.columns) == len(cols)
+            assert len(tb_uk.columns) == len(cols)
             tb_uk.columns = cols
             tb = pr.concat([tb, tb_uk])
 

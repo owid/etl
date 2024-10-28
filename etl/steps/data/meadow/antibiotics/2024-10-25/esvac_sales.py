@@ -31,14 +31,15 @@ def run(dest_dir: str) -> None:
         # Load data from snapshot.
         tb = snap.read_in_archive(filename=f"esvac/esvac_{year}.xlsx", sheet_name="Overall sales", skiprows=5)
         tb["year"] = year
-        assert tb.columns[2] == str(year), f"Year {year} not found in the table"
+        # Checking that the right year is being used - it should appear in string in a cell below the data in the Country column
+        assert tb["Country"].astype(str).str.contains(str(year)).any(), f"{year} not found in the column"
         assert len(tb.columns) == len(cols)
         tb.columns = cols
         # UK data is separate from 2017 onwards
         if year >= 2017:
-            tb_uk = snap.read_in_archive(filename=f"esvac/uk_esvac_{year}.xlsx", sheet_name="UK sales", skiprows=5)
+            tb_uk = snap.read_in_archive(filename=f"esvac/uk_esvac_{year}.xlsx", sheet_name="Overall sales", skiprows=5)
             tb_uk["year"] = year
-            assert tb_uk.columns[2] == str(year), f"Year {year} not found in the table"
+            assert tb_uk["Country"].astype(str).str.contains(str(year)).any(), f"{year} not found in the column"
             assert len(tb_uk.columns) == len(cols)
             tb_uk.columns = cols
             tb = pr.concat([tb, tb_uk])
