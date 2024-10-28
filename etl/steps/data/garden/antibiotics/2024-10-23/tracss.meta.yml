@@ -18,16 +18,24 @@ tables:
     variables:
       laws_antimicrobials_terrestrial_2_8_2:
         title: 2.8.2 - Does the country have laws or regulations on prescription and sale of antimicrobials for terrestrial animal use?
+        display:
+          name: Does the country have laws or regulations on prescription and sale of antimicrobials for terrestrial animal use?
         unit: ""
       law_antimicrobials_aquatic_2_8_3:
         title: 2.8.3 - Does the country have laws or regulations on prescription and sale of antimicrobials for aquatic animals?
         unit: ""
+        display:
+            name: Does the country have laws or regulations on prescription and sale of antimicrobials for aquatic animals?
       law_antimicrobials_terrestrial_growth_promotion_2_8_5:
         title: 2.8.5 - Does the country have laws or regulations that prohibits the use of antibiotics for growth promotion in terrestrial animals in the absence of risk analysis?
         unit: ""
+        display:
+            name: Does the country have laws or regulations that prohibits the use of antibiotics for growth promotion in terrestrial animals in the absence of risk analysis?
       monitoring_consumption_human_3_2:
         title: 3.2 - National monitoring system for consumption and rational use of antimicrobials in human health
         unit: ""
+        display:
+          name: National monitoring system for consumption and rational use of antimicrobials in human health
         type: ordinal
         sort:
             - "No monitoring system"
@@ -38,6 +46,8 @@ tables:
       amr_surveillance_human_3_3:
         title: 3.3 - National surveillance system for antimicrobial resistance (AMR) in humans
         unit: ""
+        display:
+          name: National surveillance system for antimicrobial resistance (AMR) in humans
         description_key: ["'Common' in this context refers to infections that occur most frequently in both hospitalized and community patients and constitute a majority of indications for antimicrobial treatment (such as urinary tract infections, enteric infections, bloodstream infections, respiratory infections etc)."]
         type: ordinal
         sort:
@@ -49,15 +59,23 @@ tables:
       monitoring_sales_use_animals_4_5_a:
         title: 4.5a - Does the country have a national plan or system in place for monitoring sales/use of antimicrobials in animals?
         unit: ""
+        display:
+          name: Does the country have a national plan or system in place for monitoring sales/use of antimicrobials in animals?
       amu_data_submission_whoah_4_5_b:
         title: 4.5b - Does the country submit AMU data to the WOAH Database on Antimicrobial agents intended for use in animals?
         unit: ""
+        display:
+          name: Does the country submit AMU data to the WOAH Database on Antimicrobial agents intended for use in animals?
       woah_reporting_options_4_6:
         title: 4.6 WOAH Reporting Options for the antimicrobial use database
         unit: ""
+        display:
+          name: WOAH Reporting Options for the antimicrobial use database
       surveillance_amr_terrestrial_4_7:
         title: 4.7 - National surveillance system for antimicrobial resistance (AMR) in live terrestrial animals
         unit: ""
+        display:
+          name: National surveillance system for antimicrobial resistance (AMR) in live terrestrial animals
         type: ordinal
         sort:
             - "No national plan for AMR surveillance system"
@@ -68,6 +86,8 @@ tables:
       surveillance_amr_aquatic_4_8:
         title: 4.8 - National surveillance system for antimicrobial resistance (AMR) in live aquatic animals
         unit: ""
+        display:
+          name: National surveillance system for antimicrobial resistance (AMR) in live aquatic animals
         type: ordinal
         sort:
             - "No national plan for AMR surveillance system"
@@ -78,6 +98,8 @@ tables:
       surveillance_amr_food_5_3:
         title: 5.3 - National surveillance system for antimicrobial resistance (AMR) in food (terrestrial and aquatic animal and plant origin)
         unit: ""
+        display:
+          name: National surveillance system for antimicrobial resistance (AMR) in food (terrestrial and aquatic animal and plant origin)
         type: ordinal
         sort:
             - "No national plan for AMR surveillance system"
@@ -88,3 +110,5 @@ tables:
       monitoring_amr_water_6_3:
         title: 6.3 - Is there a system for regular monitoring (passive surveillance) of antimicrobial compounds and their metabolites (or residues) and resistant bacteria or antimicrobial resistance genes (ARGs) in water quality?
         unit: ""
+        display:
+          name: Is there a system for regular monitoring (passive surveillance) of antimicrobial compounds and their metabolites (or residues) and resistant bacteria or antimicrobial resistance genes (ARGs) in water quality?
