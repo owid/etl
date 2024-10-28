@@ -9,9 +9,9 @@ meta:
     date_published: "2024"
 
     # Citation
-    producer: Global Database for Tracking AMR Country Self Assessment Survey (TrACSS)
+    producer: FAO, UNEP, WHO and WOAH
     citation_full: |-
-      Global Database for Tracking AMR Country Self Assessment Survey (TrACSS); FAO, UNEP, WHO and WOAH (2024).
+      FAO, UNEP, WHO and WOAH (2024). Global Database for Tracking AMR Country Self Assessment Survey (TrACSS)
     attribution_short: FAO, UNEP, WHO and WOAH
 
     # Files
@@ -22,6 +22,7 @@ meta:
     # License
     license:
       name: CC BY 4.0
+      url: https://new.amrcountryprogress.org/
 
 outs:
   - md5: 590f4ba739cf001abfee3c9afb0c313d
