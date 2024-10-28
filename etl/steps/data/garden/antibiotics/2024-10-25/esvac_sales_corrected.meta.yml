@@ -23,12 +23,12 @@ tables:
         short_unit: t
       pcu:
         title: Population correction unit (PCU) of food-producing animals
-        description_short: Population correction unit (PCU) is the weight of the food producing animal population in tonnes, on which the antimicrobial agents are used.
+        description_short: Population correction unit (PCU) is the weight of the food producing animal population in tonnes.
         unit: tonnes
         short_unit: t
       percentage_change_pcu:
         title: Percentage change in population correction unit of food-producing animals
-        description_short: Percentage change in the weight of the food producing animal population in tonnes, on which the antimicrobial agents are used, from the previous year.
+        description_short: Percentage change in the weight of the food producing animal population in tonnes from the previous year.
         unit: "%"
         short_unit: "%"
       mg_per_pcu:
