@@ -859,6 +859,7 @@ steps:
     - data://meadow/cancer/2024-10-13/gco_cancer_today_cervical
   data://grapher/cancer/2024-10-13/gco_cancer_today_cervical:
     - data://garden/cancer/2024-10-13/gco_cancer_today_cervical
+
   # ESVAC antimicrobial use in animals
   data://meadow/antibiotics/2024-10-25/esvac_sales:
     - snapshot://antibiotics/2024-10-25/esvac_sales.zip
@@ -874,3 +875,11 @@ steps:
     - data://meadow/antibiotics/2024-10-25/esvac_sales_corrected
   data://grapher/antibiotics/2024-10-25/esvac_sales_corrected:
     - data://garden/antibiotics/2024-10-25/esvac_sales_corrected
+
+  #Antibiotics TRACSS data
+  data://meadow/antibiotics/2024-10-23/tracss:
+    - snapshot://antibiotics/2024-10-23/tracss.xlsx
+  data://garden/antibiotics/2024-10-23/tracss:
+    - data://meadow/antibiotics/2024-10-23/tracss
+  data://grapher/antibiotics/2024-10-23/tracss:
+    - data://garden/antibiotics/2024-10-23/tracss
