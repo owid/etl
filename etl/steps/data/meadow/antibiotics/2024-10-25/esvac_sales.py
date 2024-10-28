@@ -17,23 +17,32 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("esvac_sales.zip")
 
     tables = Table()
+    cols = [
+        "country",
+        "tablets_tonnes",
+        "tablets_share_of_sales",
+        "all_other_forms_tonnes",
+        "all_other_forms_share_of_sales",
+        "total_tonnes",
+        "total_share_of_sales",
+        "year",
+    ]
     for year in range(2010, 2023):
         # Load data from snapshot.
         tb = snap.read_in_archive(filename=f"esvac/esvac_{year}.xlsx", sheet_name="Overall sales", skiprows=5)
         tb["year"] = year
         assert tb.columns[2] == str(year), f"Year {year} not found in the table"
-        cols = [
-            "country",
-            "tablets_tonnes",
-            "tablets_share_of_sales",
-            "all_other_forms_tonnes",
-            "all_other_forms_share_of_sales",
-            "total_tonnes",
-            "total_share_of_sales",
-            "year",
-        ]
         assert len(tb.columns) == len(cols)
         tb.columns = cols
+        # UK data is separate from 2017 onwards
+        if year >= 2017:
+            tb_uk = snap.read_in_archive(filename=f"esvac/uk_esvac_{year}.xlsx", sheet_name="UK sales", skiprows=5)
+            tb_uk["year"] = year
+            assert tb_uk.columns[2] == str(year), f"Year {year} not found in the table"
+            assert len(tb_uk.columns) == len(cols)
+            tb_uk.columns = cols
+            tb = pr.concat([tb, tb_uk])
+
         tb = tb.dropna(
             subset=[
                 "tablets_tonnes",

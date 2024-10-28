@@ -18,13 +18,6 @@ def run(dest_dir: str) -> None:
 
     tables = Table()
     for year in range(2010, 2023):
-        # Load data from snapshot.
-        tb = snap.read_in_archive(
-            filename=f"esvac_corrected/esvac_{year}.xlsx", sheet_name="Population corrected sales by c", skiprows=5
-        )
-        tb["year"] = year
-        # Check the right year is being processed
-        assert tb.columns[2] == str(year), f"Year {year} not found in the table"
         # Add the column names
         cols = [
             "country",
@@ -38,8 +31,30 @@ def run(dest_dir: str) -> None:
             "percentage_change_mg_per_pcu",
             "year",
         ]
+        # Load data from snapshot.
+
+        tb = snap.read_in_archive(
+            filename=f"esvac_corrected/esvac_{year}.xlsx", sheet_name="Population corrected sales by c", skiprows=5
+        )
+        tb["year"] = year
+        assert tb.columns[2] == str(year), f"Year {year} not found in the table"
+        # Check the right year is being processed
+        assert tb.columns[2] == str(year), f"Year {year} not found in the table"
         assert len(tb.columns) == len(cols)
         tb.columns = cols
+        if year >= 2017:
+            tb_uk = snap.read_in_archive(
+                filename=f"esvac_corrected/uk_esvac_{year}.xlsx",
+                sheet_name="Population corrected sales by c",
+                skiprows=5,
+            )
+            assert tb_uk.columns[2] == str(year), f"Year {year} not found in the table"
+            # Check the right year is being processed
+            assert tb_uk.columns[2] == str(year), f"Year {year} not found in the table"
+            assert len(tb.columns) == len(cols)
+            tb_uk.columns = cols
+            tb = pr.concat([tb, tb_uk])
+
         # Remove rows with missing values
         tb = tb.dropna(
             subset=[

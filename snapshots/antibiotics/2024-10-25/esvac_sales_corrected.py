@@ -2,12 +2,16 @@
 This dataset is manually downloaded. To recreate it follow these steps:
 
 * Go here: https://esvacbi.ema.europa.eu/analytics/saw.dll?Dashboard
+* Go to the 'Population corrected by sales' tab
 * Select a year between 2010 and the latest available year.
 * Click on the menu icon in the top right corner, just to the left of the ? icon
 * Click on 'Export to Excel'
 * Click on 'Export entire dashboard'
 * Repeat this for each year, naming the downloaded file with the year
 * Zip all files together and upload the zip file
+
+### Beware that from 2017 onwards the UK row is pushed onto the next page of the table and must be downloaded or added separately.
+
 
 """
 
