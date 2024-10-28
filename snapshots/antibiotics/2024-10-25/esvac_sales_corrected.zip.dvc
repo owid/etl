@@ -23,6 +23,6 @@ meta:
       name: © EMA
       url: https://www.ema.europa.eu/en/about-us/about-website/legal-notice
 outs:
-  - md5: b589523c0502adab3e9ffeb781712bb5
-    size: 5750633
-    path: esvac_sales.zip
+  - md5: 8740af9f635d41609d2d01d647762caf
+    size: 2210897
+    path: esvac_sales_corrected.zip
