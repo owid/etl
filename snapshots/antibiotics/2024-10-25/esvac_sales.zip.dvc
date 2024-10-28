@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: European database of sales of veterinary microbial agents (ESVAC)
     description: |-
-      The European database of sales of veterinary antimicrobial agents provides public access to the data the European Surveillance of Veterinary Antimicrobial consumption (ESVAC) project External link collects on the sales of veterinary antimicrobials in Member States of the European Union and European Economic Area.
+      The European database of sales of veterinary antimicrobial agents provides public access to the data the European Surveillance of Veterinary Antimicrobial consumption (ESVAC) project collects on the sales of veterinary antimicrobials in Member States of the European Union and European Economic Area.
     date_published: "2023-11-20"
 
     # Citation

@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     tables = Table()
     for year in range(2010, 2023):
         # Load data from snapshot.
-        tb = snap.read_in_archive(filename=f"esvac/esvac_{year}.xlsx", sheet_name="Overall sales", skiprows=5).dropna()
+        tb = snap.read_in_archive(filename=f"esvac/esvac_{year}.xlsx", sheet_name="Overall sales", skiprows=5)
         tb["year"] = year
         cols = [
             "country",

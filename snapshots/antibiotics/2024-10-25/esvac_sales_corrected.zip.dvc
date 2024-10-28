@@ -5,7 +5,9 @@ meta:
     # Data product / Snapshot
     title: European database of sales of veterinary microbial agents (ESVAC) - population corrected units
     description: |-
-      The European database of sales of veterinary antimicrobial agents provides public access to the data the European Surveillance of Veterinary Antimicrobial consumption (ESVAC) project External link collects on the sales of veterinary antimicrobials in Member States of the European Union and European Economic Area.
+      The European database of sales of veterinary antimicrobial agents provides public access to the data the European Surveillance of Veterinary Antimicrobial consumption (ESVAC) project collects on the sales of veterinary antimicrobials in Member States of the European Union and European Economic Area.
+
+      Sales, in tonnes of active ingredient, of veterinary antimicrobial agents marketed mainly for food-producing animals (including horses), population correction unit (PCU) and sales in mg/PCU, by country.
     date_published: "2023-11-20"
 
     # Citation
@@ -23,6 +25,6 @@ meta:
       name: © EMA
       url: https://www.ema.europa.eu/en/about-us/about-website/legal-notice
 outs:
-  - md5: 8740af9f635d41609d2d01d647762caf
-    size: 2210897
+  - md5: d185db752d24da50468e97905407adec
+    size: 2228103
     path: esvac_sales_corrected.zip

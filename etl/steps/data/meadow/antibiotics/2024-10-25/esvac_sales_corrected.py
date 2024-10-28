@@ -20,36 +20,49 @@ def run(dest_dir: str) -> None:
     for year in range(2010, 2023):
         # Load data from snapshot.
         tb = snap.read_in_archive(
-            filename=f"esvac_corrected/esvac_{year}.xlsx", sheet_name="Overall sales", skiprows=5
-        ).dropna()
+            filename=f"esvac_corrected/esvac_{year}.xlsx", sheet_name="Population corrected sales by c", skiprows=5
+        )
         tb["year"] = year
+        # Check the right year is being processed
+        assert tb.columns[2] == str(year), f"Year {year} not found in the table"
+        # Add the column names
         cols = [
             "country",
-            "tablets_tonnes",
-            "tablets_share_of_sales",
-            "all_other_forms_tonnes",
-            "all_other_forms_share_of_sales",
-            "total_tonnes",
-            "total_share_of_sales",
+            f"sales_for_food_producing_animals_{year-1}",
+            "sales_for_food_producing_animals",
+            f"pcu_{year-1}",
+            "pcu",
+            "percentage_change_pcu",
+            f"mg_per_pcu_{year-1}",
+            "mg_per_pcu",
+            "percentage_change_mg_per_pcu",
             "year",
         ]
+        assert len(tb.columns) == len(cols)
         tb.columns = cols
+        # Remove rows with missing values
         tb = tb.dropna(
             subset=[
-                "tablets_tonnes",
-                "tablets_share_of_sales",
-                "all_other_forms_tonnes",
-                "all_other_forms_share_of_sales",
-                "total_tonnes",
-                "total_share_of_sales",
+                "sales_for_food_producing_animals",
+                "pcu",
+                "mg_per_pcu",
             ]
         )
+        # Drop columns that are not needed
+        tb = tb.drop(
+            columns=[
+                f"sales_for_food_producing_animals_{year-1}",
+                f"pcu_{year-1}",
+                f"mg_per_pcu_{year-1}",
+            ]
+        )
+        # Combine tables
         tables = pr.concat([tables, tb])
     #
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tables.format(["country", "year"], short_name="esvac_sales")
+    tb = tables.format(["country", "year"], short_name="esvac_sales_corrected")
 
     #
     # Save outputs.
