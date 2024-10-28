@@ -648,7 +648,8 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     # df = df.loc[:, df.fillna(0).std(axis=0) != 0]
 
     # Sort data (which may be needed for some detectors).
-    df = df.sort_values(INDEX_COLUMNS).reset_index(drop=True).astype({"entity_name": str})
+    # NOTE: Here, we first convert the entity_name to string, because otherwise the sorting will be based on categorical order (which can be arbitrary).
+    df = df.astype({"entity_name": str}).sort_values(INDEX_COLUMNS).reset_index(drop=True)
 
     return df
 
