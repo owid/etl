@@ -17,7 +17,7 @@ definitions:
     description_short: Includes companies that received more than $1.5 million in investment (not adjusted for inflation). This data is expressed in US dollars, adjusted for inflation.
 
     description_key:
-        - Major acquisitions can heavily influence the annual investment figures, and broader economic factors like interest rates or market sentiment can also affect AI investment trends independently of AI-specific developments.
+        - One-time events like large acquisitions can skew yearly figures, and broader economic factors like interest rates or market sentiment can also affect AI investment trends independently of AI-specific developments.
         - The dataset’s methodology doesn’t specify which types of AI investments are included, so it may overlook important areas of AI investment, such as those from public companies (e.g., NVIDIA, TSMC), corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
         - The dataset likely underestimates the total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
 

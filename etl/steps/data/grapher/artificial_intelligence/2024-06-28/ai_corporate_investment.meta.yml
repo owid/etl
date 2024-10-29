@@ -20,7 +20,7 @@ definitions:
         - A public offering is the sale of equity shares or other financial instruments to the public in order to raise capital.
         - A minority stake is an ownership interest of less than 50% of the total shares of a company.
         - The categories shown suggest a focus on traditional corporate finance deals, but without a detailed methodology, we can't be certain about what's included or excluded.  This means it may not fully capture important areas of AI investment, such as those from public companies (e.g., NVIDIA, TSMC), corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
-        - Major acquisitions can heavily influence the annual investment figures, and broader economic factors like interest rates or market sentiment can also affect AI investment trends independently of AI-specific developments.
+        - One-time events like large acquisitions can skew yearly figures, and broader economic factors like interest rates or market sentiment can also affect AI investment trends independently of AI-specific developments.
         - The dataset likely underestimates the total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
 
     description_short: This data is expressed in US dollars, adjusted for inflation.
