@@ -21,6 +21,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    # Removing these datapoints as the data looks incorrect
+    tb = tb.drop(columns=["covered_biomass", "uncovered_biomass"])
     tb = tb.format(["country", "year"])
 
     #

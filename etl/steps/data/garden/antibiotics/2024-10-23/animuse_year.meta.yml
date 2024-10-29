@@ -26,14 +26,6 @@ tables:
         description_short: "[Antimicrobial](#dod:antimicrobial) use is measured in milligrams per kilogram of meat product. Since not all countries report on their antimicrobial use, the estimates presented are adjusted to account for gaps in data coverage."
         unit: milligrams per kilogram
         short_unit: mg/kg
-      covered_biomass:
-        title: Share of animal biomass covered by antimicrobial use data
-        unit: "%"
-        short_unit: "%"
-      uncovered_biomass:
-        title: Share of biomass not covered by microbial use data
-        unit: "%"
-        short_unit: "%"
       participants:
         title: Number of countries contributing data
         unit: participants
