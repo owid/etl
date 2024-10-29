@@ -95,6 +95,10 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             .sort_index()
         )
 
+        if df_wide.empty:
+            log.warning("All variables are NaN, skipping processing")
+            return pd.DataFrame()
+
         # Create a processing queue with (entity_name, variable_id) pairs
         items = _processing_queue(
             items=list(df_wide.index.unique()),
