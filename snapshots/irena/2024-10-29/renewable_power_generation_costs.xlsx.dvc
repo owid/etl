@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: International Renewable Energy Agency
+    title: Renewable Power Generation Costs
+    citation_full: IRENA (2023), Renewable power generation costs in 2022, International Renewable Energy Agency, Abu Dhabi.
+    attribution_short: IRENA
+    url_main: https://www.irena.org/Publications/2023/Aug/Renewable-Power-Generation-Costs-in-2022
+    url_download: |-
+      https://mc-cd8320d4-36a1-40ac-83cc-3389-cdn-endpoint.azureedge.net/-/media/Files/IRENA/Agency/Publication/2023/Aug/IRENA-Datafile-RenPwrGenCosts-in-2022-v1-1.xlsx
+    date_accessed: '2024-10-29'
+    date_published: '2023-08-01'
+    license:
+      name: ©IRENA 2023
+      url: |-
+        https://mc-cd8320d4-36a1-40ac-83cc-3389-cdn-endpoint.azureedge.net/-/media/Files/IRENA/Agency/Publication/2023/Aug/IRENA_Renewable_power_generation_costs_in_2022.pdf
