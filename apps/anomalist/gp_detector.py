@@ -95,6 +95,10 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             .sort_index()
         )
 
+        if df_wide.empty:
+            log.warning("All variables are NaN, skipping processing")
+            return pd.DataFrame()
+
         # Create a processing queue with (entity_name, variable_id) pairs
         items = _processing_queue(
             items=list(df_wide.index.unique()),
@@ -286,7 +290,9 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         for variable_id in variable_ids:
             # The scale is given by the size of changes in consecutive points (for a given country), as a fraction of the maximum range of values of that variable.
-            df_scale[variable_id] = df[variable_id].diff().fillna(0) / (df[variable_id].max() - df[variable_id].min())
+            df_scale[variable_id] = abs(df[variable_id].diff().fillna(0)) / (
+                df[variable_id].max() - df[variable_id].min()
+            )
 
         # The previous procedure includes the calculation of the deviation between the last point of an entity and the first point of the next, which is meaningless.
         # Therefore, make zero the first point of each entity_name for all columns.

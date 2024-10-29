@@ -24,7 +24,7 @@ from etl import grapher_model as gm
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
 from etl.files import create_folder, upload_file_to_server
-from etl.grapher_io import variable_data_df_from_catalog
+from etl.grapher_io import variable_data_table_from_catalog
 
 log = structlog.get_logger()
 
@@ -468,8 +468,6 @@ def anomaly_detection(
 
     # Create a dictionary of all variable_ids for each dataset_id (only for new variables).
     dataset_variable_ids = {}
-    # TODO: Ensure variable_ids always corresponds to new variables.
-    #  Note that currently, if dataset_id is passed and variable_ids is not, this will not load anything.
     for variable_id in variable_ids:
         variable = variables[variable_id]
         if variable.datasetId not in dataset_variable_ids:
@@ -624,22 +622,29 @@ def export_anomalies_file(df: pd.DataFrame, dataset_id: int, anomaly_type: str) 
 
 
 def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.DataFrame:
-    # Load data from local catalog
-    df = variable_data_df_from_catalog(engine, variables=variables)
-    df = df.rename(columns={"country": "entity_name"}).set_index(["entity_name", "year"])
+    # Load data from local catalog.
+    # NOTE: Data is returned as a Table, which raises some warnings about units.
+    # For now, we do not need the metadata, so, convert to dataframe.
+    df = pd.DataFrame(variable_data_table_from_catalog(engine, variables=variables))
+    df = df.rename(columns={"country": "entity_name"})
 
-    # reorder in the same order as variables
-    df = df[[v.id for v in variables]]
+    # Define the list of columns that are not index columns.
+    data_columns = [v.id for v in variables]
 
-    # set non-numeric values to NaN
-    df = df.apply(pd.to_numeric, errors="coerce")
+    # Reorder dataframe so that data columns are in the same order as the list of variables.
+    # NOTE: I'm not sure if this is necessary.
+    df = df[INDEX_COLUMNS + data_columns]
 
-    # remove variables with all nulls or all zeros or constant values
-    df = df.loc[:, df.fillna(0).std(axis=0) != 0]
+    # Set non-numeric values to NaN.
+    # Sometimes the dtypes include, e.g. UInt32, which can cause issues for the detectors.
+    # Convert all data columns to float.
+    df[data_columns] = df[data_columns].apply(pd.to_numeric, errors="coerce").astype(float)
 
-    df = df.reset_index().astype({"entity_name": str})
+    # Sort data (which may be needed for some detectors).
+    # NOTE: Here, we first convert the entity_name to string, because otherwise the sorting will be based on categorical order (which can be arbitrary).
+    df = df.astype({"entity_name": str}).sort_values(INDEX_COLUMNS).reset_index(drop=True)
 
-    return df  # type: ignore
+    return df
 
 
 # @memory.cache

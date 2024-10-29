@@ -22,7 +22,7 @@ import requests
 import structlog
 import validators
 from deprecated import deprecated
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from tenacity import Retrying
@@ -457,9 +457,9 @@ def load_entity_mapping(entity_ids: Optional[List[int]] = None, owid_env: OWIDEn
     return entity_id_to_name
 
 
-def variable_data_df_from_catalog(
+def variable_data_table_from_catalog(
     engine: Engine, variables: Optional[List[gm.Variable]] = None, variable_ids: Optional[List[int | str]] = None
-) -> pd.DataFrame:
+) -> Table:
     """Load all variables for a given dataset from local catalog."""
     if variable_ids:
         assert not variables, "Only one of variables or variable_ids must be provided"
@@ -526,7 +526,7 @@ def variable_data_df_from_catalog(
             tbs.append(tb.reset_index())
 
     # TODO: this could be slow for datasets with a lot of tables
-    return ft.reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), tbs)
+    return ft.reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), tbs)  # type: ignore
 
 
 #######################################################################################################
