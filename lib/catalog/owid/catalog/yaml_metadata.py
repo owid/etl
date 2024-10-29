@@ -67,6 +67,10 @@ def update_metadata_from_yaml(
         if "description_key" in meta_dict:
             meta_dict["description_key"] = _flatten(meta_dict["description_key"])
 
+            # make sure all elements are strings
+            # NOTE: this could be further flattened if we run into it
+            assert all(isinstance(x, str) for x in meta_dict["description_key"])
+
         # convert to objects
         tb[v_short_name].metadata = VariableMeta.from_dict(meta_dict)
 

@@ -18,33 +18,37 @@ INDEX_COLUMNS = ["entity_name", "year"]
 
 
 def estimate_bard_epsilon(series: pd.Series) -> float:
-    # Make all values positive, and ignore zeros.
-    positive_values = abs(series.dropna())
-    # Ignore zeros, since they can lead to epsilon being zero, hence allowing division by zero in BARD.
-    positive_values = positive_values.loc[positive_values > 0]
-    # Estimate epsilon as the absolute range of values divided by 10.
-    # eps = (positive_values.max() - positive_values.min()) / 10
+    # Ignore missing values.
+    real_values = series.dropna()
+    # Estimate epsilon as the range of values divided by 10.
     # Instead of just taking maximum and minimum, take 95th percentile and 5th percentile.
-    eps = (positive_values.quantile(0.95) - positive_values.quantile(0.05)) / 10
+    eps = (real_values.quantile(0.95) - real_values.quantile(0.05)) / 10
 
-    return eps
+    return eps  # type: ignore
 
 
-def get_long_format_score_df(df_score: pd.DataFrame) -> pd.DataFrame:
+def get_long_format_score_df(df_score: pd.DataFrame, df_scale: pd.DataFrame) -> pd.DataFrame:
     # Output is already in long format
     if set(df_score.columns) == {"entity_name", "year", "variable_id", "anomaly_score"}:
         df_score_long = df_score
+        # For now, assume that df_score and df_scale always have the same shape.
+        df_scale_long = df_scale
     else:
-        # Create a reduced score dataframe.
+        # Create a long-format score dataframe.
         df_score_long = df_score.melt(
             id_vars=["entity_name", "year"], var_name="variable_id", value_name="anomaly_score"
         )
+        # Create a long-format scale dataframe.
+        df_scale_long = df_scale.melt(id_vars=["entity_name", "year"], var_name="variable_id", value_name="score_scale")
 
     # Drop NaN anomalies.
     df_score_long = df_score_long.dropna(subset=["anomaly_score"])
 
     # Drop zero anomalies.
     df_score_long = df_score_long[df_score_long["anomaly_score"] != 0]
+
+    # Add a scale column.
+    df_score_long = df_score_long.merge(df_scale_long, on=["entity_name", "year", "variable_id"], how="left")
 
     # Save memory by converting to categoricals.
     df_score_long = df_score_long.astype({"entity_name": "category", "year": "category", "variable_id": "category"})
@@ -60,6 +64,9 @@ class AnomalyDetector:
         return f"Anomaly happened in {entity} in {year}!"
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+        raise NotImplementedError
+
+    def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         raise NotImplementedError
 
     def get_zeros_df(self, df: pd.DataFrame, variable_ids: List[int]) -> pd.DataFrame:
@@ -96,6 +103,14 @@ class AnomalyUpgradeMissing(AnomalyDetector):
 
         return df_lost
 
+    def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+        # Create a dataframe of ones.
+        df_scale = df.copy()
+        # NOTE: Maybe, instead of 1, we could add the maximum value of each country divided by the maximum value of the variable.
+        df_scale[df.columns.difference(["entity_name", "year"])] = 1
+
+        return df_scale
+
 
 class AnomalyUpgradeChange(AnomalyDetector):
     """New dataframe has changed abruptly with respect to the old version."""
@@ -104,7 +119,7 @@ class AnomalyUpgradeChange(AnomalyDetector):
 
     @staticmethod
     def get_text(entity: str, year: int) -> str:
-        return f"There are abrupt changes for {entity} in {year}! There might be other data points affected."
+        return f"There are significant changes for {entity} in {year} with respect to the previous version. There might be other data points affected."
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
@@ -120,6 +135,18 @@ class AnomalyUpgradeChange(AnomalyDetector):
 
         return df_version_change
 
+    def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+        # Create a dataframe of zeros.
+        df_scale = self.get_zeros_df(df, variable_ids)
+
+        for variable_id_old, variable_id_new in variable_mapping.items():
+            # Define the scale as the difference between the old and new values, as a fraction of the range of values of the new variable.
+            df_scale[variable_id_new] = abs(df[variable_id_new] - df[variable_id_old]) / (
+                df[variable_id_new].max() - df[variable_id_new].min()
+            )
+
+        return df_scale
+
 
 class AnomalyTimeChange(AnomalyDetector):
     """New dataframe has abrupt changes in time series."""
@@ -128,7 +155,7 @@ class AnomalyTimeChange(AnomalyDetector):
 
     @staticmethod
     def get_text(entity: str, year: int) -> str:
-        return f"There are significant changes for {entity} in {year} compared to the old version of the indicator. There might be other data points affected."
+        return f"There are significant changes for {entity} in {year} compared to the previous point. There might be other data points affected."
 
     def get_score_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
@@ -138,20 +165,34 @@ class AnomalyTimeChange(AnomalyDetector):
         error = "The function that detects abrupt time changes assumes the data is sorted by entity_name and year. But this is not the case. Either ensure the data is sorted, or fix the function."
         assert (df.sort_values(by=INDEX_COLUMNS).index == df.index).all(), error
         for variable_id in variable_ids:
-            series = df[variable_id].copy()
-            # Calculate the BARD epsilon for this variable.
+            # Calculate the BARD score for this variable.
+            series = pd.to_numeric(df[variable_id], errors="coerce")
             eps = estimate_bard_epsilon(series=series)
-            # Calculate the BARD for this variable.
-            _bard = bard(series, series.shift(), eps).fillna(0)
+            score = bard(series, series.shift(), eps).fillna(0)
 
-            # Add bard to the dataframe.
-            df_time_change[variable_id] = _bard
+            # Add score to the dataframe.
+            df_time_change[variable_id] = score
+
         # The previous procedure includes the calculation of the deviation between the last point of an entity and the first point of the next, which is meaningless, and can lead to a high BARD.
         # Therefore, make zero the first point of each entity_name for all columns.
-        # df_time_change.loc[df_time_change["entity_name"].diff().fillna(1) > 0, self.variable_ids] = 0
         df_time_change.loc[df_time_change["entity_name"] != df_time_change["entity_name"].shift(), variable_ids] = 0
 
         return df_time_change
+
+    def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
+        # Create a dataframe of zeros.
+        df_scale = self.get_zeros_df(df, variable_ids)
+
+        for variable_id in variable_ids:
+            series = pd.to_numeric(df[variable_id], errors="coerce")
+            # The scale is given by the size of changes in consecutive points (for a given country), as a fraction of the maximum range of values of that variable.
+            df_scale[variable_id] = abs(series.diff().fillna(0)) / (series.max() - series.min())
+
+        # The previous procedure includes the calculation of the deviation between the last point of an entity and the first point of the next, which is meaningless.
+        # Therefore, make zero the first point of each entity_name for all columns.
+        df_scale.loc[df_scale["entity_name"] != df_scale["entity_name"].shift(), variable_ids] = 0
+
+        return df_scale
 
 
 class AnomalyIsolationForest(AnomalyDetector):

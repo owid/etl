@@ -113,11 +113,14 @@ def cli(
 
     # If no variable IDs are given, load all variables from the given datasets.
     if not variable_ids:
-        assert not dataset_ids, "Cannot specify both dataset IDs and variable IDs."
-
         # Use new datasets
         if not dataset_ids:
             dataset_ids = load_datasets_new_ids(get_engine())
+
+            # Still no datasets, exit
+            if not dataset_ids:
+                log.info("No new datasets found.")
+                return
 
         # Load all variables from given datasets
         assert not variable_ids, "Cannot specify both dataset IDs and variable IDs."
@@ -126,6 +129,9 @@ def cli(
         where datasetId in %(dataset_ids)s
         """
         variable_ids = list(read_sql(q, get_engine(), params={"dataset_ids": dataset_ids})["id"])
+
+    else:
+        assert not dataset_ids, "Cannot specify both dataset IDs and variable IDs."
 
     anomaly_detection(
         anomaly_types=anomaly_types,
