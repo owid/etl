@@ -1,0 +1,44 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Antibiotics
+    display:
+      numDecimalPlaces: 1
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  esvac_sales_corrected:
+    variables:
+      sales_for_food_producing_animals:
+        title: Sales of veterinary antimicrobial agents for food-producing animals
+        description_short: Sales of active ingredient, of veterinary antimicrobial agents marketed mainly for food-producing animals (including horses).
+        unit: tonnes
+        short_unit: t
+      pcu:
+        title: Population correction unit (PCU) of food-producing animals
+        description_short: Population correction unit (PCU) is the weight of the food producing animal population in tonnes.
+        unit: tonnes
+        short_unit: t
+      percentage_change_pcu:
+        title: Percentage change in population correction unit of food-producing animals
+        description_short: Percentage change in the weight of the food producing animal population in tonnes from the previous year.
+        unit: "%"
+        short_unit: "%"
+      mg_per_pcu:
+        title: Milligrams of active ingredient of antimicrobials sold per population correction unit of food-producing animals
+        description_short: Milligrams of active ingredient of antimicrobials sold per 1000 tonnes of food-producing animals, including horses.
+        unit: mg/PCU
+        short_unit: mg/PCU
+      percentage_change_mg_per_pcu:
+        title: Percentage change in milligrams of active ingredient of antimicrobials used per population correction unit (PCU) of food-producing animals
+        unit: "%"
+        short_unit: "%"
+
+
