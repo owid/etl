@@ -468,8 +468,6 @@ def anomaly_detection(
 
     # Create a dictionary of all variable_ids for each dataset_id (only for new variables).
     dataset_variable_ids = {}
-    # TODO: Ensure variable_ids always corresponds to new variables.
-    #  Note that currently, if dataset_id is passed and variable_ids is not, this will not load anything.
     for variable_id in variable_ids:
         variable = variables[variable_id]
         if variable.datasetId not in dataset_variable_ids:
@@ -641,11 +639,6 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     # Sometimes the dtypes include, e.g. UInt32, which can cause issues for the detectors.
     # Convert all data columns to float.
     df[data_columns] = df[data_columns].apply(pd.to_numeric, errors="coerce").astype(float)
-
-    # remove variables with all nulls or all zeros or constant values
-    # TODO: Is this necessary? It cases issues later, because certain variable ids are not found in df.
-    #  It may be better to leave columns of only nans.
-    # df = df.loc[:, df.fillna(0).std(axis=0) != 0]
 
     # Sort data (which may be needed for some detectors).
     # NOTE: Here, we first convert the entity_name to string, because otherwise the sorting will be based on categorical order (which can be arbitrary).
