@@ -18,9 +18,13 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # Expected USD year.
-EXPECTED_DOLLAR_YEAR = int(paths.version.split("-")[0]) - 1
+# NOTE: We could get this from the version, but, if later on we create a minor upgrade with a different year, this will fail.
+#  So, instead, hardcode the year and change it on next update.
+EXPECTED_DOLLAR_YEAR = 2023
 # Expected unit to be found in each of the LCOE sheets.
 EXPECTED_LCOE_UNIT = f"{EXPECTED_DOLLAR_YEAR} USD/kWh"
+# Expected unit to be found in the solar PV module prices sheet.
+EXPECTED_SOLAR_PV_MODULE_COST_UNIT = f"{EXPECTED_DOLLAR_YEAR} USD/W"
 
 
 def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
@@ -41,6 +45,12 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
     """
     # Photovoltaic technology to choose for average monthly prices.
     pv_technology = "Thin film a-Si/u-Si or Global Price Index (from Q4 2013)"
+
+    # NOTE: The currency is not explicitly given in sheet 3.2. But it is in sheet B3.1a (we assume it's the same).
+    error = "Cost unit for solar PV module prices has changed."
+    assert (
+        data.parse(sheet_name="Fig B3.1a", skiprows=6).dropna(axis=1).columns[0] == EXPECTED_SOLAR_PV_MODULE_COST_UNIT
+    ), error
 
     # Load upper table in sheet from Figure 3.2, which is:
     # Average monthly solar PV module prices by technology and manufacturing country sold in Europe, 2010 to 2021.
@@ -81,6 +91,10 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
 
     # Improve table formatting.
     pv_prices = pv_prices.format(sort_columns=True, short_name="solar_photovoltaic_module_prices")
+
+    # Add units.
+    pv_prices["cost"].metadata.unit = f"{EXPECTED_DOLLAR_YEAR} US$ per Watt"
+    pv_prices["cost"].metadata.short_unit = "$/W"
 
     return pv_prices
 
@@ -298,6 +312,12 @@ def combine_global_and_national_data(tb_costs_global: Table, tb_costs_national: 
     # Improve table format.
     tb_combined = tb_combined.format(sort_columns=True)
 
+    # Add units.
+    for column in tb_combined.columns:
+        tb_combined[column].metadata.unit = f"{EXPECTED_DOLLAR_YEAR} US$ per kilowatt-hour"
+        tb_combined[column].metadata.short_unit = "$/kWh"
+        tb_combined[column].metadata.description_short = f"Measured in {EXPECTED_DOLLAR_YEAR} US$ per kilowatt-hour."
+
     return tb_combined
 
 
@@ -316,9 +336,11 @@ def run(dest_dir: str) -> None:
     tb_costs_national = extract_country_cost_from_excel_file(data=data)
 
     # Combine global and national data.
+    # NOTE: For convenience, we will also add units and a short description here (instead of in the garden step).
     tb_combined = combine_global_and_national_data(tb_costs_global=tb_costs_global, tb_costs_national=tb_costs_national)
 
     # Extract global data on solar photovoltaic module prices.
+    # NOTE: For convenience, we will also add units and a short description here (instead of in the garden step).
     tb_solar_pv_prices = prepare_solar_pv_module_prices(data=data)
 
     #
