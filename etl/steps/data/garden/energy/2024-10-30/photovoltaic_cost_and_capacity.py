@@ -83,9 +83,9 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     # Prepare solar photovoltaic cost data from Nemet (2009).
     tb_nemet_cost = tb_nemet[["year", "cost"]].copy()
     tb_nemet_cost["cost_source"] = "Nemet (2009)"
-    # Costs are given in "2004 USD/Watt", so we need to convert them to the latest year USD.
+    # Costs are given in "2004 USD/watt", so we need to convert them to the latest year USD.
     tb_nemet_cost["cost"] *= USD2004_TO_USDLATEST
-    tb_nemet_cost["cost"].metadata.unit = f"constant {LATEST_YEAR} US$ per Watt"
+    tb_nemet_cost["cost"].metadata.unit = f"constant {LATEST_YEAR} US$ per watt"
 
     # Prepare solar photovoltaic cost data from Farmer & Lafond (2016).
     tb_farmer_lafond = (
@@ -97,7 +97,7 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     tb_farmer_lafond["cost_source"] = "Farmer & Lafond (2016)"
     # Costs are given in "2013 USD/Wp", so we need to convert them to the latest year USD.
     tb_farmer_lafond["cost"] *= USD2013_TO_USDLATEST
-    tb_farmer_lafond["cost"].metadata.unit = f"constant {LATEST_YEAR} US$ per Watt"
+    tb_farmer_lafond["cost"].metadata.unit = f"constant {LATEST_YEAR} US$ per watt"
 
     # Prepare solar photovoltaic cost data from IRENA.
     tb_irena_cost = tb_irena_cost.drop(columns="country", errors="raise")

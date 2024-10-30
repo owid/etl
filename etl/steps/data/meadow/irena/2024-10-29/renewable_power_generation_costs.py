@@ -92,10 +92,13 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
     pv_prices = pv_prices.format(sort_columns=True, short_name="solar_photovoltaic_module_prices")
 
     # Add units.
-    pv_prices["cost"].metadata.unit = f"constant {EXPECTED_DOLLAR_YEAR} US$ per Watt"
+    pv_prices["cost"].metadata.unit = f"constant {EXPECTED_DOLLAR_YEAR} US$ per watt"
     pv_prices["cost"].metadata.short_unit = "$/W"
+    pv_prices[
+        "cost"
+    ].metadata.description_short = "This data is expressed in US dollars per watt, adjusted for inflation."
     pv_prices["cost"].metadata.description_key = [
-        f"IRENA presents solar PV module price series for a number of different module technologies. Here we use the series for '{PV_TECHNOLOGY}'."
+        f"IRENA presents solar photovoltaic module prices for a number of different technologies. Here we use the figures for '{PV_TECHNOLOGY}'."
     ]
 
     return pv_prices
