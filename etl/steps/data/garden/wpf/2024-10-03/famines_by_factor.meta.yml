@@ -20,30 +20,30 @@ tables:
     variables:
      sum_conflict_mortality_factor:
        title: Deaths from famines where conflict was a factor
-       description_short: Famines that are estimated to have killed 100,000 people or more. Includes factors like "war," "blockade," "counterinsurgency," "occupation," "siege," "forced starvation," and "genocide," all of which disrupt food supply and access and can either cause or contribute to famine.
+       description_short: Famines estimated to have caused over 100,000 deaths, where factors like "war," "blockade," "counterinsurgency," "occupation," "siege," "forced starvation," and "genocide" contributed to disrupting food supply and access.
        unit: 'deaths'
 
      sum_government_policy_overall_mortality_factor:
         title: Deaths from famines where government policy was a factor
-        description_short: Famines that are estimated to have killed 100,000 people or more. Includes actions such as "economic policy," "colonial policy," "taxation," "state capacity," and "forced labor," reflecting how government decisions and structures can limit food availability and access, serving as either causal or contributing factors in famine.
+        description_short: Famines estimated to have killed 100,000 or more, where government actions like "economic policy," "colonial policy," "taxation," "state capacity," and "forced labor" contributed to limiting food availability and access.
         unit: 'deaths'
 
      sum_external_factors_mortality_factor:
         title: Deaths from famines where external factors was a factor
-        description_short: Famines that are estimated to have killed 100,000 people or more.Includes factors like "climate," "environment," and "disease," representing natural and environmental conditions outside direct human control that affect food production.
+        description_short: Famines estimated to have killed 100,000 or more, where factors like "climate," "environment," and "disease" contributed to reduced food production and access.
         unit: 'deaths'
 
      sum_conflict_mortality_not_a_factor:
         title: Deaths from famines where conflict was not a factor
-        description_short: Famines that are estimated to have killed 100,000 people or more. Includes factors like "war," "blockade," "counterinsurgency," "occupation," "siege," "forced starvation," and "genocide," all of which disrupt food supply and access and can either cause or contribute to famine.
+        description_short: Famines estimated to have caused over 100,000 deaths, where factors like "war," "blockade," "counterinsurgency," "occupation," "siege," "forced starvation," and "genocide" contributed to disrupting food supply and access.
         unit: 'deaths'
 
      sum_government_policy_overall_mortality_not_a_factor:
         title: Deaths from famines where government policy was not a factor
-        description_short: Famines that are estimated to have killed 100,000 people or more. Includes actions such as "economic policy," "colonial policy," "taxation," "state capacity," and "forced labor," reflecting how government decisions and structures can limit food availability and access, serving as either causal or contributing factors in famine.
+        description_short: Famines estimated to have killed 100,000 or more, where government actions like "economic policy," "colonial policy," "taxation," "state capacity," and "forced labor" contributed to limiting food availability and access.
         unit: 'deaths'
 
      sum_external_factors_mortality_not_a_factor:
         title: Deaths from famines where external factors was not a factor
-        description_short: Famines that are estimated to have killed 100,000 people or more. Includes factors like "climate," "environment," and "disease," representing natural and environmental conditions outside direct human control that affect food production.
+        description_short: Famines estimated to have killed 100,000 or more, where factors like "climate," "environment," and "disease" contributed to reduced food production and access.
         unit: 'deaths'
