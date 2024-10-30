@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import datetime as dt
 
 import numpy as np
 import owid.catalog.processing as pr
