@@ -48,13 +48,13 @@ tables:
        famine_count:
         title: Number of famines
         unit: 'famines'
-        description_short: Number of famines that are estimated to have killed 100,000 people or more.
+        description_short: Famines that are estimated to have killed 100,000 people or more.
         display:
           numDecimalPlaces: 0
 
        decadal_famine_count:
          title: Number of famines by decade
          unit: 'famines'
-         description_short: Number of famines that are estimated to have killed 100,000 people or more.
+         description_short: Famines that are estimated to have killed 100,000 people or more.
          display:
             numDecimalPlaces: 0
