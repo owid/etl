@@ -293,16 +293,12 @@ def combine_global_and_national_data(tb_costs_global: Table, tb_costs_national: 
     tb_combined = pr.concat([tb_costs_global, tb_costs_national], ignore_index=True).astype({"year": int})
 
     # Convert from long to wide format.
-    tb_combined = tb_combined.pivot(index=["country", "year"], columns="technology", values="cost").reset_index()
+    tb_combined = tb_combined.pivot(
+        index=["country", "year"], columns="technology", values="cost", join_column_levels_with="_"
+    )
 
-    # Remove name of dummy index.
-    tb_combined.columns.names = [None]
-
-    # Underscore column names.
-    tb_combined = tb_combined.underscore()
-
-    # Set an appropriate index and sort conveniently.
-    tb_combined = tb_combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    # Improve table format.
+    tb_combined = tb_combined.format(sort_columns=True)
 
     return tb_combined
 
