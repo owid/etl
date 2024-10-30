@@ -114,7 +114,7 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     # Improve metadata.
     combined[
         "cost"
-    ].metadata.description_processing = f"Photovoltaic cost data between 1975 and 2003 has been taken from Nemet (2009). Photovoltaic cost data between 2004 and 2009 has been taken from Farmer & Lafond (2016). Photovoltaic cost data since 2010 has been taken from IRENA. Prices from Nemet (2009) and Farmer & Lafond (2016) have been converted to {LATEST_YEAR} US$ using: https://www.usinflationcalculator.com/"
+    ].metadata.description_processing = f"Photovoltaic cost data between 1975 and 2003 has been taken from Nemet (2009), between 2004 and 2009 from Farmer & Lafond (2016), and since 2010 from IRENA. Prices from Nemet (2009) and Farmer & Lafond (2016) have been converted to {LATEST_YEAR} US$ using: https://www.usinflationcalculator.com/"
 
     # Since sources column has been manually created, it does not have metadata. Copy origins from another column.
     combined["cost_source"].metadata.origins = combined["cost"].metadata.origins.copy()
