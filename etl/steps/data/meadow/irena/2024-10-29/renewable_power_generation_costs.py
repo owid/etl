@@ -17,6 +17,11 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Expected USD year.
+EXPECTED_DOLLAR_YEAR = int(paths.version.split("-")[0]) - 1
+# Expected unit to be found in each of the LCOE sheets.
+EXPECTED_LCOE_UNIT = f"{EXPECTED_DOLLAR_YEAR} USD/kWh"
+
 
 def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
     """Prepare yearly data on average solar photovoltaic module prices.
@@ -100,10 +105,13 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     # Extract weighted average LCOE for different sources (each one requires a slightly different processing):
 
     # Solar photovoltaic.
+    # TODO: Spreadsheet 3.12 includes LCOE from 2018 to 2023 for 19 countries. We should fetch that data.
+    error = "The file format for solar PV LCOE has changed."
+    assert data.parse("Fig 3.1", skiprows=21).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     solar_pv = (
         data.parse("Fig 3.1", skiprows=22)
         .dropna(how="all", axis=1)
-        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")
     )
     solar_pv = solar_pv[solar_pv["temp"] == "Weighted average"].melt(
         id_vars="temp", var_name="year", value_name="cost"
@@ -111,6 +119,10 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     solar_pv["technology"] = "Solar photovoltaic"
 
     # Onshore wind.
+    error = "The file format for onshore wind LCOE has changed."
+    # NOTE: Sheet 2.1 contains LCOE only from 2010, whereas 2.11 contains LCOE from 1984.
+    # TODO: Sheet 2.12 contains LCOE from 1984 to 2023 for 15 countries. Fetch those.
+    assert data.parse("Fig 2.11", skiprows=2).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     onshore_wind = (
         data.parse("Fig 2.11", skiprows=3)
         .drop(columns="Unnamed: 0", errors="raise")
@@ -121,30 +133,40 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     onshore_wind["technology"] = "Onshore wind"
 
     # Concentrated solar power.
-    csp = data.parse("Fig 5.7", skiprows=4).dropna(how="all", axis=1)  # type: ignore
-    latest_year = csp.columns[-1]
+    error = "The file format for CSP LCOE has changed."
+    assert data.parse("Fig 5.1", skiprows=19).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     csp = (
-        csp[csp[f"{latest_year} USD/kWh"] == "Weighted average"]
-        .melt(id_vars=f"{latest_year} USD/kWh", var_name="year", value_name="cost")[["year", "cost"]]
-        .reset_index(drop=True)
+        data.parse("Fig 5.1", skiprows=20)
+        .dropna(how="all", axis=1)
+        .rename(columns={"Unnamed: 1": "temp"}, errors="raise")
     )
+    csp = csp[csp["temp"] == "Weighted average"].melt(id_vars="temp", var_name="year", value_name="cost")[
+        ["year", "cost"]
+    ]
     csp["technology"] = "Concentrated solar power"
 
     # Offshore wind.
-    offshore_wind = data.parse("Fig 4.12", skiprows=3).rename(  # type: ignore
+    error = "The file format for offshore wind LCOE has changed."
+    assert data.parse("Fig 4.11", skiprows=1).columns[1] == EXPECTED_LCOE_UNIT, error
+    offshore_wind = data.parse("Fig 4.11", skiprows=3).rename(  # type: ignore
         columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
     )[["year", "cost"]]
     offshore_wind["technology"] = "Offshore wind"
 
     # Geothermal.
-    geothermal = data.parse("Fig 7.4", skiprows=5).rename(
+    # NOTE: Sheet 8.1 contains LCOE only from 2010, whereas 8.4 contains LCOE from 2007.
+    error = "The file format for geothermal LCOE has changed."
+    assert data.parse("Fig 8.4", skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
+    geothermal = data.parse("Fig 8.4", skiprows=5).rename(
         columns={"Year": "year", "Weighted average": "cost"}, errors="raise"
     )[["year", "cost"]]  # type: ignore
     geothermal["technology"] = "Geothermal"
 
     # Bioenergy.
+    error = "The file format for bioenergy LCOE has changed."
+    assert data.parse("Fig 9.1", skiprows=19).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     bioenergy = (
-        data.parse("Fig 8.1", skiprows=20)
+        data.parse("Fig 9.1", skiprows=20)
         .dropna(axis=1, how="all")
         .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
     )
@@ -154,8 +176,10 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     bioenergy["technology"] = "Bioenergy"
 
     # Hydropower.
+    error = "The file format for hydropower LCOE has changed."
+    assert data.parse("Fig 7.1", skiprows=19).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     hydropower = (
-        data.parse("Fig 6.1", skiprows=20)
+        data.parse("Fig 7.1", skiprows=20)
         .dropna(how="all", axis=1)
         .rename(columns={"Unnamed: 1": "temp"}, errors="raise")  # type: ignore
     )
