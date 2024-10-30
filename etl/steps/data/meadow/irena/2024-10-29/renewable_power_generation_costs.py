@@ -25,6 +25,8 @@ EXPECTED_DOLLAR_YEAR = 2023
 EXPECTED_LCOE_UNIT = f"{EXPECTED_DOLLAR_YEAR} USD/kWh"
 # Expected unit to be found in the solar PV module prices sheet.
 EXPECTED_SOLAR_PV_MODULE_COST_UNIT = f"{EXPECTED_DOLLAR_YEAR} USD/W"
+# Photovoltaic technology to choose for average monthly PV module costs.
+PV_TECHNOLOGY = "Thin film a-Si/u-Si or Global Price Index (from Q4 2013)"
 
 
 def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
@@ -43,9 +45,6 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
         PV prices.
 
     """
-    # Photovoltaic technology to choose for average monthly prices.
-    pv_technology = "Thin film a-Si/u-Si or Global Price Index (from Q4 2013)"
-
     # NOTE: The currency is not explicitly given in sheet 3.2. But it is in sheet B3.1a (we assume it's the same).
     error = "Cost unit for solar PV module prices has changed."
     assert (
@@ -65,8 +64,8 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
 
     # Select PV technologies.
     error = "Names of solar PV module technologies have changed."
-    assert pv_technology in set(pv_prices["technology"]), error
-    pv_prices = pv_prices[pv_prices["technology"] == pv_technology].reset_index(drop=True)
+    assert PV_TECHNOLOGY in set(pv_prices["technology"]), error
+    pv_prices = pv_prices[pv_prices["technology"] == PV_TECHNOLOGY].reset_index(drop=True)
 
     # Get year from dates.
     pv_prices["year"] = pd.to_datetime(pv_prices["month"], format="%b %y").dt.year
@@ -93,8 +92,11 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
     pv_prices = pv_prices.format(sort_columns=True, short_name="solar_photovoltaic_module_prices")
 
     # Add units.
-    pv_prices["cost"].metadata.unit = f"{EXPECTED_DOLLAR_YEAR} US$ per Watt"
+    pv_prices["cost"].metadata.unit = f"constant {EXPECTED_DOLLAR_YEAR} US$ per Watt"
     pv_prices["cost"].metadata.short_unit = "$/W"
+    pv_prices["cost"].metadata.description_key = [
+        f"IRENA presents solar PV module price series for a number of different module technologies. Here we use the series for '{PV_TECHNOLOGY}'."
+    ]
 
     return pv_prices
 
@@ -314,9 +316,11 @@ def combine_global_and_national_data(tb_costs_global: Table, tb_costs_national: 
 
     # Add units.
     for column in tb_combined.columns:
-        tb_combined[column].metadata.unit = f"{EXPECTED_DOLLAR_YEAR} US$ per kilowatt-hour"
+        tb_combined[column].metadata.unit = f"constant {EXPECTED_DOLLAR_YEAR} US$ per kilowatt-hour"
         tb_combined[column].metadata.short_unit = "$/kWh"
-        tb_combined[column].metadata.description_short = f"Measured in {EXPECTED_DOLLAR_YEAR} US$ per kilowatt-hour."
+        tb_combined[
+            column
+        ].metadata.description_short = "This data is expressed in US dollars per kilowatt-hour. It is adjusted for inflation but does not account for differences in living costs between countries."
 
     return tb_combined
 

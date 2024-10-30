@@ -28,11 +28,11 @@ paths = PathFinder(__file__)
 
 # Conversion factors.
 # IRENA costs are given in the latest year's USD, so we convert other costs to the same currency.
-LATEST_YEAR = 2022
+LATEST_YEAR = 2023
 # Convert 2004 USD and 2013 USD to LATEST_YEAR USD , using
 # https://www.usinflationcalculator.com/
-USD2004_TO_USDLATEST = 1.55
-USD2013_TO_USDLATEST = 1.26
+USD2004_TO_USDLATEST = 1.61
+USD2013_TO_USDLATEST = 1.31
 
 
 def prepare_capacity_data(tb_nemet: Table, tb_irena_capacity: Table) -> Table:
@@ -62,6 +62,11 @@ def prepare_capacity_data(tb_nemet: Table, tb_irena_capacity: Table) -> Table:
         .reset_index(drop=True)
     )
 
+    # Improve metadata.
+    cumulative_capacity[
+        "cumulative_capacity"
+    ].metadata.description_processing = "Photovoltaic capacity data between 1975 and 2003 has been taken from Nemet (2009). Data since 2004 has been taken from IRENA."
+
     # Since sources column has been manually created, it does not have metadata. Copy origins from another column.
     cumulative_capacity["cumulative_capacity_source"].metadata.origins = cumulative_capacity[
         "cumulative_capacity"
@@ -80,7 +85,7 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     tb_nemet_cost["cost_source"] = "Nemet (2009)"
     # Costs are given in "2004 USD/Watt", so we need to convert them to the latest year USD.
     tb_nemet_cost["cost"] *= USD2004_TO_USDLATEST
-    tb_nemet_cost["cost"].metadata.unit = f"{LATEST_YEAR} USD/Watt"
+    tb_nemet_cost["cost"].metadata.unit = f"constant {LATEST_YEAR} US$ per Watt"
 
     # Prepare solar photovoltaic cost data from Farmer & Lafond (2016).
     tb_farmer_lafond = (
@@ -92,7 +97,7 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     tb_farmer_lafond["cost_source"] = "Farmer & Lafond (2016)"
     # Costs are given in "2013 USD/Wp", so we need to convert them to the latest year USD.
     tb_farmer_lafond["cost"] *= USD2013_TO_USDLATEST
-    tb_farmer_lafond["cost"].metadata.unit = f"{LATEST_YEAR} USD/Watt"
+    tb_farmer_lafond["cost"].metadata.unit = f"constant {LATEST_YEAR} US$ per Watt"
 
     # Prepare solar photovoltaic cost data from IRENA.
     tb_irena_cost = tb_irena_cost.drop(columns="country", errors="raise")
@@ -105,6 +110,11 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
 
     # Combine the previous with IRENA, prioritizing the latter.
     combined = combine_two_overlapping_dataframes(df1=tb_irena_cost, df2=combined, index_columns="year")
+
+    # Improve metadata.
+    combined[
+        "cost"
+    ].metadata.description_processing = f"Photovoltaic cost data between 1975 and 2003 has been taken from Nemet (2009). Photovoltaic cost data between 2004 and 2009 has been taken from Farmer & Lafond (2016). Photovoltaic cost data since 2010 has been taken from IRENA. Prices from Nemet (2009) and Farmer & Lafond (2016) have been converted to {LATEST_YEAR} US$ using: https://www.usinflationcalculator.com/"
 
     # Since sources column has been manually created, it does not have metadata. Copy origins from another column.
     combined["cost_source"].metadata.origins = combined["cost"].metadata.origins.copy()
