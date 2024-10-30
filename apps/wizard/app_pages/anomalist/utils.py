@@ -53,6 +53,9 @@ def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], D
     # Initialize DB engine.
     engine = get_engine()
     with Session(engine) as session:
+        # Ensure the 'anomalies' table exists.
+        gm.Anomaly.create_table(engine, if_exists="skip")
+
         # Get list of datasets for which anomalies have already been detected (if any).
         dataset_ids_with_anomalies = sorted(set(session.scalars(select(gm.Anomaly.datasetId)).all()))
 
