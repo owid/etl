@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import datetime as dt
+
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
@@ -102,8 +104,13 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
+    date_accessed = max([origin.date_accessed for origin in tb.area_ha.m.origins])
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=[tb],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+        yaml_params={"date_accessed": dt.datetime.strptime(date_accessed, "%Y-%m-%d").strftime("%d %B %Y")},
     )
 
     # Save changes in the new garden dataset.
