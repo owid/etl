@@ -1,5 +1,4 @@
 definitions:
-  latest_year: 2022
   common:
     processing_level: major
     presentation:
