@@ -39,18 +39,14 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
         PV prices.
 
     """
-    # Photovoltaic technologies to choose for average monthly prices.
-    pv_technologies = ["Thin film a-Si/u-Si or Global Index (from Q4 2013)"]
+    # Photovoltaic technology to choose for average monthly prices.
+    pv_technology = "Thin film a-Si/u-Si or Global Price Index (from Q4 2013)"
 
     # Load upper table in sheet from Figure 3.2, which is:
     # Average monthly solar PV module prices by technology and manufacturing country sold in Europe, 2010 to 2021.
-    pv_prices = data.parse(sheet_name="Fig 3.2", skiprows=7)
-    pv_prices = pv_prices.drop(
-        columns=[column for column in pv_prices.columns if "Unnamed" in str(column)], errors="raise"
-    )
-
-    # Rename table.
-    pv_prices.metadata.short_name = "solar_photovoltaic_module_prices"
+    pv_prices = data.parse(sheet_name="Fig 3.2", skiprows=7).dropna(axis=1, how="all")
+    error = "The file format for solar PV module prices has changed."
+    assert pv_prices.columns[0] == "Technology", error
 
     # Transpose table so that each row corresponds to a month.
     pv_prices = pv_prices.rename(columns={"Technology": "technology"}, errors="raise").melt(
@@ -58,7 +54,9 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
     )
 
     # Select PV technologies.
-    pv_prices = pv_prices[pv_prices["technology"].isin(pv_technologies)].reset_index(drop=True)
+    error = "Names of solar PV module technologies have changed."
+    assert pv_technology in set(pv_prices["technology"]), error
+    pv_prices = pv_prices[pv_prices["technology"] == pv_technology].reset_index(drop=True)
 
     # Get year from dates.
     pv_prices["year"] = pd.to_datetime(pv_prices["month"], format="%b %y").dt.year
@@ -81,8 +79,8 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
     # Ignore years for which we don't have 12 months.
     pv_prices = pv_prices[pv_prices["n_months"] == 12].drop(columns=["n_months"], errors="raise").reset_index(drop=True)
 
-    # Set an appropriate index and sort conveniently.
-    pv_prices = pv_prices.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    # Improve table formatting.
+    pv_prices = pv_prices.format(sort_columns=True, short_name="solar_photovoltaic_module_prices")
 
     return pv_prices
 
@@ -326,7 +324,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new Meadow dataset and reuse walden metadata.
+    # Create a new Meadow dataset.
     ds = create_dataset(
         dest_dir=dest_dir,
         tables=[tb_combined, tb_solar_pv_prices],
