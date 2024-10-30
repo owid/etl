@@ -54,7 +54,8 @@ class AdminAPI(object):
             json=chart_config,
         )
         js = self._json_from_response(resp)
-        assert js["success"]
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "chart_config": chart_config})
         return js
 
     def update_chart(self, chart_id: int, chart_config: dict) -> dict:
@@ -64,7 +65,8 @@ class AdminAPI(object):
             json=chart_config,
         )
         js = self._json_from_response(resp)
-        assert js["success"]
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "chart_config": chart_config})
         return js
 
     def set_tags(self, chart_id: int, tags: List[Dict[str, Any]]) -> dict:
@@ -74,7 +76,8 @@ class AdminAPI(object):
             json={"tags": tags},
         )
         js = self._json_from_response(resp)
-        assert js["success"]
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "tags": tags})
         return js
 
     def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
@@ -98,7 +101,8 @@ class AdminAPI(object):
             cookies={"sessionid": self.session_id},
         )
         js = self._json_from_response(resp)
-        assert js["success"]
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "variable_id": variable_id})
         return js
 
 

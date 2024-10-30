@@ -191,6 +191,12 @@ GROUPS = (
                 "owidbot": "apps.owidbot.cli.cli",
             },
         },
+        {
+            "name": "Anomalist",
+            "commands": {
+                "anomalist": "apps.anomalist.cli.cli",
+            },
+        },
     ]
     # Add subgroups (don't modify)
     + subgroups

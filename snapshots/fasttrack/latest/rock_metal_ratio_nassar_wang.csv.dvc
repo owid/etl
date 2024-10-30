@@ -1,8 +1,8 @@
 meta:
   origin:
     producer: |-
-      Nassar et al. (2022). Rock-to-Metal Ratio: A Foundational Metric for Understanding Mine Wastes; and Wang et al. (2024). Updated Mining Footprints and Raw Material Needs for
-      Clean Energy.
+      Nassar et al. (2022) and Wang et al. (2024)
+    attribution: Nassar et al. (2022); Wang et al. (2024)
     title: rock_metal_ratio_nassar_wang
     description: |-
       Main source of this data is Nassar et al. (2022). This has been combined with data from "Wang et al. (2024). Updated Mining Footprints and Raw Material Needs for Clean Energy." for several missing materials, including uranium and lead.

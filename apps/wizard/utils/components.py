@@ -1,15 +1,14 @@
 import json
 from contextlib import contextmanager
 from copy import deepcopy
-from random import sample
-from typing import Any, Callable, Dict, Literal, Optional
+from typing import Any, Callable, Dict, List, Literal, Optional
 
 import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
 
+from apps.wizard.utils.chart_config import bake_chart_config
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher_io import load_variable_data
 from etl.grapher_model import Variable
 
 HORIZONTAL_STYLE = """<style class="hide-element">
@@ -25,8 +24,13 @@ HORIZONTAL_STYLE = """<style class="hide-element">
         display: flex;
         flex-direction: row !important;
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 1rem;
         align-items: baseline;
+    }
+    /* Override the default width of selectboxes in horizontal layout */
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) select {
+        min-width: 200px;  /* Set a minimum width for selectboxes */
+        max-width: 400px;  /* Optional: Set a max-width to avoid overly wide selectboxes */
     }
     /* Buttons and their parent container all have a width of 704px, which we need to override */
     div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) div {
@@ -50,69 +54,6 @@ def st_horizontal():
         yield
 
 
-CONFIG_BASE = {
-    # "title": "Placeholder",
-    # "subtitle": "Placeholder.",
-    # "originUrl": "placeholder",
-    # "slug": "placeholder",
-    # "selectedEntityNames": ["placeholder"],
-    "entityType": "entity",
-    "entityTypePlural": "entities",
-    "facettingLabelByYVariables": "metric",
-    "invertColorScheme": False,
-    "yAxis": {
-        "canChangeScaleType": False,
-        "min": 0,
-        "max": "auto",
-        "facetDomain": "shared",
-        "removePointsOutsideDomain": False,
-        "scaleType": "linear",
-    },
-    "hideTotalValueLabel": False,
-    "hideTimeline": False,
-    "hideLegend": False,
-    "tab": "chart",
-    "logo": "owid",
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-    "showYearLabels": False,
-    "id": 807,
-    "selectedFacetStrategy": "none",
-    "stackMode": "absolute",
-    "minTime": "earliest",
-    "compareEndPointsOnly": False,
-    "version": 14,
-    "sortOrder": "desc",
-    "maxTime": "latest",
-    "type": "LineChart",
-    "hideRelativeToggle": True,
-    "addCountryMode": "add-country",
-    "hideAnnotationFieldsInTitle": {"entity": False, "changeInPrefix": False, "time": False},
-    "matchingEntitiesOnly": False,
-    "showNoDataArea": True,
-    "scatterPointLabelStrategy": "year",
-    "hideLogo": False,
-    "xAxis": {
-        "canChangeScaleType": False,
-        "min": "auto",
-        "max": "auto",
-        "facetDomain": "shared",
-        "removePointsOutsideDomain": False,
-        "scaleType": "linear",
-    },
-    "hideConnectedScatterLines": False,
-    "zoomToSelection": False,
-    "hideFacetControl": True,
-    "hasMapTab": True,
-    "hideScatterLabels": False,
-    "missingDataStrategy": "auto",
-    "isPublished": False,
-    "timelineMinTime": "earliest",
-    "hasChartTab": True,
-    "timelineMaxTime": "latest",
-    "sortBy": "total",
-}
-
-
 def default_converter(o):
     if isinstance(o, np.integer):  # ignore
         return int(o)
@@ -122,18 +63,20 @@ def default_converter(o):
 
 def grapher_chart(
     catalog_path: Optional[str] = None,
-    variable_id: Optional[int] = None,
-    variable: Optional[Variable] = None,
+    variable_id: Optional[int | List[int]] = None,
+    variable: Optional[Variable | List[Variable]] = None,
     chart_config: Optional[Dict[str, Any]] = None,
     owid_env: OWIDEnv = OWID_ENV,
     selected_entities: Optional[list] = None,
-    num_sample_selected_entities: int = 5,
+    included_entities: Optional[list] = None,
     height=600,
     **kwargs,
 ):
     """Plot a Grapher chart using the Grapher API.
 
     You can either plot a given chart config (using chart_config) or plot an indicator with its default metadata using either catalog_path, variable_id or variable.
+
+    Note: You can find more details on our Grapher API at https://files.ourworldindata.org/schemas/grapher-schema.005.json.
 
     Parameters
     ----------
@@ -148,33 +91,22 @@ def grapher_chart(
     owid_env : OWIDEnv, optional
         Environment configuration, by default OWID_ENV
     selected_entities : Optional[list], optional
-        List of entities to plot, by default None. If None, a random sample of num_sample_selected_entities will be plotted.
-    num_sample_selected_entities : int, optional
-        Number of entities to sample if selected_entities is None, by default 5. If there are less entities than this number, all will be plotted.
+        List of entities to plot, by default None. If None, a random sample of num_sample_selected_entities will be plotted. Use entity names!
+    included_entities : Optional[list], optional
+        NOT WORKING ATM AS EXPECTED ATM. List of entities to include in chart. The rest are excluded! This is equivalent to `includedEntities` in Grapher. Use entity IDs!
     height : int, optional
         Height of the chart, by default 600
     """
-    # Check we have all needed to plot the chart
-    if (catalog_path is None) and (variable_id is None) and (variable is None) and (chart_config is None):
-        raise ValueError("Either catalog_path, variable_id, variable or chart_config must be provided")
-
     # Get data / metadata if no chart config is provided
     if chart_config is None:
-        # Get variable data
-        df = load_variable_data(
-            catalog_path=catalog_path, variable_id=variable_id, variable=variable, owid_env=owid_env
+        chart_config = bake_chart_config(
+            catalog_path=catalog_path,
+            variable_id=variable_id,
+            variable=variable,
+            selected_entities=selected_entities,
+            included_entities=included_entities,
+            owid_env=owid_env,
         )
-
-        # Define chart config
-        chart_config = deepcopy(CONFIG_BASE)
-        chart_config["dimensions"] = [{"property": "y", "variableId": variable_id}]
-
-        ## Selected entities?
-        if selected_entities is not None:
-            chart_config["selectedEntityNames"] = selected_entities
-        else:
-            entities = list(df["entity"].unique())
-            chart_config["selectedEntityNames"] = sample(entities, min(len(entities), num_sample_selected_entities))
 
     _chart_html(chart_config, owid_env, height=height, **kwargs)
 
@@ -213,6 +145,39 @@ def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **k
     components.html(HTML, height=height, **kwargs)
 
 
+def tag_in_md(tag_name: str, color: str, icon: Optional[str] = None):
+    """Create a custom HTML tag.
+
+    Parameters
+    ----------
+    tag_name : str
+        Tag name.
+    color : str
+        Color of the tag. Must be replaced with any of the following supported colors: blue, green, orange, red, violet, gray/grey, rainbow
+    icon: str
+        Icon of the tag. Can be material (e.g. ':material/upgrade:') or emoji (e.g. '🪄').
+    """
+    if icon is not None:
+        return f":{color}-background[{icon}: {tag_name}]"
+    else:
+        return f":{color}-background[{tag_name}]"
+
+
+def st_tag(tag_name: str, color: str, icon: str):
+    """Create a custom HTML tag.
+
+    Parameters
+    ----------
+    tag_name : str
+        Tag name.
+    color : str
+        Color of the tag. Must be replaced with any of the following supported colors: blue, green, orange, red, violet, gray/grey, rainbow
+    icon: str
+        Icon of the tag. Can be material (e.g. ':material/upgrade:') or emoji (e.g. '🪄').
+    """
+    st.markdown(tag_in_md(tag_name, color, icon))
+
+
 class Pagination:
     """Use pagination to show a list of items in Streamlit.
 
@@ -230,7 +195,7 @@ class Pagination:
     pagination = Pagination(
         items=items,
         items_per_page=items_per_page,
-        pagination_key="pagination-demo,
+        pagination_key="pagination-demo",
     )
 
     # Show controls only if needed
@@ -296,10 +261,11 @@ class Pagination:
 
     def show_controls_buttons(self):
         # Pagination controls
-        col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
+        # col1, col2, col3 = st.columns([1, 1, 1], vertical_alignment="center")
 
         with st.container(border=True):
-            with col1:
+            with st_horizontal():
+                # with col1:
                 key = f"previous-{self.pagination_key}"
                 if self.page > 1:
                     if st.button("⏮️ Previous", key=key):
@@ -310,7 +276,9 @@ class Pagination:
                 else:
                     st.button("⏮️ Previous", disabled=True, key=key)
 
-            with col3:
+                s = st.empty()
+
+                # with col3:
                 key = f"next-{self.pagination_key}"
                 if self.page < self.total_pages:
                     if st.button("Next ⏭️", key=key):
@@ -321,8 +289,8 @@ class Pagination:
                 else:
                     st.button("Next ⏭️", disabled=True, key=key)
 
-            with col2:
-                st.text(f"Page {self.page} of {self.total_pages}")
+                # with col2:
+                s.text(f"Page {self.page} of {self.total_pages}")
 
     def show_controls_bar(self) -> None:
         def _change_page():
@@ -332,10 +300,9 @@ class Pagination:
             if self.on_click is not None:
                 self.on_click()
 
-        col, _ = st.columns([1, 3])
-        with col:
+        with st_horizontal():
             st.number_input(
-                label=f"**Go to page** (total: {self.total_pages})",
+                label=f"**Go to page** (results per page: {self.items_per_page}; total pages: {self.total_pages})",
                 min_value=1,
                 max_value=self.total_pages,
                 # value=self.page,

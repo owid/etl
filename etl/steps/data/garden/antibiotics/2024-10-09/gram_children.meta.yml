@@ -21,6 +21,7 @@ tables:
     variables:
       antibiotic_usage__pct:
         title: Antibiotic usage in children
+        description_short: The caregiver reported share of children under five years old, with symptoms of lower respiratory tract infection, who received antibiotics for this illness.
       lower_uncertainty_interval__pct:
         title: Antibiotic usage in children, lower uncertainty interval
       upper_uncertainty_interval__pct:

@@ -99,6 +99,15 @@ sections:
         image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
         disable:
           production: True
+      - title: "Anomalist"
+        alias: anomalist
+        entrypoint: app_pages/anomalist/app.py
+        description: List anomalies in data
+        maintainer: "@lucas"
+        icon: ":material/planner_review:"
+        image_url: "https://i0.pickpik.com/photos/87/645/315/halloween-ghosts-happy-halloween-ghost-preview.jpg"
+        disable:
+          production: True
       - title: "Chart Diff"
         alias: chart-diff
         entrypoint: app_pages/chart_diff/app.py
@@ -108,15 +117,6 @@ sections:
         image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
         disable:
           production: True
-      # - title: "Anomalist"
-      #   alias: anomalist
-      #   entrypoint: app_pages/anomalist_2.py
-      #   description: List anomalies in data
-      #   maintainer: "@lucas"
-      #   icon: ":material/planner_review:"
-      #   image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
-      #   disable:
-      #     production: True
       - title: "Harmonizer"
         alias: harmonizer
         description: "Harmonize a column of a table"
@@ -124,20 +124,6 @@ sections:
         entrypoint: app_pages/harmonizer.py
         icon: ":material/music_note:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
-      - title: "Map Bracketer"
-        alias: map_brackets
-        entrypoint: app_pages/map_brackets.py
-        description: Create optimal map brackets
-        maintainer: "@pablo"
-        icon: ":material/map:"
-        image_url: "https://upload.wikimedia.org/wikipedia/en/8/8c/Human_Language_Families_Map_%28Wikipedia_Colors_.PNG"
-      - title: "Explorer editor"
-        alias: explorer_editor
-        entrypoint: app_pages/explorer_edit.py
-        description: Edit explorer config
-        maintainer: "@lucas"
-        icon: ":material/explore:"
-        image_url: "https://upload.wikimedia.org/wikipedia/en/1/18/Dora_the_Explorer_2004_album_cover.jpg"
 
   - title: "Monitoring"
     description: |-
@@ -157,6 +143,25 @@ sections:
         entrypoint: app_pages/dataset_explorer.py
         icon: ":material/search:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
+
+  - title: "Explorers"
+    description: |-
+      Explorer tools.
+    apps:
+      - title: "Map Bracketer"
+        alias: map_brackets
+        entrypoint: app_pages/map_brackets.py
+        description: Create optimal map brackets
+        maintainer: "@pablo"
+        icon: ":material/map:"
+        image_url: "https://upload.wikimedia.org/wikipedia/en/8/8c/Human_Language_Families_Map_%28Wikipedia_Colors_.PNG"
+      - title: "ID to Path"
+        alias: explorer_editor
+        entrypoint: app_pages/explorer_edit.py
+        description: Migrate id-based explorers
+        maintainer: "@lucas"
+        icon: ":material/explore:"
+        image_url: "https://upload.wikimedia.org/wikipedia/en/1/18/Dora_the_Explorer_2004_album_cover.jpg"
 
   - title: "Research"
     description: |-

@@ -867,3 +867,36 @@ steps:
     - data://meadow/antibiotics/2024-10-18/who_glass
   data://grapher/antibiotics/2024-10-18/who_glass:
     - data://garden/antibiotics/2024-10-18/who_glass
+
+    # ANIMUSE - antibiotic use in animals
+  data://meadow/antibiotics/2024-10-23/animuse_year:
+    - snapshot://antibiotics/2024-10-23/animuse_year.csv
+  data://garden/antibiotics/2024-10-23/animuse_year:
+    - data://meadow/antibiotics/2024-10-23/animuse_year
+  data://grapher/antibiotics/2024-10-23/animuse_year:
+    - data://garden/antibiotics/2024-10-23/animuse_year
+
+
+  # ESVAC antimicrobial use in animals
+  data://meadow/antibiotics/2024-10-25/esvac_sales:
+    - snapshot://antibiotics/2024-10-25/esvac_sales.zip
+  data://garden/antibiotics/2024-10-25/esvac_sales:
+    - data://meadow/antibiotics/2024-10-25/esvac_sales
+  data://grapher/antibiotics/2024-10-25/esvac_sales:
+    - data://garden/antibiotics/2024-10-25/esvac_sales
+
+  # ESVAC antimicrobial use in animals - corrected for animal size
+  data://meadow/antibiotics/2024-10-25/esvac_sales_corrected:
+    - snapshot://antibiotics/2024-10-25/esvac_sales_corrected.zip
+  data://garden/antibiotics/2024-10-25/esvac_sales_corrected:
+    - data://meadow/antibiotics/2024-10-25/esvac_sales_corrected
+  data://grapher/antibiotics/2024-10-25/esvac_sales_corrected:
+    - data://garden/antibiotics/2024-10-25/esvac_sales_corrected
+
+  #Antibiotics TRACSS data
+  data://meadow/antibiotics/2024-10-23/tracss:
+    - snapshot://antibiotics/2024-10-23/tracss.xlsx
+  data://garden/antibiotics/2024-10-23/tracss:
+    - data://meadow/antibiotics/2024-10-23/tracss
+  data://grapher/antibiotics/2024-10-23/tracss:
+    - data://garden/antibiotics/2024-10-23/tracss

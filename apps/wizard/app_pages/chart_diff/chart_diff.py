@@ -1,5 +1,7 @@
 import datetime as dt
-from typing import Dict, List, Optional
+import difflib
+import pprint
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 from sqlalchemy.engine.base import Engine
@@ -35,6 +37,8 @@ class ChartDiff:
     modified_checksum: Optional[pd.DataFrame]
     # Whether the chart has been edited in staging
     edited_in_staging: Optional[bool]
+    # Error preventing the chart from being synced
+    error: Optional[str]
 
     def __init__(
         self,
@@ -45,11 +49,13 @@ class ChartDiff:
         # approval_status: gm.CHART_DIFF_STATUS | str,
         modified_checksum: Optional[pd.DataFrame] = None,
         edited_in_staging: Optional[bool] = None,
+        error: Optional[str] = None,
     ):
         self.source_chart = source_chart
         self.target_chart = target_chart
         self.approval = approval
         self.conflict = conflict
+        self.error = error
         if target_chart:
             assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
         self.chart_id = source_chart.id
@@ -141,9 +147,14 @@ class ChartDiff:
         if self.target_chart:
             # Only published charts have slugs
             if self.target_chart.publishedAt is not None:
-                assert (
-                    self.source_chart.slug == self.target_chart.slug
-                ), f"Slug mismatch! {self.source_chart.slug} != {self.target_chart.slug}"
+                if self.source_chart.slug != self.target_chart.slug:
+                    # This happens only when someone renames a slug in the target environment
+                    log.error(
+                        "Slug mismatch!",
+                        source_chart_slug=self.source_chart.slug,
+                        target_chart_slug=self.target_chart.slug,
+                        chart_id=self.chart_id,
+                    )
         return self.source_chart.slug or "no-slug"
 
     @property
@@ -236,6 +247,9 @@ class ChartDiff:
         # Get checksums
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
 
+        # Get all slugs from target
+        slugs_in_target = cls._get_chart_slugs(target_session)
+
         # Build chart diffs
         chart_diffs = []
         for chart_id, source_chart in source_charts.items():
@@ -263,8 +277,17 @@ class ChartDiff:
             else:
                 edited_in_staging = None
 
+            # Are there any errors?
+            # Creating new chart, but slug already exists in target
+            if not target_chart and source_chart.slug in slugs_in_target:
+                error = f"Slug '{source_chart.slug}' already exists in target environment."
+            else:
+                error = None
+
             # Build Chart Diff object
-            chart_diff = cls(source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging)
+            chart_diff = cls(
+                source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging, error
+            )
             chart_diffs.append(chart_diff)
 
         return chart_diffs
@@ -335,10 +358,7 @@ class ChartDiff:
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
         assert self.target_chart is not None, "Target chart is None!"
-        exclude_keys = ("id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl")
-        config_1 = {k: v for k, v in self.source_chart.config.items() if k not in exclude_keys}
-        config_2 = {k: v for k, v in self.target_chart.config.items() if k not in exclude_keys}
-        return config_1 == config_2
+        return configs_are_equal(self.source_chart.config, self.target_chart.config)
 
     @property
     def details(self):
@@ -349,7 +369,14 @@ class ChartDiff:
             "is_rejected": self.is_rejected,
             "is_reviewed": self.is_reviewed,
             "is_new": self.is_new,
+            "error": self.error,
         }
+
+    @staticmethod
+    def _get_chart_slugs(target_session: Session) -> set[str]:
+        slugs_redirects = set(read_sql("SELECT slug FROM chart_slug_redirects", target_session)["slug"])
+        slugs = set(read_sql("SELECT slug FROM chart_configs", target_session)["slug"])
+        return slugs | slugs_redirects
 
     @staticmethod
     def _get_target_charts(target_session, source_charts):
@@ -725,3 +752,28 @@ def get_chart_diffs_from_grapher(
     chart_diffs = {chart.chart_id: chart for chart in chart_diffs}
 
     return chart_diffs
+
+
+def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbose=False) -> bool:
+    """Compare two chart configs, ignoring certain fields."""
+    exclude_keys = ("id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl", "version")
+    config_1 = {k: v for k, v in config_1.items() if k not in exclude_keys}
+    config_2 = {k: v for k, v in config_2.items() if k not in exclude_keys}
+
+    # Use pretty print to convert dicts to strings for comparison
+    config_1_str = pprint.pformat(config_1, sort_dicts=True)
+    config_2_str = pprint.pformat(config_2, sort_dicts=True)
+
+    # Compare the string representations using difflib
+    if config_1_str == config_2_str:
+        return True
+
+    if verbose:
+        log.warning("Configurations differ")
+        diff = difflib.unified_diff(config_1_str.splitlines(), config_2_str.splitlines(), lineterm="")
+
+        # Print the diff
+        for line in diff:
+            print(line)
+
+    return False
