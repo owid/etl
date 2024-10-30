@@ -13,8 +13,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset and read its tables.
     ds_meadow = paths.load_dataset("renewable_power_generation_costs")
-    tb = ds_meadow["renewable_power_generation_costs"].reset_index()
-    tb_solar_pv = ds_meadow["solar_photovoltaic_module_prices"]
+    tb = ds_meadow.read_table("renewable_power_generation_costs")
+    tb_solar_pv = ds_meadow.read_table("solar_photovoltaic_module_prices", reset_index=False)
 
     #
     # Process data.
@@ -22,13 +22,13 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Improve table formatting.
+    tb = tb.format()
 
     #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
+    # Create a new garden dataset.
     ds_garden = create_dataset(
         dest_dir, tables=[tb, tb_solar_pv], default_metadata=ds_meadow.metadata, check_variables_metadata=True
     )
