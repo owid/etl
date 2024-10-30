@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
@@ -79,18 +80,25 @@ def run(dest_dir: str) -> None:
 
     # Rename and format columns
     grouped_tb = Table(grouped_tb, short_name=paths.short_name)
-    grouped_tb = grouped_tb.rename({"region": "country"}, axis=1)
-    grouped_tb = grouped_tb.format(["year", "country"])
+    # Creating a 'World' row by summing mortality estimates across all regions for each group
+    world_agg = tb.groupby(["year"])[relevant_columns[2:]].sum().reset_index()
+    world_agg["region"] = "World"
+
+    # Concatenating the world row data with the regional data
+    tb = pr.concat([grouped_tb, world_agg], ignore_index=True)
+
+    tb = tb.rename({"region": "country"}, axis=1)
+    tb = tb.format(["year", "country"])
 
     for col in relevant_columns[2:]:
-        grouped_tb[col].metadata.origins = origins
+        tb[col].metadata.origins = origins
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[grouped_tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
