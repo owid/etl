@@ -118,12 +118,13 @@ def format_chart_diff(df: pd.DataFrame) -> str:
 
     return f"""
 <ul>
-    <li>{num_charts_reviewed}/{num_charts} reviewed charts</li>
-    <ul>
-        <li>Modified: {num_charts_modified_reviewed}/{num_charts_modified}</li>
-        <li>New: {num_charts_new_reviewed}/{num_charts_new}</li>
-        <li>Rejected: {num_charts_rejected}</li>
-        {errors}
-    </ul>
+    <li>{num_charts_reviewed}/{num_charts} reviewed charts
+        <ul>
+            <li>Modified: {num_charts_modified_reviewed}/{num_charts_modified}</li>
+            <li>New: {num_charts_new_reviewed}/{num_charts_new}</li>
+            <li>Rejected: {num_charts_rejected}</li>
+            {errors}
+        </ul>
+    </li>
 </ul>
     """.strip()

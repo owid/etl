@@ -696,6 +696,8 @@ def _modified_chart_configs_by_admin(
     # Add flag 'edited in staging'
     diff["chartEditedInStaging"] = source_df["chartLastEditedAt"] >= TIMESTAMP_STAGING_CREATION
 
+    print(diff["chartEditedInStaging"])
+
     assert (
         diff["chartEditedInStaging"].notna().all()
     ), "chartEditedInStaging has missing values! This might be due to `diff` and `eidted` dataframes not having the same number of rows."
