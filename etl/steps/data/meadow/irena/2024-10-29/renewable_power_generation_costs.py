@@ -105,7 +105,6 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     # Extract weighted average LCOE for different sources (each one requires a slightly different processing):
 
     # Solar photovoltaic.
-    # TODO: Spreadsheet 3.12 includes LCOE from 2018 to 2023 for 19 countries. We should fetch that data.
     error = "The file format for solar PV LCOE has changed."
     assert data.parse("Fig 3.1", skiprows=21).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     solar_pv = (
@@ -121,7 +120,6 @@ def extract_global_cost_for_all_sources_from_excel_file(data: pr.ExcelFile) -> T
     # Onshore wind.
     error = "The file format for onshore wind LCOE has changed."
     # NOTE: Sheet 2.1 contains LCOE only from 2010, whereas 2.11 contains LCOE from 1984.
-    # TODO: Sheet 2.12 contains LCOE from 1984 to 2023 for 15 countries. Fetch those.
     assert data.parse("Fig 2.11", skiprows=2).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     onshore_wind = (
         data.parse("Fig 2.11", skiprows=3)
@@ -215,14 +213,37 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
     # Extract LCOE for specific countries and technologies (those that are available in original data).
 
     # Solar photovoltaic.
-    solar_pv = (
-        data.parse("Fig. 3.11", skiprows=5, usecols=lambda column: "Unnamed" not in column)
-        .dropna(how="all", axis=1)
-        .rename(columns={"Country": "country", "Year": "year"}, errors="raise")
+    # NOTE: For some reason, sheet 3.11 contains LCOE from 2010 to 2023 for 15 countries, and 3.12 contains LCOE from 2018 to 2023 for 19 countries.
+    #  So, let's take both, check that they are consistent, and concatenate them.
+    solar_pv = data.parse("Fig. 3.11", skiprows=5).dropna(how="all", axis=1)
+    solar_pv = solar_pv.rename(columns={solar_pv.columns[0]: "country"}, errors="raise").melt(
+        id_vars="country", var_name="year", value_name="cost"
     )
-    solar_pv = solar_pv.rename(
-        columns={column: "cost" for column in solar_pv.columns if "Weighted" in column}, errors="raise"
-    ).drop(columns=[column for column in solar_pv.columns if "Percentage" in column], errors="raise")
+    # Keep only rows of LCOE, and drop year changes.
+    solar_pv = solar_pv[~solar_pv["year"].astype(str).str.startswith("%")].reset_index(drop=True)
+
+    # Load additional data.
+    solar_pv_extra = data.parse("Fig. 3.12", skiprows=8)
+    # Drop empty columns and unnecessary regions column.
+    solar_pv_extra = solar_pv_extra.drop(
+        columns=[column for column in solar_pv_extra.columns if "Unnamed" in str(column)], errors="raise"
+    ).drop(columns="Region", errors="raise")
+    solar_pv_extra = solar_pv_extra.rename(columns={"Country": "country"}, errors="raise").melt(
+        id_vars="country", var_name="year", value_name="cost"
+    )
+
+    # Check that, where both tables overlap, they are consistent.
+    error = "Expected coincident country-years to have the same LCOE in sheets 3.11 and 3.12."
+    check = solar_pv.merge(solar_pv_extra, on=["country", "year"], how="inner")
+    # NOTE: Consider relaxing this to coincide within a certain tolerance, if this fails.
+    assert (check["cost_x"] == check["cost_y"]).all(), error
+    # Concatenate both tables and drop duplicates and empty rows.
+    solar_pv = (
+        pr.concat([solar_pv, solar_pv_extra], ignore_index=True)
+        .drop_duplicates(subset=["country", "year"])
+        .dropna()
+        .reset_index(drop=True)
+    )
 
     # Onshore wind.
     onshore_wind = (
