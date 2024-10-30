@@ -219,8 +219,8 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
     solar_pv = solar_pv.rename(columns={solar_pv.columns[0]: "country"}, errors="raise").melt(
         id_vars="country", var_name="year", value_name="cost"
     )
-    # Keep only rows of LCOE, and drop year changes.
-    solar_pv = solar_pv[~solar_pv["year"].astype(str).str.startswith("%")].reset_index(drop=True)
+    # Keep only rows of LCOE, and drop year changes and empty rows.
+    solar_pv = solar_pv[~solar_pv["year"].astype(str).str.startswith("%")].dropna().reset_index(drop=True)
 
     # Load additional data.
     solar_pv_extra = data.parse("Fig. 3.12", skiprows=8)
@@ -246,24 +246,36 @@ def extract_country_cost_from_excel_file(data: pr.ExcelFile) -> Table:
     )
 
     # Onshore wind.
+    # NOTE: There is country-level LCOE data in sheets 2.12 and 2.13 (for smaller markets).
+    #  Fetch both and concatenate them.
+    error = "The file format for onshore wind LCOE has changed."
+    assert data.parse("Fig 2.12", skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
+    # NOTE: Column "Country" appears twice, so drop one of them.
     onshore_wind = (
         data.parse("Fig 2.12", skiprows=6)
         .dropna(how="all", axis=1)
+        .drop(columns=["Country.1"])
         .rename(columns={"Country": "country"}, errors="raise")
+        .melt(id_vars="country", var_name="year", value_name="cost")
     )
+    # Keep only rows of LCOE, and drop year changes and empty rows.
+    onshore_wind = onshore_wind[~onshore_wind["year"].astype(str).str.startswith("%")].dropna().reset_index(drop=True)
 
-    # Country column is repeated. Drop it, and drop column of percentage decrease.
-    onshore_wind = onshore_wind.drop(columns=["Country.1", "% decrease "], errors="raise")
-
-    # Change to long format.
-    onshore_wind = onshore_wind.melt(id_vars="country", var_name="year", value_name="cost")
-
-    # There is data for some additional countries in a separate sheet for smaller markets.
+    error = "The file format for country-level onshore wind LCOE for smaller markets has changed."
+    assert data.parse("Fig 2.13", skiprows=3).columns[1] == f"LCOE ({EXPECTED_LCOE_UNIT})", error
     onshore_wind_extra = (
         data.parse("Fig 2.13", skiprows=6)
         .dropna(how="all", axis=1)
-        .rename(columns={"Country": "country", "Year": "year", "Weighted average": "cost"}, errors="raise")
+        .rename(columns={"Country": "country"}, errors="raise")
+        .melt(id_vars="country", var_name="year", value_name="cost")
+        .dropna()
+        .reset_index(drop=True)
     )
+
+    # Check that there is no overlap between countries in the two tables.
+    # NOTE: If there is, then change this to check that the values on coincident country-years are consistent.
+    error = "Expected no overlap between countries in sheets 2.12 and 2.13."
+    assert set(onshore_wind["country"]).isdisjoint(set(onshore_wind_extra["country"])), error
 
     # Combine onshore wind data.
     onshore_wind_combined = pr.concat([onshore_wind, onshore_wind_extra], ignore_index=True)
