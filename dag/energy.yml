@@ -7,15 +7,6 @@ steps:
   data://garden/papers/2023-12-12/smil_2017:
     - data://meadow/papers/2023-12-12/smil_2017
   #
-  # IRENA - Renewable power generation costs.
-  #
-  data://meadow/irena/2023-12-12/renewable_power_generation_costs:
-    - snapshot://irena/2023-12-12/renewable_power_generation_costs.xlsx
-  data://garden/irena/2023-12-12/renewable_power_generation_costs:
-    - data://meadow/irena/2023-12-12/renewable_power_generation_costs
-  data://grapher/irena/2023-12-12/renewable_power_generation_costs:
-    - data://garden/irena/2023-12-12/renewable_power_generation_costs
-  #
   # IRENA - Renewable electricity capacity.
   #
   data://meadow/irena/2023-12-12/renewable_electricity_capacity:
@@ -83,16 +74,6 @@ steps:
     - data://garden/demography/2023-03-31/population
     - data://garden/wb/2024-03-11/income_groups
     - data://garden/regions/2023-01-01/regions
-  #
-  # Energy - Photovoltaic cost and capacity.
-  #
-  data://garden/energy/2024-05-08/photovoltaic_cost_and_capacity:
-    - data://garden/papers/2023-12-12/nemet_2009
-    - data://garden/papers/2023-12-12/farmer_lafond_2016
-    - data://garden/irena/2023-12-12/renewable_electricity_capacity
-    - data://garden/irena/2023-12-12/renewable_power_generation_costs
-  data://grapher/energy/2024-05-08/photovoltaic_cost_and_capacity:
-    - data://garden/energy/2024-05-08/photovoltaic_cost_and_capacity
   #
   # Energy - OWID Energy dataset.
   #
