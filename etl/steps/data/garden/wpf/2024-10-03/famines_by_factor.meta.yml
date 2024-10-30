@@ -4,6 +4,7 @@ definitions:
     display:
       numDecimalPlaces: 0
     description_short: Famines that are estimated to have killed 100,000 people or more.
+    description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
     presentation:
       topic_tags:
         - Famines
@@ -18,14 +19,26 @@ dataset:
 tables:
   famines_by_factor:
     variables:
-     sum_conflict_mortality:
-       title: Deaths from famines where conflict was not a factor
+     sum_conflict_mortality_factor:
+       title: Deaths from famines where conflict was a factor
        unit: 'deaths'
 
-     sum_government_policy_overall_mortality:
+     sum_government_policy_overall_mortality_factor:
+        title: Deaths from famines where government policy was a factor
+        unit: 'deaths'
+
+     sum_external_factors_mortality_factor:
+        title: Deaths from famines where external factors was a factor
+        unit: 'deaths'
+
+     sum_conflict_mortality_not_a_factor:
+        title: Deaths from famines where conflict was not a factor
+        unit: 'deaths'
+
+     sum_government_policy_overall_mortality_not_a_factor:
         title: Deaths from famines where government policy was not a factor
         unit: 'deaths'
 
-     sum_external_factors_mortality:
+     sum_external_factors_mortality_not_a_factor:
         title: Deaths from famines where external factors was not a factor
         unit: 'deaths'

@@ -20,40 +20,41 @@ tables:
        famine_deaths:
           title: Deaths from famines
           unit: 'deaths'
-          short_unit: ''
+          description_short: Deaths in famines that are estimated to have killed 100,000 people or more.
           display:
             numDecimalPlaces: 0
 
        decadal_famine_deaths:
           title: Deaths from famines by decade
           unit: 'deaths'
-          short_unit: ''
-          description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
+          description_short: Deaths in famines that are estimated to have killed 100,000 people or more.
           display:
             numDecimalPlaces: 0
 
        famine_deaths_per_rate:
           title: Death rates from famines
           unit: 'deaths per 100,000 people'
+          description_short: Deaths in famines that are estimated to have killed 100,000 people or more, per 100,000 people.
           display:
             numDecimalPlaces: 0
 
        decadal_famine_deaths_rate:
           title: Death rates from famines by decade
           unit: 'deaths per 100,000 people'
+          description_short: Deaths in famines that are estimated to have killed 100,000 people or more, per 100,000 people.
           display:
             numDecimalPlaces: 1
 
        famine_count:
         title: Number of famines
-        unit: ''
-        short_unit: ''
+        unit: 'famines'
+        description_short: Number of famines that are estimated to have killed 100,000 people or more.
         display:
           numDecimalPlaces: 0
 
        decadal_famine_count:
          title: Number of famines by decade
-         unit: ''
-         short_unit: ''
+         unit: 'famines'
+         description_short: Number of famines that are estimated to have killed 100,000 people or more.
          display:
             numDecimalPlaces: 0
