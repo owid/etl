@@ -15,3 +15,7 @@ tables:
         title: Wager winner
         unit: ''
         description: Who would have won the Simon-Ehrlich bet if it had happened in that given decade.
+      simon_ehrlich_code:
+        title: Wager winner code
+        unit: (0 = Ehrlich, 1 = Simon)
+        description: Coded as 0 if Ehrlich would have won the wager in that decade; 1 if Simon would have won.

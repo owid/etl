@@ -11,6 +11,6 @@ meta:
   description: ''
   license: {}
 outs:
-  - md5: a0f9c6f8a06ab842f1028b2f34455c22
-    size: 14918
+  - md5: 1c692fa70a842ffd61695c29bb75c754
+    size: 16150
     path: simon_ehrlich_wager.csv
