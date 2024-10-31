@@ -1091,7 +1091,8 @@ def regional_headcount(tb: Table) -> Table:
             {list(tb_out.year.unique())}"""
         )
         tb_regions = tb_regions[~mask].reset_index()
-        tb_regions = tb_regions.drop(columns="check_total")
+
+    tb_regions = tb_regions.drop(columns="check_total")
 
     # Get difference between world and (total) regional headcount, to patch rows with one missing value
     cols_to_sum = [e for e in list(tb_regions.columns) if e not in ["year", "World"]]

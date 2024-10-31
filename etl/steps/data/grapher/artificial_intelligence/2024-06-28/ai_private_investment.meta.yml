@@ -17,8 +17,9 @@ definitions:
     description_short: Includes companies that received more than $1.5 million in investment (not adjusted for inflation). This data is expressed in US dollars, adjusted for inflation.
 
     description_key:
-          - The source is not clear about the extent to which investment figures cover infrastructure, computational power, and support services required to develop, deploy, and operationalize AI applications
-          - For more information on how the costs to train frontier AI models are distributed refer to the article [How Much Does It Cost to Train Frontier AI Models?](https://epochai.org/blog/how-much-does-it-cost-to-train-frontier-ai-models) by EPOCH.
+        - One-time events like large acquisitions can skew yearly figures, and broader economic factors like interest rates or market sentiment can also affect AI investment trends independently of AI-specific developments.
+        - The dataset’s methodology doesn’t specify which types of AI investments are included, so it may overlook important areas of AI investment, such as those from public companies (e.g., NVIDIA, TSMC), corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
+        - The dataset likely underestimates the total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
 
     unit: 'constant 2021 US$'
     short_unit: '$'

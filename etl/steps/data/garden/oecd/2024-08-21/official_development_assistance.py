@@ -368,11 +368,11 @@ def add_donor_data_from_recipient_dataset(tb_donor: Table, tb_recipient: Table) 
     tb = pr.merge(tb_donor, tb_recipient_grants_loans, on=["country", "year"], how="left")
     tb = pr.merge(tb, tb_recipient_oda, on=["country", "year"], how="outer")
 
-    # When i_oda_net_disbursements is missing, fill with oda
-    tb["i_oda_net_disbursements"] = tb["i_oda_net_disbursements"].fillna(tb["oda"])
-
-    # Also use oda for country Multilaterals, Total
+    # Use oda for country Multilaterals, Total
     tb.loc[tb["country"] == "Multilateral organizations (OECD)", "i_oda_net_disbursements"] = tb["oda"]
+
+    # When i_oda_net_disbursements is missing, fill with oda
+    tb["i_oda_net_disbursements_multilaterals_private_grants"] = tb["i_oda_net_disbursements"].fillna(tb["oda"])
 
     # Drop oda
     tb = tb.drop(columns="oda")

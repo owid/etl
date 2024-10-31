@@ -1,0 +1,41 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Inequality
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ipsos:
+    variables:
+      perception_wealth:
+        title: Perception of wealth
+        description_short: Perceived household wealth owned by the top 1%.
+        unit: "%"
+        short_unit: "%"
+        origins:
+          - title: "Ipsos"
+            date_published: "2023-12-01"
+            producer: "Ipsos"
+            citation_full: Perils of perception, prejudice, and conspiracy theories. World Inequality Database , Ipsos (2023).
+            url_main: https://www.ipsos.com/sites/default/files/ct/news/documents/2023-12/ipsos-perils-perception-prejudice-conspiracy-theories-december-2023.pdf
+            date_accessed: 2024-10-25
+      actual_wealth:
+        title: Actual wealth
+        description_short: Actual household wealth owned by the top 1%.
+        unit: "%"
+        short_unit: "%"
+        origins:
+          - title: "World Inequality Database"
+            date_published: "2023-12-01"
+            producer: World Inequality Database (WID.world)
+            citation_full: Perils of perception, prejudice, and conspiracy theories. World Inequality Database , Ipsos (2023).
+            url_main: https://www.ipsos.com/sites/default/files/ct/news/documents/2023-12/ipsos-perils-perception-prejudice-conspiracy-theories-december-2023.pdf
+            date_accessed: 2024-10-25
