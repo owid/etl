@@ -11,6 +11,11 @@ tables:
         unit: $ per tonne
         short_unit: $
         description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      production:
+        title: Production
+        unit: tonnes
+        short_unit: t
+        description: Global mineral production, measured in tonnes per year.
       simon_ehrlich_winner:
         title: Wager winner
         unit: ''
