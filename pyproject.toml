@@ -125,7 +125,9 @@ wizard = [
     "plotly>=5.23.0",
     "geographiclib>=2.0",
     "pyproj>=3.6.1",
-    "streamlit-feedback>=0.1.3",]
+    "streamlit-feedback>=0.1.3",
+    "statsmodels>=0.14.4",
+]
 
 [project.scripts]
 etl = 'apps.cli:cli'

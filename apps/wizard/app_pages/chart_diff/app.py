@@ -74,7 +74,12 @@ def get_chart_diffs():
 
     # Sort charts
     st.session_state.chart_diffs = dict(
-        sorted(st.session_state.chart_diffs.items(), key=lambda item: item[1].latest_update, reverse=True)
+        sorted(
+            st.session_state.chart_diffs.items(),
+            # put errors first
+            key=lambda item: (item[1].error is not None, item[1].latest_update),
+            reverse=True,
+        )
     )
 
     # Init, can be changed by the toggle

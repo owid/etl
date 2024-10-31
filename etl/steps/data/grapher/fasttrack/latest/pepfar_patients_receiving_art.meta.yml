@@ -1,0 +1,21 @@
+dataset:
+  title: Number of PEPFAR patients currently receiving ART (PEPFAR, 2024)
+  description: |-
+    This dataset gives the number of PEPFAR patients receiving antiretroviral therapy (ART) by year.
+
+    You can find more information here:
+    https://spotlight.pepfar-panorama.org/MicroStrategyLibrary/app/20F2A7EC4211131FF05EE7886B0CB640/110502B54734BCD750AEAF9DED6B33DC/W5C3204B6FE4447808946F9D40FD0E497--K46
+  licenses:
+    - {}
+tables:
+  pepfar_patients_receiving_art:
+    variables:
+      patients_receiving_art:
+        title: patients_receiving_ART
+        unit: people
+        short_unit: people
+        display:
+          name: Number of people receiving antiretroviral therapy through PEPFAR
+          numDecimalPlaces: 0
+        description: |-
+          The number of patients receiving antiretroviral therapy (ART) through the President's Emergency Plan for AIDS Relief, by year.

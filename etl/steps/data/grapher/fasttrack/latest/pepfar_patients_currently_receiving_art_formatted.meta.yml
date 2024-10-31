@@ -1,0 +1,21 @@
+dataset:
+  title: DRAFT PEPFAR_patients_currently_receiving_ART_formatted
+  description: ''
+tables:
+  pepfar_patients_currently_receiving_art_formatted:
+    variables:
+      patients_receiving_art:
+        title: Patients_receiving_ART
+        unit: ''
+      unnamed__3:
+        title: 'Unnamed: 3'
+        unit: ''
+      unnamed__4:
+        title: 'Unnamed: 4'
+        unit: ''
+      unnamed__5:
+        title: 'Unnamed: 5'
+        unit: ''
+      unnamed__6:
+        title: 'Unnamed: 6'
+        unit: ''

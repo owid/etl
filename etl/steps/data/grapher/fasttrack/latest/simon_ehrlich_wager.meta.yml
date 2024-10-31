@@ -1,0 +1,21 @@
+dataset:
+  title: Material prices and Simon-Ehrlich wager (USGS)
+  description: ''
+  licenses:
+    - {}
+tables:
+  simon_ehrlich_wager:
+    variables:
+      price_per_tonne:
+        title: Price
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      simon_ehrlich_winner:
+        title: Wager winner
+        unit: ''
+        description: Who would have won the Simon-Ehrlich bet if it had happened in that given decade.
+      simon_ehrlich_code:
+        title: Wager winner code
+        unit: (0 = Ehrlich, 1 = Simon)
+        description: Coded as 0 if Ehrlich would have won the wager in that decade; 1 if Simon would have won.

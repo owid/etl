@@ -26,7 +26,12 @@ import streamlit as st
 from structlog import get_logger
 
 from apps.wizard import utils
-from apps.wizard.app_pages.indicator_upgrade.charts_update import get_affected_charts_and_preview, push_new_charts
+from apps.wizard.app_pages.indicator_upgrade.charts_update import (
+    get_affected_charts_and_preview,
+    push_new_charts,
+    save_variable_mapping,
+    undo_upgrade_dialog,
+)
 from apps.wizard.app_pages.indicator_upgrade.dataset_selection import build_dataset_form
 from apps.wizard.app_pages.indicator_upgrade.indicator_mapping import render_indicator_mapping
 from apps.wizard.app_pages.indicator_upgrade.utils import get_datasets
@@ -40,7 +45,7 @@ st.set_page_config(
     page_title="Wizard: Indicator Upgrader",
     layout="wide",
     page_icon="🪄",
-    initial_sidebar_state="collapsed",
+    # initial_sidebar_state="collapsed",
     menu_items={
         "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
         "About": """
@@ -148,14 +153,40 @@ if st.session_state.submitted_datasets:
         if st.session_state.submitted_charts:
             if isinstance(charts, list) and len(charts) > 0:
                 st.toast("Updating charts...")
+
+                # Push charts
                 push_new_charts(charts)
 
+                # Save variable mapping
+                save_variable_mapping(
+                    indicator_mapping=indicator_mapping,
+                    dataset_id_new=int(search_form.dataset_new_id),
+                    dataset_id_old=int(search_form.dataset_old_id),
+                    comments="Done with indicator-upgrader",
+                )
+
+                # Undo upgrade
+                st.markdown("Do you want to undo the indicator upgrade?")
+                st.button(
+                    "Undo upgrade",
+                    on_click=undo_upgrade_dialog,
+                    icon=":material/undo:",
+                    help="Undo all indicator upgrades",
+                    key="btn_undo_upgrade_end",
+                )
+
+
 ##########################################################################################
-# 4 UPDATE CHARTS
+# 5 UNDO UPGRADE
 #
-# TODO: add description
+# You may have accidentally upgraded the wrong indicators. Here you can undo the upgrade.
 ##########################################################################################
-# if st.session_state.submitted_datasets and st.session_state.submitted_charts and st.session_state.submitted_indicators:
-#     if isinstance(charts, list) and len(charts) > 0:
-#         st.toast("Updating charts...")
-#         push_new_charts(charts, SCHEMA_CHART_CONFIG)
+with st.sidebar:
+    st.markdown("### Advanced tools")
+    st.button(
+        "Undo upgrade",
+        on_click=undo_upgrade_dialog,
+        icon=":material/undo:",
+        help="Undo all indicator upgrades",
+        key="btn_undo_upgrade_sidebar",
+    )
