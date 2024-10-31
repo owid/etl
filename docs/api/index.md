@@ -111,3 +111,7 @@ At the moment, this API only supports [Python](python.ipynb).
 !!! warning "Our ETL API is in beta"
 
     We currently only provide a python API for our ETL catalog. Our hope is to extend this to other languages in the future. Please [report any issue](https://github.com/owid/etl) that you may find.
+
+=== "Python"
+
+    (see [example notebook](python.ipynb))
