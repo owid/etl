@@ -45,8 +45,7 @@ def prepare_capacity_data(tb_nemet: Table, tb_irena_capacity: Table) -> Table:
     # Add column of origin of the data.
     tb_nemet_capacity["cumulative_capacity_source"] = "Nemet (2009)"
 
-    # I haven't found a precise definition of the variables in IRENA's dataset, but I expect this to be
-    # cumulative capacity.
+    # Select solar PV cumulative capacity from IRENA's dataset.
     tb_irena_capacity = (
         tb_irena_capacity[tb_irena_capacity["country"] == "World"][["year", "solar_photovoltaic"]]
         .rename(columns={"solar_photovoltaic": "cumulative_capacity"}, errors="raise")
