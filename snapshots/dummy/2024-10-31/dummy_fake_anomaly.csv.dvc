@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Our World in Data
+    title: Detecting anomalies in data
+    citation_full: Our World in Data - Example of a data anomaly (2024).
+    attribution_short: OWID
+    url_main: https://ourworldindata.org
+    date_accessed: '2024-10-31'
+    date_published: '2024-10-31'
+    license:
+      name: CC BY 4.0
+      url: https://ourworldindata.org
+outs:
+  - md5: f908c96b365d2f09de828d375456acba
+    size: 423
+    path: dummy_fake_anomaly.csv
