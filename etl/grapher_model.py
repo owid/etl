@@ -570,7 +570,7 @@ class Dataset(Base):
         Index("datasets_createdByUserId", "createdByUserId"),
         Index("datasets_dataEditedByUserId", "dataEditedByUserId"),
         Index("datasets_metadataEditedByUserId", "metadataEditedByUserId"),
-        Index("datasets_catalogpath", "catalogpath", unique=True),
+        Index("datasets_catalogpath", "catalogPath", unique=True),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
