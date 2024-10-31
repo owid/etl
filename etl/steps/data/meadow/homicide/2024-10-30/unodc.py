@@ -45,8 +45,5 @@ def clean_data(tb: Table) -> Table:
         },
         errors="raise",
     )
-    # Rename regional Micronesia to differentiate from the country
-    msk = (tb["country"] == "Micronesia") & (tb["Iso3_code"] == "M49_MICRON")
-    tb.loc[msk, "country"] = "Micronesia (region)"
     tb = tb.drop(columns=["Iso3_code", "Region", "Subregion"])
     return tb

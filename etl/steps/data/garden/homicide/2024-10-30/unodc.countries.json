@@ -111,7 +111,7 @@
   "Mayotte": "Mayotte",
   "Melanesia": "Melanesia",
   "Mexico": "Mexico",
-  "Micronesia": "Micronesia (country)",
+  "Micronesia": "Micronesia",
   "Micronesia (Federated States of)": "Micronesia (country)",
   "Monaco": "Monaco",
   "Mongolia": "Mongolia",
@@ -223,6 +223,5 @@
   "United Kingdom (Scotland)": "Scotland",
   "Western Asia": "Western Asia (UNODC)",
   "Western Europe": "Western Europe (UNODC)",
-  "All Africa": "Africa (UNODC)",
-  "Micronesia (region)": "Micronesia"
+  "All Africa": "Africa (UNODC)"
 }

@@ -28,14 +28,14 @@ def run(dest_dir: str) -> None:
     )
 
     tb = clean_up_categories(tb)
-    tb = tb.format(["country", "year"])
+    tables = clean_data(tb)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -55,9 +55,7 @@ def clean_data(tb: Table) -> list[Table]:
     tb_situ = create_table(tb, table_name="by situational context")
     tb_tot = create_total_table(tb)
 
-    tb_share = calculate_share_of_homicides(tb_tot, tb_perp)
-    tb_share.update_metadata_from_yaml(paths.metadata_path, "share")
-    tb_garden_list = [tb_mech, tb_tot, tb_perp, tb_situ, tb_share]
+    tb_garden_list = [tb_mech, tb_tot, tb_perp, tb_situ]
 
     return tb_garden_list
 
