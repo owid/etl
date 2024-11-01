@@ -1,8 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
 
+import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -77,6 +79,35 @@ def run(dest_dir: str) -> None:
 
     # Sum the entries for each country and year
     tb_combined = tb_combined.groupby(["country", "year"])["wpf_authoritative_mortality_estimate"].sum().reset_index()
+
+    # Create a DataFrame with all years from 1870 to 2023
+    all_years = pd.DataFrame({"year": range(1870, 2024)})
+
+    # Get all unique regions from the original data
+    all_regions = tb_combined["country"].unique()
+
+    # Create a DataFrame with all combinations of years and regions - to ensure that where there are no data points for a year and region, the value is set to zero
+    all_years_regions = pd.MultiIndex.from_product(
+        [all_years["year"], all_regions], names=["year", "country"]
+    ).to_frame(index=False)
+    all_years_regions = Table(all_years_regions)
+
+    # Merge this DataFrame with the existing data to ensure all years are present
+    tb_combined = pr.merge(tb_combined, all_years_regions, on=["year", "country"], how="right")
+    tb_combined["wpf_authoritative_mortality_estimate"] = tb_combined["wpf_authoritative_mortality_estimate"].fillna(0)
+
+    # Calculate the decade
+    tb_combined["decade"] = (tb_combined["year"] // 10) * 10
+
+    # Group the data by region and decade, then calculate the decadal sum
+    tb_combined["decadal_famine_deaths"] = tb_combined.groupby(["country", "decade"], observed=False)[
+        "wpf_authoritative_mortality_estimate"
+    ].transform("sum")
+    # Set NaN everywhere except the start of a decade
+    tb_combined["decadal_famine_deaths"] = tb_combined["decadal_famine_deaths"].where(
+        tb_combined["year"] % 10 == 0, np.nan
+    )
+    tb_combined = tb_combined.drop(columns=["decade"])
 
     tb_combined = tb_combined.format(["country", "year"], short_name=paths.short_name)
 

@@ -3,6 +3,7 @@ definitions:
   common:
     display:
       numDecimalPlaces: 0
+    description_short: Deaths in famines that are estimated to have killed 100,000 people or more.
     description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
     presentation:
       topic_tags:
@@ -20,5 +21,7 @@ tables:
     variables:
      wpf_authoritative_mortality_estimate:
        title: Deaths from famines by top countries
-       description_short: Famines estimated to have caused over 100,000 deaths.
        unit: 'deaths'
+     decadal_famine_deaths:
+        title: Deaths from famines by top countries by decade
+        unit: 'deaths'
