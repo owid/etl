@@ -92,8 +92,6 @@ def run(dest_dir: str) -> None:
     columns = [
         "Date",
         "Place",
-        "Sub region",
-        "Global region",
         "WPF authoritative mortality estimate",
         "Cause: immediate trigger",
         "Cause: contributing factors",
@@ -176,8 +174,11 @@ def combine_entries(df):
     # Filter rows to combine
     rows_to_combine = df[df["Place"].apply(lambda x: any(sub in x for sub in famines))]
 
-    # Combine dates
+    # Combine dates and causes
     combined_dates = ",".join(rows_to_combine["Date"].unique())
+    combined_trigger = ",".join(rows_to_combine["Cause: immediate trigger"])
+    combined_contributing_cause = ",".join(rows_to_combine["Cause: contributing factors"])
+    combined_structural_cause = ",".join(rows_to_combine["Cause: structural factors"])
 
     # Calculate the sum of the 'WPF authoritative mortality estimate' column
     mortality_estimate = rows_to_combine["WPF authoritative mortality estimate"].sum()
@@ -185,14 +186,12 @@ def combine_entries(df):
     # Create new combined entry
     new_entry = {
         "Date": combined_dates,
-        "Place": rows_to_combine.iloc[0]["Place"],
-        "Sub region": rows_to_combine.iloc[0]["Sub region"],
-        "Global region": rows_to_combine.iloc[0]["Global region"],
-        "Cause: immediate trigger": rows_to_combine.iloc[0]["Cause: immediate trigger"],
-        "Cause: contributing factors": rows_to_combine.iloc[0]["Cause: contributing factors"],
-        "Cause: structural factors": rows_to_combine.iloc[0]["Cause: structural factors"],
+        "Place": "Somaliland, African Red Sea Region",
+        "Cause: immediate trigger": combined_trigger,
+        "Cause: contributing factors": combined_contributing_cause,
+        "Cause: structural factors": combined_structural_cause,
         "WPF authoritative mortality estimate": mortality_estimate,
-        "simplified_place": rows_to_combine.iloc[0]["simplified_place"],
+        "simplified_place": "Somaliland, African Red Sea Region",
     }
 
     # Add new combined entry
@@ -206,17 +205,19 @@ def combine_entries(df):
     hungerplan_rows = df[df["Place"].isin(places) & df["Date"].isin(dates)]
 
     if not hungerplan_rows.empty:
+        # Combine dates and causes
         combined_dates_hungerplan = ",".join(hungerplan_rows["Date"].unique())
         combined_mortality_estimate_hungerplan = hungerplan_rows["WPF authoritative mortality estimate"].sum()
+        combined_trigger = ",".join(hungerplan_rows["Cause: immediate trigger"])
+        combined_contributing_cause = ",".join(hungerplan_rows["Cause: contributing factors"])
+        combined_structural_cause = ",".join(hungerplan_rows["Cause: structural factors"])
 
         new_hungerplan_entry = {
             "Date": combined_dates_hungerplan,
             "Place": "USSR",
-            "Sub region": hungerplan_rows.iloc[0]["Sub region"],
-            "Global region": hungerplan_rows.iloc[0]["Global region"],
-            "Cause: immediate trigger": hungerplan_rows.iloc[0]["Cause: immediate trigger"],
-            "Cause: contributing factors": hungerplan_rows.iloc[0]["Cause: contributing factors"],
-            "Cause: structural factors": hungerplan_rows.iloc[0]["Cause: structural factors"],
+            "Cause: immediate trigger": combined_trigger,
+            "Cause: contributing factors": combined_contributing_cause,
+            "Cause: structural factors": combined_structural_cause,
             "WPF authoritative mortality estimate": combined_mortality_estimate_hungerplan,
             "simplified_place": "USSR (Hungerplan)",
         }
