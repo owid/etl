@@ -32,6 +32,7 @@ CUSTOM_REGION_DICT = {
     "East Asia": "Asia",
     "India, Bangladesh": "Asia",
     "Eastern Europe": "Europe",
+    "USSR (Hungerplan)": "Asia",
 }
 
 
@@ -81,12 +82,10 @@ def run(dest_dir: str) -> None:
         "external_factors",
         "famine_name",
     ]:
-        tb[col].metadata.origins = tb["conventional_title"].metadata.origins
+        tb[col].metadata.origins = tb["simplified_place"].metadata.origins
 
     # Drop columns that are not needed.
-    tb = tb.drop(
-        columns=["date_list", "date_range", "sub_region", "global_region", "conventional_title", "simplified_place"]
-    )
+    tb = tb.drop(columns=["date_list", "date_range", "sub_region", "global_region", "simplified_place"])
     tb = tb.format(["famine_name", "date"])
 
     #
