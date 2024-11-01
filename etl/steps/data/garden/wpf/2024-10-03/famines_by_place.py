@@ -92,7 +92,7 @@ def run(dest_dir: str) -> None:
     ).to_frame(index=False)
     all_years_regions = Table(all_years_regions)
 
-    # Merge this DataFrame with the existing data to ensure all years are present
+    # Merge this Table with the existing data to ensure all years are present
     tb = pr.merge(tb, all_years_regions, on=["year", "country"], how="right")
     tb["wpf_authoritative_mortality_estimate"] = tb["wpf_authoritative_mortality_estimate"].fillna(0)
 
