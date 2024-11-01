@@ -109,19 +109,19 @@ def clean_up_categories(tb: Table) -> Table:
         "Without a weapon/ other Mechanism": " without a weapon or by another mechanism",
         "Firearms or explosives": "firearms or explosives",
         "Another weapon": "sharp or blunt object, including motor vehicles",
-        "Intimate partner or family member": "Perpetrator is an intimate partner or family member",
+        "Intimate partner or family member": "Perpetrator is an intimate partner or family member of the victim",
         "Intimate partner or family member: Intimate partner": "Perpetrator is an intimate partner",
         "Intimate partner or family member: Family member": "Perpetrator is a family member",
         "Other Perpetrator known to the victim": "Another known perpetrator",
-        "Perpetrator unknown to the victim": "Perpetrator unknown to victim",
-        "Perpetrator to victim relationship unknown": "Perpetrator where the relationship to the victim is not known",
+        "Perpetrator unknown to the victim": "Perpetrator is unknown to victim",
+        "Perpetrator to victim relationship unknown": "the relationship to the victim is not known",
         "Socio-political homicide - terrorist offences": "Terrorist offences",
         "Unknown types of homicide": "Unknown situational context",
     }
 
     for key in category_dict.keys():
         assert key in tb["category"].values, f"{key} not in table"
-    tb["category"] = tb["category"].cat.rename_categories({"category": category_dict})
+    tb["category"] = tb["category"].cat.rename_categories(category_dict)
 
     assert tb["category"].isna().sum() == 0
     return tb

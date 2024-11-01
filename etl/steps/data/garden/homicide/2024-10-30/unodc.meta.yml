@@ -5,7 +5,38 @@ definitions:
       topic_tags:
         - Homicides
 
-
+  metric:
+    <% if unit_of_measurement == "Counts" %>
+    Number of homicides
+    <% elif sex == "Rate per 100,000 population" %>
+    Homicide rate per 100,000 population
+    <%- endif -%>
+  sex:
+    <% if sex == "Total" %> all victimes<% elif sex == "Male" %>male victims<% elif sex == "Female" %>female victims<%- endif -%>
+  age:
+    <% if age == "Total" %>
+    in all age-groups
+    <% elif age == "30-44" %>
+    aged 30-44 years
+    <% elif age == "45-59" %>
+    aged 45-59 years
+    <% elif age == "60 and older" %>
+    aged over 60 years
+    <% elif age == "0-9" %>
+    0-9 years
+    <% elif age == "10 -14" %>
+    10-14 years
+    <% elif age == "15 -17" %>
+    15-17 years
+    <% elif age == "18-19" %>
+    18-19 years
+    <% elif age == "20-24" %>
+    20-24 years
+    <% elif age == "25-29" %>
+    25-29 years
+    <% elif age == "Unknown" %>
+    of unknown age
+    <%- endif -%>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -13,46 +44,31 @@ dataset:
 
 
 tables:
-  unodc:
-    variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
-
+    by_mechanisms:
+      variables:
+        value:
+          title: |
+           {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
+          description_short: |
+           {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
+    by_relationship_to_perpetrator:
+      variables:
+        value:
+          title: |
+            {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
+          description_short: |
+            {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
+    by_situational_context:
+      variables:
+        value:
+          title: |
+            {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
+          description_short: |
+            {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
+    total:
+      variables:
+        value:
+          title: |
+            Total {definitions.metric.lower()} of {definitions.sex} {definitions.age}
+          description_short: |
+            Total {definitions.metric.lower()} of {definitions.sex} {definitions.age}
