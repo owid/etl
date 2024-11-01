@@ -219,3 +219,25 @@ steps:
   #
   data://grapher/energy/2024-10-30/photovoltaic_cost_and_capacity:
     - data://garden/energy/2024-10-30/photovoltaic_cost_and_capacity
+  #
+  # IRENA - Renewable electricity capacity.
+  #
+  data://meadow/irena/2024-11-01/renewable_capacity_statistics:
+    - snapshot://irena/2024-11-01/renewable_capacity_statistics.xlsx
+  #
+  # IRENA - Renewable electricity capacity.
+  #
+  data://garden/irena/2024-11-01/renewable_capacity_statistics:
+    - data://meadow/irena/2024-11-01/renewable_capacity_statistics
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+  #
+  # IRENA - Renewable electricity capacity.
+  #
+  # data://grapher/irena/2024-11-01/renewable_electricity_capacity_by_technology:
+  #   - data://garden/irena/2024-11-01/renewable_electricity_capacity
+  #
+  # IRENA - Renewable electricity capacity.
+  #
+  # data://grapher/irena/2024-11-01/renewable_electricity_capacity:
+  #   - data://garden/irena/2024-11-01/renewable_electricity_capacity

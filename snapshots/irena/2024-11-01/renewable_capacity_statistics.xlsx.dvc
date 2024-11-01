@@ -1,0 +1,48 @@
+meta:
+  origin:
+    producer: IRENA
+    title: Renewable Capacity Statistics
+    description: |-
+      The renewable power capacity data represents the maximum net generating capacity of power plants and other installations that use renewable energy sources to produce electricity. For most countries and technologies, the data reflects the capacity installed and connected at the end of the calendar year. The data is presented in megawatts (MW) rounded to the nearest one megawatt, with figures between zero and 0.5MW shown as a 0. The data has been obtained from a variety of sources, including: the IRENA questionnaire; official statistics; industry association reports; and other reports and news articles.
+
+      Some technologies include others, following this schema:
+
+      - Total renewable capacity
+        1. Hydropower
+          1.1 Renewable hydropower
+          1.2 Pumped storage *
+        2. Marine
+        3. Wind
+          3.1 Onshore wind energy
+          3.2 Offshore wind energy
+        4. Solar
+          4.1 Solar photovoltaic
+          4.2 Concentrated solar power
+        5. Bioenergy
+          5.1 Solid biofuels
+            5.1.1 Bagasse
+            5.1.2 Renewable municipal waste
+            5.1.3 Other solid biofuels
+          5.2 Liquid biofuels
+          5.3 Biogas
+        6. Geothermal
+      -Total off-grid renewable capacity
+        1. Off-grid hydropower
+        2. Off-grid solar photovoltaic
+        3. Other off-grid renewable energy
+
+    # NOTE: IRENA used to add a note on pumped storage, but it's not present in the 2024 data:
+    # * Pumped storage is included under the "Hydropower" category but not in the "Total renewable energy". Generation from mixed plants is split between hydropower and pumped storage as appropriate.
+    citation_full: IRENA - Renewable capacity statistics 2024. International Renewable Energy Agency, Abu Dhabi (2024).
+    attribution_short: IRENA
+    url_main: https://www.irena.org/Publications/2024/Mar/Renewable-capacity-statistics-2024
+    url_download: https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2024/Mar/IRENA_Stats_Extract_%202024_H1_V1.xlsx
+    date_accessed: '2024-11-01'
+    date_published: '2024-03-01'
+    license:
+      name: ©IRENA 2024
+      url: https://www.irena.org/Publications/2024/Mar/Renewable-capacity-statistics-2024
+outs:
+  - md5: b3f57cc92388c842e10cad837bd81a60
+    size: 7686496
+    path: renewable_capacity_statistics.xlsx
