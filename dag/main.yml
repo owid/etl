@@ -132,6 +132,8 @@ steps:
     - snapshot://un/2024-04-09/undp_hdr.csv
   data://garden/un/2024-04-09/undp_hdr:
     - data://meadow/un/2024-04-09/undp_hdr
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
   data://grapher/un/2024-04-09/undp_hdr:
     - data://garden/un/2024-04-09/undp_hdr
 
@@ -839,6 +841,12 @@ steps:
     - data://garden/wpf/2024-10-03/famines
   data://grapher/wpf/2024-10-03/famines_by_factor:
     - data://garden/wpf/2024-10-03/famines_by_factor
+
+  data://garden/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines_by_place
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
