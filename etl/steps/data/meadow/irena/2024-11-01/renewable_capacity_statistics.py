@@ -73,16 +73,28 @@ def run(dest_dir: str) -> None:
     # Sanity checks.
     sanity_check_inputs(tables)
 
-    # Add global and regional data to the country-level data.
-    tb_global = tables["Global"].assign(**{"Country": "World"})
-    tb_regional = tables["Regional"].rename(columns={"Region": "Country"}, errors="raise")
+    # Combine global, regional, and country-level data.
+    tb_global = (
+        tables["Global"]
+        .assign(**{"Country": "World"})
+        .rename(
+            columns={"Sum of Electricity Installed Capacity (MW)": "Electricity Installed Capacity (MW)"},
+            errors="raise",
+        )
+    )
+    tb_regional = (
+        tables["Regional"]
+        .rename(columns={"Region": "Country"}, errors="raise")
+        .rename(
+            columns={"Sum of Electricity Installed Capacity (MW)": "Electricity Installed Capacity (MW)"},
+            errors="raise",
+        )
+    )
     tb_all_data = tables["All Data"].drop(columns=["Region", "Sub-region", "ISO3 code", "M49 code"], errors="raise")
-    tb_all_data = pr.concat([tb_all_data, tb_global, tb_regional], ignore_index=True)
+    tb = pr.concat([tb_all_data, tb_global, tb_regional], ignore_index=True)
 
     # Format table.
-    tb = tb_all_data.format(
-        keys=["country", "year", "group_technology", "technology", "sub_technology", "producer_type"]
-    )
+    tb = tb.format(keys=["country", "year", "group_technology", "technology", "sub_technology", "producer_type"])
 
     #
     # Save outputs.
