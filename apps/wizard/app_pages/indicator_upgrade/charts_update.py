@@ -93,8 +93,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
 def push_new_charts(charts: List[gm.Chart]) -> None:
     """Updating charts in the database."""
     # API to interact with the admin tool
-    # HACK: Forcing grapher user to be Admin so that it is detected by chart sync.
-    api = AdminAPI(OWID_ENV, grapher_user_id=1)
+    api = AdminAPI(OWID_ENV)
     # Update charts
     progress_text = "Updating charts..."
     bar = st.progress(0, progress_text)
@@ -114,10 +113,7 @@ def push_new_charts(charts: List[gm.Chart]) -> None:
                 chart_id = chart.config["id"]
             else:
                 raise ValueError(f"Chart {chart} does not have an ID in config.")
-            api.update_chart(
-                chart_id=chart_id,
-                chart_config=config_new,
-            )
+            api.update_chart(chart_id=chart_id, chart_config=config_new, user_id=chart.lastEditedByUserId)
             # Show progress bar
             percent_complete = int(100 * (i + 1) / len(charts))
             bar.progress(percent_complete, text=f"{progress_text} {percent_complete}%")

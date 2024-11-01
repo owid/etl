@@ -157,6 +157,9 @@ def cli(
                 # Map variable IDs from source to target
                 migrated_config = diff.source_chart.migrate_config(source_session, target_session)
 
+                # Get user who edited the chart
+                user_id = diff.source_chart.lastEditedByUserId
+
                 # Chart in target exists, update it
                 if diff.target_chart:
                     # Configs are equal, no need to update
@@ -174,7 +177,7 @@ def cli(
                         log.info("chart_sync.chart_update", slug=chart_slug, chart_id=chart_id)
                         charts_synced += 1
                         if not dry_run:
-                            target_api.update_chart(chart_id, migrated_config)
+                            target_api.update_chart(chart_id, migrated_config, user_id=user_id)
 
                     # Rejected chart diff
                     elif diff.is_rejected:
@@ -202,8 +205,8 @@ def cli(
                     if diff.is_approved:
                         charts_synced += 1
                         if not dry_run:
-                            resp = target_api.create_chart(migrated_config)
-                            target_api.set_tags(resp["chartId"], chart_tags)
+                            resp = target_api.create_chart(migrated_config, user_id=user_id)
+                            target_api.set_tags(resp["chartId"], chart_tags, user_id=user_id)
                         else:
                             resp = {"chartId": None}
                         log.info(
