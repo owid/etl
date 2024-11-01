@@ -177,12 +177,12 @@ tables:
           name: Solar photovoltaic (off-grid)
         presentation:
           title_public: Solar photovoltaic capacity (off-grid)
-      solar_thermal_energy:
-        title: Solar thermal energy capacity (on-grid)
+      concentrated_solar_power:
+        title: Concentrated solar power capacity (on-grid)
         display:
-          name: Solar thermal energy
+          name: Concentrated solar power
         presentation:
-          title_public: Solar thermal energy capacity
+          title_public: Concentrated solar power capacity
       solid_biofuels:
         title: Solid biofuels capacity (on-grid)
         display:

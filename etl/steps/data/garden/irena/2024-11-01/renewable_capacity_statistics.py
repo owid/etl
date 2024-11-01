@@ -61,7 +61,7 @@ Yes|On-grid |Hydropower          |Mixed hydro plants  |Mixed Hydro Plants       
 Yes|On-grid |Hydropower          |Hydropower          |Renewable hydropower      -> On-grid |Hydropower
 Yes|On-grid |Marine              |Marine              |Marine energy             -> On-grid |Marine
 Yes|On-grid |Solar               |Solar photovoltaic  |On-grid Solar photovoltai -> On-grid |Solar photovoltaic
-Yes|On-grid |Solar               |Solar thermal energy|Concentrated solar power  -> On-grid |Solar thermal energy
+Yes|On-grid |Solar               |Solar thermal       |Concentrated solar power  -> On-grid |Concentrated solar power
 Yes|On-grid |Wind                |Offshore wind       |Offshore wind energy      -> On-grid |Offshore wind
 Yes|On-grid |Wind                |Onshore wind        |Onshore wind energy       -> On-grid |Onshore wind
 
@@ -126,7 +126,7 @@ TECHNOLOGY_MAPPING = {
     "Renewable municipal waste": "Renewable municipal waste",
     "Mixed Hydro Plants": "Mixed hydro plants",
     "Marine energy": "Marine",
-    "Solar thermal energy": "Solar thermal energy",
+    "Solar thermal energy": "Concentrated solar power",
     "Offshore wind energy": "Offshore wind",
 }
 
@@ -230,7 +230,6 @@ def run(dest_dir: str) -> None:
     ), error
 
     # TODO: Consider if mixed hydro should be put together with hydro (check how it's done in IRENA's PDF).
-    # TODO: Rename solar_thermal_energy -> solar_thermal (or csp?).
 
     # We will group at the technology level.
     # DEBUGGING: Print the final mapping.
