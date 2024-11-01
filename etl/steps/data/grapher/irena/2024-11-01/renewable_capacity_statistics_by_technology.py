@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Get the human-readable names of the technologies from the variable metadata.
-    rename_technologies = {variable: tb[variable].metadata.title.replace(" capacity", "") for variable in tb.columns}
+    rename_technologies = {variable: tb[variable].metadata.display["name"] for variable in tb.columns}
 
     # Simplify table to consider only the World.
     # Here we use "country" to refer to a technology.
@@ -35,7 +35,6 @@ def run(dest_dir: str) -> None:
 
     # Convert units from megawatts to gigawatts.
     tb["capacity"] *= MW_TO_GW
-    tb["country"] = tb["country"].str.replace(" - MW", "")
     # Update metadata fields.
     for field in ["title", "unit", "short_unit", "description_short"]:
         setattr(
@@ -44,11 +43,10 @@ def run(dest_dir: str) -> None:
             getattr(tb["capacity"].metadata, field).replace("mega", "giga").replace("MW", "GW"),
         )
 
-    # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Improve table format.
+    tb = tb.format(short_name="renewable_capacity_statistics_by_technology")
 
     # Update table's metadata.
-    tb.metadata.short_name = paths.short_name
     tb.metadata.title = "Renewable electricity capacity by technology"
 
     #
