@@ -2,8 +2,6 @@
 
 import re
 
-import pandas as pd
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -94,9 +92,6 @@ def run(dest_dir: str) -> None:
     columns = [
         "Date",
         "Place",
-        "Sub region",
-        "Global region",
-        "Conventional title",
         "WPF authoritative mortality estimate",
         "Cause: immediate trigger",
         "Cause: contributing factors",
@@ -113,18 +108,6 @@ def run(dest_dir: str) -> None:
     # Clean the 'Date' column
     tb["Date"] = tb["Date"].apply(clean_and_expand_years)
 
-    # Fill NaN values in 'Conventional title' with 'Place' and 'Date'
-    tb["Conventional title"] = tb.apply(
-        lambda row: f"{row['Place']} ({row['Date']})"
-        if pd.isna(row["Conventional title"])
-        else f"{row['Place']} ({row['Date']})"
-        if row["Conventional title"] == "Famine"
-        else f"{row['Conventional title']} ({row['Place']} {row['Date']})"
-        if row["Conventional title"] == "Hungerplan (German)"
-        else row["Conventional title"],
-        axis=1,
-    )
-
     tb["WPF authoritative mortality estimate"] = tb["WPF authoritative mortality estimate"].astype(str)
 
     # Keep only the number in 'WPF authoritative mortality estimate'
@@ -134,17 +117,16 @@ def run(dest_dir: str) -> None:
     tb["WPF authoritative mortality estimate"] = (
         tb["WPF authoritative mortality estimate"].str.replace(",", "").astype(float)
     )
+    # Simplify names - will later use it for titles with years combined
+    tb["simplified_place"] = tb["Place"].replace(NAMES, regex=False)
 
     # Combine famines for the African Red Sea Region and Hungerplan as the mortality estimate exists for just the total rather than each entry
     tb = combine_entries(tb)
 
-    # Simplify names - will later use it for titles with years combined
-    tb["simplified_place"] = tb["Place"].replace(NAMES, regex=False)
-
     tb = tb.rename(columns={"Place": "country"})
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["date", "conventional_title"])
+    tb = tb.format(["date", "country"])
 
     #
     # Save outputs.
@@ -187,16 +169,16 @@ def combine_entries(df):
     Combine multiple entries in the DataFrame into a single entry.
     """
     # Filter rows to combine the Haraame Cune ("the years of eating the unclean") and African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, Djibouti)) as the mortality estimate only exists for the total
-    famines = [
-        'Haraame Cune ("the years of eating the unclean")',
-        "African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, Djibouti) (1913,1914)",
-        "African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, Djibouti) (1914,1915,1916,1917,1918,1919)",
-    ]
-    # Filter rows to combine
-    rows_to_combine = df[df["Conventional title"].apply(lambda x: any(sub in x for sub in famines))]
+    famines = ["British Somaliland", "African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, Djibouti)"]
 
-    # Combine dates
+    # Filter rows to combine
+    rows_to_combine = df[df["Place"].apply(lambda x: any(sub in x for sub in famines))]
+
+    # Combine dates and causes
     combined_dates = ",".join(rows_to_combine["Date"].unique())
+    combined_trigger = ",".join(rows_to_combine["Cause: immediate trigger"])
+    combined_contributing_cause = ",".join(rows_to_combine["Cause: contributing factors"])
+    combined_structural_cause = ",".join(rows_to_combine["Cause: structural factors"])
 
     # Calculate the sum of the 'WPF authoritative mortality estimate' column
     mortality_estimate = rows_to_combine["WPF authoritative mortality estimate"].sum()
@@ -204,14 +186,12 @@ def combine_entries(df):
     # Create new combined entry
     new_entry = {
         "Date": combined_dates,
-        "Place": rows_to_combine.iloc[0]["Place"],
-        "Sub region": rows_to_combine.iloc[0]["Sub region"],
-        "Global region": rows_to_combine.iloc[0]["Global region"],
-        "Conventional title": 'African Red Sea Region and Haraame Cune ("the years of eating the unclean")',
-        "Cause: immediate trigger": rows_to_combine.iloc[0]["Cause: immediate trigger"],
-        "Cause: contributing factors": rows_to_combine.iloc[0]["Cause: contributing factors"],
-        "Cause: structural factors": rows_to_combine.iloc[0]["Cause: structural factors"],
+        "Place": "Somaliland, African Red Sea Region",
+        "Cause: immediate trigger": combined_trigger,
+        "Cause: contributing factors": combined_contributing_cause,
+        "Cause: structural factors": combined_structural_cause,
         "WPF authoritative mortality estimate": mortality_estimate,
+        "simplified_place": "Somaliland, African Red Sea Region",
     }
 
     # Add new combined entry
@@ -220,25 +200,26 @@ def combine_entries(df):
 
     # Additional logic to combine "Hungerplan" entries
     places = ["USSR (Russia)", "USSR (Ukraine)", "USSR (Russia and Western Soviet States)"]
-    famine = "Hungerplan (German)"
+    dates = ["1941,1942,1943,1944"]
 
-    hungerplan_rows = df[
-        df["Conventional title"].apply(lambda x: any(sub in x for sub in famine)) & df["Place"].isin(places)
-    ]
+    hungerplan_rows = df[df["Place"].isin(places) & df["Date"].isin(dates)]
+
     if not hungerplan_rows.empty:
+        # Combine dates and causes
         combined_dates_hungerplan = ",".join(hungerplan_rows["Date"].unique())
         combined_mortality_estimate_hungerplan = hungerplan_rows["WPF authoritative mortality estimate"].sum()
+        combined_trigger = ",".join(hungerplan_rows["Cause: immediate trigger"])
+        combined_contributing_cause = ",".join(hungerplan_rows["Cause: contributing factors"])
+        combined_structural_cause = ",".join(hungerplan_rows["Cause: structural factors"])
 
         new_hungerplan_entry = {
             "Date": combined_dates_hungerplan,
-            "Place": hungerplan_rows.iloc[0]["Place"],
-            "Sub region": hungerplan_rows.iloc[0]["Sub region"],
-            "Global region": hungerplan_rows.iloc[0]["Global region"],
-            "Conventional title": "Hungerplan (Russia, Ukraine and Western Soviet States)",
-            "Cause: immediate trigger": hungerplan_rows.iloc[0]["Cause: immediate trigger"],
-            "Cause: contributing factors": hungerplan_rows.iloc[0]["Cause: contributing factors"],
-            "Cause: structural factors": hungerplan_rows.iloc[0]["Cause: structural factors"],
+            "Place": "USSR",
+            "Cause: immediate trigger": combined_trigger,
+            "Cause: contributing factors": combined_contributing_cause,
+            "Cause: structural factors": combined_structural_cause,
             "WPF authoritative mortality estimate": combined_mortality_estimate_hungerplan,
+            "simplified_place": "USSR (Hungerplan)",
         }
 
         # Add new combined Hungerplan entry

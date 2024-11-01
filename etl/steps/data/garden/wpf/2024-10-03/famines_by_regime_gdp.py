@@ -39,6 +39,8 @@ CUSTOM_REGIMES = {
     ("Moldova, Ukraine, Russia, Belarus", range(1946, 1948)): 3,
     ("Ukraine", range(1932, 1946)): 3,
     ("Vietnam", range(1944, 1946)): 3,
+    ("USSR", range(1941, 1945)): 3,
+    ("Somaliland, African Red Sea Region", range(1910, 2020)): 3,
 }
 
 

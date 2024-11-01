@@ -841,6 +841,12 @@ steps:
     - data://garden/wpf/2024-10-03/famines
   data://grapher/wpf/2024-10-03/famines_by_factor:
     - data://garden/wpf/2024-10-03/famines_by_factor
+
+  data://garden/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines_by_place
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
