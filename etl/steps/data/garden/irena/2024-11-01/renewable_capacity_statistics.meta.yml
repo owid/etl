@@ -5,8 +5,6 @@ definitions:
         - Energy
     short_unit: MW
     unit: megawatts
-    display:
-      numDecimalPlaces: 0
     description_short: |-
       Measured in megawatts.
 
@@ -14,122 +12,210 @@ dataset:
   update_period_days: 365
 
 tables:
-  renewable_electricity_capacity:
+  renewable_capacity_statistics:
     title: Renewable electricity capacity
     variables:
-      bagasse:
-        title: Bagasse capacity - MW
-        description_key:
-        - Bagasse is a byproduct from the process of sugar cane refining, often used as a biofuel for the production of heat, energy, and electricity.
-        display:
-          name: Bagasse
-        presentation:
-          title_public: Bagasse capacity
-      bioenergy:
-        title: Bioenergy capacity - MW
-        display:
-          name: Bioenergy
-        presentation:
-          title_public: Bioenergy capacity
       biogas:
-        title: Biogas capacity - MW
+        title: Biogas capacity (on-grid)
         display:
           name: Biogas
         presentation:
           title_public: Biogas capacity
-      concentrated_solar_power:
-        title: Concentrated solar power capacity - MW
+      biogas__off_grid:
+        title: Biogas capacity (off-grid)
         display:
-          name: Concentrated solar power
+          name: Biogas (off-grid)
         presentation:
-          title_public: Concentrated solar power capacity
-      geothermal_energy:
-        title: Geothermal energy capacity - MW
+          title_public: Biogas capacity (off-grid)
+      coal_and_peat:
+        title: Coal and peat capacity (on-grid)
         display:
-          name: Geothermal energy
+          name: Coal and peat
         presentation:
-          title_public: Geothermal energy capacity
+          title_public: Coal and peat capacity
+      coal_and_peat__off_grid:
+        title: Coal and peat capacity (off-grid)
+        display:
+          name: Coal and peat (off-grid)
+        presentation:
+          title_public: Coal and peat capacity (off-grid)
+      geothermal:
+        title: Geothermal capacity (on-grid)
+        display:
+          name: Geothermal
+        presentation:
+          title_public: Geothermal capacity
+      geothermal__off_grid:
+        title: Geothermal capacity (off-grid)
+        display:
+          name: Geothermal (off-grid)
+        presentation:
+          title_public: Geothermal capacity (off-grid)
       hydropower:
-        title: Hydropower capacity - MW
+        title: Hydropower capacity (on-grid)
         display:
           name: Hydropower
         presentation:
           title_public: Hydropower capacity
+      hydropower__off_grid:
+        title: Hydropower capacity (off-grid)
+        display:
+          name: Hydropower (off-grid)
+        presentation:
+          title_public: Hydropower capacity (off-grid)
       liquid_biofuels:
-        title: Liquid biofuels capacity - MW
+        title: Liquid biofuels capacity (on-grid)
         display:
           name: Liquid biofuels
         presentation:
           title_public: Liquid biofuels capacity
-      marine_energy:
-        title: Marine energy capacity - MW
+      liquid_biofuels__off_grid:
+        title: Liquid biofuels capacity (off-grid)
         display:
-          name: Marine energy
+          name: Liquid biofuels (off-grid)
         presentation:
-          title_public: Marine energy capacity
-      offshore_wind_energy:
-        title: Offshore wind energy capacity - MW
+          title_public: Liquid biofuels capacity (off-grid)
+      marine:
+        title: Marine capacity (on-grid)
         display:
-          name: Offshore wind energy
+          name: Marine
         presentation:
-          title_public: Offshore wind energy capacity
-      onshore_wind_energy:
-        title: Onshore wind energy capacity - MW
+          title_public: Marine capacity
+      mixed_hydro_plants:
+        title: Mixed hydro plants capacity (on-grid)
         display:
-          name: Onshore wind energy
+          name: Mixed hydro plants
         presentation:
-          title_public: Onshore wind energy capacity
-      other_solid_biofuels:
-        title: Other solid biofuels capacity - MW
+          title_public: Mixed hydro plants capacity
+      natural_gas:
+        title: Natural gas capacity (on-grid)
         display:
-          name: Other solid biofuels
+          name: Natural gas
         presentation:
-          title_public: Other solid biofuels capacity
-      pure_pumped_storage:
-        title: Pure pumped storage capacity - MW
+          title_public: Natural gas capacity
+      natural_gas__off_grid:
+        title: Natural gas capacity (off-grid)
         display:
-          name: Pure pumped storage
+          name: Natural gas (off-grid)
         presentation:
-          title_public: Pure pumped storage capacity
-      renewable_hydropower_including_mixed_plants:
-        title: Renewable hydropower including mixed plants capacity - MW
+          title_public: Natural gas capacity (off-grid)
+      nuclear:
+        title: Nuclear capacity (on-grid)
         display:
-          name: Renewable hydropower including mixed plants
+          name: Nuclear
         presentation:
-          title_public: Renewable hydropower including mixed plants capacity
+          title_public: Nuclear capacity
+      offshore_wind:
+        title: Offshore wind capacity (on-grid)
+        display:
+          name: Offshore wind
+        presentation:
+          title_public: Offshore wind capacity
+      oil:
+        title: Oil capacity (on-grid)
+        display:
+          name: Oil
+        presentation:
+          title_public: Oil capacity
+      oil__off_grid:
+        title: Oil capacity (off-grid)
+        display:
+          name: Oil (off-grid)
+        presentation:
+          title_public: Oil capacity (off-grid)
+      onshore_wind:
+        title: Onshore wind capacity (on-grid)
+        display:
+          name: Onshore wind
+        presentation:
+          title_public: Onshore wind capacity
+      onshore_wind__off_grid:
+        title: Onshore wind capacity (off-grid)
+        display:
+          name: Onshore wind (off-grid)
+        presentation:
+          title_public: Onshore wind capacity (off-grid)
+      other_fossil_fuels:
+        title: Other fossil fuels capacity (on-grid)
+        display:
+          name: Other fossil fuels
+        presentation:
+          title_public: Other fossil fuels capacity
+      other_fossil_fuels__off_grid:
+        title: Other fossil fuels capacity (off-grid)
+        display:
+          name: Other fossil fuels (off-grid)
+        presentation:
+          title_public: Other fossil fuels capacity (off-grid)
+      other_non_renewable:
+        title: Other non-renewable capacity (on-grid)
+        display:
+          name: Other non-renewable
+        presentation:
+          title_public: Other non-renewable capacity
+      pumped_storage:
+        title: Pumped storage capacity (on-grid)
+        display:
+          name: Pumped storage
+        presentation:
+          title_public: Pumped storage capacity
       renewable_municipal_waste:
-        title: Renewable municipal waste capacity - MW
+        title: Renewable municipal waste capacity (on-grid)
         display:
           name: Renewable municipal waste
         presentation:
           title_public: Renewable municipal waste capacity
-      solar_energy:
-        title: Solar energy capacity - MW
-        display:
-          name: Solar energy
-        presentation:
-          title_public: Solar energy capacity
       solar_photovoltaic:
-        title: Solar photovoltaic capacity - MW
+        title: Solar photovoltaic capacity (on-grid)
         display:
           name: Solar photovoltaic
         presentation:
           title_public: Solar photovoltaic capacity
-      solid_biofuels_and_renewable_waste:
-        title: Solid biofuels and renewable waste capacity - MW
+      solar_photovoltaic__off_grid:
+        title: Solar photovoltaic capacity (off-grid)
         display:
-          name: Solid biofuels and renewable waste
+          name: Solar photovoltaic (off-grid)
         presentation:
-          title_public: Solid biofuels and renewable waste capacity
-      total_renewable_energy:
-        title: Total renewable energy capacity - MW
+          title_public: Solar photovoltaic capacity (off-grid)
+      solar_thermal_energy:
+        title: Solar thermal energy capacity (on-grid)
         display:
-          name: Total renewable energy
+          name: Solar thermal energy
         presentation:
-          title_public: Total renewable energy capacity
-      wind_energy:
-        title: Wind energy capacity - MW
+          title_public: Solar thermal energy capacity
+      solid_biofuels:
+        title: Solid biofuels capacity (on-grid)
         display:
-          name: Wind energy
+          name: Solid biofuels
         presentation:
-          title_public: Wind energy capacity
+          title_public: Solid biofuels capacity
+      solid_biofuels__off_grid:
+        title: Solid biofuels capacity (off-grid)
+        display:
+          name: Solid biofuels (off-grid)
+        presentation:
+          title_public: Solid biofuels capacity (off-grid)
+      # concentrated_solar_power:
+      #   title: Concentrated solar power capacity - MW
+      #   display:
+      #     name: Concentrated solar power
+      #   presentation:
+      #     title_public: Concentrated solar power capacity
+      # hydropower:
+      #   title: Hydropower capacity - MW
+      #   display:
+      #     name: Hydropower
+      #   presentation:
+      #     title_public: Hydropower capacity
+      # pure_pumped_storage:
+      #   title: Pure pumped storage capacity - MW
+      #   display:
+      #     name: Pure pumped storage
+      #   presentation:
+      #     title_public: Pure pumped storage capacity
+      # renewable_hydropower_including_mixed_plants:
+      #   title: Renewable hydropower including mixed plants capacity - MW
+      #   display:
+      #     name: Renewable hydropower including mixed plants
+      #   presentation:
+      #     title_public: Renewable hydropower including mixed plants capacity

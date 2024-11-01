@@ -234,10 +234,10 @@ steps:
   #
   # IRENA - Renewable electricity capacity.
   #
-  # data://grapher/irena/2024-11-01/renewable_electricity_capacity_by_technology:
-  #   - data://garden/irena/2024-11-01/renewable_electricity_capacity
+  data://grapher/irena/2024-11-01/renewable_capacity_statistics_by_technology:
+    - data://garden/irena/2024-11-01/renewable_capacity_statistics
   #
   # IRENA - Renewable electricity capacity.
   #
-  # data://grapher/irena/2024-11-01/renewable_electricity_capacity:
-  #   - data://garden/irena/2024-11-01/renewable_electricity_capacity
+  data://grapher/irena/2024-11-01/renewable_capacity_statistics:
+    - data://garden/irena/2024-11-01/renewable_capacity_statistics

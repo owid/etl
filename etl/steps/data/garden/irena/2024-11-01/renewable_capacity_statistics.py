@@ -1,5 +1,70 @@
 """Create a dataset of renewable electricity capacity using IRENA's Renewable Electricity Capacity and Generation.
 
+We will map the input data as follows (to generate the following mapping, uncomment the DEBUGGING section below):
+
+[Old categories] -> [New categories]
+Renewable or not | Producer type | Group technology    | Technology            | Sub-technology           -> Producer type | Technology
+
+No |Off-grid|Fossil fuels        |Coal and peat       |Coal and peat             -> Off-grid|Coal and peat
+No |Off-grid|Fossil fuels        |Other fossil fuels  |Fossil fuels n.e.s.       -> Off-grid|Other fossil fuels
+No |Off-grid|Fossil fuels        |Natural gas         |Natural gas               -> Off-grid|Natural gas
+No |Off-grid|Fossil fuels        |Oil                 |Oil                       -> Off-grid|Oil
+No |On-grid |Fossil fuels        |Coal and peat       |Coal and peat             -> On-grid |Coal and peat
+No |On-grid |Fossil fuels        |Other fossil fuels  |Fossil fuels n.e.s.       -> On-grid |Other fossil fuels
+No |On-grid |Fossil fuels        |Natural gas         |Natural gas               -> On-grid |Natural gas
+No |On-grid |Fossil fuels        |Oil                 |Oil                       -> On-grid |Oil
+No |On-grid |Nuclear             |Nuclear             |Nuclear                   -> On-grid |Nuclear
+No |On-grid |Other non-renewable |Other non-renewable |Other non-renewable energ -> On-grid |Other non-renewable
+No |On-grid |Pumped storage      |Pumped storage      |Pumped storage            -> On-grid |Pumped storage
+Yes|Off-grid|Bioenergy           |Biogas              |Biogas n.e.s.             -> Off-grid|Biogas
+Yes|Off-grid|Bioenergy           |Biogas              |Biogases from thermal pro -> Off-grid|Biogas
+Yes|Off-grid|Bioenergy           |Biogas              |Landfill gas              -> Off-grid|Biogas
+Yes|Off-grid|Bioenergy           |Biogas              |Other biogases from anaer -> Off-grid|Biogas
+Yes|Off-grid|Bioenergy           |Liquid biofuels     |Other liquid biofuels     -> Off-grid|Liquid biofuels
+Yes|Off-grid|Bioenergy           |Solid biofuels      |Animal waste              -> Off-grid|Solid biofuels
+Yes|Off-grid|Bioenergy           |Solid biofuels      |Bagasse                   -> Off-grid|Solid biofuels
+Yes|Off-grid|Bioenergy           |Solid biofuels      |Black liquor              -> Off-grid|Solid biofuels
+Yes|Off-grid|Bioenergy           |Solid biofuels      |Energy crops              -> Off-grid|Solid biofuels
+Yes|Off-grid|Bioenergy           |Solid biofuels      |Other primary solid biofu -> Off-grid|Solid biofuels
+Yes|Off-grid|Bioenergy           |Solid biofuels      |Other vegetal and agricul -> Off-grid|Solid biofuels
+Yes|Off-grid|Bioenergy           |Solid biofuels      |Rice husks                -> Off-grid|Solid biofuels
+Yes|Off-grid|Bioenergy           |Solid biofuels      |Wood fuel                 -> Off-grid|Solid biofuels
+Yes|Off-grid|Bioenergy           |Solid biofuels      |Wood waste                -> Off-grid|Solid biofuels
+Yes|Off-grid|Geothermal          |Geothermal          |Geothermal energy         -> Off-grid|Geothermal
+Yes|Off-grid|Hydropower          |Hydropower          |Renewable hydropower      -> Off-grid|Hydropower
+Yes|Off-grid|Solar               |Solar photovoltaic  |Off-grid Solar photovolta -> Off-grid|Solar photovoltaic
+Yes|Off-grid|Wind                |Onshore wind        |Onshore wind energy       -> Off-grid|Onshore wind
+Yes|On-grid |Bioenergy           |Biogas              |Biogas n.e.s.             -> On-grid |Biogas
+Yes|On-grid |Bioenergy           |Biogas              |Biogases from thermal pro -> On-grid |Biogas
+Yes|On-grid |Bioenergy           |Biogas              |Landfill gas              -> On-grid |Biogas
+Yes|On-grid |Bioenergy           |Biogas              |Other biogases from anaer -> On-grid |Biogas
+Yes|On-grid |Bioenergy           |Biogas              |Sewage sludge gas         -> On-grid |Biogas
+Yes|On-grid |Bioenergy           |Liquid biofuels     |Advanced biodiesel        -> On-grid |Liquid biofuels
+Yes|On-grid |Bioenergy           |Liquid biofuels     |Advanced biogasoline      -> On-grid |Liquid biofuels
+Yes|On-grid |Bioenergy           |Liquid biofuels     |Conventional biodiesel    -> On-grid |Liquid biofuels
+Yes|On-grid |Bioenergy           |Liquid biofuels     |Other liquid biofuels     -> On-grid |Liquid biofuels
+Yes|On-grid |Bioenergy           |Renewable municipal waste|Renewable municipal waste -> On-grid |Renewable municipal waste
+Yes|On-grid |Bioenergy           |Solid biofuels      |Animal waste              -> On-grid |Solid biofuels
+Yes|On-grid |Bioenergy           |Solid biofuels      |Bagasse                   -> On-grid |Solid biofuels
+Yes|On-grid |Bioenergy           |Solid biofuels      |Biomass pellets and briqu -> On-grid |Solid biofuels
+Yes|On-grid |Bioenergy           |Solid biofuels      |Black liquor              -> On-grid |Solid biofuels
+Yes|On-grid |Bioenergy           |Solid biofuels      |Energy crops              -> On-grid |Solid biofuels
+Yes|On-grid |Bioenergy           |Solid biofuels      |Other primary solid biofu -> On-grid |Solid biofuels
+Yes|On-grid |Bioenergy           |Solid biofuels      |Other vegetal and agricul -> On-grid |Solid biofuels
+Yes|On-grid |Bioenergy           |Solid biofuels      |Renewable industrial wast -> On-grid |Solid biofuels
+Yes|On-grid |Bioenergy           |Solid biofuels      |Rice husks                -> On-grid |Solid biofuels
+Yes|On-grid |Bioenergy           |Solid biofuels      |Straw                     -> On-grid |Solid biofuels
+Yes|On-grid |Bioenergy           |Solid biofuels      |Wood fuel                 -> On-grid |Solid biofuels
+Yes|On-grid |Bioenergy           |Solid biofuels      |Wood waste                -> On-grid |Solid biofuels
+Yes|On-grid |Geothermal          |Geothermal          |Geothermal energy         -> On-grid |Geothermal
+Yes|On-grid |Hydropower          |Mixed hydro plants  |Mixed Hydro Plants        -> On-grid |Mixed hydro plants
+Yes|On-grid |Hydropower          |Hydropower          |Renewable hydropower      -> On-grid |Hydropower
+Yes|On-grid |Marine              |Marine              |Marine energy             -> On-grid |Marine
+Yes|On-grid |Solar               |Solar photovoltaic  |On-grid Solar photovoltai -> On-grid |Solar photovoltaic
+Yes|On-grid |Solar               |Solar thermal energy|Concentrated solar power  -> On-grid |Solar thermal energy
+Yes|On-grid |Wind                |Offshore wind       |Offshore wind energy      -> On-grid |Offshore wind
+Yes|On-grid |Wind                |Onshore wind        |Onshore wind energy       -> On-grid |Onshore wind
+
 """
 from owid.datautils.dataframes import map_series
 
@@ -164,8 +229,11 @@ def run(dest_dir: str) -> None:
         == n_combinations
     ), error
 
+    # TODO: Consider if mixed hydro should be put together with hydro (check how it's done in IRENA's PDF).
+    # TODO: Rename solar_thermal_energy -> solar_thermal (or csp?).
+
     # We will group at the technology level.
-    # FOR DEBUGGING: Print the final mapping.
+    # DEBUGGING: Print the final mapping.
     # _technologies = ["is_renewable", "producer_type", "group_technology", "technology", "sub_technology"]
     # for _, row in tb.sort_values(_technologies)[_technologies].drop_duplicates().iterrows():
     #     print(f"{row['is_renewable']:<3}|{row['producer_type']:<8}|{row['group_technology']:<20}|{row['technology']:<20}|{row['sub_technology'][:25]:<25} -> {row['producer_type']:<8}|{row['technology']:<20}")
@@ -205,8 +273,16 @@ def run(dest_dir: str) -> None:
     error = "Unexpected negative values."
     assert (tb["capacity"] >= 0).all(), error
 
+    # Change from long to wide format.
+    off_grid_filter = tb["producer_type"] == "Off-grid"
+    tb["technology"] = tb["technology"].astype(str)
+    tb.loc[off_grid_filter, "technology"] = tb[off_grid_filter]["technology"] + " (off-grid)"
+    tb = tb.drop(columns="producer_type").pivot(
+        index=["country", "year"], columns="technology", values="capacity", join_column_levels_with="_"
+    )
+
     # Set an appropriate index and sort conveniently.
-    tb = tb.format(sort_columns=True)
+    tb = tb.format(keys=["country", "year"], sort_columns=True)
 
     #
     # Save outputs.

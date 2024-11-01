@@ -12,8 +12,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load dataset from Garden and read its main table.
-    ds_garden = paths.load_dataset("renewable_electricity_capacity")
-    tb = ds_garden["renewable_electricity_capacity"]
+    ds_garden = paths.load_dataset("renewable_capacity_statistics")
+    tb = ds_garden["renewable_capacity_statistics"]
 
     #
     # Process data.
