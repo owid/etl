@@ -89,46 +89,48 @@ COLUMNS = {
 }
 
 # Mapping of different categories.
-IS_RENEWABLE_MAPPING = {
-    "Total Non-Renewable": "No",
-    "Total Renewable": "Yes",
-}
-PRODUCER_TYPE_MAPPING = {
-    "Off-grid electricity": "Off-grid",
-    "On-grid electricity": "On-grid",
-}
-GROUP_TECHNOLOGY_MAPPING = {
-    "Fossil fuels": "Fossil fuels",
-    "Nuclear": "Nuclear",
-    "Other non-renewable energy": "Other non-renewable",
-    "Pumped storage": "Pumped storage",
-    "Bioenergy": "Bioenergy",
-    "Geothermal energy": "Geothermal",
-    "Hydropower (excl. Pumped Storage)": "Hydropower",
-    "Solar energy": "Solar",
-    "Wind energy": "Wind",
-    "Marine energy": "Marine",
-}
-TECHNOLOGY_MAPPING = {
-    "Coal and peat": "Coal and peat",
-    "Fossil fuels n.e.s.": "Other fossil fuels",
-    "Natural gas": "Natural gas",
-    "Oil": "Oil",
-    "Nuclear": "Nuclear",
-    "Other non-renewable energy": "Other non-renewable",
-    "Pumped storage": "Pumped storage",
-    "Biogas": "Biogas",
-    "Liquid biofuels": "Liquid biofuels",
-    "Solid biofuels": "Solid biofuels",
-    "Geothermal energy": "Geothermal",
-    "Renewable hydropower": "Hydropower",
-    "Solar photovoltaic": "Solar photovoltaic",
-    "Onshore wind energy": "Onshore wind",
-    "Renewable municipal waste": "Renewable municipal waste",
-    "Mixed Hydro Plants": "Mixed hydro plants",
-    "Marine energy": "Marine",
-    "Solar thermal energy": "Concentrated solar power",
-    "Offshore wind energy": "Offshore wind",
+CATEGORY_MAPPING = {
+    "is_renewable": {
+        "Total Non-Renewable": "No",
+        "Total Renewable": "Yes",
+    },
+    "producer_type": {
+        "Off-grid electricity": "Off-grid",
+        "On-grid electricity": "On-grid",
+    },
+    "group_technology": {
+        "Fossil fuels": "Fossil fuels",
+        "Nuclear": "Nuclear",
+        "Other non-renewable energy": "Other non-renewable",
+        "Pumped storage": "Pumped storage",
+        "Bioenergy": "Bioenergy",
+        "Geothermal energy": "Geothermal",
+        "Hydropower (excl. Pumped Storage)": "Hydropower",
+        "Solar energy": "Solar",
+        "Wind energy": "Wind",
+        "Marine energy": "Marine",
+    },
+    "technology": {
+        "Coal and peat": "Coal and peat",
+        "Fossil fuels n.e.s.": "Other fossil fuels",
+        "Natural gas": "Natural gas",
+        "Oil": "Oil",
+        "Nuclear": "Nuclear",
+        "Other non-renewable energy": "Other non-renewable",
+        "Pumped storage": "Pumped storage",
+        "Biogas": "Biogas",
+        "Liquid biofuels": "Liquid biofuels",
+        "Solid biofuels": "Solid biofuels",
+        "Geothermal energy": "Geothermal",
+        "Renewable hydropower": "Hydropower",
+        "Solar photovoltaic": "Solar photovoltaic",
+        "Onshore wind energy": "Onshore wind",
+        "Renewable municipal waste": "Renewable municipal waste",
+        "Mixed Hydro Plants": "Mixed hydro plants",
+        "Marine energy": "Marine",
+        "Solar thermal energy": "Concentrated solar power",
+        "Offshore wind energy": "Offshore wind",
+    },
 }
 
 # Regions for which aggregates will be created.
@@ -146,6 +148,75 @@ REGIONS = [
     "High-income countries",
     "World",
 ]
+
+
+def remove_original_regional_and_global_data(tb: Table, tb_global: Table) -> Table:
+    # The spreadsheet doesn't explicitly say whether global data corresponds to off-grid, on-grid, or both.
+    # After inspection, it seems to be only on-grid.
+    # Check that adding up the capacity of all on-grid technologies, sub-technologies and countries reproduces global data
+    # (within a certain percentage error).
+    aggregates = ["World"] + [region for region in set(tb["country"]) if "(IRENA)" in region]
+    _tb_global = (
+        tb[(tb["producer_type"] == "On-grid electricity") & (~tb["country"].isin(aggregates))]
+        .groupby(["group_technology", "year"], observed=True, as_index=False)
+        .agg({"capacity": "sum"})
+    )
+    check = tb_global.merge(_tb_global, on=["group_technology", "year"], suffixes=("", "_sum"), validate="1:1")
+    error = "Adding up on-grid capacity for all countries does not add up to global data."
+    assert check[(100 * abs(check["capacity_sum"] - check["capacity"]) / check["capacity"]) > 6].empty, error
+
+    # Drop global and regional data (they will be recalculated afterwards consistently).
+    tb = tb.loc[~tb["country"].isin(aggregates)].reset_index(drop=True)
+
+    # Check that the only index columns strictly required are producer type and subtechnology.
+    error = "Expected columns producer type and subtechnology (together with country-year) to be a unique index."
+    assert len(
+        tb[["is_renewable", "group_technology", "technology", "sub_technology", "producer_type"]].drop_duplicates()
+    ) == len(tb[["producer_type", "sub_technology"]].drop_duplicates()), error
+
+    return tb
+
+
+def remap_categories(tb: Table) -> Table:
+    # Store the number of unique categories and unique combinations (up to the technology level) before mapping.
+    n_categories = {
+        category: len(set(tb[category]))
+        for category in ["is_renewable", "group_technology", "technology", "sub_technology", "producer_type"]
+    }
+    n_combinations = len(set(tb[["is_renewable", "group_technology", "technology", "producer_type"]].drop_duplicates()))
+    # Rename categories conveniently.
+    for category in CATEGORY_MAPPING:
+        tb[category] = map_series(
+            tb[category],
+            mapping=CATEGORY_MAPPING[category],
+            warn_on_missing_mappings=True,
+            warn_on_unused_mappings=True,
+        )
+    # Check that the number of unique categories and unique combinations (up to the technology level) are the same as before mapping.
+    error = "Unexpected number of unique categories after mapping."
+    assert {
+        category: len(set(tb[category]))
+        for category in ["is_renewable", "group_technology", "technology", "sub_technology", "producer_type"]
+    } == n_categories, error
+    assert (
+        len(set(tb[["is_renewable", "group_technology", "technology", "producer_type"]].drop_duplicates()))
+        == n_combinations
+    ), error
+
+    # TODO: Consider if mixed hydro should be put together with hydro (check how it's done in IRENA's PDF).
+
+    # We will group at the technology level.
+    # DEBUGGING: Print the final mapping.
+    # _technologies = ["is_renewable", "producer_type", "group_technology", "technology", "sub_technology"]
+    # for _, row in tb.sort_values(_technologies)[_technologies].drop_duplicates().iterrows():
+    #     print(f"{row['is_renewable']:<3}|{row['producer_type']:<8}|{row['group_technology']:<20}|{row['technology']:<20}|{row['sub_technology'][:25]:<25} -> {row['producer_type']:<8}|{row['technology']:<20}")
+
+    # Group by producer type and technology (therefore dropping subtechnology level).
+    tb = tb.groupby(["country", "year", "producer_type", "technology"], observed=True, as_index=False).agg(
+        {"capacity": "sum"}
+    )
+
+    return tb
 
 
 def sanity_check_outputs(tb: Table, tb_global: Table) -> None:
@@ -199,73 +270,11 @@ def run(dest_dir: str) -> None:
     # Get original global data (used for sanity checks).
     tb_global = tb[(tb["country"] == "World")][["group_technology", "year", "capacity"]].reset_index(drop=True)
 
-    # The spreadsheet doesn't explicitly say whether global data corresponds to off-grid, on-grid, or both.
-    # After inspection, it seems to be only on-grid.
-    # Check that adding up the capacity of all on-grid technologies, sub-technologies and countries reproduces global data
-    # (within a certain percentage error).
-    aggregates = ["World"] + [region for region in set(tb["country"]) if "(IRENA)" in region]
-    _tb_global = (
-        tb[(tb["producer_type"] == "On-grid electricity") & (~tb["country"].isin(aggregates))]
-        .groupby(["group_technology", "year"], observed=True, as_index=False)
-        .agg({"capacity": "sum"})
-    )
-    check = tb_global.merge(_tb_global, on=["group_technology", "year"], suffixes=("", "_sum"), validate="1:1")
-    error = "Adding up on-grid capacity for all countries does not add up to global data."
-    assert check[(100 * abs(check["capacity_sum"] - check["capacity"]) / check["capacity"]) > 6].empty, error
-    # Drop global and regional data (they will be recalculated afterwards consistently).
-    tb = tb[~tb["country"].isin(aggregates)].reset_index(drop=True)
+    # Remove original regional and global data, and perform some sanity checks.
+    tb = remove_original_regional_and_global_data(tb=tb, tb_global=tb_global)  # type: ignore
 
-    # Check that the only index columns strictly required are producer type and subtechnology.
-    error = "Expected columns producer type and subtechnology (together with country-year) to be a unique index."
-    assert len(
-        tb[["is_renewable", "group_technology", "technology", "sub_technology", "producer_type"]].drop_duplicates()
-    ) == len(tb[["producer_type", "sub_technology"]].drop_duplicates()), error
-
-    # Store the number of unique categories and unique combinations (up to the technology level) before mapping.
-    n_categories = {
-        category: len(set(tb[category]))
-        for category in ["is_renewable", "group_technology", "technology", "sub_technology", "producer_type"]
-    }
-    n_combinations = len(set(tb[["is_renewable", "group_technology", "technology", "producer_type"]].drop_duplicates()))
-    # Rename categories conveniently.
-    tb["is_renewable"] = map_series(
-        tb["is_renewable"], mapping=IS_RENEWABLE_MAPPING, warn_on_missing_mappings=True, warn_on_unused_mappings=True
-    )
-    tb["producer_type"] = map_series(
-        tb["producer_type"], mapping=PRODUCER_TYPE_MAPPING, warn_on_missing_mappings=True, warn_on_unused_mappings=True
-    )
-    tb["group_technology"] = map_series(
-        tb["group_technology"],
-        mapping=GROUP_TECHNOLOGY_MAPPING,
-        warn_on_missing_mappings=True,
-        warn_on_unused_mappings=True,
-    )
-    tb["technology"] = map_series(
-        tb["technology"], mapping=TECHNOLOGY_MAPPING, warn_on_missing_mappings=True, warn_on_unused_mappings=True
-    )
-    # Check that the number of unique categories and unique combinations (up to the technology level) are the same as before mapping.
-    error = "Unexpected number of unique categories after mapping."
-    assert {
-        category: len(set(tb[category]))
-        for category in ["is_renewable", "group_technology", "technology", "sub_technology", "producer_type"]
-    } == n_categories, error
-    assert (
-        len(set(tb[["is_renewable", "group_technology", "technology", "producer_type"]].drop_duplicates()))
-        == n_combinations
-    ), error
-
-    # TODO: Consider if mixed hydro should be put together with hydro (check how it's done in IRENA's PDF).
-
-    # We will group at the technology level.
-    # DEBUGGING: Print the final mapping.
-    # _technologies = ["is_renewable", "producer_type", "group_technology", "technology", "sub_technology"]
-    # for _, row in tb.sort_values(_technologies)[_technologies].drop_duplicates().iterrows():
-    #     print(f"{row['is_renewable']:<3}|{row['producer_type']:<8}|{row['group_technology']:<20}|{row['technology']:<20}|{row['sub_technology'][:25]:<25} -> {row['producer_type']:<8}|{row['technology']:<20}")
-
-    # Group by producer type and technology (therefore dropping subtechnology level).
-    tb = tb.groupby(["country", "year", "producer_type", "technology"], observed=True, as_index=False).agg(
-        {"capacity": "sum"}
-    )
+    # Remap categories.
+    tb = remap_categories(tb=tb)
 
     # Add region aggregates.
     tb = geo.add_regions_to_table(
@@ -278,7 +287,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Sanity check outputs.
-    sanity_check_outputs(tb=tb, tb_global=tb_global)
+    sanity_check_outputs(tb=tb, tb_global=tb_global)  # type: ignore
 
     # Change from long to wide format.
     off_grid_filter = tb["producer_type"] == "Off-grid"
