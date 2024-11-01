@@ -66,6 +66,7 @@ Yes|On-grid |Wind                |Offshore wind       |Offshore wind energy     
 Yes|On-grid |Wind                |Onshore wind        |Onshore wind energy       -> On-grid |Onshore wind
 
 """
+from owid.catalog import Table
 from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
@@ -147,6 +148,28 @@ REGIONS = [
 ]
 
 
+def sanity_check_outputs(tb: Table, tb_global: Table) -> None:
+    # Just for peace of mind, check again that the resulting global data (for on-grid technologies) matches (within a small error) with the original global data.
+    _tb_global = (
+        tb[(tb["producer_type"] == "On-grid") & (tb["country"] == "World")]
+        .groupby(["year"], observed=True, as_index=False)
+        .agg({"capacity": "sum"})
+    )
+    check = (
+        tb_global.groupby("year", observed=True, as_index=False)
+        .agg({"capacity": "sum"})
+        .merge(_tb_global, on="year", suffixes=("", "_sum"), validate="1:1")
+    )
+    error = "Adding up on-grid capacity for all countries does not add up to global data."
+    assert check[(100 * abs(check["capacity_sum"] - check["capacity"]) / check["capacity"]) > 1].empty, error
+
+    # Check that there are no missing values or negative values.
+    error = "Unexpected missing values."
+    assert tb.notnull().all().all(), error
+    error = "Unexpected negative values."
+    assert (tb["capacity"] >= 0).all(), error
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -173,6 +196,9 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # Get original global data (used for sanity checks).
+    tb_global = tb[(tb["country"] == "World")][["group_technology", "year", "capacity"]].reset_index(drop=True)
+
     # The spreadsheet doesn't explicitly say whether global data corresponds to off-grid, on-grid, or both.
     # After inspection, it seems to be only on-grid.
     # Check that adding up the capacity of all on-grid technologies, sub-technologies and countries reproduces global data
@@ -183,7 +209,6 @@ def run(dest_dir: str) -> None:
         .groupby(["group_technology", "year"], observed=True, as_index=False)
         .agg({"capacity": "sum"})
     )
-    tb_global = tb[(tb["country"] == "World")][["group_technology", "year", "capacity"]].reset_index(drop=True)
     check = tb_global.merge(_tb_global, on=["group_technology", "year"], suffixes=("", "_sum"), validate="1:1")
     error = "Adding up on-grid capacity for all countries does not add up to global data."
     assert check[(100 * abs(check["capacity_sum"] - check["capacity"]) / check["capacity"]) > 6].empty, error
@@ -252,25 +277,8 @@ def run(dest_dir: str) -> None:
         min_num_values_per_year=1,
     )
 
-    # Just for peace of mind, check again that the resulting global data (for on-grid technologies) matches (within a small error) with the original global data.
-    _tb_global = (
-        tb[(tb["producer_type"] == "On-grid") & (tb["country"] == "World")]
-        .groupby(["year"], observed=True, as_index=False)
-        .agg({"capacity": "sum"})
-    )
-    check = (
-        tb_global.groupby("year", observed=True, as_index=False)
-        .agg({"capacity": "sum"})
-        .merge(_tb_global, on="year", suffixes=("", "_sum"), validate="1:1")
-    )
-    error = "Adding up on-grid capacity for all countries does not add up to global data."
-    assert check[(100 * abs(check["capacity_sum"] - check["capacity"]) / check["capacity"]) > 1].empty, error
-
-    # Check that there are no missing values or negative values.
-    error = "Unexpected missing values."
-    assert tb.notnull().all().all(), error
-    error = "Unexpected negative values."
-    assert (tb["capacity"] >= 0).all(), error
+    # Sanity check outputs.
+    sanity_check_outputs(tb=tb, tb_global=tb_global)
 
     # Change from long to wide format.
     off_grid_filter = tb["producer_type"] == "Off-grid"
