@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
     # Separate main countries and others
     tb_main = tb[tb["country"].isin(main_countries)]
     tb_other = tb[~tb["country"].isin(main_countries)]
-    tb["country"] = tb["country"].replace(
+    tb_main["country"] = tb_main["country"].replace(
         {
             "Russia": "USSR",
             "Ukraine": "USSR",
