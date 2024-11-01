@@ -37,6 +37,12 @@ definitions:
     <% elif age == "Unknown" %>
     of unknown age
     <%- endif -%>
+  unit:
+    <% if unit_of_measurement == "Counts" %>
+    homicides
+    <% elif sex == "Rate per 100,000 population" %>
+    homicides per 100,000 population
+    <%- endif -%>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -51,6 +57,8 @@ tables:
            {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
           description_short: |
            {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
+          unit: |
+            {definitions.unit}
     by_relationship_to_perpetrator:
       variables:
         value:
@@ -58,6 +66,8 @@ tables:
             {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
           description_short: |
             {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
+          unit: |
+            {definitions.unit}
     by_situational_context:
       variables:
         value:
@@ -65,10 +75,14 @@ tables:
             {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
           description_short: |
             {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
+          unit: |
+            {definitions.unit}
     total:
       variables:
         value:
           title: |
-            Total {definitions.metric.lower()} of {definitions.sex} {definitions.age}
+            {definitions.metric} of {definitions.sex} {definitions.age}
           description_short: |
-            Total {definitions.metric.lower()} of {definitions.sex} {definitions.age}
+            {definitions.metric} of {definitions.sex} {definitions.age}
+          unit: |
+            {definitions.unit}
