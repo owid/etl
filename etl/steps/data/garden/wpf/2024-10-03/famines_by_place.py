@@ -38,11 +38,33 @@ def run(dest_dir: str) -> None:
     tb["year"] = tb["year"].astype(int)
 
     # Define the main countries with the most famines
-    main_countries = ["China", "Ukraine", "India", "Russia", "Russia, Ukraine", "USSR"]
+    main_countries = [
+        "China",
+        "Ukraine",
+        "India",
+        "Russia",
+        "Russia, Ukraine",
+        "USSR",
+        "Germany, USSR",
+        "Moldova, Ukraine, Russia, Belarus",
+        "Russia, Western Soviet States",
+        "Russia, Kazakhstan",
+    ]
 
     # Separate main countries and others
     tb_main = tb[tb["country"].isin(main_countries)]
     tb_other = tb[~tb["country"].isin(main_countries)]
+    tb["country"] = tb["country"].replace(
+        {
+            "Russia": "USSR",
+            "Ukraine": "USSR",
+            "Russia, Ukraine": "USSR",
+            "Germany, USSR": "USSR",
+            "Moldova, Ukraine, Russia, Belarus": "USSR",
+            "Russia, Western Soviet States": "USSR",
+            "Russia, Kazakhstan": "USSR",
+        }
+    )
 
     # Sum deaths for other countries by year
     tb_other = tb_other.groupby("year")["wpf_authoritative_mortality_estimate"].sum().reset_index()
