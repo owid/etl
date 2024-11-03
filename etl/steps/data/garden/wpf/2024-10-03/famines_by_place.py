@@ -72,7 +72,7 @@ def run(dest_dir: str) -> None:
 
     # Sum deaths for other countries by year
     tb_other = tb_other.groupby("year")["wpf_authoritative_mortality_estimate"].sum().reset_index()
-    tb_other["country"] = "Other"
+    tb_other["country"] = "Other countries"
 
     # Combine main countries and others
     tb = pr.concat([tb_main, tb_other], ignore_index=True)
