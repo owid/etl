@@ -31,8 +31,7 @@ steps:
     - snapshot://artificial_intelligence/2024-11-03/epoch_compute_intensive.csv
   data://garden/artificial_intelligence/2024-11-03/epoch_compute_intensive:
     - data://meadow/artificial_intelligence/2024-11-03/epoch_compute_intensive
-  data://grapher/artificial_intelligence/2024-11-03/epoch_compute_intensive:
-    - data://garden/artificial_intelligence/2024-11-03/epoch_compute_intensive
+
 
   # EPOCH dataset on Compute Intensive AI, aggregates by country
   data://garden/artificial_intelligence/2024-11-03/epoch_compute_intensive_countries:
