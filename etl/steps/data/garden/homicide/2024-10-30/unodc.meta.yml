@@ -63,7 +63,7 @@ tables:
       variables:
         value:
           title: |
-            {definitions.metric} - << category >> - << sex >>
+            {definitions.metric} - << category >> - sex: << sex >>
           description_short: |
             {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
           unit: |
@@ -72,7 +72,7 @@ tables:
       variables:
         value:
           title: |
-            {definitions.metric} - << category >> - << sex >>
+            {definitions.metric} - << category >> - sex: << sex >>
           description_short: |
             {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
           unit: |
@@ -81,7 +81,7 @@ tables:
       variables:
         value:
           title: |
-            {definitions.metric} - << sex >> - << age >>
+            {definitions.metric} - sex: << sex >> - age: << age >>
           description_short: |
             {definitions.metric} of {definitions.sex} {definitions.age}
           unit: |
