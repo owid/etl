@@ -180,14 +180,20 @@ CATEGORY_MAPPING = {
 NEW_GROUPS = {
     "Fossil fuels (total)": ["Coal and peat", "Other fossil fuels", "Natural gas", "Oil"],
     "Bioenergy (total)": ["Biogas", "Liquid biofuels", "Solid biofuels", "Renewable municipal waste"],
-    # TODO: Compare numbers with IRENA's PDF, to ensure we are not double-counting mixed plants.
-    "Hydropower (total)": ["Hydropower", "Mixed hydro plants"],
+    # In IRENA's Renewable Capacity Statistics's PDF, they show:
+    #   * "Renewable hydropower (including mixed plants)" which includes Hydropower + Mixed hydro plants.
+    #   * "Hydropower" which includes Hydropower + Mixed hydro plants + Pumped storage.
+    #   * "Total renewable energy" which includes all renewables, but excludes Pumped storage.
+    # So, for consistency with them, we will create a hydropower total group, which includes pumped storage, and another that doesn't.
+    # And, when constructing the total of renewables, pumped storage will not be included.
+    "Hydropower (total)": ["Hydropower", "Mixed hydro plants", "Pumped storage"],
+    "Hydropower (total, excl. pumped storage)": ["Hydropower", "Mixed hydro plants"],
     "Solar (total)": ["Solar photovoltaic", "Concentrated solar power"],
     "Wind (total)": ["Onshore wind", "Offshore wind"],
     "Renewables (total)": [
         "Bioenergy (total)",
         "Geothermal",
-        "Hydropower (total)",
+        "Hydropower (total, excl. pumped storage)",
         "Solar (total)",
         "Wind (total)",
         "Marine",
@@ -283,8 +289,6 @@ def remap_categories(tb: Table) -> Table:
         len(set(tb[["is_renewable", "group_technology", "technology", "producer_type"]].drop_duplicates()))
         == n_combinations
     ), error
-
-    # TODO: Consider if mixed hydro should be put together with hydro (check how it's done in IRENA's PDF).
 
     # We will group at the technology level.
     # DEBUGGING: Print the final mapping.
