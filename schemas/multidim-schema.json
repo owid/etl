@@ -139,8 +139,8 @@
                                 "type": "string",
                                 "description": "Url of the concrete schema version to use to validate this document",
                                 "format": "uri",
-                                "default": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-                                "const": "https://files.ourworldindata.org/schemas/grapher-schema.005.json"
+                                "default": "https://files.ourworldindata.org/schemas/grapher-schema.006.json",
+                                "const": "https://files.ourworldindata.org/schemas/grapher-schema.006.json"
                             },
                             "id": {
                                 "type": "integer",
