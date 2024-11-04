@@ -8,7 +8,7 @@ definitions:
   metric:
     <% if unit_of_measurement == "Counts" %>
     Number of homicides
-    <% elif sex == "Rate per 100,000 population" %>
+    <% elif unit_of_measurement == "Rate per 100,000 population" %>
     Homicide rate per 100,000 population
     <%- endif -%>
   sex:
