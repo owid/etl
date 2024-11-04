@@ -577,6 +577,9 @@ class Harmonizer:
             json.dump(self.mapping, ostream, indent=2)
 
     def export_excluded_countries(self):
+        if not self.excluded:
+            return
+
         if self.output_file is None:
             raise ValueError("`output_file` not provided")
         assert ".countries." in str(self.output_file), "Output file is not in **/*.countries.json format"
