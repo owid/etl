@@ -66,6 +66,7 @@ Yes|On-grid |Wind                |Offshore wind       |Offshore wind energy     
 Yes|On-grid |Wind                |Onshore wind        |Onshore wind energy       -> On-grid |Onshore wind
 
 """
+import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.datautils.dataframes import map_series
 
@@ -131,7 +132,86 @@ CATEGORY_MAPPING = {
         "Solar thermal energy": "Concentrated solar power",
         "Offshore wind energy": "Offshore wind",
     },
+    # NOTE: Sub-technologies will not be stored (we will keep data aggregated at the technology level).
+    #  However, we keep this mapping just to be warned in case the data changes in a future update.
+    "sub_technology": {
+        "Onshore wind energy": "Onshore wind energy",
+        "Straw": "Straw",
+        "Pumped storage": "Pumped storage",
+        "Advanced biodiesel": "Advanced biodiesel",
+        "Oil": "Oil",
+        "Energy crops": "Energy crops",
+        "Rice husks": "Rice husks",
+        "Renewable industrial waste": "Renewable industrial waste",
+        "Coal and peat": "Coal and peat",
+        "Renewable hydropower": "Renewable hydropower",
+        "Advanced biogasoline": "Advanced biogasoline",
+        "Natural gas": "Natural gas",
+        "On-grid Solar photovoltaic": "On-grid Solar photovoltaic",
+        "Biogas n.e.s.": "Biogas n.e.s.",
+        "Sewage sludge gas": "Sewage sludge gas",
+        "Bagasse": "Bagasse",
+        "Offshore wind energy": "Offshore wind energy",
+        "Biogases from thermal processes": "Biogases from thermal processes",
+        "Other biogases from anaerobic fermentation": "Other biogases from anaerobic fermentation",
+        "Renewable municipal waste": "Renewable municipal waste",
+        "Biomass pellets and briquettes": "Biomass pellets and briquettes",
+        "Marine energy": "Marine energy",
+        "Nuclear": "Nuclear",
+        "Geothermal energy": "Geothermal energy",
+        "Black liquor": "Black liquor",
+        "Fossil fuels n.e.s.": "Fossil fuels n.e.s.",
+        "Other liquid biofuels": "Other liquid biofuels",
+        "Conventional biodiesel": "Conventional biodiesel",
+        "Off-grid Solar photovoltaic": "Off-grid Solar photovoltaic",
+        "Other vegetal and agricultural waste": "Other vegetal and agricultural waste",
+        "Animal waste": "Animal waste",
+        "Concentrated solar power": "Concentrated solar power",
+        "Mixed Hydro Plants": "Mixed Hydro Plants",
+        "Other primary solid biofuels n.e.s.": "Other primary solid biofuels n.e.s.",
+        "Landfill gas": "Landfill gas",
+        "Wood waste": "Wood waste",
+        "Other non-renewable energy": "Other non-renewable energy",
+        "Wood fuel": "Wood fuel",
+    },
 }
+# Create new groups for total capacity of each technology.
+# NOTE: The following groups will include both on-grid and off-grid. The new producer type will be "Both".
+NEW_GROUPS = {
+    "Fossil fuels (total)": ["Coal and peat", "Other fossil fuels", "Natural gas", "Oil"],
+    "Bioenergy (total)": ["Biogas", "Liquid biofuels", "Solid biofuels", "Renewable municipal waste"],
+    # TODO: Compare numbers with IRENA's PDF, to ensure we are not double-counting mixed plants.
+    "Hydropower (total)": ["Hydropower", "Mixed hydro plants"],
+    "Solar (total)": ["Solar photovoltaic", "Concentrated solar power"],
+    "Wind (total)": ["Onshore wind", "Offshore wind"],
+    "Renewables (total)": [
+        "Bioenergy (total)",
+        "Geothermal",
+        "Hydropower (total)",
+        "Solar (total)",
+        "Wind (total)",
+        "Marine",
+    ],
+    "Geothermal (total)": ["Geothermal"],
+    # Other groups that could be created, but, since they have only one item (for one producer type), they are unnecessary, and create redundancy.
+    # "Nuclear": ["Nuclear"],
+    # "Other non-renewable": ["Other non-renewable"],
+    # "Pumped storage": ["Pumped storage"],
+    # "Marine": ["Marine"],
+}
+
+# We will keep only technologies that appear explicitly in the Renewable Capacity Statistics 2024 document.
+# So we will exclude the rest.
+# NOTE: We do this after creating all aggregates, in case in the future we decide to include them.
+EXCLUDE_TECHNOLOGIES = [
+    "Fossil fuels (total)",
+    "Coal and peat",
+    "Other fossil fuels",
+    "Natural gas",
+    "Oil",
+    "Nuclear",
+    "Other non-renewable",
+]
 
 # Regions for which aggregates will be created.
 REGIONS = [
@@ -191,6 +271,7 @@ def remap_categories(tb: Table) -> Table:
             mapping=CATEGORY_MAPPING[category],
             warn_on_missing_mappings=True,
             warn_on_unused_mappings=True,
+            show_full_warning=True,
         )
     # Check that the number of unique categories and unique combinations (up to the technology level) are the same as before mapping.
     error = "Unexpected number of unique categories after mapping."
@@ -286,8 +367,21 @@ def run(dest_dir: str) -> None:
         min_num_values_per_year=1,
     )
 
+    # Add groups with total capacity (e.g. "Solar (total)").
+    for group_name, group_members in NEW_GROUPS.items():
+        _tb = (
+            tb[(tb["technology"].isin(group_members))]
+            .groupby(["country", "year"], observed=True, as_index=False)
+            .agg({"capacity": "sum"})
+            .assign(**{"technology": group_name, "producer_type": "Both"})
+        )
+        tb = pr.concat([tb, _tb], ignore_index=True)
+
     # Sanity check outputs.
     sanity_check_outputs(tb=tb, tb_global=tb_global)  # type: ignore
+
+    # Exclude technologies that are not explicitly mentioned in the IRENA's Renewable Capacity Statistics 2024 document.
+    tb = tb[~tb["technology"].isin(EXCLUDE_TECHNOLOGIES)].reset_index(drop=True)
 
     # Change from long to wide format.
     off_grid_filter = tb["producer_type"] == "Off-grid"

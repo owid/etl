@@ -23,9 +23,9 @@ def run(dest_dir: str) -> None:
         tb[new_column].metadata.title = tb[column].metadata.title + " (GW)"
         tb[new_column].metadata.unit = "gigawatts"
         tb[new_column].metadata.short_unit = "GW"
-        tb[new_column].metadata.description_short = tb[column].metadata.description_short.replace(
-            "mega", "giga"
-        ).replace("MW", "GW")
+        tb[new_column].metadata.description_short = (
+            tb[column].metadata.description_short.replace("mega", "giga").replace("MW", "GW")
+        )
 
     #
     # Save outputs.
