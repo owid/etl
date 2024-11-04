@@ -136,7 +136,9 @@ def add_population_weighted_regional_averages_for_rates(
         regions = geo.list_members_of_region(region=region, ds_regions=ds_regions)
         tb_region = tb_rates[tb_rates["country"].isin(regions)]
         tb_region = (
-            tb_region.groupby(["year", "indicator", "sex", "wealth_quintile"])[["obs_value_pop", "population"]]
+            tb_region.groupby(["year", "indicator", "sex", "wealth_quintile", "unit_of_measure"])[
+                ["obs_value_pop", "population"]
+            ]
             .sum()
             .reset_index()
         )
