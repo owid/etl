@@ -60,7 +60,7 @@ tables:
         description_short: |-
           Total geothermal (on- and off-grid) electricity installed capacity, measured in megawatts.
         display:
-          name: Geothermal
+          name: Geothermal (total)
         presentation:
           title_public: Total geothermal capacity
       hydropower:
@@ -84,7 +84,7 @@ tables:
         description_short: |-
           Total hydropower (on- and off-grid) electricity installed capacity, including pumped storage, measured in megawatts. This includes mixed hydro plans.
         display:
-          name: Hydropower
+          name: Hydropower (incl. pumped storage)
         presentation:
           title_public: Total hydropower capacity
       hydropower__total__excl__pumped_storage:
@@ -92,7 +92,7 @@ tables:
         description_short: |-
           Total hydropower (on- and off-grid) electricity installed capacity, measured in megawatts. This includes mixed hydro plans, but excludes pumped storage.
         display:
-          name: Hydropower (excluding pumped storage)
+          name: Hydropower (excl. pumped storage)
         presentation:
           title_public: Total hydropower capacity (excluding pumped storage)
       liquid_biofuels:
