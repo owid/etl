@@ -24,7 +24,6 @@ tables:
           title: Deaths from famines
           unit: 'deaths'
           short_unit: ''
-          description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
           display:
             numDecimalPlaces: 0
 

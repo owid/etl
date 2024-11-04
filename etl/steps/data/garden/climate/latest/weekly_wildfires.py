@@ -1,11 +1,12 @@
 """Load a meadow dataset and create a garden dataset."""
 
+
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder, create_dataset, last_date_accessed
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -103,7 +104,11 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=[tb],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+        yaml_params={"date_accessed": last_date_accessed(tb)},
     )
 
     # Save changes in the new garden dataset.

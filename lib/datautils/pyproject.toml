@@ -5,6 +5,12 @@ description = "Data utils library by the Data Team at Our World in Data"
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
 ]
+keywords = [
+    "our world in data",
+    "data cleaning",
+    "data processing",
+    "data utils",
+]
 license = "MIT"
 requires-python = ">=3.9, <4.0"
 dependencies = [

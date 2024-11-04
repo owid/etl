@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -21,18 +20,11 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Divide each row's 'wpf_authoritative_mortality_estimate' by the length of the corresponding 'Date' value to assume a uniform distribution of deaths over the period
-    tb["wpf_authoritative_mortality_estimate"] = tb.apply(
-        lambda row: row["wpf_authoritative_mortality_estimate"] / len(row["date"].split(","))
-        if pd.notna(row["date"])
-        else row["wpf_authoritative_mortality_estimate"],
-        axis=1,
-    )
-    # Remove rows where 'wpf_authoritative_mortality_estimate' is NaN
-    tb = tb.dropna(subset=["wpf_authoritative_mortality_estimate"])
 
     # Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
     tb = tb.assign(date=tb["date"].str.split(",")).explode("date").drop_duplicates().reset_index(drop=True)
+    # Keep only the earliest date for each country
+    tb = tb.sort_values(by="date").drop_duplicates(subset=["famine_name"], keep="first").reset_index(drop=True)
 
     # Rename columns for plotting
     tb = tb.rename({"country": "place", "famine_name": "country", "date": "year"}, axis=1)
