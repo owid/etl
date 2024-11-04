@@ -54,7 +54,7 @@ tables:
       variables:
         value:
           title: |
-           {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
+            {definitions.metric} - << category >>
           description_short: |
            {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
           unit: |
@@ -63,7 +63,7 @@ tables:
       variables:
         value:
           title: |
-            {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
+            {definitions.metric} - << category >> - << sex >>
           description_short: |
             {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
           unit: |
@@ -72,7 +72,7 @@ tables:
       variables:
         value:
           title: |
-            {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
+            {definitions.metric} - << category >> - << sex >>
           description_short: |
             {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
           unit: |
@@ -81,7 +81,7 @@ tables:
       variables:
         value:
           title: |
-            {definitions.metric} of {definitions.sex} {definitions.age}
+            {definitions.metric} - << sex >> - << age >>
           description_short: |
             {definitions.metric} of {definitions.sex} {definitions.age}
           unit: |
