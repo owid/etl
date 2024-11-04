@@ -1,9 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
 
-from etl.data_helpers import geo
+from etl.data_helpers import geo, population
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("unodc")
-
+    ds_wpp = paths.load_dataset("un_wpp")
     # Read table from meadow dataset.
     tb = ds_meadow["unodc"].reset_index()
 
@@ -124,4 +124,50 @@ def clean_up_categories(tb: Table) -> Table:
     tb["category"] = tb["category"].cat.rename_categories(category_dict)
 
     assert tb["category"].isna().sum() == 0
+    return tb
+
+
+def create_united_kingdom(tb: Table, ds_wpp: Dataset) -> Table:
+    """
+    Combine the values for England, Wales, Scotland and N.Ireland to calculate UK
+    """
+    uk_countries = ["England and Wales", "Northern Ireland", "Scotland"]
+    tb_uk = tb[(tb["country"].isin(uk_countries)) & (tb["unit_of_measurement"] == "Counts") & (tb["age"] == "Total")]
+    tb_pop = ds_wpp["population"].reset_index()
+    tb_pop = tb_pop[(tb_pop["metric"] == "population") & (tb_pop["age"] == "all") & (tb_pop["variant"] == "estimates")]
+
+    geo.add_population_to_table(tb_uk)
+    population.add_population(
+        tb_uk,
+        ds_un_wpp=ds_wpp,
+        country_col="country",
+        sex_col="sex",
+        year_col="year",
+        sex_group_female="Female",
+        sex_group_male="Male",
+        sex_group_all="Total",
+    )
+    return tb
+
+
+def calculate_united_kingdom_populations(tb: Table, ds_wpp: Dataset) -> Table:
+    """
+    Combine the values for England, Wales, Scotland and N.Ireland to calculate UK
+    """
+    uk_countries = ["England", "Wales", "Northern Ireland", "Scotland"]
+    tb_pop = ds_wpp["population"].reset_index()
+    tb_pop = tb_pop[(tb_pop["metric"] == "population") & (tb_pop["age"] == "all") & (tb_pop["variant"] == "estimates")]
+    tb_uk_pop = tb_pop[tb_pop["location"].isin(uk_countries)]
+
+    geo.add_population_to_table(tb_uk)
+    population.add_population(
+        tb_uk,
+        ds_un_wpp=ds_wpp,
+        country_col="country",
+        sex_col="sex",
+        year_col="year",
+        sex_group_female="Female",
+        sex_group_male="Male",
+        sex_group_all="Total",
+    )
     return tb

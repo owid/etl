@@ -96,6 +96,7 @@ steps:
     - snapshot://homicide/2024-10-30/unodc.xlsx
   data://garden/homicide/2024-10-30/unodc:
     - data://meadow/homicide/2024-10-30/unodc
+    - data://garden/un/2022-07-11/un_wpp
   data://grapher/homicide/2024-10-30/unodc:
     - data://garden/homicide/2024-10-30/unodc
 
