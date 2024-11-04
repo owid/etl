@@ -13,7 +13,6 @@ from apps.wizard.utils import get_staging_creation_time
 from etl import grapher_model as gm
 from etl.db import read_sql
 
-ADMIN_GRAPHER_USER_ID = 1
 log = get_logger()
 
 
@@ -199,13 +198,7 @@ class ChartDiff:
                         self._change_types.append("data")
                     if self.modified_checksum["metadataChecksum"].any():
                         self._change_types.append("metadata")
-                # if chart hasn't been edited by Admin, then disregard config change (it could come from having out of sync MySQL
-                # against master)
-                if (
-                    self.target_chart
-                    and not self.configs_are_equal()
-                    and self.source_chart.lastEditedByUserId == ADMIN_GRAPHER_USER_ID
-                ):
+                if self.target_chart and not self.configs_are_equal():
                     self._change_types.append("config")
 
                 # TODO: Should uncomment this maybe?
