@@ -97,6 +97,9 @@ def harmonize(
     # Export
     harmonizer.export_mapping()
 
+    # Excluded countries
+    harmonizer.export_excluded_countries()
+
 
 def harmonize_ipython(
     tb: Table,
@@ -264,6 +267,7 @@ class Harmonizer:
         # Mapping
         self._mapping = None
         self.countries_mapped_automatic = None
+        self.excluded = []
 
     def _get_geo(self, tb, colname, indicator):
         """Get set of country names to map."""
@@ -359,7 +363,8 @@ class Harmonizer:
 
         questionary.print("Beginning interactive harmonization...")
         questionary.print("  Select [skip] to skip a country/region mapping")
-        questionary.print("  Select [custom] to enter a custom name\n")
+        questionary.print("  Select [custom] to enter a custom name")
+        questionary.print("  Select [exclude] to exclude a country\n")
 
         instruction = "(Use shortcuts or arrow keys)"
         # start interactive session
@@ -372,7 +377,7 @@ class Harmonizer:
                 # show suggestions
                 name = questionary.select(
                     f"[{i}/{len(self.ambiguous)}] {region}:",
-                    choices=suggestions + ["[custom]", "[skip]"],
+                    choices=suggestions + ["[custom]", "[skip]", "[exclude]"],
                     use_shortcuts=True,
                     style=SHELL_FORM_STYLE,
                     instruction=instruction,
@@ -395,6 +400,9 @@ class Harmonizer:
                         )
                 elif name == "[skip]":
                     n_skipped += 1
+                    continue
+                elif name == "[exclude]":
+                    self.excluded.append(region)
                     continue
 
                 self.mapping[region] = name
@@ -567,6 +575,14 @@ class Harmonizer:
             raise ValueError("`output_file` not provided")
         with open(self.output_file, "w") as ostream:
             json.dump(self.mapping, ostream, indent=2)
+
+    def export_excluded_countries(self):
+        if self.output_file is None:
+            raise ValueError("`output_file` not provided")
+        assert ".countries." in str(self.output_file), "Output file is not in **/*.countries.json format"
+        excluded_countries_path = str(self.output_file).replace(".countries.", ".excluded_countries.")
+        with open(excluded_countries_path, "w") as ostream:
+            json.dump(self.excluded, ostream, indent=2)
 
 
 if __name__ == "__main__":
