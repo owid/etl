@@ -148,10 +148,9 @@ def load_datasets_new_ids(source_engine: Engine) -> list[int]:
     target_engine = production_or_master_engine()
 
     # Get new datasets
-    # TODO: replace by real catalogPath when we have it in MySQL
     q = """SELECT
         id,
-        CONCAT(namespace, "/", version, "/", shortName) as catalogPath
+        catalogPath
     FROM datasets
     """
     source_datasets = read_sql(q, source_engine)
