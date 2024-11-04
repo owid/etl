@@ -3,7 +3,7 @@ from math import trunc
 from typing import List
 
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -11,12 +11,14 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+REGIONS = geo.REGIONS
 
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
-    #
+    # Load countries-regions dataset (required to get ISO codes).
+    ds_regions = paths.load_dataset("regions")
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("igme", version=paths.version)
     # Load vintage dataset which has older data needed for youth mortality
@@ -60,7 +62,8 @@ def run(dest_dir: str) -> None:
     tb_com = combine_datasets(
         tb_a=tb_under_fifteen, tb_b=tb_vintage, table_name="igme_combined", preferred_source="igme (current)"
     )
-
+    # add regional data
+    tb_com = add_regional_totals_for_counts(tb_com, ds_regions)
     tb_com = calculate_under_fifteen_deaths(tb_com)
     tb_com = calculate_under_fifteen_mortality_rates(tb_com)
     tb_com = tb_com.format(["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"])
@@ -82,6 +85,31 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_regional_totals_for_counts(tb: Table, ds_regions: Dataset) -> Table:
+    """
+    Adding regional sums for variables that are counts
+    """
+    tb_counts = tb[tb["unit_of_measure"] == "Number of deaths"]
+
+    tb_all_regions = Table()
+    for region in REGIONS:
+        regions = geo.list_members_of_region(region=region, ds_regions=ds_regions)
+        tb_region = tb_counts[tb_counts["country"].isin(regions)]
+        tb_region = (
+            tb_region.groupby(["year", "indicator", "sex", "wealth_quintile"])[
+                ["obs_value", "lower_bound", "upper_bound"]
+            ]
+            .sum()
+            .reset_index()
+        )
+        tb_region["country"] = region
+        tb_all_regions = pr.concat([tb_all_regions, tb_region])
+
+    tb = pr.concat([tb, tb_all_regions])
+
+    return tb
 
 
 def convert_to_percentage(tb: Table) -> Table:

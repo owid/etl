@@ -772,6 +772,7 @@ steps:
   data://garden/un/2024-09-11/igme:
     - data://meadow/un/2024-09-11/igme
     - data://garden/un/2018/igme
+    - data://garden/regions/2023-01-01/regions
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
 
