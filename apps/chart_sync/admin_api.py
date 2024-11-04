@@ -111,11 +111,11 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "variable_id": variable_id})
         return js
 
-    def put_mdim_config(self, slug: str, mdim_config: dict) -> dict:
+    def put_mdim_config(self, slug: str, mdim_config: dict, user_id: Optional[int] = None) -> dict:
         # Retry in case we're restarting Admin on staging server
         resp = requests_with_retry().put(
             self.owid_env.admin_api + f"/multi-dim/{slug}",
-            cookies={"sessionid": self.session_id},
+            cookies={"sessionid": self._get_session_id(user_id)},
             json=mdim_config,
         )
         js = self._json_from_response(resp)
