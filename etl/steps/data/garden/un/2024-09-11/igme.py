@@ -46,6 +46,11 @@ def run(dest_dir: str) -> None:
     # Filter out just the bits of the data we want
     tb = filter_data(tb)
     tb = round_down_year(tb)
+    # add regional data for count variables
+    tb = add_regional_totals_for_counts(tb, ds_regions)
+    # add regional population weighted averages for rate variables
+    tb = add_population_weighted_regional_averages_for_rates(tb, ds_population, ds_regions)
+
     # Removing commas from the unit of measure
     tb["unit_of_measure"] = tb["unit_of_measure"].str.replace(",", "", regex=False)
     tb["source"] = "igme (current)"
@@ -64,10 +69,6 @@ def run(dest_dir: str) -> None:
     tb_com = combine_datasets(
         tb_a=tb_under_fifteen, tb_b=tb_vintage, table_name="igme_combined", preferred_source="igme (current)"
     )
-    # add regional data for count variables
-    tb_com = add_regional_totals_for_counts(tb_com, ds_regions)
-    tb_com = add_population_weighted_regional_averages_for_rates(tb_com, ds_population, ds_regions)
-    # add population-weighted averages for variables that are rates
     tb_com = calculate_under_fifteen_deaths(tb_com)
     tb_com = calculate_under_fifteen_mortality_rates(tb_com)
     tb_com = tb_com.format(["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"])
