@@ -117,7 +117,10 @@ def create_session_id(owid_env: OWIDEnv, grapher_user_id: int) -> str:
     engine = owid_env.get_engine()
     with Session(engine) as session:
         user = session.get(gm.User, grapher_user_id)
-        assert user
+        # User is not in a database, use GRAPHER_USER_ID from .env
+        if not user:
+            user = session.get(gm.User, GRAPHER_USER_ID)
+            assert user, f"User with id {GRAPHER_USER_ID} not found in the database. Initially tried to use user with id {grapher_user_id}."
         session_id = _create_user_session(session, user.email)
         session.commit()
 
