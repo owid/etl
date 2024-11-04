@@ -186,6 +186,8 @@ NEW_GROUPS = {
     #   * "Total renewable energy" which includes all renewables, but excludes Pumped storage.
     # So, for consistency with them, we will create a hydropower total group, which includes pumped storage, and another that doesn't.
     # And, when constructing the total of renewables, pumped storage will not be included.
+    # Also note that other totals seem to include off-grid capacity.
+    # For example, "Solar" in the PDF is the sum of on- and off-grid "Solar photovoltaic" and "Concentrated solar power".
     "Hydropower (total)": ["Hydropower", "Mixed hydro plants", "Pumped storage"],
     "Hydropower (total, excl. pumped storage)": ["Hydropower", "Mixed hydro plants"],
     "Solar (total)": ["Solar photovoltaic", "Concentrated solar power"],
