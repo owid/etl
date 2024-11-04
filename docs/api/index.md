@@ -1,16 +1,16 @@
 # Our World In Data - Data APIs
 
-At Our World In Data we maintain a highly curated set of charts on our website. The data and metadata for these charts is available through our Public Chart API. It is available as CSV/JSON via HTTP and so is easily consumed from any programming language. The data this API provides is optimized for creating interactive charts and is easy to use.
+Our World in Data offers a curated collection of charts on our website, with data and metadata accessible via our Public Chart API. The API provides data in CSV and JSON formats over HTTP, enabling seamless integration with any programming language. It is specifically designed to support the creation of interactive charts.
 
-We also have a larger data catalog in our ETL. This is the space where we fetch, process and prepare the data used in our charts. It contains substantially more data but it is curated to different degrees in different parts. It also offers an API although one that is less straightforward to access - for now we offer only a Python client to interact with this API. This data is structured according to our internal needs and varies a lot more in shape than the data in the public charts API - e.g. the public charts API only has time series data using time (usually the year) and entity (usually the country), whereas our ETL often has much larger datasets that contain additional dimensions like a breakdown by age group and gender.
+We also maintain a larger data catalog within our ETL system, where we fetch, process, and prepare data used for our charts. This catalog contains significantly more data, though its level of curation varies across different sections. It also has an API, albeit one that is currently less accessible; at this time, we only offer a Python client for interacting with it. Unlike the Public Chart API, which exclusively provides time series data by time (typically year) and entity (typically country), our ETL catalog includes larger datasets with additional dimensions, such as age group and gender breakdowns.
 
 This documentation briefly describes both of these APIs.
 
 # Chart data API
 
-Our chart API is structured around charts on our website, i.e. at https://ourworldindata.org/grapher/* . You can find charts by searching for them in our data catalog at https://ourworldindata.org/data.
+Our chart API is structured around charts on our website, i.e. at https://ourworldindata.org/grapher/* . You can find charts by searching our data catalog at https://ourworldindata.org/data.
 
-Once you have found the chart with the data you care about, fetching it is just appending the suffix ".csv" to fetch the data or ".metadata.json" to fetch the metadata. You can also append ".zip" to fetch a zip file containing these two files plus a readme markdown file that describes the data.
+Once you've found the chart with the data you need, simply append ".csv" to the URL to download the data or ".metadata.json" to retrieve the metadata. You can also add ".zip" to download a ZIP file that includes both files, along with a README in markdown format describing the data.
 
 An example for our life expectancy chart:
 - https://ourworldindata.org/grapher/life-expectancy - the page on our website where you can see the chart
@@ -48,13 +48,13 @@ Check out this list of public example notebooks that demonstrate the use of our 
 
 ## CSV structure
 
-The high level structure of the CSV file is that each row is an observation for an entity (usually a country or region) and a timepoint (usually a year). For example, the first three lines of the data for our life expectancy chart look like this:
+Each row in the CSV file corresponds to an observation for an entity (most often a country or region) at a specific time point (generally a year). For example, the first three rows of data from our life expectancy chart appear as follows:
 
 > Entity,Code,Year,Period life expectancy at birth - Sex: all - Age: 0
 > Afghanistan,AFG,1950,27.7275
 > Afghanistan,AFG,1951,27.9634
 
-The first two columns in the CSV file are "Entity" and "Code". "Entity" is the name of the entity, which often is a country, for example "United States". "Code" is the OWID internal entity code that we use if the entity is a country or region. For normal countries, this is the same as the [iso alpha-3](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) code of the entity (e.g. "USA") - for non-standard countries like historical countries these are custom codes. Country/Region codes across all the data at Our World In Data is harmonized, so you can join two or more of our datasets on either of these columns.
+The first two columns in the CSV file are "Entity" and "Code." "Entity" is the name of the entity, typically a country, such as "United States." "Code" is the OWID internal entity code used for countries or regions. For standard countries, this matches the [ISO alpha-3 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) (e.g., "USA"); for non-standard or historical countries, we use custom codes. Country and region codes are standardized across all Our World in Data datasets, allowing you to join multiple datasets using either of these columns.
 
 The third column is either "Year" or "Day". If the data is annual, this is "Year" and contains only the year as an integer. If the column is "Day", the column contains a date string in the form "YYYY-MM-DD".
 
