@@ -19,6 +19,8 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     # Load countries-regions dataset (required to get ISO codes).
     ds_regions = paths.load_dataset("regions")
+    # Load the population dataset
+    ds_population = paths.load_dataset("population")
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("igme", version=paths.version)
     # Load vintage dataset which has older data needed for youth mortality
@@ -62,8 +64,10 @@ def run(dest_dir: str) -> None:
     tb_com = combine_datasets(
         tb_a=tb_under_fifteen, tb_b=tb_vintage, table_name="igme_combined", preferred_source="igme (current)"
     )
-    # add regional data
+    # add regional data for count variables
     tb_com = add_regional_totals_for_counts(tb_com, ds_regions)
+    tb_com = add_population_weighted_regional_averages_for_rates(tb_com, ds_population, ds_regions)
+    # add population-weighted averages for variables that are rates
     tb_com = calculate_under_fifteen_deaths(tb_com)
     tb_com = calculate_under_fifteen_mortality_rates(tb_com)
     tb_com = tb_com.format(["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"])
@@ -105,6 +109,40 @@ def add_regional_totals_for_counts(tb: Table, ds_regions: Dataset) -> Table:
             .reset_index()
         )
         tb_region["country"] = region
+        tb_region["unit_of_measure"] = "Number of deaths"
+        tb_all_regions = pr.concat([tb_all_regions, tb_region])
+
+    tb = pr.concat([tb, tb_all_regions])
+
+    return tb
+
+
+def add_population_weighted_regional_averages_for_rates(
+    tb: Table, ds_population: Dataset, ds_regions: Dataset
+) -> Table:
+    """
+    Adding population-weighted averages for the death rates
+    """
+    tb_rates = tb[tb["unit_of_measure"] != "Number of deaths"]
+    tb_rates = geo.add_population_to_table(tb_rates, ds_population)
+    msk = tb_rates["population"].isna()
+    # Dropping out regions that don't have a population
+    tb_rates = tb_rates[~msk]
+
+    tb_rates["obs_value_pop"] = tb_rates["obs_value"] * tb_rates["population"]
+    tb_rates = tb_rates.drop(columns=["lower_bound", "upper_bound"])
+    tb_all_regions = Table()
+    for region in REGIONS:
+        regions = geo.list_members_of_region(region=region, ds_regions=ds_regions)
+        tb_region = tb_rates[tb_rates["country"].isin(regions)]
+        tb_region = (
+            tb_region.groupby(["year", "indicator", "sex", "wealth_quintile"])[["obs_value_pop", "population"]]
+            .sum()
+            .reset_index()
+        )
+        tb_region["country"] = region
+        tb_region["obs_value"] = tb_region["obs_value_pop"] / tb_region["population"]
+        tb_region = tb_region.drop(columns=["obs_value_pop"])
         tb_all_regions = pr.concat([tb_all_regions, tb_region])
 
     tb = pr.concat([tb, tb_all_regions])
