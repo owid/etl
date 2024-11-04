@@ -8,15 +8,15 @@ This documentation briefly describes both of these APIs.
 
 # Chart data API
 
-Our chart API is structured around charts on our website, i.e. at https://ourworldindata.org/grapher/* . You can find charts by searching our data catalog at https://ourworldindata.org/data.
+Our chart API is structured around charts on our website, i.e. at https://ourworldindata.org/grapher/* . You can find charts by searching our data catalog at [https://ourworldindata.org/data](https://ourworldindata.org/data).
 
 Once you've found the chart with the data you need, simply append ".csv" to the URL to download the data or ".metadata.json" to retrieve the metadata. You can also add ".zip" to download a ZIP file that includes both files, along with a README in markdown format describing the data.
 
 An example for our life expectancy chart:
-- https://ourworldindata.org/grapher/life-expectancy - the page on our website where you can see the chart
-- https://ourworldindata.org/grapher/life-expectancy.csv - the data for this chart (see below for options)
-- https://ourworldindata.org/grapher/life-expectancy.metadata.json - the metadata for this chart, like the chart title, the units, how to cite the data sources
-- https://ourworldindata.org/grapher/life-expectancy.zip - the above two plus a readme as zip file archive
+- [https://ourworldindata.org/grapher/life-expectancy](https://ourworldindata.org/grapher/life-expectancy) - the page on our website where you can see the chart
+- [https://ourworldindata.org/grapher/life-expectancy.csv](https://ourworldindata.org/grapher/life-expectancy.csv) - the data for this chart (see below for options)
+- [https://ourworldindata.org/grapher/life-expectancy.metadata.json](https://ourworldindata.org/grapher/life-expectancy.metadata.json) - the metadata for this chart, like the chart title, the units, how to cite the data sources
+- [https://ourworldindata.org/grapher/life-expectancy.zip](https://ourworldindata.org/grapher/life-expectancy.zip) - the above two plus a readme as zip file archive
 
 ## Options
 
@@ -43,16 +43,18 @@ https://ourworldindata.org/grapher/life-expectancy.csv?useShortNames=true
 ## Example notebooks
 
 Check out this list of public example notebooks that demonstrate the use of our chart API:
-- https://colab.research.google.com/drive/1HDcqCy6ZZ05IznXzaaP9Blvvp3qoPnP8?usp=sharing
-- https://observablehq.com/@owid/recreating-the-life-expectancy-chart
+- [Example python notebook](https://colab.research.google.com/drive/1HDcqCy6ZZ05IznXzaaP9Blvvp3qoPnP8?usp=sharing) on Google Colab using Pandas
+- [ObservableHQ notebook](https://observablehq.com/@owid/recreating-the-life-expectancy-chart) using Javascript to recreate the life expectancy chart
 
 ## CSV structure
 
 Each row in the CSV file corresponds to an observation for an entity (most often a country or region) at a specific time point (generally a year). For example, the first three rows of data from our life expectancy chart appear as follows:
 
-> Entity,Code,Year,Period life expectancy at birth - Sex: all - Age: 0
-> Afghanistan,AFG,1950,27.7275
-> Afghanistan,AFG,1951,27.9634
+```csv
+Entity,Code,Year,Period life expectancy at birth - Sex: all - Age: 0
+Afghanistan,AFG,1950,27.7275
+Afghanistan,AFG,1951,27.9634
+```
 
 The first two columns in the CSV file are "Entity" and "Code." "Entity" is the name of the entity, typically a country, such as "United States." "Code" is the OWID internal entity code used for countries or regions. For standard countries, this matches the [ISO alpha-3 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) (e.g., "USA"); for non-standard or historical countries, we use custom codes. Country and region codes are standardized across all Our World in Data datasets, allowing you to join multiple datasets using either of these columns.
 
@@ -62,7 +64,7 @@ The final columns are the data columns, which are the time series that powers th
 
 ## Metadata structure
 
-The .metadata.json file contains metadata about the data package. The "charts" key contains information to recreate the chart, like the title, subtitle etc.. The "columns" key contains information about each of the columns in the csv, like the unit, timespan covered, citation for the data etc.. Here is a (slightly shortened) example of the metadata for the life-expectancy chart:
+The `.metadata.json` file contains metadata about the data package. The "charts" key contains information to recreate the chart, like the title, subtitle etc.. The "columns" key contains information about each of the columns in the csv, like the unit, timespan covered, citation for the data etc.. Here is a (slightly shortened) example of the metadata for the life-expectancy chart:
 
 ```json
 {
