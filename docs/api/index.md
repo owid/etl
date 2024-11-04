@@ -2,7 +2,7 @@
 
 At Our World In Data we maintain a highly curated set of charts on our website. The data and metadata for these charts is available through our Public Chart API. It is available as CSV/JSON via HTTP and so is easily consumed from any programming language. The data this API provides is optimized for creating interactive charts and is easy to use.
 
-We also have a larger data catalog in our ETL. This is the space where we fetch, process and prepare the data used in our charts. It contains substantially more data but it is curated to different degrees in different parts. It also offers an API although one that is less straightforward to access - for now we offer only a Python client to interact with this API. This data is structured according to our internal needs and varies a lot more in shape than the data in the public charts API - e.g. the public charts API only has time series data using time (usually the year) and entity (usually the country), whereas our ETL often has much larger datasets than contain additional dimensions like a breakdown by age group and gender.
+We also have a larger data catalog in our ETL. This is the space where we fetch, process and prepare the data used in our charts. It contains substantially more data but it is curated to different degrees in different parts. It also offers an API although one that is less straightforward to access - for now we offer only a Python client to interact with this API. This data is structured according to our internal needs and varies a lot more in shape than the data in the public charts API - e.g. the public charts API only has time series data using time (usually the year) and entity (usually the country), whereas our ETL often has much larger datasets that contain additional dimensions like a breakdown by age group and gender.
 
 This documentation briefly describes both of these APIs.
 
@@ -58,7 +58,7 @@ The first two columns in the CSV file are "Entity" and "Code". "Entity" is the n
 
 The third column is either "Year" or "Day". If the data is annual, this is "Year" and contains only the year as an integer. If the column is "Day", the column contains a date string in the form "YYYY-MM-DD".
 
-The final columns are the data columns, which are the time series that powers the chart. For simple line charts there is only a single data column, more complex charts can have more columns.
+The final columns are the data columns, which are the time series that powers the chart. For simple line charts there is only a single data column, whereas more complex charts can have more columns.
 
 ## Metadata structure
 
@@ -71,7 +71,7 @@ The .metadata.json file contains metadata about the data package. The "charts" k
         "subtitle": "The [period life expectancy](#dod:period-life-expectancy) at birth, in a given year.",
         "citation": "UN WPP (2022); HMD (2023); Zijdeman et al. (2015); Riley (2005)",
         "originalChartUrl": "https://ourworldindata.org/grapher/life-expectancy",
-        "selection": ["World", "Americas", "Europe","Africa","Asia","Oceania"]
+        "selection": ["World", "Americas", "Europe", "Africa", "Asia", "Oceania"]
     },
     "columns": {
         "Period life expectancy at birth - Sex: all - Age: 0": {
