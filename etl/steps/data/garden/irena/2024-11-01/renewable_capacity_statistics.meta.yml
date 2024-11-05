@@ -5,8 +5,6 @@ definitions:
         - Energy
     short_unit: MW
     unit: megawatts
-    description_short: |-
-      Measured in megawatts.
 
 dataset:
   update_period_days: 365
