@@ -85,7 +85,13 @@ def run(dest_dir: str) -> None:
 
 def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     """
-    Add regions to remittance data.
+    Add regions to remittance data, if more than 75% of remittance volume sent/ received is covered by cost data.
+
+    notes for indicators:
+    - si_rmt_cost_ib_zs: % cost of receiving remittances (inbound)
+    - si_rmt_cost_ob_zs: % cost of sending remittances (outbound)
+    - bx_trf_pwkr_cd_dt: total remittances received by country
+    - bm_trf_pwkr_cd_dt: total remittances sent by country
     """
 
     tb = tb.reset_index()
@@ -94,6 +100,7 @@ def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_gro
     regions_tb = tb.copy()
 
     # create new columns for total remittances (only for countries where remittance cost is available)
+    # this is needed to calculate share of remittance volume covered by cost data
     regions_tb["total_received_remittances"] = regions_tb["bx_trf_pwkr_cd_dt"].where(
         regions_tb["si_rmt_cost_ib_zs"].notna()
     )
@@ -109,6 +116,7 @@ def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_gro
         regions_tb["si_rmt_cost_ob_zs"] * regions_tb["total_sent_remittances"]
     )
 
+    # aggregation for regions
     agg = {
         "total_cost_of_receiving_remittances": "sum",
         "total_cost_of_sending_remittances": "sum",
@@ -127,11 +135,26 @@ def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_gro
         min_num_values_per_year=1,
     )
 
-    regions_tb["si_rmt_cost_ib_zs"] = (
+    # calculate cost of remittances per region
+    regions_tb["calc_cost_received_for_regions"] = (
         regions_tb["total_cost_of_receiving_remittances"] / regions_tb["total_received_remittances"]
     )
-    regions_tb["si_rmt_cost_ob_zs"] = (
+    regions_tb["calc_cost_sent_for_regions"] = (
         regions_tb["total_cost_of_sending_remittances"] / regions_tb["total_sent_remittances"]
+    )
+
+    # calculate share of remittances covered by cost
+    regions_tb["perc_covered_by_cost_received"] = (
+        regions_tb["total_received_remittances"] / regions_tb["bx_trf_pwkr_cd_dt"]
+    )
+    regions_tb["perc_covered_by_cost_sent"] = regions_tb["total_sent_remittances"] / regions_tb["bm_trf_pwkr_cd_dt"]
+
+    # only keep cost for regions if >75% of remittance volumne sent/ received is covered by cost
+    regions_tb["si_rmt_cost_ib_zs"] = regions_tb["calc_cost_received_for_regions"].where(
+        regions_tb["perc_covered_by_cost_received"] > 0.75
+    )
+    regions_tb["si_rmt_cost_ob_zs"] = regions_tb["calc_cost_sent_for_regions"].where(
+        regions_tb["perc_covered_by_cost_sent"] > 0.75
     )
 
     col_to_replace = [
