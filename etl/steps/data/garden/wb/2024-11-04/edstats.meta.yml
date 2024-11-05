@@ -25,25 +25,25 @@ tables:
         unit:  |-
          <% if unit_measure == "NUMBER" %>
             number
-          <% elsif unit_measure == "SHARE" %>
+         <% elif unit_measure == "SHARE" %>
             %
-          <% elsif unit_measure == "USD" %>
+         <% elif unit_measure == "USD" %>
             US dollars
-          <% elsif unit_measure == "IX_0T1" %>
+         <% elif unit_measure == "IX_0T1" %>
             index
-          <% elsif unit_measure == "USD_CONST" %>
+         <% elif unit_measure == "USD_CONST" %>
             constant US dollars
-          <% elsif unit_measure == "YR" %>
+         <% elif unit_measure == "YR" %>
             years
-          <% elsif unit_measure == "nan" %>
+         <% elif unit_measure == "nan" %>
             ''
-          <%- endif -%>
+         <%- endif -%>
         short_unit: |-
           <% if unit_measure == "SHARE"%>
             $
-          <% elsif unit_measure == "USD" %>
+          <% elif unit_measure == "USD" %>
             $
-          <% elsif unit_measure == "USD_CONST" %>
+          <% elif unit_measure == "USD_CONST" %>
             constant $
           <%- endif -%>
 
