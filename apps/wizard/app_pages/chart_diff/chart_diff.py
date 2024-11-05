@@ -1,5 +1,7 @@
 import datetime as dt
-from typing import Dict, List, Optional
+import difflib
+import pprint
+from typing import Any, Dict, List, Optional
 
 import pandas as pd
 from sqlalchemy.engine.base import Engine
@@ -11,7 +13,6 @@ from apps.wizard.utils import get_staging_creation_time
 from etl import grapher_model as gm
 from etl.db import read_sql
 
-ADMIN_GRAPHER_USER_ID = 1
 log = get_logger()
 
 
@@ -35,6 +36,8 @@ class ChartDiff:
     modified_checksum: Optional[pd.DataFrame]
     # Whether the chart has been edited in staging
     edited_in_staging: Optional[bool]
+    # Error preventing the chart from being synced
+    error: Optional[str]
 
     def __init__(
         self,
@@ -45,11 +48,13 @@ class ChartDiff:
         # approval_status: gm.CHART_DIFF_STATUS | str,
         modified_checksum: Optional[pd.DataFrame] = None,
         edited_in_staging: Optional[bool] = None,
+        error: Optional[str] = None,
     ):
         self.source_chart = source_chart
         self.target_chart = target_chart
         self.approval = approval
         self.conflict = conflict
+        self.error = error
         if target_chart:
             assert source_chart.id == target_chart.id, "Missmatch in chart ids between Target and Source!"
         self.chart_id = source_chart.id
@@ -193,13 +198,7 @@ class ChartDiff:
                         self._change_types.append("data")
                     if self.modified_checksum["metadataChecksum"].any():
                         self._change_types.append("metadata")
-                # if chart hasn't been edited by Admin, then disregard config change (it could come from having out of sync MySQL
-                # against master)
-                if (
-                    self.target_chart
-                    and not self.configs_are_equal()
-                    and self.source_chart.lastEditedByUserId == ADMIN_GRAPHER_USER_ID
-                ):
+                if self.target_chart and not self.configs_are_equal():
                     self._change_types.append("config")
 
                 # TODO: Should uncomment this maybe?
@@ -241,6 +240,9 @@ class ChartDiff:
         # Get checksums
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
 
+        # Get all slugs from target
+        slugs_in_target = cls._get_chart_slugs(target_session)
+
         # Build chart diffs
         chart_diffs = []
         for chart_id, source_chart in source_charts.items():
@@ -268,8 +270,17 @@ class ChartDiff:
             else:
                 edited_in_staging = None
 
+            # Are there any errors?
+            # Creating new chart, but slug already exists in target
+            if not target_chart and source_chart.slug in slugs_in_target:
+                error = f"Slug '{source_chart.slug}' already exists in target environment."
+            else:
+                error = None
+
             # Build Chart Diff object
-            chart_diff = cls(source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging)
+            chart_diff = cls(
+                source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging, error
+            )
             chart_diffs.append(chart_diff)
 
         return chart_diffs
@@ -340,10 +351,7 @@ class ChartDiff:
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
         assert self.target_chart is not None, "Target chart is None!"
-        exclude_keys = ("id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl")
-        config_1 = {k: v for k, v in self.source_chart.config.items() if k not in exclude_keys}
-        config_2 = {k: v for k, v in self.target_chart.config.items() if k not in exclude_keys}
-        return config_1 == config_2
+        return configs_are_equal(self.source_chart.config, self.target_chart.config)
 
     @property
     def details(self):
@@ -354,7 +362,14 @@ class ChartDiff:
             "is_rejected": self.is_rejected,
             "is_reviewed": self.is_reviewed,
             "is_new": self.is_new,
+            "error": self.error,
         }
+
+    @staticmethod
+    def _get_chart_slugs(target_session: Session) -> set[str]:
+        slugs_redirects = set(read_sql("SELECT slug FROM chart_slug_redirects", target_session)["slug"])
+        slugs = set(read_sql("SELECT slug FROM chart_configs", target_session)["slug"])
+        return slugs | slugs_redirects
 
     @staticmethod
     def _get_target_charts(target_session, source_charts):
@@ -455,7 +470,7 @@ class ChartDiffsLoader:
         """Load changes in charts between environments from sessions."""
         with Session(self.source_engine) as source_session:
             with Session(self.target_engine) as target_session:
-                return modified_charts_by_admin(source_session, target_session, chart_ids=chart_ids)
+                return modified_charts_on_staging(source_session, target_session, chart_ids=chart_ids)
 
     @property
     def chart_ids_all(self):
@@ -518,7 +533,7 @@ class ChartDiffsLoader:
         return pd.DataFrame(summary)
 
 
-def _modified_data_metadata_by_admin(
+def _modified_data_metadata_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
     """
@@ -548,13 +563,12 @@ def _modified_data_metadata_by_admin(
     join datasets as d on v.datasetId = d.id
     where v.dataChecksum is not null and v.metadataChecksum is not null and
     """
-    # NOTE: We assume that all changes on staging server are done by Admin user with ID = 1. This is
-    #   set automatically if you use STAGING env variable.
     where = """
-        -- include all charts from datasets that have been updated
-        (d.dataEditedByUserId = 1 or d.metadataEditedByUserId = 1)
+        -- only compare data/metadata that have been updated on staging server
+        (d.dataEditedAt >= %(timestamp_staging_creation)s or d.metadataEditedAt >= %(timestamp_staging_creation)s)
     """
     query_source = base_q + where
+    params = {"timestamp_staging_creation": get_staging_creation_time(source_session)}
     # Add filter for chart IDs
     if chart_ids is not None:
         where_charts = """
@@ -562,9 +576,7 @@ def _modified_data_metadata_by_admin(
             cd.chartId in %(chart_ids)s
         """
         query_source += " and " + where_charts
-        params = {"chart_ids": tuple(chart_ids)}
-    else:
-        params = {}
+        params["chart_ids"] = tuple(chart_ids)
     source_df = read_sql(query_source, source_session, params=params)
 
     # no charts, return empty dataframe
@@ -612,7 +624,7 @@ def _modified_data_metadata_by_admin(
     return diff
 
 
-def _modified_chart_configs_by_admin(
+def _modified_chart_configs_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
     TIMESTAMP_STAGING_CREATION = get_staging_creation_time(source_session)
@@ -629,15 +641,14 @@ def _modified_chart_configs_by_admin(
     join chart_configs as cc on c.configId = cc.id
     where
     """
-    # NOTE: We assume that all changes on staging server are done by Admin user with ID = 1. This is
-    #   set automatically if you use STAGING env variable.
     where = """
-        -- only compare charts that have been updated on staging server by Admin user
+        -- only compare charts that have been updated on staging server
         (
-            c.lastEditedByUserId = 1 or c.publishedByUserId = 1
+            c.lastEditedAt >= %(timestamp_staging_creation)s
         )
     """
     query_source = base_q + where
+    params = {"timestamp_staging_creation": TIMESTAMP_STAGING_CREATION}
     # Add filter for chart IDs
     if chart_ids is not None:
         where_charts = """
@@ -645,9 +656,7 @@ def _modified_chart_configs_by_admin(
             c.id in %(chart_ids)s
         """
         query_source += " and " + where_charts
-        params = {"chart_ids": tuple(chart_ids)}
-    else:
-        params = {}
+        params["chart_ids"] = tuple(chart_ids)
     source_df = read_sql(query_source, source_session, params=params)
 
     # no charts, return empty dataframe
@@ -672,23 +681,19 @@ def _modified_chart_configs_by_admin(
     diff["configEdited"] = source_df["chartChecksum"] != target_df["chartChecksum"]
 
     # Add flag 'edited in staging'
-    diff["chartEditedInStaging"] = source_df["chartLastEditedAt"] >= TIMESTAMP_STAGING_CREATION
-
-    assert (
-        diff["chartEditedInStaging"].notna().all()
-    ), "chartEditedInStaging has missing values! This might be due to `diff` and `eidted` dataframes not having the same number of rows."
+    diff["chartEditedInStaging"] = True
 
     # Remove charts with no changes
     return diff[["configEdited", "chartEditedInStaging"]]
 
 
-def modified_charts_by_admin(
+def modified_charts_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
     """Get charts that have been modified in staging.
 
     - It includes charts with different config, data or metadata checksums.
-    - It assumes that all changes on staging server are done by Admin user with ID = 1. That is, if there are changes by a different user in staging, they are not included.
+    - It detects changes by comparing updatedAt timestamps to staging creation time.
 
     Optionally, you can provide a list of chart IDs to filter the results.
 
@@ -701,8 +706,8 @@ def modified_charts_by_admin(
         TESTING:
         - chartEditedInStaging: True if the chart config has been edited in staging.
     """
-    df_config = _modified_chart_configs_by_admin(source_session, target_session, chart_ids=chart_ids)
-    df_data_metadata = _modified_data_metadata_by_admin(source_session, target_session, chart_ids=chart_ids)
+    df_config = _modified_chart_configs_on_staging(source_session, target_session, chart_ids=chart_ids)
+    df_data_metadata = _modified_data_metadata_on_staging(source_session, target_session, chart_ids=chart_ids)
 
     df = df_config.join(df_data_metadata, how="outer").fillna(False)
 
@@ -730,3 +735,28 @@ def get_chart_diffs_from_grapher(
     chart_diffs = {chart.chart_id: chart for chart in chart_diffs}
 
     return chart_diffs
+
+
+def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbose=False) -> bool:
+    """Compare two chart configs, ignoring certain fields."""
+    exclude_keys = ("id", "isPublished", "bakedGrapherURL", "adminBaseUrl", "dataApiUrl", "version")
+    config_1 = {k: v for k, v in config_1.items() if k not in exclude_keys}
+    config_2 = {k: v for k, v in config_2.items() if k not in exclude_keys}
+
+    # Use pretty print to convert dicts to strings for comparison
+    config_1_str = pprint.pformat(config_1, sort_dicts=True)
+    config_2_str = pprint.pformat(config_2, sort_dicts=True)
+
+    # Compare the string representations using difflib
+    if config_1_str == config_2_str:
+        return True
+
+    if verbose:
+        log.warning("Configurations differ")
+        diff = difflib.unified_diff(config_1_str.splitlines(), config_2_str.splitlines(), lineterm="")
+
+        # Print the diff
+        for line in diff:
+            print(line)
+
+    return False

@@ -113,11 +113,14 @@ def cli(
 
     # If no variable IDs are given, load all variables from the given datasets.
     if not variable_ids:
-        assert not dataset_ids, "Cannot specify both dataset IDs and variable IDs."
-
         # Use new datasets
         if not dataset_ids:
             dataset_ids = load_datasets_new_ids(get_engine())
+
+            # Still no datasets, exit
+            if not dataset_ids:
+                log.info("No new datasets found.")
+                return
 
         # Load all variables from given datasets
         assert not variable_ids, "Cannot specify both dataset IDs and variable IDs."
@@ -126,6 +129,9 @@ def cli(
         where datasetId in %(dataset_ids)s
         """
         variable_ids = list(read_sql(q, get_engine(), params={"dataset_ids": dataset_ids})["id"])
+
+    else:
+        assert not dataset_ids, "Cannot specify both dataset IDs and variable IDs."
 
     anomaly_detection(
         anomaly_types=anomaly_types,
@@ -142,10 +148,9 @@ def load_datasets_new_ids(source_engine: Engine) -> list[int]:
     target_engine = production_or_master_engine()
 
     # Get new datasets
-    # TODO: replace by real catalogPath when we have it in MySQL
     q = """SELECT
         id,
-        CONCAT(namespace, "/", version, "/", shortName) as catalogPath
+        catalogPath
     FROM datasets
     """
     source_datasets = read_sql(q, source_engine)

@@ -3,6 +3,7 @@
 #  etl
 #
 
+import datetime as dt
 import re
 import sys
 import tempfile
@@ -1216,3 +1217,10 @@ def get_schema_from_url(schema_url: str) -> dict:
         Schema of a chart configuration.
     """
     return requests.get(schema_url, timeout=20, verify=TLS_VERIFY).json()
+
+
+def last_date_accessed(tb: Table) -> str:
+    """Get maximum date_accessed from all origins in the table and display it in a specific format. This
+    should be a replacement for {TODAY} in YAML templates."""
+    date_accessed = max([origin.date_accessed for col in tb.columns for origin in tb[col].m.origins])
+    return dt.datetime.strptime(date_accessed, "%Y-%m-%d").strftime("%d %B %Y")

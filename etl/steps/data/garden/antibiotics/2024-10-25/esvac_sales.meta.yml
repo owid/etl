@@ -1,0 +1,65 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Antibiotics
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  esvac_sales:
+    variables:
+      tablets_tonnes:
+        title: Total sales of antimicrobial tablets
+        description_short: Total sales of antimicrobial tablets in tonnes of active ingredients, tablets are most commonly used in companion animals.
+        unit: tonnes
+        short_unit: t
+        presentation:
+          title_public: Total sales of tablets
+      tablets_share_of_sales:
+        title: Share of total sales of antimicrobial tablets
+        description_short: Share of total sales of antimicrobial tablets in tonnes of active ingredients, tablets are most commonly used in companion animals.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of total sales of tablets
+      all_other_forms_tonnes:
+        title: Total sales of antimicrobials in all other forms
+        description_short: Total sales of antimicrobials in all other (non-tablet) forms in tonnes of active ingredients, these are typically used in food-producing animals.
+        unit: tonnes
+        short_unit: t
+        presentation:
+          title_public: Total sales of antimicrobials in all other (non-tablet) forms
+      all_other_forms_share_of_sales:
+        title: Share of total sales of antimicrobials in all other forms
+        description_short: Share of total sales of antimicrobials in all other (non-tablet) forms in tonnes of active ingredients, these are typically used in food-producing animals.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of total sales of antimicrobials in all other (non-tablet) forms
+      total_tonnes:
+        title: Total sales of antimicrobials
+        description_short: Total sales of antimicrobials in tonnes of active ingredients.
+        unit: tonnes
+        short_unit: t
+        presentation:
+          title_public: Total sales of antimicrobials
+      total_share_of_sales:
+        title: Share of total sales of antimicrobials
+        description_short: Share of total sales of antimicrobials in tonnes of active ingredients.
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of total sales of antimicrobials
