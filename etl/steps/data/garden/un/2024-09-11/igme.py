@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
         )
     ]
 
-    # Combine datasets with a preference for the current data when there is a conflict.
+    # Combine datasets with a preference for the current data when there is a conflict - this is needed to calculate the youth mortality rate.
 
     tb_com = combine_datasets(
         tb_a=tb_under_fifteen, tb_b=tb_vintage, table_name="igme_combined", preferred_source="igme (current)"
@@ -145,7 +145,7 @@ def add_population_weighted_regional_averages_for_rates(
         )
         tb_region["country"] = region
         tb_region["obs_value"] = tb_region["obs_value_pop"] / tb_region["population"]
-        tb_region = tb_region.drop(columns=["obs_value_pop"])
+        tb_region = tb_region.drop(columns=["obs_value_pop", "population"])
         tb_all_regions = pr.concat([tb_all_regions, tb_region])
 
     tb = pr.concat([tb, tb_all_regions])
