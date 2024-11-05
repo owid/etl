@@ -15,7 +15,7 @@ TECHNOLOGIES = {
     # "Geothermal": "Geothermal",
     # "Geothermal (off-grid)": "Geothermal (off-grid)",
     "Geothermal (total)": "Geothermal",
-    # "Hydropower": "Hydropower",
+    "Hydropower": "Hydropower",
     # "Hydropower (off-grid)": "Hydropower (off-grid)",
     "Hydropower (incl. pumped storage)": "Hydropower (total)",
     # "Hydropower (excl. pumped storage)": "Hydropower (excl. pumped storage)",
