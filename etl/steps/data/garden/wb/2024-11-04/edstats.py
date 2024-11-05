@@ -6,6 +6,8 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -26,7 +28,6 @@ def run(dest_dir: str) -> None:
     )
 
     tb = tb.format(["country", "year", "indicator_name", "source_note", "unit_measure"])
-    print(tb.columns)
 
     #
     # Save outputs.
