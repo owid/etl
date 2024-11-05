@@ -253,3 +253,73 @@ def test_repack_string_type():
 
     v = repack.repack_series(s)
     assert v.dtype == "category"
+
+
+def test_to_safe_types():
+    # Create a DataFrame with various dtypes
+    df = pd.DataFrame(
+        {
+            "int_col": [1, 2, 3],
+            "float_col": [1.1, 2.2, 3.3],
+            "cat_col": pd.Categorical(["a", "b", "c"]),
+            "object_col": ["x", "y", "z"],
+        }
+    )
+
+    # Set an index with integer dtype
+    df.set_index("int_col", inplace=True)
+
+    # Apply the to_safe_types function
+    df_safe = repack.to_safe_types(df)
+
+    # Check that the dtypes have been converted appropriately
+    assert df_safe.index.dtype == "Int64"
+    assert df_safe["float_col"].dtype == "Float64"
+    assert df_safe["cat_col"].dtype == "string[python]"
+    # 'object_col' should remain unchanged
+    assert df_safe["object_col"].dtype == "object"
+
+
+def test_to_safe_types_multiindex():
+    # Create a DataFrame with MultiIndex
+    df = pd.DataFrame(
+        {
+            "int_col": [1, 2, 3],
+            "cat_col": pd.Categorical(["a", "b", "c"]),
+            "float_col": [1.1, 2.2, 3.3],
+        }
+    )
+    df.set_index(["int_col", "cat_col"], inplace=True)
+
+    # Apply the to_safe_types function
+    df_safe = repack.to_safe_types(df)
+
+    # Check index levels
+    assert df_safe.index.levels[0].dtype == "Int64"  # type: ignore
+    assert df_safe.index.levels[1].dtype == "string[python]"  # type: ignore
+    # Check column dtype
+    assert df_safe["float_col"].dtype == "Float64"
+
+
+def test_to_safe_types_with_nan():
+    # Create a DataFrame with NaN values
+    df = pd.DataFrame(
+        {
+            "int_col": [1, 2, 3],
+            "float_col": [1.1, np.nan, 3.3],
+            "cat_col": pd.Categorical(["a", None, "c"]),
+        }
+    )
+    df.set_index("float_col", inplace=True)
+
+    # Apply the to_safe_types function
+    df_safe = repack.to_safe_types(df)
+
+    # Check that NaN values are handled correctly
+    assert df_safe.index.dtype == "Float64"
+    assert df_safe["int_col"].dtype == "Int64"
+    assert df_safe["cat_col"].dtype == "string[python]"
+
+    # Ensure that the NA value in 'cat_col' remains pd.NA and not the string "NA"
+    assert pd.isna(df_safe["cat_col"].iloc[1])
+    assert df_safe["cat_col"].iloc[1] is pd.NA

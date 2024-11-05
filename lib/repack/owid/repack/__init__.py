@@ -152,3 +152,28 @@ def series_eq(lhs: pd.Series, rhs: pd.Series, cast: Any, rtol: float = 1e-5, ato
         func = lambda s: s.apply(cast)  # noqa: E731
 
     return np.allclose(func(lhs), func(rhs), rtol=rtol, atol=atol, equal_nan=True)
+
+
+def _safe_dtype(dtype: Any) -> str:
+    """Determine the appropriate dtype string based on pandas dtype."""
+    if pd.api.types.is_integer_dtype(dtype):
+        return "Int64"
+    elif pd.api.types.is_float_dtype(dtype):
+        return "Float64"
+    elif isinstance(dtype, pd.CategoricalDtype):
+        return "string[python]"
+    else:
+        return dtype
+
+
+def to_safe_types(t: pd.DataFrame) -> pd.DataFrame:
+    """Convert numeric columns to Float64 and Int64 and categorical
+    columns to string[python]. This can significantly increase memory usage."""
+    t = t.astype({col: _safe_dtype(t[col].dtype) for col in t.columns})
+
+    if isinstance(t.index, pd.MultiIndex):
+        t.index = t.index.set_levels([level.astype(_safe_dtype(level.dtype)) for level in t.index.levels])
+    else:
+        t.index = t.index.astype(_safe_dtype(t.index.dtype))
+
+    return t

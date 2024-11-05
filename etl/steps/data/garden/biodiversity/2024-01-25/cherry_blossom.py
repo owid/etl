@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
 
     # read dataset from meadow
     ds_meadow = paths.load_dataset("cherry_blossom")
-    tb = ds_meadow["cherry_blossom"].reset_index()
+    tb = ds_meadow.read_table("cherry_blossom")
 
     # Calculate a 20,40 and 50 year average
     tb = calculate_multiple_year_average(tb)

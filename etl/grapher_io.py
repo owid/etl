@@ -484,7 +484,7 @@ def variable_data_table_from_catalog(
     tbs = []
     for (ds_path, table_name), variables in to_read.items():
         try:
-            tb = Dataset(DATA_DIR / ds_path).read_table(table_name)
+            tb = Dataset(DATA_DIR / ds_path).read_table(table_name, safe_types=False)
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Dataset {ds_path} not found in local catalog.") from e
 
