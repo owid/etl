@@ -219,3 +219,18 @@ steps:
   #
   data://grapher/energy/2024-10-30/photovoltaic_cost_and_capacity:
     - data://garden/energy/2024-10-30/photovoltaic_cost_and_capacity
+  #
+  # Eurostat - Energy statistics, prices of natural gas and electricity
+  #
+  data://meadow/eurostat/2024-11-05/gas_and_electricity_prices:
+    - snapshot://eurostat/2024-11-05/gas_and_electricity_prices.zip
+  #
+  # Eurostat - Energy statistics, prices of natural gas and electricity
+  #
+  data://garden/eurostat/2024-11-05/gas_and_electricity_prices:
+    - data://meadow/eurostat/2024-11-05/gas_and_electricity_prices
+  #
+  # Eurostat - Energy statistics, prices of natural gas and electricity
+  #
+  data://grapher/eurostat/2024-11-05/gas_and_electricity_prices:
+    - data://garden/eurostat/2024-11-05/gas_and_electricity_prices
