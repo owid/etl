@@ -1,0 +1,55 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Education
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 364
+
+
+tables:
+  edstats:
+    variables:
+      value:
+        title:  << indicator_name >>
+
+        description_from_producer: |-
+          <% if source_note != 'nan' %>
+            << source_note >>
+          <%- endif -%>
+        unit:  |-
+         <% if unit_measure == NUMBER %>
+            number
+          <% elsif unit_measure == SHARE %>
+            %
+          <% elsif unit_measure == USD %>
+            US dollars
+          <% elsif unit_measure == IX_0T1 %>
+            index
+          <% elsif unit_measure == USD_CONST %>
+            constant US dollars
+          <% elsif unit_measure == YR %>
+            years
+          <% elsif unit_measure == nan %>
+            ''
+          <%- endif -%>
+        short_unit: |-
+          <% if unit_measure == SHARE %>
+            $
+          <% elsif unit_measure == USD %>
+            $
+          <% elsif unit_measure == USD_CONST %>
+            constant $
+          <%- endif -%>
+
+
+
+
+
+
+
