@@ -31,8 +31,6 @@ meta:
         - Off-grid solar photovoltaic
         - Other off-grid renewable energy
 
-    # NOTE: IRENA used to add a note on pumped storage, but it's not present in the 2024 data:
-    # * Pumped storage is included under the "Hydropower" category but not in the "Total renewable energy". Generation from mixed plants is split between hydropower and pumped storage as appropriate.
     citation_full: IRENA - Renewable capacity statistics 2024. International Renewable Energy Agency, Abu Dhabi (2024).
     attribution_short: IRENA
     ####################################################################################################################
