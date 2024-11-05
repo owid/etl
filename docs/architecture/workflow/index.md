@@ -285,11 +285,9 @@ TSV files for explorers are created using the `create_explorer` function, usuall
 ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
 ds_explorer.save()
 ```
-
 !!! info "Creating explorers on staging servers"
 
-    Explorers can be created / edited on staging servers and then manually migrated to production. Every staging server creates a branch in the `owid-content` repository. Editing explorers in Admin or running `create_explorer` function pushes changes to that branch. Once the PR is merged, the branch gets pushed as to `owid-content` repository (not to the `master` branch, but its own branch). You then have to manually
-    create a PR from that branch and merge it to `master`.
+  Explorers can be created or edited on staging servers and then manually migrated to production. Each staging server creates a branch in the `owid-content` repository. Editing explorers in Admin or running the `create_explorer` function pushes changes to that branch. Once the PR is merged, the branch gets pushed to the `owid-content` repository (not to the `master` branch, but its own branch). You then need to manually create a PR from that branch and merge it into `master`.
 
 
 ### Creating multi-dimensional indicators
