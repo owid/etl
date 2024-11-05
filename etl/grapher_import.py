@@ -87,7 +87,10 @@ def upsert_dataset(
             short_name=short_name,
         )
         ds = gm.Dataset.from_dataset_metadata(
-            dataset.metadata, namespace=namespace, user_id=int(cast(str, config.GRAPHER_USER_ID))
+            dataset.metadata,
+            namespace=namespace,
+            user_id=int(cast(str, config.GRAPHER_USER_ID)),
+            table_names=dataset.table_names,
         ).upsert(session)
 
         session.commit()

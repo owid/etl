@@ -3,9 +3,9 @@ import json
 import pandas as pd
 import yaml
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import Session
 
-from etl import grapher_model as gm
+from apps.chart_sync.admin_api import AdminAPI
+from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.helpers import map_indicator_path_to_id
 
@@ -31,13 +31,9 @@ def upsert_multidim_data_page(slug: str, config: dict, engine: Engine) -> None:
                             # Map to variable ID
                             dim["variableId"] = map_indicator_path_to_id(dim["variableId"])
 
-    with Session(engine) as session:
-        mdd_page = gm.MultiDimDataPage(
-            slug=slug,
-            config=config,
-        )
-        mdd_page.upsert(session)
-        session.commit()
+    # Upsert config via Admin API
+    admin_api = AdminAPI(OWID_ENV)
+    admin_api.put_mdim_config(slug, config)
 
 
 def validate_multidim_config(config: dict, engine: Engine) -> None:

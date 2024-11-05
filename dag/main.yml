@@ -774,6 +774,8 @@ steps:
   data://garden/un/2024-09-11/igme:
     - data://meadow/un/2024-09-11/igme
     - data://garden/un/2018/igme
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
 
@@ -843,6 +845,12 @@ steps:
     - data://garden/wpf/2024-10-03/famines
   data://grapher/wpf/2024-10-03/famines_by_factor:
     - data://garden/wpf/2024-10-03/famines_by_factor
+
+  data://garden/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines_by_place
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

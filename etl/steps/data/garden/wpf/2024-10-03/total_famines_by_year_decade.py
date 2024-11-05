@@ -12,6 +12,8 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -114,6 +116,13 @@ def run(dest_dir: str) -> None:
 
     tb = geo.add_population_to_table(tb, ds_population)
 
+    # The World total population doesn't include a value for each year but every region does so calculate it for each year based on the regional sums instead
+    filtered_tb = tb[tb["country"].isin(REGIONS)]
+    population_by_year = filtered_tb.groupby("year")["population"].sum()
+
+    # Replace the "World" values in the population column with these sums
+    tb.loc[tb["country"] == "World", "population"] = tb["year"].map(population_by_year)
+
     tb["famine_deaths_per_rate"] = tb["famine_deaths"] / (tb["population"] / 100000)
     tb["decadal_famine_deaths_rate"] = tb["decadal_famine_deaths"] / (tb["population"] / 100000)
 
@@ -130,7 +139,7 @@ def run(dest_dir: str) -> None:
         "decadal_famine_deaths_rate",
     ]:
         tb[col].metadata.origins = origins
-    #
+    # for
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
