@@ -67,13 +67,17 @@ def run(dest_dir: str) -> None:
     tb_distinct_users = tb_distinct_users.groupby("date", as_index=False).author_login.nunique()
     tb_distinct_users["number_distinct_users"] = tb_distinct_users["author_login"].cumsum()
     tb_distinct_users = expand_time_column(tb_distinct_users, time_col="date", fillna_method="ffill")
-
+    tb_distinct_users = tb_distinct_users[["date", "number_distinct_users"]]
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
+    tables = [
+        tb_distinct_users.format(["date"], short_name="user_contributions"),
+    ]
+
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
