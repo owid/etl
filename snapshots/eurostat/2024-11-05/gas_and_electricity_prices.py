@@ -47,7 +47,6 @@ URL_DOWNLOADS = [
     "nrg_pc_206",
     ####################################################################################################################
     # Energy statistics - natural gas and electricity prices (until 2007) (nrg_pc_h)
-    "nrg_pc_h",
     # Gas prices for domestic consumers - bi-annual data (until 2007) (nrg_pc_202_h)
     "nrg_pc_202_h",
     # Gas prices for industrial consumers - bi-annual data (until 2007) (nrg_pc_203_h)

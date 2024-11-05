@@ -21,6 +21,6 @@ meta:
       url: https://ec.europa.eu/eurostat/web/main/help/copyright-notice
 
 outs:
-  - md5: 64cc9e4a7c8a6c08a6831dee59c9affa
-    size: 8286879
+  - md5: 285787159fb3f598db8c0fb0ba67eb2c
+    size: 8286547
     path: gas_and_electricity_prices.zip
