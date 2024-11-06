@@ -1,8 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import owid.catalog.processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -14,8 +12,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    path = paths.directory / "population_explore.xlsx"
-    tb = pr.read_excel(path)
+    tb = paths.read_snap_table("population_explore.xlsx")
     tb = tb.drop(index=range(0, 5))
 
     tb = tb.melt(

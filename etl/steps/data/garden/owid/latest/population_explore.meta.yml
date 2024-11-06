@@ -1,6 +1,7 @@
 dataset:
   update_period_days: 0
   title: Population (Maddison exploration)
+  non_redistributable: true
 
 tables:
   population_explore:

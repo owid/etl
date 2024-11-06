@@ -821,7 +821,7 @@ steps:
   data://meadow/wpf/2024-10-03/famines:
     - snapshot://wpf/2024-10-03/famines.xlsx
   data://garden/wpf/2024-10-03/famines:
-    - data://meadow/wpf/2024-10-03/famines
+  - data://meadow/wpf/2024-10-03/famines
     - data://garden/regions/2023-01-01/regions
 
   data://grapher/wpf/2024-10-03/famines:
@@ -849,10 +849,12 @@ steps:
   data://grapher/wpf/2024-10-03/famines_by_place:
     - data://garden/wpf/2024-10-03/famines_by_place
 
-  data://garden/owid/latest/population_explore:
-    - data://meadow/owid/latest/population_explore
-  data://grapher/owid/latest/population_explore:
-    - data://garden/owid/latest/population_explore
+  data-private://meadow/owid/latest/population_explore:
+    - snapshot-private://owid/latest/population_explore.xlsx
+  data-private://garden/owid/latest/population_explore:
+    - data-private://meadow/owid/latest/population_explore
+  data-private://grapher/owid/latest/population_explore:
+    - data-private://garden/owid/latest/population_explore
 
 include:
   - dag/open_numbers.yml
