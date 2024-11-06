@@ -1,0 +1,15 @@
+dataset:
+  update_period_days: 0
+  title: Population (Maddison exploration)
+
+tables:
+  population_explore:
+    variables:
+      population:
+        title: Population
+        description_short: Population of countries
+        unit: "people"
+        origins:
+          - title: Maddison (2024)
+            date_published: "2024"
+            producer: Maddison

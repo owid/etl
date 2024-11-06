@@ -849,6 +849,11 @@ steps:
   data://grapher/wpf/2024-10-03/famines_by_place:
     - data://garden/wpf/2024-10-03/famines_by_place
 
+  data://garden/owid/latest/population_explore:
+    - data://meadow/owid/latest/population_explore
+  data://grapher/owid/latest/population_explore:
+    - data://garden/owid/latest/population_explore
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
