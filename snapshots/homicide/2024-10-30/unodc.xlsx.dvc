@@ -21,9 +21,7 @@ meta:
 
       For recording purposes, all killings that meet the criteria listed above are to be considered intentional homicides, irrespective of definitions provided by national legislations or practices.  Killings as a result of terrorist activities are also to be classified as a form of intentional homicide.
 
-      In order to compile consistent time series of total homicides back to 1990, in several cases data from multiple sources were combined to expand the number of available years within a country’s time series.
-
-      Time series adjustments were performed when a country had two sources covering an overlapping time period had similar trends but differening values.
+      In several cases data from multiple sources were combined to expand the number of available years within a country’s time series, so that a consistent time series of total homicides back to 1990 could be compiled. Time series adjustments were performed when a country had two sources covering an overlapping time period had similar trends but differening values.
 
     date_published: "2024-05-16"
 
