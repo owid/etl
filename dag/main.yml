@@ -853,6 +853,7 @@ steps:
     - snapshot-private://owid/latest/population_explore.xlsx
   data-private://garden/owid/latest/population_explore:
     - data-private://meadow/owid/latest/population_explore
+    - data://garden/demography/2024-07-15/population
   data-private://grapher/owid/latest/population_explore:
     - data-private://garden/owid/latest/population_explore
 

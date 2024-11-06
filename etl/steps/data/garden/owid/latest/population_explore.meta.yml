@@ -6,11 +6,15 @@ dataset:
 tables:
   population_explore:
     variables:
-      population:
+      population_explore:
         title: Population
         description_short: Population of countries
         unit: "people"
-        origins:
-          - title: Maddison (2024)
-            date_published: "2024"
-            producer: Maddison
+      population_omm:
+        title: Population (omm)
+        description_short: Population of countries
+        unit: "people"
+      diff:
+        title: Population difference
+        description_short: Population difference
+        unit: people
