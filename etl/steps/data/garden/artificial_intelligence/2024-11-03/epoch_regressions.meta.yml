@@ -1,0 +1,12 @@
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+    description_processing: |-
+      We performed a regression analysis, fitting exponential models to the data for both the pre-deep learning (before 2010) and deep learning eras (after 2010), using the code provided by researchers from Epoch.
+dataset:
+  title: Parameter, Compute and Data Trends in Machine Learning - Regressions
+

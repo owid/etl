@@ -488,7 +488,13 @@ class Chart(Base):
 
         # copy chart as a new object
         config = copy.deepcopy(self.config)
-        config = _remap_variable_ids(config, remap_ids)
+        try:
+            config = _remap_variable_ids(config, remap_ids)
+        except KeyError as e:
+            # This should not be happening - it means that there's a chart with a variable that doesn't exist in
+            # chart_dimensions and possibly not even in variables table. It's possible that you see it admin, but
+            # only because it is cached.
+            raise ValueError(f"Issue with chart {self.id} - variable id not found in chart_dimensions table: {e}")
 
         return config
 
