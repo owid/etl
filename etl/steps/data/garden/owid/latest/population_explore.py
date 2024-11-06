@@ -1,10 +1,29 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+YEAR_MIN = 1790
+YEAR_MAX = 1955
+
+
+def standardize_tb(tb, tb_main, col_population: str = "population"):
+    tb = tb.loc[:, ["country", "year", "population"]]
+    tb = tb.loc[tb["country"].isin(tb_main["country"].unique())]
+    tb = tb.loc[(tb["year"] >= YEAR_MIN) & (tb["year"] <= YEAR_MAX)]
+    tb["population"] = tb["population"].round().astype("Int64")
+
+    tb = tb.rename(
+        columns={
+            "population": col_population,
+        }
+    )
+    return tb
 
 
 def run(dest_dir: str) -> None:
@@ -13,11 +32,17 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("population_explore")
-    ds_omm = paths.load_dataset("population")
+    ds_omm = paths.load_dataset("population", namespace="demography")
+    ds_hyde = paths.load_dataset("baseline")
+    ds_gm = paths.load_dataset("population", namespace="gapminder")
+    ds_wpp = paths.load_dataset("un_wpp")
 
     # Read table from meadow dataset.
     tb = ds_meadow["population_explore"].reset_index()
     tb_omm = ds_omm["population"].reset_index()
+    tb_hyde = ds_hyde["population"].reset_index()
+    tb_gm = ds_gm["population"].reset_index()
+    tb_wpp = ds_wpp["population"].reset_index()
 
     #
     # Process data.
@@ -28,14 +53,27 @@ def run(dest_dir: str) -> None:
     )
 
     # Format OMM column
-    tb_omm = tb_omm[["country", "year", "population"]]
-    tb_omm = tb_omm[tb_omm["country"].isin(tb["country"].unique())]
-    tb_omm = tb_omm[(tb_omm["year"] >= 1800) & (tb_omm["year"] <= 1951)]
-    tb_omm["population"] = tb_omm["population"].astype("Int64")
+    tb_omm = standardize_tb(tb_omm, tb, "population_omm")
+    # Format HYDE
+    tb_hyde = standardize_tb(tb_hyde, tb, "population_hyde")
+    # Format Gapminder
+    tb_gm = standardize_tb(tb_gm, tb, "population_gm")
+    # Format WPP
+    tb_wpp = tb_wpp[
+        (tb_wpp["age"] == "all")
+        & (tb_wpp["sex"] == "all")
+        & (tb_wpp["metric"] == "population")
+        & (tb_wpp["variant"] == "estimates")
+    ].rename(columns={"location": "country", "value": "population"})
+    tb_wpp = standardize_tb(tb_wpp, tb, "population_wpp")
 
     # Merge
-    tb = tb.merge(tb_omm, on=["country", "year"], suffixes=("_explore", "_omm"), how="outer")
-    tb["diff"] = tb["population_explore"] - tb["population_omm"]
+    tb = pr.multi_merge(
+        tables=[tb, tb_omm, tb_hyde, tb_gm, tb_wpp],
+        on=["country", "year"],
+        how="outer",
+    )
+    tb["diff"] = tb["population"] - tb["population_omm"]
 
     # Format
     tb = tb.format(["country", "year"])

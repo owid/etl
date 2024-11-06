@@ -854,6 +854,9 @@ steps:
   data-private://garden/owid/latest/population_explore:
     - data-private://meadow/owid/latest/population_explore
     - data://garden/demography/2024-07-15/population
+    - data://garden/hyde/2017/baseline
+    - data://garden/gapminder/2019-12-10/population
+    - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/owid/latest/population_explore:
     - data-private://garden/owid/latest/population_explore
 

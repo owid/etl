@@ -6,12 +6,28 @@ dataset:
 tables:
   population_explore:
     variables:
-      population_explore:
+      population:
         title: Population
         description_short: Population of countries
         unit: "people"
       population_omm:
         title: Population (omm)
+        description_short: Population of countries
+        unit: "people"
+      population_hyde:
+        title: Population (HYDE)
+        description_short: Population of countries
+        unit: "people"
+      population_gm:
+        title: Population (gapminder)
+        description_short: Population of countries
+        unit: "people"
+        origins:
+          - title: Gapminder
+            url: https://www.gapminder.org/data/
+            producer: Gapminder
+      population_wpp:
+        title: Population (UN)
         description_short: Population of countries
         unit: "people"
       diff:
