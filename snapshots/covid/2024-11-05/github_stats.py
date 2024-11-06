@@ -8,6 +8,8 @@ The data for these snapshots has been manually obtained via the GitHub API. We h
 
 If you want to retrieve this data again, please look at the script `get_stats.py` in the same folder. You can simply execute it. To run different parts of the script please use the variables at the top of the script EXECUTE_ISSUES, EXECUTE_PRS, EXECUTE_COMMIT.
 
+Run this snapshot script as:
+
     python snapshots/covid/2024-11-05/github_stats.py \
         --issues gh_stats/issues-20241104000000.csv \
         --issues-comments gh_stats/comments-issues-20241104000000.csv \
