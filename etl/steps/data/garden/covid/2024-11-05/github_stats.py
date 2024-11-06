@@ -19,6 +19,7 @@ Goal:
 """
 
 import owid.catalog.processing as pr
+import pandas as pd
 
 from etl.data_helpers.misc import expand_time_column
 from etl.helpers import PathFinder, create_dataset
@@ -26,27 +27,26 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Other config
+COLNAME_BASE = "number_distinct_users"
+
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs and pre-process data.
     #
-    # Load meadow dataset.
+    # 1/ Load meadow dataset.
     ds_meadow = paths.load_dataset("github_stats")
 
     # Combine PR & issues tables.
     tb_issues = ds_meadow.read_table("github_stats_issues")
     tb_pr = ds_meadow.read_table("github_stats_pr")
-    tb_issues = tb_issues.merge(tb_pr[["issue_id", "is_pr"]], on=["issue_id"], how="outer")
-    tb_issues["is_pr"] = tb_issues["is_pr"].fillna(False)
-    assert tb_issues.author_login.notna().all(), "Some missing usernames!"
+    tb_issues = make_table_issues(tb_issues, tb_pr)
 
     # Get list of all comments (including issue/pr description)
     tb_comments = ds_meadow.read_table("github_stats_issues_comments")
     tb_comments_pr = ds_meadow.read_table("github_stats_pr_comments")
-    tb_comments = pr.concat([tb_comments, tb_comments_pr], ignore_index=True)
-    tb_comments = tb_comments.drop_duplicates(subset=["comment_id"])
-    assert tb_comments.user_id.notna().all(), "Some missing usernames!"
+    tb_comments = make_table_comments(tb_comments, tb_comments_pr)
 
     # Get the list of all users
     tb_users = ds_meadow.read_table("github_stats_issues_users")
@@ -55,25 +55,41 @@ def run(dest_dir: str) -> None:
     tb_users = tb_users.drop_duplicates(subset=["user_id"])
     assert tb_users.user_login.notna().all(), "Some missing usernames!"
 
-    # Commits
-    tb_commits = ds_meadow.read_table("github_stats_commits")
+    # # Commits
+    # tb_commits = ds_meadow.read_table("github_stats_commits")
 
     #
     # Process data.
     #
-    # 1/ Number of distinct users submitting an issue or PR over time
-    tb_issues["date"] = tb_issues["date_created"].astype("datetime64").dt.date
-    tb_distinct_users = tb_issues.sort_values("date").drop_duplicates(subset=["author_login"], keep="first")
-    tb_distinct_users = tb_distinct_users.groupby("date", as_index=False).author_login.nunique()
-    tb_distinct_users["number_distinct_users"] = tb_distinct_users["author_login"].cumsum()
-    tb_distinct_users = expand_time_column(tb_distinct_users, time_col="date", fillna_method="ffill")
-    tb_distinct_users = tb_distinct_users[["date", "number_distinct_users"]]
+    # 2.1/ Number of distinct users submitting an issue or PR over time
+    tb_distinct_users_create = get_number_distinct_users(tb_issues, "is_pr", "author_login", f"{COLNAME_BASE}_create")
+
+    # 2.2/ Number of distinct users commenting in an issue or PR thread
+    tb_distinct_users_comments = get_number_distinct_users(tb_comments, "is_pr", "user_id", f"{COLNAME_BASE}_comment")
+
+    # 2.3 Any
+    tb_issues_b = tb_issues.merge(tb_users[["user_login", "user_id"]], left_on="author_login", right_on="user_login")
+    cols = ["date", "user_id", "issue_id", "is_pr"]
+    tb_any = pr.concat([tb_issues_b.loc[:, cols], tb_comments.loc[:, cols]])
+    tb_distinct_users_any = get_number_distinct_users(tb_any, "is_pr", "user_id", f"{COLNAME_BASE}")
+
+    # 3/ Combine
+    tb_distinct_users = combine_user_contribution(
+        tb_distinct_users_create, tb_distinct_users_comments, tb_distinct_users_any
+    )
+
+    # 4/ Cumsum, and weekly
+    tb_distinct_users = get_intervals(tb_distinct_users)
+
+    # 5/ Format
+    tb_distinct_users = tb_distinct_users.format(["date", "interval"], short_name="user_contributions").astype(int)
+
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     tables = [
-        tb_distinct_users.format(["date"], short_name="user_contributions"),
+        tb_distinct_users,
     ]
 
     ds_garden = create_dataset(
@@ -82,3 +98,120 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def make_table_issues(tb_issues, tb_pr):
+    tb_issues = tb_issues.merge(tb_pr[["issue_id", "is_pr"]], on=["issue_id"], how="outer")
+    tb_issues["is_pr"] = tb_issues["is_pr"].fillna(False)
+    assert tb_issues.author_login.notna().all(), "Some missing usernames!"
+    ## Add date
+    ## Dtypes
+    tb_issues = tb_issues.astype(
+        {
+            "author_name": "string",
+            "author_login": "string",
+            "date_created": "datetime64[ns]",
+            "is_pr": "bool",
+        }
+    )
+    tb_issues["date"] = pd.to_datetime(tb_issues["date_created"].dt.date)
+
+    ## Sort
+    tb_issues = tb_issues.sort_values("date")
+
+    # Columns
+    tb_issues = tb_issues[
+        [
+            "issue_id",
+            "author_name",
+            "author_login",
+            "date_created",
+            "date",
+            "is_pr",
+        ]
+    ]
+    return tb_issues
+
+
+def make_table_comments(tb_issues, tb_pr):
+    tb_pr["is_pr"] = True
+    tb = pr.concat([tb_issues, tb_pr], ignore_index=True)
+    tb["is_pr"] = tb["is_pr"].fillna(False)
+
+    assert tb["comment_id"].value_counts().max(), "Repeated comments!"
+    assert tb.user_id.notna().all(), "Some missing usernames!"
+
+    tb = tb.astype(
+        {
+            "date_created": "datetime64[ns]",
+            "date_updated": "datetime64[ns]",
+            "is_pr": "bool",
+        }
+    )
+    tb["date"] = pd.to_datetime(tb["date_created"].dt.date)
+
+    # Sort rows and columns
+    tb = tb.sort_values(["issue_id", "date"])[
+        [
+            "comment_id",
+            "issue_id",
+            "date",
+            "date_created",
+            "date_updated",
+            "user_id",
+            "is_pr",
+        ]
+    ]
+    return tb
+
+
+def get_number_distinct_users(tb, col_pr_flag, colname_user, colname_output, col_date: str = "date"):
+    def _get_counts(tb, colname_output):
+        # Drop duplicate users
+        tb = tb.drop_duplicates(subset=[colname_user], keep="first")
+
+        # Get unique number for a given date
+        tb = tb.groupby(col_date, as_index=False)[colname_user].nunique()
+
+        # Drop unnecessary columns
+        tb = tb.rename(columns={colname_user: colname_output})
+
+        return tb
+
+    tb_pr = _get_counts(tb[tb[col_pr_flag]], f"{colname_output}_pr")
+    tb_issue = _get_counts(tb[~tb[col_pr_flag]], f"{colname_output}_issue")
+    tb_any = _get_counts(tb, f"{colname_output}_any")
+
+    tb = pr.multi_merge([tb_pr, tb_issue, tb_any], on=col_date, how="outer").fillna(0)
+
+    # Fill NaNs and set dtypes
+    columns = [col for col in tb.columns if col != col_date]
+    tb[columns] = tb[columns].fillna(0).astype("Int64")
+
+    return tb
+
+
+def combine_user_contribution(tb_create, tb_comment, tb_any):
+    tb = pr.multi_merge([tb_create, tb_comment, tb_any], on="date", how="outer")
+    tb = expand_time_column(df=tb, time_col="date", fillna_method="zero")
+    tb = tb.format("date")
+    return tb
+
+
+def get_intervals(tb):
+    ## 4.1/ 7-day
+    tb_rolling = tb.rolling(window=7, min_periods=0).sum().reset_index()
+    tb_rolling["interval"] = "7-day sum"
+
+    ## 4.2/ Cumulative
+    tb_cum = tb.cumsum().reset_index()
+    tb_cum["interval"] = "cumulative"
+
+    ## 4.3/ Weekly
+    tb_week = tb.resample("W").sum().reset_index()
+    tb_week["interval"] = "weekly"
+
+    ## 4.3/ Combine
+    tb = pr.concat([tb_rolling, tb_cum, tb_week])
+
+    return tb

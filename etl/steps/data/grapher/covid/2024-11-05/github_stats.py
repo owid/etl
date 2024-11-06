@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     tables = [
-        tb_contrib.format(["country", "date"], short_name="user_contributions"),
+        tb_contrib.format(["country", "date", "interval"], short_name="user_contributions"),
     ]
 
     # Create a new grapher dataset with the same metadata as the garden dataset.
