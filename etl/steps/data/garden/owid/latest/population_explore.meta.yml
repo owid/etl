@@ -34,3 +34,20 @@ tables:
         title: Population difference
         description_short: Population difference
         unit: people
+
+      population_hyde_cut:
+        title: Population (HYDE), cut
+        description_short: Population of countries
+        unit: "people"
+      population_gm_cut:
+        title: Population (gapminder), cut
+        description_short: Population of countries
+        unit: "people"
+        origins:
+          - title: Gapminder
+            url: https://www.gapminder.org/data/
+            producer: Gapminder
+      population_wpp_cut:
+        title: Population (UN), cut
+        description_short: Population of countries
+        unit: "people"

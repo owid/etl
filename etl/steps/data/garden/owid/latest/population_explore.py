@@ -75,6 +75,11 @@ def run(dest_dir: str) -> None:
     )
     tb["diff"] = tb["population"] - tb["population_omm"]
 
+    # Add cut versions
+    tb["population_hyde_cut"] = tb.loc[tb["year"] <= 1800, "population_hyde"]
+    tb["population_gm_cut"] = tb.loc[(tb["year"] >= 1801) & (tb["year"] <= 1950), "population_gm"]
+    tb["population_wpp_cut"] = tb.loc[tb["year"] >= 1950, "population_wpp"]
+
     # Format
     tb = tb.format(["country", "year"])
 
