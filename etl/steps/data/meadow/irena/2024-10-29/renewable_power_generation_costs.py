@@ -25,8 +25,20 @@ EXPECTED_DOLLAR_YEAR = 2023
 EXPECTED_LCOE_UNIT = f"{EXPECTED_DOLLAR_YEAR} USD/kWh"
 # Expected unit to be found in the solar PV module prices sheet.
 EXPECTED_SOLAR_PV_MODULE_COST_UNIT = f"{EXPECTED_DOLLAR_YEAR} USD/W"
-# Photovoltaic technology to choose for average monthly PV module costs.
-PV_TECHNOLOGY = "Thin film a-Si/u-Si or Global Price Index (from Q4 2013)"
+# Photovoltaic technologies to consider for average monthly PV module costs.
+PV_TECHNOLOGIES = [
+    # "Crystalline Europe (Germany)",
+    # "Crystalline China",
+    # "Crystalline Japan",
+    # "Thin film a-Si",
+    # "Thin film CdS/CdTe",
+    "Thin film a-Si/u-Si or Global Price Index (from Q4 2013)",
+    # "Bifacial",
+    # "High Efficiency",
+    # "All black",
+    # "Mainstream",
+    # "Low Cost",
+]
 
 
 def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
@@ -64,22 +76,23 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
 
     # Select PV technologies.
     error = "Names of solar PV module technologies have changed."
-    assert PV_TECHNOLOGY in set(pv_prices["technology"]), error
-    pv_prices = pv_prices[pv_prices["technology"] == PV_TECHNOLOGY].reset_index(drop=True)
+    assert set(PV_TECHNOLOGIES) <= set(pv_prices["technology"]), error
+    pv_prices = pv_prices[pv_prices["technology"].isin(PV_TECHNOLOGIES)].reset_index(drop=True)
 
-    # Get year from dates.
+    # Get month and year from dates.
     pv_prices["year"] = pd.to_datetime(pv_prices["month"], format="%b %y").dt.year
+    pv_prices["n_month"] = pd.to_datetime(pv_prices["month"], format="%b %y").dt.month
 
     # For each year get the average cost over all months.
     pv_prices = (
-        pv_prices.groupby(["technology", "year"])
-        .agg({"cost": "mean", "year": "count"})
-        .rename(columns={"year": "n_months"})
+        pv_prices.groupby(["year"])
+        .agg({"cost": "mean", "n_month": "nunique"})
+        .rename(columns={"n_month": "n_months"})
         .reset_index()
     )
 
-    # Remove unnecessary column and add column for region.
-    pv_prices = pv_prices.drop(columns="technology", errors="raise").assign(**{"country": "World"})
+    # Add column for region.
+    pv_prices = pv_prices.assign(**{"country": "World"})
 
     # Sanity check.
     error = "Incomplete years (with less than 12 months of data) were expected to be either the first or the last."
@@ -97,8 +110,9 @@ def prepare_solar_pv_module_prices(data: pr.ExcelFile) -> Table:
     pv_prices[
         "cost"
     ].metadata.description_short = "This data is expressed in US dollars per watt, adjusted for inflation."
+    pv_technologies = ", ".join([f"'{tech}'" for tech in PV_TECHNOLOGIES])
     pv_prices["cost"].metadata.description_key = [
-        f"IRENA presents solar photovoltaic module prices for a number of different technologies. Here we use the figures for '{PV_TECHNOLOGY}'."
+        f"IRENA presents solar photovoltaic module prices for a number of different technologies. Here we use the average yearly price for technologies {pv_technologies}."
     ]
 
     return pv_prices
