@@ -1,0 +1,68 @@
+dataset:
+  title: Mineral prices (USGS, 2024)
+  description: ''
+  licenses:
+    - {}
+tables:
+  mineral_prices_usgs:
+    variables:
+      copper_prices:
+        title: Copper
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      chromium_prices:
+        title: Chromium
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      tin_prices:
+        title: Tin
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      nickel_prices:
+        title: Nickel
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      tungsten_prices:
+        title: Tungsten
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      lithium_prices:
+        title: Lithium
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      cobalt_prices:
+        title: Cobalt
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      rare_earth_prices:
+        title: Rare earths
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      silver_prices:
+        title: Silver
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      aluminum_prices:
+        title: Aluminum
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      silicon_prices:
+        title: Silicon
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
+      graphite_prices:
+        title: Graphite
+        unit: $ per tonne
+        short_unit: $
+        description: Material prices are measured in 1998 dollars per tonne, which adjusts for inflation.
