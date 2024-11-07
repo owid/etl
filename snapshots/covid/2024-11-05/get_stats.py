@@ -18,10 +18,10 @@ from github import Auth, Github
 from etl import config
 
 # FLAGS
-EXECUTE_ISSUES = True
-EXECUTE_PRS = True
+EXECUTE_ISSUES = False
+EXECUTE_PRS = False
 EXECUTE_COMMIT = False
-SKIP_COMMITS = 0  # 10_700
+SKIP_COMMITS = 13_000  # 10_700
 
 
 def get_repo(
@@ -216,8 +216,9 @@ if SKIP_COMMITS != 0:
             if i % 10 == 0:
                 print(f">> Progress: {i}/{PER_PAGE} commits processed")
 
-            user = c.author
+            user = c.committer
             stats = c.stats
+
             commit_raw = {
                 "sha": c.sha,
                 "date": c.commit.author.date.strftime("%Y-%m-%d %H:%M:%S"),
@@ -225,16 +226,29 @@ if SKIP_COMMITS != 0:
                 "lines_changed": stats.total,
                 "lines_deleted": stats.deletions,
                 "lines_added": stats.additions,
-                "user_id": user.id,
             }
+
+            if user is None:
+                commit_raw["user_id"] = c.commit.author.email
+            else:
+                commit_raw["user_id"] = user.id
+
             commits.append(commit_raw)
             # Add user
-            if user.id not in users:
-                users[user.id] = {
-                    "user_login": user.login,
-                    "user_name": user.name,
-                    "user_location": user.location,
-                }
+            if user is None:
+                if c.commit.author.email not in users:
+                    users[c.commit.author.email] = {
+                        "user_login": None,
+                        "user_name": c.commit.author.name,
+                        "user_location": None,
+                    }
+            else:
+                if user.id not in users:
+                    users[user.id] = {
+                        "user_login": user.login,
+                        "user_name": user.name,
+                        "user_location": user.location,
+                    }
 
             if (i != 0) & (i % 50 == 0):
                 # Export
