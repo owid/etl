@@ -2,12 +2,14 @@
 definitions:
   others:
     interval:
-      <% if interval == "7-day sum" %>
-      7-day sum of values (preceding 7 days).
+      <% if interval == "cumulative" %>
+      over time
       <% elif interval == "weekly" %>
-      Weekly values.
-      <% elif interval == "cumulative" %>
-      Cumulative values.
+      in the last week
+      <% elif interval == "4-weekly" %>
+      in the last four weeks
+      <% elif interval == "7-day rolling sum" %>
+      in the last 7 days
       <%- endif -%>
   common:
     presentation:
@@ -25,55 +27,56 @@ tables:
   user_contributions:
     variables:
       number_distinct_users_create_issue:
-        title: Users that created an issue (<<interval.title()>>)
+        title: Number of users who created an issue (<<interval.title()>>)
         unit: users
         short_unit: users
-        description_short: Number of distinct users that contributed by creating at least one issue in the GitHub repository. {definitions.others.interval}
+        description_short: |-
+          Number of new users that contributed by creating at least one issue in the GitHub repository {definitions.others.interval}.
 
       number_distinct_users_create_pr:
-        title: Users that created an pull request (<<interval.title()>>)
+        title: Number of users who created an pull request (<<interval.title()>>)
         unit: users
         short_unit: users
-        description_short: Number of distinct users that contributed by creating at least one pull request in the GitHub repository. {definitions.others.interval}
+        description_short: Number of new users that contributed by creating at least one pull request in the GitHub repository {definitions.others.interval}.
 
       number_distinct_users_create_any:
-        title: Users that created an issue or pull request (<<interval.title()>>)
+        title: Number of users who created an issue or pull request (<<interval.title()>>)
         unit: users
         short_unit: users
-        description_short: Number of distinct users that contributed by creating at least one issue or one pull request in the GitHub repository. {definitions.others.interval}
+        description_short: Number of new users that contributed by creating at least one issue or one pull request in the GitHub repository {definitions.others.interval}.
 
       number_distinct_users_comment_issue:
-        title: Users that commented in an issue (<<interval.title()>>)
+        title: Number of users who commented on an issue (<<interval.title()>>)
         unit: users
         short_unit: users
-        description_short: Number of distinct users that contributed by commenting to an existing issue in the GitHub repository. {definitions.others.interval}
+        description_short: Number of new users that contributed by commenting to an existing issue in the GitHub repository {definitions.others.interval}.
 
       number_distinct_users_comment_pr:
-        title: Users that commented in a pull request (<<interval.title()>>)
+        title: Number of users who commented on a pull request (<<interval.title()>>)
         unit: users
         short_unit: users
-        description_short: Number of distinct users that contributed by commenting to an existing pull request in the GitHub repository. {definitions.others.interval}
+        description_short: Number of new users that contributed by commenting to an existing pull request in the GitHub repository {definitions.others.interval}.
 
       number_distinct_users_comment_any:
-        title: Users that commented in an issue or pull request (<<interval.title()>>)
+        title: Number of users who commented on an issue or pull request (<<interval.title()>>)
         unit: users
         short_unit: users
-        description_short: Number of distinct users that contributed by commenting to an existing issue or pull request in the GitHub repository. {definitions.others.interval}
+        description_short: Number of new users that contributed by commenting to an existing issue or pull request in the GitHub repository {definitions.others.interval}.
 
       number_distinct_users_issue:
-        title: Users that participated in an issue (<<interval.title()>>)
+        title: Number of users who participated on an issue (<<interval.title()>>)
         unit: users
         short_unit: users
-        description_short: Number of distinct users that contributed either by creating or commenting to at least one issue in the GitHub repository. {definitions.others.interval}
+        description_short: Number of new users that contributed either by creating or commenting to at least one issue in the GitHub repository {definitions.others.interval}.
 
       number_distinct_users_pr:
-        title: Users that participated in a pull request (<<interval.title()>>)
+        title: Number of users who participated on a pull request (<<interval.title()>>)
         unit: users
         short_unit: users
-        description_short: Number of distinct users that contributed either by creating or commenting to at least one pull request in the GitHub repository. {definitions.others.interval}
+        description_short: Number of new users that contributed either by creating or commenting to at least one pull request in the GitHub repository {definitions.others.interval}.
 
       number_distinct_users_any:
-        title: Users that participated in an issue or pull request (<<interval.title()>>)
+        title: Number of users who participated on an issue or pull request (<<interval.title()>>)
         unit: users
         short_unit: users
-        description_short: Number of distinct users that contributed either by creating or commenting to at least one issue or one pull request in the GitHub repository. {definitions.others.interval}
+        description_short: Number of new users that contributed either by creating or commenting to at least one issue or one pull request in the GitHub repository {definitions.others.interval}.

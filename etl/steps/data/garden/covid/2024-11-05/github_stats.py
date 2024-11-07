@@ -69,29 +69,13 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # 2.1/ Number of distinct users submitting an issue or PR over time
-    tb_distinct_users_create = get_number_distinct_users(tb_issues, "is_pr", "author_login", f"{COLNAME_BASE}_create")
+    # 2/ Consolidate table
+    tb_distinct_users = make_table_user_counts(tb_issues, tb_comments, tb_users)
 
-    # 2.2/ Number of distinct users commenting in an issue or PR thread
-    tb_distinct_users_comments = get_number_distinct_users(tb_comments, "is_pr", "user_id", f"{COLNAME_BASE}_comment")
-
-    # 2.3 Any
-    tb_issues_b = tb_issues.merge(
-        tb_users[["user_login", "user_id"]], left_on="author_login", right_on="user_login", how="left"
-    )
-    cols = ["date", "user_id", "issue_id", "is_pr"]
-    tb_any = pr.concat([tb_issues_b.loc[:, cols], tb_comments.loc[:, cols]])
-    tb_distinct_users_any = get_number_distinct_users(tb_any, "is_pr", "user_id", f"{COLNAME_BASE}")
-
-    # 3/ Combine
-    tb_distinct_users = combine_user_contribution(
-        tb_distinct_users_create, tb_distinct_users_comments, tb_distinct_users_any
-    )
-
-    # 4/ Cumsum, and weekly
+    # 3/ Add flavours of counts (cumulative, weekly, 7-day rolling sum, etc.)
     tb_distinct_users = get_intervals(tb_distinct_users)
 
-    # 5/ Format
+    # 4/ Format
     tb_distinct_users = tb_distinct_users.format(["date", "interval"], short_name="user_contributions").astype(int)
 
     #
@@ -207,11 +191,7 @@ def combine_user_contribution(tb_create, tb_comment, tb_any):
 
 
 def get_intervals(tb):
-    ## 4.1/ 7-day
-    tb_rolling = tb.rolling(window=7, min_periods=0).sum().reset_index()
-    tb_rolling["interval"] = "7-day sum"
-
-    ## 4.2/ Cumulative
+    ## 4.1/ Cumulative
     tb_cum = tb.cumsum().reset_index()
     tb_cum["interval"] = "cumulative"
 
@@ -219,7 +199,36 @@ def get_intervals(tb):
     tb_week = tb.resample("W").sum().reset_index()
     tb_week["interval"] = "weekly"
 
-    ## 4.3/ Combine
-    tb = pr.concat([tb_rolling, tb_cum, tb_week])
+    ## 4.3/ 4-week
+    tb_4week = tb.resample("4W").sum().reset_index()
+    tb_4week["interval"] = "4-weekly"
+
+    ## 4.4/ 7-day rolling
+    tb_rolling = tb.rolling(window=7, min_periods=0).sum().reset_index()
+    tb_rolling["interval"] = "7-day rolling sum"
+
+    ## 4.5/ Combine
+    tb = pr.concat([tb_cum, tb_rolling, tb_week, tb_4week])
+
+    return tb
+
+
+def make_table_user_counts(tb_issues, tb_comments, tb_users):
+    # 2.1/ Number of distinct users submitting an issue or PR over time
+    tb_distinct_users_create = get_number_distinct_users(tb_issues, "is_pr", "author_login", f"{COLNAME_BASE}_create")
+
+    # 2.2/ Number of distinct users commenting in an issue or PR thread
+    tb_distinct_users_comments = get_number_distinct_users(tb_comments, "is_pr", "user_id", f"{COLNAME_BASE}_comment")
+
+    # 2.3 Any
+    tb_issues_b = tb_issues.merge(
+        tb_users[["user_login", "user_id"]], left_on="author_login", right_on="user_login", how="left"
+    )
+    cols = ["date", "user_id", "issue_id", "is_pr"]
+    tb_any = pr.concat([tb_issues_b.loc[:, cols], tb_comments.loc[:, cols]])
+    tb_distinct_users_any = get_number_distinct_users(tb_any, "is_pr", "user_id", f"{COLNAME_BASE}")
+
+    # 3/ Combine
+    tb = combine_user_contribution(tb_distinct_users_create, tb_distinct_users_comments, tb_distinct_users_any)
 
     return tb
