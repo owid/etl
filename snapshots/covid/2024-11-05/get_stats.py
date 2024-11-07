@@ -251,7 +251,7 @@ if SKIP_COMMITS != 0:
                             "user_name": user.name,
                             "user_location": user.location,
                         }
-                    except:
+                    except Exception:
                         users[user.id] = {
                             "user_login": user.login,
                             "user_name": None,
