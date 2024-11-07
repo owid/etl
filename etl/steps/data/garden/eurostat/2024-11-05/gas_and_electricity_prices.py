@@ -24,12 +24,19 @@ DATASET_CODES_AND_NAMES = {
     "nrg_pc_205_c": "Electricity prices components for non-household consumers",  # annual data (from 2007)
     ####################################################################################################################
     # Historical data.
-    # NOTE: It's unclear if we will be able to use it, since it's not disaggregated by household and non-household consumers, but domestic and industrial.
-    "nrg_pc_202_h": "Gas prices for domestic consumers",  # bi-annual data (until 2007)
-    "nrg_pc_203_h": "Gas prices for industrial consumers",  # bi-annual data (until 2007)
-    "nrg_pc_204_h": "Electricity prices for domestic consumers",  # bi-annual data (until 2007)
-    "nrg_pc_205_h": "Electricity prices for industrial consumers",  # bi-annual data (until 2007)
-    "nrg_pc_206_h": "Electricity marker prices",  # bi-annual data (until 2007)
+    # NOTE: For now I think we will have to ignore historical data.
+    # I doesn't have a band for total price. Instead, it has different consumption bands (defined by "consom").
+    # This field is a bit problematic.
+    # The same value, e.g. "4141050" has different definitions for electricity ("Households - Da (annual consumption: 600 kWh)") and for gas ("Households - D1 (annual consumption: 8.37 GJ)").
+    # The fact that the same value is used for different things is inconvenient, but not the main problem.
+    # The main problem is that we would need to figure out how to properly aggregate these values to get totals (meanwhile current data comes with totals).
+    # Additionally, historical data is disaggregated in "domestic" and "industrial", whereas current data is split in "households" and "non-households".
+    # "consom": {}
+    # "nrg_pc_202_h": "Gas prices for domestic consumers",  # bi-annual data (until 2007)
+    # "nrg_pc_203_h": "Gas prices for industrial consumers",  # bi-annual data (until 2007)
+    # "nrg_pc_204_h": "Electricity prices for domestic consumers",  # bi-annual data (until 2007)
+    # "nrg_pc_205_h": "Electricity prices for industrial consumers",  # bi-annual data (until 2007)
+    # "nrg_pc_206_h": "Electricity marker prices",  # bi-annual data (until 2007)
     ####################################################################################################################
     # Share for transmission and distribution in the network cost for gas and electricity.
     # NOTE: Decide if we could use the following.
@@ -146,13 +153,6 @@ INDEXES_MAPPING = {
         "MWH_LE149999": "<=149999MWh",
         ####################################################################################################################
     },
-    # Consumption bands for historical data.
-    # NOTE: For now I think we will have to ignore historical data.
-    # I doesn't have a band for total price. Instead, it has different consumption bands (defined by "consom").
-    # This field is a bit problematic. The same value, e.g. "4141050" has different definitions for electricity ("Households - Da (annual consumption: 600 kWh)") and for gas ("Households - D1 (annual consumption: 8.37 GJ)").
-    # We would need to figure out how to properly aggregate these values.
-    # Additionally, historical data is disaggregated in "domestic" and "industrial", whereas current data is split in "households" and "non-households".
-    # "consom": {}
     # Energy price components.
     "nrg_prc": {
         # Gas prices components for household and non-household consumers
@@ -243,8 +243,10 @@ def run(dest_dir: str) -> None:
             "unit"
         ]
     ) == set(["KWH"]), error
-    error = "Expected 'customer' column to be empty."
+    error = "Expected 'customer' column to be empty, for the selected datasets."
     assert set(tb["customer"].dropna()) == set(), error
+    error = "Expected 'consom' column to be empty, for the selected datasets (that column is only relevant for historical data)."
+    assert set(tb["consom"].dropna()) == set(), error
     for field, mapping in INDEXES_MAPPING.items():
         if field == "flags":
             # Flags need to first be extracted from the value (so they will be sanity checked later).
