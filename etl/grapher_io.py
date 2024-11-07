@@ -34,6 +34,7 @@ from etl import config
 from etl import grapher_model as gm
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_connection, read_sql
+from etl.files import checksum_str
 from etl.paths import CACHE_DIR, DATA_DIR
 
 log = structlog.get_logger()
@@ -488,9 +489,12 @@ def variable_data_table_from_catalog(
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Dataset {ds_path} not found in local catalog.") from e
 
+        # Variable names in MySQL are trimmed to 255 characters
+        tb = tb.rename(columns=trim_long_variable_name)
+
         # Simple case with no dimensions
         if not variables[0].dimensions:
-            variable_names = [variable.shortName for variable in variables]
+            variable_names = [variable.shortName for variable in variables]  # type: ignore
             tb = tb[["country", "year"] + variable_names]
 
             # Rename from shortName to id
@@ -978,3 +982,12 @@ def _get_variables_data_with_filter(
         log.warning(f"Values of {field_name} not found in database: {missing_values}")
 
     return variables_data
+
+
+def trim_long_variable_name(short_name: str) -> str:
+    """Trim long variable name to 255 characters and add a hash to make it unique."""
+    if len(short_name) > 255:
+        unique_hash = f"_{checksum_str(short_name)}"
+        return short_name[: (255 - len(unique_hash))] + unique_hash
+    else:
+        return short_name

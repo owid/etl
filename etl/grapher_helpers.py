@@ -19,8 +19,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from etl.db import get_engine, read_sql
-from etl.files import checksum_str
-from etl.grapher_io import add_entity_code_and_name
+from etl.grapher_io import add_entity_code_and_name, trim_long_variable_name
 
 log = structlog.get_logger()
 
@@ -252,8 +251,7 @@ def _underscore_column_and_dimensions(column: str, dim_dict: Dict[str, Any], tri
 
     if len(short_name) > 255:
         if trim_long_short_name:
-            unique_hash = f"_{checksum_str(short_name)}"
-            short_name = short_name[: (255 - len(unique_hash))] + unique_hash
+            short_name = trim_long_variable_name(short_name)
             log.warning(
                 "short_name_trimmed",
                 short_name=short_name,
