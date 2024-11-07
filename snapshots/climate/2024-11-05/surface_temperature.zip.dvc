@@ -22,6 +22,6 @@ meta:
       url: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-pressure-levels-monthly-means?tab=overview
 
 outs:
-  - md5: ecd27f91aaf09d1c68f69fdee35a92b9
-    size: 1394938622
+  - md5: 99968ec229bc19cc78393358805a9e25
+    size: 1396487077
     path: surface_temperature.zip
