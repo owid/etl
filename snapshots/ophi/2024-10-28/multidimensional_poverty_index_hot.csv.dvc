@@ -34,7 +34,7 @@ meta:
 
     # License
     license:
-      name: CC BY-NC 4.0
+      name: CC BY 4.0
       url: https://ophi.org.uk/global-mpi-frequently-asked-questions
 
 outs:
