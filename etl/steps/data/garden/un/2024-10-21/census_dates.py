@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
@@ -48,6 +49,9 @@ MONTHS_DICT = {
     "Dec.": "December",
 }
 
+MIN_YEAR = 1985
+CURR_YEAR = 2024
+
 
 def run(dest_dir: str) -> None:
     #
@@ -76,13 +80,16 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb_census = years_since_last_census(tb)
     tb_census = add_uk(tb_census)
     tb_census = tb_census.format(["country", "year"])
+
+    # create indicator that shows if a census was conducted in the last 10 years
+    tb_census["recent_census"] = tb_census["years_since_last_census"].apply(
+        lambda x: np.nan if np.isnan(x) else 1 if x <= 10 else 0
+    )
 
     tb = tb.format(["country", "date"])
     #
@@ -174,7 +181,7 @@ def years_since_last_census(tb: Table) -> Table:
 
 
 def add_uk(tb_census):
-    years = [int(x) for x in range(1985, 2024)]
+    years = [int(x) for x in range(MIN_YEAR, CURR_YEAR)]
     uk_rows = []
     uk_countries = ["England and Wales", "Scotland", "Northern Ireland"]
     for year in years:

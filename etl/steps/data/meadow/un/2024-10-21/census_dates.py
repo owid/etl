@@ -19,6 +19,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     tb = tb.drop_duplicates()
+    # dates with less than 4 characters are not valid dates
     tb = tb[tb["Date"].apply(len) > 3]
 
     tb = tb.format(["country", "date"])
