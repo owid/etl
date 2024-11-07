@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: GeoDist database
+    description: |-
+      GeoDist provides several geographical variables, in particular bilateral distances measured using city-level data to account for the geographic distribution of population inside each nation. Different measures of bilateral distances are available for 225 countries. For most of them, different calculations of "intra-national distances'' are also available.
+    date_published: "2011"
+
+    # Citation
+    producer: Mayer, T. and Zignago, S.
+    citation_full: |-
+      Mayer, T. & Zignago, S. (2011), Notes on CEPII’s distances measures : the GeoDist Database, CEPII Working Paper 2011-25
+    attribution_short: Mayer & Zignago
+
+    # Files
+    url_main: https://www.cepii.fr/cepii/en/bdd_modele/bdd_modele_item.asp?id=6
+    url_download: https://www.cepii.fr/distance/dist_cepii.zip
+    date_accessed: 2024-11-07
+
+    # License
+    license:
+      name: Etalab Open License 2.0 
+      url: https://www.cepii.fr/cepii/en/bdd_modele/bdd_modele_item.asp?id=6
+
+  
