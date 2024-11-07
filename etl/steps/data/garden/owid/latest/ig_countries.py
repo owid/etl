@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+
 from etl.data_helpers.misc import expand_time_column
 from etl.helpers import PathFinder, create_dataset
 
@@ -29,17 +31,45 @@ def run(dest_dir: str) -> None:
     )
 
     tb = tb.sort_values("date")
+
+    # Get share of post
+    x = tb.groupby("date").country.transform("nunique")
+    tb["share_post"] = 1 / x
+
+    ##################
+    # SUMMARY TABLE
+    # Get number of posts with country X
+    tb_summary_a = tb["country"].value_counts(normalize=True).to_frame().reset_index()
+
+    num_posts = tb["date"].nunique()
+    tb_summary_b = tb.groupby("country", as_index=False)["share_post"].sum()
+    tb_summary_b["proportion_weighed"] = tb_summary_b["share_post"] / num_posts
+    tb_summary_b = tb_summary_b.drop(columns=["share_post"])
+
+    tb_summary = tb_summary_a.merge(tb_summary_b, on="country", how="outer")
+    tb_summary["year"] = 2024
+
+    tb_summary = Table(tb_summary)
+
+    # Get
+    # Expand time column
+    # tb = expand_time_column(tb, time_col="date", dimension_col="country", fillna_method="zero")
+
+    # Cumulative
     tb["counts_cum"] = tb.groupby("country")["count"].cumsum()
 
     # expand_time_column(tb)
-    tb = tb.format(["country", "year"])
+    tables = [
+        tb.format(["country", "date"]),
+        tb_summary.format(["country"], short_name="summary"),
+    ]
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
