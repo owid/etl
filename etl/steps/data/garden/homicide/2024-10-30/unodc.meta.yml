@@ -10,7 +10,7 @@ definitions:
     Number of homicides
     <%-  elif unit_of_measurement == "Rate per 100,000 population" -%>
     Homicide rate per 100,000 population
-    <%- - endif --%>
+    <%- endif -%>
   sex:
     <%-  if sex == "Total" -%>
     all victims
@@ -18,7 +18,7 @@ definitions:
     male victims
     <%-  elif sex == "Female" -%>
     female victims
-    <%- - endif --%>
+    <%- endif -%>
   age:
     <%-  if age == "Total" -%>
     in all age-groups
@@ -42,13 +42,13 @@ definitions:
     aged 25-29 years
     <%-  elif age == "Unknown" -%>
     of unknown age
-    <%- - endif --%>
+    <%- endif -%>
   unit:
     <%-  if unit_of_measurement == "Counts" -%>
     homicides
     <%-  elif sex == "Rate per 100,000 population" -%>
     homicides per 100,000 population
-    <%- - endif --%>
+    <%- endif -%>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -69,7 +69,7 @@ tables:
             title_public: |
               {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
           display:
-            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- - endif --%>
+            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
     by_relationship_to_perpetrator:
       variables:
         value:
@@ -83,7 +83,7 @@ tables:
             title_public: |
               {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
           display:
-            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- - endif --%>
+            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
     by_situational_context:
       variables:
         value:
@@ -97,7 +97,7 @@ tables:
             title_public: |
               {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
           display:
-            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- - endif --%>
+            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
     total:
       variables:
         value:
@@ -108,4 +108,4 @@ tables:
           unit: |
             {definitions.unit}
           display:
-            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- - endif --%>
+            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
