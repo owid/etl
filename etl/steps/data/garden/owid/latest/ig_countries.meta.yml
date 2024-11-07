@@ -27,7 +27,7 @@ tables:
         title: Total count of posts with country
         unit: "posts"
   summary:
-    variable:
+    variables:
       proportion:
         title: Share of posts mentioning a country
         unit: "%"

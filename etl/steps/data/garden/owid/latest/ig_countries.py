@@ -58,6 +58,12 @@ def run(dest_dir: str) -> None:
     # Cumulative
     tb["counts_cum"] = tb.groupby("country")["count"].cumsum()
 
+    # Metadata
+    tb["counts_cum"] = tb["counts_cum"].copy_metadata(tb["date"])
+    tb["count"] = tb["count"].copy_metadata(tb["date"])
+    tb_summary["proportion"] = tb_summary["proportion"].copy_metadata(tb["date"])
+    tb_summary["proportion_weighed"] = tb_summary["proportion_weighed"].copy_metadata(tb["date"])
+
     # expand_time_column(tb)
     tables = [
         tb.format(["country", "date"]),
