@@ -6,9 +6,19 @@ definitions:
         - Homicides
 
   metric:
-    <% if unit_of_measurement == "Counts" %>Number of homicides<% elif unit_of_measurement == "Rate per 100,000 population" %>Homicide rate per 100,000 population<%- endif -%>
+    <% if unit_of_measurement == "Counts" %>
+    Number of homicides
+    <% elif unit_of_measurement == "Rate per 100,000 population" %>
+    Homicide rate per 100,000 population
+    <%- endif -%>
   sex:
-    <% if sex == "Total" %> all victimes<% elif sex == "Male" %>male victims<% elif sex == "Female" %>female victims<%- endif -%>
+    <% if sex == "Total" %>
+    all victims
+    <% elif sex == "Male" %>
+    male victims
+    <% elif sex == "Female" %>
+    female victims
+    <%- endif -%>
   age:
     <% if age == "Total" %>
     in all age-groups
