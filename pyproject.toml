@@ -51,7 +51,7 @@ dependencies = [
     "rioxarray>=0.15.1",
     "html2text>=2020.1.16",
     "pygithub>=2.3.0",
-    "pandas>2.3",
+    "pandas==2.2.2",
     "sqlalchemy>=2.0.30",
     "pymysql>=1.1.1",
     "tiktoken>=0.7.0",
@@ -74,7 +74,6 @@ owid-datautils = { path = "lib/datautils", editable = true }
 owid-repack = { path = "lib/repack", editable = true }
 walden = { path = "lib/walden", editable = true }
 sqlacodegen = { git = "https://github.com/agronholm/sqlacodegen.git" }
-pandas = { path = "../pandas-2.3" }
 
 [tool.uv]
 dev-dependencies = [
