@@ -47,7 +47,7 @@ tables:
           attribution_short: UN IGME; Gapminder
           grapher_config:
             title: Child mortality rate
-            subtitle: The estimated share of [newborns](#dod:newborn) who die before reaching the age of five.
+            subtitle: The estimated share of newborns who die before reaching the age of five.
             variantName: Long-run data; Gapminder & UN IGME
             sourceDesc: UN IGME (2023); Gapminder (2015)
             originUrl: https://ourworldindata.org/child-mortality
