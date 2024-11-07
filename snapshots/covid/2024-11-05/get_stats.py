@@ -1,20 +1,10 @@
-# issues
+"""
+issues: list of all issues, including PRs.
+pr: list of PRs (redundant with `issues`)
 
-# issue_id, author_name, author_login, date_created
-# issue.id, issue.user.name, issue.user.login, issue.created_at
-
-
-# comments
-
-# comment_id, date_created, date_updated, user_id, issue_id
-# comment.id, comment.created_at, comment.updated_at, user_id, issue.id
-
-
-# users
-
-# user_id, user_login, user_name, user_location
-# user.id, user.login, user.name, user.location
-
+issues_comments:  list of comments on issues.
+pr_comments: list of comments on PRs. These are not regular comments, but comments on code (e.g. review comments).
+"""
 
 from datetime import datetime
 from typing import Optional
@@ -51,13 +41,14 @@ def get_repo(
 
 def process_issue(issue_or_pr, users):
     """Function to process each issue and its comments."""
+    is_pr = "pull/" in issue_or_pr.html_url
     user = issue_or_pr.user
     issue_or_pr_data = {
         "issue_id": issue_or_pr.number,
         "author_name": user.name,
         "author_login": user.login,
         "date_created": issue_or_pr.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-        "is_pr": "pull/" in issue_or_pr.html_url,
+        "is_pr": is_pr,
     }
     issue_or_pr_comments = []
 
@@ -77,6 +68,7 @@ def process_issue(issue_or_pr, users):
                 "date_updated": comment.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
                 "user_id": user.id,
                 "issue_id": issue_or_pr.number,
+                "is_pr": is_pr,
             }
         )
 

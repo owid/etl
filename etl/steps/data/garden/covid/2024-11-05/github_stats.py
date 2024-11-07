@@ -16,6 +16,14 @@ Goal:
     - B) Number of users submitting a commit
     - C = A or B
     - Contributions by country (e.g. number of users, number of user-comments, etc.)
+
+Clarifications:
+
+    - github_stats_issues: list of all issues, including PRs.
+    - github_stats_pr: list of PRs (redundant with `issues`)
+    - github_stats_issues_comments:  list of comments on issues.
+    - github_stats_pr_comments: list of comments on PRs. These are not regular comments, but comments on code (e.g. review comments).
+
 """
 
 import owid.catalog.processing as pr
@@ -40,8 +48,8 @@ def run(dest_dir: str) -> None:
 
     # Combine PR & issues tables.
     tb_issues = ds_meadow.read_table("github_stats_issues")
-    tb_pr = ds_meadow.read_table("github_stats_pr")
-    tb_issues = make_table_issues(tb_issues, tb_pr)
+    # tb_pr = ds_meadow.read_table("github_stats_pr")
+    tb_issues = make_table_issues(tb_issues)
 
     # Get list of all comments (including issue/pr description)
     tb_comments = ds_meadow.read_table("github_stats_issues_comments")
@@ -102,9 +110,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def make_table_issues(tb_issues, tb_pr):
-    tb_issues = tb_issues.merge(tb_pr[["issue_id", "is_pr"]], on=["issue_id"], how="outer")
-    tb_issues["is_pr"] = tb_issues["is_pr"].fillna(False)
+def make_table_issues(tb_issues):
     assert tb_issues.author_login.notna().all(), "Some missing usernames!"
     ## Add date
     ## Dtypes
