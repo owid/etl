@@ -179,7 +179,7 @@ def test_repack_float_object_to_float32():
 
 def test_repack_category():
     s = pd.Series(["a", "b", "c", None])
-    assert s.dtype == np.object_
+    assert s.dtype == np.object_ or s.dtype == "str"
 
     v = repack.repack_series(s)
     assert v.dtype == "category"
