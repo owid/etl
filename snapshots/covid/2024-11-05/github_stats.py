@@ -11,14 +11,14 @@ If you want to retrieve this data again, please look at the script `get_stats.py
 Run this snapshot script as:
 
     python snapshots/covid/2024-11-05/github_stats.py \
-        --issues gh_stats/issues-20241104000000.csv \
-        --issues-comments gh_stats/comments-issues-20241104000000.csv \
-        --issues-users gh_stats/users-issues-20241104000000.csv \
-        --pr gh_stats/prs-20241105104652.csv \
-        --pr-comments gh_stats/comments-prs-20241105104652.csv \
-        --pr-users gh_stats/users-prs-20241105104652.csv \
-        --commits gh_stats/commits/8800-commits-20241105165504.csv \
-        --commits-users gh_stats/commits/8800-users-commits-20241105165504.csv
+        --issues gh_stats/issues-20241106211832.csv \
+        --issues-comments gh_stats/comments-issues-20241106211832.csv \
+        --issues-users gh_stats/users-issues-20241106211832.csv \
+        --pr gh_stats/prs-20241106220603.csv \
+        --pr-comments gh_stats/comments-prs-20241106220603.csv \
+        --pr-users gh_stats/users-prs-20241106220603.csv \
+        --commits gh_stats/commits/10800-commits-20241105182054.csv \
+        --commits-users gh_stats/commits/10800-users-commits-20241105182054.csv
 
 """
 

@@ -28,10 +28,10 @@ from github import Auth, Github
 from etl import config
 
 # FLAGS
-EXECUTE_ISSUES = False
-EXECUTE_PRS = False
+EXECUTE_ISSUES = True
+EXECUTE_PRS = True
 EXECUTE_COMMIT = False
-SKIP_COMMITS = 10_700
+SKIP_COMMITS = 0  # 10_700
 
 
 def get_repo(
@@ -51,14 +51,22 @@ def get_repo(
 
 def process_issue(issue_or_pr, users):
     """Function to process each issue and its comments."""
+    user = issue_or_pr.user
     issue_or_pr_data = {
         "issue_id": issue_or_pr.number,
-        "author_name": issue_or_pr.user.name,
-        "author_login": issue_or_pr.user.login,
+        "author_name": user.name,
+        "author_login": user.login,
         "date_created": issue_or_pr.created_at.strftime("%Y-%m-%d %H:%M:%S"),
         "is_pr": "pull/" in issue_or_pr.html_url,
     }
     issue_or_pr_comments = []
+
+    if user.id not in users:
+        users[user.id] = {
+            "user_login": user.login,
+            "user_name": user.name,
+            "user_location": user.location,
+        }
 
     for comment in issue_or_pr.get_comments():
         user = comment.user

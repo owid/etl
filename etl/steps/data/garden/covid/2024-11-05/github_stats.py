@@ -68,7 +68,9 @@ def run(dest_dir: str) -> None:
     tb_distinct_users_comments = get_number_distinct_users(tb_comments, "is_pr", "user_id", f"{COLNAME_BASE}_comment")
 
     # 2.3 Any
-    tb_issues_b = tb_issues.merge(tb_users[["user_login", "user_id"]], left_on="author_login", right_on="user_login")
+    tb_issues_b = tb_issues.merge(
+        tb_users[["user_login", "user_id"]], left_on="author_login", right_on="user_login", how="outer"
+    )
     cols = ["date", "user_id", "issue_id", "is_pr"]
     tb_any = pr.concat([tb_issues_b.loc[:, cols], tb_comments.loc[:, cols]])
     tb_distinct_users_any = get_number_distinct_users(tb_any, "is_pr", "user_id", f"{COLNAME_BASE}")

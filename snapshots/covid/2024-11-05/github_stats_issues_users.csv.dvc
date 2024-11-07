@@ -29,6 +29,6 @@ meta:
       url: https://creativecommons.org/licenses/by/4.0/
 
 outs:
-  - md5: 305bd6080fdf3a0ea6ac89d1e4fdf681
-    size: 14719
+  - md5: cd763a16ae80aa391f2f82b4572ba272
+    size: 26019
     path: github_stats_issues_users.csv
