@@ -70,8 +70,6 @@ def run(dest_dir: str) -> None:
 
     tb = make_tables_wide_and_merge(tb_cme=tb_cme, tb_hot=tb_hot)
 
-    tb = assign_different_origins_by_indicator(tb)
-
     tb = tb.format(keys=INDEX_COLS, short_name="multidimensional_poverty_index")
 
     #
@@ -147,14 +145,5 @@ def select_categories_and_rename(tb: Table) -> Table:
 
     # Rename ind_lab as indicator and area_lab as area
     tb = tb.rename(columns={"ind_lab": "indicator", "area_lab": "area"})
-
-    return tb
-
-
-def assign_different_origins_by_indicator(tb: Table) -> Table:
-    """
-    Assign different origins depending on the indicator.
-    This is because there are different papers explaining the data, depending if the data is current margin estimates, harmonized over time, or disaggregated.
-    """
 
     return tb
