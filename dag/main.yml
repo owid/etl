@@ -860,10 +860,16 @@ steps:
 # GeoDist database with distances between countries
   data://meadow/geography/2024-11-07/geodist:
     - snapshot://geography/2024-11-07/geodist.zip
-
-
   data://garden/geography/2024-11-07/geodist:
     - data://meadow/geography/2024-11-07/geodist
+
+# Migration - Calculate median distance of migrants
+  data://garden/migration/2024-11-07/median_distance_migration:
+    - data://garden/un/2024-07-16/migrant_stock
+    - data://garden/geography/2024-11-07/geodist
+
+
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
