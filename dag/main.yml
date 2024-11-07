@@ -857,6 +857,13 @@ steps:
   data://grapher/wpf/2024-10-03/famines_by_place:
     - data://garden/wpf/2024-10-03/famines_by_place
 
+# GeoDist database with distances between countries
+  data://meadow/geography/2024-11-07/geodist:
+    - snapshot://geography/2024-11-07/geodist.zip
+
+
+  data://garden/geography/2024-11-07/geodist:
+    - data://meadow/geography/2024-11-07/geodist
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

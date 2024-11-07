@@ -21,7 +21,10 @@ meta:
 
     # License
     license:
-      name: Etalab Open License 2.0 
+      name: Etalab Open License 2.0
       url: https://www.cepii.fr/cepii/en/bdd_modele/bdd_modele_item.asp?id=6
 
-  
+outs:
+  - md5: 1fe83ad124505b511cc79ea47421a1b7
+    size: 2102114
+    path: geodist.zip
