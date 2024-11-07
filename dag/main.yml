@@ -857,6 +857,13 @@ steps:
   data://grapher/wpf/2024-10-03/famines_by_place:
     - data://garden/wpf/2024-10-03/famines_by_place
 
+  data-private://meadow/owid/latest/ig_countries:
+    - snapshot-private://owid/latest/ig_countries.csv
+  data-private://garden/owid/latest/ig_countries:
+    - data-private://meadow/owid/latest/ig_countries
+  data-private://grapher/owid/latest/ig_countries:
+    - data-private://garden/owid/latest/ig_countries
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
