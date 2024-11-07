@@ -868,6 +868,14 @@ steps:
   data://grapher/antibiotics/2024-10-18/who_glass:
     - data://garden/antibiotics/2024-10-18/who_glass
 
+    # Antibiotic resistance data - WHO GLASS
+  data://meadow/antibiotics/2024-10-18/who_glass_by_antibiotic:
+    - snapshot://antibiotics/2024-10-18/who_glass_by_antibiotic.zip
+  data://garden/antibiotics/2024-10-18/who_glass_by_antibiotic:
+    - data://meadow/antibiotics/2024-10-18/who_glass_by_antibiotic
+  data://grapher/antibiotics/2024-10-18/who_glass_by_antibiotic:
+    - data://garden/antibiotics/2024-10-18/who_glass_by_antibiotic
+
     # ANIMUSE - antibiotic use in animals
   data://meadow/antibiotics/2024-10-23/animuse_year:
     - snapshot://antibiotics/2024-10-23/animuse_year.csv
