@@ -151,6 +151,42 @@ CONSUMPTION_BANDS = {
     ####################################################################################################################
 }
 
+COMPONENTS = {
+    # Gas prices components for household and non-household consumers
+    # Energy and supply
+    "NRG_SUP": "Energy and supply",
+    # Network costs
+    "NETC": "Network costs",
+    # Taxes, fees, levies and charges
+    "TAX_FEE_LEV_CHRG": "Taxes, fees, levies, and charges",
+    # Value added tax (VAT)
+    "VAT": "Value added tax (VAT)",
+    # Renewable taxes
+    "TAX_RNW": "Renewable taxes",
+    # Capacity taxes
+    "TAX_CAP": "Capacity taxes",
+    # Environmental taxes
+    "TAX_ENV": "Environmental taxes",
+    # Renewable taxes allowance
+    "TAX_RNW_ALLOW": "Renewable taxes allowance",
+    # Capacity taxes allowances
+    "TAX_CAP_ALLOW": "Capacity taxes allowances",
+    # Environmental taxes allowance
+    "TAX_ENV_ALLOW": "Environmental taxes allowance",
+    # Other allowance
+    "ALLOW_OTH": "Other allowance",
+    # Other
+    "OTH": "Other",
+    # Electricity prices components for household and non-household consumers
+    # All the above, plus the additional:
+    # Nuclear taxes
+    "TAX_NUC": "Nuclear taxes",
+    # Nuclear taxes allowance
+    "TAX_NUC_ALLOW": "Nuclear taxes allowance",
+    # Taxes, fees, levies and charges allowance
+    "TAX_FEE_LEV_CHRG_ALLOW": "Taxes, fees, levies, and charges allowance",
+}
+
 # Energy units.
 UNITS = {
     # TODO: Confirm this definition (the page wasn't working).
@@ -212,6 +248,8 @@ def run(dest_dir: str) -> None:
     assert set(tb["unit"].dropna()) == set(UNITS), error
     error = "Unexpected consumption bands."
     assert set(tb["nrg_cons"].dropna()) == set(CONSUMPTION_BANDS), error
+    error = "Unexpected components."
+    assert set(tb["nrg_prc"].dropna()) == set(COMPONENTS), error
 
     # Drop unnecessary columns and rename conveniently.
     tb = tb.drop(columns=["freq", "product"], errors="raise").rename(columns={"geo": "country"}, errors="raise")
