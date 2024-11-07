@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+from owid.catalog import Table
 from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
@@ -50,6 +51,19 @@ DATASET_CODES_AND_NAMES = {
     # "nrg_pc_205_v": "Electricity consumption volumes for non-households", # annual data (from 2007)
 }
 
+# Columns to keep and how to rename them.
+COLUMNS = {
+    "nrg_cons": "consumption_band",
+    "unit": "energy_unit",
+    "tax": "price_level",
+    "currency": "currency",
+    "geo": "country",
+    "time": "year",
+    "dataset_code": "dataset_code",
+    "nrg_prc": "price_component",
+    "value": "value",
+}
+
 # Mappings of indexes.
 # The definitions are copied from (replace [DATASET_CODE] with the dataset code):
 # https://ec.europa.eu/eurostat/databrowser/view/[DATASET_CODE]/default/table?lang=en&category=nrg.nrg_price.nrg_pc
@@ -64,7 +78,7 @@ INDEXES_MAPPING = {
     },
     # Flags (found right next to the value, as a string).
     # NOTE: Flag definitions are right below the data table in that page.
-    "flags": {
+    "flag": {
         "e": "estimated",
         "c": "confidential",
         "d": "definition differs",
@@ -77,7 +91,7 @@ INDEXES_MAPPING = {
         "n": "unknown flag",
     },
     # Price levels.
-    "tax": {
+    "price_level": {
         # All taxes and levies included
         "I_TAX": "Indirect tax",
         # Excluding taxes and levies
@@ -88,7 +102,7 @@ INDEXES_MAPPING = {
     },
     # Consumption bands.
     # NOTE: This is only relevant for non-historical data.
-    "nrg_cons": {
+    "consumption_band": {
         # Consumption bands for "Gas prices for household consumers" and "Gas price components for household consumers":
         # Consumption of GJ - all bands
         "TOT_GJ": "All bands",
@@ -154,7 +168,7 @@ INDEXES_MAPPING = {
         ####################################################################################################################
     },
     # Energy price components.
-    "nrg_prc": {
+    "price_component": {
         # Gas prices components for household and non-household consumers
         # Energy and supply
         "NRG_SUP": "Energy and supply",
@@ -190,7 +204,7 @@ INDEXES_MAPPING = {
         "TAX_FEE_LEV_CHRG_ALLOW": "Taxes, fees, levies, and charges allowance",
     },
     # Energy units.
-    "unit": {
+    "energy_unit": {
         # TODO: Confirm this definition (the page wasn't working).
         "GJ_GCV": "GJ - Gross Calorific Value",
         "KWH": "kWh",
@@ -198,6 +212,37 @@ INDEXES_MAPPING = {
         # "PC": "Percentage",
     },
 }
+
+
+def sanity_check_inputs(tb: Table) -> None:
+    # Ensure all relevant dataset codes are present.
+    error = "Some dataset codes are missing."
+    assert set(DATASET_CODES_AND_NAMES) <= set(tb["dataset_code"]), error
+    # Check that each dataset has only one value in fields "freq", "product", and "nrg_cons".
+    # error = "Some datasets have more than one value in field 'freq'."
+    # assert (tb.groupby("dataset_code")["freq"].nunique() == 1).all(), error
+    # error = "Expected 'freq' column to be either A (annual) or S (bi-annual)."
+    # assert set(tb["freq"].dropna()) == set(["A", "S"]), error
+    # error = "Some datasets have more than one value in field 'product'."
+    # assert (tb.dropna(subset="product").groupby("dataset_code")["product"].nunique() == 1).all(), error
+    # error = "Expected 'product' column to be either 4100 (gas) or 6000 (electricity)."
+    # assert set(tb["product"].dropna()) == set([4100, 6000]), error
+    error = "Expected electricity prices to be measured in kWh."
+    assert set(
+        tb[tb["dataset_code"].isin(["nrg_pc_204", "nrg_pc_205", "nrg_pc_204_h", "nrg_pc_205_h", "nrg_pc_206_h"])][
+            "energy_unit"
+        ]
+    ) == set(["KWH"]), error
+    # error = "Expected 'customer' column to be empty, for the selected datasets."
+    # assert set(tb["customer"].dropna()) == set(), error
+    # error = "Expected 'consom' column to be empty, for the selected datasets (that column is only relevant for historical data)."
+    # assert set(tb["consom"].dropna()) == set(), error
+    for field, mapping in INDEXES_MAPPING.items():
+        if field == "flag":
+            # Flags need to first be extracted from the value (so they will be sanity checked later).
+            continue
+        error = f"Unexpected values in field '{field}'."
+        assert set(tb[field].dropna()) == set(mapping), error
 
 
 def run(dest_dir: str) -> None:
@@ -215,53 +260,16 @@ def run(dest_dir: str) -> None:
     #
     # Select relevant dataset codes, and add a column with the dataset name.
     tb = tb[tb["dataset_code"].isin(DATASET_CODES_AND_NAMES.keys())].reset_index(drop=True)
-    tb["dataset_name"] = map_series(
-        tb["dataset_code"],
-        mapping=DATASET_CODES_AND_NAMES,
-        warn_on_missing_mappings=True,
-        warn_on_unused_mappings=True,
-        show_full_warning=True,
-    )
+
+    # Select and rename columns.
+    tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Sanity checks on inputs.
-    # TODO: Encapsulate sanity checks in a function.
-    # Ensure all relevant dataset codes are present.
-    error = "Some dataset codes are missing."
-    assert set(DATASET_CODES_AND_NAMES) <= set(tb["dataset_code"]), error
-    # Check that each dataset has only one value in fields "freq", "product", and "nrg_cons".
-    error = "Some datasets have more than one value in field 'freq'."
-    assert (tb.groupby("dataset_code")["freq"].nunique() == 1).all(), error
-    error = "Expected 'freq' column to be either A (annual) or S (bi-annual)."
-    assert set(tb["freq"].dropna()) == set(["A", "S"]), error
-    error = "Some datasets have more than one value in field 'product'."
-    assert (tb.dropna(subset="product").groupby("dataset_code")["product"].nunique() == 1).all(), error
-    error = "Expected 'product' column to be either 4100 (gas) or 6000 (electricity)."
-    assert set(tb["product"].dropna()) == set([4100, 6000]), error
-    error = "Expected electricity prices to be measured in kWh."
-    assert set(
-        tb[tb["dataset_code"].isin(["nrg_pc_204", "nrg_pc_205", "nrg_pc_204_h", "nrg_pc_205_h", "nrg_pc_206_h"])][
-            "unit"
-        ]
-    ) == set(["KWH"]), error
-    error = "Expected 'customer' column to be empty, for the selected datasets."
-    assert set(tb["customer"].dropna()) == set(), error
-    error = "Expected 'consom' column to be empty, for the selected datasets (that column is only relevant for historical data)."
-    assert set(tb["consom"].dropna()) == set(), error
-    for field, mapping in INDEXES_MAPPING.items():
-        if field == "flags":
-            # Flags need to first be extracted from the value (so they will be sanity checked later).
-            continue
-        error = f"Unexpected values in field '{field}'."
-        assert set(tb[field].dropna()) == set(mapping), error
-
-    # Drop unnecessary columns and rename conveniently.
-    tb = tb.drop(columns=["freq", "product", "customer", "consom"], errors="raise").rename(
-        columns={"geo": "country"}, errors="raise"
-    )
+    sanity_check_inputs(tb=tb)
 
     # Values sometimes include a letter, which is a flag. Extract those letters and create a separate column with them.
     # Note that sometimes there can be multiple letters (which means multiple flags).
-    tb["flags"] = tb["value"].astype("string").str.extract(r"([a-z]+)", expand=False)
+    tb["flag"] = tb["value"].astype("string").str.extract(r"([a-z]+)", expand=False)
     tb["value"] = tb["value"].str.replace(r"[a-z]", "", regex=True)
 
     # Some values are start with ':' (namely ':', ': ', ': c', ': u', ': cd'). Replace them with nan.
@@ -270,19 +278,13 @@ def run(dest_dir: str) -> None:
     # Assign a proper type to the column of values.
     tb["value"] = tb["value"].astype(float)
 
-    # Harmonize country names.
-    # Countries are given in NUTS (Nomenclature of Territorial Units for Statistics) codes.
-    # Region codes are defined in: https://ec.europa.eu/eurostat/web/nuts/correspondence-tables
-    # There are additional codes not included there, namely:
-    # EA: Countries in the Euro Area, that use the Euro as their official currency.
-    # EU15: The 15 countries that made up the EU prior to its 2004 expansion.
-    # EU25: The 25 member states after the 2004 enlargement, which added ten countries.
-    # EU27_2007: The 27 EU member states in 2007.
-    # EU27_2020: The 27 EU members after the United Kingdom left in 2020.
-    # UA: Ukraine (not a member of the EU, but often included in some European data).
-    # UK: United Kingdom (not a member since 2020, but included in some European data).
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    # Add a column with the dataset name.
+    tb["dataset_name"] = map_series(
+        tb["dataset_code"],
+        mapping=DATASET_CODES_AND_NAMES,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+        show_full_warning=True,
     )
 
     # Harmonize all other index names.
@@ -297,6 +299,22 @@ def run(dest_dir: str) -> None:
             warn_on_unused_mappings=True,
             show_full_warning=True,
         )
+
+    # Harmonize country names.
+    # Countries are given in NUTS (Nomenclature of Territorial Units for Statistics) codes.
+    # Region codes are defined in: https://ec.europa.eu/eurostat/web/nuts/correspondence-tables
+    # There are additional codes not included there, namely:
+    # EA: Countries in the Euro Area, that use the Euro as their official currency.
+    # In the historical datasets, there are some additional regions:
+    # EU15: The 15 countries that made up the EU prior to its 2004 expansion.
+    # EU25: The 25 member states after the 2004 enlargement, which added ten countries.
+    # EU27_2007: The 27 EU member states in 2007.
+    # EU27_2020: The 27 EU members after the United Kingdom left in 2020.
+    # UA: Ukraine (not a member of the EU, but often included in some European data).
+    # UK: United Kingdom (not a member since 2020, but included in some European data).
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
 
     # Improve table format.
     tb = tb.format(["country", "year"])
