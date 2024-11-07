@@ -2,7 +2,7 @@
 
 from owid.catalog import Table
 
-# from etl.data_helpers.misc import expand_time_column
+from etl.data_helpers.misc import expand_time_column
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -53,16 +53,17 @@ def run(dest_dir: str) -> None:
 
     # Get
     # Expand time column
-    # tb = expand_time_column(tb, time_col="date", dimension_col="country", fillna_method="zero")
+    tb = expand_time_column(tb, time_col="date", dimension_col="country", method="observed", fillna_method="zero")
 
     # Cumulative
     tb["counts_cum"] = tb.groupby("country")["count"].cumsum()
+    tb["count"] = (tb["counts_cum"] > 0).astype(int)
 
     # Metadata
     tb["counts_cum"] = tb["counts_cum"].copy_metadata(tb["date"])
     tb["count"] = tb["count"].copy_metadata(tb["date"])
-    tb_summary["proportion"] = tb_summary["proportion"].copy_metadata(tb["date"])
-    tb_summary["proportion_weighed"] = tb_summary["proportion_weighed"].copy_metadata(tb["date"])
+    tb_summary["proportion"] = 100 * tb_summary["proportion"].copy_metadata(tb["date"])
+    tb_summary["proportion_weighed"] = 100 * tb_summary["proportion_weighed"].copy_metadata(tb["date"])
 
     # expand_time_column(tb)
     tables = [
