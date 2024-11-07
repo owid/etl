@@ -83,13 +83,21 @@ steps:
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # Homicide - UNODC - current
+  # Homicide - UNODC - to archive
   data://meadow/homicide/2023-07-04/unodc:
     - snapshot://homicide/2023-07-04/unodc.xlsx
   data://garden/homicide/2023-07-04/unodc:
     - data://meadow/homicide/2023-07-04/unodc
   data://grapher/homicide/2023-07-04/unodc:
     - data://garden/homicide/2023-07-04/unodc
+
+    # Homicide - UNODC - update
+  data://meadow/homicide/2024-10-30/unodc:
+    - snapshot://homicide/2024-10-30/unodc.xlsx
+  data://garden/homicide/2024-10-30/unodc:
+    - data://meadow/homicide/2024-10-30/unodc
+  data://grapher/homicide/2024-10-30/unodc:
+    - data://garden/homicide/2024-10-30/unodc
 
   #
   # UN
@@ -132,6 +140,8 @@ steps:
     - snapshot://un/2024-04-09/undp_hdr.csv
   data://garden/un/2024-04-09/undp_hdr:
     - data://meadow/un/2024-04-09/undp_hdr
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
   data://grapher/un/2024-04-09/undp_hdr:
     - data://garden/un/2024-04-09/undp_hdr
 
@@ -770,6 +780,8 @@ steps:
   data://garden/un/2024-09-11/igme:
     - data://meadow/un/2024-09-11/igme
     - data://garden/un/2018/igme
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
 
@@ -839,6 +851,12 @@ steps:
     - data://garden/wpf/2024-10-03/famines
   data://grapher/wpf/2024-10-03/famines_by_factor:
     - data://garden/wpf/2024-10-03/famines_by_factor
+
+  data://garden/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines_by_place
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

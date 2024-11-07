@@ -283,6 +283,7 @@
     - "Bosnia Herzegovina"
     - "Bsnia.&Hrzgvna."
     - "Bosnia & Herzegovina"
+  short_name: "Bosnia and Herz."
 
 - code: "BWA"
   name: "Botswana"
@@ -1529,6 +1530,7 @@
     - "Turks & Caicos"
     - "Turks and Caicos Islands (the)"
     - "Turk Island"
+  short_name: "Turks and Caicos"
 
 - code: "TUV"
   name: "Tuvalu"

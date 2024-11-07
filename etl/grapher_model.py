@@ -488,7 +488,13 @@ class Chart(Base):
 
         # copy chart as a new object
         config = copy.deepcopy(self.config)
-        config = _remap_variable_ids(config, remap_ids)
+        try:
+            config = _remap_variable_ids(config, remap_ids)
+        except KeyError as e:
+            # This should not be happening - it means that there's a chart with a variable that doesn't exist in
+            # chart_dimensions and possibly not even in variables table. It's possible that you see it admin, but
+            # only because it is cached.
+            raise ValueError(f"Issue with chart {self.id} - variable id not found in chart_dimensions table: {e}")
 
         return config
 
@@ -570,7 +576,7 @@ class Dataset(Base):
         Index("datasets_createdByUserId", "createdByUserId"),
         Index("datasets_dataEditedByUserId", "dataEditedByUserId"),
         Index("datasets_metadataEditedByUserId", "metadataEditedByUserId"),
-        Index("unique_short_name_version_namespace", "shortName", "version", "namespace", unique=True),
+        Index("datasets_catalogpath", "catalogPath", unique=True),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
@@ -591,13 +597,13 @@ class Dataset(Base):
     metadataEditedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
     isArchived: Mapped[Optional[int]] = mapped_column(TINYINT(1), server_default=text("'0'"), default=0)
     sourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
+    catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767), default=None)
+    tables: Mapped[Optional[list]] = mapped_column(JSON, default=None)
 
     def upsert(self, session: Session) -> "Dataset":
         cls = self.__class__
         q = select(cls).where(
-            cls.shortName == self.shortName,
-            cls.version == self.version,
-            cls.namespace == self.namespace,
+            cls.catalogPath == self.catalogPath,
         )
         ds = session.scalar(q)
         if not ds:
@@ -611,6 +617,8 @@ class Dataset(Base):
             ds.isPrivate = self.isPrivate
             ds.updatePeriodDays = self.updatePeriodDays
             ds.nonRedistributable = self.nonRedistributable
+            ds.catalogPath = self.catalogPath
+            ds.tables = self.tables
             ds.updatedAt = datetime.utcnow()
             ds.metadataEditedAt = datetime.utcnow()
             ds.dataEditedAt = datetime.utcnow()
@@ -619,17 +627,13 @@ class Dataset(Base):
         ds.sourceChecksum = None
 
         session.add(ds)
-
-        # select added object to get its id
-        q = select(cls).where(
-            cls.shortName == self.shortName,
-            cls.version == self.version,
-            cls.namespace == self.namespace,
-        )
-        return session.scalars(q).one()
+        session.flush()  # Ensure the object is written to the database and its ID is generated
+        return ds
 
     @classmethod
-    def from_dataset_metadata(cls, metadata: catalog.DatasetMeta, namespace: str, user_id: int) -> "Dataset":
+    def from_dataset_metadata(
+        cls, metadata: catalog.DatasetMeta, namespace: str, user_id: int, table_names: List[str]
+    ) -> "Dataset":
         assert metadata.title
         return cls(
             shortName=metadata.short_name,
@@ -643,6 +647,8 @@ class Dataset(Base):
             isPrivate=not metadata.is_public,
             updatePeriodDays=metadata.update_period_days,
             nonRedistributable=metadata.non_redistributable,
+            catalogPath=f"{namespace}/{metadata.version}/{metadata.short_name}",
+            tables=table_names,
         )
 
     @classmethod
@@ -751,9 +757,8 @@ class Source(Base):
             ds.description = self.description
 
         session.add(ds)
-
-        # select added object to get its id
-        return session.scalars(self._upsert_select).one()
+        session.flush()  # Ensure the object is written to the database and its ID is generated
+        return ds
 
     @classmethod
     def from_catalog_source(cls, source: catalog.Source, dataset_id: int) -> "Source":
@@ -1163,13 +1168,8 @@ class Variable(Base):
                 ds.sort = self.sort
 
         session.add(ds)
-
-        # select added object to get its id
-        q = select(cls).where(
-            cls.shortName == self.shortName,
-            cls.datasetId == self.datasetId,
-        )
-        return session.scalars(q).one()
+        session.flush()  # Ensure the object is written to the database and its ID is generated
+        return ds
 
     @classmethod
     def from_variable_metadata(

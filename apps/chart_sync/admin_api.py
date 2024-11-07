@@ -25,7 +25,7 @@ def is_502_error(exception):
 
 
 class AdminAPI(object):
-    def __init__(self, owid_env: OWIDEnv, grapher_user_id: Optional[int] = None):
+    def __init__(self, owid_env: OWIDEnv, grapher_user_id: Optional[int] = GRAPHER_USER_ID):
         self.owid_env = owid_env
         self.session_id = create_session_id(owid_env, grapher_user_id)
 
@@ -39,6 +39,12 @@ class AdminAPI(object):
             raise AdminAPIError(resp.text) from e
         return js
 
+    def _get_session_id(self, user_id: Optional[int] = None) -> str:
+        """Return the session id for the given user, or the default session id."""
+        if user_id:
+            return create_session_id(self.owid_env, user_id)
+        return self.session_id
+
     def get_chart_config(self, chart_id: int) -> dict:
         resp = requests.get(
             f"{self.owid_env.admin_api}/charts/{chart_id}.config.json",
@@ -47,10 +53,10 @@ class AdminAPI(object):
         js = self._json_from_response(resp)
         return js
 
-    def create_chart(self, chart_config: dict) -> dict:
+    def create_chart(self, chart_config: dict, user_id: Optional[int] = None) -> dict:
         resp = requests.post(
             self.owid_env.admin_api + "/charts",
-            cookies={"sessionid": self.session_id},
+            cookies={"sessionid": self._get_session_id(user_id)},
             json=chart_config,
         )
         js = self._json_from_response(resp)
@@ -58,10 +64,10 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "chart_config": chart_config})
         return js
 
-    def update_chart(self, chart_id: int, chart_config: dict) -> dict:
+    def update_chart(self, chart_id: int, chart_config: dict, user_id: Optional[int] = None) -> dict:
         resp = requests.put(
             f"{self.owid_env.admin_api}/charts/{chart_id}",
-            cookies={"sessionid": self.session_id},
+            cookies={"sessionid": self._get_session_id(user_id)},
             json=chart_config,
         )
         js = self._json_from_response(resp)
@@ -69,10 +75,10 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "chart_config": chart_config})
         return js
 
-    def set_tags(self, chart_id: int, tags: List[Dict[str, Any]]) -> dict:
+    def set_tags(self, chart_id: int, tags: List[Dict[str, Any]], user_id: Optional[int] = None) -> dict:
         resp = requests.post(
             f"{self.owid_env.admin_api}/charts/{chart_id}/setTags",
-            cookies={"sessionid": self.session_id},
+            cookies={"sessionid": self._get_session_id(user_id)},
             json={"tags": tags},
         )
         js = self._json_from_response(resp)
@@ -105,16 +111,28 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "variable_id": variable_id})
         return js
 
+    def put_mdim_config(self, slug: str, mdim_config: dict, user_id: Optional[int] = None) -> dict:
+        # Retry in case we're restarting Admin on staging server
+        resp = requests_with_retry().put(
+            self.owid_env.admin_api + f"/multi-dim/{slug}",
+            cookies={"sessionid": self._get_session_id(user_id)},
+            json=mdim_config,
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "slug": slug, "mdim_config": mdim_config})
+        return js
+
 
 @cache
-def create_session_id(owid_env: OWIDEnv, grapher_user_id: Optional[int] = None) -> str:
+def create_session_id(owid_env: OWIDEnv, grapher_user_id: int) -> str:
     engine = owid_env.get_engine()
     with Session(engine) as session:
-        if grapher_user_id:
-            user = session.get(gm.User, grapher_user_id)
-        else:
+        user = session.get(gm.User, grapher_user_id)
+        # User is not in a database, use GRAPHER_USER_ID from .env
+        if not user:
             user = session.get(gm.User, GRAPHER_USER_ID)
-        assert user
+            assert user, f"User with id {GRAPHER_USER_ID} not found in the database. Initially tried to use user with id {grapher_user_id}."
         session_id = _create_user_session(session, user.email)
         session.commit()
 

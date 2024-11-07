@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
@@ -49,9 +50,16 @@ def run(dest_dir: str) -> None:
     tb["year"] = tb["year"].astype(int)
     tb["region"] = tb["region"].astype("category")
 
-    # Create new columns for the sum of mortality estimates for where each cause was not (0) a factor.
+    # Create new columns for the sum of mortality estimates where each cause was a factor.
     for factor in ["conflict", "government_policy_overall", "external_factors"]:
-        new_column_name = f"sum_{factor}_mortality"
+        new_column_name = f"sum_{factor}_mortality_factor"
+        tb[new_column_name] = tb.apply(
+            lambda row: row["wpf_authoritative_mortality_estimate"] if row[factor] == 1 else 0, axis=1
+        )
+
+    # Create new columns for the sum of mortality estimates where each cause was not a factor.
+    for factor in ["conflict", "government_policy_overall", "external_factors"]:
+        new_column_name = f"sum_{factor}_mortality_not_a_factor"
         tb[new_column_name] = tb.apply(
             lambda row: row["wpf_authoritative_mortality_estimate"] if row[factor] == 0 else 0, axis=1
         )
@@ -60,24 +68,37 @@ def run(dest_dir: str) -> None:
     grouped_tb = tb.groupby(["year", "region"]).sum().reset_index()
 
     # Keep only the relevant columns
-    relevant_columns = ["year", "region"] + [
-        f"sum_{factor}_mortality" for factor in ["conflict", "government_policy_overall", "external_factors"]
-    ]
+    relevant_columns = (
+        ["year", "region"]
+        + [f"sum_{factor}_mortality_factor" for factor in ["conflict", "government_policy_overall", "external_factors"]]
+        + [
+            f"sum_{factor}_mortality_not_a_factor"
+            for factor in ["conflict", "government_policy_overall", "external_factors"]
+        ]
+    )
     grouped_tb = grouped_tb[relevant_columns]
 
+    # Rename and format columns
     grouped_tb = Table(grouped_tb, short_name=paths.short_name)
-    grouped_tb = grouped_tb.rename({"region": "country"}, axis=1)
-    grouped_tb = grouped_tb.format(["year", "country"])
+    # Creating a 'World' row by summing mortality estimates across all regions for each group
+    world_agg = tb.groupby(["year"])[relevant_columns[2:]].sum().reset_index()
+    world_agg["region"] = "World"
 
-    for col in ["sum_conflict_mortality", "sum_government_policy_overall_mortality", "sum_external_factors_mortality"]:
-        grouped_tb[col].metadata.origins = origins
+    # Concatenating the world row data with the regional data
+    tb = pr.concat([grouped_tb, world_agg], ignore_index=True)
+
+    tb = tb.rename({"region": "country"}, axis=1)
+    tb = tb.format(["year", "country"])
+
+    for col in relevant_columns[2:]:
+        tb[col].metadata.origins = origins
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[grouped_tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.

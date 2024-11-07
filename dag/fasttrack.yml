@@ -238,3 +238,7 @@ steps:
     - snapshot://fasttrack/latest/pepfar_patients_currently_receiving_art_formatted.csv
   data://grapher/fasttrack/latest/pepfar_patients_receiving_art:
     - snapshot://fasttrack/latest/pepfar_patients_receiving_art.csv
+  data://grapher/fasttrack/latest/simon_ehrlich_wager:
+    - snapshot://fasttrack/latest/simon_ehrlich_wager.csv
+  data://grapher/fasttrack/latest/mineral_prices_usgs:
+    - snapshot://fasttrack/latest/mineral_prices_usgs.csv
