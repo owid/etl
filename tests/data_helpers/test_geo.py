@@ -192,17 +192,14 @@ class TestHarmonizeCountries:
         df_out = pd.DataFrame({"country": [np.nan, np.nan], "some_variable": [1, 2]})
         df_out["country"] = df_out["country"].astype("str")
 
-        df_in2 = geo.harmonize_countries(
+        result = geo.harmonize_countries(
             df=df_in,
             countries_file="MOCK_COUNTRIES_FILE",
             make_missing_countries_nan=True,
             warn_on_unused_countries=False,
             warn_on_missing_countries=False,
         )
-        assert dataframes.are_equal(
-            df1=df_out,
-            df2=df_in2,
-        )[0]
+        assert dataframes.are_equal(df1=df_out, df2=result)[0]
 
     def test_one_unknown_country_made_nan_and_a_known_country_changed(self):
         df_in = pd.DataFrame({"country": ["Country 1", "country_02"], "some_variable": [1, 2]})
@@ -221,10 +218,9 @@ class TestHarmonizeCountries:
     def test_on_dataframe_with_no_countries(self):
         df_in = pd.DataFrame({"country": []})
         df_out = pd.DataFrame({"country": []})
-        assert dataframes.are_equal(
-            df1=df_out,
-            df2=geo.harmonize_countries(df=df_in, countries_file="MOCK_COUNTRIES_FILE", warn_on_unused_countries=False),
-        )[0]
+        df_out["country"] = df_out["country"].astype(object)
+        result = geo.harmonize_countries(df=df_in, countries_file="MOCK_COUNTRIES_FILE", warn_on_unused_countries=False)
+        assert dataframes.are_equal(df1=df_out, df2=result)[0]
 
     def test_change_country_column_name(self):
         df_in = pd.DataFrame({"Country": ["country_02"]})
