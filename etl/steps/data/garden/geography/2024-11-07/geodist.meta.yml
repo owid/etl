@@ -1,4 +1,4 @@
-# NOTE: To learn more about the fields, hover over their names.
+
 definitions:
   common:
     presentation:
@@ -12,47 +12,67 @@ dataset:
   update_period_days: 9999
 
 
+# Original documentation/ metadata https://www.cepii.fr/pdf_pub/wp/2011/wp2011-25.pdf
 tables:
   geodist:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      contig:
+        title: Neighbouring countries
+        description_short: This indicator takes the value 1 if the two countries are neighbouring and 0 otherwise.
+        unit: ""
+        short_unit: ""
+      comlang_off:
+        title: Common official language
+        description_short: This indicator takes the value 1 if the two countries have the same official language and 0 otherwise.
+        unit: ""
+        short_unit: ""
+      comlang_ethno:
+        title: Common language
+        description_short: This indicator takes the value 1 if the two countries have the same language spoken by at least 9% of the population of both countries. It is 0 otherwise.
+        unit: ""
+        short_unit: ""
+      colony:
+        title: Colonial relationship
+        description_short: This indicator takes the value 1 if the two countries ever had a colonial relationship (as colonizer/ colonized) and 0 otherwise.
+        unit: ""
+        short_unit: ""
+      comcol:
+        title: Common colonizer after 1945
+        description_short: This indicator takes the value 1 if the two countries had the same colonizer at some point after 1945 and 0 otherwise.
+        unit: ""
+        short_unit: ""
+      curcol:
+        title: Current colonial relationship
+        description_short: This indicator takes the value 1 if the two countries currently have a colonial relationship (as colonizer/ colonized) and 0 otherwise.
+        unit: ""
+        short_unit: ""
+      col45:
+        title: Colonial relationship after 1945
+        description_short: This indicator takes the value 1 if the two countries had a colonial relationship (as colonizer/ colonized) after 1945 and 0 otherwise.
+        unit: ""
+        short_unit: ""
+      dist_populous_city:
+        title: Distance between most populated cities
+        description_short: Distance between the most populated cities of two countries in km.
+        unit: Kilometers
+        short_unit: km
+      dist_capital_city:
+        title: Distance between capitals
+        description_short: Distance between the capitals of two countries in km.
+        unit: Kilometers
+        short_unit: km
+      dist_weighted_arithmetic:
+        title: Distance between the two countries
+        description_short: Weighted distance measure between countries in km. This uses the arithmetic mean of city-to-city bilateral distances weighted by the share of the city in the overall country’s population.
+        unit: Kilometers
+        short_unit: km
+        description_from_producer: |-
+          The weighted distance measures use city-level data to assess the geographic distribution of population inside each nation. The idea is to calculate distance between two countries based on bilateral distances between the largest cities of those two countries, those inter-city distances being weighted by the share of the city in the overall country’s population. The distance formula used is a generalized mean of city-to-city bilateral distances developed by Head and Mayer (2002), which takes the arithmetic mean and the harmonic means as special cases.
+      dist_weighted_harmonic:
+        title: Distance between the two countries
+        description_short: Weighted distance measure between countries in km. This uses the harmonic mean of city-to-city bilateral distances weighted by the share of the city in the overall country’s population.
+        unit: Kilometers
+        short_unit: km
+        description_from_producer: |-
+          The weighted distance measures use city-level data to assess the geographic distribution of population inside each nation. The idea is to calculate distance between two countries based on bilateral distances between the largest cities of those two countries, those inter-city distances being weighted by the share of the city in the overall country’s population. The distance formula used is a generalized mean of city-to-city bilateral distances developed by Head and Mayer (2002), which takes the arithmetic mean and the harmonic means as special cases.
 

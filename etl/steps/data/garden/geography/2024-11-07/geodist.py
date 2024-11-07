@@ -17,13 +17,28 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow["geodist"].reset_index()
 
+    tb = tb.rename(
+        columns={
+            "iso_o": "country_origin",
+            "iso_d": "country_dest",
+            "dist": "dist_populous_city",
+            "distcap": "dist_capital_city",
+            "distw": "dist_weighted_arithmetic",
+            "distwces": "dist_weighted_harmonic",
+        },
+        errors="raise",
+    )
+
+    # drop all rows where country_origin or country_dest is identical
+    tb = tb[tb["smctry"] == 0]
+    tb = tb.drop(columns=["smctry"])
+
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
-    tb = tb.format(["country", "year"])
+    tb = geo.harmonize_countries(df=tb, country_col="country_origin", countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(df=tb, country_col="country_dest", countries_file=paths.country_mapping_path)
+    tb = tb.format(["country_origin", "country_dest"])
 
     #
     # Save outputs.
