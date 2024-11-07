@@ -2,7 +2,7 @@
 
 from owid.catalog import Table
 
-from etl.data_helpers.misc import expand_time_column
+# from etl.data_helpers.misc import expand_time_column
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
