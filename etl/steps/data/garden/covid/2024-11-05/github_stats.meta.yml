@@ -24,6 +24,29 @@ dataset:
 
 
 tables:
+  contributions:
+    variables:
+      new_issue:
+        title: "Number of created issues (<<interval.title()>>)"
+        unit: issue
+        description_short: "The number of new issues created in the GitHub repository {definitions.others.interval}."
+      new_pr:
+        title: "Number of created pull requests (<<interval.title()>>)"
+        unit: pull request
+        description_short: "The number of new pull requests created in the GitHub repository {definitions.others.interval}."
+      new_issue_or_pr:
+        title: "Number of created issues or pull requests (<<interval.title()>>)"
+        unit: issue or pull request
+        description_short: "The number of new issues or pull requests created in the GitHub repository {definitions.others.interval}."
+      new_comment_issue_or_pr:
+        title: "Number of comments on issues or pull requests (<<interval.title()>>)"
+        unit: comments
+        description_short: "The number of new comments on issues or pull requests in the GitHub repository {definitions.others.interval}."
+      new_contributions:
+        title: "Number of contributions (<<interval.title()>>)"
+        unit: contributions
+        description_short: "The number of new contributions in the GitHub repository {definitions.others.interval}. A contribution can be a new issue, a new pull request, or a comment on an issue or pull request."
+
   user_contributions:
     variables:
       number_distinct_users_create_issue:

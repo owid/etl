@@ -161,6 +161,7 @@ def expand_time_column(
     if dimension_col is None:
         dimension_col = DIMENSION_COL_NONE
         df[DIMENSION_COL_NONE] = ""
+        df[DIMENSION_COL_NONE] = df[DIMENSION_COL_NONE].astype("string")
 
     # Determine if we have a single or multiple dimensiosn (will affect how groupbys are done)
     SINGLE_DIMENSION = isinstance(dimension_col, str)

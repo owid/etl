@@ -69,14 +69,38 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # 2/ Consolidate table
+    # 1/ TABLE: user contributions
+    ## Get table with number of new users contribution to the repository
     tb_distinct_users = make_table_user_counts(tb_issues, tb_comments, tb_users)
-
-    # 3/ Add flavours of counts (cumulative, weekly, 7-day rolling sum, etc.)
+    ## Add flavours of counts (cumulative, weekly, 7-day rolling sum, etc.)
     tb_distinct_users = get_intervals(tb_distinct_users)
+
+    # 2/ TABLE: issues or PR created, and comments
+    ## Issue or PR
+    tb_issues_count = tb_issues.copy()
+    tb_issues_count["new_pr"] = tb_issues_count["is_pr"].astype(int)
+    tb_issues_count["new_issue"] = (~tb_issues_count["is_pr"]).astype(int)
+    tb_issues_count["new_issue_or_pr"] = 1
+    tb_issues_count["new_issue_or_pr"] = tb_issues_count["new_issue_or_pr"].copy_metadata(tb_issues_count["new_issue"])
+    tb_issues_count = tb_issues_count.groupby("date", as_index=False)[["new_issue", "new_pr", "new_issue_or_pr"]].sum()
+    ## Comments
+    tb_comments_count = tb_comments.copy()
+    tb_comments_count["new_comment_issue_or_pr"] = 1
+    tb_comments_count["new_comment_issue_or_pr"] = tb_comments_count["new_comment_issue_or_pr"].copy_metadata(
+        tb_comments_count["issue_id"]
+    )
+    tb_comments_count = tb_comments_count.groupby("date", as_index=False)["new_comment_issue_or_pr"].sum()
+    ## Combine
+    tb_counts = tb_issues_count.merge(tb_comments_count, on="date", how="outer")
+    tb_counts = expand_time_column(tb_counts, time_col="date", fillna_method="zero")
+    tb_counts["new_contributions"] = tb_counts["new_issue_or_pr"] + tb_counts["new_comment_issue_or_pr"]
+    tb_counts = tb_counts.format("date")
+    ## Intervals
+    tb_counts = get_intervals(tb_counts)
 
     # 4/ Format
     tb_distinct_users = tb_distinct_users.format(["date", "interval"], short_name="user_contributions").astype(int)
+    tb_counts = tb_counts.format(["date", "interval"], short_name="contributions").astype(int)
 
     #
     # Save outputs.
@@ -84,6 +108,7 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset with the same metadata as the meadow dataset.
     tables = [
         tb_distinct_users,
+        tb_counts,
     ]
 
     ds_garden = create_dataset(
@@ -106,10 +131,11 @@ def make_table_issues(tb_issues):
             "is_pr": "bool",
         }
     )
+    tb_issues["date_created"] = pd.to_datetime(tb_issues["date_created"])
     tb_issues["date"] = pd.to_datetime(tb_issues["date_created"].dt.date)
 
     ## Sort
-    tb_issues = tb_issues.sort_values("date")
+    tb_issues = tb_issues.sort_values("date_created")
 
     # Columns
     tb_issues = tb_issues[

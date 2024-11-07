@@ -21,7 +21,7 @@ from etl import config
 EXECUTE_ISSUES = False
 EXECUTE_PRS = False
 EXECUTE_COMMIT = False
-SKIP_COMMITS = 13_000  # 10_700
+SKIP_COMMITS = 15_400  # 10_700
 
 
 def get_repo(
@@ -243,12 +243,20 @@ if SKIP_COMMITS != 0:
                         "user_location": None,
                     }
             else:
+                # print(user)
                 if user.id not in users:
-                    users[user.id] = {
-                        "user_login": user.login,
-                        "user_name": user.name,
-                        "user_location": user.location,
-                    }
+                    try:
+                        users[user.id] = {
+                            "user_login": user.login,
+                            "user_name": user.name,
+                            "user_location": user.location,
+                        }
+                    except:
+                        users[user.id] = {
+                            "user_login": user.login,
+                            "user_name": None,
+                            "user_location": None,
+                        }
 
             if (i != 0) & (i % 50 == 0):
                 # Export

@@ -16,16 +16,19 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb_contrib = ds_garden.read_table("user_contributions")
+    tb_usr_contrib = ds_garden.read_table("user_contributions")
+    tb_contrib = ds_garden.read_table("contributions")
 
     # Add entity
+    tb_usr_contrib["country"] = "World"
     tb_contrib["country"] = "World"
 
     #
     # Save outputs.
     #
     tables = [
-        tb_contrib.format(["country", "date", "interval"], short_name="user_contributions"),
+        tb_contrib.format(["country", "date", "interval"]),
+        tb_usr_contrib.format(["country", "date", "interval"]),
     ]
 
     # Create a new grapher dataset with the same metadata as the garden dataset.
