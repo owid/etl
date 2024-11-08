@@ -308,7 +308,15 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
         elif dataclasses.is_dataclass(field_type):
             init_args[field_name] = dataclass_from_dict(field_type, v)  # type: ignore
         elif isinstance(field_type, type):
-            init_args[field_name] = field_type(v)
+            try:
+                init_args[field_name] = field_type(v)
+            except ValueError as e:
+                # HACK 2024-11-08: we got invalid type into one of the fields, remove it when we fix it
+                # on all staging servers
+                if "invalid literal for int() with base 10: '2020" in str(e):
+                    init_args[field_name] = int(v.replace('"', ""))
+                else:
+                    raise e
         else:
             init_args[field_name] = v
 
