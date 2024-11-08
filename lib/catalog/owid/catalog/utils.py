@@ -288,6 +288,12 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
         origin = get_origin(field_type)
         args = get_args(field_type)
 
+        # unwrap Optional (e.g. Optional[License] -> License)
+        if type(None) in args:
+            filtered_args = tuple(a for a in args if a is not type(None))
+            if len(filtered_args) == 1:
+                field_type = filtered_args[0]
+
         if origin is list:
             item_type = args[0]
             init_args[field_name] = [dataclass_from_dict(item_type, item) for item in v]
