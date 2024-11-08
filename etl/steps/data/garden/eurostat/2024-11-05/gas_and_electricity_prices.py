@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 DATASET_CODES_AND_NAMES = {
     ####################################################################################################################
     # Gas and electricity prices.
-    # NOTE: Prices are given per semester. It would be good to have the actual consumption of each semester, to be able to compute a weighted average. But I don't see that data.
+    # NOTE: Prices are given per semester.
     "nrg_pc_202": "Gas prices for household consumers",  # bi-annual data (from 2007)
     "nrg_pc_203": "Gas prices for non-household consumers",  # bi-annual data (from 2007)
     "nrg_pc_204": "Electricity prices for household consumers",  # bi-annual data (from 2007)
@@ -290,7 +290,7 @@ def run(dest_dir: str) -> None:
     # Harmonize all other index names.
     for field, mapping in INDEXES_MAPPING.items():
         # Avoid categorical dtypes.
-        tb = tb.astype("string")
+        tb[field] = tb[field].astype("string")
         not_null_mask = tb[field].notnull()
         tb.loc[not_null_mask, field] = map_series(
             tb[not_null_mask][field],
@@ -315,6 +315,49 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+
+    # For now, select only "All bands", instead of keeping track of all consumption bands.
+    tb = (
+        tb[tb["consumption_band"] == "All bands"]
+        .drop(columns=["consumption_band"], errors="raise")
+        .reset_index(drop=True)
+    )
+
+    # All datasets have a energy unit except electricity components (both for household and non-households).
+    # I assume the energy unit is kWh.
+    error = "Expected electricity components (both for household and non-households) to have no energy unit. Remove this code."
+    assert tb[tb["dataset_code"].isin(["nrg_pc_204_c", "nrg_pc_205_c"])]["energy_unit"].isnull().all(), error
+    tb.loc[tb["dataset_code"].isin(["nrg_pc_204_c", "nrg_pc_205_c"]), "energy_unit"] = "kWh"
+
+    error = "Expected all datasets to have the same energy unit (kWh)."
+    assert (
+        tb.groupby(["dataset_code"], observed=True, as_index=False)
+        .agg({"energy_unit": lambda x: "kWh" in x.unique()})["energy_unit"]
+        .all()
+    ), error
+    # Select the same energy unit for all datasets (kWh).
+    tb = tb[tb["energy_unit"] == "kWh"].drop(columns=["energy_unit"], errors="raise").reset_index(drop=True)
+
+    # For convenience, instead of having a column for price component (for components datasets) and price level (for prices datasets), create a single column with the price component or level.
+    assert tb[(tb["price_level"].isnull()) & (tb["price_component"].isnull())].empty
+    assert tb[(tb["price_level"].notnull()) & (tb["price_component"].notnull())].empty
+    tb["price_component_or_level"] = tb["price_level"].fillna(tb["price_component"])
+    tb = tb.drop(columns=["price_level", "price_component"], errors="raise")
+
+    # Transform biannual data into annual data, by taking the average price of both semesters.
+    # NOTE: It would be better to have the actual energy consumption of each semester, to be able to compute a weighted average. But I don't see that data (we might need to import some additional datasets). For now, simply take the average.
+    tb_biannual = tb[tb["year"].str.contains("S")].reset_index(drop=True)
+    error = "Expected no flags for biannual data. This is not a requirement. It was simply easier to ignore flags. But we can simply join them when grouping by semester."
+    assert tb_biannual["flag"].isnull().all(), error
+    tb_biannual["year"] = tb_biannual["year"].str[0:4]
+    tb_biannual = tb_biannual.groupby(
+        ["currency", "country", "dataset_code", "dataset_name", "price_component_or_level"],
+        observed=True,
+        as_index=False,
+    ).agg({"value": "mean", "year": "first"})
+
+    # TODO: Check that the resulting total price for the components dataset (summing up all components) is similar to the electricity prices averaged over the two semesters.
+    tb_annual = tb[~tb["year"].str.contains("S")].reset_index(drop=True)
 
     # Improve table format.
     tb = tb.format(["country", "year"])
