@@ -1,4 +1,5 @@
 import json
+from typing import Any, Dict
 
 import pandas as pd
 import streamlit as st
@@ -11,24 +12,12 @@ from etl.db import read_sql
 # Initialize log.
 log = get_logger()
 
-# Load the pre-trained model
+# Load the pre-trained model.
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 def get_raw_data_insights() -> pd.DataFrame:
-    """Get the content of data insights that exist in the database.
-
-    Parameters
-    ----------
-    db_conn : pymysql.Connection
-        Connection to database. Defaults to None, in which case a default connection is created (uses etl.config).
-
-    Returns
-    -------
-    df : pd.DataFrame
-        Dataframe containing the data insights raw content extracted from the database.
-
-    """
+    """Get the content of data insights that exist in the database."""
     # Get all data insights from the database.
     # NOTE: Not all data insights have slugs, so for now identify them by id.
     query = """
@@ -41,7 +30,7 @@ def get_raw_data_insights() -> pd.DataFrame:
     return df
 
 
-def extract_text_from_raw_data_insight(content):
+def extract_text_from_raw_data_insight(content: Dict[str, Any]) -> str:
     """
     Extract the text from the raw data insight, ignoring URLs and other fields.
 
@@ -68,7 +57,7 @@ def extract_text_from_raw_data_insight(content):
 
 
 @st.cache_data
-def get_data_insights():
+def get_data_insights() -> list[Dict[str, Any]]:
     # Get the raw data insights from the database.
     df = get_raw_data_insights()
 
@@ -84,7 +73,7 @@ def get_data_insights():
 
 
 @st.cache_data
-def get_insights_embeddings(insights):
+def get_insights_embeddings(insights: list[Dict[str, Any]]) -> list:
     # Combine the title and body of each insight into a single string.
     insights_texts = [insight["title"] + " " + insight["body"] for insight in insights]
     embeddings = [model.encode(doc, convert_to_tensor=True) for doc in tqdm(insights_texts)]
@@ -92,21 +81,23 @@ def get_insights_embeddings(insights):
     return embeddings
 
 
-def get_sorted_documents_by_similarity(input_string, insights, embeddings):
+def get_sorted_documents_by_similarity(
+    input_string: str, insights: list[Dict[str, str]], embeddings: list
+) -> list[Dict[str, Any]]:
     """Ingests an input string and a list of documents, returning the list of documents sorted by their semantic similarity to the input string."""
     _insights = insights.copy()
 
     # Encode the input string and the document texts.
     input_embedding = model.encode(input_string, convert_to_tensor=True)
 
-    # Compute the cosine similarity between the input and each document
+    # Compute the cosine similarity between the input and each document.
     similarities = [util.pytorch_cos_sim(input_embedding, doc_embedding).item() for doc_embedding in embeddings]  # type: ignore
 
-    # Attach the similarity scores to the documents
+    # Attach the similarity scores to the documents.
     for i, doc in enumerate(_insights):
-        doc["similarity"] = similarities[i]
+        doc["similarity"] = similarities[i]  # type: ignore
 
-    # Sort the documents by similarity score in descending order
+    # Sort the documents by descending similarity score.
     sorted_documents = sorted(_insights, key=lambda x: x["similarity"], reverse=True)
 
     return sorted_documents
@@ -135,14 +126,15 @@ if input_string:
     sorted_docs = get_sorted_documents_by_similarity(input_string, insights=insights, embeddings=embeddings)
 
     # Display the sorted documents.
-    # TODO: This could be enhanced, with colored similarities, and possibly other fields (e.g. author). Ideally, also the chart (but that may be a bit more complicated).
+    # TODO: This could be enhanced in different ways:
+    #   * Add a color to similarity score.
+    #   * Add other fields (e.g. author).
+    #   * Ideally, show a miniature of the chart (but that may be a bit more complicated).
+    #   * Add a link to open the preview of the insight.
+    #   * Show the part of the text that justifies the score (this may also slow down the search).
     st.subheader("Results")
     for doc in sorted_docs:
         st.markdown(f"### {doc['title']}")
         st.write(f"**Similarity Score:** {doc['similarity']:.4f}")
-
-        # Highlight relevant words in the document text
-        # highlighted_text = highlight_relevant_words(input_string, doc['text'])
-        # st.markdown(f"**Excerpt:** {highlighted_text[:500]}...", unsafe_allow_html=True)
 
         st.write("---")
