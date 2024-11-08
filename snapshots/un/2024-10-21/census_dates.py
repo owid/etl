@@ -13,6 +13,7 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
 
+# These are helper functions to clean the data from the website
 def file_to_list(filename):
     with open(filename) as f:
         return [line.strip() for line in f]
@@ -57,7 +58,6 @@ def list_to_dict(txt_ls):
         entry = txt_ls[i]
         last_element = entry.split(" ")
         if not all(char.isdigit() for char in last_element):  # if last element is not a number -> it is a country name
-            print(entry)
             cty = entry
             i += 1
             if i < len(txt_ls):
@@ -77,6 +77,7 @@ def list_to_dict(txt_ls):
 
 
 def clean_file(filename, output_filename):
+    """Clean the result of copy-pasting the website and save it as a csv."""
     txt_ls = file_to_list(filename)
     txt_ls = clean_list_entries(txt_ls)
     census_list = list_to_dict(txt_ls)
