@@ -1,4 +1,5 @@
 import json
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict
 
 import pandas as pd
@@ -72,11 +73,28 @@ def get_data_insights() -> list[Dict[str, Any]]:
     return insights
 
 
+# @st.cache_data
+# def get_insights_embeddings(insights: list[Dict[str, Any]]) -> list:
+#     # Combine the title and body of each insight into a single string.
+#     insights_texts = [insight["title"] + " " + insight["body"] for insight in insights]
+#     embeddings = [model.encode(doc, convert_to_tensor=True) for doc in tqdm(insights_texts)]
+
+#     return embeddings
+
+
+def _encode_text(text):
+    return model.encode(text, convert_to_tensor=True)
+
+
 @st.cache_data
 def get_insights_embeddings(insights: list[Dict[str, Any]]) -> list:
     # Combine the title and body of each insight into a single string.
     insights_texts = [insight["title"] + " " + insight["body"] for insight in insights]
-    embeddings = [model.encode(doc, convert_to_tensor=True) for doc in tqdm(insights_texts)]
+
+    # Run embedding generation in parallel.
+
+    with ThreadPoolExecutor() as executor:
+        embeddings = list(tqdm(executor.map(_encode_text, insights_texts), total=len(insights_texts)))
 
     return embeddings
 
