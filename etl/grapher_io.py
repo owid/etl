@@ -491,9 +491,7 @@ def variable_data_table_from_catalog(
         # Simple case with no dimensions
         if not variables[0].dimensions:
             col_mapping = {"country": "country", "year": "year"}
-            for col in tb.columns:
-                # if col in ("country", "year"):
-                #     continue
+            for col in set(tb.columns) - {"country", "year"}:
                 # Variable names in MySQL are trimmed to 255 characters
                 name = trim_long_variable_name(col)
                 matches = [variable for variable in variables if name == variable.shortName]
@@ -533,7 +531,7 @@ def variable_data_table_from_catalog(
             tbs.append(tb.reset_index())
 
     # NOTE: this can be pretty slow for datasets with a lot of tables
-    return pd.concat([tb.set_index(["country", "year"]) for tb in tbs], axis=1)  # type: ignore
+    return pd.concat([tb.set_index(["country", "year"]) for tb in tbs], axis=1).reset_index()  # type: ignore
 
 
 #######################################################################################################

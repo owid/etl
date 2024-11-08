@@ -475,6 +475,10 @@ def anomaly_detection(
         dataset_variable_ids[variable.datasetId].append(variable)
 
     for dataset_id, variables_in_dataset in dataset_variable_ids.items():
+        # TODO: fix this
+        # Limit the number of variables to 100 for now.
+        variables_in_dataset = variables_in_dataset[:100]
+
         # Get dataset's checksum
         with Session(engine) as session:
             dataset = gm.Dataset.load_dataset(session, dataset_id)
