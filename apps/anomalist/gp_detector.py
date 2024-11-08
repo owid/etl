@@ -172,8 +172,6 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         # Final score is 1 - p-value
         df_score_long["anomaly_score"] = 1 - df_score_long["adj_p_value"]
 
-        print(df_score_long.sort_values("adj_p_value"))
-
         return df_score_long.drop(columns=["p_value", "adj_p_value", "z"])
 
     @staticmethod

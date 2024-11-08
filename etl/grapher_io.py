@@ -513,7 +513,6 @@ def variable_data_table_from_catalog(
             #     {'name': 'gender', 'value': 'all'},
             #     {'name': 'age_group', 'value': '15-29'}
             # ]
-            # dim_names = list({f["name"] for v in variables if v.dimensions for f in v.dimensions["filters"]})
             dim_names = [k for k in tb.metadata.primary_key if k not in ("country", "year")]
             tb_pivoted = tb.pivot(index=["country", "year"], columns=dim_names)
 

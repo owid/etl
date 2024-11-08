@@ -1,4 +1,4 @@
-"""Load a garden dataset and create a grapher dataset.."""
+"""Load a garden dataset and create a grapher dataset."""
 
 import pandas as pd
 import structlog
