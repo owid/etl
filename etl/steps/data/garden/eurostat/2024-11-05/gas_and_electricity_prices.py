@@ -93,12 +93,12 @@ INDEXES_MAPPING = {
     # Price levels.
     "price_level": {
         # All taxes and levies included
-        "I_TAX": "Indirect tax",
-        # Excluding taxes and levies
+        "I_TAX": "All taxes and levies included",
+        # Excluding VAT and other recoverable taxes and levies
         # NOTE: This value gives a baseline price for electricity before any additional costs imposed by taxes or fees are added. It represents the net price of electricity.
-        "X_TAX": "Excluding tax",
+        "X_TAX": "Excluding taxes and levies",
         # Excluding value-added tax (VAT) and other recoverable taxes and levies
-        "X_VAT": "Excluding VAT",
+        "X_VAT": "Excluding VAT and other recoverable taxes and levies",
     },
     # Consumption bands.
     # NOTE: This is only relevant for non-historical data.
@@ -317,6 +317,10 @@ def run(dest_dir: str) -> None:
     )
 
     # For now, select only "All bands", instead of keeping track of all consumption bands.
+    # TODO: After inspection, it looks like the "All bands" consumption is very sparse in the prices datasets. Maybe the most common consumption bands are well informed. We could check this by looking at the consumption volumes per band.
+    #  On the other hand, "All bands" in the components dataset seem to be less sparse (at least from 2019 onwards). However, to get the total price we would need to add up all components. After a quick inspection, all components seem similarly well informed.
+    #  There are some special cases where the data is omitted (e.g. due to flag "c" (confidential)).
+    #  So, in principle we could add up all components, only when all of them are informed.
     tb = (
         tb[tb["consumption_band"] == "All bands"]
         .drop(columns=["consumption_band"], errors="raise")
@@ -351,13 +355,37 @@ def run(dest_dir: str) -> None:
     assert tb_biannual["flag"].isnull().all(), error
     tb_biannual["year"] = tb_biannual["year"].str[0:4]
     tb_biannual = tb_biannual.groupby(
-        ["currency", "country", "dataset_code", "dataset_name", "price_component_or_level"],
+        ["currency", "country", "year", "dataset_code", "dataset_name", "price_component_or_level"],
         observed=True,
         as_index=False,
-    ).agg({"value": "mean", "year": "first"})
+    ).agg({"value": "mean"})
 
     # TODO: Check that the resulting total price for the components dataset (summing up all components) is similar to the electricity prices averaged over the two semesters.
     tb_annual = tb[~tb["year"].str.contains("S")].reset_index(drop=True)
+    # OPTION 1: Sum over all price components to get the total.
+    annual_1 = (
+        tb_annual[(tb_annual["currency"] == "Euro") & (tb_annual["dataset_code"] == "nrg_pc_202_c")]
+        .groupby(
+            ["country", "year"],
+            observed=True,
+            as_index=False,
+        )
+        .agg({"value": lambda x: x.sum(min_count=1)})
+        .dropna()
+        .reset_index(drop=True)
+    )
+    # OPTION 2: Choose one of the price levels ({'All taxes and levies included', 'Excluding VAT and other recoverable taxes and levies', 'Excluding taxes and levies').
+    price_level = "All taxes and levies included"
+    # price_level = "Excluding VAT and other recoverable taxes and levies"
+    # price_level = "Excluding taxes and levies"
+    annual_2 = tb_biannual[
+        (tb_biannual["currency"] == "Euro")
+        & (tb_biannual["dataset_code"] == "nrg_pc_202")
+        & (tb_biannual["price_component_or_level"] == price_level)
+    ][["country", "year", "value"]]
+    compared = annual_1.merge(annual_2, on=["country", "year"], suffixes=("_components", "_prices"))
+    # Only a few country-years could be compared this way. Most of the points in the prices datasets were missing.
+    # TODO: Consider redoing this comparison for other consumption bands. But maybe the best solution is to use only the components dataset.
 
     # Improve table format.
     tb = tb.format(["country", "year"])
