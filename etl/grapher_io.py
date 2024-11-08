@@ -510,19 +510,31 @@ def variable_data_table_from_catalog(
             #     {'name': 'gender', 'value': 'all'},
             #     {'name': 'age_group', 'value': '15-29'}
             # ]
-            filters = variables[0].dimensions["filters"]
-            dim_names = [f["name"] for f in filters]
+            # Collect unique dimension names across all variables' filters.
+            dim_names = []
+            for variable in variables:
+                if "filters" in variable.dimensions:  # type: ignore
+                    for f in variable.dimensions["filters"]:  # type: ignore
+                        if f["name"] not in dim_names:
+                            dim_names.append(f["name"])
+
+            # Pivot the table using the generalized dimension names.
             tb_pivoted = tb.pivot(index=["country", "year"], columns=dim_names)
 
+            # Generate labels with exact structure matching tb_pivoted.columns.
             labels = []
             for variable in variables:
                 assert variable.dimensions, f"Variable {variable.id} has no dimensions"
-                labels.append(
-                    tuple(
-                        [variable.dimensions["originalShortName"]]
-                        + [f["value"] for f in variable.dimensions["filters"]]
+                label_tuple = [variable.dimensions["originalShortName"]]
+
+                # Add filter values in the same order as dim_names.
+                for name in dim_names:
+                    value = next(
+                        (f["value"] for f in variable.dimensions.get("filters", []) if f["name"] == name), None
                     )
-                )
+                    label_tuple.append(value)  # type: ignore
+
+                labels.append(tuple(label_tuple))
 
             tb = tb_pivoted.loc[:, labels]
 
