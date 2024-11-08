@@ -273,7 +273,7 @@ def hash_any(x: Any) -> int:
 
 def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
     """Recursively create an instance of a dataclass from a dictionary."""
-    if cls is None or not dataclasses.is_dataclass(cls):
+    if d is None or not dataclasses.is_dataclass(cls) or not isinstance(d, dict):
         return d  # type: ignore
 
     field_types = {f.name: f.type for f in dataclasses.fields(cls)}
