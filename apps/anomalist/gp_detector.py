@@ -118,8 +118,8 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             # Get the data for the current entity and variable
             group = df_wide.loc[(entity_name, variable_id)]
 
-            # Skip if the series has only one or fewer data points
-            if isinstance(group, pd.Series) or len(group) <= 1:
+            # Skip if the series has only three or fewer data points
+            if isinstance(group, pd.Series) or len(group) <= 3:
                 continue
 
             # Prepare the input features (X) and target values (y) for Gaussian Process
@@ -160,6 +160,10 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         # Convert z-score into p-value
         df_score_long["p_value"] = 2 * (1 - norm.cdf(np.abs(df_score_long["z"])))
 
+        # Anomalies with p-value < 0.1 are not interesting, drop them. This could be
+        # even stricter
+        df_score_long = df_score_long[df_score_long["p_value"] < 0.1]
+
         # Adjust p-values for multiple testing
         df_score_long["adj_p_value"] = df_score_long.groupby(["entity_name", "variable_id"]).p_value.transform(
             lambda p: multipletests(p, method="fdr_bh")[1]
@@ -167,6 +171,8 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
 
         # Final score is 1 - p-value
         df_score_long["anomaly_score"] = 1 - df_score_long["adj_p_value"]
+
+        print(df_score_long.sort_values("adj_p_value"))
 
         return df_score_long.drop(columns=["p_value", "adj_p_value", "z"])
 
