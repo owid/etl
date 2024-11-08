@@ -768,6 +768,7 @@ if st.session_state.anomalist_df is not None:
 
     # 4.3/ APPLY FILTERS
     df = filter_df(st.session_state.anomalist_df)
+    assert df.views.notnull().all()
 
     # 5/ SHOW ANOMALIES
     # Different types need formatting
