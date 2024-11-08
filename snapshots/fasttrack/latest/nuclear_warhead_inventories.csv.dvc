@@ -2,10 +2,9 @@ meta:
   source:
     name: Google Sheet
     url: https://fas.org/issues/nuclear-weapons/status-world-nuclear-forces/
-    source_data_url: 
+    source_data_url:
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRLseg03w2pyyqQIq9ip016J168lYsJ8BWJRqzDX8L8LqF6zm4TTyOGS7HmrwW3ZL1bj2KHXQNuhNir/pub?output=csv
     date_accessed: '2023-08-22'
-    publication_year: .nan
     published_by: Google Sheet
   name: Nuclear warhead inventories – Federation of American Scientists
   description: >-
