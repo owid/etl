@@ -529,8 +529,7 @@ def variable_data_table_from_catalog(
             tb.columns = [variable.id for variable in variables]
             tbs.append(tb.reset_index())
 
-    # TODO: this could be slow for datasets with a lot of tables
-    return ft.reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), tbs)  # type: ignore
+    return pd.concat([tb.set_index(["country", "year"]) for tb in tbs], axis=1)
 
 
 #######################################################################################################
