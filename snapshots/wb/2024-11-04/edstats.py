@@ -1,6 +1,6 @@
 """Script to create a snapshot of dataset."""
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import click
