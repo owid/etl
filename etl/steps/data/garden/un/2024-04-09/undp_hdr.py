@@ -82,7 +82,7 @@ def region_avg(tb, ds_regions, ds_income_groups):
         tb[col + "_pop"] = tb[col] * tb["pop_total"]
         rel_cols_pop.append(col + "_pop")
 
-    # Define aggregations
+    # Define aggregations only for the columns I need
     aggregations = dict.fromkeys(
         rel_cols + rel_cols_pop,
         "sum",
@@ -99,5 +99,11 @@ def region_avg(tb, ds_regions, ds_income_groups):
     # calculate regional averages
     for col in rel_cols:
         tb[col] = tb[col + "_pop"] / tb["pop_total"]
+
+    # Add description_processing only to rel_cols
+    for col in rel_cols:
+        tb[
+            col
+        ].m.description_processing = "We calculated averages over continents and income groups by taking the population-weighted average of the countries in each group. If less than 80% of countries in an area report data for a given year, we do not calculate the average for that area."
 
     return tb[tb_cols]
