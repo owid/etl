@@ -488,8 +488,10 @@ def variable_data_table_from_catalog(
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Dataset {ds_path} not found in local catalog.") from e
 
+        dim_names = [k for k in tb.metadata.primary_key if k not in ("country", "year")]
+
         # Simple case with no dimensions
-        if not variables[0].dimensions:
+        if not dim_names:
             col_mapping = {"country": "country", "year": "year"}
             for col in set(tb.columns) - {"country", "year"}:
                 # Variable names in MySQL are trimmed to 255 characters
@@ -500,7 +502,7 @@ def variable_data_table_from_catalog(
 
             tb = tb[col_mapping.keys()]
             tb.columns = col_mapping.values()
-            tbs.append(tb)
+            tbs.append(tb.set_index(["country", "year"]))
 
         # Dimensional case
         else:
@@ -511,27 +513,34 @@ def variable_data_table_from_catalog(
             #     {'name': 'gender', 'value': 'all'},
             #     {'name': 'age_group', 'value': '15-29'}
             # ]
-            filters = variables[0].dimensions["filters"]
-            dim_names = [f["name"] for f in filters]
+            # dim_names = list({f["name"] for v in variables if v.dimensions for f in v.dimensions["filters"]})
+            dim_names = [k for k in tb.metadata.primary_key if k not in ("country", "year")]
             tb_pivoted = tb.pivot(index=["country", "year"], columns=dim_names)
 
             labels = []
             for variable in variables:
-                assert variable.dimensions, f"Variable {variable.id} has no dimensions"
-                labels.append(
-                    tuple(
-                        [variable.dimensions["originalShortName"]]
-                        + [f["value"] for f in variable.dimensions["filters"]]
-                    )
-                )
+                if not variable.dimensions:
+                    label = [variable.shortName] + [None] * len(dim_names)
+                    # assert variable.dimensions, f"Variable {variable.id} has no dimensions"
+                else:
+                    # Construct label for multidim columns
+                    label = [variable.dimensions["originalShortName"]]
+                    for dim_name in dim_names:
+                        for f in variable.dimensions["filters"]:
+                            if f["name"] == dim_name:
+                                label.append(f["value"])
+                                break
+                        else:
+                            label.append(None)  # type: ignore
+                labels.append(label)
 
             tb = tb_pivoted.loc[:, labels]
 
             tb.columns = [variable.id for variable in variables]
-            tbs.append(tb.reset_index())
+            tbs.append(tb)
 
     # NOTE: this can be pretty slow for datasets with a lot of tables
-    return pd.concat([tb.set_index(["country", "year"]) for tb in tbs], axis=1).reset_index()  # type: ignore
+    return pd.concat(tbs, axis=1).reset_index()  # type: ignore
 
 
 #######################################################################################################
