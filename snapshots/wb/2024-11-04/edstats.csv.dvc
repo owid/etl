@@ -14,7 +14,6 @@ meta:
 
   # Files
     url_main: https://datacatalog.worldbank.org/search/dataset/0038480/education-statistics
-    url_download: https://datacatalogfiles.worldbank.org/ddh-published/0038480/DR0047022/Edstats_Updated.csv?versionId=2024-10-10T07:14:21.2811991Z
     date_accessed: 2024-11-04
 
     # License
@@ -22,6 +21,6 @@ meta:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
 outs:
-  - md5: 8c938c0c062c1586fe4153b45cc03032
-    size: 995792693
+  - md5: 83f93b0ab9ba48850ea75045d76c8c38
+    size: 31626492
     path: edstats.csv

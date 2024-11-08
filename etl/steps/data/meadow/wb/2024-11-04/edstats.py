@@ -19,42 +19,9 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Remove redundant columns (SEX, URBANIZATION, AGE, COMP_BREAKDOWN_1, INDICATOR_ROOT, INDICATOR_ROOT_NAME, economy are already within the indicator_name)
-    columns_to_drop = [
-        "unit",
-        "name",
-        "SEX",
-        "URBANIZATION",
-        "AGE",
-        "COMP_BREAKDOWN_1",
-        "INDICATOR_ROOT",
-        "INDICATOR_ROOT_NAME",
-        "economy",
-        "UNIT_TYPE",
-        "source",
-        "INDICATOR",
-    ]
+    # Rename indicator code and name columns
+    tb = tb.rename(columns={"Series": "indicator_name", "wb_seriescode": "indicator_code"})
 
-    tb = tb.drop(columns=columns_to_drop)
-
-    # Identify columns that start with 'YR'
-    year_columns = [col for col in tb.columns if col.startswith("YR")]
-
-    # Melt the DataFrame to create a 'year' column
-    tb = tb.melt(
-        id_vars=[col for col in tb.columns if col not in year_columns],
-        value_vars=year_columns,
-        var_name="year",
-        value_name="value",
-    )
-
-    # Remove 'YR' prefix from the 'year' column
-    tb["year"] = tb["year"].str.replace("YR", "").astype(int)
-
-    tb = tb.rename({"Country name": "country"}, axis=1)
-    # Drop rows where 'country' is NaN
-    tb = tb.dropna(subset=["country"])
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year", "indicator_name"])
 
     #

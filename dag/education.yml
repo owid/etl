@@ -125,5 +125,8 @@ steps:
     - snapshot://wb/2024-11-04/edstats.csv
   data://garden/wb/2024-11-04/edstats:
     - data://meadow/wb/2024-11-04/edstats
+    - data://garden/education/2017-09-30/public_expenditure
+    - data://garden/education/2018-04-18/literacy_rates
+
   data://grapher/wb/2024-11-04/edstats:
     - data://garden/wb/2024-11-04/edstats
