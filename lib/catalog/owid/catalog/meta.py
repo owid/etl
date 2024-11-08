@@ -40,8 +40,8 @@ class MetaBase(DataClassJsonMixin):
             return False
         return self.__hash__() == other.__hash__()
 
-    def to_dict(self) -> Dict[str, Any]:  # type: ignore
-        return super().to_dict()
+    def to_dict(self, encode_json: bool = False) -> Dict[str, Any]:  # type: ignore
+        return super().to_dict(encode_json=encode_json)
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> T:  # type: ignore
