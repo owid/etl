@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     )
 
     # drop all rows where country_origin or country_dest is identical
-    tb = tb[tb["smctry"] == 0]
+    tb = tb[tb["country_origin"] != tb["country_dest"]]
     tb = tb.drop(columns=["smctry"])
 
     #

@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -7,18 +9,26 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
+# Missing countries from distance file:
+# Liechtenstein, Montenegro, Serbia, Bonaire Sint Eustatius and Saba, Curacao, Sint Maarten (Dutch part), United States Virgin Islands, Isle of Man, South Sudan, American Samoa, Guam, Mayotte, Channel Islands, Monaco, Vatican
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # TODO import right data sets
     # Load meadow dataset.
     ds_flows = paths.load_dataset("migrant_stock")
     ds_distance = paths.load_dataset("geodist")
 
     # Read table from meadow dataset.
-    tb = ds_flows["tb_do"].reset_index()
-    tb_distance = ds_distance["geodist"].reset_index()
+    tb = ds_flows["migrant_stock_dest_origin"].reset_index()
+    tb_dist = ds_distance["geodist"].reset_index()
+
+    tb_dist = tb_dist[["country_origin", "country_dest", "dist_capital_city"]]
+    tb_dist = tb_dist.rename(columns={"country_dest": "country_destination"})
+
+    tb = pr.merge(tb, tb_dist, on=["country_origin", "country_destination"], how="left")
 
     #
     # Process data.
