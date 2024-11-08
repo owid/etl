@@ -12,7 +12,7 @@ should probably be moved to owid-datautils. However this can be time consuming a
 """
 
 import math
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any, Iterable, List, Literal, Optional, Set, TypeVar, Union, cast
 
 import owid.catalog.processing as pr
@@ -23,6 +23,7 @@ from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
 TableOrDataFrame = TypeVar("TableOrDataFrame", pd.DataFrame, Table)
+DIMENSION_COL_NONE = "temporary"
 
 
 def check_known_columns(df: pd.DataFrame, known_cols: list) -> None:
@@ -85,7 +86,12 @@ def interpolate_table(
 
     if time_mode != "none":
         # Expand time
-        df = expand_time_column(df, entity_col, time_col, method=time_mode)
+        df = expand_time_column(
+            df,
+            dimension_col=entity_col,
+            time_col=time_col,
+            method=time_mode,
+        )
 
     # Set index
     df = cast(TableOrDataFrame, df.set_index(index).sort_index())
@@ -102,8 +108,8 @@ def interpolate_table(
 
 def expand_time_column(
     df: TableOrDataFrame,
-    dimension_col: str | Iterable[str],
     time_col: str,
+    dimension_col: Optional[str | Iterable[str]] = None,
     method: Literal["full_range", "full_range_entity", "observed", "none"] = "full_range",
     until_time: Optional[int | datetime] = None,
     since_time: Optional[int | datetime] = None,
@@ -151,6 +157,12 @@ def expand_time_column(
     # Sanity check
     assert isinstance(time_col, str), "`time_col` must be a string!"
 
+    # TODO: This is temporary hack
+    if dimension_col is None:
+        dimension_col = DIMENSION_COL_NONE
+        df[DIMENSION_COL_NONE] = ""
+        df[DIMENSION_COL_NONE] = df[DIMENSION_COL_NONE].astype("string")
+
     # Determine if we have a single or multiple dimensiosn (will affect how groupbys are done)
     SINGLE_DIMENSION = isinstance(dimension_col, str)
     MULTIPLE_DIMENSION = isinstance(dimension_col, list)
@@ -171,6 +183,8 @@ def expand_time_column(
         date_max = ds.max()
         if isinstance(date_max, datetime):
             return pd.date_range(start=date_min, end=date_max)
+        if isinstance(date_max, date):
+            return pd.date_range(start=date_min, end=date_max).date
         else:
             return range(int(date_min), int(date_max) + 1)
 
@@ -326,6 +340,10 @@ def expand_time_column(
             df = df.astype(dtypes)
         except pd.errors.IntCastingNaNError:
             pass
+
+    if dimension_col == DIMENSION_COL_NONE:
+        df = df.drop(columns=dimension_col)
+
     return df
 
 
