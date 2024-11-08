@@ -301,3 +301,16 @@ steps:
     - grapher://grapher/covid/latest/covax
     - grapher://grapher/covid/latest/infections_model
     - grapher://grapher/covid/latest/xm_who
+  data://meadow/covid/2024-11-05/github_stats:
+    - snapshot://covid/2024-11-05/github_stats_issues.csv
+    - snapshot://covid/2024-11-05/github_stats_issues_comments.csv
+    - snapshot://covid/2024-11-05/github_stats_issues_users.csv
+    - snapshot://covid/2024-11-05/github_stats_pr.csv
+    - snapshot://covid/2024-11-05/github_stats_pr_comments.csv
+    - snapshot://covid/2024-11-05/github_stats_pr_users.csv
+    - snapshot://covid/2024-11-05/github_stats_commits.csv
+    - snapshot://covid/2024-11-05/github_stats_commits_users.csv
+  data://garden/covid/2024-11-05/github_stats:
+    - data://meadow/covid/2024-11-05/github_stats
+  data://grapher/covid/2024-11-05/github_stats:
+    - data://garden/covid/2024-11-05/github_stats
