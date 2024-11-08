@@ -89,7 +89,7 @@ definitions:
   description_short_headcount_ratio: This is the share of the population that is multidimensionally poor.
   description_short_intensity: The intensity is the share of indicators in which the multidimensionally poor are deprived on average.
   description_short_vulnerable: This is the share of the population that is close to the multidimensional poverty threshold.
-  description_short_severe: This is the share of the population that is severely multidimensionally poor.
+  description_short_severe: This is the share of the population that is in severe multidimensional poverty.
   description_short_censored_headcount_ratio: This is the share of the multidimensionally poor population deprived in the indicator <<indicator.lower()>>.
   description_short_uncensored_headcount_ratio: This is the share of the population deprived in the indicator <<indicator.lower()>>.
   description_short_area: |-
