@@ -284,6 +284,11 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
         if field_name not in field_types:
             continue
 
+        # Handle None values right away
+        if v is None:
+            init_args[field_name] = None
+            continue
+
         field_type = field_types[field_name]
         origin = get_origin(field_type)
         args = get_args(field_type)
