@@ -60,13 +60,14 @@ steps:
   data://explorers/lis/latest/luxembourg_income_study:
     - data://garden/lis/2024-06-13/luxembourg_income_study
 
-  # Multidimensional Poverty Index
-  data://meadow/ophi/2023-07-05/multidimensional_poverty_index:
-    - snapshot://ophi/2023-07-05/multidimensional_poverty_index.csv
-  data://garden/ophi/2023-07-05/multidimensional_poverty_index:
-    - data://meadow/ophi/2023-07-05/multidimensional_poverty_index
-  data://grapher/ophi/2023-07-05/multidimensional_poverty_index:
-    - data://garden/ophi/2023-07-05/multidimensional_poverty_index
+  # Global Multidimensional Poverty Index
+  data://meadow/ophi/2024-10-28/multidimensional_poverty_index:
+    - snapshot://ophi/2024-10-28/multidimensional_poverty_index_cme.csv
+    - snapshot://ophi/2024-10-28/multidimensional_poverty_index_hot.csv
+  data://garden/ophi/2024-10-28/multidimensional_poverty_index:
+    - data://meadow/ophi/2024-10-28/multidimensional_poverty_index
+  data://grapher/ophi/2024-10-28/multidimensional_poverty_index:
+    - data://garden/ophi/2024-10-28/multidimensional_poverty_index
 
   # # OECD Income Distribution Database
   data://meadow/oecd/2024-04-10/income_distribution_database:
