@@ -4,7 +4,7 @@ import hashlib
 import re
 from dataclasses import fields, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional, Type, TypeVar, Union, overload
+from typing import Any, Dict, Optional, Type, TypeVar, Union, get_args, get_origin, overload
 
 import dynamic_yaml
 import pytz
@@ -280,16 +280,20 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
 
     init_args = {}
     for field_name, v in d.items():
-        # Skip values in a dictionary that are not in the dataclass. We do this to stay backwards compatible
+        # Skip values in a dictionary that are not in the dataclass
         if field_name not in field_types:
             continue
 
         field_type = field_types[field_name]
+        origin = get_origin(field_type)
+        args = get_args(field_type)
 
-        if isinstance(field_type, list):
-            init_args[field_name] = [dataclass_from_dict(None, item) for item in v]
-        elif isinstance(field_type, dict):
-            init_args[field_name] = {k: dataclass_from_dict(None, item) for k, item in v.items()}
+        if origin is list:
+            item_type = args[0]
+            init_args[field_name] = [dataclass_from_dict(item_type, item) for item in v]
+        elif origin is dict:
+            key_type, value_type = args
+            init_args[field_name] = {k: dataclass_from_dict(value_type, item) for k, item in v.items()}
         elif dataclasses.is_dataclass(field_type):
             init_args[field_name] = dataclass_from_dict(field_type, v)  # type: ignore
         elif isinstance(field_type, type):
