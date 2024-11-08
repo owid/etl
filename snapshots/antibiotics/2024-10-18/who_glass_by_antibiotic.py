@@ -1,4 +1,17 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+To download the data visit:
+
+https://worldhealthorg.shinyapps.io/glass-dashboard/_w_679389fb/#!/amr
+
+and go to the section called 'Global maps of testing coverage by bacterial pathogen and antibiotic group'
+
+Download each slice of the data (this is quite time-consuming but I tried and failed at automating it using selenium, shiny apps are not fun!) into a folder structured like: bloodstream/acinetobacter_spp/carbapenems/2022.csv
+
+Then zip this up and upload the file to snapshot.
+
+
+"""
 
 
 from pathlib import Path

@@ -20,18 +20,18 @@ def run(dest_dir: str) -> None:
     tables = []
     # Load data from snapshot.
     with zipfile.ZipFile(snap.path, "r") as zip_file:
-        csv_files = [file_name for file_name in zip_file.namelist() if file_name.endswith(".csv")]
-        print("Files in zip archive:")
+        # Get all csv files in the zip file - for some reason there are duplicated with __MACOSX at the start, we'll drop these
+        csv_files = [
+            file_name for file_name in zip_file.namelist() if file_name.endswith(".csv") and "__MACOSX" not in file_name
+        ]
         for file_name in csv_files:
-            cleaned_path = file_name.replace("__MACOSX/", "").replace("._", "")
             tb = snap.read_in_archive(
-                filename=cleaned_path,
+                filename=file_name,
                 skiprows=8,
                 encoding="ISO-8859-1",
             )
-            filters = snap.read_in_archive(
-                filename=cleaned_path, nrows=6, header=None, usecols=[0], encoding="ISO-8859-1"
-            )
+            # Read in the filters from the csv file which contain important information on the slice of data
+            filters = snap.read_in_archive(filename=file_name, nrows=6, header=None, usecols=[0], encoding="ISO-8859-1")
             tb.columns = [
                 "country",
                 "bcis_per_million",
@@ -41,10 +41,13 @@ def run(dest_dir: str) -> None:
                 "share_bcis_with_ast",
             ]
             # adding additional columns of key information stored in the csv
-            tb["year"] = filters.iloc[1, 0].split(" ")[-1]
-            tb["syndrome"] = filters.iloc[3, 0].split(" ")[-1]
-            tb["pathogen"] = filters.iloc[4, 0].split(" ")[-1]
-            tb["antibiotic"] = filters.iloc[5, 0].split(" ")[-1]
+            tb["year"] = filters.iloc[1, 0].split(":")[-1]
+            tb["syndrome"] = filters.iloc[3, 0].split(":")[-1]
+            tb["pathogen"] = filters.iloc[4, 0].split(":")[-1]
+            tb["antibiotic"] = filters.iloc[5, 0].split(":")[-1]
+            assert all(
+                tb[["year", "syndrome", "pathogen", "antibiotic"]].notna()
+            ), f"missing key information in {file_name}"
             tables.append(tb)
 
     tb = pr.concat(tables)
