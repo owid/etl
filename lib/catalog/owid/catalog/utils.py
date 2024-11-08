@@ -1,9 +1,10 @@
+import dataclasses
 import datetime as dt
 import hashlib
 import re
 from dataclasses import fields, is_dataclass
 from pathlib import Path
-from typing import Any, Optional, TypeVar, Union, overload
+from typing import Any, Dict, Optional, Type, TypeVar, Union, overload
 
 import dynamic_yaml
 import pytz
@@ -268,3 +269,32 @@ def hash_any(x: Any) -> int:
     else:
         # Fallback for other types: use the built-in hash() function
         return hash(x)
+
+
+def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
+    """Recursively create an instance of a dataclass from a dictionary."""
+    if cls is None or not dataclasses.is_dataclass(cls):
+        return d  # type: ignore
+
+    field_types = {f.name: f.type for f in dataclasses.fields(cls)}
+
+    init_args = {}
+    for field_name, v in d.items():
+        # Skip values in a dictionary that are not in the dataclass. We do this to stay backwards compatible
+        if field_name not in field_types:
+            continue
+
+        field_type = field_types[field_name]
+
+        if isinstance(field_type, list):
+            init_args[field_name] = [dataclass_from_dict(None, item) for item in v]
+        elif isinstance(field_type, dict):
+            init_args[field_name] = {k: dataclass_from_dict(None, item) for k, item in v.items()}
+        elif dataclasses.is_dataclass(field_type):
+            init_args[field_name] = dataclass_from_dict(field_type, v)  # type: ignore
+        elif isinstance(field_type, type):
+            init_args[field_name] = field_type(v)
+        else:
+            init_args[field_name] = v
+
+    return cls(**init_args)

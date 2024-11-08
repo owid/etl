@@ -8,7 +8,6 @@ TODO: This file contains some code that needs some revision:
 
 """
 import concurrent.futures
-import functools as ft
 import io
 import warnings
 from collections import defaultdict
@@ -489,16 +488,20 @@ def variable_data_table_from_catalog(
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Dataset {ds_path} not found in local catalog.") from e
 
-        # Variable names in MySQL are trimmed to 255 characters
-        tb = tb.rename(columns=trim_long_variable_name)
-
         # Simple case with no dimensions
         if not variables[0].dimensions:
-            variable_names = [variable.shortName for variable in variables]  # type: ignore
-            tb = tb[["country", "year"] + variable_names]
+            col_mapping = {"country": "country", "year": "year"}
+            for col in tb.columns:
+                # if col in ("country", "year"):
+                #     continue
+                # Variable names in MySQL are trimmed to 255 characters
+                name = trim_long_variable_name(col)
+                matches = [variable for variable in variables if name == variable.shortName]
+                if matches:
+                    col_mapping[col] = matches[0].id  # type: ignore
 
-            # Rename from shortName to id
-            tb = tb.rename(columns={variable.shortName: variable.id for variable in variables})
+            tb = tb[col_mapping.keys()]
+            tb.columns = col_mapping.values()
             tbs.append(tb)
 
         # Dimensional case
@@ -529,7 +532,8 @@ def variable_data_table_from_catalog(
             tb.columns = [variable.id for variable in variables]
             tbs.append(tb.reset_index())
 
-    return pd.concat([tb.set_index(["country", "year"]) for tb in tbs], axis=1)
+    # NOTE: this can be pretty slow for datasets with a lot of tables
+    return pd.concat([tb.set_index(["country", "year"]) for tb in tbs], axis=1)  # type: ignore
 
 
 #######################################################################################################

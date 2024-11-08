@@ -10,15 +10,15 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, Type, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, TypeVar, Union
 
 import mistune
 import pandas as pd
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin
 from typing_extensions import Self
 
 from .processing_log import ProcessingLog
-from .utils import hash_any, pruned_json
+from .utils import dataclass_from_dict, hash_any, pruned_json
 
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 
@@ -30,7 +30,7 @@ YearDateLatest = NewType("YearDateLatest", str)
 T = TypeVar("T")
 
 
-class MetaBase:
+class MetaBase(DataClassJsonMixin):
     def __hash__(self):
         """Hash that uniquely identifies an object (without needing frozen dataclass)."""
         return hash_any(self)
@@ -40,12 +40,10 @@ class MetaBase:
             return False
         return self.__hash__() == other.__hash__()
 
-    def to_dict(self) -> Dict[str, Any]:
-        ...
-
     @classmethod
-    def from_dict(cls: Type[T], d: Dict[str, Any]) -> T:
-        ...
+    def from_dict(cls, d: Dict[str, Any]) -> T:  # type: ignore
+        # NOTE: this is much faster than using dataclasses_json
+        return dataclass_from_dict(cls, d)  # type: ignore
 
     def update(self, **kwargs: Dict[str, Any]) -> None:
         """Update object with new values."""
@@ -72,7 +70,6 @@ class MetaBase:
 
 
 @pruned_json
-@dataclass_json
 @dataclass(eq=False)
 class License(MetaBase):
     name: Optional[str] = None
@@ -84,7 +81,6 @@ class License(MetaBase):
 
 # DEPRECATED: use Origin instead
 @pruned_json
-@dataclass_json
 @dataclass(eq=False)
 class Source(MetaBase):
     """Notes on importing sources to grapher:
@@ -109,7 +105,6 @@ class Source(MetaBase):
 
 
 @pruned_json
-@dataclass_json
 @dataclass(eq=False)
 class Origin(MetaBase):
     # Producer name
@@ -167,7 +162,6 @@ PROCESSING_LEVELS_ORDER = {
 
 
 @pruned_json
-@dataclass_json
 @dataclass(eq=False)
 class FaqLink(MetaBase):
     gdoc_id: str
@@ -178,7 +172,6 @@ GrapherConfig = Dict[str, Any]
 
 
 @pruned_json
-@dataclass_json
 @dataclass(eq=False)
 class VariablePresentationMeta(MetaBase):
     # Any fields of grapher config can be set here - title and subtitle *should* be set whenever possible
@@ -201,7 +194,6 @@ class VariablePresentationMeta(MetaBase):
 
 
 @pruned_json
-@dataclass_json
 @dataclass(eq=False)
 class VariableMeta(MetaBase):
     """Allowed fields for `display` attribute used for grapher:
@@ -283,7 +275,6 @@ class VariableMeta(MetaBase):
 
 
 @pruned_json
-@dataclass_json
 @dataclass(eq=False)
 class DatasetMeta(MetaBase):
     """
@@ -385,7 +376,6 @@ class DatasetMeta(MetaBase):
 
 
 @pruned_json
-@dataclass_json
 @dataclass(eq=False)
 class TableMeta(MetaBase):
     # data about this table
