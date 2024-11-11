@@ -865,6 +865,12 @@ steps:
   data://grapher/wpf/2024-10-03/famines_by_place:
     - data://garden/wpf/2024-10-03/famines_by_place
 
+  data-private://meadow/gfs/2024-11-11/gfs_wave_one:
+    - snapshot-private://gfs/2024-11-11/gfs_wave_one.csv
+  data-private://garden/gfs/2024-11-11/gfs_wave_one:
+    - data-private://meadow/gfs/2024-11-11/gfs_wave_one
+  data-private://grapher/gfs/2024-11-11/gfs_wave_one:
+    - data-private://garden/gfs/2024-11-11/gfs_wave_one
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
