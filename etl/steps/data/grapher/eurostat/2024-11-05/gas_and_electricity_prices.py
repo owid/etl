@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("gas_and_electricity_prices")
 
     # Read table from garden dataset.
-    tb = ds_garden["gas_and_electricity_prices"]
+    tb = ds_garden["gas_and_electricity_prices_flat"]
 
     #
     # Process data.

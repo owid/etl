@@ -257,6 +257,10 @@ def clean_inputs(tb: Table) -> Table:
     # Assign a proper type to the column of values.
     tb["value"] = tb["value"].astype(float)
 
+    # Create a clean column of years, and another for year-semesters.
+    tb["year-semester"] = tb["year"].copy()
+    tb["year"] = tb["year"].str.strip().str[0:4].astype(int)
+
     return tb
 
 
@@ -309,8 +313,7 @@ def compare_components_and_prices_data(tb: Table) -> None:
     dataset_prices = "nrg_pc_204"
     # Transform biannual data into annual data, by taking the average price of both semesters.
     # NOTE: It would be better to have the actual energy consumption of each semester, to be able to compute a weighted average. But I don't see that data (we might need to import some additional datasets). For now, simply take the average.
-    tb_biannual = tb[tb["year"].str.contains("S")].reset_index(drop=True)
-    tb_biannual["year"] = tb_biannual["year"].str.strip().str[0:4].astype(int)
+    tb_biannual = tb[tb["year-semester"].str.contains("S")].reset_index(drop=True)
     # Compute an annual average only if there is data for the two semesters.
     tb_biannual_filtered = tb_biannual.groupby(
         ["currency", "country", "year", "dataset_code", "dataset_name", "price_component_or_level"],
@@ -324,8 +327,7 @@ def compare_components_and_prices_data(tb: Table) -> None:
     ).agg({"value": "mean"})
 
     # Check that the resulting total price for the components dataset (summing up all components) is similar to the electricity prices averaged over the two semesters.
-    tb_annual = tb[~tb["year"].str.contains("S")].reset_index(drop=True)
-    tb_annual["year"] = tb_annual["year"].str.strip().str[0:4].astype(int)
+    tb_annual = tb[~tb["year-semester"].str.contains("S")].reset_index(drop=True)
 
     # OPTION 1: Sum over all price components to get the total.
     annual_1 = (
@@ -373,6 +375,120 @@ def compare_components_and_prices_data(tb: Table) -> None:
     # With all this, it seems reasonable to discard the prices datasets, and use the components ones.
 
 
+def select_and_prepare_relevant_data(tb: Table) -> Table:
+    # All datasets have a energy unit except electricity components (both for household and non-households).
+    # I assume the energy unit is kWh.
+    error = "Expected electricity components (both for household and non-households) to have no energy unit. Remove this code."
+    assert tb[tb["dataset_code"].isin(["nrg_pc_204_c", "nrg_pc_205_c"])]["energy_unit"].isnull().all(), error
+    tb.loc[tb["dataset_code"].isin(["nrg_pc_204_c", "nrg_pc_205_c"]), "energy_unit"] = "kWh"
+
+    error = "Expected all datasets to have the same energy unit (kWh)."
+    assert (
+        tb.groupby(["dataset_code"], observed=True, as_index=False)
+        .agg({"energy_unit": lambda x: "kWh" in x.unique()})["energy_unit"]
+        .all()
+    ), error
+    # Select the same energy unit for all datasets (kWh).
+    tb = tb[tb["energy_unit"] == "kWh"].drop(columns=["energy_unit"], errors="raise").reset_index(drop=True)
+
+    # For convenience, instead of having a column for price component (for components datasets) and price level (for prices datasets), create a single column with the price component or level.
+    assert tb[(tb["price_level"].isnull()) & (tb["price_component"].isnull())].empty
+    assert tb[(tb["price_level"].notnull()) & (tb["price_component"].notnull())].empty
+    tb["price_component_or_level"] = tb["price_level"].fillna(tb["price_component"])
+    tb = tb.drop(columns=["price_level", "price_component"], errors="raise")
+
+    # After inspection, it looks like the "All bands" consumption is very sparse in the prices datasets.
+    # One option (if we decided to use the prices dataset) would be to use the more common consumption bands only, which are better informed.
+    # However, "All bands" in the components dataset seem to be less sparse (at least from 2019 onwards).
+    # To get the total price from the components dataset, we would need to add up all components.
+    # After a quick inspection, all components seem similarly well informed.
+    # There are some special cases where the data is omitted (e.g. due to flag "c" (confidential)).
+    # So, in principle we could add up all components, only when all of them are informed.
+    # TODO: Reconsider this choice if this loses much data, e.g. when some components are missing simply because they are irrelevant for a specific country.
+    # For now, select "All bands" and the components datasets.
+    tb = (
+        tb[tb["consumption_band"] == "All bands"]
+        .drop(columns=["consumption_band"], errors="raise")
+        .reset_index(drop=True)
+    )
+
+    # Check that the total price obtained by summing all components is similar to the price obtained in the prices dataset.
+    # NOTE: Uncomment to perform some visual checks.
+    #  See conclusions in the following function to understand the choices.
+    # compare_components_and_prices_data(tb=tb)
+
+    # Select the components datasets only and rename columns conveniently.
+    tb = (
+        tb[tb["dataset_code"].isin(["nrg_pc_202_c", "nrg_pc_203_c", "nrg_pc_204_c", "nrg_pc_205_c"])]
+        .reset_index(drop=True)
+        .rename(columns={"price_component_or_level": "price_component"}, errors="raise")
+    )
+
+    # Remove empty rows.
+    tb = tb.dropna(subset=["value"]).reset_index(drop=True)
+
+    # Remove data with certain flags.
+    tb = tb[
+        ~tb["flag"].isin(
+            [
+                "confidential",
+                "definition differs",
+                "low reliability",
+                "confidential, definition differs",
+                "unknown flag",
+            ]
+        )
+    ].reset_index(drop=True)
+    error = "Unexpected flag values."
+    assert set(tb["flag"].dropna()) <= set(["estimated", "break in time series", "provisional", "unknown flag"]), error
+
+    # Remove groups (of country-year-dataset-currency) for which "Energy and supply" is not included.
+    # For example, Albania doesn't have "Energy and supply" costs for household electricity, but it does have other components (e.g. "Network costs").
+    tb = tb[
+        tb.groupby(["country", "year", "dataset_code", "currency"], observed=True, as_index=False)[
+            "price_component"
+        ].transform(lambda x: "Energy and supply" in x.tolist())
+    ].reset_index(drop=True)
+
+    # Create a column for the energy source.
+    tb["source"] = map_series(
+        tb["dataset_code"],
+        mapping={
+            "nrg_pc_202_c": "Gas",
+            "nrg_pc_203_c": "Gas",
+            "nrg_pc_204_c": "Electricity",
+            "nrg_pc_205_c": "Electricity",
+        },
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+        show_full_warning=True,
+    )
+    error = "Unexpected energy source."
+    assert set(tb["source"]) == set(["Gas", "Electricity"]), error
+
+    # Create a column for the consumer type.
+    tb["consumer_type"] = map_series(
+        tb["dataset_code"],
+        mapping={
+            "nrg_pc_202_c": "Household",
+            "nrg_pc_203_c": "Non-household",
+            "nrg_pc_204_c": "Household",
+            "nrg_pc_205_c": "Non-household",
+        },
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+        show_full_warning=True,
+    )
+
+    # It would be confusing to keep different national currencies, so, keep only Euro and PPS.
+    tb = tb[tb["currency"].isin(["Euro", "PPS"])].reset_index(drop=True)
+
+    # Drop unnecessary columns.
+    tb = tb.drop(columns=["flag", "dataset_code", "year-semester", "dataset_name"], errors="raise")
+
+    return tb
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -401,67 +517,27 @@ def run(dest_dir: str) -> None:
     # Harmonize indexes and country names.
     tb = harmonize_indexes_and_countries(tb=tb)
 
-    def select_and_prepare_relevant_data(tb: Table) -> Table:
-        # All datasets have a energy unit except electricity components (both for household and non-households).
-        # I assume the energy unit is kWh.
-        error = "Expected electricity components (both for household and non-households) to have no energy unit. Remove this code."
-        assert tb[tb["dataset_code"].isin(["nrg_pc_204_c", "nrg_pc_205_c"])]["energy_unit"].isnull().all(), error
-        tb.loc[tb["dataset_code"].isin(["nrg_pc_204_c", "nrg_pc_205_c"]), "energy_unit"] = "kWh"
-
-        error = "Expected all datasets to have the same energy unit (kWh)."
-        assert (
-            tb.groupby(["dataset_code"], observed=True, as_index=False)
-            .agg({"energy_unit": lambda x: "kWh" in x.unique()})["energy_unit"]
-            .all()
-        ), error
-        # Select the same energy unit for all datasets (kWh).
-        tb = tb[tb["energy_unit"] == "kWh"].drop(columns=["energy_unit"], errors="raise").reset_index(drop=True)
-
-        # For convenience, instead of having a column for price component (for components datasets) and price level (for prices datasets), create a single column with the price component or level.
-        assert tb[(tb["price_level"].isnull()) & (tb["price_component"].isnull())].empty
-        assert tb[(tb["price_level"].notnull()) & (tb["price_component"].notnull())].empty
-        tb["price_component_or_level"] = tb["price_level"].fillna(tb["price_component"])
-        tb = tb.drop(columns=["price_level", "price_component"], errors="raise")
-
-        # After inspection, it looks like the "All bands" consumption is very sparse in the prices datasets.
-        # One option (if we decided to use the prices dataset) would be to use the more common consumption bands only, which are better informed.
-        # However, "All bands" in the components dataset seem to be less sparse (at least from 2019 onwards).
-        # To get the total price from the components dataset, we would need to add up all components.
-        # After a quick inspection, all components seem similarly well informed.
-        # There are some special cases where the data is omitted (e.g. due to flag "c" (confidential)).
-        # So, in principle we could add up all components, only when all of them are informed.
-        # TODO: Reconsider this choice if this loses much data, e.g. when some components are missing simply because they are irrelevant for a specific country.
-        # For now, select "All bands" and the components datasets.
-        tb = (
-            tb[tb["consumption_band"] == "All bands"]
-            .drop(columns=["consumption_band"], errors="raise")
-            .reset_index(drop=True)
-        )
-
-        # Check that the total price obtained by summing all components is similar to the price obtained in the prices dataset.
-        # NOTE: Uncomment to perform some visual checks.
-        #  See conclusions in the following function to understand the choices.
-        # compare_components_and_prices_data(tb=tb)
-
-        # Select the components datasets only.
-        tb = tb[tb["dataset_code"].isin(["nrg_pc_202_c", "nrg_pc_203_c", "nrg_pc_204_c", "nrg_pc_205_c"])].reset_index(
-            drop=True
-        )
-
-        return tb
-
     # Select and prepare relevant data.
     tb = select_and_prepare_relevant_data(tb=tb)
 
-    # Improve table format.
-    tb = tb.format(["country", "year"])
+    # Create a wide table.
+    tb_flat = tb.pivot(
+        index=["country", "year"],
+        columns=["source", "consumer_type", "price_component", "currency"],
+        values="value",
+        join_column_levels_with="-",
+    )
+
+    # Improve table formats.
+    tb = tb.format(["country", "year", "source", "consumer_type", "currency", "price_component"])
+    tb_flat = tb_flat.format(short_name="gas_and_electricity_prices_flat")
 
     #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
+    # Create a new garden dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb, tb_flat], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
