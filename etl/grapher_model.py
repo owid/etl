@@ -259,6 +259,10 @@ class User(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     lastSeen: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
+    @classmethod
+    def load_user(cls, session: Session, full_name: str) -> Optional["User"]:
+        return session.scalars(select(cls).where(cls.fullName == full_name)).one_or_none()
+
 
 class ChartRevisions(Base):
     __tablename__ = "chart_revisions"
