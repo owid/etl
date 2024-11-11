@@ -1,6 +1,5 @@
 from typing import Dict, List
 
-import numpy as np
 import pandas as pd
 import structlog
 from sklearn.ensemble import IsolationForest
