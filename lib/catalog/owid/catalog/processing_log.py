@@ -69,6 +69,8 @@ class ProcessingLog(List[LogEntry]):
     __args__ = (LogEntry,)
 
     def __init__(self, entries: List[LogEntry | Dict[str, Any]] = []):
+        # Accept both LogEntry and dict when initializing, i.e. ProcessingLog([{"variable": "foo", ...}]) returns a list
+        # of LogEntry objects.
         super().__init__([entry if isinstance(entry, LogEntry) else LogEntry.from_dict(entry) for entry in entries])
 
     # NOTE: calling this method `as_dict` is intentional, otherwise it gets called
