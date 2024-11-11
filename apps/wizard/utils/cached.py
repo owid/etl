@@ -177,6 +177,7 @@ def load_latest_population():
 
 @st.cache_data
 def get_tailscale_ip_to_user_map():
+    """Get the mapping of Tailscale IPs to user display names."""
     proc = subprocess.run(["tailscale", "status", "--json"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     if proc.returncode != 0:
@@ -205,6 +206,7 @@ def get_tailscale_ip_to_user_map():
 
 @st.cache_data
 def get_grapher_user_id(user_ip: str) -> Optional[int]:
+    """Get the Grapher user ID associated with the given Tailscale IP address."""
     # Get Tailscale IP-to-User mapping
     ip_to_user_map = get_tailscale_ip_to_user_map()
 
