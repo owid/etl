@@ -45,6 +45,10 @@ tables:
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
+          entityAnnotationsMap: |
+            <%- if cause == 'Maternal conditions' -%>
+            'United States: Values from 2003–2017 affected by measurement change'
+            <%- endif -%>
         presentation:
           grapher_config:
             note: |-
