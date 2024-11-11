@@ -68,6 +68,11 @@ class ProcessingLog(List[LogEntry]):
     # hack for dataclasses_json
     __args__ = (LogEntry,)
 
+    def __init__(self, entries: List[LogEntry | Dict[str, Any]] = []):
+        # Accept both LogEntry and dict when initializing, i.e. ProcessingLog([{"variable": "foo", ...}]) returns a list
+        # of LogEntry objects.
+        super().__init__([entry if isinstance(entry, LogEntry) else LogEntry.from_dict(entry) for entry in entries])
+
     # NOTE: calling this method `as_dict` is intentional, otherwise it gets called
     # by dataclass_json
     def as_dict(self) -> List[Dict[str, Any]]:
@@ -331,7 +336,7 @@ def _add_upstream_channels(data_dir: Path, pl: ProcessingLog) -> ProcessingLog:
     from owid.catalog import Dataset
 
     # reverse processing log to traverse backwards
-    pl = ProcessingLog(pl[::-1])
+    pl = ProcessingLog(pl[::-1])  # type: ignore
     new_pl = []
 
     seen_parents_variables = set()

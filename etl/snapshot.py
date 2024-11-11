@@ -4,17 +4,17 @@ import re
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, Optional, Union
+from typing import Any, Iterator, Optional, Union
 
 import owid.catalog.processing as pr
 import pandas as pd
 import structlog
 import yaml
-from dataclasses_json import dataclass_json
 from owid.catalog import Table, s3_utils
 from owid.catalog.meta import (
     DatasetMeta,
     License,
+    MetaBase,
     Origin,
     Source,
     TableMeta,
@@ -287,9 +287,8 @@ class Snapshot:
 
 
 @pruned_json
-@dataclass_json
 @dataclass
-class SnapshotMeta:
+class SnapshotMeta(MetaBase):
     # how we identify the dataset, determined automatically from snapshot path
     namespace: str  # a short source name (usually institution name)
     version: str  # date, `latest` or year (discouraged)
@@ -342,7 +341,7 @@ class SnapshotMeta:
 
         return yaml_dump({"meta": d})  # type: ignore
 
-    def save(self) -> None:
+    def save(self) -> None:  # type: ignore
         self.path.parent.mkdir(exist_ok=True, parents=True)
         with open(self.path, "w") as f:
             f.write(self.to_yaml())
@@ -407,13 +406,6 @@ class SnapshotMeta:
             raise ValueError(f"Snapshot {self.uri} hasn't been added to DVC yet")
         assert len(self.outs) == 1
         return self.outs[0]["md5"]
-
-    def to_dict(self) -> Dict[str, Any]:
-        ...
-
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "SnapshotMeta":
-        ...
 
     def fill_from_backport_snapshot(self, snap_config_path: Path) -> None:
         """Load metadat from backported snapshot.
