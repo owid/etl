@@ -484,11 +484,14 @@ def anomaly_detection(
         dataset_variable_ids[variable.datasetId].append(variable)
 
     for dataset_id, variables_in_dataset in dataset_variable_ids.items():
+        # Limit variables to max 100, more than that is hard to process
+        variables_in_dataset = variables_in_dataset[:1000]
+
         # Get dataset's checksum
         with Session(engine) as session:
             dataset = gm.Dataset.load_dataset(session, dataset_id)
 
-        log.info("loading_data.start")
+        log.info("loading_data.start", variables=len(variables_in_dataset))
         variables_old = [
             variables[variable_id_old]
             for variable_id_old in variable_mapping.keys()
@@ -658,7 +661,7 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
 
     # Sort data (which may be needed for some detectors).
     # NOTE: Here, we first convert the entity_name to string, because otherwise the sorting will be based on categorical order (which can be arbitrary).
-    df = df.astype({"entity_name": str}).sort_values(INDEX_COLUMNS).reset_index(drop=True)
+    df = df.astype({"entity_name": "string[pyarrow]"}).sort_values(INDEX_COLUMNS).reset_index(drop=True)
 
     return df
 
