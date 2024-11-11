@@ -485,7 +485,7 @@ def anomaly_detection(
 
     for dataset_id, variables_in_dataset in dataset_variable_ids.items():
         # Limit variables to max 100, more than that is hard to process
-        variables_in_dataset = variables_in_dataset[:1000]
+        # variables_in_dataset = variables_in_dataset[:100]
 
         # Get dataset's checksum
         with Session(engine) as session:
