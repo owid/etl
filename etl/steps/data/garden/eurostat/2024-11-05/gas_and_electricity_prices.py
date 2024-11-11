@@ -480,11 +480,24 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
         show_full_warning=True,
     )
 
+    # Drop unnecessary columns.
+    tb = tb.drop(columns=["flag", "dataset_code", "year-semester", "dataset_name"], errors="raise")
+
     # It would be confusing to keep different national currencies, so, keep only Euro and PPS.
     tb = tb[tb["currency"].isin(["Euro", "PPS"])].reset_index(drop=True)
 
-    # Drop unnecessary columns.
-    tb = tb.drop(columns=["flag", "dataset_code", "year-semester", "dataset_name"], errors="raise")
+    # Separate euros and PPS in two different columns.
+    tb = (
+        tb[tb["currency"] == "Euro"]
+        .drop(columns=["currency"])
+        .merge(
+            tb[tb["currency"] == "PPS"].drop(columns=["currency"]),
+            how="outer",
+            on=["country", "year", "source", "price_component", "consumer_type"],
+            suffixes=("_euro", "_pps"),
+        )
+        .rename(columns={"value_euro": "price_euro", "value_pps": "price_pps"}, errors="raise")
+    )
 
     return tb
 
@@ -520,24 +533,34 @@ def run(dest_dir: str) -> None:
     # Select and prepare relevant data.
     tb = select_and_prepare_relevant_data(tb=tb)
 
-    # Create a wide table.
-    tb_flat = tb.pivot(
+    # Create wide tables for the price in euros and in PPS.
+    tb_euro_flat = tb.pivot(
         index=["country", "year"],
-        columns=["source", "consumer_type", "price_component", "currency"],
-        values="value",
+        columns=["source", "consumer_type", "price_component"],
+        values="price_euro",
+        join_column_levels_with="-",
+    )
+    tb_pps_flat = tb.pivot(
+        index=["country", "year"],
+        columns=["source", "consumer_type", "price_component"],
+        values="price_pps",
         join_column_levels_with="-",
     )
 
     # Improve table formats.
-    tb = tb.format(["country", "year", "source", "consumer_type", "currency", "price_component"])
-    tb_flat = tb_flat.format(short_name="gas_and_electricity_prices_flat")
+    tb = tb.format(["country", "year", "source", "consumer_type", "price_component"])
+    tb_euro_flat = tb_euro_flat.format(short_name="gas_and_electricity_prices_euro_flat")
+    tb_pps_flat = tb_pps_flat.format(short_name="gas_and_electricity_prices_pps_flat")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb, tb_flat], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=[tb, tb_euro_flat, tb_pps_flat],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
