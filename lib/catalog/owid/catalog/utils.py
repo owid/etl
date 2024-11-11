@@ -272,7 +272,10 @@ def hash_any(x: Any) -> int:
 
 
 def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
-    """Recursively create an instance of a dataclass from a dictionary."""
+    """Recursively create an instance of a dataclass from a dictionary. We've implemented custom
+    method because original dataclasses_json.from_dict was too slow (this gives us more than 2x
+    speedup). See https://github.com/owid/etl/pull/3517#issuecomment-2468084380 for more details.
+    """
     if d is None or not dataclasses.is_dataclass(cls) or not isinstance(d, dict):
         return d  # type: ignore
 
