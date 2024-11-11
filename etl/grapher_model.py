@@ -254,14 +254,15 @@ class User(Base):
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     isActive: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     fullName: Mapped[str] = mapped_column(VARCHAR(255))
+    githubUsername: Mapped[str] = mapped_column(VARCHAR(255))
     password: Mapped[Optional[str]] = mapped_column(VARCHAR(128))
     lastLogin: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     lastSeen: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
     @classmethod
-    def load_user(cls, session: Session, full_name: str) -> Optional["User"]:
-        return session.scalars(select(cls).where(cls.fullName == full_name)).one_or_none()
+    def load_user(cls, session: Session, github_username: str) -> Optional["User"]:
+        return session.scalars(select(cls).where(cls.githubUsername == github_username)).one_or_none()
 
 
 class ChartRevisions(Base):
