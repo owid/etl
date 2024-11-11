@@ -8,10 +8,13 @@ from typing import Any, Dict, Optional, Type, TypeVar, Union, get_args, get_orig
 
 import dynamic_yaml
 import pytz
+import structlog
 import yaml
 from unidecode import unidecode
 
 T = TypeVar("T")
+
+log = structlog.get_logger()
 
 
 def prune_dict(d: dict) -> dict:
@@ -314,12 +317,14 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
             try:
                 init_args[field_name] = field_type(v)
             except ValueError as e:
-                # HACK 2024-11-08: we got invalid type into one of the fields, remove it when we fix it
-                # on all staging servers
-                if "invalid literal for int() with base 10: '2020" in str(e):
-                    init_args[field_name] = int(v.replace('"', ""))
-                else:
-                    raise e
+                log.error(
+                    "conversion.failed",
+                    field_name=field_name,
+                    field_type=field_type,
+                    path=f"{d.get('channel')}/{d.get('namespace')}/{d.get('version')}/{d.get('short_name')}",
+                    error=str(e),
+                )
+                continue
         else:
             init_args[field_name] = v
 
