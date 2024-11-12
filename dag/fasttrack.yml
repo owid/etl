@@ -242,3 +242,5 @@ steps:
     - snapshot://fasttrack/latest/simon_ehrlich_wager.csv
   data://grapher/fasttrack/latest/mineral_prices_usgs:
     - snapshot://fasttrack/latest/mineral_prices_usgs.csv
+  data://grapher/fasttrack/latest/useful_energy_cost_way:
+    - snapshot://fasttrack/latest/useful_energy_cost_way.csv

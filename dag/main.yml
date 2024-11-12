@@ -83,13 +83,21 @@ steps:
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # Homicide - UNODC - current
+  # Homicide - UNODC - to archive
   data://meadow/homicide/2023-07-04/unodc:
     - snapshot://homicide/2023-07-04/unodc.xlsx
   data://garden/homicide/2023-07-04/unodc:
     - data://meadow/homicide/2023-07-04/unodc
   data://grapher/homicide/2023-07-04/unodc:
     - data://garden/homicide/2023-07-04/unodc
+
+    # Homicide - UNODC - update
+  data://meadow/homicide/2024-10-30/unodc:
+    - snapshot://homicide/2024-10-30/unodc.xlsx
+  data://garden/homicide/2024-10-30/unodc:
+    - data://meadow/homicide/2024-10-30/unodc
+  data://grapher/homicide/2024-10-30/unodc:
+    - data://garden/homicide/2024-10-30/unodc
 
   #
   # UN
@@ -817,6 +825,14 @@ steps:
   data://grapher/itopf/2024-10-16/oil_spills:
     - data://garden/itopf/2024-10-16/oil_spills
 
+# UN SD census data
+  data://meadow/un/2024-10-21/census_dates:
+    - snapshot://un/2024-10-21/census_dates.csv
+  data://garden/un/2024-10-21/census_dates:
+    - data://meadow/un/2024-10-21/census_dates
+  data://grapher/un/2024-10-21/census_dates:
+    - data://garden/un/2024-10-21/census_dates
+
 #  World Peace Foundation - Famines
   data://meadow/wpf/2024-10-03/famines:
     - snapshot://wpf/2024-10-03/famines.xlsx
@@ -859,6 +875,14 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/owid/latest/population_explore:
     - data-private://garden/owid/latest/population_explore
+
+  data-private://meadow/owid/latest/ig_countries:
+    - snapshot-private://owid/latest/ig_countries.csv
+  data-private://garden/owid/latest/ig_countries:
+    - data-private://meadow/owid/latest/ig_countries
+  data-private://grapher/owid/latest/ig_countries:
+    - data-private://garden/owid/latest/ig_countries
+
 
 include:
   - dag/open_numbers.yml
