@@ -3,6 +3,21 @@ tables:
     variables:
       prevalence_of_overweight_among_adults__bmi__gt__25__age_standardized_estimate__pct:
         title: Share of adults who are overweight (age-standardized)
+  maternal_mortality_ratio__per_100_000_live_births:
+    variables:
+      maternal_mortality_ratio__per_100_000_live_births:
+        display:
+          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
+  maternal_mortality_ratio__per_100_000_live_births__country_reported_estimates:
+    variables:
+      maternal_mortality_ratio__per_100_000_live_births__country_reported_estimates:
+        display:
+          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
+  number_of_maternal_deaths:
+    variables:
+      number_of_maternal_deaths:
+        display:
+          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
   stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates:
     variables:
       stunting_prevalence_among_children_under_5_years_of_age__pct_height_for_age__lt__2_sd__model_based_estimates:
