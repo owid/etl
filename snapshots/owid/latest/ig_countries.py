@@ -1,6 +1,11 @@
 """Script to create a snapshot of dataset.
 
 File lives in GD: https://docs.google.com/spreadsheets/d/1SY7K_hyMtJUhyXDtQQwXAHgSNl22vrOqR6e3RljEU9I/edit?gid=917952968#gid=917952968
+
+Example execution:
+
+    python snapshots/owid/latest/ig_countries.py --path-to-file snapshots/owid/latest/countries.csv
+    etlr ig_countries --private
 """
 
 from pathlib import Path

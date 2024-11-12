@@ -22,6 +22,6 @@ meta:
 
   is_public: false
 outs:
-  - md5: 7434f01a640b844b58ac03ade23c520e
-    size: 5164
+  - md5: ec13666b8ad90755ca913d8ad90a943d
+    size: 5399
     path: ig_countries.csv
