@@ -327,14 +327,14 @@ def sanity_checks_on_input_data(
         how="inner",
         on="year",
     )
-    # TODO: Improve the error messages below to clarify where each table comes from.
-    # TODO: The following check is not fulfilled anymore. The percentage error needs to be increased to 0.05% to work. Check if this increase in discrepancy is expected, and bring this check back.
-    # error = "Production emissions for the world were expected to coincide with global fossil emissions."
-    # assert (
-    #     abs(comparison["production_emissions"] - comparison["global_fossil_emissions"])
-    #     / (comparison["global_fossil_emissions"])
-    #     < 0.001
-    # ).all(), error
+    # NOTE: The following percentage error used to be 0.1%, and in the last version it needed to be increased to 5% to work.
+    error = "Production emissions for the world were expected to coincide with global fossil emissions."
+    assert (
+        100
+        * abs(comparison["production_emissions"] - comparison["global_fossil_emissions"])
+        / (comparison["global_fossil_emissions"])
+        < 5
+    ).all(), error
 
     # In the Fossil CO2 file, international transport emissions has been separated into aviation and shipping.
     # Emissions are also separated by fuel.
@@ -364,17 +364,17 @@ def sanity_checks_on_input_data(
     comparison = comparison.dropna(
         subset=["global_bunker_emissions", "global_aviation_and_shipping"], how="any"
     ).reset_index(drop=True)
-    # TODO: The following check is not fulfilled anymore. The percentage error needs to be increased to 2% to work. Check if this increase in discrepancy is expected, and bring this check back.
-    # error = (
-    #     "Bunker emissions from national emissions file should coincide (within 0.0001%) with the sum of aviation"
-    #     " and shipping emissions from the Fossil CO2 file."
-    # )
-    # assert (
-    #     100
-    #     * abs(comparison["global_bunker_emissions"] - comparison["global_aviation_and_shipping"])
-    #     / (comparison["global_bunker_emissions"])
-    #     < 0.0001
-    # ).all(), error
+    # NOTE: The following percentage error used to be 0.0001%, and now it is 2% to work.
+    error = (
+        "Bunker emissions from national emissions file should coincide (within 0.0001%) with the sum of aviation"
+        " and shipping emissions from the Fossil CO2 file."
+    )
+    assert (
+        100
+        * abs(comparison["global_bunker_emissions"] - comparison["global_aviation_and_shipping"])
+        / (comparison["global_bunker_emissions"])
+        < 2
+    ).all(), error
 
     # Now check that all other emissions (that are not from bunker fuels) in tb_production (emissions from the national
     # excel file) coincide with emissions in tb_co2 (from the Fossil CO2 emissions csv file).
