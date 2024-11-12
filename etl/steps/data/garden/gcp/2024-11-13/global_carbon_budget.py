@@ -227,6 +227,16 @@ def run(dest_dir: str) -> None:
         ds_income_groups=ds_income_groups,
     )
 
+    ####################################################################################################################
+    # The data for emissions from other industry is quite sparse.
+    # This causes the share of emissions to have spurious jumps (because during some years only a few countries are informed). You can easily see these jumps for China and US. From 1990 on, more countries are informed, and therefore the data is more reliable. So I will set the share of emissions from other industry to None for years before 1990.
+    tb_combined.loc[(tb_combined["year"] < 1990), "emissions_from_other_industry_as_share_of_global"] = None
+    tb_combined.loc[(tb_combined["year"] < 1990), "cumulative_emissions_from_other_industry_as_share_of_global"] = None
+    ####################################################################################################################
+
+    # Set an appropriate index, ensure there are no rows that only have nan, and sort conveniently.
+    tb_combined = tb_combined.format(sort_columns=True, short_name=paths.short_name)
+
     # Run sanity checks on output data.
     sanity_checks_on_output_data(tb_combined)
 
@@ -1130,13 +1140,9 @@ def combine_data_and_add_variables(
         drop=True
     )
 
-    # Set an appropriate index, ensure there are no rows that only have nan, and sort conveniently.
-    tb_co2_with_regions = tb_co2_with_regions.set_index(["country", "year"], verify_integrity=True)
-    tb_co2_with_regions = (
-        tb_co2_with_regions.dropna(subset=tb_co2_with_regions.columns, how="all").sort_index().sort_index(axis=1)
+    # Ensure that there are no rows that only have nan values.
+    tb_co2_with_regions = tb_co2_with_regions.dropna(
+        subset=tb_co2_with_regions.drop(columns=["country", "year"]).columns, how="all"
     )
-
-    # Rename table.
-    tb_co2_with_regions.metadata.short_name = paths.short_name
 
     return tb_co2_with_regions
