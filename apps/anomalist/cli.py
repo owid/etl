@@ -62,6 +62,12 @@ memory = Memory(CACHE_DIR, verbose=0)
     type=bool,
     help="Drop anomalies table and recreate it. This is useful for development when the schema changes.",
 )
+@click.option(
+    "--sample-n",
+    type=int,
+    default=500,
+    help="Sample at most N variables from a dataset",
+)
 def cli(
     anomaly_types: Optional[Tuple[str, ...]],
     dataset_ids: Optional[list[int]],
@@ -70,6 +76,7 @@ def cli(
     dry_run: bool,
     force: bool,
     reset_db: bool,
+    sample_n: Optional[int],
 ) -> None:
     """TBD
 
@@ -140,6 +147,7 @@ def cli(
         dry_run=dry_run,
         force=force,
         reset_db=reset_db,
+        sample_n=sample_n,
     )
 
 

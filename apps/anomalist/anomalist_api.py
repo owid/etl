@@ -1,3 +1,4 @@
+import random
 import tempfile
 import time
 from pathlib import Path
@@ -445,6 +446,7 @@ def anomaly_detection(
     dry_run: bool = False,
     force: bool = False,
     reset_db: bool = False,
+    sample_n: Optional[int] = None,
 ) -> None:
     """Detect anomalies."""
     engine = get_engine()
@@ -484,8 +486,9 @@ def anomaly_detection(
         dataset_variable_ids[variable.datasetId].append(variable)
 
     for dataset_id, variables_in_dataset in dataset_variable_ids.items():
-        # Limit variables to max 100, more than that is hard to process
-        # variables_in_dataset = variables_in_dataset[:100]
+        # Limit the number of variables.
+        if sample_n and len(variables_in_dataset) > sample_n:
+            variables_in_dataset = _sample_variables(variables_in_dataset, sample_n)
 
         # Get dataset's checksum
         with Session(engine) as session:
@@ -700,3 +703,29 @@ def combine_and_reduce_scores_df(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
     # df = df.astype({"year": int})
 
     return df_reduced
+
+
+def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]:
+    """Sample n variables. Prioritize variables that are used in charts, then fill the rest
+    with random variables."""
+    if len(variables) <= n:
+        return variables
+
+    # Include all variables that are used in charts.
+    df_views = get_variables_views_in_charts(variable_ids=[v.id for v in variables])
+    sample_ids = set(df_views.sort_values("views_365d", ascending=False).head(n)["variable_id"])
+
+    # Fill the rest with random variables.
+    unused_ids = list(set(v.id for v in variables) - sample_ids)
+    random.seed(1)
+    random.shuffle(unused_ids)
+
+    if len(sample_ids) < n:
+        sample_ids |= set(np.random.choice(unused_ids, n - len(sample_ids), replace=False))
+
+    log.info(
+        "sampling_variables",
+        original_n=len(variables),
+        new_n=len(sample_ids),
+    )
+    return [v for v in variables if v.id in sample_ids]

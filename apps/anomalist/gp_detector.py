@@ -100,6 +100,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             return pd.DataFrame()
 
         # Create a processing queue with (entity_name, variable_id) pairs
+        # TODO: we could make probabilities proportional to "relevance" score in anomalist
         items = _processing_queue(
             items=list(df_wide.index.unique()),
         )
