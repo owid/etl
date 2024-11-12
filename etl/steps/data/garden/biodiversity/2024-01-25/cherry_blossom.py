@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 def run(dest_dir: str) -> None:
     log.info("cherry_blossom.start")
 
-    # read dataset from meadow
+    # Read dataset from meadow.
     ds_meadow = paths.load_dataset("cherry_blossom")
     tb = ds_meadow.read_table("cherry_blossom")
 

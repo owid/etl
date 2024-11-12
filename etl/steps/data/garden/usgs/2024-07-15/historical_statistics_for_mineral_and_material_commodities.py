@@ -330,7 +330,7 @@ def prepare_us_production(tb: Table, tb_metadata: Table) -> Table:
         mapping={"W": None},
         warn_on_missing_mappings=False,
         warn_on_unused_mappings=True,
-    ).astype({"production": float})
+    ).astype({"production": "float64[pyarrow]"})
     # Add notes to the table, using the extracted metadata.
     for column in ["production"]:
         mask = tb_metadata[column].notnull()

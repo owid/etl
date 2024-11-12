@@ -16,8 +16,8 @@ def test_repack_non_object_columns():
     df2 = df.copy()
     df2 = repack.repack_frame(df2, {})
 
-    assert df2.myint.dtype.name == "uint8"
-    assert df2.myfloat.dtype.name == "float32"
+    assert df2.myint.dtype.name == "uint8[pyarrow]"
+    assert df2.myfloat.dtype.name == "float[pyarrow]"
     assert_frame_equal(df, df2, check_dtype=False)
 
 
@@ -27,6 +27,9 @@ def test_repack_object_columns():
             "myint": [1, 2, None, 3],
             "myfloat": [1.2, 2.0, 3.0, None],
             "mycat": ["a", None, "b", "c"],
+            "myintstr": [1, 2, 3, "4"],
+            "nans1": [1, 2, 3, pd.NA],
+            "nans2": [1, 2.1, 3, np.nan],
         },
         dtype="object",
     )
@@ -34,9 +37,12 @@ def test_repack_object_columns():
     df_repack = df.copy()
 
     df_repack = repack.repack_frame(df_repack)
-    assert df_repack.myint.dtype.name == "UInt8"
-    assert df_repack.myfloat.dtype.name == "float32"
+    assert df_repack.myint.dtype.name == "uint8[pyarrow]"
+    assert df_repack.myfloat.dtype.name == "float[pyarrow]"
     assert df_repack.mycat.dtype.name == "category"
+    assert df_repack.myintstr.dtype.name == "uint8[pyarrow]"
+    assert df_repack.nans1.dtype.name == "uint8[pyarrow]"
+    assert df_repack.nans2.dtype.name == "float[pyarrow]"
 
 
 def test_repack_frame_with_index():
@@ -57,19 +63,19 @@ def test_repack_frame_with_index():
 def test_repack_integer_strings():
     s = pd.Series(["1", "2", "3", None])
     v = repack.repack_series(s)
-    assert v.dtype.name == "UInt8"
+    assert v.dtype.name == "uint8[pyarrow]"
 
 
 def test_repack_float_strings():
     s = pd.Series(["10", "22.2", "30"])
     v = repack.repack_series(s)
-    assert v.dtype.name == "float32"
+    assert v.dtype.name == "float[pyarrow]"
 
 
 def test_repack_uint64():
     s = pd.Series([10, 20], dtype="uint64")
     v = repack.repack_series(s)
-    assert v.dtype.name == "uint8"
+    assert v.dtype.name == "uint8[pyarrow]"
 
 
 def test_repack_int8_boundaries():
@@ -78,15 +84,15 @@ def test_repack_int8_boundaries():
 
     # check the lower boundary
     s[0] = info.min
-    assert repack.repack_series(s).dtype.name == "int8"
+    assert repack.repack_series(s).dtype.name == "int8[pyarrow]"
     s[0] -= 1
-    assert repack.repack_series(s).dtype.name == "int16"
+    assert repack.repack_series(s).dtype.name == "int16[pyarrow]"
 
     # check the upper boundary
     s[0] = info.max
-    assert repack.repack_series(s).dtype.name == "int8"
+    assert repack.repack_series(s).dtype.name == "int8[pyarrow]"
     s[0] += 1
-    assert repack.repack_series(s).dtype.name == "int16"
+    assert repack.repack_series(s).dtype.name == "int16[pyarrow]"
 
 
 def test_repack_int16_boundaries():
@@ -95,15 +101,15 @@ def test_repack_int16_boundaries():
 
     # check the lower boundary
     s[0] = info.min
-    assert repack.repack_series(s).dtype.name == "int16"
+    assert repack.repack_series(s).dtype.name == "int16[pyarrow]"
     s[0] -= 1
-    assert repack.repack_series(s).dtype.name == "int32"
+    assert repack.repack_series(s).dtype.name == "int32[pyarrow]"
 
     # check the upper boundary
     s[0] = info.max
-    assert repack.repack_series(s).dtype.name == "int16"
+    assert repack.repack_series(s).dtype.name == "int16[pyarrow]"
     s[0] += 1
-    assert repack.repack_series(s).dtype.name == "int32"
+    assert repack.repack_series(s).dtype.name == "int32[pyarrow]"
 
 
 def test_repack_int32_boundaries():
@@ -112,15 +118,15 @@ def test_repack_int32_boundaries():
 
     # check the lower boundary
     s[0] = info.min
-    assert repack.repack_series(s).dtype.name == "int32"
+    assert repack.repack_series(s).dtype.name == "int32[pyarrow]"
     s[0] -= 1
-    assert repack.repack_series(s).dtype.name == "int64"
+    assert repack.repack_series(s).dtype.name == "int64[pyarrow]"
 
     # check the upper boundary
     s[0] = info.max
-    assert repack.repack_series(s).dtype.name == "int32"
+    assert repack.repack_series(s).dtype.name == "int32[pyarrow]"
     s[0] += 1
-    assert repack.repack_series(s).dtype.name == "int64"
+    assert repack.repack_series(s).dtype.name == "int64[pyarrow]"
 
 
 def test_repack_uint_boundaries():
@@ -128,53 +134,53 @@ def test_repack_uint_boundaries():
     # uint8
     info: Any = np.iinfo(np.uint8)
     s[0] = info.max
-    assert repack.repack_series(s).dtypes.name == "uint8"
+    assert repack.repack_series(s).dtypes.name == "uint8[pyarrow]"
 
     s[0] += 1
-    assert repack.repack_series(s).dtypes.name == "uint16"
+    assert repack.repack_series(s).dtypes.name == "uint16[pyarrow]"
 
     # uint16
     info2: Any = np.iinfo(np.uint16)
     s[0] = info2.max
-    assert repack.repack_series(s).dtypes.name == "uint16"
+    assert repack.repack_series(s).dtypes.name == "uint16[pyarrow]"
 
     s[0] += 1
-    assert repack.repack_series(s).dtypes.name == "uint32"
+    assert repack.repack_series(s).dtypes.name == "uint32[pyarrow]"
 
     # uint32
     info3: Any = np.iinfo(np.uint32)
     s[0] = info3.max
-    assert repack.repack_series(s).dtypes.name == "uint32"
+    assert repack.repack_series(s).dtypes.name == "uint32[pyarrow]"
 
     # we don't bother using uint64, we just use int64
     s[0] += 1
-    assert repack.repack_series(s).dtypes.name == "int64"
+    assert repack.repack_series(s).dtypes.name == "int64[pyarrow]"
 
 
 def test_repack_int():
     s = pd.Series([1, 2, None, 3]).astype("object")
     v = repack.repack_series(s)
-    assert v.dtype == "UInt8"
+    assert v.dtype == "uint8[pyarrow]"
 
 
 def test_repack_int_no_null():
     s = pd.Series([1, 2, 3]).astype("object")
     v = repack.repack_series(s)
-    assert v.dtype == "uint8"
+    assert v.dtype == "uint8[pyarrow]"
 
 
 def test_repack_float_to_int():
     s = pd.Series([1, 2, None, 3])
     assert s.dtype == "float64"
     v = repack.repack_series(s)
-    assert v.dtype == "UInt8"
+    assert v.dtype == "uint8[pyarrow]"
 
 
 def test_repack_float_object_to_float32():
     s = pd.Series([1, 2, None, 3.3], dtype="object")
 
     v = repack.repack_series(s)
-    assert v.dtype == "float32"
+    assert v.dtype == "float[pyarrow]"
 
 
 def test_repack_category():
@@ -188,13 +194,13 @@ def test_repack_category():
 def test_shrink_integers_uint8():
     s = pd.Series([1, 2, 3], dtype="Int64")
     v = repack.shrink_integer(s)
-    assert v.dtype.name == "uint8"
+    assert v.dtype.name == "uint8[pyarrow]"
 
 
 def test_shrink_integers_int8():
     s = pd.Series([1, 2, 3, -3], dtype="Int64")
     v = repack.shrink_integer(s)
-    assert v.dtype.name == "int8"
+    assert v.dtype.name == "int8[pyarrow]"
 
 
 def test_repack_frame_keep_dtypes():
@@ -204,19 +210,19 @@ def test_repack_frame_keep_dtypes():
     df2 = repack.repack_frame(df2, dtypes={"myint": float})
 
     assert df2.myint.dtype.name == "float64"
-    assert df2.myfloat.dtype.name == "float32"
+    assert df2.myfloat.dtype.name == "float[pyarrow]"
 
 
 def test_repack_int64_all_nans():
     s = pd.Series([np.nan, np.nan, np.nan], dtype="Int64")
     v = repack.repack_series(s)
-    assert v.dtype.name == "Int8"
+    assert v.dtype.name == "int8[pyarrow]"
 
 
 def test_repack_float64_all_nans():
     s = pd.Series([np.nan, np.nan, np.nan], dtype="float64")
     v = repack.repack_series(s)
-    assert v.dtype.name == "Int8"
+    assert v.dtype.name == "int8[pyarrow]"
 
 
 def test_series_eq():
@@ -238,7 +244,7 @@ def test_repack_object_np_str():
 def test_repack_with_inf():
     s = pd.Series([0, np.inf], dtype=object)
     v = repack.repack_series(s)
-    assert v.dtype.name == "float32"
+    assert v.dtype.name == "float[pyarrow]"
 
 
 def test_repack_with_datetime():
@@ -273,11 +279,10 @@ def test_to_safe_types():
     df_safe = repack.to_safe_types(df)
 
     # Check that the dtypes have been converted appropriately
-    assert df_safe.index.dtype == "Int64"
-    assert df_safe["float_col"].dtype == "Float64"
-    assert df_safe["cat_col"].dtype == "string[python]"
-    # 'object_col' should remain unchanged
-    assert df_safe["object_col"].dtype == "object"
+    assert df_safe.index.dtype == "int64[pyarrow]"
+    assert df_safe["float_col"].dtype == "float64[pyarrow]"
+    assert df_safe["cat_col"].dtype == "string[pyarrow]"
+    assert df_safe["object_col"].dtype == "string[pyarrow]"
 
 
 def test_to_safe_types_multiindex():
@@ -295,10 +300,10 @@ def test_to_safe_types_multiindex():
     df_safe = repack.to_safe_types(df)
 
     # Check index levels
-    assert df_safe.index.levels[0].dtype == "Int64"  # type: ignore
-    assert df_safe.index.levels[1].dtype == "string[python]"  # type: ignore
+    assert df_safe.index.levels[0].dtype == "int64[pyarrow]"  # type: ignore
+    assert df_safe.index.levels[1].dtype == "string[pyarrow]"  # type: ignore
     # Check column dtype
-    assert df_safe["float_col"].dtype == "Float64"
+    assert df_safe["float_col"].dtype == "float64[pyarrow]"
 
 
 def test_to_safe_types_with_nan():
@@ -316,9 +321,9 @@ def test_to_safe_types_with_nan():
     df_safe = repack.to_safe_types(df)
 
     # Check that NaN values are handled correctly
-    assert df_safe.index.dtype == "Float64"
-    assert df_safe["int_col"].dtype == "Int64"
-    assert df_safe["cat_col"].dtype == "string[python]"
+    assert df_safe.index.dtype == "float64[pyarrow]"
+    assert df_safe["int_col"].dtype == "int64[pyarrow]"
+    assert df_safe["cat_col"].dtype == "string[pyarrow]"
 
     # Ensure that the NA value in 'cat_col' remains pd.NA and not the string "NA"
     assert pd.isna(df_safe["cat_col"].iloc[1])

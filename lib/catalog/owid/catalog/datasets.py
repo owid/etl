@@ -162,7 +162,7 @@ class Dataset:
         :param reset_index: If true, don't set primary keys of the table. This can make loading
             large datasets with multi-indexes much faster.
         :param safe_types: If true, convert numeric columns to Float64 and Int64 and categorical
-            columns to string[python]. This can significantly increase memory usage.
+            columns to string[pyarrow]. This can significantly increase memory usage.
         """
         stem = self.path / Path(name)
 

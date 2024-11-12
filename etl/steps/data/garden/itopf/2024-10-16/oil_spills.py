@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
         )
         # set NaN everywhere except start of a decade
         tb.loc[mask, "decadal_" + str(column)] = tb.loc[mask, "decadal_" + str(column)].where(
-            tb.loc[mask, "year"] % 10 == 0, np.nan
+            tb.loc[mask, "year"].astype(int) % 10 == 0, np.nan
         )
 
     # Replace any '__' in column names with a space (done because of double _ in some variable names)

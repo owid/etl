@@ -27,11 +27,17 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("military_expenditure.xlsx")
 
     # Load data from snapshot.
-    tb_constant_usd = snap.read(sheet_name="Constant (2022) US$", skiprows=5, na_values=["...", "xxx"])
-    tb_constant_usd_regions = snap.read(sheet_name="Regional totals", skiprows=13, na_values=["...", "xxx"])
-    tb_share_gdp = snap.read(sheet_name="Share of GDP", skiprows=5, na_values=["...", "xxx"])
-    tb_per_capita = snap.read(sheet_name="Per capita", skiprows=6, na_values=["...", "xxx"])
-    tb_share_govt_spending = snap.read(sheet_name="Share of Govt. spending", skiprows=7, na_values=["...", "xxx"])
+    tb_constant_usd = snap.read(
+        safe_types=False, sheet_name="Constant (2022) US$", skiprows=5, na_values=["...", "xxx"]
+    )
+    tb_constant_usd_regions = snap.read(
+        safe_types=False, sheet_name="Regional totals", skiprows=13, na_values=["...", "xxx"]
+    )
+    tb_share_gdp = snap.read(safe_types=False, sheet_name="Share of GDP", skiprows=5, na_values=["...", "xxx"])
+    tb_per_capita = snap.read(safe_types=False, sheet_name="Per capita", skiprows=6, na_values=["...", "xxx"])
+    tb_share_govt_spending = snap.read(
+        safe_types=False, sheet_name="Share of Govt. spending", skiprows=7, na_values=["...", "xxx"]
+    )
 
     #
     # Process data.

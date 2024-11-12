@@ -14,11 +14,11 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("lancet_2022.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # Remove all characters after "(" in statin use (confidence boundaries for statin use)
-    tb["statin_use_secondary"] = tb["statin_use_secondary"].str.split("(").str[0].str.strip().astype(float)
-    tb["statin_use_primary"] = tb["statin_use_primary"].str.split("(").str[0].str.strip().astype(float)
+    tb["statin_use_secondary"] = tb["statin_use_secondary"].str.split("(").str[0].str.strip().astype("float[pyarrow]")
+    tb["statin_use_primary"] = tb["statin_use_primary"].str.split("(").str[0].str.strip().astype("float[pyarrow]")
     # Drop rows that contain only NaN values and row with Grenadines (actually belongs to St. Vincent and the Grenadines, row above)
     tb = tb[tb["country"] != "Grenadines"]
     tb = tb.dropna(how="all")

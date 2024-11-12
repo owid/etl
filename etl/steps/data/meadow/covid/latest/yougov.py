@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve aux table
     snap = paths.load_snapshot("yougov_extra_mapping.csv")
-    tb_mapping = snap.read()
+    tb_mapping = snap.read(safe_types=False)
     tb_mapping = process_mapping_table(tb_mapping)
 
     # Retrieve country snapshots.

@@ -179,14 +179,14 @@ def make_monotonic(tb: Table, max_removed_rows=10) -> Table:
 
     tb = tb.sort_values("date")
     metrics = ("total_vaccinations", "people_vaccinated", "people_fully_vaccinated")
-    tb[list(metrics)] = tb[list(metrics)].astype(float)
+    tb[list(metrics)] = tb[list(metrics)].astype("float64[pyarrow]")
     for metric in metrics:
         while not tb[metric].ffill().fillna(0).is_monotonic_increasing:
             diff = tb[metric].ffill().shift(-1) - tb[metric].ffill()
             tb = tb.loc[(diff >= 0) | (diff.isna())]
     dates_now = set(tb.date)
 
-    tb[list(metrics)] = tb[list(metrics)].astype("Int64")
+    tb[list(metrics)] = tb[list(metrics)].astype("int64[pyarrow]")
 
     if max_removed_rows is not None:
         num_removed_rows = n_rows_before - len(tb)

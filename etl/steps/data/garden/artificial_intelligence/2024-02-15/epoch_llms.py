@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("epoch_llms.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb["training_computation_petaflop"] = tb["Approx Compute (FLOP)"] / 1e15
     tb = tb.drop("Approx Compute (FLOP)", axis=1)
     tb["MMLU avg"] *= 100

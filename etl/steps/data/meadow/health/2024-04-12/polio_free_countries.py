@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot and read its data.
     snap = paths.load_snapshot("polio_free_countries.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb = tb.format()
     #
     # Save outputs.
