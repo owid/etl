@@ -11,6 +11,101 @@ paths = PathFinder(__file__)
 YEAR_MIN = 1790
 YEAR_MAX = 1955
 
+# Countries that are relevant for the analysis
+COUNTRIES_RELEVANT = [
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Andorra",
+    "Angola",
+    "Armenia",
+    "Azerbaijan",
+    "Bahrain",
+    "Bangladesh",
+    "Belarus",
+    "British Virgin Islands",
+    "Burundi",
+    "Cambodia",
+    "Cameroon",
+    "Central African Republic",
+    "Chad",
+    "Comoros",
+    "South Korea",
+    "North Korea",
+    "Democratic Republic of Congo",
+    "Djibouti",
+    "Eritrea",
+    "Falkland Islands",
+    "Gabon",
+    "Georgia",
+    "Guam",
+    "Iceland",
+    "India",
+    "Iran",
+    "Iraq",
+    "Iran",
+    "Ireland",
+    "Japan",
+    "Kazakhstan",
+    "Kenya",
+    "Kuwait",
+    "Kyrgyzstan",
+    "Laos",
+    "Latvia",
+    "Libya",
+    "Liechtenstein",
+    "Madagascar",
+    "Malawi",
+    "Mali",
+    "Marshall Islands",
+    "Mauritania",
+    "Micronesia (country)",  # TODO
+    "Namibia",
+    "Nauru",
+    "New Caledonia",
+    "New Zealand",
+    "Niger",
+    "Nigeria",
+    "Niue",
+    # "Northern Mariana Islands",  # TODO
+    # "Palestine",  # TODO
+    "Oman",
+    "Palau",
+    "Paraquay",
+    "Qatar",
+    # "Russia",  # TODO
+    "Rwanda",
+    "Reunion",
+    "Saint Helena",
+    "Saint Kitts and Nevis",
+    "Saint Lucia",
+    "Saint Pierre and Miquelon",
+    "Saint Vincent and the Grenadines",
+    "Samoa",
+    "San Marino",
+    "Sao Tome and Principe",
+    "Saudi Arabia",
+    "Senegal",
+    "Serbia",
+    "Sierra Leone",
+    "Slovakia",
+    "Solomon Islands",
+    "Somalia",
+    "South Africa",
+    "Sudan",
+    "Tajikistan",
+    "Thailand",
+    "Tonga",
+    "Turkmenistan",
+    "Uganda",
+    "Ukraine",
+    "United Arab Emirates",
+    "Uzbekistan",
+    "Vanuatu",
+    "Yemen",
+    "Zambia",
+]
+
 
 def standardize_tb(tb, tb_main, col_population: str = "population"):
     tb = tb.loc[:, ["country", "year", "population"]]
@@ -79,6 +174,9 @@ def run(dest_dir: str) -> None:
     tb["population_hyde_cut"] = tb.loc[tb["year"] <= 1800, "population_hyde"]
     tb["population_gm_cut"] = tb.loc[(tb["year"] >= 1801) & (tb["year"] <= 1950), "population_gm"]
     tb["population_wpp_cut"] = tb.loc[tb["year"] >= 1950, "population_wpp"]
+
+    # Filter relevant countries
+    tb = tb.loc[tb["country"].isin(COUNTRIES_RELEVANT)]
 
     # Format
     tb = tb.format(["country", "year"])
