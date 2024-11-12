@@ -825,6 +825,14 @@ steps:
   data://grapher/itopf/2024-10-16/oil_spills:
     - data://garden/itopf/2024-10-16/oil_spills
 
+# UN SD census data
+  data://meadow/un/2024-10-21/census_dates:
+    - snapshot://un/2024-10-21/census_dates.csv
+  data://garden/un/2024-10-21/census_dates:
+    - data://meadow/un/2024-10-21/census_dates
+  data://grapher/un/2024-10-21/census_dates:
+    - data://garden/un/2024-10-21/census_dates
+
 #  World Peace Foundation - Famines
   data://meadow/wpf/2024-10-03/famines:
     - snapshot://wpf/2024-10-03/famines.xlsx
