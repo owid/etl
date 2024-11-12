@@ -23,3 +23,7 @@ meta:
       name: CC BY 4.0
       url: https://www.icos-cp.eu/data-services/about-data-portal/data-license
   is_public: false
+outs:
+  - md5: 0ac3b67c3f24414f983913a5d227f1cd
+    size: 1592979
+    path: global_carbon_budget_land_use_change_emissions.xlsx
