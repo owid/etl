@@ -288,6 +288,13 @@ steps:
   data://grapher/covid/latest/deaths_vax_status:
     - data://garden/covid/latest/deaths_vax_status
 
+  # Countries reporting data
+  data://garden/covid/latest/countries_reporting:
+    - data://meadow/covid/latest/vaccinations_global
+  data://grapher/covid/latest/countries_reporting:
+    - data://garden/covid/latest/countries_reporting
+
+
   ######################################
   # MULTIDIM
   export://multidim/covid/latest/covid:
