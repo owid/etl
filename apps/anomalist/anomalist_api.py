@@ -90,7 +90,13 @@ def get_variables_views_in_charts(
     if len(df) == 0:
         df = pd.DataFrame(columns=["variable_id", "chart_id", "chart_slug", "views_7d", "views_14d", "views_365d"])
 
-    return df
+    return df.astype(
+        {
+            "views_7d": "Int64",
+            "views_14d": "Int64",
+            "views_365d": "Int64",
+        }
+    ).fillna(0)
 
 
 def renormalize_score(
@@ -393,6 +399,9 @@ def add_analytics_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     # Variables that do not have charts will have an analytics score nan.
     # Fill them with a low value (e.g. 0.1) to avoid zeros when calculating the final score.
     df_reduced["score_analytics"] = df_reduced["score_analytics"].fillna(fillna_value)
+
+    # Fill missing views
+    df_reduced["views"] = df_reduced["views"].fillna(0)
 
     return df_reduced
 
