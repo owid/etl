@@ -533,7 +533,7 @@ def run(dest_dir: str) -> None:
     # Select and prepare relevant data.
     tb = select_and_prepare_relevant_data(tb=tb)
 
-    # Create wide tables for the price in euros and in PPS.
+    # Create a wide table for the price in euros and in PPS.
     tb_euro_flat = tb.pivot(
         index=["country", "year"],
         columns=["source", "consumer_type", "price_component"],
@@ -545,6 +545,10 @@ def run(dest_dir: str) -> None:
         columns=["source", "consumer_type", "price_component"],
         values="price_pps",
         join_column_levels_with="-",
+    )
+    tb_pps_flat = tb_pps_flat.rename(
+        columns={column: f"{column}_pps" for column in tb_pps_flat.drop(columns=["country", "year"]).columns},
+        errors="raise",
     )
 
     # Improve table formats.
