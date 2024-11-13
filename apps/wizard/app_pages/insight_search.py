@@ -249,6 +249,17 @@ embeddings = get_insights_embeddings(insights)
 # Streamlit app layout.
 st.title(":material/search: DI search")
 
+# Other interesting links
+with st.popover("Other resources"):
+    st.markdown(
+        """
+
+        - [**Topic diversity**](http://analytics/private?sql=with+pages+as%28+select+slug+as+topic_page%2C+views[…]c_page+%3D+insights.topic_page+order+by+ratio%2C+views_365d+desc) (Datasette): Check which topics we've covered so far — and which have been neglected — to find new ideas.
+        - **Country diversity** (Instagram): Look at which countries we have referenced in our Instagram posts. IG posts originate from a subset of DIs, therefore these can be a good indicator of which countries we are focusing on.
+            - [Countries covered by Instagram posts](https://admin.owid.io/admin/charts/8259/edit)
+            - [Average country share of mentions in a post](https://admin.owid.io/admin/charts/8260/edit)
+        """
+    )
 # Box for input text.
 input_string = st.text_input(
     label="Enter a word or phrase to find the most similar insights.",
@@ -268,9 +279,10 @@ if input_string:
         #   * Add a color to similarity score.
         #   * Show the part of the text that justifies the score (this may also slow down the search).
 
+        # Filter DIs by publication status
         options = ["All", "Published", "Drafts"]
         selection = st.segmented_control(
-            "Status",
+            "Publication status",
             options,
             selection_mode="single",
             default="All",
@@ -278,7 +290,6 @@ if input_string:
         )
 
         # Filter DIs
-        st.write(selection)
         match selection:
             case "All":
                 filtered_dis = sorted_dis
@@ -290,7 +301,7 @@ if input_string:
                 filtered_dis = sorted_dis
 
         # Use pagination
-        items_per_page = 2000
+        items_per_page = 100
         pagination = Pagination(
             items=filtered_dis,
             items_per_page=items_per_page,
