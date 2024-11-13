@@ -90,20 +90,8 @@ def prepare_land_use_emissions(tb_land_use: Table) -> Table:
     error = "'BLUE' sheet in national land-use change data file has changed (consider changing 'skiprows')."
     assert tb_land_use.columns[1] == "Afghanistan", error
 
-    # Extract quality flag from the zeroth row of the data.
-    # Ignore nans (which happen when a certain country has no data).
-    quality_flag = (
-        tb_land_use.drop(columns=tb_land_use.columns[0])
-        .loc[0]
-        .dropna()
-        .astype(int)
-        .to_frame("quality_flag")
-        .reset_index()
-        .rename(columns={"index": "country"})
-    )
-
-    # Drop the first row, which is for quality factor (which we have already extracted).
-    tb_land_use = tb_land_use.rename(columns={tb_land_use.columns[0]: "year"}).drop(0)
+    # Rename year column.
+    tb_land_use = tb_land_use.rename(columns={tb_land_use.columns[0]: "year"})
 
     # Ignore countries that have no data.
     tb_land_use = tb_land_use.dropna(axis=1, how="all")
@@ -113,15 +101,6 @@ def prepare_land_use_emissions(tb_land_use: Table) -> Table:
 
     # Restructure data to have a column for country and another for emissions.
     tb_land_use = tb_land_use.melt(id_vars="year", var_name="country", value_name="emissions")
-
-    error = "Countries with emissions data differ from countries with quality flag."
-    assert set(tb_land_use["country"]) == set(quality_flag["country"]), error
-
-    # Add quality factor as an additional column.
-    tb_land_use = tb_land_use.merge(quality_flag, how="left", on="country")
-
-    # Copy metadata from another existing variable to the new quality flag.
-    tb_land_use["quality_flag"] = tb_land_use["quality_flag"].copy_metadata(tb_land_use["emissions"])
 
     # Set an index and sort row and columns conveniently.
     tb_land_use = tb_land_use.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)

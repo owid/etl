@@ -461,13 +461,6 @@ tables:
         unit: "tonnes"
         short_unit: "t"
         description_short: "Annual growth in total emissions of carbon dioxide (CO₂), including land-use change, measured in tonnes."
-      land_use_change_quality_flag:
-        title: "Land-use change quality flag"
-        unit: ""
-        short_unit: ""
-        description_short: "The quality flag is 1 if the different estimates of land-use change emissions considered by the Global Carbon Project have a reasonable agreement. Otherwise the quality flag is 0. The flag is also set to zero if not all estimates have data for a given country."
-        description_key:
-          - Carbon dioxide emissions from land use change vary significantly in their degree of certainty.
       pct_growth_emissions_total:
         title: "Annual CO₂ emissions growth (%)"
         unit: "%"

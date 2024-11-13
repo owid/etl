@@ -141,7 +141,6 @@ COLUMNS_THAT_MUST_HAVE_DATA = [
     "emissions_total",
     "consumption_emissions",
     "emissions_from_land_use_change",
-    # 'land_use_change_quality_flag',
 ]
 
 
@@ -933,9 +932,7 @@ def combine_data_and_add_variables(
     tb_co2_with_regions = pr.merge(tb_co2_with_regions, tb_energy, on=["country", "year"], how="left")
 
     # For convenience, rename columns in land-use change emissions data.
-    tb_land_use = tb_land_use.rename(
-        columns={"emissions": "emissions_from_land_use_change", "quality_flag": "land_use_change_quality_flag"}
-    )
+    tb_land_use = tb_land_use.rename(columns={"emissions": "emissions_from_land_use_change"})
 
     # Land-use change data does not include data for the World. Include it by merging with the global dataset.
     tb_land_use = pr.concat(
@@ -961,11 +958,7 @@ def combine_data_and_add_variables(
     # Add region aggregates.
     # Aggregate not only emissions data, but also population, gdp and primary energy.
     # This way we ensure that custom regions (e.g. "North America (excl. USA)") will have all required data.
-    aggregations = {
-        column: "sum"
-        for column in tb_co2_with_regions.columns
-        if column not in ["country", "year", "land_use_change_quality_flag"]
-    }
+    aggregations = {column: "sum" for column in tb_co2_with_regions.columns if column not in ["country", "year"]}
     for region in REGIONS:
         countries_in_region = geo.list_members_of_region(
             region=region,
