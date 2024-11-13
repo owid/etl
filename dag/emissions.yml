@@ -110,8 +110,6 @@ steps:
   #
   # Decoupling of GDP and CO2 (2023).
   #
-  # The data from the following step will be used in this static chart:
-  # https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
   data://garden/emissions/2024-06-20/gdp_and_co2_decoupling:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/gcp/2024-06-20/global_carbon_budget
@@ -141,8 +139,6 @@ steps:
   #
   # Decoupling of GDP and CO2 (2023).
   #
-  # The data from the following step will be used in this static chart:
-  # https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
   # data://garden/emissions/2024-11-13/gdp_and_co2_decoupling:
   #   - data://garden/worldbank_wdi/2024-05-20/wdi
   #   - data://garden/gcp/2024-11-13/global_carbon_budget
