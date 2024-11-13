@@ -213,6 +213,14 @@ INDEXES_MAPPING = {
     },
 }
 
+# The following components need to be present in the prices components datasets of a country-year-dataset-currency, otherwise its data will not be included.
+MANDATORY_PRICE_COMPONENTS = [
+    "Energy and supply",
+    "Network costs",
+    "Taxes, fees, levies, and charges",
+    "Value added tax (VAT)",
+]
+
 
 def sanity_check_inputs(tb: Table) -> None:
     # Ensure all relevant dataset codes are present.
@@ -442,12 +450,12 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
     error = "Unexpected flag values."
     assert set(tb["flag"].dropna()) <= set(["estimated", "break in time series", "provisional", "unknown flag"]), error
 
-    # Remove groups (of country-year-dataset-currency) for which "Energy and supply" is not included.
+    # Remove groups (of country-year-dataset-currency) for which certain components (e.g. "Energy and supply") are not included.
     # For example, Albania doesn't have "Energy and supply" costs for household electricity, but it does have other components (e.g. "Network costs").
     tb = tb[
         tb.groupby(["country", "year", "dataset_code", "currency"], observed=True, as_index=False)[
             "price_component"
-        ].transform(lambda x: "Energy and supply" in x.tolist())
+        ].transform(lambda x: all(comp in x.tolist() for comp in MANDATORY_PRICE_COMPONENTS))
     ].reset_index(drop=True)
 
     # Create a column for the energy source.
