@@ -5,6 +5,8 @@ We already have an interactive chart showing similar data,
 for per capita GDP and per capita, consumption-based CO2 emissions:
 https://ourworldindata.org/grapher/co2-emissions-and-gdp
 
+The data in the current step is not used by any grapher step, but will be used by the following static chart:
+
 The data from this step is used in this static chart:
 https://drive.google.com/file/d/1PflfQpr4mceVWRSGEqMP6Gbo1tFQZzOp/view?usp=sharing
 
