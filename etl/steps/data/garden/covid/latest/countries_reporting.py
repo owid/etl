@@ -31,9 +31,7 @@ def run(dest_dir: str) -> None:
     ## Keep relevant columns
     tb = tb[["country", "date", "reporting"]]
     ## Extend
-    tb = expand_time_column(
-        tb, time_col="date", dimension_col="country", method="full_range", fillna_method=["ffill", "zero"]
-    )
+    tb = expand_time_column(tb, time_col="date", dimension_col="country", method="full_range", fillna_method=["ffill"])
     ## Add data type
     tb["type"] = "vaccinations"
 
