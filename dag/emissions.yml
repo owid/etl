@@ -139,9 +139,9 @@ steps:
   #
   # Decoupling of GDP and CO2 (2023).
   #
-  # data://garden/emissions/2024-11-13/gdp_and_co2_decoupling:
-  #   - data://garden/worldbank_wdi/2024-05-20/wdi
-  #   - data://garden/gcp/2024-11-13/global_carbon_budget
+  data://garden/emissions/2024-11-13/gdp_and_co2_decoupling:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/gcp/2024-11-13/global_carbon_budget
   #
   # Emissions - CO2 dataset.
   #
