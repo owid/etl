@@ -13,46 +13,21 @@ dataset:
 
 
 tables:
-  antimicrobial_usage:
+  class:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
-
+      ddd:
+        title: Defined daily doses of << atc4name.lower() >> antibiotics used where the route of administration is << routeofadministration.lower() >>
+        description_short: Volume of antimicrobials used in a given year.
+        description_processing: <<notes>>
+      did:
+        title: Defined daily doses per 1000 inhabitants per day of << atc4name.lower() >> antibiotics used where the route of administration is << routeofadministration.lower() >>
+        description_short: Volume of antimicrobials used per 1000 inhabitants per day.
+        description_processing: <<notes>>
+  aware:
+    variables:
+      ddd:
+        title: Defined daily doses of << awarelabel.lower() >> antibiotics used
+        description_short: Volume of antimicrobials used in a given year.
+      did:
+        title: Defined daily doses per 1000 inhabitants per day of << awarelabel.lower() >>
+        description_short: Volume of antimicrobials used per 1000 inhabitants per day.
