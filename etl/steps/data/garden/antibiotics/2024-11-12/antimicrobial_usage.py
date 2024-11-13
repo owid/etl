@@ -15,14 +15,13 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("antimicrobial_usage")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["antimicrobial_usage"].reset_index()
-
+    tb_class = ds_meadow["class"].reset_index()
+    tb_aware = ds_meadow["aware"].reset_index()
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb_class = geo.harmonize_countries(df=tb_class, countries_file=paths.country_mapping_path)
+    tb_aware = geo.harmonize_countries(df=tb_aware, countries_file=paths.country_mapping_path)
     tb = tb.format(["country", "year"])
 
     #
