@@ -499,6 +499,9 @@ def anomaly_detection(
         df = load_data_for_variables(engine=engine, variables=variables_old_and_new)
         log.info("loading_data.end", t=time.time() - t)
 
+        if df.empty:
+            continue
+
         for anomaly_type in anomaly_types:
             # Instantiate the anomaly detector.
             if anomaly_type not in ANOMALY_DETECTORS:
@@ -636,6 +639,10 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     # For now, we do not need the metadata, so, convert to dataframe.
     df = pd.DataFrame(variable_data_table_from_catalog(engine, variables=variables))
     df = df.rename(columns={"country": "entity_name"})
+
+    if "year" not in df.columns and "date" in df.columns:
+        log.warning("Anomalist does not work for datasets with `date` column yet.")
+        return pd.DataFrame()
 
     # Define the list of columns that are not index columns.
     data_columns = [v.id for v in variables]
