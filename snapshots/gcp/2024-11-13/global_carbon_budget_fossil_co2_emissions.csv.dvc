@@ -22,7 +22,6 @@ meta:
     license:
       name: CC BY 4.0
       url: https://zenodo.org/records/10177738
-  is_public: false
 outs:
   - md5: eefcbe53b9da64d615a170970496c7c1
     size: 2869860
