@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["time"], errors="raise")
 
     # Filter the DataFrame to include only years less than 2023
-    filtered_tb = tb[tb["year"] < 2023]
+    filtered_tb = tb[tb["year"] < 2024]
 
     # Group by country and month, and then calculate the maximum temperature anomaly for each group
     max_temp_anomaly = filtered_tb.groupby(["country", "month"])["temperature_anomaly"].max().reset_index()
