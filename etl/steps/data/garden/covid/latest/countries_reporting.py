@@ -36,12 +36,33 @@ def run(dest_dir: str) -> None:
     ## 1.2/ New table: counts
     tb_counts = make_table_counts(tb_latest)
 
+    ## 1.3/ Renamings
+    tb_latest = tb_latest.rename(
+        columns={
+            "reporting": "reporting_latest",
+        }
+    )
+    tb_counts = tb_counts.rename(
+        columns={
+            "num_countries_reporting": "num_countries_reporting_latest",
+            "share_countries_reporting": "share_countries_reporting_latest",
+        }
+    )
     # 2/ GIT HISTORY
-    ## 1.1/ Process main table
+    ## 2.0/ Only keep countries (as per the UN list) and avoid double-countings
+    COUNTRIES_SKIP = [
+        "England",
+        "Scotland",
+        "Wales",
+        "Northern Ireland",
+    ]
+    tb = tb.loc[~tb["country"].isin(COUNTRIES_SKIP)]
+
+    ## 2.1/ Process main table
     tb_history = make_table_with_country_flags(tb)
-    ## 1.2/ New table: counts
+    ## 2.2/ New table: counts
     tb_hist_counts = make_table_counts(tb_history)
-    ## 1.3/ Aux
+    ## 2.3/ Aux
     tb["num_days_delay_in_reporting"] = (tb["date_first_reported"] - tb["date_first_value"]).dt.days
     tb["num_days_delay_in_reporting"] = tb["num_days_delay_in_reporting"].copy_metadata(tb["date_first_reported"])
     tb["year"] = 2023
@@ -85,13 +106,13 @@ def make_table_with_country_flags(tb: Table):
     return tb
 
 
-def make_table_counts(tb: Table):
+def make_table_counts(tb: Table, col_name: str = "reporting"):
     ## Count number of countries reporting
-    tb_counts = tb.groupby("date", as_index=False)["reporting"].sum()
+    tb_counts = tb.groupby("date", as_index=False)[col_name].sum()
     ## Rename columns
     tb_counts = tb_counts.rename(
         columns={
-            "reporting": "num_countries_reporting",
+            col_name: "num_countries_reporting",
         }
     )
     ## Estimate ratio
