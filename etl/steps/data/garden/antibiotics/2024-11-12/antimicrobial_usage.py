@@ -24,7 +24,9 @@ def run(dest_dir: str) -> None:
     tb_aware = geo.harmonize_countries(df=tb_aware, countries_file=paths.country_mapping_path)
 
     # Drop columns that are not needed in the garden dataset.
-    tb_class = tb_class.drop(columns=["whoregioncode", "whoregionname", "countryiso3", "incomeworldbankjune", "atc4"])
+    tb_class = tb_class.drop(
+        columns=["whoregioncode", "whoregionname", "countryiso3", "incomeworldbankjune", "atc4", "notes"]
+    )
     tb_aware = tb_aware.drop(columns=["whoregioncode", "whoregionname", "incomeworldbankjune", "aware"])
 
     tb_class = tb_class.format(["country", "year", "antimicrobialclass", "atc4name", "routeofadministration", "notes"])
