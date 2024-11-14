@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("fur_laws")
-    tb = ds_garden.read_table("fur_laws")
+    tb = ds_garden.read("fur_laws")
 
     #
     # Process data.

@@ -1,5 +1,7 @@
 """Generate aggregated table for total yearly and cumulative number of compute intensive AI systems in each country."""
 
+import datetime as dt
+
 import shared as sh
 
 from etl.data_helpers import geo
@@ -47,11 +49,17 @@ def run(dest_dir: str) -> None:
     # Set the index to year and country
     tb_agg = tb_agg.format(["year", "country"])
 
+    date_acessed = tb_agg.yearly_count.m.origins[0].date_accessed
+
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_agg])
+    ds_garden = create_dataset(
+        dest_dir,
+        tables=[tb_agg],
+        yaml_params={"date_accessed": dt.datetime.strptime(date_acessed, "%Y-%m-%d").strftime("%d %B %Y")},
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()

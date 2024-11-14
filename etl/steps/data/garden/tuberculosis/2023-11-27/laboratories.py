@@ -38,7 +38,7 @@ def run(dest_dir: str) -> None:
 
     ds_pop = ds_un_wpp["population"].reset_index()
     # Load data dictionary from snapshot.
-    dd = snap.read()
+    dd = snap.read(safe_types=False)
     # Read table from meadow dataset.
     tb = ds_meadow["laboratories"].reset_index()
 

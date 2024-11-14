@@ -76,7 +76,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("famines.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="0. Spreadsheet for disseminatio")
+    tb = snap.read(safe_types=False, sheet_name="0. Spreadsheet for disseminatio")
 
     #
     # Process data.

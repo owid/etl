@@ -65,11 +65,11 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("fur_laws")
-    tb = ds_meadow.read_table("fur_laws")
+    tb = ds_meadow.read("fur_laws")
 
     # Load regions dataset and read its main table.
     ds_regions = paths.load_dataset("regions")
-    tb_regions = ds_regions.read_table("regions")
+    tb_regions = ds_regions.read("regions")
 
     #
     # Process data.

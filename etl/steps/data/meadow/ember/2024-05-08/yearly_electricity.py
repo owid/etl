@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     #
     # Load snapshot and read its data.
     snap = paths.load_snapshot("yearly_electricity.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

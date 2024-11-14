@@ -16,8 +16,8 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("atkinson_2008_australia.xls")
 
     # Load data from snapshot.
-    tb_oecd_lms = snap.read(sheet_name="Table A.3 (OECD LMS)", usecols="C:I", skiprows=2)
-    tb_eeh = snap.read(sheet_name="Table A.5 (EEH)", usecols="C:I", skiprows=3)
+    tb_oecd_lms = snap.read(safe_types=False, sheet_name="Table A.3 (OECD LMS)", usecols="C:I", skiprows=2)
+    tb_eeh = snap.read(safe_types=False, sheet_name="Table A.5 (EEH)", usecols="C:I", skiprows=3)
 
     #
     # Process data.
