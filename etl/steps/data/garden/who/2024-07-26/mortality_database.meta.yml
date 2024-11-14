@@ -6,7 +6,7 @@ definitions:
         - Causes of Death
     processing_level: minor
   annotation: |-
-    <% if cause == 'Maternal disorders' %>United States: Values from 2003–2017 affected by measurement change<%- endif -%># Learn more about the available fields:
+    <% if cause == 'Maternal conditions' %>United States: Values from 2003–2017 affected by measurement change<%- endif -%># Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
