@@ -1,4 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
+from typing import Dict
+
+import pandas as pd
 from owid.catalog import Table
 from owid.datautils.dataframes import map_series
 
@@ -213,6 +216,31 @@ INDEXES_MAPPING = {
     },
 }
 
+# Dataset codes for prices and components.
+DATASET_CODES_PRICES = ["nrg_pc_202", "nrg_pc_203", "nrg_pc_204", "nrg_pc_205"]
+DATASET_CODES_COMPONENTS = ["nrg_pc_202_c", "nrg_pc_203_c", "nrg_pc_204_c", "nrg_pc_205_c"]
+DATASET_CODE_TO_ENERGY_SOURCE = {
+    "nrg_pc_202": "Gas",
+    "nrg_pc_203": "Gas",
+    "nrg_pc_204": "Electricity",
+    "nrg_pc_205": "Electricity",
+    "nrg_pc_202_c": "Gas",
+    "nrg_pc_203_c": "Gas",
+    "nrg_pc_204_c": "Electricity",
+    "nrg_pc_205_c": "Electricity",
+}
+DATASET_CODE_TO_CONSUMER_TYPE_MAPPING = {
+    "nrg_pc_202": "Household",
+    "nrg_pc_203": "Non-household",
+    "nrg_pc_204": "Household",
+    "nrg_pc_205": "Non-household",
+    "nrg_pc_202_c": "Household",
+    "nrg_pc_203_c": "Non-household",
+    "nrg_pc_204_c": "Household",
+    "nrg_pc_205_c": "Non-household",
+}
+
+
 # The following components need to be present in the prices components datasets of a country-year-dataset-currency, otherwise its data will not be included.
 MANDATORY_PRICE_COMPONENTS = [
     "Energy and supply",
@@ -253,7 +281,7 @@ def sanity_check_inputs(tb: Table) -> None:
         assert set(tb[field].dropna()) == set(mapping), error
 
 
-def clean_inputs(tb: Table) -> Table:
+def prepare_inputs(tb: Table) -> Table:
     # Values sometimes include a letter, which is a flag. Extract those letters and create a separate column with them.
     # Note that sometimes there can be multiple letters (which means multiple flags).
     tb["flag"] = tb["value"].astype("string").str.extract(r"([a-z]+)", expand=False)
@@ -265,9 +293,21 @@ def clean_inputs(tb: Table) -> Table:
     # Assign a proper type to the column of values.
     tb["value"] = tb["value"].astype(float)
 
-    # Create a clean column of years, and another for year-semesters.
-    tb["year-semester"] = tb["year"].copy()
-    tb["year"] = tb["year"].str.strip().str[0:4].astype(int)
+    # Create a clean column of years, and another of dates.
+    tb["year-semester"] = tb["year"].str.strip().copy()
+    tb["year"] = tb["year-semester"].str[0:4].astype(int)
+    # For the date column:
+    # * For the first semester, use April 1st.
+    # * For the second semester, use October 1st.
+    # * For annual data, use July 1st.
+    semester_1_mask = tb["year-semester"].str.contains("S1")
+    semester_2_mask = tb["year-semester"].str.contains("S2")
+    annual_mask = tb["year-semester"].str.isdigit()
+    error = "Unexpected values in field 'year-semester'."
+    assert (semester_1_mask | semester_2_mask | annual_mask).all(), error
+    tb["date"] = pd.to_datetime(tb["year"].astype(str) + "-07-01")
+    tb.loc[semester_1_mask, "date"] = pd.to_datetime(tb[semester_1_mask]["year"].astype(str) + "-04-01")
+    tb.loc[semester_2_mask, "date"] = pd.to_datetime(tb[semester_2_mask]["year"].astype(str) + "-10-01")
 
     return tb
 
@@ -315,33 +355,49 @@ def harmonize_indexes_and_countries(tb: Table) -> Table:
 
 
 def compare_components_and_prices_data(tb: Table) -> None:
-    # Ideally, the prices obtained by adding up all components (in the components dataset) should be similar to those obtained in the prices dataset.
-    # However, both are very sparse (especially the prices dataset), and the prices dataset is also given in semesters, which makes it difficult to compare (without having the actual consumption of each semester).
+    # Check that the resulting total price for the components dataset (summing up components) is similar to the biannual electricity prices data.
+
+    # Ideally, the prices obtained by adding up components (in the components dataset) should be similar to those obtained in the prices dataset.
+    # However, both are very sparse (especially the prices dataset), and the prices dataset is also given in semesters, which makes it difficult to compare (without having the actual consumption of each semester to be able to compute a weighted average).
     dataset_components = "nrg_pc_204_c"
     dataset_prices = "nrg_pc_204"
-    # Transform biannual data into annual data, by taking the average price of both semesters.
-    # NOTE: It would be better to have the actual energy consumption of each semester, to be able to compute a weighted average. But I don't see that data (we might need to import some additional datasets). For now, simply take the average.
-    tb_biannual = tb[tb["year-semester"].str.contains("S")].reset_index(drop=True)
-    # Compute an annual average only if there is data for the two semesters.
-    tb_biannual_filtered = tb_biannual.groupby(
-        ["currency", "country", "year", "dataset_code", "dataset_name", "price_component_or_level"],
-        observed=True,
-        as_index=False,
-    ).filter(lambda x: len(x) == 2)
-    tb_biannual = tb_biannual_filtered.groupby(
-        ["currency", "country", "year", "dataset_code", "dataset_name", "price_component_or_level"],
-        observed=True,
-        as_index=False,
-    ).agg({"value": "mean"})
+    # Transforming biannual data into annual data is not straightforward.
+    # I tried simply taking the average, but what I found is that the annual components prices (summed over all components) tends to be systematically higher than the biannual prices (averaged over the two semester of the year). I suppose this was caused by doing a simple average instead of weighting by consumption. In semesters with higher consumption (e.g. winter), the increased demand tends to drive prices up. Annual prices, as far as I understand, are consumption-weighted averages, and therefore assign a larger weight to those semesters with higher prices. So, intuitively, it makes sense that the true annual prices tend to be higher than the averaged biannual prices.
+    # We could create a weighted average, but we would need the actual consumption of each semester (which I haven't found straightaway).
 
-    # Check that the resulting total price for the components dataset (summing up all components) is similar to the electricity prices averaged over the two semesters.
+    tb_biannual = tb[tb["year-semester"].str.contains("S")].reset_index(drop=True)
+    # # Compute an annual average only if there is data for the two semesters.
+    # tb_biannual_filtered = tb_biannual.groupby(
+    #     ["currency", "country", "year", "dataset_code", "dataset_name", "price_component_or_level"],
+    #     observed=True,
+    #     as_index=False,
+    # ).filter(lambda x: len(x) == 2)
+    # tb_biannual = tb_biannual_filtered.groupby(
+    #     ["currency", "country", "year", "dataset_code", "dataset_name", "price_component_or_level"],
+    #     observed=True,
+    #     as_index=False,
+    # ).agg({"value": "mean"})
+
+    # Similarly, for annual data, assign July 1st.
     tb_annual = tb[~tb["year-semester"].str.contains("S")].reset_index(drop=True)
 
     # OPTION 1: Sum over all price components to get the total.
-    annual_1 = (
-        tb_annual[(tb_annual["currency"] == "Euro") & (tb_annual["dataset_code"] == dataset_components)]
+    # NOTE: The sum of all components tends to be systematically above the values in the prices dataset.
+    #  That means that some components include others. To avoid double-counting, we need to select a subset of components.
+    # It's not clear if some other components (e.g. "Other") should also be included here, but for now, keep only these main components.
+    components_to_include = [
+        "Energy and supply",
+        "Network costs",
+        "Taxes, fees, levies, and charges",
+    ]
+    annual_components = (
+        tb_annual[
+            (tb_annual["price_component_or_level"].isin(components_to_include))
+            & (tb_annual["currency"] == "Euro")
+            & (tb_annual["dataset_code"] == dataset_components)
+        ]
         .groupby(
-            ["country", "year"],
+            ["country", "date"],
             observed=True,
             as_index=False,
         )
@@ -354,33 +410,36 @@ def compare_components_and_prices_data(tb: Table) -> None:
     price_level = "All taxes and levies included"
     # price_level = "Excluding VAT and other recoverable taxes and levies"
     # price_level = "Excluding taxes and levies"
-    annual_2 = tb_biannual[
+    annual_prices = tb_biannual[
         (tb_biannual["currency"] == "Euro")
         & (tb_biannual["dataset_code"] == dataset_prices)
         & (tb_biannual["price_component_or_level"] == price_level)
-    ][["country", "year", "value"]]
-    compared = annual_1.merge(annual_2, how="inner", on=["country", "year"], suffixes=("_components", "_prices"))
+    ][["country", "date", "value"]]
+
+    # Combine both datasets.
+    compared = pd.concat(
+        [annual_components.assign(**{"source": "components"}), annual_prices.assign(**{"source": "prices"})],
+        ignore_index=True,
+    )
     # Only a few country-years could be compared this way. Most of the points in the prices datasets were missing.
     import plotly.express as px
 
     for country in sorted(set(compared["country"])):
         px.line(
-            compared[compared["country"] == country].melt(id_vars=["country", "year"]),
-            x="year",
+            compared[compared["country"] == country],
+            x="date",
             y="value",
-            color="variable",
+            color="source",
             markers=True,
             title=country,
-        ).show()
+        ).update_yaxes(range=[0, None]).show()
 
     # Also check the percentage deviation.
     # compared["dev"] = 100 * abs(compared["value_components"] - compared["value_prices"]) / compared["value_prices"]
 
     # Conclusions:
     # * When consumption band "All bands" is selected, there are very few points where both curves (prices and components) can be compared. When choosing another band, e.g. "<20GJ", there are more points to compare (in the case of gas).
-    # * The annual components prices (summed over all components) tends to be systematically higher than the biannual prices (averaged over the two semester of the year). I suppose this is caused by doing a simple average instead of weighting by consumption. In semesters with higher consumption (e.g. winter), the increased demand tends to drive prices up. Annual prices, as far as I understand, are consumption-weighted averages, and therefore assign a larger weight to those semesters with higher prices. So, intuitively, it makes sense that the true annual prices tend to be higher than the averaged biannual prices.
-
-    # With all this, it seems reasonable to discard the prices datasets, and use the components ones.
+    # * The prices and components datasets coincide reasonably well, but we need to figure out which subset of components needs to be included, to avoid double-counting.
 
 
 def select_and_prepare_relevant_data(tb: Table) -> Table:
@@ -407,30 +466,30 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
 
     # After inspection, it looks like the "All bands" consumption is very sparse in the prices datasets.
     # One option (if we decided to use the prices dataset) would be to use the more common consumption bands only, which are better informed.
-    # However, "All bands" in the components dataset seem to be less sparse (at least from 2019 onwards).
-    # To get the total price from the components dataset, we would need to add up all components.
-    # After a quick inspection, all components seem similarly well informed.
-    # There are some special cases where the data is omitted (e.g. due to flag "c" (confidential)).
-    # So, in principle we could add up all components, only when all of them are informed.
-    # TODO: Reconsider this choice if this loses much data, e.g. when some components are missing simply because they are irrelevant for a specific country.
-    # For now, select "All bands" and the components datasets.
+    # In the components dataset, "All bands" seems to be less sparse (at least from 2019 onwards).
+    # To get the total price from the components dataset, we would need to add up components.
+    # But we would need to figure out which one is the subset of components that ensures no double-counting.
     tb = (
         tb[tb["consumption_band"] == "All bands"]
         .drop(columns=["consumption_band"], errors="raise")
         .reset_index(drop=True)
     )
 
-    # Check that the total price obtained by summing all components is similar to the price obtained in the prices dataset.
-    # NOTE: Uncomment to perform some visual checks.
-    #  See conclusions in the following function to understand the choices.
+    # Check that the total price obtained by summing components is similar to the price obtained in the prices dataset.
+    # NOTE: Uncomment to perform some visual checks, and see conclusions in the following function to understand the choices.
     # compare_components_and_prices_data(tb=tb)
 
-    # Select the components datasets only and rename columns conveniently.
-    tb = (
-        tb[tb["dataset_code"].isin(["nrg_pc_202_c", "nrg_pc_203_c", "nrg_pc_204_c", "nrg_pc_205_c"])]
-        .reset_index(drop=True)
-        .rename(columns={"price_component_or_level": "price_component"}, errors="raise")
-    )
+    # Remove groups (of country-year-dataset-currency) from the components dataset for which certain components (e.g. "Energy and supply") are not included.
+    # For example, Albania doesn't have "Energy and supply" costs for household electricity, but it does have other components (e.g. "Network costs").
+    tb.loc[
+        (tb["dataset_code"].isin(DATASET_CODES_COMPONENTS))
+        & (
+            ~tb.groupby(["country", "year", "currency"])["price_component_or_level"].transform(
+                lambda x: all(comp in x.tolist() for comp in MANDATORY_PRICE_COMPONENTS)
+            )
+        ),
+        "value",
+    ] = None
 
     # Remove empty rows.
     tb = tb.dropna(subset=["value"]).reset_index(drop=True)
@@ -450,23 +509,10 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
     error = "Unexpected flag values."
     assert set(tb["flag"].dropna()) <= set(["estimated", "break in time series", "provisional", "unknown flag"]), error
 
-    # Remove groups (of country-year-dataset-currency) for which certain components (e.g. "Energy and supply") are not included.
-    # For example, Albania doesn't have "Energy and supply" costs for household electricity, but it does have other components (e.g. "Network costs").
-    tb = tb[
-        tb.groupby(["country", "year", "dataset_code", "currency"], observed=True, as_index=False)[
-            "price_component"
-        ].transform(lambda x: all(comp in x.tolist() for comp in MANDATORY_PRICE_COMPONENTS))
-    ].reset_index(drop=True)
-
     # Create a column for the energy source.
     tb["source"] = map_series(
         tb["dataset_code"],
-        mapping={
-            "nrg_pc_202_c": "Gas",
-            "nrg_pc_203_c": "Gas",
-            "nrg_pc_204_c": "Electricity",
-            "nrg_pc_205_c": "Electricity",
-        },
+        mapping=DATASET_CODE_TO_ENERGY_SOURCE,
         warn_on_missing_mappings=True,
         warn_on_unused_mappings=True,
         show_full_warning=True,
@@ -477,19 +523,16 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
     # Create a column for the consumer type.
     tb["consumer_type"] = map_series(
         tb["dataset_code"],
-        mapping={
-            "nrg_pc_202_c": "Household",
-            "nrg_pc_203_c": "Non-household",
-            "nrg_pc_204_c": "Household",
-            "nrg_pc_205_c": "Non-household",
-        },
+        mapping=DATASET_CODE_TO_CONSUMER_TYPE_MAPPING,
         warn_on_missing_mappings=True,
         warn_on_unused_mappings=True,
         show_full_warning=True,
     )
+    error = "Unexpected consumer type."
+    assert set(tb["consumer_type"]) == set(["Household", "Non-household"]), error
 
     # Drop unnecessary columns.
-    tb = tb.drop(columns=["flag", "dataset_code", "year-semester", "dataset_name"], errors="raise")
+    tb = tb.drop(columns=["flag", "year-semester", "dataset_name"], errors="raise")
 
     # It would be confusing to keep different national currencies, so, keep only Euro and PPS.
     tb = tb[tb["currency"].isin(["Euro", "PPS"])].reset_index(drop=True)
@@ -501,13 +544,61 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
         .merge(
             tb[tb["currency"] == "PPS"].drop(columns=["currency"]),
             how="outer",
-            on=["country", "year", "source", "price_component", "consumer_type"],
+            on=["country", "year", "date", "dataset_code", "source", "price_component_or_level", "consumer_type"],
             suffixes=("_euro", "_pps"),
         )
         .rename(columns={"value_euro": "price_euro", "value_pps": "price_pps"}, errors="raise")
     )
 
     return tb
+
+
+def prepare_wide_tables(tb: Table) -> Dict[str, Table]:
+    wide_tables = {
+        # Table for average prices (in euros) of gas and electricity prices of household and non-household consumers.
+        "gas_and_electricity_prices_euro_flat": tb[tb["dataset_code"].isin(DATASET_CODES_PRICES)].pivot(
+            index=["country", "date"],
+            columns=["source", "consumer_type", "price_component_or_level"],
+            values="price_euro",
+            join_column_levels_with="-",
+        ),
+        # Table for average prices (in PPS) of gas and electricity prices of household and non-household consumers.
+        "gas_and_electricity_prices_pps_flat": tb[tb["dataset_code"].isin(DATASET_CODES_PRICES)].pivot(
+            index=["country", "date"],
+            columns=["source", "consumer_type", "price_component_or_level"],
+            values="price_pps",
+            join_column_levels_with="-",
+        ),
+        # Table for price components (in euros) of gas and electricity prices of household and non-household consumers.
+        "gas_and_electricity_price_components_euro_flat": tb[tb["dataset_code"].isin(DATASET_CODES_COMPONENTS)].pivot(
+            index=["country", "year"],
+            columns=["source", "consumer_type", "price_component_or_level"],
+            values="price_euro",
+            join_column_levels_with="-",
+        ),
+        # Table for price components (in PPS) of gas and electricity prices of household and non-household consumers.
+        "gas_and_electricity_price_components_pps_flat": tb[tb["dataset_code"].isin(DATASET_CODES_COMPONENTS)].pivot(
+            index=["country", "year"],
+            columns=["source", "consumer_type", "price_component_or_level"],
+            values="price_pps",
+            join_column_levels_with="-",
+        ),
+    }
+    # Rename columns and format tables conveniently.
+    for table_name, table in wide_tables.items():
+        if "component" in table_name:
+            table = table.format(["country", "year"], short_name=table_name)
+        else:
+            table = table.format(["country", "date"], short_name=table_name)
+
+        # Rename columns conveniently.
+        if "pps" in table_name:
+            table = table.rename(columns={column: f"{column}_pps" for column in table.columns}, errors="raise")
+        table = table.rename(columns={column: column.replace("__", "_") for column in table.columns}, errors="raise")
+
+        wide_tables[table_name] = table
+
+    return wide_tables
 
 
 def run(dest_dir: str) -> None:
@@ -533,7 +624,7 @@ def run(dest_dir: str) -> None:
     sanity_check_inputs(tb=tb)
 
     # Clean inputs.
-    tb = clean_inputs(tb=tb)
+    tb = prepare_inputs(tb=tb)
 
     # Harmonize indexes and country names.
     tb = harmonize_indexes_and_countries(tb=tb)
@@ -541,28 +632,21 @@ def run(dest_dir: str) -> None:
     # Select and prepare relevant data.
     tb = select_and_prepare_relevant_data(tb=tb)
 
-    # Create a wide table for the price in euros and in PPS.
-    tb_euro_flat = tb.pivot(
-        index=["country", "year"],
-        columns=["source", "consumer_type", "price_component"],
-        values="price_euro",
-        join_column_levels_with="-",
-    )
-    tb_pps_flat = tb.pivot(
-        index=["country", "year"],
-        columns=["source", "consumer_type", "price_component"],
-        values="price_pps",
-        join_column_levels_with="-",
-    )
-    tb_pps_flat = tb_pps_flat.rename(
-        columns={column: f"{column}_pps" for column in tb_pps_flat.drop(columns=["country", "year"]).columns},
-        errors="raise",
+    # Create convenient wide tables.
+    wide_tables = prepare_wide_tables(tb=tb)
+
+    # Improve table format.
+    tb = tb.drop(columns=["dataset_code"]).format(
+        ["country", "date", "source", "consumer_type", "price_component_or_level"]
     )
 
-    # Improve table formats.
-    tb = tb.format(["country", "year", "source", "consumer_type", "price_component"])
-    tb_euro_flat = tb_euro_flat.format(short_name="gas_and_electricity_prices_euro_flat")
-    tb_pps_flat = tb_pps_flat.format(short_name="gas_and_electricity_prices_pps_flat")
+    # TODO: Temporary solution until metadata is added for new tables.
+    wide_tables = {
+        table_name: table
+        for table_name, table in wide_tables.items()
+        if table_name
+        in ["gas_and_electricity_price_components_euro_flat", "gas_and_electricity_price_components_pps_flat"]
+    }
 
     #
     # Save outputs.
@@ -570,7 +654,7 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb, tb_euro_flat, tb_pps_flat],
+        tables=[tb] + list(wide_tables.values()),
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )

@@ -25,7 +25,7 @@ tables:
         unit: purchasing power standard
         short_unit: PPS
         description_short: Energy price in purchasing power standard.
-  gas_and_electricity_prices_euro_flat:
+  gas_and_electricity_price_components_euro_flat:
     common:
       unit: 'euros per kilowatt-hour'
       short_unit: "€/kWh"
@@ -144,25 +144,25 @@ tables:
           name: Renewable taxes allowance
         presentation:
           title_public: Electricity price component for household consumers - Renewable taxes allowance
-      electricity_household_taxes__fees__levies__and_charges:
+      electricity_household_taxes_fees_levies_and_charges:
         title: Electricity price component for household consumers - Taxes, fees, levies, and charges
         display:
           name: Taxes, fees, levies, and charges
         presentation:
           title_public: Electricity price component for household consumers - Taxes, fees, levies, and charges
-      electricity_non_household_taxes__fees__levies__and_charges:
+      electricity_non_household_taxes_fees_levies_and_charges:
         title: Electricity price component for non-household consumers - Taxes, fees, levies, and charges
         display:
           name: Taxes, fees, levies, and charges
         presentation:
           title_public: Electricity price component for non-household consumers - Taxes, fees, levies, and charges
-      electricity_household_value_added_tax__vat:
+      electricity_household_value_added_tax_vat:
         title: Electricity price component for household consumers - Value added tax (VAT)
         display:
           name: Value added tax (VAT)
         presentation:
           title_public: Electricity price component for household consumers - Value added tax (VAT)
-      electricity_non_household_value_added_tax__vat:
+      electricity_non_household_value_added_tax_vat:
         title: Electricity price component for non-household consumers - Value added tax (VAT)
         display:
           name: Value added tax (VAT)
@@ -204,13 +204,13 @@ tables:
           name: Renewable taxes
         presentation:
           title_public: Gas price component for household consumers - Renewable taxes
-      gas_household_taxes__fees__levies__and_charges:
+      gas_household_taxes_fees_levies_and_charges:
         title: Gas price component for household consumers - Taxes, fees, levies, and charges
         display:
           name: Taxes, fees, levies, and charges
         presentation:
           title_public: Gas price component for household consumers - Taxes, fees, levies, and charges
-      gas_household_value_added_tax__vat:
+      gas_household_value_added_tax_vat:
         title: Gas price component for household consumers - Value added tax (VAT)
         display:
           name: Value added tax (VAT)
@@ -252,26 +252,26 @@ tables:
           name: Renewable taxes
         presentation:
           title_public: Gas price component for non-household consumers - Renewable taxes
-      gas_non_household_taxes__fees__levies__and_charges:
+      gas_non_household_taxes_fees_levies_and_charges:
         title: Gas price component for non-household consumers - Taxes, fees, levies, and charges
         display:
           name: Taxes, fees, levies, and charges
         presentation:
           title_public: Gas price component for non-household consumers - Taxes, fees, levies, and charges
-      gas_non_household_value_added_tax__vat:
+      gas_non_household_value_added_tax_vat:
         title: Gas price component for non-household consumers - Value added tax (VAT)
         display:
           name: Value added tax (VAT)
         presentation:
           title_public: Gas price component for non-household consumers - Value added tax (VAT)
-      electricity_household_taxes__fees__levies__and_charges_allowance:
+      electricity_household_taxes_fees_levies_and_charges_allowance:
         title: Electricity price component for household consumers - Taxes, fees, levies, and charges allowance
         display:
           name: Taxes, fees, levies, and charges allowance
         presentation:
           title_public: Electricity price component for household consumers - Taxes, fees, levies, and charges allowance
 
-  gas_and_electricity_prices_pps_flat:
+  gas_and_electricity_price_components_pps_flat:
     common:
       unit: "purchasing power standard per kilowatt-hour"
       short_unit: "PPS/kWh"
@@ -390,25 +390,25 @@ tables:
           name: Renewable taxes allowance_pps
         presentation:
           title_public: Electricity price component (PPS) for household consumers - Renewable taxes allowance_pps
-      electricity_household_taxes__fees__levies__and_charges_pps:
+      electricity_household_taxes_fees_levies_and_charges_pps:
         title: Electricity price component (PPS) for household consumers - Taxes, fees, levies, and charges_pps
         display:
           name: Taxes, fees, levies, and charges_pps
         presentation:
           title_public: Electricity price component (PPS) for household consumers - Taxes, fees, levies, and charges_pps
-      electricity_non_household_taxes__fees__levies__and_charges_pps:
+      electricity_non_household_taxes_fees_levies_and_charges_pps:
         title: Electricity price component (PPS) for non-household consumers - Taxes, fees, levies, and charges_pps
         display:
           name: Taxes, fees, levies, and charges_pps
         presentation:
           title_public: Electricity price component (PPS) for non-household consumers - Taxes, fees, levies, and charges_pps
-      electricity_household_value_added_tax__vat__pps:
+      electricity_household_value_added_tax_vat_pps:
         title: Electricity price component (PPS) for household consumers - Value added tax (VAT)_pps
         display:
           name: Value added tax (VAT)_pps
         presentation:
           title_public: Electricity price component (PPS) for household consumers - Value added tax (VAT)_pps
-      electricity_non_household_value_added_tax__vat__pps:
+      electricity_non_household_value_added_tax_vat_pps:
         title: Electricity price component (PPS) for non-household consumers - Value added tax (VAT)_pps
         display:
           name: Value added tax (VAT)_pps
@@ -450,13 +450,13 @@ tables:
           name: Renewable taxes_pps
         presentation:
           title_public: Gas price component (PPS) for household consumers - Renewable taxes_pps
-      gas_household_taxes__fees__levies__and_charges_pps:
+      gas_household_taxes_fees_levies_and_charges_pps:
         title: Gas price component (PPS) for household consumers - Taxes, fees, levies, and charges_pps
         display:
           name: Taxes, fees, levies, and charges_pps
         presentation:
           title_public: Gas price component (PPS) for household consumers - Taxes, fees, levies, and charges_pps
-      gas_household_value_added_tax__vat__pps:
+      gas_household_value_added_tax_vat_pps:
         title: Gas price component (PPS) for household consumers - Value added tax (VAT)_pps
         display:
           name: Value added tax (VAT)_pps
@@ -498,19 +498,19 @@ tables:
           name: Renewable taxes_pps
         presentation:
           title_public: Gas price component (PPS) for non-household consumers - Renewable taxes_pps
-      gas_non_household_taxes__fees__levies__and_charges_pps:
+      gas_non_household_taxes_fees_levies_and_charges_pps:
         title: Gas price component (PPS) for non-household consumers - Taxes, fees, levies, and charges_pps
         display:
           name: Taxes, fees, levies, and charges_pps
         presentation:
           title_public: Gas price component (PPS) for non-household consumers - Taxes, fees, levies, and charges_pps
-      gas_non_household_value_added_tax__vat__pps:
+      gas_non_household_value_added_tax_vat_pps:
         title: Gas price component (PPS) for non-household consumers - Value added tax (VAT)_pps
         display:
           name: Value added tax (VAT)_pps
         presentation:
           title_public: Gas price component (PPS) for non-household consumers - Value added tax (VAT)_pps
-      electricity_household_taxes__fees__levies__and_charges_allowance_pps:
+      electricity_household_taxes_fees_levies_and_charges_allowance_pps:
         title: Electricity price component (PPS) for household consumers - Taxes, fees, levies, and charges allowance_pps
         display:
           name: Taxes, fees, levies, and charges allowance_pps
