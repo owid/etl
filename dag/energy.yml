@@ -248,3 +248,5 @@ steps:
   #
   data://grapher/eurostat/2024-11-05/gas_and_electricity_prices:
     - data://garden/eurostat/2024-11-05/gas_and_electricity_prices
+  data://grapher/eurostat/2024-11-05/gas_and_electricity_price_components:
+    - data://garden/eurostat/2024-11-05/gas_and_electricity_prices

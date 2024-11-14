@@ -635,18 +635,10 @@ def run(dest_dir: str) -> None:
     # Create convenient wide tables.
     wide_tables = prepare_wide_tables(tb=tb)
 
-    # Improve table format.
+    # Improve main table format.
     tb = tb.drop(columns=["dataset_code"]).format(
         ["country", "date", "source", "consumer_type", "price_component_or_level"]
     )
-
-    # TODO: Temporary solution until metadata is added for new tables.
-    wide_tables = {
-        table_name: table
-        for table_name, table in wide_tables.items()
-        if table_name
-        in ["gas_and_electricity_price_components_euro_flat", "gas_and_electricity_price_components_pps_flat"]
-    }
 
     #
     # Save outputs.

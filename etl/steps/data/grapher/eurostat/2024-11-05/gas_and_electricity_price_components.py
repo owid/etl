@@ -14,8 +14,8 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("gas_and_electricity_prices")
 
     # Read tables from garden dataset.
-    tb_euro = ds_garden["gas_and_electricity_prices_euro_flat"]
-    tb_pps = ds_garden["gas_and_electricity_prices_pps_flat"]
+    tb_euro = ds_garden["gas_and_electricity_price_components_euro_flat"]
+    tb_pps = ds_garden["gas_and_electricity_price_components_pps_flat"]
 
     #
     # Save outputs.
