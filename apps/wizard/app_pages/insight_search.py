@@ -40,7 +40,6 @@ MODEL = get_model()
 def get_raw_data_insights() -> pd.DataFrame:
     """Get the content of data insights that exist in the database."""
     # Get all data insights from the database.
-    # NOTE: Not all data insights have slugs, so for now identify them by id.
     query = """
         SELECT id, slug, content, published, publishedAt, markdown
         FROM posts_gdocs
@@ -134,26 +133,17 @@ def get_data_insights() -> list[Dict[str, Any]]:
                 "url_img_mobile": url_img_mobile,
                 "url_vid": url_vid,
                 "slug": di["slug"],
-                "public": bool(di["published"]),
+                "is_public": bool(di["published"]),
                 "date_published": di["publishedAt"],
                 "markdown": markdown,
             }
 
-            if di_dict["public"]:
+            if di_dict["is_public"]:
                 di_dict["url"] = f"https://ourworldindata.org/data-insights/{di_dict['slug']}"
 
             insights.append(di_dict)
 
     return insights
-
-
-# @st.cache_data
-# def get_insights_embeddings(insights: list[Dict[str, Any]]) -> list:
-#     # Combine the title and body of each insight into a single string.
-#     insights_texts = [insight["title"] + " " + insight["body"] for insight in insights]
-#     embeddings = [model.encode(doc, convert_to_tensor=True) for doc in tqdm(insights_texts)]
-
-#     return embeddings
 
 
 def _encode_text(text):
@@ -209,7 +199,7 @@ def st_display_insight(insight):
         st.markdown(f"#### {insight['title']}")
 
         # If public, display special header (inc multimedia content if insight is public)
-        if insight["public"]:
+        if insight["is_public"]:
             # Display header 'Author | Date | Link'
             date_str = insight["date_published"].strftime("%B %d, %Y")
             date_str = tag_in_md(date_str, "green", ":material/calendar_month")
@@ -254,7 +244,7 @@ with st.popover("Other resources"):
     st.markdown(
         """
 
-        - [**Topic diversity**](http://analytics/private?sql=with+pages+as%28+select+slug+as+topic_page%2C+views[…]c_page+%3D+insights.topic_page+order+by+ratio%2C+views_365d+desc) (Datasette): Check which topics we've covered so far — and which have been neglected — to find new ideas.
+        - [**Topic diversity**](http://analytics/analytics?sql=--%0D%0A--+Table+of+topics+%22neglected%22+by+our+published%2Fscheduled+data+insights%0D%0A--%0D%0A--+Notes%3A%0D%0A--+++-+%60n_insights_per_1m_views_365d%60+column+represents+the+%23+of+published%2Fscheduled+data%0D%0A--+++++insights+per+1+million+page+views+on+the+topic+in+the+past+365+days.%0D%0A--+++-+views_365d+represents+all+views+on+the+topic+%28including+articles%2C+charts%2C+data%0D%0A--+++++insights%2C+explorers%2C+topic+pages%29.%0D%0A--+++-+published+and+scheduled+data+insights+are+counted%2C+draft+data+insights+are+not.%0D%0A--+%0D%0A%0D%0Awith%0D%0A%0D%0Atopics+as+%28%0D%0A++select+%0D%0A++++topic%2C%0D%0A++++sum%28views_365d%29+as+views_365d%0D%0A++from+pages%0D%0A++join+page_x_topic+using%28url%29%0D%0A++group+by+topic%0D%0A%29%2C%0D%0A%0D%0Acounts+as+%28%0D%0A++select+topic%2C+count%28*%29+as+n_insights%0D%0A++from+%28%0D%0A++++select+unnest%28topics%29+as+topic+%0D%0A++++from+data_insights++--+alternatives%3A+articles%2C+charts%2C+explorers%0D%0A++++--+filter+by+author%3A%0D%0A++++--+where+list_contains%28authors%2C+%27Hannah+Ritchie%27%29%0D%0A++++--+filter+by+days+since+published%3A%0D%0A++++--+where+published_at+%3E+CURRENT_DATE%28%29+-+INTERVAL+90+DAY%0D%0A++%29%0D%0A++group+by+topic%0D%0A%29%0D%0A%0D%0Aselect%0D%0A++topic%2C%0D%0A++views_365d%2C%0D%0A++COALESCE%28n_insights%2C+0%29+as+n_insights%2C%0D%0A++COALESCE%28round%281e6+*+n_insights+%2F+views_365d%2C+1%29%2C+0%29+as+n_insights_per_1m_views_365d%0D%0Afrom+topics%0D%0Aleft+join+counts+using%28topic%29%0D%0Aorder+by+views_365d+desc) (Datasette): Check which topics we've covered so far — and which have been neglected — to find new ideas.
         - **Country diversity** (Instagram): Look at which countries we have referenced in our Instagram posts. IG posts originate from a subset of DIs, therefore these can be a good indicator of which countries we are focusing on.
             - [Countries covered by Instagram posts](https://admin.owid.io/admin/charts/8259/edit)
             - [Average country share of mentions in a post](https://admin.owid.io/admin/charts/8260/edit)
@@ -294,9 +284,9 @@ if input_string:
             case "All":
                 filtered_dis = sorted_dis
             case "Published":
-                filtered_dis = [di for di in sorted_dis if di["public"]]
+                filtered_dis = [di for di in sorted_dis if di["is_public"]]
             case "Drafts":
-                filtered_dis = [di for di in sorted_dis if not di["public"]]
+                filtered_dis = [di for di in sorted_dis if not di["is_public"]]
             case _:
                 filtered_dis = sorted_dis
 
