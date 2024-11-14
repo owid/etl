@@ -129,12 +129,18 @@ files = get_country_file_paths(repo, path_vax)
 # GET FIRST FILE VERSIONS
 ######################################################
 data = []
-for file in files:
+for i, file in enumerate(files):
     print(f"> {file}")
     data_ = get_initial_version_of_file(repo, file)
     if data_ is not None:
         data_["country"] = file
     data.append(data_)
+
+    if i % 10 == 0:
+        print(f">> {i} files processed")
+        df = pd.DataFrame(data)
+        df.to_csv(f"first_reporting_dates-{i}.csv", index=False)
+
 
 # Create DataFrame
 df = pd.DataFrame(data)
