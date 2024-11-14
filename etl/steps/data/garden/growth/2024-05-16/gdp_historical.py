@@ -179,7 +179,7 @@ def create_estimations_from_growth(
             tb[f"{var}_estimated"] = to_adjust_value * tb[f"{var}_scalar"]
 
             # Rename the estimated variables without the suffix
-            tb[f"{var}"] = tb[f"{var}{to_adjust_var_suffix}"].fillna(tb[f"{var}_estimated"])
+            tb[f"{var}"] = tb[f"{var}{to_adjust_var_suffix}"].astype("Float64").fillna(tb[f"{var}_estimated"])
 
     # Specify "World" entity for each row
     tb["country"] = "World"

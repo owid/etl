@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("gco_cancer_today_cervical.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

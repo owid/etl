@@ -33,7 +33,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("hours_and_earnings_uk.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="Table 5", header=2)
+    tb = snap.read(safe_types=False, sheet_name="Table 5", header=2)
 
     #
     # Process data.

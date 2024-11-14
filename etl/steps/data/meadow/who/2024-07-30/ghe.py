@@ -8,7 +8,7 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     snap = paths.load_snapshot()
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # clean and transform data
     tb = clean_data(tb)

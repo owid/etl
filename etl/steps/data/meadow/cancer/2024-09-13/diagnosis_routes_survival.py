@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("diagnosis_routes_survival.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     tb = tb[["Year", "Site", "Geography", "Gender", "Length", "Route", "Patients", "Survival"]]
     tb = tb.rename(columns={"Geography": "country"})

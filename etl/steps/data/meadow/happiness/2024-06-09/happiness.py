@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("happiness.xls")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # add year and country columns
     tb["year"] = 2023  # 2024 report -> 2023 data

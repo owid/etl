@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("mortality_database")
-    tb = ds_meadow.read_table("mortality_database")
+    tb = ds_meadow.read("mortality_database", safe_types=False)
     #
     # Process data.
     #
