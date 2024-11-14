@@ -177,7 +177,7 @@ def load_latest_population():
 
 @st.cache_data
 def get_tailscale_ip_to_user_map():
-    """Get the mapping of Tailscale IPs to user display names."""
+    """Get the mapping of Tailscale IPs to github usernames."""
     proc = subprocess.run(["tailscale", "status", "--json"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     if proc.returncode != 0:
@@ -190,16 +190,16 @@ def get_tailscale_ip_to_user_map():
     # Map user IDs to display names
     user_id_to_name = {}
     for user_id, user_info in status.get("User", {}).items():
-        if "DisplayName" in user_info:
-            user_id_to_name[int(user_id)] = user_info["DisplayName"]
+        if "LoginName" in user_info:
+            user_id_to_name[int(user_id)] = user_info["LoginName"]
 
     # Map IPs to user display names
     for peer in status.get("Peer", {}).values():
         user_id = peer.get("UserID")
-        display_name = user_id_to_name.get(user_id)
-        if display_name:
+        login_name = user_id_to_name.get(user_id)
+        if login_name:
             for ip in peer.get("TailscaleIPs", []):
-                ip_to_user[ip] = display_name
+                ip_to_user[ip] = login_name
 
     return ip_to_user
 
