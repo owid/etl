@@ -21,7 +21,7 @@ tables:
         #description_processing: <<notes>>
         unit: Defined daily doses
       did:
-        title: Defined daily doses per 1000 inhabitants per day of << atc4name.lower() >> antibiotics used where the route of administration is << routeofadministration.lower() >>
+        title: Defined daily doses per 1000 inhabitants per day of << antimicrobialclass>> - << atc4name.lower() >> s used where the route of administration is << routeofadministration.lower() >>
         description_short: Volume of antimicrobials used per 1000 inhabitants per day.
         #description_processing: <<notes>>
         unit: Defined daily doses per 1000 inhabitants per day
