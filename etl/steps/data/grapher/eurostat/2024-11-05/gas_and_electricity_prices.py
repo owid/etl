@@ -1,5 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -24,6 +25,9 @@ def run(dest_dir: str) -> None:
     ds_grapher = create_dataset(
         dest_dir, tables=[tb_euro, tb_pps], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
+
+    # Improve metadata.
+    ds_grapher.metadata.title = "Gas and electricity prices in Europe"
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
