@@ -309,3 +309,15 @@ class Pagination:
                 on_change=_change_page,
                 key=self.pagination_key,
             )
+
+
+def st_multiselect_wider(num_px: int = 1000):
+    st.markdown(
+        f"""
+        <style>
+        .stMultiSelect [data-baseweb=select] span{{
+                max-width: {num_px}px;
+            }}
+        </style>""",
+        unsafe_allow_html=True,
+    )

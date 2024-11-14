@@ -488,12 +488,19 @@ def variable_data_table_from_catalog(
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Dataset {ds_path} not found in local catalog.") from e
 
-        dim_names = [k for k in tb.metadata.primary_key if k not in ("country", "year")]
+        if "date" in tb.columns:
+            year_or_date = "date"
+        elif "year" in tb.columns:
+            year_or_date = "year"
+        else:
+            raise ValueError(f"Table {table_name} has no 'date' or 'year' column")
+
+        dim_names = [k for k in tb.metadata.primary_key if k not in ("country", year_or_date)]
 
         # Simple case with no dimensions
         if not dim_names:
-            col_mapping = {"country": "country", "year": "year"}
-            for col in set(tb.columns) - {"country", "year"}:
+            col_mapping = {"country": "country", year_or_date: year_or_date}
+            for col in set(tb.columns) - {"country", year_or_date}:
                 # Variable names in MySQL are trimmed to 255 characters
                 name = trim_long_variable_name(col)
                 matches = [variable for variable in variables if name == variable.shortName]
@@ -502,7 +509,7 @@ def variable_data_table_from_catalog(
 
             tb = tb[col_mapping.keys()]
             tb.columns = col_mapping.values()
-            tbs.append(tb.set_index(["country", "year"]))
+            tbs.append(tb.set_index(["country", year_or_date]))
 
         # Dimensional case
         else:
@@ -513,8 +520,8 @@ def variable_data_table_from_catalog(
             #     {'name': 'gender', 'value': 'all'},
             #     {'name': 'age_group', 'value': '15-29'}
             # ]
-            dim_names = [k for k in tb.metadata.primary_key if k not in ("country", "year")]
-            tb_pivoted = tb.pivot(index=["country", "year"], columns=dim_names)
+            dim_names = [k for k in tb.metadata.primary_key if k not in ("country", year_or_date)]
+            tb_pivoted = tb.pivot(index=["country", year_or_date], columns=dim_names)
 
             labels = []
             for variable in variables:

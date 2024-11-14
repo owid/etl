@@ -1,3 +1,4 @@
+import random
 import tempfile
 import time
 from pathlib import Path
@@ -445,6 +446,7 @@ def anomaly_detection(
     dry_run: bool = False,
     force: bool = False,
     reset_db: bool = False,
+    sample_n: Optional[int] = None,
 ) -> None:
     """Detect anomalies."""
     engine = get_engine()
@@ -484,11 +486,15 @@ def anomaly_detection(
         dataset_variable_ids[variable.datasetId].append(variable)
 
     for dataset_id, variables_in_dataset in dataset_variable_ids.items():
+        # Limit the number of variables.
+        if sample_n and len(variables_in_dataset) > sample_n:
+            variables_in_dataset = _sample_variables(variables_in_dataset, sample_n)
+
         # Get dataset's checksum
         with Session(engine) as session:
             dataset = gm.Dataset.load_dataset(session, dataset_id)
 
-        log.info("loading_data.start")
+        log.info("loading_data.start", variables=len(variables_in_dataset))
         variables_old = [
             variables[variable_id_old]
             for variable_id_old in variable_mapping.keys()
@@ -498,6 +504,9 @@ def anomaly_detection(
         t = time.time()
         df = load_data_for_variables(engine=engine, variables=variables_old_and_new)
         log.info("loading_data.end", t=time.time() - t)
+
+        if df.empty:
+            continue
 
         for anomaly_type in anomaly_types:
             # Instantiate the anomaly detector.
@@ -637,6 +646,10 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
     df = pd.DataFrame(variable_data_table_from_catalog(engine, variables=variables))
     df = df.rename(columns={"country": "entity_name"})
 
+    if "year" not in df.columns and "date" in df.columns:
+        log.warning("Anomalist does not work for datasets with `date` column yet.")
+        return pd.DataFrame()
+
     # Define the list of columns that are not index columns.
     data_columns = [v.id for v in variables]
 
@@ -651,7 +664,7 @@ def load_data_for_variables(engine: Engine, variables: list[gm.Variable]) -> pd.
 
     # Sort data (which may be needed for some detectors).
     # NOTE: Here, we first convert the entity_name to string, because otherwise the sorting will be based on categorical order (which can be arbitrary).
-    df = df.astype({"entity_name": str}).sort_values(INDEX_COLUMNS).reset_index(drop=True)
+    df = df.astype({"entity_name": "string[pyarrow]"}).sort_values(INDEX_COLUMNS).reset_index(drop=True)
 
     return df
 
@@ -690,3 +703,30 @@ def combine_and_reduce_scores_df(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
     # df = df.astype({"year": int})
 
     return df_reduced
+
+
+def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]:
+    """Sample n variables. Prioritize variables that are used in charts, then fill the rest
+    with random variables."""
+    if len(variables) <= n:
+        return variables
+
+    # Include all variables that are used in charts.
+    # NOTE: if we run this before indicator upgrader, none of the charts will be in charts yet. So the
+    #  first round of anomalies with random sampling won't be very useful. Next runs should be useful
+    #  though
+    df_views = get_variables_views_in_charts(variable_ids=[v.id for v in variables])
+    sample_ids = set(df_views.sort_values("views_365d", ascending=False).head(n)["variable_id"])
+
+    # Fill the rest with random variables.
+    unused_ids = list(set(v.id for v in variables) - sample_ids)
+    random.seed(1)
+    if len(sample_ids) < n:
+        sample_ids |= set(np.random.choice(unused_ids, n - len(sample_ids), replace=False))
+
+    log.info(
+        "sampling_variables",
+        original_n=len(variables),
+        new_n=len(sample_ids),
+    )
+    return [v for v in variables if v.id in sample_ids]
