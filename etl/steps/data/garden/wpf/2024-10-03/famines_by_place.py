@@ -66,6 +66,7 @@ def run(dest_dir: str) -> None:
             "Moldova, Ukraine, Russia, Belarus": "USSR/Russia",
             "Russia, Western Soviet States": "USSR/Russia",
             "Russia, Kazakhstan": "USSR/Russia",
+            "USSR": "USSR/Russia",
             "India, Bangladesh": "India",
         }
     )
