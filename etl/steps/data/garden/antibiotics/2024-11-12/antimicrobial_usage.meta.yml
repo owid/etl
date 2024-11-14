@@ -16,24 +16,24 @@ tables:
   class:
     variables:
       ddd:
-        title: Defined daily doses of << atc4name.lower() >> antibiotics used where the route of administration is << routeofadministration.lower() >>
+        title: Defined daily doses of << antimicrobialclass>> - << atc4name.lower() >>  used where the route of administration is << routeofadministration.lower() >>
         description_short: Volume of antimicrobials used in a given year.
-        description_processing: <<notes>>
+        #description_processing: <<notes>>
         unit: Defined daily doses
       did:
         title: Defined daily doses per 1000 inhabitants per day of << atc4name.lower() >> antibiotics used where the route of administration is << routeofadministration.lower() >>
         description_short: Volume of antimicrobials used per 1000 inhabitants per day.
-        description_processing: <<notes>>
+        #description_processing: <<notes>>
         unit: Defined daily doses per 1000 inhabitants per day
   aware:
     variables:
       ddd:
         title: Defined daily doses of << awarelabel.lower() >> antibiotics used
         description_short: Volume of antimicrobials used in a given year.
-        description_processing: <<notes>>
+        #description_processing: <<notes>>
         unit: Defined daily doses
       did:
         title: Defined daily doses per 1000 inhabitants per day of << awarelabel.lower() >>
         description_short: Volume of antimicrobials used per 1000 inhabitants per day.
-        description_processing: <<notes>>
+        #description_processing: <<notes>>
         unit: Defined daily doses per 1000 inhabitants per day
