@@ -126,6 +126,7 @@ def get_data_insights() -> list[Dict[str, Any]]:
 
             # Build DI dictionary
             di_dict = {
+                "id": di["id"],
                 "title": content["title"],
                 "raw_text": extract_text_from_raw_data_insight(content),
                 "authors": content["authors"],
@@ -193,18 +194,24 @@ def get_sorted_documents_by_similarity(
 
 
 def st_display_insight(insight):
-    authors = ", ".join([tag_in_md(a, "gray", ":material/ink_pen") for a in insight["authors"]])
+    # :material/person
+    authors = ", ".join([tag_in_md(a, "gray", ":material/person") for a in insight["authors"]])
     score = round(insight["similarity"] * 100)
-    with st.container(border=True):
-        st.markdown(f"#### {insight['title']}")
 
+    # Get edit URLs
+    url_gdoc = f"https://docs.google.com/document/d/{insight['id']}/edit"
+    url_admin = f"http://staging-site-covid-reporting-5/admin/gdocs/{insight['id']}/preview"
+
+    with st.container(border=True):
         # If public, display special header (inc multimedia content if insight is public)
         if insight["is_public"]:
-            # Display header 'Author | Date | Link'
+            st.markdown(f"#### [{insight['title']}]({insight['url']})")
+
+            # Display header 'Author | Date'
             date_str = insight["date_published"].strftime("%B %d, %Y")
             date_str = tag_in_md(date_str, "green", ":material/calendar_month")
             # header = f"by **{authors}** | published **{date_str}** | [view]({insight['url']})"
-            st.markdown(f"by {authors} | {date_str}")
+            st.markdown(f"by {authors} | {date_str} | [:material/edit: edit]({url_admin})")
 
             # Show multimedia content if available (image, video)
             if insight["url_img_desktop"] is not None:
@@ -213,7 +220,8 @@ def st_display_insight(insight):
                 st.video(insight["url_vid"])
         # Display only authors if not public
         else:
-            st.write(f":red[(Draft)] {authors}")
+            st.markdown(f"#### {insight['title']}")
+            st.write(f":red[(Draft)] {authors} | [:material/edit: edit]({url_admin})")
 
         # Render text
         text = insight["markdown"].replace("$", "\$")
@@ -223,9 +231,18 @@ def st_display_insight(insight):
         st.write(f"**Similarity Score:** {score}%")
 
 
+@st.cache_data(show_spinner=False)
+def get_authors_with_DIs(insights):
+    with st.spinner("Getting author names..."):
+        return set(author for insight in insights for author in insight["authors"])
+
+
 ########################################################################################################################
 # Fetch all data insights.
 insights = get_data_insights()
+# Available authors
+authors = get_authors_with_DIs(insights)
+
 # Create an embedding for each insight.
 # TODO: This could also be stored in db.
 embeddings = get_insights_embeddings(insights)
@@ -240,7 +257,7 @@ embeddings = get_insights_embeddings(insights)
 st.title(":material/search: DI search")
 
 # Other interesting links
-with st.popover("Other resources"):
+with st.popover("Additional resources"):
     st.markdown(
         """
 
@@ -257,9 +274,14 @@ input_string = st.text_input(
     help="Write any text to find the most similar data insights.",
 )
 
-if input_string:
-    if len(input_string) < 3:
-        st.warning("Please enter at least 3 characters.")
+input_authors = st.multiselect(
+    label="Authors",
+    options=authors,
+)
+
+if input_string or (input_authors != []):
+    if (len(input_string) < 3) and (len(input_authors) == 0):
+        st.warning("Please enter at least 3 characters or one author.")
     else:
         # Get the sorted DIs.
         sorted_dis = get_sorted_documents_by_similarity(input_string, insights=insights, embeddings=embeddings)
@@ -289,6 +311,10 @@ if input_string:
                 filtered_dis = [di for di in sorted_dis if not di["is_public"]]
             case _:
                 filtered_dis = sorted_dis
+
+        # Filter DIs by author
+        if input_authors:
+            filtered_dis = [di for di in filtered_dis if any(author in di["authors"] for author in input_authors)]
 
         # Use pagination
         items_per_page = 100
