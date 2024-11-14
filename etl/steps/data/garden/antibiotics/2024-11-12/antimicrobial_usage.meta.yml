@@ -6,13 +6,13 @@ definitions:
         - Global Health
   aware_description:
     <- if awarelabel == "Access" ->
-    "Access antibiotics have activity against a wide range of common pathogens and show lower resistance potential than antibiotics in the other groups."
+    Access antibiotics have activity against a wide range of common pathogens and show lower resistance potential than antibiotics in the other groups.
     <- elif awarelabel == "Watch" ->
-    "Watch antibiotic have higher resistance potential and include most of the highest priority agents among the Critically Important Antimicrobials for Human Medicine and/or antibiotics that are at relatively high risk of bacterial resistance."
+    Watch antibiotic have higher resistance potential and include most of the highest priority agents among the Critically Important Antimicrobials for Human Medicine and/or antibiotics that are at relatively high risk of bacterial resistance.
     <- elif awarelabel == "Reserve" ->
-    "Reserve antibiotics  should be reserved for treatment of confirmed or suspected infections due to multi-drug-resistant organisms. Reserve group antibiotics should be treated as “last resort” options."
+    Reserve antibiotics  should be reserved for treatment of confirmed or suspected infections due to multi-drug-resistant organisms. Reserve group antibiotics should be treated as “last resort” options.
     <- elif awarelabel == "Not classified/Not recommended" ->
-    "The use of the Not classified/Not recommended antibiotics is not evidence-based, nor recommended in high-quality international guidelines.  WHO does not recommend the use of these antibiotics in clinical practice."
+    The use of the Not classified/Not recommended antibiotics is not evidence-based, nor recommended in high-quality international guidelines.  WHO does not recommend the use of these antibiotics in clinical practice.
     <- endif ->
 
 
