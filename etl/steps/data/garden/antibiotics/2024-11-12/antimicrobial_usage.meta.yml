@@ -15,15 +15,7 @@ definitions:
     The use of the Not classified/Not recommended antibiotics is not evidence-based, nor recommended in high-quality international guidelines.  WHO does not recommend the use of these antibiotics in clinical practice.
     <%- endif -%>
   routeofadministration:
-    <%- if routeofadministration == "O" -%>
-    orally administered
-    <%- elif routeofadministration == "P" -%>
-    parentearally administered
-    <%- elif routeofadministration == "R" -%>
-    rectally administered
-    <%- elif routeofadministration == "I" -%>
-    inhaled
-    <%- endif -%>
+    <%- if routeofadministration == "O" -%>orally administered<%- elif routeofadministration == "P" -%>parentearally administered<%- elif routeofadministration == "R" -%>rectally administered<%- elif routeofadministration == "I" -%>inhaled<%- endif -%>
 
 
 # Learn more about the available fields:
@@ -39,21 +31,21 @@ tables:
         title: Defined daily doses of {definitions.routeofadministration}  << antimicrobialclass>> - << atc4name.lower() >>  used
         description_short: Volume of antimicrobials used in a given year.
         #description_processing: <<notes>>
-        unit: Defined daily doses
+        unit: defined daily doses
       did:
         title: Defined daily doses per 1000 inhabitants per day of {definitions.routeofadministration} << antimicrobialclass>> - << atc4name.lower() >> used
         description_short: Volume of antimicrobials used per 1000 inhabitants per day.
         #description_processing: <<notes>>
-        unit: Defined daily doses per 1000 inhabitants per day
+        unit: defined daily doses per 1000 inhabitants per day
   aware:
     variables:
       ddd:
-        title: Defined daily doses of << awarelabel.lower() >> antibiotics used
-        description_short: Volume of antibiotics in AWaRe category << awarelabel.lower() >> used in a given year. {definitions.aware_description}
+        title: Defined daily doses of << awarelabel >> antibiotics used
+        description_short: "Volume of AWaRe category: << awarelabel >> antibiotics used in a given year. {definitions.aware_description}"
         #description_processing: <<notes>>
-        unit: Defined daily doses
+        unit: defined daily doses
       did:
-        title: Defined daily doses per 1000 inhabitants per day of << awarelabel.lower() >> antibiotics used
-        description_short: Volume of antibiotics in AWaRe category used per 1000 inhabitants per day. {definitions.aware_description}
+        title: Defined daily doses per 1000 inhabitants per day of << awarelabel>> antibiotics used
+        description_short: "Volume of AWaRe category: <<awarelabel>> used per 1000 inhabitants per day. {definitions.aware_description}"
         #description_processing: <<notes>>
-        unit: Defined daily doses per 1000 inhabitants per day
+        unit: defined daily doses per 1000 inhabitants per day
