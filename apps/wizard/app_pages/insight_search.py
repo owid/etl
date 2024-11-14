@@ -10,7 +10,7 @@ from sentence_transformers import SentenceTransformer, util
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from apps.wizard.utils.components import Pagination, tag_in_md
+from apps.wizard.utils.components import Pagination, st_horizontal, st_multiselect_wider, tag_in_md
 from etl.db import read_sql
 
 # Initialize log.
@@ -199,7 +199,7 @@ def st_display_insight(insight):
     score = round(insight["similarity"] * 100)
 
     # Get edit URLs
-    url_gdoc = f"https://docs.google.com/document/d/{insight['id']}/edit"
+    # url_gdoc = f"https://docs.google.com/document/d/{insight['id']}/edit"
     url_admin = f"http://staging-site-covid-reporting-5/admin/gdocs/{insight['id']}/preview"
 
     with st.container(border=True):
@@ -274,10 +274,14 @@ input_string = st.text_input(
     help="Write any text to find the most similar data insights.",
 )
 
-input_authors = st.multiselect(
-    label="Authors",
-    options=authors,
-)
+st_multiselect_wider()
+with st_horizontal():
+    input_authors = st.multiselect(
+        label="Authors",
+        options=authors,
+        help="Show only insights by selected authors.",
+        placeholder="Filter by author(s)",
+    )
 
 if input_string or (input_authors != []):
     if (len(input_string) < 3) and (len(input_authors) == 0):
