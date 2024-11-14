@@ -21,6 +21,7 @@ Run this snapshot script as:
         --commits-users gh_stats/commits/10800-users-commits-20241105182054.csv \
         --vax-reporting first_reporting_dates.csv
 
+NOTE: To get data on when countries first reported vaccination data, please refer to get_vax_reporting.py script.
 """
 
 from pathlib import Path
