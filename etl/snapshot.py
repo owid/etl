@@ -4,7 +4,7 @@ import re
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterator, Optional, Union
+from typing import Any, Iterator, Optional, Union, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -22,6 +22,7 @@ from owid.catalog.meta import (
 )
 from owid.datautils import dataframes
 from owid.datautils.io import decompress_file
+from owid.repack import to_safe_types
 from owid.walden import files
 
 from etl import config, paths
@@ -484,6 +485,7 @@ def read_table_from_snapshot(
     table_metadata: TableMeta,
     snapshot_origin: Union[Origin, None],
     file_extension: str,
+    safe_types: bool = True,
     *args,
     **kwargs,
 ) -> Table:
@@ -500,23 +502,28 @@ def read_table_from_snapshot(
     }
     # Read table
     if file_extension == "csv":
-        return pr.read_csv(*args, **kwargs)
+        tb = pr.read_csv(*args, **kwargs)
     elif file_extension == "feather":
-        return pr.read_feather(*args, **kwargs)
+        tb = pr.read_feather(*args, **kwargs)
     elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
-        return pr.read_excel(*args, **kwargs)
+        tb = pr.read_excel(*args, **kwargs)
     elif file_extension == "json":
-        return pr.read_json(*args, **kwargs)
+        tb = pr.read_json(*args, **kwargs)
     elif file_extension == "dta":
-        return pr.read_stata(*args, **kwargs)
+        tb = pr.read_stata(*args, **kwargs)
     elif file_extension == "rds":
-        return pr.read_rds(*args, **kwargs)
+        tb = pr.read_rds(*args, **kwargs)
     elif file_extension == "rda":
-        return pr.read_rda(*args, **kwargs)
+        tb = pr.read_rda(*args, **kwargs)
     elif file_extension == "parquet":
-        return pr.read_parquet(*args, **kwargs)
+        tb = pr.read_parquet(*args, **kwargs)
     else:
         raise ValueError(f"Unknown extension {file_extension}")
+
+    if safe_types:
+        tb = cast(Table, to_safe_types(tb))
+
+    return tb
 
 
 def add_snapshot(

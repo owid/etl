@@ -336,8 +336,6 @@ def add_cfr(tb: Table) -> Table:
         return pd.NA
 
     tb["cfr"] = 100 * tb["total_deaths"] / tb["total_cases"]
-    # 0/0 returns np.nan and not pd.NA which would be more natural for Float64
-    tb["cfr"] = tb["cfr"].mask(np.isnan(tb["cfr"]), pd.NA)
     tb["cfr_100_cases"] = tb.apply(_apply_row_cfr_100, axis=1)
     tb["cfr_100_cases"] = tb["cfr_100_cases"].copy_metadata(tb["cfr"])
 
