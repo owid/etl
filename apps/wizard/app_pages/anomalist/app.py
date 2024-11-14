@@ -34,7 +34,7 @@ from apps.wizard.app_pages.anomalist.utils import (
 )
 from apps.wizard.utils import cached, set_states, url_persist
 from apps.wizard.utils.chart_config import bake_chart_config
-from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
+from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, st_multiselect_wider, tag_in_md
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
 from etl.grapher_io import load_variables
@@ -549,15 +549,7 @@ st.title(":material/planner_review: Anomalist")
 
 # 2/ DATASET FORM
 # Ask user to select datasets. By default, we select the new datasets (those that are new in the current PR compared to master).
-st.markdown(
-    """
-    <style>
-       .stMultiSelect [data-baseweb=select] span{
-            max-width: 1000px;
-        }
-    </style>""",
-    unsafe_allow_html=True,
-)
+st_multiselect_wider()
 
 with st.form(key="dataset_search"):
     query_dataset_ids = [int(v) for v in st.query_params.get_all("anomalist_datasets_selected")]
