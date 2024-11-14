@@ -1,5 +1,4 @@
 """Load a garden dataset and create a grapher dataset."""
-# TODO: UNDO THIS LINE!
 import json
 import os
 import re

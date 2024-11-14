@@ -712,14 +712,15 @@ def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]
         return variables
 
     # Include all variables that are used in charts.
+    # NOTE: if we run this before indicator upgrader, none of the charts will be in charts yet. So the
+    #  first round of anomalies with random sampling won't be very useful. Next runs should be useful
+    #  though
     df_views = get_variables_views_in_charts(variable_ids=[v.id for v in variables])
     sample_ids = set(df_views.sort_values("views_365d", ascending=False).head(n)["variable_id"])
 
     # Fill the rest with random variables.
     unused_ids = list(set(v.id for v in variables) - sample_ids)
     random.seed(1)
-    random.shuffle(unused_ids)
-
     if len(sample_ids) < n:
         sample_ids |= set(np.random.choice(unused_ids, n - len(sample_ids), replace=False))
 
