@@ -147,6 +147,7 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
+          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
         description_from_producer: |-
           {definitions.description_methodology}
 
