@@ -16,11 +16,13 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     tb = snap.read()
 
-    #
-    # Process data.
-    #
+    # fix dtypes for object columns
+    for col in tb.columns:
+        if tb[col].dtype == "object":
+            tb[col] = tb[col].astype("str")
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["id"])
 
     #
     # Save outputs.

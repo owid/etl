@@ -11,16 +11,15 @@ meta:
 
       GFS measures global human flourishing in six areas:
 
-          Happiness and life satisfaction
-          Mental and physical health
-          Meaning and purpose
-          Character and virtue
-          Close social relationships
-          Material and financial stability
+        - Happiness and life satisfaction
+        - Mental and physical health
+        - Meaning and purpose
+        - Character and virtue
+        - Close social relationships
+        - Material and financial stability
 
       The GFS is being led by principal investigators Byron R. Johnson, Director of the Institute for Studies of Religion at Baylor University, and Tyler J. VanderWeele, Director of the Human Flourishing Program at Harvard University.
 
-      OSF link: https://osf.io/3jtz8/
     date_published: "2024-06-07"
     title_snapshot: Global Flourishing Study - Wave 1
     description_snapshot: |-
@@ -33,6 +32,8 @@ meta:
     attribution_short: GFS
 
     # Files
+    # OSF link for e.g. metadata and methodology https://osf.io/3jtz8/
+    # There is another OSF link for downloading the data - but I won't include it since it's not public
     url_main: https://globalflourishingstudy.com/
     date_accessed: 2024-11-11
 
