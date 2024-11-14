@@ -226,11 +226,6 @@ steps:
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  data://grapher/energy/2024-10-30/photovoltaic_cost_and_capacity:
-    - data://garden/energy/2024-10-30/photovoltaic_cost_and_capacity
-  #
-  # Energy - Photovoltaic cost and capacity.
-  #
   data://grapher/energy/2024-11-01/photovoltaic_cost_and_capacity:
     - data://garden/energy/2024-11-01/photovoltaic_cost_and_capacity
   #
