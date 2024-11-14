@@ -1,0 +1,33 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  title: COVID-19, Countries reporting data
+
+tables:
+  country_flags:
+    variables:
+      reporting:
+        title: Country reporting data on COVID-19 << type >>
+        description_short: |-
+          Whether a country had reported data on COVID-19 << type >> at least once by a given date.
+        unit: ""
+  country_counts:
+    variables:
+      num_countries_reporting:
+        title: Number of countries reporting data on COVID-19 << type >>
+        description_short: |-
+          Number of counties had reported data on COVID-19 << type >> at least once by a given date.
+        unit: "countries"
+      share_countries_reporting:
+        title: Share of countries reporting data on COVID-19 << type >>
+        description_short: |-
+          Share of counties had reported data on COVID-19 << type >> at least once by a given date.
+        unit: "%"
