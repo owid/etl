@@ -30,9 +30,8 @@ dataset:
   title: Minimum and maximumk temperature anomalies
 
 tables:
-  surface_temperature:
+  surface_temperature_anomalies_min_max:
     variables:
-
       upper_bound_anomaly:
         title: Upper bound surface temperature anomaly
         description_short: |-

@@ -1,5 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -15,6 +16,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("surface_temperature")
     tb = ds_garden["surface_temperature"].reset_index()
     tb["year"] = tb["time"].astype(str).str[0:4]
+    tb["year"] = tb["year"].astype(int)
     tb["month"] = tb["time"].astype(str).str[5:7]
     origin = tb["temperature_2m"].metadata.origins
 
@@ -23,51 +25,23 @@ def run(dest_dir: str) -> None:
     #
     tb = tb.drop(columns=["time"], errors="raise")
 
-    # Transpose the DataFrame to have a country column, a column identifying the measure, and year columns
-    tb = tb[["country", "year", "month", "temperature_anomaly"]].pivot(
-        index=["country", "month"], columns="year", values="temperature_anomaly", join_column_levels_with="_"
-    )
+    # Filter the DataFrame to include only years less than 2023
+    filtered_tb = tb[tb["year"] < 2023]
 
-    # Select columns that contain the group name and a year between 2003 (minimum value in emisssions; 2012 in area burned) and 2023 (inclusive)
-    group_columns = [col for col in tb.columns if col <= "2022"]
-    print(group_columns)
+    # Group by country and month, and then calculate the maximum temperature anomaly for each group
+    max_temp_anomaly = filtered_tb.groupby(["country", "month"])["temperature_anomaly"].max().reset_index()
+    max_temp_anomaly.rename(columns={"temperature_anomaly": "upper_bound_anomaly"}, inplace=True)
 
-    tb = tb[group_columns + ["country", "month"]]
-    tb["month"] = tb["month"].astype(int)
-
-    # Sort the group columns by year
-    group_columns_sorted = sorted(group_columns)
-
-    # Process data for each country
-    for country in tb["country"].unique():
-        country_rows = tb[tb["country"] == country]
-
-        # Select rows with year 52 (actually the last week of the year)
-        country_row_12 = country_rows[country_rows["month"] == 12]
-
-        if country_row_12.empty or country_row_12[group_columns_sorted].isnull().all(axis=1).all():
-            continue
-
-        # Find the column with the maximum value at year 52 (actually the last week of the year)
-        max_col = country_row_12[group_columns_sorted].idxmax(axis=1).iloc[0]
-
-        # Find the column with the minimum value at year 52 (actually the last week of the year)
-        min_col = country_row_12[group_columns_sorted].idxmin(axis=1).iloc[0]
-
-        # Set upper and lower bounds for all rows of this country using the columns identified at year 52
-        tb.loc[tb["country"] == country, "upper_bound_anomaly"] = country_rows[max_col]
-        tb.loc[tb["country"] == country, "lower_bound_anomaly"] = country_rows[min_col]
-
-    # Drop original columns as they are used in a different dataset and not needed here
-    tb = tb.drop(columns=group_columns)
-
-    # Dynamically set origins based on the group
+    # Group by country and month, and then calculate the minimum temperature anomaly for each group
+    min_temp_anomaly = filtered_tb.groupby(["country", "month"])["temperature_anomaly"].min().reset_index()
+    min_temp_anomaly.rename(columns={"temperature_anomaly": "lower_bound_anomaly"}, inplace=True)
+    tb = pr.merge(max_temp_anomaly, min_temp_anomaly, on=["country", "month"])
 
     for col in ["upper_bound_anomaly", "lower_bound_anomaly"]:
         tb[col].origins = origin
 
     tb = tb.rename(columns={"month": "year"})
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.
