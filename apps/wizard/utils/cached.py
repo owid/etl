@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
@@ -11,6 +12,9 @@ from etl.config import OWID_ENV, OWIDEnv
 from etl.git_helpers import get_changed_files
 from etl.grapher_model import Anomaly, Variable
 from etl.version_tracker import VersionTracker
+
+# silence WARNING streamlit.runtime.caching.cache_data_api: No runtime found, using MemoryCacheStorageManager
+logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.ERROR)
 
 
 @st.cache_data
