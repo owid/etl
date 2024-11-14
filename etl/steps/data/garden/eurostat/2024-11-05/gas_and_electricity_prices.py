@@ -205,6 +205,15 @@ INDEXES_MAPPING = {
         "TAX_NUC_ALLOW": "Nuclear taxes allowance",
         # Taxes, fees, levies and charges allowance
         "TAX_FEE_LEV_CHRG_ALLOW": "Taxes, fees, levies, and charges allowance",
+        # From the metadata page (https://ec.europa.eu/eurostat/cache/metadata/en/nrg_pc_204_sims.htm), these are the components:
+        # * Energy and supply: generation, aggregation, balancing energy, supplied energy costs, customer services, after-sales management and other supply costs.
+        # * Network cost: transmission and distribution tariffs, transmission and distribution losses, network costs, after-sale service costs, system service costs, and meter rental and metering costs.
+        # * Value added taxes (VAT): as defined in Council Directive 2006/112/EC.
+        # * Renewable taxes: taxes, fees, levies or charges relating to the promotion of renewable energy sources, energy efficiency and CHP generation.
+        # * Capacity taxes: Taxes, fees, levies or charges relating to capacity payments, energy security and generation adequacy; taxes on coal industry restructuring; taxes on electricity distribution; stranded costs and levies on financing energy regulatory authorities or market and system operators.
+        # * Environmental taxes: taxes, fees, levies or charges relating to air quality and for other environmental purposes; taxes on emissions of CO2 or other greenhouse gases. This component includes the excise duties.
+        # * Nuclear taxes: taxes, fees, levies or charges relating to the nuclear sector, including nuclear decommissioning, inspections and fees for nuclear installations.
+        # * All other taxes: taxes, fees, levies or charges not covered by any of the previous five categories: support for district heating; local or regional fiscal charges; island compensation; concession fees relating to licences and fees for the occupation of land and public or private property by networks or other devices.
     },
     # Energy units.
     "energy_unit": {
@@ -382,13 +391,16 @@ def compare_components_and_prices_data(tb: Table) -> None:
     tb_annual = tb[~tb["year-semester"].str.contains("S")].reset_index(drop=True)
 
     # OPTION 1: Sum over all price components to get the total.
-    # NOTE: The sum of all components tends to be systematically above the values in the prices dataset.
-    #  That means that some components include others. To avoid double-counting, we need to select a subset of components.
-    # It's not clear if some other components (e.g. "Other") should also be included here, but for now, keep only these main components.
     components_to_include = [
         "Energy and supply",
         "Network costs",
         "Taxes, fees, levies, and charges",
+        # "Taxes, fees, levies, and charges allowance",
+        # "Renewable taxes allowance",
+        # "Capacity taxes allowances",
+        # "Environmental taxes allowance",
+        # "Other allowance",
+        # "Nuclear taxes allowance",
     ]
     annual_components = (
         tb_annual[
@@ -440,6 +452,11 @@ def compare_components_and_prices_data(tb: Table) -> None:
     # Conclusions:
     # * When consumption band "All bands" is selected, there are very few points where both curves (prices and components) can be compared. When choosing another band, e.g. "<20GJ", there are more points to compare (in the case of gas).
     # * The prices and components datasets coincide reasonably well, but we need to figure out which subset of components needs to be included, to avoid double-counting.
+    # * It seems that some components include others, so we can't simply sum them all up. It seems that "Energy and supply", "Network costs", and "Taxes, fees, levies, and charges" are the main components. When adding them up, the result is quite close to the prices dataset.
+    # * Numerically, I have checked that for all price components datasets, "Taxes, fees, levies and charges" coincides with the sum of 'Capacity taxes', 'Environmental taxes', 'Nuclear taxes', 'Renewable taxes', 'Value added tax (VAT)', 'Other'. For some country-years, there is a small discrepancy. Also, for Romania 2022 there is is no "Taxes, fees, levies and charges" component, but there are other components; however, those extra components are zero (so, we can ignore this exception).
+    # TODO: Assert the previous hypothesis.
+    # * What's not so clear is what happens with the "allowances". Is "Taxes, fees, levies, and charges allowance" the sum of all other "* allowance"? It's hard to know, since it's non-zero only once (nrg_pc_204_c Netherlands 2023). At that point, it does coincide with the sum of all other "* allowance". But there are other instances of non-zero "* allowance" where "Taxes...allowance" is not defined. It may be possible that allowances are not included in the prices dataset (in any case, I think there are not many cases of significant allowances in the data).
+    # TODO: Assert that certain price components are always positive.
 
 
 def select_and_prepare_relevant_data(tb: Table) -> Table:
