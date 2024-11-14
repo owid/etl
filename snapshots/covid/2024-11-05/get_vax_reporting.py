@@ -1,7 +1,7 @@
 """
 Get dates of first reporting for each country.
 
-python snapshot/covid/2024-11-05/get_vax_repoting.py
+python snapshot/covid/2024-11-05/get_vax_reporting.py
 """
 
 import os
