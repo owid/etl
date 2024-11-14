@@ -29,7 +29,8 @@ def run(dest_dir: str) -> None:
     )
 
     # Select columns that contain the group name and a year between 2003 (minimum value in emisssions; 2012 in area burned) and 2023 (inclusive)
-    group_columns = [col for col in tb.columns if "2003" <= col <= "2023"]
+    group_columns = [col for col in tb.columns if col <= "2022"]
+    print(group_columns)
 
     tb = tb[group_columns + ["country", "month"]]
     tb["month"] = tb["month"].astype(int)
