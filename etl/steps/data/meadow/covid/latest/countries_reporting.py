@@ -25,8 +25,18 @@ def run(dest_dir: str) -> None:
     tb["date"] = tb["date_first_reported"]
     tb = tb[["country", "date", "date_first_reported", "date_first_value"]]
 
+    # Dtypes
+    tb = tb.astype(
+        {
+            "country": "string",
+            "date": "datetime64[ns]",
+            "date_first_reported": "datetime64[ns]",
+            "date_first_value": "datetime64[ns]",
+        }
+    )
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "date"])
+    tb = tb.format(["country", "date"], short_name="vaccinations")
 
     #
     # Save outputs.
