@@ -37,6 +37,14 @@ main:
       - "@daniel"
     entrypoint: app_pages/expert/app.py
     icon: ":material/hotel_class:"
+  analytics:
+    title: "Analytics (external)"
+    description: "Learn more about OWID in Data!"
+    maintainer:
+      - "@bobbie"
+      - "@lucas"
+    entrypoint: app_pages/analytics.py
+    icon: ":material/bar_chart:"
 
 # ETL steps
 etl:
@@ -86,7 +94,7 @@ etl:
       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
 
 sections:
-  - title: "Data tools"
+  - title: "Data curation"
     description: |-
       Updates, data edits, etc.
     apps:
@@ -125,7 +133,7 @@ sections:
         icon: ":material/music_note:"
         image_url: "https://www.shutterstock.com/image-vector/abstract-vector-musical-background-music-260nw-485443810.jpg"
 
-  - title: "Monitoring"
+  - title: "Data monitoring"
     description: |-
       Control panel for ETL steps.
     apps:
@@ -167,13 +175,6 @@ sections:
     description: |-
       Research tools.
     apps:
-      - title: "Insighter"
-        alias: insighter
-        description: "Data insights with GPT"
-        maintainer: "@daniel"
-        entrypoint: app_pages/datainsight_robot.py
-        icon: ":material/lightbulb:"
-        image_url: "https://cdn.cpdonline.co.uk/wp-content/uploads/2023/08/03153310/Starting-To-Become-A-Writer-1200x350.jpg"
       - title: "Insight search"
         alias: insight_search
         description: "Browse data insights by their semantic similarity"
@@ -181,6 +182,14 @@ sections:
         entrypoint: app_pages/insight_search.py
         icon: ":material/search:"
         image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
+      - title: "Insighter"
+        alias: insighter
+        description: "Data insights with GPT"
+        maintainer: "@daniel"
+        entrypoint: app_pages/datainsight_robot.py
+        icon: ":material/lightbulb:"
+        image_url: "https://cdn.cpdonline.co.uk/wp-content/uploads/2023/08/03153310/Starting-To-Become-A-Writer-1200x350.jpg"
+
 
   - title: "Misc"
     description: |-
