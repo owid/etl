@@ -1,7 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
-import pandas as pd
+
+# import pandas as pd
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -221,7 +222,7 @@ def run(dest_dir: str) -> None:
     # 2023    170562
     # 2022     32334
     # 2024         2
-    tb["year"] = pd.to_datetime(tb["doi_annual"]).dt.year
+    # tb["year"] = 2023  # pd.to_datetime(tb["doi_annual"]).dt.year
 
     tb["country"] = tb["country"].map(COUNTRY_MAPPING)
 
@@ -248,13 +249,16 @@ def run(dest_dir: str) -> None:
     #
     tbs_full = pr.multi_merge([tb_scored_10, tb_binary, tb_cat, tb_scored_other, tb_cat_other, tb_scored_97])
 
+    # see above - change when decision about year is made
+    tbs_full["year"] = 2023
+
     tbs_full.metadata = tb.metadata
-    tbs_full.m.short_name = "gfs_summary"
+    tbs_full.m.short_name = "gfs_wave_one"
 
     for col in tbs_full.columns:
         tbs_full[col].metadata = tb["country"].metadata
 
-    tbs_full = tbs_full.format(["country"])
+    tbs_full = tbs_full.format(["country", "year"])
 
     #
     # Save outputs.
@@ -298,7 +302,7 @@ def share_binary(tb, groups=["country"], cols=BINARY_COLS):
     for col in cols:
         tb_binary[col + "_no_share"] = tb_binary[col] - 1
         tb_binary[col + "_yes_share"] = 1 - tb_binary[col + "_no_share"]
-    tb_binary = tb_binary.drop(columns=BINARY_COLS).reset_index()
+    tb_binary = tb_binary.drop(columns=cols).reset_index()
     tb_binary = pr.merge(tb_binary, tb_na, on=groups)
     return tb_binary
 

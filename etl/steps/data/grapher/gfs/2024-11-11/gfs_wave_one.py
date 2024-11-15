@@ -50,7 +50,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("gfs_wave_one")
 
     # Read table from garden dataset.
-    tb = ds_garden["gfs_summary"]
+    tb = ds_garden["gfs_wave_one"]
 
     tbs = []
     for var in REL_COL_VAR:
@@ -58,10 +58,18 @@ def run(dest_dir: str) -> None:
         tb_var = rm_sparse_countries(tb, var, var_cols).reset_index()
         tbs.append(tb_var)
 
-    tb_res = pr.multi_merge(tbs, on="country", how="outer")
+    tb_res = pr.multi_merge(tbs, on=["country", "year"], how="outer")
 
-    tb_res["discriminated_often"] = tb_res["discriminated_ans_1_share"] + tb_res["discriminated_ans_2_share"]
-    tb_res["trust_most"] = tb_res["trust_people_ans_1_share"] + tb_res["trust_people_ans_2_share"]
+    tb_res["discriminated_often_share"] = tb_res["discriminated_ans_1_share"] + tb_res["discriminated_ans_2_share"]
+    tb_res["trust_people_most_share"] = tb_res["trust_people_ans_1_share"] + tb_res["trust_people_ans_2_share"]
+
+    for col in tb_res.columns:
+        if "_share" in col:
+            tb_res[col] = tb_res[col] * 100
+            tb_res[col].m.unit = "%"
+            tb_res[col].m.short_unit = "%"
+
+    tb_res = tb_res.format(["country", "year"])
 
     #
     # Save outputs.

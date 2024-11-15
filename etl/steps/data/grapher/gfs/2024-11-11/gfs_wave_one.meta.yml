@@ -33,8 +33,8 @@ tables:
         description_short: "Average answer to the question: 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
       close_to_no_share:
         title: Share of people who feel close to no one
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'no' when asked, 'Is there a special person you feel very close to?'"
         presentation:
           grapher_config:
@@ -43,8 +43,8 @@ tables:
               For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes."
       close_to_yes_share:
         title: Share of people who feel close to at least one person
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'yes' when asked, 'Is there a special person you feel very close to?'"
         presentation:
           grapher_config:
@@ -66,64 +66,64 @@ tables:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_0_share:
         title: Share of people who did not exercise in the last week
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported exercising 0 days in the last week."
         presentation:
           grapher_config:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_1_share:
         title: Share of people who exercised on one day in the last week
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported exercising one day in the last week."
         presentation:
           grapher_config:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_2_share:
         title: Share of people who exercised on two days in the last week
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported exercising two days in the last week."
         presentation:
           grapher_config:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_3_share:
         title: Share of people who exercised on three days in the last week
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported exercising three days in the last week."
         presentation:
           grapher_config:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_4_share:
         title: Share of people who exercised on four days in the last week
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported exercising four days in the last week."
         presentation:
           grapher_config:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_5_share:
         title: Share of people who exercised on five days in the last week
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported exercising five days in the last week."
         presentation:
           grapher_config:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_6_share:
         title: Share of people who exercised on six days in the last week
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported exercising six days in the last week."
         presentation:
           grapher_config:
             note: "{definitions.survey_text.exercise}"
       days_exercise_ans_7_share:
         title: Share of people who exercised every day in the last week
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported exercising every day in the last week."
         presentation:
           grapher_config:
@@ -135,63 +135,63 @@ tables:
         description_short: "Average score people gave when asked 'In the last two weeks, have you felt down, depressed or hopeless', where 1 is 'nearly every day' and 4 is 'not at all'."
       depressed_ans_1_share:
         title: Share of people who felt depressed nearly every day in the last two weeks
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported feeling down nearly every day in the last two weeks."
       depressed_ans_2_share:
         title: Share of people who felt depressed more than half of the days in the last two weeks
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported feeling depressed or hopeless more than half of the days in the last two weeks."
       depressed_ans_3_share:
         title: Share of people who felt depressed several days in the last two weeks
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported feeling down several days in the last two weeks."
       depressed_ans_4_share:
         title: Share of people who did not feel depressed in the last two weeks
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported not feeling down, depressed or hopeless in the last two weeks."
       discriminated_mean:
         title: Self-reported feeling of discrimination
         unit: ""
         short_unit: ""
         description_short: "Average score people gave when asked 'How often do you feel discriminated against because of any group you are part of?', where 1 is 'always' and 4 is 'never'."
-      discriminated_often:
+      discriminated_often_share:
         title: Share of people who feel discriminated against often or always
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'often' or 'always' when asked 'How often do you feel discriminated against because of any group you are part of?'"
       discriminated_ans_1_share:
         title: Share of people who feel discriminated against always
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'always' when asked 'How often do you feel discriminated against because of any group you are part of?'"
       discriminated_ans_2_share:
         title: Share of people who feel discriminated against often
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'often' when asked 'How often do you feel discriminated against because of any group you are part of?'"
       discriminated_ans_3_share:
         title: Share of people who feel discriminated against rarely
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'rarely' when asked 'How often do you feel discriminated against because of any group you are part of?'"
       discriminated_ans_4_share:
         title: Share of people who never feel discriminated against
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'never' when asked 'How often do you feel discriminated against because of any group you are part of?'"
       donated_no_share:
         title: Share of people who did not donate to charity in the last month
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'no' when asked 'In the last month, have you donated money to a charity or non-profit organization?'"
       donated_yes_share:
         title: Share of people who donated to charity in the last month
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'yes' when asked 'In the last month, have you donated money to a charity or non-profit organization?'"
       expenses_mean:
         title: Average worry about living expenses
@@ -205,23 +205,23 @@ tables:
         description_short: "Average score people gave when asked 'In the last two weeks, how often have you felt nervous, anxious or on edge?', where 1 is 'nearly every day' and 4 is 'not at all'."
       feel_anxious_ans_1_share:
         title: Share of people who felt anxious nearly every day in the last two weeks
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported feeling nervous nearly every day in the last two weeks."
       feel_anxious_ans_2_share:
         title: Share of people who felt anxious more than half of the days in the last two weeks
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported feeling nervous or anxious more than half of the days in the last two weeks."
       feel_anxious_ans_3_share:
         title: Share of people who felt anxious several days in the last two weeks
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported feeling nervous several days in the last two weeks."
       feel_anxious_ans_4_share:
         title: Share of people who did not feel anxious in the last two weeks
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who reported not feeling nervous, anxious or on edge in the last two weeks."
       freedom_mean:
         title: Self-reported freedom to make life choices
@@ -250,83 +250,83 @@ tables:
         description_short: "Average answer people gave when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
       rel8_ans_1_share:
         title: Share of people who feel identify as spiritual
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'spiritual' when asked 'Would you say you are religious, spiritual, neither, or both?'"
       rel8_ans_2_share:
         title: Share of people who feel identify as religious
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'religious' when asked 'Would you say you are religious, spiritual, neither, or both?'"
       rel8_ans_3_share:
         title: Share of people who feel identify as both religious and spiritual
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'both' when asked 'Would you say you are religious, spiritual, neither, or both?'"
       rel8_ans_4_share:
         title: Share of people who feel identify as neither religious nor spiritual
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'neither' when asked 'Would you say you are religious, spiritual, neither, or both?'"
       say_in_govt_ans_1_share:
         title: Share of people who feel they have a say in government
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who agree with the statement 'People like me have a say in what the government does.'"
       say_in_govt_ans_2_share:
         title: Share of people who feel they do not have a say in government
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who disagree with the statement 'People like me have a say in what the government does.'"
       say_in_govt_ans_3_share:
         title: Share of people who feel unsure about having a say in government
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who are unsure about whether 'People like me have a say in what the government does.'"
       trust_people_mean:
         title: Perceived trust in people
         unit: ""
         short_unit: ""
         description_short: "Average score people gave when asked 'How many people in this country trust each other?', where 1 is 'all people' and 5 is 'none'."
-      trust_people_most:
+      trust_people_most_share:
         title: Share of people who think most or all people trust each other
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'most' or 'all' when asked 'How many people in this country trust each other?'"
       trust_people_ans_1_share:
         title: Share of people who think all people trust each other
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'all' when asked 'How many people in this country trust each other?'"
       trust_people_ans_2_share:
         title: Share of people who think most people trust each other
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'most' when asked 'How many people in this country trust each other?'"
       trust_people_ans_3_share:
         title: Share of people who think only some people trust each other
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'some' when asked 'How many people in this country trust each other?'"
       trust_people_ans_4_share:
         title: Share of people who think not very many people trust each other
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'not very many' when asked 'How many people in this country trust each other?'"
       trust_people_ans_5_share:
         title: Share of people who think no people trust each other
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'none' when asked 'How many people in this country trust each other?'"
       volunteered_no_share:
         title: Share of people who did not volunteer in the last month
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'no' when asked 'In the last month, have you volunteered your time to an organization?'"
       volunteered_yes_share:
         title: Share of people who volunteered in the last month
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered 'yes' when asked 'In the last month, have you volunteered your time to an organization?'"
       wb_today_mean:
         title: Self-reported life evaluation score
@@ -334,19 +334,19 @@ tables:
         short_unit: ""
         description_short: "Average score people gave when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
       wb_fiveyrs_mean:
-        title: Self-reported live evaluation outlook
+        title: Self-reported life evaluation outlook
         unit: ""
         short_unit: ""
         description_short: " Average score people gave when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
       wb_improvement_yes_share:
         title: Share of people who expect their life to improve in the next five years
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered that they will be on a higher step of the [cantril ladder](#dod:cantril-ladder) in five years than they are now."
       wb_improvement_no_share:
         title: Share of people who do not expect their life to improve in the next five years
-        unit: ""
-        short_unit: ""
+        unit: "%"
+        short_unit: "%"
         description_short: "Share of people who answered that they will be on the same or a lower step of the [cantril ladder](#dod:cantril-ladder) in five years than they are now."
       worry_safety_mean:
         title: Average worry about safety
