@@ -15,7 +15,7 @@ definitions:
     The use of the Not classified/Not recommended antibiotics is not evidence-based, nor recommended in high-quality international guidelines.  WHO does not recommend the use of these antibiotics in clinical practice.
     <%- endif -%>
   routeofadministration:
-    <%- if routeofadministration == "O" -%>orally administered<%- elif routeofadministration == "P" -%>parentearally administered<%- elif routeofadministration == "R" -%>rectally administered<%- elif routeofadministration == "I" -%>inhaled<%- endif -%>
+    <%- if routeofadministration == "O" -%> orally administered <%- elif routeofadministration == "P" -%> parentearally administered <%- elif routeofadministration == "R" -%> rectally administered <%- elif routeofadministration == "I" -%> inhaled <%- endif -%>
 
 
 # Learn more about the available fields:
