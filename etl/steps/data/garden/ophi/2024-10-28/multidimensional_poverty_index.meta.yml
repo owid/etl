@@ -111,16 +111,16 @@ definitions:
   description_key_severe: |-
     Being _severely_ multidimensionally poor means that a person lives in a household deprived in 50% or more of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
   description_key_assessments: |-
-    Households are assessed as being deprived in a given indicator if they do not meet a specific threshold for that indicator. The thresholds for each indicator are published by OPHI in their [methodological notes](https://ophi.org.uk/sites/default/files/2024-10/OPHI%20MPI%20Methodological%20Note%2058_2.pdf).
+    Households are assessed as being deprived in a given indicator if they do not meet a specific threshold for that indicator. [This article](https://ourworldindata.org/multidimensional-poverty-index) explains the specific thresholds.
   description_key_weights: |-
     The indicators vary in weight: health and education indicators weigh 1/6, while living standards indicators weigh 1/18, making each dimension contribute equally to one-third of the total.
   description_key_mpi: |-
-    The Multidimensional Poverty Index (MPI) is calculated by multiplying two values: the share of people who are multidimensionally poor and the intensity of their poverty. Values range between 0 and 1, where a larger figure represents a higher level of poverty.
+    The Multidimensional Poverty Index (MPI) is calculated by multiplying two values: the share of people who are multidimensionally poor and the intensity of their poverty. Values range between 0 and 1, where a larger number represents a higher level of poverty.
   description_key_intensity: |-
-    The intensity of multidimensional poverty is calculated as the average share of indicators in which those counted as MPI poor are deprived (using the same weights to calculate the average). This is an important complementary measure to the share of the population who are MPI poor (the _incidence_ of MPI poverty).
+    The intensity of multidimensional poverty is calculated as the average share of indicators in which those counted as MPI poor are deprived.
   description_key_flavor: |-
     <% if flavor == "Current margin estimate" %>
-    This variable is a current margin estimate (CME), based on the most recent survey data. Look for the harmonized over time (HOT) estimate to see trends over time.
+    This variable is a current margin estimate (CME), based on the most recent survey data available for each country. Look for the harmonized over time (HOT) estimate to see trends over time.
     <% elif flavor == "Harmonized over time" %>
     This variable is a harmonized over time (HOT) estimate. This harmonization seeks to make two or more MPI estimations comparable by aligning the indicator definitions in each survey. Look for the current margin estimate (CME) to see the most recent survey data.
     <%- endif -%>
@@ -207,8 +207,8 @@ tables:
         description_key:
           - "{definitions.description_key_multidimensional_poverty}"
           - "{definitions.description_key_assessments}"
-          - "{definitions.description_key_weights}"
           - "{definitions.description_key_intensity}"
+          - "{definitions.description_key_weights}"
           - "{definitions.description_key_flavor}"
         presentation:
           title_public: Intensity of multidimensional poverty
