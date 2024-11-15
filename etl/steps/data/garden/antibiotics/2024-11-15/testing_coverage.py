@@ -43,7 +43,8 @@ def format_specimen(tb: Table) -> Table:
     Format the syndrome column.
     """
     specimen_dict = {"BLOOD": "bloodstream", "STOOL": "stool", "URINE": "urine", "UROGENITAL": "gonorrhea"}
-
-    tb["specimen"] = tb["specimen"].str.replace(specimen_dict, errors="raise")
+    tb["specimen"] = tb["specimen"].astype(str)
+    tb["specimen"] = tb["specimen"].replace(specimen_dict)
+    assert tb["specimen"].isin(specimen_dict.values()).all()
 
     return tb
