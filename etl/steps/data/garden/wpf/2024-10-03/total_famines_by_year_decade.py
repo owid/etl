@@ -30,6 +30,50 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+
+    # Calculate the number of famines and deaths per decade before exploding the 'date' column to avoid double counting
+    tb_decadal_famine_counts = tb.copy()
+
+    # Split the years in the 'date' column and extract as a list of integers
+    tb_decadal_famine_counts["date"] = tb_decadal_famine_counts["date"].astype(str)
+
+    tb_decadal_famine_counts["years"] = tb_decadal_famine_counts["date"].apply(
+        lambda x: [int(year.strip()) for year in x.split(",")]
+    )
+
+    # Filter years to keep only those from different decades
+    def filter_decades(years):
+        # Use a dictionary to ensure only one year per decade is retained
+        decade_map = {}
+        for year in years:
+            decade = (year // 10) * 10
+            if decade not in decade_map:
+                decade_map[decade] = year
+        return sorted(decade_map.values())
+
+    tb_decadal_famine_counts["filtered_years"] = tb_decadal_famine_counts["years"].apply(filter_decades)
+
+    # Explode the filtered years into individual rows - this ensures we keep the correct count of famines and deaths per decade
+    tb_decadal_famine_counts = tb_decadal_famine_counts.explode("filtered_years").rename(
+        columns={"filtered_years": "year"}
+    )
+
+    # Calculate the decade for each year
+    tb_decadal_famine_counts["decade"] = (tb_decadal_famine_counts["year"] // 10) * 10
+
+    # Group the data by region and decade
+    famine_counts = (
+        tb_decadal_famine_counts.groupby(["region", "decade"], observed=False).size().reset_index(name="famine_count")
+    )
+
+    # Create a 'World' row by summing counts across regions
+    famine_counts_world_only = tb_decadal_famine_counts.groupby("decade").size().reset_index(name="famine_count")
+    famine_counts_world_only["region"] = "World"
+
+    # Concatenating the world row data with the regional data
+    famine_counts_combined = pr.concat([famine_counts, famine_counts_world_only], ignore_index=True)
+    famine_counts_combined = famine_counts_combined.rename(columns={"decade": "year"})
+
     # Divide each row's 'wpf_authoritative_mortality_estimate' by the length of the corresponding 'Date' value to assume a uniform distribution of deaths over the period
     tb["wpf_authoritative_mortality_estimate"] = tb.apply(
         lambda row: row["wpf_authoritative_mortality_estimate"] / len(row["date"].split(","))
@@ -51,14 +95,6 @@ def run(dest_dir: str) -> None:
         .sum()
         .reset_index(name="famine_deaths")
     )
-
-    # Grouping by 'year', 'region', 'conflict', 'government_policy_overall', 'external_factors' and counting the occurrences
-    famine_counts = tb.groupby(["year", "region"], observed=False).size().reset_index(name="famine_count")
-    # Creating a 'World' row by summing counts across unique regions for each group
-    famine_counts_world_only = tb.groupby(["year"]).size().reset_index(name="famine_count")
-    famine_counts_world_only["region"] = "World"
-    # Concatenating the world row data with the regional data
-    famine_counts_combined = pr.concat([famine_counts, famine_counts_world_only], ignore_index=True)
 
     # Grouping by relevant columns and summing the 'wpf_authoritative_mortality_estimate' for regional data
     deaths_counts = (
