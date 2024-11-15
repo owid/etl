@@ -22,16 +22,6 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    ####################################################################################################################
-    # Netherland's onshore wind LCOE in 2017 is unreasonably high.
-    # In the previous version of the data, it was 0.087USD/kWh, and in the new version it is 0.84USD/kWh.
-    # Looking at the report (Figure 2.13, page 78) that abrupt spike does not occur.
-    # So, for now, I will remove that data point and contact IRENA.
-    error = "Expected potentially spurious data point for Netherlands in 2017 onshore wind LCOE. It may have been removed in the latest update, so this code can be removed."
-    assert tb.loc[(tb["country"] == "Netherlands") & (tb["year"] == 2017)]["onshore_wind"].item() > 0.8, error
-    tb.loc[((tb["country"] == "Netherlands") & (tb["year"] == 2017)), "onshore_wind"] = None
-    ####################################################################################################################
-
     # Improve table formatting.
     tb = tb.format()
 
