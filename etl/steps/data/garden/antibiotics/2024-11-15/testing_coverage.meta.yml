@@ -5,13 +5,13 @@ definitions:
       topic_tags:
         - Antibiotics
   syndrome: |-
-    <%- if syndrome == 'BLOOD' -%>
+    <%- if specimen == 'BLOOD' -%>
     bloodstream
-    <%- elif syndrome == 'STOOL' -%>
+    <%- elif specimen == 'STOOL' -%>
     gastrointestinal
-    <%- elif syndrome == 'UROGENITAL' -%>
+    <%- elif specimen == 'UROGENITAL' -%>
     gonorrhea
-    <%- elif syndrome == 'URINE' -%>
+    <%- elif specimen == 'URINE' -%>
     urinary tract
     <%- endif -%>
 
