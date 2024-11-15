@@ -231,9 +231,12 @@ def run(dest_dir: str) -> None:
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # Custom column: people who think their life will get better in the next 5 years
+    tb["wb_improvement"] = (tb["wb_fiveyrs"] < tb["wb_today"]).astype(float) + 1  # 1 if yes, 2 if no
+
     # Calculate average scores/ shares of answers for all variables
     tb_scored_10 = average_scored(tb, cols=SCORED_10_COLS)
-    tb_binary = share_binary(tb, cols=BINARY_COLS)
+    tb_binary = share_binary(tb, cols=BINARY_COLS + ["wb_improvement"])
     tb_cat = share_categorical(tb, cols=CAT_COLS)
 
     tb_scored_other = average_scored(tb, cols=LOW_SCORED_COLS)
@@ -246,6 +249,7 @@ def run(dest_dir: str) -> None:
     tbs_full = pr.multi_merge([tb_scored_10, tb_binary, tb_cat, tb_scored_other, tb_cat_other, tb_scored_97])
 
     tbs_full.metadata = tb.metadata
+    tbs_full.m.short_name = "gfs_summary"
 
     for col in tbs_full.columns:
         tbs_full[col].metadata = tb["country"].metadata
