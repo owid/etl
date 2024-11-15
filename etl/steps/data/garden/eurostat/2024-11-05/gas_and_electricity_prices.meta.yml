@@ -88,6 +88,7 @@ tables:
   gas_and_electricity_price_components_euro_flat:
     title: Gas and electricity price components in Europe
     common:
+      description_short: Price components are given in euros per [kilowatt-hour](#dod:watt-hours).
       unit: 'euros per kilowatt-hour'
       short_unit: "€/kWh"
     variables:
@@ -534,6 +535,7 @@ tables:
   gas_and_electricity_price_components_pps_flat:
     title: Gas and electricity price components in Europe (PPS)
     common:
+      description_short: Price components are given in purchasing power standard (PPS) per [kilowatt-hour](#dod:watt-hours).
       unit: "purchasing power standard per kilowatt-hour"
       short_unit: "PPS/kWh"
     variables:
@@ -1020,6 +1022,7 @@ tables:
   gas_and_electricity_prices_euro_flat:
     title: Gas and electricity prices in Europe
     common:
+      description_short: Prices are given in euros per [kilowatt-hour](#dod:watt-hours).
       unit: "euros per kilowatt-hour"
       short_unit: "€/kWh"
     variables:
@@ -1122,6 +1125,7 @@ tables:
   gas_and_electricity_prices_pps_flat:
     title: Gas and electricity prices in Europe (PPS)
     common:
+      description_short: Prices are given in purchasing power standard (PPS) per [kilowatt-hour](#dod:watt-hours).
       unit: "purchasing power standard per kilowatt-hour"
       short_unit: "PPS/kWh"
     variables:
