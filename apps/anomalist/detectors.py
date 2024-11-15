@@ -1,6 +1,5 @@
 from typing import Dict, List
 
-import numpy as np
 import pandas as pd
 import structlog
 from sklearn.ensemble import IsolationForest
@@ -71,16 +70,9 @@ class AnomalyDetector:
 
     def get_zeros_df(self, df: pd.DataFrame, variable_ids: List[int]) -> pd.DataFrame:
         # Create a dataframe of zeros.
-        df_zeros = pd.DataFrame(np.zeros_like(df), columns=df.columns)[INDEX_COLUMNS + variable_ids]
-        df_zeros[INDEX_COLUMNS] = df[INDEX_COLUMNS].copy()
+        df_zeros = df[INDEX_COLUMNS + variable_ids].copy()
+        df_zeros[variable_ids] = 0
         return df_zeros
-
-    def get_nans_df(self, df: pd.DataFrame, variable_ids: List[int]) -> pd.DataFrame:
-        # Create a dataframe of nans.
-        df_nans = pd.DataFrame(np.empty_like(df), columns=df.columns)[INDEX_COLUMNS + variable_ids]
-        df_nans[variable_ids] = np.nan
-        df_nans[INDEX_COLUMNS] = df[INDEX_COLUMNS].copy()
-        return df_nans
 
 
 class AnomalyUpgradeMissing(AnomalyDetector):

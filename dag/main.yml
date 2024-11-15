@@ -871,6 +871,13 @@ steps:
     - data-private://meadow/gfs/2024-11-11/gfs_wave_one
   data-private://grapher/gfs/2024-11-11/gfs_wave_one:
     - data-private://garden/gfs/2024-11-11/gfs_wave_one
+  data-private://meadow/owid/latest/ig_countries:
+    - snapshot-private://owid/latest/ig_countries.csv
+  data-private://garden/owid/latest/ig_countries:
+    - data-private://meadow/owid/latest/ig_countries
+  data-private://grapher/owid/latest/ig_countries:
+    - data-private://garden/owid/latest/ig_countries
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

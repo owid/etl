@@ -288,19 +288,16 @@ steps:
   data://grapher/covid/latest/deaths_vax_status:
     - data://garden/covid/latest/deaths_vax_status
 
-  ######################################
-  # MULTIDIM
-  export://multidim/covid/latest/covid:
-    - grapher://grapher/covid/latest/cases_deaths
-    - grapher://grapher/covid/latest/hospital
-    - grapher://grapher/covid/latest/vaccinations_global
-    - grapher://grapher/covid/latest/vaccinations_manufacturer
-    - grapher://grapher/covid/latest/testing
-    - grapher://grapher/covid/latest/google_mobility
-    - grapher://grapher/excess_mortality/latest/excess_mortality
-    - grapher://grapher/covid/latest/covax
-    - grapher://grapher/covid/latest/infections_model
-    - grapher://grapher/covid/latest/xm_who
+  # Countries reporting data
+  data://meadow/covid/latest/countries_reporting:
+    - snapshot://covid/2024-11-05/github_stats_vax_reporting.csv
+  data://garden/covid/latest/countries_reporting:
+    - data://meadow/covid/latest/vaccinations_global
+    - data://meadow/covid/latest/countries_reporting
+  data://grapher/covid/latest/countries_reporting:
+    - data://garden/covid/latest/countries_reporting
+
+  # Contributions to GitHub
   data://meadow/covid/2024-11-05/github_stats:
     - snapshot://covid/2024-11-05/github_stats_issues.csv
     - snapshot://covid/2024-11-05/github_stats_issues_comments.csv
@@ -314,3 +311,18 @@ steps:
     - data://meadow/covid/2024-11-05/github_stats
   data://grapher/covid/2024-11-05/github_stats:
     - data://garden/covid/2024-11-05/github_stats
+
+  ######################################
+  # MULTIDIM
+  export://multidim/covid/latest/covid:
+    - grapher://grapher/covid/latest/cases_deaths
+    - grapher://grapher/covid/latest/hospital
+    - grapher://grapher/covid/latest/vaccinations_global
+    - grapher://grapher/covid/latest/vaccinations_manufacturer
+    - grapher://grapher/covid/latest/testing
+    - grapher://grapher/covid/latest/google_mobility
+    - grapher://grapher/excess_mortality/latest/excess_mortality
+    - grapher://grapher/covid/latest/covax
+    - grapher://grapher/covid/latest/infections_model
+    - grapher://grapher/covid/latest/xm_who
+

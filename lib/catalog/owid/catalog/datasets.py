@@ -30,7 +30,7 @@ FileFormat = Literal["csv", "feather", "parquet"]
 SUPPORTED_FORMATS: List[FileFormat] = ["feather", "parquet", "csv"]
 
 # the formats we generate by default
-DEFAULT_FORMATS: List[FileFormat] = ["feather"]
+DEFAULT_FORMATS: List[FileFormat] = environ.get("DEFAULT_FORMATS", "feather").split(",")  # type: ignore
 
 # the format we use by default if we only need one
 PREFERRED_FORMAT: FileFormat = "feather"
