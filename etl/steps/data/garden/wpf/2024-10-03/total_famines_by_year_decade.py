@@ -124,7 +124,7 @@ def run(dest_dir: str) -> None:
         on=["year", "region"],
     )
 
-    tb = pr.merge(tb, famine_counts_decadal_combined, on=["year", "region"], how="left")
+    tb = pr.merge(tb, famine_counts_decadal_combined, on=["year", "region"], how="outer")
 
     # Create a DataFrame with all years from 1870 to 2023
     all_years = pd.DataFrame({"year": range(1870, 2024)})
