@@ -915,3 +915,9 @@ steps:
     - data://meadow/antibiotics/2024-11-12/antimicrobial_usage
   data://grapher/antibiotics/2024-11-12/antimicrobial_usage:
     - data://garden/antibiotics/2024-11-12/antimicrobial_usage
+  data://meadow/antibiotics/2024-11-15/testing_coverage:
+    - snapshot://antibiotics/2024-11-15/testing_coverage.zip
+  data://garden/antibiotics/2024-11-15/testing_coverage:
+    - data://meadow/antibiotics/2024-11-15/testing_coverage
+  data://grapher/antibiotics/2024-11-15/testing_coverage:
+    - data://garden/antibiotics/2024-11-15/testing_coverage
