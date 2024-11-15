@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -21,7 +23,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
+    tb = format_specimen(tb)
     tb = tb.format(["country", "year", "specimen"])
 
     #
@@ -34,3 +36,14 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def format_specimen(tb: Table) -> Table:
+    """
+    Format the syndrome column.
+    """
+    specimen_dict = {"BLOOD": "bloodstream", "STOOL": "stool", "URINE": "urine", "UROGENITAL": "gonorrhea"}
+
+    tb["specimen"] = tb["specimen"].str.replace(specimen_dict, errors="raise")
+
+    return tb

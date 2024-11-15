@@ -4,18 +4,6 @@ definitions:
     presentation:
       topic_tags:
         - Antibiotics
-  syndrome: |-
-    <%- if specimen == 'BLOOD' -%>
-    bloodstream
-    <%- elif specimen == 'STOOL' -%>
-    gastrointestinal
-    <%- elif specimen == 'UROGENITAL' -%>
-    gonorrhea
-    <%- elif specimen == 'URINE' -%>
-    urinary tract
-    <%- endif -%>
-
-
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -27,38 +15,38 @@ tables:
   testing_coverage:
     variables:
       ctas_with_reported_bcis:
-        title: Number of countries reporting {definitions.syndrome} infections
-        description_short: Number of countries reporting bacteriologically confirmed {definitions.syndrome} infections to WHO.
+        title: Number of countries reporting << specimen >> infections
+        description_short: Number of countries reporting bacteriologically confirmed << specimen >> infections to WHO.
         unit: countries
       ctas_with_reported_bcis_with_ast__gt__80_bcis:
-        title: Number of countries testing >80% {definitions.syndrome} infections for antibiotic susceptibility
-        description_short: Number of countries testing >80% bacteriologically confirmed {definitions.syndrome} infections for antibiotic susceptibility.
+        title: Number of countries testing >80% << specimen >> infections for antibiotic susceptibility
+        description_short: Number of countries testing >80% bacteriologically confirmed << specimen >> infections for antibiotic susceptibility.
         unit: countries
       total_bcis:
-        title: Total {definitions.syndrome} infections tested for antibiotic susceptibility
-        description_short: Total bacteriologically confirmed {definitions.syndrome} infections tested for antibiotic susceptibility.
+        title: Total << specimen >> infections tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed << specimen >> infections tested for antibiotic susceptibility.
         unit: infections
       total_bcis_with_ast:
-        title: Total {definitions.syndrome} infections tested for antibiotic susceptibility
-        description_short: Total bacteriologically confirmed {definitions.syndrome} infections tested for antibiotic susceptibility.
+        title: Total << specimen >> infections tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed << specimen >> infections tested for antibiotic susceptibility.
         unit: infections
       min:
-        title: Minimum number of {definitions.syndrome} infections tested for antibiotic susceptibility per million people
-        description_short: Minimum number of {definitions.syndrome} infections tested for antibiotic susceptibility per million people
+        title: Minimum number of << specimen >> infections tested for antibiotic susceptibility per million people
+        description_short: Minimum number of << specimen >> infections tested for antibiotic susceptibility per million people
         unit: infections per million
       q1:
-        title: 25th percentile of {definitions.syndrome} infections tested for antibiotic susceptibility per million people
-        description_short: 25th percentile of {definitions.syndrome} infections tested for antibiotic susceptibility per million people
+        title: 25th percentile of << specimen >> infections tested for antibiotic susceptibility per million people
+        description_short: 25th percentile of << specimen >> infections tested for antibiotic susceptibility per million people
         unit: infections per million
       median:
-        title: Median number of {definitions.syndrome} infections tested for antibiotic susceptibility per million people
-        description_short: Median number of {definitions.syndrome} infections tested for antibiotic susceptibility per million people
+        title: Median number of << specimen >> infections tested for antibiotic susceptibility per million people
+        description_short: Median number of << specimen >> infections tested for antibiotic susceptibility per million people
         unit: infections per million
       q3:
-        title: 75th percentile of {definitions.syndrome} infections tested for antibiotic susceptibility per million people
-        description_short: 75th percentile of {definitions.syndrome} infections tested for antibiotic susceptibility per million people
+        title: 75th percentile of << specimen >> infections tested for antibiotic susceptibility per million people
+        description_short: 75th percentile of << specimen >> infections tested for antibiotic susceptibility per million people
         unit: infections per million
       max:
-        title: Maximum number of {definitions.syndrome} infections tested for antibiotic susceptibility per million people
-        description_short: Maximum number of {definitions.syndrome} infections tested for antibiotic susceptibility per million people
+        title: Maximum number of << specimen >> infections tested for antibiotic susceptibility per million people
+        description_short: Maximum number of << specimen >> infections tested for antibiotic susceptibility per million people
         unit: infections per million
