@@ -94,27 +94,24 @@ def run(dest_dir: str) -> None:
     tb["year"] = tb["year"].astype(int)
     tb["region"] = tb["region"].astype("category")
 
-    # Grouping by relevant columns and summing the 'wpf_authoritative_mortality_estimate' for regional data
+    # Calculate the total number of famine deaths per year and region
     deaths_counts = (
         tb.groupby(["year", "region"], observed=False)["wpf_authoritative_mortality_estimate"]
         .sum()
         .reset_index(name="famine_deaths")
     )
-
-    # Creating a 'World' row by summing mortality estimates across all regions for each group
     deaths_counts_world_only = (
         tb.groupby(["year"])["wpf_authoritative_mortality_estimate"].sum().reset_index(name="famine_deaths")
     )
     deaths_counts_world_only["region"] = "World"
 
-    # Concatenating the world row data with the regional data
+    # Concatenate the number of famines per year and region
     deaths_counts_combined = pr.concat([deaths_counts, deaths_counts_world_only], ignore_index=True)
 
-    #
     famine_counts = tb.groupby(["year", "region"], observed=False).size().reset_index(name="famine_count")
-    # Creating a 'World' row by summing counts across unique regions for each group
     famine_counts_world_only = tb.groupby(["year"]).size().reset_index(name="famine_count")
     famine_counts_world_only["region"] = "World"
+
     # Concatenating the world row data with the regional data
     famine_counts_combined = pr.concat([famine_counts, famine_counts_world_only], ignore_index=True)
 
@@ -126,7 +123,7 @@ def run(dest_dir: str) -> None:
 
     tb = pr.merge(tb, famine_counts_decadal_combined, on=["year", "region"], how="outer")
 
-    # Create a DataFrame with all years from 1870 to 2023
+    # Create a DataFrame with all years from 1870 to 2023 so we don't have 0s for years where there is no data
     all_years = pd.DataFrame({"year": range(1870, 2024)})
 
     # Get all unique regions from the original data
