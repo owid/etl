@@ -217,8 +217,9 @@ INDEXES_MAPPING = {
     },
     # Energy units.
     "energy_unit": {
-        # TODO: Confirm this definition (the page wasn't working).
-        "GJ_GCV": "GJ - Gross Calorific Value",
+        # Gigajoule (gross calorific value - GCV)
+        "GJ_GCV": "GJ",
+        # Kilowatt-hour
         "KWH": "kWh",
         # The following is used in consumption volumes datasets.
         # "PC": "Percentage",
@@ -454,9 +455,7 @@ def compare_components_and_prices_data(tb: Table) -> None:
     # * The prices and components datasets coincide reasonably well, but we need to figure out which subset of components needs to be included, to avoid double-counting.
     # * It seems that some components include others, so we can't simply sum them all up. It seems that "Energy and supply", "Network costs", and "Taxes, fees, levies, and charges" are the main components. When adding them up, the result is quite close to the prices dataset.
     # * Numerically, I have checked that for all price components datasets, "Taxes, fees, levies and charges" coincides with the sum of 'Capacity taxes', 'Environmental taxes', 'Nuclear taxes', 'Renewable taxes', 'Value added tax (VAT)', 'Other'. For some country-years, there is a small discrepancy. Also, for Romania 2022 there is is no "Taxes, fees, levies and charges" component, but there are other components; however, those extra components are zero (so, we can ignore this exception).
-    # TODO: Assert the previous hypothesis.
     # * What's not so clear is what happens with the "allowances". Is "Taxes, fees, levies, and charges allowance" the sum of all other "* allowance"? It's hard to know, since it's non-zero only once (nrg_pc_204_c Netherlands 2023). At that point, it does coincide with the sum of all other "* allowance". But there are other instances of non-zero "* allowance" where "Taxes...allowance" is not defined. It may be possible that allowances are not included in the prices dataset (in any case, I think there are not many cases of significant allowances in the data).
-    # TODO: Assert that certain price components are always positive.
 
 
 def select_and_prepare_relevant_data(tb: Table) -> Table:
@@ -618,6 +617,48 @@ def prepare_wide_tables(tb: Table) -> Dict[str, Table]:
     return wide_tables
 
 
+def sanity_check_outputs(tb: Table) -> None:
+    error = "Expected 'Energy and supply' and 'Network costs' to be non-negative."
+    assert tb[
+        tb["dataset_code"].isin(DATASET_CODES_COMPONENTS)
+        & tb["price_component_or_level"].isin(["Energy and supply", "Network costs"])
+        & (tb["price_euro"] < 0)
+    ].empty, error
+
+    # Further sanity checks on component prices.
+    tb_components = tb[tb["dataset_code"].isin(DATASET_CODES_COMPONENTS)].reset_index(drop=True)
+    tb_taxes_sum = (
+        tb_components[
+            tb_components["price_component_or_level"].isin(
+                [
+                    "Capacity taxes",
+                    "Environmental taxes",
+                    "Nuclear taxes",
+                    "Renewable taxes",
+                    "Value added tax (VAT)",
+                    "Other",
+                ]
+            )
+        ]
+        .groupby(["dataset_code", "country", "year"], observed=True, as_index=False)
+        .agg({"price_euro": "sum"})
+    )
+    tb_taxes_original = tb_components[
+        tb_components["price_component_or_level"] == "Taxes, fees, levies, and charges"
+    ].reset_index(drop=True)[["dataset_code", "country", "year", "price_euro"]]
+    # NOTE: The median value of the sum is 0.0191 euros/kWh. When comparing the percentage difference, ignore values that are too small.
+    compared = tb_taxes_sum.merge(
+        tb_taxes_original, how="outer", on=["dataset_code", "country", "year"], suffixes=("_sum", "_original")
+    )
+    compared["dev"] = 100 * (
+        abs(compared["price_euro_sum"] - compared["price_euro_original"]) / compared["price_euro_original"]
+    )
+    error = "Expected the sum of 'Capacity taxes', 'Environmental taxes', 'Nuclear taxes', 'Renewable taxes', 'Value added tax (VAT)', 'Other' to coincide with 'Taxes, fees, levies, and charges', within 2% (ignoring any prices below 0.007, which is 17% of rows)."
+    # NOTE: Some dataset-country-year have a significant discrepancy, e.g. nrg_pc_202_c-Greece-2022, with a price of 0.0067€/kWh.
+    assert compared[(compared["price_euro_original"] > 0.007) & (compared["dev"] > 2)].empty, error
+    # compared.sort_values("dev", ascending=False).head(60)
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -648,6 +689,9 @@ def run(dest_dir: str) -> None:
 
     # Select and prepare relevant data.
     tb = select_and_prepare_relevant_data(tb=tb)
+
+    # Sanity check outputs.
+    sanity_check_outputs(tb=tb)
 
     # Create convenient wide tables.
     wide_tables = prepare_wide_tables(tb=tb)
