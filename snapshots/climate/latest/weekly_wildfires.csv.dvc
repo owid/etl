@@ -9,12 +9,12 @@ meta:
     citation_full: Global Wildfire Information System
     attribution_short: GWIS
     url_main: https://gwis.jrc.ec.europa.eu/apps/gwis.statistics/seasonaltrend
-    date_accessed: 2024-11-16
-    date_published: 2024-11-16
+    date_accessed: 2024-11-17
+    date_published: 2024-11-17
     license:
       name: CC BY 4.0
       url: https://gwis.jrc.ec.europa.eu/about-gwis/data-license
 outs:
-  - md5: b16667ae5a835e17c96f772e06e05f04
-    size: 12664388
+  - md5: cc9d86cc1cd38f2ddf8734011d83e43b
+    size: 12698133
     path: weekly_wildfires.csv
