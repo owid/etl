@@ -6,8 +6,6 @@ steps:
     - snapshot://papers/2023-01-04/farmer_lafond_2016.csv
   data://garden/papers/2023-01-04/farmer_lafond_2016:
     - data://meadow/papers/2023-01-04/farmer_lafond_2016
-  data://grapher/papers/2023-01-04/farmer_lafond_2016:
-    - data://garden/papers/2023-01-04/farmer_lafond_2016
   #
   # Nemet (2009).
   #

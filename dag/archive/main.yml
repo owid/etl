@@ -13,8 +13,6 @@ steps:
     - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_southern_hemisphere.csv
   data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature:
     - data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature
-  data://grapher/met_office_hadley_centre/2023-01-02/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature
   #
   # Met Office Hadley Centre - Near surface temperature anomaly (2023-01-17).
   #
@@ -24,8 +22,6 @@ steps:
     - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_southern_hemisphere.csv
   data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature:
     - data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature
-  data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
 
 
   # Homicide - UNODC - to archive
@@ -33,8 +29,6 @@ steps:
   - snapshot://homicide/2023-01-27/unodc.xlsx
   data://garden/homicide/2023-01-27/unodc:
   - data://meadow/homicide/2023-01-27/unodc
-  data://grapher/homicide/2023-01-27/unodc:
-  - data://garden/homicide/2023-01-27/unodc
 
   # SDG dataset assmebled from https://sdg-tracker.org/
   # This is commented now to avoid `etl.helpers.LatestVersionOfStepShouldBeActive` error
