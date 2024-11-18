@@ -68,13 +68,6 @@ steps:
   #
   data://meadow/emdat/2022-11-24/natural_disasters:
     - snapshot://emdat/2022-11-24/natural_disasters.xlsx
-  # The following dataset has a table for yearly data and another for decadal data.
-  data://garden/emdat/2022-11-24/natural_disasters:
-    - data://meadow/emdat/2022-11-24/natural_disasters
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # International Monetary Fund, World Economic Outlook
   data://meadow/imf/2023-05-02/world_economic_outlook:
