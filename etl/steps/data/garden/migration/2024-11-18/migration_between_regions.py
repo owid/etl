@@ -41,7 +41,8 @@ def run(dest_dir: str) -> None:
     # Filter only on regions
     tb_reg = tb_reg[tb_reg["country_destination"].isin(REGIONS) & tb_reg["country_origin"].isin(REGIONS)]
 
-    tb_reg = tb_reg.reset_index().format(["country_destination", "country_origin", "year"])
+    tb_reg = tb_reg.format(["country_destination", "country_origin", "year"])
+    tb_reg.m.short_name = "migration_between_regions"
 
     #
     # Save outputs.
