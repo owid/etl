@@ -387,11 +387,6 @@ steps:
     - data://garden/countries/2024-08-27/gleditsch
 
   # Outdated gleditsch
-  data://garden/countries/2023-09-25/gleditsch:
-    - data://meadow/countries/2023-09-25/gleditsch
-    - data://garden/demography/2023-03-31/population
-  data://grapher/countries/2023-10-01/gleditsch:
-    - data://garden/countries/2023-09-25/gleditsch
   data://garden/countries/2024-01-08/gleditsch_no_population:
     - data://meadow/countries/2023-09-25/gleditsch
 

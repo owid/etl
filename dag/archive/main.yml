@@ -316,6 +316,12 @@ steps:
   data://grapher/itopf/2023-05-18/oil_spills:
     - data://garden/itopf/2023-05-18/oil_spills
 
+  data://garden/countries/2023-09-25/gleditsch:
+    - data://meadow/countries/2023-09-25/gleditsch
+    - data://garden/demography/2023-03-31/population
+  data://grapher/countries/2023-10-01/gleditsch:
+    - data://garden/countries/2023-09-25/gleditsch
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
