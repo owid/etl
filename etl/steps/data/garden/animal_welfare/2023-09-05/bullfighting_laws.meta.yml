@@ -27,6 +27,6 @@ tables:
             note: "Countries where bullfighting is not banned may have sub-national bans. Partially banned means that the bull cannot be severely injured or killed during the event."
             subtitle: >-
               Bullfighting is a physical contest that involves a bullfighter attempting to subdue, immobilize, or kill a bull.
-            hasChartTab: false
+            chartTypes: []
             hasMapTab: true
             tab: map
