@@ -55,12 +55,6 @@ steps:
   #   - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017
   #   - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  #
-  # EM-DAT Natural disasters (2022).
-  #
-  data://meadow/emdat/2022-11-24/natural_disasters:
-    - snapshot://emdat/2022-11-24/natural_disasters.xlsx
-
   # International Monetary Fund, World Economic Outlook
   data://meadow/imf/2023-05-02/world_economic_outlook:
     - snapshot://imf/2023-05-02/world_economic_outlook.xls

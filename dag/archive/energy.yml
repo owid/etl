@@ -1,20 +1,5 @@
 steps:
   #
-  # Ember yearly electricity 2022.
-  #
-  data://meadow/ember/2022-12-13/yearly_electricity:
-    - snapshot://ember/2022-12-13/yearly_electricity.csv
-  #
-  # Ember - Yearly electricity data 2023.
-  #
-  data://meadow/ember/2023-02-20/yearly_electricity:
-    - snapshot://ember/2023-02-20/yearly_electricity.csv
-  #
-  # Ember - Yearly electricity data 2023.
-  #
-  data://meadow/ember/2023-06-01/yearly_electricity:
-    - snapshot://ember/2023-06-01/yearly_electricity.csv
-  #
   # UNEP - Global trends in renewable energy investment (2019).
   #
   data://meadow/unep/2023-01-03/renewable_energy_investments:
