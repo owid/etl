@@ -5,3 +5,5 @@ steps:
   - snapshot-private://fasttrack/2023-01-19/food_expenditures_by_country.csv
   data://grapher/fasttrack/2023-06-19/world_population_comparison:
     - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
+  data://grapher/fasttrack/latest/democracy_lexical_index:
+    - snapshot://fasttrack/latest/democracy_lexical_index.csv

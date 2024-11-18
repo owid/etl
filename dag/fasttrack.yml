@@ -94,8 +94,6 @@ steps:
     - snapshot://fasttrack/latest/transport_co2_emissions_modes.csv
   data://grapher/fasttrack/latest/democracy_freedom_house:
     - snapshot://fasttrack/latest/democracy_freedom_house.csv
-  data://grapher/fasttrack/latest/democracy_lexical_index:
-    - snapshot://fasttrack/latest/democracy_lexical_index.csv
   data://grapher/fasttrack/latest/global_maternal_offspring_loss:
     - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
   data://grapher/fasttrack/latest/under_five_mortality_lmics:
