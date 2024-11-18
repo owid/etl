@@ -2,16 +2,6 @@ steps:
   #
   # Farmer & Lafond (2016).
   #
-  data://meadow/papers/2023-01-04/farmer_lafond_2016:
-    - snapshot://papers/2023-01-04/farmer_lafond_2016.csv
-  #
-  # Nemet (2009).
-  #
-  data://meadow/papers/2023-01-04/nemet_2009:
-    - snapshot://papers/2023-01-04/nemet_2009.csv
-  #
-  # Farmer & Lafond (2016).
-  #
   data://meadow/papers/2023-07-10/farmer_lafond_2016:
     - snapshot://papers/2023-01-04/farmer_lafond_2016.csv
   data://garden/papers/2023-07-10/farmer_lafond_2016:

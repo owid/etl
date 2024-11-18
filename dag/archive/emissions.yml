@@ -1,43 +1,11 @@
 steps:
   #
-  # GCP - Global Carbon Budget (2023-04-28).
-  #
-  data://meadow/gcp/2023-04-28/global_carbon_budget:
-    - snapshot://gcp/2023-04-28/global_carbon_budget_fossil_co2_emissions.csv
-    - snapshot://gcp/2023-04-28/global_carbon_budget_global_emissions.xlsx
-    - snapshot://gcp/2023-04-28/global_carbon_budget_national_emissions.xlsx
-    - snapshot://gcp/2023-04-28/global_carbon_budget_land_use_change_emissions.xlsx
-  #
-  # GCP - Global Carbon Budget (2023-07-10).
-  #
-  data://meadow/gcp/2023-07-10/global_carbon_budget:
-    - snapshot://gcp/2023-04-28/global_carbon_budget_fossil_co2_emissions.csv
-    - snapshot://gcp/2023-04-28/global_carbon_budget_global_emissions.xlsx
-    - snapshot://gcp/2023-04-28/global_carbon_budget_national_emissions.xlsx
-    - snapshot://gcp/2023-04-28/global_carbon_budget_land_use_change_emissions.xlsx
-  #
   # Jones et al. (2023) - National contributions to climate change (2023-05-02).
   #
   data://meadow/emissions/2023-05-02/national_contributions:
     - snapshot://emissions/2023-05-02/national_contributions_annual_emissions.csv
     - snapshot://emissions/2023-05-02/national_contributions_cumulative_emissions.csv
     - snapshot://emissions/2023-05-02/national_contributions_temperature_response.csv
-  #
-  # GCP - Global Carbon Budget (2023-09-28).
-  #
-  data://meadow/gcp/2023-09-28/global_carbon_budget:
-    - snapshot://gcp/2023-09-28/global_carbon_budget_fossil_co2_emissions.csv
-    - snapshot://gcp/2023-09-28/global_carbon_budget_global_emissions.xlsx
-    - snapshot://gcp/2023-09-28/global_carbon_budget_national_emissions.xlsx
-    - snapshot://gcp/2023-09-28/global_carbon_budget_land_use_change_emissions.xlsx
-  #
-  # GCP - Global Carbon Budget (2023-12-05).
-  #
-  data://meadow/gcp/2023-12-05/global_carbon_budget:
-    - snapshot://gcp/2023-12-05/global_carbon_budget_fossil_co2_emissions.csv
-    - snapshot://gcp/2023-12-05/global_carbon_budget_global_emissions.xlsx
-    - snapshot://gcp/2023-12-05/global_carbon_budget_national_emissions.xlsx
-    - snapshot://gcp/2023-12-05/global_carbon_budget_land_use_change_emissions.xlsx
   #
   # Emissions - CO2 dataset (2023-12-12).
   #
