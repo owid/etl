@@ -447,32 +447,26 @@ class VersionTracker:
         # Get step attributes.
         _, step_type, _, channel, namespace, version, name, _ = extract_step_attributes(step=step).values()
         state = "active" if step in self.all_active_steps else "archive"
+        assert state == "active", "Archived steps are deprecated, this should not happen"
 
         # Create a dictionary that contains the path to a script for a given step.
         # This dictionary has to keys, namely "active" and "archive".
         # Active steps should have a script in the active directory.
         # But steps that are in the archive dag can be either in the active or the archive directory.
-        path_to_script = {"active": None, "archive": None}
+        path_to_script = {"active": None}
         if step_type == "export":
             path_to_script["active"] = paths.STEP_DIR / "export" / channel / namespace / version / name  # type: ignore
         elif channel == "snapshot":
             path_to_script["active"] = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.SNAPSHOTS_DIR_ARCHIVE / namespace / version / name  # type: ignore
         elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
             path_to_script["active"] = paths.STEP_DIR / "data" / channel / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.STEP_DIR_ARCHIVE / channel / namespace / version / name  # type: ignore
         elif channel == "walden":
             path_to_script["active"] = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
         elif channel in ["backport", "etag"]:
             # Ignore these channels, for which there is never a script.
             return None
         else:
             log.error(f"Unknown channel {channel} for step {step}.")
-
-        if state == "active":
-            # Steps in the active dag should only have a script in the active directory.
-            del path_to_script["archive"]
 
         path_to_script_detected = None
         for state in path_to_script:
