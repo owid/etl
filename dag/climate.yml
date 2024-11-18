@@ -275,3 +275,8 @@ steps:
   #
   data://grapher/met_office_hadley_centre/2024-11-18/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2024-11-18/near_surface_temperature
+  #
+  # NSIDC - Monthly sea ice anomalies ("country" for month names, "year" for years, one indicator per hemisphere).
+  #
+  data://grapher/climate/2024-11-18/sea_ice_anomalies_by_month:
+    - data://garden/climate/2024-11-18/sea_ice_index
