@@ -7,6 +7,18 @@ definitions:
     presentation:
       topic_tags:
         - Poverty
+      faqs:
+        - fragment_id: mpi-definition
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-how
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-indicators-unavailable
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-comparability
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-other-sources
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+
     # Description from producer
     description_from_producer: >-
       The global MPI is a measure of acute poverty covering over 100 countries in the developing
