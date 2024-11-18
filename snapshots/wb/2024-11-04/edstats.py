@@ -27,7 +27,7 @@ def main(upload: bool) -> None:
     # Fetch data from the World Bank API.
     wb_education_df = get_data()
 
-    # Using ThreadPoolExecutor for parallel requests with progress bar
+    # Using ThreadPoolExecutor for parallel requests with progress bar. Fetch metadata for each indicator.
     indicators = wb_education_df["wb_seriescode"].unique()
     results = []
 
@@ -66,7 +66,7 @@ def fetch_indicator_metadata(indicator):
 
 def used_world_bank_ids():
     # This will connect to MySQL from specified ENV, so to run it against production you'd run
-    # ETL=.env.prod python snapshots/wb/2023-07-10/education.py
+    # ETL=.env.prod python snapshots/wb/2024-11-04/edstats.py
     engine = get_engine()
     q = """
     select distinct
@@ -94,10 +94,7 @@ def fetch_education_data(education_code: str) -> pd.DataFrame:
         DataFrame: DataFrame with fetched data or None if an error occurs.
     """
     try:
-        # Replace the indicator code if necessary
-        education_code = "IT.NET.USER.ZS" if education_code == "IT.NET.USER.P2" else education_code
         # Fetch data for the given indicator code
-        # This is a placeholder for the actual data fetching function
         data_series = wb.get_series(education_code)
 
         # Convert the series to a DataFrame and reset the index
@@ -130,10 +127,10 @@ def get_data():
     # Some variables were created posthoc and don't use the standard World bank id convention
     wb_ids = [element for element in wb_ids if element is not None]
 
-    # Add Wittgenstein Projection: Percentage of the population 15+ by highest level of educational attainment. No Education. Total
+    # Add some additional World Bank indicators that aren't used in the charts directly but other datasets use them.
     wb_ids = wb_ids + ["PRJ.ATT.15UP.NED.MF", "SE.ADT.LITR.ZS"]
 
-    # Assert that the list is not empty
+    # Assert that the list of indicators is not empty
     assert len(wb_ids) > 0, "The list wb_ids is empty after removing None elements."
 
     with ThreadPoolExecutor() as executor:
