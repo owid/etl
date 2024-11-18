@@ -2,8 +2,6 @@ steps:
   # Homicide - UNODC
   data://meadow/homicide/2023-01-04/unodc:
     - snapshot://homicide/2023-01-04/unodc.xlsx
-  data://garden/homicide/2023-01-04/unodc:
-    - data://meadow/homicide/2023-01-04/unodc
   #
   # Met Office Hadley Centre - Near surface temperature anomaly (2023-01-02).
   #
@@ -23,8 +21,6 @@ steps:
   # Homicide - UNODC - to archive
   data://meadow/homicide/2023-01-27/unodc:
   - snapshot://homicide/2023-01-27/unodc.xlsx
-  data://garden/homicide/2023-01-27/unodc:
-  - data://meadow/homicide/2023-01-27/unodc
 
   # SDG dataset assmebled from https://sdg-tracker.org/
   # This is commented now to avoid `etl.helpers.LatestVersionOfStepShouldBeActive` error
