@@ -275,3 +275,30 @@ steps:
   #
   data://grapher/climate/2024-11-18/climate_change_impacts_annual:
     - data://garden/climate/2024-11-18/climate_change_impacts
+  #
+  # NSIDC - Monthly sea ice extent ("country" for years, "year" for month number, one indicator per hemisphere).
+  #
+  data://grapher/climate/2024-11-18/sea_ice_extent_by_year:
+    - data://garden/climate/2024-11-18/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice extent ("country" for decades and latest year, "year" for month number, one indicator per hemisphere).
+  #
+  data://grapher/climate/2024-11-18/sea_ice_extent_by_decade:
+    - data://garden/climate/2024-11-18/sea_ice_index
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://meadow/met_office_hadley_centre/2024-11-18/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2024-11-18/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2024-11-18/near_surface_temperature_southern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2024-11-18/near_surface_temperature_northern_hemisphere.csv
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://garden/met_office_hadley_centre/2024-11-18/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2024-11-18/near_surface_temperature
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://grapher/met_office_hadley_centre/2024-11-18/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2024-11-18/near_surface_temperature
