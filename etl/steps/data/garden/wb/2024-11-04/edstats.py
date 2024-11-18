@@ -76,20 +76,9 @@ def combine_historical_literacy_expenditure(tb: Table, tb_literacy: Table, tb_ex
     Merge historical and recent literacy and expenditure data into a single Table.
 
     This function combines data from two separate Tables containing historical literacy rates and
-    public expenditure on education with a primary WB Table. It merges these datasets based on common
-    'year' and 'country' columns. The resulting Table includes two new columns, 'combined_literacy'
-    and 'combined_expenditure', which contain the respective literacy and expenditure data. The function
-    prioritizes recent data over historical data when both are available.
-
-    Parameters:
-    - tb (Table): The primary Table containing recent literacy and expenditure data.
-    - tb_literacy (Table): A Table containing historical literacy data with columns
-      ['year', 'country', 'literacy_rates__world_bank__cia_world_factbook__and_other_sources'].
-    - tb_expenditure (Table): A Table containing historical expenditure data with columns
-      ['year', 'country', 'public_expenditure_on_education__tanzi__and__schuktnecht__2000'].
-
-    The function handles missing data by favoring recent World Bank data; if this is not available,
+    public expenditure on education with a primary WB Table. The function handles missing data by favoring recent World Bank data; if this is not available,
     it falls back to historical data, which could also be missing (NaN).
+
     """
 
     historic_literacy = (
@@ -148,7 +137,7 @@ def rename_columns(tb: Table, metadata_tb: Table) -> Table:
             "combined_literacy",
             "combined_expenditure",
         ]:
-            # Extract relevant name, description and source from the metadata table using the WB code
+            # Extract relevant name.
             name = (
                 metadata_tb.loc[metadata_tb["indicator_code"] == column, "indicator_name"]
                 .str.replace("‚", "")  # commas caused problems when renaming variables later on

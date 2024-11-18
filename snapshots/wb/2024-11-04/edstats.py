@@ -1,4 +1,7 @@
-"""Script to create a snapshot of dataset."""
+"""
+The script fetches education data from the World Bank API and adds metadata for each indicator.
+It uses parallel requests to fetch metadata for each indicator largely because previously we were importing all of the data from the database and I'd like to keep the same structure in case we need to expand the number of indicators we import from this database in the future.
+At the moment we extract the indicators from the grapher database that are actually used in our charts and then fetch the data and the metadata for only these indicators but this might change in the future."""
 
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
