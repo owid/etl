@@ -293,11 +293,6 @@ steps:
   data://grapher/faostat/2023-02-22/faostat_wcad:
     - data://garden/faostat/2023-02-22/faostat_wcad
   #
-  # FAOSTAT food explorer step for version 2023-02-22
-  #
-  data://explorers/faostat/2023-02-22/food_explorer:
-    - data://garden/faostat/2023-02-22/faostat_food_explorer
-  #
   # FAOSTAT garden step for additional variables for version 2023-02-22
   #
   data://garden/faostat/2023-02-22/additional_variables:

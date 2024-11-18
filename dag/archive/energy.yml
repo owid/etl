@@ -8,20 +8,11 @@ steps:
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/regions/2023-01-01/regions
-  data://grapher/bp/2022-07-14/statistical_review:
-    - data://garden/bp/2022-07-14/statistical_review
-  #
-  # BP - Energy mix 2022.
-  #
-  data://grapher/bp/2022-07-14/energy_mix:
-    - data://garden/bp/2022-07-14/energy_mix
   #
   # BP - Fossil fuel reserves/production ratio (2022).
   #
   data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
     - data://garden/bp/2022-07-14/statistical_review
-  data://grapher/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio
   #
   # Ember yearly electricity 2022.
   #
@@ -38,8 +29,6 @@ steps:
     - data://garden/bp/2022-12-28/statistical_review
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
-  data://grapher/bp/2022-12-28/energy_mix:
-    - data://garden/bp/2022-12-28/energy_mix
   #
   # Ember - Yearly electricity data 2023.
   #
@@ -80,15 +69,11 @@ steps:
     - data://garden/owid/latest/key_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/regions/2023-01-01/regions
-  data://grapher/bp/2022-12-28/statistical_review:
-    - data://garden/bp/2022-12-28/statistical_review
   #
   # BP - Fossil fuel reserves/production ratio (2022).
   #
   data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
     - data://garden/bp/2022-12-28/statistical_review
-  data://grapher/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio
   #
   # Ember - Yearly electricity data 2023.
   #
@@ -106,8 +91,6 @@ steps:
     - data://garden/bp/2022-12-28/statistical_review
     - data://garden/demography/2022-12-08/population
     - data://garden/wb/2021-07-01/wb_income
-  data://grapher/bp/2023-02-20/energy_mix:
-    - data://garden/bp/2023-02-20/energy_mix
   #
   # UNEP - Global trends in renewable energy investment (2019).
   #
@@ -211,8 +194,6 @@ steps:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
     - data://garden/demography/2023-03-31/population
     - data://garden/wb/2023-04-30/income_groups
-  data://grapher/energy/2023-07-10/energy_mix:
-    - data://garden/energy/2023-07-10/energy_mix
   #
   # Energy - Primary energy consumption 2023.
   #
@@ -285,8 +266,6 @@ steps:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/demography/2023-03-31/population
     - data://garden/wb/2023-04-30/income_groups
-  data://grapher/energy/2023-12-12/energy_mix:
-    - data://garden/energy/2023-12-12/energy_mix
   #
   # Energy - OWID Energy dataset.
   #
@@ -417,8 +396,6 @@ steps:
     - data://garden/energy/2024-05-08/primary_energy_consumption
   data://grapher/energy/2024-05-08/fossil_fuel_production:
     - data://garden/energy/2024-05-08/fossil_fuel_production
-  data://grapher/energy/2024-05-08/energy_mix:
-    - data://garden/energy/2024-05-08/energy_mix
   data://grapher/energy/2024-05-08/fossil_fuel_reserves_production_ratio:
     - data://garden/energy/2024-05-08/fossil_fuel_reserves_production_ratio
   data://grapher/energy/2024-05-08/uk_historical_electricity:

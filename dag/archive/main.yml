@@ -81,15 +81,6 @@ steps:
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/regions/2023-01-01/regions
     - data://garden/worldbank_wdi/2022-05-26/wdi
-  # The following dataset has all (yearly and decadal) variables together.
-  data://grapher/emdat/2022-11-24/natural_disasters:
-    - data://garden/emdat/2022-11-24/natural_disasters
-  # The following dataset has only global data, and entity corresponds to the type of disaster.
-  data://grapher/emdat/2022-11-24/natural_disasters_global_by_type:
-    - data://garden/emdat/2022-11-24/natural_disasters
-  # Natural disasters explorer.
-  data://explorers/emdat/2022-12-07/natural_disasters:
-    - data://garden/emdat/2022-11-24/natural_disasters
 
   # International Monetary Fund, World Economic Outlook
   data://meadow/imf/2023-05-02/world_economic_outlook:
