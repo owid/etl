@@ -22,13 +22,6 @@ steps:
     - snapshot://emissions/2023-05-02/national_contributions_annual_emissions.csv
     - snapshot://emissions/2023-05-02/national_contributions_cumulative_emissions.csv
     - snapshot://emissions/2023-05-02/national_contributions_temperature_response.csv
-  data://garden/emissions/2023-05-02/national_contributions:
-    - data://meadow/emissions/2023-05-02/national_contributions
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/demography/2022-12-08/population
-  data://grapher/emissions/2023-05-02/national_contributions:
-    - data://garden/emissions/2023-05-02/national_contributions
   #
   # GCP - Global Carbon Budget (2023-09-28).
   #
