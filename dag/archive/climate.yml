@@ -768,3 +768,18 @@ steps:
   #
   data://grapher/met_office_hadley_centre/2024-10-22/near_surface_temperature:
     - data://garden/met_office_hadley_centre/2024-10-22/near_surface_temperature
+  #
+  # NSIDC - Arctic sea ice extent.
+  #
+  data://meadow/climate/2024-09-30/sea_ice_index:
+    - snapshot://climate/2024-09-30/sea_ice_index.xlsx
+  #
+  # NSIDC - Arctic sea ice extent.
+  #
+  data://garden/climate/2024-09-30/sea_ice_index:
+    - data://meadow/climate/2024-09-30/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice anomalies ("country" for month names, "year" for years, one indicator per hemisphere).
+  #
+  data://grapher/climate/2024-09-30/sea_ice_anomalies_by_month:
+    - data://garden/climate/2024-09-30/sea_ice_index

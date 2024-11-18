@@ -122,21 +122,6 @@ steps:
   data://garden/epa/2024-04-17/mass_balance_us_glaciers:
     - data://meadow/epa/2024-04-17/mass_balance_us_glaciers
   #
-  # NSIDC - Arctic sea ice extent.
-  #
-  data://meadow/climate/2024-09-30/sea_ice_index:
-    - snapshot://climate/2024-09-30/sea_ice_index.xlsx
-  #
-  # NSIDC - Arctic sea ice extent.
-  #
-  data://garden/climate/2024-09-30/sea_ice_index:
-    - data://meadow/climate/2024-09-30/sea_ice_index
-  #
-  # NSIDC - Monthly sea ice anomalies ("country" for month names, "year" for years, one indicator per hemisphere).
-  #
-  data://grapher/climate/2024-09-30/sea_ice_anomalies_by_month:
-    - data://garden/climate/2024-09-30/sea_ice_index
-  #
   #  School of Ocean and Earth Science and Technology - Hawaii Ocean Time-series (HOT).
   #
   data://meadow/climate/2024-11-18/hawaii_ocean_time_series:
