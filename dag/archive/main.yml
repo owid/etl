@@ -11,8 +11,6 @@ steps:
     - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_global.csv
     - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_northern_hemisphere.csv
     - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_southern_hemisphere.csv
-  data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature
   #
   # Met Office Hadley Centre - Near surface temperature anomaly (2023-01-17).
   #
@@ -20,8 +18,6 @@ steps:
     - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_global.csv
     - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_northern_hemisphere.csv
     - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_southern_hemisphere.csv
-  data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature
 
 
   # Homicide - UNODC - to archive
