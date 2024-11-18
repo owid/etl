@@ -254,10 +254,15 @@ class User(Base):
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     isActive: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     fullName: Mapped[str] = mapped_column(VARCHAR(255))
+    githubUsername: Mapped[str] = mapped_column(VARCHAR(255))
     password: Mapped[Optional[str]] = mapped_column(VARCHAR(128))
     lastLogin: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     lastSeen: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+    @classmethod
+    def load_user(cls, session: Session, github_username: str) -> Optional["User"]:
+        return session.scalars(select(cls).where(cls.githubUsername == github_username)).one_or_none()
 
 
 class ChartRevisions(Base):
@@ -488,7 +493,13 @@ class Chart(Base):
 
         # copy chart as a new object
         config = copy.deepcopy(self.config)
-        config = _remap_variable_ids(config, remap_ids)
+        try:
+            config = _remap_variable_ids(config, remap_ids)
+        except KeyError as e:
+            # This should not be happening - it means that there's a chart with a variable that doesn't exist in
+            # chart_dimensions and possibly not even in variables table. It's possible that you see it admin, but
+            # only because it is cached.
+            raise ValueError(f"Issue with chart {self.id} - variable id not found in chart_dimensions table: {e}")
 
         return config
 

@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: United States Geological Survey (2024). National Minerals Information Center.
+    title: mineral_prices_usgs
+    citation_full: United States Geological Survey (2024). National Minerals Information Center.
+    url_main: https://www.usgs.gov/centers/national-minerals-information-center
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSSKAJ9UB8Pcjg1pm10s8l64cndMbW-LdlAHVOOZ4af4X10b8Iu76HgZuRtscI0NMsBtfueHxFi_XYo/pub?output=csv
+    date_accessed: '2024-11-06'
+  name: Mineral prices (USGS, 2024)
+  description: ''
+  license: {}
+outs:
+  - md5: 4a445a61d31803e84335ff9990405913
+    size: 8969
+    path: mineral_prices_usgs.csv

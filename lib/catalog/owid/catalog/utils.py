@@ -1,16 +1,20 @@
+import dataclasses
 import datetime as dt
 import hashlib
 import re
 from dataclasses import fields, is_dataclass
 from pathlib import Path
-from typing import Any, Optional, TypeVar, Union, overload
+from typing import Any, Dict, Optional, Type, TypeVar, Union, get_args, get_origin, overload
 
 import dynamic_yaml
 import pytz
+import structlog
 import yaml
 from unidecode import unidecode
 
 T = TypeVar("T")
+
+log = structlog.get_logger()
 
 
 def prune_dict(d: dict) -> dict:
@@ -268,3 +272,60 @@ def hash_any(x: Any) -> int:
     else:
         # Fallback for other types: use the built-in hash() function
         return hash(x)
+
+
+def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
+    """Recursively create an instance of a dataclass from a dictionary. We've implemented custom
+    method because original dataclasses_json.from_dict was too slow (this gives us more than 2x
+    speedup). See https://github.com/owid/etl/pull/3517#issuecomment-2468084380 for more details.
+    """
+    if d is None or not dataclasses.is_dataclass(cls) or not isinstance(d, dict):
+        return d  # type: ignore
+
+    field_types = {f.name: f.type for f in dataclasses.fields(cls)}
+
+    init_args = {}
+    for field_name, v in d.items():
+        # Skip values in a dictionary that are not in the dataclass
+        if field_name not in field_types:
+            continue
+
+        # Handle None values right away
+        if v is None:
+            init_args[field_name] = None
+            continue
+
+        field_type = field_types[field_name]
+        origin = get_origin(field_type)
+        args = get_args(field_type)
+
+        # unwrap Optional (e.g. Optional[License] -> License)
+        if type(None) in args:
+            filtered_args = tuple(a for a in args if a is not type(None))
+            if len(filtered_args) == 1:
+                field_type = filtered_args[0]
+
+        if origin is list:
+            item_type = args[0]
+            init_args[field_name] = [dataclass_from_dict(item_type, item) for item in v]
+        elif origin is dict:
+            key_type, value_type = args
+            init_args[field_name] = {k: dataclass_from_dict(value_type, item) for k, item in v.items()}
+        elif dataclasses.is_dataclass(field_type):
+            init_args[field_name] = dataclass_from_dict(field_type, v)  # type: ignore
+        elif isinstance(field_type, type) and field_type not in (Any,):
+            try:
+                init_args[field_name] = field_type(v)
+            except ValueError as e:
+                log.error(
+                    "conversion.failed",
+                    field_name=field_name,
+                    field_type=field_type,
+                    path=f"{d.get('channel')}/{d.get('namespace')}/{d.get('version')}/{d.get('short_name')}",
+                    error=str(e),
+                )
+                continue
+        else:
+            init_args[field_name] = v
+
+    return cls(**init_args)

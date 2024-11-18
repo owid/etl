@@ -100,6 +100,7 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             return pd.DataFrame()
 
         # Create a processing queue with (entity_name, variable_id) pairs
+        # TODO: we could make probabilities proportional to "relevance" score in anomalist
         items = _processing_queue(
             items=list(df_wide.index.unique()),
         )
@@ -118,8 +119,8 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
             # Get the data for the current entity and variable
             group = df_wide.loc[(entity_name, variable_id)]
 
-            # Skip if the series has only one or fewer data points
-            if isinstance(group, pd.Series) or len(group) <= 1:
+            # Skip if the series has only three or fewer data points
+            if isinstance(group, pd.Series) or len(group) <= 3:
                 continue
 
             # Prepare the input features (X) and target values (y) for Gaussian Process
@@ -161,9 +162,13 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
         df_score_long["p_value"] = 2 * (1 - norm.cdf(np.abs(df_score_long["z"])))
 
         # Adjust p-values for multiple testing
-        df_score_long["adj_p_value"] = df_score_long.groupby(["entity_name", "variable_id"]).p_value.transform(
-            lambda p: multipletests(p, method="fdr_bh")[1]
-        )
+        df_score_long["adj_p_value"] = df_score_long.groupby(
+            ["entity_name", "variable_id"], observed=True
+        ).p_value.transform(lambda p: multipletests(p, method="fdr_bh")[1])
+
+        # Anomalies with adj p-value < 0.1 are not interesting, drop them. This could be
+        # even stricter
+        df_score_long = df_score_long[df_score_long["adj_p_value"] < 0.1]
 
         # Final score is 1 - p-value
         df_score_long["anomaly_score"] = 1 - df_score_long["adj_p_value"]
@@ -285,20 +290,25 @@ class AnomalyGaussianProcessOutlier(AnomalyDetector):
     def get_scale_df(self, df: pd.DataFrame, variable_ids: List[int], variable_mapping: Dict[int, int]) -> pd.DataFrame:
         # NOTE: Ideally, for this detector, the scale should be the difference between a value and the mean, divided by the range of values of the variable. But calculating that may be hard to implement in an efficient way.
 
+        log.info("gp_outlier.get_scale_df.start")
+        t = time.time()
+
         # Create a dataframe of zeros.
         df_scale = self.get_zeros_df(df, variable_ids)
 
-        for variable_id in variable_ids:
-            # The scale is given by the size of changes in consecutive points (for a given country), as a fraction of the maximum range of values of that variable.
-            df_scale[variable_id] = abs(df[variable_id].diff().fillna(0)) / (
-                df[variable_id].max() - df[variable_id].min()
-            )
+        # The scale is given by the size of changes in consecutive points (for a given country), as a fraction of the maximum range of values of that variable.
+        ranges = df[variable_ids].max() - df[variable_ids].min()
+        diff = df[variable_ids].diff().fillna(0).abs()
 
         # The previous procedure includes the calculation of the deviation between the last point of an entity and the first point of the next, which is meaningless.
         # Therefore, make zero the first point of each entity_name for all columns.
-        df_scale.loc[df_scale["entity_name"] != df_scale["entity_name"].shift(), variable_ids] = 0
+        diff.loc[df["entity_name"] != df["entity_name"].shift(), :] = 0
+
+        df_scale[variable_ids] = diff / ranges
 
         # Since this anomaly detector return a long dataframe, we need to melt it.
         df_scale = df_scale.melt(id_vars=["entity_name", "year"], var_name="variable_id", value_name="score_scale")
+
+        log.info("gp_outlier.get_scale_df.end", t=time.time() - t)
 
         return df_scale

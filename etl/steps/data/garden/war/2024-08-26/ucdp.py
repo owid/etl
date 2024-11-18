@@ -158,15 +158,15 @@ def run(dest_dir: str) -> None:
     paths.log.info("replace missing data with zeros (where applicable)")
     tb_prio = expand_time_column(
         tb_prio,
-        ["region", "conflict_type"],
-        "year",
+        dimension_col=["region", "conflict_type"],
+        time_col="year",
         method="full_range",
         fillna_method="zero",
     )
     tb = expand_time_column(
         tb,
-        ["region", "conflict_type"],
-        "year",
+        dimension_col=["region", "conflict_type"],
+        time_col="year",
         method="full_range",
         fillna_method="zero",
     )
@@ -1083,8 +1083,8 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     # Fill with zeroes
     tb_locations_country = expand_time_column(
         tb_locations_country,
-        ["country", "conflict_type"],
-        "year",
+        dimension_col=["country", "conflict_type"],
+        time_col="year",
         method="full_range",
         fillna_method="zero",
     )

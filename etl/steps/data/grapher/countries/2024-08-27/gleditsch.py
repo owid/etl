@@ -32,8 +32,8 @@ def run(dest_dir: str) -> None:
     column_index = ["year", "country"]
     tb_countries = expand_time_column(
         tb_countries,
-        ["country"],
-        "year",
+        dimension_col=["country"],
+        time_col="year",
         method="full_range",
         fillna_method="zero",
     )

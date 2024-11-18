@@ -114,3 +114,5 @@ steps:
     - data://garden/countries/2023-09-25/gleditsch
   data://grapher/war/2023-10-24/ucdp_prio:
     - data://garden/war/2023-09-21/ucdp_prio
+  data://grapher/war/2023-09-21/prio_v31:
+    - data://garden/war/2023-09-21/prio_v31

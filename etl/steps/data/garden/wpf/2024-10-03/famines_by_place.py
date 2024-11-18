@@ -59,13 +59,14 @@ def run(dest_dir: str) -> None:
     tb_other = tb[~tb["country"].isin(main_countries)]
     tb_main["country"] = tb_main["country"].replace(
         {
-            "Russia": "USSR",
-            "Ukraine": "USSR",
-            "Russia, Ukraine": "USSR",
-            "Germany, USSR": "USSR",
-            "Moldova, Ukraine, Russia, Belarus": "USSR",
-            "Russia, Western Soviet States": "USSR",
-            "Russia, Kazakhstan": "USSR",
+            "Russia": "USSR/Russia",
+            "Ukraine": "USSR/Russia",
+            "Russia, Ukraine": "USSR/Russia",
+            "Germany, USSR": "USSR/Russia",
+            "Moldova, Ukraine, Russia, Belarus": "USSR/Russia",
+            "Russia, Western Soviet States": "USSR/Russia",
+            "Russia, Kazakhstan": "USSR/Russia",
+            "USSR": "USSR/Russia",
             "India, Bangladesh": "India",
         }
     )

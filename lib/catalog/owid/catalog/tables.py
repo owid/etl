@@ -320,9 +320,9 @@ class Table(pd.DataFrame):
             raise ValueError(f'filename must end in ".csv": {path}')
 
         # load the data and add metadata
-        df = Table(pd.read_csv(path, index_col=False, na_values=[""], keep_default_na=False))
-        cls._add_metadata(df, path, **kwargs)
-        return df
+        tb = Table(pd.read_csv(path, index_col=False, na_values=[""], keep_default_na=False))
+        cls._add_metadata(tb, path, **kwargs)
+        return tb
 
     def update_metadata(self, **kwargs) -> "Table":
         """Set Table metadata."""
@@ -332,7 +332,7 @@ class Table(pd.DataFrame):
         return self
 
     @classmethod
-    def _add_metadata(cls, df: pd.DataFrame, path: str, primary_key: Optional[list[str]] = None) -> None:
+    def _add_metadata(cls, tb: "Table", path: str, primary_key: Optional[list[str]] = None) -> None:
         """Read metadata from JSON sidecar and add it to the dataframe."""
         metadata = cls._read_metadata(path)
 
@@ -340,12 +340,12 @@ class Table(pd.DataFrame):
             primary_key = metadata.get("primary_key", [])
         fields = metadata.pop("fields") if "fields" in metadata else {}
 
-        df.metadata = TableMeta.from_dict(metadata)
-        df._set_fields_from_dict(fields)
+        tb.metadata = TableMeta.from_dict(metadata)
+        tb._set_fields_from_dict(fields)
 
         # NOTE: setting index is really slow for large datasets
         if primary_key:
-            df.set_index(primary_key, inplace=True)
+            tb.set_index(primary_key, inplace=True)
 
     @classmethod
     def read_feather(cls, path: Union[str, Path], **kwargs) -> "Table":
