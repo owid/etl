@@ -14,12 +14,11 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("migration_distance")
 
     # Read table from garden dataset.
-    tb = ds_garden["migration_distance"]
+    tb = ds_garden["migration_distance"].reset_index()
 
-    #
-    # Process data.
-    #
+    tb = tb.rename(columns={"country_origin": "country"})
 
+    tb = tb.format(["country", "year"])
     #
     # Save outputs.
     #

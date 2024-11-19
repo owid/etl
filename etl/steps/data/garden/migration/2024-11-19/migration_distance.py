@@ -77,18 +77,22 @@ def run(dest_dir: str) -> None:
     migrant_groups = tb.groupby(["country_origin", "year"])
     med_distance = migrant_groups.apply(calc_median).reset_index()
     med_distance["median_distance"] = med_distance[0].apply(lambda x: x[0])
-    med_distance["total_journeys"] = med_distance[0].apply(lambda x: x[1])
-    med_distance = med_distance.drop(columns=[0])
+    med_distance["total_emigrants"] = med_distance[0].apply(lambda x: x[1])
+    med_distance = med_distance.drop(columns=[0]).copy_metadata(tb)
 
-    tb = med_distance.format(["country_origin", "year"])
+    med_distance.metadata.dataset.short_name = "migration_distance"
+    med_distance.metadata.short_name = "migration_distance"
+
+    for col in med_distance.columns:
+        med_distance[col].metadata.origins = tb["country_origin"].m.origins
+
+    med_distance = med_distance.format(["country_origin", "year"])
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = create_dataset(dest_dir, tables=[med_distance], check_variables_metadata=True, default_metadata=None)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
