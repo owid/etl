@@ -97,7 +97,7 @@ definitions:
 
   # For description_short
   description_short_multidimensional_poverty: Multidimensional poverty is defined as being deprived in a range of health, education and living standards indicators.
-  description_short_mpi: The MPI is a measure that combines the prevalence and the intensity of multidimensional poverty.
+  description_short_mpi: The Multidimensional Poverty Index (MPI) is a measure that combines the prevalence and the intensity of multidimensional poverty on a scale from 0 to 1. Higher values indicate higher poverty.
   description_short_headcount_ratio: This is the share of the population that is multidimensionally poor.
   description_short_intensity: The intensity is the share of indicators in which people in multidimensional poverty are deprived on average.
   description_short_vulnerable: This is the share of the population that is close to the multidimensional poverty threshold.
@@ -119,9 +119,9 @@ definitions:
   description_key_multidimensional_poverty: |-
     Being _MPI poor_ means that a person lives in a household deprived in a third or more of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
   description_key_vulnerable: |-
-    Being _vulnerable_ to multidimensional poverty means that a person lives in a household deprived in 20-33.33% of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
+    Being _vulnerable_ to multidimensional poverty means that a person lives in a household deprived in 20-33.3% of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
   description_key_severe: |-
-    Being in severe multidimensional poverty means that a person lives in a household deprived in 50% or more of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
+    Being in _severe_ multidimensional poverty means that a person lives in a household deprived in 50% or more of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
   description_key_assessments: |-
     Each household is assessed against specific thresholds for these indicators. For example, a household is considered deprived in the _electricity_ indicator if it does not have access to it. [This article](https://ourworldindata.org/multidimensional-poverty-index) discusses specific thresholds in more detail.
   description_key_weights: |-
