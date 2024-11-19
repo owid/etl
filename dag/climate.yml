@@ -54,15 +54,15 @@ steps:
   #
   # Copernicus Climate Change Service - Precipitation.
   #
-  data://meadow/climate/2024-09-11/total_precipitation:
-  - snapshot://climate/2024-09-11/total_precipitation.gz
-  - snapshot://countries/2023-12-27/world_bank.zip
-  data://garden/climate/2024-09-11/total_precipitation:
-    - data://meadow/climate/2024-09-11/total_precipitation
-  data://grapher/climate/2024-09-11/total_precipitation:
-    - data://garden/climate/2024-09-11/total_precipitation
-  data://grapher/climate/2024-09-11/total_precipitation_annual_average:
-    - data://garden/climate/2024-09-11/total_precipitation
+  data://meadow/climate/2024-11-19/total_precipitation:
+  - snapshot://climate/2024-11-19/total_precipitation.zip
+  - snapshot://countries/2024-11-19/world_bank.zip
+  data://garden/climate/2024-11-19/total_precipitation:
+    - data://meadow/climate/2024-11-19/total_precipitation
+  data://grapher/climate/2024-11-19/total_precipitation:
+    - data://garden/climate/2024-11-19/total_precipitation
+  data://grapher/climate/2024-11-19/total_precipitation_annual_average:
+    - data://garden/climate/2024-11-19/total_precipitation
   #
   # Climate change impacts data explorer.
   #
