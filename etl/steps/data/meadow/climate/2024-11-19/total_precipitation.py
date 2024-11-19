@@ -34,10 +34,6 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     # Create an in-memory bytes file and load the dataset
     with io.BytesIO(file_content) as memfile:
         da = xr.open_dataset(memfile).load()  # .load() ensures data is eagerly loaded
-
-    # Convert precipitation from Kelvin to Celsius.
-    da = da["tp"] - 273.15
-
     # Set the coordinate reference system for the precipitation data to EPSG 4326.
     da = da.rio.write_crs("epsg:4326")
 
