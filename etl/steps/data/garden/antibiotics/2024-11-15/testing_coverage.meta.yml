@@ -56,7 +56,7 @@ tables:
         description_short: Number of countries testing >80% bacteriologically confirmed gonorrhea infections for antibiotic susceptibility.
         description_key: *description_key_ast_gonorrhea
         unit: countries
-      ctas_with_reported_bcis_with_ast__gt__80_bcis__stool:
+      ctas_with_reported_bcis_with_ast__gt__80_bcis_stool:
         title: Number of countries testing >80% of confirmed gastrointestinal infections for antibiotic susceptibility
         description_short: Number of countries testing >80% bacteriologically confirmed gastrointestinal infections for antibiotic susceptibility.
         description_key: *description_key_ast_stool
