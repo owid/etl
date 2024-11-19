@@ -38,8 +38,7 @@ tables:
       ctas_with_reported_bcis_with_ast__gt__80_bcis:
         title: Number of countries testing >80% of confirmed << specimen >> infections for antibiotic susceptibility
         description_short: Number of countries testing >80% bacteriologically confirmed << specimen >> infections for antibiotic susceptibility.
-        description_key:
-          - <<definitions.description_key>>
+        description_key: {definitions.description_key}
         unit: countries
       total_bcis:
         title: Total confirmed << specimen >> infections
@@ -48,36 +47,30 @@ tables:
       total_bcis_with_ast:
         title: Total confirmed << specimen >> infections  tested for antibiotic susceptibility
         description_short: Total bacteriologically confirmed << specimen >> infections tested for antibiotic susceptibility.
-        description_key:
-          - <<definitions.description_key>>
+        description_key: {definitions.description_key}
         unit: infections
       min:
         title: Minimum number of confirmed << specimen >> infections tested for antibiotic susceptibility per million people
         description_short: Minimum number of << specimen >> infections tested for antibiotic susceptibility per million people
-        description_key:
-          - <<definitions.description_key>>
+        description_key: {definitions.description_key}
         unit: infections per million
       q1:
         title: 25th percentile of confirmed << specimen >> infections tested for antibiotic susceptibility per million people
         description_short: 25th percentile of << specimen >> infections tested for antibiotic susceptibility per million people
-        description_key:
-          - <<definitions.description_key>>
+        description_key: {definitions.description_key}
         unit: infections per million
       median:
         title: Median number of confirmed << specimen >> infections tested for antibiotic susceptibility per million people
         description_short: Median number of << specimen >> infections tested for antibiotic susceptibility per million people
-        description_key:
-          - <<definitions.description_key>>
+        description_key: {definitions.description_key}
         unit: infections per million
       q3:
         title: 75th percentile of confirmed << specimen >> infections tested for antibiotic susceptibility per million people
         description_short: 75th percentile of << specimen >> infections tested for antibiotic susceptibility per million people
-        description_key:
-          - <<definitions.description_key>>
+        description_key: {definitions.description_key}
         unit: infections per million
       max:
         title: Maximum number of confirmed << specimen >> infections tested for antibiotic susceptibility per million people
         description_short: Maximum number of << specimen >> infections tested for antibiotic susceptibility per million people
-        description_key:
-          - <<definitions.description_key>>
+        description_key: {definitions.description_key}
         unit: infections per million
