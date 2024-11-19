@@ -6,7 +6,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-REGIONS = geo.REGIONS.keys()
+REGIONS = [reg for reg in geo.REGIONS.keys() if reg != "European Union (27)"]
 
 
 def run(dest_dir: str) -> None:
