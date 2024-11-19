@@ -865,6 +865,10 @@ steps:
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
 
+# Migration distances
+  data://garden/migration/2024-11-19/migration_distance:
+    - data://garden/un/2024-07-16/migrant_stock
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
