@@ -34,6 +34,7 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     # Create an in-memory bytes file and load the dataset
     with io.BytesIO(file_content) as memfile:
         da = xr.open_dataset(memfile).load()  # .load() ensures data is eagerly loaded
+    da = da["tp"]
     # Set the coordinate reference system for the precipitation data to EPSG 4326.
     da = da.rio.write_crs("epsg:4326")
 
@@ -113,7 +114,6 @@ def run(dest_dir: str) -> None:
 
             # Calculate the weighted mean precipitation for the country.
             country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
-
             # Store the calculated mean precipitation in the dictionary with the country's name as the key.
             temp_country[country_name] = country_weighted_mean
 
@@ -145,7 +145,6 @@ def run(dest_dir: str) -> None:
     # month_starts is a DateTimeIndex object; you can convert it to a list if needed
     month_starts_list = month_middles.tolist()
 
-    # df of temperatures for each country
     df_temp = pd.DataFrame(temp_country)
     df_temp["time"] = month_starts_list
 
