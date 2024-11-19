@@ -15,7 +15,7 @@ tags:
 
 - __[Indicator](#variable)__ (variable)
 - __[Origin](#origin)__
-- __[Table](#tables)__
+- __[Table](#table)__
 - __[Dataset](#dataset)__
 </div>
 
