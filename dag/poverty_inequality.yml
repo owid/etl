@@ -39,6 +39,8 @@ steps:
     - data://meadow/wid/2024-11-19/world_inequality_database
   data://grapher/wid/2024-11-19/world_inequality_database:
     - data://garden/wid/2024-11-19/world_inequality_database
+  data://explorers/wid/latest/world_inequality_database:
+    - data://garden/wid/2024-11-19/world_inequality_database
 
   # Luxembourg Income Study
   data://meadow/lis/2024-06-13/luxembourg_income_study:

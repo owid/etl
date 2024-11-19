@@ -865,11 +865,6 @@ steps:
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
 
-  #
-  # Regions.
-  #
-  data://garden/regions/2024-11-19/regions:
-
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
