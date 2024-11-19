@@ -45,9 +45,9 @@ def run(dest_dir: str) -> None:
     )
 
     # Set the decadal values for 2020 to NaN
-    tb_decadal_average.loc[tb_decadal_average["decade"] == 2020, ["total_precipitation", "precipitation_anomaly"]] = (
-        np.nan
-    )
+    tb_decadal_average.loc[
+        tb_decadal_average["decade"] == 2020, ["total_precipitation", "precipitation_anomaly"]
+    ] = np.nan
 
     # Merge the decadal average Table with the original Table
     combined = pr.merge(
