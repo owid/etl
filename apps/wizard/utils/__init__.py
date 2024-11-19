@@ -663,23 +663,36 @@ def _get_staging_creation_time(session: Session):
     return create_time
 
 
+def _staging_creation_time_cache_key(session: Optional[Session] = None) -> str:
+    """Create a unique key for a session to avoid conflicts when working with multiple
+    staging servers."""
+    if session is None:
+        return VARNAME_STAGING_CREATION_TIME
+    else:
+        return f"{VARNAME_STAGING_CREATION_TIME}_{str(session.bind)}"
+
+
 def get_staging_creation_time(session: Optional[Session] = None):
     """Get staging server creation time."""
-    if VARNAME_STAGING_CREATION_TIME not in st.session_state:
+    key = _staging_creation_time_cache_key(session)
+    if key not in st.session_state:
         set_staging_creation_time(session)
-    return st.session_state[VARNAME_STAGING_CREATION_TIME]
+    return st.session_state[key]
 
 
-def set_staging_creation_time(session: Optional[Session] = None, key: str = VARNAME_STAGING_CREATION_TIME) -> None:
+def set_staging_creation_time(session: Optional[Session] = None) -> None:
     """Gest staging server creation time estimate."""
 
     if session is None:
         if OWID_ENV.env_remote == "staging":
             with Session(OWID_ENV.engine) as session:
+                key = _staging_creation_time_cache_key(session)
                 st.session_state[key] = _get_staging_creation_time(session)
         else:
+            key = _staging_creation_time_cache_key(session)
             st.session_state[key] = None
     else:
+        key = _staging_creation_time_cache_key(session)
         st.session_state[key] = _get_staging_creation_time(session)
 
 
