@@ -875,6 +875,7 @@ dev = [
     { name = "mkdocs-git-revision-date-localized-plugin" },
     { name = "mkdocs-glightbox" },
     { name = "mkdocs-jupyter" },
+    { name = "mkdocs-material" },
     { name = "pandas-stubs" },
     { name = "plotly" },
     { name = "pyright" },
@@ -979,10 +980,11 @@ dev = [
     { name = "mkdocs-click", specifier = ">=0.8.1" },
     { name = "mkdocs-exclude", specifier = ">=1.0.2" },
     { name = "mkdocs-gen-files", specifier = ">=0.5.0" },
-    { name = "mkdocs-git-authors-plugin", specifier = ">=0.7.2" },
+    { name = "mkdocs-git-authors-plugin", specifier = ">=0.9.2" },
     { name = "mkdocs-git-revision-date-localized-plugin", specifier = ">=1.2.6" },
     { name = "mkdocs-glightbox", specifier = ">=0.3.7" },
     { name = "mkdocs-jupyter", specifier = ">=0.24.8" },
+    { name = "mkdocs-material", specifier = ">=9.5.34" },
     { name = "pandas-stubs", specifier = "==1.2.0.62" },
     { name = "plotly", specifier = ">=5.23.0" },
     { name = "pyright", specifier = "==1.1.373" },
@@ -2636,14 +2638,14 @@ wheels = [
 
 [[package]]
 name = "mkdocs-git-authors-plugin"
-version = "0.7.2"
+version = "0.9.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mkdocs" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/43/ff/a759124da74b0874b8db4988af5f60f594917316ce82baaef36abae94073/mkdocs-git-authors-plugin-0.7.2.tar.gz", hash = "sha256:f541730e4cabdafa0ac758c94d28ba5e8ddca4c859e5de4c89f1226cb6ccd0ad", size = 15785 }
+sdist = { url = "https://files.pythonhosted.org/packages/80/ef/09ab7178d580e342cb3ba279c48eaf3abf55795a2ae6e5426fe2c725143c/mkdocs_git_authors_plugin-0.9.2.tar.gz", hash = "sha256:77f97c321e08a8757beb866293eb257070b11cd5a080976bc6696b249cbade4f", size = 21403 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/55/7c/c4b6d71921dd0cf33f87bfd69d7c72774bf4ece57b6aa23221d1ac31d9fb/mkdocs_git_authors_plugin-0.7.2-py3-none-any.whl", hash = "sha256:c8a2784a867db79ad3b477a96ee96875d17b09192b6d3be71f08df25afff76c4", size = 18860 },
+    { url = "https://files.pythonhosted.org/packages/48/08/57d0fea1cc30096fcc94ec9cd4ccdee625be89fd710626f78d90fc13738e/mkdocs_git_authors_plugin-0.9.2-py3-none-any.whl", hash = "sha256:f6cefc4dc832865d26f7f9f944c0a8c7dc852742d79320f3800e0d97814e2a84", size = 20332 },
 ]
 
 [[package]]
