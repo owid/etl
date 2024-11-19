@@ -93,6 +93,8 @@ extra:
       link: https://ourworldindata.org
     - icon: fontawesome/brands/instagram
       link: https://instagram.com/ourworldindata
+    - icon: fontawesome/brands/bluesky
+      link: https://bsky.app/profile/ourworldindata.org
     - icon: fontawesome/brands/x-twitter
       link: https://twitter.com/ourworldindata
 
@@ -149,9 +151,12 @@ plugins:
   - git-authors:
       show_email_address: false
       # authorship_threshold_percent: 1
-      # show_contribution: true
+      show_contribution: true
       # show_line_count: true
       # count_empty_lines: true
+      ignore_authors:
+        - owidbot
+      sort_authors_by: contribution
   - git-revision-date-localized
   - tags:
       tags_file: tags.md
