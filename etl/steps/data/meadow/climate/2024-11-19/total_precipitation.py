@@ -1,6 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-import gzip
 import io
 import zipfile
 
@@ -27,25 +26,21 @@ log = get_logger()
 def _load_data_array(snap: Snapshot) -> xr.DataArray:
     log.info("load_data_array.start")
     # Load data from snapshot.
-    with gzip.open(snap.path, "rb") as file:
-        file_content = file.read()
-
+    with zipfile.ZipFile(snap.path, "r") as zip_file:
+        # Iterate through all files in the zip archive
+        for file_info in zip_file.infolist():
+            with zip_file.open(file_info) as file:
+                file_content = file.read()
     # Create an in-memory bytes file and load the dataset
     with io.BytesIO(file_content) as memfile:
-        ds = xr.open_dataset(memfile).load()  # .load() ensures data is eagerly loaded
+        da = xr.open_dataset(memfile).load()  # .load() ensures data is eagerly loaded
 
-    # The latest 3 months in this dataset are made available through ERA5T, which is slightly different to ERA5. In the downloaded file, an extra dimenions ‘expver’ indicates which data is ERA5 (expver = 1) and which is ERA5T (expver = 5).
-    # If a value is missing in the first dataset, it is filled with the value from the second dataset.
-    # Select the 't2m' variable from the combined dataset.
-    ds1 = ds.sel(expver=1)
-    ds5 = ds.sel(expver=5)
-    da = ds1.combine_first(ds5)["tp"]
-    del ds1, ds5
+    # Convert precipitation from Kelvin to Celsius.
+    da = da["t2m"] - 273.15
 
-    # Set the coordinate reference system for the temperature data to EPSG 4326.
+    # Set the coordinate reference system for the precipitation data to EPSG 4326.
     da = da.rio.write_crs("epsg:4326")
 
-    # Convert temperature from Kelvin to Celsius.
     return da
 
 
@@ -64,11 +59,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("total_precipitation.gz")
+    snap = paths.load_snapshot("total_precipitation.zip")
 
-    # Read surface temperature data from snapshot
+    # Read data from snapshot
     da = _load_data_array(snap)
-    print(da)
 
     # Read the shapefile to extract country informaiton
     snap_geo = paths.load_snapshot("world_bank.zip")
@@ -86,17 +80,17 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    # Initialize an empty dictionary to store the country-wise average temperature.
+    # Initialize an empty dictionary to store the country-wise average precipitation.
     temp_country = {}
 
-    # Add Global mean temperature
+    # Add Global mean precipitation
     weights = np.cos(np.deg2rad(da.latitude))
     weights.name = "weights"
     clim_month_weighted = da.weighted(weights)
     global_mean = clim_month_weighted.mean(["longitude", "latitude"])
     temp_country["World"] = global_mean
 
-    # Initialize a list to keep track of small countries where temperature data extraction fails.
+    # Initialize a list to keep track of small countries where precipitation data extraction fails.
     small_countries = []
 
     # Iterate over each row in the shapefile data.
@@ -118,13 +112,13 @@ def run(dest_dir: str) -> None:
             weights = np.cos(np.deg2rad(clip.latitude))
             weights.name = "weights"
 
-            # Apply the weights to the clipped temperature data.
+            # Apply the weights to the clipped precipitation data.
             clim_month_weighted = clip.weighted(weights)
 
-            # Calculate the weighted mean temperature for the country.
+            # Calculate the weighted mean precipitation for the country.
             country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
 
-            # Store the calculated mean temperature in the dictionary with the country's name as the key.
+            # Store the calculated mean precipitation in the dictionary with the country's name as the key.
             temp_country[country_name] = country_weighted_mean
 
             # Clean up the memory
@@ -142,10 +136,12 @@ def run(dest_dir: str) -> None:
     log.info(
         f"It wasn't possible to extract precipitation data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
-
     # Define the start and end dates
-    start_time = da["time"].min().dt.date.astype(str).item()
-    end_time = da["time"].max().dt.date.astype(str).item()
+    da["date"] = pd.to_datetime(da["date"].astype(str), format="%Y%m%d")
+
+    # Now you can access the 'dt' accessor
+    start_time = da["date"].min().dt.date.astype(str).item()
+    end_time = da["date"].max().dt.date.astype(str).item()
 
     # Generate a date range from start_time to end_time with monthly frequency
     month_middles = pd.date_range(start=start_time, end=end_time, freq="MS") + pd.offsets.Day(14)
