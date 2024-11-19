@@ -364,53 +364,27 @@ def harmonize_indexes_and_countries(tb: Table) -> Table:
     return tb
 
 
+########################################################################################################################
+
+# The code in this block is not used in the data pipeline, but it was useful to understand the data and justify some of the choices.
+
+
 def compare_components_and_prices_data(tb: Table) -> None:
-    # Check that the resulting total price for the components dataset (summing up components) is similar to the biannual electricity prices data.
-
-    # Ideally, the prices obtained by adding up components (in the components dataset) should be similar to those obtained in the prices dataset.
-    # However, both are very sparse (especially the prices dataset), and the prices dataset is also given in semesters, which makes it difficult to compare (without having the actual consumption of each semester to be able to compute a weighted average).
-    dataset_components = "nrg_pc_204_c"
-    dataset_prices = "nrg_pc_204"
-    # Transforming biannual data into annual data is not straightforward.
-    # I tried simply taking the average, but what I found is that the annual components prices (summed over all components) tends to be systematically higher than the biannual prices (averaged over the two semester of the year). I suppose this was caused by doing a simple average instead of weighting by consumption. In semesters with higher consumption (e.g. winter), the increased demand tends to drive prices up. Annual prices, as far as I understand, are consumption-weighted averages, and therefore assign a larger weight to those semesters with higher prices. So, intuitively, it makes sense that the true annual prices tend to be higher than the averaged biannual prices.
-    # We could create a weighted average, but we would need the actual consumption of each semester (which I haven't found straightaway).
-
-    tb_biannual = tb[tb["year-semester"].str.contains("S")].reset_index(drop=True)
-    # # Compute an annual average only if there is data for the two semesters.
-    # tb_biannual_filtered = tb_biannual.groupby(
-    #     ["currency", "country", "year", "dataset_code", "dataset_name", "price_component_or_level"],
-    #     observed=True,
-    #     as_index=False,
-    # ).filter(lambda x: len(x) == 2)
-    # tb_biannual = tb_biannual_filtered.groupby(
-    #     ["currency", "country", "year", "dataset_code", "dataset_name", "price_component_or_level"],
-    #     observed=True,
-    #     as_index=False,
-    # ).agg({"value": "mean"})
-
-    # Similarly, for annual data, assign July 1st.
-    tb_annual = tb[~tb["year-semester"].str.contains("S")].reset_index(drop=True)
-
-    # OPTION 1: Sum over all price components to get the total.
-    components_to_include = [
-        "Energy and supply",
-        "Network costs",
-        "Taxes, fees, levies, and charges",
-        # "Taxes, fees, levies, and charges allowance",
-        # "Renewable taxes allowance",
-        # "Capacity taxes allowances",
-        # "Environmental taxes allowance",
-        # "Other allowance",
-        # "Nuclear taxes allowance",
+    # Compare biannual prices data (without averaging overs semesters) with annual components data.
+    price_level = "All taxes and levies included"
+    tb_biannual = tb[(tb["year-semester"].str.contains("S")) & (tb["currency"] == "Euro")].reset_index(drop=True)
+    tb_biannual = tb_biannual[(tb_biannual["price_component_or_level"] == price_level)][
+        ["dataset_code", "country", "date", "value"]
     ]
+    # Similarly, for annual data, assign July 1st.
+    tb_annual = tb[(~tb["year-semester"].str.contains("S")) & (tb["currency"] == "Euro")].reset_index(drop=True)
+    tb_annual["dataset_code"] = tb_annual["dataset_code"].str.replace("_c", "")
+
+    combination = ["Energy and supply", "Network costs", "Taxes, fees, levies, and charges"]
     annual_components = (
-        tb_annual[
-            (tb_annual["price_component_or_level"].isin(components_to_include))
-            & (tb_annual["currency"] == "Euro")
-            & (tb_annual["dataset_code"] == dataset_components)
-        ]
+        tb_annual[(tb_annual["price_component_or_level"].isin(combination))]
         .groupby(
-            ["country", "date"],
+            ["dataset_code", "country", "date"],
             observed=True,
             as_index=False,
         )
@@ -419,43 +393,174 @@ def compare_components_and_prices_data(tb: Table) -> None:
         .reset_index(drop=True)
     )
 
-    # OPTION 2: Choose one of the price levels ({'All taxes and levies included', 'Excluding VAT and other recoverable taxes and levies', 'Excluding taxes and levies').
-    price_level = "All taxes and levies included"
-    # price_level = "Excluding VAT and other recoverable taxes and levies"
-    # price_level = "Excluding taxes and levies"
-    annual_prices = tb_biannual[
-        (tb_biannual["currency"] == "Euro")
-        & (tb_biannual["dataset_code"] == dataset_prices)
-        & (tb_biannual["price_component_or_level"] == price_level)
-    ][["country", "date", "value"]]
-
-    # Combine both datasets.
+    # Combine both datasets for plotting.
     compared = pd.concat(
-        [annual_components.assign(**{"source": "components"}), annual_prices.assign(**{"source": "prices"})],
+        [annual_components.assign(**{"source": "components"}), tb_biannual.assign(**{"source": "prices"})],
         ignore_index=True,
     )
     # Only a few country-years could be compared this way. Most of the points in the prices datasets were missing.
     import plotly.express as px
 
-    for country in sorted(set(compared["country"])):
-        px.line(
-            compared[compared["country"] == country],
-            x="date",
-            y="value",
-            color="source",
-            markers=True,
-            title=country,
-        ).update_yaxes(range=[0, None]).show()
+    for dataset_code in compared["dataset_code"].unique():
+        for country in sorted(set(compared["country"])):
+            _compared = compared[(compared["dataset_code"] == dataset_code) & (compared["country"] == country)]
+            if len(set(_compared["source"])) < 2:
+                continue
+            px.line(
+                _compared,
+                x="date",
+                y="value",
+                color="source",
+                markers=True,
+                title=f"{dataset_code} - {country}",
+            ).update_yaxes(range=[0, None]).show()
 
-    # Also check the percentage deviation.
-    # compared["dev"] = 100 * abs(compared["value_components"] - compared["value_prices"]) / compared["value_prices"]
+
+def find_best_combination_of_components(tb: Table) -> None:
+    # Check that the resulting total price for the components dataset (summing up components) is similar to the biannual electricity prices data.
+
+    # Ideally, the prices obtained by adding up components (in the components dataset) should be similar to those obtained in the prices dataset.
+    # However, both are very sparse (especially the prices dataset), and the prices dataset is also given in semesters, which makes it difficult to compare (without having the actual consumption of each semester to be able to compute a weighted average).
+    # Transforming biannual data into annual data is not straightforward.
+    # I tried simply taking the average, but what I found is that the annual components prices (summed over all components) tends to be systematically higher than the biannual prices (averaged over the two semester of the year). I suppose this was caused by doing a simple average instead of weighting by consumption. In semesters with higher consumption (e.g. winter), the increased demand tends to drive prices up. Annual prices, as far as I understand, are consumption-weighted averages, and therefore assign a larger weight to those semesters with higher prices. So, intuitively, it makes sense that the true annual prices tend to be higher than the averaged biannual prices.
+    # We could create a weighted average, but we would need the actual consumption of each semester (which I haven't found straightaway).
+
+    # Compute an annual average only if there is data for the two semesters.
+    price_level = "All taxes and levies included"
+    tb_biannual = tb[(tb["year-semester"].str.contains("S")) & (tb["currency"] == "Euro")].reset_index(drop=True)
+    tb_biannual_filtered = tb_biannual.groupby(
+        ["country", "year", "dataset_code", "price_component_or_level"],
+        observed=True,
+        as_index=False,
+    ).filter(lambda x: len(x) == 2)
+    tb_biannual = tb_biannual_filtered.groupby(
+        ["country", "year", "dataset_code", "price_component_or_level"],
+        observed=True,
+        as_index=False,
+    ).agg({"value": "mean"})
+    tb_biannual = tb_biannual[(tb_biannual["price_component_or_level"] == price_level)][
+        ["dataset_code", "country", "year", "value"]
+    ]
+    # Similarly, for annual data, assign July 1st.
+    tb_annual = tb[(~tb["year-semester"].str.contains("S")) & (tb["currency"] == "Euro")].reset_index(drop=True)
+    tb_annual["dataset_code"] = tb_annual["dataset_code"].str.replace("_c", "")
+
+    def _get_annual_sum(tb_annual, combination):
+        annual_components = (
+            tb_annual[(tb_annual["price_component_or_level"].isin(combination))]
+            .groupby(
+                ["dataset_code", "country", "year"],
+                observed=True,
+                as_index=False,
+            )
+            .agg({"value": lambda x: x.sum(min_count=1)})
+            .dropna()
+            .reset_index(drop=True)
+        )
+
+        return annual_components
+
+    import itertools
+
+    from tqdm.auto import tqdm
+
+    # Get all possible combinations of components.
+    elements = INDEXES_MAPPING["price_component"].values()
+    combinations = []
+    for r in range(1, len(elements) + 1):
+        combinations.extend(itertools.combinations(elements, r))
+    # Keep only combinations that include "Energy and supply" and "Network costs".
+    combinations = [c for c in combinations if "Energy and supply" in c and "Network costs" in c]
+
+    # Brute-force analysis: Check which combination of components minimizes the error between the sum of components and the prices data.
+    # NOTE: This takes about 4 minutes.
+    error_median = []
+    error_mean = []
+    error_max = []
+    for combination in tqdm(combinations):
+        annual_components = _get_annual_sum(tb_annual, combination)
+        compared = (
+            tb_biannual.merge(
+                annual_components,
+                on=["dataset_code", "country", "year"],
+                how="inner",
+                suffixes=("_prices", "_components"),
+            )
+            .dropna()
+            .reset_index(drop=True)
+        )
+        compared["pct"] = 100 * abs(compared["value_prices"] - compared["value_components"]) / compared["value_prices"]
+        error_mean.append(compared["pct"].mean())
+        error_median.append(compared["pct"].median())
+        error_max.append(compared["pct"].max())
+    # Find the combination that minimizes the error.
+    results_df = pd.DataFrame(
+        {
+            "combination": combinations,
+            "error_mean": error_mean,
+            "error_median": error_median,
+            "error_max": error_max,
+        }
+    )
+    # There is no single combination that minimizes all error.
+    set(results_df[results_df["error_mean"] == results_df["error_mean"].min()]["combination"])
+    # After inspection, there are different combinations that minimize error (since some components are actually always zero). In terms of the minimum mean error, the combinations are:
+    # ('Energy and supply', 'Network costs', 'Taxes, fees, levies, and charges'),
+    # ('Energy and supply', 'Network costs', 'Taxes, fees, levies, and charges', 'Capacity taxes allowances'),
+    # ('Energy and supply', 'Network costs', 'Taxes, fees, levies, and charges', 'Capacity taxes allowances', 'Nuclear taxes allowance'),
+    # ('Energy and supply', 'Network costs', 'Taxes, fees, levies, and charges', 'Nuclear taxes allowance')
+    # Given that some of those allowance components are actually (almost) always zero, it seems clear that
+    # the best combination is, as expected:
+    components_optimal = ["Energy and supply", "Network costs", "Taxes, fees, levies, and charges"]
+    annual_components = _get_annual_sum(tb_annual, combination=components_optimal)
+    compared = (
+        tb_biannual.merge(
+            annual_components, on=["dataset_code", "country", "year"], how="inner", suffixes=("_prices", "_components")
+        )
+        .dropna()
+        .reset_index(drop=True)
+    )
+    compared["pct"] = 100 * abs(compared["value_prices"] - compared["value_components"]) / compared["value_prices"]
+    compared.sort_values("pct", ascending=False).head(60)
+    # For most countries, the agreement is good, but some country-years, the discrepancy is significant, e.g. Georgia household electricity.
+
+    # Visually inspect these discrepancies.
+    compared = pd.concat(
+        [annual_components.assign(**{"source": "components"}), tb_biannual.assign(**{"source": "prices"})],
+        ignore_index=True,
+    )
+    # Only a few country-years could be compared this way. Most of the points in the prices datasets were missing.
+    import plotly.express as px
+
+    for dataset_code in compared["dataset_code"].unique():
+        for country in sorted(set(compared["country"])):
+            if (
+                len(
+                    set(
+                        compared[(compared["dataset_code"] == dataset_code) & (compared["country"] == country)][
+                            "source"
+                        ]
+                    )
+                )
+                < 2
+            ):
+                continue
+            px.line(
+                compared[(compared["dataset_code"] == dataset_code) & (compared["country"] == country)],
+                x="year",
+                y="value",
+                color="source",
+                markers=True,
+                title=f"{dataset_code} - {country}",
+            ).update_yaxes(range=[0, None]).show()
 
     # Conclusions:
-    # * When consumption band "All bands" is selected, there are very few points where both curves (prices and components) can be compared. When choosing another band, e.g. "<20GJ", there are more points to compare (in the case of gas).
-    # * The prices and components datasets coincide reasonably well, but we need to figure out which subset of components needs to be included, to avoid double-counting.
-    # * It seems that some components include others, so we can't simply sum them all up. It seems that "Energy and supply", "Network costs", and "Taxes, fees, levies, and charges" are the main components. When adding them up, the result is quite close to the prices dataset.
-    # * Numerically, I have checked that for all price components datasets, "Taxes, fees, levies and charges" coincides with the sum of 'Capacity taxes', 'Environmental taxes', 'Nuclear taxes', 'Renewable taxes', 'Value added tax (VAT)', 'Other'. For some country-years, there is a small discrepancy. Also, for Romania 2022 there is is no "Taxes, fees, levies and charges" component, but there are other components; however, those extra components are zero (so, we can ignore this exception).
-    # * What's not so clear is what happens with the "allowances". Is "Taxes, fees, levies, and charges allowance" the sum of all other "* allowance"? It's hard to know, since it's non-zero only once (nrg_pc_204_c Netherlands 2023). At that point, it does coincide with the sum of all other "* allowance". But there are other instances of non-zero "* allowance" where "Taxes...allowance" is not defined. It may be possible that allowances are not included in the prices dataset (in any case, I think there are not many cases of significant allowances in the data).
+    # * The prices and components datasets coincide reasonably well. To recover prices, it seems that the components to be added up are just "Energy and supply", "Network costs", and "Taxes, fees, levies, and charges". For most countries, this combination gives a good agreement with the prices dataset. However, for some countries, there is a significant discrepancy.
+    # * Numerically, I have checked that for all price components datasets, "Taxes, fees, levies and charges" coincides with the sum of 'Capacity taxes', 'Environmental taxes', 'Nuclear taxes', 'Renewable taxes', 'Value added tax (VAT)', 'Other'. For some country-years, there is a small discrepancy.
+    # * What's not so clear is what happens with the "allowances". Is "Taxes, fees, levies, and charges allowance" the sum of all other "* allowance"? It's hard to know, since it's non-zero only once (nrg_pc_204_c Netherlands 2023). At that point, it does coincide with the sum of all other "* allowance". But there are other instances of non-zero "* allowance" where "Taxes...allowance" is not defined. It may be possible that allowances are not included in the prices dataset.
+
+
+########################################################################################################################
 
 
 def select_and_prepare_relevant_data(tb: Table) -> Table:
@@ -491,8 +596,12 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
         .reset_index(drop=True)
     )
 
-    # Check that the total price obtained by summing components is similar to the price obtained in the prices dataset.
-    # NOTE: Uncomment to perform some visual checks, and see conclusions in the following function to understand the choices.
+    # Find the combination of price components that needs to be summed up to recover the full prices.
+    # NOTE: Uncomment to perform the analysis again, and see conclusions in the following function to understand the choices.
+    # find_best_combination_of_components(tb=tb)
+
+    # Visually compare the resulting prices obtained by adding up certain components, with the original prices data.
+    # NOTE: Uncomment to perform some visual checks.
     # compare_components_and_prices_data(tb=tb)
 
     # Remove groups (of country-year-dataset-currency) from the components dataset for which certain components (e.g. "Energy and supply") are not included.
