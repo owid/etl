@@ -10,6 +10,7 @@ from structlog import get_logger
 import etl.grapher_model as gm
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.utils import set_states, st_page_link, st_toast_error
+from apps.wizard.utils.cached import get_grapher_user_id
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
 from etl.helpers import get_schema_from_url
@@ -92,8 +93,14 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
 
 def push_new_charts(charts: List[gm.Chart]) -> None:
     """Updating charts in the database."""
+    # Use Tailscale user if it is available, otherwise use GRAPHER_USER_ID from env
+    if "X-Forwarded-For" in st.context.headers:
+        grapher_user_id = get_grapher_user_id(st.context.headers["X-Forwarded-For"])
+    else:
+        grapher_user_id = None
+
     # API to interact with the admin tool
-    api = AdminAPI(OWID_ENV)
+    api = AdminAPI(OWID_ENV, grapher_user_id=grapher_user_id)
     # Update charts
     progress_text = "Updating charts..."
     bar = st.progress(0, progress_text)
@@ -113,7 +120,7 @@ def push_new_charts(charts: List[gm.Chart]) -> None:
                 chart_id = chart.config["id"]
             else:
                 raise ValueError(f"Chart {chart} does not have an ID in config.")
-            api.update_chart(chart_id=chart_id, chart_config=config_new, user_id=chart.lastEditedByUserId)
+            api.update_chart(chart_id=chart_id, chart_config=config_new)
             # Show progress bar
             percent_complete = int(100 * (i + 1) / len(charts))
             bar.progress(percent_complete, text=f"{progress_text} {percent_complete}%")

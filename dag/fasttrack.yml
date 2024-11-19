@@ -66,8 +66,6 @@ steps:
     - snapshot://fasttrack/2023-06-16/guinea_worm.csv
   data://grapher/fasttrack/2023-06-28/guinea_worm:
     - snapshot://fasttrack/2023-06-28/guinea_worm.csv
-  data://grapher/fasttrack/2023-06-19/world_population_comparison:
-    - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
   data-private://grapher/fasttrack/latest/fiscal_top1_shares_country_standardized:
     - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
   data://grapher/fasttrack/2023-04-30/paratz:
@@ -96,8 +94,6 @@ steps:
     - snapshot://fasttrack/latest/transport_co2_emissions_modes.csv
   data://grapher/fasttrack/latest/democracy_freedom_house:
     - snapshot://fasttrack/latest/democracy_freedom_house.csv
-  data://grapher/fasttrack/latest/democracy_lexical_index:
-    - snapshot://fasttrack/latest/democracy_lexical_index.csv
   data://grapher/fasttrack/latest/global_maternal_offspring_loss:
     - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
   data://grapher/fasttrack/latest/under_five_mortality_lmics:

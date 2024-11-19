@@ -1,4 +1,0 @@
-dataset:
-  title: "Long-term crop yields (various sources, 2023)"
-  description: |
-    This is a compilation of all our data on crop yields, extracted from different sources. The majority of the data comes from FAOSTAT, where the earliest information is of 1961. However, where possible, we complement that data with other sources, to have long-run series on crop yields, going back to even the XIII century.

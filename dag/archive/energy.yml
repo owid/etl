@@ -1,114 +1,5 @@
 steps:
   #
-  # BP - Statistical review 2022.
-  #
-  data://garden/bp/2022-07-14/statistical_review:
-    - backport://backport/owid/latest/dataset_5650_statistical_review_of_world_energy__bp__2022
-    - data://garden/bp/2022-07-11/statistical_review
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/bp/2022-07-14/statistical_review:
-    - data://garden/bp/2022-07-14/statistical_review
-  #
-  # BP - Energy mix 2022.
-  #
-  data://grapher/bp/2022-07-14/energy_mix:
-    - data://garden/bp/2022-07-14/energy_mix
-  #
-  # BP - Fossil fuel reserves/production ratio (2022).
-  #
-  data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-07-14/statistical_review
-  data://grapher/bp/2022-09-19/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-09-19/fossil_fuel_reserves_production_ratio
-  #
-  # Ember yearly electricity 2022.
-  #
-  data://meadow/ember/2022-12-13/yearly_electricity:
-    - snapshot://ember/2022-12-13/yearly_electricity.csv
-  data://garden/ember/2022-12-13/yearly_electricity:
-    - data://meadow/ember/2022-12-13/yearly_electricity
-    - data://garden/owid/latest/key_indicators
-    - data://garden/regions/2023-01-01/regions
-  #
-  # BP - Energy mix 2022.
-  #
-  data://garden/bp/2022-12-28/energy_mix:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
-  data://grapher/bp/2022-12-28/energy_mix:
-    - data://garden/bp/2022-12-28/energy_mix
-  #
-  # Ember - Yearly electricity data 2023.
-  #
-  data://meadow/ember/2023-02-20/yearly_electricity:
-    - snapshot://ember/2023-02-20/yearly_electricity.csv
-  data://garden/ember/2023-02-20/yearly_electricity:
-    - data://meadow/ember/2023-02-20/yearly_electricity
-    - data://garden/demography/2022-12-08/population
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-  #
-  # BP - Energy mix (2022).
-  #
-  data://garden/bp/2022-07-14/energy_mix:
-    - data://garden/bp/2022-07-14/statistical_review
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
-  #
-  # BP - Statistical review 2021.
-  #
-  # NOTE: This dataset is not used in grapher. It exists only to fill gaps in the 2022 version.
-  data://garden/bp/2022-07-11/statistical_review:
-    - backport://backport/owid/latest/dataset_5347_statistical_review_of_world_energy__bp__2021
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-  #
-  # BP - Statistical review 2022.
-  #
-  # NOTE: For the moment this is not the full processing (which is still done in importers).
-  #  This garden step loads the dataset and adds region aggregates properly, plus some other minor improvements.
-  #  Here, we also remove some regions that had misleading data (BP regions like "Other *").
-  data://garden/bp/2022-12-28/statistical_review:
-    # The backported 2022 release is the main source of data of this step.
-    - backport://backport/owid/latest/dataset_5650_statistical_review_of_world_energy__bp__2022
-    # The 2021 release is loaded just to fill missing data in the current version (and to get a missing column).
-    - data://garden/bp/2022-07-11/statistical_review
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/bp/2022-12-28/statistical_review:
-    - data://garden/bp/2022-12-28/statistical_review
-  #
-  # BP - Fossil fuel reserves/production ratio (2022).
-  #
-  data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-12-28/statistical_review
-  data://grapher/bp/2022-12-28/fossil_fuel_reserves_production_ratio:
-    - data://garden/bp/2022-12-28/fossil_fuel_reserves_production_ratio
-  #
-  # Ember - Yearly electricity data 2023.
-  #
-  data://meadow/ember/2023-06-01/yearly_electricity:
-    - snapshot://ember/2023-06-01/yearly_electricity.csv
-  data://garden/ember/2023-06-01/yearly_electricity:
-    - data://meadow/ember/2023-06-01/yearly_electricity
-    - data://garden/demography/2023-03-31/population
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/regions/2023-01-01/regions
-  #
-  # BP - Energy mix 2023.
-  #
-  data://garden/bp/2023-02-20/energy_mix:
-    - data://garden/bp/2022-12-28/statistical_review
-    - data://garden/demography/2022-12-08/population
-    - data://garden/wb/2021-07-01/wb_income
-  data://grapher/bp/2023-02-20/energy_mix:
-    - data://garden/bp/2023-02-20/energy_mix
-  #
   # UNEP - Global trends in renewable energy investment (2019).
   #
   data://meadow/unep/2023-01-03/renewable_energy_investments:
@@ -211,8 +102,6 @@ steps:
     - data://garden/energy_institute/2023-06-26/statistical_review_of_world_energy
     - data://garden/demography/2023-03-31/population
     - data://garden/wb/2023-04-30/income_groups
-  data://grapher/energy/2023-07-10/energy_mix:
-    - data://garden/energy/2023-07-10/energy_mix
   #
   # Energy - Primary energy consumption 2023.
   #
@@ -285,8 +174,6 @@ steps:
     - data://garden/energy_institute/2023-12-12/statistical_review_of_world_energy
     - data://garden/demography/2023-03-31/population
     - data://garden/wb/2023-04-30/income_groups
-  data://grapher/energy/2023-12-12/energy_mix:
-    - data://garden/energy/2023-12-12/energy_mix
   #
   # Energy - OWID Energy dataset.
   #
@@ -417,8 +304,6 @@ steps:
     - data://garden/energy/2024-05-08/primary_energy_consumption
   data://grapher/energy/2024-05-08/fossil_fuel_production:
     - data://garden/energy/2024-05-08/fossil_fuel_production
-  data://grapher/energy/2024-05-08/energy_mix:
-    - data://garden/energy/2024-05-08/energy_mix
   data://grapher/energy/2024-05-08/fossil_fuel_reserves_production_ratio:
     - data://garden/energy/2024-05-08/fossil_fuel_reserves_production_ratio
   data://grapher/energy/2024-05-08/uk_historical_electricity:
@@ -468,3 +353,31 @@ steps:
     - data://garden/irena/2023-12-12/renewable_electricity_capacity
   data://grapher/irena/2023-12-12/renewable_electricity_capacity:
     - data://garden/irena/2023-12-12/renewable_electricity_capacity
+  #
+  # IRENA - Renewable power generation costs.
+  #
+  data://meadow/irena/2024-10-29/renewable_power_generation_costs:
+    - snapshot://irena/2024-10-29/renewable_power_generation_costs.xlsx
+  #
+  # IRENA - Renewable power generation costs.
+  #
+  data://garden/irena/2024-10-29/renewable_power_generation_costs:
+    - data://meadow/irena/2024-10-29/renewable_power_generation_costs
+  #
+  # Energy - Photovoltaic cost and capacity.
+  #
+  data://garden/energy/2024-11-01/photovoltaic_cost_and_capacity:
+    - data://garden/irena/2024-11-01/renewable_capacity_statistics
+    - data://garden/papers/2023-12-12/nemet_2009
+    - data://garden/papers/2023-12-12/farmer_lafond_2016
+    - data://garden/irena/2024-10-29/renewable_power_generation_costs
+  #
+  # IRENA - Renewable power generation costs.
+  #
+  data://grapher/irena/2024-10-29/renewable_power_generation_costs:
+    - data://garden/irena/2024-10-29/renewable_power_generation_costs
+  #
+  # Energy - Photovoltaic cost and capacity.
+  #
+  data://grapher/energy/2024-11-01/photovoltaic_cost_and_capacity:
+    - data://garden/energy/2024-11-01/photovoltaic_cost_and_capacity
