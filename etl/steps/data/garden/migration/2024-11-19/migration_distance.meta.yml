@@ -4,10 +4,12 @@ definitions:
     presentation:
       topic_tags:
         - Migration
+    processing_level: major
+    description_processing: >-
+      - The migration distance indicator measures the median distance between the borders of the origin and destination country of migrants. It is calculated by first taking the minimum distance between the borders of origin and destination countries for each migrant, and then taking the median of these minimum distances.
+      - The indicator is based on the UN DESA International Migrant Stock data, which provides the number of international migrants by country of origin and destination. The geospatial data for the borders of countries is retrieved from the Natural Earth project (https://www.naturalearthdata.com/downloads/110m-cultural-vectors/), specifically the admin o - countries and tiny country points datasets.
 
 
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
@@ -15,44 +17,15 @@ dataset:
 tables:
   migration_distance:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      median_distance:
+        title: Median migration distance for emigrants leaving this country
+        description_short: |-
+          The median distance between the borders of the origin and destination country of migrants. It is calculated by first taking the minimum distance between the borders of origin and destination countries for each migrant, and then calculating the median of these minimum distances.
+        unit: kilometers
+        short_unit: km
+      total_migrants:
+        title: Total number of migrants leaving this country
+        description_short: The total number of international migrants leaving this country.
+        unit: persons
+        short_unit: ""
 

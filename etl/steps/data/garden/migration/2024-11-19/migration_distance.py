@@ -95,7 +95,8 @@ def run(dest_dir: str) -> None:
 
 
 def get_min_distance(distance):
-    """Get the minimum distance between two countries."""
+    """Get the minimum distance between two countries.
+    Sometimes the distance is a DataFrame or Series (if country is represented by multiple polygons). Then we take the minimum distance."""
     if isinstance(distance, pd.Series):
         return distance.min()
     elif isinstance(distance, pd.DataFrame):

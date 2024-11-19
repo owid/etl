@@ -869,6 +869,8 @@ steps:
   data://garden/migration/2024-11-19/migration_distance:
     - data://garden/un/2024-07-16/migrant_stock
 
+  data://grapher/migration/2024-11-19/migration_distance:
+    - data://garden/migration/2024-11-19/migration_distance
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
