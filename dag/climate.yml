@@ -56,7 +56,7 @@ steps:
   #
   data://meadow/climate/2024-11-19/total_precipitation:
   - snapshot://climate/2024-11-19/total_precipitation.zip
-  - snapshot://countries/2024-11-19/world_bank.zip
+  - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2024-11-19/total_precipitation:
     - data://meadow/climate/2024-11-19/total_precipitation
   data://grapher/climate/2024-11-19/total_precipitation:
