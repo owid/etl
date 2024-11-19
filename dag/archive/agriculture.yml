@@ -1,58 +1,5 @@
 steps:
   #
-  # Attainable yields.
-  #
-  data://garden/agriculture/2023-05-26/attainable_yields:
-    - data://garden/papers/2023-05-26/mueller_et_al_2012
-    - data://garden/faostat/2023-02-22/faostat_qcl
-  data://grapher/agriculture/2023-05-26/attainable_yields:
-    - data://garden/agriculture/2023-05-26/attainable_yields
-  #
-  # Crop yields explorer.
-  #
-  data://explorers/agriculture/2023-05-26/crop_yields:
-    - data://grapher/agriculture/2023-05-26/attainable_yields
-  #
-  # Long-term wheat yields in Europe.
-  #
-  data://garden/agriculture/2023-04-20/long_term_wheat_yields:
-    - data://garden/papers/2023-04-20/bayliss_smith_wanmali_1984
-    - data://garden/faostat/2023-02-22/faostat_qcl
-  data://grapher/agriculture/2023-04-20/long_term_wheat_yields:
-    - data://garden/agriculture/2023-04-20/long_term_wheat_yields
-  #
-  # Long-run crop yields.
-  #
-  data://garden/agriculture/2023-05-30/long_term_crop_yields:
-    - data://garden/faostat/2023-02-22/faostat_qcl
-    - data://garden/agriculture/2023-04-21/uk_long_term_yields
-    - data://garden/usda_nass/2023-04-20/us_corn_yields
-    - data://garden/agriculture/2023-04-20/long_term_wheat_yields
-  data://grapher/agriculture/2023-05-30/long_term_crop_yields:
-    - data://garden/agriculture/2023-05-30/long_term_crop_yields
-  #
-  # Long-term yields in the United Kingdom.
-  #
-  data://garden/agriculture/2023-04-21/uk_long_term_yields:
-    - data://garden/papers/2023-04-21/broadberry_et_al_2015
-    - data://garden/papers/2023-04-21/brassley_2000
-    - data://garden/faostat/2023-02-22/faostat_qcl
-  data://grapher/agriculture/2023-04-21/uk_long_term_yields:
-    - data://garden/agriculture/2023-04-21/uk_long_term_yields
-  #
-  # Attainable yields.
-  #
-  data://garden/agriculture/2023-05-30/attainable_yields:
-    - data://garden/papers/2023-05-26/mueller_et_al_2012
-    - data://garden/agriculture/2023-05-30/long_term_crop_yields
-  data://grapher/agriculture/2023-05-30/attainable_yields:
-    - data://garden/agriculture/2023-05-30/attainable_yields
-  #
-  # Crop yields explorer.
-  #
-  data://explorers/agriculture/2023-05-30/crop_yields:
-    - data://grapher/agriculture/2023-05-30/attainable_yields
-  #
   # Long-term wheat yields in Europe.
   #
   data://garden/agriculture/2023-06-12/long_term_wheat_yields:
