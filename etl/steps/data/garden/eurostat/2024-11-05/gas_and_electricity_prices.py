@@ -428,11 +428,15 @@ def find_best_combination_of_components(tb: Table) -> None:
     # Compute an annual average only if there is data for the two semesters.
     price_level = "All taxes and levies included"
     tb_biannual = tb[(tb["year-semester"].str.contains("S")) & (tb["currency"] == "Euro")].reset_index(drop=True)
-    tb_biannual_filtered = tb_biannual.groupby(
-        ["country", "year", "dataset_code", "price_component_or_level"],
-        observed=True,
-        as_index=False,
-    ).filter(lambda x: len(x) == 2)
+    tb_biannual_filtered = (
+        tb_biannual.dropna(subset="value")
+        .groupby(
+            ["country", "year", "dataset_code", "price_component_or_level"],
+            observed=True,
+            as_index=False,
+        )
+        .filter(lambda x: len(x) == 2)
+    )
     tb_biannual = tb_biannual_filtered.groupby(
         ["country", "year", "dataset_code", "price_component_or_level"],
         observed=True,
@@ -522,7 +526,8 @@ def find_best_combination_of_components(tb: Table) -> None:
     )
     compared["pct"] = 100 * abs(compared["value_prices"] - compared["value_components"]) / compared["value_prices"]
     compared.sort_values("pct", ascending=False).head(60)
-    # For most countries, the agreement is good, but some country-years, the discrepancy is significant, e.g. Georgia household electricity.
+    # For most countries, the agreement is good, but some country-years, the discrepancy is significant, e.g. Denmark non-household electricity in 2022 and 2023, with an error of 26%.
+    # There are only a few other discrepancies above 10%.
 
     # Visually inspect these discrepancies.
     compared = pd.concat(
