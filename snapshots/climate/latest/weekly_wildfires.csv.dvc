@@ -15,6 +15,6 @@ meta:
       name: CC BY 4.0
       url: https://gwis.jrc.ec.europa.eu/about-gwis/data-license
 outs:
-  - md5: b78fe54410e9117a4d3c0535fef437bf
-    size: 2683354
+  - md5: 962935dd0b4c2a2b39059fe9caf6d743
+    size: 12698416
     path: weekly_wildfires.csv
