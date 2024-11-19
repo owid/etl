@@ -24,7 +24,19 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = format_specimen(tb)
-    tb = tb.format(["country", "year", "specimen"])
+    tb = tb.drop(columns=["min", "q1", "median", "q3", "max"])
+    tb = tb.pivot(
+        index=["country", "year"],
+        columns="specimen",
+        values=[
+            "ctas_with_reported_bcis",
+            "ctas_with_reported_bcis_with_ast__gt__80_bcis",
+            "total_bcis",
+            "total_bcis_with_ast",
+        ],
+        join_column_levels_with="_",
+    )
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

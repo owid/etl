@@ -4,17 +4,20 @@ definitions:
     presentation:
       topic_tags:
         - Antibiotics
-  description_key:
-    <% if specimen == "bloodstream" %>
-    ["Acinetobacter spp. infections are tested for their susceptibility to carbapanem antibiotics.","Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics.","Staphylococcus aureus infections are tested for their susceptibility to methicillin antibiotics.","Escheria coli and Klebsiella pneumoniae infections are tested for their susceptibility to third-generation cephalosporin antibiotics and carbapanem antibiotics.","Streptococcus pneumoniae infections are tested for their susceptibility to penicillin antibiotics."]
-    <% elif specimen == "stool" %>
-      - Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics and Shigella spp. infections are tested for their susceptibility to third-generation cephalosporin antibiotics.
-    <% elif specimen == "urine" %>
+  description_key_ast_bloodstream: &description_key_ast_bloodstream
+      - Acinetobacter spp. infections are tested for their susceptibility to carbapanem antibiotics.
+      - Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics.
+      - Staphylococcus aureus infections are tested for their susceptibility to methicillin antibiotics.
+      - Escheria coli and Klebsiella pneumoniae infections are tested for their susceptibility to third-generation cephalosporin antibiotics and carbapanem antibiotics.
+      - Streptococcus pneumoniae infections are tested for their susceptibility to penicillin antibiotics.
+  description_key_ast_stool: &description_key_ast_stool
+      - Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics.
+      - Shigella spp. infections are tested for their susceptibility to third-generation cephalosporin antibiotics.
+  description_key_ast_urine: &description_key_ast_urine
       - Escheria coli infections are tested for their susceptibility to fluoroquinolone antibiotics, sulfonamides and trimethoprim antibiotics and third-generation cephalosporin antibiotics.
       - Klebsiella pneumoniae infections are tested for their susceptibility to fluoroquinolone antibiotics, sulfonamides and trimethoprim antibiotics and third-generation cephalosporin antibiotics.
-    <% elif specimen == "gonorrhea" %>
+  description_key_ast_gonorrhea: &description_key_ast_gonorrhea
       - Neisseria gonorrhoeae infections are tested for their susceptibility to macrolide antibiotics and third-generation cephalosporin antibiotics.
-    <% endif %>
 
 
 
@@ -27,46 +30,75 @@ dataset:
 tables:
   testing_coverage:
     variables:
-      ctas_with_reported_bcis:
-        title: Number of countries reporting confirmed << specimen >> infections
-        description_short: Number of countries reporting bacteriologically confirmed << specimen >> infections to WHO.
+      ctas_with_reported_bcis_bloodstream:
+        title: Number of countries reporting confirmed bloodstream infections
+        description_short: Number of countries reporting bacteriologically confirmed bloodstream infections to WHO.
         unit: countries
-      ctas_with_reported_bcis_with_ast__gt__80_bcis:
-        title: Number of countries testing >80% of confirmed << specimen >> infections for antibiotic susceptibility
-        description_short: Number of countries testing >80% bacteriologically confirmed << specimen >> infections for antibiotic susceptibility.
-        description_key: ["{definitions.description_key}"]
+      ctas_with_reported_bcis_gonorrhea:
+        title: Number of countries reporting confirmed gonorrhea infections
+        description_short: Number of countries reporting bacteriologically confirmed gonorrhea infections to WHO.
         unit: countries
-      total_bcis:
-        title: Total confirmed << specimen >> infections
-        description_short: Total bacteriologically confirmed << specimen >> infections tested for antibiotic susceptibility.
+      ctas_with_reported_bcis_stool:
+        title: Number of countries reporting confirmed gastrointestinal infections
+        description_short: Number of countries reporting bacteriologically confirmed gastrointestinal infections to WHO.
+        unit: countries
+      ctas_with_reported_bcis_urine:
+        title: Number of countries reporting confirmed urinary tract infections
+        description_short: Number of countries reporting bacteriologically confirmed urinary tract infections to WHO.
+        unit: countries
+      ctas_with_reported_bcis_with_ast__gt__80_bcis_bloodstream:
+        title: Number of countries testing >80% of confirmed bloodstrean infections for antibiotic susceptibility
+        description_short: Number of countries testing >80% bacteriologically confirmed bloodstream infections for antibiotic susceptibility.
+        description_key: *description_key_ast_bloodstream
+        unit: countries
+      ctas_with_reported_bcis_with_ast__gt__80_bcis_gonorrhea:
+        title: Number of countries testing >80% of confirmed gonorrhea infections for antibiotic susceptibility
+        description_short: Number of countries testing >80% bacteriologically confirmed gonorrhea infections for antibiotic susceptibility.
+        description_key: *description_key_ast_gonorrhea
+        unit: countries
+      ctas_with_reported_bcis_with_ast__gt__80_bcis__stool:
+        title: Number of countries testing >80% of confirmed gastrointestinal infections for antibiotic susceptibility
+        description_short: Number of countries testing >80% bacteriologically confirmed gastrointestinal infections for antibiotic susceptibility.
+        description_key: *description_key_ast_stool
+        unit: countries
+      ctas_with_reported_bcis_with_ast__gt__80_bcis_urine:
+        title: Number of countries testing >80% of confirmed urinary tract infections for antibiotic susceptibility
+        description_short: Number of countries testing >80% bacteriologically confirmed urinary tract infections for antibiotic susceptibility.
+        description_key: *description_key_ast_urine
+        unit: countries
+      total_bcis_bloodstream:
+        title: Total confirmed bloodstream infections
+        description_short: Total bacteriologically confirmed bloodstream infections tested for antibiotic susceptibility.
         unit: infections
-      total_bcis_with_ast:
-        title: Total confirmed << specimen >> infections  tested for antibiotic susceptibility
-        description_short: Total bacteriologically confirmed << specimen >> infections tested for antibiotic susceptibility.
-        description_key: ["{definitions.description_key}"]
+      total_bcis_gonorrhea:
+        title: Total confirmed gonorrhea infections
+        description_short: Total bacteriologically confirmed gonorrhea infections tested for antibiotic susceptibility.
         unit: infections
-      min:
-        title: Minimum number of confirmed << specimen >> infections tested for antibiotic susceptibility per million people
-        description_short: Minimum number of << specimen >> infections tested for antibiotic susceptibility per million people
-        description_key: ["{definitions.description_key}"]
-        unit: infections per million
-      q1:
-        title: 25th percentile of confirmed << specimen >> infections tested for antibiotic susceptibility per million people
-        description_short: 25th percentile of << specimen >> infections tested for antibiotic susceptibility per million people
-        description_key: ["{definitions.description_key}"]
-        unit: infections per million
-      median:
-        title: Median number of confirmed << specimen >> infections tested for antibiotic susceptibility per million people
-        description_short: Median number of << specimen >> infections tested for antibiotic susceptibility per million people
-        description_key: ["{definitions.description_key}"]
-        unit: infections per million
-      q3:
-        title: 75th percentile of confirmed << specimen >> infections tested for antibiotic susceptibility per million people
-        description_short: 75th percentile of << specimen >> infections tested for antibiotic susceptibility per million people
-        description_key: ["{definitions.description_key}"]
-        unit: infections per million
-      max:
-        title: Maximum number of confirmed << specimen >> infections tested for antibiotic susceptibility per million people
-        description_short: Maximum number of << specimen >> infections tested for antibiotic susceptibility per million people
-        description_key: ["{definitions.description_key}"]
-        unit: infections per million
+      total_bcis_stool:
+        title: Total confirmed gastrointestinal infections
+        description_short: Total bacteriologically confirmed gastrointestinal infections tested for antibiotic susceptibility.
+        unit: infections
+      total_bcis_urine:
+        title: Total confirmed urinary tract infections
+        description_short: Total bacteriologically confirmed urinary tract infections tested for antibiotic susceptibility.
+        unit: infections
+      total_bcis_with_ast_bloodstream:
+        title: Total confirmed bloodstream infections tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed bloodstream infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_bloodstream
+        unit: infections
+      total_bcis_with_ast_gonorrhea:
+        title: Total confirmed gonorrhea infections tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed gonorrhea infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_gonorrhea
+        unit: infections
+      total_bcis_with_ast_stool:
+        title: Total confirmed gastrointestinal infections tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed gastrointestinal infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_stool
+        unit: infections
+      total_bcis_with_ast_urine:
+        title: Total confirmed urinary tract infections tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed urinary tract infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_urine
+        unit: infections
