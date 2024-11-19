@@ -66,7 +66,7 @@ def run(dest_dir: str) -> None:
 
     ds_garden.save()
 
-    log.info("un_sdg.end")
+    log.info("un_sdg.finished")
 
 
 def create_units(df: pd.DataFrame) -> pd.DataFrame:

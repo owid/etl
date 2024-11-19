@@ -1,0 +1,39 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 308
+
+
+tables:
+  class:
+    variables:
+      ddd:
+        title: Defined daily doses of << antimicrobialclass>> - << atc4name.lower() >>  used where the route of administration is << routeofadministration.lower() >>
+        description_short: Volume of antimicrobials used in a given year.
+        #description_processing: <<notes>>
+        unit: Defined daily doses
+      did:
+        title: Defined daily doses per 1000 inhabitants per day of << antimicrobialclass>> - << atc4name.lower() >> s used where the route of administration is << routeofadministration.lower() >>
+        description_short: Volume of antimicrobials used per 1000 inhabitants per day.
+        #description_processing: <<notes>>
+        unit: Defined daily doses per 1000 inhabitants per day
+  aware:
+    variables:
+      ddd:
+        title: Defined daily doses of << awarelabel.lower() >> antibiotics used
+        description_short: Volume of antimicrobials used in a given year.
+        #description_processing: <<notes>>
+        unit: Defined daily doses
+      did:
+        title: Defined daily doses per 1000 inhabitants per day of << awarelabel.lower() >>
+        description_short: Volume of antimicrobials used per 1000 inhabitants per day.
+        #description_processing: <<notes>>
+        unit: Defined daily doses per 1000 inhabitants per day
