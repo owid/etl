@@ -194,7 +194,7 @@ tables:
           <<: *common_display
 
       headcount_ratio:
-        title: Share of the population in multidimensional poverty (<<area>>) - <<flavor>>
+        title: Share of population living in multidimensional poverty (<<area>>) - <<flavor>>
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_headcount_ratio}{definitions.description_short_area}"
@@ -204,10 +204,10 @@ tables:
           - "{definitions.description_key_weights}"
           - "{definitions.description_key_flavor}"
         presentation:
-          title_public: Share of the population in multidimensional poverty
+          title_public: Share of population living in multidimensional poverty
           title_variant: <<area>>, <<flavor>>
         display:
-          name: Share of the population in multidimensional poverty
+          name: Share of population living in multidimensional poverty
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -231,7 +231,7 @@ tables:
           <<: *common_display
 
       vulnerable:
-        title: Share of the population vulnerable to multidimensional poverty (<<area>>) - <<flavor>>
+        title: Share of population vulnerable to multidimensional poverty (<<area>>) - <<flavor>>
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_vulnerable}{definitions.description_short_area}"
@@ -241,15 +241,15 @@ tables:
           - "{definitions.description_key_weights}"
           - "{definitions.description_key_flavor}"
         presentation:
-          title_public: Share of the population vulnerable to multidimensional poverty
+          title_public: Share of population vulnerable to multidimensional poverty
           title_variant: <<area>>, <<flavor>>
         display:
-          name: Share of the population vulnerable to multidimensional poverty
+          name: Share of population vulnerable to multidimensional poverty
           numDecimalPlaces: 1
           <<: *common_display
 
       severe:
-        title: Share of the population in severe multidimensional poverty (<<area>>) - <<flavor>>
+        title: Share of population living in severe multidimensional poverty (<<area>>) - <<flavor>>
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_severe}{definitions.description_short_area}"
@@ -259,15 +259,15 @@ tables:
           - "{definitions.description_key_weights}"
           - "{definitions.description_key_flavor}"
         presentation:
-          title_public: Share of the population in severe multidimensional poverty
+          title_public: Share of population living in severe multidimensional poverty
           title_variant: <<area>>, <<flavor>>
         display:
-          name: Share of the population in severe multidimensional poverty
+          name: Share of population living in severe multidimensional poverty
           numDecimalPlaces: 1
           <<: *common_display
 
       censored_headcount_ratio:
-        title: Share of the population in multidimensional poverty deprived in the indicator <<indicator>> (<<area>>) - <<flavor>>
+        title: Share of population in multidimensional poverty deprived in the indicator <<indicator>> (<<area>>) - <<flavor>>
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_censored_headcount_ratio}{definitions.description_short_area}"
@@ -276,15 +276,15 @@ tables:
           - "{definitions.description_key_indicator}"
           - "{definitions.description_key_flavor}"
         presentation:
-          title_public: Share of the population in multidimensional poverty deprived in the indicator <<indicator>>
+          title_public: Share of population in multidimensional poverty deprived in the indicator <<indicator>>
           title_variant: <<area>>, <<flavor>>
         display:
-          name: Share of the population in multidimensional poverty deprived in the indicator <<indicator>>
+          name: Share of population in multidimensional poverty deprived in the indicator <<indicator>>
           numDecimalPlaces: 1
           <<: *common_display
 
       uncensored_headcount_ratio:
-        title: Share of the population deprived in the indicator <<indicator>> (<<area>>) - <<flavor>>
+        title: Share of population deprived in the indicator <<indicator>> (<<area>>) - <<flavor>>
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_uncensored_headcount_ratio}{definitions.description_short_area}"
@@ -293,10 +293,10 @@ tables:
           - "{definitions.description_key_indicator}"
           - "{definitions.description_key_flavor}"
         presentation:
-          title_public: Share of the population deprived in the indicator <<indicator>>
+          title_public: Share of population deprived in the indicator <<indicator>>
           title_variant: <<area>>, <<flavor>>
         display:
-          name: Share of the population deprived in the indicator <<indicator>>
+          name: Share of population deprived in the indicator <<indicator>>
           numDecimalPlaces: 1
           <<: *common_display
 
