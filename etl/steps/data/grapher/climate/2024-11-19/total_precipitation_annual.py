@@ -34,40 +34,14 @@ def run(dest_dir: str) -> None:
     # Convert the 'year' column to integer type
     tb_annual_average["year"] = tb_annual_average["year"].astype(int)
 
-    # Create a new column for the decade
-    tb_annual_average["decade"] = (tb_annual_average["year"] // 10) * 10
-
-    # Group by decade and country, then calculate the mean for specified columns
-    tb_decadal_average = (
-        tb_annual_average.groupby(["decade", "country"])[["total_precipitation", "precipitation_anomaly"]]
-        .mean()
-        .reset_index()
-    )
-
-    # Set the decadal values for 2020 to NaN
-    tb_decadal_average.loc[
-        tb_decadal_average["decade"] == 2020, ["total_precipitation", "precipitation_anomaly"]
-    ] = np.nan
-
-    # Merge the decadal average Table with the original Table
-    combined = pr.merge(
-        tb_annual_average, tb_decadal_average, on=["decade", "country"], how="left", suffixes=("", "_decadal")
-    )
-
-    # Replace the decadal values with NaN for all years except the start of each decade
-    combined.loc[combined["year"] % 10 != 0, ["total_precipitation_decadal", "precipitation_anomaly_decadal"]] = np.nan
-
-    # Drop the 'decade' column
-    combined = combined.drop(columns=["decade"])
-
     # Set the index to 'year' and 'country'
-    combined = combined.set_index(["year", "country"], verify_integrity=True)
+    tb_annual_average = tb_annual_average.set_index(["year", "country"], verify_integrity=True)
 
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[combined], default_metadata=ds_garden.metadata, check_variables_metadata=True
+        dest_dir, tables=[tb_annual_average], default_metadata=ds_garden.metadata, check_variables_metadata=True
     )
 
     ds_grapher.save()

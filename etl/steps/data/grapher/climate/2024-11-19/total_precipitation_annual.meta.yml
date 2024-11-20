@@ -44,21 +44,3 @@ tables:
             {definitions.common_processing}
             {definitions.precipitation_anomaly}
 
-      precipitation_anomaly_decadal:
-        title: Decadal average annual precipitation anomaly
-        description_short: |-
-          The deviation of a specific decade's average precipitation from the 1991-2020 mean, in millimeters. {definitions.desc_update}
-
-        description_processing: |-
-            {definitions.common_processing}
-            {definitions.precipitation_anomaly}
-            - Decadal average precipitation anomaly is calculated by averaging the annual precipitation anomaly values for each decade.
-
-      total_precipitation_decadal:
-        title: Decadal average total annual precipitation
-        description_short: |-
-          Average decadal amount of rain and snow that falls to the Earth's surface, reported as the depth of water over a given time period, excluding fog, dew, and evaporated precipitation.
-        description_processing: |-
-            {definitions.common_processing}
-            {definitions.precipitation_anomaly}
-            - Decadal average total precipitation is calculated by averaging the annual total precipitation values for each decade.

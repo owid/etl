@@ -28,7 +28,7 @@ tables:
   total_precipitation:
     variables:
       total_precipitation:
-        title: Total precipitation
+        title: Total monthly precipitation
         description_short: Total monthly amount of rain and snow that falls to the Earth's surface, reported as the depth of water over a given time period, excluding fog, dew, and evaporated precipitation.
         description_processing: |-
             {definitions.common_processing}
