@@ -231,6 +231,8 @@ nav:
           - Types in Tables: "guides/types-tables.md"
           - OpenAI setup: "guides/openai.md"
 
+      - Tips when working with ETL: "guides/etl-tips.md"
+
       - Others:
           - Edit the documentation: "dev/docs.md"
           - Metadata in data pages: "guides/metadata-play.md"
