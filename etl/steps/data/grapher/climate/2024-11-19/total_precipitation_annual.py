@@ -6,6 +6,10 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
+# Year with incomplete data
+INCOMPLETE_YEAR = 2024
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -32,7 +36,7 @@ def run(dest_dir: str) -> None:
     tb_annual_average["year"] = tb_annual_average["year"].astype(int)
 
     # Remove rows where the year is 2024 as it's incomplete
-    tb_annual_average = tb_annual_average[tb["year"] != 2024]
+    tb_annual_average = tb_annual_average[tb["year"] != INCOMPLETE_YEAR]
 
     # Set the index to 'year' and 'country'
     tb_annual_average = tb_annual_average.set_index(["year", "country"], verify_integrity=True)
