@@ -43,6 +43,8 @@ definitions:
     "Environmental taxes" are charges aimed at addressing environmental concerns, such as improving air quality and reducing greenhouse gas emissions (e.g., CO₂ taxes). This category also includes excise duties—specific taxes applied to goods or activities like fuels and energy use, which contribute to environmental impacts.
   description_key_gas_component_other_taxes: &description_key_gas_component_other_taxes |-
     "All other taxes" include fees, levies, or charges not covered by other tax components. They may relate to district heating support, local or regional fiscal charges, island compensation, concession fees for licenses, or fees for occupying land or property with networks or other devices.
+  description_key_gas_component_total_price_including_taxes: &description_key_gas_component_total_price_including_taxes |-
+    "Total price including taxes" is the sum of all price components, including energy and supply, network costs, taxes, fees, levies and charges.
   description_key_electricity_component_energy_and_supply: |-
     "Energy and supply" is the cost of electricity generation, aggregation, balancing, and other supply-related activities, including end-user costs such as customer services and after-sales management.
   description_key_electricity_component_network_cost: *description_key_gas_component_network_cost
@@ -54,7 +56,7 @@ definitions:
   description_key_electricity_component_other_taxes: *description_key_gas_component_other_taxes
   description_key_electricity_component_nuclear_taxes: |-
     "Nuclear taxes" are charges related to the nuclear sector, including decommissioning, inspections, and fees for nuclear installations.
-
+  description_key_electricity_component_total_price_including_taxes: *description_key_gas_component_total_price_including_taxes
   # Definitions of price levels:
   # Original Eurostat definitions of price levels:
   # Level 1 prices ("X_TAX"): Prices excluding taxes and levies.
@@ -530,6 +532,50 @@ tables:
         description_key:
           - "{definitions.description_key_household_consumer}"
           # - "{definitions.description_key_electricity_component_taxes_fees_levies_and_charges_allowance}"
+          - "{definitions.description_key_all_consumer_bands}"
+
+      electricity_household_total_price_including_taxes:
+        title: Electricity price component (euros) for household consumers - Total price including taxes
+        display:
+          name: Total price including taxes
+        presentation:
+          title_public: Electricity price component for household consumers - Total price including taxes
+        description_key:
+          - "{definitions.description_key_household_consumer}"
+          - "{definitions.description_key_electricity_component_total_price_including_taxes}"
+          - "{definitions.description_key_all_consumer_bands}"
+
+      electricity_non_household_total_price_including_taxes:
+        title: Electricity price component (euros) for non-household consumers - Total price including taxes
+        display:
+          name: Total price including taxes
+        presentation:
+          title_public: Electricity price component for non-household consumers - Total price including taxes
+        description_key:
+          - "{definitions.description_key_non_household_consumer}"
+          - "{definitions.description_key_electricity_component_total_price_including_taxes}"
+          - "{definitions.description_key_all_consumer_bands}"
+
+      gas_household_total_price_including_taxes:
+        title: Gas price component (euros) for household consumers - Total price including taxes
+        display:
+          name: Total price including taxes
+        presentation:
+          title_public: Gas price component for household consumers - Total price including taxes
+        description_key:
+          - "{definitions.description_key_household_consumer}"
+          - "{definitions.description_key_gas_component_total_price_including_taxes}"
+          - "{definitions.description_key_all_consumer_bands}"
+
+      gas_non_household_total_price_including_taxes:
+        title: Gas price component (euros) for non-household consumers - Total price including taxes
+        display:
+          name: Total price including taxes
+        presentation:
+          title_public: Gas price component for non-household consumers - Total price including taxes
+        description_key:
+          - "{definitions.description_key_non_household_consumer}"
+          - "{definitions.description_key_gas_component_total_price_including_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
   gas_and_electricity_price_components_pps_flat:
@@ -1017,6 +1063,54 @@ tables:
         description_key:
           - "{definitions.description_key_household_consumer}"
           # - "{definitions.description_key_electricity_component_taxes_fees_levies_and_charges_allowance}"
+          - "{definitions.description_key_all_consumer_bands}"
+
+      electricity_household_total_price_including_taxes_pps:
+        title: Electricity price component (PPS) for household consumers - Total price including taxes
+        display:
+          name: Total price including taxes
+        presentation:
+          title_public: Electricity price component (PPS) for household consumers - Total price including taxes
+          title_variant: PPS
+        description_key:
+          - "{definitions.description_key_household_consumer}"
+          - "{definitions.description_key_electricity_component_total_price_including_taxes}"
+          - "{definitions.description_key_all_consumer_bands}"
+
+      electricity_non_household_total_price_including_taxes_pps:
+        title: Electricity price component (PPS) for non-household consumers - Total price including taxes
+        display:
+          name: Total price including taxes
+        presentation:
+          title_public: Electricity price component (PPS) for non-household consumers - Total price including taxes
+          title_variant: PPS
+        description_key:
+          - "{definitions.description_key_non_household_consumer}"
+          - "{definitions.description_key_electricity_component_total_price_including_taxes}"
+          - "{definitions.description_key_all_consumer_bands}"
+
+      gas_household_total_price_including_taxes_pps:
+        title: Gas price component (PPS) for household consumers - Total price including taxes
+        display:
+          name: Total price including taxes
+        presentation:
+          title_public: Gas price component (PPS) for household consumers - Total price including taxes
+          title_variant: PPS
+        description_key:
+          - "{definitions.description_key_household_consumer}"
+          - "{definitions.description_key_gas_component_total_price_including_taxes}"
+          - "{definitions.description_key_all_consumer_bands}"
+
+      gas_non_household_total_price_including_taxes_pps:
+        title: Gas price component (PPS) for non-household consumers - Total price including taxes
+        display:
+          name: Total price including taxes
+        presentation:
+          title_public: Gas price component (PPS) for non-household consumers - Total price including taxes
+          title_variant: PPS
+        description_key:
+          - "{definitions.description_key_non_household_consumer}"
+          - "{definitions.description_key_gas_component_total_price_including_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
   gas_and_electricity_prices_euro_flat:
