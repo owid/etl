@@ -6,15 +6,13 @@ definitions:
     processing_level: major
 
   # Definitions of consumer type:
-  description_key_household_consumer: &description_key_household_consumer |
+  description_key_household_consumer: |-
     A household consumer of gas or electricity is a residential user who consumes energy for domestic purposes like heating, cooking, lighting, and appliances.
-  description_key_non_household_consumer: &description_key_non_household_consumer |
+  description_key_non_household_consumer: |-
     A non-household consumer of gas or electricity is a business or organization using energy for purposes like industry, services, offices, or agriculture.
-
   # Definitions of consumer bands:
-  description_key_all_consumer_bands: &description_key_all_consumer_bands |
+  description_key_all_consumer_bands: |-
     Prices are a weighted average across all consumption bands, from low to high energy consumers, based on the relative consumption shares reported by each country.
-
   # Definitions of price components:
   # Eurostat's definitions can be found:
   # * For gas: https://ec.europa.eu/eurostat/cache/metadata/en/nrg_pc_202_sims.htm
@@ -39,7 +37,7 @@ definitions:
     "Value-added tax (VAT)" is a consumption tax applied to the final price of gas or electricity, as defined in Council Directive 2006/112/EC.
   description_key_gas_component_renewable_taxes: &description_key_gas_component_renewable_taxes |-
     "Renewable taxes" are taxes, fees, levies, or charges that promote renewable energy sources, energy efficiency, and combined heat and power (CHP) generation.
-  description_key_gas_component_capacity_taxes: &description_key_gas_component_capacity_taxes |-
+  description_key_gas_component_capacity_taxes: |-
     "Capacity taxes" are charges related to maintaining energy security and the gas distribution system. They include taxes or fees for strategic gas stockpiles, payments to ensure sufficient supply capacity, costs for supporting energy regulatory authorities or system operators, and levies to cover past infrastructure investments (stranded costs).
   description_key_gas_component_environmental_taxes: &description_key_gas_component_environmental_taxes |-
     "Environmental taxes" are charges aimed at addressing environmental concerns, such as improving air quality and reducing greenhouse gas emissions (e.g., CO₂ taxes). This category also includes excise duties—specific taxes applied to goods or activities like fuels and energy use, which contribute to environmental impacts.
