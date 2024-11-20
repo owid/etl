@@ -53,9 +53,11 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["gfs_wave_one"]
 
     tbs = []
+
+    # this is a bit more involved than it needs to be, to keep the option of removing countries with too many missing values
     for var in REL_COL_VAR:
         var_cols = [col for col in tb.columns if var in col]
-        tb_var = rm_sparse_countries(tb, var, var_cols).reset_index()
+        tb_var = tb[var_cols].copy().reset_index()  # rm_sparse_countries(tb, var, var_cols).reset_index()
         tbs.append(tb_var)
 
     tb_res = pr.multi_merge(tbs, on=["country", "year"], how="outer")

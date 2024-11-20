@@ -296,12 +296,14 @@ def share_binary(tb, groups=["country"], cols=BINARY_COLS):
         tb_binary[col] = tb_binary[col].astype("Int64")
 
     # group by variable (e.g. country) and calculate share of yes/no/na answers
-    tb_na = get_na_share(tb, groups, cols)
-    tb_binary = tb_binary.groupby(groups).mean()
+    # tb_na = get_na_share(tb, groups, cols)
 
     for col in cols:
+        tb_binary[col] = tb_binary[col].groupby(groups, drop_na=False)[col].value_counts(normalize=True).unstack()
+
         tb_binary[col + "_no_share"] = tb_binary[col] - 1
         tb_binary[col + "_yes_share"] = 1 - tb_binary[col + "_no_share"]
+
     tb_binary = tb_binary.drop(columns=cols).reset_index()
     tb_binary = pr.merge(tb_binary, tb_na, on=groups)
     return tb_binary
@@ -309,11 +311,12 @@ def share_binary(tb, groups=["country"], cols=BINARY_COLS):
 
 def share_categorical(tb, groups: list = ["country"], cols: list = CAT_COLS):
     tb_cat = tb[groups + cols].copy()
-    tb_na = get_na_share(tb, groups, cols)
-    res_tbs = [tb_na]
+    # tb_na = get_na_share(tb, groups, cols)
+    res_tbs = []  # [tb_na]
     for col in cols:
-        res = tb_cat.groupby(groups)[col].value_counts(normalize=True).unstack()
-        res.columns = [f"{col}_ans_{int(x)}_share" for x in res.columns]
+        res = tb_cat.groupby(groups, dropna=False)[col].value_counts(normalize=True, dropna=False).unstack()
+        col_names = [int(x) if x == x else "na" for x in res.columns]
+        res.columns = [f"{col}_ans_{x}_share" for x in col_names]
         res = res.fillna(0)  # if one category does not appear for country, fill with 0
         res = check_for_missing_answer(res, col)
         res_tbs.append(res.reset_index())
