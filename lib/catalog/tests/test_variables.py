@@ -599,3 +599,12 @@ def test_variable_rolling(variable_1: Variable):
     # make sure we are not modifying the original table
     rolling.m.title = "new"
     assert v.m.title != "new"
+
+
+def test_truediv_zero_division() -> None:
+    v1 = Variable([0, 1, 2], name="v1")
+    v2 = Variable([0, 1, 2], name="v2")
+    result = v1 / v2
+    assert result.isnull()[0]  # Check that 0/0 results in pandas NaN
+    assert not result.isnull()[1]  # Check that 1/1 does not result in NaN
+    assert not result.isnull()[2]  # Check that 2/2 does not result in NaN

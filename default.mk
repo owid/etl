@@ -47,7 +47,7 @@ check-default:
 	@git fetch -q origin master
 	@RELATIVE_PATH=$$(pwd | sed "s|^$$(git rev-parse --show-toplevel)/||"); \
 	CHANGED_PY_FILES=$$(git diff --name-only origin/master HEAD -- . && git diff --name-only && git ls-files --others --exclude-standard | grep '\.py'); \
-	CHANGED_PY_FILES=$$(echo "$$CHANGED_PY_FILES" | sed "s|^$$RELATIVE_PATH/||" | grep '\.py' | xargs -I {} sh -c 'test -f {} && echo {}'); \
+	CHANGED_PY_FILES=$$(echo "$$CHANGED_PY_FILES" | sed "s|^$$RELATIVE_PATH/||" | grep '\.py' | xargs -I {} sh -c 'test -f {} && echo {}' | grep -v '{}'); \
 	if [ -n "$$CHANGED_PY_FILES" ]; then \
 		echo "$$CHANGED_PY_FILES" | xargs ruff check --fix; \
 		echo "$$CHANGED_PY_FILES" | xargs ruff format; \

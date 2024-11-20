@@ -100,7 +100,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
                 year = tab["year"]
             else:
                 year = tab.index.get_level_values("year")
-            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {tab['year'].dtype}"
+            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {year.dtype}"
         elif {"date", "country"} <= set(tab.all_columns):
             pass
         else:

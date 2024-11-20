@@ -150,11 +150,11 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset and read all its tables.
     ds_meadow = paths.load_dataset("global_carbon_budget")
-    tb_co2 = ds_meadow.read_table("global_carbon_budget_fossil_co2_emissions")
-    tb_historical = ds_meadow.read_table("global_carbon_budget_historical_budget")
-    tb_consumption = ds_meadow.read_table("global_carbon_budget_consumption_emissions")
-    tb_production = ds_meadow.read_table("global_carbon_budget_production_emissions")
-    tb_land_use = ds_meadow.read_table("global_carbon_budget_land_use_change")
+    tb_co2 = ds_meadow.read("global_carbon_budget_fossil_co2_emissions", safe_types=False)
+    tb_historical = ds_meadow.read("global_carbon_budget_historical_budget", safe_types=False)
+    tb_consumption = ds_meadow.read("global_carbon_budget_consumption_emissions", safe_types=False)
+    tb_production = ds_meadow.read("global_carbon_budget_production_emissions", safe_types=False)
+    tb_land_use = ds_meadow.read("global_carbon_budget_land_use_change", safe_types=False)
 
     # Load primary energy consumption dataset and read its main table.
     ds_energy = paths.load_dataset("primary_energy_consumption")

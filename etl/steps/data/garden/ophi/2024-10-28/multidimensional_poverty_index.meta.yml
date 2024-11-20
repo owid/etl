@@ -7,6 +7,18 @@ definitions:
     presentation:
       topic_tags:
         - Poverty
+      faqs:
+        - fragment_id: mpi-definition
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-sources
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-indicators-unavailable
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-comparability
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+        - fragment_id: mpi-other-sources
+          gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+
     # Description from producer
     description_from_producer: >-
       The global MPI is a measure of acute poverty covering over 100 countries in the developing
@@ -85,9 +97,9 @@ definitions:
 
   # For description_short
   description_short_multidimensional_poverty: Multidimensional poverty is defined as being deprived in a range of health, education and living standards indicators.
-  description_short_mpi: The MPI is a measure that combines the prevalence and the intensity of multidimensional poverty.
+  description_short_mpi: The Multidimensional Poverty Index (MPI) is a measure that combines the prevalence and the intensity of multidimensional poverty on a scale from 0 to 1. Higher values indicate higher poverty.
   description_short_headcount_ratio: This is the share of the population that is multidimensionally poor.
-  description_short_intensity: The intensity is the share of indicators in which the multidimensionally poor are deprived on average.
+  description_short_intensity: The intensity is the share of indicators in which people in multidimensional poverty are deprived on average.
   description_short_vulnerable: This is the share of the population that is close to the multidimensional poverty threshold.
   description_short_severe: This is the share of the population that is in severe multidimensional poverty.
   description_short_censored_headcount_ratio: This is the share of the multidimensionally poor population deprived in the indicator <<indicator.lower()>>.
@@ -107,13 +119,13 @@ definitions:
   description_key_multidimensional_poverty: |-
     Being _MPI poor_ means that a person lives in a household deprived in a third or more of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
   description_key_vulnerable: |-
-    Being _vulnerable_ to multidimensional poverty means that a person lives in a household deprived in 20-33.33% of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
+    Being _vulnerable_ to multidimensional poverty means that a person lives in a household deprived in 20-33.3% of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
   description_key_severe: |-
-    Being _severely_ multidimensionally poor means that a person lives in a household deprived in 50% or more of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
+    Being in _severe_ multidimensional poverty means that a person lives in a household deprived in 50% or more of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
   description_key_assessments: |-
-    Households are assessed as being deprived in a given indicator if they do not meet a specific threshold for that indicator. [This article](https://ourworldindata.org/multidimensional-poverty-index) explains the specific thresholds.
+    Each household is assessed against specific thresholds for these indicators. For example, a household is considered deprived in the _electricity_ indicator if it does not have access to it. [This article](https://ourworldindata.org/multidimensional-poverty-index) discusses specific thresholds in more detail.
   description_key_weights: |-
-    The indicators vary in weight: health and education indicators weigh 1/6, while living standards indicators weigh 1/18, making each dimension contribute equally to one-third of the total.
+    Each indicator contributes to one of the three dimensions of well-being.  Health and education indicators are weighted more (1/6 each) than living standards indicators (1/18 each) so that all three dimensions contribute equally to the overall measure.
   description_key_mpi: |-
     The Multidimensional Poverty Index (MPI) is calculated by multiplying two values: the share of people who are multidimensionally poor and the intensity of their poverty. Values range between 0 and 1, where a larger number represents a higher level of poverty.
   description_key_intensity: |-
@@ -182,7 +194,7 @@ tables:
           <<: *common_display
 
       headcount_ratio:
-        title: Share of the population in multidimensional poverty (<<area>>) - <<flavor>>
+        title: Share of population living in multidimensional poverty (<<area>>) - <<flavor>>
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_headcount_ratio}{definitions.description_short_area}"
@@ -192,10 +204,10 @@ tables:
           - "{definitions.description_key_weights}"
           - "{definitions.description_key_flavor}"
         presentation:
-          title_public: Share of the population in multidimensional poverty
+          title_public: Share of population living in multidimensional poverty
           title_variant: <<area>>, <<flavor>>
         display:
-          name: Share of the population in multidimensional poverty
+          name: Share of population living in multidimensional poverty
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -219,7 +231,7 @@ tables:
           <<: *common_display
 
       vulnerable:
-        title: Share of the population vulnerable to multidimensional poverty (<<area>>) - <<flavor>>
+        title: Share of population vulnerable to multidimensional poverty (<<area>>) - <<flavor>>
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_vulnerable}{definitions.description_short_area}"
@@ -229,15 +241,15 @@ tables:
           - "{definitions.description_key_weights}"
           - "{definitions.description_key_flavor}"
         presentation:
-          title_public: Share of the population vulnerable to multidimensional poverty
+          title_public: Share of population vulnerable to multidimensional poverty
           title_variant: <<area>>, <<flavor>>
         display:
-          name: Share of the population vulnerable to multidimensional poverty
+          name: Share of population vulnerable to multidimensional poverty
           numDecimalPlaces: 1
           <<: *common_display
 
       severe:
-        title: Share of the population in severe multidimensional poverty (<<area>>) - <<flavor>>
+        title: Share of population living in severe multidimensional poverty (<<area>>) - <<flavor>>
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_severe}{definitions.description_short_area}"
@@ -247,15 +259,15 @@ tables:
           - "{definitions.description_key_weights}"
           - "{definitions.description_key_flavor}"
         presentation:
-          title_public: Share of the population in severe multidimensional poverty
+          title_public: Share of population living in severe multidimensional poverty
           title_variant: <<area>>, <<flavor>>
         display:
-          name: Share of the population in severe multidimensional poverty
+          name: Share of population living in severe multidimensional poverty
           numDecimalPlaces: 1
           <<: *common_display
 
       censored_headcount_ratio:
-        title: Share of the population in multidimensional poverty deprived in the indicator <<indicator>> (<<area>>) - <<flavor>>
+        title: Share of population in multidimensional poverty deprived in the indicator <<indicator>> (<<area>>) - <<flavor>>
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_censored_headcount_ratio}{definitions.description_short_area}"
@@ -264,15 +276,15 @@ tables:
           - "{definitions.description_key_indicator}"
           - "{definitions.description_key_flavor}"
         presentation:
-          title_public: Share of the population in multidimensional poverty deprived in the indicator <<indicator>>
+          title_public: Share of population in multidimensional poverty deprived in the indicator <<indicator>>
           title_variant: <<area>>, <<flavor>>
         display:
-          name: Share of the population in multidimensional poverty deprived in the indicator <<indicator>>
+          name: Share of population in multidimensional poverty deprived in the indicator <<indicator>>
           numDecimalPlaces: 1
           <<: *common_display
 
       uncensored_headcount_ratio:
-        title: Share of the population deprived in the indicator <<indicator>> (<<area>>) - <<flavor>>
+        title: Share of population deprived in the indicator <<indicator>> (<<area>>) - <<flavor>>
         unit: "%"
         short_unit: "%"
         description_short: "{definitions.description_short_multidimensional_poverty} {definitions.description_short_uncensored_headcount_ratio}{definitions.description_short_area}"
@@ -281,10 +293,10 @@ tables:
           - "{definitions.description_key_indicator}"
           - "{definitions.description_key_flavor}"
         presentation:
-          title_public: Share of the population deprived in the indicator <<indicator>>
+          title_public: Share of population deprived in the indicator <<indicator>>
           title_variant: <<area>>, <<flavor>>
         display:
-          name: Share of the population deprived in the indicator <<indicator>>
+          name: Share of population deprived in the indicator <<indicator>>
           numDecimalPlaces: 1
           <<: *common_display
 
