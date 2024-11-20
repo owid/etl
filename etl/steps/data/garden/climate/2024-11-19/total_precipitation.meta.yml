@@ -1,8 +1,8 @@
 
 definitions:
   common:
-    unit: centimeters
-    short_unit: cm
+    unit: millimeters
+    short_unit: mm
     presentation:
       topic_tags:
       - Climate Change
@@ -38,7 +38,7 @@ tables:
       precipitation_anomaly:
         title: Precipitation anomaly
         description_short: |-
-          The difference between the total precipitation in a specific month and the average total precipitation for that month, in centimeters.
+          The difference between the total precipitation in a specific month and the average total precipitation for that month, in millimeters.
         description_processing: |-
             {definitions.common_processing}
             {definitions.precipitation_anomaly}

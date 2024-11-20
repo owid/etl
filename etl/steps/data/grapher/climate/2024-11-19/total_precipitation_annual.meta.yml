@@ -1,7 +1,7 @@
 definitions:
   common:
-    unit: centimeters
-    short_unit: cm
+    unit: millimeters
+    short_unit: mm
     presentation:
       topic_tags:
       - Climate Change
@@ -39,7 +39,7 @@ tables:
       precipitation_anomaly:
         title: Precipitation anomaly
         description_short: |-
-          The deviation of a specific year's total amount of rain and snow from the 1991-2020 mean, in centimeters. {definitions.desc_update}
+          The deviation of a specific year's total amount of rain and snow from the 1991-2020 mean, in millimeters. {definitions.desc_update}
         description_processing: |-
             {definitions.common_processing}
             {definitions.precipitation_anomaly}
@@ -47,7 +47,7 @@ tables:
       precipitation_anomaly_decadal:
         title: Decadal average annual precipitation anomaly
         description_short: |-
-          The deviation of a specific decade's average precipitation from the 1991-2020 mean, in centimeters. {definitions.desc_update}
+          The deviation of a specific decade's average precipitation from the 1991-2020 mean, in millimeters. {definitions.desc_update}
 
         description_processing: |-
             {definitions.common_processing}
