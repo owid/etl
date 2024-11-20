@@ -26,7 +26,7 @@ tables:
       value:
         title: Deaths from << pathogen >> infections
         unit: deaths
-        description_short: Estimated deaths from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+        description_short: Estimated number [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
       upper:
         title: Upper bound of deaths from << pathogen >> infections
         unit: deaths
