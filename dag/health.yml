@@ -922,6 +922,8 @@ steps:
     - data://meadow/antibiotics/2024-11-15/testing_coverage
   data://grapher/antibiotics/2024-11-15/testing_coverage:
     - data://garden/antibiotics/2024-11-15/testing_coverage
+
+  # IHME Neonatal all infectious syndromes
   data-private://meadow/antibiotics/2024-11-20/microbe:
     - snapshot-private://antibiotics/2024-11-20/microbe.zip
   data-private://garden/antibiotics/2024-11-20/microbe:

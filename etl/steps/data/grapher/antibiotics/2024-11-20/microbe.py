@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("microbe")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("microbe")
+    tb = ds_garden.read("microbe", reset_index=False)
     #
     # Save outputs.
     #
