@@ -54,8 +54,8 @@ Each table has different dimensions. I had to explore them and decide which colu
 2y patfr
 2y patfrc
 
-3x pft
-3x pftc
+3X pft
+3X pftc
 
 2y pmab
 2y pmabc
@@ -83,6 +83,7 @@ where:
 2c: code, cohort
 3c: code, cohort, age
 3x: code, cohort, x
+3X: code, year, x
 4A: code, year, cohort, ardy
 
 
@@ -139,7 +140,9 @@ def get_cols_format(tb, short_name):
     cols_index = None  # Default value
 
     # 2y: code, year
-    if (short_name.endswith(("RR", "RRbo")) and "Age" not in tb.columns) or (short_name in {"patfr", "patfrc", "pmab"}):
+    if (short_name.endswith(("RR", "RRbo")) and "Age" not in tb.columns) or (
+        short_name in {"patfr", "patfrc", "pmab", "pmabc"}
+    ):
         cols_index = ["code", "year"]
 
     # 3y: code, year, age
@@ -160,9 +163,13 @@ def get_cols_format(tb, short_name):
     elif short_name.endswith(("VH", "VHbo")) and "Age" in tb.columns:
         cols_index = ["code", "cohort", "age"]
 
-    # 3x: code, cohort, x
-    elif short_name in {"pft", "pftc", "cft"}:
+    # 3X: code, cohort, x
+    elif short_name == "cft":
         cols_index = ["code", "cohort", "x"]
+
+    # 3X: code, year, x
+    elif short_name in {"pft", "pftc"}:
+        cols_index = ["code", "year", "x"]
 
     # 4A: code, year, cohort, ardy
     elif short_name.endswith(("VV", "VVbo")):
@@ -186,7 +193,7 @@ def run(dest_dir: str) -> None:
         p = Path(tmp_dir)
         files = sorted(p.glob("Files/zip_w/*.txt"))
         for f in files:
-            print(f"> {f}")
+            # print(f"> {f}")
             # Read the content of the text file
             tb_ = pr.read_csv(
                 f,
@@ -197,17 +204,17 @@ def run(dest_dir: str) -> None:
 
             # Detect the columns to use to index the table (accounting for dimensions)
             cols_format = get_cols_format(tb_, short_name)
-            print(cols_format)
-            print(tb_.columns)
+            # print(cols_format)
+            # print(tb_.columns)
 
-            if short_name == "pft":
+            if short_name in {"pft", "pftc"}:
                 tb_ = tb_.rename(
                     columns={
-                        "L0x": "big_l0x",
-                        "L1x": "big_l1x",
-                        "L2x": "big_l2x",
-                        "L3x": "big_l3x",
-                        "L4x": "big_l4x",
+                        "L0x": "cap_l0x",
+                        "L1x": "cap_l1x",
+                        "L2x": "cap_l2x",
+                        "L3x": "cap_l3x",
+                        "L4x": "cap_l4x",
                     }
                 )
             # Format
