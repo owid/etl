@@ -59,8 +59,6 @@ steps:
   - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2024-11-19/total_precipitation:
     - data://meadow/climate/2024-11-19/total_precipitation
-  data://grapher/climate/2024-11-19/total_precipitation:
-    - data://garden/climate/2024-11-19/total_precipitation
   data://grapher/climate/2024-11-19/total_precipitation_annual:
     - data://garden/climate/2024-11-19/total_precipitation
   #
