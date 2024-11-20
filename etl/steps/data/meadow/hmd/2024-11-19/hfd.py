@@ -1,6 +1,110 @@
-"""Load a snapshot and create a meadow dataset."""
+"""Load a snapshot and create a meadow dataset.
 
-import os
+Each table has different dimensions. I had to explore them and decide which columns to use as index. Find below the list of columns, tagged according to the columns used to index them:
+
+2y adjtfrRR
+2y adjtfrRRbo
+
+3y asfrRR
+3y asfrRRbo
+4y asfrTR
+4y asfrTRbo
+3c asfrVH
+3c asfrVHbo
+4A asfrVV
+4A asfrVVbo
+
+3y birthsRR
+3y birthsRRbo
+4y birthsTR
+4y birthsTRbo
+3c birthsVH
+3c birthsVHbo
+4A birthsVV
+4A birthsVVbo
+
+2y cbrRR
+2y cbrRRbo
+
+3c ccfrVH
+3c ccfrVHbo
+
+3x cft
+
+3y cpfrRR
+3y cpfrRRbo
+4A cpfrVV
+4A cpfrVVbo
+
+3y exposRR
+3y exposRRpa
+3y exposRRpac
+4y exposTR
+3c exposVH
+4A exposVV
+
+2y mabRR
+2y mabRRbo
+2c mabVH
+2c mabVHbo
+
+3y mi
+3y mic
+
+2y patfr
+2y patfrc
+
+3x pft
+3x pftc
+
+2y pmab
+2y pmabc
+
+2c pprVHbo
+
+2y sdmabRR
+2y sdmabRRbo
+2c sdmabVH
+2c sdmabVHbo
+
+2y tfrRR
+2y tfrRRbo
+2c tfrVH
+2c tfrVHbo
+
+2y totbirthsRR
+2y totbirthsRRbo
+
+
+where:
+2y: code, year
+3y: code, year, age
+4y: code, year, age, cohort
+2c: code, cohort
+3c: code, cohort, age
+3x: code, cohort, x
+4A: code, year, cohort, ardy
+
+
+summary:
+2y: code, year
+
+if [(tb.name ends with RR or RRbo) & ('age' is not a column in tb)] or (tb.name in {'patfr', 'pmab'}):
+    this is 2y
+elif [(tb.name ends with RR or RRbo) & ('age' is a column in tb)] or (tb.name in {'mi', 'mic'}):
+    this is 3y
+elif: (tb.name ends with TR or TRbo)
+    this is 4y
+elif [(tb.name ends with VH or VHbo) & ('age' is not a column in tb)]:
+    this is 2c
+elif [(tb.name ends with VH or VHbo) & ('age' is a column in tb)]:
+    this is 3c
+elif (tb.name in {'pft', 'pftc', 'cft'}):
+    this is 3x
+elif (tb.name ends with VV or VVbo):
+    this is 4A
+
+"""
 from pathlib import Path
 
 import owid.catalog.processing as pr
@@ -10,119 +114,63 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-indicators = {
-    "cbr": {
-        "name": "Crude birth rate",
-    },
-    "expos": "Female exposure to risk",
-    "mi": "Conditional fertility rates",
-}
+# Behavior 1:
+# Mosrtly use ["code", "year", "age"] except:
+# - When table end with 'TR' or 'TRbo': ["code", "year", "year", "cohort"] for those
+# - When table end with 'VV' or 'VVbo': ["code", "year", "ardy"] for those
+cols_1 = (
+    "asfr",
+    "births",
+    "ccfr",
+    "cpfr",
+    "expos",
+    "mi",
+)
+# Behaviour 2: Use ["code", "cohort"] always
+cols_2 = ("pprVHbo",)
+# Behavior 3: Use ["code", "year", "age"] always
+cols_3 = (
+    "cft",
+    "pft",
+)
 
-# code year age
-"""
-x: code, year, age
-o: code, year, ardy
-$: code, cohort, x
-£: code, cohort
-dimensions_age = [
 
-    adjtfrRR
-    adjtfrRRbo
+def get_cols_format(tb, short_name):
+    cols_index = None  # Default value
 
-    x asfrRR
-    x asfrRRbo
-    x asfrTR
-    x asfrTRbo
-    x asfrVH
-    x asfrVHbo
-    o asfrVV
-    o asfrVVbo
+    # 2y: code, year
+    if (short_name.endswith(("RR", "RRbo")) and "Age" not in tb.columns) or (short_name in {"patfr", "patfrc", "pmab"}):
+        cols_index = ["code", "year"]
 
-    x birthsRR
-    x birthsRRbo
-    x birthsTR
-    x birthsTRbo
-    x birthsVH
-    x birthsVHbo
-    o birthsVV
-    o birthsVVbo
+    # 3y: code, year, age
+    elif (short_name.endswith(("RR", "RRbo", "RRpa", "RRpac")) and "Age" in tb.columns) or (
+        short_name in {"mi", "mic"}
+    ):
+        cols_index = ["code", "year", "age"]
 
-    cbrRR
-    cbrRRbo
+    # 4y: code, year, age, cohort
+    elif short_name.endswith(("TR", "TRbo")):
+        cols_index = ["code", "year", "age", "cohort"]
 
-    x ccfrVH
-    x ccfrVHbo
+    # 2c: code, cohort
+    elif short_name.endswith(("VH", "VHbo")) and "Age" not in tb.columns:
+        cols_index = ["code", "cohort"]
 
-    $ cft
+    # 3c: code, cohort, age
+    elif short_name.endswith(("VH", "VHbo")) and "Age" in tb.columns:
+        cols_index = ["code", "cohort", "age"]
 
-    x cpfrRR
-    x cpfrRRbo
-    o cpfrVV
-    o cpfrVVbo
+    # 3x: code, cohort, x
+    elif short_name in {"pft", "pftc", "cft"}:
+        cols_index = ["code", "cohort", "x"]
 
-    x exposRR
-    x exposRRpa
-    x exposRRpac
-    x exposTR
-    x exposVH
-    o exposVV
+    # 4A: code, year, cohort, ardy
+    elif short_name.endswith(("VV", "VVbo")):
+        cols_index = ["code", "year", "cohort", "ardy"]
 
-    mabRR
-    mabRRbo
-    mabVH
-    mabVHbo
-
-    x mi
-    x mic
-
-    patfr
-    patfrc
-
-    $ pft
-    $ pftc
-
-    pmab
-    pmabc
-
-    £ pprVHbo
-
-    sdmabRR
-    sdmabRRbo
-    sdmabVH
-    sdmabVHbo
-
-    tfrRR
-    tfrRRbo
-    tfrVH
-    tfrVHbo
-
-    totbirthsRR
-    totbirthsRRbo
-]
-"""
-# code year ardy
-dimensions_ardy = [
-    "asfrVV",
-    "asfrVVbo",
-    "birthsVV",
-    "birthsVVbo",
-]
-dimensions_custom = {
-    "asfrRR":
-
-    "exposRRpa": ["code", "year", "age"],
-    "exposRRpac": ["code", "year", "age"],
-    "mi": ["code", "year", "age"],
-    "mic": ["code", "year", "age"],
-    "pftc": ["code", "year", "x"],
-    "sdmabVH": ["code", "cohort"],
-    "sdmabVHbo": ["code", "cohort"],
-    "cft": ["code", "cohort"],
-    "pft": ["code", "year", "x"],
-    "cpfrRRbo": ["code", "year", "age"],
-    "cpfrVV": ["code", "year", "ardy"],
-    "cpfrVVbo": ["code", "year", "ardy"],
-}
+    else:
+        raise Exception(f"No index columns defined for this table! {short_name}")
+    return cols_index
 
 
 def run(dest_dir: str) -> None:
@@ -136,16 +184,34 @@ def run(dest_dir: str) -> None:
     tbs = []
     with snap.extract_to_tempdir() as tmp_dir:
         p = Path(tmp_dir)
-        files = p.glob("Files/zip_w/*.txt")
+        files = sorted(p.glob("Files/zip_w/*.txt"))
         for f in files:
+            print(f"> {f}")
             # Read the content of the text file
             tb_ = pr.read_csv(
                 f,
-                delim_whitespace=True,
+                sep="\s+",
                 skiprows=2,
             )
-            tb_.m.short_name = f.stem
-            # tb_ = tb_.format(["code", "year"])
+            short_name = f.stem
+
+            # Detect the columns to use to index the table (accounting for dimensions)
+            cols_format = get_cols_format(tb_, short_name)
+            print(cols_format)
+            print(tb_.columns)
+
+            if short_name == "pft":
+                tb_ = tb_.rename(
+                    columns={
+                        "L0x": "big_l0x",
+                        "L1x": "big_l1x",
+                        "L2x": "big_l2x",
+                        "L3x": "big_l3x",
+                        "L4x": "big_l4x",
+                    }
+                )
+            # Format
+            tb_ = tb_.format(cols_format, short_name=short_name)
             tbs.append(tb_)
 
     #
@@ -158,7 +224,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=tbs, check_variables_metadata=True, default_metadata=snap.metadata)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
