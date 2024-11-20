@@ -77,7 +77,78 @@ Each table has different dimensions. I had to explore them and decide which colu
 
 
 where:
+
 2y: code, year
+
+    adjtfrRR
+        Tempo-adjusted total fertility rates, Bongaarts-Feeney method
+        adjTFR
+    adjtfrRRbo
+        Tempo-adjusted total fertility rates by birth order, Bongaarts-Feeney method
+        adjTFR   adjTFR1   adjTFR2   adjTFR3   adjTFR4  adjTFR5p
+
+
+    cbrRR
+        Crude birth rate
+        CBR
+    cbrRRbo
+        Crude birth rate by birth order
+        CBR     CBR1     CBR2     CBR3     CBR4    CBR5p
+
+    mabRR
+        Period mean ages at birth and period mean ages at birth by age 40
+        MAB      MAB40
+    mabRRbo
+        Period mean ages at birth by birth order and period mean ages at birth by birth order by age 40
+        MAB1     MAB2     MAB3     MAB4    MAB5p    MAB40_1    MAB40_2    MAB40_3    MAB40_4    MAB40_5p
+
+    patfr
+        Parity- and age-adjusted total fertility rate
+        PATFR   PATFR1   PATFR2   PATFR3   PATFR4  PATFR5p
+    patfrc
+        Parity- and age-adjusted total fertility rate (based on parity distribution from population census)
+        PATFR   PATFR1   PATFR2   PATFR3   PATFR4  PATFR5p
+
+    pmab
+        Period table mean ages at birth by birth order
+        TMAB    TMAB1    TMAB2    TMAB3    TMAB4   TMAB5p
+    pmabc
+        Period table mean ages at birth by birth order (based on parity distribution from population census)
+        TMAB    TMAB1    TMAB2    TMAB3    TMAB4   TMAB5p
+
+    sdmabRR
+        Standard deviation in period mean ages at birth and standard deviation in period mean ages at birth by age 40
+        sdMAB    sdMAB40
+    sdmabRRbo
+        Standard deviation in period mean ages at birth by birth order and standard deviation in period mean ages at birth by birth order by age 40
+        sdMAB      sdMAB1      sdMAB2      sdMAB3      sdMAB4     sdMAB5p     sdMAB40   sdMAB40_1   sdMAB40_2   sdMAB40_3   sdMAB40_4  sdMAB40_5p
+
+    tfrRR
+        Period total fertility rates and period total fertility rates by age 40
+        TFR     TFR40
+    tfrRRbo
+        Period total fertility rates by birth order and period total fertility rates by birth order by age 40
+        TFR      TFR1      TFR2      TFR3      TFR4     TFR5p     TFR40   TFR40_1   TFR40_2   TFR40_3   TFR40_4  TFR40_5p
+
+
+    => OUTPUT
+
+    columns
+        adjTFR
+        CBR
+        MAB
+        MAB40
+        sdMAB
+        sdMAB40
+        TFR
+        TFR40
+        PATFR
+        PATFR_c
+        TMAB
+        TMAB_c
+    dimensions
+        code, year, birth_order
+
 3y: code, year, age
 4y: code, year, age, cohort
 2c: code, cohort
@@ -85,6 +156,63 @@ where:
 3x: code, cohort, x
 3X: code, year, x
 4A: code, year, cohort, ardy
+----
+
+3y asfrRR
+3y asfrRRbo
+4y asfrTR
+4y asfrTRbo
+3c asfrVH
+3c asfrVHbo
+4A asfrVV
+4A asfrVVbo
+
+3y birthsRR
+3y birthsRRbo
+4y birthsTR
+4y birthsTRbo
+3c birthsVH
+3c birthsVHbo
+4A birthsVV
+4A birthsVVbo
+
+
+3c ccfrVH
+3c ccfrVHbo
+
+3x cft
+
+3y cpfrRR
+3y cpfrRRbo
+4A cpfrVV
+4A cpfrVVbo
+
+3y exposRR
+3y exposRRpa
+3y exposRRpac
+4y exposTR
+3c exposVH
+4A exposVV
+
+2c mabVH
+2c mabVHbo
+
+3y mi
+3y mic
+
+3X pft
+3X pftc
+
+2c pprVHbo
+
+2c sdmabVH
+2c sdmabVHbo
+
+2c tfrVH
+2c tfrVHbo
+
+2y totbirthsRR
+2y totbirthsRRbo
 
 """
 from pathlib import Path
