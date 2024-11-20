@@ -74,7 +74,7 @@ def interpolate_table(
     time_col: str
         Name of the column with years.
     mode: str
-        How to compelte time series. 'full_range' for complete range, 'full_range_entity' for complete range within an entity, 'reduced' for only time values appearing in the data. Use 'none' to interpolate with existing values.
+        How to complete time series. 'full_range' for complete range, 'full_range_entity' for complete range within an entity, 'reduced' for only time values appearing in the data. Use 'none' to interpolate with existing values.
     """
     SINGLE_ENTITY = isinstance(entity_col, str)
     MULTIPLE_ENTITY = isinstance(entity_col, list)
@@ -409,7 +409,7 @@ def explode_rows_by_time_range(
 
 
 ########################################################################################################################
-# TODO: Remote this temporary function once WDI has origins.
+# TODO: Remove this temporary function once WDI has origins.
 def add_origins_to_mortality_database(tb_who: Table) -> Table:
     tb_who = tb_who.copy()
 
@@ -441,7 +441,7 @@ def add_origins_to_mortality_database(tb_who: Table) -> Table:
 
 
 ##################################################################################
-# TODO: Remote this temporary function once WDI has origins.
+# TODO: Remove this temporary function once WDI has origins.
 def add_origins_to_global_burden_of_disease(tb_gbd: Table) -> Table:
     tb_gbd = tb_gbd.copy()
 

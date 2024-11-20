@@ -10,6 +10,7 @@ from typing import Any, Dict, Hashable, List, Literal, Optional, Set, TypeVar, U
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
+from deprecated import deprecated
 from owid.catalog import Dataset, Table, Variable
 from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entities
 from owid.datautils.dataframes import groupby_agg, map_series
@@ -653,6 +654,7 @@ def _add_population_to_dataframe(
     return cast(TableOrDataFrame, df_with_population)
 
 
+@deprecated("This function is deprecated. Use `etl.data_helpers.misc.interpolate_table` instead.")
 def interpolate_table(
     df: TableOrDataFrame,
     country_col: str,
