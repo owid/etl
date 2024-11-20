@@ -4,8 +4,11 @@ definitions:
     presentation:
       topic_tags:
         - Antibiotics
+      title_public: << pathogen >>
     display:
       numDecimalPlaces: 0
+      name: << pathogen >>
+
   pathogen_type:
     <% if pathogen_type == "Fungi" %>
     fungus
