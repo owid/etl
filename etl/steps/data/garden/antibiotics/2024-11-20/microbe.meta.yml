@@ -1,0 +1,37 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+  pathogen_type:
+    <% if pathogen_type == "Fungi" %>
+    fungus
+    <% elif pathogen_type == "Viruses" %>
+    virus
+    <% else  %>
+    << pathogen_type >>
+    <% endif %>
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  microbe:
+    variables:
+      value:
+        title: Deaths from << pathogen >> infections
+        unit: deaths
+        description_short: Estimated deaths from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+      upper:
+        title: Upper bound of deaths from << pathogen >> infections
+        unit: deaths
+        description_short: Estimated upper bound of deaths from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+      lower:
+        title: Lower bound of deaths from << pathogen >> infections
+        unit: deaths
+        description_short: Estimated lower bound of deaths from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
