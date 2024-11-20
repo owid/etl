@@ -18,10 +18,9 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("fossil_fuel_subsidies")
 
     # Read tables from meadow dataset.
-    # NOTE: For now, use only the data from the first sheet.
     tb = ds_meadow.read("fossil_fuel_subsidies")
-    # tb_indicators = ds_meadow.read("fossil_fuel_subsidies_indicators")
-    # tb_transport = ds_meadow.read("fossil_fuel_subsidies_transport_oil")
+    tb_indicators = ds_meadow.read("fossil_fuel_subsidies_indicators")
+    tb_transport = ds_meadow.read("fossil_fuel_subsidies_transport_oil")
 
     #
     # Process data.
@@ -34,6 +33,16 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Include additional indicators from the other tables.
+    # TODO: Rename columns appropriately.
+    # TODO: Add metadata to new columns.
+    tb = tb.merge(tb_indicators, on=["country", "year"], how="outer")
+    tb = tb.merge(
+        tb_transport.rename(columns={"subsidy": "transport_oil_subsidy"}, errors="raise"),
+        on=["country", "year"],
+        how="outer",
+    )
 
     # Improve format.
     tb = tb.format()
