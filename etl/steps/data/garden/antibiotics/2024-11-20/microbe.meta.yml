@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Global Health
+    display:
+      numDecimalPlaces: 0
   pathogen_type:
     <% if pathogen_type == "Fungi" %>
     fungus
@@ -24,14 +26,14 @@ tables:
   microbe:
     variables:
       value:
-        title: Deaths from << pathogen >> infections
+        title: Neonatal deaths from << pathogen >> infections
         unit: deaths
         description_short: Estimated number [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
       upper:
-        title: Upper bound of deaths from << pathogen >> infections
+        title: Upper bound of neonatal deaths from << pathogen >> infections
         unit: deaths
-        description_short: Estimated upper bound of deaths from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+        description_short: Estimated number [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
       lower:
-        title: Lower bound of deaths from << pathogen >> infections
+        title: Lower bound of neonatal deaths from << pathogen >> infections
         unit: deaths
-        description_short: Estimated lower bound of deaths from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+        description_short: Estimated number [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.

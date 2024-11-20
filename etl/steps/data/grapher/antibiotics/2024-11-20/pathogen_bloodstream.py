@@ -17,10 +17,6 @@ def run(dest_dir: str) -> None:
     tb = ds_garden.read("pathogen_bloodstream", reset_index=False)
 
     #
-    # Process data.
-    #
-
-    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
