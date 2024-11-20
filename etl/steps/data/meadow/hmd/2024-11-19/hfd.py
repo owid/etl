@@ -86,25 +86,6 @@ where:
 3X: code, year, x
 4A: code, year, cohort, ardy
 
-
-summary:
-2y: code, year
-
-if [(tb.name ends with RR or RRbo) & ('age' is not a column in tb)] or (tb.name in {'patfr', 'pmab'}):
-    this is 2y
-elif [(tb.name ends with RR or RRbo) & ('age' is a column in tb)] or (tb.name in {'mi', 'mic'}):
-    this is 3y
-elif: (tb.name ends with TR or TRbo)
-    this is 4y
-elif [(tb.name ends with VH or VHbo) & ('age' is not a column in tb)]:
-    this is 2c
-elif [(tb.name ends with VH or VHbo) & ('age' is a column in tb)]:
-    this is 3c
-elif (tb.name in {'pft', 'pftc', 'cft'}):
-    this is 3x
-elif (tb.name ends with VV or VVbo):
-    this is 4A
-
 """
 from pathlib import Path
 
