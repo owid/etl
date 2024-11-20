@@ -84,7 +84,7 @@ def run(dest_dir: str) -> None:
     weights = np.cos(np.deg2rad(da.latitude))
     weights.name = "weights"
     clim_month_weighted = da.weighted(weights)
-    global_mean = clim_month_weighted.sum(["longitude", "latitude"])
+    global_mean = clim_month_weighted.mean(["longitude", "latitude"])
     temp_country["World"] = global_mean
 
     # Initialize a list to keep track of small countries where precipitation data extraction fails.
@@ -114,7 +114,7 @@ def run(dest_dir: str) -> None:
 
             # Calculate the weighted mean precipitation for the country.
             # country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
-            country_sum = clim_month_weighted.sum(dim=["longitude", "latitude"]).values
+            country_sum = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
 
             # Store the calculated mean precipitation in the dictionary with the country's name as the key.
             temp_country[country_name] = country_sum
