@@ -1,6 +1,8 @@
 """Load a garden dataset and create a grapher dataset."""
 
 
+import calendar
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -31,6 +33,9 @@ def run(dest_dir: str) -> None:
 
     # Convert the 'year' column to integer type
     tb_annual_average["year"] = tb_annual_average["year"].astype(int)
+
+    # Remove rows where the year is 2024 as it's incomplete
+    tb_annual_average = tb_annual_average[tb["year"] != 2024]
 
     # Set the index to 'year' and 'country'
     tb_annual_average = tb_annual_average.set_index(["year", "country"], verify_integrity=True)
