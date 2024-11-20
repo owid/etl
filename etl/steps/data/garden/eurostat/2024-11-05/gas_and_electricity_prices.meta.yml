@@ -33,6 +33,8 @@ definitions:
     "Energy and supply" is the cost of natural gas, including the commodity price paid by the supplier or the price at the point of entry into the transmission system. It also includes, where applicable, end-user costs such as storage and expenses related to the sale of gas to final customers.
   description_key_gas_component_network_cost: &description_key_gas_component_network_cost |-
     "Network costs" include the tariffs for transmission and distribution, costs from transmission and distribution losses, and system-related expenses such as after-sale services, system services, meter rental, and metering.
+  description_key_gas_component_taxes_fees_levies_and_charges: &description_key_gas_component_taxes_fees_levies_and_charges |-
+    "Taxes, fees, levies, and charges" include value-added tax (VAT), renewable taxes, capacity taxes, environmental taxes, and all other taxes, fees, levies, or charges.
   description_key_gas_component_vat: &description_key_gas_component_vat |-
     "Value-added tax (VAT)" is a consumption tax applied to the final price of gas or electricity, as defined in Council Directive 2006/112/EC.
   description_key_gas_component_renewable_taxes: &description_key_gas_component_renewable_taxes |-
@@ -57,6 +59,7 @@ definitions:
   description_key_electricity_component_nuclear_taxes: |-
     "Nuclear taxes" are charges related to the nuclear sector, including decommissioning, inspections, and fees for nuclear installations.
   description_key_electricity_component_total_price_including_taxes: *description_key_gas_component_total_price_including_taxes
+  description_key_electricity_component_taxes_fees_levies_and_charges: *description_key_gas_component_taxes_fees_levies_and_charges
   # Definitions of price levels:
   # Original Eurostat definitions of price levels:
   # Level 1 prices ("X_TAX"): Prices excluding taxes and levies.
@@ -311,7 +314,7 @@ tables:
           title_public: Electricity price component for household consumers - Taxes, fees, levies, and charges
         description_key:
           - "{definitions.description_key_household_consumer}"
-          - "{definitions.description_key_electricity_component_other_taxes}"
+          - "{definitions.description_key_electricity_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
       electricity_non_household_taxes_fees_levies_and_charges:
@@ -322,7 +325,7 @@ tables:
           title_public: Electricity price component for non-household consumers - Taxes, fees, levies, and charges
         description_key:
           - "{definitions.description_key_non_household_consumer}"
-          - "{definitions.description_key_electricity_component_other_taxes}"
+          - "{definitions.description_key_electricity_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
       electricity_household_value_added_tax_vat:
@@ -421,7 +424,7 @@ tables:
           title_public: Gas price component for household consumers - Taxes, fees, levies, and charges
         description_key:
           - "{definitions.description_key_household_consumer}"
-          - "{definitions.description_key_gas_component_other_taxes}"
+          - "{definitions.description_key_gas_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
       gas_household_value_added_tax_vat:
@@ -509,7 +512,7 @@ tables:
           title_public: Gas price component for non-household consumers - Taxes, fees, levies, and charges
         description_key:
           - "{definitions.description_key_non_household_consumer}"
-          - "{definitions.description_key_gas_component_other_taxes}"
+          - "{definitions.description_key_gas_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
       gas_non_household_value_added_tax_vat:
@@ -822,7 +825,7 @@ tables:
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
-          - "{definitions.description_key_electricity_component_other_taxes}"
+          - "{definitions.description_key_electricity_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
       electricity_non_household_taxes_fees_levies_and_charges_pps:
@@ -834,7 +837,7 @@ tables:
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
-          - "{definitions.description_key_electricity_component_other_taxes}"
+          - "{definitions.description_key_electricity_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
       electricity_household_value_added_tax_vat_pps:
@@ -942,7 +945,7 @@ tables:
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
-          - "{definitions.description_key_gas_component_other_taxes}"
+          - "{definitions.description_key_gas_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
       gas_household_value_added_tax_vat_pps:
@@ -1038,7 +1041,7 @@ tables:
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
-          - "{definitions.description_key_gas_component_other_taxes}"
+          - "{definitions.description_key_gas_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
       gas_non_household_value_added_tax_vat_pps:
