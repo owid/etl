@@ -28,7 +28,7 @@ tables:
   total_precipitation:
     variables:
       total_precipitation:
-        title: Average annual precipitation
+        title: Annual precipitation
         description_short: Total annual precipitation—rain and snow—calculated as the sum of daily averages, reported as the depth of water falling to Earth's surface, excluding fog, dew, and evaporation.
         description_processing: |-
             {definitions.common_processing}
