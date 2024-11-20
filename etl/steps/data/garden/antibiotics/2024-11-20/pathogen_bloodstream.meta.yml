@@ -6,6 +6,7 @@ definitions:
         - Antibiotics
     display:
       numDecimalPlaces: 0
+      numSignificantFigures: 3
       name: << pathogen >>
 
   pathogen_type:
