@@ -48,10 +48,16 @@ check-default:
 	@RELATIVE_PATH=$$(pwd | sed "s|^$$(git rev-parse --show-toplevel)/||"); \
 	CHANGED_PY_FILES=$$(git diff --name-only origin/master HEAD -- . && git diff --name-only && git ls-files --others --exclude-standard | grep '\.py'); \
 	CHANGED_PY_FILES=$$(echo "$$CHANGED_PY_FILES" | sed "s|^$$RELATIVE_PATH/||" | grep '\.py' | xargs -I {} sh -c 'test -f {} && echo {}' | grep -v '{}'); \
-	if [ -n "$$CHANGED_PY_FILES" ]; then \
+	FILE_COUNT=$$(echo "$$CHANGED_PY_FILES" | wc -l); \
+	if [ "$$FILE_COUNT" -le 1 ] && [ "$$FILE_COUNT" -gt 0 ]; then \
 		echo "$$CHANGED_PY_FILES" | xargs ruff check --fix; \
 		echo "$$CHANGED_PY_FILES" | xargs ruff format; \
 		echo "$$CHANGED_PY_FILES" | xargs pyright; \
+	else \
+		echo "Too many files, checking all files instead."; \
+		make lint; \
+		make format; \
+		make check-typing; \
 	fi
 
 lint-default: .venv
