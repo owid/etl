@@ -114,8 +114,7 @@ markdown_extensions:
   - pymdownx.critic
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator:
-        !!python/name:materialx.emoji.to_svg # The Details extension supercharges the Admonition extension, making the resulting call-outs collapsible, allowing them to be opened and closed by the user. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#details
+      emoji_generator: !!python/name:materialx.emoji.to_svg # The Details extension supercharges the Admonition extension, making the resulting call-outs collapsible, allowing them to be opened and closed by the user. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#details
 
 
   - pymdownx.details
@@ -227,12 +226,12 @@ nav:
           - Staging servers: "guides/staging-servers.md"
           - Public servers: "guides/sharing-external.md"
           - Private datasets: "guides/private-import.md"
+          - Types in Tables: "guides/types-tables.md"
           - OpenAI setup: "guides/openai.md"
 
       - Others:
           - Edit the documentation: "dev/docs.md"
           - Metadata in data pages: "guides/metadata-play.md"
-
 
   - Design principles:
       - Design principles & workflow: architecture/index.md
