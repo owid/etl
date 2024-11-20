@@ -1,11 +1,11 @@
 """Load a meadow dataset and create a garden dataset."""
 from typing import Dict
 
+import owid.catalog.processing as pr
 import pandas as pd
+import plotly.express as px
 from owid.catalog import Table
 from owid.datautils.dataframes import map_series
-import owid.catalog.processing as pr
-import plotly.express as px
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
