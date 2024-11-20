@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     # Group by year and calculate the mean of the specified columns
     tb_annual_average = (
         tb.groupby(["year", "country"])
-        .agg({"total_precipitation": "sum", "precipitation_anomaly": "mean"})
+        .agg({"total_precipitation": "sum", "precipitation_anomaly": "sum"})
         .reset_index()
     )
 

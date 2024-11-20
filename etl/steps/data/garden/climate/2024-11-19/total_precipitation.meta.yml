@@ -42,3 +42,4 @@ tables:
         description_processing: |-
             {definitions.common_processing}
             {definitions.precipitation_anomaly}
+

@@ -37,7 +37,7 @@ tables:
 
 
       precipitation_anomaly:
-        title: Precipitation anomaly
+        title: Annual precipitation anomaly
         description_short: |-
           The deviation of a specific year's total amount of rain and snow from the 1991-2020 mean, in millimeters. {definitions.desc_update}
         description_processing: |-

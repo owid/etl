@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import calendar
+
 import owid.catalog.processing as pr
 
 from etl.data_helpers import geo
@@ -24,31 +26,35 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+    # Extract year and month as integers
+    tb["year"] = tb["time"].astype(str).str[0:4].astype(int)
+    tb["month"] = tb["time"].astype(str).str[5:7].astype(int)
 
-    tb["year"] = tb["time"].astype(str).str[0:4]
-    tb["month"] = tb["time"].astype(str).str[5:7]
+    # Get the number of days in the given month and year
+    tb["days_in_month"] = tb.apply(lambda row: calendar.monthrange(row["year"], row["month"])[1], axis=1)
 
-    tb["total_precipitation"] = tb["total_precipitation"] * 1000  # Convert from m to mm
+    # Use the number of days to convert to monthly totals rather than daily averages - as per info here https://confluence.ecmwf.int/pages/viewpage.action?pageId=197702790
+    tb["total_precipitation"] = tb["total_precipitation"] * 1000 * tb["days_in_month"]
+
     # Use the baseline from the Copernicus Climate Service https://climate.copernicus.eu/surface-air-temperature-january-2024
     tb_baseline = tb[(tb["year"].astype(int) > 1990) & (tb["year"].astype(int) < 2021)]
     tb_baseline = tb_baseline.groupby(["country", "month"], as_index=False)["total_precipitation"].mean()
     tb_baseline = tb_baseline.rename(columns={"total_precipitation": "mean_total_precipitation"})
 
     # Ensure that the reference mean DataFrame has a name for the mean column, e.g., 'mean_temp'
-    merged_df = pr.merge(tb, tb_baseline, on=["country", "month"])
+    tb = pr.merge(tb, tb_baseline, on=["country", "month"])
 
     # Calculate the anomalies (below and above the mean)
-    merged_df["precipitation_anomaly"] = merged_df["total_precipitation"] - merged_df["mean_total_precipitation"]
-    merged_df = merged_df.drop(columns=["mean_total_precipitation"])
+    tb["precipitation_anomaly"] = tb["total_precipitation"] - tb["mean_total_precipitation"]
 
-    merged_df = merged_df.drop(columns=["month", "year"])
-    merged_df = merged_df.set_index(["country", "time"], verify_integrity=True)
+    tb = tb.drop(columns=["month", "year", "mean_total_precipitation"])
+    tb = tb.set_index(["country", "time"], verify_integrity=True)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[merged_df], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
     ds_garden.save()
