@@ -26,8 +26,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # TODO: Write year in metadata programmatically.
-
     # Convert units from millions of dollars to dollars.
     tb["subsidy"] *= 1e6
 
@@ -44,7 +42,9 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, yaml_params={"dollar_year": DOLLAR_YEAR}
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()

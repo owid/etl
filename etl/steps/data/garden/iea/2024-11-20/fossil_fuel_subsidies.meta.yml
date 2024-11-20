@@ -5,9 +5,9 @@ definitions:
         - Energy
         - Fossil Fuels
       grapher_config:
-        note: This data is expressed in constant 2023 US$.
+        note: This data is expressed in constant {dollar_year} US$.
     processing_level: minor
-    unit: constant 2023 US$
+    unit: constant {dollar_year} US$
     short_unit: "$"
     description_short: |-
       This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in living costs between countries.
