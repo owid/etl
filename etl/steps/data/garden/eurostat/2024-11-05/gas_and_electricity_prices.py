@@ -4,6 +4,8 @@ from typing import Dict
 import pandas as pd
 from owid.catalog import Table
 from owid.datautils.dataframes import map_series
+import owid.catalog.processing as pr
+import plotly.express as px
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -256,8 +258,14 @@ MANDATORY_PRICE_COMPONENTS = [
     "Energy and supply",
     "Network costs",
     "Taxes, fees, levies, and charges",
-    "Value added tax (VAT)",
 ]
+
+# List of components that add up to the total price.
+# NOTE: See find_best_combination_of_components to understand how this choice was made.
+COMPONENTS_THAT_ADD_UP_TO_TOTAL = ["Energy and supply", "Network costs", "Taxes, fees, levies, and charges"]
+
+# Label to use for the calculated total price based on the sum of the main components.
+COMPONENTS_TOTAL_PRICE_LABEL = "Total price, including taxes"
 
 
 def sanity_check_inputs(tb: Table) -> None:
@@ -380,7 +388,7 @@ def compare_components_and_prices_data(tb: Table) -> None:
     tb_annual = tb[(~tb["year-semester"].str.contains("S")) & (tb["currency"] == "Euro")].reset_index(drop=True)
     tb_annual["dataset_code"] = tb_annual["dataset_code"].str.replace("_c", "")
 
-    combination = ["Energy and supply", "Network costs", "Taxes, fees, levies, and charges"]
+    combination = COMPONENTS_THAT_ADD_UP_TO_TOTAL
     annual_components = (
         tb_annual[(tb_annual["price_component_or_level"].isin(combination))]
         .groupby(
@@ -399,8 +407,6 @@ def compare_components_and_prices_data(tb: Table) -> None:
         ignore_index=True,
     )
     # Only a few country-years could be compared this way. Most of the points in the prices datasets were missing.
-    import plotly.express as px
-
     for dataset_code in compared["dataset_code"].unique():
         for country in sorted(set(compared["country"])):
             _compared = compared[(compared["dataset_code"] == dataset_code) & (compared["country"] == country)]
@@ -535,8 +541,6 @@ def find_best_combination_of_components(tb: Table) -> None:
         ignore_index=True,
     )
     # Only a few country-years could be compared this way. Most of the points in the prices datasets were missing.
-    import plotly.express as px
-
     for dataset_code in compared["dataset_code"].unique():
         for country in sorted(set(compared["country"])):
             if (
@@ -563,6 +567,32 @@ def find_best_combination_of_components(tb: Table) -> None:
     # * The prices and components datasets coincide reasonably well. To recover prices, it seems that the components to be added up are just "Energy and supply", "Network costs", and "Taxes, fees, levies, and charges". For most countries, this combination gives a good agreement with the prices dataset. However, for some countries, there is a significant discrepancy.
     # * Numerically, I have checked that for all price components datasets, "Taxes, fees, levies and charges" coincides with the sum of 'Capacity taxes', 'Environmental taxes', 'Nuclear taxes', 'Renewable taxes', 'Value added tax (VAT)', 'Other'. For some country-years, there is a small discrepancy.
     # * What's not so clear is what happens with the "allowances". Is "Taxes, fees, levies, and charges allowance" the sum of all other "* allowance"? It's hard to know, since it's non-zero only once (nrg_pc_204_c Netherlands 2023). At that point, it does coincide with the sum of all other "* allowance". But there are other instances of non-zero "* allowance" where "Taxes...allowance" is not defined. It may be possible that allowances are not included in the prices dataset.
+
+
+def plot_final_comparison_between_prices_and_components_data(tb: Table) -> None:
+    for country in tb["country"].unique():
+        for consumer_type in tb["consumer_type"].unique():
+            for source in tb["source"].unique():
+                _tb = tb[
+                    (tb["country"] == country)
+                    & (tb["source"] == source)
+                    & (tb["consumer_type"] == consumer_type)
+                    & (
+                        tb["price_component_or_level"].isin(
+                            [COMPONENTS_TOTAL_PRICE_LABEL, "All taxes and levies included"]
+                        )
+                    )
+                ]
+                if len(_tb["price_component_or_level"].unique()) < 2:
+                    continue
+                px.line(
+                    _tb,
+                    x="date",
+                    y="price_euro",
+                    color="price_component_or_level",
+                    markers=True,
+                    title=f"{consumer_type} {source} - {country}",
+                ).show()
 
 
 ########################################################################################################################
@@ -638,6 +668,22 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
     ].reset_index(drop=True)
     error = "Unexpected flag values."
     assert set(tb["flag"].dropna()) <= set(["estimated", "break in time series", "provisional", "unknown flag"]), error
+
+    # Add total price to the components dataset, by adding up the contribution of the main components.
+    tb_components_total = (
+        tb[
+            tb["dataset_code"].isin(DATASET_CODES_COMPONENTS)
+            & (tb["price_component_or_level"].isin(COMPONENTS_THAT_ADD_UP_TO_TOTAL))
+        ]
+        .groupby(
+            ["currency", "country", "year", "dataset_code", "year-semester", "date", "dataset_name"],
+            observed=True,
+            as_index=False,
+        )
+        .agg({"value": "sum"})
+        .assign(**{"price_component_or_level": COMPONENTS_TOTAL_PRICE_LABEL})
+    )
+    tb = pr.concat([tb, tb_components_total], ignore_index=True)
 
     # Create a column for the energy source.
     tb["source"] = map_series(
@@ -806,6 +852,10 @@ def run(dest_dir: str) -> None:
 
     # Sanity check outputs.
     sanity_check_outputs(tb=tb)
+
+    # Uncomment to plot a comparison (for each country, source, and consumer type) between the prices and the components data.
+    # NOTE: Some of the biggest discrepancies happen where prices data is given only for one of the semesters. This is the case of Georgia household electricity in 2021 and 2022, where we can't see the value of the missing semester (which could explain why the components data is significantly higher).
+    # plot_final_comparison_between_prices_and_components_data(tb=tb)
 
     # Create convenient wide tables.
     wide_tables = prepare_wide_tables(tb=tb)
