@@ -6,6 +6,9 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Assumed USD year.
+DOLLAR_YEAR = 2023
+
 
 def run(dest_dir: str) -> None:
     #
@@ -14,24 +17,34 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("fossil_fuel_subsidies")
 
-    # Read table from meadow dataset.
+    # Read tables from meadow dataset.
+    # NOTE: For now, use only the data from the first sheet.
     tb = ds_meadow.read("fossil_fuel_subsidies")
+    # tb_indicators = ds_meadow.read("fossil_fuel_subsidies_indicators")
+    # tb_transport = ds_meadow.read("fossil_fuel_subsidies_transport_oil")
 
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
-    tb = tb.format(["country", "year"])
+    # TODO: Write year in metadata programmatically.
+
+    # Convert units from millions of dollars to dollars.
+    tb["subsidy"] *= 1e6
+
+    # Transpose table.
+    tb = tb.pivot(index=["country", "year"], columns="product", values="subsidy", join_column_levels_with="_")
+
+    # Harmonize country names.
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Improve format.
+    tb = tb.format()
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

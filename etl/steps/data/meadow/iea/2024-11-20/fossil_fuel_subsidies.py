@@ -29,6 +29,7 @@ def prepare_subsidies_by_country_table(tb_subsidies: Table) -> Table:
         columns={old_column: new_column for old_column, new_column in zip(tb_global.columns, columns)}, errors="raise"
     )
     tb_global["Country"] = "World"
+    tb_global["Product"] = tb_global["Product"].replace({"All Products": "Total", "Natural Gas": "Gas"})
     # Extract countries subtable.
     tb_countries = tb_subsidies.loc[table_country_start_index + 1 :].reset_index(drop=True)
     tb_countries = tb_countries.rename(
