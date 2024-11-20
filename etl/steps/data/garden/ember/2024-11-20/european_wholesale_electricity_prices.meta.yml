@@ -1,0 +1,19 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+
+tables:
+  european_wholesale_electricity_prices:
+    variables:
+      price:
+        title: Electricity wholesale monthly price
+        unit: "Euros per megawatt-hour"
+        short_unit: "€/MWh"
+        description_short: |-
+          Monthly average day-ahead spot prices per [megawatt-hour](#dod:watt-hours) of electricity sold.

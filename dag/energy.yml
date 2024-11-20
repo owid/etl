@@ -248,3 +248,18 @@ steps:
   #
   data://grapher/eurostat/2024-11-05/gas_and_electricity_price_components:
     - data://garden/eurostat/2024-11-05/gas_and_electricity_prices
+  #
+  # Ember - European wholesale electricity prices
+  #
+  data://meadow/ember/2024-11-20/european_wholesale_electricity_prices:
+    - snapshot://ember/2024-11-20/european_wholesale_electricity_prices.csv
+  #
+  # Ember - European wholesale electricity prices
+  #
+  data://garden/ember/2024-11-20/european_wholesale_electricity_prices:
+    - data://meadow/ember/2024-11-20/european_wholesale_electricity_prices
+  #
+  # Ember - European wholesale electricity prices
+  #
+  data://grapher/ember/2024-11-20/european_wholesale_electricity_prices:
+    - data://garden/ember/2024-11-20/european_wholesale_electricity_prices
