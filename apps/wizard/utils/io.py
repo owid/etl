@@ -75,7 +75,8 @@ def get_changed_grapher_steps(files_changed: Dict[str, Dict[str, str]]) -> List[
 
         # Identify grapher data steps, and ignore the rest.
         if file_path.startswith(STEP_DIR.relative_to(BASE_DIR).as_posix()) and file_path.endswith(".py"):
-            if Path(file_path).with_suffix("").as_posix().split("/")[-4] == "grapher":
+            parts = Path(file_path).with_suffix("").as_posix().split("/")
+            if len(parts) == 4 and parts[-4] == "grapher":
                 grapher_steps.append(file_path)
         else:
             continue
