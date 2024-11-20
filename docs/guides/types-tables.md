@@ -18,7 +18,14 @@ The preferred way to load a table from a dataset is
     tb = ds_meadow["my_table"]
     ```
 
-This automatically converts all columns to the recommended types. (This method also includes extra parameters for memory optimization.)
+This process automatically converts all columns to the recommended types:
+
+* `float64` or `float32` -> `Float64`
+* `int32`, `uint32`, or `int64` -> `Int64`
+* `category` -> `string[pyarrow]`
+
+To disable this conversion, use `.read("my_table", safe_types=False)`. This is especially useful when working with large tables where conversion to string type would significantly increase memory usage.
+
 
 ### Repacking datasets
 We use a "repacking process" to reduce the size of the dataset before saving it to disk (`dataset.save()`). This process also converts the data to the recommended types, even if you have converted the data to old NumOy types (e.g. `.astype(float)`).
@@ -40,6 +47,12 @@ To convert a column to a string type use
     ```
 
 However, if you don’t use the new method, repack will handle this conversion when saving.
+
+
+!!! info "Difference between `string` and `string[pyarrow]`"
+
+    Both types are very similar, but `string[pyarrow]` is more efficient and will be the default in Pandas 3.0. In practice, you won't notice a difference.
+
 
 ### `NaN` values
 Avoid using `np.nan`! Always use `pd.NA`.
