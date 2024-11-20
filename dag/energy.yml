@@ -263,3 +263,18 @@ steps:
   #
   data://grapher/ember/2024-11-20/european_wholesale_electricity_prices:
     - data://garden/ember/2024-11-20/european_wholesale_electricity_prices
+  #
+  # IEA - Fossil fuel subsidies
+  #
+  data://meadow/iea/2024-11-20/fossil_fuel_subsidies:
+    - snapshot://iea/2024-11-20/fossil_fuel_subsidies.xlsx
+  #
+  # IEA - Fossil fuel subsidies
+  #
+  data://garden/iea/2024-11-20/fossil_fuel_subsidies:
+    - data://meadow/iea/2024-11-20/fossil_fuel_subsidies
+  #
+  # IEA - Fossil fuel subsidies
+  #
+  data://grapher/iea/2024-11-20/fossil_fuel_subsidies:
+    - data://garden/iea/2024-11-20/fossil_fuel_subsidies
