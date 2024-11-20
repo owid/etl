@@ -31,18 +31,17 @@ def run(dest_dir: str) -> None:
     # Transpose table.
     tb = tb.pivot(index=["country", "year"], columns="product", values="subsidy", join_column_levels_with="_")
 
+    # Rename conveniently.
+    tb = tb.rename(
+        columns={column: f"{column}_subsidy" for column in tb.drop(columns=["country", "year"]).columns}, errors="raise"
+    )
+
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Include additional indicators from the other tables.
-    # TODO: Rename columns appropriately.
-    # TODO: Add metadata to new columns.
     tb = tb.merge(tb_indicators, on=["country", "year"], how="outer")
-    tb = tb.merge(
-        tb_transport.rename(columns={"subsidy": "transport_oil_subsidy"}, errors="raise"),
-        on=["country", "year"],
-        how="outer",
-    )
+    tb = tb.merge(tb_transport, on=["country", "year"], how="outer")
 
     # Improve format.
     tb = tb.format()

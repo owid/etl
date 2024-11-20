@@ -18,13 +18,28 @@ dataset:
 tables:
   fossil_fuel_subsidies:
     variables:
-      coal:
+      coal_subsidy:
         title: Subsidies to coal
-      electricity:
+      electricity_subsidy:
         title: Subsidies to electricity
-      gas:
+      gas_subsidy:
         title: Subsidies to gas
-      oil:
+      oil_subsidy:
         title: Subsidies to oil
-      total:
+      total_subsidy:
         title: Total subsidies
+      transport_oil_subsidy:
+        title: Subsidies to oil in transport
+      subsidization_rate:
+        title: Subsidization rate
+        unit: "%"
+        short_unit: "%"
+      subsidy_per_capita:
+        title: Subsidy per capita
+        unit: constant {dollar_year} US$ per person
+        short_unit: "$/person"
+      subsidy_as_share_of_gdp:
+        title: Subsidy as share of GDP
+        unit: "%"
+        short_unit: "%"
+

@@ -51,16 +51,16 @@ def prepare_indicators_by_country_table(tb_indicators: Table) -> Table:
     # The year of the data is given in the very first cell. The actual table starts a few rows below.
     error = "Indicators by country sheet has changed."
     assert tb_indicators.columns[0] == f"Indicators for year {DOLLAR_YEAR}", error
-    columns = [
-        "Country",
-        "Average subsidisation rate (%)",
-        "Subsidy per capita ($/person)",
-        "Total subsidy as share of GDP (%)",
-    ]
-    assert tb_indicators.loc[2].tolist() == columns, error
+    columns = {
+        "Country": "country",
+        "Average subsidisation rate (%)": "subsidization_rate",
+        "Subsidy per capita ($/person)": "subsidy_per_capita",
+        "Total subsidy as share of GDP (%)": "subsidy_as_share_of_gdp",
+    }
+    assert tb_indicators.loc[2].tolist() == list(columns), error
     tb_indicators = tb_indicators.loc[3:].reset_index(drop=True)
     tb_indicators = tb_indicators.rename(
-        columns={old_column: new_column for old_column, new_column in zip(tb_indicators.columns, columns)},
+        columns={old_column: new_column for old_column, new_column in zip(tb_indicators.columns, columns.values())},
         errors="raise",
     )
     # Add a year column.
@@ -82,7 +82,7 @@ def prepare_transport_oil_table(tb_transport: Table) -> Table:
         errors="raise",
     )
     # Transpose table.
-    tb_transport = tb_transport.melt(id_vars=["country"], var_name="year", value_name="subsidy")
+    tb_transport = tb_transport.melt(id_vars=["country"], var_name="year", value_name="transport_oil_subsidy")
     # Improve format.
     tb_transport = tb_transport.format(short_name="fossil_fuel_subsidies_transport_oil")
 
