@@ -233,7 +233,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Custom column: people who think their life will get better in the next 5 years
-    tb["wb_improvement"] = (tb["wb_fiveyrs"] < tb["wb_today"]).astype(float) + 1  # 1 if yes, 2 if no
+    tb["wb_improvement"] = tb.apply(get_ineq_nan, axis=1)  # 1 if yes, 2 if no
 
     # Calculate average scores/ shares of answers for all variables
     tb_scored_10 = average_scored(tb, cols=SCORED_10_COLS)
@@ -297,16 +297,15 @@ def share_binary(tb, groups=["country"], cols=BINARY_COLS):
 
     # group by variable (e.g. country) and calculate share of yes/no/na answers
     # tb_na = get_na_share(tb, groups, cols)
-
+    col_ans = {1: "yes", 2: "no"}
+    res_tbs = []
     for col in cols:
-        tb_binary[col] = tb_binary[col].groupby(groups, drop_na=False)[col].value_counts(normalize=True).unstack()
+        res = tb_binary.groupby(groups, dropna=False)[col].value_counts(normalize=True, dropna=False).unstack()
+        col_names = [col_ans[x] if x in col_ans.keys() else "na" for x in res.columns]
+        res.columns = [f"{col}_{x}_share" for x in col_names]
+        res_tbs.append(res.reset_index())
 
-        tb_binary[col + "_no_share"] = tb_binary[col] - 1
-        tb_binary[col + "_yes_share"] = 1 - tb_binary[col + "_no_share"]
-
-    tb_binary = tb_binary.drop(columns=cols).reset_index()
-    tb_binary = pr.merge(tb_binary, tb_na, on=groups)
-    return tb_binary
+    return pr.multi_merge(res_tbs, on=groups)
 
 
 def share_categorical(tb, groups: list = ["country"], cols: list = CAT_COLS):
@@ -315,8 +314,8 @@ def share_categorical(tb, groups: list = ["country"], cols: list = CAT_COLS):
     res_tbs = []  # [tb_na]
     for col in cols:
         res = tb_cat.groupby(groups, dropna=False)[col].value_counts(normalize=True, dropna=False).unstack()
-        col_names = [int(x) if x == x else "na" for x in res.columns]
-        res.columns = [f"{col}_ans_{x}_share" for x in col_names]
+        col_names = [f"ans_{int(x)}" if x == x else "na" for x in res.columns]
+        res.columns = [f"{col}_{x}_share" for x in col_names]
         res = res.fillna(0)  # if one category does not appear for country, fill with 0
         res = check_for_missing_answer(res, col)
         res_tbs.append(res.reset_index())
@@ -354,3 +353,11 @@ def get_na_share(tb, groups: list, cols: list):
     tb_na.columns = [f"{col}_na_share" if col not in groups else col for col in tb_na.columns]
     tb_na = tb_na.drop(columns=groups)
     return tb_na.reset_index()
+
+
+def get_ineq_nan(tb_row):
+    """Return truth value of tb["wb_fiveyrs"] < tb["wb_today"] if both are not nan, else return nan"""
+    if tb_row["wb_fiveyrs"] == tb_row["wb_fiveyrs"] and tb_row["wb_today"] == tb_row["wb_today"]:
+        return float(tb_row["wb_fiveyrs"] < tb_row["wb_today"]) + 1  # 1 if yes, 2 if no
+    else:
+        return np.nan
