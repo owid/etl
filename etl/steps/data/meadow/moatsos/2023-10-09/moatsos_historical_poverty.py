@@ -18,25 +18,25 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot and load data
     # OECD (Cost of Basic Needs and $1.90 poverty line (2011 PPP))
     snap = paths.load_snapshot("moatsos_historical_poverty_oecd.csv")
-    tb_oecd = snap.read()
+    tb_oecd = snap.read(safe_types=False)
 
     # $5, $10, $30 poverty lines (2011 PPP)
     snap = paths.load_snapshot("moatsos_historical_poverty_5.csv")
-    tb_5 = snap.read()
+    tb_5 = snap.read(safe_types=False)
 
     snap = paths.load_snapshot("moatsos_historical_poverty_10.csv")
-    tb_10 = snap.read()
+    tb_10 = snap.read(safe_types=False)
 
     snap = paths.load_snapshot("moatsos_historical_poverty_30.csv")
-    tb_30 = snap.read()
+    tb_30 = snap.read(safe_types=False)
 
     # CBN share for countries
     snap = paths.load_snapshot("moatsos_historical_poverty_oecd_countries_share.xlsx")
-    tb_cbn_share_countries = snap.read(sheet_name="Sheet1", header=2)
+    tb_cbn_share_countries = snap.read(safe_types=False, sheet_name="Sheet1", header=2)
 
     # CBN number for regions
     snap = paths.load_snapshot("moatsos_historical_poverty_oecd_regions_number.xlsx")
-    tb_cbn_number = snap.read(sheet_name="g9-4", header=17)
+    tb_cbn_number = snap.read(safe_types=False, sheet_name="g9-4", header=17)
 
     # Merge and format tables
     tables = [tb_oecd, tb_5, tb_10, tb_30]

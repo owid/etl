@@ -11,6 +11,7 @@ from structlog import get_logger
 
 from apps.wizard.utils import get_staging_creation_time
 from etl import grapher_model as gm
+from etl.config import OWID_ENV
 from etl.db import read_sql
 
 log = get_logger()
@@ -164,7 +165,8 @@ class ChartDiff:
                 return False
 
             # Check if chart has been edited in production
-            chart_edited_in_prod = self.target_chart.updatedAt > get_staging_creation_time()
+            with Session(OWID_ENV.engine) as session:
+                chart_edited_in_prod = self.target_chart.updatedAt > get_staging_creation_time(session)
 
             # If edited, check if conflict was resolved
             if chart_edited_in_prod:

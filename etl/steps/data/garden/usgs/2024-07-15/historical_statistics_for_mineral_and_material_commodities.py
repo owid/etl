@@ -330,7 +330,7 @@ def prepare_us_production(tb: Table, tb_metadata: Table) -> Table:
         mapping={"W": None},
         warn_on_missing_mappings=False,
         warn_on_unused_mappings=True,
-    ).astype({"production": float})
+    ).astype({"production": "float64[pyarrow]"})
     # Add notes to the table, using the extracted metadata.
     for column in ["production"]:
         mask = tb_metadata[column].notnull()
@@ -490,10 +490,8 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("historical_statistics_for_mineral_and_material_commodities")
 
     # Read tables of data and extracted metadata from meadow dataset.
-    tb = ds_meadow.read_table("historical_statistics_for_mineral_and_material_commodities")
-    tb_metadata = ds_meadow.read_table("historical_statistics_for_mineral_and_material_commodities_metadata").astype(
-        "string"
-    )
+    tb = ds_meadow.read("historical_statistics_for_mineral_and_material_commodities")
+    tb_metadata = ds_meadow.read("historical_statistics_for_mineral_and_material_commodities_metadata").astype("string")
 
     #
     # Process data.

@@ -27,12 +27,12 @@ def run(dest_dir: str) -> None:
     ds_wdi = paths.load_dataset("wdi")
     ds_idmc = paths.load_dataset("internal_displacement")
 
-    tb_child_mig = ds_unicef.read_table("child_migration")
-    tb_refugee_data = ds_unhcr.read_table("refugee_data")
-    tb_migrant_stock = ds_undesa.read_table("migrant_stock")
-    tb_un_wpp_full = ds_un_wpp.read_table("migration")
-    tb_wdi = ds_wdi.read_table("wdi")
-    tb_idmc = ds_idmc.read_table("internal_displacement")
+    tb_child_mig = ds_unicef.read("child_migration")
+    tb_refugee_data = ds_unhcr.read("refugee_data")
+    tb_migrant_stock = ds_undesa.read("migrant_stock")
+    tb_un_wpp_full = ds_un_wpp.read("migration")
+    tb_wdi = ds_wdi.read("wdi")
+    tb_idmc = ds_idmc.read("internal_displacement")
 
     tbs_and_ds = [
         (tb_child_mig, ds_unicef),

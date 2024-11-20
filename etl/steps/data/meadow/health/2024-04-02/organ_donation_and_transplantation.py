@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot and read its data.
     snap = paths.load_snapshot("organ_donation_and_transplantation.xlsx")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # Population column has a bad formatting, so, for now, store it as a string.
     tb = tb.astype({"POPULATION": str})

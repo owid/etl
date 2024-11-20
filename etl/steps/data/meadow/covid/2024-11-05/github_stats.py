@@ -12,26 +12,28 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     # Issues
-    tb_issues = paths.read_snap_table("github_stats_issues.csv").sort_values("date_created")
-    tb_issues_com = paths.read_snap_table("github_stats_issues_comments.csv").sort_values("date_created")
-    tb_issues_usr = paths.read_snap_table("github_stats_issues_users.csv").rename(
+    tb_issues = paths.read_snap_table("github_stats_issues.csv", safe_types=False).sort_values("date_created")
+    tb_issues_com = paths.read_snap_table("github_stats_issues_comments.csv", safe_types=False).sort_values(
+        "date_created"
+    )
+    tb_issues_usr = paths.read_snap_table("github_stats_issues_users.csv", safe_types=False).rename(
         columns={
             "index": "user_id",
         }
     )
 
     # PRs
-    tb_pr = paths.read_snap_table("github_stats_pr.csv").sort_values("date_created")
-    tb_pr_com = paths.read_snap_table("github_stats_pr_comments.csv").sort_values("date_created")
-    tb_pr_usr = paths.read_snap_table("github_stats_pr_users.csv").rename(
+    tb_pr = paths.read_snap_table("github_stats_pr.csv", safe_types=False).sort_values("date_created")
+    tb_pr_com = paths.read_snap_table("github_stats_pr_comments.csv", safe_types=False).sort_values("date_created")
+    tb_pr_usr = paths.read_snap_table("github_stats_pr_users.csv", safe_types=False).rename(
         columns={
             "index": "user_id",
         }
     )
 
     # Commits
-    tb_commits = paths.read_snap_table("github_stats_commits.csv").sort_values("date")
-    tb_commits_usr = paths.read_snap_table("github_stats_commits_users.csv").rename(
+    tb_commits = paths.read_snap_table("github_stats_commits.csv", safe_types=False).sort_values("date")
+    tb_commits_usr = paths.read_snap_table("github_stats_commits_users.csv", safe_types=False).rename(
         columns={
             "index": "user_id",
         }

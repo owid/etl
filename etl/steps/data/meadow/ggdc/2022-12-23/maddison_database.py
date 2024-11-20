@@ -14,9 +14,9 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("maddison_database.xlsx")
 
     # Load data from snapshot.
-    tb_pop = snap.read(sheet_name="Population", skiprows=2)
-    tb_gdp = snap.read(sheet_name="GDP", skiprows=2)
-    tb_gdppc = snap.read(sheet_name="PerCapita GDP", skiprows=2)
+    tb_pop = snap.read(safe_types=False, sheet_name="Population", skiprows=2)
+    tb_gdp = snap.read(safe_types=False, sheet_name="GDP", skiprows=2)
+    tb_gdppc = snap.read(safe_types=False, sheet_name="PerCapita GDP", skiprows=2)
 
     #
     # Process data.

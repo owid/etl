@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     ds_population = paths.load_dataset("population")
 
     # Load data dictionary from snapshot.
-    dd = snap.read()
+    dd = snap.read(safe_types=False)
     # Read table from meadow dataset.
     tb = ds_meadow["burden_estimates"].reset_index()
     tb = tb.drop(columns=["iso2", "iso3", "iso_numeric", "g_whoregion"])
