@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("pathogen_bloodstream")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("pathogen_bloodstream")
+    tb = ds_garden.read("pathogen_bloodstream", reset_index=False)
 
     #
     # Process data.
