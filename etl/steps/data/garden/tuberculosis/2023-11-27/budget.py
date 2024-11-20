@@ -37,7 +37,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("data_dictionary.csv")
     # Read table from meadow dataset.
     tb = ds_meadow["budget"].reset_index()
-    dd = snap.read()
+    dd = snap.read(safe_types=False)
     # Process data.
     #
     tb = add_variable_description_from_producer(tb, dd)

@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("gbd_risk.feather")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     # standardize column names
     tb = clean_data(tb)
     # fix percent values - they aren't consistently presented as either 0-1, or 0-100.

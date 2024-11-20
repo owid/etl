@@ -1,6 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
@@ -82,7 +83,7 @@ def find_max_label_and_concat(tb, column, label):
     rows_to_keep = []
 
     for _, row in tb.iterrows():
-        if row[column] > max_value:
+        if not pd.isna(row[column]) and row[column] > max_value:
             max_value = row[column]
             rows_to_keep.append(row)
 

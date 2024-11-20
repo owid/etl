@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("modal_age_death.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(header=1)
+    tb = snap.read(safe_types=False, header=1)
 
     #
     # Process data.

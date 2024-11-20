@@ -64,7 +64,7 @@ def load_data(snap: Snapshot) -> Table:
     tbs = []
     for year in range(2006, YEAR_MAX + 1, 2):
         # Read
-        tb_ = snap.read(sheet_name=f"BTI {year}")
+        tb_ = snap.read(safe_types=False, sheet_name=f"BTI {year}")
         # Column check
         columns_missing = set(COLUMNS) - set(tb_.columns)
         if columns_missing:

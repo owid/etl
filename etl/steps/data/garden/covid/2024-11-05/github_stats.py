@@ -47,24 +47,24 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("github_stats")
 
     # Combine PR & issues tables.
-    tb_issues = ds_meadow.read_table("github_stats_issues")
-    # tb_pr = ds_meadow.read_table("github_stats_pr")
+    tb_issues = ds_meadow.read("github_stats_issues")
+    # tb_pr = ds_meadow.read("github_stats_pr")
     tb_issues = make_table_issues(tb_issues)
 
     # Get list of all comments (including issue/pr description)
-    tb_comments = ds_meadow.read_table("github_stats_issues_comments")
-    tb_comments_pr = ds_meadow.read_table("github_stats_pr_comments")
+    tb_comments = ds_meadow.read("github_stats_issues_comments")
+    tb_comments_pr = ds_meadow.read("github_stats_pr_comments")
     tb_comments = make_table_comments(tb_comments, tb_comments_pr)
 
     # Get the list of all users
-    tb_users = ds_meadow.read_table("github_stats_issues_users")
-    tb_users_pr = ds_meadow.read_table("github_stats_pr_users")
+    tb_users = ds_meadow.read("github_stats_issues_users")
+    tb_users_pr = ds_meadow.read("github_stats_pr_users")
     tb_users = pr.concat([tb_users, tb_users_pr], ignore_index=True)
     tb_users = tb_users.drop_duplicates(subset=["user_id"])
     assert tb_users.user_login.notna().all(), "Some missing usernames!"
 
     # # Commits
-    # tb_commits = ds_meadow.read_table("github_stats_commits")
+    # tb_commits = ds_meadow.read("github_stats_commits")
 
     #
     # Process data.

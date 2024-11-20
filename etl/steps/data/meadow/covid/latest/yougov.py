@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve aux table
     snap = paths.load_snapshot("yougov_extra_mapping.csv")
-    tb_mapping = snap.read()
+    tb_mapping = snap.read(safe_types=False)
     tb_mapping = process_mapping_table(tb_mapping)
 
     # Retrieve country snapshots.
@@ -45,7 +45,7 @@ def run(dest_dir: str) -> None:
 
     # Retrieve composite table
     snap_composite = paths.load_snapshot("yougov_composite.csv")
-    tb_composite = snap_composite.read()
+    tb_composite = snap_composite.read(safe_types=False)
 
     #
     # Process data.
@@ -58,6 +58,7 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(subset=["date"])
 
     # Format
+    tb = tb.sort_values(["country", "date"]).reset_index(drop=True)
     tb["identifier"] = tb.index
     tb = tb.format(["identifier"])
     tb_mapping = tb_mapping.format(["code_name"])

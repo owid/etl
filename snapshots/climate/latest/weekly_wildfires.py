@@ -62,7 +62,9 @@ def main(upload: bool) -> None:
         base_url = (
             "https://api2.effis.emergency.copernicus.eu/statistics/v2/gwis/weekly?country={country_code}&year={year}"
         )
+
         url = base_url.format(country_code=country, year=YEAR)
+
         # timeout after 30s, they have occasional outages
         response = requests.get(url, timeout=30)
         if response.status_code == 200:
@@ -72,7 +74,6 @@ def main(upload: bool) -> None:
             banfweekly = data["banfweekly"]
             # Convert the weekly data into a pandas DataFrame.
             df = pd.DataFrame(banfweekly)
-
             # Select and rename relevant columns, and calculate the 'month_day' column.
             df = df[["mddate", "events", "area_ha"]]
             df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["mddate"]]

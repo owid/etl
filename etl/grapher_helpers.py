@@ -35,7 +35,9 @@ jinja_env = Environment(
 )
 
 # this might work too pd.api.types.is_integer_dtype(col)
-INT_TYPES = tuple({f"{n}{b}" for n in ("int", "Int", "uint", "UInt") for b in ("8", "16", "32", "64")})
+INT_TYPES = tuple(
+    {f"{n}{b}{p}" for n in ("int", "Int", "uint", "UInt") for b in ("8", "16", "32", "64") for p in ("", "[pyarrow]")}
+)
 
 
 def as_table(df: pd.DataFrame, table: catalog.Table) -> catalog.Table:

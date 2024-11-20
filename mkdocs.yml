@@ -215,12 +215,14 @@ nav:
           - Updating data: "guides/data-work/update-data.md"
           - Update charts: "guides/data-work/update-charts.md"
           - Export data: "guides/data-work/export-data.md"
-      - Main tools:
+      - Admin:
           - Wizard: "guides/wizard.md"
           - CLI: "guides/etl-cli.md"
+      - Tools:
           - Harmonize country names: "guides/harmonize-countries.md"
           - Backport from database: "guides/backport.md"
           - Regular updates: "guides/auto-regular-updates.md"
+          - Pull requests: "guides/pull-requests.md"
       - Servers & settings:
           - Environments: "guides/environment.md"
           - Staging servers: "guides/staging-servers.md"

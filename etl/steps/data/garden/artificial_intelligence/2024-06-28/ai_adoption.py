@@ -11,7 +11,7 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     #
-    # Load inputs.
+    # Load inputs
     #
     # Retrieve snapshots for 2024 and 2023 data.
     snap_2024 = paths.load_snapshot("ai_adoption.csv")
@@ -22,14 +22,14 @@ def run(dest_dir: str) -> None:
     tb_2023 = snap_2023.read()
 
     #
-    # Process data.
+    # Process data
     #
     tb_2023["% of Respondents"] *= 100
     tb_2023 = tb_2023.rename(columns={"Geographic Area": "country", "% of Respondents": "pct_of_respondents"})
     # Select the rows where 'year' is 2021 as 2022 is already in 2024 AI index data
     tb_2021 = tb_2023[tb_2023["Year"] == 2021].copy()
 
-    tb_2024["% of respondents"] = tb_2024["% of respondents"].str.replace("%", "")
+    tb_2024["% of respondents"] = tb_2024["% of respondents"].str.replace("%", "").astype(float)
     tb_2024 = tb_2024.rename(columns={"Geographic Area": "country", "% of respondents": "pct_of_respondents"})
 
     tb_2021.rename(columns={"Geographic Area": "country"}, inplace=True)

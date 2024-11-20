@@ -36,8 +36,8 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("maddison_project_database.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="Full data")
-    tb_regions = snap.read(sheet_name="Regional data", skiprows=1)
+    tb = snap.read(safe_types=False, sheet_name="Full data")
+    tb_regions = snap.read(safe_types=False, sheet_name="Regional data", skiprows=1)
 
     #
     # Process data.

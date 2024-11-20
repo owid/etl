@@ -29,8 +29,8 @@ def run(dest_dir: str) -> None:
     ds_income_groups = paths.load_dataset("income_groups")
 
     # Read table datasets.
-    tb_this_year = ds_meadow["happiness"].reset_index()
-    tb_prev_years = ds_prev_years["happiness"]
+    tb_this_year = ds_meadow.read("happiness")
+    tb_prev_years = ds_prev_years.read("happiness")
 
     # combine meadow data with previous years
     tb_this_year["cantril_ladder_score"] = tb_this_year["ladder_score"]

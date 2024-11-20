@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("gco_infections.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.
@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     # Drop unnecessary columns.
     tb = tb.drop(columns=["id", "code", "ncases_sites", "ncases_all", "ir_att", "ir", "asr"])
 
-    tb["sex"] = tb["sex"].replace({0: "both", 1: "males", 2: "females"})
+    tb["sex"] = tb["sex"].astype(str).replace({"0": "both", "1": "males", "2": "females"})
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year", "sex", "agent", "cancer"])
