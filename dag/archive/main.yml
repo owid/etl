@@ -276,3 +276,4 @@ include:
   - dag/archive/fasttrack.yml
   - dag/archive/climate.yml
   - dag/archive/environment.yml
+  - dag/archive/poverty_inequality.yml
