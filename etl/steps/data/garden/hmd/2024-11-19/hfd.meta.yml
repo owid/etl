@@ -4,14 +4,104 @@ definitions:
     presentation:
       topic_tags:
         - Fertility Rate
+    display:
+      numDecimalPlaces: 2
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  title: Human Fertility Database
 
 tables:
   period:
-    variables: {}
-  cohort:
-    variables: {}
+    variables:
+      tfr:
+        title: "Period total fertility rates"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      tfr40:
+        title: "Period total fertility rates at 40"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      adjtfr:
+        title: "Tempo-adjusted total fertility rates"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      patfr:
+        title: "Parity- and age-adjusted total fertility rate"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+
+      # Mean ages at birth, and at 40
+      mab:
+        title: "Period mean ages at birth"
+        description_short: ""
+        unit: ""
+      mab40:
+        title: "Period mean ages at birth at 40"
+        description_short: ""
+        unit: ""
+      sdmab:
+        title: "Standard deviation in period mean ages at birth"
+        description_short: ""
+        unit: ""
+      sdmab40:
+        title: "Standard deviation in period mean ages at 40"
+        description_short: ""
+        unit: ""
+      tmab:
+        title: "Period table mean ages at birth"
+        description_short: ""
+        unit: ""
+
+      # Births and birth rate
+      cbr:
+        title: "Crude birth rate"
+        description_short: ""
+        unit: ""
+      b:
+        title: "Total live births"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+
+  # cohort:
+  #   variables:
+  #     cmab:
+  #       title: ""
+  #       description_short: ""
+  #       unit: ""
+  #     cmab40:
+  #       title: ""
+  #       description_short: ""
+  #       unit: ""
+  #     sdcmab:
+  #       title: ""
+  #       description_short: ""
+  #       unit: ""
+  #     sdcmab40:
+  #       title: ""
+  #       description_short: ""
+  #       unit: ""
+  #     ccf:
+  #       title: ""
+  #       description_short: ""
+  #       unit: ""
+  #       display:
+  #         numDecimalPlaces: 3
+  #     ccf40:
+  #       title: ""
+  #       description_short: ""
+  #       unit: ""
+  #       display:
+  #         numDecimalPlaces: 3
