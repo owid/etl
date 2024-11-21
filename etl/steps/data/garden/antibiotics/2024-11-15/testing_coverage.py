@@ -50,6 +50,8 @@ def run(dest_dir: str) -> None:
     tb = add_number_of_countries_in_each_region(tb)
     # Calculate the share of countries in each WHO region that are reporting data.
     tb = calculate_share_of_countries(tb)
+    # Calculate the number of infections not tested for susceptibility to make stacked bar chart.
+    tb = calculate_number_infections_not_tested_for_susceptibility(tb)
     tb = tb.format(["country", "year"])
 
     #
@@ -68,7 +70,7 @@ def format_specimen(tb: Table) -> Table:
     """
     Format the syndrome column.
     """
-    specimen_dict = {"BLOOD": "bloodstream", "STOOL": "stool", "URINE": "urinary tract", "UROGENITAL": "gonorrhea"}
+    specimen_dict = {"BLOOD": "bloodstream", "STOOL": "stool", "URINE": "urinary_tract", "UROGENITAL": "gonorrhea"}
     tb["specimen"] = tb["specimen"].astype(str)
     tb["specimen"] = tb["specimen"].replace(specimen_dict)
     assert tb["specimen"].isin(specimen_dict.values()).all()
@@ -96,4 +98,16 @@ def calculate_share_of_countries(tb: Table) -> Table:
         tb[new_column] = (tb[column] / tb["number_of_countries_in_region"]) * 100
 
     tb = tb.drop(columns="number_of_countries_in_region")
+    return tb
+
+
+def calculate_number_infections_not_tested_for_susceptibility(tb: Table) -> Table:
+    """
+    Calculate the number of infections not tested for susceptibility to make stacked bar chart.
+    """
+    syndromes = ["bloodstream", "stool", "urinary_tract", "gonorrhea"]
+
+    for syndrome in syndromes:
+        tb[f"total_bcis_without_ast_{syndrome}"] = tb[f"total_bcis_{syndrome}"] - tb[f"total_bcis_with_ast_{syndrome}"]
+
     return tb
