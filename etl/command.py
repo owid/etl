@@ -400,7 +400,13 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
 
         with strictness_level(strict):
             # Execute the step and measure the time taken
-            time_taken = timed_run(lambda: step.run())
+            try:
+                time_taken = timed_run(lambda: step.run())
+            except Exception:
+                # log which step failed and re-raise the exception, otherwise it gets lost
+                # in logs and we don't know which step failed
+                log.error("step_failed", step=str(step))
+                raise
             execution_times[str(step)] = time_taken
 
             click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
