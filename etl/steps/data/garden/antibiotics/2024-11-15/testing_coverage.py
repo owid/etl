@@ -35,6 +35,10 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = format_specimen(tb)
     tb = tb.drop(columns=["min", "q1", "median", "q3", "max"])
+    # A table where the specimen column is the country, to make stacked bar chart.
+    tb_specimen = calculate_number_infections_not_tested_for_susceptibility(tb)
+
+    # Pivot the table to have one row per country and year.
     tb = tb.pivot(
         index=["country", "year"],
         columns="specimen",
@@ -50,8 +54,6 @@ def run(dest_dir: str) -> None:
     tb = add_number_of_countries_in_each_region(tb)
     # Calculate the share of countries in each WHO region that are reporting data.
     tb = calculate_share_of_countries(tb)
-    # Calculate the number of infections not tested for susceptibility to make stacked bar chart.
-    tb = calculate_number_infections_not_tested_for_susceptibility(tb)
     tb = tb.format(["country", "year"])
 
     #
@@ -59,7 +61,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb, tb_specimen], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -107,9 +109,17 @@ def calculate_number_infections_not_tested_for_susceptibility(tb: Table) -> Tabl
     """
     Calculate the number of infections not tested for susceptibility to make stacked bar chart.
     """
-    syndromes = ["bloodstream", "stool", "urinary_tract", "gonorrhea"]
-
-    for syndrome in syndromes:
-        tb[f"total_bcis_without_ast_{syndrome}"] = tb[f"total_bcis_{syndrome}"] - tb[f"total_bcis_with_ast_{syndrome}"]
+    tb = tb[tb["country"] == "World"]
+    tb["infections_not_tested_for_susceptibility"] = tb["total_bcis"] - tb["total_bcis_with_ast"]
+    tb = tb.drop(
+        columns=[
+            "country",
+            "ctas_with_reported_bcis",
+            "ctas_with_reported_bcis_with_ast__gt__80_bcis",
+            "total_bcis",
+        ]
+    )
+    tb = tb.rename(columns={"specimen": "country"})
+    tb = tb.format(["country", "year"], short_name="specimen")
 
     return tb
