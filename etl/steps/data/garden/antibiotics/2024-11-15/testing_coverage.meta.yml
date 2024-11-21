@@ -13,7 +13,7 @@ definitions:
   description_key_ast_stool: &description_key_ast_stool
       - Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics.
       - Shigella spp. infections are tested for their susceptibility to third-generation cephalosporin antibiotics.
-  description_key_ast_urine: &description_key_ast_urine
+  description_key_ast_urinary_tract: &description_key_ast_urinary_tract
       - Escheria coli infections are tested for their susceptibility to fluoroquinolone antibiotics, sulfonamides and trimethoprim antibiotics and third-generation cephalosporin antibiotics.
       - Klebsiella pneumoniae infections are tested for their susceptibility to fluoroquinolone antibiotics, sulfonamides and trimethoprim antibiotics and third-generation cephalosporin antibiotics.
   description_key_ast_gonorrhea: &description_key_ast_gonorrhea
@@ -42,7 +42,7 @@ tables:
         title: Number of countries reporting confirmed gastrointestinal infections
         description_short: Number of countries reporting bacteriologically confirmed gastrointestinal infections to WHO.
         unit: countries
-      ctas_with_reported_bcis_urine:
+      ctas_with_reported_bcis_urinary_tract:
         title: Number of countries reporting confirmed urinary tract infections
         description_short: Number of countries reporting bacteriologically confirmed urinary tract infections to WHO.
         unit: countries
@@ -61,10 +61,10 @@ tables:
         description_short: Number of countries testing >80% bacteriologically confirmed gastrointestinal infections for antibiotic susceptibility.
         description_key: *description_key_ast_stool
         unit: countries
-      ctas_with_reported_bcis_with_ast__gt__80_bcis_urine:
+      ctas_with_reported_bcis_with_ast__gt__80_bcis_urinary_tract:
         title: Number of countries testing >80% of confirmed urinary tract infections for antibiotic susceptibility
         description_short: Number of countries testing >80% bacteriologically confirmed urinary tract infections for antibiotic susceptibility.
-        description_key: *description_key_ast_urine
+        description_key: *description_key_ast_urinary_tract
         unit: countries
       total_bcis_bloodstream:
         title: Total confirmed bloodstream infections
@@ -78,7 +78,7 @@ tables:
         title: Total confirmed gastrointestinal infections
         description_short: Total bacteriologically confirmed gastrointestinal infections tested for antibiotic susceptibility.
         unit: infections
-      total_bcis_urine:
+      total_bcis_urinary_tract:
         title: Total confirmed urinary tract infections
         description_short: Total bacteriologically confirmed urinary tract infections tested for antibiotic susceptibility.
         unit: infections
@@ -97,10 +97,10 @@ tables:
         description_short: Total bacteriologically confirmed gastrointestinal infections tested for antibiotic susceptibility.
         description_key: *description_key_ast_stool
         unit: infections
-      total_bcis_with_ast_urine:
+      total_bcis_with_ast_urinary_tract:
         title: Total confirmed urinary tract infections tested for antibiotic susceptibility
         description_short: Total bacteriologically confirmed urinary tract infections tested for antibiotic susceptibility.
-        description_key: *description_key_ast_urine
+        description_key: *description_key_ast_urinary_tract
         unit: infections
       share_ctas_with_reported_bcis_bloodstream:
         title: Share of countries reporting confirmed bloodstream infections
@@ -117,7 +117,7 @@ tables:
         description_short: Share of countries reporting bacteriologically confirmed gastrointestinal infections to WHO.
         unit: "%"
         short_unit: "%"
-      share_ctas_with_reported_bcis_urine:
+      share_ctas_with_reported_bcis_urinary_tract:
         title: Share of countries reporting confirmed urinary tract infections
         description_short: Share of countries reporting bacteriologically confirmed urinary tract infections to WHO.
         unit: "%"
@@ -140,9 +140,9 @@ tables:
         description_key: *description_key_ast_stool
         unit: "%"
         short_unit: "%"
-      share_ctas_with_reported_bcis_with_ast__gt__80_bcis_urine:
+      share_ctas_with_reported_bcis_with_ast__gt__80_bcis_urinary_tract:
         title: Share of countries testing >80% of confirmed urinary tract infections for antibiotic susceptibility
         description_short: Share of countries testing >80% bacteriologically confirmed urinary tract infections for antibiotic susceptibility.
-        description_key: *description_key_ast_urine
+        description_key: *description_key_ast_urinary_tract
         unit: "%"
         short_unit: "%"
