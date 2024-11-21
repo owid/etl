@@ -28,6 +28,7 @@ def run(dest_dir: str) -> None:
         ds_income_groups=ds_income_groups,
         index_columns=["country_destination", "country_origin", "year"],
         country_col="country_destination",
+        frac_allowed_nans_per_year=0.1,
     )
 
     tb_reg = geo.add_regions_to_table(
@@ -36,13 +37,13 @@ def run(dest_dir: str) -> None:
         ds_income_groups=ds_income_groups,
         index_columns=["country_destination", "country_origin", "year"],
         country_col="country_origin",
+        frac_allowed_nans_per_year=0.1,
     )
 
     # Filter only on regions
     tb_reg = tb_reg[tb_reg["country_destination"].isin(REGIONS) & tb_reg["country_origin"].isin(REGIONS)]
 
-    tb_reg = tb_reg.format(["country_destination", "country_origin", "year"])
-    tb_reg.m.short_name = "migration_between_regions"
+    tb_reg = tb_reg.format(["country_destination", "country_origin", "year"], short_name="migration_between_regions")
 
     #
     # Save outputs.
