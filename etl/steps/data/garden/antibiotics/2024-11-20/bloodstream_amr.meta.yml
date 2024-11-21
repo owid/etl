@@ -9,20 +9,20 @@ definitions:
       name: << pathogen >>
 
   pathogen_type:
-    <% if pathogen_type == "Fungi" %>
+    <%- if pathogen_type == "Fungi" -%>
     fungus
-    <% elif pathogen_type == "Viruses" %>
+    <%- elif pathogen_type == "Viruses" -%>
     virus
-    <% else  %>
+    <%- else  -%>
     << pathogen_type.lower() >>
-    <% endif %>
+    <%- endif -%>
   counterfactual:
     <% if counterfactual == "Associated" %>
-    where the death was associated with antibiotic resistance
+    where the death was associated with antibiotic resistance.
     <% elif counterfactual == "Susceptible" %>
-    where the bacteria causing the death were susceptible to antibiotics
+    where the bacteria causing the death were susceptible to antibiotics.
     <% elif counterfactual == "Untested" %>
-    where the pathogen was not tested for antibiotic resistance
+    where the pathogen was not tested for antibiotic resistance.
     <% endif %>
 
 
@@ -39,7 +39,7 @@ tables:
       value:
         title: Neonatal deaths from << pathogen >> infections {definitions.counterfactual}
         unit: deaths
-        description_short: Estimated number [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections, {definitions.counterfactual}. << pathogen >> is a {definitions.pathogen_type}.
+        description_short: Estimated number [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections, {definitions.counterfactual} << pathogen >> is a {definitions.pathogen_type}.
       upper:
         title: Upper bound of neonatal deaths from << pathogen >> infections {definitions.counterfactual}
         unit: deaths
