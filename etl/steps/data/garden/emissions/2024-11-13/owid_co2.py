@@ -16,8 +16,12 @@ import re
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Origin, Table
+from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+
+# Initialize logger.
+log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -388,6 +392,14 @@ def prepare_codebook(tb: Table) -> pd.DataFrame:
     return codebook
 
 
+def sanity_check_outputs(tb: Table, tb_codebook: Table) -> None:
+    error = "Dataset columns should coincide with the codebook 'columns'."
+    assert set(tb_codebook.reset_index()["column"]) == set(tb.reset_index().columns), error
+
+    error = "All rows in dataset should contain at least one non-NaN value."
+    assert not tb.isnull().all(axis=1).any(), error
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -465,11 +477,14 @@ def run(dest_dir: str) -> None:
     tb = prepare_outputs(combined=combined, ds_regions=ds_regions)
 
     # Prepare codebook.
-    codebook = prepare_codebook(tb=tb)
+    tb_codebook = prepare_codebook(tb=tb)
+
+    # Sanity check.
+    sanity_check_outputs(tb=tb, tb_codebook=tb_codebook)
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb, codebook], check_variables_metadata=True)
+    ds_grapher = create_dataset(dest_dir, tables=[tb, tb_codebook], check_variables_metadata=True)
     ds_grapher.save()
