@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("bmj_2022.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # Process data.
     #
@@ -55,6 +55,7 @@ def run(dest_dir: str) -> None:
     essential_med_tb["year"] = 2017
     essential_med_tb["indicator"] = "Essential medicine list"
     essential_med_tb = essential_med_tb.rename(columns={"statins_essential_medicine_2017": "value"})
+    essential_med_tb["value"] = essential_med_tb["value"].astype(str)
     essential_med_tb["value"].replace("-", np.nan, inplace=True)
     essential_med_tb["value"].replace("No", 0, inplace=True)
     essential_med_tb["value"].replace("Yes", 1, inplace=True)

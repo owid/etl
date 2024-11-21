@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     #
     # Load snapshot.
     snap = paths.load_snapshot("nemet_2009.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

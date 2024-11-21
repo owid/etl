@@ -498,7 +498,7 @@ def process_combined_data(tb: Table, ds_population: Dataset) -> Table:
     # Fill gaps in OWID population with FAO population (for "* (FAO)" countries, i.e. countries that were not
     # harmonized and for which there is no OWID population).
     # Then drop "fao_population", since it is no longer needed.
-    tb_wide["population"] = tb_wide["population"].fillna(tb_wide["fao_population"])
+    tb_wide["population"] = tb_wide["population"].astype("Float64").fillna(tb_wide["fao_population"]).astype("Float64")
     tb_wide = tb_wide.drop(columns="fao_population")
 
     assert len(tb_wide.columns[tb_wide.isnull().all(axis=0)]) == 0, "Unexpected columns with only nan values."

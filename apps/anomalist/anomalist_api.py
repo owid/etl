@@ -502,7 +502,13 @@ def anomaly_detection(
         ]
         variables_old_and_new = variables_in_dataset + variables_old
         t = time.time()
-        df = load_data_for_variables(engine=engine, variables=variables_old_and_new)
+        try:
+            df = load_data_for_variables(engine=engine, variables=variables_old_and_new)
+        except FileNotFoundError as e:
+            # This happens when a dataset is in DB, but not in a local catalog.
+            log.error("loading_data.error", error=str(e))
+            continue
+
         log.info("loading_data.end", t=time.time() - t)
 
         if df.empty:

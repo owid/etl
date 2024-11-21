@@ -33,7 +33,7 @@ def run(dest_dir: str) -> None:
     ds_pop = paths.load_dataset("population")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # rename and drop columns
     tb = tb.drop(columns=COLUMNS_TO_DROP, errors="raise")

@@ -29,6 +29,7 @@ import yaml
 from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.catalogs import OWID_CATALOG_URI
+from owid.catalog.datasets import DEFAULT_FORMATS
 from owid.walden import CATALOG as WALDEN_CATALOG
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
@@ -662,8 +663,18 @@ class DataStep(Step):
         if self.checksum_output() != ds_meta["source_checksum"]:
             return False
 
+        # only download DEFAULT_FORMATS
+        include = [".meta.json"] + [f".{format}" for format in DEFAULT_FORMATS]
+
         r2 = s3_utils.connect_r2_cached()
-        s3_utils.download_s3_folder(f"s3://owid-catalog/{self.path}", self._dest_dir, client=r2, ignore="index.json")
+        s3_utils.download_s3_folder(
+            f"s3://owid-catalog/{self.path}/",
+            self._dest_dir,
+            client=r2,
+            include=include,
+            exclude=["index.json"],
+            delete=True,
+        )
 
         """download files over HTTPS, the problem is that we don't have a list of tables to download
         in index.json

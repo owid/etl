@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot and load data.
     snap = paths.load_snapshot("antarctic_ice_core_co2_concentration.xls")
-    tb = snap.read(sheet_name="CO2 Composite", skiprows=14)
+    tb = snap.read(safe_types=False, sheet_name="CO2 Composite", skiprows=14)
 
     #
     # Process data.

@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     tb = Table()
     # Load data from snapshot.
     for sheet in sheet_names:
-        tb_sheet = snap.read(sheet_name=sheet)
+        tb_sheet = snap.read(safe_types=False, sheet_name=sheet)
         tb = pr.concat([tb, tb_sheet])
 
     tb.metadata = snap.to_table_metadata()

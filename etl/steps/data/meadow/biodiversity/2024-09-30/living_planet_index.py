@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     all_tbs = Table()
     # Load data from snapshot.
     for sheet_name in sheet_names:
-        tb = snap.read(sheet_name=sheet_name)
+        tb = snap.read(safe_types=False, sheet_name=sheet_name)
         tb = tb[
             [
                 "Unnamed: 0",

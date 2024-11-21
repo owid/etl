@@ -334,7 +334,7 @@ def run(dest_dir: str) -> None:
     #
     # Load dataset from Meadow and read its main table.
     ds_meadow = paths.load_dataset("renewable_capacity_statistics")
-    tb = ds_meadow.read_table("renewable_capacity_statistics")
+    tb = ds_meadow.read("renewable_capacity_statistics")
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")

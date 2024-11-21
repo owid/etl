@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("world_income_inequality_database.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="Sheet1")
+    tb = snap.read(safe_types=False, sheet_name="Sheet1")
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(
