@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Homicides
+    description_processing: |-
+      Values for the United Kingdom are calcuated by Our World in Data from UNODC data for England, Wales, Scotland and Northern Ireland.
 
   metric: |-
     <% if unit_of_measurement == "Counts" %>
