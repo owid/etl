@@ -2,16 +2,16 @@
 definitions:
   others:
     bo_1: |-
-      <% if birth_order == 1 %>
-      first
-      <%- elif birth_order == 2 %>
-      second
-      <%- elif birth_order == 3 %>
-      third
-      <%- elif birth_order == 4 %>
-      fourth
+      <% if birth_order == '1' %>
+       first
+      <%- elif birth_order == '2' %>
+       second
+      <%- elif birth_order == '3' %>
+       third
+      <%- elif birth_order == '4' %>
+       fourth
       <%- elif birth_order == '5p' %>
-      fifth
+       fifth (or greater)
       <%- else %>
       <% endif %>
   common:
@@ -33,7 +33,7 @@ tables:
       tfr:
         title: "Period total fertility rates"
         description_short: |-
-          The average number of {definitions.others.bo_1}children a woman would have in her lifetime if she experienced the fertility rates of a specific year.
+          The average number of{definitions.others.bo_1} children a woman would have in her lifetime if she experienced the fertility rates of a specific year.
         unit: "births per woman"
         description_key:
           - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
@@ -43,7 +43,7 @@ tables:
       tfr40:
         title: "Period total fertility rates by age 40"
         description_short: |-
-          The average number of children a woman would have by age 40 if she experienced the fertility rates of a specific year.
+          The average number of{definitions.others.bo_1} children a woman would have by age 40 if she experienced the fertility rates of a specific year.
         unit: "births per woman"
         description_key:
           - Useful for understanding early and mid-reproductive age fertility patterns.
@@ -52,7 +52,11 @@ tables:
       adjtfr:
         title: "Tempo-adjusted total fertility rates"
         description_short: |-
+          <% if birth_order == 'total' %>
           The total fertility rate adjusted to account for delays or advances in childbearing.
+          <%- else %>
+          The total fertility rate for {definitions.others.bo_1} births adjusted to account for delays or advances in having a {definitions.others.bo_1} child.
+          <% endif %>
         unit: "births per woman"
         description_key:
           - The TFR has been adjusted using a method proposed by Bongaarts-Feeneysted. It sums order-specific TFRs and adjusts for changes in the mean age of order-specific fertility schedule.
@@ -65,7 +69,11 @@ tables:
       patfr:
         title: "Parity- and age-adjusted total fertility rate"
         description_short: |-
+          <% if birth_order == 'total' %>
           The total fertility rate adjusted for both the age of the mother and the number of children she already has.
+          <%- else %>
+          The total fertility rate for{definitions.others.bo_1} births adjusted for the age of the mother.
+          <% endif %>
         unit: "births per woman"
         description_key:
           - Accounts for both the age structure and parity distribution of the female population.
@@ -77,19 +85,31 @@ tables:
       mab:
         title: "Period mean ages at birth"
         description_short: |-
+          <% if birth_order == 'total' %>
           The average age of mothers when they give birth in a specific year. It is standardized for the age structure of the female population of reproductive age.
+          <%- else %>
+          The average age of mothers when they have their{definitions.others.bo_1} child in a specific year. It is standardized for the age structure of the female population of reproductive age.
+          <% endif %>
         unit: "years"
       mab40:
         title: "Period mean ages at birth by age 40"
         description_short: |-
+          <% if birth_order == 'total' %>
           The average age of mothers when they give birth, calculated only up to age 40. It is standardized for the age structure of the female population of reproductive age.
+          <%- else %>
+          The average age of mothers when they have their{definitions.others.bo_1} child in a specific year, calculated only up to age 40. It is standardized for the age structure of the female population of reproductive age.
+          <% endif %>
         unit: "years"
         description_key:
           - Focuses on childbearing occurring before age 40, providing insights into early fertility patterns.
       sdmab:
         title: "Standard deviation in period mean ages at birth"
         description_short: |-
+          <% if birth_order == 'total' %>
           How much variation there is in the ages of mothers when they give birth in a specific year.
+          <%- else %>
+          How much variation there is in the ages of mothers when they have their{definitions.others.bo_1} child in a specific year.
+          <% endif %>
         unit: "years"
         description_key:
           - Measures the spread of ages at which women give birth.
@@ -98,7 +118,11 @@ tables:
       sdmab40:
         title: "Standard deviation in period mean ages at birth by age 40"
         description_short: |-
+          <% if birth_order == 'total' %>
           How much variation there is in the ages of mothers when they give birth, calculated only up to age 40.
+          <%- else %>
+          How much variation there is in the ages of mothers when they have their{definitions.others.bo_1} child in a specific year, calculated only up to age 40.
+          <% endif %>
         unit: "years"
         description_key:
           - Reflects variability in the timing of births up to age 40.
@@ -106,7 +130,11 @@ tables:
       tmab:
         title: "Period table mean ages at birth"
         description_short: |-
+          <% if birth_order == 'total' %>
           The average age of mothers at birth, considering the number of children they already have.
+          <%- else %>
+          The average age of mothers at the birth of their{definitions.others.bo_1} child.
+          <% endif %>
         unit: "years"
         description_key:
           - Derived from fertility tables that account for both age and parity.
@@ -115,18 +143,19 @@ tables:
       # Births and birth rate
       cbr:
         title: "Crude birth rate"
-        description_short: The number of live births per 1,000 people in a given year. It is not standardized for the age structure of the population.
+        description_short: |-
+          The number of{definitions.others.bo_1} live births per 1,000 people in a given year. It is not standardized for the age structure of the population.
         unit: "births per 1,000 people"
         description_key:
-          - The rate is calculated by dividing the total number of live births occurring in a given year by person-years lived by all population in that year.
+          - The rate is calculated by dividing the total number of{definitions.others.bo_1} live births occurring in a given year by person-years lived by all population in that year.
           - Simple measure of birth intensity, not adjusted for age or parity.
           - It is influenced by the age structure of the population, which can make comparisons between populations challenging.
       b:
         title: "Total live births"
-        description_short: The total number of live births recorded in a given year.
+        description_short: The total number of{definitions.others.bo_1} live births recorded in a given year.
         unit: "births"
         description_key:
-          - Represents the total number of live births without considering age or parity.
+          - Represents the total number of{definitions.others.bo_1} live births without considering age or parity.
           - Serves as a foundational statistic for calculating other fertility measures.
           - Can be influenced by population size and structure.
         display:
