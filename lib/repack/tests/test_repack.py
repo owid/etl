@@ -197,7 +197,7 @@ def test_repack_object_with_nan_string():
 
 def test_repack_category():
     s = pd.Series(["a", "b", "c", None])
-    assert s.dtype == np.object_
+    assert s.dtype == np.object_ or s.dtype == "str"
 
     v = repack.repack_series(s)
     assert v.dtype == "category"

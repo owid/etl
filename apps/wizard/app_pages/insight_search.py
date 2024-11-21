@@ -224,7 +224,7 @@ def st_display_insight(insight):
             st.write(f":red[(Draft)] {authors} | [:material/edit: edit]({url_admin})")
 
         # Render text
-        text = insight["markdown"].replace("$", "\$")
+        text = insight["markdown"].replace("$", "\$")  # type: ignore
         st.caption(text)
 
         # Score

@@ -23,8 +23,8 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow["oecd_education"].reset_index()
 
     # Load the World Bank Education Dataset
-    ds_garden_wb = paths.load_dataset("education")
-    tb_wb = ds_garden_wb["education"].reset_index()
+    ds_garden_wb = paths.load_dataset("edstats")
+    tb_wb = ds_garden_wb["edstats"].reset_index()
 
     # Harmonize country names
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)

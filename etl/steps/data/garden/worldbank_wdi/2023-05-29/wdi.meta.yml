@@ -4057,10 +4057,12 @@ tables:
         title: Average transaction cost of sending remittances to a specific country (%)
         short_unit: '%'
         unit: '%'
+        description_processing: We calculated average transaction cost of regions by taking the average cost of each country weighted by the volume of remittances sent to that country. Only countries where both average remittance costs and total remittance inflows are available are included in the calculation.
       si_rmt_cost_ob_zs:
         title: Average transaction cost of sending remittances from a specific country (%)
         short_unit: '%'
         unit: '%'
+        description_processing: We calculated average transaction cost of regions by taking the average cost of each country weighted by the volume of remittances sent from that country. Only countries where both average remittance costs and total remittance outflows are available are included in the calculation.
       si_spr_pc40:
         title: Survey mean consumption or income per capita, bottom 40% of population (2017 PPP $ per day)
         short_unit: $
