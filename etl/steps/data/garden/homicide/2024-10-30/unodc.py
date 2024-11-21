@@ -145,7 +145,7 @@ def calculate_united_kingdom(tb: Table, ds_population: Dataset) -> Table:
         .reset_index()
     )
     # Use only rows where all three entites are in the data
-    tb_uk = tb_uk[tb_uk["count"] == 2]
+    tb_uk = tb_uk[tb_uk["count"] == 3]
     tb_uk["country"] = "United Kingdom"
     tb_uk = tb_uk.drop(columns="count")
 
