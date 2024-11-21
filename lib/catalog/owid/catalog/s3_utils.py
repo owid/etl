@@ -81,6 +81,8 @@ def download_s3_folder(
     delete: bool = False,
 ) -> None:
     """Download all files in the given S3 folder to the local directory."""
+    assert s3_folder.endswith("/"), "s3_folder must end with a slash"
+
     client = client or connect_r2()
 
     bucket, _ = s3_bucket_key(s3_folder)
