@@ -45,23 +45,23 @@ tables:
       mab:
         title: "Period mean ages at birth"
         description_short: ""
-        unit: ""
+        unit: "years"
       mab40:
         title: "Period mean ages at birth at 40"
         description_short: ""
-        unit: ""
+        unit: "years"
       sdmab:
         title: "Standard deviation in period mean ages at birth"
         description_short: ""
-        unit: ""
+        unit: "years"
       sdmab40:
         title: "Standard deviation in period mean ages at 40"
         description_short: ""
-        unit: ""
+        unit: "years"
       tmab:
         title: "Period table mean ages at birth"
         description_short: ""
-        unit: ""
+        unit: "years"
 
       # Births and birth rate
       cbr:
@@ -71,37 +71,40 @@ tables:
       b:
         title: "Total live births"
         description_short: ""
-        unit: ""
+        unit: "births"
         display:
           numDecimalPlaces: 3
 
-  # cohort:
-  #   variables:
-  #     cmab:
-  #       title: ""
-  #       description_short: ""
-  #       unit: ""
-  #     cmab40:
-  #       title: ""
-  #       description_short: ""
-  #       unit: ""
-  #     sdcmab:
-  #       title: ""
-  #       description_short: ""
-  #       unit: ""
-  #     sdcmab40:
-  #       title: ""
-  #       description_short: ""
-  #       unit: ""
-  #     ccf:
-  #       title: ""
-  #       description_short: ""
-  #       unit: ""
-  #       display:
-  #         numDecimalPlaces: 3
-  #     ccf40:
-  #       title: ""
-  #       description_short: ""
-  #       unit: ""
-  #       display:
-  #         numDecimalPlaces: 3
+  cohort:
+    variables:
+      # Mean age at birth
+      cmab:
+        title: "Cohort mean ages at birth"
+        description_short: ""
+        unit: "years"
+      cmab40:
+        title: "Cohort mean ages at 40"
+        description_short: ""
+        unit: "years"
+      sdcmab:
+        title: "Standard deviation in cohort mean ages at birth"
+        description_short: ""
+        unit: "years"
+      sdcmab40:
+        title: "Standard deviation in cohort mean ages at 40"
+        description_short: ""
+        unit: "years"
+
+      # Fertility
+      ccf:
+        title: "Completed cohort fertility"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      ccf40:
+        title: "Completed cohort fertility at 40"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3

@@ -444,8 +444,8 @@ def integrate_bo(tb, tb_bo, col_index, core_indicators):
     return tb
 
 
-def make_table_with_parity(tb, col_index, core_indicators, col_parity="parity"):
-    """Make a table from wide to long, to incorporate the parity as a dimension."""
+def make_table_with_birth_order(tb, col_index, core_indicators, col_bo="birth_order"):
+    """Make a table from wide to long, to incorporate the birth order as a dimension."""
 
     def _generate_regex(name):
         if re.search(r"\d$", name):  # Check if the name ends with a number
@@ -462,7 +462,7 @@ def make_table_with_parity(tb, col_index, core_indicators, col_parity="parity"):
     )
 
     tb["indicator_name"] = None
-    tb[col_parity] = None
+    tb[col_bo] = None
     for name, pattern in regex_patterns.items():
         # print(f"> {name}")
 
@@ -472,17 +472,17 @@ def make_table_with_parity(tb, col_index, core_indicators, col_parity="parity"):
         assert tb.loc[flag, COLUMN_IND].isna().all(), "Multiple columns assign to the same indicator!"
         tb.loc[flag, COLUMN_IND] = name
 
-        # Get parity
-        tb.loc[flag, col_parity] = tb.loc[flag, COLUMN_RAW].replace({f"{name}_?": ""}, regex=True)
-        tb.loc[tb[COLUMN_RAW] == name, col_parity] = "total"
+        # Get birth order
+        tb.loc[flag, col_bo] = tb.loc[flag, COLUMN_RAW].replace({f"{name}_?": ""}, regex=True)
+        tb.loc[tb[COLUMN_RAW] == name, col_bo] = "total"
 
     # Sanity check
     assert tb[COLUMN_IND].notna().all(), "Some NaNs found in column `indicator_name`"
-    assert tb[col_parity].notna().all(), f"Some NaNs found in column `{col_parity}`"
+    assert tb[col_bo].notna().all(), f"Some NaNs found in column `{col_bo}`"
 
     # Final reshape
     tb = tb.drop(columns=[COLUMN_RAW])
-    tb = tb.pivot(index=col_index + [col_parity], columns=COLUMN_IND, values="value").reset_index()
+    tb = tb.pivot(index=col_index + [col_bo], columns=COLUMN_IND, values="value").reset_index()
     tb = tb.rename_axis(None, axis=1)
 
     # Drop NaNs
@@ -517,7 +517,7 @@ def read_table(ds_meadow, tname, tname_base=None):
     return tb
 
 
-def make_table_list(ds_meadow, table_names, cols_index, col_parity):
+def make_table_list(ds_meadow, table_names, cols_index, col_bo):
     tbs = []
     for tname in table_names:
         # print(tname)
@@ -535,10 +535,10 @@ def make_table_list(ds_meadow, table_names, cols_index, col_parity):
             # Add BO to main table
             tb = integrate_bo(tb, tb_bo, cols_index, core_indicators)
             # Consolidate table
-            tb = make_table_with_parity(tb, cols_index, core_indicators, col_parity)
+            tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo)
         elif tname in TABLES_PERIOD_W_PARITY:
             core_indicators = cols_index + TABLES_PERIOD_W_PARITY[tname]["indicators"]
-            tb = make_table_with_parity(tb, cols_index, core_indicators, col_parity)
+            tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo)
         tbs.append(tb)
 
     return tbs
@@ -553,9 +553,9 @@ def run(dest_dir: str) -> None:
 
     # Read period tables
     cols_index = ["country", "year"]
-    col_parity = "parity"
-    cols_index_out = cols_index + [col_parity]
-    tbs = make_table_list(ds_meadow, TABLES_PERIOD, cols_index, col_parity)
+    col_bo = "birth_order"
+    cols_index_out = cols_index + [col_bo]
+    tbs = make_table_list(ds_meadow, TABLES_PERIOD, cols_index, col_bo)
     ## Sanity check: no column is named the same
     colnames = [col for t in tbs for col in t.columns if col not in cols_index_out]
     assert len(colnames) == len(set(colnames)), "Some columns are named the same!"
@@ -565,9 +565,9 @@ def run(dest_dir: str) -> None:
 
     # Read cohort tables
     cols_index = ["country", "cohort"]
-    col_parity = "parity"
-    cols_index_out = cols_index + [col_parity]
-    tbs = make_table_list(ds_meadow, TABLES_COHORT, cols_index, col_parity)
+    col_bo = "birth_order"
+    cols_index_out = cols_index + [col_bo]
+    tbs = make_table_list(ds_meadow, TABLES_COHORT, cols_index, col_bo)
     ## Sanity check: no column is named the same
     colnames = [col for t in tbs for col in t.columns if col not in cols_index_out]
     assert len(colnames) == len(set(colnames)), "Some columns are named the same!"
