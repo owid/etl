@@ -1,0 +1,110 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Fertility Rate
+    display:
+      numDecimalPlaces: 2
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Human Fertility Database
+
+tables:
+  period:
+    variables:
+      tfr:
+        title: "Period total fertility rates"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      tfr40:
+        title: "Period total fertility rates at 40"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      adjtfr:
+        title: "Tempo-adjusted total fertility rates"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      patfr:
+        title: "Parity- and age-adjusted total fertility rate"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+
+      # Mean ages at birth, and at 40
+      mab:
+        title: "Period mean ages at birth"
+        description_short: ""
+        unit: "years"
+      mab40:
+        title: "Period mean ages at birth at 40"
+        description_short: ""
+        unit: "years"
+      sdmab:
+        title: "Standard deviation in period mean ages at birth"
+        description_short: ""
+        unit: "years"
+      sdmab40:
+        title: "Standard deviation in period mean ages at 40"
+        description_short: ""
+        unit: "years"
+      tmab:
+        title: "Period table mean ages at birth"
+        description_short: ""
+        unit: "years"
+
+      # Births and birth rate
+      cbr:
+        title: "Crude birth rate"
+        description_short: ""
+        unit: ""
+      b:
+        title: "Total live births"
+        description_short: ""
+        unit: "births"
+        display:
+          numDecimalPlaces: 3
+
+  cohort:
+    variables:
+      # Mean age at birth
+      cmab:
+        title: "Cohort mean ages at birth"
+        description_short: ""
+        unit: "years"
+      cmab40:
+        title: "Cohort mean ages at 40"
+        description_short: ""
+        unit: "years"
+      sdcmab:
+        title: "Standard deviation in cohort mean ages at birth"
+        description_short: ""
+        unit: "years"
+      sdcmab40:
+        title: "Standard deviation in cohort mean ages at 40"
+        description_short: ""
+        unit: "years"
+
+      # Fertility
+      ccf:
+        title: "Completed cohort fertility"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
+      ccf40:
+        title: "Completed cohort fertility at 40"
+        description_short: ""
+        unit: ""
+        display:
+          numDecimalPlaces: 3
