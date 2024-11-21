@@ -13,10 +13,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("education_opri")
+    ds_meadow = paths.load_dataset("enrolment_rates")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["education_opri"].reset_index()
+    tb = ds_meadow["enrolment_rates"].reset_index()
 
     # Retrieve snapshot with the metadata provided via World Bank.
 
