@@ -308,6 +308,9 @@ def run(dest_dir: str) -> None:
                 f,
                 sep="\s+",
                 skiprows=2,
+                na_values=["."],
+                metadata=snap.to_table_metadata(),
+                origin=snap.m.origin,
             )
             short_name = f.stem
 
