@@ -270,8 +270,12 @@ def prepare_outputs(combined: Table, ds_regions: Dataset) -> Table:
     columns_with_inf = [column for column in combined.columns if len(combined[combined[column] == np.inf]) > 0]
     assert len(columns_with_inf) == 0, f"Infinity values detected in columns: {columns_with_inf}"
 
-    # Set index and sort conveniently.
-    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
+    # Sort rows and columns conveniently.
+    first_columns = ["country", "year", "iso_code", "population", "gdp"]
+    combined = combined[first_columns + [column for column in sorted(combined.columns) if column not in first_columns]]
+
+    # Improve table format.
+    combined = combined.format()
 
     return combined
 
