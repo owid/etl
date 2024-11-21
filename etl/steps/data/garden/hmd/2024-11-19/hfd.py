@@ -1,5 +1,15 @@
 """There are various input tables, this step brings them together.
 
+
+The comments below summarize the various columns in all tables. This comments are meant for maintenance, and not for the end-user. They try to:
+
+    - Group the various tables into categories, depending on the primary index columns that they have.
+    - Each group is separated from the next one with '----'.
+    - I've tagged each category with a number + letter. E.g. "2y" meaning it has two primary indices, and one is 'year'. 'c' stands for 'cohort.
+    - '*y' categories likely contain period indicators. '*c' categories likely contain cohort indicators.
+    - Within each group, I've listed the names of the original tables, along with their header (description of its indicators). I've also added the list of columns (indicators that the table presents).
+    - At the end I've added a section '=> OUTPUT' which tries to summarize the format of the output & consolidated table.
+
 ------------
 P 2y: code, year [PERIOD]
 
@@ -9,7 +19,6 @@ P 2y: code, year [PERIOD]
     x adjtfrRRbo
         Tempo-adjusted total fertility rates by birth order, Bongaarts-Feeney method
         adjTFR   adjTFR1   adjTFR2   adjTFR3   adjTFR4  adjTFR5p
-
 
     cbrRR
         Crude birth rate
@@ -445,7 +454,7 @@ def integrate_bo(tb, tb_bo, col_index, core_indicators):
 
 
 def make_table_with_birth_order(tb, col_index, core_indicators, col_bo="birth_order"):
-    """Make a table from wide to long, to incorporate the birth order as a dimension."""
+    """Change the format of a table from wide to long, to incorporate the birth order as a dimension."""
 
     def _generate_regex(name):
         if re.search(r"\d$", name):  # Check if the name ends with a number
@@ -497,48 +506,58 @@ def read_table(ds_meadow, tname, tname_base=None):
     - Rename columns if applicable
     - Harmonize country names
     """
+    # Read table
     tb = ds_meadow.read(tname)
 
     # Rename columns
     if tname_base is None:
         tname_base = tname
-
     if tname_base in COLUMNS_RENAME:
         tb = tb.rename(columns=COLUMNS_RENAME[tname_base])
 
+    # Harmonize country names
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
         country_col="code",
     )
 
+    # Rename country column
     tb = tb.rename(columns={"code": "country"})
 
     return tb
 
 
-def make_table_list(ds_meadow, table_names, cols_index, col_bo):
+def make_table_list(ds_meadow, table_names, tables_w_parity, cols_index, col_bo):
+    """Reads relevant tables, and formats them accordingly.
+
+    Tables come in wide format, sometimes as two-tables (main and birth order). This function consolidates them into single tables per topic.
+
+    For instance, we have one table with total fertility rates (columns `tfr`). And then another one with fertilities broken down by birth order (columns `tfr`, `tfr1`, etc.)
+    Instead, we want a table in long format, which has one column `tfr` and adds the birth order as a dimension of the table.
+    """
     tbs = []
     for tname in table_names:
-        # print(tname)
-        # Main table
+        # Read main table
         tb = read_table(ds_meadow, tname)
 
-        # Birth order table
+        # Check if there is a birth order table for this indicator(s). If so, process it and integrate it to the main table
         tname_bo = tname + "bo"
         if tname_bo in ds_meadow.table_names:
             # Read BO table
             tb_bo = read_table(ds_meadow, tname_bo, tname)
-
-            # Get list of core indicators
+            # Get list of core indicators: These are the names of the columns that are actual indicators (and not dimensional indicators, e.g. `tfr1`, `tfr2`, etc.)
             core_indicators = [col for col in tb.columns.intersection(tb_bo.columns) if col not in cols_index]
             # Add BO to main table
             tb = integrate_bo(tb, tb_bo, cols_index, core_indicators)
-            # Consolidate table
+            # Consolidate table: Use long format, and add birth_order as a dimension of the main table.
             tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo)
-        elif tname in TABLES_PERIOD_W_PARITY:
-            core_indicators = cols_index + TABLES_PERIOD_W_PARITY[tname]["indicators"]
+        # Sometimes, the main table contains already indicators broken down by birth order. In such cases, we also need to reshape the table.
+        elif tname in tables_w_parity:
+            core_indicators = cols_index + tables_w_parity[tname]["indicators"]
             tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo)
+
+        # Add formatted table to the list of tables.
         tbs.append(tb)
 
     return tbs
@@ -551,11 +570,13 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("hfd")
 
-    # Read period tables
+    # 1/ Read period tables + consolidate in one table tb_period
+    ## Initial definitions
     cols_index = ["country", "year"]
     col_bo = "birth_order"
     cols_index_out = cols_index + [col_bo]
-    tbs = make_table_list(ds_meadow, TABLES_PERIOD, cols_index, col_bo)
+    ## Read tables
+    tbs = make_table_list(ds_meadow, TABLES_PERIOD, TABLES_PERIOD_W_PARITY, cols_index, col_bo)
     ## Sanity check: no column is named the same
     colnames = [col for t in tbs for col in t.columns if col not in cols_index_out]
     assert len(colnames) == len(set(colnames)), "Some columns are named the same!"
@@ -563,11 +584,13 @@ def run(dest_dir: str) -> None:
     tb_period = pr.multi_merge(tbs, on=cols_index_out, how="outer")
     tb_period = tb_period.format(cols_index_out, short_name="period")
 
-    # Read cohort tables
+    # 2/Read cohort tables + consolidate in one table tb_cohort
+    ## Initial definitions
     cols_index = ["country", "cohort"]
     col_bo = "birth_order"
     cols_index_out = cols_index + [col_bo]
-    tbs = make_table_list(ds_meadow, TABLES_COHORT, cols_index, col_bo)
+    ## Read tables
+    tbs = make_table_list(ds_meadow, TABLES_COHORT, TABLES_COHORT_W_PARITY, cols_index, col_bo)
     ## Sanity check: no column is named the same
     colnames = [col for t in tbs for col in t.columns if col not in cols_index_out]
     assert len(colnames) == len(set(colnames)), "Some columns are named the same!"
