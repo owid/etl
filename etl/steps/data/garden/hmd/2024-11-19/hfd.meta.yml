@@ -19,7 +19,7 @@ definitions:
       << title >> - Total
       <%- else %>
       << title >> - Birth order: << birth_order >>
-      <% endif %>
+      <%- endif %>
   common:
     presentation:
       topic_tags:
@@ -69,8 +69,8 @@ tables:
           <% if birth_order == 'total' %>
           The total fertility rate adjusted to account for delays or advances in childbearing.
           <%- else %>
-          The total fertility rate for {definitions.others.bo_1} births adjusted to account for delays or advances in having a {definitions.others.bo_1} child.
-          <% endif %>
+          The total fertility rate for{definitions.others.bo_1} births adjusted to account for delays or advances in having a{definitions.others.bo_1} child.
+          <%- endif %>
         unit: "births per woman"
         description_key:
           - The TFR has been adjusted using a method proposed by Bongaarts-Feeneysted. It sums order-specific TFRs and adjusts for changes in the mean age of order-specific fertility schedule.
@@ -90,7 +90,7 @@ tables:
           The total fertility rate adjusted for both the age of the mother and the number of children she already has.
           <%- else %>
           The total fertility rate for{definitions.others.bo_1} births adjusted for the age of the mother.
-          <% endif %>
+          <%- endif %>
         unit: "births per woman"
         description_key:
           - Accounts for both the age structure and parity distribution of the female population.
@@ -108,19 +108,19 @@ tables:
           The average age of mothers when they give birth in a specific year. It is standardized for the age structure of the female population of reproductive age.
           <%- else %>
           The average age of mothers when they have their{definitions.others.bo_1} child in a specific year. It is standardized for the age structure of the female population of reproductive age.
-          <% endif %>
+          <%- endif %>
         unit: "years"
 
       mab40:
         title: |-
-          <% set title = "Period mean ages at birth" %>
-          {definitions.others.title} "Period mean ages at birth by age 40"
+          <% set title = "Period mean ages at birth by age 40" %>
+          {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average age of mothers when they give birth, calculated only up to age 40. It is standardized for the age structure of the female population of reproductive age.
+          The average age of mothers under 40 when they give birth. It is standardized for the age structure of the female population of reproductive age.
           <%- else %>
-          The average age of mothers when they have their{definitions.others.bo_1} child in a specific year, calculated only up to age 40. It is standardized for the age structure of the female population of reproductive age.
-          <% endif %>
+          The average age of mothers under 40 when they have their{definitions.others.bo_1} child in a specific year. It is standardized for the age structure of the female population of reproductive age.
+          <%- endif %>
         unit: "years"
         description_key:
           - Focuses on childbearing occurring before age 40, providing insights into early fertility patterns.
@@ -134,7 +134,7 @@ tables:
           How much variation there is in the ages of mothers when they give birth in a specific year.
           <%- else %>
           How much variation there is in the ages of mothers when they have their{definitions.others.bo_1} child in a specific year.
-          <% endif %>
+          <%- endif %>
         unit: "years"
         description_key:
           - Measures the spread of ages at which women give birth.
@@ -147,10 +147,10 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          How much variation there is in the ages of mothers when they give birth, calculated only up to age 40.
+          How much variation there is in the ages of mothers under 40 when they give birth.
           <%- else %>
-          How much variation there is in the ages of mothers when they have their{definitions.others.bo_1} child in a specific year, calculated only up to age 40.
-          <% endif %>
+          How much variation there is in the ages of mothers under 40 when they have their{definitions.others.bo_1} child in a specific year.
+          <%- endif %>
         unit: "years"
         description_key:
           - Reflects variability in the timing of births up to age 40.
@@ -165,7 +165,7 @@ tables:
           The average age of mothers at birth, considering the number of children they already have.
           <%- else %>
           The average age of mothers at the birth of their{definitions.others.bo_1} child.
-          <% endif %>
+          <%- endif %>
         unit: "years"
         description_key:
           - Derived from fertility tables that account for both age and parity.
@@ -210,7 +210,7 @@ tables:
           The average number of children born to women in a specific cohort over their lifetime.
           <%- else %>
           The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
-          <% endif %>
+          <%- endif %>
         unit: "births per woman"
         description_key:
           - Represents the completed fertility of a cohort by the end of their reproductive years.
@@ -221,14 +221,14 @@ tables:
 
       ccf40:
         title: |-
-          <% set title = "Completed cohort fertility rate at 40" %>
+          <% set title = "Completed cohort fertility rate by the age 40" %>
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average number of children born to women in a specific cohort by age 40.
+          The average number of children born to women under 40 in a specific cohort.
           <%- else %>
-          The average number of{definitions.others.bo_1} children born to women in a specific cohort by age 40.
-          <% endif %>
+          The average number of{definitions.others.bo_1} children born to women under 40 in a specific cohort.
+          <%- endif %>
         unit: "births per woman"
         description_key:
           - Represents the fertility of a cohort up to age 40.
@@ -246,7 +246,7 @@ tables:
           The average age at which women in a specific birth cohort have children. It is standardized for the age structure of the female population of reproductive age.
           <%- else %>
           The average age at which women in a specific birth cohort have their{definitions.others.bo_1} child. It is standardized for the age structure of the female population of reproductive age.
-          <% endif %>
+          <%- endif %>
         unit: "years"
         description_key:
           - Represents the average age at which women from a particular cohort give birth.
@@ -255,14 +255,14 @@ tables:
 
       cmab40:
         title: |-
-          <% set title = "Cohort mean ages at 40" %>
+          <% set title = "Cohort mean ages at birth by the age 40" %>
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average age at which women in a specific cohort have children, calculated only up to age 40.
+          The average age at which women under 40 in a specific cohort have children.
           <%- else %>
-          The average age at which women in a specific cohort have their{definitions.others.bo_1} child, calculated only up to age 40.
-          <% endif %>
+          The average age at which women under 40 in a specific cohort have their{definitions.others.bo_1} child.
+          <%- endif %>
         unit: "years"
         description_key:
           - Focuses on births occurring before age 40, providing insights into early fertility patterns for the cohort.
@@ -277,7 +277,7 @@ tables:
           How much variation there is in the ages at which women in a specific cohort have children.
           <%- else %>
           How much variation there is in the ages at which women in a specific cohort have their{definitions.others.bo_1} child.
-          <% endif %>
+          <%- endif %>
         unit: "years"
         description_key:
           - Measures the spread of ages at which women in a cohort give birth.
@@ -293,7 +293,7 @@ tables:
           How much variation there is in the ages at which women in a specific cohort have children, calculated only up to age 40.
           <%- else %>
           How much variation there is in the ages at which women in a specific cohort have their{definitions.others.bo_1} child, calculated only up to age 40.
-          <% endif %>
+          <%- endif %>
         unit: "years"
         description_key:
           - Reflects variability in the timing of births up to age 40 within a cohort.
