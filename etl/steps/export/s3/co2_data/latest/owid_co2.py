@@ -17,12 +17,11 @@ Outputs:
 
 """
 import json
-import re
 import tempfile
 from pathlib import Path
 
 import pandas as pd
-from owid.catalog import Origin, Table
+from owid.catalog import Table
 from owid.datautils.s3 import S3
 from structlog import get_logger
 from tqdm.auto import tqdm
@@ -76,116 +75,14 @@ def save_data_to_json(tb: Table, output_path: str) -> None:
         file.write(json.dumps(output_dict, indent=4))
 
 
-def remove_details_on_demand(text: str) -> str:
-    # Remove references to details on demand from a text.
-    # Example: "This is a [description](#dod:something)." -> "This is a description."
-    regex = r"\(\#dod\:.*\)"
-    if "(#dod:" in text:
-        text = re.sub(regex, "", text).replace("[", "").replace("]", "")
-
-    return text
-
-
-def prepare_codebook(tb: Table) -> pd.DataFrame:
-    table = tb.copy()
-
-    # Manually create an origin for the regions dataset.
-    regions_origin = [Origin(producer="Our World in Data", title="Regions", date_published=str(table["year"].max()))]
-
-    # Manually edit some of the metadata fields.
-    table["country"].metadata.title = "Country"
-    table["country"].metadata.description_short = "Geographic location."
-    table["country"].metadata.description = None
-    table["country"].metadata.unit = ""
-    table["country"].metadata.origins = regions_origin
-    table["year"].metadata.title = "Year"
-    table["year"].metadata.description_short = "Year of observation."
-    table["year"].metadata.description = None
-    table["year"].metadata.unit = ""
-    table["year"].metadata.origins = regions_origin
-
-    ####################################################################################################################
-    if table["population"].metadata.description is None:
-        print("WARNING: Column population has no longer a description field. Remove this part of the code")
-    else:
-        table["population"].metadata.description = None
-
-    ####################################################################################################################
-
-    # Gather column names, titles, short descriptions, unit and origins from the indicators' metadata.
-    metadata = {"column": [], "description": [], "unit": [], "source": []}
-    for column in table.columns:
-        metadata["column"].append(column)
-
-        if hasattr(table[column].metadata, "description") and table[column].metadata.description is not None:
-            print(f"WARNING: Column {column} still has a 'description' field.")
-        # Prepare indicator's description.
-        description = ""
-        if (
-            hasattr(table[column].metadata.presentation, "title_public")
-            and table[column].metadata.presentation.title_public is not None
-        ):
-            description += table[column].metadata.presentation.title_public
-        else:
-            description += table[column].metadata.title
-        if table[column].metadata.description_short:
-            description += f" - {table[column].metadata.description_short}"
-            description = remove_details_on_demand(description)
-        metadata["description"].append(description)
-
-        # Prepare indicator's unit.
-        if table[column].metadata.unit is None:
-            print(f"WARNING: Column {column} does not have a unit.")
-            unit = ""
-        else:
-            unit = table[column].metadata.unit
-        metadata["unit"].append(unit)
-
-        # Gather unique origins of current variable.
-        unique_sources = []
-        for origin in table[column].metadata.origins:
-            # Construct the source name from the origin's attribution.
-            # If not defined, build it using the default format "Producer - Data product (year)".
-            source_name = (
-                origin.attribution
-                or f"{origin.producer} - {origin.title or origin.title_snapshot} ({origin.date_published.split('-')[0]})"
-            )
-
-            # Add url at the end of the source.
-            if origin.url_main:
-                source_name += f" [{origin.url_main}]"
-
-            # Add the source to the list of unique sources.
-            if source_name not in unique_sources:
-                unique_sources.append(source_name)
-
-        # Concatenate all sources.
-        sources_combined = "; ".join(unique_sources)
-        metadata["source"].append(sources_combined)
-
-    # Create a dataframe with the gathered metadata and sort conveniently by column name.
-    codebook = pd.DataFrame(metadata).set_index("column").sort_index()
-    # For clarity, ensure column descriptions are in the same order as the columns in the data.
-    first_columns = ["country", "year", "iso_code", "population", "gdp"]
-    codebook = pd.concat([codebook.loc[first_columns], codebook.drop(first_columns, errors="raise")]).reset_index()
-
-    return codebook
-
-
-def prepare_and_save_outputs(tb: Table, temp_dir_path: Path) -> None:
-    # Create codebook and save it as a csv file.
-    log.info("Creating codebook csv file.")
-    codebook = prepare_codebook(tb=tb)
-    codebook.to_csv(temp_dir_path / "owid-co2-codebook.csv", index=False)
-
+def prepare_and_save_outputs(tb: Table, codebook: Table, temp_dir_path: Path) -> None:
     # Create a csv file.
     log.info("Creating csv file.")
     pd.DataFrame(tb).to_csv(temp_dir_path / "owid-co2-data.csv", index=False, float_format="%.3f")
 
     # Create a json file.
     log.info("Creating json file.")
-    # TODO: Uncomment.
-    # save_data_to_json(tb, temp_dir_path / "owid-co2-data.json")
+    save_data_to_json(tb, temp_dir_path / "owid-co2-data.json")
 
     # Create an excel file.
     log.info("Creating excel file.")
@@ -201,7 +98,7 @@ def run(dest_dir: str) -> None:
     # Load the owid_co2 emissions dataset from garden, and read its main table.
     ds_gcp = paths.load_dataset("owid_co2")
     tb = ds_gcp.read("owid_co2")
-    # TODO: Maybe codebook should also be a table of owid_co2 dataset, so we can also load it here.
+    codebook = ds_gcp.read("owid_co2_codebook")
 
     #
     # Save outputs.
@@ -210,7 +107,7 @@ def run(dest_dir: str) -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir_path = Path(temp_dir)
 
-        prepare_and_save_outputs(tb, temp_dir_path)
+        prepare_and_save_outputs(tb, codebook=codebook, temp_dir_path=temp_dir_path)
 
         # Initialise S3 client.
         s3 = S3()

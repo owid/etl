@@ -11,7 +11,10 @@ GDP are included.
 
 """
 
+import re
+
 import numpy as np
+import pandas as pd
 from owid.catalog import Dataset, Origin, Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -280,6 +283,109 @@ def prepare_outputs(combined: Table, ds_regions: Dataset) -> Table:
     return combined
 
 
+def remove_details_on_demand(text: str) -> str:
+    # Remove references to details on demand from a text.
+    # Example: "This is a [description](#dod:something)." -> "This is a description."
+    regex = r"\(\#dod\:.*\)"
+    if "(#dod:" in text:
+        text = re.sub(regex, "", text).replace("[", "").replace("]", "")
+
+    return text
+
+
+def prepare_codebook(tb: Table) -> pd.DataFrame:
+    table = tb.reset_index()
+
+    # Manually create an origin for the regions dataset.
+    regions_origin = [Origin(producer="Our World in Data", title="Regions", date_published=str(table["year"].max()))]
+
+    # Manually edit some of the metadata fields.
+    table["country"].metadata.title = "Country"
+    table["country"].metadata.description_short = "Geographic location."
+    table["country"].metadata.description = None
+    table["country"].metadata.unit = ""
+    table["country"].metadata.origins = regions_origin
+    table["year"].metadata.title = "Year"
+    table["year"].metadata.description_short = "Year of observation."
+    table["year"].metadata.description = None
+    table["year"].metadata.unit = ""
+    table["year"].metadata.origins = regions_origin
+
+    ####################################################################################################################
+    if table["population"].metadata.description is None:
+        print("WARNING: Column population has no longer a description field. Remove this part of the code")
+    else:
+        table["population"].metadata.description = None
+
+    ####################################################################################################################
+
+    # Gather column names, titles, short descriptions, unit and origins from the indicators' metadata.
+    metadata = {"column": [], "description": [], "unit": [], "source": []}
+    for column in table.columns:
+        metadata["column"].append(column)
+
+        if hasattr(table[column].metadata, "description") and table[column].metadata.description is not None:
+            print(f"WARNING: Column {column} still has a 'description' field.")
+        # Prepare indicator's description.
+        description = ""
+        if (
+            hasattr(table[column].metadata.presentation, "title_public")
+            and table[column].metadata.presentation.title_public is not None
+        ):
+            description += table[column].metadata.presentation.title_public
+        else:
+            description += table[column].metadata.title
+        if table[column].metadata.description_short:
+            description += f" - {table[column].metadata.description_short}"
+            description = remove_details_on_demand(description)
+        metadata["description"].append(description)
+
+        # Prepare indicator's unit.
+        if table[column].metadata.unit is None:
+            print(f"WARNING: Column {column} does not have a unit.")
+            unit = ""
+        else:
+            unit = table[column].metadata.unit
+        metadata["unit"].append(unit)
+
+        # Gather unique origins of current variable.
+        unique_sources = []
+        for origin in table[column].metadata.origins:
+            # Construct the source name from the origin's attribution.
+            # If not defined, build it using the default format "Producer - Data product (year)".
+            source_name = (
+                origin.attribution
+                or f"{origin.producer} - {origin.title or origin.title_snapshot} ({origin.date_published.split('-')[0]})"
+            )
+
+            # Add url at the end of the source.
+            if origin.url_main:
+                source_name += f" [{origin.url_main}]"
+
+            # Add the source to the list of unique sources.
+            if source_name not in unique_sources:
+                unique_sources.append(source_name)
+
+        # Concatenate all sources.
+        sources_combined = "; ".join(unique_sources)
+        metadata["source"].append(sources_combined)
+
+    # Create a dataframe with the gathered metadata and sort conveniently by column name.
+    codebook = pd.DataFrame(metadata).set_index("column").sort_index()
+    # For clarity, ensure column descriptions are in the same order as the columns in the data.
+    first_columns = ["country", "year", "iso_code", "population", "gdp"]
+    codebook = pd.concat([codebook.loc[first_columns], codebook.drop(first_columns, errors="raise")]).reset_index()
+    # Create a table with the appropriate metadata.
+    codebook = Table(codebook).format(keys=["column"], short_name="owid_co2_codebook")
+    codebook_origin = [
+        Origin(producer="Our World in Data", title="CO2-data codebook", date_published=str(table["year"].max()))
+    ]
+    for column in ["description", "unit", "source"]:
+        codebook[column].metadata.origins = codebook_origin
+
+    return codebook
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -353,12 +459,15 @@ def run(dest_dir: str) -> None:
         tb_regions=tb_regions,
     )
 
-    # Prepare outputs.
-    combined = prepare_outputs(combined=combined, ds_regions=ds_regions)
+    # Prepare output data table.
+    tb = prepare_outputs(combined=combined, ds_regions=ds_regions)
+
+    # Prepare codebook.
+    codebook = prepare_codebook(tb=tb)
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[combined], check_variables_metadata=True)
+    ds_grapher = create_dataset(dest_dir, tables=[tb, codebook], check_variables_metadata=True)
     ds_grapher.save()
