@@ -10,26 +10,70 @@ Additionally, OWID's regions dataset, population dataset and Maddison Project Da
 GDP are included.
 
 Outputs:
-* The main data file and codebook (both in .csv format) will be committed to the co2-data repository.
+* The data in three different formats will also be uploaded to S3, and will be made publicly available, in:
+  * https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.csv
+  * https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.xlsx
+  * https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.json
 
 """
-import os
+import json
 import re
 import tempfile
 from pathlib import Path
 
 import pandas as pd
 from owid.catalog import Origin, Table
+from owid.datautils.s3 import S3
 from structlog import get_logger
+from tqdm.auto import tqdm
 
-from apps.owidbot import github_utils as gh
 from etl.helpers import PathFinder
 
 # Initialize logger.
 log = get_logger()
 
+# Define S3 base URL.
+S3_URL = "https://nyc3.digitaloceanspaces.com"
+# Profile name to use for S3 client (as defined in .aws/config).
+S3_PROFILE_NAME = "default"
+# S3 bucket name and folder where dataset files will be stored.
+S3_BUCKET_NAME = "owid-public"
+S3_DATA_DIR = Path("data/co2")
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+def save_data_to_json(tb: Table, output_path: str) -> None:
+    tb = tb.copy()
+
+    # Initialize output dictionary, that contains one item per country in the data.
+    output_dict = {}
+
+    # Each country contains a dictionary, which contains:
+    # * "iso_code", which is the ISO code (as a string), if it exists.
+    # * "data", which is a list of dictionaries, one per year.
+    #   Each dictionary contains "year" as the first item, followed by all other non-nan indicator values for that year.
+    for country in sorted(set(tb["country"])):
+        # Initialize output dictionary for current country.
+        output_dict[country] = {}
+
+        # If there is an ISO code for this country, add it as a new item of the dictionary.
+        iso_code = tb[tb["country"] == country].iloc[0]["iso_code"]
+        if not pd.isna(iso_code):
+            output_dict[country]["iso_code"] = iso_code
+
+        # Create the data dictionary for this country.
+        dict_country = tb[tb["country"] == country].drop(columns=["country", "iso_code"]).to_dict(orient="records")
+        # Remove all nans.
+        data_country = [
+            {indicator: value for indicator, value in d_year.items() if not pd.isna(value)} for d_year in dict_country
+        ]
+        output_dict[country]["data"] = data_country
+
+    # Write dictionary to file as a big json object.
+    with open(output_path, "w") as file:
+        file.write(json.dumps(output_dict, indent=4))
 
 
 def remove_details_on_demand(text: str) -> str:
@@ -157,34 +201,28 @@ def run(dest_dir: str) -> None:
     # Load the owid_co2 emissions dataset from garden, and read its main table.
     ds_gcp = paths.load_dataset("owid_co2")
     tb = ds_gcp.read("owid_co2")
+    # TODO: Maybe codebook should also be a table of owid_co2 dataset, so we can also load it here.
 
     #
     # Save outputs.
     #
-    # If you want to really commit the data, use `CO2_BRANCH=my-branch etlr github/co2_data --export`
-    if os.environ.get("CO2_BRANCH"):
-        dry_run = False
-        branch = os.environ["CO2_BRANCH"]
-    else:
-        dry_run = True
-        branch = "master"
-
     # Create a temporary directory for all files to be committed.
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir_path = Path(temp_dir)
 
         prepare_and_save_outputs(tb, temp_dir_path)
 
-        # TODO: Create README as well.
-
-        # Commit csv files to the repos.
-        for file_name in ["owid-co2-data.csv", "owid-co2-codebook.csv"]:
-            with (temp_dir_path / file_name).open("r") as file_content:
-                gh.commit_file_to_github(
-                    file_content.read(),
-                    repo_name="co2-data",
-                    file_path=file_name,
-                    commit_message=":bar_chart: Automated update",
-                    branch=branch,
-                    dry_run=dry_run,
-                )
+        # Initialise S3 client.
+        s3 = S3()
+        for file_name in tqdm(["owid-co2-data.csv", "owid-co2-data.xlsx", "owid-co2-data.json"]):
+            # Path to local file.
+            local_file = temp_dir_path / file_name
+            # Path (within bucket) to S3 file.
+            s3_file = Path("data/co2") / file_name
+            tqdm.write(f"Uploading file {local_file} to S3 bucket {S3_BUCKET_NAME} as {s3_file}.")
+            # Upload and make public each of the files.
+            s3.upload_to_s3(
+                local_path=str(local_file),
+                s3_path=f"s3://{S3_BUCKET_NAME}/{str(s3_file)}",
+                public=True,
+            )

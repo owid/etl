@@ -129,3 +129,8 @@ steps:
   #
   export://github/co2_data/latest/owid_co2:
     - data://garden/emissions/2024-11-13/owid_co2
+  #
+  # Emissions - CO2 dataset.
+  #
+  export://s3/co2_data/latest/owid_co2:
+    - data://garden/emissions/2024-11-13/owid_co2
