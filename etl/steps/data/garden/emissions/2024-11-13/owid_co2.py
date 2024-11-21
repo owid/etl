@@ -376,7 +376,9 @@ def prepare_codebook(tb: Table) -> pd.DataFrame:
     first_columns = ["country", "year", "iso_code", "population", "gdp"]
     codebook = pd.concat([codebook.loc[first_columns], codebook.drop(first_columns, errors="raise")]).reset_index()
     # Create a table with the appropriate metadata.
-    codebook = Table(codebook).format(keys=["column"], short_name="owid_co2_codebook")
+    codebook = Table(codebook).format(
+        keys=["column"], sort_rows=False, sort_columns=False, short_name="owid_co2_codebook"
+    )
     codebook_origin = [
         Origin(producer="Our World in Data", title="CO2-data codebook", date_published=str(table["year"].max()))
     ]
