@@ -1,0 +1,46 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Flourishing Study
+    description: |-
+      The Global Flourishing Study (GFS) is a five-year longitudinal data collection and research collaboration between researchers at Baylor University and Harvard University, in partnership with Gallup and the Center for Open Science (COS), and with the support of a consortium of funders. As part of this project, COS is making the data from the study an open access resource so researchers, journalists, policymakers, and educators worldwide can access detailed information about what makes for a flourishing life.
+
+      This initiative includes data collection for approximately 200,000 participants from 20+ geographically and culturally diverse countries and territories, including Argentina, Australia, Brazil, China (Hong Kong), Egypt, Germany, India, Indonesia, Israel, Japan, Kenya, Mexico, Nigeria, the Philippines, Poland, South Africa, Spain, Sweden, Tanzania, Turkey, United Kingdom, and the United States. The study will obtain nationally representative data within each country, with collection on the same panel of individuals annually.
+
+            GFS measures global human flourishing in six areas:
+
+              - Happiness and life satisfaction
+              - Mental and physical health
+              - Meaning and purpose
+              - Character and virtue
+              - Close social relationships
+              - Material and financial stability
+
+      The GFS is being led by principal investigators Byron R. Johnson, Director of the Institute for Studies of Religion at Baylor University, and Tyler J. VanderWeele, Director of the Human Flourishing Program at Harvard University.
+    date_published: "2024-06-07"
+    title_snapshot: Global Flourishing Study - Metadata and Translations
+    description_snapshot: |-
+      This file includes the survey questions as well as possible answers, their codes and translations into other languages.
+
+    # Citation
+    producer: Global Flourishing Study
+    citation_full: |-
+      Johnson, B. R., Ritter, Z., Fogleman, A., Markham, L., Stankov, T., Srinivasan, R., Honohan, J., Ripley, A., Phillips, T.A., Wang, H., & VanderWeele, T. J. (2024, February 8). The Global Flourishing Study. https://doi.org/10.17605/OSF.IO/3JTZ8
+    attribution_short: GFS
+
+    # Files
+    url_main: https://globalflourishingstudy.com/
+    url_download: https://osf.io/download/d4qw8/
+    date_accessed: 2024-11-21
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://osf.io/3jtz8/
+
+outs:
+  - md5: cddfc12d476cc8df0e5535de08e94998
+    size: 1177085
+    path: gfs_metadata.xls

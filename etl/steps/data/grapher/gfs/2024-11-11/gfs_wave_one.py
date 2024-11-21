@@ -9,12 +9,15 @@ paths = PathFinder(__file__)
 
 
 REL_COL_VAR = [
+    "abused",
+    "cigarettes",
     "close_to",
     "content",
     "days_exercise",
     "depressed",
     "discriminated",
     "donated",
+    "drinks",
     "expenses",
     "feel_anxious",
     "freedom",

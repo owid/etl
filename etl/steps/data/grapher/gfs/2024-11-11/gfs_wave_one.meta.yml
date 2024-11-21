@@ -25,6 +25,47 @@ dataset:
 tables:
   gfs_wave_one:
     variables:
+      abused_yes_share:
+        title: Share of people who report having experienced abuse when growing up
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of people who report that they have experienced physical or sexual abuse when growing up.
+      abused_no_share:
+        title: Share of people who report not having experienced abuse when growing up
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of people who report that they have not experienced physical or sexual abuse when growing up.
+      abused_na_share:
+        title: Share of people who did not answer the question about abuse
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - "{definitions.survey_text.no_answer}"
+        description_short: Share of people who did not answer the question 'Were you ever physically or sexually abused when you were growing up?'
+      cigarettes_mean:
+        title: Average number of cigarettes smoked per day, self-reported
+        unit: cigarettes
+        short_unit: ""
+        description_short: Average number of cigarettes people report smoking per day. This average includes both smokers and non-smokers.
+      cigarettes_na_share:
+        title: Share of people who did not answer the question about smoking
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - "{definitions.survey_text.no_answer}"
+        description_short: Share of people who did not answer the question 'On average, how many cigarettes do you smoke per day?'
+      drinks_mean:
+        title: Average number of alcoholic drinks consumed in the last week, self-reported
+        unit: drinks
+        short_unit: ""
+        description_short: Average number of alcoholic drinks people report consuming in the last week. A drink is defined as a glass of wine, a can or bottle of beer, or a shot of hard liquor. This average includes both people who report drinking alcohol and those who do not.
+      drinks_na_share:
+        title: Share of people who did not answer the question about alcohol consumption
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - "{definitions.survey_text.no_answer}"
+        description_short: Share of people who did not answer the question 'On how many days did you drink alcohol in the last week?'
       happy_mean:
         title: Self-reported happiness
         unit: ""
