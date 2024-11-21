@@ -7,6 +7,16 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+# Number of countries in each WHO region.
+WHO_REGION_MEMBERS = {
+    "African Region (WHO)": 47,
+    "World": 194,
+    "Eastern Mediterranean Region (WHO)": 21,
+    "European Region (WHO)": 53,
+    "Region of the Americas (WHO)": 35,
+    "South-East Asia Region (WHO)": 11,
+    "Western Pacific Region (WHO)": 27,
+}
 
 
 def run(dest_dir: str) -> None:
@@ -36,6 +46,10 @@ def run(dest_dir: str) -> None:
         ],
         join_column_levels_with="_",
     )
+    # Add the number of countries in each WHO region to calculate the share of countries that are reporting data.
+    tb = add_number_of_countries_in_each_region(tb)
+    # Calculate the share of countries in each WHO region that are reporting data.
+    tb = calculate_share_of_countries(tb)
     tb = tb.format(["country", "year"])
 
     #
@@ -54,9 +68,31 @@ def format_specimen(tb: Table) -> Table:
     """
     Format the syndrome column.
     """
-    specimen_dict = {"BLOOD": "bloodstream", "STOOL": "stool", "URINE": "urine", "UROGENITAL": "gonorrhea"}
+    specimen_dict = {"BLOOD": "bloodstream", "STOOL": "stool", "URINE": "urinary tract", "UROGENITAL": "gonorrhea"}
     tb["specimen"] = tb["specimen"].astype(str)
     tb["specimen"] = tb["specimen"].replace(specimen_dict)
     assert tb["specimen"].isin(specimen_dict.values()).all()
 
+    return tb
+
+
+def add_number_of_countries_in_each_region(tb: Table) -> Table:
+    """
+    Adding number of countries in each WHO region in order to calculate the share that are reporting data.
+    """
+    tb["number_of_countries_in_region"] = tb["country"].map(WHO_REGION_MEMBERS)
+
+    return tb
+
+
+def calculate_share_of_countries(tb: Table) -> Table:
+    """
+    Calculate the share of countries in each WHO region that are reporting data.
+    """
+    columns_with_number_of_countries = tb.columns[tb.columns.str.startswith("ctas")]
+    for column in columns_with_number_of_countries:
+        new_column = "share_" + column
+        tb[new_column] = tb[column] / tb["number_of_countries_in_region"]
+
+    tb = tb.drop(columns="number_of_countries_in_region")
     return tb
