@@ -6,7 +6,7 @@ definitions:
     display:
       numDecimalPlaces: 0
       numSignificantFigures: 3
-      name: << pathogen >>
+      name: << pathogen >> - << counterfactual >>
 
   pathogen_type:
     <%- if pathogen_type == "Fungi" -%>
