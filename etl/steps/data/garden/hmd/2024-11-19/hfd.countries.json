@@ -7,10 +7,18 @@
     "CHE": "Switzerland",
     "CHL": "Chile",
     "CZE": "Czechia",
+    "DEUTE": "East Germany",
+    "DEUTNP": "Germany",
+    "DEUTW": "West Germany",
     "DNK": "Denmark",
     "ESP": "Spain",
     "EST": "Estonia",
+    "FRATNP": "France",
     "FIN": "Finland",
+    "GBRTENW": "England & Wales",
+    "GBR_NIR": "Northern Ireland",
+    "GBR_SCO": "Scotland",
+    "GBR_NP": "United Kingdom",
     "HRV": "Croatia",
     "HUN": "Hungary",
     "IRL": "Ireland",
@@ -29,7 +37,5 @@
     "SWE": "Sweden",
     "TWN": "Taiwan",
     "UKR": "Ukraine",
-    "USA": "United States",
-    "DEUTE": "Germany",
-    "GBR_NIR": "Northern Ireland"
+    "USA": "United States"
 }
