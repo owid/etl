@@ -1,0 +1,53 @@
+dataset:
+  update_period_days: 0
+  title: Population (Maddison exploration)
+  non_redistributable: true
+
+tables:
+  population_explore:
+    variables:
+      population:
+        title: Population
+        description_short: Population of countries
+        unit: "people"
+      population_omm:
+        title: Population (omm)
+        description_short: Population of countries
+        unit: "people"
+      population_hyde:
+        title: Population (HYDE)
+        description_short: Population of countries
+        unit: "people"
+      population_gm:
+        title: Population (gapminder)
+        description_short: Population of countries
+        unit: "people"
+        origins:
+          - title: Gapminder
+            url: https://www.gapminder.org/data/
+            producer: Gapminder
+      population_wpp:
+        title: Population (UN)
+        description_short: Population of countries
+        unit: "people"
+      diff:
+        title: Population difference
+        description_short: Population difference
+        unit: people
+
+      population_hyde_cut:
+        title: Population (HYDE), cut
+        description_short: Population of countries
+        unit: "people"
+      population_gm_cut:
+        title: Population (gapminder), cut
+        description_short: Population of countries
+        unit: "people"
+        origins:
+          - title: Gapminder
+            url: https://www.gapminder.org/data/
+            producer: Gapminder
+      population_wpp_cut:
+        title: Population (UN), cut
+        description_short: Population of countries
+        unit: "people"
