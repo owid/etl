@@ -92,7 +92,7 @@ def calculate_share_of_countries(tb: Table) -> Table:
     columns_with_number_of_countries = tb.columns[tb.columns.str.startswith("ctas")]
     for column in columns_with_number_of_countries:
         new_column = "share_" + column
-        tb[new_column] = tb[column] / tb["number_of_countries_in_region"]
+        tb[new_column] = (tb[column] / tb["number_of_countries_in_region"]) * 100
 
     tb = tb.drop(columns="number_of_countries_in_region")
     return tb
