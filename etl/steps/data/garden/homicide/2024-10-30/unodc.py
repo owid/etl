@@ -147,6 +147,7 @@ def calculate_united_kingdom(tb: Table, ds_population: Dataset) -> Table:
     # Use only rows where all three entites are in the data
     tb_uk = tb_uk[tb_uk["count"] == 2]
     tb_uk["country"] = "United Kingdom"
+    tb_uk = tb_uk.drop(columns="count")
 
     # Add in UK population to calculate rates
     tb_uk_rate = tb_uk.copy()
