@@ -163,34 +163,85 @@ tables:
 
   cohort:
     variables:
-      # Mean age at birth
-      cmab:
-        title: "Cohort mean ages at birth"
-        description_short: ""
-        unit: "years"
-      cmab40:
-        title: "Cohort mean ages at 40"
-        description_short: ""
-        unit: "years"
-      sdcmab:
-        title: "Standard deviation in cohort mean ages at birth"
-        description_short: ""
-        unit: "years"
-      sdcmab40:
-        title: "Standard deviation in cohort mean ages at 40"
-        description_short: ""
-        unit: "years"
-
       # Fertility
       ccf:
-        title: "Completed cohort fertility"
-        description_short: ""
-        unit: ""
+        title: "Completed cohort fertility rate"
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average number of children born to women in a specific cohort over their lifetime.
+          <%- else %>
+          The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
+          <% endif %>
+        unit: "births per woman"
+        description_key:
+          - Represents the completed fertility of a cohort by the end of their reproductive years.
+          - Useful for comparing fertility across different cohorts.
+          - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
         display:
           numDecimalPlaces: 3
       ccf40:
-        title: "Completed cohort fertility at 40"
-        description_short: ""
-        unit: ""
+        title: "Completed cohort fertility rate at 40"
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average number of children born to women in a specific cohort by age 40.
+          <%- else %>
+          The average number of{definitions.others.bo_1} children born to women in a specific cohort by age 40.
+          <% endif %>
+        unit: "births per woman"
+        description_key:
+          - Represents the fertility of a cohort up to age 40.
+          - Provides insights into early and mid-reproductive age fertility patterns.
         display:
           numDecimalPlaces: 3
+
+      # Mean age at birth
+      cmab:
+        title: "Cohort mean ages at birth"
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average age at which women in a specific birth cohort have children. It is standardized for the age structure of the female population of reproductive age.
+          <%- else %>
+          The average age at which women in a specific birth cohort have their{definitions.others.bo_1} child. It is standardized for the age structure of the female population of reproductive age.
+          <% endif %>
+        unit: "years"
+        description_key:
+          - Represents the average age at which women from a particular cohort give birth.
+          - Helps understand generational differences in fertility timing.
+          - Calculated from observed fertility rates across the reproductive lifespan of the cohort.
+      cmab40:
+        title: "Cohort mean ages at 40"
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average age at which women in a specific cohort have children, calculated only up to age 40.
+          <%- else %>
+          The average age at which women in a specific cohort have their{definitions.others.bo_1} child, calculated only up to age 40.
+          <% endif %>
+        unit: "years"
+        description_key:
+          - Focuses on births occurring before age 40, providing insights into early fertility patterns for the cohort.
+          - Useful for comparing early reproductive behavior across different cohorts.
+      sdcmab:
+        title: "Standard deviation in cohort mean ages at birth"
+        description_short: |-
+          <% if birth_order == 'total' %>
+          How much variation there is in the ages at which women in a specific cohort have children.
+          <%- else %>
+          How much variation there is in the ages at which women in a specific cohort have their{definitions.others.bo_1} child.
+          <% endif %>
+        unit: "years"
+        description_key:
+          - Measures the spread of ages at which women in a cohort give birth.
+          - A lower value indicates concentrated timing, while a higher value suggests more variation in childbearing ages.
+          - Helps to understand the diversity of reproductive timing within a cohort.
+      sdcmab40:
+        title: "Standard deviation in cohort mean ages at 40"
+        description_short: |-
+          <% if birth_order == 'total' %>
+          How much variation there is in the ages at which women in a specific cohort have children, calculated only up to age 40.
+          <%- else %>
+          How much variation there is in the ages at which women in a specific cohort have their{definitions.others.bo_1} child, calculated only up to age 40.
+          <% endif %>
+        unit: "years"
+        description_key:
+          - Reflects variability in the timing of births up to age 40 within a cohort.
+          - Helps to understand how concentrated or spread out early childbearing is within the cohort.
