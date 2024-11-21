@@ -867,6 +867,15 @@ steps:
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
 
+# Migration between regions, based on UN DESA flows
+  data://garden/migration/2024-11-18/migration_between_regions:
+    - data://garden/un/2024-07-16/migrant_stock
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+
+  data://grapher/migration/2024-11-18/migration_between_regions:
+    - data://garden/migration/2024-11-18/migration_between_regions
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
