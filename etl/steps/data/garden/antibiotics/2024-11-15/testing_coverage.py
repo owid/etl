@@ -11,7 +11,7 @@ paths = PathFinder(__file__)
 WHO_REGION_MEMBERS = {
     "African Region (WHO)": 47,
     "World": 194,
-    "Eastern Mediterranean Region (WHO)": 21,
+    "Eastern Mediterranean (WHO)": 21,
     "European Region (WHO)": 53,
     "Region of the Americas (WHO)": 35,
     "South-East Asia Region (WHO)": 11,
@@ -81,6 +81,7 @@ def add_number_of_countries_in_each_region(tb: Table) -> Table:
     Adding number of countries in each WHO region in order to calculate the share that are reporting data.
     """
     tb["number_of_countries_in_region"] = tb["country"].map(WHO_REGION_MEMBERS)
+    assert tb["number_of_countries_in_region"].notnull().all(), "Missing WHO region! Check spelling."
 
     return tb
 
