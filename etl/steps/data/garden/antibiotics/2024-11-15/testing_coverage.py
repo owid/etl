@@ -83,6 +83,7 @@ def add_number_of_countries_in_each_region(tb: Table) -> Table:
     Adding number of countries in each WHO region in order to calculate the share that are reporting data.
     """
     tb["number_of_countries_in_region"] = tb["country"].map(WHO_REGION_MEMBERS)
+    tb["number_of_countries_in_region"] = tb["number_of_countries_in_region"].astype("Int64")
     assert tb["number_of_countries_in_region"].notnull().all(), "Missing WHO region! Check spelling."
 
     return tb
@@ -94,6 +95,7 @@ def calculate_share_of_countries(tb: Table) -> Table:
     """
     columns_with_number_of_countries = tb.columns[tb.columns.str.startswith("ctas")]
     for column in columns_with_number_of_countries:
+        print(column)
         new_column = "share_" + column
         tb[new_column] = (tb[column] / tb["number_of_countries_in_region"]) * 100
 
