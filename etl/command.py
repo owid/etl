@@ -536,7 +536,11 @@ def _exec_step_job(
     step = parse_step(step_name, dag)
     strict = _detect_strictness_level(step, strict)
     with strictness_level(strict):
-        execution_times[step_name] = timed_run(lambda: step.run())
+        try:
+            execution_times[step_name] = timed_run(lambda: step.run())
+        except Exception:
+            log.error("step_failed", step=step_name)
+            raise
     print(f"--- Finished {step_name} ({execution_times[step_name]:.1f}s)")
 
 
