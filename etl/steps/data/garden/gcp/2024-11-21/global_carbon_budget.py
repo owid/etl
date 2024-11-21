@@ -430,7 +430,8 @@ def sanity_checks_on_output_data(tb_combined: Table) -> None:
 
     error = "Consumption emissions as a share of global emissions should be 100% for 'World'."
     assert tb_combined[
-        (tb_combined["country"] == "World") & (abs(tb_combined["consumption_emissions_as_share_of_global"] - 100) > 0.0001)
+        (tb_combined["country"] == "World")
+        & (abs(tb_combined["consumption_emissions_as_share_of_global"] - 100) > 0.0001)
     ].empty, error
 
     error = "Population as a share of global population should be 100% for 'World'."
@@ -465,7 +466,12 @@ def sanity_checks_on_output_data(tb_combined: Table) -> None:
     assert (
         tb_combined.sort_values("year", ascending=False)
         .groupby("country")
-        .agg({col: lambda x: ((x.pct_change(fill_method=None).dropna() * 100) <= 0.0001).all() for col in cumulative_cols})
+        .agg(
+            {
+                col: lambda x: ((x.pct_change(fill_method=None).dropna() * 100) <= 0.0001).all()
+                for col in cumulative_cols
+            }
+        )
         .all()
         .all()
     ), error
