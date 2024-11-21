@@ -145,7 +145,7 @@ steps:
   #
   # Emissions - CO2 dataset.
   #
-  export://github/co2_data/latest/owid_co2:
+  data://garden/emissions/2024-11-13/owid_co2:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
@@ -153,3 +153,8 @@ steps:
     - data://garden/gcp/2024-11-13/global_carbon_budget
     - data://garden/climate_watch/2023-10-31/emissions_by_sector
     - data://garden/energy/2024-06-20/primary_energy_consumption
+  #
+  # Emissions - CO2 dataset.
+  #
+  export://github/co2_data/latest/owid_co2:
+    - data://garden/emissions/2024-11-13/owid_co2
