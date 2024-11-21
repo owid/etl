@@ -97,7 +97,6 @@ def calculate_share_of_countries(tb: Table) -> Table:
     """
     columns_with_number_of_countries = tb.columns[tb.columns.str.startswith("ctas")]
     for column in columns_with_number_of_countries:
-        print(column)
         new_column = "share_" + column
         tb[new_column] = (tb[column] / tb["number_of_countries_in_region"]) * 100
 
@@ -120,6 +119,14 @@ def calculate_number_infections_not_tested_for_susceptibility(tb: Table) -> Tabl
         ]
     )
     tb = tb.rename(columns={"specimen": "country"})
+    tb["country"] = tb["country"].replace(
+        {
+            "bloodstream": "Bloodstream",
+            "stool": "Stool",
+            "urinary_tract": "Urinary tract",
+            "gonorrhea": "Gonorrhea",
+        }
+    )
     tb = tb.format(["country", "year"], short_name="specimen")
 
     return tb
