@@ -107,6 +107,16 @@ steps:
   data://grapher/unesco/2024-06-25/education_sdgs:
     - data://garden/unesco/2024-06-25/education_sdgs
 
+  # UNESCO data on other policy related education indicators
+  data://meadow/unesco/2024-11-21/education_opri:
+    - snapshot://unesco/2024-11-21/education_opri.csv
+  data://garden/unesco/2024-11-21/education_opri:
+    - data://meadow/unesco/2024-11-21/education_opri
+    - snapshot://wb/2024-06-18/edstats_metadata.xls
+  data://grapher/unesco/2024-11-21/education_opri:
+    - data://garden/unesco/2024-11-21/education_opri
+
+
   # World Bank EdStats
   data://meadow/wb/2024-11-04/edstats:
     - snapshot://wb/2024-11-04/edstats.csv
