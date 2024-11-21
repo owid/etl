@@ -54,7 +54,7 @@ steps:
     - snapshot://education/2023-08-14/oecd_education.csv
   data://garden/education/2023-08-14/oecd_education:
     - data://meadow/education/2023-08-14/oecd_education
-    - data://garden/wb/2023-07-10/education
+    - data://garden/wb/2024-11-04/edstats
   data://grapher/education/2023-08-14/oecd_education:
     - data://garden/education/2023-08-14/oecd_education
 
@@ -119,3 +119,14 @@ steps:
     - snapshot://wb/2024-06-18/edstats_metadata.xls
   data://grapher/unesco/2024-06-25/education_sdgs:
     - data://garden/unesco/2024-06-25/education_sdgs
+
+  # World Bank EdStats
+  data://meadow/wb/2024-11-04/edstats:
+    - snapshot://wb/2024-11-04/edstats.csv
+  data://garden/wb/2024-11-04/edstats:
+    - data://meadow/wb/2024-11-04/edstats
+    - data://garden/education/2017-09-30/public_expenditure
+    - data://garden/education/2018-04-18/literacy_rates
+
+  data://grapher/wb/2024-11-04/edstats:
+    - data://garden/wb/2024-11-04/edstats

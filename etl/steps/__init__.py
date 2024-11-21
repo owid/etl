@@ -668,7 +668,7 @@ class DataStep(Step):
 
         r2 = s3_utils.connect_r2_cached()
         s3_utils.download_s3_folder(
-            f"s3://owid-catalog/{self.path}",
+            f"s3://owid-catalog/{self.path}/",
             self._dest_dir,
             client=r2,
             include=include,
