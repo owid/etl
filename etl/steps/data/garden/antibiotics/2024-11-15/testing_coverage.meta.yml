@@ -134,6 +134,34 @@ tables:
         unit: infections
         display:
           name: Urinary tract infections
+      total_bcis_without_ast_bloodstream:
+        title: Total confirmed bloodstream infections that aren't tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed bloodstream infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_bloodstream
+        unit: infections
+        display:
+          name: Bloodstream infections
+      total_bcis_without_ast_gonorrhea:
+        title: Total confirmed gonorrhea infections that aren't tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed gonorrhea infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_gonorrhea
+        unit: infections
+        display:
+          name: Gonorrhea infections
+      total_bcis_without_ast_stool:
+        title: Total confirmed gastrointestinal infections that aren't tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed gastrointestinal infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_stool
+        unit: infections
+        display:
+          name: Gastrointestinal infections
+      total_bcis_without_ast_urinary_tract:
+        title: Total confirmed urinary tract infections that aren't tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed urinary tract infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_urinary_tract
+        unit: infections
+        display:
+          name: Urinary tract infections
       share_ctas_with_reported_bcis_bloodstream:
         title: Share of countries reporting confirmed bloodstream infections
         description_short: Share of countries reporting bacteriologically confirmed bloodstream infections to WHO.
