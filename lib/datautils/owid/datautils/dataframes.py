@@ -544,7 +544,7 @@ def concatenate(objs: List[pd.DataFrame], **kwargs: Any) -> pd.DataFrame:
         uc = union_categoricals([df[col] for df in objs], ignore_order=ignore_order)
         # Change to union category for all dataframes
         for df in objs:
-            df[col] = pd.Categorical(df[col].values, categories=uc.categories)
+            df.loc[:, col] = pd.Categorical(df[col].values, categories=uc.categories)
 
     with warnings.catch_warnings():
         warnings.simplefilter(action="ignore", category=FutureWarning)
