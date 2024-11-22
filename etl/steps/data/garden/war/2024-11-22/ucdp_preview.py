@@ -50,12 +50,13 @@ TYPE_OF_VIOLENCE_MAPPING = {
     3: "one-sided violence",
 }
 # Mapping for armed conflicts dataset (inc PRIO/UCDP)
+UNKNOWN_TYPE_ID = 99
 TYPE_OF_CONFLICT_MAPPING = {
     1: "extrasystemic",
     2: "interstate",
     3: "intrastate (non-internationalized)",
     4: "intrastate (internationalized)",
-    99: "state-based (unknown)",
+    UNKNOWN_TYPE_ID: "state-based (unknown)",
 }
 # Regions mapping (for PRIO/UCDP dataset)
 REGIONS_MAPPING = {
@@ -165,6 +166,10 @@ def run(dest_dir: str) -> None:
     # Create `conflict_type` column
     paths.log.info("add field `conflict_type`")
     tb = add_conflict_type(tb_ged, tb_conflict)
+
+    # NOTE: Export summary of conflicts that have no category assigned
+    tb_summary = get_summary_unknown(tb)
+    tb_summary.to_csv("summary.csv")
 
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
@@ -1359,3 +1364,37 @@ def extend_latest_years(tb: Table) -> Table:
 
     tb = tb.set_index(index)
     return tb
+
+
+def get_summary_unknown(tb: Table):
+    """Get a table summary of the ongoing conflicts that couldn't be mapped to a specific category.
+
+    We know that these are state-based conflicts, but we don't have more information about them!
+
+    By looking at them, we may be able to map these to a specific category:
+
+        - "extrasystemic",
+        - "interstate"
+        - "intrastate (non-internationalized)"
+        - "intrastate (internationalized)"
+    """
+    tbx = tb.loc[
+        tb["type_of_conflict"] == UNKNOWN_TYPE_ID,
+        ["id", "conflict_new_id", "conflict_name", "date_start", "date_end", "side_a", "side_b"],
+    ]
+    tbx = tbx.groupby(["conflict_new_id", "conflict_name"], as_index=False).agg(
+        {
+            "date_start": "min",
+            "date_end": "max",
+            "side_a": (lambda x: "; ".join(set(x))),
+            "side_b": (lambda x: "; ".join(set(x))),
+            "id": "nunique",
+        }
+    )
+    tbx = tbx.drop_duplicates(subset=["conflict_new_id", "conflict_name"])
+    tbx["date_start"] = pd.to_datetime(tbx["date_start"])
+    tbx["date_end"] = pd.to_datetime(tbx["date_end"])
+    tbx = tbx.rename(columns={"id": "num_events"})
+    tbx = tbx.sort_values(["num_events", "date_start"], ascending=False)
+
+    return tbx
