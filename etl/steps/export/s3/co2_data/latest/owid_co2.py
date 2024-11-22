@@ -105,12 +105,19 @@ def run(dest_dir: str) -> None:
     #
     # Create a temporary directory for all files to be committed.
     with tempfile.TemporaryDirectory() as temp_dir:
+        ################################################################################################################
+        # TODO: Create new public files and update the way we write to them.
+        log.warning(
+            "This implementation currently does not work. We should create an R2 public bucket and update the way we write to it. For now, manually update files in Digital Ocean using the web interface."
+        )
+        ################################################################################################################
+
         temp_dir_path = Path(temp_dir)
 
         prepare_and_save_outputs(tb, codebook=codebook, temp_dir_path=temp_dir_path)
 
         # Initialise S3 client.
-        s3 = S3()
+        s3 = S3(profile_name=S3_PROFILE_NAME)
         for file_name in tqdm(["owid-co2-data.csv", "owid-co2-data.xlsx", "owid-co2-data.json"]):
             # Path to local file.
             local_file = temp_dir_path / file_name
