@@ -11,10 +11,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("ucdp_monthly")
+    ds_garden = paths.load_dataset("ucdp_preview")
 
     # Read table from garden dataset.
-    tb = ds_garden["ucdp_monthly"]
+    tb = ds_garden["ucdp_preview"]
 
     # Process data.
     #
@@ -26,8 +26,8 @@ def run(dest_dir: str) -> None:
     tb = tb.set_index(["year", "country", "conflict_type"])
 
     # Get country-level data
-    tb_participants = ds_garden["ucdp_monthly_country"]
-    tb_locations = ds_garden["ucdp_monthly_locations"]
+    tb_participants = ds_garden["ucdp_preview_country"]
+    tb_locations = ds_garden["ucdp_preview_locations"]
 
     tables = [
         tb,

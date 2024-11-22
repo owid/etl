@@ -149,7 +149,7 @@ definitions:
 
 tables:
   # PARTICIPANT INDICATORS
-  ucdp_monthly_country:
+  ucdp_preview_country:
     common:
       presentation:
         attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
@@ -204,7 +204,7 @@ tables:
           <%- endif -%>
 
   # LOCATION INDICATORS
-  ucdp_monthly_locations:
+  ucdp_preview_locations:
     common:
       description_processing: |-
         {definitions.all.location_conflicts_method}
@@ -358,7 +358,7 @@ tables:
       #     {definitions.number_deaths_type.description_short_per_capita}
 
   # MAIN INDICATORS
-  ucdp_monthly:
+  ucdp_preview:
     common:
       presentation:
         grapher_config:
@@ -475,7 +475,6 @@ tables:
       #   display:
       #     numDecimalPlaces: 1
 
-
       # number_deaths_ongoing_conflicts_unknown_per_capita:
       #   title: Death rate from unknown type in ongoing conflicts
       #   unit: deaths
@@ -485,7 +484,6 @@ tables:
       #   description_key: *description_key_deaths
       #   display:
       #     numDecimalPlaces: 1
-
 
       #####################
       # Ongoing conflicts #
