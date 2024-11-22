@@ -59,6 +59,19 @@ steps:
   data://grapher/war/2024-10-02/ucdp_monthly:
     - data://garden/war/2024-10-02/ucdp_monthly
 
+    # UCDP (candidate data)
+  data://meadow/war/2024-11-22/ucdp_ced:
+    - snapshot://war/2024-11-22/ucdp_ced_v24_0_10.csv
+    - snapshot://war/2024-11-22/ucdp_ced_v24_01_24_09.csv
+  data://garden/war/2024-11-22/ucdp_preview:
+    - data://meadow/war/2024-11-22/ucdp_ced
+    - data://garden/demography/2024-07-15/population
+    - data://garden/geography/2023-11-28/nat_earth_110
+    - data://meadow/war/2024-08-26/ucdp
+    - data://garden/countries/2024-08-27/gleditsch
+  data://grapher/war/2024-11-22/ucdp_preview:
+    - data://garden/war/2024-11-22/ucdp_preview
+
   # PRIO v3.1
   data://meadow/war/2023-09-21/prio_v31:
     - snapshot://war/2023-09-21/prio_v31.xls
