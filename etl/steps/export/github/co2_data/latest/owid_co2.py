@@ -224,6 +224,13 @@ def run(dest_dir: str) -> None:
         dry_run = True
         branch = "master"
 
+    # Uncomment to inspect changes.
+    # from etl.data_helpers.misc import compare_tables
+    # branch = "update-gcb-data"
+    # old = pd.read_csv("https://raw.githubusercontent.com/owid/co2-data/refs/heads/master/owid-co2-data.csv")
+    # new = pd.read_csv(f"https://raw.githubusercontent.com/owid/co2-data/refs/heads/{branch}/owid-co2-data.csv")
+    # compare_tables(old, new, countries=["World"])
+
     # Create a temporary directory for all files to be committed.
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_dir_path = Path(temp_dir)
