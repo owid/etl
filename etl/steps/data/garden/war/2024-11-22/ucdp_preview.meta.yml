@@ -557,9 +557,11 @@ tables:
           attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
 
 dataset:
-  title: UCDP, History of war (monthly)
+  title: UCDP, History of war (preview)
   description: |-
-    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 23.1), the UCDP/PRIO Armed Conflict Dataset (version 23.1), and the UCDP Battle-Related Deaths Dataset (version 23.1).
+    This dataset provides information on armed conflicts, using data from the UCDP Georeferenced Event Dataset (version 24.1), the UCDP/PRIO Armed Conflict Dataset (version 24.1), the UCDP Battle-Related Deaths Dataset (version 24.1), and the UCDP Candidate Event Dataset (version 24.X).
+
+    Its difference with the main "UCDP, History of war" dataset is that it includes data up to the latest available, using preliminary data from the UCDP Candidate Event Dataset.
 
     We aggregate the UCDP Georeferenced Event Dataset up to the year and world (region) to identify all conflict deaths, non-state conflicts, and one-sided violence.
 
