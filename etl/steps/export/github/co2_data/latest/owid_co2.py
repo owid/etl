@@ -3,7 +3,6 @@
 The combined datasets are:
 * Global Carbon Budget - Global Carbon Project.
 * National contributions to climate change - Jones et al.
-* Greenhouse gas emissions by sector - Climate Watch.
 * Primary energy consumption - EI & EIA.
 
 Additionally, OWID's regions dataset, population dataset and Maddison Project Database (Bolt and van Zanden, 2023) on
@@ -86,26 +85,21 @@ The dataset is built upon a number of datasets and processing steps:
   - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/gcp/2024-11-13/global_carbon_budget.py)
 - National contributions to climate change (Jones et al. (2024)):
   - [Source data](https://zenodo.org/records/7636699/latest)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/emissions/2024-04-08/national_contributions.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/emissions/2024-04-08/national_contributions.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/emissions/2024-04-08/national_contributions.py)
-- Greenhouse gas emissions (including methane and nitrous oxide) by sector (Climate Watch):
-  - [Source data](https://www.climatewatchdata.org/ghg-emissions)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/climate_watch/2023-10-31/emissions_by_sector.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/climate_watch/2023-10-31/emissions_by_sector.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/climate_watch/2023-10-31/emissions_by_sector.py)
+  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/emissions/2024-11-21/national_contributions.py)
+  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/emissions/2024-11-21/national_contributions.py)
+  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/emissions/2024-11-21/national_contributions.py)
 - CO2 dataset (Our World in Data based on all sources above):
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/external/co2_data/latest/owid_co2.py)
-  - [Exporting code](https://github.com/owid/co2-data/blob/master/scripts/make_dataset.py)
-  - [Uploading code](https://github.com/owid/co2-data/blob/master/scripts/upload_datasets_to_s3.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/emissions/2024-11-21/owid_co2.py)
+  - [Exporting code](https://github.com/owid/etl/blob/master/etl/steps/export/github/co2_data/latest/owid_co2.py)
+  - [Uploading code](https://github.com/owid/etl/blob/master/etl/steps/export/s3/co2_data/latest/owid_co2.py)
 
 Additionally, to construct indicators per capita and per GDP, we use the following datasets and processing steps:
 - Regions (Our World in Data).
   - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/regions/2023-01-01/regions.py)
 - Population (Our World in Data based on [a number of different sources](https://ourworldindata.org/population-sources)).
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/demography/2023-03-31/population/__init__.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/demography/2024-07-15/population/__init__.py)
 - Income groups (World Bank).
-  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/wb/2024-03-11/income_groups.py)
+  - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/wb/2024-07-29/income_groups.py)
 - GDP (University of Groningen GGDC's Maddison Project Database, Bolt and van Zanden, 2024).
   - [Source data](https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023)
   - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/ggdc/2024-04-26/maddison_project_database.py)
@@ -115,7 +109,8 @@ Additionally, to construct indicators per capita and per GDP, we use the followi
 ## Changelog
 
 - 2024-11-21:
-  - Updated dataset (and codebook) to use the latest version of the Global Carbon Budget (2024).
+  - Updated dataset (and codebook) to use the latest version of the Global Carbon Budget (2024), and Jones et al. (2024) (version 2024.2).
+  - Now methane, nitrous oxide, and total greenhouse gas emissions data come from Jones et al. (2024), instead of Climate Watch, to provide a wider data coverage.
 - 2024-06-20:
   - Update data from the Statistical Review of World Energy.
   - Update data from the Maddison Project Database.
@@ -226,8 +221,9 @@ def run(dest_dir: str) -> None:
 
     # Uncomment to inspect changes.
     # from etl.data_helpers.misc import compare_tables
-    # branch = "update-gcb-data"
+    # branch = "update-ghg-emissions"
     # old = pd.read_csv("https://raw.githubusercontent.com/owid/co2-data/refs/heads/master/owid-co2-data.csv")
+    # new = tb.copy()
     # new = pd.read_csv(f"https://raw.githubusercontent.com/owid/co2-data/refs/heads/{branch}/owid-co2-data.csv")
     # compare_tables(old, new, countries=["World"])
 

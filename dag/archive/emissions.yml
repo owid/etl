@@ -117,3 +117,29 @@ steps:
   #
   data://grapher/gcp/2024-11-13/global_carbon_budget:
     - data://garden/gcp/2024-11-13/global_carbon_budget
+  #
+  # Climate Watch - Greenhouse gas emissions by sector (2023-10-31).
+  #
+  data://meadow/climate_watch/2023-10-31/emissions_by_sector:
+    - snapshot://climate_watch/2023-10-31/emissions_by_sector.gz
+  #
+  # Jones et al. - National contributions to climate change.
+  #
+  data://meadow/emissions/2024-04-08/national_contributions:
+    - snapshot://emissions/2024-04-08/national_contributions_temperature_response.csv
+    - snapshot://emissions/2024-04-08/national_contributions_annual_emissions.csv
+    - snapshot://emissions/2024-04-08/national_contributions_cumulative_emissions.csv
+  data://garden/climate_watch/2023-10-31/emissions_by_sector:
+    - data://meadow/climate_watch/2023-10-31/emissions_by_sector
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+  data://garden/emissions/2024-04-08/national_contributions:
+    - data://meadow/emissions/2024-04-08/national_contributions
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/climate_watch/2023-10-31/emissions_by_sector:
+    - data://garden/climate_watch/2023-10-31/emissions_by_sector
+  data://grapher/emissions/2024-04-08/national_contributions:
+    - data://garden/emissions/2024-04-08/national_contributions

@@ -253,7 +253,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("national_contributions")
-    tb = ds_meadow["national_contributions"].reset_index()
+    tb = ds_meadow.read("national_contributions")
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
