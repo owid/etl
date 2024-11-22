@@ -402,6 +402,13 @@ tables:
         description_short: *measured-in-tonnes-per-person
         presentation:
           title_public: Per capita CO₂ emissions including land use
+      annual_emissions_co2_fossil_per_capita:
+        title: Per capita CO₂ emissions from fossil fuels and industry
+        unit: tonnes per person
+        short_unit: t/person
+        description_short: *measured-in-tonnes-per-person
+        presentation:
+          title_public: Per capita CO₂ emissions from fossil fuels and industry
       annual_emissions_ch4_total_co2eq_per_capita:
         title: Per capita methane emissions in CO₂ equivalents
         unit: tonnes of CO₂ equivalents per person
@@ -434,3 +441,4 @@ tables:
         description_processing: *processing-greenhouse-gases
         presentation:
           title_public: Per capita greenhouse gas emissions from fossil fuels and industry
+
