@@ -131,13 +131,13 @@ def create_gif_from_chart_url(
     png_folder=None,
     tab=None,
     years=None,
-    year_range_open=None,
+    year_range_open=True,
     duration_frame=200,
     duration_loop=None,
     loops=0,
     max_workers=None,
     remove_duplicate_frames=True,
-    max_num_years=50,
+    max_num_years=100,
 ):
     # Given a chart URL, create a GIF with the chart data.
 
@@ -167,10 +167,11 @@ def create_gif_from_chart_url(
             # Default to "map" if the tab parameter is not found.
             tab = "map"
 
-    # Infer year_range_open is not provided, infer it based on URL.
-    if year_range_open is None:
-        _year_range_open = parse_qs(urlparse(chart_url).query).get("time", [None])[0]
-        year_range_open = ".." in _year_range_open if _year_range_open else False
+    # By default, assume an open year range (which is the most likely desired output).
+    # # Infer year_range_open is not provided, infer it based on URL.
+    # if year_range_open is None:
+    #     _year_range_open = parse_qs(urlparse(chart_url).query).get("time", [None])[0]
+    #     year_range_open = ".." in _year_range_open if _year_range_open else False
 
     if years is None:
         years = get_years_in_chart(chart_url=chart_url)
@@ -179,11 +180,11 @@ def create_gif_from_chart_url(
             log.error("No years available.")
             return None
 
-    if year_range_open:
-        if len(years) < 2:
-            log.error("Cannot generate year ranges with less than two years.")
-            return None
-        years = years[1:]
+        if year_range_open:
+            if len(years) < 2:
+                log.error("Cannot generate year ranges with less than two years.")
+                return None
+            years = years[1:]
 
     if max_num_years is not None and len(years) > max_num_years:
         log.error(
@@ -272,10 +273,9 @@ def create_gif_from_chart_url(
     help="Comma-separated list of years to plot. If None, uses all years in the chart. To avoid many queries, a parameter --max-num-years is defined.",
 )
 @click.option(
-    "--year-range-open",
-    is_flag=True,
-    default=None,
-    help="Assume an open range of years in each frame (from the earliest year in the chart to a given year). If not specified, it is inferred from the URL.",
+    "--year-range-open/--year-range-closed",
+    default=True,
+    help="Whether the year range is open or closed. If open, the range is from earliest to the year. If closed, the range is only the year.",
 )
 @click.option(
     "--duration-frame",
@@ -310,7 +310,7 @@ def create_gif_from_chart_url(
 @click.option(
     "--max-num-years",
     type=int,
-    default=50,
+    default=100,
     help="Maximum number of years to download. If the number of years in the chart exceeds this value, the script will stop.",
 )
 @click.option(
@@ -332,6 +332,10 @@ def main(
     max_num_years,
     remove_duplicate_frames,
 ):
+    # Parse years.
+    if years is not None:
+        years = [int(year) for year in years.split(",")]
+
     create_gif_from_chart_url(
         chart_url=chart_url,
         output_gif=output_gif,
