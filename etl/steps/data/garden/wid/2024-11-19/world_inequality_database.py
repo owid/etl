@@ -1,8 +1,10 @@
 """
 Load World Inequality Database meadow dataset and create a garden dataset.
 
-NOTE: To extract the log of the process (to review sanity checks, for example), run the following command in the terminal:
-    nohup uv run etl run world_inequality_database > output.log 2>&1 &
+NOTE: To extract the log of the process (to review sanity checks, for example), follow these steps:
+    1. Define LONG_FORMAT as True.
+    2. Run the following command in the terminal:
+        nohup uv run etl run world_inequality_database > output.log 2>&1 &
 
 """
 
@@ -24,6 +26,9 @@ WELFARE_VARS = ["pretax", "posttax_nat", "posttax_dis", "wealth"]
 
 # Set table format when printing
 TABLEFMT = "pretty"
+
+# Define if I show the full table or just the first 5 rows for assertions
+LONG_FORMAT = False
 
 
 def run(dest_dir: str) -> None:
@@ -208,16 +213,16 @@ def check_between_0_and_1(tb: Table, variables: list, welfare: list):
                     # Filter only values lower than 0 or higher than 1
                     tb_error = tb[mask].copy().reset_index()
                     paths.log.fatal(
-                        f"""Values for {col} are not between 0 and 1:
-                        {_tabulate(tb_error[['country', 'year', col]])}"""
+                        f"""{len(tb_error)} values for {col} are not between 0 and 1:
+                        {_tabulate(tb_error[['country', 'year', col]], long_format=LONG_FORMAT)}"""
                     )
 
                 elif any_error and w == "wealth":
                     # Filter only values lower than 0 or higher than 1
                     tb_error = tb[mask].copy().reset_index()
                     paths.log.warning(
-                        f"""Values for {col} are not between 0 and 1:
-                        {_tabulate(tb_error[['country', 'year', col]])}"""
+                        f"""{len(tb_error)} values for {col} are not between 0 and 1:
+                        {_tabulate(tb_error[['country', 'year', col]], long_format=LONG_FORMAT)}"""
                     )
 
     return tb
@@ -247,7 +252,7 @@ def check_shares_sum_100(tb: Table, welfare: list, margin: float):
                 tb_error = tb[mask].reset_index(drop=True).copy()
                 paths.log.fatal(
                     f"""{len(tb_error)} share observations ({w}{EXTRAPOLATED_DICT[e]}) are not adding up to 100%:
-                    {_tabulate(tb_error[['country', 'year', 'sum_check']].sort_values(by='sum_check', ascending=False).reset_index(drop=True), floatfmt=".1f")}"""
+                    {_tabulate(tb_error[['country', 'year', 'sum_check']].sort_values(by='sum_check', ascending=False).reset_index(drop=True), floatfmt=".1f", long_format=LONG_FORMAT)}"""
                 )
 
     return tb
@@ -274,7 +279,7 @@ def check_negative_values(tb: Table):
             tb_error = tb[mask].reset_index(drop=True).copy()
             paths.log.warning(
                 f"""{len(tb_error)} observations for {v} are negative:
-                {_tabulate(tb_error[['country', 'year', v]])}"""
+                {_tabulate(tb_error[['country', 'year', v]], long_format=LONG_FORMAT)}"""
             )
 
     return tb
@@ -316,7 +321,7 @@ def check_monotonicity(tb: Table, metric: list, welfare: list):
                     tb_error = tb[mask].reset_index(drop=True).copy()
                     paths.log.fatal(
                         f"""{len(tb_error)} observations for {m}_{w}{EXTRAPOLATED_DICT[e]} are not monotonically increasing:
-                        {_tabulate(tb_error[['country', 'year'] + cols], floatfmt=".2f")}"""
+                        {_tabulate(tb_error[['country', 'year'] + cols], floatfmt=".2f", long_format=LONG_FORMAT)}"""
                     )
 
     return tb
@@ -366,11 +371,14 @@ def check_avg_between_thr(tb: Table, welfare: list) -> Table:
                 tb_error = tb[mask].reset_index(drop=True).copy()
                 paths.log.fatal(
                     f"""{len(tb_error)} observations for avg {w}{EXTRAPOLATED_DICT[e]} are not between the corresponding thresholds:
-                    {_tabulate(tb_error[['country', 'year'] + check_cols])}"""
+                    {_tabulate(tb_error[['country', 'year'] + check_cols], long_format=LONG_FORMAT)}"""
                 )
 
     return tb
 
 
-def _tabulate(tb: Table, headers="keys", tablefmt=TABLEFMT, **kwargs):
-    return tabulate(tb.head(5), headers=headers, tablefmt=tablefmt, **kwargs)
+def _tabulate(tb: Table, long_format: bool, headers="keys", tablefmt=TABLEFMT, **kwargs):
+    if long_format:
+        return tabulate(tb, headers=headers, tablefmt=tablefmt, **kwargs)
+    else:
+        return tabulate(tb.head(5), headers=headers, tablefmt=tablefmt, **kwargs)
