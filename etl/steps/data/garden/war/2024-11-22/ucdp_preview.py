@@ -51,12 +51,13 @@ TYPE_OF_VIOLENCE_MAPPING = {
 }
 # Mapping for armed conflicts dataset (inc PRIO/UCDP)
 UNKNOWN_TYPE_ID = 99
+UNKNOWN_TYPE_NAME = "state-based (unknown)"
 TYPE_OF_CONFLICT_MAPPING = {
     1: "extrasystemic",
     2: "interstate",
     3: "intrastate (non-internationalized)",
     4: "intrastate (internationalized)",
-    UNKNOWN_TYPE_ID: "state-based (unknown)",
+    UNKNOWN_TYPE_ID: UNKNOWN_TYPE_NAME,
 }
 # Regions mapping (for PRIO/UCDP dataset)
 REGIONS_MAPPING = {
@@ -168,7 +169,7 @@ def run(dest_dir: str) -> None:
     tb = add_conflict_type(tb_ged, tb_conflict)
 
     # NOTE: Export summary of conflicts that have no category assigned
-    # tb_summary = get_summary_unknown(tb)
+    tb_summary = get_summary_unknown(tb)
     # tb_summary.to_csv("summary.csv")
 
     # Get country-level stuff
@@ -367,12 +368,14 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
     # Add `type_of_conflict` to `tb_ged`.
     # This column contains the type of state-based conflict (1: inter-state, 2: intra-state, 3: extra-state, 4: internationalized intrastate)
     tb_ged = tb_ged.merge(
-        tb_conflict, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
+        tb_conflict,
+        left_on=["conflict_new_id", "year"],
+        right_on=["conflict_id", "year"],
+        how="outer",
     )
-    # Fill unknown types of violence (99: 'state-based (unknown)')
-    mask = tb_ged["type_of_violence"] == 1  # these are state-based conflicts
-    tb_ged["type_of_conflict"] = tb_ged["type_of_conflict"].astype(object)
-    tb_ged.loc[mask, "type_of_conflict"] = tb_ged.loc[mask, "type_of_conflict"].fillna(99)
+
+    # Assign latest available conflict type to unknown state-based conflicts
+    tb_ged = patch_unknown_conflict_type_ced(tb_ged)
 
     # Assert that `type_of_conflict` was only added for state-based events
     assert (
@@ -393,7 +396,30 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
 
     # Sanity check
     assert tb_ged["conflict_type"].isna().sum() == 0, "Check NaNs in conflict_type (i.e. conflicts without a type)!"
+
     return tb_ged
+
+
+def patch_unknown_conflict_type_ced(tb):
+    """Assign conflict types to unknown state-based conflicts (based on latest category appearing in GED)"""
+    mask = (tb["type_of_violence"] == 1) & (tb["type_of_conflict"].isna())
+    assert (
+        tb.loc[mask, "year"] > LAST_YEAR_STABLE
+    ).all(), "Unknown conflict types should only be present in years after GED!"
+    ids_unknown = list(tb.loc[mask, "conflict_new_id"].unique())
+
+    # Get table with the latest assigned conflict type for each conflict that has category 'state-based (unknown)' assigned
+    id_to_type = (
+        tb.loc[tb["conflict_new_id"].isin(ids_unknown) & ~mask, ["conflict_new_id", "year", "type_of_conflict"]]
+        .sort_values("year")
+        .drop_duplicates(subset=["conflict_new_id"], keep="last")
+        .set_index("conflict_new_id")["type_of_conflict"]
+        .to_dict()
+    )
+    tb.loc[mask, "type_of_conflict"] = tb.loc[mask, "conflict_new_id"].apply(
+        lambda x: id_to_type.get(x, UNKNOWN_TYPE_ID)
+    )
+    return tb
 
 
 def _sanity_check_conflict_types(tb: Table) -> Table:
