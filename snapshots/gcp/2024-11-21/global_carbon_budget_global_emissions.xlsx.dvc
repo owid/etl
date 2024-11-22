@@ -6,7 +6,7 @@ meta:
       The Global Carbon Budget was founded by the Global Carbon Project (GCP) international science team to track the trends in global carbon emissions and sinks and is a key measure of progress towards the goals of the Paris Agreement. It's widely recognized as the most comprehensive report of its kind.
 
       The GCP has been publishing estimates of global and national fossil CO2 emissions since 2001. In the first instance these were simple re-publications of data from another source, but over subsequent years refinements have been made in response to feedback and identification of inaccuracies.
-    title_snapshot: Global Carbon Budget - Land-use change emissions
+    title_snapshot: Global Carbon Budget - Global emissions
     citation_full: |-
       Andrew, R. M., & Peters, G. P. (2024). The Global Carbon Project's fossil CO2 emissions dataset (2024v17) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.13981696
 
@@ -17,13 +17,12 @@ meta:
     attribution: Global Carbon Budget (2024)
     attribution_short: GCB
     url_main: https://globalcarbonbudget.org/
-    url_download: https://globalcarbonbudgetdata.org/downloads/jGJH0-data/National_LandUseChange_Carbon_Emissions_2024v1.0.xlsx
-    date_accessed: '2024-11-13'
-    date_published: '2024-11-13'
+    date_accessed: '2024-11-21'
+    date_published: '2024-11-21'
     license:
       name: CC BY 4.0
       url: https://www.icos-cp.eu/data-services/about-data-portal/data-license
 outs:
-  - md5: 3415714f06bf3c00dbd675e40a73152b
-    size: 1257748
-    path: global_carbon_budget_land_use_change_emissions.xlsx
+  - md5: ad8155e5db112173f5ab465205e30680
+    size: 941480
+    path: global_carbon_budget_global_emissions.xlsx

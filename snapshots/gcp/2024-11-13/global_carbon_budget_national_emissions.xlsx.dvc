@@ -17,12 +17,13 @@ meta:
     attribution: Global Carbon Budget (2024)
     attribution_short: GCB
     url_main: https://globalcarbonbudget.org/
+    url_download: https://globalcarbonbudgetdata.org/downloads/jGJH0-data/National_Fossil_Carbon_Emissions_2024v1.0.xlsx
     date_accessed: '2024-11-13'
     date_published: '2024-11-13'
     license:
       name: CC BY 4.0
       url: https://www.icos-cp.eu/data-services/about-data-portal/data-license
 outs:
-  - md5: ca5d4bc5b7b29255129d3e9df51548ad
-    size: 818314
+  - md5: 15f157d2f4c6770c85883a33beec954c
+    size: 724957
     path: global_carbon_budget_national_emissions.xlsx
