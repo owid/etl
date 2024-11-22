@@ -46,6 +46,8 @@ steps:
     - data://meadow/war/2024-08-26/ucdp
   data://grapher/war/2024-08-26/ucdp:
     - data://garden/war/2024-08-26/ucdp
+
+  # UCDP (with candidate data, latest available)
   data://meadow/war/2024-11-22/ucdp_ced:
     - snapshot://war/2024-11-22/ucdp_ced_v24_0_10.csv
     - snapshot://war/2024-11-22/ucdp_ced_v24_01_24_09.csv
