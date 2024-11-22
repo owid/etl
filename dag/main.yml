@@ -96,8 +96,10 @@ steps:
     - snapshot://homicide/2024-10-30/unodc.xlsx
   data://garden/homicide/2024-10-30/unodc:
     - data://meadow/homicide/2024-10-30/unodc
+    - data://garden/demography/2023-03-31/population
   data://grapher/homicide/2024-10-30/unodc:
     - data://garden/homicide/2024-10-30/unodc
+
 
   #
   # UN
@@ -654,6 +656,8 @@ steps:
     - snapshot://worldbank_wdi/2024-05-20/wdi.zip
     - data://meadow/worldbank_wdi/2024-05-20/wdi
     - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
 
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
@@ -864,6 +868,15 @@ steps:
     - data-private://meadow/owid/latest/ig_countries
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
+
+# Migration between regions, based on UN DESA flows
+  data://garden/migration/2024-11-18/migration_between_regions:
+    - data://garden/un/2024-07-16/migrant_stock
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+
+  data://grapher/migration/2024-11-18/migration_between_regions:
+    - data://garden/migration/2024-11-18/migration_between_regions
 
 include:
   - dag/open_numbers.yml
