@@ -1,9 +1,14 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    unit: "%"
+    short_unit: "%"
     presentation:
       topic_tags:
         - Global Education
+    display:
+      numDecimalPlaces: 1
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
