@@ -23,7 +23,7 @@ definitions:
 
 dataset:
   title: Monthly precipitation by country
-  update_period_days: 31
+  update_period_days: 180
 tables:
   total_precipitation:
     variables:
