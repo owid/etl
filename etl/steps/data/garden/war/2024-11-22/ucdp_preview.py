@@ -168,8 +168,10 @@ def run(dest_dir: str) -> None:
     paths.log.info("add field `conflict_type`")
     tb = add_conflict_type(tb_ged, tb_conflict)
 
+    # Sanity-check that the number of 'unknown' types of some conflicts is controlled
     # NOTE: Export summary of conflicts that have no category assigned
-    # tb_summary = get_summary_unknown(tb)
+    tb_summary = get_summary_unknown(tb)
+    assert len(tb_summary) / tb["conflict_new_id"].nunique() < 0.01, "Too many conflicts without a category assigned!"
     # tb_summary.to_csv("summary.csv")
 
     # Get country-level stuff
