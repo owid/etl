@@ -168,8 +168,8 @@ def run(dest_dir: str) -> None:
     tb = add_conflict_type(tb_ged, tb_conflict)
 
     # NOTE: Export summary of conflicts that have no category assigned
-    tb_summary = get_summary_unknown(tb)
-    tb_summary.to_csv("summary.csv")
+    # tb_summary = get_summary_unknown(tb)
+    # tb_summary.to_csv("summary.csv")
 
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
