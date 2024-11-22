@@ -16,6 +16,7 @@ log = get_logger()
 
 
 def get_chart_metadata(chart_url):
+    # Given a chart URL, get the chart metadata.
     base_url = urlunparse(urlparse(chart_url)._replace(query=""))
     chart_metadata_url = str(base_url).rstrip("/") + ".metadata.json"
     log.info(f"Fetching metadata from: {chart_metadata_url}")
@@ -27,12 +28,15 @@ def get_chart_metadata(chart_url):
 
 
 def get_indicator_metadata(indicator_metadata_url):
+    # Given an indicator metadata URL, get the indicator metadata.
     response = requests.get(indicator_metadata_url)
     response.raise_for_status()
     return response.json()
 
 
 def get_indicators_metadata_from_chart_metadata(chart_metadata, max_workers=None):
+    # Given a chart metadata, get the metadata for all the indicators in the chart.
+
     # Get indicator API URLs.
     indicator_metadata_urls = [
         column["fullMetadata"]
@@ -55,6 +59,7 @@ def get_indicators_metadata_from_chart_metadata(chart_metadata, max_workers=None
 
 
 def get_years_in_chart(chart_url):
+    # Given a chart URL, get the years available in the chart.
     chart_metadata = get_chart_metadata(chart_url)
     indicators_metadata = get_indicators_metadata_from_chart_metadata(chart_metadata)
     years = sorted(
@@ -96,6 +101,7 @@ def modify_chart_url(chart_url, year, year_range_open, tab):
 
 
 def download_chart_png(png_url, output_file):
+    # Download a PNG file from a given URL.
     output_file = Path(output_file)
 
     # Skip download if the file already exists.
@@ -133,6 +139,8 @@ def create_gif_from_chart_url(
     remove_duplicate_frames=True,
     max_num_years=50,
 ):
+    # Given a chart URL, create a GIF with the chart data.
+
     # Get chart slug.
     slug = urlparse(chart_url).path.split("/")[-1]
 
