@@ -51,6 +51,7 @@ PER_CAPITA_VARIABLES = [
     "annual_emissions_co2_total",
     "annual_emissions_n2o_total_co2eq",
     "annual_emissions_ghg_total_co2eq",
+    "annual_emissions_ghg_fossil_co2eq",
 ]
 
 # Regions to be added by aggregating data from their member countries.

@@ -3,7 +3,6 @@
 The combined datasets are:
 * Global Carbon Budget - Global Carbon Project.
 * National contributions to climate change - Jones et al.
-* Greenhouse gas emissions by sector - Climate Watch.
 * Primary energy consumption - EI & EIA.
 
 Additionally, OWID's regions dataset, population dataset and Maddison Project Database (Bolt and van Zanden, 2023) on
@@ -89,11 +88,6 @@ The dataset is built upon a number of datasets and processing steps:
   - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/emissions/2024-04-08/national_contributions.py)
   - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/emissions/2024-04-08/national_contributions.py)
   - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/emissions/2024-04-08/national_contributions.py)
-- Greenhouse gas emissions (including methane and nitrous oxide) by sector (Climate Watch):
-  - [Source data](https://www.climatewatchdata.org/ghg-emissions)
-  - [Ingestion code](https://github.com/owid/etl/blob/master/snapshots/climate_watch/2023-10-31/emissions_by_sector.py)
-  - [Basic processing code](https://github.com/owid/etl/blob/master/etl/steps/data/meadow/climate_watch/2023-10-31/emissions_by_sector.py)
-  - [Further processing code](https://github.com/owid/etl/blob/master/etl/steps/data/garden/climate_watch/2023-10-31/emissions_by_sector.py)
 - CO2 dataset (Our World in Data based on all sources above):
   - [Processing code](https://github.com/owid/etl/blob/master/etl/steps/data/external/co2_data/latest/owid_co2.py)
   - [Exporting code](https://github.com/owid/co2-data/blob/master/scripts/make_dataset.py)
@@ -116,6 +110,7 @@ Additionally, to construct indicators per capita and per GDP, we use the followi
 
 - 2024-11-21:
   - Updated dataset (and codebook) to use the latest version of the Global Carbon Budget (2024).
+  - Now methane, nitrous oxide, and total greenhouse gas emissions data come from Jones et al. (2024), instead of Climate Watch, to provide a wider data coverage.
 - 2024-06-20:
   - Update data from the Statistical Review of World Energy.
   - Update data from the Maddison Project Database.
@@ -226,8 +221,9 @@ def run(dest_dir: str) -> None:
 
     # Uncomment to inspect changes.
     # from etl.data_helpers.misc import compare_tables
-    # branch = "update-gcb-data"
+    # branch = "update-ghg-emissions"
     # old = pd.read_csv("https://raw.githubusercontent.com/owid/co2-data/refs/heads/master/owid-co2-data.csv")
+    # new = tb.copy()
     # new = pd.read_csv(f"https://raw.githubusercontent.com/owid/co2-data/refs/heads/{branch}/owid-co2-data.csv")
     # compare_tables(old, new, countries=["World"])
 

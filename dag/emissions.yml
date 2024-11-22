@@ -122,7 +122,7 @@ steps:
     - data://garden/gcp/2024-11-21/global_carbon_budget
     - data://garden/regions/2023-01-01/regions
     - data://garden/energy/2024-06-20/primary_energy_consumption
-    - data://garden/climate_watch/2024-11-21/emissions_by_sector
+    # - data://garden/climate_watch/2024-11-21/emissions_by_sector
     - data://garden/ggdc/2024-04-26/maddison_project_database
   #
   # Emissions - CO2 dataset.

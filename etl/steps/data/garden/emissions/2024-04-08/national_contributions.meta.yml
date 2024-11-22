@@ -75,7 +75,7 @@ tables:
         short_unit: t
         description_short: *measured-in-tonnes
         presentation:
-          title_public: Annual CO₂ emissions
+          title_public: Annual CO₂ emissions including land use
       annual_emissions_n2o_fossil:
         title: Annual nitrous oxide emissions from fossil fuels and industry
         unit: tonnes
@@ -121,7 +121,7 @@ tables:
         description_short: *ghg-emissions
         description_processing: *processing-greenhouse-gases
         presentation:
-          title_public: Annual greenhouse gas emissions
+          title_public: Annual greenhouse gas emissions including land use
       annual_emissions_ch4_fossil_co2eq:
         title: Annual methane emissions from fossil fuels and industry in CO₂ equivalents
         unit: tonnes of CO₂ equivalents
@@ -145,7 +145,7 @@ tables:
         description_short: *measured-in-co2-eq
         description_processing: *processing-methane
         presentation:
-          title_public: Annual methane emissions
+          title_public: Annual methane emissions including land use
       annual_emissions_n2o_fossil_co2eq:
         title: Annual nitrous oxide emissions from fossil fuels and industry in CO₂ equivalents
         unit: tonnes of CO₂ equivalents
@@ -169,7 +169,7 @@ tables:
         description_short: *measured-in-co2-eq
         description_processing: *processing-nitrous-oxide
         presentation:
-          title_public: Annual nitrous oxide emissions
+          title_public: Annual nitrous oxide emissions including land use
       # Cumulative emissions of CH4, CO2, N2O and GHG, in tonnes of CO2eq (as originally given in the data).
       cumulative_emissions_ghg_fossil:
         title: Cumulative greenhouse gas emissions from fossil fuels and industry
@@ -396,33 +396,41 @@ tables:
           title_public: Share of contribution to global warming
       # Per capita emissions (calculated by OWID).
       annual_emissions_co2_total_per_capita:
-        title: Per-capita CO₂ emissions
-        unit: tonnes
-        short_unit: t
+        title: Per capita CO₂ emissions
+        unit: tonnes per person
+        short_unit: t/person
         description_short: *measured-in-tonnes-per-person
         presentation:
-          title_public: Per-capita CO₂ emissions
+          title_public: Per capita CO₂ emissions including land use
       annual_emissions_ch4_total_co2eq_per_capita:
-        title: Per-capita methane emissions in CO₂ equivalents
-        unit: tonnes of CO₂ equivalents
-        short_unit: t
+        title: Per capita methane emissions in CO₂ equivalents
+        unit: tonnes of CO₂ equivalents per person
+        short_unit: t/person
         description_short: *measured-in-co2-eq-per-person
         description_processing: *processing-methane
         presentation:
-          title_public: Per-capita methane emissions
+          title_public: Per capita methane emissions including land use
       annual_emissions_n2o_total_co2eq_per_capita:
-        title: Per-capita nitrous oxide emissions in CO₂ equivalents
-        unit: tonnes of CO₂ equivalents
-        short_unit: t
+        title: Per capita nitrous oxide emissions in CO₂ equivalents
+        unit: tonnes of CO₂ equivalents per person
+        short_unit: t/person
         description_short: *measured-in-co2-eq-per-person
         description_processing: *processing-nitrous-oxide
         presentation:
-          title_public: Per-capita nitrous oxide emissions
+          title_public: Per capita nitrous oxide emissions including land use
       annual_emissions_ghg_total_co2eq_per_capita:
-        title: Per-capita greenhouse gas emissions in CO₂ equivalents
-        unit: tonnes of CO₂ equivalents
-        short_unit: t
+        title: Per capita greenhouse gas emissions in CO₂ equivalents
+        unit: tonnes of CO₂ equivalents per person
+        short_unit: t/person
         description_short: *ghg-emissions-per-person
         description_processing: *processing-greenhouse-gases
         presentation:
-          title_public: Per-capita greenhouse gas emissions
+          title_public: Per capita greenhouse gas emissions including land use
+      annual_emissions_ghg_fossil_co2eq_per_capita:
+        title: Per capita greenhouse gas emissions from fossil fuels and industry in CO₂ equivalents
+        unit: tonnes of CO₂ equivalents per person
+        short_unit: t/person
+        description_short: *ghg-emissions-per-person
+        description_processing: *processing-greenhouse-gases
+        presentation:
+          title_public: Per capita greenhouse gas emissions from fossil fuels and industry
