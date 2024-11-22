@@ -36,8 +36,7 @@ def run(dest_dir: str) -> None:
     tb["year"] = tb["year"].astype(int)
     tb = tb[tb["year"] != INCOMPLETE_YEAR]
 
-    # Set the index to 'year' and 'country'
-    tb = tb.set_index(["year", "country"], verify_integrity=True)
+    tb = tb.format(["year", "country"])
 
     # Save outputs.
     #

@@ -23,13 +23,13 @@ definitions:
 
 dataset:
   title: Annual precipitation and anomalies by country
-
+  update_period_days: 31
 tables:
   total_precipitation:
     variables:
       total_precipitation:
         title: Annual precipitation
-        description_short: Total annual precipitation—rain and snow—calculated as the sum of daily averages, reported as the depth of water falling to Earth's surface, excluding fog, dew, and evaporation.
+        description_short: Total annual precipitation—rain and snow—calculated as the sum of daily averages, reported as the depth of water falling to Earth's surface, excluding fog and dew.
         description_processing: |-
             {definitions.common_processing}
             {definitions.precipitation_anomaly}
@@ -37,7 +37,7 @@ tables:
 
       precipitation_anomaly:
         title: Annual precipitation anomaly
-        description_short: The difference in a specific year's total precipitation—rain and snow—from the 1991–2020 average, measured in millimeters, excluding moisture lost to fog, dew, or evaporation.
+        description_short: The difference in a specific year's total precipitation—rain and snow—from the 1991–2020 average, measured in millimeters, excluding fog and dew.
         description_processing: |-
             {definitions.common_processing}
             {definitions.precipitation_anomaly}

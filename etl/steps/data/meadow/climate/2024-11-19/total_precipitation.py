@@ -113,11 +113,10 @@ def run(dest_dir: str) -> None:
             clim_month_weighted = clip.weighted(weights)
 
             # Calculate the weighted mean precipitation for the country.
-            # country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
-            country_sum = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
+            country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
 
             # Store the calculated mean precipitation in the dictionary with the country's name as the key.
-            temp_country[country_name] = country_sum
+            temp_country[country_name] = country_weighted_mean
 
             # Clean up the memory
             del clip
@@ -154,7 +153,7 @@ def run(dest_dir: str) -> None:
 
     # Create a new table and ensure all columns are snake-case and add relevant metadata.
     tb = Table(melted_df, short_name=paths.short_name, underscore=True)
-    tb = tb.set_index(["time", "country"], verify_integrity=True)
+    tb = tb.format(["time", "country"])
 
     tb["total_precipitation"].metadata.origins = [snap.metadata.origin]
     #

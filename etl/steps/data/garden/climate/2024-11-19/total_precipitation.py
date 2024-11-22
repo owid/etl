@@ -32,8 +32,9 @@ def run(dest_dir: str) -> None:
 
     # Get the number of days in the given month and year
     tb["days_in_month"] = tb.apply(lambda row: calendar.monthrange(row["year"], row["month"])[1], axis=1)
+    tb["days_in_month"] = tb["days_in_month"].copy_metadata(tb["total_precipitation"])
 
-    # Use the number of days to convert to monthly totals rather than daily averages - as per info here https://confluence.ecmwf.int/pages/viewpage.action?pageId=197702790
+    # Use the number of days to convert to monthly totals rather than daily averages - as per info here https://confluence.ecmwf.int/pages/viewpage.action?pageId=197702790. The data is in meters so we convert to mm.
     tb["total_precipitation"] = tb["total_precipitation"] * 1000 * tb["days_in_month"]
 
     # Use the baseline from the Copernicus Climate Service https://climate.copernicus.eu/surface-air-temperature-january-2024
@@ -48,8 +49,7 @@ def run(dest_dir: str) -> None:
     tb["precipitation_anomaly"] = tb["total_precipitation"] - tb["mean_total_precipitation"]
 
     tb = tb.drop(columns=["month", "year", "mean_total_precipitation"])
-    tb = tb.set_index(["country", "time"], verify_integrity=True)
-
+    tb = tb.format(["country", "time"])
     #
     # Save outputs.
     #
