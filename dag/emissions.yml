@@ -118,7 +118,7 @@ steps:
   #
   data://garden/emissions/2024-11-21/owid_co2:
     - data://garden/demography/2024-07-15/population
-    - data://garden/emissions/2024-04-08/national_contributions
+    - data://garden/emissions/2024-11-21/national_contributions
     - data://garden/gcp/2024-11-21/global_carbon_budget
     - data://garden/regions/2023-01-01/regions
     - data://garden/energy/2024-06-20/primary_energy_consumption
@@ -139,10 +139,36 @@ steps:
   #
   data://meadow/climate_watch/2024-11-21/emissions_by_sector:
     - snapshot://climate_watch/2024-11-21/emissions_by_sector.gz
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
   data://garden/climate_watch/2024-11-21/emissions_by_sector:
     - data://meadow/climate_watch/2024-11-21/emissions_by_sector
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-07-29/income_groups
     - data://garden/demography/2024-07-15/population
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
   data://grapher/climate_watch/2024-11-21/emissions_by_sector:
     - data://garden/climate_watch/2024-11-21/emissions_by_sector
+  #
+  # Jones et al. - National contributions to climate change.
+  #
+  data://meadow/emissions/2024-11-21/national_contributions:
+    - snapshot://emissions/2024-11-21/national_contributions_temperature_response.csv
+    - snapshot://emissions/2024-11-21/national_contributions_cumulative_emissions.csv
+    - snapshot://emissions/2024-11-21/national_contributions_annual_emissions.csv
+  #
+  # Jones et al. - National contributions to climate change.
+  #
+  data://garden/emissions/2024-11-21/national_contributions:
+    - data://meadow/emissions/2024-11-21/national_contributions
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Jones et al. - National contributions to climate change.
+  #
+  data://grapher/emissions/2024-11-21/national_contributions:
+    - data://garden/emissions/2024-11-21/national_contributions
