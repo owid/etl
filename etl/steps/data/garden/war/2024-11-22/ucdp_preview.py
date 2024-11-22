@@ -55,6 +55,7 @@ TYPE_OF_CONFLICT_MAPPING = {
     2: "interstate",
     3: "intrastate (non-internationalized)",
     4: "intrastate (internationalized)",
+    99: "state-based (unknown)",
 }
 # Regions mapping (for PRIO/UCDP dataset)
 REGIONS_MAPPING = {
@@ -355,7 +356,7 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
         tb_conflict: Table
             This is a secondary table, that we use to obtain the conflict types of the conflicts.
     """
-    tb_conflict = tb_conflict[["conflict_id", "year", "type_of_conflict"]].drop_duplicates()
+    tb_conflict = tb_conflict.loc[:, ["conflict_id", "year", "type_of_conflict"]].drop_duplicates()
     assert tb_conflict.groupby(["conflict_id", "year"]).size().max() == 1, "Some conflict_id-year pairs are duplicated!"
 
     # Add `type_of_conflict` to `tb_ged`.
@@ -363,10 +364,10 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
     tb_ged = tb_ged.merge(
         tb_conflict, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
     )
-    # Fill unknown types of violence
+    # Fill unknown types of violence (99: 'state-based (unknown)')
     mask = tb_ged["type_of_violence"] == 1  # these are state-based conflicts
     tb_ged["type_of_conflict"] = tb_ged["type_of_conflict"].astype(object)
-    tb_ged.loc[mask, "type_of_conflict"] = tb_ged.loc[mask, "type_of_conflict"].fillna("state-based (unknown)")
+    tb_ged.loc[mask, "type_of_conflict"] = tb_ged.loc[mask, "type_of_conflict"].fillna(99)
 
     # Assert that `type_of_conflict` was only added for state-based events
     assert (
@@ -671,7 +672,7 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
 
 def _prepare_prio_table(tb: Table) -> Table:
     # Select relevant columns
-    tb = tb[["conflict_id", "year", "region", "type_of_conflict", "start_date"]]
+    tb = tb.loc[:, ["conflict_id", "year", "region", "type_of_conflict", "start_date"]]
 
     # Flatten (some entries have multiple regions, e.g. `1, 2`). This should be flattened to multiple rows.
     # https://stackoverflow.com/a/42168328/5056599
