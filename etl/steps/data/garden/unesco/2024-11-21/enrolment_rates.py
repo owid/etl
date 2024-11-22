@@ -45,6 +45,11 @@ def run(dest_dir: str) -> None:
         long_definition = tb["long_description"].loc[tb["indicator"] == column].iloc[0]
         meta.description_from_producer = long_definition
         meta.title = column
+        meta.display = {}
+
+        meta.display["numDecimalPlaces"] = 1
+        meta.unit = "%"
+        meta.short_unit = "%"
 
     tb_pivoted = tb_pivoted.reset_index()
     tb_pivoted = tb_pivoted.format(["country", "year"])
