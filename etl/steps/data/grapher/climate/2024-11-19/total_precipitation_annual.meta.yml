@@ -23,7 +23,7 @@ definitions:
 
 dataset:
   title: Annual precipitation and anomalies by country
-  update_period_days: 31
+  update_period_days: 180
 tables:
   total_precipitation:
     variables:
