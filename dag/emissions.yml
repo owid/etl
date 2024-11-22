@@ -122,7 +122,7 @@ steps:
     - data://garden/gcp/2024-11-21/global_carbon_budget
     - data://garden/regions/2023-01-01/regions
     - data://garden/energy/2024-06-20/primary_energy_consumption
-    - data://garden/climate_watch/2023-10-31/emissions_by_sector
+    - data://garden/climate_watch/2024-11-21/emissions_by_sector
     - data://garden/ggdc/2024-04-26/maddison_project_database
   #
   # Emissions - CO2 dataset.
@@ -134,3 +134,15 @@ steps:
   #
   export://s3/co2_data/latest/owid_co2:
     - data://garden/emissions/2024-11-21/owid_co2
+  #
+  # Climate Watch - Greenhouse gas emissions by sector.
+  #
+  data://meadow/climate_watch/2024-11-21/emissions_by_sector:
+    - snapshot://climate_watch/2024-11-21/emissions_by_sector.gz
+  data://garden/climate_watch/2024-11-21/emissions_by_sector:
+    - data://meadow/climate_watch/2024-11-21/emissions_by_sector
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/demography/2024-07-15/population
+  data://grapher/climate_watch/2024-11-21/emissions_by_sector:
+    - data://garden/climate_watch/2024-11-21/emissions_by_sector

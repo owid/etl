@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
         tb = ds_garden[table_name].copy()
 
         # Drop unnecessary columns.
-        tb = tb.drop(columns=["population"])
+        tb = tb.drop(columns=["population"], errors="raise")
 
         # For convenience, change units from "million tonnes" to "tonnes" and multiply all variables by a million.
         # Doing this, grapher will know when to use the word "million" and when to use "billion".

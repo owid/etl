@@ -34,16 +34,14 @@ def run(dest_dir: str) -> None:
         tb[column] = tb[column].copy_metadata(tb["emissions"])
 
     # Drop unnecessary columns.
-    tb = tb.drop(columns="emissions")
+    tb = tb.drop(columns="emissions", errors="raise")
 
-    # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year", "gas", "sector", "data_source"], verify_integrity=True).sort_index()
+    # Improve table format.
+    tb = tb.format(["country", "year", "gas", "sector", "data_source"])
 
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
+    # Create a new meadow dataset.
     ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
-
-    # Save changes in the new garden dataset.
     ds_meadow.save()
