@@ -15,7 +15,7 @@ meta:
       More details at https://www.humanfertility.org/Data/ExplanatoryNotes
     date_published: 2024-05-23
     # Citation
-    producer: Human Mortality Database
+    producer: Human Fertility Database
     citation_full: |-
       Human Fertility Database. Max Planck Institute for Demographic Research (Germany) and Vienna Institute of Demography (Austria). Available at www.humanfertility.org (data downloaded on 2024-11-19).
     attribution_short: HFD
