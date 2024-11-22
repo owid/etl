@@ -46,8 +46,6 @@ tables:
         description_key:
           - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
           - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
-        display:
-          numDecimalPlaces: 3
 
       tfr40:
         title: |-
@@ -58,8 +56,6 @@ tables:
         unit: "births per woman"
         description_key:
           - Useful for understanding early and mid-reproductive age fertility patterns.
-        display:
-          numDecimalPlaces: 3
 
       adjtfr:
         title: |-
@@ -78,8 +74,6 @@ tables:
           - Helps to distinguish between changes in the number of children women have and changes in the timing of when they have them.
           - The tempo-adjusted TFR often displays large year-to-year fluctuations (Sobotka 2003), which can make its use for specific years problematic. Therefore, three- or five-year moving averages are often used to smooth out fluctuations.
           - Requires careful interpretation, as the adjustment is based on specific assumptions about timing effects.
-        display:
-          numDecimalPlaces: 3
 
       patfr:
         title: |-
@@ -95,8 +89,6 @@ tables:
         description_key:
           - Accounts for both the age structure and parity distribution of the female population.
           - Provides a more nuanced view of fertility compared to the unadjusted total fertility rate.
-        display:
-          numDecimalPlaces: 3
 
       # Mean ages at birth, and at 40
       mab:
@@ -195,7 +187,7 @@ tables:
           - Serves as a foundational statistic for calculating other fertility measures.
           - Can be influenced by population size and structure.
         display:
-          numDecimalPlaces: 3
+          numDecimalPlaces: 0
 
   cohort:
     variables:
@@ -216,8 +208,6 @@ tables:
           - Represents the completed fertility of a cohort by the end of their reproductive years.
           - Useful for comparing fertility across different cohorts.
           - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
-        display:
-          numDecimalPlaces: 3
 
       ccf40:
         title: |-
@@ -233,8 +223,6 @@ tables:
         description_key:
           - Represents the fertility of a cohort up to age 40.
           - Provides insights into early and mid-reproductive age fertility patterns.
-        display:
-          numDecimalPlaces: 3
 
       # Mean age at birth
       cmab:
