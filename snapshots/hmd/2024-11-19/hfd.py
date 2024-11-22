@@ -1,4 +1,10 @@
-"""To be able to download the dataset, you need to be registered at HFD."""
+"""To be able to download the dataset, you need to be registered at HFD.
+
+Just go to their site: https://www.humanfertility.org/
+Or directly try to login: https://www.humanfertility.org/Account/Login / register: https://www.humanfertility.org/Account/Auth
+
+Only after that, you'll be allowed to download the dataset: https://www.humanfertility.org/File/Download/Files/zip/HFD.zip
+"""
 
 from pathlib import Path
 
