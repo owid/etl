@@ -43,7 +43,10 @@ def run(dest_dir: str) -> None:
     tb = tb.drop_duplicates(subset="id", keep="last")
 
     # Format table
-    tb = tb.format("id")
+    tb = tb.format(
+        "id",
+        short_name="ucdp_ced",
+    )
 
     #
     # Save outputs.
