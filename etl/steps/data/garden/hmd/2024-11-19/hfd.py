@@ -520,6 +520,7 @@ def read_table(ds_meadow, tname, tname_base=None):
         df=tb,
         countries_file=paths.country_mapping_path,
         country_col="code",
+        warn_on_unused_countries=False,
     )
 
     # Rename country column

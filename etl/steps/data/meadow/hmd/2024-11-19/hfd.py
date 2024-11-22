@@ -334,12 +334,6 @@ def run(dest_dir: str) -> None:
             tbs.append(tb_)
 
     #
-    # Process data.
-    #
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    # tb = tb.format(["country", "year"])
-
-    #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
