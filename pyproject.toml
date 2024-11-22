@@ -5,7 +5,7 @@ description = ""
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
 ]
-requires-python = ">=3.10, <3.12"
+requires-python = ">=3.10, <3.14"
 dependencies = [
     "click>=8.0.1",
     "PyYAML>=6.0.1",
