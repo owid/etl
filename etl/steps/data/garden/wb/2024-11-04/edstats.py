@@ -57,6 +57,10 @@ def run(dest_dir: str) -> None:
     #  Rename columns based on metadata
     tb = rename_columns(tb, metadata_tb)
 
+    # Convert the share of the population with no education to a percentage (bug in the data)
+    tb[
+        "wittgenstein_projection__percentage_of_the_population_age_15plus_by_highest_level_of_educational_attainment__no_education__total"
+    ] *= 100
     tb = tb.format(["country", "year"])
 
     #
