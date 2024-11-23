@@ -23,6 +23,7 @@ def run(dest_dir: str) -> None:
     ds_oecd = paths.load_dataset("oecd_education")
     tb_oecd = ds_oecd["oecd_education"].reset_index()
     tb_oecd_formal_ed = tb_oecd[["country", "year", "no_formal_education", "population_with_basic_education"]]
+    print(tb_oecd_formal_ed)
 
     # Filter the for years above 2020 (New Wittgenstein Center data starts at 2020)
     tb_below_2020 = tb_oecd_formal_ed[tb_oecd_formal_ed["year"] < 2020].reset_index(drop=True)
