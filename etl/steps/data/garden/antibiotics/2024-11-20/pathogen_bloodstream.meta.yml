@@ -5,7 +5,6 @@ definitions:
       topic_tags:
         - Antibiotics
     display:
-      numDecimalPlaces: 0
       numSignificantFigures: 3
       name: << pathogen >>
 
