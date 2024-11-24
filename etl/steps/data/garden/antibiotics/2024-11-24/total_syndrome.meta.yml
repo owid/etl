@@ -4,8 +4,6 @@ definitions:
     presentation:
       topic_tags:
         - Antibiotics
-    display:
-      numSignificantFigures: 3
 
 
 # Learn more about the available fields:
@@ -28,8 +26,14 @@ tables:
         title: Upper bound of global neonatal deaths from << infectious_syndrome.lower() >> infections
         unit: deaths
         description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << infectious_syndrome.lower() >>.
+        display:
+          numSignificantFigures: 3
+          name: << infectious_syndrome >>
       lower:
         title: Lower bound of global neonatal deaths from << infectious_syndrome.lower() >> infections
         unit: deaths
         description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << infectious_syndrome.lower() >>.
+        display:
+          numSignificantFigures: 3
+          name: << infectious_syndrome >>
 
