@@ -16,11 +16,11 @@ definitions:
     <%- endif -%>
   counterfactual:
     <% if counterfactual == "Associated" %>
-    where the death was associated with antibiotic resistance.
+    where the death was associated with antibiotic resistance
     <% elif counterfactual == "Susceptible" %>
-    where the bacteria causing the death were susceptible to antibiotics.
+    where the bacteria causing the death were susceptible to antibiotics
     <% elif counterfactual == "Untested" %>
-    where the pathogen was not tested for antibiotic resistance.
+    where the pathogen was not tested for antibiotic resistance
     <% endif %>
 
 
