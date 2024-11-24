@@ -18,15 +18,15 @@ tables:
   total_syndrome:
     variables:
       value:
-        title: Global neonatal deaths from << syndrome >> infections
+        title: Global neonatal deaths from << syndrome.lower() >> infections
         unit: deaths
-        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << syndrome >> infections.
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << syndrome.lower() >> infections.
       upper:
-        title: Upper bound of global neonatal deaths from << syndrome >> infections
+        title: Upper bound of global neonatal deaths from << syndrome.lower() >> infections
         unit: deaths
-        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << syndrome >> infections.
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << syndrome.lower() >> infections.
       lower:
-        title: Lower bound of global neonatal deaths from << syndrome >> infections
+        title: Lower bound of global neonatal deaths from << syndrome.lower() >> infections
         unit: deaths
-        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << syndrome >> infections.
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << syndrome.lower() >> infections.
 
