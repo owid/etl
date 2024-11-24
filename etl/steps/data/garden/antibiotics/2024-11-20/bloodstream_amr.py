@@ -22,6 +22,8 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.drop(columns=["age", "sex", "measure", "metric", "infectious_syndrome"])
+    tb_amr = tb.drop(columns=["country", "pathogen_type"]).rename(columns={"pathogen": "country"})
+    tb_amr = tb_amr.format(["country", "year", "counterfactual"], short_name="amr_entity")
     tb = tb.format(["country", "year", "pathogen", "pathogen_type", "counterfactual"])
 
     #
@@ -29,7 +31,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb, tb_amr], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
