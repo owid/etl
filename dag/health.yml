@@ -930,12 +930,14 @@ steps:
     - data-private://meadow/antibiotics/2024-11-20/microbe
   data-private://grapher/antibiotics/2024-11-20/microbe:
     - data-private://garden/antibiotics/2024-11-20/microbe
+  # IHME Neonatal bloodstream infections by pathogen
   data-private://meadow/antibiotics/2024-11-20/pathogen_bloodstream:
     - snapshot-private://antibiotics/2024-11-20/pathogen_bloodstream.csv
   data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream:
     - data-private://meadow/antibiotics/2024-11-20/pathogen_bloodstream
   data-private://grapher/antibiotics/2024-11-20/pathogen_bloodstream:
     - data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream
+  # IHME Neonatal bloodstream infections by resistance
   data-private://meadow/antibiotics/2024-11-20/bloodstream_amr:
     - snapshot-private://antibiotics/2024-11-20/bloodstream_amr.csv
   data-private://garden/antibiotics/2024-11-20/bloodstream_amr:
