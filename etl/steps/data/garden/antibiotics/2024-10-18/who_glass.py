@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from etl.data_helpers import geo
-from etl.data_helpers.geo import add_population_to_table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
