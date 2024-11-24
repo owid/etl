@@ -7,13 +7,13 @@ definitions:
     display:
       numDecimalPlaces: 0
   pathogen_type:
-    <% if pathogen_type == "Fungi" %>
+    <%- if pathogen_type == "Fungi" -%>
     fungus
-    <% elif pathogen_type == "Viruses" %>
+    <%- elif pathogen_type == "Viruses" -%>
     virus
-    <% else  %>
+    <%- else  -%>
     << pathogen_type.lower() >>
-    <% endif %>
+    <%- endif -%>
 
 
 # Learn more about the available fields:
