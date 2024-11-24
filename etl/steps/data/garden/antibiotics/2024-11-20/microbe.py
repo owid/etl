@@ -23,8 +23,10 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb = tb.drop(columns=["age", "sex", "measure", "metric", "counterfactual", "infectious_syndrome"])
+    # Create a table where the pathogen is the entity
+    tb_pathogen = tb.drop(columns=["country", "pathogen_type"]).rename(columns={"pathogen": "country"})
     tb = tb.format(["country", "year", "pathogen_type", "pathogen"])
-
+    tb_pathogen = tb_pathogen.format(["country", "year"], short_name="pathogen_entity")
     #
     # Save outputs.
     #
