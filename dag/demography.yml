@@ -269,3 +269,11 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/un/2024-10-01/births_by_age:
     - data://garden/un/2024-10-01/births_by_age
+
+  # Human Fertility Database
+  data://meadow/hmd/2024-11-19/hfd:
+    - snapshot://hmd/2024-11-19/hfd.zip
+  data://garden/hmd/2024-11-19/hfd:
+    - data://meadow/hmd/2024-11-19/hfd
+  data://grapher/hmd/2024-11-19/hfd:
+    - data://garden/hmd/2024-11-19/hfd
