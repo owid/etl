@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Antibiotics
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  total_syndrome:
+    variables:
+      value:
+        title: Global neonatal deaths from << syndrome >> infections
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << syndrome >> infections.
+      upper:
+        title: Upper bound of global neonatal deaths from << syndrome >> infections
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << syndrome >> infections.
+      lower:
+        title: Lower bound of global neonatal deaths from << syndrome >> infections
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << syndrome >> infections.
+
