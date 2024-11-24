@@ -9,7 +9,7 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-REGIONS = ["Africa", "Americas", "Asia", "Europe", "Oceania"]
+REGIONS = ["Africa", "North America", "South America", "Asia", "Europe", "Oceania"]
 
 
 def run(dest_dir: str) -> None:
