@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - Global Health
     display:
-      numDecimalPlaces: 0
+      numSignificantFigures: 3
   pathogen_type:
     <%- if pathogen_type == "Fungi" -%>
     fungus
