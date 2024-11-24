@@ -1,6 +1,11 @@
 """Data from UCDP.
 
 
+IMPORTANT NOTE:
+
+    - This script is basically a copy of the latest script used to generate UCDP dataset. At some point we should align the tools in both scripts to avoid duplication.
+
+
 Notes:
     - Conflict types for state-based violence is sourced from UCDP/PRIO dataset. non-state and one-sided violence is sourced from GED dataset.
     - There can be some mismatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their dashboard, which might not be available yet as bulk download.
@@ -104,46 +109,34 @@ def run(dest_dir: str) -> None:
     _sanity_checks(ds_meadow)
 
     # Load relevant tables
-    tb_ged = (
-        ds_meadow.read("ucdp_ged")
-        .reset_index()
-        .astype(
-            {
-                "deaths_a": float,
-                "deaths_b": float,
-                "deaths_civilians": float,
-                "deaths_unknown": float,
-                "best": float,
-                "high": float,
-                "low": float,
-            }
-        )
+    tb_ged = ds_meadow.read("ucdp_ged").astype(
+        {
+            "deaths_a": float,
+            "deaths_b": float,
+            "deaths_civilians": float,
+            "deaths_unknown": float,
+            "best": float,
+            "high": float,
+            "low": float,
+        }
     )
-    tb_ced = (
-        ds_ced.read("ucdp_ced")
-        .reset_index()
-        .astype(
-            {
-                "deaths_a": float,
-                "deaths_b": float,
-                "deaths_civilians": float,
-                "deaths_unknown": float,
-                "best": float,
-                "high": float,
-                "low": float,
-            }
-        )
+    tb_ced = ds_ced.read("ucdp_ced").astype(
+        {
+            "deaths_a": float,
+            "deaths_b": float,
+            "deaths_civilians": float,
+            "deaths_unknown": float,
+            "best": float,
+            "high": float,
+            "low": float,
+        }
     )
-    tb_conflict = (
-        ds_meadow.read("ucdp_battle_related_conflict")
-        .reset_index()
-        .astype(
-            {
-                "bd_best": float,
-                "bd_low": float,
-                "bd_high": float,
-            }
-        )
+    tb_conflict = ds_meadow.read("ucdp_battle_related_conflict").astype(
+        {
+            "bd_best": float,
+            "bd_low": float,
+            "bd_high": float,
+        }
     )
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
 
