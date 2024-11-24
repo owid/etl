@@ -14,11 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("total_syndrome")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("total_syndrome")
-
-    #
-    # Process data.
-    #
+    tb = ds_garden.read("total_syndrome", reset_index=False)
 
     #
     # Save outputs.
