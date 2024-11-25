@@ -11,6 +11,7 @@ dataset:
 tables:
   world_economic_outlook:
     variables:
+      # GDP growth
       gross_domestic_product__constant_prices__percent_change_observation:
         title: Gross domestic product, constant prices - Percent change - Observations
         unit: "%"
@@ -18,9 +19,10 @@ tables:
         description_short: "Annual percent change in gross domestic product. This data is adjusted for inflation."
         description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
           tableDisplay:
             hideRelativeChange: True
+
       gross_domestic_product__constant_prices__percent_change_forecast:
         title: Gross domestic product, constant prices - Percent change - Forecasts
         unit: "%"
@@ -28,9 +30,11 @@ tables:
         description_short: "Near-term projections of the annual percent change in gross domestic product. This data is adjusted for inflation."
         description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
           tableDisplay:
             hideRelativeChange: True
+
+      # Unemployment rate
       unemployment_rate__percent_of_total_labor_force_observation:
         title: Unemployment rate - Percent of total labor force - Observations
         unit: "%"
@@ -41,6 +45,7 @@ tables:
           numDecimalPlaces: 1
           tableDisplay:
             hideRelativeChange: True
+
       unemployment_rate__percent_of_total_labor_force_forecast:
         title: Unemployment rate - Percent of total labor force - Forecasts
         unit: "%"
