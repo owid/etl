@@ -410,94 +410,202 @@ TABLES_PERIOD_W_PARITY = {
     },
     # "pmabc",
 }
+REGEX_PERIOD_BO = {}
+
 # Tables to process for COHORT country-cohort
 TABLES_COHORT = [
     "mabvh",
-    # "pprvhbo",
+    "pprvhbo",
     "sdmabvh",
     "tfrvh",
 ]
 TABLES_COHORT_W_PARITY = {
-    # "pprvhbo": {
-    #     "indicators": ["patfr"],
-    # },
+    "pprvhbo": {
+        "indicators": ["ppr"],
+    },
 }
+REGEX_COHORT_BO = {
+    "pprvhbo": {
+        "ppr": r"^ppr\d+_\d+$",
+    },
+}
+# Tables to process for PERIOD country-year-age
+TABLES_PERIOD_AGE = [
+    "asfrrr",
+]
+TABLES_PERIOD_AGE_W_PARITY = {}
+REGEX_PERIOD_AGE_BO = {}
+# Tables to process for COHORT country-year-age
+TABLES_COHORT_AGE = [
+    "asfrvh",
+]
+TABLES_COHORT_AGE_W_PARITY = {}
+REGEX_COHORT_AGE_BO = {}
 
 
-def integrate_bo(tb, tb_bo, col_index, core_indicators):
-    """Merge main table with its BO counterpart.
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset.
+    ds_meadow = paths.load_dataset("hfd")
 
-    Some tables have a secondary table which provides the same core indicators but by birth order.
+    # 1/ Read period tables + consolidate in one table tb_period
+    ## Initial definitions
+    cols_index = ["country", "year"]
+    col_bo = "birth_order"
+    ## Read tables
+    tbs = make_table_list(
+        ds_meadow=ds_meadow,
+        table_names=TABLES_PERIOD,
+        tables_w_parity=TABLES_PERIOD_W_PARITY,
+        cols_index=cols_index,
+        col_bo=col_bo,
+        regex_bo=REGEX_PERIOD_BO,
+    )
+    ## Merge
+    tb_period = consolidate_table_from_list(tbs, cols_index + [col_bo], "period")
+
+    # 2/ Read cohort tables + consolidate in one table tb_cohort
+    ## Initial definitions
+    cols_index = ["country", "cohort"]
+    col_bo = "birth_order"
+    ## Read tables
+    tbs = make_table_list(
+        ds_meadow=ds_meadow,
+        table_names=TABLES_COHORT,
+        tables_w_parity=TABLES_COHORT_W_PARITY,
+        cols_index=cols_index,
+        col_bo=col_bo,
+        regex_bo=REGEX_COHORT_BO,
+    )
+    # Quick fix: change birth_order label for PPR
+    tbs = _fix_ppr(tbs)
+    ## Merge
+    tb_cohort = consolidate_table_from_list(tbs, cols_index + [col_bo], "cohort")
+
+    # 3/ Period tables (by age)
+    cols_index = ["country", "year", "age"]
+    col_bo = "birth_order"
+    ## Read tables
+    tbs = make_table_list(
+        ds_meadow=ds_meadow,
+        table_names=TABLES_PERIOD_AGE,
+        tables_w_parity=TABLES_PERIOD_AGE_W_PARITY,
+        cols_index=cols_index,
+        col_bo=col_bo,
+        regex_bo=REGEX_PERIOD_AGE_BO,
+    )
+    ## Consolidate
+    tb_period_ages = consolidate_table_from_list(
+        tbs=tbs,
+        cols_index_out=cols_index + [col_bo],
+        short_name="period_ages",
+        fcn=keep_relevant_ages,
+    )
+
+    # 4/ Cohort tables (by age)
+    cols_index = ["country", "cohort", "age"]
+    col_bo = "birth_order"
+    ## Read tables
+    tbs = make_table_list(
+        ds_meadow=ds_meadow,
+        table_names=TABLES_COHORT_AGE,
+        tables_w_parity=TABLES_COHORT_AGE_W_PARITY,
+        cols_index=cols_index,
+        col_bo=col_bo,
+        regex_bo=REGEX_COHORT_AGE_BO,
+        check_integration=False,
+        check_integration_limit=143,
+    )
+    ## Consolidate
+    tb_cohort_ages = consolidate_table_from_list(
+        tbs=tbs,
+        cols_index_out=cols_index + [col_bo],
+        short_name="cohort_ages",
+        fcn=keep_relevant_ages,
+    )
+
+    #
+    # Process data.
+    #
+    tables = [
+        tb_period,
+        tb_cohort,
+        tb_period_ages,
+        tb_cohort_ages,
+    ]
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+    )
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+
+def make_table_list(
+    ds_meadow,
+    table_names,
+    tables_w_parity,
+    cols_index,
+    col_bo,
+    regex_bo=None,
+    check_integration=True,
+    check_integration_limit=None,
+):
+    """Reads relevant tables, and formats them accordingly.
+
+    Tables come in wide format, sometimes as two-tables (main and birth order). This function consolidates them into single tables per topic.
+
+    For instance, we have one table with total fertility rates (columns `tfr`). And then another one with fertilities broken down by birth order (columns `tfr`, `tfr1`, etc.)
+    Instead, we want a table in long format, which has one column `tfr` and adds the birth order as a dimension of the table.
     """
-    # Outer join
-    tb = tb.merge(
-        tb_bo,
-        on=col_index,
-        suffixes=["", "__bo"],
-        how="outer",
-    )
+    if regex_bo is None:
+        regex_bo = {}
 
-    # Integrate core indicators
-    # It can happen that one table has more values for the core indicator. We solve this with fillna calls.
-    for col in core_indicators:
-        # Check that we can integrate them!
-        TOLERANCE = 5e-3
-        assert (
-            (((tb[col] - tb[f"{col}__bo"]) / tb[col]).dropna().abs() < TOLERANCE).all()
-        ).all(), f"Integration failed for {col}. Core indicator is not equivalent between main and `bo` tables."
+    tbs = []
+    for tname in table_names:
+        # Get custom regex for this table
+        regex = regex_bo.get(tname)
 
-        # Actual integration
-        tb[col] = tb[col].fillna(tb[f"{col}__bo"])
-        tb = tb.drop(columns=[f"{col}__bo"])
+        # Read main table
+        tb = read_table(ds_meadow, tname)
 
-    return tb
+        # Check if there is a birth order table for this indicator(s). If so, process it and integrate it to the main table
+        tname_bo = tname + "bo"
+        if tname_bo in ds_meadow.table_names:
+            # Read BO table
+            tb_bo = read_table(ds_meadow, tname_bo, tname)
+            # Get list of core indicators: These are the names of the columns that are actual indicators (and not dimensional indicators, e.g. `tfr1`, `tfr2`, etc.)
+            core_indicators = [col for col in tb.columns.intersection(tb_bo.columns) if col not in cols_index]
+            # Add BO to main table
+            tb = integrate_bo(
+                tb=tb,
+                tb_bo=tb_bo,
+                cols_index=cols_index,
+                core_indicators=core_indicators,
+                check=check_integration,
+                check_limit_wrong=check_integration_limit,
+            )
+            # Consolidate table: Use long format, and add birth_order as a dimension of the main table.
+            tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo, regex)
+        # Sometimes, the main table contains already indicators broken down by birth order. In such cases, we also need to reshape the table.
+        elif tname in tables_w_parity:
+            core_indicators = tables_w_parity[tname]["indicators"]
+            tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo, regex)
 
+        # Add formatted table to the list of tables.
+        tbs.append(tb)
 
-def make_table_with_birth_order(tb, col_index, core_indicators, col_bo="birth_order"):
-    """Change the format of a table from wide to long, to incorporate the birth order as a dimension."""
-
-    def _generate_regex(name):
-        if re.search(r"\d$", name):  # Check if the name ends with a number
-            return rf"^{name}_?(\d+|(\d+p)?)$"
-        else:
-            return rf"^{name}(\d+|(\d+p)?)$"
-
-    regex_patterns = {name: _generate_regex(name) for name in core_indicators}
-
-    tb = tb.melt(
-        col_index,
-        var_name=COLUMN_RAW,
-        value_name="value",
-    )
-
-    tb["indicator_name"] = None
-    tb[col_bo] = None
-    for name, pattern in regex_patterns.items():
-        # print(f"> {name}")
-
-        # Set indicator name
-        flag_0 = (~tb[COLUMN_RAW].isin(core_indicators)) | (tb[COLUMN_RAW] == name)
-        flag = tb[COLUMN_RAW].str.match(pattern) & flag_0
-        assert tb.loc[flag, COLUMN_IND].isna().all(), "Multiple columns assign to the same indicator!"
-        tb.loc[flag, COLUMN_IND] = name
-
-        # Get birth order
-        tb.loc[flag, col_bo] = tb.loc[flag, COLUMN_RAW].replace({f"{name}_?": ""}, regex=True)
-        tb.loc[tb[COLUMN_RAW] == name, col_bo] = "total"
-
-    # Sanity check
-    assert tb[COLUMN_IND].notna().all(), "Some NaNs found in column `indicator_name`"
-    assert tb[col_bo].notna().all(), f"Some NaNs found in column `{col_bo}`"
-
-    # Final reshape
-    tb = tb.drop(columns=[COLUMN_RAW])
-    tb = tb.pivot(index=col_index + [col_bo], columns=COLUMN_IND, values="value").reset_index()
-    tb = tb.rename_axis(None, axis=1)
-
-    # Drop NaNs
-    tb = tb.dropna(subset=core_indicators)
-
-    return tb
+    return tbs
 
 
 def read_table(ds_meadow, tname, tname_base=None):
@@ -529,94 +637,126 @@ def read_table(ds_meadow, tname, tname_base=None):
     return tb
 
 
-def make_table_list(ds_meadow, table_names, tables_w_parity, cols_index, col_bo):
-    """Reads relevant tables, and formats them accordingly.
+def integrate_bo(tb, tb_bo, cols_index, core_indicators, check=True, check_limit_wrong=None):
+    """Merge main table with its BO counterpart.
 
-    Tables come in wide format, sometimes as two-tables (main and birth order). This function consolidates them into single tables per topic.
-
-    For instance, we have one table with total fertility rates (columns `tfr`). And then another one with fertilities broken down by birth order (columns `tfr`, `tfr1`, etc.)
-    Instead, we want a table in long format, which has one column `tfr` and adds the birth order as a dimension of the table.
+    Some tables have a secondary table which provides the same core indicators but by birth order.
     """
-    tbs = []
-    for tname in table_names:
-        # Read main table
-        tb = read_table(ds_meadow, tname)
+    # Outer join
+    tb = tb.merge(
+        tb_bo,
+        on=cols_index,
+        suffixes=["", "__bo"],
+        how="outer",
+    )
 
-        # Check if there is a birth order table for this indicator(s). If so, process it and integrate it to the main table
-        tname_bo = tname + "bo"
-        if tname_bo in ds_meadow.table_names:
-            # Read BO table
-            tb_bo = read_table(ds_meadow, tname_bo, tname)
-            # Get list of core indicators: These are the names of the columns that are actual indicators (and not dimensional indicators, e.g. `tfr1`, `tfr2`, etc.)
-            core_indicators = [col for col in tb.columns.intersection(tb_bo.columns) if col not in cols_index]
-            # Add BO to main table
-            tb = integrate_bo(tb, tb_bo, cols_index, core_indicators)
-            # Consolidate table: Use long format, and add birth_order as a dimension of the main table.
-            tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo)
-        # Sometimes, the main table contains already indicators broken down by birth order. In such cases, we also need to reshape the table.
-        elif tname in tables_w_parity:
-            core_indicators = cols_index + tables_w_parity[tname]["indicators"]
-            tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo)
+    # Integrate core indicators
+    # It can happen that one table has more values for the core indicator. We solve this with fillna calls.
+    for col in core_indicators:
+        # Check that we can integrate them!
+        TOLERANCE = 5e-3
+        if check:
+            assert (
+                (((tb[col] - tb[f"{col}__bo"]) / tb[col]).dropna().abs() < TOLERANCE).all()
+            ).all(), f"Integration failed for {col}. Core indicator is not equivalent between main and `bo` tables."
+        elif check_limit_wrong is not None:
+            num = (~(((tb[col] - tb[f"{col}__bo"]) / tb[col]).dropna().abs() < TOLERANCE)).sum()
+            assert (
+                num == check_limit_wrong
+            ), f"Integration failed for {col}. There are too many allowed miss-matches ({check_limit_wrong})!"
+        # Actual integration
+        tb[col] = tb[col].fillna(tb[f"{col}__bo"])
+        tb = tb.drop(columns=[f"{col}__bo"])
 
-        # Add formatted table to the list of tables.
-        tbs.append(tb)
+    return tb
 
+
+def make_table_with_birth_order(tb, cols_index, core_indicators, col_bo="birth_order", regex_bo=None):
+    """Change the format of a table from wide to long, to incorporate the birth order as a dimension."""
+
+    if regex_bo is None:
+        regex_bo = {}
+
+    def _generate_regex(name):
+        if re.search(r"\d$", string=name):  # Check if the name ends with a number
+            return rf"^{name}_?(\d+|(\d+p)?)$"
+        else:
+            return rf"^{name}(\d+|(\d+p)?)$"
+
+    regex_patterns = {name: regex_bo.get(name, _generate_regex(name)) for name in core_indicators}
+
+    tb = tb.melt(
+        cols_index,
+        var_name=COLUMN_RAW,
+        value_name="value",
+    )
+
+    tb["indicator_name"] = None
+    tb[col_bo] = None
+    for name, pattern in regex_patterns.items():
+        # print(f"> {name}")
+
+        # Set indicator name
+        flag_0 = (~tb[COLUMN_RAW].isin(core_indicators)) | (tb[COLUMN_RAW] == name)
+        flag = tb[COLUMN_RAW].str.match(pattern) & flag_0
+        assert tb.loc[flag, COLUMN_IND].isna().all(), "Multiple columns assign to the same indicator!"
+        tb.loc[flag, COLUMN_IND] = name
+
+        # Get birth order
+        tb.loc[flag, col_bo] = tb.loc[flag, COLUMN_RAW].replace({f"{name}_?": ""}, regex=True)
+        tb.loc[tb[COLUMN_RAW] == name, col_bo] = "total"
+
+    # Sanity check
+    assert tb[COLUMN_IND].notna().all(), "Some NaNs found in column `indicator_name`"
+    assert tb[col_bo].notna().all(), f"Some NaNs found in column `{col_bo}`"
+
+    # Final reshape
+    tb = tb.drop(columns=[COLUMN_RAW])
+    tb = tb.pivot(index=cols_index + [col_bo], columns=COLUMN_IND, values="value").reset_index()
+    tb = tb.rename_axis(None, axis=1)
+
+    # Drop NaNs
+    tb = tb.dropna(subset=core_indicators)
+
+    return tb
+
+
+def consolidate_table_from_list(tbs, cols_index_out, short_name, fcn=None) -> geo.Table:
+    ## Sanity check: no column is named the same
+    _sanity_check_colnames(tbs, cols_index_out)
+
+    # Merge
+    tb = pr.multi_merge(tbs, on=cols_index_out, how="outer")
+
+    # Optional function
+    if fcn is not None:
+        tb = fcn(tb)
+
+    # Format
+    tb = tb.format(cols_index_out, short_name=short_name)
+    return tb
+
+
+def _fix_ppr(tbs):
+    for tb in tbs:
+        if tb.m.short_name == "pprvhbo":
+            tb["birth_order"] = tb["birth_order"].str.split("_").str[-1]
     return tbs
 
 
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset.
-    ds_meadow = paths.load_dataset("hfd")
-
-    # 1/ Read period tables + consolidate in one table tb_period
-    ## Initial definitions
-    cols_index = ["country", "year"]
-    col_bo = "birth_order"
-    cols_index_out = cols_index + [col_bo]
-    ## Read tables
-    tbs = make_table_list(ds_meadow, TABLES_PERIOD, TABLES_PERIOD_W_PARITY, cols_index, col_bo)
-    ## Sanity check: no column is named the same
+def _sanity_check_colnames(tbs, cols_index_out):
     colnames = [col for t in tbs for col in t.columns if col not in cols_index_out]
     assert len(colnames) == len(set(colnames)), "Some columns are named the same!"
-    ## Merge
-    tb_period = pr.multi_merge(tbs, on=cols_index_out, how="outer")
-    tb_period = tb_period.format(cols_index_out, short_name="period")
 
-    # 2/Read cohort tables + consolidate in one table tb_cohort
-    ## Initial definitions
-    cols_index = ["country", "cohort"]
-    col_bo = "birth_order"
-    cols_index_out = cols_index + [col_bo]
-    ## Read tables
-    tbs = make_table_list(ds_meadow, TABLES_COHORT, TABLES_COHORT_W_PARITY, cols_index, col_bo)
-    ## Sanity check: no column is named the same
-    colnames = [col for t in tbs for col in t.columns if col not in cols_index_out]
-    assert len(colnames) == len(set(colnames)), "Some columns are named the same!"
-    ## Merge
-    tb_cohort = pr.multi_merge(tbs, on=cols_index_out, how="outer")
-    tb_cohort = tb_cohort.format(cols_index_out, short_name="cohort")
 
-    #
-    # Process data.
-    #
-    tables = [
-        tb_period,
-        tb_cohort,
+def keep_relevant_ages(tb):
+    AGES_RELEVANT = [
+        "12-",
+        "20",
+        "30",
+        "40",
+        "50",
+        "55+",
     ]
-
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
-        tables=tables,
-        check_variables_metadata=True,
-        default_metadata=ds_meadow.metadata,
-    )
-
-    # Save changes in the new garden dataset.
-    ds_garden.save()
+    tb = tb.loc[tb["age"].isin(AGES_RELEVANT)]
+    return tb
