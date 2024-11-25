@@ -10,6 +10,7 @@ from apps.chart_to_gif.cli import (
     get_images_from_chart_url,
     get_years_in_chart,
 )
+from etl.config import ENV
 
 # Initialize log.
 log = get_logger()
@@ -136,3 +137,14 @@ if st.session_state.get("show_gif_settings"):
         st.image(str(st.session_state.gif_file), caption="Preview of the Generated GIF", use_container_width=True)
     else:
         st.info("Generate a GIF to preview it.")
+
+    if ENV in ("production", "staging"):
+        # Add a download button if wizard is run remotely.
+        if st.session_state.gif_file:
+            with open(st.session_state.gif_file, "rb") as f:
+                st.download_button(
+                    label=f"Download {output_type}",
+                    data=f.read(),
+                    file_name=f"{str(st.session_state.gif_file.stem)}.{output_type.lower()}",
+                    mime="image/gif" if output_type == "GIF" else "video/mp4",
+                )
