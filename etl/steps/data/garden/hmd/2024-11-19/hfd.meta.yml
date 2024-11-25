@@ -297,7 +297,7 @@ tables:
 
       ppr:
         title: |-
-          Cohort parity progression ratios - << int(birt_order) >> to << int(birth_order) + 1 >> birth
+          Cohort parity progression ratios - << birth_order | int >> to << (birth_order | int) + 1 >> birth
         description_short: |-
           <% if birth_order == '1' %>
           Probability of giving birth to a first child.
