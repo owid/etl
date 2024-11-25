@@ -17,12 +17,13 @@ meta:
     attribution: Global Carbon Budget (2024)
     attribution_short: GCB
     url_main: https://globalcarbonbudget.org/
+    url_download: https://zenodo.org/records/13981696/files/GCB2024v17_MtCO2_flat.csv
     date_accessed: '2024-11-13'
     date_published: '2024-11-13'
     license:
       name: CC BY 4.0
       url: https://zenodo.org/records/10177738
 outs:
-  - md5: eefcbe53b9da64d615a170970496c7c1
-    size: 2869860
+  - md5: 70dac1843444b14655bf756c70c1f04a
+    size: 3128569
     path: global_carbon_budget_fossil_co2_emissions.csv

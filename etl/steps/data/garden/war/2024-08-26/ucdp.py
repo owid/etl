@@ -1,6 +1,12 @@
 """Data from UCDP.
 
 
+IMPORTANT NOTE:
+
+    Changes in this script should probably be reflected also in the script for ucdp_preview!
+
+    At some point we should merge the tools from both scripts to avoid duplication.
+
 Notes:
     - Conflict types for state-based violence is sourced from UCDP/PRIO dataset. non-state and one-sided violence is sourced from GED dataset.
     - There can be some mismatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their dashboard, which might not be available yet as bulk download.
