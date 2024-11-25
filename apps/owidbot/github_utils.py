@@ -16,16 +16,10 @@ log = structlog.get_logger()
 
 
 def get_repo(repo_name: str, access_token: Optional[str] = None) -> github.Repository.Repository:
-    # No access token, try using OWIDBOT_ACCESS_TOKEN
     if not access_token:
-        if config.OWIDBOT_ACCESS_TOKEN:
-            access_token = config.OWIDBOT_ACCESS_TOKEN
-            auth = Auth.Token(access_token)
-        else:
-            # Don't auth, be aware that you won't be able to do write operations. You should
-            # set up your access token on https://github.com/settings/tokens and set it as
-            # OWIDBOT_ACCESS_TOKEN in .env
-            auth = None
+        # Don't auth, be aware that you won't be able to do write operations. You should
+        # set up your access token on https://github.com/settings/tokens.
+        auth = None
     else:
         auth = Auth.Token(access_token)
 
@@ -105,10 +99,19 @@ def compute_git_blob_sha1(content: bytes) -> str:
     return sha1.hexdigest()
 
 
+def _github_access_token():
+    # Use GITHUB_TOKEN if set, otherwise use OWIDBOT_ACCESS_TOKEN
+    if config.GITHUB_TOKEN:
+        return config.GITHUB_TOKEN
+    elif config.OWIDBOT_ACCESS_TOKEN:
+        return config.OWIDBOT_ACCESS_TOKEN
+    else:
+        raise AssertionError("You need to set GITHUB_TOKEN or OWIDBOT_ACCESS_TOKEN in your .env file to commit.")
+
+
 def create_branch_if_not_exists(repo_name: str, branch: str, dry_run: bool) -> None:
     """Create a branch if it doesn't exist."""
-    assert config.OWIDBOT_ACCESS_TOKEN, "You need to set OWIDBOT_ACCESS_TOKEN in your .env file to create a branch."
-    repo = get_repo(repo_name, config.OWIDBOT_ACCESS_TOKEN)
+    repo = get_repo(repo_name, access_token=_github_access_token())
     try:
         repo.get_branch(branch)
     except github.GithubException as e:
@@ -136,10 +139,8 @@ def commit_file_to_github(
     dry_run: bool = True,
 ) -> None:
     """Commit a table to a GitHub repository using the GitHub API."""
-    assert config.OWIDBOT_ACCESS_TOKEN, "You need to set OWIDBOT_ACCESS_TOKEN in your .env file to commit."
-
     # Get the repository object
-    repo = get_repo(repo_name, config.OWIDBOT_ACCESS_TOKEN)
+    repo = get_repo(repo_name, access_token=_github_access_token())
     new_content_checksum = compute_git_blob_sha1(content.encode("utf-8"))
 
     try:
