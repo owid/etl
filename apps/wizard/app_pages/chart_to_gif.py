@@ -17,7 +17,7 @@ log = get_logger()
 
 # PAGE CONFIG
 st.set_page_config(
-    page_title="Wizard: Chart to GIF",
+    page_title="Wizard: Chart animation",
     page_icon="🪄",
 )
 
@@ -26,7 +26,7 @@ st.set_page_config(
 ########################################################################################################################
 
 # Streamlit app layout.
-st.title(":material/tv: Chart to GIF")
+st.title(":material/animated_images: Chart animation")
 
 # Initialize session state for generated files.
 if "images_folder" not in st.session_state:
