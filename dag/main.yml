@@ -280,14 +280,6 @@ steps:
   data://grapher/eth/2023-03-15/ethnic_power_relations:
     - data://garden/eth/2023-03-15/ethnic_power_relations
 
-  # International Monetary Fund, World Economic Outlook
-  data://meadow/imf/2024-05-02/world_economic_outlook:
-    - snapshot://imf/2024-05-02/world_economic_outlook.xls
-  data://garden/imf/2024-05-02/world_economic_outlook:
-    - data://meadow/imf/2024-05-02/world_economic_outlook
-  data://grapher/imf/2024-05-02/world_economic_outlook:
-    - data://garden/imf/2024-05-02/world_economic_outlook
-
   # Patents & journal articles (World Bank, United Nations)
   data://garden/research_development/2024-05-20/patents_articles:
     - data://garden/worldbank_wdi/2024-05-20/wdi
@@ -877,6 +869,16 @@ steps:
 
   data://grapher/migration/2024-11-18/migration_between_regions:
     - data://garden/migration/2024-11-18/migration_between_regions
+
+  # International Monetary Fund, World Economic Outlook
+  data://meadow/imf/2024-11-25/world_economic_outlook:
+    - snapshot://imf/2024-11-25/world_economic_outlook.xls
+
+  data://garden/imf/2024-11-25/world_economic_outlook:
+    - data://meadow/imf/2024-11-25/world_economic_outlook
+
+  data://grapher/imf/2024-11-25/world_economic_outlook:
+    - data://garden/imf/2024-11-25/world_economic_outlook
 
 include:
   - dag/open_numbers.yml
