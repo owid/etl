@@ -1,0 +1,5 @@
+tables:
+  world_inequality_database:
+    variables:
+      p99p100_share_wealth:
+        title: Top 1% - Share (Net national wealth) (Estimated).
