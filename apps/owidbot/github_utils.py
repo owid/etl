@@ -16,10 +16,19 @@ log = structlog.get_logger()
 
 
 def get_repo(repo_name: str, access_token: Optional[str] = None) -> github.Repository.Repository:
+    # No access token, try using OWIDBOT_ACCESS_TOKEN
     if not access_token:
-        assert config.OWIDBOT_ACCESS_TOKEN, "OWIDBOT_ACCESS_TOKEN is not set"
-        access_token = config.OWIDBOT_ACCESS_TOKEN
-    auth = Auth.Token(access_token)
+        if config.OWIDBOT_ACCESS_TOKEN:
+            access_token = config.OWIDBOT_ACCESS_TOKEN
+            auth = Auth.Token(access_token)
+        else:
+            # Don't auth, be aware that you won't be able to do write operations. You should
+            # set up your access token on https://github.com/settings/tokens and set it as
+            # OWIDBOT_ACCESS_TOKEN in .env
+            auth = None
+    else:
+        auth = Auth.Token(access_token)
+
     g = Github(auth=auth)
     return g.get_repo(f"owid/{repo_name}")
 
@@ -96,6 +105,28 @@ def compute_git_blob_sha1(content: bytes) -> str:
     return sha1.hexdigest()
 
 
+def create_branch_if_not_exists(repo_name: str, branch: str, dry_run: bool) -> None:
+    """Create a branch if it doesn't exist."""
+    assert config.OWIDBOT_ACCESS_TOKEN, "You need to set OWIDBOT_ACCESS_TOKEN in your .env file to create a branch."
+    repo = get_repo(repo_name, config.OWIDBOT_ACCESS_TOKEN)
+    try:
+        repo.get_branch(branch)
+    except github.GithubException as e:
+        if e.status == 404:
+            if not dry_run:
+                try:
+                    master_ref = repo.get_branch("main").commit.sha
+                    log.info(f"Using 'main' branch as reference for creating {branch}.")
+                except github.GithubException:
+                    master_ref = repo.get_branch("master").commit.sha
+                    log.info(f"Using 'master' branch as reference for creating {branch}.")
+                log.info(f"Creating branch {branch} with reference {master_ref}.")
+                repo.create_git_ref(ref=f"refs/heads/{branch}", sha=master_ref)
+            log.info(f"Branch {branch} created in {repo.name}.")
+        else:
+            raise e
+
+
 def commit_file_to_github(
     content: str,
     repo_name: str,
@@ -105,8 +136,10 @@ def commit_file_to_github(
     dry_run: bool = True,
 ) -> None:
     """Commit a table to a GitHub repository using the GitHub API."""
+    assert config.OWIDBOT_ACCESS_TOKEN, "You need to set OWIDBOT_ACCESS_TOKEN in your .env file to commit."
+
     # Get the repository object
-    repo = get_repo(repo_name)
+    repo = get_repo(repo_name, config.OWIDBOT_ACCESS_TOKEN)
     new_content_checksum = compute_git_blob_sha1(content.encode("utf-8"))
 
     try:
