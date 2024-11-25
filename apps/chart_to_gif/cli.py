@@ -16,7 +16,7 @@ from tqdm.auto import tqdm
 log = get_logger()
 
 # Define default downloads folder (to use if either output_gif is None or png_folder is None).
-DOWNLOADS_DIR = Path.home() / "Downloads"
+DOWNLOADS_DIR = Path.home() / ".chart_animation"
 
 
 def get_chart_metadata(chart_url):
