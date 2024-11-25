@@ -410,17 +410,24 @@ TABLES_PERIOD_W_PARITY = {
     },
     # "pmabc",
 }
+REGEX_PERIOD_BO = {}
+
 # Tables to process for COHORT country-cohort
 TABLES_COHORT = [
     "mabvh",
-    # "pprvhbo",
+    "pprvhbo",
     "sdmabvh",
     "tfrvh",
 ]
 TABLES_COHORT_W_PARITY = {
-    # "pprvhbo": {
-    #     "indicators": ["patfr"],
-    # },
+    "pprvhbo": {
+        "indicators": ["ppr"],
+    },
+}
+REGEX_COHORT_BO = {
+    "pprvhbo": {
+        "ppr": r"^ppr\d+_\d+$",
+    },
 }
 
 
@@ -453,8 +460,11 @@ def integrate_bo(tb, tb_bo, col_index, core_indicators):
     return tb
 
 
-def make_table_with_birth_order(tb, col_index, core_indicators, col_bo="birth_order"):
+def make_table_with_birth_order(tb, col_index, core_indicators, col_bo="birth_order", regex_bo=None):
     """Change the format of a table from wide to long, to incorporate the birth order as a dimension."""
+
+    if regex_bo is None:
+        regex_bo = {}
 
     def _generate_regex(name):
         if re.search(r"\d$", name):  # Check if the name ends with a number
@@ -462,7 +472,7 @@ def make_table_with_birth_order(tb, col_index, core_indicators, col_bo="birth_or
         else:
             return rf"^{name}(\d+|(\d+p)?)$"
 
-    regex_patterns = {name: _generate_regex(name) for name in core_indicators}
+    regex_patterns = {name: regex_bo.get(name, _generate_regex(name)) for name in core_indicators}
 
     tb = tb.melt(
         col_index,
@@ -529,7 +539,7 @@ def read_table(ds_meadow, tname, tname_base=None):
     return tb
 
 
-def make_table_list(ds_meadow, table_names, tables_w_parity, cols_index, col_bo):
+def make_table_list(ds_meadow, table_names, tables_w_parity, cols_index, col_bo, regex_bo=None):
     """Reads relevant tables, and formats them accordingly.
 
     Tables come in wide format, sometimes as two-tables (main and birth order). This function consolidates them into single tables per topic.
@@ -537,8 +547,14 @@ def make_table_list(ds_meadow, table_names, tables_w_parity, cols_index, col_bo)
     For instance, we have one table with total fertility rates (columns `tfr`). And then another one with fertilities broken down by birth order (columns `tfr`, `tfr1`, etc.)
     Instead, we want a table in long format, which has one column `tfr` and adds the birth order as a dimension of the table.
     """
+    if regex_bo is None:
+        regex_bo = {}
+
     tbs = []
     for tname in table_names:
+        # Get custom regex for this table
+        regex = regex_bo.get(tname)
+
         # Read main table
         tb = read_table(ds_meadow, tname)
 
@@ -552,11 +568,11 @@ def make_table_list(ds_meadow, table_names, tables_w_parity, cols_index, col_bo)
             # Add BO to main table
             tb = integrate_bo(tb, tb_bo, cols_index, core_indicators)
             # Consolidate table: Use long format, and add birth_order as a dimension of the main table.
-            tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo)
+            tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo, regex)
         # Sometimes, the main table contains already indicators broken down by birth order. In such cases, we also need to reshape the table.
         elif tname in tables_w_parity:
-            core_indicators = cols_index + tables_w_parity[tname]["indicators"]
-            tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo)
+            core_indicators = tables_w_parity[tname]["indicators"]
+            tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo, regex)
 
         # Add formatted table to the list of tables.
         tbs.append(tb)
@@ -577,7 +593,14 @@ def run(dest_dir: str) -> None:
     col_bo = "birth_order"
     cols_index_out = cols_index + [col_bo]
     ## Read tables
-    tbs = make_table_list(ds_meadow, TABLES_PERIOD, TABLES_PERIOD_W_PARITY, cols_index, col_bo)
+    tbs = make_table_list(
+        ds_meadow=ds_meadow,
+        table_names=TABLES_PERIOD,
+        tables_w_parity=TABLES_PERIOD_W_PARITY,
+        cols_index=cols_index,
+        col_bo=col_bo,
+        regex_bo=REGEX_PERIOD_BO,
+    )
     ## Sanity check: no column is named the same
     colnames = [col for t in tbs for col in t.columns if col not in cols_index_out]
     assert len(colnames) == len(set(colnames)), "Some columns are named the same!"
@@ -591,10 +614,21 @@ def run(dest_dir: str) -> None:
     col_bo = "birth_order"
     cols_index_out = cols_index + [col_bo]
     ## Read tables
-    tbs = make_table_list(ds_meadow, TABLES_COHORT, TABLES_COHORT_W_PARITY, cols_index, col_bo)
+    tbs = make_table_list(
+        ds_meadow=ds_meadow,
+        table_names=TABLES_COHORT,
+        tables_w_parity=TABLES_COHORT_W_PARITY,
+        cols_index=cols_index,
+        col_bo=col_bo,
+        regex_bo=REGEX_COHORT_BO,
+    )
     ## Sanity check: no column is named the same
     colnames = [col for t in tbs for col in t.columns if col not in cols_index_out]
     assert len(colnames) == len(set(colnames)), "Some columns are named the same!"
+    # Quick fix: change birth_order label for PPR
+    for tb in tbs:
+        if tb.m.short_name == "pprvhbo":
+            tb["birth_order"] = tb["birth_order"].str.split("_").str[-1]
     ## Merge
     tb_cohort = pr.multi_merge(tbs, on=cols_index_out, how="outer")
     tb_cohort = tb_cohort.format(cols_index_out, short_name="cohort")

@@ -13,6 +13,16 @@ definitions:
       <%- elif birth_order == '5p' %>
        fifth (or greater)
       <% endif %>
+    bo_1_m1: |-
+      <% if birth_order == '2' %>
+       second
+      <%- elif birth_order == '3' %>
+       third
+      <%- elif birth_order == '4' %>
+       fourth
+      <%- elif birth_order == '5p' %>
+       fifth (or greater)
+      <% endif %>
     title: |-
       <% if birth_order == 'total' %>
       << title >> - Total
@@ -284,3 +294,21 @@ tables:
         description_key:
           - Reflects variability in the timing of births up to age 40 within a cohort.
           - Helps to understand how concentrated or spread out early childbearing is within the cohort.
+
+      ppr:
+        title: |-
+          Cohort parity progression ratios - << int(birt_order) >> to << int(birth_order) + 1 >> birth
+        description_short: |-
+          <% if birth_order == '1' %>
+          Probability of giving birth to a first child.
+          <%- elif birth_order == '2' %>
+          Probability of giving birth to a second child, conditioned on having had a first child.
+          <%- elif birth_order == '3' %>
+          Probability of giving birth to a third child, conditioned on having had a second child.
+          <%- elif birth_order == '4' %>
+          Probability of giving birth to a fourth child, conditioned on having had a third child.
+          <% endif %>
+        unit: ""
+        description_key:
+          - Measures the likelihood that a woman with a given number of children will go on to have another child.
+          - It is useful for understanding family-building dynamics and changes in reproductive behavior over time.
