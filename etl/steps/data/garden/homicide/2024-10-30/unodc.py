@@ -1,9 +1,11 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
+from owid.catalog import processing as pr
 from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
+from etl.data_helpers.geo import add_population_to_table
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -16,7 +18,8 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("unodc")
-
+    # Load population dataset.
+    ds_population = paths.load_dataset("population")
     # Read table from meadow dataset.
     tb = ds_meadow["unodc"].reset_index()
 
@@ -28,6 +31,7 @@ def run(dest_dir: str) -> None:
     )
 
     tb = clean_up_categories(tb)
+    tb = calculate_united_kingdom(tb, ds_population)
     tables = clean_data(tb)
 
     #
@@ -124,4 +128,33 @@ def clean_up_categories(tb: Table) -> Table:
     tb["category"] = tb["category"].cat.rename_categories(category_dict)
 
     assert tb["category"].isna().sum() == 0
+    return tb
+
+
+def calculate_united_kingdom(tb: Table, ds_population: Dataset) -> Table:
+    """
+    Calculate data for the UK as it is reported by the constituent countries
+    """
+
+    countries = ["England and Wales", "Scotland", "Northern Ireland"]
+    tb_uk = tb[(tb["country"].isin(countries)) & (tb["unit_of_measurement"] == "Counts")]
+
+    tb_uk = (
+        tb_uk.groupby(["year", "indicator", "dimension", "category", "sex", "age", "unit_of_measurement"])
+        .agg(value=("value", "sum"), count=("value", "size"))
+        .reset_index()
+    )
+    # Use only rows where all three entites are in the data
+    tb_uk = tb_uk[tb_uk["count"] == 3]
+    tb_uk["country"] = "United Kingdom"
+    tb_uk = tb_uk.drop(columns="count")
+
+    # Add in UK population to calculate rates
+    tb_uk_rate = tb_uk.copy()
+    tb_uk_rate = add_population_to_table(tb_uk_rate, ds_population)
+    tb_uk_rate["value"] = tb_uk_rate["value"] / tb_uk_rate["population"] * 100000
+    tb_uk_rate["unit_of_measurement"] = "Rate per 100,000 population"
+    tb_uk_rate = tb_uk_rate.drop(columns=["population"])
+
+    tb = pr.concat([tb, tb_uk, tb_uk_rate])
     return tb
