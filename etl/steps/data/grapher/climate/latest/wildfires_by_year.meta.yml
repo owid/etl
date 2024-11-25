@@ -56,7 +56,17 @@ tables:
           description_key: *desc_wildfires
 
         co2_ha_per_area:
-          title: Annual carbon dioxide emissions per area burnt
+          title: Carbon dioxide emissions per hectare burnt
+          unit: tonnes
+          short_unit: t
+          description_short: Carbon dioxide emissions per hectare burnt by [wildfires](#dod:wildfires), in tonnes. {definitions.desc_update}
+          description_processing: The carbon dioxide emissions per hectare is calculated by dividing the carbon dioxide emissions by the area burnt by wildfires.
+          description_key: *desc_wildfires
 
         pm2_5_ha_per_area:
-          title: Annual PM2.5 emissions per area burnt
+          title: PM2.5 emissions per hectare burnt
+          unit: tonnes
+          short_unit: t
+          description_short: PM2.5 emissions per hectare burnt by [wildfires](#dod:wildfires), in tonnes. {definitions.desc_update}
+          description_processing: The PM2.5 emissions per hectare is calculated by dividing the PM2.5 emissions by the area burnt by wildfires.
+          description_key: *desc_wildfires
