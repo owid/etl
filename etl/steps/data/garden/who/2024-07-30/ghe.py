@@ -71,7 +71,7 @@ AGE_GROUPS_MAP = {
 def run(dest_dir: str) -> None:
     # read dataset from meadow
     ds_meadow = paths.load_dataset()
-    tb = ds_meadow.read("ghe")
+    tb = ds_meadow.read("ghe", safe_types=False)
     tb = tb.drop(columns="flag_level")
 
     tb = rename_table_for_compatibility(tb)
@@ -114,7 +114,7 @@ def run(dest_dir: str) -> None:
 
 def rename_table_for_compatibility(tb: Table) -> Table:
     """Rename columns and labels to be compatible with the previous version of the dataset."""
-    tb.age_group = tb.age_group.map(AGE_GROUPS_MAP)
+    tb.age_group = dataframes.map_series(tb.age_group, AGE_GROUPS_MAP)
     tb = tb.rename(
         columns={
             "val_dths_count_numeric": "death_count",
