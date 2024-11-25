@@ -1,7 +1,7 @@
 import streamlit as st
 from structlog import get_logger
 
-from apps.chart_to_gif.cli import (
+from apps.chart_animation.cli import (
     DOWNLOADS_DIR,
     create_gif_from_images,
     get_chart_slug,

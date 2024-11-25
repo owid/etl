@@ -209,10 +209,10 @@ sections:
         icon: ":material/videogame_asset:"
         image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
       - title: "Chart animation"
-        alias: chart-to-gif
-        description: "Create a GIF or a video from a chart"
+        alias: chart-animation
+        description: "Create an animated GIF or a video from a chart"
         maintainer: "@pablo"
-        entrypoint: app_pages/chart_to_gif.py
+        entrypoint: app_pages/chart_animation.py
         icon: ":material/animated_images:"
         image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
 
