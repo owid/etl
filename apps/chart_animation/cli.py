@@ -200,6 +200,20 @@ def get_images_from_chart_url(
     return image_paths
 
 
+def prepare_images(image_paths, remove_duplicate_frames, repetitions_last_frame):
+    # Create a list of images from a list of image paths.
+    images = [Image.open(img) for img in sorted(image_paths)]
+    if remove_duplicate_frames:
+        # Sometimes, even though the list of years is correct for all countries, for the specifically selected ones there may not be any data.
+        # In this case, the PNGs will be the same, so we can remove duplicates.
+        images = [images[i] for i in range(len(images)) if i == 0 or images[i] != images[i - 1]]
+
+    # Optionally repeat the last frame.
+    images += [images[-1]] * repetitions_last_frame
+
+    return images
+
+
 def create_gif_from_images(
     image_paths,
     output_file,
@@ -209,14 +223,12 @@ def create_gif_from_images(
     repetitions_last_frame=0,
     duration_of_animation=False,
 ):
-    images = [Image.open(img) for img in sorted(image_paths)]
-    if remove_duplicate_frames:
-        # Sometimes, even though the list of years is correct for all countries, for the specifically selected ones there may not be any data.
-        # In this case, the PNGs will be the same, so we can remove duplicates.
-        images = [images[i] for i in range(len(images)) if i == 0 or images[i] != images[i - 1]]
-
-    # Optionally repeat the last frame.
-    images = images + [images[-1]] * repetitions_last_frame
+    # Prepare a list of image objects.
+    images = prepare_images(
+        image_paths=image_paths,
+        remove_duplicate_frames=remove_duplicate_frames,
+        repetitions_last_frame=repetitions_last_frame,
+    )
 
     if duration_of_animation:
         duration = duration // len(images)
@@ -247,16 +259,12 @@ def create_mp4_from_images(
     repetitions_last_frame=0,
     duration_of_animation=False,
 ):
-    # Load images.
-    images = [str(img) for img in sorted(image_paths)]
-
-    if remove_duplicate_frames:
-        # TODO: Fix this, currently it compares paths, not images.
-        # Remove duplicate frames.
-        images = [images[i] for i in range(len(images)) if i == 0 or images[i] != images[i - 1]]
-
-    # Optionally repeat the last frame.
-    images += [images[-1]] * repetitions_last_frame
+    # Prepare a list of image objects.
+    images = prepare_images(
+        image_paths=image_paths,
+        remove_duplicate_frames=remove_duplicate_frames,
+        repetitions_last_frame=repetitions_last_frame,
+    )
 
     if duration_of_animation:
         duration = duration / len(images)
@@ -264,10 +272,13 @@ def create_mp4_from_images(
     # Calculate frame rate from duration per frame.
     frame_rate = 1 / (duration / 1000)
 
-    # Create video clip.
-    clip = ImageSequenceClip(images, fps=frame_rate)
+    temp_image_paths = []
+    for idx, img in enumerate(images):
+        temp_path = f"/tmp/temp_image_{idx}.png"
+        img.save(temp_path)
+        temp_image_paths.append(temp_path)
 
-    # Write video to file.
+    clip = ImageSequenceClip(temp_image_paths, fps=frame_rate)
     clip.write_videofile(output_file, codec="libx264", fps=frame_rate, preset="slow", audio=False)
 
     return output_file
