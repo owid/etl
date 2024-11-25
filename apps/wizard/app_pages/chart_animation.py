@@ -92,6 +92,20 @@ if st.session_state.chart_animation_show_image_settings:
         # Get the selected subset of years.
         years = [year for year in st.session_state.chart_animation_years if year_min <= year <= year_max]
 
+        st.session_state.chart_animation_max_num_years = st.number_input(
+            "Maximum number of years",
+            value=MAX_NUM_YEARS,
+            help="Maximum number of years to generate images for (to avoid too many API call).",
+        )
+
+    if len(years) > st.session_state.chart_animation_max_num_years:
+        st.error(
+            f"Number of years in the chart ({len(years)}) is higher than the maximum number of years ({st.session_state.chart_animation_max_num_years}). You can either increase the maximum number of years or select a smaller range."
+        )
+        st.stop()
+
+    # SHOW OPTIONS FOR IMAGE GENERATION
+    with st.container(border=True):
         # Tab and year range settings.
         def add_icons_to_tabs(tab_name):
             if tab_name == "map":
@@ -108,22 +122,10 @@ if st.session_state.chart_animation_show_image_settings:
             value=True,
             help="Only relevant for the chart view. If checked, the year range will be open. Uncheck if you want to generate a sequence of bar charts.",
         )
-        st.session_state.chart_animation_max_num_years = st.number_input(
-            "Maximum number of years",
-            value=MAX_NUM_YEARS,
-            help="Maximum number of years to generate images for (to avoid too many API call).",
-        )
 
-    if len(years) > st.session_state.chart_animation_max_num_years:
-        st.error(
-            f"Number of years in the chart ({len(years)}) is higher than the maximum number of years ({st.session_state.chart_animation_max_num_years}). You can either increase the maximum number of years or select a smaller range."
-        )
-        st.stop()
-
-    # SHOW OPTIONS FOR IMAGE GENERATION
-    with st.container(border=True):
         # GIF settings.
-        output_type = st.radio("Output Type", ["GIF", "Video"], horizontal=True)
+        # output_type = st.radio("Output Type", ["GIF", "Video"], horizontal=True)
+        output_type = st.segmented_control("Output Type", ["GIF", "Video"], default="GIF")
         st.session_state.chart_animation_gif_file = st.session_state.chart_animation_gif_file.with_suffix(
             ".gif" if output_type == "GIF" else ".mp4"
         )
