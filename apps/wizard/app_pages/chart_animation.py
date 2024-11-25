@@ -8,7 +8,7 @@ from apps.chart_animation.cli import (
     get_images_from_chart_url,
     get_years_in_chart,
 )
-from apps.wizard.utils.components import grapher_chart_from_url
+from apps.wizard.utils.components import grapher_chart_from_url, st_horizontal
 
 # Initialize log.
 log = get_logger()
@@ -52,6 +52,9 @@ slug = get_chart_slug(chart_url=chart_url)
 
 # Set images folder and output file.
 st.session_state.chart_animation_images_folder = DOWNLOADS_DIR / slug
+if not st.session_state.chart_animation_images_folder.exists():
+    # Create the default output folder if it doesn't exist.
+    st.session_state.chart_animation_images_folder.mkdir(parents=True)
 st.session_state.chart_animation_gif_file = DOWNLOADS_DIR / f"{slug}.gif"
 st.session_state.chart_animation_images_exist = (
     len([image for image in st.session_state.chart_animation_images_folder.iterdir() if image.suffix == ".png"]) > 0
@@ -128,10 +131,11 @@ if st.session_state.chart_animation_show_gif_settings:
         ".gif" if output_type == "GIF" else ".mp4"
     )
     remove_duplicates = st.toggle("Remove duplicate frames", value=True)
-    repetitions_last_frame = st.number_input("Repetitions of Last Frame", value=0, step=1)
-    duration = st.number_input("Duration (ms)", value=200, step=10)
+    with st_horizontal():
+        repetitions_last_frame = st.number_input("Repetitions of Last Frame", value=0, step=1)
+        loop_count = st.number_input("Number of Loops (0 = Infinite)", value=0, step=1)
+        duration = st.number_input("Duration (ms)", value=200, step=10)
     duration_of = st.radio("Duration of", ["Each frame", "Entire animation"])
-    loop_count = st.number_input("Number of Loops (0 = Infinite)", value=0, step=1)
 
     # Regenerate GIF button.
     if st.button("Generate animation"):
