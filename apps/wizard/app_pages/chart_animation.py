@@ -76,14 +76,15 @@ if st.session_state.chart_animation_show_image_settings:
     st.info("Modify chart as you wish, click on share -> copy link, and paste it in the box above.")
     st.session_state.chart_animation_iframe_html = grapher_chart_from_url(chart_url)
 
-    # Slider for year range.
-    year_min, year_max = st.slider(
+    # Create a slider to select min and max years.
+    year_min, year_max = st.select_slider(
         "Select year range",
-        min_value=min(st.session_state.chart_animation_years),
-        max_value=max(st.session_state.chart_animation_years),
+        options=st.session_state.chart_animation_years,
         value=(min(st.session_state.chart_animation_years), max(st.session_state.chart_animation_years)),
     )
-    years = range(year_min, year_max + 1)
+
+    # Get the selected subset of years.
+    years = [year for year in st.session_state.chart_animation_years if year_min <= year <= year_max]
 
     # Tab and year range settings.
     tab = st.radio("Select tab", ["map", "chart"])
