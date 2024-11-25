@@ -331,3 +331,7 @@ def st_multiselect_wider(num_px: int = 1000):
         </style>""",
         unsafe_allow_html=True,
     )
+
+
+def st_info(text):
+    st.info(text, icon=":material/info:")

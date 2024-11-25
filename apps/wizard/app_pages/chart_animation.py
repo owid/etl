@@ -10,7 +10,7 @@ from apps.chart_animation.cli import (
     get_images_from_chart_url,
     get_years_in_chart,
 )
-from apps.wizard.utils.components import grapher_chart_from_url, st_horizontal
+from apps.wizard.utils.components import grapher_chart_from_url, st_horizontal, st_info
 
 # Initialize log.
 log = get_logger()
@@ -74,80 +74,96 @@ if st.button("Get chart"):
 
 # Display iframe if it was fetched.
 if st.session_state.chart_animation_show_image_settings:
-    st.info("Modify chart as you wish, click on share -> copy link, and paste it in the box above.")
-    st.session_state.chart_animation_iframe_html = grapher_chart_from_url(chart_url)
+    with st.container(border=True):
+        st.session_state.chart_animation_iframe_html = grapher_chart_from_url(chart_url)
+        st_info(
+            "Modify chart as you wish, click on share -> copy link, and paste it in the box above.",
+        )
 
-    # Create a slider to select min and max years.
-    year_min, year_max = st.select_slider(
-        "Select year range",
-        options=st.session_state.chart_animation_years,
-        value=(min(st.session_state.chart_animation_years), max(st.session_state.chart_animation_years)),
-    )
+    # SHOW OPTIONS FOR CHART
+    with st.container(border=True):
+        # Create a slider to select min and max years.
+        year_min, year_max = st.select_slider(
+            "Select year range",
+            options=st.session_state.chart_animation_years,
+            value=(min(st.session_state.chart_animation_years), max(st.session_state.chart_animation_years)),
+        )
 
-    # Get the selected subset of years.
-    years = [year for year in st.session_state.chart_animation_years if year_min <= year <= year_max]
+        # Get the selected subset of years.
+        years = [year for year in st.session_state.chart_animation_years if year_min <= year <= year_max]
 
-    # Tab and year range settings.
-    tab = st.radio("Select tab", ["map", "chart"])
-    year_range_open = st.checkbox(
-        "Year range open",
-        value=True,
-        help="Only relevant for the chart view. If checked, the year range will be open. Uncheck if you want to generate a sequence of bar charts.",
-    )
-    st.session_state.chart_animation_max_num_years = st.number_input(
-        "Maximum number of years",
-        value=MAX_NUM_YEARS,
-        help="Maximum number of years to generate images for (to avoid too many API call).",
-    )
+        # Tab and year range settings.
+        def add_icons_to_tabs(tab_name):
+            if tab_name == "map":
+                return ":material/map: map"
+            elif tab_name == "chart":
+                return ":material/show_chart: chart"
+            return f":material/{tab_name}: {tab_name}"
+
+        # tab = st.radio("Select tab", ["map", "chart"], horizontal=True)
+        tab = st.segmented_control("Select tab", ["map", "chart"], format_func=add_icons_to_tabs, default="map")
+
+        year_range_open = st.toggle(
+            "Year range open",
+            value=True,
+            help="Only relevant for the chart view. If checked, the year range will be open. Uncheck if you want to generate a sequence of bar charts.",
+        )
+        st.session_state.chart_animation_max_num_years = st.number_input(
+            "Maximum number of years",
+            value=MAX_NUM_YEARS,
+            help="Maximum number of years to generate images for (to avoid too many API call).",
+        )
 
     if len(years) > st.session_state.chart_animation_max_num_years:
         st.error(
-            f"Number of years in the chart ({len(years)}) is higher than the maximum number of years ({st.session_state.chart_animation_max_num_years})."
+            f"Number of years in the chart ({len(years)}) is higher than the maximum number of years ({st.session_state.chart_animation_max_num_years}). You can either increase the maximum number of years or select a smaller range."
         )
         st.stop()
 
-    with st_horizontal():
-        # Button to generate images.
-        if st.button(
-            "Get images",
-            help=f'Get images for selected years. Years for which there is already a file in {st.session_state.chart_animation_images_folder} will be skipped.\nEither delete them all (using "Delete images") or continue to get images for remaining years (if any is missing).',
-            type="primary",
-        ):
-            st.session_state.chart_animation_image_paths = get_images_from_chart_url(
-                chart_url=chart_url,
-                png_folder=st.session_state.chart_animation_images_folder,
-                tab=tab,
-                years=years,
-                year_range_open=year_range_open,
-                max_workers=None,
-                max_num_years=st.session_state.chart_animation_max_num_years,
-            )
-            st.session_state.chart_animation_images_exist = len(st.session_state.chart_animation_image_paths) > 0  # type: ignore
+    # SHOW OPTIONS FOR IMAGE GENERATION
+    with st.container(border=True):
+        # GIF settings.
+        output_type = st.radio("Output Type", ["GIF", "Video"], horizontal=True)
+        st.session_state.chart_animation_gif_file = st.session_state.chart_animation_gif_file.with_suffix(
+            ".gif" if output_type == "GIF" else ".mp4"
+        )
+        remove_duplicates = st.toggle("Remove duplicate frames", value=True)
+        with st_horizontal():
+            repetitions_last_frame = st.number_input("Repetitions of Last Frame", value=0, step=1)
+            if output_type == "GIF":
+                loop_count = st.number_input("Number of Loops (0 = Infinite)", value=0, step=1)
+            duration = st.number_input("Duration (ms)", value=200, step=10)
+        duration_of = st.radio("Duration of", ["Each frame", "Entire animation"], horizontal=True)
 
-        # Button to delete the folder.
-        if st.button(
-            "Delete images",
-            disabled=not st.session_state.chart_animation_images_exist,
-            help=f"Delete images in folder: {st.session_state.chart_animation_images_folder}.",
-        ):
-            for image in st.session_state.chart_animation_image_paths:  # type: ignore
-                image.unlink()
-            # Update session state to reflect that images are deleted.
-            st.session_state.chart_animation_images_exist = False
-            st.info("Images deleted.")
+        with st_horizontal():
+            # Button to generate images.
+            if st.button(
+                "Animate",
+                help=f'Get images for selected years. Years for which there is already a file in `{st.session_state.chart_animation_images_folder}` will be skipped.\nEither delete them all (using "Delete images") or continue to get images for remaining years (if any is missing).',
+                type="primary",
+            ):
+                st.session_state.chart_animation_image_paths = get_images_from_chart_url(
+                    chart_url=chart_url,
+                    png_folder=st.session_state.chart_animation_images_folder,
+                    tab=tab,
+                    years=years,
+                    year_range_open=year_range_open,
+                    max_workers=None,
+                    max_num_years=st.session_state.chart_animation_max_num_years,
+                )
+                st.session_state.chart_animation_images_exist = len(st.session_state.chart_animation_image_paths) > 0  # type: ignore
 
-    # GIF settings.
-    output_type = st.radio("Output Type", ["GIF", "Video"])
-    st.session_state.chart_animation_gif_file = st.session_state.chart_animation_gif_file.with_suffix(
-        ".gif" if output_type == "GIF" else ".mp4"
-    )
-    remove_duplicates = st.toggle("Remove duplicate frames", value=True)
-    with st_horizontal():
-        repetitions_last_frame = st.number_input("Repetitions of Last Frame", value=0, step=1)
-        if output_type == "GIF":
-            loop_count = st.number_input("Number of Loops (0 = Infinite)", value=0, step=1)
-        duration = st.number_input("Duration (ms)", value=200, step=10)
-    duration_of = st.radio("Duration of", ["Each frame", "Entire animation"])
+            # Button to delete the folder.
+            if st.button(
+                "Delete images",
+                disabled=not st.session_state.chart_animation_images_exist,
+                help=f"Delete images in folder: {st.session_state.chart_animation_images_folder}.",
+            ):
+                for image in st.session_state.chart_animation_image_paths:  # type: ignore
+                    image.unlink()
+                # Update session state to reflect that images are deleted.
+                st.session_state.chart_animation_images_exist = False
+                st.toast("✅ Images deleted.")
 
     # GIF generation.
     if st.session_state.chart_animation_images_exist:
@@ -162,7 +178,7 @@ if st.session_state.chart_animation_show_image_settings:
                 duration_of_animation=duration_of == "Entire animation",
             )
             # GIF preview.
-            st.info('Animation preview. Right click and "Save Image As..." to download it.')
+            st_info('Animation preview. Right click and "Save Image As..." to download it.')
             st.image(str(st.session_state.chart_animation_gif_file), use_container_width=True)
         else:
             st.session_state.chart_animation_gif_file = create_mp4_from_images(
@@ -174,6 +190,6 @@ if st.session_state.chart_animation_show_image_settings:
                 duration_of_animation=duration_of == "Entire animation",
             )
             # Video preview
-            st.info('Animation preview. Right click and "Save video as..." to download it.')
+            st_info('Animation preview. Right click and "Save video as..." to download it.')
             with open(str(st.session_state.chart_animation_gif_file), "rb") as video_file:
                 st.video(video_file.read(), format="video/mp4", autoplay=True)
