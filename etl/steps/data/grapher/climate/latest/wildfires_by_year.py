@@ -49,7 +49,11 @@ def run(dest_dir: str) -> None:
     )
     for col in ["area_ha", "events", "pm2_5", "co2", "share_area_ha"]:
         tb_cumulative = tb_cumulative.rename(columns={col: col + "_cumulative"})
+
     tb = pr.merge(tb_annual_sum, tb_cumulative, on=["year", "country"])
+    # Area per wildfire
+    tb["area_ha_per_wildfire"] = tb["area_ha"] / tb["events"]
+
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     # Save outputs.

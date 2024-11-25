@@ -87,8 +87,6 @@ def run(dest_dir: str) -> None:
     tb["share_area_ha"] = (tb["area_ha"] / tb["total_area_ha"]) * 100
     tb["share_area_ha_cumulative"] = (tb["area_ha_cumulative"] / tb["total_area_ha"]) * 100
 
-    # Area per wildfire
-    tb["area_ha_per_wildfire"] = tb["area_ha"] / tb["events"]
     tb["co2_ha_per_area"] = tb["CO2"] / tb["area_ha"]
     tb["pm2_5_ha_per_area"] = tb["PM2.5"] / tb["area_ha"]
 
