@@ -131,6 +131,8 @@ wizard = [
     # Starting from PyTorch 2.3.0, the minimum requirement for macOS is macOS 11.0+ ARM64. Some poor people on the team still use it. Jeez...
     "torch<2.3.0",
     "sentence-transformers>=2.2.2",
+    "moviepy>=2.1.1",
+    "imageio[ffmpeg]>=2.31.0",
 ]
 
 [project.scripts]

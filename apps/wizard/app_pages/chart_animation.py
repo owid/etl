@@ -5,6 +5,7 @@ from apps.chart_animation.cli import (
     DOWNLOADS_DIR,
     MAX_NUM_YEARS,
     create_gif_from_images,
+    create_mp4_from_images,
     get_chart_slug,
     get_images_from_chart_url,
     get_years_in_chart,
@@ -137,30 +138,42 @@ if st.session_state.chart_animation_show_image_settings:
 
     # GIF settings.
     output_type = st.radio("Output Type", ["GIF", "Video"])
-    if output_type == "Video":
-        st.error("Video output is not yet supported. Please select GIF.")
     st.session_state.chart_animation_gif_file = st.session_state.chart_animation_gif_file.with_suffix(
         ".gif" if output_type == "GIF" else ".mp4"
     )
     remove_duplicates = st.toggle("Remove duplicate frames", value=True)
     with st_horizontal():
         repetitions_last_frame = st.number_input("Repetitions of Last Frame", value=0, step=1)
-        loop_count = st.number_input("Number of Loops (0 = Infinite)", value=0, step=1)
+        if output_type == "GIF":
+            loop_count = st.number_input("Number of Loops (0 = Infinite)", value=0, step=1)
         duration = st.number_input("Duration (ms)", value=200, step=10)
     duration_of = st.radio("Duration of", ["Each frame", "Entire animation"])
 
     # GIF generation.
     if st.session_state.chart_animation_images_exist:
-        st.session_state.chart_animation_gif_file = create_gif_from_images(
-            image_paths=st.session_state.chart_animation_image_paths,
-            output_gif=st.session_state.chart_animation_gif_file,
-            duration=duration,
-            loops=loop_count,
-            remove_duplicate_frames=remove_duplicates,
-            repetitions_last_frame=repetitions_last_frame,
-            duration_of_full_gif=duration_of == "Entire animation",
-        )
-
-        # GIF preview.
-        st.info('Animation preview. Right click and "Save Image As..." to download it.')
-        st.image(str(st.session_state.chart_animation_gif_file), use_container_width=True)
+        if output_type == "GIF":
+            st.session_state.chart_animation_gif_file = create_gif_from_images(
+                image_paths=st.session_state.chart_animation_image_paths,
+                output_file=st.session_state.chart_animation_gif_file,
+                duration=duration,
+                loops=loop_count,  # type: ignore
+                remove_duplicate_frames=remove_duplicates,
+                repetitions_last_frame=repetitions_last_frame,
+                duration_of_animation=duration_of == "Entire animation",
+            )
+            # GIF preview.
+            st.info('Animation preview. Right click and "Save Image As..." to download it.')
+            st.image(str(st.session_state.chart_animation_gif_file), use_container_width=True)
+        else:
+            st.session_state.chart_animation_gif_file = create_mp4_from_images(
+                image_paths=st.session_state.chart_animation_image_paths,
+                output_file=st.session_state.chart_animation_gif_file,
+                duration=duration,
+                remove_duplicate_frames=remove_duplicates,
+                repetitions_last_frame=repetitions_last_frame,
+                duration_of_animation=duration_of == "Entire animation",
+            )
+            # Video preview
+            st.info('Animation preview. Right click and "Save video as..." to download it.')
+            with open(str(st.session_state.chart_animation_gif_file), "rb") as video_file:
+                st.video(video_file.read(), format="video/mp4", autoplay=True)

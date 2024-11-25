@@ -1,4 +1,4 @@
-"""Create a GIF for a given chart URL.
+"""Create a GIF or video for a given chart URL.
 
 """
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import click
 import requests
+from moviepy import ImageSequenceClip
 from PIL import Image
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
@@ -201,12 +202,12 @@ def get_images_from_chart_url(
 
 def create_gif_from_images(
     image_paths,
-    output_gif,
+    output_file,
     duration=200,
     loops=0,
     remove_duplicate_frames=True,
     repetitions_last_frame=0,
-    duration_of_full_gif=False,
+    duration_of_animation=False,
 ):
     images = [Image.open(img) for img in sorted(image_paths)]
     if remove_duplicate_frames:
@@ -217,34 +218,74 @@ def create_gif_from_images(
     # Optionally repeat the last frame.
     images = images + [images[-1]] * repetitions_last_frame
 
-    if duration_of_full_gif:
+    if duration_of_animation:
         duration = duration // len(images)
 
     # There seems to be a PIL bug when specifying loops.
     if loops == 1:
         # Repeat loop only once.
-        images[0].save(output_gif, save_all=True, append_images=images[1:], optimize=True, duration=duration)
+        images[0].save(output_file, save_all=True, append_images=images[1:], optimize=True, duration=duration)
     elif loops == 0:
         # Infinite loop.
         images[0].save(
-            output_gif, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops
+            output_file, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops
         )
     else:
         # Repeat loop a fixed number of times.
         images[0].save(
-            output_gif, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops - 1
+            output_file, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops - 1
         )
-    log.info(f"GIF successfully created at {output_gif}")
-    return output_gif
+    log.info(f"GIF successfully created at {output_file}")
+    return output_file
 
 
-@click.command(name="chart_to_gif", cls=RichCommand, help=__doc__)
+def create_mp4_from_images(
+    image_paths,
+    output_file,
+    duration,
+    remove_duplicate_frames=True,
+    repetitions_last_frame=0,
+    duration_of_animation=False,
+):
+    # Load images.
+    images = [str(img) for img in sorted(image_paths)]
+
+    if remove_duplicate_frames:
+        # TODO: Fix this, currently it compares paths, not images.
+        # Remove duplicate frames.
+        images = [images[i] for i in range(len(images)) if i == 0 or images[i] != images[i - 1]]
+
+    # Optionally repeat the last frame.
+    images += [images[-1]] * repetitions_last_frame
+
+    if duration_of_animation:
+        duration = duration / len(images)
+
+    # Calculate frame rate from duration per frame.
+    frame_rate = 1 / (duration / 1000)
+
+    # Create video clip.
+    clip = ImageSequenceClip(images, fps=frame_rate)
+
+    # Write video to file.
+    clip.write_videofile(output_file, codec="libx264", fps=frame_rate, preset="slow", audio=False)
+
+    return output_file
+
+
+@click.command(name="chart_animation", cls=RichCommand, help=__doc__)
 @click.argument("chart_url", type=str)
 @click.option(
-    "--output-gif",
+    "--output-file",
     type=str,
     default=None,
-    help="Output GIF file path. If None, uses Downloads folder.",
+    help=f"Output file path. If None, creates a file in {DOWNLOADS_DIR}.",
+)
+@click.option(
+    "--output-format",
+    type=click.Choice(["gif", "mp4"]),
+    default="gif",
+    help="Output format (either gif or mp4).",
 )
 @click.option(
     "--tab",
@@ -300,9 +341,9 @@ def create_gif_from_images(
     help="Maximum number of years to download. If the number of years in the chart exceeds this value, the script will stop.",
 )
 @click.option(
-    "--duration-of-full-gif/--duration-of-each-frame",
+    "--duration-of-animation/--duration-of-frame",
     default=False,
-    help="Whether the duration is for each frame or the entire GIF.",
+    help="Whether the duration is for each frame or the entire animation.",
     is_flag=True,
 )
 @click.option(
@@ -312,7 +353,8 @@ def create_gif_from_images(
 )
 def cli(
     chart_url,
-    output_gif,
+    output_format,
+    output_file,
     tab,
     years,
     year_range_open,
@@ -322,7 +364,7 @@ def cli(
     max_workers,
     png_folder,
     max_num_years,
-    duration_of_full_gif,
+    duration_of_animation,
     remove_duplicate_frames,
 ):
     # Given a chart URL, create a GIF with the chart data.
@@ -343,8 +385,8 @@ def cli(
         Path(png_folder).mkdir(parents=True, exist_ok=True)
 
     # Define output file for the GIF.
-    if output_gif is None:
-        output_gif = DOWNLOADS_DIR / f"{slug}.gif"
+    if output_file is None:
+        output_file = DOWNLOADS_DIR / f"{slug}.{output_format}"
 
     # Get images from chart URL.
     image_paths = get_images_from_chart_url(
@@ -357,20 +399,30 @@ def cli(
         max_num_years=max_num_years,
     )
 
-    # Create GIF from images.
     if image_paths:
-        log.info("Creating GIF...")
-        return create_gif_from_images(
-            image_paths=image_paths,
-            output_gif=output_gif,
-            duration=duration,
-            loops=loops,
-            remove_duplicate_frames=remove_duplicate_frames,
-            repetitions_last_frame=repetitions_last_frame,
-            duration_of_full_gif=duration_of_full_gif,
-        )
+        if output_format == "mp4":
+            log.info("Creating GIF...")
+            return create_mp4_from_images(
+                image_paths=image_paths,
+                output_file=output_file,
+                duration=duration,
+                remove_duplicate_frames=remove_duplicate_frames,
+                repetitions_last_frame=repetitions_last_frame,
+                duration_of_animation=duration_of_animation,
+            )
+        else:
+            log.info("Creating video...")
+            return create_gif_from_images(
+                image_paths=image_paths,
+                output_file=output_file,
+                duration=duration,
+                loops=loops,
+                remove_duplicate_frames=remove_duplicate_frames,
+                repetitions_last_frame=repetitions_last_frame,
+                duration_of_animation=duration_of_animation,
+            )
     else:
-        log.error("Could not create GIF because there are no images downloaded.")
+        log.error("Could not create animation because there are no images downloaded.")
         return None
 
 
