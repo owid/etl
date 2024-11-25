@@ -29,6 +29,12 @@ definitions:
       <%- else %>
       << title >> - Birth order: << birth_order >>
       <%- endif %>
+    title_age: |-
+      <% if birth_order == 'total' %>
+      << title >> - Mother age: << age >> - Birth order: Total
+      <%- else %>
+      << title >> - Mother age: << age >> - Birth order: << birth_order >>
+      <%- endif %>
   common:
     presentation:
       topic_tags:
@@ -312,3 +318,31 @@ tables:
         description_key:
           - Measures the likelihood that a woman with a given number of children will go on to have another child.
           - It is useful for understanding family-building dynamics and changes in reproductive behavior over time.
+
+  period_ages:
+    variables:
+      asfr:
+        title: |-
+          <% set title = "Period fertility rates" %>
+          {definitions.others.title_age}
+        description_short: |-
+          Age-specific fertility rates for each calendar year, measured in completed years of age.
+        unit: "births per woman"
+        description_key:
+          - Represents fertility rates for each age group in a specific year.
+          - Useful for detailed analysis of fertility patterns by both age and year.
+          - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
+
+  cohort_ages:
+    variables:
+      asfr:
+        title: |-
+          <% set title = "Cohort fertility rates" %>
+          {definitions.others.title_age}
+        unit: "births per woman"
+        description_short: |-
+          Age-specific fertility rates for women in a specific birth cohort, measured by their age in completed years.
+        description_key:
+          - Represents fertility rates for a specific cohort as they age.
+          - Useful for understanding how fertility behavior changes across different cohorts over time.
+          - Presented in the form of horizontal parallelograms, allowing for the tracking of cohort-specific fertility patterns.
