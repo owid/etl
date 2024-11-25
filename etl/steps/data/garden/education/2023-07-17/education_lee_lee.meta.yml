@@ -195,3 +195,30 @@ tables:
         processing_level: minor
         display:
           numDecimalPlaces: 1
+
+      mf_secondary_enrollment_rates:
+        title: Historical net enrollment rate, secondary education, both sexes
+        unit: '%'
+        short_unit: '%'
+        description_key:
+          - Net enrollment rate for secondary school is calculated by dividing the number of students of official school age enrolled in secondary education by the population of the age group which officially corresponds to secondary education, and multiplying by 100.
+        display:
+          numDecimalPlaces: 1
+
+      f_secondary_enrollment_rates:
+        title: Historical net enrollment rate, secondary education, females
+        unit: '%'
+        short_unit: '%'
+        description_key:
+          - Net enrollment rate for secondary school is calculated by dividing the number of students of official school age enrolled in secondary education by the population of the age group which officially corresponds to secondary education, and multiplying by 100.
+        display:
+          numDecimalPlaces: 1
+
+      m_secondary_enrollment_rates:
+        title: Historical net enrollment rate, secondary education, males
+        unit: '%'
+        short_unit: '%'
+        description_key:
+          - Net enrollment rate for secondary school is calculated by dividing the number of students of official school age enrolled in secondary education by the population of the age group which officially corresponds to secondary education, and multiplying by 100.
+        display:
+          numDecimalPlaces: 1

@@ -151,6 +151,9 @@ def run(dest_dir: str) -> None:
         "mf_adults__25_64_years__percentage_of_tertiary_education",
         "mf_youth_and_adults__15_64_years__average_years_of_education",
         "f_youth_and_adults__15_64_years__average_years_of_education",
+        "mf_secondary_enrollment_rates",
+        "f_secondary_enrollment_rates",
+        "m_secondary_enrollment_rates",
     ]
     tb_merged_wb = tb_merged_wb[columns_to_use]
 
