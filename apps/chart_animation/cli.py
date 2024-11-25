@@ -18,6 +18,9 @@ log = get_logger()
 # Define default downloads folder (to use if either output_gif is None or png_folder is None).
 DOWNLOADS_DIR = Path.home() / ".chart_animation"
 
+# Default maximum number of years to fetch images for.
+MAX_NUM_YEARS = 100
+
 
 def get_chart_metadata(chart_url):
     # Given a chart URL, get the chart metadata.
@@ -141,7 +144,7 @@ def get_images_from_chart_url(
     years=None,
     year_range_open=True,
     max_workers=None,
-    max_num_years=100,
+    max_num_years=MAX_NUM_YEARS,
 ):
     # Given a chart URL, download the PNGs into a folder. If they already exists, skip them.
 
@@ -293,7 +296,7 @@ def create_gif_from_images(
 @click.option(
     "--max-num-years",
     type=int,
-    default=100,
+    default=MAX_NUM_YEARS,
     help="Maximum number of years to download. If the number of years in the chart exceeds this value, the script will stop.",
 )
 @click.option(

@@ -3,6 +3,7 @@ from structlog import get_logger
 
 from apps.chart_animation.cli import (
     DOWNLOADS_DIR,
+    MAX_NUM_YEARS,
     create_gif_from_images,
     get_chart_slug,
     get_images_from_chart_url,
@@ -37,6 +38,7 @@ st.session_state.chart_animation_show_image_settings = st.session_state.get(
 )
 # NOTE: The range of years will be loaded automatically from the chart's metadata. We just define this range here to avoid typing issues.
 st.session_state.chart_animation_years = st.session_state.get("chart_animation_years", range(2000, 2022))
+st.session_state.chart_animation_max_num_years = MAX_NUM_YEARS
 
 # Step 1: Input chart URL and get years.
 chart_url = st.text_input(
@@ -81,6 +83,7 @@ if st.session_state.chart_animation_show_image_settings:
         max_value=max(st.session_state.chart_animation_years),
         value=(min(st.session_state.chart_animation_years), max(st.session_state.chart_animation_years)),
     )
+    years = range(year_min, year_max + 1)
 
     # Tab and year range settings.
     tab = st.radio("Select tab", ["map", "chart"])
@@ -89,37 +92,47 @@ if st.session_state.chart_animation_show_image_settings:
         value=True,
         help="Only relevant for the chart view. If checked, the year range will be open. Uncheck if you want to generate a sequence of bar charts.",
     )
+    st.session_state.chart_animation_max_num_years = st.number_input(
+        "Maximum number of years",
+        value=MAX_NUM_YEARS,
+        help="Maximum number of years to generate images for (to avoid too many API call).",
+    )
 
-    # Button to delete the folder.
-    if st.button(
-        "Delete images",
-        disabled=not st.session_state.chart_animation_images_exist,
-        help=f"Delete images in folder: {st.session_state.chart_animation_images_folder}.",
-    ):
-        for image in st.session_state.chart_animation_image_paths:
-            image.unlink()
-        # Update session state to reflect that images are deleted.
-        st.session_state.chart_animation_images_exist = False
-        st.info("Images deleted.")
-
-    # Button to generate images.
-    if st.button(
-        "Get images",
-        help=f'Get images for selected years. Years for which there is already a file in {st.session_state.chart_animation_images_folder} will be skipped.\nEither delete them all (using "Delete images") or continue to get images for remaining years (if any is missing).',
-    ):
-        years = range(year_min, year_max + 1)
-        st.session_state.chart_animation_image_paths = get_images_from_chart_url(
-            chart_url=chart_url,
-            png_folder=st.session_state.chart_animation_images_folder,
-            tab=tab,
-            years=years,
-            year_range_open=year_range_open,
-            max_workers=None,
-            max_num_years=100,
+    if len(years) > st.session_state.chart_animation_max_num_years:
+        st.error(
+            f"Number of years in the chart ({len(years)}) is higher than the maximum number of years ({st.session_state.chart_animation_max_num_years})."
         )
-        st.session_state.chart_animation_images_exist = len(st.session_state.chart_animation_image_paths) > 0  # type: ignore
+        st.stop()
 
-    col1, col2 = st.columns([1, 1])
+    with st_horizontal():
+        # Button to generate images.
+        if st.button(
+            "Get images",
+            help=f'Get images for selected years. Years for which there is already a file in {st.session_state.chart_animation_images_folder} will be skipped.\nEither delete them all (using "Delete images") or continue to get images for remaining years (if any is missing).',
+            type="primary",
+        ):
+            st.session_state.chart_animation_image_paths = get_images_from_chart_url(
+                chart_url=chart_url,
+                png_folder=st.session_state.chart_animation_images_folder,
+                tab=tab,
+                years=years,
+                year_range_open=year_range_open,
+                max_workers=None,
+                max_num_years=st.session_state.chart_animation_max_num_years,
+            )
+            st.session_state.chart_animation_images_exist = len(st.session_state.chart_animation_image_paths) > 0  # type: ignore
+
+        # Button to delete the folder.
+        if st.button(
+            "Delete images",
+            disabled=not st.session_state.chart_animation_images_exist,
+            help=f"Delete images in folder: {st.session_state.chart_animation_images_folder}.",
+        ):
+            for image in st.session_state.chart_animation_image_paths:  # type: ignore
+                image.unlink()
+            # Update session state to reflect that images are deleted.
+            st.session_state.chart_animation_images_exist = False
+            st.info("Images deleted.")
 
     # GIF settings.
     output_type = st.radio("Output Type", ["GIF", "Video"])
