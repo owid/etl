@@ -128,6 +128,10 @@ def run(dest_dir: str) -> None:
         / tb_merged_wb["m_tertiary_enrollment_rates_combined_wb"]
     )
 
+    # Only keep the historical data for secondary enrollment rates before the UNESCO ones starts
+    for col in ["mf_secondary_enrollment_rates", "f_secondary_enrollment_rates", "m_secondary_enrollment_rates"]:
+        tb_merged_wb[col] = tb_merged_wb.loc[tb_merged_wb["year"] < 1998, col]
+
     # Set metadata and format the dataframe for saving.
     tb_merged_wb.metadata.short_name = paths.short_name
     tb_merged_wb = tb_merged_wb.underscore().set_index(["country", "year"], verify_integrity=True)
