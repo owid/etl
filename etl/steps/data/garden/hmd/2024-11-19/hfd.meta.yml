@@ -30,10 +30,11 @@ definitions:
       << title >> - Birth order: << birth_order >>
       <%- endif %>
     title_age: |-
+      <% set age_str = '≤12' if age == '12-' else age %>
       <% if birth_order == 'total' %>
-      << title >> - Mother age: << age >> - Birth order: Total
+      << title >> - Mother age: << age_str >> - All births
       <%- else %>
-      << title >> - Mother age: << age >> - Birth order: << birth_order >>
+      << title >> - Mother age: << age_str >> - Birth order: << birth_order >>
       <%- endif %>
   common:
     presentation:
@@ -321,7 +322,7 @@ tables:
 
   period_ages:
     variables:
-      asfr:
+      asfr_period:
         title: |-
           <% set title = "Period fertility rates" %>
           {definitions.others.title_age}
@@ -335,7 +336,7 @@ tables:
 
   cohort_ages:
     variables:
-      asfr:
+      asfr_cohort:
         title: |-
           <% set title = "Cohort fertility rates" %>
           {definitions.others.title_age}
