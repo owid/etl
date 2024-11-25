@@ -24,11 +24,14 @@ def run(dest_dir: str) -> None:
 
     for ind in indicators:
         # Find the last observation year by country
-        last_obs = tb.loc[tb[ind + "_observation"].notnull()].groupby("country")["year"].max()
+        last_obs = tb.loc[tb[f"{ind}_observation"].notnull()].groupby("country")["year"].max()
+
         # Assign that to last_obs column
         tb["last_obs"] = tb["country"].map(last_obs)
+
         # Where the year is the last_obs year, assign the value of the last observation
-        tb.loc[tb["year"] == tb["last_obs"], ind + "_forecast"] = tb[ind + "_observation"]
+        tb.loc[tb["year"] == tb["last_obs"], f"{ind}_forecast"] = tb[f"{ind}_observation"]
+
         # Drop last_obs
         tb = tb.drop(columns="last_obs")
 
