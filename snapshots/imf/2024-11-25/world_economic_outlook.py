@@ -1,4 +1,16 @@
-"""Script to create a snapshot of dataset."""
+"""
+Script to create a snapshot of dataset.
+
+The IMF doesn't allow automatic download of the dataset, so we need to manually download the dataset from the IMF website.
+    1. Visit https://www.imf.org/en/Publications/SPROLLS/world-economic-outlook-databases
+    2. Select the latest version of the data.
+    3. Select "Entire dataset"
+    4. Select "By Countries" to download the file.
+    5. Save the file to this folder.
+    6. Run this command on the terminal:
+        python snapshots/imf/{version}/world_economic_outlook.py --path-to-file <path-to-file>
+    7. Delete the file from the folder.
+"""
 
 from pathlib import Path
 
