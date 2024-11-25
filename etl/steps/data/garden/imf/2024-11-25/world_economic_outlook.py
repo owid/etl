@@ -15,23 +15,23 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("world_economic_outlook")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["world_economic_outlook"].reset_index()
+    tb = ds_meadow.read("world_economic_outlook")
 
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
+    )
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir,
-        tables=[tb],
-        check_variables_metadata=True,
-        default_metadata=ds_meadow.metadata,
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
