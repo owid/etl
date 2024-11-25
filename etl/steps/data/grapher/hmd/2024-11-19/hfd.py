@@ -16,7 +16,17 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tables = [
         ds_garden.read("period", reset_index=False),
-        ds_garden.read("cohort", reset_index=False).rename_index_names({"cohort": "year"}),
+        ds_garden.read("cohort", reset_index=False).rename_index_names(
+            {
+                "cohort": "year",
+            }
+        ),
+        ds_garden.read("period_ages", reset_index=False),
+        ds_garden.read("cohort_ages", reset_index=False).rename_index_names(
+            {
+                "cohort": "year",
+            }
+        ),
     ]
     #
     # Process data.
