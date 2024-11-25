@@ -870,16 +870,6 @@ steps:
   data://grapher/migration/2024-11-18/migration_between_regions:
     - data://garden/migration/2024-11-18/migration_between_regions
 
-  # International Monetary Fund, World Economic Outlook
-  data://meadow/imf/2024-11-25/world_economic_outlook:
-    - snapshot://imf/2024-11-25/world_economic_outlook.xls
-
-  data://garden/imf/2024-11-25/world_economic_outlook:
-    - data://meadow/imf/2024-11-25/world_economic_outlook
-
-  data://grapher/imf/2024-11-25/world_economic_outlook:
-    - data://garden/imf/2024-11-25/world_economic_outlook
-
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
