@@ -503,6 +503,11 @@ def run(dest_dir: str) -> None:
         short_name="period_ages",
         fcn=keep_relevant_ages,
     )
+    tb_period_ages = tb_period_ages.rename(
+        columns={
+            "asfr": "asfr_period",
+        }
+    )
 
     # 4/ Cohort tables (by age)
     cols_index = ["country", "cohort", "age"]
@@ -524,6 +529,11 @@ def run(dest_dir: str) -> None:
         cols_index_out=cols_index + [col_bo],
         short_name="cohort_ages",
         fcn=keep_relevant_ages,
+    )
+    tb_cohort_ages = tb_cohort_ages.rename(
+        columns={
+            "asfr": "asfr_cohort",
+        }
     )
 
     #
