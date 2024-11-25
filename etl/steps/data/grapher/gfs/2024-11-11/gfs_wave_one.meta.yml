@@ -15,6 +15,20 @@ definitions:
   survey_text:
     exercise: The full text of the question was 'On how many days did you exercise or engage in vigorous physical activities for 30 minutes or more in the past week?'
     no_answer: "No answer can mean one of three things: the respondend saw and skipped the question, the respondend refused to answer or the respondend answered with 'I don't know'."
+    happiness: "The full text of the question was: 'In general, how happy or unhappy do you usually feel? Please use a 0 to 10 scale where 10 means 'extremely happy' and 0 means 'extremely unhappy.''"
+    life_sat: "The full text of the question was: 'Overall, how satisfied are you with life as a whole these days? Please use a 0 to 10 scale where 10 means 'completely satisfied with your life' and 0 means 'not at all satisfied with your life.''"
+    content: "The full text of the question was: 'I am content with my friendships and relationships. How much do you agree with this statement, where 0 means 'strongly disagree' and 10 means 'strongly agree'?'"
+    freedom: "The full text of the question was: 'I have the freedom in my life to pursue the things that are most important to me. How much do you agree with this statement, where 0 means 'strongly disagree' and 10 means 'strongly agree'?'"
+    expenses: "The full text of the question was: 'How often do you worry about being able to meet normal monthly living expenses? Please use a 0 to 10 scale where 10 means 'do not ever worry' and 0 means 'worry all of the time'."
+    hope: "The full text of the question was 'How much do you agree with the statement: 'Despite challenges, I always remain hopeful about the future.' Please use a 0 to 10 scale where 0 means 'strongly disagree' and 10 means 'strongly agree'."
+    lonely: "The full text of the question was 'How often do you feel lonely? Please use a 0 to 10 scale where 10 means 'never' and 0 means 'always'."
+    physical_health: "The full text of the question was 'How would you rate your physical health? Please use a 0 to 10 scale where 10 means 'excellent physical health' and 0 means 'poor physical health'."
+    mental_health: "The full text of the question was 'How would you rate your mental health? Please use a 0 to 10 scale where 10 means 'excellent mental health' and 0 means 'poor mental health'."
+    wb_today: "The full text of the question was 'Please imagine a ladder with steps numbered from zero at the bottom to ten at the top. Suppose we say that the top of the ladder at 10 represents the best possible life for you, and the bottom of the ladder at 0 represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+    wb_fiveyrs: "The full text of the question was 'Please imagine a ladder with steps numbered from zero at the bottom to ten at the top. Suppose we say that the top of the ladder at 10 represents the best possible life for you, and the bottom of the ladder at 0 represents the worst possible life for you. Just your best, on which step of the ladder do you think you will stand in the future, say about five years from now?'"
+    worry: "The full text of the question was 'How often do you worry about safety, food, or housing? Please use a 0 to 10 scale where 10 means you 'do not ever worry' and 0 means you 'worry all of the time.'"
+
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -76,6 +90,83 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Share of people who did not answer the question 'In general, how happy or unhappy do you usually feel?'"
+      happy_ans_0_share:
+        title: Happiness - Share of people who answer 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 0 when asked 'On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?'"
+        description_key:
+          - "{definitions.survey_text.happiness}"
+      happy_ans_1_share:
+        title: Happiness - Share of people who answer 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 1 when asked 'On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?'"
+        description_key:
+          - "{definitions.survey_text.happiness}"
+      happy_ans_2_share:
+        title: Happiness - Share of people who answer 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 2 when asked 'On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?'"
+        description_key:
+          - "{definitions.survey_text.happiness}"
+      happy_ans_3_share:
+        title: Happiness - Share of people who answer 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 3 when asked 'On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?'"
+        description_key:
+          - "{definitions.survey_text.happiness}"
+      happy_ans_4_share:
+        title: Happiness - Share of people who answer 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 4 when asked 'On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?'"
+        description_key:
+          - "{definitions.survey_text.happiness}"
+      happy_ans_5_share:
+        title: Happiness - Share of people who answer 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 5 when asked 'On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?'"
+        description_key:
+          - "{definitions.survey_text.happiness}"
+      happy_ans_6_share:
+        title: Happiness - Share of people who answer 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 6 when asked 'On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?'"
+        description_key:
+          - "{definitions.survey_text.happiness}"
+      happy_ans_7_share:
+        title: Happiness - Share of people who answer 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 7 when asked 'On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?'"
+        description_key:
+          - "{definitions.survey_text.happiness}"
+      happy_ans_8_share:
+        title: Happiness - Share of people who answer 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 8 when asked 'On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?'"
+        description_key:
+          - "{definitions.survey_text.happiness}"
+      happy_ans_9_share:
+        title: Happiness - Share of people who answer 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 9 when asked 'On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?'"
+        description_key:
+          - "{definitions.survey_text.happiness}"
+      happy_ans_10_share:
+        title: Happiness - Share of people who answer 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 10 when asked 'On a scale from 0 to 10, where 0 means extremely unhappy and 10 means extremely happy, how happy do you usually feel?'"
+        description_key:
+          - "{definitions.survey_text.happiness}"
       life_sat_mean:
         title: Self-reported life satisfaction
         unit: ""
@@ -88,6 +179,83 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: "Share of people who did not answer the question 'Overall, how satisfied are you with your life as a whole these days?'"
+      life_sat_ans_0_share:
+        title: Life satisfaction - Share of people who answer 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 0 when asked 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
+        description_key:
+          - "{definitions.survey_text.life_sat}"
+      life_sat_ans_1_share:
+        title: Life satisfaction - Share of people who answer 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 1 when asked 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
+        description_key:
+          - "{definitions.survey_text.life_sat}"
+      life_sat_ans_2_share:
+        title: Life satisfaction - Share of people who answer 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 2 when asked 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
+        description_key:
+          - "{definitions.survey_text.life_sat}"
+      life_sat_ans_3_share:
+        title: Life satisfaction - Share of people who answer 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 3 when asked 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
+        description_key:
+          - "{definitions.survey_text.life_sat}"
+      life_sat_ans_4_share:
+        title: Life satisfaction - Share of people who answer 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 4 when asked 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
+        description_key:
+          - "{definitions.survey_text.life_sat}"
+      life_sat_ans_5_share:
+        title: Life satisfaction - Share of people who answer 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 5 when asked 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
+        description_key:
+          - "{definitions.survey_text.life_sat}"
+      life_sat_ans_6_share:
+        title: Life satisfaction - Share of people who answer 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 6 when asked 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
+        description_key:
+          - "{definitions.survey_text.life_sat}"
+      life_sat_ans_7_share:
+        title: Life satisfaction - Share of people who answer 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 7 when asked 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
+        description_key:
+          - "{definitions.survey_text.life_sat}"
+      life_sat_ans_8_share:
+        title: Life satisfaction - Share of people who answer 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 8 when asked 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
+        description_key:
+          - "{definitions.survey_text.life_sat}"
+      life_sat_ans_9_share:
+        title: Life satisfaction - Share of people who answer 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 9 when asked 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
+        description_key:
+          - "{definitions.survey_text.life_sat}"
+      life_sat_ans_10_share:
+        title: Life satisfaction - Share of people who answer 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answer 10 when asked 'Overall, how satisfied are you with your life as a whole these days?', with 0 being 'not at all satisfied' and 10 being 'completely satisfied'."
+        description_key:
+          - "{definitions.survey_text.life_sat}"
       close_to_no_share:
         title: Share of people who feel close to no one
         unit: "%"
@@ -132,6 +300,83 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: "Share of people who did not answer the question 'I am content with my friendships and relationships.'"
+      content_ans_0_share:
+        title: Content with relationships - Share of people who answered 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 0 when asked to rate how much they agree with the statement 'I am content with my friendships and relationships.'"
+        description_key:
+          - "{definitions.survey_text.content}"
+      content_ans_1_share:
+        title: Content with relationships - Share of people who answered 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 1 when asked to rate how much they agree with the statement 'I am content with my friendships and relationships.'"
+        description_key:
+          - "{definitions.survey_text.content}"
+      content_ans_2_share:
+        title: Content with relationships - Share of people who answered 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 2 when asked to rate how much they agree with the statement 'I am content with my friendships and relationships.'"
+        description_key:
+          - "{definitions.survey_text.content}"
+      content_ans_3_share:
+        title: Content with relationships - Share of people who answered 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 3 when asked to rate how much they agree with the statement 'I am content with my friendships and relationships.'"
+        description_key:
+          - "{definitions.survey_text.content}"
+      content_ans_4_share:
+        title: Content with relationships - Share of people who answered 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 4 when asked to rate how much they agree with the statement 'I am content with my friendships and relationships.'"
+        description_key:
+          - "{definitions.survey_text.content}"
+      content_ans_5_share:
+        title: Content with relationships - Share of people who answered 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 5 when asked to rate how much they agree with the statement 'I am content with my friendships and relationships.'"
+        description_key:
+          - "{definitions.survey_text.content}"
+      content_ans_6_share:
+        title: Content with relationships - Share of people who answered 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 6 when asked to rate how much they agree with the statement 'I am content with my friendships and relationships.'"
+        description_key:
+          - "{definitions.survey_text.content}"
+      content_ans_7_share:
+        title: Content with relationships - Share of people who answered 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 7 when asked to rate how much they agree with the statement 'I am content with my friendships and relationships.'"
+        description_key:
+          - "{definitions.survey_text.content}"
+      content_ans_8_share:
+        title: Content with relationships - Share of people who answered 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 8 when asked to rate how much they agree with the statement 'I am content with my friendships and relationships.'"
+        description_key:
+          - "{definitions.survey_text.content}"
+      content_ans_9_share:
+        title: Content with relationships - Share of people who answered 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 9 when asked to rate how much they agree with the statement 'I am content with my friendships and relationships.'"
+        description_key:
+          - "{definitions.survey_text.content}"
+      content_ans_10_share:
+        title: Content with relationships - Share of people who answered 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 10 when asked to rate how much they agree with the statement 'I am content with my friendships and relationships.'"
+        description_key:
+          - "{definitions.survey_text.content}"
       days_exercise_mean:
         title: Average days of exercise per week
         unit: ""
@@ -309,6 +554,83 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: "Share of people who did not answer the question 'How often do you worry about being able to meet normal monthly living expenses?'"
+      expenses_ans_0_share:
+        title: Worry about living expenses - Share of people who answered 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 0 when asked 'How often do you worry about being able to meet normal monthly living expenses?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.expenses}"
+      expenses_ans_1_share:
+        title: Worry about living expenses - Share of people who answered 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 1 when asked 'How often do you worry about being able to meet normal monthly living expenses?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.expenses}"
+      expenses_ans_2_share:
+        title: Worry about living expenses - Share of people who answered 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 2 when asked 'How often do you worry about being able to meet normal monthly living expenses?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.expenses}"
+      expenses_ans_3_share:
+        title: Worry about living expenses - Share of people who answered 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 3 when asked 'How often do you worry about being able to meet normal monthly living expenses?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.expenses}"
+      expenses_ans_4_share:
+        title: Worry about living expenses - Share of people who answered 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 4 when asked 'How often do you worry about being able to meet normal monthly living expenses?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.expenses}"
+      expenses_ans_5_share:
+        title: Worry about living expenses - Share of people who answered 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 5 when asked 'How often do you worry about being able to meet normal monthly living expenses?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.expenses}"
+      expenses_ans_6_share:
+        title: Worry about living expenses - Share of people who answered 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 6 when asked 'How often do you worry about being able to meet normal monthly living expenses?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.expenses}"
+      expenses_ans_7_share:
+        title: Worry about living expenses - Share of people who answered 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 7 when asked 'How often do you worry about being able to meet normal monthly living expenses?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.expenses}"
+      expenses_ans_8_share:
+        title: Worry about living expenses - Share of people who answered 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 8 when asked 'How often do you worry about being able to meet normal monthly living expenses?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.expenses}"
+      expenses_ans_9_share:
+        title: Worry about living expenses - Share of people who answered 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 9 when asked 'How often do you worry about being able to meet normal monthly living expenses?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.expenses}"
+      expenses_ans_10_share:
+        title: Worry about living expenses - Share of people who answered 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 10 when asked 'How often do you worry about being able to meet normal monthly living expenses?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.expenses}"
       feel_anxious_mean:
         title: Self-reported anxiety
         unit: ""
@@ -353,6 +675,83 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: "Share of people who did not answer the question 'I have the freedom in my life to pursue the things that are most important to me.'"
+      freedom_ans_0_share:
+        title: Freedom to make life choices - Share of people who answered 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 0 when asked to rate how much they agree with the statement 'I have the freedom in my life to pursue the things that are most important to me.'"
+        description_key:
+          - "{definitions.survey_text.freedom}"
+      freedom_ans_1_share:
+        title: Freedom to make life choices - Share of people who answered 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 1 when asked to rate how much they agree with the statement 'I have the freedom in my life to pursue the things that are most important to me.'"
+        description_key:
+          - "{definitions.survey_text.freedom}"
+      freedom_ans_2_share:
+        title: Freedom to make life choices - Share of people who answered 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 2 when asked to rate how much they agree with the statement 'I have the freedom in my life to pursue the things that are most important to me.'"
+        description_key:
+          - "{definitions.survey_text.freedom}"
+      freedom_ans_3_share:
+        title: Freedom to make life choices - Share of people who answered 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 3 when asked to rate how much they agree with the statement 'I have the freedom in my life to pursue the things that are most important to me.'"
+        description_key:
+          - "{definitions.survey_text.freedom}"
+      freedom_ans_4_share:
+        title: Freedom to make life choices - Share of people who answered 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 4 when asked to rate how much they agree with the statement 'I have the freedom in my life to pursue the things that are most important to me.'"
+        description_key:
+          - "{definitions.survey_text.freedom}"
+      freedom_ans_5_share:
+        title: Freedom to make life choices - Share of people who answered 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 5 when asked to rate how much they agree with the statement 'I have the freedom in my life to pursue the things that are most important to me.'"
+        description_key:
+          - "{definitions.survey_text.freedom}"
+      freedom_ans_6_share:
+        title: Freedom to make life choices - Share of people who answered 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 6 when asked to rate how much they agree with the statement 'I have the freedom in my life to pursue the things that are most important to me.'"
+        description_key:
+          - "{definitions.survey_text.freedom}"
+      freedom_ans_7_share:
+        title: Freedom to make life choices - Share of people who answered 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 7 when asked to rate how much they agree with the statement 'I have the freedom in my life to pursue the things that are most important to me.'"
+        description_key:
+          - "{definitions.survey_text.freedom}"
+      freedom_ans_8_share:
+        title: Freedom to make life choices - Share of people who answered 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 8 when asked to rate how much they agree with the statement 'I have the freedom in my life to pursue the things that are most important to me.'"
+        description_key:
+          - "{definitions.survey_text.freedom}"
+      freedom_ans_9_share:
+        title: Freedom to make life choices - Share of people who answered 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 9 when asked to rate how much they agree with the statement 'I have the freedom in my life to pursue the things that are most important to me.'"
+        description_key:
+          - "{definitions.survey_text.freedom}"
+      freedom_ans_10_share:
+        title: Freedom to make life choices - Share of people who answered 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 10 when asked to rate how much they agree with the statement 'I have the freedom in my life to pursue the things that are most important to me.'"
+        description_key:
+          - "{definitions.survey_text.freedom}"
       hope_future_mean:
         title: Self-reported hopefulness
         unit: ""
@@ -365,6 +764,83 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: "Share of people who did not answer the question 'Despite challenges, I always remain hopeful about the future.'"
+      hope_future_ans_0_share:
+        title: Hopefulness - Share of people who answered 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 0 when asked to rate how much they agree with the statement 'Despite challenges, I always remain hopeful about the future.', where 0 is 'strongly disagree' and 10 is 'strongly agree'."
+        description_key:
+          - "{definitions.survey_text.hope}"
+      hope_future_ans_1_share:
+        title: Hopefulness - Share of people who answered 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 1 when asked to rate how much they agree with the statement 'Despite challenges, I always remain hopeful about the future.', where 0 is 'strongly disagree' and 10 is 'strongly agree'."
+        description_key:
+          - "{definitions.survey_text.hope}"
+      hope_future_ans_2_share:
+        title: Hopefulness - Share of people who answered 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 2 when asked to rate how much they agree with the statement 'Despite challenges, I always remain hopeful about the future.', where 0 is 'strongly disagree' and 10 is 'strongly agree'."
+        description_key:
+          - "{definitions.survey_text.hope}"
+      hope_future_ans_3_share:
+        title: Hopefulness - Share of people who answered 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 3 when asked to rate how much they agree with the statement 'Despite challenges, I always remain hopeful about the future.', where 0 is 'strongly disagree' and 10 is 'strongly agree'."
+        description_key:
+          - "{definitions.survey_text.hope}"
+      hope_future_ans_4_share:
+        title: Hopefulness - Share of people who answered 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 4 when asked to rate how much they agree with the statement 'Despite challenges, I always remain hopeful about the future.', where 0 is 'strongly disagree' and 10 is 'strongly agree'."
+        description_key:
+          - "{definitions.survey_text.hope}"
+      hope_future_ans_5_share:
+        title: Hopefulness - Share of people who answered 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 5 when asked to rate how much they agree with the statement 'Despite challenges, I always remain hopeful about the future.', where 0 is 'strongly disagree' and 10 is 'strongly agree'."
+        description_key:
+          - "{definitions.survey_text.hope}"
+      hope_future_ans_6_share:
+        title: Hopefulness - Share of people who answered 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 6 when asked to rate how much they agree with the statement 'Despite challenges, I always remain hopeful about the future.', where 0 is 'strongly disagree' and 10 is 'strongly agree'."
+        description_key:
+          - "{definitions.survey_text.hope}"
+      hope_future_ans_7_share:
+        title: Hopefulness - Share of people who answered 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 7 when asked to rate how much they agree with the statement 'Despite challenges, I always remain hopeful about the future.', where 0 is 'strongly disagree' and 10 is 'strongly agree'."
+        description_key:
+          - "{definitions.survey_text.hope}"
+      hope_future_ans_8_share:
+        title: Hopefulness - Share of people who answered 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 8 when asked to rate how much they agree with the statement 'Despite challenges, I always remain hopeful about the future.', where 0 is 'strongly disagree' and 10 is 'strongly agree'."
+        description_key:
+          - "{definitions.survey_text.hope}"
+      hope_future_ans_9_share:
+        title: Hopefulness - Share of people who answered 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 9 when asked to rate how much they agree with the statement 'Despite challenges, I always remain hopeful about the future.', where 0 is 'strongly disagree' and 10 is 'strongly agree'."
+        description_key:
+          - "{definitions.survey_text.hope}"
+      hope_future_ans_10_share:
+        title: Hopefulness - Share of people who answered 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 10 when asked to rate how much they agree with the statement 'Despite challenges, I always remain hopeful about the future.', where 0 is 'strongly disagree' and 10 is 'strongly agree'."
+        description_key:
+          - "{definitions.survey_text.hope}"
       mental_health_mean:
         title: Self-reported mental health
         unit: ""
@@ -375,6 +851,83 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Share of people who did not answer the question 'How would you rate your overall mental health?'"
+      mental_health_ans_0_share:
+        title: Mental health - Share of people who answered 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 0 when asked 'How would you rate your overall mental health?', where 0 is 'poor mental health' and 10 is 'excellent mental health'."
+        description_key:
+          - "{definitions.survey_text.mental_health}"
+      mental_health_ans_1_share:
+        title: Mental health - Share of people who answered 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 1 when asked 'How would you rate your overall mental health?', where 0 is 'poor mental health' and 10 is 'excellent mental health'."
+        description_key:
+          - "{definitions.survey_text.mental_health}"
+      mental_health_ans_2_share:
+        title: Mental health - Share of people who answered 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 2 when asked 'How would you rate your overall mental health?', where 0 is 'poor mental health' and 10 is 'excellent mental health'."
+        description_key:
+          - "{definitions.survey_text.mental_health}"
+      mental_health_ans_3_share:
+        title: Mental health - Share of people who answered 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 3 when asked 'How would you rate your overall mental health?', where 0 is 'poor mental health' and 10 is 'excellent mental health'."
+        description_key:
+          - "{definitions.survey_text.mental_health}"
+      mental_health_ans_4_share:
+        title: Mental health - Share of people who answered 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 4 when asked 'How would you rate your overall mental health?', where 0 is 'poor mental health' and 10 is 'excellent mental health'."
+        description_key:
+          - "{definitions.survey_text.mental_health}"
+      mental_health_ans_5_share:
+        title: Mental health - Share of people who answered 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 5 when asked 'How would you rate your overall mental health?', where 0 is 'poor mental health' and 10 is 'excellent mental health'."
+        description_key:
+          - "{definitions.survey_text.mental_health}"
+      mental_health_ans_6_share:
+        title: Mental health - Share of people who answered 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 6 when asked 'How would you rate your overall mental health?', where 0 is 'poor mental health' and 10 is 'excellent mental health'."
+        description_key:
+          - "{definitions.survey_text.mental_health}"
+      mental_health_ans_7_share:
+        title: Mental health - Share of people who answered 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 7 when asked 'How would you rate your overall mental health?', where 0 is 'poor mental health' and 10 is 'excellent mental health'."
+        description_key:
+          - "{definitions.survey_text.mental_health}"
+      mental_health_ans_8_share:
+        title: Mental health - Share of people who answered 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 8 when asked 'How would you rate your overall mental health?', where 0 is 'poor mental health' and 10 is 'excellent mental health'."
+        description_key:
+          - "{definitions.survey_text.mental_health}"
+      mental_health_ans_9_share:
+        title: Mental health - Share of people who answered 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 9 when asked 'How would you rate your overall mental health?', where 0 is 'poor mental health' and 10 is 'excellent mental health'."
+        description_key:
+          - "{definitions.survey_text.mental_health}"
+      mental_health_ans_10_share:
+        title: Mental health - Share of people who answered 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 10 when asked 'How would you rate your overall mental health?', where 0 is 'poor mental health' and 10 is 'excellent mental health'."
+        description_key:
+          - "{definitions.survey_text.mental_health}"
       lonely_mean:
         title: Self-reported loneliness
         unit: ""
@@ -387,6 +940,83 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: "Share of people who did not answer the question 'How often do you feel lonely?'"
+      lonely_ans_0_share:
+        title: Loneliness - Share of people who answered 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 0 when asked 'How often do you feel lonely?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.lonely}"
+      lonely_ans_1_share:
+        title: Loneliness - Share of people who answered 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 1 when asked 'How often do you feel lonely?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.lonely}"
+      lonely_ans_2_share:
+        title: Loneliness - Share of people who answered 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 2 when asked 'How often do you feel lonely?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.lonely}"
+      lonely_ans_3_share:
+        title: Loneliness - Share of people who answered 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 3 when asked 'How often do you feel lonely?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.lonely}"
+      lonely_ans_4_share:
+        title: Loneliness - Share of people who answered 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 4 when asked 'How often do you feel lonely?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.lonely}"
+      lonely_ans_5_share:
+        title: Loneliness - Share of people who answered 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 5 when asked 'How often do you feel lonely?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.lonely}"
+      lonely_ans_6_share:
+        title: Loneliness - Share of people who answered 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 6 when asked 'How often do you feel lonely?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.lonely}"
+      lonely_ans_7_share:
+        title: Loneliness - Share of people who answered 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 7 when asked 'How often do you feel lonely?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.lonely}"
+      lonely_ans_8_share:
+        title: Loneliness - Share of people who answered 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 8 when asked 'How often do you feel lonely?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.lonely}"
+      lonely_ans_9_share:
+        title: Loneliness - Share of people who answered 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 9 when asked 'How often do you feel lonely?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.lonely}"
+      lonely_ans_10_share:
+        title: Loneliness - Share of people who answered 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 10 when asked 'How often do you feel lonely?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.lonely}"
       physical_hlth_mean:
         title: Self-reported physical health
         unit: ""
@@ -397,6 +1027,83 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: "Share of people who did not answer the question 'How would you rate your overall physical health?'"
+      physical_hlth_ans_0_share:
+        title: Physical health - Share of people who answered 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 0 when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
+        description_key:
+          - "{definitions.survey_text.physical_health}"
+      physical_hlth_ans_1_share:
+        title: Physical health - Share of people who answered 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 1 when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
+        description_key:
+          - "{definitions.survey_text.physical_health}"
+      physical_hlth_ans_2_share:
+        title: Physical health - Share of people who answered 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 2 when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
+        description_key:
+          - "{definitions.survey_text.physical_health}"
+      physical_hlth_ans_3_share:
+        title: Physical health - Share of people who answered 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 3 when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
+        description_key:
+          - "{definitions.survey_text.physical_health}"
+      physical_hlth_ans_4_share:
+        title: Physical health - Share of people who answered 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 4 when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
+        description_key:
+          - "{definitions.survey_text.physical_health}"
+      physical_hlth_ans_5_share:
+        title: Physical health - Share of people who answered 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 5 when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
+        description_key:
+          - "{definitions.survey_text.physical_health}"
+      physical_hlth_ans_6_share:
+        title: Physical health - Share of people who answered 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 6 when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
+        description_key:
+          - "{definitions.survey_text.physical_health}"
+      physical_hlth_ans_7_share:
+        title: Physical health - Share of people who answered 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 7 when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
+        description_key:
+          - "{definitions.survey_text.physical_health}"
+      physical_hlth_ans_8_share:
+        title: Physical health - Share of people who answered 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 8 when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
+        description_key:
+          - "{definitions.survey_text.physical_health}"
+      physical_hlth_ans_9_share:
+        title: Physical health - Share of people who answered 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 9 when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
+        description_key:
+          - "{definitions.survey_text.physical_health}"
+      physical_hlth_ans_10_share:
+        title: Physical health - Share of people who answered 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 10 when asked 'How would you rate your overall physical health?', where 0 is 'poor physical health' and 10 is 'excellent physical health'."
+        description_key:
+          - "{definitions.survey_text.physical_health}"
       rel8_ans_1_share:
         title: Share of people who feel identify as spiritual
         unit: "%"
@@ -517,6 +1224,83 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: "Share of people who did not answer the question 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+      wb_today_ans_0_share:
+        title: Life evaluation - Share of people who answered 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 0 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+        description_key:
+          - "{definitions.survey_text.wb_today}"
+      wb_today_ans_1_share:
+        title: Life evaluation - Share of people who answered 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 1 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+        description_key:
+          - "{definitions.survey_text.wb_today}"
+      wb_today_ans_2_share:
+        title: Life evaluation - Share of people who answered 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 2 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+        description_key:
+          - "{definitions.survey_text.wb_today}"
+      wb_today_ans_3_share:
+        title: Life evaluation - Share of people who answered 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 3 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+        description_key:
+          - "{definitions.survey_text.wb_today}"
+      wb_today_ans_4_share:
+        title: Life evaluation - Share of people who answered 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 4 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+        description_key:
+          - "{definitions.survey_text.wb_today}"
+      wb_today_ans_5_share:
+        title: Life evaluation - Share of people who answered 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 5 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+        description_key:
+          - "{definitions.survey_text.wb_today}"
+      wb_today_ans_6_share:
+        title: Life evaluation - Share of people who answered 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 6 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+        description_key:
+          - "{definitions.survey_text.wb_today}"
+      wb_today_ans_7_share:
+        title: Life evaluation - Share of people who answered 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 7 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+        description_key:
+          - "{definitions.survey_text.wb_today}"
+      wb_today_ans_8_share:
+        title: Life evaluation - Share of people who answered 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 8 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+        description_key:
+          - "{definitions.survey_text.wb_today}"
+      wb_today_ans_9_share:
+        title: Life evaluation - Share of people who answered 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 9 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+        description_key:
+          - "{definitions.survey_text.wb_today}"
+      wb_today_ans_10_share:
+        title: Life evaluation - Share of people who answered 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 10 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?'"
+        description_key:
+          - "{definitions.survey_text.wb_today}"
       wb_fiveyrs_mean:
         title: Self-reported life evaluation outlook
         unit: ""
@@ -529,6 +1313,83 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: "Share of people who did not answer the question 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+      wb_fiveyrs_ans_0_share:
+        title : Life evaluation outlook - Share of people who answered 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 0 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+        description_key:
+          - "{definitions.survey_text.wb_fiveyrs}"
+      wb_fiveyrs_ans_1_share:
+        title: Life evaluation outlook - Share of people who answered 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 1 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+        description_key:
+          - "{definitions.survey_text.wb_fiveyrs}"
+      wb_fiveyrs_ans_2_share:
+        title: Life evaluation outlook - Share of people who answered 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 2 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+        description_key:
+          - "{definitions.survey_text.wb_fiveyrs}"
+      wb_fiveyrs_ans_3_share:
+        title: Life evaluation outlook - Share of people who answered 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 3 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+        description_key:
+          - "{definitions.survey_text.wb_fiveyrs}"
+      wb_fiveyrs_ans_4_share:
+        title: Life evaluation outlook - Share of people who answered 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 4 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+        description_key:
+          - "{definitions.survey_text.wb_fiveyrs}"
+      wb_fiveyrs_ans_5_share:
+        title: Life evaluation outlook - Share of people who answered 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 5 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+        description_key:
+          - "{definitions.survey_text.wb_fiveyrs}"
+      wb_fiveyrs_ans_6_share:
+        title: Life evaluation outlook - Share of people who answered 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 6 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+        description_key:
+          - "{definitions.survey_text.wb_fiveyrs}"
+      wb_fiveyrs_ans_7_share:
+        title: Life evaluation outlook - Share of people who answered 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 7 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+        description_key:
+          - "{definitions.survey_text.wb_fiveyrs}"
+      wb_fiveyrs_ans_8_share:
+        title: Life evaluation outlook - Share of people who answered 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 8 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+        description_key:
+          - "{definitions.survey_text.wb_fiveyrs}"
+      wb_fiveyrs_ans_9_share:
+        title: Life evaluation outlook - Share of people who answered 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 9 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+        description_key:
+          - "{definitions.survey_text.wb_fiveyrs}"
+      wb_fiveyrs_ans_10_share:
+        title: Life evaluation outlook - Share of people who answered 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 10 when asked 'Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?'"
+        description_key:
+          - "{definitions.survey_text.wb_fiveyrs}"
       wb_improvement_yes_share:
         title: Share of people who expect their life to improve in the next five years
         unit: "%"
@@ -558,4 +1419,81 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: "Share of people who did not answer the question 'How often do you worry about safety, food or housing?'"
+      worry_safety_ans_0_share:
+        title: Safety worry - Share of people who answered 0
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 0 when asked 'How often do you worry about safety, food or housing?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.worry}"
+      worry_safety_ans_1_share:
+        title: Safety worry - Share of people who answered 1
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 1 when asked 'How often do you worry about safety, food or housing?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.worry}"
+      worry_safety_ans_2_share:
+        title: Safety worry - Share of people who answered 2
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 2 when asked 'How often do you worry about safety, food or housing?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.worry}"
+      worry_safety_ans_3_share:
+        title: Safety worry - Share of people who answered 3
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 3 when asked 'How often do you worry about safety, food or housing?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.worry}"
+      worry_safety_ans_4_share:
+        title: Safety worry - Share of people who answered 4
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 4 when asked 'How often do you worry about safety, food or housing?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.worry}"
+      worry_safety_ans_5_share:
+        title: Safety worry - Share of people who answered 5
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 5 when asked 'How often do you worry about safety, food or housing?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.worry}"
+      worry_safety_ans_6_share:
+        title: Safety worry - Share of people who answered 6
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 6 when asked 'How often do you worry about safety, food or housing?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.worry}"
+      worry_safety_ans_7_share:
+        title: Safety worry - Share of people who answered 7
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 7 when asked 'How often do you worry about safety, food or housing?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.worry}"
+      worry_safety_ans_8_share:
+        title: Safety worry - Share of people who answered 8
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 8 when asked 'How often do you worry about safety, food or housing?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.worry}"
+      worry_safety_ans_9_share:
+        title: Safety worry - Share of people who answered 9
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 9 when asked 'How often do you worry about safety, food or housing?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.worry}"
+      worry_safety_ans_10_share:
+        title: Safety worry - Share of people who answered 10
+        unit: "%"
+        short_unit: "%"
+        description_short: "Share of people who answered 10 when asked 'How often do you worry about safety, food or housing?', where 0 is 'always' and 10 is 'never'."
+        description_key:
+          - "{definitions.survey_text.worry}"
 

@@ -237,6 +237,7 @@ def run(dest_dir: str) -> None:
 
     # Calculate average scores/ shares of answers for all variables
     tb_scored_10 = average_scored(tb, cols=SCORED_10_COLS)
+    tb_share_10 = share_categorical(tb, cols=SCORED_10_COLS)
     tb_binary = share_binary(tb, cols=BINARY_COLS + ["wb_improvement"])
     tb_cat = share_categorical(tb, cols=CAT_COLS)
 
@@ -244,10 +245,14 @@ def run(dest_dir: str) -> None:
     tb_cat_other = share_categorical(tb, cols=LOW_SCORED_COLS)
 
     # 97 is treated as 97 rather than 97+
+    # drinks: 116 rows
+    # cigarettes: 45 rows
     tb_scored_97 = average_scored(tb, cols=["cigarettes", "drinks"])
 
     #
-    tbs_full = pr.multi_merge([tb_scored_10, tb_binary, tb_cat, tb_scored_other, tb_cat_other, tb_scored_97])
+    tbs_full = pr.multi_merge(
+        [tb_scored_10, tb_share_10, tb_binary, tb_cat, tb_scored_other, tb_cat_other, tb_scored_97]
+    )
 
     # see above - change when decision about year is made
     tbs_full["year"] = 2023
@@ -310,8 +315,7 @@ def share_binary(tb, groups=["country"], cols=BINARY_COLS):
 
 def share_categorical(tb, groups: list = ["country"], cols: list = CAT_COLS):
     tb_cat = tb[groups + cols].copy()
-    # tb_na = get_na_share(tb, groups, cols)
-    res_tbs = []  # [tb_na]
+    res_tbs = []
     for col in cols:
         res = tb_cat.groupby(groups, dropna=False)[col].value_counts(normalize=True, dropna=False).unstack()
         col_names = [f"ans_{int(x)}" if x == x else "na" for x in res.columns]
