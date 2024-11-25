@@ -12,7 +12,11 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 from tqdm.auto import tqdm
 
+# Initialize log.
 log = get_logger()
+
+# Define default downloads folder (to use if either output_gif is None or png_folder is None).
+DOWNLOADS_DIR = Path.home() / "Downloads"
 
 
 def get_chart_metadata(chart_url):
@@ -125,39 +129,21 @@ def download_chart_png(png_url, output_file):
         return None
 
 
-def create_gif_from_chart_url(
+def get_chart_slug(chart_url):
+    # Given a chart URL, get the chart slug.
+    return urlparse(chart_url).path.split("/")[-1]
+
+
+def get_images_from_chart_url(
     chart_url,
-    output_gif=None,
-    png_folder=None,
+    png_folder,
     tab=None,
     years=None,
     year_range_open=True,
-    duration_frame=200,
-    duration_loop=None,
-    loops=0,
     max_workers=None,
-    remove_duplicate_frames=True,
     max_num_years=100,
 ):
-    # Given a chart URL, create a GIF with the chart data.
-
-    # Get chart slug.
-    slug = urlparse(chart_url).path.split("/")[-1]
-
-    # Define default downloads folder (to use if either output_gif is None or png_folder is None).
-    download_folder = Path.home() / "Downloads"
-
-    # Define output file for the GIF.
-    if output_gif is None:
-        output_gif = download_folder / f"{slug}.gif"
-
-    # Determine the default directory for PNGs.
-    if png_folder is None:
-        png_folder = download_folder / slug
-        png_folder.mkdir(parents=True, exist_ok=True)
-        log.info(f"Using Downloads folder for PNGs: {png_folder}")
-    else:
-        Path(png_folder).mkdir(parents=True, exist_ok=True)
+    # Given a chart URL, download the PNGs into a folder. If they already exists, skip them.
 
     # If the tab parameter is not provided, extract it from the chart URL.
     if tab is None:
@@ -166,12 +152,6 @@ def create_gif_from_chart_url(
         if tab is None:
             # Default to "map" if the tab parameter is not found.
             tab = "map"
-
-    # By default, assume an open year range (which is the most likely desired output).
-    # # Infer year_range_open is not provided, infer it based on URL.
-    # if year_range_open is None:
-    #     _year_range_open = parse_qs(urlparse(chart_url).query).get("time", [None])[0]
-    #     year_range_open = ".." in _year_range_open if _year_range_open else False
 
     if years is None:
         years = get_years_in_chart(chart_url=chart_url)
@@ -191,16 +171,6 @@ def create_gif_from_chart_url(
             f"Number of years ({len(years)}) exceeds the maximum number of years ({max_num_years}). Consider setting years explicitly or increasing max_num_years. Years available: {years}"
         )
         return None
-
-    # Decide configuration for GIF creation.
-    if duration_loop is not None:
-        if duration_frame is not None:
-            raise ValueError("Cannot specify both duration_frame and duration_loop.")
-        duration = duration_loop // len(years)
-        if duration == 0:
-            log.warning("Duration per frame is less than 1ms. Set a longer duration.")
-    else:
-        duration = duration_frame
 
     # Download PNGs in parallel.
     log.info("Downloading images in parallel.")
@@ -223,33 +193,46 @@ def create_gif_from_chart_url(
             except Exception as e:
                 log.error(f"Error downloading image: {e}")
 
-    # Create GIF from images.
-    if image_paths:
-        log.info("Creating GIF...")
-        images = [Image.open(img) for img in sorted(image_paths)]
-        if remove_duplicate_frames:
-            # Sometimes, even though the list of years is correct for all countries, for the specifically selected ones there may not be any data.
-            # In this case, the PNGs will be the same, so we can remove duplicates.
-            images = [images[i] for i in range(len(images)) if i == 0 or images[i] != images[i - 1]]
-        # There seems to be a PIL bug when specifying loops.
-        if loops == 1:
-            # Repeat loop only once.
-            images[0].save(output_gif, save_all=True, append_images=images[1:], optimize=True, duration=duration)
-        elif loops == 0:
-            # Infinite loop.
-            images[0].save(
-                output_gif, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops
-            )
-        else:
-            # Repeat loop a fixed number of times.
-            images[0].save(
-                output_gif, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops - 1
-            )
-        log.info(f"GIF successfully created at {output_gif}")
-        return output_gif
+    return image_paths
+
+
+def create_gif_from_images(
+    image_paths,
+    output_gif,
+    duration=200,
+    loops=0,
+    remove_duplicate_frames=True,
+    repetitions_last_frame=0,
+    duration_of_full_gif=False,
+):
+    images = [Image.open(img) for img in sorted(image_paths)]
+    if remove_duplicate_frames:
+        # Sometimes, even though the list of years is correct for all countries, for the specifically selected ones there may not be any data.
+        # In this case, the PNGs will be the same, so we can remove duplicates.
+        images = [images[i] for i in range(len(images)) if i == 0 or images[i] != images[i - 1]]
+
+    # Optionally repeat the last frame.
+    images = images + [images[-1]] * repetitions_last_frame
+
+    if duration_of_full_gif:
+        duration = duration // len(images)
+
+    # There seems to be a PIL bug when specifying loops.
+    if loops == 1:
+        # Repeat loop only once.
+        images[0].save(output_gif, save_all=True, append_images=images[1:], optimize=True, duration=duration)
+    elif loops == 0:
+        # Infinite loop.
+        images[0].save(
+            output_gif, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops
+        )
     else:
-        log.error("Could not create GIF because there are no images downloaded.")
-        return None
+        # Repeat loop a fixed number of times.
+        images[0].save(
+            output_gif, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops - 1
+        )
+    log.info(f"GIF successfully created at {output_gif}")
+    return output_gif
 
 
 @click.command(name="chart_to_gif", cls=RichCommand, help=__doc__)
@@ -278,22 +261,22 @@ def create_gif_from_chart_url(
     help="Whether the year range is open or closed. If open, the range is from earliest to the year. If closed, the range is only the year.",
 )
 @click.option(
-    "--duration-frame",
+    "--duration",
     type=int,
     default=200,
-    help="Duration of each frame in milliseconds.",
-)
-@click.option(
-    "--duration-loop",
-    type=int,
-    default=None,
-    help="Duration of the entire GIF in milliseconds. NOTE: Cannot specify both duration_frame and duration_loop.",
+    help="Duration in milliseconds (of each frame, or of the entire GIF).",
 )
 @click.option(
     "--loops",
     type=int,
     default=0,
     help="Number of times the GIF should loop. 0 = infinite looping.",
+)
+@click.option(
+    "--repetitions-last-frame",
+    type=int,
+    default=0,
+    help="Number of repetitions of the last frame.",
 )
 @click.option(
     "--max-workers",
@@ -314,43 +297,79 @@ def create_gif_from_chart_url(
     help="Maximum number of years to download. If the number of years in the chart exceeds this value, the script will stop.",
 )
 @click.option(
+    "--duration-of-full-gif/--duration-of-each-frame",
+    default=False,
+    help="Whether the duration is for each frame or the entire GIF.",
+    is_flag=True,
+)
+@click.option(
     "--remove-duplicate-frames",
     is_flag=True,
     help="Remove duplicate frames from the GIF.",
 )
-def main(
+def cli(
     chart_url,
     output_gif,
     tab,
     years,
     year_range_open,
-    duration_frame,
-    duration_loop,
+    duration,
     loops,
+    repetitions_last_frame,
     max_workers,
     png_folder,
     max_num_years,
+    duration_of_full_gif,
     remove_duplicate_frames,
 ):
+    # Given a chart URL, create a GIF with the chart data.
+
     # Parse years.
     if years is not None:
         years = [int(year) for year in years.split(",")]
 
-    create_gif_from_chart_url(
+    # Get chart slug.
+    slug = get_chart_slug(chart_url)
+
+    # Determine the default directory for PNGs.
+    if png_folder is None:
+        png_folder = DOWNLOADS_DIR / slug
+        png_folder.mkdir(parents=True, exist_ok=True)
+        log.info(f"Using Downloads folder for PNGs: {png_folder}")
+    else:
+        Path(png_folder).mkdir(parents=True, exist_ok=True)
+
+    # Define output file for the GIF.
+    if output_gif is None:
+        output_gif = DOWNLOADS_DIR / f"{slug}.gif"
+
+    # Get images from chart URL.
+    image_paths = get_images_from_chart_url(
         chart_url=chart_url,
-        output_gif=output_gif,
+        png_folder=png_folder,
         tab=tab,
         years=years,
         year_range_open=year_range_open,
-        duration_frame=duration_frame,
-        duration_loop=duration_loop,
-        loops=loops,
-        png_folder=png_folder,
         max_workers=max_workers,
         max_num_years=max_num_years,
-        remove_duplicate_frames=remove_duplicate_frames,
     )
+
+    # Create GIF from images.
+    if image_paths:
+        log.info("Creating GIF...")
+        return create_gif_from_images(
+            image_paths=image_paths,
+            output_gif=output_gif,
+            duration=duration,
+            loops=loops,
+            remove_duplicate_frames=remove_duplicate_frames,
+            repetitions_last_frame=repetitions_last_frame,
+            duration_of_full_gif=duration_of_full_gif,
+        )
+    else:
+        log.error("Could not create GIF because there are no images downloaded.")
+        return None
 
 
 if __name__ == "__main__":
-    main()
+    cli()

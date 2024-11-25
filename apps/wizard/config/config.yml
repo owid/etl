@@ -209,6 +209,13 @@ sections:
         entrypoint: app_pages/owidle.py
         icon: ":material/videogame_asset:"
         image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
+      - title: "Chart to GIF"
+        alias: chart-to-gif
+        description: "Create a GIF or a video from a chart"
+        maintainer: "@pablo"
+        entrypoint: app_pages/chart_to_gif.py
+        icon: ":material/tv:"
+        image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
 
   - title: "Metadata"
     description: |-
