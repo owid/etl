@@ -214,7 +214,7 @@ sections:
         maintainer: "@pablo"
         entrypoint: app_pages/chart_animation.py
         icon: ":material/animated_images:"
-        image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
+        image_url: "https://img.freepik.com/free-photo/abstract-yellow-smooth-wave-lines_1017-24863.jpg"
 
   - title: "Metadata"
     description: |-
