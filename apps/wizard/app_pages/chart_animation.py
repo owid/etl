@@ -35,12 +35,10 @@ st.session_state.chart_animation_iframe_html = st.session_state.get("chart_anima
 st.session_state.chart_animation_show_image_settings = st.session_state.get(
     "chart_animation_show_image_settings", False
 )
-st.session_state.chart_animation_show_gif_settings = st.session_state.get("chart_animation_show_gif_settings", False)
 # NOTE: The range of years will be loaded automatically from the chart's metadata. We just define this range here to avoid typing issues.
 st.session_state.chart_animation_years = st.session_state.get("chart_animation_years", range(2000, 2022))
 
 # Step 1: Input chart URL and get years.
-st.markdown("### Step 1: Chart URL and timeline")
 chart_url = st.text_input(
     "Enter grapher URL",
     "",
@@ -59,6 +57,9 @@ st.session_state.chart_animation_gif_file = DOWNLOADS_DIR / f"{slug}.gif"
 st.session_state.chart_animation_images_exist = (
     len([image for image in st.session_state.chart_animation_images_folder.iterdir() if image.suffix == ".png"]) > 0
 )
+st.session_state.chart_animation_image_paths = [
+    image for image in st.session_state.chart_animation_images_folder.iterdir() if image.suffix == ".png"
+]
 
 if st.button("Get chart"):
     if not chart_url:
@@ -73,7 +74,6 @@ if st.session_state.chart_animation_show_image_settings:
     st.info("Modify chart as you wish, click on share -> copy link, and paste it in the box above.")
     st.session_state.chart_animation_iframe_html = grapher_chart_from_url(chart_url)
 
-    st.markdown("### Step 2: Image generation settings")
     # Slider for year range.
     year_min, year_max = st.slider(
         "Select year range",
@@ -90,22 +90,23 @@ if st.session_state.chart_animation_show_image_settings:
         help="Only relevant for the chart view. If checked, the year range will be open. Uncheck if you want to generate a sequence of bar charts.",
     )
 
-    # Button to generate images.
-    if st.session_state.chart_animation_images_exist:
-        st.warning(
-            f"Images already exist in the folder: {st.session_state.chart_animation_images_folder}\nYears for which there is already a file will be skipped.\nEither delete them all or continue to get images for remaining years (if any is missing)."
-        )
-        # Create a button to delete the folder.
-        if st.button("Delete images"):
-            for image in [
-                image for image in st.session_state.chart_animation_images_folder.iterdir() if image.suffix == ".png"
-            ]:
-                image.unlink()
-            # Update session state to reflect that images are deleted.
-            st.session_state.chart_animation_images_exist = False
-            st.info("Images deleted.")
+    # Button to delete the folder.
+    if st.button(
+        "Delete images",
+        disabled=not st.session_state.chart_animation_images_exist,
+        help=f"Delete images in folder: {st.session_state.chart_animation_images_folder}.",
+    ):
+        for image in st.session_state.chart_animation_image_paths:
+            image.unlink()
+        # Update session state to reflect that images are deleted.
+        st.session_state.chart_animation_images_exist = False
+        st.info("Images deleted.")
 
-    if st.button("Get images"):
+    # Button to generate images.
+    if st.button(
+        "Get images",
+        help=f'Get images for selected years. Years for which there is already a file in {st.session_state.chart_animation_images_folder} will be skipped.\nEither delete them all (using "Delete images") or continue to get images for remaining years (if any is missing).',
+    ):
         years = range(year_min, year_max + 1)
         st.session_state.chart_animation_image_paths = get_images_from_chart_url(
             chart_url=chart_url,
@@ -116,11 +117,8 @@ if st.session_state.chart_animation_show_image_settings:
             max_workers=None,
             max_num_years=100,
         )
-        st.session_state.chart_animation_show_gif_settings = True
+        st.session_state.chart_animation_images_exist = len(st.session_state.chart_animation_image_paths) > 0  # type: ignore
 
-# Step 3: GIF Settings and preview.
-if st.session_state.chart_animation_show_gif_settings:
-    st.markdown("### Step 3: GIF settings and preview")
     col1, col2 = st.columns([1, 1])
 
     # GIF settings.
@@ -137,8 +135,8 @@ if st.session_state.chart_animation_show_gif_settings:
         duration = st.number_input("Duration (ms)", value=200, step=10)
     duration_of = st.radio("Duration of", ["Each frame", "Entire animation"])
 
-    # Regenerate GIF button.
-    if st.button("Generate animation"):
+    # GIF generation.
+    if st.session_state.chart_animation_images_exist:
         st.session_state.chart_animation_gif_file = create_gif_from_images(
             image_paths=st.session_state.chart_animation_image_paths,
             output_gif=st.session_state.chart_animation_gif_file,
@@ -149,7 +147,6 @@ if st.session_state.chart_animation_show_gif_settings:
             duration_of_full_gif=duration_of == "Entire animation",
         )
 
-    # GIF preview.
-    if st.session_state.chart_animation_gif_file.exists():
+        # GIF preview.
         st.info('Animation preview. Right click and "Save Image As..." to download it.')
         st.image(str(st.session_state.chart_animation_gif_file), use_container_width=True)
