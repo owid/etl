@@ -38,6 +38,7 @@ COUNTRIES_RELEVANT = [
     "Falkland Islands",
     "Gabon",
     "Georgia",
+    "Germany",
     "Guam",
     "Iceland",
     "India",
@@ -176,7 +177,7 @@ def run(dest_dir: str) -> None:
     tb["population_wpp_cut"] = tb.loc[tb["year"] >= 1950, "population_wpp"]
 
     # Filter relevant countries
-    tb = tb.loc[tb["country"].isin(COUNTRIES_RELEVANT)]
+    # tb = tb.loc[tb["country"].isin(COUNTRIES_RELEVANT)]
 
     # Format
     tb = tb.format(["country", "year"])
