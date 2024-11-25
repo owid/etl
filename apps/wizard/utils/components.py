@@ -111,6 +111,16 @@ def grapher_chart(
     _chart_html(chart_config, owid_env, height=height, **kwargs)
 
 
+def grapher_chart_from_url(chart_url: str, height=600):
+    """Plot a Grapher chart using the Grapher API."""
+    chart_animation_iframe_html = f"""
+    <iframe src="{chart_url}" loading="lazy"
+            style="width: 100%; height: 600px; border: 0px none;"
+            allow="web-share; clipboard-write"></iframe>
+    """
+    return st.components.v1.html(chart_animation_iframe_html, height=height)  # type: ignore
+
+
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
     """Plot a Grapher chart using the Grapher API.
 

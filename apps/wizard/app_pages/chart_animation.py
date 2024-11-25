@@ -8,6 +8,7 @@ from apps.chart_animation.cli import (
     get_images_from_chart_url,
     get_years_in_chart,
 )
+from apps.wizard.utils.components import grapher_chart_from_url
 
 # Initialize log.
 log = get_logger()
@@ -28,11 +29,15 @@ st.title(":material/animated_images: Chart animation")
 # Initialize session state for generated files.
 st.session_state.chart_animation_images_folder = st.session_state.get("chart_animation_images_folder", DOWNLOADS_DIR)
 st.session_state.chart_animation_image_paths = st.session_state.get("chart_animation_image_paths", None)
-st.session_state.chart_animation_images_exist = st.session_state.get("images_exist", False)
-st.session_state.chart_animation_gif_file = st.session_state.get("gif_file", None)
-st.session_state.chart_animation_iframe_html = st.session_state.get("iframe_html", None)
+st.session_state.chart_animation_images_exist = st.session_state.get("chart_animation_images_exist", False)
+st.session_state.chart_animation_gif_file = st.session_state.get("chart_animation_gif_file", None)
+st.session_state.chart_animation_iframe_html = st.session_state.get("chart_animation_iframe_html", None)
+st.session_state.chart_animation_show_image_settings = st.session_state.get(
+    "chart_animation_show_image_settings", False
+)
+st.session_state.chart_animation_show_gif_settings = st.session_state.get("chart_animation_show_gif_settings", False)
 # NOTE: The range of years will be loaded automatically from the chart's metadata. We just define this range here to avoid typing issues.
-st.session_state.chart_animation_years = st.session_state.get("years", range(2000, 2022))
+st.session_state.chart_animation_years = st.session_state.get("chart_animation_years", range(2000, 2022))
 
 # Step 1: Input chart URL and get years.
 st.markdown("### Step 1: Chart URL and timeline")
@@ -52,26 +57,19 @@ st.session_state.chart_animation_images_exist = (
     len([image for image in st.session_state.chart_animation_images_folder.iterdir() if image.suffix == ".png"]) > 0
 )
 
-
 if st.button("Get chart"):
     if not chart_url:
         st.error("Please enter a valid chart URL.")
         st.stop()
     # Embed the iframe in the app.
-    st.session_state.chart_animation_iframe_html = f"""
-    <iframe src="{chart_url}" loading="lazy"
-            style="width: 100%; height: 600px; border: 0px none;"
-            allow="web-share; clipboard-write"></iframe>
-    """
     st.session_state.chart_animation_years = get_years_in_chart(chart_url)
-    st.session_state.show_image_settings = True
+    st.session_state.chart_animation_show_image_settings = True
 
 # Display iframe if it was fetched.
-if st.session_state.chart_animation_iframe_html:
+if st.session_state.chart_animation_show_image_settings:
     st.info("Modify chart as you wish, click on share -> copy link, and paste it in the box above.")
-    st.components.v1.html(st.session_state.chart_animation_iframe_html, height=600)  # type: ignore
+    st.session_state.chart_animation_iframe_html = grapher_chart_from_url(chart_url)
 
-if st.session_state.get("show_image_settings"):
     st.markdown("### Step 2: Image generation settings")
     # Slider for year range.
     year_min, year_max = st.slider(
@@ -115,10 +113,10 @@ if st.session_state.get("show_image_settings"):
             max_workers=None,
             max_num_years=100,
         )
-        st.session_state.show_gif_settings = True
+        st.session_state.chart_animation_show_gif_settings = True
 
 # Step 3: GIF Settings and preview.
-if st.session_state.get("show_gif_settings"):
+if st.session_state.chart_animation_show_gif_settings:
     st.markdown("### Step 3: GIF settings and preview")
     col1, col2 = st.columns([1, 1])
 
@@ -129,7 +127,7 @@ if st.session_state.get("show_gif_settings"):
     st.session_state.chart_animation_gif_file = st.session_state.chart_animation_gif_file.with_suffix(
         ".gif" if output_type == "GIF" else ".mp4"
     )
-    remove_duplicates = st.checkbox("Remove Duplicate Frames?", value=True)
+    remove_duplicates = st.toggle("Remove duplicate frames", value=True)
     repetitions_last_frame = st.number_input("Repetitions of Last Frame", value=0, step=1)
     duration = st.number_input("Duration (ms)", value=200, step=10)
     duration_of = st.radio("Duration of", ["Each frame", "Entire animation"])
