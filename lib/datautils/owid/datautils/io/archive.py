@@ -5,6 +5,8 @@ import zipfile
 from pathlib import Path
 from typing import Union
 
+from py7zr import SevenZipFile
+
 from owid.datautils.decorators import enable_file_download
 
 
@@ -32,6 +34,9 @@ def decompress_file(
         _decompress_zip_file(input_file, output_folder, overwrite)
     elif tarfile.is_tarfile(input_file):
         _decompress_tar_file(input_file, output_folder, overwrite)
+    elif input_file.suffix.lower() == ".7z":
+        with SevenZipFile(input_file, mode="r") as z:
+            z.extractall(path=output_folder)
     else:
         raise ValueError("File is neither a zip nor a tar file.")
 
