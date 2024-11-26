@@ -65,6 +65,8 @@ definitions:
         - New Zealand: Excluded for 1856-1915, included otherwise.
         - Scotland: Excluded for 1856-1938, included otherwise.
 
+      For more details about the data for a specific country, please refer to the original source.
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
