@@ -35,35 +35,13 @@ definitions:
     description_processing: |-
       Data sometimes includes stillbirths, therefore comparability across countries should be done with care.
 
-      Countries including stillbirths:
-        - Czech Republic
-        - Denmark
-        - England and Wales
-        - France
-        - Greece
-        - Italy
-        - Lithuania
-        - Netherlands
-        - Norway
-        - Spain
-        - Sweden
-        - Switzerland
-        - Austria: Unknown for 1920, 1921, 1928, 1929, 1931, 1934
-        - Canada: Unknown for 1921-1925, 1927-1990
-        - Finland: Unknown for 1906-1936, 1941-1999
-        - Germany: Unknown for 1906-1936
-        - Japan: Unknown for 1923-1936
+      **Countries including stillbirths**: Czech Republic, Denmark, England and Wales, France, Greece, Italy, Lithuania, Netherlands, Norway, Spain, Sweden, Switzerland
 
-      Countries excluding stillbirths:
-        - Chile
-        - South Korea
+      **Countries mostly including stillbirths**: Austria (unknown for 1920, 1921, 1928, 1929, 1931, 1934), Canada (unknown for 1921-1925, 1927-1990), Finland (unknown for 1906-1936, 1941-1999), Germany (unknown for 1906-1936), Japan (unknown for 1923-1936)
 
-      Countries with mixed practices:
-        - Australia
-        - United States
-        - Uruguay
-        - New Zealand: Excluded for 1856-1915, included otherwise.
-        - Scotland: Excluded for 1856-1938, included otherwise.
+      **Countries excluding stillbirths**: Chile, South Korea
+
+      **Countries with mixed practices**: Australia, New Zealand (excluded for 1856-1915), United States, Scotland (excluded for 1856-1938), Uruguay
 
       For more details about the data for a specific country, please refer to the original source.
 
@@ -84,32 +62,32 @@ tables:
         title: Twin deliveries
         unit: "deliveries"
         description_short: |-
-          "Number of twin deliveries."
+          Number of twin deliveries.
       multiple_deliveries:
         title: Multiple deliveries
         unit: "deliveries"
         description_short: |-
-          "Total number of multiple deliveries (i.e. the sum of twin, triplet, and quadruplet+ deliveries)."
+          Total number of multiple deliveries (i.e. the sum of twin, triplet, and quadruplet+ deliveries).
       total_deliveries:
         title: Total deliveries
         unit: "deliveries"
         description_short: |-
-          "Total number of deliveries (i.e., single and multiple deliveries combined)"
+          Total number of deliveries (i.e., single and multiple deliveries combined)
       singleton_rate:
         title: Singleton rate
         unit: "twin deliveries per total deliveries"
         description_short: |-
-          "Number of single deliveries divided by the total number of deliveries, per 1,000 people."
+          The rate of deliveries that are single deliveries, per 1,000 deliveries.
       twinning_rate:
         title: Twinning rate
         unit: "twin deliveries per 1,000 deliveries"
         description_short: |-
-          "Number of twin deliveries divided by the total number of deliveries, per 1,000 people."
+          The rate of twin deliveries, per 1,000 deliveries.
       multiple_rate:
         title: Multiple rate
         unit: "multiple deliveries per 1,000 deliveries"
         description_short: |-
-          "Number of multiple deliveries divided by the total number of deliveries, per 1,000 people."
+          The rate of deliveries that are multiple deliveries, per 1,000 deliveries.
       children_delivery_ratio:
         title: "Children per multiple delivery"
         unit: "children per 1,000 multiple deliveries"
@@ -119,4 +97,4 @@ tables:
         title: "Multiple children to singleton ratio"
         unit: "multiple deliveries per 1,000 single delivery"
         description_short: |-
-          "Number of multiple deliveries divided by the number of single deliveries, per 1,000 people."
+          Number of multiple deliveries per 1,000 single deliveries.
