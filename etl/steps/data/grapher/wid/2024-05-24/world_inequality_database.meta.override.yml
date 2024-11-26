@@ -4,4 +4,4 @@ tables:
       p99p100_share_wealth:
         title: Top 1% - Share (Net national wealth) (Estimated)
         presentation:
-          title_public: Top 1% - Share (Net national wealth) (Estimated)
+          title_public: Wealth share of the richest 1%
