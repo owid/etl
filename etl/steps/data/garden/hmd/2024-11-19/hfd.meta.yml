@@ -26,6 +26,8 @@ definitions:
     title: |-
       <% if birth_order == 'total' %>
       << title >> - Total
+      <%- elif birth_order == '5p' %>
+      << title >> - Birth order: ≥5
       <%- else %>
       << title >> - Birth order: << birth_order >>
       <%- endif %>
@@ -33,6 +35,8 @@ definitions:
       <% set age_str = '≤12' if age == '12-' else age %>
       <% if birth_order == 'total' %>
       << title >> - Mother age: << age_str >> - All births
+      <% elif birth_order == '5p' %>
+      << title >> - Mother age: << age_str >> - Birth order: ≥5
       <%- else %>
       << title >> - Mother age: << age_str >> - Birth order: << birth_order >>
       <%- endif %>
@@ -304,7 +308,7 @@ tables:
 
       ppr:
         title: |-
-          Cohort parity progression ratios - << birth_order | int >> to << (birth_order | int) + 1 >> birth
+          Cohort parity progression ratios - << (birth_order | int) - 1 >> to << (birth_order | int) >> birth
         description_short: |-
           <% if birth_order == '1' %>
           Probability of giving birth to a first child.
