@@ -79,12 +79,12 @@ tables:
         description_short: |-
           The rate of deliveries that are single deliveries, per 1,000 deliveries.
       twinning_rate:
-        title: Twinning rate
+        title: Twinning delivery rate
         unit: "twin deliveries per 1,000 deliveries"
         description_short: |-
           The rate of twin deliveries, per 1,000 deliveries.
       multiple_rate:
-        title: Multiple rate
+        title: Multiple delivery rate
         unit: "multiple deliveries per 1,000 deliveries"
         description_short: |-
           The rate of deliveries that are multiple deliveries, per 1,000 deliveries.
