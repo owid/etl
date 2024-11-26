@@ -51,6 +51,7 @@ chart_url = st.text_input(
     "Enter grapher URL",
     "",
     placeholder="https://ourworldindata.org/grapher/share-electricity-low-carbon?tab=chart&country=OWID_WRL~OWID_EUR~OWID_AFR",
+    help="Paste the URL of the chart you want to animate. Note that some parameters cannot be extracted from the URL (e.g. the type of tab view). But you can modify them afterwards.",
 )
 
 # Get slug from URL.
@@ -146,7 +147,12 @@ if st.session_state.chart_animation_show_image_settings:
             if output_type == "GIF":
                 loop_count = st.number_input("Number of Loops (0 = Infinite)", value=0, step=1)
             duration = st.number_input("Duration (ms)", value=200, step=10)
-        duration_of = st.radio("Duration of", ["Each frame", "Entire animation"], horizontal=True)
+        duration_of = st.radio(
+            "Duration of",
+            ["Each frame", "Entire animation"],
+            horizontal=True,
+            help="Choose if the duration parameter refers to each frame, or the entire animation. Note that each frame cannot be shorter than 20ms.",
+        )
 
     # Fetch all needed images (skipping the ones that already exist).
     st.session_state.chart_animation_image_paths = get_images_from_chart_url(
