@@ -58,7 +58,7 @@ tables:
     variables:
       tfr:
         title: |-
-          <% set title = "Period total fertility rates" %>
+          <% set title = "Period total fertility rate" %>
           {definitions.others.title}
         description_short: |-
           The average number of{definitions.others.bo_1} children a woman would have in her lifetime if she experienced the fertility rates of a specific year.
@@ -69,7 +69,7 @@ tables:
 
       tfr40:
         title: |-
-          <% set title = "Period total fertility rates by age 40" %>
+          <% set title = "Period total fertility rate by age 40" %>
           {definitions.others.title}
         description_short: |-
           The average number of{definitions.others.bo_1} children a woman would have by age 40 if she experienced the fertility rates of a specific year.
@@ -79,7 +79,7 @@ tables:
 
       adjtfr:
         title: |-
-          <% set title = "Tempo-adjusted total fertility rates" %>
+          <% set title = "Tempo-adjusted total fertility rate" %>
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
@@ -308,7 +308,7 @@ tables:
 
       ppr:
         title: |-
-          Cohort parity progression ratios - << (birth_order | int) - 1 >> to << (birth_order | int) >> birth
+          Cohort parity progression ratio - << (birth_order | int) - 1 >> to << (birth_order | int) >> birth
         description_short: |-
           <% if birth_order == '1' %>
           Probability of giving birth to a first child.
@@ -328,7 +328,7 @@ tables:
     variables:
       asfr_period:
         title: |-
-          <% set title = "Period fertility rates" %>
+          <% set title = "Period fertility rate" %>
           {definitions.others.title_age}
         description_short: |-
           Age-specific fertility rates for each calendar year, measured in completed years of age.
@@ -342,7 +342,7 @@ tables:
     variables:
       asfr_cohort:
         title: |-
-          <% set title = "Cohort fertility rates" %>
+          <% set title = "Cohort fertility rate" %>
           {definitions.others.title_age}
         unit: "births per woman"
         description_short: |-
