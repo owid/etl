@@ -147,12 +147,17 @@ if st.session_state.chart_animation_show_image_settings:
             if output_type == "GIF":
                 loop_count = st.number_input("Number of Loops (0 = Infinite)", value=0, step=1)
             duration = st.number_input("Duration (ms)", value=200, step=10)
-        duration_of = st.radio(
-            "Duration of",
-            ["Each frame", "Entire animation"],
-            horizontal=True,
-            help="Choose if the duration parameter refers to each frame, or the entire animation. Note that each frame cannot be shorter than 20ms.",
-        )
+            # duration_of = st.radio(
+            #     "Duration of",
+            #     ["Each frame", "Entire animation"],
+            #     horizontal=True,
+            #     help="Choose if the duration parameter refers to each frame, or the entire animation. Note that each frame cannot be shorter than 20ms.",
+            # )
+            duration_of = st.segmented_control(
+                "Duration of",
+                ["Each frame", "Entire animation"],
+                help="Choose if the duration parameter refers to each frame, or the entire animation. Note that each frame cannot be shorter than 20ms.",
+            )
 
     # Fetch all needed images (skipping the ones that already exist).
     st.session_state.chart_animation_image_paths = get_images_from_chart_url(
