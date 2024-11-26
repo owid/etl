@@ -133,6 +133,7 @@ wizard = [
     # error: distribution torch==2.2.2 @ registry+https://pypi.org/simple can't be installed because it doesn't have a source distribution or wheel for the current platform
     "torch<2.3.0",
     "sentence-transformers>=2.2.2",
+    "moviepy>=2.1.1",
 ]
 
 [project.scripts]
