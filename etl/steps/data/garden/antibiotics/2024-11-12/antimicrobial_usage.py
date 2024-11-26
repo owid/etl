@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -29,8 +31,12 @@ def run(dest_dir: str) -> None:
     )
     tb_aware = tb_aware.drop(columns=["whoregioncode", "whoregionname", "incomeworldbankjune", "aware", "notes"])
 
+    # Aggregate by antimicrobial class
+    tb_class_agg = aggregate_antimicrobial_classes(tb_class)
+
     tb_class = tb_class.format(["country", "year", "antimicrobialclass", "atc4name", "routeofadministration"])
     tb_aware = tb_aware.format(["country", "year", "awarelabel"])
+    tb_class_agg = tb_class_agg.format(["country", "year", "antimicrobialclass"], short_name="class_aggregated")
 
     #
     # Save outputs.
@@ -42,3 +48,13 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def aggregate_antimicrobial_classes(tb_class: Table) -> Table:
+    """
+    Aggregating by antimicrobial class
+    """
+
+    tb_class = tb_class.groupby(["country", "year", "antimicrobialclass"])[["ddd", "did"]].sum().reset_index()
+
+    return tb_class

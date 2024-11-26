@@ -4,8 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Global Health
-  aware_description:
-    <% if aware == "A" %>
+  aware_description: <% if aware == "A" %>
     Access antibiotics have activity against a wide range of common pathogens and show lower resistance potential than antibiotics in the other groups.
     <% elif aware == "W" %>
     Watch antibiotic have higher resistance potential and include most of the highest priority agents among the Critically Important Antimicrobials for Human Medicine and/or antibiotics that are at relatively high risk of bacterial resistance.
@@ -14,8 +13,7 @@ definitions:
     <% elif aware == "O" %>
     The use of the Not classified/Not recommended antibiotics is not evidence-based, nor recommended in high-quality international guidelines.  WHO does not recommend the use of these antibiotics in clinical practice.
     <% endif %>
-  routeofadministration:
-    <% if routeofadministration == "O" %>
+  routeofadministration: <% if routeofadministration == "O" %>
     orally administered
     <% elif routeofadministration == "P" %>
     parentearally administered
@@ -24,13 +22,23 @@ definitions:
     <% elif routeofadministration == "I" %>
     inhaled
     <% endif %>
-
+  antimicrobialclass:
+    <% if antimicrobialclass == "Antibacterials (ATC J01, A07AA, P01AB)" %>
+    antibiotics
+    <% elif antimicrobialclass == "Antimalarials (ATC P01B)" %>
+    antimalarials
+    <% elif antimicrobialclass == "Antimycotics and antifungals for systemic use (J02, D01B)" %>
+    antifungals
+    <% elif antimicrobialclass == "Antivirals for systemic use (ATC J05)" %>
+    antivirals
+    <% elif antimicrobialclass == "Drugs for the treatment of tuberculosis (ATC J04A)" %>
+    antituberculosis medicines
+    <% endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 308
-
 
 tables:
   class:
@@ -42,6 +50,18 @@ tables:
         unit: defined daily doses
       did:
         title: Defined daily doses per 1000 inhabitants per day of {definitions.routeofadministration} << antimicrobialclass>> - << atc4name.lower() >> used
+        description_short: Volume of antimicrobials used per 1000 inhabitants per day.
+        #description_processing: <<notes>>
+        unit: defined daily doses per 1000 inhabitants per day
+  class_aggregated:
+    variables:
+      ddd:
+        title: Defined daily doses of {defintions.antimicrobialclass} used
+        description_short: Volume of antimicrobials used in a given year.
+        #description_processing: <<notes>>
+        unit: defined daily doses
+      did:
+        title: Defined daily doses per 1000 inhabitants per day of {defintions.antimicrobialclass} used
         description_short: Volume of antimicrobials used per 1000 inhabitants per day.
         #description_processing: <<notes>>
         unit: defined daily doses per 1000 inhabitants per day
