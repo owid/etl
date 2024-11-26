@@ -30,6 +30,9 @@ def decompress_file(
         Overwrite decompressed content if it already exists (otherwise raises an error if content already exists).
 
     """
+    if isinstance(input_file, str):
+        input_file = Path(input_file)
+
     if zipfile.is_zipfile(input_file):
         _decompress_zip_file(input_file, output_folder, overwrite)
     elif tarfile.is_tarfile(input_file):
