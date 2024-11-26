@@ -1,6 +1,12 @@
 """This data is collected by the WHO, and summarised in PDF reports.
 
-CDC provides this same data but in a machine-readable format, which one can download from https://www.cdc.gov/bird-flu/php/avian-flu-summary/chart-epi-curve-ah5n1.html under "Download data (CSV)".
+CDC provides this same data but in a machine-readable format. To download it:
+
+- Go to https://www.cdc.gov/bird-flu/php/avian-flu-summary/chart-epi-curve-ah5n1.html
+- Under the main chart, click on "Download data (CSV)".
+
+To get the publication date, look at the top right part of the site.
+
 """
 
 from pathlib import Path
