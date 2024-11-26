@@ -1206,7 +1206,7 @@ def map_indicator_path_to_id(catalog_path: str) -> str | int:
 def get_schema_from_url(schema_url: str) -> dict:
     """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
 
-    https://files.ourworldindata.org/schemas/grapher-schema.005.json
+    https://files.ourworldindata.org/schemas/grapher-schema.006.json
 
     More details on available versions can be found
     at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema.
