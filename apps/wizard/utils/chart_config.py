@@ -31,7 +31,7 @@ CONFIG_BASE = {
     "hideLegend": False,
     "tab": "chart",
     "logo": "owid",
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.006.json",
     "showYearLabels": False,
     "id": 807,
     "selectedFacetStrategy": "none",
@@ -41,7 +41,7 @@ CONFIG_BASE = {
     "version": 14,
     "sortOrder": "desc",
     "maxTime": "latest",
-    "type": "LineChart",
+    "chartTypes": ["LineChart"],
     "hideRelativeToggle": True,
     "addCountryMode": "add-country",
     "hideAnnotationFieldsInTitle": {"entity": False, "changeInPrefix": False, "time": False},
@@ -65,7 +65,6 @@ CONFIG_BASE = {
     "missingDataStrategy": "auto",
     "isPublished": False,
     "timelineMinTime": "earliest",
-    "hasChartTab": True,
     "timelineMaxTime": "latest",
     "sortBy": "total",
 }
@@ -84,7 +83,7 @@ def bake_chart_config(
 
     Bakes a very basic config, which will be enough most of the times. If you want a more complex config, use this as a baseline to adjust to your needs.
 
-    Note: You can find more details on our Grapher API at https://files.ourworldindata.org/schemas/grapher-schema.005.json.
+    Note: You can find more details on our Grapher API at https://files.ourworldindata.org/schemas/grapher-schema.latest.json.
 
     """
     # Define chart config

@@ -5,7 +5,7 @@ description = ""
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
 ]
-requires-python = ">=3.10, <3.12"
+requires-python = ">=3.10, <3.13"
 dependencies = [
     "click>=8.0.1",
     "PyYAML>=6.0.1",
@@ -129,8 +129,11 @@ wizard = [
     "streamlit-feedback>=0.1.3",
     "statsmodels>=0.14.4",
     # Starting from PyTorch 2.3.0, the minimum requirement for macOS is macOS 11.0+ ARM64. Some poor people on the team still use it. Jeez...
+    # Torch doesn't work with python 3.13
+    # error: distribution torch==2.2.2 @ registry+https://pypi.org/simple can't be installed because it doesn't have a source distribution or wheel for the current platform
     "torch<2.3.0",
     "sentence-transformers>=2.2.2",
+    "moviepy>=2.1.1",
 ]
 
 [project.scripts]
