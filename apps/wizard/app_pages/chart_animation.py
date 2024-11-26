@@ -192,7 +192,7 @@ if st.session_state.chart_animation_show_image_settings:
     if st.button(
         "Delete images",
         disabled=not st.session_state.chart_animation_images_exist,
-        help=f"Delete images in folder: {st.session_state.chart_animation_images_folder}.",
+        help=f"To generate the animation, several chart images were downloaded and saved in in folder: `{st.session_state.chart_animation_images_folder}`. Click this button to delete them.",
     ):
         for image in st.session_state.chart_animation_image_paths:  # type: ignore
             image.unlink()
