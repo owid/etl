@@ -190,7 +190,6 @@ sections:
         icon: ":material/lightbulb:"
         image_url: "https://cdn.cpdonline.co.uk/wp-content/uploads/2023/08/03153310/Starting-To-Become-A-Writer-1200x350.jpg"
 
-
   - title: "Misc"
     description: |-
       Other helpful tools in the ETL ecosystem.
@@ -209,6 +208,13 @@ sections:
         entrypoint: app_pages/owidle.py
         icon: ":material/videogame_asset:"
         image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
+      - title: "Chart animation"
+        alias: chart-animation
+        description: "Create an animated GIF or a video from a chart"
+        maintainer: "@pablo"
+        entrypoint: app_pages/chart_animation.py
+        icon: ":material/animated_images:"
+        image_url: "https://img.freepik.com/free-photo/abstract-yellow-smooth-wave-lines_1017-24863.jpg"
 
   - title: "Metadata"
     description: |-
