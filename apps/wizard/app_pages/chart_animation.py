@@ -9,6 +9,7 @@ from apps.chart_animation.cli import (
     create_mp4_from_images,
     get_chart_slug,
     get_images_from_chart_url,
+    get_query_parameters_in_chart,
     get_years_in_chart,
 )
 from apps.wizard.utils.components import grapher_chart_from_url, st_horizontal, st_info
@@ -40,6 +41,9 @@ st.session_state.chart_animation_show_image_settings = st.session_state.get(
 )
 # NOTE: The range of years will be loaded automatically from the chart's metadata. We just define this range here to avoid typing issues.
 st.session_state.chart_animation_years = st.session_state.get("chart_animation_years", range(2000, 2022))
+st.session_state.chart_animation_years_selected = st.session_state.get(
+    "chart_animation_years_selected", st.session_state.chart_animation_years
+)
 st.session_state.chart_animation_max_num_years = MAX_NUM_YEARS
 
 # Step 1: Input chart URL and get years.
@@ -83,11 +87,12 @@ if st.session_state.chart_animation_show_image_settings:
 
     # SHOW OPTIONS FOR CHART
     with st.container(border=True):
+        query_parameters = get_query_parameters_in_chart(chart_url, all_years=st.session_state.chart_animation_years)
         # Create a slider to select min and max years.
         year_min, year_max = st.select_slider(
             "Select year range",
             options=st.session_state.chart_animation_years,
-            value=(min(st.session_state.chart_animation_years), max(st.session_state.chart_animation_years)),
+            value=(query_parameters["year_min"], query_parameters["year_max"]),
         )
 
         # Get the selected subset of years.
@@ -116,12 +121,14 @@ if st.session_state.chart_animation_show_image_settings:
             return f":material/{tab_name}: {tab_name}"
 
         # tab = st.radio("Select tab", ["map", "chart"], horizontal=True)
-        tab = st.segmented_control("Select tab", ["map", "chart"], format_func=add_icons_to_tabs, default="map")
+        tab = st.segmented_control(
+            "Select tab", ["map", "chart"], format_func=add_icons_to_tabs, default=query_parameters["tab"]
+        )
 
         if tab == "chart":
             year_range_open = st.toggle(
                 "Year range open",
-                value=True,
+                value=query_parameters["year_range_open"],
                 help="Only relevant for the chart view. If checked, the year range will be open. Uncheck if you want to generate a sequence of bar charts.",
             )
         else:

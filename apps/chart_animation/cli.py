@@ -89,6 +89,40 @@ def get_years_in_chart(chart_url):
     return years
 
 
+def get_query_parameters_in_chart(chart_url, all_years):
+    # Select default values.
+    year_range_open = True
+    year_start, year_end = min(all_years), max(all_years)
+    tab = "map"
+
+    # Attempt to get those parameters from the chart URL.
+    query_params = parse_qs(urlparse(chart_url).query)
+    if "time" in query_params:
+        time = query_params["time"][0]
+        if ".." in time:
+            year_range_open = True
+            year_start, year_end = time.split("..")
+            if year_start == "earliest":
+                year_start = min(all_years)
+            if year_end == "latest":
+                year_end = max(all_years)
+        else:
+            year_range_open = False
+            year_start = int(time)
+            year_end = year_start
+    if "tab" in query_params:
+        tab = query_params["tab"][0]
+
+    params = {
+        "year_range_open": year_range_open,
+        "year_min": int(year_start),
+        "year_max": int(year_end),
+        "tab": tab,
+    }
+
+    return params
+
+
 def modify_chart_url(chart_url, year, year_range_open, tab):
     # Take a chart URL, modify its parameters, and create a new URL for the PNG download.
     parsed_url = urlparse(chart_url)
