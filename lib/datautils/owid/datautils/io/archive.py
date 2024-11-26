@@ -3,7 +3,7 @@
 import tarfile
 import zipfile
 from pathlib import Path
-from typing import Union
+from typing import Union, cast
 
 from py7zr import SevenZipFile
 
@@ -32,6 +32,7 @@ def decompress_file(
     """
     if isinstance(input_file, str):
         input_file = Path(input_file)
+    input_file = cast(Path, input_file)
 
     if zipfile.is_zipfile(input_file):
         _decompress_zip_file(input_file, output_folder, overwrite)
