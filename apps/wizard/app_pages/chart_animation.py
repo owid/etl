@@ -142,6 +142,7 @@ if st.session_state.chart_animation_show_image_settings:
             ".gif" if output_type == "GIF" else ".mp4"
         )
         remove_duplicates = st.toggle("Remove duplicate frames", value=True)
+        social_media_square = st.toggle("Square format for social media", value=False)
         with st_horizontal():
             repetitions_last_frame = st.number_input("Repetitions of Last Frame", value=0, step=1)
             if output_type == "GIF":
@@ -159,6 +160,7 @@ if st.session_state.chart_animation_show_image_settings:
         chart_url=chart_url,
         png_folder=st.session_state.chart_animation_images_folder,
         tab=tab,
+        social_media_square=social_media_square,
         years=years,
         year_range_open=year_range_open,
         max_workers=None,
@@ -169,7 +171,9 @@ if st.session_state.chart_animation_show_image_settings:
     # Select only images that match the required parameters.
     image_paths_selected = [
         st.session_state.chart_animation_images_folder
-        / create_image_file_name(year=year, year_range_open=year_range_open, tab=tab)
+        / create_image_file_name(
+            year=year, year_range_open=year_range_open, tab=tab, social_media_square=social_media_square
+        )
         for year in years
     ]
 

@@ -123,7 +123,7 @@ def get_query_parameters_in_chart(chart_url, all_years):
     return params
 
 
-def modify_chart_url(chart_url, year, year_range_open, tab):
+def modify_chart_url(chart_url, year, year_range_open, tab, social_media_square):
     # Take a chart URL, modify its parameters, and create a new URL for the PNG download.
     parsed_url = urlparse(chart_url)
     path = parsed_url.path
@@ -135,6 +135,11 @@ def modify_chart_url(chart_url, year, year_range_open, tab):
         query_params["time"] = [f"earliest..{year}"]
     else:
         query_params["time"] = [str(year)]
+
+    if social_media_square:
+        query_params["imType"] = ["social-media-square"]
+        query_params["imSquareSize"] = ["1080"]
+
     query_params["tab"] = [tab]
     query_params["download"] = ["png"]
     updated_query = urlencode(query_params, doseq=True)
@@ -172,14 +177,17 @@ def get_chart_slug(chart_url):
     return urlparse(chart_url).path.split("/")[-1]
 
 
-def create_image_file_name(year, year_range_open, tab):
-    return f"{year}_{'open' if year_range_open else 'close'}_{tab}.png"
+def create_image_file_name(year, year_range_open, tab, social_media_square):
+    return (
+        f"{year}_{'open' if year_range_open else 'close'}_{tab}_{'square' if social_media_square else 'nonsquare'}.png"
+    )
 
 
 def get_images_from_chart_url(
     chart_url,
     png_folder,
     tab=None,
+    social_media_square=False,
     years=None,
     year_range_open=True,
     max_workers=None,
@@ -221,8 +229,11 @@ def get_images_from_chart_url(
         futures = {
             executor.submit(
                 download_chart_png,
-                modify_chart_url(chart_url, year, year_range_open, tab),
-                Path(png_folder) / create_image_file_name(year=year, year_range_open=year_range_open, tab=tab),
+                modify_chart_url(chart_url, year, year_range_open, tab, social_media_square),
+                Path(png_folder)
+                / create_image_file_name(
+                    year=year, year_range_open=year_range_open, tab=tab, social_media_square=social_media_square
+                ),
             ): year
             for year in years
         }
@@ -343,6 +354,11 @@ def create_mp4_from_images(
     help="Chart tab view (either map or chart). If not specified, it is inferred from URL, and otherwise defaults to map.",
 )
 @click.option(
+    "--social-media-square",
+    is_flag=True,
+    help="Create a square image for social media.",
+)
+@click.option(
     "--years",
     type=str,
     default=None,
@@ -405,6 +421,7 @@ def cli(
     output_format,
     output_file,
     tab,
+    social_media_square,
     years,
     year_range_open,
     duration,
@@ -442,6 +459,7 @@ def cli(
         chart_url=chart_url,
         png_folder=png_folder,
         tab=tab,
+        social_media_square=social_media_square,
         years=years,
         year_range_open=year_range_open,
         max_workers=max_workers,
