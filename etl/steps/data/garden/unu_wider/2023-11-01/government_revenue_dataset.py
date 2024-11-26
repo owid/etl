@@ -1,7 +1,15 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""
+Load a meadow dataset and create a garden dataset.
+
+NOTE: To extract the log of the process (to review sanity checks, for example), follow these steps:
+    1. Define LONG_FORMAT as True.
+    2. Run the following command in the terminal:
+        nohup uv run etl run government_revenue_dataset > output.log 2>&1 &
+"""
 
 from owid.catalog import Table
 from structlog import get_logger
+from tabulate import tabulate
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -10,6 +18,12 @@ log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Set table format when printing
+TABLEFMT = "pretty"
+
+# Define if I show the full table or just the first 5 rows for assertions
+LONG_FORMAT = True
 
 
 def run(dest_dir: str) -> None:
@@ -34,6 +48,9 @@ def run(dest_dir: str) -> None:
         df=tb,
         countries_file=paths.country_mapping_path,
     )
+
+    tb = sanity_checks(tb)
+
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
@@ -100,3 +117,47 @@ def drop_flagged_rows_and_unnecessary_columns(tb: Table) -> Table:
     )
 
     return tb
+
+
+def sanity_checks(tb: Table) -> None:
+    """
+    Perform sanity checks on the data.
+    """
+
+    tb = tb.copy()
+
+    tb = check_negative_values(tb)
+
+    return tb
+
+
+def check_negative_values(tb: Table):
+    """
+    Check if there are negative values in the variables
+    """
+
+    tb = tb.copy()
+
+    # Define columns as all the columns minus country and year
+    variables = [col for col in tb.columns if col not in ["country", "year"]]
+
+    for v in variables:
+        # Create a mask to check if any value is negative
+        mask = tb[v] < 0
+        any_error = mask.any()
+
+        if any_error:
+            tb_error = tb[mask].reset_index(drop=True).copy()
+            paths.log.warning(
+                f"""{len(tb_error)} observations for {v} are negative:
+                {_tabulate(tb_error[['country', 'year', v]], long_format=LONG_FORMAT)}"""
+            )
+
+    return tb
+
+
+def _tabulate(tb: Table, long_format: bool, headers="keys", tablefmt=TABLEFMT, **kwargs):
+    if long_format:
+        return tabulate(tb, headers=headers, tablefmt=tablefmt, **kwargs)
+    else:
+        return tabulate(tb.head(5), headers=headers, tablefmt=tablefmt, **kwargs)
