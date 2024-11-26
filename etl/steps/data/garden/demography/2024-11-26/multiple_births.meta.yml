@@ -5,54 +5,111 @@ definitions:
       topic_tags:
         - Fertility Rate
 
+    display:
+      entityAnnotationsMap: |-
+        Chile: Stillbirths excluded
+        South Korea: Stillbirths excluded
+        Czech Republic: Stillbirths included
+        Denmark: Stillbirths included
+        England and Wales: Stillbirths included
+        France: Stillbirths included
+        Greece: Stillbirths included
+        Italy: Stillbirths included
+        Lithuania: Stillbirths included
+        Netherlands: Stillbirths included
+        Norway: Stillbirths included
+        Spain: Stillbirths included
+        Sweden: Stillbirths included
+        Switzerland: Stillbirths included
+        Australia: Mixed
+        New Zealand: Mixed
+        Scotland: Mixed
+        United States: Mixed
+        Uruguay: Mixed
+        Austria: Stillbirths mostly included
+        Canada: Stillbirths mostly included
+        Finland: Stillbirths mostly included
+        Germany: Stillbirths mostly included
+        Japan: Stillbirths mostly included
+
+    description_processing: |-
+      Data sometimes includes stillbirths, therefore comparability across countries should be done with care.
+
+      Countries including stillbirths:
+        - Czech Republic
+        - Denmark
+        - England and Wales
+        - France
+        - Greece
+        - Italy
+        - Lithuania
+        - Netherlands
+        - Norway
+        - Spain
+        - Sweden
+        - Switzerland
+        - Austria: Unknown for 1920, 1921, 1928, 1929, 1931, 1934
+        - Canada: Unknown for 1921-1925, 1927-1990
+        - Finland: Unknown for 1906-1936, 1941-1999
+        - Germany: Unknown for 1906-1936
+        - Japan: Unknown for 1923-1936
+
+      Countries excluding stillbirths:
+        - Chile
+        - South Korea
+
+      Countries with mixed practices:
+        - Australia
+        - United States
+        - Uruguay
+        - New Zealand: Excluded for 1856-1915, included otherwise.
+        - Scotland: Excluded for 1856-1938, included otherwise.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
-
 tables:
   multiple_births:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
-
+      singletons:
+        title: Singleton deliveries
+        unit: "deliveries"
+        description_short: |-
+          Number of single deliveries.
+      twin_deliveries:
+        title: Twin deliveries
+        unit: "deliveries"
+        description_short: |-
+          "Number of twin deliveries."
+      multiple_deliveries:
+        title: Multiple deliveries
+        unit: "deliveries"
+        description_short: |-
+          "Total number of multiple deliveries (i.e. the sum of twin, triplet, and quadruplet+ deliveries)."
+      total_deliveries:
+        title: Total deliveries
+        unit: "deliveries"
+        description_short: |-
+          "Total number of deliveries (i.e., single and multiple deliveries combined)"
+      singleton_rate:
+        title: Singleton rate
+        unit: "twin deliveries per total deliveries"
+        description_short: |-
+          "Number of single deliveries divided by the total number of deliveries, per 1,000 people."
+      twinning_rate:
+        title: Twinning rate
+        unit: "twin deliveries per 1,000 deliveries"
+        description_short: |-
+          "Number of twin deliveries divided by the total number of deliveries, per 1,000 people."
+      multiple_rate:
+        title: Multiple rate
+        unit: "multiple deliveries per 1,000 deliveries"
+        description_short: |-
+          "Number of multiple deliveries divided by the total number of deliveries, per 1,000 people."
+      children_delivery_ratio:
+        title: "Children per multiple delivery"
+        unit: "children per 1,000 multiple deliveries"
+        description_short: |-
+          Number of children born in multiple deliveries divided by the total number of multiple deliveries, per 1,000 people. Gives an indication of the average number of children born in multiple deliveries.
