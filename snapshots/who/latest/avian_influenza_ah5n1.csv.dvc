@@ -12,12 +12,12 @@ meta:
       Human Cases with Highly Pathogenic Avian Influenza A/H5N1. World Health Organization, Global Influenza Programme; 2024. Licence: CC BY-NC-SA 3.0 IGO. Retrieved from CDC May 23, 2024.
     attribution_short: WHO
     url_main: https://www.cdc.gov/bird-flu/php/avian-flu-summary/chart-epi-curve-ah5n1.html
-    date_accessed: 2024-09-30
-    date_published: "2024-08-07"
+    date_accessed: 2024-11-26
+    date_published: "2024-10-26"
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
 outs:
-  - md5: 8eb1eab7b38b2c98dcb750c23e926acf
-    size: 24467
+  - md5: 79b4747eae76381d715acba09196ca23
+    size: 24674
     path: avian_influenza_ah5n1.csv
