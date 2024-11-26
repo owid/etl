@@ -1026,7 +1026,7 @@ dev = [
     { name = "argh", specifier = ">=0.31.3" },
     { name = "boto3-stubs", extras = ["s3"], specifier = ">=1.34.154" },
     { name = "cookiecutter", specifier = ">=2.6.0" },
-    { name = "gspread", specifier = ">=5.12.4" },
+    { name = "gspread", specifier = ">=5.12.4,<6.0.0" },
     { name = "hydra-core", specifier = ">=1.3.2" },
     { name = "ipdb", specifier = ">=0.13.13" },
     { name = "ipython", specifier = ">=8.14.0,<8.15.0" },
@@ -1555,15 +1555,15 @@ wheels = [
 
 [[package]]
 name = "gspread"
-version = "6.1.4"
+version = "5.12.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "google-auth" },
     { name = "google-auth-oauthlib" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/48/76/d23fcdef5d8137513b64f7447849369983078e4025100d9149d5c8222e5a/gspread-6.1.4.tar.gz", hash = "sha256:b8eec27de7cadb338bb1b9f14a9be168372dee8965c0da32121816b5050ac1de", size = 78251 }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/5d/8e822fcdb4c1237399cd4a3c8d235f02bad897d81f64f587fbee3e543e88/gspread-5.12.4.tar.gz", hash = "sha256:3fcef90183f15d3c9233b4caa021a83682f2b2ee678340c42d7ca7d8be98c6d1", size = 69868 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/47/c7/28ad61476626d635288d1671326f6540145778a5f2fc9f907ad4d929ba90/gspread-6.1.4-py3-none-any.whl", hash = "sha256:c34781c426031a243ad154952b16f21ac56a5af90687885fbee3d1fba5280dcd", size = 57574 },
+    { url = "https://files.pythonhosted.org/packages/22/25/7457afe296c3c7ad6ec374c91ecefe3da2c6585fa4b2818e00ee3546a33d/gspread-5.12.4-py3-none-any.whl", hash = "sha256:1e453d87e0fde23bc5546e33eb684cf8b8c26540615f2f1ae004a9084a29051d", size = 49511 },
 ]
 
 [[package]]

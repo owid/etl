@@ -90,7 +90,8 @@ dev-dependencies = [
     "types-pyyaml>=6.0.12.20240808",
     "hydra-core>=1.3.2",
     "boto3-stubs[s3]>=1.34.154",
-    "gspread>=5.12.4",
+    # ETL unit tests fail on version "6.1.4", something would need to be adjusted in fasttrack_backport.
+    "gspread>=5.12.4, <6.0.0",
     "jsonref>=1.1.0",
     "mkdocs-material>=9.5.34",
     "mkdocs-jupyter>=0.24.8",
