@@ -162,9 +162,9 @@ if st.session_state.chart_animation_show_image_settings:
         # If chart, show option to just show single year
         if tab == "chart":
             year_range_open = not st.toggle(
-                "Show only current year",
+                "Show single year",
                 value=not query_parameters["year_range_open"],
-                help="Only relevant for the chart view. If checked, the animated chart will display a sequence of bar charts with current year.",
+                help="Only relevant for the chart view. If checked, the animated chart will only display a single year per frame. For LineCharts, this means a sequence of bar charts. For ScatterCharts, this means a sequence of bubbles (and not vectors).",
             )
         else:
             year_range_open = True
