@@ -1,14 +1,14 @@
 meta:
   origin:
-    producer: 'Global trends in antimicrobial use in food-producing animals: 2020 to 2030 (Mulchandani et al., 2023)'
-    title: Antibiotic usage in livestock (Mulchandani et al., 2023)
+    producer: Mulchandani et al. (2023)
+    title: 'Global trends in antimicrobial use in food-producing animals: 2020 to 2030'
     description: |-
       Data on usage of antimicrobials in food animals were collected from 42 countries. Multivariate regression models were used in combination with projections of animal counts for cattle, sheep, chicken, and pigs from the Food and Agriculture Organization to estimate global antimicrobial usage of veterinary antimicrobials in 2020 and 2030. Maps of animal densities were used to identify geographic hotspots of antimicrobial use. In each country, estimates of antimicrobial use (tonnes) were calibrated to match continental-level reports of antimicrobial use intensity (milligrams per kilogram of animal) from the World Organization for Animal Health, as well as country-level reports of antimicrobial use from countries that made this information publicly available.
     citation_full: |-
       Mulchandani, R., Wang, Y., Gilbert, M., & Van Boeckel, T. P. (2023). Global trends in antimicrobial use in food-producing animals: 2020 to 2030. PLOS Global Public Health, 3(2), e0001305. https://doi.org/10.1371/journal.pgph.0001305
     url_main: https://journals.plos.org/globalpublichealth/article?id=10.1371/journal.pgph.0001305
     url_download: |-
-      gAAAAABnRY6GKNSPcor7sq8Jz8wRi1BLSm1E4yKAxE4XUOvoDzucGD4Ofv4vq5Z74mVx0bW1HWBui_acOgqs85oyvljgrGWXBjUkEaP0y1jQkVziKjF8Q9pPkOu85FoIa2zzNNOS3rYFxJMJvGIyGV2CIDR7CqdN8Uh3XRKKMqV4PL9ZZETZQtkmPhgqMye_TF2KEofjyTVnlh6dqijLT5rJuuLudtbZAxHvrXmx6mJDW8YveVkDexBzwCSxnw1L_yCsbWqwHqJc
+      gAAAAABnRZJtJagGwio4A8B3H6-jsxNa4M3zZtR92Arl_amq659ebrzeaxRovvWxLH4v5lvmoTALQnfL2aC7g2J8SSkjrgOPMLZXqOtoECV4ISER2UrZ9lbQUCsOS9-Cbc52-I1joAi2QwDz0J4UV5ufumvj0rYVGmv6YdPAypyrHbpnd893i21f-l7IULYWBQSdPCrRAUV0RlAXURJuGd1dVadThd_gwBgMdxYmxuh4EUvxSSHVQG_I4pYURJQGNOuNI59qAJa5
     date_accessed: '2024-11-26'
     date_published: '2023-02-01'
     license:
