@@ -9,7 +9,6 @@ definitions:
       attribution_short: World Bank
       grapher_config:
         originUrl: https://ourworldindata.org/poverty
-        $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
     processing_level: major
 
 
@@ -406,7 +405,6 @@ tables:
               - Nigeria
               - Bangladesh
             originUrl: https://ourworldindata.org/poverty
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
 
       gini:
         presentation:
