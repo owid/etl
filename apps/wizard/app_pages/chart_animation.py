@@ -166,7 +166,7 @@ if st.session_state.chart_animation_show_image_settings:
         # If chart, show option to just show single year
         if tab == "chart":
             year_range_open = not st.toggle(
-                "Chart: Only show current year",
+                "Show only current year",
                 value=not query_parameters["year_range_open"],
                 help="Only relevant for the chart view. If checked, the animated chart will display a sequence of bar charts with current year.",
             )
@@ -201,7 +201,7 @@ if st.session_state.chart_animation_show_image_settings:
                     min_value=duration,
                     value=duration,
                     step=duration,
-                    help="",
+                    help="Increase this to make the last frame last longer.",
                 )
                 repetitions_last_frame = repetitions_last_frame // duration - 1
                 if output_type == "GIF":
