@@ -23,7 +23,7 @@ paths = PathFinder(__file__)
 TABLEFMT = "pretty"
 
 # Define if I show the full table or just the first 5 rows for assertions
-LONG_FORMAT = True
+LONG_FORMAT = False
 
 
 def run(dest_dir: str) -> None:
@@ -41,15 +41,11 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
-    tb = drop_flagged_rows_and_unnecessary_columns(tb)
-
-    #
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
     )
-
-    tb = sanity_checks(tb)
+    tb = drop_flagged_rows_and_unnecessary_columns(tb)
 
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
@@ -109,11 +105,19 @@ def drop_flagged_rows_and_unnecessary_columns(tb: Table) -> Table:
             "cautionnotes",
             "resourcerevenuenotes",
             "socialcontributionsnotes",
+        ]
+    )
+
+    tb = sanity_checks(tb)
+
+    # Remove all caution columns
+    tb = tb.drop(
+        columns=[
+            "caution1accuracyqualityorco",
             "caution2resourcerevenuestax",
             "caution3unexcludedresourcere",
             "caution4inconsistencieswiths",
         ]
-        + caution_variables
     )
 
     return tb
@@ -139,7 +143,18 @@ def check_negative_values(tb: Table):
     tb = tb.copy()
 
     # Define columns as all the columns minus country and year
-    variables = [col for col in tb.columns if col not in ["country", "year"]]
+    variables = [
+        col
+        for col in tb.columns
+        if col
+        not in ["country", "year"]
+        + [
+            "caution1accuracyqualityorco",
+            "caution2resourcerevenuestax",
+            "caution3unexcludedresourcere",
+            "caution4inconsistencieswiths",
+        ]
+    ]
 
     for v in variables:
         # Create a mask to check if any value is negative
@@ -150,7 +165,7 @@ def check_negative_values(tb: Table):
             tb_error = tb[mask].reset_index(drop=True).copy()
             paths.log.warning(
                 f"""{len(tb_error)} observations for {v} are negative:
-                {_tabulate(tb_error[['country', 'year', v]], long_format=LONG_FORMAT)}"""
+                {_tabulate(tb_error[['country', 'year', 'caution1accuracyqualityorco', 'caution2resourcerevenuestax','caution3unexcludedresourcere','caution4inconsistencieswiths',v]], long_format=LONG_FORMAT)}"""
             )
 
     return tb
