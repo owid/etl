@@ -224,8 +224,8 @@ nav:
           - Regular updates: "guides/auto-regular-updates.md"
           - Pull requests: "guides/pull-requests.md"
       - Servers & settings:
-          - Environments: "guides/environment.md"
           - Upgrade Python version: "guides/upgrade-python-version.md"
+          - Environments: "guides/environment.md"
           - Staging servers: "guides/staging-servers.md"
           - Public servers: "guides/sharing-external.md"
           - Private datasets: "guides/private-import.md"
