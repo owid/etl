@@ -101,6 +101,7 @@ def run(dest_dir: str) -> None:
 
     # Estimate children_per_delivery
     tb["children_delivery_ratio"] = (1_000 * tb["multiple_children"] / tb["multiple_deliveries"]).round(3)
+    tb["multiple_to_singleton_ratio"] = (1_000 * tb["multiple_delivery"] / tb["singletons"]).round(3)
 
     # Keep relevant columns
     tb = tb[
@@ -117,8 +118,9 @@ def run(dest_dir: str) -> None:
             "singleton_rate",
             "twinning_rate",
             "multiple_rate",
-            # Ratio
+            # Ratios
             "children_delivery_ratio",
+            "multiple_to_singleton_ratio",
         ]
     ]
 

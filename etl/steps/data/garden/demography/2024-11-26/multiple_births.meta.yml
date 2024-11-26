@@ -113,3 +113,8 @@ tables:
         unit: "children per 1,000 multiple deliveries"
         description_short: |-
           Number of children born in multiple deliveries divided by the total number of multiple deliveries, per 1,000 people. Gives an indication of the average number of children born in multiple deliveries.
+      multiple_to_singleton_ratio:
+        title: "Multiple children to singleton ratio"
+        unit: "multiple deliveries per 1,000 single delivery"
+        description_short: |-
+          "Number of multiple deliveries divided by the number of single deliveries, per 1,000 people."
