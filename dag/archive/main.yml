@@ -263,6 +263,14 @@ steps:
   data://grapher/countries/2023-10-01/gleditsch:
     - data://garden/countries/2023-09-25/gleditsch
 
+    # International Monetary Fund, World Economic Outlook
+  data://meadow/imf/2024-05-02/world_economic_outlook:
+    - snapshot://imf/2024-05-02/world_economic_outlook.xls
+  data://garden/imf/2024-05-02/world_economic_outlook:
+    - data://meadow/imf/2024-05-02/world_economic_outlook
+  data://grapher/imf/2024-05-02/world_economic_outlook:
+    - data://garden/imf/2024-05-02/world_economic_outlook
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
