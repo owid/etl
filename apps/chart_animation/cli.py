@@ -138,6 +138,10 @@ def get_chart_slug(chart_url):
     return urlparse(chart_url).path.split("/")[-1]
 
 
+def create_image_file_name(year, year_range_open, tab):
+    return f"{year}_{'open' if year_range_open else 'close'}_{tab}.png"
+
+
 def get_images_from_chart_url(
     chart_url,
     png_folder,
@@ -184,7 +188,7 @@ def get_images_from_chart_url(
             executor.submit(
                 download_chart_png,
                 modify_chart_url(chart_url, year, year_range_open, tab),
-                Path(png_folder) / f"{year}.png",
+                Path(png_folder) / create_image_file_name(year=year, year_range_open=year_range_open, tab=tab),
             ): year
             for year in years
         }

@@ -5,6 +5,7 @@ from apps.chart_animation.cli import (
     DOWNLOADS_DIR,
     MAX_NUM_YEARS,
     create_gif_from_images,
+    create_image_file_name,
     create_mp4_from_images,
     get_chart_slug,
     get_images_from_chart_url,
@@ -117,11 +118,14 @@ if st.session_state.chart_animation_show_image_settings:
         # tab = st.radio("Select tab", ["map", "chart"], horizontal=True)
         tab = st.segmented_control("Select tab", ["map", "chart"], format_func=add_icons_to_tabs, default="map")
 
-        year_range_open = st.toggle(
-            "Year range open",
-            value=True,
-            help="Only relevant for the chart view. If checked, the year range will be open. Uncheck if you want to generate a sequence of bar charts.",
-        )
+        if tab == "chart":
+            year_range_open = st.toggle(
+                "Year range open",
+                value=True,
+                help="Only relevant for the chart view. If checked, the year range will be open. Uncheck if you want to generate a sequence of bar charts.",
+            )
+        else:
+            year_range_open = True
 
         # GIF settings.
         # output_type = st.radio("Output Type", ["GIF", "Video"], horizontal=True)
@@ -137,61 +141,61 @@ if st.session_state.chart_animation_show_image_settings:
             duration = st.number_input("Duration (ms)", value=200, step=10)
         duration_of = st.radio("Duration of", ["Each frame", "Entire animation"], horizontal=True)
 
-        with st_horizontal():
-            # Button to generate images.
-            if st.button(
-                "Animate",
-                help=f'Get images for selected years. Years for which there is already a file in `{st.session_state.chart_animation_images_folder}` will be skipped.\nEither delete them all (using "Delete images") or continue to get images for remaining years (if any is missing).',
-                type="primary",
-            ):
-                st.session_state.chart_animation_image_paths = get_images_from_chart_url(
-                    chart_url=chart_url,
-                    png_folder=st.session_state.chart_animation_images_folder,
-                    tab=tab,
-                    years=years,
-                    year_range_open=year_range_open,
-                    max_workers=None,
-                    max_num_years=st.session_state.chart_animation_max_num_years,
-                )
-                st.session_state.chart_animation_images_exist = len(st.session_state.chart_animation_image_paths) > 0  # type: ignore
+    # Fetch all needed images (skipping the ones that already exist).
+    st.session_state.chart_animation_image_paths = get_images_from_chart_url(
+        chart_url=chart_url,
+        png_folder=st.session_state.chart_animation_images_folder,
+        tab=tab,
+        years=years,
+        year_range_open=year_range_open,
+        max_workers=None,
+        max_num_years=st.session_state.chart_animation_max_num_years,
+    )
+    st.session_state.chart_animation_images_exist = len(st.session_state.chart_animation_image_paths) > 0  # type: ignore
 
-            # Button to delete the folder.
-            if st.button(
-                "Delete images",
-                disabled=not st.session_state.chart_animation_images_exist,
-                help=f"Delete images in folder: {st.session_state.chart_animation_images_folder}.",
-            ):
-                for image in st.session_state.chart_animation_image_paths:  # type: ignore
-                    image.unlink()
-                # Update session state to reflect that images are deleted.
-                st.session_state.chart_animation_images_exist = False
-                st.toast("✅ Images deleted.")
+    # Select only images that match the required parameters.
+    image_paths_selected = [
+        st.session_state.chart_animation_images_folder
+        / create_image_file_name(year=year, year_range_open=year_range_open, tab=tab)
+        for year in years
+    ]
 
-    # GIF generation.
-    if st.session_state.chart_animation_images_exist:
-        if output_type == "GIF":
-            st.session_state.chart_animation_gif_file = create_gif_from_images(
-                image_paths=st.session_state.chart_animation_image_paths,
-                output_file=st.session_state.chart_animation_gif_file,
-                duration=duration,
-                loops=loop_count,  # type: ignore
-                remove_duplicate_frames=remove_duplicates,
-                repetitions_last_frame=repetitions_last_frame,
-                duration_of_animation=duration_of == "Entire animation",
-            )
-            # GIF preview.
-            st_info('Animation preview. Right click and "Save Image As..." to download it.')
-            st.image(str(st.session_state.chart_animation_gif_file), use_container_width=True)
-        else:
-            st.session_state.chart_animation_gif_file = create_mp4_from_images(
-                image_paths=st.session_state.chart_animation_image_paths,
-                output_file=st.session_state.chart_animation_gif_file,
-                duration=duration,
-                remove_duplicate_frames=remove_duplicates,
-                repetitions_last_frame=repetitions_last_frame,
-                duration_of_animation=duration_of == "Entire animation",
-            )
-            # Video preview
-            st_info('Animation preview. Right click and "Save video as..." to download it.')
-            with open(str(st.session_state.chart_animation_gif_file), "rb") as video_file:
-                st.video(video_file.read(), format="video/mp4", autoplay=True)
+    # GIF/Video generation.
+    if output_type == "GIF":
+        st.session_state.chart_animation_gif_file = create_gif_from_images(
+            image_paths=image_paths_selected,
+            output_file=st.session_state.chart_animation_gif_file,
+            duration=duration,
+            loops=loop_count,  # type: ignore
+            remove_duplicate_frames=remove_duplicates,
+            repetitions_last_frame=repetitions_last_frame,
+            duration_of_animation=duration_of == "Entire animation",
+        )
+        # GIF preview.
+        st_info('Animation preview. Right click and "Save Image As..." to download it.')
+        st.image(str(st.session_state.chart_animation_gif_file), use_container_width=True)
+    else:
+        st.session_state.chart_animation_gif_file = create_mp4_from_images(
+            image_paths=image_paths_selected,
+            output_file=st.session_state.chart_animation_gif_file,
+            duration=duration,
+            remove_duplicate_frames=remove_duplicates,
+            repetitions_last_frame=repetitions_last_frame,
+            duration_of_animation=duration_of == "Entire animation",
+        )
+        # Video preview
+        st_info('Animation preview. Right click and "Save video as..." to download it.')
+        with open(str(st.session_state.chart_animation_gif_file), "rb") as video_file:
+            st.video(video_file.read(), format="video/mp4", autoplay=True)
+
+    # Button to delete all images in the folder.
+    if st.button(
+        "Delete images",
+        disabled=not st.session_state.chart_animation_images_exist,
+        help=f"Delete images in folder: {st.session_state.chart_animation_images_folder}.",
+    ):
+        for image in st.session_state.chart_animation_image_paths:  # type: ignore
+            image.unlink()
+        # Update session state to reflect that images are deleted.
+        st.session_state.chart_animation_images_exist = False
+        st.toast("✅ Images deleted.")
