@@ -66,6 +66,7 @@ dependencies = [
     "walden",
     "deprecated>=1.2.14",
     "scikit-learn>=1.5.2",
+    "py7zr>=0.22.0",
 ]
 
 [tool.uv.sources]
