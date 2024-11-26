@@ -827,7 +827,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("gas_and_electricity_prices")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read_table("gas_and_electricity_prices")
+    tb = ds_meadow.read("gas_and_electricity_prices")
 
     #
     # Process data.
