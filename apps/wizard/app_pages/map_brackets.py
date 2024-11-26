@@ -138,7 +138,7 @@ def create_default_chart_config_for_variable(metadata: Dict[str, Any]) -> Dict[s
     """Create a default chart for a variable with id `variable_id`."""
     chart_config = {
         "hasMapTab": True,
-        "hasChartTab": False,
+        "chartTypes": [],
         "tab": "map",
         "map": {
             # "timeTolerance": 0,
