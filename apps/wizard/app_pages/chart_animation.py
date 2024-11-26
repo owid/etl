@@ -75,13 +75,9 @@ if not st.session_state.chart_animation_images_folder.exists():
     # Create the default output folder if it doesn't exist.
     st.session_state.chart_animation_images_folder.mkdir(parents=True)
 image_paths = [image for image in st.session_state.chart_animation_images_folder.iterdir() if image.suffix == ".png"]
-set_states(
-    {
-        "chart_animation_gif_file": DOWNLOADS_DIR / f"{slug}.gif",
-        "chart_animation_image_paths": image_paths,
-        "chart_animation_images_exist": len(image_paths) > 0,
-    }
-)
+st.session_state.chart_animation_gif_file = DOWNLOADS_DIR / f"{slug}.gif"
+st.session_state.chart_animation_image_paths = image_paths
+st.session_state.chart_animation_images_exist = len(image_paths) > 0
 
 # Button
 if st.button(
