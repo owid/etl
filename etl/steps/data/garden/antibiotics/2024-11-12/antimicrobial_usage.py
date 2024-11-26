@@ -35,8 +35,9 @@ def run(dest_dir: str) -> None:
 
     tb_class = tb_class.format(["country", "year", "antimicrobialclass", "atc4name", "routeofadministration"])
     tb_aware = tb_aware.format(["country", "year", "awarelabel"])
+    tb_class_agg = format_notes(tb_class_agg)
     tb_class_agg = tb_class_agg.format(["country", "year", "antimicrobialclass"], short_name="class_aggregated")
-    tb_class = format_notes(tb_class_agg)
+
     #
     # Save outputs.
     #
@@ -56,7 +57,15 @@ def aggregate_antimicrobial_classes(tb_class: Table) -> Table:
     """
     Aggregating by antimicrobial class
     """
-
+    # Combine antitubercolosis into antibacterials
+    tb_class["antimicrobialclass"] = tb_class["antimicrobialclass"].astype(str)
+    tb_class["antimicrobialclass"] = tb_class["antimicrobialclass"].replace(
+        {
+            "Drugs for the treatment of tuberculosis (ATC J04A)": "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)",
+            "Antibacterials (ATC J01, A07AA, P01AB)": "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)",
+        },
+    )
+    assert len(tb_class["antimicrobialclass"].unique()) == 4
     tb_class = tb_class.groupby(["country", "year", "antimicrobialclass", "notes"])[["ddd", "did"]].sum().reset_index()
 
     return tb_class
