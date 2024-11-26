@@ -3,11 +3,6 @@ dataset:
   description: ''
   licenses:
     - {}
-  sources:
-    - name: 'Sentience Institute. Animals, Food, and Technology (AFT) Survey: 2021 Update.'
-      url: https://www.sentienceinstitute.org/aft-survey-2021
-      publication_year: '2021'
-      published_by: Sentience Institute
 tables:
   sentience_institute:
     variables:

@@ -1,21 +1,16 @@
 dataset:
-  sources:
-  - name: Paratz et al., (2023)
-    published_by: Heart Rhythm Journal
-    publication_year: 2023
-    date_accessed: 2023-07-13
-    url: https://www.heartrhythmjournal.com/article/S1547-5271(23)00027-9/fulltext
+  title: A systematic review of global autopsy rates in all-cause mortality and young sudden death, Paratz et al (2023)
+  description: |-
+    The data for this indicator is taken from: Paratz ED, Rowe SJ, Stub D, Pflaumer A, La Gerche A. A systematic review of global autopsy rates in all-cause mortality and young sudden death. Heart Rhythm. 2023 Apr;20(4):607-613. doi: 10.1016/j.hrthm.2023.01.008.
+
+    The data is collated from a number of published papers and databases. The year shown reflects the date given in the database or the year of the publication. For Spain and Australia the data is only representative of a region of each country, Catalonia and Victoria, respectively.
+  licenses:
+    - {}
 tables:
   paratz:
     variables:
       autopsy_rate:
         title: Autopsy rate
-        short_unit: '%'
         unit: '%'
+        short_unit: '%'
         description: Autopsy rates reported in all-cause death.
-        sources:
-        - name: Paratz et al., (2023)
-          published_by: Heart Rhythm Journal
-          publication_year: 2023
-          date_accessed: 2023-07-13
-          url: https://www.heartrhythmjournal.com/article/S1547-5271(23)00027-9/fulltext
