@@ -24,6 +24,8 @@ def run(dest_dir: str) -> None:
     #
     tb_class = geo.harmonize_countries(df=tb_class, countries_file=paths.country_mapping_path)
     tb_aware = geo.harmonize_countries(df=tb_aware, countries_file=paths.country_mapping_path)
+    # Aggregate by antimicrobial class
+    tb_class_agg = aggregate_antimicrobial_classes(tb_class)
 
     # Drop columns that are not needed in the garden dataset.
     tb_class = tb_class.drop(
@@ -31,13 +33,10 @@ def run(dest_dir: str) -> None:
     )
     tb_aware = tb_aware.drop(columns=["whoregioncode", "whoregionname", "incomeworldbankjune", "aware", "notes"])
 
-    # Aggregate by antimicrobial class
-    tb_class_agg = aggregate_antimicrobial_classes(tb_class)
-
     tb_class = tb_class.format(["country", "year", "antimicrobialclass", "atc4name", "routeofadministration"])
     tb_aware = tb_aware.format(["country", "year", "awarelabel"])
     tb_class_agg = tb_class_agg.format(["country", "year", "antimicrobialclass"], short_name="class_aggregated")
-
+    tb_class = format_notes(tb_class_agg)
     #
     # Save outputs.
     #
@@ -58,6 +57,32 @@ def aggregate_antimicrobial_classes(tb_class: Table) -> Table:
     Aggregating by antimicrobial class
     """
 
-    tb_class = tb_class.groupby(["country", "year", "antimicrobialclass"])[["ddd", "did"]].sum().reset_index()
+    tb_class = tb_class.groupby(["country", "year", "antimicrobialclass", "notes"])[["ddd", "did"]].sum().reset_index()
 
     return tb_class
+
+
+def format_notes(tb: Table) -> Table:
+    """
+    Format notes column
+    """
+    for note in tb["notes"].unique():
+        msk = tb["notes"] == note
+        tb_note = tb[msk]
+        countries = tb_note["country"].unique()
+        countries_formatted = combine_countries(countries)
+        description_processing_string = f"In {countries_formatted}: {note}"
+        tb.loc[msk, "description_processing"] = description_processing_string
+    return tb
+
+
+def combine_countries(countries):
+    # Combine countries into a string
+    if not countries:
+        return ""
+    elif len(countries) == 1:
+        return countries[0]
+    elif len(countries) == 2:
+        return " and ".join(countries)
+    else:
+        return ", ".join(countries[:-1]) + " and " + countries[-1]
