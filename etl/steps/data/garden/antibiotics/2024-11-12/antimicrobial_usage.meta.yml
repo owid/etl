@@ -56,12 +56,12 @@ tables:
   class_aggregated:
     variables:
       ddd:
-        title: Defined daily doses of {definitions.antimicrobialclass} used
+        title: Defined daily doses of <<antimicrobialclass>> used
         description_short: Volume of antimicrobials used in a given year.
         description_processing: <<description_processing>>
         unit: defined daily doses
       did:
-        title: Defined daily doses per 1000 inhabitants per day of {definitions.antimicrobialclass} used
+        title: Defined daily doses per 1000 inhabitants per day of <<antimicrobialclass>> used
         description_short: Volume of antimicrobials used per 1000 inhabitants per day.
         description_processing: <<description_processing>>
         unit: defined daily doses per 1000 inhabitants per day
