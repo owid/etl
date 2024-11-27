@@ -13,7 +13,10 @@ Arguments:
 etl pr "some title for the PR"
 
 # With a category
-etl rp "some title for the PR" data
+etl pr "some title for the PR" data
+
+# With private stating server
+etl pr "some title for the PR" --private
 ```
 
 **Custom use case (1)**: Same as main use case, but with a specific branch name for the `work_branch`.
@@ -122,6 +125,12 @@ SHELL_FORM_STYLE = questionary.Style(
     is_flag=True,
     help="Directly create a PR from the current branch to the target branch (default: master).",
 )
+@click.option(
+    "--private",
+    "-p",
+    is_flag=True,
+    help="By default, staging server site (not admin) will be publicly accessible. Use --private to have it private instead. This does not apply when using --direct mode.",
+)
 def cli(
     title: str,
     category: Optional[str],
@@ -129,6 +138,7 @@ def cli(
     work_branch: Optional[str],
     base_branch: str,
     direct: bool,
+    private: bool,
     # base_branch: Optional[str] = None,
 ) -> None:
     # Check that the user has set up a GitHub token.
@@ -163,6 +173,9 @@ def cli(
 
     # Auto PR mode: Create a new branch from the base branch.
     if not direct:
+        if private:
+            if not work_branch.endswith("-private"):
+                work_branch = f"{work_branch}-private"
         branch_out(repo, base_branch, work_branch)
 
     # Create PR
