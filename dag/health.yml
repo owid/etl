@@ -926,3 +926,32 @@ steps:
     - data://meadow/antibiotics/2024-11-15/testing_coverage
   data://grapher/antibiotics/2024-11-15/testing_coverage:
     - data://garden/antibiotics/2024-11-15/testing_coverage
+
+  # IHME Neonatal all infectious syndromes
+  data-private://meadow/antibiotics/2024-11-20/microbe:
+    - snapshot-private://antibiotics/2024-11-20/microbe.zip
+  data-private://garden/antibiotics/2024-11-20/microbe:
+    - data-private://meadow/antibiotics/2024-11-20/microbe
+  data-private://grapher/antibiotics/2024-11-20/microbe:
+    - data-private://garden/antibiotics/2024-11-20/microbe
+  # IHME Neonatal bloodstream infections by pathogen
+  data-private://meadow/antibiotics/2024-11-20/pathogen_bloodstream:
+    - snapshot-private://antibiotics/2024-11-20/pathogen_bloodstream.csv
+  data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream:
+    - data-private://meadow/antibiotics/2024-11-20/pathogen_bloodstream
+  data-private://grapher/antibiotics/2024-11-20/pathogen_bloodstream:
+    - data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream
+  # IHME Neonatal bloodstream infections by resistance
+  data-private://meadow/antibiotics/2024-11-20/bloodstream_amr:
+    - snapshot-private://antibiotics/2024-11-20/bloodstream_amr.csv
+  data-private://garden/antibiotics/2024-11-20/bloodstream_amr:
+    - data-private://meadow/antibiotics/2024-11-20/bloodstream_amr
+  data-private://grapher/antibiotics/2024-11-20/bloodstream_amr:
+    - data-private://garden/antibiotics/2024-11-20/bloodstream_amr
+  # IHME Neonatal infections by syndrome
+  data-private://meadow/antibiotics/2024-11-24/total_syndrome:
+    - snapshot-private://antibiotics/2024-11-24/total_syndrome.csv
+  data-private://garden/antibiotics/2024-11-24/total_syndrome:
+    - data-private://meadow/antibiotics/2024-11-24/total_syndrome
+  data-private://grapher/antibiotics/2024-11-24/total_syndrome:
+    - data-private://garden/antibiotics/2024-11-24/total_syndrome
