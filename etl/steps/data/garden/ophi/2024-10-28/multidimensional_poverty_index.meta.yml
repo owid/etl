@@ -166,18 +166,18 @@ definitions:
   # For title_variant
   title_variant_area: |-
     <% if area == "Urban" %>
-    Urban
+    , Urban
     <% elif area == "Rural" %>
-    Rural
+    , Rural
     <% elif area == "Camp" %>
-    Refugee camps
+    , Refugee camps
     <%- endif -%>
 
   title_variant_flavor: |-
     <% if flavor == "Current margin estimate" %>
-    Most recent year,
+    Most recent year
     <% elif flavor == "Harmonized over time" %>
-    Harmonized over time,
+    Harmonized over time
     <%- endif -%>
 
 
