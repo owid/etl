@@ -30,7 +30,6 @@ def run(dest_dir: str) -> None:
     # Aggregate by antimicrobial class
     tb_class_agg, tb_notes = aggregate_antimicrobial_classes(tb_class)
     # Save the origins of the aggregated table to insert back in later
-    # origins = tb_class_agg["did"].metadata.origins
     # Drop columns that are not needed in the garden dataset.
     tb_class = tb_class.drop(
         columns=["whoregioncode", "whoregionname", "countryiso3", "incomeworldbankjune", "atc4", "notes"]
@@ -39,9 +38,6 @@ def run(dest_dir: str) -> None:
 
     tb_class = tb_class.format(["country", "year", "antimicrobialclass", "atc4name", "routeofadministration"])
     tb_aware = tb_aware.format(["country", "year", "awarelabel"])
-    # Insert back the origins
-    # tb_class_agg["did"].metadata.origins = origins
-    # tb_class_agg["ddd"].metadata.origins = origins
     tb_class_agg = pivot_aggregated_table(tb_class_agg, tb_notes)
     tb_class_agg = tb_class_agg.format(["country", "year"], short_name="class_aggregated")
 
@@ -89,7 +85,7 @@ def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
         if f"did_{key}" in tb_class_agg.columns:
             tb_class_agg[f"did_{key}"].metadata.description_processing = tb_notes["description_processing"][
                 tb_notes["category"] == key
-            ]
+            ].astype(str)
 
     return tb_class_agg
 
@@ -143,7 +139,7 @@ def format_notes(tb_notes: Table) -> Table:
             tb_note = tb_notes[msk]
             countries = tb_note["country"].unique()
             countries_formatted = combine_countries(countries)
-            description_processing_string = f"In {countries_formatted}: {note}"
+            description_processing_string = f"- In {countries_formatted}: {note}\n"
             tb_notes.loc[msk, "description_processing"] = description_processing_string
     # Creating onedescription processing for each antimicrobial class, the variable unit
     tb_desc = (
