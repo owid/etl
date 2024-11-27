@@ -23,7 +23,7 @@ definitions:
     inhaled
     <% endif %>
   antimicrobialclass:
-    <% if antimicrobialclass == "Antibacterials (ATC J01, A07AA, P01AB)" %>
+    <% if antimicrobialclass == "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)" %>
     antibiotics
     <% elif antimicrobialclass == "Antimalarials (ATC P01B)" %>
     antimalarials
@@ -31,8 +31,6 @@ definitions:
     antifungals
     <% elif antimicrobialclass == "Antivirals for systemic use (ATC J05)" %>
     antivirals
-    <% elif antimicrobialclass == "Drugs for the treatment of tuberculosis (ATC J04A)" %>
-    antituberculosis medicines
     <% endif %>
 
 # Learn more about the available fields:
@@ -56,12 +54,12 @@ tables:
   class_aggregated:
     variables:
       ddd:
-        title: Defined daily doses of <<antimicrobialclass>> used
+        title: Defined daily doses of {definitions.antimicrobialclass} used
         description_short: Volume of antimicrobials used in a given year.
         description_processing: <<description_processing>>
         unit: defined daily doses
       did:
-        title: Defined daily doses per 1000 inhabitants per day of <<antimicrobialclass>> used
+        title: Defined daily doses per 1000 inhabitants per day of {definitions.antimicrobialclass} used
         description_short: Volume of antimicrobials used per 1000 inhabitants per day.
         description_processing: <<description_processing>>
         unit: defined daily doses per 1000 inhabitants per day
