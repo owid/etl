@@ -10,32 +10,32 @@ Arguments:
 
 ```shell
 # Without specifying a category (you will be prompted for a category)
-etl p "some title for the PR"
+etl pr "some title for the PR"
 
 # With a category
-etl p "some title for the PR" data
+etl rp "some title for the PR" data
 ```
 
 **Custom use case (1)**: Same as main use case, but with a specific branch name for the `work_branch`.
 
 ```shell
-etl p "some title for the PR" --work-branch "this-temporary-branch"
+etl pr "some title for the PR" --work-branch "this-temporary-branch"
 # Shorter
-etl p "some title for the PR" -w "this-temporary-branch"
+etl pr "some title for the PR" -w "this-temporary-branch"
 ```
 
 **Custom use case (2)**: Create a pull request from `current_branch` to `master`.
 
 ```shell
-etl p "some title for the PR" --direct
+etl pr "some title for the PR" --direct
 ```
 
 **Custom use case (3)**: Create a pull request from branch `this-temporary-branch` -> `develop`.
 
 ```shell
-etl p "some title for the PR" --direct --base-branch "develop" --work-branch "this-temporary-branch"
+etl pr "some title for the PR" --direct --base-branch "develop" --work-branch "this-temporary-branch"
 # Shorter
-etl p "some title for the PR" --direct -b "develop" -w "this-temporary-branch"
+etl pr "some title for the PR" --direct -b "develop" -w "this-temporary-branch"
 ```
 """
 
