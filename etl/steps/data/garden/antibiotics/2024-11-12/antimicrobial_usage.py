@@ -60,22 +60,23 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def aggregate_antimicrobial_classes(tb_class: Table) -> Table:
+def aggregate_antimicrobial_classes(tb: Table) -> Table:
     """
     Aggregating by antimicrobial class
     """
+    tb = tb.copy(deep=True)
     # Combine antitubercolosis into antibacterials
-    tb_class["antimicrobialclass"] = tb_class["antimicrobialclass"].astype(str)
-    tb_class["antimicrobialclass"] = tb_class["antimicrobialclass"].replace(
+    tb["antimicrobialclass"] = tb["antimicrobialclass"].astype(str)
+    tb["antimicrobialclass"] = tb["antimicrobialclass"].replace(
         {
             "Drugs for the treatment of tuberculosis (ATC J04A)": "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)",
             "Antibacterials (ATC J01, A07AA, P01AB)": "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)",
         },
     )
-    assert len(tb_class["antimicrobialclass"].unique()) == 4
-    tb_class = tb_class.groupby(["country", "year", "antimicrobialclass", "notes"])[["ddd", "did"]].sum().reset_index()
+    assert len(tb["antimicrobialclass"].unique()) == 4
+    tb = tb.groupby(["country", "year", "antimicrobialclass", "notes"])[["ddd", "did"]].sum().reset_index()
 
-    return tb_class
+    return tb
 
 
 def format_notes(tb: Table) -> Table:

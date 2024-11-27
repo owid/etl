@@ -42,7 +42,7 @@ tables:
   class:
     variables:
       ddd:
-        title: Defined daily doses of {definitions.routeofadministration}  << antimicrobialclass>> - << atc4name.lower() >>  used
+        title: Defined daily doses of {definitions.routeofadministration}  << antimicrobialclass.lower()>> - << atc4name.lower() >>  used
         description_short: Volume of antimicrobials used in a given year.
         #description_processing: <<notes>>
         unit: defined daily doses
