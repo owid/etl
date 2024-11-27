@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load garden dataset.
+    # Load garden dataset
     ds_garden = paths.load_dataset("gfs_wave_one")
 
     # Read table from garden dataset.
