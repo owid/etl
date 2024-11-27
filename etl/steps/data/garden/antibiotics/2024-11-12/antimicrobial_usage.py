@@ -36,7 +36,10 @@ def run(dest_dir: str) -> None:
     tb_class = tb_class.format(["country", "year", "antimicrobialclass", "atc4name", "routeofadministration"])
     tb_aware = tb_aware.format(["country", "year", "awarelabel"])
     tb_class_agg = format_notes(tb_class_agg)
-    tb_class_agg = tb_class_agg.format(["country", "year", "antimicrobialclass"], short_name="class_aggregated")
+    tb_class_agg = tb_class_agg.drop(columns=["notes"])
+    tb_class_agg = tb_class_agg.format(
+        ["country", "year", "antimicrobialclass", "description_processing"], short_name="class_aggregated"
+    )
 
     #
     # Save outputs.
