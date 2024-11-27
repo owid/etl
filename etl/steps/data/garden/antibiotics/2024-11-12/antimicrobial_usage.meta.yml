@@ -24,13 +24,15 @@ definitions:
     <% endif %>
   antimicrobialclass:
     <% if antimicrobialclass == "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)" %>
-    antibiotics
+    antibiotics including antituberculosis drugs
     <% elif antimicrobialclass == "Antimalarials (ATC P01B)" %>
     antimalarials
     <% elif antimicrobialclass == "Antimycotics and antifungals for systemic use (J02, D01B)" %>
     antifungals
     <% elif antimicrobialclass == "Antivirals for systemic use (ATC J05)" %>
     antivirals
+    <% elif antimicrobialclass == "Drugs for the treatment of tuberculosis (ATC J04A)" %>
+    antituberculosis drugs
     <% endif %>
 
 # Learn more about the available fields:
@@ -44,12 +46,10 @@ tables:
       ddd:
         title: Defined daily doses of {definitions.routeofadministration}  << antimicrobialclass.lower()>> - << atc4name.lower() >>  used
         description_short: Volume of antimicrobials used in a given year.
-        #description_processing: <<notes>>
         unit: defined daily doses
       did:
         title: Defined daily doses per 1000 inhabitants per day of {definitions.routeofadministration} << antimicrobialclass>> - << atc4name.lower() >> used
         description_short: Volume of antimicrobials used per 1000 inhabitants per day.
-        #description_processing: <<notes>>
         unit: defined daily doses per 1000 inhabitants per day
   class_aggregated:
     variables:
@@ -68,10 +68,8 @@ tables:
       ddd:
         title: Defined daily doses of << awarelabel >> antibiotics used
         description_short: "Volume of AWaRe category: << awarelabel >> antibiotics used in a given year. {definitions.aware_description}"
-        #description_processing: <<notes>>
         unit: defined daily doses
       did:
         title: Defined daily doses per 1000 inhabitants per day of << awarelabel>> antibiotics used
         description_short: "Volume of AWaRe category: <<awarelabel>> used per 1000 inhabitants per day. {definitions.aware_description}"
-        #description_processing: <<notes>>
         unit: defined daily doses per 1000 inhabitants per day

@@ -62,11 +62,13 @@ def run(dest_dir: str) -> None:
 
 def aggregate_antimicrobial_classes(tb: Table) -> Table:
     """
-    Aggregating by antimicrobial class
+    Aggregating by antimicrobial class, we want to combine antibacterials and antituberculosis, but also keep antituberculosis separately
     """
     tb = tb.copy(deep=True)
     # Combine antitubercolosis into antibacterials
     tb["antimicrobialclass"] = tb["antimicrobialclass"].astype(str)
+    tb_anti_tb = tb[tb["antimicrobialclass"].str.contains("Drugs for the treatment of tuberculosis (ATC J04A)")]
+    # Combine tb with antibacterials, but also have tb separately
     tb["antimicrobialclass"] = tb["antimicrobialclass"].replace(
         {
             "Drugs for the treatment of tuberculosis (ATC J04A)": "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)",
@@ -74,6 +76,8 @@ def aggregate_antimicrobial_classes(tb: Table) -> Table:
         },
     )
     assert len(tb["antimicrobialclass"].unique()) == 4
+    # Adding antituberculosis back in
+    tb = pr.concat([tb, tb_anti_tb])
     tb = tb.groupby(["country", "year", "antimicrobialclass", "notes"])[["ddd", "did"]].sum().reset_index()
 
     return tb
