@@ -1,15 +1,13 @@
 import json
 import os
 import re
-from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, Tuple
 
 import pandas as pd
 import streamlit as st
-from sentence_transformers import SentenceTransformer, util
 from structlog import get_logger
-from tqdm.auto import tqdm
 
+from apps.wizard.app_pages.insight_search import embeddings as emb
 from apps.wizard.utils.components import Pagination, st_horizontal, st_multiselect_wider, tag_in_md
 from etl.db import read_sql
 
@@ -26,15 +24,6 @@ st.set_page_config(
 ########################################################################################################################
 # FUNCTIONS
 ########################################################################################################################
-@st.cache_data(show_spinner=False)
-def get_model():
-    "Load the pre-trained model."
-    with st.spinner("Loading model..."):
-        model = SentenceTransformer("all-MiniLM-L6-v2")
-    return model
-
-
-MODEL = get_model()
 
 
 def get_raw_data_insights() -> pd.DataFrame:
@@ -147,52 +136,6 @@ def get_data_insights() -> list[Dict[str, Any]]:
     return insights
 
 
-def _encode_text(text):
-    return MODEL.encode(text, convert_to_tensor=True)
-
-
-@st.cache_data(show_spinner=False)
-def get_insights_embeddings(insights: list[Dict[str, Any]]) -> list:
-    with st.spinner("Generating embeddings..."):
-        # Combine the title, body and authors of each insight into a single string.
-        insights_texts = [
-            insight["title"] + " " + insight["raw_text"] + " " + " ".join(insight["authors"]) for insight in insights
-        ]
-
-        # Run embedding generation in parallel.
-        with ThreadPoolExecutor() as executor:
-            embeddings = list(tqdm(executor.map(_encode_text, insights_texts), total=len(insights_texts)))
-
-    return embeddings
-
-
-def get_sorted_documents_by_similarity(
-    input_string: str, insights: list[Dict[str, str]], embeddings: list
-) -> list[Dict[str, Any]]:
-    """Ingests an input string and a list of documents, returning the list of documents sorted by their semantic similarity to the input string."""
-    _insights = insights.copy()
-
-    # Encode the input string and the document texts.
-    input_embedding = MODEL.encode(input_string, convert_to_tensor=True)
-
-    # Compute the cosine similarity between the input and each document.
-    def _get_score(a, b):
-        score = util.pytorch_cos_sim(a, b).item()
-        score = (score + 1) / 2
-        return score
-
-    similarities = [_get_score(input_embedding, doc_embedding) for doc_embedding in embeddings]  # type: ignore
-
-    # Attach the similarity scores to the documents.
-    for i, doc in enumerate(_insights):
-        doc["similarity"] = similarities[i]  # type: ignore
-
-    # Sort the documents by descending similarity score.
-    sorted_documents = sorted(_insights, key=lambda x: x["similarity"], reverse=True)
-
-    return sorted_documents
-
-
 def st_display_insight(insight):
     # :material/person
     authors = ", ".join([tag_in_md(a, "gray", ":material/person") for a in insight["authors"]])
@@ -200,7 +143,7 @@ def st_display_insight(insight):
 
     # Get edit URLs
     # url_gdoc = f"https://docs.google.com/document/d/{insight['id']}/edit"
-    url_admin = f"http://staging-site-covid-reporting-5/admin/gdocs/{insight['id']}/preview"
+    url_admin = f"http://staging-site-master/admin/gdocs/{insight['id']}/preview"
 
     with st.container(border=True):
         # If public, display special header (inc multimedia content if insight is public)
@@ -224,7 +167,7 @@ def st_display_insight(insight):
             st.write(f":red[(Draft)] {authors} | [:material/edit: edit]({url_admin})")
 
         # Render text
-        text = insight["markdown"].replace("$", "\$")  # type: ignore
+        text = insight["markdown"].replace("$", r"\$")
         st.caption(text)
 
         # Score
@@ -238,6 +181,8 @@ def get_authors_with_DIs(insights):
 
 
 ########################################################################################################################
+# Get embedding model.
+MODEL = emb.get_model()
 # Fetch all data insights.
 insights = get_data_insights()
 # Available authors
@@ -245,7 +190,7 @@ authors = get_authors_with_DIs(insights)
 
 # Create an embedding for each insight.
 # TODO: This could also be stored in db.
-embeddings = get_insights_embeddings(insights)
+embeddings = emb.get_insights_embeddings(MODEL, insights)
 ########################################################################################################################
 
 
@@ -288,7 +233,9 @@ if input_string or (input_authors != []):
         st.warning("Please enter at least 3 characters or one author.")
     else:
         # Get the sorted DIs.
-        sorted_dis = get_sorted_documents_by_similarity(input_string, insights=insights, embeddings=embeddings)
+        sorted_dis = emb.get_sorted_documents_by_similarity(
+            MODEL, input_string, insights=insights, embeddings=embeddings
+        )
 
         # Display the sorted documents.
         # TODO: This could be enhanced in different ways:
