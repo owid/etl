@@ -166,18 +166,18 @@ definitions:
   # For title_variant
   title_variant_area: |-
     <% if area == "Urban" %>
-    Urban,
+    Urban
     <% elif area == "Rural" %>
-    Rural,
+    Rural
     <% elif area == "Camp" %>
-    Refugee camps,
+    Refugee camps
     <%- endif -%>
 
   title_variant_flavor: |-
     <% if flavor == "Current margin estimate" %>
-    Most recent year
+    Most recent year,
     <% elif flavor == "Harmonized over time" %>
-    Harmonized over time
+    Harmonized over time,
     <%- endif -%>
 
 
@@ -204,7 +204,7 @@ tables:
           - "{definitions.description_key_flavor}"
         presentation:
           title_public: Multidimensional Poverty Index (MPI)
-          title_variant: "{definitions.title_variant_area}{definitions.title_variant_flavor}"
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Multidimensional Poverty Index (MPI)
           numDecimalPlaces: 3
@@ -222,7 +222,7 @@ tables:
           - "{definitions.description_key_flavor}"
         presentation:
           title_public: Share of population living in multidimensional poverty
-          title_variant: "{definitions.title_variant_area}{definitions.title_variant_flavor}"
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Share of population living in multidimensional poverty
           numDecimalPlaces: 1
@@ -241,7 +241,7 @@ tables:
           - "{definitions.description_key_flavor}"
         presentation:
           title_public: Intensity of multidimensional poverty
-          title_variant: "{definitions.title_variant_area}{definitions.title_variant_flavor}"
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Intensity of multidimensional poverty
           numDecimalPlaces: 1
@@ -259,7 +259,7 @@ tables:
           - "{definitions.description_key_flavor}"
         presentation:
           title_public: Share of population vulnerable to multidimensional poverty
-          title_variant: "{definitions.title_variant_area}{definitions.title_variant_flavor}"
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Share of population vulnerable to multidimensional poverty
           numDecimalPlaces: 1
@@ -277,7 +277,7 @@ tables:
           - "{definitions.description_key_flavor}"
         presentation:
           title_public: Share of population living in severe multidimensional poverty
-          title_variant: "{definitions.title_variant_area}{definitions.title_variant_flavor}"
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Share of population living in severe multidimensional poverty
           numDecimalPlaces: 1
@@ -294,7 +294,7 @@ tables:
           - "{definitions.description_key_flavor}"
         presentation:
           title_public: Share of population in multidimensional poverty deprived in the indicator <<indicator>>
-          title_variant: "{definitions.title_variant_area}{definitions.title_variant_flavor}"
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Share of population in multidimensional poverty deprived in the indicator <<indicator>>
           numDecimalPlaces: 1
@@ -311,7 +311,7 @@ tables:
           - "{definitions.description_key_flavor}"
         presentation:
           title_public: Share of population deprived in the indicator <<indicator>>
-          title_variant: "{definitions.title_variant_area}{definitions.title_variant_flavor}"
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Share of population deprived in the indicator <<indicator>>
           numDecimalPlaces: 1
