@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -90,11 +91,14 @@ def format_notes(tb: Table) -> Table:
         tb.loc[msk, "description_processing"] = description_processing_string
     # Now combine them per each country, year and antimicrobial class
     tb = tb.drop(columns=["notes"])
-    tb = (
-        tb.groupby(["country", "year", "antimicrobialclass", "did", "ddd"])["description_processing"]
-        .apply(lambda x: "; ".join(x))
+    # Creating onedescription processing for each antimicrobial class, the variable unit
+    tb_desc = (
+        tb.groupby(["antimicrobialclass"])["description_processing"]
+        .apply(lambda x: "; ".join(set(x)))  # Using set to remove duplicates
         .reset_index()
     )
+    tb = tb.drop(columns=["description_processing"])
+    tb = pr.merge(tb, tb_desc, on=["antimicrobialclass"])
 
     return tb
 
