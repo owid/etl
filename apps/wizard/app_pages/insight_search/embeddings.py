@@ -1,28 +1,124 @@
+import pickle
 import time
-from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any, Dict, Optional
 
+import pandas as pd
 import streamlit as st
+import torch
+from joblib import Memory
 from sentence_transformers import SentenceTransformer, util
 from structlog import get_logger
 from tqdm.auto import tqdm
+
+from etl.paths import CACHE_DIR
+
+memory = Memory(CACHE_DIR, verbose=0)
 
 # Initialize log.
 log = get_logger()
 
 
-@st.cache_data(show_spinner=False, persist="disk", max_entries=1)
-def get_model():
+@memory.cache
+def get_model(model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
     "Load the pre-trained model."
     with st.spinner("Loading model..."):
-        model = SentenceTransformer("all-MiniLM-L6-v2")
+        model = SentenceTransformer(model_name)
     return model
 
 
-# cache every text to disk for faster startup
-@st.cache_data(show_spinner=False, persist="disk")
-def _encode_text(_model, insight_text: str):
-    return _model.encode(insight_text, convert_to_tensor=True)
+def get_embeddings(
+    model: SentenceTransformer,
+    texts: list[str],
+    model_name: Optional[str] = None,
+    batch_size=32,
+    workers=1,
+    # cache_file: Path = CACHE_DIR / "embeddings.pt",
+) -> list:
+    log.info("get_embeddings.start", n_embeddings=len(texts))
+    t = time.time()
+
+    # Get model name
+    if model_name is None:
+        # NOTE: this is a bit of a hack
+        model_name = model.tokenizer.name_or_path.split("/")[-1]
+
+    # Set the default device
+    device = "mps" if torch.backends.mps.is_available() else "cpu"
+
+    cache_file_keys = CACHE_DIR / f"embeddings_{model_name}.keys"
+    cache_file_keys.touch(exist_ok=True)
+
+    cache_file_tensor = CACHE_DIR / f"embeddings_{model_name}.pt"
+    if not cache_file_tensor.exists():
+        embedding_dim = model.get_sentence_embedding_dimension()
+        torch.save(torch.empty((0, embedding_dim)), cache_file_tensor)
+
+    # Load embeddings and keys
+    embeddings = torch.load(cache_file_tensor).to(device)
+    with open(str(cache_file_keys).replace(".pt", ".keys"), "r") as f:
+        keys = [line.strip() for line in f]
+
+    missing_texts = []
+
+    # Check cache for existing embeddings
+    keys_set = set(keys)
+    for idx, text in tqdm(enumerate(texts), total=len(texts), desc="Checking cache"):
+        if text not in keys_set:
+            missing_texts.append(text)
+
+    log.info(
+        "get_embeddings.encoding",
+        n_embeddings=len(texts),
+        in_cache=len(texts) - len(missing_texts),
+    )
+
+    # Encode missing texts
+    if missing_texts:
+        if workers > 1:
+            # Start the multiprocessing pool
+            pool = model.start_multi_process_pool(target_devices=workers * ["cpu"])
+            # Encode sentences using multiprocessing
+            batch_embeddings = model.encode_multi_process(
+                missing_texts, pool, batch_size=batch_size, precision="float32"
+            )
+            # Close the multiprocessing pool
+            model.stop_multi_process_pool(pool)
+        else:
+            # Use single process encoding
+            batch_embeddings = model.encode(
+                missing_texts,
+                convert_to_tensor=True,
+                batch_size=batch_size,
+                show_progress_bar=True,
+            )
+
+        # Convert batch_embeddings to torch tensor if necessary
+        if not isinstance(batch_embeddings, torch.Tensor):
+            batch_embeddings = torch.from_numpy(batch_embeddings)
+
+        # Move batch_embeddings to the same device as embeddings
+        # batch_embeddings = batch_embeddings.to(embeddings.device)
+
+        # Update keys and embeddings
+        keys.extend(missing_texts)
+        embeddings = torch.cat([embeddings, batch_embeddings])
+
+        # Save updated cache to pickle file
+        torch.save(embeddings, cache_file_tensor)
+        with open(cache_file_keys, "w") as f:
+            f.writelines([key + "\n" for key in keys])
+
+    # Create a mapping from keys to indices
+    key_to_index = {key: idx for idx, key in enumerate(keys)}
+
+    # Get requested embeddings in order
+    indices = [key_to_index[text] for text in texts]
+    req_embeddings = embeddings[indices]
+
+    log.info("get_embeddings.end", t=time.time() - t)
+
+    return req_embeddings.unbind(dim=0)
 
 
 @st.cache_data(show_spinner=False, persist="disk", max_entries=1)
@@ -33,18 +129,7 @@ def get_insights_embeddings(_model, insights: list[Dict[str, Any]]) -> list:
             insight["title"] + " " + insight["raw_text"] + " " + " ".join(insight["authors"]) for insight in insights
         ]
 
-        # Run embedding generation sequentially.
-        log.info("get_insights_embeddings.start", n_embeddings=len(insights))
-        t = time.time()
-        # TODO: it's unclear to me why using threads should speed it up since it is CPU bound
-        with ThreadPoolExecutor() as executor:
-            embeddings = list(
-                tqdm(executor.map(lambda text: _encode_text(_model, text), insights_texts), total=len(insights_texts))
-            )
-
-        log.info("get_insights_embeddings.end", t=time.time() - t)
-
-    return embeddings
+        return get_embeddings(_model, insights_texts)
 
 
 def get_sorted_documents_by_similarity(
