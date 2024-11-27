@@ -26,13 +26,11 @@ def run(dest_dir: str) -> None:
     #
     tb_class = geo.harmonize_countries(df=tb_class, countries_file=paths.country_mapping_path)
     tb_aware = geo.harmonize_countries(df=tb_aware, countries_file=paths.country_mapping_path)
-    # Create tb_notes for use in metadata
-    tb_notes = tb_class[["country", "year", "antimicrobialclass", "notes"]].dropna(subset=["notes"])
 
     # Aggregate by antimicrobial class
-    tb_class_agg = aggregate_antimicrobial_classes(tb_class)
+    tb_class_agg, tb_notes = aggregate_antimicrobial_classes(tb_class)
     # Save the origins of the aggregated table to insert back in later
-    origins = tb_class_agg["did"].metadata.origins
+    # origins = tb_class_agg["did"].metadata.origins
     # Drop columns that are not needed in the garden dataset.
     tb_class = tb_class.drop(
         columns=["whoregioncode", "whoregionname", "countryiso3", "incomeworldbankjune", "atc4", "notes"]
@@ -41,13 +39,11 @@ def run(dest_dir: str) -> None:
 
     tb_class = tb_class.format(["country", "year", "antimicrobialclass", "atc4name", "routeofadministration"])
     tb_aware = tb_aware.format(["country", "year", "awarelabel"])
-    tb_class_agg = format_notes(tb_class_agg, tb_notes)
     # Insert back the origins
-    tb_class_agg["did"].metadata.origins = origins
-    tb_class_agg["ddd"].metadata.origins = origins
-    tb_class_agg = tb_class_agg.format(
-        ["country", "year", "antimicrobialclass", "description_processing"], short_name="class_aggregated"
-    )
+    # tb_class_agg["did"].metadata.origins = origins
+    # tb_class_agg["ddd"].metadata.origins = origins
+    tb_class_agg = pivot_aggregated_table(tb_class_agg, tb_notes)
+    tb_class_agg = tb_class_agg.format(["country", "year"], short_name="class_aggregated")
 
     #
     # Save outputs.
@@ -62,6 +58,40 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
+    """
+    Pivot the aggregated table to have a column for each antimicrobial class, then add the description_processing metadata
+    """
+
+    tb_notes_dict = {
+        "Antibacterials (ATC J01, A07AA, P01AB)": "antibacterials",
+        "Antimalarials (ATC P01B)": "anti_malarials",
+        "Antimycotics and antifungals for systemic use (J02, D01B)": "antifungals",
+        "Antivirals for systemic use (ATC J05)": "antivirals",
+        "Drugs for the treatment of tuberculosis (ATC J04A)": "antituberculosis",
+        "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)": "antibacterials_and_antituberculosis",
+    }
+    tb_notes["category"] = tb_notes["antimicrobialclass"].map(tb_notes_dict)
+    tb_class_agg = tb_class_agg.copy(deep=True)
+    tb_class_agg["antimicrobialclass"] = tb_class_agg["antimicrobialclass"].replace(tb_notes_dict)
+    tb_class_agg = tb_class_agg.pivot(index=["country", "year"], columns="antimicrobialclass", values=["ddd", "did"])
+    tb_class_agg.columns = tb_class_agg.columns.to_flat_index()
+    tb_class_agg.columns = [f"{col[0]}_{col[1]}" for col in tb_class_agg.columns]
+    tb_class_agg = tb_class_agg.reset_index()
+
+    for key in tb_notes_dict.values():
+        if f"ddd_{key}" in tb_class_agg.columns:
+            tb_class_agg[f"ddd_{key}"].metadata.description_processing = tb_notes["description_processing"][
+                tb_notes["category"] == key
+            ]
+        if f"did_{key}" in tb_class_agg.columns:
+            tb_class_agg[f"did_{key}"].metadata.description_processing = tb_notes["description_processing"][
+                tb_notes["category"] == key
+            ]
+
+    return tb_class_agg
 
 
 def aggregate_antimicrobial_classes(tb: Table) -> Table:
@@ -85,6 +115,11 @@ def aggregate_antimicrobial_classes(tb: Table) -> Table:
         },
     )
     assert len(tb["antimicrobialclass"].unique()) == 4
+    # Format the notes tables before it's removed
+    tb_notes = tb[["country", "year", "antimicrobialclass", "notes"]].dropna(subset=["notes"])
+    tb_notes = format_notes(tb_notes)
+
+    # Aggregate the data
     tb = tb.groupby(["country", "year", "antimicrobialclass"], dropna=False)[["ddd", "did"]].sum().reset_index()
     assert len(tb["antimicrobialclass"].unique()) == 4
     # Add the antituberculosis data back to tb
@@ -95,10 +130,10 @@ def aggregate_antimicrobial_classes(tb: Table) -> Table:
 
     tb_combined.set_index(["country", "year", "antimicrobialclass"], verify_integrity=True)
 
-    return tb_combined
+    return tb_combined, tb_notes
 
 
-def format_notes(tb: Table, tb_notes: Table) -> Table:
+def format_notes(tb_notes: Table) -> Table:
     """
     Format notes column
     """
@@ -117,9 +152,9 @@ def format_notes(tb: Table, tb_notes: Table) -> Table:
         .apply(lambda x: "; ".join(set(x)))  # Combine unique values
         .reset_index()
     )
-    tb = pr.merge(tb, tb_desc, on=["antimicrobialclass"])
+    # tb = pr.merge(tb, tb_desc, on=["antimicrobialclass"])
 
-    return tb
+    return tb_desc
 
 
 def combine_countries(countries):

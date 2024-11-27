@@ -38,31 +38,61 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 308
+  update_period_days: 365
 
 tables:
   class:
     variables:
       ddd:
         title: Defined daily doses of {definitions.routeofadministration}  << antimicrobialclass.lower()>> - << atc4name.lower() >>  used
-        description_short: Volume of antimicrobials used in a given year.
+        description_short: Total defined daily doses of antimicrobials used in a given year.
         unit: defined daily doses
       did:
         title: Defined daily doses per 1000 inhabitants per day of {definitions.routeofadministration} << antimicrobialclass>> - << atc4name.lower() >> used
-        description_short: Volume of antimicrobials used per 1000 inhabitants per day.
+        description_short: Total defined daily doses of antimicrobials used per 1000 inhabitants per day.
         unit: defined daily doses per 1000 inhabitants per day
   class_aggregated:
     variables:
-      ddd:
-        title: Defined daily doses of {definitions.antimicrobialclass} used
-        description_short: Volume of antimicrobials used in a given year.
-        description_processing: <<description_processing>>
+      ddd_anti_malarials:
+        title: Defined daily doses of antimalarials used
+        description_short: Total defined daily doses of antimalarials used in a given year.
         unit: defined daily doses
-      did:
-        title: Defined daily doses per 1000 inhabitants per day of {definitions.antimicrobialclass} used
-        description_short: Volume of antimicrobials used per 1000 inhabitants per day.
-        description_processing: <<description_processing>>
-        unit: defined daily doses per 1000 inhabitants per day
+      ddd_antibacterials_and_antituberculosis:
+        title: Defined daily doses of antibiotics and antituberculosis drugs used
+        description_short: Total defined daily doses of antibiotics and antituberculosis drugs used in a given year.
+        unit: defined daily doses
+      ddd_antifungals:
+        title: Defined daily doses of antifungals used
+        description_short: Total defined daily doses of antifungals used in a given year.
+        unit: defined daily doses
+      ddd_antituberculosis:
+        title: Defined daily doses of antituberculosis drugs used
+        description_short: Total defined daily doses of antituberculosis drugs used in a given year.
+        unit: defined daily doses
+      ddd_antivirals:
+        title: Defined daily doses of antivirals used
+        description_short: Total defined daily doses of antivirals used in a given year.
+        unit: defined daily doses
+      did_anti_malarials:
+        title: Defined daily doses of antimalarials used per 1,000 inhabitants per day
+        description_short: Total defined daily doses of antimalarials used in a given year per 1,000 inhabitants per day.
+        unit: defined daily doses per 1,000 inhabitants per day
+      did_antibacterials_and_antituberculosis:
+        title: Defined daily doses of antibiotics and antituberculosis drugs used per 1,000 inhabitants per day
+        description_short: Total defined daily doses of antibiotics and antituberculosis drugs used in a given year per 1,000 inhabitants per day.
+        unit: defined daily doses per 1,000 inhabitants per day
+      did_antifungals:
+        title: Defined daily doses of antifungals used per 1,000 inhabitants per day
+        description_short: Total defined daily doses of antifungals used in a given year per 1,000 inhabitants per day.
+        unit: defined daily doses per 1,000 inhabitants per day
+      did_antituberculosis:
+        title: Defined daily doses of antituberculosis drugs used per 1,000 inhabitants per day
+        description_short: Total defined daily doses of antituberculosis drugs used in a given year per 1,000 inhabitants per day.
+        unit: defined daily doses per 1,000 inhabitants per day
+      did_antivirals:
+        title: Defined daily doses of antivirals used per 1,000 inhabitants per day
+        description_short: Total defined daily doses of antivirals used in a given year per 1,000 inhabitants per day.
+        unit: defined daily doses per 1,000 inhabitants per day
   aware:
     variables:
       ddd:
