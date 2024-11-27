@@ -36,7 +36,6 @@ def run(dest_dir: str) -> None:
     tb_class = tb_class.format(["country", "year", "antimicrobialclass", "atc4name", "routeofadministration"])
     tb_aware = tb_aware.format(["country", "year", "awarelabel"])
     tb_class_agg = format_notes(tb_class_agg)
-    tb_class_agg = tb_class_agg.drop(columns=["notes"])
     tb_class_agg = tb_class_agg.format(
         ["country", "year", "antimicrobialclass", "description_processing"], short_name="class_aggregated"
     )
@@ -85,6 +84,14 @@ def format_notes(tb: Table) -> Table:
         countries_formatted = combine_countries(countries)
         description_processing_string = f"In {countries_formatted}: {note}"
         tb.loc[msk, "description_processing"] = description_processing_string
+    # Now combine them per each country, year and antimicrobial class
+    tb = tb.drop(columns=["notes"])
+    tb = (
+        tb.groupby(["country", "year", "antimicrobialclass", "did", "ddd"])["description_processing"]
+        .apply(lambda x: "; ".join(x))
+        .reset_index()
+    )
+
     return tb
 
 
