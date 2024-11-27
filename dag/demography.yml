@@ -277,3 +277,11 @@ steps:
     - data://meadow/hmd/2024-11-19/hfd
   data://grapher/hmd/2024-11-19/hfd:
     - data://garden/hmd/2024-11-19/hfd
+
+  # Human Mortality Database
+  data://meadow/hmd/2024-11-27/hmd:
+    - snapshot://hmd/2024-11-27/hmd.zip
+  data://garden/hmd/2024-11-27/hmd:
+    - data://meadow/hmd/2024-11-27/hmd
+  data://grapher/hmd/2024-11-27/hmd:
+    - data://garden/hmd/2024-11-27/hmd
