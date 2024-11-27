@@ -166,11 +166,11 @@ definitions:
   # For title_variant
   title_variant_area: |-
     <% if area == "Urban" %>
-    "Urban, "
+    Urban,
     <% elif area == "Rural" %>
-    "Rural, "
+    Rural,
     <% elif area == "Camp" %>
-    "Refugee camps, "
+    Refugee camps,
     <%- endif -%>
 
   title_variant_flavor: |-
