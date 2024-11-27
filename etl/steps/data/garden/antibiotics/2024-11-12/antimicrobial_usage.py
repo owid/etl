@@ -26,7 +26,8 @@ def run(dest_dir: str) -> None:
     tb_aware = geo.harmonize_countries(df=tb_aware, countries_file=paths.country_mapping_path)
     # Aggregate by antimicrobial class
     tb_class_agg = aggregate_antimicrobial_classes(tb_class)
-
+    # Save the origins of the aggregated table to insert back in later
+    origins = tb_class_agg["did"].metadata.origins
     # Drop columns that are not needed in the garden dataset.
     tb_class = tb_class.drop(
         columns=["whoregioncode", "whoregionname", "countryiso3", "incomeworldbankjune", "atc4", "notes"]
@@ -36,6 +37,9 @@ def run(dest_dir: str) -> None:
     tb_class = tb_class.format(["country", "year", "antimicrobialclass", "atc4name", "routeofadministration"])
     tb_aware = tb_aware.format(["country", "year", "awarelabel"])
     tb_class_agg = format_notes(tb_class_agg)
+    # Insert back the origins
+    tb_class_agg["did"].metadata.origins = origins
+    tb_class_agg["ddd"].metadata.origins = origins
     tb_class_agg = tb_class_agg.format(
         ["country", "year", "antimicrobialclass", "description_processing"], short_name="class_aggregated"
     )
