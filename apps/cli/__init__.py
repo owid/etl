@@ -168,6 +168,7 @@ GROUPS = (
                 "archive": "apps.step_update.cli.archive_cli",
                 "explorer-update": "apps.explorer_update.cli.cli",
                 "pr": "apps.utils.draft_pull_request.cli",
+                "p": "apps.pr.cli.cli",
             },
         },
         {
