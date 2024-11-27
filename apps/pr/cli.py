@@ -264,10 +264,7 @@ def ensure_work_branch(repo, work_branch, direct, pr_title, remote_branches, no_
     if work_branch is None:
         if not direct:
             # Generate name for new branch
-            work_branch = bake_branch_name(repo, pr_title, no_llm)
-            if work_branch in remote_branches:
-                log.info("Generating a hash for this branch name to prevent name collisions.")
-                work_branch = f"{work_branch}-{generate_short_hash()}"
+            work_branch = bake_branch_name(repo, pr_title, no_llm, remote_branches)
         else:
             # If not explicitly given, the new branch will be the current branch.
             work_branch = repo.active_branch.name
@@ -367,10 +364,10 @@ def _generate_pr_title(title: str, category: str, scope: str | None) -> Optional
     return title
 
 
-def bake_branch_name(repo, pr_title, no_llm):
+def bake_branch_name(repo, pr_title, no_llm, remote_branches):
     # Get user
-    git_config = repo.config_reader()
-    user = git_config.get_value("user", "name").lower()
+    # git_config = repo.config_reader()
+    # user = git_config.get_value("user", "name").lower()
 
     # Get category
     category = pr_title.category
@@ -379,8 +376,16 @@ def bake_branch_name(repo, pr_title, no_llm):
     title = _extract_relevant_title_for_branch_name(pr_title.title, not no_llm)
 
     # Bake complete PR branch name
-    name = f"{user}-{category}-{title}"
+    # name = f"{user}-{category}-{title}"
+    name = f"{category}-{title}"
 
+    # If branch name collision
+    # if name in remote_branches:
+    #     log.info("Generating a hash for this branch name to prevent name collisions.")
+    #     name = f"{name}-{user}"
+    if name in remote_branches:
+        log.info("Generating a hash for this branch name to prevent name collisions.")
+        name = f"{name}-{generate_short_hash()}"
     return name
 
 
