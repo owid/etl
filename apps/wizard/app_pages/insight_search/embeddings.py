@@ -1,11 +1,7 @@
-import json
-import os
-import re
 import time
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
-import pandas as pd
 import streamlit as st
 from sentence_transformers import SentenceTransformer, util
 from structlog import get_logger
