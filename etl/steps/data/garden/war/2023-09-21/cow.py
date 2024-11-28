@@ -681,6 +681,7 @@ def make_table_intra(tb: Table) -> Table:
         tb.groupby("warnum")["intnl"].nunique().max() == 1
     ), "An intra-state conflict is not expected to change between international / non-international!"
     mask = tb["intnl"] == 1
+    tb["conflict_type"] = tb["conflict_type"].astype(object)
     tb.loc[mask, "conflict_type"] = CTYPE_INTRA_INTL
     tb.loc[-mask, "conflict_type"] = CTYPE_INTRA_NINTL
 

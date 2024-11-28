@@ -1,69 +1,68 @@
 dataset:
-  sources:
-  - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
-    published_by: Welfare Footprint
-    publication_year: 2021
-    url: https://welfarefootprint.org/research-projects/laying-hens/
+  title: Pain hours of hen systems (Welfare Footprint)
+  description: ''
+  licenses:
+    - {}
 tables:
   pain_hours_hen_systems:
     variables:
       total_hours_of_pain:
         title: Total hours of pain
-        short_unit: hours
         unit: hours
+        short_unit: hours
+        display:
+          numDecimalPlaces: 0.0
         description: The total number of hours an average hen will spend in pain, regardless of the intensity.
-        display:
-          numDecimalPlaces: 0
-        sources:
-        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
-          published_by: Welfare Footprint
-          publication_year: 2021
-          url: https://welfarefootprint.org/research-projects/laying-hens/
-      excrutiating_pain:
-        title: Excrutiating pain
-        short_unit: hours
+      excrutiating_pain_in_hours:
+        title: Excrutiating pain in hours
         unit: hours
+        short_unit: hours
+        display:
+          numDecimalPlaces: 2.0
         description: The number of hours an average hen will spend in excrutiating pain.
-        display:
-          numDecimalPlaces: 2
-        sources:
-        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
-          published_by: Welfare Footprint
-          publication_year: 2021
-          url: https://welfarefootprint.org/research-projects/laying-hens/
-      disabling_pain:
-        title: Disabling pain
-        short_unit: hours
+      disabling_pain_in_hours:
+        title: Disabling pain in hours
         unit: hours
+        short_unit: hours
+        display:
+          numDecimalPlaces: 0.0
         description: The number of hours an average hen will spend in disabling pain.
-        display:
-          numDecimalPlaces: 0
-        sources:
-        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
-          published_by: Welfare Footprint
-          publication_year: 2021
-          url: https://welfarefootprint.org/research-projects/laying-hens/
-      hurtful_pain:
-        title: Hurtful pain
-        short_unit: hours
+      hurtful_pain_in_hours:
+        title: Hurtful pain in hours
         unit: hours
+        short_unit: hours
+        display:
+          numDecimalPlaces: 0.0
         description: The number of hours an average hen will spend in hurtful pain.
-        display:
-          numDecimalPlaces: 0
-        sources:
-        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
-          published_by: Welfare Footprint
-          publication_year: 2021
-          url: https://welfarefootprint.org/research-projects/laying-hens/
-      annoying_pain:
-        title: Annoying pain
-        short_unit: hours
+      annoying_pain_in_hours:
+        title: Annoying pain in hours
         unit: hours
-        description: The number of hours an average hen will spend in annoying pain.
+        short_unit: hours
         display:
-          numDecimalPlaces: 0
-        sources:
-        - name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
-          published_by: Welfare Footprint
-          publication_year: 2021
-          url: https://welfarefootprint.org/research-projects/laying-hens/
+          numDecimalPlaces: 0.0
+        description: The number of hours an average hen will spend in annoying pain.
+      total_days_of_pain:
+        title: Total days of pain
+        unit: days
+        short_unit: days
+        description: The total number of days an average hen will spend in pain, regardless of the intensity.
+      excrutiating_pain_in_days:
+        title: Excrutiating pain in days
+        unit: days
+        short_unit: days
+        description: The number of days an average hen will spend in excrutiating pain.
+      disabling_pain_in_days:
+        title: Disabling pain in days
+        unit: days
+        short_unit: days
+        description: The number of days an average hen will spend in disabling pain.
+      hurtful_pain_in_days:
+        title: Hurtful pain in days
+        unit: days
+        short_unit: days
+        description: The number of days an average hen will spend in hurtful pain.
+      annoying_pain_in_days:
+        title: Annoying pain in days
+        unit: days
+        short_unit: days
+        description: The number of days an average hen will spend in annoying pain.

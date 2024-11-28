@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("{{cookiecutter.short_name}}")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["{{cookiecutter.short_name}}"].reset_index()
+    tb = ds_meadow.read("{{cookiecutter.short_name}}")
 
     #
     # Process data.

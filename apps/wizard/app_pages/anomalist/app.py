@@ -161,6 +161,19 @@ def llm_ask(df: pd.DataFrame):
     )
 
 
+@st.fragment()
+def download_anomalies(df: pd.DataFrame):
+    csv_data = convert_df_to_csv(df)
+    st.download_button(
+        "Export data (CSV)",
+        data=csv_data,
+        file_name="data.csv",
+        mime="text/csv",
+        icon=":material/download:",
+        help="Download the anomalies as a CSV file. Selected filters apply!",
+    )
+
+
 @st.dialog("AI summary of anomalies", width="large")
 def llm_dialog(df: pd.DataFrame):
     """Ask LLM for summary of the anomalies."""
@@ -360,6 +373,13 @@ def _sort_df(df: pd.DataFrame, sort_strategy: Union[str, List[str]]) -> Tuple[pd
     return df, columns_sort
 
 
+# Function to convert DataFrame to CSV
+@st.cache_data
+def convert_df_to_csv(df):
+    df["indicator_uri"] = df["indicator_id"].apply(lambda x: st.session_state.anomalist_indicators.get(x))
+    return df.to_csv(index=False).encode("utf-8")
+
+
 # Functions to show the anomalies
 @st.fragment
 def show_anomaly_compact(index, df):
@@ -425,6 +445,8 @@ def show_anomaly_compact(index, df):
             else:
                 config = bake_chart_config(variable_id=indicator_id, selected_entities=entities)
             config["hideAnnotationFieldsInTitle"]["time"] = True
+            config["hideFacetControl"] = False
+
             # Actually plot
             grapher_chart(chart_config=config, owid_env=OWID_ENV)
 
@@ -769,8 +791,11 @@ if st.session_state.anomalist_df is not None:
 
     # Show anomalies with time and version changes
     if not df.empty:
-        # LLM summary option
-        llm_ask(df)
+        # Top option buttons
+        with st_horizontal():
+            # LLM summary option
+            llm_ask(df)
+            download_anomalies(df)
 
         # st.dataframe(df_change)
         groups = df.groupby(["indicator_id", "type"], sort=False, observed=True)

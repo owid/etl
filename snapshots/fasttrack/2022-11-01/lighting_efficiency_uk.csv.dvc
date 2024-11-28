@@ -1,18 +1,18 @@
 meta:
-  namespace: fasttrack
-  short_name: lighting_efficiency_uk
-  file_extension: csv
-  date_accessed: 2023-01-20
+  source:
+    name: |-
+      Fouquet & Pearson (2006). Seven centuries of energy services: The price and use of light in the United Kingdom (1300-2000).
+    url: https://www.jstor.org/stable/23296980
+    source_data_url: |-
+      gAAAAABnRYZlXxepMAB9sIKn_qv_qmZn_zxaLMC7r6W0Pm4yDGaffkjMBQa1ovpzqTVnmQFcclmueGVS_TPk9_ethfFaKeAVFo7yRlvM-T5Vn56IJP1ZDGZzGF1pZQtvwvsWCYq7O_ZzRq9mGI439QHZ5s-0oewSvJFcpvI_Nc1EqVdsO-Hyb3hKhvCdXuR5Sg_E0gtagMAeh0KT8kAYTIxfAVtj29fY5yVUXXQU76CEkSRtenAVfSYjMD7hwik8ZFaG-fS-XRrP
+    date_accessed: '2024-11-26'
+    published_by: |-
+      Fouquet, R., & Pearson, P. J. (2006). Seven centuries of energy services: The price and use of light in the United Kingdom (1300-2000). The energy journal, 27(1).
   name: Lighting effiency and shares in the UK
   description: ''
-  source_name: Google Sheet
-  url: https://www.jstor.org/stable/23296980
-  source_published_by: Google Sheet
-  source_data_url: gAAAAABjykepDM9qSPmcia30Y6XfRfCAr-IVVU4MKQ-5uronVcInRAbQENcbYoFR7vrbbSMRsNqulOO1uRMVdAZ3lQIdTl_fQNWcRFmxC1V8nujs-6pa5aXPNDAmm4mOtKD_d--xITDJEdrwIFi-xCKtZmx7oLm8b-sbG2b1WEvUHKbJAIARIgw1PEA_7KQEhiKmbnpU-SjalCi-9PAeMKUDtsQhxAYSBtkOUwXt7_HCq5UBYPvqA_N8fUw5pb7MDILs0bScwGzY
+  license: {}
   is_public: false
-  version: '2022-11-01'
-wdir: ../../../data/snapshots/fasttrack/2022-11-01
 outs:
-- md5: 7e2d4e77b9c23946c89c518df591a009
-  size: 747
-  path: lighting_efficiency_uk.csv
+  - md5: 8de6c6871078ece444a6c927db29ad48
+    size: 679
+    path: lighting_efficiency_uk.csv

@@ -1,0 +1,365 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Education
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 364
+
+tables:
+  edstats:
+    variables:
+      expected_years_of_school:
+        title: Expected years of schooling
+        unit: years
+        description_from_producer: |-
+          Expected years of school is calculated as the sum of age-specific enrollment rates between ages 4 and 17. Age-specific enrollment rates are approximated using school enrollment rates at different levels: pre-primary enrollment rates approximate the age-specific enrolment rates for 4 and 5 year-olds; the primary rate approximates for 6-11 year-olds; the lower-secondary rate approximates for 12-14 year-olds; and the upper-secondary approximates for 15-17 year-olds. Most recent estimates are used.  Year of most recent primary enrollment rate used is shown in data notes.
+
+          World Bank variable id: HD.HCI.EYRS
+
+          Original source: World Bank staff estimates based on data from UNESCO Institute for Statistics, supplemented with data provided by World Bank staff.
+        display:
+          numDecimalPlaces: 0
+
+      harmonized_test_scores:
+        title: Harmonized test scores
+        unit: score
+        description_short: Average learning outcomes correspond to [harmonized](#dod:harmonized-scores) test scores across standardized, psychometrically-robust international and regional student achievement tests.
+        description_from_producer: |-
+           Harmonized test scores from major international student achievement testing programs. They are measured in TIMSS-equivalent units, where 300 is minimal attainment and 625 is advanced attainment.
+
+           World Bank variable id: HD.HCI.HLO
+
+           Original source: Patrinos and Angrist (2018). http://documents.worldbank.org/curated/en/390321538076747773/Global-Dataset-on-Education-Quality-A-Review-and-Update-2000-2017
+        display:
+          numDecimalPlaces: 0
+
+      learning_adjusted_years_of_school:
+        title: Learning-adjusted years of schooling
+        unit: years
+        description_short: |-
+          [Learning-adjusted years of schooling](#dod:lays) merge the quantity and quality of education into one metric, accounting for the fact that similar durations of schooling can yield different learning outcomes.
+        description_from_producer: |-
+          Learning-Adjusted Years of School are calculated by multiplying the estimates of Expected Years of School by the ratio of most recent Harmonized Test Score to 625, where 625 corresponds to advancement attainment on the TIMSS (Trends in International Mathematics and Science Study) test. For more information, consult the Human Capital Index website: http://www.worldbank.org/en/publication/human-capital.
+
+          World Bank variable id: HD.HCI.LAYS
+
+          Original source: World Bank staff calculation based on methodology in Filmer et al. (2018). http://documents.worldbank.org/curated/en/243261538075151093/Learning-Adjusted-Years-of-Schooling-LAYS-Defining-A-New-Macro-Measure-of-Education
+        display:
+          numDecimalPlaces: 0
+
+      piaac__mean_adult_literacy_proficiency__total:
+        title: PIAAC Mean Adult Literacy Proficiency. Total
+        unit: score
+        description_short: Average literacy proficiency of adults aged 16-65.
+        description_from_producer: |-
+          Literacy is defined as the ability to understand, evaluate, use and engage with written texts to participate in society, to achieve one’s goals, and to develop one’s knowledge and potential. Literacy encompasses a range of skills from the decoding of written words and sentences to the comprehension, interpretation, and evaluation of complex texts. It does not, however, involve the production of text (writing). Information on the skills of adults with low levels of proficiency is provided by an assessment of reading components that covers text vocabulary, sentence comprehension and passage fluency. The target population for the survey was the non institutionalized population, aged 16-65 years, residing in the country at the time of data collection, irrespective of nationality, citizenship or language status. Literacy-related non-respondents are not included in the calculation of the mean scores which, thus, present an upper bound of the estimated literacy proficiency of the population. For more information, consult the OECD PIAAC website: http://www.oecd.org/site/piaac/.
+
+          World Bank variable id: LO.PIAAC.LIT
+
+          Original source: OECD Programme for the International Assessment of Adult Competencies (PIAAC)
+        display:
+          numDecimalPlaces: 0
+
+      piaac__mean_adult_numeracy_proficiency__total:
+        title: PIAAC Mean Adult Numeracy Proficiency. Total
+        unit: score
+        description_short: Average numeracy proficiency of adults aged 16-65.
+        description_from_producer: |-
+            Numeracy is defined as the ability to access, use, interpret and communicate mathematical information and ideas in order to engage in and manage the mathematical demands of a range of situations in adult life. To this end, numeracy involves managing a situation or solving a problem in a real context, by responding to mathematical content/information/ideas represented in multiple ways. The target population for the survey was the non-institutionalized population, aged 16-65 years, residing in the country at the time of data collection, irrespective of nationality, citizenship or language status. For more information, consult the OECD PIAAC website: http://www.oecd.org/site/piaac/.
+
+            World Bank variable id: LO.PIAAC.NUM
+
+            Original source: OECD Programme for the International Assessment of Adult Competencies (PIAAC)
+        display:
+          numDecimalPlaces: 0
+
+
+      piaac__mean_young_adult_numeracy_proficiency__total:
+        title: PIAAC Mean Young Adult Numeracy Proficiency. Total
+        unit: score
+        description_short: Average numeracy proficiency of young adults aged 16-34.
+        description_from_producer: |-
+          Numeracy is defined as the ability to access, use, interpret and communicate mathematical information and ideas in order to engage in and manage the mathematical demands of a range of situations in adult life. To this end, numeracy involves managing a situation or solving a problem in a real context, by responding to mathematical content/information/ideas represented in multiple ways. The target population was the non-institutionalized population, aged 16-24 years, residing in the country at the time of data collection, irrespective of nationality, citizenship or language status. For more information, consult the OECD PIAAC website: http://www.oecd.org/site/piaac/.
+
+          World Bank variable id: LO.PIAAC.NUM.YOU
+
+          Original source: OECD Programme for the International Assessment of Adult Competencies (PIAAC)
+        display:
+          numDecimalPlaces: 0
+
+      pisa__female_15_year_olds_by_mathematics_proficiency_level__pct__level_6:
+        title: PISA. Female 15-year-olds by mathematics proficiency level (%). Level 6
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of 15-year-old female students scoring higher than 669 on the PISA mathematics scale.
+        description_from_producer: |-
+          Percentage of 15-year-old female students scoring higher than 669 on the PISA mathematics scale. At Level 6, students can conceptualize, generalize and utilize information based on their investigations and modeling of complex problem situations, and can use their knowledge in relatively non-standard contexts. They can link different information sources and representations and flexibly translate among them. Students at this level are capable of advanced mathematical thinking and reasoning. These students can apply this insight and understanding, along with a mastery of symbolic and formal mathematical operations and relationships, to develop new approaches and strategies for attacking novel situations. Students at this level can reflect on their actions, and can formulate and precisely communicate their actions and reflections regarding their findings, interpretations, arguments, and the appropriateness of these to the original situation. Data reflects country performance in the stated year according to PISA reports, but may not be comparable across years or countries. Consult the PISA website for more detailed information: http://www.oecd.org/pisa/.
+
+          World Bank variable id: LO.PISA.MAT.6.FE
+
+          Original source: OECD Programme for International Student Assessment (PISA)
+        display:
+          numDecimalPlaces: 1
+
+      pisa__male_15_year_olds_by_mathematics_proficiency_level__pct__level_6:
+        title: PISA. Male 15-year-olds by mathematics proficiency level (%). Level 6
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of 15-year-old male students scoring higher than 669 on the PISA mathematics scale.
+        description_from_producer: |-
+          Percentage of 15-year-old male students scoring higher than 669 on the PISA mathematics scale. At Level 6, students can conceptualize, generalize and utilize information based on their investigations and modeling of complex problem situations, and can use their knowledge in relatively non-standard contexts. They can link different information sources and representations and flexibly translate among them. Students at this level are capable of advanced mathematical thinking and reasoning. These students can apply this insight and understanding, along with a mastery of symbolic and formal mathematical operations and relationships, to develop new approaches and strategies for attacking novel situations. Students at this level can reflect on their actions, and can formulate and precisely communicate their actions and reflections regarding their findings, interpretations, arguments, and the appropriateness of these to the original situation. Data reflects country performance in the stated year according to PISA reports, but may not be comparable across years or countries. Consult the PISA website for more detailed information: http://www.oecd.org/pisa/
+
+          World Bank variable id: LO.PISA.MAT.6.MA
+
+          Original source: OECD Programme for International Student Assessment (PISA)
+        display:
+          numDecimalPlaces: 1
+
+      annual_statutory_teacher_salaries_in_public_institutions_in_usd__primary__10_years_of_experience:
+        title: Annual statutory teacher salaries in public institutions in USD. Primary. 10 years of experience
+        unit: US dollars
+        short_unit: US $
+        description_short: Gross annual salary expressed in [international-$](#dod:int_dollar_abbreviation) at 2020/21 prices before tax for a fully qualified teacher with 10 years of experience, based on official pay scales, and includes employer contributions to social security and pension.
+        description_from_producer: |-
+          Salaries after 10 years of experience refer to the scheduled annual salary of a full-time classroom teacher with the minimum training necessary to be fully qualified plus 10 years of experience. Salaries are in equivalent USD converted using PPPs for private consumption. Statutory salaries refer to scheduled salaries according to official pay scales, while actual salaries refer to the average annual salary earned by a full-time teacher. The salaries reported are gross (total sum paid by the employer) less the employer’s contribution to social security and pension, according to existing salary scales. Salaries are “before tax”, i.e. before deductions for income tax. Teachers’ salaries are one component of teachers’ total compensation. Other benefits, such as regional allowances for teaching in remote areas, family allowances, reduced rates on public transport and tax allowances on the purchase of cultural materials, may also form part of teachers’ total remuneration. There are also large differences in taxation and social-benefits systems in OECD countries. All this should be borne in mind when comparing statutory salaries across countries. Data after 2009 is not comparable to data for 2009 and before due to changes in methodology. For more information, consult the OECD's Education at a Glance website: http://www.oecd.org/edu/eag.htm
+
+          World Bank variable id: OECD.TSAL.1.E10
+
+          Original source: Organisation for Economic Co-operation and Development (OECD)
+        display:
+          numDecimalPlaces: 0
+
+      wittgenstein_projection__percentage_of_the_population_age_15plus_by_highest_level_of_educational_attainment__no_education__total:
+        title: Wittgenstein Projection. Percentage of the population age 15+ by highest level of educational attainment. No education. Total
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the population aged 15 and older with no formal education.
+        description_from_producer: |-
+          Share of the population of the stated age group that has never attended school. Projections are based on collected census and survey data for the base year (around 2010) and the Medium Shared Socioeconomic Pathways (SSP2) projection model. The SSP2 is a middle-of-the-road scenario that combines medium fertility with medium mortality, medium migration, and the Global Education Trend (GET) education scenario. For more information and other projection models, consult the Wittgenstein Centre for Demography and Global Human Capital's website: http://www.oeaw.ac.at/vid/dataexplorer/
+
+          World Bank variable id: PRJ.ATT.15UP.NED.MF
+
+          Original source: Wittgenstein Centre for Demography and Global Human Capital: http://www.oeaw.ac.at/vid/dataexplorer/
+        display:
+          numDecimalPlaces: 1
+
+      saber__teachers__policy_goal_7__supporting_teachers_to_improve_instruction:
+        title: SABER rating of education policies aimed at preparing teachers with training
+        unit: score
+        description_short: The rating score reflects each country's level of effectiveness in preparing teachers through training and experience, assessed on a scale from 1 (Latent) to 4 (Advanced), based on criteria like availability of professional development opportunities and their assignment based on perceived needs.
+        description_from_producer: |-
+          Data Interpretation: 1=Latent; 2=Emerging; 3=Established; 4=Advanced. For additional information, visit the SABER: (website: http://saber.worldbank.org/index.cfm
+
+          World Bank variable id: SABER.TECH.GOAL7
+
+          Original source: Systems Approach for Better Education Results (SABER), World Bank
+        display:
+          numDecimalPlaces: 0
+
+      literacy_rate__adult_total__pct_of_people_ages_15_and_above:
+        title: Literacy rate. Adult total. % of people ages 15 and above
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of people aged 15 and above who can read and write a short, simple statement on their everyday life.
+        description_from_producer: |-
+          Percentage of the population age 15 and above who can, with understanding, read and write a short, simple statement on their everyday life. Generally, ‘literacy’ also encompasses ‘numeracy’, the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 15 years and over by the corresponding age group population and multiplying the result by 100.
+
+          World Bank variable id: SE.ADT.LITR.ZS
+
+          Original source: UNESCO Institute for Statistics
+        display:
+          numDecimalPlaces: 1
+
+      school_enrollment__preprimary__pct_gross:
+        title: Gross enrolment ratio in pre-primary education
+        unit: "%"
+        short_unit: "%"
+        description_short: Number of children of any age group who are enrolled in [pre-primary](#dod:pre-primary-education) education expressed as a percentage of the total population of the official pre-primary school age.
+        description_from_producer: |-
+         Total enrollment in pre-primary education, regardless of age, expressed as a percentage of the total population of official pre-primary education age. GER can exceed 100% due to the inclusion of over-aged and under-aged students because of early or late school entrance and grade repetition.
+
+         World Bank variable id: SE.PRE.ENRR
+
+         Original source: UNESCO Institute for Statistics
+        display:
+          numDecimalPlaces: 1
+
+      trained_teachers_in_primary_education__pct_of_total_teachers:
+        title: Share of teachers in primary education who are trained
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of [primary](#dod:primary-education) school teachers who have completed either the training required before starting their teaching career (pre-service) or the ongoing professional development after becoming teachers (in-service) in their specific country.
+        description_from_producer: |-
+          Number of teachers who have received the minimum organized teacher training (pre-service or in-service) required for teaching at the primary level in the given country, expressed as a percentage of the total number of teachers at the primary level.
+
+          World Bank variable id: SE.PRM.TCAQ.ZS
+
+          Original source: UNESCO Institute for Statistics
+        display:
+          numDecimalPlaces: 1
+
+
+      trained_teachers_in_secondary_education__pct_of_total_teachers:
+        title:  Share of teachers in secondary education who are trained
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of [secondary](#dod:secondary-education) school teachers who have completed either the training required before starting their teaching career (pre-service) or the ongoing professional development after becoming teachers (in-service) in their specific country.
+        description_from_producer: |-
+          Number of teachers who have received the minimum organized teacher training (pre-service or in-service) required for teaching at the secondary level in the given country, expressed as a percentage of the total number of teachers at the secondary level.
+
+          World Bank variable id: SE.SEC.TCAQ.ZS
+
+          Original source: UNESCO Institute for Statistics
+        display:
+          numDecimalPlaces: 1
+
+      government_expenditure_on_education__total__pct_of_gdp:
+        title: Government expenditure on education. Total. % of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Public expenditure on education as a percentage of GDP.
+        description_from_producer: |-
+          Total general (local, regional and central) government expenditure on education (current, capital, and transfers), expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. Divide total government expenditure for a given level of education (ex. primary, secondary, or all levels combined) by the GDP, and multiply by 100. A higher percentage of GDP spent on education shows a higher government priority for education, but also a higher capacity of the government to raise revenues for public spending, in relation to the size of the country's economy. When interpreting this indicator however, one should keep in mind in some countries, the private sector and/or households may fund a higher proportion of total funding for education, thus making government expenditure appear lower than in other countries. For more information, consult the UNESCO Institute of Statistics website: http://www.uis.unesco.org/Education/
+
+          World Bank variable id: SE.XPD.TOTL.GD.ZS
+
+          Original source: UNESCO Institute for Statistics
+        display:
+          numDecimalPlaces: 1
+
+
+      literacy_rate__population_25_64_years__both_sexes__pct:
+        title: Adult literacy rate
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of the population aged 25-64 who can read and write a short, simple statement on their everyday life.
+        description_from_producer: |-
+          Percentage of the population age 25-64 who can, with understanding, read and write a short, simple statement on their everyday life. Generally, ‘literacy’ also encompasses ‘numeracy’, the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 25-64 years by the corresponding age group population and multiplying the result by 100.
+
+          World Bank variable id: SE.ADT.LITR.ZS
+
+          Original source: UNESCO Institute for Statistics
+        display:
+          numDecimalPlaces: 1
+
+      total_net_enrolment_rate__primary__gender_parity_index__gpi:
+        title: Gender parity in net enrolment rates in primary education
+        unit: index
+        description_short: Ratio of female to male net [primary education](#dod:primary-education) enrolment rates, which is defined as the ratio of children of official primary school age who are enrolled in primary school to the population of the official primary school age.
+        description_from_producer: |-
+          Ratio of female total net enrolment rate for primary to the male total net enrolment rate for primary. It is calculated by dividing the female value for the indicator by the male value for the indicator. A GPI equal to 1 indicates parity between females and males. In general, a value less than 1 indicates disparity in favor of males and a value greater than 1 indicates disparity in favor of females.
+
+          World Bank variable id: UIS.NERT.1.GPI
+
+          Original source: UNESCO Institute for Statistics
+        display:
+          numDecimalPlaces: 2
+
+      total_net_enrolment_rate__lower_secondary__gender_parity_index__gpi:
+        title: Gender parity in net enrolment rates in lower-secondary education
+        unit: index
+        description_short: Ratio of female to male net [lower-secondary](#dod:lower-secondary-education) education enrolment rates, defined as the ratio of children of official secondary school age who are enrolled in lower-secondary school to the population of the official lower-secondary school age.
+        description_from_producer: |-
+          Ratio of female total net enrolment rate for lower secondary to the male total net enrolment rate for lower secondary. It is calculated by dividing the female value for the indicator by the male value for the indicator. A GPI equal to 1 indicates parity between females and males. In general, a value less than 1 indicates disparity in favor of males and a value greater than 1 indicates disparity in favor of females.
+
+          World Bank variable id: UIS.NERT.2.GPI
+
+          Original source: UNESCO Institute for Statistics
+        display:
+          numDecimalPlaces: 2
+
+      out_of_school_children__adolescents_and_youth_of_primary_and_secondary_school_age__female__number:
+        title: Out-of-school girls, adolescents and youth of primary and secondary
+        unit: girls
+        description_short: Number of children, adolescents and youth of primary and secondary school age who are not enrolled in school.
+        description_from_producer: |-
+          Number of children, adolescents, and youth of primary, lower secondary, and upper secondary school age who are not enrolled or attending school during in a given academic year. For more information, consult the UNESCO Institute of Statistics website: http://www.uis.unesco.org/Education/
+
+          World Bank variable id: UIS.OFST.1T3.F.CP
+
+          Original source: UNESCO Institute for Statistics
+        display:
+          numDecimalPlaces: 0
+
+      out_of_school_children__adolescents_and_youth_of_primary_and_secondary_school_age__male__number:
+        title: Out-of-school boys, adolescents and youth of primary and secondary
+        unit: children
+        description_short: Number of children, adolescents and youth of primary and secondary school age who are not enrolled in school.
+        description_from_producer: |-
+          Number of children, adolescents, and youth of primary, lower secondary, and upper secondary school age who are not enrolled or attending school during in a given academic year. For more information, consult the UNESCO Institute of Statistics website: http://www.uis.unesco.org/Education/
+
+          World Bank variable id: UIS.OFST.1T3.M.CP
+
+          Original source: UNESCO Institute for Statistics
+        display:
+          numDecimalPlaces: 0
+
+      school_life_expectancy__primary__gender_parity_index__gpi:
+        title: Gender parity in primary school life expectancy
+        unit: index
+        description_short: Ratio of female to male primary school life expectancy, which is defined as the number of years a person of school entrance age can expect to spend within [primary](#dod:primary-education) education.
+        description_from_producer: |-
+          Ratio of female school life expectancy to the male school life expectancy. It is calculated by dividing the female value for the indicator by the male value for the indicator. A GPI equal to 1 indicates parity between females and males. In general, a value less than 1 indicates disparity in favor of males and a value greater than 1 indicates disparity in favor of females.
+
+          World Bank variable id: UIS.SLE.1.GPI
+
+          Original source: UNESCO Institute for Statistics
+        display:
+          numDecimalPlaces: 2
+
+      normalized_hci:
+        title: Normalized  harmonized test scores
+        unit: score
+        description_short: The quality of schooling is assessed using the [harmonized learning scores](#dod:harmonized-scores), adjusted relative to the country with the highest performance, in this instance, Singapore.
+        description_from_producer: |-
+           Harmonized test scores from major international student achievement testing programs. They are measured in TIMSS-equivalent units, where 300 is minimal attainment and 625 is advanced attainment. Most recent estimates are used.  Year of most recent estimate shown in data notes. \n\nTest scores from the following testing programs are included:\n• TIMSS/PIRLS:  Refers to average of test scores from TIMSS (Trends in International Maths and Science Study) and PIRLS (Progress in International Reading Literacy Study), both carried out by the International Association for the Evaluation of Educational Achievement. Data from each PIRLS round is moved to the year of the nearest TIMSS round and averaged with the TIMSS data.     \n• PISA:  Refers to test scores from Programme for International Student Assessment\n• PISA+TIMSS/PIRLS:  Refers to the average of these programs for countries and years where both are available\n• SACMEQ:  Refers to test scores from Southern and Eastern Africa Consortium for Monitoring Educational Quality \n• PASEC: Refers to test scores from Program of Analysis of Education Systems\n• LLECE:  Refers to test scores from Latin American Laboratory for Assessment of the Quality of Education\n• PILNA: Refers to test scores from Pacific Islands Literacy and Numeracy Assessment\n• EGRA:  Refers to test scores from nationally-representative Early Grade Reading Assessments  \n• EGRANR:  Refers to test scores from non-nationally-representative Early Grade Reading Assessments\
+
+           World Bank variable id: HD.HCI.HLO
+
+           Original source: Patrinos and Angrist (2018). http://documents.worldbank.org/curated/en/390321538076747773/Global-Dataset-on-Education-Quality-A-Review-and-Update-2000-2017
+        description_processing: |-
+          Harmonized test scores are normalized to the country with the highest performance, in this case, Singapore. The normalization process involves dividing the country's score by the highest score.
+
+      combined_literacy:
+        title: Literacy rate
+        unit: "%"
+        description_short: Percentage of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
+        description_processing: |-
+          **Recent estimates:**
+
+          Percentage of the population between age 25 and age 64 who can, with understanding, read and write a short, simple statement on their everyday life. Generally, ‘literacy’ also encompasses ‘numeracy’, the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 25-64 years by the corresponding age group population and multiplying the result by 100.
+
+          World Bank variable id: UIS.LR.AG25T64
+
+          Original source: UNESCO Institute for Statistics
+
+          **Historical literacy data:**
+
+          The historical estimates in this long-run cross-country dataset were derived from a blend of diverse sources, each contributing to different time periods. For data before 1800, the dataset relies on the work of Buringh and Van Zanden (2009), which offers insights into literacy through the lens of manuscript and book production in Europe from the sixth to the eighteenth centuries. For the years 1820 and 1870 (excluding the United States), it incorporates data from Broadberry and O'Rourke's "The Cambridge Economic History of Modern Europe." The United States data comes from the National Center for Education Statistics. Additionally, global estimates for the period 1820-2000 are drawn from van Zanden and colleagues’ "How Was Life?: Global Well-being since 1820," an OECD publication. For historical estimates specific to Latin America, the dataset uses the Oxford Latin American Economic History Database (OxLAD). Each source follows a consistent conceptual definition of literacy, although discrepancies among sources are acknowledged, necessitating cautious interpretation of year-to-year changes. The dataset also includes instances where specific sources were preferred, such as opting for OxLAD data over the World Bank for Paraguay in 1982 due to significant differences in literacy rate estimates.
+        display:
+          numDecimalPlaces: 1
+
+      combined_expenditure:
+        title: Public spending on education as a share of GDP
+        unit: "%"
+        description_short: Total general government expenditure on education (all levels of government and all levels of education), given as a share of GDP.
+        description_processing: |-
+          **Historical expenditure data:**
+
+          Historical data in this dataset is based on a wide array of sources, reflecting a comprehensive approach to data collection across different time periods and regions. However, the diverse nature of these sources leads to inconsistencies, as methodologies and data quality vary between sources. For instance, older sources like the League of Nations Statistical Yearbook or Mitchell's 1962 data may use different metrics or collection methods compared to more modern sources like the OECD Education reports or UN surveys. This variance in source material and methodology means that direct comparisons across different years or countries might be challenging, necessitating careful interpretation and cross-reference for accuracy. The dataset serves as a rich historical repository but also underscores the complexities and challenges inherent in compiling and harmonizing historical data from multiple, diverse sources.
+
+          **Recent estimates:**
+
+          General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments.
+
+          World Bank variable id: SE.XPD.TOTL.GD.ZS
+
+          Original source: UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022.
+        display:
+          numDecimalPlaces: 1

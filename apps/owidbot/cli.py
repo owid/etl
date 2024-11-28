@@ -139,7 +139,7 @@ def create_comment_body(branch: str, services: Dict[str, str], start_time: float
 
     body = f"""
 <b>Quick links (staging server)</b>:
-[Site Dev](http://{container_name}/) | [Site Preview](https://{branch}.owid.pages.dev/) | [Admin](http://{container_name}/admin/login) | [Wizard](http://{container_name}/etl/wizard/) | [Docs](http://{container_name}/etl/docs/)
+[Site Dev](http://{container_name}/) | [Site Preview](https://{branch}.owid.pages.dev/) | [Admin](http://{container_name}/admin) | [Wizard](http://{container_name}/etl/wizard/) | [Docs](http://{container_name}/etl/docs/)
 |--------------------------------|----------------------------------|---|---|---|
 
 **Login**: `ssh owid@{container_name}`

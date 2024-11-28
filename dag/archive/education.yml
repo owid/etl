@@ -1,0 +1,12 @@
+steps:
+  # World Bank EdStats
+  data://meadow/wb/2023-07-10/education:
+    - snapshot://wb/2023-07-10/education.csv
+
+  data://garden/wb/2023-07-10/education:
+    - data://meadow/wb/2023-07-10/education
+    - data://garden/education/2017-09-30/public_expenditure
+    - data://garden/education/2018-04-18/literacy_rates
+
+  data://grapher/wb/2023-07-10/education:
+    - data://garden/wb/2023-07-10/education

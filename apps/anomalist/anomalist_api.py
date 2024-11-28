@@ -121,14 +121,14 @@ def renormalize_score(
 
 # Function to format population numbers.
 def pretty_print_number(number):
-    if number >= 1e9:
+    if pd.isna(number):
+        return "?"
+    elif int(number) >= 1e9:
         return f"{number/1e9:.1f}B"
     elif number >= 1e6:
         return f"{number/1e6:.1f}M"
     elif number >= 1e3:
         return f"{number/1e3:.1f}k"
-    elif pd.isna(number):
-        return "?"
     else:
         return f"{int(number)}"
 
@@ -502,7 +502,13 @@ def anomaly_detection(
         ]
         variables_old_and_new = variables_in_dataset + variables_old
         t = time.time()
-        df = load_data_for_variables(engine=engine, variables=variables_old_and_new)
+        try:
+            df = load_data_for_variables(engine=engine, variables=variables_old_and_new)
+        except FileNotFoundError as e:
+            # This happens when a dataset is in DB, but not in a local catalog.
+            log.error("loading_data.error", error=str(e))
+            continue
+
         log.info("loading_data.end", t=time.time() - t)
 
         if df.empty:

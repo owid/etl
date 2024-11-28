@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("road_accidents.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # drop unneeded columns
     tb = tb[COLS_TO_KEEP.keys()]

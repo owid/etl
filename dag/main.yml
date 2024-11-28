@@ -96,8 +96,10 @@ steps:
     - snapshot://homicide/2024-10-30/unodc.xlsx
   data://garden/homicide/2024-10-30/unodc:
     - data://meadow/homicide/2024-10-30/unodc
+    - data://garden/demography/2023-03-31/population
   data://grapher/homicide/2024-10-30/unodc:
     - data://garden/homicide/2024-10-30/unodc
+
 
   #
   # UN
@@ -277,14 +279,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/eth/2023-03-15/ethnic_power_relations:
     - data://garden/eth/2023-03-15/ethnic_power_relations
-
-  # International Monetary Fund, World Economic Outlook
-  data://meadow/imf/2024-05-02/world_economic_outlook:
-    - snapshot://imf/2024-05-02/world_economic_outlook.xls
-  data://garden/imf/2024-05-02/world_economic_outlook:
-    - data://meadow/imf/2024-05-02/world_economic_outlook
-  data://grapher/imf/2024-05-02/world_economic_outlook:
-    - data://garden/imf/2024-05-02/world_economic_outlook
 
   # Patents & journal articles (World Bank, United Nations)
   data://garden/research_development/2024-05-20/patents_articles:
@@ -654,6 +648,8 @@ steps:
     - snapshot://worldbank_wdi/2024-05-20/wdi.zip
     - data://meadow/worldbank_wdi/2024-05-20/wdi
     - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
 
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
@@ -871,6 +867,24 @@ steps:
 
   data://grapher/migration/2024-11-19/migration_distance:
     - data://garden/migration/2024-11-19/migration_distance
+
+# Migration between regions, based on UN DESA flows
+  data://garden/migration/2024-11-18/migration_between_regions:
+    - data://garden/un/2024-07-16/migrant_stock
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+
+  data://grapher/migration/2024-11-18/migration_between_regions:
+    - data://garden/migration/2024-11-18/migration_between_regions
+
+  # IMF World Economic Outlook
+  data://meadow/imf/2024-11-25/world_economic_outlook:
+    - snapshot://imf/2024-11-25/world_economic_outlook.xls
+  data://garden/imf/2024-11-25/world_economic_outlook:
+    - data://meadow/imf/2024-11-25/world_economic_outlook
+  data://grapher/imf/2024-11-25/world_economic_outlook:
+    - data://garden/imf/2024-11-25/world_economic_outlook
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

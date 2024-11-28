@@ -42,8 +42,7 @@ The GCP has been publishing estimates of global and national fossil CO2 emission
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--path-to-folder", prompt=True, type=str, help="Path to local folder where data files are.")
-def main(path_to_folder: str, upload: bool) -> None:
+def main(upload: bool) -> None:
     # Create a new snapshot for each dataset.
     for data_file in DATA_FILES:
         snap = Snapshot(f"gcp/{SNAPSHOT_VERSION}/{data_file}")
@@ -58,13 +57,7 @@ def main(path_to_folder: str, upload: bool) -> None:
         snap.metadata_path.write_text(snap.metadata.to_yaml())
 
         # Download data from source, add file to DVC and upload to S3.
-        ################################################################################################################
-        # snap.create_snapshot(upload=upload)
-        # TODO: Once public, remove this, uncomment previous, and remove click.option for path to folder.
-        path_to_file = Path(path_to_folder) / data_file
-        assert path_to_file.exists(), f"File {path_to_file} does not exist."
-        snap.create_snapshot(filename=path_to_file, upload=upload)
-        ################################################################################################################
+        snap.create_snapshot(upload=upload)
 
 
 if __name__ == "__main__":

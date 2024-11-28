@@ -18,11 +18,11 @@ def run(dest_dir: str) -> None:
     #
     # Load minerals grapher dataset on demand by technology.
     ds_demand = paths.load_dataset("critical_minerals_demand_by_technology")
-    tb_demand = ds_demand.read_table("demand_by_technology")
+    tb_demand = ds_demand.read("demand_by_technology")
 
     # Load minerals grapher dataset on supply by country.
     ds_supply = paths.load_dataset("critical_minerals_supply_by_country")
-    tb_supply = ds_supply.read_table("supply_by_country")
+    tb_supply = ds_supply.read("supply_by_country")
 
     #
     # Process data.
@@ -86,7 +86,7 @@ def run(dest_dir: str) -> None:
     df_graphers["yAxisMin"] = 0
 
     # Make all views stacked area charts.
-    df_graphers["type"] = "StackedArea"
+    df_graphers["chartTypes"] = ["StackedArea"]
 
     # Sanity check.
     error = "Duplicated rows in explorer."

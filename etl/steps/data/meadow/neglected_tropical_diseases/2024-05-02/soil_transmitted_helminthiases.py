@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("soil_transmitted_helminthiases.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb = tb.drop(columns="country_code")
 
     #

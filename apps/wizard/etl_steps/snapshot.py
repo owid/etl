@@ -789,7 +789,7 @@ if submitted:
 
         # Display next steps
         if form.dataset_manual_import:
-            manual_import_instructions = "--path-to-file **relative path of file**"
+            manual_import_instructions = "-f **relative path of file**"
         else:
             manual_import_instructions = ""
         st.subheader("Next steps")
@@ -845,7 +845,7 @@ if st.session_state["run_step"]:
     commands = ["uv", "run", "python", script_path]
     if form.dataset_manual_import:
         # Get snapshot local file
-        commands.extend(["--path-to-file", st.session_state["snapshot_file"]])
+        commands.extend(["-f", st.session_state["snapshot_file"]])
     command_str = f"`{' '.join(commands)}`"
 
     # Run step

@@ -294,6 +294,13 @@ class ChartConfig(Base):
     slug: Mapped[Optional[str]] = mapped_column(
         String(255), Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True)
     )
+    chartType: Mapped[Optional[str]] = mapped_column(
+        String(255),
+        Computed(
+            "(CASE WHEN full ->> '$.chartTypes' IS NULL THEN 'LineChart' ELSE full ->> '$.chartTypes[0]' END)",
+            persisted=True,
+        ),
+    )
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, onupdate=func.current_timestamp())
 
