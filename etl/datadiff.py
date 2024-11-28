@@ -40,11 +40,13 @@ class DatasetDiff:
         ds_b: Optional[Dataset],
         verbose: bool = False,
         cols: Optional[str] = None,
+        tables: Optional[str] = None,
         print: Callable = rich.print,
         snippet: bool = False,
     ):
         """
         :param cols: Only compare columns matching pattern
+        :param tables: Only compare tables matching pattern
         :param print: Function to print the diff summary. Defaults to rich.print.
         :param snippet: Print snippet for loading both tables
         """
@@ -54,6 +56,7 @@ class DatasetDiff:
         self.p = print
         self.verbose = verbose
         self.cols = cols
+        self.tables = tables
         self.snippet = snippet
 
     def _diff_datasets(self, ds_a: Optional[Dataset], ds_b: Optional[Dataset]):
@@ -257,6 +260,8 @@ tb = {_snippet_dataset(ds_b, table_name)}
 
         if self.ds_a and self.ds_b:
             for table_name in set(self.ds_a.table_names) | set(self.ds_b.table_names):
+                if self.tables and not re.search(self.tables, table_name):
+                    continue
                 self._diff_tables(self.ds_a, self.ds_b, table_name)
 
 
@@ -312,6 +317,11 @@ class RemoteDataset:
     help="Compare only columns matching pattern.",
 )
 @click.option(
+    "--tables",
+    type=str,
+    help="Compare only tables matching pattern.",
+)
+@click.option(
     "--exclude",
     "-e",
     type=str,
@@ -341,6 +351,7 @@ def cli(
     channel: Iterable[CHANNEL],
     include: Optional[str],
     cols: Optional[str],
+    tables: Optional[str],
     exclude: Optional[str],
     verbose: bool,
     snippet: bool,
@@ -417,7 +428,13 @@ def cli(
                 def func(ds_a, ds_b):
                     lines = []
                     differ = DatasetDiff(
-                        ds_a, ds_b, cols=cols, print=lambda x: lines.append(x), verbose=verbose, snippet=snippet
+                        ds_a,
+                        ds_b,
+                        cols=cols,
+                        tables=tables,
+                        print=lambda x: lines.append(x),
+                        verbose=verbose,
+                        snippet=snippet,
                     )
                     differ.summary()
                     return lines
@@ -451,7 +468,9 @@ def cli(
                 console.print(x)
 
             try:
-                differ = DatasetDiff(ds_a, ds_b, cols=cols, print=_append_and_print, verbose=verbose, snippet=snippet)
+                differ = DatasetDiff(
+                    ds_a, ds_b, tables=tables, cols=cols, print=_append_and_print, verbose=verbose, snippet=snippet
+                )
                 differ.summary()
             except DatasetError as e:
                 # soft fail and continue with another dataset

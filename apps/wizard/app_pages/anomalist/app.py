@@ -11,21 +11,20 @@ The main structure of the app is implemented. Its main logic is:
 
 TODO:
 - Test with upgrade flow more extensively.
-- What happens with data that do not have years (e.g. dates)?
+- For datasets that use dates instead of years, Anomalist works, but it still shows "year". It would be good to show the correct dates instead.
 - We can infer if the anomalies are out of sync (because user has updated the data) by checking the dataset checksum. NOTE: checksum might change bc of metadata changes, so might show several false positives.
 - Further explore LLM summary:
     - We should store the LLM summary in the DB. We need a new table for this. Each summary is associated with a set of anomalies (Anomaly table), at a precise moment. We should detect out-of-sync here too.
 - Hiding capabilities. Option to hide anomalies would be great. Idea: have a button in each anomaly box to hide it. We need a register of the hidden anomalies. We then could have a st.popover element in the filter section which only appears if there are anomalies hidden. Then, we can list them there, in case the user wants to unhide some.
-- New dataset detection. We should explore if this can be done quicker.
 
 """
 
-from typing import List, Tuple, cast
+from typing import List, Tuple, Union, cast
 
 import pandas as pd
 import streamlit as st
 
-from apps.anomalist.anomalist_api import anomaly_detection, load_detector
+from apps.anomalist.anomalist_api import anomaly_detection, load_detector, pretty_print_number
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens, get_number_tokens
 from apps.wizard.app_pages.anomalist.utils import (
     AnomalyTypeEnum,
@@ -35,7 +34,7 @@ from apps.wizard.app_pages.anomalist.utils import (
 )
 from apps.wizard.utils import cached, set_states, url_persist
 from apps.wizard.utils.chart_config import bake_chart_config
-from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, tag_in_md
+from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, st_multiselect_wider, tag_in_md
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
 from etl.grapher_io import load_variables
@@ -77,12 +76,21 @@ ANOMALY_TYPES_TO_DETECT = tuple(ANOMALY_TYPES.keys())
 # GPT
 MODEL_NAME = "gpt-4o"
 
+# Map sorting strategy to name to show in UI.
 SORTING_STRATEGIES = {
     "relevance": "Relevance",
     "score": "Anomaly score",
+    "scale": "Scale",
     "population": "Population",
     "views": "Chart views",
-    "population+views": "Population+views",
+}
+# Map sorting strategy to columns in the reduced scores dataframe.
+SORTING_COLUMNS = {
+    "relevance": "score_weighted",
+    "score": "score",
+    "scale": "score_scale",
+    "population": "score_population",
+    "views": "score_analytics",
 }
 
 # SESSION STATE
@@ -107,11 +115,27 @@ st.session_state.anomalist_filter_entities = st.session_state.get("anomalist_fil
 st.session_state.anomalist_filter_indicators = st.session_state.get("anomalist_filter_indicators", [])
 
 # Sorting
-st.session_state.anomalist_sorting_columns = st.session_state.get("anomalist_sorting_columns", [])
+st.session_state.anomalist_sorting_columns = st.session_state.get("anomalist_sorting_columns", SORTING_COLUMNS.values())
+st.session_state.anomalist_sorting_strategy = st.session_state.get("anomalist_sorting_strategy", [])
 
 # FLAG: True to trigger anomaly detection manually
 st.session_state.anomalist_trigger_detection = st.session_state.get("anomalist_trigger_detection", False)
 
+# Scores.
+# These are the default thresholds for the different scores.
+# Only anomalies with scores above the following thresholds will be shown by default.
+# NOTE: For some reason, streamlit raises an error when the minimum is zero.
+#  To avoid this, set it to a positive number (above, e.g. 1e-9).
+st.session_state.anomalist_min_anomaly_score = st.session_state.get("anomalist_min_anomaly_score", 0.3)
+st.session_state.anomalist_min_weighted_score = st.session_state.get("anomalist_min_weighted_score", 0.1)
+st.session_state.anomalist_min_population_score = st.session_state.get("anomalist_min_population_score", 1e-9)
+st.session_state.anomalist_min_analytics_score = st.session_state.get("anomalist_min_analytics_score", 1e-9)
+st.session_state.anomalist_min_scale_score = st.session_state.get("anomalist_min_scale_score", 1e-9)
+
+# Advanced expander.
+st.session_state.anomalist_expander_advanced_options = st.session_state.get(
+    "anomalist_expander_advanced_options", False
+)
 
 ######################################################################
 # FUNCTIONS
@@ -134,6 +158,19 @@ def llm_ask(df: pd.DataFrame):
         on_click=lambda: llm_dialog(df),
         icon=":material/robot:",
         help=f"Ask GPT {MODEL_NAME} to summarize the anomalies. This is experimental.",
+    )
+
+
+@st.fragment()
+def download_anomalies(df: pd.DataFrame):
+    csv_data = convert_df_to_csv(df)
+    st.download_button(
+        "Export data (CSV)",
+        data=csv_data,
+        file_name="data.csv",
+        mime="text/csv",
+        icon=":material/download:",
+        help="Download the anomalies as a CSV file. Selected filters apply!",
     )
 
 
@@ -273,6 +310,11 @@ def filter_df(df: pd.DataFrame):
         anomaly_types=st.session_state.anomalist_filter_anomaly_types,
         entities=st.session_state.anomalist_filter_entities,
         indicators=st.session_state.anomalist_filter_indicators,
+        min_weighted_score=st.session_state.anomalist_min_weighted_score,
+        min_anomaly_score=st.session_state.anomalist_min_anomaly_score,
+        min_population_score=st.session_state.anomalist_min_population_score,
+        min_analytics_score=st.session_state.anomalist_min_analytics_score,
+        min_scale_score=st.session_state.anomalist_min_scale_score,
     )
     ## Sort dataframe
     df, st.session_state.anomalist_sorting_columns = _sort_df(df, st.session_state.anomalist_sorting_strategy)
@@ -280,10 +322,30 @@ def filter_df(df: pd.DataFrame):
 
 
 @st.cache_data
-def _filter_df(df: pd.DataFrame, year_min, year_max, anomaly_types, entities, indicators) -> pd.DataFrame:
+def _filter_df(
+    df: pd.DataFrame,
+    year_min,
+    year_max,
+    anomaly_types,
+    entities,
+    indicators,
+    min_weighted_score,
+    min_anomaly_score,
+    min_population_score,
+    min_analytics_score,
+    min_scale_score,
+) -> pd.DataFrame:
     """Used in filter_df."""
-    ## Year
-    df = df[(df["year"] >= year_min) & (df["year"] <= year_max)]
+    ## Year and scores
+    df = df[
+        (df["year"] >= year_min)
+        & (df["year"] <= year_max)
+        & (df["score_weighted"] >= min_weighted_score)
+        & (df["score"] >= min_anomaly_score)
+        & (df["score_population"] >= min_population_score)
+        & (df["score_analytics"] >= min_analytics_score)
+        & (df["score_scale"] >= min_scale_score)
+    ]
     ## Anomaly type
     if len(anomaly_types) > 0:
         df = df[df["type"].isin(anomaly_types)]
@@ -298,27 +360,24 @@ def _filter_df(df: pd.DataFrame, year_min, year_max, anomaly_types, entities, in
 
 
 @st.cache_data
-def _sort_df(df: pd.DataFrame, sort_strategy: str) -> Tuple[pd.DataFrame, List[str]]:
+def _sort_df(df: pd.DataFrame, sort_strategy: Union[str, List[str]]) -> Tuple[pd.DataFrame, list[str]]:
     """Used in filter_df."""
-    ## Sort
-    columns_sort = []
-    match sort_strategy:
-        case "relevance":
-            columns_sort = ["score_weighted"]
-        case "score":
-            columns_sort = ["score"]
-        case "population":
-            columns_sort = ["score_population"]
-        case "views":
-            columns_sort = ["score_analytics"]
-        case "population+views":
-            columns_sort = ["score_population", "score_analytics"]
-        case _:
-            pass
-    if columns_sort != []:
-        df = df.sort_values(columns_sort, ascending=False)
+    if not sort_strategy:
+        columns_sort = list(SORTING_COLUMNS.values())
+    elif isinstance(sort_strategy, str):
+        columns_sort = [SORTING_COLUMNS[sort_strategy]]
+    else:
+        columns_sort = [SORTING_COLUMNS[_sort_strategy] for _sort_strategy in sort_strategy]
+    df = df.sort_values(columns_sort, ascending=False)
 
     return df, columns_sort
+
+
+# Function to convert DataFrame to CSV
+@st.cache_data
+def convert_df_to_csv(df):
+    df["indicator_uri"] = df["indicator_id"].apply(lambda x: st.session_state.anomalist_indicators.get(x))
+    return df.to_csv(index=False).encode("utf-8")
 
 
 # Functions to show the anomalies
@@ -327,11 +386,13 @@ def show_anomaly_compact(index, df):
     """Show anomaly compactly.
 
     Container with all anomalies of a certain type and for a concrete indicator.
+
+    :param df: DataFrame with a single anomaly type and indicator
     """
-    indicator_id, an_type = index
+    indicator_id, anomaly_type = index
     row = 0
 
-    key = f"{indicator_id}_{an_type}"
+    key = f"{indicator_id}_{anomaly_type}"
     key_table = f"anomaly_table_{key}"
     key_selection = f"selected_entities_{key}"
 
@@ -346,19 +407,19 @@ def show_anomaly_compact(index, df):
     indicator_uri = st.session_state.anomalist_indicators.get(indicator_id)
 
     # Generate descriptive text. Only contains information about top-scoring entity.
-    text = load_detector(an_type).get_text(entity_default, year_default)
+    text = load_detector(anomaly_type).get_text(entity_default, year_default)
 
     # Render
     with st.container(border=True):
         # Title
         link = OWID_ENV.indicator_admin_site(indicator_id)
-        st.markdown(f"{tag_in_md(**ANOMALY_TYPES[an_type])} **[{indicator_uri}]({link})**")
+        st.markdown(f"{tag_in_md(**ANOMALY_TYPES[anomaly_type])} **[{indicator_uri}]({link})**")
         col1, col2 = st.columns(2)
         # Chart
         with col1:
             # Bake chart config
             # If the anomaly is compared to previous indicator, then we need to show two indicators (old and new)!
-            if an_type in {AnomalyTypeEnum.UPGRADE_CHANGE.value, AnomalyTypeEnum.UPGRADE_MISSING.value}:
+            if anomaly_type in {AnomalyTypeEnum.UPGRADE_CHANGE.value, AnomalyTypeEnum.UPGRADE_MISSING.value}:
                 display = [
                     {
                         "name": "New",
@@ -384,6 +445,8 @@ def show_anomaly_compact(index, df):
             else:
                 config = bake_chart_config(variable_id=indicator_id, selected_entities=entities)
             config["hideAnnotationFieldsInTitle"]["time"] = True
+            config["hideFacetControl"] = False
+
             # Actually plot
             grapher_chart(chart_config=config, owid_env=OWID_ENV)
 
@@ -395,7 +458,8 @@ def show_anomaly_compact(index, df):
             with st.container(border=False):
                 st.markdown("**Select** other affected entities")
                 st.dataframe(
-                    df[["entity_name"] + st.session_state.anomalist_sorting_columns],
+                    # df[["entity_name"] + st.session_state.anomalist_sorting_columns],
+                    _score_table(df=df),
                     selection_mode=["multi-row"],
                     key=key_table,
                     on_select=lambda df=df, key_table=key_table, key_selection=key_selection: _change_chart_selection(
@@ -417,6 +481,70 @@ def _change_chart_selection(df, key_table, key_selection):
 
     # Update entities in chart
     st.session_state[key_selection] = df.iloc[rows]["entity_name"].tolist()
+
+
+def _score_table(df: pd.DataFrame) -> pd.DataFrame:
+    """Return a table of scores and other useful columns for a given indicator. Return styled dataframe."""
+    # Filter df_all for the indicator and anomaly type currently displayed.
+    df_show = df.copy()
+    # Columns in df_all:
+    # ['entity_name', 'year', 'indicator_id', 'score', 'score_scale', 'type', 'population', 'score_population', 'views', 'score_analytics', 'score_weighted']
+
+    # Select certain columns, and rename them.
+    df_show = df_show.drop(columns=["type", "indicator_id"]).rename(
+        columns={"score": "score_anomaly", "score_weighted": "score_relevance", "entity_name": "entity"}
+    )
+
+    # Store population and analytics scores for later use.
+    score_population = df_show["score_population"].copy()
+    score_analytics = df_show["score_analytics"].copy()
+
+    # Create a column that shows both population and population score, and another one for views and analytics score.
+    df_show["population_and_score"] = df_show.apply(
+        lambda row: f"{row['score_population']:.0%} ({pretty_print_number(row['population'])})", axis=1
+    )
+    df_show["analytics_and_score"] = df_show.apply(
+        lambda row: f"{row['score_analytics']:.0%} ({pretty_print_number(row['views'])})", axis=1
+    )
+    df_show = df_show.drop(columns=["population", "score_population", "views", "score_analytics"])
+
+    # Rearrange and rename columns more conveniently.
+    df_show = df_show[
+        [
+            "entity",
+            "year",
+            "score_relevance",
+            "score_anomaly",
+            "score_scale",
+            "population_and_score",
+            "analytics_and_score",
+        ]
+    ]
+    df_show = df_show.rename(columns={column: column.replace("score_", "") for column in df_show.columns})
+    df_show = df_show.rename(columns={"population_and_score": "population", "analytics_and_score": "views"})
+
+    # Apply styling to columns that only show percentages.
+    df_style = df_show.style.format("{:.0%}", subset=["relevance", "anomaly", "scale"]).background_gradient(
+        subset=["relevance", "anomaly", "scale"],
+        vmin=0,
+        vmax=1,
+    )
+
+    # Apply styling to special columns population and views.
+    df_style = df_style.background_gradient(
+        subset=["population"],
+        gmap=score_population,
+        vmin=0,
+        vmax=1,
+    )
+    df_style = df_style.background_gradient(
+        subset=["views"],
+        gmap=score_analytics,
+        vmin=0,
+        vmax=1,
+    )
+
+    return df_style
 
 
 ######################################################################
@@ -443,15 +571,7 @@ st.title(":material/planner_review: Anomalist")
 
 # 2/ DATASET FORM
 # Ask user to select datasets. By default, we select the new datasets (those that are new in the current PR compared to master).
-st.markdown(
-    """
-    <style>
-       .stMultiSelect [data-baseweb=select] span{
-            max-width: 1000px;
-        }
-    </style>""",
-    unsafe_allow_html=True,
-)
+st_multiselect_wider()
 
 with st.form(key="dataset_search"):
     query_dataset_ids = [int(v) for v in st.query_params.get_all("anomalist_datasets_selected")]
@@ -602,19 +722,20 @@ if st.session_state.anomalist_df is not None:
         with col1:
             cols = st.columns(2)
             with cols[0]:
-                st.selectbox(
+                url_persist(st.multiselect)(
                     label="Sort by",
                     options=SORTING_STRATEGIES.keys(),
                     format_func=SORTING_STRATEGIES.get,
+                    placeholder="Select sorting strategy",
                     help=(
                         """
                         Sort anomalies by a certain criteria.
 
-                        - **Relevance**: This is a combined score based on population in country, views of charts using this indicator, and anomaly-algorithm error score. The higher this score, the more relevant the anomaly.
+                        - **Relevance**: This is a combined score based on the anomaly score, the scale of the anomaly, the population in the country, and the views of charts using this indicator.
                         - **Anomaly score**: The anomaly detection algorithm assigns a score to each anomaly based on its significance.
+                        - **Scale**: Scale score, based on how big the anomaly as a share of the range of values of the indicator.
                         - **Population**: Population score, based on the population in the affected country.
                         - **Views**: Views of charts using this indicator.
-                        - **Population+views**: Combined population and chart views to rank.
                         """
                     ),
                     key="anomalist_sorting_strategy",
@@ -647,6 +768,18 @@ if st.session_state.anomalist_df is not None:
                     key="anomalist_max_year",
                 )
 
+        with st.expander("Advanced options", expanded=st.session_state.anomalist_expander_advanced_options):
+            for score_name in ["weighted", "anomaly", "scale", "population", "analytics"]:
+                # For some reason, if the slider minimum value is zero, streamlit raises an error when the slider is
+                # dragged to the minimum. Set it to a small, non-zero number.
+                url_persist(st.slider)(
+                    f"Minimum {score_name} score",
+                    min_value=1e-9,
+                    max_value=1.0,
+                    # step=0.001,
+                    key=f"anomalist_min_{score_name}_score",
+                )
+
     # 4.3/ APPLY FILTERS
     df = filter_df(st.session_state.anomalist_df)
 
@@ -658,11 +791,14 @@ if st.session_state.anomalist_df is not None:
 
     # Show anomalies with time and version changes
     if not df.empty:
-        # LLM summary option
-        llm_ask(df)
+        # Top option buttons
+        with st_horizontal():
+            # LLM summary option
+            llm_ask(df)
+            download_anomalies(df)
 
         # st.dataframe(df_change)
-        groups = df.groupby(["indicator_id", "type"], sort=False)
+        groups = df.groupby(["indicator_id", "type"], sort=False, observed=True)
         items = list(groups)
         items_per_page = 10
 
@@ -675,7 +811,7 @@ if st.session_state.anomalist_df is not None:
 
         # Show items (only current page)
         for item in pagination.get_page_items():
-            show_anomaly_compact(item[0], item[1])
+            show_anomaly_compact(index=item[0], df=item[1])
 
         # Show controls only if needed
         if len(items) > items_per_page:

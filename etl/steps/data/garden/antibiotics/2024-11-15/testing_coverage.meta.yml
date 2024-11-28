@@ -1,0 +1,207 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Antibiotics
+  description_key_ast_bloodstream: &description_key_ast_bloodstream
+      - Acinetobacter spp. infections are tested for their susceptibility to carbapanem antibiotics.
+      - Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics.
+      - Staphylococcus aureus infections are tested for their susceptibility to methicillin antibiotics.
+      - Escheria coli and Klebsiella pneumoniae infections are tested for their susceptibility to third-generation cephalosporin antibiotics and carbapanem antibiotics.
+      - Streptococcus pneumoniae infections are tested for their susceptibility to penicillin antibiotics.
+  description_key_ast_stool: &description_key_ast_stool
+      - Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics.
+      - Shigella spp. infections are tested for their susceptibility to third-generation cephalosporin antibiotics.
+  description_key_ast_urinary_tract: &description_key_ast_urinary_tract
+      - Escheria coli infections are tested for their susceptibility to fluoroquinolone antibiotics, sulfonamides and trimethoprim antibiotics and third-generation cephalosporin antibiotics.
+      - Klebsiella pneumoniae infections are tested for their susceptibility to fluoroquinolone antibiotics, sulfonamides and trimethoprim antibiotics and third-generation cephalosporin antibiotics.
+  description_key_ast_gonorrhea: &description_key_ast_gonorrhea
+      - Neisseria gonorrhoeae infections are tested for their susceptibility to macrolide antibiotics and third-generation cephalosporin antibiotics.
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  testing_coverage:
+    variables:
+      ctas_with_reported_bcis_bloodstream:
+        title: Number of countries reporting confirmed bloodstream infections
+        description_short: Number of countries reporting bacteriologically confirmed bloodstream infections to WHO.
+        unit: countries
+        display:
+          name: Bloodstream infections
+      ctas_with_reported_bcis_gonorrhea:
+        title: Number of countries reporting confirmed gonorrhea infections
+        description_short: Number of countries reporting bacteriologically confirmed gonorrhea infections to WHO.
+        unit: countries
+        display:
+          name: Gonorrhea infections
+      ctas_with_reported_bcis_stool:
+        title: Number of countries reporting confirmed gastrointestinal infections
+        description_short: Number of countries reporting bacteriologically confirmed gastrointestinal infections to WHO.
+        unit: countries
+        display:
+          name: Gastrointestinal infections
+      ctas_with_reported_bcis_urinary_tract:
+        title: Number of countries reporting confirmed urinary tract infections
+        description_short: Number of countries reporting bacteriologically confirmed urinary tract infections to WHO.
+        unit: countries
+        display:
+          name: Urinary tract infections
+      ctas_with_reported_bcis_with_ast__gt__80_bcis_bloodstream:
+        title: Number of countries testing >80% of confirmed bloodstream infections for antibiotic susceptibility
+        description_short: Number of countries testing >80% bacteriologically confirmed bloodstream infections for antibiotic susceptibility.
+        description_key: *description_key_ast_bloodstream
+        unit: countries
+        display:
+          name: Bloodstream infections
+      ctas_with_reported_bcis_with_ast__gt__80_bcis_gonorrhea:
+        title: Number of countries testing >80% of confirmed gonorrhea infections for antibiotic susceptibility
+        description_short: Number of countries testing >80% bacteriologically confirmed gonorrhea infections for antibiotic susceptibility.
+        description_key: *description_key_ast_gonorrhea
+        unit: countries
+        display:
+          name: Gonorrhea infections
+      ctas_with_reported_bcis_with_ast__gt__80_bcis_stool:
+        title: Number of countries testing >80% of confirmed gastrointestinal infections for antibiotic susceptibility
+        description_short: Number of countries testing >80% bacteriologically confirmed gastrointestinal infections for antibiotic susceptibility.
+        description_key: *description_key_ast_stool
+        unit: countries
+        display:
+          name: Gastrointestinal infections
+      ctas_with_reported_bcis_with_ast__gt__80_bcis_urinary_tract:
+        title: Number of countries testing >80% of confirmed urinary tract infections for antibiotic susceptibility
+        description_short: Number of countries testing >80% bacteriologically confirmed urinary tract infections for antibiotic susceptibility.
+        description_key: *description_key_ast_urinary_tract
+        unit: countries
+        display:
+          name: Urinary tract infections
+      total_bcis_bloodstream:
+        title: Total confirmed bloodstream infections
+        description_short: Total bacteriologically confirmed bloodstream infections tested for antibiotic susceptibility.
+        unit: infections
+        display:
+          name: Bloodstream infections
+      total_bcis_gonorrhea:
+        title: Total confirmed gonorrhea infections
+        description_short: Total bacteriologically confirmed gonorrhea infections tested for antibiotic susceptibility.
+        unit: infections
+        display:
+          name: Gonorrhea infections
+      total_bcis_stool:
+        title: Total confirmed gastrointestinal infections
+        description_short: Total bacteriologically confirmed gastrointestinal infections tested for antibiotic susceptibility.
+        unit: infections
+        display:
+          name: Gastrointestinal infections
+      total_bcis_urinary_tract:
+        title: Total confirmed urinary tract infections
+        description_short: Total bacteriologically confirmed urinary tract infections tested for antibiotic susceptibility.
+        unit: infections
+        display:
+          name: Urinary tract infections
+      total_bcis_with_ast_bloodstream:
+        title: Total confirmed bloodstream infections tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed bloodstream infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_bloodstream
+        unit: infections
+        display:
+          name: Bloodstream infections
+      total_bcis_with_ast_gonorrhea:
+        title: Total confirmed gonorrhea infections tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed gonorrhea infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_gonorrhea
+        unit: infections
+        display:
+          name: Gonorrhea infections
+      total_bcis_with_ast_stool:
+        title: Total confirmed gastrointestinal infections tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed gastrointestinal infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_stool
+        unit: infections
+        display:
+          name: Gastrointestinal infections
+      total_bcis_with_ast_urinary_tract:
+        title: Total confirmed urinary tract infections tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed urinary tract infections tested for antibiotic susceptibility.
+        description_key: *description_key_ast_urinary_tract
+        unit: infections
+        display:
+          name: Urinary tract infections
+      share_ctas_with_reported_bcis_bloodstream:
+        title: Share of countries reporting confirmed bloodstream infections
+        description_short: Share of countries reporting bacteriologically confirmed bloodstream infections to WHO.
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Bloodstream infections
+      share_ctas_with_reported_bcis_gonorrhea:
+        title: Share of countries reporting confirmed gonorrhea infections
+        description_short: Share of countries reporting bacteriologically confirmed gonorrhea infections to WHO.
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Gonorrhea infections
+      share_ctas_with_reported_bcis_stool:
+        title: Share of countries reporting confirmed gastrointestinal infections
+        description_short: Share of countries reporting bacteriologically confirmed gastrointestinal infections to WHO.
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Gastrointestinal infections
+      share_ctas_with_reported_bcis_urinary_tract:
+        title: Share of countries reporting confirmed urinary tract infections
+        description_short: Share of countries reporting bacteriologically confirmed urinary tract infections to WHO.
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Urinary tract infections
+      share_ctas_with_reported_bcis_with_ast__gt__80_bcis_bloodstream:
+        title: Share of countries testing >80% of confirmed bloodstream infections for antibiotic susceptibility
+        description_short: Share of countries testing >80% bacteriologically confirmed bloodstream infections for antibiotic susceptibility.
+        description_key: *description_key_ast_bloodstream
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Bloodstream infections
+      share_ctas_with_reported_bcis_with_ast__gt__80_bcis_gonorrhea:
+        title: Share of countries testing >80% of confirmed gonorrhea infections for antibiotic susceptibility
+        description_short: Share of countries testing >80% bacteriologically confirmed gonorrhea infections for antibiotic susceptibility.
+        description_key: *description_key_ast_gonorrhea
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Gonorrhea infections
+      share_ctas_with_reported_bcis_with_ast__gt__80_bcis_stool:
+        title: Share of countries testing >80% of confirmed gastrointestinal infections for antibiotic susceptibility
+        description_short: Share of countries testing >80% bacteriologically confirmed gastrointestinal infections for antibiotic susceptibility.
+        description_key: *description_key_ast_stool
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Gastrointestinal infections
+      share_ctas_with_reported_bcis_with_ast__gt__80_bcis_urinary_tract:
+        title: Share of countries testing >80% of confirmed urinary tract infections for antibiotic susceptibility
+        description_short: Share of countries testing >80% bacteriologically confirmed urinary tract infections for antibiotic susceptibility.
+        description_key: *description_key_ast_urinary_tract
+        unit: "%"
+        short_unit: "%"
+        display:
+          name: Urinary tract infections
+  specimen:
+    variables:
+      total_bcis_with_ast:
+        title: Confirmed infections tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed infections tested for antibiotic susceptibility.
+        unit: infections
+      infections_not_tested_for_susceptibility:
+        title: Confirmed infections not tested for antibiotic susceptibility
+        description_short: Total bacteriologically confirmed infections that have not been tested for antibiotic susceptibility.
+        unit: infections
+

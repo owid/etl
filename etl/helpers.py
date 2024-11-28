@@ -3,6 +3,7 @@
 #  etl
 #
 
+import datetime as dt
 import re
 import sys
 import tempfile
@@ -99,7 +100,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
                 year = tab["year"]
             else:
                 year = tab.index.get_level_values("year")
-            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {tab['year'].dtype}"
+            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {year.dtype}"
         elif {"date", "country"} <= set(tab.all_columns):
             pass
         else:
@@ -1205,7 +1206,7 @@ def map_indicator_path_to_id(catalog_path: str) -> str | int:
 def get_schema_from_url(schema_url: str) -> dict:
     """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
 
-    https://files.ourworldindata.org/schemas/grapher-schema.005.json
+    https://files.ourworldindata.org/schemas/grapher-schema.006.json
 
     More details on available versions can be found
     at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema.
@@ -1216,3 +1217,10 @@ def get_schema_from_url(schema_url: str) -> dict:
         Schema of a chart configuration.
     """
     return requests.get(schema_url, timeout=20, verify=TLS_VERIFY).json()
+
+
+def last_date_accessed(tb: Table) -> str:
+    """Get maximum date_accessed from all origins in the table and display it in a specific format. This
+    should be a replacement for {TODAY} in YAML templates."""
+    date_accessed = max([origin.date_accessed for col in tb.columns for origin in tb[col].m.origins])
+    return dt.datetime.strptime(date_accessed, "%Y-%m-%d").strftime("%d %B %Y")

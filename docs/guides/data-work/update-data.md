@@ -12,9 +12,9 @@ This guide explains the general workflow to update a dataset that already exists
     In a nutshell, these are the steps to follow:
 
     - Switch to `master` branch (`git switch master`), and ensure it's up-to-date (`git pull`).
-    - Create a new branch and a draft pull request (PR) with a staging server:
+    - Create a new branch (name is auto-generated) and a draft pull request (PR) with a staging server:
         ```bash
-        etl pr update-{short_name} --title "Update {short_name}" --category data
+        etl pr "{short_name}: update" data
         ```
     - Use the ETL Dashboard to create new versions of the steps (this will duplicate the code of the old steps).
     - Execute the newly created snapshot scripts, if any.
@@ -47,12 +47,12 @@ This guide assumes you have already a [working installation of `etl`](../../../g
 - **Create a draft PR and a temporary staging server**
     - Create a PR with the following command (replace `{short_name}` with the short name of the dataset, e.g. `temperature-anomaly`):
     ```bash
-    etl pr update-{short_name} --title "Update {short_name}" --category data
+    etl pr "{short_name}: update" data
     ```
 
-    This will create a new git branch in your local repository with an empty commit, which will be pushed to remote.
-    It will also create a draft pull request in github, and a staging server.
-    - Wait for a notification from `owidbot`. It should take a few minutes, and will inform you that the staging server [http://staging-site-update-temperature-anomaly/admin](http://staging-site-update-temperature-anomaly/admin) has been created.
+        This will create a new git branch in your local repository with an empty commit, which will be pushed to remote. It will also create a draft pull request in github, and a staging server.
+
+    - Wait for a notification from [@owidbot](https://github.com/owidbot). It should take a few minutes, and will inform you that the staging server `http://staging-site-update-{short_name}` has been created.
 
 - **Update steps using the ETL Dashboard**:
     - Start the ETL Wizard, by running:

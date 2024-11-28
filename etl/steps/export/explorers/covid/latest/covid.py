@@ -69,7 +69,7 @@ def run(dest_dir: str) -> None:
 
     # Load necessry tables
     # ds = paths.load_dataset("cases_deaths")
-    # tb = ds.read_table("cases_deaths")
+    # tb = ds.read("cases_deaths")
 
     # Read all tables
     # tables = {}

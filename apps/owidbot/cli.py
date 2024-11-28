@@ -60,7 +60,8 @@ def cli(
     repo = gh_utils.get_repo(repo_name)
     pr = gh_utils.get_pr(repo, branch)
     if pr is None:
-        raise AssertionError(f"No open PR found for branch {branch}")
+        log.warning(f"No open PR found for branch {branch}")
+        return
 
     # recalculate services
     services_body = {}
@@ -138,8 +139,8 @@ def create_comment_body(branch: str, services: Dict[str, str], start_time: float
 
     body = f"""
 <b>Quick links (staging server)</b>:
-[Site](http://{container_name}/) | [Admin](http://{container_name}/admin/login) | [Wizard](http://{container_name}/etl/wizard/)
-|--------------------------------|---|---|
+[Site Dev](http://{container_name}/) | [Site Preview](https://{branch}.owid.pages.dev/) | [Admin](http://{container_name}/admin) | [Wizard](http://{container_name}/etl/wizard/) | [Docs](http://{container_name}/etl/docs/)
+|--------------------------------|----------------------------------|---|---|---|
 
 **Login**: `ssh owid@{container_name}`
 

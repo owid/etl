@@ -1,0 +1,48 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  desc_update: The 2024 data is incomplete and was last updated {date_accessed}.
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+      grapher_config:
+        note: Confirmed large-scale AI models are those where the training compute exceeds 10²³ floating-point operations (FLOP).
+    description_short: Describes the specific area, application, or field in which a large-scale AI model is designed to operate. {definitions.desc_update}
+    description_key:
+        - Game systems are specifically designed for games and excel in understanding and strategizing gameplay. For instance, AlphaGo, developed by DeepMind, defeated the world champion in the game of Go. Such systems use complex algorithms to compete effectively, even against skilled human players.
+
+        - Language systems are tailored to process language, focusing on understanding, translating, and interacting with human languages. Examples include chatbots, machine translation tools like Google Translate, and sentiment analysis algorithms that can detect emotions in text.
+
+        - Multimodal systems are artificial intelligence frameworks that integrate and interpret more than one type of data input, such as text, images, and audio. ChatGPT-4 is an example of a multimodal system, as it has the capability to process and generate responses based on both textual and visual inputs.
+
+        - Vision systems focus on processing visual information, playing a pivotal role in image recognition and related areas. For example, Facebook's photo tagging system uses vision AI to identify faces.
+
+        - Speech systems are dedicated to handling spoken language, serving as the backbone of voice assistants and similar applications. They recognize, interpret, and generate spoken language to interact with users.
+
+        - Biology systems analyze biological data and simulate biological processes, aiding in drug discovery and genetic research.
+
+        - Image generation systems create visual content from text descriptions or other inputs, used in graphic design and content creation.
+
+    description_processing: The count of large-scale AI models AI systems per domain is derived by tallying the instances of machine learning models classified under each domain category. It's important to note that a single machine learning model can fall under multiple domains. The classification into domains is determined by the specific area, application, or field that the AI system is primarily designed to operate within.
+    description_from_producer: A foreign key field categorizing the system’s domain of machine learning. This field links to the [ML Domains table](https://airtable.com/appDFXXgaG1xLtXGL/shrhzolGiQCVnwOY5/tbleYEsZORsiYRVTM), and domains are selected from the options in that table.
+    unit: 'AI systems'
+    short_unit: ''
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 31
+  title: Large-scale AI systems by domain type
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch_compute_intensive_domain:
+    variables:
+      yearly_count:
+        title: Annual number of large-scale AI models by domain
+
+      cumulative_count:
+        title: Cumulative number of large-scale AI models by domain

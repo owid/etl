@@ -1,8 +1,13 @@
 meta:
-  namespace: fasttrack
-  short_name: global_warming_contributions
-  file_extension: csv
-  date_accessed: 2023-03-29
+  source:
+    name: Matthew Jones et al. (2023)
+    url: https://doi.org/10.5281/zenodo.7636699
+    source_data_url: |-
+      gAAAAABnRYaj4DTXeJP0ir8ExcuaJRXjM2guld5knTOnakD5MVRDT9gg0A5PS-3i584pjGjV-RpP-30PBWfwi7DcqsY2qcDyjtdELFAz_0YeiJPZBPjb6SgpO5xGPJq5HBzJugTrPm15GuJ0ntAZGz3mh13Ev2eNs4AdpXcM5R2V-z9Ru3PdHs-ZFIpHVXUOD3zw5cGmm5mlCNybYfiqvFEPuhSgCP5-aWk2wZdj9Nv6rFUK6g2F1IKygoH1DUS5Gk4TciIBKcaT
+    date_accessed: '2024-11-26'
+    publication_year: 2023
+    published_by: |-
+      Jones, Matthew W., Peters, Glen P., Gasser, Thomas, Andrew, Robbie M., Schwingshackl, Clemens, Gütschow, Johannes, Houghton, Richard A., Friedlingstein, Pierre, Pongratz, Julia, & Le Quéré, Corinne. (2023). National contributions to climate change due to historical emissions of carbon dioxide, methane and nitrous oxide [Data set]. In Scientific Data (2023.1).
   name: Global warming contributions
   description: |-
     Jones et al. (2023) quantify national and regional contributions to the increase of global mean surface temperature over the last few centuries. As they detail: the "dataset describing the global warming response to national emissions CO2, CH4 and N2O from fossil and land use sources during 1851-2021.
@@ -14,15 +19,9 @@ meta:
     We construct a time series of cumulative CO2-equivalent emissions for each country, gas, and emissions source (fossil or land use). Emissions of CH4 and N2O emissions are related to cumulative CO2-equivalent emissions using the Global Warming Potential (GWP*) approach, with best-estimates of the coefficients taken from the IPCC AR6 (Forster et al., 2021).
 
     Warming in response to cumulative CO2-equivalent emissions is estimated using the transient climate response to cumulative carbon emissions (TCRE) approach, with best-estimate value of TCRE taken from the IPCC AR6 (Forster et al., 2021, Canadell et al., 2021). 'Warming' is specifically the change in global mean surface temperature (GMST)."
-  source_name: Google Sheet
-  url: https://doi.org/10.5281/zenodo.7636699
-  source_published_by: Google Sheet
-  source_data_url: gAAAAABkJA7WvCo-f3u_JMGUF9cid_2fGu1DIt-m-5KWm8yczckrjMqCtatgoUgl0ndutC89gy_T0x7nP0SLoOLFwT9QPPBnHhk1q4NVdXRQmQGqtMUZ9fpI3ihqHUGi536Kh2baRyUgXWQFBG_3QPLq0gLEMs2o9zYNx_e0ZxsXrNrIsTCjtopQEeV4Wwc_h2dk_5l4i-MYFbNSbqs6hXMMmUAKRMIKmwxQG8pKnjgAoYSQZclY581EqJrFjRKnmFGSXbLnc6i4
+  license: {}
   is_public: false
-  version: '2023-03-27'
-  publication_year: 2023
-wdir: ../../../data/snapshots/fasttrack/2023-03-27
 outs:
-- md5: 48f8ff1455c82c193d7e5ec1cbc58fb7
-  size: 27352636
-  path: global_warming_contributions.csv
+  - md5: 237c2f9f1ec5ffc19978b1f40d36b028
+    size: 19377131
+    path: global_warming_contributions.csv

@@ -492,7 +492,7 @@ views:
     title: COVID-19 vaccines administered, initial doses and boosters
     subtitle: Total number of doses administered, broken down by whether they are part of the initial protocol or booster doses.
     hasMapTab: False
-    type: StackedDiscreteBar
+    chartTypes: ["StackedDiscreteBar"]
   - indicator:
       - grapher/covid/latest/vaccinations_global/vaccinations_global#total_vaccinations_no_boosters_per_hundred_interpolated
       - grapher/covid/latest/vaccinations_global/vaccinations_global#total_boosters_per_hundred
@@ -503,7 +503,7 @@ views:
     title: COVID-19 vaccines administered per 100 people, initial doses and boosters
     subtitle: Total number of doses administered, broken down by whether they are part of the initial protocol or booster doses, divided by the total population of the country.
     hasMapTab: False
-    type: StackedDiscreteBar
+    chartTypes: ["StackedDiscreteBar"]
 
   #######################
   # People vaccinated
@@ -622,7 +622,7 @@ views:
     sortBy: column
     sortColumnSlug: Omicron
     hideTotalValueLabel: True
-    type: StackedDiscreteBar
+    chartTypes: ["StackedDiscreteBar"]
     note: This share may not reflect the complete breakdown of cases, since only a fraction of all cases are sequenced. Recently-discovered or actively-monitored variants may be overrepresented, as suspected cases of these variants are likely to be sequenced preferentially or faster than other cases.
   #######################
   # Omicron variant (share)

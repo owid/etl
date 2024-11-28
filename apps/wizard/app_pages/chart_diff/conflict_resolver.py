@@ -155,12 +155,16 @@ class ChartDiffConflictResolver:
             # Verify config
             config_new = validate_chart_config_and_set_defaults(config, schema=get_schema_from_url(config["$schema"]))
 
-            api = AdminAPI(SOURCE, grapher_user_id=1)
+            # User who last edited the chart
+            user_id = self.diff.source_chart.lastEditedByUserId
+
+            api = AdminAPI(SOURCE)
             try:
                 # Push new chart to staging
                 api.update_chart(
                     chart_id=self.diff.chart_id,
                     chart_config=config_new,
+                    user_id=user_id,
                 )
             except HTTPError as e:
                 log.error(e)

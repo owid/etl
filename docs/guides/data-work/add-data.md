@@ -35,6 +35,16 @@ There are different ways you can add data to the catalog, depending on your tech
 </div>
 
 
+## Create your new environment
+Before starting to add a new dataset, make sure to create your new environment. This means creating a new branch, its corresponding pull request and staging server. This can all be made with one command:
+
+```bash
+etl pr "{short_name}: new dataset" data
+```
+
+This will create a new git branch in your local repository with an empty commit, which will be pushed to remote. It will also create a draft pull request in github, and a staging server. Wait for a notification from [@owidbot](https://github.com/owidbot). It should take a few minutes, and will inform you that the staging server `http://staging-site-data-{short_name}` has been created.
+
+
 ## Using Wizard (recommended)
 
 !!! info

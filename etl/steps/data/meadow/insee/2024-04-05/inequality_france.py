@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("inequality_france.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(header=2)
+    tb = snap.read(safe_types=False, header=2)
 
     #
     # Process data.

@@ -17,10 +17,17 @@ tables:
     variables:
       antibiotic_consumption__ddd_1_000_day:
         title: Antibiotic consumption of << atc_level_3_class >> (DDD per 1,000 people)
-        description_short: Estimated defined daily doses (DDD) of << atc_level_3_class >> per 1,000 people.
+        description_short: Estimated [Defined Daily Doses](#dod:defined-daily-doses) of << atc_level_3_class >> per 1,000 people.
         unit: DDD per 1,000 people per day
         display:
           numDecimalPlaces: 1
           name: << atc_level_3_class >>
+        origins:
+          - title: Global Research on Antimicrobial Resistance (GRAM) - by antibiotic group
+            date_published: '2021-11-11'
+            producer: Browne AJ et al. (2021)
+            citation_full: "Browne AJ, Chipeta MG, Haines-Woodhouse G, et al. Global antibiotic consumption and usage in humans, 2000 to 2018: a spatial modelling study. Lancet Planetary Health 2021."
+            url_main: https://www.tropicalmedicine.ox.ac.uk/gram/research/visualisation-app-antibiotic-usage-and-consumption
+            date_accessed: '2024-10-09'
 
 

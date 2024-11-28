@@ -130,17 +130,17 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("migrant_stock")
     # Read tables from meadow dataset.
     # destination and origin table
-    tb_do = ds_meadow.read_table("migrant_stock_dest_origin")
+    tb_do = ds_meadow.read("migrant_stock_dest_origin")
     # destination table, total numbers and shares
-    tb_d_total = ds_meadow.read_table("migrant_stock_dest_total")
-    tb_d_share = ds_meadow.read_table("migrant_stock_dest_share")
+    tb_d_total = ds_meadow.read("migrant_stock_dest_total")
+    tb_d_share = ds_meadow.read("migrant_stock_dest_share")
     # origin table
-    tb_o = ds_meadow.read_table("migrant_stock_origin")
+    tb_o = ds_meadow.read("migrant_stock_origin")
     # table for data by sex and age
-    tb_sa_total = ds_meadow.read_table("migrant_stock_sex_age_total")
-    tb_sa_share = ds_meadow.read_table("migrant_stock_sex_age_share")
+    tb_sa_total = ds_meadow.read("migrant_stock_sex_age_total")
+    tb_sa_share = ds_meadow.read("migrant_stock_sex_age_share")
     # population data
-    tb_pop = ds_meadow.read_table("total_population")
+    tb_pop = ds_meadow.read("total_population")
 
     ## data on destination and origin
     # Remove aggregated regions from the dataset.

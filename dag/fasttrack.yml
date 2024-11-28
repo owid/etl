@@ -66,8 +66,6 @@ steps:
     - snapshot://fasttrack/2023-06-16/guinea_worm.csv
   data://grapher/fasttrack/2023-06-28/guinea_worm:
     - snapshot://fasttrack/2023-06-28/guinea_worm.csv
-  data://grapher/fasttrack/2023-06-19/world_population_comparison:
-    - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
   data-private://grapher/fasttrack/latest/fiscal_top1_shares_country_standardized:
     - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
   data://grapher/fasttrack/2023-04-30/paratz:
@@ -96,8 +94,6 @@ steps:
     - snapshot://fasttrack/latest/transport_co2_emissions_modes.csv
   data://grapher/fasttrack/latest/democracy_freedom_house:
     - snapshot://fasttrack/latest/democracy_freedom_house.csv
-  data://grapher/fasttrack/latest/democracy_lexical_index:
-    - snapshot://fasttrack/latest/democracy_lexical_index.csv
   data://grapher/fasttrack/latest/global_maternal_offspring_loss:
     - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
   data://grapher/fasttrack/latest/under_five_mortality_lmics:
@@ -234,3 +230,13 @@ steps:
     - snapshot-private://fasttrack/latest/de_sanjose_2019_hpv_cancers.csv
   data-private://grapher/fasttrack/latest/wei_2024_invasive_cervical_cancer_hpv_types:
     - snapshot-private://fasttrack/latest/wei_2024_invasive_cervical_cancer_hpv_types.csv
+  data://grapher/fasttrack/latest/pepfar_patients_currently_receiving_art_formatted:
+    - snapshot://fasttrack/latest/pepfar_patients_currently_receiving_art_formatted.csv
+  data://grapher/fasttrack/latest/pepfar_patients_receiving_art:
+    - snapshot://fasttrack/latest/pepfar_patients_receiving_art.csv
+  data://grapher/fasttrack/latest/simon_ehrlich_wager:
+    - snapshot://fasttrack/latest/simon_ehrlich_wager.csv
+  data://grapher/fasttrack/latest/mineral_prices_usgs:
+    - snapshot://fasttrack/latest/mineral_prices_usgs.csv
+  data://grapher/fasttrack/latest/useful_energy_cost_way:
+    - snapshot://fasttrack/latest/useful_energy_cost_way.csv

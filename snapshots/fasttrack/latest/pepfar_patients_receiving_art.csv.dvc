@@ -1,0 +1,27 @@
+meta:
+  origin:
+    producer: President's Emergency Plan for AIDS Relief
+    title: Number of patients currently receiving antiretroviral therapy (ART)
+    description: |-
+      This dataset gives the number of PEPFAR patients receiving antiretroviral therapy (ART) by year.
+
+      You can find more information here:
+      https://spotlight.pepfar-panorama.org/MicroStrategyLibrary/app/20F2A7EC4211131FF05EE7886B0CB640/110502B54734BCD750AEAF9DED6B33DC/W5C3204B6FE4447808946F9D40FD0E497--K46
+    citation_full: President's Emergency Plan for AIDS Relief (2024) PEPFAR. 20 Years of Impact.
+    url_main: |-
+      https://spotlight.pepfar-panorama.org/MicroStrategyLibrary/app/20F2A7EC4211131FF05EE7886B0CB640/110502B54734BCD750AEAF9DED6B33DC/W5C3204B6FE4447808946F9D40FD0E497--K46
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTFbG6GRWpadmoVjfaYop7_NTCyWafFYcByCHidpoZeWPPaszlJYSDnOzUAn4MNuQLRcbLGZf84svqA/pub?output=csv
+    date_accessed: '2024-10-25'
+    date_published: '2024'
+  name: Number of PEPFAR patients currently receiving ART (PEPFAR, 2024)
+  description: |-
+    This dataset gives the number of PEPFAR patients receiving antiretroviral therapy (ART) by year.
+
+    You can find more information here:
+    https://spotlight.pepfar-panorama.org/MicroStrategyLibrary/app/20F2A7EC4211131FF05EE7886B0CB640/110502B54734BCD750AEAF9DED6B33DC/W5C3204B6FE4447808946F9D40FD0E497--K46
+  license: {}
+outs:
+  - md5: 33d1c2642723f1ad14895a60f564b67c
+    size: 420
+    path: pepfar_patients_receiving_art.csv

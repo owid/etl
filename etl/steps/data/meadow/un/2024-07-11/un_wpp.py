@@ -129,10 +129,10 @@ def read_estimates_and_projections_from_snap(short_name: str) -> Table:
     snap = paths.load_snapshot(short_name)
     # Read tables
     # TODO: Add support for Low, and High variants
-    tb_estimates = snap.read(sheet_name="Estimates")
-    tb_projections_medium = snap.read(sheet_name="Medium")
-    # tb_projections_low = snap.read(sheet_name="Low")
-    # tb_projections_high = snap.read(sheet_name="High")
+    tb_estimates = snap.read(safe_types=False, sheet_name="Estimates")
+    tb_projections_medium = snap.read(safe_types=False, sheet_name="Medium")
+    # tb_projections_low = snap.read(safe_types=False, sheet_name="Low")
+    # tb_projections_high = snap.read(safe_types=False, sheet_name="High")
     # Merge tables
     tb = concat(
         [

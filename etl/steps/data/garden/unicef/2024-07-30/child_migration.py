@@ -79,7 +79,7 @@ def run(dest_dir: str) -> None:
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read_table("child_migration")
+    tb = ds_meadow.read("child_migration")
 
     # combine indicator, statistical population and unit columns (to get one indicator per combination)
 

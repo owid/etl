@@ -2,8 +2,8 @@ import pandas as pd
 from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
-from etl.config import OWID_ENV, OWIDEnv, get_container_name
-from etl.db import Engine
+from etl.config import OWIDEnv, get_container_name
+from etl.db import production_or_master_engine
 
 from . import github_utils as gh_utils
 
@@ -24,6 +24,9 @@ def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_r
     if charts_df.empty:
         conclusion = "neutral"
         title = "No charts for review"
+    elif charts_df[~charts_df.is_rejected].error.any():
+        conclusion = "failure"
+        title = "Some charts have errors"
     elif charts_df.is_reviewed.all():
         conclusion = "success"
         title = "All charts are reviewed"
@@ -50,7 +53,11 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
 
     chart_diff = format_chart_diff(charts_df)
 
-    if charts_df.empty or charts_df.is_reviewed.all():
+    if charts_df.empty:
+        status = "✅"
+    elif charts_df[~charts_df.is_rejected].error.any():
+        status = "⚠️"
+    elif charts_df.is_reviewed.all():
         status = "✅"
     else:
         status = "❌"
@@ -65,15 +72,6 @@ def run(branch: str, charts_df: pd.DataFrame) -> str:
     """.strip()
 
     return body
-
-
-def production_or_master_engine() -> Engine:
-    """Return the production engine if available, otherwise connect to staging-site-master."""
-    if OWID_ENV.env_remote == "production":
-        return OWID_ENV.get_engine()
-    else:
-        log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
-        return OWIDEnv.from_staging("master").get_engine()
 
 
 def call_chart_diff(branch: str) -> pd.DataFrame:
@@ -93,8 +91,9 @@ def format_chart_diff(df: pd.DataFrame) -> str:
     if df.empty:
         return "No charts for review."
 
-    new = df[df.is_new]
-    modified = df[~df.is_new]
+    rejected = df[df.is_rejected]
+    new = df[df.is_new & ~df.is_rejected]
+    modified = df[~df.is_new & ~df.is_rejected]
 
     # Total charts
     num_charts = len(df)
@@ -108,12 +107,21 @@ def format_chart_diff(df: pd.DataFrame) -> str:
     num_charts_new = len(new)
     num_charts_new_reviewed = new.is_reviewed.sum()
 
+    # Rejected charts
+    num_charts_rejected = len(rejected)
+
+    # Errors
+    if df.error.any():
+        errors = f"<li>Errors: {df.error.notnull().sum()}</li>"
+    else:
+        errors = ""
+
     return f"""
 <ul>
     <li>{num_charts_reviewed}/{num_charts} reviewed charts</li>
-    <ul>
-        <li>Modified: {num_charts_modified_reviewed}/{num_charts_modified}</li>
-        <li>New: {num_charts_new_reviewed}/{num_charts_new}</li>
-    </ul>
+    <li>Modified: {num_charts_modified_reviewed}/{num_charts_modified}</li>
+    <li>New: {num_charts_new_reviewed}/{num_charts_new}</li>
+    <li>Rejected: {num_charts_rejected}</li>
+    {errors}
 </ul>
     """.strip()

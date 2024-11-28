@@ -7,6 +7,7 @@ version, where data needed to be combined with the European Electricity Review).
 from typing import Dict
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Dataset, Table, utils
 from structlog import get_logger
 
@@ -452,10 +453,11 @@ def run(dest_dir: str) -> None:
     # Therefore, we make nan all aggregate data in all yearly electricity tables prior to 2000.
     for table_name in tables:
         for column in tables[table_name].columns:
-            tables[table_name][
+            tables[table_name].loc[
                 (tables[table_name].index.get_level_values(0).isin(geo.REGIONS))
-                & (tables[table_name].index.get_level_values(1) < 2000)
-            ] = None
+                & (tables[table_name].index.get_level_values(1) < 2000),
+                :,
+            ] = pd.NA
     ####################################################################################################################
 
     # Combine all tables into one.

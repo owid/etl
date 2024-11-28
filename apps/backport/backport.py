@@ -281,6 +281,8 @@ def _upload_data_metadata(lg: Any, backport_short_name: str, dry_run: bool) -> N
         if not dry_run:
             upload_gzip_dict(upload_variable_data, db_var.s3_data_path())
 
+        db_variable_row["type"] = gm.Variable.infer_type(var_data["value"])
+
         upload_variable_metadata = _variable_metadata(
             db_variable_row=db_variable_row,
             variable_data=var_data,

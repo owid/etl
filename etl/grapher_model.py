@@ -254,10 +254,15 @@ class User(Base):
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     isActive: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     fullName: Mapped[str] = mapped_column(VARCHAR(255))
+    githubUsername: Mapped[str] = mapped_column(VARCHAR(255))
     password: Mapped[Optional[str]] = mapped_column(VARCHAR(128))
     lastLogin: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     lastSeen: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+    @classmethod
+    def load_user(cls, session: Session, github_username: str) -> Optional["User"]:
+        return session.scalars(select(cls).where(cls.githubUsername == github_username)).one_or_none()
 
 
 class ChartRevisions(Base):
@@ -288,6 +293,13 @@ class ChartConfig(Base):
     fullMd5: Mapped[str] = mapped_column(CHAR(24), Computed("(to_base64(unhex(md5(full))))", persisted=True))
     slug: Mapped[Optional[str]] = mapped_column(
         String(255), Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True)
+    )
+    chartType: Mapped[Optional[str]] = mapped_column(
+        String(255),
+        Computed(
+            "(CASE WHEN full ->> '$.chartTypes' IS NULL THEN 'LineChart' ELSE full ->> '$.chartTypes[0]' END)",
+            persisted=True,
+        ),
     )
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, onupdate=func.current_timestamp())
@@ -488,7 +500,13 @@ class Chart(Base):
 
         # copy chart as a new object
         config = copy.deepcopy(self.config)
-        config = _remap_variable_ids(config, remap_ids)
+        try:
+            config = _remap_variable_ids(config, remap_ids)
+        except KeyError as e:
+            # This should not be happening - it means that there's a chart with a variable that doesn't exist in
+            # chart_dimensions and possibly not even in variables table. It's possible that you see it admin, but
+            # only because it is cached.
+            raise ValueError(f"Issue with chart {self.id} - variable id not found in chart_dimensions table: {e}")
 
         return config
 
@@ -570,7 +588,7 @@ class Dataset(Base):
         Index("datasets_createdByUserId", "createdByUserId"),
         Index("datasets_dataEditedByUserId", "dataEditedByUserId"),
         Index("datasets_metadataEditedByUserId", "metadataEditedByUserId"),
-        Index("unique_short_name_version_namespace", "shortName", "version", "namespace", unique=True),
+        Index("datasets_catalogpath", "catalogPath", unique=True),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
@@ -591,13 +609,13 @@ class Dataset(Base):
     metadataEditedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
     isArchived: Mapped[Optional[int]] = mapped_column(TINYINT(1), server_default=text("'0'"), default=0)
     sourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)
+    catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767), default=None)
+    tables: Mapped[Optional[list]] = mapped_column(JSON, default=None)
 
     def upsert(self, session: Session) -> "Dataset":
         cls = self.__class__
         q = select(cls).where(
-            cls.shortName == self.shortName,
-            cls.version == self.version,
-            cls.namespace == self.namespace,
+            cls.catalogPath == self.catalogPath,
         )
         ds = session.scalar(q)
         if not ds:
@@ -611,6 +629,8 @@ class Dataset(Base):
             ds.isPrivate = self.isPrivate
             ds.updatePeriodDays = self.updatePeriodDays
             ds.nonRedistributable = self.nonRedistributable
+            ds.catalogPath = self.catalogPath
+            ds.tables = self.tables
             ds.updatedAt = datetime.utcnow()
             ds.metadataEditedAt = datetime.utcnow()
             ds.dataEditedAt = datetime.utcnow()
@@ -619,17 +639,13 @@ class Dataset(Base):
         ds.sourceChecksum = None
 
         session.add(ds)
-
-        # select added object to get its id
-        q = select(cls).where(
-            cls.shortName == self.shortName,
-            cls.version == self.version,
-            cls.namespace == self.namespace,
-        )
-        return session.scalars(q).one()
+        session.flush()  # Ensure the object is written to the database and its ID is generated
+        return ds
 
     @classmethod
-    def from_dataset_metadata(cls, metadata: catalog.DatasetMeta, namespace: str, user_id: int) -> "Dataset":
+    def from_dataset_metadata(
+        cls, metadata: catalog.DatasetMeta, namespace: str, user_id: int, table_names: List[str]
+    ) -> "Dataset":
         assert metadata.title
         return cls(
             shortName=metadata.short_name,
@@ -643,6 +659,8 @@ class Dataset(Base):
             isPrivate=not metadata.is_public,
             updatePeriodDays=metadata.update_period_days,
             nonRedistributable=metadata.non_redistributable,
+            catalogPath=f"{namespace}/{metadata.version}/{metadata.short_name}",
+            tables=table_names,
         )
 
     @classmethod
@@ -751,9 +769,8 @@ class Source(Base):
             ds.description = self.description
 
         session.add(ds)
-
-        # select added object to get its id
-        return session.scalars(self._upsert_select).one()
+        session.flush()  # Ensure the object is written to the database and its ID is generated
+        return ds
 
     @classmethod
     def from_catalog_source(cls, source: catalog.Source, dataset_id: int) -> "Source":
@@ -1163,13 +1180,8 @@ class Variable(Base):
                 ds.sort = self.sort
 
         session.add(ds)
-
-        # select added object to get its id
-        q = select(cls).where(
-            cls.shortName == self.shortName,
-            cls.datasetId == self.datasetId,
-        )
-        return session.scalars(q).one()
+        session.flush()  # Ensure the object is written to the database and its ID is generated
+        return ds
 
     @classmethod
     def from_variable_metadata(
@@ -1256,18 +1268,14 @@ class Variable(Base):
     @overload
     @classmethod
     def from_id_or_path(
-        cls,
-        session: Session,
-        id_or_path: str | int,
+        cls, session: Session, id_or_path: str | int, columns: Optional[List[str]] = None
     ) -> "Variable":
         ...
 
     @overload
     @classmethod
     def from_id_or_path(
-        cls,
-        session: Session,
-        id_or_path: List[str | int],
+        cls, session: Session, id_or_path: List[str | int], columns: Optional[List[str]] = None
     ) -> List["Variable"]:
         ...
 
@@ -1276,14 +1284,15 @@ class Variable(Base):
         cls,
         session: Session,
         id_or_path: int | str | List[str | int],
+        columns: Optional[List[str]] = None,
     ) -> "Variable" | List["Variable"]:
         """Load a variable from the database by its catalog path or variable ID."""
         # Single id
         if isinstance(id_or_path, int):
-            return cls.from_id(session=session, variable_id=id_or_path)
+            return cls.from_id(session=session, variable_id=id_or_path, columns=columns)
         # Single path
         elif isinstance(id_or_path, str):
-            return cls.from_catalog_path(session=session, catalog_path=id_or_path)
+            return cls.from_catalog_path(session=session, catalog_path=id_or_path, columns=columns)
 
         # Multiple path or id
         elif isinstance(id_or_path, list):
@@ -1292,10 +1301,10 @@ class Variable(Base):
             str_ids = [i for i in id_or_path if isinstance(i, str)]
             # Multiple IDs
             if len(int_ids) == len(id_or_path):
-                return cls.from_id(session=session, variable_id=int_ids)
+                return cls.from_id(session=session, variable_id=int_ids, columns=columns)
             # Multiple paths
             elif len(str_ids) == len(id_or_path):
-                return cls.from_catalog_path(session=session, catalog_path=str_ids)
+                return cls.from_catalog_path(session=session, catalog_path=str_ids, columns=columns)
             else:
                 raise TypeError("All elements in the list must be integers")
 
@@ -1312,40 +1321,46 @@ class Variable(Base):
 
     @overload
     @classmethod
-    def from_catalog_path(cls, session: Session, catalog_path: str) -> "Variable":
+    def from_catalog_path(cls, session: Session, catalog_path: str, columns: Optional[List[str]] = None) -> "Variable":
         ...
 
     @overload
     @classmethod
-    def from_catalog_path(cls, session: Session, catalog_path: List[str]) -> List["Variable"]:
+    def from_catalog_path(
+        cls, session: Session, catalog_path: List[str], columns: Optional[List[str]] = None
+    ) -> List["Variable"]:
         ...
 
     @classmethod
-    def from_catalog_path(cls, session: Session, catalog_path: str | List[str]) -> "Variable" | List["Variable"]:
+    def from_catalog_path(
+        cls, session: Session, catalog_path: str | List[str], columns: Optional[List[str]] = None
+    ) -> "Variable" | List["Variable"]:
         """Load a variable from the DB by its catalog path."""
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
         if isinstance(catalog_path, str):
-            return session.scalars(select(cls).where(cls.catalogPath == catalog_path)).one()
+            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath == catalog_path)).one()
         elif isinstance(catalog_path, list):
-            return session.scalars(select(cls).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
+            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
 
     @overload
     @classmethod
-    def from_id(cls, session: Session, variable_id: int) -> "Variable":
+    def from_id(cls, session: Session, variable_id: int, columns: Optional[List[str]] = None) -> "Variable":
         ...
 
     @overload
     @classmethod
-    def from_id(cls, session: Session, variable_id: List[int]) -> List["Variable"]:
+    def from_id(cls, session: Session, variable_id: List[int], columns: Optional[List[str]] = None) -> List["Variable"]:
         ...
 
     @classmethod
-    def from_id(cls, session: Session, variable_id: int | List[int]) -> "Variable" | List["Variable"]:
+    def from_id(
+        cls, session: Session, variable_id: int | List[int], columns: Optional[List[str]] = None
+    ) -> "Variable" | List["Variable"]:
         """Load a variable (or list of variables) from the DB by its ID path."""
         if isinstance(variable_id, int):
-            return session.scalars(select(cls).where(cls.id == variable_id)).one()
+            return session.scalars(_select_columns(cls, columns).where(cls.id == variable_id)).one()
         elif isinstance(variable_id, list):
-            return session.scalars(select(cls).where(cls.id.in_(variable_id))).all()  # type: ignore
+            return session.scalars(_select_columns(cls, columns).where(cls.id.in_(variable_id))).all()  # type: ignore
 
     @classmethod
     def catalog_paths_to_variable_ids(cls, session: Session, catalog_paths: List[str]) -> Dict[str, int]:
@@ -1353,7 +1368,8 @@ class Variable(Base):
         query = select(Variable).where(Variable.catalogPath.in_(catalog_paths))
         return {var.catalogPath: var.id for var in session.scalars(query).all()}  # type: ignore
 
-    def infer_type(self, values: pd.Series) -> VARIABLE_TYPE:
+    @classmethod
+    def infer_type(cls, values: pd.Series) -> VARIABLE_TYPE:
         """Set type and sort fields based on indicator values."""
         return _infer_variable_type(values)
 
@@ -1964,3 +1980,13 @@ def _fetch_entities(
 
     df = df.rename(columns=column_renames)
     return df
+
+
+def _select_columns(cls, columns: Optional[list[str]] = None) -> Select:
+    # Select only the specified columns, or all if not specified
+    if columns:
+        # Use getattr to dynamically select the columns
+        columns_to_select = [getattr(cls, col) for col in columns]
+        return select(*columns_to_select)
+    else:
+        return select(cls)

@@ -5,9 +5,10 @@ import click
 import structlog
 from joblib import Memory
 from rich_click.rich_command import RichCommand
+from sqlalchemy.engine import Engine
 
 from apps.anomalist.anomalist_api import ANOMALY_TYPE, anomaly_detection
-from etl.db import get_engine, read_sql
+from etl.db import get_engine, production_or_master_engine, read_sql
 from etl.paths import CACHE_DIR
 
 log = structlog.get_logger()
@@ -61,6 +62,12 @@ memory = Memory(CACHE_DIR, verbose=0)
     type=bool,
     help="Drop anomalies table and recreate it. This is useful for development when the schema changes.",
 )
+@click.option(
+    "--sample-n",
+    type=int,
+    default=500,
+    help="Sample at most N variables from a dataset",
+)
 def cli(
     anomaly_types: Optional[Tuple[str, ...]],
     dataset_ids: Optional[list[int]],
@@ -69,6 +76,7 @@ def cli(
     dry_run: bool,
     force: bool,
     reset_db: bool,
+    sample_n: Optional[int],
 ) -> None:
     """TBD
 
@@ -91,6 +99,12 @@ def cli(
     ```
     $ etl anomalist --anomaly-type gp --dataset-ids 6589
     ```
+
+    **Example 4:** Create anomalies for new datasets
+
+    ```
+    $ etl anomalist --anomaly-type gp
+    ```
     """
     # Convert variable mapping from JSON to dictionary.
     if variable_mapping:
@@ -104,14 +118,27 @@ def cli(
     else:
         variable_mapping_dict = {}
 
-    # Load all variables from given datasets
-    if dataset_ids:
+    # If no variable IDs are given, load all variables from the given datasets.
+    if not variable_ids:
+        # Use new datasets
+        if not dataset_ids:
+            dataset_ids = load_datasets_new_ids(get_engine())
+
+            # Still no datasets, exit
+            if not dataset_ids:
+                log.info("No new datasets found.")
+                return
+
+        # Load all variables from given datasets
         assert not variable_ids, "Cannot specify both dataset IDs and variable IDs."
         q = """
         select id from variables
         where datasetId in %(dataset_ids)s
         """
         variable_ids = list(read_sql(q, get_engine(), params={"dataset_ids": dataset_ids})["id"])
+
+    else:
+        assert not dataset_ids, "Cannot specify both dataset IDs and variable IDs."
 
     anomaly_detection(
         anomaly_types=anomaly_types,
@@ -120,6 +147,27 @@ def cli(
         dry_run=dry_run,
         force=force,
         reset_db=reset_db,
+        sample_n=sample_n,
+    )
+
+
+def load_datasets_new_ids(source_engine: Engine) -> list[int]:
+    # Compare against production or staging-site-master
+    target_engine = production_or_master_engine()
+
+    # Get new datasets
+    q = """SELECT
+        id,
+        catalogPath
+    FROM datasets
+    """
+    source_datasets = read_sql(q, source_engine)
+    target_datasets = read_sql(q, target_engine)
+
+    return list(
+        source_datasets[
+            source_datasets.catalogPath.isin(set(source_datasets["catalogPath"]) - set(target_datasets["catalogPath"]))
+        ]["id"]
     )
 
 
