@@ -16,9 +16,10 @@ Steps to extract the data:
         - pandas
     2. Run this code to extract the data.
         python snapshots/one/{version}/oda_data_extract.py
-    3. Use the file oda_by_sectors_one.feather as the snapshot, by running the following code:
-        python snapshots/one/{version}/official_development_assistance_one.py --path-to-file snapshots/one/{version}/oda_by_sectors_one.feather
-    4. Delete all the files that are _not_ oda_by_sectors_one.feather or oda_data_extract.py.
+    3. Use the file oda_by_sectors_one.feather as the snapshot, by running the following codes:
+        python snapshots/one/{version}/oda_one_sectors.py --path-to-file snapshots/one/{version}/oda_one_sectors.feather
+        python snapshots/one/{version}/oda_one_channels.py --path-to-file snapshots/one/{version}/oda_one_channels.feather
+    4. Delete oda_one_sectors.feather, oda_one_channels.feather and fullCRS.parquet files.
 
 
 How to run the snapshot on the staging server:
@@ -26,16 +27,16 @@ How to run the snapshot on the staging server:
 1. sudo apt install libgl1-mesa-glx
 2. cd etl
 3. uv run pip install oda_data --upgrade
-4. uv run python snapshots/one/2024-10-02/oda_data_extract.py
+4. uv run python "snapshots/one/2024-10-02/oda_data_extract.py"
 
 """
 
 
 from pathlib import Path
-from typing import Dict, List
+from typing import List
 
 import pandas as pd
-from oda_data import ODAData, set_data_path
+from oda_data import read_crs, set_data_path
 from oda_data.tools.groupings import donor_groupings, recipient_groupings
 from structlog import get_logger
 
@@ -48,139 +49,121 @@ log = get_logger()
 # Set path where ODA data is downloaded
 set_data_path(path=PARENT_DIR)
 
+# Define start and end years for the data
+START_YEAR = 1960
+END_YEAR = 2024
+
 # Save dictionaries of groups of donors and recipients
 DONOR_GROUPINGS = donor_groupings()
 RECIPIENT_GROUPINGS = recipient_groupings()
 
-# Define parameters in ODAData class
-# Define years (remember ranges do not include the last element)
-YEARS = range(1960, 2024)
-
-# Define prices: constant or current
-PRICES = "constant"
-
-# Set the base year. We must set this given that we've asked for constant data.
-BASE_YEAR = 2022
-
-# Define if include names in the data
-INCLUDE_NAMES = False
-
-# Define list of indicators to extract
-INDICATORS = ["crs_bilateral_flow_disbursement_gross", "imputed_multi_flow_disbursement_gross"]
-
-# Columns to keep
-COLUMNS_TO_KEEP = [
-    "year",
-    "donor_code",
-    "recipient_code",
-    "sector_code",
-    "channel_code",
-    "currency",
-    "prices",
-    "value",
-]
-
-# Define columns with codes and names to remap
-COLUMNS_TO_REMAP = {
-    "donor": ["donor_code", "donor_name"],
-    "recipient": ["recipient_code", "recipient_name"],
-    "sector": ["sector_code", "sector_name"],
-    "channel": ["channel_code", "channel_name"],
-}
-
-# Define columns to extract in the csv
-FINAL_COLUMNS = [
+# Define index + value columns
+BASIC_COLUMNS = [
     "year",
     "donor_code",
     "donor_name",
     "recipient_code",
     "recipient_name",
-    "sector_name",
-    "channel_code",
-    "channel_name",
     "value",
 ]
 
 
 def main() -> None:
-    df = get_the_data(columns_to_keep=COLUMNS_TO_KEEP)
+    # Define the start and end years for the data
 
-    df = rename_categories(df=df, columns_to_remap=COLUMNS_TO_REMAP, columns_to_keep=FINAL_COLUMNS)
-
-    df = aggregate_data(df=df, columns_to_keep=FINAL_COLUMNS)
-
-    # Extract data as csv
-    df.to_feather(f"{PARENT_DIR}/oda_by_sectors_one.feather")
-
-    log.info("Data extracted successfully")
-
-
-def get_the_data(columns_to_keep: List[str]) -> pd.DataFrame:
-    """
-    Get data from ONE wrapper and group it by columns_to_keep
-    """
-
-    # Define file name for the raw data
-    raw_data_file = f"{PARENT_DIR}/oda_by_sectors_one_raw.feather"
-
-    if Path(raw_data_file).is_file():
-        log.info("Raw data already exists. Loading it...")
-        return pd.read_feather(raw_data_file)
-
-    log.info("Loading data...")
-    # Instantiate the `ODAData` class and store it in a variable called 'oda'
-    oda = ODAData(years=YEARS, prices=PRICES, base_year=BASE_YEAR, include_names=INCLUDE_NAMES)
-
-    # Load the indicators
-    # A list of all available indicators can be seen by checking `ODAData().available_indicators()`
-
-    # Add all the indicators in our `indicators` list
-    for indicator in INDICATORS:
-        log.info(f"Loading indicator {indicator}...")
-        oda.load_indicator(indicator)
-
-    # Get a DataFrame with all the data.
-    df = oda.get_data("all")
-    log.info("Raw data loaded to a dataframe")
-
-    # Finally, group the DataFrame rows by year, currency, prices and indicator
-    columns_to_group = [col for col in columns_to_keep if col not in ["value"]]
-    df = (
-        df.groupby(
-            columns_to_group,
-            observed=True,
-            dropna=False,
-        )["value"]
-        .sum(numeric_only=True)
-        .reset_index(drop=False)
+    # Get the data by sector and channels
+    df_sector = get_data_by_sector_or_channel(
+        start_year=START_YEAR, end_year=END_YEAR, flow_column="usd_commitment_constant", sector_or_channel="sector"
     )
-    log.info(f"Data grouped by {columns_to_group}")
+    df_channel = get_data_by_sector_or_channel(
+        start_year=START_YEAR, end_year=END_YEAR, flow_column="usd_disbursement_constant", sector_or_channel="channel"
+    )
 
-    # Export grouped data to csv
-    df.to_feather(raw_data_file)
+    # Save the data to feather files
+    df_sector.to_feather(f"{PARENT_DIR}/oda_one_sectors.feather")
+    df_channel.to_feather(f"{PARENT_DIR}/oda_one_channels.feather")
 
-    return df
 
-
-def rename_categories(df: pd.DataFrame, columns_to_remap: Dict[str, List], columns_to_keep: List[str]) -> pd.DataFrame:
+def get_data_by_sector_or_channel(
+    start_year: int,
+    end_year: int,
+    flow_column: str = "usd_commitment_constant",
+    by_donor: bool = True,
+    by_recipient: bool = True,
+    sector_or_channel: str = "sector",
+) -> pd.DataFrame:
+    """Get the data by sector.
+    Args:
+        start_year (int): The start year for the data.
+        end_year (int): The end year for the data.
+        flow_column (str): The flow column to aggregate (e.g usd_disbursement_constant, usd_commitment_constant).
+        by_donor (bool): Whether to show the data by donor country. The default is True,
+        by_recipient (bool): Whether to show the data by recipient country. The default is True,
+        which means the data will be shown for all recipients, total.
+    Returns:
+        pd.DataFrame: A DataFrame with data by sector.
     """
-    Rename all the categories from codes to names by using crs_codes.json
-    """
 
-    # Open the CRS file to obtain the codes and names
-    df_crs_full = pd.read_parquet(f"{PARENT_DIR}/fullCRS.parquet")
+    # Create an instance of the ODAData class. For the sectors analysis, the starting
+    # year must be 2 years before the requested start_year.
+    crs = read_crs(years=list(range(start_year, end_year + 1)))
 
-    for concept, columns in columns_to_remap.items():
-        log.info(f"Remapping {concept}...")
-        # Keep only the columns we need and drop duplicates
-        df_crs_extract = df_crs_full[columns].drop_duplicates(ignore_index=True).copy()
+    # filter for ODA
+    crs = crs.loc[lambda d: d.category == 10]
 
-        # Merge the dataframes
-        df = pd.merge(df, df_crs_extract, how="left", on=columns[0])
+    # Select columns depending on sector_or_channel
+    if sector_or_channel == "sector":
+        extra_columns = ["sector_name"]
+    elif sector_or_channel == "channel":
+        extra_columns = ["channel_code"]
 
-    log.info("Done remapping")
+    # Define columns to keep
+    columns_to_keep = (
+        [
+            "year",
+            "donor_code",
+            "donor_name",
+            "recipient_code",
+            "recipient_name",
+        ]
+        + [flow_column]
+        + extra_columns
+    )
 
-    return df
+    # Get the spending data
+    spending = crs.filter(columns_to_keep)
+
+    # group data
+    grouper = [
+        c
+        for c in columns_to_keep
+        if c
+        not in [
+            "donor_code",
+            "donor_name",
+            "recipient_code",
+            "recipient_name",
+            flow_column,
+        ]
+    ]
+
+    if by_donor:
+        grouper.extend(["donor_code", "donor_name"])
+
+    if by_recipient:
+        grouper.extend(["recipient_code", "recipient_name"])
+
+    spending = spending.groupby(grouper, observed=True, dropna=False)[flow_column].sum().reset_index()
+
+    # Rename flow_column by value
+    spending = spending.rename(columns={flow_column: "value"})
+
+    # Replace flow_column by value in columns_to_keep
+    columns_to_keep = [col if col != flow_column else "value" for col in columns_to_keep]
+
+    spending = aggregate_data(df=spending, columns_to_keep=columns_to_keep)
+
+    return spending
 
 
 def aggregate_data(df: pd.DataFrame, columns_to_keep: List[str]) -> pd.DataFrame:
