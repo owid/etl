@@ -278,3 +278,19 @@ steps:
   #
   data://grapher/iea/2024-11-20/fossil_fuel_subsidies:
     - data://garden/iea/2024-11-20/fossil_fuel_subsidies
+  #
+  # Energy prices
+  #
+  data://garden/energy/2024-11-20/energy_prices:
+    - data://garden/eurostat/2024-11-05/gas_and_electricity_prices
+    - data://garden/ember/2024-11-20/european_wholesale_electricity_prices
+  #
+  # Energy prices
+  #
+  data://grapher/energy/2024-11-20/energy_prices:
+    - data://garden/energy/2024-11-20/energy_prices
+  #
+  # Energy prices explorer
+  #
+  export://multidim/energy/latest/energy_prices:
+    - data://grapher/energy/2024-11-20/energy_prices

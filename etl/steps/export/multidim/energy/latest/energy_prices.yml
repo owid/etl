@@ -1,0 +1,50 @@
+title:
+  title: "Energy prices"
+  titleVariant: "by energy source"
+defaultSelection:
+  - "European Union (27)"
+topicTags:
+  - "Energy"
+dimensions:
+  - slug: "source"
+    name: "Energy source"
+    choices:
+      - slug: "electricity"
+        name: "Electricity"
+      - slug: "gas"
+        name: "Gas"
+  - slug: "price_component"
+    name: "Price component"
+    choices:
+      - slug: "wholesale"
+        name: "Wholesale price"
+        description: "Wholesale price"
+      - slug: "total_price_including_taxes"
+        name: "Total consumer price"
+        description: "Total consumer price including all taxes and levies"
+      # TODO: Add more price components.
+  - slug: "consumer"
+    name: "Consumer type"
+    choices:
+      - slug: "household"
+        name: "Households"
+        description: "Household consumers"
+      - slug: "non_household"
+        name: "Non-households"
+        description: "Non-household consumers"
+      - slug: "all"
+        name: "All consumers"
+        description: "All consumers"
+  - slug: "unit"
+    name: "Unit"
+    choices:
+      - slug: "euro"
+        name: "Euro"
+        description: "Price in euros"
+      - slug: "pps"
+        name: "PPS"
+        description: "Price in Purchasing Power Standard"
+views:
+  # Views will be filled out programmatically.
+  []
+
