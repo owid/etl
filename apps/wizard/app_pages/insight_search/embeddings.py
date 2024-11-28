@@ -1,9 +1,7 @@
-import pickle
+import os
 import time
-from pathlib import Path
 from typing import Any, Dict, Optional
 
-import pandas as pd
 import streamlit as st
 import torch
 from joblib import Memory
@@ -17,6 +15,16 @@ memory = Memory(CACHE_DIR, verbose=0)
 
 # Initialize log.
 log = get_logger()
+
+
+def get_default_device() -> str:
+    return "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+
+
+# Set the default device. We use CPU on our servers, but you can change this to "cuda" if you have a GPU.
+DEVICE = os.environ.get("DEVICE", get_default_device())
+
+torch.set_default_device(DEVICE)
 
 
 @memory.cache
@@ -33,7 +41,6 @@ def get_embeddings(
     model_name: Optional[str] = None,
     batch_size=32,
     workers=1,
-    # cache_file: Path = CACHE_DIR / "embeddings.pt",
 ) -> list:
     log.info("get_embeddings.start", n_embeddings=len(texts))
     t = time.time()
@@ -43,19 +50,16 @@ def get_embeddings(
         # NOTE: this is a bit of a hack
         model_name = model.tokenizer.name_or_path.split("/")[-1]
 
-    # Set the default device
-    device = "mps" if torch.backends.mps.is_available() else "cpu"
-
     cache_file_keys = CACHE_DIR / f"embeddings_{model_name}.keys"
     cache_file_keys.touch(exist_ok=True)
 
     cache_file_tensor = CACHE_DIR / f"embeddings_{model_name}.pt"
     if not cache_file_tensor.exists():
         embedding_dim = model.get_sentence_embedding_dimension()
-        torch.save(torch.empty((0, embedding_dim)), cache_file_tensor)
+        torch.save(torch.empty((0, embedding_dim)), cache_file_tensor)  # type: ignore
 
     # Load embeddings and keys
-    embeddings = torch.load(cache_file_tensor).to(device)
+    embeddings = torch.load(cache_file_tensor).to(DEVICE)
     with open(str(cache_file_keys).replace(".pt", ".keys"), "r") as f:
         keys = [line.strip() for line in f]
 
@@ -77,10 +81,13 @@ def get_embeddings(
     if missing_texts:
         if workers > 1:
             # Start the multiprocessing pool
-            pool = model.start_multi_process_pool(target_devices=workers * ["cpu"])
+            pool = model.start_multi_process_pool(target_devices=workers * [DEVICE])
             # Encode sentences using multiprocessing
             batch_embeddings = model.encode_multi_process(
-                missing_texts, pool, batch_size=batch_size, precision="float32"
+                missing_texts,
+                pool,
+                batch_size=batch_size,
+                # precision="float32"
             )
             # Close the multiprocessing pool
             model.stop_multi_process_pool(pool)
@@ -91,14 +98,16 @@ def get_embeddings(
                 convert_to_tensor=True,
                 batch_size=batch_size,
                 show_progress_bar=True,
+                device=DEVICE,
             )
 
         # Convert batch_embeddings to torch tensor if necessary
         if not isinstance(batch_embeddings, torch.Tensor):
             batch_embeddings = torch.from_numpy(batch_embeddings)
 
-        # Move batch_embeddings to the same device as embeddings
-        # batch_embeddings = batch_embeddings.to(embeddings.device)
+        # TODO: should embeddings be on CPU or GPU?
+        # Ensure batch_embeddings are on CPU
+        # batch_embeddings = batch_embeddings.cpu()
 
         # Update keys and embeddings
         keys.extend(missing_texts)
@@ -121,7 +130,8 @@ def get_embeddings(
     return req_embeddings.unbind(dim=0)
 
 
-@st.cache_data(show_spinner=False, persist="disk", max_entries=1)
+# TODO: caching isn't working properly when on different devices
+# @st.cache_data(show_spinner=False, persist="disk", max_entries=1)
 def get_insights_embeddings(_model, insights: list[Dict[str, Any]]) -> list:
     with st.spinner("Generating embeddings..."):
         # Combine the title, body and authors of each insight into a single string.
@@ -133,13 +143,13 @@ def get_insights_embeddings(_model, insights: list[Dict[str, Any]]) -> list:
 
 
 def get_sorted_documents_by_similarity(
-    model, input_string: str, insights: list[Dict[str, str]], embeddings: list
+    model: SentenceTransformer, input_string: str, insights: list[Dict[str, str]], embeddings: list
 ) -> list[Dict[str, Any]]:
     """Ingests an input string and a list of documents, returning the list of documents sorted by their semantic similarity to the input string."""
     _insights = insights.copy()
 
     # Encode the input string and the document texts.
-    input_embedding = model.encode(input_string, convert_to_tensor=True)
+    input_embedding = model.encode(input_string, convert_to_tensor=True, device=DEVICE)
 
     # Compute the cosine similarity between the input and each document.
     def _get_score(a, b):
