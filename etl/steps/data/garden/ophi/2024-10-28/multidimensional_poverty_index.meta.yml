@@ -233,7 +233,7 @@ tables:
           - "{definitions.description_key_multidimensional_poverty}"
           - "{definitions.description_key_assessments}"
           - "{definitions.description_key_weights}"
-          - <% set cme_link = "https://ourworldindata.org/grapher/share-multi-poverty" %> <% set hot_link = "https://ourworldindata.org/grapher/share-of-population-multidimensionally-poor-hot" %>"{definitions.description_key_flavor}"
+          - <% set cme_link = "https://ourworldindata.org/grapher/share-multi-poverty" %> <% set hot_link = "https://ourworldindata.org/grapher/share-of-population-multidimensionally-poor-hot" %>{definitions.description_key_flavor}
         presentation:
           title_public: Share of population living in multidimensional poverty
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
@@ -252,7 +252,7 @@ tables:
           - "{definitions.description_key_assessments}"
           - "{definitions.description_key_intensity}"
           - "{definitions.description_key_weights}"
-          - <% set cme_link = "https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty" %> <% set hot_link = "https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty-hot" %>"{definitions.description_key_flavor}"
+          - <% set cme_link = "https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty" %> <% set hot_link = "https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty-hot" %>{definitions.description_key_flavor}
         presentation:
           title_public: Intensity of multidimensional poverty
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
