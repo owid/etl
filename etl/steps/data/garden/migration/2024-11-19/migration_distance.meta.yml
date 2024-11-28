@@ -7,7 +7,7 @@ definitions:
     processing_level: major
     description_processing: >-
       - The migration distance indicator measures the median distance between the borders of the origin and destination country of migrants. It is calculated by first taking the minimum distance between the borders of origin and destination countries for each migrant, and then taking the median of these minimum distances.
-      - The indicator is based on the UN DESA International Migrant Stock data, which provides the number of international migrants by country of origin and destination. The geospatial data for the borders of countries is retrieved from the Natural Earth project (https://www.naturalearthdata.com/downloads/110m-cultural-vectors/), specifically the admin o - countries and tiny country points datasets.
+      - The indicator is based on the UN DESA International Migrant Stock data, which provides the number of international migrants by country of origin and destination. The geospatial data for the borders of countries is retrieved from the Natural Earth project (https://www.naturalearthdata.com/downloads/110m-cultural-vectors/), specifically the "Admin 0 - countries and tiny country points" datasets.
 
 
 dataset:

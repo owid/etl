@@ -2,6 +2,7 @@
 
 import geopandas as gpd
 import pandas as pd
+from owid.catalog import License, Origin
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -11,6 +12,17 @@ paths = PathFinder(__file__)
 
 # GeoJson file with country boundaries
 URL_TINY_CTY = "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_tiny_countries.geojson"
+
+NATURAL_EARTH_ORIGIN = Origin(
+    producer="Natural Earth",
+    title="Admin 0 - Countries and Tiny Country Points",
+    url_main="https://www.naturalearthdata.com/",
+    url_download="https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_countries.zip",
+    description="""Natural Earth is a public domain map dataset available at 1:10m, 1:50m, and 1:110 million scales. It features tightly integrated vector and raster data, was built through a collaboration of many volunteers and is supported by NACIS (North American Cartographic Information Society).""",
+    license=License(name="Public Domain", url="https://www.naturalearthdata.com/about/terms-of-use/"),
+    date_accessed="2024-11-19",
+    citation_full="Made with Natural Earth. Free vector and raster map data @ naturalearthdata.com.",
+)
 
 
 def run(dest_dir: str) -> None:
@@ -84,7 +96,7 @@ def run(dest_dir: str) -> None:
     med_distance.metadata.short_name = "migration_distance"
 
     for col in med_distance.columns:
-        med_distance[col].metadata.origins = tb["country_origin"].m.origins
+        med_distance[col].metadata.origins = tb["country_origin"].m.origins + [NATURAL_EARTH_ORIGIN]
 
     med_distance = med_distance.format(["country_origin", "year"])
 
