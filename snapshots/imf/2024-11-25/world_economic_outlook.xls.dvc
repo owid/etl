@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Economic Outlook (WEO)
+    description: |-
+      The World Economic Outlook (WEO) database contains selected macroeconomic data series from the statistical appendix of the report of the same name, which presents the IMF staff's analysis and projections of economic developments at the global level, in major country groups, and many individual countries.
+    date_published: "2024-10-22"
+    version_producer: October 2024
+
+    # Citation
+    producer: International Monetary Fund
+    citation_full: |-
+      IMF. 2024. World Economic Outlook, October 2024. Washington, DC: International Monetary Fund. ©IMF. https://doi.org/10.5089/9798400281150.081
+    attribution_short: IMF
+
+    # Files
+    url_main: https://www.imf.org/en/Publications/WEO/weo-database/2024/October
+    url_download: https://www.imf.org/-/media/Files/Publications/WEO/WEO-Database/2024/October/WEOOct2024all.ashx
+    date_accessed: 2024-11-25
+
+    # License
+    license:
+      name: IMF Copyright and Usage
+      url: https://www.imf.org/en/About/copyright-and-terms
+
+outs:
+  - md5: 2b56b3c547bd689518188f64d739e8d5
+    size: 20297276
+    path: world_economic_outlook.xls

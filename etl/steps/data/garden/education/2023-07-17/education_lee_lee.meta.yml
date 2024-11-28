@@ -11,7 +11,7 @@ definitions:
       For the period before 1985, regional aggregates were computed by Our World in Data through yearly population-weighted averages, where annual values are proportionally adjusted to emphasize the influence of larger populations.
 
 dataset:
-  title: Human Capital in the Long Run (Lee and Lee 2016) and WDI (World Bank)
+  title: Human Capital in the Long Run (Lee and Lee 2016), WDI (World Bank) and UNESCO
   description: >
     This dataset is based on 'Human Capital in the Long Run' by Lee and Lee (2016) and World Development Indicators by World Bank.
     It includes indicators relating to enrollment rates in various levels of education, historic data on average years of education and educational attainment, specifically share of people with no education.

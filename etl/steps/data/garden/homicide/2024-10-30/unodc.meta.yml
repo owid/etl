@@ -4,45 +4,53 @@ definitions:
     presentation:
       topic_tags:
         - Homicides
+    description_processing: |-
+      Values for the United Kingdom are calcuated by Our World in Data from UNODC data for England, Wales, Scotland and Northern Ireland.
 
-  metric:
+  metric: |-
     <% if unit_of_measurement == "Counts" %>
     Number of homicides
-    <% elif unit_of_measurement == "Rate per 100,000 population" %>
+    <%- elif unit_of_measurement == "Rate per 100,000 population" %>
     Homicide rate per 100,000 population
-    <%- endif -%>
-  sex:
-    <% if sex == "Total" %> all victimes<% elif sex == "Male" %>male victims<% elif sex == "Female" %>female victims<%- endif -%>
-  age:
+    <%- endif %>
+  sex: |-
+    <% if sex == "Total" %>
+    all victims
+    <%- elif sex == "Male" -%>
+    male victims
+    <%- elif sex == "Female" -%>
+    female victims
+    <% endif %>
+  age: |-
     <% if age == "Total" %>
     in all age-groups
-    <% elif age == "30-44" %>
+    <%- elif age == "30-44" %>
     aged 30-44 years
-    <% elif age == "45-59" %>
+    <%- elif age == "45-59" %>
     aged 45-59 years
-    <% elif age == "60 and older" %>
+    <%- elif age == "60 and older" %>
     aged over 60 years
-    <% elif age == "0-9" %>
+    <%- elif age == "0-9" %>
     aged 0-9 years
-    <% elif age == "10 -14" %>
+    <%- elif age == "10 -14" %>
     aged 10-14 years
-    <% elif age == "15 -17" %>
+    <%- elif age == "15 -17" %>
     aged 15-17 years
-    <% elif age == "18-19" %>
+    <%- elif age == "18-19" %>
     aged 18-19 years
-    <% elif age == "20-24" %>
+    <%-  elif age == "20-24" %>
     aged 20-24 years
-    <% elif age == "25-29" %>
+    <%- elif age == "25-29" %>
     aged 25-29 years
-    <% elif age == "Unknown" %>
+    <%- elif age == "Unknown" %>
     of unknown age
-    <%- endif -%>
-  unit:
+    <%- endif %>
+  unit: |-
     <% if unit_of_measurement == "Counts" %>
     homicides
-    <% elif sex == "Rate per 100,000 population" %>
+    <%- elif sex == "Rate per 100,000 population" %>
     homicides per 100,000 population
-    <%- endif -%>
+    <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -53,53 +61,53 @@ tables:
     by_mechanisms:
       variables:
         value:
-          title: |
+          title: |-
             {definitions.metric} - << category >>
-          description_short: |
-           {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
-          unit: |
+          description_short: |-
+            {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
+          unit: |-
             {definitions.unit}
           presentation:
-            title_public: |
+            title_public: |-
               {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
           display:
-            numDecimalPlaces: <% if unit_of_measurement == "Counts" %>0<% elif unit_of_measurement == "Rate per 100,000 population" %>1<%- endif -%>
+            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
     by_relationship_to_perpetrator:
       variables:
         value:
-          title: |
+          title: |-
             {definitions.metric} - << category >> - sex: << sex >>
-          description_short: |
+          description_short: |-
             {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
-          unit: |
+          unit: |-
             {definitions.unit}
           presentation:
-            title_public: |
+            title_public: |-
               {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
           display:
-            numDecimalPlaces: <% if unit_of_measurement == "Counts" %>0<% elif unit_of_measurement == "Rate per 100,000 population" %>1<%- endif -%>
+            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
     by_situational_context:
       variables:
         value:
-          title: |
+          title: |-
             {definitions.metric} - << category >> - sex: << sex >>
-          description_short: |
+          description_short: |-
             {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
-          unit: |
+          unit: |-
             {definitions.unit}
           presentation:
-            title_public: |
+            title_public: |-
               {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
           display:
-            numDecimalPlaces: <% if unit_of_measurement == "Counts" %>0<% elif unit_of_measurement == "Rate per 100,000 population" %>1<%- endif -%>
+            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
     total:
       variables:
         value:
-          title: |
+          title: |-
             {definitions.metric} - sex: << sex >> - age: << age >>
-          description_short: |
+          description_short: |-
             {definitions.metric} of {definitions.sex} {definitions.age}
-          unit: |
+          unit: |-
             {definitions.unit}
           display:
-            numDecimalPlaces: <% if unit_of_measurement == "Counts" %>0<% elif unit_of_measurement == "Rate per 100,000 population" %>1<%- endif -%>
+            numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
