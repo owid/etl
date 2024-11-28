@@ -85,54 +85,76 @@ def run_regression(tb):
         # Filter out models without the metric information
         tb_metric = tb[pd.notnull(tb[metric])]
 
-        # Fit exponential models for pre-DL and DL eras
-        pre_dl_models = tb_metric[tb_metric["frac_year"] < DL_ERA_START]
-        pre_dl_fit = fit_exponential(pre_dl_models, metric)
-        pre_dl_oom_per_year = pre_dl_fit[1]
+        # Define time periods
+        period1 = tb_metric[tb_metric["frac_year"] < 2010]
+        period2 = tb_metric[(tb_metric["frac_year"] >= 2010) & (tb_metric["frac_year"] < 2018)]
+        period3 = tb_metric[tb_metric["frac_year"] >= 2018]
 
-        dl_models = tb_metric[tb_metric["frac_year"] >= DL_ERA_START]
-        dl_fit = fit_exponential(dl_models, metric)
-        dl_oom_per_year = dl_fit[1]
+        # Fit exponential models for each period
+        fit1 = fit_exponential(period1, metric)
+        fit2 = fit_exponential(period2, metric)
+        fit3 = fit_exponential(period3, metric)
+
+        # Calculate OOM per year for each period
+        oom1 = fit1[1]
+        oom2 = fit2[1]
+        oom3 = fit3[1]
 
         # Log the results
-        pre_dl_info = f"{10**pre_dl_oom_per_year:.1f}x/year"
-        dl_info = f"{10**dl_oom_per_year:.1f}x/year"
-        paths.log.info(f"Pre Deep Learning Era ({metric}): {pre_dl_info}")
-        paths.log.info(f"Deep Learning Era ({metric}): {dl_info}")
+        info1 = f"{10**oom1:.1f}x/year"
+        info2 = f"{10**oom2:.1f}x/year"
+        info3 = f"{10**oom3:.1f}x/year"
 
-        # Define the year grids for the periods 1950 to 2010 and 2010 to 2025 with just two points
-        pre_dl_year_grid = np.array([START_DATE, DL_ERA_START])
-        dl_year_grid = np.array([DL_ERA_START, END_DATE])
+        paths.log.info(f"1950–2010 ({metric}): {info1}")
+        paths.log.info(f"2010–2018 ({metric}): {info2}")
+        paths.log.info(f"2018–2025 ({metric}): {info3}")
 
-        # Calculate the lines for each period using the fitted exponential models
-        pre_dl_line = 10 ** (pre_dl_fit[0] + pre_dl_year_grid * pre_dl_fit[1])
-        dl_line = 10 ** (dl_fit[0] + dl_year_grid * dl_fit[1])
+        # Define year grids for each period
+        year_grid1 = np.array([1950, 2010])
+        year_grid2 = np.array([2010, 2018])
+        year_grid3 = np.array([2018, 2025])
 
-        # Create new DataFrames for pre-deep learning and deep learning era trends with only necessary columns
-        pre_dl_df = pd.DataFrame(
+        # Calculate lines for each period
+        line1 = 10 ** (fit1[0] + year_grid1 * fit1[1])
+        line2 = 10 ** (fit2[0] + year_grid2 * fit2[1])
+        line3 = 10 ** (fit3[0] + year_grid3 * fit3[1])
+
+        # Create DataFrames for each period
+        df1 = pd.DataFrame(
             {
                 "days_since_1949": [
                     tb_metric["days_since_1949"].min(),
-                    tb_metric[tb_metric["frac_year"] < DL_ERA_START]["days_since_1949"].max(),
+                    tb_metric[tb_metric["frac_year"] < 2010]["days_since_1949"].max(),
                 ],
-                f"{metric}": [pre_dl_line[0], pre_dl_line[-1]],
-                "system": [f"{pre_dl_info}"] * 2,
+                f"{metric}": [line1[0], line1[-1]],
+                "system": [f"{info1}"] * 2,
             }
         )
 
-        dl_df = pd.DataFrame(
+        df2 = pd.DataFrame(
             {
                 "days_since_1949": [
-                    tb_metric[tb_metric["frac_year"] >= DL_ERA_START]["days_since_1949"].min(),
-                    tb_metric["days_since_1949"].max(),
+                    tb_metric[tb_metric["frac_year"] >= 2010]["days_since_1949"].min(),
+                    tb_metric[tb_metric["frac_year"] < 2018]["days_since_1949"].max(),
                 ],
-                f"{metric}": [dl_line[0], dl_line[-1]],
-                "system": [f"{dl_info}"] * 2,
+                f"{metric}": [line2[0], line2[-1]],
+                "system": [f"{info2}"] * 2,
             }
         )
 
-        # Combine the pre-deep learning and deep learning era DataFrames
-        df_combined = pd.concat([pre_dl_df, dl_df], ignore_index=True)
+        df3 = pd.DataFrame(
+            {
+                "days_since_1949": [
+                    tb_metric[tb_metric["frac_year"] >= 2018]["days_since_1949"].min(),
+                    tb_metric["days_since_1949"].max(),
+                ],
+                f"{metric}": [line3[0], line3[-1]],
+                "system": [f"{info3}"] * 2,
+            }
+        )
+
+        # Combine all three DataFrames
+        df_combined = pd.concat([df1, df2, df3], ignore_index=True)
         new_tables.append(df_combined)
 
     # Merge all the new DataFrames
