@@ -1,9 +1,21 @@
 """Load a snapshot and create a meadow dataset."""
 
+import os
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+TABLES_LIFE_TABLES = [
+    "lt_male",
+    "lt_female",
+    "lt_both",
+    "c_lt_male",
+    "c_lt_female",
+    "c_lt_both",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -14,8 +26,8 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("hmd.zip")
 
     # Load data from snapshot.
-    tb = snap.read()
-
+    with snap.extract_to_tempdir() as tmpdir:
+        print(os.listdir(tmpdir))
     #
     # Process data.
     #
