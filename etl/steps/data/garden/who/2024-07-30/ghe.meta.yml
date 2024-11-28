@@ -13,39 +13,39 @@ definitions:
   age: |-
     <% if age_group == "ALLAges" %>
     all ages
-    <% elif age_group == "age-standardized" %>
+    <%- elif age_group == "age-standardized" %>
     an age-standardized population
-    <% elif age_group == "YEARS0-14" %>
+    <%- elif age_group == "YEARS0-14" %>
     0-14 year olds
-    <% elif age_group == "YEARS0-4" %>
+    <%- elif age_group == "YEARS0-4" %>
     0-4 year olds
-    <% elif age_group == "YEARS5-14" %>
+    <%- elif age_group == "YEARS5-14" %>
     5-14 year olds
-    <% elif age_group == "YEARS15-19" %>
+    <%- elif age_group == "YEARS15-19" %>
     15-19 year olds
-    <% elif age_group == "YEARS15-49" %>
+    <%- elif age_group == "YEARS15-49" %>
     15-49 year olds
-    <% elif age_group == "YEARS20-24" %>
+    <%- elif age_group == "YEARS20-24" %>
     20-24 year olds
-    <% elif age_group == "YEARS25-34" %>
+    <%- elif age_group == "YEARS25-34" %>
     25-34 year olds
-    <% elif age_group == "YEARS35-44" %>
+    <%- elif age_group == "YEARS35-44" %>
     35-44 year olds
-    <% elif age_group == "YEARS45-54" %>
+    <%- elif age_group == "YEARS45-54" %>
     45-54 year olds
-    <% elif age_group == "YEARS50-69" %>
+    <%- elif age_group == "YEARS50-69" %>
     50-69 year olds
-    <% elif age_group == "YEARS55-64" %>
+    <%- elif age_group == "YEARS55-64" %>
     55-64 year olds
-    <% elif age_group == "YEARS65-74" %>
+    <%- elif age_group == "YEARS65-74" %>
     65-74 year olds
-    <% elif age_group == "YEARS70+" %>
+    <%- elif age_group == "YEARS70+" %>
     70+ year olds
-    <% elif age_group == "YEARS75-84" %>
+    <%- elif age_group == "YEARS75-84" %>
     75-84 year olds
-    <% elif age_group == "YEARS85PLUS" %>
+    <%- elif age_group == "YEARS85PLUS" %>
     85+ year olds
-    <% endif %>
+    <%- endif %>
   sex: |-
     <% if sex == "Both sexes" %>both sexes<% elif sex == "Male" %>males<% elif sex == "Female" %>females<% endif %>
   deaths_title: |-
