@@ -9,9 +9,11 @@ Dedicated staging servers are automatically created from every ETL pull request.
 
 !!! note "PR staging servers URLs"
 
-    You can visit your PR staging server at `http://staging-site-<branch>`. Note that `<branch>` might differ from the exact branch name, for example `feature/123` will be `feature-123` (all symbols are changed to dashes, and the maximum length is of 50 characters).
+    You can visit your PR staging server at `http://staging-site-<branch>` or `https://<branch>.owid.pages.dev/`. Note that `<branch>` might differ from the exact branch name, for example `feature/123` will be `feature-123` (all symbols are changed to dashes, and the maximum length is of 50 characters).
 
     For more details, refer to the [python code](https://github.com/owid/etl/blob/master/apps/chart_sync/cli.py#L284) generating `<branch>` from the branch name.
+
+OWID site on staging servers is **public** by default. If you want to keep the work private (e.g. for embargoed data), use `-private` suffix in the branch name. This will make it available only on `http://staging-site-<branch>`.
 
 Once the PR is ready and data manager merges into master, ETL will deploy the changes and automatically run `chart-sync` that syncs approved charts to production. Then the staging server is stopped and destroyed after 3 days.
 
