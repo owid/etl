@@ -824,6 +824,8 @@ steps:
     - snapshot://antibiotics/2024-10-09/gram.csv
   data://garden/antibiotics/2024-10-09/gram:
     - data://meadow/antibiotics/2024-10-09/gram
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
   data://grapher/antibiotics/2024-10-09/gram:
     - data://garden/antibiotics/2024-10-09/gram
 
@@ -832,6 +834,8 @@ steps:
     - snapshot://antibiotics/2024-10-09/gram_level.csv
   data://garden/antibiotics/2024-10-09/gram_level:
     - data://meadow/antibiotics/2024-10-09/gram_level
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
   data://grapher/antibiotics/2024-10-09/gram_level:
     - data://garden/antibiotics/2024-10-09/gram_level
 
@@ -859,3 +863,95 @@ steps:
     - data://meadow/cancer/2024-10-13/gco_cancer_today_cervical
   data://grapher/cancer/2024-10-13/gco_cancer_today_cervical:
     - data://garden/cancer/2024-10-13/gco_cancer_today_cervical
+
+  # Antibiotic resistance data - WHO GLASS
+  data://meadow/antibiotics/2024-10-18/who_glass:
+    - snapshot://antibiotics/2024-10-18/who_glass.zip
+  data://garden/antibiotics/2024-10-18/who_glass:
+    - data://meadow/antibiotics/2024-10-18/who_glass
+  data://grapher/antibiotics/2024-10-18/who_glass:
+    - data://garden/antibiotics/2024-10-18/who_glass
+
+    # Antibiotic resistance data - WHO GLASS
+  data://meadow/antibiotics/2024-10-18/who_glass_by_antibiotic:
+    - snapshot://antibiotics/2024-10-18/who_glass_by_antibiotic.zip
+  data://garden/antibiotics/2024-10-18/who_glass_by_antibiotic:
+    - data://meadow/antibiotics/2024-10-18/who_glass_by_antibiotic
+  data://grapher/antibiotics/2024-10-18/who_glass_by_antibiotic:
+    - data://garden/antibiotics/2024-10-18/who_glass_by_antibiotic
+
+    # ANIMUSE - antibiotic use in animals
+  data://meadow/antibiotics/2024-10-23/animuse_year:
+    - snapshot://antibiotics/2024-10-23/animuse_year.csv
+  data://garden/antibiotics/2024-10-23/animuse_year:
+    - data://meadow/antibiotics/2024-10-23/animuse_year
+  data://grapher/antibiotics/2024-10-23/animuse_year:
+    - data://garden/antibiotics/2024-10-23/animuse_year
+
+
+  # ESVAC antimicrobial use in animals
+  data://meadow/antibiotics/2024-10-25/esvac_sales:
+    - snapshot://antibiotics/2024-10-25/esvac_sales.zip
+  data://garden/antibiotics/2024-10-25/esvac_sales:
+    - data://meadow/antibiotics/2024-10-25/esvac_sales
+  data://grapher/antibiotics/2024-10-25/esvac_sales:
+    - data://garden/antibiotics/2024-10-25/esvac_sales
+
+  # ESVAC antimicrobial use in animals - corrected for animal size
+  data://meadow/antibiotics/2024-10-25/esvac_sales_corrected:
+    - snapshot://antibiotics/2024-10-25/esvac_sales_corrected.zip
+  data://garden/antibiotics/2024-10-25/esvac_sales_corrected:
+    - data://meadow/antibiotics/2024-10-25/esvac_sales_corrected
+  data://grapher/antibiotics/2024-10-25/esvac_sales_corrected:
+    - data://garden/antibiotics/2024-10-25/esvac_sales_corrected
+
+  #Antibiotics TRACSS data
+  data://meadow/antibiotics/2024-10-23/tracss:
+    - snapshot://antibiotics/2024-10-23/tracss.xlsx
+  data://garden/antibiotics/2024-10-23/tracss:
+    - data://meadow/antibiotics/2024-10-23/tracss
+  data://grapher/antibiotics/2024-10-23/tracss:
+    - data://garden/antibiotics/2024-10-23/tracss
+  # WHO Antimicrobial usage
+  data://meadow/antibiotics/2024-11-12/antimicrobial_usage:
+    - snapshot://antibiotics/2024-11-12/antimicrobial_usage.xlsx
+  data://garden/antibiotics/2024-11-12/antimicrobial_usage:
+    - data://meadow/antibiotics/2024-11-12/antimicrobial_usage
+  data://grapher/antibiotics/2024-11-12/antimicrobial_usage:
+    - data://garden/antibiotics/2024-11-12/antimicrobial_usage
+  # WHO Antibiotic testing coverage
+  data://meadow/antibiotics/2024-11-15/testing_coverage:
+    - snapshot://antibiotics/2024-11-15/testing_coverage.zip
+  data://garden/antibiotics/2024-11-15/testing_coverage:
+    - data://meadow/antibiotics/2024-11-15/testing_coverage
+  data://grapher/antibiotics/2024-11-15/testing_coverage:
+    - data://garden/antibiotics/2024-11-15/testing_coverage
+
+  # IHME Neonatal all infectious syndromes
+  data-private://meadow/antibiotics/2024-11-20/microbe:
+    - snapshot-private://antibiotics/2024-11-20/microbe.zip
+  data-private://garden/antibiotics/2024-11-20/microbe:
+    - data-private://meadow/antibiotics/2024-11-20/microbe
+  data-private://grapher/antibiotics/2024-11-20/microbe:
+    - data-private://garden/antibiotics/2024-11-20/microbe
+  # IHME Neonatal bloodstream infections by pathogen
+  data-private://meadow/antibiotics/2024-11-20/pathogen_bloodstream:
+    - snapshot-private://antibiotics/2024-11-20/pathogen_bloodstream.csv
+  data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream:
+    - data-private://meadow/antibiotics/2024-11-20/pathogen_bloodstream
+  data-private://grapher/antibiotics/2024-11-20/pathogen_bloodstream:
+    - data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream
+  # IHME Neonatal bloodstream infections by resistance
+  data-private://meadow/antibiotics/2024-11-20/bloodstream_amr:
+    - snapshot-private://antibiotics/2024-11-20/bloodstream_amr.csv
+  data-private://garden/antibiotics/2024-11-20/bloodstream_amr:
+    - data-private://meadow/antibiotics/2024-11-20/bloodstream_amr
+  data-private://grapher/antibiotics/2024-11-20/bloodstream_amr:
+    - data-private://garden/antibiotics/2024-11-20/bloodstream_amr
+  # IHME Neonatal infections by syndrome
+  data-private://meadow/antibiotics/2024-11-24/total_syndrome:
+    - snapshot-private://antibiotics/2024-11-24/total_syndrome.csv
+  data-private://garden/antibiotics/2024-11-24/total_syndrome:
+    - data-private://meadow/antibiotics/2024-11-24/total_syndrome
+  data-private://grapher/antibiotics/2024-11-24/total_syndrome:
+    - data-private://garden/antibiotics/2024-11-24/total_syndrome

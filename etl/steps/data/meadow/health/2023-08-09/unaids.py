@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     log.info("health.unaids: loading data from snapshot")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

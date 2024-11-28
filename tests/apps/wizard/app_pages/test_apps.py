@@ -8,7 +8,7 @@ from streamlit.testing.v1.element_tree import Button
 from apps.wizard.utils import WIZARD_DIR
 from etl import config
 
-DEFAULT_TIMEOUT = 20
+DEFAULT_TIMEOUT = 30
 
 
 @contextmanager

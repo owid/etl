@@ -1,5 +1,6 @@
 import click
 import requests
+import streamlit as st
 from rich_click.rich_command import RichCommand
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from structlog import get_logger
@@ -34,6 +35,9 @@ def cli(dry_run: bool) -> None:
             args.append("--dry-run")
 
         try:
+            # Make sure to clear state, otherwise we'd be using cached state from previous
+            # branch.
+            st.session_state.clear()
             owidbot_cli(args, standalone_mode=False)
         except ProgrammingError as e:
             # MySQL is being refreshed and tables are not ready

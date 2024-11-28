@@ -24,7 +24,7 @@ detectors_classes = {
     "time_change": detectors.AnomalyTimeChange,
     "one_class_svm": detectors.AnomalyOneClassSVM,
     "isolation_forest": detectors.AnomalyIsolationForest,
-    "gp": AnomalyGaussianProcessOutlier,
+    "gp_outlier": AnomalyGaussianProcessOutlier,
 }
 
 # Initialize logger.
@@ -87,7 +87,7 @@ def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Var
     #     log.info(f"Loading data from local ETL file: {etl_file}")
     #     ds_etl = catalog.Dataset(etl_file)
     #     if ds_etl.table_names == [ds.shortName]:
-    #         df = pd.DataFrame(ds_etl.read_table(ds.shortName))  # type: ignore
+    #         df = pd.DataFrame(ds_etl.read(ds.shortName))  # type: ignore
     #     # Change column names to variable ids.
     #     df = df.rename(columns={column: ds_variable_ids[column] for column in df.columns if column in ds_variable_ids}, errors="raise").rename(columns={"country": "entity_name"}, errors="raise")
 
@@ -112,6 +112,9 @@ def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Var
             .rename(columns={"entityName": "entity_name"}, errors="raise")
         )
 
+        # Sort rows (which may be necessary for some anomaly detectors).
+        df = df.sort_values(["entity_name", "year"]).reset_index(drop=True)
+
     return df, ds_variables
 
 
@@ -134,7 +137,7 @@ def get_all_necessary_data(dataset_id: int):
         }
     else:
         # Otherwise, create an empty dataframe.
-        df_old = pd.DataFrame()
+        df_old = pd.DataFrame(columns=["entity_name", "year"])
         variables_old = []
         variable_mapping = {}
 
@@ -170,13 +173,13 @@ def inspect_anomalies(
     )
     for _, row in df_show.iterrows():
         variable_id = row["indicator_id"]
-        variable_name = metadata[variable_id].shortName
+        variable_name = f"{metadata[variable_id].shortName} ({variable_id})"
         variable_title = metadata[variable_id].titlePublic
         country = row["entity_name"]
         anomaly_type = row["anomaly_type"]
         year = row["year"]
         title = f"{variable_title}<br>{variable_name}<br>{country}-{year}<br>"
-        title += f'{anomaly_type} - weighted score: {row["score_weighted"]:.0%} | score: {row["score"]:.0%} | population: {row["score_population"]:.0%} | views: {row["score_analytics"]:.0%}'
+        title += f'{anomaly_type} - weighted score: {row["score_weighted"]:.0%} | anomaly: {row["score"]:.0%} | scale: {row["score_scale"]:.0%} | population: {row["score_population"]:.0%} | views: {row["score_analytics"]:.0%}<br>'
         new = df_data[df_data["entity_name"] == row["entity_name"]][["entity_name", "year", variable_id]]
         new = new.rename(columns={row["indicator_id"]: variable_name}, errors="raise")
         if anomaly_type in ["upgrade_change", "upgrade_missing"]:
@@ -248,8 +251,9 @@ def main(dataset_id: int, anomaly_type: str, n_anomalies: int = 10) -> None:
     # Initialize the anomaly detector object.
     detector = detectors_classes[anomaly_type]()
     df_score = detector.get_score_df(df=df_data, variable_ids=variable_ids, variable_mapping=variable_mapping)
+    df_scale = detector.get_scale_df(df=df_data, variable_ids=variable_ids, variable_mapping=variable_mapping)
     df = (
-        detectors.get_long_format_score_df(df_score)
+        detectors.get_long_format_score_df(df_score=df_score, df_scale=df_scale)
         .sort_values(["anomaly_score", "year"], ascending=False)
         .drop_duplicates(subset=["entity_name", "variable_id"], keep="first")
         .reset_index(drop=True)
@@ -261,9 +265,21 @@ def main(dataset_id: int, anomaly_type: str, n_anomalies: int = 10) -> None:
     # Add anomaly type.
     df["anomaly_type"] = detector.anomaly_type
 
+    SCORE_ANOMALY_THRESHOLD = 0.3
+    SCORE_POPULATION_THRESHOLD = 0.3
+    SCORE_ANALYTICS_THRESHOLD = 0.3
+    SCORE_SCALE_THRESHOLD = 0.3
+    SCORE_WEIGHTED_THRESHOLD = 0.3
     # Inspect anomalies.
+    df_candidates = df[
+        (df["score"] > SCORE_ANOMALY_THRESHOLD)
+        & (df["score_population"] > SCORE_POPULATION_THRESHOLD)
+        & (df["score_analytics"] > SCORE_ANALYTICS_THRESHOLD)
+        & (df["score_scale"] > SCORE_SCALE_THRESHOLD)
+        & (df["score_weighted"] > SCORE_WEIGHTED_THRESHOLD)
+    ].sort_values("score_weighted", ascending=False)
     inspect_anomalies(
-        df=df.sort_values("score", ascending=False),
+        df=df_candidates,
         df_data=df_data,
         metadata=metadata,
         variable_mapping=variable_mapping,

@@ -14,11 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("{{cookiecutter.short_name}}")
 
     # Read table from garden dataset.
-    tb = ds_garden["{{cookiecutter.short_name}}"]
-
-    #
-    # Process data.
-    #
+    tb = ds_garden.read("{{cookiecutter.short_name}}", reset_index=False)
 
     #
     # Save outputs.

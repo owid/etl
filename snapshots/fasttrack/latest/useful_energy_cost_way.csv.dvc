@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: Way et al. (2022). Empirically grounded technology forecasts and the energy transition.
+    title: useful_energy_cost_way
+    citation_full: |-
+      Way, R., Ives, M. C., Mealy, P., & Farmer, J. D. (2022). Empirically grounded technology forecasts and the energy transition. Joule, 6(9), 2057-2082.
+    url_main: https://www.sciencedirect.com/science/article/pii/S254243512200410X
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSO9emLabLcnGvJWeSGjZVbmYFqXPQ5uggopEH7QZLg9gExLk1ZVu4vR7_9W0_4qlIBLBo4uRGltigs/pub?output=csv
+    date_accessed: '2024-11-07'
+  name: Useful energy costs (Way et al. 2022)
+  description: ''
+  license: {}
+outs:
+  - md5: fc62ac8d1f10a2f067db04834fecd331
+    size: 3543
+    path: useful_energy_cost_way.csv

@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("igme.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb = tb.rename(columns={"REF_AREA_NAME": "country", "REF_DATE": "year"})
     columns_to_keep = [
         "country",

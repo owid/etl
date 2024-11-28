@@ -350,10 +350,10 @@ def read_from_xlsx(short_name: str) -> Table:
     # Read snap
     snap = paths.load_snapshot(short_name)
     # Read tables
-    tb_estimates = snap.read(sheet_name="Estimates", skiprows=16)
-    tb_projections_medium = snap.read(sheet_name="Medium variant", skiprows=16)
-    tb_projections_low = snap.read(sheet_name="Low variant", skiprows=16)
-    tb_projections_high = snap.read(sheet_name="High variant", skiprows=16)
+    tb_estimates = snap.read(safe_types=False, sheet_name="Estimates", skiprows=16)
+    tb_projections_medium = snap.read(safe_types=False, sheet_name="Medium variant", skiprows=16)
+    tb_projections_low = snap.read(safe_types=False, sheet_name="Low variant", skiprows=16)
+    tb_projections_high = snap.read(safe_types=False, sheet_name="High variant", skiprows=16)
     # Merge tables
     tb = concat(
         [

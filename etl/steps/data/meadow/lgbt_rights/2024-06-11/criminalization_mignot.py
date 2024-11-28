@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("criminalization_mignot.csv")
 
     # Load data from snapshot.
-    tb = snap.read(header=None, names=COLUMN_NAMES)
+    tb = snap.read(safe_types=False, header=None, names=COLUMN_NAMES)
 
     #
     # Process data.

@@ -1,11 +1,9 @@
 dataset:
-  sources:
-  - name: Mulchandani et al. (2023)
-    published_by: 'Mulchandani, R., Wang, Y., Gilbert, M., & Van Boeckel, T. P. (2023). Global trends in antimicrobial use
-      in food-producing animals: 2020 to 2030. PLOS Global Public Health, 3(2), e0001305. https://doi.org/10.1371/journal.pgph.0001305'
-    publication_year: 2023
-    date_accessed: 2023-07-25
-    url: https://journals.plos.org/globalpublichealth/article?id=10.1371/journal.pgph.0001305
+  title: Antimicrobial usage in livestock
+  description: |-
+    This dataset estimates the usage of antimicrobials in livestock (cattle, sheep, chicken, and pigs) by country. Data on antimicrobials comes from government reports, surveillance systems and national surveys. In addition, the authors estimate the biomass of livestock in the country, to adjust for differences in antimicrobial usage by animal size. Biomass data comes from the Food and Agriculture Organization (FAO). 'The PCU represents the total number of animals in a country (alive or slaughtered), multiplied by the average weight of the animal at the time of treatment. Therefore, the PCU is a standardization metric that accounts for differences in animal weight, and number of production cycles per year between countries.' Therefore, mg/PCU refers to the usage of antimicrobials per animal population-corrected unit.
+  licenses:
+    - {}
 tables:
   antimicrobial_usage_livestock:
     variables:

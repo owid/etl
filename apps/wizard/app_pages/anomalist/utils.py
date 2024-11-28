@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 import streamlit as st
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
@@ -49,12 +50,22 @@ def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], D
     # Get all datasets from DB.
     df_datasets = gm.Dataset.load_all_datasets(columns=["id", "name"])
 
-    # Detect local files that correspond to new or modified grapher steps, identify their corresponding grapher dataset ids, and the grapher dataset id of the previous version (if any).
-    # NOTE: this is quite slow taking ~4s, it would be faster to reuse function `_load_datasets_new_ids` from owidbot/anomalist.py
-    dataset_new_and_old = get_new_grapher_datasets_and_their_previous_versions()
+    # Initialize DB engine.
+    engine = get_engine()
+    with Session(engine) as session:
+        # Ensure the 'anomalies' table exists.
+        gm.Anomaly.create_table(engine, if_exists="skip")
+
+        # Get list of datasets for which anomalies have already been detected (if any).
+        dataset_ids_with_anomalies = sorted(set(session.scalars(select(gm.Anomaly.datasetId)).all()))
+
+        # Detect local files that correspond to new or modified grapher steps, identify their corresponding grapher dataset ids, and the grapher dataset id of the previous version (if any).
+        # NOTE: this is quite slow taking ~4s, it would be faster to reuse function `_load_datasets_new_ids` from owidbot/anomalist.py
+        dataset_new_and_old = get_new_grapher_datasets_and_their_previous_versions(session=session)
 
     # List new dataset ids.
-    datasets_new_ids = list(dataset_new_and_old)
+    # Add datasets with already detected anomalies (if any).
+    datasets_new_ids = list(dataset_new_and_old) + dataset_ids_with_anomalies
 
     # Load mapping created by indicator upgrader (if any).
     variable_mapping = load_variable_mapping(datasets_new_ids, dataset_new_and_old)

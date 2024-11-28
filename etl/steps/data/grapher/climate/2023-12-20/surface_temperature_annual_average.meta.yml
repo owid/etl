@@ -28,7 +28,7 @@ definitions:
 
   temperature_anomaly_above: Calculated when the average surface temperature for a year is higher than the 1991-2020 average, this anomaly indicates a hotter-than-average temperature for that year.
   temperature_anomaly_below: Calculated when the average surface temperature for a year is lower than the 1991-2020 average, this anomaly indicates a colder-than-average temperature for that year.
-  desc_update: The 2024 data is incomplete and was last updated {TODAY}.
+  desc_update: The 2024 data is incomplete and was last updated {date_accessed}.
 
 dataset:
   title: Annual surface temperatures and anomalies by country

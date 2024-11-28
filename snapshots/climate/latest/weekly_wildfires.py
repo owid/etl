@@ -51,6 +51,9 @@ def main(upload: bool) -> None:
     # Initialize a new snapshot object for storing data, using a predefined file path structure.
     snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/weekly_wildfires.csv")
 
+    # Load existing snapshot for comparison at the end of the script.
+    orig_snapshot_df = snap.read()
+
     # Initialize an empty list to hold DataFrames for wildfire data.
     dfs_fires = []
 
@@ -62,7 +65,9 @@ def main(upload: bool) -> None:
         base_url = (
             "https://api2.effis.emergency.copernicus.eu/statistics/v2/gwis/weekly?country={country_code}&year={year}"
         )
+
         url = base_url.format(country_code=country, year=YEAR)
+
         # timeout after 30s, they have occasional outages
         response = requests.get(url, timeout=30)
         if response.status_code == 200:
@@ -72,7 +77,6 @@ def main(upload: bool) -> None:
             banfweekly = data["banfweekly"]
             # Convert the weekly data into a pandas DataFrame.
             df = pd.DataFrame(banfweekly)
-
             # Select and rename relevant columns, and calculate the 'month_day' column.
             df = df[["mddate", "events", "area_ha"]]
             df["month_day"] = [date[4:6] + "-" + date[6:] for date in df["mddate"]]
@@ -165,6 +169,12 @@ def main(upload: bool) -> None:
 
     # Combine both fires and emissions data into a final DataFrame.
     df_final = pd.concat([dfs_fires, dfs_emissions])
+
+    if len(df_final) < len(orig_snapshot_df):
+        raise ValueError(
+            f"New snapshot has fewer rows ({len(df_final)}) than the original snapshot {len(orig_snapshot_df)}. API could be down or data is missing."
+        )
+
     # Save the final DataFrame to the specified file path in the snapshot.
     df_to_file(df_final, file_path=snap.path)  # type: ignore[reportArgumentType]
 

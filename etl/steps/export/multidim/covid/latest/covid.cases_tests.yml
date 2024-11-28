@@ -23,7 +23,7 @@ views:
       y: grapher/covid/latest/testing/testing#new_tests_7day_smoothed
       x: grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right
     config:
-      type: ScatterPlot
+      chartTypes: ["ScatterPlot"]
   - dimensions:
       normalize: per_capita
     indicators:
@@ -31,7 +31,7 @@ views:
       x: grapher/covid/latest/cases_deaths/cases_deaths#new_cases_per_million_7_day_avg_right
       color: 123
     config:
-      type: ScatterPlot
+      chartTypes: ["ScatterPlot"]
       map:
         colorScale:
           binningStrategy: equalInterval

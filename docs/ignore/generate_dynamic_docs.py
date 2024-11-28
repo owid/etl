@@ -2,7 +2,7 @@
 import mkdocs_gen_files
 
 from etl.docs import render_dataset, render_indicator, render_origin, render_table
-from etl.paths import LIB_DIR
+from etl.paths import BASE_DIR, LIB_DIR
 
 header_metadata = """---
 tags:
@@ -15,7 +15,7 @@ tags:
 
 - __[Indicator](#variable)__ (variable)
 - __[Origin](#origin)__
-- __[Table](#tables)__
+- __[Table](#table)__
 - __[Dataset](#dataset)__
 </div>
 
@@ -58,29 +58,23 @@ with mkdocs_gen_files.open("architecture/metadata/reference/index.md", "w") as f
 ############################################################
 # owid-catalog
 ############################################################
-docs_api = """# Public data API
+# Load index.md and concatenate with catalog README.md
+with open(BASE_DIR / "docs/api/index.md", "r") as f2:
+    docs_api = f2.readlines()
 
-Our mission is to make research and data on the world's biggest problems accessible and understandable to the public. As part of this work, we provide an experimental API to the datasets.
+with open(LIB_DIR / "catalog/README.md", "r") as f2:
+    docs_catalog = f2.readlines()
 
-When using the API, you have access to the public catalog of data processed by our data team. The catalog indexes _tables_ of data, rather than datasets or individual indicators. To learn more, read about our [data model](../architecture/design/common-format.md).
+docs_catalog = "    ".join(docs_catalog)
+docs_api = "".join(docs_api)
 
-At the moment, we only support Python.
+docs = """
+{docs_api}
 
 
-!!! warning "Our API is in beta"
+{docs_catalog}
+""".format(docs_catalog=f"    {docs_catalog}", docs_api=docs_api)
 
-    We currently only provide a python API. Our hope is to extend this to other languages in the future. Please [report any issue](https://github.com/owid/etl) that you may find.
-
-=== "Python"
-
-    (see [example notebook](python.ipynb))
-
-{docs_api_python}
-
-"""
+# Dynamically create the API documentation
 with mkdocs_gen_files.open("api/index.md", "w") as f:
-    with open(LIB_DIR / "catalog/README.md", "r") as f2:
-        docs = f2.readlines()
-    docs = "    ".join(docs)
-    docs = docs_api.format(docs_api_python=f"    {docs}")
     print(docs, file=f)

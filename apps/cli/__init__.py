@@ -73,7 +73,6 @@ SUBGROUPS = {
             "run-python-step": "etl.run_python_step.main",
             "map-datasets": "apps.utils.map_datasets.cli",
             "scan-chart-diff": "apps.utils.scan_chart_diff.cli",
-            "draft-pr": "apps.utils.draft_pull_request.cli",
             "profile": "apps.utils.profile.cli",
         },
     },
@@ -168,7 +167,8 @@ GROUPS = (
                 "update": "apps.step_update.cli.cli",
                 "archive": "apps.step_update.cli.archive_cli",
                 "explorer-update": "apps.explorer_update.cli.cli",
-                "pr": "apps.utils.draft_pull_request.cli",
+                "prr": "apps.utils.draft_pull_request.cli",
+                "pr": "apps.pr.cli.cli",
             },
         },
         {

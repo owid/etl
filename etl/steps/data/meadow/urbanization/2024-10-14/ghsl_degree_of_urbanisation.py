@@ -62,7 +62,7 @@ def run(dest_dir: str) -> None:
 
 def load_and_process_sheet(snap, sheet_name: str, columns_to_drop: list) -> Table:
     # Load data from snapshot.
-    tb = snap.read(sheet_name=sheet_name)
+    tb = snap.read(safe_types=False, sheet_name=sheet_name)
 
     # Remove rows where all values are NaNs.
     tb = tb.dropna(how="all")

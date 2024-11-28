@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("unhlm_commitments")
     snap = paths.load_snapshot("data_dictionary.csv")
     # Load data dictionary from snapshot.
-    dd = snap.read()
+    dd = snap.read(safe_types=False)
     # Read table from meadow dataset.
     tb = ds_meadow["unhlm_commitments"].reset_index()
 

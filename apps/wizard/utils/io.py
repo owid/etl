@@ -12,7 +12,6 @@ from structlog import get_logger
 
 import etl.grapher_model as gm
 from apps.wizard.utils.cached import get_datasets_from_version_tracker
-from etl.db import get_engine
 from etl.git_helpers import get_changed_files
 from etl.grapher_io import get_all_datasets
 from etl.paths import BASE_DIR, STEP_DIR
@@ -76,7 +75,8 @@ def get_changed_grapher_steps(files_changed: Dict[str, Dict[str, str]]) -> List[
 
         # Identify grapher data steps, and ignore the rest.
         if file_path.startswith(STEP_DIR.relative_to(BASE_DIR).as_posix()) and file_path.endswith(".py"):
-            if Path(file_path).with_suffix("").as_posix().split("/")[-4] == "grapher":
+            parts = Path(file_path).with_suffix("").as_posix().split("/")
+            if len(parts) == 4 and parts[-4] == "grapher":
                 grapher_steps.append(file_path)
         else:
             continue
@@ -84,7 +84,7 @@ def get_changed_grapher_steps(files_changed: Dict[str, Dict[str, str]]) -> List[
     return grapher_steps
 
 
-def get_new_grapher_datasets_and_their_previous_versions() -> Dict[int, Optional[int]]:
+def get_new_grapher_datasets_and_their_previous_versions(session: Session) -> Dict[int, Optional[int]]:
     """Detect which local grapher step files have changed, identify their corresponding grapher dataset ids, and the grapher dataset id of the previous version (if any).
 
     The result is a dictionary {dataset_id (of the new dataset): previous_dataset_id or None (if there is no previous version)}.
@@ -96,19 +96,16 @@ def get_new_grapher_datasets_and_their_previous_versions() -> Dict[int, Optional
     # Get properties of the modified grapher steps.
     namespaces = sorted(set([step.split("/")[-3] for step in grapher_steps]))
     short_names = sorted(set([step.split("/")[-1].replace(".py", "") for step in grapher_steps]))
-    # Initialize database engine.
-    engine = get_engine()
 
     # Load all relevant grapher datasets from DB.
-    with Session(engine) as session:
-        datasets = (
-            session.query(gm.Dataset)
-            .filter(
-                gm.Dataset.namespace.in_(namespaces),
-                gm.Dataset.shortName.in_(short_names),
-            )
-            .all()
+    datasets = (
+        session.query(gm.Dataset)
+        .filter(
+            gm.Dataset.namespace.in_(namespaces),
+            gm.Dataset.shortName.in_(short_names),
         )
+        .all()
+    )
     df_datasets = pd.DataFrame(datasets)
     # For each modified grapher step, check if the corresponding dataset is the latest version.
     # If there is no dataset, raise a warning (either it has not been run yet, or it was deleted).

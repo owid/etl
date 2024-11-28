@@ -250,7 +250,8 @@ def add_age_and_experience(tb: Table) -> Table:
         # Replace category numbers with labels (age in *)
         mapping = {num: label for num, label in REGIME_LABELS.items() if num <= col[2]}
         mask = (tb[col_age] == 0) | (tb[col_age].isna())
-        tb.loc[mask, col_age] = tb.loc[mask, col[0]].replace(mapping)
+        tb[col_age] = tb[col_age].astype(object)
+        tb.loc[mask, col_age] = tb.loc[mask, col[0]].astype(object).replace(mapping)
 
     return tb
 

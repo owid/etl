@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("polio_historical.xls")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="Polio")
+    tb = snap.read(safe_types=False, sheet_name="Polio")
 
     #
     # Process data.

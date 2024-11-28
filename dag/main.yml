@@ -83,13 +83,23 @@ steps:
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # Homicide - UNODC - current
+  # Homicide - UNODC - to archive
   data://meadow/homicide/2023-07-04/unodc:
     - snapshot://homicide/2023-07-04/unodc.xlsx
   data://garden/homicide/2023-07-04/unodc:
     - data://meadow/homicide/2023-07-04/unodc
   data://grapher/homicide/2023-07-04/unodc:
     - data://garden/homicide/2023-07-04/unodc
+
+    # Homicide - UNODC - update
+  data://meadow/homicide/2024-10-30/unodc:
+    - snapshot://homicide/2024-10-30/unodc.xlsx
+  data://garden/homicide/2024-10-30/unodc:
+    - data://meadow/homicide/2024-10-30/unodc
+    - data://garden/demography/2023-03-31/population
+  data://grapher/homicide/2024-10-30/unodc:
+    - data://garden/homicide/2024-10-30/unodc
+
 
   #
   # UN
@@ -132,6 +142,8 @@ steps:
     - snapshot://un/2024-04-09/undp_hdr.csv
   data://garden/un/2024-04-09/undp_hdr:
     - data://meadow/un/2024-04-09/undp_hdr
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
   data://grapher/un/2024-04-09/undp_hdr:
     - data://garden/un/2024-04-09/undp_hdr
 
@@ -268,14 +280,6 @@ steps:
   data://grapher/eth/2023-03-15/ethnic_power_relations:
     - data://garden/eth/2023-03-15/ethnic_power_relations
 
-  # International Monetary Fund, World Economic Outlook
-  data://meadow/imf/2024-05-02/world_economic_outlook:
-    - snapshot://imf/2024-05-02/world_economic_outlook.xls
-  data://garden/imf/2024-05-02/world_economic_outlook:
-    - data://meadow/imf/2024-05-02/world_economic_outlook
-  data://grapher/imf/2024-05-02/world_economic_outlook:
-    - data://garden/imf/2024-05-02/world_economic_outlook
-
   # Patents & journal articles (World Bank, United Nations)
   data://garden/research_development/2024-05-20/patents_articles:
     - data://garden/worldbank_wdi/2024-05-20/wdi
@@ -377,11 +381,6 @@ steps:
     - data://garden/countries/2024-08-27/gleditsch
 
   # Outdated gleditsch
-  data://garden/countries/2023-09-25/gleditsch:
-    - data://meadow/countries/2023-09-25/gleditsch
-    - data://garden/demography/2023-03-31/population
-  data://grapher/countries/2023-10-01/gleditsch:
-    - data://garden/countries/2023-09-25/gleditsch
   data://garden/countries/2024-01-08/gleditsch_no_population:
     - data://meadow/countries/2023-09-25/gleditsch
 
@@ -484,8 +483,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://garden/ess/2023-08-02/ess_trust:
     - data://meadow/ess/2023-08-02/ess_trust
-  data://grapher/ess/2023-08-02/ess_trust:
-    - data://garden/ess/2023-08-02/ess_trust
 
   # Latinobarómetro survey - Trust
   data://meadow/survey/2023-08-04/latinobarometro_trust:
@@ -651,6 +648,8 @@ steps:
     - snapshot://worldbank_wdi/2024-05-20/wdi.zip
     - data://meadow/worldbank_wdi/2024-05-20/wdi
     - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
 
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
@@ -770,6 +769,8 @@ steps:
   data://garden/un/2024-09-11/igme:
     - data://meadow/un/2024-09-11/igme
     - data://garden/un/2018/igme
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
 
@@ -839,6 +840,71 @@ steps:
     - data://meadow/itopf/2024-10-16/oil_spills
   data://grapher/itopf/2024-10-16/oil_spills:
     - data://garden/itopf/2024-10-16/oil_spills
+
+# UN SD census data
+  data://meadow/un/2024-10-21/census_dates:
+    - snapshot://un/2024-10-21/census_dates.csv
+  data://garden/un/2024-10-21/census_dates:
+    - data://meadow/un/2024-10-21/census_dates
+  data://grapher/un/2024-10-21/census_dates:
+    - data://garden/un/2024-10-21/census_dates
+
+#  World Peace Foundation - Famines
+  data://meadow/wpf/2024-10-03/famines:
+    - snapshot://wpf/2024-10-03/famines.xlsx
+  data://garden/wpf/2024-10-03/famines:
+    - data://meadow/wpf/2024-10-03/famines
+    - data://garden/regions/2023-01-01/regions
+
+  data://grapher/wpf/2024-10-03/famines:
+    - data://garden/wpf/2024-10-03/famines
+  data://garden/wpf/2024-10-03/total_famines_by_year_decade:
+    - data://garden/wpf/2024-10-03/famines
+    - data://garden/demography/2024-07-15/population
+  data://grapher/wpf/2024-10-03/total_famines_by_year_decade:
+    - data://garden/wpf/2024-10-03/total_famines_by_year_decade
+
+  data://garden/wpf/2024-10-03/famines_by_regime_gdp:
+    - data://garden/wpf/2024-10-03/famines
+    - data://garden/democracy/2024-03-07/vdem
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+  data://grapher/wpf/2024-10-03/famines_by_regime_gdp:
+    - data://garden/wpf/2024-10-03/famines_by_regime_gdp
+
+  data://garden/wpf/2024-10-03/famines_by_factor:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_factor:
+    - data://garden/wpf/2024-10-03/famines_by_factor
+
+  data://garden/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines_by_place
+
+  data-private://meadow/owid/latest/ig_countries:
+    - snapshot-private://owid/latest/ig_countries.csv
+  data-private://garden/owid/latest/ig_countries:
+    - data-private://meadow/owid/latest/ig_countries
+  data-private://grapher/owid/latest/ig_countries:
+    - data-private://garden/owid/latest/ig_countries
+
+# Migration between regions, based on UN DESA flows
+  data://garden/migration/2024-11-18/migration_between_regions:
+    - data://garden/un/2024-07-16/migrant_stock
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+
+  data://grapher/migration/2024-11-18/migration_between_regions:
+    - data://garden/migration/2024-11-18/migration_between_regions
+
+  # IMF World Economic Outlook
+  data://meadow/imf/2024-11-25/world_economic_outlook:
+    - snapshot://imf/2024-11-25/world_economic_outlook.xls
+  data://garden/imf/2024-11-25/world_economic_outlook:
+    - data://meadow/imf/2024-11-25/world_economic_outlook
+  data://grapher/imf/2024-11-25/world_economic_outlook:
+    - data://garden/imf/2024-11-25/world_economic_outlook
+
 
 
 include:

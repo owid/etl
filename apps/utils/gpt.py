@@ -217,6 +217,21 @@ class OpenAIWrapper(OpenAI):
         else:
             raise ValueError("message_content is expected to be a string!")
 
+    def query_gpt_fast(self, user_prompt: str, system_prompt: str, model: str = MODEL_DEFAULT) -> str:
+        """Query Chat GPT to get message content from the chat completion."""
+        query = GPTQuery(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+        )
+        response = self.query_gpt(query=query, model=model)
+
+        if isinstance(response, GPTResponse):
+            return response.message_content
+        else:
+            raise ValueError("message_content is expected to be a string!")
+
 
 def get_number_tokens(text: str, model_name: str) -> int:
     """Get number of tokens of text.

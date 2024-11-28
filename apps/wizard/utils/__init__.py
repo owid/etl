@@ -663,24 +663,13 @@ def _get_staging_creation_time(session: Session):
     return create_time
 
 
-def get_staging_creation_time(session: Optional[Session] = None):
+def get_staging_creation_time(session: Session):
     """Get staging server creation time."""
-    if VARNAME_STAGING_CREATION_TIME not in st.session_state:
-        set_staging_creation_time(session)
-    return st.session_state[VARNAME_STAGING_CREATION_TIME]
-
-
-def set_staging_creation_time(session: Optional[Session] = None, key: str = VARNAME_STAGING_CREATION_TIME) -> None:
-    """Gest staging server creation time estimate."""
-
-    if session is None:
-        if OWID_ENV.env_remote == "staging":
-            with Session(OWID_ENV.engine) as session:
-                st.session_state[key] = _get_staging_creation_time(session)
-        else:
-            st.session_state[key] = None
-    else:
+    # Create a unique key for a session to avoid conflicts when working with multiple staging servers.
+    key = f"{VARNAME_STAGING_CREATION_TIME}_{str(session.bind)}"
+    if key not in st.session_state:
         st.session_state[key] = _get_staging_creation_time(session)
+    return st.session_state[key]
 
 
 def st_toast_error(message: str) -> None:

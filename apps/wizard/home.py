@@ -6,7 +6,7 @@ import streamlit as st
 from streamlit_card import card
 
 from apps.wizard.config import WIZARD_CONFIG
-from apps.wizard.utils import set_staging_creation_time, st_page_link
+from apps.wizard.utils import st_page_link
 
 st.set_page_config(
     page_title="Wizard: Home",
@@ -24,14 +24,26 @@ def st_show_home():
         st.title("Wizard 🪄")
     with cols[1]:
         st.caption(f"streamlit {st.__version__}")
-    # Expert link
-    st_page_link(
-        "expert",
-        label="Questions about ETL or Grapher? Ask the expert!",
-        help="Ask the expert any documentation question!",
-        use_container_width=True,
-        border=True,
-    )
+
+    # Relevant links
+    with st.container(border=False):
+        cols = st.columns(2, vertical_alignment="center")
+        with cols[0]:
+            st_page_link(
+                "expert",
+                label="Questions about ETL or Grapher? Ask the expert!",
+                help="Ask the expert any documentation question!",
+                use_container_width=True,
+                border=True,
+            )
+        with cols[1]:
+            st_page_link(
+                "analytics",
+                label="OWID Analytics",
+                help="Learn more with the OWID Analytics dashboard. It redirects you to another internal site.",
+                use_container_width=True,
+                border=True,
+            )
 
     # Generic tools
     ## Default styling for the cards (Wizard apps are presented as cards)
@@ -198,9 +210,6 @@ def st_show_home():
                 if st.query_params["page"] == app["alias"]:
                     st.switch_page(app["entrypoint"])
 
-
-# Load some config parameters
-set_staging_creation_time()
 
 # Show the home page
 st_show_home()

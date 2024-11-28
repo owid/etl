@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     #
     # Load minerals grapher dataset and read its main table.
     ds = paths.load_dataset("minerals")
-    tb = ds.read_table("minerals")
+    tb = ds.read("minerals")
 
     #
     # Process data.

@@ -1,7 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from shared import to_grapher_date
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -21,9 +19,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Grapher date
-    tb = to_grapher_date(tb, "2021-01-01")
-
     # Rename state -> country for grapher
     tb = tb.rename_index_names(
         {

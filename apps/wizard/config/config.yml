@@ -37,6 +37,14 @@ main:
       - "@daniel"
     entrypoint: app_pages/expert/app.py
     icon: ":material/hotel_class:"
+  analytics:
+    title: "Analytics (external)"
+    description: "Learn more about OWID in Data!"
+    maintainer:
+      - "@bobbie"
+      - "@lucas"
+    entrypoint: app_pages/analytics.py
+    icon: ":material/bar_chart:"
 
 # ETL steps
 etl:
@@ -86,7 +94,7 @@ etl:
       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
 
 sections:
-  - title: "Data tools"
+  - title: "Data curation"
     description: |-
       Updates, data edits, etc.
     apps:
@@ -96,7 +104,7 @@ sections:
         description: Migrate indicators in charts
         maintainer: "@lucas"
         icon: ":material/upgrade:"
-        image_url: "https://superheroetc.wordpress.com/wp-content/uploads/2017/05/bulbasaur-line.jpg"
+        image_url: "https://wallpapers.com/images/hd/pokemon-evolution-1920-x-1080-wallpaper-h5u6nbg98e3tibyn.jpg"
         disable:
           production: True
       - title: "Anomalist"
@@ -105,7 +113,7 @@ sections:
         description: List anomalies in data
         maintainer: "@lucas"
         icon: ":material/planner_review:"
-        image_url: "https://i0.pickpik.com/photos/87/645/315/halloween-ghosts-happy-halloween-ghost-preview.jpg"
+        image_url: "https://www.shutterstock.com/image-illustration/multitude-endless-standing-white-eggs-260nw-310142192.jpg"
         disable:
           production: True
       - title: "Chart Diff"
@@ -114,7 +122,7 @@ sections:
         description: Compare charts in staging and prod
         maintainer: "@mojmir"
         icon: ":material/difference:"
-        image_url: "https://static.wikia.nocookie.net/dragonball/images/6/60/FusionDanceFinaleGotenTrunksBuuSaga.png"
+        image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
         disable:
           production: True
       - title: "Harmonizer"
@@ -123,9 +131,9 @@ sections:
         maintainer: "@lucas"
         entrypoint: app_pages/harmonizer.py
         icon: ":material/music_note:"
-        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/C_triad.svg/2560px-C_triad.svg.png"
+        image_url: "https://www.shutterstock.com/image-vector/abstract-vector-musical-background-music-260nw-485443810.jpg"
 
-  - title: "Monitoring"
+  - title: "Data monitoring"
     description: |-
       Control panel for ETL steps.
     apps:
@@ -167,13 +175,20 @@ sections:
     description: |-
       Research tools.
     apps:
+      - title: "Insight search"
+        alias: insight_search
+        description: "Browse data insights by their semantic similarity"
+        maintainer: "@pablo"
+        entrypoint: app_pages/insight_search.py
+        icon: ":material/search:"
+        image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
       - title: "Insighter"
         alias: insighter
         description: "Data insights with GPT"
         maintainer: "@daniel"
         entrypoint: app_pages/datainsight_robot.py
         icon: ":material/lightbulb:"
-        image_url: "https://assets.change.org/photos/7/zi/ph/ZMziPHIKGSDaDCJ-800x450-noPad.jpg?1525274743"
+        image_url: "https://cdn.cpdonline.co.uk/wp-content/uploads/2023/08/03153310/Starting-To-Become-A-Writer-1200x350.jpg"
 
   - title: "Misc"
     description: |-
@@ -185,14 +200,21 @@ sections:
         maintainer: "@lucas"
         entrypoint: app_pages/news.py
         icon: ":material/newspaper:"
-        image_url: "https://www.tsanet.org/wp-content/uploads/2022/08/latest-news.jpg"
+        image_url: "https://img.freepik.com/free-photo/top-view-old-french-newspaper-pieces_23-2149318857.jpg"
       - title: "owidle"
         alias: owidle
         description: "Guess the country game!"
         maintainer: "@lucas"
         entrypoint: app_pages/owidle.py
         icon: ":material/videogame_asset:"
-        image_url: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/WPVG_icon_2016.svg/160px-WPVG_icon_2016.svg.png"
+        image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
+      - title: "Chart animation"
+        alias: chart-animation
+        description: "Create an animated GIF or a video from a chart"
+        maintainer: "@pablo"
+        entrypoint: app_pages/chart_animation.py
+        icon: ":material/animated_images:"
+        image_url: "https://img.freepik.com/free-photo/abstract-yellow-smooth-wave-lines_1017-24863.jpg"
 
   - title: "Metadata"
     description: |-

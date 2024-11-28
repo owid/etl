@@ -1,0 +1,43 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    description_short: Famines that are estimated to have killed 100,000 people or more.
+    presentation:
+      topic_tags:
+        - Famines
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  famines:
+    variables:
+       region:
+        title: Region
+        unit: ''
+
+       wpf_authoritative_mortality_estimate:
+          title: Deaths from famines
+          unit: 'deaths'
+          short_unit: ''
+          display:
+            numDecimalPlaces: 0
+
+       conflict:
+         title: Famines where conflict was a factor
+         unit: ''
+         short_unit: ''
+
+       government_policy_overall:
+          title: Government policy as a factor in the famine
+          unit: ''
+          short_unit: ''
+
+       external_factors:
+          title: External factors as a factor in the famine
+          unit: ''
+          short_unit: ''
