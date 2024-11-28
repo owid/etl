@@ -87,7 +87,8 @@ def run(dest_dir: str) -> None:
     ds_grapher = paths.load_dataset("energy_prices")
 
     # Read table of prices in euros.
-    tb = ds_grapher.read("energy_prices_annual")
+    tb_annual = ds_grapher.read("energy_prices_annual")
+    tb_monthly = ds_grapher.read("energy_prices_monthly")
 
     #
     # Process data.
@@ -98,8 +99,8 @@ def run(dest_dir: str) -> None:
     # Create views.
     config["views"] = generate_combinations_with_config(
         config,
-        tables=[tb],
-        dimensions_order_in_slug=("source", "consumer", "price_component", "unit"),
+        tables=[tb_annual, tb_monthly],
+        dimensions_order_in_slug=("frequency", "source", "consumer", "price_component", "unit"),
         warn_on_missing_combinations=False,
     )
 

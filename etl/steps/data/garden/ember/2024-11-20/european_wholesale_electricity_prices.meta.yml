@@ -9,7 +9,7 @@ dataset:
   update_period_days: 365
 
 tables:
-  european_wholesale_electricity_prices:
+  european_wholesale_electricity_prices_monthly:
     variables:
       price:
         title: Electricity wholesale monthly price
@@ -17,3 +17,11 @@ tables:
         short_unit: "€/MWh"
         description_short: |-
           Monthly average day-ahead spot prices per [megawatt-hour](#dod:watt-hours) of electricity sold.
+  european_wholesale_electricity_prices_annual:
+    variables:
+      price:
+        title: Electricity wholesale annual price
+        unit: "Euros per megawatt-hour"
+        short_unit: "€/MWh"
+        description_short: |-
+          Annual average day-ahead spot prices per [megawatt-hour](#dod:watt-hours) of electricity sold.

@@ -6,6 +6,15 @@ defaultSelection:
 topicTags:
   - "Energy"
 dimensions:
+  - slug: "frequency"
+    name: "Frequency"
+    choices:
+      - slug: "annual"
+        name: "Annual"
+        description: "Annual data"
+      - slug: "monthly"
+        name: "Monthly"
+        description: "Monthly data"
   - slug: "source"
     name: "Energy source"
     choices:

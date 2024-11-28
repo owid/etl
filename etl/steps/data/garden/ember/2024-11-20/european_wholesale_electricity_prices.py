@@ -22,25 +22,33 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("european_wholesale_electricity_prices")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("european_wholesale_electricity_prices")
+    tb_monthly = ds_meadow.read("european_wholesale_electricity_prices")
 
     #
     # Process data.
     #
     # Select and rename columns.
-    tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+    tb_monthly = tb_monthly[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb_monthly = geo.harmonize_countries(df=tb_monthly, countries_file=paths.country_mapping_path)
 
-    # Improve table format.
-    tb = tb.format(["country", "date"])
+    # Ember provides monthly data, so we can create a monthly table of wholesale electricity prices.
+    # But we also need to create an annual table of average wholesale electricity prices.
+    tb_annual = tb_monthly.copy()
+    tb_annual["year"] = tb_annual["date"].str[:4].astype("Int64")
+    # TODO: Consider removing incomplete years.
+    tb_annual = tb_annual.groupby(["country", "year"], observed=True, as_index=False).agg({"price": "mean"})
+
+    # Improve table formats.
+    tb_monthly = tb_monthly.format(["country", "date"], short_name="european_wholesale_electricity_prices_monthly")
+    tb_annual = tb_annual.format(short_name="european_wholesale_electricity_prices_annual")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb_monthly, tb_annual], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

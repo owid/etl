@@ -20,32 +20,25 @@ def run(dest_dir: str) -> None:
 
     # Load Ember data on European wholesale electricity prices.
     ds_ember = paths.load_dataset("european_wholesale_electricity_prices")
-    tb_ember = ds_ember.read("european_wholesale_electricity_prices")
+    tb_ember_monthly = ds_ember.read("european_wholesale_electricity_prices_monthly")
+    tb_ember_annual = ds_ember.read("european_wholesale_electricity_prices_annual")
 
     #
     # Process data.
     #
-    # Prepare eurostat columns.
+    # Rename columns in all tables to have consistent dimensions.
     # TODO: Instead of this, consider having just one table for both euro and pps.
     tb_eurostat_euro = tb_eurostat_euro.rename(
-        columns={column: f"{column}_euro" for column in tb_eurostat_euro.columns if column not in ["country", "year"]},
+        columns={
+            column: f"annual_{column}_euro" for column in tb_eurostat_euro.columns if column not in ["country", "year"]
+        },
         errors="raise",
     )
-
-    # Rename columns to match the Eurostat table.
     # TODO: Ensure euros are consistent (possibly convert both to constant USD, for consistency with battery prices?).
-    tb_ember = tb_ember.rename(columns={"price": "electricity_all_wholesale_euro"}, errors="raise")
-
-    # Ember provides monthly data, so we can create a monthly table of wholesale electricity prices.
-    # But we also need to create an annual table.
-    tb_ember_annual = tb_ember.copy()
-    tb_ember_annual["year"] = tb_ember_annual["date"].str[:4].astype("Int64")
-
-    # Create a table of annual average wholesale electricity prices.
-    # TODO: Consider removing incomplete years.
-    tb_ember_annual = tb_ember_annual.groupby(["country", "year"], observed=True, as_index=False).agg(
-        {"electricity_all_wholesale_euro": "mean"}
+    tb_ember_monthly = tb_ember_monthly.rename(
+        columns={"price": "monthly_electricity_all_wholesale_euro"}, errors="raise"
     )
+    tb_ember_annual = tb_ember_annual.rename(columns={"price": "annual_electricity_all_wholesale_euro"}, errors="raise")
 
     # Create a combined annual table.
     tb_annual = pr.multi_merge(
@@ -55,7 +48,7 @@ def run(dest_dir: str) -> None:
 
     # Create a combined monthly table.
     # For now, only Ember has monthly data.
-    tb_monthly = tb_ember.copy()
+    tb_monthly = tb_ember_monthly.copy()
     tb_monthly = tb_monthly.format(keys=["country", "date"], short_name="energy_prices_monthly")
 
     #
