@@ -102,7 +102,7 @@ SHELL_FORM_STYLE = questionary.Style(
 @click.option(
     "--scope",
     "-s",
-    help="Scope of the PR (only relevant if --title is given). This text will be preprended to the PR title. \n\n**Examples**: 'demography' for data work on this field, 'etl.db' if working on specific modules, 'wizard', etc.",
+    help="Scope of the PR (only relevant if --title is given). This text will be preprended to the PR title. **Examples**: 'demography' for data work on this field, 'etl.db' if working on specific modules, 'wizard', etc.",
     default=None,
 )
 @click.option(
