@@ -1,10 +1,9 @@
 """Load a snapshot and create a meadow dataset."""
 
-import os
 import re
 from io import StringIO
 from pathlib import Path
-from typing import Callable, List
+from typing import List
 
 import owid.catalog.processing as pr
 from owid.catalog import Table
