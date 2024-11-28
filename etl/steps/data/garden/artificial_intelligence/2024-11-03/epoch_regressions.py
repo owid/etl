@@ -10,7 +10,9 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+# Constants for defining the time periods
 DL_ERA_START = 2010
+SECOND_PERIOD_END = 2018
 START_DATE = 1950
 END_DATE = 2025.2
 
@@ -72,89 +74,67 @@ def fit_exponential(models, metric):
 
 def run_regression(tb):
     """Run regression analysis on the given table and return the updated table."""
+    # Add fractional year for sorting and processing
     publication_dates = tb["publication_date"]
     tb.loc[:, "frac_year"] = (
         publication_dates.dt.year + (publication_dates.dt.month - 1) / 12 + (publication_dates.dt.day - 1) / 365
     )
     tb = tb.sort_values(by="frac_year")
 
+    # Define periods dynamically
+    periods = {
+        f"{START_DATE}–{DL_ERA_START}": (tb["frac_year"] < DL_ERA_START),
+        f"{DL_ERA_START}–{SECOND_PERIOD_END}": (
+            (tb["frac_year"] >= DL_ERA_START) & (tb["frac_year"] < SECOND_PERIOD_END)
+        ),
+        f"{SECOND_PERIOD_END}–{int(END_DATE)}": (tb["frac_year"] >= SECOND_PERIOD_END),
+    }
+    # Define year grids dynamically
+    year_grids = {
+        f"{START_DATE}–{DL_ERA_START}": np.array([START_DATE, DL_ERA_START]),
+        f"{DL_ERA_START}–{SECOND_PERIOD_END}": np.array([DL_ERA_START, SECOND_PERIOD_END]),
+        f"{SECOND_PERIOD_END}–{int(END_DATE)}": np.array([SECOND_PERIOD_END, END_DATE]),
+    }
+
     metrics = ["training_computation_petaflop", "parameters", "training_dataset_size__datapoints"]
     new_tables = []
 
-    for m, metric in enumerate(metrics):
+    for metric in metrics:
         # Filter out models without the metric information
         tb_metric = tb[pd.notnull(tb[metric])]
+        dfs = []
 
-        # Define time periods
-        period1 = tb_metric[tb_metric["frac_year"] < 2010]
-        period2 = tb_metric[(tb_metric["frac_year"] >= 2010) & (tb_metric["frac_year"] < 2018)]
-        period3 = tb_metric[tb_metric["frac_year"] >= 2018]
+        for period_name, condition in periods.items():
+            # Subset data for the current period
+            period_data = tb_metric[condition]
 
-        # Fit exponential models for each period
-        fit1 = fit_exponential(period1, metric)
-        fit2 = fit_exponential(period2, metric)
-        fit3 = fit_exponential(period3, metric)
+            # Fit exponential model
+            fit = fit_exponential(period_data, metric)
+            oom_per_year = fit[1]
+            info = f"{10**oom_per_year:.1f}x/year"
 
-        # Calculate OOM per year for each period
-        oom1 = fit1[1]
-        oom2 = fit2[1]
-        oom3 = fit3[1]
+            # Log the results
+            paths.log.info(f"{period_name} ({metric}): {info}")
 
-        # Log the results
-        info1 = f"{10**oom1:.1f}x/year"
-        info2 = f"{10**oom2:.1f}x/year"
-        info3 = f"{10**oom3:.1f}x/year"
+            # Calculate the regression line for the current period
+            year_grid = year_grids[period_name]
+            line = 10 ** (fit[0] + year_grid * fit[1])
 
-        paths.log.info(f"1950–2010 ({metric}): {info1}")
-        paths.log.info(f"2010–2018 ({metric}): {info2}")
-        paths.log.info(f"2018–2025 ({metric}): {info3}")
+            # Create DataFrame for the current period
+            df = pd.DataFrame(
+                {
+                    "days_since_1949": [
+                        period_data["days_since_1949"].min(),
+                        period_data["days_since_1949"].max(),
+                    ],
+                    f"{metric}": [line[0], line[-1]],
+                    "system": [info] * 2,
+                }
+            )
+            dfs.append(df)
 
-        # Define year grids for each period
-        year_grid1 = np.array([1950, 2010])
-        year_grid2 = np.array([2010, 2018])
-        year_grid3 = np.array([2018, 2025])
-
-        # Calculate lines for each period
-        line1 = 10 ** (fit1[0] + year_grid1 * fit1[1])
-        line2 = 10 ** (fit2[0] + year_grid2 * fit2[1])
-        line3 = 10 ** (fit3[0] + year_grid3 * fit3[1])
-
-        # Create DataFrames for each period
-        df1 = pd.DataFrame(
-            {
-                "days_since_1949": [
-                    tb_metric["days_since_1949"].min(),
-                    tb_metric[tb_metric["frac_year"] < 2010]["days_since_1949"].max(),
-                ],
-                f"{metric}": [line1[0], line1[-1]],
-                "system": [f"{info1}"] * 2,
-            }
-        )
-
-        df2 = pd.DataFrame(
-            {
-                "days_since_1949": [
-                    tb_metric[tb_metric["frac_year"] >= 2010]["days_since_1949"].min(),
-                    tb_metric[tb_metric["frac_year"] < 2018]["days_since_1949"].max(),
-                ],
-                f"{metric}": [line2[0], line2[-1]],
-                "system": [f"{info2}"] * 2,
-            }
-        )
-
-        df3 = pd.DataFrame(
-            {
-                "days_since_1949": [
-                    tb_metric[tb_metric["frac_year"] >= 2018]["days_since_1949"].min(),
-                    tb_metric["days_since_1949"].max(),
-                ],
-                f"{metric}": [line3[0], line3[-1]],
-                "system": [f"{info3}"] * 2,
-            }
-        )
-
-        # Combine all three DataFrames
-        df_combined = pd.concat([df1, df2, df3], ignore_index=True)
+        # Combine the DataFrames for all periods for the current metric
+        df_combined = pd.concat(dfs, ignore_index=True)
         new_tables.append(df_combined)
 
     # Merge all the new DataFrames
