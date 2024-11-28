@@ -142,6 +142,12 @@ definitions:
     <% elif flavor == "Harmonized over time" and area == "National" %>
      Look for the [current margin estimate (CME)](<<cme_link>>) to see the most recent survey data.
     <%- endif -%>
+  description_key_flavor_no_links_for_national: |-
+    <% if flavor == "Current margin estimate" %>
+    This indicator is a current margin estimate (CME), meaning that it relies on the most recent survey data available for each country.
+    <% elif flavor == "Harmonized over time" %>
+    This indicator is a harmonized over time (HOT) estimate. This harmonization seeks to make two or more MPI estimates comparable by aligning the indicator definitions in each survey.
+    <%- endif -%>
   description_key_indicator_start: |-
     A person in a household is deprived in the indicator _<<indicator.lower()>>_ if
   description_key_indicator_end: |-
@@ -262,7 +268,7 @@ tables:
           - "{definitions.description_key_vulnerable}"
           - "{definitions.description_key_assessments}"
           - "{definitions.description_key_weights}"
-          - "{definitions.description_key_flavor}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
         presentation:
           title_public: Share of population vulnerable to multidimensional poverty
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
@@ -280,7 +286,7 @@ tables:
           - "{definitions.description_key_severe}"
           - "{definitions.description_key_assessments}"
           - "{definitions.description_key_weights}"
-          - "{definitions.description_key_flavor}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
         presentation:
           title_public: Share of population living in severe multidimensional poverty
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
@@ -297,7 +303,7 @@ tables:
         description_key:
           - "{definitions.description_key_multidimensional_poverty}"
           - "{definitions.description_key_indicator}"
-          - "{definitions.description_key_flavor}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
         presentation:
           title_public: Share of population in multidimensional poverty deprived in the indicator <<indicator>>
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
@@ -314,7 +320,7 @@ tables:
         description_key:
           - "{definitions.description_key_multidimensional_poverty}"
           - "{definitions.description_key_indicator}"
-          - "{definitions.description_key_flavor}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
         presentation:
           title_public: Share of population deprived in the indicator <<indicator>>
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
