@@ -1,0 +1,81 @@
+definitions:
+  table: grapher/un/2024-07-16/migrant_stock/migrant_stock
+
+
+title:
+  title: Immigration
+  titleVariant: by total and five year change
+defaultSelection:
+  - Europe
+  - Asia
+dimensions:
+  - name: Period
+    slug: period
+    choices:
+      - name: Total number
+        slug: cumulative
+      - name: Five-year change
+        slug: five-year-change
+  - name: Sub-metric
+    slug: sub-metric
+    choices:
+      - name: Total
+        slug: total
+      - name: Per capita / Share of population
+        slug: per-capita
+name: Immigration
+
+views:
+  - dimensions:
+      period: cumulative
+      sub-metric: total
+    indicators:
+      y: "{definitions.table}#immigrants_all"
+    config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
+      hasMapTab: true
+      yAxis:
+        min: 0
+      map:
+        colorScale:
+          binningStrategy: manual
+          baseColorScheme: OrRd
+          customNumericValues:
+            - 10000
+            - 30000
+            - 100000
+            - 300000
+            - 1000000
+            - 3000000
+            - 10000000
+            - 30000000
+  - dimensions:
+      period: cumulative
+      sub-metric: per-capita
+    indicators:
+      y: "{definitions.table}#immigrant_share_of_dest_population_all"
+    config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
+      hasMapTab: true
+      yAxis:
+        min: 0
+  - dimensions:
+      period: five-year-change
+      sub-metric: total
+    indicators:
+      y: "{definitions.table}#immigrants_change_5_years"
+    config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
+      hasMapTab: true
+      yAxis:
+        min: 0
+  - dimensions:
+      period: five-year-change
+      sub-metric: per-capita
+    indicators:
+      y: "{definitions.table}#immigrants_change_5_years_per_1000"
+    config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
+      hasMapTab: true
+      yAxis:
+        min: 0
