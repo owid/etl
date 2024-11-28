@@ -196,12 +196,10 @@ definitions:
     Harmonized over time
     <%- endif -%>
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
 
 tables:
   multidimensional_poverty_index:
@@ -217,7 +215,7 @@ tables:
           - "{definitions.description_key_assessments}"
           - "{definitions.description_key_weights}"
           - "{definitions.description_key_intensity}"
-          - <% set cme_link = "https://ourworldindata.org/grapher/multidimensional-poverty-index-mpi" %> <% set hot_link = "https://ourworldindata.org/grapher/multidimensional-poverty-index-mpi-hot" %>"{definitions.description_key_flavor}"
+          - <% set cme_link = "https://ourworldindata.org/grapher/multidimensional-poverty-index-mpi" %> <% set hot_link = "https://ourworldindata.org/grapher/multidimensional-poverty-index-mpi-hot" %>{definitions.description_key_flavor}
         presentation:
           title_public: Multidimensional Poverty Index (MPI)
           title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
@@ -332,4 +330,3 @@ tables:
           name: Share of population deprived in the indicator <<indicator>>
           numDecimalPlaces: 1
           <<: *common_display
-
