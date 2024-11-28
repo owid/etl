@@ -19,7 +19,6 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden.read("migrant_stock_dest_origin")
 
-    # grapher cannot handle this many indicators, so we remove male and female columns
     tb = tb.drop(columns=["migrants_female", "migrants_male"])
 
     tb_dest_cols = tb.pivot(
