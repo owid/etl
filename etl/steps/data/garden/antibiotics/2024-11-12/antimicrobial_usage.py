@@ -78,16 +78,16 @@ def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
 
     for key in tb_notes_dict.values():
         if f"ddd_{key}" in tb_class_agg.columns:
-            tb_class_agg[f"ddd_{key}"].metadata.description_processing = "\n".join(
-                tb_notes["description_processing"][tb_notes["category"] == key].tolist()
-            )
+            # tb_class_agg[f"ddd_{key}"].metadata.description_processing = "\n".join(
+            #    tb_notes["description_processing"][tb_notes["category"] == key].tolist()
+            # )
             tb_class_agg[f"ddd_{key}"].metadata.description_key = tb_notes["description_processing"][
                 tb_notes["category"] == key
             ].tolist()
         if f"did_{key}" in tb_class_agg.columns:
-            tb_class_agg[f"did_{key}"].metadata.description_processing = "\n".join(
-                tb_notes["description_processing"][tb_notes["category"] == key].tolist()
-            )
+            # tb_class_agg[f"did_{key}"].metadata.description_processing = "\n".join(
+            #    tb_notes["description_processing"][tb_notes["category"] == key].tolist()
+            # )
             tb_class_agg[f"did_{key}"].metadata.description_key = tb_notes["description_processing"][
                 tb_notes["category"] == key
             ].tolist()
@@ -150,7 +150,7 @@ def format_notes(tb_notes: Table) -> Table:
         tb_note = tb_notes[msk]
         countries = tb_note["country"].unique()
         countries_formatted = combine_countries(countries)
-        description_processing_string = f"- In {countries_formatted}: {note}\n"
+        description_processing_string = f"In {countries_formatted}: {note}\n"
         tb_notes.loc[msk, "description_processing"] = description_processing_string
     # Creating onedescription processing for each antimicrobial class, the variable unit
     tb_desc = (
