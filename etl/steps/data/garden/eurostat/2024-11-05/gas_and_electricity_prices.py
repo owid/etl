@@ -730,51 +730,65 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
 
 
 def prepare_wide_tables(tb: Table) -> Dict[str, Table]:
-    wide_tables = {
-        # Table for average prices (in euros) of gas and electricity prices of household and non-household consumers.
-        "gas_and_electricity_prices_euro_flat": tb[tb["dataset_code"].isin(DATASET_CODES_PRICES)].pivot(
-            index=["country", "date"],
-            columns=["source", "consumer_type", "price_component_or_level"],
-            values="price_euro",
-            join_column_levels_with="-",
-        ),
-        # Table for average prices (in PPS) of gas and electricity prices of household and non-household consumers.
-        "gas_and_electricity_prices_pps_flat": tb[tb["dataset_code"].isin(DATASET_CODES_PRICES)].pivot(
-            index=["country", "date"],
-            columns=["source", "consumer_type", "price_component_or_level"],
-            values="price_pps",
-            join_column_levels_with="-",
-        ),
-        # Table for price components (in euros) of gas and electricity prices of household and non-household consumers.
-        "gas_and_electricity_price_components_euro_flat": tb[tb["dataset_code"].isin(DATASET_CODES_COMPONENTS)].pivot(
-            index=["country", "year"],
-            columns=["source", "consumer_type", "price_component_or_level"],
-            values="price_euro",
-            join_column_levels_with="-",
-        ),
-        # Table for price components (in PPS) of gas and electricity prices of household and non-household consumers.
-        "gas_and_electricity_price_components_pps_flat": tb[tb["dataset_code"].isin(DATASET_CODES_COMPONENTS)].pivot(
-            index=["country", "year"],
-            columns=["source", "consumer_type", "price_component_or_level"],
-            values="price_pps",
-            join_column_levels_with="-",
-        ),
-    }
-    # Rename columns and format tables conveniently.
-    for table_name, table in wide_tables.items():
-        if "component" in table_name:
-            table = table.format(["country", "year"], short_name=table_name)
-        else:
-            table = table.format(["country", "date"], short_name=table_name)
+    # Table for average prices (in euros) of gas and electricity prices of household and non-household consumers.
+    tb_prices_euro = tb[tb["dataset_code"].isin(DATASET_CODES_PRICES)].pivot(
+        index=["country", "date"],
+        columns=["source", "consumer_type", "price_component_or_level"],
+        values="price_euro",
+        join_column_levels_with="-",
+    )
+    # Table for average prices (in PPS) of gas and electricity prices of household and non-household consumers.
+    tb_prices_pps = tb[tb["dataset_code"].isin(DATASET_CODES_PRICES)].pivot(
+        index=["country", "date"],
+        columns=["source", "consumer_type", "price_component_or_level"],
+        values="price_pps",
+        join_column_levels_with="-",
+    )
+    # Improve tables format.
+    tb_prices_euro = tb_prices_euro.format(["country", "date"], short_name="gas_and_electricity_prices_euro_flat")
+    tb_prices_pps = tb_prices_pps.format(["country", "date"], short_name="gas_and_electricity_prices_pps_flat")
 
-        # Rename columns conveniently.
-        if "pps" in table_name:
-            table = table.rename(columns={column: f"{column}_pps" for column in table.columns}, errors="raise")
-        table = table.rename(columns={column: column.replace("__", "_") for column in table.columns}, errors="raise")
+    # Improve column names.
+    tb_prices_euro = tb_prices_euro.rename(
+        columns={column: column.replace("__", "_") + "_euro" for column in tb_prices_euro.columns}, errors="raise"
+    )
+    tb_prices_pps = tb_prices_pps.rename(
+        columns={column: column.replace("__", "_") + "_pps" for column in tb_prices_pps.columns}, errors="raise"
+    )
 
-        wide_tables[table_name] = table
+    # Table for price components (in euros) of gas and electricity prices of household and non-household consumers.
+    tb_price_components_euro = tb[tb["dataset_code"].isin(DATASET_CODES_COMPONENTS)].pivot(
+        index=["country", "year"],
+        columns=["source", "consumer_type", "price_component_or_level"],
+        values="price_euro",
+        join_column_levels_with="-",
+    )
+    # Table for price components (in PPS) of gas and electricity prices of household and non-household consumers.
+    tb_price_components_pps = tb[tb["dataset_code"].isin(DATASET_CODES_COMPONENTS)].pivot(
+        index=["country", "year"],
+        columns=["source", "consumer_type", "price_component_or_level"],
+        values="price_pps",
+        join_column_levels_with="-",
+    )
+    # Improve tables format.
+    tb_price_components_euro = tb_price_components_euro.format(
+        ["country", "year"], short_name="gas_and_electricity_price_components_euro_flat"
+    )
+    tb_price_components_pps = tb_price_components_pps.format(
+        ["country", "year"], short_name="gas_and_electricity_price_components_pps_flat"
+    )
 
-    return wide_tables
+    # Improve column names.
+    tb_price_components_euro = tb_price_components_euro.rename(
+        columns={column: column.replace("__", "_") + "_euro" for column in tb_price_components_euro.columns},
+        errors="raise",
+    )
+    tb_price_components_pps = tb_price_components_pps.rename(
+        columns={column: column.replace("__", "_") + "_pps" for column in tb_price_components_pps.columns},
+        errors="raise",
+    )
+
+    return tb_prices_euro, tb_prices_pps, tb_price_components_euro, tb_price_components_pps
 
 
 def sanity_check_outputs(tb: Table) -> None:
@@ -858,7 +872,7 @@ def run(dest_dir: str) -> None:
     # plot_final_comparison_between_prices_and_components_data(tb=tb)
 
     # Create convenient wide tables.
-    wide_tables = prepare_wide_tables(tb=tb)
+    tb_prices_euro, tb_prices_pps, tb_price_components_euro, tb_price_components_pps = prepare_wide_tables(tb=tb)
 
     # Improve main table format.
     tb = tb.drop(columns=["dataset_code"]).format(
@@ -871,10 +885,8 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb] + list(wide_tables.values()),
+        tables=[tb, tb_prices_euro, tb_prices_pps, tb_price_components_euro, tb_price_components_pps],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )
-
-    # Save changes in the new garden dataset.
     ds_garden.save()

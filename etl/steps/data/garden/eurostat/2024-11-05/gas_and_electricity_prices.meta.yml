@@ -95,7 +95,7 @@ tables:
       unit: 'euros per kilowatt-hour'
       short_unit: "€/kWh"
     variables:
-      electricity_household_capacity_taxes:
+      electricity_household_capacity_taxes_euro:
         title: Electricity price component (euros) for household consumers - Capacity taxes
         display:
           name: Capacity taxes
@@ -106,7 +106,7 @@ tables:
           - "{definitions.description_key_electricity_component_capacity_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_non_household_capacity_taxes:
+      electricity_non_household_capacity_taxes_euro:
         title: Electricity price component (euros) for non-household consumers - Capacity taxes
         display:
           name: Capacity taxes
@@ -117,7 +117,7 @@ tables:
           - "{definitions.description_key_electricity_component_capacity_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_capacity_taxes_allowances:
+      electricity_household_capacity_taxes_allowances_euro:
         title: Electricity price component (euros) for household consumers - Capacity taxes allowances
         display:
           name: Capacity taxes allowances
@@ -128,7 +128,7 @@ tables:
           # - "{definitions.description_key_electricity_component_capacity_taxes_allowances}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_energy_and_supply:
+      electricity_household_energy_and_supply_euro:
         title: Electricity price component (euros) for household consumers - Energy and supply
         display:
           name: Energy and supply
@@ -139,7 +139,7 @@ tables:
           - "{definitions.description_key_electricity_component_energy_and_supply}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_non_household_energy_and_supply:
+      electricity_non_household_energy_and_supply_euro:
         title: Electricity price component (euros) for non-household consumers - Energy and supply
         display:
           name: Energy and supply
@@ -150,7 +150,7 @@ tables:
           - "{definitions.description_key_electricity_component_energy_and_supply}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_environmental_taxes:
+      electricity_household_environmental_taxes_euro:
         title: Electricity price component (euros) for household consumers - Environmental taxes
         display:
           name: Environmental taxes
@@ -161,7 +161,7 @@ tables:
           - "{definitions.description_key_electricity_component_environmental_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_non_household_environmental_taxes:
+      electricity_non_household_environmental_taxes_euro:
         title: Electricity price component (euros) for non-household consumers - Environmental taxes
         display:
           name: Environmental taxes
@@ -172,7 +172,7 @@ tables:
           - "{definitions.description_key_electricity_component_environmental_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_environmental_taxes_allowance:
+      electricity_household_environmental_taxes_allowance_euro:
         title: Electricity price component (euros) for household consumers - Environmental taxes allowance
         display:
           name: Environmental taxes allowance
@@ -183,7 +183,7 @@ tables:
           # - "{definitions.description_key_electricity_component_environmental_taxes_allowance}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_network_costs:
+      electricity_household_network_costs_euro:
         title: Electricity price component (euros) for household consumers - Network costs
         display:
           name: Network costs
@@ -194,7 +194,7 @@ tables:
           - "{definitions.description_key_electricity_component_network_cost}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_non_household_network_costs:
+      electricity_non_household_network_costs_euro:
         title: Electricity price component (euros) for non-household consumers - Network costs
         display:
           name: Network costs
@@ -205,7 +205,7 @@ tables:
           - "{definitions.description_key_electricity_component_network_cost}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_nuclear_taxes:
+      electricity_household_nuclear_taxes_euro:
         title: Electricity price component (euros) for household consumers - Nuclear taxes
         display:
           name: Nuclear taxes
@@ -216,7 +216,7 @@ tables:
           - "{definitions.description_key_electricity_component_nuclear_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_non_household_nuclear_taxes:
+      electricity_non_household_nuclear_taxes_euro:
         title: Electricity price component (euros) for non-household consumers - Nuclear taxes
         display:
           name: Nuclear taxes
@@ -227,7 +227,7 @@ tables:
           - "{definitions.description_key_electricity_component_nuclear_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_nuclear_taxes_allowance:
+      electricity_household_nuclear_taxes_allowance_euro:
         title: Electricity price component (euros) for household consumers - Nuclear taxes allowance
         display:
           name: Nuclear taxes allowance
@@ -238,7 +238,7 @@ tables:
           # - "{definitions.description_key_electricity_component_nuclear_taxes_allowance}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_other:
+      electricity_household_other_euro:
         title: Electricity price component (euros) for household consumers - Other
         display:
           name: Other
@@ -249,7 +249,7 @@ tables:
           - "{definitions.description_key_electricity_component_other_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_non_household_other:
+      electricity_non_household_other_euro:
         title: Electricity price component (euros) for non-household consumers - Other
         display:
           name: Other
@@ -260,7 +260,7 @@ tables:
           - "{definitions.description_key_electricity_component_other_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_other_allowance:
+      electricity_household_other_allowance_euro:
         title: Electricity price component (euros) for household consumers - Other allowance
         display:
           name: Other allowance
@@ -271,7 +271,7 @@ tables:
           # - "{definitions.description_key_electricity_component_other_allowance}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_renewable_taxes:
+      electricity_household_renewable_taxes_euro:
         title: Electricity price component (euros) for household consumers - Renewable taxes
         display:
           name: Renewable taxes
@@ -282,7 +282,7 @@ tables:
           - "{definitions.description_key_electricity_component_renewable_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_non_household_renewable_taxes:
+      electricity_non_household_renewable_taxes_euro:
         title: Electricity price component (euros) for non-household consumers - Renewable taxes
         display:
           name: Renewable taxes
@@ -293,7 +293,7 @@ tables:
           - "{definitions.description_key_electricity_component_renewable_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_renewable_taxes_allowance:
+      electricity_household_renewable_taxes_allowance_euro:
         title: Electricity price component (euros) for household consumers - Renewable taxes allowance
         display:
           name: Renewable taxes allowance
@@ -304,7 +304,7 @@ tables:
           # - "{definitions.description_key_electricity_component_renewable_taxes_allowance}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_taxes_fees_levies_and_charges:
+      electricity_household_taxes_fees_levies_and_charges_euro:
         title: Electricity price component (euros) for household consumers - Taxes, fees, levies, and charges
         display:
           name: Taxes, fees, levies, and charges
@@ -315,7 +315,7 @@ tables:
           - "{definitions.description_key_electricity_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_non_household_taxes_fees_levies_and_charges:
+      electricity_non_household_taxes_fees_levies_and_charges_euro:
         title: Electricity price component (euros) for non-household consumers - Taxes, fees, levies, and charges
         display:
           name: Taxes, fees, levies, and charges
@@ -326,7 +326,7 @@ tables:
           - "{definitions.description_key_electricity_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_value_added_tax_vat:
+      electricity_household_value_added_tax_vat_euro:
         title: Electricity price component (euros) for household consumers - Value added tax (VAT)
         display:
           name: Value added tax (VAT)
@@ -337,7 +337,7 @@ tables:
           - "{definitions.description_key_electricity_component_vat}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_non_household_value_added_tax_vat:
+      electricity_non_household_value_added_tax_vat_euro:
         title: Electricity price component (euros) for non-household consumers - Value added tax (VAT)
         display:
           name: Value added tax (VAT)
@@ -348,7 +348,7 @@ tables:
           - "{definitions.description_key_electricity_component_vat}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_household_capacity_taxes:
+      gas_household_capacity_taxes_euro:
         title: Gas price component (euros) for household consumers - Capacity taxes
         display:
           name: Capacity taxes
@@ -359,7 +359,7 @@ tables:
           - "{definitions.description_key_gas_component_capacity_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_household_energy_and_supply:
+      gas_household_energy_and_supply_euro:
         title: Gas price component (euros) for household consumers - Energy and supply
         display:
           name: Energy and supply
@@ -370,7 +370,7 @@ tables:
           - "{definitions.description_key_gas_component_energy_and_supply}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_household_environmental_taxes:
+      gas_household_environmental_taxes_euro:
         title: Gas price component (euros) for household consumers - Environmental taxes
         display:
           name: Environmental taxes
@@ -381,7 +381,7 @@ tables:
           - "{definitions.description_key_gas_component_environmental_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_household_network_costs:
+      gas_household_network_costs_euro:
         title: Gas price component (euros) for household consumers - Network costs
         display:
           name: Network costs
@@ -392,7 +392,7 @@ tables:
           - "{definitions.description_key_gas_component_network_cost}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_household_other:
+      gas_household_other_euro:
         title: Gas price component (euros) for household consumers - Other
         display:
           name: Other
@@ -403,7 +403,7 @@ tables:
           - "{definitions.description_key_gas_component_other_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_household_renewable_taxes:
+      gas_household_renewable_taxes_euro:
         title: Gas price component (euros) for household consumers - Renewable taxes
         display:
           name: Renewable taxes
@@ -414,7 +414,7 @@ tables:
           - "{definitions.description_key_gas_component_renewable_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_household_taxes_fees_levies_and_charges:
+      gas_household_taxes_fees_levies_and_charges_euro:
         title: Gas price component (euros) for household consumers - Taxes, fees, levies, and charges
         display:
           name: Taxes, fees, levies, and charges
@@ -425,7 +425,7 @@ tables:
           - "{definitions.description_key_gas_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_household_value_added_tax_vat:
+      gas_household_value_added_tax_vat_euro:
         title: Gas price component (euros) for household consumers - Value added tax (VAT)
         display:
           name: Value added tax (VAT)
@@ -436,7 +436,7 @@ tables:
           - "{definitions.description_key_gas_component_vat}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_non_household_capacity_taxes:
+      gas_non_household_capacity_taxes_euro:
         title: Gas price component (euros) for non-household consumers - Capacity taxes
         display:
           name: Capacity taxes
@@ -447,7 +447,7 @@ tables:
           - "{definitions.description_key_gas_component_capacity_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_non_household_energy_and_supply:
+      gas_non_household_energy_and_supply_euro:
         title: Gas price component (euros) for non-household consumers - Energy and supply
         display:
           name: Energy and supply
@@ -458,7 +458,7 @@ tables:
           - "{definitions.description_key_gas_component_energy_and_supply}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_non_household_environmental_taxes:
+      gas_non_household_environmental_taxes_euro:
         title: Gas price component (euros) for non-household consumers - Environmental taxes
         display:
           name: Environmental taxes
@@ -469,7 +469,7 @@ tables:
           - "{definitions.description_key_gas_component_environmental_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_non_household_network_costs:
+      gas_non_household_network_costs_euro:
         title: Gas price component (euros) for non-household consumers - Network costs
         display:
           name: Network costs
@@ -480,7 +480,7 @@ tables:
           - "{definitions.description_key_gas_component_network_cost}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_non_household_other:
+      gas_non_household_other_euro:
         title: Gas price component (euros) for non-household consumers - Other
         display:
           name: Other
@@ -491,7 +491,7 @@ tables:
           - "{definitions.description_key_gas_component_other_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_non_household_renewable_taxes:
+      gas_non_household_renewable_taxes_euro:
         title: Gas price component (euros) for non-household consumers - Renewable taxes
         display:
           name: Renewable taxes
@@ -502,7 +502,7 @@ tables:
           - "{definitions.description_key_gas_component_renewable_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_non_household_taxes_fees_levies_and_charges:
+      gas_non_household_taxes_fees_levies_and_charges_euro:
         title: Gas price component (euros) for non-household consumers - Taxes, fees, levies, and charges
         display:
           name: Taxes, fees, levies, and charges
@@ -513,7 +513,7 @@ tables:
           - "{definitions.description_key_gas_component_taxes_fees_levies_and_charges}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_non_household_value_added_tax_vat:
+      gas_non_household_value_added_tax_vat_euro:
         title: Gas price component (euros) for non-household consumers - Value added tax (VAT)
         display:
           name: Value added tax (VAT)
@@ -524,7 +524,7 @@ tables:
           - "{definitions.description_key_gas_component_vat}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_taxes_fees_levies_and_charges_allowance:
+      electricity_household_taxes_fees_levies_and_charges_allowance_euro:
         title: Electricity price component (euros) for household consumers - Taxes, fees, levies, and charges allowance
         display:
           name: Taxes, fees, levies, and charges allowance
@@ -535,7 +535,7 @@ tables:
           # - "{definitions.description_key_electricity_component_taxes_fees_levies_and_charges_allowance}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_household_total_price_including_taxes:
+      electricity_household_total_price_including_taxes_euro:
         title: Electricity price component (euros) for household consumers - Total price including taxes
         display:
           name: Total price including taxes
@@ -546,7 +546,7 @@ tables:
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      electricity_non_household_total_price_including_taxes:
+      electricity_non_household_total_price_including_taxes_euro:
         title: Electricity price component (euros) for non-household consumers - Total price including taxes
         display:
           name: Total price including taxes
@@ -557,7 +557,7 @@ tables:
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_household_total_price_including_taxes:
+      gas_household_total_price_including_taxes_euro:
         title: Gas price component (euros) for household consumers - Total price including taxes
         display:
           name: Total price including taxes
@@ -568,7 +568,7 @@ tables:
           - "{definitions.description_key_gas_component_total_price_including_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
 
-      gas_non_household_total_price_including_taxes:
+      gas_non_household_total_price_including_taxes_euro:
         title: Gas price component (euros) for non-household consumers - Total price including taxes
         display:
           name: Total price including taxes
@@ -1121,7 +1121,7 @@ tables:
       unit: "euros per kilowatt-hour"
       short_unit: "€/kWh"
     variables:
-      electricity_household_all_taxes_and_levies_included:
+      electricity_household_all_taxes_and_levies_included_euro:
         title: Electricity price (euros) for household consumers - All taxes and levies included
         presentation:
           title_public: Electricity price for household consumers - All taxes and levies included
@@ -1129,7 +1129,7 @@ tables:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_all_consumer_bands}"
           - "{definitions.description_key_price_including_all_taxes}"
-      electricity_household_excluding_taxes_and_levies:
+      electricity_household_excluding_taxes_and_levies_euro:
         title: Electricity price (euros) for household consumers - Excluding taxes and levies
         presentation:
           title_public: Electricity price for household consumers - Excluding taxes and levies
@@ -1137,7 +1137,7 @@ tables:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_all_consumer_bands}"
           - "{definitions.description_key_price_excluding_taxes}"
-      electricity_household_excluding_vat_and_other_recoverable_taxes_and_levies:
+      electricity_household_excluding_vat_and_other_recoverable_taxes_and_levies_euro:
         title: Electricity price (euros) for household consumers - Excluding VAT and other recoverable taxes and levies
         presentation:
           title_public: Electricity price for household consumers - Excluding VAT and other recoverable taxes and levies
@@ -1145,7 +1145,7 @@ tables:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_all_consumer_bands}"
           - "{definitions.description_key_price_excluding_vat}"
-      electricity_non_household_all_taxes_and_levies_included:
+      electricity_non_household_all_taxes_and_levies_included_euro:
         title: Electricity price (euros) for non-household consumers - All taxes and levies included
         presentation:
           title_public: Electricity price for non-household consumers - All taxes and levies included
@@ -1153,7 +1153,7 @@ tables:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_all_consumer_bands}"
           - "{definitions.description_key_price_including_all_taxes}"
-      electricity_non_household_excluding_taxes_and_levies:
+      electricity_non_household_excluding_taxes_and_levies_euro:
         title: Electricity price (euros) for non-household consumers - Excluding taxes and levies
         presentation:
           title_public: Electricity price for non-household consumers - Excluding taxes and levies
@@ -1161,7 +1161,7 @@ tables:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_all_consumer_bands}"
           - "{definitions.description_key_price_excluding_taxes}"
-      electricity_non_household_excluding_vat_and_other_recoverable_taxes_and_levies:
+      electricity_non_household_excluding_vat_and_other_recoverable_taxes_and_levies_euro:
         title: Electricity price (euros) for non-household consumers - Excluding VAT and other recoverable taxes and levies
         presentation:
           title_public: Electricity price for non-household consumers - Excluding VAT and other recoverable taxes and levies
@@ -1169,7 +1169,7 @@ tables:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_all_consumer_bands}"
           - "{definitions.description_key_price_excluding_vat}"
-      gas_household_all_taxes_and_levies_included:
+      gas_household_all_taxes_and_levies_included_euro:
         title: Gas price (euros) for household consumers - All taxes and levies included
         presentation:
           title_public: Gas price for household consumers - All taxes and levies included
@@ -1177,7 +1177,7 @@ tables:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_all_consumer_bands}"
           - "{definitions.description_key_price_including_all_taxes}"
-      gas_household_excluding_taxes_and_levies:
+      gas_household_excluding_taxes_and_levies_euro:
         title: Gas price (euros) for household consumers - Excluding taxes and levies
         presentation:
           title_public: Gas price for household consumers - Excluding taxes and levies
@@ -1185,7 +1185,7 @@ tables:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_all_consumer_bands}"
           - "{definitions.description_key_price_excluding_taxes}"
-      gas_household_excluding_vat_and_other_recoverable_taxes_and_levies:
+      gas_household_excluding_vat_and_other_recoverable_taxes_and_levies_euro:
         title: Gas price (euros) for household consumers - Excluding VAT and other recoverable taxes and levies
         presentation:
           title_public: Gas price for household consumers - Excluding VAT and other recoverable taxes and levies
@@ -1193,7 +1193,7 @@ tables:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_all_consumer_bands}"
           - "{definitions.description_key_price_excluding_vat}"
-      gas_non_household_all_taxes_and_levies_included:
+      gas_non_household_all_taxes_and_levies_included_euro:
         title: Gas price (euros) for non-household consumers - All taxes and levies included
         presentation:
           title_public: Gas price for non-household consumers - All taxes and levies included
@@ -1201,7 +1201,7 @@ tables:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_all_consumer_bands}"
           - "{definitions.description_key_price_including_all_taxes}"
-      gas_non_household_excluding_taxes_and_levies:
+      gas_non_household_excluding_taxes_and_levies_euro:
         title: Gas price (euros) for non-household consumers - Excluding taxes and levies
         presentation:
           title_public: Gas price for non-household consumers - Excluding taxes and levies
@@ -1209,7 +1209,7 @@ tables:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_all_consumer_bands}"
           - "{definitions.description_key_price_excluding_taxes}"
-      gas_non_household_excluding_vat_and_other_recoverable_taxes_and_levies:
+      gas_non_household_excluding_vat_and_other_recoverable_taxes_and_levies_euro:
         title: Gas price (euros) for non-household consumers - Excluding VAT and other recoverable taxes and levies
         presentation:
           title_public: Gas price for non-household consumers - Excluding VAT and other recoverable taxes and levies
