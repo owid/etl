@@ -33,8 +33,7 @@ def run(dest_dir: str) -> None:
             "config": {
                 "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
                 "chartTypes": ["LineChart"],
-                # TODO: Fix the upsert_multidim_data_page function to properly handle booleans (the following doesn't seem to work if it's set to True).
-                "hasMapTab": "true",
+                "hasMapTab": True,
                 "tab": "map",
                 "map": {
                     "projection": "Europe",
