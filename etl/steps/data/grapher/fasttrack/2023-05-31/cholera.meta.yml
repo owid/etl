@@ -1,7 +1,4 @@
 dataset:
-  namespace: fasttrack
-  version: '2023-05-31'
-  short_name: cholera
   title: Cholera reported cases, deaths and case fatality rate (WHO, 2023)
   description: |-
     The data is created by combining multiple WHO Weekly Epidemiological Reports for cholera reported cases, deaths and case fatality rate.
@@ -17,37 +14,22 @@ dataset:
     2020: https://web.archive.org/web/20230326231135/http://apps.who.int/iris/bitstream/handle/10665/345271/WER9637-445-454-eng-fre.pdf?sequence=1&isAllowed=y
 
     2021: https://web.archive.org/web/20230526223955/https://apps.who.int/iris/bitstream/handle/10665/362858/WER9737-453-464-eng-fre.pdf?sequence=1&isAllowed=y
-  sources:
-  - name: World Health Organization (2023)
-    published_by: World Health Organization
-    date_accessed: 2023-05-31
+  licenses:
+    - {}
 tables:
   cholera:
     variables:
       cholera_reported_cases:
         title: Cholera reported cases
         unit: reported cases
-        description: Confirmed cholera cases, including those confirmed clinically,
-          epidemiologically, or by laboratory investigation.
-        sources:
-        - name: World Health Organization (2023)
-          published_by: World Health Organization
-          date_accessed: 2023-05-31
+        description: Confirmed cholera cases, including those confirmed clinically, epidemiologically, or by laboratory investigation.
       cholera_case_fatality_rate:
         title: Cholera case fatality rate
-        short_unit: '%'
         unit: '%'
-        description: WHO calculates case fatality rates based on the numbers of cases
-          and deaths as reported by national authorities (Ministries of Health).
-        sources:
-        - name: World Health Organization (2023)
-          published_by: World Health Organization
-          date_accessed: 2023-05-31
+        short_unit: '%'
+        description: |-
+          WHO calculates case fatality rates based on the numbers of cases and deaths as reported by national authorities (Ministries of Health).
       cholera_deaths:
         title: Cholera deaths
         unit: deaths
         description: Number of deaths from cholera reported to WHO
-        sources:
-        - name: World Health Organization (2023)
-          published_by: World Health Organization
-          date_accessed: 2023-05-31
