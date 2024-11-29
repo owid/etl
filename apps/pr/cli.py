@@ -373,7 +373,7 @@ def bake_branch_name(repo, pr_title, no_llm, remote_branches):
     category = pr_title.category
 
     # Get input title (without emoji, scope, etc.)
-    title = _extract_relevant_title_for_branch_name(pr_title.title, not no_llm)
+    title = _extract_relevant_title_for_branch_name(pr_title.title, category, not no_llm)
 
     # Bake complete PR branch name
     # name = f"{user}-{category}-{title}"
@@ -390,7 +390,7 @@ def bake_branch_name(repo, pr_title, no_llm, remote_branches):
     return name
 
 
-def _extract_relevant_title_for_branch_name(text_in: str, use_llm) -> str:
+def _extract_relevant_title_for_branch_name(text_in: str, category: str, use_llm) -> str:
     """
     Process the input string by:
     1. Removing all symbols, keeping only letters and numbers.
@@ -412,8 +412,13 @@ def _extract_relevant_title_for_branch_name(text_in: str, use_llm) -> str:
 
     # Split into tokens/words
     tokens = cleaned_text.split()
+
+    # Clean if there is word included in category
+    tokens = [t for t in tokens if t.lower() != category]
+
     # Keep only the first 3 tokens
     tokens = tokens[:3]
+
     # Combine tokens with '-'
     name = "-".join(tokens).lower()
 
