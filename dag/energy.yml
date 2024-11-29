@@ -249,11 +249,6 @@ steps:
   data://garden/ember/2024-11-20/european_wholesale_electricity_prices:
     - data://meadow/ember/2024-11-20/european_wholesale_electricity_prices
   #
-  # Ember - European wholesale electricity prices
-  #
-  data://grapher/ember/2024-11-20/european_wholesale_electricity_prices:
-    - data://garden/ember/2024-11-20/european_wholesale_electricity_prices
-  #
   # IEA - Fossil fuel subsidies
   #
   data://meadow/iea/2024-11-20/fossil_fuel_subsidies:
