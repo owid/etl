@@ -1,0 +1,22 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Energy
+
+dataset:
+  update_period_days: 365
+
+tables:
+  battery_cell_prices:
+    variables:
+      battery_cell_price:
+        title: "Average battery cell price"
+        unit: "current US$ per kilowatt-hour"
+        short_unit: "$/kWh"
+        description_short: |-
+          Average price of lithium ion battery cells per [kilowatt-hour](#dod:watt-hours).
+        display:
+          numDecimalPlaces: 2
+
