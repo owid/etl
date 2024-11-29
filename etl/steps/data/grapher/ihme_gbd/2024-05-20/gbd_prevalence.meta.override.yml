@@ -1,0 +1,5 @@
+tables:
+  gbd_prevalence:
+    variables:
+      value:
+        title: Current cases of liver cancer, among individuals aged 15-49 years

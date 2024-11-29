@@ -231,6 +231,10 @@ steps:
   data://grapher/un/2024-07-16/migrant_stock:
     - data://garden/un/2024-07-16/migrant_stock
 
+  # Migration UN DESA (flows)
+  data://grapher/migration/2024-11-20/migrant_stock_flows:
+    - data://garden/un/2024-07-16/migrant_stock
+
   # Internal displacement monitoring centre
   data://meadow/idmc/2024-08-02/internal_displacement:
     - snapshot://idmc/2024-08-02/internal_displacement.xlsx

@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
 
     # Convert messy columns to string.
     # for col in ("aother_subtype_details", "parainfluenza", "otherrespvirus"):
-    for col in ("aother_subtype_details",):
+    for col in ("aother_subtype_details", "other_respvirus_details"):
         ix = tb[col].notnull()
         tb.loc[ix, col] = tb.loc[ix, col].astype("str")
 
