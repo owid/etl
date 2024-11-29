@@ -72,20 +72,20 @@ def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
     tb_notes["category"] = tb_notes["antimicrobialclass"].map(tb_notes_dict)
     tb_class_agg = tb_class_agg.copy(deep=True)
     tb_class_agg["antimicrobialclass"] = tb_class_agg["antimicrobialclass"].replace(tb_notes_dict)
-    tb_class_agg = tb_class_agg.pivot(index=["country", "year"], columns="antimicrobialclass", values=["ddd", "did"])
-    tb_class_agg.columns = tb_class_agg.columns.to_flat_index()
-    tb_class_agg.columns = [f"{col[0]}_{col[1]}" for col in tb_class_agg.columns]
-    tb_class_agg = tb_class_agg.reset_index()
+    tb_class_agg = tb_class_agg.pivot(
+        index=["country", "year"], columns="antimicrobialclass", values=["ddd", "did"], join_column_levels_with="_"
+    )
+    tb_class_agg = tb_class_agg.reset_index(drop=True)
 
     for key in tb_notes_dict.values():
         if f"ddd_{key}" in tb_class_agg.columns:
-            tb_class_agg[f"ddd_{key}"].metadata.description_processing = tb_notes["description_processing"][
-                tb_notes["category"] == key
-            ]
+            tb_class_agg[f"ddd_{key}"].metadata.description_processing = "\n".join(
+                tb_notes["description_processing"][tb_notes["category"] == key].tolist()
+            )
         if f"did_{key}" in tb_class_agg.columns:
-            tb_class_agg[f"did_{key}"].metadata.description_processing = tb_notes["description_processing"][
-                tb_notes["category"] == key
-            ].astype("string")
+            tb_class_agg[f"did_{key}"].metadata.description_processing = "\n".join(
+                tb_notes["description_processing"][tb_notes["category"] == key].tolist()
+            )
 
     return tb_class_agg
 
