@@ -27,10 +27,9 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Rename columns in all tables to have consistent dimensions.
-    # TODO: Instead of this, consider having just one table for both euro and pps.
     tb_eurostat_euro = tb_eurostat_euro.rename(
         columns={
-            column: f"annual_{column}_euro" for column in tb_eurostat_euro.columns if column not in ["country", "year"]
+            column: f"annual_{column}" for column in tb_eurostat_euro.columns if column not in ["country", "year"]
         },
         errors="raise",
     )

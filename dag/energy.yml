@@ -239,16 +239,6 @@ steps:
   data://garden/eurostat/2024-11-05/gas_and_electricity_prices:
     - data://meadow/eurostat/2024-11-05/gas_and_electricity_prices
   #
-  # Eurostat - Energy statistics, prices of natural gas and electricity
-  #
-  data://grapher/eurostat/2024-11-05/gas_and_electricity_prices:
-    - data://garden/eurostat/2024-11-05/gas_and_electricity_prices
-  #
-  # Eurostat - Energy statistics, price components of natural gas and electricity
-  #
-  data://grapher/eurostat/2024-11-05/gas_and_electricity_price_components:
-    - data://garden/eurostat/2024-11-05/gas_and_electricity_prices
-  #
   # Ember - European wholesale electricity prices
   #
   data://meadow/ember/2024-11-20/european_wholesale_electricity_prices:
