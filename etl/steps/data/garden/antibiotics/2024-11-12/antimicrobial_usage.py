@@ -57,7 +57,7 @@ def run(dest_dir: str) -> None:
 
 def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
     """
-    Pivot the aggregated table to have a column for each antimicrobial class, then add the description_processing metadata
+    Pivot the aggregated table to have a column for each antimicrobial class, then add the description_key metadata
     """
 
     tb_notes_dict = {
@@ -78,12 +78,12 @@ def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
 
     for key in tb_notes_dict.values():
         if f"ddd_{key}" in tb_class_agg.columns:
-            tb_class_agg[f"ddd_{key}"].metadata.description_processing = "\n".join(
-                tb_notes["description_processing"][tb_notes["category"] == key].tolist()
+            tb_class_agg[f"ddd_{key}"].metadata.description_key = "\n".join(
+                tb_notes["description_key"][tb_notes["category"] == key].tolist()
             )
         if f"did_{key}" in tb_class_agg.columns:
-            tb_class_agg[f"did_{key}"].metadata.description_processing = "\n".join(
-                tb_notes["description_processing"][tb_notes["category"] == key].tolist()
+            tb_class_agg[f"did_{key}"].metadata.description_key = "\n".join(
+                tb_notes["description_key"][tb_notes["category"] == key].tolist()
             )
 
     return tb_class_agg
@@ -144,16 +144,15 @@ def format_notes(tb_notes: Table) -> Table:
         tb_note = tb_notes[msk]
         countries = tb_note["country"].unique()
         countries_formatted = combine_countries(countries)
-        description_processing_string = f"- In {countries_formatted}: {note}\n"
-        tb_notes.loc[msk, "description_processing"] = description_processing_string
+        description_key_string = f"- In {countries_formatted}: {note}\n"
+        tb_notes.loc[msk, "description_key"] = description_key_string
     # Creating onedescription processing for each antimicrobial class, the variable unit
     tb_desc = (
-        tb_notes.dropna(subset=["description_processing"])  # Remove NaNs
-        .groupby(["antimicrobialclass"])["description_processing"]
-        .apply(lambda x: "; ".join(set(x)))  # Combine unique values
+        tb_notes.dropna(subset=["description_key"])  # Remove NaNs
+        .groupby(["antimicrobialclass"])["description_key"]
+        .apply(lambda x: "".join(set(x)))  # Combine unique values
         .reset_index()
     )
-    # tb = pr.merge(tb, tb_desc, on=["antimicrobialclass"])
 
     return tb_desc
 
