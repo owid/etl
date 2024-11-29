@@ -26,6 +26,8 @@ def run(dest_dir: str) -> None:
     tb_class = geo.harmonize_countries(df=tb_class, countries_file=paths.country_mapping_path)
     tb_aware = geo.harmonize_countries(df=tb_aware, countries_file=paths.country_mapping_path)
 
+    # Tidy notes column
+    tb_class = tidy_notes(tb_class)
     # Aggregate by antimicrobial class
     tb_class_agg, tb_notes = aggregate_antimicrobial_classes(tb_class)
     # Save the origins of the aggregated table to insert back in later
@@ -78,16 +80,10 @@ def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
 
     for key in tb_notes_dict.values():
         if f"ddd_{key}" in tb_class_agg.columns:
-            # tb_class_agg[f"ddd_{key}"].metadata.description_processing = "\n".join(
-            #    tb_notes["description_processing"][tb_notes["category"] == key].tolist()
-            # )
             tb_class_agg[f"ddd_{key}"].metadata.description_key = tb_notes["description_processing"][
                 tb_notes["category"] == key
             ]
         if f"did_{key}" in tb_class_agg.columns:
-            # tb_class_agg[f"did_{key}"].metadata.description_processing = "\n".join(
-            #    tb_notes["description_processing"][tb_notes["category"] == key].tolist()
-            # )
             tb_class_agg[f"did_{key}"].metadata.description_key = tb_notes["description_processing"][
                 tb_notes["category"] == key
             ]
@@ -149,7 +145,7 @@ def format_notes(tb_notes: Table) -> Table:
         tb_note = tb_notes[msk]
         countries = tb_note["country"].unique()
         countries_formatted = combine_countries(countries)
-        description_processing_string = f"In {countries_formatted}: {note}"
+        description_processing_string = f"For {countries_formatted}: {note}"
         tb_notes.loc[msk, "description_processing"] = description_processing_string
     # Creating onedescription processing for each antimicrobial class, the variable unit
     tb_desc = (
@@ -160,6 +156,25 @@ def format_notes(tb_notes: Table) -> Table:
     )
 
     return tb_desc
+
+
+def tidy_notes(tb_class: Table) -> Table:
+    """
+    Tidy notes column - improve the syntax and fix spelling errors
+    """
+    notes_dict = {
+        "Only consumption in the community reported": "only antimicrobial consumption in the community is reported.",
+        "For antimycotics and antifungals: only J02 reported": "for antimycotics and antifungals, only antimycotics for systemic use (ATC code J02) are reported.",
+        "For antibiotics: only J01 and P01AB reported": "for antibiotics, only antibiotics for systemic use (ATC code J01) and nitroimidazole derivatives (ATC code P01AB) are reported.",
+        "For antibiotics: only J01 reported": "for antibiotics, only antibiotics for systemic use (ATC code J01) are reported",
+        "For antifungals: only use in the hospital reported": "for antifungals, only those used in hospitals are reported.",
+        "Data incomplete since not collected from all sources of data": "data is incomplete since it's not collected from all sources.",
+        "Only consumption in the public sector reported and this is estimated to reppresent less than 90% of the antimicrobial used in the country ": "only consumption in the public sector reported and this is estimated to represent less than 90% of total antimicrobial usage.",
+        "Data incomplete: not all antibiotics reported systematically": "data is incomplete, not all antibiotics reported systematically.",
+        "For antituberculosis medicines: data are incomplete": "data are incomplete for antituberculosis medicines.",
+    }
+    tb_class["notes"] = tb_class["notes"].replace(notes_dict)
+    return tb_class
 
 
 def combine_countries(countries):
