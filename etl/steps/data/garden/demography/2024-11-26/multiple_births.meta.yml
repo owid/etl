@@ -21,16 +21,16 @@ definitions:
         Spain: Stillbirths included
         Sweden: Stillbirths included
         Switzerland: Stillbirths included
-        Australia: Stillbirths sometimes included
-        New Zealand: Stillbirths sometimes included
-        Scotland: Stillbirths sometimes included
-        United States: Stillbirths sometimes included
-        Uruguay: Stillbirths sometimes included
-        Austria: Stillbirths mostly included
-        Canada: Stillbirths mostly included
-        Finland: Stillbirths mostly included
-        Germany: Stillbirths mostly included
-        Japan: Stillbirths mostly included
+        Australia: Stillbirths included in some years
+        New Zealand: Stillbirths included in some years
+        Scotland: Stillbirths included in some years
+        United States: Stillbirths included in some years
+        Uruguay: Stillbirths included in some years
+        Austria: Stillbirths typically included
+        Canada: Stillbirths typically included
+        Finland: Stillbirths typically included
+        Germany: Stillbirths typically included
+        Japan: Stillbirths typically included
 
     description_processing: |-
       Data sometimes includes stillbirths, therefore comparability across countries should be done with care.
