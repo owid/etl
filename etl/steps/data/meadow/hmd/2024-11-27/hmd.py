@@ -135,16 +135,18 @@ def run(dest_dir: str) -> None:
     _check_nas(tb_pop, 0.001, 1)
 
     # Ensure correct year dtype
-    def _remove_range_years(tb):
+    def _clean_year(tb):
+        # Remove year ranges, and convert to int
         flag = tb["Year"].astype("string").str.contains("-")
         tb = tb.loc[~flag]
+        tb["Year"] = tb["Year"].astype(int)
         return tb
 
-    tb_lt = _remove_range_years(tb_lt)
-    tb_exp = _remove_range_years(tb_exp)
-    tb_m = _remove_range_years(tb_m)
-    tb_pop = _remove_range_years(tb_pop)
-    tb_bi = _remove_range_years(tb_bi)
+    tb_lt = _clean_year(tb_lt)
+    tb_exp = _clean_year(tb_exp)
+    tb_m = _clean_year(tb_m)
+    tb_pop = _clean_year(tb_pop)
+    tb_bi = _clean_year(tb_bi)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [
