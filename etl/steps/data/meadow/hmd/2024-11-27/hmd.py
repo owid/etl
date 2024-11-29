@@ -115,14 +115,14 @@ def run(dest_dir: str) -> None:
             main_folders=FOLDERS_BIRTHS,
             regex=REGEX_BIRTHS,
         )
-    #
-    # Process data.
-    #
-    # Column rename
+
+    # Life tables
+    ## Column rename
     ## e.g. "Lx -> lx" and "lx -> lx". This will cause an error when setting the index.
     tb_lt = tb_lt.rename(columns=COLUMNS_RENAME_LT)
 
-    # Invert 'abridged' <-> '1-year' in the type column
+    # Population
+    ## Invert 'abridged' <-> '1-year' in the type column
     message = "Types 'abridged' and '1-year' might not be reversed anymore!"
     assert not tb_pop.loc[tb_pop["type"] == "abridged", "Age"].str.contains("-").any(), message
     assert tb_pop.loc[tb_pop["type"] == "1-year", "Age"].str.contains("80-84").any(), message
@@ -134,13 +134,25 @@ def run(dest_dir: str) -> None:
     _check_nas(tb_m, 0.001, 1)
     _check_nas(tb_pop, 0.001, 1)
 
+    # Ensure correct year dtype
+    def _remove_range_years(tb):
+        flag = tb["Year"].astype("string").str.contains("-")
+        tb = tb.loc[~flag]
+        return tb
+
+    tb_lt = _remove_range_years(tb_lt)
+    tb_exp = _remove_range_years(tb_exp)
+    tb_m = _remove_range_years(tb_m)
+    tb_pop = _remove_range_years(tb_pop)
+    tb_bi = _remove_range_years(tb_bi)
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [
-        tb_lt.format(["country", "year", "sex", "age", "type", "format"]),
-        tb_exp.format(["country", "year", "sex", "age", "type", "format"]),
-        tb_m.format(["country", "year", "sex", "age", "type", "format"]),
-        tb_pop.format(["country", "year", "sex", "age", "type"]),
-        tb_bi.format(["country", "year", "sex", "type"]),
+        tb_lt.format(["country", "year", "sex", "age", "type", "format"], short_name="life_tables"),
+        tb_exp.format(["country", "year", "sex", "age", "type", "format"], short_name="exposures"),
+        tb_m.format(["country", "year", "sex", "age", "type", "format"], short_name="deaths"),
+        tb_pop.format(["country", "year", "sex", "age", "type"], short_name="population"),
+        tb_bi.format(["country", "year", "sex", "type"], short_name="births"),
     ]
 
     #
