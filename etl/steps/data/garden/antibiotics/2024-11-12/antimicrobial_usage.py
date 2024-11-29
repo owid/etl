@@ -85,7 +85,7 @@ def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
         if f"did_{key}" in tb_class_agg.columns:
             tb_class_agg[f"did_{key}"].metadata.description_processing = tb_notes["description_processing"][
                 tb_notes["category"] == key
-            ].astype(str)
+            ].astype("string")
 
     return tb_class_agg
 
@@ -96,7 +96,7 @@ def aggregate_antimicrobial_classes(tb: Table) -> Table:
     """
     tb = tb.copy(deep=True)
     # Convert the column to strings (if not already done)
-    tb["antimicrobialclass"] = tb["antimicrobialclass"].astype(str)
+    tb["antimicrobialclass"] = tb["antimicrobialclass"].astype("string")
 
     # Create a completely independent copy of antituberculosis rows and reset its index
     msk = tb["antimicrobialclass"] == "Drugs for the treatment of tuberculosis (ATC J04A)"
@@ -110,7 +110,14 @@ def aggregate_antimicrobial_classes(tb: Table) -> Table:
             "Antibacterials (ATC J01, A07AA, P01AB)": "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)",
         },
     )
-    assert len(tb["antimicrobialclass"].unique()) == 4
+    expected_class_values = {
+        "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)",
+        "Antimalarials (ATC P01B)",
+        "Antimycotics and antifungals for systemic use (J02, D01B)",
+        "Antivirals for systemic use (ATC J05)",
+    }
+    actual_values = set(tb["antimicrobialclass"].unique())
+    assert actual_values == expected_class_values
     # Format the notes tables before it's removed
     tb_notes = tb[["country", "year", "antimicrobialclass", "notes"]].dropna(subset=["notes"])
     tb_notes = format_notes(tb_notes)
@@ -134,13 +141,12 @@ def format_notes(tb_notes: Table) -> Table:
     Format notes column
     """
     for note in tb_notes["notes"].unique():
-        if pd.notna(note):
-            msk = tb_notes["notes"] == note
-            tb_note = tb_notes[msk]
-            countries = tb_note["country"].unique()
-            countries_formatted = combine_countries(countries)
-            description_processing_string = f"- In {countries_formatted}: {note}\n"
-            tb_notes.loc[msk, "description_processing"] = description_processing_string
+        msk = tb_notes["notes"] == note
+        tb_note = tb_notes[msk]
+        countries = tb_note["country"].unique()
+        countries_formatted = combine_countries(countries)
+        description_processing_string = f"- In {countries_formatted}: {note}\n"
+        tb_notes.loc[msk, "description_processing"] = description_processing_string
     # Creating onedescription processing for each antimicrobial class, the variable unit
     tb_desc = (
         tb_notes.dropna(subset=["description_processing"])  # Remove NaNs
