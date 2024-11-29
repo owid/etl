@@ -42,9 +42,3 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/unicef/2024-07-30/child_migration:
     - data://garden/unicef/2024-07-30/child_migration
-
-  # Mothers by decadal age-group
-  data://garden/un/2024-10-01/births_by_age:
-    - data://garden/un/2024-07-12/un_wpp
-  data://grapher/un/2024-10-01/births_by_age:
-    - data://garden/un/2024-10-01/births_by_age
