@@ -1,7 +1,7 @@
 steps:
-  ####################################
-  # Population #######################
-  ####################################
+  ########################################################################
+  # Population                                                           #
+  ########################################################################
 
   # Population OMM #############################
   # 2022-12-08: HYDE 3.2 + Gapminder + UN WPP 2022
@@ -111,9 +111,9 @@ steps:
   data://grapher/demography/2023-07-03/world_population_comparison:
     - data://garden/demography/2023-06-27/world_population_comparison
 
-  ####################################
-  # Life expectancy ##################
-  ####################################
+  ########################################################################
+  # Life expectancy                                                      #
+  ########################################################################
 
   # HMD
   data://meadow/hmd/2023-09-19/hmd:
@@ -122,6 +122,14 @@ steps:
     - data://meadow/hmd/2023-09-19/hmd
   data://grapher/hmd/2023-09-19/hmd:
     - data://garden/hmd/2023-09-19/hmd
+
+  # Human Mortality Database
+  data://meadow/hmd/2024-11-27/hmd:
+    - snapshot://hmd/2024-11-27/hmd.zip
+  data://garden/hmd/2024-11-27/hmd:
+    - data://meadow/hmd/2024-11-27/hmd
+  data://grapher/hmd/2024-11-27/hmd:
+    - data://garden/hmd/2024-11-27/hmd
 
   # Gini Life Expectancy Inequality
   data://garden/demography/2023-10-04/gini_le:
@@ -220,53 +228,9 @@ steps:
   data://grapher/un/2024-03-14/un_wpp_most:
     - data://garden/un/2024-03-14/un_wpp_most
 
-  # Migration UN DESA
-  data://meadow/un/2024-07-16/migrant_stock:
-    - snapshot://un/2024-07-16/migrant_stock_dest_origin.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_origin.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_dest.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_age_sex.xlsx
-  data://garden/un/2024-07-16/migrant_stock:
-    - data://meadow/un/2024-07-16/migrant_stock
-  data://grapher/un/2024-07-16/migrant_stock:
-    - data://garden/un/2024-07-16/migrant_stock
-
-  # Migration UN DESA (flows)
-  data://grapher/migration/2024-11-20/migrant_stock_flows:
-    - data://garden/un/2024-07-16/migrant_stock
-
-  # Internal displacement monitoring centre
-  data://meadow/idmc/2024-08-02/internal_displacement:
-    - snapshot://idmc/2024-08-02/internal_displacement.xlsx
-    - data://garden/demography/2024-07-15/population
-  data://grapher/idmc/2024-08-02/internal_displacement:
-    - data://meadow/idmc/2024-08-02/internal_displacement
-
-  # UNHCR refugee data
-  data://meadow/un/2024-07-25/refugee_data:
-    - snapshot://un/2024-07-25/refugee_data.zip
-  data://garden/un/2024-07-25/refugee_data:
-    - data://meadow/un/2024-07-25/refugee_data
-    - data://garden/demography/2024-07-15/population
-    - data://garden/un/2024-07-25/resettlement
-  data://grapher/un/2024-07-25/refugee_data:
-    - data://garden/un/2024-07-25/refugee_data
-
-  # UNHCR resettlement data
-  data://meadow/un/2024-07-25/resettlement:
-    - snapshot://un/2024-07-25/resettlement.zip
-  data://garden/un/2024-07-25/resettlement:
-    - data://meadow/un/2024-07-25/resettlement
-    - data://garden/demography/2024-07-15/population
-
-  # Child migration (UNICEF)
-  data://meadow/unicef/2024-07-30/child_migration:
-    - snapshot://unicef/2024-07-30/child_migration.csv
-  data://garden/unicef/2024-07-30/child_migration:
-    - data://meadow/unicef/2024-07-30/child_migration
-    - data://garden/demography/2024-07-15/population
-  data://grapher/unicef/2024-07-30/child_migration:
-    - data://garden/unicef/2024-07-30/child_migration
+  ########################################################################
+  # Fertility                                                            #
+  ########################################################################
 
   # Mothers by decadal age-group
   data://garden/un/2024-10-01/births_by_age:
@@ -282,10 +246,10 @@ steps:
   data://grapher/hmd/2024-11-19/hfd:
     - data://garden/hmd/2024-11-19/hfd
 
-  # Human Mortality Database
-  data://meadow/hmd/2024-11-27/hmd:
-    - snapshot://hmd/2024-11-27/hmd.zip
-  data://garden/hmd/2024-11-27/hmd:
-    - data://meadow/hmd/2024-11-27/hmd
-  data://grapher/hmd/2024-11-27/hmd:
-    - data://garden/hmd/2024-11-27/hmd
+  # Multiple births
+  data://meadow/demography/2024-11-26/multiple_births:
+    - snapshot://demography/2024-11-26/multiple_births.7z
+  data://garden/demography/2024-11-26/multiple_births:
+    - data://meadow/demography/2024-11-26/multiple_births
+  data://grapher/demography/2024-11-26/multiple_births:
+    - data://garden/demography/2024-11-26/multiple_births
