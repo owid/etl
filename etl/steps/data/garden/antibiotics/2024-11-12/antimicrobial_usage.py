@@ -83,15 +83,14 @@ def pivot_aggregated_table(tb_class_agg: Table, tb_notes: Table) -> Table:
             # )
             tb_class_agg[f"ddd_{key}"].metadata.description_key = tb_notes["description_processing"][
                 tb_notes["category"] == key
-            ].tolist()
+            ]
         if f"did_{key}" in tb_class_agg.columns:
             # tb_class_agg[f"did_{key}"].metadata.description_processing = "\n".join(
             #    tb_notes["description_processing"][tb_notes["category"] == key].tolist()
             # )
             tb_class_agg[f"did_{key}"].metadata.description_key = tb_notes["description_processing"][
                 tb_notes["category"] == key
-            ].tolist()
-
+            ]
     return tb_class_agg
 
 
@@ -156,7 +155,7 @@ def format_notes(tb_notes: Table) -> Table:
     tb_desc = (
         tb_notes.dropna(subset=["description_processing"])  # Remove NaNs
         .groupby(["antimicrobialclass"])["description_processing"]
-        .apply(lambda x: "".join(set(x)))  # Combine unique values
+        .apply(lambda x: list(set(x)))  # Combine unique values into a list
         .reset_index()
     )
 
