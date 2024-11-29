@@ -15,7 +15,7 @@ paths = PathFinder(__file__)
 
 
 # Life tables
-TABLES_LIFE_TABLES = [
+FOLDERS_LT = [
     "lt_male",
     "lt_female",
     "lt_both",
@@ -39,21 +39,37 @@ COLUMNS_RENAME_LT = {
 }
 
 # Exposures
-TABLES_EXPOSURES = [
+FOLDERS_EXPOSURES = [
     "c_exposures",
     "exposures",
 ]
 REGEX_EXP = (
-    r"(?P<country>[a-zA-Z\-\s,]+), Exposure to risk \((?P<type>[a-zA-Z]+) (?P<format>\d+x\d+)\),\s\tLast modified: "
+    r"(?P<country>[a-zA-Z\-\s,]+), (?P<name>Exposure) to risk \((?P<type>[a-zA-Z]+) (?P<format>\d+x\d+)\),\s\tLast modified: "
     r"(?P<last_modified>\d+ [a-zA-Z]{3} \d+);  Methods Protocol: v\d+ \(\d+\)\n\n(?P<data>(?s:.)*)"
 )
 
 # Mortality
-TABLES_M = [
+FOLDERS_MOR = [
     "deaths",
 ]
-REGEX_M = (
-    r"(?P<country>[a-zA-Z\-\s,]+), Deaths \((?P<type>[a-zA-Z]+) (?P<format>\d+x\d+|Lexis triangle)\),\s\tLast modified: "
+REGEX_MOR = (
+    r"(?P<country>[a-zA-Z\-\s,]+), (?P<name>Deaths) \((?P<type>[a-zA-Z]+) (?P<format>\d+x\d+|Lexis triangle)\),\s\tLast modified: "
+    r"(?P<last_modified>\d+ [a-zA-Z]{3} \d+);  Methods Protocol: v\d+ \(\d+\)\n\n(?P<data>(?s:.)*)"
+)
+# Population
+FOLDERS_POP = [
+    "population",
+]
+REGEX_POP = (
+    r"(?P<country>[a-zA-Z\-\s,]+)(,\s)?(?P<name>Population) size \((?P<type>1\-year|abridged)\)\s+Last modified: "
+    r"(?P<last_modified>\d+ [a-zA-Z]{3} \d+)(;  Methods Protocol: v\d+ \(\d+\)|,MPv\d \(in development\))\n\n(?P<data>(?s:.)*)"
+)
+# Births
+FOLDERS_BIRTHS = [
+    "births",
+]
+REGEX_BIRTHS = (
+    r"(?P<country>[a-zA-Z\-\s,]+),\s+(?P<name>Births) \((?P<type>1\-year)\)\s+Last modified: "
     r"(?P<last_modified>\d+ [a-zA-Z]{3} \d+);  Methods Protocol: v\d+ \(\d+\)\n\n(?P<data>(?s:.)*)"
 )
 
@@ -67,23 +83,37 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     with snap.extract_to_tempdir() as tmpdir:
+        # Population
+        tb_pop = make_tb(
+            path=Path(tmpdir),
+            main_folders=FOLDERS_POP,
+            regex=REGEX_POP,
+        )
+
         # Life tables
         tb_lt = make_tb(
             path=Path(tmpdir),
-            main_folders=TABLES_LIFE_TABLES,
+            main_folders=FOLDERS_LT,
             regex=REGEX_LT,
         )
         # Exposure
         tb_exp = make_tb(
             path=Path(tmpdir),
-            main_folders=TABLES_EXPOSURES,
+            main_folders=FOLDERS_EXPOSURES,
             regex=REGEX_EXP,
         )
         # Mortality
         tb_m = make_tb(
             path=Path(tmpdir),
-            main_folders=TABLES_M,
-            regex=REGEX_M,
+            main_folders=FOLDERS_MOR,
+            regex=REGEX_MOR,
+        )
+
+        # Births
+        tb_bi = make_tb(
+            path=Path(tmpdir),
+            main_folders=FOLDERS_BIRTHS,
+            regex=REGEX_BIRTHS,
         )
     #
     # Process data.
@@ -92,28 +122,25 @@ def run(dest_dir: str) -> None:
     ## e.g. "Lx -> lx" and "lx -> lx". This will cause an error when setting the index.
     tb_lt = tb_lt.rename(columns=COLUMNS_RENAME_LT)
 
+    # Invert 'abridged' <-> '1-year' in the type column
+    message = "Types 'abridged' and '1-year' might not be reversed anymore!"
+    assert not tb_pop.loc[tb_pop["type"] == "abridged", "Age"].str.contains("-").any(), message
+    assert tb_pop.loc[tb_pop["type"] == "1-year", "Age"].str.contains("80-84").any(), message
+    tb_pop["type"] = tb_pop["type"].map(lambda x: "1-year" if x == "abridged" else "abridged" if x == "1-year" else x)
+
     # Check missing values
-    def _check_missing(tb, missing_row_max, missing_countries_max):
-        row_nans = tb.isna().any(axis=1)
-        assert (
-            row_nans.sum() / len(tb) < missing_row_max
-        ), f"Too many missing values in life tables: {row_nans.sum()/len(tb)}"
-
-        # Countries missing
-        countries_missing_data = tb.loc[row_nans, "country"].unique()
-        assert (
-            len(countries_missing_data) / len(tb) < missing_countries_max
-        ), f"Too many missing values in life tables: {len(countries_missing_data)}"
-
-    _check_missing(tb_lt, 0.01, 14)
-    _check_missing(tb_exp, 0.23, 47)
-    _check_missing(tb_m, 0.001, 1)
+    _check_nas(tb_lt, 0.01, 14)
+    _check_nas(tb_exp, 0.23, 47)
+    _check_nas(tb_m, 0.001, 1)
+    _check_nas(tb_pop, 0.001, 1)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [
         tb_lt.format(["country", "year", "sex", "age", "type", "format"]),
         tb_exp.format(["country", "year", "sex", "age", "type", "format"]),
         tb_m.format(["country", "year", "sex", "age", "type", "format"]),
+        tb_pop.format(["country", "year", "sex", "age", "type"]),
+        tb_bi.format(["country", "year", "sex", "type"]),
     ]
 
     #
@@ -177,19 +204,25 @@ def make_tb_from_txt(text_path: Path, regex: str) -> Table:
     tb = parse_table(groups["data"])
 
     # Optional melt
-    if ("Female" in tb.columns) & ("Male" in tb.columns):
-        tb = tb.melt(id_vars=["Age", "Year"], var_name="sex", value_name="deaths")
+    if ("Female" in tb.columns) and ("Male" in tb.columns):
+        id_vars = [col for col in ["Age", "Year"] if col in tb.columns]
+        if "name" not in groups:
+            raise ValueError(
+                f"Indicator name not found in {text_path}! Please revise that source files' content matches FILE_REGEX."
+            )
+        tb = tb.melt(id_vars=id_vars, var_name="sex", value_name=groups["name"])
 
     # Add dimensions
     tb = tb.assign(
         country=groups["country"],
         type=groups["type"],
-        format=groups["format"],
     )
 
     # Optional sex column
     if "sex" in groups:
         tb["sex"] = groups["sex"]
+    if "format" in groups:
+        tb["format"] = groups["format"]
 
     return tb
 
@@ -220,3 +253,17 @@ def parse_table(data_raw: str):
     )
 
     return tb
+
+
+def _check_nas(tb, missing_row_max, missing_countries_max):
+    """Check missing values & countries in data."""
+    row_nans = tb.isna().any(axis=1)
+    assert (
+        row_nans.sum() / len(tb) < missing_row_max
+    ), f"Too many missing values in life tables: {row_nans.sum()/len(tb)}"
+
+    # Countries missing
+    countries_missing_data = tb.loc[row_nans, "country"].unique()
+    assert (
+        len(countries_missing_data) / len(tb) < missing_countries_max
+    ), f"Too many missing values in life tables: {len(countries_missing_data)}"
