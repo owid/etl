@@ -1,8 +1,13 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import warnings
+
 import geopandas as gpd
 import pandas as pd
-from owid.catalog import License, Origin
+import structlog
+from geopy.distance import geodesic
+from shapely import wkt
+from shapely.ops import nearest_points
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -10,19 +15,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# GeoJson file with country boundaries
-URL_TINY_CTY = "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_tiny_countries.geojson"
-
-NATURAL_EARTH_ORIGIN = Origin(
-    producer="Natural Earth",
-    title="Admin 0 - Countries and Tiny Country Points",
-    url_main="https://www.naturalearthdata.com/",
-    url_download="https://www.naturalearthdata.com/http//www.naturalearthdata.com/download/110m/cultural/ne_110m_admin_0_countries.zip",
-    description="""Natural Earth is a public domain map dataset available at 1:10m, 1:50m, and 1:110 million scales. It features tightly integrated vector and raster data, was built through a collaboration of many volunteers and is supported by NACIS (North American Cartographic Information Society).""",
-    license=License(name="Public Domain", url="https://www.naturalearthdata.com/about/terms-of-use/"),
-    date_accessed="2024-11-19",
-    citation_full="Made with Natural Earth. Free vector and raster map data @ naturalearthdata.com.",
-)
+LOG = structlog.get_logger()
 
 
 def run(dest_dir: str) -> None:
@@ -31,21 +24,19 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("migrant_stock")
+    ds_nat_earth = paths.load_dataset("nat_earth_110")
 
     # Read table from meadow dataset.
     tb = ds_meadow["migrant_stock_dest_origin"].reset_index()
+    tb_countries = ds_nat_earth["nat_earth_110"].reset_index()
 
-    # read natural earth data
-    world = gpd.read_file(gpd.datasets.get_path("naturalearth_lowres"))  # type: ignore
-    tiny_countries = gpd.read_file(URL_TINY_CTY)
+    # Read natural earth data
+    # Convert the geometry string column to a Shapely object.
+    tb_countries["geometry"] = tb_countries["geometry"].apply(wkt.loads)
+    world = gpd.GeoDataFrame(tb_countries, geometry="geometry")
 
-    # use web mercator projection
-    world = world.to_crs("EPSG:3857")[["name", "geometry"]]
-    tiny_countries = tiny_countries.to_crs("EPSG:3857")[["admin", "geometry"]]
-    tiny_countries = tiny_countries.rename(columns={"admin": "name"})
-
-    # add tiny countries to world
-    world = pd.concat([world, tiny_countries], ignore_index=True)
+    # use World Geodetic System 1984 as projection
+    world = world.set_crs("EPSG:4326")
 
     # harmonize country names
     world = geo.harmonize_countries(
@@ -54,23 +45,15 @@ def run(dest_dir: str) -> None:
         countries_file=paths.country_mapping_path,
     )
 
-    # Calculate distance matrix (in km)
-    distance_matrix = (
-        world.geometry.apply(lambda geom1: world.geometry.apply(lambda geom2: geom1.distance(geom2))) / 1e3
-    )
-
-    # Add country names to the distance matrix
-    distance_df = distance_matrix.copy()
-    distance_df.index = world["name"]
-    distance_df.columns = world["name"]
+    # Calculate distance matrix (in km) (catch warnings to ignore "invalid value encountered" warning)
+    with warnings.catch_warnings(action="ignore"):
+        distance_matrix = calculate_distance_matrix(world)
 
     ## Add distances to migration flows table
-    # Remove "Other" and countries without distance data from country destination or country origin columns
+    # Remove countries not included in nat earth data and "Other" from country destination or country origin columns
     cty_no_data = [
         "Other",
         "Tokelau",
-        "Cape Verde",
-        "Montserrat",
         "Bonaire Sint Eustatius and Saba",
         "French Guiana",
         "Guadeloupe",
@@ -79,11 +62,14 @@ def run(dest_dir: str) -> None:
         "Channel Islands",
         "Mayotte",
     ]
+
     cty_data = [cty for cty in tb["country_origin"].unique() if cty not in cty_no_data]
     tb = tb[(tb["country_destination"].isin(cty_data)) & (tb["country_origin"].isin(cty_data))]
 
     # Add distance to the table
-    tb["distance"] = tb.apply(lambda row: distance_df.loc[row["country_origin"], row["country_destination"]], axis=1)
+    tb["distance"] = tb.apply(
+        lambda row: distance_matrix.loc[row["country_origin"], row["country_destination"]], axis=1
+    )
     tb["distance"] = tb["distance"].apply(get_min_distance).astype("Float64")
 
     migrant_groups = tb.groupby(["country_origin", "year"])
@@ -96,7 +82,7 @@ def run(dest_dir: str) -> None:
     med_distance.metadata.short_name = "migration_distance"
 
     for col in med_distance.columns:
-        med_distance[col].metadata.origins = tb["country_origin"].m.origins + [NATURAL_EARTH_ORIGIN]
+        med_distance[col].metadata.origins = tb["country_origin"].m.origins + tb_countries["name"].m.origins
 
     med_distance = med_distance.format(["country_origin", "year"])
 
@@ -129,3 +115,24 @@ def calc_median(group):
     median_journey = total_journeys / 2
     median_dist = group[group["cumulative_journeys"] >= median_journey].iloc[0]["distance"]
     return median_dist, total_journeys
+
+
+def calculate_distance_matrix(world):
+    # Create an empty distance matrix
+    distance_matrix = pd.DataFrame(index=world["name"], columns=world["name"])
+
+    for i, row1 in world.iterrows():
+        if i % 10 == 0:
+            LOG.info("Calculating distance matrix", progress=f"{i*100/ len(world):.2f}% done")
+        for j, row2 in world.iterrows():
+            if i == j:
+                distance_matrix.iloc[i, j] = 0  # Distance to itself
+            else:
+                # Get the nearest points between two geometries
+                point1, point2 = nearest_points(row1.geometry, row2.geometry)  # type: ignore
+
+                # Calculate geodesic distance between the nearest points
+                distance_matrix.iloc[i, j] = geodesic((point1.y, point1.x), (point2.y, point2.x)).kilometers  # type: ignore
+
+    LOG.info("Calculating distance matrix", progress=f"{100}% done")
+    return distance_matrix

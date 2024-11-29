@@ -610,6 +610,8 @@ steps:
   data://garden/geography/2023-11-28/nat_earth_110:
     - data://meadow/geography/2023-11-28/nat_earth_110
 
+  data://meadow/geography/2024-11-29/natural_earth_tiny_countries:
+    - snapshot://geography/2024-11-29/natural_earth_tiny_countries.geojson
   ######################################################################################################################
 
   #Latitude
@@ -864,7 +866,8 @@ steps:
 # Migration distances
   data://garden/migration/2024-11-19/migration_distance:
     - data://garden/un/2024-07-16/migrant_stock
-
+    - data://garden/geography/2023-11-28/nat_earth_110
+    - data://meadow/geography/2024-11-29/natural_earth_tiny_countries
   data://grapher/migration/2024-11-19/migration_distance:
     - data://garden/migration/2024-11-19/migration_distance
 
@@ -884,6 +887,7 @@ steps:
     - data://meadow/imf/2024-11-25/world_economic_outlook
   data://grapher/imf/2024-11-25/world_economic_outlook:
     - data://garden/imf/2024-11-25/world_economic_outlook
+
 
 include:
   - dag/open_numbers.yml

@@ -66,6 +66,7 @@ dependencies = [
     "walden",
     "deprecated>=1.2.14",
     "scikit-learn>=1.5.2",
+    "geopy>=2.4.1",
 ]
 
 [tool.uv.sources]
