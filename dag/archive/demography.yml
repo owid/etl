@@ -52,9 +52,15 @@ steps:
   data-private://grapher/un/2024-07-11/un_wpp_full:
     - data-private://garden/un/2024-07-11/un_wpp
 
-    # Population density
+  # Population density
   data://garden/demography/2023-06-12/population_density:
     - data://garden/demography/2023-03-31/population
     - data://garden/faostat/2024-03-14/faostat_rl
   data://grapher/demography/2023-06-12/population_density:
     - data://garden/demography/2023-06-12/population_density
+
+  # HMD
+  data://meadow/hmd/2022-12-07/life_tables:
+    - snapshot://hmd/2022-12-07/hmd.zip
+  data://garden/hmd/2022-12-07/life_tables:
+    - data://meadow/hmd/2022-12-07/life_tables
