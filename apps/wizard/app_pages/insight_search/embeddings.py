@@ -1,4 +1,5 @@
 import os
+import pickle
 import time
 from typing import Any, Dict, Optional
 
@@ -17,14 +18,22 @@ memory = Memory(CACHE_DIR, verbose=0)
 log = get_logger()
 
 
-def get_default_device() -> str:
-    return "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+def set_device() -> str:
+    default_device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+
+    # Set the default device. We use CPU on our servers, but you can change this to "cuda" if you have a GPU.
+    device = os.environ.get("DEVICE", default_device)
+
+    try:
+        torch.set_default_device(device)
+    except RuntimeError:
+        # If was already called, this can happen in streamlit apps
+        pass
+
+    return device
 
 
-# Set the default device. We use CPU on our servers, but you can change this to "cuda" if you have a GPU.
-DEVICE = os.environ.get("DEVICE", get_default_device())
-
-torch.set_default_device(DEVICE)
+DEVICE = set_device()
 
 
 @memory.cache
@@ -41,7 +50,7 @@ def get_embeddings(
     model_name: Optional[str] = None,
     batch_size=32,
     workers=1,
-) -> list:
+) -> torch.Tensor:
     log.info("get_embeddings.start", n_embeddings=len(texts))
     t = time.time()
 
@@ -50,26 +59,21 @@ def get_embeddings(
         # NOTE: this is a bit of a hack
         model_name = model.tokenizer.name_or_path.split("/")[-1]
 
-    cache_file_keys = CACHE_DIR / f"embeddings_{model_name}.keys"
-    cache_file_keys.touch(exist_ok=True)
-
+    cache_file_keys = CACHE_DIR / f"embeddings_{model_name}.keys.pkl"
     cache_file_tensor = CACHE_DIR / f"embeddings_{model_name}.pt"
-    if not cache_file_tensor.exists():
-        embedding_dim = model.get_sentence_embedding_dimension()
-        torch.save(torch.empty((0, embedding_dim)), cache_file_tensor)  # type: ignore
 
-    # Load embeddings and keys
-    embeddings = torch.load(cache_file_tensor).to(DEVICE)
-    with open(str(cache_file_keys).replace(".pt", ".keys"), "r") as f:
-        keys = [line.strip() for line in f]
-
-    missing_texts = []
+    if not cache_file_keys.exists():
+        keys = []
+        embeddings = None
+    else:
+        # Load embeddings and keys
+        embeddings = torch.load(cache_file_tensor).to(DEVICE)
+        # Load keys from pickle file
+        with open(cache_file_keys, "rb") as f:
+            keys = pickle.load(f)
 
     # Check cache for existing embeddings
-    keys_set = set(keys)
-    for idx, text in tqdm(enumerate(texts), total=len(texts), desc="Checking cache"):
-        if text not in keys_set:
-            missing_texts.append(text)
+    missing_texts = list(set(texts) - set(keys))
 
     log.info(
         "get_embeddings.encoding",
@@ -105,29 +109,32 @@ def get_embeddings(
         if not isinstance(batch_embeddings, torch.Tensor):
             batch_embeddings = torch.from_numpy(batch_embeddings)
 
-        # TODO: should embeddings be on CPU or GPU?
-        # Ensure batch_embeddings are on CPU
-        # batch_embeddings = batch_embeddings.cpu()
+        # Ensure batch_embeddings are on the right device
+        batch_embeddings = batch_embeddings.to(DEVICE)
 
-        # Update keys and embeddings
+        # Extend keys and embeddings
         keys.extend(missing_texts)
-        embeddings = torch.cat([embeddings, batch_embeddings])
+        if embeddings is None:
+            embeddings = batch_embeddings
+        else:
+            embeddings = torch.cat([embeddings, batch_embeddings])
 
-        # Save updated cache to pickle file
+        # Save updated cache to files
         torch.save(embeddings, cache_file_tensor)
-        with open(cache_file_keys, "w") as f:
-            f.writelines([key + "\n" for key in keys])
+        with open(cache_file_keys, "wb") as f:
+            pickle.dump(keys, f)
 
     # Create a mapping from keys to indices
     key_to_index = {key: idx for idx, key in enumerate(keys)}
 
     # Get requested embeddings in order
     indices = [key_to_index[text] for text in texts]
-    req_embeddings = embeddings[indices]
+    req_embeddings = embeddings[indices]  # type: ignore
 
     log.info("get_embeddings.end", t=time.time() - t)
 
-    return req_embeddings.unbind(dim=0)
+    # return req_embeddings.unbind(dim=0)
+    return req_embeddings
 
 
 # TODO: caching isn't working properly when on different devices
@@ -143,27 +150,32 @@ def get_insights_embeddings(_model, insights: list[Dict[str, Any]]) -> list:
 
 
 def get_sorted_documents_by_similarity(
-    model: SentenceTransformer, input_string: str, insights: list[Dict[str, str]], embeddings: list
+    model: SentenceTransformer, input_string: str, docs: list[Dict[str, str]], embeddings: torch.Tensor
 ) -> list[Dict[str, Any]]:
     """Ingests an input string and a list of documents, returning the list of documents sorted by their semantic similarity to the input string."""
-    _insights = insights.copy()
+    log.info("get_sorted_documents_by_similarity.start", n_docs=len(docs))
+    t = time.time()
+
+    _docs = docs.copy()
 
     # Encode the input string and the document texts.
     input_embedding = model.encode(input_string, convert_to_tensor=True, device=DEVICE)
 
     # Compute the cosine similarity between the input and each document.
-    def _get_score(a, b):
-        score = util.pytorch_cos_sim(a, b).item()
+    def _get_score(input_embedding, embeddings):
+        score = util.pytorch_cos_sim(embeddings, input_embedding)
         score = (score + 1) / 2
-        return score
+        return score.cpu().numpy()[:, 0]
 
-    similarities = [_get_score(input_embedding, doc_embedding) for doc_embedding in embeddings]  # type: ignore
+    similarities = _get_score(input_embedding, embeddings)
 
     # Attach the similarity scores to the documents.
-    for i, doc in enumerate(_insights):
+    for i, doc in enumerate(_docs):
         doc["similarity"] = similarities[i]  # type: ignore
 
     # Sort the documents by descending similarity score.
-    sorted_documents = sorted(_insights, key=lambda x: x["similarity"], reverse=True)
+    sorted_documents = sorted(_docs, key=lambda x: x["similarity"], reverse=True)
+
+    log.info("get_sorted_documents_by_similarity.end", t=time.time() - t)
 
     return sorted_documents
