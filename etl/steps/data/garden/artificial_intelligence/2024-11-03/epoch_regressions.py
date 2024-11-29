@@ -12,7 +12,6 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 # Constants for defining the time periods
 DL_ERA_START = 2010
-SECOND_PERIOD_END = 2018
 START_DATE = 1950
 END_DATE = 2025.2
 
@@ -84,16 +83,12 @@ def run_regression(tb):
     # Define periods dynamically
     periods = {
         f"{START_DATE}–{DL_ERA_START}": (tb["frac_year"] < DL_ERA_START),
-        f"{DL_ERA_START}–{SECOND_PERIOD_END}": (
-            (tb["frac_year"] >= DL_ERA_START) & (tb["frac_year"] < SECOND_PERIOD_END)
-        ),
-        f"{SECOND_PERIOD_END}–{int(END_DATE)}": (tb["frac_year"] >= SECOND_PERIOD_END),
+        f"{DL_ERA_START}–{int(END_DATE)}": ((tb["frac_year"] >= DL_ERA_START) & (tb["frac_year"] < END_DATE)),
     }
     # Define year grids dynamically
     year_grids = {
         f"{START_DATE}–{DL_ERA_START}": np.array([START_DATE, DL_ERA_START]),
-        f"{DL_ERA_START}–{SECOND_PERIOD_END}": np.array([DL_ERA_START, SECOND_PERIOD_END]),
-        f"{SECOND_PERIOD_END}–{int(END_DATE)}": np.array([SECOND_PERIOD_END, END_DATE]),
+        f"{DL_ERA_START}–{int(END_DATE)}": np.array([DL_ERA_START, END_DATE]),
     }
 
     metrics = ["training_computation_petaflop", "parameters", "training_dataset_size__datapoints"]
@@ -128,7 +123,7 @@ def run_regression(tb):
                         period_data["days_since_1949"].max(),
                     ],
                     f"{metric}": [line[0], line[-1]],
-                    "system": [info] * 2,
+                    "system": [f"{info} between {period_name}"] * 2,
                 }
             )
             dfs.append(df)
