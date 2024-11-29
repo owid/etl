@@ -6,6 +6,7 @@ definitions:
         - Energy
 
 dataset:
+  non_redistributable: true
   update_period_days: 365
 
 tables:
