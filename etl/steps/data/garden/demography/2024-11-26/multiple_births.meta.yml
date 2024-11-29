@@ -98,3 +98,8 @@ tables:
         unit: "multiple deliveries per 1,000 single delivery"
         description_short: |-
           Number of multiple deliveries per 1,000 single deliveries.
+      multiple_children:
+        title: "Multiple children"
+        unit: "children"
+        description_short: |-
+          Number of children born from multiple deliveries (twin babies, triplet babies, etc.)

@@ -121,6 +121,8 @@ def run(dest_dir: str) -> None:
             # Ratios
             "children_delivery_ratio",
             "multiple_to_singleton_ratio",
+            # Births
+            "multiple_children",
         ]
     ]
 
