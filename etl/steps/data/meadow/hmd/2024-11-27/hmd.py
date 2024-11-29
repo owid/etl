@@ -139,7 +139,7 @@ def run(dest_dir: str) -> None:
         # Remove year ranges, and convert to int
         flag = tb["Year"].astype("string").str.contains("-")
         tb = tb.loc[~flag]
-        tb["Year"] = tb["Year"].astype(int)
+        tb["Year"] = tb["Year"].astype("string")
         return tb
 
     tb_lt = _clean_year(tb_lt)
