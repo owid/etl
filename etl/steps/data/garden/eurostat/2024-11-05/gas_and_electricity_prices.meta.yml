@@ -91,9 +91,9 @@ tables:
   gas_and_electricity_price_components_euro_flat:
     title: Gas and electricity price components in Europe
     common:
-      description_short: Price components are given in euros per [kilowatt-hour](#dod:watt-hours).
-      unit: 'euros per kilowatt-hour'
-      short_unit: "€/kWh"
+      description_short: Price components are given in euros per [megawatt-hour](#dod:watt-hours).
+      unit: 'current euros per megawatt-hour'
+      short_unit: "€/MWh"
     variables:
       electricity_household_capacity_taxes_euro:
         title: Electricity price component (euros) for household consumers - Capacity taxes
@@ -582,9 +582,9 @@ tables:
   gas_and_electricity_price_components_pps_flat:
     title: Gas and electricity price components in Europe (PPS)
     common:
-      description_short: Price components are given in purchasing power standard (PPS) per [kilowatt-hour](#dod:watt-hours).
-      unit: "purchasing power standard per kilowatt-hour"
-      short_unit: "PPS/kWh"
+      description_short: Price components are given in purchasing power standard (PPS) per [megawatt-hour](#dod:watt-hours).
+      unit: "purchasing power standard per megawatt-hour"
+      short_unit: "PPS/MWh"
     variables:
       electricity_household_capacity_taxes_pps:
         title: Electricity price component (PPS) for household consumers - Capacity taxes
@@ -1117,9 +1117,9 @@ tables:
   gas_and_electricity_prices_euro_flat:
     title: Gas and electricity prices in Europe
     common:
-      description_short: Prices are given in euros per [kilowatt-hour](#dod:watt-hours).
-      unit: "euros per kilowatt-hour"
-      short_unit: "€/kWh"
+      description_short: Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries.
+      unit: "current euros per megawatt-hour"
+      short_unit: "€/MWh"
     variables:
       electricity_household_all_taxes_and_levies_included_euro:
         title: Electricity price (euros) for household consumers - All taxes and levies included
@@ -1220,9 +1220,9 @@ tables:
   gas_and_electricity_prices_pps_flat:
     title: Gas and electricity prices in Europe (PPS)
     common:
-      description_short: Prices are given in purchasing power standard (PPS) per [kilowatt-hour](#dod:watt-hours).
-      unit: "purchasing power standard per kilowatt-hour"
-      short_unit: "PPS/kWh"
+      description_short: Prices are given in purchasing power standard (PPS) per [megawatt-hour](#dod:watt-hours).
+      unit: "purchasing power standard per megawatt-hour"
+      short_unit: "PPS/MWh"
     variables:
       electricity_household_all_taxes_and_levies_included_pps:
         title: Electricity price (PPS) for household consumers - All taxes and levies included

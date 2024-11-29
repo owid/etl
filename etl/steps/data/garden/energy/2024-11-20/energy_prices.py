@@ -37,7 +37,6 @@ def run(dest_dir: str) -> None:
         columns={column: f"annual_{column}" for column in tb_eurostat_pps.columns if column not in ["country", "year"]},
         errors="raise",
     )
-    # TODO: Ensure euros are consistent (possibly convert both to constant USD, for consistency with battery prices?).
     tb_ember_monthly = tb_ember_monthly.rename(
         columns={"price": "monthly_electricity_all_wholesale_euro"}, errors="raise"
     )

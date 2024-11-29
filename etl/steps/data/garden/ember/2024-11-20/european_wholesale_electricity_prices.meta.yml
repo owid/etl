@@ -13,7 +13,7 @@ tables:
     variables:
       price:
         title: Electricity wholesale monthly price
-        unit: "Euros per megawatt-hour"
+        unit: "current euros per megawatt-hour"
         short_unit: "€/MWh"
         description_short: |-
           Monthly average day-ahead spot prices per [megawatt-hour](#dod:watt-hours) of electricity sold.
@@ -21,7 +21,7 @@ tables:
     variables:
       price:
         title: Electricity wholesale annual price
-        unit: "Euros per megawatt-hour"
+        unit: "current euros per megawatt-hour"
         short_unit: "€/MWh"
         description_short: |-
           Annual average day-ahead spot prices per [megawatt-hour](#dod:watt-hours) of electricity sold.

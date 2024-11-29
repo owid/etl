@@ -614,6 +614,9 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
     # Select the same energy unit for all datasets (kWh).
     tb = tb[tb["energy_unit"] == "kWh"].drop(columns=["energy_unit"], errors="raise").reset_index(drop=True)
 
+    # Convert prices from price per kWh to price per MWh.
+    tb["value"] *= 1000
+
     # For convenience, instead of having a column for price component (for components datasets) and price level (for prices datasets), create a single column with the price component or level.
     assert tb[(tb["price_level"].isnull()) & (tb["price_component"].isnull())].empty
     assert tb[(tb["price_level"].notnull()) & (tb["price_component"].notnull())].empty
@@ -828,8 +831,8 @@ def sanity_check_outputs(tb: Table) -> None:
         abs(compared["price_euro_sum"] - compared["price_euro_original"]) / compared["price_euro_original"]
     )
     error = "Expected the sum of 'Capacity taxes', 'Environmental taxes', 'Nuclear taxes', 'Renewable taxes', 'Value added tax (VAT)', 'Other' to coincide with 'Taxes, fees, levies, and charges', within 2% (ignoring any prices below 0.007, which is 17% of rows)."
-    # NOTE: Some dataset-country-year have a significant discrepancy, e.g. nrg_pc_202_c-Greece-2022, with a price of 0.0067€/kWh.
-    assert compared[(compared["price_euro_original"] > 0.007) & (compared["dev"] > 2)].empty, error
+    # NOTE: Some dataset-country-year have a significant discrepancy, e.g. nrg_pc_202_c-Greece-2022, with a price of 6.7€/MWh.
+    assert compared[(compared["price_euro_original"] > 7) & (compared["dev"] > 2)].empty, error
     # compared.sort_values("dev", ascending=False).head(60)
 
 
