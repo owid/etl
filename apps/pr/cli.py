@@ -383,7 +383,8 @@ def bake_branch_name(repo, pr_title, no_llm, remote_branches):
     # if name in remote_branches:
     #     log.info("Generating a hash for this branch name to prevent name collisions.")
     #     name = f"{name}-{user}"
-    if name in remote_branches:
+    local_branches = [branch.name for branch in repo.branches]
+    if (name in remote_branches) or (name in local_branches):
         log.info("Generating a hash for this branch name to prevent name collisions.")
         name = f"{name}-{generate_short_hash()}"
     return name
