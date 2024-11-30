@@ -74,7 +74,7 @@ def run(dest_dir: str) -> None:
     tb = tb.pivot(index=["country", "year"], columns="wb_seriescode", values="value").reset_index()
 
     # Filter for Slovakia and the specific year range, then update the value as it was not correctly recorded (the source will change it in their next update)
-    tb.loc[(tb["country"] == "Slovakia") & (tb["year"].between(1971, 1993)), "sg_law_eqrm_wk"] = 1
+    tb.loc[(tb["country"] == "Slovakia") & (tb["year"].between(1971, 1993)), "SG.LAW.EQRM.WK"] = 1
 
     # Add metadata by finding the descriptions and sources using indicator codes
     tb = add_metadata(tb, metadata_tb)
