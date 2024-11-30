@@ -72,6 +72,10 @@ def run(dest_dir: str) -> None:
     )
     # Pivot the dataframe so that each indicator is a separate column
     tb = tb.pivot(index=["country", "year"], columns="wb_seriescode", values="value")
+
+    # Filter for Slovakia and the specific year range, then update the value as it was not correctly recorded (the source will change it in their next update)
+    tb.loc[(tb["country"] == "Slovakia") & (tb["year"].between(1971, 1993)), "sg_law_eqrm_wk"] = 1
+
     tb = tb.reset_index()
 
     # Add metadata by finding the descriptions and sources using indicator codes
