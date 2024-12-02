@@ -17,9 +17,9 @@ definitions:
       part1: |-
         Have you had the first or second doses of a Coronavirus (COVID-19) vaccine?
   question_mapper: |-
-    <% set standard = definitions.questions_templates.standard.part1 %>
-    <% set i12_part1 = definitions.questions_templates.i12.part1 %>
-    <% set i12_part2 = definitions.questions_templates.i12.part2 %>
+    <% set standard = "{definitions.questions_templates.standard.part1}" %>
+    <% set i12_part1 = "{definitions.questions_templates.i12.part1}" %>
+    <% set i12_part2 = "{definitions.questions_templates.i12.part2}" %>
 
     <% set question_mapper = dict(
         activities_improve_health=standard ~ " 'I feel it is important to carry out activities which will improve my health'",
