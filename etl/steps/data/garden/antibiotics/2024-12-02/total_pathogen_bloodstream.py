@@ -12,26 +12,23 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("bloodstream_amr")
+    ds_meadow = paths.load_dataset("total_pathogen_bloodstream")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("bloodstream_amr")
+    tb = ds_meadow.read("total_pathogen_bloodstream")
 
     #
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.drop(columns=["age", "sex", "measure", "metric", "infectious_syndrome"])
-    tb_amr = tb.drop(columns=["country", "pathogen_type"]).rename(columns={"pathogen": "country"})
-    tb_amr = tb_amr.format(["country", "year", "counterfactual"], short_name="amr_entity")
-    tb = tb.format(["country", "year", "pathogen", "pathogen_type", "counterfactual"])
+    tb = tb.format(["country", "year", "pathogen", "pathogen_type"])
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb, tb_amr], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.

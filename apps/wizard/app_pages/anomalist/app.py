@@ -446,6 +446,9 @@ def show_anomaly_compact(index, df):
                 config = bake_chart_config(variable_id=indicator_id, selected_entities=entities)
             config["hideAnnotationFieldsInTitle"]["time"] = True
             config["hideFacetControl"] = False
+            config["hideShareButton"] = True
+            config["hideExploreTheDataButton"] = True
+            # config["isSocialMediaExport"] = False
 
             # Actually plot
             grapher_chart(chart_config=config, owid_env=OWID_ENV)
