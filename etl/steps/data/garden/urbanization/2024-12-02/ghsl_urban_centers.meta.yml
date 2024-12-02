@@ -4,7 +4,11 @@ definitions:
     presentation:
       topic_tags:
         - Urbanization
-    processing_level: major
+    display:
+      numDecimalPlaces:
+        0
+
+    processing_level: minor
     description_key:
     - |-
       **The Degree of Urbanisation (DEGURBA)**  is a method for capturing the urban-rural divide, designed for international comparisons. Developed by six organizations and endorsed by the UN, it uses a two-level classification.
@@ -15,8 +19,10 @@ definitions:
 
       To predict future urbanization (2025 and 2030), both static (land features) and dynamic (past satellite images) components are used to project growth. DEGURBA defines cities by population, not administrative borders, aligning with UN guidelines, though fixed thresholds may not always capture local differences.
 
-    description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba), [towns and semi-dense areas](#dod:towns-suburbs-degurba), and [rural areas](#dod:rural-areas-degurba) and estimate their respective populations.
+    description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba) and estimate their respective populations.
 
+  desc_density:  &desc_density |-
+    Population density was calculated by dividing the population of the capital by the total area it covers, providing a measure of the number of people living in each km².
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -28,18 +34,31 @@ dataset:
 tables:
   ghsl_urban_centers:
     variables:
-     urban_center_name:
-        title: The name of the urban center
-        unit: ''
-     urban_pop:
+
+     urban_pop_projections:
+        title: The population of the capital city (projected)
+        unit: 'people'
+
+
+     urban_area_projections:
+        title: The area of the capital city (projected)
+        unit: 'km²'
+
+     urban_density_projections:
+        title: The population density of the capital city (projected)
+        unit: 'people/km²'
+        description_processing: *desc_density
+
+     urban_pop_estimates:
         title: The population of the capital city
         unit: 'people'
-     urban_area:
+
+     urban_area_estimates:
         title: The area of the capital city
         unit: 'km²'
-     urban_density:
+
+     urban_density_estimates:
         title: The population density of the capital city
         unit: 'people/km²'
-
-
+        description_processing: *desc_density
 
