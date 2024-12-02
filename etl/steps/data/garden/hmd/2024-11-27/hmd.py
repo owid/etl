@@ -25,68 +25,47 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-
     # 1/ Life tables
-    tb_lt = standardize_sex_cat_names(tb_lt)
-    tb_lt = tb_lt.sort_values("format").drop_duplicates(
-        subset=[col for col in tb_lt.columns if col != "format"], keep="first"
+    def _sanity_check_lt(tb):
+        summary = tb.groupby(["country", "year", "sex", "type", "age"], as_index=False).size().sort_values("size")
+        row_dups = summary.loc[summary["size"] != 1]
+        assert row_dups.shape[0] <= 19, "Found duplicated rows in life tables!"
+        assert (row_dups["country"].unique() == "Switzerland").all() & (
+            row_dups["year"] <= 1931
+        ).all(), "Unexpected duplicates in life tables!"
+        tb = tb.loc[~(tb["format"] == "5x1") & (tb["age"] == "110+")]
+        return tb
+
+    tb_lt = reshape_table(
+        tb=tb_lt,
+        col_index=["country", "year", "sex", "age", "type"],
+        sex_expected={"females", "males", "total"},
+        callback_post=_sanity_check_lt,
     )
-    ## Check
-    summary = tb_lt.groupby(["country", "year", "sex", "type", "age"], as_index=False).size().sort_values("size")
-    row_dups = summary.loc[summary["size"] != 1]
-    assert row_dups.shape[0] <= 19, "Found duplicated rows in life tables!"
-    assert (row_dups["country"].unique() == "Switzerland").all() & (
-        row_dups["year"] <= 1931
-    ).all(), "Unexpected duplicates in life tables!"
-    ## Final drops
-    tb_lt = tb_lt.loc[~(tb_lt["format"] == "5x1") & (tb_lt["age"] == "110+")]
-    tb_lt = tb_lt.drop(columns="format")
 
     # 2/ Exposures
-    tb_exp = standardize_sex_cat_names(tb_exp, {"female", "male", "total"})
-    tb_exp = tb_exp.sort_values("format").drop_duplicates(
-        subset=[col for col in tb_exp.columns if col != "format"], keep="first"
+    tb_exp = reshape_table(
+        tb=tb_exp,
+        col_index=["country", "year", "sex", "age", "type"],
     )
-    ## Check
-    summary = tb_exp.groupby(["country", "year", "sex", "type", "age"], as_index=False).size().sort_values("size")
-    row_dups = summary.loc[summary["size"] != 1]
-    assert row_dups.empty, "Found duplicated rows in life tables!"
-    ## Final drops
-    tb_exp = tb_exp.drop(columns="format")
 
     # 3/ Mortality
-    tb_mort = standardize_sex_cat_names(tb_mort, {"female", "male", "total"})
-    tb_mort = tb_mort.sort_values("format").drop_duplicates(
-        subset=[col for col in tb_mort.columns if col != "format"], keep="first"
+    tb_mort = reshape_table(
+        tb=tb_mort,
+        col_index=["country", "year", "sex", "age", "type"],
     )
-    ## Check
-    summary = tb_mort.groupby(["country", "year", "sex", "type", "age"], as_index=False).size().sort_values("size")
-    row_dups = summary.loc[summary["size"] != 1]
-    assert row_dups.empty, "Found duplicated rows in life tables!"
-    ## Final drops
-    tb_mort = tb_mort.drop(columns="format")
 
     # 4/ Population
-    tb_pop = standardize_sex_cat_names(tb_pop, {"female", "male", "total"})
-    tb_pop = tb_pop.sort_values("format").drop_duplicates(
-        subset=[col for col in tb_pop.columns if col != "format"], keep="first"
+    tb_pop = reshape_table(
+        tb=tb_pop,
+        col_index=["country", "year", "sex", "age"],
     )
-    summary = tb_pop.groupby(["country", "year", "sex", "age"], as_index=False).size().sort_values("size")
-    row_dups = summary.loc[summary["size"] != 1]
-    assert row_dups.empty, "Found duplicated rows in life tables!"
-    ## Final drops
-    tb_pop = tb_pop.drop(columns="format")
 
-    # 4/ Population
-    tb_births = standardize_sex_cat_names(tb_births, {"female", "male", "total"})
-    tb_births = tb_births.sort_values("format").drop_duplicates(
-        subset=[col for col in tb_births.columns if col != "format"], keep="first"
+    # 5/ Births
+    tb_births = reshape_table(
+        tb=tb_births,
+        col_index=["country", "year", "sex"],
     )
-    summary = tb_births.groupby(["country", "year", "sex"], as_index=False).size().sort_values("size")
-    row_dups = summary.loc[summary["size"] != 1]
-    assert row_dups.empty, "Found duplicated rows in life tables!"
-    ## Final drops
-    tb_births = tb_births.drop(columns="format")
 
     # tb = geo.harmonize_countries(
     #     df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
@@ -115,12 +94,41 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def standardize_sex_cat_names(tb, sex_expected=None):
-    # Define expected sex categories
+def reshape_table(tb, col_index, sex_expected=None, callback_post=None):
+    """Reshape a table.
+
+    Input table has column `format`, which is sort-of redundant. This function ensures we can safely drop it (i.e. no duplicate rows).
+
+    Additionally, it standardizes the dimension values.
+    """
     if sex_expected is None:
-        sex_expected = {"females", "males", "total"}
+        sex_expected = {"female", "male", "total"}
+
+    # Standardize dimension values
+    tb = standardize_sex_cat_names(tb, sex_expected)
+
+    # Drop duplicate rows
+    tb = tb.sort_values("format").drop_duplicates(subset=[col for col in tb.columns if col != "format"], keep="first")
+
+    # Check no duplicates
+    summary = tb.groupby(col_index, as_index=False).size().sort_values("size")
+    row_dups = summary.loc[summary["size"] != 1]
+    if callback_post is not None:
+        tb = callback_post(tb)
     else:
-        sex = {s.lower() for s in sex_expected}
+        summary = tb.groupby(col_index, as_index=False).size().sort_values("size")
+        row_dups = summary.loc[summary["size"] != 1]
+        assert row_dups.empty, "Found duplicated rows in life tables!"
+
+    # Final dropping o f columns
+    tb = tb.drop(columns="format")
+
+    return tb
+
+
+def standardize_sex_cat_names(tb, sex_expected):
+    # Define expected sex categories
+    sex_expected = {s.lower() for s in sex_expected}
 
     # Set sex categories to lowercase
     tb["sex"] = tb["sex"].str.lower()
