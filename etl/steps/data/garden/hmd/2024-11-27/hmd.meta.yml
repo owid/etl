@@ -293,7 +293,7 @@ tables:
           <%- endif %>
         display:
           name: |-
-            {tables.births.variables.births.title} {definitions.others.display_name_dim}
+            Births, << type >>
         presentation:
           title_public: |-
             {tables.births.variables.births.title} {definitions.others.title_public_dim}
@@ -309,7 +309,7 @@ tables:
           <%- endif %>
         display:
           name: |-
-            {tables.births.variables.births.title} {definitions.others.display_name_dim}
+            Birth rate, << type >>
         presentation:
           title_public: |-
             {tables.births.variables.births.title} {definitions.others.title_public_dim}
