@@ -3,7 +3,6 @@ definitions:
   common:
     presentation:
       attribution_short: HMD
-      title_variant: << sex + 's, ' if sex != 'total' >><< type + ' tables'>>
       topic_tags:
         - Life Expectancy
 
@@ -57,6 +56,7 @@ tables:
   life_tables:
     common:
       presentation:
+        title_variant: << sex + 's, ' if sex != 'total' >><< type + ' tables'>>
         topic_tags:
           - Life Expectancy
 
@@ -203,6 +203,12 @@ tables:
             {tables.life_tables.variables.life_expectancy.title} {definitions.others.title_public_dim}
 
   exposures:
+    common:
+      presentation:
+        title_variant: << sex + 's, ' if sex != 'total' >><< type + ' tables'>>
+        topic_tags:
+          - Life Expectancy
+
     variables:
       exposure:
         title: Exposure-to-risk
@@ -224,6 +230,7 @@ tables:
       presentation:
         topic_tags:
           - Global Health
+        title_variant: << sex + 's, ' if sex != 'total' >>
 
     variables:
       deaths:
@@ -247,6 +254,7 @@ tables:
       presentation:
         topic_tags:
           - Population Growth
+        title_variant: << sex + 's, ' if sex != 'total' >>
 
     variables:
       population:
@@ -274,6 +282,7 @@ tables:
       presentation:
         topic_tags:
           - Fertility Rate
+        title_variant: << sex + 's, ' if sex != 'total' >>
 
     variables:
       births:
@@ -293,7 +302,7 @@ tables:
             {tables.births.variables.births.title} {definitions.others.title_public_dim}
 
       birth_rate:
-        title: Births
+        title: Birth rate
         unit: births per 1,000 people
         description_short: |-
           <% if sex == 'total' %>
@@ -309,6 +318,12 @@ tables:
             {tables.births.variables.births.title} {definitions.others.title_public_dim}
 
   diff_ratios:
+    common:
+      presentation:
+        topic_tags:
+          - Life Expectancy
+        title_variant: << sex + 's, ' if sex != 'total' >><< type + ' tables'>>
+
     variables:
       central_death_rate_mf_ratio:
         title: Central death rate ratio (m/f)
@@ -368,7 +383,8 @@ tables:
         display:
           numDecimalPlaces: 1
           name: |-
-            Life expectancy (female-to-male ratio) at << 'birth' if (age == '0') else age >>, << type >>
+            Life expectancy (female-to-male ratio) at << 'birth' if (age == '0') else age >>, <<
+             >>
         presentation:
           title_public: Life expectancy at << age if age != '0' else 'birth'>>
           title_variant: female-to-male ratio, << type + ' tables'>>
