@@ -1433,6 +1433,17 @@ tables:
           shortUnit: $
         presentation:
           title_public: Phosphate rock unit value
+      unit_value_rare_earths_mine_constant_1998_usd_per_tonne:
+        title: unit value|Rare earths|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of rare earths, in constant 1998 US$ per tonne.
+        description_key: *unit-value-description-key
+        display:
+          name: Rare earths
+          shortUnit: $
+        presentation:
+          title_public: Rare earths unit value
       unit_value_salt_mine_constant_1998_usd_per_tonne:
         title: unit value|Salt|Mine|constant 1998 US$ per tonne
         unit: constant 1998 US$ per tonne

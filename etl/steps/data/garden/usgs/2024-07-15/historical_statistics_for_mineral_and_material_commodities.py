@@ -165,7 +165,7 @@ COMMODITY_MAPPING = {
     ("Plywood and veneer", "Total"): None,
     ("Potash", "Total"): None,
     ("Quartz crystal", "Total"): None,
-    ("Rare earths", "Total"): None,
+    ("Rare earths", "Total"): ("Rare earths", "Mine"),
     ("Rhenium", "Total"): None,
     ("Sodium sulfate", "Total"): None,
     ("Thallium", "Total"): None,
