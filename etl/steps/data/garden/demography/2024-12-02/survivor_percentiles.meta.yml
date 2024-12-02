@@ -8,7 +8,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/en/latest/architecture/metadata/reference/dataset/
 dataset:
-  title: Survivorship percentiles (HMD, Alvarez and Vaupel; 2023)
+  title: Survivorship percentiles (HMD; Alvarez and Vaupel 2023)
   update_period_days: 365
 
 # Learn more about the available fields:
