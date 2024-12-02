@@ -296,8 +296,12 @@ tables:
             Births, sex: << sex >>
         presentation:
           title_public: |-
-            {tables.births.variables.births.title} {definitions.others.title_public_dim}
-
+            {tables.births.variables.births.title},
+            <%- if sex == 'total' %>
+             total
+            <%- else %>
+             << sex >>s
+            <%- endif %>
       birth_rate:
         title: Birth rate
         unit: births per 1,000 people
@@ -312,7 +316,12 @@ tables:
             Birth rate, sex: << sex >>
         presentation:
           title_public: |-
-            {tables.births.variables.births.title} {definitions.others.title_public_dim}
+            {tables.births.variables.birth_rate.title},
+            <%- if sex == 'total' %>
+             total
+            <%- else %>
+             << sex >>s
+            <%- endif %>
 
   diff_ratios:
     common:
