@@ -1,0 +1,45 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    processing_level: major
+    description_key:
+    - |-
+      **The Degree of Urbanisation (DEGURBA)**  is a method for capturing the urban-rural divide, designed for international comparisons. Developed by six organizations and endorsed by the UN, it uses a two-level classification.
+
+      The first level divides areas into cities, towns and semi-dense areas, and rural areas, distinguishing between urban (cities, towns, suburbs) and rural regions. The second level adds detail, splitting towns and rural areas further.
+
+      This classification is based on 1 km² grid cells, grouped into urban centers, urban clusters, and rural cells. These grids are then used to classify smaller areas, typically using residential population grids from censuses or registers. If detailed data isn't available, a disaggregation grid estimates population distribution.
+
+      To predict future urbanization (2025 and 2030), both static (land features) and dynamic (past satellite images) components are used to project growth. DEGURBA defines cities by population, not administrative borders, aligning with UN guidelines, though fixed thresholds may not always capture local differences.
+
+    description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba), [towns and semi-dense areas](#dod:towns-suburbs-degurba), and [rural areas](#dod:rural-areas-degurba) and estimate their respective populations.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+
+tables:
+  ghsl_urban_centers:
+    variables:
+     urban_center_name:
+        title: The name of the urban center
+        unit: ''
+     urban_pop:
+        title: The population of the capital city
+        unit: 'people'
+     urban_area:
+        title: The area of the capital city
+        unit: 'km²'
+     urban_density:
+        title: The population density of the capital city
+        unit: 'people/km²'
+
+
+
