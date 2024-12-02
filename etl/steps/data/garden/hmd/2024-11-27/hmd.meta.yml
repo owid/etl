@@ -322,7 +322,6 @@ tables:
       presentation:
         topic_tags:
           - Life Expectancy
-        title_variant: << sex + 's, ' if sex != 'total' >><< type + ' tables'>>
 
     variables:
       central_death_rate_mf_ratio:
@@ -337,7 +336,7 @@ tables:
         presentation:
           title_public: Central death rate {definitions.others.title_public_dim}
           title_variant: |-
-            male-to-female ratio, << type + ' tables'>>
+            male-to-female ratio, << type >> tables
           topic_tags:
             - Life Expectancy
             - Gender Ratio
@@ -362,7 +361,7 @@ tables:
             Life expectancy (female-male difference) at << 'birth' if (age == '0') else age >>, << type >>
         presentation:
           title_public: Life expectancy at << age if age != '0' else 'birth'>>
-          title_variant: female-male difference, << type + ' tables'>>
+          title_variant: female-male difference, << type >> tables
           topic_tags:
             - Life Expectancy
             - Gender Ratio
@@ -383,11 +382,10 @@ tables:
         display:
           numDecimalPlaces: 1
           name: |-
-            Life expectancy (female-to-male ratio) at << 'birth' if (age == '0') else age >>, <<
-             >>
+            Life expectancy (female-to-male ratio) at << 'birth' if (age == '0') else age >>, << type >>
         presentation:
           title_public: Life expectancy at << age if age != '0' else 'birth'>>
-          title_variant: female-to-male ratio, << type + ' tables'>>
+          title_variant: female-to-male ratio, << type >> tables
           topic_tags:
             - Life Expectancy
             - Gender Ratio
