@@ -937,10 +937,7 @@ steps:
   # IHME Neonatal infections by syndrome
   data-private://meadow/antibiotics/2024-11-24/total_syndrome:
     - snapshot-private://antibiotics/2024-11-24/total_syndrome.csv
-  data-private://garden/antibiotics/2024-11-24/total_syndrome:
-    - data-private://meadow/antibiotics/2024-11-24/total_syndrome
-  data-private://grapher/antibiotics/2024-11-24/total_syndrome:
-    - data-private://garden/antibiotics/2024-11-24/total_syndrome
+  # IHME Neonatal infections by syndrome and amr resistance
   data-private://meadow/antibiotics/2024-12-02/microbe_amr:
     - snapshot-private://antibiotics/2024-12-02/microbe_amr.csv
   data-private://garden/antibiotics/2024-12-02/microbe_amr:
