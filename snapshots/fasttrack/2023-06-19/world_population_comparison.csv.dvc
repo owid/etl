@@ -3,8 +3,8 @@ meta:
     name: Multiple sources compiled by Our World in Data (2019)
     url: nan
     source_data_url: |-
-      gAAAAABnRY6nUyVDNtPCovkS4H-5VMv5I1DR0yP7n1-P4229GNrFX4tUZyLSaM9Edu4-Vi8r6nAzXwDWervgZCIwfkTapg96TkU0qzLN67zSTDpi_pZ7tHLL2CwfPXjLtVTRGkC4CxlpW7NZtW6__osTWP6JVEDb-mzDZJvhToUDb0hhHv8NCrJuUwgTxDPYNAhvIFbuIAKWhrpiFpZ-38zwFEIboVYBHKc8sq4hQ_b4TRwHFVuCrzMlkRzyAjBSl7dMVA0rUhZI
-    date_accessed: '2024-11-26'
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQjyo0SCpkP7gW490fsxx2x0nkCPqW3elr5LfI-zbFWkb1rzOAumgJrEDO0eFpoEtPsZyHjIM58iXDe/pub?output=csv
+    date_accessed: '2024-12-02'
     published_by: Multiple sources compiled by Our World in Data (2019)
   name: Historical world population comparison (various sources)
   description: |-
@@ -25,7 +25,6 @@ meta:
 
     Michael Kremer (1993) “Population Growth and Technological Change: One Million B.C. to 1990”, Quarterly Journal of Economics., August 1993, pp.681-716.
   license: {}
-  is_public: false
 outs:
   - md5: f7ff2acb39ad85d3a9b2599a63175abc
     size: 13424
