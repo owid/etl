@@ -4,15 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Antibiotics
-    display:
-      name: << pathogen >>
-  pathogen_type: <% if pathogen_type == "Fungi" %>
-    fungus
-    <% elif pathogen_type == "Viruses" %>
-    virus
-    <% else  %>
-    << pathogen_type.lower() >>
-    <% endif %>
+  pathogen_type: <% if pathogen_type == "Fungi" %>fungus<% elif pathogen_type == "Viruses" %>virus<% else  %><< pathogen_type.lower() >><% endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -30,6 +22,7 @@ tables:
           title_public: Total deaths from << pathogen >> infections
         display:
           numSignificantFigures: 3
+          name: << pathogen >>
       upper:
         title: Upper bound of total deaths from << pathogen >> infections
         unit: deaths
@@ -38,6 +31,7 @@ tables:
           title_public: Upper bound of total deaths from << pathogen >> infections
         display:
           numSignificantFigures: 3
+          name: << pathogen >>
       lower:
         title: Lower bound of total deaths from << pathogen >> infections
         unit: deaths
@@ -46,3 +40,4 @@ tables:
           title_public: Lower bound of total deaths from << pathogen >> infections
         display:
           numSignificantFigures: 3
+          name: << pathogen >>
