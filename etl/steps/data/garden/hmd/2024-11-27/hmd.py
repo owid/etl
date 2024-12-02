@@ -1,5 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import List, cast
+
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -44,6 +48,9 @@ def run(dest_dir: str) -> None:
         sex_expected={"females", "males", "total"},
         callback_post=_sanity_check_lt,
     )
+    # Scale central death rates
+    tb_lt["central_death_rate"] = tb_lt["central_death_rate"] * 1_000
+    tb_lt["probability_of_death"] = tb_lt["probability_of_death"] * 100
 
     # 2/ Exposures
     tb_exp = process_table(
@@ -56,6 +63,8 @@ def run(dest_dir: str) -> None:
         tb=tb_mort,
         col_index=["country", "year", "sex", "age", "type"],
     )
+    assert set(tb_mort["type"].unique()) == {"period"}, "Unexpected values in column 'type' in mortality tables!"
+    tb_mort = tb_mort.drop(columns="type")
 
     # 4/ Population
     tb_pop = process_table(
@@ -68,14 +77,22 @@ def run(dest_dir: str) -> None:
         tb=tb_births,
         col_index=["country", "year", "sex"],
     )
+    tb_pop_agg = tb_pop.groupby(["country", "year", "sex"], as_index=False)["population"].sum()
+    tb_births = tb_births.merge(tb_pop_agg, on=["country", "year", "sex"], how="left")
+    tb_births["birth_rate"] = tb_births["births"] / tb_births["population"] * 1_000
+    tb_births = tb_births.drop(columns=["population"])
+
+    # 6/ Create table with differences and ratios
+    tb_ratios = make_table_diffs_ratios(tb_lt)
 
     # Create list with tables
     tables = [
         tb_lt.format(["country", "year", "sex", "age", "type"]),
         tb_exp.format(["country", "year", "sex", "age", "type"]),
-        tb_mort.format(["country", "year", "sex", "age", "type"]),
+        tb_mort.format(["country", "year", "sex", "age"]),
         tb_pop.format(["country", "year", "sex", "age"]),
         tb_births.format(["country", "year", "sex"]),
+        tb_ratios.format(["country", "year", "age", "type"], short_name="diff_ratio"),
     ]
 
     #
@@ -127,6 +144,9 @@ def process_table(tb, col_index, sex_expected=None, callback_post=None):
         countries_file=paths.country_mapping_path,
     )
 
+    # Make year column integer
+    tb["year"] = tb["year"].astype(int)
+
     return tb
 
 
@@ -145,3 +165,43 @@ def standardize_sex_cat_names(tb, sex_expected):
     tb["sex"] = tb["sex"].replace({"females": "female", "males": "male"})
 
     return tb
+
+
+def make_table_diffs_ratios(tb: Table) -> Table:
+    """Create table with metric differences and ratios.
+
+    Currently, we estimate:
+
+    - female - male: Life expectancy
+    - male/female: Life Expectancy, Central Death Rate
+    """
+    # Pivot & obtain differences and ratios
+    cols_index = ["country", "year", "age", "type"]
+    tb_new = (
+        tb.pivot_table(
+            index=cols_index,
+            columns="sex",
+            values=["life_expectancy", "central_death_rate"],
+        )
+        .assign(
+            life_expectancy_fm_diff=lambda df: df[("life_expectancy", "female")] - df[("life_expectancy", "male")],
+            life_expectancy_mf_ratio=lambda df: df[("life_expectancy", "male")] / df[("life_expectancy", "female")],
+            central_death_rate_mf_ratio=lambda df: df[("central_death_rate", "male")]
+            / df[("central_death_rate", "female")],
+        )
+        .reset_index()
+    )
+
+    # Keep relevant columns
+    cols = [col for col in tb_new.columns if col[1] == ""]
+    tb_new = tb_new.loc[:, cols]
+
+    # Rename columns
+    tb_new.columns = [col[0] for col in tb_new.columns]
+
+    # Add metadata back
+    for col in tb_new.columns:
+        if col not in cols_index:
+            tb_new[col] = tb_new[col].copy_metadata(tb["life_expectancy"])
+
+    return tb_new

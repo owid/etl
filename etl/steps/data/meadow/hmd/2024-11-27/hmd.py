@@ -142,18 +142,11 @@ def run(dest_dir: str) -> None:
     _check_nas(tb_pop, 0.001, 1)
 
     # Ensure correct year dtype
-    def _clean_year(tb):
-        # Remove year ranges, and convert to int
-        flag = tb["Year"].astype("string").str.contains("-")
-        tb = tb.loc[~flag]
-        tb["Year"] = tb["Year"].astype("string")
-        return tb
-
     tb_lt = _clean_year(tb_lt)
     tb_exp = _clean_year(tb_exp)
     tb_m = _clean_year(tb_m)
-    tb_pop = _clean_year(tb_pop)
     tb_bi = _clean_year(tb_bi)
+    tb_pop = _clean_population_type(tb_pop)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [
@@ -291,3 +284,42 @@ def _check_nas(tb, missing_row_max, missing_countries_max):
     assert (
         len(countries_missing_data) / len(tb) < missing_countries_max
     ), f"Too many missing values in life tables: {len(countries_missing_data)}"
+
+
+def _clean_population_type(tb):
+    """Data provider notes the following:
+
+    For populations with territorial changes, two sets of population estimates are given for years in which a territorial change occurred. The first set of estimates (identified as year "19xx-") refers to the population just before the territorial change, whereas the second set (identified as year "19xx+") refers to the population just after the change. For example, in France, the data for "1914-" cover the previous territory (i.e., as of December 31, 1913), whereas the data for "1914+" reflect the territorial boundaries as of January 1, 1914.
+
+    To avoid confusion and duplicity, whenever there are multiple entries for a year, we keep YYYY+ definition for the year (e.g. country with new territorial changes).
+    """
+    # Crete new column with the year.
+    regex = r"\b\d{4}\b"
+    tb["year"] = tb["Year"].astype("string").str.extract(f"({regex})", expand=False)
+    assert tb["year"].notna().all(), "Year extraction was successful!"
+    tb["year"] = tb["year"].astype(int)
+
+    # Ensure raw year is as expected
+    assert (
+        tb.groupby(["country", "year", "Age", "sex", "format"]).Year.nunique().max() == 2
+    ), "Unexpected number of years (+/-)"
+
+    # Drop duplicate years, keeping YYYY+.
+    tb["Year"] = tb["Year"].astype("string")
+    tb = tb.sort_values("Year")
+    tb = tb.drop_duplicates(subset=["year", "Age", "sex", "country", "format"], keep="first").drop(columns="Year")
+
+    tb = tb.rename(columns={"year": "Year"})
+
+    # Additionally, remove year periods
+    tb = _clean_year(tb)
+
+    return tb
+
+
+def _clean_year(tb):
+    # Remove year ranges, and convert to int
+    flag = tb["Year"].astype("string").str.contains("-")
+    tb = tb.loc[~flag]
+    tb["Year"] = tb["Year"].astype("int")
+    return tb
