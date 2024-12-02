@@ -150,6 +150,31 @@ COMMODITY_MAPPING = {
     ("Tungsten", "Total"): ("Tungsten", "Mine"),
     ("Vanadium", "Total"): ("Vanadium", "Mine"),
     ("Zinc", "Total"): ("Zinc", "Mine"),
+    # TODO: Include the relevant ones from below and sort alphabetically with the ones above.
+    ("Gemstones", "Total"): None,
+    ("Hafnium", "Total"): None,
+    ("Iodine", "Total"): None,
+    ("Iron and Steel Scrap", "Total"): None,
+    ("Kyanite", "Total"): None,
+    ("Lithium statistics", "Total"): None,
+    ("Lumber", "Total"): None,
+    ("Natural & Synthetic Rutile", "Total"): None,
+    ("Other industrial wood products", "Total"): None,
+    ("Paper and board", "Total"): None,
+    ("Platinum-group metals", "Total"): None,
+    ("Plywood and veneer", "Total"): None,
+    ("Potash", "Total"): None,
+    ("Quartz crystal", "Total"): None,
+    ("Rare earths", "Total"): None,
+    ("Rhenium", "Total"): None,
+    ("Sodium sulfate", "Total"): None,
+    ("Thallium", "Total"): None,
+    ("Thorium", "Total"): None,
+    ("Total forestry", "Total"): None,
+    ("Vermiculite", "Total"): None,
+    ("Wollastonite", "Total"): None,
+    ("Wood panel products", "Total"): None,
+    ("Zirconium", "Total"): None,
 }
 
 # Units can either be "metric tonnes" or "metric tonnes of gross weight".
@@ -325,9 +350,10 @@ def prepare_us_production(tb: Table, tb_metadata: Table) -> Table:
     # For now, we'll only keep "production".
     tb_us_production = tb[["commodity", "year", "production", "unit"]].assign(**{"country": "United States"})
     # Remove spurious footnotes like "W".
+    # Also, zirconiummineral_concentrates contains rows of "< 100,000". It's unclear which value should be assigned here, so we will remove these (two) rows.
     tb_us_production["production"] = map_series(
         tb_us_production["production"],
-        mapping={"W": None},
+        mapping={"W": None, "< 100,000": None},
         warn_on_missing_mappings=False,
         warn_on_unused_mappings=True,
     ).astype({"production": "float64[pyarrow]"})
