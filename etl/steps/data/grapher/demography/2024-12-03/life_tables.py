@@ -37,7 +37,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("life_tables")
 
     # Read table from garden dataset.
-    tb = ds_garden["life_tables"]
+    tb = ds_garden.read("life_tables")
 
     #
     # Process data.

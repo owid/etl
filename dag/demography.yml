@@ -261,6 +261,7 @@ steps:
     - snapshot://un/2024-12-02/un_wpp_lt_f.csv
   data://garden/un/2024-12-02/un_wpp_lt:
     - data://meadow/un/2024-12-02/un_wpp_lt
+
   # UN WPP + HMD Life Tables
   data://garden/demography/2024-12-03/life_tables:
     - data://garden/hmd/2024-11-27/hmd
