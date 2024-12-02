@@ -17,7 +17,7 @@ definitions:
   desc_short_density_capital: &desc_short_density_capital |-
     The number of people per km² of land area for the country's capital city.
   desc_short_density_top_100: &desc_short_density_top_100 |-
-    The number of people per km² of land area for the top 100 most populous cities.
+    The number of people per km² of land area for cities ranked among the top 100 most populous in either 1975 or 2020.
 
   desc_processing_density:  &desc_processing_density |-
     Population density was calculated by dividing the population of the city by the total area it covers, providing a measure of the number of people living in each km².
