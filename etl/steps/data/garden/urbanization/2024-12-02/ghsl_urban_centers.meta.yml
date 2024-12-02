@@ -46,7 +46,6 @@ tables:
      urban_density_projections:
         title: Population density of the capital city (projected)
         unit: 'people/km²'
-        short_unit: 'people/km²'
         description_short: *desc_short_density_capital
         description_processing: *desc_processing_density
         display:
