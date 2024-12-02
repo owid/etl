@@ -31,7 +31,6 @@ How to run the snapshot on the staging server:
 
 """
 
-
 from pathlib import Path
 from typing import List
 
@@ -73,10 +72,16 @@ def main() -> None:
 
     # Get the data by sector and channels
     df_sector = get_data_by_sector_or_channel(
-        start_year=START_YEAR, end_year=END_YEAR, flow_column="usd_commitment_constant", sector_or_channel="sector"
+        start_year=START_YEAR,
+        end_year=END_YEAR,
+        flow_column="usd_commitment_constant",
+        sector_or_channel="sector",
     )
     df_channel = get_data_by_sector_or_channel(
-        start_year=START_YEAR, end_year=END_YEAR, flow_column="usd_disbursement_constant", sector_or_channel="channel"
+        start_year=START_YEAR,
+        end_year=END_YEAR,
+        flow_column="usd_disbursement_constant",
+        sector_or_channel="channel",
     )
 
     # Save the data to feather files
@@ -194,7 +199,7 @@ def aggregate_donors(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.Da
         log.info(f"Aggregating {donor_group} donors...")
 
         # Check missing donors in the data
-        missing_donors = set(donor_composition.keys()).difference(df_donors["donor_code"].unique())
+        missing_donors = set(donor_composition.values()).difference(df_donors["donor_code"].unique())
         if missing_donors:
             log.warning(f"Missing donors in the data for {donor_group}: {missing_donors}")
 
@@ -225,7 +230,13 @@ def aggregate_donors(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.Da
                     [
                         col
                         for col in columns_to_keep
-                        if col not in ["donor_code", "recipient_code", "recipient_name", "value"]
+                        if col
+                        not in [
+                            "donor_code",
+                            "recipient_code",
+                            "recipient_name",
+                            "value",
+                        ]
                     ],
                     observed=True,
                     dropna=False,
@@ -254,7 +265,7 @@ def aggregate_recipients(df: pd.DataFrame, columns_to_keep: List[str]) -> List[p
         log.info(f"Aggregating {recipient_group} recipients...")
 
         # Check missing recipients in the data
-        missing_recipients = set(recipient_composition.keys()).difference(df_recipients["recipient_code"].unique())
+        missing_recipients = set(recipient_composition.values()).difference(df_recipients["recipient_code"].unique())
         if missing_recipients:
             log.warning(f"Missing recipients in the data for {recipient_group}: {missing_recipients}")
 
