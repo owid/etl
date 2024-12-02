@@ -63,20 +63,21 @@ def run(dest_dir: str) -> None:
 
 def rename_syndromes(tb: Table) -> Table:
     """
-    Rename syndromes to be shorter for use in stacked bar charts
+    Rename syndromes to be shorter for use in stacked bar charts.
+    Ensure all infectious syndromes are replaced.
     """
     name_dict = {
-        "Bloodstream Infections": "Bloodstream infections",
-        "Lower Respiratory Infections": "Lower respiratory infections",
+        "Bloodstream infections": "Bloodstream infections",
+        "Lower respiratory infections": "Lower respiratory infections",
         "Diarrhea": "Diarrhea",
-        "Meninigitis": "Meningitis",
+        "Meningitis": "Meningitis",
         "Infections of the skin and subcutaneous systems": "Skin infections",
         "Urinary tract infections and pyelonephritis": "Kidney and urinary tract infections",
         "Peritoneal and intra-abdominal infections": "Abdominal infections",
         "Tuberculosis": "Tuberculosis",
         "Endocarditis": "Endocarditis",
         "Typhoid fever, paratyphoid fever, and invasive non-typhoidal Salmonella": "Typhoid, paratyphoid, and iNTS",
-        "Infections of bones, joints, and related organs": " Bone and joint infections",
+        "Infections of bones, joints, and related organs": "Bone and joint infections",
         "Other unspecified site infections": "Other infections",
         "Other parasitic infections": "Other parasitic infections",
         "Oral infections": "Oral infections",
@@ -88,6 +89,13 @@ def rename_syndromes(tb: Table) -> Table:
         "Carditis, myocarditis, and pericarditis": "Heart inflammation",
         "Sexually transmitted infections": "Sexually transmitted infections",
     }
-    tb["infectious_syndrome"] = tb["infectious_syndrome"].replace(name_dict, errors="raise")
+
+    # Find unmatched syndromes
+    unmatched_syndromes = set(tb["infectious_syndrome"].unique()) - set(name_dict.keys())
+    if unmatched_syndromes:
+        raise ValueError(f"The following syndromes were not found in the name dictionary: {unmatched_syndromes}")
+
+    # Replace syndromes
+    tb["infectious_syndrome"] = tb["infectious_syndrome"].replace(name_dict)
 
     return tb
