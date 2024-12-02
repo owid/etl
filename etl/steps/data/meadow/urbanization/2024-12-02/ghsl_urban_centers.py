@@ -73,11 +73,11 @@ def run(dest_dir: str) -> None:
     tb_capitals = tb[tb["capital"] == 1]
     tb_capitals = tb_capitals.drop(columns=["ID_MTUC_G0", "region", "capital"])
 
-    # Select the top 25 most populous urban centers in 1975 and 2030
+    # Select the top 100 most populous urban centers in 1975 and 2030
     tb_1975 = tb[tb["year"] == 1975]
     tb_2030 = tb[tb["year"] == 2030]
-    top_10_pop_1975 = tb_1975.nlargest(25, "urban_pop")
-    top_10_pop_2030 = tb_2030.nlargest(25, "urban_pop")
+    top_10_pop_1975 = tb_1975.nlargest(100, "urban_pop")
+    top_10_pop_2030 = tb_2030.nlargest(100, "urban_pop")
 
     # Combine the results, ensuring no duplicates
     top_10_pop_combined = pr.concat([top_10_pop_1975, top_10_pop_2030]).drop_duplicates(subset=["ID_MTUC_G0"])
