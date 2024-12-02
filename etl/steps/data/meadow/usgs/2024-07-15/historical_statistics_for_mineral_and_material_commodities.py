@@ -48,6 +48,8 @@ World production data represent world refinery production of selenium metal. Dat
 World production data for 1908 to the most recent year represent the quantity of feldspar that was produced annually throughout the world as reported in the MR and the MYB. World production data do not include production data for nepheline syenite.""",
     "silver": """World Production
 World production data for 1900 to the most recent year represent the recoverable silver content of precious-metal ores that were extracted from mines throughout the world. World production data were from the MR and the MYB.""",
+    "kyanite": """World Production
+World production data for 1928-60 were from the “World Production” table in the 1960 MYB. World production data for 1961-70 were from the “World Mine Production” table in the CDS. World production data for 1971-2002 were from the MCS. Data for 2003 to 2006 are unpublished revisions made by the USGS kyanite commodity specialist. World production data for 2007 to the most recent year are from the 2010 to most recent MYB.""",
 }
 
 
@@ -243,6 +245,15 @@ def combine_data_for_all_commodities(
                 # This spurious empty sheet appears sometimes; simply skip it.
                 continue
             df = clean_sheet_data(data=data, commodity=commodity, sheet_name=sheet_name)
+
+            if sheet_name == "Gemstones":
+                # Gemstones does not contain a "Production" column, but a "Production value ($)" column.
+                # For now, for consistency with all other files, ignore this column.
+                df = df.drop(columns=["Production value ($)"], errors="raise")
+
+            if sheet_name == "Ilmenite and Slag":
+                # For commodity "titanium_mineralconcentrates", the table contains a column "Unit values", with subcolumns for "Ilmenite", "Slag", and "Weighted average". We could attempt to extract the latter, but for now, simply skip.
+                continue
 
             # Add the dataframe for the current commodity to the combined dataframe.
             combined = pd.concat([combined, df])
