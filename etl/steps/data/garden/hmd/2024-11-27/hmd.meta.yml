@@ -332,7 +332,7 @@ tables:
         processing_level: major
         display:
           name: |-
-            Central death rate (male-to-female ratio) {definitions.others.display_name_dim}
+            Central death rate (male-to-female ratio) at << 'birth' if (age == '0') else age >>, << type >>
         presentation:
           title_public: Central death rate {definitions.others.title_public_dim}
           title_variant: |-

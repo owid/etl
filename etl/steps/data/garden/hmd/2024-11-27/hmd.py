@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -85,10 +86,16 @@ def run(dest_dir: str) -> None:
         tb=tb_births,
         col_index=["country", "year", "sex"],
     )
-    tb_pop_agg = tb_pop.groupby(["country", "year", "sex"], as_index=False)["population"].sum()
-    tb_births = tb_births.merge(tb_pop_agg, on=["country", "year", "sex"], how="left")
-    tb_births["birth_rate"] = tb_births["births"] / tb_births["population"] * 1_000
-    tb_births = tb_births.drop(columns=["population"])
+
+    def add_birth_rate(tb_pop, tb_births):
+        tb_pop_agg = tb_pop.groupby(["country", "year", "sex"], as_index=False)["population"].sum()
+        tb_births = tb_births.merge(tb_pop_agg, on=["country", "year", "sex"], how="left")
+        tb_births["birth_rate"] = tb_births["births"] / tb_births["population"] * 1_000
+        tb_births["birth_rate"] = tb_births["birth_rate"].replace([np.inf, -np.inf], np.nan)
+        tb_births = tb_births.drop(columns=["population"])
+        return tb_births
+
+    tb_births = add_birth_rate(tb_pop, tb_births)
 
     # 6/ Create table with differences and ratios
     tb_ratios = make_table_diffs_ratios(tb_lt)
@@ -212,5 +219,6 @@ def make_table_diffs_ratios(tb: Table) -> Table:
     for col in tb_new.columns:
         if col not in cols_index:
             tb_new[col] = tb_new[col].copy_metadata(tb["life_expectancy"])
+            tb_new[col] = tb_new[col].replace([np.inf, -np.inf], np.nan)
 
     return tb_new
