@@ -240,3 +240,5 @@ steps:
     - snapshot://fasttrack/latest/mineral_prices_usgs.csv
   data://grapher/fasttrack/latest/useful_energy_cost_way:
     - snapshot://fasttrack/latest/useful_energy_cost_way.csv
+  data://grapher/fasttrack/2023-06-19/world_population_comparison:
+    - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
