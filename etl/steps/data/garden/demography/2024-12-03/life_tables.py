@@ -59,7 +59,7 @@ def run(dest_dir: str) -> None:
     ds_un = paths.load_dataset("un_wpp_lt")
 
     # Read table from meadow dataset.
-    tb_hmd = ds_hmd.read("hmd")
+    tb_hmd = ds_hmd.read("life_tables")
     tb_un = ds_un.read("un_wpp_lt")
 
     #
@@ -79,12 +79,14 @@ def run(dest_dir: str) -> None:
     # Set DTypes
     tb = tb.astype(
         {
-            "age": str,
+            "age": "string",
+            "sex": "string",
+            "type": "string",
         }
     )
 
     # Set index
-    tb = tb.set_index(COLUMNS_INDEX, verify_integrity=True)
+    tb = tb.format(COLUMNS_INDEX)
 
     #
     # Save outputs.
@@ -106,15 +108,14 @@ def combine_tables(tb_hmd: Table, tb_un: Table) -> Table:
         - We decided against this to ensure comparability across countries (i.e. all countries use same source after 1950).
     """
     # HMD
-    ## Get only format=1x1 in HMD, drop 'format' column
-    tb_hmd = tb_hmd[tb_hmd["format"] == "1x1"].drop(columns=["format"])
-    ## Ensure year is int
-    tb_hmd["year"] = tb_hmd["year"].astype(str).astype("Int64")
+    ## Get only single-year, set dtype as int
+    flag = ~tb_hmd["age"].str.contains("-")
+    tb_hmd = tb_hmd.loc[flag]
     ## Sanity check years
-    assert tb_hmd["year"].max() == 2022, "HMD data should end in 2022"
-    assert tb_hmd["year"].min() == 1676, "HMD data should start in 1676"
+    assert tb_hmd["year"].max() == 2023, "HMD data should end in 2023"
+    assert tb_hmd["year"].min() == 1751, "HMD data should start in 1751"
     ## Keep only period HMD data prior to 1950 (UN data starts in 1950)
-    tb_hmd = tb_hmd[((tb_hmd["year"] < 1950) & (tb_hmd["type"] == "period")) | (tb_hmd["type"] == "cohort")]
+    tb_hmd = tb_hmd.loc[((tb_hmd["year"] < 1950) & (tb_hmd["type"] == "period")) | (tb_hmd["type"] == "cohort")]
     ## Column renames
     tb_hmd = tb_hmd.rename(
         columns={
@@ -123,15 +124,15 @@ def combine_tables(tb_hmd: Table, tb_un: Table) -> Table:
     )
     ## Filter relevant columns (UN has two columns that HMD doesn't: 'probability_of_survival', 'survivorship_ratio')
     columns_indicators_hmd = [col for col in tb_hmd.columns if col in COLUMNS_INDICATORS]
-    tb_hmd = tb_hmd[COLUMNS_INDEX + columns_indicators_hmd]
+    tb_hmd = tb_hmd.loc[:, COLUMNS_INDEX + columns_indicators_hmd]
 
     # UN
     ## Sanity check years
-    assert tb_un["year"].max() == 2021, "UN data should end in 2021"
+    assert tb_un["year"].max() == 2023, "UN data should end in 2023"
     assert tb_un["year"].min() == 1950, "UN data should start in 1950"
     assert (tb_un["year"].drop_duplicates().diff().dropna() == 1).all(), "UN data should be yearly"
     ## Filter relevant columns
-    tb_un = tb_un[COLUMNS_INDEX + COLUMNS_INDICATORS]
+    tb_un = tb_un.loc[:, COLUMNS_INDEX + COLUMNS_INDICATORS]
 
     # Combine tables
     tb = pr.concat([tb_hmd, tb_un], short_name=paths.short_name)
