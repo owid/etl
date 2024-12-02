@@ -64,3 +64,9 @@ steps:
     - snapshot://hmd/2022-12-07/hmd.zip
   data://garden/hmd/2022-12-07/life_tables:
     - data://meadow/hmd/2022-12-07/life_tables
+
+  # Survivorship ages (HMD-derived)
+  data://garden/demography/2023-09-27/survivor_percentiles:
+    - data://garden/hmd/2023-09-19/hmd
+  data://grapher/demography/2023-09-27/survivor_percentiles:
+    - data://garden/demography/2023-09-27/survivor_percentiles
