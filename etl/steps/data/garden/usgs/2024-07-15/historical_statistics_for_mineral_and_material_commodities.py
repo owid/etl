@@ -667,6 +667,16 @@ def run(dest_dir: str) -> None:
         (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1974, 1999])),
         "production|Magnesium metal|Smelter|tonnes",
     ] = None
+
+    # Lithium production in the US is only given until 1954. From then on, the data is "W" (which means withheld to avoid disclosing company proprietary data). To avoid confusion, simply remove all this data.
+    error = "Expected lithium US production data to end in 1954. Remove this part of the code."
+    assert (
+        tb_flat.loc[
+            (tb_flat["country"] == "United States") & (tb_flat["production|Lithium|Mine|tonnes"].notnull()), "year"
+        ].max()
+        == 1954
+    ), error
+    tb_flat.loc[(tb_flat["country"] == "United States"), "production|Lithium|Mine|tonnes"] = None
     ####################################################################################################################
 
     # Format tables conveniently.
