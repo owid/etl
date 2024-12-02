@@ -21,6 +21,7 @@ tables:
         presentation:
           title_public: Total deaths from << pathogen >> infections
         display:
+          roundingMode: significantFigures
           numSignificantFigures: 3
           name: << pathogen >>
       upper:
@@ -30,6 +31,7 @@ tables:
         presentation:
           title_public: Upper bound of total deaths from << pathogen >> infections
         display:
+          roundingMode: significantFigures
           numSignificantFigures: 3
           name: << pathogen >>
       lower:
@@ -39,5 +41,6 @@ tables:
         presentation:
           title_public: Lower bound of total deaths from << pathogen >> infections
         display:
+          roundingMode: significantFigures
           numSignificantFigures: 3
           name: << pathogen >>
