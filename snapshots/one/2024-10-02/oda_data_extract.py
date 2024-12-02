@@ -200,8 +200,12 @@ def aggregate_donors(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.Da
 
         # Check missing donors in the data
         missing_donors = set(donor_composition.values()).difference(df_donors["donor_code"].unique())
+
+        # Construct a list of names of missing donors from the codes of missing_donors
+        missing_donors_names = [v for k, v in donor_composition.items() if k in missing_donors]
+
         if missing_donors:
-            log.warning(f"Missing donors in the data for {donor_group}: {missing_donors}")
+            log.warning(f"Missing donors in the data for {donor_group}: {missing_donors_names}")
 
         df_donors_by_group = df_donors[df_donors["donor_code"].isin(donor_composition.keys())].copy()
 
@@ -266,6 +270,10 @@ def aggregate_recipients(df: pd.DataFrame, columns_to_keep: List[str]) -> List[p
 
         # Check missing recipients in the data
         missing_recipients = set(recipient_composition.values()).difference(df_recipients["recipient_code"].unique())
+
+        # Construct a list of names of missing recipients from the codes of missing_recipients
+        missing_recipients = [v for k, v in recipient_composition.items() if k in missing_recipients]
+
         if missing_recipients:
             log.warning(f"Missing recipients in the data for {recipient_group}: {missing_recipients}")
 
