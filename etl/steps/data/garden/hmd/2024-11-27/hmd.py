@@ -126,7 +126,7 @@ def process_table(tb, col_index, sex_expected=None, callback_post=None):
 
     Additionally, it standardizes the dimension values.
     """
-    paths.log.info(f"Pivoting table with columns {col_index}")
+    paths.log.info(f"processing table {tb.name}")
 
     if sex_expected is None:
         sex_expected = {"female", "male", "total"}
