@@ -11,16 +11,16 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("bloodstream_amr.csv")
+    snap = paths.load_snapshot("multiple_births.7z")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read_in_archive("HMBD_pooled_data_30.09.2024.csv")
 
     #
     # Process data.
-    tb = tb.rename(columns={"Location": "country", "Year": "year"})
+    #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "pathogen", "counterfactual"])
+    tb = tb.format(["country", "year", "stillbirths"])
 
     #
     # Save outputs.
