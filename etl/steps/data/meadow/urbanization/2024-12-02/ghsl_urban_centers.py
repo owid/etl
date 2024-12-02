@@ -70,10 +70,31 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(subset=["urban_center_name"])
 
     # Population and density of the capital city
-    tb = tb[tb["capital"] == 1]
-    tb = tb.drop(columns=["ID_MTUC_G0", "region", "capital"])
+    tb_capitals = tb[tb["capital"] == 1]
+    tb_capitals = tb_capitals.drop(columns=["ID_MTUC_G0", "region", "capital"])
 
-    tb = tb.format(["country", "year", "urban_center_name"])
+    # Select the top 25 most populous urban centers in 1975 and 2030
+    tb_1975 = tb[tb["year"] == 1975]
+    tb_2030 = tb[tb["year"] == 2030]
+    top_10_pop_1975 = tb_1975.nlargest(25, "urban_pop")
+    top_10_pop_2030 = tb_2030.nlargest(25, "urban_pop")
+
+    # Combine the results, ensuring no duplicates
+    top_10_pop_combined = pr.concat([top_10_pop_1975, top_10_pop_2030]).drop_duplicates(subset=["ID_MTUC_G0"])
+
+    # Filter the original Table to select the top urban centers
+    tb_top = tb[tb["ID_MTUC_G0"].isin(top_10_pop_combined["ID_MTUC_G0"])]
+
+    tb_top = tb_top.drop(columns=["urban_pop", "urban_area", "ID_MTUC_G0", "region", "capital"])
+    tb_top = tb_top.rename(columns={"urban_density": "urban_density_top_100"})
+
+    # Format the country column
+    tb_top["country"] = tb_top["urban_center_name"] + " (" + tb_top["country"] + ")"
+    tb_top = tb_top.drop(columns=["urban_center_name"])
+
+    tb = pr.merge(tb_capitals, tb_top, on=["country", "year"], how="outer")
+
+    tb = tb.format(["country", "year"])
 
     # Save outputs.
     #

@@ -14,10 +14,13 @@ definitions:
       The European Commission integrates satellite imagery with national census data to delineate the boundaries of capital cities and estimate their populations.
       To predict future urbanization (2025 and 2030), both static (land features) and dynamic (past satellite images) components are used to project growth. DEGURBA defines cities by population, not administrative borders, aligning with UN guidelines, though fixed thresholds may not always capture local differences.
 
-  desc_short_density: &desc_short_density |-
+  desc_short_density_capital: &desc_short_density_capital |-
     The number of people per km² of land area for the country's capital city.
+  desc_short_density_top_100: &desc_short_density_top_100 |-
+    The number of people per km² of land area for the top 100 most populous cities.
+
   desc_processing_density:  &desc_processing_density |-
-    Population density was calculated by dividing the population of the country's capital by the total area it covers, providing a measure of the number of people living in each km².
+    Population density was calculated by dividing the population of the city by the total area it covers, providing a measure of the number of people living in each km².
 
   desc_short_pop: &desc_short_pop |-
     The total number of people living in the country's capital city.
@@ -43,7 +46,7 @@ tables:
         title: The population density of the capital city (projected)
         unit: 'people/km²'
         short_unit: 'people/km²'
-        description_short: *desc_short_density
+        description_short: *desc_short_density_capital
         description_processing: *desc_processing_density
 
      urban_pop_estimates:
@@ -55,6 +58,17 @@ tables:
      urban_density_estimates:
         title: The population density of the capital city
         unit: 'people/km²'
-        description_short: *desc_short_density
+        description_short: *desc_short_density_capital
         description_processing: *desc_processing_density
 
+     urban_density_top_100_estimates:
+        title: The population density of the top 100 most populous cities
+        unit: 'people/km²'
+        description_short: *desc_short_density_top_100
+        description_processing: *desc_processing_density
+
+     urban_density_top_100_projections:
+        title: The population density of the top 100 most populous cities (projected)
+        unit: 'people/km²'
+        description_short: *desc_short_density_top_100
+        description_processing: *desc_processing_density
