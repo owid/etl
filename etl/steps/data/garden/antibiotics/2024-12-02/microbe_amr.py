@@ -1,5 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -32,13 +35,18 @@ def run(dest_dir: str) -> None:
     )
     tb_total = tb_total.rename(columns={"value": "total_deaths"}, errors="raise").drop(columns=["lower", "upper"])
 
-    tb = tb_amr.merge(tb_total, on=["country", "year", "infectious_syndrome"], how="left")
+    tb = tb_amr.merge(tb_total, on=["country", "year", "infectious_syndrome"], how="right")
 
+    tb["amr_attributable_deaths"] = tb["amr_attributable_deaths"].replace(pd.NA, 0)
     tb["non_amr_attributable_deaths"] = tb["total_deaths"] - tb["amr_attributable_deaths"]
+    # Rename syndromes to be shorter for use in stacked bar charts
+    tb = rename_syndromes(tb)
+
     # Reformatting the data so it can be used in stacked bar charts
     tb = (
         tb.drop(columns=["country"]).rename(columns={"infectious_syndrome": "country"}).drop(columns=["counterfactual"])
     )
+
     tb = tb.format(["country", "year"])
 
     #
@@ -51,3 +59,35 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def rename_syndromes(tb: Table) -> Table:
+    """
+    Rename syndromes to be shorter for use in stacked bar charts
+    """
+    name_dict = {
+        "Bloodstream Infections": "Bloodstream infections",
+        "Lower Respiratory Infections": "Lower respiratory infections",
+        "Diarrhea": "Diarrhea",
+        "Meninigitis": "Meningitis",
+        "Infections of the skin and subcutaneous systems": "Skin infections",
+        "Urinary tract infections and pyelonephritis": "Kidney and urinary tract infections",
+        "Peritoneal and intra-abdominal infections": "Abdominal infections",
+        "Tuberculosis": "Tuberculosis",
+        "Endocarditis": "Endocarditis",
+        "Typhoid fever, paratyphoid fever, and invasive non-typhoidal Salmonella": "Typhoid, paratyphoid, and iNTS",
+        "Infections of bones, joints, and related organs": " Bone and joint infections",
+        "Other unspecified site infections": "Other infections",
+        "Other parasitic infections": "Other parasitic infections",
+        "Oral infections": "Oral infections",
+        "Myelitis, meningoencephalitis, and other central nervous system infections": "Central nervous system infections",
+        "Upper respiratory infections": "Upper respiratory infections",
+        "Hepatitis": "Hepatitis",
+        "Eye infections": "Eye infections",
+        "Encephalitis": "Encephalitis",
+        "Carditis, myocarditis, and pericarditis": "Heart inflammation",
+        "Sexually transmitted infections": "Sexually transmitted infections",
+    }
+    tb["infectious_syndrome"] = tb["infectious_syndrome"].replace(name_dict, errors="raise")
+
+    return tb
