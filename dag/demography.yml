@@ -253,3 +253,11 @@ steps:
     - data://garden/hmd/2024-11-27/hmd
   data://grapher/demography/2024-12-02/survivor_percentiles:
     - data://garden/demography/2024-12-02/survivor_percentiles
+
+  # UN WPP Life Tables
+  data://meadow/un/2024-12-02/un_wpp_lt:
+    - snapshot://un/2024-12-02/un_wpp_lt_m.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_all.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_f.csv
+  data://garden/un/2024-12-02/un_wpp_lt:
+    - data://meadow/un/2024-12-02/un_wpp_lt
