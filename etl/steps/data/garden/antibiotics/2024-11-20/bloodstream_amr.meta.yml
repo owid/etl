@@ -5,17 +5,17 @@ definitions:
         - Antibiotics
     display:
       numSignificantFigures: 3
+    description_key:
+      - The pathogen and antimicrobial pairs that were tested for resistance can be found on pages 51-52 in the [Supplementary Materials (part 1)](#https://www.thelancet.com/cms/10.1016/S0140-6736(24)01867-1/attachment/005e2559-204f-46d7-b2e3-27b2091209aa/mmc1.pdf) of the original publication.
 
-  pathogen_type:
-    <%- if pathogen_type == "Fungi" -%>
+  pathogen_type: <%- if pathogen_type == "Fungi" -%>
     fungus
     <%- elif pathogen_type == "Viruses" -%>
     virus
     <%- else  -%>
     << pathogen_type.lower() >>
     <%- endif -%>
-  counterfactual:
-    <% if counterfactual == "Associated" %>
+  counterfactual: <% if counterfactual == "Associated" %>
     where the death was associated with antibiotic resistance
     <% elif counterfactual == "Susceptible" %>
     where the bacteria causing the death were susceptible to antibiotics
@@ -23,13 +23,10 @@ definitions:
     where the pathogen was not tested for antibiotic resistance
     <% endif %>
 
-
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
 
 tables:
   bloodstream_amr:
