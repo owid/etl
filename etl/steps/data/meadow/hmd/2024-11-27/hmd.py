@@ -61,7 +61,7 @@ FOLDERS_POP = [
     "population",
 ]
 REGEX_POP = (
-    r"(?P<country>[a-zA-Z\-\s,]+)(,\s)?(?P<name>Population) size \((?P<type>1\-year|abridged)\)\s+Last modified: "
+    r"(?P<country>[a-zA-Z\-\s,]+?),?\s?(?P<name>Population) size \((?P<format>1\-year|abridged)\)\s+Last modified: "
     r"(?P<last_modified>\d+ [a-zA-Z]{3} \d+)(;  Methods Protocol: v\d+ \(\d+\)|,MPv\d \(in development\))\n\n(?P<data>(?s:.)*)"
 )
 # Births
@@ -69,7 +69,7 @@ FOLDERS_BIRTHS = [
     "births",
 ]
 REGEX_BIRTHS = (
-    r"(?P<country>[a-zA-Z\-\s,]+),\s+(?P<name>Births) \((?P<type>1\-year)\)\s+Last modified: "
+    r"(?P<country>[a-zA-Z\-\s,]+),\s+(?P<name>Births) \((?P<format>1\-year)\)\s+Last modified: "
     r"(?P<last_modified>\d+ [a-zA-Z]{3} \d+);  Methods Protocol: v\d+ \(\d+\)\n\n(?P<data>(?s:.)*)"
 )
 
@@ -124,9 +124,11 @@ def run(dest_dir: str) -> None:
     # Population
     ## Invert 'abridged' <-> '1-year' in the type column
     message = "Types 'abridged' and '1-year' might not be reversed anymore!"
-    assert not tb_pop.loc[tb_pop["type"] == "abridged", "Age"].str.contains("-").any(), message
-    assert tb_pop.loc[tb_pop["type"] == "1-year", "Age"].str.contains("80-84").any(), message
-    tb_pop["type"] = tb_pop["type"].map(lambda x: "1-year" if x == "abridged" else "abridged" if x == "1-year" else x)
+    assert not tb_pop.loc[tb_pop["format"] == "abridged", "Age"].str.contains("-").any(), message
+    assert tb_pop.loc[tb_pop["format"] == "1-year", "Age"].str.contains("80-84").any(), message
+    tb_pop["format"] = tb_pop["format"].map(
+        lambda x: "1-year" if x == "abridged" else "abridged" if x == "1-year" else x
+    )
 
     # Check missing values
     _check_nas(tb_lt, 0.01, 14)
@@ -153,8 +155,8 @@ def run(dest_dir: str) -> None:
         tb_lt.format(["country", "year", "sex", "age", "type", "format"], short_name="life_tables"),
         tb_exp.format(["country", "year", "sex", "age", "type", "format"], short_name="exposures"),
         tb_m.format(["country", "year", "sex", "age", "type", "format"], short_name="deaths"),
-        tb_pop.format(["country", "year", "sex", "age", "type"], short_name="population"),
-        tb_bi.format(["country", "year", "sex", "type"], short_name="births"),
+        tb_pop.format(["country", "year", "sex", "age", "format"], short_name="population"),
+        tb_bi.format(["country", "year", "sex", "format"], short_name="births"),
     ]
 
     #
@@ -211,6 +213,7 @@ def make_tb(path: Path, main_folders: List[str], regex: str) -> Table:
 
 def make_tb_from_txt(text_path: Path, regex: str) -> Table:
     """Create a table from a TXT file."""
+    # print(text_path)
     # Extract fields
     groups = extract_fields(regex, text_path)
 
@@ -229,7 +232,6 @@ def make_tb_from_txt(text_path: Path, regex: str) -> Table:
     # Add dimensions
     tb = tb.assign(
         country=groups["country"],
-        type=groups["type"],
     )
 
     # Optional sex column
@@ -237,7 +239,8 @@ def make_tb_from_txt(text_path: Path, regex: str) -> Table:
         tb["sex"] = groups["sex"]
     if "format" in groups:
         tb["format"] = groups["format"]
-
+    if "type" in groups:
+        tb["type"] = groups["type"]
     return tb
 
 
