@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import List, cast
-
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -92,7 +90,7 @@ def run(dest_dir: str) -> None:
         tb_mort.format(["country", "year", "sex", "age"]),
         tb_pop.format(["country", "year", "sex", "age"]),
         tb_births.format(["country", "year", "sex"]),
-        tb_ratios.format(["country", "year", "age", "type"], short_name="diff_ratio"),
+        tb_ratios.format(["country", "year", "age", "type"], short_name="diff_ratios"),
     ]
 
     #

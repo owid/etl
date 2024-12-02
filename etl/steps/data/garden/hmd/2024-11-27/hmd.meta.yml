@@ -75,10 +75,10 @@ tables:
           The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 1,000 to get a per-1,000 people rate.
         display:
           name: |-
-            {tables.hmd.variables.central_death_rate.title} {definitions.others.display_name_dim}
+            {tables.life_tables.variables.central_death_rate.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.central_death_rate.title} {definitions.others.title_public_dim}
+            {tables.life_tables.variables.central_death_rate.title} {definitions.others.title_public_dim}
           topic_tags:
             - Life Expectancy
             - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
@@ -95,10 +95,10 @@ tables:
           The original metric is given as a fraction between 0 and 1 (i.e. per-capita). We multiply this by 100 to get a percentage.
         display:
           name: |-
-            {tables.hmd.variables.probability_of_death.title} {definitions.others.display_name_dim}
+            {tables.life_tables.variables.probability_of_death.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.probability_of_death.title} {definitions.others.title_public_dim}
+            {tables.life_tables.variables.probability_of_death.title} {definitions.others.title_public_dim}
           topic_tags:
             - Life Expectancy
             - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
@@ -110,10 +110,10 @@ tables:
         description_short: Average length of survival between ages x and x+n for persons dying in the interval.
         display:
           name: |-
-            {tables.hmd.variables.average_survival_length.title} {definitions.others.display_name_dim}
+            {tables.life_tables.variables.average_survival_length.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.average_survival_length.title} {definitions.others.title_public_dim}
+            {tables.life_tables.variables.average_survival_length.title} {definitions.others.title_public_dim}
 
       number_survivors:
         title: Number of survivors
@@ -121,10 +121,10 @@ tables:
         description_short: Number of survivors at a given age, assuming survivors at 0 years old is 100,000.
         display:
           name: |-
-            {tables.hmd.variables.number_survivors.title} {definitions.others.display_name_dim}
+            {tables.life_tables.variables.number_survivors.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.number_survivors.title} {definitions.others.title_public_dim}
+            {tables.life_tables.variables.number_survivors.title} {definitions.others.title_public_dim}
 
       number_deaths:
         title: Number of deaths
@@ -133,10 +133,10 @@ tables:
         description_short: Number of deaths between ages x and x+n.
         display:
           name: |-
-            {tables.hmd.variables.number_deaths.title} {definitions.others.display_name_dim}
+            {tables.life_tables.variables.number_deaths.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.number_deaths.title} {definitions.others.title_public_dim}
+            {tables.life_tables.variables.number_deaths.title} {definitions.others.title_public_dim}
           topic_tags:
             - Life Expectancy
             - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
@@ -147,10 +147,10 @@ tables:
         description_short: Number of person-years lived between ages x and x+n.
         display:
           name: |-
-            {tables.hmd.variables.number_person_years_lived.title} {definitions.others.display_name_dim}
+            {tables.life_tables.variables.number_person_years_lived.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.number_person_years_lived.title} {definitions.others.title_public_dim}
+            {tables.life_tables.variables.number_person_years_lived.title} {definitions.others.title_public_dim}
 
       number_person_years_remaining:
         title: Number of person-years remaining
@@ -158,10 +158,10 @@ tables:
         description_short: Number of person-years remaining after a given age.
         display:
           name: |-
-            {tables.hmd.variables.number_person_years_remaining.title} {definitions.others.display_name_dim}
+            {tables.life_tables.variables.number_person_years_remaining.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.number_person_years_remaining.title} {definitions.others.title_public_dim}
+            {tables.life_tables.variables.number_person_years_remaining.title} {definitions.others.title_public_dim}
 
       life_expectancy:
         title: Life expectancy
@@ -197,12 +197,12 @@ tables:
         display:
           numDecimalPlaces: 1
           name: |-
-            {tables.hmd.variables.life_expectancy.title} {definitions.others.display_name_dim}
+            {tables.life_tables.variables.life_expectancy.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.life_expectancy.title} {definitions.others.title_public_dim}
+            {tables.life_tables.variables.life_expectancy.title} {definitions.others.title_public_dim}
 
-  exposure:
+  exposures:
     variables:
       exposure:
         title: Exposure-to-risk
@@ -214,10 +214,10 @@ tables:
           Estimates of the population exposed to the risk of death during some age-time interval are based on annual (January 1st) population estimates, with small corrections that reflect the timing of deaths during the interval. Period exposure estimations are based on assumptions of uniformity in the distribution of events except when historical monthly birth data are available.
         display:
           name: |-
-            {tables.hmd.variables.exposure.title} {definitions.others.display_name_dim}
+            {tables.exposures.variables.exposure.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.exposure.title} {definitions.others.title_public_dim}
+            {tables.exposures.variables.exposure.title} {definitions.others.title_public_dim}
 
   deaths:
     common:
@@ -237,10 +237,10 @@ tables:
           <%- endif %>
         display:
           name: |-
-            {tables.hmd.variables.exposure.title} {definitions.others.display_name_dim}
+            {tables.deaths.variables.deaths.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.exposure.title} {definitions.others.title_public_dim}
+            {tables.deaths.variables.deaths.title} {definitions.others.title_public_dim}
 
   population:
     common:
@@ -264,10 +264,10 @@ tables:
           We have used the "19xx+" population estimates for the year of the territorial change.
         display:
           name: |-
-            {tables.hmd.variables.population.title} {definitions.others.display_name_dim}
+            {tables.population.variables.population.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.population.title} {definitions.others.title_public_dim}
+            {tables.population.variables.population.title} {definitions.others.title_public_dim}
 
   births:
     common:
@@ -287,10 +287,10 @@ tables:
           <%- endif %>
         display:
           name: |-
-            {tables.hmd.variables.births.title} {definitions.others.display_name_dim}
+            {tables.births.variables.births.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.births.title} {definitions.others.title_public_dim}
+            {tables.births.variables.births.title} {definitions.others.title_public_dim}
 
       birth_rate:
         title: Births
@@ -303,10 +303,10 @@ tables:
           <%- endif %>
         display:
           name: |-
-            {tables.hmd.variables.births.title} {definitions.others.display_name_dim}
+            {tables.births.variables.births.title} {definitions.others.display_name_dim}
         presentation:
           title_public: |-
-            {tables.hmd.variables.births.title} {definitions.others.title_public_dim}
+            {tables.births.variables.births.title} {definitions.others.title_public_dim}
 
   diff_ratios:
     variables:
@@ -352,7 +352,7 @@ tables:
             - Life Expectancy
             - Gender Ratio
 
-      life_expectancy_fm_ratio:
+      life_expectancy_mf_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
         short_unit: ""
