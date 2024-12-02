@@ -11,18 +11,16 @@ definitions:
     processing_level: minor
     description_key:
     - |-
-      **The Degree of Urbanisation (DEGURBA)**  is a method for capturing the urban-rural divide, designed for international comparisons. Developed by six organizations and endorsed by the UN, it uses a two-level classification.
-
-      The first level divides areas into cities, towns and semi-dense areas, and rural areas, distinguishing between urban (cities, towns, suburbs) and rural regions. The second level adds detail, splitting towns and rural areas further.
-
-      This classification is based on 1 km² grid cells, grouped into urban centers, urban clusters, and rural cells. These grids are then used to classify smaller areas, typically using residential population grids from censuses or registers. If detailed data isn't available, a disaggregation grid estimates population distribution.
-
+      The European Commission integrates satellite imagery with national census data to delineate the boundaries of capital cities and estimate their populations.
       To predict future urbanization (2025 and 2030), both static (land features) and dynamic (past satellite images) components are used to project growth. DEGURBA defines cities by population, not administrative borders, aligning with UN guidelines, though fixed thresholds may not always capture local differences.
 
-    description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba) and estimate their respective populations.
+  desc_short_density: &desc_short_density |-
+    The number of people per km² of land area for the country's capital city.
+  desc_processing_density:  &desc_processing_density |-
+    Population density was calculated by dividing the population of the country's capital by the total area it covers, providing a measure of the number of people living in each km².
 
-  desc_density:  &desc_density |-
-    Population density was calculated by dividing the population of the capital by the total area it covers, providing a measure of the number of people living in each km².
+  desc_short_pop: &desc_short_pop |-
+    The total number of people living in the country's capital city.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -38,27 +36,25 @@ tables:
      urban_pop_projections:
         title: The population of the capital city (projected)
         unit: 'people'
+        description_short: *desc_short_pop
 
-
-     urban_area_projections:
-        title: The area of the capital city (projected)
-        unit: 'km²'
 
      urban_density_projections:
         title: The population density of the capital city (projected)
         unit: 'people/km²'
-        description_processing: *desc_density
+        short_unit: 'people/km²'
+        description_short: *desc_short_density
+        description_processing: *desc_processing_density
 
      urban_pop_estimates:
         title: The population of the capital city
         unit: 'people'
+        description_short: *desc_short_pop
 
-     urban_area_estimates:
-        title: The area of the capital city
-        unit: 'km²'
 
      urban_density_estimates:
         title: The population density of the capital city
         unit: 'people/km²'
-        description_processing: *desc_density
+        description_short: *desc_short_density
+        description_processing: *desc_processing_density
 

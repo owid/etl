@@ -24,14 +24,14 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.drop(columns=["urban_center_name"])
+    tb = tb.drop(columns=["urban_center_name", "urban_area"])
 
     # Split data into estimates and projections.
     past_estimates = tb[tb["year"] < START_OF_PROJECTIONS].copy()
     future_projections = tb[tb["year"] >= START_OF_PROJECTIONS - 5].copy()
 
     # Now, for each column, split it into two (projections and estimates).
-    for col in ["urban_pop", "urban_area", "urban_density"]:
+    for col in ["urban_pop", "urban_density"]:
         if col not in ["country", "year"]:
             past_estimates[f"{col}_estimates"] = tb.loc[tb["year"] < START_OF_PROJECTIONS, col]
             future_projections[f"{col}_projections"] = tb.loc[tb["year"] >= START_OF_PROJECTIONS - 5, col]
