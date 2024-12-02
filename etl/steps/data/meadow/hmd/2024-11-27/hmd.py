@@ -88,6 +88,7 @@ def run(dest_dir: str) -> None:
             path=Path(tmpdir),
             main_folders=FOLDERS_POP,
             regex=REGEX_POP,
+            snap=snap,
         )
 
         # Life tables
@@ -95,18 +96,21 @@ def run(dest_dir: str) -> None:
             path=Path(tmpdir),
             main_folders=FOLDERS_LT,
             regex=REGEX_LT,
+            snap=snap,
         )
         # Exposure
         tb_exp = make_tb(
             path=Path(tmpdir),
             main_folders=FOLDERS_EXPOSURES,
             regex=REGEX_EXP,
+            snap=snap,
         )
         # Mortality
         tb_m = make_tb(
             path=Path(tmpdir),
             main_folders=FOLDERS_MOR,
             regex=REGEX_MOR,
+            snap=snap,
         )
 
         # Births
@@ -114,6 +118,7 @@ def run(dest_dir: str) -> None:
             path=Path(tmpdir),
             main_folders=FOLDERS_BIRTHS,
             regex=REGEX_BIRTHS,
+            snap=snap,
         )
 
     # Life tables
@@ -174,7 +179,7 @@ def run(dest_dir: str) -> None:
     ds_meadow.save()
 
 
-def make_tb(path: Path, main_folders: List[str], regex: str) -> Table:
+def make_tb(path: Path, main_folders: List[str], regex: str, snap) -> Table:
     """Create table from multiple category folders.
 
     It inspects the content in `main_folders` (should be in `path`), and looks for TXT files to parse into tables.
@@ -204,21 +209,21 @@ def make_tb(path: Path, main_folders: List[str], regex: str) -> Table:
                 # Read all TXT files in the indicator folder, and put them as a single table
                 paths.log.info(f"Creating list of tables from available files in {path}...")
                 files = list(indicator_path.glob("*.txt"))
-                tbs_ = [make_tb_from_txt(f, regex) for f in files]
+                tbs_ = [make_tb_from_txt(f, regex, snap) for f in files]
                 tbs.extend(tbs_)
     # Concatenate all dataframes
     tb = pr.concat(tbs, ignore_index=True)
     return tb
 
 
-def make_tb_from_txt(text_path: Path, regex: str) -> Table:
+def make_tb_from_txt(text_path: Path, regex: str, snap) -> Table:
     """Create a table from a TXT file."""
     # print(text_path)
     # Extract fields
     groups = extract_fields(regex, text_path)
 
     # Build df
-    tb = parse_table(groups["data"])
+    tb = parse_table(groups["data"], snap)
 
     # Optional melt
     if ("Female" in tb.columns) and ("Male" in tb.columns):
@@ -258,7 +263,7 @@ def extract_fields(regex: str, path: Path) -> dict:
     return groups
 
 
-def parse_table(data_raw: str):
+def parse_table(data_raw: str, snap):
     """Given the raw data from the TXT file (as string) map it to a table."""
     tb_str = data_raw.strip()
     tb_str = re.sub(r"\n\s+", "\n", tb_str)
@@ -267,6 +272,8 @@ def parse_table(data_raw: str):
         StringIO(tb_str),
         sep="\t",
         na_values=["."],
+        metadata=snap.to_table_metadata(),
+        origin=snap.m.origin,
     )
 
     return tb
