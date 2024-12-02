@@ -25,6 +25,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    paths.log.info("processing tables")
+
     # 1/ Life tables
     def _sanity_check_lt(tb):
         summary = tb.groupby(["country", "year", "sex", "type", "age"], as_index=False).size().sort_values("size")
@@ -36,7 +38,7 @@ def run(dest_dir: str) -> None:
         tb = tb.loc[~(tb["format"] == "5x1") & (tb["age"] == "110+")]
         return tb
 
-    tb_lt = reshape_table(
+    tb_lt = process_table(
         tb=tb_lt,
         col_index=["country", "year", "sex", "age", "type"],
         sex_expected={"females", "males", "total"},
@@ -44,33 +46,30 @@ def run(dest_dir: str) -> None:
     )
 
     # 2/ Exposures
-    tb_exp = reshape_table(
+    tb_exp = process_table(
         tb=tb_exp,
         col_index=["country", "year", "sex", "age", "type"],
     )
 
     # 3/ Mortality
-    tb_mort = reshape_table(
+    tb_mort = process_table(
         tb=tb_mort,
         col_index=["country", "year", "sex", "age", "type"],
     )
 
     # 4/ Population
-    tb_pop = reshape_table(
+    tb_pop = process_table(
         tb=tb_pop,
         col_index=["country", "year", "sex", "age"],
     )
 
     # 5/ Births
-    tb_births = reshape_table(
+    tb_births = process_table(
         tb=tb_births,
         col_index=["country", "year", "sex"],
     )
 
-    # tb = geo.harmonize_countries(
-    #     df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    # )
-
+    # Create list with tables
     tables = [
         tb_lt.format(["country", "year", "sex", "age", "type"]),
         tb_exp.format(["country", "year", "sex", "age", "type"]),
@@ -87,14 +86,13 @@ def run(dest_dir: str) -> None:
         dest_dir,
         tables=tables,
         check_variables_metadata=True,
-        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
 
 
-def reshape_table(tb, col_index, sex_expected=None, callback_post=None):
+def process_table(tb, col_index, sex_expected=None, callback_post=None):
     """Reshape a table.
 
     Input table has column `format`, which is sort-of redundant. This function ensures we can safely drop it (i.e. no duplicate rows).
@@ -123,6 +121,12 @@ def reshape_table(tb, col_index, sex_expected=None, callback_post=None):
     # Final dropping o f columns
     tb = tb.drop(columns="format")
 
+    # Country name standardization
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
+    )
+
     return tb
 
 
@@ -139,4 +143,5 @@ def standardize_sex_cat_names(tb, sex_expected):
 
     # Rename
     tb["sex"] = tb["sex"].replace({"females": "female", "males": "male"})
+
     return tb
