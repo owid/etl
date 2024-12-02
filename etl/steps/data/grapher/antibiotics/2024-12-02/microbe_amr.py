@@ -15,10 +15,6 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden.read("microbe_amr", reset_index=False)
-    tb = tb.reset_index()
-    # Reformatting the data so it can be used in stacked bar charts
-    tb = tb.drop(columns=["country"]).rename(columns={"infectious_syndrome": "country"})
-    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
