@@ -945,3 +945,11 @@ steps:
     - data-private://meadow/antibiotics/2024-11-24/total_syndrome
   data-private://grapher/antibiotics/2024-12-02/microbe_amr:
     - data-private://garden/antibiotics/2024-12-02/microbe_amr
+  # IHME Neonatal infections and amr resistance
+  data-private://meadow/antibiotics/2024-12-02/microbe_neonatal_amr:
+    - snapshot-private://antibiotics/2024-12-02/microbe_neonatal_amr.csv
+  data-private://garden/antibiotics/2024-12-02/microbe_neonatal_amr:
+    - data-private://meadow/antibiotics/2024-12-02/microbe_neonatal_amr
+    - data-private://meadow/antibiotics/2024-11-20/microbe
+  data-private://grapher/antibiotics/2024-12-02/microbe_neonatal_amr:
+    - data-private://garden/antibiotics/2024-12-02/microbe_neonatal_amr
