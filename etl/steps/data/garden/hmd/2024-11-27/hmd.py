@@ -25,6 +25,10 @@ def run(dest_dir: str) -> None:
     tb_pop = ds_meadow.read("population")
     tb_births = ds_meadow.read("births")
 
+    # Drop NaNs
+    tb_exp = tb_exp.dropna(subset="exposure")
+    tb_births = tb_births.dropna(subset="births")
+
     #
     # Process data.
     #
