@@ -11,16 +11,24 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("bloodstream_amr.csv")
+    snap = paths.load_snapshot("microbe_neonatal_amr.csv")
 
     # Load data from snapshot.
     tb = snap.read()
+    assert all(tb["Age"] == "Neonatal")
+    assert len(tb["Counterfactual"].unique()) == 1
+    assert all(tb["Infectious syndrome"] == "Bloodstream infections")
+    #
+    # Process data.
+    #
+    tb = tb.drop(columns=["Age", "Sex", "Measure", "Metric", "Infectious syndrome", "Pathogen Type", "Counterfactual"])
+    tb = tb.rename(columns={"Location": "country", "Year": "year"})
 
     #
     # Process data.
-    tb = tb.rename(columns={"Location": "country", "Year": "year"})
+    #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "pathogen", "counterfactual"])
+    tb = tb.format(["country", "year", "pathogen"])
 
     #
     # Save outputs.

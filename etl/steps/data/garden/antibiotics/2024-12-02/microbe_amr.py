@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
     tb_total = tb_total.rename(columns={"value": "total_deaths"}, errors="raise").drop(columns=["lower", "upper"])
 
     tb = tb_amr.merge(tb_total, on=["country", "year", "infectious_syndrome"], how="right")
-
+    # Fill missing values with 0
     tb["amr_attributable_deaths"] = tb["amr_attributable_deaths"].replace(pd.NA, 0)
     tb["non_amr_attributable_deaths"] = tb["total_deaths"] - tb["amr_attributable_deaths"]
     # Rename syndromes to be shorter for use in stacked bar charts
