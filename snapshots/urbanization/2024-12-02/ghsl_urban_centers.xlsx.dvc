@@ -8,7 +8,7 @@ meta:
       The "Stats in the City Database" offers harmonized data on population and population density for 11,422 urban centres.
 
       This data, based on the Global Human Settlement Layer Dataset, uses the Degree of Urbanisation framework to delineate spatial entities and integrates geospatial data from a variety of open-source datasets. It represents one of the most comprehensive resources for understanding urban population patterns and densities worldwide
-    date_published: 2024-09-10
+    date_published: "2024"
 
     # Citation
     producer: European Commission, Joint Research Centre (JRC)
@@ -21,7 +21,7 @@ meta:
       Schiavina M., Melchiorri M., Pesaresi M. (2023): GHS-SMOD R2023A - GHS settlement layers, application of the Degree of Urbanisation methodology (stage I) to GHS-POP R2023A and GHS-BUILT-S R2023A, multitemporal (1975-2030)European Commission, Joint Research Centre (JRC) PID: http://data.europa.eu/89h/a0df7a6f-49de-46ea-9bde-563437a6e2ba, doi:10.2905/A0DF7A6F-49DE-46EA-9BDE-563437A6E2BA
 
     url_main: https://human-settlement.emergency.copernicus.eu/index.php
-    date_accessed: 2024-10-14
+    date_accessed: 2024-12-02
 
     # License
     license:
