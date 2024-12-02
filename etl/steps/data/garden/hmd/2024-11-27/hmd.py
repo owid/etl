@@ -38,6 +38,17 @@ def run(dest_dir: str) -> None:
             row_dups["year"] <= 1931
         ).all(), "Unexpected duplicates in life tables!"
         tb = tb.loc[~(tb["format"] == "5x1") & (tb["age"] == "110+")]
+
+        flag = (
+            (tb_lt["country"] == "Switzerland")
+            & (tb_lt["age"] == "110+")
+            & (tb_lt["type"] == "cohort")
+            & (tb_lt["sex"] == "Males")
+            & (tb_lt["year"] <= 1931)
+            & (tb_lt["year"] >= 1913)
+        )
+        tb = tb.loc[~flag]
+
         return tb
 
     tb_lt = process_table(
@@ -84,6 +95,7 @@ def run(dest_dir: str) -> None:
     tb_ratios = make_table_diffs_ratios(tb_lt)
 
     # Create list with tables
+    paths.log.info("saving tables")
     tables = [
         tb_lt.format(["country", "year", "sex", "age", "type"]),
         tb_exp.format(["country", "year", "sex", "age", "type"]),
@@ -114,6 +126,8 @@ def process_table(tb, col_index, sex_expected=None, callback_post=None):
 
     Additionally, it standardizes the dimension values.
     """
+    paths.log.info(f"Pivoting table with columns {col_index}")
+
     if sex_expected is None:
         sex_expected = {"female", "male", "total"}
 
@@ -124,8 +138,6 @@ def process_table(tb, col_index, sex_expected=None, callback_post=None):
     tb = tb.sort_values("format").drop_duplicates(subset=[col for col in tb.columns if col != "format"], keep="first")
 
     # Check no duplicates
-    summary = tb.groupby(col_index, as_index=False).size().sort_values("size")
-    row_dups = summary.loc[summary["size"] != 1]
     if callback_post is not None:
         tb = callback_post(tb)
     else:
