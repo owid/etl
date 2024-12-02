@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
     tb["percentile"] = 100 - tb["percentile"]
 
     # Propagate metadata
-    tb["age"] = tb["age"].copy_metadata(tb_exposure["exposure"])
+    tb["age"].metadata.origins = tb_exposure["exposure"].m.origins.copy()
 
     # Set index
     paths.log.info("format")

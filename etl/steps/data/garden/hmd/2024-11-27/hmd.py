@@ -222,7 +222,7 @@ def make_table_diffs_ratios(tb: Table) -> Table:
     # Add metadata back
     for col in tb_new.columns:
         if col not in cols_index:
-            tb_new[col] = tb_new[col].copy_metadata(tb["life_expectancy"])
+            tb_new[col].metadata.origins = tb["life_expectancy"].m.origins.copy()
             tb_new[col] = tb_new[col].replace([np.inf, -np.inf], np.nan)
 
     return tb_new
