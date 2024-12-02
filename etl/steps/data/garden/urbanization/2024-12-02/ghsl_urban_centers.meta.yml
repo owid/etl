@@ -37,38 +37,44 @@ tables:
     variables:
 
      urban_pop_projections:
-        title: The population of the capital city (projected)
+        title: Population of the capital city (projected)
         unit: 'people'
         description_short: *desc_short_pop
-
+        display:
+          isProjection: true
 
      urban_density_projections:
-        title: The population density of the capital city (projected)
+        title: Population density of the capital city (projected)
         unit: 'people/km²'
         short_unit: 'people/km²'
         description_short: *desc_short_density_capital
         description_processing: *desc_processing_density
+        display:
+          isProjection: true
+
+     urban_density_top_100_projections:
+        title: Population density of the top 100 most populous cities (projected)
+        unit: 'people/km²'
+        description_short: *desc_short_density_top_100
+        description_processing: *desc_processing_density
+        display:
+          isProjection: true
 
      urban_pop_estimates:
-        title: The population of the capital city
+        title: Population of the capital city
         unit: 'people'
         description_short: *desc_short_pop
 
 
      urban_density_estimates:
-        title: The population density of the capital city
+        title: Population density of the capital city
         unit: 'people/km²'
         description_short: *desc_short_density_capital
         description_processing: *desc_processing_density
 
      urban_density_top_100_estimates:
-        title: The population density of the top 100 most populous cities
+        title: Population density of the top 100 most populous cities
         unit: 'people/km²'
         description_short: *desc_short_density_top_100
         description_processing: *desc_processing_density
 
-     urban_density_top_100_projections:
-        title: The population density of the top 100 most populous cities (projected)
-        unit: 'people/km²'
-        description_short: *desc_short_density_top_100
-        description_processing: *desc_processing_density
