@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
 
     # Process data.
     #
-    # Remove duplicates in the ID sheet
+    # Remove duplicates in the ID sheet - based on the name of the urban center and country
     tb_urban_center_names = tb_urban_center_names.drop_duplicates(subset=["Main Name", "GADM_name"])
 
     tb_urban_center_names = tb_urban_center_names[
