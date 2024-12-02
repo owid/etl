@@ -81,7 +81,6 @@ tables:
             {tables.life_tables.variables.central_death_rate.title} {definitions.others.title_public_dim}
           topic_tags:
             - Life Expectancy
-            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
 
       probability_of_death:
         title: Probability of death
@@ -101,7 +100,6 @@ tables:
             {tables.life_tables.variables.probability_of_death.title} {definitions.others.title_public_dim}
           topic_tags:
             - Life Expectancy
-            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
 
       average_survival_length:
         title: Average survival length
@@ -139,7 +137,6 @@ tables:
             {tables.life_tables.variables.number_deaths.title} {definitions.others.title_public_dim}
           topic_tags:
             - Life Expectancy
-            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
 
       number_person_years_lived:
         title: Number of person-years lived
@@ -340,7 +337,6 @@ tables:
           topic_tags:
             - Life Expectancy
             - Gender Ratio
-            - << 'Child & Infant Mortality' if age in ['0', '1-4'] else 'Causes of Death'>>
 
       life_expectancy_fm_diff:
         title: Life expectancy difference (f-m)
