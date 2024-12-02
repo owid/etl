@@ -1,4 +1,23 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+To access the data for this snapshot, follow these steps:
+
+- Go to https://vizhub.healthdata.org/microbe/
+- Click on Antimicrobial Resistance in the top tab
+- Select these options:
+    - Category: Syndromes
+    - Burden: By resistance
+    - Location: Global
+    - Age: Neonatal
+    - Counterfactual: Both (or Attributable)
+    - Year: 2021 (or whatever latest year is available)
+    - Measure: Deaths
+    - Metric: Number
+
+Download the file and upload it using the script below.
+
+
+"""
 
 from pathlib import Path
 
