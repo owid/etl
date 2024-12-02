@@ -156,7 +156,7 @@ COMMODITY_MAPPING = {
     ("Iodine", "Total"): None,
     ("Iron and Steel Scrap", "Total"): None,
     ("Kyanite", "Total"): None,
-    ("Lithium statistics", "Total"): None,
+    ("Lithium statistics", "Total"): ("Lithium", "Mine"),
     ("Lumber", "Total"): None,
     ("Natural & Synthetic Rutile", "Total"): None,
     ("Other industrial wood products", "Total"): None,
@@ -238,6 +238,7 @@ FOOTNOTES_PRODUCTION = {
     # "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
     "production|Cobalt|Refinery|tonnes": "Values are reported as tonnes of cobalt content.",
     "production|Bismuth|Mine|tonnes": "Values are reported as tonnes of metal content.",
+    "production|Lithium|Mine|tonnes": "Values are reported as tonnes of lithium content.",
 }
 FOOTNOTES_UNIT_VALUE = {
     "unit_value|Silicon|Processing|constant 1998 US$ per tonne": "Values refer to constant 1998 US$ per tonne of silicon content in ferrosilicon or silicon metal.",

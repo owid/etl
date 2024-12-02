@@ -255,6 +255,14 @@ def combine_data_for_all_commodities(
                 # For commodity "titanium_mineralconcentrates", the table contains a column "Unit values", with subcolumns for "Ilmenite", "Slag", and "Weighted average". We could attempt to extract the latter, but for now, simply skip.
                 continue
 
+            if sheet_name == "Lithium statistics":
+                # Lithium has three different columns for global production, namely "World production (gross weight)", "World production (lithium content)", and "World production (lithium carbonate equivalent)".
+                # For consistency with USGS current data, we'll use the "World production (lithium content)" column.
+                # NOTE: The original "World production (gross weight)" column was already renamed to "World production" in clean_sheet_data().
+                df = df.drop(
+                    columns=["World production", "World production (lithium carbonate equivalent)"], errors="raise"
+                ).rename(columns={"World production (lithium content)": "World production"}, errors="raise")
+
             # Add the dataframe for the current commodity to the combined dataframe.
             combined = pd.concat([combined, df])
 
