@@ -677,6 +677,14 @@ def run(dest_dir: str) -> None:
         == 1954
     ), error
     tb_flat.loc[(tb_flat["country"] == "United States"), "production|Lithium|Mine|tonnes"] = None
+    # Similarly, unit value from 1900 to 1951 is only informed in 1936 (and in terms of production, it's only informed in terms of gross weight, not lithium content). This creates a significant decline in unit value in line charts (between 1936 and 1952) which is unclear if it's real or not. To avoid confusion, ignore that data point and start the series in 1952.
+    error = (
+        "Expected lithium unit value data to only be informed in 1936 (prior to 1952). Remove this part of the code."
+    )
+    assert tb_flat[
+        (tb_flat["unit_value|Lithium|Mine|constant 1998 US$ per tonne"].notnull()) & (tb_flat["year"] < 1952)
+    ]["year"].tolist() == [1936], error
+    tb_flat.loc[(tb_flat["year"] < 1952), "unit_value|Lithium|Mine|constant 1998 US$ per tonne"] = None
     ####################################################################################################################
 
     # Format tables conveniently.
