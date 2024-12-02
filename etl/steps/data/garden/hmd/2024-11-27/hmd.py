@@ -37,13 +37,12 @@ def run(dest_dir: str) -> None:
         assert (row_dups["country"].unique() == "Switzerland").all() & (
             row_dups["year"] <= 1931
         ).all(), "Unexpected duplicates in life tables!"
-        tb = tb.loc[~(tb["format"] == "5x1") & (tb["age"] == "110+")]
 
         flag = (
             (tb_lt["country"] == "Switzerland")
             & (tb_lt["age"] == "110+")
             & (tb_lt["type"] == "cohort")
-            & (tb_lt["sex"] == "Males")
+            & (tb_lt["sex"] == "male")
             & (tb_lt["year"] <= 1931)
             & (tb_lt["year"] >= 1913)
         )
@@ -126,7 +125,7 @@ def process_table(tb, col_index, sex_expected=None, callback_post=None):
 
     Additionally, it standardizes the dimension values.
     """
-    paths.log.info(f"processing table {tb.name}")
+    paths.log.info(f"processing table {tb.m.short_name}")
 
     if sex_expected is None:
         sex_expected = {"female", "male", "total"}
