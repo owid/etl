@@ -3,14 +3,12 @@
 To access the data for this snapshot, follow these steps:
 
 - Go to https://vizhub.healthdata.org/microbe/
-- Click on Antimicrobial Resistance in the top tab
+- Click on Pathogens in the top tab
 - Select these options:
-    - Category: Pathogens
-    - Burden: By resistance
-    - Infectious syndrome: Bloodstream infections
+    - Infectious syndrome: Bloodsteam infections
     - Location: Global
-    - Age: Neonatal
-    - Counterfactual: Both (or Attributable)
+    - Age: All ages
+    - Sex: Both
     - Year: 2021 (or whatever latest year is available)
     - Measure: Deaths
     - Metric: Number
@@ -35,7 +33,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", "-f", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"antibiotics/{SNAPSHOT_VERSION}/microbe_neonatal_amr.csv")
+    snap = Snapshot(f"antibiotics/{SNAPSHOT_VERSION}/total_pathogen_bloodstream.csv")
 
     # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
     snap.create_snapshot(filename=path_to_file, upload=upload)
