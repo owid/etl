@@ -35,8 +35,11 @@ def run(dest_dir: str) -> None:
     tb = tb_amr.merge(tb_total, on=["country", "year", "infectious_syndrome"], how="left")
 
     tb["non_amr_attributable_deaths"] = tb["total_deaths"] - tb["amr_attributable_deaths"]
-
-    tb = tb.format(["country", "year", "infectious_syndrome"]).drop(columns=["counterfactual"])
+    # Reformatting the data so it can be used in stacked bar charts
+    tb = (
+        tb.drop(columns=["country"]).rename(columns={"infectious_syndrome": "country"}).drop(columns=["counterfactual"])
+    )
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
