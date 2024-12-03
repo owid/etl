@@ -16,7 +16,6 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("ghsl_urban_centers")
-
     # Read table from meadow dataset.
     tb = ds_meadow.read("ghsl_urban_centers")
 
@@ -32,7 +31,7 @@ def run(dest_dir: str) -> None:
     future_projections = tb[tb["year"] >= START_OF_PROJECTIONS - 5].copy()
 
     # Now, for each column, split it into two (projections and estimates).
-    for col in ["urban_pop", "urban_density", "urban_density_top_100"]:
+    for col in ["urban_pop", "urban_density", "urban_density_top_100", "urban_pop_top_100"]:
         if col not in ["country", "year"]:
             past_estimates[f"{col}_estimates"] = tb.loc[tb["year"] < START_OF_PROJECTIONS, col]
             future_projections[f"{col}_projections"] = tb.loc[tb["year"] >= START_OF_PROJECTIONS - 5, col]

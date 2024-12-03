@@ -22,8 +22,10 @@ definitions:
   desc_processing_density:  &desc_processing_density |-
     Population density was calculated by dividing the population of the city by the total area it covers, providing a measure of the number of people living in each km².
 
-  desc_short_pop: &desc_short_pop |-
+  desc_short_pop_capital: &desc_short_pop_capital |-
     The total number of people living in the country's capital city.
+  desc_short_pop_top_100: &desc_short_pop_top_100 |-
+    The total number of people living in cities ranked among the top 100 most populous in either 1975 or 2020.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -39,7 +41,7 @@ tables:
      urban_pop_projections:
         title: Population of the capital city (projected)
         unit: 'people'
-        description_short: *desc_short_pop
+        description_short: *desc_short_pop_capital
         display:
           isProjection: true
 
@@ -62,7 +64,7 @@ tables:
      urban_pop_estimates:
         title: Population of the capital city
         unit: 'people'
-        description_short: *desc_short_pop
+        description_short: *desc_short_pop_capital
 
 
      urban_density_estimates:
@@ -76,4 +78,16 @@ tables:
         unit: 'people/km²'
         description_short: *desc_short_density_top_100
         description_processing: *desc_processing_density
+
+     urban_pop_top_100_estimates:
+        title: Population of the top 100 most populous cities
+        unit: 'people'
+        description_short: *desc_short_pop_top_100
+
+     urban_pop_top_100_projections:
+        title: Population of the top 100 most populous cities (projected)
+        unit: 'people'
+        description_short: *desc_short_pop_top_100
+        display:
+          isProjection: true
 

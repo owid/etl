@@ -85,8 +85,8 @@ def run(dest_dir: str) -> None:
     # Filter the original Table to select the top urban centers
     tb_top = tb[tb["ID_MTUC_G0"].isin(top_10_pop_combined["ID_MTUC_G0"])]
 
-    tb_top = tb_top.drop(columns=["urban_pop", "urban_area", "ID_MTUC_G0", "region", "capital"])
-    tb_top = tb_top.rename(columns={"urban_density": "urban_density_top_100"})
+    tb_top = tb_top.drop(columns=["urban_area", "ID_MTUC_G0", "region", "capital"])
+    tb_top = tb_top.rename(columns={"urban_density": "urban_density_top_100", "urban_pop": "urban_pop_top_100"})
 
     # Format the country column
     tb_top["country"] = tb_top["urban_center_name"] + " (" + tb_top["country"] + ")"
