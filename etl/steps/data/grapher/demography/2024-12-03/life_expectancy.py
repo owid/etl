@@ -14,11 +14,8 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("life_expectancy")
 
     # Read table from garden dataset.
-    tables = [
-        ds_garden["life_expectancy"],
-        ds_garden["life_expectancy_with_proj"],
-        ds_garden["life_expectancy_only_proj"],
-    ]
+    tables = list(ds_garden)
+
     #
     # Process data.
     #
