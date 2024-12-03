@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Filter relevant dimensions
-    tb = tb.loc[("period", slice(None), slice(None), slice(None), "0"), ["life_expectancy"]].reset_index()
+    tb = tb.loc[(slice(None), slice(None), slice(None), "0", "period"), ["life_expectancy"]].reset_index()
 
     # Keep relevant columns and rows
     tb = tb.drop(columns=["type", "age"]).dropna()
