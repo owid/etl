@@ -103,7 +103,7 @@ def run(dest_dir: str) -> None:
 
     # Estimate ratios
     tb["children_delivery_ratio"] = (
-        1_000 * (tb["multiple_children"] + tb["singletons"]) / tb["multiple_deliveries"]
+        1_000 * (tb["multiple_children"] + tb["singletons"]) / tb["total_deliveries"]
     ).round(3)
     tb["children_multiple_delivery_ratio"] = (1_000 * tb["multiple_children"] / tb["multiple_deliveries"]).round(3)
     tb["multiple_to_singleton_ratio"] = (1_000 * tb["multiple_deliveries"] / tb["singletons"]).round(3)
@@ -113,12 +113,12 @@ def run(dest_dir: str) -> None:
     assert (
         tb.loc[flag, "children_multiple_delivery_ratio"] >= 4000
     ).all(), "Unexpected outlier for England and Wales in 1938"
-    tb.loc[flag, ["multiple_children", "children_multiple_delivery_ratio"]] = pd.NA
+    tb.loc[flag, ["multiple_children", "children_multiple_delivery_ratio", "children_delivery_ratio"]] = pd.NA
     flag = (tb["country"] == "England and Wales") & (tb["year"] == 1939)
     assert (
         tb.loc[flag, "children_multiple_delivery_ratio"] <= 1500
     ).all(), "Unexpected outlier for England and Wales in 1938"
-    tb.loc[flag, ["multiple_children", "children_multiple_delivery_ratio"]] = pd.NA
+    tb.loc[flag, ["multiple_children", "children_multiple_delivery_ratio", "children_delivery_ratio"]] = pd.NA
 
     # Keep relevant columns
     tb = tb[
