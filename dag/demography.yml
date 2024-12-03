@@ -122,6 +122,7 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/un/2024-03-14/un_wpp_most:
     - data://garden/un/2024-03-14/un_wpp_most
+
   ########################################################################
   # Life expectancy                                                      #
   ########################################################################
@@ -138,11 +139,16 @@ steps:
   data://garden/demography/2023-10-10/riley_2005:
     - data://meadow/demography/2023-10-10/riley_2005
 
+  # HMD country data
+  data://meadow/hmd/2024-12-03/hmd_country:
+    - snapshot://hmd/2024-12-01/hmd_country.zip
+
   # Human Mortality Database
   data://meadow/hmd/2024-12-01/hmd:
     - snapshot://hmd/2024-11-27/hmd.zip
   data://garden/hmd/2024-12-01/hmd:
     - data://meadow/hmd/2024-12-01/hmd
+    - data://meadow/hmd/2024-12-03/hmd_country
   data://grapher/hmd/2024-12-01/hmd:
     - data://garden/hmd/2024-12-01/hmd
 
@@ -251,13 +257,6 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/demography/2024-12-03/fertility_rate:
     - data://garden/demography/2024-12-03/fertility_rate
-
-  # OMM: Mean Age at Birth -- HFD + UN WPP
-  # data://garden/demography/2024-12-03/mean_age_birth:
-  #   - data://garden/hmd/2024-11-19/hfd
-  #   - data://garden/un/2024-07-12/un_wpp
-  # data://grapher/demography/2024-12-03/mean_age_birth:
-  #   - data://garden/demography/2024-12-03/mean_age_birth
 
   # OMM: Birth rate -- HFD + UN WPP
   data://garden/demography/2024-12-03/birth_rate:
