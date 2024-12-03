@@ -36,16 +36,23 @@ COLUMNS_INDICATORS = [
     "number_person_years_remaining",
     "life_expectancy",
     "average_survival_length",
+]
+COLUMN_INDICATORS_REL = [
     "life_expectancy_fm_diff",
-    "life_expectancy_fm_ratio",
-    "central_death_rate_mf_ratio",
+    "life_expectancy_mf_ratio",
 ]
 COLUMNS_INDEX = [
-    "type",
-    "location",
+    "country",
     "year",
     "sex",
     "age",
+    "type",
+]
+COLUMNS_INDEX_REL = [
+    "country",
+    "year",
+    "age",
+    "type",
 ]
 
 
@@ -60,33 +67,46 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb_hmd = ds_hmd.read("life_tables")
+    tb_hmd_rel = ds_hmd.read("diff_ratios")
     tb_un = ds_un.read("un_wpp_lt")
 
     #
     # Process data.
     #
+    tb_un = tb_un.rename(
+        columns={
+            "location": "country",
+        }
+    )
     # Set type='period' for UN data
     tb_un["type"] = "period"
 
+    # Keep only single-years
+    ## Get only single-year, set dtype as int
+    flag = ~tb_hmd["age"].str.contains("-")
+    tb_hmd = tb_hmd.loc[flag]
+    flag = ~tb_hmd_rel["age"].str.contains("-")
+    tb_hmd_rel = tb_hmd_rel.loc[flag]
+
     # Add life expectancy differences and ratios
     paths.log.info("calculating extra variables (ratio and difference in life expectancy for f and m).")
-    tb_un = add_le_diff_and_ratios(tb_un, COLUMNS_INDEX)
+    tb_un_rel = make_table_diffs_ratios(tb_un)
 
     # Combine HMD + UN
     paths.log.info("concatenate tables")
-    tb = combine_tables(tb_hmd, tb_un)
+    tb = combine_tables(tb_hmd, tb_un, COLUMNS_INDEX, COLUMNS_INDICATORS)
+    tb_rel = combine_tables(tb_hmd_rel, tb_un_rel, COLUMNS_INDEX_REL, COLUMN_INDICATORS_REL)
 
     # Set DTypes
-    tb = tb.astype(
-        {
-            "age": "string",
-            "sex": "string",
-            "type": "string",
-        }
-    )
+    dtypes = {
+        "type": "string",
+    }
+    tb = tb.astype(dtypes)
+    tb_rel = tb_rel.astype(dtypes)
 
     # Set index
-    tb = tb.format(COLUMNS_INDEX)
+    tb = tb.format(COLUMNS_INDEX, short_name=paths.short_name)
+    tb_rel = tb_rel.format(COLUMNS_INDEX_REL, short_name="diff_ratios")
 
     #
     # Save outputs.
@@ -98,7 +118,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def combine_tables(tb_hmd: Table, tb_un: Table) -> Table:
+def combine_tables(tb_hmd: Table, tb_un: Table, cols_index, cols_indicators) -> Table:
     """Combine HMD and UN life tables.
 
     - UN only provides period data.
@@ -108,23 +128,14 @@ def combine_tables(tb_hmd: Table, tb_un: Table) -> Table:
         - We decided against this to ensure comparability across countries (i.e. all countries use same source after 1950).
     """
     # HMD
-    ## Get only single-year, set dtype as int
-    flag = ~tb_hmd["age"].str.contains("-")
-    tb_hmd = tb_hmd.loc[flag]
     ## Sanity check years
     assert tb_hmd["year"].max() == 2023, "HMD data should end in 2023"
     assert tb_hmd["year"].min() == 1751, "HMD data should start in 1751"
     ## Keep only period HMD data prior to 1950 (UN data starts in 1950)
     tb_hmd = tb_hmd.loc[((tb_hmd["year"] < 1950) & (tb_hmd["type"] == "period")) | (tb_hmd["type"] == "cohort")]
-    ## Column renames
-    tb_hmd = tb_hmd.rename(
-        columns={
-            "country": "location",
-        }
-    )
     ## Filter relevant columns (UN has two columns that HMD doesn't: 'probability_of_survival', 'survivorship_ratio')
-    columns_indicators_hmd = [col for col in tb_hmd.columns if col in COLUMNS_INDICATORS]
-    tb_hmd = tb_hmd.loc[:, COLUMNS_INDEX + columns_indicators_hmd]
+    columns_indicators_hmd = [col for col in tb_hmd.columns if col in cols_indicators]
+    tb_hmd = tb_hmd.loc[:, cols_index + columns_indicators_hmd]
 
     # UN
     ## Sanity check years
@@ -132,52 +143,51 @@ def combine_tables(tb_hmd: Table, tb_un: Table) -> Table:
     assert tb_un["year"].min() == 1950, "UN data should start in 1950"
     assert (tb_un["year"].drop_duplicates().diff().dropna() == 1).all(), "UN data should be yearly"
     ## Filter relevant columns
-    tb_un = tb_un.loc[:, COLUMNS_INDEX + COLUMNS_INDICATORS]
+    tb_un = tb_un.loc[:, cols_index + cols_indicators]
 
     # Combine tables
     tb = pr.concat([tb_hmd, tb_un], short_name=paths.short_name)
 
     # Remove all-NaN rows
-    tb = tb.dropna(subset=COLUMNS_INDICATORS, how="all")
+    tb = tb.dropna(subset=cols_indicators, how="all")
 
     return tb
 
 
-def add_le_diff_and_ratios(tb: Table, columns_primary: List[str]) -> Table:
-    """Add metrics on life expectancy ratios and differences between females and males."""
-    ## Get relevant metric, split into f and m tables
-    metrics = {
-        "life_expectancy": ["ratio_fm", "diff_fm"],
-        "central_death_rate": ["ratio_mf"],
-    }
-    for metric, operations in metrics.items():
-        tb_metric = tb[columns_primary + [metric]].dropna(subset=[metric])
-        tb_metric_m = tb_metric[tb_metric["sex"] == "male"].drop(columns=["sex"])
-        tb_metric_f = tb_metric[tb_metric["sex"] == "female"].drop(columns=["sex"])
+def make_table_diffs_ratios(tb: Table) -> Table:
+    """Create table with metric differences and ratios.
 
-        ## Merge f and m tables
-        tb_metric = tb_metric_f.merge(tb_metric_m, on=list(set(columns_primary) - {"sex"}), suffixes=("_f", "_m"))
-        ## Calculate extra variables
-        if "diff_fm" in operations:
-            tb_metric[f"{metric}_fm_diff"] = tb_metric[f"{metric}_f"] - tb_metric[f"{metric}_m"]
-            tb_metric[f"{metric}_fm_diff"] = tb_metric[f"{metric}_fm_diff"].replace([np.inf, -np.inf], np.nan)
-        if "diff_mf" in operations:
-            tb_metric[f"{metric}_mf_diff"] = tb_metric[f"{metric}_m"] - tb_metric[f"{metric}_f"]
-            tb_metric[f"{metric}_mf_diff"] = tb_metric[f"{metric}_mf_diff"].replace([np.inf, -np.inf], np.nan)
-        if "ratio_fm" in operations:
-            tb_metric[f"{metric}_fm_ratio"] = tb_metric[f"{metric}_f"] / tb_metric[f"{metric}_m"]
-            tb_metric[f"{metric}_fm_ratio"] = tb_metric[f"{metric}_fm_ratio"].replace([np.inf, -np.inf], np.nan)
-        if "ratio_mf" in operations:
-            tb_metric[f"{metric}_mf_ratio"] = tb_metric[f"{metric}_m"] / tb_metric[f"{metric}_f"]
-            tb_metric[f"{metric}_mf_ratio"] = tb_metric[f"{metric}_mf_ratio"].replace([np.inf, -np.inf], np.nan)
-        # drop individual sex columns
-        tb_metric = tb_metric.drop(columns=[f"{metric}_f", f"{metric}_m"])
-        ## Set sex dimension to none
-        tb_metric["sex"] = "both"
-        ## optional cast
-        tb_metric = cast(Table, tb_metric)
+    Currently, we estimate:
 
-        ## Add table to main table
-        tb = tb.merge(tb_metric, on=columns_primary, how="left")
+    - female - male: Life expectancy
+    - male/female: Life Expectancy, Central Death Rate
+    """
+    # Pivot & obtain differences and ratios
+    cols_index = ["country", "year", "age", "type"]
+    tb_new = (
+        tb.pivot_table(
+            index=cols_index,
+            columns="sex",
+            values=["life_expectancy", "central_death_rate"],
+        )
+        .assign(
+            life_expectancy_fm_diff=lambda df: df[("life_expectancy", "female")] - df[("life_expectancy", "male")],
+            life_expectancy_mf_ratio=lambda df: df[("life_expectancy", "male")] / df[("life_expectancy", "female")],
+        )
+        .reset_index()
+    )
 
-    return tb
+    # Keep relevant columns
+    cols = [col for col in tb_new.columns if col[1] == ""]
+    tb_new = tb_new.loc[:, cols]
+
+    # Rename columns
+    tb_new.columns = [col[0] for col in tb_new.columns]
+
+    # Add metadata back
+    for col in tb_new.columns:
+        if col not in cols_index:
+            tb_new[col].metadata.origins = tb["life_expectancy"].m.origins.copy()
+            tb_new[col] = tb_new[col].replace([np.inf, -np.inf], np.nan)
+
+    return tb_new

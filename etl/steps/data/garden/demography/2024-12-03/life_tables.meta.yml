@@ -190,6 +190,8 @@ tables:
           title_public: Life expectancy at << age if age != '0' else 'birth'>>
           title_variant: << sex + 's, ' if sex != 'both' >><< type + ' tables'>>
 
+  diff_ratios:
+    variables:
       life_expectancy_fm_diff:
         title: Life expectancy difference (f-m)
         short_unit: years
