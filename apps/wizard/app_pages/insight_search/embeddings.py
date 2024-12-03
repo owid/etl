@@ -8,7 +8,6 @@ import torch
 from joblib import Memory
 from sentence_transformers import SentenceTransformer, util
 from structlog import get_logger
-from tqdm.auto import tqdm
 
 from etl.paths import CACHE_DIR
 
@@ -32,6 +31,10 @@ def set_device() -> str:
 
     return device
 
+
+# Set cpu as default, other devices are causing problems
+if "DEVICE" not in os.environ:
+    os.environ["DEVICE"] = "cpu"
 
 DEVICE = set_device()
 
@@ -84,6 +87,8 @@ def get_embeddings(
     # Encode missing texts
     if missing_texts:
         if workers > 1:
+            # NOTE: I haven't figured out why... anyway, single process is fast enough for 200k indicators
+            raise NotImplementedError("Multiprocessing is much slower than a single process")
             # Start the multiprocessing pool
             pool = model.start_multi_process_pool(target_devices=workers * [DEVICE])
             # Encode sentences using multiprocessing
@@ -146,7 +151,7 @@ def get_insights_embeddings(_model, insights: list[Dict[str, Any]]) -> list:
             insight["title"] + " " + insight["raw_text"] + " " + " ".join(insight["authors"]) for insight in insights
         ]
 
-        return get_embeddings(_model, insights_texts)
+        return get_embeddings(_model, insights_texts)  # type: ignore
 
 
 def get_sorted_documents_by_similarity(
