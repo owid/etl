@@ -240,7 +240,7 @@ PLOT_TO_COMPARE_DATA_SOURCES = [
     # "production|Chromium|Mine|tonnes",
     # 'production|Titanium|Mine, ilmenite|tonnes',
     # 'production|Helium|Mine|tonnes',
-    # "production|Rare earths|Mine|tonnes",
+    # "production|Gemstones|Mine|tonnes",
 ]
 
 

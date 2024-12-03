@@ -86,6 +86,7 @@ COMMODITY_MAPPING = {
     # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
     ("Fuller's earth", "Total"): None,
     ("Gallium", "Total"): ("Gallium", "Refinery"),
+    ("Gemstones", "Total"): ("Gemstones", "Mine"),
     ("Germanium", "Total"): ("Germanium", "Refinery"),
     ("Gold", "Total"): ("Gold", "Mine"),
     ("Graphite", "Total"): ("Graphite", "Mine"),
@@ -151,7 +152,6 @@ COMMODITY_MAPPING = {
     ("Vanadium", "Total"): ("Vanadium", "Mine"),
     ("Zinc", "Total"): ("Zinc", "Mine"),
     # TODO: Include the relevant ones from below and sort alphabetically with the ones above.
-    ("Gemstones", "Total"): None,
     ("Hafnium", "Total"): None,
     ("Iodine", "Total"): None,
     ("Iron and Steel Scrap", "Total"): None,
@@ -224,6 +224,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     # NOTE: Bismuth is in gross weight for the US, but metal content for the World.
     #  However, data for the US contains only nans and zeros, and will be removed later on.
     "Bismuth",
+    "Gemstones",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
@@ -239,6 +240,7 @@ FOOTNOTES_PRODUCTION = {
     "production|Cobalt|Refinery|tonnes": "Values are reported as tonnes of cobalt content.",
     "production|Bismuth|Mine|tonnes": "Values are reported as tonnes of metal content.",
     "production|Lithium|Mine|tonnes": "Values are reported as tonnes of lithium content.",
+    "production|Gemstones|Mine|tonnes": "Values are reported as tonnes of gemstone-quality diamonds.",
 }
 FOOTNOTES_UNIT_VALUE = {
     "unit_value|Silicon|Processing|constant 1998 US$ per tonne": "Values refer to constant 1998 US$ per tonne of silicon content in ferrosilicon or silicon metal.",
@@ -685,6 +687,22 @@ def run(dest_dir: str) -> None:
         (tb_flat["unit_value|Lithium|Mine|constant 1998 US$ per tonne"].notnull()) & (tb_flat["year"] < 1952)
     ]["year"].tolist() == [1936], error
     tb_flat.loc[(tb_flat["year"] < 1952), "unit_value|Lithium|Mine|constant 1998 US$ per tonne"] = None
+
+    # Gemstones unit values is zero in a range of years.
+    # The documentation says "Unit value data for 1922–28 were estimated by interpolation of imports value data, and rounded to two significant figures".
+    # In practice, the unit values for those years are exactly zero, which are probably spurious.
+    # Remove those zeros.
+    _years_with_zero_value = [1922, 1923, 1924, 1925, 1926, 1927, 1928]
+    error = "Expected gemstones unit value to be zero in a range of years. Remove this part of the code."
+    assert set(
+        tb_flat.loc[
+            (tb_flat["year"].isin(_years_with_zero_value)) & (tb_flat["country"] == "World"),
+            "unit_value|Gemstones|Mine|constant 1998 US$ per tonne",
+        ]
+    ) == {0.0}, error
+    tb_flat.loc[
+        (tb_flat["year"].isin(_years_with_zero_value)), "unit_value|Gemstones|Mine|constant 1998 US$ per tonne"
+    ] = None
     ####################################################################################################################
 
     # Format tables conveniently.
