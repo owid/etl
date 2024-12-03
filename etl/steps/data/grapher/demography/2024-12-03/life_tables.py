@@ -11,10 +11,12 @@ paths = PathFinder(__file__)
 INDICATORS_RELEVANT = [
     "central_death_rate",
     "life_expectancy",
+    "probability_of_death",
+]
+INDICATORS_RELEVANT_REL = [
     "life_expectancy_fm_diff",
     "life_expectancy_fm_ratio",
     "central_death_rate_mf_ratio",
-    "probability_of_death",
 ]
 # Single-age groups to preserve
 AGES_SINGLE = [
@@ -38,21 +40,22 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden.read("life_tables")
+    tb_diff = ds_garden.read("diff_ratios")
 
     #
     # Process data.
     #
     ## Only keep particular ages
     tb = tb.loc[tb["age"].isin(AGES_SINGLE)]
+    tb_diff = tb_diff.loc[tb_diff["age"].isin(AGES_SINGLE)]
 
     ## Set index back
-    tb = tb.format(["location", "year", "sex", "age", "type"])
+    tb = tb.format(["country", "year", "sex", "age", "type"])
+    tb_diff = tb_diff.format(["country", "year", "age", "type"])
 
     ## Only keep subset of columns
     tb = tb[INDICATORS_RELEVANT]
-
-    # Rename location -> country
-    tb = tb.rename_index_names({"location": "country"})
+    tb_diff = tb_diff[INDICATORS_RELEVANT_REL]
 
     #
     # Save outputs.

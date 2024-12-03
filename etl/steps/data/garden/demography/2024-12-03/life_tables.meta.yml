@@ -77,26 +77,6 @@ tables:
           topic_tags:
             - Life Expectancy
 
-      central_death_rate_mf_ratio:
-        title: Central death rate ratio (m/f)
-        unit: ""
-        description_short: |-
-          <%- if type == "cohort" -%>
-          The ratio of cohort central death rate (males/females) at a given age.
-          <%- elif type == "period" -%>
-          The ratio of period central death rate (males/females) at a given age.
-          <%- endif -%>
-        processing_level: major
-        display:
-          name: |-
-            Central death rate (male-to-female ratio) at << 'birth' if (age == '0') else age >>, << type >>
-        presentation:
-          title_public: Central death rate at << age if age != '0' else 'birth'>>
-          title_variant: male-to-female ratio, << type + ' tables'>>
-          topic_tags:
-            - Life Expectancy
-            - Gender Ratio
-
       probability_of_death:
         title: Probability of death
         unit: "%"

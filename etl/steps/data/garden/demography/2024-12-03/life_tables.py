@@ -38,6 +38,7 @@ COLUMNS_INDICATORS = [
 COLUMN_INDICATORS_REL = [
     "life_expectancy_fm_diff",
     "life_expectancy_fm_ratio",
+    "central_death_rate_mf_ratio",
 ]
 COLUMNS_INDEX = [
     "country",
@@ -65,7 +66,7 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb_hmd = ds_hmd.read("life_tables")
-    tb_hmd_rel = ds_hmd.read("diff_ratios")
+    tb_hmd_diff = ds_hmd.read("diff_ratios")
     tb_un = ds_un.read("un_wpp_lt")
 
     #
@@ -83,8 +84,8 @@ def run(dest_dir: str) -> None:
     ## Get only single-year, set dtype as int
     flag = ~tb_hmd["age"].str.contains("-")
     tb_hmd = tb_hmd.loc[flag]
-    flag = ~tb_hmd_rel["age"].str.contains("-")
-    tb_hmd_rel = tb_hmd_rel.loc[flag]
+    flag = ~tb_hmd_diff["age"].str.contains("-")
+    tb_hmd_diff = tb_hmd_diff.loc[flag]
 
     # Add life expectancy differences and ratios
     paths.log.info("calculating extra variables (ratio and difference in life expectancy for f and m).")
@@ -93,7 +94,7 @@ def run(dest_dir: str) -> None:
     # Combine HMD + UN
     paths.log.info("concatenate tables")
     tb = combine_tables(tb_hmd, tb_un, COLUMNS_INDEX, COLUMNS_INDICATORS)
-    tb_rel = combine_tables(tb_hmd_rel, tb_un_rel, COLUMNS_INDEX_REL, COLUMN_INDICATORS_REL)
+    tb_rel = combine_tables(tb_hmd_diff, tb_un_rel, COLUMNS_INDEX_REL, COLUMN_INDICATORS_REL)
 
     # Set DTypes
     dtypes = {
@@ -110,7 +111,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb, tb_rel], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -171,6 +172,8 @@ def make_table_diffs_ratios(tb: Table) -> Table:
         .assign(
             life_expectancy_fm_diff=lambda df: df[("life_expectancy", "female")] - df[("life_expectancy", "male")],
             life_expectancy_fm_ratio=lambda df: df[("life_expectancy", "female")] / df[("life_expectancy", "male")],
+            central_death_rate_mf_ratio=lambda df: df[("central_death_rate", "male")]
+            / df[("central_death_rate", "female")],
         )
         .reset_index()
     )
