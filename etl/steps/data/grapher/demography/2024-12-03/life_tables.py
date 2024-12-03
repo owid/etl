@@ -42,18 +42,11 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    ## Reset index
-    column_index = list(tb.index.names)
-    tb = tb.reset_index()
-
-    ## Only keep 5-year age groups, and 1-year observation periods
-    tb = tb[tb["age"].isin(AGES_SINGLE)]
-
-    ## Set dtype of year to int
-    tb["year"] = tb["year"].astype("Int64")
+    ## Only keep particular ages
+    tb = tb.loc[tb["age"].isin(AGES_SINGLE)]
 
     ## Set index back
-    tb = tb.set_index(column_index, verify_integrity=True).sort_index()
+    tb = tb.format(["location", "year", "sex", "age", "type"])
 
     ## Only keep subset of columns
     tb = tb[INDICATORS_RELEVANT]
