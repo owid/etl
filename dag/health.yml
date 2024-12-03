@@ -946,3 +946,19 @@ steps:
     - data-private://meadow/antibiotics/2024-11-20/microbe
   data-private://grapher/antibiotics/2024-12-02/microbe_neonatal_amr:
     - data-private://garden/antibiotics/2024-12-02/microbe_neonatal_amr
+
+  # MICROBE - total deaths by pathogen
+  data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream:
+    - snapshot-private://antibiotics/2024-12-02/total_pathogen_bloodstream.csv
+  data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream:
+    - data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream
+  data-private://grapher/antibiotics/2024-12-02/total_pathogen_bloodstream:
+    - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream
+  # MICROBE - total deaths by pathogen and amr resistance
+  data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - snapshot-private://antibiotics/2024-12-02/total_pathogen_bloodstream_amr.csv
+  data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream
+    - data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream_amr
+  data-private://grapher/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream_amr
