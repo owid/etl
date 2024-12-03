@@ -107,9 +107,9 @@ def get_min_distance(distance):
         return distance
 
 
-def calc_median(group):
+def calc_median(group, col="distance"):
     """Calculate the median distance for each country origin and year."""
-    group = group.sort_values(by="distance")
+    group = group.sort_values(by=col)
     group["cumulative_journeys"] = group["migrants_all_sexes"].cumsum()
     total_journeys = group["migrants_all_sexes"].sum()
     median_journey = total_journeys / 2
