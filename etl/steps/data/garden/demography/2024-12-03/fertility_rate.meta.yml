@@ -10,6 +10,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: Fertility Rate (UN WPP; HFD)
   update_period_days: 365
 
 tables:
@@ -18,7 +19,7 @@ tables:
       fertility_rate:
         title: Fertility rate (period)
         description_short: |-
-          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality. {definitions.global.dimensions.description_short}
+          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
         description_key:
           - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
           - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
@@ -38,7 +39,7 @@ tables:
       fertility_rate_hist:
         title: Fertility rate (period), historical
         description_short: |-
-          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality. {definitions.global.dimensions.description_short}
+          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
         description_key:
           - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
           - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
