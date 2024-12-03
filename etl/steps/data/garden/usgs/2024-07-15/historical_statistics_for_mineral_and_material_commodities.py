@@ -138,6 +138,7 @@ COMMODITY_MAPPING = {
     # In USGS current data, PGM are broken down into palladium and platinum.
     ("Platinum-group metals", "Total"): None,
     ("Plywood and veneer", "Total"): None,
+    ("Potash", "Total"): ("Potash", "Mine"),
     ("Pumice and Pumicite", "Total"): ("Pumice and pumicite", "Mine"),
     ("Quartz crystal", "Total"): None,
     ("Rare earths", "Total"): ("Rare earths", "Mine"),
@@ -176,7 +177,6 @@ COMMODITY_MAPPING = {
     # In USGS current data, "Hafnium" is not reported, only "Zirconium and Hafnium".
     ("Zirconium", "Total"): None,
     # TODO: Include the relevant ones from below and sort alphabetically with the ones above.
-    ("Potash", "Total"): None,
     ("Rhenium", "Total"): None,
 }
 
