@@ -91,6 +91,8 @@ COMMODITY_MAPPING = {
     ("Gold", "Total"): ("Gold", "Mine"),
     ("Graphite", "Total"): ("Graphite", "Mine"),
     ("Gypsum", "Total"): ("Gypsum", "Mine"),
+    # In USGS current data, "Hafnium" is not reported, only "Zirconium and Hafnium".
+    ("Hafnium", "Total"): None,
     ("Helium", "Total"): ("Helium", "Mine"),
     ("Indium", "Total"): ("Indium", "Refinery"),
     # NOTE: Industrial diamond production includes natural and synthetic diamonds.
@@ -98,6 +100,7 @@ COMMODITY_MAPPING = {
     ("Industrial diamond", "Total"): ("Diamond", "Mine and synthetic, industrial"),
     ("Industrial garnet", "Total"): ("Garnet", "Mine"),
     ("Industrial sand and gravel", "Total"): ("Sand and gravel", "Mine, industrial"),
+    ("Iodine", "Total"): ("Iodine", "Mine"),
     ("Iron Oxide Pigments", "Total"): None,
     ("Iron and Steel Slag", "Total"): None,
     ("Iron ore", "Total"): ("Iron ore", "Mine, crude ore"),
@@ -152,8 +155,6 @@ COMMODITY_MAPPING = {
     ("Vanadium", "Total"): ("Vanadium", "Mine"),
     ("Zinc", "Total"): ("Zinc", "Mine"),
     # TODO: Include the relevant ones from below and sort alphabetically with the ones above.
-    ("Hafnium", "Total"): None,
-    ("Iodine", "Total"): None,
     ("Iron and Steel Scrap", "Total"): None,
     ("Kyanite", "Total"): None,
     ("Lithium statistics", "Total"): ("Lithium", "Mine"),
@@ -225,6 +226,7 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     #  However, data for the US contains only nans and zeros, and will be removed later on.
     "Bismuth",
     "Gemstones",
+    "Iodine",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
