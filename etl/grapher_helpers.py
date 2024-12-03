@@ -171,34 +171,69 @@ def _yield_wide_table(
             tab.metadata.short_name = short_name
             tab.rename(columns={column: short_name}, inplace=True)
 
-            # add info about dimensions to metadata
-            if dim_dict:
-                tab[short_name].metadata.additional_info = {
-                    "dimensions": {
-                        "originalShortName": column,
-                        "originalName": tab[short_name].metadata.title,
-                        "filters": [
-                            {"name": dim_name, "value": sanitize_numpy(dim_value)}
-                            for dim_name, dim_value in dim_dict.items()
-                        ],
-                    }
-                }
-
-            # Add dimensions to title (which will be used as variable name in grapher)
-            if tab[short_name].metadata.title:
-                # We use template as a title
-                if _uses_jinja(tab[short_name].metadata.title):
-                    title_with_dims = _expand_jinja_text(tab[short_name].metadata.title, dim_dict)
-                # Otherwise use default
-                else:
-                    title_with_dims = _title_column_and_dimensions(tab[short_name].metadata.title, dim_dict)
-
-                tab[short_name].metadata.title = title_with_dims
-
-            # traverse metadata and expand Jinja
-            tab[short_name].metadata = _expand_jinja(tab[short_name].metadata, dim_dict)
+            tab[short_name].metadata = _set_metadata(tab[short_name].metadata, dim_dict, column)
 
             yield tab
+
+
+def _set_metadata(meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: str) -> catalog.VariableMeta:
+    # add info about dimensions to metadata
+    if dim_dict:
+        meta.additional_info = {
+            "dimensions": {
+                "originalShortName": column,
+                "originalName": meta.title,
+                "filters": [
+                    {"name": dim_name, "value": sanitize_numpy(dim_value)} for dim_name, dim_value in dim_dict.items()
+                ],
+            }
+        }
+
+    # Add dimensions to title (which will be used as variable name in grapher)
+    if meta.title:
+        # We use template as a title
+        if _uses_jinja(meta.title):
+            title_with_dims = _expand_jinja_text(meta.title, dim_dict)
+        # Otherwise use default
+        else:
+            title_with_dims = _title_column_and_dimensions(meta.title, dim_dict)
+
+        meta.title = title_with_dims
+
+    # traverse metadata and expand Jinja
+    meta = _expand_jinja(meta, dim_dict)
+
+    return meta
+
+
+def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
+    # meta_path = get_metadata_path(str(dest_dir))
+    # if meta_path.exists():
+    #     ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, yaml_params=yaml_params, errors=errors)
+
+    dim_names = [k for k in long_tb.primary_key if k not in ("year", "country", "date")]
+
+    wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))
+
+    short_names = []
+    metadatas = []
+    for dims in wide_tb.columns:
+        column = dims[0]
+        dim_dict = {k: v for k, v in zip(dim_names, dims[1:])}
+        short_name = _underscore_column_and_dimensions(
+            column,
+            dim_dict,
+        )
+
+        short_names.append(short_name)
+        metadatas.append(_set_metadata(long_tb[dims[0]].metadata, dim_dict, column))
+
+    # Set short_name and metadata for all columns
+    wide_tb.columns = short_names
+    for col, meta in zip(wide_tb.columns, metadatas):
+        wide_tb[col].metadata = meta
+
+    return wide_tb
 
 
 def _uses_jinja(text: Optional[str]):

@@ -262,6 +262,8 @@ def create_dataset(
 
     ds = _set_metadata_from_dest_dir(ds, dest_dir)
 
+    meta_path = get_metadata_path(str(dest_dir))
+
     # add tables to dataset
     used_short_names = set()
     for table in tables:
@@ -270,9 +272,19 @@ def create_dataset(
         if table.metadata.short_name in used_short_names:
             raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
         used_short_names.add(table.metadata.short_name)
+
+        from etl import grapher_helpers as gh
+
+        # Expand long to wide
+        if meta_path.exists():
+            table.update_metadata_from_yaml(meta_path, table.m.short_name)
+
+        tb_wide = gh.long_to_wide(table)
+
+        __import__("ipdb").set_trace()
+
         ds.add(table, formats=formats, repack=repack)
 
-    meta_path = get_metadata_path(str(dest_dir))
     if meta_path.exists():
         ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, yaml_params=yaml_params, errors=errors)
 
