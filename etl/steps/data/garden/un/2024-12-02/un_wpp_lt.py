@@ -82,7 +82,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, country_col="location")
 
     # Harmonize sex sex
-    tb["sex"] = tb["sex"].map({"Total": "both", "Male": "male", "Female": "female"})
+    tb["sex"] = tb["sex"].map({"Total": "total", "Male": "male", "Female": "female"})
     assert tb["sex"].notna().all(), "NaNs detected after mapping sex values!"
 
     # Set index
