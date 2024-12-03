@@ -14,8 +14,6 @@ Some notes:
         - UN contains single-age groups from 0 to 99 and 100+ (equivalent to >=100)
 """
 
-from typing import List, cast
-
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Table
@@ -39,7 +37,7 @@ COLUMNS_INDICATORS = [
 ]
 COLUMN_INDICATORS_REL = [
     "life_expectancy_fm_diff",
-    "life_expectancy_mf_ratio",
+    "life_expectancy_fm_ratio",
 ]
 COLUMNS_INDEX = [
     "country",
@@ -172,7 +170,7 @@ def make_table_diffs_ratios(tb: Table) -> Table:
         )
         .assign(
             life_expectancy_fm_diff=lambda df: df[("life_expectancy", "female")] - df[("life_expectancy", "male")],
-            life_expectancy_mf_ratio=lambda df: df[("life_expectancy", "male")] / df[("life_expectancy", "female")],
+            life_expectancy_fm_ratio=lambda df: df[("life_expectancy", "female")] / df[("life_expectancy", "male")],
         )
         .reset_index()
     )
