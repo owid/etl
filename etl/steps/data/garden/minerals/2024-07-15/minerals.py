@@ -237,9 +237,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
 ]
 # Columns to plot with the individual data sources differentiated.
 PLOT_TO_COMPARE_DATA_SOURCES = [
-    # "production|Chromium|Mine|tonnes",
-    # 'production|Titanium|Mine, ilmenite|tonnes',
-    # 'production|Helium|Mine|tonnes',
+    # "production|Rhenium|Mine|tonnes",
 ]
 
 
@@ -606,6 +604,10 @@ def combine_data(
     tb.loc[
         (tb["country"] != "World") & (tb["year"].isin([1992])),
         "production|Cobalt|Refinery|tonnes",
+    ] = None
+    tb.loc[
+        (tb["country"] != "World") & (tb["year"].isin([1977, 1978, 1979, 1983])),
+        "production|Iodine|Mine|tonnes",
     ] = None
 
     ####################################################################################################################

@@ -130,11 +130,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/technology/2022/internet:
     - data://garden/technology/2022/internet
-  # HMD
-  data://meadow/hmd/2022-12-07/life_tables:
-    - snapshot://hmd/2022-12-07/hmd.zip
-  data://garden/hmd/2022-12-07/life_tables:
-    - data://meadow/hmd/2022-12-07/life_tables
 
   # UNDP
   data://meadow/un/2024-04-09/undp_hdr:

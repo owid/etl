@@ -999,6 +999,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of aluminum, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Aluminum
+          shortUnit: $
         presentation:
           title_public: Aluminum unit value
       unit_value_antimony_mine_constant_1998_usd_per_tonne:
@@ -1007,6 +1010,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [antimony](#dod:antimony), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Antimony
+          shortUnit: $
         presentation:
           title_public: Antimony unit value
       unit_value_arsenic_processing_constant_1998_usd_per_tonne:
@@ -1015,6 +1021,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of arsenic, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Arsenic
+          shortUnit: $
         presentation:
           title_public: Arsenic unit value
       unit_value_asbestos_mine_constant_1998_usd_per_tonne:
@@ -1023,6 +1032,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of asbestos, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Asbestos
+          shortUnit: $
         presentation:
           title_public: Asbestos unit value
       unit_value_barite_mine_constant_1998_usd_per_tonne:
@@ -1031,6 +1043,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [barite](#dod:barite), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Barite
+          shortUnit: $
         presentation:
           title_public: Barite unit value
       unit_value_bauxite_mine_constant_1998_usd_per_tonne:
@@ -1039,6 +1054,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [bauxite](#dod:bauxite), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Bauxite
+          shortUnit: $
         presentation:
           title_public: Bauxite unit value
       unit_value_beryllium_mine_constant_1998_usd_per_tonne:
@@ -1047,6 +1065,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [beryllium](#dod:beryllium), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Beryllium
+          shortUnit: $
         presentation:
           title_public: Beryllium unit value
       unit_value_bismuth_mine_constant_1998_usd_per_tonne:
@@ -1055,6 +1076,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [bismuth](#dod:bismuth), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Bismuth
+          shortUnit: $
         presentation:
           title_public: Bismuth unit value
       unit_value_boron_mine_constant_1998_usd_per_tonne:
@@ -1063,6 +1087,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [boron](#dod:boron), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Boron
+          shortUnit: $
         presentation:
           title_public: Boron unit value
       unit_value_cadmium_refinery_constant_1998_usd_per_tonne:
@@ -1071,6 +1098,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [cadmium](#dod:cadmium), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Cadmium
+          shortUnit: $
         presentation:
           title_public: Refined cadmium unit value
       unit_value_cement_processing_constant_1998_usd_per_tonne:
@@ -1079,6 +1109,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of cement, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Cement
+          shortUnit: $
         presentation:
           title_public: Cement unit value
       # unit_value_chromium_mine_constant_1998_usd_per_tonne:
@@ -1087,6 +1120,9 @@ tables:
       #   short_unit: $/t
       #   description_short: Value of 1 tonne of chromium, in constant 1998 US$ per tonne.
       #   description_key: *unit-value-description-key
+      #   display:
+      #     name: Chromium
+      #     shortUnit: $
       #   presentation:
       #     title_public: Chromium unit value
       unit_value_cobalt_value_constant_1998_usd_per_tonne:
@@ -1095,6 +1131,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [cobalt](#dod:cobalt), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Cobalt
+          shortUnit: $
         presentation:
           title_public: Cobalt unit value
       unit_value_copper_mine_constant_1998_usd_per_tonne:
@@ -1103,6 +1142,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of copper, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Copper
+          shortUnit: $
         presentation:
           title_public: Copper unit value
       unit_value_diamond_mine_and_synthetic__industrial_constant_1998_usd_per_tonne:
@@ -1111,6 +1153,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of diamond, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Diamond
+          shortUnit: $
         presentation:
           title_public: Diamond unit value
       unit_value_feldspar_mine_constant_1998_usd_per_tonne:
@@ -1119,6 +1164,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [feldspar](#dod:feldspar), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Feldspar
+          shortUnit: $
         presentation:
           title_public: Feldspar unit value
       unit_value_fluorspar_mine_constant_1998_usd_per_tonne:
@@ -1127,6 +1175,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [fluorspar](#dod:fluorspar), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Fluorspar
+          shortUnit: $
         presentation:
           title_public: Fluorspar unit value
       unit_value_gallium_refinery_constant_1998_usd_per_tonne:
@@ -1135,6 +1186,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [gallium](#dod:gallium), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Gallium
+          shortUnit: $
         presentation:
           title_public: Refined gallium unit value
       unit_value_garnet_mine_constant_1998_usd_per_tonne:
@@ -1143,6 +1197,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [garnet](#dod:garnet), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Garnet
+          shortUnit: $
         presentation:
           title_public: Garnet unit value
       unit_value_germanium_refinery_constant_1998_usd_per_tonne:
@@ -1151,6 +1208,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [germanium](#dod:germanium), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Germanium
+          shortUnit: $
         presentation:
           title_public: Refined germanium unit value
       unit_value_gold_mine_constant_1998_usd_per_tonne:
@@ -1159,6 +1219,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of gold, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Gold
+          shortUnit: $
         presentation:
           title_public: Gold unit value
       unit_value_graphite_mine_constant_1998_usd_per_tonne:
@@ -1167,6 +1230,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [graphite](#dod:graphite), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Graphite
+          shortUnit: $
         presentation:
           title_public: Graphite unit value
       unit_value_gypsum_mine_constant_1998_usd_per_tonne:
@@ -1175,6 +1241,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [gypsum](#dod:gypsum), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Gypsum
+          shortUnit: $
         presentation:
           title_public: Gypsum unit value
       unit_value_helium_mine_constant_1998_usd_per_tonne:
@@ -1183,6 +1252,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of helium, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Helium
+          shortUnit: $
         presentation:
           title_public: Helium unit value
       unit_value_iron_ore_mine__crude_ore_constant_1998_usd_per_tonne:
@@ -1191,6 +1263,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of iron ore, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Iron ore
+          shortUnit: $
         presentation:
           title_public: Iron ore (crude ore) unit value
       unit_value_iron_smelter__pig_iron_constant_1998_usd_per_tonne:
@@ -1199,6 +1274,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of iron, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Iron
+          shortUnit: $
         presentation:
           title_public: Iron unit value
       unit_value_lead_mine_constant_1998_usd_per_tonne:
@@ -1207,6 +1285,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of lead, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Lead
+          shortUnit: $
         presentation:
           title_public: Lead unit value
       unit_value_lime_processing_constant_1998_usd_per_tonne:
@@ -1215,14 +1296,31 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of lime, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Lime
+          shortUnit: $
         presentation:
           title_public: Lime unit value
+      unit_value_lithium_mine_constant_1998_usd_per_tonne:
+        title: unit value|Lithium|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of lithium, in constant 1998 US$ per tonne.
+        description_key: *unit-value-description-key
+        display:
+          name: Lithium
+          shortUnit: $
+        presentation:
+          title_public: Lithium unit value
       unit_value_magnesium_compounds_mine_constant_1998_usd_per_tonne:
         title: unit value|Magnesium compounds|Mine|constant 1998 US$ per tonne
         unit: constant 1998 US$ per tonne
         short_unit: $/t
         description_short: Value of 1 tonne of magnesium compounds, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Magnesium compounds
+          shortUnit: $
         presentation:
           title_public: Magnesium compounds unit value
       unit_value_magnesium_metal_smelter_constant_1998_usd_per_tonne:
@@ -1231,6 +1329,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of magnesium metal, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Magnesium metal
+          shortUnit: $
         presentation:
           title_public: Magnesium metal unit value
       unit_value_manganese_mine_constant_1998_usd_per_tonne:
@@ -1239,6 +1340,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of manganese, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Manganese
+          shortUnit: $
         presentation:
           title_public: Manganese unit value
       unit_value_mercury_mine_constant_1998_usd_per_tonne:
@@ -1247,6 +1351,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of mercury, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Mercury
+          shortUnit: $
         presentation:
           title_public: Mercury unit value
       unit_value_mica_mine__scrap_and_flake_constant_1998_usd_per_tonne:
@@ -1255,6 +1362,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [mica](#dod:mica) (scrap and flake), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Mica (scrap and flake)
+          shortUnit: $
         presentation:
           title_public: Mica (scrap and flake) unit value
       unit_value_mica_mine__sheet_constant_1998_usd_per_tonne:
@@ -1263,6 +1373,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [mica](#dod:mica) (sheet), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Mica (sheet)
+          shortUnit: $
         presentation:
           title_public: Mica (sheet) unit value
       unit_value_molybdenum_mine_constant_1998_usd_per_tonne:
@@ -1271,6 +1384,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [molybdenum](#dod:molybdenum), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Molybdenum
+          shortUnit: $
         presentation:
           title_public: Molybdenum unit value
       unit_value_nickel_mine_constant_1998_usd_per_tonne:
@@ -1279,6 +1395,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of nickel, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Nickel
+          shortUnit: $
         presentation:
           title_public: Nickel unit value
       unit_value_niobium_mine_constant_1998_usd_per_tonne:
@@ -1287,6 +1406,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [niobium](#dod:niobium), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Niobium
+          shortUnit: $
         presentation:
           title_public: Niobium unit value
       unit_value_nitrogen_fixed_ammonia_constant_1998_usd_per_tonne:
@@ -1295,6 +1417,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of nitrogen, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Nitrogen
+          shortUnit: $
         presentation:
           title_public: Nitrogen unit value
       unit_value_phosphate_rock_mine_constant_1998_usd_per_tonne:
@@ -1303,14 +1428,31 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of phosphate rock, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Phosphate rock
+          shortUnit: $
         presentation:
           title_public: Phosphate rock unit value
+      unit_value_rare_earths_mine_constant_1998_usd_per_tonne:
+        title: unit value|Rare earths|Mine|constant 1998 US$ per tonne
+        unit: constant 1998 US$ per tonne
+        short_unit: $/t
+        description_short: Value of 1 tonne of rare earths, in constant 1998 US$ per tonne.
+        description_key: *unit-value-description-key
+        display:
+          name: Rare earths
+          shortUnit: $
+        presentation:
+          title_public: Rare earths unit value
       unit_value_salt_mine_constant_1998_usd_per_tonne:
         title: unit value|Salt|Mine|constant 1998 US$ per tonne
         unit: constant 1998 US$ per tonne
         short_unit: $/t
         description_short: Value of 1 tonne of salt, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Salt
+          shortUnit: $
         presentation:
           title_public: Salt unit value
       unit_value_sand_and_gravel_mine__construction_constant_1998_usd_per_tonne:
@@ -1319,6 +1461,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of sand and gravel, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Sand and gravel
+          shortUnit: $
         presentation:
           title_public: Sand and gravel (construction) unit value
       unit_value_sand_and_gravel_mine__industrial_constant_1998_usd_per_tonne:
@@ -1327,6 +1472,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of sand and gravel, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Sand and gravel
+          shortUnit: $
         presentation:
           title_public: Sand and gravel (industrial) unit value
       unit_value_selenium_refinery_constant_1998_usd_per_tonne:
@@ -1335,6 +1483,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of selenium, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Selenium
+          shortUnit: $
         presentation:
           title_public: Refined selenium unit value
       unit_value_silicon_processing_constant_1998_usd_per_tonne:
@@ -1343,6 +1494,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of silicon, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Silicon
+          shortUnit: $
         presentation:
           title_public: Silicon unit value
       unit_value_silver_mine_constant_1998_usd_per_tonne:
@@ -1351,6 +1505,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of silver, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Silver
+          shortUnit: $
         presentation:
           title_public: Silver unit value
       unit_value_steel_processing__crude_constant_1998_usd_per_tonne:
@@ -1359,6 +1516,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of steel, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Steel
+          shortUnit: $
         presentation:
           title_public: Steel unit value
       unit_value_strontium_mine_constant_1998_usd_per_tonne:
@@ -1367,6 +1527,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [strontium](#dod:strontium), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Strontium
+          shortUnit: $
         presentation:
           title_public: Strontium unit value
       unit_value_sulfur_processing_constant_1998_usd_per_tonne:
@@ -1375,6 +1538,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of sulfur, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Sulfur
+          shortUnit: $
         presentation:
           title_public: Sulfur unit value
       unit_value_talc_and_pyrophyllite_mine_constant_1998_usd_per_tonne:
@@ -1383,6 +1549,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of talc and pyrophyllite, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Talc and pyrophyllite
+          shortUnit: $
         presentation:
           title_public: Talc and pyrophyllite unit value
       unit_value_tantalum_mine_constant_1998_usd_per_tonne:
@@ -1391,6 +1560,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [tantalum](#dod:tantalum), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Tantalum
+          shortUnit: $
         presentation:
           title_public: Tantalum unit value
       unit_value_tin_mine_constant_1998_usd_per_tonne:
@@ -1399,6 +1571,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of tin, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Tin
+          shortUnit: $
         presentation:
           title_public: Tin unit value
       unit_value_tungsten_mine_constant_1998_usd_per_tonne:
@@ -1407,6 +1582,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [tungsten](#dod:tungsten), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Tungsten
+          shortUnit: $
         presentation:
           title_public: Tungsten unit value
       unit_value_vanadium_mine_constant_1998_usd_per_tonne:
@@ -1415,6 +1593,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of [vanadium](#dod:vanadium), in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Vanadium
+          shortUnit: $
         presentation:
           title_public: Vanadium unit value
       unit_value_zinc_mine_constant_1998_usd_per_tonne:
@@ -1423,6 +1604,9 @@ tables:
         short_unit: $/t
         description_short: Value of 1 tonne of zinc, in constant 1998 US$ per tonne.
         description_key: *unit-value-description-key
+        display:
+          name: Zinc
+          shortUnit: $
         presentation:
           title_public: Zinc unit value
       share_of_global_production_aluminum_smelter_tonnes:
