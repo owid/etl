@@ -222,6 +222,27 @@ steps:
   data://grapher/un/2024-03-14/un_wpp_most:
     - data://garden/un/2024-03-14/un_wpp_most
 
+  # Survivorship ages (HMD-derived)
+  data://garden/demography/2024-12-02/survivor_percentiles:
+    - data://garden/hmd/2024-12-01/hmd
+  data://grapher/demography/2024-12-02/survivor_percentiles:
+    - data://garden/demography/2024-12-02/survivor_percentiles
+
+  # UN WPP Life Tables
+  data://meadow/un/2024-12-02/un_wpp_lt:
+    - snapshot://un/2024-12-02/un_wpp_lt_m.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_all.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_f.csv
+  data://garden/un/2024-12-02/un_wpp_lt:
+    - data://meadow/un/2024-12-02/un_wpp_lt
+
+  # UN WPP + HMD Life Tables
+  data://garden/demography/2024-12-03/life_tables:
+    - data://garden/hmd/2024-12-01/hmd
+    - data://garden/un/2024-12-02/un_wpp_lt
+  data://grapher/demography/2024-12-03/life_tables:
+    - data://garden/demography/2024-12-03/life_tables
+
   ########################################################################
   # Fertility                                                            #
   ########################################################################
@@ -247,24 +268,3 @@ steps:
     - data://meadow/demography/2024-11-26/multiple_births
   data://grapher/demography/2024-11-26/multiple_births:
     - data://garden/demography/2024-11-26/multiple_births
-
-  # Survivorship ages (HMD-derived)
-  data://garden/demography/2024-12-02/survivor_percentiles:
-    - data://garden/hmd/2024-12-01/hmd
-  data://grapher/demography/2024-12-02/survivor_percentiles:
-    - data://garden/demography/2024-12-02/survivor_percentiles
-
-  # UN WPP Life Tables
-  data://meadow/un/2024-12-02/un_wpp_lt:
-    - snapshot://un/2024-12-02/un_wpp_lt_m.csv
-    - snapshot://un/2024-12-02/un_wpp_lt_all.csv
-    - snapshot://un/2024-12-02/un_wpp_lt_f.csv
-  data://garden/un/2024-12-02/un_wpp_lt:
-    - data://meadow/un/2024-12-02/un_wpp_lt
-
-  # UN WPP + HMD Life Tables
-  data://garden/demography/2024-12-03/life_tables:
-    - data://garden/hmd/2024-11-27/hmd
-    - data://garden/un/2024-12-02/un_wpp_lt
-  data://grapher/demography/2024-12-03/life_tables:
-    - data://garden/demography/2024-12-03/life_tables
