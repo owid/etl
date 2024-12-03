@@ -142,6 +142,7 @@ COMMODITY_MAPPING = {
     ("Pumice and Pumicite", "Total"): ("Pumice and pumicite", "Mine"),
     ("Quartz crystal", "Total"): None,
     ("Rare earths", "Total"): ("Rare earths", "Mine"),
+    ("Rhenium", "Total"): ("Rhenium", "Mine"),
     ("Salt", "Total"): ("Salt", "Mine"),
     ("Selenium", "Total"): ("Selenium", "Refinery"),
     ("Silicon", "Total"): ("Silicon", "Processing"),
@@ -176,8 +177,6 @@ COMMODITY_MAPPING = {
     ("Zinc", "Total"): ("Zinc", "Mine"),
     # In USGS current data, "Hafnium" is not reported, only "Zirconium and Hafnium".
     ("Zirconium", "Total"): None,
-    # TODO: Include the relevant ones from below and sort alphabetically with the ones above.
-    ("Rhenium", "Total"): None,
 }
 
 # Units can either be "metric tonnes" or "metric tonnes of gross weight".

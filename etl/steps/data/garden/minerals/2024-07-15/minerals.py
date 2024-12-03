@@ -237,10 +237,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
 ]
 # Columns to plot with the individual data sources differentiated.
 PLOT_TO_COMPARE_DATA_SOURCES = [
-    # "production|Chromium|Mine|tonnes",
-    # 'production|Titanium|Mine, ilmenite|tonnes',
-    # 'production|Helium|Mine|tonnes',
-    # "production|Potash|Mine|tonnes",
+    # "production|Rhenium|Mine|tonnes",
 ]
 
 
