@@ -92,14 +92,7 @@ def run(dest_dir: str) -> None:
     tb_top["country"] = tb_top["urban_center_name"] + " (" + tb_top["country"] + ")"
     tb_top = tb_top.drop(columns=["urban_center_name"])
 
-    # Number of people living in cities over 1 million people
-    tb["urban_pop_1m"] = tb["urban_pop"].where(tb["urban_pop"] > 1 * 10**6, 0)
-
-    # Group by country and calculate the total population of urban centers with population greater than 1 million
-    tb_grouped = tb.groupby(["country", "year"])["urban_pop_1m"].sum().reset_index()
-
     tb = pr.merge(tb_capitals, tb_top, on=["country", "year"], how="outer")
-    tb = pr.merge(tb, tb_grouped, on=["country", "year"], how="outer")
 
     tb = tb.format(["country", "year"])
 
