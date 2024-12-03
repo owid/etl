@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("life_tables")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["life_tables"].reset_index()
+    tb = ds_meadow.read("life_tables")
 
     #
     # Process data.
@@ -33,19 +33,16 @@ def run(dest_dir: str) -> None:
         .astype(int)
     )
 
-    # Keep only 1x1
+    # Keep only period data broken down by sex
     paths.log.info("keep only type='period' and sex in {'male', 'female'}")
-    tb = tb[(tb["type"] == "period") & (tb["sex"].isin(["female", "male"]))].drop(columns=["type"])
+    tb = tb.loc[(tb["type"] == "period") & (tb["sex"].isin(["female", "male"]))].drop(columns=["type"])
 
     # Add phi
     paths.log.info("add phi parameter")
     tb = make_table_phi(tb)
 
-    # Change short name
-    tb.metadata.short_name = paths.short_name
-
     # Set index
-    tb = tb.set_index(["location", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.
@@ -62,7 +59,7 @@ def run(dest_dir: str) -> None:
 def make_table_phi(tb: Table) -> Table:
     """Estimate phi.
 
-    Phi is defined as the outsurvival pronability of males (i.e. probability that a male will live longer than a female in a given population).
+    Phi is defined as the outsurvival probability of males (i.e. probability that a male will live longer than a female in a given population).
 
     This is estimated using Equation 2 from https://bmjopen.bmj.com/content/bmjopen/12/8/e059964.full.pdf.
 
@@ -79,12 +76,15 @@ def make_table_phi(tb: Table) -> Table:
 
     # Pivot table to align males and females for the different metrics
     tb = tb.pivot(
-        index=["location", "year", "age"], columns="sex", values=["number_survivors", "number_deaths"]
+        index=["country", "year", "age"], columns="sex", values=["number_survivors", "number_deaths"]
     ).reset_index()
+
+    # Order
+    tb = tb.sort_values(["country", "year", "age"])
 
     # Shift one up (note the subindex in the equation 'x-n', in our case n=1 (age group width))
     column = ("number_survivors", "male")
-    tb[column] = tb.groupby(["location", "year"])[[column]].shift(-1).squeeze()
+    tb[column] = tb.groupby(["country", "year"])[[column]].shift(-1).squeeze()
 
     # Estimate phi_i (i.e. Eq 2 for a specific age group, without the summation)
     tb["phi"] = (
@@ -92,7 +92,7 @@ def make_table_phi(tb: Table) -> Table:
         + tb["number_deaths"]["female"] * tb["number_deaths"]["male"] / 2
     )
     # Apply the summation from Eq 2
-    tb = tb.groupby(["location", "year"], as_index=False, observed=True)[[("phi", "")]].sum()
+    tb = tb.groupby(["country", "year"], as_index=False, observed=True)[[("phi", "")]].sum()
 
     # Scale
     tb["phi"] = (tb["phi"] * 100).round(2)

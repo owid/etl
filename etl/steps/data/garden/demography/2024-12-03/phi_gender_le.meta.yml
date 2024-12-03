@@ -5,7 +5,6 @@ definitions:
       topic_tags:
         - Life Expectancy
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -38,4 +37,4 @@ tables:
           grapher_config:
             hasMapTab: true
           attribution: |-
-            Human Mortality Database (2023); UN - World Population Prospects (2022); Bergeron-Boucher et al. (2022)
+            Human Mortality Database (2024); UN, World Population Prospects (2024); Bergeron-Boucher et al. (2022)
