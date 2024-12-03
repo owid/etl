@@ -245,9 +245,23 @@ steps:
   data://grapher/demography/2024-11-26/multiple_births:
     - data://garden/demography/2024-11-26/multiple_births
 
-  # OMM: HFD + UN WPP
+  # OMM: Fertility Rate -- HFD + UN WPP
   data://garden/demography/2024-12-03/fertility_rate:
     - data://garden/hmd/2024-11-19/hfd
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/demography/2024-12-03/fertility_rate:
     - data://garden/demography/2024-12-03/fertility_rate
+
+  # OMM: Mean Age at Birth -- HFD + UN WPP
+  # data://garden/demography/2024-12-03/mean_age_birth:
+  #   - data://garden/hmd/2024-11-19/hfd
+  #   - data://garden/un/2024-07-12/un_wpp
+  # data://grapher/demography/2024-12-03/mean_age_birth:
+  #   - data://garden/demography/2024-12-03/mean_age_birth
+
+  # OMM: Birth rate -- HFD + UN WPP
+  data://garden/demography/2024-12-03/birth_rate:
+    - data://garden/hmd/2024-12-01/hmd
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/demography/2024-12-03/birth_rate:
+    - data://garden/demography/2024-12-03/birth_rate
