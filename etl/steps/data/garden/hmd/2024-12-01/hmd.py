@@ -162,6 +162,7 @@ def process_table(tb, col_index, sex_expected=None, callback_post=None):
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
     )
 
     # Make year column integer
