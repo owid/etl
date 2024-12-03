@@ -74,13 +74,16 @@ steps:
     - data://meadow/urbanization/2024-10-14/ghsl_degree_of_urbanisation
     - data://garden/wb/2024-07-29/income_groups
     - data://garden/regions/2023-01-01/regions
-
-  # GHSL urban centers.
   data://grapher/urbanization/2024-10-14/ghsl_degree_of_urbanisation:
     - data://garden/urbanization/2024-10-14/ghsl_degree_of_urbanisation
+
+  # GHSL urban centers.
   data://meadow/urbanization/2024-12-02/ghsl_urban_centers:
     - snapshot://urbanization/2024-12-02/ghsl_urban_centers.xlsx
   data://garden/urbanization/2024-12-02/ghsl_urban_centers:
     - data://meadow/urbanization/2024-12-02/ghsl_urban_centers
+    - data://meadow/urbanization/2024-10-14/ghsl_degree_of_urbanisation
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
   data://grapher/urbanization/2024-12-02/ghsl_urban_centers:
     - data://garden/urbanization/2024-12-02/ghsl_urban_centers

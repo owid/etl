@@ -19,13 +19,20 @@ definitions:
   desc_short_density_top_100: &desc_short_density_top_100 |-
     The number of people per km² of land area for cities ranked among the top 100 most populous in either 1975 or 2020.
 
-  desc_processing_density:  &desc_processing_density |-
-    Population density was calculated by dividing the population of the city by the total area it covers, providing a measure of the number of people living in each km².
-
   desc_short_pop_capital: &desc_short_pop_capital |-
     The total number of people living in the country's capital city.
   desc_short_pop_top_100: &desc_short_pop_top_100 |-
     The total number of people living in cities ranked among the top 100 most populous in either 1975 or 2020.
+  desc_short_pop_1mil: &desc_short_pop_1mil |-
+    The total number of people living in cities with more than 1 million inhabitants.
+
+  desc_short_1m_total : &desc_short_1m_total |-
+    The percentage of the total population living in cities with more than 1 million inhabitants.
+  desc_short_1m_urb: &desc_short_1m_urb |-
+    The percentage of the urban population living in cities with more than 1 million inhabitants.
+
+  desc_processing_density:  &desc_processing_density |-
+    Population density was calculated by dividing the population of the city by the total area it covers, providing a measure of the number of people living in each km².
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -91,3 +98,50 @@ tables:
         display:
           isProjection: true
 
+     urban_pop_1m_estimates:
+        title: Population of cities with more than 1 million people
+        unit: 'people'
+        description_short: *desc_short_pop_1mil
+
+     urban_pop_1m_projections:
+        title: Population of cities with more than 1 million people (projected)
+        unit: 'people'
+        description_short: *desc_short_pop_1mil
+        display:
+          isProjection: true
+
+     share_1m_total_estimates:
+        title: Share of the total population living in cities with more than 1 million people
+        unit: '%'
+        short_unit: '%'
+        description_short: *desc_short_1m_total
+        display:
+          isProjection: false
+          numDecimalPlaces: 1
+
+     share_1m_total_projections:
+        title: Share of the total population living in cities with more than 1 million people (projected)
+        unit: '%'
+        short_unit: '%'
+        description_short: *desc_short_1m_total
+        display:
+          isProjection: true
+          numDecimalPlaces: 1
+
+     share_1m_urban_estimates:
+        title: Share of the urban population living in cities with more than 1 million people
+        unit: '%'
+        short_unit: '%'
+        description_short: *desc_short_1m_urb
+        display:
+          isProjection: false
+          numDecimalPlaces: 1
+
+     share_1m_urban_projections:
+        title: Share of the urban population living in cities with more than 1 million people (projected)
+        unit: '%'
+        short_unit: '%'
+        description_short: *desc_short_1m_urb
+        display:
+          isProjection: true
+          numDecimalPlaces: 1
