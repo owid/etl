@@ -8,11 +8,14 @@ paths = PathFinder(__file__)
 # Define files directory
 FILES_DIRECTORY = "FR_WLD_2024_198/Reproducibility package/Chapter 1/1-data/raw/forecasts"
 
+# Define index columns
+INDEX_COLUMNS = ["country", "year", "povertyline", "scenario"]
+
 # Define table parameters
 TABLE_PARAMETERS = {
-    "country": {"file": "FGTcountry_1990_2050_3pr24.dta", "index": ["country", "year", "povertyline", "scenario"]},
-    "region": {"file": "FGTregion_1990_2050_3pr24.dta", "index": ["region_pip", "year", "povertyline", "scenario"]},
-    "global": {"file": "FGTglobal_1990_2050_3pr24.dta", "index": ["year", "povertyline", "scenario"]},
+    "country": {"file": "FGTcountry_1990_2050_3pr24.dta"},
+    "region": {"file": "FGTregion_1990_2050_3pr24.dta"},
+    "global": {"file": "FGTglobal_1990_2050_3pr24.dta"},
 }
 
 
@@ -32,11 +35,17 @@ def run(dest_dir: str) -> None:
         #
         # Process data.
         #
+        # Rename and add columns
+        if table == "region":
+            tb = tb.rename(columns={"region_pip": "country"})
+        elif table == "global":
+            tb["country"] = "World"
+
         # Remove duplicates in the data
-        tb = tb.drop_duplicates(subset=table_config["index"])
+        tb = tb.drop_duplicates(subset=INDEX_COLUMNS)
 
         # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-        tb = tb.format(keys=table_config["index"], short_name=table)
+        tb = tb.format(keys=INDEX_COLUMNS, short_name=table)
 
         # Append table to list.
         tables.append(tb)
