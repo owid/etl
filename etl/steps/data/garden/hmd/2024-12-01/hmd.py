@@ -162,6 +162,7 @@ def process_table(tb, col_index, sex_expected=None, callback_post=None):
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
     )
 
     # Make year column integer
@@ -205,7 +206,7 @@ def make_table_diffs_ratios(tb: Table) -> Table:
         )
         .assign(
             life_expectancy_fm_diff=lambda df: df[("life_expectancy", "female")] - df[("life_expectancy", "male")],
-            life_expectancy_mf_ratio=lambda df: df[("life_expectancy", "male")] / df[("life_expectancy", "female")],
+            life_expectancy_fm_ratio=lambda df: df[("life_expectancy", "female")] / df[("life_expectancy", "male")],
             central_death_rate_mf_ratio=lambda df: df[("central_death_rate", "male")]
             / df[("central_death_rate", "female")],
         )
