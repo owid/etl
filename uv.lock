@@ -1088,7 +1088,7 @@ requires-dist = [
     { name = "fastapi", marker = "extra == 'api'", specifier = ">=0.109.0" },
     { name = "fasteners", specifier = ">=0.19" },
     { name = "frictionless", extras = ["pandas"], specifier = ">=5.0.3" },
-    { name = "fsspec", specifier = "==2022.11.0" },
+    { name = "fsspec", specifier = ">=2022.11.0" },
     { name = "geographiclib", marker = "extra == 'wizard'", specifier = ">=2.0" },
     { name = "geopandas", specifier = ">=0.14.1" },
     { name = "gitpython", specifier = ">=3.1.30" },

@@ -6,8 +6,8 @@ steps:
     - github://open-numbers/ddf--open_numbers--world_development_indicators
 
   # Datasets we don't use anywhere. Feel free to uncomment them if you need them.
-  data://open_numbers/open_numbers/latest/bp__energy:
-    - github://open-numbers/ddf--bp--energy
+  # data://open_numbers/open_numbers/latest/bp__energy:
+  #   - github://open-numbers/ddf--bp--energy
   # data://open_numbers/open_numbers/latest/cait__historical_emissions:
   #   - github://open-numbers/ddf--cait--historical_emissions
   # data://open_numbers/open_numbers/latest/cdiac__co2:
