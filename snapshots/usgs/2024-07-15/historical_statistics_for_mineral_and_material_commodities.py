@@ -32,26 +32,24 @@ def get_table_of_commodities_and_urls(url_main: str) -> pd.DataFrame:
 
     # Extract the rows
     data = []
-    for row in table.find_all("tr")[2:]:  # type: ignore
+    for row in table.find_all("tr")[2:]:
         cols = row.find_all("td")
-        if len(cols) >= 6:  # Ensure there are enough columns
-            commodity = cols[0].get_text(strip=True)
-            supply_demand_url = cols[1].find("a")["href"] if cols[1].find("a") else "NA"
-            supply_demand_year_update = cols[2].get_text(strip=True)
-            end_use_url = cols[4].find("a")["href"] if cols[4].find("a") else "NA"
-            end_use_year_update = cols[5].get_text(strip=True)
+        commodity = cols[0].get_text(strip=True) if len(cols) > 0 else "NA"
+        supply_demand_url = cols[1].find("a")["href"] if len(cols) > 1 and cols[1].find("a") else "NA"
+        supply_demand_year_update = cols[2].get_text(strip=True) if len(cols) > 2 else "NA"
+        end_use_url = cols[4].find("a")["href"] if len(cols) > 4 and cols[4].find("a") else "NA"
+        end_use_year_update = cols[5].get_text(strip=True) if len(cols) > 5 else "NA"
 
-            # Add row to data if urls are not 'NA'
-            if not supply_demand_url.lower().endswith(".pdf") and not end_use_url.lower().endswith(".pdf"):
-                data.append(
-                    [
-                        commodity,
-                        supply_demand_url if not supply_demand_url.lower().endswith(".pdf") else "NA",
-                        supply_demand_year_update,
-                        end_use_url if not end_use_url.lower().endswith(".pdf") else "NA",
-                        end_use_year_update,
-                    ]
-                )
+        # Add row to data regardless of whether URLs are present
+        data.append(
+            [
+                commodity,
+                supply_demand_url,
+                supply_demand_year_update,
+                end_use_url,
+                end_use_year_update,
+            ]
+        )
 
     # Create a DataFrame with the fetched data.
     df = pd.DataFrame(
@@ -105,15 +103,6 @@ def _fetch_file_url_from_media_path(media_path: str) -> Optional[str]:
     return data_file_url  # type: ignore
 
 
-def _download_file(url: str, dest_folder: Path, commodity: str) -> None:
-    response = requests.get(url)
-    file_path = dest_folder / f"{underscore(commodity)}.xlsx"
-    file_path.write_bytes(response.content)
-
-    # Wait before sending next query.
-    sleep(TIME_BETWEEN_QUERIES)
-
-
 def download_all_files(df: pd.DataFrame, snapshot_path: Path) -> None:
     # Ensure the output folder exists.
     snapshot_path.parent.mkdir(exist_ok=True, parents=True)
@@ -129,7 +118,7 @@ def download_all_files(df: pd.DataFrame, snapshot_path: Path) -> None:
         end_use_dir.mkdir(parents=True, exist_ok=True)
 
         # Download files for all commodities.
-        for index, row in tqdm(df.iterrows(), total=df.shape[0], desc="Downloading files"):
+        for _, row in tqdm(df.iterrows(), total=df.shape[0], desc="Downloading files"):
             if row["supply_demand_url"] != "NA":
                 download_file_from_url(
                     url=row["supply_demand_url"],
@@ -167,11 +156,12 @@ def main(upload: bool) -> None:
     # NOTE: This may take a few minutes.
     df = get_table_of_commodities_and_urls(url_main=snap.metadata.origin.url_main)  # type: ignore
 
-    # Download the supply-demand statistics file and end-use statistics file for each commodity.
+    # Download the supply-demand statistics file and end-use statistics file for each commodity in a temporary folder.
+    # A compressed file will be created at the end in the corresponding data/snapshots/ folder.
     # NOTE: This may take a few minutes.
     download_all_files(df=df, snapshot_path=snap.path)
 
-    # Upload file to S3.
+    # Upload zip file to S3.
     snap.create_snapshot(upload=upload, filename=snap.path)
 
 

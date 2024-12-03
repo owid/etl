@@ -13,7 +13,7 @@ import datetime as dt
 import hashlib
 import tempfile
 import warnings
-from multiprocessing import Pool
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Dict, List, Tuple, cast
 
@@ -58,9 +58,9 @@ def run(dest_dir: str) -> None:
     resource_map = remap_names(package.resources)
 
     # copy tables one by one
-    with Pool() as pool:
+    with ThreadPoolExecutor() as executor:
         args = [(ds, repo, short_name, resources) for short_name, resources in resource_map.items()]
-        pool.starmap(add_resource, args)
+        executor.map(lambda p: add_resource(*p), args)
 
 
 def add_resource(

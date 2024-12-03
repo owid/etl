@@ -173,6 +173,7 @@ tables:
         unit: deaths
         description_short: |-
           <% set estimate = "high" %>
+          <% set per_capita = "" %>
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
 
@@ -181,6 +182,7 @@ tables:
         unit: deaths
         description_short: |-
           <% set estimate = "low" %>
+          <% set per_capita = "" %>
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
 
@@ -189,6 +191,7 @@ tables:
         unit: deaths
         description_short: |-
           <% set estimate = "best" %>
+          <% set per_capita = "" %>
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
 
@@ -197,6 +200,7 @@ tables:
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "high" %>
+          <% set per_capita = ", per 100,000 people" %>
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
         display:
@@ -207,6 +211,7 @@ tables:
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "low" %>
+          <% set per_capita = ", per 100,000 people" %>
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
         display:
@@ -217,6 +222,7 @@ tables:
         unit: deaths per 100,000 people
         description_short: |-
           <% set estimate = "best" %>
+          <% set per_capita = ", per 100,000 people" %>
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
 
@@ -227,6 +233,7 @@ tables:
         title: Number of ongoing conflicts
         unit: conflicts
         description_short: |-
+          <% set per_capita = "" %>
           {definitions.number_ongoing_conflicts.description_short}.
         description_key: *description_key_ongoing
 
@@ -234,6 +241,7 @@ tables:
         title: Number of ongoing conflicts per state
         unit: conflicts per state
         description_short: |-
+          <% set per_capita = "" %>
           The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
         description_key: *description_key_ongoing
         display:
@@ -243,6 +251,7 @@ tables:
         title: Number of ongoing conflicts per state-pair
         unit: conflicts per state-pair
         description_short: |-
+          <% set per_capita = "" %>
           The number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_ongoing_conflicts.description_short}
         description_key: *description_key_ongoing
         display:
@@ -255,6 +264,7 @@ tables:
         title: Number of new conflicts
         unit: conflicts
         description_short: |-
+          <% set per_capita = "" %>
           {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
 
@@ -262,6 +272,7 @@ tables:
         title: Number of new conflicts per state
         unit: conflicts per state
         description_short: |-
+          <% set per_capita = "" %>
           The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
         display:
@@ -271,6 +282,7 @@ tables:
         title: Number of new conflicts per state-pair
         unit: conflicts per state-pair
         description_short: |-
+          <% set per_capita = "" %>
           The number of conflicts divided by the number of all state-pairs. This accounts for the changing number of states over time. {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
         display:
