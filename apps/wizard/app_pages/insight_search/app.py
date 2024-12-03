@@ -117,8 +117,11 @@ if input_string or (input_authors != []):
         st.warning("Please enter at least 3 characters or one author.")
     else:
         # Get the sorted DIs.
-        sorted_dis = emb.get_sorted_documents_by_similarity(
-            MODEL, input_string, insights=insights, embeddings=embeddings
+        sorted_dis = emb.get_sorted_documents_by_similarity(  # type: ignore
+            MODEL,
+            input_string,
+            insights=insights,  # type: ignore
+            embeddings=embeddings,  # type: ignore
         )
 
         # Display the sorted documents.

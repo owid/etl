@@ -1,7 +1,4 @@
-import json
-import os
-import re
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
 import pandas as pd
 import streamlit as st
@@ -37,16 +34,16 @@ def get_raw_data_indicators() -> pd.DataFrame:
         t.catalogPath,
         COALESCE(n_charts.n_charts, 0) as n_charts
     from t
-    -- TODO: uncomment me to include indicators without charts
-    -- left join n_charts on t.variableId = n_charts.variableId
-    join n_charts on t.variableId = n_charts.variableId
+    left join n_charts on t.variableId = n_charts.variableId
+    -- only indicators with charts
+    -- join n_charts on t.variableId = n_charts.variableId
     """
     df = read_sql(query)
 
     return df
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False, persist="disk", max_entries=1)
 def get_data_indicators() -> list[Dict[str, Any]]:
     with st.spinner("Loading data indicators..."):
         # Get the raw data indicators from the database.
@@ -54,4 +51,4 @@ def get_data_indicators() -> list[Dict[str, Any]]:
 
         indicators = df.to_dict(orient="records")
 
-    return indicators
+    return indicators  # type: ignore
