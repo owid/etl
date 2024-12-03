@@ -29,6 +29,10 @@ How to run the snapshot on the staging server:
 3. uv run pip install oda_data --upgrade
 4. uv run python "snapshots/one/2024-10-02/oda_data_extract.py"
 
+
+# To run it and save a log file:
+nohup uv run python "snapshots/one/2024-10-02/oda_data_extract.py" > output_one.log 2>&1 &
+
 """
 
 from pathlib import Path
@@ -55,6 +59,7 @@ END_YEAR = 2024
 # Save dictionaries of groups of donors and recipients
 DONOR_GROUPINGS = donor_groupings()
 RECIPIENT_GROUPINGS = recipient_groupings()
+
 
 # Define index + value columns
 BASIC_COLUMNS = [
@@ -199,7 +204,7 @@ def aggregate_donors(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.Da
         log.info(f"Aggregating {donor_group} donors...")
 
         # Check missing donors in the data
-        missing_donors = set(donor_composition.values()).difference(df_donors["donor_code"].unique())
+        missing_donors = set(donor_composition.keys()).difference(df_donors["donor_code"].unique())
 
         # Construct a list of names of missing donors from the codes of missing_donors
         missing_donors_names = [v for k, v in donor_composition.items() if k in missing_donors]
@@ -269,7 +274,7 @@ def aggregate_recipients(df: pd.DataFrame, columns_to_keep: List[str]) -> List[p
         log.info(f"Aggregating {recipient_group} recipients...")
 
         # Check missing recipients in the data
-        missing_recipients = set(recipient_composition.values()).difference(df_recipients["recipient_code"].unique())
+        missing_recipients = set(recipient_composition.keys()).difference(df_recipients["recipient_code"].unique())
 
         # Construct a list of names of missing recipients from the codes of missing_recipients
         missing_recipients = [v for k, v in recipient_composition.items() if k in missing_recipients]
