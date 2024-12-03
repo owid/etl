@@ -371,12 +371,12 @@ tables:
             - Life Expectancy
             - Gender Ratio
 
-      life_expectancy_mf_ratio:
+      life_expectancy_fm_ratio:
         title: Life expectancy ratio (f/m)
         unit: ""
         short_unit: ""
         description_short: |-
-          The ratio of the << type >> life expectancy (males to females) at age << age >>.
+          The ratio of the << type >> life expectancy (females to males) at age << age >>.
         processing_level: major
         description_key:
           - Higher values indicate longer life expectancy among females than males.
