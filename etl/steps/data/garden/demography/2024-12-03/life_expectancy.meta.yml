@@ -21,9 +21,9 @@ definitions:
     title_public: Life expectancy
     data_used: |-
       <%- if (age == 0) and (sex == 'total') -%>
-      Prior to 1950, we use HMD (2023) data combined with Zijdeman (2015). From 1950 onwards, we use UN WPP (2022) data. For old regional data, we use Riley (2005) estimates.
+      Prior to 1950, we use HMD (2024) data combined with Zijdeman (2015). From 1950 onwards, we use UN WPP (2024) data. For old regional data, we use Riley (2005) estimates.
       <%- else -%>
-      Prior to 1950, we use HMD (2023) data. From 1950 onwards, we use UN WPP (2022) data.
+      Prior to 1950, we use HMD (2024) data. From 1950 onwards, we use UN WPP (2024) data.
       <%- endif -%>
     point_1: |-
       Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
@@ -104,7 +104,7 @@ tables:
           grapher_config:
             selectedEntityNames: *sel_entities_americas
           attribution: |-
-            UN WPP (2022); HMD (2023); Zijdeman et al. (2015); Riley (2005)
+            UN WPP (2024); HMD (2024); Zijdeman et al. (2015); Riley (2005)
 
   # WITH PROJECTIONS
   life_expectancy_with_proj:
@@ -129,7 +129,7 @@ tables:
           grapher_config:
             selectedEntityNames: *sel_entities_americas
           attribution: |-
-            UN WPP (2022); HMD (2023); Zijdeman et al. (2015); Riley (2005)
+            UN WPP (2024); HMD (2024); Zijdeman et al. (2015); Riley (2005)
 
   # ONLY PROJECTIONS
   life_expectancy_only_proj:

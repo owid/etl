@@ -32,7 +32,6 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load datasets
     ## Life tables
     paths.log.info("reading dataset `life_tables`")
     ds_lt = paths.load_dataset("life_tables")
@@ -66,44 +65,40 @@ def run(dest_dir: str) -> None:
     tb["country"] = tb["country"].replace(REGION_MAPPING)
 
     # Add Americas
-    tb = add_americas(tb, ds_un)
+    # tb = add_americas(tb, ds_un)
 
     ## Check values
     paths.log.info("final checks")
-    _check_column_values(tb, "sex", {"all", "male", "female"})
+    _check_column_values(tb, "sex", {"total", "male", "female"})
     _check_column_values(tb, "age", {0, 10, 15, 25, 45, 65, 80})
 
-    ## Set index
-    tb = tb.format(["country", "year", "sex", "age"])
+    # Create three tables: (i) only historical values, (ii) only future values, (iii) all values
+    columns_index = ["country", "year", "sex", "age"]
 
-    ## Create tables (main, only projections, with projections)
-    tb_main = tb[tb.index.get_level_values("year") <= YEAR_ESTIMATE_LAST].copy()
-    tb_main.m.short_name = paths.short_name
+    ## (i) Main table (historical values)
+    tb_main = tb.loc[tb["year"] <= YEAR_ESTIMATE_LAST].copy()
 
-    tb_only_proj = tb[tb.index.get_level_values("year") > YEAR_ESTIMATE_LAST].copy()
-    tb_only_proj.m.short_name = paths.short_name + "_only_proj"
-    tb_only_proj.columns = [f"{col}_only_proj" for col in tb_only_proj.columns]
-    # Table only with projections should only contain UN as origin
-    origins = tb_main["life_expectancy"].m.origins
-    origins_un = [origin for origin in origins if origin.producer == "United Nations"]
+    ## (ii) Only projections
+    tb_only_proj = tb.loc[tb["year"] > YEAR_ESTIMATE_LAST].copy()
+    tb_only_proj = _add_suffix_to_indicators(tb_only_proj, "_only_proj", columns_index=columns_index)
+    ## Table only with projections should only contain UN as origin
+    origins_un = [origin for origin in tb_main["life_expectancy"].m.origins if origin.producer == "United Nations"]
     for col in tb_only_proj.columns:
         tb_only_proj[col].origins = origins_un
 
-    tb_with_proj = tb
+    ## (iii) All values
+    tb_with_proj = tb.copy()
     # Only preserve ages that have projections (i.e. data after YEAR_ESTIMATE_LAST)
-    columns_index = tb_with_proj.index.names
-    tb_with_proj = tb_with_proj.reset_index()
-    ages = set(tb_with_proj.loc[tb_with_proj["year"] > YEAR_ESTIMATE_LAST, "age"])
-    tb_with_proj = tb_with_proj.loc[tb_with_proj["age"].isin(ages)]
-    tb_with_proj = tb_with_proj.set_index(columns_index)
-    # Add metadata
-    tb_with_proj.m.short_name = paths.short_name + "_with_proj"
-    tb_with_proj.columns = [f"{col}_with_proj" for col in tb_with_proj.columns]
+    ages_with_projections = set(tb_with_proj.loc[tb_with_proj["year"] > YEAR_ESTIMATE_LAST, "age"].unique())
+    tb_with_proj = tb_with_proj.loc[tb_with_proj["age"].isin(ages_with_projections)]
+    # Column names
+    tb_with_proj = _add_suffix_to_indicators(tb_with_proj, "_with_proj", columns_index=columns_index)
 
+    # Format
     tables = [
-        tb_main,
-        tb_only_proj,
-        tb_with_proj,
+        tb_main.format(columns_index, short_name=paths.short_name),
+        tb_only_proj.format(columns_index, short_name=f"{paths.short_name}_only_proj"),
+        tb_with_proj.format(columns_index, short_name=f"{paths.short_name}_with_proj"),
     ]
 
     #
@@ -114,6 +109,13 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def _add_suffix_to_indicators(tb, suffix, columns_index=None):
+    if columns_index is None:
+        columns_index = []
+    tb.columns = [f"{col}{suffix}" if col not in columns_index else col for col in tb.columns]
+    return tb
 
 
 def process_lt(tb: Table) -> Table:
@@ -257,7 +259,7 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
     tb = pr.concat([tb_lt, tb_un], ignore_index=True, short_name="life_expectancy")
 
     # Separate LE at birth from at different ages
-    mask = (tb["age"] == 0) & (tb["sex"] == "all")
+    mask = (tb["age"] == 0) & (tb["sex"] == "total")
     tb_0 = tb.loc[mask]
     tb = tb.loc[~mask]
 
@@ -296,7 +298,7 @@ def add_americas(tb: Table, ds_population: Dataset) -> Table:
     """
     # filter only member countries of the region
     AMERICAS_MEMBERS = ["Northern America", "Latin America and the Caribbean"]
-    tb_am = tb.loc[(tb["country"].isin(AMERICAS_MEMBERS)) & (tb["sex"] == "all") & (tb["age"] == 0),].copy()
+    tb_am = tb.loc[(tb["country"].isin(AMERICAS_MEMBERS)) & (tb["sex"] == "total") & (tb["age"] == 0),].copy()
 
     # sanity check
     assert (
@@ -323,7 +325,7 @@ def add_americas(tb: Table, ds_population: Dataset) -> Table:
     # assign region name
     tb_am = tb_am.assign(
         country="Americas",
-        sex="all",
+        sex="total",
         age=0,
     )
 
@@ -352,18 +354,15 @@ def load_america_population_from_unwpp(ds_population: Dataset) -> Table:
     """
     # load population from WPP
     countries = ["Latin America and the Caribbean (UN)", "Northern America (UN)"]
-    tb = ds_population["population"].reset_index()
+    tb = ds_population.read("population")
     tb = tb.loc[
         (tb["country"].isin(countries))
-        & (tb["metric"] == "population")
         & (tb["sex"] == "all")
         & (tb["age"] == "all")
         & (tb["variant"].isin(["estimates", "medium"])),
-        ["country", "year", "value"],
+        ["country", "year", "population"],
     ]
     assert len(set(tb["country"])) == 2, f"Check that all of {countries} are in df"
     tb["country"] = tb["country"].replace(REGION_MAPPING).drop(columns="country")
 
-    # rename columns
-    tb = tb.rename(columns={"value": "population"})
     return tb
