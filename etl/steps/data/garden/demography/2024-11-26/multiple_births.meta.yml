@@ -89,6 +89,11 @@ tables:
         description_short: |-
           The rate of deliveries that are multiple deliveries, per 1,000 deliveries.
       children_delivery_ratio:
+        title: "Children per delivery"
+        unit: "children per 1,000 deliveries"
+        description_short: |-
+          The average number of children born per delivery. This is estimated by dividing the number of children born by the total number deliveries, per 1,000 people.
+      children_multiple_delivery_ratio:
         title: "Children per multiple delivery"
         unit: "children per 1,000 multiple deliveries"
         description_short: |-
