@@ -74,7 +74,7 @@ def run(dest_dir: str) -> None:
 
     tb["share_1m_total"] = tb["urban_pop_1m"] / tb["total_population"]
     tb["share_1m_urban"] = tb["urban_pop_1m"] / tb["urban_total"]
-
+    tb = tb.drop(columns=["total_population", "urban_total"])
     # Split data into estimates and projections.
     past_estimates = tb[tb["year"] < START_OF_PROJECTIONS].copy()
     future_projections = tb[tb["year"] >= START_OF_PROJECTIONS - 5].copy()
