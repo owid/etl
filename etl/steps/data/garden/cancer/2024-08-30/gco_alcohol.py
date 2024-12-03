@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from etl.data_helpers import geo
+from etl.grapher_helpers import long_to_wide
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -26,6 +27,7 @@ def run(dest_dir: str) -> None:
     tb["value"] = tb["value"].replace("<0.1", "0.05")
 
     tb = tb.format(["country", "year", "sex", "cancer", "indicator"])
+
     #
     # Save outputs.
     #
