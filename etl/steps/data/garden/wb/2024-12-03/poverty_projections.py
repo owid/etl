@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
+from owid.catalog import Table
 from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
@@ -8,6 +9,9 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Define latest year without projections
+LATEST_YEAR_WITHOUT_PROJECTIONS = 2024
 
 # Define tables to be loaded.
 TABLES = ["country", "region", "global"]
@@ -58,6 +62,8 @@ def run(dest_dir: str) -> None:
         countries_file=paths.country_mapping_path,
     )
 
+    tb = connect_estimates_with_projections(tb)
+
     # Rename scenario column
     tb["scenario"] = map_series(
         series=tb["scenario"],
@@ -69,9 +75,6 @@ def run(dest_dir: str) -> None:
 
     tb = tb.format(INDEX_COLUMNS, short_name="poverty_projections")
 
-    # Keep only relevant columns
-    tb = tb[INDICATOR_COLUMNS]
-
     #
     # Save outputs.
     #
@@ -82,3 +85,38 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def connect_estimates_with_projections(tb: Table) -> Table:
+    """
+    Connects estimates with projections for visualizations in Grapher.
+    This is repeating the latest estimate in the historical scenario in the rest of the scenarios.
+    """
+
+    tb = tb.copy()
+
+    # Make table wider, by using scenario as columns
+    tb = tb.pivot(index=["country", "year", "povertyline"], columns="scenario", values=INDICATOR_COLUMNS)
+
+    # For year LATEST_YEAR_WITHOUT_PROJECTIONS, fill the rest of the columns with the same value
+    for indicator in INDICATOR_COLUMNS:
+        for scenario in SCENARIOS.keys():
+            if scenario != "historical":
+                tb.loc[
+                    tb.index.get_level_values("year") == LATEST_YEAR_WITHOUT_PROJECTIONS, (indicator, scenario)
+                ] = tb.loc[
+                    tb.index.get_level_values("year") == LATEST_YEAR_WITHOUT_PROJECTIONS, (indicator, scenario)
+                ].combine_first(
+                    tb.loc[
+                        tb.index.get_level_values("year") == LATEST_YEAR_WITHOUT_PROJECTIONS, (indicator, "historical")
+                    ]
+                )
+
+    # Make table long again, by creating a scenario column
+    tb = tb.stack("scenario").reset_index()
+
+    # Recover origins
+    for indicator in INDICATOR_COLUMNS:
+        tb[indicator] = tb[indicator].copy_metadata(tb["country"])
+
+    return tb

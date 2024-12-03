@@ -2,7 +2,7 @@
 definitions:
   common:
     processing_level: minor
-    display:
+    display: &common-display
       tolerance: 0
       entityAnnotationsMap: |-
         Other high income countries (PIP): e.g. US, Western Europe, Australia, Japan, South Korea and Saudi Arabia
@@ -55,11 +55,10 @@ definitions:
     <%- endif -%>
 
 
-
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: Poverty projections by the World Bank
   update_period_days: 681
 
 
@@ -81,9 +80,10 @@ tables:
           title_public: Share of population living in poverty
           title_variant: $<<povertyline>> a day, <<scenario>>
         display:
-          name: Share of population living below $<<povertyline>> a day
-          numDecimalPlaces: 0
+          name: Share of population living below $<<povertyline>> a day (<<scenario>>)
+          numDecimalPlaces: 1
           isProjection: {definitions.isprojection_by_scenario}
+          <<: *common-display
 
       poorpop:
         title: $<<povertyline>> a day - Number of people in poverty (<<scenario>>)
@@ -100,6 +100,7 @@ tables:
           title_public: Number of people living in poverty
           title_variant: $<<povertyline>> a day, <<scenario>>
         display:
-          name: Number of people living below $<<povertyline>> a day
+          name: Number of people living below $<<povertyline>> a day (<<scenario>>)
           numDecimalPlaces: 0
           isProjection: {definitions.isprojection_by_scenario}
+          <<: *common-display
