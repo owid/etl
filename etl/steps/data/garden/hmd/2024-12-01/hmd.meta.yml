@@ -241,7 +241,7 @@ tables:
           <%- endif %>
         display:
           name: |-
-            {tables.deaths.variables.deaths.title} {definitions.others.display_name_dim}
+            {tables.deaths.variables.deaths.title} at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'total') >>
         presentation:
           title_public: |-
             {tables.deaths.variables.deaths.title} {definitions.others.title_public_dim}
@@ -269,7 +269,7 @@ tables:
           We have used the "19xx+" population estimates for the year of the territorial change.
         display:
           name: |-
-            {tables.population.variables.population.title} {definitions.others.display_name_dim}
+            {tables.population.variables.population.title} aged << age >><< ', ' + sex + 's' if (sex != 'total') >>
         presentation:
           title_public: |-
             {tables.population.variables.population.title} {definitions.others.title_public_dim}
@@ -293,11 +293,15 @@ tables:
           <%- endif %>
         display:
           name: |-
-            {tables.births.variables.births.title} {definitions.others.display_name_dim}
+            Births, sex: << sex >>
         presentation:
           title_public: |-
-            {tables.births.variables.births.title} {definitions.others.title_public_dim}
-
+            {tables.births.variables.births.title},
+            <%- if sex == 'total' %>
+             total
+            <%- else %>
+             << sex >>s
+            <%- endif %>
       birth_rate:
         title: Birth rate
         unit: births per 1,000 people
@@ -309,10 +313,15 @@ tables:
           <%- endif %>
         display:
           name: |-
-            {tables.births.variables.births.title} {definitions.others.display_name_dim}
+            Birth rate, sex: << sex >>
         presentation:
           title_public: |-
-            {tables.births.variables.births.title} {definitions.others.title_public_dim}
+            {tables.births.variables.birth_rate.title},
+            <%- if sex == 'total' %>
+             total
+            <%- else %>
+             << sex >>s
+            <%- endif %>
 
   diff_ratios:
     common:

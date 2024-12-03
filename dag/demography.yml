@@ -124,12 +124,12 @@ steps:
     - data://garden/hmd/2023-09-19/hmd
 
   # Human Mortality Database
-  data://meadow/hmd/2024-11-27/hmd:
+  data://meadow/hmd/2024-12-01/hmd:
     - snapshot://hmd/2024-11-27/hmd.zip
-  data://garden/hmd/2024-11-27/hmd:
-    - data://meadow/hmd/2024-11-27/hmd
-  data://grapher/hmd/2024-11-27/hmd:
-    - data://garden/hmd/2024-11-27/hmd
+  data://garden/hmd/2024-12-01/hmd:
+    - data://meadow/hmd/2024-12-01/hmd
+  data://grapher/hmd/2024-12-01/hmd:
+    - data://garden/hmd/2024-12-01/hmd
 
   # Gini Life Expectancy Inequality
   data://garden/demography/2023-10-04/gini_le:
@@ -250,6 +250,6 @@ steps:
 
   # Survivorship ages (HMD-derived)
   data://garden/demography/2024-12-02/survivor_percentiles:
-    - data://garden/hmd/2024-11-27/hmd
+    - data://garden/hmd/2024-12-01/hmd
   data://grapher/demography/2024-12-02/survivor_percentiles:
     - data://garden/demography/2024-12-02/survivor_percentiles
