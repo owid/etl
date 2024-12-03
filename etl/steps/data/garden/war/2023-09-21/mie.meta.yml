@@ -60,6 +60,7 @@ definitions:
 
   number_deaths:
     description_short: |-
+      <% set per_capita = "" %>
       The << estimate >> estimate of the number of deaths of combatants due to fighting between states that year<< per_capita >>.
     description_short_per_capita:
       <% set per_capita = ", per 100,000 people" %>
