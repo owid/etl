@@ -74,6 +74,6 @@ meta:
       url: https://www.mortality.org/Data/UserAgreement
 
 outs:
-  - md5: ceed045241a19573e6621423b582558e
-    size: 147314590
-    path: hmd.zip
+  - md5: efae1882e47e8132bd5a2add9f7e445a
+    size: 345841896
+    path: hmd_country.zip
