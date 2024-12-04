@@ -116,7 +116,7 @@ def connect_estimates_with_projections(tb: Table) -> Table:
                 )
 
     # Make table long again, by creating a scenario column
-    tb = tb.stack("scenario").reset_index()
+    tb = tb.stack(level="scenario", future_stack=True).reset_index()
 
     # Recover origins
     for indicator in INDICATOR_COLUMNS:
