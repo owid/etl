@@ -54,17 +54,7 @@ def run(dest_dir: str) -> None:
 
 def make_main_table(tb, tb_pop):
     ## Discard unknown/total values
-    tb = tb.loc[~tb["month"].isin(["TOT", "UNK"])]
-    tb["month"] = tb["month"].astype(int)
-    ## Create date column. TODO: check what day of the month to assign
-    tb["date"] = pd.to_datetime(tb[["year", "month"]].assign(day=1))
-    # Harmonize country names
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-        warn_on_unknown_excluded_countries=False,
-    )
+    tb = clean_table(tb)
 
     # Add population to monthly birth data table
     tb = add_population_column(tb, tb_pop)
@@ -93,7 +83,9 @@ def make_tables(tb):
         left_on=["country", "date"],
         right_on=["country", "date_lead"],
         suffixes=("", "_lead_9months"),
+        how="outer",
     )
+    tb_long["date"] = tb_long["date"].fillna(tb_long["date_lead"])
     tb_long = tb_long.drop(columns="date_lead")
 
     # Month as a dimension
@@ -121,8 +113,7 @@ def make_tables(tb):
 
     tb_pre9m = find_peak_month(tb_pre9m)
     # Merge
-    tb_month_max = tb_month_max.merge(tb_pre9m, on=["country", "year"], how="left", suffixes=("", "_lead_9months"))
-
+    tb_month_max = tb_month_max.merge(tb_pre9m, on=["country", "year"], how="outer", suffixes=("", "_lead_9months"))
     return tb_long, tb_dimensions, tb_month_max
 
 
@@ -130,13 +121,13 @@ def clean_table(tb):
     """Filter rows, harmonize country names, add date column."""
     # Filter unwanted month categories, set dtype
     tb = tb.loc[~tb["month"].isin(["TOT", "UNK"])]
-    tb["month"] = tb["month"].astype(int)
+    tb["month"] = tb["month"].astype("Int64")
     ## Create date column. TODO: check what day of the month to assign
     tb["date"] = pd.to_datetime(tb[["year", "month"]].assign(day=1))
     # Harmonize country names
     tb = geo.harmonize_countries(
         df=tb,
-        countries_file=paths.directory / (paths.short_name + "_month.countries.json"),
+        countries_file=paths.country_mapping_path,
         excluded_countries_file=paths.excluded_countries_path,
         warn_on_unknown_excluded_countries=False,
     )
