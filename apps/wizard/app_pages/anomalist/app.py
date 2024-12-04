@@ -819,6 +819,7 @@ if st.session_state.anomalist_df is not None:
         # Show controls only if needed
         if len(items) > items_per_page:
             pagination.show_controls(mode="bar")
-
+else:
+    st.success("Ha! We did not find any no anomalies in the selected datasets! What were the odds of that?")
 # Reset state
 set_states({"anomalist_datasets_submitted": False})
