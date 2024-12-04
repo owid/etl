@@ -207,28 +207,27 @@ def _set_metadata(meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: 
 
 
 def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
-    # meta_path = get_metadata_path(str(dest_dir))
-    # if meta_path.exists():
-    #     ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, yaml_params=yaml_params, errors=errors)
+    """Convert a long table to a wide table by unstacking dimensions. This function mimics the process that occurs
+    when a long table is upserted to the database. With this function, you can explicitly perform this transformation
+    in the grapher step and store a flattened dataset in the catalog."""
 
     dim_names = [k for k in long_tb.primary_key if k not in ("year", "country", "date")]
 
-    wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))
+    # Unstack dimensions to a wide format
+    wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))  # type: ignore
 
+    # Get short names and metadata for all columns
     short_names = []
     metadatas = []
     for dims in wide_tb.columns:
         column = dims[0]
         dim_dict = {k: v for k, v in zip(dim_names, dims[1:])}
-        short_name = _underscore_column_and_dimensions(
-            column,
-            dim_dict,
-        )
+        short_name = _underscore_column_and_dimensions(column, dim_dict)
 
         short_names.append(short_name)
         metadatas.append(_set_metadata(long_tb[dims[0]].metadata, dim_dict, column))
 
-    # Set short_name and metadata for all columns
+    # Set column names to new short names and use proper metadata
     wide_tb.columns = short_names
     for col, meta in zip(wide_tb.columns, metadatas):
         wide_tb[col].metadata = meta
