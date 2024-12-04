@@ -9,6 +9,7 @@ from structlog import get_logger
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
 from etl.db import read_sql
+from etl.grapher_io import trim_long_variable_name
 from etl.helpers import map_indicator_path_to_id
 
 # Initialize logger.
@@ -223,9 +224,7 @@ def generate_views_for_dimensions(
             log.warning(f"Combination {slug_combination} found in multiple tables: {relevant_table}")
 
         # Construct the indicator path.
-        indicator_path = (
-            f"{relevant_table[0].metadata.dataset.uri}/{relevant_table[0].metadata.short_name}#{slug_combination}"
-        )
+        indicator_path = f"{relevant_table[0].metadata.dataset.uri}/{relevant_table[0].metadata.short_name}#{trim_long_variable_name(slug_combination)}"
         indicators = {
             "y": indicator_path,
         }
