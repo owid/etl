@@ -132,7 +132,8 @@ def _prepare_population_table(tb):
 
     Original table is given in years, but we need it in days! We use linear interpolation for that.
     """
-    tb_aux = tb.loc[(tb["sex"] == "total") & ~(tb["age"].str.contains("-")), ["country", "year", "population"]]
+    flag = tb["age"].str.match(r"^(\d{1,3}|\d{3}\+)$")
+    tb_aux = tb.loc[(tb["sex"] == "total") & flag, ["country", "year", "population"]]
     tb_aux = tb_aux.groupby(["country", "year"], as_index=False)["population"].sum()
     ## Assign a day to population. TODO: Check if this is true
     tb_aux["date"] = pd.to_datetime(tb_aux["year"].astype(str) + "-01-01")
