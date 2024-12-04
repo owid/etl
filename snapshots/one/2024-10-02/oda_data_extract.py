@@ -8,12 +8,12 @@ We are particularly interested in extracting gross disbursements by sectors and 
 The CRS dataset shows aid information by project, with multiple columns not easily understood by non-experts.
 
 Steps to extract the data:
-    1. Update the versions of the libraries available in pyproject.toml, if necessary:
-        - oda_data
-        - oda_reader
-        - thefuzz
-        - rapidfuzz
-        - pandas
+    1. Update the versions of the libraries available, if necessary:
+        pip install oda_data --upgrade
+        pip install oda_reader --upgrade
+        pip install thefuzz --upgrade
+        pip install rapidfuzz --upgrade
+        pip install pandas --upgrade
     2. Run this code to extract the data.
         python snapshots/one/{version}/oda_data_extract.py
     3. Use the file oda_by_sectors_one.feather as the snapshot, by running the following codes:
