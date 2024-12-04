@@ -973,6 +973,7 @@ dependencies = [
     { name = "frictionless", extra = ["pandas"] },
     { name = "fsspec" },
     { name = "geopandas" },
+    { name = "geopy" },
     { name = "gitpython" },
     { name = "h5netcdf" },
     { name = "html2text" },
@@ -987,6 +988,7 @@ dependencies = [
     { name = "pandas" },
     { name = "papermill" },
     { name = "pdfplumber" },
+    { name = "py7zr" },
     { name = "pydantic" },
     { name = "pygithub" },
     { name = "pyhumps" },
@@ -1091,6 +1093,7 @@ requires-dist = [
     { name = "fsspec", specifier = ">=2022.11.0" },
     { name = "geographiclib", marker = "extra == 'wizard'", specifier = ">=2.0" },
     { name = "geopandas", specifier = ">=0.14.1" },
+    { name = "geopy", specifier = ">=2.4.1" },
     { name = "gitpython", specifier = ">=3.1.30" },
     { name = "h5netcdf", specifier = ">=1.3.0" },
     { name = "html2text", specifier = ">=2020.1.16" },
@@ -1108,6 +1111,7 @@ requires-dist = [
     { name = "papermill", specifier = ">=2.3.3" },
     { name = "pdfplumber", specifier = ">=0.9.0" },
     { name = "plotly", marker = "extra == 'wizard'", specifier = ">=5.23.0" },
+    { name = "py7zr", specifier = ">=0.22.0" },
     { name = "pydantic", specifier = ">=1.9.0" },
     { name = "pygithub", specifier = ">=2.3.0" },
     { name = "pyhumps", specifier = ">=3.8.0" },
@@ -1499,6 +1503,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f6/79/79af2645d40d590a466f8329ab04c2d4fffc811e6713d1c1580dcfdf285c/geopandas-0.14.4.tar.gz", hash = "sha256:56765be9d58e2c743078085db3bd07dc6be7719f0dbe1dfdc1d705cb80be7c25", size = 1106304 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3e/b0/69fa7a0f55122847506a42fea6988d03b34136938082f142151bc9d9f7e7/geopandas-0.14.4-py3-none-any.whl", hash = "sha256:3bb6473cb59d51e1a7fe2dbc24a1a063fb0ebdeddf3ce08ddbf8c7ddc99689aa", size = 1109913 },
+]
+
+[[package]]
+name = "geopy"
+version = "2.4.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "geographiclib" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0e/fd/ef6d53875ceab72c1fad22dbed5ec1ad04eb378c2251a6a8024bad890c3b/geopy-2.4.1.tar.gz", hash = "sha256:50283d8e7ad07d89be5cb027338c6365a32044df3ae2556ad3f52f4840b3d0d1", size = 117625 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e5/15/cf2a69ade4b194aa524ac75112d5caac37414b20a3a03e6865dfe0bd1539/geopy-2.4.1-py3-none-any.whl", hash = "sha256:ae8b4bc5c1131820f4d75fce9d4aaaca0c85189b3aa5d64c3dcaf5e3b7b882a7", size = 125437 },
 ]
 
 [[package]]
