@@ -94,7 +94,7 @@ def run(dest_dir: str) -> None:
     )
 
     def add_birth_rate(tb_pop, tb_births):
-        tb_pop_agg = tb_pop[tb_pop["age"] == "total"]
+        tb_pop_agg = tb_pop[tb_pop["age"] == "total"].drop(columns="age")
         tb_births = tb_births.merge(tb_pop_agg, on=["country", "year", "sex"], how="left")
         tb_births["birth_rate"] = tb_births["births"] / tb_births["population"] * 1_000
         tb_births["birth_rate"] = tb_births["birth_rate"].replace([np.inf, -np.inf], np.nan)
