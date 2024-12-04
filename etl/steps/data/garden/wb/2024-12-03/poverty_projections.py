@@ -57,6 +57,9 @@ def run(dest_dir: str) -> None:
     # Concatenate tables
     tb = pr.concat(tables, ignore_index=True)
 
+    # Multiply poorpop by 1_000_000
+    tb["poorpop"] = tb["poorpop"] * 1_000_000
+
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
