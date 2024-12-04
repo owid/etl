@@ -22,13 +22,15 @@ def run(dest_dir: str) -> None:
     ds_hmd = paths.load_dataset("hmd")
 
     # Read table from meadow dataset.
-    tb_month = ds_meadow.read("monthly")
+    tb = ds_meadow.read("monthly")
     tb_pop = ds_hmd.read("population")
 
     #
     # Process data.
     #
-    tb_month_long, tb_month_dimensions, tb_month_max = make_monthly_tables(tb_month, tb_pop)
+    tb = make_main_table(tb, tb_pop)
+    tb_month_long, tb_month_dimensions, tb_month_max = make_tables(tb)
+
     tables = [
         tb_month_long.format(["country", "date"], short_name="birth_rate"),
         tb_month_dimensions.format(["country", "year", "month"], short_name="birth_rate_month"),
@@ -50,7 +52,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def make_monthly_tables(tb, tb_pop):
+def make_main_table(tb, tb_pop):
     ## Discard unknown/total values
     tb = tb.loc[~tb["month"].isin(["TOT", "UNK"])]
     tb["month"] = tb["month"].astype(int)
@@ -70,22 +72,56 @@ def make_monthly_tables(tb, tb_pop):
     # Estimate metrics
     tb = estimate_metrics(tb)
 
+    # Fix date (use last day instead of first)
+    tb["date"] = tb["date"] + pd.to_timedelta(tb["days_in_month"] - 1, unit="D")
+
     # Sort rows
     tb = tb.sort_values(["country", "date", "date"])
 
+    return tb
+
+
+def make_tables(tb):
     # Classic time-series, with date-values
     tb_long = tb[["country", "date", "birth_rate", "birth_rate_per_day"]]
+    ## Add 9-month lead
+    tb_long["date_lead"] = (tb_long[["date"]] - pd.DateOffset(months=9) + pd.offsets.MonthEnd(0)).squeeze()
+    cols = [col for col in tb_long.columns if col != "date_lead"]
+    cols_lead = [col for col in tb_long.columns if col != "date"]
+    tb_long = tb_long[cols].merge(
+        tb_long[cols_lead],
+        left_on=["country", "date"],
+        right_on=["country", "date_lead"],
+        suffixes=("", "_lead_9months"),
+    )
+    tb_long = tb_long.drop(columns="date_lead")
 
     # Month as a dimension
     tb_dimensions = tb[["country", "year", "month", "birth_rate", "birth_rate_per_day"]]
     tb_dimensions["month"] = tb_dimensions["month"].apply(lambda x: calendar.month_name[x])
 
     # For each year, ID of the month with highest birth rate per day
-    tb_month_max = tb.loc[
-        tb.groupby(["country", "year"])["birth_rate_per_day"].idxmax(),
-        ["country", "year", "month", "birth_rate_per_day"],
-    ].rename(columns={"month": "month_max", "birth_rate_per_day": "birth_rate_per_day_max"})
-    tb_month_max["month_max_name"] = tb_month_max["month_max"].apply(lambda x: calendar.month_name[x])
+    def find_peak_month(tb):
+        tb = tb.loc[
+            tb.groupby(["country", "year"])["birth_rate_per_day"].idxmax(),
+            ["country", "year", "month", "birth_rate_per_day"],
+        ].rename(columns={"month": "month_max", "birth_rate_per_day": "birth_rate_per_day_max"})
+        tb["month_max_name"] = tb["month_max"].apply(lambda x: calendar.month_name[x])
+
+        return tb
+
+    tb_month_max = find_peak_month(tb)
+    # Get: "for a given year, what was the month that lead to highest month-birth rate in +9months"
+    tb_pre9m = tb.copy()
+    tb_pre9m["date"] = (tb_pre9m[["date"]] - pd.DateOffset(months=9) + pd.offsets.MonthEnd(0)).squeeze()
+    tb_pre9m["year"] = tb_pre9m["date"].dt.year
+    tb_pre9m["year"] = tb_pre9m["year"].copy_metadata(tb["year"])
+    tb_pre9m["month"] = tb_pre9m["date"].dt.month
+    tb_pre9m["month"] = tb_pre9m["month"].copy_metadata(tb["month"])
+
+    tb_pre9m = find_peak_month(tb_pre9m)
+    # Merge
+    tb_month_max = tb_month_max.merge(tb_pre9m, on=["country", "year"], how="left", suffixes=("", "_lead_9months"))
 
     return tb_long, tb_dimensions, tb_month_max
 
