@@ -7,6 +7,7 @@ import datetime as dt
 import re
 import sys
 import tempfile
+import time
 from collections.abc import Generator
 from contextlib import contextmanager
 from functools import cache
@@ -200,6 +201,7 @@ def create_dataset(
     default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
     underscore_table: bool = True,
     camel_to_snake: bool = False,
+    long_to_wide: bool = False,
     formats: List[FileFormat] = DEFAULT_FORMATS,
     check_variables_metadata: bool = False,
     run_grapher_checks: bool = True,
@@ -221,6 +223,7 @@ def create_dataset(
     :param default_metadata: The default metadata to use for the dataset, could be either SnapshotMeta or DatasetMeta.
     :param underscore_table: Whether to underscore the table name before adding it to the dataset.
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
+    :param long_to_wide: Convert data in long format (with dimensions) to wide format (flattened).
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
     :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
     :param yaml_params: Dictionary of parameters that can be used in the metadata yaml file.
@@ -264,6 +267,9 @@ def create_dataset(
 
     meta_path = get_metadata_path(str(dest_dir))
 
+    # Raise an error if there's a variable in YAML that is not in the dataset
+    extra_variables = "raise"
+
     # add tables to dataset
     used_short_names = set()
     for table in tables:
@@ -276,22 +282,37 @@ def create_dataset(
         from etl import grapher_helpers as gh
 
         # Expand long to wide
-        if meta_path.exists():
-            table.update_metadata_from_yaml(meta_path, table.m.short_name)
+        if long_to_wide:
+            dim_names = set(table.index.names) - {"country", "year", "date"}
+            if dim_names:
+                # First pass to update metadata from YAML
+                if meta_path.exists():
+                    table.update_metadata_from_yaml(meta_path, table.m.short_name)  # type: ignore
+                log.info("long_to_wide.start", shape=table.shape, short_name=table.m.short_name, dim_names=dim_names)
+                t = time.time()
+                table = gh.long_to_wide(table)
+                log.info("long_to_wide.end", shape=table.shape, short_name=table.m.short_name, t=time.time() - t)
 
-        tb_wide = gh.long_to_wide(table)
-
-        __import__("ipdb").set_trace()
+                # Ignore extra variables for the following pass of metadata
+                extra_variables = "ignore"
+            else:
+                log.info("long_to_wide.skip", short_name=table.m.short_name)
 
         ds.add(table, formats=formats, repack=repack)
 
     if meta_path.exists():
-        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, yaml_params=yaml_params, errors=errors)
+        ds.update_metadata(
+            meta_path,
+            if_origins_exist=if_origins_exist,
+            yaml_params=yaml_params,
+            errors=errors,
+            extra_variables=extra_variables,
+        )
 
     # another override YAML file with higher priority
     meta_override_path = get_metadata_path(str(dest_dir)).with_suffix(".override.yml")
     if meta_override_path.exists():
-        ds.update_metadata(meta_override_path, if_origins_exist=if_origins_exist)
+        ds.update_metadata(meta_override_path, if_origins_exist=if_origins_exist, extra_variables=extra_variables)
 
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:
