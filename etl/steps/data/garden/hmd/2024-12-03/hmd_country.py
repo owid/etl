@@ -149,7 +149,7 @@ def add_population_column(tb, tb_pop):
     # Prepare population table
     tb_pop = _prepare_population_table(tb_pop)
     # Merge population table with main table
-    tb = tb.merge(tb_pop, on=["country", "date"], how="left")
+    tb = tb.merge(tb_pop, on=["country", "date"], how="outer")
     tb = tb.sort_values(["country", "date"])
     # Interpolate to get monthly population estimates
     tb_ = interpolate_table(
@@ -159,7 +159,8 @@ def add_population_column(tb, tb_pop):
         time_mode="none",
     )
     tb = tb.drop(columns="population").merge(tb_, on=["country", "date"], how="left")
-
+    # Drop unused rows
+    tb = tb.dropna(subset=["year"])
     return tb
 
 
@@ -168,9 +169,7 @@ def _prepare_population_table(tb):
 
     Original table is given in years, but we need it in days! We use linear interpolation for that.
     """
-    flag = tb["age"].str.match(r"^(\d{1,3}|\d{3}\+)$")
-    tb_aux = tb.loc[(tb["sex"] == "total") & flag, ["country", "year", "population"]]
-    tb_aux = tb_aux.groupby(["country", "year"], as_index=False)["population"].sum()
+    tb_aux = tb.loc[(tb["age"] == "total") & (tb["sex"] == "total"), ["country", "year", "population"]]
     ## Assign a day to population. TODO: Check if this is true
     tb_aux["date"] = pd.to_datetime(tb_aux["year"].astype(str) + "-01-01")
     tb_aux = tb_aux.drop(columns="year")
