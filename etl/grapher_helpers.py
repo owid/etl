@@ -171,12 +171,13 @@ def _yield_wide_table(
             tab.metadata.short_name = short_name
             tab.rename(columns={column: short_name}, inplace=True)
 
-            tab[short_name].metadata = _set_metadata(tab[short_name].metadata, dim_dict, column)
+            tab[short_name].metadata = _metadata_for_dimensions(tab[short_name].metadata, dim_dict, column)
 
             yield tab
 
 
-def _set_metadata(meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: str) -> catalog.VariableMeta:
+def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: str) -> catalog.VariableMeta:
+    """Add dimensions to metadata and expand Jinja in metadata fields."""
     # add info about dimensions to metadata
     if dim_dict:
         meta.additional_info = {
@@ -222,10 +223,13 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
     for dims in wide_tb.columns:
         column = dims[0]
         dim_dict = {k: v for k, v in zip(dim_names, dims[1:])}
-        short_name = _underscore_column_and_dimensions(column, dim_dict)
 
+        # Create a short name from dimension values
+        short_name = _underscore_column_and_dimensions(column, dim_dict)
         short_names.append(short_name)
-        metadatas.append(_set_metadata(long_tb[dims[0]].metadata, dim_dict, column))
+
+        # Create metadata for the column from dimensions
+        metadatas.append(_metadata_for_dimensions(long_tb[dims[0]].metadata, dim_dict, column))
 
     # Set column names to new short names and use proper metadata
     wide_tb.columns = short_names
