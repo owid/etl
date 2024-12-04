@@ -11,18 +11,17 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("bloodstream_amr")
+    ds_garden = paths.load_dataset("phi_gender_le")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("bloodstream_amr", reset_index=False)
-    tb_amr = ds_garden.read("amr_entity", reset_index=False)
+    tables = list(ds_garden)
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb, tb_amr], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new grapher dataset.

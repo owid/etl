@@ -136,7 +136,6 @@ You can adapt the function to your needs, and perform different kinds of expansi
     )
     ```
 
-
 ## Deprecate code
 Our codebase has lots of code. Some of it may no longer be maintained or used. To avoid confusion, it is a good practice to slowly deprecate code. This can be done by adding a deprecation warning to the code, and then removing it after a certain period of time:
 
@@ -149,3 +148,23 @@ from deprecated import deprecated
 Make sure to point users to an alternative function or method that they can use instead.
 
 Please deprecate function with care, and make sure to check if the function is widely used, and communicate the deprecation to the team.
+
+## Add entity annotations to your dataset
+Just add the field `display.entityAnnotationsMap` to the desired indicator.
+
+```yaml
+display:
+    entityAnnotationsMap: |-
+        Spain: Some annotation
+        France: Another annotation
+```
+
+!!! note "Space is limited"
+
+    The space for annotations in charts is limited. Please be mindful and keep the annotations short and to the point. 2-4 words is usually enough, ideally 2.
+
+
+<figure markdown="span">
+    <img src="../../assets/annotations-chart.png" alt="OWID chart with annotations" style="width:80%;">
+    <figcaption>Example chart with entity annotations. Note that the space for annotations.</figcaption>
+</figure>

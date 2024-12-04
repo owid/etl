@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Population Prospects
+    description: |-
+      The World Population Prospects 2024 is the 28th edition of the official estimates and projections of the global population published by the United Nations since 1951. The estimates are based on all available sources of data on population size and levels of fertility, mortality, and international migration for 237 countries or areas.
+
+      For each revision, any new, recent, and historical, information that has become available from population censuses, vital registration of births and deaths, and household surveys is considered to produce consistent time series of population estimates for each country or areas from 1950 to today
+
+      For the estimation period between 1950 and 2023, data from 1,910 censuses were considered in the present evaluation, which is 79 more than the 2022 revision. In some countries, population registers based on administrative data systems provide the necessary information. Population data from censuses or registers referring to 2019 or later were available for 114 countries or areas, representing 48 per cent of the 237 countries or areas included in this analysis (and 54 per cent of the world population). For 43 countries or areas, the most recent available population count was from the period 2014-2018, and for another 57 locations from the period 2009-2013. For the remaining 23 countries or areas, the most recent available census data were from before 2009, that is more than 15 years ago.
+    date_published: 2024-07-11
+    title_snapshot: World Population Prospects - Life Tables (Female)
+    description_snapshot: |-
+      Provides single-age life tables up to age 100 for females with a set of values showing the mortality experience of a hypothetical group of infants born at the same time and subject throughout their lifetime to the specific mortality rates of a given year. The following series are provided: age-specific mortality rates (mx), probabilities of dying (qx), probabilities of surviving (px), number surviving (lx), number dying (dx), number of person-years lived (Lx), survivorship ratios (Sx), cumulative stationary population (Tx), average remaining life expectancy (ex) and average number of years lived (ax).
+
+    # Citation
+    producer: United Nations
+    citation_full: |-
+      United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024, Online Edition.
+    attribution: UN, World Population Prospects (2024)
+    attribution_short: UN WPP
+
+    # Files
+    url_main: https://population.un.org/wpp/Download/
+    date_accessed: 2024-12-02
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://population.un.org/wpp/Download/Standard/MostUsed/
+outs:
+  - md5: bc8637e9e160cc99e496e245f1d4bff6
+    size: 199164889
+    path: un_wpp_lt_f.csv
