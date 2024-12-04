@@ -171,9 +171,40 @@ def fetch_variables_from_table(table: str, engine: Engine) -> pd.DataFrame:
 
 
 def generate_views_for_dimensions(
-    dimensions, tables, dimensions_order_in_slug=None, additional_fields=None, warn_on_missing_combinations=True
+    dimensions, tables, dimensions_order_in_slug=None, additional_config=None, warn_on_missing_combinations=True
 ):
-    """Generate individual views for all possible combinations of dimensions in a list of flattened tables."""
+    """Generate individual views for all possible combinations of dimensions in a list of flattened tables.
+
+    Parameters
+    ----------
+    dimensions : List[Dict[str, Any]]
+        Dimensions, as given in the configuration of the multidim step, e.g.
+        [
+            {'slug': 'frequency', 'name': 'Frequency', 'choices': [{'slug': 'annual','name': 'Annual'}, {'slug': 'monthly', 'name': 'Monthly'}]},
+            {'slug': 'source', 'name': 'Energy source', 'choices': [{'slug': 'electricity', 'name': 'Electricity'}, {'slug': 'gas', 'name': 'Gas'}]},
+            ...
+        ]
+    tables : List[Table]
+        Tables whose indicator views will be generated.
+    dimensions_order_in_slug : Tuple[str], optional
+        Dimension names, as they appear in "dimensions", and in the order in which they are spelled out in indicator names. For example, if indicator names are, e.g. annual_electricity_euros, then dimensions_order_in_slug would be ("frequency", "source", "unit").
+    additional_config : _type_, optional
+        Additional config fields to add to each view, e.g.
+        {"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"}
+    warn_on_missing_combinations : bool, optional
+        True to warn if any combination of dimensions is not found among the indicators in the given tables.
+
+    Returns
+    -------
+    results : List[Dict[str, Any]]
+        Views configuration, e.g.
+        [
+            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'euro'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_euro'},
+            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'pps'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_pps'},
+            ...
+        ]
+
+    """
     # Extract all choices for each dimension as (slug, choice_slug) pairs.
     choices = {dim["slug"]: [choice["slug"] for choice in dim["choices"]] for dim in dimensions}
     dimension_slugs_in_config = set(choices.keys())
@@ -231,9 +262,9 @@ def generate_views_for_dimensions(
         # Append the combination to results.
         results.append({"dimensions": dimension_mapping, "indicators": indicators})
 
-    if additional_fields:
+    if additional_config:
         # Include additional fields in all results.
         for result in results:
-            result.update(additional_fields)
+            result.update({"config": additional_config})
 
     return results

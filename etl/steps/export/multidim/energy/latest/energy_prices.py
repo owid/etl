@@ -29,16 +29,14 @@ def run(dest_dir: str) -> None:
         tables=[tb_annual, tb_monthly],
         dimensions_order_in_slug=("frequency", "source", "consumer", "price_component", "unit"),
         warn_on_missing_combinations=False,
-        additional_fields={
-            "config": {
-                "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-                "chartTypes": ["LineChart"],
-                "hasMapTab": True,
-                "tab": "map",
-                "map": {
-                    "projection": "Europe",
-                    "colorScale": {"baseColorScheme": "YlOrBr"},
-                },
+        additional_config={
+            "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+            "chartTypes": ["LineChart"],
+            "hasMapTab": True,
+            "tab": "map",
+            "map": {
+                "projection": "Europe",
+                "colorScale": {"baseColorScheme": "YlOrBr"},
             },
         },
     )
