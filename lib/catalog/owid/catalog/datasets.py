@@ -222,6 +222,7 @@ class Dataset:
         if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
         if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
         errors: Literal["ignore", "warn", "raise"] = "raise",
+        extra_variables: Literal["raise", "ignore"] = "raise",
     ) -> None:
         """
         Load YAML file with metadata from given path and update metadata of dataset and its tables.
@@ -258,7 +259,11 @@ class Dataset:
                                 warnings.warn(str(e))
                             continue
                 table.update_metadata_from_yaml(
-                    metadata_path, table_name, if_origins_exist=if_origins_exist, yaml_params=yaml_params
+                    metadata_path,
+                    table_name,
+                    if_origins_exist=if_origins_exist,
+                    yaml_params=yaml_params,
+                    extra_variables=extra_variables,
                 )
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 

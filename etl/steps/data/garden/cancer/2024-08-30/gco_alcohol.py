@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("gco_alcohol")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["gco_alcohol"].reset_index()
+    tb = ds_meadow.read("gco_alcohol")
 
     #
     # Process data.
@@ -27,13 +27,12 @@ def run(dest_dir: str) -> None:
     tb["value"] = tb["value"].replace("<0.1", "0.05")
 
     tb = tb.format(["country", "year", "sex", "cancer", "indicator"])
-
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb], long_to_wide=True, check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
