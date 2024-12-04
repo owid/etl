@@ -27,7 +27,7 @@ tables:
         description_processing: |-
           The fertility data is constructed by combining data from multiple sources:
 
-          - 1800 - 1949: Historical estimates by Human Fertility Database (2024).
+          - Before 1949: Historical estimates by Human Fertility Database (2024).
 
           - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
 
@@ -47,7 +47,7 @@ tables:
         description_processing: |-
           The fertility data is constructed by combining data from multiple sources:
 
-          - 1800 - 1949: Historical estimates by Human Fertility Database (2024).
+          - Before 1949: Historical estimates by Human Fertility Database (2024).
 
           - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
         presentation:

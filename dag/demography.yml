@@ -122,6 +122,7 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/un/2024-03-14/un_wpp_most:
     - data://garden/un/2024-03-14/un_wpp_most
+
   ########################################################################
   # Life expectancy                                                      #
   ########################################################################
@@ -245,9 +246,27 @@ steps:
   data://grapher/demography/2024-11-26/multiple_births:
     - data://garden/demography/2024-11-26/multiple_births
 
-  # OMM: HFD + UN WPP
+  # OMM: Fertility Rate -- HFD + UN WPP
   data://garden/demography/2024-12-03/fertility_rate:
     - data://garden/hmd/2024-11-19/hfd
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/demography/2024-12-03/fertility_rate:
     - data://garden/demography/2024-12-03/fertility_rate
+
+  # OMM: Birth rate -- HFD + UN WPP
+  data://garden/demography/2024-12-03/birth_rate:
+    - data://garden/hmd/2024-12-01/hmd
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/demography/2024-12-03/birth_rate:
+    - data://garden/demography/2024-12-03/birth_rate
+
+  # HMD country data
+  data://meadow/hmd/2024-12-03/hmd_country:
+    - snapshot://hmd/2024-12-01/hmd_country.zip
+
+  # HMD - Birth rate by month
+  data://garden/hmd/2024-12-03/hmd_country:
+    - data://meadow/hmd/2024-12-03/hmd_country
+    - data://garden/hmd/2024-12-01/hmd
+  data://grapher/hmd/2024-12-03/hmd_country:
+    - data://garden/hmd/2024-12-03/hmd_country

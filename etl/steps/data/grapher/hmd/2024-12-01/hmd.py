@@ -70,6 +70,7 @@ def keep_only_relevant_dimensions(tb):
         45,
         65,
         80,
+        "total",
     ]
     AGES_SINGLE = list(map(str, AGES_SINGLE)) + ["110+"]
     flag_1 = tb["age"].isin(AGES_SINGLE)

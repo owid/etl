@@ -10,7 +10,7 @@ definitions:
     display_name_dim: |-
       at << 'birth' if (age == '0') else age >><< ', ' + sex + 's' if (sex != 'total') >>, << type >>
     title_public_dim: |-
-      at << age if age != '0' else 'birth'>>
+      <% if age != 'total' %>at << age if age != '0' else 'birth'>><% endif %>
   global:
     life_expectancy:
       point_1: |-
@@ -251,17 +251,24 @@ tables:
       presentation:
         topic_tags:
           - Population Growth
-        title_variant: << sex + 's, ' if sex != 'total' >>
 
     variables:
       population:
         title: Population
         unit: people
         description_short: |-
+          <% if age == 'total' %>
+          <%- if sex == 'total' %>
+          The total number of people living in a country.
+          <%- else %>
+          The total number of << sex + 's' >> living in a country.
+          <%- endif %>
+          <%- else %>
           <% if sex == 'total' %>
           The total number of people aged << age >> living in a country.
           <%- else %>
           The total number of << sex + 's' >> aged << age >> living in a country.
+          <%- endif %>
           <%- endif %>
         description_processing: |-
           From HMD Notes: For populations with territorial changes, two sets of population estimates are given for years in which a territorial change occurred. The first set of estimates (identified as year "19xx-") refers to the population just before the territorial change, whereas the second set (identified as year "19xx+") refers to the population just after the change. For example, in France, the data for "1914-" cover the previous territory (i.e., as of December 31, 1913), whereas the data for "1914+" reflect the territorial boundaries as of January 1, 1914.
@@ -269,10 +276,11 @@ tables:
           We have used the "19xx+" population estimates for the year of the territorial change.
         display:
           name: |-
-            {tables.population.variables.population.title} aged << age >><< ', ' + sex + 's' if (sex != 'total') >>
+            {tables.population.variables.population.title}<< 'aged ' + age if (age != 'total') >><< ', ' + sex + 's' if (sex != 'total') >>
         presentation:
           title_public: |-
             {tables.population.variables.population.title} {definitions.others.title_public_dim}
+          title_variant: << sex + 's, ' if sex != 'total' >>
 
   births:
     common:
