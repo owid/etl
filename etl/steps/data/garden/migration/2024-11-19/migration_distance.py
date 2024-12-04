@@ -8,6 +8,7 @@ import structlog
 from geopy.distance import geodesic
 from shapely import wkt
 from shapely.ops import nearest_points
+from tqdm import tqdm
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -46,7 +47,8 @@ def run(dest_dir: str) -> None:
     )
 
     # Calculate distance matrix (in km) (catch warnings to ignore "invalid value encountered" warning)
-    with warnings.catch_warnings(action="ignore"):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
         distance_matrix = calculate_distance_matrix(world)
 
     ## Add distances to migration flows table
@@ -121,12 +123,12 @@ def calculate_distance_matrix(world):
     # Create an empty distance matrix
     distance_matrix = pd.DataFrame(index=world["name"], columns=world["name"])
 
-    for i, row1 in world.iterrows():
-        if i % 10 == 0:
-            LOG.info("Calculating distance matrix", progress=f"{i*100/ len(world):.2f}% done")
+    for i, row1 in tqdm(world.iterrows(), total=len(world), desc="Calculating distance matrix"):
         for j, row2 in world.iterrows():
             if i == j:
                 distance_matrix.iloc[i, j] = 0  # Distance to itself
+            elif i > j:
+                distance_matrix.iloc[i, j] = distance_matrix.iloc[j, i]  # Distance is symmetric
             else:
                 # Get the nearest points between two geometries
                 point1, point2 = nearest_points(row1.geometry, row2.geometry)  # type: ignore
@@ -134,5 +136,4 @@ def calculate_distance_matrix(world):
                 # Calculate geodesic distance between the nearest points
                 distance_matrix.iloc[i, j] = geodesic((point1.y, point1.x), (point2.y, point2.x)).kilometers  # type: ignore
 
-    LOG.info("Calculating distance matrix", progress=f"{100}% done")
     return distance_matrix
