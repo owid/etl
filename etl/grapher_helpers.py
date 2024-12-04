@@ -229,7 +229,7 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
         short_names.append(short_name)
 
         # Create metadata for the column from dimensions
-        metadatas.append(_metadata_for_dimensions(long_tb[dims[0]].metadata, dim_dict, column))
+        metadatas.append(_metadata_for_dimensions(long_tb[dims[0]].metadata.copy(), dim_dict, column))
 
     # Set column names to new short names and use proper metadata
     wide_tb.columns = short_names
