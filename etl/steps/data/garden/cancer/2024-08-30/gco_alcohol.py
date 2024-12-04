@@ -15,14 +15,14 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("gco_alcohol")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("gco_alcohol")
+    tb = ds_meadow["gco_alcohol"].reset_index()
 
     #
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # To display on grapher we need to replace "<0.1" with "0.05" and set the decimal places to 1 so that it shows up as <0.1 on the chart
+    # To display on grapher we need to replace "<0.1" with "0.05" and set the decimal places to 1 so that it shows up as <0.1 on the chart.
     tb["value"] = tb["value"].replace("<0.1", "0.05")
 
     tb = tb.format(["country", "year", "sex", "cancer", "indicator"])
@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], long_to_wide=True, check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
