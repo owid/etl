@@ -2,6 +2,7 @@
 
 import numpy as np
 from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -84,6 +85,7 @@ def run(dest_dir: str) -> None:
         tb=tb_pop,
         col_index=["country", "year", "sex", "age"],
     )
+    tb_pop = add_total_population(tb_pop)
 
     # 5/ Births
     tb_births = process_table(
@@ -92,7 +94,7 @@ def run(dest_dir: str) -> None:
     )
 
     def add_birth_rate(tb_pop, tb_births):
-        tb_pop_agg = tb_pop.groupby(["country", "year", "sex"], as_index=False)["population"].sum()
+        tb_pop_agg = tb_pop[tb_pop["age"] == "total"].drop(columns="age")
         tb_births = tb_births.merge(tb_pop_agg, on=["country", "year", "sex"], how="left")
         tb_births["birth_rate"] = tb_births["births"] / tb_births["population"] * 1_000
         tb_births["birth_rate"] = tb_births["birth_rate"].replace([np.inf, -np.inf], np.nan)
@@ -162,6 +164,7 @@ def process_table(tb, col_index, sex_expected=None, callback_post=None):
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
     )
 
     # Make year column integer
@@ -187,6 +190,15 @@ def standardize_sex_cat_names(tb, sex_expected):
     return tb
 
 
+def add_total_population(tb_pop):
+    flag = tb_pop["age"].str.match(r"^(\d{1,3}|\d{3}\+)$")
+    tb_pop_total = tb_pop[flag]
+    tb_pop_total = tb_pop_total.groupby(["country", "year", "sex"], as_index=False)["population"].sum()
+    tb_pop_total["age"] = "total"
+    tb_pop = pr.concat([tb_pop, tb_pop_total], ignore_index=True)
+    return tb_pop
+
+
 def make_table_diffs_ratios(tb: Table) -> Table:
     """Create table with metric differences and ratios.
 
@@ -205,7 +217,7 @@ def make_table_diffs_ratios(tb: Table) -> Table:
         )
         .assign(
             life_expectancy_fm_diff=lambda df: df[("life_expectancy", "female")] - df[("life_expectancy", "male")],
-            life_expectancy_mf_ratio=lambda df: df[("life_expectancy", "male")] / df[("life_expectancy", "female")],
+            life_expectancy_fm_ratio=lambda df: df[("life_expectancy", "female")] / df[("life_expectancy", "male")],
             central_death_rate_mf_ratio=lambda df: df[("central_death_rate", "male")]
             / df[("central_death_rate", "female")],
         )
