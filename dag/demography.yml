@@ -139,16 +139,11 @@ steps:
   data://garden/demography/2023-10-10/riley_2005:
     - data://meadow/demography/2023-10-10/riley_2005
 
-  # HMD country data
-  data://meadow/hmd/2024-12-03/hmd_country:
-    - snapshot://hmd/2024-12-01/hmd_country.zip
-
   # Human Mortality Database
   data://meadow/hmd/2024-12-01/hmd:
     - snapshot://hmd/2024-11-27/hmd.zip
   data://garden/hmd/2024-12-01/hmd:
     - data://meadow/hmd/2024-12-01/hmd
-    - data://meadow/hmd/2024-12-03/hmd_country
   data://grapher/hmd/2024-12-01/hmd:
     - data://garden/hmd/2024-12-01/hmd
 
@@ -264,3 +259,14 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/demography/2024-12-03/birth_rate:
     - data://garden/demography/2024-12-03/birth_rate
+
+  # HMD country data
+  data://meadow/hmd/2024-12-03/hmd_country:
+    - snapshot://hmd/2024-12-01/hmd_country.zip
+
+  # HMD - Birth rate by month
+  data://garden/hmd/2024-12-03/hmd_country:
+    - data://meadow/hmd/2024-12-03/hmd_country
+    - data://garden/hmd/2024-12-01/hmd
+  data://grapher/hmd/2024-12-03/hmd_country:
+    - data://garden/hmd/2024-12-03/hmd_country

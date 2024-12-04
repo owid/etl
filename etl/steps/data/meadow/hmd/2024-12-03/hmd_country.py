@@ -57,7 +57,7 @@ def run(dest_dir: str) -> None:
         }
     )
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "month"], short_name="hmd_country")
+    tb = tb.format(["country", "year", "month"], short_name="monthly")
 
     #
     # Save outputs.
