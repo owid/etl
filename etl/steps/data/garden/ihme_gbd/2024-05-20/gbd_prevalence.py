@@ -71,7 +71,7 @@ def run(dest_dir: str) -> None:
 
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
+    # Create a new garden dataset with the same metadata as the meadow dataset
     ds_garden = create_dataset(
         dest_dir,
         tables=[tb_prevalence, tb_incidence],
