@@ -1,0 +1,63 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Human Multiple Births Database
+    description: |-
+      The frequency of twin births has significantly increased in developed countries, doubling since the 1970s (see Figure 1). Two main factors have contributed to this development, namely the rise in the use of medically assisted reproduction techniques, as well as a substantial increase in the mean age at childbearing (Pison et al., 2015). This 'boom' in the birth of twins constitutes a public health challenge, in that twins tend to have frailer health than singletons, at least during their early years. Compared to singletons, twins have lower birth weight, they tend to be born prematurely, and the deliveries are more complicated, all of which can potentially lead to long-term health problems. It is therefore important to understand better the causes of the increase in the twinning rate, as well as the variations across countries.
+
+      The Human Multiple Births Database (HMBD) gathers the number of twin births and the twinning rates for countries with reliable statistics. The database also provides statistics on other multiple births (i.e., triplets, quadruplets, etc.) whenever possible. Although their frequency has increased even more than that of twins, they still constitute a minority, as most multiple deliveries involve twins. A detailed description of the HMBD is available in this article (DOI: 10.4054/DemRes.2023.48.4).
+    date_published: "2024-09-30"
+    version_producer: v.1
+
+    # Citation
+    producer: Human Multiple Births Database
+    citation_full: |-
+      Human Multiple Births Database (2024). French Institute for Demographic Studies - INED (distributor). Extracted from: https://www.twinbirths.org (26/11/2024).
+
+      A detailed description of the HMBD is available in:
+      Torres, C., Caporali, A., & Pison, G. (2023). The Human Multiple Births Database (HMBD). Demographic Research, 48, 89–106. https://doi.org/10.4054/demres.2023.48.4
+
+      Country-level sources:
+      - Australia: Australian Bureau of Statistics (https://www.abs.gov.au/)
+      - Austria: Statistics Austria (https://www.statistik.at/web_en/statistics/index.html)
+      - Canada: Statistics Canada (https://www.statcan.gc.ca/)
+      - Chile: Instituto Nacional de Estadísticas (http://www.ine.cl/)
+      - Czech Republic: Czech Statistical Office (https://www.czso.cz/csu/czso/home)
+      - Denmark: Statistics Denmark (https://www.dst.dk/en)
+      - Finland: Statistics Finland (https://www.stat.fi/index_en.html)
+      - France: INSEE (https://www.insee.fr/fr/accueil)
+      - Germany: Statistisches Bundesamt (https://www.destatis.de/EN/Home/_node.html)
+      - Greece: Hellenic Statistical Authority (https://www.statistics.gr/en/home/)
+      - Iceland: Statistics Iceland (https://www.statice.is/)
+      - Italy: ISTAT and Ministerio della Salute (https://www.istat.it/en/, https://www.salute.gov.it/portale/home.html)
+      - Japan: Ministry of Health, Labour and Welfare (https://www.e-stat.go.jp/en)
+      - Lithuania: Statistics Lithuania (https://www.stat.gov.lt/en/)
+      - New Zealand: Statistics New Zealand (https://www.stats.govt.nz/)
+      - Netherlands: Statistics Netherlands (https://www.cbs.nl/en-gb)
+      - Norway: Statistics Norway (https://www.ssb.no/en)
+      - South Korea: Statistics Korea (http://kostat.go.kr/portal/eng/index.action)
+      - Spain: Instituto Nacional de Estadística (https://www.ine.es/en/index.htm)
+      - Sweden: Statistics Sweden (https://www.scb.se/en/)
+      - Switzerland: Federal Statistical Office (https://www.bfs.admin.ch/bfs/en/home.html)
+      - United States: Centers for Disease Control and Prevention - National Center for Health Statistics (https://www.cdc.gov/nchs/index.htm)
+      - UK - England and Wales: Office for National Statistics (https://www.ons.gov.uk/)
+      - UK - Scotland: National Records of Scotland (https://www.nrscotland.gov.uk/)
+      - Uruguay: Instituto Nacional de Estadística (https://www.gub.uy/ministerio-salud-publica/home)
+
+    attribution_short: HMDB
+    # Files
+    url_main: https://www.twinbirths.org/en/data-metadata/
+    url_download: https://www.twinbirths.org/fichier/s_rubrique/30699/hmbd_pooled_data_30.09.2024.7z
+    date_accessed: 2024-11-26
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+
+outs:
+  - md5: 14a9122b39cb033b646c44a915644d63
+    size: 69023
+    path: multiple_births.7z

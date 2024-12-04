@@ -77,7 +77,7 @@ def run(dest_dir: str) -> None:
     tb = rename_table_for_compatibility(tb)
 
     if SUBSET:
-        required_causes = ["Drug use disorders", "Alcohol use disorders"]
+        required_causes = ["Drug use disorders", "Alcohol use disorders", "Self-harm"]
         tb = tb[tb.cause.isin(SUBSET.split(",") + required_causes)]
 
     # Load countries regions

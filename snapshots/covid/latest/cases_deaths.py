@@ -1,4 +1,13 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+As of 2024-11-29, the WHO reports three files for cases & deaths:
+
+- [NEW] Daily frequency reporting of new COVID-19 cases and deaths by date reported to WHO: Mostly weekly data, but occasionally daily data (especially past data).
+- Weekly COVID-19 cases and deaths by date reported to WHO: Reports weekly values. This is what we have been using since we switched from JHU to WHO.
+- Latest reported counts of COVID-19 cases and deaths: Reports latest values (only latest date is available)
+
+
+"""
 
 from datetime import date
 from pathlib import Path
