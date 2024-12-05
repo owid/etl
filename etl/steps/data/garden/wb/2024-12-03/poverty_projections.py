@@ -42,14 +42,8 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("poverty_projections")
 
-    # Read table from meadow dataset.
-    # Define empty table list to store tables.
-    tables = []
-    for table in TABLES:
-        tb = ds_meadow.read(table)
-
-        # Append table to list.
-        tables.append(tb)
+    # Read tables from meadow dataset.
+    tables = [ds_meadow.read(table_name) for table_name in TABLES]
 
     #
     # Process data.
