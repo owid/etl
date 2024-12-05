@@ -1,6 +1,4 @@
 """Load a meadow dataset and create a garden dataset."""
-import pandas as pd
-
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -39,9 +37,7 @@ def run(dest_dir: str) -> None:
     )
     tb_total = tb_total[tb_total["year"] == 2021]
 
-    tb = tb_amr.merge(tb_total, on=["country", "year", "pathogen"], how="right")
-    # Fill missing values with 0
-    tb["amr_attributable_deaths"] = tb["amr_attributable_deaths"].replace(pd.NA, 0)
+    tb = tb_amr.merge(tb_total, on=["country", "year", "pathogen"], how="inner")
     tb["non_amr_attributable_deaths"] = tb["total_deaths"] - tb["amr_attributable_deaths"]
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
