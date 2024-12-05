@@ -46,6 +46,10 @@ def run(dest_dir: str) -> None:
     tb_counts = tb_counts.astype({col: "string" for col in str_types})
     tb_rates = tb_rates.astype({col: "string" for col in str_types})
 
+    # Drop spurious data
+    tb_counts = tb_counts.loc[~(tb_counts["source"] != "True")]
+    tb_rates = tb_rates.loc[~tb_rates["source"].isna()]
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [
         tb_counts.format(["code", "year", "source", "type"], short_name="counts"),
