@@ -41,15 +41,27 @@ def run(dest_dir: str) -> None:
     flag_gbr = (tb_rates["tname"] == "rates_GBREW4") & (tb_rates["year"] >= 1964) & (tb_rates["year"] <= 2013)
     tb_rates = tb_rates.loc[~(flag_isl1 | flag_isl2 | flag_gbr)]
 
+    # Dtypes
+    str_types = ["sourcelong", "tname", "GMI", "country", "type", "source"]
+    tb_counts = tb_counts.astype({col: "string" for col in str_types})
+    tb_rates = tb_rates.astype({col: "string" for col in str_types})
+
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb_counts = tb_counts.format(["code", "year", "source", "type"], short_name="counts")
-    tb_rates = tb_rates.format(["code", "year", "source", "type"], short_name="rates")
+    tables = [
+        tb_counts.format(["code", "year", "source", "type"], short_name="counts"),
+        tb_rates.format(["code", "year", "source", "type"], short_name="rates"),
+    ]
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = create_dataset(
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=snap.metadata,
+    )
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
