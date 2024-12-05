@@ -284,7 +284,7 @@ def create_dataset(
         # Expand long to wide
         if long_to_wide:
             if ds.metadata.channel != "grapher":
-                log.warning("long_to_wide=True should be only used in grapher channel")
+                log.warning("It is recommended to use long_to_wide=True only in the grapher channel")
 
             dim_names = set(table.index.names) - {"country", "year", "date"}
             if dim_names:
