@@ -969,3 +969,18 @@ steps:
     - data://meadow/antibiotics/2024-12-03/glass_enrolment
   data://grapher/antibiotics/2024-12-03/glass_enrolment:
     - data://garden/antibiotics/2024-12-03/glass_enrolment
+  # MICROBE - total deaths by pathogen
+  data-private://meadow/antibiotics/2024-12-04/microbe_total_pathogens:
+    - snapshot-private://antibiotics/2024-12-04/microbe_total_pathogens.csv
+  data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens:
+    - data-private://meadow/antibiotics/2024-12-04/microbe_total_pathogens
+  data-private://grapher/antibiotics/2024-12-04/microbe_total_pathogens:
+    - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens
+  # MICROBE - total deaths by pathogen and amr resistance
+  data-private://meadow/antibiotics/2024-12-04/microbe_total_pathogens_amr:
+    - snapshot-private://antibiotics/2024-12-04/microbe_total_pathogens_amr.csv
+  data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens_amr:
+    - data-private://meadow/antibiotics/2024-12-04/microbe_total_pathogens_amr
+    - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens
+  data-private://grapher/antibiotics/2024-12-04/microbe_total_pathogens_amr:
+    - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens_amr
