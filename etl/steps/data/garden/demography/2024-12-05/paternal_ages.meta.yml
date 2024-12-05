@@ -1,58 +1,37 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  others:
+    note_on_average: |-
+      Kai and Klüsener provide data from various sources. Whenever there were multiple data available for a given year, we averaged them.
   common:
+    unit: years
     presentation:
       topic_tags:
         - Fertility Rate
-
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
-
 tables:
   paternal_age:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
-
+      mpac_fr:
+        title: Mean paternal age at childbirth (based on fertility rates)
+        description_short: |-
+          Average age of fathers at the time their children are born. Estimated using fertilty rates.
+        description_processing: |-
+          {definitions.others.note_on_average}
+      mpac_mean:
+        title: Mean paternal age at childbirth (based on arithmetic mean)
+        description_short: |-
+          Average age of fathers at the time their children are born. Estimated using fertilty rates.
+        description_processing: |-
+          {definitions.others.note_on_average}
+      mpac_rates:
+        title: Mean paternal age at childbirth (other method)
+        description_short: |-
+          Average age of fathers at the time their children are born.
+        description_processing: |-
+          {definitions.others.note_on_average}

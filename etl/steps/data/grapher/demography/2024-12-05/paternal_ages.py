@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("paternal_age")
+    ds_garden = paths.load_dataset("paternal_ages")
 
     # Read table from garden dataset.
     tb = ds_garden.read("paternal_age", reset_index=False)
