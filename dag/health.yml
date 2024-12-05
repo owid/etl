@@ -980,3 +980,12 @@ steps:
     - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens
   data-private://grapher/antibiotics/2024-12-04/microbe_total_pathogens_amr:
     - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens_amr
+
+  # MICROBE - neonatal deaths by pathogen and amr resistance
+  data-private://meadow/antibiotics/2024-12-05/microbe_neonatal_total_amr:
+    - snapshot-private://antibiotics/2024-12-05/microbe_neonatal_total_amr.csv
+  data-private://garden/antibiotics/2024-12-05/microbe_neonatal_total_amr:
+    - data-private://meadow/antibiotics/2024-12-05/microbe_neonatal_total_amr
+    - data-private://garden/antibiotics/2024-11-20/microbe
+  data-private://grapher/antibiotics/2024-12-05/microbe_neonatal_total_amr:
+    - data-private://garden/antibiotics/2024-12-05/microbe_neonatal_total_amr
