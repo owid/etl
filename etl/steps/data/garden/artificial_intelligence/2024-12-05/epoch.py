@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop("notability_criteria", axis=1)
 
     # Convert relevant columns to string type
-    columns = ["system", "domain", "organization_categorization"]
+    columns = ["model", "domain", "organization_categorization"]
     tb[columns] = tb[columns].astype(str)
 
     def simplify_entry(entry):
@@ -120,14 +120,14 @@ def run(dest_dir: str) -> None:
 
     tb = tb.reset_index(drop=True)
 
-    assert not tb[["system", "days_since_1949"]].isnull().any().any(), "Index columns should not have NaN values"
+    assert not tb[["model", "days_since_1949"]].isnull().any().any(), "Index columns should not have NaN values"
 
     # Drop columns that are not needed
     tb = tb.drop(
         ["training_compute__flop", "organization", "authors", "country__from_organization"],
         axis=1,
     )
-    tb = tb.format(["days_since_1949", "system"])
+    tb = tb.format(["days_since_1949", "model"])
 
     # Add metadata to the publication date column
     tb["publication_date"].metadata.origins = tb["domain"].metadata.origins

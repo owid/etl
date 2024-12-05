@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Rename for plotting model name as country in grapher
-    tb = tb.rename_index_names({"system": "country", "days_since_1949": "year"})
+    tb = tb.rename_index_names({"model": "country", "days_since_1949": "year"})
     #
     # Save outputs.
     #

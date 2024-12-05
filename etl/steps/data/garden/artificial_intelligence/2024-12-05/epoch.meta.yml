@@ -19,9 +19,9 @@ tables:
         title: Domain
         unit: ''
         short_unit: ''
-        description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
+        description_short: Refers to the specific area, application, or field in which an AI model is designed to operate.
         description_processing: |-
-          In cases where multiple domains were associated with a system, we consolidated these entries under the label "Multiple domains". We also identified domains associated with fewer than 20 notable systems and grouped these under the category 'Other'.
+          In cases where multiple domains were associated with a model, we consolidated these entries under the label "Multiple domains". We also identified domains associated with fewer than 20 notable systems and grouped these under the category 'Other'.
         display:
           zeroDay: '1949-01-01'
           yearIsDay: true
@@ -30,7 +30,7 @@ tables:
         title: Researcher affiliation
         unit: ''
         short_unit: ''
-        description_short: Describes the sector where the authors of an AI system have their primary affiliations.
+        description_short: Describes the sector where the authors of an AI model have their primary affiliations.
         description_from_producer: |-
             Systems are categorized as “Industry” if their authors are affiliated with private sector organizations, “Academia” if the authors are affiliated with universities or academic institutions, or “Industry - Academia Collaboration” when at least 30% of the authors are from each.
 
@@ -91,7 +91,7 @@ tables:
       publication_date:
           title: Publication date
           unit: ''
-          description_short: The date when the AI system was first published.
+          description_short: The date when the AI model was first published.
           description_from_producer:  The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
 
 

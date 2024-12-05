@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     #
     # Define columns of interest.
     cols = [
-        "System",
+        "Model",
         "Domain",
         "Authors",
         "Country (from Organization)",
@@ -53,13 +53,13 @@ def run(dest_dir: str) -> None:
     tb["Training compute (FLOP)"] = tb["Training compute (FLOP)"].astype(float)
 
     # Replace the missing values in the system column with the organization column. If organization column is NaN as well replace the missing values in the system column with the authors column
-    tb["System"] = tb["System"].fillna(tb["Organization"]).fillna(tb["Authors"])
+    tb["Model"] = tb["Model"].fillna(tb["Organization"]).fillna(tb["Authors"])
     # Check that there are no NaN values in the system column
-    assert not tb["System"].isna().any(), "NaN values found in 'System' column after processing."
+    assert not tb["Model"].isna().any(), "NaN values found in 'Model' column after processing."
     #
     # Create a new table.
     #
-    tb = tb.format(["system", "publication_date"])
+    tb = tb.format(["model", "publication_date"])
 
     #
     # Save outputs.

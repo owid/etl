@@ -37,13 +37,13 @@ def run(dest_dir: str) -> None:
 
     # Update metadata
     for col in ["max_compute", "max_parameters", "max_data"]:
-        tb[col].metadata.origins = tb["system"].metadata.origins
+        tb[col].metadata.origins = tb["model"].metadata.origins
 
     # Drop year as we don't need it anymore
     tb = tb.drop("year", axis=1)
 
     # Rename for plotting model name as country in grapher
-    tb = tb.rename(columns={"system": "country", "days_since_1949": "year"})
+    tb = tb.rename(columns={"model": "country", "days_since_1949": "year"})
     tb = tb.format(["country", "year"])
 
     #

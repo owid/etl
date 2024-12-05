@@ -57,8 +57,8 @@ def run(dest_dir: str) -> None:
     # Explode the table to create separate rows for each country or domain
     tb_exploded = tb.explode("domain")
 
-    # Drop duplicates where the year, system and country/domain are the same
-    tb_unique = tb_exploded.drop_duplicates(subset=["year", "system", "domain"])
+    # Drop duplicates where the year, model and country/domain are the same
+    tb_unique = tb_exploded.drop_duplicates(subset=["year", "model", "domain"])
 
     # Replace domains with less than 10 systems with 'Other'
     domain_counts = tb_unique["domain"].value_counts()

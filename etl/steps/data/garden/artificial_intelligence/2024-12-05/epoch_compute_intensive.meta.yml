@@ -21,7 +21,7 @@ tables:
         title: Domain
         unit: ''
         short_unit: ''
-        description_short: Refers to the specific area, application, or field in which an AI system is designed to operate.
+        description_short: Refers to the specific area, application, or field in which an AI model is designed to operate.
         display:
           zeroDay: '1949-01-01'
           yearIsDay: true
@@ -84,7 +84,7 @@ tables:
       publication_date:
           title: Publication date
           unit: ''
-          description_short: The date when the AI system was first published.
+          description_short: The date when the AI model was first published.
           description_from_producer:  The publication, announcement, or release date of the model, in YYYY-MM-DD format. If the year and month are known but the day is unknown, the day is filled in as YYYY-MM-15. If the year is known but the month and day are unknown, the month and day are filled in as YYYY-07-01.
 
 

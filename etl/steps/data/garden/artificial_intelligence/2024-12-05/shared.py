@@ -52,8 +52,8 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
     # Convert the column to category type so that the missing values will be considered as 0
     tb_exploded[agg_column] = tb_exploded[agg_column].astype("category")
 
-    # Drop duplicates where the year, system and country/domain are the same
-    tb_unique = tb_exploded.drop_duplicates(subset=["year", "system", agg_column])
+    # Drop duplicates where the year, model and country/domain are the same
+    tb_unique = tb_exploded.drop_duplicates(subset=["year", "model", agg_column])
 
     # Group by year and country/domain and count the number of systems (consider all categories which will assume 0 for missing values)
     tb_agg = tb_unique.groupby(["year", agg_column], observed=False).size().reset_index(name="yearly_count")

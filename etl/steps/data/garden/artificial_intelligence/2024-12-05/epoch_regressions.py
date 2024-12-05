@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
     tb = pr.concat([tb_trend, tb])
 
     # Format the table
-    tb = tb.format(["days_since_1949", "system"])
+    tb = tb.format(["days_since_1949", "model"])
 
     #
     # Save outputs.
@@ -123,7 +123,7 @@ def run_regression(tb):
                         period_data["days_since_1949"].max(),
                     ],
                     f"{metric}": [line[0], line[-1]],
-                    "system": [f"{info} between {period_name}"] * 2,
+                    "model": [f"{info} between {period_name}"] * 2,
                 }
             )
             dfs.append(df)
@@ -135,7 +135,7 @@ def run_regression(tb):
     # Merge all the new DataFrames
     tb_new = new_tables[0]
     for tb_m in new_tables[1:]:
-        tb_new = pd.merge(tb_new, tb_m, on=["system", "days_since_1949"], how="outer")
+        tb_new = pd.merge(tb_new, tb_m, on=["model", "days_since_1949"], how="outer")
 
     # Convert to OWID Table and add metadata
     tb_new = Table(tb_new, short_name=paths.short_name)

@@ -14,9 +14,9 @@ definitions:
 
         - Language systems are tailored to process language, focusing on understanding, translating, and interacting with human languages. Examples include chatbots, machine translation tools like Google Translate, and sentiment analysis algorithms that can detect emotions in text.
 
-        - Multimodal systems are artificial intelligence frameworks that integrate and interpret more than one type of data input, such as text, images, and audio. ChatGPT-4 is an example of a multimodal system, as it has the capability to process and generate responses based on both textual and visual inputs.
+        - Multimodal systems are artificial intelligence frameworks that integrate and interpret more than one type of data input, such as text, images, and audio. ChatGPT-4 is an example of a multimodal model, as it has the capability to process and generate responses based on both textual and visual inputs.
 
-        - Vision systems focus on processing visual information, playing a pivotal role in image recognition and related areas. For example, Facebook's photo tagging system uses vision AI to identify faces.
+        - Vision systems focus on processing visual information, playing a pivotal role in image recognition and related areas. For example, Facebook's photo tagging model uses vision AI to identify faces.
 
         - Speech systems are dedicated to handling spoken language, serving as the backbone of voice assistants and similar applications. They recognize, interpret, and generate spoken language to interact with users.
 
@@ -24,7 +24,7 @@ definitions:
 
         - Image generation systems create visual content from text descriptions or other inputs, used in graphic design and content creation.
 
-    description_processing: The count of large-scale AI models AI systems per domain is derived by tallying the instances of machine learning models classified under each domain category. It's important to note that a single machine learning model can fall under multiple domains. The classification into domains is determined by the specific area, application, or field that the AI system is primarily designed to operate within.
+    description_processing: The count of large-scale AI models AI systems per domain is derived by tallying the instances of machine learning models classified under each domain category. It's important to note that a single machine learning model can fall under multiple domains. The classification into domains is determined by the specific area, application, or field that the AI model is primarily designed to operate within.
     description_from_producer: A foreign key field categorizing the system’s domain of machine learning. This field links to the [ML Domains table](https://airtable.com/appDFXXgaG1xLtXGL/shrhzolGiQCVnwOY5/tbleYEsZORsiYRVTM), and domains are selected from the options in that table.
     unit: 'AI systems'
     short_unit: ''
