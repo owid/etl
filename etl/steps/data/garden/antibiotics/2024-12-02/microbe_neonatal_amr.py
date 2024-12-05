@@ -1,6 +1,4 @@
 """Load a meadow dataset and create a garden dataset."""
-import pandas as pd
-
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
