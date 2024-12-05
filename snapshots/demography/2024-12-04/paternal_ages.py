@@ -18,7 +18,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", "-f", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"demography/{SNAPSHOT_VERSION}/patternal_ages.rdata")
+    snap = Snapshot(f"demography/{SNAPSHOT_VERSION}/paternal_ages.rdata")
 
     # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
     snap.create_snapshot(filename=path_to_file, upload=upload)
