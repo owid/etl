@@ -1770,6 +1770,51 @@ def read_rda(
     return cast(Table, table)
 
 
+def read_rda_multiple(
+    filepath_or_buffer: Union[str, Path, IO[AnyStr]],
+    table_names: Optional[List[str]] = None,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+) -> Dict[str, Table]:
+    # Read RData
+    parsed = rdata.parser.parse_file(filepath_or_buffer)  # type: ignore
+    converted = rdata.conversion.convert(parsed)
+
+    # Init output dictionary
+    tables = {}
+
+    if table_names is not None:
+        # If table names are given, read them
+        for tname in table_names:
+            # Check that name exists in RDA file
+            if tname not in converted:
+                raise ValueError(f"Table {tname} not found in RDA file.")
+            # Load object
+            table = converted[tname]
+            # Check that object is a DataFrame (otherwise raise error!). NOTE: here we raise an error, bc user explicitly asked us to load this table.
+            if isinstance(table, pd.DataFrame):
+                raise ValueError(f"Table {tname} is not a DataFrame.")
+            # Parse object to Table, and add metadata
+            table = Table(converted[tname], underscore=underscore)
+            table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+            table.metadata.short_name = tname
+            # Safe table in main dictionary object
+            tables[tname] = cast(Table, table)
+    else:
+        # Read them all (only those objects that are Dataframes)
+        for fname, data in converted.items():
+            if isinstance(data, pd.DataFrame):
+                # Parse object to Table, and add metadata
+                table = Table(data, underscore=underscore)
+                table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+                table.metadata.short_name = fname
+                # Safe table in main dictionary object
+                tables[fname] = cast(Table, table)
+
+    return tables
+
+
 def read_rds(
     filepath_or_buffer: Union[str, Path, IO[AnyStr]],
     metadata: Optional[TableMeta] = None,
