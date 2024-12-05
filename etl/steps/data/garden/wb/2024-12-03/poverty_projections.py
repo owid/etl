@@ -13,8 +13,8 @@ paths = PathFinder(__file__)
 # Define latest year without projections
 LATEST_YEAR_WITHOUT_PROJECTIONS = 2024
 
-# Define tables to be loaded.
-TABLES = ["country", "region", "global"]
+# Define tables to be loaded. I am not processing country, because they were created for the aggregations and not to highlight them.
+TABLES = ["region", "global"]
 
 # Define scenarios and new names
 SCENARIOS = {
