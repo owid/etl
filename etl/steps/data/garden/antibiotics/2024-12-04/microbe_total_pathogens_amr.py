@@ -12,20 +12,26 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("total_pathogen_bloodstream_amr")
-    ds_total = paths.load_dataset("total_pathogen_bloodstream")
+    ds_meadow = paths.load_dataset("microbe_total_pathogens_amr")
+    ds_total = paths.load_dataset("microbe_total_pathogens")
+
     # Read table from meadow dataset.
     tb = (
-        ds_meadow.read("total_pathogen_bloodstream_amr")
+        ds_meadow.read("microbe_total_pathogens_amr")
         .drop(columns=["upper", "lower"])
         .rename(columns={"value": "amr_attributable_deaths"})
     )
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
     tb_total = (
-        ds_total.read("total_pathogen_bloodstream")
+        ds_total.read("microbe_total_pathogens")
         .drop(columns=["upper", "lower"])
         .rename(columns={"value": "total_deaths"})
+    )
+    #
+    # Process data.
+    #
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
     )
 
     tb = tb.merge(tb_total, on=["country", "year", "pathogen", "pathogen_type"], how="inner")
