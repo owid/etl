@@ -598,6 +598,10 @@ def _modified_data_metadata_on_staging(
     dataset_paths = source_df.catalogPath.str.split("/").str[:4].str.join("/")
     source_df = source_df[dataset_paths.isin(catalog_paths)]
 
+    # no charts, return empty dataframe
+    if source_df.empty:
+        return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited"]).set_index("chartId")
+
     # read those variables from target
     where = """
         v.catalogPath in %(catalog_paths)s
