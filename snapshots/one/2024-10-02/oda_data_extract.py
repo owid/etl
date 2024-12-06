@@ -114,6 +114,8 @@ def get_data_by_sector_or_channel(
         pd.DataFrame: A DataFrame with data by sector.
     """
 
+    log.info(f"Getting data by {sector_or_channel}...")
+
     # Create an instance of the ODAData class. For the sectors analysis, the starting
     # year must be 2 years before the requested start_year.
     crs = read_crs(years=list(range(start_year, end_year + 1)))
