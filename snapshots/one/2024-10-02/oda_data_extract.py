@@ -201,8 +201,6 @@ def aggregate_donors(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.Da
     df_donors_list = []
 
     for donor_group, donor_composition in DONOR_GROUPINGS.items():
-        log.info(f"Aggregating {donor_group} donors...")
-
         # Check missing donors in the data
         missing_donors = set(donor_composition.keys()).difference(df_donors["donor_code"].unique())
 
@@ -234,6 +232,21 @@ def aggregate_donors(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.Da
 
         for recipient_group, recipient_composition in RECIPIENT_GROUPINGS.items():
             log.info(f"Aggregating {donor_group} donors to {recipient_group} recipients...")
+
+            # Check missing recipients in the data
+            missing_recipients = set(recipient_composition.keys()).difference(
+                df_donors_by_group["recipient_code"].unique()
+            )
+
+            # Construct a list of names of missing recipients from the codes of missing_recipients
+            missing_recipients = [v for k, v in recipient_composition.items() if k in missing_recipients]
+
+            if missing_recipients:
+                # If all recipients are missing, log a warning
+                if missing_recipients == set(recipient_composition.keys()):
+                    log.warning(f"No recipients in the data for {recipient_group}")
+                else:
+                    log.warning(f"Missing recipients in the data for {recipient_group}: {missing_recipients}")
             df_donors_by_recipient_group = df_donors_by_group[
                 df_donors_by_group["recipient_code"].isin(recipient_composition.keys())
             ].copy()
@@ -275,8 +288,6 @@ def aggregate_recipients(df: pd.DataFrame, columns_to_keep: List[str]) -> List[p
     df_recipients_list = []
 
     for recipient_group, recipient_composition in RECIPIENT_GROUPINGS.items():
-        log.info(f"Aggregating {recipient_group} recipients...")
-
         # Check missing recipients in the data
         missing_recipients = set(recipient_composition.keys()).difference(df_recipients["recipient_code"].unique())
 
