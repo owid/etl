@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Mulchandani et al. (2023)
+    producer: Mulchandani et al.
     title: 'Global trends in antimicrobial use in food-producing animals: 2020 to 2030'
     description: |-
       Data on usage of antimicrobials in food animals were collected from 42 countries. Multivariate regression models were used in combination with projections of animal counts for cattle, sheep, chicken, and pigs from the Food and Agriculture Organization to estimate global antimicrobial usage of veterinary antimicrobials in 2020 and 2030. Maps of animal densities were used to identify geographic hotspots of antimicrobial use. In each country, estimates of antimicrobial use (tonnes) were calibrated to match continental-level reports of antimicrobial use intensity (milligrams per kilogram of animal) from the World Organization for Animal Health, as well as country-level reports of antimicrobial use from countries that made this information publicly available.
@@ -8,8 +8,8 @@ meta:
       Mulchandani, R., Wang, Y., Gilbert, M., & Van Boeckel, T. P. (2023). Global trends in antimicrobial use in food-producing animals: 2020 to 2030. PLOS Global Public Health, 3(2), e0001305. https://doi.org/10.1371/journal.pgph.0001305
     url_main: https://journals.plos.org/globalpublichealth/article?id=10.1371/journal.pgph.0001305
     url_download: |-
-      gAAAAABnRZJtJagGwio4A8B3H6-jsxNa4M3zZtR92Arl_amq659ebrzeaxRovvWxLH4v5lvmoTALQnfL2aC7g2J8SSkjrgOPMLZXqOtoECV4ISER2UrZ9lbQUCsOS9-Cbc52-I1joAi2QwDz0J4UV5ufumvj0rYVGmv6YdPAypyrHbpnd893i21f-l7IULYWBQSdPCrRAUV0RlAXURJuGd1dVadThd_gwBgMdxYmxuh4EUvxSSHVQG_I4pYURJQGNOuNI59qAJa5
-    date_accessed: '2024-11-26'
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vT1GgT43B-J5fD0kqup2QeajeMNLtjo10An4N3OkugtbOn-Q4OIaoI5pC2hsnYroRn8UmVhcczZADHw/pub?output=csv
+    date_accessed: '2024-12-06'
     date_published: '2023-02-01'
     license:
       name: Open access
@@ -17,7 +17,6 @@ meta:
   description: |-
     This dataset estimates the usage of antimicrobials in livestock (cattle, sheep, chicken, and pigs) by country. Data on antimicrobials comes from government reports, surveillance systems and national surveys. In addition, the authors estimate the biomass of livestock in the country, to adjust for differences in antimicrobial usage by animal size. Biomass data comes from the Food and Agriculture Organization (FAO). 'The PCU represents the total number of animals in a country (alive or slaughtered), multiplied by the average weight of the animal at the time of treatment. Therefore, the PCU is a standardization metric that accounts for differences in animal weight, and number of production cycles per year between countries.' Therefore, mg/PCU refers to the usage of antimicrobials per animal population-corrected unit.
   license: {}
-  is_public: false
 outs:
   - md5: e0c44fec35851446ebb61784ce6528e3
     size: 8682
