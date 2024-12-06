@@ -210,7 +210,11 @@ def aggregate_donors(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.Da
         missing_donors_names = [v for k, v in donor_composition.items() if k in missing_donors]
 
         if missing_donors:
-            log.warning(f"Missing donors in the data for {donor_group}: {missing_donors_names}")
+            # If all donors are missing, log a warning
+            if missing_donors == set(donor_composition.keys()):
+                log.warning(f"No donors in the data for {donor_group}")
+            else:
+                log.warning(f"Missing donors in the data for {donor_group}: {missing_donors_names}")
 
         df_donors_by_group = df_donors[df_donors["donor_code"].isin(donor_composition.keys())].copy()
 
@@ -280,7 +284,11 @@ def aggregate_recipients(df: pd.DataFrame, columns_to_keep: List[str]) -> List[p
         missing_recipients = [v for k, v in recipient_composition.items() if k in missing_recipients]
 
         if missing_recipients:
-            log.warning(f"Missing recipients in the data for {recipient_group}: {missing_recipients}")
+            # If all recipients are missing, log a warning
+            if missing_recipients == set(recipient_composition.keys()):
+                log.warning(f"No recipients in the data for {recipient_group}")
+            else:
+                log.warning(f"Missing recipients in the data for {recipient_group}: {missing_recipients}")
 
         df_recipients_by_group = df_recipients[
             df_recipients["recipient_code"].isin(recipient_composition.keys())
