@@ -30,17 +30,85 @@ SCENARIOS_EXPECTED = {
     "4",
     "5",
 }
+
+# Renaming of relevant columns
 COLUMNS_RENAME = {
     "name": "country",
     "period": "year",
 }
 
+# Harmonization of the dimension values
 REPLACE_AGE = {
     "all": "total",
 }
 REPLACE_SEX = {
     "both": "total",
 }
+TABLES_RELEVANT = [
+    "asfr",
+]
+
+
+# First table contains education = "all", the other the rest
+TABLES_COMBINE_EDUCATION = [
+    ("asfr", "easfr"),
+    ("assr", "eassr"),
+    ("macb", "emacb"),
+    # ("net", "netedu"),
+    ("tfr", "etfr"),
+    ("bpop", "epop"),
+]
+
+TABLES_CONCAT = [
+    ("prop", "bprop"),
+    ("mys", "bmys"),
+]
+TABLES_AS_IS = []
+
+# With education
+# - TABLES_COMBINE_EDUCATION
+# - TABLES_COMBINE_POPULATION
+# - prop
+#
+
+# NO DIMENSIONS
+# - growth, nirate
+
+# TODO
+# - Population: use epop + bpop (ignore all pop)
+
+
+def reduce_tables(tables):
+    """Reduces the original number based on similar indicators."""
+    tables_combined = [cc for c in TABLES_COMBINE_EDUCATION for cc in c] + [cc for c in TABLES_CONCAT for cc in c]
+    tables_not_combined = [name for name in tables.keys() if name not in tables_combined]
+    tables_reduced = {name: tables[name] for name in tables_not_combined}
+
+    for tb_comb in TABLES_COMBINE_EDUCATION:
+        # Load tables
+        tb1 = tables[tb_comb[0]]
+        tb2 = tables[tb_comb[1]]
+        # Prepare tables for merge
+        tb1 = tb1.assign(education="total")
+        tb2 = tb2.rename(columns={tb_comb[1]: tb_comb[0]})
+        # Check: columns are identical except 'education'
+        assert set(tb1.columns) == set(tb2.columns), "Unexpected columns!"
+        # Concatenate
+        tb = pr.concat([tb1, tb2], ignore_index=True)
+        # Add to dictionary
+        tables_reduced[tb_comb[0]] = tb
+    for tb_comb in TABLES_CONCAT:
+        # Load tables
+        tb1 = tables[tb_comb[0]]
+        tb2 = tables[tb_comb[1]]
+        # Prepare tables for merge
+        tb2 = tb2.rename(columns={tb_comb[1]: tb_comb[0]})
+        # Check: columns are identical except 'education'
+        assert set(tb1.columns) == set(tb2.columns), "Unexpected columns!"
+        # Concatenate
+        tb = pr.concat([tb1, tb2], ignore_index=True)
+        # Add to dictionary
+        tables_reduced[tb_comb[0]] = tb
 
 
 def run(dest_dir: str) -> None:
@@ -105,6 +173,11 @@ def make_table(tbs):
 
 def make_table_from_scenario(tbs):
     """Integrate all tables from scenario into a single table"""
+    # Create dictionary to ease navigation
+    tbs_dix = {t.m.short_name: t for t in tbs}
+    # Dictionary with table combinations made
+    tbs_dix_new = {}
+
     # Separate population from the rest
     tbs_all, tbs_pop = separate_population_from_rest(tbs)
     # Consolidate all population metrics into one single table with dimensions
