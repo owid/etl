@@ -212,13 +212,19 @@ def _cached_jinja_template(text: str) -> jinja2.environment.Template:
     return jinja_env.from_string(text)
 
 
-def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> str:
+def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> Union[str, bool]:
     if not _uses_jinja(text):
         return text
 
     try:
         # NOTE: we're stripping the result to avoid trailing newlines
-        return _cached_jinja_template(text).render(dim_dict).strip()
+        out = _cached_jinja_template(text).render(dim_dict).strip()
+        # Convert strings to booleans. Getting boolean directly from Jinja is not possible
+        if out in ("false", "False", "FALSE"):
+            return False
+        elif out in ("true", "True", "TRUE"):
+            return True
+        return out
     except jinja2.exceptions.TemplateSyntaxError as e:
         new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
         raise e.__class__(new_message, e.lineno, e.name, e.filename) from e
