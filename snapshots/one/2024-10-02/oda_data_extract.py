@@ -210,7 +210,7 @@ def aggregate_donors(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.Da
         if missing_donors:
             # If all donors are missing, log a warning
             if missing_donors == set(donor_composition.keys()):
-                log.warning(f"No donors in the data for {donor_group}")
+                log.warning(f"No donors in the data for {donor_group}: {missing_donors_names}")
             else:
                 log.warning(f"Missing donors in the data for {donor_group}: {missing_donors_names}")
 
@@ -237,15 +237,17 @@ def aggregate_donors(df: pd.DataFrame, columns_to_keep: List[str]) -> List[pd.Da
             )
 
             # Construct a list of names of missing recipients from the codes of missing_recipients
-            missing_recipients = [v for k, v in recipient_composition.items() if k in missing_recipients]
+            missing_recipients_names = [v for k, v in recipient_composition.items() if k in missing_recipients]
 
             if missing_recipients:
                 # If all recipients are missing, log a warning
                 if missing_recipients == set(recipient_composition.keys()):
-                    log.warning(f"No recipients in the data for {recipient_group} in {donor_group} donors")
+                    log.warning(
+                        f"No recipients in the data for {recipient_group} in {donor_group} donors: {missing_recipients_names}"
+                    )
                 else:
                     log.warning(
-                        f"Missing recipients in the data for {recipient_group} in {donor_group} donors: {missing_recipients}"
+                        f"Missing recipients in the data for {recipient_group} in {donor_group} donors: {missing_recipients_names}"
                     )
             df_donors_by_recipient_group = df_donors_by_group[
                 df_donors_by_group["recipient_code"].isin(recipient_composition.keys())
@@ -292,14 +294,14 @@ def aggregate_recipients(df: pd.DataFrame, columns_to_keep: List[str]) -> List[p
         missing_recipients = set(recipient_composition.keys()).difference(df_recipients["recipient_code"].unique())
 
         # Construct a list of names of missing recipients from the codes of missing_recipients
-        missing_recipients = [v for k, v in recipient_composition.items() if k in missing_recipients]
+        missing_recipients_names = [v for k, v in recipient_composition.items() if k in missing_recipients]
 
         if missing_recipients:
             # If all recipients are missing, log a warning
             if missing_recipients == set(recipient_composition.keys()):
-                log.warning(f"No recipients in the data for {recipient_group}")
+                log.warning(f"No recipients in the data for {recipient_group}: {missing_recipients_names}")
             else:
-                log.warning(f"Missing recipients in the data for {recipient_group}: {missing_recipients}")
+                log.warning(f"Missing recipients in the data for {recipient_group}: {missing_recipients_names}")
 
         df_recipients_by_group = df_recipients[
             df_recipients["recipient_code"].isin(recipient_composition.keys())
