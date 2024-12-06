@@ -11,18 +11,26 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("epoch_regressions")
+    ds_garden = paths.load_dataset("epoch_aggregates_affiliation")
 
     # Read table from garden dataset.
-    tb = ds_garden["epoch_regressions"]
-    tb = tb.rename_index_names({"model": "country", "days_since_1949": "year"})
+    tb = ds_garden["epoch_aggregates_affiliation"]
+
+    #
+    # Process data.
+    #
+    # Rename for plotting research affiliation as country in grapher
+    tb = tb.rename_index_names(
+        {
+            "organization_categorization": "country",
+        }
+    )
+
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir, tables=[tb], default_metadata=ds_garden.metadata, check_variables_metadata=True
-    )
+    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
 
     #
     # Checks.

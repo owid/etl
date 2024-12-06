@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     # Extract year from 'publication_date' and create a new 'year' column
     tb["year"] = tb["publication_date"].dt.year
 
-    # For visualization purposes I am adding the rows with the maximum values of compute, data, and parameters in each year to the table as a separate "system". I don't want to do this in garden as it'd affect other datasets that depend on this one.
+    # For visualization purposes I am adding the rows with the maximum values of compute, data, and parameters in each year to the table as a separate "model". I don't want to do this in garden as it'd affect other datasets that depend on this one.
     columns = {
         "training_computation_petaflop": "compute",
         "training_dataset_size__datapoints": "data",
@@ -69,14 +69,14 @@ def find_max_label_and_concat(tb, column, label):
 
     This function:
     1. Identifies rows with maximum values for the specified column in each year.
-    2. Labels these maximum value rows in a new column using their original system names.
+    2. Labels these maximum value rows in a new column using their original model names.
     3. Creates new summary rows for these maximum values.
     4. Adds these new summary rows to the original table.
 
     Note:
     - Creates a new column named f"max_{label}" to indicate maximum values.
-    - Preserves original data and system names.
-    - Adds new summary rows with "system" set to f"Maximum {label}".
+    - Preserves original data and model names.
+    - Adds new summary rows with "model" set to f"Maximum {label}".
     """
     tb = tb.sort_values(by=["year"])  # Ensure the DataFrame is sorted by year
     max_value = -float("inf")
@@ -95,7 +95,7 @@ def find_max_label_and_concat(tb, column, label):
     tb_filtered.loc[idx, f"max_{label}"] = f"Maximum {label}"
 
     max_rows = tb_filtered.loc[idx].copy()
-    max_rows["system"] = f"Maximum {label}"
+    max_rows["model"] = f"Maximum {label}"
 
     tb = pr.concat([tb, max_rows], ignore_index=True)
 
