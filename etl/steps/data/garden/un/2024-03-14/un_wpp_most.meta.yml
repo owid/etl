@@ -1,3 +1,11 @@
+definitions:
+  common:
+    presentation:
+      grapher_config:
+        subtitle: ""
+        originUrl: "https://ourworldindata.org/population-growth"
+        note: ""
+
 tables:
   population_5_year_age_groups:
     variables:
@@ -24,13 +32,8 @@ tables:
           - 65-69
           - 70-74
           - 75-79
-      population:
-        title: Population of the most populous five-year age group
-        unit: "people"
-        description_short: |-
-          Population of the most populous five-year age-group.
-        display:
-          numDecimalPlaces: 0
+        presentation:
+          title_public: Five year age-group with the highest population
   population_10_year_age_groups:
     variables:
       age_group:
@@ -48,10 +51,5 @@ tables:
           - 50-59
           - 60-69
           - 70-79
-      population:
-        title: Population of the most populous ten year age group
-        unit: "people"
-        description_short: |-
-          Population of the most populous ten-year age-group.
-        display:
-          numDecimalPlaces: 0
+        presentation:
+          title_public: Ten year age-group with the highest population
