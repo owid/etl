@@ -56,7 +56,6 @@ def run(dest_dir: str) -> None:
     # Consolidate
     tb = make_table(tbs_scenario)
 
-    # Repeated columns: pop, ggapmys
     #
     # Process data.
     #
