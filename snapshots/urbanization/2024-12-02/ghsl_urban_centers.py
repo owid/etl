@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset. This version of the dataset was provided directly by the source via email."""
+"""Script to create a snapshot of dataset. This version of the dataset was provided directly by the source via email (DIJKSTRA Lewis <Lewis.DIJKSTRA@ec.europa.eu>)."""
 
 from pathlib import Path
 

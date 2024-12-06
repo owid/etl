@@ -1,6 +1,7 @@
 """Load a snapshot and create a meadow dataset."""
 
 import owid.catalog.processing as pr
+import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -22,6 +23,7 @@ def run(dest_dir: str) -> None:
 
     # Process data.
     #
+
     # Remove duplicates in the ID sheet - based on the name of the urban center and country
     tb_urban_center_names = tb_urban_center_names.drop_duplicates(subset=["Main Name", "GADM_name"])
 
@@ -40,6 +42,12 @@ def run(dest_dir: str) -> None:
     tb_urban_center_population = tb_urban_center_population.melt(
         id_vars=["ID_MTUC_G0"], var_name="year", value_name="urban_pop"
     )
+
+    # Replace zeros with NaNs in the urban_pop column (when the urban center did not meet the criteria)
+    tb_urban_center_population["urban_pop"] = tb_urban_center_population["urban_pop"].replace(0, pd.NA)
+
+    # Convert the urban_pop column to a numeric dtype
+    tb_urban_center_population["urban_pop"] = pd.to_numeric(tb_urban_center_population["urban_pop"], errors="coerce")
 
     tb = pr.merge(
         tb_urban_center_population,
@@ -71,19 +79,20 @@ def run(dest_dir: str) -> None:
 
     # Population and density of the capital city
     tb_capitals = tb[tb["capital"] == 1]
+
     tb_capitals = tb_capitals.drop(columns=["ID_MTUC_G0", "region", "capital"])
 
     # Select the top 100 most populous urban centers in 1975 and 2020
     tb_1975 = tb[tb["year"] == 1975]
     tb_2020 = tb[tb["year"] == 2020]
-    top_10_pop_1975 = tb_1975.nlargest(100, "urban_pop")
-    top_10_pop_2020 = tb_2020.nlargest(100, "urban_pop")
+    top_100_pop_1975 = tb_1975.nlargest(100, "urban_pop")
+    top_100_pop_2020 = tb_2020.nlargest(100, "urban_pop")
 
     # Combine the results, ensuring no duplicates
-    top_10_pop_combined = pr.concat([top_10_pop_1975, top_10_pop_2020]).drop_duplicates(subset=["ID_MTUC_G0"])
+    top_100_pop_combined = pr.concat([top_100_pop_1975, top_100_pop_2020]).drop_duplicates(subset=["ID_MTUC_G0"])
 
     # Filter the original Table to select the top urban centers
-    tb_top = tb[tb["ID_MTUC_G0"].isin(top_10_pop_combined["ID_MTUC_G0"])]
+    tb_top = tb[tb["ID_MTUC_G0"].isin(top_100_pop_combined["ID_MTUC_G0"])]
 
     tb_top = tb_top.drop(columns=["urban_area", "ID_MTUC_G0", "region", "capital"])
     tb_top = tb_top.rename(columns={"urban_density": "urban_density_top_100", "urban_pop": "urban_pop_top_100"})
@@ -93,6 +102,9 @@ def run(dest_dir: str) -> None:
     tb_top = tb_top.drop(columns=["urban_center_name"])
 
     tb = pr.merge(tb_capitals, tb_top, on=["country", "year"], how="outer")
+
+    for col in ["urban_pop", "urban_density_top_100", "urban_pop_top_100"]:
+        tb[col].metadata.origins = tb["country"].metadata.origins
 
     tb = tb.format(["country", "year"])
 
