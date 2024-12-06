@@ -82,7 +82,7 @@ tables:
         display:
           name: Share of population living below $<<povertyline>> a day (<<scenario>>)
           numDecimalPlaces: 1
-          isProjection: {definitions.isprojection_by_scenario}
+          isProjection: "{definitions.isprojection_by_scenario}"
           <<: *common-display
 
       poorpop:
@@ -102,5 +102,5 @@ tables:
         display:
           name: Number of people living below $<<povertyline>> a day (<<scenario>>)
           numDecimalPlaces: 0
-          isProjection: {definitions.isprojection_by_scenario}
+          isProjection: "{definitions.isprojection_by_scenario}"
           <<: *common-display
