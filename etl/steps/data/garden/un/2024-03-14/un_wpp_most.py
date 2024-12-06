@@ -32,8 +32,7 @@ def run(dest_dir: str) -> None:
             .reset_index(drop=True)  # Reset index to have a clean DataFrame
         )
         # The function above creates NAs for some countrys that don't appear to be in the table e.g. Vatican, Melanesia, so dropping here
-        # tb_pop_filter = tb_pop_filter.dropna()
-        # tb_pop_filter = tb_pop_filter.reset_index(drop=True)
+
         tb_pop_filter = tb_pop_filter.copy_metadata(tb_pop)
         tb_pop_filter["age_group"].metadata.origins = [origins]
         tb_pop_filter = tb_pop_filter.set_index(["country", "year"], verify_integrity=True)
@@ -41,7 +40,6 @@ def run(dest_dir: str) -> None:
         tb_list.append(tb_pop_filter)
     # Save outputs.
 
-    # tb_list["age_group"].metadata.origins = [origins]
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=tb_list, default_metadata=ds_garden.metadata)
 
