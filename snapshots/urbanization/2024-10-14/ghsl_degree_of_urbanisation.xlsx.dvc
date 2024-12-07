@@ -11,10 +11,10 @@ meta:
     # Citation
     producer: European Commission, Joint Research Centre (JRC)
     citation_full: |-
-      Carioli A., Schiavina M., Melchiorri M. (2024): GHS-COUNTRY-STATS R2024A - GHSL Country Statistics by Degree of Urbanization, multitemporal (1975-2030). European Commission, Joint Research Centre (JRC) [Dataset] doi:10.2905/341c0608-5ca5-4ddb-b068-a412e35a3326 PID: http://data.europa.eu/89h/341c0608-5ca5-4ddb-b068-a412e35a3326
+        Carioli, Alessandra; Schiavina, Marcello; Melchiorri, Michele (2024): GHS-COUNTRY-STATS R2024A - GHSL Country Statistics by Degree of Urbanization, multitemporal (1975-2030). European Commission, Joint Research Centre (JRC) [Dataset] doi: 10.2905/341c0608-5ca5-4ddb-b068-a412e35a3326 PID: http://data.europa.eu/89h/341c0608-5ca5-4ddb-b068-a412e35a3326
 
     # Files
-    url_main: https://ghsl.jrc.ec.europa.eu/CFS.php
+    url_main: https://data.jrc.ec.europa.eu/dataset/341c0608-5ca5-4ddb-b068-a412e35a3326
     date_accessed: 2024-10-14
 
     # License
