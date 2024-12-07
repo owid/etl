@@ -60,11 +60,7 @@ class Snapshot:
     @property
     def metadata_path(self) -> Path:
         """Path to metadata file."""
-        archive_path = Path(f"{paths.SNAPSHOTS_DIR_ARCHIVE / self.uri}.dvc")
-        if archive_path.exists():
-            return archive_path
-        else:
-            return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
+        return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
     def _download_dvc_file(self, md5: str) -> None:
         """Download file from remote to self.path."""

@@ -23,7 +23,6 @@ EXPORT_DIR = BASE_DIR / "export"
 
 # Snapshots
 SNAPSHOTS_DIR = BASE_DIR / "snapshots"
-SNAPSHOTS_DIR_ARCHIVE = BASE_DIR / "snapshots_archive"
 
 # ETL library
 ETL_DIR = BASE_DIR / "etl"
@@ -32,7 +31,6 @@ STEPS_DATA_DIR = STEP_DIR / "data"
 STEPS_MEADOW_DIR = STEPS_DATA_DIR / "meadow"
 STEPS_GARDEN_DIR = STEPS_DATA_DIR / "garden"
 STEPS_GRAPHER_DIR = STEPS_DATA_DIR / "grapher"
-STEP_DIR_ARCHIVE = STEP_DIR / "archive"
 
 # Apps
 APPS_DIR = BASE_DIR / "apps"
