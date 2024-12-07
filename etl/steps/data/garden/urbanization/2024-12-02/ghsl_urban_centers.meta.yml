@@ -17,12 +17,12 @@ definitions:
   desc_short_density_capital: &desc_short_density_capital |-
     The number of people per km² of land area for the country's capital city.
   desc_short_density_top_100: &desc_short_density_top_100 |-
-    The number of people per km² of land area for cities ranked among the top 100 most populous in either 1975 or 2020.
+    The number of people per km² of land area for cities ranked among the top 100 most populous in 2020.
 
   desc_short_pop_capital: &desc_short_pop_capital |-
     The total number of people living in the country's capital city.
   desc_short_pop_top_100: &desc_short_pop_top_100 |-
-    The total number of people living in cities ranked among the top 100 most populous in either 1975 or 2020.
+    The total number of people living in cities ranked among the top 100 most populous in 2020.
   desc_short_pop_1mil: &desc_short_pop_1mil |-
     The total number of people living in cities with more than 1 million inhabitants.
 
