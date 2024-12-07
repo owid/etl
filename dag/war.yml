@@ -221,16 +221,16 @@ steps:
     - data://garden/sipri/2024-07-08/military_expenditure
 
   # Global Military Spending Dataset
-  data://meadow/harvard/2024-07-22/global_military_spending_dataset:
+  data://meadow/harvard/2024-11-26/global_military_spending_dataset:
     - snapshot://harvard/2024-07-22/global_military_spending_dataset.rds
-    - snapshot://harvard/2024-07-22/global_military_spending_dataset_burden.rds
-  data://garden/harvard/2024-07-22/global_military_spending_dataset:
-    - data://meadow/harvard/2024-07-22/global_military_spending_dataset
+    - snapshot://harvard/2024-11-26/global_military_spending_dataset_burden.rds
+  data://garden/harvard/2024-11-26/global_military_spending_dataset:
+    - data://meadow/harvard/2024-11-26/global_military_spending_dataset
     - data://garden/demography/2024-07-15/population
     - data://garden/countries/2024-08-27/gleditsch
     - data://garden/cow/2024-07-26/national_material_capabilities
-  data://grapher/harvard/2024-07-22/global_military_spending_dataset:
-    - data://garden/harvard/2024-07-22/global_military_spending_dataset
+  data://grapher/harvard/2024-11-26/global_military_spending_dataset:
+    - data://garden/harvard/2024-11-26/global_military_spending_dataset
 
     # Correlates of War - National Material Capabilities
   data://meadow/cow/2024-07-26/national_material_capabilities:
