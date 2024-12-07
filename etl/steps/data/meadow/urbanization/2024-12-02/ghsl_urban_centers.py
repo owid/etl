@@ -84,7 +84,7 @@ def run(dest_dir: str) -> None:
 
     # Select the top 100 most populous cities in 2020
     tb_2020 = tb[tb["year"] == 2020]
-    top_100_pop_2020 = tb_2020.nlargest(30, "urban_pop").drop_duplicates(subset=["ID_MTUC_G0"])
+    top_100_pop_2020 = tb_2020.nlargest(100, "urban_pop").drop_duplicates(subset=["ID_MTUC_G0"])
 
     # Filter the original Table to select the top urban centers
     tb_top = tb[tb["ID_MTUC_G0"].isin(top_100_pop_2020["ID_MTUC_G0"])]
