@@ -43,7 +43,6 @@ def run(dest_dir: str) -> None:
 
         tables.append(tb)
 
-    #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
