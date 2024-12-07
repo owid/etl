@@ -82,17 +82,12 @@ def run(dest_dir: str) -> None:
 
     tb_capitals = tb_capitals.drop(columns=["ID_MTUC_G0", "region", "capital"])
 
-    # Select the top 100 most populous urban centers in 1975 and 2020
-    tb_1975 = tb[tb["year"] == 1975]
+    # Select the top 100 most populous cities in 2020
     tb_2020 = tb[tb["year"] == 2020]
-    top_100_pop_1975 = tb_1975.nlargest(100, "urban_pop")
-    top_100_pop_2020 = tb_2020.nlargest(100, "urban_pop")
-
-    # Combine the results, ensuring no duplicates
-    top_100_pop_combined = pr.concat([top_100_pop_1975, top_100_pop_2020]).drop_duplicates(subset=["ID_MTUC_G0"])
+    top_100_pop_2020 = tb_2020.nlargest(100, "urban_pop").drop_duplicates(subset=["ID_MTUC_G0"])
 
     # Filter the original Table to select the top urban centers
-    tb_top = tb[tb["ID_MTUC_G0"].isin(top_100_pop_combined["ID_MTUC_G0"])]
+    tb_top = tb[tb["ID_MTUC_G0"].isin(top_100_pop_2020["ID_MTUC_G0"])]
 
     tb_top = tb_top.drop(columns=["urban_area", "ID_MTUC_G0", "region", "capital"])
     tb_top = tb_top.rename(columns={"urban_density": "urban_density_top_100", "urban_pop": "urban_pop_top_100"})
