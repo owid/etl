@@ -1,3 +1,5 @@
+from typing import Any
+
 from owid.catalog import Table
 from owid.catalog import processing as pr
 from structlog import get_logger
@@ -22,9 +24,9 @@ def run(dest_dir: str) -> None:
         log.info(f"Creating population table for {age_group} year age groups")
         # filter data for just sex = all, metrics = population, variant = estimates
         if age_group == 5:
-            tb_pop_filter = create_five_year_age_groups(tb_pop)
+            tb_pop_filter = create_five_year_age_groups(tb_pop, origins)
         if age_group == 10:
-            tb_pop_filter = create_ten_year_age_groups(tb_pop)
+            tb_pop_filter = create_ten_year_age_groups(tb_pop, origins)
         # Group by country and year, and apply the custom function
         tb_pop_filter = (
             tb_pop_filter.groupby(["country", "year"], group_keys=False)
@@ -33,8 +35,6 @@ def run(dest_dir: str) -> None:
         )
         # The function above creates NAs for some countrys that don't appear to be in the table e.g. Vatican, Melanesia, so dropping here
 
-        # tb_pop_filter = tb_pop_filter.copy_metadata(tb_pop)
-        tb_pop_filter["age_group"].metadata.origins = [origins]
         tb_pop_filter = tb_pop_filter.drop(columns=["population"])
         tb_pop_filter = tb_pop_filter.set_index(["country", "year"], verify_integrity=True)
         tb_pop_filter.metadata.short_name = f"population_{age_group}_year_age_groups"
@@ -48,7 +48,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def create_ten_year_age_groups(tb: Table) -> Table:
+def create_ten_year_age_groups(tb: Table, origins: Any) -> Table:
     # Initialize an empty list to hold the age bands
     age_bands = []
     # Loop through a range with a step of 5, stopping before 100
@@ -73,12 +73,13 @@ def create_ten_year_age_groups(tb: Table) -> Table:
     tb = tb[(tb.age != "0-4") & (tb.age != "5-9") & (tb.age != "10-14") & (tb.age != "15-19")]
     # Concatenate the 0-9 and 10-19 age groups with the original table
     tb = pr.concat([tb, tb_0_9, tb_10_19])
-    tb = tb.rename(columns={"age": "age_group"})
+    tb = tb.rename(columns={"age": "age_group_ten"})
+    tb["age_group_ten"].metadata.origins = [origins]
     tb = tb.reset_index(drop=True)
     return tb
 
 
-def create_five_year_age_groups(tb: Table) -> Table:
+def create_five_year_age_groups(tb: Table, origins: Any) -> Table:
     # Initialize an empty list to hold the age bands
     age_bands = []
     # Loop through a range with a step of 5, stopping before 100
@@ -90,7 +91,8 @@ def create_five_year_age_groups(tb: Table) -> Table:
     tb = tb[(tb.sex == "all") & (tb.variant == "estimates") & (tb.age.isin(age_bands))]
     assert tb["age"].nunique() == len(age_bands), "Age groups are not as expected"
     tb = tb.drop(columns=["sex", "variant", "population_change", "population_density"])
-    tb = tb.rename(columns={"age": "age_group"})
+    tb = tb.rename(columns={"age": "age_group_five"})
+    tb["age_group_five"].metadata.origins = [origins]
     tb = tb.reset_index(drop=True)
     return tb
 

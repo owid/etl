@@ -9,7 +9,7 @@ definitions:
 tables:
   population_5_year_age_groups:
     variables:
-      age_group:
+      age_group_five:
         title: Five year age-group with the highest population
         unit: ""
         description_short: |-
@@ -36,7 +36,7 @@ tables:
           title_public: Five year age-group with the highest population
   population_10_year_age_groups:
     variables:
-      age_group:
+      age_group_ten:
         title: Ten year age-group with the highest population
         unit: ""
         description_short: |-
