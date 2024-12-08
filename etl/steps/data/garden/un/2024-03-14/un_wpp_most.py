@@ -73,7 +73,7 @@ def create_ten_year_age_groups(tb: Table) -> Table:
     tb = tb[(tb.age != "0-4") & (tb.age != "5-9") & (tb.age != "10-14") & (tb.age != "15-19")]
     # Concatenate the 0-9 and 10-19 age groups with the original table
     tb = pr.concat([tb, tb_0_9, tb_10_19])
-    tb = tb.rename(columns={"age": "age_group"})
+    tb = tb.rename(columns={"age": "age_group_ten"})
     tb = tb.reset_index(drop=True)
     return tb
 
@@ -90,7 +90,7 @@ def create_five_year_age_groups(tb: Table) -> Table:
     tb = tb[(tb.sex == "all") & (tb.variant == "estimates") & (tb.age.isin(age_bands))]
     assert tb["age"].nunique() == len(age_bands), "Age groups are not as expected"
     tb = tb.drop(columns=["sex", "variant", "population_change", "population_density"])
-    tb = tb.rename(columns={"age": "age_group"})
+    tb = tb.rename(columns={"age": "age_group_five"})
     tb = tb.reset_index(drop=True)
     return tb
 
