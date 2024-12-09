@@ -10,7 +10,7 @@ meta:
       In 2021, the Shared Socioeconomic Pathways (SSPs) scenario community related to the Intergovernmental Panel on Climate Change requested an update of the human core of the SSPs, which is at the origin of this version. This updated version is based on 2020 as the reference year, with adjustments to certain short-term assumptions extending to 2030. However, most long-term assumptions have not been changed. Several changes were nevertheless implemented particularly in estimating and using country-specific education differentials in mortality and migration.
 
       This new version includes population projections by levels of educational attainment from 2020 to 2100 for 200 countries according to seven scenarios (SSP1-5, SSP2-Zero Migration and SSP2-Double Migration). The reconstruction will become available in the course of 2024.
-    version_producer: 3
+    title_snapshot: Human Capital, Wittgenstein Centre (Historical data)
     date_published: "2024-02-08"
 
     # Citation
@@ -27,6 +27,6 @@ meta:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/deed.en
 outs:
-  - md5: a1bc7bb756f24d5a0e6eb1fe90f057e5
-    size: 115287227
-    path: wittgenstein_human_capital.zip
+  - md5: 6aaf6017779daed3356935b745d8d25e
+    size: 318304437
+    path: wittgenstein_human_capital_historical.zip
