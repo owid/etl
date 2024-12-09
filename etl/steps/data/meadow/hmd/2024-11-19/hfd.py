@@ -215,6 +215,7 @@ where:
 2y totbirthsRRbo
 
 """
+
 from pathlib import Path
 
 import owid.catalog.processing as pr

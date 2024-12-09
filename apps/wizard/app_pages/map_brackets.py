@@ -1,6 +1,4 @@
-"""Helper tool to create map brackets for all indicators in an indicator-based explorer.
-
-"""
+"""Helper tool to create map brackets for all indicators in an indicator-based explorer."""
 
 import json
 from pathlib import Path

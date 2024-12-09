@@ -15,7 +15,7 @@ from apps.wizard.utils.io import get_all_changed_catalog_paths
 from etl import grapher_model as gm
 from etl.config import OWID_ENV
 from etl.db import read_sql
-from etl.git_helpers import get_changed_files
+from etl.git_helpers import get_changed_files, log_time
 
 log = get_logger()
 
@@ -540,6 +540,7 @@ class ChartDiffsLoader:
         return pd.DataFrame(summary)
 
 
+@log_time
 def _modified_data_metadata_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
@@ -644,6 +645,7 @@ def _modified_data_metadata_on_staging(
     return diff
 
 
+@log_time
 def _modified_chart_configs_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:

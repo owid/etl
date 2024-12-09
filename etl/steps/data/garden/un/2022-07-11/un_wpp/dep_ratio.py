@@ -1,4 +1,5 @@
 """Depenndency ratio table"""
+
 from owid.catalog import Table
 
 from .dtypes import optimize_dtypes

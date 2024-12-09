@@ -11,7 +11,6 @@ GDP are included.
 
 """
 
-
 import numpy as np
 from owid.catalog import Dataset, Origin, Table
 

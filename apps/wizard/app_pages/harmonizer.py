@@ -1,4 +1,5 @@
 """Harmonize entities."""
+
 import json
 from operator import itemgetter
 from pathlib import Path

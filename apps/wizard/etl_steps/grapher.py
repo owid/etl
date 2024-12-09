@@ -1,4 +1,5 @@
 """Grapher phase."""
+
 from pathlib import Path
 from typing import cast
 

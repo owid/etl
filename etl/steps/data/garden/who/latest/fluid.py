@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
 from datetime import datetime
 
 import numpy as np

@@ -5,7 +5,6 @@ Loads the latest PIP data from garden and stores multiple tables as csv files.
 
 """
 
-
 from owid.catalog import Dataset, Table
 
 from etl.helpers import PathFinder, create_dataset

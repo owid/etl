@@ -1,6 +1,4 @@
-"""Load snapshot of Farmer & Lafond (2016) data and create a table.
-
-"""
+"""Load snapshot of Farmer & Lafond (2016) data and create a table."""
 
 from etl.helpers import PathFinder, create_dataset
 
