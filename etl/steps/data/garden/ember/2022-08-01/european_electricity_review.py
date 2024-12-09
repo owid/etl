@@ -1,6 +1,4 @@
-"""Garden step for European Electricity Review (Ember, 2022).
-
-"""
+"""Garden step for European Electricity Review (Ember, 2022)."""
 
 from typing import cast
 

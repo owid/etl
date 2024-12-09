@@ -3,7 +3,6 @@ Load the three LIS snapshots and creates three tables in the luxembourg_income_s
 Country names are converted from iso-2 codes in this step and years are reformated from "YY" to "YYYY"
 """
 
-
 from typing import Dict
 
 import owid.catalog.processing as pr

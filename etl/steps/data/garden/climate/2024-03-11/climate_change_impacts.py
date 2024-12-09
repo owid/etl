@@ -1,6 +1,4 @@
-"""Create a garden dataset with all climate change impacts data.
-
-"""
+"""Create a garden dataset with all climate change impacts data."""
 
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes

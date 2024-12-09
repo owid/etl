@@ -33,7 +33,7 @@ dev-dependencies = [
     "argh>=0.26.2",
     "pyright==1.1.373",
     "pandas-stubs==1.2.0.62",
-    "ruff==0.1.6"
+    "ruff==0.8.2"
 ]
 
 [tool.uv.sources]

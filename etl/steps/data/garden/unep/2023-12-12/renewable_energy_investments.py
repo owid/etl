@@ -1,6 +1,5 @@
-"""Create a garden dataset on renewable energy investments based on UNEP data.
+"""Create a garden dataset on renewable energy investments based on UNEP data."""
 
-"""
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions.

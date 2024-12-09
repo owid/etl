@@ -18,7 +18,7 @@ dependencies = [
 dev-dependencies = [
     "pytest>=7.2.0",
     "pyright==1.1.373",
-    "ruff==0.1.6",
+    "ruff==0.8.2",
     "ipdb>=0.13.13",
 ]
 

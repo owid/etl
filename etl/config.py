@@ -6,6 +6,7 @@
 The environment variables and settings here are for publishing options, they're
 only important for OWID staff.
 """
+
 import os
 import pwd
 import re

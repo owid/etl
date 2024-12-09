@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+
 from typing import Any, Dict
 
 from owid.catalog import Table

@@ -1,6 +1,5 @@
-"""Common operations performed on tables and variables.
+"""Common operations performed on tables and variables."""
 
-"""
 from .tables import (
     ExcelFile,
     concat,

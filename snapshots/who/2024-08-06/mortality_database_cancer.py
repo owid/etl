@@ -17,6 +17,7 @@ Save them in the same folder and read from this folder when creating the snapsho
 ICD 10 codes were gathered from the downloaded files and the broad cause group was inferred from the platform.
 
 """
+
 import os
 from pathlib import Path
 

@@ -20,7 +20,6 @@ The data will then be requested and a download link will be sent to you with a n
 We will download and combine the files in the following script.
 """
 
-
 from pathlib import Path
 
 import click

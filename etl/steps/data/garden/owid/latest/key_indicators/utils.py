@@ -1,4 +1,5 @@
 """Utils for key_indicators module."""
+
 import pandas as pd
 
 from etl.data_helpers import geo

@@ -1,6 +1,4 @@
-"""Generate the energy mix dataset using data from the Energy Institute Statistical Review of World Energy.
-
-"""
+"""Generate the energy mix dataset using data from the Energy Institute Statistical Review of World Energy."""
 
 import numpy as np
 from owid.catalog import Dataset, Table

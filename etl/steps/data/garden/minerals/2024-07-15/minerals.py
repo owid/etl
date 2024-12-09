@@ -17,6 +17,7 @@ For debugging:
   NOTE: We allow this where one or a few BGS data points are significantly larger than USGS (e.g. Lead). But we do not do this if many points in BGS data are consistently larger than USGS (e.g. Graphite).
 
 """
+
 import warnings
 from typing import List, Optional, Tuple
 
@@ -589,9 +590,9 @@ def combine_data(
     tb.loc[
         (tb["country"] != "World") & (tb["year"].isin([1997, 2006, 2008, 2010, 2011])), "production|Barite|Mine|tonnes"
     ] = None
-    tb.loc[
-        (tb["country"] != "World") & (tb["year"].isin([1972, 1973, 1975])), "production|Fluorspar|Mine|tonnes"
-    ] = None
+    tb.loc[(tb["country"] != "World") & (tb["year"].isin([1972, 1973, 1975])), "production|Fluorspar|Mine|tonnes"] = (
+        None
+    )
     tb.loc[(tb["country"] != "World") & (tb["year"] < 1975), "production|Gold|Mine|tonnes"] = None
     tb.loc[
         (tb["country"] != "World") & (tb["year"].isin([2014])),

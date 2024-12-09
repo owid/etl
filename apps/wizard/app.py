@@ -4,6 +4,7 @@ This is the page that is loaded when the app is started. It redirects to the hom
 
 NOTE: This only works with >1.35 (nightly) version of Streamlit.
 """
+
 import streamlit as st
 
 from apps.wizard.config import WIZARD_CONFIG

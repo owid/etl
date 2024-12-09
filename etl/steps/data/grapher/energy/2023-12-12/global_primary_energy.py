@@ -1,5 +1,5 @@
-"""Grapher step for the global primary energy dataset.
-"""
+"""Grapher step for the global primary energy dataset."""
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.

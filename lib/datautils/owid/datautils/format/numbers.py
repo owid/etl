@@ -1,4 +1,5 @@
 """Numeric formatting."""
+
 import re
 from typing import Any, Dict, Set, Union
 

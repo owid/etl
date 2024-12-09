@@ -1,6 +1,4 @@
-"""Garden step for European Electricity Review (Ember, 2022).
-
-"""
+"""Garden step for European Electricity Review (Ember, 2022)."""
 
 from owid.catalog import Table
 from owid.datautils import dataframes

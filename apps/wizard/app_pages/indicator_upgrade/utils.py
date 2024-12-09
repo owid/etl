@@ -1,4 +1,5 @@
 """Utils for chart revision tool."""
+
 from typing import Dict, Tuple, cast
 
 import pandas as pd

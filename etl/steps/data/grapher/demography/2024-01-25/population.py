@@ -2,6 +2,7 @@
 
 This dataset is a work in progress. We have layed down the foundations for the step, but are waiting until new data is available (both from Maddison and from 2024 WPP).
 """
+
 import re
 from copy import deepcopy
 from typing import Any, List

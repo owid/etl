@@ -1,6 +1,4 @@
-"""Common definitions used by scripts to create new snapshots and data steps.
-
-"""
+"""Common definitions used by scripts to create new snapshots and data steps."""
 
 import datetime as dt
 from typing import Dict, List, Tuple

@@ -24,9 +24,9 @@ def run(dest_dir: str) -> None:
     tb = tb[["Indicator", "Location", "Period", "Value"]]
     tb = tb.rename(columns={"Location": "country", "Period": "year", "Value": "value"})
 
-    tb.loc[
-        tb["year"] == "2017-2019", "year"
-    ] = "2018"  # 2017-2019 is the average of 2017, 2018 and 2019 so we replace it with 2018 to be consistent with the other years
+    tb.loc[tb["year"] == "2017-2019", "year"] = (
+        "2018"  # 2017-2019 is the average of 2017, 2018 and 2019 so we replace it with 2018 to be consistent with the other years
+    )
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.underscore().set_index(["country", "year", "indicator"], verify_integrity=True).sort_index()
 

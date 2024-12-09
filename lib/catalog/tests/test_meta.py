@@ -20,8 +20,7 @@ def test_dict_mixin():
         name: Optional[str] = None
         age: Optional[int] = None
 
-        def to_dict(self) -> Dict[str, Any]:
-            ...
+        def to_dict(self) -> Dict[str, Any]: ...
 
     assert Dog(name="fred").to_dict() == {"name": "fred"}
     assert Dog(age=10).to_dict() == {"age": 10}
@@ -43,8 +42,7 @@ def test_dict_mixin_nested():
         age: Optional[int] = None
         cat: Optional[Cat] = None
 
-        def to_dict(self) -> Dict[str, Any]:
-            ...
+        def to_dict(self) -> Dict[str, Any]: ...
 
     assert Dog(name="fred", cat=Cat(name="cred")).to_dict() == {"name": "fred", "cat": {"name": "cred"}}
 
