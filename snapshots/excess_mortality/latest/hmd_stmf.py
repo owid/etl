@@ -1,4 +1,5 @@
 """Script to create a snapshot of dataset 'Short-Term Mortality Fluctuations (HMD, 2023)'."""
+
 import re
 from datetime import date, datetime
 from pathlib import Path

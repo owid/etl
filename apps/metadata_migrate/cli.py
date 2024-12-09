@@ -209,9 +209,9 @@ def cli(
 
         # empty fields to be filled
         vars[col]["presentation"] = {}
-        vars[col]["presentation"][
-            "title_public"
-        ] = "TBD - Indicator title to be shown in data pages, that overrides the indicator's title."
+        vars[col]["presentation"]["title_public"] = (
+            "TBD - Indicator title to be shown in data pages, that overrides the indicator's title."
+        )
         vars[col]["presentation"]["title_variant"] = "TBD - Indicator's title variant"
         vars[col]["presentation"]["attribution_short"] = "TBD - Indicator's attribution (shorter version)"
         vars[col]["presentation"]["faqs"] = [

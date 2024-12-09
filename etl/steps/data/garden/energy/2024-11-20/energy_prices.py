@@ -1,6 +1,5 @@
-"""Compilation of energy prices datasets.
+"""Compilation of energy prices datasets."""
 
-"""
 import owid.catalog.processing as pr
 
 from etl.helpers import PathFinder, create_dataset

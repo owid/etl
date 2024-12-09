@@ -14,6 +14,7 @@ Outputs that will be committed to a branch in the co2-data repository:
 * The README file.
 
 """
+
 import os
 import tempfile
 from pathlib import Path
