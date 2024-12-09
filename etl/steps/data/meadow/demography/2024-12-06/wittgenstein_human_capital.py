@@ -63,8 +63,34 @@ TABLES_CONCAT = [
     ("prop", "bprop"),
     ("mys", "bmys"),
 ]
-TABLES_AS_IS = []
-
+TABLES_DROP = [
+    # Several tables are just population!
+    "pop",
+    "pop-age",
+    "pop-age-edattain",
+    "pop-age-sex",
+    "pop-age-sex-edattain",
+    "pop-sex",
+    "pop-sex-edattain",
+    "pop-total",
+]
+# Composition of tables
+TABLES_COMPOSITION = {
+    # 0/ No dimension
+    "main": {"cbr", "cdr", "emi", "ggapmys15", "ggapmys25", "growth", "imm", "mage", "nirate", "odr", "ydr", "tdr"},
+    # 1/ Sex dimension. NOTE: no sex=total
+    "by_sex": {"e0", "pryl15", "ryl15"},
+    # 1/ Age dimension
+    "by_age": {"sexratio"},
+    # 1/ Education dimension
+    "by_edu": {"ggapedu15", "ggapedu25", "macb", "net", "tfr"},
+    # 2/ Sex+Age dimensions. NOTE: no age=total
+    "by_sex_age": {"mys"},
+    # 2/ Age+Education dimensions. NOTE: no age=total, that's fine. We have tfr for all ages actually.
+    "by_age_edu": {"asfr"},
+    # 3/ Sex+Age+Education dimensions
+    "by_sex_age_edu": {"assr", "pop", "prop"},
+}
 # With education
 # - TABLES_COMBINE_EDUCATION
 # - TABLES_COMBINE_POPULATION
@@ -78,12 +104,129 @@ TABLES_AS_IS = []
 # - Population: use epop + bpop (ignore all pop)
 
 
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot.
+    snap = paths.load_snapshot("wittgenstein_human_capital.zip")
+
+    # Load data from snapshot. {"1": [tb1, tb2, ...], "2": [tb1, tb2, ...], ...}
+    tbs_scenario = read_data_from_snap(snap)
+
+    #
+    # Process data.
+    #
+    # Consolidate individual scenario tables: {"main": [tb_main1, tb_main2, ...], "by_sex": [tb_sex1, tb_sex2, ...], ...}
+    tbs_scenario = make_scenario_tables(tbs_scenario)
+
+    # Concatenate: [table_main, table_sex, ...]
+    tables = concatenate_tables(tbs_scenario)
+
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    ds_meadow = create_dataset(
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=snap.metadata,
+    )
+
+    # Save changes in the new meadow dataset.
+    ds_meadow.save()
+
+
+def make_scenario_tables(tbs_scenario):
+    """Create main table from all scenarios.
+
+    Index: country, year, scenario, age, sex, education.
+    """
+    # Obtain tables
+    tbs_base = []
+    for scenario, tbs in tbs_scenario.items():
+        paths.log.info(f"Preparing data for scenario {scenario}...")
+        tb = make_tables_from_scenario(tbs, scenario)
+        tbs_base.append(tb)
+
+    # Re-shape table structure
+    tbs_ = {group: [] for group in TABLES_COMPOSITION}
+    for tbs in tbs_base:
+        for key, tb in tbs.items():
+            tbs_[key].append(tb)
+
+    return tbs_
+
+
+def concatenate_tables(tbs_scenario):
+    tables = []
+    for tname, tbs in tbs_scenario.items():
+        paths.log.info(f"Concatenating table {tname}")
+        # Check columns match for all tables in group
+        cols_index = None
+        for tb in tbs:
+            cols_index_ = _get_index_columns(tb)
+            if cols_index is None:
+                cols_index = list(cols_index_)
+            else:
+                assert set(cols_index) == set(cols_index_), "Unexpected index columns!"
+        # Merge
+        tb = pr.concat(tbs, short_name=tname)
+
+        # Format
+        paths.log.info(f"Formatting table {tname}")
+        assert isinstance(cols_index, list)
+        tb = tb.format(cols_index + ["scenario"])
+
+        # Add to main list
+        tables.append(tb)
+    return tables
+
+
+def make_tables_from_scenario(tbs, scenario_num):
+    """Integrate all tables from scenario into single tables.
+
+    We generate multiple single tables since different tables may use different dimensions. This helps in optimizing computation.
+    """
+    # Sanity check country - country_code match
+    tables = []
+    for tb in tbs:
+        # Check columns are in tables
+        assert ("country" in tb.columns) and ("country_code" in tb.columns), "Missing country or country_code!"
+        # Check there is a one-to-one correspondence
+        assert tb.groupby("country").country_code.nunique().max() == 1, "Multiple country codes for a single country!"
+        # Drop country_code
+        tb = tb.drop(columns="country_code")
+        tables.append(tb)
+
+    # Create dictionary to ease navigation
+    tables = {t.m.short_name: t for t in tables}
+    # Dictionary with table combinations made
+    tables = reduce_tables(tables)
+
+    # Composition of tables
+    tables = consolidate_table_all(tables, scenario_num)
+
+    return tables
+
+
 def reduce_tables(tables):
-    """Reduces the original number based on similar indicators."""
+    """Reduces the original number based on similar indicators.
+
+    Given a key-value dictionary with all the tables, this function simplifies it structure:
+
+    - It combines different tables into a single one. That is possible when, e.g. a table contains the same indicator but broken down by an additional dimension.
+    - Some tables don't have new data. These can be discarded.
+    """
+    # Start by defining the output dictionary `tables_reduced`, with those tables that are not combined and thus should be kept, at least for now, as they are
     tables_combined = [cc for c in TABLES_COMBINE_EDUCATION for cc in c] + [cc for c in TABLES_CONCAT for cc in c]
+    tables_combined += ["net", "netedu"]
     tables_not_combined = [name for name in tables.keys() if name not in tables_combined]
     tables_reduced = {name: tables[name] for name in tables_not_combined}
 
+    # Iterate over the tables from TABLES_COMBINE_EDUCATION to consolidate the pairs into single representation.
+    # Index 1 contains data broken down by 'education'. Index 0 contains data with 'education' = 'total'.
     for tb_comb in TABLES_COMBINE_EDUCATION:
         # Load tables
         tb1 = tables[tb_comb[0]]
@@ -110,139 +253,77 @@ def reduce_tables(tables):
         # Add to dictionary
         tables_reduced[tb_comb[0]] = tb
 
+    # Special case: net and netedu
+    # net has age=all and sex=all, so we can drop these columns
+    # NOTE: net is equivalent to sum(netedu) + epsilon (probably unknown education?)
+    tb1 = tables["net"]
+    tb2 = tables["netedu"]
+    assert set(tb1["age"].unique()) == {"All"}
+    assert set(tb1["sex"].unique()) == {"Both"}
+    tb1 = tb1.drop(columns=["age", "sex"])
+    tb1["education"] = "total"
+    # Rename
+    tb2 = tb2.rename(columns={"netedu": "net"})
+    # Check: columns are identical except 'education'
+    assert set(tb1.columns) == set(tb2.columns), "Unexpected columns!"
+    # Concatenate
+    tb = pr.concat([tb1, tb2], ignore_index=True)
+    tables_reduced["net"] = tb
 
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Retrieve snapshot.
-    snap = paths.load_snapshot("wittgenstein_human_capital.zip")
+    # Remove tables that are not needed
+    tables_reduced = {tname: tb for tname, tb in tables_reduced.items() if tname not in TABLES_DROP}
 
-    # Load data from snapshot.
-    tbs_scenario = read_data_from_snap(snap)
+    # Special: rename 'bpop' -> 'pop'
+    tables_reduced["pop"] = tables_reduced["bpop"].rename(columns={"bpop": "pop"})
+    del tables_reduced["bpop"]
 
-    # Consolidate
-    tb = make_table(tbs_scenario)
-
-    #
-    # Process data.
-    #
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "scenario", "sex", "age", "education"])
-
-    #
-    # Save outputs.
-    #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir,
-        tables=[tb],
-        check_variables_metadata=True,
-        default_metadata=snap.metadata,
-    )
-
-    # Save changes in the new meadow dataset.
-    ds_meadow.save()
+    # Sort dictionary by keys
+    tables_reduced = dict(sorted(tables_reduced.items()))
+    return tables_reduced
 
 
-# with snap.extract_to_tempdir() as tmp:
-#     path = tmp / Path("1_assr.rds")
-#     parsed = rdata.parser.parse_file(path, extension="rds")  # type: ignore
+def consolidate_table_all(tables, scenario_num):
+    """Consolidate tables into new groups.
 
-
-# with snap.extract_to_tempdir() as tmp:
-#     path = tmp / Path("1_assr.rds")
-#     result = pyreadr.read_r(path)
-
-
-def make_table(tbs):
-    """Create main table from all scenarios.
-
-    Index: country, year, scenario, age, sex, education.
+    Each table group is differentiated from the rest based on the index its tables use.
+    Grouping by index helps make the merge of all tables way faster.
+    The idea is that in garden, we process & export each table separately.
+    This function also harmonizes dimension names.
     """
-    tbs_ = []
-    for scenario, tbs_scenario in tbs.items():
-        print(f"scenario {scenario}")
-        tb = make_table_from_scenario(tbs_scenario)
-        tb["scenario"] = scenario
+    # Group tables in new groups
+    tables_new = {}
+    for tname_new, tnames in TABLES_COMPOSITION.items():
+        paths.log.info(f"Building {tname_new}...")
+        # Get list with table objects, with harmonized dimensions
+        tbs_ = []
+        # Index columns
+        cols_index = None
+        for tname in tnames:
+            # Get table
+            tb_ = tables[tname]
+            # Harmonize table
+            tb_ = harmonize_tb(tb_)
+            # Check dimensions
+            cols_index_ = _get_index_columns(tb_)
+            if cols_index is None:
+                cols_index = list(cols_index_)
+            else:
+                assert set(cols_index) == set(cols_index_), "Unexpected index columns!"
+            tbs_.append(tb_)
+        # Merge all tables in list
+        tb = merge_tables_opt(tbs_, on=cols_index, how="outer")
+        # Add scenario information
+        tb["scenario"] = scenario_num
         tb["scenario"] = tb["scenario"].astype("string")
-        tbs_.append(tb)
-    tb = pr.concat(tbs_, ignore_index=True)
-    return tb
+        # Add consolidated table in main dictionary
+        tables_new[tname_new] = tb
+    return tables_new
 
 
-def make_table_from_scenario(tbs):
-    """Integrate all tables from scenario into a single table"""
-    # Create dictionary to ease navigation
-    tbs_dix = {t.m.short_name: t for t in tbs}
-    # Dictionary with table combinations made
-    tbs_dix_new = {}
-
-    # Separate population from the rest
-    tbs_all, tbs_pop = separate_population_from_rest(tbs)
-    # Consolidate all population metrics into one single table with dimensions
-    tb_pop = consolidate_population(tbs_pop)
-    # Consolidate all other metrics into one single table with dimensions
-    tb_all = consolidate_table_all(tbs_all)
-    # Merge both tables
-    tb = tb_all.merge(tb_pop, on=["country", "year", "sex", "age", "education"], how="outer")
-    return tb
-
-
-def separate_population_from_rest(tbs):
-    """Separate the tables into two main groups: population and the rest.
-
-    This is because there are numerous population tables and these have to be consolidated on their own before attempting to merge them with the rest of the tables.
-    """
-    tbs_all = []
-    tbs_pop = []
-    for tb in tbs:
-        if tb.m.short_name.startswith("pop"):
-            tbs_pop.append(tb)
-        else:
-            tbs_all.append(tb)
-    return tbs_all, tbs_pop
-
-
-def consolidate_population(tbs):
-    # Get main table (contains data broken down by age, sex)
-    tb_main = [tb for tb in tbs if tb.m.short_name == "pop"][0]
-    tb_main["education"] = "total"
-
-    # Get data by education
-    tb_edu = [tb for tb in tbs if tb.m.short_name == "pop-age-sex-edattain"][0]
-    tb_edu_all_sex = [tb for tb in tbs if tb.m.short_name == "pop-age-edattain"][0]
-    tb_edu_all_sex["sex"] = "total"
-    tb_edu_all_ages = [tb for tb in tbs if tb.m.short_name == "pop-sex-edattain"][0]
-    tb_edu_all_ages["age"] = "total"
-    # tb_edu = pr.concat([tb_edu, tb_edu_all_sex, tb_edu_all_ages], ignore_index=True)
-    # _ = tb_edu.format(["country", "year", "age", "sex", "education"])
-
-    # Concatenate all tables
-    tb = pr.concat([tb_edu, tb_edu_all_sex, tb_edu_all_ages], ignore_index=True)
-
-    # Final cleaning
-    tb = harmonize_tb(tb)
-
-    return tb
-
-
-def consolidate_table_all(tbs):
-    tbs_ = []
-    for tb in tbs:
-        if "sex" not in tb:
-            tb["sex"] = "total"
-        if "age" not in tb:
-            tb["age"] = "total"
-        if "education" not in tb:
-            tb["education"] = "total"
-        # Final cleaning
-        tb = harmonize_tb(tb)
-        # Append to list
-        tbs_.append(tb)
-
-    tb = merge_tables_opt(tbs_, on=["country", "year", "sex", "age", "education"], how="outer")
-    return tb
+def _get_index_columns(tb):
+    cols_index_all = ["country", "year", "sex", "age", "education"]
+    cols_index = list(tb.columns.intersection(cols_index_all))
+    return cols_index
 
 
 def harmonize_tb(tb):
@@ -251,27 +332,24 @@ def harmonize_tb(tb):
     - Dimensions are named differently in different tables. This function ensures that they are consistent.
     - Makes sure DTypes are set correctly.
     """
-    tb["age"] = (
-        tb["age"]
-        .str.lower()
-        .replace(REPLACE_AGE)
-        .str.replace("––", "-", regex=False)
-        .str.replace("--", "-", regex=False)
-    )
-    tb["sex"] = tb["sex"].str.lower().replace(REPLACE_SEX)
-    tb["education"] = tb["education"].str.lower().str.replace(" ", "_")
-
-    # Drop unused column
-    tb = tb.drop(columns="country_code")
+    if "age" in tb.columns:
+        tb["age"] = (
+            tb["age"]
+            .str.lower()
+            .replace(REPLACE_AGE)
+            .str.replace("––", "-", regex=False)
+            .str.replace("--", "-", regex=False)
+        ).astype("string")
+    if "sex" in tb.columns:
+        tb["sex"] = tb["sex"].str.lower().replace(REPLACE_SEX).astype("string")
+    if "education" in tb.columns:
+        tb["education"] = tb["education"].str.lower().str.replace(" ", "_").astype("string")
 
     # Set dtype
     tb = tb.astype(
         {
             "country": "string",
             "year": "string",
-            "age": "string",
-            "sex": "string",
-            "education": "string",
         }
     )
     return tb
@@ -344,10 +422,10 @@ def read_data_from_snap(snap):
 def inspect_tbs_in_scenario(tbs):
     """For exploration purposes only."""
     cols_index = ["country", "country_code", "scenario", "year", "age", "sex", "education"]
-    for tb in tbs:
+    for tname, tb in tbs.items():
         cols = set(tb.columns)
         cols_index_ = [col for col in cols_index if col in cols]
         cols_indicators_ = [col for col in cols if col not in cols_index_]
         # cols_ = list(sorted(cols_index_)) + list(sorted(cols_indicators_))
-        # print(cols_index_)
-        print("\t" + f"{list(sorted(cols_indicators_))}")
+        print(f"> {', '.join(sorted(cols_indicators_))} ({tname}): {', '.join(cols_index_)}")
+        # print(f"{', '.join(cols_index_)}")
