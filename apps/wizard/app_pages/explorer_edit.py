@@ -1,4 +1,5 @@
 """Helper tool to create map brackets for all indicators in an indicator-based explorer."""
+
 from io import StringIO
 
 import streamlit as st

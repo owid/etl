@@ -1,4 +1,4 @@
-""" Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of researcher affiliation."""
+"""Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of researcher affiliation."""
 
 from etl.helpers import PathFinder, create_dataset
 

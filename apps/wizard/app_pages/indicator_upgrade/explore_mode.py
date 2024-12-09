@@ -2,6 +2,7 @@
 
 This is currently shown in the indicator upgrader, but might be moved to chart-diff in the future.
 """
+
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Tuple, cast
 

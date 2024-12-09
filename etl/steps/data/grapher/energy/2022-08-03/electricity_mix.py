@@ -1,5 +1,4 @@
-"""Grapher step for the Electricity Mix (BP & Ember, 2022) dataset.
-"""
+"""Grapher step for the Electricity Mix (BP & Ember, 2022) dataset."""
 
 from owid import catalog
 

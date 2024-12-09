@@ -36,7 +36,6 @@ On regions:
         Asia and Oceania: 700-999
 """
 
-
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd

@@ -16,7 +16,6 @@ Steps:
 Based on https://stackoverflow.com/questions/62031809/extracting-javascript-variables-into-python-dictionaries
 """
 
-
 import json
 from pathlib import Path
 

@@ -1,6 +1,4 @@
-"""Test functions in owid.datautils.io.local module.
-
-"""
+"""Test functions in owid.datautils.io.local module."""
 
 from unittest.mock import mock_open, patch
 

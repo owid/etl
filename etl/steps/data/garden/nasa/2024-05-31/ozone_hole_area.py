@@ -3,7 +3,6 @@
 This step adds a new column: "country" with the value "World", since the data in this dataset
 is only for the world."""
 
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.

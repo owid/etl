@@ -1,5 +1,4 @@
-"""Grapher step for the fossil fuel production dataset.
-"""
+"""Grapher step for the fossil fuel production dataset."""
 
 from owid.catalog import Dataset
 

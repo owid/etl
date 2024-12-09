@@ -7,7 +7,6 @@ To update:
         python snapshots/pew/{version}/same_sex_marriage.py --path-to-file snapshots/pew/{version}/same_sex_marriage.csv
 """
 
-
 from pathlib import Path
 
 import pandas as pd

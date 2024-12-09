@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
 import owid.catalog.processing as pr
 import pandas as pd
 

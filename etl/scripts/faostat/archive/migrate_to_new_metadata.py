@@ -5,6 +5,7 @@ NOTE: This script should only be used once, to generate the files for the first 
 In future updates we will need to adapt the scripts or etl steps to be able to easily update metadata.
 
 """
+
 import argparse
 import json
 

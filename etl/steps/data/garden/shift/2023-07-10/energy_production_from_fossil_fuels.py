@@ -1,6 +1,4 @@
-"""Garden step for Shift data on energy production from fossil fuels.
-
-"""
+"""Garden step for Shift data on energy production from fossil fuels."""
 
 from typing import Dict, List, Optional, Union
 

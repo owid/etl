@@ -2,7 +2,6 @@
 Option to get data from Google Earth Engine is in 2024-07-10 version of this script
 """
 
-
 from pathlib import Path
 
 import click

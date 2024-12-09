@@ -523,12 +523,12 @@ def harmonize_minerals_and_processes(tb_demand: Table, tb_supply: Table) -> Tupl
     # * For graphite, supply data is divided in "mining (natural)" and "battery grade". For consistency, we can rename them "mining" and "refining" and add a footnote.
     tb_supply = tb_supply.astype({"process": "string", "mineral": "string"}).copy()
     tb_supply.loc[(tb_supply["mineral"] == "Lithium") & (tb_supply["process"] == "Chemicals"), "process"] = "Refining"
-    tb_supply.loc[
-        (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Battery grade"), "process"
-    ] = "Refining"
-    tb_supply.loc[
-        (tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Mining (natural)"), "process"
-    ] = "Mining"
+    tb_supply.loc[(tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Battery grade"), "process"] = (
+        "Refining"
+    )
+    tb_supply.loc[(tb_supply["mineral"] == "Graphite") & (tb_supply["process"] == "Mining (natural)"), "process"] = (
+        "Mining"
+    )
 
     # Rename a few things, for consistency with the minerals explorer.
     for table in [tb_demand, tb_supply]:

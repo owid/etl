@@ -1,12 +1,12 @@
 """Script to create a snapshot of the monthly averaged surface temperature data from 1950 to present from the Copernicus Climate Change Service.
 
-   The script assumes that the data is available on the CDS API.
-   Instructions on how to access the API on a Mac are here: https://confluence.ecmwf.int/display/CKB/How+to+install+and+use+CDS+API+on+macOS
+The script assumes that the data is available on the CDS API.
+Instructions on how to access the API on a Mac are here: https://confluence.ecmwf.int/display/CKB/How+to+install+and+use+CDS+API+on+macOS
 
-   More information on how to access the data is here: https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels-monthly-means?tab=overview
+More information on how to access the data is here: https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels-monthly-means?tab=overview
 
-   The data is downloaded as a NetCDF file. Tutorials for using the Copernicus API are here and work with the NETCDF format are here: https://ecmwf-projects.github.io/copernicus-training-c3s/cds-tutorial.html
-   """
+The data is downloaded as a NetCDF file. Tutorials for using the Copernicus API are here and work with the NETCDF format are here: https://ecmwf-projects.github.io/copernicus-training-c3s/cds-tutorial.html
+"""
 
 import gzip
 import shutil

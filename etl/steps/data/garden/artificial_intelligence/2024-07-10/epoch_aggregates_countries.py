@@ -1,4 +1,5 @@
-""" Generate aggregated table for total yearly and cumulative number of notable AI systems in each country."""
+"""Generate aggregated table for total yearly and cumulative number of notable AI systems in each country."""
+
 import shared as sh
 
 from etl.data_helpers import geo

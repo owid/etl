@@ -3,6 +3,7 @@
 All these things are done in a single script because the processes are intertwined.
 
 """
+
 import tempfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -1136,9 +1137,9 @@ def run(dest_dir: str) -> None:
 
     # Asbestos mine production in Kazakhstan 2020, data says "27400", but in BGS, it is "227400", which is much more
     # reasonable, looking at prior and posterior data. So it looks like an error in the data. Remove that point.
-    tb_flat.loc[
-        (tb_flat["country"] == "Kazakhstan") & (tb_flat["year"] == 2020), "production|Asbestos|Mine|tonnes"
-    ] = None
+    tb_flat.loc[(tb_flat["country"] == "Kazakhstan") & (tb_flat["year"] == 2020), "production|Asbestos|Mine|tonnes"] = (
+        None
+    )
     ####################################################################################################################
 
     # Format tables conveniently.

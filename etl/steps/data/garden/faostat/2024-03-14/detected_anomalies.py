@@ -5,6 +5,7 @@ If after a data update an anomaly is no longer in the data, remove the correspon
 See documentation of class DataAnomaly below for more details on how anomaly classes are structured.
 
 """
+
 import abc
 import os
 from typing import Tuple

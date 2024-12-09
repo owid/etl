@@ -3,7 +3,6 @@
 These functions are used when there are updates on variables. They are used in the chart revision process.
 """
 
-
 from copy import deepcopy
 from typing import Any, Dict, List, Set
 

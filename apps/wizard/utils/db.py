@@ -5,6 +5,7 @@ NOTE: We are currently migrating some of the logic to our actual MySQL database.
 Some of the tools here rely on a local temporary sqlite database. This database is a custom and temporary database used to store data in a server. Not intended for production use.
 
 """
+
 import datetime as dt
 import hashlib
 import os

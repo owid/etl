@@ -1,6 +1,5 @@
-"""Load snapshot of Ember's Yearly Electricity Data and create a raw data table.
+"""Load snapshot of Ember's Yearly Electricity Data and create a raw data table."""
 
-"""
 from etl.helpers import PathFinder, create_dataset
 
 # Get naming conventions.
