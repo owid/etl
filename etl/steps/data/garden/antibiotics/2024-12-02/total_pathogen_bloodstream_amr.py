@@ -28,9 +28,7 @@ def run(dest_dir: str) -> None:
         .rename(columns={"value": "total_deaths"})
     )
 
-    tb = tb.merge(tb_total, on=["country", "year", "pathogen", "pathogen_type"], how="right")
-
-    tb["amr_attributable_deaths"] = tb["amr_attributable_deaths"].fillna(0)
+    tb = tb.merge(tb_total, on=["country", "year", "pathogen", "pathogen_type"], how="inner")
     tb["non_amr_attributable_deaths"] = tb["total_deaths"] - tb["amr_attributable_deaths"]
     # Process data.
     tb = tb.drop(columns=["country", "pathogen_type"]).rename(columns={"pathogen": "country"})

@@ -9,13 +9,13 @@ definitions:
     - |-
       **The Degree of Urbanisation (DEGURBA)**  is a method for capturing the urban-rural divide, designed for international comparisons. Developed by six organizations and endorsed by the UN, it uses a two-level classification.
 
-      The first level divides areas into cities, towns and semi-dense areas, and rural areas, distinguishing between urban (cities, towns, suburbs) and rural regions. The second level adds detail, splitting towns and rural areas further.
+      The first level divides areas into cities, towns, and villages, distinguishing between urban (cities, towns, suburbs) and rural regions. The second level adds detail, splitting towns and villages further.
 
       This classification is based on 1 km² grid cells, grouped into urban centers, urban clusters, and rural cells. These grids are then used to classify smaller areas, typically using residential population grids from censuses or registers. If detailed data isn't available, a disaggregation grid estimates population distribution.
 
       To predict future urbanization (2025 and 2030), both static (land features) and dynamic (past satellite images) components are used to project growth. DEGURBA defines cities by population, not administrative borders, aligning with UN guidelines, though fixed thresholds may not always capture local differences.
 
-    description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba), [towns and semi-dense areas](#dod:towns-suburbs-degurba), and [rural areas](#dod:rural-areas-degurba) and estimate their respective populations.
+    description_short: The European Commission combines satellite imagery with national census data to identify [cities](#dod:cities-degurba), [towns](#dod:towns-degurba), and [villages](#dod:villages-degurba) and estimate their respective populations.
 
 
 # Learn more about the available fields:
@@ -30,13 +30,13 @@ tables:
       value:
           title: |-
             <% if location_type == "rural_total" and attribute == 'area' and type == 'estimates' %>
-            Land covered by rural areas
+            Land covered by villages
             <% elif location_type == "rural_total" and attribute == 'population' and type == 'estimates' %>
-            Population living in rural areas
+            Population living in villages
             <% elif location_type == "rural_total" and attribute == 'share' and type == 'estimates' %>
-            Share of land covered by rural areas
+            Share of land covered by villages
             <% elif location_type == "rural_total" and attribute == 'popshare' and type == 'estimates' %>
-            Share of population living in rural areas
+            Share of population living in villages
 
             <% elif location_type == "urban_centre" and attribute == 'area' and type == 'estimates' %>
             Land covered by cities
@@ -48,13 +48,13 @@ tables:
             Share of population living in cities
 
             <% elif location_type == "urban_cluster" and attribute == 'area' and type == 'estimates' %>
-            Land covered by towns and semi-dense areas
+            Land covered by towns
             <% elif location_type == "urban_cluster" and attribute == 'population' and type == 'estimates' %>
-            Population living in towns and semi-dense areas
+            Population living in towns
             <% elif location_type == "urban_cluster" and attribute == 'share' and type == 'estimates' %>
-            Share of land covered by towns and semi-dense areas
+            Share of land covered by towns
             <% elif location_type == "urban_cluster" and attribute == 'popshare' and type == 'estimates' %>
-            Share of population living in towns and semi-dense areas
+            Share of population living in towns
 
             <% elif location_type == "urban_total" and attribute == 'area' and type == 'estimates' %>
             Land covered by urban areas
@@ -66,13 +66,13 @@ tables:
             Share of population living in urban areas
 
             <% elif location_type == "rural_total" and attribute == 'area' and type == 'projections' %>
-            Projected land covered by rural areas
+            Projected land covered by villages
             <% elif location_type == "rural_total" and attribute == 'population' and type == 'projections' %>
-            Projected population living in rural areas
+            Projected population living in villages
             <% elif location_type == "rural_total" and attribute == 'share' and type == 'projections' %>
-            Projected share of land covered by rural areas
+            Projected share of land covered by villages
             <% elif location_type == "rural_total" and attribute == 'popshare' and type == 'projections' %>
-            Projected share of population living in rural areas
+            Projected share of population living in villages
 
             <% elif location_type == "urban_centre" and attribute == 'area' and type == 'projections' %>
             Projected land covered by cities
@@ -84,13 +84,13 @@ tables:
             Projected share of population living in cities
 
             <% elif location_type == "urban_cluster" and attribute == 'area' and type == 'projections' %>
-            Projected land covered by towns and semi-dense areas
+            Projected land covered by towns
             <% elif location_type == "urban_cluster" and attribute == 'population' and type == 'projections' %>
-            Projected population living in towns and semi-dense areas
+            Projected population living in towns
             <% elif location_type == "urban_cluster" and attribute == 'share' and type == 'projections' %>
-            Projected share of land covered by towns and semi-dense areas
+            Projected share of land covered by towns
             <% elif location_type == "urban_cluster" and attribute == 'popshare' and type == 'projections' %>
-            Projected share of population living in towns and semi-dense areas
+            Projected share of population living in towns
 
             <% elif location_type == "urban_total" and attribute == 'area' and type == 'projections' %>
             Projected land covered by urban areas
@@ -107,7 +107,7 @@ tables:
             <% elif location_type == "semi_dense" and attribute == 'number' and type == 'estimates' %>
             Number of semi-dense areas
             <% elif location_type == "rural_total" and attribute == 'number' and type == 'estimates' %>
-            Number of rural areas
+            Number of villages
             <% elif location_type == "urban_centre" and attribute == 'number' and type == 'estimates' %>
             Number of cities
 
@@ -117,7 +117,7 @@ tables:
             <% elif location_type == "semi_dense" and attribute == 'number' and type == 'projections' %>
             Projected number of semi-dense areas
             <% elif location_type == "rural_total" and attribute == 'number' and type == 'projections' %>
-            Projected number of rural areas
+            Projected number of villages
             <% elif location_type == "urban_centre" and attribute == 'number' and type == 'projections' %>
             Projected number of cities
 
@@ -127,14 +127,14 @@ tables:
             Projected population density in cities
 
             <% elif location_type == "urban_cluster" and attribute == 'density' and type == 'estimates' %>
-            Population density in towns and semi-dense areas
+            Population density in towns
             <% elif location_type == "urban_cluster" and attribute == 'density' and type == 'projections' %>
-            Projected population density in towns and semi-dense areas
+            Projected population density in towns
 
             <% elif location_type == "rural_total" and attribute == 'density' and type == 'estimates' %>
-            Population density in rural areas
+            Population density in villages
             <% elif location_type == "rural_total" and attribute == 'density' and type == 'projections' %>
-            Projected population density in rural areas
+            Projected population density in villages
 
             <% endif %>
           unit:
@@ -160,7 +160,7 @@ tables:
             <%- endif -%>
           description_processing:
             <% if attribute == 'share' or attribute == 'popshare' %>
-            The share of total area or population for each urbanization level was calculated by dividing the area or population of each level (cities, towns and semi-dense areas, rural areas) by the overall total, providing a percentage representation for each category.
+            The share of total area or population for each urbanization level was calculated by dividing the area or population of each level (cities, towns, villages) by the overall total, providing a percentage representation for each category.
            <% elif attribute == 'density' %>
             Population density was calculated by dividing the population of cities by the total area it covers, providing a measure of the number of people living in each km².
            <%- endif -%>

@@ -50,15 +50,15 @@ def run(dest_dir: str) -> None:
         }
     )
 
-    # Create two new dataframes to separate data into estimates and projections (pre-2019 and post-2019)
-    past_estimates = tb_average[tb_average["year"] < 2019].copy()
-    future_projections = tb_average[tb_average["year"] >= 2019].copy()
+    # Create two new dataframes to separate data into estimates and projections
+    past_estimates = tb_average[tb_average["year"] <= 2015].copy()
+    future_projections = tb_average[tb_average["year"] >= 2015].copy()
 
     # Now, for each column in the original dataframe, split it into two
     for col in tb_average.columns:
         if col not in ["country", "year"]:
-            past_estimates[f"{col}_estimates"] = tb_average.loc[tb_average["year"] < 2019, col]
-            future_projections[f"{col}_projections"] = tb_average.loc[tb_average["year"] >= 2019, col]
+            past_estimates[f"{col}_estimates"] = tb_average.loc[tb_average["year"] <= 2015, col]
+            future_projections[f"{col}_projections"] = tb_average.loc[tb_average["year"] >= 2015, col]
             past_estimates = past_estimates.drop(columns=[col])
             future_projections = future_projections.drop(columns=[col])
 
