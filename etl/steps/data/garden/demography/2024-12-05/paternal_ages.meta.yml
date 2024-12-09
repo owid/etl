@@ -1,0 +1,1185 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  others:
+    note_on_average: |-
+      Kai and Klüsener provide data from various sources. Whenever there were multiple data available for a given year, we averaged them.
+    sources_counts: |-
+      Australia:
+        1936-2020: UN DYB
+
+      Austria:
+        1958-1969: UN DYB
+        1970-1982: National Statistic Bureau
+        1983-1984: National Statistic Bureau; UN DYB (averaged)
+        1985-1989: National Statistic Bureau
+        1990-1998: National Statistic Bureau; UN DYB (averaged)
+        1999-2006: National Statistic Bureau
+        2007: National Statistic Bureau; UN DYB (averaged)
+        2008: National Statistic Bureau
+        2009-2013: National Statistic Bureau; UN DYB (averaged)
+        2014: National Statistic Bureau
+        2015-2018: National Statistic Bureau; UN DYB (averaged)
+        2019: National Statistic Bureau
+
+      Belarus:
+        1994-2018: UN DYB
+
+      Belgium:
+        1939-2014: UN DYB
+
+      Bulgaria:
+        1949-2021: UN DYB
+
+      Canada:
+        1944-2020: UN DYB
+
+      Chile:
+        1992-2020: UN DYB
+
+      Croatia:
+        2007-2020: UN DYB
+
+      Czechia:
+        1956-2021: UN DYB
+
+      Denmark:
+        1957-1985: UN DYB
+        1986-1989: National Statistic Bureau
+        1990: National Statistic Bureau; UN DYB (averaged)
+        1991: National Statistic Bureau
+        1992-1991: National Statistic Bureau; UN DYB (averaged)
+        1992-2006: National Statistic Bureau
+        2007: National Statistic Bureau; UN DYB (averaged)
+        2008: National Statistic Bureau
+        2009-2008: National Statistic Bureau; UN DYB (averaged)
+        2009: National Statistic Bureau
+        2010-2009: National Statistic Bureau; UN DYB (averaged)
+        2010: National Statistic Bureau
+        2011-2010: National Statistic Bureau; UN DYB (averaged)
+        2011: National Statistic Bureau
+        2012-2011: National Statistic Bureau; UN DYB (averaged)
+        2012: National Statistic Bureau
+        2013: National Statistic Bureau; UN DYB (averaged)
+        2014: National Statistic Bureau
+        2015-2014: National Statistic Bureau; UN DYB (averaged)
+        2015: National Statistic Bureau
+        2016-2018: National Statistic Bureau; UN DYB (averaged)
+        2019: National Statistic Bureau
+        2020: National Statistic Bureau; UN DYB (averaged)
+
+      England and Wales:
+        1961-1985: UN DYB
+
+      Estonia:
+        1989: National Statistic Bureau
+        1990: National Statistic Bureau; UN DYB (averaged)
+        1991-1990: National Statistic Bureau
+        1991-1997: National Statistic Bureau; UN DYB (averaged)
+        1998-2006: National Statistic Bureau
+        2007-2006: National Statistic Bureau; UN DYB (averaged)
+        2007: National Statistic Bureau
+        2008-2007: National Statistic Bureau; UN DYB (averaged)
+        2008: National Statistic Bureau
+        2009-2008: National Statistic Bureau; UN DYB (averaged)
+        2009: National Statistic Bureau
+        2010: National Statistic Bureau; UN DYB (averaged)
+        2011: National Statistic Bureau
+        2012-2011: National Statistic Bureau; UN DYB (averaged)
+        2012: National Statistic Bureau
+        2013-2012: National Statistic Bureau; UN DYB (averaged)
+        2013: National Statistic Bureau
+        2014-2013: National Statistic Bureau; UN DYB (averaged)
+        2014: National Statistic Bureau
+        2015-2014: National Statistic Bureau; UN DYB (averaged)
+        2015: National Statistic Bureau
+        2016-2019: UN DYB
+
+      Finland:
+        1939-1986: UN DYB
+        1987-1989: National Statistic Bureau
+        1990-1989: National Statistic Bureau; UN DYB (averaged)
+        1990-1993: National Statistic Bureau
+        1994: National Statistic Bureau; UN DYB (averaged)
+        1995-1994: National Statistic Bureau
+        1995: National Statistic Bureau; UN DYB (averaged)
+        1996-1995: National Statistic Bureau
+        1996: National Statistic Bureau; UN DYB (averaged)
+        1997: National Statistic Bureau
+        1998: National Statistic Bureau; UN DYB (averaged)
+        1999-2006: National Statistic Bureau
+        2007-2006: National Statistic Bureau; UN DYB (averaged)
+        2007: National Statistic Bureau
+        2008-2007: National Statistic Bureau; UN DYB (averaged)
+        2008: National Statistic Bureau
+        2009-2008: National Statistic Bureau; UN DYB (averaged)
+        2009: National Statistic Bureau
+        2010: National Statistic Bureau; UN DYB (averaged)
+        2011: National Statistic Bureau
+        2012-2011: National Statistic Bureau; UN DYB (averaged)
+        2012-2013: National Statistic Bureau
+        2014-2013: National Statistic Bureau; UN DYB (averaged)
+        2014: National Statistic Bureau
+        2015-2014: National Statistic Bureau; UN DYB (averaged)
+        2015: National Statistic Bureau
+        2016-2019: UN DYB
+
+      France:
+        1936-2005: UN DYB
+        2006: National Statistic Bureau
+        2007: National Statistic Bureau; UN DYB (averaged)
+        2008: National Statistic Bureau
+        2009-2008: National Statistic Bureau; UN DYB (averaged)
+        2009: National Statistic Bureau
+        2010-2009: National Statistic Bureau; UN DYB (averaged)
+        2010-2011: National Statistic Bureau
+        2012: National Statistic Bureau; UN DYB (averaged)
+        2013: National Statistic Bureau
+        2014-2013: National Statistic Bureau; UN DYB (averaged)
+        2014: National Statistic Bureau
+        2015-2014: National Statistic Bureau; UN DYB (averaged)
+        2015: National Statistic Bureau
+        2016-2020: UN DYB
+
+      Germany:
+        1991-1999: UN DYB
+        2000-2006: National Statistic Bureau
+        2007-2006: National Statistic Bureau; UN DYB (averaged)
+        2007-2010: National Statistic Bureau
+        2011-2010: National Statistic Bureau; UN DYB (averaged)
+        2011: National Statistic Bureau
+        2012-2011: National Statistic Bureau; UN DYB (averaged)
+        2012: National Statistic Bureau
+        2013-2012: National Statistic Bureau; UN DYB (averaged)
+        2013: National Statistic Bureau
+        2014: National Statistic Bureau; UN DYB (averaged)
+        2015-2017: National Statistic Bureau
+        2018-2017: National Statistic Bureau; UN DYB (averaged)
+        2018: National Statistic Bureau
+        2019-2018: National Statistic Bureau; UN DYB (averaged)
+        2019-2020: National Statistic Bureau
+
+      Greece:
+        1981-2019: UN DYB
+
+      Hungary:
+        1950-2020: UN DYB
+
+      Iceland:
+        1951-1980: UN DYB
+        1981-1980: Statistics Iceland; UN DYB (averaged)
+        1981: UN DYB
+        1982-1981: Statistics Iceland; UN DYB (averaged)
+        1982: UN DYB
+        1983-1982: Statistics Iceland; UN DYB (averaged)
+        1983: UN DYB
+        1984-1983: Statistics Iceland; UN DYB (averaged)
+        1984: UN DYB
+        1985-1989: Statistics Iceland
+        1990-1989: Statistics Iceland; UN DYB (averaged)
+        1990: UN DYB
+        1991-1990: Statistics Iceland; UN DYB (averaged)
+        1991: UN DYB
+        1992-1991: Statistics Iceland; UN DYB (averaged)
+        1992: UN DYB
+        1993-1992: Statistics Iceland; UN DYB (averaged)
+        1993: UN DYB
+        1994: Statistics Iceland
+        1995-1994: Statistics Iceland; UN DYB (averaged)
+        1995: UN DYB
+        1996: Statistics Iceland; UN DYB (averaged)
+        1997: UN DYB
+        1998-2006: Statistics Iceland
+        2007-2015: Statistics Iceland; UN DYB (averaged)
+        2016: Statistics Iceland
+        2017-2019: Statistics Iceland; UN DYB (averaged)
+        2020: Statistics Iceland
+        2021: UN DYB
+
+      Ireland:
+        2006: UN DYB
+
+      Israel:
+        1983-2016: UN DYB
+
+      Italy:
+        1958-2019: UN DYB
+
+      Japan:
+        1952-2021: UN DYB
+
+      Latvia:
+        1990-1999: UN DYB
+        2000-2006: National Statistic Bureau
+        2007-2010: National Statistic Bureau; UN DYB (averaged)
+        2011: National Statistic Bureau
+        2012-2014: National Statistic Bureau; UN DYB (averaged)
+        2015-2019: UN DYB
+
+      Lithuania:
+        1990-2020: UN DYB
+
+      Luxembourg:
+        1960-2021: UN DYB
+
+      Netherlands:
+        1937-1995: UN DYB
+        1996-1995: National Statistic Bureau
+        1996: UN DYB
+        1997-2009: National Statistic Bureau
+        2010: National Statistic Bureau; UN DYB (averaged)
+        2011-2013: National Statistic Bureau
+        2014: National Statistic Bureau; UN DYB (averaged)
+        2015-2019: National Statistic Bureau
+
+      New Zealand:
+        1948-2020: UN DYB
+
+      Northern Ireland:
+        1974-1985: UN DYB
+
+      Norway:
+        1953-2021: UN DYB
+
+      Poland:
+        1958-2019: UN DYB
+
+      Portugal:
+        1980-2021: UN DYB
+
+      Russia:
+        1990-2012: UN DYB
+
+      Scotland:
+        1961-1985: UN DYB
+
+      Slovakia:
+        1956-2019: UN DYB
+
+      Slovenia:
+        1990-2008: UN DYB
+        2009-2014: National Statistic Bureau; UN DYB (averaged)
+        2015-2019: UN DYB
+
+      South Korea:
+        2006-2020: UN DYB
+
+      Spain:
+        1936-1995: UN DYB
+        1996-1997: National Statistic Bureau; UN DYB (averaged)
+        1998-2006: National Statistic Bureau
+        2007-2006: National Statistic Bureau; UN DYB (averaged)
+        2007-2008: National Statistic Bureau
+        2009-2008: National Statistic Bureau; UN DYB (averaged)
+        2009: National Statistic Bureau
+        2010-2009: National Statistic Bureau; UN DYB (averaged)
+        2010: National Statistic Bureau
+        2011-2010: National Statistic Bureau; UN DYB (averaged)
+        2011: National Statistic Bureau
+        2012: National Statistic Bureau; UN DYB (averaged)
+        2013-2015: National Statistic Bureau
+        2016-2015: UN DYB
+        2016: National Statistic Bureau
+        2017-2016: UN DYB
+        2017: National Statistic Bureau
+        2018-2017: UN DYB
+        2018: National Statistic Bureau
+        2019-2018: UN DYB
+        2019: National Statistic Bureau
+        2020-2019: UN DYB
+        2020: National Statistic Bureau
+
+      Sweden:
+        1901-2015: National Statistic Bureau
+
+      Switzerland:
+        1979-1978: National Statistic Bureau
+        1979: National Statistic Bureau; UN DYB (averaged)
+        1980-1979: National Statistic Bureau
+        1980: National Statistic Bureau; UN DYB (averaged)
+        1981-1980: National Statistic Bureau
+        1981: National Statistic Bureau; UN DYB (averaged)
+        1982-1981: National Statistic Bureau
+        1982: National Statistic Bureau; UN DYB (averaged)
+        1983-1982: National Statistic Bureau
+        1983: National Statistic Bureau; UN DYB (averaged)
+        1984: National Statistic Bureau
+        1985: National Statistic Bureau; UN DYB (averaged)
+        1986-1989: National Statistic Bureau
+        1990: National Statistic Bureau; UN DYB (averaged)
+        1991-1990: National Statistic Bureau
+        1991: National Statistic Bureau; UN DYB (averaged)
+        1992-1991: National Statistic Bureau
+        1992: National Statistic Bureau; UN DYB (averaged)
+        1993: National Statistic Bureau
+        1994-1993: National Statistic Bureau; UN DYB (averaged)
+        1994: National Statistic Bureau
+        1995: National Statistic Bureau; UN DYB (averaged)
+        1996-1995: National Statistic Bureau
+        1996: National Statistic Bureau; UN DYB (averaged)
+        1997: National Statistic Bureau
+        1998-1997: National Statistic Bureau; UN DYB (averaged)
+        1998-2005: National Statistic Bureau
+        2006: National Statistic Bureau; UN DYB (averaged)
+        2007: National Statistic Bureau
+        2008: National Statistic Bureau; UN DYB (averaged)
+        2009: National Statistic Bureau
+        2010: National Statistic Bureau; UN DYB (averaged)
+        2011-2010: National Statistic Bureau
+        2011: National Statistic Bureau; UN DYB (averaged)
+        2012-2011: National Statistic Bureau
+        2012: National Statistic Bureau; UN DYB (averaged)
+        2013: National Statistic Bureau
+        2014-2013: National Statistic Bureau; UN DYB (averaged)
+        2014: National Statistic Bureau
+        2015: UN DYB
+        2016-2015: National Statistic Bureau
+        2016: UN DYB
+        2017-2016: National Statistic Bureau
+        2017: UN DYB
+        2018-2017: National Statistic Bureau
+        2018: UN DYB
+        2019: National Statistic Bureau; UN DYB (averaged)
+        2020: UN DYB
+
+      Ukraine:
+        1995-2013: UN DYB
+
+      United States:
+        1933-1935: US Census Bureau - all births
+        1936-1945: US Census Bureau - all births; UN DYB (averaged)
+        1946-1949: UN DYB
+        1950: US Census Bureau - all births; UN DYB (averaged)
+        1951-1959: UN DYB
+        1960: US Census Bureau - all births; UN DYB (averaged)
+        1961-2019: UN DYB
+    sources_rates: |-
+      Albania:
+        1955-2021: UN DYB
+
+      Algeria:
+        1948-1955: UN DYB
+
+      American Samoa:
+        1956-1960: UN DYB
+
+      Argentina:
+        1954-1961: UN DYB
+
+      Armenia:
+        2018-2020: UN DYB
+
+      Australia:
+        1936-1974: UN DYB
+        1975: HFC
+        1976-1975: HFC; UN DYB (averaged)
+        1976: UN DYB
+        1977-1980: HFC; UN DYB (averaged)
+        1981: UN DYB
+        1982-1983: HFC; UN DYB (averaged)
+        1984-1989: HFC
+        1990: HFC; UN DYB (averaged)
+        1991: HFC
+        1992-1995: HFC; UN DYB (averaged)
+        1996-2006: HFC
+        2007-2006: UN DYB
+        2007: HFC
+        2008: UN DYB
+        2009-2008: HFC
+        2009: UN DYB
+        2010-2009: HFC
+        2010: UN DYB
+        2011-2010: HFC
+        2011: UN DYB
+        2012-2014: HFC; UN DYB (averaged)
+        2015-2021: UN DYB
+
+      Austria:
+        1965-2018: UN DYB
+
+      Azerbaijan:
+        2004-2019: UN DYB
+
+      Bahamas:
+        1990-2007: UN DYB
+
+      Bahrain:
+        1990-2019: UN DYB
+
+      Belarus:
+        2007-2019: UN DYB
+
+      Belgium:
+        1940: Lognard (2010)
+        1941: Statistical Yearbook of Belgium; Lognard (2010) (averaged)
+        1942-1944: Lognard (2010)
+        1945: Statistical Yearbook of Belgium; Lognard (2010) (averaged)
+        1946-1949: Lognard (2010)
+        1950: Statistical Yearbook of Belgium; Lognard (2010) (averaged)
+        1951-1954: Lognard (2010)
+        1955: Statistical Yearbook of Belgium; Lognard (2010) (averaged)
+        1956-1957: Lognard (2010)
+        1958-1973: Statistical Yearbook of Belgium; Lognard (2010) (averaged)
+        1974-1995: Lognard (2010)
+
+      Bolivia:
+        1951: UN DYB
+
+      Bosnia and Herzegovina:
+        1960-2010: UN DYB
+
+      Brunei:
+        1971-2021: UN DYB
+
+      Bulgaria:
+        1956-2021: UN DYB
+
+      Canada:
+        1944-1973: UN DYB
+        1974-1975: HFC
+        1976-1979: HFC; UN DYB (averaged)
+        1980-1989: HFC
+        1990: HFC; UN DYB (averaged)
+        1991: HFC
+        1992-1997: HFC; UN DYB (averaged)
+        1998-2004: HFC
+        2005: HFC; UN DYB (averaged)
+        2006: HFC
+        2007-2009: HFC; UN DYB (averaged)
+        2010-2016: HFC
+        2017-2021: UN DYB
+
+      Central African Republic:
+        1960: UN DYB
+
+      Chile:
+        1952-2020: UN DYB
+
+      Colombia:
+        1951-2022: UN DYB
+
+      Congo:
+        1961: UN DYB
+
+      Costa Rica:
+        1955-2022: UN DYB
+
+      Croatia:
+        1960-2021: UN DYB
+
+      Cuba:
+        1970-2021: UN DYB
+
+      Cyprus:
+        1948-2016: UN DYB
+
+      Czechia:
+        1961-2021: UN DYB
+
+      Denmark:
+        1957-1985: UN DYB
+        1986-1989: HFC
+        1990: UN DYB
+        1991-1997: HFC; UN DYB (averaged)
+        1998-2006: HFC
+        2007-2015: HFC; UN DYB (averaged)
+        2016-2020: UN DYB
+
+      Dominican Republic:
+        1960-2007: UN DYB
+
+      Egypt:
+        1976-2012: UN DYB
+
+      El Salvador:
+        1951-2014: UN DYB
+
+      England and Wales:
+        1961-1963: UN DYB
+        1964-1963: UN DYB; NSSEC - Institute for Social and Economic Research (averaged)
+        1964: UN DYB
+        1965-1967: UN DYB; NSSEC - Institute for Social and Economic Research (averaged)
+        1968: UN DYB
+        1969-1972: UN DYB; NSSEC - Institute for Social and Economic Research (averaged)
+        1973-1972: UN DYB
+        1973: UN DYB; NSSEC - Institute for Social and Economic Research (averaged)
+        1974: NSSEC - Institute for Social and Economic Research
+        1975-1978: UN DYB; NSSEC - Institute for Social and Economic Research (averaged)
+        1979: UN DYB
+        1980-1984: UN DYB; NSSEC - Institute for Social and Economic Research (averaged)
+        1985: UN DYB
+        1986-2020: NSSEC - Institute for Social and Economic Research
+
+      Estonia:
+        1989-1992: HFC
+        1993-1997: HFC; UN DYB (averaged)
+        1998-2006: HFC
+        2007-2014: HFC; UN DYB (averaged)
+        2015-2020: UN DYB
+
+      Faroe Islands:
+        2015-2022: UN DYB
+
+      Fiji:
+        1953-2004: UN DYB
+
+      Finland:
+        1939-1938: National Statistic Bureau
+        1939: UN DYB
+        1940-1939: National Statistic Bureau
+        1940: UN DYB
+        1941-1940: National Statistic Bureau
+        1941: UN DYB
+        1942-1941: National Statistic Bureau
+        1942: UN DYB
+        1943: National Statistic Bureau
+        1944: UN DYB
+        1945-1944: National Statistic Bureau
+        1945: UN DYB
+        1946-1945: National Statistic Bureau
+        1946: UN DYB
+        1947: National Statistic Bureau
+        1948-1947: UN DYB
+        1948: National Statistic Bureau
+        1949: UN DYB
+        1950: National Statistic Bureau
+        1951: UN DYB
+        1952-1951: National Statistic Bureau
+        1952-1954: UN DYB
+        1955: National Statistic Bureau
+        1956: UN DYB
+        1957-1956: National Statistic Bureau
+        1957: UN DYB
+        1958-1957: National Statistic Bureau
+        1958-1986: UN DYB
+        1987-1993: HFC
+        1994-1993: UN DYB
+        1994: National Statistic Bureau; HFC (averaged)
+        1995: UN DYB
+        1996-1995: National Statistic Bureau; HFC (averaged)
+        1996: UN DYB
+        1997-1996: National Statistic Bureau; HFC (averaged)
+        1997: UN DYB
+        1998: National Statistic Bureau; HFC (averaged)
+        1999-2006: HFC
+        2007-2012: HFC; UN DYB (averaged)
+        2013: HFC
+        2014-2015: HFC; UN DYB (averaged)
+        2016-2019: UN DYB
+
+      France:
+        1900: Brouard; N. (1977) doi:10.2307/1531392 (averaged)
+        1901-1900: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1901: Insee; Etat civil (averaged)
+        1902-1901: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1902: Insee; Etat civil (averaged)
+        1903-1902: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1903: Insee; Etat civil (averaged)
+        1904-1903: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1904: Insee; Etat civil (averaged)
+        1905-1904: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1905: Insee; Etat civil (averaged)
+        1906-1905: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1906: Insee; Etat civil (averaged)
+        1907: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1908: Insee; Etat civil (averaged)
+        1909-1908: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1909: Insee; Etat civil (averaged)
+        1910-1909: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1910: Insee; Etat civil (averaged)
+        1911-1910: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1911: Insee; Etat civil (averaged)
+        1912-1911: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1912: Insee; Etat civil (averaged)
+        1913-1912: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1913: Insee; Etat civil (averaged)
+        1914: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1915: Insee; Etat civil (averaged)
+        1916-1915: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1916: Insee; Etat civil (averaged)
+        1917-1916: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1917: Insee; Etat civil (averaged)
+        1918-1917: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1918: Insee; Etat civil (averaged)
+        1919-1918: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1919: Insee; Etat civil (averaged)
+        1920-1919: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1920: Insee; Etat civil (averaged)
+        1921: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1922: Insee; Etat civil (averaged)
+        1923-1922: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1923: Insee; Etat civil (averaged)
+        1924-1923: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1924: Insee; Etat civil (averaged)
+        1925-1924: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1925: Insee; Etat civil (averaged)
+        1926-1925: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1926: Insee; Etat civil (averaged)
+        1927: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1928-1927: Insee; Etat civil (averaged)
+        1928: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1929: Insee; Etat civil (averaged)
+        1930-1929: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1930: Insee; Etat civil (averaged)
+        1931-1930: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1931: Insee; Etat civil (averaged)
+        1932-1931: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1932: Insee; Etat civil (averaged)
+        1933-1932: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1933: Insee; Etat civil (averaged)
+        1934-1933: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1934: Insee; Etat civil (averaged)
+        1935: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1936: Insee; Etat civil; UN DYB (averaged)
+        1937-1936: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1937: Insee; Etat civil; UN DYB (averaged)
+        1938-1937: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1938: Insee; Etat civil; UN DYB (averaged)
+        1939-1938: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1939: Insee; Etat civil; UN DYB (averaged)
+        1940-1939: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1940: Insee; Etat civil; UN DYB (averaged)
+        1941: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1942-1941: Insee; Etat civil; UN DYB (averaged)
+        1942: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1943: Insee; Etat civil; UN DYB (averaged)
+        1944-1943: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1944: Insee; Etat civil; UN DYB (averaged)
+        1945-1944: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1945: Insee; Etat civil; UN DYB (averaged)
+        1946-1945: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1946: Insee; Etat civil; UN DYB (averaged)
+        1947-1946: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1947: Insee; Etat civil (averaged)
+        1948-1947: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1948: Insee; Etat civil; UN DYB (averaged)
+        1949: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1950: Insee; Etat civil; UN DYB (averaged)
+        1951-1950: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1951: Insee; Etat civil (averaged)
+        1952-1951: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1952: Insee; Etat civil (averaged)
+        1953-1952: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1953: Insee; Etat civil (averaged)
+        1954-1953: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1954: Insee; Etat civil (averaged)
+        1955-1954: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1955: Insee; Etat civil (averaged)
+        1956: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1957: Insee; Etat civil (averaged)
+        1958-1957: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1958: Insee; Etat civil (averaged)
+        1959-1958: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1959: Insee; Etat civil (averaged)
+        1960-1959: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1960: Insee; Etat civil (averaged)
+        1961-1960: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1961: Insee; Etat civil (averaged)
+        1962-1961: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1962: Insee; Etat civil (averaged)
+        1963-1962: Insee; Etat civil; UN DYB (averaged)
+        1963: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1964: Insee; Etat civil (averaged)
+        1965-1964: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1965: Insee; Etat civil (averaged)
+        1966-1965: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1966: Insee; Etat civil (averaged)
+        1967-1966: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1967: Insee; Etat civil; UN DYB (averaged)
+        1968-1967: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1968: Insee; Etat civil (averaged)
+        1969-1968: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1969: Insee; Etat civil (averaged)
+        1970: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1971: Insee; Etat civil (averaged)
+        1972-1971: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1972: Insee; Etat civil; UN DYB (averaged)
+        1973-1972: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1973: Insee; Etat civil (averaged)
+        1974-1973: Brouard; N. (1977) doi:10.2307/1531392; Insee; Etat civil (averaged)
+        1974: Insee; Etat civil (averaged)
+        1975-1974: Insee; Etat civil; UN DYB (averaged)
+        1975: Insee; Etat civil (averaged)
+        1976-1975: Insee; Etat civil; UN DYB (averaged)
+        1976: Insee; Etat civil (averaged)
+        1977: Insee; Etat civil; UN DYB (averaged)
+        1978-1979: Insee; Etat civil (averaged)
+        1980: Insee; Etat civil; UN DYB (averaged)
+        1981-1990: Insee; Etat civil (averaged)
+        1991-1990: Insee; Etat civil; UN DYB (averaged)
+        1991-1997: Insee; Etat civil (averaged)
+        1998: Insee; Etat civil; HFC (averaged)
+        1999: Insee; Etat civil (averaged)
+        2000-1999: Insee; Etat civil; HFC (averaged)
+        2000: Insee; Etat civil (averaged)
+        2001-2000: Insee; Etat civil; HFC (averaged)
+        2001: Insee; Etat civil (averaged)
+        2002-2001: Insee; Etat civil; HFC (averaged)
+        2002: Insee; Etat civil (averaged)
+        2003-2002: Insee; Etat civil; HFC (averaged)
+        2003: Insee; Etat civil (averaged)
+        2004: Insee; Etat civil; HFC (averaged)
+        2005-2004: Insee; Etat civil (averaged)
+        2005-2006: Insee; Etat civil; HFC (averaged)
+        2007-2010: Insee; Etat civil; HFC; UN DYB (averaged)
+        2011: Insee; Etat civil; HFC (averaged)
+        2012-2013: Insee; Etat civil; HFC; UN DYB (averaged)
+        2014-2017: Insee; Etat civil; UN DYB (averaged)
+        2018: Insee; Etat civil (averaged)
+        2019: Insee; Etat civil; UN DYB (averaged)
+        2020: UN DYB
+
+      French Guiana:
+        1961-2021: UN DYB
+
+      French Polynesia:
+        2018-2021: UN DYB
+
+      Georgia:
+        2016: UN DYB
+
+      Germany:
+        1950-1990: UN DYB
+        1991-1990: National Statistic Bureau; HFC (averaged)
+        1991: UN DYB
+        1992-1991: National Statistic Bureau; HFC (averaged)
+        1992: UN DYB
+        1993-1992: National Statistic Bureau; HFC (averaged)
+        1993: UN DYB
+        1994-1993: National Statistic Bureau; HFC (averaged)
+        1994: UN DYB
+        1995-2006: National Statistic Bureau; HFC (averaged)
+        2007: National Statistic Bureau; HFC; UN DYB (averaged)
+        2008-2010: National Statistic Bureau; HFC (averaged)
+        2011-2013: National Statistic Bureau; HFC; UN DYB (averaged)
+        2014-2015: National Statistic Bureau; UN DYB (averaged)
+        2016-2017: National Statistic Bureau
+        2018-2019: National Statistic Bureau; UN DYB (averaged)
+        2020: National Statistic Bureau
+
+      Greece:
+        1961-2020: UN DYB
+
+      Greenland:
+        1993-2006: UN DYB
+
+      Guadeloupe:
+        1954-2021: UN DYB
+
+      Guam:
+        1950-1980: UN DYB
+
+      Guatemala:
+        1950-2020: UN DYB
+
+      Guinea:
+        1955: UN DYB
+
+      Guyana:
+        1954-1970: UN DYB
+
+      Honduras:
+        1951-1981: UN DYB
+
+      Hungary:
+        1950-1969: UN DYB
+        1970-1973: HFC; UN DYB (averaged)
+        1974: UN DYB
+        1975-1979: HFC; UN DYB (averaged)
+        1980: UN DYB
+        1981-1984: HFC; UN DYB (averaged)
+        1985: UN DYB
+        1986-1989: HFC
+        1990-1989: HFC; UN DYB (averaged)
+        1990: UN DYB
+        1991: HFC; UN DYB (averaged)
+        1992: UN DYB
+        1993: HFC
+        1994-1993: HFC; UN DYB (averaged)
+        1994: UN DYB
+        1995-1994: HFC; UN DYB (averaged)
+        1995: UN DYB
+        1996: HFC; UN DYB (averaged)
+        1997: UN DYB
+        1998-1997: HFC; UN DYB (averaged)
+        1998: UN DYB
+        1999-2006: HFC
+        2007-2014: HFC; UN DYB (averaged)
+        2015-2021: UN DYB
+
+      Iceland:
+        1951-1954: UN DYB
+        1955-1966: Statistics Iceland; UN DYB (averaged)
+        1967: UN DYB
+        1968: Statistics Iceland; UN DYB (averaged)
+        1969-1968: UN DYB
+        1969-1979: Statistics Iceland; UN DYB (averaged)
+        1980: UN DYB
+        1981-1983: Statistics Iceland; UN DYB (averaged)
+        1984: UN DYB
+        1985-1989: Statistics Iceland
+        1990-1993: Statistics Iceland; UN DYB (averaged)
+        1994: Statistics Iceland
+        1995-1997: Statistics Iceland; UN DYB (averaged)
+        1998-2006: Statistics Iceland
+        2007-2015: Statistics Iceland; UN DYB (averaged)
+        2016: Statistics Iceland
+        2017-2019: Statistics Iceland; UN DYB (averaged)
+        2020: Statistics Iceland
+
+      Iraq:
+        1975-1977: UN DYB
+
+      Ireland:
+        2006: UN DYB
+
+      Israel:
+        1944-2021: UN DYB
+
+      Italy:
+        1967-1998: UN DYB
+        1999-2005: HFC
+        2006-2011: HFC; UN DYB (averaged)
+        2012: HFC
+        2013-2015: HFC; UN DYB (averaged)
+        2016-2021: UN DYB
+
+      Jamaica:
+        1947-1956: UN DYB
+
+      Japan:
+        1960-2008: UN DYB
+        2009-2008: HFC
+        2009: UN DYB
+        2010-2009: HFC
+        2010: UN DYB
+        2011: HFC
+        2012: UN DYB
+        2013-2012: HFC
+        2013: UN DYB
+        2014-2013: HFC
+        2014-2021: UN DYB
+
+      Jordan:
+        1969-1979: UN DYB
+
+      Kazakhstan:
+        2006-2022: UN DYB
+
+      Kuwait:
+        1965-1984: UN DYB
+
+      Kyrgyzstan:
+        1996-2021: UN DYB
+
+      Latvia:
+        1995-2021: UN DYB
+
+      Libya:
+        1973: UN DYB
+
+      Lithuania:
+        1993-2021: UN DYB
+
+      Luxembourg:
+        1960-2021: UN DYB
+
+      Macao:
+        1960-2022: UN DYB
+
+      Malaysia:
+        2008-2021: UN DYB
+
+      Maldives:
+        2010-2019: UN DYB
+
+      Malta:
+        1958-2020: UN DYB
+
+      Martinique:
+        1954-2021: UN DYB
+
+      Mauritius:
+        1991-2022: UN DYB
+
+      Mayotte:
+        2021: UN DYB
+
+      Mexico:
+        1976-2020: UN DYB
+
+      Moldova:
+        2007-2020: UN DYB
+
+      Monaco:
+        1951: UN DYB
+
+      Mongolia:
+        2018-2022: UN DYB
+
+      Morocco:
+        1951: UN DYB
+
+      Namibia:
+        1936-1960: UN DYB
+
+      Netherlands:
+        1936-2014: UN DYB
+
+      Netherlands Antilles:
+        1971: UN DYB
+
+      New Caledonia:
+        2007-2015: UN DYB
+
+      New Zealand:
+        1936-2020: UN DYB
+
+      Nicaragua:
+        1950-1965: UN DYB
+
+      North Macedonia:
+        1960-2018: UN DYB
+
+      Northern Ireland:
+        1981: UN DYB
+
+      Norway:
+        1953-1998: UN DYB
+        1999-2006: National Statistic Bureau
+        2007-2012: National Statistic Bureau; UN DYB (averaged)
+        2013-2020: National Statistic Bureau
+        2021: UN DYB
+
+      Oman:
+        2017-2022: UN DYB
+
+      Pakistan:
+        1968: UN DYB
+
+      Palau:
+        1965-1979: UN DYB
+
+      Panama:
+        1949-2021: UN DYB
+
+      Papua New Guinea:
+        1947: UN DYB
+
+      Peru:
+        1960-1973: UN DYB
+
+      Philippines:
+        1952-2021: UN DYB
+
+      Poland:
+        1950-1985: UN DYB
+        1986-1989: HFC
+        1990-1989: UN DYB
+        1990-1995: HFC; UN DYB (averaged)
+        1996: UN DYB
+        1997-1996: HFC; UN DYB (averaged)
+        1997: UN DYB
+        1998-2006: HFC
+        2007: HFC; UN DYB (averaged)
+        2008: HFC
+        2009-2012: HFC; UN DYB (averaged)
+        2013-2014: HFC
+        2015-2021: UN DYB
+
+      Portugal:
+        1963-1979: UN DYB
+        1980: HFC; UN DYB (averaged)
+        1981: UN DYB
+        1982: HFC
+        1983-1985: HFC; UN DYB (averaged)
+        1986-1990: HFC
+        1991-1990: HFC; UN DYB (averaged)
+        1991: UN DYB
+        1992-1993: HFC; UN DYB (averaged)
+        1994: HFC
+        1995-1997: HFC; UN DYB (averaged)
+        1998-2006: HFC
+        2007-2009: HFC; UN DYB (averaged)
+        2010: HFC
+        2011-2015: HFC; UN DYB (averaged)
+        2016-2021: UN DYB
+
+      Puerto Rico:
+        1959-2008: UN DYB
+
+      Qatar:
+        2007-2020: UN DYB
+
+      Reunion:
+        1954-2021: UN DYB
+
+      Romania:
+        1961-2021: UN DYB
+
+      Russia:
+        2011-2012: UN DYB
+
+      Samoa:
+        1976: UN DYB
+
+      San Marino:
+        1962-1985: UN DYB
+
+      Scotland:
+        1964-1985: UN DYB
+
+      Serbia:
+        1960-2021: UN DYB
+
+      Seychelles:
+        1971-1973: UN DYB
+
+      Singapore:
+        1984-2021: UN DYB
+
+      Slovakia:
+        1961-2021: UN DYB
+
+      Slovenia:
+        1960-2021: UN DYB
+
+      South Africa:
+        1943-2020: UN DYB
+
+      South Korea:
+        1981-2020: UN DYB
+
+      Spain:
+        1960-1974: UN DYB
+        1975-1977: HFC
+        1978-1977: HFC; UN DYB (averaged)
+        1978: UN DYB
+        1979-1990: HFC
+        1991-1990: HFC; UN DYB (averaged)
+        1991: UN DYB
+        1992-1997: HFC; UN DYB (averaged)
+        1998-2006: HFC
+        2007: HFC; UN DYB (averaged)
+        2008: HFC
+        2009-2013: HFC; UN DYB (averaged)
+        2014-2015: HFC
+        2016-2021: UN DYB
+
+      Sweden:
+        1936-1967: UN DYB
+        1968-1973: HFC
+        1974: UN DYB
+        1975-1979: HFC
+        1980-1979: UN DYB
+        1980-1984: HFC
+        1985: UN DYB
+        1986-1989: HFC
+        1990: UN DYB
+        1991-1990: HFC
+        1991: UN DYB
+        1992-1991: HFC
+        1992: UN DYB
+        1993: HFC
+        1994: UN DYB
+        1995: HFC
+        1996-1995: UN DYB
+        1996: HFC
+        1997: UN DYB
+        1998-2006: HFC
+        2007-2012: HFC; UN DYB (averaged)
+        2013-2015: HFC
+
+      Switzerland:
+        1980-2020: UN DYB
+
+      Taiwan:
+        1950-1997: UN DYB
+        1998-2014: HFC
+
+      Tajikistan:
+        2020-2021: UN DYB
+
+      Trinidad and Tobago:
+        1954-1997: UN DYB
+
+      Tunisia:
+        1965-1980: UN DYB
+
+      Turkey:
+        2010-2019: UN DYB
+
+      Ukraine:
+        1995-2021: UN DYB
+
+      United States:
+        1936-1968: UN DYB
+        1969-1984: HFC; UN DYB (averaged)
+        1985-1990: HFC
+        1991: HFC; UN DYB (averaged)
+        1992: HFC
+        1993-1997: HFC; UN DYB (averaged)
+        1998-2007: HFC
+        2008-2009: HFC; UN DYB (averaged)
+        2010-2011: HFC
+        2012: HFC; UN DYB (averaged)
+        2013-2014: HFC
+        2015: HFC; UN DYB (averaged)
+
+      United States Virgin Islands:
+        1960-1980: UN DYB
+
+      Uruguay:
+        1963-2021: UN DYB
+
+      Uzbekistan:
+        2014-2022: UN DYB
+
+      Venezuela:
+        1950-2013: UN DYB
+
+      Yugoslavia:
+        1960-2009: UN DYB
+  common:
+    unit: years
+    presentation:
+      topic_tags:
+        - Fertility Rate
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  paternal_age:
+    variables:
+      mpac_fr:
+        title: Mean paternal age at childbirth (based on fertility rates)
+        description_short: |-
+          Average age of fathers at the time their children are born. Estimated using fertilty rates.
+        description_processing: |-
+          {definitions.others.note_on_average}
+
+          ### Sources:
+
+          {definitions.others.sources_counts}
+      mpac_mean:
+        title: Mean paternal age at childbirth (based on arithmetic mean)
+        description_short: |-
+          Average age of fathers at the time their children are born. Estimated using fertilty rates.
+        description_processing: |-
+          {definitions.others.note_on_average}
+
+          ### Sources:
+
+          {definitions.others.sources_counts}
+      mpac_rates:
+        title: Mean paternal age at childbirth (unknown method)
+        description_short: |-
+          Average age of fathers at the time their children are born.
+        description_processing: |-
+          {definitions.others.note_on_average}
+
+          ### Sources:
+
+          {definitions.others.sources_rates}
