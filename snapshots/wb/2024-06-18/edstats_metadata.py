@@ -6,7 +6,6 @@ To create a csv with education related indicators and download it:
     - on the left click on Country -> select World, series -> select All and Time -> select All  -->  'Click Download Options' -> Metadata"
 """
 
-
 from pathlib import Path
 
 import click

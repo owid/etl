@@ -3,6 +3,7 @@ The data has been obtained from covid-19-data repository.
 
 Run the lines from https://github.com/owid/covid-19-data/blob/d8fae5631e2130270532951400fa449a9b20d00b/scripts/src/cowidev/cmd/vax/generate/utils.py#L712-L734, and export df_age.
 """
+
 from pathlib import Path
 from typing import Optional
 

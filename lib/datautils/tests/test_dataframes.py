@@ -1,6 +1,4 @@
-"""Test functions in owid.datautils.dataframes module.
-
-"""
+"""Test functions in owid.datautils.dataframes module."""
 
 import tempfile
 from pathlib import Path

@@ -9,6 +9,7 @@ recognize and extract the data from the table (in page 2)
 I decided to manually extract the data from the PDF and save it as a CSV and get feedback
 from authors.
 """
+
 import hashlib
 
 import pandas as pd

@@ -1,6 +1,5 @@
-"""Detect anomalies in a given grapher dataset.
+"""Detect anomalies in a given grapher dataset."""
 
-"""
 from typing import Dict, List, Optional, Tuple
 
 import click

@@ -1,6 +1,4 @@
-"""Garden step for Global Electricity Review (Ember, 2022).
-
-"""
+"""Garden step for Global Electricity Review (Ember, 2022)."""
 
 import pandas as pd
 from owid import catalog

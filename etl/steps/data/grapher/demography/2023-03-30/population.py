@@ -1,4 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
+
 import re
 from copy import deepcopy
 from typing import Any, List
@@ -184,8 +185,8 @@ def _create_metric_version_from_mask(
     if title_suffix:
         table[metric_new].metadata.title = f"{table[metric_new].metadata.title} {title_suffix}"
     if display_name_suffix:
-        table[metric_new].metadata.display[
-            "name"
-        ] = f"{table[metric_new].metadata.display['name']} {display_name_suffix}"
+        table[metric_new].metadata.display["name"] = (
+            f"{table[metric_new].metadata.display['name']} {display_name_suffix}"
+        )
     table[metric_new].metadata.description = description
     return table.astype({metric_new: dtype})

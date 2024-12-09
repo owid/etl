@@ -1,4 +1,5 @@
 """Utils for chart revision tool."""
+
 import time
 from enum import Enum
 from typing import Dict, List, Optional, Tuple

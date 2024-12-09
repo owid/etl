@@ -1,5 +1,5 @@
-"""Grapher step for the UK historical electricity dataset.
-"""
+"""Grapher step for the UK historical electricity dataset."""
+
 from owid.catalog import Dataset
 
 from etl.helpers import PathFinder, create_dataset

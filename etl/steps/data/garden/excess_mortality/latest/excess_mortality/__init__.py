@@ -6,6 +6,7 @@ Both sources are updated weekly.
 This step merges the two datasets into one single dataset, combining metrics from both sources to obtain excess mortality metrics.
 
 """
+
 from input import build_df
 from owid.catalog import Table
 from process import process_df

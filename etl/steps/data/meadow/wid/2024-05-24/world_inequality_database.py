@@ -1,6 +1,5 @@
 """Load a snapshot and create the World Inequality Dataset meadow dataset."""
 
-
 import owid.catalog.processing as pr
 from owid.catalog import Table
 

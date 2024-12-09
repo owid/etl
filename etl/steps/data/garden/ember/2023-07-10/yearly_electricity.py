@@ -1,6 +1,4 @@
-"""Garden step for Ember's Yearly Electricity Data.
-
-"""
+"""Garden step for Ember's Yearly Electricity Data."""
 
 import numpy as np
 import owid.catalog.processing as pr

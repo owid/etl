@@ -1,4 +1,5 @@
 """Fertility table."""
+
 from typing import Any, Dict, List
 
 from owid.catalog import Table

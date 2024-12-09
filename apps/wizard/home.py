@@ -1,4 +1,5 @@
 """Home page of wizard."""
+
 from copy import deepcopy
 from typing import Any, Dict, List, Optional
 
