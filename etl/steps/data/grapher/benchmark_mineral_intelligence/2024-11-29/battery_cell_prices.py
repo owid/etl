@@ -13,8 +13,17 @@ def run(dest_dir: str) -> None:
     # Load garden dataset.
     ds_garden = paths.load_dataset("battery_cell_prices")
 
-    # Read table from garden dataset.
-    tb = ds_garden.read("battery_cell_prices", reset_index=False)
+    # Read combined table from garden dataset.
+    tb = ds_garden.read("battery_cell_prices_combined")
+
+    #
+    # Process data.
+    #
+    # Rename columns to adapt to grapher requirements.
+    tb = tb.rename(columns={"chemistry": "country"}, errors="raise")
+
+    # Improve table format.
+    tb = tb.format(["country", "date"])
 
     #
     # Save outputs.

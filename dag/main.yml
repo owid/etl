@@ -850,6 +850,13 @@ steps:
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
 
+# Migration distances
+  data://garden/migration/2024-11-19/migration_distance:
+    - data://garden/un/2024-07-16/migrant_stock
+    - data://garden/geography/2023-11-28/nat_earth_110
+  data://grapher/migration/2024-11-19/migration_distance:
+    - data://garden/migration/2024-11-19/migration_distance
+
   # Migration between regions, based on UN DESA flows
   data://garden/migration/2024-11-18/migration_between_regions:
     - data://garden/un/2024-07-16/migrant_stock
@@ -866,6 +873,7 @@ steps:
     - data://meadow/imf/2024-11-25/world_economic_outlook
   data://grapher/imf/2024-11-25/world_economic_outlook:
     - data://garden/imf/2024-11-25/world_economic_outlook
+
 
 include:
   - dag/open_numbers.yml

@@ -925,8 +925,7 @@ steps:
     - snapshot-private://antibiotics/2024-11-20/pathogen_bloodstream.csv
   data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream:
     - data-private://meadow/antibiotics/2024-11-20/pathogen_bloodstream
-  data-private://grapher/antibiotics/2024-11-20/pathogen_bloodstream:
-    - data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream
+
   # IHME Neonatal infections by syndrome
   data-private://meadow/antibiotics/2024-11-24/total_syndrome:
     - snapshot-private://antibiotics/2024-11-24/total_syndrome.csv
@@ -952,8 +951,7 @@ steps:
     - snapshot-private://antibiotics/2024-12-02/total_pathogen_bloodstream.csv
   data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream:
     - data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream
-  data-private://grapher/antibiotics/2024-12-02/total_pathogen_bloodstream:
-    - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream
+
   # MICROBE - total deaths by pathogen and amr resistance
   data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
     - snapshot-private://antibiotics/2024-12-02/total_pathogen_bloodstream_amr.csv
@@ -969,3 +967,39 @@ steps:
     - data://meadow/antibiotics/2024-12-03/glass_enrolment
   data://grapher/antibiotics/2024-12-03/glass_enrolment:
     - data://garden/antibiotics/2024-12-03/glass_enrolment
+  # MICROBE - total deaths by pathogen
+  data-private://meadow/antibiotics/2024-12-04/microbe_total_pathogens:
+    - snapshot-private://antibiotics/2024-12-04/microbe_total_pathogens.csv
+  data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens:
+    - data-private://meadow/antibiotics/2024-12-04/microbe_total_pathogens
+  # MICROBE - total deaths by pathogen and amr resistance
+  data-private://meadow/antibiotics/2024-12-04/microbe_total_pathogens_amr:
+    - snapshot-private://antibiotics/2024-12-04/microbe_total_pathogens_amr.csv
+  data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens_amr:
+    - data-private://meadow/antibiotics/2024-12-04/microbe_total_pathogens_amr
+    - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens
+  data-private://grapher/antibiotics/2024-12-04/microbe_total_pathogens_amr:
+    - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens_amr
+
+  # MICROBE - neonatal deaths by pathogen and amr resistance
+  data-private://meadow/antibiotics/2024-12-05/microbe_neonatal_total_amr:
+    - snapshot-private://antibiotics/2024-12-05/microbe_neonatal_total_amr.csv
+  data-private://garden/antibiotics/2024-12-05/microbe_neonatal_total_amr:
+    - data-private://meadow/antibiotics/2024-12-05/microbe_neonatal_total_amr
+    - data-private://garden/antibiotics/2024-11-20/microbe
+  data-private://grapher/antibiotics/2024-12-05/microbe_neonatal_total_amr:
+    - data-private://garden/antibiotics/2024-12-05/microbe_neonatal_total_amr
+    # MICROBE - total deaths by syndrome
+  data-private://meadow/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome:
+    - snapshot-private://antibiotics/2024-12-05/microbe_total_deaths_by_syndrome.csv
+  data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome:
+    - data-private://meadow/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome
+
+  # MICROBE - total deaths by syndrome and amr resistance
+  data-private://meadow/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr:
+    - snapshot-private://antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr.csv
+  data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr:
+    - data-private://meadow/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr
+    - data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome
+  data-private://grapher/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr:
+    - data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr

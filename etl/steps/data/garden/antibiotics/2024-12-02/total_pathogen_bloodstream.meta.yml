@@ -15,31 +15,31 @@ tables:
   total_pathogen_bloodstream:
     variables:
       value:
-        title: Total deaths from << pathogen >> infections
+        title: Total deaths from << pathogen >> bloodstream infections
         unit: deaths
-        description_short: Estimated number of deaths << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+        description_short: Estimated number of deaths << pathogen >> bloodstream infections. << pathogen >> is a {definitions.pathogen_type}.
         presentation:
-          title_public: Total deaths from << pathogen >> infections
+          title_public: Total deaths from << pathogen >> bloodstream infections
         display:
           roundingMode: significantFigures
           numSignificantFigures: 3
           name: << pathogen >>
       upper:
-        title: Upper bound of total deaths from << pathogen >> infections
+        title: Upper bound of total deaths from << pathogen >> bloodstream infections
         unit: deaths
-        description_short: Estimated number of deaths << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+        description_short: Estimated number of deaths << pathogen >> bloodstream infections. << pathogen >> is a {definitions.pathogen_type}.
         presentation:
-          title_public: Upper bound of total deaths from << pathogen >> infections
+          title_public: Upper bound of total deaths from << pathogen >> bloodstream infections
         display:
           roundingMode: significantFigures
           numSignificantFigures: 3
           name: << pathogen >>
       lower:
-        title: Lower bound of total deaths from << pathogen >> infections
+        title: Lower bound of total deaths from << pathogen >> bloodstream infections
         unit: deaths
-        description_short: Estimated number of deaths << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+        description_short: Estimated number of deaths << pathogen >> bloodstream infections. << pathogen >> is a {definitions.pathogen_type}.
         presentation:
-          title_public: Lower bound of total deaths from << pathogen >> infections
+          title_public: Lower bound of total deaths from << pathogen >> bloodstream infections
         display:
           roundingMode: significantFigures
           numSignificantFigures: 3

@@ -117,9 +117,9 @@ steps:
   data://garden/ggdc/2024-01-19/maddison_federico_paper:
     - data://meadow/ggdc/2024-01-19/maddison_federico_paper
 
-  # UN WPP experiments
+  # UN WPP largest age-group per country
   data://garden/un/2024-03-14/un_wpp_most:
-    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/un/2024-07-12/un_wpp
   data://grapher/un/2024-03-14/un_wpp_most:
     - data://garden/un/2024-03-14/un_wpp_most
 

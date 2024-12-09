@@ -10,9 +10,11 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.wizard.utils import get_staging_creation_time
+from apps.wizard.utils.io import get_all_changed_catalog_paths
 from etl import grapher_model as gm
 from etl.config import OWID_ENV
 from etl.db import read_sql
+from etl.git_helpers import get_changed_files
 
 log = get_logger()
 
@@ -200,7 +202,9 @@ class ChartDiff:
                         self._change_types.append("data")
                     if self.modified_checksum["metadataChecksum"].any():
                         self._change_types.append("metadata")
-                if self.target_chart and not self.configs_are_equal():
+                # NOTE: configs might differ and edited_in_staging is False if the chart had just
+                #   data / metadata changes
+                if self.edited_in_staging and self.target_chart and not self.configs_are_equal():
                     self._change_types.append("config")
 
                 # TODO: Should uncomment this maybe?
@@ -353,7 +357,7 @@ class ChartDiff:
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
         assert self.target_chart is not None, "Target chart is None!"
-        return configs_are_equal(self.source_chart.config, self.target_chart.config)
+        return configs_are_equal(self.source_chart.config, self.target_chart.config, verbose=False)
 
     @property
     def details(self):
@@ -580,6 +584,19 @@ def _modified_data_metadata_on_staging(
         query_source += " and " + where_charts
         params["chart_ids"] = tuple(chart_ids)
     source_df = read_sql(query_source, source_session, params=params)
+
+    # no charts, return empty dataframe
+    if source_df.empty:
+        return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited"]).set_index("chartId")
+
+    # Get all changed files and their catalog paths, including downstream dependencies.
+    files_changed = get_changed_files()
+    catalog_paths = get_all_changed_catalog_paths(files_changed)
+
+    # Exclude variables that haven't been changed by updating the files. This is to prevent showing
+    # spurious changes from lagging behind master.
+    dataset_paths = source_df.catalogPath.str.split("/").str[:4].str.join("/")
+    source_df = source_df[dataset_paths.isin(catalog_paths)]
 
     # no charts, return empty dataframe
     if source_df.empty:
