@@ -91,17 +91,6 @@ TABLES_COMPOSITION = {
     # 3/ Sex+Age+Education dimensions
     "by_sex_age_edu": {"assr", "pop", "prop"},
 }
-# With education
-# - TABLES_COMBINE_EDUCATION
-# - TABLES_COMBINE_POPULATION
-# - prop
-#
-
-# NO DIMENSIONS
-# - growth, nirate
-
-# TODO
-# - Population: use epop + bpop (ignore all pop)
 
 
 def run(dest_dir: str) -> None:
@@ -112,15 +101,20 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("wittgenstein_human_capital.zip")
 
     # Load data from snapshot. {"1": [tb1, tb2, ...], "2": [tb1, tb2, ...], ...}
+    # ~2 minutes
     tbs_scenario = read_data_from_snap(snap)
 
     #
     # Process data.
     #
     # Consolidate individual scenario tables: {"main": [tb_main1, tb_main2, ...], "by_sex": [tb_sex1, tb_sex2, ...], ...}
+    # ~3:30 minutes
+    # dix = {k: v for k, v in tbs_scenario.items() if k == "1"}
+    # tbs_scenario_ = make_scenario_tables(dix)
     tbs_scenario = make_scenario_tables(tbs_scenario)
 
     # Concatenate: [table_main, table_sex, ...]
+    # > 1 minute
     tables = concatenate_tables(tbs_scenario)
 
     #
@@ -195,7 +189,9 @@ def make_tables_from_scenario(tbs, scenario_num):
         # Check columns are in tables
         assert ("country" in tb.columns) and ("country_code" in tb.columns), "Missing country or country_code!"
         # Check there is a one-to-one correspondence
-        assert tb.groupby("country").country_code.nunique().max() == 1, "Multiple country codes for a single country!"
+        assert (
+            tb.groupby("country")["country_code"].nunique().max() == 1
+        ), "Multiple country codes for a single country!"
         # Drop country_code
         tb = tb.drop(columns="country_code")
         tables.append(tb)
@@ -223,7 +219,7 @@ def reduce_tables(tables):
     tables_combined = [cc for c in TABLES_COMBINE_EDUCATION for cc in c] + [cc for c in TABLES_CONCAT for cc in c]
     tables_combined += ["net", "netedu"]
     tables_not_combined = [name for name in tables.keys() if name not in tables_combined]
-    tables_reduced = {name: tables[name] for name in tables_not_combined}
+    tables_reduced = {name: harmonize_tb(tables[name]) for name in tables_not_combined}
 
     # Iterate over the tables from TABLES_COMBINE_EDUCATION to consolidate the pairs into single representation.
     # Index 1 contains data broken down by 'education'. Index 0 contains data with 'education' = 'total'.
@@ -236,8 +232,11 @@ def reduce_tables(tables):
         tb2 = tb2.rename(columns={tb_comb[1]: tb_comb[0]})
         # Check: columns are identical except 'education'
         assert set(tb1.columns) == set(tb2.columns), "Unexpected columns!"
+        # Harmonize
+        tb1 = harmonize_tb(tb1)
+        tb2 = harmonize_tb(tb2)
         # Concatenate
-        tb = pr.concat([tb1, tb2], ignore_index=True)
+        tb = pr.concat([tb1, tb2], ignore_index=True).drop_duplicates()
         # Add to dictionary
         tables_reduced[tb_comb[0]] = tb
     for tb_comb in TABLES_CONCAT:
@@ -248,8 +247,11 @@ def reduce_tables(tables):
         tb2 = tb2.rename(columns={tb_comb[1]: tb_comb[0]})
         # Check: columns are identical except 'education'
         assert set(tb1.columns) == set(tb2.columns), "Unexpected columns!"
+        # Harmonize
+        tb1 = harmonize_tb(tb1)
+        tb2 = harmonize_tb(tb2)
         # Concatenate
-        tb = pr.concat([tb1, tb2], ignore_index=True)
+        tb = pr.concat([tb1, tb2], ignore_index=True).drop_duplicates()
         # Add to dictionary
         tables_reduced[tb_comb[0]] = tb
 
@@ -266,8 +268,11 @@ def reduce_tables(tables):
     tb2 = tb2.rename(columns={"netedu": "net"})
     # Check: columns are identical except 'education'
     assert set(tb1.columns) == set(tb2.columns), "Unexpected columns!"
+    # Harmonize
+    tb1 = harmonize_tb(tb1)
+    tb2 = harmonize_tb(tb2)
     # Concatenate
-    tb = pr.concat([tb1, tb2], ignore_index=True)
+    tb = pr.concat([tb1, tb2], ignore_index=True).drop_duplicates()
     tables_reduced["net"] = tb
 
     # Remove tables that are not needed
@@ -398,7 +403,7 @@ def read_data_from_snap(snap):
         files = os.listdir(tmp)
         for i, f in enumerate(files):
             if i % 10 == 0:
-                print(f"Processing file {i}/{len(files)}: {f}")
+                paths.log.info(f"Processing file {i}/{len(files)}: {f}")
             # Read RDS file
             path = tmp / Path(f)
             data = pyreadr.read_r(path)
