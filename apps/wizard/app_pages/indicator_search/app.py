@@ -26,6 +26,7 @@ st.set_page_config(
 def st_display_indicators(indicators: list[dict]):
     df = pd.DataFrame(indicators)
 
+    # TODO: make the link dynamic
     df["link"] = df.apply(lambda x: f"http://staging-site-indicator-search/admin/variables/{x['variableId']}/", axis=1)
 
     df["catalogPath"] = df["catalogPath"].str.replace("grapher/", "")
