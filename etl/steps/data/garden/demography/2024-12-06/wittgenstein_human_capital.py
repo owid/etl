@@ -15,22 +15,31 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("wittgenstein_human_capital")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("wittgenstein_human_capital")
+    tb = ds_meadow.read("main")
 
     #
     # Process data.
     #
     tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+        df=tb,
+        countries_file=paths.country_mapping_path,
     )
-    tb = tb.format(["country", "year"])
 
+    # Fix year
+
+    # Format
+    tables = [
+        tb.format(["country", "year", "scenario"]),
+    ]
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.

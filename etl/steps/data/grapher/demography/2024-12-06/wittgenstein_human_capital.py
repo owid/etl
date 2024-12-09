@@ -14,14 +14,17 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("wittgenstein_human_capital")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("wittgenstein_human_capital", reset_index=False)
+    tables = list(ds_garden)
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_garden.metadata,
     )
 
     # Save changes in the new grapher dataset.

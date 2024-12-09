@@ -7,15 +7,13 @@ definitions:
         - Population Growth
         - Fertility Rate
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
-
 tables:
-  wittgenstein_human_capital:
+  main:
     variables:
       # testing_variable:
       #   title: Testing variable title
@@ -57,4 +55,3 @@ tables:
       #     numSignificantFigures:
       #
       {}
-
