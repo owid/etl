@@ -127,9 +127,11 @@ def reduce_tables(tables, tables_combine_edu, tables_concat, tables_drop):
     - It combines different tables into a single one. That is possible when, e.g. a table contains the same indicator but broken down by an additional dimension.
     - Some tables don't have new data. These can be discarded.
     """
+    paths.log.info("Reducing tables...")
     # Start by defining the output dictionary `tables_reduced`, with those tables that are not combined and thus should be kept, at least for now, as they are
     tables_combined = [cc for c in tables_combine_edu for cc in c] + [cc for c in tables_concat for cc in c]
-    tables_combined += ["net", "netedu"]
+    if ("net" in tables) and ("netedu" in tables):
+        tables_combined += ["net", "netedu"]
     tables_not_combined = [name for name in tables.keys() if name not in tables_combined]
     tables_reduced = {name: harmonize_tb(tables[name]) for name in tables_not_combined}
 
@@ -168,24 +170,25 @@ def reduce_tables(tables, tables_combine_edu, tables_concat, tables_drop):
         tables_reduced[tb_comb[0]] = tb
 
     # Special case: net and netedu
-    # net has age=all and sex=all, so we can drop these columns
-    # NOTE: net is equivalent to sum(netedu) + epsilon (probably unknown education?)
-    tb1 = tables["net"]
-    tb2 = tables["netedu"]
-    assert set(tb1["age"].unique()) == {"All"}
-    assert set(tb1["sex"].unique()) == {"Both"}
-    tb1 = tb1.drop(columns=["age", "sex"])
-    tb1["education"] = "total"
-    # Rename
-    tb2 = tb2.rename(columns={"netedu": "net"})
-    # Check: columns are identical except 'education'
-    assert set(tb1.columns) == set(tb2.columns), "Unexpected columns!"
-    # Harmonize
-    tb1 = harmonize_tb(tb1)
-    tb2 = harmonize_tb(tb2)
-    # Concatenate
-    tb = pr.concat([tb1, tb2], ignore_index=True).drop_duplicates()
-    tables_reduced["net"] = tb
+    if ("net" in tables) and ("netedu" in tables):
+        # net has age=all and sex=all, so we can drop these columns
+        # NOTE: net is equivalent to sum(netedu) + epsilon (probably unknown education?)
+        tb1 = tables["net"]
+        tb2 = tables["netedu"]
+        assert set(tb1["age"].unique()) == {"All"}
+        assert set(tb1["sex"].unique()) == {"Both"}
+        tb1 = tb1.drop(columns=["age", "sex"])
+        tb1["education"] = "total"
+        # Rename
+        tb2 = tb2.rename(columns={"netedu": "net"})
+        # Check: columns are identical except 'education'
+        assert set(tb1.columns) == set(tb2.columns), "Unexpected columns!"
+        # Harmonize
+        tb1 = harmonize_tb(tb1)
+        tb2 = harmonize_tb(tb2)
+        # Concatenate
+        tb = pr.concat([tb1, tb2], ignore_index=True).drop_duplicates()
+        tables_reduced["net"] = tb
 
     # Remove tables that are not needed
     tables_reduced = {tname: tb for tname, tb in tables_reduced.items() if tname not in tables_drop}
@@ -323,20 +326,30 @@ def read_data_from_snap(snap, scenarios_expected):
                 continue
             # Read RDS file
             path = tmp / Path(f)
-            data = pyreadr.read_r(path)
-            assert set(data.keys()) == {None}, "Unexpected keys in RDS file!"
-            df = data[None]
+            if f.endswith(".rds"):
+                data = pyreadr.read_r(path)
+                assert set(data.keys()) == {None}, "Unexpected keys in RDS file!"
+                df = data[None]
+                # Map to table
+                tb = Table(
+                    df,
+                    short_name=f.split("_")[1].replace(".rds", ""),
+                )
+                tb = _add_table_and_variables_metadata_to_table(
+                    table=tb, metadata=snap.to_table_metadata(), origin=snap.metadata.origin
+                )
+                tb.metadata.short_name = f.split("_")[1].replace(".rds", "")
+            elif f.endswith(".csv.gz"):
+                tb = pr.read_csv(
+                    path,
+                    metadata=snap.to_table_metadata(),
+                    origin=snap.metadata.origin,
+                )
+                tb.metadata.short_name = f.split("_")[1].replace(".csv.gz", "")
+            else:
+                raise ValueError(f"Unexpected file format: {f}!")
             # Rename columns
-            df = df.rename(columns=COLUMNS_RENAME)
-            # Map to table
-            tb = Table(
-                df,
-                short_name=f.split("_")[1].replace(".rds", ""),
-            )
-            tb = _add_table_and_variables_metadata_to_table(
-                table=tb, metadata=snap.to_table_metadata(), origin=snap.metadata.origin
-            )
-            tb.metadata.short_name = f.split("_")[1].replace(".rds", "")
+            tb = tb.rename(columns=COLUMNS_RENAME)
             # Add to main list
             if scenario in tbs_scenario.keys():
                 tbs_scenario[scenario].append(tb)

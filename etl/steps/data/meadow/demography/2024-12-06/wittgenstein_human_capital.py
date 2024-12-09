@@ -9,8 +9,6 @@ When values are aggregates, dimensions are set to "total".
 """
 
 
-import owid.catalog.processing as pr
-
 from etl.helpers import PathFinder, create_dataset
 
 from .utils import concatenate_tables, make_scenario_tables, read_data_from_snap

@@ -9,23 +9,19 @@ When values are aggregates, dimensions are set to "total".
 """
 
 
-import owid.catalog.processing as pr
+from utils import concatenate_tables, make_scenario_tables, read_data_from_snap
 
 from etl.helpers import PathFinder, create_dataset
-
-from .utils import concatenate_tables, make_scenario_tables, read_data_from_snap
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 SCENARIOS_EXPECTED = {
-    "1",
-    "2",
-    "22",
-    "23",
-    "3",
-    "4",
-    "5",
+    "ssp1",
+    "ssp2",
+    "ssp3",
+    "ssp4",
+    "ssp5",
 }
 
 # Renaming of relevant columns
@@ -47,8 +43,7 @@ REPLACE_SEX = {
 TABLES_COMBINE_EDUCATION = [
     ("asfr", "easfr"),
     ("assr", "eassr"),
-    ("macb", "emacb"),
-    # ("net", "netedu"),
+    # ("macb", "emacb"),
     ("tfr", "etfr"),
     ("bpop", "epop"),
 ]
@@ -57,29 +52,20 @@ TABLES_CONCAT = [
     ("prop", "bprop"),
     ("mys", "bmys"),
 ]
-TABLES_DROP = [
-    # Several tables are just population!
-    "pop",
-    "pop-age",
-    "pop-age-edattain",
-    "pop-age-sex",
-    "pop-age-sex-edattain",
-    "pop-sex",
-    "pop-sex-edattain",
-    "pop-total",
-]
+TABLES_DROP = []
+
 # Composition of tables
 TABLES_COMPOSITION = {
     # 0/ No dimension
-    "main": {"cbr", "cdr", "emi", "ggapmys15", "ggapmys25", "growth", "imm", "mage", "nirate", "odr", "ydr", "tdr"},
+    "main": {"cbr", "cdr", "ggapmys15", "ggapmys25", "growth", "mage", "nirate", "odr", "ydr", "tdr", "macb"},
     # 1/ Sex dimension. NOTE: no sex=total
     "by_sex": {"e0", "pryl15", "ryl15"},
     # 1/ Age dimension
     "by_age": {"sexratio"},
     # 1/ Education dimension
-    "by_edu": {"ggapedu15", "ggapedu25", "macb", "net", "tfr"},
+    "by_edu": {"ggapedu15", "ggapedu25", "tfr"},
     # 2/ Sex+Age dimensions. NOTE: no age=total
-    "by_sex_age": {"mys"},
+    "by_sex_age": {"mys", "net"},
     # 2/ Age+Education dimensions. NOTE: no age=total, that's fine. We have tfr for all ages actually.
     "by_age_edu": {"asfr"},
     # 3/ Sex+Age+Education dimensions
@@ -93,7 +79,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("wittgenstein_human_capital.zip")
+    snap = paths.load_snapshot("wittgenstein_human_capital_historical.zip")
 
     # Load data from snapshot. {"1": [tb1, tb2, ...], "2": [tb1, tb2, ...], ...}
     # ~ 1:20 minutes (2 minutes if all scenarios are used)
@@ -104,7 +90,7 @@ def run(dest_dir: str) -> None:
     #
     # Consolidate individual scenario tables: {"main": [tb_main1, tb_main2, ...], "by_sex": [tb_sex1, tb_sex2, ...], ...}
     # ~ 3 minutes (4:30 if all scenarios are used)
-    # dix = {k: v for k, v in tbs_scenario.items() if k == "1"}
+    # dix = {k: v for k, v in tbs_scenario.items() if k == "ssp1"}
     # tbs_scenario_ = make_scenario_tables(dix)
     tbs_scenario = make_scenario_tables(
         tbs_scenario=tbs_scenario,
@@ -113,6 +99,15 @@ def run(dest_dir: str) -> None:
         tables_drop=TABLES_DROP,
         tables_composition=TABLES_COMPOSITION,
     )
+
+    # Filter out rows that are >=2020
+    year_ranges_ignore = [f"{i}-{i+5}" for i in range(2020, 2101, 5)] + [f"{i}.0-{i+5}.0" for i in range(2020, 2101, 5)]
+    year_ranges_ignore += [f"{i}.0" for i in range(2020, 2101)] + [f"{i}" for i in range(2020, 2101)]
+
+    for scenario, tbs in tbs_scenario.items():
+        for i, tb in enumerate(tbs):
+            tb = tb.loc[~(tb["year"].isin(year_ranges_ignore))]
+            tbs_scenario[scenario][i] = tb
 
     # Concatenate: [table_main, table_sex, ...]
     # ~ 2 minutes
