@@ -9,15 +9,45 @@ dataset:
   non_redistributable: true
   update_period_days: 365
 
+# TODO: Add description key to explain how weighted averages are calculated (confirm with Benchmark) and what each of the battery chemistries are and where they are used.
 tables:
   battery_cell_prices:
     variables:
       battery_cell_price:
-        title: "Average battery cell price"
+        title: "Annual average battery cell price"
         unit: "current US$ per kilowatt-hour"
         short_unit: "$/kWh"
         description_short: |-
-          Average price of lithium ion battery cells per [kilowatt-hour](#dod:watt-hours).
+          Average annual price of lithium ion battery cells per [kilowatt-hour](#dod:watt-hours).
         display:
           numDecimalPlaces: 2
-
+  battery_cell_prices_by_chemistry:
+    variables:
+      ncm_battery_cell_price:
+        # TODO: Define acronyms used for batteries.
+        title: "Quarterly NCM battery cell price"
+        unit: "current US$ per kilowatt-hour"
+        short_unit: "$/kWh"
+        description_short: |-
+          Average quarterly price of NCM battery cells per [kilowatt-hour](#dod:watt-hours).
+        display:
+          numDecimalPlaces: 2
+      lfp_battery_cell_price:
+        title: "Quarterly LFP battery cell price"
+        unit: "current US$ per kilowatt-hour"
+        short_unit: "$/kWh"
+        description_short: |-
+          Average quarterly price of LFP battery cells per [kilowatt-hour](#dod:watt-hours).
+        display:
+          numDecimalPlaces: 2
+  battery_cell_prices_combined:
+    variables:
+      price:
+        title: "Battery cell prices"
+        unit: "current US$ per kilowatt-hour"
+        short_unit: "$/kWh"
+        # TODO: Improve description.
+        description_short: |-
+          Battery prices per [kilowatt-hour](#dod:watt-hours).
+        display:
+          numDecimalPlaces: 2

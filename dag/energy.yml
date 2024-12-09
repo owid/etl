@@ -284,6 +284,7 @@ steps:
   #
   data-private://meadow/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
     - snapshot-private://benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx
+    - snapshot-private://benchmark_mineral_intelligence/2024-11-29/battery_cell_prices_by_chemistry.xlsx
   #
   # Benchmark Mineral Intelligence - Battery cell prices.
   #
