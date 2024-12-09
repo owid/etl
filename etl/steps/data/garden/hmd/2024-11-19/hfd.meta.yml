@@ -218,7 +218,39 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average number of children born to women in a specific cohort over their lifetime.
+          The average number of children born to women in the current cohort over their lifetime.
+          <%- else %>
+          The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
+          <%- endif %>
+        unit: "births per woman"
+        description_key:
+          - Represents the completed fertility of a cohort by the end of their reproductive years.
+          - Useful for comparing fertility across different cohorts.
+          - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
+
+      ccf_plus15y:
+        title: |-
+          <% set title = "Completed cohort fertility rate (adjusted +15 years)" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average number of children born to women in the 15-years-ago cohort over their lifetime.
+          <%- else %>
+          The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
+          <%- endif %>
+        unit: "births per woman"
+        description_key:
+          - Represents the completed fertility of a cohort by the end of their reproductive years.
+          - Useful for comparing fertility across different cohorts.
+          - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
+
+      ccf_plus30y:
+        title: |-
+          <% set title = "Completed cohort fertility rate (adjusted +30 years)" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average number of children born to women in the 30-years-ago cohort over their lifetime.
           <%- else %>
           The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
           <%- endif %>
