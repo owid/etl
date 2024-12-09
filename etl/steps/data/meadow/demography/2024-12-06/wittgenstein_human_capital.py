@@ -15,6 +15,7 @@ from pathlib import Path
 import owid.catalog.processing as pr
 import pyreadr
 from owid.catalog import Table
+from owid.catalog.tables import _add_table_and_variables_metadata_to_table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -44,9 +45,6 @@ REPLACE_AGE = {
 REPLACE_SEX = {
     "both": "total",
 }
-TABLES_RELEVANT = [
-    "asfr",
-]
 
 
 # First table contains education = "all", the other the rest
@@ -94,6 +92,7 @@ TABLES_COMPOSITION = {
 
 
 def run(dest_dir: str) -> None:
+    """Overall, this step could take 6:30 minutes on my machine (lucas)."""
     #
     # Load inputs.
     #
@@ -101,20 +100,20 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("wittgenstein_human_capital.zip")
 
     # Load data from snapshot. {"1": [tb1, tb2, ...], "2": [tb1, tb2, ...], ...}
-    # ~2 minutes
+    # ~ 1:20 minutes (2 minutes if all scenarios are used)
     tbs_scenario = read_data_from_snap(snap)
 
     #
     # Process data.
     #
     # Consolidate individual scenario tables: {"main": [tb_main1, tb_main2, ...], "by_sex": [tb_sex1, tb_sex2, ...], ...}
-    # ~3:30 minutes
+    # ~ 3 minutes (4:30 if all scenarios are used)
     # dix = {k: v for k, v in tbs_scenario.items() if k == "1"}
     # tbs_scenario_ = make_scenario_tables(dix)
     tbs_scenario = make_scenario_tables(tbs_scenario)
 
     # Concatenate: [table_main, table_sex, ...]
-    # > 1 minute
+    # ~ 2 minutes
     tables = concatenate_tables(tbs_scenario)
 
     #
@@ -140,7 +139,7 @@ def make_scenario_tables(tbs_scenario):
     # Obtain tables
     tbs_base = []
     for scenario, tbs in tbs_scenario.items():
-        paths.log.info(f"Preparing data for scenario {scenario}...")
+        paths.log.info(f"> scenario {scenario}")
         tb = make_tables_from_scenario(tbs, scenario)
         tbs_base.append(tb)
 
@@ -404,18 +403,27 @@ def read_data_from_snap(snap):
         for i, f in enumerate(files):
             if i % 10 == 0:
                 paths.log.info(f"Processing file {i}/{len(files)}: {f}")
+            # Add relevant columns
+            scenario = f.split("_")[0]
+            assert scenario in SCENARIOS_EXPECTED, f"Unexpected scenario: {scenario}"
+            if scenario in {"22", "23"}:
+                continue
             # Read RDS file
             path = tmp / Path(f)
             data = pyreadr.read_r(path)
             assert set(data.keys()) == {None}, "Unexpected keys in RDS file!"
             df = data[None]
-            # Add relevant columns
-            scenario = f.split("_")[0]
-            assert scenario in SCENARIOS_EXPECTED, f"Unexpected scenario: {scenario}"
             # Rename columns
             df = df.rename(columns=COLUMNS_RENAME)
             # Map to table
-            tb = Table(df, short_name=f.split("_")[1].replace(".rds", ""))
+            tb = Table(
+                df,
+                short_name=f.split("_")[1].replace(".rds", ""),
+            )
+            tb = _add_table_and_variables_metadata_to_table(
+                table=tb, metadata=snap.to_table_metadata(), origin=snap.metadata.origin
+            )
+            tb.metadata.short_name = f.split("_")[1].replace(".rds", "")
             # Add to main list
             if scenario in tbs_scenario.keys():
                 tbs_scenario[scenario].append(tb)
