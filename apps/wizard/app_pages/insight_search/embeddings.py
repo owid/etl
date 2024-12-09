@@ -167,9 +167,17 @@ def get_sorted_documents_by_similarity(
     input_embedding = model.encode(input_string, convert_to_tensor=True, device=DEVICE)
 
     # Compute the cosine similarity between the input and each document.
-    def _get_score(input_embedding, embeddings):
-        score = util.pytorch_cos_sim(embeddings, input_embedding)
-        score = (score + 1) / 2
+    def _get_score(input_embedding, embeddings, typ="cosine"):
+        if typ == "cosine":
+            score = util.pytorch_cos_sim(embeddings, input_embedding)
+            score = (score + 1) / 2
+        elif typ == "euclidean":
+            # distance = torch.cdist(embeddings, input_embedding)
+            score = util.euclidean_sim(embeddings, input_embedding)
+            score = 1 / (1 - score)  # Normalize to [0, 1]
+        else:
+            raise ValueError(f"Invalid similarity type: {typ}")
+
         return score.cpu().numpy()[:, 0]
 
     similarities = _get_score(input_embedding, embeddings)

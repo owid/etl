@@ -82,6 +82,12 @@ def indicator_query(indicator: dict) -> str:
 
 def indicator_text(indicator: dict) -> str:
     # Combine the name and description into a single string
+    # NOTE: Using both name and description can be sometimes too long, making the embedding less accurate.
+    #  One example is query "beer" for which the indicator
+    #     "Alcohol, recorded per capita (15+) consumption (in litres of pure alcohol) - Beverage types: Beer"
+    #  has lower similarity than indicator "Coffee".
+    #  Append description only if the name is too short helps a bit. An alternative would be to shorten
+    #  it with a summarizer before embedding.
     return indicator["name"] + " " + indicator["description"]
 
 
