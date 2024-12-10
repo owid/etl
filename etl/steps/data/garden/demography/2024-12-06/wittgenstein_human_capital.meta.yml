@@ -4,16 +4,18 @@ definitions:
     display:
       numDecimalPlaces: 2
   others:
+    projections: |-
+      Projections from 2025 onwards are based on the << scenario >> scenario
     dim_ssp: |-
-      <% if scenario == "SSP1" %>
+      <% if scenario == "1" %>
       **Population Component of Rapid Development (SSP1)**: This scenario assumes a future that is moving toward a more sustainable path, with educational and health investments accelerating the demographic transition, leading to a relatively low world population. The emphasis is on strengthening human wellbeing. This is associated with high education, low mortality and low fertility. Migration levels are assumed to be medium for all countries under this SSP.
-      <%- elif scenario == "SSP2" %>
+      <%- elif scenario == "2" %>
       **Population Component of Medium (SSP2)**: This is the middle of the road scenario that can also be seen as the most likely path for each country. It combines for all countries medium fertility with medium mortality, medium migration, and the Global Education Trend (GET) education scenario.
-      <%- elif scenario == "SSP3" %>
+      <%- elif scenario == "3" %>
       **Population Component of Stalled Development (SSP3)**: This scenario portrays a world separated into regions characterized by extreme poverty, pockets of moderate wealth, and many countries struggling to maintain living standards for rapidly growing populations. This is associated with low education, high mortality and high fertility. Due to the emphasis on security and barriers to international exchange, migration is assumed to be low for all countries.
-      <%- elif scenario == "SSP4" %>
+      <%- elif scenario == "4" %>
       **Population Component of Inequality (SSP4)**: This scenario assumes increasing inequalities and stratification both across and within countries. It assumes high fertility and mortality scenarios in high-fertility countries and low fertility and medium mortality scenarios in low-fertility countries combined with medium migration scenario. In terms of education the SSP3 education transitions (CER) are decreased by 10% for levels up to lower secondary education, keeping the SSP2 (GET) education transitions for upper and post-secondary education.
-      <%- elif scenario == "SSP5" %>
+      <%- elif scenario == "5" %>
       **Population Component of Conventional Development (SSP5)**: This scenario is similar to SSP1 for the fertility, mortality and education assumptions except that it combines them with high migration scenario in a context of widespread globalization.
       <%- endif %>
     dim_edu: |-
@@ -49,19 +51,19 @@ tables:
     variables:
       # Population
       growth:
-        title: Average Annual Growth Rate
+        title: "Average Annual Growth Rate - Scenario: SSP<<scenario>>"
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Rate of growth of the population over the period of one year, as per << scenario >> scenario.
+          Rate of growth of the population over the period of one year. {definitions.others.projections}.
         presentation:
           topic_tags:
             - Population Growth
       nirate:
-        title: Average Annual Rate of Natural Increase
+        title: "Average Annual Rate of Natural Increase - Scenario: SSP<<scenario>>"
         unit: "per 1,000 people"
         description_short: |-
-          Represents the portion of population growth (or decline) determined exclusively by births and deaths, as per << scenario >> scenario.
+          Represents the portion of population growth (or decline) determined exclusively by births and deaths. {definitions.others.projections}.
         display:
           numDecimalPlaces: 1
         presentation:
@@ -70,50 +72,50 @@ tables:
 
       # Years
       ggapmys15:
-        title: Gender Gap in Mean Years Schooling (15+)
+        title: "Gender Gap in Mean Years Schooling (15+) - Scenario: SSP<<scenario>>"
         unit: years
         description_short: |-
-          The difference between female and male mean years of schooling for the population over 15 years of age, as per << scenario >> scenario. Negative values indicate that women spent fewer years in school.
+          The difference between female and male mean years of schooling for the population over 15 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
         display:
           numDecimalPlaces: 0
         presentation:
           topic_tags:
             - Global Education
       ggapmys25:
-        title: Gender Gap in Mean Years Schooling (25+)
+        title: "Gender Gap in Mean Years Schooling (25+) - Scenario: SSP<<scenario>>"
         unit: years
         description_short: |-
-          The difference between female and male mean years of schooling for population over 25 years of age, as per << scenario >> scenario. Negative values indicate that women spent fewer years in school.
+          The difference between female and male mean years of schooling for population over 25 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
         display:
           numDecimalPlaces: 0
         presentation:
           topic_tags:
             - Global Education
       mage:
-        title: Population Median Age
+        title: "Population Median Age - Scenario: SSP<<scenario>>"
         unit: years
         description_short: |-
-          Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median. As per << scenario >> scenario.
+          Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median. {definitions.others.projections}.
         presentation:
           topic_tags:
             - Population Growth
 
       # Rates (Births, Deaths)
       cbr:
-        title: Crude Birth Rate
+        title: "Crude Birth Rate - Scenario: SSP<<scenario>>"
         unit: births per 1,000 people
         description_short: |-
-          Number of live births recorded over the last 5-year period, divided by population-years. It is based on the civil calendar year, spanning from January 1 to December 31. As per << scenario >> scenario.
+          Number of live births recorded over the last 5-year period, divided by population-years. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.others.projections}.
         presentation:
           topic_tags:
             - Fertility Rate
             - Population Growth
 
       cdr:
-        title: Crude Death Rate
+        title: "Crude Death Rate - Scenario: SSP<<scenario>>"
         unit: deaths per 1,000 people
         description_short: |-
-          Number of deaths recorded in the last 5-year period, divided by population-years. It is based on the civil calendar year, spanning from January 1 to December 31. As per << scenario >> scenario.
+          Number of deaths recorded in the last 5-year period, divided by population-years. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.others.projections}.
         presentation:
           topic_tags:
             - Population Growth
@@ -121,20 +123,20 @@ tables:
 
       # Ratios
       tdr:
-        title: Total Dependency Ratio
+        title: "Total Dependency Ratio - Scenario: SSP<<scenario>>"
         unit: "%"
         description_short: |-
-          The ratio of the youth (0-14) and elderly (65+) population over the working age (15-64) population, as per << scenario >> scenario.
+          The ratio of the youth (0-14) and elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
         description_processing: |-
           The source gives the values as the number of young and elderly persons per person of working age. We have scaled the figures to have percentages instead.
         presentation:
           topic_tags:
             - Age Structure
       ydr:
-        title: Youth Dependency Ratio
+        title: "Youth Dependency Ratio - Scenario: SSP<<scenario>>"
         unit: "%"
         description_short: |-
-          The ratio of the youth (0-14) population over the working age (15-64) population, as per << scenario >> scenario.
+          The ratio of the youth (0-14) population over the working age (15-64) population. {definitions.others.projections}.
         description_processing: |-
           The source gives the values as the number of young persons per person of working age. We have scaled the figures to have percentages instead.
         presentation:
@@ -142,10 +144,10 @@ tables:
             - Age Structure
 
       odr:
-        title: Old-age Dependency Ratio
+        title: "Old-age Dependency Ratio - Scenario: SSP<<scenario>>"
         unit: "%"
         description_short: |-
-          The ratio of the elderly (65+) population over the working age (15-64) population, as per << scenario >> scenario.
+          The ratio of the elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
         description_processing: |-
           The source gives the values as the number of elderly persons per person of working age. We have scaled the figures to have percentages instead.
         presentation:
@@ -154,27 +156,163 @@ tables:
 
       # Migration
       emi:
-        title: Emigration Flows
+        title: "Emigration Flows - Scenario: SSP<<scenario>>"
         unit: "people in last 5 years"
         description_short: |-
-          The number of emigrants over a five-year period. Available in all scenarios, and at country level, as per << scenario >> scenario.
+          The number of emigrants over a five-year period. {definitions.others.projections}.
         description_processing: |-
           The source provides the values in thousands. We have scaled them to have the actual number of emigrants.
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
         presentation:
           topic_tags:
             - Migration
 
       imm:
-        title: Immigration Flows
+        title: "Immigration Flows - Scenario: SSP<<scenario>>"
         unit: "people in last 5 years"
         description_short: |-
-          The number of immigrants over a five-year period. Available in all scenarios, and at country level, as per << scenario >> scenario.
+          The number of immigrants over a five-year period. {definitions.others.projections}.
         description_processing: |-
           The source provides the values in thousands. We have scaled them to have the actual number of immigrants.
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
         presentation:
           topic_tags:
             - Migration
+
+  by_age:
+    variables:
+      sexratio:
+        title: "Sex ratio - Scenario: SSP<<scenario>> - Age: <<age>>"
+        unit: "males per 100 females"
+        description_short: |-
+          <% if age == "total" %>
+          The number of male population per 100 female population. {definitions.others.projections}.
+          <%- else %>
+          The number of male population per 100 female population (aged << age >>). {definitions.others.projections}.
+          <%- endif %>
+        presentation:
+          topic_tags:
+            - Gender Ratio
+
+  by_sex:
+    variables:
+      e0:
+        title: "Life expectancy - Scenario: SSP<<scenario>> - Sex: <<sex>>"
+        unit: "years"
+        description_short: |-
+          <% if sex == "total" %>
+          The number of years a newborn is expected to live. {definitions.others.projections}.
+          <%- else %>
+          The number of years a << sex >> newborn is expected to live. {definitions.others.projections}.
+          <% endif %>
+        presentation:
+          topic_tags:
+            - Life Expectancy
+      ryl15:
+        title: "Age when remaining Life Expectancy is below 15 years - Scenario: SSP<<scenario>> - Sex: <<sex>>"
+        unit: "years"
+        description_short: |-
+          <% if sex == "total" %>
+          The age of a person in a population when remaining life expectancy is 15 years. {definitions.others.projections}.
+          <%- else %>
+          The age of a << sex >> person in a population when remaining life expectancy is 15 years. {definitions.others.projections}.
+          <%- endif %>
+        description_processing: |-
+          Source: [Lutz et al. 2008](https://previous.iiasa.ac.at/web/home/research/researchPrograms/WorldPopulation/PublicationsMediaCoverage/POPNETNewsletter/popnet39.pdf#page=4)
+        presentation:
+          topic_tags:
+            - Life Expectancy
+      pryl15:
+        title: "Proportion of population with a remaining Life Expectancy below 15 Years - Scenario: SSP<<scenario>> - Sex: <<sex>>"
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <% if sex == "total" %>
+          Proportion of the population with a remaining life expectancy below 15 years in the total population. {definitions.others.projections}.
+          <%- else %>
+          Proportion of the << sex >> population with a remaining life expectancy below 15 years in the total population. {definitions.others.projections}.
+          <%- endif %>
+        description_processing: |-
+          Source: [Sanderson and Scherbov 2010](https://dataexplorer.wittgensteincentre.org/wcde-v3/www.iiasa.ac.at/web/home/research/researchPrograms/WorldPopulation/PublicationsMediaCoverage/POPNETNewsletter/popnet42.pdf#page=6)
+        presentation:
+          topic_tags:
+            - Life Expectancy
+
+  by_edu:
+    variables:
+      ggapedu15:
+        title: "Gender gap in Educational Attainment (15+) - Scenario: SSP<<scenario>> - Education: <<education>>"
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The difference between the proportion of females and the proportion of males in the population over 15 years of age achieving education level "<< education.replace('_', ' ').title() >>"". {definitions.others.projections}.
+        presentation:
+          topic_tags:
+            - Global Education
+      ggapedu25:
+        title: "Gender gap in Educational Attainment (25+) - Scenario: SSP<<scenario>> - Education: <<education>>"
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The difference between the proportion of females and the proportion of males in the population over 25 years of age achieving education level "<< education.replace('_', ' ').title() >>". {definitions.others.projections}.
+        presentation:
+          topic_tags:
+            - Global Education
+      macb:
+        title: "Mean age at childbearing - Scenario: SSP<<scenario>> - Education: <<education>>"
+        unit: "years"
+        short_unit: "years"
+        description_short: |-
+          <% if education == "total" %>
+          The mean age of mothers at the birth of their children observed in the last five-year period. {definitions.others.projections}.
+          <%- else %>
+          The mean age of mothers at the birth of their children observed in the last five-year period. Data for people with education level "<< education.replace('_', ' ').title() >>". {definitions.others.projections}.
+          <%- endif %>
+        presentation:
+          topic_tags:
+            - Fertility Rate
+      tfr:
+        title: "Total Fertility Rate - Scenario: SSP<<scenario>> - Education: <<education>>"
+        unit: "births per woman in last 5 years"
+        description_short: |-
+          <% if education == "total" %>
+          The average number of children born in the last 5-year period to the women of reproductive age (15-49).
+          <%- else %>
+          The average number of children born in the last 5-year period to the women of reproductive age (15-49). Data for people with education level "<< education.replace('_', ' ').title() >>". {definitions.others.projections}.
+          <%- endif %>
+        presentation:
+          topic_tags:
+            - Fertility Rate
+      net:
+        title: "Net migration - Scenario: SSP<<scenario>> - Education: <<education>>"
+        unit: "people"
+        description_short: |-
+          <% if education == "total" %>
+          The number of immigrants minus the number of emigrants over the last five-year period. {definitions.others.projections}.
+          <%- else %>
+          The number of immigrants minus the number of emigrants over the last five-year period. Data for migrants with education level "<< education.replace('_', ' ').title() >>". {definitions.others.projections}.
+          <%- endif %>
+        presentation:
+          topic_tags:
+            - Migration
+
+  by_sex_age:
+    variables:
+      mys:
+        title: "Mean years of schooling - Scenario: SSP<<scenario>> - Sex: <<sex>> - Age: <<age>>"
+        unit: years
+        description_short: |-
+          <%- if (age == "total") and (sex == "total") %>
+          Mean number of years spent in school. {definitions.others.projections}.
+          <%- elif (age != "total") and (sex == "total") %>
+          Mean number of years spent in school (aged <<age>>). {definitions.others.projections}.
+          <%- elif (age == "total") and (sex != "total") %>
+          Mean number of years spent in school (<<sex>>s). {definitions.others.projections}.
+          <%- else %>
+          Mean number of years spent in school (aged <<age>>, <<sex>>s). {definitions.others.projections}.
+          <%- endif %>
+        presentation:
+          topic_tags:
+            - Global Education
