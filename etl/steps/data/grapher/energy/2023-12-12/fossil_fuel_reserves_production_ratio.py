@@ -1,6 +1,5 @@
-"""Grapher step for the fossil fuel reserves-to-production ratio dataset.
+"""Grapher step for the fossil fuel reserves-to-production ratio dataset."""
 
-"""
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.

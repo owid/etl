@@ -5,14 +5,14 @@ NOTE: For now I will keep only rounds >=9, because to make the other work I need
 
 INSTRUCTIONS
 
-	1. In the ESS Data Portal, register and download all the survey files from the Data Wizard, https://ess-search.nsd.no/CDW/RoundCountry.
-	2. Extract the dta file from the zip file.
-	3. Run this ess_trust.do in Stata. If it fails, check the name of the dta file in the first line of the code.
-	4. The output is given in Stata's output window. Copy and paste it into a csv file, called `ess_trust.csv`.
-	5. Add snapshot. The command is:
- 		python snapshots/ess/{version}/ess_trust.py --path-to-file snapshots/ess/{version}/ess_trust.csv
-	6. Delete csv file
-	7. Run `etl ess_trust`
+        1. In the ESS Data Portal, register and download all the survey files from the Data Wizard, https://ess-search.nsd.no/CDW/RoundCountry.
+        2. Extract the dta file from the zip file.
+        3. Run this ess_trust.do in Stata. If it fails, check the name of the dta file in the first line of the code.
+        4. The output is given in Stata's output window. Copy and paste it into a csv file, called `ess_trust.csv`.
+        5. Add snapshot. The command is:
+                python snapshots/ess/{version}/ess_trust.py --path-to-file snapshots/ess/{version}/ess_trust.csv
+        6. Delete csv file
+        7. Run `etl ess_trust`
 
 """
 

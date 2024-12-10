@@ -383,13 +383,13 @@ def fix_sub_saharan_africa(tb: Table) -> Table:
     """
     tb["country"] = tb["country"].astype(str)
 
-    tb.loc[
-        (tb["country"] == "Sub-Saharan Africa") & (tb["regional_group"] == "UNICEF"), "country"
-    ] = "Sub-Saharan Africa (UNICEF)"
+    tb.loc[(tb["country"] == "Sub-Saharan Africa") & (tb["regional_group"] == "UNICEF"), "country"] = (
+        "Sub-Saharan Africa (UNICEF)"
+    )
 
-    tb.loc[
-        (tb["country"] == "Sub-Saharan Africa") & (tb["regional_group"] == "SDG"), "country"
-    ] = "Sub-Saharan Africa (SDG)"
+    tb.loc[(tb["country"] == "Sub-Saharan Africa") & (tb["regional_group"] == "SDG"), "country"] = (
+        "Sub-Saharan Africa (SDG)"
+    )
 
     return tb
 

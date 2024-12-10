@@ -2,6 +2,7 @@
 
 Contains instructions to correctly query chat GPT for the different use cases (snapshot, garden, grapher, etc.). This includes details on what each metadata field means.
 """
+
 import json
 from typing import Any, Dict, List
 

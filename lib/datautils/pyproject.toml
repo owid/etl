@@ -41,7 +41,7 @@ dev-dependencies = [
     "openpyxl>=3.0.10",
     "lxml>=4.9.1",
     "pyright==1.1.373",
-    "ruff==0.1.6"
+    "ruff==0.8.2"
 ]
 
 [tool.ruff]

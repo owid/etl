@@ -4,6 +4,7 @@ The script downloads four Excel files from the UN website. Each file contains di
 Each file is processed by cleaning the data, excluding certain columns, and reshaping the data into a format that is easier to analyze.
 The data from each file is merged into a single DataFrame. This is done by merging on the country, urban agglomeration, latitude, and year.
 """
+
 import os
 from pathlib import Path
 

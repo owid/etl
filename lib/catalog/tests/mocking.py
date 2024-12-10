@@ -40,19 +40,19 @@ def mock(_type: type) -> Any:
     if hasattr(_type, "__forward_arg__"):
         raise ValueError(_type)
 
-    if _type == int:
+    if _type is int:
         return random.randint(0, 1000)
 
-    elif _type == bool:
+    elif _type is bool:
         return random.choice([True, False])
 
-    elif _type == float:
+    elif _type is float:
         return 10 * random.random() / random.random()
 
-    elif _type == dt.date:
+    elif _type is dt.date:
         return _random_date()
 
-    elif _type == str:
+    elif _type is str:
         # some strings in the frictionless standard must be lowercase with no spaces
         return random.choice(_MOCK_STRINGS).lower()
 
@@ -72,7 +72,7 @@ def mock(_type: type) -> Any:
     elif getattr(_type, "__name__", None) == "ProcessingLog":
         return _type([])
 
-    elif _type == Any:
+    elif _type is Any:
         return mock(random.choice([str, int, float]))
 
     elif getattr(_type, "__name__", None) == "YearDateLatest":

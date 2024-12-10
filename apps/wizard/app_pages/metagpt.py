@@ -2,6 +2,7 @@
 
 Note that it still relies on apps/metagpt.
 """
+
 import os
 import tempfile
 from pathlib import Path

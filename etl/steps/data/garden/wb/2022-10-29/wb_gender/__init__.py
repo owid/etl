@@ -1,4 +1,5 @@
 """WB Gender Garden step."""
+
 from pathlib import Path
 from typing import Union
 

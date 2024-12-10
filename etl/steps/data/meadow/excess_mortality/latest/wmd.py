@@ -1,6 +1,7 @@
 """Load a snapshot and create a meadow dataset.
 
 In this step we perform sanity checks on the expected input fields and the values that they take."""
+
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger

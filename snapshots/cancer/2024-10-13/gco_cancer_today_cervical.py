@@ -1,5 +1,6 @@
 """Script to create a snapshot of dataset.
 To download the csv file go to https://gco.iarc.fr/today/en/dataviz/maps-heatmap?mode=population&cancers=23&sexes=2 and click Downloads --> csv"""
+
 from pathlib import Path
 
 import click

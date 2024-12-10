@@ -1,6 +1,5 @@
-"""Load snapshot of EM-DAT natural disasters data and prepare a table with basic metadata.
+"""Load snapshot of EM-DAT natural disasters data and prepare a table with basic metadata."""
 
-"""
 import warnings
 
 from etl.helpers import PathFinder, create_dataset

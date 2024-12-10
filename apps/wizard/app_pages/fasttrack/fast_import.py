@@ -1,4 +1,5 @@
 """Definition of FasttrackImport object (mainly backend)."""
+
 import datetime as dt
 import difflib
 import html

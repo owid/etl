@@ -2,6 +2,7 @@
 
 streamlit run app.py
 """
+
 import webbrowser
 from pathlib import Path
 

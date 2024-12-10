@@ -1,6 +1,5 @@
-"""Create a GIF or video for a given chart URL.
+"""Create a GIF or video for a given chart URL."""
 
-"""
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse

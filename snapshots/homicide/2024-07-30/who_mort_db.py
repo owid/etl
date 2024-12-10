@@ -1,6 +1,6 @@
 """Script to create a snapshot of dataset.
-    Download full data set from here: https://platform.who.int/mortality/themes/theme-details/topics/indicator-groups/indicator-group-details/MDB/violence
-    Click on the download button and then select 'full dataset'. It doesn't matter what age groups or years you select it will download them all anyway.
+Download full data set from here: https://platform.who.int/mortality/themes/theme-details/topics/indicator-groups/indicator-group-details/MDB/violence
+Click on the download button and then select 'full dataset'. It doesn't matter what age groups or years you select it will download them all anyway.
 """
 
 from pathlib import Path

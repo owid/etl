@@ -1,6 +1,4 @@
-"""Load renewable energy investments data from garden and create a grapher dataset.
-
-"""
+"""Load renewable energy investments data from garden and create a grapher dataset."""
 
 from owid import catalog
 

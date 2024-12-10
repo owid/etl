@@ -1,4 +1,5 @@
 """Demographics table."""
+
 from typing import Any, Dict
 
 from owid.catalog import Table

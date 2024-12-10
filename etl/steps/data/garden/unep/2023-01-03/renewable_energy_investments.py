@@ -1,6 +1,4 @@
-"""Create a garden dataset on renewable energy investments based on UNEP data.
-
-"""
+"""Create a garden dataset on renewable energy investments based on UNEP data."""
 
 from owid import catalog
 

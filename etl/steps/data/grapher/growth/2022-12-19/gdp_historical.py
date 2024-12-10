@@ -1,6 +1,7 @@
 """
 Just upload GDP and GDP per capita estimations the way they are from Garden
 """
+
 from owid import catalog
 
 from etl.helpers import PathFinder
