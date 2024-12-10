@@ -151,6 +151,13 @@ sections:
         entrypoint: app_pages/dataset_explorer.py
         icon: ":material/search:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
+      - title: "Producer analytics"
+        alias: producer-analytics
+        description: "Extract analytics to share with data producers"
+        maintainer: "@pablo"
+        entrypoint: app_pages/producer_analytics.py
+        icon: ":material/developer_board:"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Wikimedia_Product_Analytics_team_logo.svg/512px-Wikimedia_Product_Analytics_team_logo.svg.png"
 
   - title: "Explorers"
     description: |-
