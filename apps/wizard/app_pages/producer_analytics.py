@@ -22,6 +22,7 @@ GRAPHERS_BASE_URL = "https://ourworldindata.org/grapher/"
 # PAGE CONFIG
 st.set_page_config(
     page_title="Wizard: Producer analytics",
+    layout="wide",
     page_icon="🪄",
 )
 
@@ -168,6 +169,9 @@ def get_producer_analytics_per_producer():
     error = "Duplicated chart slugs found for a given producer."
     assert df_grouped["grapher"].apply(lambda x: len(x) == len(set(x))).all(), error
 
+    # Drop unnecessary columns.
+    df_grouped = df_grouped.drop(columns=["grapher"])
+
     # Sort conveniently.
     df_grouped = df_grouped.sort_values(["renders_all"], ascending=False).reset_index(drop=True)
 
@@ -204,32 +208,47 @@ gb.configure_selection(
     groupSelectsFiltered=True,
 )
 gb.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
+
+# Enable column auto-sizing for the grid.
+gb.configure_grid_options(suppressSizeToFit=False)  # Allows dynamic resizing to fit.
+gb.configure_default_column(autoSizeColumns=True)  # Ensures all columns can auto-size.
+
+# Configure individual columns with specific settings.
+gb.configure_column("n_charts", headerName="Charts", headerTooltip="Number of charts using data from a producer.")
 gb.configure_column(
-    "n_charts", headerName="N. charts", width=120, headerTooltip="Number of charts that use data from the step."
+    "renders_all",
+    headerName="Views all time",
+    headerTooltip="Number of renders since the beginning of data collection.",
 )
-# gb.configure_column(
-#     "db_dataset_name_and_url",  # This will be the displayed column
-#     headerName="Grapher dataset",
-#     cellRenderer=grapher_dataset_jscode,
-#     headerTooltip="Name of the grapher dataset (if any), linked to its corresponding dataset admin page.",
-# )
-gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
+gb.configure_column(
+    "renders_365d", headerName="Views last 365d", headerTooltip="Number of renders in the last 365 days."
+)
+gb.configure_column("renders_30d", headerName="Views last 30d", headerTooltip="Number of renders in the last 30 days.")
+
+# Configure pagination with dynamic page size.
+gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=50)
+
+# Build the grid options.
 grid_options = gb.build()
 
-# Display the grid table with pagination.
+# Custom CSS to ensure the table stretches across the page.
+custom_css = {
+    ".ag-theme-streamlit": {
+        "max-width": "100% !important",
+        "width": "100% !important",
+        "margin": "0 auto !important",  # Centers the grid horizontally.
+    },
+}
+
+# Display the grid table with the updated grid options.
 grid_response = AgGrid(
     data=steps_df_display,
     gridOptions=grid_options,
     height=1000,
     width="100%",
     update_mode=GridUpdateMode.MODEL_CHANGED,
-    fit_columns_on_grid_load=False,
+    fit_columns_on_grid_load=True,  # Automatically adjust columns when the grid loads.
     allow_unsafe_jscode=True,
     theme="streamlit",
-    # The following ensures that the pagination controls are not cropped.
-    custom_css={
-        "#gridToolBar": {
-            "padding-bottom": "0px !important",
-        }
-    },
+    custom_css=custom_css,
 )
