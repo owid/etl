@@ -92,6 +92,10 @@ def connect_estimates_with_projections(tb: Table) -> Table:
 
     tb = tb.copy()
 
+    # Save tb_historical and tb_current_forecast, by filtering scenario in historical and current_forecast
+    tb_historical = tb[tb["scenario"] == "historical"].copy().reset_index(drop=True)
+    tb_current_forecast = tb[tb["scenario"] == "current_forecast"].copy().reset_index(drop=True)
+
     # Make table wider, by using scenario as columns
     tb = tb.pivot(index=["country", "year", "povertyline"], columns="scenario", values=INDICATOR_COLUMNS)
 
@@ -115,5 +119,17 @@ def connect_estimates_with_projections(tb: Table) -> Table:
     # Recover origins
     for indicator in INDICATOR_COLUMNS:
         tb[indicator] = tb[indicator].copy_metadata(tb["country"])
+
+    # Combine historical and current_forecast, by concatenating tb_historical and tb_current_forecast
+    tb_connected = pr.concat([tb_historical, tb_current_forecast], ignore_index=True)
+
+    # Rename scenario column to "Historical + current forecast + historical growth"
+    tb_connected["scenario"] = "Historical + current forecast + historical growth"
+
+    # Keep only the columns in INDEX_COLUMNS and INDICATOR_COLUMNS
+    tb_connected = tb_connected[INDEX_COLUMNS + INDICATOR_COLUMNS]
+
+    # Concatenate tb and tb_connected
+    tb = pr.concat([tb, tb_connected], ignore_index=True)
 
     return tb
