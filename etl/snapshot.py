@@ -4,7 +4,7 @@ import re
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterator, Optional, Union, cast
+from typing import Any, Dict, Iterator, Optional, Union, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -228,6 +228,29 @@ class Snapshot:
     def read_rda(self, *args, **kwargs) -> Table:
         """Read R data .rda file into a Table and populate it with metadata."""
         return pr.read_rda(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
+
+    def read_rda_multiple(self, *args, **kwargs) -> Dict[str, Table]:
+        """Read R data .rda file into multiple Tables and populate it with metadata.
+
+        RData objects can contain multiple dataframes.
+
+        Read specific dataframes from an RData file:
+
+        ```python
+        tables = snap.read_rda_multiple(["tname1", "tname2"])
+        ```
+
+        If you don't provide any table names, all tables will be read:
+
+        ```python
+        tables = snap.read_rda_multiple()
+        ```
+
+        where tables is a key-value dictionary, and keys are the names of the tables (same as table short_names too).
+        """
+        return pr.read_rda_multiple(
+            self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
+        )
 
     def read_fwf(self, *args, **kwargs) -> Table:
         """Read a table of fixed-width formatted lines with metadata."""
