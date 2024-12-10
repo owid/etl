@@ -165,8 +165,6 @@ build-backend = "hatchling.build"
 [tool.pyright]
 exclude = [
     "lib/",
-    "etl/steps/archive",
-    "etl/snapshots/archive",
     "apps/wizard/etl_steps/cookiecutter/",
     "apps/wizard/etl_steps/cookiecutter/snapshot/**",
     "**/node_modules",
