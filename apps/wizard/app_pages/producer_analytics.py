@@ -198,10 +198,10 @@ Select the minimum and maximum dates for the custom date range. Note that this m
 
 with st_horizontal():
     # Create input fields for minimum and maximum dates.
-    min_date = st.date_input("Select minimum date", value=MIN_DATE, key="min_date", format="YYYY-MM-DD").strftime(
+    min_date = st.date_input("Select minimum date", value=MIN_DATE, key="min_date", format="YYYY-MM-DD").strftime(  # type: ignore
         "%Y-%m-%d"
     )
-    max_date = st.date_input("Select maximum date", value=TODAY, key="max_date", format="YYYY-MM-DD").strftime(
+    max_date = st.date_input("Select maximum date", value=TODAY, key="max_date", format="YYYY-MM-DD").strftime(  # type: ignore
         "%Y-%m-%d"
     )
 
