@@ -201,7 +201,7 @@ def create_dataset(
     default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
     underscore_table: bool = True,
     camel_to_snake: bool = False,
-    long_to_wide: bool = False,
+    long_to_wide: Optional[bool] = None,
     formats: List[FileFormat] = DEFAULT_FORMATS,
     check_variables_metadata: bool = False,
     run_grapher_checks: bool = True,
@@ -280,6 +280,10 @@ def create_dataset(
         used_short_names.add(table.metadata.short_name)
 
         from etl import grapher_helpers as gh
+
+        # Default long_to_wide for grapher channel is true
+        if long_to_wide is None:
+            long_to_wide = ds.metadata.channel == "grapher"
 
         # Expand long to wide
         if long_to_wide:
