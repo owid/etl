@@ -1,57 +1,180 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    presentation:
-      topic_tags:
-        - Global Education
-        - Population Growth
-        - Fertility Rate
-
+    display:
+      numDecimalPlaces: 2
+  others:
+    dim_ssp: |-
+      <% if scenario == "SSP1" %>
+      **Population Component of Rapid Development (SSP1)**: This scenario assumes a future that is moving toward a more sustainable path, with educational and health investments accelerating the demographic transition, leading to a relatively low world population. The emphasis is on strengthening human wellbeing. This is associated with high education, low mortality and low fertility. Migration levels are assumed to be medium for all countries under this SSP.
+      <%- elif scenario == "SSP2" %>
+      **Population Component of Medium (SSP2)**: This is the middle of the road scenario that can also be seen as the most likely path for each country. It combines for all countries medium fertility with medium mortality, medium migration, and the Global Education Trend (GET) education scenario.
+      <%- elif scenario == "SSP3" %>
+      **Population Component of Stalled Development (SSP3)**: This scenario portrays a world separated into regions characterized by extreme poverty, pockets of moderate wealth, and many countries struggling to maintain living standards for rapidly growing populations. This is associated with low education, high mortality and high fertility. Due to the emphasis on security and barriers to international exchange, migration is assumed to be low for all countries.
+      <%- elif scenario == "SSP4" %>
+      **Population Component of Inequality (SSP4)**: This scenario assumes increasing inequalities and stratification both across and within countries. It assumes high fertility and mortality scenarios in high-fertility countries and low fertility and medium mortality scenarios in low-fertility countries combined with medium migration scenario. In terms of education the SSP3 education transitions (CER) are decreased by 10% for levels up to lower secondary education, keeping the SSP2 (GET) education transitions for upper and post-secondary education.
+      <%- elif scenario == "SSP5" %>
+      **Population Component of Conventional Development (SSP5)**: This scenario is similar to SSP1 for the fertility, mortality and education assumptions except that it combines them with high migration scenario in a context of widespread globalization.
+      <%- endif %>
+    dim_edu: |-
+      <% if education == "total" %>
+      Over all education categories.
+      <% elif education == "under_15" %>
+      Population below 15 years old.
+      <% elif education == "no_education" %>
+      Highest level of education attained: No level and Grade 1 of ISCED 1 not completed.
+      <% elif education == "incomplete_primary" %>
+      Highest level of education attained: Incomplete ISCED 1.
+      <% elif education == "primary" %>
+      Highest level of education attained: Completed ISCED 1 and incomplete ISCED 2.
+      <% elif education == "lower_secondary" %>
+      Highest level of education attained: Completed ISCED 2 and incomplete ISCED 3.
+      <% elif education == "upper_secondary" %>
+      Highest level of education attained: Completed ISCED 3 and incomplete ISCED 4 5 or 6.
+      <% elif education == "post_secondary" %>
+      Highest level of education attained: Completed ISCED 4 5 6 7 or 8.
+      <% endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
+  update_period_days: 730
+  title: Wittgenstein Centre, Human Capital
 
 tables:
   main:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      # Population
+      growth:
+        title: Average Annual Growth Rate
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Rate of growth of the population over the period of one year, as per << scenario >> scenario.
+        presentation:
+          topic_tags:
+            - Population Growth
+      nirate:
+        title: Average Annual Rate of Natural Increase
+        unit: "per 1,000 people"
+        description_short: |-
+          Represents the portion of population growth (or decline) determined exclusively by births and deaths, as per << scenario >> scenario.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Population Growth
+
+      # Years
+      ggapmys15:
+        title: Gender Gap in Mean Years Schooling (15+)
+        unit: years
+        description_short: |-
+          The difference between female and male mean years of schooling for the population over 15 years of age, as per << scenario >> scenario. Negative values indicate that women spent fewer years in school.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Global Education
+      ggapmys25:
+        title: Gender Gap in Mean Years Schooling (25+)
+        unit: years
+        description_short: |-
+          The difference between female and male mean years of schooling for population over 25 years of age, as per << scenario >> scenario. Negative values indicate that women spent fewer years in school.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Global Education
+      mage:
+        title: Population Median Age
+        unit: years
+        description_short: |-
+          Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median. As per << scenario >> scenario.
+        presentation:
+          topic_tags:
+            - Population Growth
+
+      # Rates (Births, Deaths)
+      cbr:
+        title: Crude Birth Rate
+        unit: births per 1,000 people
+        description_short: |-
+          Number of live births recorded over the last 5-year period, divided by population-years. It is based on the civil calendar year, spanning from January 1 to December 31. As per << scenario >> scenario.
+        presentation:
+          topic_tags:
+            - Fertility Rate
+            - Population Growth
+
+      cdr:
+        title: Crude Death Rate
+        unit: deaths per 1,000 people
+        description_short: |-
+          Number of deaths recorded in the last 5-year period, divided by population-years. It is based on the civil calendar year, spanning from January 1 to December 31. As per << scenario >> scenario.
+        presentation:
+          topic_tags:
+            - Population Growth
+            - Life Expectancy
+
+      # Ratios
+      tdr:
+        title: Total Dependency Ratio
+        unit: "%"
+        description_short: |-
+          The ratio of the youth (0-14) and elderly (65+) population over the working age (15-64) population, as per << scenario >> scenario.
+        description_processing: |-
+          The source gives the values as the number of young and elderly persons per person of working age. We have scaled the figures to have percentages instead.
+        presentation:
+          topic_tags:
+            - Age Structure
+      ydr:
+        title: Youth Dependency Ratio
+        unit: "%"
+        description_short: |-
+          The ratio of the youth (0-14) population over the working age (15-64) population, as per << scenario >> scenario.
+        description_processing: |-
+          The source gives the values as the number of young persons per person of working age. We have scaled the figures to have percentages instead.
+        presentation:
+          topic_tags:
+            - Age Structure
+
+      odr:
+        title: Old-age Dependency Ratio
+        unit: "%"
+        description_short: |-
+          The ratio of the elderly (65+) population over the working age (15-64) population, as per << scenario >> scenario.
+        description_processing: |-
+          The source gives the values as the number of elderly persons per person of working age. We have scaled the figures to have percentages instead.
+        presentation:
+          topic_tags:
+            - Age Structure
+
+      # Migration
+      emi:
+        title: Emigration Flows
+        unit: "people in last 5 years"
+        description_short: |-
+          The number of emigrants over a five-year period. Available in all scenarios, and at country level, as per << scenario >> scenario.
+        description_processing: |-
+          The source provides the values in thousands. We have scaled them to have the actual number of emigrants.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Migration
+
+      imm:
+        title: Immigration Flows
+        unit: "people in last 5 years"
+        description_short: |-
+          The number of immigrants over a five-year period. Available in all scenarios, and at country level, as per << scenario >> scenario.
+        description_processing: |-
+          The source provides the values in thousands. We have scaled them to have the actual number of immigrants.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Migration
