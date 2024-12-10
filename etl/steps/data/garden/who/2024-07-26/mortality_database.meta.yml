@@ -41,8 +41,8 @@ tables:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       age_standardized_death_rate_per_100_000_standard_population:
-        title: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> per 100,000 people
-        description_short: Reported deaths from << cause.lower() >> in << sex.lower() >> per 100,000 people.
+        title: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people
+        description_short: Reported deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.
         description_key: ["The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>."]
         unit: deaths per 100,000 people
         display:
