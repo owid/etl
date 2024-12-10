@@ -9,6 +9,7 @@ from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from structlog import get_logger
 
+from apps.wizard.utils.components import st_horizontal
 from etl.snapshot import Snapshot
 from etl.version_tracker import VersionTracker
 
@@ -17,6 +18,8 @@ log = get_logger()
 
 # Define constants.
 TODAY = datetime.today()
+# Date when the new views metric started to be recorded.
+MIN_DATE = datetime.strptime("2024-11-01", "%Y-%m-%d")
 GRAPHERS_BASE_URL = "https://ourworldindata.org/grapher/"
 
 # PAGE CONFIG
@@ -49,12 +52,12 @@ def get_chart_renders_query(date_start, date_end) -> pd.DataFrame:
 
 
 @st.cache_data
-def get_chart_renders() -> pd.DataFrame:
+def get_chart_renders(min_date: str, max_date: str) -> pd.DataFrame:
     # List ranges of dates to fetch views.
     date_ranges = {
         "renders_365d": ((TODAY - timedelta(days=365)).strftime("%Y-%m-%d"), TODAY.strftime("%Y-%m-%d")),
         "renders_30d": ((TODAY - timedelta(days=30)).strftime("%Y-%m-%d"), TODAY.strftime("%Y-%m-%d")),
-        "renders_all": ("2000-01-01", TODAY.strftime("%Y-%m-%d")),
+        "renders_custom": (min_date, max_date),  # Use user-defined date range.
     }
 
     # Get analytics for those ranges, for all grapher URLs.
@@ -120,9 +123,9 @@ def load_steps_df_with_producer_data() -> pd.DataFrame:
 
 
 @st.cache_data
-def get_producer_charts_analytics():
-    # Get the number of renders for each chart.
-    df_renders = get_chart_renders()
+def get_producer_charts_analytics(min_date, max_date):
+    # Get chart renders using user-defined date range for "renders_custom".
+    df_renders = get_chart_renders(min_date=min_date, max_date=max_date)
 
     # Load the steps dataframe with producer data.
     df_expanded = load_steps_df_with_producer_data()
@@ -134,21 +137,21 @@ def get_producer_charts_analytics():
 
 
 @st.cache_data
-def get_producer_analytics_per_chart():
+def get_producer_analytics_per_chart(min_date, max_date):
     # Load the steps dataframe with producer data and analytics.
-    df_expanded = get_producer_charts_analytics()
+    df_expanded = get_producer_charts_analytics(min_date=min_date, max_date=max_date)
 
     # Create an expanded table with number of views per chart.
     df_renders_per_chart = df_expanded.dropna(subset=["grapher"]).fillna(0).reset_index(drop=True)
-    df_renders_per_chart = df_renders_per_chart.sort_values("renders_all", ascending=False).reset_index(drop=True)
+    df_renders_per_chart = df_renders_per_chart.sort_values("renders_custom", ascending=False).reset_index(drop=True)
 
     return df_renders_per_chart
 
 
 @st.cache_data
-def get_producer_analytics_per_producer():
+def get_producer_analytics_per_producer(min_date, max_date):
     # Load the steps dataframe with producer data and analytics.
-    df_expanded = get_producer_charts_analytics()
+    df_expanded = get_producer_charts_analytics(min_date=min_date, max_date=max_date)
 
     # Group by producer and get the full list of chart slugs for each producer.
     df_grouped = df_expanded.groupby("producer", observed=True, as_index=False).agg(
@@ -156,7 +159,7 @@ def get_producer_analytics_per_producer():
             "grapher": lambda x: [item for item in x if pd.notna(item)],  # Filter out NaN values
             "renders_365d": "sum",
             "renders_30d": "sum",
-            "renders_all": "sum",
+            "renders_custom": "sum",
         }
     )
     df_grouped["n_charts"] = df_grouped["grapher"].apply(len)
@@ -169,7 +172,7 @@ def get_producer_analytics_per_producer():
     df_grouped = df_grouped.drop(columns=["grapher"])
 
     # Sort conveniently.
-    df_grouped = df_grouped.sort_values(["renders_all"], ascending=False).reset_index(drop=True)
+    df_grouped = df_grouped.sort_values(["renders_custom"], ascending=False).reset_index(drop=True)
 
     # Create a separate dataframe with the top producers, just for curiosity.
     # df_check = df_grouped[["producer", "renders_30d", "n_charts"]].sort_values(["renders_30d"], ascending=False).reset_index(drop=True).head(20)
@@ -186,10 +189,21 @@ def get_producer_analytics_per_producer():
 st.title("📊 Producer analytics")
 
 st.markdown(
-    """\
+    f"""\
 Explore analytics of data producers.
+
+Select the minimum and maximum dates for the custom date range. Note that this metric started to be recorded on {MIN_DATE.strftime("%Y-%m-%d")}.
 """
 )
+
+with st_horizontal():
+    # Create input fields for minimum and maximum dates.
+    min_date = st.date_input("Select minimum date", value=MIN_DATE, key="min_date", format="YYYY-MM-DD").strftime(
+        "%Y-%m-%d"
+    )
+    max_date = st.date_input("Select maximum date", value=TODAY, key="max_date", format="YYYY-MM-DD").strftime(
+        "%Y-%m-%d"
+    )
 
 st.markdown(
     """## Producers table
@@ -203,7 +217,7 @@ Total number of charts and chart views for each producer. Producers selected in 
 ########################################
 
 # Load table content and select only columns to be shown.
-df_producers = get_producer_analytics_per_producer()
+df_producers = get_producer_analytics_per_producer(min_date=min_date, max_date=max_date)
 
 # Define the options of the main grid table with pagination.
 gb = GridOptionsBuilder.from_dataframe(df_producers)
@@ -232,9 +246,9 @@ COLUMNS_PRODUCERS = {
         "headerName": "Charts",
         "headerTooltip": "Number of charts using data from a producer.",
     },
-    "renders_all": {
-        "headerName": "Views all time",
-        "headerTooltip": "Number of renders since the beginning of data collection.",
+    "renders_custom": {
+        "headerName": "Views in custom range",
+        "headerTooltip": f"Number of renders betweeen {min_date} and {max_date}.",
     },
     "renders_365d": {
         "headerName": "Views 365 days",
@@ -286,7 +300,7 @@ Number of chart views for each chart that uses data of the selected producers.
 )
 
 # Load detailed analytics per producer-chart.
-df_producer_charts = get_producer_analytics_per_chart()
+df_producer_charts = get_producer_analytics_per_chart(min_date=min_date, max_date=max_date)
 
 # Get the selected producers from the first table.
 if len(grid_response["selected_rows"]) == 0:
@@ -338,7 +352,7 @@ COLUMNS_PRODUCER_CHARTS = {
         if column == "grapher"
         else COLUMNS_PRODUCERS[column]
     )
-    for column in ["producer", "renders_all", "renders_365d", "renders_30d", "grapher"]
+    for column in ["producer", "renders_custom", "renders_365d", "renders_30d", "grapher"]
 }
 # Configure and display the second table.
 gb2 = GridOptionsBuilder.from_dataframe(df_producer_charts_filtered)
@@ -365,7 +379,6 @@ AgGrid(
 )
 
 # TODO:
-# * Instead of "render_all", this could be a custom range of dates. By default, it will be the date when this metric started to be recorded.
 # * Currently, one way to export analytics is by right-clicking on the table and exporting. But maybe there's a better way (e.g. with a button below, which combines different analytics in a more customized way).
 # * It would be good to have a toggle button to ignore auxiliary datasets (namely population and income groups). Currently, the analytics are heavily affected by a few producers, namely those that are involved in the population and income groups datasets. Ideally, we should be able to ignore them (as they are used mostly as auxiliary data). Note that FAOSTAT is also loaded as an auxiliary dataset (specifically faostat_rl, I think to get the surface area of each country). I was considering here to have a list of snapshot/walden/github steps that should be removed from df. But a better approach would be to let VersionTracker ingest a DAG as an argument. This way, we could load the original data, and manually remove the dependencies of the garden population and income groups steps. Then, pass this DAG to VersionTracker, and see the resulting analytics. With this approach, we would be able to properly account for any un_wpp or faostat use that are not related to population.
 # * Consider also counting how many grapher datasets come from each producer. We cannot simply count unique steps, because that would be counting several versions of the same step. We could count identifiers. We can then estimate the number of DB datasets by counting how many identifiers have the grapher channel.
