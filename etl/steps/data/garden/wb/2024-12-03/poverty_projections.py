@@ -18,14 +18,14 @@ TABLES = ["region", "global"]
 
 # Define scenarios and new names
 SCENARIOS = {
-    "historical": "Historical",
-    "current_forecast": "Current forecast + historical growth",
-    "2pct": "2% growth",
-    "2pct_gini1": "2% growth + Gini reduction 1%",
-    "2pct_gini2": "2% growth + Gini reduction 2%",
-    "4pct": "4% growth",
-    "6pct": "6% growth",
-    "8pct": "8% growth",
+    "historical": "Historical estimates",
+    "current_forecast": "Current forecast + historical growth projections",
+    "2pct": "2% growth projections",
+    "2pct_gini1": "2% growth + Gini reduction 1% projections",
+    "2pct_gini2": "2% growth + Gini reduction 2% projections",
+    "4pct": "4% growth projections",
+    "6pct": "6% growth projections",
+    "8pct": "8% growth projections",
 }
 
 # Define index columns
@@ -124,7 +124,7 @@ def connect_estimates_with_projections(tb: Table) -> Table:
     tb_connected = pr.concat([tb_historical, tb_current_forecast], ignore_index=True)
 
     # Rename scenario column to "Historical + current forecast + historical growth"
-    tb_connected["scenario"] = "Historical + current forecast + historical growth"
+    tb_connected["scenario"] = "Historical estimates + projections"
 
     # Keep only the columns in INDEX_COLUMNS and INDICATOR_COLUMNS
     tb_connected = tb_connected[INDEX_COLUMNS + INDICATOR_COLUMNS]
