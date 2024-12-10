@@ -50,6 +50,9 @@ def run(dest_dir: str) -> None:
     # Reset index
     df = df.reset_index()
 
+    # Fix typos
+    df.dimension = df.dimension.str.replace("villAge", "village")
+
     #
     # Process data.
     #
