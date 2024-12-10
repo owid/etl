@@ -117,7 +117,8 @@ def filter_to_subgraph(
     if exact_match:
         included = set(includes) & all_steps
     else:
-        included = {s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)}
+        compiled_includes = [re.compile(p) for p in includes]
+        included = {s for s in all_steps if any(p.search(s) for p in compiled_includes)}
 
     if only:
         # Only include explicitly selected nodes
