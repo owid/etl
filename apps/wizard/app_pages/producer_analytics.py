@@ -5,7 +5,7 @@ import owid.catalog.processing as pr
 import pandas as pd
 import streamlit as st
 from pandas_gbq import read_gbq
-from st_aggrid import AgGrid, GridUpdateMode
+from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from structlog import get_logger
 
@@ -183,7 +183,7 @@ def get_producer_analytics_per_producer():
 ########################################################################################################################
 
 # Streamlit app layout.
-st.title(":material/search: Producer analytics")
+st.title("📊 Producer analytics")
 
 st.markdown(
     """\
@@ -281,7 +281,7 @@ grid_response = AgGrid(
 st.markdown(
     """## Producer-charts table
 
-Number of charts and chart views for each chart that uses data of the selected producers.
+Number of chart views for each chart that uses data of the selected producers.
 """
 )
 
@@ -313,13 +313,44 @@ COLUMNS_PRODUCER_CHARTS.update(
         "grapher": {
             "headerName": "Chart URL",
             "headerTooltip": "URL of the chart in the grapher.",
-            "cellRenderer": "urlCellRenderer",
+            # "cellRenderer": "urlCellRenderer",
         },
     }
 )
-for column in COLUMNS_PRODUCER_CHARTS:
-    gb2.configure_column(column, **COLUMNS_PRODUCER_CHARTS[column])
 
+# Create a JavaScript renderer for clickable slugs.
+grapher_slug_jscode = JsCode(
+    r"""
+    class UrlCellRenderer {
+    init(params) {
+        this.eGui = document.createElement('a');
+        if (params.value) {
+            // Extract the slug from the full URL.
+            const url = new URL(params.value);
+            const slug = url.pathname.split('/').pop();  // Get the last part of the path as the slug.
+            this.eGui.innerText = slug;
+            this.eGui.setAttribute('href', params.value);
+        } else {
+            this.eGui.innerText = '';
+        }
+        this.eGui.setAttribute('style', "text-decoration:none; color:blue");
+        this.eGui.setAttribute('target', "_blank");
+    }
+    getGui() {
+        return this.eGui;
+    }
+    }
+    """
+)
+
+# Update column configurations for the second table.
+for column in COLUMNS_PRODUCER_CHARTS:
+    if column == "grapher":
+        gb2.configure_column(column, **COLUMNS_PRODUCER_CHARTS[column], cellRenderer=grapher_slug_jscode)
+    else:
+        gb2.configure_column(column, **COLUMNS_PRODUCER_CHARTS[column])
+
+# Configure pagination with dynamic page size.
 gb2.configure_pagination(paginationAutoPageSize=False, paginationPageSize=30)
 grid_options2 = gb2.build()
 AgGrid(
