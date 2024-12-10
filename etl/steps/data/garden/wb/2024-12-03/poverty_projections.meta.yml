@@ -29,28 +29,28 @@ definitions:
     Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
 
   description_key_scenarios: |-
-    <% if scenario == "Historical" %>
+    <% if scenario == "Historical estimates" %>
     Estimates are based on household surveys or extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
-    <% elif scenario == "Current forecast + historical growth" %>
+    <% elif scenario == "Current forecast + historical growth projections" %>
     This data is a projection of the estimates based on GDP growth projections from the World Bank's Global Economic Prospects and the the Macro Poverty Outlook, together with IMF's World Economic Outlook, in the period 2025-2029. For the period 2030-2050, the data is projected using the average annual historical GDP per capita growth over 2010-2019.
-    <% elif scenario == "Historical + current forecast + historical growth" %>
+    <% elif scenario == "Historical estimates + current forecast + historical growth projections" %>
     This data combines data based on household surveys or extrapolated up until the year of the data release using GDP growth estimates and forecasts, with projections based on GDP growth projections from the World Bank's Global Economic Prospects and the the Macro Poverty Outlook, together with IMF's World Economic Outlook, in the period 2025-2029. For the period 2030-2050, the data is projected using the average annual historical GDP per capita growth over 2010-2019.
-    <% elif scenario == "2% growth" %>
+    <% elif scenario == "2% growth projections" %>
     This data is a projection of the estimates based on a scenario of 2% average GDP per capita growth, while keeping income inequality constant.
-    <% elif scenario == "2% growth + Gini reduction 1%" %>
+    <% elif scenario == "2% growth + Gini reduction 1% projections" %>
     This data is a projection of the estimates based on a scenatio of 2% average GDP per capita growth, while reducing income inequality by 1% of the Gini coefficient per year.
-    <% elif scenario == "2% growth + Gini reduction 2%" %>
+    <% elif scenario == "2% growth + Gini reduction 2% projections" %>
     This data is a projection of the estimates based on a scenatio of 2% average GDP per capita growth, while reducing income inequality by 2% of the Gini coefficient per year.
-    <% elif scenario == "4% growth" %>
+    <% elif scenario == "4% growth projections" %>
     This data is a projection of the estimates based on a scenario of 4% average GDP per capita growth, while keeping income inequality constant.
-    <% elif scenario == "6% growth" %>
+    <% elif scenario == "6% growth projections" %>
     This data is a projection of the estimates based on a scenario of 6% average GDP per capita growth, while keeping income inequality constant.
-    <% elif scenario == "8% growth" %>
+    <% elif scenario == "8% growth projections" %>
     This data is a projection of the estimates based on a scenario of 8% average GDP per capita growth, while keeping income inequality constant.
     <%- endif -%>
 
   isprojection_by_scenario: |-
-    <% if scenario == "Historical" or scenario == "Historical + current forecast + historical growth" %>
+    <% if scenario == "Historical estimates" or scenario == "Historical estimates + current forecast + historical growth projections" %>
     false
     <% else %>
     true
