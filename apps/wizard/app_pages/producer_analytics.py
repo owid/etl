@@ -88,8 +88,6 @@ def load_steps_df_with_producer_data() -> pd.DataFrame:
     # Select only relevant columns.
     df = df[["step", "all_chart_slugs"]]
 
-    # TODO: Currently, the analytics are heavily affected by a few producers, namely those that are involved in the population and income groups datasets. Ideally, we should be able to ignore them (as they are used mostly as auxiliary data). Note that FAOSTAT is also loaded as an auxiliary dataset (specifically faostat_rl, I think to get the surface area of each country). I was considering here to have a list of snapshot/walden/github steps that should be removed from df. But a better approach would be to let VersionTracker ingest a DAG as an argument. This way, we could load the original data, and manually remove the dependencies of the garden population and income groups steps. Then, pass this DAG to VersionTracker, and see the resulting analytics. With this approach, we would be able to properly account for any un_wpp or faostat use that are not related to population.
-
     # Add a column of producer to steps df (where possible).
     for i, row in df.iterrows():
         snap_uri = row["step"].split("snapshot://" if "snapshot://" in row["step"] else "snapshot-private://")[1]
@@ -113,7 +111,6 @@ def load_steps_df_with_producer_data() -> pd.DataFrame:
 
     # Remove duplicates.
     # NOTE: This happens because df contains one row per snapshot. Some grapher datasets come from a combination of multiple snapshots (often from the same producer). We want to count producer-chart pairs only once.
-    # TODO: Consider also counting how many grapher datasets come from each producer. We cannot simply count unique steps, because that would be counting several versions of the same step. We could count identifiers. We can then estimate the number of DB datasets by counting how many identifiers have the grapher channel.
     df_expanded = df_expanded.drop_duplicates(subset=["producer", "all_chart_slugs"]).reset_index(drop=True)
 
     # Add a column for grapher URL.
@@ -143,8 +140,7 @@ def get_producer_analytics_per_chart():
 
     # Create an expanded table with number of views per chart.
     df_renders_per_chart = df_expanded.dropna(subset=["grapher"]).fillna(0).reset_index(drop=True)
-    df_renders_per_chart.sort_values("renders_all")
-    df_renders_per_chart[df_renders_per_chart["producer"] == "Global Carbon Project"]["renders_all"].sum()
+    df_renders_per_chart = df_renders_per_chart.sort_values("renders_all", ascending=False).reset_index(drop=True)
 
     return df_renders_per_chart
 
@@ -189,15 +185,28 @@ def get_producer_analytics_per_producer():
 # Streamlit app layout.
 st.title(":material/search: Producer analytics")
 
+st.markdown(
+    """\
+Explore analytics of data producers.
+"""
+)
+
+st.markdown(
+    """## Producers table
+
+Total number of charts and chart views for each producer. Producers selected in this table will be used to filter the producer-charts table below.
+"""
+)
 
 ########################################
-# Display TABLE
+# Display main table with producer analytics.
 ########################################
+
 # Load table content and select only columns to be shown.
-steps_df_display = get_producer_analytics_per_producer()
+df_producers = get_producer_analytics_per_producer()
 
 # Define the options of the main grid table with pagination.
-gb = GridOptionsBuilder.from_dataframe(steps_df_display)
+gb = GridOptionsBuilder.from_dataframe(df_producers)
 gb.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
 gb.configure_selection(
     selection_mode="multiple",
@@ -213,24 +222,37 @@ gb.configure_default_column(editable=False, groupable=True, sortable=True, filte
 gb.configure_grid_options(suppressSizeToFit=False)  # Allows dynamic resizing to fit.
 gb.configure_default_column(autoSizeColumns=True)  # Ensures all columns can auto-size.
 
+# Define columns to be shown.
+COLUMNS_PRODUCERS = {
+    "producer": {
+        "headerName": "Producer",
+        "headerTooltip": "Name of the producer.",
+    },
+    "n_charts": {
+        "headerName": "Charts",
+        "headerTooltip": "Number of charts using data from a producer.",
+    },
+    "renders_all": {
+        "headerName": "Views all time",
+        "headerTooltip": "Number of renders since the beginning of data collection.",
+    },
+    "renders_365d": {
+        "headerName": "Views 365 days",
+        "headerTooltip": "Number of renders in the last 365 days.",
+    },
+    "renders_30d": {
+        "headerName": "Views 30 days",
+        "headerTooltip": "Number of renders in the last 30 days.",
+    },
+}
+
 # Configure individual columns with specific settings.
-gb.configure_column("n_charts", headerName="Charts", headerTooltip="Number of charts using data from a producer.")
-gb.configure_column(
-    "renders_all",
-    headerName="Views all time",
-    headerTooltip="Number of renders since the beginning of data collection.",
-)
-gb.configure_column(
-    "renders_365d", headerName="Views last 365d", headerTooltip="Number of renders in the last 365 days."
-)
-gb.configure_column("renders_30d", headerName="Views last 30d", headerTooltip="Number of renders in the last 30 days.")
-
+for column in COLUMNS_PRODUCERS:
+    gb.configure_column(column, **COLUMNS_PRODUCERS[column])
 # Configure pagination with dynamic page size.
-gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=50)
-
+gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
 # Build the grid options.
 grid_options = gb.build()
-
 # Custom CSS to ensure the table stretches across the page.
 custom_css = {
     ".ag-theme-streamlit": {
@@ -239,10 +261,9 @@ custom_css = {
         "margin": "0 auto !important",  # Centers the grid horizontally.
     },
 }
-
 # Display the grid table with the updated grid options.
 grid_response = AgGrid(
-    data=steps_df_display,
+    data=df_producers,
     gridOptions=grid_options,
     height=1000,
     width="100%",
@@ -252,3 +273,67 @@ grid_response = AgGrid(
     theme="streamlit",
     custom_css=custom_css,
 )
+
+########################################
+# Display main table with producer analytics.
+########################################
+
+st.markdown(
+    """## Producer-charts table
+
+Number of charts and chart views for each chart that uses data of the selected producers.
+"""
+)
+
+# Load detailed analytics per producer-chart.
+df_producer_charts = get_producer_analytics_per_chart()
+
+# Get the selected producers from the first table.
+if len(grid_response["selected_rows"]) == 0:
+    # If no producers are selected, show all producer-charts.
+    df_producer_charts_filtered = df_producer_charts
+else:
+    # Filter producer-charts by selected producers.
+    selected_producers = [row["producer"] for row in grid_response["selected_rows"]]
+    df_producer_charts_filtered = df_producer_charts[df_producer_charts["producer"].isin(selected_producers)]
+
+# Configure and display the second table.
+gb2 = GridOptionsBuilder.from_dataframe(df_producer_charts_filtered)
+gb2.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
+gb2.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
+
+# Define columns to be shown.
+COLUMNS_PRODUCER_CHARTS = {
+    column: values
+    for column, values in COLUMNS_PRODUCERS.items()
+    if column in ["producer", "renders_all", "renders_365d", "renders_30d"]
+}
+COLUMNS_PRODUCER_CHARTS.update(
+    {
+        "grapher": {
+            "headerName": "Chart URL",
+            "headerTooltip": "URL of the chart in the grapher.",
+            "cellRenderer": "urlCellRenderer",
+        },
+    }
+)
+for column in COLUMNS_PRODUCER_CHARTS:
+    gb2.configure_column(column, **COLUMNS_PRODUCER_CHARTS[column])
+
+gb2.configure_pagination(paginationAutoPageSize=False, paginationPageSize=30)
+grid_options2 = gb2.build()
+AgGrid(
+    data=df_producer_charts_filtered,
+    gridOptions=grid_options2,
+    height=500,
+    width="100%",
+    fit_columns_on_grid_load=True,
+    allow_unsafe_jscode=True,
+    theme="streamlit",
+)
+
+# TODO:
+# * Instead of "render_all", this could be a custom range of dates. By default, it will be the date when this metric started to be recorded.
+# * Currently, one way to export analytics is by right-clicking on the table and exporting. But maybe there's a better way (e.g. with a button below, which combines different analytics in a more customized way).
+# * It would be good to have a toggle button to ignore auxiliary datasets (namely population and income groups). Currently, the analytics are heavily affected by a few producers, namely those that are involved in the population and income groups datasets. Ideally, we should be able to ignore them (as they are used mostly as auxiliary data). Note that FAOSTAT is also loaded as an auxiliary dataset (specifically faostat_rl, I think to get the surface area of each country). I was considering here to have a list of snapshot/walden/github steps that should be removed from df. But a better approach would be to let VersionTracker ingest a DAG as an argument. This way, we could load the original data, and manually remove the dependencies of the garden population and income groups steps. Then, pass this DAG to VersionTracker, and see the resulting analytics. With this approach, we would be able to properly account for any un_wpp or faostat use that are not related to population.
+# * Consider also counting how many grapher datasets come from each producer. We cannot simply count unique steps, because that would be counting several versions of the same step. We could count identifiers. We can then estimate the number of DB datasets by counting how many identifiers have the grapher channel.
