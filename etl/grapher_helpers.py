@@ -199,7 +199,7 @@ def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any
         else:
             title_with_dims = _title_column_and_dimensions(meta.title, dim_dict)
 
-        meta.title = title_with_dims
+        meta.title = str(title_with_dims)
 
     # traverse metadata and expand Jinja
     meta = _expand_jinja(meta, dim_dict)
