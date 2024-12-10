@@ -302,22 +302,6 @@ gb2 = GridOptionsBuilder.from_dataframe(df_producer_charts_filtered)
 gb2.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
 gb2.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
 
-# Define columns to be shown.
-COLUMNS_PRODUCER_CHARTS = {
-    column: values
-    for column, values in COLUMNS_PRODUCERS.items()
-    if column in ["producer", "renders_all", "renders_365d", "renders_30d"]
-}
-COLUMNS_PRODUCER_CHARTS.update(
-    {
-        "grapher": {
-            "headerName": "Chart URL",
-            "headerTooltip": "URL of the chart in the grapher.",
-            # "cellRenderer": "urlCellRenderer",
-        },
-    }
-)
-
 # Create a JavaScript renderer for clickable slugs.
 grapher_slug_jscode = JsCode(
     r"""
@@ -343,16 +327,33 @@ grapher_slug_jscode = JsCode(
     """
 )
 
-# Update column configurations for the second table.
-for column in COLUMNS_PRODUCER_CHARTS:
-    if column == "grapher":
-        gb2.configure_column(column, **COLUMNS_PRODUCER_CHARTS[column], cellRenderer=grapher_slug_jscode)
-    else:
-        gb2.configure_column(column, **COLUMNS_PRODUCER_CHARTS[column])
+# Define columns to be shown, including the cell renderer for "grapher".
+COLUMNS_PRODUCER_CHARTS = {
+    column: (
+        {
+            "headerName": "Chart URL",
+            "headerTooltip": "URL of the chart in the grapher.",
+            "cellRenderer": grapher_slug_jscode,
+        }
+        if column == "grapher"
+        else COLUMNS_PRODUCERS[column]
+    )
+    for column in ["producer", "renders_all", "renders_365d", "renders_30d", "grapher"]
+}
+# Configure and display the second table.
+gb2 = GridOptionsBuilder.from_dataframe(df_producer_charts_filtered)
+gb2.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
+gb2.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
+
+# Apply column configurations directly from the dictionary.
+for column, config in COLUMNS_PRODUCER_CHARTS.items():
+    gb2.configure_column(column, **config)
 
 # Configure pagination with dynamic page size.
 gb2.configure_pagination(paginationAutoPageSize=False, paginationPageSize=30)
 grid_options2 = gb2.build()
+
+# Display the grid.
 AgGrid(
     data=df_producer_charts_filtered,
     gridOptions=grid_options2,
