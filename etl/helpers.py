@@ -290,7 +290,7 @@ def create_dataset(
             if ds.metadata.channel != "grapher":
                 log.warning("It is recommended to use long_to_wide=True only in the grapher channel")
 
-            dim_names = set(table.index.names) - {"country", "year", "date"}
+            dim_names = set(table.index.names) - {"country", "year", "date", None}
             if dim_names:
                 # First pass to update metadata from YAML
                 if meta_path.exists():
