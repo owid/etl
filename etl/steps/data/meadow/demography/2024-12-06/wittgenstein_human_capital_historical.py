@@ -9,9 +9,9 @@ When values are aggregates, dimensions are set to "total".
 """
 
 
-from utils import concatenate_tables, make_scenario_tables, read_data_from_snap
-
 from etl.helpers import PathFinder, create_dataset
+
+from .shared import concatenate_tables, make_scenario_tables, read_data_from_snap
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -110,15 +110,15 @@ def run(dest_dir: str) -> None:
             tb = tb.loc[~(tb["year"].isin(year_ranges_ignore))]
             # Remove duplicate rows
             # An alternative to solve this is: drop age=All in bpop table.
-            if tname == "by_sex_age_edu":
-                cols = ["country", "year", "age", "education", "sex", "scenario"]
-                x = tb.groupby(["country", "year", "age", "education", "sex", "scenario"], as_index=False).size()
-                x = x[x["size"] > 1]
-                assert set(x["year"].unique()) == {"2015"}
-                assert set(x["age"].unique()) == {"total"}
-                assert set(x["sex"].unique()) == {"male"}
-                assert set(x["education"].unique()) == {"total"}
-                tb = tb.drop_duplicates(subset=cols)
+            # if tname == "by_sex_age_edu":
+            #     cols = ["country", "year", "age", "education", "sex", "scenario"]
+            #     x = tb.groupby(["country", "year", "age", "education", "sex", "scenario"], as_index=False).size()
+            #     x = x[x["size"] > 1]
+            #     assert set(x["year"].unique()) == {"2015"}
+            #     assert set(x["age"].unique()) == {"total"}
+            #     assert set(x["sex"].unique()) == {"male"}
+            #     assert set(x["education"].unique()) == {"total"}
+            #     tb = tb.drop_duplicates(subset=cols)
 
             # Overwrite
             tables[tname][i] = tb

@@ -11,7 +11,7 @@ When values are aggregates, dimensions are set to "total".
 
 from etl.helpers import PathFinder, create_dataset
 
-from .utils import concatenate_tables, make_scenario_tables, read_data_from_snap
+from .shared import concatenate_tables, make_scenario_tables, read_data_from_snap
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

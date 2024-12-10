@@ -141,6 +141,9 @@ def reduce_tables(tables, tables_combine_edu, tables_concat, tables_drop):
         # Load tables
         tb1 = tables[tb_comb[0]]
         tb2 = tables[tb_comb[1]]
+        # Drop in special case
+        if tb_comb[0] == "bpop":
+            tb1 = tb1.loc[tb1["age"] != "All"]
         # Prepare tables for merge
         tb1 = tb1.assign(education="total")
         tb2 = tb2.rename(columns={tb_comb[1]: tb_comb[0]})
