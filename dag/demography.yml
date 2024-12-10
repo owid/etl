@@ -278,10 +278,10 @@ steps:
   # Wittgenstein Centre
   data://meadow/demography/2024-12-06/wittgenstein_human_capital:
     - snapshot://demography/2024-12-06/wittgenstein_human_capital.zip
-  data://garden/demography/2024-12-06/wittgenstein_human_capital:
-    - data://meadow/demography/2024-12-06/wittgenstein_human_capital
-  data://grapher/demography/2024-12-06/wittgenstein_human_capital:
-    - data://garden/demography/2024-12-06/wittgenstein_human_capital
+  # data://garden/demography/2024-12-06/wittgenstein_human_capital:
+  #   - data://meadow/demography/2024-12-06/wittgenstein_human_capital
+  # data://grapher/demography/2024-12-06/wittgenstein_human_capital:
+  #   - data://garden/demography/2024-12-06/wittgenstein_human_capital
 
   data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical:
     - snapshot://demography/2024-12-06/wittgenstein_human_capital_historical.zip

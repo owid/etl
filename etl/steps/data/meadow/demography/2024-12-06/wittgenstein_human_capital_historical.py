@@ -92,7 +92,7 @@ def run(dest_dir: str) -> None:
     # ~ 3 minutes (4:30 if all scenarios are used)
     # dix = {k: v for k, v in tbs_scenario.items() if k == "ssp1"}
     # tbs_scenario_ = make_scenario_tables(dix)
-    tbs_scenario = make_scenario_tables(
+    tables = make_scenario_tables(
         tbs_scenario=tbs_scenario,
         tables_combine_edu=TABLES_COMBINE_EDUCATION,
         tables_concat=TABLES_CONCAT,
@@ -104,14 +104,30 @@ def run(dest_dir: str) -> None:
     year_ranges_ignore = [f"{i}-{i+5}" for i in range(2020, 2101, 5)] + [f"{i}.0-{i+5}.0" for i in range(2020, 2101, 5)]
     year_ranges_ignore += [f"{i}.0" for i in range(2020, 2101)] + [f"{i}" for i in range(2020, 2101)]
 
-    for scenario, tbs in tbs_scenario.items():
+    for tname, tbs in tables.items():
         for i, tb in enumerate(tbs):
+            # Remove unwanted years
             tb = tb.loc[~(tb["year"].isin(year_ranges_ignore))]
-            tbs_scenario[scenario][i] = tb
+            # Remove duplicate rows
+            # An alternative to solve this is: drop age=All in bpop table.
+            if tname == "by_sex_age_edu":
+                cols = ["country", "year", "age", "education", "sex", "scenario"]
+                x = tb.groupby(["country", "year", "age", "education", "sex", "scenario"], as_index=False).size()
+                x = x[x["size"] > 1]
+                assert set(x["year"].unique()) == {"2015"}
+                assert set(x["age"].unique()) == {"total"}
+                assert set(x["sex"].unique()) == {"male"}
+                assert set(x["education"].unique()) == {"total"}
+                tb = tb.drop_duplicates(subset=cols)
+
+            # Overwrite
+            tables[tname][i] = tb
+
+    # Remove duplicates
 
     # Concatenate: [table_main, table_sex, ...]
     # ~ 2 minutes
-    tables = concatenate_tables(tbs_scenario)
+    tables = concatenate_tables(tables)
 
     #
     # Save outputs.
