@@ -33,6 +33,8 @@ definitions:
     Estimates are based on household surveys or extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
     <% elif scenario == "Current forecast + historical growth" %>
     This data is a projection of the estimates based on GDP growth projections from the World Bank's Global Economic Prospects and the the Macro Poverty Outlook, together with IMF's World Economic Outlook, in the period 2025-2029. For the period 2030-2050, the data is projected using the average annual historical GDP per capita growth over 2010-2019.
+    <% elif scenario == "Historical + current forecast + historical growth" %>
+    This data combines data based on household surveys or extrapolated up until the year of the data release using GDP growth estimates and forecasts, with projections based on GDP growth projections from the World Bank's Global Economic Prospects and the the Macro Poverty Outlook, together with IMF's World Economic Outlook, in the period 2025-2029. For the period 2030-2050, the data is projected using the average annual historical GDP per capita growth over 2010-2019.
     <% elif scenario == "2% growth" %>
     This data is a projection of the estimates based on a scenario of 2% average GDP per capita growth, while keeping income inequality constant.
     <% elif scenario == "2% growth + Gini reduction 1%" %>
@@ -48,7 +50,7 @@ definitions:
     <%- endif -%>
 
   isprojection_by_scenario: |-
-    <% if scenario == "Historical" %>
+    <% if scenario == "Historical" or scenario == "Historical + current forecast + historical growth" %>
     false
     <% else %>
     true
