@@ -24,6 +24,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("wittgenstein_human_capital")
 
     # Read table from meadow dataset.
+    paths.log.info("reading tables...")
     tb = ds_meadow.read("main").reset_index(drop=True)
     tb_age = ds_meadow.read("by_age").reset_index(drop=True)
     tb_sex = ds_meadow.read("by_sex").reset_index(drop=True)
@@ -31,65 +32,76 @@ def run(dest_dir: str) -> None:
         drop=True
     )  # TODO: add metadata field for table explaining the different education levels
     tb_sex_age = ds_meadow.read("by_sex_age").reset_index(drop=True)
-    # tb_age_edu = ds_meadow.read("by_age_edu")
-    # tb_age_sex_edu = ds_meadow.read("by_age_sex_edu")
+    tb_age_edu = ds_meadow.read("by_age_edu").reset_index(drop=True)
+    tb_sex_age_edu = ds_meadow.read("by_sex_age_edu").reset_index(drop=True)
 
     #
     # Process data.
     #
 
     # 1/ MAKE MAIN TABLE
-    # Fix year
-    tb = consolidate_year_single_and_ranges(
-        tb=tb,
+    paths.log.info("baking main table...")
+    tb = make_table(
+        tb,
         cols_single=["tdr", "ggapmys25", "mage", "ydr", "ggapmys15", "odr"],
         cols_range=["growth", "imm", "emi", "cbr", "nirate", "cdr"],
+        per_100=["tdr", "odr", "ydr"],
+        per_1000=["emi", "imm"],
     )
 
-    # Harmonize scenarios, country names
-    tb = harmonize_columns(tb=tb)
-
-    # Scale factor
-    tb = scale_values(tb, per_100=["tdr", "odr", "ydr"], per_1000=["emi", "imm"])
-
     # 2.1/ MAKE BY AGE TABLE (sexratio)
-    # Fix year type
-    tb_age["year"] = tb_age["year"].astype("Int32")
-
-    # Harmonize scenarios, country names
-    tb_age = harmonize_columns(tb=tb_age)
-
-    # Scale factor
-    tb_age = scale_values(tb_age, per_100=["sexratio"])
+    paths.log.info("baking tables by age...")
+    tb_age = make_table(
+        tb_age,
+        all_single=True,
+        per_100=["sexratio"],
+    )
 
     # 2.2/ BY SEX
-    # Fix year type
-    assert tb_sex["year"].str.contains("-").all(), "Some years are not ranges!"
-    tb_sex["year"] = tb_sex["year"].str.extract(r"(\d{4}\.?0?)$").astype("Float32").astype("Int32")
-
-    # Harmonize scenarios, country names
-    tb_sex = harmonize_columns(tb=tb_sex)
+    paths.log.info("baking tables by sex...")
+    tb_sex = make_table(
+        tb_sex,
+        all_range=True,
+    )
 
     # 2.3/ BY EDU
-    # Fix year
-    tb_edu = consolidate_year_single_and_ranges(
+    paths.log.info("baking tables by education...")
+    tb_edu = make_table(
         tb_edu,
         cols_single=["ggapedu15", "ggapedu25"],
         cols_range=["macb", "tfr", "net"],
+        per_1000=["net"],
     )
 
-    # Harmonize scenarios, country names
-    tb_edu = harmonize_columns(tb=tb_edu)
-
-    # Scale factor
-    tb_edu = scale_values(tb_edu, per_1000=["net"])
-
     # 3.1/ BY SEX+AGE
-    # Fix year
-    tb_sex_age["year"] = tb_sex_age["year"].astype("Int32")
+    paths.log.info("baking tables by sex+age...")
+    tb_sex_age = make_table(
+        tb_sex_age,
+        all_single=True,
+    )
 
-    # Harmonize scenarios, country names
-    tb_sex_age = harmonize_columns(tb=tb_sex_age)
+    # 3.2/ BY AGE+EDU
+    paths.log.info("baking tables by age+education...")
+    assert "total" not in set(tb_age_edu["age"].unique()), "Unexpected age category: 'total'"
+    tb_age_edu = make_table(
+        tb_age_edu,
+        all_range=True,
+    )
+
+    # 4.1/ BY SEX+AGE+EDU
+    paths.log.info("baking tables by sex+age+education...")
+    tb_sex_age_edu = make_table(
+        tb_sex_age_edu,
+        dtypes={
+            "sex": "category",
+            "age": "category",
+            "education": "category",
+        },
+        cols_single=["pop", "prop"],
+        cols_range=["assr"],
+        per_1000=["pop"],
+        per_100=["assr"],
+    )
 
     #
     # Save outputs.
@@ -101,6 +113,8 @@ def run(dest_dir: str) -> None:
         tb_sex.format(["country", "scenario", "sex", "year"], short_name="by_sex"),
         tb_edu.format(["country", "scenario", "education", "year"], short_name="by_edu"),
         tb_sex_age.format(["country", "scenario", "sex", "age", "year"], short_name="by_sex_age"),
+        tb_age_edu.format(["country", "scenario", "age", "education", "year"], short_name="by_age_edu"),
+        tb_sex_age_edu.format(["country", "scenario", "sex", "age", "education", "year"], short_name="by_sex_age_edu"),
     ]
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
@@ -114,6 +128,39 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
+def make_table(
+    tb, dtypes=None, all_single=False, all_range=False, cols_single=None, cols_range=None, per_100=None, per_1000=None
+):
+    dtypes = {**{"scenario": "UInt8", "country": "category"}, **(dtypes or {})}
+    tb = tb.astype(dtypes)
+
+    if all_single:
+        tb["year"] = tb["year"].astype("Int32")
+    elif all_range:
+        assert tb["year"].str.contains("-").all(), "Some years are not ranges!"
+        tb["year"] = tb["year"].str.extract(r"(\d{4}\.?0?)$").astype("Float32").astype("Int32")
+    else:
+        tb = consolidate_year_single_and_ranges(
+            tb=tb,
+            cols_single=cols_single,
+            cols_range=cols_range,
+        )
+
+    # Ensure expected scenario IDs
+    assert set(tb["scenario"].unique()) == set(range(1, 6))
+
+    # Harmonize country names
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
+        show_full_warning=False,
+    )
+
+    # Scale
+    tb = scale_values(tb, per_100=per_100, per_1000=per_1000)
+    return tb
+
+
 def scale_values(tb, per_100=None, per_1000=None):
     if per_100 is not None:
         for col in per_100:
@@ -121,19 +168,6 @@ def scale_values(tb, per_100=None, per_1000=None):
     if per_1000 is not None:
         for col in per_1000:
             tb[col] *= 1000
-    return tb
-
-
-def harmonize_columns(tb):
-    # Ensure expected scenario IDs
-    assert set(tb["scenario"].unique()) == set(range(1, 6))
-    # tb["scenario"] = "SSP" + tb["scenario"].astype("string[pyarrow]")
-
-    # Harmonize country names
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-    )
     return tb
 
 
