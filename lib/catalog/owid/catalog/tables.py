@@ -192,12 +192,10 @@ class Table(pd.DataFrame):
         return table
 
     @overload
-    def to_csv(self, path: None = None, **kwargs: Any) -> str:
-        ...
+    def to_csv(self, path: None = None, **kwargs: Any) -> str: ...
 
     @overload
-    def to_csv(self, path: Any, **kwargs: Any) -> None:
-        ...
+    def to_csv(self, path: Any, **kwargs: Any) -> None: ...
 
     def to_csv(self, path: Optional[Any] = None, **kwargs: Any) -> Union[None, str]:
         """
@@ -306,6 +304,12 @@ class Table(pd.DataFrame):
             try:
                 json.dump(metadata, ostream, indent=2, default=str, allow_nan=False)
             except ValueError as e:
+                # try to find a problematic field
+                for k, v in metadata["fields"].items():
+                    try:
+                        json.dumps(v, default=str, allow_nan=False)
+                    except ValueError as e2:
+                        raise ValueError(f"metadata field {k} contains NaNs:\n{v}") from e2
                 raise ValueError(f"metadata contains NaNs:\n{metadata}") from e
 
     @classmethod
@@ -445,16 +449,13 @@ class Table(pd.DataFrame):
         *,
         inplace: Literal[True],
         **kwargs: Any,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
-    def rename(self, mapper: Any = None, *, inplace: Literal[False], **kwargs: Any) -> "Table":
-        ...
+    def rename(self, mapper: Any = None, *, inplace: Literal[False], **kwargs: Any) -> "Table": ...
 
     @overload
-    def rename(self, *args: Any, **kwargs: Any) -> "Table":
-        ...
+    def rename(self, *args: Any, **kwargs: Any) -> "Table": ...
 
     def rename(self, *args: Any, **kwargs: Any) -> Optional["Table"]:
         """Rename columns while keeping their metadata."""
@@ -559,16 +560,13 @@ class Table(pd.DataFrame):
         *,
         inplace: Literal[True],
         **kwargs: Any,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
-    def set_index(self, keys: Union[str, List[str]], *, inplace: Literal[False], **kwargs: Any) -> "Table":
-        ...
+    def set_index(self, keys: Union[str, List[str]], *, inplace: Literal[False], **kwargs: Any) -> "Table": ...
 
     @overload
-    def set_index(self, keys: Union[str, List[str]], **kwargs: Any) -> "Table":
-        ...
+    def set_index(self, keys: Union[str, List[str]], **kwargs: Any) -> "Table": ...
 
     def set_index(
         self,
@@ -588,16 +586,13 @@ class Table(pd.DataFrame):
             return cast(Table, t)
 
     @overload
-    def reset_index(self, level=None, *, inplace: Literal[True], **kwargs) -> None:
-        ...
+    def reset_index(self, level=None, *, inplace: Literal[True], **kwargs) -> None: ...
 
     @overload
-    def reset_index(self, level=None, *, inplace: Literal[False], **kwargs) -> "Table":
-        ...
+    def reset_index(self, level=None, *, inplace: Literal[False], **kwargs) -> "Table": ...
 
     @overload
-    def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> "Table":
-        ...
+    def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> "Table": ...
 
     def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> Optional["Table"]:  # type: ignore
         """Fix type signature of reset_index."""
@@ -617,16 +612,13 @@ class Table(pd.DataFrame):
         return cast(Table, t)
 
     @overload
-    def drop_duplicates(self, *, inplace: Literal[True], **kwargs) -> None:
-        ...
+    def drop_duplicates(self, *, inplace: Literal[True], **kwargs) -> None: ...
 
     @overload
-    def drop_duplicates(self, *, inplace: Literal[False], **kwargs) -> "Table":
-        ...
+    def drop_duplicates(self, *, inplace: Literal[False], **kwargs) -> "Table": ...
 
     @overload
-    def drop_duplicates(self, **kwargs) -> "Table":
-        ...
+    def drop_duplicates(self, **kwargs) -> "Table": ...
 
     def drop_duplicates(self, *args, **kwargs) -> Optional["Table"]:
         return super().drop_duplicates(*args, **kwargs)
@@ -817,16 +809,13 @@ class Table(pd.DataFrame):
         return t
 
     @overload
-    def dropna(self, *, inplace: Literal[True], **kwargs) -> None:
-        ...
+    def dropna(self, *, inplace: Literal[True], **kwargs) -> None: ...
 
     @overload
-    def dropna(self, *, inplace: Literal[False], **kwargs) -> "Table":
-        ...
+    def dropna(self, *, inplace: Literal[False], **kwargs) -> "Table": ...
 
     @overload
-    def dropna(self, **kwargs) -> "Table":
-        ...
+    def dropna(self, **kwargs) -> "Table": ...
 
     def dropna(self, *args, **kwargs) -> Optional["Table"]:
         tb = super().dropna(*args, **kwargs)
@@ -1072,12 +1061,10 @@ class TableGroupBy:
         self._fields = fields
 
     @overload
-    def __getattr__(self, name: Literal["count", "size", "sum", "mean", "median"]) -> Callable[[], "Table"]:
-        ...
+    def __getattr__(self, name: Literal["count", "size", "sum", "mean", "median"]) -> Callable[[], "Table"]: ...
 
     @overload
-    def __getattr__(self, name: str) -> "VariableGroupBy":
-        ...
+    def __getattr__(self, name: str) -> "VariableGroupBy": ...
 
     def __getattr__(self, name: str) -> Union[Callable[..., "Table"], "VariableGroupBy"]:
         # Calling method on the groupby object
@@ -1108,12 +1095,10 @@ class TableGroupBy:
             return VariableGroupBy(getattr(self.groupby, name), name, self._fields[name], self.metadata)
 
     @overload
-    def __getitem__(self, key: str) -> "VariableGroupBy":
-        ...
+    def __getitem__(self, key: str) -> "VariableGroupBy": ...
 
     @overload
-    def __getitem__(self, key: list) -> "TableGroupBy":
-        ...
+    def __getitem__(self, key: list) -> "TableGroupBy": ...
 
     def __getitem__(self, key: Union[str, list]) -> Union["VariableGroupBy", "TableGroupBy"]:
         if isinstance(key, list):

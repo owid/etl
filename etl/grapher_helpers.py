@@ -214,18 +214,42 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
 
     dim_names = [k for k in long_tb.primary_key if k not in ("year", "country", "date")]
 
+    # Check for null values in dimensions
+    # for dim_name in dim_names:
+    #     if long_tb.index.get_level_values(dim_name).isnull().any():
+    #         raise ValueError(f"NaN values in dimension: {dim_name}")
+
     # Unstack dimensions to a wide format
     wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))  # type: ignore
+
+    # Drop columns with all NaNs
+    wide_tb = wide_tb.dropna(axis=1, how="all")
 
     # Get short names and metadata for all columns
     short_names = []
     metadatas = []
     for dims in wide_tb.columns:
         column = dims[0]
-        dim_dict = {k: v for k, v in zip(dim_names, dims[1:])}
+
+        # TODO: DRY this with function above
+        # Filter NaN values from dimensions and return dictionary
+        dim_dict: Dict[str, Any] = {n: v for n, v in zip(dim_names, dims[1:]) if pd.notnull(v)}
+
+        # Check for NaN values in dimensions
+        # if any(pd.isnull(v) for v in dim_dict.values()):
+        #     raise ValueError(f"NaN values in dimensions: {dim_dict}")
 
         # Create a short name from dimension values
         short_name = _underscore_column_and_dimensions(column, dim_dict)
+
+        if short_name in short_names:
+            duplicate_short_name_ix = short_names.index(short_name)
+            # raise ValueError(f"Duplicate short name: {short_name} for column: {column} and dimensions: {dim_dict}")
+            duplicate_dim_dict = dict(zip(dim_names, wide_tb.columns[duplicate_short_name_ix][1:]))
+            raise ValueError(
+                f"Duplicate short name for column '{column}' with dim values:\n{duplicate_dim_dict}\n{dim_dict}"
+            )
+
         short_names.append(short_name)
 
         # Create metadata for the column from dimensions
@@ -608,7 +632,7 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
     variable_titles_counts = variable_titles.value_counts()
     assert (
         variable_titles_counts.empty or variable_titles_counts.max() == 1
-    ), f"Variable titles are not unique ({variable_titles_counts[variable_titles_counts > 1].index})."
+    ), f"Variable titles are not unique:\n{variable_titles_counts[variable_titles_counts > 1].index}."
 
     # Remember original dimensions
     dim_names = [n for n in table.index.names if n and n not in ("year", "date", "entity_id", "country")]
