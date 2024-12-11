@@ -181,6 +181,33 @@ def get_producer_analytics_per_producer(min_date, max_date):
     return df_grouped
 
 
+def prepare_summary(df_producer_charts_filtered, producers_selected, min_date, max_date) -> str:
+    # Prepare the total number of views.
+    df_total_str = f"{df_producer_charts_filtered['renders_custom'].sum():9,}".replace(",", " ")
+    # Prepare a summary of the top 10 charts to be copy-pasted.
+    if len(producers_selected) == 0:
+        producers_selected_str = "all producers"
+    elif len(producers_selected) == 1:
+        producers_selected_str = producers_selected[0]
+    else:
+        producers_selected_str = ", ".join(producers_selected[:-1]) + " and " + producers_selected[-1]
+    # NOTE: I tried .to_string() and .to_markdown() and couldn't find a way to keep a meaningful format.
+    df_summary_str = ""
+    for i, row in df_producer_charts_filtered.head(10).iterrows():
+        df_summary_str += f"{row['renders_custom']:9,}".replace(",", " ") + " - " + row["grapher"] + "\n"
+
+    # Define the content to copy.
+    summary = f"""\
+Analytics for {producers_selected_str} between {min_date} and {max_date}:
+
+{df_summary_str}
+
+Total number of views of all charts: {df_total_str}
+
+    """
+    return summary
+
+
 ########################################################################################################################
 # RENDER
 ########################################################################################################################
@@ -303,13 +330,13 @@ Number of chart views for each chart that uses data of the selected producers.
 df_producer_charts = get_producer_analytics_per_chart(min_date=min_date, max_date=max_date)
 
 # Get the selected producers from the first table.
-if len(grid_response["selected_rows"]) == 0:
+producers_selected = [row["producer"] for row in grid_response["selected_rows"]]
+if len(producers_selected) == 0:
     # If no producers are selected, show all producer-charts.
     df_producer_charts_filtered = df_producer_charts
 else:
     # Filter producer-charts by selected producers.
-    selected_producers = [row["producer"] for row in grid_response["selected_rows"]]
-    df_producer_charts_filtered = df_producer_charts[df_producer_charts["producer"].isin(selected_producers)]
+    df_producer_charts_filtered = df_producer_charts[df_producer_charts["producer"].isin(producers_selected)]
 
 # Configure and display the second table.
 gb2 = GridOptionsBuilder.from_dataframe(df_producer_charts_filtered)
@@ -378,7 +405,28 @@ AgGrid(
     theme="streamlit",
 )
 
+# Prepare the summary to be copy-pasted.
+summary = prepare_summary(
+    df_producer_charts_filtered=df_producer_charts_filtered,
+    producers_selected=producers_selected,
+    min_date=min_date,
+    max_date=max_date,
+)
+
+# Display the content.
+st.markdown(
+    """## Summary for data producers
+
+You can copy the following summary (click on the upper right of the box) and paste it in an email.
+
+
+If they want more details, you can right-click on the table above and export as a CSV or Excel file.
+"""
+)
+st.code(summary, language="text")
+
 # TODO:
-# * Currently, one way to export analytics is by right-clicking on the table and exporting. But maybe there's a better way (e.g. with a button below, which combines different analytics in a more customized way).
 # * It would be good to have a toggle button to ignore auxiliary datasets (namely population and income groups). Currently, the analytics are heavily affected by a few producers, namely those that are involved in the population and income groups datasets. Ideally, we should be able to ignore them (as they are used mostly as auxiliary data). Note that FAOSTAT is also loaded as an auxiliary dataset (specifically faostat_rl, I think to get the surface area of each country). I was considering here to have a list of snapshot/walden/github steps that should be removed from df. But a better approach would be to let VersionTracker ingest a DAG as an argument. This way, we could load the original data, and manually remove the dependencies of the garden population and income groups steps. Then, pass this DAG to VersionTracker, and see the resulting analytics. With this approach, we would be able to properly account for any un_wpp or faostat use that are not related to population.
 # * Consider also counting how many grapher datasets come from each producer. We cannot simply count unique steps, because that would be counting several versions of the same step. We could count identifiers. We can then estimate the number of DB datasets by counting how many identifiers have the grapher channel.
+# * It would be good to have a chart showing the evolution of daily views in the custom date range.
+# * We could add the average number of daily views. But keep in mind that analytics have some delay (it seems maybe one or two days). We could fix max_date to be the last day with at last one view in any chart.
