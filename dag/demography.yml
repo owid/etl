@@ -88,13 +88,6 @@ steps:
   data://grapher/hyde/2024-01-02/all_indicators:
     - data://garden/hyde/2024-01-02/all_indicators
 
-  ## Population by education group (Wittgenstein centre)
-  data://meadow/demography/2023-04-07/population_education_wittgenstein:
-    - snapshot://demography/2023-04-07/population_education_wittgenstein.csv
-  data://garden/demography/2023-04-07/population_education_wittgenstein:
-    - data://meadow/demography/2023-04-07/population_education_wittgenstein
-  data://grapher/demography/2023-04-07/population_education_wittgenstein:
-    - data://garden/demography/2023-04-07/population_education_wittgenstein
   ## Population doubling times
   data://garden/demography/2024-07-18/population_doubling_times:
     - data://garden/demography/2024-07-15/population
