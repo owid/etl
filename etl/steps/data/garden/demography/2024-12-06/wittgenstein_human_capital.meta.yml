@@ -132,7 +132,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 730
-  title: Wittgenstein Centre, Human Capital
+  title: Wittgenstein Centre, Human Capital (Historical data + Projections)
 
 tables:
   main:
@@ -266,37 +266,6 @@ tables:
           topic_tags:
             - Age Structure
 
-      # Migration
-      emi:
-        title: |-
-          <% set title = "Emigration Flows" %>
-          {definitions.others.title}
-        unit: "people in last 5 years"
-        description_short: |-
-          The number of emigrants over a five-year period. {definitions.others.projections}.
-        description_processing: |-
-          The source provides the values in thousands. We have scaled them to have the actual number of emigrants.
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          topic_tags:
-            - Migration
-
-      imm:
-        title: |-
-          <% set title = "Immigration Flows" %>
-          {definitions.others.title}
-        unit: "people in last 5 years"
-        description_short: |-
-          The number of immigrants over a five-year period. {definitions.others.projections}.
-        description_processing: |-
-          The source provides the values in thousands. We have scaled them to have the actual number of immigrants.
-        display:
-          numDecimalPlaces: 0
-        presentation:
-          topic_tags:
-            - Migration
-
   by_age:
     variables:
       sexratio:
@@ -388,21 +357,21 @@ tables:
         presentation:
           topic_tags:
             - Global Education
-      macb:
-        title: |-
-          <% set title = "Mean age at childbearing" %>
-          {definitions.others.title_edu}
-        unit: "years"
-        short_unit: "years"
-        description_short: |-
-          <% if education == "total" %>
-          The mean age of mothers at the birth of their children observed in the last five-year period. {definitions.others.projections}.
-          <%- else %>
-          The mean age of mothers at the birth of their children observed in the last five-year period. Data for people with education level "{definitions.others.education}". {definitions.others.projections}.
-          <%- endif %>
-        presentation:
-          topic_tags:
-            - Fertility Rate
+      # macb:
+      #   title: |-
+      #     <% set title = "Mean age at childbearing" %>
+      #     {definitions.others.title_edu}
+      #   unit: "years"
+      #   short_unit: "years"
+      #   description_short: |-
+      #     <% if education == "total" %>
+      #     The mean age of mothers at the birth of their children observed in the last five-year period. {definitions.others.projections}.
+      #     <%- else %>
+      #     The mean age of mothers at the birth of their children observed in the last five-year period. Data for people with education level "{definitions.others.education}". {definitions.others.projections}.
+      #     <%- endif %>
+      #   presentation:
+      #     topic_tags:
+      #       - Fertility Rate
       tfr:
         title: |-
           <% set title = "Total Fertility Rate" %>
@@ -417,20 +386,20 @@ tables:
         presentation:
           topic_tags:
             - Fertility Rate
-      net:
-        title: |-
-          <% set title = "Net migration" %>
-          {definitions.others.title_edu}
-        unit: "people"
-        description_short: |-
-          <% if education == "total" %>
-          The number of immigrants minus the number of emigrants over the last five-year period. {definitions.others.projections}.
-          <%- else %>
-          The number of immigrants minus the number of emigrants over the last five-year period. Data for migrants with education level "{definitions.others.education}". {definitions.others.projections}.
-          <%- endif %>
-        presentation:
-          topic_tags:
-            - Migration
+      # net:
+      #   title: |-
+      #     <% set title = "Net migration" %>
+      #     {definitions.others.title_edu}
+      #   unit: "people"
+      #   description_short: |-
+      #     <% if education == "total" %>
+      #     The number of immigrants minus the number of emigrants over the last five-year period. {definitions.others.projections}.
+      #     <%- else %>
+      #     The number of immigrants minus the number of emigrants over the last five-year period. Data for migrants with education level "{definitions.others.education}". {definitions.others.projections}.
+      #     <%- endif %>
+      #   presentation:
+      #     topic_tags:
+      #       - Migration
 
   by_sex_age:
     variables:

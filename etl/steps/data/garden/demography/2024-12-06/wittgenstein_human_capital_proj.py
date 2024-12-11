@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("wittgenstein_human_capital_historical")
+    ds_meadow = paths.load_dataset("wittgenstein_human_capital_proj")
 
     # Read table from meadow dataset.
     paths.log.info("reading tables...")
@@ -36,9 +36,10 @@ def run(dest_dir: str) -> None:
     tb = make_table(
         tb,
         country_mapping_path=paths.country_mapping_path,
-        cols_single=["ggapmys25", "ggapmys15", "mage", "odr", "ydr", "tdr"],
-        cols_range=["nirate", "cbr", "cdr", "macb", "growth"],
+        cols_single=["tdr", "ggapmys25", "mage", "ydr", "ggapmys15", "odr"],
+        cols_range=["growth", "imm", "emi", "cbr", "nirate", "cdr"],
         per_100=["tdr", "odr", "ydr"],
+        per_1000=["emi", "imm"],
     )
 
     # 2.1/ MAKE BY AGE TABLE (sexratio)
@@ -64,7 +65,8 @@ def run(dest_dir: str) -> None:
         tb_edu,
         country_mapping_path=paths.country_mapping_path,
         cols_single=["ggapedu15", "ggapedu25"],
-        cols_range=["tfr"],
+        cols_range=["macb", "tfr", "net"],
+        per_1000=["net"],
     )
 
     # 3.1/ BY SEX+AGE
@@ -72,9 +74,7 @@ def run(dest_dir: str) -> None:
     tb_sex_age = make_table(
         tb_sex_age,
         country_mapping_path=paths.country_mapping_path,
-        cols_single=["mys"],
-        cols_range=["net"],
-        per_100=["net"],
+        all_single=True,
     )
 
     # 3.2/ BY AGE+EDU
@@ -104,6 +104,7 @@ def run(dest_dir: str) -> None:
 
     # Add education="some_education" (only for sex=total and age=total, and indicator 'pop')
     tb_sex_age_edu = add_dim_some_education(tb_sex_age_edu)
+
     #
     # Save outputs.
     #

@@ -1,20 +1,25 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from shared import add_dim_some_education, make_table
+import owid.catalog.processing as pr
+from shared import add_dim_some_education, get_index_columns, make_table
 
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-# Columns index
-COLUMNS_INDEX = [
-    "country",
-    "year",
-    "scenario",
-    "sex",
-    "age",
-    "education",
-]
+# Not all columns are present in historical and projections datasets. This dictionary contains the expected differences.
+TABLE_COLUMN_DIFFERENCES = {
+    "by_edu": {
+        "missing_in_hist": {"macb", "net"},
+    },
+    "by_sex_age": {
+        "missing_in_proj": {"net"},
+    },
+    "main": {
+        "missing_in_hist": {"emi", "imm"},
+        "missing_in_proj": {"macb"},
+    },
+}
 
 
 def run(dest_dir: str) -> None:
@@ -22,118 +27,88 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("wittgenstein_human_capital")
+    ds_proj = paths.load_dataset("wittgenstein_human_capital_proj")
+    ds_hist = paths.load_dataset("wittgenstein_human_capital_historical")
 
     # Read table from meadow dataset.
     paths.log.info("reading tables...")
-    tb = ds_meadow.read("main").reset_index(drop=True)
-    tb_age = ds_meadow.read("by_age").reset_index(drop=True)
-    tb_sex = ds_meadow.read("by_sex").reset_index(drop=True)
-    tb_edu = ds_meadow.read("by_edu").reset_index(
-        drop=True
-    )  # TODO: add metadata field for table explaining the different education levels
-    tb_sex_age = ds_meadow.read("by_sex_age").reset_index(drop=True)
-    tb_age_edu = ds_meadow.read("by_age_edu").reset_index(drop=True)
-    tb_sex_age_edu = ds_meadow.read("by_sex_age_edu").reset_index(drop=True)
+    tbs_proj = {t.m.short_name: t.reset_index() for t in ds_proj}
+    tbs_hist = {t.m.short_name: t.reset_index() for t in ds_hist}
 
     #
-    # Process data.
+    # Processing
     #
+    assert tbs_proj.keys() == tbs_hist.keys(), "Mismatch in tables between historical and projection datasets"
 
-    # 1/ MAKE MAIN TABLE
-    paths.log.info("baking main table...")
-    tb = make_table(
-        tb,
-        country_mapping_path=paths.country_mapping_path,
-        cols_single=["tdr", "ggapmys25", "mage", "ydr", "ggapmys15", "odr"],
-        cols_range=["growth", "imm", "emi", "cbr", "nirate", "cdr"],
-        per_100=["tdr", "odr", "ydr"],
-        per_1000=["emi", "imm"],
-    )
+    tables = []
+    for key in tbs_proj.keys():
+        paths.log.info(f"Building {key}")
 
-    # 2.1/ MAKE BY AGE TABLE (sexratio)
-    paths.log.info("baking tables by age...")
-    tb_age = make_table(
-        tb_age,
-        country_mapping_path=paths.country_mapping_path,
-        all_single=True,
-        per_100=["sexratio"],
-    )
+        # Get tables
+        tb_proj = tbs_proj[key]
+        tb_hist = tbs_hist[key]
 
-    # 2.2/ BY SEX
-    paths.log.info("baking tables by sex...")
-    tb_sex = make_table(
-        tb_sex,
-        country_mapping_path=paths.country_mapping_path,
-        all_range=True,
-    )
+        # Check
+        sanity_checks(tb_proj, tb_hist)
 
-    # 2.3/ BY EDU
-    paths.log.info("baking tables by education...")
-    tb_edu = make_table(
-        tb_edu,
-        country_mapping_path=paths.country_mapping_path,
-        cols_single=["ggapedu15", "ggapedu25"],
-        cols_range=["macb", "tfr", "net"],
-        per_1000=["net"],
-    )
+        # Keep only the columns that are present in both datasets
+        columns_common = tb_proj.columns.intersection(tb_hist.columns)
 
-    # 3.1/ BY SEX+AGE
-    paths.log.info("baking tables by sex+age...")
-    tb_sex_age = make_table(
-        tb_sex_age,
-        country_mapping_path=paths.country_mapping_path,
-        all_single=True,
-    )
+        # Concatenate
+        tb = pr.concat([tb_proj[columns_common], tb_hist[columns_common]], ignore_index=True)
 
-    # 3.2/ BY AGE+EDU
-    paths.log.info("baking tables by age+education...")
-    assert "total" not in set(tb_age_edu["age"].unique()), "Unexpected age category: 'total'"
-    tb_age_edu = make_table(
-        tb_age_edu,
-        country_mapping_path=paths.country_mapping_path,
-        all_range=True,
-    )
+        # Remove duplicates
+        index = get_index_columns(tb)
+        tb = tb.drop_duplicates(subset=index, keep="first")
 
-    # 4.1/ BY SEX+AGE+EDU
-    paths.log.info("baking tables by sex+age+education...")
-    tb_sex_age_edu = make_table(
-        tb_sex_age_edu,
-        country_mapping_path=paths.country_mapping_path,
-        dtypes={
-            "sex": "category",
-            "age": "category",
-            "education": "category",
-        },
-        cols_single=["pop", "prop"],
-        cols_range=["assr"],
-        per_1000=["pop"],
-        per_100=["assr"],
-    )
+        # Format
+        tb = tb.format(index, short_name=key)
 
-    # Add education="some_education" (only for sex=total and age=total, and indicator 'pop')
-    tb_sex_age_edu = add_dim_some_education(tb_sex_age_edu)
+        # Reduce origins
+        for col in tb.columns:
+            tb[col].metadata.origins = tb[col].metadata.origins[0]
 
+        # Add to list
+        tables.append(tb)
     #
     # Save outputs.
     #
-    # Format
-    tables = [
-        tb.format(["country", "year", "scenario"], short_name="main"),
-        tb_age.format(["country", "scenario", "age", "year"], short_name="by_age"),
-        tb_sex.format(["country", "scenario", "sex", "year"], short_name="by_sex"),
-        tb_edu.format(["country", "scenario", "education", "year"], short_name="by_edu"),
-        tb_sex_age.format(["country", "scenario", "sex", "age", "year"], short_name="by_sex_age"),
-        tb_age_edu.format(["country", "scenario", "age", "education", "year"], short_name="by_age_edu"),
-        tb_sex_age_edu.format(["country", "scenario", "sex", "age", "education", "year"], short_name="by_sex_age_edu"),
-    ]
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
         tables=tables,
         check_variables_metadata=True,
-        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def sanity_checks(tb_proj, tb_hist):
+    # Short name sanity check
+    assert (
+        tb_proj.m.short_name == tb_hist.m.short_name
+    ), f"Mismatch in short_name of historical ({tb_hist.m.short_name}) and projection ({tb_proj.m.short_name})"
+    key = tb_proj.m.short_name
+
+    # Look for differences
+    missing_in_hist = set(tb_proj.columns) - set(tb_hist.columns)
+    missing_in_proj = set(tb_hist.columns) - set(tb_proj.columns)
+
+    # Check with expected differences
+    if key in TABLE_COLUMN_DIFFERENCES:
+        missing_in_hist_expected = TABLE_COLUMN_DIFFERENCES[key].get("missing_in_hist", set())
+        missing_in_proj_expected = TABLE_COLUMN_DIFFERENCES[key].get("missing_in_proj", set())
+        assert missing_in_hist == missing_in_hist_expected, (
+            f"Table {key}: Missing columns in historical dataset. "
+            f"Expected: {missing_in_hist_expected}, Found: {missing_in_hist}"
+        )
+        assert missing_in_proj == missing_in_proj_expected, (
+            f"Table {key}: Missing columns in projection dataset. "
+            f"Expected: {missing_in_proj_expected}, Found: {missing_in_proj}"
+        )
+    else:
+        assert set(tb_proj.columns) == set(tb_hist.columns), (
+            f"Table {key}: Mismatch in columns between historical and projection. "
+            f"Projection columns: {tb_proj.columns.tolist()}, Historical columns: {tb_hist.columns.tolist()}"
+        )
