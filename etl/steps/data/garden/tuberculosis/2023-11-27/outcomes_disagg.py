@@ -45,9 +45,6 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = combining_sexes_for_all_age_groups(tb)
     tb = add_region_sum_aggregates(tb, ds_regions, ds_income_groups)
-    tb["tsr"] = tb["tsr"].astype(
-        "float16"
-    )  # Ensure the column is of type float16 - was getting an error when it was float64
     tb = tb.set_index(["country", "year", "age_group", "sex", "cohort_type"], verify_integrity=True)
 
     #
