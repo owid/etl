@@ -3,6 +3,7 @@ from typing import Optional, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 from pandas_gbq import read_gbq
 from st_aggrid import AgGrid, GridUpdateMode, JsCode
@@ -224,8 +225,12 @@ def get_producer_analytics_per_producer(min_date, max_date):
 
 
 def prepare_summary(df_producer_charts_filtered, producers_selected, min_date, max_date) -> str:
+    # Get dataframe of chart views (regardless of the producer).
+    df_summary = df_producer_charts_filtered.sort_values("renders_custom", ascending=False).drop_duplicates(
+        subset=["grapher"]
+    )
     # Prepare the total number of views.
-    df_total_str = f"{df_producer_charts_filtered['renders_custom'].sum():9,}".replace(",", " ")
+    df_total_str = f"{df_summary['renders_custom'].sum():9,}".replace(",", " ")
     # Prepare a summary of the top 10 charts to be copy-pasted.
     if len(producers_selected) == 0:
         producers_selected_str = "all producers"
@@ -235,7 +240,7 @@ def prepare_summary(df_producer_charts_filtered, producers_selected, min_date, m
         producers_selected_str = ", ".join(producers_selected[:-1]) + " and " + producers_selected[-1]
     # NOTE: I tried .to_string() and .to_markdown() and couldn't find a way to keep a meaningful format.
     df_summary_str = ""
-    for i, row in df_producer_charts_filtered.head(10).iterrows():
+    for i, row in df_summary.head(10).iterrows():
         df_summary_str += f"{row['renders_custom']:9,}".replace(",", " ") + " - " + row["grapher"] + "\n"
 
     # Define the content to copy.
@@ -281,9 +286,9 @@ Total number of charts and chart views for each producer. Producers selected in 
 """
 )
 
-########################################
+########################################################################################################################
 # Display main table with producer analytics.
-########################################
+########################################################################################################################
 
 # Load table content and select only columns to be shown.
 df_producers = get_producer_analytics_per_producer(min_date=min_date, max_date=max_date)
@@ -357,9 +362,9 @@ grid_response = AgGrid(
     custom_css=custom_css,
 )
 
-########################################
-# Display main table with producer analytics.
-########################################
+########################################################################################################################
+# Display table with producer-chart analytics.
+########################################################################################################################
 
 st.markdown(
     """## Producer-charts table
@@ -447,6 +452,38 @@ AgGrid(
     theme="streamlit",
 )
 
+########################################################################################################################
+# Display a chart with the total number of daily views, and the daily views of the top performing charts.
+########################################################################################################################
+
+# Get total daily views of selected producers.
+grapher_urls_selected = df_producer_charts_filtered["grapher"].unique().tolist()  # type: ignore
+df_total_daily_views = get_grapher_views(
+    date_start=min_date, date_end=max_date, groupby=["day"], grapher_urls=grapher_urls_selected
+)
+
+st.toast(f"Total views: {df_total_daily_views['renders'].sum():,}")
+st.toast(f"Average daily views: {df_total_daily_views['renders'].mean():,.0f}")
+# Get daily views of the top 10 charts.
+grapher_urls_top_10 = (
+    df_producer_charts_filtered.sort_values("renders_custom", ascending=False)["grapher"].unique().tolist()[0:10]  # type: ignore
+)
+df_top_10_daily_views = get_grapher_views(
+    date_start=min_date, date_end=max_date, groupby=["day", "grapher"], grapher_urls=grapher_urls_top_10
+)
+df_top_10_daily_views["grapher"] = df_top_10_daily_views["grapher"].apply(lambda x: x.split("/")[-1])
+
+# Create a line chart.
+df_plot = pd.concat([df_total_daily_views.assign(**{"grapher": "total"}), df_top_10_daily_views])
+fig = px.line(df_plot, x="day", y="renders", color="grapher", title="Total daily views and views of top 10 charts")
+
+# Display the chart.
+st.plotly_chart(fig, use_container_width=True)
+
+########################################################################################################################
+# Display a summary to be shared with the data producer.
+########################################################################################################################
+
 # Prepare the summary to be copy-pasted.
 summary = prepare_summary(
     df_producer_charts_filtered=df_producer_charts_filtered,
@@ -459,16 +496,15 @@ summary = prepare_summary(
 st.markdown(
     """## Summary for data producers
 
-You can copy the following summary (click on the upper right of the box) and paste it in an email.
-
-
-If they want more details, you can right-click on the table above and export as a CSV or Excel file.
+For now, to share analytics with a data provider you can so any of the following:
+- Right-click on the table above and export as a CSV or Excel file.
+- Click on the upper right corner of the box below to copy the summary to the clipboard.
+- Click on the camera icon on the top right of the chart below to download the chart as a PNG.
 """
 )
 st.code(summary, language="text")
 
 # TODO:
 # * It would be good to have a toggle button to ignore auxiliary datasets (namely population and income groups). Currently, the analytics are heavily affected by a few producers, namely those that are involved in the population and income groups datasets. Ideally, we should be able to ignore them (as they are used mostly as auxiliary data). Note that FAOSTAT is also loaded as an auxiliary dataset (specifically faostat_rl, I think to get the surface area of each country). I was considering here to have a list of snapshot/walden/github steps that should be removed from df. But a better approach would be to let VersionTracker ingest a DAG as an argument. This way, we could load the original data, and manually remove the dependencies of the garden population and income groups steps. Then, pass this DAG to VersionTracker, and see the resulting analytics. With this approach, we would be able to properly account for any un_wpp or faostat use that are not related to population.
-# * Consider also counting how many grapher datasets come from each producer. We cannot simply count unique steps, because that would be counting several versions of the same step. We could count identifiers. We can then estimate the number of DB datasets by counting how many identifiers have the grapher channel.
-# * It would be good to have a chart showing the evolution of daily views in the custom date range.
 # * We could add the average number of daily views. But keep in mind that analytics have some delay (it seems maybe one or two days). We could fix max_date to be the last day with at last one view in any chart.
+# * Currently, any changes in the second table trigger a query to re-calculate the chart. This can be avoided. We only need to recalculate the chart if the selected producers in the first table change. We could add selected producers to session_state to avoid this.
