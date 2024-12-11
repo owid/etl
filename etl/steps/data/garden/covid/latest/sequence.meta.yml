@@ -21,13 +21,13 @@ tables:
       num_sequences:
         title: "Number of sequenced COVID-19 genomes - Variant: << variant >>"
         description_short: |-
-          <% set mapping = dict(
-            non_who="The number of analyzed sequences in the preceding two weeks that correspond to non-relevant variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.",
-            other="The number of analyzed sequences in the preceding two weeks that correspond to non-categorised variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.",
-            else="The number of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced."
-          ) %>
-
-          << mapping.get(variant, mapping['else']) >>
+          <% if variant == 'non_who' %>
+          The number of analyzed sequences in the preceding two weeks that correspond to non-relevant variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          <% elif variant == 'other' %>
+          The number of analyzed sequences in the preceding two weeks that correspond to non-categorised variant groups. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          <% else %>
+          The number of analyzed sequences in the preceding two weeks that correspond to variant group '<< variant >>'. This number may not reflect the complete breakdown of cases since only a fraction of all cases are sequenced.
+          <%- endif -%>
         unit: "sequenced genomes"
         display:
           tolerance: 28
