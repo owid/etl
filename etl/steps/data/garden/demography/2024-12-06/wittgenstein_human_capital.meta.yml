@@ -531,7 +531,7 @@ tables:
            aged <<age>>
           <%- endif %>
           <%- if (education != "total") %>
-           with <%- if (education == "no_education") %>no education<%- if (education == "some_education") %>some formal education<%- else %><<education>> education<%- endif %>
+           with <%- if (education == "no_education") %>no education<%- elif (education == "some_education") %>some formal education<%- else %><<education>> education<%- endif %>
           <%- endif %>
            in a country or region.
         presentation:
