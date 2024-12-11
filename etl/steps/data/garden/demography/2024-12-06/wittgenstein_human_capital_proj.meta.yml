@@ -558,6 +558,8 @@ tables:
            with <%- if (education == "no_education") %>no education<%- elif (education == "some_education") %>some formal education<%- else %><<education>> education<%- endif %>
           <%- endif %>
            in a country or region.
+        description_processing: |-
+          We have estimated this indicator with the population values from this source.
         presentation:
           topic_tags:
             - Global Education

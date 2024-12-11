@@ -52,7 +52,7 @@ TABLES_COMBINE_EDUCATION = [
 ]
 
 TABLES_CONCAT = [
-    ("prop", "bprop"),
+    # ("prop", "bprop"),
     ("mys", "bmys"),
 ]
 TABLES_DROP = [
@@ -81,7 +81,7 @@ TABLES_COMPOSITION = {
     # 2/ Age+Education dimensions. NOTE: no age=total, that's fine. We have tfr for all ages actually.
     "by_age_edu": {"asfr"},
     # 3/ Sex+Age+Education dimensions
-    "by_sex_age_edu": {"assr", "pop", "prop"},
+    "by_sex_age_edu": {"assr", "pop"},
 }
 
 

@@ -136,3 +136,12 @@ def add_dim_some_education(tb):
 def get_index_columns(tb):
     cols_index = list(tb.columns.intersection(COLUMNS_INDEX))
     return cols_index
+
+
+def add_prop(tb):
+    # Add
+    tbx = tb[tb["education"] == "total"].drop(columns=["education", "assr"])
+    tb_sex_age_edu = tb.merge(tbx, on=["country", "year", "age", "sex", "scenario"], suffixes=["", "_total"])
+    tb_sex_age_edu["prop"] = 100 * tb_sex_age_edu["pop"] / tb_sex_age_edu["pop_total"]
+
+    return tb
