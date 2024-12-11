@@ -27,9 +27,9 @@ def run(dest_dir: str) -> None:
     )
     tb = use_only_wuenic_data(tb)
 
-    antigen_dict = (
-        tb[["antigen", "antigen_description"]].drop_duplicates().set_index("antigen")["antigen_description"].to_dict()
-    )
+    # antigen_dict = (
+    #    tb[["antigen", "antigen_description"]].drop_duplicates().set_index("antigen")["antigen_description"].to_dict()
+    # )
 
     tb = clean_data(tb)
 
