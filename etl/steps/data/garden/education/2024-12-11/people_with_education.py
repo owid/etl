@@ -21,69 +21,66 @@ def run(dest_dir: str) -> None:
     ds_oecd = paths.load_dataset("oecd_education")
     tb_oecd = ds_oecd.read("oecd_education")
 
-    # Filter the for years above 2020 (New Wittgenstein Center data starts at 2020)
-    tb_oecd = tb_oecd.loc[
-        tb_oecd["year"] < 2020, ["country", "year", "no_formal_education", "population_with_basic_education"]
-    ].reset_index(drop=True)
-
     #
     # Process data.
     #
-    # tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb_wc[
-        (tb_wc.scenario == 2)
-        & (tb_wc.country == "World")
-        & (tb_wc.sex == "total")
-        & (tb_wc.age == "total")
-        & (tb_wc.education == "no_education")
-    ]
-    # Filter the dataset for individuals aged 15 and older and with 'No Education'
-    age_15_and_above = tb_wc["age_group"].apply(lambda x: x not in ["0-4", "5-9", "10-14"])
-    no_education = tb_wc["educational_attainment"] == "No Education"
-    filtered_df = tb_wc[age_15_and_above & no_education]
+    # Prepare OECD
+    tb_oecd = make_oecd(tb_oecd)
+    countries_oecd = set(tb_oecd["country"].unique())
 
-    # Calculate the share of people 15+ with no formal education for each country and year
-    # First, calculate the total population aged 15+ for each country and year
-    total_population_15_plus = tb_wc[age_15_and_above].groupby(["country", "year"])["population"].sum()
+    # Prepare Wittgenstein Center
+    tb_wc = make_wc(tb_wc)
+    countries_wc = set(tb_wc["country"].unique())
 
-    # Then, calculate the population with no formal education for each country and year
-    no_education_population = filtered_df.groupby(["country", "year"])["population"].sum()
-
-    # Calculate the share
-    share_no_education = (no_education_population / total_population_15_plus) * 100
-
-    # Create a yearly global estimate
-    # Sum up the total population aged 15+ and no education population for each year
-    global_total_population_15_plus = total_population_15_plus.groupby("year").sum()
-    global_no_education_population = no_education_population.groupby("year").sum()
-
-    # Calculate the global share for each year
-    global_share_no_education = (global_no_education_population / global_total_population_15_plus) * 100
-    # Renaming the columns for clarity
-    share_no_education = share_no_education.rename("no_formal_education")
-    global_share_no_education = global_share_no_education.rename("no_formal_education")
-
-    # Resetting the index to prepare for concatenation
-    share_no_education = share_no_education.reset_index()
-    global_share_no_education = global_share_no_education.reset_index()
-    global_share_no_education["country"] = "World"
-
-    tb_combined = pr.concat([global_share_no_education, share_no_education])
-    tb_combined["population_with_basic_education"] = 100 - tb_combined["no_formal_education"]
-    tb_combined_with_oecd = pr.merge(
-        tb_combined,
-        tb_below_2020,
-        on=["country", "year", "no_formal_education", "population_with_basic_education"],
-        how="outer",
-    )
-    tb_combined_with_oecd = tb_combined_with_oecd.set_index(["country", "year"], verify_integrity=True)
-    tb_combined_with_oecd.metadata = tb.metadata
+    # Combine tables
+    tb = pr.concat([tb_oecd, tb_wc], short_name="education")
+    # Keep only relevant countries
+    countries = countries_oecd.intersection(countries_wc)
+    tb = tb.loc[tb["country"].isin(countries)]
+    # Format
+    tb = tb.format(["country", "year"], short_name="people_with_education")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined_with_oecd], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def make_oecd(tb):
+    # Filter the for years above 2020 (New Wittgenstein Center data starts at 2020)
+    tb = tb.loc[
+        tb["year"] < 1950, ["country", "year", "no_formal_education", "population_with_basic_education"]
+    ].reset_index(drop=True)
+
+    # Rename columns
+    tb = tb.rename(
+        columns={
+            "no_formal_education": "no_basic_education",
+            "population_with_basic_education": "basic_education",
+        }
+    )
+    return tb
+
+
+def make_wc(tb):
+    tb = tb.loc[
+        (tb["scenario"] == 2)
+        # & (tb_wc["country"] == "World")
+        & (tb["sex"] == "total")
+        & (tb["age"] == "15+")
+        & (tb["education"].isin(["no_education"])),
+        ["country", "year", "prop"],
+    ]
+    assert tb.groupby(["country", "year"]).size().max() == 1, "Only 1 rows per country-year accepted"
+
+    # Estimate "no formal education"
+    tb = tb.rename(columns={"prop": "no_basic_education"})
+
+    # Estimate "with basic education"
+    tb["basic_education"] = 100 - tb["no_basic_education"]
+
+    return tb
