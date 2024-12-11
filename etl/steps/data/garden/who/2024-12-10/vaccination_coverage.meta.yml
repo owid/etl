@@ -49,8 +49,8 @@ tables:
   vaccination_coverage:
     variables:
       coverage:
-        title: Share of target population who have received {antigen_description}
-        description_short: The percentage in the target population who have received {antigen_description} in a given year.
+        title: Share of target population who have received {definitions.antigen_description}
+        description_short: The percentage in the target population who have received {definitions.antigen_description} in a given year.
         description_key:
           - "The current release of the WUENIC with data up to 2023 (released in 2024) includes estimates for WHO Member States, including those that did not report 2023 data. For these non-reporting countries, estimates were extrapolated from the last point informed by empirical data."
           - "Global and regional coverages, values were extrapolated from 2022 for non-reporting countries."
