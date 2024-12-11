@@ -114,16 +114,21 @@ def add_dim_some_education(tb):
 
     It only adds it for sex=total and age=total.
     """
+    SOME_EDUCATION = "some_education"
     # Add education="some_education" (only for sex=total and age=total, and indicator 'pop')
     cols_index = ["country", "year", "age", "sex", "scenario"]
     tb_tmp = tb.loc[tb["education"].isin(["total", "no_education"]), cols_index + ["education", "pop"]]
     tb_tmp = tb_tmp.pivot(index=cols_index, columns="education", values="pop").reset_index().dropna()
     tb_tmp["some_education"] = tb_tmp["total"] - tb_tmp["no_education"]
     assert (tb_tmp["some_education"] >= 0).all()
-    tb_tmp = tb_tmp.melt(id_vars=cols_index, value_vars="some_education", var_name="education", value_name="pop")
+    tb_tmp = tb_tmp.melt(id_vars=cols_index, value_vars=SOME_EDUCATION, var_name="education", value_name="pop")
+
+    # Add new education
+    tb["education"] = tb["education"].cat.add_categories([SOME_EDUCATION])
 
     dtypes = tb.dtypes
-    tb = pr.concat([tb, tb_tmp], ignore_index=True).astype(dtypes)
+    tb = pr.concat([tb, tb_tmp], ignore_index=True)
+    tb = tb.astype(dtypes)
 
     return tb
 

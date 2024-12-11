@@ -78,7 +78,7 @@ def run(dest_dir: str) -> None:
 
         # Reduce origins
         for col in tb.columns:
-            tb[col].metadata.origins = tb[col].metadata.origins[0]
+            tb[col].metadata.origins = [tb[col].metadata.origins[0]]
 
         # Add to list
         tables.append(tb)
