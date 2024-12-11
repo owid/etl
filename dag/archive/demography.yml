@@ -118,3 +118,11 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/demography/2023-10-10/life_expectancy:
     - data://garden/demography/2023-10-09/life_expectancy
+
+  ## Population by education group (Wittgenstein centre)
+  data://meadow/demography/2023-04-07/population_education_wittgenstein:
+    - snapshot://demography/2023-04-07/population_education_wittgenstein.csv
+  data://garden/demography/2023-04-07/population_education_wittgenstein:
+    - data://meadow/demography/2023-04-07/population_education_wittgenstein
+  data://grapher/demography/2023-04-07/population_education_wittgenstein:
+    - data://garden/demography/2023-04-07/population_education_wittgenstein
