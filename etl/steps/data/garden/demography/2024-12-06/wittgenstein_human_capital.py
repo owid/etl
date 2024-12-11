@@ -1,9 +1,10 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from shared import add_dim_some_education, get_index_columns, make_table
 
 from etl.helpers import PathFinder, create_dataset
+
+from .shared import get_index_columns
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

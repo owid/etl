@@ -1,8 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from shared import add_dim_some_education, make_table
-
 from etl.helpers import PathFinder, create_dataset
+
+from .shared import add_dim_some_education, make_table
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
