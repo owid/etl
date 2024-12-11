@@ -38,20 +38,27 @@ install-uv-default:
 	@echo '==> Installing packages'
 	@if [ -n "$(PYTHON_VERSION)" ]; then \
 		echo '==> Using Python version $(PYTHON_VERSION)'; \
-		export UV_PYTHON=$(PYTHON_VERSION); \
+		[ -f $$HOME/.cargo/env ] && . $$HOME/.cargo/env || true && UV_PYTHON=$(PYTHON_VERSION) uv sync --all-extras; \
+	else \
+		[ -f $$HOME/.cargo/env ] && . $$HOME/.cargo/env || true && uv sync --all-extras; \
 	fi
-	[ -f $$HOME/.cargo/env ] && . $$HOME/.cargo/env || true && uv sync --all-extras
 
 check-default:
 	@echo '==> Lint & Format & Typecheck changed files'
 	@git fetch -q origin master
 	@RELATIVE_PATH=$$(pwd | sed "s|^$$(git rev-parse --show-toplevel)/||"); \
 	CHANGED_PY_FILES=$$(git diff --name-only origin/master HEAD -- . && git diff --name-only && git ls-files --others --exclude-standard | grep '\.py'); \
-	CHANGED_PY_FILES=$$(echo "$$CHANGED_PY_FILES" | sed "s|^$$RELATIVE_PATH/||" | grep '\.py' | xargs -I {} sh -c 'test -f {} && echo {}'); \
-	if [ -n "$$CHANGED_PY_FILES" ]; then \
+	CHANGED_PY_FILES=$$(echo "$$CHANGED_PY_FILES" | sed "s|^$$RELATIVE_PATH/||" | grep '\.py' | xargs -I {} sh -c 'test -f {} && echo {}' | grep -v '{}'); \
+	FILE_COUNT=$$(echo "$$CHANGED_PY_FILES" | wc -l); \
+	if [ "$$FILE_COUNT" -le 1 ] && [ "$$FILE_COUNT" -gt 0 ]; then \
 		echo "$$CHANGED_PY_FILES" | xargs ruff check --fix; \
 		echo "$$CHANGED_PY_FILES" | xargs ruff format; \
 		echo "$$CHANGED_PY_FILES" | xargs pyright; \
+	else \
+		echo "Too many files, checking all files instead."; \
+		make lint; \
+		make format; \
+		make check-typing; \
 	fi
 
 lint-default: .venv

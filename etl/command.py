@@ -38,6 +38,12 @@ from etl.steps import (
 
 config.enable_bugsnag()
 
+# NOTE: I tried enabling this, but ran into weird errors with unit tests and inconsistencies
+#   with owid libraries. It's better to wait for an official pandas 3.0 release and update
+#   it all at once.
+# Use string[pyarrow] by default, this will become True in pandas 3.0
+# pd.options.future.infer_string = True
+
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
 
@@ -394,7 +400,13 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
 
         with strictness_level(strict):
             # Execute the step and measure the time taken
-            time_taken = timed_run(lambda: step.run())
+            try:
+                time_taken = timed_run(lambda: step.run())
+            except Exception:
+                # log which step failed and re-raise the exception, otherwise it gets lost
+                # in logs and we don't know which step failed
+                log.error("step_failed", step=str(step))
+                raise
             execution_times[str(step)] = time_taken
 
             click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
@@ -524,7 +536,11 @@ def _exec_step_job(
     step = parse_step(step_name, dag)
     strict = _detect_strictness_level(step, strict)
     with strictness_level(strict):
-        execution_times[step_name] = timed_run(lambda: step.run())
+        try:
+            execution_times[step_name] = timed_run(lambda: step.run())
+        except Exception:
+            log.error("step_failed", step=step_name)
+            raise
     print(f"--- Finished {step_name} ({execution_times[step_name]:.1f}s)")
 
 

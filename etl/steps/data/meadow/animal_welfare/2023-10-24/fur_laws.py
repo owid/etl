@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot and read data.
     snap = paths.load_snapshot("fur_laws.xlsx")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

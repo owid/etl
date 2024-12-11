@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     snap = paths.load_snapshot("renewable_energy_patents.xlsx")
-    tb = snap.read(sheet_name="INSPIRE_data")
+    tb = snap.read(safe_types=False, sheet_name="INSPIRE_data")
 
     #
     # Process data.

@@ -1,0 +1,231 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    short_unit: MW
+    unit: megawatts
+
+dataset:
+  update_period_days: 365
+
+tables:
+  renewable_capacity_statistics:
+    title: Renewable electricity capacity
+    variables:
+      bioenergy__total:
+        title: Bioenergy capacity (total)
+        description_short: |-
+          Total bioenergy (on- and off-grid) electricity installed capacity, measured in megawatts. This includes biogas, liquid biofuels, solid biofuels, and renewable municipal waste.
+        display:
+          name: Bioenergy
+        presentation:
+          title_public: Total bioenergy capacity
+      biogas:
+        title: Biogas capacity (on-grid)
+        description_short: |-
+          Biogas (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Biogas
+        presentation:
+          title_public: Biogas capacity
+      biogas__off_grid:
+        title: Biogas capacity (off-grid)
+        description_short: |-
+          Biogas (off-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Biogas (off-grid)
+        presentation:
+          title_public: Biogas capacity (off-grid)
+      geothermal:
+        title: Geothermal capacity (on-grid)
+        description_short: |-
+          Geothermal (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Geothermal
+        presentation:
+          title_public: Geothermal capacity
+      geothermal__off_grid:
+        title: Geothermal capacity (off-grid)
+        description_short: |-
+          Geothermal (off-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Geothermal (off-grid)
+        presentation:
+          title_public: Geothermal capacity (off-grid)
+      geothermal__total:
+        title: Geothermal capacity (total)
+        description_short: |-
+          Total geothermal (on- and off-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Geothermal (total)
+        presentation:
+          title_public: Total geothermal capacity
+      hydropower:
+        title: Hydropower capacity (on-grid)
+        description_short: |-
+          Hydropower (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Hydropower
+        presentation:
+          title_public: Hydropower capacity
+      hydropower__off_grid:
+        title: Hydropower capacity (off-grid)
+        description_short: |-
+          Hydropower (off-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Hydropower (off-grid)
+        presentation:
+          title_public: Hydropower capacity (off-grid)
+      hydropower__total:
+        title: Hydropower capacity (total)
+        description_short: |-
+          Total hydropower (on- and off-grid) electricity installed capacity, including pumped storage, measured in megawatts. This includes mixed hydro plans.
+        display:
+          name: Hydropower (incl. pumped storage)
+        presentation:
+          title_public: Total hydropower capacity
+      hydropower__total__excl__pumped_storage:
+        title: Hydropower capacity (total, excluding pumped storage)
+        description_short: |-
+          Total hydropower (on- and off-grid) electricity installed capacity, measured in megawatts. This includes mixed hydro plans, but excludes pumped storage.
+        display:
+          name: Hydropower (excl. pumped storage)
+        presentation:
+          title_public: Total hydropower capacity (excluding pumped storage)
+      liquid_biofuels:
+        title: Liquid biofuels capacity (on-grid)
+        description_short: |-
+          Liquid biofuels (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Liquid biofuels
+        presentation:
+          title_public: Liquid biofuels capacity
+      liquid_biofuels__off_grid:
+        title: Liquid biofuels capacity (off-grid)
+        description_short: |-
+          Liquid biofuels (off-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Liquid biofuels (off-grid)
+        presentation:
+          title_public: Liquid biofuels capacity (off-grid)
+      marine:
+        title: Marine capacity (on-grid)
+        description_short: |-
+          Marine (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Marine
+        presentation:
+          title_public: Marine capacity
+      mixed_hydro_plants:
+        title: Mixed hydro plants capacity (on-grid)
+        description_short: |-
+          Mixed hydro plants (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Mixed hydro plants
+        presentation:
+          title_public: Mixed hydro plants capacity
+      offshore_wind:
+        title: Offshore wind capacity (on-grid)
+        description_short: |-
+          Offshore wind (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Offshore wind
+        presentation:
+          title_public: Offshore wind capacity
+      onshore_wind:
+        title: Onshore wind capacity (on-grid)
+        description_short: |-
+          Onshore wind (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Onshore wind
+        presentation:
+          title_public: Onshore wind capacity
+      onshore_wind__off_grid:
+        title: Onshore wind capacity (off-grid)
+        description_short: |-
+          Onshore wind (off-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Onshore wind (off-grid)
+        presentation:
+          title_public: Onshore wind capacity (off-grid)
+      pumped_storage:
+        title: Pumped storage capacity (on-grid)
+        description_short: |-
+          Pumped storage (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Pumped storage
+        presentation:
+          title_public: Pumped storage capacity
+      renewable_municipal_waste:
+        title: Renewable municipal waste capacity (on-grid)
+        description_short: |-
+          Renewable municipal waste (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Renewable municipal waste
+        presentation:
+          title_public: Renewable municipal waste capacity
+      renewables__total:
+        title: Renewable electricity capacity (total)
+        description_short: |-
+          Total renewable (on- and off-grid) electricity installed capacity, measured in megawatts. This includes bioenergy, geothermal,hydropower (excluding pumped storage), solar, wind, and marine energy.
+        display:
+          name: Renewable electricity
+        presentation:
+          title_public: Total renewable capacity
+      solar__total:
+        title: Solar capacity (total)
+        description_short: |-
+          Total solar (on- and off-grid) electricity installed capacity, measured in megawatts. This includes solar photovoltaic and concentrated solar power.
+        display:
+          name: Solar
+        presentation:
+          title_public: Total solar capacity
+      solar_photovoltaic:
+        title: Solar photovoltaic capacity (on-grid)
+        description_short: |-
+          Solar photovoltaic (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Solar photovoltaic
+        presentation:
+          title_public: Solar photovoltaic capacity
+      solar_photovoltaic__off_grid:
+        title: Solar photovoltaic capacity (off-grid)
+        description_short: |-
+          Solar photovoltaic (off-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Solar photovoltaic (off-grid)
+        presentation:
+          title_public: Solar photovoltaic capacity (off-grid)
+      concentrated_solar_power:
+        title: Concentrated solar power capacity (on-grid)
+        description_short: |-
+          Concentrated solar power (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Concentrated solar power
+        presentation:
+          title_public: Concentrated solar power capacity
+      solid_biofuels:
+        title: Solid biofuels capacity (on-grid)
+        description_short: |-
+          Solid biofuels (on-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Solid biofuels
+        presentation:
+          title_public: Solid biofuels capacity
+      solid_biofuels__off_grid:
+        title: Solid biofuels capacity (off-grid)
+        description_short: |-
+          Solid biofuels (off-grid) electricity installed capacity, measured in megawatts.
+        display:
+          name: Solid biofuels (off-grid)
+        presentation:
+          title_public: Solid biofuels capacity (off-grid)
+      wind__total:
+        title: Wind capacity (total)
+        description_short: |-
+          Total wind (on- and off-grid) electricity installed capacity, measured in megawatts. This includes onshore and offshore wind.
+        display:
+          name: Wind
+        presentation:
+          title_public: Total wind capacity

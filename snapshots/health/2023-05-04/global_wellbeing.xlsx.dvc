@@ -3,7 +3,7 @@ meta:
   short_name: global_wellbeing
   name: Global Wellbeing Initiative (Gallup, 2020)
   version: '2023-05-04'
-  publication_year: 2020"
+  publication_year: 2020
   source_name: Global Wellbeing Initiative (2020)
   source_published_by: Gallup World Poll, Global Wellbeing Initiative dataset, 2020
   url: https://www.gallup.com/analytics/468179/global-wellbeing-initiative-dataset.aspx

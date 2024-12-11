@@ -115,9 +115,7 @@ function findFiles(dir: string, ig: any): { path: string, date: Date | 'latest',
         const excludeFolders = [
             path.join('etl', 'data'),
             path.join('etl', 'export'),
-            path.join('snapshots', 'backport'),
-            'snapshots_archive',
-            path.join('etl', 'steps', 'archive')
+            path.join('snapshots', 'backport')
         ];
 
         if (excludeFolders.some(excludeFolder => filePath.includes(excludeFolder)) || filePath.includes('__pycache__')) {

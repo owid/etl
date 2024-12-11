@@ -1,0 +1,38 @@
+dataset:
+  title: Useful energy costs (Way et al. 2022)
+  description: ''
+  licenses:
+    - {}
+tables:
+  useful_energy_cost_way:
+    variables:
+      oil_useful_cost:
+        title: Oil
+        unit: $ per MWh
+        short_unit: $
+        description: Useful cost of energy, per megawatt-hour.
+      coal_useful_cost:
+        title: Coal
+        unit: $ per MWh
+        short_unit: $
+        description: Useful cost of energy, per megawatt-hour.
+      gas_useful_cost:
+        title: Gas
+        unit: $ per MWh
+        short_unit: $
+        description: Useful cost of energy, per megawatt-hour.
+      wind_useful_cost:
+        title: Wind
+        unit: $ per MWh
+        short_unit: $
+        description: Useful cost of energy, per megawatt-hour.
+      solar_useful_cost:
+        title: Solar
+        unit: $ per MWh
+        short_unit: $
+        description: Useful cost of energy, per megawatt-hour.
+      battery_useful_cost:
+        title: Lithium-ion batteries
+        unit: $ per MWh
+        short_unit: $
+        description: Useful cost of energy, per megawatt-hour.

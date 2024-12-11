@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("us_consumer_prices.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # Process data.
     tb = tb.set_index(["Series ID", "Year", "Period"], verify_integrity=True)

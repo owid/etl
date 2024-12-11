@@ -8,7 +8,6 @@ TODO: This file contains some code that needs some revision:
 
 """
 import concurrent.futures
-import functools as ft
 import io
 import warnings
 from collections import defaultdict
@@ -34,6 +33,7 @@ from etl import config
 from etl import grapher_model as gm
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_connection, read_sql
+from etl.files import checksum_str
 from etl.paths import CACHE_DIR, DATA_DIR
 
 log = structlog.get_logger()
@@ -484,18 +484,32 @@ def variable_data_table_from_catalog(
     tbs = []
     for (ds_path, table_name), variables in to_read.items():
         try:
-            tb = Dataset(DATA_DIR / ds_path).read_table(table_name)
+            tb = Dataset(DATA_DIR / ds_path).read(table_name, safe_types=False)
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Dataset {ds_path} not found in local catalog.") from e
 
-        # Simple case with no dimensions
-        if not variables[0].dimensions:
-            variable_names = [variable.shortName for variable in variables]
-            tb = tb[["country", "year"] + variable_names]
+        if "date" in tb.columns:
+            year_or_date = "date"
+        elif "year" in tb.columns:
+            year_or_date = "year"
+        else:
+            raise ValueError(f"Table {table_name} has no 'date' or 'year' column")
 
-            # Rename from shortName to id
-            tb = tb.rename(columns={variable.shortName: variable.id for variable in variables})
-            tbs.append(tb)
+        dim_names = [k for k in tb.metadata.primary_key if k not in ("country", year_or_date)]
+
+        # Simple case with no dimensions
+        if not dim_names:
+            col_mapping = {"country": "country", year_or_date: year_or_date}
+            for col in set(tb.columns) - {"country", year_or_date}:
+                # Variable names in MySQL are trimmed to 255 characters
+                name = trim_long_variable_name(col)
+                matches = [variable for variable in variables if name == variable.shortName]
+                if matches:
+                    col_mapping[col] = matches[0].id  # type: ignore
+
+            tb = tb[col_mapping.keys()]
+            tb.columns = col_mapping.values()
+            tbs.append(tb.set_index(["country", year_or_date]))
 
         # Dimensional case
         else:
@@ -506,27 +520,33 @@ def variable_data_table_from_catalog(
             #     {'name': 'gender', 'value': 'all'},
             #     {'name': 'age_group', 'value': '15-29'}
             # ]
-            filters = variables[0].dimensions["filters"]
-            dim_names = [f["name"] for f in filters]
-            tb_pivoted = tb.pivot(index=["country", "year"], columns=dim_names)
+            dim_names = [k for k in tb.metadata.primary_key if k not in ("country", year_or_date)]
+            tb_pivoted = tb.pivot(index=["country", year_or_date], columns=dim_names)
 
             labels = []
             for variable in variables:
-                assert variable.dimensions, f"Variable {variable.id} has no dimensions"
-                labels.append(
-                    tuple(
-                        [variable.dimensions["originalShortName"]]
-                        + [f["value"] for f in variable.dimensions["filters"]]
-                    )
-                )
+                if not variable.dimensions:
+                    label = [variable.shortName] + [None] * len(dim_names)
+                    # assert variable.dimensions, f"Variable {variable.id} has no dimensions"
+                else:
+                    # Construct label for multidim columns
+                    label = [variable.dimensions["originalShortName"]]
+                    for dim_name in dim_names:
+                        for f in variable.dimensions["filters"]:
+                            if f["name"] == dim_name:
+                                label.append(f["value"])
+                                break
+                        else:
+                            label.append(None)  # type: ignore
+                labels.append(label)
 
             tb = tb_pivoted.loc[:, labels]
 
             tb.columns = [variable.id for variable in variables]
-            tbs.append(tb.reset_index())
+            tbs.append(tb)
 
-    # TODO: this could be slow for datasets with a lot of tables
-    return ft.reduce(lambda left, right: pd.merge(left, right, on=["country", "year"], how="outer"), tbs)  # type: ignore
+    # NOTE: this can be pretty slow for datasets with a lot of tables
+    return pd.concat(tbs, axis=1).reset_index()  # type: ignore
 
 
 #######################################################################################################
@@ -978,3 +998,12 @@ def _get_variables_data_with_filter(
         log.warning(f"Values of {field_name} not found in database: {missing_values}")
 
     return variables_data
+
+
+def trim_long_variable_name(short_name: str) -> str:
+    """Trim long variable name to 255 characters and add a hash to make it unique."""
+    if len(short_name) > 255:
+        unique_hash = f"_{checksum_str(short_name)}"
+        return short_name[: (255 - len(unique_hash))] + unique_hash
+    else:
+        return short_name

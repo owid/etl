@@ -23,7 +23,8 @@ dependencies = [
     "pydrive2>=1.15.0",
     "pyarrow>=10.0.1",
     "urllib3<2",
-    "click>=8.1.7"
+    "click>=8.1.7",
+    "py7zr>=0.22.0",
 ]
 
 [tool.uv]

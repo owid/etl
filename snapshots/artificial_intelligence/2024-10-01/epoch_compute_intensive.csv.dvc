@@ -15,17 +15,17 @@ meta:
     # Citation
     producer: Epoch
     citation_full: |-
-      Robi Rahman, David Owen and Josh You (2024), "Tracking Compute-Intensive AI Models". Published online at epochai.org. Retrieved from: 'https://epochai.org/blog/tracking-compute-intensive-ai-models' [online resource]
+      Robi Rahman, David Owen and Josh You (2024), "Tracking Compute-Intensive AI Models". Published online at epoch.ai. Retrieved from: 'https://epoch.ai/blog/tracking-compute-intensive-ai-models' [online resource]
 
     # Files
-    url_main: https://epochai.org/blog/tracking-compute-intensive-ai-models
-    url_download: https://epochai.org/data/epochdb/large_scale_ai_models.csv
+    url_main: https://epoch.ai/blog/tracking-compute-intensive-ai-models
+    url_download: https://epoch.ai/data/epochdb/large_scale_ai_models.csv
     date_accessed: 2024-10-01
 
     # License
     license:
       name: CC BY 4.0
-      url: https://epochai.org/blog/how-much-does-it-cost-to-train-frontier-ai-models
+      url: https://epoch.ai/blog/how-much-does-it-cost-to-train-frontier-ai-models
 outs:
   - md5: fc0daab615a6057ff1c9a0df94d757c7
     size: 441995

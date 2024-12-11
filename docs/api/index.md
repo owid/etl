@@ -26,7 +26,7 @@ The following options can be specified for all of these endpoints:
 **csvType**
 
 - `full` (default): Get the full data, i.e. all time points and all entities
-- `filtered`: Get only the data needed to display the visible chart. For a map chart this will be only data for a single year but all countries, for a line chart it will be the selected time range and visible entities, ...
+- `filtered`: Get only the data needed to display the visible chart. Different chart types return different subsets of the full data. For a map this will download data for only a single year but all countries, for a line chart it will be the selected time range and visible entities and so on for other chart types.
 
 Note that if you use `filtered`, the other query parameters in the URL will change what is downloaded. E.g. if you navigate to our life-expectancy chart and then visually select the country "Italy" and change the time range to 1950-2000 you will see that the URL in the browser is modified to include `?time=1980..2000&country=~ITA`. When you make a request to any of the endpoints above you can include any of these modifications to get exactly that data:
 
@@ -40,7 +40,7 @@ https://ourworldindata.org/grapher/life-expectancy.csv?csvType=filtered&time=198
 - `true`: Column names are short and don't use whitespace - e.g. `life_expectancy_0__sex_all__age_0`
 
 ```
-https://ourworldindata.org/grapher/life-expectancy.csv?useShortNames=true
+https://ourworldindata.org/grapher/life-expectancy.csv?useColumnShortNames=true
 ```
 
 ## Example notebooks
@@ -60,7 +60,7 @@ Afghanistan,AFG,1950,27.7275
 Afghanistan,AFG,1951,27.9634
 ```
 
-The first two columns in the CSV file are "Entity" and "Code." "Entity" is the name of the entity, typically a country, such as "United States." "Code" is the OWID internal entity code used for countries or regions. For standard countries, this matches the [ISO alpha-3 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) (e.g., "USA"); for non-standard or historical countries, we use custom codes. Country and region codes are standardized across all Our World in Data datasets, allowing you to join multiple datasets using either of these columns.
+The first two columns in the CSV file are "Entity" and "Code." "Entity" is the name of the entity, typically a country, such as "United States." "Code" is the OWID internal entity code used for countries or regions. For standard countries, this matches the [ISO alpha-3 code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) (e.g., "USA"); for non-standard or historical countries, we use custom codes. Country and region names are standardized across all Our World in Data datasets, allowing you to join multiple datasets using either of these columns.
 
 The third column is either "Year" or "Day". If the data is annual, this is "Year" and contains only the year as an integer. If the column is "Day", the column contains a date string in the form "YYYY-MM-DD".
 
@@ -68,7 +68,7 @@ The final columns are the data columns, which are the time series that powers th
 
 ## Metadata structure
 
-The `.metadata.json` file contains metadata about the data package. The "charts" key contains information to recreate the chart, like the title, subtitle etc.. The "columns" key contains information about each of the columns in the csv, like the unit, timespan covered, citation for the data etc.. Here is a (slightly shortened) example of the metadata for the life-expectancy chart:
+The `.metadata.json` file contains metadata about the data package. The "charts" key contains information to recreate the chart, like the title, subtitle etc. The "columns" key contains information about each of the columns in the csv, like the unit, timespan covered, citation for the data etc. Here is a (slightly shortened) example of the metadata for the life-expectancy chart:
 
 ```json
 {

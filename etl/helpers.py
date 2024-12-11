@@ -100,7 +100,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
                 year = tab["year"]
             else:
                 year = tab.index.get_level_values("year")
-            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {tab['year'].dtype}"
+            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {year.dtype}"
         elif {"date", "country"} <= set(tab.all_columns):
             pass
         else:
@@ -594,7 +594,7 @@ class PathFinder:
         if channel_type.startswith(("walden", "snapshot")):
             channel = channel_type
             namespace, version, short_name = path.split("/")
-        elif channel_type.startswith(("data",)):
+        elif channel_type.startswith(("data", "export")):
             channel, namespace, version, short_name = path.split("/")
         else:
             raise WrongStepName
@@ -1206,7 +1206,7 @@ def map_indicator_path_to_id(catalog_path: str) -> str | int:
 def get_schema_from_url(schema_url: str) -> dict:
     """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
 
-    https://files.ourworldindata.org/schemas/grapher-schema.005.json
+    https://files.ourworldindata.org/schemas/grapher-schema.006.json
 
     More details on available versions can be found
     at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema.

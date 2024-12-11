@@ -11,12 +11,14 @@ from glob import glob
 from os import environ
 from os.path import join
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Literal, Optional, Union
+from typing import Any, Dict, Iterator, List, Literal, Optional, Union, cast
 
 import numpy as np
 import pandas as pd
 import yaml
 from _hashlib import HASH
+
+from owid.repack import to_safe_types
 
 from . import tables, utils
 from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta
@@ -30,7 +32,7 @@ FileFormat = Literal["csv", "feather", "parquet"]
 SUPPORTED_FORMATS: List[FileFormat] = ["feather", "parquet", "csv"]
 
 # the formats we generate by default
-DEFAULT_FORMATS: List[FileFormat] = ["feather"]
+DEFAULT_FORMATS: List[FileFormat] = environ.get("DEFAULT_FORMATS", "feather").split(",")  # type: ignore
 
 # the format we use by default if we only need one
 PREFERRED_FORMAT: FileFormat = "feather"
@@ -117,7 +119,7 @@ class Dataset:
             utils.validate_underscore(col, "Variable's name")
 
         if not table.primary_key:
-            if "OWID_STRICT" in environ:
+            if environ.get("OWID_STRICT"):
                 raise PrimaryKeyMissing(
                     f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
                 )
@@ -126,7 +128,7 @@ class Dataset:
                     f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
                 )
 
-        if not table.index.is_unique and "OWID_STRICT" in environ:
+        if not table.index.is_unique and environ.get("OWID_STRICT"):
             [(k, dups)] = table.index.value_counts().head(1).to_dict().items()
             raise NonUniqueIndex(
                 f"Table `{table.metadata.short_name}` has duplicate values in the index -- could you have made a mistake?\n\n"
@@ -153,12 +155,14 @@ class Dataset:
             table_filename = join(self.path, table.metadata.checked_name + f".{format}")
             table.to(table_filename, repack=repack)
 
-    def read_table(self, name: str, reset_index: bool = True) -> tables.Table:
+    def read(self, name: str, reset_index: bool = True, safe_types: bool = True) -> tables.Table:
         """Read dataset's table from disk. Alternative to ds[table_name], but
         with more options to optimize the reading.
 
         :param reset_index: If true, don't set primary keys of the table. This can make loading
             large datasets with multi-indexes much faster.
+        :param safe_types: If true, convert numeric columns to Float64 and Int64 and categorical
+            columns to string[pyarrow]. This can significantly increase memory usage.
         """
         stem = self.path / Path(name)
 
@@ -166,14 +170,15 @@ class Dataset:
             path = stem.with_suffix(f".{format}")
             if path.exists():
                 t = tables.Table.read(path, primary_key=[] if reset_index else None)
-                # dataset metadata might have been updated, refresh it
                 t.metadata.dataset = self.metadata
+                if safe_types:
+                    t = cast(tables.Table, to_safe_types(t))
                 return t
 
         raise KeyError(f"Table `{name}` not found, available tables: {', '.join(self.table_names)}")
 
     def __getitem__(self, name: str) -> tables.Table:
-        return self.read_table(name, reset_index=False)
+        return self.read(name, reset_index=False, safe_types=False)
 
     def __contains__(self, name: str) -> bool:
         return any((Path(self.path) / name).with_suffix(f".{format}").exists() for format in SUPPORTED_FORMATS)

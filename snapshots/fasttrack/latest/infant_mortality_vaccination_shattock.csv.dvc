@@ -1,14 +1,14 @@
 meta:
   origin:
     producer: |-
-      Shattock et al. (2024). Contribution of vaccination to improved child survival: modelling 50 years of the Expanded Programme on Immunization.
+      Shattock et al. (2024). Contribution of vaccination to improved survival and health: modelling 50 years of the Expanded Programme on Immunization.
     title: infant_mortality_vaccination_shattock
     citation_full: |-
-      Shattock et al. (2024). Contribution of vaccination to improved child survival: modelling 50 years of the Expanded Programme on Immunization. The Lancet.
+      Shattock et al. (2024). Contribution of vaccination to improved survival and health: modelling 50 years of the Expanded Programme on Immunization. The Lancet.
     url_main: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(24)00850-X/fulltext
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vSLcIzJwPFHDM0x41c0X0h4_YNiw43W3YtVQfpoNtVKOjCZuOyyFcd0JM1O-RjCW_DASDOJkWRIfntY/pub?output=csv
-    date_accessed: '2024-05-03'
+    date_accessed: '2024-11-28'
   name: Infant mortality with and without vaccinations (Shattock et al, 2024)
   description: Estimates of the infant mortality rates with and without vital vaccinations.
   license: {}

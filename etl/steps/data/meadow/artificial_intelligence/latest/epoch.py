@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("epoch.csv")
 
     # Read snapshot
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

@@ -97,6 +97,8 @@ def process_ratio(df: pd.DataFrame) -> pd.DataFrame:
     df_female = df[df["sex"] == "female"].drop(columns=["sex"])
     # Merge data by year and country
     df_ratio = df_male.merge(df_female, on=["country", "year"], suffixes=("_m", "_f"))
+    # Don't divide by zero
+    df_ratio = df_ratio[df_ratio.suicide_rate_f != 0]
     # Estimate ratio
     df_ratio["suicide_rate_male_to_female"] = df_ratio["suicide_rate_m"] / df_ratio["suicide_rate_f"]
     # Keep only relevant columns

@@ -81,7 +81,7 @@ def find_max_label_and_concat(tb, column, label):
     max_value = -float("inf")
     rows_to_keep = []
 
-    for _, row in tb.iterrows():
+    for _, row in tb.dropna(subset=[column]).iterrows():
         if row[column] > max_value:
             max_value = row[column]
             rows_to_keep.append(row)

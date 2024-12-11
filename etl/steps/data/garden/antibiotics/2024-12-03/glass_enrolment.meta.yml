@@ -1,0 +1,20 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Antibiotics
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  glass_enrolment:
+    variables:
+      enrolment:
+        title: Which countries have enrolled in the Global Antimicrobial Resistance Surveillance System (GLASS)?
+        description_short: "Global Antimicrobial Resistance Surveillance System participation status of each country."
+        unit: ""
+        short_unit: ""

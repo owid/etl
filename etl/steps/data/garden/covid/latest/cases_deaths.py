@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read_table("cases_deaths")
+    tb = ds_meadow.read("cases_deaths")
 
     #
     # Process data.
@@ -175,15 +175,15 @@ def discard_rows(tb: Table):
     print("Discarding rows…")
     # For all rows where new_cases or new_deaths is negative, we keep the cumulative value but set
     # the daily change to NA. This also sets the 7-day rolling average to NA for the next 7 days.
-    tb.loc[tb["new_cases"] < 0, "new_cases"] = np.nan
-    tb.loc[tb["new_deaths"] < 0, "new_deaths"] = np.nan
+    tb.loc[tb["new_cases"] < 0, "new_cases"] = pd.NA
+    tb.loc[tb["new_deaths"] < 0, "new_deaths"] = pd.NA
 
     # Custom data corrections
     for ldc in LARGE_DATA_CORRECTIONS:
-        tb.loc[(tb["country"] == ldc[0]) & (tb["date"].astype(str) == ldc[1]), f"new_{ldc[2]}"] = np.nan
+        tb.loc[(tb["country"] == ldc[0]) & (tb["date"].astype(str) == ldc[1]), f"new_{ldc[2]}"] = pd.NA
 
     for ldc in LARGE_DATA_CORRECTIONS_SINCE:
-        tb.loc[(tb["country"] == ldc[0]) & (tb["date"].astype(str) >= ldc[1]), f"new_{ldc[2]}"] = np.nan
+        tb.loc[(tb["country"] == ldc[0]) & (tb["date"].astype(str) >= ldc[1]), f"new_{ldc[2]}"] = pd.NA
 
     # Sort (legacy)
     tb = tb.sort_values(["country", "date"])
@@ -216,8 +216,8 @@ def add_period_aggregates(tb: Table, prefix: str, periods: int):
     )
 
     # Set NaNs where the original data was NaN
-    tb.loc[tb["new_cases"].isnull(), cases_colname] = np.nan
-    tb.loc[tb["new_deaths"].isnull(), deaths_colname] = np.nan
+    tb.loc[tb["new_cases"].isnull(), cases_colname] = pd.NA
+    tb.loc[tb["new_deaths"].isnull(), deaths_colname] = pd.NA
 
     return tb
 
@@ -247,7 +247,7 @@ def add_doubling_days(tb: Table) -> Table:
     for col, spec in DOUBLING_DAYS_SPEC.items():
         value_col = spec["value_col"]
         periods = spec["periods"]
-        tb.loc[tb[value_col] == 0, value_col] = np.nan
+        tb.loc[tb[value_col] == 0, value_col] = pd.NA
         tb[col] = (
             tb.groupby("country", as_index=False)[value_col]
             .pct_change(periods=periods, fill_method=None)
@@ -348,7 +348,7 @@ def add_cfr(tb: Table) -> Table:
     tb.loc[
         (tb["cfr_short_term"] < 0) | (tb["cfr_short_term"] > 10) | (tb["date"].astype(str) < "2020-09-01"),
         "cfr_short_term",
-    ] = np.nan
+    ] = pd.NA
 
     # Replace inf
     cols = [

@@ -157,8 +157,8 @@ def get_number_of_countries_in_conflict_by_region(tb: Table, dimension_name: str
     # Complement with missing entries
     tb_num_participants = expand_time_column(
         tb_num_participants,
-        ["country", dimension_name],
-        "year",
+        dimension_col=["country", dimension_name],
+        time_col="year",
         method="full_range",
         fillna_method="zero",
     )

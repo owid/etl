@@ -32,6 +32,7 @@ definitions:
       <%- endif -%>
   indicator:
     display_name: |-
+      <% set indicator = indicator | default('') %>
       <% if indicator == "Neonatal mortality rate" %>
       The estimated number of deaths of {definitions.sex} children aged less than 28 days, per 100 live births, in {definitions.wealth_quintile}
       <% elif indicator == "Mortality rate 1-59 months" %>
@@ -102,39 +103,46 @@ tables:
         title: Observation value
         unit: |-
           {definitions.unit_of_measure.unit}
-        short_unit: <% if 'rate' in indicator %>%<% else %><%- endif -%>
+        short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
         display:
           name: |-
             {definitions.indicator.display_name}
-          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
+          numDecimalPlaces: <% if 'rate' in indicator | default('') %>1<% else %>0<%- endif -%>
+        presentation:
+          attribution: United Nations Inter-agency Group for Child Mortality Estimation (2024)
       lower_bound:
         title: Lower bound
         unit: |-
           {definitions.unit_of_measure.unit}
-        short_unit: <% if 'rate' in indicator %>%<% else %><%- endif -%>
+        short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
         display:
           name: |-
             {definitions.indicator.display_name}
-          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
+          numDecimalPlaces: <% if 'rate' in indicator | default('') %>1<% else %>0<%- endif -%>
+        presentation:
+          attribution: United Nations Inter-agency Group for Child Mortality Estimation (2024)
       upper_bound:
         title: Upper bound
         unit: |-
           {definitions.unit_of_measure.unit}
-        short_unit: <% if 'rate' in indicator %>%<% else %><%- endif -%>
+        short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
         display:
           name: |-
             {definitions.indicator.display_name}
-          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
+          numDecimalPlaces: <% if 'rate' in indicator | default('') %>1<% else %>0<%- endif -%>
+        presentation:
+          attribution: United Nations Inter-agency Group for Child Mortality Estimation (2024)
   igme_under_fifteen_mortality:
     variables:
       obs_value:
         title: <<indicator>>
+        description_short: <% if 'rate' in indicator | default('') %>Estimated share of children that die before reaching the age of fifteen.<% else %>Estiamted number of children that die before reaching the age of fifteen.<%- endif -%>
         description_processing: This indicator is processed by OWID based on the original data source. It is a combination of the under-five mortality rate and the 5-14 mortality rate.
         unit: <<unit_of_measure.lower()>>
-        short_unit: "%"
+        short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
         display:
           name: <<indicator>>
-          numDecimalPlaces: <% if 'rate' in indicator %>1<% else %>0<%- endif -%>
+          numDecimalPlaces: <% if 'rate' in indicator %>2<% else %>0<%- endif -%>
         sources:
           - name: United Nations Inter-agency Group for Child Mortality Estimation (2018; 2024)
         presentation:

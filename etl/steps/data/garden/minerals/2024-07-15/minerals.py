@@ -237,9 +237,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
 ]
 # Columns to plot with the individual data sources differentiated.
 PLOT_TO_COMPARE_DATA_SOURCES = [
-    # "production|Chromium|Mine|tonnes",
-    # 'production|Titanium|Mine, ilmenite|tonnes',
-    # 'production|Helium|Mine|tonnes',
+    # "production|Rhenium|Mine|tonnes",
 ]
 
 
@@ -607,6 +605,10 @@ def combine_data(
         (tb["country"] != "World") & (tb["year"].isin([1992])),
         "production|Cobalt|Refinery|tonnes",
     ] = None
+    tb.loc[
+        (tb["country"] != "World") & (tb["year"].isin([1977, 1978, 1979, 1983])),
+        "production|Iodine|Mine|tonnes",
+    ] = None
 
     ####################################################################################################################
 
@@ -627,7 +629,7 @@ def combine_data(
 
     # # Visually compare the resulting Coal and Oil global data with the ones from the Statistical Review of World Energy.
     # from etl.paths import DATA_DIR
-    # tb_sr = Dataset(DATA_DIR / "garden/energy_institute/2024-06-20/statistical_review_of_world_energy").read_table("statistical_review_of_world_energy")
+    # tb_sr = Dataset(DATA_DIR / "garden/energy_institute/2024-06-20/statistical_review_of_world_energy").read("statistical_review_of_world_energy")
     # tb_sr = tb_sr[tb_sr["country"]=="World"][["country", "year", 'coal_production_mt', 'oil_production_mt']].rename(columns={"coal_production_mt": "production|Coal|Mine|tonnes", "oil_production_mt": "production|Petroleum|Crude|tonnes"})
     # tb_sr[["production|Coal|Mine|tonnes", "production|Petroleum|Crude|tonnes"]] *= 1e6
     # for column in ["production|Coal|Mine|tonnes", "production|Petroleum|Crude|tonnes"]:
@@ -703,11 +705,9 @@ def run(dest_dir: str) -> None:
     ds_usgs = paths.load_dataset("mineral_commodity_summaries")
 
     # Read tables.
-    tb_usgs_historical_flat = ds_usgs_historical.read_table(
-        "historical_statistics_for_mineral_and_material_commodities_flat"
-    )
-    tb_usgs_flat = ds_usgs.read_table("mineral_commodity_summaries_flat")
-    tb_bgs_flat = ds_bgs.read_table("world_mineral_statistics_flat")
+    tb_usgs_historical_flat = ds_usgs_historical.read("historical_statistics_for_mineral_and_material_commodities_flat")
+    tb_usgs_flat = ds_usgs.read("mineral_commodity_summaries_flat")
+    tb_bgs_flat = ds_bgs.read("world_mineral_statistics_flat")
 
     # Load regions dataset.
     # NOTE: It will only be used for sanity checks.

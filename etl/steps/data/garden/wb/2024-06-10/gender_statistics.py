@@ -71,9 +71,10 @@ def run(dest_dir: str) -> None:
         countries_file=paths.country_mapping_path,
     )
     # Pivot the dataframe so that each indicator is a separate column
-    tb = tb.pivot(index=["country", "year"], columns="wb_seriescode", values="value")
-    tb = tb.reset_index()
+    tb = tb.pivot(index=["country", "year"], columns="wb_seriescode", values="value").reset_index()
 
+    # Slovakia - should be the same as Czechoslovakia in the period 1970-1993 for the indicator SG.LAW.EQRM.WK as confirmed by the source (but not yet updated on their database)
+    tb.loc[(tb["country"] == "Slovakia") & (tb["year"].between(1970, 1993)), "SG.LAW.EQRM.WK"] = 1
     # Add metadata by finding the descriptions and sources using indicator codes
     tb = add_metadata(tb, metadata_tb)
 

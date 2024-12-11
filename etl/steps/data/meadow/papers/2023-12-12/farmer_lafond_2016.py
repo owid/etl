@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     #
     # Load snapshot.
     snap = paths.load_snapshot("farmer_lafond_2016.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Prepare data.

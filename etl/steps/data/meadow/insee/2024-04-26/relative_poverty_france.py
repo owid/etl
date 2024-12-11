@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("relative_poverty_france.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="Données", skiprows=3)
+    tb = snap.read(safe_types=False, sheet_name="Données", skiprows=3)
 
     #
     # Process data.

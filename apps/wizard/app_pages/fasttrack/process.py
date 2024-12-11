@@ -151,7 +151,7 @@ def _convert_percentages(data: pd.DataFrame, variables_meta_dict: Dict[str, Vari
     """Convert percentages to numbers."""
     for col in data.columns:
         if getattr(variables_meta_dict.get(col, {}), "unit", "") == "%":
-            data[col] = data[col].str.replace("%", "").astype(float)
+            data[col] = data[col].astype(str).str.replace("%", "").astype(float)
     return data
 
 

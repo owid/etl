@@ -1,0 +1,79 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  others:
+    processing_1: &processing_1 |-
+      Dates were obtained based on each country's time series in our current COVID-19 dataset. Therefore, it may not completely reflect the history of the reporting since data points may have been removed by providers from previous versions.
+    processing_2: &processing_2 |-
+      Dates were obtained based on the GitHub history of our COVID-19 dataset. We have been reporting vaccination data since 2020 for each country, and storing individual country files at https://github.com/owid/covid-19-data/tree/master/public/data/vaccinations/country_data.
+    description_key_2: &description_key_2
+      - A country may have started reporting with reports, and not necessarily with standardized data files.
+      - Reporting is not necessarily a measure of the quality of the data or the reporting.
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+  title: COVID-19, Countries reporting data
+
+tables:
+  country_flags:
+    variables:
+      reporting_latest:
+        title: Country has data on COVID-19 << type >> (OLD)
+        description_short: |-
+          Whether a country has at least one data point on COVID-19 << type >> by a given date. This does not imply that the country was reporting by then.
+        description_processing: *processing_1
+        unit: ""
+  country_counts:
+    variables:
+      num_countries_reporting_latest:
+        title: Number of countries with data on COVID-19 << type >> (OLD)
+        description_short: |-
+          Number of counties had at least one data point on COVID-19 << type >> by a given date. This does not imply that the country was reporting by then.
+        description_processing: *processing_1
+        unit: "countries"
+      share_countries_reporting_latest:
+        title: Share of countries with data on COVID-19 << type >> (OLD)
+        description_short: |-
+          Share of counties had at least one data point on COVID-19 << type >> by a given date. This does not imply that the country was reporting by then.
+        description_processing: *processing_1
+        unit: "%"
+
+  country_flags_historical:
+    variables:
+      reporting:
+        title: Countries reporting data on COVID-19 vaccinations
+        description_short: |-
+          Whether a country had started reporting data on COVID-19 << type >>.
+        description_processing: *processing_2
+        description_key: *description_key_2
+        unit: ""
+  country_counts_historical:
+    variables:
+      num_countries_reporting:
+        title: Number of countries reporting data on COVID-19 << type >>
+        description_short: |-
+          Number of counties had reported data on COVID-19 << type >> at least once by a given date.
+        description_processing: *processing_2
+        description_key: *description_key_2
+        unit: "countries"
+      share_countries_reporting:
+        title: Share of countries reporting data on COVID-19 << type >>
+        description_short: |-
+          Share of counties had reported data on COVID-19 << type >> at least once by a given date.
+        description_processing: *processing_2
+        description_key: *description_key_2
+        unit: "%"
+  country_reporting_delay:
+    variables:
+      num_days_delay_in_reporting:
+        title: Number of days needed to first report data on COVID-19 << type | default('') >> since the first vaccine was administered
+        description_short: |-
+          Number of days needed to first report data on COVID-19 << type | default('') >> since the first vaccine was administered. Some countries may have started vaccinating before they reported it, or may have started reporting it before they started vaccinating.
+        description_processing: *processing_2
+        description_key: *description_key_2
+        unit: "days"

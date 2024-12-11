@@ -27,7 +27,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     # Demography
     - data://garden/demography/2024-07-15/population
-    - data://garden/demography/2023-10-09/life_expectancy
+    - data://garden/demography/2024-12-03/life_expectancy
     - data://garden/un/2024-07-12/un_wpp
     # Econ
     - data://garden/wb/2024-10-07/world_bank_pip
@@ -287,6 +287,30 @@ steps:
     - data://meadow/covid/latest/deaths_vax_status
   data://grapher/covid/latest/deaths_vax_status:
     - data://garden/covid/latest/deaths_vax_status
+
+  # Countries reporting data
+  data://meadow/covid/latest/countries_reporting:
+    - snapshot://covid/2024-11-05/github_stats_vax_reporting.csv
+  data://garden/covid/latest/countries_reporting:
+    - data://meadow/covid/latest/vaccinations_global
+    - data://meadow/covid/latest/countries_reporting
+  data://grapher/covid/latest/countries_reporting:
+    - data://garden/covid/latest/countries_reporting
+
+  # Contributions to GitHub
+  data://meadow/covid/2024-11-05/github_stats:
+    - snapshot://covid/2024-11-05/github_stats_issues.csv
+    - snapshot://covid/2024-11-05/github_stats_issues_comments.csv
+    - snapshot://covid/2024-11-05/github_stats_issues_users.csv
+    - snapshot://covid/2024-11-05/github_stats_pr.csv
+    - snapshot://covid/2024-11-05/github_stats_pr_comments.csv
+    - snapshot://covid/2024-11-05/github_stats_pr_users.csv
+    - snapshot://covid/2024-11-05/github_stats_commits.csv
+    - snapshot://covid/2024-11-05/github_stats_commits_users.csv
+  data://garden/covid/2024-11-05/github_stats:
+    - data://meadow/covid/2024-11-05/github_stats
+  data://grapher/covid/2024-11-05/github_stats:
+    - data://garden/covid/2024-11-05/github_stats
 
   ######################################
   # MULTIDIM

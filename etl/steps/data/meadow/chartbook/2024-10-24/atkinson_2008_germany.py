@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("atkinson_2008_germany.xls")
 
     # Load data from snapshot
-    tb = snap.read(sheet_name="Table H.4", usecols="C,I", skiprows=2)
+    tb = snap.read(safe_types=False, sheet_name="Table H.4", usecols="C,I", skiprows=2)
 
     #
     # Process data.

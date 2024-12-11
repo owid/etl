@@ -1,8 +1,6 @@
 definitions:
   common:
     processing_level: minor
-    description_processing: |-
-      - We calculated averages over continents and income groups by taking the population-weighted average of the countries in each group. If less than 80% of countries in an area report data for a given year, we do not calculate the average for that area.
     presentation:
       topic_tags:
         - Human Development Index (HDI)

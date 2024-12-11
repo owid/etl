@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("diagnosis_routes_by_route.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     tb = tb[["Year", "Site", "Stage", "Route", "Count", "Percentage"]]
     tb = tb.rename(columns={"Count": "count_by_route", "Percentage": "percentage_by_route"})

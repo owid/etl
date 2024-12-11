@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Antimicrobial Resistance and Use Surveillance System (GLASS)
+    description: |-
+      GLASS provides a standardized approach to the collection, analysis, interpretation and sharing of data by countries and seeks to actively support capacity building and monitor the status of existing and new national surveillance systems. Furthermore, GLASS promotes a shift from surveillance approaches based solely on laboratory data to a system that includes epidemiological, clinical, and population-level data. GLASS has been conceived to progressively incorporate data from surveillance of AMR in humans, such as monitoring of resistance and the use of antimicrobial medicines, including AMR in the food chain and in the environment.
+    date_published: "2024-09-16"
+    title_snapshot: Global AMR data
+    description_snapshot: |-
+      The global AMR data dashboard describes the implementation status, quality assurance, and standards of national AMR surveillance systems in 2022. It also describes the progress in global coverage of GLASS-AMR since its initiation (2016), and presents global antibiotic resistance estimates for the latest available calendar year (2022). Filters allow users to also access the estimates from the previous years (2020-2021). The main unit of observation for AMR data are bacteriologically confirmed infections (BCIs) with interpretable antibiotic susceptibility test (AST) results. The latter are presented for infectious syndromes, bacterial pathogens and antibiotics under surveillance. The reader is referred to previous report editions and the manual for early implementation for a detailed description of GLASS methods. The 2024 GLASS report uses mid-year population estimates of the United Nations World Population Prospects 2024, to calculate testing coverage per million population each year.
+
+    # Citation
+    producer: World Health Organization
+    citation_full: |-
+      Global AMR data - Global Antimicrobial Resistance and Use Surveillance System (GLASS), World Health Organization (2024)
+
+    attribution_short: WHO
+
+    # Files
+    url_main: https://worldhealthorg.shinyapps.io/glass-dashboard/_w_679389fb/#!/amr
+    date_accessed: 2024-10-18
+
+    # License
+    license:
+      name: © 2024 WHO
+      url: https://www.who.int/about/policies/terms-of-use
+
+outs:
+  - md5: b1c4d820b37417b77214db814348233f
+    size: 55169
+    path: who_glass.zip

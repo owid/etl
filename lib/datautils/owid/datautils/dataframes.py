@@ -108,7 +108,7 @@ def compare(
     # Compare, column by column, the elements of the two dataframes.
     compared = pd.DataFrame()
     for col in columns:
-        if (df1[col].dtype in (object, "category")) or (df2[col].dtype in (object, "category")):
+        if (df1[col].dtype in (object, "category", "string")) or (df2[col].dtype in (object, "category", "string")):
             # Apply a direct comparison for strings or categories
             compared_row = df1[col].values == df2[col].values
         else:
@@ -461,6 +461,13 @@ def map_series(
         # Replace those nans with their original values, except if they were actually meant to be mapped to nan.
         # For example, if {"bad_value": np.nan} was part of the mapping, do not replace those nans back to "bad_value".
 
+        # if we are setting values from the original series, ensure we have the same dtype
+        try:
+            series_mapped = series_mapped.astype(series.dtype, copy=False)
+        except ValueError:
+            # casting NaNs to integer will fail
+            pass
+
         # Detect values in the mapping that were intended to be mapped to nan.
         values_mapped_to_nan = [
             original_value for original_value, target_value in mapping.items() if pd.isnull(target_value)
@@ -631,6 +638,14 @@ def combine_two_overlapping_dataframes(
     # Align both dataframes on their common indexes.
     # Give priority to df1 on overlapping values.
     combined, df2 = df1.align(df2)
+
+    new_columns = df2.columns.difference(df1.columns)
+    for col in new_columns:
+        try:
+            combined[col] = combined[col].astype(df2[col].dtype, copy=False)
+        except ValueError:
+            # casting NaNs to integer will fail
+            pass
 
     # Fill missing values in df1 with values from df2.
     combined = combined.fillna(df2)

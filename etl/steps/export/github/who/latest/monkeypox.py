@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     ds = paths.load_dataset("monkeypox")
-    tb = ds.read_table("monkeypox")
+    tb = ds.read("monkeypox")
 
     # Process it for backwards compatibility.
     tb = tb.rename(columns={"country": "location"}).drop(columns=["suspected_cases_cumulative", "annotation"])

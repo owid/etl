@@ -69,7 +69,7 @@ def validate_chart_config_and_set_defaults(
         raise Exception(f"Could not validate schema for chart {config['id']}: {e}")
     # Add minTime if not set (no default provided in schema)
     # Kinda hacky
-    if config_new["type"] not in {"StackedDiscreteBar", "Marimekko", "DiscreteBar"}:
+    if config_new["chartTypes"][0] not in {"StackedDiscreteBar", "Marimekko", "DiscreteBar"}:
         if "minTime" not in config_new:
             config_new["minTime"] = "earliest"
     return config_new

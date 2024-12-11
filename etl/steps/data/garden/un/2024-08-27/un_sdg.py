@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("un_sdg")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow.read_table("un_sdg")
+    tb_meadow = ds_meadow.read("un_sdg", safe_types=False)
 
     # Create long and short units columns
     tb = create_units(tb_meadow)

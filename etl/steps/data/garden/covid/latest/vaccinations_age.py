@@ -72,7 +72,7 @@ def fill_time_gaps(tb: Table) -> Table:
 
     Often, values for certain countries are missing. This can lead to very large under-estimates regional values. To mitigate this, we combine zero-filling with interpolation and other techniques.
     """
-    tb = expand_time_column(tb, ["country", "vaccine"], "date", "full_range")
+    tb = expand_time_column(tb, dimension_col=["country", "vaccine"], time_col="date", method="full_range")
     # cumulative metrics: Interpolate, forward filling (for latest) + zero-filling (for remaining NaNs, likely at start)
     cols_ffill = [
         "total_vaccinations",

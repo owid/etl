@@ -1,5 +1,5 @@
 steps:
-  data-private://grapher/fasttrack/2023-03-27/global_warming_contributions:
-  - snapshot-private://fasttrack/2023-03-27/global_warming_contributions.csv
-  data-private://grapher/fasttrack/2023-01-19/food_expenditures_by_country:
-  - snapshot-private://fasttrack/2023-01-19/food_expenditures_by_country.csv
+  data://grapher/fasttrack/latest/democracy_lexical_index:
+    - snapshot://fasttrack/latest/democracy_lexical_index.csv
+  data://grapher/fasttrack/latest/mineral_prices_usgs:
+    - snapshot://fasttrack/latest/mineral_prices_usgs.csv

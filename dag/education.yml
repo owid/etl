@@ -1,17 +1,4 @@
 steps:
-  # World Bank EdStats
-  data://meadow/wb/2023-07-10/education:
-    - snapshot://wb/2023-07-10/education.csv
-
-  data://garden/wb/2023-07-10/education:
-    - data://meadow/wb/2023-07-10/education
-    - data://garden/education/2017-09-30/public_expenditure
-    - data://garden/education/2018-04-18/literacy_rates
-
-  data://grapher/wb/2023-07-10/education:
-    - data://garden/wb/2023-07-10/education
-
-
   # Barro and Lee projections dataset
   data://meadow/education/2023-07-17/education_barro_lee_projections:
     - snapshot://education/2023-07-17/education_barro_lee_projections.csv
@@ -32,8 +19,9 @@ steps:
   data://garden/education/2023-07-17/education_lee_lee:
     - data://meadow/education/2023-07-17/education_lee_lee
     - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/demography/2022-12-08/population
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/unesco/2024-11-21/enrolment_rates
   data://grapher/education/2023-07-17/education_lee_lee:
     - data://garden/education/2023-07-17/education_lee_lee
 
@@ -54,7 +42,7 @@ steps:
     - snapshot://education/2023-08-14/oecd_education.csv
   data://garden/education/2023-08-14/oecd_education:
     - data://meadow/education/2023-08-14/oecd_education
-    - data://garden/wb/2023-07-10/education
+    - data://garden/wb/2024-11-04/edstats
   data://grapher/education/2023-08-14/oecd_education:
     - data://garden/education/2023-08-14/oecd_education
 
@@ -119,3 +107,24 @@ steps:
     - snapshot://wb/2024-06-18/edstats_metadata.xls
   data://grapher/unesco/2024-06-25/education_sdgs:
     - data://garden/unesco/2024-06-25/education_sdgs
+
+  # UNESCO data on other policy related education indicators
+  data://meadow/unesco/2024-11-21/enrolment_rates:
+    - snapshot://unesco/2024-11-21/enrolment_rates.csv
+  data://garden/unesco/2024-11-21/enrolment_rates:
+    - data://meadow/unesco/2024-11-21/enrolment_rates
+    - snapshot://wb/2024-06-18/edstats_metadata.xls
+  data://grapher/unesco/2024-11-21/enrolment_rates:
+    - data://garden/unesco/2024-11-21/enrolment_rates
+
+
+  # World Bank EdStats
+  data://meadow/wb/2024-11-04/edstats:
+    - snapshot://wb/2024-11-04/edstats.csv
+  data://garden/wb/2024-11-04/edstats:
+    - data://meadow/wb/2024-11-04/edstats
+    - data://garden/education/2017-09-30/public_expenditure
+    - data://garden/education/2018-04-18/literacy_rates
+
+  data://grapher/wb/2024-11-04/edstats:
+    - data://garden/wb/2024-11-04/edstats

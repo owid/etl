@@ -49,8 +49,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb: Table = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb["released_national_strategy_on_ai"] = tb["released_national_strategy_on_ai"].replace(
-        {0: "In development", 1: "Released"}
+    tb["released_national_strategy_on_ai"] = (
+        tb["released_national_strategy_on_ai"].astype("string").replace({"0": "In development", "1": "Released"})
     )
     df_merged = pd.merge(countries_national_ai, tb, on=["country", "year"], how="outer")
     df_merged.sort_values(by=["year"], inplace=True)

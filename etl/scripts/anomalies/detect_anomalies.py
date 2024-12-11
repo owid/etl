@@ -87,7 +87,7 @@ def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Var
     #     log.info(f"Loading data from local ETL file: {etl_file}")
     #     ds_etl = catalog.Dataset(etl_file)
     #     if ds_etl.table_names == [ds.shortName]:
-    #         df = pd.DataFrame(ds_etl.read_table(ds.shortName))  # type: ignore
+    #         df = pd.DataFrame(ds_etl.read(ds.shortName))  # type: ignore
     #     # Change column names to variable ids.
     #     df = df.rename(columns={column: ds_variable_ids[column] for column in df.columns if column in ds_variable_ids}, errors="raise").rename(columns={"country": "entity_name"}, errors="raise")
 

@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot and read its main table.
     snap = paths.load_snapshot("nuclear_threat_initiative_overview.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

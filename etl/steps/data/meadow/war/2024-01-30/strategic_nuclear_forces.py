@@ -12,11 +12,11 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshots of dyadic data.
     snap = paths.load_snapshot("strategic_nuclear_forces.xlsx")
-    tb_dyadic = snap.read()
+    tb_dyadic = snap.read(safe_types=False)
 
     # Retrieve snapshots of monadic data.
     snap = paths.load_snapshot("strategic_nuclear_forces_monadic.xlsx")
-    tb_monadic = snap.read()
+    tb_monadic = snap.read(safe_types=False)
 
     #
     # Process data.

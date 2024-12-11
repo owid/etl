@@ -100,7 +100,7 @@ def run(dest_dir: str) -> None:
     log.info("un_sdg.start")
     snap = paths.load_snapshot("un_sdg.feather")
 
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

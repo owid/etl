@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: Emission Factor Database
     description: |-
-      The Intergovernmental Panel on Climate Change (IPCC) Emission Factor Database (EFDB) is a library of emission factors and parameters that can be used for estimation of national greenhouse gas emissions/removals. For more details, see [the User Manual](https://www.ipccnggip.iges.or.jp/EFDB/documents/EFDB_User_Manual.pdf).
+      The Intergovernmental Panel on Climate Change (IPCC) Emission Factor Database (EFDB) is a library of emission factors and parameters that can be used for estimation of national greenhouse gas emissions/removals. For more details, see [the User Manual](https://www.ipcc-nggip.iges.or.jp/EFDB/documents/EFDB_User_Manual.pdf).
     date_published: 2023-10-24
 
     # Citation

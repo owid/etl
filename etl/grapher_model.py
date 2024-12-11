@@ -254,10 +254,15 @@ class User(Base):
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     isActive: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     fullName: Mapped[str] = mapped_column(VARCHAR(255))
+    githubUsername: Mapped[str] = mapped_column(VARCHAR(255))
     password: Mapped[Optional[str]] = mapped_column(VARCHAR(128))
     lastLogin: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     lastSeen: Mapped[Optional[datetime]] = mapped_column(DateTime)
+
+    @classmethod
+    def load_user(cls, session: Session, github_username: str) -> Optional["User"]:
+        return session.scalars(select(cls).where(cls.githubUsername == github_username)).one_or_none()
 
 
 class ChartRevisions(Base):
@@ -288,6 +293,13 @@ class ChartConfig(Base):
     fullMd5: Mapped[str] = mapped_column(CHAR(24), Computed("(to_base64(unhex(md5(full))))", persisted=True))
     slug: Mapped[Optional[str]] = mapped_column(
         String(255), Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True)
+    )
+    chartType: Mapped[Optional[str]] = mapped_column(
+        String(255),
+        Computed(
+            "(CASE WHEN full ->> '$.chartTypes' IS NULL THEN 'LineChart' ELSE full ->> '$.chartTypes[0]' END)",
+            persisted=True,
+        ),
     )
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, onupdate=func.current_timestamp())
@@ -413,13 +425,15 @@ class Chart(Base):
         rows = session.execute(stm).scalars().all()
         variables = {r.id: r for r in rows}
 
+        # NOTE: columnSlug must always exist in dimensions and in chart_dimensions, so there's
+        # no need to include columnSlug
         # add columnSlug if present
-        column_slug = self.config.get("map", {}).get("columnSlug")
-        if column_slug:
-            try:
-                variables[int(column_slug)] = Variable.load_variable(session, column_slug)
-            except NoResultFound:
-                raise ValueError(f"columnSlug variable {column_slug} for chart {self.id} not found")
+        # column_slug = self.config.get("map", {}).get("columnSlug")
+        # if column_slug:
+        #     try:
+        #         variables[int(column_slug)] = Variable.load_variable(session, column_slug)
+        #     except NoResultFound:
+        #         raise ValueError(f"columnSlug variable {column_slug} for chart {self.id} not found")
 
         return variables
 
@@ -488,7 +502,13 @@ class Chart(Base):
 
         # copy chart as a new object
         config = copy.deepcopy(self.config)
-        config = _remap_variable_ids(config, remap_ids)
+        try:
+            config = _remap_variable_ids(config, remap_ids)
+        except KeyError as e:
+            # This should not be happening - it means that there's a chart with a variable that doesn't exist in
+            # chart_dimensions and possibly not even in variables table. It's possible that you see it admin, but
+            # only because it is cached.
+            raise ValueError(f"Issue with chart {self.id} - variable id not found in chart_dimensions table: {e}")
 
         return config
 
@@ -1846,7 +1866,9 @@ def _remap_variable_ids(config: Union[List, Dict[str, Any], Any], remap_ids: Dic
                 out[k] = remap_ids[int(v)]
             # columnSlug is actually a variable id, but stored as a string (it wasn't a great decision)
             elif k in ("columnSlug", "sortColumnSlug"):
-                out[k] = str(remap_ids[int(v)])
+                # sometimes columnSlug stays in config, but is deleted from dimensions. Ignore it
+                if int(v) in remap_ids:
+                    out[k] = str(remap_ids[int(v)])
             # if new fields with variable ids are added, try to handle them and raise a warning
             elif isinstance(v, int) and v in remap_ids:
                 log.warning("remap_variable_ids.new_field", field=k, value=v)

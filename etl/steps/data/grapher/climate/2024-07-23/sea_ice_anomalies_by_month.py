@@ -110,7 +110,7 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("sea_ice_index")
-    tb = ds_garden.read_table("sea_ice_index")
+    tb = ds_garden.read("sea_ice_index")
 
     #
     # Process data.

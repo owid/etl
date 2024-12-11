@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("critical_minerals")
-    tb_demand_by_technology_flat = ds_garden.read_table("demand_by_technology")
+    tb_demand_by_technology_flat = ds_garden.read("demand_by_technology")
 
     #
     # Process data.

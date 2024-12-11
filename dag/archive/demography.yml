@@ -1,11 +1,4 @@
 steps:
-  # Population density
-  data://garden/demography/2023-04-14/population_density:
-    - data://garden/demography/2023-03-31/population
-    - data://garden/faostat/2023-02-22/faostat_rl
-  data://grapher/demography/2023-04-14/population_density:
-    - data://garden/demography/2023-04-14/population_density
-
   # GINI LE inequality
   data://garden/demography/2023-09-29/gini_le:
     - data://garden/hmd/2023-09-19/hmd
@@ -59,9 +52,69 @@ steps:
   data-private://grapher/un/2024-07-11/un_wpp_full:
     - data-private://garden/un/2024-07-11/un_wpp
 
-    # Population density
+  # Population density
   data://garden/demography/2023-06-12/population_density:
     - data://garden/demography/2023-03-31/population
     - data://garden/faostat/2024-03-14/faostat_rl
   data://grapher/demography/2023-06-12/population_density:
     - data://garden/demography/2023-06-12/population_density
+
+  # HMD
+  data://meadow/hmd/2022-12-07/life_tables:
+    - snapshot://hmd/2022-12-07/hmd.zip
+  data://garden/hmd/2022-12-07/life_tables:
+    - data://meadow/hmd/2022-12-07/life_tables
+
+  # Survivorship ages (HMD-derived)
+  data://garden/demography/2023-09-27/survivor_percentiles:
+    - data://garden/hmd/2023-09-19/hmd
+  data://grapher/demography/2023-09-27/survivor_percentiles:
+    - data://garden/demography/2023-09-27/survivor_percentiles
+
+  # Phi-gender life expectancy inequality
+  data://garden/demography/2023-10-03/phi_gender_le:
+    - data://garden/demography/2023-10-03/life_tables
+  data://grapher/demography/2023-10-03/phi_gender_le:
+    - data://garden/demography/2023-10-03/phi_gender_le
+
+  # Broken limits of Life Expectancy
+  data://garden/demography/2023-10-20/broken_limits_le:
+    - data://garden/demography/2023-10-03/life_tables
+    - data://garden/hmd/2023-09-19/hmd
+  data://grapher/demography/2023-10-20/broken_limits_le:
+    - data://garden/demography/2023-10-20/broken_limits_le
+
+  # Gini Life Expectancy Inequality
+  data://garden/demography/2023-10-04/gini_le:
+    - data://garden/demography/2023-10-03/life_tables
+  data://grapher/demography/2023-10-04/gini_le:
+    - data://garden/demography/2023-10-04/gini_le
+
+  # HMD
+  data://meadow/hmd/2023-09-19/hmd:
+    - snapshot://hmd/2023-09-18/hmd.zip
+  data://garden/hmd/2023-09-19/hmd:
+    - data://meadow/hmd/2023-09-19/hmd
+  data://grapher/hmd/2023-09-19/hmd:
+    - data://garden/hmd/2023-09-19/hmd
+  # UN WPP Life Tables
+  data://meadow/un/2023-10-02/un_wpp_lt:
+    - snapshot://un/2023-10-02/un_wpp_lt_all.zip
+    - snapshot://un/2023-10-02/un_wpp_lt_f.zip
+    - snapshot://un/2023-10-02/un_wpp_lt_m.zip
+  data://garden/un/2023-10-02/un_wpp_lt:
+    - data://meadow/un/2023-10-02/un_wpp_lt
+  # UN WPP + HMD Life Tables
+  data://garden/demography/2023-10-03/life_tables:
+    - data://garden/hmd/2023-09-19/hmd
+    - data://garden/un/2023-10-02/un_wpp_lt
+  data://grapher/demography/2023-10-04/life_tables:
+    - data://garden/demography/2023-10-03/life_tables
+  # OMM: Life Expectancy
+  data://garden/demography/2023-10-09/life_expectancy:
+    - data://garden/demography/2023-10-03/life_tables
+    - data://garden/demography/2023-10-10/zijdeman_et_al_2015
+    - data://garden/demography/2023-10-10/riley_2005
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/demography/2023-10-10/life_expectancy:
+    - data://garden/demography/2023-10-09/life_expectancy

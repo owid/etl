@@ -76,7 +76,7 @@ def grapher_chart(
 
     You can either plot a given chart config (using chart_config) or plot an indicator with its default metadata using either catalog_path, variable_id or variable.
 
-    Note: You can find more details on our Grapher API at https://files.ourworldindata.org/schemas/grapher-schema.005.json.
+    Note: You can find more details on our Grapher API at https://files.ourworldindata.org/schemas/grapher-schema.latest.json.
 
     Parameters
     ----------
@@ -109,6 +109,16 @@ def grapher_chart(
         )
 
     _chart_html(chart_config, owid_env, height=height, **kwargs)
+
+
+def grapher_chart_from_url(chart_url: str, height=600):
+    """Plot a Grapher chart using the Grapher API."""
+    chart_animation_iframe_html = f"""
+    <iframe src="{chart_url}" loading="lazy"
+            style="width: 100%; height: 600px; border: 0px none;"
+            allow="web-share; clipboard-write"></iframe>
+    """
+    return st.components.v1.html(chart_animation_iframe_html, height=height)  # type: ignore
 
 
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
@@ -309,3 +319,19 @@ class Pagination:
                 on_change=_change_page,
                 key=self.pagination_key,
             )
+
+
+def st_multiselect_wider(num_px: int = 1000):
+    st.markdown(
+        f"""
+        <style>
+        .stMultiSelect [data-baseweb=select] span{{
+                max-width: {num_px}px;
+            }}
+        </style>""",
+        unsafe_allow_html=True,
+    )
+
+
+def st_info(text):
+    st.info(text, icon=":material/info:")

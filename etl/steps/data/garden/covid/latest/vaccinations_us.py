@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("vaccinations_us")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["vaccinations_us"].reset_index()
+    tb = ds_meadow.read("vaccinations_us")
 
     #
     # Process data.

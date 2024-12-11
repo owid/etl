@@ -205,22 +205,22 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     # Point-in-time data
-    tb_point_in_time = snap.read(sheet_name="HC3.1.1", usecols="L:P", skiprows=2, na_values=[".."])
+    tb_point_in_time = snap.read(safe_types=False, sheet_name="HC3.1.1", usecols="L:P", skiprows=2, na_values=[".."])
 
     # Flow data
-    tb_flow = snap.read(sheet_name="HC3.1.1", usecols="S:W", skiprows=2, na_values=[".."])
+    tb_flow = snap.read(safe_types=False, sheet_name="HC3.1.1", usecols="S:W", skiprows=2, na_values=[".."])
 
     # Share of women
-    tb_women = snap.read(sheet_name="HC3.1.2", usecols="R:S", skiprows=1, na_values=[".."])
+    tb_women = snap.read(safe_types=False, sheet_name="HC3.1.2", usecols="R:S", skiprows=1, na_values=[".."])
 
     # Index of people experiencing homelessness
-    tb_index = snap.read(sheet_name="HC3.1.3", usecols="L:S", skiprows=6, na_values=[".."])
+    tb_index = snap.read(safe_types=False, sheet_name="HC3.1.3", usecols="L:S", skiprows=6, na_values=[".."])
 
     # Share trends
-    tb_share = snap.read(sheet_name="HC3.1.4", usecols="Q:AE", skiprows=6, na_values=[".."])
+    tb_share = snap.read(safe_types=False, sheet_name="HC3.1.4", usecols="Q:AE", skiprows=6, na_values=[".."])
 
     # Number of people experiencing homelessness
-    tb_number = snap.read(sheet_name="Table_HC3.1.A2", skiprows=3, na_values=[".."])
+    tb_number = snap.read(safe_types=False, sheet_name="Table_HC3.1.A2", skiprows=3, na_values=[".."])
 
     #
     # Process data.

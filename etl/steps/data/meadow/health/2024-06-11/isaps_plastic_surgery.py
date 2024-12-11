@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("isaps_plastic_surgery.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="Global")
+    tb = snap.read(safe_types=False, sheet_name="Global")
 
     # Add entity World
     tb["country"] = "World"

@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
     # Read surface temperature data from snapshot
     da = _load_data_array(snap)
 
-    # Read the shapefile to extract country informaiton
+    # Read the shapefile to extract country information
     snap_geo = paths.load_snapshot("world_bank.zip")
     shapefile_name = "WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp"
 

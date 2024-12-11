@@ -7,6 +7,8 @@ definitions:
       topic_tags:
         - Famines
 
+  footnote_decadal: |-
+     Decadal figures represent data averaged over each ten-year period (e.g., 1990–1999 for the 1990s). The 2020s figure is provisional and includes data only up to and including 2023.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -30,6 +32,10 @@ tables:
           description_short: Deaths in famines that are estimated to have killed 100,000 people or more.
           display:
             numDecimalPlaces: 0
+          presentation:
+            grapher_config:
+             note: |-
+               {definitions.footnote_decadal}
 
        famine_deaths_per_rate:
           title: Death rates from famines
@@ -44,6 +50,10 @@ tables:
           description_short: Deaths in famines that are estimated to have killed 100,000 people or more, per 100,000 people.
           display:
             numDecimalPlaces: 1
+          presentation:
+            grapher_config:
+             note: |-
+               {definitions.footnote_decadal}
 
        famine_count:
         title: Number of famines
@@ -58,3 +68,7 @@ tables:
          description_short: Famines that are estimated to have killed 100,000 people or more.
          display:
             numDecimalPlaces: 0
+         presentation:
+           grapher_config:
+            note: |-
+              {definitions.footnote_decadal}

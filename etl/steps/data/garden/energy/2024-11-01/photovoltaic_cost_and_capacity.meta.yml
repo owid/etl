@@ -1,0 +1,30 @@
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Energy
+
+dataset:
+  update_period_days: 365
+
+tables:
+  # NOTE: Some metadata fields are filled out programmatically in the garden step.
+  photovoltaic_cost_and_capacity:
+    title: Solar photovoltaic cost and capacity
+    variables:
+      cost:
+        title: Solar photovoltaic module price
+        presentation:
+          title_public: Solar photovoltaic module price
+      cost_source:
+        title: Source for each value of cost data
+        unit: ''
+      cumulative_capacity:
+        title: Solar photovoltaic cumulative capacity
+        presentation:
+          # NOTE: A title_public is needed, since a display.name is defined (it's propagated from one of the combined datasets, namely farmer_lafond_2016).
+          title_public: Solar photovoltaic cumulative capacity
+      cumulative_capacity_source:
+        title: Source for each value of cumulative capacity data
+        unit: ''

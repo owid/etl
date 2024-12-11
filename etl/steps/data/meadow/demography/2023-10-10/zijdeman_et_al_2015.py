@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("zijdeman_et_al_2015.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="Data Long Format")
+    tb = snap.read(safe_types=False, sheet_name="Data Long Format")
 
     #
     # Process data.

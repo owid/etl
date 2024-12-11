@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
     # Load snapshot.
     snap = paths.load_snapshot("natural_disasters.xlsx")
     with warnings.catch_warnings(record=True):
-        tb = snap.read(sheet_name="emdat data", skiprows=6)
+        tb = snap.read(safe_types=False, sheet_name="emdat data", skiprows=6)
 
     #
     # Process data.

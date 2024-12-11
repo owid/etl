@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
 
     # Retieve data from Gapminder
     snap = paths.load_snapshot("eiu_gapminder.csv")
-    tb_gm = snap.read()
+    tb_gm = snap.read(safe_types=False)
 
     # Retrieve data from EIU (single year reports)
     shortnames = [
@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     tbs = []
     for name in shortnames:
         snap = paths.load_snapshot(f"{name}.csv")
-        tb = snap.read()
+        tb = snap.read(safe_types=False)
         tbs.append(tb)
 
     # Correct data by Gapminder

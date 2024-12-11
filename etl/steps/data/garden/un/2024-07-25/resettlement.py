@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("resettlement")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read_table("resettlement")
+    tb = ds_meadow.read("resettlement")
 
     # filter out data before data availability starts (s. https://www.unhcr.org/refugee-statistics/methodology/, "Data publication timeline")
     tb["resettlement_arrivals"] = tb.apply(lambda x: x["resettlement_arrivals"] if x["year"] > 1958 else pd.NA, axis=1)

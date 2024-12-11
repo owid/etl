@@ -1,0 +1,43 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Multidimensional Poverty Index (MPI)
+    description: |-
+      The global Multidimensional Poverty Index (MPI) is an international measure of acute multidimensional poverty covering over 100 developing countries. It complements traditional monetary poverty measures by capturing the acute deprivations in health, education, and living standards that a person faces simultaneously.
+
+      The MPI assesses poverty at the individual level. If a person is deprived in a third or more of ten (weighted) indicators, the global MPI identifies them as ‘MPI poor’. The extent – or intensity – of their poverty is also measured through the percentage of deprivations they are experiencing.
+
+      The global MPI shows who is poor and how they are poor and can be used to create a comprehensive picture of people living in poverty. It permits comparisons both across countries and world regions, and within countries by ethnic group, urban/rural area, subnational region, and age group, as well as other key household and community characteristics. For each group and for countries as a whole, the composition of MPI by each of the ten indicators shows how people are poor.
+
+      This makes the MPI and its linked information platform invaluable as an analytical tool to identify the most vulnerable people – the poorest among the poor, revealing poverty patterns within countries and over time, enabling policy makers to target resources and design policies more effectively.
+
+      The global MPI was developed by OPHI with the UN Development Programme (UNDP) for inclusion in UNDP’s flagship Human Development Report in 2010. It has been published annually by OPHI and in the HDRs ever since.
+    date_published: "2024-10-17"
+    version_producer: 2024
+    title_snapshot: Global Multidimensional Poverty Index (MPI) - Harmonized over time (HOT)
+    description_snapshot: |-
+      This dataset contains harmonized over time (HOT) estimates. This harmonization seeks to make two or more MPI estimations comparable by aligning the indicator definitions in each survey.
+
+    # Citation
+    producer: Alkire, Kanagaratnam and Suppa
+    citation_full: |-
+      - Alkire, S., Kanagaratnam, U., and Suppa, N. (2024). A methodological note on the global Multidimensional Poverty Index (MPI) 2024 changes over time results for 86 countries. OPHI MPI Methodological Note 60, Oxford Poverty and Human Development Initiative, University of Oxford.
+      - Alkire, S., Kanagaratnam, U., and Suppa, N. (2024). The Global Multidimensional Poverty Index (MPI) 2024. Disaggregation Results and Methodological Note. OPHI MPI Methodological Note 59, Oxford Poverty and Human Development Initiative, University of Oxford.
+    attribution: Alkire, Kanagaratnam and Suppa (2024) - The Global Multidimensional Poverty Index (MPI) 2024
+
+    # Files
+    url_main: https://ophi.org.uk/global-mpi
+    url_download: https://cloud-ophi.qeh.ox.ac.uk/index.php/s/eRLL5jGKPLTygYT/download?path=%2F&files=GMPI_HOT_2024_puf.csv
+    date_accessed: 2024-10-28
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ophi.org.uk/global-mpi-frequently-asked-questions
+
+outs:
+  - md5: 7de477b10168ce0dfea0c48046c1b905
+    size: 31115054
+    path: multidimensional_poverty_index_hot.csv

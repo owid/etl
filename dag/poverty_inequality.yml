@@ -60,13 +60,14 @@ steps:
   data://explorers/lis/latest/luxembourg_income_study:
     - data://garden/lis/2024-06-13/luxembourg_income_study
 
-  # Multidimensional Poverty Index
-  data://meadow/ophi/2023-07-05/multidimensional_poverty_index:
-    - snapshot://ophi/2023-07-05/multidimensional_poverty_index.csv
-  data://garden/ophi/2023-07-05/multidimensional_poverty_index:
-    - data://meadow/ophi/2023-07-05/multidimensional_poverty_index
-  data://grapher/ophi/2023-07-05/multidimensional_poverty_index:
-    - data://garden/ophi/2023-07-05/multidimensional_poverty_index
+  # Global Multidimensional Poverty Index
+  data://meadow/ophi/2024-10-28/multidimensional_poverty_index:
+    - snapshot://ophi/2024-10-28/multidimensional_poverty_index_cme.csv
+    - snapshot://ophi/2024-10-28/multidimensional_poverty_index_hot.csv
+  data://garden/ophi/2024-10-28/multidimensional_poverty_index:
+    - data://meadow/ophi/2024-10-28/multidimensional_poverty_index
+  data://grapher/ophi/2024-10-28/multidimensional_poverty_index:
+    - data://garden/ophi/2024-10-28/multidimensional_poverty_index
 
   # # OECD Income Distribution Database
   data://meadow/oecd/2024-04-10/income_distribution_database:
@@ -113,15 +114,6 @@ steps:
   data://grapher/oecd/2024-04-30/affordable_housing_database:
     - data://garden/oecd/2024-04-30/affordable_housing_database
 
-  # Poverty projections from the World Bank
-  data://meadow/wb/2024-06-26/poverty_projections:
-    - snapshot://wb/2024-06-26/poverty_projections_number_global.csv
-    - snapshot://wb/2024-06-26/poverty_projections_share_regions.csv
-  data://garden/wb/2024-06-26/poverty_projections:
-    - data://meadow/wb/2024-06-26/poverty_projections
-  data://grapher/wb/2024-06-26/poverty_projections:
-    - data://garden/wb/2024-06-26/poverty_projections
-
   # Institute of Global Homelessness - Better Data Project
   data://meadow/igh/2024-07-05/better_data_homelessness:
     - snapshot://igh/2024-07-05/better_data_homelessness.xlsx
@@ -129,3 +121,11 @@ steps:
     - data://meadow/igh/2024-07-05/better_data_homelessness
   data://grapher/igh/2024-07-05/better_data_homelessness:
     - data://garden/igh/2024-07-05/better_data_homelessness
+
+  # Poverty projections from the Poverty, Prosperity and Planet Report 2024
+  data://meadow/wb/2024-12-03/poverty_projections:
+    - snapshot://wb/2024-12-03/reproducibility_package_poverty_prosperity_planet.zip
+  data://garden/wb/2024-12-03/poverty_projections:
+    - data://meadow/wb/2024-12-03/poverty_projections
+  data://grapher/wb/2024-12-03/poverty_projections:
+    - data://garden/wb/2024-12-03/poverty_projections

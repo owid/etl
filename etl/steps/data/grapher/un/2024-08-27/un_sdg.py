@@ -51,7 +51,7 @@ def run(dest_dir: str) -> None:
 
         log.info("un_sdg.process", table_name=var)
 
-        tb = ds_garden.read_table(var)
+        tb = ds_garden.read(var, safe_types=False)
 
         tb = create_table(tb)
 

@@ -4,17 +4,17 @@ import re
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, Optional, Union
+from typing import Any, Iterator, Optional, Union, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
 import structlog
 import yaml
-from dataclasses_json import dataclass_json
 from owid.catalog import Table, s3_utils
 from owid.catalog.meta import (
     DatasetMeta,
     License,
+    MetaBase,
     Origin,
     Source,
     TableMeta,
@@ -22,6 +22,7 @@ from owid.catalog.meta import (
 )
 from owid.datautils import dataframes
 from owid.datautils.io import decompress_file
+from owid.repack import to_safe_types
 from owid.walden import files
 
 from etl import config, paths
@@ -59,11 +60,7 @@ class Snapshot:
     @property
     def metadata_path(self) -> Path:
         """Path to metadata file."""
-        archive_path = Path(f"{paths.SNAPSHOTS_DIR_ARCHIVE / self.uri}.dvc")
-        if archive_path.exists():
-            return archive_path
-        else:
-            return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
+        return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
     def _download_dvc_file(self, md5: str) -> None:
         """Download file from remote to self.path."""
@@ -287,9 +284,8 @@ class Snapshot:
 
 
 @pruned_json
-@dataclass_json
 @dataclass
-class SnapshotMeta:
+class SnapshotMeta(MetaBase):
     # how we identify the dataset, determined automatically from snapshot path
     namespace: str  # a short source name (usually institution name)
     version: str  # date, `latest` or year (discouraged)
@@ -342,7 +338,7 @@ class SnapshotMeta:
 
         return yaml_dump({"meta": d})  # type: ignore
 
-    def save(self) -> None:
+    def save(self) -> None:  # type: ignore
         self.path.parent.mkdir(exist_ok=True, parents=True)
         with open(self.path, "w") as f:
             f.write(self.to_yaml())
@@ -407,13 +403,6 @@ class SnapshotMeta:
             raise ValueError(f"Snapshot {self.uri} hasn't been added to DVC yet")
         assert len(self.outs) == 1
         return self.outs[0]["md5"]
-
-    def to_dict(self) -> Dict[str, Any]:
-        ...
-
-    @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "SnapshotMeta":
-        ...
 
     def fill_from_backport_snapshot(self, snap_config_path: Path) -> None:
         """Load metadat from backported snapshot.
@@ -492,6 +481,7 @@ def read_table_from_snapshot(
     table_metadata: TableMeta,
     snapshot_origin: Union[Origin, None],
     file_extension: str,
+    safe_types: bool = True,
     *args,
     **kwargs,
 ) -> Table:
@@ -508,23 +498,28 @@ def read_table_from_snapshot(
     }
     # Read table
     if file_extension == "csv":
-        return pr.read_csv(*args, **kwargs)
+        tb = pr.read_csv(*args, **kwargs)
     elif file_extension == "feather":
-        return pr.read_feather(*args, **kwargs)
+        tb = pr.read_feather(*args, **kwargs)
     elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
-        return pr.read_excel(*args, **kwargs)
+        tb = pr.read_excel(*args, **kwargs)
     elif file_extension == "json":
-        return pr.read_json(*args, **kwargs)
+        tb = pr.read_json(*args, **kwargs)
     elif file_extension == "dta":
-        return pr.read_stata(*args, **kwargs)
+        tb = pr.read_stata(*args, **kwargs)
     elif file_extension == "rds":
-        return pr.read_rds(*args, **kwargs)
+        tb = pr.read_rds(*args, **kwargs)
     elif file_extension == "rda":
-        return pr.read_rda(*args, **kwargs)
+        tb = pr.read_rda(*args, **kwargs)
     elif file_extension == "parquet":
-        return pr.read_parquet(*args, **kwargs)
+        tb = pr.read_parquet(*args, **kwargs)
     else:
         raise ValueError(f"Unknown extension {file_extension}")
+
+    if safe_types:
+        tb = cast(Table, to_safe_types(tb))
+
+    return tb
 
 
 def add_snapshot(

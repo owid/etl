@@ -1,0 +1,105 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  others:
+    interval:
+      <% if interval == "cumulative" %>
+      over time
+      <% elif interval == "weekly" %>
+      in the last week
+      <% elif interval == "4-weekly" %>
+      in the last four weeks
+      <% elif interval == "7-day rolling sum" %>
+      in the last 7 days
+      <%- endif -%>
+  common:
+    presentation:
+      topic_tags:
+        - COVID-19
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  contributions:
+    variables:
+      new_issue:
+        title: "Number of created issues (<<interval.title()>>)"
+        unit: issue
+        description_short: "The number of new issues created in the GitHub repository {definitions.others.interval}."
+      new_pr:
+        title: "Number of created pull requests (<<interval.title()>>)"
+        unit: pull request
+        description_short: "The number of new pull requests created in the GitHub repository {definitions.others.interval}."
+      new_issue_or_pr:
+        title: "Number of created issues or pull requests (<<interval.title()>>)"
+        unit: issue or pull request
+        description_short: "The number of new issues or pull requests created in the GitHub repository {definitions.others.interval}."
+      new_comment_issue_or_pr:
+        title: "Number of comments on issues or pull requests (<<interval.title()>>)"
+        unit: comments
+        description_short: "The number of new comments on issues or pull requests in the GitHub repository {definitions.others.interval}."
+      new_contributions:
+        title: "Number of contributions (<<interval.title()>>)"
+        unit: contributions
+        description_short: "The number of new contributions in the GitHub repository {definitions.others.interval}. A contribution can be a new issue, a new pull request, or a comment on an issue or pull request."
+
+  user_contributions:
+    variables:
+      number_distinct_users_create_issue:
+        title: Number of users who created an issue (<<interval.title()>>)
+        unit: users
+        short_unit: users
+        description_short: |-
+          Number of new users that contributed by creating at least one issue in the GitHub repository {definitions.others.interval}.
+
+      number_distinct_users_create_pr:
+        title: Number of users who created an pull request (<<interval.title()>>)
+        unit: users
+        short_unit: users
+        description_short: Number of new users that contributed by creating at least one pull request in the GitHub repository {definitions.others.interval}.
+
+      number_distinct_users_create_any:
+        title: Number of users who created an issue or pull request (<<interval.title()>>)
+        unit: users
+        short_unit: users
+        description_short: Number of new users that contributed by creating at least one issue or one pull request in the GitHub repository {definitions.others.interval}.
+
+      number_distinct_users_comment_issue:
+        title: Number of users who commented on an issue or pull request (<<interval.title()>>)
+        unit: users
+        short_unit: users
+        description_short: Number of new users that contributed by commenting to an existing issue or pull request in the GitHub repository {definitions.others.interval}.
+
+      number_distinct_users_comment_pr:
+        title: Number of users who added a code-review comment on a pull request (<<interval.title()>>)
+        unit: users
+        short_unit: users
+        description_short: Number of new users that contributed by commenting to a code snippet of an existing pull request in the GitHub repository {definitions.others.interval}.
+
+      number_distinct_users_comment_any:
+        title: Number of users who commented on an issue or pull request in any form (<<interval.title()>>)
+        unit: users
+        short_unit: users
+        description_short: Number of new users that contributed by commenting to an existing issue or pull request (in any form) in the GitHub repository {definitions.others.interval}.
+
+      number_distinct_users_issue:
+        title: Number of users who participated on an issue (<<interval.title()>>)
+        unit: users
+        short_unit: users
+        description_short: Number of new users that contributed either by creating or commenting to at least one issue in the GitHub repository {definitions.others.interval}.
+
+      number_distinct_users_pr:
+        title: Number of users who participated on a pull request (<<interval.title()>>)
+        unit: users
+        short_unit: users
+        description_short: Number of new users that contributed either by creating or commenting to at least one pull request in the GitHub repository {definitions.others.interval}.
+
+      number_distinct_users_any:
+        title: Number of users who participated on an issue or pull request (<<interval.title()>>)
+        unit: users
+        short_unit: users
+        description_short: Number of new users that contributed either by creating or commenting to at least one issue or one pull request in the GitHub repository {definitions.others.interval}.

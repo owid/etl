@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("katic_leigh_2015_australia.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="Top wealth data", usecols="B,I", skiprows=4)
+    tb = snap.read(safe_types=False, sheet_name="Top wealth data", usecols="B,I", skiprows=4)
 
     #
     # Process data.

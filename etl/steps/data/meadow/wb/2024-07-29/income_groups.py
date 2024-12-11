@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     #
     # Load snapshot and read its data.
     snap = paths.load_snapshot("income_groups.xlsx")
-    tb = snap.read(sheet_name="Country Analytical History")
+    tb = snap.read(safe_types=False, sheet_name="Country Analytical History")
 
     #
     # Process data.

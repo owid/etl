@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     for sheet, sheet_name in excel_sheets.items():
         # Retrieve snapshots
         snap = paths.load_snapshot("augmented_hdi.xlsx")
-        tb = snap.read(sheet_name=sheet, skiprows=1)
+        tb = snap.read(safe_types=False, sheet_name=sheet, skiprows=1)
 
         snap_region = paths.load_snapshot("augmented_hdi_region.xlsx")
         tb_region = snap_region.read(sheet_name=sheet + 1, skiprows=2)

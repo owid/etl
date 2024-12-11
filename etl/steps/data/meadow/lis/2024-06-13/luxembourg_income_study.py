@@ -76,7 +76,7 @@ def edit_snapshots_and_add_to_dataset(
         for tb_name, tb_ids in snapshots_dict.items():
             # Retrieve snapshot.
             snap = paths.load_snapshot(f"{tb_name}{age_suffix}.csv")
-            tb = snap.read()
+            tb = snap.read(safe_types=False)
 
             tb[[col for col in tb.columns if col not in tb_ids]] = tb[
                 [col for col in tb.columns if col not in tb_ids]

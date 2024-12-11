@@ -294,7 +294,7 @@ def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
     source = sources[0]
 
     if pd.isnull(source.get("date_accessed")):
-        source.pop("date_accessed")
+        source.pop("date_accessed", None)
 
     if pd.isnull(source.get("publication_year")):
         source.pop("publication_year")

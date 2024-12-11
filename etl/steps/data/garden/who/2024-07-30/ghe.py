@@ -71,20 +71,20 @@ AGE_GROUPS_MAP = {
 def run(dest_dir: str) -> None:
     # read dataset from meadow
     ds_meadow = paths.load_dataset()
-    tb = ds_meadow.read_table("ghe")
+    tb = ds_meadow.read("ghe", safe_types=False)
     tb = tb.drop(columns="flag_level")
 
     tb = rename_table_for_compatibility(tb)
 
     if SUBSET:
-        required_causes = ["Drug use disorders", "Alcohol use disorders"]
+        required_causes = ["Drug use disorders", "Alcohol use disorders", "Self-harm"]
         tb = tb[tb.cause.isin(SUBSET.split(",") + required_causes)]
 
     # Load countries regions
     regions = paths.load_dataset("regions")["regions"]
     # Load WHO Standard population
     snap = paths.load_snapshot("standard_age_distribution.csv")
-    who_standard = snap.read()
+    who_standard = snap.read(safe_types=False)
     who_standard = format_who_standard(who_standard)
     # Read population dataset
     ds_population = paths.load_dataset("un_wpp")
@@ -114,7 +114,7 @@ def run(dest_dir: str) -> None:
 
 def rename_table_for_compatibility(tb: Table) -> Table:
     """Rename columns and labels to be compatible with the previous version of the dataset."""
-    tb.age_group = tb.age_group.map(AGE_GROUPS_MAP)
+    tb.age_group = dataframes.map_series(tb.age_group, AGE_GROUPS_MAP)
     tb = tb.rename(
         columns={
             "val_dths_count_numeric": "death_count",

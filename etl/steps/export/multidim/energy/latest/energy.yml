@@ -89,7 +89,7 @@ views:
         - "grapher/energy/2024-06-20/energy_mix/energy_mix#wind__twh__equivalent"
     config:
       $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
-      type: StackedArea
+      chartTypes: ["StackedArea"]
       tab: chart
       title: Total consumed energy by source
       subtitle: "[Primary energy](#dod:primaryenergy) consumption is measured in [terawatt-hours](#dod:watt-hours), using the [substitution method](#dod:substitutionmethod)."
@@ -107,7 +107,7 @@ views:
         - "grapher/energy/2024-06-20/energy_mix/energy_mix#wind_per_capita__kwh__equivalent"
     config:
       $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
-      type: StackedArea
+      chartTypes: ["StackedArea"]
   - dimensions:
       source: all
       metric: total

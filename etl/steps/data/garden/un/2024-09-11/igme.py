@@ -3,7 +3,7 @@ from math import trunc
 from typing import List
 
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -11,12 +11,16 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+REGIONS = geo.REGIONS
 
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
-    #
+    # Load countries-regions dataset (required to get ISO codes).
+    ds_regions = paths.load_dataset("regions")
+    # Load the population dataset
+    ds_population = paths.load_dataset("population")
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("igme", version=paths.version)
     # Load vintage dataset which has older data needed for youth mortality
@@ -42,6 +46,11 @@ def run(dest_dir: str) -> None:
     # Filter out just the bits of the data we want
     tb = filter_data(tb)
     tb = round_down_year(tb)
+    # add regional data for count variables
+    tb = add_regional_totals_for_counts(tb, ds_regions)
+    # add regional population weighted averages for rate variables
+    tb = add_population_weighted_regional_averages_for_rates(tb, ds_population, ds_regions)
+
     # Removing commas from the unit of measure
     tb["unit_of_measure"] = tb["unit_of_measure"].str.replace(",", "", regex=False)
     tb["source"] = "igme (current)"
@@ -55,12 +64,11 @@ def run(dest_dir: str) -> None:
         )
     ]
 
-    # Combine datasets with a preference for the current data when there is a conflict.
+    # Combine datasets with a preference for the current data when there is a conflict - this is needed to calculate the youth mortality rate.
 
     tb_com = combine_datasets(
         tb_a=tb_under_fifteen, tb_b=tb_vintage, table_name="igme_combined", preferred_source="igme (current)"
     )
-
     tb_com = calculate_under_fifteen_deaths(tb_com)
     tb_com = calculate_under_fifteen_mortality_rates(tb_com)
     tb_com = tb_com.format(["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"])
@@ -82,6 +90,67 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def add_regional_totals_for_counts(tb: Table, ds_regions: Dataset) -> Table:
+    """
+    Adding regional sums for variables that are counts
+    """
+    tb_counts = tb[tb["unit_of_measure"] == "Number of deaths"]
+
+    tb_all_regions = Table()
+    for region in REGIONS:
+        regions = geo.list_members_of_region(region=region, ds_regions=ds_regions)
+        tb_region = tb_counts[tb_counts["country"].isin(regions)]
+        tb_region = (
+            tb_region.groupby(["year", "indicator", "sex", "wealth_quintile"])[
+                ["obs_value", "lower_bound", "upper_bound"]
+            ]
+            .sum()
+            .reset_index()
+        )
+        tb_region["country"] = region
+        tb_region["unit_of_measure"] = "Number of deaths"
+        tb_all_regions = pr.concat([tb_all_regions, tb_region])
+
+    tb = pr.concat([tb, tb_all_regions])
+
+    return tb
+
+
+def add_population_weighted_regional_averages_for_rates(
+    tb: Table, ds_population: Dataset, ds_regions: Dataset
+) -> Table:
+    """
+    Adding population-weighted averages for the death rates
+    """
+    tb_rates = tb[tb["unit_of_measure"] != "Number of deaths"]
+    tb_rates = geo.add_population_to_table(tb_rates, ds_population)
+    msk = tb_rates["population"].isna()
+    # Dropping out regions that don't have a population
+    tb_rates = tb_rates[~msk]
+
+    tb_rates["obs_value_pop"] = tb_rates["obs_value"] * tb_rates["population"]
+    tb_rates = tb_rates.drop(columns=["lower_bound", "upper_bound"])
+    tb_all_regions = Table()
+    for region in REGIONS:
+        regions = geo.list_members_of_region(region=region, ds_regions=ds_regions)
+        tb_region = tb_rates[tb_rates["country"].isin(regions)]
+        tb_region = (
+            tb_region.groupby(["year", "indicator", "sex", "wealth_quintile", "unit_of_measure"])[
+                ["obs_value_pop", "population"]
+            ]
+            .sum()
+            .reset_index()
+        )
+        tb_region["country"] = region
+        tb_region["obs_value"] = tb_region["obs_value_pop"] / tb_region["population"]
+        tb_region = tb_region.drop(columns=["obs_value_pop", "population"])
+        tb_all_regions = pr.concat([tb_all_regions, tb_region])
+
+    tb = pr.concat([tb, tb_all_regions])
+
+    return tb
 
 
 def convert_to_percentage(tb: Table) -> Table:

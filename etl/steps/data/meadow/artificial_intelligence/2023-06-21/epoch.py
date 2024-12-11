@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("epoch.csv")
 
     # Read snapshot
-    df = snap.read()
+    df = snap.read(safe_types=False)
     #
     # Process data.
     #

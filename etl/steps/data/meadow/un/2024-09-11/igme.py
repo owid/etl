@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("igme.zip")
 
     # Load data from snapshot.
-    tb = snap.read_in_archive("UN IGME 2023.csv", low_memory=False)
+    tb = snap.read_in_archive("UN IGME 2023.csv", low_memory=False, safe_types=False)
     #
     # Process data.
     #

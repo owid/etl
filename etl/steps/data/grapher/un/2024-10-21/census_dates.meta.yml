@@ -1,0 +1,34 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - State Capacity
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  years_since_last_census:
+    variables:
+      years_since_last_census:
+        title: Years since last census
+        description_short: The number of years since the last census of this country
+        unit: years
+        short_unit: ""
+      last_census:
+        title: Year of the last census
+        description_short: Year of the last census in this country
+        unit: year
+        short_unit: ""
+      recent_census:
+        title: Population census recently completed
+        description_short: Population census completed in the last 10 years. Population censuses collect data on the size, distribution and composition of the population.
+        unit: ""
+        short_unit: ""
+
+

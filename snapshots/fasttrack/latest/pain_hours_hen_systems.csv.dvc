@@ -1,23 +1,17 @@
 meta:
+  source:
+    name: Welfare Footprint based on Schuck-Paim and Alonso (2021)
+    url: https://welfarefootprint.org/research-projects/laying-hens/
+    source_data_url: |-
+      gAAAAABnRY4A9xP89q46o72YIhvw5MBBfzt_84o2BNljMcBv29JHUFXvVtuYbTDPVsVbX-hfm9rZ8DJ-rW8qWqW0lWbhRDNvNd_ncCTITnovArjMEeLU41PNBF1vXiAz3Exdbb4orqamK0KosiZFwIKGtyvRFrF7XOH32d6O3z8ybbYchAUPJ8fqDyHP87olHyJt21OraPoNDQZ-MmNI5oSAHeMlz6zqyaEtO6mfd1g98R0B5QG6wf4zx7ogpunekE2MdQl1bOkQ
+    date_accessed: '2024-11-26'
+    publication_year: 2021
+    published_by: Welfare Footprint
   name: Pain hours of hen systems (Welfare Footprint)
   description: ''
-  source:
-    name: Google Sheet
-    description:
-    url: https://welfarefootprint.org/research-projects/laying-hens/
-    source_data_url: 
-      gAAAAABkwT3GHig9-hHZr_XHHeWuAsK5PHjtz55H-Tvu_KCW-XytOuBUvNMnrv3hZ593VSyU95XV8hLYTSto8khid8slVfs4OA7joXQ4qzAsufp7A3vltFcf9o3BbCJseT64F2CYUUgMkJ9ptK0YjR0E2VhxNWylRc5G8OCv19srGHlFBGjG7_isIrTbJimw3L_c4hmRMlUNEZMMoo9OyTNjNRKb6Ta_4bkYL4xn6hBHt-89D_6xF58zl2ZQFdtjZn69vnwBW58p
-    owid_data_url:
-    date_accessed: '2023-07-26'
-    publication_date:
-    publication_year: 2021
-    published_by: Google Sheet
-  license:
-    name:
-    url:
+  license: {}
   is_public: false
-wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 73b70fa53e689c7115055f982d9b17b5
-  size: 228
-  path: pain_hours_hen_systems.csv
+  - md5: daf4b07b53f3eb73c1725266e6e7b83c
+    size: 466
+    path: pain_hours_hen_systems.csv

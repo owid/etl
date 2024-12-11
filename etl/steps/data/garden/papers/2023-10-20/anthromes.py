@@ -259,6 +259,6 @@ def assign_land_use_types(tb: Table) -> Table:
         70: "No land",
     }
 
-    tb["value"] = tb["value"].replace(land_use_dict)
+    tb["value"] = tb["value"].astype(object).replace(land_use_dict)
 
     return tb

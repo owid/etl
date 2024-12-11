@@ -52,6 +52,7 @@ def run(dest_dir: str) -> None:
         .groupby(["status", "year"], as_index=False)
         .count()
         .pivot(index="year", columns="status", join_column_levels_with="_")
+        .rename(columns={"year_<NA>": "year"})
     )
 
     # Rename columns conveniently.

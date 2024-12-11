@@ -7,19 +7,6 @@ steps:
   data://garden/papers/2023-12-12/smil_2017:
     - data://meadow/papers/2023-12-12/smil_2017
   #
-  # IRENA - Renewable electricity capacity.
-  #
-  data://meadow/irena/2023-12-12/renewable_electricity_capacity:
-    - snapshot://irena/2023-12-12/renewable_electricity_capacity_and_generation.xlsm
-  data://garden/irena/2023-12-12/renewable_electricity_capacity:
-    - data://meadow/irena/2023-12-12/renewable_electricity_capacity
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
-  data://grapher/irena/2023-12-12/renewable_electricity_capacity_by_technology:
-    - data://garden/irena/2023-12-12/renewable_electricity_capacity
-  data://grapher/irena/2023-12-12/renewable_electricity_capacity:
-    - data://garden/irena/2023-12-12/renewable_electricity_capacity
-  #
   # IRENA - Renewable energy patents.
   #
   data://meadow/irena/2023-12-12/renewable_energy_patents:
@@ -192,30 +179,103 @@ steps:
   export://multidim/energy/latest/energy:
     - grapher://grapher/energy/2024-06-20/primary_energy_consumption
   #
+  # IRENA - Renewable electricity capacity.
+  #
+  data://meadow/irena/2024-11-01/renewable_capacity_statistics:
+    - snapshot://irena/2024-11-01/renewable_capacity_statistics.xlsx
+  #
+  # IRENA - Renewable electricity capacity.
+  #
+  data://garden/irena/2024-11-01/renewable_capacity_statistics:
+    - data://meadow/irena/2024-11-01/renewable_capacity_statistics
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+  #
+  # IRENA - Renewable electricity capacity.
+  #
+  data://grapher/irena/2024-11-01/renewable_capacity_statistics_by_technology:
+    - data://garden/irena/2024-11-01/renewable_capacity_statistics
+  #
+  # IRENA - Renewable electricity capacity.
+  #
+  data://grapher/irena/2024-11-01/renewable_capacity_statistics:
+    - data://garden/irena/2024-11-01/renewable_capacity_statistics
+  #
   # IRENA - Renewable power generation costs.
   #
-  data://meadow/irena/2024-10-29/renewable_power_generation_costs:
-    - snapshot://irena/2024-10-29/renewable_power_generation_costs.xlsx
+  data://meadow/irena/2024-11-15/renewable_power_generation_costs:
+    - snapshot://irena/2024-11-15/renewable_power_generation_costs.xlsx
   #
   # IRENA - Renewable power generation costs.
   #
-  data://garden/irena/2024-10-29/renewable_power_generation_costs:
-    - data://meadow/irena/2024-10-29/renewable_power_generation_costs
-  #
-  # IRENA - Renewable power generation costs.
-  #
-  data://grapher/irena/2024-10-29/renewable_power_generation_costs:
-    - data://garden/irena/2024-10-29/renewable_power_generation_costs
+  data://garden/irena/2024-11-15/renewable_power_generation_costs:
+    - data://meadow/irena/2024-11-15/renewable_power_generation_costs
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  data://garden/energy/2024-10-30/photovoltaic_cost_and_capacity:
+  data://garden/energy/2024-11-15/photovoltaic_cost_and_capacity:
     - data://garden/papers/2023-12-12/farmer_lafond_2016
-    - data://garden/irena/2023-12-12/renewable_electricity_capacity
     - data://garden/papers/2023-12-12/nemet_2009
-    - data://garden/irena/2024-10-29/renewable_power_generation_costs
+    - data://garden/irena/2024-11-15/renewable_power_generation_costs
+    - data://garden/irena/2024-11-01/renewable_capacity_statistics
+  #
+  # IRENA - Renewable power generation costs.
+  #
+  data://grapher/irena/2024-11-15/renewable_power_generation_costs:
+    - data://garden/irena/2024-11-15/renewable_power_generation_costs
   #
   # Energy - Photovoltaic cost and capacity.
   #
-  data://grapher/energy/2024-10-30/photovoltaic_cost_and_capacity:
-    - data://garden/energy/2024-10-30/photovoltaic_cost_and_capacity
+  data://grapher/energy/2024-11-15/photovoltaic_cost_and_capacity:
+    - data://garden/energy/2024-11-15/photovoltaic_cost_and_capacity
+  #
+  # Eurostat - Energy statistics, prices of natural gas and electricity
+  #
+  data://meadow/eurostat/2024-11-05/gas_and_electricity_prices:
+    - snapshot://eurostat/2024-11-05/gas_and_electricity_prices.zip
+  #
+  # Eurostat - Energy statistics, prices of natural gas and electricity
+  #
+  data://garden/eurostat/2024-11-05/gas_and_electricity_prices:
+    - data://meadow/eurostat/2024-11-05/gas_and_electricity_prices
+  #
+  # Ember - European wholesale electricity prices
+  #
+  data://meadow/ember/2024-11-20/european_wholesale_electricity_prices:
+    - snapshot://ember/2024-11-20/european_wholesale_electricity_prices.csv
+  #
+  # Ember - European wholesale electricity prices
+  #
+  data://garden/ember/2024-11-20/european_wholesale_electricity_prices:
+    - data://meadow/ember/2024-11-20/european_wholesale_electricity_prices
+  #
+  # IEA - Fossil fuel subsidies
+  #
+  data://meadow/iea/2024-11-20/fossil_fuel_subsidies:
+    - snapshot://iea/2024-11-20/fossil_fuel_subsidies.xlsx
+  #
+  # IEA - Fossil fuel subsidies
+  #
+  data://garden/iea/2024-11-20/fossil_fuel_subsidies:
+    - data://meadow/iea/2024-11-20/fossil_fuel_subsidies
+  #
+  # IEA - Fossil fuel subsidies
+  #
+  data://grapher/iea/2024-11-20/fossil_fuel_subsidies:
+    - data://garden/iea/2024-11-20/fossil_fuel_subsidies
+  #
+  # Energy prices
+  #
+  data://garden/energy/2024-11-20/energy_prices:
+    - data://garden/eurostat/2024-11-05/gas_and_electricity_prices
+    - data://garden/ember/2024-11-20/european_wholesale_electricity_prices
+  #
+  # Energy prices
+  #
+  data://grapher/energy/2024-11-20/energy_prices:
+    - data://garden/energy/2024-11-20/energy_prices
+  #
+  # Energy prices explorer
+  #
+  export://multidim/energy/latest/energy_prices:
+    - data://grapher/energy/2024-11-20/energy_prices

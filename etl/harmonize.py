@@ -120,11 +120,15 @@ def harmonize_ipython(
     # Run automatic harmonization
     harmonizer.run_automatic(logging="ipython")
 
-    # Need user input
-    harmonizer.run_interactive_ipython(
-        institution=institution,
-        num_suggestions=num_suggestions,
-    )
+    # Export mapping immediately after automatic harmonization
+    harmonizer.export_mapping()
+
+    # If there are ambiguous countries, proceed with interactive harmonization
+    if harmonizer.ambiguous:
+        harmonizer.run_interactive_ipython(
+            institution=institution,
+            num_suggestions=num_suggestions,
+        )
 
 
 def read_table(input_file: str) -> pd.DataFrame:
@@ -144,6 +148,7 @@ class CountryRegionMapper:
     # known aliases of our canonical geo-regions
     aliases: Dict[str, str]
     valid_names: Set[str]
+    owid_continents: Set[str]
 
     def __init__(self) -> None:
         try:
@@ -172,6 +177,11 @@ class CountryRegionMapper:
 
         self.aliases = aliases
         self.valid_names = valid_names
+
+        # continents defined by OWID that require explicit confirmation
+        self.owid_continents = set(
+            rc_df[(rc_df.defined_by == "owid") & (rc_df.region_type.isin({"continent", "aggregate"}))].name
+        ) - {"World"}
 
     def __contains__(self, key: str) -> bool:
         return key.lower() in self.aliases
@@ -324,15 +334,20 @@ class Harmonizer:
         for region in self.geo:
             if region in self.mapping:
                 # we did this one in a previous run
-                continue
+                pass
 
-            if region in self.mapper:
+            elif region in self.mapper.owid_continents:
+                # continents require explicit confirmation to avoid accidental mappings to "Asia" instead of "Asia (UN)"
+                ambiguous.append(region)
+
+            elif region in self.mapper:
                 # it's an exact match for a country/region or its known aliases
                 name = self.mapper[region]
                 self.mapping[region] = name
-                continue
 
-            ambiguous.append(region)
+            else:
+                # unknown country
+                ambiguous.append(region)
 
         # logging
         if logging == "ipython":
@@ -579,7 +594,6 @@ class Harmonizer:
     def export_excluded_countries(self):
         if not self.excluded:
             return
-
         if self.output_file is None:
             raise ValueError("`output_file` not provided")
         assert ".countries." in str(self.output_file), "Output file is not in **/*.countries.json format"

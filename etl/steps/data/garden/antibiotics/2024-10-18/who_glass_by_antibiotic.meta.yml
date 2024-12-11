@@ -1,0 +1,40 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Antibiotics
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  bci_table:
+    variables:
+      bcis_per_million:
+        title: Rate of << syndrome.lower() >> infections where the pathogen is << pathogen >>
+        description_short: Bacteriologically confirmed << syndrome.lower() >> infections where the pathogen is << pathogen >> per million people.
+        unit: infections per million
+      total_bcis:
+        title: Total << syndrome.lower() >> infections where the pathogen is << pathogen >>
+        description_short: Total bacteriologically confirmed << syndrome.lower() >> infections where the pathogen is << pathogen >>
+        unit: infections
+  antibiotic_table:
+    variables:
+      bcis_with_ast_per_million:
+        title: Rate of << syndrome.lower() >> infections with susceptibility to << antibiotic.lower() >> where the pathogen is << pathogen >>
+        description_short: Bacteriologically confirmed << syndrome.lower() >> infections with susceptibility to << antibiotic.lower() >> where the pathogen is << pathogen >> per million people.
+        unit: infections per million
+      total_bcis_with_ast:
+        title: Total << syndrome.lower() >> infections with susceptibility to << antibiotic >> where the pathogen is << pathogen >>
+        description_short: Total bacteriologically confirmed << syndrome.lower() >> infections with susceptibility to << antibiotic >> where the pathogen is << pathogen >>.
+        unit: infections
+      share_bcis_with_ast:
+        title: Share of << syndrome.lower() >> infections with susceptibility to << antibiotic >> where the pathogen is << pathogen >>
+        description_short: Share of bacteriologically confirmed << syndrome.lower() >> infections with susceptibility to << antibiotic >> where the pathogen is << pathogen >>
+        unit: "%"
+        short_unit: "%"

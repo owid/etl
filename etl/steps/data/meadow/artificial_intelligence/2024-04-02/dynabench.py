@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     column_names = ["benchmark", "date", "performance"]
 
-    tb = snap.read(sheet_name="Chart Data", header=None, names=column_names)
+    tb = snap.read(safe_types=False, sheet_name="Chart Data", header=None, names=column_names)
 
     tb["date"] = tb["date"].astype(str)  # Convert to string for extracting year
     tb["date"] = tb["date"].str[:4]  # Extract year from date

@@ -432,9 +432,8 @@ def fetch_db_checksum(dataset: catalog.Dataset) -> Optional[str]:
 
     with Session(get_engine()) as session:
         q = select(gm.Dataset).where(
-            gm.Dataset.shortName == dataset.metadata.short_name,
-            gm.Dataset.version == dataset.metadata.version,
-            gm.Dataset.namespace == dataset.metadata.namespace,
+            gm.Dataset.catalogPath
+            == f"{dataset.metadata.namespace}/{dataset.metadata.version}/{dataset.metadata.short_name}"
         )
         ds = session.scalars(q).one_or_none()
         return ds.sourceChecksum if ds is not None else None

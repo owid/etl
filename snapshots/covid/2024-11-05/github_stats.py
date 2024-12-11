@@ -8,16 +8,20 @@ The data for these snapshots has been manually obtained via the GitHub API. We h
 
 If you want to retrieve this data again, please look at the script `get_stats.py` in the same folder. You can simply execute it. To run different parts of the script please use the variables at the top of the script EXECUTE_ISSUES, EXECUTE_PRS, EXECUTE_COMMIT.
 
-    python snapshots/covid/2024-11-05/github_stats.py \
-        --issues gh_stats/issues-20241104000000.csv \
-        --issues-comments gh_stats/comments-issues-20241104000000.csv \
-        --issues-users gh_stats/users-issues-20241104000000.csv \
-        --pr gh_stats/prs-20241105104652.csv \
-        --pr-comments gh_stats/comments-prs-20241105104652.csv \
-        --pr-users gh_stats/users-prs-20241105104652.csv \
-        --commits gh_stats/commits/8800-commits-20241105165504.csv \
-        --commits-users gh_stats/commits/8800-users-commits-20241105165504.csv
+Run this snapshot script as:
 
+    python snapshots/covid/2024-11-05/github_stats.py \
+        --issues gh_stats/issues-20241106211832.csv \
+        --issues-comments gh_stats/comments-issues-20241106211832.csv \
+        --issues-users gh_stats/users-issues-20241106211832.csv \
+        --pr gh_stats/prs-20241106220603.csv \
+        --pr-comments gh_stats/comments-prs-20241106220603.csv \
+        --pr-users gh_stats/users-prs-20241106220603.csv \
+        --commits gh_stats/commits/10800-commits-20241105182054.csv \
+        --commits-users gh_stats/commits/10800-users-commits-20241105182054.csv \
+        --vax-reporting first_reporting_dates.csv
+
+NOTE: To get data on when countries first reported vaccination data, please refer to get_vax_reporting.py script.
 """
 
 from pathlib import Path
@@ -44,6 +48,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--pr-comments", type=str, help="File with data on PR comments.")
 @click.option("--pr-users", type=str, help="File with data on users that commented in PRs.")
 @click.option("--commits", type=str, help="File with data on commits.")
+@click.option("--vax-reporting", type=str, help="File with data on reporting of vaccination data.")
 @click.option("--commits-users", type=str, help="File with data on commit users.")
 def main(
     upload: bool,
@@ -55,6 +60,7 @@ def main(
     pr_users: Optional[str] = None,
     commits: Optional[str] = None,
     commits_users: Optional[str] = None,
+    vax_reporting: Optional[str] = None,
 ) -> None:
     snapshot_paths = [
         (issues, "github_stats_issues.csv"),
@@ -65,6 +71,7 @@ def main(
         (pr_users, "github_stats_pr_users.csv"),
         (commits, "github_stats_commits.csv"),
         (commits_users, "github_stats_commits_users.csv"),
+        (vax_reporting, "github_stats_vax_reporting.csv"),
     ]
 
     for paths in snapshot_paths:

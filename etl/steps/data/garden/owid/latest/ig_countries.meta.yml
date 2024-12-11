@@ -1,0 +1,39 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ig_countries:
+    variables:
+      count:
+        title: Country in post (flag)
+        unit: ""
+      share_post:
+        title: Country in post (share of post)
+        unit: "%"
+        short_unit: "%"
+        description_short: If there are 4 countries in the post, each country will have a share of 25%
+      counts_cum:
+        title: Total count of posts with country
+        unit: "posts"
+  summary:
+    variables:
+      proportion:
+        title: Share of posts mentioning a country
+        unit: "%"
+        short_unit: "%"
+        description_short: Proportion of posts with country
+      proportion_weighed:
+        title: Average mention of a country in a post
+        unit: ""
+        description_short: If there are two posts, and the first one mentions a country A and another country, this equals to (50% + 0%)/2 = 25%

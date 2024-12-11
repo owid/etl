@@ -212,7 +212,7 @@ def _prepare_table_for_aggregates(tb: Table) -> Table:
 
     Often, values for certain countries are missing. This can lead to very large under-estimates regional values. To mitigate this, we combine zero-filling with interpolation and other techniques.
     """
-    tb_agg = expand_time_column(tb, "country", "date", method="full_range")
+    tb_agg = expand_time_column(tb, dimension_col="country", time_col="date", method="full_range")
     cols_index = ["country", "date"]
     # cumulative metrics: Interpolate, forward filling (for latest) + zero-filling (for remaining NaNs, likely at start)
     cols_ffill = [
