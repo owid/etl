@@ -76,9 +76,9 @@ definitions:
        Sex: <<sex.title()>>s -
       <%- endif %>
       <%- if (age == 'total') %>
-       Age: All
+       Age: All -
       <% else %>
-       Age: <<age>>
+       Age: <<age>> -
       <%- endif %>
       <%- if (education == 'total') %>
        Education: All
