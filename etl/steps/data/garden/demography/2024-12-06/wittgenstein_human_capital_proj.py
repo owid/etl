@@ -2,7 +2,7 @@
 
 from etl.helpers import PathFinder, create_dataset
 
-from shared import add_dim_15plus, add_dim_some_education, add_prop, make_table
+from .shared import add_dim_15plus, add_dim_some_education, add_prop, make_table
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
