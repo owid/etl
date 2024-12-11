@@ -446,53 +446,41 @@ class VersionTracker:
         """Get the path to the script of a given step."""
         # Get step attributes.
         _, step_type, _, channel, namespace, version, name, _ = extract_step_attributes(step=step).values()
-        state = "active" if step in self.all_active_steps else "archive"
 
         # Create a dictionary that contains the path to a script for a given step.
         # This dictionary has to keys, namely "active" and "archive".
         # Active steps should have a script in the active directory.
         # But steps that are in the archive dag can be either in the active or the archive directory.
-        path_to_script = {"active": None, "archive": None}
+        path_to_script = None
         if step_type == "export":
-            path_to_script["active"] = paths.STEP_DIR / "export" / channel / namespace / version / name  # type: ignore
+            path_to_script = paths.STEP_DIR / "export" / channel / namespace / version / name  # type: ignore
         elif channel == "snapshot":
-            path_to_script["active"] = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.SNAPSHOTS_DIR_ARCHIVE / namespace / version / name  # type: ignore
+            path_to_script = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
         elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
-            path_to_script["active"] = paths.STEP_DIR / "data" / channel / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.STEP_DIR_ARCHIVE / channel / namespace / version / name  # type: ignore
+            path_to_script = paths.STEP_DIR / "data" / channel / namespace / version / name  # type: ignore
         elif channel == "walden":
-            path_to_script["active"] = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
+            path_to_script = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
         elif channel in ["backport", "etag"]:
             # Ignore these channels, for which there is never a script.
             return None
         else:
             log.error(f"Unknown channel {channel} for step {step}.")
 
-        if state == "active":
-            # Steps in the active dag should only have a script in the active directory.
-            del path_to_script["archive"]
-
         path_to_script_detected = None
-        for state in path_to_script:
-            # A step script can exist either as a .py file, as a .ipynb file, or a __init__.py file inside a folder.
-            # In the case of snapshots, there may or may not be a .py file, but there definitely needs to be a dvc file.
-            # In that case, the corresponding script is not trivial to find, but at least we can return the dvc file.
-            for path_to_script_candidate in [
-                path_to_script[state].with_suffix(".py"),  # type: ignore
-                path_to_script[state].with_suffix(".ipynb"),  # type: ignore
-                path_to_script[state] / "__init__.py",  # type: ignore
-                path_to_script[state].with_name(path_to_script[state].name + ".dvc"),  # type: ignore
-            ]:
-                if path_to_script_candidate.exists():
-                    path_to_script_detected = path_to_script_candidate
-                    break
+        # A step script can exist either as a .py file, as a .ipynb file, or a __init__.py file inside a folder.
+        # In the case of snapshots, there may or may not be a .py file, but there definitely needs to be a dvc file.
+        # In that case, the corresponding script is not trivial to find, but at least we can return the dvc file.
+        for path_to_script_candidate in [
+            path_to_script.with_suffix(".py"),  # type: ignore
+            path_to_script.with_suffix(".ipynb"),  # type: ignore
+            path_to_script / "__init__.py",  # type: ignore
+            path_to_script.with_name(path_to_script.name + ".dvc"),  # type: ignore
+        ]:
+            if path_to_script_candidate.exists():
+                path_to_script_detected = path_to_script_candidate
+                break
         if path_to_script_detected is None:
-            if state == "active":
-                log.error(f"Script for step {step} not found.")
-            else:
-                log.warning(f"Script for archive step {step} not found.")
+            log.error(f"Script for step {step} not found.")
 
         if omit_base_dir and path_to_script_detected is not None:
             # Return the path relative to the base directory (omitting the local path to the ETL repos).

@@ -1,5 +1,6 @@
 import datetime as dt
 import difflib
+import json
 import pprint
 from typing import Any, Dict, List, Optional
 
@@ -653,6 +654,7 @@ def _modified_chart_configs_on_staging(
     select
         c.id as chartId,
         MD5(cc.full) as chartChecksum,
+        cc.full as chartConfig,
         c.lastEditedByUserId as chartLastEditedByUserId,
         c.publishedByUserId as chartPublishedByUserId,
         c.lastEditedAt as chartLastEditedAt
@@ -698,6 +700,20 @@ def _modified_chart_configs_on_staging(
 
     diff = source_df.copy()
     diff["configEdited"] = source_df["chartChecksum"] != target_df["chartChecksum"]
+
+    # Go through edited configs and do a more detailed comparison
+    ix = diff["configEdited"] & target_df["chartChecksum"].notnull()
+    equal_configs = []
+    for chart_id, row in diff.loc[ix].iterrows():
+        source_config = json.loads(row["chartConfig"])
+        target_config = json.loads(target_df.loc[chart_id, "chartConfig"])
+
+        # Compare configs
+        if configs_are_equal(source_config, target_config):
+            equal_configs.append(chart_id)
+
+    # Exclude configs that have different chartChecksum, but are actually the same (e.g. have just different version)
+    diff = diff[~diff.index.isin(equal_configs)]
 
     # Add flag 'edited in staging'
     diff["chartEditedInStaging"] = True
