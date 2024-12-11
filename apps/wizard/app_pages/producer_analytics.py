@@ -266,34 +266,37 @@ Analytics of charts using data by {producers_selected_str} between {min_date} an
 ########################################################################################################################
 
 # Streamlit app layout.
-st.title("📊 Producer analytics")
-
 st.markdown(
-    f"""\
-Explore analytics of data producers.
+    """# 📊 Producer analytics
 
-Select the minimum and maximum dates for the custom date range. Note that this metric started to be recorded on {MIN_DATE.strftime("%Y-%m-%d")}.
-
-"""
+Explore analytics of data producers."""
 )
 
-with st_horizontal():
-    # Create input fields for minimum and maximum dates.
-    min_date = st.date_input("Select minimum date", value=MIN_DATE, key="min_date", format="YYYY-MM-DD").strftime(  # type: ignore
-        "%Y-%m-%d"
+with st.container(border=True):
+    st.markdown(
+        f"Select the minimum and maximum dates for the custom date range (note that this metric started to be recorded on {MIN_DATE.strftime('%Y-%m-%d')})."
     )
-    max_date = st.date_input("Select maximum date", value=TODAY, key="max_date", format="YYYY-MM-DD").strftime(  # type: ignore
-        "%Y-%m-%d"
-    )
-    exclude_auxiliary_steps = st.checkbox(
-        "Exclude auxiliary steps (e.g. population)",
-        False,
-        help="Exclude steps that are commonly used as auxiliary data, so they do not skew the analytics in favor of a few producers. But note that this will exclude all uses of these steps, even when they are the main datasets (not auxiliary). Auxiliary steps are:\n- "
-        + "\n- ".join(sorted(AUXILIARY_STEPS)),
-    )
+
+    with st_horizontal():
+        # Create input fields for minimum and maximum dates.
+        min_date = st.date_input("Select minimum date", value=MIN_DATE, key="min_date", format="YYYY-MM-DD").strftime(  # type: ignore
+            "%Y-%m-%d"
+        )
+        max_date = st.date_input("Select maximum date", value=TODAY, key="max_date", format="YYYY-MM-DD").strftime(  # type: ignore
+            "%Y-%m-%d"
+        )
+        exclude_auxiliary_steps = st.checkbox(
+            "Exclude auxiliary steps (e.g. population)",
+            False,
+            help="Exclude steps that are commonly used as auxiliary data, so they do not skew the analytics in favor of a few producers. But note that this will exclude all uses of these steps, even when they are the main datasets (not auxiliary). Auxiliary steps are:\n- "
+            + "\n- ".join(sorted(AUXILIARY_STEPS)),
+        )
+
 if exclude_auxiliary_steps:
+    # If the user wants to exclude auxiliary steps, take the default list of excluded steps.
     excluded_steps = AUXILIARY_STEPS
 else:
+    # Otherwise, do not exclude any steps.
     excluded_steps = []
 
 st.markdown(
@@ -401,7 +404,7 @@ else:
 st.markdown(
     """## Analytics by chart
 
-Number of chart views for each chart that uses data of the selected producers.
+Number of views for each chart that uses data by the selected producers.
 """
 )
 
