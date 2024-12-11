@@ -71,9 +71,9 @@ tables:
   country_reporting_delay:
     variables:
       num_days_delay_in_reporting:
-        title: Number of days needed to first report data on COVID-19 << type >> since the first vaccine was administered
+        title: Number of days needed to first report data on COVID-19 << type | default('') >> since the first vaccine was administered
         description_short: |-
-          Number of days needed to first report data on COVID-19 << type >> since the first vaccine was administered. Some countries may have started vaccinating before they reported it, or may have started reporting it before they started vaccinating.
+          Number of days needed to first report data on COVID-19 << type | default('') >> since the first vaccine was administered. Some countries may have started vaccinating before they reported it, or may have started reporting it before they started vaccinating.
         description_processing: *processing_2
         description_key: *description_key_2
         unit: "days"
