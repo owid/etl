@@ -87,7 +87,7 @@ steps:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital
     - data://garden/education/2023-08-14/oecd_education
   data://grapher/education/2024-12-11/people_with_education:
-    - data://garden/education/2023-12-15/people_with_education
+    - data://garden/education/2024-12-11/people_with_education
 
   # UNESCO data on other policy related education indicators
   data://meadow/unesco/2024-06-16/education_opri:
