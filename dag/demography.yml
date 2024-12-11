@@ -273,8 +273,8 @@ steps:
     - snapshot://demography/2024-12-06/wittgenstein_human_capital.zip
   data://garden/demography/2024-12-06/wittgenstein_human_capital_proj:
     - data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj
-  data://grapher/demography/2024-12-06/wittgenstein_human_capital_proj:
-    - data://garden/demography/2024-12-06/wittgenstein_human_capital_proj
+  # data://grapher/demography/2024-12-06/wittgenstein_human_capital_proj:
+  #   - data://garden/demography/2024-12-06/wittgenstein_human_capital_proj
 
   # Wittgenstein Centre (Historical)
   data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical:
