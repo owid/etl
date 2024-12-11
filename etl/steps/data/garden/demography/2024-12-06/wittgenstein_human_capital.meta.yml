@@ -120,6 +120,14 @@ definitions:
       <% elif education == "post_secondary" %>
       Highest level of education attained: Completed ISCED 4 5 6 7 or 8.
       <% endif %>
+    dim_edu_all: |-
+      Under-15: Population below 15 years old.
+      No education: Highest level of education attained: No level and Grade 1 of ISCED 1 not completed.
+      Incomplete primary: Highest level of education attained: Incomplete ISCED 1.
+      Primary: Highest level of education attained: Completed ISCED 1 and incomplete ISCED 2.
+      Lower secondary: Highest level of education attained: Completed ISCED 2 and incomplete ISCED 3.
+      Upper secondary: Highest level of education attained: Completed ISCED 3 and incomplete ISCED 4 5 or 6.
+      Post secondary: Highest level of education attained: Completed ISCED 4 5 6 7 or 8.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -523,7 +531,7 @@ tables:
            aged <<age>>
           <%- endif %>
           <%- if (education != "total") %>
-           with <%- if (education == "no_education") %>no education<%- else %><<education>> education<%- endif %>
+           with <%- if (education == "no_education") %>no education<%- if (education == "some_education") %>some formal education<%- else %><<education>> education<%- endif %>
           <%- endif %>
            in a country or region.
         presentation:

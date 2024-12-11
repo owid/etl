@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -102,6 +104,18 @@ def run(dest_dir: str) -> None:
         per_1000=["pop"],
         per_100=["assr"],
     )
+
+    # Add education="some_education" (only for sex=total and age=total, and indicator 'pop')
+    cols_index = ["country", "year", "age", "sex", "scenario"]
+    tb_tmp = tb_sex_age_edu.loc[
+        tb_sex_age_edu["education"].isin(["total", "no_education"]), cols_index + ["education", "pop"]
+    ]
+    tb_tmp = tb_tmp.pivot(index=cols_index, columns="education", values="pop").reset_index().dropna()
+    tb_tmp["some_education"] = tb_tmp["total"] - tb_tmp["no_education"]
+    assert (tb_tmp["some_education"] >= 0).all()
+    tb_tmp = tb_tmp.melt(id_vars=cols_index, value_vars="some_education", var_name="education", value_name="pop")
+
+    tb_sex_age_edu = pr.concat([tb_sex_age_edu, tb_tmp], ignore_index=True)
 
     #
     # Save outputs.
