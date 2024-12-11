@@ -22,6 +22,15 @@ TODAY = datetime.today()
 # Date when the new views metric started to be recorded.
 MIN_DATE = datetime.strptime("2024-11-01", "%Y-%m-%d")
 GRAPHERS_BASE_URL = "https://ourworldindata.org/grapher/"
+# List of auxiliary steps to be (optionally) excluded from the DAG.
+# It may be convenient to ignore these steps because the analytics are heavily affected by a few producers (e.g. those that are involved in the population and income groups datasets).
+AUXILIARY_STEPS = [
+    "data://garden/demography/.*/population",
+    # Primary energy consumption is loaded by GCB.
+    "data://garden/energy/.*/primary_energy_consumption",
+    "data://garden/ggdc/.*/maddison_project_database",
+    "data://garden/wb/.*/income_groups",
+]
 
 # PAGE CONFIG
 st.set_page_config(
@@ -117,17 +126,17 @@ def get_chart_renders(min_date: str, max_date: str) -> pd.DataFrame:
 
 
 @st.cache_data
-def load_steps_df() -> pd.DataFrame:
+def load_steps_df(excluded_steps) -> pd.DataFrame:
     # Load steps dataframe.
-    steps_df = VersionTracker().steps_df
+    steps_df = VersionTracker(exclude_steps=excluded_steps).steps_df
 
     return steps_df
 
 
 @st.cache_data
-def load_steps_df_with_producer_data() -> pd.DataFrame:
+def load_steps_df_with_producer_data(excluded_steps) -> pd.DataFrame:
     # Load steps dataframe.
-    steps_df = load_steps_df()
+    steps_df = load_steps_df(excluded_steps=excluded_steps)
 
     # Select only active snapshots.
     df = steps_df[(steps_df["channel"] == "snapshot") & (steps_df["state"] == "active")].reset_index(drop=True)
@@ -167,12 +176,12 @@ def load_steps_df_with_producer_data() -> pd.DataFrame:
 
 
 @st.cache_data
-def get_producer_charts_analytics(min_date, max_date):
+def get_producer_charts_analytics(min_date, max_date, excluded_steps):
     # Get chart renders using user-defined date range for "renders_custom".
     df_renders = get_chart_renders(min_date=min_date, max_date=max_date)
 
     # Load the steps dataframe with producer data.
-    df_expanded = load_steps_df_with_producer_data()
+    df_expanded = load_steps_df_with_producer_data(excluded_steps=excluded_steps)
 
     # Add columns with the numbers of chart renders.
     df_expanded = df_expanded.merge(df_renders, on="grapher", how="left").drop(columns=["all_chart_slugs"])
@@ -181,9 +190,9 @@ def get_producer_charts_analytics(min_date, max_date):
 
 
 @st.cache_data
-def get_producer_analytics_per_chart(min_date, max_date):
+def get_producer_analytics_per_chart(min_date, max_date, excluded_steps):
     # Load the steps dataframe with producer data and analytics.
-    df_expanded = get_producer_charts_analytics(min_date=min_date, max_date=max_date)
+    df_expanded = get_producer_charts_analytics(min_date=min_date, max_date=max_date, excluded_steps=excluded_steps)
 
     # Create an expanded table with number of views per chart.
     df_renders_per_chart = df_expanded.dropna(subset=["grapher"]).fillna(0).reset_index(drop=True)
@@ -193,9 +202,9 @@ def get_producer_analytics_per_chart(min_date, max_date):
 
 
 @st.cache_data
-def get_producer_analytics_per_producer(min_date, max_date):
+def get_producer_analytics_per_producer(min_date, max_date, excluded_steps):
     # Load the steps dataframe with producer data and analytics.
-    df_expanded = get_producer_charts_analytics(min_date=min_date, max_date=max_date)
+    df_expanded = get_producer_charts_analytics(min_date=min_date, max_date=max_date, excluded_steps=excluded_steps)
 
     # Group by producer and get the full list of chart slugs for each producer.
     df_grouped = df_expanded.groupby("producer", observed=True, as_index=False).agg(
@@ -264,6 +273,7 @@ st.markdown(
 Explore analytics of data producers.
 
 Select the minimum and maximum dates for the custom date range. Note that this metric started to be recorded on {MIN_DATE.strftime("%Y-%m-%d")}.
+
 """
 )
 
@@ -275,6 +285,16 @@ with st_horizontal():
     max_date = st.date_input("Select maximum date", value=TODAY, key="max_date", format="YYYY-MM-DD").strftime(  # type: ignore
         "%Y-%m-%d"
     )
+    exclude_auxiliary_steps = st.checkbox(
+        "Exclude auxiliary steps (e.g. population)",
+        False,
+        help="Exclude steps that are commonly used as auxiliary data, so they do not skew the analytics in favor of a few producers. But note that this will exclude all uses of these steps, even when they are the main datasets (not auxiliary). Auxiliary steps are:\n- "
+        + "\n- ".join(sorted(AUXILIARY_STEPS)),
+    )
+if exclude_auxiliary_steps:
+    excluded_steps = AUXILIARY_STEPS
+else:
+    excluded_steps = []
 
 st.markdown(
     """## Analytics by producer
@@ -288,7 +308,7 @@ Total number of charts and chart views for each producer. Producers selected in 
 ########################################################################################################################
 
 # Load table content and select only columns to be shown.
-df_producers = get_producer_analytics_per_producer(min_date=min_date, max_date=max_date)
+df_producers = get_producer_analytics_per_producer(min_date=min_date, max_date=max_date, excluded_steps=excluded_steps)
 
 # Define the options of the main grid table with pagination.
 gb = GridOptionsBuilder.from_dataframe(df_producers)
@@ -360,7 +380,9 @@ grid_response = AgGrid(
 )
 
 # Load detailed analytics per producer-chart.
-df_producer_charts = get_producer_analytics_per_chart(min_date=min_date, max_date=max_date)
+df_producer_charts = get_producer_analytics_per_chart(
+    min_date=min_date, max_date=max_date, excluded_steps=excluded_steps
+)
 
 # Get the selected producers from the first table.
 producers_selected = [row["producer"] for row in grid_response["selected_rows"]]
@@ -514,7 +536,3 @@ For now, to share analytics with a data producer you can so any of the following
 """
 )
 st.code(summary, language="text")
-
-# TODO:
-# * It would be good to have a toggle button to ignore auxiliary datasets (namely population and income groups). Currently, the analytics are heavily affected by a few producers, namely those that are involved in the population and income groups datasets. Ideally, we should be able to ignore them (as they are used mostly as auxiliary data). Note that FAOSTAT is also loaded as an auxiliary dataset (specifically faostat_rl, I think to get the surface area of each country). I was considering here to have a list of snapshot/walden/github steps that should be removed from df. But a better approach would be to let VersionTracker ingest a DAG as an argument. This way, we could load the original data, and manually remove the dependencies of the garden population and income groups steps. Then, pass this DAG to VersionTracker, and see the resulting analytics. With this approach, we would be able to properly account for any un_wpp or faostat use that are not related to population.
-# * Show average daily views in the summary.
