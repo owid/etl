@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     tb = tables["by_sex_age_edu"]
     index_cols = tb.index.names
     tb = tb.reset_index()
-    tb = tb.loc[(tb["sex"] == "total") & (tb["age"].isin([AGE_ACCEPTED]))]
+    tb = tb.loc[(tb["sex"] == "total") & (tb["age"].isin(AGE_ACCEPTED))]
     tables["by_sex_age_edu"] = tb.format(index_cols)
 
     #
