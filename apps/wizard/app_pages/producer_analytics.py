@@ -218,20 +218,16 @@ def get_producer_analytics_per_producer(min_date, max_date):
     # Sort conveniently.
     df_grouped = df_grouped.sort_values(["renders_custom"], ascending=False).reset_index(drop=True)
 
-    # Create a separate dataframe with the top producers, just for curiosity.
-    # df_check = df_grouped[["producer", "renders_30d", "n_charts"]].sort_values(["renders_30d"], ascending=False).reset_index(drop=True).head(20)
-    # df_check["percentage"] = (df_check["renders_30d"] / df_check["renders_30d"].sum() * 100).round(1)
-
     return df_grouped
 
 
-def prepare_summary(df_producer_charts_filtered, producers_selected, min_date, max_date) -> str:
-    # Get dataframe of chart views (regardless of the producer).
-    df_summary = df_producer_charts_filtered.sort_values("renders_custom", ascending=False).drop_duplicates(
-        subset=["grapher"]
-    )
+def prepare_summary(
+    df_top_10_total_views, producers_selected, total_views, average_daily_views, min_date, max_date
+) -> str:
     # Prepare the total number of views.
-    df_total_str = f"{df_summary['renders_custom'].sum():9,}".replace(",", " ")
+    total_views_str = f"{total_views:9,}".replace(",", " ")
+    # Prepare the average daily views.
+    average_views_str = f"{round(average_daily_views):9,}".replace(",", " ")
     # Prepare a summary of the top 10 charts to be copy-pasted.
     if len(producers_selected) == 0:
         producers_selected_str = "all producers"
@@ -241,16 +237,16 @@ def prepare_summary(df_producer_charts_filtered, producers_selected, min_date, m
         producers_selected_str = ", ".join(producers_selected[:-1]) + " and " + producers_selected[-1]
     # NOTE: I tried .to_string() and .to_markdown() and couldn't find a way to keep a meaningful format.
     df_summary_str = ""
-    for i, row in df_summary.head(10).iterrows():
-        df_summary_str += f"{row['renders_custom']:9,}".replace(",", " ") + " - " + row["grapher"] + "\n"
+    for _, row in df_top_10_total_views.sort_values("renders", ascending=False).iterrows():
+        df_summary_str += f"{row['renders']:9,}".replace(",", " ") + " - " + row["grapher"] + "\n"
 
     # Define the content to copy.
     summary = f"""\
-Analytics for {producers_selected_str} between {min_date} and {max_date}:
-
+Analytics of charts using data by {producers_selected_str} between {min_date} and {max_date}:
+- Total number of chart views: {total_views_str}
+- Average daily chart views: {average_views_str}
+- Views of top performing charts:
 {df_summary_str}
-
-Total number of views of all charts: {df_total_str}
 
     """
     return summary
@@ -393,8 +389,10 @@ df_total_daily_views = get_grapher_views(
     date_start=min_date, date_end=max_date, groupby=["day"], grapher_urls=grapher_urls_selected
 )
 
-st.toast(f"Total views: {df_total_daily_views['renders'].sum():,}")
-st.toast(f"Average daily views: {df_total_daily_views['renders'].mean():,.0f}")
+# Get total number of views and average daily views.
+total_views = df_total_daily_views["renders"].sum()
+average_daily_views = df_total_daily_views["renders"].mean()
+
 # Get daily views of the top 10 charts.
 grapher_urls_top_10 = (
     df_producer_charts_filtered.sort_values("renders_custom", ascending=False)["grapher"].unique().tolist()[0:10]  # type: ignore
@@ -402,14 +400,19 @@ grapher_urls_top_10 = (
 df_top_10_daily_views = get_grapher_views(
     date_start=min_date, date_end=max_date, groupby=["day", "grapher"], grapher_urls=grapher_urls_top_10
 )
-df_top_10_daily_views["grapher"] = df_top_10_daily_views["grapher"].apply(lambda x: x.split("/")[-1])
+
+# Get total views of the top 10 charts in the selected date range.
+df_top_10_total_views = df_top_10_daily_views.groupby("grapher", as_index=False).agg({"renders": "sum"})
 
 # Create a line chart.
 df_plot = pd.concat([df_total_daily_views.assign(**{"grapher": "Total"}), df_top_10_daily_views]).rename(
-    columns={"renders": "Views", "grapher": "Chart slug", "day": "Date"}
+    columns={"grapher": "Chart slug"}
 )
-df_plot["Date"] = pd.to_datetime(df_plot["Date"]).dt.strftime("%a. %Y-%m-%d")
-fig = px.line(df_plot, x="Date", y="Views", color="Chart slug", title="Total daily views and views of top 10 charts")
+df_plot["Chart slug"] = df_plot["Chart slug"].apply(lambda x: x.split("/")[-1])
+df_plot["day"] = pd.to_datetime(df_plot["day"]).dt.strftime("%a. %Y-%m-%d")
+fig = px.line(
+    df_plot, x="day", y="renders", color="Chart slug", title="Total daily views and views of top 10 charts"
+).update_layout(xaxis_title=None, yaxis_title=None)
 
 # Display the chart.
 st.plotly_chart(fig, use_container_width=True)
@@ -492,8 +495,10 @@ AgGrid(
 
 # Prepare the summary to be copy-pasted.
 summary = prepare_summary(
-    df_producer_charts_filtered=df_producer_charts_filtered,
+    df_top_10_total_views=df_top_10_total_views,
     producers_selected=producers_selected,
+    total_views=total_views,
+    average_daily_views=average_daily_views,
     min_date=min_date,
     max_date=max_date,
 )
