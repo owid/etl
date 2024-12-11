@@ -133,6 +133,24 @@ def add_dim_some_education(tb):
     return tb
 
 
+def add_dim_15plus(tb):
+    # Pivot table to have two columns: "0-14" and "total"
+    tb_adults = tb.loc[tb["age"].isin(["0-14", "total"])]
+    cols_index = ["country", "scenario", "sex", "education", "year"]
+    tb_adults = tb_adults.pivot(index=cols_index, columns="age", values="pop").reset_index()
+    # Fill with zero NAs of agr group "0-14". NAs mostly come from 'doesn't apply' (e.g. primary education for 0-14)
+    tb_adults["0-14"] = tb_adults["0-14"].fillna(0)
+    # Only estimate values for adults when "total" is not NA
+    tb_adults = tb_adults.dropna(subset=["total"])
+    # Estimate adults as "0-14" - 15+
+    tb_adults["15+"] = tb_adults["total"] - tb_adults["0-14"].fillna(0)
+    # Shape table
+    tb_adults = tb_adults.melt(id_vars=cols_index, value_name="pop", var_name="age")
+    # Concatenate with original table
+    tb = pr.concat([tb, tb_adults], ignore_index=True)
+    return tb
+
+
 def get_index_columns(tb):
     cols_index = list(tb.columns.intersection(COLUMNS_INDEX))
     return cols_index

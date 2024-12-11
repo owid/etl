@@ -2,7 +2,7 @@
 
 from etl.helpers import PathFinder, create_dataset
 
-from .shared import add_dim_some_education, add_prop, make_table
+from .shared import add_dim_15plus, add_dim_some_education, add_prop, make_table
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -104,6 +104,9 @@ def run(dest_dir: str) -> None:
 
     # Add education="some_education" (only for sex=total and age=total, and indicator 'pop')
     tb_sex_age_edu = add_dim_some_education(tb_sex_age_edu)
+
+    # Add 15+ age group
+    tb_sex_age_edu = add_dim_15plus(tb_sex_age_edu)
 
     # Add population share
     tb_sex_age_edu = add_prop(tb_sex_age_edu)
