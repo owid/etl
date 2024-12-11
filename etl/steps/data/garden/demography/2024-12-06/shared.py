@@ -125,3 +125,8 @@ def add_dim_some_education(tb):
     tb = pr.concat([tb, tb_tmp], ignore_index=True)
 
     return tb
+
+
+def get_index_columns(tb):
+    cols_index = list(tb.columns.intersection(COLUMNS_INDEX))
+    return cols_index

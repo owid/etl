@@ -290,6 +290,6 @@ steps:
     - data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical
 
   # Wittgenstein Centre (Projections + Historical)
-  # data://garden/demography/2024-12-06/wittgenstein_human_capital_complete:
-  #   - data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical
-  #   - data://meadow/demography/2024-12-06/wittgenstein_human_capital
+  data://garden/demography/2024-12-06/wittgenstein_human_capital_combined:
+    - data://meadow/demography/2024-12-06/wittgenstein_human_capital_historical
+    - data://meadow/demography/2024-12-06/wittgenstein_human_capital
