@@ -52,6 +52,7 @@ def get_chart_renders_query(date_start, date_end) -> pd.DataFrame:
     return cast(pd.DataFrame, df_views)
 
 
+@st.cache_data
 def get_grapher_views(
     date_start: str = MIN_DATE.strftime("%Y-%m-%d"),
     date_end: str = TODAY.strftime("%Y-%m-%d"),
@@ -280,7 +281,7 @@ with st_horizontal():
     )
 
 st.markdown(
-    """## Producers table
+    """## Analytics by producer
 
 Total number of charts and chart views for each producer. Producers selected in this table will be used to filter the producer-charts table below.
 """
@@ -362,17 +363,6 @@ grid_response = AgGrid(
     custom_css=custom_css,
 )
 
-########################################################################################################################
-# Display table with producer-chart analytics.
-########################################################################################################################
-
-st.markdown(
-    """## Producer-charts table
-
-Number of chart views for each chart that uses data of the selected producers.
-"""
-)
-
 # Load detailed analytics per producer-chart.
 df_producer_charts = get_producer_analytics_per_chart(min_date=min_date, max_date=max_date)
 
@@ -384,6 +374,50 @@ if len(producers_selected) == 0:
 else:
     # Filter producer-charts by selected producers.
     df_producer_charts_filtered = df_producer_charts[df_producer_charts["producer"].isin(producers_selected)]
+
+
+########################################################################################################################
+# Display a chart with the total number of daily views, and the daily views of the top performing charts.
+########################################################################################################################
+
+st.markdown(
+    """## Analytics by chart
+
+Number of chart views for each chart that uses data of the selected producers.
+"""
+)
+
+# Get total daily views of selected producers.
+grapher_urls_selected = df_producer_charts_filtered["grapher"].unique().tolist()  # type: ignore
+df_total_daily_views = get_grapher_views(
+    date_start=min_date, date_end=max_date, groupby=["day"], grapher_urls=grapher_urls_selected
+)
+
+st.toast(f"Total views: {df_total_daily_views['renders'].sum():,}")
+st.toast(f"Average daily views: {df_total_daily_views['renders'].mean():,.0f}")
+# Get daily views of the top 10 charts.
+grapher_urls_top_10 = (
+    df_producer_charts_filtered.sort_values("renders_custom", ascending=False)["grapher"].unique().tolist()[0:10]  # type: ignore
+)
+df_top_10_daily_views = get_grapher_views(
+    date_start=min_date, date_end=max_date, groupby=["day", "grapher"], grapher_urls=grapher_urls_top_10
+)
+df_top_10_daily_views["grapher"] = df_top_10_daily_views["grapher"].apply(lambda x: x.split("/")[-1])
+
+# Create a line chart.
+df_plot = pd.concat([df_total_daily_views.assign(**{"grapher": "Total"}), df_top_10_daily_views]).rename(
+    columns={"renders": "Views", "grapher": "Chart slug", "day": "Date"}
+)
+df_plot["Date"] = pd.to_datetime(df_plot["Date"]).dt.strftime("%a. %Y-%m-%d")
+fig = px.line(df_plot, x="Date", y="Views", color="Chart slug", title="Total daily views and views of top 10 charts")
+
+# Display the chart.
+st.plotly_chart(fig, use_container_width=True)
+
+
+########################################################################################################################
+# Display table with producer-chart analytics.
+########################################################################################################################
 
 # Configure and display the second table.
 gb2 = GridOptionsBuilder.from_dataframe(df_producer_charts_filtered)
@@ -438,7 +472,7 @@ for column, config in COLUMNS_PRODUCER_CHARTS.items():
     gb2.configure_column(column, **config)
 
 # Configure pagination with dynamic page size.
-gb2.configure_pagination(paginationAutoPageSize=False, paginationPageSize=30)
+gb2.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
 grid_options2 = gb2.build()
 
 # Display the grid.
@@ -451,34 +485,6 @@ AgGrid(
     allow_unsafe_jscode=True,
     theme="streamlit",
 )
-
-########################################################################################################################
-# Display a chart with the total number of daily views, and the daily views of the top performing charts.
-########################################################################################################################
-
-# Get total daily views of selected producers.
-grapher_urls_selected = df_producer_charts_filtered["grapher"].unique().tolist()  # type: ignore
-df_total_daily_views = get_grapher_views(
-    date_start=min_date, date_end=max_date, groupby=["day"], grapher_urls=grapher_urls_selected
-)
-
-st.toast(f"Total views: {df_total_daily_views['renders'].sum():,}")
-st.toast(f"Average daily views: {df_total_daily_views['renders'].mean():,.0f}")
-# Get daily views of the top 10 charts.
-grapher_urls_top_10 = (
-    df_producer_charts_filtered.sort_values("renders_custom", ascending=False)["grapher"].unique().tolist()[0:10]  # type: ignore
-)
-df_top_10_daily_views = get_grapher_views(
-    date_start=min_date, date_end=max_date, groupby=["day", "grapher"], grapher_urls=grapher_urls_top_10
-)
-df_top_10_daily_views["grapher"] = df_top_10_daily_views["grapher"].apply(lambda x: x.split("/")[-1])
-
-# Create a line chart.
-df_plot = pd.concat([df_total_daily_views.assign(**{"grapher": "total"}), df_top_10_daily_views])
-fig = px.line(df_plot, x="day", y="renders", color="grapher", title="Total daily views and views of top 10 charts")
-
-# Display the chart.
-st.plotly_chart(fig, use_container_width=True)
 
 ########################################################################################################################
 # Display a summary to be shared with the data producer.
@@ -496,15 +502,14 @@ summary = prepare_summary(
 st.markdown(
     """## Summary for data producers
 
-For now, to share analytics with a data provider you can so any of the following:
+For now, to share analytics with a data producer you can so any of the following:
 - Right-click on the table above and export as a CSV or Excel file.
+- Click on the camera icon on the top right of the chart to download the chart as a PNG.
 - Click on the upper right corner of the box below to copy the summary to the clipboard.
-- Click on the camera icon on the top right of the chart below to download the chart as a PNG.
 """
 )
 st.code(summary, language="text")
 
 # TODO:
 # * It would be good to have a toggle button to ignore auxiliary datasets (namely population and income groups). Currently, the analytics are heavily affected by a few producers, namely those that are involved in the population and income groups datasets. Ideally, we should be able to ignore them (as they are used mostly as auxiliary data). Note that FAOSTAT is also loaded as an auxiliary dataset (specifically faostat_rl, I think to get the surface area of each country). I was considering here to have a list of snapshot/walden/github steps that should be removed from df. But a better approach would be to let VersionTracker ingest a DAG as an argument. This way, we could load the original data, and manually remove the dependencies of the garden population and income groups steps. Then, pass this DAG to VersionTracker, and see the resulting analytics. With this approach, we would be able to properly account for any un_wpp or faostat use that are not related to population.
-# * We could add the average number of daily views. But keep in mind that analytics have some delay (it seems maybe one or two days). We could fix max_date to be the last day with at last one view in any chart.
-# * Currently, any changes in the second table trigger a query to re-calculate the chart. This can be avoided. We only need to recalculate the chart if the selected producers in the first table change. We could add selected producers to session_state to avoid this.
+# * Show average daily views in the summary.
