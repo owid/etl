@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import cast
+from typing import Optional, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -51,6 +51,46 @@ def get_chart_renders_query(date_start, date_end) -> pd.DataFrame:
     return cast(pd.DataFrame, df_views)
 
 
+def get_grapher_views(
+    date_start: str = MIN_DATE.strftime("%Y-%m-%d"),
+    date_end: str = TODAY.strftime("%Y-%m-%d"),
+    groupby: Optional[list[str]] = None,
+    grapher_urls: Optional[list[str]] = None,
+) -> pd.DataFrame:
+    grapher_filter = ""
+    if grapher_urls:
+        # If a list of grapher URLs is given, consider only those.
+        grapher_urls_formatted = ", ".join(f"'{url}'" for url in grapher_urls)
+        grapher_filter = f"AND grapher IN ({grapher_urls_formatted})"
+    else:
+        # If no list is given, consider all grapher URLs.
+        grapher_filter = f"AND grapher LIKE '{GRAPHERS_BASE_URL}%'"
+
+    if not groupby:
+        # If a groupby list is not given, assume the simplest case, which gives total views for each grapher.
+        groupby = ["grapher"]
+
+    # Prepare the query.
+    groupby_clause = ", ".join(groupby)
+    select_clause = f"{groupby_clause}, SUM(events) AS renders"
+    query = f"""
+        SELECT
+            {select_clause}
+        FROM prod_google_analytics4.grapher_views_by_day_page_grapher_device_country_iframe
+        WHERE
+            day >= '{date_start}'
+            AND day <= '{date_end}'
+            {grapher_filter}
+        GROUP BY {groupby_clause}
+        ORDER BY {groupby_clause}
+    """
+
+    # Execute the query.
+    df_views = read_gbq(query, project_id="owid-analytics")
+
+    return cast(pd.DataFrame, df_views)
+
+
 @st.cache_data
 def get_chart_renders(min_date: str, max_date: str) -> pd.DataFrame:
     # List ranges of dates to fetch views.
@@ -62,7 +102,9 @@ def get_chart_renders(min_date: str, max_date: str) -> pd.DataFrame:
 
     # Get analytics for those ranges, for all grapher URLs.
     list_renders = [
-        get_chart_renders_query(date_start, date_end).rename(columns={"renders": column_name})
+        get_grapher_views(date_start=date_start, date_end=date_end, grapher_urls=None, groupby=["grapher"]).rename(
+            columns={"renders": column_name}
+        )
         for column_name, (date_start, date_end) in date_ranges.items()
     ]
 
