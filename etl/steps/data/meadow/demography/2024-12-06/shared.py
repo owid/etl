@@ -327,6 +327,7 @@ def read_data_from_snap(snap, scenarios_expected):
             assert scenario in scenarios_expected, f"Unexpected scenario: {scenario}"
             if scenario in {"22", "23"}:
                 continue
+            filename = f.split("_")[1]
             # Read RDS file
             path = tmp / Path(f)
             if f.endswith(".rds"):
@@ -334,21 +335,19 @@ def read_data_from_snap(snap, scenarios_expected):
                 assert set(data.keys()) == {None}, "Unexpected keys in RDS file!"
                 df = data[None]
                 # Map to table
-                tb = Table(
-                    df,
-                    short_name=f.split("_")[1].replace(".rds", ""),
-                )
+                tb = Table(df)
                 tb = _add_table_and_variables_metadata_to_table(
                     table=tb, metadata=snap.to_table_metadata(), origin=snap.metadata.origin
                 )
-                tb.metadata.short_name = f.split("_")[1].replace(".rds", "")
+                tb.metadata.short_name = filename.replace(".rds", "")
             elif f.endswith(".csv.gz"):
+                scenario = scenario.replace("ssp", "")
                 tb = pr.read_csv(
                     path,
                     metadata=snap.to_table_metadata(),
                     origin=snap.metadata.origin,
                 )
-                tb.metadata.short_name = f.split("_")[1].replace(".csv.gz", "").replace("ssp", "")
+                tb.metadata.short_name = filename.replace(".csv.gz", "")
             else:
                 raise ValueError(f"Unexpected file format: {f}!")
             # Rename columns

@@ -1,3 +1,5 @@
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 
 # Columns index
@@ -19,8 +21,12 @@ def make_table(
     all_range=False,
     cols_single=None,
     cols_range=None,
+    per_10=None,
     per_100=None,
     per_1000=None,
+    div_10=None,
+    div_100=None,
+    div_1000=None,
 ):
     dtypes = {**{"scenario": "UInt8", "country": "category"}, **(dtypes or {})}
     tb = tb.astype(dtypes)
@@ -48,17 +54,31 @@ def make_table(
     )
 
     # Scale
-    tb = scale_values(tb, per_100=per_100, per_1000=per_1000)
+    tb = scale_values(
+        tb, per_10=per_10, per_100=per_100, per_1000=per_1000, div_10=div_10, div_100=div_100, div_1000=div_1000
+    )
     return tb
 
 
-def scale_values(tb, per_100=None, per_1000=None):
+def scale_values(tb, per_10=None, per_100=None, per_1000=None, div_10=None, div_100=None, div_1000=None):
+    if per_10 is not None:
+        for col in per_10:
+            tb[col] *= 10
     if per_100 is not None:
         for col in per_100:
             tb[col] *= 100
     if per_1000 is not None:
         for col in per_1000:
             tb[col] *= 1000
+    if div_10 is not None:
+        for col in div_10:
+            tb[col] /= 10
+    if div_100 is not None:
+        for col in div_100:
+            tb[col] /= 100
+    if div_1000 is not None:
+        for col in div_1000:
+            tb[col] /= 1000
     return tb
 
 
@@ -85,5 +105,23 @@ def consolidate_year_single_and_ranges(tb, cols_single, cols_range):
 
     # Merge back
     tb = tb_single.merge(tb_range, on=cols_index, how="outer")
+
+    return tb
+
+
+def add_dim_some_education(tb):
+    """Add dimension "some education" to sex+age+education table.
+
+    It only adds it for sex=total and age=total.
+    """
+    # Add education="some_education" (only for sex=total and age=total, and indicator 'pop')
+    cols_index = ["country", "year", "age", "sex", "scenario"]
+    tb_tmp = tb.loc[tb["education"].isin(["total", "no_education"]), cols_index + ["education", "pop"]]
+    tb_tmp = tb_tmp.pivot(index=cols_index, columns="education", values="pop").reset_index().dropna()
+    tb_tmp["some_education"] = tb_tmp["total"] - tb_tmp["no_education"]
+    assert (tb_tmp["some_education"] >= 0).all()
+    tb_tmp = tb_tmp.melt(id_vars=cols_index, value_vars="some_education", var_name="education", value_name="pop")
+
+    tb = pr.concat([tb, tb_tmp], ignore_index=True)
 
     return tb

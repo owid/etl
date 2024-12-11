@@ -1,10 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import owid.catalog.processing as pr
+from shared import add_dim_some_education, make_table
 
 from etl.helpers import PathFinder, create_dataset
-
-from .shared import make_table
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -114,16 +112,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Add education="some_education" (only for sex=total and age=total, and indicator 'pop')
-    cols_index = ["country", "year", "age", "sex", "scenario"]
-    tb_tmp = tb_sex_age_edu.loc[
-        tb_sex_age_edu["education"].isin(["total", "no_education"]), cols_index + ["education", "pop"]
-    ]
-    tb_tmp = tb_tmp.pivot(index=cols_index, columns="education", values="pop").reset_index().dropna()
-    tb_tmp["some_education"] = tb_tmp["total"] - tb_tmp["no_education"]
-    assert (tb_tmp["some_education"] >= 0).all()
-    tb_tmp = tb_tmp.melt(id_vars=cols_index, value_vars="some_education", var_name="education", value_name="pop")
-
-    tb_sex_age_edu = pr.concat([tb_sex_age_edu, tb_tmp], ignore_index=True)
+    tb_sex_age_edu = add_dim_some_education(tb_sex_age_edu)
 
     #
     # Save outputs.
