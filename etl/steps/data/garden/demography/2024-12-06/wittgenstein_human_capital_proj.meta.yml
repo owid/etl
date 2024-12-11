@@ -298,6 +298,10 @@ tables:
             - Migration
 
   by_age:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
     variables:
       sexratio:
         title: |-
@@ -315,6 +319,10 @@ tables:
             - Gender Ratio
 
   by_sex:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
     variables:
       e0:
         title: |-
@@ -365,6 +373,10 @@ tables:
             - Life Expectancy
 
   by_edu:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
     variables:
       ggapedu15:
         title: |-
@@ -433,6 +445,10 @@ tables:
             - Migration
 
   by_sex_age:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
     variables:
       mys:
         title: |-
@@ -454,6 +470,10 @@ tables:
             - Global Education
 
   by_age_edu:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
     variables:
       asfr:
         title: |-
@@ -474,6 +494,10 @@ tables:
             - Fertility Rate
 
   by_sex_age_edu:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
     variables:
       assr:
         title: |-
