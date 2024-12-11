@@ -348,7 +348,7 @@ def read_data_from_snap(snap, scenarios_expected):
                     metadata=snap.to_table_metadata(),
                     origin=snap.metadata.origin,
                 )
-                tb.metadata.short_name = f.split("_")[1].replace(".csv.gz", "")
+                tb.metadata.short_name = f.split("_")[1].replace(".csv.gz", "").replace("ssp", "")
             else:
                 raise ValueError(f"Unexpected file format: {f}!")
             # Rename columns
