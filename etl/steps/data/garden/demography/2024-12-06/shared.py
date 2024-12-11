@@ -135,15 +135,21 @@ def add_dim_some_education(tb):
 
 def add_dim_15plus(tb):
     # Pivot table to have two columns: "0-14" and "total"
-    tb_adults = tb.loc[tb["age"].isin(["0-14", "total"])]
+    tb_adults = tb.loc[tb["age"].isin(["0-4", "5-9", "10-14", "total"]) & (tb["education"] != "total")]
     cols_index = ["country", "scenario", "sex", "education", "year"]
     tb_adults = tb_adults.pivot(index=cols_index, columns="age", values="pop").reset_index()
-    # Fill with zero NAs of agr group "0-14". NAs mostly come from 'doesn't apply' (e.g. primary education for 0-14)
-    tb_adults["0-14"] = tb_adults["0-14"].fillna(0)
     # Only estimate values for adults when "total" is not NA
     tb_adults = tb_adults.dropna(subset=["total"])
     # Estimate adults as "0-14" - 15+
-    tb_adults["15+"] = tb_adults["total"] - tb_adults["0-14"].fillna(0)
+    # Fill with zero NAs of agr group "0-14". NAs mostly come from 'doesn't apply' (e.g. primary education for 0-14)
+    tb_adults["15+"] = (
+        tb_adults["total"] - tb_adults["0-4"].fillna(0) - tb_adults["5-9"].fillna(0) - tb_adults["10-14"].fillna(0)
+    )
+    # Drop columns
+    tb_adults = tb_adults.drop(columns=["0-4", "5-9", "10-14", "total"])
+    # Replace negative values for zero
+    flag = tb_adults["15+"] < 0
+    tb_adults.loc[flag, "15+"] = 0
     # Shape table
     tb_adults = tb_adults.melt(id_vars=cols_index, value_name="pop", var_name="age")
     # Concatenate with original table
