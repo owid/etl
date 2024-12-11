@@ -141,7 +141,7 @@ def get_index_columns(tb):
 def add_prop(tb):
     # Add
     tbx = tb[tb["education"] == "total"].drop(columns=["education", "assr"])
-    tb_sex_age_edu = tb.merge(tbx, on=["country", "year", "age", "sex", "scenario"], suffixes=["", "_total"])
-    tb_sex_age_edu["prop"] = 100 * tb_sex_age_edu["pop"] / tb_sex_age_edu["pop_total"]
-
+    tb = tb.merge(tbx, on=["country", "year", "age", "sex", "scenario"], suffixes=["", "_total"])
+    tb["prop"] = (100 * tb["pop"] / tb["pop_total"]).copy_metadata(tb["pop"])
+    tb = tb.drop(columns=["pop_total"])
     return tb
