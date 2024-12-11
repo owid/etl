@@ -8,6 +8,13 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Not sure how easy this will be to describe - might only be possible at global/regional levels
+DENOMINATOR = {
+    "BCG": "Live births",  # live births
+    "DTPCV1": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "DTPCV3": "Surviving infants",  # the national annual number of infants surviving their first year of life
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -33,7 +40,7 @@ def run(dest_dir: str) -> None:
 
     tb = clean_data(tb)
 
-    tb = tb.format(["country", "year", "antigen_description"])
+    tb = tb.format(["country", "year", "antigen"])
 
     #
     # Save outputs.
@@ -65,6 +72,8 @@ def clean_data(tb: Table) -> Table:
     """
 
     tb = tb[tb["coverage"].notna()]
-    tb = tb.drop(columns=["group", "code", "coverage_category_description", "target_number", "doses"])
+    tb = tb.drop(
+        columns=["group", "code", "antigen_description", "coverage_category_description", "target_number", "doses"]
+    )
 
     return tb
