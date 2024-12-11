@@ -122,7 +122,8 @@ def add_dim_some_education(tb):
     assert (tb_tmp["some_education"] >= 0).all()
     tb_tmp = tb_tmp.melt(id_vars=cols_index, value_vars="some_education", var_name="education", value_name="pop")
 
-    tb = pr.concat([tb, tb_tmp], ignore_index=True)
+    dtypes = tb.dtypes
+    tb = pr.concat([tb, tb_tmp], ignore_index=True).astype(dtypes)
 
     return tb
 

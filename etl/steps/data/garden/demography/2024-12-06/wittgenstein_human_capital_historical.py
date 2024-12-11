@@ -104,6 +104,7 @@ def run(dest_dir: str) -> None:
 
     # Add education="some_education" (only for sex=total and age=total, and indicator 'pop')
     tb_sex_age_edu = add_dim_some_education(tb_sex_age_edu)
+
     #
     # Save outputs.
     #

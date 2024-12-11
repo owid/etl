@@ -20,6 +20,14 @@ TABLE_COLUMN_DIFFERENCES = {
         "missing_in_proj": {"macb"},
     },
 }
+DTYPES = {
+    "sex": "category",
+    "age": "category",
+    "education": "category",
+    "country": "category",
+    "year": "UInt16",
+    "scenario": "UInt8",
+}
 
 
 def run(dest_dir: str) -> None:
@@ -47,6 +55,10 @@ def run(dest_dir: str) -> None:
         # Get tables
         tb_proj = tbs_proj[key]
         tb_hist = tbs_hist[key]
+
+        # Dtypes
+        tb_proj = tb_proj.astype({k: v for k, v in DTYPES.items() if k in tb_proj.columns})
+        tb_hist = tb_hist.astype({k: v for k, v in DTYPES.items() if k in tb_hist.columns})
 
         # Check
         sanity_checks(tb_proj, tb_hist)
