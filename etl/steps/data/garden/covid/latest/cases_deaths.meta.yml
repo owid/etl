@@ -202,7 +202,7 @@ tables:
         presentation:
           grapher_config:
             title: Week by week change of confirmed COVID-19 cases
-            subtitle: The weekly growth rate on any given date measures the percentage change in number of confirmed cases over the last seven days relative to the number in the previous seven days.
+            subtitle: The weekly growth rate measures the percentage change in confirmed cases over the past seven days compared to the seven days before.
             hasMapTab: true
             map:
               colorScale:
@@ -264,7 +264,7 @@ tables:
         presentation:
           grapher_config:
             title: Biweekly change of confirmed COVID-19 cases
-            subtitle: The biweekly growth rate on any given date measures the percentage change in the number of new confirmed cases over the last 14 days relative to the number in the previous 14 days.
+            subtitle: The biweekly growth rate measures the percentage change in confirmed cases over the past 14 days compared to the 14 days before.
             hasMapTab: true
             map:
               colorScale:
