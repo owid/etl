@@ -45,7 +45,7 @@ st.set_page_config(
 ########################################################################################################################
 
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_grapher_views(
     date_start: str = MIN_DATE.strftime("%Y-%m-%d"),
     date_end: str = TODAY.strftime("%Y-%m-%d"),
@@ -86,7 +86,7 @@ def get_grapher_views(
     return cast(pd.DataFrame, df_views)
 
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_chart_renders(min_date: str, max_date: str) -> pd.DataFrame:
     # List ranges of dates to fetch views.
     date_ranges = {
@@ -109,7 +109,7 @@ def get_chart_renders(min_date: str, max_date: str) -> pd.DataFrame:
     return df_renders
 
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def load_steps_df(excluded_steps) -> pd.DataFrame:
     # Load steps dataframe.
     steps_df = VersionTracker(exclude_steps=excluded_steps).steps_df
@@ -117,7 +117,7 @@ def load_steps_df(excluded_steps) -> pd.DataFrame:
     return steps_df
 
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def load_steps_df_with_producer_data(excluded_steps) -> pd.DataFrame:
     # Load steps dataframe.
     steps_df = load_steps_df(excluded_steps=excluded_steps)
@@ -159,7 +159,7 @@ def load_steps_df_with_producer_data(excluded_steps) -> pd.DataFrame:
     return df_expanded
 
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_producer_charts_analytics(min_date, max_date, excluded_steps):
     # Get chart renders using user-defined date range for "renders_custom".
     df_renders = get_chart_renders(min_date=min_date, max_date=max_date)
@@ -173,7 +173,7 @@ def get_producer_charts_analytics(min_date, max_date, excluded_steps):
     return df_expanded
 
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_producer_analytics_per_chart(min_date, max_date, excluded_steps):
     # Load the steps dataframe with producer data and analytics.
     df_expanded = get_producer_charts_analytics(min_date=min_date, max_date=max_date, excluded_steps=excluded_steps)
@@ -185,7 +185,7 @@ def get_producer_analytics_per_chart(min_date, max_date, excluded_steps):
     return df_renders_per_chart
 
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_producer_analytics_per_producer(min_date, max_date, excluded_steps):
     # Load the steps dataframe with producer data and analytics.
     df_expanded = get_producer_charts_analytics(min_date=min_date, max_date=max_date, excluded_steps=excluded_steps)
@@ -212,6 +212,78 @@ def get_producer_analytics_per_producer(min_date, max_date, excluded_steps):
     df_grouped = df_grouped.sort_values(["renders_custom"], ascending=False).reset_index(drop=True)
 
     return df_grouped
+
+
+def prepare_grid(df_producers, min_date, max_date):
+    gb = GridOptionsBuilder.from_dataframe(df_producers)
+    gb.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
+    gb.configure_selection(
+        selection_mode="multiple",
+        use_checkbox=True,
+        rowMultiSelectWithClick=True,
+        suppressRowDeselection=False,
+        groupSelectsChildren=True,
+        groupSelectsFiltered=True,
+    )
+    gb.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
+
+    # Enable column auto-sizing for the grid.
+    gb.configure_grid_options(suppressSizeToFit=False)  # Allows dynamic resizing to fit.
+    gb.configure_default_column(autoSizeColumns=True)  # Ensures all columns can auto-size.
+
+    # Define columns to be shown.
+    COLUMNS_PRODUCERS = {
+        "producer": {
+            "headerName": "Producer",
+            "headerTooltip": "Name of the producer. This is NOT the name of the dataset.",
+        },
+        "n_charts": {
+            "headerName": "Charts",
+            "headerTooltip": "Number of charts using data from a producer.",
+        },
+        "renders_custom": {
+            "headerName": "Views in custom range",
+            "headerTooltip": f"Number of renders between {min_date} and {max_date}.",
+        },
+        "renders_365d": {
+            "headerName": "Views 365 days",
+            "headerTooltip": "Number of renders in the last 365 days.",
+        },
+        "renders_30d": {
+            "headerName": "Views 30 days",
+            "headerTooltip": "Number of renders in the last 30 days.",
+        },
+    }
+
+    # Configure individual columns with specific settings.
+    for column in COLUMNS_PRODUCERS:
+        gb.configure_column(column, **COLUMNS_PRODUCERS[column])
+    # Configure pagination with dynamic page size.
+    gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
+    # Build the grid options.
+    grid_options = gb.build()
+    # Custom CSS to ensure the table stretches across the page.
+    custom_css = {
+        ".ag-theme-streamlit": {
+            "max-width": "100% !important",
+            "width": "100% !important",
+            "margin": "0 auto !important",  # Centers the grid horizontally.
+        },
+    }
+    # Display the grid table with the updated grid options.
+    grid_response = AgGrid(
+        data=df_producers,
+        gridOptions=grid_options,
+        height=1000,
+        width="100%",
+        update_mode=GridUpdateMode.MODEL_CHANGED,
+        fit_columns_on_grid_load=True,  # Automatically adjust columns when the grid loads.
+        allow_unsafe_jscode=True,
+        theme="streamlit",
+        custom_css=custom_css,
+    )
+
+    return grid_response
 
 
 def prepare_summary(
@@ -253,6 +325,7 @@ Analytics of charts using data by {producers_selected_str} between {min_date} an
 st.title(":material/bar_chart: Producer analytics")
 st.markdown("Explore analytics of data producers.")
 
+# SEARCH BOX
 with st.container(border=True):
     st.markdown(
         f"Select a custom date range (note that this metric started to be recorded on {MIN_DATE.strftime('%Y-%m-%d')})."
@@ -260,10 +333,20 @@ with st.container(border=True):
 
     with st_horizontal():
         # Create input fields for minimum and maximum dates.
-        min_date = st.date_input("Select minimum date", value=MIN_DATE, key="min_date", format="YYYY-MM-DD").strftime(  # type: ignore
+        min_date = st.date_input(
+            "Select minimum date",
+            value=MIN_DATE,
+            key="min_date",
+            format="YYYY-MM-DD",
+        ).strftime(  # type: ignore
             "%Y-%m-%d"
         )
-        max_date = st.date_input("Select maximum date", value=TODAY, key="max_date", format="YYYY-MM-DD").strftime(  # type: ignore
+        max_date = st.date_input(
+            "Select maximum date",
+            value=TODAY,
+            key="max_date",
+            format="YYYY-MM-DD",
+        ).strftime(  # type: ignore
             "%Y-%m-%d"
         )
         exclude_auxiliary_steps = st.checkbox(
@@ -280,88 +363,23 @@ else:
     # Otherwise, do not exclude any steps.
     excluded_steps = []
 
+st.header("Analytics by producer")
 st.markdown(
-    """## Analytics by producer
-
-Total number of charts and chart views for each producer. Producers selected in this table will be used to filter the producer-charts table below.
-"""
+    "Total number of charts and chart views for each producer. Producers selected in this table will be used to filter the producer-charts table below."
 )
 
 ########################################################################################################################
-# Display main table with producer analytics.
+# Display MAIN TABLE with producer analytics.
 ########################################################################################################################
 
 # Load table content and select only columns to be shown.
-df_producers = get_producer_analytics_per_producer(min_date=min_date, max_date=max_date, excluded_steps=excluded_steps)
+with st.spinner("Loading data. This can take few seconds..."):
+    df_producers = get_producer_analytics_per_producer(
+        min_date=min_date, max_date=max_date, excluded_steps=excluded_steps
+    )
 
-# Define the options of the main grid table with pagination.
-gb = GridOptionsBuilder.from_dataframe(df_producers)
-gb.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
-gb.configure_selection(
-    selection_mode="multiple",
-    use_checkbox=True,
-    rowMultiSelectWithClick=True,
-    suppressRowDeselection=False,
-    groupSelectsChildren=True,
-    groupSelectsFiltered=True,
-)
-gb.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
-
-# Enable column auto-sizing for the grid.
-gb.configure_grid_options(suppressSizeToFit=False)  # Allows dynamic resizing to fit.
-gb.configure_default_column(autoSizeColumns=True)  # Ensures all columns can auto-size.
-
-# Define columns to be shown.
-COLUMNS_PRODUCERS = {
-    "producer": {
-        "headerName": "Producer",
-        "headerTooltip": "Name of the producer.",
-    },
-    "n_charts": {
-        "headerName": "Charts",
-        "headerTooltip": "Number of charts using data from a producer.",
-    },
-    "renders_custom": {
-        "headerName": "Views in custom range",
-        "headerTooltip": f"Number of renders betweeen {min_date} and {max_date}.",
-    },
-    "renders_365d": {
-        "headerName": "Views 365 days",
-        "headerTooltip": "Number of renders in the last 365 days.",
-    },
-    "renders_30d": {
-        "headerName": "Views 30 days",
-        "headerTooltip": "Number of renders in the last 30 days.",
-    },
-}
-
-# Configure individual columns with specific settings.
-for column in COLUMNS_PRODUCERS:
-    gb.configure_column(column, **COLUMNS_PRODUCERS[column])
-# Configure pagination with dynamic page size.
-gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
-# Build the grid options.
-grid_options = gb.build()
-# Custom CSS to ensure the table stretches across the page.
-custom_css = {
-    ".ag-theme-streamlit": {
-        "max-width": "100% !important",
-        "width": "100% !important",
-        "margin": "0 auto !important",  # Centers the grid horizontally.
-    },
-}
-# Display the grid table with the updated grid options.
-grid_response = AgGrid(
-    data=df_producers,
-    gridOptions=grid_options,
-    height=1000,
-    width="100%",
-    update_mode=GridUpdateMode.MODEL_CHANGED,
-    fit_columns_on_grid_load=True,  # Automatically adjust columns when the grid loads.
-    allow_unsafe_jscode=True,
-    theme="streamlit",
-    custom_css=custom_css,
-)
+# Prepare and display the grid table with the updated grid options.
+grid_response = prepare_grid(df_producers, min_date, max_date)
 
 # Load detailed analytics per producer-chart.
 df_producer_charts = get_producer_analytics_per_chart(
