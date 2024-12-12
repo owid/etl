@@ -250,15 +250,12 @@ Analytics of charts using data by {producers_selected_str} between {min_date} an
 ########################################################################################################################
 
 # Streamlit app layout.
-st.markdown(
-    """# 📊 Producer analytics
-
-Explore analytics of data producers."""
-)
+st.title(":material/bar_chart: Producer analytics")
+st.markdown("Explore analytics of data producers.")
 
 with st.container(border=True):
     st.markdown(
-        f"Select the minimum and maximum dates for the custom date range (note that this metric started to be recorded on {MIN_DATE.strftime('%Y-%m-%d')})."
+        f"Select a custom date range (note that this metric started to be recorded on {MIN_DATE.strftime('%Y-%m-%d')})."
     )
 
     with st_horizontal():
@@ -273,7 +270,7 @@ with st.container(border=True):
             "Exclude auxiliary steps (e.g. population)",
             False,
             help="Exclude steps that are commonly used as auxiliary data, so they do not skew the analytics in favor of a few producers. But note that this will exclude all uses of these steps, even when they are the main datasets (not auxiliary). Auxiliary steps are:\n- "
-            + "\n- ".join(sorted(AUXILIARY_STEPS)),
+            + "\n- ".join(sorted(f"`{s}`" for s in AUXILIARY_STEPS)),
         )
 
 if exclude_auxiliary_steps:
