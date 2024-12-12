@@ -45,22 +45,6 @@ st.set_page_config(
 ########################################################################################################################
 
 
-def get_chart_renders_query(date_start, date_end) -> pd.DataFrame:
-    df_views = read_gbq(
-        f"""
-        SELECT grapher, SUM(events) AS renders
-        FROM prod_google_analytics4.grapher_views_by_day_page_grapher_device_country_iframe
-        WHERE
-            day >= '{date_start}'
-            AND day <= '{date_end}'
-            AND grapher LIKE '{GRAPHERS_BASE_URL}%'
-        GROUP BY grapher
-        """,
-        project_id="owid-analytics",
-    )
-    return cast(pd.DataFrame, df_views)
-
-
 @st.cache_data
 def get_grapher_views(
     date_start: str = MIN_DATE.strftime("%Y-%m-%d"),
