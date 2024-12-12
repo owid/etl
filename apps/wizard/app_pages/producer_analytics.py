@@ -41,8 +41,33 @@ st.set_page_config(
 
 
 ########################################################################################################################
-# FUNCTIONS
+# FUNCTIONS & GLOBAL VARS
 ########################################################################################################################
+def columns_producer(min_date, max_date):
+    # Define columns to be shown.
+    cols_prod = {
+        "producer": {
+            "headerName": "Producer",
+            "headerTooltip": "Name of the producer. This is NOT the name of the dataset.",
+        },
+        "n_charts": {
+            "headerName": "Charts",
+            "headerTooltip": "Number of charts using data from a producer.",
+        },
+        "renders_custom": {
+            "headerName": "Views in custom range",
+            "headerTooltip": f"Number of renders between {min_date} and {max_date}.",
+        },
+        "renders_365d": {
+            "headerName": "Views 365 days",
+            "headerTooltip": "Number of renders in the last 365 days.",
+        },
+        "renders_30d": {
+            "headerName": "Views 30 days",
+            "headerTooltip": "Number of renders in the last 30 days.",
+        },
+    }
+    return cols_prod
 
 
 @st.cache_data(show_spinner=False)
@@ -214,7 +239,7 @@ def get_producer_analytics_per_producer(min_date, max_date, excluded_steps):
     return df_grouped
 
 
-def prepare_grid(df_producers, min_date, max_date):
+def show_producers_grid(df_producers, min_date, max_date):
     gb = GridOptionsBuilder.from_dataframe(df_producers)
     gb.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
     gb.configure_selection(
@@ -231,31 +256,8 @@ def prepare_grid(df_producers, min_date, max_date):
     gb.configure_grid_options(suppressSizeToFit=False)  # Allows dynamic resizing to fit.
     gb.configure_default_column(autoSizeColumns=True)  # Ensures all columns can auto-size.
 
-    # Define columns to be shown.
-    COLUMNS_PRODUCERS = {
-        "producer": {
-            "headerName": "Producer",
-            "headerTooltip": "Name of the producer. This is NOT the name of the dataset.",
-        },
-        "n_charts": {
-            "headerName": "Charts",
-            "headerTooltip": "Number of charts using data from a producer.",
-        },
-        "renders_custom": {
-            "headerName": "Views in custom range",
-            "headerTooltip": f"Number of renders between {min_date} and {max_date}.",
-        },
-        "renders_365d": {
-            "headerName": "Views 365 days",
-            "headerTooltip": "Number of renders in the last 365 days.",
-        },
-        "renders_30d": {
-            "headerName": "Views 30 days",
-            "headerTooltip": "Number of renders in the last 30 days.",
-        },
-    }
-
     # Configure individual columns with specific settings.
+    COLUMNS_PRODUCERS = columns_producer(min_date, max_date)
     for column in COLUMNS_PRODUCERS:
         gb.configure_column(column, **COLUMNS_PRODUCERS[column])
     # Configure pagination with dynamic page size.
@@ -283,7 +285,121 @@ def prepare_grid(df_producers, min_date, max_date):
         custom_css=custom_css,
     )
 
-    return grid_response
+    # Get the selected producers from the first table.
+    producers_selected = [row["producer"] for row in grid_response["selected_rows"]]
+
+    return producers_selected
+
+
+def plot_chart_analytics(df):
+    # Get total daily views of selected producers.
+    grapher_urls_selected = df["grapher"].unique().tolist()  # type: ignore
+    df_total_daily_views = get_grapher_views(
+        date_start=min_date, date_end=max_date, groupby=["day"], grapher_urls=grapher_urls_selected
+    )
+
+    # Get daily views of the top 10 charts.
+    grapher_urls_top_10 = (
+        df.sort_values("renders_custom", ascending=False)["grapher"].unique().tolist()[0:10]  # type: ignore
+    )
+    df_top_10_daily_views = get_grapher_views(
+        date_start=min_date, date_end=max_date, groupby=["day", "grapher"], grapher_urls=grapher_urls_top_10
+    )
+
+    # Get total number of views and average daily views.
+    total_views = df_total_daily_views["renders"].sum()
+    average_daily_views = df_total_daily_views["renders"].mean()
+    # Get total views of the top 10 charts in the selected date range.
+    df_top_10_total_views = df_top_10_daily_views.groupby("grapher", as_index=False).agg({"renders": "sum"})
+
+    # Create a line chart.
+    df_plot = pd.concat([df_total_daily_views.assign(**{"grapher": "Total"}), df_top_10_daily_views]).rename(
+        columns={"grapher": "Chart slug"}
+    )
+    df_plot["Chart slug"] = df_plot["Chart slug"].apply(lambda x: x.split("/")[-1])
+    df_plot["day"] = pd.to_datetime(df_plot["day"]).dt.strftime("%a. %Y-%m-%d")
+    fig = px.line(
+        df_plot,
+        x="day",
+        y="renders",
+        color="Chart slug",
+        title="Total daily views and views of top 10 charts",
+    ).update_layout(xaxis_title=None, yaxis_title=None)
+
+    # Display the chart.
+    st.plotly_chart(fig, use_container_width=True)
+
+    return total_views, average_daily_views, df_top_10_total_views
+
+
+def show_producer_charts_grid(df):
+    # Configure and display the second table.
+    gb2 = GridOptionsBuilder.from_dataframe(df)
+    gb2.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
+    gb2.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
+
+    # Create a JavaScript renderer for clickable slugs.
+    grapher_slug_jscode = JsCode(
+        r"""
+        class UrlCellRenderer {
+        init(params) {
+            this.eGui = document.createElement('a');
+            if (params.value) {
+                // Extract the slug from the full URL.
+                const url = new URL(params.value);
+                const slug = url.pathname.split('/').pop();  // Get the last part of the path as the slug.
+                this.eGui.innerText = slug;
+                this.eGui.setAttribute('href', params.value);
+            } else {
+                this.eGui.innerText = '';
+            }
+            this.eGui.setAttribute('style', "text-decoration:none; color:blue");
+            this.eGui.setAttribute('target', "_blank");
+        }
+        getGui() {
+            return this.eGui;
+        }
+        }
+        """
+    )
+
+    # Define columns to be shown, including the cell renderer for "grapher".
+    COLUMNS_PRODUCERS = columns_producer(min_date, max_date)
+    COLUMNS_PRODUCER_CHARTS = {
+        column: (
+            {
+                "headerName": "Chart URL",
+                "headerTooltip": "URL of the chart in the grapher.",
+                "cellRenderer": grapher_slug_jscode,
+            }
+            if column == "grapher"
+            else COLUMNS_PRODUCERS[column]
+        )
+        for column in ["producer", "renders_custom", "renders_365d", "renders_30d", "grapher"]
+    }
+    # Configure and display the second table.
+    gb2 = GridOptionsBuilder.from_dataframe(df)
+    gb2.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
+    gb2.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
+
+    # Apply column configurations directly from the dictionary.
+    for column, config in COLUMNS_PRODUCER_CHARTS.items():
+        gb2.configure_column(column, **config)
+
+    # Configure pagination with dynamic page size.
+    gb2.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
+    grid_options2 = gb2.build()
+
+    # Display the grid.
+    AgGrid(
+        data=df,
+        gridOptions=grid_options2,
+        height=500,
+        width="100%",
+        fit_columns_on_grid_load=True,
+        allow_unsafe_jscode=True,
+        theme="streamlit",
+    )
 
 
 def prepare_summary(
@@ -363,31 +479,41 @@ else:
     # Otherwise, do not exclude any steps.
     excluded_steps = []
 
+########################################################################################################################
+# 1/ PRODUCER ANALYTICS: Display main table, with analytics per producer.
+# Allow the user to select a subset of producers.
+########################################################################################################################
 st.header("Analytics by producer")
 st.markdown(
     "Total number of charts and chart views for each producer. Producers selected in this table will be used to filter the producer-charts table below."
 )
 
-########################################################################################################################
-# Display MAIN TABLE with producer analytics.
-########################################################################################################################
-
 # Load table content and select only columns to be shown.
-with st.spinner("Loading data. This can take few seconds..."):
+with st.spinner("Loading producer data. This can take few seconds..."):
     df_producers = get_producer_analytics_per_producer(
         min_date=min_date, max_date=max_date, excluded_steps=excluded_steps
     )
 
-# Prepare and display the grid table with the updated grid options.
-grid_response = prepare_grid(df_producers, min_date, max_date)
-
-# Load detailed analytics per producer-chart.
-df_producer_charts = get_producer_analytics_per_chart(
-    min_date=min_date, max_date=max_date, excluded_steps=excluded_steps
+# Prepare and display the grid table with producer analytics.
+producers_selected = show_producers_grid(
+    df_producers=df_producers,
+    min_date=min_date,
+    max_date=max_date,
 )
 
+########################################################################################################################
+# 2/ CHART ANALYTICS: Display a chart with the total number of daily views, and the daily views of the top performing charts.
+########################################################################################################################
+st.header("Analytics by chart")
+st.markdown("Number of views for each chart that uses data by the selected producers.")
+
+# Load detailed analytics per producer-chart.
+with st.spinner("Loading chart data. This can take few seconds..."):
+    df_producer_charts = get_producer_analytics_per_chart(
+        min_date=min_date, max_date=max_date, excluded_steps=excluded_steps
+    )
+
 # Get the selected producers from the first table.
-producers_selected = [row["producer"] for row in grid_response["selected_rows"]]
 if len(producers_selected) == 0:
     # If no producers are selected, show all producer-charts.
     df_producer_charts_filtered = df_producer_charts
@@ -395,126 +521,14 @@ else:
     # Filter producer-charts by selected producers.
     df_producer_charts_filtered = df_producer_charts[df_producer_charts["producer"].isin(producers_selected)]
 
+# Show chart with chart analytics, and get some summary data.
+total_views, average_daily_views, df_top_10_total_views = plot_chart_analytics(df_producer_charts_filtered)
+
+# Show table
+show_producer_charts_grid(df_producer_charts_filtered)
 
 ########################################################################################################################
-# Display a chart with the total number of daily views, and the daily views of the top performing charts.
-########################################################################################################################
-
-st.markdown(
-    """## Analytics by chart
-
-Number of views for each chart that uses data by the selected producers.
-"""
-)
-
-# Get total daily views of selected producers.
-grapher_urls_selected = df_producer_charts_filtered["grapher"].unique().tolist()  # type: ignore
-df_total_daily_views = get_grapher_views(
-    date_start=min_date, date_end=max_date, groupby=["day"], grapher_urls=grapher_urls_selected
-)
-
-# Get total number of views and average daily views.
-total_views = df_total_daily_views["renders"].sum()
-average_daily_views = df_total_daily_views["renders"].mean()
-
-# Get daily views of the top 10 charts.
-grapher_urls_top_10 = (
-    df_producer_charts_filtered.sort_values("renders_custom", ascending=False)["grapher"].unique().tolist()[0:10]  # type: ignore
-)
-df_top_10_daily_views = get_grapher_views(
-    date_start=min_date, date_end=max_date, groupby=["day", "grapher"], grapher_urls=grapher_urls_top_10
-)
-
-# Get total views of the top 10 charts in the selected date range.
-df_top_10_total_views = df_top_10_daily_views.groupby("grapher", as_index=False).agg({"renders": "sum"})
-
-# Create a line chart.
-df_plot = pd.concat([df_total_daily_views.assign(**{"grapher": "Total"}), df_top_10_daily_views]).rename(
-    columns={"grapher": "Chart slug"}
-)
-df_plot["Chart slug"] = df_plot["Chart slug"].apply(lambda x: x.split("/")[-1])
-df_plot["day"] = pd.to_datetime(df_plot["day"]).dt.strftime("%a. %Y-%m-%d")
-fig = px.line(
-    df_plot, x="day", y="renders", color="Chart slug", title="Total daily views and views of top 10 charts"
-).update_layout(xaxis_title=None, yaxis_title=None)
-
-# Display the chart.
-st.plotly_chart(fig, use_container_width=True)
-
-
-########################################################################################################################
-# Display table with producer-chart analytics.
-########################################################################################################################
-
-# Configure and display the second table.
-gb2 = GridOptionsBuilder.from_dataframe(df_producer_charts_filtered)
-gb2.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
-gb2.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
-
-# Create a JavaScript renderer for clickable slugs.
-grapher_slug_jscode = JsCode(
-    r"""
-    class UrlCellRenderer {
-    init(params) {
-        this.eGui = document.createElement('a');
-        if (params.value) {
-            // Extract the slug from the full URL.
-            const url = new URL(params.value);
-            const slug = url.pathname.split('/').pop();  // Get the last part of the path as the slug.
-            this.eGui.innerText = slug;
-            this.eGui.setAttribute('href', params.value);
-        } else {
-            this.eGui.innerText = '';
-        }
-        this.eGui.setAttribute('style', "text-decoration:none; color:blue");
-        this.eGui.setAttribute('target', "_blank");
-    }
-    getGui() {
-        return this.eGui;
-    }
-    }
-    """
-)
-
-# Define columns to be shown, including the cell renderer for "grapher".
-COLUMNS_PRODUCER_CHARTS = {
-    column: (
-        {
-            "headerName": "Chart URL",
-            "headerTooltip": "URL of the chart in the grapher.",
-            "cellRenderer": grapher_slug_jscode,
-        }
-        if column == "grapher"
-        else COLUMNS_PRODUCERS[column]
-    )
-    for column in ["producer", "renders_custom", "renders_365d", "renders_30d", "grapher"]
-}
-# Configure and display the second table.
-gb2 = GridOptionsBuilder.from_dataframe(df_producer_charts_filtered)
-gb2.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
-gb2.configure_default_column(editable=False, groupable=True, sortable=True, filterable=True, resizable=True)
-
-# Apply column configurations directly from the dictionary.
-for column, config in COLUMNS_PRODUCER_CHARTS.items():
-    gb2.configure_column(column, **config)
-
-# Configure pagination with dynamic page size.
-gb2.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
-grid_options2 = gb2.build()
-
-# Display the grid.
-AgGrid(
-    data=df_producer_charts_filtered,
-    gridOptions=grid_options2,
-    height=500,
-    width="100%",
-    fit_columns_on_grid_load=True,
-    allow_unsafe_jscode=True,
-    theme="streamlit",
-)
-
-########################################################################################################################
-# Display a summary to be shared with the data producer.
+# 3/ SUMMARY: Display a summary to be shared with the data producer.
 ########################################################################################################################
 
 # Prepare the summary to be copy-pasted.
