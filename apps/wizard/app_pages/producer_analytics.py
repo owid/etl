@@ -240,6 +240,7 @@ def get_producer_analytics_per_producer(min_date, max_date, excluded_steps):
 
 
 def show_producers_grid(df_producers, min_date, max_date):
+    """Show table with producers analytics."""
     gb = GridOptionsBuilder.from_dataframe(df_producers)
     gb.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
     gb.configure_selection(
@@ -283,6 +284,7 @@ def show_producers_grid(df_producers, min_date, max_date):
         allow_unsafe_jscode=True,
         theme="streamlit",
         custom_css=custom_css,
+        # excel_export_mode=ExcelExportMode.MANUAL,  # Doesn't work?
     )
 
     # Get the selected producers from the first table.
@@ -292,6 +294,7 @@ def show_producers_grid(df_producers, min_date, max_date):
 
 
 def plot_chart_analytics(df):
+    """Show chart with analytics on producer's charts."""
     # Get total daily views of selected producers.
     grapher_urls_selected = df["grapher"].unique().tolist()  # type: ignore
     df_total_daily_views = get_grapher_views(
@@ -333,6 +336,7 @@ def plot_chart_analytics(df):
 
 
 def show_producer_charts_grid(df):
+    """Show table with analytics on producer's charts."""
     # Configure and display the second table.
     gb2 = GridOptionsBuilder.from_dataframe(df)
     gb2.configure_grid_options(domLayout="autoHeight", enableCellTextSelection=True)
@@ -399,16 +403,18 @@ def show_producer_charts_grid(df):
         fit_columns_on_grid_load=True,
         allow_unsafe_jscode=True,
         theme="streamlit",
+        # excel_export_mode=ExcelExportMode.MANUAL,  # Doesn't work?
     )
 
 
 def prepare_summary(
     df_top_10_total_views, producers_selected, total_views, average_daily_views, min_date, max_date
 ) -> str:
+    """Prepare summary at the end of the app."""
     # Prepare the total number of views.
-    total_views_str = f"{total_views:9,}".replace(",", " ")
+    total_views_str = f"{total_views:9,}"
     # Prepare the average daily views.
-    average_views_str = f"{round(average_daily_views):9,}".replace(",", " ")
+    average_views_str = f"{round(average_daily_views):9,}"
     # Prepare a summary of the top 10 charts to be copy-pasted.
     if len(producers_selected) == 0:
         producers_selected_str = "all producers"
@@ -419,7 +425,7 @@ def prepare_summary(
     # NOTE: I tried .to_string() and .to_markdown() and couldn't find a way to keep a meaningful format.
     df_summary_str = ""
     for _, row in df_top_10_total_views.sort_values("renders", ascending=False).iterrows():
-        df_summary_str += f"{row['renders']:9,}".replace(",", " ") + " - " + row["grapher"] + "\n"
+        df_summary_str += f"{row['renders']:9,}" + " - " + row["grapher"] + "\n"
 
     # Define the content to copy.
     summary = f"""\
@@ -546,9 +552,9 @@ st.markdown(
     """## Summary for data producers
 
 For now, to share analytics with a data producer you can so any of the following:
-- Right-click on the table above and export as a CSV or Excel file.
-- Click on the camera icon on the top right of the chart to download the chart as a PNG.
-- Click on the upper right corner of the box below to copy the summary to the clipboard.
+- **Table export**: Right-click on a cell in the above's table and export as a CSV or Excel file.
+- **Chart export**: Click on the camera icon on the top right of the chart to download the chart as a PNG.
+- **Copy summary**: Click on the upper right corner of the box below to copy the summary to the clipboard.
 """
 )
 st.code(summary, language="text")
