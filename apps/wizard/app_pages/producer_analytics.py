@@ -447,7 +447,7 @@ with st.container(border=True):
         f"Select a custom date range (note that this metric started to be recorded on {MIN_DATE.strftime('%Y-%m-%d')})."
     )
 
-    with st_horizontal():
+    with st_horizontal(vertical_alignment="center"):
         # Create input fields for minimum and maximum dates.
         min_date = st.date_input(
             "Select minimum date",
