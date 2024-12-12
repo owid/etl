@@ -77,9 +77,10 @@ def repack_series(s: pd.Series) -> pd.Series:
 def _to_float(s: pd.Series) -> pd.Series:
     """Convert series to Float64. Replace numpy NaNs with NA. This can
     happen when original series is an object and contains 'nan' string."""
-    s = s.astype("Float64")
-    s = s.mask(np.isnan(s), pd.NA)
-    return s
+    r = s.astype("Float64")
+    if s.dtype == "object":
+        r = r.mask(np.isnan(r), pd.NA)
+    return r
 
 
 def to_int(s: pd.Series) -> pd.Series:
@@ -173,7 +174,7 @@ def _safe_dtype(dtype: Any) -> str:
         return "boolean"
     elif isinstance(dtype, pd.CategoricalDtype):
         return "string[pyarrow]"
-    elif dtype == object:
+    elif dtype == "object":
         return "string[pyarrow]"
     else:
         return dtype

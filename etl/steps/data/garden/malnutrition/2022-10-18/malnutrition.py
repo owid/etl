@@ -1,5 +1,5 @@
-"""Combine WDI's prevalence of stunting, wasting and underweight in children under five. Convert this into absolute numbers using UNWPP population data.
-"""
+"""Combine WDI's prevalence of stunting, wasting and underweight in children under five. Convert this into absolute numbers using UNWPP population data."""
+
 from owid import catalog
 from shared import CURRENT_DIR
 

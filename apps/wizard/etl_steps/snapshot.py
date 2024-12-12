@@ -1,4 +1,5 @@
 """Snapshot phase."""
+
 import os
 import subprocess
 import traceback

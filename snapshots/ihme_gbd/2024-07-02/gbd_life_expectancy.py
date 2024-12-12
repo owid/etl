@@ -15,6 +15,7 @@ Important - You need and account to access the data.
 
 We will download and combine the files in the following script.
 """
+
 from pathlib import Path
 
 import click

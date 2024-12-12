@@ -1,55 +1,31 @@
 meta:
+  source:
+    name: Multiple sources compiled by Our World in Data (2019)
+    url: nan
+    source_data_url: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQjyo0SCpkP7gW490fsxx2x0nkCPqW3elr5LfI-zbFWkb1rzOAumgJrEDO0eFpoEtPsZyHjIM58iXDe/pub?output=csv
+    date_accessed: '2024-12-02'
+    published_by: Multiple sources compiled by Our World in Data (2019)
   name: Historical world population comparison (various sources)
-  description: >-
+  description: |-
     Among others these are the original source:
 
+    McEvedy, Colin and Richard Jones, 1978, “Atlas of World Population History,” Facts on File, New York, pp. 342-351.
 
-    McEvedy, Colin and Richard Jones, 1978, “Atlas of World Population History,” Facts
-    on File, New York, pp. 342-351.
+    Biraben, Jean-Noel, 1980, An Essay Concerning Mankind’s Evolution, Population, Selected Papers, December, table 2.
 
+    Durand, John D., 1974, “Historical Estimates of World Population: An Evaluation,” University of Pennsylvania, Population Center, Analytical and Technical Reports, Number 10, table 2.
 
-    Biraben, Jean-Noel, 1980, An Essay Concerning Mankind’s Evolution, Population,
-    Selected Papers, December, table 2.
+    Haub, Carl, 1995, “How Many People Have Ever Lived on Earth?” Population Today, February, p. 5.
 
+    Thomlinson, Ralph, 1975, “Demographic Problems, Controversy Over Population Control,” Second Edition, Table 1.
 
-    Durand, John D., 1974, “Historical Estimates of World Population: An Evaluation,”
-    University of Pennsylvania, Population
-    Center, Analytical and Technical Reports, Number 10, table 2.
-
-
-    Haub, Carl, 1995, “How Many People Have Ever Lived on Earth?” Population Today,
-    February, p. 5.
-
-
-    Thomlinson, Ralph, 1975, “Demographic Problems, Controversy Over Population Control,”
-    Second Edition, Table 1.
-
-
-    United Nations, 1999, The World at Six Billion, Table 1, “World Population From”
-    Year 0 to Stabilization, p. 5,
-
+    United Nations, 1999, The World at Six Billion, Table 1, “World Population From” Year 0 to Stabilization, p. 5,
     U.S. Census Bureau (USCB), 2012, Total Midyear Population for the World: 1950-2050.
 
-
-    Michael Kremer (1993) “Population Growth and Technological Change: One Million
-    B.C. to 1990”, Quarterly Journal of Economics.,
-    August 1993, pp.681-716.
-  source:
-    name: Google Sheet
-    description:
-    url: ''
-    source_data_url: 
-      https://docs.google.com/spreadsheets/d/e/2PACX-1vQjyo0SCpkP7gW490fsxx2x0nkCPqW3elr5LfI-zbFWkb1rzOAumgJrEDO0eFpoEtPsZyHjIM58iXDe/pub?output=csv
-    owid_data_url:
-    date_accessed: '2023-07-03'
-    publication_date:
-    publication_year:
-    published_by: Google Sheet
-  license:
-    name:
-    url:
-wdir: ../../../data/snapshots/fasttrack/2023-06-19
+    Michael Kremer (1993) “Population Growth and Technological Change: One Million B.C. to 1990”, Quarterly Journal of Economics., August 1993, pp.681-716.
+  license: {}
 outs:
-- md5: fa998c4590ac0bdada993b0bcaf0f2a8
-  size: 14087
-  path: world_population_comparison.csv
+  - md5: f7ff2acb39ad85d3a9b2599a63175abc
+    size: 13424
+    path: world_population_comparison.csv

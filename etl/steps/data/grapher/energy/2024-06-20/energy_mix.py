@@ -1,5 +1,5 @@
-"""Grapher step for BP's energy mix dataset.
-"""
+"""Grapher step for BP's energy mix dataset."""
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.

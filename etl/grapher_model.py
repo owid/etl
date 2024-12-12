@@ -13,6 +13,7 @@ Another option is to run `show create table mytable;` in MySQL and then ask Chat
 
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
 """
+
 import copy
 import io
 import json
@@ -425,13 +426,15 @@ class Chart(Base):
         rows = session.execute(stm).scalars().all()
         variables = {r.id: r for r in rows}
 
+        # NOTE: columnSlug must always exist in dimensions and in chart_dimensions, so there's
+        # no need to include columnSlug
         # add columnSlug if present
-        column_slug = self.config.get("map", {}).get("columnSlug")
-        if column_slug:
-            try:
-                variables[int(column_slug)] = Variable.load_variable(session, column_slug)
-            except NoResultFound:
-                raise ValueError(f"columnSlug variable {column_slug} for chart {self.id} not found")
+        # column_slug = self.config.get("map", {}).get("columnSlug")
+        # if column_slug:
+        #     try:
+        #         variables[int(column_slug)] = Variable.load_variable(session, column_slug)
+        #     except NoResultFound:
+        #         raise ValueError(f"columnSlug variable {column_slug} for chart {self.id} not found")
 
         return variables
 
@@ -1269,15 +1272,13 @@ class Variable(Base):
     @classmethod
     def from_id_or_path(
         cls, session: Session, id_or_path: str | int, columns: Optional[List[str]] = None
-    ) -> "Variable":
-        ...
+    ) -> "Variable": ...
 
     @overload
     @classmethod
     def from_id_or_path(
         cls, session: Session, id_or_path: List[str | int], columns: Optional[List[str]] = None
-    ) -> List["Variable"]:
-        ...
+    ) -> List["Variable"]: ...
 
     @classmethod
     def from_id_or_path(
@@ -1321,15 +1322,15 @@ class Variable(Base):
 
     @overload
     @classmethod
-    def from_catalog_path(cls, session: Session, catalog_path: str, columns: Optional[List[str]] = None) -> "Variable":
-        ...
+    def from_catalog_path(
+        cls, session: Session, catalog_path: str, columns: Optional[List[str]] = None
+    ) -> "Variable": ...
 
     @overload
     @classmethod
     def from_catalog_path(
         cls, session: Session, catalog_path: List[str], columns: Optional[List[str]] = None
-    ) -> List["Variable"]:
-        ...
+    ) -> List["Variable"]: ...
 
     @classmethod
     def from_catalog_path(
@@ -1344,13 +1345,13 @@ class Variable(Base):
 
     @overload
     @classmethod
-    def from_id(cls, session: Session, variable_id: int, columns: Optional[List[str]] = None) -> "Variable":
-        ...
+    def from_id(cls, session: Session, variable_id: int, columns: Optional[List[str]] = None) -> "Variable": ...
 
     @overload
     @classmethod
-    def from_id(cls, session: Session, variable_id: List[int], columns: Optional[List[str]] = None) -> List["Variable"]:
-        ...
+    def from_id(
+        cls, session: Session, variable_id: List[int], columns: Optional[List[str]] = None
+    ) -> List["Variable"]: ...
 
     @classmethod
     def from_id(
@@ -1864,7 +1865,9 @@ def _remap_variable_ids(config: Union[List, Dict[str, Any], Any], remap_ids: Dic
                 out[k] = remap_ids[int(v)]
             # columnSlug is actually a variable id, but stored as a string (it wasn't a great decision)
             elif k in ("columnSlug", "sortColumnSlug"):
-                out[k] = str(remap_ids[int(v)])
+                # sometimes columnSlug stays in config, but is deleted from dimensions. Ignore it
+                if int(v) in remap_ids:
+                    out[k] = str(remap_ids[int(v)])
             # if new fields with variable ids are added, try to handle them and raise a warning
             elif isinstance(v, int) and v in remap_ids:
                 log.warning("remap_variable_ids.new_field", field=k, value=v)

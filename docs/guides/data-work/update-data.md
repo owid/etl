@@ -12,9 +12,9 @@ This guide explains the general workflow to update a dataset that already exists
     In a nutshell, these are the steps to follow:
 
     - Switch to `master` branch (`git switch master`), and ensure it's up-to-date (`git pull`).
-    - Create a new branch and a draft pull request (PR) with a staging server:
+    - Create a new branch (name is auto-generated) and a draft pull request (PR) with a staging server:
         ```bash
-        etl pr update-{short_name} -c data -t "{short_name}: update"
+        etl pr "{short_name}: update" data
         ```
     - Use the ETL Dashboard to create new versions of the steps (this will duplicate the code of the old steps).
     - Execute the newly created snapshot scripts, if any.
@@ -47,7 +47,7 @@ This guide assumes you have already a [working installation of `etl`](../../../g
 - **Create a draft PR and a temporary staging server**
     - Create a PR with the following command (replace `{short_name}` with the short name of the dataset, e.g. `temperature-anomaly`):
     ```bash
-    etl pr update-{short_name} -c data -t "{short_name}: update"
+    etl pr "{short_name}: update" data
     ```
 
         This will create a new git branch in your local repository with an empty commit, which will be pushed to remote. It will also create a draft pull request in github, and a staging server.

@@ -117,7 +117,8 @@ def filter_to_subgraph(
     if exact_match:
         included = set(includes) & all_steps
     else:
-        included = {s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)}
+        compiled_includes = [re.compile(p) for p in includes]
+        included = {s for s in all_steps if any(p.search(s) for p in compiled_includes)}
 
     if only:
         # Only include explicitly selected nodes
@@ -369,14 +370,11 @@ class Step(Protocol):
     version: str
     dependencies: List["Step"]
 
-    def run(self) -> None:
-        ...
+    def run(self) -> None: ...
 
-    def is_dirty(self) -> bool:
-        ...
+    def is_dirty(self) -> bool: ...
 
-    def checksum_output(self) -> str:
-        ...
+    def checksum_output(self) -> str: ...
 
     def __str__(self) -> str:
         raise NotImplementedError()

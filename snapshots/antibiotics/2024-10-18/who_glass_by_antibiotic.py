@@ -13,7 +13,6 @@ Then zip this up and upload the file to snapshot.
 
 """
 
-
 from pathlib import Path
 
 import click

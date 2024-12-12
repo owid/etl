@@ -1,7 +1,7 @@
 definitions:
   global:
     projections:
-      <%- if variant != 'estimates' -%>
+      <%- if (variant is defined) and (variant != 'estimates') -%>
         Projections from 2024 onwards are based on the UN's << variant >> scenario.
       <%- endif -%>
     dimensions:
@@ -43,6 +43,7 @@ definitions:
         {definitions.global.projections}
 
       description_short_births: |-
+        <%- if sex is defined -%>
         <%-if not (sex == 'all' and age == 'all') -%>
         This only includes
         <%- if sex != 'all' -%>
@@ -51,7 +52,8 @@ definitions:
         <%- if age != 'all' -%>
         mothers aged << age >>
         <%- endif -%>.
-        <%-endif -%>
+        <%- endif -%>
+        <%- endif -%>
 
         {definitions.global.projections}
 

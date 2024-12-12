@@ -7,6 +7,7 @@ What do we do here?
 - Format the tables to have them in long format
 - Set indices and verify integrity
 """
+
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np

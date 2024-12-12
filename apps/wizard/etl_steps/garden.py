@@ -1,4 +1,5 @@
 """Garden phase."""
+
 import os
 from pathlib import Path
 from typing import List, cast
@@ -452,9 +453,9 @@ if submitted:
                     f"Use the generated notebook `{notebook_path.relative_to(BASE_DIR)}` to examine the dataset output interactively."
                 )
                 # B/ Generate metadata
-                st.session_state[
-                    "garden.dataset_path"
-                ] = f"data/garden/{form.namespace}/{form.version}/{form.short_name}"
+                st.session_state["garden.dataset_path"] = (
+                    f"data/garden/{form.namespace}/{form.version}/{form.short_name}"
+                )
                 st.markdown("#### Generate metadata")
                 st.markdown(f"Generate metadata file `{form.short_name}.meta.yml` from your dataset with:")
                 st.button(

@@ -9,7 +9,6 @@ These are manually created, based on:
 
 """
 
-
 MAPPING_GENDER_VALUES = {
     1: "male",
     2: "female",

@@ -102,8 +102,8 @@ definitions:
   description_short_intensity: The intensity is the share of indicators in which people in multidimensional poverty are deprived on average.
   description_short_vulnerable: This is the share of the population that is close to being in multidimensional poverty.
   description_short_severe: This is the share of the population that is in severe multidimensional poverty.
-  description_short_censored_headcount_ratio: This is the share of the multidimensionally poor population deprived in the indicator <<indicator.lower()>>.
-  description_short_uncensored_headcount_ratio: This is the share of the population deprived in the indicator <<indicator.lower()>>.
+  description_short_censored_headcount_ratio: This is the share of the multidimensionally poor population deprived in the indicator _<<indicator.lower()>>_.
+  description_short_uncensored_headcount_ratio: This is the share of the population deprived in the indicator _<<indicator.lower()>>_.
   description_short_area: |-
     <% if area == "Urban" %>
      This indicator is calculated for urban areas.
@@ -115,9 +115,9 @@ definitions:
 
   # For description_key
   description_key_multidimensional_poverty_complement: |-
-    grouped into three dimensions of well-being: **health** (using two indicators: nutrition, child mortality), **education** (using two indicators: years of schooling, school attendance), and **living standards** (using five indicators: cooking fuel, sanitation, drinking water, electricity, housing, assets).
+    grouped into three dimensions of well-being: **health** (using two indicators: nutrition, child mortality), **education** (using two indicators: years of schooling, school attendance), and **living standards** (using six indicators: cooking fuel, sanitation, drinking water, electricity, housing, assets).
   description_key_multidimensional_poverty: |-
-    Being _MPI poor_ means that a person lives in a household deprived in a third or more of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
+    Being in multidimensional poverty means that a person lives in a household deprived in a third or more of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
   description_key_vulnerable: |-
     Being _vulnerable_ to multidimensional poverty means that a person lives in a household deprived in 20-33.3% of ten indicators, {definitions.description_key_multidimensional_poverty_complement}
   description_key_severe: |-
@@ -127,14 +127,30 @@ definitions:
   description_key_weights: |-
     Each indicator contributes to one of the three dimensions of well-being.  Health and education indicators are weighted more (1/6 each) than living standards indicators (1/18 each) so that all three dimensions contribute equally to the overall measure.
   description_key_mpi: |-
-    The Multidimensional Poverty Index (MPI) is calculated by multiplying two values: the share of people who are multidimensionally poor and the intensity of their poverty.
+    The Multidimensional Poverty Index (MPI) is calculated by multiplying two values: the [share of people who are multidimensionally poor](https://ourworldindata.org/grapher/share-multi-poverty) and the [intensity of their poverty](https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty-national).
   description_key_intensity: |-
     The intensity of multidimensional poverty is calculated as the average share of indicators in which those counted as MPI poor are deprived.
+  description_key_flavor_cme: |-
+    This indicator is a current margin estimate (CME), meaning that it relies on the most recent survey data available for each country.
+  description_key_flavor_hot: |-
+    This indicator is a harmonized over time (HOT) estimate. This harmonization seeks to make two or more MPI estimates comparable by aligning the indicator definitions in each survey.
   description_key_flavor: |-
     <% if flavor == "Current margin estimate" %>
-    This indicator is a current margin estimate (CME), based on the most recent survey data available for each country. Look for the harmonized over time (HOT) estimate to see trends over time.
+    {definitions.description_key_flavor_cme}{definitions.description_key_flavor_link}
     <% elif flavor == "Harmonized over time" %>
-    This indicator is a harmonized over time (HOT) estimate. This harmonization seeks to make two or more MPI estimates comparable by aligning the indicator definitions in each survey. Look for the current margin estimate (CME) to see the most recent survey data.
+    {definitions.description_key_flavor_hot}{definitions.description_key_flavor_link}
+    <%- endif -%>
+  description_key_flavor_link: |-
+    <% if flavor == "Current margin estimate" and area == "National" %>
+     Look for the [harmonized over time (HOT) estimate](<<hot_link>>) to see trends over time.
+    <% elif flavor == "Harmonized over time" and area == "National" %>
+     Look for the [current margin estimate (CME)](<<cme_link>>) to see the most recent survey data.
+    <%- endif -%>
+  description_key_flavor_no_links_for_national: |-
+    <% if flavor == "Current margin estimate" %>
+    {definitions.description_key_flavor_cme}
+    <% elif flavor == "Harmonized over time" %>
+    {definitions.description_key_flavor_hot}
     <%- endif -%>
   description_key_indicator_start: |-
     A person in a household is deprived in the indicator _<<indicator.lower()>>_ if
@@ -163,12 +179,27 @@ definitions:
   description_key_indicator: |-
     {definitions.description_key_indicator_start} {definitions.description_key_indicator_end}
 
+  # For title_variant
+  title_variant_area: |-
+    <% if area == "Urban" %>
+    , Urban area
+    <% elif area == "Rural" %>
+    , Rural area
+    <% elif area == "Camp" %>
+    , Refugee camps
+    <%- endif -%>
+
+  title_variant_flavor: |-
+    <% if flavor == "Current margin estimate" %>
+    Most recent year
+    <% elif flavor == "Harmonized over time" %>
+    Harmonized over time
+    <%- endif -%>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
 
 tables:
   multidimensional_poverty_index:
@@ -184,10 +215,10 @@ tables:
           - "{definitions.description_key_assessments}"
           - "{definitions.description_key_weights}"
           - "{definitions.description_key_intensity}"
-          - "{definitions.description_key_flavor}"
+          - <% set cme_link = "https://ourworldindata.org/grapher/multidimensional-poverty-index-mpi" %> <% set hot_link = "https://ourworldindata.org/grapher/multidimensional-poverty-index-mpi-hot" %>{definitions.description_key_flavor}
         presentation:
           title_public: Multidimensional Poverty Index (MPI)
-          title_variant: <<area>>, <<flavor>>
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Multidimensional Poverty Index (MPI)
           numDecimalPlaces: 3
@@ -202,10 +233,10 @@ tables:
           - "{definitions.description_key_multidimensional_poverty}"
           - "{definitions.description_key_assessments}"
           - "{definitions.description_key_weights}"
-          - "{definitions.description_key_flavor}"
+          - <% set cme_link = "https://ourworldindata.org/grapher/share-multi-poverty" %> <% set hot_link = "https://ourworldindata.org/grapher/share-of-population-multidimensionally-poor-hot" %>{definitions.description_key_flavor}
         presentation:
           title_public: Share of population living in multidimensional poverty
-          title_variant: <<area>>, <<flavor>>
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Share of population living in multidimensional poverty
           numDecimalPlaces: 1
@@ -221,10 +252,10 @@ tables:
           - "{definitions.description_key_assessments}"
           - "{definitions.description_key_intensity}"
           - "{definitions.description_key_weights}"
-          - "{definitions.description_key_flavor}"
+          - <% set cme_link = "https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty" %> <% set hot_link = "https://ourworldindata.org/grapher/intensity-of-multidimensional-poverty-hot" %>{definitions.description_key_flavor}
         presentation:
           title_public: Intensity of multidimensional poverty
-          title_variant: <<area>>, <<flavor>>
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Intensity of multidimensional poverty
           numDecimalPlaces: 1
@@ -239,10 +270,10 @@ tables:
           - "{definitions.description_key_vulnerable}"
           - "{definitions.description_key_assessments}"
           - "{definitions.description_key_weights}"
-          - "{definitions.description_key_flavor}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
         presentation:
           title_public: Share of population vulnerable to multidimensional poverty
-          title_variant: <<area>>, <<flavor>>
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Share of population vulnerable to multidimensional poverty
           numDecimalPlaces: 1
@@ -257,10 +288,10 @@ tables:
           - "{definitions.description_key_severe}"
           - "{definitions.description_key_assessments}"
           - "{definitions.description_key_weights}"
-          - "{definitions.description_key_flavor}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
         presentation:
           title_public: Share of population living in severe multidimensional poverty
-          title_variant: <<area>>, <<flavor>>
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Share of population living in severe multidimensional poverty
           numDecimalPlaces: 1
@@ -274,10 +305,10 @@ tables:
         description_key:
           - "{definitions.description_key_multidimensional_poverty}"
           - "{definitions.description_key_indicator}"
-          - "{definitions.description_key_flavor}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
         presentation:
           title_public: Share of population in multidimensional poverty deprived in the indicator <<indicator>>
-          title_variant: <<area>>, <<flavor>>
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Share of population in multidimensional poverty deprived in the indicator <<indicator>>
           numDecimalPlaces: 1
@@ -291,12 +322,11 @@ tables:
         description_key:
           - "{definitions.description_key_multidimensional_poverty}"
           - "{definitions.description_key_indicator}"
-          - "{definitions.description_key_flavor}"
+          - "{definitions.description_key_flavor_no_links_for_national}"
         presentation:
           title_public: Share of population deprived in the indicator <<indicator>>
-          title_variant: <<area>>, <<flavor>>
+          title_variant: "{definitions.title_variant_flavor}{definitions.title_variant_area}"
         display:
           name: Share of population deprived in the indicator <<indicator>>
           numDecimalPlaces: 1
           <<: *common_display
-

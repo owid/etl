@@ -11,7 +11,7 @@ paths = PathFinder(__file__)
 WHO_REGION_MEMBERS = {
     "African Region (WHO)": 47,
     "World": 194,
-    "Eastern Mediterranean (WHO)": 21,
+    "Eastern Mediterranean (WHO)": 22,
     "European Region (WHO)": 53,
     "Region of the Americas (WHO)": 35,
     "South-East Asia Region (WHO)": 11,

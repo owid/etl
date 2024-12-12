@@ -6,6 +6,7 @@ import hashlib
 import json
 import shutil
 import warnings
+from _hashlib import HASH
 from dataclasses import dataclass
 from glob import glob
 from os import environ
@@ -16,7 +17,6 @@ from typing import Any, Dict, Iterator, List, Literal, Optional, Union, cast
 import numpy as np
 import pandas as pd
 import yaml
-from _hashlib import HASH
 
 from owid.repack import to_safe_types
 
@@ -119,7 +119,7 @@ class Dataset:
             utils.validate_underscore(col, "Variable's name")
 
         if not table.primary_key:
-            if "OWID_STRICT" in environ:
+            if environ.get("OWID_STRICT"):
                 raise PrimaryKeyMissing(
                     f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
                 )
@@ -128,7 +128,7 @@ class Dataset:
                     f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
                 )
 
-        if not table.index.is_unique and "OWID_STRICT" in environ:
+        if not table.index.is_unique and environ.get("OWID_STRICT"):
             [(k, dups)] = table.index.value_counts().head(1).to_dict().items()
             raise NonUniqueIndex(
                 f"Table `{table.metadata.short_name}` has duplicate values in the index -- could you have made a mistake?\n\n"

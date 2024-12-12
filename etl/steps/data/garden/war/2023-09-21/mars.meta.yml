@@ -41,6 +41,7 @@ definitions:
 
   number_deaths:
     description_short: |-
+      <% set per_capita = "" %>
       <%- if conflict_type == "all" -%>
       The << estimate >> estimate of the number of deaths<< per_capita >> in all ongoing conventional wars that year.
 

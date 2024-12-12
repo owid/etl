@@ -1,6 +1,4 @@
-"""Load snapshot of Nemet (2009) data and create a table.
-
-"""
+"""Load snapshot of Nemet (2009) data and create a table."""
 
 from etl.helpers import PathFinder, create_dataset
 

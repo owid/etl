@@ -1,0 +1,55 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Fertility Rate
+      attribution: UN WPP (2024); HFD (2024)
+    processing_level: major
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Fertility Rate (UN WPP; HFD)
+  update_period_days: 365
+
+tables:
+  fertility_rate:
+    variables:
+      fertility_rate:
+        title: Fertility rate (period)
+        description_short: |-
+          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
+        description_key:
+          - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
+          - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
+        unit: live births per woman
+        description_processing: |-
+          The fertility data is constructed by combining data from multiple sources:
+
+          - Before 1949: Historical estimates by Human Fertility Database (2024).
+
+          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+
+          - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
+        presentation:
+          title_public: Fertility rate
+          title_variant: period tables
+
+      fertility_rate_hist:
+        title: Fertility rate (period), historical
+        description_short: |-
+          The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality.
+        description_key:
+          - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
+          - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
+        unit: live births per woman
+        description_processing: |-
+          The fertility data is constructed by combining data from multiple sources:
+
+          - Before 1949: Historical estimates by Human Fertility Database (2024).
+
+          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+        presentation:
+          title_public: Fertility rate
+          title_variant: period tables

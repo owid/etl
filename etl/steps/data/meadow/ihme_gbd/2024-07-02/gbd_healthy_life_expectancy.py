@@ -1,4 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
+
 import zipfile
 
 from owid.catalog import Table

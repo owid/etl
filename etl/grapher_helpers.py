@@ -2,7 +2,7 @@ import copy
 from dataclasses import dataclass, field, is_dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
+from typing import Any, Dict, Iterable, List, Literal, Optional, Set, Union, cast
 
 import jinja2
 import numpy as np
@@ -10,10 +10,9 @@ import pandas as pd
 import pymysql
 import sqlalchemy
 import structlog
-from jinja2 import Environment
 from owid import catalog
 from owid.catalog import warnings
-from owid.catalog.utils import underscore
+from owid.catalog.utils import dynamic_yaml_load, dynamic_yaml_to_dict, underscore
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
@@ -23,7 +22,7 @@ from etl.grapher_io import add_entity_code_and_name, trim_long_variable_name
 
 log = structlog.get_logger()
 
-jinja_env = Environment(
+jinja_env = jinja2.Environment(
     block_start_string="<%",
     block_end_string="%>",
     variable_start_string="<<",
@@ -32,7 +31,16 @@ jinja_env = Environment(
     comment_end_string="#>",
     trim_blocks=True,
     lstrip_blocks=True,
+    undefined=jinja2.StrictUndefined,
 )
+
+
+# Helper function to raise an error with << raise("uh oh...") >>
+def raise_helper(msg):
+    raise Exception(msg)
+
+
+jinja_env.globals["raise"] = raise_helper
 
 # this might work too pd.api.types.is_integer_dtype(col)
 INT_TYPES = tuple(
@@ -204,19 +212,29 @@ def _cached_jinja_template(text: str) -> jinja2.environment.Template:
     return jinja_env.from_string(text)
 
 
-def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> str:
+def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> Union[str, bool]:
     if not _uses_jinja(text):
         return text
 
     try:
-        return _cached_jinja_template(text).render(dim_dict)
+        # NOTE: we're stripping the result to avoid trailing newlines
+        out = _cached_jinja_template(text).render(dim_dict).strip()
+        # Convert strings to booleans. Getting boolean directly from Jinja is not possible
+        if out in ("false", "False", "FALSE"):
+            return False
+        elif out in ("true", "True", "TRUE"):
+            return True
+        return out
     except jinja2.exceptions.TemplateSyntaxError as e:
         new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
         raise e.__class__(new_message, e.lineno, e.name, e.filename) from e
+    except jinja2.exceptions.UndefinedError as e:
+        new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
+        raise e.__class__(new_message) from e
 
 
 def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
-    """Expand Jinja in all metadata fields."""
+    """Expand Jinja in all metadata fields. This modifies the original object in place."""
     if obj is None:
         return None
     elif isinstance(obj, str):
@@ -231,6 +249,33 @@ def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
         return {k: _expand_jinja(v, dim_dict) for k, v in obj.items()}
     else:
         return obj
+
+
+def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[str, Any]:
+    """Load YAML file and render Jinja in all fields. Return a dictionary.
+
+    Usage:
+        from etl import grapher_helpers as gh
+        from etl import paths
+
+        tb = Dataset(paths.DATA_DIR / "garden/who/2024-07-30/ghe")['ghe']
+        gh.render_variable_meta(tb.my_col.m, dim_dict={"sex": "male"})
+    """
+    meta = dynamic_yaml_to_dict(dynamic_yaml_load(path))
+    return _expand_jinja(meta, dim_dict)
+
+
+def render_variable_meta(meta: catalog.VariableMeta, dim_dict: Dict[str, str]) -> catalog.VariableMeta:
+    """Render Jinja in all fields of VariableMeta. Return a new VariableMeta object.
+
+    Usage:
+        # Create a playground.ipynb next to YAML file and run this in notebook
+        from etl import grapher_helpers as gh
+        m = gh.render_yaml_file("ghe.meta.yml", dim_dict={"sex": "male"})
+        m['tables']['ghe']['variables']['death_count']
+    """
+    # TODO: move this as a method to VariableMeta class
+    return _expand_jinja(meta.copy(), dim_dict)
 
 
 def _title_column_and_dimensions(title: str, dim_dict: Dict[str, Any]) -> str:

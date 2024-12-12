@@ -446,6 +446,9 @@ def show_anomaly_compact(index, df):
                 config = bake_chart_config(variable_id=indicator_id, selected_entities=entities)
             config["hideAnnotationFieldsInTitle"]["time"] = True
             config["hideFacetControl"] = False
+            config["hideShareButton"] = True
+            config["hideExploreTheDataButton"] = True
+            # config["isSocialMediaExport"] = False
 
             # Actually plot
             grapher_chart(chart_config=config, owid_env=OWID_ENV)
@@ -816,6 +819,7 @@ if st.session_state.anomalist_df is not None:
         # Show controls only if needed
         if len(items) > items_per_page:
             pagination.show_controls(mode="bar")
-
+else:
+    st.success("Ha! We did not find any no anomalies in the selected datasets! What were the odds of that?")
 # Reset state
 set_states({"anomalist_datasets_submitted": False})

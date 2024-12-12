@@ -575,13 +575,11 @@ def combine_variables_metadata(
 
 
 @overload
-def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Literal[False] = False) -> Variable:
-    ...
+def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Literal[False] = False) -> Variable: ...
 
 
 @overload
-def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Literal[True] = True) -> None:
-    ...
+def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Literal[True] = True) -> None: ...
 
 
 def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool = False) -> Optional[Variable]:

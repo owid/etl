@@ -1,6 +1,4 @@
-"""Garden step that combines Ember's European and Global Electricity Review.
-
-"""
+"""Garden step that combines Ember's European and Global Electricity Review."""
 
 import pandas as pd
 from owid import catalog
