@@ -144,18 +144,16 @@ steps:
   #
   # Fishcount - Number of farmed fish.
   #
-  # data://meadow/animal_welfare/2024-12-12/number_of_farmed_fish:
-  #   - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2015.xlsx
-  #   - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2016.xlsx
-  #   - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2017.xlsx
-  #   - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2020.xlsx
-  #   - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2021.xlsx
-  #   - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2022.xlsx
-  # data://garden/animal_welfare/2024-12-12/number_of_farmed_fish:
-  #   - data://meadow/animal_welfare/2024-12-12/number_of_farmed_fish
-  #   - data://garden/animal_welfare/2024-12-12/farmed_finfishes_used_for_food
-  #   - data://garden/regions/2023-01-01/regions
-  #   - data://garden/wb/2024-07-29/income_groups
-  #   - garden/demography/2024-07-15/population
+  data://meadow/animal_welfare/2024-12-12/number_of_farmed_fish:
+    - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2015.xlsx
+    - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2016.xlsx
+    - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_2017.xlsx
+    - snapshot://animal_welfare/2024-12-12/number_of_farmed_fish_from_2020.csv
+  data://garden/animal_welfare/2024-12-12/number_of_farmed_fish:
+    - data://meadow/animal_welfare/2024-12-12/number_of_farmed_fish
+    - data://garden/animal_welfare/2024-12-12/farmed_finfishes_used_for_food
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/demography/2024-07-15/population
   # data://grapher/animal_welfare/2024-12-12/number_of_farmed_fish:
   #   - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
