@@ -66,6 +66,7 @@ dependencies = [
     "scikit-learn>=1.5.2",
     "geopy>=2.4.1",
     "py7zr>=0.22.0",
+    "pyreadr>=0.5.2",
 ]
 
 [tool.uv.sources]
@@ -106,7 +107,7 @@ dev-dependencies = [
     # unpinning those would introduce tons of type errors
     "pyright==1.1.373",
     "pandas-stubs==1.2.0.62",
-    "ruff==0.1.6",
+    "ruff>=0.8.2",
     "ipdb>=0.13.13",
 ]
 
@@ -147,16 +148,17 @@ compare = 'etl.compare:cli'
 backport = 'apps.backport.backport:backport_cli'
 
 [tool.ruff]
-extend-select = [
+lint.extend-select = [
     # isort
     "I"
 ]
-ignore = ["E501"]
+lint.ignore = ["E501"]
 line-length = 120
 target-version = "py310"
 extend-exclude = [
     ".ipynb_checkpoints",
     "*cookiecutter",
+    "*.ipynb",
 ]
 
 [build-system]
