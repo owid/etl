@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -259,6 +260,31 @@ def _recursive_get_all_step_dependencies_ndim(
     return dependencies, memo
 
 
+def remove_steps_from_dag(dag: dict, exclude: list[str]) -> dict:
+    """
+    Remove specific steps (either active steps or dependencies) from the DAG.
+
+    This can be useful to ignore auxiliary datasets. The excluded steps can have wildcards:
+    exclude = [
+            "data://garden/demography/.*/population",
+            "data://garden/wb/.*/income_groups",
+        ]
+    """
+
+    # Check if a step matches any exclude pattern.
+    def is_excluded(step: str) -> bool:
+        return any(pattern.match(step) for pattern in [re.compile(pattern) for pattern in exclude])
+
+    # Filter out steps and dependencies that match any element from the excluded list.
+    dag_filtered = {
+        step: {dep for dep in dependencies if not is_excluded(dep)}
+        for step, dependencies in dag.items()
+        if not is_excluded(step)
+    }
+
+    return dag_filtered
+
+
 class VersionTracker:
     """Helper object that loads the dag, provides useful functions to check for versions and dataset dependencies, and
     checks for inconsistencies.
@@ -299,6 +325,7 @@ class VersionTracker:
         warn_on_archivable: bool = True,
         warn_on_unused: bool = True,
         ignore_archive: bool = False,
+        exclude_steps: Optional[list[str]] = None,
     ):
         # Load dag of active steps (a dictionary step: set of dependencies).
         self.dag_active = load_dag(paths.DAG_FILE)
@@ -308,6 +335,13 @@ class VersionTracker:
         else:
             # Load dag of active and archive steps.
             self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
+
+        # Optionally exclude certain steps and dependencies.
+        self.exclude_steps = exclude_steps
+        if self.exclude_steps:
+            self.dag_active = remove_steps_from_dag(self.dag_active, self.exclude_steps)
+            self.dag_all = remove_steps_from_dag(self.dag_all, self.exclude_steps)
+
         # Create a reverse dag (a dictionary where each item is step: set of usages).
         self.dag_all_reverse = reverse_graph(graph=self.dag_all)
         # Create a reverse dag (a dictionary where each item is step: set of usages) of active steps.
@@ -621,14 +655,14 @@ class VersionTracker:
         ] = UpdateState.ARCHIVABLE.value
 
         # There are special steps that, even though they are archivable or unused, we want to keep in the active dag.
-        steps_active_df.loc[steps_active_df["step"].isin(self.ARCHIVABLE_STEPS_TO_KEEP), "update_state"] = (
-            UpdateState.UP_TO_DATE.value
-        )
+        steps_active_df.loc[
+            steps_active_df["step"].isin(self.ARCHIVABLE_STEPS_TO_KEEP), "update_state"
+        ] = UpdateState.UP_TO_DATE.value
 
         # All explorers and external steps should be considered up to date.
-        steps_active_df.loc[steps_active_df["channel"].isin(["explorers", "external"]), "update_state"] = (
-            UpdateState.UP_TO_DATE.value
-        )
+        steps_active_df.loc[
+            steps_active_df["channel"].isin(["explorers", "external"]), "update_state"
+        ] = UpdateState.UP_TO_DATE.value
 
         # Add update state to archived steps.
         steps_inactive_df["update_state"] = UpdateState.ARCHIVED.value

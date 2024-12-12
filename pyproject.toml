@@ -66,7 +66,6 @@ dependencies = [
     "scikit-learn>=1.5.2",
     "geopy>=2.4.1",
     "py7zr>=0.22.0",
-    "pyreadr>=0.5.2",
 ]
 
 [tool.uv.sources]
@@ -107,7 +106,7 @@ dev-dependencies = [
     # unpinning those would introduce tons of type errors
     "pyright==1.1.373",
     "pandas-stubs==1.2.0.62",
-    "ruff>=0.8.2",
+    "ruff==0.1.6",
     "ipdb>=0.13.13",
 ]
 
@@ -135,6 +134,7 @@ wizard = [
     "torch<2.3.0",
     "sentence-transformers>=2.2.2",
     "moviepy>=2.1.1",
+    "pandas-gbq>=0.25.0",
 ]
 
 [project.scripts]
@@ -147,17 +147,16 @@ compare = 'etl.compare:cli'
 backport = 'apps.backport.backport:backport_cli'
 
 [tool.ruff]
-lint.extend-select = [
+extend-select = [
     # isort
     "I"
 ]
-lint.ignore = ["E501"]
+ignore = ["E501"]
 line-length = 120
 target-version = "py310"
 extend-exclude = [
     ".ipynb_checkpoints",
     "*cookiecutter",
-    "*.ipynb",
 ]
 
 [build-system]
