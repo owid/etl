@@ -22,7 +22,7 @@ meta:
 
     # Files
     url_main: https://github.com/ONEcampaign/oda_data_package/
-    date_accessed: 2024-10-02
+    date_accessed: 2024-12-12
 
     # License
     license:
@@ -30,6 +30,6 @@ meta:
       url: https://www.oecd.org/en/about/terms-conditions.html
 
 outs:
-  - md5: 1665ade996d48abeef77f738aee8b594
-    size: 25713058
+  - md5: c68d6059ab60020bee24fb9f31b77979
+    size: 25960490
     path: oda_one_channels.feather
