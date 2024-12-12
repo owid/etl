@@ -1,4 +1,5 @@
 """Google API class."""
+
 from typing import Any, Optional
 
 import gdown

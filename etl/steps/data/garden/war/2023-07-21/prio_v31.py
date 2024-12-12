@@ -21,6 +21,7 @@ ON REGIONS:
         5 = Americas (GWNo: 2-199).
     - Data for incompatibilities in Oceania are included in region Asia (source decision). Therefore, we have changed the region's name from "Asia" to "Asia and Oceania".
 """
+
 from typing import cast
 
 import numpy as np

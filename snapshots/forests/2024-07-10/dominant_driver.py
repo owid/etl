@@ -10,7 +10,6 @@ Scripts in this folder must be run in this order:
 
 """
 
-
 from pathlib import Path
 
 import click

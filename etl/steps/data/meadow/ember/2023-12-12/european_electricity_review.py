@@ -1,6 +1,4 @@
-"""Meadow step for European Electricity Review (Ember, 2022).
-
-"""
+"""Meadow step for European Electricity Review (Ember, 2022)."""
 
 from pathlib import Path
 from tempfile import TemporaryDirectory

@@ -2,6 +2,7 @@
 
 TODO: Fully decouple front-end from backend (see fasttrack.utils for back-end, i.e. should not have streamlit calls).
 """
+
 from pathlib import Path
 
 import pandas as pd

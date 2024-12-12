@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Table

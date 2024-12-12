@@ -5,6 +5,7 @@
 """
 Check the integrity of the DAG.
 """
+
 from pathlib import Path
 from typing import List, Union
 from unittest.mock import patch

@@ -1,6 +1,4 @@
-"""Load garden dataset of photovoltaic cost and capacity and create a grapher dataset.
-
-"""
+"""Load garden dataset of photovoltaic cost and capacity and create a grapher dataset."""
 
 from etl.helpers import PathFinder, create_dataset
 

@@ -1,4 +1,5 @@
 """Methods to update Wizard DB to have the necessary PR data."""
+
 from typing import Tuple
 
 import requests

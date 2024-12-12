@@ -1,4 +1,5 @@
 """Input/Output methods."""
+
 from owid.datautils.io.archive import decompress_file
 from owid.datautils.io.df import from_file as df_from_file
 from owid.datautils.io.df import to_file as df_to_file

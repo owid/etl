@@ -1,7 +1,4 @@
-"""Test functions in owid.datautils.web module.
-
-"""
-
+"""Test functions in owid.datautils.web module."""
 
 from unittest import mock
 

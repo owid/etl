@@ -298,7 +298,7 @@ def add_region_aggregates(
 
 
 def _expand_combinations_in_amendments(
-    amendments: List[Tuple[Dict[Any, Any], Dict[Any, Any]]]
+    amendments: List[Tuple[Dict[Any, Any], Dict[Any, Any]]],
 ) -> List[Tuple[Dict[Any, Any], Dict[Any, Any]]]:
     """When values in amendments are given as lists, explode them to have all possible combinations of values."""
     amendments_expanded = []

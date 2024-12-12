@@ -1068,7 +1068,7 @@ requires-dist = [
     { name = "owid-datautils", editable = "lib/datautils" },
     { name = "owid-repack", editable = "lib/repack" },
     { name = "pandas", specifier = "==2.2.3" },
-    { name = "pandas-gbq", marker = "extra == 'wizard'", specifier = ">=0.24.0" },
+    { name = "pandas-gbq", marker = "extra == 'wizard'", specifier = ">=0.25.0" },
     { name = "papermill", specifier = ">=2.3.3" },
     { name = "pdfplumber", specifier = ">=0.9.0" },
     { name = "plotly", marker = "extra == 'wizard'", specifier = ">=5.23.0" },
@@ -3576,7 +3576,7 @@ dev = [
     { name = "pyright", specifier = "==1.1.373" },
     { name = "pytest", specifier = ">=6.2.5" },
     { name = "pytest-cov", specifier = ">=2.12.1" },
-    { name = "ruff", specifier = "==0.1.6" },
+    { name = "ruff", specifier = "==0.8.2" },
     { name = "watchdog", specifier = ">=2.1.5" },
 ]
 
@@ -3625,7 +3625,7 @@ dev = [
     { name = "pyright", specifier = "==1.1.373" },
     { name = "pytest", specifier = ">=6.2.5" },
     { name = "pytest-cov", specifier = ">=2.12.1" },
-    { name = "ruff", specifier = "==0.1.6" },
+    { name = "ruff", specifier = "==0.8.2" },
     { name = "sphinx", specifier = "==4.5.0" },
     { name = "watchdog", specifier = ">=2.1.5" },
 ]
@@ -3652,7 +3652,7 @@ dev = [
     { name = "ipdb", specifier = ">=0.13.13" },
     { name = "pyright", specifier = "==1.1.373" },
     { name = "pytest", specifier = ">=7.2.0" },
-    { name = "ruff", specifier = "==0.1.6" },
+    { name = "ruff", specifier = "==0.8.2" },
 ]
 
 [[package]]
@@ -3710,7 +3710,7 @@ wheels = [
 
 [[package]]
 name = "pandas-gbq"
-version = "0.24.0"
+version = "0.25.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "db-dtypes" },
@@ -3725,9 +3725,9 @@ dependencies = [
     { name = "pydata-google-auth" },
     { name = "setuptools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/84/cb/2b1e480472217386aecb85807debe5eace8625af8572a2c4f03b328cd3b9/pandas_gbq-0.24.0.tar.gz", hash = "sha256:264415277059821497e74ed0b2240b538cba9646ee627fb4668cac5cf274e4c3", size = 60411 }
+sdist = { url = "https://files.pythonhosted.org/packages/1c/45/11cc72ad49587112a95bb053a271660816c205b8e55159763991776138a1/pandas_gbq-0.25.0.tar.gz", hash = "sha256:e16362701788c2b528e0202ac744195b1e1c9153e1fe5cfa130401756077e2d7", size = 60705 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3a/89/7adeabe074773cfc3b88529e984833d3aa0dd7a14ef68c06ea84b598b429/pandas_gbq-0.24.0-py2.py3-none-any.whl", hash = "sha256:e3e39f4fd8651ced033515e5e63a6c19bc757b26155fac01c4367e1aa74ee122", size = 35674 },
+    { url = "https://files.pythonhosted.org/packages/f9/7e/3efc07e054ebc950fe7370937b2a073aa10240baf0559357d08193359962/pandas_gbq-0.25.0-py2.py3-none-any.whl", hash = "sha256:fbb89146c959cf54ed9003db0a5775af908c41de8cf5f24739fa8959893c67e6", size = 35799 },
 ]
 
 [[package]]
@@ -6596,7 +6596,7 @@ dev = [
     { name = "pytest", specifier = ">=6.2.4" },
     { name = "pyyaml", specifier = ">=6.0.1" },
     { name = "requests-mock", specifier = ">=1.9.3" },
-    { name = "ruff", specifier = "==0.1.6" },
+    { name = "ruff", specifier = "==0.8.2" },
     { name = "tqdm", specifier = ">=4.62.3" },
     { name = "types-pyyaml", specifier = ">=6.0.5" },
     { name = "types-requests", specifier = ">=2.25.2" },

@@ -1,6 +1,4 @@
-"""Garden step for Ember's Yearly Electricity Data.
-
-"""
+"""Garden step for Ember's Yearly Electricity Data."""
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table

@@ -1,5 +1,4 @@
-"""Grapher step for BP's energy mix dataset.
-"""
+"""Grapher step for BP's energy mix dataset."""
 
 from owid.catalog import Dataset
 

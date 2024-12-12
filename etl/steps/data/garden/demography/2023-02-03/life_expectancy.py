@@ -11,6 +11,7 @@ To do this, we use different sources, depending on the year and metric:
     - UN WPP for data since 1950.
     - HMD for data prior to 1950.
 """
+
 from typing import List
 
 import pandas as pd
