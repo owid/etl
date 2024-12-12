@@ -1,4 +1,5 @@
 """Game owidle."""
+
 import datetime as dt
 import math
 from itertools import product

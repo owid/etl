@@ -103,14 +103,15 @@ def connect_estimates_with_projections(tb: Table) -> Table:
     for indicator in INDICATOR_COLUMNS:
         for scenario in SCENARIOS.keys():
             if scenario != "historical":
-                tb.loc[
-                    tb.index.get_level_values("year") == LATEST_YEAR_WITHOUT_PROJECTIONS, (indicator, scenario)
-                ] = tb.loc[
-                    tb.index.get_level_values("year") == LATEST_YEAR_WITHOUT_PROJECTIONS, (indicator, scenario)
-                ].combine_first(
+                tb.loc[tb.index.get_level_values("year") == LATEST_YEAR_WITHOUT_PROJECTIONS, (indicator, scenario)] = (
                     tb.loc[
-                        tb.index.get_level_values("year") == LATEST_YEAR_WITHOUT_PROJECTIONS, (indicator, "historical")
-                    ]
+                        tb.index.get_level_values("year") == LATEST_YEAR_WITHOUT_PROJECTIONS, (indicator, scenario)
+                    ].combine_first(
+                        tb.loc[
+                            tb.index.get_level_values("year") == LATEST_YEAR_WITHOUT_PROJECTIONS,
+                            (indicator, "historical"),
+                        ]
+                    )
                 )
 
     # Make table long again, by creating a scenario column

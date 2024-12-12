@@ -5,7 +5,6 @@ UN WPP provides estimates for the period 1950 - 2021 and projections for the per
 We only use projections with medium-fertility variant.
 """
 
-
 from owid.catalog import Table
 
 # Year boundaries

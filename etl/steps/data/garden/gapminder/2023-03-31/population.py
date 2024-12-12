@@ -4,6 +4,7 @@ Import population data from Gapminder. Very little processing is done.
 
 More details at https://www.gapminder.org/data/documentation/gd003/.
 """
+
 import pandas as pd
 from owid.catalog import Dataset, Table
 from structlog import get_logger

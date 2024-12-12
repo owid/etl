@@ -8,6 +8,7 @@ It harmonizes and further processes meadow data, and uses the following auxiliar
 - WorldBank's Income groups, to generate aggregates for different income groups.
 
 """
+
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
@@ -1125,9 +1126,9 @@ def combine_data_and_add_variables(
     added_variables = tb_co2_with_regions.drop(
         columns=["country", "year"] + COLUMNS_THAT_MUST_HAVE_DATA
     ).columns.tolist()
-    tb_co2_with_regions.loc[
-        (tb_co2_with_regions["country"].str.contains(" (GCP)", regex=False)), added_variables
-    ] = np.nan
+    tb_co2_with_regions.loc[(tb_co2_with_regions["country"].str.contains(" (GCP)", regex=False)), added_variables] = (
+        np.nan
+    )
 
     # Remove uninformative rows (those that have only data for, say, gdp, but not for variables related to emissions).
     tb_co2_with_regions = tb_co2_with_regions.dropna(subset=COLUMNS_THAT_MUST_HAVE_DATA, how="all").reset_index(

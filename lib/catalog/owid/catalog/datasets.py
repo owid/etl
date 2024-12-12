@@ -6,6 +6,7 @@ import hashlib
 import json
 import shutil
 import warnings
+from _hashlib import HASH
 from dataclasses import dataclass
 from glob import glob
 from os import environ
@@ -16,7 +17,6 @@ from typing import Any, Dict, Iterator, List, Literal, Optional, Union, cast
 import numpy as np
 import pandas as pd
 import yaml
-from _hashlib import HASH
 
 from owid.repack import to_safe_types
 

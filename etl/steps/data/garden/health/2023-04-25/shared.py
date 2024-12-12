@@ -3,7 +3,6 @@
 The mappings are created from the metadata dictionary provided by the source (a tab in the excel sheet)
 """
 
-
 # Gender ID mappings
 MAPPING_GENDER_VALUES = {
     1: "male",
