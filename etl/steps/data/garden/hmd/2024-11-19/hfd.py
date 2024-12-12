@@ -481,8 +481,26 @@ def run(dest_dir: str) -> None:
     )
     # Quick fix: change birth_order label for PPR
     tbs = _fix_ppr(tbs)
+
     ## Merge
-    tb_cohort = consolidate_table_from_list(tbs, cols_index + [col_bo], "cohort")
+    def add_shifted_to_cohort(tb):
+        cols_index_all = cols_index + [col_bo]
+        # Create shifted cohorts
+        tb_plus15 = tb.copy()
+        tb_plus15["cohort"] = tb_plus15["cohort"] + 15
+        tb_plus30 = tb.copy()
+        tb_plus30["cohort"] = tb_plus30["cohort"] + 30
+        # Merge
+        tb = tb.merge(tb_plus15[cols_index_all + ["ccf"]], on=cols_index_all, suffixes=["", "_plus15y"], how="outer")
+        tb = tb.merge(tb_plus30[cols_index_all + ["ccf"]], on=cols_index_all, suffixes=["", "_plus30y"], how="outer")
+        return tb
+
+    tb_cohort = consolidate_table_from_list(
+        tbs=tbs,
+        cols_index_out=cols_index + [col_bo],
+        short_name="cohort",
+        fcn=add_shifted_to_cohort,
+    )
 
     # 3/ Period tables (by age)
     cols_index = ["country", "year", "age"]

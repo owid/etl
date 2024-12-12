@@ -15,7 +15,6 @@ update.
 
 """
 
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from shared import (

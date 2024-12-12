@@ -1,6 +1,4 @@
-"""Grapher step for the Electricity Mix (Energy Institute & Ember) dataset.
-
-"""
+"""Grapher step for the Electricity Mix (Energy Institute & Ember) dataset."""
 
 from owid.catalog import Dataset
 

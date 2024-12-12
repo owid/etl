@@ -1,4 +1,5 @@
 """Generate documentation files dynamically"""
+
 import mkdocs_gen_files
 
 from etl.docs import render_dataset, render_indicator, render_origin, render_table

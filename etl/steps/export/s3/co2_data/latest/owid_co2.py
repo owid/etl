@@ -16,6 +16,7 @@ Outputs:
   * https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.json
 
 """
+
 import json
 import tempfile
 from pathlib import Path

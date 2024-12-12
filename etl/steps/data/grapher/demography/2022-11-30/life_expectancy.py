@@ -1,4 +1,5 @@
 """Grapher step for our Life Expectancy OMM."""
+
 import yaml
 from owid import catalog
 

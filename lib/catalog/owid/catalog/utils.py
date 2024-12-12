@@ -42,13 +42,11 @@ def pruned_json(cls: T) -> T:
 
 
 @overload
-def underscore(name: str, validate: bool = True, camel_to_snake: bool = False) -> str:
-    ...
+def underscore(name: str, validate: bool = True, camel_to_snake: bool = False) -> str: ...
 
 
 @overload
-def underscore(name: None, validate: bool = True, camel_to_snake: bool = False) -> None:
-    ...
+def underscore(name: None, validate: bool = True, camel_to_snake: bool = False) -> None: ...
 
 
 def underscore(name: Optional[str], validate: bool = True, camel_to_snake: bool = False) -> Optional[str]:

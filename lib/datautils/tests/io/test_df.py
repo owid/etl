@@ -1,6 +1,5 @@
-"""Test functions in owid.datautils.io.local module.
+"""Test functions in owid.datautils.io.local module."""
 
-"""
 import tempfile
 from pathlib import Path
 from typing import Any

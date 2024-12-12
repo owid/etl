@@ -11,6 +11,7 @@ To download the data visit: https://vizhub.healthdata.org/microbe/
 - Metric: 'Number'
 
 """
+
 from pathlib import Path
 
 import click
