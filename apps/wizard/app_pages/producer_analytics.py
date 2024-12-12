@@ -145,8 +145,10 @@ def load_steps_df(excluded_steps) -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def load_steps_df_with_producer_data(excluded_steps) -> pd.DataFrame:
     # Load steps dataframe.
+    # st.toast("⌛ Loading data from VersionTracker...")
     steps_df = load_steps_df(excluded_steps=excluded_steps)
 
+    # st.toast("⌛ Processing VersionTracker data...")
     # Select only active snapshots.
     df = steps_df[(steps_df["channel"] == "snapshot") & (steps_df["state"] == "active")].reset_index(drop=True)
 
@@ -187,6 +189,7 @@ def load_steps_df_with_producer_data(excluded_steps) -> pd.DataFrame:
 @st.cache_data(show_spinner=False)
 def get_producer_charts_analytics(min_date, max_date, excluded_steps):
     # Get chart renders using user-defined date range for "renders_custom".
+    # st.toast("⌛ Getting analytics on chart renders...")
     df_renders = get_chart_renders(min_date=min_date, max_date=max_date)
 
     # Load the steps dataframe with producer data.
@@ -215,6 +218,7 @@ def get_producer_analytics_per_producer(min_date, max_date, excluded_steps):
     # Load the steps dataframe with producer data and analytics.
     df_expanded = get_producer_charts_analytics(min_date=min_date, max_date=max_date, excluded_steps=excluded_steps)
 
+    # st.toast("⌛ Adapting the data for presentation...")
     # Group by producer and get the full list of chart slugs for each producer.
     df_grouped = df_expanded.groupby("producer", observed=True, as_index=False).agg(
         {
@@ -495,7 +499,7 @@ st.markdown(
 )
 
 # Load table content and select only columns to be shown.
-with st.spinner("Loading producer data. This can take few seconds..."):
+with st.spinner("Loading producer data. We are accessing various databases. This can take few seconds..."):
     df_producers = get_producer_analytics_per_producer(
         min_date=min_date, max_date=max_date, excluded_steps=excluded_steps
     )
