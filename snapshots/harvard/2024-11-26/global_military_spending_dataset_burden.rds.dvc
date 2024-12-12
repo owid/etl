@@ -6,8 +6,7 @@ meta:
     title: Global Military Spending Dataset
     description: |-
       Military spending data measure key international relations concepts such as balancing, arms races, the distribution of power, and the severity of military burdens. Unfortunately, missing values and measurement error threaten the validity of existing findings. Addressing this challenge, we introduce the Global Military Spending Dataset (GMSD). GMSD collates new and existing expenditure variables from a comprehensive collection of sources, expands data coverage, and employs a latent variable model to estimate missing values and quantify measurement error.
-    date_published: "2024-03-07"
-    version_producer: Version 1
+    date_published: "2024-11-25"
     title_snapshot: Global Military Spending Dataset - Military Burden
 
     # Citation

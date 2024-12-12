@@ -1,15 +1,10 @@
 """
 Script to create a snapshot of dataset.
 
-The file is manually uploaded, because it is a small file from a 1.5 GB zip file.
+This file was provided by Christopher Fariss to update an error in the dataset.
 
-STEPS TO UPDATE THIS SNAPSHOT
-
-    1. Go to https://dataverse.harvard.edu/file.xhtml?fileId=8144788
-    2. Download the file by selecting "Access File" and then "ZIP Archive".
-    3. Unzip the file and copy the file in "data/milburden_all_xxxxx.rds" to this directory. xxxxx is the date of the latest version of the data.
-    4. Run this script with the path to the file as an argument.
-        python snapshots/harvard/{version}/global_military_spending_dataset_burden.py --path-to-file milburden_xxxxx.rds
+Run
+    python snapshots/harvard/2024-11-26/global_military_spending_dataset_burden.py --path-to-file <path-to-file>
 
 
 """
