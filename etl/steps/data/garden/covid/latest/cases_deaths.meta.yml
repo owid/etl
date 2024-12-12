@@ -208,9 +208,10 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [-200, -100, -50, -20, 0, 20, 50, 100, 200, 500]
+                customNumericValues: [-200, -100, -50, -20, 0, 20, 50, 100, 200, 1]
                 colorSchemeInvert: true
                 baseColorScheme: RdBu
+                customNumericMinValue: -1
         display:
           numDecimalPlaces: 2
           tolerance: 30
@@ -269,9 +270,10 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [-200, -100, -40, 0, 40, 100, 200, 400, 1000]
+                customNumericValues: [-500, -100, -50, 0, 50, 100, 500, 1]
                 colorSchemeInvert: true
                 baseColorScheme: RdBu
+                customNumericMinValue: -1
 
       # Deaths
       ################
