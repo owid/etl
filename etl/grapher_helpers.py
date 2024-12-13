@@ -134,7 +134,7 @@ def _yield_wide_table(
         table_to_yield = table_to_yield[[c for c in table_to_yield.columns if c not in dim_names]]
 
         # Filter NaN values from dimensions and return dictionary
-        dim_dict: Dict[str, Any] = {n: v for n, v in zip(dim_names, dim_values) if pd.notnull(v)}
+        dim_dict = _create_dim_dict(dim_names, dim_values)  # type: ignore
 
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
@@ -207,17 +207,17 @@ def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any
     return meta
 
 
+def _create_dim_dict(dim_names: List[str], dim_values: List[Any]) -> Dict[str, Any]:
+    # Filter NaN values from dimensions and return dictionary
+    return {n: v for n, v in zip(dim_names, dim_values) if pd.notnull(v)}
+
+
 def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
     """Convert a long table to a wide table by unstacking dimensions. This function mimics the process that occurs
     when a long table is upserted to the database. With this function, you can explicitly perform this transformation
     in the grapher step and store a flattened dataset in the catalog."""
 
     dim_names = [k for k in long_tb.primary_key if k not in ("year", "country", "date")]
-
-    # Check for null values in dimensions
-    # for dim_name in dim_names:
-    #     if long_tb.index.get_level_values(dim_name).isnull().any():
-    #         raise ValueError(f"NaN values in dimension: {dim_name}")
 
     # Unstack dimensions to a wide format
     wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))  # type: ignore
@@ -231,13 +231,8 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
     for dims in wide_tb.columns:
         column = dims[0]
 
-        # TODO: DRY this with function above
         # Filter NaN values from dimensions and return dictionary
-        dim_dict: Dict[str, Any] = {n: v for n, v in zip(dim_names, dims[1:]) if pd.notnull(v)}
-
-        # Check for NaN values in dimensions
-        # if any(pd.isnull(v) for v in dim_dict.values()):
-        #     raise ValueError(f"NaN values in dimensions: {dim_dict}")
+        dim_dict = _create_dim_dict(dim_names, dims[1:])
 
         # Create a short name from dimension values
         short_name = _underscore_column_and_dimensions(column, dim_dict)
