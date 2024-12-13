@@ -13,7 +13,7 @@ import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.etl_steps.utils import TAGS_DEFAULT, remove_playground_notebook
-from apps.wizard.utils import set_states
+from apps.wizard.utils import set_states, st_page_link
 from apps.wizard.utils.components import st_horizontal
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
@@ -600,3 +600,10 @@ if st.session_state.submit_form:
     else:
         st.write(form.errors)
         st.error("Form not submitted! Check errors!")
+
+
+st.divider()
+st.subheader("Legacy")
+st_page_link("meadow")
+st_page_link("garden")
+st_page_link("grapher")
