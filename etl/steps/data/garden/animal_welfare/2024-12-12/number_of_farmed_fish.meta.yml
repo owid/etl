@@ -15,6 +15,7 @@ definitions:
 
 tables:
   number_of_farmed_fish:
+    title: Number of farmed fish killed for food
     variables:
       n_farmed_fish_low:
         title: Estimated number of farmed fish (lower bound)

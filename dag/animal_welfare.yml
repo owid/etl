@@ -155,5 +155,5 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-07-29/income_groups
     - data://garden/demography/2024-07-15/population
-  # data://grapher/animal_welfare/2024-12-12/number_of_farmed_fish:
-  #   - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
+  data://grapher/animal_welfare/2024-12-12/number_of_farmed_fish:
+    - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
