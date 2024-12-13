@@ -24,9 +24,11 @@ tables:
         description_short: Lower bound estimate of the annual number of farmed fish slaughtered for food.
         description_key: *description_key
         display:
-          numDecimalPlaces: 0
+          numSignificantFigures: 2
+          name: Lower estimate
         presentation:
           attribution: *attribution
+          title_public: Estimated number of farmed fish (lower bound)
       n_farmed_fish:
         title: Estimated number of farmed fish
         unit: 'fish'
@@ -34,9 +36,11 @@ tables:
         description_short: Midpoint estimate of the annual number of farmed fish slaughtered for food, calculated as the average between the lower and upper estimates.
         description_key: *description_key
         display:
-          numDecimalPlaces: 0
+          numSignificantFigures: 2
+          name: Midpoint estimate
         presentation:
           attribution: *attribution
+          title_public: Estimated number of farmed fish
           grapher_config:
             subtitle: &subtitle This data does not include lobsters, farmed fish used as bait, and species without an estimated mean weight (which were an additional 17% of reported global fish production).
             note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
@@ -47,9 +51,11 @@ tables:
         description_short: Upper bound estimate of the annual number of farmed fish slaughtered for food.
         description_key: *description_key
         display:
-          numDecimalPlaces: 0
+          numSignificantFigures: 2
+          name: Upper estimate
         presentation:
           attribution: *attribution
+          title_public: Estimated number of farmed fish (upper bound)
       n_farmed_fish_low_per_capita:
         title: Estimated number of farmed fish per capita (lower bound)
         unit: 'fish per person'
@@ -57,7 +63,7 @@ tables:
         description_short: Lower bound estimate of the annual number of farmed fish slaughtered for food per person.
         description_key: *description_key
         display:
-          numDecimalPlaces: 2
+          numSignificantFigures: 2
         presentation:
           attribution: *attribution
       n_farmed_fish_per_capita:
@@ -67,7 +73,7 @@ tables:
         description_short: Midpoint estimate of the annual number of farmed fish slaughtered for food per person.
         description_key: *description_key
         display:
-          numDecimalPlaces: 2
+          numSignificantFigures: 2
         presentation:
           attribution: *attribution
           grapher_config:
@@ -80,6 +86,6 @@ tables:
         description_short: Upper bound estimate of the annual number of farmed fish slaughtered for food per person.
         description_key: *description_key
         display:
-          numDecimalPlaces: 2
+          numSignificantFigures: 2
         presentation:
           attribution: *attribution

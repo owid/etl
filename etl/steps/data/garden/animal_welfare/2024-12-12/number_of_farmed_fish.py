@@ -1,4 +1,13 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+NOTES:
+- In the 2016 and 2017 excel files, the estimated number of farmed fish only count fish with an estimated mean weight (EMW). To understand this, see that, at the top of the "Farmed fishes" sheet they have a table clarifying that the total number of fish is (for 2017) between 42 and 138 billion fish per year. But then there is an additional 17% of fish tonnage that corresponds to fish without an EMW. So, the total global number, after including this missing 17% of tonnage, is between 51 and 167 billion.
+- For the data from 2020 onwards, generic mean weights (GEMWs) are used whenever there is no EMW, both for country and for global data. Therefore, there might be a spurious jump between pre and post 2020 data (corresponding to about 17% of the global tonnage). This jump may be more pronounced in countries with a higher proportion of fish without an EMW.
+- For the data from 2020 onwards, there are cases of "<1" in the data. We replace those with the average value in that range, namely 0.5.
+
+TODO: We can take the global data from Mood et al. (2023), combine it with the latest global data from fishcount. Then, in the metadata and subtitle, mention that country data prior to 2020 is missing an additional 17% of fish, and that data from 2020 onwards uses GEMWs.
+
+"""
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
