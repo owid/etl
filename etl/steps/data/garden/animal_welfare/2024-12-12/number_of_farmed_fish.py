@@ -222,6 +222,11 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    # Instead of having an attribution for each individual snapshot, add a single attribution, with the latest year of all origins.
+    publication_year = max([origin.date_published for origin in tb["n_farmed_fish"].m.origins])
+
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, yaml_params={"publication_year": publication_year}
+    )
     ds_garden.save()

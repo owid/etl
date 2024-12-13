@@ -1,5 +1,5 @@
 definitions:
-  attribution: &attribution Fishcount (2018)
+  attribution: &attribution Fishcount ({publication_year})
   description_key: &description_key
     - This indicator uses data on aquaculture production tonnages and mean weights estimated from available fish size data.
     - |
