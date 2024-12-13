@@ -679,4 +679,5 @@ tables:
         description_short: |
           Net exports, calculated as the difference between exports and imports, expressed as a share of domestic supply. This includes all agricultural products, such as food allocated for human consumption, animal feed, and other uses.
         description_processing: |
-          - This indicator is calculated as 100 x (expors - imports) / domestic supply.
+          - This indicator is calculated as 100 x (exports - imports) / domestic supply.
+          - Imports, exports, and domestic supply encompass the total of all items across the following groups: cereals and grains, pulses, starchy roots, fruits and vegetables, oils and fats, sugar, meat, dairy and eggs, alcoholic beverages, and an other products. The latter group includes miscellaneous items such as spices, offals, and other minor commodities.
