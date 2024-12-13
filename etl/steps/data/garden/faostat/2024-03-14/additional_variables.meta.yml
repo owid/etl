@@ -673,7 +673,7 @@ tables:
   net_exports_as_share_of_supply:
     variables:
       net_exports_as_share_of_supply:
-        title: Net trade food balance as a share of domestic supply
+        title: Net food trade as a share of domestic supply
         unit: "%"
         short_unit: "%"
         description_short: |
