@@ -3,14 +3,16 @@ from typing import Optional, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
+import pandas_gbq
 import plotly.express as px
 import streamlit as st
-from pandas_gbq import read_gbq
+from google.oauth2 import service_account
 from st_aggrid import AgGrid, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from structlog import get_logger
 
 from apps.wizard.utils.components import st_horizontal
+from etl.config import GOOGLE_APPLICATION_CREDENTIALS
 from etl.snapshot import Snapshot
 from etl.version_tracker import VersionTracker
 
@@ -68,6 +70,16 @@ def columns_producer(min_date, max_date):
         },
     }
     return cols_prod
+
+
+def read_gbq(*args, **kwargs) -> pd.DataFrame:
+    if GOOGLE_APPLICATION_CREDENTIALS:
+        # Use service account
+        credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
+        return pandas_gbq.read_gbq(*args, **kwargs, credentials=credentials)  # type: ignore
+    else:
+        # Use browser authentication.
+        return pandas_gbq.read_gbq(*args, **kwargs)  # type: ignore
 
 
 @st.cache_data(show_spinner=False)
