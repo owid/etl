@@ -36,7 +36,7 @@ main:
       - "@lucas"
       - "@daniel"
     entrypoint: app_pages/expert/app.py
-    icon: ":material/hotel_class:"
+    icon: ":material/lightbulb_2:"
   analytics:
     title: "Analytics (external)"
     description: "Learn more about OWID in Data!"
@@ -58,32 +58,11 @@ etl:
       image_url: "https://greatescapepublishing.com/wp-content/uploads/2019/11/30463274482_90aff8a230_c.jpg"
       disable:
         "production": True
-    express:
-      title: "Express"
-      entrypoint: etl_steps/express.py
-      icon: ":material/bolt:"
+    data:
+      title: "Data step"
+      entrypoint: etl_steps/data.py
+      icon: ":material/table:"
       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
-      disable:
-        "production": True
-    meadow:
-      title: "Meadow"
-      entrypoint: etl_steps/meadow.py
-      icon: ":material/nature:"
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
-      disable:
-        "production": True
-    garden:
-      title: "Garden"
-      entrypoint: etl_steps/garden.py
-      icon: ":material/deceased:"
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
-      disable:
-        "production": True
-    grapher:
-      title: "Grapher"
-      entrypoint: etl_steps/grapher.py
-      icon: ":material/database:"
-      image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
       disable:
         "production": True
     fasttrack:
@@ -94,6 +73,41 @@ etl:
       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/be/Alonso_%28Renault%29_qualifying_at_USGP_2005.jpg"
 
 sections:
+  - title: "ETL Steps (legacy)"
+    description: "Keeping this temporary"
+    apps:
+      - alias: express
+        title: "Express"
+        description: "Add all data steps."
+        entrypoint: etl_steps/express.py
+        icon: ":material/bolt:"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
+        disable:
+          "production": True
+      - alias: meadow
+        title: "Meadow"
+        description: "Add meadow step."
+        entrypoint: etl_steps/meadow.py
+        icon: ":material/nature:"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
+        disable:
+          "production": True
+      - alias: garden
+        title: "Garden"
+        description: "Add garden step."
+        entrypoint: etl_steps/garden.py
+        icon: ":material/deceased:"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
+        disable:
+          "production": True
+      - alias: grapher
+        title: "Grapher"
+        description: "Add grapher step."
+        entrypoint: etl_steps/grapher.py
+        icon: ":material/database:"
+        image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
+        disable:
+          "production": True
   - title: "Data curation"
     description: |-
       Updates, data edits, etc.
@@ -156,7 +170,7 @@ sections:
         description: "Extract analytics to share with data producers"
         maintainer: "@pablo"
         entrypoint: app_pages/producer_analytics.py
-        icon: ":material/developer_board:"
+        icon: ":material/analytics:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Wikimedia_Product_Analytics_team_logo.svg/512px-Wikimedia_Product_Analytics_team_logo.svg.png"
 
   - title: "Explorers"
@@ -194,7 +208,7 @@ sections:
         description: "Data insights with GPT"
         maintainer: "@daniel"
         entrypoint: app_pages/datainsight_robot.py
-        icon: ":material/lightbulb:"
+        icon: ":material/stylus_note:"
         image_url: "https://cdn.cpdonline.co.uk/wp-content/uploads/2023/08/03153310/Starting-To-Become-A-Writer-1200x350.jpg"
 
   - title: "Misc"
