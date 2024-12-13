@@ -670,3 +670,13 @@ tables:
   # All metadata for maize_and_wheat and fertilizer_exports is prepared via script.
   # maize_and_wheat:
   # fertilizer_exports:
+  net_exports_as_share_of_supply:
+    variables:
+      net_exports_as_share_of_supply:
+        title: Net trade balance as a share of domestic supply
+        unit: "%"
+        short_unit: "%"
+        description_short: |
+          Net exports, calculated as the difference between exports and imports, as a share of domestic supply of all agricultural products, including food allocated for human consumption, animal feed, and other commodities.
+        description_processing: |
+          - This indicator is calculated as 100 x (expors - imports) / domestic supply.
