@@ -11,6 +11,7 @@ TODO: We can take the global data from Mood et al. (2023), combine it with the l
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
+from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -34,6 +35,15 @@ COLUMNS_FROM_2020 = {
     "numbers__lower__in_millions": "n_farmed_fish_low",
     "numbers__midpoint__in_millions": "n_farmed_fish",
     "numbers__upper__in_millions": "n_farmed_fish_high",
+}
+
+# Columns to select and how to rename them, for historical data from Mood et al. (2023).
+COLUMNS_HISTORICAL = {
+    "country": "country",
+    "year": "year",
+    "n_fish_low": "n_farmed_fish_low",
+    "n_fish": "n_farmed_fish",
+    "n_fish_high": "n_farmed_fish_high",
 }
 
 # Regions to create aggregates for.
@@ -125,13 +135,18 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
 def sanity_check_outputs(tb: Table) -> None:
     # Check that the total agrees with the sum of aggregates from each continent, for non per capita columns.
     tb = tb[[column for column in tb.columns if "per_capita" not in column]].copy()
-    world = tb[tb["country"] == "World"].reset_index(drop=True).drop(columns=["country"])
-    test = (
-        tb[tb["country"].isin(["Africa", "North America", "South America", "Asia", "Europe", "Oceania"])]
-        .groupby("year", as_index=False)
-        .sum(numeric_only=True)
-    )
-    assert (abs(world - test) / world < 1e-5).all().all()
+    # NOTE: This is only expected for data from 2020 onwards. Data until 2017 at the country level is expected to be missing fish without an EMW.
+    for year in tb[tb["year"] >= 2020]["year"].unique():
+        world = tb[(tb["country"] == "World") & (tb["year"] == year)].reset_index(drop=True).drop(columns=["country"])
+        test = (
+            tb[
+                (tb["year"] == year)
+                & (tb["country"].isin(["Africa", "North America", "South America", "Asia", "Europe", "Oceania"]))
+            ]
+            .groupby("year", as_index=False)
+            .sum(numeric_only=True)
+        )
+        assert (100 * abs(world - test) / world < 1).all().all()
 
 
 def run(dest_dir: str) -> None:
@@ -143,9 +158,9 @@ def run(dest_dir: str) -> None:
     tb_until_2017 = ds_meadow.read("number_of_farmed_fish_until_2017")
     tb_from_2020 = ds_meadow.read("number_of_farmed_fish_from_2020")
 
-    ####################################################################################################################
-    # TODO: Consider adding 1990-2019 data from Mood et al. (2023)
-    ####################################################################################################################
+    # Load Mood et al. (2023) historical data and read its main table.
+    ds_historical = paths.load_dataset("farmed_finfishes_used_for_food")
+    tb_historical = ds_historical.read("farmed_finfishes_used_for_food")
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
@@ -211,13 +226,24 @@ def run(dest_dir: str) -> None:
     )
 
     # Add region aggregates.
+    # NOTE: Data from 2020 onwards contains global data. We will ignore it to create our own aggregate.
     tb = geo.add_regions_to_table(
-        tb=tb,
+        tb=tb[~tb["country"].isin(REGIONS_TO_ADD)],
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         regions=REGIONS_TO_ADD,
         min_num_values_per_year=1,
     )
+
+    # Select and rename columns in historical global data from Mood et al. (2023).
+    tb_historical = (
+        tb_historical[list(COLUMNS_HISTORICAL)]
+        .rename(columns=COLUMNS_HISTORICAL, errors="raise")
+        .astype({column: "Float64" for column in ["n_farmed_fish_low", "n_farmed_fish", "n_farmed_fish_high"]})
+    )
+
+    # Combine with historical (only global) data from Mood et al. (2023). Where there is overlap (prior to 2019) prioritize historical data (which contains data for fish without an EMW).
+    tb = combine_two_overlapping_dataframes(df1=tb_historical, df2=tb, index_columns=["country", "year"])
 
     # Add per capita number of farmed fish.
     tb = add_per_capita_variables(tb=tb, ds_population=ds_population)

@@ -7,7 +7,7 @@ definitions:
       - Non-fish species, e.g. lobsters.
       - Fish deaths arising in fish farms prior to harvest, in the capture of wild fish for feed or re-stocking, or from environmental impacts on surrounding wildlife.
       - Fish farmed for use as bait, whose small production tonnages may comprise large numbers of fish due to their very small size of just a few grams.
-      - Species without an estimated mean weight (which were an additional 17% of reported global fish production).
+    - Data at the country level prior to 2020 does not include species without an estimated mean weight (which were an additional 17% of reported global fish production).
   presentation:
     topic_tags:
     - Animal Welfare
@@ -42,7 +42,7 @@ tables:
           attribution: *attribution
           title_public: Estimated number of farmed fish
           grapher_config:
-            subtitle: &subtitle This data does not include lobsters, farmed fish used as bait, and species without an estimated mean weight (which were an additional 17% of reported global fish production).
+            subtitle: &subtitle This data does not include crustaceans or farmed fish used as bait. Data at the country level prior to 2020 does not include species without an estimated mean weight (which were an additional 17% of reported global fish production).
             note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
       n_farmed_fish_high:
         title: Estimated number of farmed fish (upper bound)
