@@ -151,6 +151,7 @@ def run(dest_dir: str) -> None:
     tb_cereal_allocation = ds_garden["cereal_allocation"]
     tb_maize_and_wheat = ds_garden["maize_and_wheat"].reset_index()
     tb_fertilizer_exports = ds_garden["fertilizer_exports"]
+    tb_net_exports_as_share_of_supply = ds_garden["net_exports_as_share_of_supply"]
 
     #
     # Process data.
@@ -204,6 +205,7 @@ def run(dest_dir: str) -> None:
             tb_cereal_allocation,
             tb_maize_and_wheat_in_the_context_of_the_ukraine_war,
             tb_fertilizer_exports_in_the_context_of_the_ukraine_war,
+            tb_net_exports_as_share_of_supply,
         ],
         default_metadata=ds_garden.metadata,
         check_variables_metadata=True,
