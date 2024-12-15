@@ -82,7 +82,7 @@ st.session_state["data_step_uris"] = st.session_state.get(
 )
 
 
-# @st.cache_data
+@st.cache_data
 def get_steps_per_channel():
     steps_all = get_datasets_in_etl(
         snapshots=True,
