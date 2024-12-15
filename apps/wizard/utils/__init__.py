@@ -571,7 +571,10 @@ def get_datasets_in_etl(
         dag = load_dag()
 
     # Define list with options
-    options = sorted(list(dag.keys()))
+    if snapshots:
+        options = sorted(list(set(dag.keys()) | set([dd for d in dag.values() for dd in d])))
+    else:
+        options = sorted(list(dag.keys()))
     ## Optional: Show some options first based on their prefix. E.g. Show those that are Meadow (i.e. start with 'data://meadow') first.
     if prefix_priorities:
         options, options_left = [], options

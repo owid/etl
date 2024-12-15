@@ -1,5 +1,6 @@
 """Garden phase."""
 
+import re
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -12,7 +13,8 @@ from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.app_pages.harmonizer.utils import render
 from apps.wizard.etl_steps.utils import TAGS_DEFAULT, remove_playground_notebook
-from apps.wizard.utils.components import st_horizontal
+from apps.wizard.utils import get_datasets_in_etl
+from apps.wizard.utils.components import st_horizontal, st_multiselect_wider
 from etl.config import DB_HOST, DB_NAME
 from etl.paths import DAG_DIR
 
@@ -63,11 +65,41 @@ dummy_values = {
 USING_TAGS_DEFAULT = True
 tag_list = TAGS_DEFAULT
 # Step names
-STEP_NAME_PRESENT = {
-    "meadow": ":material/nature: Meadow",
-    "garden": ":material/deceased: Garden",
-    "grapher": ":material/database: Grapher",
+STEP_ICONS = {
+    "meadow": ":material/nature:",
+    "garden": ":material/deceased:",
+    "grapher": ":material/database:",
 }
+STEP_NAME_PRESENT = {k: f"{v} {k.capitalize()}" for k, v in STEP_ICONS.items()}
+
+# GET STEP URIS
+st.session_state["data_step_uris"] = st.session_state.get(
+    "data_step_uris",
+    get_datasets_in_etl(
+        snapshots=False,
+        prefixes=["data://", "data-private://"],
+    ),
+)
+
+
+# @st.cache_data
+def get_steps_per_channel():
+    steps_all = get_datasets_in_etl(
+        snapshots=True,
+    )
+    steps = {"meadow": [], "garden": [], "grapher": []}
+    for s in steps_all:
+        if re.match(r"^(data(-private)?://meadow|snapshot(-private)?://)", s):
+            steps["meadow"].append(s)
+        if re.match(r"^(data(-private)?://(meadow|garden))", s):
+            steps["garden"].append(s)
+        if re.match(r"^(data(-private)?://(garden|grapher))", s):
+            steps["grapher"].append(s)
+
+    return steps
+
+
+STEPS_URI = get_steps_per_channel()
 
 
 #########################################################
@@ -354,165 +386,184 @@ def render_step_selection():
 
 def render_form():
     """Render form."""
-    with st.expander("**Form**", expanded=True):
-        if (default_version := APP_STATE.default_value("version", previous_step="snapshot")) == "":
-            default_version = APP_STATE.default_value("snapshot_version", previous_step="snapshot")
+    if (default_version := APP_STATE.default_value("version", previous_step="snapshot")) == "":
+        default_version = APP_STATE.default_value("snapshot_version", previous_step="snapshot")
 
-        # Namespace
-        custom_label = "Custom namespace..."
-        APP_STATE.st_selectbox_responsive(
-            st_widget=st.selectbox,
-            custom_label=custom_label,
-            key="namespace",
-            label="Namespace",
-            help="Institution or topic name",
-            options=OPTIONS_NAMESPACES,
-            default_last=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
-            on_change=edit_field,
-        )
-        if APP_STATE.vars.get("namespace") == custom_label:
-            namespace_key = "namespace_custom"
-        else:
-            namespace_key = "namespace"
+    # Namespace
+    custom_label = "Custom namespace..."
+    APP_STATE.st_selectbox_responsive(
+        st_widget=st.selectbox,
+        custom_label=custom_label,
+        key="namespace",
+        label="Namespace",
+        help="Institution or topic name",
+        options=OPTIONS_NAMESPACES,
+        default_last=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
+        on_change=edit_field,
+    )
+    if APP_STATE.vars.get("namespace") == custom_label:
+        namespace_key = "namespace_custom"
+    else:
+        namespace_key = "namespace"
 
-        # Short name (meadow, garden, grapher)
+    # Short name (meadow, garden, grapher)
+    APP_STATE.st_widget(
+        st_widget=st.text_input,
+        key="short_name",
+        label="short name",
+        help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
+        placeholder="Example: 'cherry_blossom'",
+        value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
+        on_change=edit_field,
+    )
+
+    # Version (meadow, garden, grapher)
+    APP_STATE.st_widget(
+        st_widget=st.text_input,
+        label="version",
+        help="Version of the dataset (by default, the current date, or exceptionally the publication date).",
+        key="version",
+        default_last=default_version,
+        value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
+        on_change=edit_field,
+    )
+
+    # Add to DAG
+    sorted_dag = sorted(
+        utils.dag_files,
+        key=lambda file_name: fuzz.ratio(file_name.replace(".yml", ""), APP_STATE.vars[namespace_key]),
+        reverse=True,
+    )
+    sorted_dag = [
+        utils.dag_not_add_option,
+        *sorted_dag,
+    ]
+    if sorted_dag[1].replace(".yml", "") == APP_STATE.vars[namespace_key]:
+        default_value = sorted_dag[1]
+    else:
+        default_value = ""
+    APP_STATE.st_widget(
+        st.selectbox,
+        label="Add to DAG",
+        options=sorted_dag,
+        key="dag_file",
+        help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
+        default_value=default_value,
+        on_change=edit_field,
+    )
+
+    # Customize dependencies
+    with st.popover(
+        "Customize dependencies",
+        use_container_width=True,
+        help="Use this optionally if you want to add more dependencies to your steps.",
+    ):
+        st.markdown("Add other dependencies to your steps in the DAG!")
+        for channel in ["meadow", "garden", "grapher"]:
+            if channel in st.session_state["data.steps_to_create"]:
+                APP_STATE.st_widget(
+                    st_widget=st.multiselect,
+                    label=STEP_NAME_PRESENT.get(channel),
+                    help=("Customize the dependency channel in the DAG."),
+                    key=f"data.dependenies_{channel}",
+                    options=STEPS_URI[channel],
+                    placeholder="Add dependency steps",
+                    default=None,
+                    on_change=edit_field,
+                )
+
+    if "garden" in st.session_state["data.steps_to_create"]:
+        # Indicator tags
+        label = "Indicators tag"
+        if USING_TAGS_DEFAULT:
+            label += f"\n\n:red[Using a 2024 March snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
+
+        namespace = APP_STATE.vars[namespace_key].replace("_", " ")
+        default_last = None
+        for tag in tag_list:
+            if namespace.lower() == tag.lower():
+                default_last = tag
+                break
         APP_STATE.st_widget(
-            st_widget=st.text_input,
-            key="short_name",
-            label="short name",
-            help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
-            placeholder="Example: 'cherry_blossom'",
-            value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
+            st_widget=st.multiselect,
+            label=label,
+            help=(
+                """
+                This tag will be propagated to all dataset's indicators (it will not be assigned to the dataset).
+
+                If you want to use a different tag for a specific indicator you can do it by editing its metadata field `variable.presentation.topic_tags`.
+
+                Exceptionally, and if unsure what to choose, choose tag `Uncategorized`.
+                """
+            ),
+            key="topic_tags",
+            options=tag_list,
+            placeholder="Choose a tag (or multiple)",
+            default=dummy_values["topic_tags"] if APP_STATE.args.dummy_data else default_last,
             on_change=edit_field,
         )
 
-        # Version (meadow, garden, grapher)
+        # Update frequency
+        today = datetime.today()
         APP_STATE.st_widget(
-            st_widget=st.text_input,
-            label="version",
-            help="Version of the dataset (by default, the current date, or exceptionally the publication date).",
-            key="version",
-            default_last=default_version,
-            value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
+            st_widget=st.date_input,
+            label="When is the next update expected?",
+            help="Expected date of the next update of this dataset by OWID (typically in a year).",
+            key="update_period_date",
+            min_value=today + timedelta(days=1),
+            default_last=today.replace(year=today.year + 1),
             on_change=edit_field,
         )
 
-        # Add to DAG
-        sorted_dag = sorted(
-            utils.dag_files,
-            key=lambda file_name: fuzz.ratio(file_name.replace(".yml", ""), APP_STATE.vars[namespace_key]),
-            reverse=True,
-        )
-        sorted_dag = [
-            utils.dag_not_add_option,
-            *sorted_dag,
-        ]
-        if sorted_dag[1].replace(".yml", "") == APP_STATE.vars[namespace_key]:
-            default_value = sorted_dag[1]
-        else:
-            default_value = ""
+    if "meadow" in st.session_state["data.steps_to_create"]:
+        st.markdown("#### Snapshot")
+        # Snapshot version
         APP_STATE.st_widget(
-            st.selectbox,
-            label="Add to DAG",
-            options=sorted_dag,
-            key="dag_file",
-            help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
-            default_value=default_value,
+            st.text_input,
+            label="Snapshot version",
+            help="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
+            # placeholder=f"Example: {DATE_TODAY}",
+            key="snapshot_version",
+            value=dummy_values["snapshot_version"] if APP_STATE.args.dummy_data else None,
+            on_change=edit_field,
+        )
+        # File extension
+        APP_STATE.st_widget(
+            st.text_input,
+            label="File extension",
+            help="File extension (without the '.') of the file to be downloaded.",
+            placeholder="Example: 'csv', 'xls', 'zip'",
+            key="file_extension",
+            value=dummy_values["file_extension"] if APP_STATE.args.dummy_data else None,
             on_change=edit_field,
         )
 
-        if "garden" in st.session_state["data.steps_to_create"]:
-            # Indicator tags
-            label = "Indicators tag"
-            if USING_TAGS_DEFAULT:
-                label += f"\n\n:red[Using a 2024 March snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
+    # Others
+    st.markdown("#### Other options")
+    name_mapping = {
+        "private": ":material/lock:  Make dataset private",
+        "notebook": ":material/skateboarding:  Create playground notebook",
+        # "grapher": ":material/database: Grapher",
+    }
 
-            namespace = APP_STATE.vars[namespace_key].replace("_", " ")
-            default_last = None
-            for tag in tag_list:
-                if namespace.lower() == tag.lower():
-                    default_last = tag
-                    break
-            APP_STATE.st_widget(
-                st_widget=st.multiselect,
-                label=label,
-                help=(
-                    """
-                    This tag will be propagated to all dataset's indicators (it will not be assigned to the dataset).
+    st.pills(
+        label="Select the steps you want to create",
+        help="Extra options.",
+        options=["private", "notebook"],
+        format_func=lambda option: name_mapping[option],
+        selection_mode="multi",
+        label_visibility="collapsed",
+        key="data.extra_options",
+        on_change=edit_field,
+    )
 
-                    If you want to use a different tag for a specific indicator you can do it by editing its metadata field `variable.presentation.topic_tags`.
-
-                    Exceptionally, and if unsure what to choose, choose tag `Uncategorized`.
-                    """
-                ),
-                key="topic_tags",
-                options=tag_list,
-                placeholder="Choose a tag (or multiple)",
-                default=dummy_values["topic_tags"] if APP_STATE.args.dummy_data else default_last,
-                on_change=edit_field,
-            )
-
-            # Update frequency
-            today = datetime.today()
-            APP_STATE.st_widget(
-                st_widget=st.date_input,
-                label="When is the next update expected?",
-                help="Expected date of the next update of this dataset by OWID (typically in a year).",
-                key="update_period_date",
-                min_value=today + timedelta(days=1),
-                default_last=today.replace(year=today.year + 1),
-                on_change=edit_field,
-            )
-
-        if "meadow" in st.session_state["data.steps_to_create"]:
-            st.markdown("#### Snapshot")
-            # Snapshot version
-            APP_STATE.st_widget(
-                st.text_input,
-                label="Snapshot version",
-                help="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
-                # placeholder=f"Example: {DATE_TODAY}",
-                key="snapshot_version",
-                value=dummy_values["snapshot_version"] if APP_STATE.args.dummy_data else None,
-                on_change=edit_field,
-            )
-            # File extension
-            APP_STATE.st_widget(
-                st.text_input,
-                label="File extension",
-                help="File extension (without the '.') of the file to be downloaded.",
-                placeholder="Example: 'csv', 'xls', 'zip'",
-                key="file_extension",
-                value=dummy_values["file_extension"] if APP_STATE.args.dummy_data else None,
-                on_change=edit_field,
-            )
-
-        # Others
-        st.markdown("#### Other options")
-        name_mapping = {
-            "private": ":material/lock:  Make dataset private",
-            "notebook": ":material/skateboarding:  Create playground notebook",
-            # "grapher": ":material/database: Grapher",
-        }
-
-        st.pills(
-            label="Select the steps you want to create",
-            help="Extra options.",
-            options=["private", "notebook"],
-            format_func=lambda option: name_mapping[option],
-            selection_mode="multi",
-            label_visibility="collapsed",
-            key="data.extra_options",
-            on_change=edit_field,
-        )
-
-        # Submit
-        st.button(
-            label="Submit",
-            type="primary",
-            use_container_width=True,
-            on_click=submit_form,
-        )
+    # Submit
+    st.button(
+        label="Submit",
+        type="primary",
+        use_container_width=True,
+        on_click=submit_form,
+    )
 
 
 @st.dialog("Harmonize country names", width="large")
@@ -620,6 +671,7 @@ def render_instructions_grapher(form=None):
 #########################################################
 # MAIN ##################################################
 #########################################################
+st_multiselect_wider()
 # TITLE
 st.title(":material/bolt: Data **:gray[Create steps]**")
 
@@ -629,7 +681,11 @@ step_selected = render_step_selection()
 # FORM
 if step_selected:
     # form_widget = st.empty()
-    render_form()
+    form_title = " ".join(
+        [STEP_ICONS[s] for s in ["meadow", "garden", "grapher"] if s in st.session_state["data.steps_to_create"]]
+    )
+    with st.expander(f"**Steps: {form_title}**", expanded=True):
+        render_form()
 else:
     st.warning("Select at least one step to create.")
 
