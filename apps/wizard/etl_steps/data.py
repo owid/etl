@@ -344,7 +344,7 @@ def render_step_selection():
                 help="Express mode will create all steps at once.",
                 # default=default,
                 key="data_steps_to_create",
-                on_change=lambda: set_states({"update_steps_selection": True, "submit_form": False}),
+                on_change=lambda: utils.set_states({"update_steps_selection": True, "submit_form": False}),
             )
 
         if len(st.session_state["data.steps_to_create"]) > 0:

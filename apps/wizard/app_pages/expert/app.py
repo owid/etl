@@ -20,7 +20,6 @@ from apps.wizard.app_pages.expert.prompts import (
     SYSTEM_PROMPT_START,
 )
 from apps.wizard.utils import set_states
-from apps.wizard.utils.components import st_horizontal
 from apps.wizard.utils.db import DB_IS_SET_UP, WizardDB
 from etl.config import load_env
 
