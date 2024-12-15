@@ -109,7 +109,7 @@ sections:
         alias: harmonizer
         description: "Harmonize a column of a table"
         maintainer: "@lucas"
-        entrypoint: app_pages/harmonizer.py
+        entrypoint: app_pages/harmonizer/app.py
         icon: ":material/music_note:"
         image_url: "https://www.shutterstock.com/image-vector/abstract-vector-musical-background-music-260nw-485443810.jpg"
 
