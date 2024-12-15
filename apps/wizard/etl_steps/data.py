@@ -11,7 +11,7 @@ from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.app_pages.harmonizer.utils import render
+from apps.wizard.app_pages.harmonizer.utils import render as render_harmonizer
 from apps.wizard.etl_steps.utils import TAGS_DEFAULT, remove_playground_notebook
 from apps.wizard.utils import get_datasets_in_etl
 from apps.wizard.utils.components import st_horizontal, st_multiselect_wider
@@ -128,6 +128,8 @@ class DataForm(utils.StepForm):
     update_period_days: Optional[int] = None
     topic_tags: Optional[List[str]] = None
     update_period_date: Optional[date] = None  # Custom
+    # Extra steps
+    dependencies_extra: Dict[str, Any]
 
     def __init__(self: Self, **data: Any) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
@@ -148,6 +150,11 @@ class DataForm(utils.StepForm):
         data["is_private"] = True if "private" in data["extra_options"] else False
         data["notebook"] = True if "notebook" in data["extra_options"] else False
 
+        data["dependencies_extra"] = {
+            "meadow": data.get("dependencies_extra_meadow"),
+            "garden": data.get("dependencies_extra_garden"),
+            "grapher": data.get("dependencies_extra_grapher"),
+        }
         # st.write(data)
         super().__init__(**data)  # type: ignore
 
@@ -183,6 +190,20 @@ class DataForm(utils.StepForm):
     def base_step_name(self) -> str:
         """namespace/version/short_name"""
         return f"{form.namespace}/{form.version}/{form.short_name}"
+
+    def step_uri(self, channel: str) -> str:
+        """Get step URI."""
+        match channel:
+            case "snapshot":
+                return f"snapshot{self.private_suffix}://{self.namespace}/{self.snapshot_version}/{self.short_name}.{self.file_extension}"
+            case "meadow":
+                return f"data{self.private_suffix}://meadow/{self.base_step_name}"
+            case "garden":
+                return f"data{self.private_suffix}://garden/{self.base_step_name}"
+            case "grapher":
+                return f"data{self.private_suffix}://grapher/{self.base_step_name}"
+            case _:
+                raise ValueError(f"Channel `{channel}` not recognized.")
 
     @property
     def snapshot_step_uri(self) -> str:
@@ -316,12 +337,12 @@ class DataForm(utils.StepForm):
 
     def dag(self) -> Dict[str, Any]:
         dag = {}
-        if "meadow" in self.steps_to_create:
-            dag[self.meadow_step_uri] = [self.snapshot_step_uri]
-        if "garden" in self.steps_to_create:
-            dag[self.garden_step_uri] = [self.meadow_step_uri]
-        if "grapher" in self.steps_to_create:
-            dag[self.grapher_step_uri] = [self.garden_step_uri]
+        channels_all = ["snapshot", "meadow", "garden", "grapher"]
+        for i, channel in enumerate(channels_all[1:]):
+            if channel in self.steps_to_create:
+                dag[self.step_uri(channel)] = [self.step_uri(channels_all[i])]
+                if self.dependencies_extra[channel] is not None:
+                    dag[self.step_uri(channel)] += self.dependencies_extra[channel]
         return dag
 
 
@@ -465,7 +486,7 @@ def render_form():
                     st_widget=st.multiselect,
                     label=STEP_NAME_PRESENT.get(channel),
                     help=("Customize the dependency channel in the DAG."),
-                    key=f"data.dependenies_{channel}",
+                    key=f"data.dependencies_extra_{channel}",
                     options=STEPS_URI[channel],
                     placeholder="Add dependency steps",
                     default=None,
@@ -567,8 +588,9 @@ def render_form():
 
 
 @st.dialog("Harmonize country names", width="large")
-def render_harm():
-    render()
+def render_harm(form):
+    meadow_step = form.step_uri("meadow")
+    render_harmonizer(meadow_step)
 
 
 def render_instructions(form):
@@ -607,8 +629,11 @@ def render_instructions_meadow(form=None):
             line_numbers=True,
         )
 
-    st.markdown("**2) Harmonize country names**")
-    st.button("Harmonize", on_click=render_harm)
+
+def render_instructions_garden(form=None):
+    ## 1/ Run etl step
+    st.markdown("**1) Harmonize country names**")
+    st.button("Harmonize", on_click=lambda form=form: render_harm(form))
     st.markdown("You can also run it in your terminal:")
     if form is None:
         st.code(
@@ -624,11 +649,7 @@ def render_instructions_meadow(form=None):
             wrap_lines=True,
             line_numbers=True,
         )
-
-
-def render_instructions_garden(form=None):
-    ## 1/ Run etl step
-    st.markdown("**1) Run Garden step**")
+    st.markdown("**2) Run Garden step**")
     st.markdown("After editing the code of your Garden step, run the following command:")
     if form is None:
         st.code(

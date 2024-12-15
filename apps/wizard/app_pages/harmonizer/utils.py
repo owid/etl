@@ -14,13 +14,6 @@ from etl.harmonize import Harmonizer
 from etl.paths import STEP_DIR
 from etl.steps import load_from_uri
 
-# Get session state
-path = None
-if ("steps" in st.session_state) and ("garden" in st.session_state.steps):
-    garden_vars = st.session_state["steps"]["garden"]
-    if ("namespace" in garden_vars) and ("meadow_version" in garden_vars) and ("short_name" in garden_vars):
-        path = f"data://meadow/{garden_vars['namespace']}/{garden_vars['meadow_version']}/{garden_vars['short_name']}"
-
 # RANK OF PREFERED TABLE NAMES
 TABLE_NAME_PRIORITIES = ["main", "core"]
 # RANK OF PREFERED COLUMN NAMES (for country)
@@ -91,7 +84,7 @@ def sort_indicators(indicators: List[str]) -> List[str]:
     return indicators
 
 
-def render():
+def render(step_uri):
     # Page config
     st.title(":material/music_note: Entity Harmonizer")
 
@@ -119,7 +112,7 @@ def render():
         label="Select a dataset",
         placeholder="Select a dataset",
         options=options,
-        index=options.index(path) if path in options else None,
+        index=options.index(step_uri) if step_uri in options else None,
         help="By default, only meadow datasets are shown in the dataset search bar.",
     )
     st.toggle(
