@@ -6,17 +6,14 @@ from typing import Any, Dict, List, Optional
 
 import streamlit as st
 from rapidfuzz import fuzz
-from sqlalchemy.exc import OperationalError
 from typing_extensions import Self
 
-import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
+from apps.wizard.app_pages.harmonizer.utils import render
 from apps.wizard.etl_steps.utils import TAGS_DEFAULT, remove_playground_notebook
-from apps.wizard.utils import set_states, st_page_link
 from apps.wizard.utils.components import st_horizontal
 from etl.config import DB_HOST, DB_NAME
-from etl.db import get_session
 from etl.paths import DAG_DIR
 
 #########################################################
@@ -518,6 +515,11 @@ def render_form():
         )
 
 
+@st.dialog("Harmonize country names", width="large")
+def render_harm():
+    render()
+
+
 def render_instructions(form):
     for channel in ["meadow", "garden", "grapher"]:
         if channel in form.steps_to_create:
@@ -554,11 +556,9 @@ def render_instructions_meadow(form=None):
             line_numbers=True,
         )
 
-
-def render_instructions_garden(form=None):
-    ## 1/ Harmonize country names
-    st.markdown("**1) Harmonize country names**")
-    st.markdown("Run it in your terminal:")
+    st.markdown("**2) Harmonize country names**")
+    st.button("Harmonize", on_click=render_harm)
+    st.markdown("You can also run it in your terminal:")
     if form is None:
         st.code(
             "uv run etl harmonize data/meadow/version/short_name/table_name.feather country etl/steps/data/garden/version/short_name.countries.json",
@@ -573,15 +573,11 @@ def render_instructions_garden(form=None):
             wrap_lines=True,
             line_numbers=True,
         )
-    st.markdown("Or run it on Wizard")
-    utils.st_page_link(
-        "harmonizer",
-        use_container_width=True,
-        help="You will leave this page, and the guideline text will be hidden.",
-    )
 
-    # 2/ Run etl step
-    st.markdown("**2) Run Garden step**")
+
+def render_instructions_garden(form=None):
+    ## 1/ Run etl step
+    st.markdown("**1) Run Garden step**")
     st.markdown("After editing the code of your Garden step, run the following command:")
     if form is None:
         st.code(
