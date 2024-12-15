@@ -81,7 +81,7 @@ st.markdown(
 ##########################################################
 IMPORT_OPTIONS = {
     IMPORT_GSHEET: {
-        "title": "New Google sheet",
+        "title": ":material/cloud: :material/add: New Google sheet",
         "description": "Import data from a Google sheet",
         "guidelines": {
             "heading": "**How to import from a Google sheet**",
@@ -89,7 +89,7 @@ IMPORT_OPTIONS = {
         },
     },
     UPDATE_GSHEET: {
-        "title": "Existing Google sheet",
+        "title": ":material/cloud: :material/sync:  Existing Google sheet",
         "description": "Update from a Google sheet (already imported in the database)",
         "guidelines": {
             "heading": "**How to update from an existing sheet**",
@@ -97,7 +97,7 @@ IMPORT_OPTIONS = {
         },
     },
     LOCAL_CSV: {
-        "title": "Local CSV",
+        "title": ":material/attach_file: Local CSV",
         "description": "Import from a local CSV",
         "guidelines": {
             "heading": "**How to import a local CSV**",
