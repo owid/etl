@@ -166,13 +166,14 @@ class classproperty(property):
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express"]
+    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data"]
     dataset_edit: Dict[str, Dataset | None] = {
         "snapshot": None,
         "meadow": None,
         "garden": None,
         "grapher": None,
         "express": None,
+        "data": None,
     }
     _previous_step: str | None = None
 
@@ -199,6 +200,9 @@ class AppState:
 
         self.default_steps["express"]["snapshot_version"] = DATE_TODAY
         self.default_steps["express"]["version"] = DATE_TODAY
+
+        self.default_steps["data"]["snapshot_version"] = DATE_TODAY
+        self.default_steps["data"]["version"] = DATE_TODAY
 
         self.default_steps["meadow"]["version"] = DATE_TODAY
         self.default_steps["meadow"]["snapshot_version"] = DATE_TODAY
@@ -315,10 +319,10 @@ class AppState:
         """
         if self._previous_step is None:
             self._check_step()
-            if self.step not in {"explorer", "express"}:
+            if self.step not in {"explorer", "express", "data"}:
                 idx = max(self.steps.index(self.step) - 1, 0)
                 self._previous_step = self.steps[idx]
-            elif self.step == "express":
+            elif self.step in {"express", "data"}:
                 self._previous_step = "snapshot"
         return self._previous_step
 
@@ -440,18 +444,18 @@ def config_style_html() -> None:
     )
 
 
-def preview_file(file_path: str | Path, language: str = "python") -> None:
+def preview_file(file_path: str | Path, prefix: str = "File", language: str = "python") -> None:
     """Preview file in streamlit."""
     with open(file_path, "r") as f:
         code = f.read()
-    with st.expander(f"File: `{file_path}`", expanded=False):
+    with st.expander(f"{prefix}: `{file_path}`", expanded=False):
         st.code(code, language=language)
 
 
-def preview_dag_additions(dag_content: str, dag_path: str | Path, expanded: bool = False) -> None:
+def preview_dag_additions(dag_content: str, dag_path: str | Path, prefix: str = "File", expanded: bool = False) -> None:
     """Preview DAG additions."""
     if dag_content:
-        with st.expander(f"File: `{dag_path}`", expanded=expanded):
+        with st.expander(f"{prefix}: `{dag_path}`", expanded=expanded):
             st.code(dag_content, "yaml")
 
 

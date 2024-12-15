@@ -62,7 +62,8 @@ etl:
       title: "Data step"
       entrypoint: etl_steps/data.py
       icon: ":material/table:"
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
+      image_url: "https://media.gettyimages.com/id/1272610693/es/v%C3%ADdeo/muro-de-perspectiva-del-fondo-del-patr%C3%B3n-digital-del-c%C3%B3digo-binario.jpg?s=640x640&k=20&c=Pb4m4UbGiVZEuQ8egLm2IYtLLmQxncBFFa1zR87-St4%3D"
+      description: "Meadow, Garden, Grapher."
       disable:
         "production": True
     fasttrack:
@@ -132,7 +133,7 @@ sections:
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
       - title: "Producer analytics"
         alias: producer-analytics
-        description: "Extract analytics to share with data producers"
+        description: "Share analytics with data producers"
         maintainer: "@pablo"
         entrypoint: app_pages/producer_analytics.py
         icon: ":material/analytics:"
@@ -163,7 +164,7 @@ sections:
     apps:
       - title: "Insight search"
         alias: insight_search
-        description: "Browse data insights by their semantic similarity"
+        description: "Smart-browse DIs"
         maintainer: "@pablo"
         entrypoint: app_pages/insight_search.py
         icon: ":material/search:"
@@ -196,7 +197,7 @@ sections:
         image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
       - title: "Chart animation"
         alias: chart-animation
-        description: "Create an animated GIF or a video from a chart"
+        description: "Animate charts (GIF/video)"
         maintainer: "@pablo"
         entrypoint: app_pages/chart_animation.py
         icon: ":material/animated_images:"

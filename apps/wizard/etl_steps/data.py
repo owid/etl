@@ -2,7 +2,7 @@
 
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import streamlit as st
 from rapidfuzz import fuzz
@@ -27,8 +27,8 @@ st.set_page_config(
     page_icon="🪄",
 )
 st.session_state.submit_form = st.session_state.get("submit_form", False)
-st.session_state.data_steps_to_create = st.session_state.get("data_steps_to_create", [])
-st.session_state.data_express_mode = st.session_state.get("data_express_mode")
+st.session_state["data.steps_to_create"] = st.session_state.get("data.steps_to_create", [])
+st.session_state["data_steps_to_create"] = st.session_state.get("data_steps_to_create")
 st.session_state.update_steps_selection = st.session_state.get("update_steps_selection", False)
 
 # Available namespaces
@@ -38,7 +38,7 @@ OPTIONS_NAMESPACES = utils.get_namespaces("all")
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
 # FIELDS FROM OTHER STEPS
-st.session_state["step_name"] = "express"
+st.session_state["step_name"] = "data"
 APP_STATE = utils.AppState()
 APP_STATE._previous_step = "snapshot"
 # Config style
@@ -65,6 +65,12 @@ dummy_values = {
 # TODO: Remove following lines, uncomment lines above
 USING_TAGS_DEFAULT = True
 tag_list = TAGS_DEFAULT
+# Step names
+STEP_NAME_PRESENT = {
+    "meadow": ":material/nature: Meadow",
+    "garden": ":material/deceased: Garden",
+    "grapher": ":material/database: Grapher",
+}
 
 
 #########################################################
@@ -73,26 +79,28 @@ tag_list = TAGS_DEFAULT
 class DataForm(utils.StepForm):
     """express step form."""
 
-    step_name: str = "express"
+    step_name: str = "data"
 
+    # List of steps
+    steps_to_create: List[str]
+    # Common
     namespace: str
+    namespace_custom: Optional[str] = None  # Custom
     short_name: str
     version: str
-    update_period_days: int
-    topic_tags: List[str]
     add_to_dag: bool
     dag_file: str
-    # Others
     is_private: bool
-    # Snapshot
-    snapshot_version: str
-    file_extension: str
+    # Only in Garden
+    snapshot_version: Optional[str] = None
+    file_extension: Optional[str] = None
+    notebook: Optional[bool] = None
+    # Only in Garden
+    update_period_days: Optional[int] = None
+    topic_tags: Optional[List[str]] = None
+    update_period_date: Optional[date] = None  # Custom
 
-    # Others
-    namespace_custom: str | None = None
-    update_period_date: date
-
-    def __init__(self: Self, **data: str | date | bool | int) -> None:  # type: ignore[reportInvalidTypeVarUse]
+    def __init__(self: Self, **data: Any) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
 
@@ -107,6 +115,11 @@ class DataForm(utils.StepForm):
 
             data["update_period_days"] = update_period_days
 
+        # Extra options
+        data["is_private"] = True if "private" in data["extra_options"] else False
+        data["notebook"] = True if "notebook" in data["extra_options"] else False
+
+        # st.write(data)
         super().__init__(**data)  # type: ignore
 
     def validate(self: Self) -> None:
@@ -115,18 +128,27 @@ class DataForm(utils.StepForm):
         - Add error message for each field (to be displayed in the form).
         - Return True if all fields are valid, False otherwise.
         """
-        # Check other fields (non meta)
-        fields_required = ["namespace", "short_name", "version", "topic_tags", "snapshot_version", "file_extension"]
+        # Default common checks
+        fields_required = ["namespace", "short_name", "version"]
         fields_snake = ["namespace", "short_name"]
-        fields_version = ["version", "snapshot_version"]
+        fields_version = ["version"]
+
+        # Extra checks for particular steps
+        if "meadow" in self.steps_to_create:
+            fields_required += ["snapshot_version", "file_extension"]
+            fields_version += ["snapshot_version"]
+        if "garden" in self.steps_to_create:
+            fields_required += ["topic_tags"]
 
         self.check_required(fields_required)
         self.check_snake(fields_snake)
         self.check_is_version(fields_version)
 
         # Check tags
-        if (len(self.topic_tags) > 1) and ("Uncategorized" in self.topic_tags):
-            self.errors["topic_tags"] = "If you choose multiple tags, you cannot choose `Uncategorized`."
+        if "garden" in self.steps_to_create:
+            assert isinstance(self.topic_tags, list), "topic_tags must be a list! Should have been ensured actually!"
+            if (len(self.topic_tags) > 1) and ("Uncategorized" in self.topic_tags):
+                self.errors["topic_tags"] = "If you choose multiple tags, you cannot choose `Uncategorized`."
 
     @property
     def base_step_name(self) -> str:
@@ -230,14 +252,16 @@ class DataForm(utils.StepForm):
         DATASET_DIR = generate_step_to_channel(
             cookiecutter_path=utils.COOKIE_STEPS[channel], data=self.to_dict(channel)
         )
-        # Remove playground (by default it is created, we no longer want it)
-        remove_playground_notebook(DATASET_DIR)
+        # Remove playground notebook if not needed
+        if channel != "garden" or not self.notebook:
+            remove_playground_notebook(DATASET_DIR)
+
         # Add to generated files
         generated_files = [
             {
                 "path": DATASET_DIR / (self.short_name + ".py"),
                 "language": "python",
-                "channel": "meadow",
+                "channel": channel,
             }
         ]
         if channel == "garden":
@@ -253,23 +277,23 @@ class DataForm(utils.StepForm):
     def add_steps_to_dag(self) -> str:
         if form.add_to_dag:
             dag_content = add_to_dag(
-                dag={
-                    self.meadow_step_uri: [
-                        self.snapshot_step_uri,
-                    ],
-                    self.garden_step_uri: [
-                        self.meadow_step_uri,
-                    ],
-                    self.grapher_step_uri: [
-                        self.garden_step_uri,
-                    ],
-                },
+                dag=self.dag(),
                 dag_path=self.dag_path,
             )
         else:
             dag_content = ""
 
         return dag_content
+
+    def dag(self) -> Dict[str, Any]:
+        dag = {}
+        if "meadow" in self.steps_to_create:
+            dag[self.meadow_step_uri] = [self.snapshot_step_uri]
+        if "garden" in self.steps_to_create:
+            dag[self.garden_step_uri] = [self.meadow_step_uri]
+        if "grapher" in self.steps_to_create:
+            dag[self.grapher_step_uri] = [self.garden_step_uri]
+        return dag
 
 
 def submit_form() -> None:
@@ -290,34 +314,31 @@ def edit_field() -> None:
 
 def render_step_selection():
     """Render step selection."""
-    name_mapping = {
-        "meadow": ":material/nature: Meadow",
-        "garden": ":material/deceased: Garden",
-        "grapher": ":material/database: Grapher",
-    }
-
     # st.write(st.session_state)
     with st_horizontal("center"):
         # Multi-select (data steps)
         with st.container():
-            if (st.session_state.update_steps_selection) and (st.session_state.data_express_mode is not None):
-                st.session_state.data_steps_to_create = ["meadow", "garden", "grapher"]
+            if (st.session_state.update_steps_selection) and (st.session_state["data_steps_to_create"] is not None):
+                st.session_state["data.steps_to_create"] = ["meadow", "garden", "grapher"]
                 st.session_state.update_steps_selection = False
 
             st.segmented_control(
                 label="Select the steps you want to create",
                 options=["meadow", "garden", "grapher"],
-                format_func=lambda option: name_mapping[option],
+                format_func=lambda option: STEP_NAME_PRESENT[option],
                 selection_mode="multi",
                 help="You can select multiple steps to create.",
-                key="data_steps_to_create",
+                key="data.steps_to_create",
+                on_change=edit_field,
             )
         # Express mode
         with st.container():
-            if (st.session_state.data_express_mode is not None) and (len(st.session_state.data_steps_to_create) != 3):
-                st.session_state.data_express_mode = None
+            if (st.session_state["data_steps_to_create"] is not None) and (
+                len(st.session_state["data.steps_to_create"]) != 3
+            ):
+                st.session_state["data_steps_to_create"] = None
 
-            # Set to false if: data_express_mode is "express" & len(st.session_state.data_steps_to_create) is not 3
+            # Set to false if: data_steps_to_create is "express" & len(st.session_state["data.steps_to_create"]) is not 3
             st.segmented_control(
                 "Express?",
                 ["express"],
@@ -325,18 +346,18 @@ def render_step_selection():
                 label_visibility="hidden",
                 help="Express mode will create all steps at once.",
                 # default=default,
-                key="data_express_mode",
-                on_change=lambda: set_states({"update_steps_selection": True}),
+                key="data_steps_to_create",
+                on_change=lambda: set_states({"update_steps_selection": True, "submit_form": False}),
             )
 
-        if len(st.session_state.data_steps_to_create) > 0:
+        if len(st.session_state["data.steps_to_create"]) > 0:
             return True
         return False
 
 
 def render_form():
     """Render form."""
-    with form_widget.container(border=True):
+    with st.expander("**Form**", expanded=True):
         if (default_version := APP_STATE.default_value("version", previous_step="snapshot")) == "":
             default_version = APP_STATE.default_value("snapshot_version", previous_step="snapshot")
 
@@ -403,7 +424,7 @@ def render_form():
             on_change=edit_field,
         )
 
-        if "garden" in st.session_state.data_steps_to_create:
+        if "garden" in st.session_state["data.steps_to_create"]:
             # Indicator tags
             label = "Indicators tag"
             if USING_TAGS_DEFAULT:
@@ -446,7 +467,7 @@ def render_form():
                 on_change=edit_field,
             )
 
-        if "meadow" in st.session_state.data_steps_to_create:
+        if "meadow" in st.session_state["data.steps_to_create"]:
             st.markdown("#### Snapshot")
             # Snapshot version
             APP_STATE.st_widget(
@@ -484,7 +505,7 @@ def render_form():
             format_func=lambda option: name_mapping[option],
             selection_mode="multi",
             label_visibility="collapsed",
-            key="extra_options",
+            key="data.extra_options",
             on_change=edit_field,
         )
 
@@ -495,6 +516,109 @@ def render_form():
             use_container_width=True,
             on_click=submit_form,
         )
+
+
+def render_instructions(form):
+    for channel in ["meadow", "garden", "grapher"]:
+        if channel in form.steps_to_create:
+            with st.container(border=True):
+                st.markdown(f"##### **{STEP_NAME_PRESENT.get(channel, channel)}**")
+                render_instructions_step(channel, form)
+
+
+def render_instructions_step(channel, form=None):
+    if channel == "meadow":
+        render_instructions_meadow(form)
+    elif channel == "garden":
+        render_instructions_garden(form)
+    elif channel == "grapher":
+        render_instructions_grapher(form)
+
+
+def render_instructions_meadow(form=None):
+    ## Run step
+    st.markdown("**1) Run Meadow step**")
+    if form is None:
+        st.code(
+            "uv run etl run data://meadow/namespace/version/short_name",
+            language="shellSession",
+            wrap_lines=True,
+            line_numbers=True,
+        )
+        st.markdown("Use `--private` if the dataset is private.")
+    else:
+        st.code(
+            f"uv run etl run {form.meadow_step_uri} {'--private' if form.is_private else ''}",
+            language="shellSession",
+            wrap_lines=True,
+            line_numbers=True,
+        )
+
+
+def render_instructions_garden(form=None):
+    ## 1/ Harmonize country names
+    st.markdown("**1) Harmonize country names**")
+    st.markdown("Run it in your terminal:")
+    if form is None:
+        st.code(
+            "uv run etl harmonize data/meadow/version/short_name/table_name.feather country etl/steps/data/garden/version/short_name.countries.json",
+            "shellSession",
+            wrap_lines=True,
+            line_numbers=True,
+        )
+    else:
+        st.code(
+            f"uv run etl harmonize data/meadow/{form.base_step_name}/{form.short_name}.feather country etl/steps/data/garden/{form.base_step_name}.countries.json",
+            "shellSession",
+            wrap_lines=True,
+            line_numbers=True,
+        )
+    st.markdown("Or run it on Wizard")
+    utils.st_page_link(
+        "harmonizer",
+        use_container_width=True,
+        help="You will leave this page, and the guideline text will be hidden.",
+    )
+
+    # 2/ Run etl step
+    st.markdown("**2) Run Garden step**")
+    st.markdown("After editing the code of your Garden step, run the following command:")
+    if form is None:
+        st.code(
+            "uv run etl run data://garden/namespace/version/short_name",
+            "shellSession",
+            wrap_lines=True,
+            line_numbers=True,
+        )
+        st.markdown("Use `--private` if the dataset is private.")
+    else:
+        st.code(
+            f"uv run etl run {form.garden_step_uri} {'--private' if form.is_private else ''}",
+            "shellSession",
+            wrap_lines=True,
+            line_numbers=True,
+        )
+
+
+def render_instructions_grapher(form=None):
+    st.markdown("**1) Run Grapher step**")
+    if form is None:
+        st.code(
+            "uv run etl run data://meadow/namespace/version/short_name",
+            language="shellSession",
+            wrap_lines=True,
+            line_numbers=True,
+        )
+        st.markdown("Use `--private` if the dataset is private.")
+    else:
+        st.code(
+            f"uv run etl run {form.grapher_step_uri} {'--private' if form.is_private else ''}",
+            language="shellSession",
+            wrap_lines=True,
+            line_numbers=True,
+        )
+    st.markdown("**2) Pull request**")
+    st.markdown("Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.")
 
 
 #########################################################
@@ -508,9 +632,10 @@ step_selected = render_step_selection()
 
 # FORM
 if step_selected:
-    form_widget = st.empty()
+    # form_widget = st.empty()
     render_form()
-
+else:
+    st.warning("Select at least one step to create.")
 
 #########################################################
 # SUBMISSION ############################################
@@ -519,78 +644,37 @@ if st.session_state.submit_form:
     # Create form
     form = DataForm.from_state()
 
+    # st.write(form.model_dump())
     if not form.errors:
         # Remove form from UI
-        form_widget.empty()
+        # form_widget.empty()
 
         # Create files for all steps
-        generated_files = []
-        for channel in ["meadow", "garden", "grapher"]:
+        generated_files = {}
+        for channel in form.steps_to_create:
             generated_files_ = form.create_files(channel)
-            generated_files.extend(generated_files_)
+            generated_files[channel] = generated_files_
 
         # Add lines to DAG
         dag_content = form.add_steps_to_dag()
 
-        #######################
-        # PREVIEW #############
-        #######################
-        st.subheader("Generated files")
-        utils.preview_dag_additions(dag_content, form.dag_path, expanded=True)
+        ########################
+        # PREVIEW & NEXT STEPS #
+        ########################
+        utils.preview_dag_additions(dag_content, form.dag_path, prefix="**DAG**", expanded=True)
 
-        tab_meadow, tab_garden, tab_grapher = st.tabs(["Meadow", "Garden", "Grapher"])
-        for f in generated_files:
-            if f["channel"] == "meadow":
-                with tab_meadow:
-                    utils.preview_file(f["path"], f["language"])
-            elif f["channel"] == "garden":
-                with tab_garden:
-                    utils.preview_file(f["path"], f["language"])
-            elif f["channel"] == "grapher":
-                with tab_grapher:
-                    utils.preview_file(f["path"], f["language"])
+        # st.write(generated_files)
+        tab_instructions, tab_files = st.tabs(["Instructions", "Files"])
 
-        #######################
-        # NEXT STEPS ##########
-        #######################
-        with tab_meadow:
-            st.markdown("#### ⏭️ Next")
-            ## Run step
-            st.markdown("##### Run ETL meadow step")
-            st.code(
-                f"uv run etl run {form.meadow_step_uri} {'--private' if form.is_private else ''}",
-                language="shellSession",
-            )
+        with tab_files:
+            for channel in ["meadow", "garden", "grapher"]:
+                if channel in generated_files:
+                    # st.markdown(f"**{channel.title()}**")
+                    for f in generated_files[channel]:
+                        utils.preview_file(f["path"], f"**{STEP_NAME_PRESENT.get(channel)}**", f["language"])
 
-        with tab_garden:
-            st.markdown("#### ⏭️ Next")
-            ## 1/ Harmonize country names
-            st.markdown("##### Harmonize country names")
-            st.markdown("Run it in your terminal:")
-            st.code(
-                f"uv run etl harmonize data/meadow/{form.base_step_name}/{form.short_name}.feather country etl/steps/data/garden/{form.base_step_name}.countries.json",
-                "shellSession",
-            )
-            st.markdown("Or run it on Wizard")
-            utils.st_page_link(
-                "harmonizer",
-                use_container_width=True,
-                help="You will leave this page, and the guideline text will be hidden.",
-            )
-
-            # 2/ Run etl step
-            st.markdown("##### Run ETL step")
-            st.markdown("After editing the code of your Garden step, run the following command:")
-            st.code(
-                f"uv run etl run {form.garden_step_uri} {'--private' if form.is_private else ''}",
-                "shellSession",
-            )
-
-        with tab_grapher:
-            st.markdown("#### ⏭️ Next")
-            # 1/ PR
-            st.markdown("##### Pull request")
-            st.markdown("Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.")
+        with tab_instructions:
+            render_instructions(form)
 
         # Prompt user
         st.toast("Templates generated. Read the next steps.", icon="✅")
@@ -602,8 +686,8 @@ if st.session_state.submit_form:
         st.error("Form not submitted! Check errors!")
 
 
-st.divider()
-st.subheader("Legacy")
-st_page_link("meadow")
-st_page_link("garden")
-st_page_link("grapher")
+# st.divider()
+# st.subheader("Legacy")
+# st_page_link("meadow")
+# st_page_link("garden")
+# st_page_link("grapher")
