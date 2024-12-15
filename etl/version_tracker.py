@@ -655,14 +655,14 @@ class VersionTracker:
         ] = UpdateState.ARCHIVABLE.value
 
         # There are special steps that, even though they are archivable or unused, we want to keep in the active dag.
-        steps_active_df.loc[
-            steps_active_df["step"].isin(self.ARCHIVABLE_STEPS_TO_KEEP), "update_state"
-        ] = UpdateState.UP_TO_DATE.value
+        steps_active_df.loc[steps_active_df["step"].isin(self.ARCHIVABLE_STEPS_TO_KEEP), "update_state"] = (
+            UpdateState.UP_TO_DATE.value
+        )
 
         # All explorers and external steps should be considered up to date.
-        steps_active_df.loc[
-            steps_active_df["channel"].isin(["explorers", "external"]), "update_state"
-        ] = UpdateState.UP_TO_DATE.value
+        steps_active_df.loc[steps_active_df["channel"].isin(["explorers", "external"]), "update_state"] = (
+            UpdateState.UP_TO_DATE.value
+        )
 
         # Add update state to archived steps.
         steps_inactive_df["update_state"] = UpdateState.ARCHIVED.value

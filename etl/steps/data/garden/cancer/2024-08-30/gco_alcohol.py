@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # To display on grapher we need to replace "<0.1" with "0.05" and set the decimal places to 1 so that it shows up as <0.1 on the chart
+    # To display on grapher we need to replace "<0.1" with "0.05" and set the decimal places to 1 so that it shows up as <0.1 on the chart.
     tb["value"] = tb["value"].replace("<0.1", "0.05")
 
     tb = tb.format(["country", "year", "sex", "cancer", "indicator"])

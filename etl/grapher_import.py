@@ -31,8 +31,9 @@ from sqlalchemy.orm import Session
 from apps.backport.datasync import data_metadata as dm
 from apps.backport.datasync.datasync import upload_gzip_string
 from apps.chart_sync.admin_api import AdminAPI
+from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 from etl import config
-from etl.db import get_engine
+from etl.db import get_engine, production_or_master_engine
 
 from . import grapher_helpers as gh
 from . import grapher_model as gm
@@ -496,8 +497,7 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
         if rows:
             rows = pd.DataFrame(rows, columns=["chartId", "variableId"])
 
-            # raise an error if on staging server
-            if config.ENV == "staging":
+            if _raise_error_for_deleted_variables(rows):
                 raise ValueError(f"Variables used in charts will not be deleted automatically:\n{rows}")
             else:
                 # otherwise show a warning
@@ -572,6 +572,19 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
             variables=variable_ids_to_delete,
         )
 
+        return True
+
+
+def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
+    """If we run into ghost variables that are still used in charts, should we raise an error?"""
+    # raise an error if on staging server
+    if config.ENV == "staging":
+        # It's possible that we merged changes to ETL, but the staging server still uses old charts. In
+        # that case, we first check that the charts were really modified on our staging server.
+        modified_charts = ChartDiffsLoader(config.OWID_ENV.get_engine(), production_or_master_engine()).df
+        return bool(set(modified_charts.index) & set(rows.chartId))
+    # if not on staging, always raise an error
+    else:
         return True
 
 

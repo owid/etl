@@ -304,6 +304,12 @@ class Table(pd.DataFrame):
             try:
                 json.dump(metadata, ostream, indent=2, default=str, allow_nan=False)
             except ValueError as e:
+                # try to find a problematic field
+                for k, v in metadata["fields"].items():
+                    try:
+                        json.dumps(v, default=str, allow_nan=False)
+                    except ValueError as e2:
+                        raise ValueError(f"metadata field {k} contains NaNs:\n{v}") from e2
                 raise ValueError(f"metadata contains NaNs:\n{metadata}") from e
 
     @classmethod
