@@ -108,20 +108,6 @@ steps:
   data://grapher/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
     - data://garden/animal_welfare/2023-08-08/farmed_finfishes_used_for_food
   #
-  # Number of farmed fish (Fishcount, 2018).
-  #
-  data://meadow/animal_welfare/2023-08-14/number_of_farmed_fish:
-    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2015.xlsx
-    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2016.xlsx
-    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2017.xlsx
-  data://garden/animal_welfare/2023-08-14/number_of_farmed_fish:
-    - data://meadow/animal_welfare/2023-08-14/number_of_farmed_fish
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/demography/2023-03-31/population
-  data://grapher/animal_welfare/2023-08-14/number_of_farmed_fish:
-    - data://garden/animal_welfare/2023-08-14/number_of_farmed_fish
-  #
   # Mood et al. 2023 - Farmed finfishes used for food.
   #
   data://meadow/animal_welfare/2024-12-12/farmed_finfishes_used_for_food:
@@ -145,18 +131,6 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/animal_welfare/2024-12-12/number_of_farmed_fish:
     - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
-  #
-  # Number of wild-caught fish killed for food.
-  #
-  data://meadow/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
-    - snapshot://animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food.xlsx
-  data://garden/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
-    - data://meadow/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/demography/2023-03-31/population
-  data://grapher/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
-    - data://garden/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food
   #
   # Number of wild-caught fish killed for food.
   #
