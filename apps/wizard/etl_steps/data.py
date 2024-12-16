@@ -1,5 +1,7 @@
 """Garden phase."""
 
+import glob
+import os
 import re
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -21,7 +23,7 @@ from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.files import ruamel_dump
 from etl.helpers import write_to_dag_file
-from etl.paths import DAG_DIR
+from etl.paths import DAG_DIR, DATA_DIR
 
 # from etl.snapshot import Snapshot
 
@@ -87,6 +89,23 @@ st.session_state["data_step_uris"] = st.session_state.get(
         prefixes=["data://", "data-private://"],
     ),
 )
+
+
+# GET SNAPSHOT URIS
+def get_snapshots():
+    base_folder = DATA_DIR / "snapshots"
+    # Construct a glob pattern for level 3 files
+    pattern = os.path.join(base_folder, "*/*/*")
+
+    # Use glob to get all file paths matching the pattern
+    snapshots = [
+        f"snapshot://{os.path.relpath(path, base_folder)}" for path in glob.glob(pattern) if os.path.isfile(path)
+    ]
+
+    return snapshots
+
+
+st.session_state["snapshot_uris"] = get_snapshots()
 
 
 @st.cache_data
@@ -554,52 +573,63 @@ def render_form():
     #     help="Use this optionally if you want to add more dependencies to your steps.",
     # ):
 
-    with st.container(border=True):
+    if "meadow" in st.session_state["data.steps_to_create"]:
+        with st_horizontal(vertical_alignment="center", justify_content="space-between"):
+            st.markdown("#### Dependencies")
+            st.button(":material/refresh: Refresh snapshot list", type="tertiary")
+
+        APP_STATE.st_widget(
+            st.multiselect,
+            label="Snapshots",
+            help="Select snapshots.",
+            placeholder="Select snapshots",
+            options=st.session_state["snapshot_uris"],
+            default=None,
+            key="snapshot_dependency",
+            on_change=edit_field,
+        )
+
+        # TODO: remove
+        # APP_STATE.st_widget(
+        #     st.text_input,
+        #     label="Snapshot version",
+        #     help="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
+        #     # placeholder=f"Example: {DATE_TODAY}",
+        #     key="snapshot_version",
+        #     value=dummy_values["snapshot_version"] if APP_STATE.args.dummy_data else None,
+        #     on_change=edit_field,
+        # )
+        # # File extension
+        # APP_STATE.st_widget(
+        #     st.text_input,
+        #     label="File extension",
+        #     help="File extension (without the '.') of the file to be downloaded.",
+        #     placeholder="'csv', 'xls', 'zip'",
+        #     key="file_extension",
+        #     value=dummy_values["file_extension"] if APP_STATE.args.dummy_data else None,
+        #     on_change=edit_field,
+        # )
+
+    # with st.expander(
+    #     "Customize dependencies",
+    #     expanded=False,
+    #     # use_container_width=True,
+    #     # help="Use this optionally if you want to add more dependencies to your steps.",
+    # ):
+    else:
         st.markdown("#### Dependencies")
-
-        if "meadow" in st.session_state["data.steps_to_create"]:
-            with st_horizontal("center"):
-                # Snapshot version
-                APP_STATE.st_widget(
-                    st.text_input,
-                    label="Snapshot version",
-                    help="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
-                    # placeholder=f"Example: {DATE_TODAY}",
-                    key="snapshot_version",
-                    value=dummy_values["snapshot_version"] if APP_STATE.args.dummy_data else None,
-                    on_change=edit_field,
-                )
-                # File extension
-                APP_STATE.st_widget(
-                    st.text_input,
-                    label="File extension",
-                    help="File extension (without the '.') of the file to be downloaded.",
-                    placeholder="'csv', 'xls', 'zip'",
-                    key="file_extension",
-                    value=dummy_values["file_extension"] if APP_STATE.args.dummy_data else None,
-                    on_change=edit_field,
-                )
-                st.toggle("Disable default snapshot import")
-
-        # with st.expander(
-        #     "Customize dependencies",
-        #     expanded=False,
-        #     # use_container_width=True,
-        #     # help="Use this optionally if you want to add more dependencies to your steps.",
-        # ):
-        st.markdown("Add other dependencies to your steps in the DAG!")
-        for channel in ["meadow", "garden", "grapher"]:
-            if channel in st.session_state["data.steps_to_create"]:
-                APP_STATE.st_widget(
-                    st_widget=st.multiselect,
-                    label=STEP_NAME_PRESENT.get(channel),
-                    help=("Customize the dependency channel in the DAG."),
-                    key=f"data.dependencies_extra_{channel}",
-                    options=STEPS_URI[channel],
-                    placeholder="Add dependency steps",
-                    default=None,
-                    on_change=edit_field,
-                )
+    for channel in ["garden", "grapher"]:
+        if channel in st.session_state["data.steps_to_create"]:
+            APP_STATE.st_widget(
+                st_widget=st.multiselect,
+                label=f"(OPTIONAL) Extra dependencies for {channel.capitalize()}",
+                help="Additional dependencies.",
+                key=f"data.dependencies_extra_{channel}",
+                options=STEPS_URI[channel],
+                placeholder="Add dependency steps",
+                default=None,
+                on_change=edit_field,
+            )
 
     # Others
     st.markdown("#### Other options")
