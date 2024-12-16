@@ -7,8 +7,10 @@ from typing import Any, Dict, List, Optional
 
 import streamlit as st
 from rapidfuzz import fuzz
+from sqlalchemy.exc import OperationalError
 from typing_extensions import Self
 
+import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.app_pages.harmonizer.utils import render as render_harmonizer
@@ -16,6 +18,7 @@ from apps.wizard.etl_steps.utils import TAGS_DEFAULT, remove_playground_notebook
 from apps.wizard.utils import get_datasets_in_etl
 from apps.wizard.utils.components import st_horizontal, st_multiselect_wider
 from etl.config import DB_HOST, DB_NAME
+from etl.db import get_session
 from etl.paths import DAG_DIR
 
 #########################################################
@@ -53,16 +56,16 @@ dummy_values = {
 
 # Get list of available tags from DB (only those used as topic pages)
 # If can't connect to DB, use TAGS_DEFAULT instead
-# USING_TAGS_DEFAULT = False
-# try:
-#     with get_session() as session:
-#         tag_list = gm.Tag.load_tags(session)
-#         tag_list = ["Uncategorized"] + sorted([tag.name for tag in tag_list])
-# except OperationalError:
-#     USING_TAGS_DEFAULT = True
-#     tag_list = TAGS_DEFAULT
-# TODO: Remove following lines, uncomment lines above
-USING_TAGS_DEFAULT = True
+USING_TAGS_DEFAULT = False
+try:
+    with get_session() as session:
+        tag_list = gm.Tag.load_tags(session)
+        tag_list = ["Uncategorized"] + sorted([tag.name for tag in tag_list])
+except OperationalError:
+    USING_TAGS_DEFAULT = True
+    tag_list = TAGS_DEFAULT
+# NOTE: Use this when debugging
+# USING_TAGS_DEFAULT = True
 tag_list = TAGS_DEFAULT
 # Step names
 STEP_ICONS = {
@@ -326,6 +329,7 @@ class DataForm(utils.StepForm):
 
     def add_steps_to_dag(self) -> str:
         if form.add_to_dag:
+            # TODO: use etl.helpers.write_to_dag_file
             dag_content = add_to_dag(
                 dag=self.dag(),
                 dag_path=self.dag_path,
