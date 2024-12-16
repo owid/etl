@@ -37,15 +37,25 @@ def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
 
 
 def run_sanity_checks_on_outputs(tb: Table) -> None:
+    error = "Expected lower bound <= midpoint <= upper bound."
+    assert (tb["n_wild_fish_low"] <= tb["n_wild_fish"]).all(), error
+    assert (tb["n_wild_fish"] <= tb["n_wild_fish_high"]).all(), error
     # Check that the total agrees with the sum of aggregates from each continent, for non per capita columns.
-    tb = tb[[column for column in tb.columns if "per_capita" not in column]].copy()
-    world = tb[tb["country"] == "World"].reset_index(drop=True).drop(columns=["country"])
+    _tb = tb[[column for column in tb.columns if column not in "per_capita" not in column]].copy()
+    # Get average global values between 2000 and 2019 (since country-level data are averages of that range).
+    world = (
+        _tb[(_tb["country"] == "World") & (_tb["year"] >= 2000) & (_tb["year"] <= 2019)]
+        .groupby("country", as_index=False)
+        .mean(numeric_only=True)
+        .drop(columns=["country", "year"])
+    )
     test = (
-        tb[tb["country"].isin(["Africa", "North America", "South America", "Asia", "Europe", "Oceania"])]
+        _tb[_tb["country"].isin(["Africa", "North America", "South America", "Asia", "Europe", "Oceania"])]
         .groupby("year", as_index=False)
         .sum(numeric_only=True)
+        .drop(columns=["year"])
     )
-    assert (abs(world - test) / world < 1e-2).all().all()
+    assert (100 * abs(world - test) / world < 1).all().all()
 
 
 def run(dest_dir: str) -> None:
@@ -92,10 +102,12 @@ def run(dest_dir: str) -> None:
     tb = pr.concat([tb_by_country[tb_by_country["country"] != "All countries combined"], tb_global])
 
     # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    # NOTE: Since the data is assumed to be for 2019, we exclude historical regions like Netherland Antilles.
+    tb = geo.harmonize_countries(
+        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
 
     # Add region aggregates.
-    # TODO: Fix region overlaps.
     tb = geo.add_regions_to_table(
         tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups, min_num_values_per_year=1
     )
@@ -104,8 +116,7 @@ def run(dest_dir: str) -> None:
     tb = add_per_capita_variables(tb=tb, ds_population=ds_population)
 
     # Run sanity checks on outputs.
-    # TODO: Fix sanity checks.
-    # run_sanity_checks_on_outputs(tb=tb)
+    run_sanity_checks_on_outputs(tb=tb)
 
     # Set an appropriate index and sort conveniently.
     tb = tb.format(sort_columns=True, short_name=paths.short_name)
