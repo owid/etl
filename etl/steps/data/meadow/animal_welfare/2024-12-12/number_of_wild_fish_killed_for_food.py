@@ -96,8 +96,8 @@ def run(dest_dir: str) -> None:
     )
 
     # Improve table formats.
-    tb_global = tb_global.format(keys=["year"])
-    tb_by_country = tb_by_country.format(keys=["country"])
+    tb_global = tb_global.format(keys=["year"], short_name="number_of_wild_fish_killed_for_food_global")
+    tb_by_country = tb_by_country.format(keys=["country"], short_name="number_of_wild_fish_killed_for_food_by_country")
 
     #
     # Save outputs.
