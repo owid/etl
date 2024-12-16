@@ -134,7 +134,7 @@ def _yield_wide_table(
         table_to_yield = table_to_yield[[c for c in table_to_yield.columns if c not in dim_names]]
 
         # Filter NaN values from dimensions and return dictionary
-        dim_dict: Dict[str, Any] = {n: v for n, v in zip(dim_names, dim_values) if pd.notnull(v)}
+        dim_dict = _create_dim_dict(dim_names, dim_values)  # type: ignore
 
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
@@ -171,34 +171,91 @@ def _yield_wide_table(
             tab.metadata.short_name = short_name
             tab.rename(columns={column: short_name}, inplace=True)
 
-            # add info about dimensions to metadata
-            if dim_dict:
-                tab[short_name].metadata.additional_info = {
-                    "dimensions": {
-                        "originalShortName": column,
-                        "originalName": tab[short_name].metadata.title,
-                        "filters": [
-                            {"name": dim_name, "value": sanitize_numpy(dim_value)}
-                            for dim_name, dim_value in dim_dict.items()
-                        ],
-                    }
-                }
-
-            # Add dimensions to title (which will be used as variable name in grapher)
-            if tab[short_name].metadata.title:
-                # We use template as a title
-                if _uses_jinja(tab[short_name].metadata.title):
-                    title_with_dims = _expand_jinja_text(tab[short_name].metadata.title, dim_dict)
-                # Otherwise use default
-                else:
-                    title_with_dims = _title_column_and_dimensions(tab[short_name].metadata.title, dim_dict)
-
-                tab[short_name].metadata.title = title_with_dims
-
-            # traverse metadata and expand Jinja
-            tab[short_name].metadata = _expand_jinja(tab[short_name].metadata, dim_dict)
+            tab[short_name].metadata = _metadata_for_dimensions(tab[short_name].metadata, dim_dict, column)
 
             yield tab
+
+
+def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: str) -> catalog.VariableMeta:
+    """Add dimensions to metadata and expand Jinja in metadata fields."""
+    # add info about dimensions to metadata
+    if dim_dict:
+        meta.additional_info = {
+            "dimensions": {
+                "originalShortName": column,
+                "originalName": meta.title,
+                "filters": [
+                    {"name": dim_name, "value": sanitize_numpy(dim_value)} for dim_name, dim_value in dim_dict.items()
+                ],
+            }
+        }
+
+    # Add dimensions to title (which will be used as variable name in grapher)
+    if meta.title:
+        # We use template as a title
+        if _uses_jinja(meta.title):
+            title_with_dims = _expand_jinja_text(meta.title, dim_dict)
+        # Otherwise use default
+        else:
+            title_with_dims = _title_column_and_dimensions(meta.title, dim_dict)
+
+        meta.title = str(title_with_dims)
+
+    # traverse metadata and expand Jinja
+    meta = _expand_jinja(meta, dim_dict)
+
+    return meta
+
+
+def _create_dim_dict(dim_names: List[str], dim_values: List[Any]) -> Dict[str, Any]:
+    # Filter NaN values from dimensions and return dictionary
+    return {n: v for n, v in zip(dim_names, dim_values) if pd.notnull(v)}
+
+
+def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
+    """Convert a long table to a wide table by unstacking dimensions. This function mimics the process that occurs
+    when a long table is upserted to the database. With this function, you can explicitly perform this transformation
+    in the grapher step and store a flattened dataset in the catalog."""
+
+    dim_names = [k for k in long_tb.primary_key if k not in ("year", "country", "date")]
+
+    # Unstack dimensions to a wide format
+    wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))  # type: ignore
+
+    # Drop columns with all NaNs
+    wide_tb = wide_tb.dropna(axis=1, how="all")
+
+    # Get short names and metadata for all columns
+    short_names = []
+    metadatas = []
+    for dims in wide_tb.columns:
+        column = dims[0]
+
+        # Filter NaN values from dimensions and return dictionary
+        dim_dict = _create_dim_dict(dim_names, dims[1:])
+
+        # Create a short name from dimension values
+        short_name = _underscore_column_and_dimensions(column, dim_dict)
+
+        if short_name in short_names:
+            duplicate_short_name_ix = short_names.index(short_name)
+            # raise ValueError(f"Duplicate short name: {short_name} for column: {column} and dimensions: {dim_dict}")
+            duplicate_dim_dict = dict(zip(dim_names, wide_tb.columns[duplicate_short_name_ix][1:]))
+            raise ValueError(
+                f"Duplicate short name for column '{column}' with dim values:\n{duplicate_dim_dict}\n{dim_dict}"
+            )
+
+        short_names.append(short_name)
+
+        # Create metadata for the column from dimensions
+        metadatas.append(_metadata_for_dimensions(long_tb[dims[0]].metadata.copy(), dim_dict, column))
+
+    # Set column names to new short names and use proper metadata
+    wide_tb.columns = short_names
+    for col, meta in zip(wide_tb.columns, metadatas):
+        wide_tb[col].metadata = meta
+
+    return wide_tb
 
 
 def _uses_jinja(text: Optional[str]):
@@ -570,7 +627,7 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
     variable_titles_counts = variable_titles.value_counts()
     assert (
         variable_titles_counts.empty or variable_titles_counts.max() == 1
-    ), f"Variable titles are not unique ({variable_titles_counts[variable_titles_counts > 1].index})."
+    ), f"Variable titles are not unique:\n{variable_titles_counts[variable_titles_counts > 1].index}."
 
     # Remember original dimensions
     dim_names = [n for n in table.index.names if n and n not in ("year", "date", "entity_id", "country")]

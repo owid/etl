@@ -11,21 +11,17 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("gco_infections")
+    ds_garden = paths.load_dataset("global_military_spending_dataset")
 
     # Read table from garden dataset.
-    tb = ds_garden["gco_infections"]
-
-    #
-    # Process data.
-    #
+    tb = ds_garden["global_military_spending_dataset"]
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata, long_to_wide=False
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new grapher dataset.

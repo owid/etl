@@ -135,6 +135,7 @@ wizard = [
     "torch<2.3.0",
     "sentence-transformers>=2.2.2",
     "moviepy>=2.1.1",
+    "pandas-gbq>=0.25.0",
 ]
 
 [project.scripts]
