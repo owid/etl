@@ -11,7 +11,7 @@ from sqlalchemy.exc import OperationalError
 from typing_extensions import Self
 
 import etl.grapher_model as gm
-from apps.utils.files import add_to_dag, generate_step_to_channel
+from apps.utils.files import generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.app_pages.harmonizer.utils import render as render_harmonizer
 from apps.wizard.etl_steps.utils import TAGS_DEFAULT, remove_playground_notebook
@@ -19,7 +19,10 @@ from apps.wizard.utils import get_datasets_in_etl
 from apps.wizard.utils.components import st_horizontal, st_multiselect_wider
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
+from etl.files import ruamel_dump
+from etl.helpers import write_to_dag_file
 from etl.paths import DAG_DIR
+from etl.snapshot import Snapshot
 
 #########################################################
 # CONSTANTS #############################################
@@ -329,16 +332,34 @@ class DataForm(utils.StepForm):
 
     def add_steps_to_dag(self) -> str:
         if form.add_to_dag:
-            # TODO: use etl.helpers.write_to_dag_file
-            dag_content = add_to_dag(
-                dag=self.dag(),
-                dag_path=self.dag_path,
-            )
+            # Get dag
+            dag = self.dag
+            # Get comment
+            if "meadow" in self.steps_to_create:
+                # Load metadata from Snapshot
+                snap = Snapshot(self.step_uri("snapshot"))
+                assert snap.metadata.origin is not None, "Origin metadata must be present!"
+                comment = f"#\n#{snap.metadata.origin.title} - {snap.metadata.origin.producer}\n#\n#"
+                comments = {
+                    self.step_uri("meadow"): comment,
+                }
+            elif "garden" in self.steps_to_create:
+                comments = {
+                    self.garden_step_uri: "TODO: add step name (just something recognizable)",
+                }
+            elif "grapher" in self.steps_to_create:
+                comments = {
+                    self.grapher_step_uri: "TODO: add step name (just something recognizable)",
+                }
+            else:
+                comments = None
+            # Add to DAG
+            write_to_dag_file(dag_file=self.dag_path, dag_part=dag, comments=comments)
+            return ruamel_dump({"steps": dag})
         else:
-            dag_content = ""
+            return ""
 
-        return dag_content
-
+    @property
     def dag(self) -> Dict[str, Any]:
         dag = {}
         channels_all = ["snapshot", "meadow", "garden", "grapher"]
@@ -477,26 +498,6 @@ def render_form():
         on_change=edit_field,
     )
 
-    # Customize dependencies
-    with st.popover(
-        "Customize dependencies",
-        use_container_width=True,
-        help="Use this optionally if you want to add more dependencies to your steps.",
-    ):
-        st.markdown("Add other dependencies to your steps in the DAG!")
-        for channel in ["meadow", "garden", "grapher"]:
-            if channel in st.session_state["data.steps_to_create"]:
-                APP_STATE.st_widget(
-                    st_widget=st.multiselect,
-                    label=STEP_NAME_PRESENT.get(channel),
-                    help=("Customize the dependency channel in the DAG."),
-                    key=f"data.dependencies_extra_{channel}",
-                    options=STEPS_URI[channel],
-                    placeholder="Add dependency steps",
-                    default=None,
-                    on_change=edit_field,
-                )
-
     if "garden" in st.session_state["data.steps_to_create"]:
         # Indicator tags
         label = "Indicators tag"
@@ -540,28 +541,59 @@ def render_form():
             on_change=edit_field,
         )
 
-    if "meadow" in st.session_state["data.steps_to_create"]:
-        st.markdown("#### Snapshot")
-        # Snapshot version
-        APP_STATE.st_widget(
-            st.text_input,
-            label="Snapshot version",
-            help="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
-            # placeholder=f"Example: {DATE_TODAY}",
-            key="snapshot_version",
-            value=dummy_values["snapshot_version"] if APP_STATE.args.dummy_data else None,
-            on_change=edit_field,
-        )
-        # File extension
-        APP_STATE.st_widget(
-            st.text_input,
-            label="File extension",
-            help="File extension (without the '.') of the file to be downloaded.",
-            placeholder="Example: 'csv', 'xls', 'zip'",
-            key="file_extension",
-            value=dummy_values["file_extension"] if APP_STATE.args.dummy_data else None,
-            on_change=edit_field,
-        )
+    # Customize dependencies
+    # with st.popover(
+    #     "Customize dependencies",
+    #     use_container_width=True,
+    #     help="Use this optionally if you want to add more dependencies to your steps.",
+    # ):
+
+    with st.container(border=True):
+        st.markdown("#### Dependencies")
+
+        if "meadow" in st.session_state["data.steps_to_create"]:
+            with st_horizontal("center"):
+                # Snapshot version
+                APP_STATE.st_widget(
+                    st.text_input,
+                    label="Snapshot version",
+                    help="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
+                    # placeholder=f"Example: {DATE_TODAY}",
+                    key="snapshot_version",
+                    value=dummy_values["snapshot_version"] if APP_STATE.args.dummy_data else None,
+                    on_change=edit_field,
+                )
+                # File extension
+                APP_STATE.st_widget(
+                    st.text_input,
+                    label="File extension",
+                    help="File extension (without the '.') of the file to be downloaded.",
+                    placeholder="'csv', 'xls', 'zip'",
+                    key="file_extension",
+                    value=dummy_values["file_extension"] if APP_STATE.args.dummy_data else None,
+                    on_change=edit_field,
+                )
+                st.toggle("Disable default snapshot import")
+
+        # with st.expander(
+        #     "Customize dependencies",
+        #     expanded=False,
+        #     # use_container_width=True,
+        #     # help="Use this optionally if you want to add more dependencies to your steps.",
+        # ):
+        st.markdown("Add other dependencies to your steps in the DAG!")
+        for channel in ["meadow", "garden", "grapher"]:
+            if channel in st.session_state["data.steps_to_create"]:
+                APP_STATE.st_widget(
+                    st_widget=st.multiselect,
+                    label=STEP_NAME_PRESENT.get(channel),
+                    help=("Customize the dependency channel in the DAG."),
+                    key=f"data.dependencies_extra_{channel}",
+                    options=STEPS_URI[channel],
+                    placeholder="Add dependency steps",
+                    default=None,
+                    on_change=edit_field,
+                )
 
     # Others
     st.markdown("#### Other options")
@@ -709,7 +741,10 @@ if step_selected:
     form_title = " ".join(
         [STEP_ICONS[s] for s in ["meadow", "garden", "grapher"] if s in st.session_state["data.steps_to_create"]]
     )
-    with st.expander(f"**Steps: {form_title}**", expanded=True):
+    with st.container(border=True):
+        st.markdown(
+            f"**Steps: {form_title}**",
+        )
         render_form()
 else:
     st.warning("Select at least one step to create.")
