@@ -1057,7 +1057,7 @@ def detect_overlapping_regions(
     # List all variables in data (ignoring index columns).
     variables = [column for column in df.columns if column not in index_columns]
     # List all country names found in data.
-    countries_in_data = df[country_col].unique().tolist()  # type: ignore
+    countries_in_data = set(df[country_col].unique().tolist())  # type: ignore
     # List all regions found in data.
     # TODO: Possible overlaps in custom regions are not considered here. I think it would be simple enough to include
     #   here custom regions and check for overlaps.

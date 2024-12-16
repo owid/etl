@@ -353,14 +353,14 @@ def load_from_uri(uri: str) -> catalog.Dataset | Snapshot | WaldenDataset:
         try:
             dataset = Snapshot(path)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Snapshot not found for URI '{uri}'. You may want to run `python {path}` first")
+            raise FileNotFoundError(f"Snapshot not found for URI '{uri}'. Please run `python snapshot {path}` first")
     # Data
     else:
         path = f"{attributes['channel']}/{attributes['namespace']}/{attributes['version']}/{attributes['name']}"
         try:
             dataset = catalog.Dataset(paths.DATA_DIR / path)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Dataset not found for URI '{uri}'. You may want to run `etl {uri}` first")
+            raise FileNotFoundError(f"Dataset not found for URI '{uri}'. Please run `etlr {uri}` first")
     return dataset
 
 
