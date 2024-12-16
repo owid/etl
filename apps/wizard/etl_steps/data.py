@@ -22,7 +22,8 @@ from etl.db import get_session
 from etl.files import ruamel_dump
 from etl.helpers import write_to_dag_file
 from etl.paths import DAG_DIR
-from etl.snapshot import Snapshot
+
+# from etl.snapshot import Snapshot
 
 #########################################################
 # CONSTANTS #############################################
@@ -197,11 +198,15 @@ class DataForm(utils.StepForm):
         """namespace/version/short_name"""
         return f"{form.namespace}/{form.version}/{form.short_name}"
 
+    @property
+    def base_snapshot_name(self) -> str:
+        return f"{self.namespace}/{self.snapshot_version}/{self.short_name}.{self.file_extension}"
+
     def step_uri(self, channel: str) -> str:
         """Get step URI."""
         match channel:
             case "snapshot":
-                return f"snapshot{self.private_suffix}://{self.namespace}/{self.snapshot_version}/{self.short_name}.{self.file_extension}"
+                return f"snapshot{self.private_suffix}://{self.base_snapshot_name}"
             case "meadow":
                 return f"data{self.private_suffix}://meadow/{self.base_step_name}"
             case "garden":
@@ -335,21 +340,22 @@ class DataForm(utils.StepForm):
             # Get dag
             dag = self.dag
             # Get comment
+            default_comment = "\n#\n# TODO: add step name (just something recognizable)\n#"
             if "meadow" in self.steps_to_create:
                 # Load metadata from Snapshot
-                snap = Snapshot(self.step_uri("snapshot"))
-                assert snap.metadata.origin is not None, "Origin metadata must be present!"
-                comment = f"#\n#{snap.metadata.origin.title} - {snap.metadata.origin.producer}\n#\n#"
+                # snap = Snapshot(self.base_snapshot_name)
+                # assert snap.metadata.origin is not None, "Origin metadata must be present!"
+                # comment = f"#\n#{snap.metadata.origin.title} - {snap.metadata.origin.producer}\n#\n#"
                 comments = {
-                    self.step_uri("meadow"): comment,
+                    self.step_uri("meadow"): default_comment,
                 }
             elif "garden" in self.steps_to_create:
                 comments = {
-                    self.garden_step_uri: "TODO: add step name (just something recognizable)",
+                    self.step_uri("garden"): default_comment,
                 }
             elif "grapher" in self.steps_to_create:
                 comments = {
-                    self.grapher_step_uri: "TODO: add step name (just something recognizable)",
+                    self.step_uri("grapher"): default_comment,
                 }
             else:
                 comments = None
