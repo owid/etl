@@ -40,7 +40,7 @@ def update_metadata_from_yaml(
 
     tb.metadata.short_name = table_name
 
-    t_annot = annot["tables"][table_name]
+    t_annot = annot.get("tables", {}).get(table_name, {})
 
     # validation
     if extra_variables == "raise":
