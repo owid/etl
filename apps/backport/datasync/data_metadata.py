@@ -261,7 +261,7 @@ def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
 def _omit_nullable_values(d: dict) -> dict:
     out = {}
     for k, v in d.items():
-        if hasattr(v, "__len__"):
+        if isinstance(v, list):
             if len(v) > 0:
                 out[k] = v
         elif v is not None and not pd.isna(v):
