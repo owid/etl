@@ -7,7 +7,7 @@ definitions:
     - Animal Welfare
     - Fish & Overfishing
   subtitle: &subtitle |-
-    Data at the country level is based on the average tonnage of annual catch from 2000 to 2019, and estimated mean weights for fish species. It does not include unrecorded fish capture, such as fish caught illegally and those caught as bycatch and discards.
+    This data does not include unrecorded fish capture, such as fish caught illegally and those caught as bycatch and discards. Data at the country level is based on the average tonnage of annual catch from 2000 to 2019, and estimated mean weights for fish species.
   footnote: &footnote |-
     Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds.
 
