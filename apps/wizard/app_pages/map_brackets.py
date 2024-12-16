@@ -282,7 +282,7 @@ class MapBracketer:
         self.brackets_selected = self.brackets_all[self.bracket_type].tolist()
         # Define the grapher version of the selected brackets, which needs a minimum value and a list of brackets.
         self.brackets_selected_grapher_min_value = None
-        self.brackets_selected_grapher_values = self.brackets_selected.copy()
+        self.brackets_selected_grapher_values = self.brackets_selected.copy()  # type: ignore
 
     @property
     def brackets(self):
@@ -582,7 +582,7 @@ class MapBracketer:
         self._update_grapher_brackets()
 
     def _update_grapher_brackets(self):
-        self.brackets_selected_grapher_values = self.brackets_selected.copy()
+        self.brackets_selected_grapher_values = self.brackets_selected.copy()  # type: ignore
         if self.lower_bracket_open:
             # To ensure the lower bracket is open, use a large value of "customNumericMinValue".
             self.brackets_selected_grapher_min_value = self.max_value

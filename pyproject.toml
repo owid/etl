@@ -119,7 +119,7 @@ api = [
     "joblib>=1.3.2",
 ]
 wizard = [
-    "streamlit>=1.40.0",
+    "streamlit>=1.41.0",
     "streamlit-aggrid>=0.3.4.post3",
     "streamlit-ace>=0.1.1",
     "streamlit-extras>=0.3.6",

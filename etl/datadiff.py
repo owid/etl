@@ -646,7 +646,7 @@ def _data_diff(
 
 def _is_datetime(dtype: Any) -> bool:
     try:
-        return np.issubdtype(dtype, np.datetime64)
+        return np.issubdtype(dtype, np.datetime64)  # type: ignore
     except Exception:
         return False
 
