@@ -816,9 +816,9 @@ if submitted:
             )
 
             st.markdown("#### 3. Proceed to next step")
-            utils.st_page_link("meadow", use_container_width=True, border=True)
-            st.markdown("Or use **Express** mode to create a Meadow, Garden and Grapher steps at once.")
-            utils.st_page_link("express", use_container_width=True, border=True)
+            utils.st_page_link("data", use_container_width=True, border=True)
+            # st.markdown("Or use **Express** mode to create a Meadow, Garden and Grapher steps at once.")
+            # utils.st_page_link("express", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")
