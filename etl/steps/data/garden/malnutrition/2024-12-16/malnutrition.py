@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=list(COLUMNS.keys()) + ["population", "sex", "age", "variant"])
     tb = tb.dropna(subset=[COLUMNS[col] for col in COLUMNS.keys()], how="all")
     # Format
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name="malnutrition")
 
     #
     # Save outputs.
