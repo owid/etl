@@ -26,6 +26,7 @@ HORIZONTAL_STYLE = """<style class="hide-element">
         flex-wrap: wrap;
         gap: 1rem;
         align-items: {vertical_alignment};
+        justify-content: {justify_content};
     }}
     /* Override the default width of selectboxes in horizontal layout */
     div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) select {{
@@ -47,8 +48,8 @@ HORIZONTAL_STYLE = """<style class="hide-element">
 
 
 @contextmanager
-def st_horizontal(vertical_alignment="baseline"):
-    h_style = HORIZONTAL_STYLE.format(vertical_alignment=vertical_alignment)
+def st_horizontal(vertical_alignment="baseline", justify_content="flex-start"):
+    h_style = HORIZONTAL_STYLE.format(vertical_alignment=vertical_alignment, justify_content=justify_content)
     st.markdown(h_style, unsafe_allow_html=True)
     with st.container():
         st.markdown('<span class="hide-element horizontal-marker"></span>', unsafe_allow_html=True)
