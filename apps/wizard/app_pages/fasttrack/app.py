@@ -20,6 +20,7 @@ from apps.wizard.app_pages.fasttrack.utils import (
     UPDATE_GSHEET,
     set_states,
 )
+from apps.wizard.utils.components import st_horizontal
 from etl import config
 from etl.command import main as etl_main
 from etl.paths import DAG_DIR
@@ -115,26 +116,27 @@ IMPORT_OPTIONS = {
 #     horizontal=True,
 # )
 
-import_method = st.segmented_control(
-    label="How do you want to import the dataset?",
-    options=IMPORT_OPTIONS.keys(),
-    # captions=[IMPORT_OPTIONS[x]["description"] for x in IMPORT_OPTIONS],
-    format_func=lambda x: IMPORT_OPTIONS[x]["title"],
-    help="""Select the source of your data.
+with st_horizontal(vertical_alignment="flex-end", justify_content="space-between"):
+    import_method = st.segmented_control(
+        label="How do you want to import the dataset?",
+        options=IMPORT_OPTIONS.keys(),
+        # captions=[IMPORT_OPTIONS[x]["description"] for x in IMPORT_OPTIONS],
+        format_func=lambda x: IMPORT_OPTIONS[x]["title"],
+        help="""Select the source of your data.
 
-- **New Google sheet**: Import data from a Google sheet.
-- **Existing Google sheet**: Update from a Google sheet (already imported in the database).
-- **Local CSV**: Import from a local CSV.
-""",
-    default=[IMPORT_GSHEET],
-)
+    - **New Google sheet**: Import data from a Google sheet.
+    - **Existing Google sheet**: Update from a Google sheet (already imported in the database).
+    - **Local CSV**: Import from a local CSV.
+    """,
+        default=[IMPORT_GSHEET],
+    )
 
-# Show brief guidelines for each import method
-if import_method is not None:
-    with st.popover("Instructions"):
-        assert import_method in IMPORT_OPTIONS, "import_method not found in IMPORT_OPTIONS!"
-        with open(IMPORT_OPTIONS[import_method]["guidelines"]["file_path"], "r") as f:
-            st.markdown(f.read())
+    # Show brief guidelines for each import method
+    if import_method is not None:
+        with st.popover(":material/info: Instructions"):
+            assert import_method in IMPORT_OPTIONS, "import_method not found in IMPORT_OPTIONS!"
+            with open(IMPORT_OPTIONS[import_method]["guidelines"]["file_path"], "r") as f:
+                st.markdown(f.read())
 
 ##########################################################
 # CREATE AND SHOW THE FORM
