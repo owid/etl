@@ -18,6 +18,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from etl.db import get_engine, read_sql
+from etl.files import yaml_dump
 from etl.grapher_io import add_entity_code_and_name, trim_long_variable_name
 
 log = structlog.get_logger()
@@ -202,7 +203,13 @@ def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any
         meta.title = str(title_with_dims)
 
     # traverse metadata and expand Jinja
-    meta = _expand_jinja(meta, dim_dict)
+    try:
+        meta = _expand_jinja(meta, dim_dict)
+    except Exception as e:
+        # Reraise with more context
+        raise ValueError(
+            f"Error expanding Jinja in metadata for column '{column}' with dim values: {dim_dict}.\n\nVariable metadata:\n\n{yaml_dump(meta.to_dict())}"
+        ) from e
 
     return meta
 
