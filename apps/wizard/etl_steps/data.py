@@ -59,14 +59,14 @@ dummy_values = {
 USING_TAGS_DEFAULT = False
 try:
     with get_session() as session:
-        tag_list = gm.Tag.load_tags(session)
-        tag_list = ["Uncategorized"] + sorted([tag.name for tag in tag_list])
+        tag_list_ = gm.Tag.load_tags(session)
+        tag_list = ["Uncategorized"] + sorted([tag.name for tag in tag_list_])
 except OperationalError:
     USING_TAGS_DEFAULT = True
     tag_list = TAGS_DEFAULT
 # NOTE: Use this when debugging
 # USING_TAGS_DEFAULT = True
-tag_list = TAGS_DEFAULT
+# tag_list = TAGS_DEFAULT
 # Step names
 STEP_ICONS = {
     "meadow": ":material/nature:",
