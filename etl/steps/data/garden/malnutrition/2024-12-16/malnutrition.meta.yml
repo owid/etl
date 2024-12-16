@@ -7,15 +7,21 @@ tables:
         unit: stunted children
         display:
           numDecimalPlaces: 0
+        presentation:
+          title_public: Number of stunted children
       number_of_underweight_children:
         title: Number of underweight children
         description_short: Prevalence of underweight children is the percentage of children under age 5 whose weight for age is more than two standard deviations below the median for the international reference population ages 0-59 months. The data are based on the WHO's child growth standards released in 2006.
         unit: underweight children
         display:
           numDecimalPlaces: 0
+        presentation:
+          title_public: Number of underweight children
       number_of_wasted_children:
         title: Number of wasted children
         description_short: Prevalence of wasting is the proportion of children under age 5 whose weight for height is more than two standard deviations below the median for the international reference population ages 0-59.
         unit: wasted children
         display:
           numDecimalPlaces: 0
+        presentation:
+          title_public: Number of wasted children
