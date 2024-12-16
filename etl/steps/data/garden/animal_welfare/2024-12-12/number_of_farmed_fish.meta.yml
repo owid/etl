@@ -42,7 +42,7 @@ tables:
           attribution: *attribution
           title_public: Estimated number of farmed fish
           grapher_config:
-            subtitle: &subtitle This data does not include crustaceans or farmed fish used as bait.
+            subtitle: &subtitle This data does not include crustaceans, wild-caught fish, or farmed fish used as bait.
             note: Due to large uncertainties, the chart shows upper and lower bounds, and midpoint values (also shown in the map), which are the average of those bounds. Figures below 1 million are assigned a value of 500,000 fish.
       n_farmed_fish_high:
         title: Estimated number of farmed fish (upper bound)
