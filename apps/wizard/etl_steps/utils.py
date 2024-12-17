@@ -2,6 +2,7 @@ import os
 
 import streamlit as st
 
+from apps.wizard.utils import WIZARD_DIR
 from etl.steps import load_dag
 
 
@@ -152,3 +153,15 @@ def remove_playground_notebook(dataset_dir, notebook_name: str = "playground.ipy
     notebook_path = dataset_dir / notebook_name
     if notebook_path.is_file():
         os.remove(notebook_path)
+
+
+# Paths to cookiecutter files
+COOKIE_SNAPSHOT = WIZARD_DIR / "etl_steps" / "cookiecutter" / "snapshot"
+COOKIE_STEPS = {
+    "snapshot": COOKIE_SNAPSHOT,
+    "meadow": WIZARD_DIR / "etl_steps" / "cookiecutter" / "meadow",
+    "garden": WIZARD_DIR / "etl_steps" / "cookiecutter" / "garden",
+    "grapher": WIZARD_DIR / "etl_steps" / "cookiecutter" / "grapher",
+}
+# Paths to markdown templates
+MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"

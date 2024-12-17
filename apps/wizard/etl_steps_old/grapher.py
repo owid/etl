@@ -8,6 +8,7 @@ from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
+from apps.wizard.etl_steps_old.utils import COOKIE_GRAPHER, MD_GRAPHER
 from etl.paths import DAG_DIR
 
 #########################################################
@@ -43,7 +44,7 @@ dummy_values = {
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=utils.MD_GRAPHER, mode="r") as f:
+    with open(file=MD_GRAPHER, mode="r") as f:
         return f.read()
 
 
@@ -221,7 +222,7 @@ if submitted:
 
         # Create necessary files
         DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_GRAPHER, data=dict(**form.dict(), channel="grapher")
+            cookiecutter_path=COOKIE_GRAPHER, data=dict(**form.dict(), channel="grapher")
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")

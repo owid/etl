@@ -10,7 +10,7 @@ from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps_old.utils import load_datasets
+from apps.wizard.etl_steps_old.utils import COOKIE_MEADOW, MD_MEADOW, load_datasets
 from etl.paths import BASE_DIR, DAG_DIR
 from etl.steps import load_from_uri
 
@@ -47,7 +47,7 @@ dummy_values = {
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=utils.MD_MEADOW, mode="r") as f:
+    with open(file=MD_MEADOW, mode="r") as f:
         return f.read()
 
 
@@ -261,7 +261,7 @@ if submitted:
 
         # Create necessary files
         DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_MEADOW, data=dict(**form.dict(), channel="meadow")
+            cookiecutter_path=COOKIE_MEADOW, data=dict(**form.dict(), channel="meadow")
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")

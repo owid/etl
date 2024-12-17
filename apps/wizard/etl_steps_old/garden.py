@@ -12,7 +12,7 @@ from typing_extensions import Self
 import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps_old.utils import TAGS_DEFAULT
+from apps.wizard.etl_steps_old.utils import COOKIE_GARDEN, MD_GARDEN, TAGS_DEFAULT
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.files import ruamel_dump, ruamel_load
@@ -63,7 +63,7 @@ except OperationalError:
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=utils.MD_GARDEN, mode="r") as f:
+    with open(file=MD_GARDEN, mode="r") as f:
         return f.read()
 
 
@@ -394,7 +394,7 @@ if submitted:
             form_dict["topic_tags"] = "- " + "\n- ".join(form_dict["topic_tags"])
 
         DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**form_dict, channel="garden")
+            cookiecutter_path=COOKIE_GARDEN, data=dict(**form_dict, channel="garden")
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")

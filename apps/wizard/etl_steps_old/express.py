@@ -12,7 +12,7 @@ from typing_extensions import Self
 import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps_old.utils import TAGS_DEFAULT, remove_playground_notebook
+from apps.wizard.etl_steps_old.utils import COOKIE_STEPS, TAGS_DEFAULT, remove_playground_notebook
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.paths import DAG_DIR
@@ -226,9 +226,7 @@ class ExpressForm(utils.StepForm):
 
     def create_files(self, channel: str) -> List[Dict[str, Any]]:
         # Generate files
-        DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_STEPS[channel], data=self.to_dict(channel)
-        )
+        DATASET_DIR = generate_step_to_channel(cookiecutter_path=COOKIE_STEPS[channel], data=self.to_dict(channel))
         # Remove playground (by default it is created, we no longer want it)
         remove_playground_notebook(DATASET_DIR)
         # Add to generated files

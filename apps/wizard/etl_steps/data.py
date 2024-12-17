@@ -3,6 +3,7 @@
 import glob
 import os
 import re
+import subprocess
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -16,14 +17,14 @@ import etl.grapher_model as gm
 from apps.utils.files import generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.app_pages.harmonizer.utils import render as render_harmonizer
-from apps.wizard.etl_steps.utils import TAGS_DEFAULT, remove_playground_notebook
+from apps.wizard.etl_steps.utils import COOKIE_STEPS, TAGS_DEFAULT, remove_playground_notebook
 from apps.wizard.utils import get_datasets_in_etl
 from apps.wizard.utils.components import st_horizontal, st_multiselect_wider
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.files import ruamel_dump
 from etl.helpers import write_to_dag_file
-from etl.paths import DAG_DIR, DATA_DIR
+from etl.paths import DAG_DIR, DATA_DIR, SNAPSHOTS_DIR
 
 # from etl.snapshot import Snapshot
 
@@ -102,10 +103,20 @@ def get_snapshots():
         f"snapshot://{os.path.relpath(path, base_folder)}" for path in glob.glob(pattern) if os.path.isfile(path)
     ]
 
+    # Get list of private ones
+    bash_cmd = f'grep -rl --exclude-dir="backport" -E "is_public\s*:\s*false" {SNAPSHOTS_DIR}'
+    result = subprocess.run(bash_cmd, shell=True, capture_output=True, text=True)
+    steps_private = result.stdout.split("\n")
+    steps_private = [
+        step.replace(str(SNAPSHOTS_DIR), "snapshot:/").replace(".dvc", "") for step in steps_private if step != ""
+    ]
+
+    # Combine both
+    snapshots = [s if s not in steps_private else s.replace("snapshot://", "snapshot-private://") for s in snapshots]
     return snapshots
 
 
-st.session_state["snapshot_uris"] = get_snapshots()
+st.session_state["snapshot_uris"] = st.session_state.get("snapshot_uris", get_snapshots())
 
 
 @st.cache_data
@@ -329,9 +340,7 @@ class DataForm(utils.StepForm):
 
     def create_files(self, channel: str) -> List[Dict[str, Any]]:
         # Generate files
-        DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_STEPS[channel], data=self.to_dict(channel)
-        )
+        DATASET_DIR = generate_step_to_channel(cookiecutter_path=COOKIE_STEPS[channel], data=self.to_dict(channel))
         # Remove playground notebook if not needed
         if channel != "garden" or not self.notebook:
             remove_playground_notebook(DATASET_DIR)
@@ -415,7 +424,7 @@ def edit_field() -> None:
 def render_step_selection():
     """Render step selection."""
     # st.write(st.session_state)
-    with st_horizontal("center"):
+    with st_horizontal(vertical_alignment="center"):  # ("center", justify_content="space-between"):
         # Multi-select (data steps)
         with st.container():
             if (st.session_state.update_steps_selection) and (st.session_state["data_steps_to_create"] is not None):
@@ -566,17 +575,14 @@ def render_form():
             on_change=edit_field,
         )
 
-    # Customize dependencies
-    # with st.popover(
-    #     "Customize dependencies",
-    #     use_container_width=True,
-    #     help="Use this optionally if you want to add more dependencies to your steps.",
-    # ):
-
     if "meadow" in st.session_state["data.steps_to_create"]:
         with st_horizontal(vertical_alignment="center", justify_content="space-between"):
             st.markdown("#### Dependencies")
-            st.button(":material/refresh: Refresh snapshot list", type="tertiary")
+            st.button(
+                ":material/refresh: Refresh snapshot list",
+                type="tertiary",
+                help="Only snapshots that have been added to the catalog (local folder `data/`) are shown in the dropdown. If a snapshot is missing, please make sure that you have added it (i.e. ran `python snapshot ...`) and then click here to refresh the list.",
+            )
 
         APP_STATE.st_widget(
             st.multiselect,
@@ -610,19 +616,15 @@ def render_form():
         #     on_change=edit_field,
         # )
 
-    # with st.expander(
-    #     "Customize dependencies",
-    #     expanded=False,
-    #     # use_container_width=True,
-    #     # help="Use this optionally if you want to add more dependencies to your steps.",
-    # ):
-    else:
-        st.markdown("#### Dependencies")
+    if ("garden" in st.session_state["data.steps_to_create"]) or (
+        "grapher" in st.session_state["data.steps_to_create"]
+    ):
+        st.markdown("###### OPTIONAL dependencies")
     for channel in ["garden", "grapher"]:
         if channel in st.session_state["data.steps_to_create"]:
             APP_STATE.st_widget(
                 st_widget=st.multiselect,
-                label=f"(OPTIONAL) Extra dependencies for {channel.capitalize()}",
+                label=f"Extra dependencies for {channel.capitalize()}",
                 help="Additional dependencies.",
                 key=f"data.dependencies_extra_{channel}",
                 options=STEPS_URI[channel],
@@ -640,7 +642,7 @@ def render_form():
     }
 
     st.pills(
-        label="Select the steps you want to create",
+        label="Extra options.",
         help="Extra options.",
         options=["private", "notebook"],
         format_func=lambda option: name_mapping[option],

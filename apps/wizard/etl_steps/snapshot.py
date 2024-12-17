@@ -12,6 +12,7 @@ from typing_extensions import Self
 
 from apps.utils.files import generate_step
 from apps.wizard import utils
+from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT, MD_SNAPSHOT
 from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
 from etl.helpers import read_json_schema
 from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
@@ -249,7 +250,7 @@ def create_display_name_snap_section(
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=utils.MD_SNAPSHOT, mode="r") as f:
+    with open(file=MD_SNAPSHOT, mode="r") as f:
         return f.read()
 
 
@@ -774,7 +775,7 @@ if submitted:
 
         # Create files
         generate_step(
-            cookiecutter_path=utils.COOKIE_SNAPSHOT,
+            cookiecutter_path=COOKIE_SNAPSHOT,
             data=dict(**form.model_dump(), channel="snapshots"),
             target_dir=SNAPSHOTS_DIR,
         )
