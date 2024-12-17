@@ -455,6 +455,6 @@ if st.session_state.submit_form:
 
 # st.divider()
 # st.subheader("Legacy")
-# st_page_link("meadow")
-# st_page_link("garden")
-# st_page_link("grapher")
+# st_wizard_page_link("meadow")
+# st_wizard_page_link("garden")
+# st_wizard_page_link("grapher")

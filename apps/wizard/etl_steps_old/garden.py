@@ -13,7 +13,7 @@ import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.etl_steps_old.utils import COOKIE_GARDEN, MD_GARDEN, TAGS_DEFAULT
-from apps.wizard.utils.components import config_style_html
+from apps.wizard.utils.components import config_style_html, st_wizard_page_link
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.files import ruamel_dump, ruamel_load
@@ -432,7 +432,7 @@ if submitted:
                 "shellSession",
             )
             st.markdown("Or run it on Wizard")
-            utils.st_page_link(
+            st_wizard_page_link(
                 "harmonizer",
                 use_container_width=True,
                 help="You will leave this page, and the guideline text will be hidden.",
@@ -509,7 +509,7 @@ if submitted:
             st.markdown(
                 "If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step."
             )
-            utils.st_page_link("grapher", use_container_width=True, border=True)
+            st_wizard_page_link("grapher", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

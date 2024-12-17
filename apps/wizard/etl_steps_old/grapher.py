@@ -9,7 +9,7 @@ from typing_extensions import Self
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.etl_steps_old.utils import COOKIE_GRAPHER, MD_GRAPHER
-from apps.wizard.utils.components import config_style_html
+from apps.wizard.utils.components import config_style_html, st_wizard_page_link
 from etl.paths import DAG_DIR
 
 #########################################################
@@ -294,7 +294,7 @@ if submitted:
         5. If you are an internal OWID member and, because of this dataset update, you want to update charts in our Grapher DB, continue with charts
         """
             )
-            utils.st_page_link("charts", use_container_width=True, border=True)
+            st_wizard_page_link("charts", use_container_width=True, border=True)
 
         # Preview generated files
         st.subheader("Generated files")

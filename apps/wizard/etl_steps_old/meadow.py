@@ -11,7 +11,7 @@ from typing_extensions import Self
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.etl_steps_old.utils import COOKIE_MEADOW, MD_MEADOW, load_datasets
-from apps.wizard.utils.components import config_style_html
+from apps.wizard.utils.components import config_style_html, st_wizard_page_link
 from etl.paths import BASE_DIR, DAG_DIR
 from etl.steps import load_from_uri
 
@@ -304,7 +304,7 @@ if submitted:
                         st.markdown(f"Check the DAG `{dag_path}`.")
 
             st.markdown("#### 2. Proceed to next step")
-            utils.st_page_link("garden", use_container_width=True, border=True)
+            st_wizard_page_link("garden", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

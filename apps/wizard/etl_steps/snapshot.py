@@ -12,6 +12,7 @@ from apps.utils.files import generate_step
 from apps.wizard import utils
 from apps.wizard.etl_steps.forms import SnapshotForm
 from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT, MD_SNAPSHOT, SCHEMA_ORIGIN
+from apps.wizard.utils.components import st_wizard_page_link
 from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 
@@ -674,9 +675,9 @@ if submitted:
             )
 
             st.markdown("#### 3. Proceed to next step")
-            utils.st_page_link("data", use_container_width=True, border=True)
+            st_wizard_page_link("data", use_container_width=True, border=True)
             # st.markdown("Or use **Express** mode to create a Meadow, Garden and Grapher steps at once.")
-            # utils.st_page_link("express", use_container_width=True, border=True)
+            # st_wizard_page_link("express", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

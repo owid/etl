@@ -13,7 +13,7 @@ import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.etl_steps_old.utils import COOKIE_STEPS, MD_EXPRESS, TAGS_DEFAULT, remove_playground_notebook
-from apps.wizard.utils.components import config_style_html
+from apps.wizard.utils.components import config_style_html, st_wizard_page_link
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.paths import DAG_DIR
@@ -303,7 +303,8 @@ def export_metadata() -> None:
 # TITLE
 st.title(":material/bolt: Express **:gray[Create steps]**")
 
-st.info("Use this step to create Meadow, Garden and Grapher step for a _single dataset_!")
+st.warning("This has been deprecated. Use the new version instead.")
+st_wizard_page_link("data")
 
 # SIDEBAR
 with st.sidebar:
@@ -523,7 +524,7 @@ if st.session_state.submit_form:
                 "shellSession",
             )
             st.markdown("Or run it on Wizard")
-            utils.st_page_link(
+            st_wizard_page_link(
                 "harmonizer",
                 use_container_width=True,
                 help="You will leave this page, and the guideline text will be hidden.",

@@ -7,7 +7,7 @@ import streamlit as st
 from streamlit_card import card
 
 from apps.wizard.config import WIZARD_CONFIG
-from apps.wizard.utils import st_page_link
+from apps.wizard.utils.components import st_wizard_page_link
 
 st.set_page_config(
     page_title="Wizard: Home",
@@ -30,7 +30,7 @@ def st_show_home():
     with st.container(border=False):
         cols = st.columns(2, vertical_alignment="center")
         with cols[0]:
-            st_page_link(
+            st_wizard_page_link(
                 "expert",
                 label="Questions about ETL or Grapher? Ask the expert!",
                 help="Ask the expert any documentation question!",
@@ -38,7 +38,7 @@ def st_show_home():
                 border=True,
             )
         with cols[1]:
-            st_page_link(
+            st_wizard_page_link(
                 "analytics",
                 label="OWID Analytics",
                 help="Learn more with the OWID Analytics dashboard. It redirects you to another internal site.",

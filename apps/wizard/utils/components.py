@@ -7,6 +7,7 @@ import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
 
+from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.chart_config import bake_chart_config
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher_model import Variable
@@ -351,3 +352,19 @@ def config_style_html() -> None:
     """,
         unsafe_allow_html=True,
     )
+
+
+def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
+    """Link to page."""
+    if "page" not in kwargs:
+        kwargs["page"] = PAGES_BY_ALIAS[alias]["entrypoint"]
+    if "label" not in kwargs:
+        kwargs["label"] = PAGES_BY_ALIAS[alias]["title"]
+    if "icon" not in kwargs:
+        kwargs["icon"] = PAGES_BY_ALIAS[alias]["icon"]
+
+    if border:
+        with st.container(border=True):
+            st.page_link(**kwargs)
+    else:
+        st.page_link(**kwargs)
