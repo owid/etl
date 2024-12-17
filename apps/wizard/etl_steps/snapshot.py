@@ -299,9 +299,9 @@ def render_fields_from_schema(
                         field = APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
                 elif container:
                     with container:
-                        field = APP_STATE.st_widget(st.text_input, **kwargs)
+                        field = APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
                 else:
-                    field = APP_STATE.st_widget(st.text_input, **kwargs)
+                    field = APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
             # Add field to list
             form_fields.append(cast(str, field))
     return form_fields
