@@ -17,3 +17,9 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
   data://grapher/forests/2024-07-10/tree_cover_loss_by_driver:
     - data://garden/forests/2024-07-10/tree_cover_loss_by_driver
+
+  data://garden/forests/2024-09-17/primary_forest:
+    - data://garden/faostat/2024-03-14/faostat_rl
+  data://grapher/forests/2024-09-17/primary_forest:
+    - data://garden/forests/2024-09-17/primary_forest
+
