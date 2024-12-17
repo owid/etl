@@ -21,7 +21,7 @@ import yaml
 from owid.repack import to_safe_types
 
 from . import tables, utils
-from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta
+from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
 from .processing_log import disable_processing_log
 from .properties import metadata_property
 
@@ -155,7 +155,13 @@ class Dataset:
             table_filename = join(self.path, table.metadata.checked_name + f".{format}")
             table.to(table_filename, repack=repack)
 
-    def read(self, name: str, reset_index: bool = True, safe_types: bool = True) -> tables.Table:
+    def read(
+        self,
+        name: str,
+        reset_index: bool = True,
+        safe_types: bool = True,
+        reset_metadata: bool = False,
+    ) -> tables.Table:
         """Read dataset's table from disk. Alternative to ds[table_name], but
         with more options to optimize the reading.
 
@@ -163,6 +169,8 @@ class Dataset:
             large datasets with multi-indexes much faster.
         :param safe_types: If true, convert numeric columns to Float64 and Int64 and categorical
             columns to string[pyarrow]. This can significantly increase memory usage.
+        :param reset_metadata: If true, reset table and columns metadata. This is useful for loading
+            datasets like population which could pollute the metadata with irrelevant information.
         """
         stem = self.path / Path(name)
 
@@ -173,6 +181,10 @@ class Dataset:
                 t.metadata.dataset = self.metadata
                 if safe_types:
                     t = cast(tables.Table, to_safe_types(t))
+                if reset_metadata:
+                    t.metadata = TableMeta()
+                    for col in t.columns:
+                        t[col].metadata = VariableMeta()
                 return t
 
         raise KeyError(f"Table `{name}` not found, available tables: {', '.join(self.table_names)}")
