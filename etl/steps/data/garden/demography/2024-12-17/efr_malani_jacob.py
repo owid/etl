@@ -12,10 +12,12 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("un_wpp_lt")
+    ds_un = paths.load_dataset("un_wpp_lt")
+    ds_hmd = paths.load_dataset("hmd")
+    ds_hfd = paths.load_dataset("hfd")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("efr_malani_jacob")
+    tb = ds_un.read("efr_malani_jacob")
 
     #
     # Process data.
@@ -30,7 +32,9 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=[tb],
+        check_variables_metadata=True,
     )
 
     # Save changes in the new garden dataset.
