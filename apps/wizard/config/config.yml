@@ -234,7 +234,7 @@ sections:
       - alias: express
         title: "Express"
         description: "Add all data steps."
-        entrypoint: etl_steps/express.py
+        entrypoint: etl_steps_old/express.py
         icon: ":material/bolt:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
         disable:
@@ -242,7 +242,7 @@ sections:
       - alias: meadow
         title: "Meadow"
         description: "Add meadow step."
-        entrypoint: etl_steps/meadow.py
+        entrypoint: etl_steps_old/meadow.py
         icon: ":material/nature:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
         disable:
@@ -250,7 +250,7 @@ sections:
       - alias: garden
         title: "Garden"
         description: "Add garden step."
-        entrypoint: etl_steps/garden.py
+        entrypoint: etl_steps_old/garden.py
         icon: ":material/deceased:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
         disable:
@@ -258,7 +258,7 @@ sections:
       - alias: grapher
         title: "Grapher"
         description: "Add grapher step."
-        entrypoint: etl_steps/grapher.py
+        entrypoint: etl_steps_old/grapher.py
         icon: ":material/database:"
         image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
         disable:

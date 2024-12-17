@@ -1,12 +1,16 @@
+import hashlib
 import json
+import random
 from contextlib import contextmanager
 from copy import deepcopy
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional
 
 import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
 
+from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.chart_config import bake_chart_config
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher_model import Variable
@@ -20,25 +24,26 @@ HORIZONTAL_STYLE = """<style class="hide-element">
         The selector for >.element-container is necessary to avoid selecting the whole
         body of the streamlit app, which is also a stVerticalBlock.
     */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) {{
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) {{
         display: flex;
         flex-direction: row !important;
         flex-wrap: wrap;
         gap: 1rem;
         align-items: {vertical_alignment};
+        justify-content: {justify_content};
     }}
     /* Override the default width of selectboxes in horizontal layout */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) select {{
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) select {{
         min-width: 200px;  /* Set a minimum width for selectboxes */
         max-width: 400px;  /* Optional: Set a max-width to avoid overly wide selectboxes */
     }}
     /* Buttons and their parent container all have a width of 704px, which we need to override */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) div {{
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) div {{
         width: max-content !important;
     }}
     /* Just an example of how you would style buttons, if desired */
     /*
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) button {{
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) button {{
         border-color: red;
     }}
     */
@@ -46,12 +51,23 @@ HORIZONTAL_STYLE = """<style class="hide-element">
 """
 
 
+def _generate_6char_hash():
+    random_input = str(random.random()).encode()  # Random input as bytes
+    hash_object = hashlib.sha256(random_input)  # Generate hash
+    return hash_object.hexdigest()[:6]  # Return first 6 characters of the hash
+
+
 @contextmanager
-def st_horizontal(vertical_alignment="baseline"):
-    h_style = HORIZONTAL_STYLE.format(vertical_alignment=vertical_alignment)
+def st_horizontal(vertical_alignment="baseline", justify_content="flex-start"):
+    hash_string = _generate_6char_hash()
+    h_style = HORIZONTAL_STYLE.format(
+        hash=hash_string,
+        vertical_alignment=vertical_alignment,
+        justify_content=justify_content,
+    )
     st.markdown(h_style, unsafe_allow_html=True)
     with st.container():
-        st.markdown('<span class="hide-element horizontal-marker"></span>', unsafe_allow_html=True)
+        st.markdown(f'<span class="hide-element horizontal-marker-{hash_string}"></span>', unsafe_allow_html=True)
         yield
 
 
@@ -336,3 +352,111 @@ def st_multiselect_wider(num_px: int = 1000):
 
 def st_info(text):
     st.info(text, icon=":material/info:")
+
+
+def config_style_html() -> None:
+    """Increase font-size of expander headers."""
+    st.markdown(
+        """
+    <style>
+    .streamlit-expanderHeader {
+        font-size: x-large;
+    }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
+
+def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
+    """Link to page."""
+    if "page" not in kwargs:
+        kwargs["page"] = PAGES_BY_ALIAS[alias]["entrypoint"]
+    if "label" not in kwargs:
+        kwargs["label"] = PAGES_BY_ALIAS[alias]["title"]
+    if "icon" not in kwargs:
+        kwargs["icon"] = PAGES_BY_ALIAS[alias]["icon"]
+
+    if border:
+        with st.container(border=True):
+            st.page_link(**kwargs)
+    else:
+        st.page_link(**kwargs)
+
+
+def preview_file(
+    file_path: str | Path, prefix: str = "File", language: str = "python", custom_header: Optional[str] = None
+) -> None:
+    """Preview file in streamlit."""
+    with open(file_path, "r") as f:
+        code = f.read()
+    if custom_header is None:
+        custom_header = f"{prefix}: `{file_path}`"
+    with st.expander(custom_header, expanded=False):
+        st.code(code, language=language)
+
+
+def st_toast_error(message: str) -> None:
+    """Show error message."""
+    st.toast(f"❌ :red[{message}]")
+
+
+def st_toast_success(message: str) -> None:
+    """Show success message."""
+    st.toast(f"✅ :green[{message}]")
+
+
+def update_query_params(key):
+    def _update_query_params():
+        value = st.session_state[key]
+        if value:
+            st.query_params.update({key: value})
+        else:
+            st.query_params.pop(key, None)
+
+    return _update_query_params
+
+
+def url_persist(component: Any) -> Any:
+    """Wrapper around streamlit components that persist values in the URL query string.
+
+    Usage:
+        url_persist(st.multiselect)(
+          key="abc",
+          ...
+        )
+    """
+    # Component uses list of values
+    if component == st.multiselect:
+        repeated = True
+    else:
+        repeated = False
+
+    def _persist(*args, **kwargs):
+        assert "key" in kwargs, "key should be passed to persist"
+        # TODO: we could wrap on_change too to make it work
+        assert "on_change" not in kwargs, "on_change should not be passed to persist"
+
+        key = kwargs["key"]
+
+        if not st.session_state.get(key):
+            if repeated:
+                params = st.query_params.get_all(key)
+                # convert to int if digit
+                params = [int(q) if q.isdigit() else q for q in params]
+            else:
+                params = st.query_params.get(key)
+                if params and params.isdigit():
+                    params = int(params)
+
+            # Use `value` from the component as a default value if available
+            if not params and "value" in kwargs:
+                params = kwargs.pop("value")
+
+            st.session_state[key] = params
+
+        kwargs["on_change"] = update_query_params(key)
+
+        return component(*args, **kwargs)
+
+    return _persist

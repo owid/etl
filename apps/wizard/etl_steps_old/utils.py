@@ -1,19 +1,11 @@
 import os
+from typing import Any, List
 
 import streamlit as st
 
 from apps.wizard.utils import WIZARD_DIR
-from etl.helpers import read_json_schema
-from etl.paths import DAG_DIR, SCHEMAS_DIR
+from etl.paths import DAG_DIR
 from etl.steps import load_dag
-
-# Step icons
-STEP_ICONS = {
-    "meadow": ":material/nature:",
-    "garden": ":material/deceased:",
-    "grapher": ":material/database:",
-}
-STEP_NAME_PRESENT = {k: f"{v} {k.capitalize()}" for k, v in STEP_ICONS.items()}
 
 
 @st.cache_data
@@ -166,15 +158,29 @@ def remove_playground_notebook(dataset_dir, notebook_name: str = "playground.ipy
 
 
 # Paths to cookiecutter files
-COOKIE_SNAPSHOT = WIZARD_DIR / "etl_steps" / "cookiecutter" / "snapshot"
+COOKIE_SNAPSHOT = WIZARD_DIR / "etl_steps_old" / "cookiecutter" / "snapshot"
+COOKIE_MEADOW = WIZARD_DIR / "etl_steps_old" / "cookiecutter" / "meadow"
+COOKIE_GARDEN = WIZARD_DIR / "etl_steps_old" / "cookiecutter" / "garden"
+COOKIE_GRAPHER = WIZARD_DIR / "etl_steps_old" / "cookiecutter" / "grapher"
 COOKIE_STEPS = {
     "snapshot": COOKIE_SNAPSHOT,
-    "meadow": WIZARD_DIR / "etl_steps" / "cookiecutter" / "meadow",
-    "garden": WIZARD_DIR / "etl_steps" / "cookiecutter" / "garden",
-    "grapher": WIZARD_DIR / "etl_steps" / "cookiecutter" / "grapher",
+    "meadow": COOKIE_MEADOW,
+    "garden": COOKIE_GARDEN,
+    "grapher": COOKIE_GRAPHER,
 }
 # Paths to markdown templates
-MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"
+MD_SNAPSHOT = WIZARD_DIR / "etl_steps_old" / "markdown" / "snapshot.md"
+MD_MEADOW = WIZARD_DIR / "etl_steps_old" / "markdown" / "meadow.md"
+MD_GARDEN = WIZARD_DIR / "etl_steps_old" / "markdown" / "garden.md"
+MD_GRAPHER = WIZARD_DIR / "etl_steps_old" / "markdown" / "grapher.md"
+MD_EXPRESS = WIZARD_DIR / "etl_steps_old" / "markdown" / "express.md"
+MD_STEPS = {
+    "snapshot": MD_SNAPSHOT,
+    "meadow": MD_MEADOW,
+    "garden": MD_GARDEN,
+    "grapher": MD_GRAPHER,
+    "express": MD_EXPRESS,
+}
 
 
 # DAG dropdown options
@@ -183,7 +189,46 @@ dag_not_add_option = "(do not add to DAG)"
 ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 
 
-# Read schema
-SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
-# Get properties for origin in schema
-SCHEMA_ORIGIN = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]
+def render_responsive_field_in_form(
+    key: str,
+    display_name: str,
+    field_1: Any,
+    field_2: Any,
+    options: List[str],
+    custom_label: str,
+    help_text: str,
+    app_state: Any,
+    default_value: str,
+) -> None:
+    """Render the namespace field within the form.
+
+    We want the namespace field to be a selectbox, but with the option to add a custom namespace.
+
+    This is a workaround to have repsonsive behaviour within a form.
+
+    Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
+    """
+    # Main decription
+    help_text = "## Institution or topic name"
+
+    # Render and get element depending on selection in selectbox
+    with field_1:
+        field = app_state.st_widget(
+            st.selectbox,
+            label=display_name,
+            options=[custom_label] + options,
+            help=help_text,
+            key=key,
+            default_last=default_value,  # dummy_values[prop_uri],
+        )
+    with field_2:
+        if field == custom_label:
+            default_value = app_state.default_value(key)
+            field = app_state.st_widget(
+                st.text_input,
+                label="↳ *Use custom value*",
+                placeholder="",
+                help="Enter custom value.",
+                key=f"{key}_custom",
+                default_last=default_value,
+            )
