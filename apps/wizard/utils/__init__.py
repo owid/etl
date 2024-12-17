@@ -309,6 +309,7 @@ class AppState:
         default_last: Optional[str | bool | int | date] = "",
         dataset_field_name: Optional[str] = None,
         default_value: Optional[str | bool | int | date] = None,
+        index_if_value_is_none: Optional[int] = 0,
         **kwargs: Optional[str | int | List[str] | date | Callable],
     ) -> None:
         """Wrap a streamlit widget with a default value."""
@@ -329,7 +330,7 @@ class AppState:
             # Default value for selectbox (and other widgets with selectbox-like behavior)
             if "options" in kwargs:
                 options = cast(List[str], kwargs["options"])
-                index = options.index(default_value) if default_value in options else 0  # type: ignore
+                index = options.index(default_value) if default_value in options else index_if_value_is_none  # type: ignore
                 kwargs["index"] = index
             # Default value for other widgets (if none is given)
             elif (
