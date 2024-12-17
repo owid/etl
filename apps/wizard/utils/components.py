@@ -1,6 +1,7 @@
 import json
 from contextlib import contextmanager
 from copy import deepcopy
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional
 
 import numpy as np
@@ -368,3 +369,15 @@ def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
             st.page_link(**kwargs)
     else:
         st.page_link(**kwargs)
+
+
+def preview_file(
+    file_path: str | Path, prefix: str = "File", language: str = "python", custom_header: Optional[str] = None
+) -> None:
+    """Preview file in streamlit."""
+    with open(file_path, "r") as f:
+        code = f.read()
+    if custom_header is None:
+        custom_header = f"{prefix}: `{file_path}`"
+    with st.expander(custom_header, expanded=False):
+        st.code(code, language=language)

@@ -8,8 +8,8 @@ from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps_old.utils import COOKIE_GRAPHER, MD_GRAPHER
-from apps.wizard.utils.components import config_style_html, st_wizard_page_link
+from apps.wizard.etl_steps_old.utils import ADD_DAG_OPTIONS, COOKIE_GRAPHER, MD_GRAPHER
+from apps.wizard.utils.components import config_style_html, preview_file, st_wizard_page_link
 from etl.paths import DAG_DIR
 
 #########################################################
@@ -64,7 +64,7 @@ class GrapherForm(utils.StepForm):
 
     def __init__(self: Self, **data: str | bool) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
-        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+        data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
 
         # Handle custom namespace
         if "namespace_custom" in data:
@@ -101,6 +101,12 @@ def update_state() -> None:
 #########################################################
 # TITLE
 st.title(":material/database: Grapher  **:gray[Create step]**")
+
+# Deprecate warning
+with st.container(border=True):
+    st.warning("This has been deprecated. Use the new version instead.", icon=":material/warning:")
+    st_wizard_page_link("data")
+
 
 # SIDEBAR
 with st.sidebar:
@@ -158,7 +164,7 @@ with form_widget.form("grapher"):
     dag_file = APP_STATE.st_widget(
         st_widget=st.selectbox,
         label="Add to DAG",
-        options=utils.ADD_DAG_OPTIONS,
+        options=ADD_DAG_OPTIONS,
         key="dag_file",
         help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
     )
@@ -298,7 +304,7 @@ if submitted:
 
         # Preview generated files
         st.subheader("Generated files")
-        utils.preview_file(step_path, "python")
+        preview_file(step_path, "python")
         utils.preview_dag_additions(dag_content, dag_path)
 
         # User message

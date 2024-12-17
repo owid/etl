@@ -20,7 +20,7 @@ from apps.wizard.app_pages.fasttrack.utils import (
     UPDATE_GSHEET,
     set_states,
 )
-from apps.wizard.utils.components import config_style_html, st_horizontal
+from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal
 from etl import config
 from etl.command import main as etl_main
 from etl.paths import DAG_DIR
@@ -378,15 +378,15 @@ else:
                 dag_content=dag_content,
                 dag_path=DAG_FASTTRACK_PATH,
             )
-            wizard_utils.preview_file(
+            preview_file(
                 snapshot_path,
                 language="yaml",
             )
-            wizard_utils.preview_file(
+            preview_file(
                 fast_import.step_path,
                 language="python",
             )
-            wizard_utils.preview_file(
+            preview_file(
                 fast_import.metadata_path,
                 "yaml",
             )

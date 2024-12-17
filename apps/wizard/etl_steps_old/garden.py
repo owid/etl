@@ -12,8 +12,8 @@ from typing_extensions import Self
 import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps_old.utils import COOKIE_GARDEN, MD_GARDEN, TAGS_DEFAULT
-from apps.wizard.utils.components import config_style_html, st_wizard_page_link
+from apps.wizard.etl_steps_old.utils import ADD_DAG_OPTIONS, COOKIE_GARDEN, MD_GARDEN, TAGS_DEFAULT
+from apps.wizard.utils.components import config_style_html, preview_file, st_wizard_page_link
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.files import ruamel_dump, ruamel_load
@@ -87,7 +87,7 @@ class GardenForm(utils.StepForm):
 
     def __init__(self: Self, **data: str | bool) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
-        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+        data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
 
         # Handle custom namespace
         if "namespace_custom" in data:
@@ -215,6 +215,11 @@ def export_metadata() -> None:
 # TITLE
 st.title(":material/deceased: Garden **:gray[Create step]**")
 
+# Deprecate warning
+with st.container(border=True):
+    st.warning("This has been deprecated. Use the new version instead.", icon=":material/warning:")
+    st_wizard_page_link("data")
+
 # SIDEBAR
 with st.sidebar:
     # utils.warning_metadata_unstable()
@@ -309,7 +314,7 @@ with form_widget.form("garden"):
     APP_STATE.st_widget(
         st.selectbox,
         label="Add to DAG",
-        options=utils.ADD_DAG_OPTIONS,
+        options=ADD_DAG_OPTIONS,
         key="dag_file",
         help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
     )
@@ -415,8 +420,8 @@ if submitted:
         # Preview generated files
         st.subheader("Generated files")
         if form.include_metadata_yaml:
-            utils.preview_file(metadata_path, "yaml")
-        utils.preview_file(step_path, "python")
+            preview_file(metadata_path, "yaml")
+        preview_file(step_path, "python")
         if form.generate_notebook:
             with st.expander(f"File: `{notebook_path}`", expanded=False):
                 st.markdown("Open the file to see the generated notebook.")

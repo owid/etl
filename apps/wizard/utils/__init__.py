@@ -14,7 +14,6 @@ import argparse
 import ast
 import datetime as dt
 import json
-import os
 import re
 import sys
 from datetime import date
@@ -29,7 +28,6 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 from typing_extensions import Self
 
-from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
 from apps.wizard.utils.step_form import StepForm
 from etl.config import OWID_ENV, enable_bugsnag
@@ -62,11 +60,6 @@ DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
 # Load latest dataset versions
 DATASET_POPULATION_URI = f"data://garden/demography/{LATEST_POPULATION_VERSION}/population"
 DATASET_REGIONS_URI = f"data://garden/regions/{LATEST_REGIONS_VERSION}/regions"
-
-# DAG dropdown options
-dag_files = sorted([f for f in os.listdir(DAG_DIR) if f.endswith(".yml")])
-dag_not_add_option = "(do not add to DAG)"
-ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 
 # Date today
 DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
@@ -405,14 +398,6 @@ def extract(error_message: str) -> List[Any]:
     """Get field name that caused the error."""
     rex = r"'(.*)' is a required property"
     return re.findall(rex, error_message)[0]
-
-
-def preview_file(file_path: str | Path, prefix: str = "File", language: str = "python") -> None:
-    """Preview file in streamlit."""
-    with open(file_path, "r") as f:
-        code = f.read()
-    with st.expander(f"{prefix}: `{file_path}`", expanded=False):
-        st.code(code, language=language)
 
 
 def preview_dag_additions(dag_content: str, dag_path: str | Path, prefix: str = "File", expanded: bool = False) -> None:

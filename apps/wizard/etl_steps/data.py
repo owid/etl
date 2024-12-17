@@ -15,8 +15,8 @@ import etl.grapher_model as gm
 from apps.wizard import utils
 from apps.wizard.etl_steps.forms import DataForm
 from apps.wizard.etl_steps.instructions import render_instructions
-from apps.wizard.etl_steps.utils import STEP_ICONS, STEP_NAME_PRESENT, TAGS_DEFAULT
-from apps.wizard.utils.components import config_style_html, st_horizontal, st_multiselect_wider
+from apps.wizard.etl_steps.utils import STEP_ICONS, STEP_NAME_PRESENT, TAGS_DEFAULT, dag_files, dag_not_add_option
+from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal, st_multiselect_wider
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.paths import DATA_DIR, SNAPSHOTS_DIR
@@ -229,12 +229,12 @@ def render_form():
 
     # Add to DAG
     sorted_dag = sorted(
-        utils.dag_files,
+        dag_files,
         key=lambda file_name: fuzz.ratio(file_name.replace(".yml", ""), APP_STATE.vars[namespace_key]),
         reverse=True,
     )
     sorted_dag = [
-        utils.dag_not_add_option,
+        dag_not_add_option,
         *sorted_dag,
     ]
     if sorted_dag[1].replace(".yml", "") == APP_STATE.vars[namespace_key]:
@@ -438,7 +438,7 @@ if st.session_state.submit_form:
                 if channel in generated_files:
                     # st.markdown(f"**{channel.title()}**")
                     for f in generated_files[channel]:
-                        utils.preview_file(f["path"], f"**{STEP_NAME_PRESENT.get(channel)}**", f["language"])
+                        preview_file(f["path"], f"**{STEP_NAME_PRESENT.get(channel)}**", f["language"])
 
         with tab_instructions:
             render_instructions(form)

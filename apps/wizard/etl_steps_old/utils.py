@@ -3,6 +3,7 @@ import os
 import streamlit as st
 
 from apps.wizard.utils import WIZARD_DIR
+from etl.paths import DAG_DIR
 from etl.steps import load_dag
 
 
@@ -179,3 +180,9 @@ MD_STEPS = {
     "grapher": MD_GRAPHER,
     "express": MD_EXPRESS,
 }
+
+
+# DAG dropdown options
+dag_files = sorted([f for f in os.listdir(DAG_DIR) if f.endswith(".yml")])
+dag_not_add_option = "(do not add to DAG)"
+ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
