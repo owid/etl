@@ -337,3 +337,17 @@ def st_multiselect_wider(num_px: int = 1000):
 
 def st_info(text):
     st.info(text, icon=":material/info:")
+
+
+def config_style_html() -> None:
+    """Increase font-size of expander headers."""
+    st.markdown(
+        """
+    <style>
+    .streamlit-expanderHeader {
+        font-size: x-large;
+    }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )

@@ -12,7 +12,8 @@ from typing_extensions import Self
 import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps_old.utils import COOKIE_STEPS, TAGS_DEFAULT, remove_playground_notebook
+from apps.wizard.etl_steps_old.utils import COOKIE_STEPS, MD_EXPRESS, TAGS_DEFAULT, remove_playground_notebook
+from apps.wizard.utils.components import config_style_html
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.paths import DAG_DIR
@@ -37,7 +38,7 @@ st.session_state["step_name"] = "express"
 APP_STATE = utils.AppState()
 APP_STATE._previous_step = "snapshot"
 # Config style
-utils.config_style_html()
+config_style_html()
 # DUMMY defaults
 dummy_values = {
     "namespace": "dummy",
@@ -65,7 +66,7 @@ except OperationalError:
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=utils.MD_EXPRESS, mode="r") as f:
+    with open(file=MD_EXPRESS, mode="r") as f:
         return f.read()
 
 

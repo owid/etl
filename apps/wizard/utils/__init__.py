@@ -19,7 +19,7 @@ import re
 import sys
 from datetime import date
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, Callable, Dict, List, Optional, Union, cast
 
 import bugsnag
 import numpy as np
@@ -222,7 +222,7 @@ class AppState:
         print(f"Updating {self.step}...")
         st.session_state["steps"][self.step] = self.get_variables_of_step()
 
-    def update_from_form(self, form: "StepForm") -> None:
+    def update_from_form(self, form: Any) -> None:
         self._check_step()
         st.session_state["steps"][self.step] = form.model_dump()
 
@@ -407,19 +407,6 @@ def extract(error_message: str) -> List[Any]:
     return re.findall(rex, error_message)[0]
 
 
-def config_style_html() -> None:
-    st.markdown(
-        """
-    <style>
-    .streamlit-expanderHeader {
-        font-size: x-large;
-    }
-    </style>
-    """,
-        unsafe_allow_html=True,
-    )
-
-
 def preview_file(file_path: str | Path, prefix: str = "File", language: str = "python") -> None:
     """Preview file in streamlit."""
     with open(file_path, "r") as f:
@@ -471,7 +458,7 @@ def _show_environment():
     )
 
 
-def clean_empty_dict(d: Dict[str, Any]) -> Dict[str, Any] | List[Any]:
+def clean_empty_dict(d: Union[Dict[str, Any], List[Any]]) -> Union[Dict[str, Any], List[Any]]:
     """Remove empty values from dict.
 
     REference: https://stackoverflow.com/a/27974027/5056599
@@ -480,7 +467,7 @@ def clean_empty_dict(d: Dict[str, Any]) -> Dict[str, Any] | List[Any]:
         return {k: v for k, v in ((k, clean_empty_dict(v)) for k, v in d.items()) if v}
     if isinstance(d, list):
         return [v for v in map(clean_empty_dict, d) if v]
-    return d
+    raise TypeError("Invalid type for argument `d`.")
 
 
 def warning_metadata_unstable() -> None:

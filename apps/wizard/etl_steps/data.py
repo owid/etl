@@ -4,27 +4,22 @@ import glob
 import os
 import re
 import subprocess
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 import streamlit as st
 from rapidfuzz import fuzz
 from sqlalchemy.exc import OperationalError
-from typing_extensions import Self
 
 import etl.grapher_model as gm
-from apps.utils.files import generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.app_pages.harmonizer.utils import render as render_harmonizer
-from apps.wizard.etl_steps.utils import COOKIE_STEPS, TAGS_DEFAULT, remove_playground_notebook
-from apps.wizard.utils import get_datasets_in_etl
-from apps.wizard.utils.components import st_horizontal, st_multiselect_wider
+from apps.wizard.etl_steps.forms import DataForm
+from apps.wizard.etl_steps.instructions import render_instructions
+from apps.wizard.etl_steps.utils import STEP_ICONS, STEP_NAME_PRESENT, TAGS_DEFAULT
+from apps.wizard.utils.components import config_style_html, st_horizontal, st_multiselect_wider
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
-from etl.files import ruamel_dump
-from etl.helpers import write_to_dag_file
-from etl.paths import DAG_DIR, DATA_DIR, SNAPSHOTS_DIR
+from etl.paths import DATA_DIR, SNAPSHOTS_DIR
 
 # from etl.snapshot import Snapshot
 
@@ -51,7 +46,7 @@ st.session_state["step_name"] = "data"
 APP_STATE = utils.AppState()
 APP_STATE._previous_step = "snapshot"
 # Config style
-utils.config_style_html()
+config_style_html()
 # DUMMY defaults
 dummy_values = {
     "namespace": "dummy",
@@ -74,22 +69,6 @@ except OperationalError:
 # NOTE: Use this when debugging
 # USING_TAGS_DEFAULT = True
 # tag_list = TAGS_DEFAULT
-# Step names
-STEP_ICONS = {
-    "meadow": ":material/nature:",
-    "garden": ":material/deceased:",
-    "grapher": ":material/database:",
-}
-STEP_NAME_PRESENT = {k: f"{v} {k.capitalize()}" for k, v in STEP_ICONS.items()}
-
-# GET STEP URIS
-st.session_state["data_step_uris"] = st.session_state.get(
-    "data_step_uris",
-    get_datasets_in_etl(
-        snapshots=False,
-        prefixes=["data://", "data-private://"],
-    ),
-)
 
 
 # GET SNAPSHOT URIS
@@ -104,7 +83,7 @@ def get_snapshots():
     ]
 
     # Get list of private ones
-    bash_cmd = f'grep -rl --exclude-dir="backport" -E "is_public\s*:\s*false" {SNAPSHOTS_DIR}'
+    bash_cmd = rf'grep -rl --exclude-dir="backport" -E "is_public\s*:\s*false" {SNAPSHOTS_DIR}'
     result = subprocess.run(bash_cmd, shell=True, capture_output=True, text=True)
     steps_private = result.stdout.split("\n")
     steps_private = [
@@ -121,13 +100,13 @@ st.session_state["snapshot_uris"] = st.session_state.get("snapshot_uris", get_sn
 
 @st.cache_data
 def get_steps_per_channel():
-    steps_all = get_datasets_in_etl(
+    steps_all = utils.get_datasets_in_etl(
         snapshots=True,
     )
-    steps = {"meadow": [], "garden": [], "grapher": []}
+    steps = {"garden": [], "grapher": []}
     for s in steps_all:
-        if re.match(r"^(data(-private)?://meadow|snapshot(-private)?://)", s):
-            steps["meadow"].append(s)
+        # if re.match(r"^(data(-private)?://meadow|snapshot(-private)?://)", s):
+        #     steps["meadow"].append(s)
         if re.match(r"^(data(-private)?://(meadow|garden))", s):
             steps["garden"].append(s)
         if re.match(r"^(data(-private)?://(garden|grapher))", s):
@@ -136,273 +115,13 @@ def get_steps_per_channel():
     return steps
 
 
+# GET STEP URIS
 STEPS_URI = get_steps_per_channel()
 
 
 #########################################################
 # FUNCTIONS & CLASSES ###################################
 #########################################################
-class DataForm(utils.StepForm):
-    """express step form."""
-
-    step_name: str = "data"
-
-    # List of steps
-    steps_to_create: List[str]
-    # Common
-    namespace: str
-    namespace_custom: Optional[str] = None  # Custom
-    short_name: str
-    version: str
-    add_to_dag: bool
-    dag_file: str
-    is_private: bool
-    # Only in Garden
-    snapshot_version: Optional[str] = None
-    file_extension: Optional[str] = None
-    notebook: Optional[bool] = None
-    # Only in Garden
-    update_period_days: Optional[int] = None
-    topic_tags: Optional[List[str]] = None
-    update_period_date: Optional[date] = None  # Custom
-    # Extra steps
-    dependencies_extra: Dict[str, Any]
-
-    def __init__(self: Self, **data: Any) -> None:  # type: ignore[reportInvalidTypeVarUse]
-        """Construct class."""
-        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
-
-        # Handle custom namespace
-        if ("namespace_custom" in data) and data["namespace_custom"] is not None:
-            data["namespace"] = str(data["namespace_custom"])
-
-        # Handle update_period_days. Obtain from date.
-        if "update_period_date" in data:
-            assert isinstance(data["update_period_date"], date)
-            update_period_days = (data["update_period_date"] - date.today()).days
-
-            data["update_period_days"] = update_period_days
-
-        # Extra options
-        data["is_private"] = True if "private" in data["extra_options"] else False
-        data["notebook"] = True if "notebook" in data["extra_options"] else False
-
-        data["dependencies_extra"] = {
-            "meadow": data.get("dependencies_extra_meadow"),
-            "garden": data.get("dependencies_extra_garden"),
-            "grapher": data.get("dependencies_extra_grapher"),
-        }
-        # st.write(data)
-        super().__init__(**data)  # type: ignore
-
-    def validate(self: Self) -> None:
-        """Check that fields in form are valid.
-
-        - Add error message for each field (to be displayed in the form).
-        - Return True if all fields are valid, False otherwise.
-        """
-        # Default common checks
-        fields_required = ["namespace", "short_name", "version"]
-        fields_snake = ["namespace", "short_name"]
-        fields_version = ["version"]
-
-        # Extra checks for particular steps
-        if "meadow" in self.steps_to_create:
-            fields_required += ["snapshot_version", "file_extension"]
-            fields_version += ["snapshot_version"]
-        if "garden" in self.steps_to_create:
-            fields_required += ["topic_tags"]
-
-        self.check_required(fields_required)
-        self.check_snake(fields_snake)
-        self.check_is_version(fields_version)
-
-        # Check tags
-        if "garden" in self.steps_to_create:
-            assert isinstance(self.topic_tags, list), "topic_tags must be a list! Should have been ensured actually!"
-            if (len(self.topic_tags) > 1) and ("Uncategorized" in self.topic_tags):
-                self.errors["topic_tags"] = "If you choose multiple tags, you cannot choose `Uncategorized`."
-
-    @property
-    def base_step_name(self) -> str:
-        """namespace/version/short_name"""
-        return f"{form.namespace}/{form.version}/{form.short_name}"
-
-    @property
-    def base_snapshot_name(self) -> str:
-        return f"{self.namespace}/{self.snapshot_version}/{self.short_name}.{self.file_extension}"
-
-    def step_uri(self, channel: str) -> str:
-        """Get step URI."""
-        match channel:
-            case "snapshot":
-                return f"snapshot{self.private_suffix}://{self.base_snapshot_name}"
-            case "meadow":
-                return f"data{self.private_suffix}://meadow/{self.base_step_name}"
-            case "garden":
-                return f"data{self.private_suffix}://garden/{self.base_step_name}"
-            case "grapher":
-                return f"data{self.private_suffix}://grapher/{self.base_step_name}"
-            case _:
-                raise ValueError(f"Channel `{channel}` not recognized.")
-
-    @property
-    def snapshot_step_uri(self) -> str:
-        """Get snapshot step URI."""
-        return f"snapshot{self.private_suffix}://{self.namespace}/{self.snapshot_version}/{self.short_name}.{self.file_extension}"
-
-    @property
-    def meadow_step_uri(self) -> str:
-        """Get garden step name."""
-        return f"data{self.private_suffix}://meadow/{self.base_step_name}"
-
-    @property
-    def garden_step_uri(self) -> str:
-        """Get garden step name."""
-        return f"data{self.private_suffix}://garden/{self.base_step_name}"
-
-    @property
-    def grapher_step_uri(self) -> str:
-        """Get garden step name."""
-        return f"data{self.private_suffix}://grapher/{self.base_step_name}"
-
-    @property
-    def dag_path(self) -> Path:
-        """Get DAG path."""
-        return DAG_DIR / self.dag_file
-
-    @property
-    def private_suffix(self) -> str:
-        return "-private" if self.is_private else ""
-
-    @property
-    def meadow_dict(self):
-        """Get meadow dictionary."""
-        return {
-            "namespace": self.namespace,
-            "short_name": self.short_name,
-            "version": self.version,
-            "add_to_dag": self.add_to_dag,
-            "dag_file": self.dag_file,
-            "is_private": self.is_private,
-            "snapshot_version": self.snapshot_version,
-            "file_extension": self.file_extension,
-            "channel": "meadow",
-        }
-
-    @property
-    def garden_dict(self):
-        """Get meadow dictionary."""
-        ## HOTFIX 1: filter topic_tags if empty
-        if self.topic_tags is None or self.topic_tags == []:
-            topic_tags = ""
-        ## HOTFIX 2: For some reason, when using cookiecutter only the first element in the list is taken?
-        ## Hence we need to convert the list to an actual string
-        else:
-            topic_tags = "- " + "\n- ".join(self.topic_tags)
-        return {
-            "namespace": self.namespace,
-            "short_name": self.short_name,
-            "version": self.version,
-            "meadow_version": self.version,
-            "add_to_dag": self.add_to_dag,
-            "dag_file": self.dag_file,
-            "is_private": self.is_private,
-            "update_period_days": self.update_period_days,
-            "topic_tags": topic_tags,
-            "channel": "garden",
-        }
-
-    @property
-    def grapher_dict(self):
-        """Get meadow dictionary."""
-        return {
-            "namespace": self.namespace,
-            "short_name": self.short_name,
-            "version": self.version,
-            "garden_version": self.version,
-            "add_to_dag": self.add_to_dag,
-            "dag_file": self.dag_file,
-            "is_private": self.is_private,
-            "channel": "grapher",
-        }
-
-    def to_dict(self, channel: str):
-        match channel:
-            case "meadow":
-                return self.meadow_dict
-            case "garden":
-                return self.garden_dict
-            case "grapher":
-                return self.grapher_dict
-            case _:
-                raise ValueError(f"Channel `{channel}` not recognized.")
-
-    def create_files(self, channel: str) -> List[Dict[str, Any]]:
-        # Generate files
-        DATASET_DIR = generate_step_to_channel(cookiecutter_path=COOKIE_STEPS[channel], data=self.to_dict(channel))
-        # Remove playground notebook if not needed
-        if channel != "garden" or not self.notebook:
-            remove_playground_notebook(DATASET_DIR)
-
-        # Add to generated files
-        generated_files = [
-            {
-                "path": DATASET_DIR / (self.short_name + ".py"),
-                "language": "python",
-                "channel": channel,
-            }
-        ]
-        if channel == "garden":
-            generated_files.append(
-                {
-                    "path": DATASET_DIR / (self.short_name + ".meta.yml"),
-                    "language": "yaml",
-                    "channel": "garden",
-                }
-            )
-        return generated_files
-
-    def add_steps_to_dag(self) -> str:
-        if form.add_to_dag:
-            # Get dag
-            dag = self.dag
-            # Get comment
-            default_comment = "\n#\n# TODO: add step name (just something recognizable)\n#"
-            if "meadow" in self.steps_to_create:
-                # Load metadata from Snapshot
-                # snap = Snapshot(self.base_snapshot_name)
-                # assert snap.metadata.origin is not None, "Origin metadata must be present!"
-                # comment = f"#\n#{snap.metadata.origin.title} - {snap.metadata.origin.producer}\n#\n#"
-                comments = {
-                    self.step_uri("meadow"): default_comment,
-                }
-            elif "garden" in self.steps_to_create:
-                comments = {
-                    self.step_uri("garden"): default_comment,
-                }
-            elif "grapher" in self.steps_to_create:
-                comments = {
-                    self.step_uri("grapher"): default_comment,
-                }
-            else:
-                comments = None
-            # Add to DAG
-            write_to_dag_file(dag_file=self.dag_path, dag_part=dag, comments=comments)
-            return ruamel_dump({"steps": dag})
-        else:
-            return ""
-
-    @property
-    def dag(self) -> Dict[str, Any]:
-        dag = {}
-        channels_all = ["snapshot", "meadow", "garden", "grapher"]
-        for i, channel in enumerate(channels_all[1:]):
-            if channel in self.steps_to_create:
-                dag[self.step_uri(channel)] = [self.step_uri(channels_all[i])]
-                if self.dependencies_extra[channel] is not None:
-                    dag[self.step_uri(channel)] += self.dependencies_extra[channel]
-        return dag
 
 
 def submit_form() -> None:
@@ -619,7 +338,7 @@ def render_form():
     if ("garden" in st.session_state["data.steps_to_create"]) or (
         "grapher" in st.session_state["data.steps_to_create"]
     ):
-        st.markdown("###### OPTIONAL dependencies")
+        st.markdown("###### OPTIONAL extra dependencies")
     for channel in ["garden", "grapher"]:
         if channel in st.session_state["data.steps_to_create"]:
             APP_STATE.st_widget(
@@ -659,108 +378,6 @@ def render_form():
         use_container_width=True,
         on_click=submit_form,
     )
-
-
-@st.dialog("Harmonize country names", width="large")
-def render_harm(form):
-    meadow_step = form.step_uri("meadow")
-    render_harmonizer(meadow_step)
-
-
-def render_instructions(form):
-    for channel in ["meadow", "garden", "grapher"]:
-        if channel in form.steps_to_create:
-            with st.container(border=True):
-                st.markdown(f"##### **{STEP_NAME_PRESENT.get(channel, channel)}**")
-                render_instructions_step(channel, form)
-
-
-def render_instructions_step(channel, form=None):
-    if channel == "meadow":
-        render_instructions_meadow(form)
-    elif channel == "garden":
-        render_instructions_garden(form)
-    elif channel == "grapher":
-        render_instructions_grapher(form)
-
-
-def render_instructions_meadow(form=None):
-    ## Run step
-    st.markdown("**1) Run Meadow step**")
-    if form is None:
-        st.code(
-            "uv run etl run data://meadow/namespace/version/short_name",
-            language="shellSession",
-            wrap_lines=True,
-            line_numbers=True,
-        )
-        st.markdown("Use `--private` if the dataset is private.")
-    else:
-        st.code(
-            f"uv run etl run {form.meadow_step_uri} {'--private' if form.is_private else ''}",
-            language="shellSession",
-            wrap_lines=True,
-            line_numbers=True,
-        )
-
-
-def render_instructions_garden(form=None):
-    ## 1/ Run etl step
-    st.markdown("**1) Harmonize country names**")
-    st.button("Harmonize", on_click=lambda form=form: render_harm(form))
-    st.markdown("You can also run it in your terminal:")
-    if form is None:
-        st.code(
-            "uv run etl harmonize data/meadow/version/short_name/table_name.feather country etl/steps/data/garden/version/short_name.countries.json",
-            "shellSession",
-            wrap_lines=True,
-            line_numbers=True,
-        )
-    else:
-        st.code(
-            f"uv run etl harmonize data/meadow/{form.base_step_name}/{form.short_name}.feather country etl/steps/data/garden/{form.base_step_name}.countries.json",
-            "shellSession",
-            wrap_lines=True,
-            line_numbers=True,
-        )
-    st.markdown("**2) Run Garden step**")
-    st.markdown("After editing the code of your Garden step, run the following command:")
-    if form is None:
-        st.code(
-            "uv run etl run data://garden/namespace/version/short_name",
-            "shellSession",
-            wrap_lines=True,
-            line_numbers=True,
-        )
-        st.markdown("Use `--private` if the dataset is private.")
-    else:
-        st.code(
-            f"uv run etl run {form.garden_step_uri} {'--private' if form.is_private else ''}",
-            "shellSession",
-            wrap_lines=True,
-            line_numbers=True,
-        )
-
-
-def render_instructions_grapher(form=None):
-    st.markdown("**1) Run Grapher step**")
-    if form is None:
-        st.code(
-            "uv run etl run data://meadow/namespace/version/short_name",
-            language="shellSession",
-            wrap_lines=True,
-            line_numbers=True,
-        )
-        st.markdown("Use `--private` if the dataset is private.")
-    else:
-        st.code(
-            f"uv run etl run {form.grapher_step_uri} {'--private' if form.is_private else ''}",
-            language="shellSession",
-            wrap_lines=True,
-            line_numbers=True,
-        )
-    st.markdown("**2) Pull request**")
-    st.markdown("Create a pull request in [ETL](https://github.com/owid/etl), get it reviewed and merged.")
 
 
 #########################################################
