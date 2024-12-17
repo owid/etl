@@ -70,11 +70,18 @@ steps:
     - data://garden/owid/latest/key_indicators
   data://meadow/oecd/2016-06-01/regional_wellbeing:
     - walden://oecd/2016-06-01/regional_wellbeing
+  # Malnutrition to archive
   data://grapher/malnutrition/2022-10-18/malnutrition:
     - data://garden/malnutrition/2022-10-18/malnutrition
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://garden/un/2022-07-11/un_wpp
+  # Malnutrition to update
+  data://grapher/malnutrition/2024-12-16/malnutrition:
+    - data://garden/malnutrition/2024-12-16/malnutrition
+  data://garden/malnutrition/2024-12-16/malnutrition:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/un/2024-07-12/un_wpp
 
   data://meadow/worldbank_wdi/2022-05-26/wdi:
     - walden://worldbank_wdi/2022-05-26/wdi
@@ -850,7 +857,7 @@ steps:
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
 
-# Migration distances
+  # Migration distances
   data://garden/migration/2024-11-19/migration_distance:
     - data://garden/un/2024-07-16/migrant_stock
     - data://garden/geography/2023-11-28/nat_earth_110
@@ -873,7 +880,6 @@ steps:
     - data://meadow/imf/2024-11-25/world_economic_outlook
   data://grapher/imf/2024-11-25/world_economic_outlook:
     - data://garden/imf/2024-11-25/world_economic_outlook
-
 
 include:
   - dag/open_numbers.yml
