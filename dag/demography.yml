@@ -263,7 +263,7 @@ steps:
     - data://garden/hmd/2024-12-01/hmd
   data://grapher/hmd/2024-12-03/hmd_country:
     - data://garden/hmd/2024-12-03/hmd_country
-  
+
   # Patternal ages (Kai & Klüssner)
   data://meadow/demography/2024-12-05/paternal_ages:
     - snapshot://demography/2024-12-04/paternal_ages.rdata
@@ -271,11 +271,22 @@ steps:
     - data://meadow/demography/2024-12-05/paternal_ages
   data://grapher/demography/2024-12-05/paternal_ages:
     - data://garden/demography/2024-12-05/paternal_ages
-  
+
+  #
+  # Effective Fertility Rate (Malani & Jacob)
+  #
+  data://garden/demography/2024-12-17/efr_malani_jacob:
+    - data://garden/demography/2024-12-03/life_tables
+    - data://garden/un/2024-12-02/un_wpp_lt
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/hmd/2024-12-01/hmd
+    - data://garden/hmd/2024-11-19/hfd
+  data://grapher/demography/2024-12-17/efr_malani_jacob:
+    - data://garden/demography/2024-12-17/efr_malani_jacob
+
   ########################################################################
   # OTHERS
   ########################################################################
-
   # Wittgenstein Centre (Projections)
   data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj:
     - snapshot://demography/2024-12-06/wittgenstein_human_capital.zip
