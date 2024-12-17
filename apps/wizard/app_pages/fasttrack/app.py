@@ -20,7 +20,7 @@ from apps.wizard.app_pages.fasttrack.utils import (
     UPDATE_GSHEET,
     set_states,
 )
-from apps.wizard.utils.components import st_horizontal
+from apps.wizard.utils.components import config_style_html, st_horizontal
 from etl import config
 from etl.command import main as etl_main
 from etl.paths import DAG_DIR
@@ -45,7 +45,7 @@ def reset_states() -> None:
 CURRENT_DIR = Path(__file__).parent
 DAG_FASTTRACK_PATH = DAG_DIR / "fasttrack.yml"
 # Config style
-wizard_utils.config_style_html()
+config_style_html()
 # Logger
 log = get_logger()
 # Bugsnag
