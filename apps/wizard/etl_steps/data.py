@@ -145,38 +145,36 @@ def render_step_selection():
     # st.write(st.session_state)
     with st_horizontal(vertical_alignment="center"):  # ("center", justify_content="space-between"):
         # Multi-select (data steps)
-        with st.container():
-            if (st.session_state.update_steps_selection) and (st.session_state["data_steps_to_create"] is not None):
-                st.session_state["data.steps_to_create"] = ["meadow", "garden", "grapher"]
-                st.session_state.update_steps_selection = False
+        if (st.session_state.update_steps_selection) and (st.session_state["data_steps_to_create"] is not None):
+            st.session_state["data.steps_to_create"] = ["meadow", "garden", "grapher"]
+            st.session_state.update_steps_selection = False
 
-            st.segmented_control(
-                label="Select the steps you want to create",
-                options=["meadow", "garden", "grapher"],
-                format_func=lambda option: STEP_NAME_PRESENT[option],
-                selection_mode="multi",
-                help="You can select multiple steps to create.",
-                key="data.steps_to_create",
-                on_change=edit_field,
-            )
+        st.segmented_control(
+            label="Select the steps you want to create",
+            options=["meadow", "garden", "grapher"],
+            format_func=lambda option: STEP_NAME_PRESENT[option],
+            selection_mode="multi",
+            help="You can select multiple steps to create.",
+            key="data.steps_to_create",
+            on_change=edit_field,
+        )
         # Express mode
-        with st.container():
-            if (st.session_state["data_steps_to_create"] is not None) and (
-                len(st.session_state["data.steps_to_create"]) != 3
-            ):
-                st.session_state["data_steps_to_create"] = None
+        if (st.session_state["data_steps_to_create"] is not None) and (
+            len(st.session_state["data.steps_to_create"]) != 3
+        ):
+            st.session_state["data_steps_to_create"] = None
 
-            # Set to false if: data_steps_to_create is "express" & len(st.session_state["data.steps_to_create"]) is not 3
-            st.segmented_control(
-                "Express?",
-                ["express"],
-                format_func=lambda _: ":material/bolt: Use express mode",
-                label_visibility="hidden",
-                help="Express mode will create all steps at once.",
-                # default=default,
-                key="data_steps_to_create",
-                on_change=lambda: utils.set_states({"update_steps_selection": True, "submit_form": False}),
-            )
+        # Set to false if: data_steps_to_create is "express" & len(st.session_state["data.steps_to_create"]) is not 3
+        st.segmented_control(
+            "Express?",
+            ["express"],
+            format_func=lambda _: ":material/bolt: Use express mode",
+            label_visibility="hidden",
+            help="Express mode will create all steps at once.",
+            # default=default,
+            key="data_steps_to_create",
+            on_change=lambda: utils.set_states({"update_steps_selection": True, "submit_form": False}),
+        )
 
         if len(st.session_state["data.steps_to_create"]) > 0:
             return True
