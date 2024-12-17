@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from typing_extensions import Self
 
 from apps.utils.files import generate_step_to_channel
-from apps.wizard.etl_steps.utils import ADD_DAG_OPTIONS, COOKIE_STEPS, SNAPSHOT_SCHEMA, remove_playground_notebook
+from apps.wizard.etl_steps.utils import COOKIE_STEPS, SNAPSHOT_SCHEMA, remove_playground_notebook
 from apps.wizard.utils import clean_empty_dict
 from etl.files import ruamel_dump
 from etl.helpers import write_to_dag_file
