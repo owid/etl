@@ -15,7 +15,7 @@ import etl.grapher_model as gm
 from apps.wizard import utils
 from apps.wizard.etl_steps.forms import DataForm
 from apps.wizard.etl_steps.instructions import render_instructions
-from apps.wizard.etl_steps.utils import STEP_ICONS, STEP_NAME_PRESENT, TAGS_DEFAULT, dag_files, dag_not_add_option
+from apps.wizard.etl_steps.utils import STEP_NAME_PRESENT, TAGS_DEFAULT, dag_files, dag_not_add_option
 from apps.wizard.utils.components import config_style_html, preview_file, st_horizontal, st_multiselect_wider
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
@@ -53,7 +53,6 @@ dummy_values = {
     "namespace": "dummy",
     "version": utils.DATE_TODAY,
     "short_name": "dummy",
-    "snapshot_version": "2020-01-01",
     "topic_tags": ["Uncategorized"],
 }
 
@@ -197,7 +196,9 @@ def render_step_selection():
             help="Express mode will create all steps at once.",
             # default=default,
             key="data_steps_to_create",
-            on_change=lambda: utils.set_states({"update_steps_selection": True, "submit_form": False}),
+            on_change=lambda: utils.set_states(
+                {"update_steps_selection": True, "submit_form": False}  # , "data_edit_namespace_sname_version": True}
+            ),
         )
 
         if len(st.session_state["data.steps_to_create"]) > 0:
@@ -221,7 +222,7 @@ def render_form_main():
             help="Institution or topic name",
             options=OPTIONS_NAMESPACES,
             default_last=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
-            on_change=edit_dependant_field,
+            on_change=edit_field,
         )
         if APP_STATE.vars.get("namespace") == custom_label:
             namespace_key = "namespace_custom"
@@ -239,7 +240,7 @@ def render_form_main():
             help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
             placeholder="Example: 'cherry_blossom'",
             value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
-            on_change=edit_dependant_field,
+            on_change=edit_field,
         )
 
     #
@@ -255,7 +256,7 @@ def render_form_main():
             key="version",
             default_last=default_version,
             value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
-            on_change=edit_dependant_field,
+            on_change=edit_field,
         )
 
     #
@@ -275,7 +276,6 @@ def render_form_main():
     else:
         default_value = ""
 
-    print(default_value)
     APP_STATE.st_widget(
         st.selectbox,
         label="Add to DAG",
@@ -353,6 +353,7 @@ def render_form_dependencies(namespace_key):
                 on_click=lambda: utils.set_states({"snapshot_uris": get_snapshots()}),
             )
 
+        # Render snapshot selector
         render_snapshot_selection(namespace_key)
 
     if any(step in st.session_state["data.steps_to_create"] for step in ["garden", "grapher"]):
@@ -415,28 +416,28 @@ def render_snapshot_selection(namespace_key):
         reverse=True,
     )
 
-    default = None
-    if st.session_state["data_edit_namespace_sname_version"]:
-        default = st.session_state["data.snapshot_dependency"]
-        st.session_state["data_edit_namespace_sname_version"] = False
+    # default = None
+    # if st.session_state["data_edit_namespace_sname_version"] and ("data.snapshot_dependencies" in st.session_state):
+    #     default = APP_STATE.vars["snapshot_dependencies"]
+    #     st.session_state["data_edit_namespace_sname_version"] = False
 
     def render_snapshot_selection_widget():
         """Use fragment to avoid flickering"""
-        APP_STATE.st_widget(
+        st.session_state["snapshot_dependencies_saving"] = APP_STATE.st_widget(
             st.multiselect,
             label="Snapshots",
             help="Select snapshots.",
             placeholder="Select snapshots",
             options=sorted_snaps,
-            default=default,
-            # default=st.session_state.get("data.snapshot_dependency", None),
-            key="snapshot_dependency",
+            default=st.session_state.get("data.snapshot_dependencies", None),
+            key="snapshot_dependencies",
             on_change=edit_field,
         )
 
     render_snapshot_selection_widget()
 
 
+@st.fragment
 def render_form_others():
     st.markdown("#### Other options")
     name_mapping = {
@@ -456,7 +457,7 @@ def render_form_others():
     )
 
 
-@st.fragment()
+@st.fragment
 def render_form():
     """Render form."""
     #
@@ -477,16 +478,6 @@ def render_form():
     with st.container(border=True):
         render_form_others()
 
-    #
-    # Submit
-    #
-    st.button(
-        label="Submit",
-        type="primary",
-        use_container_width=True,
-        on_click=submit_form,
-    )
-
 
 #########################################################
 # MAIN ##################################################
@@ -501,14 +492,13 @@ step_selected = render_step_selection()
 # FORM
 if step_selected:
     # form_widget = st.empty()
-    form_title = " ".join(
-        [STEP_ICONS[s] for s in ["meadow", "garden", "grapher"] if s in st.session_state["data.steps_to_create"]]
-    )
-    # with st.container(border=True):
-    #     st.markdown(
-    #         f"**Steps: {form_title}**",
-    #     )
     render_form()
+    st.button(
+        label="Submit",
+        type="primary",
+        use_container_width=True,
+        on_click=submit_form,
+    )
 else:
     st.warning("Select at least one step to create.")
 

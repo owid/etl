@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from typing_extensions import Self
 
 from apps.utils.files import generate_step_to_channel
-from apps.wizard.etl_steps.utils import COOKIE_STEPS, SNAPSHOT_SCHEMA, remove_playground_notebook
+from apps.wizard.etl_steps.utils import ADD_DAG_OPTIONS, COOKIE_STEPS, SNAPSHOT_SCHEMA, remove_playground_notebook
 from apps.wizard.utils import clean_empty_dict
 from etl.files import ruamel_dump
 from etl.helpers import write_to_dag_file
@@ -104,7 +104,7 @@ class StepForm(BaseModel):
                 self.errors[uri] = values["errorMessage"]
             else:
                 self.errors[uri] = error.message
-            print("DEBUG", uri, error.message, values["errorMessage"])
+            # print("DEBUG", uri, error.message, values["errorMessage"])
 
     def get_invalid_field(self: Self, error, schema_full) -> Any:
         """Get all key-values for the field that did not validate.
@@ -139,7 +139,7 @@ class StepForm(BaseModel):
         """Check that all fields in `fields_names` are not empty."""
         for field_name in fields_names:
             attr = getattr(self, field_name)
-            print(field_name, attr)
+            # print(field_name, attr)
             if attr in ["", []]:
                 self.errors[field_name] = f"`{field_name}` is a required property"
 
@@ -173,19 +173,21 @@ class DataForm(StepForm):
     version: str
     dag_file: str
     is_private: bool
-    # Only in Garden
-    snapshot_version: Optional[str] = None
-    file_extension: Optional[str] = None
-    notebook: Optional[bool] = None
+    add_to_dag: bool
+    # Only in Meadow
+    snapshot_dependencies: Optional[List[str]] = None
     # Only in Garden
     update_period_days: Optional[int] = None
     topic_tags: Optional[List[str]] = None
     update_period_date: Optional[date] = None  # Custom
+    notebook: Optional[bool] = None
     # Extra steps
     dependencies_extra: Dict[str, Any]
 
     def __init__(self: Self, **data: Any) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
+        data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
+
         # Handle custom namespace
         if ("namespace_custom" in data) and data["namespace_custom"] is not None:
             data["namespace"] = str(data["namespace_custom"])
@@ -202,7 +204,6 @@ class DataForm(StepForm):
         data["notebook"] = True if "notebook" in data["extra_options"] else False
 
         data["dependencies_extra"] = {
-            "meadow": data.get("dependencies_extra_meadow"),
             "garden": data.get("dependencies_extra_garden"),
             "grapher": data.get("dependencies_extra_grapher"),
         }
@@ -222,8 +223,7 @@ class DataForm(StepForm):
 
         # Extra checks for particular steps
         if "meadow" in self.steps_to_create:
-            fields_required += ["snapshot_version", "file_extension"]
-            fields_version += ["snapshot_version"]
+            fields_required += ["snapshot_dependencies"]
         if "garden" in self.steps_to_create:
             fields_required += ["topic_tags"]
 
@@ -243,14 +243,15 @@ class DataForm(StepForm):
         return f"{self.namespace}/{self.version}/{self.short_name}"
 
     @property
-    def base_snapshot_name(self) -> str:
-        return f"{self.namespace}/{self.snapshot_version}/{self.short_name}.{self.file_extension}"
+    def snapshot_names_with_extension(self) -> List[str]:
+        """Get snapshot names with extension."""
+        assert "meadow" in self.steps_to_create, "Snapshot names are only needed for meadow steps!"
+        assert self.snapshot_dependencies is not None, "Snapshot dependencies must be present!"
+        return [s.split("/")[-1] for s in self.snapshot_dependencies]
 
     def step_uri(self, channel: str) -> str:
         """Get step URI."""
         match channel:
-            case "snapshot":
-                return f"snapshot{self.private_suffix}://{self.base_snapshot_name}"
             case "meadow":
                 return f"data{self.private_suffix}://meadow/{self.base_step_name}"
             case "garden":
@@ -259,11 +260,6 @@ class DataForm(StepForm):
                 return f"data{self.private_suffix}://grapher/{self.base_step_name}"
             case _:
                 raise ValueError(f"Channel `{channel}` not recognized.")
-
-    @property
-    def snapshot_step_uri(self) -> str:
-        """Get snapshot step URI."""
-        return f"snapshot{self.private_suffix}://{self.namespace}/{self.snapshot_version}/{self.short_name}.{self.file_extension}"
 
     @property
     def meadow_step_uri(self) -> str:
@@ -290,23 +286,7 @@ class DataForm(StepForm):
         return "-private" if self.is_private else ""
 
     @property
-    def meadow_dict(self):
-        """Get meadow dictionary."""
-        return {
-            "namespace": self.namespace,
-            "short_name": self.short_name,
-            "version": self.version,
-            "add_to_dag": self.add_to_dag,
-            "dag_file": self.dag_file,
-            "is_private": self.is_private,
-            "snapshot_version": self.snapshot_version,
-            "file_extension": self.file_extension,
-            "channel": "meadow",
-        }
-
-    @property
-    def garden_dict(self):
-        """Get meadow dictionary."""
+    def topic_tags_export(self):
         ## HOTFIX 1: filter topic_tags if empty
         if self.topic_tags is None or self.topic_tags == []:
             topic_tags = ""
@@ -314,45 +294,45 @@ class DataForm(StepForm):
         ## Hence we need to convert the list to an actual string
         else:
             topic_tags = "- " + "\n- ".join(self.topic_tags)
-        return {
-            "namespace": self.namespace,
-            "short_name": self.short_name,
-            "version": self.version,
-            "meadow_version": self.version,
-            "add_to_dag": self.add_to_dag,
-            "dag_file": self.dag_file,
-            "is_private": self.is_private,
-            "update_period_days": self.update_period_days,
-            "topic_tags": topic_tags,
-            "channel": "garden",
-        }
-
-    @property
-    def grapher_dict(self):
-        """Get meadow dictionary."""
-        return {
-            "namespace": self.namespace,
-            "short_name": self.short_name,
-            "version": self.version,
-            "garden_version": self.version,
-            "add_to_dag": self.add_to_dag,
-            "dag_file": self.dag_file,
-            "is_private": self.is_private,
-            "channel": "grapher",
-        }
+        return topic_tags
 
     def to_dict(self, channel: str):
+        common = {
+            "namespace": self.namespace,
+            "short_name": self.short_name,
+            "version": self.version,
+            "add_to_dag": self.add_to_dag,
+            "dag_file": self.dag_file,
+            "is_private": self.is_private,
+            "channel": "meadow",
+        }
         match channel:
             case "meadow":
-                return self.meadow_dict
+                common.update(
+                    {
+                        "snapshot_names_with_extension": self.snapshot_names_with_extension,
+                    }
+                )
             case "garden":
-                return self.garden_dict
+                common.update(
+                    {
+                        "meadow_version": self.version,
+                        "update_period_days": self.update_period_days,
+                        "topic_tags": self.topic_tags_export,
+                    }
+                )
             case "grapher":
-                return self.grapher_dict
+                common.update(
+                    {
+                        "garden_version": self.version,
+                    }
+                )
             case _:
                 raise ValueError(f"Channel `{channel}` not recognized.")
+        return common
 
     def create_files(self, channel: str) -> List[Dict[str, Any]]:
+        # print(self.snapshot_names_with_extension)
         # Generate files
         DATASET_DIR = generate_step_to_channel(cookiecutter_path=COOKIE_STEPS[channel], data=self.to_dict(channel))
         # Remove playground notebook if not needed
@@ -410,7 +390,13 @@ class DataForm(StepForm):
     @property
     def dag(self) -> Dict[str, Any]:
         dag = {}
-        channels_all = ["snapshot", "meadow", "garden", "grapher"]
+
+        # Meadow dependencies (snapshots)
+        if "meadow" in self.steps_to_create:
+            dag[self.step_uri("meadow")] = self.snapshot_dependencies
+
+        # Garden, Grapher dependencies. Default + Extra.
+        channels_all = ["meadow", "garden", "grapher"]
         for i, channel in enumerate(channels_all[1:]):
             if channel in self.steps_to_create:
                 dag[self.step_uri(channel)] = [self.step_uri(channels_all[i])]
