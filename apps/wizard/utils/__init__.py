@@ -458,6 +458,7 @@ def clean_empty_dict(d: Union[Dict[str, Any], List[Any]]) -> Union[Dict[str, Any
 
 def get_datasets_in_etl(
     dag: Dict[str, Any] | None = None,
+    dag_path: Path | None = None,
     snapshots: bool = False,
     prefixes: List[str] | None = None,
     prefix_priorities: List[str] | None = None,
@@ -465,7 +466,10 @@ def get_datasets_in_etl(
     """Show a selectbox with all datasets available."""
     # Load dag
     if dag is None:
-        dag = load_dag()
+        if dag_path is not None:
+            dag = load_dag(dag_path)
+        else:
+            dag = load_dag()
 
     # Define list with options
     if snapshots:

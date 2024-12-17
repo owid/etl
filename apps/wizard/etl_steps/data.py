@@ -34,6 +34,7 @@ st.session_state.submit_form = st.session_state.get("submit_form", False)
 st.session_state["data.steps_to_create"] = st.session_state.get("data.steps_to_create", [])
 st.session_state["data_steps_to_create"] = st.session_state.get("data_steps_to_create")
 st.session_state.update_steps_selection = st.session_state.get("update_steps_selection", False)
+st.session_state.data_edit_namespace_sname_version = st.session_state.get("data_edit_namespace_sname_version", False)
 
 # Available namespaces
 OPTIONS_NAMESPACES = utils.get_namespaces("all")
@@ -90,12 +91,25 @@ def get_snapshots():
         step.replace(str(SNAPSHOTS_DIR), "snapshot:/").replace(".dvc", "") for step in steps_private if step != ""
     ]
 
-    # Combine both
-    snapshots = [s if s not in steps_private else s.replace("snapshot://", "snapshot-private://") for s in snapshots]
+    # Get list of archived ones
+    # archived = utils.get_datasets_in_etl(dag_path=DAG_ARCHIVE_FILE, snapshots=True)
+    # archived = [s for s in archived if re.match(r"^snapshot(-private)?://", s)]
+
+    # Combine all
+    snapshots = [
+        s.replace("snapshot://", "snapshot-private://") if s in steps_private else s
+        for s in snapshots
+        # if s not in archived
+    ]
     return snapshots
 
 
-st.session_state["snapshot_uris"] = st.session_state.get("snapshot_uris", get_snapshots())
+@st.cache_data
+def get_snapshots_cached():
+    return get_snapshots()
+
+
+st.session_state["snapshot_uris"] = st.session_state.get("snapshot_uris", get_snapshots_cached())
 
 
 @st.cache_data
@@ -140,6 +154,16 @@ def edit_field() -> None:
     utils.set_states({"submit_form": False})
 
 
+def edit_dependant_field() -> None:
+    """Submit form."""
+    utils.set_states(
+        {
+            "submit_form": False,
+            "data_edit_namespace_sname_version": True,
+        }
+    )
+
+
 def render_step_selection():
     """Render step selection."""
     # st.write(st.session_state)
@@ -154,7 +178,7 @@ def render_step_selection():
             options=["meadow", "garden", "grapher"],
             format_func=lambda option: STEP_NAME_PRESENT[option],
             selection_mode="multi",
-            help="You can select multiple steps to create.",
+            help="Select the steps that you want to create. You can choose as many as necessary.",
             key="data.steps_to_create",
             on_change=edit_field,
         )
@@ -181,9 +205,8 @@ def render_step_selection():
         return False
 
 
-@st.fragment()
-def render_form():
-    """Render form."""
+def render_form_main():
+    """Render main part of the form."""
     col1, col2, col3 = st.columns([2, 2, 1])
     #
     # Namespace
@@ -198,7 +221,7 @@ def render_form():
             help="Institution or topic name",
             options=OPTIONS_NAMESPACES,
             default_last=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
-            on_change=edit_field,
+            on_change=edit_dependant_field,
         )
         if APP_STATE.vars.get("namespace") == custom_label:
             namespace_key = "namespace_custom"
@@ -216,7 +239,7 @@ def render_form():
             help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
             placeholder="Example: 'cherry_blossom'",
             value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
-            on_change=edit_field,
+            on_change=edit_dependant_field,
         )
 
     #
@@ -232,7 +255,7 @@ def render_form():
             key="version",
             default_last=default_version,
             value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
-            on_change=edit_field,
+            on_change=edit_dependant_field,
         )
 
     #
@@ -315,27 +338,22 @@ def render_form():
                 on_change=edit_field,
             )
 
-    #
-    # Meadow options: pick snapshot
-    #
+    return namespace_key
+
+
+@st.fragment
+def render_form_dependencies(namespace_key):
     if "meadow" in st.session_state["data.steps_to_create"]:
         with st_horizontal(vertical_alignment="center", justify_content="space-between"):
             st.markdown("#### Dependencies")
             st.button(
                 ":material/refresh: Refresh snapshot list",
                 type="tertiary",
-                help="Only snapshots that have been added to the catalog (local folder `data/`) are shown in the dropdown. If a snapshot is missing, please make sure that you have added it (i.e. ran `python snapshot ...`) and then click here to refresh the list.",
+                help="The following dropdown only shows snapshots that have been added to the catalog (local folder `data/`). If a snapshot is missing, please add it to the catalog first (i.e. `python snapshot ...`), and then click here to refresh the list.",
+                on_click=lambda: utils.set_states({"snapshot_uris": get_snapshots()}),
             )
-        APP_STATE.st_widget(
-            st.multiselect,
-            label="Snapshots",
-            help="Select snapshots.",
-            placeholder="Select snapshots",
-            options=st.session_state["snapshot_uris"],
-            default=None,
-            key="snapshot_dependency",
-            on_change=edit_field,
-        )
+
+        render_snapshot_selection(namespace_key)
 
     if any(step in st.session_state["data.steps_to_create"] for step in ["garden", "grapher"]):
         st.markdown("###### OPTIONAL extra dependencies")
@@ -352,9 +370,74 @@ def render_form():
                     on_change=edit_field,
                 )
 
-    #
-    # Others
-    #
+
+def render_snapshot_selection(namespace_key):
+    def similarity_snap(uri):
+        # Extract individual URI parts
+        pattern = r"(?:snapshot(?:-private)?://)([^/]+)/([^/]+)/([^/.]+)\.\w+"
+        match = re.match(pattern, uri)
+        if match:
+            namespace, version, short_name = match.groups()
+        else:
+            st.toast(f"Error parsing snapshot URI: {uri}. Please report.", icon="🚨")
+            return 0
+
+        # Compare with current values
+        if namespace == APP_STATE.vars[namespace_key]:
+            namespace_score = 150
+        else:
+            namespace_score = fuzz.ratio(namespace, APP_STATE.vars[namespace_key])
+        if short_name == APP_STATE.vars["short_name"]:
+            short_name_score = 150
+        else:
+            short_name_score = fuzz.ratio(short_name, APP_STATE.vars["short_name"])
+        if version == APP_STATE.vars["version"]:
+            version_score = 150
+        elif version == "latest":
+            version_score = 100
+        elif bool(re.match(r"^\d{4}-\d{2}-\d{2}$", version)):
+            date_obj = datetime.strptime(version, "%Y-%m-%d").date()
+            delta = (datetime.today().date() - date_obj).days
+            if delta < 0:
+                version_score = 100
+            else:
+                version_score = max(1 - delta / 4_000, 0) * 100
+        else:
+            version_score = 0
+
+        score = namespace_score + short_name_score + 0.2 * version_score
+
+        return score
+
+    sorted_snaps = sorted(
+        st.session_state["snapshot_uris"],
+        key=lambda uri: similarity_snap(uri),
+        reverse=True,
+    )
+
+    default = None
+    if st.session_state["data_edit_namespace_sname_version"]:
+        default = st.session_state["data.snapshot_dependency"]
+        st.session_state["data_edit_namespace_sname_version"] = False
+
+    def render_snapshot_selection_widget():
+        """Use fragment to avoid flickering"""
+        APP_STATE.st_widget(
+            st.multiselect,
+            label="Snapshots",
+            help="Select snapshots.",
+            placeholder="Select snapshots",
+            options=sorted_snaps,
+            default=default,
+            # default=st.session_state.get("data.snapshot_dependency", None),
+            key="snapshot_dependency",
+            on_change=edit_field,
+        )
+
+    render_snapshot_selection_widget()
+
+
+def render_form_others():
     st.markdown("#### Other options")
     name_mapping = {
         "private": ":material/lock:  Make dataset private",
@@ -372,7 +455,31 @@ def render_form():
         on_change=edit_field,
     )
 
+
+@st.fragment()
+def render_form():
+    """Render form."""
+    #
+    # Main options
+    #
+    with st.container(border=True):
+        namespace_key = render_form_main()
+
+    #
+    # Meadow options: pick snapshot
+    #
+    with st.container(border=True):
+        render_form_dependencies(namespace_key)
+
+    #
+    # Others
+    #
+    with st.container(border=True):
+        render_form_others()
+
+    #
     # Submit
+    #
     st.button(
         label="Submit",
         type="primary",
@@ -397,11 +504,11 @@ if step_selected:
     form_title = " ".join(
         [STEP_ICONS[s] for s in ["meadow", "garden", "grapher"] if s in st.session_state["data.steps_to_create"]]
     )
-    with st.container(border=True):
-        st.markdown(
-            f"**Steps: {form_title}**",
-        )
-        render_form()
+    # with st.container(border=True):
+    #     st.markdown(
+    #         f"**Steps: {form_title}**",
+    #     )
+    render_form()
 else:
     st.warning("Select at least one step to create.")
 
