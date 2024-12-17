@@ -37,6 +37,8 @@ FUR_FARMING_BAN_STATUS = {
     "Parliamentary debate": "Not banned",
     "": "Not banned",
     PHASE_OUT_DUE_TO_STRICTER_REGULATIONS: PHASE_OUT_DUE_TO_STRICTER_REGULATIONS,
+    # As requested by the Fur-Free Alliance, we will replace "NO DATA" by "No active farms reported", since, in this case, there is no sign of fur farming for those countries.
+    # NOTE: The same does not apply to fur trading.
     NO_DATA_LABEL: "No active farms reported",
 }
 # Define label for fur farming status that are not yet effective.
