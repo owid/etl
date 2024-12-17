@@ -250,6 +250,8 @@ def render_form():
         default_value = sorted_dag[1]
     else:
         default_value = ""
+
+    print(default_value)
     APP_STATE.st_widget(
         st.selectbox,
         label="Add to DAG",
@@ -260,6 +262,8 @@ def render_form():
         on_change=edit_field,
     )
 
+    #
+    # Garden options: update_frequency, tags
     if "garden" in st.session_state["data.steps_to_create"]:
         col1, col2 = st.columns(2)
         #
@@ -310,6 +314,9 @@ def render_form():
                 on_change=edit_field,
             )
 
+    #
+    # Meadow options: pick snapshot
+    #
     if "meadow" in st.session_state["data.steps_to_create"]:
         with st_horizontal(vertical_alignment="center", justify_content="space-between"):
             st.markdown("#### Dependencies")
@@ -318,7 +325,6 @@ def render_form():
                 type="tertiary",
                 help="Only snapshots that have been added to the catalog (local folder `data/`) are shown in the dropdown. If a snapshot is missing, please make sure that you have added it (i.e. ran `python snapshot ...`) and then click here to refresh the list.",
             )
-
         APP_STATE.st_widget(
             st.multiselect,
             label="Snapshots",
@@ -330,50 +336,28 @@ def render_form():
             on_change=edit_field,
         )
 
-        # TODO: remove
-        # APP_STATE.st_widget(
-        #     st.text_input,
-        #     label="Snapshot version",
-        #     help="Version of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
-        #     # placeholder=f"Example: {DATE_TODAY}",
-        #     key="snapshot_version",
-        #     value=dummy_values["snapshot_version"] if APP_STATE.args.dummy_data else None,
-        #     on_change=edit_field,
-        # )
-        # # File extension
-        # APP_STATE.st_widget(
-        #     st.text_input,
-        #     label="File extension",
-        #     help="File extension (without the '.') of the file to be downloaded.",
-        #     placeholder="'csv', 'xls', 'zip'",
-        #     key="file_extension",
-        #     value=dummy_values["file_extension"] if APP_STATE.args.dummy_data else None,
-        #     on_change=edit_field,
-        # )
-
-    if ("garden" in st.session_state["data.steps_to_create"]) or (
-        "grapher" in st.session_state["data.steps_to_create"]
-    ):
+    if any(step in st.session_state["data.steps_to_create"] for step in ["garden", "grapher"]):
         st.markdown("###### OPTIONAL extra dependencies")
-    for channel in ["garden", "grapher"]:
-        if channel in st.session_state["data.steps_to_create"]:
-            APP_STATE.st_widget(
-                st_widget=st.multiselect,
-                label=f"Extra dependencies for {channel.capitalize()}",
-                help="Additional dependencies.",
-                key=f"data.dependencies_extra_{channel}",
-                options=STEPS_URI[channel],
-                placeholder="Add dependency steps",
-                default=None,
-                on_change=edit_field,
-            )
+        for channel in ["garden", "grapher"]:
+            if channel in st.session_state["data.steps_to_create"]:
+                APP_STATE.st_widget(
+                    st_widget=st.multiselect,
+                    label=f"Extra dependencies for {channel.capitalize()}",
+                    help="Additional dependencies.",
+                    key=f"data.dependencies_extra_{channel}",
+                    options=STEPS_URI[channel],
+                    placeholder="Add dependency steps",
+                    default=None,
+                    on_change=edit_field,
+                )
 
+    #
     # Others
+    #
     st.markdown("#### Other options")
     name_mapping = {
         "private": ":material/lock:  Make dataset private",
         "notebook": ":material/skateboarding:  Create playground notebook",
-        # "grapher": ":material/database: Grapher",
     }
 
     st.pills(
