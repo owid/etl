@@ -183,49 +183,60 @@ def render_step_selection():
 
 def render_form():
     """Render form."""
+    col1, col2, col3 = st.columns([2, 2, 1])
+    #
+    # Namespace
+    #
+    with col1:
+        custom_label = "Custom namespace..."
+        APP_STATE.st_selectbox_responsive(
+            st_widget=st.selectbox,
+            custom_label=custom_label,
+            key="namespace",
+            label="Namespace",
+            help="Institution or topic name",
+            options=OPTIONS_NAMESPACES,
+            default_last=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
+            on_change=edit_field,
+        )
+        if APP_STATE.vars.get("namespace") == custom_label:
+            namespace_key = "namespace_custom"
+        else:
+            namespace_key = "namespace"
+
+    #
+    # Short name (meadow, garden, grapher)
+    #
+    with col2:
+        APP_STATE.st_widget(
+            st_widget=st.text_input,
+            key="short_name",
+            label="short name",
+            help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
+            placeholder="Example: 'cherry_blossom'",
+            value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
+            on_change=edit_field,
+        )
+
+    #
+    # Version (meadow, garden, grapher)
+    #
     if (default_version := APP_STATE.default_value("version", previous_step="snapshot")) == "":
         default_version = APP_STATE.default_value("snapshot_version", previous_step="snapshot")
+    with col3:
+        APP_STATE.st_widget(
+            st_widget=st.text_input,
+            label="version",
+            help="Version of the dataset (by default, the current date, or exceptionally the publication date).",
+            key="version",
+            default_last=default_version,
+            value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
+            on_change=edit_field,
+        )
 
-    # Namespace
-    custom_label = "Custom namespace..."
-    APP_STATE.st_selectbox_responsive(
-        st_widget=st.selectbox,
-        custom_label=custom_label,
-        key="namespace",
-        label="Namespace",
-        help="Institution or topic name",
-        options=OPTIONS_NAMESPACES,
-        default_last=dummy_values["namespace"] if APP_STATE.args.dummy_data else OPTIONS_NAMESPACES[0],
-        on_change=edit_field,
-    )
-    if APP_STATE.vars.get("namespace") == custom_label:
-        namespace_key = "namespace_custom"
-    else:
-        namespace_key = "namespace"
-
-    # Short name (meadow, garden, grapher)
-    APP_STATE.st_widget(
-        st_widget=st.text_input,
-        key="short_name",
-        label="short name",
-        help="Dataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
-        placeholder="Example: 'cherry_blossom'",
-        value=dummy_values["short_name"] if APP_STATE.args.dummy_data else None,
-        on_change=edit_field,
-    )
-
-    # Version (meadow, garden, grapher)
-    APP_STATE.st_widget(
-        st_widget=st.text_input,
-        label="version",
-        help="Version of the dataset (by default, the current date, or exceptionally the publication date).",
-        key="version",
-        default_last=default_version,
-        value=dummy_values["version"] if APP_STATE.args.dummy_data else default_version,
-        on_change=edit_field,
-    )
-
+    #
     # Add to DAG
+    #
     sorted_dag = sorted(
         dag_files,
         key=lambda file_name: fuzz.ratio(file_name.replace(".yml", ""), APP_STATE.vars[namespace_key]),
@@ -250,47 +261,54 @@ def render_form():
     )
 
     if "garden" in st.session_state["data.steps_to_create"]:
+        col1, col2 = st.columns(2)
+        #
         # Indicator tags
-        label = "Indicators tag"
-        if USING_TAGS_DEFAULT:
-            label += f"\n\n:red[Using a 2024 March snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
+        #
+        with col1:
+            label = "Indicators tag"
+            if USING_TAGS_DEFAULT:
+                label += f"\n\n:red[Using a 2024 March snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
 
-        namespace = APP_STATE.vars[namespace_key].replace("_", " ")
-        default_last = None
-        for tag in tag_list:
-            if namespace.lower() == tag.lower():
-                default_last = tag
-                break
-        APP_STATE.st_widget(
-            st_widget=st.multiselect,
-            label=label,
-            help=(
-                """
-                This tag will be propagated to all dataset's indicators (it will not be assigned to the dataset).
+            namespace = APP_STATE.vars[namespace_key].replace("_", " ")
+            default_last = None
+            for tag in tag_list:
+                if namespace.lower() == tag.lower():
+                    default_last = tag
+                    break
+            APP_STATE.st_widget(
+                st_widget=st.multiselect,
+                label=label,
+                help=(
+                    """
+                    This tag will be propagated to all dataset's indicators (it will not be assigned to the dataset).
 
-                If you want to use a different tag for a specific indicator you can do it by editing its metadata field `variable.presentation.topic_tags`.
+                    If you want to use a different tag for a specific indicator you can do it by editing its metadata field `variable.presentation.topic_tags`.
 
-                Exceptionally, and if unsure what to choose, choose tag `Uncategorized`.
-                """
-            ),
-            key="topic_tags",
-            options=tag_list,
-            placeholder="Choose a tag (or multiple)",
-            default=dummy_values["topic_tags"] if APP_STATE.args.dummy_data else default_last,
-            on_change=edit_field,
-        )
+                    Exceptionally, and if unsure what to choose, choose tag `Uncategorized`.
+                    """
+                ),
+                key="topic_tags",
+                options=tag_list,
+                placeholder="Choose a tag (or multiple)",
+                default=dummy_values["topic_tags"] if APP_STATE.args.dummy_data else default_last,
+                on_change=edit_field,
+            )
 
+        #
         # Update frequency
-        today = datetime.today()
-        APP_STATE.st_widget(
-            st_widget=st.date_input,
-            label="When is the next update expected?",
-            help="Expected date of the next update of this dataset by OWID (typically in a year).",
-            key="update_period_date",
-            min_value=today + timedelta(days=1),
-            default_last=today.replace(year=today.year + 1),
-            on_change=edit_field,
-        )
+        #
+        with col2:
+            today = datetime.today()
+            APP_STATE.st_widget(
+                st_widget=st.date_input,
+                label="When is the next update expected?",
+                help="Expected date of the next update of this dataset by OWID (typically in a year).",
+                key="update_period_date",
+                min_value=today + timedelta(days=1),
+                default_last=today.replace(year=today.year + 1),
+                on_change=edit_field,
+            )
 
     if "meadow" in st.session_state["data.steps_to_create"]:
         with st_horizontal(vertical_alignment="center", justify_content="space-between"):
