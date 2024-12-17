@@ -455,58 +455,6 @@ def clean_empty_dict(d: Union[Dict[str, Any], List[Any]]) -> Union[Dict[str, Any
     raise TypeError("Invalid type for argument `d`.")
 
 
-def warning_metadata_unstable() -> None:
-    """Show warning on latest metadata definitions being available in Notion."""
-    st.warning(
-        "Documentation for new metadata is almost complete, but still being finalised based on feedback. Feel free to open a [new issue](https://github.com/owid/etl/issues/new) for any question of suggestion!"
-    )
-
-
-def render_responsive_field_in_form(
-    key: str,
-    display_name: str,
-    field_1: Any,
-    field_2: Any,
-    options: List[str],
-    custom_label: str,
-    help_text: str,
-    app_state: Any,
-    default_value: str,
-) -> None:
-    """Render the namespace field within the form.
-
-    We want the namespace field to be a selectbox, but with the option to add a custom namespace.
-
-    This is a workaround to have repsonsive behaviour within a form.
-
-    Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
-    """
-    # Main decription
-    help_text = "## Institution or topic name"
-
-    # Render and get element depending on selection in selectbox
-    with field_1:
-        field = app_state.st_widget(
-            st.selectbox,
-            label=display_name,
-            options=[custom_label] + options,
-            help=help_text,
-            key=key,
-            default_last=default_value,  # dummy_values[prop_uri],
-        )
-    with field_2:
-        if field == custom_label:
-            default_value = app_state.default_value(key)
-            field = app_state.st_widget(
-                st.text_input,
-                label="↳ *Use custom value*",
-                placeholder="",
-                help="Enter custom value.",
-                key=f"{key}_custom",
-                default_last=default_value,
-            )
-
-
 def get_datasets_in_etl(
     dag: Dict[str, Any] | None = None,
     snapshots: bool = False,
@@ -612,16 +560,6 @@ def get_staging_creation_time(session: Session):
     return st.session_state[key]
 
 
-def st_toast_error(message: str) -> None:
-    """Show error message."""
-    st.toast(f"❌ :red[{message}]")
-
-
-def st_toast_success(message: str) -> None:
-    """Show success message."""
-    st.toast(f"✅ :green[{message}]")
-
-
 def default_converter(o):
     if isinstance(o, np.integer):  # ignore
         return int(o)
@@ -653,59 +591,3 @@ def as_list(s):
         except (ValueError, SyntaxError):
             return s
     return s
-
-
-def update_query_params(key):
-    def _update_query_params():
-        value = st.session_state[key]
-        if value:
-            st.query_params.update({key: value})
-        else:
-            st.query_params.pop(key, None)
-
-    return _update_query_params
-
-
-def url_persist(component: Any) -> Any:
-    """Wrapper around streamlit components that persist values in the URL query string.
-
-    Usage:
-        url_persist(st.multiselect)(
-          key="abc",
-          ...
-        )
-    """
-    # Component uses list of values
-    if component == st.multiselect:
-        repeated = True
-    else:
-        repeated = False
-
-    def _persist(*args, **kwargs):
-        assert "key" in kwargs, "key should be passed to persist"
-        # TODO: we could wrap on_change too to make it work
-        assert "on_change" not in kwargs, "on_change should not be passed to persist"
-
-        key = kwargs["key"]
-
-        if not st.session_state.get(key):
-            if repeated:
-                params = st.query_params.get_all(key)
-                # convert to int if digit
-                params = [int(q) if q.isdigit() else q for q in params]
-            else:
-                params = st.query_params.get(key)
-                if params and params.isdigit():
-                    params = int(params)
-
-            # Use `value` from the component as a default value if available
-            if not params and "value" in kwargs:
-                params = kwargs.pop("value")
-
-            st.session_state[key] = params
-
-        kwargs["on_change"] = update_query_params(key)
-
-        return component(*args, **kwargs)
-
-    return _persist

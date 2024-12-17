@@ -12,7 +12,13 @@ from typing_extensions import Self
 import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps_old.utils import ADD_DAG_OPTIONS, COOKIE_GARDEN, MD_GARDEN, TAGS_DEFAULT
+from apps.wizard.etl_steps_old.utils import (
+    ADD_DAG_OPTIONS,
+    COOKIE_GARDEN,
+    MD_GARDEN,
+    TAGS_DEFAULT,
+    render_responsive_field_in_form,
+)
 from apps.wizard.utils.components import config_style_html, preview_file, st_wizard_page_link
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
@@ -222,7 +228,6 @@ with st.container(border=True):
 
 # SIDEBAR
 with st.sidebar:
-    # utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
@@ -347,7 +352,7 @@ with form_widget.form("garden"):
 
 
 # Render responsive namespace field
-utils.render_responsive_field_in_form(
+render_responsive_field_in_form(
     key="namespace",
     display_name="Namespace",
     field_1=namespace_field[0],

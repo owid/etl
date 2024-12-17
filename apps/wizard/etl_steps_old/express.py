@@ -294,17 +294,6 @@ def edit_field() -> None:
     utils.set_states({"submit_form": False})
 
 
-def export_metadata() -> None:
-    dataset_path = st.session_state["garden.dataset_path"]
-    try:
-        output_path = utils.metadata_export_basic(dataset_path=dataset_path)
-    except Exception as e:
-        st.exception(e)
-        st.stop()
-    else:
-        st.success(f"Metadata exported to `{output_path}`.")
-
-
 #########################################################
 # MAIN ##################################################
 #########################################################
@@ -318,7 +307,6 @@ with st.container(border=True):
 
 # SIDEBAR
 with st.sidebar:
-    # utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()  # TODO: which instructions?
         st.markdown(text)

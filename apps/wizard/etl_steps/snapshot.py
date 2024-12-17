@@ -571,8 +571,6 @@ st.title(":material/photo_camera: Snapshot **:gray[Create step]**")
 
 # SIDEBAR
 with st.sidebar:
-    # utils.warning_metadata_unstable()
-
     # INSTRUCTIONS
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()

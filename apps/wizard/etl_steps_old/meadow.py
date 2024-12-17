@@ -9,7 +9,7 @@ from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps_old.utils import ADD_DAG_OPTIONS, COOKIE_MEADOW, MD_MEADOW
+from apps.wizard.etl_steps_old.utils import ADD_DAG_OPTIONS, COOKIE_MEADOW, MD_MEADOW, render_responsive_field_in_form
 from apps.wizard.utils.components import config_style_html, preview_file, st_wizard_page_link
 from etl.paths import BASE_DIR, DAG_DIR
 
@@ -127,7 +127,6 @@ with st.container(border=True):
 
 # SIDEBAR
 with st.sidebar:
-    # utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
@@ -212,7 +211,7 @@ with form_widget.form("meadow"):
 
 
 # Render responsive namespace field
-utils.render_responsive_field_in_form(
+render_responsive_field_in_form(
     key="namespace",
     display_name="Namespace",
     field_1=namespace_field[0],
