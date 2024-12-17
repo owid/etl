@@ -224,7 +224,7 @@ C 3c: code, cohort, age [COHORT]
         Total          B1          B2          B3          B4         B5p
 
     ccfrVH
-        Cumulative cohort fertility rates (horizontal parallelograms
+        Cumulative cohort fertility rates (horizontal parallelograms)
         CCFR
     ccfrVHbo
         Cumulative cohort fertility rates by birth order (horizontal parallelograms
@@ -438,6 +438,7 @@ REGEX_PERIOD_AGE_BO = {}
 # Tables to process for COHORT country-year-age
 TABLES_COHORT_AGE = [
     "asfrvh",
+    "ccfrvh",
 ]
 TABLES_COHORT_AGE_W_PARITY = {}
 REGEX_COHORT_AGE_BO = {}
@@ -519,13 +520,32 @@ def run(dest_dir: str) -> None:
         tbs=tbs,
         cols_index_out=cols_index + [col_bo],
         short_name="period_ages",
-        fcn=keep_relevant_ages,
+        # fcn=keep_relevant_ages,
+        formatting=False,
     )
     tb_period_ages = tb_period_ages.rename(
         columns={
             "asfr": "asfr_period",
         }
     )
+
+    # TODO: move elsewhere
+    # Build special table
+    years = list(range(1925, tb_period_ages["year"].max() + 1, 5))
+    tb_period_years = tb_period_ages.loc[
+        tb_period_ages["year"].isin(years) & (tb_period_ages["birth_order"] == "total")
+    ].drop(columns=["birth_order"])
+    tb_period_years["age"] = tb_period_years["age"].str.replace("-", "").str.replace("+", "").astype("UInt8")
+    tb_period_years = tb_period_years.rename(
+        columns={
+            "year": "year_as_dimension",
+        }
+    )
+    tb_period_years = tb_period_years.format(["country", "age", "year_as_dimension"], short_name="period_ages_years")
+
+    # Resume normal processing
+    tb_period_ages = keep_relevant_ages(tb_period_ages)
+    tb_period_ages = tb_period_ages.format(cols_index + [col_bo], short_name="period_ages")
 
     # 4/ Cohort tables (by age)
     cols_index = ["country", "cohort", "age"]
@@ -539,20 +559,43 @@ def run(dest_dir: str) -> None:
         col_bo=col_bo,
         regex_bo=REGEX_COHORT_AGE_BO,
         check_integration=False,
-        check_integration_limit=143,
+        check_integration_limit={
+            "asfr": 143,
+            "ccfr": 84,
+        },
     )
     ## Consolidate
     tb_cohort_ages = consolidate_table_from_list(
         tbs=tbs,
         cols_index_out=cols_index + [col_bo],
         short_name="cohort_ages",
-        fcn=keep_relevant_ages,
+        # fcn=keep_relevant_ages,
+        formatting=False,
     )
     tb_cohort_ages = tb_cohort_ages.rename(
         columns={
             "asfr": "asfr_cohort",
+            "ccfr": "ccfr_cohort",
         }
     )
+
+    # TODO: move elsewhere
+    # Build special table
+    years = list(range(1925, tb_cohort_ages["cohort"].max() + 1, 5))
+    tb_cohort_years = tb_cohort_ages.loc[
+        tb_cohort_ages["cohort"].isin(years) & (tb_cohort_ages["birth_order"] == "total")
+    ].drop(columns=["birth_order"])
+    tb_cohort_years["age"] = tb_cohort_years["age"].str.replace("-", "").str.replace("+", "").astype("UInt8")
+    # Fix 12- vs 12, 55+ vs 55 etc.
+    assert tb_cohort_years.groupby(["country", "cohort", "age"])["asfr_cohort"].nunique().max() == 1
+    assert tb_cohort_years.groupby(["country", "cohort", "age"])["ccfr_cohort"].nunique().max() == 1
+    tb_cohort_years = tb_cohort_years.groupby(["country", "cohort", "age"], as_index=False).mean()
+    # Format
+    tb_cohort_years = tb_cohort_years.format(["country", "age", "cohort"], short_name="cohort_ages_years")
+
+    # Resume normal processing
+    tb_cohort_ages = keep_relevant_ages(tb_cohort_ages)
+    tb_cohort_ages = tb_cohort_ages.format(cols_index + [col_bo], short_name="cohort_ages")
 
     #
     # Process data.
@@ -562,6 +605,8 @@ def run(dest_dir: str) -> None:
         tb_cohort,
         tb_period_ages,
         tb_cohort_ages,
+        tb_period_years,
+        tb_cohort_years,
     ]
 
     #
@@ -630,6 +675,13 @@ def make_table_list(
             core_indicators = tables_w_parity[tname]["indicators"]
             tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo, regex)
 
+        dtypes = {}
+        if "age" in tb.columns:
+            dtypes["age"] = "string"
+        if "birth_order" in tb.columns:
+            dtypes["birth_order"] = "string"
+        tb = tb.astype(dtypes)
+
         # Add formatted table to the list of tables.
         tbs.append(tb)
 
@@ -683,15 +735,27 @@ def integrate_bo(tb, tb_bo, cols_index, core_indicators, check=True, check_limit
     for col in core_indicators:
         # Check that we can integrate them!
         TOLERANCE = 5e-3
-        if check:
+
+        # Check per column
+        do_check = check
+        if isinstance(check, dict):
+            do_check = check.get(col, True)
+
+        if do_check:
             assert (
                 (((tb[col] - tb[f"{col}__bo"]) / tb[col]).dropna().abs() < TOLERANCE).all()
             ).all(), f"Integration failed for {col}. Core indicator is not equivalent between main and `bo` tables."
         elif check_limit_wrong is not None:
+            max_allowed = check_limit_wrong
+            if isinstance(check_limit_wrong, dict):
+                if col not in check_limit_wrong:
+                    raise ValueError(f"Missing limit for {col} in check_limit_wrong!")
+                max_allowed = check_limit_wrong[col]
+
             num = (~(((tb[col] - tb[f"{col}__bo"]) / tb[col]).dropna().abs() < TOLERANCE)).sum()
             assert (
-                num == check_limit_wrong
-            ), f"Integration failed for {col}. There are too many allowed miss-matches ({check_limit_wrong})!"
+                num == max_allowed
+            ), f"Integration failed for {col}. There are too many ({num}) allowed miss-matches ({check_limit_wrong})!"
         # Actual integration
         tb[col] = tb[col].fillna(tb[f"{col}__bo"])
         tb = tb.drop(columns=[f"{col}__bo"])
@@ -749,7 +813,7 @@ def make_table_with_birth_order(tb, cols_index, core_indicators, col_bo="birth_o
     return tb
 
 
-def consolidate_table_from_list(tbs, cols_index_out, short_name, fcn=None) -> geo.Table:
+def consolidate_table_from_list(tbs, cols_index_out, short_name, fcn=None, formatting=True) -> geo.Table:
     ## Sanity check: no column is named the same
     _sanity_check_colnames(tbs, cols_index_out)
 
@@ -761,7 +825,8 @@ def consolidate_table_from_list(tbs, cols_index_out, short_name, fcn=None) -> ge
         tb = fcn(tb)
 
     # Format
-    tb = tb.format(cols_index_out, short_name=short_name)
+    if formatting:
+        tb = tb.format(cols_index_out, short_name=short_name)
     return tb
 
 
