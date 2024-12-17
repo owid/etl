@@ -875,6 +875,10 @@ steps:
     - data://garden/imf/2024-11-25/world_economic_outlook
 
 
+  data://meadow/atus/2024-12-10/atus_0323:
+    - snapshot://atus/2024-12-10/atus_who.zip
+
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
