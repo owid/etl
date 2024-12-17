@@ -1,4 +1,6 @@
+import hashlib
 import json
+import random
 from contextlib import contextmanager
 from copy import deepcopy
 from pathlib import Path
@@ -22,7 +24,7 @@ HORIZONTAL_STYLE = """<style class="hide-element">
         The selector for >.element-container is necessary to avoid selecting the whole
         body of the streamlit app, which is also a stVerticalBlock.
     */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) {{
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) {{
         display: flex;
         flex-direction: row !important;
         flex-wrap: wrap;
@@ -31,17 +33,17 @@ HORIZONTAL_STYLE = """<style class="hide-element">
         justify-content: {justify_content};
     }}
     /* Override the default width of selectboxes in horizontal layout */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) select {{
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) select {{
         min-width: 200px;  /* Set a minimum width for selectboxes */
         max-width: 400px;  /* Optional: Set a max-width to avoid overly wide selectboxes */
     }}
     /* Buttons and their parent container all have a width of 704px, which we need to override */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) div {{
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) div {{
         width: max-content !important;
     }}
     /* Just an example of how you would style buttons, if desired */
     /*
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) button {{
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) button {{
         border-color: red;
     }}
     */
@@ -49,12 +51,23 @@ HORIZONTAL_STYLE = """<style class="hide-element">
 """
 
 
+def _generate_6char_hash():
+    random_input = str(random.random()).encode()  # Random input as bytes
+    hash_object = hashlib.sha256(random_input)  # Generate hash
+    return hash_object.hexdigest()[:6]  # Return first 6 characters of the hash
+
+
 @contextmanager
 def st_horizontal(vertical_alignment="baseline", justify_content="flex-start"):
-    h_style = HORIZONTAL_STYLE.format(vertical_alignment=vertical_alignment, justify_content=justify_content)
+    hash_string = _generate_6char_hash()
+    h_style = HORIZONTAL_STYLE.format(
+        hash=hash_string,
+        vertical_alignment=vertical_alignment,
+        justify_content=justify_content,
+    )
     st.markdown(h_style, unsafe_allow_html=True)
     with st.container():
-        st.markdown('<span class="hide-element horizontal-marker"></span>', unsafe_allow_html=True)
+        st.markdown(f'<span class="hide-element horizontal-marker-{hash_string}"></span>', unsafe_allow_html=True)
         yield
 
 
