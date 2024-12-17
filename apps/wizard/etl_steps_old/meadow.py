@@ -10,7 +10,7 @@ from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps.utils import load_datasets
+from apps.wizard.etl_steps_old.utils import load_datasets
 from etl.paths import BASE_DIR, DAG_DIR
 from etl.steps import load_from_uri
 
