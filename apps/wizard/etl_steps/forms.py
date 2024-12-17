@@ -171,7 +171,6 @@ class DataForm(StepForm):
     namespace_custom: Optional[str] = None  # Custom
     short_name: str
     version: str
-    add_to_dag: bool
     dag_file: str
     is_private: bool
     # Only in Garden
@@ -187,8 +186,6 @@ class DataForm(StepForm):
 
     def __init__(self: Self, **data: Any) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
-        data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
-
         # Handle custom namespace
         if ("namespace_custom" in data) and data["namespace_custom"] is not None:
             data["namespace"] = str(data["namespace_custom"])
