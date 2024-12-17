@@ -160,7 +160,7 @@ class Dataset:
         name: str,
         reset_index: bool = True,
         safe_types: bool = True,
-        reset_metadata: bool = False,
+        reset_metadata: Optional[Union[bool, str]] = False,  # Allow "keep_origins" as a valid option
     ) -> tables.Table:
         """Read dataset's table from disk. Alternative to ds[table_name], but
         with more options to optimize the reading.
@@ -169,8 +169,10 @@ class Dataset:
             large datasets with multi-indexes much faster.
         :param safe_types: If true, convert numeric columns to Float64 and Int64 and categorical
             columns to string[pyarrow]. This can significantly increase memory usage.
-        :param reset_metadata: If true, reset table and columns metadata. This is useful for loading
-            datasets like population which could pollute the metadata with irrelevant information.
+        :param reset_metadata:
+            - If True, reset table and columns metadata.
+            - If "keep_origins", reset metadata but retain the 'origins' attribute for columns.
+            - If False, leave metadata unchanged.
         """
         stem = self.path / Path(name)
 
@@ -181,10 +183,15 @@ class Dataset:
                 t.metadata.dataset = self.metadata
                 if safe_types:
                     t = cast(tables.Table, to_safe_types(t))
-                if reset_metadata:
+                if reset_metadata:  # Handles True and "keep_origins"
                     t.metadata = TableMeta()
                     for col in t.columns:
-                        t[col].metadata = VariableMeta()
+                        if reset_metadata == "keep_origins":
+                            origins = t[col].metadata.origins if hasattr(t[col].metadata, "origins") else None
+                            t[col].metadata = VariableMeta()
+                            t[col].metadata.origins = origins  # Preserve 'origins' attribute
+                        else:  # True case: reset all metadata
+                            t[col].metadata = VariableMeta()
                 return t
 
         raise KeyError(f"Table `{name}` not found, available tables: {', '.join(self.table_names)}")
