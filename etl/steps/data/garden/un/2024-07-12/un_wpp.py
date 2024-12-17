@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     tb_median_age = ds_meadow["median_age"].reset_index()
     tb_le = ds_meadow["life_expectancy"].reset_index()
     tb_mortality = ds_meadow["mortality_rate"].reset_index()
-    # tb_childbearing_age = ds_meadow["childbearing_age"].reset_index()
+    tb_childbearing_age = ds_meadow["mean_age_childbearing"].reset_index()
 
     #
     # Process data.
@@ -106,6 +106,11 @@ def run(dest_dir: str) -> None:
     tb_mortality = process_mortality(tb_mortality)
     tb_mortality = set_variant_to_estimates(tb_mortality)
     tb_mortality = tb_mortality.format(COLUMNS_INDEX)
+
+    ## Mean age at childbearing
+    tb_childbearing_age = process_standard(tb_childbearing_age)
+    tb_childbearing_age = set_variant_to_estimates(tb_childbearing_age)
+    tb_childbearing_age = tb_childbearing_age.format(COLUMNS_INDEX)
 
     # Build tables list for dataset
     tables = [
