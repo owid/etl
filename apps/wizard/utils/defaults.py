@@ -1,7 +1,6 @@
 import json
 from typing import Any, Dict
 
-from apps.wizard.utils.step_form import StepForm
 from etl.paths import BASE_DIR
 
 # PATH WIZARD CONFIG
