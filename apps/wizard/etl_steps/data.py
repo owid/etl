@@ -181,6 +181,7 @@ def render_step_selection():
         return False
 
 
+@st.fragment()
 def render_form():
     """Render form."""
     col1, col2, col3 = st.columns([2, 2, 1])
