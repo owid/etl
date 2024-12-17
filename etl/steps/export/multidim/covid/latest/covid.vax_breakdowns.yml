@@ -23,13 +23,13 @@ dimensions:
         name: Manufacturer
         description: null
 
-
 views:
   - dimensions:
       breakdown: income_group
     indicators:
       y: "grapher/covid/latest/vaccinations_global/vaccinations_global#total_vaccinations_per_hundred"
     config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       addCountryMode: "disabled"
       selectedEntityNames:
         - High-income countries
@@ -55,6 +55,7 @@ views:
         - "{definitions.table}#total_vaccinations__vaccine_skycovione"
         - "{definitions.table}#total_vaccinations__vaccine_valneva"
     config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       chartTypes: ["StackedArea"]
       selectedEntityNames:
         - European Union (27)

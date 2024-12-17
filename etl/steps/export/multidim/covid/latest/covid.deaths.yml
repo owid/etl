@@ -1,6 +1,7 @@
 definitions:
   table: grapher/covid/latest/cases_deaths/cases_deaths
   config: &config
+    $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
     tab: map
     originUrl: ourworldindata.org/coronavirus
     hideAnnotationFieldsInTitle:
