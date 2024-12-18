@@ -1,0 +1,44 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Antibiotics
+    description_key:
+      - The pathogen and antimicrobial pairs that were tested for resistance can be found on pages 51-52 in the [Supplementary Materials (part 1)](#https://www.thelancet.com/cms/10.1016/S0140-6736(24)01867-1/attachment/005e2559-204f-46d7-b2e3-27b2091209aa/mmc1.pdf) of the original publication.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  microbe_amr:
+    variables:
+      amr_attributable_deaths:
+        title: Global neonatal deaths from infections attributed to AMR, by syndrome
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from infections that are attributed to antimicrobial resistance.
+        presentation:
+          title_public: Global neonatal deaths from infections attributed to AMR
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3
+      non_amr_attributable_deaths:
+        title: Global neonatal deaths from infections not attributed to AMR, by syndrome
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from infections not attributed to antimicrobial resistance.
+        presentation:
+          title_public: Global neonatal deaths from infections not attributed to AMR
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3
+      total_deaths:
+        title: Total global neonatal deaths from infections
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from infections.
+        presentation:
+          title_public: Total global neonatal deaths from infections
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3

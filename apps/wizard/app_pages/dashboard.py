@@ -1,6 +1,5 @@
-"""Create a dashboard with the main information about ETL steps, and the possibility to update them.
+"""Create a dashboard with the main information about ETL steps, and the possibility to update them."""
 
-"""
 import subprocess
 from datetime import datetime
 

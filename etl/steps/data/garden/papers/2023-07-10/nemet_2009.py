@@ -1,6 +1,4 @@
-"""Harmonize data from Nemet (2009) paper on cost and capacity of photovoltaic energy.
-
-"""
+"""Harmonize data from Nemet (2009) paper on cost and capacity of photovoltaic energy."""
 
 from owid.catalog import Dataset
 

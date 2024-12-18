@@ -406,6 +406,12 @@ tables:
               - Bangladesh
             originUrl: https://ourworldindata.org/poverty
 
+      poverty_gap_index_215:
+        presentation:
+          title_public: Poverty gap index at $2.15 per day
+          topic_tags:
+            - Poverty
+
       gini:
         presentation:
           title_public: Gini Coefficient

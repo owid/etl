@@ -1,24 +1,18 @@
 meta:
   source:
-    name: Google Sheet
+    name: Smith-Greenaway et al. (2021)
     url: https://gh.bmj.com/content/6/4/e004837.abstract
-    source_data_url: 
+    source_data_url: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vSiCgGTJ8kXoVPpaaskyRz79os2jbWtLbcqk18ybEXI_tsE6WPJy6DH-lXggK_VbHir456mI3D98Jbd/pub?output=csv
-    date_accessed: '2023-09-05'
-    publication_year: '2021'
-    published_by: Google Sheet
+    date_accessed: '2024-11-26'
+    publication_year: 2021
+    published_by: |-
+      Global burden of maternal bereavement: indicators of the cumulative prevalence of child loss. (2021) Emily Smith-Greenaway, Diego Alburez-Gutierrez, Jenny Trinitapoli, Emilio Zagheni.
   name: Global maternal offspring loss - Smith-Greenaway et al. 2021
-  description: This dataset shows survey data and estimates of maternal offspring
-    loss across countries. This includes mothers who have lost an infant, child under
-    5 years old, or offspring. These are given as a rate per 1000 women in the age
-    group. Underlying data comes from large-scale surveys (such as the Demographic
-    and Health Surveys and Multiple Indicator Cluster Surveys) conducted in many low-
-    and middle-income countries. For countries lacking data, these are estimated using
-    an indirect approach that combines formal kinship models and life-table methods
-    in an additional 81 countries.
+  description: |-
+    This dataset shows survey data and estimates of maternal offspring loss across countries. This includes mothers who have lost an infant, child under 5 years old, or offspring. These are given as a rate per 1000 women in the age group. Underlying data comes from large-scale surveys (such as the Demographic and Health Surveys and Multiple Indicator Cluster Surveys) conducted in many low- and middle-income countries. For countries lacking data, these are estimated using an indirect approach that combines formal kinship models and life-table methods in an additional 81 countries. Citation: Smith-Greenaway, E., Alburez-Gutierrez, D., Trinitapoli, J., & Zagheni, E. (2021). Global burden of maternal bereavement: Indicators of the cumulative prevalence of child loss. BMJ Global Health, 6(4), e004837. https://doi.org/10.1136/bmjgh-2020-004837
   license: {}
-wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 7ce7e9d8a371afa038a470f8977d160d
-  size: 8075
-  path: global_maternal_offspring_loss.csv
+  - md5: 7ce7e9d8a371afa038a470f8977d160d
+    size: 8075
+    path: global_maternal_offspring_loss.csv

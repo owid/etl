@@ -19,7 +19,7 @@ Once you've created a PR, the automation user [@owidbot](https://github.com/owid
 - data-diff: Changes introduced in the data compared to PRODUCTION.
 
 <figure markdown="span">
-    <img src="../../assets/pr-1.png" alt="Chart Upgrader" style="width:50%;">
+    <img src="../../assets/pr-1.png" alt="Chart Upgrader" style="width:80%;">
     <figcaption>PR, and [comment by @owidbot](https://github.com/owid/etl/pull/3563#issuecomment-2485397175), as of 19th November 2024</figcaption>
 </figure>
 

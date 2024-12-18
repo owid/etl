@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -259,6 +260,31 @@ def _recursive_get_all_step_dependencies_ndim(
     return dependencies, memo
 
 
+def remove_steps_from_dag(dag: dict, exclude: list[str]) -> dict:
+    """
+    Remove specific steps (either active steps or dependencies) from the DAG.
+
+    This can be useful to ignore auxiliary datasets. The excluded steps can have wildcards:
+    exclude = [
+            "data://garden/demography/.*/population",
+            "data://garden/wb/.*/income_groups",
+        ]
+    """
+
+    # Check if a step matches any exclude pattern.
+    def is_excluded(step: str) -> bool:
+        return any(pattern.match(step) for pattern in [re.compile(pattern) for pattern in exclude])
+
+    # Filter out steps and dependencies that match any element from the excluded list.
+    dag_filtered = {
+        step: {dep for dep in dependencies if not is_excluded(dep)}
+        for step, dependencies in dag.items()
+        if not is_excluded(step)
+    }
+
+    return dag_filtered
+
+
 class VersionTracker:
     """Helper object that loads the dag, provides useful functions to check for versions and dataset dependencies, and
     checks for inconsistencies.
@@ -299,6 +325,7 @@ class VersionTracker:
         warn_on_archivable: bool = True,
         warn_on_unused: bool = True,
         ignore_archive: bool = False,
+        exclude_steps: Optional[list[str]] = None,
     ):
         # Load dag of active steps (a dictionary step: set of dependencies).
         self.dag_active = load_dag(paths.DAG_FILE)
@@ -308,6 +335,13 @@ class VersionTracker:
         else:
             # Load dag of active and archive steps.
             self.dag_all = load_dag(paths.DAG_ARCHIVE_FILE)
+
+        # Optionally exclude certain steps and dependencies.
+        self.exclude_steps = exclude_steps
+        if self.exclude_steps:
+            self.dag_active = remove_steps_from_dag(self.dag_active, self.exclude_steps)
+            self.dag_all = remove_steps_from_dag(self.dag_all, self.exclude_steps)
+
         # Create a reverse dag (a dictionary where each item is step: set of usages).
         self.dag_all_reverse = reverse_graph(graph=self.dag_all)
         # Create a reverse dag (a dictionary where each item is step: set of usages) of active steps.
@@ -446,53 +480,41 @@ class VersionTracker:
         """Get the path to the script of a given step."""
         # Get step attributes.
         _, step_type, _, channel, namespace, version, name, _ = extract_step_attributes(step=step).values()
-        state = "active" if step in self.all_active_steps else "archive"
 
         # Create a dictionary that contains the path to a script for a given step.
         # This dictionary has to keys, namely "active" and "archive".
         # Active steps should have a script in the active directory.
         # But steps that are in the archive dag can be either in the active or the archive directory.
-        path_to_script = {"active": None, "archive": None}
+        path_to_script = None
         if step_type == "export":
-            path_to_script["active"] = paths.STEP_DIR / "export" / channel / namespace / version / name  # type: ignore
+            path_to_script = paths.STEP_DIR / "export" / channel / namespace / version / name  # type: ignore
         elif channel == "snapshot":
-            path_to_script["active"] = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.SNAPSHOTS_DIR_ARCHIVE / namespace / version / name  # type: ignore
+            path_to_script = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
         elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
-            path_to_script["active"] = paths.STEP_DIR / "data" / channel / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.STEP_DIR_ARCHIVE / channel / namespace / version / name  # type: ignore
+            path_to_script = paths.STEP_DIR / "data" / channel / namespace / version / name  # type: ignore
         elif channel == "walden":
-            path_to_script["active"] = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
-            path_to_script["archive"] = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
+            path_to_script = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
         elif channel in ["backport", "etag"]:
             # Ignore these channels, for which there is never a script.
             return None
         else:
             log.error(f"Unknown channel {channel} for step {step}.")
 
-        if state == "active":
-            # Steps in the active dag should only have a script in the active directory.
-            del path_to_script["archive"]
-
         path_to_script_detected = None
-        for state in path_to_script:
-            # A step script can exist either as a .py file, as a .ipynb file, or a __init__.py file inside a folder.
-            # In the case of snapshots, there may or may not be a .py file, but there definitely needs to be a dvc file.
-            # In that case, the corresponding script is not trivial to find, but at least we can return the dvc file.
-            for path_to_script_candidate in [
-                path_to_script[state].with_suffix(".py"),  # type: ignore
-                path_to_script[state].with_suffix(".ipynb"),  # type: ignore
-                path_to_script[state] / "__init__.py",  # type: ignore
-                path_to_script[state].with_name(path_to_script[state].name + ".dvc"),  # type: ignore
-            ]:
-                if path_to_script_candidate.exists():
-                    path_to_script_detected = path_to_script_candidate
-                    break
+        # A step script can exist either as a .py file, as a .ipynb file, or a __init__.py file inside a folder.
+        # In the case of snapshots, there may or may not be a .py file, but there definitely needs to be a dvc file.
+        # In that case, the corresponding script is not trivial to find, but at least we can return the dvc file.
+        for path_to_script_candidate in [
+            path_to_script.with_suffix(".py"),  # type: ignore
+            path_to_script.with_suffix(".ipynb"),  # type: ignore
+            path_to_script / "__init__.py",  # type: ignore
+            path_to_script.with_name(path_to_script.name + ".dvc"),  # type: ignore
+        ]:
+            if path_to_script_candidate.exists():
+                path_to_script_detected = path_to_script_candidate
+                break
         if path_to_script_detected is None:
-            if state == "active":
-                log.error(f"Script for step {step} not found.")
-            else:
-                log.warning(f"Script for archive step {step} not found.")
+            log.error(f"Script for step {step} not found.")
 
         if omit_base_dir and path_to_script_detected is not None:
             # Return the path relative to the base directory (omitting the local path to the ETL repos).
@@ -633,14 +655,14 @@ class VersionTracker:
         ] = UpdateState.ARCHIVABLE.value
 
         # There are special steps that, even though they are archivable or unused, we want to keep in the active dag.
-        steps_active_df.loc[
-            steps_active_df["step"].isin(self.ARCHIVABLE_STEPS_TO_KEEP), "update_state"
-        ] = UpdateState.UP_TO_DATE.value
+        steps_active_df.loc[steps_active_df["step"].isin(self.ARCHIVABLE_STEPS_TO_KEEP), "update_state"] = (
+            UpdateState.UP_TO_DATE.value
+        )
 
         # All explorers and external steps should be considered up to date.
-        steps_active_df.loc[
-            steps_active_df["channel"].isin(["explorers", "external"]), "update_state"
-        ] = UpdateState.UP_TO_DATE.value
+        steps_active_df.loc[steps_active_df["channel"].isin(["explorers", "external"]), "update_state"] = (
+            UpdateState.UP_TO_DATE.value
+        )
 
         # Add update state to archived steps.
         steps_inactive_df["update_state"] = UpdateState.ARCHIVED.value

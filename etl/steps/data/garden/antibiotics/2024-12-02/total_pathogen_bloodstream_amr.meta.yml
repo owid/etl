@@ -1,0 +1,42 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Antibiotics
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  total_pathogen_bloodstream_amr:
+    variables:
+      amr_attributable_deaths:
+        title: Total deaths from bloodstream infections attributed to AMR, by pathogen
+        unit: deaths
+        description_short: Estimated number of deaths from bloodstream infections that are attributed to antimicrobial resistance.
+        presentation:
+          title_public: Total deaths from bloodstream infections attributed to AMR, by pathogen
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3
+      non_amr_attributable_deaths:
+        title: Total global deaths from bloodstream infections not attributed to AMR, by pathogen
+        unit: deaths
+        description_short: Estimated number of deaths from bloodstream infections that are not attributed to antimicrobial resistance.
+        presentation:
+          title_public: Total global deaths from bloodstream infections not attributed to AMR, by pathogen
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3
+      total_deaths:
+        title: Total global deaths from bloodstream infections
+        unit: deaths
+        description_short: Estimated number of deaths from bloodstream infections.
+        presentation:
+          title_public: Total global deaths from bloodstream infections
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3

@@ -3,6 +3,7 @@
 references:
 - https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps#build-a-chatgpt-like-app
 """
+
 from typing import Any, Dict, cast
 
 import streamlit as st
@@ -33,7 +34,7 @@ log = get_logger()
 
 # CONFIG
 ## Title/subtitle
-st.title("**Expert** 🧙")
+st.title(":rainbow[:material/lightbulb_2:] Expert")
 st.markdown(
     "Ask the Expert any questions about ETL! Alternatively, visit [**our documentation ↗**](https://docs.owid.io/projects/etl])."
 )
@@ -130,6 +131,8 @@ def reset_messages() -> None:
     )
 
 
+container_chat = st.container()
+
 # Category for the chat
 options = [
     Options.FULL,
@@ -139,14 +142,9 @@ options = [
     Options.GUIDES,
     Options.PRINCIPLES,
 ]
-# captions = [
-#     "The most complete chat. Use all our documentation.",
-#     "Specific queries about the metadata, yaml files, etc.",
-#     "Create SQL queries on our Datasette instance.",
-#     "Specific queries about setting up your environment.",
-# ]
 # NOTE: using pills is a good viz (https://github.com/jrieke/streamlit-pills). however, existing tool does not have an on_change options, which is basic if we want to reset some values from session_state
 with st.container(border=True):
+    st.markdown("**Settings**")
     st.radio(
         label="Choose a category for the question",
         options=options,
@@ -157,60 +155,73 @@ with st.container(border=True):
         horizontal=True,
     )
 
-## EXAMPLE QUERIES
-if st.session_state["category_gpt"] == Options.DATASETTE:
-    EXAMPLE_QUERIES = [
-        "> Which are our top 10 articles by pageviews?",
-        "> How many charts do we have that use only a single indicator?",
-        "> Do we have datasets whose indicators are not used in any chart?",
-    ]
-else:
-    EXAMPLE_QUERIES = [
-        "> In the metadata yaml file, which field should I use to disable the map tap view?",
-        "> In the metadata yaml file, how can I define a common `description_processing` that affects all indicators in a specific table?"
-        "> What is the difference between `description_key` and `description_from_producer`? Be concise.",
-        "> Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
-        "> What is the difference between an Origin and Dataset?",
-    ]
-with st.popover("See examples"):
-    for example in EXAMPLE_QUERIES:
-        st.markdown(example)
+    ## EXAMPLE QUERIES
+    if st.session_state["category_gpt"] == Options.DATASETTE:
+        EXAMPLE_QUERIES = [
+            "> Which are our top 10 articles by pageviews?",
+            "> How many charts do we have that use only a single indicator?",
+            "> Do we have datasets whose indicators are not used in any chart?",
+        ]
+    else:
+        EXAMPLE_QUERIES = [
+            "> In the metadata yaml file, which field should I use to disable the map tap view?",
+            "> In the metadata yaml file, how can I define a common `description_processing` that affects all indicators in a specific table?"
+            "> What is the difference between `description_key` and `description_from_producer`? Be concise.",
+            "> Is the following snapshot title correct? 'Cherry Blossom Full Blook Dates in Kyoto, Japan'",
+            "> What is the difference between an Origin and Dataset?",
+        ]
+    with st.popover("See examples"):
+        for example in EXAMPLE_QUERIES:
+            st.markdown(example)
 
-# Sidebar with GPT config
-st.session_state.analytics = st.session_state.get("analytics", True)
-with st.sidebar:
+    # Sidebar with GPT config
+    st.session_state.analytics = st.session_state.get("analytics", True)
+    # with st.container():
+    st.divider()
     st.button(
         label="Clear chat",
         on_click=reset_messages,
     )
-    st.divider()
-    st.toggle(
-        label="Collect data for analytics",
-        value=True,
-        on_change=lambda: set_states(
-            {
-                "analytics": not st.session_state.analytics,
-            }
-        ),
-        help="If enabled, we will collect usage data to improve the app. \n\nThis **is really helpful to improve** how we query chat GPT: E.g. which system prompt to use, optimise costs, and much more 😊. \n\nData collected: questions, responses and feedback submitted. \n\nYou can see how this data is collected [here](https://github.com/owid/etl/blob/master/apps/wizard/utils/db.py). \n\nRecords are anonymous.",
-    )
-    st.divider()
-    st.markdown("## GPT Configuration")
-    model_name = st.selectbox(
-        label="Select GPT model",
-        options=MODELS_AVAILABLE_LIST,
-        format_func=lambda x: MODELS_AVAILABLE[x],
-        index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
-        help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
-    )
+    # st.divider()
+    # st.toggle(
+    #     label="Collect data for analytics",
+    #     value=True,
+    #     on_change=lambda: set_states(
+    #         {
+    #             "analytics": not st.session_state.analytics,
+    #         }
+    #     ),
+    #     help="If enabled, we will collect usage data to improve the app. \n\nThis **is really helpful to improve** how we query chat GPT: E.g. which system prompt to use, optimise costs, and much more 😊. \n\nData collected: questions, responses and feedback submitted. \n\nYou can see how this data is collected [here](https://github.com/owid/etl/blob/master/apps/wizard/utils/db.py). \n\nRecords are anonymous.",
+    # )
+    col1, col2, col3 = st.columns(3, vertical_alignment="center")
+    with col1:
+        model_name = st.selectbox(
+            label="Select GPT model",
+            options=MODELS_AVAILABLE_LIST,
+            format_func=lambda x: MODELS_AVAILABLE[x],
+            index=MODELS_AVAILABLE_LIST.index(MODEL_DEFAULT),
+            help="[Pricing](https://openai.com/api/pricing) | [Model list](https://platform.openai.com/docs/models/)",
+        )
     ## See pricing list: https://openai.com/api/pricing (USD)
     ## See model list: https://platform.openai.com/docs/models/
+    with col2:
+        max_tokens = int(
+            st.number_input(
+                "Max tokens",
+                min_value=32,
+                max_value=4096,
+                value=4096,
+                step=32,
+                help="The maximum number of tokens in the response.",
+            )
+        )
 
-    use_reduced_context = st.toggle(
-        "Reduced context window",
-        value=False,
-        help="If checked, only the last user message will be accounted (i.e less tokens and therefore cheaper).",
-    )
+    with col3:
+        use_reduced_context = st.toggle(
+            "Reduced context window",
+            value=False,
+            help="If checked, only the last user message will be accounted (i.e less tokens and therefore cheaper).",
+        )
     temperature = st.slider(
         "Temperature",
         min_value=0.0,
@@ -219,94 +230,94 @@ with st.sidebar:
         step=0.01,
         help="What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.",
     )
-    max_tokens = int(
-        st.number_input(
-            "Max tokens",
-            min_value=32,
-            max_value=4096,
-            value=4096,
-            step=32,
-            help="The maximum number of tokens in the response.",
-        )
-    )
 
-# API with OPENAI
-api = OpenAIWrapper()
+with container_chat:
+    # API with OPENAI
+    api = OpenAIWrapper()
 
-# ACTUAL APP
-# Initialize chat history
-if "messages" not in st.session_state:
-    reset_messages()
+    # ACTUAL APP
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        reset_messages()
 
-# DEGUG
-# st.write([m for m in st.session_state.messages if m["role"] != "system"])
+    # DEGUG
+    # st.write([m for m in st.session_state.messages if m["role"] != "system"])
 
-# Display chat messages from history on app rerun
-for message in st.session_state.messages:
-    if message["role"] != "system":
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        if message["role"] != "system":
+            avatar = None
+            if message["role"] == "user":
+                avatar = ":material/person:"
+            with st.chat_message(message["role"], avatar=avatar):
+                st.markdown(message["content"])
 
-# Initialise session state
-st.session_state.response = st.session_state.get("response", None)
-st.session_state.prompt = st.session_state.get("prompt", None)
-st.session_state.feedback_key = st.session_state.get("feedback_key", 0)
-st.session_state.cost_last = st.session_state.get("cost_last", 0)
+    # Initialise session state
+    st.session_state.response = st.session_state.get("response", None)
+    st.session_state.prompt = st.session_state.get("prompt", None)
+    st.session_state.feedback_key = st.session_state.get("feedback_key", 0)
+    st.session_state.cost_last = st.session_state.get("cost_last", 0)
 
-# React to user input
-if prompt := st.chat_input("Ask me!"):
-    st.session_state.feedback_key += 1
-    print("asking GPT...")
-    # Display user message in chat message container
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    # Placeholder for response
+    container_response = st.container()
 
-    # Add user message to chat history
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    # React to user input
+    if prompt := st.chat_input("Ask me any question!"):
+        st.session_state.feedback_key += 1
+        print("asking GPT...")
+        # Display user message in chat message container
+        with container_response:
+            with st.chat_message("user", avatar=":material/person:"):
+                st.markdown(prompt)
 
-    # Build GPT query (only use the system prompt and latest user input)
-    if use_reduced_context:
-        messages = [{"role": "system", "content": get_system_prompt()}, {"role": "user", "content": prompt}]
-    else:
-        messages = st.session_state.messages
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # Display assistant response in chat message container
-    with st.chat_message("assistant"):
-        # Ask GPT (stream)
-        stream = api.chat.completions.create(
-            model=cast(str, model_name),
-            messages=messages,  # type: ignore
-            temperature=temperature,
-            max_tokens=max_tokens,
-            stream=True,
-        )
-        st.session_state.response = cast(str, st.write_stream(stream))
+        # Build GPT query (only use the system prompt and latest user input)
+        if use_reduced_context:
+            messages = [{"role": "system", "content": get_system_prompt()}, {"role": "user", "content": prompt}]
+        else:
+            messages = st.session_state.messages
 
-        # Add new response by the System
-        st.session_state.messages.append({"role": "assistant", "content": st.session_state.response})
+        # Display assistant response in chat message container
+        with container_response:
+            with st.chat_message("assistant"):
+                # Ask GPT (stream)
+                stream = api.chat.completions.create(
+                    model=cast(str, model_name),
+                    messages=messages,  # type: ignore
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    stream=True,
+                )
+                st.session_state.response = cast(str, st.write_stream(stream))
 
-        # Add prompt to session state
-        st.session_state.prompt = prompt
+            # Add new response by the System
+            st.session_state.messages.append({"role": "assistant", "content": st.session_state.response})
 
-        print("finished asking GPT...")
+            # Add prompt to session state
+            st.session_state.prompt = prompt
 
-if st.session_state.response:
-    # Get cost & tokens
-    text_in = "\n".join([m["content"] for m in st.session_state.messages])
-    cost, num_tokens = get_cost_and_tokens(text_in, st.session_state.response, cast(str, model_name))
-    cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
-    st.session_state.cost_last = cost
+            print("finished asking GPT...")
 
-    if DB_IS_SET_UP and st.session_state.analytics:
-        # Get feedback only if DB is properly setup
-        feedback = streamlit_feedback(
-            feedback_type="thumbs",
-            optional_text_label="[Optional] Please provide an explanation",
-            key=f"feedback_{st.session_state.feedback_key}",
-            on_submit=handle_feedback,
-        )
-    # Show cost below feedback
-    st.info(cost_msg)
+    if st.session_state.response:
+        # Get cost & tokens
+        text_in = "\n".join([m["content"] for m in st.session_state.messages])
+        cost, num_tokens = get_cost_and_tokens(text_in, st.session_state.response, cast(str, model_name))
+        cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
+        st.session_state.cost_last = cost
 
-# DEBUG
-# st.write([m for m in st.session_state.messages if m["role"] != "system"])
+        if DB_IS_SET_UP and st.session_state.analytics:
+            # Get feedback only if DB is properly setup
+            feedback = streamlit_feedback(
+                feedback_type="thumbs",
+                optional_text_label="[Optional] Please provide an explanation",
+                key=f"feedback_{st.session_state.feedback_key}",
+                on_submit=handle_feedback,
+            )
+        # Show cost below feedback
+        with container_response:
+            st.info(cost_msg)
+
+    # DEBUG
+    # st.write([m for m in st.session_state.messages if m["role"] != "system"])

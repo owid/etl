@@ -1,21 +1,16 @@
 meta:
-  namespace: fasttrack
-  short_name: guinea_worm
-  file_extension: csv
-  date_accessed: 2023-06-16
+  source:
+    name: The Carter Center (2023)
+    url: https://www.cartercenter.org/resources/pdfs/news/health_publications/guinea_worm/guinea-worm-cases-by-year-from-1989.pdf
+    source_data_url: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQRR-nQzFpJXWz6cuB9aqrt2yt2Z8BtOtu3eNkF4WvI3xuNEdinb0vCN3wIagy2hEOHiSj3xUAffHeX/pub?output=csv
+    date_accessed: '2024-11-26'
+    publication_year: 2023
+    published_by: The Carter Center (2023)
   name: Guinea Worm Cases - Carter Center (2023)
   description: The number of cases of guinea worm disease worldwide since 1989
-  source_name: Google Sheet
-  url: 
-    https://www.cartercenter.org/resources/pdfs/news/health_publications/guinea_worm/guinea-worm-cases-by-year-from-1989.pdf
-  source_published_by: Google Sheet
-  source_data_url: 
-    https://docs.google.com/spreadsheets/d/e/2PACX-1vQRR-nQzFpJXWz6cuB9aqrt2yt2Z8BtOtu3eNkF4WvI3xuNEdinb0vCN3wIagy2hEOHiSj3xUAffHeX/pub?output=csv
-  is_public: true
-  version: '2023-06-16'
-  publication_year: 2023
-wdir: ../../../data/snapshots/fasttrack/2023-06-16
+  license: {}
 outs:
-- md5: 44af3d83549167d5edde31c323526c19
-  size: 582
-  path: guinea_worm.csv
+  - md5: 44af3d83549167d5edde31c323526c19
+    size: 582
+    path: guinea_worm.csv

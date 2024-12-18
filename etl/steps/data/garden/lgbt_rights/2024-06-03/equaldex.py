@@ -181,9 +181,9 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # NOTE: Correcting data for France in changing_gender to "Legal, surgery required" between 1992 and 2018
-    tb.loc[
-        (tb["country"] == "France") & (tb["year"] >= 1992) & (tb["year"] < 2018), "changing_gender"
-    ] = "Legal, surgery required"
+    tb.loc[(tb["country"] == "France") & (tb["year"] >= 1992) & (tb["year"] < 2018), "changing_gender"] = (
+        "Legal, surgery required"
+    )
 
     # Select only sovereign countries
     tb = select_only_sovereign_countries(tb=tb, tb_sovereign_countries=tb_sovereign_countries)

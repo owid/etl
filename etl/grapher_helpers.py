@@ -2,7 +2,7 @@ import copy
 from dataclasses import dataclass, field, is_dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, Optional, Set, cast
+from typing import Any, Dict, Iterable, List, Literal, Optional, Set, Union, cast
 
 import jinja2
 import numpy as np
@@ -10,20 +10,20 @@ import pandas as pd
 import pymysql
 import sqlalchemy
 import structlog
-from jinja2 import Environment
 from owid import catalog
 from owid.catalog import warnings
-from owid.catalog.utils import underscore
+from owid.catalog.utils import dynamic_yaml_load, dynamic_yaml_to_dict, underscore
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from etl.db import get_engine, read_sql
+from etl.files import yaml_dump
 from etl.grapher_io import add_entity_code_and_name, trim_long_variable_name
 
 log = structlog.get_logger()
 
-jinja_env = Environment(
+jinja_env = jinja2.Environment(
     block_start_string="<%",
     block_end_string="%>",
     variable_start_string="<<",
@@ -32,7 +32,16 @@ jinja_env = Environment(
     comment_end_string="#>",
     trim_blocks=True,
     lstrip_blocks=True,
+    undefined=jinja2.StrictUndefined,
 )
+
+
+# Helper function to raise an error with << raise("uh oh...") >>
+def raise_helper(msg):
+    raise Exception(msg)
+
+
+jinja_env.globals["raise"] = raise_helper
 
 # this might work too pd.api.types.is_integer_dtype(col)
 INT_TYPES = tuple(
@@ -126,7 +135,7 @@ def _yield_wide_table(
         table_to_yield = table_to_yield[[c for c in table_to_yield.columns if c not in dim_names]]
 
         # Filter NaN values from dimensions and return dictionary
-        dim_dict: Dict[str, Any] = {n: v for n, v in zip(dim_names, dim_values) if pd.notnull(v)}
+        dim_dict = _create_dim_dict(dim_names, dim_values)  # type: ignore
 
         # Now iterate over every column in the original dataset and export the
         # subset of data that we prepared above
@@ -163,34 +172,97 @@ def _yield_wide_table(
             tab.metadata.short_name = short_name
             tab.rename(columns={column: short_name}, inplace=True)
 
-            # add info about dimensions to metadata
-            if dim_dict:
-                tab[short_name].metadata.additional_info = {
-                    "dimensions": {
-                        "originalShortName": column,
-                        "originalName": tab[short_name].metadata.title,
-                        "filters": [
-                            {"name": dim_name, "value": sanitize_numpy(dim_value)}
-                            for dim_name, dim_value in dim_dict.items()
-                        ],
-                    }
-                }
-
-            # Add dimensions to title (which will be used as variable name in grapher)
-            if tab[short_name].metadata.title:
-                # We use template as a title
-                if _uses_jinja(tab[short_name].metadata.title):
-                    title_with_dims = _expand_jinja_text(tab[short_name].metadata.title, dim_dict)
-                # Otherwise use default
-                else:
-                    title_with_dims = _title_column_and_dimensions(tab[short_name].metadata.title, dim_dict)
-
-                tab[short_name].metadata.title = title_with_dims
-
-            # traverse metadata and expand Jinja
-            tab[short_name].metadata = _expand_jinja(tab[short_name].metadata, dim_dict)
+            tab[short_name].metadata = _metadata_for_dimensions(tab[short_name].metadata, dim_dict, column)
 
             yield tab
+
+
+def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: str) -> catalog.VariableMeta:
+    """Add dimensions to metadata and expand Jinja in metadata fields."""
+    # add info about dimensions to metadata
+    if dim_dict:
+        meta.additional_info = {
+            "dimensions": {
+                "originalShortName": column,
+                "originalName": meta.title,
+                "filters": [
+                    {"name": dim_name, "value": sanitize_numpy(dim_value)} for dim_name, dim_value in dim_dict.items()
+                ],
+            }
+        }
+
+    # Add dimensions to title (which will be used as variable name in grapher)
+    if meta.title:
+        # We use template as a title
+        if _uses_jinja(meta.title):
+            title_with_dims = _expand_jinja_text(meta.title, dim_dict)
+        # Otherwise use default
+        else:
+            title_with_dims = _title_column_and_dimensions(meta.title, dim_dict)
+
+        meta.title = str(title_with_dims)
+
+    # traverse metadata and expand Jinja
+    try:
+        meta = _expand_jinja(meta, dim_dict)
+    except Exception as e:
+        # Reraise with more context
+        raise ValueError(
+            f"Error expanding Jinja in metadata for column '{column}' with dim values: {dim_dict}.\n\nVariable metadata:\n\n{yaml_dump(meta.to_dict())}"
+        ) from e
+
+    return meta
+
+
+def _create_dim_dict(dim_names: List[str], dim_values: List[Any]) -> Dict[str, Any]:
+    # Filter NaN values from dimensions and return dictionary
+    return {n: v for n, v in zip(dim_names, dim_values) if pd.notnull(v)}
+
+
+def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
+    """Convert a long table to a wide table by unstacking dimensions. This function mimics the process that occurs
+    when a long table is upserted to the database. With this function, you can explicitly perform this transformation
+    in the grapher step and store a flattened dataset in the catalog."""
+
+    dim_names = [k for k in long_tb.primary_key if k not in ("year", "country", "date")]
+
+    # Unstack dimensions to a wide format
+    wide_tb = cast(catalog.Table, long_tb.unstack(level=dim_names))  # type: ignore
+
+    # Drop columns with all NaNs
+    wide_tb = wide_tb.dropna(axis=1, how="all")
+
+    # Get short names and metadata for all columns
+    short_names = []
+    metadatas = []
+    for dims in wide_tb.columns:
+        column = dims[0]
+
+        # Filter NaN values from dimensions and return dictionary
+        dim_dict = _create_dim_dict(dim_names, dims[1:])
+
+        # Create a short name from dimension values
+        short_name = _underscore_column_and_dimensions(column, dim_dict)
+
+        if short_name in short_names:
+            duplicate_short_name_ix = short_names.index(short_name)
+            # raise ValueError(f"Duplicate short name: {short_name} for column: {column} and dimensions: {dim_dict}")
+            duplicate_dim_dict = dict(zip(dim_names, wide_tb.columns[duplicate_short_name_ix][1:]))
+            raise ValueError(
+                f"Duplicate short name for column '{column}' with dim values:\n{duplicate_dim_dict}\n{dim_dict}"
+            )
+
+        short_names.append(short_name)
+
+        # Create metadata for the column from dimensions
+        metadatas.append(_metadata_for_dimensions(long_tb[dims[0]].metadata.copy(), dim_dict, column))
+
+    # Set column names to new short names and use proper metadata
+    wide_tb.columns = short_names
+    for col, meta in zip(wide_tb.columns, metadatas):
+        wide_tb[col].metadata = meta
+
+    return wide_tb
 
 
 def _uses_jinja(text: Optional[str]):
@@ -204,19 +276,29 @@ def _cached_jinja_template(text: str) -> jinja2.environment.Template:
     return jinja_env.from_string(text)
 
 
-def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> str:
+def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> Union[str, bool]:
     if not _uses_jinja(text):
         return text
 
     try:
-        return _cached_jinja_template(text).render(dim_dict)
+        # NOTE: we're stripping the result to avoid trailing newlines
+        out = _cached_jinja_template(text).render(dim_dict).strip()
+        # Convert strings to booleans. Getting boolean directly from Jinja is not possible
+        if out in ("false", "False", "FALSE"):
+            return False
+        elif out in ("true", "True", "TRUE"):
+            return True
+        return out
     except jinja2.exceptions.TemplateSyntaxError as e:
         new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
         raise e.__class__(new_message, e.lineno, e.name, e.filename) from e
+    except jinja2.exceptions.UndefinedError as e:
+        new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
+        raise e.__class__(new_message) from e
 
 
 def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
-    """Expand Jinja in all metadata fields."""
+    """Expand Jinja in all metadata fields. This modifies the original object in place."""
     if obj is None:
         return None
     elif isinstance(obj, str):
@@ -231,6 +313,33 @@ def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
         return {k: _expand_jinja(v, dim_dict) for k, v in obj.items()}
     else:
         return obj
+
+
+def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[str, Any]:
+    """Load YAML file and render Jinja in all fields. Return a dictionary.
+
+    Usage:
+        from etl import grapher_helpers as gh
+        from etl import paths
+
+        tb = Dataset(paths.DATA_DIR / "garden/who/2024-07-30/ghe")['ghe']
+        gh.render_variable_meta(tb.my_col.m, dim_dict={"sex": "male"})
+    """
+    meta = dynamic_yaml_to_dict(dynamic_yaml_load(path))
+    return _expand_jinja(meta, dim_dict)
+
+
+def render_variable_meta(meta: catalog.VariableMeta, dim_dict: Dict[str, str]) -> catalog.VariableMeta:
+    """Render Jinja in all fields of VariableMeta. Return a new VariableMeta object.
+
+    Usage:
+        # Create a playground.ipynb next to YAML file and run this in notebook
+        from etl import grapher_helpers as gh
+        m = gh.render_yaml_file("ghe.meta.yml", dim_dict={"sex": "male"})
+        m['tables']['ghe']['variables']['death_count']
+    """
+    # TODO: move this as a method to VariableMeta class
+    return _expand_jinja(meta.copy(), dim_dict)
 
 
 def _title_column_and_dimensions(title: str, dim_dict: Dict[str, Any]) -> str:
@@ -525,7 +634,7 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
     variable_titles_counts = variable_titles.value_counts()
     assert (
         variable_titles_counts.empty or variable_titles_counts.max() == 1
-    ), f"Variable titles are not unique ({variable_titles_counts[variable_titles_counts > 1].index})."
+    ), f"Variable titles are not unique:\n{variable_titles_counts[variable_titles_counts > 1].index}."
 
     # Remember original dimensions
     dim_names = [n for n in table.index.names if n and n not in ("year", "date", "entity_id", "country")]

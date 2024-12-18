@@ -1,4 +1,5 @@
 """Handle submission of chart updates."""
+
 from http.client import RemoteDisconnected
 from typing import Dict, List
 from urllib.error import URLError
@@ -9,8 +10,9 @@ from structlog import get_logger
 
 import etl.grapher_model as gm
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.utils import set_states, st_page_link, st_toast_error
+from apps.wizard.utils import set_states
 from apps.wizard.utils.cached import get_grapher_user_id
+from apps.wizard.utils.components import st_toast_error, st_wizard_page_link
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
 from etl.helpers import get_schema_from_url
@@ -133,7 +135,7 @@ def push_new_charts(charts: List[gm.Chart]) -> None:
         st.success(
             "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
         )
-        st_page_link("chart-diff")
+        st_wizard_page_link("chart-diff")
 
 
 def save_variable_mapping(

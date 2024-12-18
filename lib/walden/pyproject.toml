@@ -37,7 +37,7 @@ dev-dependencies = [
     "jupyter_nbextensions_configurator>=0.4.1",
     "types-PyYAML>=6.0.5",
     "pyright==1.1.373",
-    "ruff==0.1.6",
+    "ruff==0.8.2",
 ]
 
 [tool.uv.sources]

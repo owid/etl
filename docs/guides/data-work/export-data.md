@@ -31,101 +31,93 @@ ds_explorer.save()
 
 Multi-dimensional indicators are powered by a configuration that is typically created from a YAML file. The structure of the YAML file looks like this:
 
-```yaml title="etl/steps/export/multidim/covid/latest/covid.deaths.yaml"
-definitions:
-  table: {definitions.table}
-
+```yaml title="etl/steps/export/multidim/energy/latest/energy_prices.yaml"
 title:
-  title: COVID-19 deaths
-  titleVariant: by interval
+  title: "Energy prices"
+  titleVariant: "by energy source"
 defaultSelection:
-  - World
-  - Europe
-  - Asia
+  - "European Union (27)"
 topicTags:
-  - COVID-19
-
+  - "Energy"
 dimensions:
-  - slug: interval
-    name: Interval
+  - slug: "frequency"
+    name: "Frequency"
     choices:
-      - slug: weekly
-        name: Weekly
-        description: null
-      - slug: biweekly
-        name: Biweekly
-        description: null
-
-  - slug: metric
-    name: Metric
+      - slug: "annual"
+        name: "Annual"
+        description: "Annual data"
+      - slug: "monthly"
+        name: "Monthly"
+        description: "Monthly data"
+  - slug: "source"
+    name: "Energy source"
     choices:
-      - slug: absolute
-        name: Absolute
-        description: null
-      - slug: per_capita
-        name: Per million people
-        description: null
-      - slug: change
-        name: Change from previous interval
-        description: null
-
+      - slug: "electricity"
+        name: "Electricity"
+      - slug: "gas"
+        name: "Gas"
+  - slug: "unit"
+    name: "Unit"
+    choices:
+      - slug: "euro"
+        name: "Euro"
+        description: "Price in euros"
+      - slug: "pps"
+        name: "PPS"
+        description: "Price in Purchasing Power Standard"
 views:
-  - dimensions:
-      interval: weekly
-      metric: absolute
-    indicators:
-      y: "{definitions.table}#weekly_deaths"
-  - dimensions:
-      interval: weekly
-      metric: per_capita
-    indicators:
-      y: "{definitions.table}#weekly_deaths_per_million"
-  - dimensions:
-      interval: weekly
-      metric: change
-    indicators:
-      y: "{definitions.table}#weekly_pct_growth_deaths"
+  # Views will be filled out programmatically.
+  []
 
-  - dimensions:
-      interval: biweekly
-      metric: absolute
-    indicators:
-      y: "{definitions.table}#biweekly_deaths"
-  - dimensions:
-      interval: biweekly
-      metric: per_capita
-    indicators:
-      y: "{definitions.table}#biweekly_deaths_per_million"
-  - dimensions:
-      interval: biweekly
-      metric: change
-    indicators:
-      y: "{definitions.table}#biweekly_pct_growth_deaths"
 ```
 
-The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically. However, it's a good idea to create a few of them manually to start.
+The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.multidim.generate_views_for_dimensions`).
 
 You can also combine manually defined views with generated ones. See the `etl.multidim` module for available helper functions or refer to examples from `etl/steps/export/multidim/`. Feel free to add or modify the helper functions as needed.
 
-The export step loads the YAML file, adds `views` to the config, and then calls the function.
+The export step loads the data dependencies and the config YAML file, adds `views` to the config, and then pushes the configuration to the database.
 
-```python title="etl/steps/export/multidim/covid/latest/covid.py"
+```python title="etl/steps/export/multidim/energy/latest/energy_prices.py"
 def run(dest_dir: str) -> None:
-    engine = get_engine()
+    #
+    # Load inputs.
+    #
+    # Load data on energy prices.
+    ds_grapher = paths.load_dataset("energy_prices")
 
-    # Load YAML file
-    config = paths.load_mdim_config("covid.deaths.yaml")
+    # Read table of prices in euros.
+    tb_annual = ds_grapher.read("energy_prices_annual")
+    tb_monthly = ds_grapher.read("energy_prices_monthly")
 
-    multidim.upsert_multidim_data_page("mdd-energy", config, engine)
+    #
+    # Process data.
+    #
+    # Load configuration from adjacent yaml file.
+    config = paths.load_mdim_config()
+
+    # Create views.
+    config["views"] = multidim.generate_views_for_dimensions(
+        dimensions=config["dimensions"],
+        tables=[tb_annual, tb_monthly],
+        dimensions_order_in_slug=("frequency", "source", "unit"),
+        warn_on_missing_combinations=False,
+        additional_config={"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"},
+    )
+
+    #
+    # Save outputs.
+    #
+    multidim.upsert_multidim_data_page(slug="mdd-energy-prices", config=config, engine=get_engine())
+
 ```
 
 To see the multi-dimensional indicator in Admin, run
 
 ```bash
-etlr export://multidim/energy/latest/energy --export
+etlr export://multidim/energy/latest/energy_prices --export
 ```
 
-and check out the preview at http://staging-site-my-branch/admin/grapher/mdd-name.
+and check out the preview at: http://staging-site-my-branch/admin/grapher/mdd-energy-prices
 
 
 ## Exporting data to GitHub

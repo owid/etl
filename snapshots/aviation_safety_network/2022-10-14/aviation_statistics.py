@@ -1,6 +1,4 @@
-"""Get data from the Aviation Safety Network (extracted from a Google Sheet).
-
-"""
+"""Get data from the Aviation Safety Network (extracted from a Google Sheet)."""
 
 import click
 import pandas as pd

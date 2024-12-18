@@ -259,7 +259,14 @@ def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
 
 
 def _omit_nullable_values(d: dict) -> dict:
-    return {k: v for k, v in d.items() if v is not None and (isinstance(v, list) and len(v) or not pd.isna(v))}
+    out = {}
+    for k, v in d.items():
+        if isinstance(v, list):
+            if len(v) > 0:
+                out[k] = v
+        elif v is not None and not pd.isna(v):
+            out[k] = v
+    return out
 
 
 def filter_out_fields_in_metadata_for_checksum(meta: Dict[str, Any]) -> Dict[str, Any]:

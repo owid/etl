@@ -2,54 +2,35 @@ dataset:
   title: Survey attitudes to livestock farming (Oklahoma University)
   description: ''
   licenses:
-  - {}
-  sources:
-  - name: Food Demand Survey, Oklahoma State University
-    url: https://web.archive.org/web/20190806000018/http://agecon.okstate.edu/files/january%202018.pdf
-    publication_year: '2018'
-    published_by: Oklahoma State University, Department of Agricultural Economics
+    - {}
 tables:
   survey_livestock_oklahoma:
     variables:
       strongly_agree:
-        title: strongly_agree
+        title: Strongly agree
         unit: ''
         short_unit: '%'
-        display:
-          name: Strongly agree
       agree:
-        title: agree
+        title: Agree
         unit: ''
         short_unit: '%'
-        display:
-          name: Agree
       somewhat_agree:
-        title: somewhat_agree
+        title: Somewhat agree
         unit: ''
         short_unit: '%'
-        display:
-          name: Somewhat agree
       no_opinion:
-        title: no_opinion
+        title: No opinion
         unit: ''
         short_unit: '%'
-        display:
-          name: No opinion
       somewhat_disagree:
-        title: somewhat_disagree
+        title: Somewhat disagree
         unit: ''
         short_unit: '%'
-        display:
-          name: Somewhat disagree
       disagree:
-        title: disagree
+        title: Disagree
         unit: ''
         short_unit: '%'
-        display:
-          name: Disagree
       strongly_disagree:
-        title: strongly_disagree
+        title: Strongly disagree
         unit: ''
         short_unit: '%'
-        display:
-          name: Strongly disagree

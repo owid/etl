@@ -20,8 +20,8 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     tables = [
-        tb_garden,
         tb_garden_ratio,
+        tb_garden,
     ]
 
     # Create a new grapher dataset with the same metadata as the garden dataset.

@@ -117,7 +117,8 @@ def filter_to_subgraph(
     if exact_match:
         included = set(includes) & all_steps
     else:
-        included = {s for s in all_steps if any(re.findall(pattern, s) for pattern in includes)}
+        compiled_includes = [re.compile(p) for p in includes]
+        included = {s for s in all_steps if any(p.search(s) for p in compiled_includes)}
 
     if only:
         # Only include explicitly selected nodes
@@ -352,14 +353,14 @@ def load_from_uri(uri: str) -> catalog.Dataset | Snapshot | WaldenDataset:
         try:
             dataset = Snapshot(path)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Snapshot not found for URI '{uri}'. You may want to run `python {path}` first")
+            raise FileNotFoundError(f"Snapshot not found for URI '{uri}'. Please run `python snapshot {path}` first")
     # Data
     else:
         path = f"{attributes['channel']}/{attributes['namespace']}/{attributes['version']}/{attributes['name']}"
         try:
             dataset = catalog.Dataset(paths.DATA_DIR / path)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Dataset not found for URI '{uri}'. You may want to run `etl {uri}` first")
+            raise FileNotFoundError(f"Dataset not found for URI '{uri}'. Please run `etlr {uri}` first")
     return dataset
 
 
@@ -369,14 +370,11 @@ class Step(Protocol):
     version: str
     dependencies: List["Step"]
 
-    def run(self) -> None:
-        ...
+    def run(self) -> None: ...
 
-    def is_dirty(self) -> bool:
-        ...
+    def is_dirty(self) -> bool: ...
 
-    def checksum_output(self) -> str:
-        ...
+    def checksum_output(self) -> str: ...
 
     def __str__(self) -> str:
         raise NotImplementedError()

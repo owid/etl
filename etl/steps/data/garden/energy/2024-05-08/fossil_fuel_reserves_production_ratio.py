@@ -1,6 +1,4 @@
-"""Load Statistical Review of World Energy and create variables of reserves-to-production ratios of fossil fuels.
-
-"""
+"""Load Statistical Review of World Energy and create variables of reserves-to-production ratios of fossil fuels."""
 
 from owid.catalog import Table
 

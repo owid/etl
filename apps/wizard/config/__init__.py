@@ -75,7 +75,15 @@ def _check_wizard_config(config: dict):
     assert "description" in config["etl"], "`etl.description` property is required in wizard config!"
     assert "steps" in config["etl"], "`etl.steps` property is required in wizard config!"
     steps = config["etl"]["steps"]
-    steps_expected = ["snapshot", "express", "meadow", "garden", "fasttrack", "grapher"]
+    steps_expected = [
+        "snapshot",
+        "data",
+        # "express",
+        # "meadow",
+        # "garden",
+        # "grapher",
+        "fasttrack",
+    ]
     for step_expected in steps_expected:
         assert step_expected in steps, f"{step_expected} property is required in etl.steps property in wizard config!"
         for prop in etl_steps_properties_expected:

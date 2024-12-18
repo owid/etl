@@ -1,3 +1,6 @@
+import os
+from unittest.mock import patch
+
 import pandas as pd
 from owid.catalog import Dataset, DatasetMeta, Table
 
@@ -19,6 +22,7 @@ def _create_datasets(tmp_path):
     return ds_a, ds_b
 
 
+@patch.dict(os.environ, {"OWID_STRICT": ""})
 def test_DatasetDiff_summary(tmp_path):
     ds_a, ds_b = _create_datasets(tmp_path)
 
@@ -43,6 +47,7 @@ def test_DatasetDiff_summary(tmp_path):
     ]
 
 
+@patch.dict(os.environ, {"OWID_STRICT": ""})
 def test_new_data(tmp_path):
     ds_a, ds_b = _create_datasets(tmp_path)
 

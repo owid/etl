@@ -70,11 +70,18 @@ steps:
     - data://garden/owid/latest/key_indicators
   data://meadow/oecd/2016-06-01/regional_wellbeing:
     - walden://oecd/2016-06-01/regional_wellbeing
+  # Malnutrition to archive
   data://grapher/malnutrition/2022-10-18/malnutrition:
     - data://garden/malnutrition/2022-10-18/malnutrition
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://garden/un/2022-07-11/un_wpp
+  # Malnutrition to update
+  data://grapher/malnutrition/2024-12-16/malnutrition:
+    - data://garden/malnutrition/2024-12-16/malnutrition
+  data://garden/malnutrition/2024-12-16/malnutrition:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/un/2024-07-12/un_wpp
 
   data://meadow/worldbank_wdi/2022-05-26/wdi:
     - walden://worldbank_wdi/2022-05-26/wdi
@@ -99,7 +106,6 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/homicide/2024-10-30/unodc:
     - data://garden/homicide/2024-10-30/unodc
-
 
   #
   # UN
@@ -131,11 +137,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/technology/2022/internet:
     - data://garden/technology/2022/internet
-  # HMD
-  data://meadow/hmd/2022-12-07/life_tables:
-    - snapshot://hmd/2022-12-07/hmd.zip
-  data://garden/hmd/2022-12-07/life_tables:
-    - data://meadow/hmd/2022-12-07/life_tables
 
   # UNDP
   data://meadow/un/2024-04-09/undp_hdr:
@@ -321,8 +322,6 @@ steps:
   data://grapher/terrorism/2023-07-20/global_terrorism_database:
     - data://garden/terrorism/2023-07-20/global_terrorism_database
 
-
-
   # Colonial Dates Dataset (COLDAT)
   data://meadow/harvard/2023-09-18/colonial_dates_dataset:
     - snapshot://harvard/2023-09-18/colonial_dates_dataset.csv
@@ -354,7 +353,6 @@ steps:
     - snapshot://gapminder/2023-09-21/under_five_mortality.xlsx
   data://garden/gapminder/2023-09-21/under_five_mortality:
     - data://meadow/gapminder/2023-09-21/under_five_mortality
-
 
   # Older vintage UN IGME (with longer time-series)
   data://meadow/un/2018/igme:
@@ -763,7 +761,7 @@ steps:
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
 
-# Child Mortality Estimates - UN IGME
+  # Child Mortality Estimates - UN IGME
   data://meadow/un/2024-09-11/igme:
     - snapshot://un/2024-09-11/igme.zip
   data://garden/un/2024-09-11/igme:
@@ -774,8 +772,7 @@ steps:
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
 
-
-# Long-run child mortality, Gapminder + UN IGME
+  # Long-run child mortality, Gapminder + UN IGME
   data://garden/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-11/igme
     - data://garden/gapminder/2023-09-18/under_five_mortality
@@ -783,8 +780,7 @@ steps:
   data://grapher/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-16/long_run_child_mortality
 
-
-# UN SDG (2024)
+  # UN SDG (2024)
   data://meadow/un/2024-08-27/un_sdg:
     - snapshot://un/2024-08-27/un_sdg.feather
   data://garden/un/2024-08-27/un_sdg:
@@ -794,7 +790,7 @@ steps:
   data://grapher/un/2024-08-27/un_sdg:
     - data://garden/un/2024-08-27/un_sdg
 
-# OECD Official Development Assistance (ODA)
+  # OECD Official Development Assistance (ODA)
   data://meadow/oecd/2024-08-21/official_development_assistance:
     - snapshot://oecd/2024-08-21/official_development_assistance_dac1.zip
     - snapshot://oecd/2024-08-21/official_development_assistance_dac2a.zip
@@ -806,7 +802,7 @@ steps:
   data://grapher/oecd/2024-08-21/official_development_assistance:
     - data://garden/oecd/2024-08-21/official_development_assistance
 
-# Oil Spills
+  # Oil Spills
   data://meadow/itopf/2024-10-16/oil_spills:
     - snapshot://itopf/2024-10-16/oil_spills.pdf
   data://garden/itopf/2024-10-16/oil_spills:
@@ -814,7 +810,7 @@ steps:
   data://grapher/itopf/2024-10-16/oil_spills:
     - data://garden/itopf/2024-10-16/oil_spills
 
-# UN SD census data
+  # UN SD census data
   data://meadow/un/2024-10-21/census_dates:
     - snapshot://un/2024-10-21/census_dates.csv
   data://garden/un/2024-10-21/census_dates:
@@ -822,7 +818,7 @@ steps:
   data://grapher/un/2024-10-21/census_dates:
     - data://garden/un/2024-10-21/census_dates
 
-#  World Peace Foundation - Famines
+  #  World Peace Foundation - Famines
   data://meadow/wpf/2024-10-03/famines:
     - snapshot://wpf/2024-10-03/famines.xlsx
   data://garden/wpf/2024-10-03/famines:
@@ -861,7 +857,14 @@ steps:
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
 
-# Migration between regions, based on UN DESA flows
+  # Migration distances
+  data://garden/migration/2024-11-19/migration_distance:
+    - data://garden/un/2024-07-16/migrant_stock
+    - data://garden/geography/2023-11-28/nat_earth_110
+  data://grapher/migration/2024-11-19/migration_distance:
+    - data://garden/migration/2024-11-19/migration_distance
+
+  # Migration between regions, based on UN DESA flows
   data://garden/migration/2024-11-18/migration_between_regions:
     - data://garden/un/2024-07-16/migrant_stock
     - data://garden/regions/2023-01-01/regions
@@ -913,3 +916,4 @@ include:
   - dag/chartbook.yml
   - dag/minerals.yml
   - dag/tourism.yml
+  - dag/migration.yml

@@ -222,12 +222,16 @@ def test_expand_jinja():
         presentation=VariablePresentationMeta(
             title_variant="Variant << foo >>",
         ),
+        display={
+            "isProjection": "<% if foo == 'bar' %>true<% else %>false<% endif %>",
+        },
     )
     out = gh._expand_jinja(m, dim_dict={"foo": "bar"})
     assert out.to_dict() == {
         "title": "Title bar",
         "description_key": ["This is bar"],
         "presentation": {"title_variant": "Variant bar"},
+        "display": {"isProjection": True},
     }
 
 
@@ -241,3 +245,26 @@ def test_underscore_column_and_dimensions():
 def test_title_column_and_dimensions():
     assert gh._title_column_and_dimensions("A", {"age": "1"}) == "A - Age: 1"
     assert gh._title_column_and_dimensions("A", {"age_group": "15-18"}) == "A - Age group: 15-18"
+
+
+def test_long_to_wide():
+    df = pd.DataFrame(
+        {
+            "year": [2019, 2019, 2019, 2019],
+            "country": ["France", "France", "France", "France"],
+            "age": ["10-18", "19-25", "26-30", np.nan],
+            "deaths": [1, 2, 3, 4],
+        }
+    )
+    table = Table(df.set_index(["country", "year", "age"]))
+    table.deaths.metadata.unit = "people"
+    table.deaths.metadata.title = "Deaths"
+
+    wide = gh.long_to_wide(table)
+
+    assert list(wide.columns) == ["deaths", "deaths__age_10_18", "deaths__age_19_25", "deaths__age_26_30"]
+
+    assert wide["deaths"].m.title == "Deaths"
+    assert wide["deaths__age_10_18"].m.title == "Deaths - Age: 10-18"
+    assert wide["deaths__age_19_25"].m.title == "Deaths - Age: 19-25"
+    assert wide["deaths__age_26_30"].m.title == "Deaths - Age: 26-30"
