@@ -1,12 +1,34 @@
+import datetime as dt
 import json
 import os
 import re
-from typing import Any, Dict, Tuple
+from dataclasses import dataclass
+from typing import Any, Dict, Optional, Tuple
 
 import pandas as pd
 import streamlit as st
 
+from apps.wizard.utils.embeddings import Doc
 from etl.db import read_sql
+
+
+@dataclass
+class Insight(Doc):
+    id: int
+    title: str
+    raw_text: str
+    authors: list[str]
+    url: Optional[str]
+    url_img_desktop: Optional[str]
+    url_img_mobile: Optional[str]
+    url_vid: Optional[str]
+    slug: str
+    is_public: bool
+    date_published: dt.date
+    markdown: str
+
+    def text(self) -> str:
+        return self.title + " " + self.raw_text + " " + " ".join(self.authors)
 
 
 def get_raw_data_insights() -> pd.DataFrame:
@@ -74,7 +96,7 @@ def extract_video_urls_from_raw_data_insight(content) -> str | None:
 
 
 @st.cache_data(show_spinner=False)
-def get_data_insights() -> list[Dict[str, Any]]:
+def get_data_insights() -> list[Insight]:
     with st.spinner("Loading data insights..."):
         # Get the raw data insights from the database.
         df = get_raw_data_insights()
@@ -97,23 +119,24 @@ def get_data_insights() -> list[Dict[str, Any]]:
                 markdown = extract_text_from_raw_data_insight(content)
 
             # Build DI dictionary
-            di_dict = {
-                "id": di["id"],
-                "title": content["title"],
-                "raw_text": extract_text_from_raw_data_insight(content),
-                "authors": content["authors"],
-                "url_img_desktop": url_img_desktop,
-                "url_img_mobile": url_img_mobile,
-                "url_vid": url_vid,
-                "slug": di["slug"],
-                "is_public": bool(di["published"]),
-                "date_published": di["publishedAt"],
-                "markdown": markdown,
-            }
+            di = Insight(
+                id=di["id"],
+                title=content["title"],
+                raw_text=extract_text_from_raw_data_insight(content),
+                authors=content["authors"],
+                url=None,
+                url_img_desktop=url_img_desktop,
+                url_img_mobile=url_img_mobile,
+                url_vid=url_vid,
+                slug=di["slug"],
+                is_public=bool(di["published"]),
+                date_published=di["publishedAt"],
+                markdown=markdown,
+            )
 
-            if di_dict["is_public"]:
-                di_dict["url"] = f"https://ourworldindata.org/data-insights/{di_dict['slug']}"
+            if di.is_public:
+                di.url = f"https://ourworldindata.org/data-insights/{di.slug}"
 
-            insights.append(di_dict)
+            insights.append(di)
 
     return insights

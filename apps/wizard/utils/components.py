@@ -417,8 +417,12 @@ def update_query_params(key):
     return _update_query_params
 
 
-def url_persist(component: Any) -> Any:
+def url_persist(component: Any, default: Any = None) -> Any:
     """Wrapper around streamlit components that persist values in the URL query string.
+
+    :param component: Streamlit component to wrap
+    :param default: Default value. If value is equal to default value, it will not be added to the query string.
+        This is useful to avoid cluttering the URL with default values.
 
     Usage:
         url_persist(st.multiselect)(
@@ -432,12 +436,21 @@ def url_persist(component: Any) -> Any:
     else:
         repeated = False
 
+    if component == st.checkbox:
+        convert_to_bool = True
+    else:
+        convert_to_bool = False
+
     def _persist(*args, **kwargs):
         assert "key" in kwargs, "key should be passed to persist"
         # TODO: we could wrap on_change too to make it work
         assert "on_change" not in kwargs, "on_change should not be passed to persist"
 
         key = kwargs["key"]
+
+        # Set default value
+        if default is not None and key not in st.query_params:
+            st.session_state[key] = default
 
         if not st.session_state.get(key):
             if repeated:
@@ -448,12 +461,21 @@ def url_persist(component: Any) -> Any:
                 params = st.query_params.get(key)
                 if params and params.isdigit():
                     params = int(params)
+                elif params and params.replace(".", "", 1).isdigit():
+                    params = float(params)
+
+            if convert_to_bool:
+                params = params == "True"
 
             # Use `value` from the component as a default value if available
             if not params and "value" in kwargs:
                 params = kwargs.pop("value")
 
             st.session_state[key] = params
+        else:
+            # Set the value in query params, but only if it isn't default
+            if default is None or st.session_state[key] != default:
+                update_query_params(key)()
 
         kwargs["on_change"] = update_query_params(key)
 
