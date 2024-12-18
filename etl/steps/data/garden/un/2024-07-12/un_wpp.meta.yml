@@ -1,8 +1,7 @@
 definitions:
   global:
-    projections:
-      <%- if (variant is defined) and (variant != 'estimates') -%>
-        Projections from 2024 onwards are based on the UN's << variant >> scenario.
+    projections: <%- if (variant is defined) and (variant != 'estimates') -%>
+      Projections from 2024 onwards are based on the UN's << variant >> scenario.
       <%- endif -%>
     dimensions:
       title: |-
@@ -65,13 +64,10 @@ definitions:
         subtitle: "{definitions.global.projections}"
         originUrl: "https://ourworldindata.org/population-growth"
 
-
 # this metadata file is not used in garden step, but in grapher step
 tables:
   population:
-
     variables:
-
       population:
         title: Population
         unit: people
@@ -82,7 +78,6 @@ tables:
             Population, {definitions.global.dimensions.title}
           grapher_config:
             note: "Values as of 1 July of the indicated year."
-
 
       population_change:
         title: Population change
@@ -152,7 +147,6 @@ tables:
           grapher_config:
             subtitle: |-
               The natural growth rate is the population change determined by births and deaths. Migration flows are not taken into account. {definitions.global.projections}
-
 
   fertility_rate:
     variables:
@@ -232,8 +226,7 @@ tables:
           title_public: |-
             Death rate, {definitions.global.dimensions.title}
           grapher_config:
-            subtitle:
-              The number of deaths occurring during the year, per 1,000 people. {definitions.global.projections}
+            subtitle: The number of deaths occurring during the year, per 1,000 people. {definitions.global.projections}
 
   births:
     variables:
@@ -273,18 +266,18 @@ tables:
             subtitle: |-
               The median age divides the population into two parts of equal size; that is, there are as many people with ages above the median age as there are with ages below. {definitions.global.projections}
 
-  # childbearing_age:
-  #   variables:
-  #     childbearing_age:
-  #       title: Mean age at childbearing
-  #       unit: years
-  #       description_short: &cb_description_short |-
-  #         Mean age of mothers at the birth of their children if women were subject throughout their lives to the age-specific fertility rates observed in a given year. {definitions.global.dimensions.description_short}
-  #       presentation:
-  #         title_public: |-
-  #           Mean age at childbearing, {definitions.global.dimensions.title}
-  #         grapher_config:
-  #           subtitle: *cb_description_short
+  mean_age_childbearing:
+    variables:
+      mean_age_childbearing:
+        title: Mean age at childbearing
+        unit: years
+        description_short: &cb_description_short |-
+          Mean age of mothers at the birth of their children if women were subject throughout their lives to the age-specific fertility rates observed in a given year. {definitions.global.dimensions.description_short}
+        presentation:
+          title_public: |-
+            Mean age at childbearing, {definitions.global.dimensions.title}
+          grapher_config:
+            subtitle: *cb_description_short
 
   life_expectancy:
     variables:
@@ -383,7 +376,6 @@ tables:
             <%-else -%>
             Old-age dependency ratio
             <%-endif -%>, {definitions.global.dimensions.title}
-
 
   mortality_rate:
     variables:

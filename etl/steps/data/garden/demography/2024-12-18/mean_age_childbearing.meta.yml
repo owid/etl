@@ -1,0 +1,51 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Fertility Rate
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Mean age at childbearing (HFD; UN WPP)
+
+tables:
+  mean_age_childbearing:
+    variables:
+      mean_age_childbearing:
+        title: Mean age at childbearing
+        unit: years
+        description_short: &cb_description_short |-
+          Mean age of mothers at the birth of their children if women were subject throughout their lives to the age-specific fertility rates observed in a given year. UN Medium projections for 2024-2100.
+        description_processing: |-
+          This indicator is constructed by combining data from multiple sources:
+
+          - Before 1949: Historical estimates by Human Fertility Database (2024).
+
+          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+
+          - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
+        presentation:
+          title_public: |-
+            Mean age at childbearing
+          grapher_config:
+            subtitle: *cb_description_short
+
+      mean_age_childbearing_hist:
+        title: Mean age at childbearing, historical
+        unit: years
+        description_short: &cb_description_short_hist |-
+          Mean age of mothers at the birth of their children if women were subject throughout their lives to the age-specific fertility rates observed in a given year.
+        description_processing: |-
+          This indicator is constructed by combining data from multiple sources:
+
+          - Before 1949: Historical estimates by Human Fertility Database (2024).
+
+          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+        presentation:
+          title_public: |-
+            Mean age at childbearing
+          grapher_config:
+            subtitle: *cb_description_short_hist

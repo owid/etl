@@ -263,7 +263,7 @@ steps:
     - data://garden/hmd/2024-12-01/hmd
   data://grapher/hmd/2024-12-03/hmd_country:
     - data://garden/hmd/2024-12-03/hmd_country
-  
+
   # Patternal ages (Kai & Klüssner)
   data://meadow/demography/2024-12-05/paternal_ages:
     - snapshot://demography/2024-12-04/paternal_ages.rdata
@@ -271,7 +271,14 @@ steps:
     - data://meadow/demography/2024-12-05/paternal_ages
   data://grapher/demography/2024-12-05/paternal_ages:
     - data://garden/demography/2024-12-05/paternal_ages
-  
+
+  # Mean Age at childbirth (HFD + UN WPP)
+  data://garden/demography/2024-12-18/mean_age_childbearing:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/hmd/2024-11-19/hfd
+  data://grapher/demography/2024-12-18/mean_age_childbearing:
+    - data://garden/demography/2024-12-18/mean_age_childbearing
+
   ########################################################################
   # OTHERS
   ########################################################################
