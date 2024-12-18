@@ -145,6 +145,9 @@ steps:
     - snapshot://un/2024-12-02/un_wpp_lt_m.csv
     - snapshot://un/2024-12-02/un_wpp_lt_all.csv
     - snapshot://un/2024-12-02/un_wpp_lt_f.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_proj_m.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_proj_all.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_proj_f.csv
   data://garden/un/2024-12-02/un_wpp_lt:
     - data://meadow/un/2024-12-02/un_wpp_lt
 
