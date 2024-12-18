@@ -1,6 +1,6 @@
 import streamlit as st
 
-from .utils import render
+from apps.wizard.app_pages.harmonizer.utils import render
 
 # Get session state
 path = None

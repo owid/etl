@@ -304,13 +304,13 @@ class DataForm(StepForm):
             "add_to_dag": self.add_to_dag,
             "dag_file": self.dag_file,
             "is_private": self.is_private,
-            "channel": "meadow",
         }
         match channel:
             case "meadow":
                 common.update(
                     {
                         "snapshot_names_with_extension": self.snapshot_names_with_extension,
+                        "channel": "meadow",
                     }
                 )
             case "garden":
@@ -319,12 +319,14 @@ class DataForm(StepForm):
                         "meadow_version": self.version,
                         "update_period_days": self.update_period_days,
                         "topic_tags": self.topic_tags_export,
+                        "channel": "garden",
                     }
                 )
             case "grapher":
                 common.update(
                     {
                         "garden_version": self.version,
+                        "channel": "grapher",
                     }
                 )
             case _:
@@ -332,7 +334,6 @@ class DataForm(StepForm):
         return common
 
     def create_files(self, channel: str) -> List[Dict[str, Any]]:
-        # print(self.snapshot_names_with_extension)
         # Generate files
         DATASET_DIR = generate_step_to_channel(cookiecutter_path=COOKIE_STEPS[channel], data=self.to_dict(channel))
         # Remove playground notebook if not needed
