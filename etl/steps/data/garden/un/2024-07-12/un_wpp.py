@@ -126,6 +126,7 @@ def run(dest_dir: str) -> None:
         tb_sex_ratio,
         tb_mortality,
         tb_dependency,
+        tb_childbearing_age,
     ]
 
     #
