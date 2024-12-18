@@ -11,6 +11,9 @@ import streamlit as st
 from apps.wizard.utils.embeddings import Doc
 from etl.db import read_sql
 
+# Base URL for images in cloudflare
+CLOUDFLARE_IMAGES_URL = "https://imagedelivery.net/qLq-8BTgXU8yG0N6HnOy8g"
+
 
 @dataclass
 class Insight(Doc):
@@ -44,6 +47,15 @@ def get_raw_data_insights() -> pd.DataFrame:
     return df
 
 
+def get_raw_images() -> Dict[Any, Any]:
+    """Get the content of data insights that exist in the database."""
+    # Get all data insights from the database.
+    query = "select filename, cloudflareId from images;"
+    df = read_sql(query).dropna()
+
+    return df.set_index("filename").squeeze().to_dict()
+
+
 def extract_text_from_raw_data_insight(content: Dict[str, Any]) -> str:
     """Extract the text from the raw data insight, ignoring URLs and other fields."""
     texts = []
@@ -67,21 +79,28 @@ def extract_text_from_raw_data_insight(content: Dict[str, Any]) -> str:
     return clean_text
 
 
-def extract_image_urls_from_raw_data_insight(content) -> Tuple[str | None, str | None]:
+def extract_image_urls_from_raw_data_insight(content, cf_image_mapping) -> Tuple[str | None, str | None]:
     url_img_desktop = None
     url_img_mobile = None
 
-    for element in content.get("body", []):
+    body = content.get("body", [])
+    for element in body:
         if "type" in element and element["type"] == "image":
             if "filename" in element:
                 fname = element["filename"]
-                name, extension = os.path.splitext(fname)
-                url_img_desktop = f"https://ourworldindata.org/images/published/{name}_1350{extension}"
+                if fname not in cf_image_mapping:
+                    pass
+                    # print(f"{fname} not in CF!")
+                    # if len(body) > 1:
+                    #     print(body[1])
+                else:
+                    url_img_desktop = f"{CLOUDFLARE_IMAGES_URL}/{cf_image_mapping[fname]}/w=1350"
             if "smallFilename" in element:
                 fname = element["smallFilename"]
-                name, extension = os.path.splitext(fname)
-                url_img_mobile = f"https://ourworldindata.org/images/published/{name}_850{extension}"
+                if fname in cf_image_mapping:
+                    url_img_mobile = f"{CLOUDFLARE_IMAGES_URL}/{cf_image_mapping[fname]}/w=850"
             break
+
     return url_img_desktop, url_img_mobile
 
 
@@ -100,6 +119,7 @@ def get_data_insights() -> list[Insight]:
     with st.spinner("Loading data insights..."):
         # Get the raw data insights from the database.
         df = get_raw_data_insights()
+        cf_image_mapping = get_raw_images()
 
         # Parse data insights and construct a convenient dictionary.
         insights = []
@@ -107,8 +127,11 @@ def get_data_insights() -> list[Insight]:
             content = json.loads(di["content"])
 
             # Get multimedia urls
-            url_img_desktop, url_img_mobile = extract_image_urls_from_raw_data_insight(content)
+            url_img_desktop, url_img_mobile = extract_image_urls_from_raw_data_insight(content, cf_image_mapping)
             url_vid = extract_video_urls_from_raw_data_insight(content)
+
+            # if url_vid is not None:
+            #     print(di.slug)
 
             # Get markdown
             markdown = di["markdown"]
