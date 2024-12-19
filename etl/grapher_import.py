@@ -27,7 +27,7 @@ from owid.catalog.utils import hash_any
 from sqlalchemy import select, text, update
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import Session
 
 from apps.backport.datasync import data_metadata as dm
@@ -117,7 +117,7 @@ def upsert_dataset(
             assert source.name
             source_ids[hash(source)] = _upsert_source_to_db(session, source, ds.id)
 
-        await session.commit()
+        session.commit()
 
         return DatasetUpsertResult(ds.id, source_ids)
 
