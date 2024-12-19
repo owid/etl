@@ -42,3 +42,13 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/unicef/2024-07-30/child_migration:
     - data://garden/unicef/2024-07-30/child_migration
+
+  #KNOMAD
+  data://meadow/wb/2024-12-17/knomad:
+    - snapshot://wb/2024-12-17/knomad.xlsx
+  data://garden/wb/2024-12-17/bilateral_remittance:
+    - data://meadow/wb/2024-12-17/knomad
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+  data://grapher/wb/2024-12-17/bilateral_remittance:
+    - data://garden/wb/2024-12-17/bilateral_remittance
