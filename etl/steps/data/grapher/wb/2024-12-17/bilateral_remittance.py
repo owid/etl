@@ -29,7 +29,6 @@ def run(dest_dir: str) -> None:
         tb_cty = tb_cty.drop(columns=["country_origin"])
 
         col_name = f"remittance_flows_from_{'_'.join([word.lower() for word in cty.split(' ')])}"
-        print(col_name)
         tb_cty = tb_cty.rename(columns={"remittance_flows": col_name})
 
         tb_cty[col_name].metadata.title = f"{indicator_title} sent from {cty}"
