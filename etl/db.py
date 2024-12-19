@@ -26,9 +26,7 @@ def can_connect(conf: Optional[Dict[str, Any]] = None) -> bool:
         return False
 
 
-@deprecated(
-    "This function is deprecated. Instead, look at using etl.db.read_sql function."
-)
+@deprecated("This function is deprecated. Instead, look at using etl.db.read_sql function.")
 def get_connection(conf: Optional[Dict[str, Any]] = None) -> pymysql.Connection:
     "Connect to the Grapher database."
     cf: Any = dict_to_object(conf) if conf else config
@@ -185,9 +183,7 @@ def _get_variables_data_with_filter(
         warnings.simplefilter("ignore", UserWarning)
         variables_data = pd.read_sql(query, con=db_conn, params=field_values)
 
-    assert set(variables_data[field_name]) <= set(
-        field_values
-    ), f"Unexpected values for {field_name}."
+    assert set(variables_data[field_name]) <= set(field_values), f"Unexpected values for {field_name}."
 
     # Warn about values that were not found.
     missing_values = set(field_values) - set(variables_data[field_name])
@@ -229,9 +225,7 @@ def get_variables_data(
     if filter is not None:
         df = pd.DataFrame({"id": []}).astype({"id": int})
         for field_name, field_values in filter.items():
-            _df = _get_variables_data_with_filter(
-                field_name=field_name, field_values=field_values, db_conn=db_conn
-            )
+            _df = _get_variables_data_with_filter(field_name=field_name, field_values=field_values, db_conn=db_conn)
             if condition == "OR":
                 df = pd.concat([df, _df], axis=0)
             elif condition == "AND":
@@ -245,9 +239,7 @@ def get_variables_data(
     return df
 
 
-def get_all_datasets(
-    archived: bool = True, db_conn: Optional[pymysql.Connection] = None
-) -> pd.DataFrame:
+def get_all_datasets(archived: bool = True, db_conn: Optional[pymysql.Connection] = None) -> pd.DataFrame:
     """Get all datasets in database.
 
     Parameters
@@ -274,9 +266,7 @@ def dict_to_object(d):
     return type("DynamicObject", (object,), d)()
 
 
-def read_sql(
-    sql: str, engine: Optional[Engine | Session] = None, *args, **kwargs
-) -> pd.DataFrame:
+def read_sql(sql: str, engine: Optional[Engine | Session] = None, *args, **kwargs) -> pd.DataFrame:
     """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
     This adds overhead, so if you need performance, reuse the same connection and cursor.
     """
@@ -321,7 +311,5 @@ def production_or_master_engine() -> Engine:
     elif config.ENV_FILE_PROD:
         return config.OWIDEnv.from_env_file(config.ENV_FILE_PROD).get_engine()
     else:
-        log.warning(
-            "ENV file doesn't connect to production DB, comparing against staging-site-master"
-        )
+        log.warning("ENV file doesn't connect to production DB, comparing against staging-site-master")
         return config.OWIDEnv.from_staging("master").get_engine()

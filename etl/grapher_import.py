@@ -22,7 +22,6 @@ import pandas as pd
 import structlog
 from aiobotocore.session import get_session
 from owid import catalog
-from owid.catalog import Table, VariableMeta, utils
 from owid.catalog import Table, VariableMeta, s3_utils, utils
 from owid.catalog.utils import hash_any
 from sqlalchemy import select, text, update
@@ -36,8 +35,7 @@ from apps.backport.datasync.datasync import upload_gzip_string_async
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 from etl import config
-from etl.db import get_engine, production_or_master_engine
-from etl.db import get_engine, get_engine_async
+from etl.db import get_engine, get_engine_async, production_or_master_engine
 
 from . import grapher_helpers as gh
 from . import grapher_model as gm
@@ -118,6 +116,8 @@ def upsert_dataset(
         for source in sources:
             assert source.name
             source_ids[hash(source)] = _upsert_source_to_db(session, source, ds.id)
+
+        await session.commit()
 
         return DatasetUpsertResult(ds.id, source_ids)
 
@@ -332,141 +332,6 @@ async def upsert_table(
             log.info("upsert_table.uploaded_to_s3", size=len(df), variable_id=db_variable.id)
 
 
-def upsert_data(df: pd.DataFrame, s3_data_path: str):
-    # upload data to R2
-    var_data = dm.variable_data(df)
-    var_data_str = json.dumps(var_data, default=str)
-    upload_gzip_string(var_data_str, s3_data_path)
-
-
-def upsert_metadata(
-    session: Session,
-    df: pd.DataFrame,
-    variable_meta: VariableMeta,
-    column_name: str,
-    dataset_upsert_result: DatasetUpsertResult,
-    catalog_path: str,
-    dimensions: Optional[gm.Dimensions],
-    admin_api: AdminAPI,
-) -> gm.Variable:
-    timespan = _get_timespan(df, variable_meta)
-
-    source_id = _add_or_update_source(session, variable_meta, column_name, dataset_upsert_result)
-
-    with origins_table_lock:
-        db_origins = _add_or_update_origins(session, variable_meta.origins)
-        # commit within the lock to make sure other threads get the latest sources
-        session.commit()
-
-    # pop grapher_config from variable metadata, later we send it to Admin API
-    if variable_meta.presentation and variable_meta.presentation.grapher_config:
-        grapher_config = variable_meta.presentation.grapher_config
-        variable_meta.presentation.grapher_config = None
-    else:
-        grapher_config = None
-
-    db_variable = gm.Variable.from_variable_metadata(
-        variable_meta,
-        short_name=column_name,
-        timespan=timespan,
-        dataset_id=dataset_upsert_result.dataset_id,
-        source_id=source_id,
-        catalog_path=catalog_path,
-        dimensions=dimensions,
-    ).upsert(session)
-    db_variable_id = db_variable.id
-    assert db_variable_id
-
-    # TODO: `type` is part of metadata, but not part of checksum!
-    if not db_variable.type:
-        db_variable.type = db_variable.infer_type(df["value"])
-
-    # update links, we need to do it after we commit deleted relationships above
-    db_variable.update_links(
-        session,
-        db_origins,
-        faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],
-        tag_names=variable_meta.presentation.topic_tags if variable_meta.presentation else [],
-    )
-    session.add(db_variable)
-
-"""
-    # All following functions assume that `value` is string
-    # NOTE: we could make the code more efficient if we didn't convert `value` to string
-    # TODO: can we avoid setting & resetting index back and forth?
-    df = table.reset_index().rename(columns={column_name: "value"})
-    df["value"] = df["value"].astype("string")
-
-    checksum_data = calculate_checksum_data(df)
-    checksum_metadata = calculate_checksum_metadata(variable_meta, df)
-
-    # NOTE: this is useful for debugging, will be removed once it is stable
-    if os.environ.get("SKIP_CHECKSUMS"):
-        import random
-
-        checksum_metadata = str(random.randint(0, 10000))
-        checksum_data = str(random.randint(0, 10000))
-
-    async with semaphore:
-        log.info(
-            "upsert_dataset.upsert_table.start",
-            column_name=column_name,
-        )
-
-        async_session = async_sessionmaker(engine_async, expire_on_commit=False)
-        async with async_session() as session:
-            # compare checksums
-            try:
-                db_variable = await gm.Variable.load_from_catalog_path_async(session, catalog_path)
-            except NoResultFound:
-                db_variable = None
-
-            upsert_metadata_kwargs = dict(
-                session=session,
-                df=df,
-                variable_meta=variable_meta,
-                column_name=column_name,
-                dataset_upsert_result=dataset_upsert_result,
-                catalog_path=catalog_path,
-                dimensions=dimensions,
-                admin_api=admin_api,
-                client=client,
-            )
-
-            # create variable if it doesn't exist
-            if not db_variable:
-                db_variable = await upsert_metadata(**upsert_metadata_kwargs)
-                await upsert_data(df, db_variable.s3_data_path(), client)
-
-            # variable exists
-            else:
-                if db_variable.dataChecksum == checksum_data and db_variable.metadataChecksum == checksum_metadata:
-                    if verbose:
-                        log.info("upsert_table.skipped_no_changes", size=len(df), variable_id=db_variable.id)
-                    return
-
-                upsert_data_task = None
-                if db_variable.dataChecksum != checksum_data:
-                    upsert_data_task = upsert_data(df, db_variable.s3_data_path(), client)
-
-                if db_variable.metadataChecksum != checksum_metadata:
-                    db_variable = await upsert_metadata(**upsert_metadata_kwargs)
-
-                if upsert_data_task:
-                    await upsert_data_task
-
-            # Update checksums
-            db_variable.dataChecksum = checksum_data
-            db_variable.metadataChecksum = checksum_metadata
-
-            # Commit new checksums
-            session.add(db_variable)
-            await session.commit()
-
-            if verbose:
-                log.info("upsert_table.uploaded_to_s3", size=len(df), variable_id=db_variable.id)
-
-
 async def upsert_data(df: pd.DataFrame, s3_data_path: str, client) -> None:
     # upload data to R2
     var_data = dm.variable_data(df)
@@ -516,7 +381,6 @@ async def upsert_metadata(
     # TODO: `type` is part of metadata, but not part of checksum!
     if not db_variable.type:
         db_variable.type = db_variable.infer_type(df["value"])
-        session.add(db_variable)
 
     # update links, we need to do it after we commit deleted relationships above
     update_links_task = db_variable.update_links(
@@ -525,7 +389,7 @@ async def upsert_metadata(
         faqs=variable_meta.presentation.faqs if variable_meta.presentation else [],
         tag_names=variable_meta.presentation.topic_tags if variable_meta.presentation else [],
     )
-"""
+
     # we need to commit changes because `dm.variable_metadata` pulls all data from MySQL
     # and sends it to R2
     # NOTE: we could optimize this by evading pulling from MySQL and instead constructing JSON files from objects

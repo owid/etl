@@ -186,9 +186,7 @@ def _sample_table() -> Table:
 
 
 def test_adapt_table_for_grapher_multiindex():
-    with mock.patch(
-        "etl.grapher_helpers._get_entities_from_db"
-    ) as mock_get_entities_from_db:
+    with mock.patch("etl.grapher_helpers._get_entities_from_db") as mock_get_entities_from_db:
         with mock.patch("etl.grapher_io._fetch_entities") as mock_fetch_entities:
             # with mock.patch("apps.backport.datasync.data_metadata._fetch_entities") as mock_fetch_entities:
             mock_get_entities_from_db.return_value = {"Poland": 1, "France": 2}
@@ -261,20 +259,12 @@ def test_underscore_column_and_dimensions():
     short_name = "a" * 200
     dims = {"age": "1" * 100}
     expected = short_name + "__age_1111111111111111_4e8d3bae4e8b9786396245429a8430af"
-    assert (
-        gh._underscore_column_and_dimensions(
-            short_name, dims, trim_long_short_name=True
-        )
-        == expected
-    )
+    assert gh._underscore_column_and_dimensions(short_name, dims, trim_long_short_name=True) == expected
 
 
 def test_title_column_and_dimensions():
     assert gh._title_column_and_dimensions("A", {"age": "1"}) == "A - Age: 1"
-    assert (
-        gh._title_column_and_dimensions("A", {"age_group": "15-18"})
-        == "A - Age group: 15-18"
-    )
+    assert gh._title_column_and_dimensions("A", {"age_group": "15-18"}) == "A - Age group: 15-18"
 
 
 def test_long_to_wide():

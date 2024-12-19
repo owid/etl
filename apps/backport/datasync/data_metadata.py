@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Union
 import numpy as np
 import pandas as pd
 from sqlalchemy import text
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from structlog import get_logger
 
 log = get_logger()
@@ -219,10 +219,7 @@ def _move_population_origin_to_end(
     new_origins = []
     pop_origin = None
     for origin in origins:
-        if (
-            origin.get("title") == "Population"
-            and origin.get("producer") == "Various sources"
-        ):
+        if origin.get("title") == "Population" and origin.get("producer") == "Various sources":
             pop_origin = origin
         else:
             new_origins.append(origin)
@@ -231,9 +228,7 @@ def _move_population_origin_to_end(
     return new_origins
 
 
-async def variable_metadata(
-    session: AsyncSession, variable_id: int, variable_data: pd.DataFrame
-) -> Dict[str, Any]:
+async def variable_metadata(session: AsyncSession, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
     """Fetch metadata for a single variable from database. This function was initially based on the
     one from owid-grapher repository and uses raw SQL commands. It'd be interesting to rewrite it
     using SQLAlchemy ORM in grapher_model.py.
