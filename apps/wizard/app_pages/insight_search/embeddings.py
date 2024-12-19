@@ -145,7 +145,7 @@ def get_insights_embeddings(_model, insights: list[Dict[str, Any]]) -> list:
             insight["title"] + " " + insight["raw_text"] + " " + " ".join(insight["authors"]) for insight in insights
         ]
 
-        return get_embeddings(_model, insights_texts)
+        return get_embeddings(_model, insights_texts)  # type: ignore
 
 
 def get_sorted_documents_by_similarity(
