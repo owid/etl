@@ -6,8 +6,7 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.similar_charts import data, scoring
 from apps.wizard.utils import embeddings as emb
-from apps.wizard.utils import url_persist
-from apps.wizard.utils.components import Pagination, st_horizontal, st_multiselect_wider
+from apps.wizard.utils.components import Pagination, st_horizontal, st_multiselect_wider, url_persist
 from etl.config import OWID_ENV
 
 DEVICE = "cpu"
