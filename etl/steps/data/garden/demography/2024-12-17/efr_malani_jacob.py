@@ -23,6 +23,14 @@ origin = Origin(
     title="A New Measure of Surviving Children that Sheds Light on Long-term Trends in Fertility",
     citation_full="Malani, A., & Jacob, A. (2024). A New Measure of Surviving Children that Sheds Light on Long-term Trends in Fertility. https://doi.org/10.3386/w33175",
     date_published="2024-11-01",  # type: ignore
+    description="""
+The world has experienced a dramatic decline in total fertility rate (TFR) since the Industrial Revolution. Yet the consequences of this decline flow not merely from a reduction in births, but from a reduction in the number of surviving children. Authors propose a new measure of the number of surviving children per female, which authors call the effective fertility rate (EFR). EFR can be approximated as the product of TFR and the probability of survival. Moreover, TFR changes can be decomposed into changes that preserve EFR and those that change EFR. Authors specialized EFR to measure the number of daughters that survive to reproduce (reproductive EFR) and the number children that survive to become workers (labor EFR).
+
+Authors use three data sets to shed light on EFR over time across locations. First, authors use data from 165 countries between 1950-2019 to show that one-third of the global decline in TFR during this period did not change labor EFR, suggesting that a substantial portion of fertility decline merely compensated for higher survival rates. Focusing on the change in labor EFR, at least 40% of variation cannot be explained by economic factors such as income, prices, education levels, structural transformation, an urbanization, leaving room for explanations like cultural change. Second, using historical demographic data on European countries since 1750, authors find that there was dramatic fluctuation in labor EFR in Europe around each of the World Wars, a phenomenon that is distinct from the demographic transition. However, prior to that fluctuation, EFRs were remarkably constant, even as European countries were undergoing demographic transitions. Indeed, even when EFRs fell below 2 after 1975, we find that EFRs remained stable rather than continuing to decline. Third, data from the US since 1800 reveal that, despite great differences in mortality rates, Black and White populations have remarkably similar numbers of surviving children over time.
+
+
+""",
+    url_main="https://www.nber.org/papers/w33175",
 )
 
 
