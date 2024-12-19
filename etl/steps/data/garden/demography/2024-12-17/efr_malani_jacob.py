@@ -2,7 +2,6 @@
 
 from owid.catalog import processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -30,9 +29,9 @@ def run(dest_dir: str) -> None:
     # ds_hfd = paths.load_dataset("hfd")
 
     # Load tables
-    tb_un = ds_un_lt.read("un_wpp_lt")
-    tb_un_proj = ds_un_lt.read("un_wpp_lt_proj")
-    tb_tfr = ds_un_wpp.read("fertility_rate")
+    tb_un = ds_un_lt.read("un_wpp_lt", reset_metadata="keep_origins")
+    tb_un_proj = ds_un_lt.read("un_wpp_lt_proj", reset_metadata="keep_origins")
+    tb_tfr = ds_un_wpp.read("fertility_rate", reset_metadata="keep_origins")
 
     # Estimate cumulative survival in UN LT tables
     tb_un = estimate_un_cum_survival(
