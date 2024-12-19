@@ -17,7 +17,6 @@ from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from apps.backport.datasync import data_metadata as dm
 from etl.db import get_engine, read_sql
 from etl.files import yaml_dump
 from etl.grapher_io import add_entity_code_and_name, trim_long_variable_name
