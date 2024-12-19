@@ -121,10 +121,7 @@ def _yield_wide_table(
     if dim_names:
         # `dropna=False` makes sure we don't drop NaN values from index
         grouped = table.groupby(
-            dim_names if len(dim_names) > 1 else dim_names[0],
-            as_index=False,
-            observed=True,
-            dropna=False,
+            dim_names if len(dim_names) > 1 else dim_names[0], as_index=False, observed=True, dropna=False
         )
     else:
         # a situation when there's only year and entity_id in index with no additional dimensions
@@ -146,11 +143,7 @@ def _yield_wide_table(
             # If all values are null, skip variable
             if table_to_yield[column].isnull().all():
                 if warn_null_variables:
-                    log.warning(
-                        "yield_wide_table.null_variable",
-                        column=column,
-                        dim_dict=dim_dict,
-                    )
+                    log.warning("yield_wide_table.null_variable", column=column, dim_dict=dim_dict)
                 continue
 
             # Safety check to see if the metadata is still intact

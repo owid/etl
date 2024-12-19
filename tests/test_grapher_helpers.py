@@ -120,8 +120,7 @@ def test_ensure_source_per_variable_multiple_sources():
         )
     )
     table.metadata.dataset = DatasetMeta(
-        description="Dataset description",
-        sources=[Source(name="s3", description="s3 description")],
+        description="Dataset description", sources=[Source(name="s3", description="s3 description")]
     )
     table.metadata.description = "Table description"
 
@@ -178,8 +177,7 @@ def _sample_table() -> Table:
         )
     )
     table.metadata.dataset = DatasetMeta(
-        description="Dataset description",
-        sources=[Source(name="s3", description="s3 description")],
+        description="Dataset description", sources=[Source(name="s3", description="s3 description")]
     )
     table.metadata.description = "Table description"
     return table
@@ -202,34 +200,17 @@ def test_adapt_table_for_grapher_multiindex():
 
             table = _sample_table()
             out_table = gh._adapt_table_for_grapher(table, engine)
-            assert out_table.index.names == [
-                "entityId",
-                "entityCode",
-                "entityName",
-                "year",
-            ]
+            assert out_table.index.names == ["entityId", "entityCode", "entityName", "year"]
             assert out_table.columns.tolist() == ["deaths", "sex"]
 
             table = _sample_table().set_index(["country", "year", "sex"])
             out_table = gh._adapt_table_for_grapher(table, engine)
-            assert out_table.index.names == [
-                "entityId",
-                "entityCode",
-                "entityName",
-                "year",
-                "sex",
-            ]
+            assert out_table.index.names == ["entityId", "entityCode", "entityName", "year", "sex"]
             assert out_table.columns.tolist() == ["deaths"]
 
             table = _sample_table().set_index(["sex"])
             out_table = gh._adapt_table_for_grapher(table, engine)
-            assert out_table.index.names == [
-                "entityId",
-                "entityCode",
-                "entityName",
-                "year",
-                "sex",
-            ]
+            assert out_table.index.names == ["entityId", "entityCode", "entityName", "year", "sex"]
             assert out_table.columns.tolist() == ["deaths"]
 
 
@@ -282,12 +263,7 @@ def test_long_to_wide():
 
     wide = gh.long_to_wide(table)
 
-    assert list(wide.columns) == [
-        "deaths",
-        "deaths__age_10_18",
-        "deaths__age_19_25",
-        "deaths__age_26_30",
-    ]
+    assert list(wide.columns) == ["deaths", "deaths__age_10_18", "deaths__age_19_25", "deaths__age_26_30"]
 
     assert wide["deaths"].m.title == "Deaths"
     assert wide["deaths__age_10_18"].m.title == "Deaths - Age: 10-18"

@@ -269,67 +269,71 @@ async def upsert_table(
     checksum_data = calculate_checksum_data(df)
     checksum_metadata = calculate_checksum_metadata(variable_meta, df)
 
-    with Session(engine) as session:
-        # compare checksums
-        try:
-            db_variable = gm.Variable.from_catalog_path(session, catalog_path)
-        except NoResultFound:
-            db_variable = None
+    # NOTE: this is useful for debugging, will be removed once it is stable
+    if os.environ.get("SKIP_CHECKSUMS"):
+        import random
 
-        upsert_metadata_kwargs = dict(
-            session=session,
-            df=df,
-            variable_meta=variable_meta,
+        checksum_metadata = str(random.randint(0, 10000))
+        checksum_data = str(random.randint(0, 10000))
+
+    async with semaphore:
+        log.info(
+            "upsert_dataset.upsert_table.start",
             column_name=column_name,
-            dataset_upsert_result=dataset_upsert_result,
-            catalog_path=catalog_path,
-            dimensions=dimensions,
-            admin_api=admin_api,
         )
 
-        # create variable if it doesn't exist
-        if not db_variable:
-            db_variable = upsert_metadata(**upsert_metadata_kwargs)
-            upsert_data(df, db_variable.s3_data_path())
+        async_session = async_sessionmaker(engine_async, expire_on_commit=False)
+        async with async_session() as session:
+            # compare checksums
+            try:
+                db_variable = await gm.Variable.load_from_catalog_path_async(session, catalog_path)
+            except NoResultFound:
+                db_variable = None
 
-        # variable exists
-        else:
-            if db_variable.dataChecksum == checksum_data and db_variable.metadataChecksum == checksum_metadata:
-                if verbose:
-                    log.info("upsert_table.skipped_no_changes", size=len(df), variable_id=db_variable.id)
-                return
+            upsert_metadata_kwargs = dict(
+                session=session,
+                df=df,
+                variable_meta=variable_meta,
+                column_name=column_name,
+                dataset_upsert_result=dataset_upsert_result,
+                catalog_path=catalog_path,
+                dimensions=dimensions,
+                admin_api=admin_api,
+                client=client,
+            )
 
-            # NOTE: sequantial upserts are slower than parallel, but they will be useful once we switch to asyncio
-            # if db_variable.dataChecksum != checksum_data:
-            #     upsert_data(df, db_variable.s3_data_path())
-            # if db_variable.metadataChecksum != checksum_metadata:
-            #     db_variable = upsert_metadata(**upsert_metadata_kwargs)
+            # create variable if it doesn't exist
+            if not db_variable:
+                db_variable = await upsert_metadata(**upsert_metadata_kwargs)
+                await upsert_data(df, db_variable.s3_data_path(), client)
 
-            futures = {}
-            with ThreadPoolExecutor() as executor:
+            # variable exists
+            else:
+                if db_variable.dataChecksum == checksum_data and db_variable.metadataChecksum == checksum_metadata:
+                    if verbose:
+                        log.info("upsert_table.skipped_no_changes", size=len(df), variable_id=db_variable.id)
+                    return
+
+                upsert_data_task = None
                 if db_variable.dataChecksum != checksum_data:
-                    futures["data"] = executor.submit(upsert_data, df, db_variable.s3_data_path())
+                    upsert_data_task = upsert_data(df, db_variable.s3_data_path(), client)
 
                 if db_variable.metadataChecksum != checksum_metadata:
-                    futures["metadata"] = executor.submit(upsert_metadata, **upsert_metadata_kwargs)
+                    db_variable = await upsert_metadata(**upsert_metadata_kwargs)
 
-            if futures:
-                # Wait for futures to complete in case exceptions are raised
-                if "data" in futures:
-                    futures["data"].result()
-                if "metadata" in futures:
-                    db_variable = futures["metadata"].result()
+                if upsert_data_task:
+                    await upsert_data_task
 
-        # Update checksums
-        db_variable.dataChecksum = checksum_data
-        db_variable.metadataChecksum = checksum_metadata
+            # Update checksums
+            db_variable.dataChecksum = checksum_data
+            db_variable.metadataChecksum = checksum_metadata
 
-        # Commit new checksums
-        session.add(db_variable)
-        session.commit()
+            # Commit new checksums
+            session.add(db_variable)
+            await session.commit()
 
-        if verbose:
-            log.info("upsert_table.uploaded_to_s3", size=len(df), variable_id=db_variable.id)
+            if verbose:
+                log.info("upsert_table.uploaded_to_s3", size=len(df), variable_id=db_variable.id)
 
 
 async def upsert_data(df: pd.DataFrame, s3_data_path: str, client) -> None:

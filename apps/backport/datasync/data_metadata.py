@@ -212,9 +212,7 @@ def _variable_metadata(
     return variableMetadata
 
 
-def _move_population_origin_to_end(
-    origins: List[Dict[str, Any]],
-) -> List[Dict[str, Any]]:
+def _move_population_origin_to_end(origins: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Move population origin to the end of the list of origins. This way it gets displayed last on data page."""
     new_origins = []
     pop_origin = None

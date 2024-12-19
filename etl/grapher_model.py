@@ -132,10 +132,7 @@ class Base(MappedAsDataclass, DeclarativeBase):
 
 class Entity(Base):
     __tablename__ = "entities"
-    __table_args__ = (
-        Index("code", "code", unique=True),
-        Index("name", "name", unique=True),
-    )
+    __table_args__ = (Index("code", "code", unique=True), Index("name", "name", unique=True))
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     name: Mapped[str] = mapped_column(VARCHAR(255))
@@ -217,19 +214,8 @@ class Namespace(Base):
 class Tag(Base):
     __tablename__ = "tags"
     __table_args__ = (
-        ForeignKeyConstraint(
-            ["parentId"],
-            ["tags.id"],
-            ondelete="RESTRICT",
-            onupdate="RESTRICT",
-            name="tags_ibfk_1",
-        ),
-        Index(
-            "dataset_subcategories_name_fk_dst_cat_id_6ce1cc36_uniq",
-            "name",
-            "parentId",
-            unique=True,
-        ),
+        ForeignKeyConstraint(["parentId"], ["tags.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="tags_ibfk_1"),
+        Index("dataset_subcategories_name_fk_dst_cat_id_6ce1cc36_uniq", "name", "parentId", unique=True),
         Index("parentId", "parentId"),
         Index("slug", "slug", unique=True),
     )
@@ -286,11 +272,7 @@ class ChartRevisions(Base):
     __tablename__ = "chart_revisions"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["userId"],
-            ["users.id"],
-            ondelete="RESTRICT",
-            onupdate="RESTRICT",
-            name="chart_revisions_userId",
+            ["userId"], ["users.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="chart_revisions_userId"
         ),
         Index("chartId", "chartId"),
         Index("chart_revisions_userId", "userId"),
@@ -313,8 +295,7 @@ class ChartConfig(Base):
     full: Mapped[dict] = mapped_column(JSON, nullable=False)
     fullMd5: Mapped[str] = mapped_column(CHAR(24), Computed("(to_base64(unhex(md5(full))))", persisted=True))
     slug: Mapped[Optional[str]] = mapped_column(
-        String(255),
-        Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True),
+        String(255), Computed("(json_unquote(json_extract(`full`, '$.slug')))", persisted=True)
     )
     chartType: Mapped[Optional[str]] = mapped_column(
         String(255),
@@ -333,11 +314,7 @@ class Chart(Base):
     __tablename__ = "charts"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["configId"],
-            ["chart_configs.id"],
-            ondelete="RESTRICT",
-            onupdate="RESTRICT",
-            name="charts_configId",
+            ["configId"], ["chart_configs.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="charts_configId"
         ),
         ForeignKeyConstraint(
             ["lastEditedByUserId"],
@@ -396,12 +373,7 @@ class Chart(Base):
         return select(ChartConfig.slug).where(ChartConfig.id == cls.configId).scalar_subquery()
 
     @classmethod
-    def load_chart(
-        cls,
-        session: Session,
-        chart_id: Optional[int] = None,
-        slug: Optional[str] = None,
-    ) -> "Chart":
+    def load_chart(cls, session: Session, chart_id: Optional[int] = None, slug: Optional[str] = None) -> "Chart":
         """Load chart with id `chart_id`."""
         if chart_id:
             cond = cls.id == chart_id
@@ -519,8 +491,7 @@ class Chart(Base):
                 try:
                     target_var = target_session.scalars(
                         select(Variable).where(
-                            Variable.name == source_var.name,
-                            Variable.datasetId == source_var.datasetId,
+                            Variable.name == source_var.name, Variable.datasetId == source_var.datasetId
                         )
                     ).one()
 
@@ -603,11 +574,7 @@ class Dataset(Base):
     __tablename__ = "datasets"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["createdByUserId"],
-            ["users.id"],
-            ondelete="RESTRICT",
-            onupdate="RESTRICT",
-            name="datasets_createdByUserId",
+            ["createdByUserId"], ["users.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="datasets_createdByUserId"
         ),
         ForeignKeyConstraint(
             ["dataEditedByUserId"],
@@ -682,11 +649,7 @@ class Dataset(Base):
 
     @classmethod
     def from_dataset_metadata(
-        cls,
-        metadata: catalog.DatasetMeta,
-        namespace: str,
-        user_id: int,
-        table_names: List[str],
+        cls, metadata: catalog.DatasetMeta, namespace: str, user_id: int, table_names: List[str]
     ) -> "Dataset":
         assert metadata.title
         return cls(
@@ -712,11 +675,7 @@ class Dataset(Base):
     @classmethod
     def load_with_path(cls, session: Session, namespace: str, short_name: str, version: str) -> "Dataset":
         return session.scalars(
-            select(cls).where(
-                cls.namespace == namespace,
-                cls.shortName == short_name,
-                cls.version == version,
-            )
+            select(cls).where(cls.namespace == namespace, cls.shortName == short_name, cls.version == version)
         ).one()
 
     @classmethod
@@ -780,11 +739,7 @@ class Source(Base):
     __tablename__ = "sources"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["datasetId"],
-            ["datasets.id"],
-            ondelete="RESTRICT",
-            onupdate="RESTRICT",
-            name="sources_datasetId",
+            ["datasetId"], ["datasets.id"], ondelete="RESTRICT", onupdate="RESTRICT", name="sources_datasetId"
         ),
         Index("sources_datasetId", "datasetId"),
     )
@@ -804,16 +759,8 @@ class Source(Base):
         conds = [
             cls.name == self.name,
             cls.datasetId == self.datasetId,
-            _json_is(
-                cls.description,
-                "additionalInfo",
-                self.description.get("additionalInfo"),
-            ),
-            _json_is(
-                cls.description,
-                "dataPublishedBy",
-                self.description.get("dataPublishedBy"),
-            ),
+            _json_is(cls.description, "additionalInfo", self.description.get("additionalInfo")),
+            _json_is(cls.description, "dataPublishedBy", self.description.get("dataPublishedBy")),
         ]
         return select(cls).where(*conds)
 
@@ -908,10 +855,7 @@ class Dimensions(TypedDict):
 
 class PostsGdocs(Base):
     __tablename__ = "posts_gdocs"
-    __table_args__ = (
-        Index("idx_posts_gdocs_type", "type"),
-        Index("idx_updatedAt", "updatedAt"),
-    )
+    __table_args__ = (Index("idx_posts_gdocs_type", "type"), Index("idx_updatedAt", "updatedAt"))
 
     id: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
     slug: Mapped[str] = mapped_column(VARCHAR(255))
@@ -920,8 +864,7 @@ class PostsGdocs(Base):
     createdAt: Mapped[datetime] = mapped_column(DateTime, init=False)
     publicationContext: Mapped[str] = mapped_column(ENUM("unlisted", "listed"), server_default=text("'unlisted'"))
     type: Mapped[Optional[str]] = mapped_column(
-        VARCHAR(255),
-        Computed("(json_unquote(json_extract(`content`,_utf8mb4'$.type')))", persisted=False),
+        VARCHAR(255), Computed("(json_unquote(json_extract(`content`,_utf8mb4'$.type')))", persisted=False)
     )
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
@@ -977,11 +920,7 @@ class OriginsVariablesLink(Base):
         if to_add:
             session.add_all(
                 [
-                    cls(
-                        originId=origin_id,
-                        variableId=variable_id,
-                        displayOrder=display_order,
-                    )
+                    cls(originId=origin_id, variableId=variable_id, displayOrder=display_order)
                     for origin_id, display_order in to_add
                 ]
             )
@@ -1034,12 +973,7 @@ class PostsGdocsVariablesFaqsLink(Base):
         if to_add:
             session.add_all(
                 [
-                    cls(
-                        gdocId=gdoc_id,
-                        fragmentId=fragment_id,
-                        displayOrder=display_order,
-                        variableId=variable_id,
-                    )
+                    cls(gdocId=gdoc_id, fragmentId=fragment_id, displayOrder=display_order, variableId=variable_id)
                     for gdoc_id, fragment_id, display_order in to_add
                 ]
             )
@@ -1351,19 +1285,13 @@ class Variable(Base):
     @overload
     @classmethod
     def from_id_or_path(
-        cls,
-        session: Session,
-        id_or_path: str | int,
-        columns: Optional[List[str]] = None,
+        cls, session: Session, id_or_path: str | int, columns: Optional[List[str]] = None
     ) -> "Variable": ...
 
     @overload
     @classmethod
     def from_id_or_path(
-        cls,
-        session: Session,
-        id_or_path: List[str | int],
-        columns: Optional[List[str]] = None,
+        cls, session: Session, id_or_path: List[str | int], columns: Optional[List[str]] = None
     ) -> List["Variable"]: ...
 
     @classmethod
@@ -1415,18 +1343,12 @@ class Variable(Base):
     @overload
     @classmethod
     def from_catalog_path(
-        cls,
-        session: Session,
-        catalog_path: List[str],
-        columns: Optional[List[str]] = None,
+        cls, session: Session, catalog_path: List[str], columns: Optional[List[str]] = None
     ) -> List["Variable"]: ...
 
     @classmethod
     def from_catalog_path(
-        cls,
-        session: Session,
-        catalog_path: str | List[str],
-        columns: Optional[List[str]] = None,
+        cls, session: Session, catalog_path: str | List[str], columns: Optional[List[str]] = None
     ) -> "Variable" | List["Variable"]:
         """Load a variable from the DB by its catalog path."""
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
@@ -1442,18 +1364,12 @@ class Variable(Base):
     @overload
     @classmethod
     def from_id(
-        cls,
-        session: Session,
-        variable_id: List[int],
-        columns: Optional[List[str]] = None,
+        cls, session: Session, variable_id: List[int], columns: Optional[List[str]] = None
     ) -> List["Variable"]: ...
 
     @classmethod
     def from_id(
-        cls,
-        session: Session,
-        variable_id: int | List[int],
-        columns: Optional[List[str]] = None,
+        cls, session: Session, variable_id: int | List[int], columns: Optional[List[str]] = None
     ) -> "Variable" | List["Variable"]:
         """Load a variable (or list of variables) from the DB by its ID path."""
         if isinstance(variable_id, int):
@@ -1726,11 +1642,7 @@ class ChartDiffApprovals(Base):
     __tablename__ = "chart_diff_approvals"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["chartId"],
-            ["charts.id"],
-            ondelete="CASCADE",
-            onupdate="CASCADE",
-            name="chart_diff_approvals_ibfk_1",
+            ["chartId"], ["charts.id"], ondelete="CASCADE", onupdate="CASCADE", name="chart_diff_approvals_ibfk_1"
         ),
         Index("chartId", "chartId"),
     )
@@ -1744,11 +1656,7 @@ class ChartDiffApprovals(Base):
 
     @classmethod
     def latest_chart_approval_batch(
-        cls,
-        session: Session,
-        chart_ids: list[int],
-        source_updated_ats: list,
-        target_updated_ats: list,
+        cls, session: Session, chart_ids: list[int], source_updated_ats: list, target_updated_ats: list
     ) -> List[Optional["ChartDiffApprovals"]]:
         """Load the latest approval of the charts.
 
@@ -1813,11 +1721,7 @@ class ChartDiffConflicts(Base):
     __tablename__ = "chart_diff_conflicts"
     __table_args__ = (
         ForeignKeyConstraint(
-            ["chartId"],
-            ["charts.id"],
-            ondelete="CASCADE",
-            onupdate="CASCADE",
-            name="chart_diff_conflicts_ibfk_1",
+            ["chartId"], ["charts.id"], ondelete="CASCADE", onupdate="CASCADE", name="chart_diff_conflicts_ibfk_1"
         ),
         Index("chartId", "chartId"),
     )
@@ -1886,9 +1790,7 @@ class MultiDimDataPage(Base):
     published: Mapped[int] = mapped_column(TINYINT, server_default=text("'0'"), init=False)
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     updatedAt: Mapped[datetime] = mapped_column(
-        DateTime,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        init=False,
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
     )
 
     def upsert(self, session: Session) -> "MultiDimDataPage":
@@ -1909,9 +1811,7 @@ class Anomaly(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     updatedAt: Mapped[datetime] = mapped_column(
-        DateTime,
-        server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
-        init=False,
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
     )
     datasetId: Mapped[int] = mapped_column(Integer)
     datasetSourceChecksum: Mapped[Optional[str]] = mapped_column(VARCHAR(64), default=None)

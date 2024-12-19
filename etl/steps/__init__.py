@@ -11,10 +11,9 @@ import re
 import subprocess
 import sys
 import tempfile
-import time
 import warnings
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from glob import glob
 from importlib import import_module

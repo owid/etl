@@ -87,36 +87,21 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "tags": tags})
         return js
 
-    def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
+    async def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
         # If schema is missing, use the default one
         grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
 
-        # Retry in case we're restarting Admin on staging server
-        resp = requests_with_retry().put(
-            self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
-            cookies={"sessionid": self.session_id},
-            json=grapher_config,
-        )
-        js = self._json_from_response(resp)
-        if not js["success"]:
-            raise AdminAPIError(
-                {
-                    "error": js["error"],
-                    "variable_id": variable_id,
-                    "grapher_config": grapher_config,
-                }
-            )
-        return js
-
-    async def put_grapher_config(self, variable_id: int, grapher_config: Dict[str, Any]) -> dict:
         async with aiohttp.ClientSession(cookies={"sessionid": self.session_id}) as session:
             async with session.put(
-                self.base_url + f"/admin/api/variables/{variable_id}/grapherConfigETL",
+                self.owid_env.admin_api + f"/variables/{variable_id}/grapherConfigETL",
                 json=grapher_config,
             ) as resp:
                 # TODO: make _json_from_response async
                 js = await resp.json()
-                assert js["success"]
+                if not js["success"]:
+                    raise AdminAPIError(
+                        {"error": js["error"], "variable_id": variable_id, "grapher_config": grapher_config}
+                    )
                 return js
 
     # TODO: make it async
