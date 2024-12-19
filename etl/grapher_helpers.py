@@ -667,7 +667,6 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
     # Add entity code and name
     with Session(engine) as session:
         table = add_entity_code_and_name(session, table).copy_metadata(table)
-        # table = dm.add_entity_code_and_name(session, table).copy_metadata(table)
 
     table = table.set_index(["entityId", "entityCode", "entityName", "year"] + dim_names)
 

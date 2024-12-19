@@ -559,7 +559,9 @@ def variable_data_table_from_catalog(
 
 
 def get_dataset_id(
-    dataset_name: str, db_conn: Optional[pymysql.Connection] = None, version: Optional[str] = None
+    dataset_name: str,
+    db_conn: Optional[pymysql.Connection] = None,
+    version: Optional[str] = None,
 ) -> Any:
     """Get the dataset ID of a specific dataset name from database.
 
@@ -604,7 +606,9 @@ def get_dataset_id(
 
 @deprecated("This function is deprecated. Its logic will be soon moved to etl.grapher_model.Dataset.")
 def get_variables_in_dataset(
-    dataset_id: int, only_used_in_charts: bool = False, db_conn: Optional[pymysql.Connection] = None
+    dataset_id: int,
+    only_used_in_charts: bool = False,
+    db_conn: Optional[pymysql.Connection] = None,
 ) -> Any:
     """Get all variables data for a specific dataset ID from database.
 
@@ -660,7 +664,7 @@ def get_all_datasets(archived: bool = True, db_conn: Optional[pymysql.Connection
     if db_conn is None:
         db_conn = get_connection()
 
-    query = " SELECT namespace, name, id, updatedAt, isArchived FROM datasets"
+    query = " SELECT namespace, name, id, updatedAt FROM datasets"
     if not archived:
         query += " WHERE isArchived = 0"
     datasets = pd.read_sql(query, con=db_conn)
