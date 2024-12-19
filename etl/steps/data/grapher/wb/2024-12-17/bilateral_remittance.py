@@ -36,12 +36,15 @@ def run(dest_dir: str) -> None:
 
     tbs = []
 
-    for cty in tb["country_origin"].unique():
+    countries = list(tb["country_origin"].unique())
+
+    for cty in countries:
         tb_cty = tb[tb["country_origin"] == cty].copy()
         tb_cty = tb_cty.rename(columns={"country_receiving": "country"})
         tb_cty = tb_cty.drop(columns=["country_origin"])
 
-        col_name = f"remittance_flows_from_{cty}"
+        col_name = f"remittance_flows_from_{'_'.join([word.lower() for word in cty.split(' ')])}"
+        print(col_name)
         tb_cty = tb_cty.rename(columns={"remittance_flows": col_name})
 
         tb_cty[col_name].metadata.title = f"{indicator_title} sent from {cty}"
