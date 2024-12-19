@@ -1,14 +1,14 @@
 meta:
   origin:
     producer: |-
-      Shattock et al. (2024). Contribution of vaccination to improved child survival: modelling 50 years of the Expanded Programme on Immunization.
+      Shattock et al. (2024). Contribution of vaccination to improved survival and health: modelling 50 years of the Expanded Programme on Immunization.
     title: cumulative_lives_saved_vaccination_shattock
     citation_full: |-
-      Shattock et al. (2024). Contribution of vaccination to improved child survival: modelling 50 years of the Expanded Programme on Immunization. The Lancet.
+      Shattock et al. (2024). Contribution of vaccination to improved survival and health: modelling 50 years of the Expanded Programme on Immunization. The Lancet.
     url_main: https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(24)00850-X/fulltext
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vQHxzyufogWkSCuwEmHd6jF2c3JfqTdUY9ngwgpdwZfR5FA7JGQRzKNKhJ6hmAfGXReeAmgpHRMj8iM/pub?output=csv
-    date_accessed: '2024-05-03'
+    date_accessed: '2024-11-28'
   name: Cumulative lives saved from vaccinations since 1974 (Shattock et al. 2024)
   description: The cumulative number of lives saved thanks to vaccinations, from 1974 onwards.
   license: {}

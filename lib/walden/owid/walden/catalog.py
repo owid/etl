@@ -272,8 +272,7 @@ class Dataset:
     def local_path(self) -> str:
         return path.join(CACHE_DIR, f"{self.relative_base}.{self.file_extension}")
 
-    def to_dict(self) -> Dict[str, Any]:
-        ...  # type: ignore
+    def to_dict(self) -> Dict[str, Any]: ...  # type: ignore
 
     def has_changed_from_last_version(self) -> bool:
         """Check if local dataset is different to latest available version in Walden.

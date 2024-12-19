@@ -1,4 +1,5 @@
 """Google Sheet utils."""
+
 import os
 from typing import Any, Optional, Union
 

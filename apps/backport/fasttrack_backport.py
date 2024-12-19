@@ -88,7 +88,7 @@ def _create_client():
     # Add your service account file
     creds = Credentials.from_service_account_file(os.environ["GOOGLE_APPLICATION_CREDENTIALS"], scopes=scope)
 
-    return gspread.authorize(creds)
+    return gspread.authorize(creds)  # type: ignore
 
 
 def _create_temp_dataset(pb: PotentialBackport, short_name):
@@ -174,7 +174,7 @@ def _fill_variables_meta(spreadsheet, meta, short_name):
     vars_df = vars_df.reindex(columns=wks.row_values(1)).fillna("")
 
     # update values
-    values = [vars_df.columns.values.tolist()] + vars_df.values.tolist()
+    values = [vars_df.columns.values.tolist()] + vars_df.values.tolist()  # type: ignore
     wks.update("A1", values)
 
 

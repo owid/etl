@@ -165,15 +165,13 @@ def yaml_dump(
     strip_lines: bool = True,
     replace_confusing_ascii: bool = False,
     width: int = 120,
-) -> str:
-    ...
+) -> str: ...
 
 
 @overload
 def yaml_dump(
     d: Dict[str, Any], stream: TextIO, strip_lines: bool = True, replace_confusing_ascii: bool = False, width: int = 120
-) -> None:
-    ...
+) -> None: ...
 
 
 def yaml_dump(

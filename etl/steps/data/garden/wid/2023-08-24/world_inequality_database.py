@@ -1,6 +1,5 @@
 """Load World Inequality Database meadow dataset and create a garden dataset."""
 
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from shared import add_metadata_vars, add_metadata_vars_distribution

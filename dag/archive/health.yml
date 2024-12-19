@@ -38,7 +38,7 @@ steps:
     - data://meadow/oecd/2023-08-11/road_accidents
     - data://garden/oecd/2018-03-11/road_deaths_and_injuries
 
-# GBD 2019
+  # GBD 2019
 
   # IHME GBD Leading cause of deaths - to archive
   data://meadow/ihme_gbd/2023-10-04/cause_hierarchy:
@@ -49,7 +49,7 @@ steps:
   data://grapher/ihme_gbd/2023-10-04/leading_causes_child_deaths:
     - data://garden/ihme_gbd/2023-10-04/leading_causes_child_deaths
 
-# IHME Global Burden of Disease - Prevalence and incidence
+  # IHME Global Burden of Disease - Prevalence and incidence
   data://meadow/ihme_gbd/2019/gbd_prevalence:
     - walden://ihme_gbd/2019/gbd_prevalence
   data://garden/ihme_gbd/2019/gbd_prevalence:
@@ -119,3 +119,11 @@ steps:
     - data://meadow/who/2023-08-04/icd_codes
   data://grapher/who/2023-08-04/icd_codes:
     - data://garden/who/2023-08-04/icd_codes
+
+  # MICROBE - removing some unneeded datasets from grapher
+  data-private://grapher/antibiotics/2024-12-04/microbe_total_pathogens:
+    - data-private://garden/antibiotics/2024-12-04/microbe_total_pathogens
+  data-private://grapher/antibiotics/2024-12-02/total_pathogen_bloodstream:
+    - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream
+  data-private://grapher/antibiotics/2024-11-20/pathogen_bloodstream:
+    - data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream

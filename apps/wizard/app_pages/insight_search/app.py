@@ -2,7 +2,7 @@ import streamlit as st
 from structlog import get_logger
 
 from apps.wizard.app_pages.insight_search import data
-from apps.wizard.app_pages.insight_search import embeddings as emb
+from apps.wizard.utils import embeddings as emb
 from apps.wizard.utils.components import Pagination, st_horizontal, st_multiselect_wider, tag_in_md
 
 # Initialize log.
@@ -20,61 +20,67 @@ st.set_page_config(
 ########################################################################################################################
 
 
-def st_display_insight(insight):
+def st_display_insight(insight: data.Insight):
+    assert insight.similarity is not None
+
     # :material/person
-    authors = ", ".join([tag_in_md(a, "gray", ":material/person") for a in insight["authors"]])
-    score = round(insight["similarity"] * 100)
+    authors = ", ".join([tag_in_md(a, "gray", ":material/person") for a in insight.authors])
+    score = round(insight.similarity * 100)
 
     # Get edit URLs
-    # url_gdoc = f"https://docs.google.com/document/d/{insight['id']}/edit"
-    url_admin = f"http://staging-site-master/admin/gdocs/{insight['id']}/preview"
+    # url_gdoc = f"https://docs.google.com/document/d/{insight.id}/edit"
+    url_admin = f"https://admin.owid.io/admin/gdocs/{insight.id}/preview"
 
     with st.container(border=True):
         # If public, display special header (inc multimedia content if insight is public)
-        if insight["is_public"]:
-            st.markdown(f"#### [{insight['title']}]({insight['url']})")
+        if insight.is_public:
+            st.markdown(f"#### [{insight.title}]({insight.url})")
 
             # Display header 'Author | Date'
-            date_str = insight["date_published"].strftime("%B %d, %Y")
+            date_str = insight.date_published.strftime("%B %d, %Y")
             date_str = tag_in_md(date_str, "green", ":material/calendar_month")
-            # header = f"by **{authors}** | published **{date_str}** | [view]({insight['url']})"
+            # header = f"by **{authors}** | published **{date_str}** | [view]({insight.url})"
             st.markdown(f"by {authors} | {date_str} | [:material/edit: edit]({url_admin})")
 
             # Show multimedia content if available (image, video)
-            if insight["url_img_desktop"] is not None:
-                st.image(insight["url_img_desktop"], use_container_width=True)
-            elif insight["url_vid"] is not None:
-                st.video(insight["url_vid"])
+            if insight.url_img_desktop is not None:
+                st.image(insight.url_img_desktop, use_container_width=True)
+            elif insight.url_vid is not None:
+                st.video(insight.url_vid)
         # Display only authors if not public
         else:
-            st.markdown(f"#### {insight['title']}")
+            st.markdown(f"#### {insight.title}")
             st.write(f":red[(Draft)] {authors} | [:material/edit: edit]({url_admin})")
 
         # Render text
-        text = insight["markdown"].replace("$", r"\$")
+        text = insight.markdown.replace("$", r"\$")
         st.caption(text)
 
         # Score
         st.write(f"**Similarity Score:** {score}%")
 
 
-@st.cache_data(show_spinner=False)
-def get_authors_with_DIs(insights):
-    with st.spinner("Getting author names..."):
-        return set(author for insight in insights for author in insight["authors"])
+def get_authors_with_DIs(insights: list[data.Insight]) -> set[str]:
+    return set(author for insight in insights for author in insight.authors)
+
+
+@st.cache_data(show_spinner=False, max_entries=1)
+def get_and_fit_model(insights: list[data.Insight]) -> emb.EmbeddingsModel:
+    # Get embedding model.
+    model = emb.EmbeddingsModel(emb.get_model())
+    # Create an embedding for each insight.
+    model.fit(insights)
+    return model
 
 
 ########################################################################################################################
-# Get embedding model.
-MODEL = emb.get_model()
 # Fetch all data insights.
 insights = data.get_data_insights()
+# Get embedding model.
+model = get_and_fit_model(insights)
 # Available authors
 authors = get_authors_with_DIs(insights)
 
-# Create an embedding for each insight.
-# TODO: This could also be stored in db.
-embeddings = emb.get_insights_embeddings(MODEL, insights)
 ########################################################################################################################
 
 
@@ -117,9 +123,7 @@ if input_string or (input_authors != []):
         st.warning("Please enter at least 3 characters or one author.")
     else:
         # Get the sorted DIs.
-        sorted_dis = emb.get_sorted_documents_by_similarity(
-            MODEL, input_string, insights=insights, embeddings=embeddings
-        )
+        sorted_dis: list[data.Insight] = model.get_sorted_documents_by_similarity(input_string)
 
         # Display the sorted documents.
         # TODO: This could be enhanced in different ways:
@@ -141,15 +145,15 @@ if input_string or (input_authors != []):
             case "All":
                 filtered_dis = sorted_dis
             case "Published":
-                filtered_dis = [di for di in sorted_dis if di["is_public"]]
+                filtered_dis = [di for di in sorted_dis if di.is_public]
             case "Drafts":
-                filtered_dis = [di for di in sorted_dis if not di["is_public"]]
+                filtered_dis = [di for di in sorted_dis if not di.is_public]
             case _:
                 filtered_dis = sorted_dis
 
         # Filter DIs by author
         if input_authors:
-            filtered_dis = [di for di in filtered_dis if any(author in di["authors"] for author in input_authors)]
+            filtered_dis = [di for di in filtered_dis if any(author in di.authors for author in input_authors)]
 
         # Use pagination
         items_per_page = 100

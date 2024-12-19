@@ -1,4 +1,5 @@
 """Deaths table"""
+
 from typing import Any, Dict
 
 import pandas as pd

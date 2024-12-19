@@ -1,6 +1,4 @@
-"""Create a dataset of renewable electricity capacity using IRENA's Renewable Electricity Capacity and Generation.
-
-"""
+"""Create a dataset of renewable electricity capacity using IRENA's Renewable Electricity Capacity and Generation."""
 
 from typing import List
 

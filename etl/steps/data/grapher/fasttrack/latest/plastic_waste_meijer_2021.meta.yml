@@ -3,12 +3,6 @@ dataset:
   description: ''
   licenses:
     - {}
-  sources:
-    - name: Plastic ocean waste and pollution (Meijer et al. 2021)
-      url: https://www.science.org/doi/10.1126/sciadv.aaz5803
-      publication_year: '2021'
-      published_by: Meijer, L. J., Van Emmerik, T., Van Der Ent, R., Schmidt, C., & Lebreton, L. (2021). More than 1000 rivers
-        account for 80% of global riverine plastic emissions into the ocean. Science Advances, 7(18), eaaz5803.
 tables:
   plastic_waste_meijer_2021:
     variables:

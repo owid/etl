@@ -32,7 +32,7 @@ PR_CATEGORIES = {
         "shortcut_key": "0",
     },
     "chore": {
-        "emoji": "🧹",
+        "emoji": "🐝",
         "emoji_raw": ":honeybee:",
         "description": "upgrading dependencies, tooling, etc. No production code change",
     },

@@ -27,7 +27,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     # Demography
     - data://garden/demography/2024-07-15/population
-    - data://garden/demography/2023-10-09/life_expectancy
+    - data://garden/demography/2024-12-03/life_expectancy
     - data://garden/un/2024-07-12/un_wpp
     # Econ
     - data://garden/wb/2024-10-07/world_bank_pip
@@ -325,4 +325,3 @@ steps:
     - grapher://grapher/covid/latest/covax
     - grapher://grapher/covid/latest/infections_model
     - grapher://grapher/covid/latest/xm_who
-

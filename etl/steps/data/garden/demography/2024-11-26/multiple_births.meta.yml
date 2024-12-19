@@ -1,0 +1,110 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Fertility Rate
+
+    display:
+      entityAnnotationsMap: |-
+        Chile: Stillbirths excluded
+        South Korea: Stillbirths excluded
+        Czech Republic: Stillbirths included
+        Denmark: Stillbirths included
+        England and Wales: Stillbirths included
+        France: Stillbirths included
+        Greece: Stillbirths included
+        Italy: Stillbirths included
+        Lithuania: Stillbirths included
+        Netherlands: Stillbirths included
+        Norway: Stillbirths included
+        Spain: Stillbirths included
+        Sweden: Stillbirths included
+        Switzerland: Stillbirths included
+        Australia: Stillbirths included in some years
+        New Zealand: Stillbirths included in some years
+        Scotland: Stillbirths included in some years
+        United States: Stillbirths included in some years
+        Uruguay: Stillbirths included in some years
+        Austria: Stillbirths typically included
+        Canada: Stillbirths typically included
+        Finland: Stillbirths typically included
+        Germany: Stillbirths typically included
+        Japan: Stillbirths typically included
+
+    description_processing: |-
+      Data sometimes includes stillbirths, therefore comparability across countries should be done with care.
+
+      **Countries including stillbirths**: Czech Republic, Denmark, England and Wales, France, Greece, Italy, Lithuania, Netherlands, Norway, Spain, Sweden, Switzerland
+
+      **Countries mostly including stillbirths**: Austria (unknown for 1920, 1921, 1928, 1929, 1931, 1934), Canada (unknown for 1921-1925, 1927-1990), Finland (unknown for 1906-1936, 1941-1999), Germany (unknown for 1906-1936), Japan (unknown for 1923-1936)
+
+      **Countries excluding stillbirths**: Chile, South Korea
+
+      **Countries with mixed practices**: Australia, New Zealand (excluded for 1856-1915), United States, Scotland (excluded for 1856-1938), Uruguay
+
+      For more details about the data for a specific country, please refer to the original source.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  multiple_births:
+    variables:
+      singletons:
+        title: Singleton deliveries
+        unit: "deliveries"
+        description_short: |-
+          Number of single deliveries.
+      twin_deliveries:
+        title: Twin deliveries
+        unit: "deliveries"
+        description_short: |-
+          Number of twin deliveries.
+      multiple_deliveries:
+        title: Multiple deliveries
+        unit: "deliveries"
+        description_short: |-
+          Total number of multiple deliveries (i.e. the sum of twin, triplet, and quadruplet+ deliveries).
+      total_deliveries:
+        title: Total deliveries
+        unit: "deliveries"
+        description_short: |-
+          Total number of deliveries (i.e., single and multiple deliveries combined)
+      singleton_rate:
+        title: Singleton rate
+        unit: "twin deliveries per total deliveries"
+        description_short: |-
+          The rate of deliveries that are single deliveries, per 1,000 deliveries.
+      twinning_rate:
+        title: Twinning delivery rate
+        unit: "twin deliveries per 1,000 deliveries"
+        description_short: |-
+          The rate of twin deliveries, per 1,000 deliveries.
+      multiple_rate:
+        title: Multiple delivery rate
+        unit: "multiple deliveries per 1,000 deliveries"
+        description_short: |-
+          The rate of deliveries that are multiple deliveries, per 1,000 deliveries.
+      children_delivery_ratio:
+        title: "Children per delivery"
+        unit: "children per 1,000 deliveries"
+        description_short: |-
+          The average number of children born per delivery. This is estimated by dividing the number of children born by the total number deliveries, per 1,000 people.
+      children_multiple_delivery_ratio:
+        title: "Children per multiple delivery"
+        unit: "children per 1,000 multiple deliveries"
+        description_short: |-
+          Number of children born in multiple deliveries divided by the total number of multiple deliveries, per 1,000 people. Gives an indication of the average number of children born in multiple deliveries.
+      multiple_to_singleton_ratio:
+        title: "Multiple children to singleton ratio"
+        unit: "multiple deliveries per 1,000 single delivery"
+        description_short: |-
+          Number of multiple deliveries per 1,000 single deliveries.
+      multiple_children:
+        title: "Multiple children"
+        unit: "children"
+        description_short: |-
+          Number of children born from multiple deliveries (twin babies, triplet babies, etc.)

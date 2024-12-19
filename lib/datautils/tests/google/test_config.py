@@ -29,16 +29,21 @@ def test_google_config_is_init_true(mock_check):
 def test_check_google_config_1():
     """All files are created"""
     with tempfile.TemporaryDirectory() as config_dir:
-        with mock.patch("owid.datautils.google.config.CONFIG_DIR", config_dir), mock.patch(
-            "owid.datautils.google.config.CLIENT_SECRETS_PATH",
-            Path(config_dir) / "google_client_secrets.json",
-        ) as secrets_dir, mock.patch(
-            "owid.datautils.google.config.SETTINGS_PATH",
-            Path(config_dir) / "google_settings.yaml",
-        ) as settings_dir, mock.patch(
-            "owid.datautils.google.config.CREDENTIALS_PATH",
-            Path(config_dir) / "google_credentials.json",
-        ) as creds_dir:
+        with (
+            mock.patch("owid.datautils.google.config.CONFIG_DIR", config_dir),
+            mock.patch(
+                "owid.datautils.google.config.CLIENT_SECRETS_PATH",
+                Path(config_dir) / "google_client_secrets.json",
+            ) as secrets_dir,
+            mock.patch(
+                "owid.datautils.google.config.SETTINGS_PATH",
+                Path(config_dir) / "google_settings.yaml",
+            ) as settings_dir,
+            mock.patch(
+                "owid.datautils.google.config.CREDENTIALS_PATH",
+                Path(config_dir) / "google_credentials.json",
+            ) as creds_dir,
+        ):
             with open(secrets_dir, "w") as f:
                 f.write("This is test")
             with open(settings_dir, "w") as f:
@@ -59,16 +64,21 @@ def test_check_google_config_2():
 def test_check_google_config_3():
     """Folder created, files not created"""
     with raises(FileNotFoundError), tempfile.TemporaryDirectory() as config_dir:
-        with mock.patch("owid.datautils.google.config.CONFIG_DIR", config_dir), mock.patch(
-            "owid.datautils.google.config.CLIENT_SECRETS_PATH",
-            Path(config_dir) / "google_client_secrets.json",
-        ) as _, mock.patch(
-            "owid.datautils.google.config.SETTINGS_PATH",
-            Path(config_dir) / "google_settings.yaml",
-        ) as _, mock.patch(
-            "owid.datautils.google.config.CREDENTIALS_PATH",
-            Path(config_dir) / "google_credentials.json",
-        ) as _:
+        with (
+            mock.patch("owid.datautils.google.config.CONFIG_DIR", config_dir),
+            mock.patch(
+                "owid.datautils.google.config.CLIENT_SECRETS_PATH",
+                Path(config_dir) / "google_client_secrets.json",
+            ) as _,
+            mock.patch(
+                "owid.datautils.google.config.SETTINGS_PATH",
+                Path(config_dir) / "google_settings.yaml",
+            ) as _,
+            mock.patch(
+                "owid.datautils.google.config.CREDENTIALS_PATH",
+                Path(config_dir) / "google_credentials.json",
+            ) as _,
+        ):
             _check_google_config()
 
 
@@ -85,15 +95,20 @@ def test_google_config_init_1(mocker_google_1, mocker_google_2):
     config_dir = next(tempfile._get_candidate_names())  # type: ignore
     defult_tmp_dir = tempfile._get_default_tempdir()  # type: ignore
     config_dir = os.path.join(defult_tmp_dir, config_dir)
-    with mock.patch("owid.datautils.google.config.CONFIG_DIR", config_dir), mock.patch(
-        "owid.datautils.google.config.CLIENT_SECRETS_PATH",
-        Path(config_dir) / "google_client_secrets.json",
-    ) as _, mock.patch(
-        "owid.datautils.google.config.SETTINGS_PATH",
-        Path(config_dir) / "google_settings.yaml",
-    ) as _, mock.patch(
-        "owid.datautils.google.config.CREDENTIALS_PATH",
-        Path(config_dir) / "google_credentials.json",
-    ) as _:
+    with (
+        mock.patch("owid.datautils.google.config.CONFIG_DIR", config_dir),
+        mock.patch(
+            "owid.datautils.google.config.CLIENT_SECRETS_PATH",
+            Path(config_dir) / "google_client_secrets.json",
+        ) as _,
+        mock.patch(
+            "owid.datautils.google.config.SETTINGS_PATH",
+            Path(config_dir) / "google_settings.yaml",
+        ) as _,
+        mock.patch(
+            "owid.datautils.google.config.CREDENTIALS_PATH",
+            Path(config_dir) / "google_credentials.json",
+        ) as _,
+    ):
         with tempfile.NamedTemporaryFile() as secrets_dir_og:
             google_config_init(str(secrets_dir_og.name))

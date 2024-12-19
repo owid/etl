@@ -1,15 +1,8 @@
 dataset:
-  namespace: fasttrack
-  version: '2023-06-16'
-  short_name: guinea_worm
   title: Guinea Worm Cases - Carter Center (2023)
   description: The number of cases of guinea worm disease worldwide since 1989
-  sources:
-  - name: The Carter Center (2023)
-    published_by: The Carter Center (2023)
-    publication_year: 2023
-    date_accessed: 2023-06-16
-    url: https://www.cartercenter.org/resources/pdfs/news/health_publications/guinea_worm/guinea-worm-cases-by-year-from-1989.pdf
+  licenses:
+    - {}
 tables:
   guinea_worm:
     variables:
@@ -17,9 +10,3 @@ tables:
         title: Guinea Worm Cases
         unit: cases
         description: The number of human cases of guinea worm disease.
-        sources:
-        - name: The Carter Center (2023)
-          published_by: The Carter Center (2023)
-          publication_year: 2023
-          date_accessed: 2023-06-16
-          url: https://www.cartercenter.org/resources/pdfs/news/health_publications/guinea_worm/guinea-worm-cases-by-year-from-1989.pdf

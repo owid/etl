@@ -74,8 +74,6 @@ steps:
     - snapshot-private://fasttrack/latest/pain_hours_hen_systems.csv
   data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
     - snapshot-private://fasttrack/latest/antibiotic_usage_livestock.csv
-  data-private://grapher/fasttrack/latest/antimicrobial_usage_livestock:
-    - snapshot-private://fasttrack/latest/antimicrobial_usage_livestock.csv
   data://grapher/fasttrack/2023-08-07/pain_hours_days_hen_systems:
     - snapshot://fasttrack/2023-08-07/pain_hours_days_hen_systems.csv
   data-private://grapher/fasttrack/latest/historical_france_mortality_cause:
@@ -236,7 +234,9 @@ steps:
     - snapshot://fasttrack/latest/pepfar_patients_receiving_art.csv
   data://grapher/fasttrack/latest/simon_ehrlich_wager:
     - snapshot://fasttrack/latest/simon_ehrlich_wager.csv
-  data://grapher/fasttrack/latest/mineral_prices_usgs:
-    - snapshot://fasttrack/latest/mineral_prices_usgs.csv
   data://grapher/fasttrack/latest/useful_energy_cost_way:
     - snapshot://fasttrack/latest/useful_energy_cost_way.csv
+  data://grapher/fasttrack/2023-06-19/world_population_comparison:
+    - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
+  data://grapher/fasttrack/latest/antimicrobial_usage_livestock:
+    - snapshot://fasttrack/latest/antimicrobial_usage_livestock.csv

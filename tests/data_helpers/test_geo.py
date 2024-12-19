@@ -1,6 +1,4 @@
-"""Test functions in etl.data_helpers.geo module.
-
-"""
+"""Test functions in etl.data_helpers.geo module."""
 
 import json
 import unittest

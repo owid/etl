@@ -1,5 +1,5 @@
 steps:
-  data://grapher/fasttrack/2023-06-19/world_population_comparison:
-    - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
   data://grapher/fasttrack/latest/democracy_lexical_index:
     - snapshot://fasttrack/latest/democracy_lexical_index.csv
+  data://grapher/fasttrack/latest/mineral_prices_usgs:
+    - snapshot://fasttrack/latest/mineral_prices_usgs.csv

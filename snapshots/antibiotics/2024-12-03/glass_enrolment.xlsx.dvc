@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: GLASS Country Participation
+    description: |-
+      The list of countries that are enrolled in the WHO's Global Antimicrobial Resistance and Use Surveillance System (GLASS). Countries can be enrolled in GLASS to collect and share data on antimicrobial consumption (AMC), and, or antimicrobial resistance (AMR) in line with the GLASS-AMR and GLASS-AMC methodologies, respectively. 
+    date_published: "2024-12-03"
+
+    # Citation
+    producer: World Health Organization
+    citation_full: |-
+      GLASS Country Participation (2024). Global Antimicrobial Resistance and Use Surveillance System (GLASS), World Health Organization. 
+    attribution_short: WHO
+
+    # Files
+    url_main: https://www.who.int/initiatives/glass/country-participation
+    date_accessed: 2024-12-03
+
+    # License
+    license:
+      name: © 2024 WHO
+      url: https://www.who.int/about/policies/terms-of-use
+
+outs:
+  - md5: d10cca0830352c8145c9feb4958b4120
+    size: 88534
+    path: glass_enrolment.xlsx

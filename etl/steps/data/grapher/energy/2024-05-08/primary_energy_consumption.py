@@ -1,5 +1,5 @@
-"""Grapher step for the primary energy consumption dataset.
-"""
+"""Grapher step for the primary energy consumption dataset."""
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
