@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Origin
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
@@ -15,6 +16,14 @@ YEAR_UN_END = 2023
 AGE_LAB_START = 15
 AGE_REPR_END = 49
 AGE_LAB_END = 65
+
+# Additional origin metadata of the paper
+origin = Origin(
+    producer="Malani and Jacob",
+    title="A New Measure of Surviving Children that Sheds Light on Long-term Trends in Fertility",
+    citation_full="Malani, A., & Jacob, A. (2024). A New Measure of Surviving Children that Sheds Light on Long-term Trends in Fertility. https://doi.org/10.3386/w33175",
+    date_published="2024-11-01",  # type: ignore
+)
 
 
 def run(dest_dir: str) -> None:
@@ -39,45 +48,16 @@ def run(dest_dir: str) -> None:
         tb_proj=tb_un_proj,
     )
 
-    # Filter TFR table
-    tb_tfr = tb_tfr.loc[
-        (tb_tfr["sex"] == "all") & (tb_tfr["age"] == "all") & (tb_tfr["variant"].isin(["estimates", "medium"])),
-        ["country", "year", "fertility_rate"],
-    ]
-
-    # Add TFR
-    tb_un = tb_un.merge(tb_tfr, on=["country", "year"], validate="m:1")
-
-    # Estimate EFR
-    tb_un["efr"] = tb_un["fertility_rate"] * tb_un["cumulative_survival"]
-
-    # Estimate metrics
-    ## EFR-labor: Average number of daughters that make it to the reproductive age (15-49)
-    ## EFR-reproductive: Average number of kids that make it to the labour age (15-65)
-    ## Cum survival prob, labor: Probability of a girl to survive to the reproductive age (15-49)
-    ## Cum survival prob, reproductive: Probability of a kid to survive to the labor age (15-65)
-    tb_un = tb_un.loc[(tb_un["age"] <= AGE_REPR_END) | (tb_un["sex"] == "total")]
-    tb_un = tb_un.groupby(["country", "year", "sex"], as_index=False)[["efr", "cumulative_survival"]].mean()
-
-    # Pivot
-    tb_un = tb_un.pivot(index=["country", "year"], columns=["sex"], values=["efr", "cumulative_survival"]).reset_index()
-
-    def rename_col(colname):
-        mapping = {
-            "female": "repr",
-            "total": "labor",
-        }
-
-        if colname[1] == "":
-            return colname[0]
-        else:
-            return f"{colname[0]}_{mapping.get(colname[1])}"
-
-    tb_un.columns = [rename_col(col) for col in tb_un.columns]
+    # Add EFR
+    tb_un = estimate_un_efr(tb_un, tb_tfr)
 
     # Format
     tb_un = tb_un.format(["country", "year"], short_name="un")
 
+    # Add extra origin
+    tb_un.efr_repr.metadata.origins = [origin] + tb_un.efr_repr.metadata.origins
+
+    # Build list of tables
     tables = [
         tb_un,
     ]
@@ -131,3 +111,44 @@ def estimate_un_cum_survival(tb, tb_proj):
     # tb = tb.drop(columns=["year_born"])
 
     return tb
+
+
+def estimate_un_efr(tb_un, tb_tfr):
+    # Filter TFR table
+    tb_tfr = tb_tfr.loc[
+        (tb_tfr["sex"] == "all") & (tb_tfr["age"] == "all") & (tb_tfr["variant"].isin(["estimates", "medium"])),
+        ["country", "year", "fertility_rate"],
+    ]
+
+    # Add TFR
+    tb_un = tb_un.merge(tb_tfr, on=["country", "year"], validate="m:1")
+
+    # Estimate EFR
+    tb_un["efr"] = tb_un["fertility_rate"] * tb_un["cumulative_survival"]
+
+    # Estimate metrics
+    ## EFR-labor: Average number of daughters that make it to the reproductive age (15-49)
+    ## EFR-reproductive: Average number of kids that make it to the labour age (15-65)
+    ## Cum survival prob, labor: Probability of a girl to survive to the reproductive age (15-49)
+    ## Cum survival prob, reproductive: Probability of a kid to survive to the labor age (15-65)
+    tb_un = tb_un.loc[(tb_un["age"] <= AGE_REPR_END) | (tb_un["sex"] == "total")]
+    tb_un = tb_un.groupby(["country", "year", "sex"], as_index=False)[["efr", "cumulative_survival"]].mean()
+
+    # Pivot
+    tb_un = tb_un.pivot(index=["country", "year"], columns=["sex"], values=["efr", "cumulative_survival"]).reset_index()
+
+    # Rename columns
+    def rename_col(colname):
+        mapping = {
+            "female": "repr",
+            "total": "labor",
+        }
+
+        if colname[1] == "":
+            return colname[0]
+        else:
+            return f"{colname[0]}_{mapping.get(colname[1])}"
+
+    tb_un.columns = [rename_col(col) for col in tb_un.columns]
+
+    return tb_un

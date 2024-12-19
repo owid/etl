@@ -17,7 +17,7 @@ tables:
       efr_repr:
         title: Reproductive Effective Fertility rate (scaled by sex ratio), using UN data
         description_short: |-
-          The number of daughters that live long enough to reproduce, between ages 15 and 49. This focuses on daughters, not all children because only females reproduce. Because a child need not live until age 49 to reproduce, we approximate efr_r by taking the average of efr over all reproductive ages (15-49).
+          The number of children who live long enough to reproduce, per woman. This number is dependent on the survival of daughters to childbearing age (between 15 and 49 years old).
         unit: "children per women"
         description_processing: |-
           For a given cohort year, we estimate the cumulative survival probability for a person to reach each age from 0 to 49. For example, the probability of a person born in 2000 reaching age 15, 16, 17, and so on up to 49.
@@ -37,7 +37,7 @@ tables:
       efr_labor:
         title: Labor Effective Fertility rate, using UN data
         description_short: |-
-          The number of children born in a year who will live long enough to earn labor income. This is approximated this by taking the average of Effective Fertility rate (EFR) over all working ages (15-65).
+          The number of children who live long enough to earn labor income, per woman. This number is dependent on the survival of daughters to childbearing age (between 15 and 49 years old).
         unit: "children per women"
         description_processing: |-
           For a given cohort year, we estimate the cumulative survival probability for a person to reach each age age from 0 to 65. E.g. the probability of a person born in 2000 to reach age 15, 16, 17, ..., 65.
