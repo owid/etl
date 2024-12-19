@@ -178,10 +178,6 @@ IPDB_ENABLED = False
 # because we're making a lot of HTTP requests
 DIRTY_STEPS_WORKERS = int(env.get("DIRTY_STEPS_WORKERS", 5))
 
-# number of workers for grapher inserts to DB, this is for all processes, so if
-# --workers is higher than 1, this will be divided among them
-GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
-
 # only upsert indicators matching this filter, this is useful for fast development
 # of data pages for a single indicator
 GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)

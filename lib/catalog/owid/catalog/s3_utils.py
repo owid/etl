@@ -144,10 +144,7 @@ def _read_owid_rclone_config() -> Dict[str, str]:
     return dict(config["owid-r2"].items())
 
 
-def connect_r2() -> BaseClient:
-    "Return a connection to Cloudflare's R2."
-    import boto3
-
+def r2_config():
     # first, get the R2 credentials from dotenv
     R2_ACCESS_KEY = env.get("R2_ACCESS_KEY")
     R2_SECRET_KEY = env.get("R2_SECRET_KEY")
@@ -165,7 +162,7 @@ def connect_r2() -> BaseClient:
         except KeyError:
             pass
 
-    client = boto3.client(
+    return dict(
         service_name="s3",
         aws_access_key_id=R2_ACCESS_KEY,
         aws_secret_access_key=R2_SECRET_KEY,
@@ -173,7 +170,12 @@ def connect_r2() -> BaseClient:
         region_name=R2_REGION_NAME or "auto",
     )
 
-    return client
+
+def connect_r2() -> BaseClient:
+    "Return a connection to Cloudflare's R2."
+    import boto3
+
+    return boto3.client(**r2_config())
 
 
 @lru_cache(maxsize=None)
