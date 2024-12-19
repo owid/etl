@@ -9,8 +9,6 @@ from apps.wizard.utils import embeddings as emb
 from apps.wizard.utils.components import Pagination, st_horizontal, st_multiselect_wider, url_persist
 from etl.config import OWID_ENV
 
-DEVICE = "cpu"
-
 # Initialize log.
 log = get_logger()
 
@@ -26,7 +24,7 @@ st.set_page_config(
 ########################################################################################################################
 
 
-def st_chart_info(chart: data.Chart):
+def st_chart_info(chart: data.Chart) -> None:
     chart_url = OWID_ENV.chart_site(chart.slug)
     title = f"#### [{chart.title}]({chart_url})"
     if chart.gpt_reason:
@@ -38,21 +36,23 @@ def st_chart_info(chart: data.Chart):
     st.markdown(f"Pageviews: **{chart.views_365d}**")
 
 
+def st_chart_scores(chart: data.Chart, sim_components: pd.DataFrame) -> None:
+    st.markdown(f"#### Similarity: {chart.similarity:.0%}")
+    st.table(sim_components.loc[chart.chart_id].to_frame("score").style.format("{:.0%}"))
+    if chart.gpt_reason:
+        st.markdown(f"**GPT Diversity Reason**:\n{chart.gpt_reason}")
+
+
 def st_display_chart(
     chart: data.Chart,
     sim_components: pd.DataFrame = pd.DataFrame(),
-):
+) -> None:
     with st.container(border=True):
         col1, col2 = st.columns(2)
         with col1:
             st_chart_info(chart)
         with col2:
-            st.markdown(f"#### Similarity: {chart.similarity:.0%}")
-            st.table(sim_components.loc[chart.chart_id].to_frame("score").style.format("{:.0%}"))
-            if chart.gpt_reason:
-                st.markdown(f"**GPT Diversity Reason**:\n{chart.gpt_reason}")
-
-    return
+            st_chart_scores(chart, sim_components)
 
 
 def split_input_string(input_string: str) -> tuple[str, list[str], list[str]]:
@@ -70,14 +70,6 @@ def split_input_string(input_string: str) -> tuple[str, list[str], list[str]]:
             query.append(term)
 
     return " ".join(query), includes, excludes
-
-
-def indicator_query(indicator: dict) -> str:
-    return indicator["name"] + " " + indicator["description"] + " " + (indicator["catalogPath"] or "")
-
-
-def chart_text(chart: dict) -> str:
-    return chart["title"]
 
 
 @st.cache_data(show_spinner=False, max_entries=1)
