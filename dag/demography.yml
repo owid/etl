@@ -279,11 +279,9 @@ steps:
   # Effective Fertility Rate (Malani & Jacob)
   #
   data://garden/demography/2024-12-17/efr_malani_jacob:
-    - data://garden/demography/2024-12-03/life_tables
     - data://garden/un/2024-12-02/un_wpp_lt
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/hmd/2024-12-01/hmd
-    - data://garden/hmd/2024-11-19/hfd
   data://grapher/demography/2024-12-17/efr_malani_jacob:
     - data://garden/demography/2024-12-17/efr_malani_jacob
 
