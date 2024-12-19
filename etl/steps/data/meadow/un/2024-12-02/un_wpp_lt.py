@@ -31,6 +31,9 @@ def run(dest_dir: str) -> None:
         "un_wpp_lt_all",  # ALL
         "un_wpp_lt_f",  # FEMALE
         "un_wpp_lt_m",  # MALE
+        "un_wpp_lt_proj_all",  # PROJECTIONS, ALL
+        "un_wpp_lt_proj_f",  # PROJECTIONS, FEMALE
+        "un_wpp_lt_proj_m",  # PROJECTIONS, MALE
     ]
 
     tables = []
@@ -53,7 +56,7 @@ def run(dest_dir: str) -> None:
             tb["LocTypeName"].isin(["Geographic region", "Income group", "Country/Area", "World", "Development group"])
         ]
         # Set index
-        tb = tb.format(["location", "time", "sex", "agegrp", "loctypename"])
+        tb = tb.format(["location", "time", "sex", "agegrp", "loctypename", "variant"])
         # Add to tables list
         tables.append(tb)
 

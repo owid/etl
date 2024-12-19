@@ -145,6 +145,9 @@ steps:
     - snapshot://un/2024-12-02/un_wpp_lt_m.csv
     - snapshot://un/2024-12-02/un_wpp_lt_all.csv
     - snapshot://un/2024-12-02/un_wpp_lt_f.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_proj_m.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_proj_all.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_proj_f.csv
   data://garden/un/2024-12-02/un_wpp_lt:
     - data://meadow/un/2024-12-02/un_wpp_lt
 
@@ -272,6 +275,16 @@ steps:
   data://grapher/demography/2024-12-05/paternal_ages:
     - data://garden/demography/2024-12-05/paternal_ages
 
+  #
+  # Effective Fertility Rate (Malani & Jacob)
+  #
+  data://garden/demography/2024-12-17/efr_malani_jacob:
+    - data://garden/un/2024-12-02/un_wpp_lt
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/hmd/2024-12-01/hmd
+  data://grapher/demography/2024-12-17/efr_malani_jacob:
+    - data://garden/demography/2024-12-17/efr_malani_jacob
+
   # Mean Age at childbirth (HFD + UN WPP)
   data://garden/demography/2024-12-18/mean_age_childbearing:
     - data://garden/un/2024-07-12/un_wpp
@@ -282,7 +295,6 @@ steps:
   ########################################################################
   # OTHERS
   ########################################################################
-
   # Wittgenstein Centre (Projections)
   data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj:
     - snapshot://demography/2024-12-06/wittgenstein_human_capital.zip
