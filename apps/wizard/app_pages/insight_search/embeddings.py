@@ -8,7 +8,6 @@ import torch
 from joblib import Memory
 from sentence_transformers import SentenceTransformer, util
 from structlog import get_logger
-from tqdm.auto import tqdm
 
 from etl.paths import CACHE_DIR
 
