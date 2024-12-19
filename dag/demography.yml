@@ -287,6 +287,13 @@ steps:
   data://grapher/demography/2024-12-17/efr_malani_jacob:
     - data://garden/demography/2024-12-17/efr_malani_jacob
 
+  # Mean Age at childbirth (HFD + UN WPP)
+  data://garden/demography/2024-12-18/mean_age_childbearing:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/hmd/2024-11-19/hfd
+  data://grapher/demography/2024-12-18/mean_age_childbearing:
+    - data://garden/demography/2024-12-18/mean_age_childbearing
+
   ########################################################################
   # OTHERS
   ########################################################################

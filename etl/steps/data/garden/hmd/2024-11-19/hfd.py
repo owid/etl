@@ -529,13 +529,17 @@ def run(dest_dir: str) -> None:
         }
     )
 
-    # TODO: move elsewhere
-    # Build special table
-    years = list(range(1925, tb_period_ages["year"].max() + 1, 5))
-    tb_period_years = tb_period_ages.loc[
-        tb_period_ages["year"].isin(years) & (tb_period_ages["birth_order"] == "total")
-    ].drop(columns=["birth_order"])
+    # Special table: Distribution of period metrics
+    ## Keep only birth_order = total
+    tb_period_years = tb_period_ages.loc[(tb_period_ages["birth_order"] == "total")].drop(columns=["birth_order"])
+    ## Keep only cohorts that are multiples of 5 (from year_min to year_max)
+    year_min = tb_period_years.loc[tb_period_years["year"] % 5 == 0, "year"].min()
+    year_max = tb_period_years["year"].max() + 1
+    years = list(range(year_min, year_max, 5))
+    tb_period_years = tb_period_years.loc[tb_period_years["year"].isin(years)]
+    ## Change age group names 12- -> 12, 55+ -> 55
     tb_period_years["age"] = tb_period_years["age"].str.replace("-", "").str.replace("+", "").astype("UInt8")
+    ## HOTFIX: Name of the dimension
     tb_period_years = tb_period_years.rename(
         columns={
             "year": "year_as_dimension",
@@ -579,14 +583,19 @@ def run(dest_dir: str) -> None:
         }
     )
 
-    # TODO: move elsewhere
-    # Build special table
-    years = list(range(1925, tb_cohort_ages["cohort"].max() + 1, 5))
-    tb_cohort_years = tb_cohort_ages.loc[
-        tb_cohort_ages["cohort"].isin(years) & (tb_cohort_ages["birth_order"] == "total")
-    ].drop(columns=["birth_order"])
+    # Special table: Distribution of cohort metrics
+    ## Keep only birth_order = total
+    tb_cohort_years = tb_cohort_ages.loc[(tb_cohort_ages["birth_order"] == "total")].drop(columns=["birth_order"])
+    ## Keep only cohorts that are multiples of 5 (from year_min to year_max)
+    year_min = tb_cohort_years.loc[tb_cohort_years["cohort"] % 5 == 0, "cohort"].min()
+    year_max = tb_cohort_years["cohort"].max() + 1
+    years = list(range(year_min, year_max, 5))
+    tb_cohort_years = tb_cohort_years.loc[tb_cohort_years["cohort"].isin(years)]
+    ## Change age group names 12- -> 12, 55+ -> 55
     tb_cohort_years["age"] = tb_cohort_years["age"].str.replace("-", "").str.replace("+", "").astype("UInt8")
-    # Fix 12- vs 12, 55+ vs 55 etc.
+    # 'asfr_cohort' and 'ccfr_cohort' don't always use the same names for the same age groups. E.g. 12- vs 12, 55+ vs 55 etc.
+    # Therefore, these age groups are not aligned after the merge. We fix this by grouping + averaging.
+    # The following check ensures that this is actually the case, so that the groupby.mean makes sense!
     assert tb_cohort_years.groupby(["country", "cohort", "age"])["asfr_cohort"].nunique().max() == 1
     assert tb_cohort_years.groupby(["country", "cohort", "age"])["ccfr_cohort"].nunique().max() == 1
     tb_cohort_years = tb_cohort_years.groupby(["country", "cohort", "age"], as_index=False).mean()
