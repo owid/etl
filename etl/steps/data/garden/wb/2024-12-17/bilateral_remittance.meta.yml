@@ -28,6 +28,5 @@ tables:
           (c) Remittance behavior of second-generation migrants who may be recorded as native-born in the remittance source country are not accounted for;
           (d) There is no way to capture remittances flowing  through informal, unrecorded channels;
           (e) It does not account for cases where remittances may be miscalculated due to accounting errors arising from confusion with trade and tourism receipts;
-          (f) It may also include cases of retirees moving to certain countries and taking out (remitting) their life long savings."
-        unit: Current US Dollars
-        short_unit: USD
+        unit: current US$
+        short_unit: $

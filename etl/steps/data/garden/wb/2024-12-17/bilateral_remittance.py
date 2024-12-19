@@ -32,13 +32,18 @@ def run(dest_dir: str) -> None:
     # filter on 2021 as that is the year we have data for
     tb = tb[tb["year"] == 2021]
 
-    tb.metadata.short_name = "bilateral_remittance"
-
     #
     # Harmonize country names
     #
-    tb = geo.harmonize_countries(df=tb, country_col="country_origin", countries_file=paths.country_mapping_path)
-    tb = geo.harmonize_countries(df=tb, country_col="country_receiving", countries_file=paths.country_mapping_path)
+    tb = geo.harmonize_countries(
+        df=tb, country_col="country_origin", countries_file=paths.country_mapping_path, warn_on_unused_countries=False
+    )
+    tb = geo.harmonize_countries(
+        df=tb,
+        country_col="country_receiving",
+        countries_file=paths.country_mapping_path,
+        warn_on_unused_countries=False,
+    )
 
     # aggregate over countries:
     tb = geo.add_regions_to_table(
