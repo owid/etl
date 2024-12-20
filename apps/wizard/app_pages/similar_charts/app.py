@@ -113,11 +113,16 @@ with col2:
         chart_slug = random.sample(charts, 1)[0].slug
         st.session_state["chart_search_text"] = chart_slug
 
-    chart_search_text = url_persist(st.text_input)(
-        # chart_search_text = st.text_input(
+    # chart_search_text = url_persist(st.text_input)(
+    #     key="chart_search_text",
+    #     label="Chart slug or ID",
+    #     placeholder="Type something...",
+    # )
+
+    chart_search_text = url_persist(st.selectbox)(
+        "Select a chart",
         key="chart_search_text",
-        label="Chart slug or ID or text search",
-        placeholder="Type something...",
+        options=[c.slug for c in charts],
     )
 
     # Advanced expander.
@@ -160,11 +165,13 @@ chosen_chart = next(
     None,
 )
 if not chosen_chart:
-    # Find a chart by title
-    chart_id = scoring_model.similar_chart_by_title(chart_search_text)
-    chosen_chart = next((chart for chart in charts if chart.chart_id == chart_id), None)
-    assert chosen_chart
+    st.error(f"Chart with slug {chart_search_text} not found.")
 
+    # # Find a chart by title
+    # chart_id = scoring_model.similar_chart_by_title(chart_search_text)
+    # chosen_chart = next((chart for chart in charts if chart.chart_id == chart_id), None)
+
+assert chosen_chart
 
 # Display chosen chart
 with col1:
