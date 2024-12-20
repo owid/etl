@@ -63,7 +63,8 @@ def run(dest_dir: str) -> None:
     tb_un = tb_un.format(["country", "year"], short_name="un")
 
     # Add extra origin
-    tb_un.efr_repr.metadata.origins = [origin] + tb_un.efr_repr.metadata.origins
+    for col in tb_un.columns:
+        tb_un[col].metadata.origins = [origin] + tb_un[col].metadata.origins
 
     # Build list of tables
     tables = [
