@@ -56,7 +56,6 @@ def main():
     to_exclude = {s: True for s in sorted(snapshots_to_exclude(active_snapshots) | steps_to_exclude(active_steps))}
 
     # Update .vscode/settings file
-    # update .vscode/settings.json
     settings = json.loads((BASE_DIR / ".vscode/settings.json").read_text())
     settings["files.exclude"].update(to_exclude)
     settings["search.exclude"].update(to_exclude)
