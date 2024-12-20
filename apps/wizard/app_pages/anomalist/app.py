@@ -32,9 +32,16 @@ from apps.wizard.app_pages.anomalist.utils import (
     get_datasets_and_mapping_inputs,
     get_scores,
 )
-from apps.wizard.utils import cached, set_states, url_persist
+from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.chart_config import bake_chart_config
-from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, st_multiselect_wider, tag_in_md
+from apps.wizard.utils.components import (
+    Pagination,
+    grapher_chart,
+    st_horizontal,
+    st_multiselect_wider,
+    tag_in_md,
+    url_persist,
+)
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
 from etl.grapher_io import load_variables

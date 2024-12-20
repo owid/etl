@@ -174,7 +174,7 @@ def _safe_dtype(dtype: Any) -> str:
         return "boolean"
     elif isinstance(dtype, pd.CategoricalDtype):
         return "string[pyarrow]"
-    elif dtype == object:
+    elif dtype == "object":
         return "string[pyarrow]"
     else:
         return dtype

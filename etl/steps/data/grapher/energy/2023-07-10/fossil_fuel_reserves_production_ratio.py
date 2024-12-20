@@ -1,6 +1,4 @@
-"""Grapher step for the fossil fuel reserves-to-production ratio dataset.
-
-"""
+"""Grapher step for the fossil fuel reserves-to-production ratio dataset."""
 
 from owid.catalog import Dataset
 

@@ -13,6 +13,7 @@ Another option is to run `show create table mytable;` in MySQL and then ask Chat
 
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
 """
+
 import copy
 import io
 import json
@@ -1271,15 +1272,13 @@ class Variable(Base):
     @classmethod
     def from_id_or_path(
         cls, session: Session, id_or_path: str | int, columns: Optional[List[str]] = None
-    ) -> "Variable":
-        ...
+    ) -> "Variable": ...
 
     @overload
     @classmethod
     def from_id_or_path(
         cls, session: Session, id_or_path: List[str | int], columns: Optional[List[str]] = None
-    ) -> List["Variable"]:
-        ...
+    ) -> List["Variable"]: ...
 
     @classmethod
     def from_id_or_path(
@@ -1323,15 +1322,15 @@ class Variable(Base):
 
     @overload
     @classmethod
-    def from_catalog_path(cls, session: Session, catalog_path: str, columns: Optional[List[str]] = None) -> "Variable":
-        ...
+    def from_catalog_path(
+        cls, session: Session, catalog_path: str, columns: Optional[List[str]] = None
+    ) -> "Variable": ...
 
     @overload
     @classmethod
     def from_catalog_path(
         cls, session: Session, catalog_path: List[str], columns: Optional[List[str]] = None
-    ) -> List["Variable"]:
-        ...
+    ) -> List["Variable"]: ...
 
     @classmethod
     def from_catalog_path(
@@ -1346,13 +1345,13 @@ class Variable(Base):
 
     @overload
     @classmethod
-    def from_id(cls, session: Session, variable_id: int, columns: Optional[List[str]] = None) -> "Variable":
-        ...
+    def from_id(cls, session: Session, variable_id: int, columns: Optional[List[str]] = None) -> "Variable": ...
 
     @overload
     @classmethod
-    def from_id(cls, session: Session, variable_id: List[int], columns: Optional[List[str]] = None) -> List["Variable"]:
-        ...
+    def from_id(
+        cls, session: Session, variable_id: List[int], columns: Optional[List[str]] = None
+    ) -> List["Variable"]: ...
 
     @classmethod
     def from_id(

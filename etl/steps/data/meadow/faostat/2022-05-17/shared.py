@@ -1,6 +1,4 @@
-"""Shared definitions in FAOSTAT meadow steps.
-
-"""
+"""Shared definitions in FAOSTAT meadow steps."""
 
 import os
 import tempfile

@@ -122,7 +122,7 @@ def run(dest_dir: str) -> None:
     tb["other_help_harm"] = tb[["dk__help_harm", "dont_have_an_opinion", "refused__help_harm"]].sum(axis=1).values
     tb["other_yes_no"] = tb[["dk__cars", "refused__cars"]].sum(axis=1).values
     tb[["dk_no_op", "other_help_harm", "other_yes_no"]] = tb[["dk_no_op", "other_help_harm", "other_yes_no"]].replace(
-        0.0, np.NaN
+        0.0, np.nan
     )
 
     #

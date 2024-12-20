@@ -1,4 +1,5 @@
 """Garden phase."""
+
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List
@@ -11,7 +12,16 @@ from typing_extensions import Self
 import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps.utils import TAGS_DEFAULT, remove_playground_notebook
+from apps.wizard.etl_steps_old.utils import (
+    ADD_DAG_OPTIONS,
+    COOKIE_STEPS,
+    MD_EXPRESS,
+    TAGS_DEFAULT,
+    dag_files,
+    dag_not_add_option,
+    remove_playground_notebook,
+)
+from apps.wizard.utils.components import config_style_html, preview_file, st_wizard_page_link
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.paths import DAG_DIR
@@ -36,7 +46,7 @@ st.session_state["step_name"] = "express"
 APP_STATE = utils.AppState()
 APP_STATE._previous_step = "snapshot"
 # Config style
-utils.config_style_html()
+config_style_html()
 # DUMMY defaults
 dummy_values = {
     "namespace": "dummy",
@@ -64,7 +74,7 @@ except OperationalError:
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=utils.MD_EXPRESS, mode="r") as f:
+    with open(file=MD_EXPRESS, mode="r") as f:
         return f.read()
 
 
@@ -92,7 +102,7 @@ class ExpressForm(utils.StepForm):
 
     def __init__(self: Self, **data: str | date | bool | int) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
-        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+        data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
 
         # Handle custom namespace
         if ("namespace_custom" in data) and data["namespace_custom"] is not None:
@@ -225,9 +235,7 @@ class ExpressForm(utils.StepForm):
 
     def create_files(self, channel: str) -> List[Dict[str, Any]]:
         # Generate files
-        DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_STEPS[channel], data=self.to_dict(channel)
-        )
+        DATASET_DIR = generate_step_to_channel(cookiecutter_path=COOKIE_STEPS[channel], data=self.to_dict(channel))
         # Remove playground (by default it is created, we no longer want it)
         remove_playground_notebook(DATASET_DIR)
         # Add to generated files
@@ -286,28 +294,19 @@ def edit_field() -> None:
     utils.set_states({"submit_form": False})
 
 
-def export_metadata() -> None:
-    dataset_path = st.session_state["garden.dataset_path"]
-    try:
-        output_path = utils.metadata_export_basic(dataset_path=dataset_path)
-    except Exception as e:
-        st.exception(e)
-        st.stop()
-    else:
-        st.success(f"Metadata exported to `{output_path}`.")
-
-
 #########################################################
 # MAIN ##################################################
 #########################################################
 # TITLE
 st.title(":material/bolt: Express **:gray[Create steps]**")
 
-st.info("Use this step to create Meadow, Garden and Grapher step for a _single dataset_!")
+# Deprecate warning
+with st.container(border=True):
+    st.warning("This has been deprecated. Use the new version instead.", icon=":material/warning:")
+    st_wizard_page_link("data")
 
 # SIDEBAR
 with st.sidebar:
-    # utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()  # TODO: which instructions?
         st.markdown(text)
@@ -390,12 +389,12 @@ with form_widget.container(border=True):
 
     # Add to DAG
     sorted_dag = sorted(
-        utils.dag_files,
+        dag_files,
         key=lambda file_name: fuzz.ratio(file_name.replace(".yml", ""), APP_STATE.vars[namespace_key]),
         reverse=True,
     )
     sorted_dag = [
-        utils.dag_not_add_option,
+        dag_not_add_option,
         *sorted_dag,
     ]
     if sorted_dag[1].replace(".yml", "") == APP_STATE.vars[namespace_key]:
@@ -493,13 +492,13 @@ if st.session_state.submit_form:
         for f in generated_files:
             if f["channel"] == "meadow":
                 with tab_meadow:
-                    utils.preview_file(f["path"], f["language"])
+                    preview_file(f["path"], f["language"])
             elif f["channel"] == "garden":
                 with tab_garden:
-                    utils.preview_file(f["path"], f["language"])
+                    preview_file(f["path"], f["language"])
             elif f["channel"] == "grapher":
                 with tab_grapher:
-                    utils.preview_file(f["path"], f["language"])
+                    preview_file(f["path"], f["language"])
 
         #######################
         # NEXT STEPS ##########
@@ -523,7 +522,7 @@ if st.session_state.submit_form:
                 "shellSession",
             )
             st.markdown("Or run it on Wizard")
-            utils.st_page_link(
+            st_wizard_page_link(
                 "harmonizer",
                 use_container_width=True,
                 help="You will leave this page, and the guideline text will be hidden.",

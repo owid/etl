@@ -1,4 +1,5 @@
 """Client module."""
+
 import os
 from typing import Any, Dict, Literal, cast
 

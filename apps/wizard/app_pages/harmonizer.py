@@ -1,4 +1,5 @@
 """Harmonize entities."""
+
 import json
 from operator import itemgetter
 from pathlib import Path
@@ -117,7 +118,7 @@ st.markdown(
 # show_all = False
 options = get_datasets_in_etl(
     snapshots=False,
-    prefixes=None if st.session_state.show_all else ["data://meadow"],
+    prefixes=None if st.session_state.show_all else ["data://meadow", "data-private://meadow"],
 )
 option = st.selectbox(
     label="Select a dataset",

@@ -3,6 +3,7 @@
 
 If you want to learn more about it, start from its `show` method.
 """
+
 import difflib
 import json
 import os

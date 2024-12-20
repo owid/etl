@@ -4,6 +4,7 @@ NOTE: Some of the processing in this step could be simplified (it inherited some
 version, where data needed to be combined with the European Electricity Review).
 
 """
+
 from typing import Dict
 
 import owid.catalog.processing as pr

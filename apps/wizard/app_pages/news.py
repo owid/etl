@@ -1,4 +1,5 @@
 """Display news from ETL."""
+
 from datetime import datetime
 
 import streamlit as st

@@ -7,7 +7,9 @@
 Helpers for working with Git in an ETL flow.
 """
 
+import time
 from dataclasses import dataclass
+from functools import wraps
 from pathlib import Path
 from typing import Any, Dict, Optional, Union, cast
 
@@ -134,13 +136,28 @@ class GitError(Exception):
     pass
 
 
+def log_time(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        log.info(f"{func.__name__}.start")
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        log.info(f"{func.__name__}.end", t=end_time - start_time)
+        return result
+
+    return wrapper
+
+
+@log_time
 def get_changed_files(
     current_branch: Optional[str] = None,
     base_branch: Optional[str] = None,
     repo_path: Union[Path, str] = BASE_DIR,
     only_committed: bool = False,
 ) -> Dict[str, Dict[str, str]]:
-    """Return files that are different between the current branch and the specified base branch."""
+    """Return files that are different between the current branch and the specified base branch. This can
+    be really slow if the number of files is large."""
     repo = Repo(repo_path)
 
     if current_branch is None:

@@ -7,6 +7,7 @@ What do we do here?
 - Format the tables to have them in long format
 - Set indices and verify integrity
 """
+
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -83,6 +84,7 @@ def run(dest_dir: str) -> None:
     tb_death_rate = clean_table_standard_xlsx(tb_main, "Crude Death Rate (deaths per 1,000 population)", "death_rate")
     tb_birth_rate = clean_table_standard_xlsx(tb_main, "Crude Birth Rate (births per 1,000 population)", "birth_rate")
     tb_median_age = clean_table_standard_xlsx(tb_main, "Median Age, as of 1 July (years)", "median_age")
+    tb_macb = clean_table_standard_xlsx(tb_main, "Mean Age Childbearing (years)", "mean_age_childbearing")
     tb_mortality = make_tb_mortality(tb_main)
     tb_le = make_tb_life_expectancy(tb_main)
 
@@ -114,7 +116,7 @@ def run(dest_dir: str) -> None:
         tb_median_age,
         tb_le,
         tb_mortality,
-        # tb_childbearing_age,
+        tb_macb,
         # tb_population_doubling,
     ]
     # Create a new meadow dataset with the same metadata as the snapshot.

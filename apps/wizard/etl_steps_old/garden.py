@@ -1,4 +1,5 @@
 """Garden phase."""
+
 import os
 from pathlib import Path
 from typing import List, cast
@@ -11,7 +12,14 @@ from typing_extensions import Self
 import etl.grapher_model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps.utils import TAGS_DEFAULT
+from apps.wizard.etl_steps_old.utils import (
+    ADD_DAG_OPTIONS,
+    COOKIE_GARDEN,
+    MD_GARDEN,
+    TAGS_DEFAULT,
+    render_responsive_field_in_form,
+)
+from apps.wizard.utils.components import config_style_html, preview_file, st_wizard_page_link
 from etl.config import DB_HOST, DB_NAME
 from etl.db import get_session
 from etl.files import ruamel_dump, ruamel_load
@@ -34,7 +42,7 @@ CURRENT_DIR = Path(__file__).parent
 st.session_state["step_name"] = "garden"
 APP_STATE = utils.AppState()
 # Config style
-utils.config_style_html()
+config_style_html()
 # DUMMY defaults
 dummy_values = {
     "namespace": "dummy",
@@ -62,7 +70,7 @@ except OperationalError:
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=utils.MD_GARDEN, mode="r") as f:
+    with open(file=MD_GARDEN, mode="r") as f:
         return f.read()
 
 
@@ -85,7 +93,7 @@ class GardenForm(utils.StepForm):
 
     def __init__(self: Self, **data: str | bool) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
-        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+        data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
 
         # Handle custom namespace
         if "namespace_custom" in data:
@@ -213,9 +221,13 @@ def export_metadata() -> None:
 # TITLE
 st.title(":material/deceased: Garden **:gray[Create step]**")
 
+# Deprecate warning
+with st.container(border=True):
+    st.warning("This has been deprecated. Use the new version instead.", icon=":material/warning:")
+    st_wizard_page_link("data")
+
 # SIDEBAR
 with st.sidebar:
-    # utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
@@ -307,7 +319,7 @@ with form_widget.form("garden"):
     APP_STATE.st_widget(
         st.selectbox,
         label="Add to DAG",
-        options=utils.ADD_DAG_OPTIONS,
+        options=ADD_DAG_OPTIONS,
         key="dag_file",
         help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
     )
@@ -340,7 +352,7 @@ with form_widget.form("garden"):
 
 
 # Render responsive namespace field
-utils.render_responsive_field_in_form(
+render_responsive_field_in_form(
     key="namespace",
     display_name="Namespace",
     field_1=namespace_field[0],
@@ -393,7 +405,7 @@ if submitted:
             form_dict["topic_tags"] = "- " + "\n- ".join(form_dict["topic_tags"])
 
         DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_GARDEN, data=dict(**form_dict, channel="garden")
+            cookiecutter_path=COOKIE_GARDEN, data=dict(**form_dict, channel="garden")
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")
@@ -413,8 +425,8 @@ if submitted:
         # Preview generated files
         st.subheader("Generated files")
         if form.include_metadata_yaml:
-            utils.preview_file(metadata_path, "yaml")
-        utils.preview_file(step_path, "python")
+            preview_file(metadata_path, "yaml")
+        preview_file(step_path, "python")
         if form.generate_notebook:
             with st.expander(f"File: `{notebook_path}`", expanded=False):
                 st.markdown("Open the file to see the generated notebook.")
@@ -430,7 +442,7 @@ if submitted:
                 "shellSession",
             )
             st.markdown("Or run it on Wizard")
-            utils.st_page_link(
+            st_wizard_page_link(
                 "harmonizer",
                 use_container_width=True,
                 help="You will leave this page, and the guideline text will be hidden.",
@@ -452,9 +464,9 @@ if submitted:
                     f"Use the generated notebook `{notebook_path.relative_to(BASE_DIR)}` to examine the dataset output interactively."
                 )
                 # B/ Generate metadata
-                st.session_state[
-                    "garden.dataset_path"
-                ] = f"data/garden/{form.namespace}/{form.version}/{form.short_name}"
+                st.session_state["garden.dataset_path"] = (
+                    f"data/garden/{form.namespace}/{form.version}/{form.short_name}"
+                )
                 st.markdown("#### Generate metadata")
                 st.markdown(f"Generate metadata file `{form.short_name}.meta.yml` from your dataset with:")
                 st.button(
@@ -507,7 +519,7 @@ if submitted:
             st.markdown(
                 "If you are an internal OWID member and want to push data to our Grapher DB, continue to the grapher step or to explorers step."
             )
-            utils.st_page_link("grapher", use_container_width=True, border=True)
+            st_wizard_page_link("grapher", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

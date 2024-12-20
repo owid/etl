@@ -1,6 +1,4 @@
-"""This script should be manually adapted and executed on the event of an update of the Maddison Project Database.
-
-"""
+"""This script should be manually adapted and executed on the event of an update of the Maddison Project Database."""
 
 import click
 

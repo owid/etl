@@ -6,6 +6,7 @@ import hashlib
 import json
 import shutil
 import warnings
+from _hashlib import HASH
 from dataclasses import dataclass
 from glob import glob
 from os import environ
@@ -16,12 +17,11 @@ from typing import Any, Dict, Iterator, List, Literal, Optional, Union, cast
 import numpy as np
 import pandas as pd
 import yaml
-from _hashlib import HASH
 
 from owid.repack import to_safe_types
 
 from . import tables, utils
-from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta
+from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, TableMeta, VariableMeta
 from .processing_log import disable_processing_log
 from .properties import metadata_property
 
@@ -119,7 +119,7 @@ class Dataset:
             utils.validate_underscore(col, "Variable's name")
 
         if not table.primary_key:
-            if "OWID_STRICT" in environ:
+            if environ.get("OWID_STRICT"):
                 raise PrimaryKeyMissing(
                     f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
                 )
@@ -128,7 +128,7 @@ class Dataset:
                     f"Table `{table.metadata.short_name}` does not have a primary_key -- please use t.set_index([col, ...], verify_integrity=True) to indicate dimensions before saving"
                 )
 
-        if not table.index.is_unique and "OWID_STRICT" in environ:
+        if not table.index.is_unique and environ.get("OWID_STRICT"):
             [(k, dups)] = table.index.value_counts().head(1).to_dict().items()
             raise NonUniqueIndex(
                 f"Table `{table.metadata.short_name}` has duplicate values in the index -- could you have made a mistake?\n\n"
@@ -155,7 +155,13 @@ class Dataset:
             table_filename = join(self.path, table.metadata.checked_name + f".{format}")
             table.to(table_filename, repack=repack)
 
-    def read(self, name: str, reset_index: bool = True, safe_types: bool = True) -> tables.Table:
+    def read(
+        self,
+        name: str,
+        reset_index: bool = True,
+        safe_types: bool = True,
+        reset_metadata: Literal["keep", "keep_origins", "reset"] = "keep",
+    ) -> tables.Table:
         """Read dataset's table from disk. Alternative to ds[table_name], but
         with more options to optimize the reading.
 
@@ -163,6 +169,10 @@ class Dataset:
             large datasets with multi-indexes much faster.
         :param safe_types: If true, convert numeric columns to Float64 and Int64 and categorical
             columns to string[pyarrow]. This can significantly increase memory usage.
+        :param reset_metadata: Controls variable metadata reset behavior.
+            - "keep": Leave metadata unchanged (default).
+            - "keep_origins": Reset variable metadata but retain the 'origins' attribute.
+            - "reset": Reset all variable metadata.
         """
         stem = self.path / Path(name)
 
@@ -173,6 +183,15 @@ class Dataset:
                 t.metadata.dataset = self.metadata
                 if safe_types:
                     t = cast(tables.Table, to_safe_types(t))
+                if reset_metadata in ["keep_origins", "reset"]:  # Handles "keep_origins" and "reset"
+                    t.metadata = TableMeta()
+                    for col in t.columns:
+                        if reset_metadata == "keep_origins":  # Preserve 'origins' attribute
+                            origins = t[col].metadata.origins if hasattr(t[col].metadata, "origins") else None
+                            t[col].metadata = VariableMeta()
+                            t[col].metadata.origins = origins  # Preserve 'origins' attribute
+                        if reset_metadata == "reset":  # Reset all metadata
+                            t[col].metadata = VariableMeta()
                 return t
 
         raise KeyError(f"Table `{name}` not found, available tables: {', '.join(self.table_names)}")
@@ -222,6 +241,7 @@ class Dataset:
         if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
         if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
         errors: Literal["ignore", "warn", "raise"] = "raise",
+        extra_variables: Literal["raise", "ignore"] = "raise",
     ) -> None:
         """
         Load YAML file with metadata from given path and update metadata of dataset and its tables.
@@ -258,7 +278,11 @@ class Dataset:
                                 warnings.warn(str(e))
                             continue
                 table.update_metadata_from_yaml(
-                    metadata_path, table_name, if_origins_exist=if_origins_exist, yaml_params=yaml_params
+                    metadata_path,
+                    table_name,
+                    if_origins_exist=if_origins_exist,
+                    yaml_params=yaml_params,
+                    extra_variables=extra_variables,
                 )
                 table._save_metadata(join(self.path, table.metadata.checked_name + ".meta.json"))
 

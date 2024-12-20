@@ -4,6 +4,7 @@ This is the page that is loaded when the app is started. It redirects to the hom
 
 NOTE: This only works with >1.35 (nightly) version of Streamlit.
 """
+
 import streamlit as st
 
 from apps.wizard.config import WIZARD_CONFIG
@@ -88,4 +89,7 @@ else:
 
 
 # LOGO
-st.logo(str(DOCS_DIR / "assets/wizard-logo.png"))
+st.logo(
+    str(DOCS_DIR / "assets/wizard-logo.png"),
+    # link="https://google.com",  # TODO: would be cool if we could link to an internal page (and not only external). Check streamlit issues, and consider creating one.
+)

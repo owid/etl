@@ -1,4 +1,5 @@
 """Grapher phase."""
+
 from pathlib import Path
 from typing import cast
 
@@ -7,6 +8,8 @@ from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
+from apps.wizard.etl_steps_old.utils import ADD_DAG_OPTIONS, COOKIE_GRAPHER, MD_GRAPHER, render_responsive_field_in_form
+from apps.wizard.utils.components import config_style_html, preview_file, st_wizard_page_link
 from etl.paths import DAG_DIR
 
 #########################################################
@@ -26,7 +29,7 @@ CURRENT_DIR = Path(__file__).parent
 st.session_state["step_name"] = "grapher"
 APP_STATE = utils.AppState()
 # Config style
-utils.config_style_html()
+config_style_html()
 # DUMMY defaults
 dummy_values = {
     "namespace": "dummy",
@@ -42,7 +45,7 @@ dummy_values = {
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=utils.MD_GRAPHER, mode="r") as f:
+    with open(file=MD_GRAPHER, mode="r") as f:
         return f.read()
 
 
@@ -61,7 +64,7 @@ class GrapherForm(utils.StepForm):
 
     def __init__(self: Self, **data: str | bool) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
-        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+        data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
 
         # Handle custom namespace
         if "namespace_custom" in data:
@@ -99,9 +102,14 @@ def update_state() -> None:
 # TITLE
 st.title(":material/database: Grapher  **:gray[Create step]**")
 
+# Deprecate warning
+with st.container(border=True):
+    st.warning("This has been deprecated. Use the new version instead.", icon=":material/warning:")
+    st_wizard_page_link("data")
+
+
 # SIDEBAR
 with st.sidebar:
-    # utils.warning_metadata_unstable()
     # CONNECT AND
     if APP_STATE.args.run_checks:
         with st.expander("**Environment checks**", expanded=True):
@@ -155,7 +163,7 @@ with form_widget.form("grapher"):
     dag_file = APP_STATE.st_widget(
         st_widget=st.selectbox,
         label="Add to DAG",
-        options=utils.ADD_DAG_OPTIONS,
+        options=ADD_DAG_OPTIONS,
         key="dag_file",
         help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
     )
@@ -177,7 +185,7 @@ with form_widget.form("grapher"):
 
 
 # Render responsive namespace field
-utils.render_responsive_field_in_form(
+render_responsive_field_in_form(
     key="namespace",
     display_name="Namespace",
     field_1=namespace_field[0],
@@ -220,7 +228,7 @@ if submitted:
 
         # Create necessary files
         DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_GRAPHER, data=dict(**form.dict(), channel="grapher")
+            cookiecutter_path=COOKIE_GRAPHER, data=dict(**form.dict(), channel="grapher")
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")
@@ -291,11 +299,11 @@ if submitted:
         5. If you are an internal OWID member and, because of this dataset update, you want to update charts in our Grapher DB, continue with charts
         """
             )
-            utils.st_page_link("charts", use_container_width=True, border=True)
+            st_wizard_page_link("charts", use_container_width=True, border=True)
 
         # Preview generated files
         st.subheader("Generated files")
-        utils.preview_file(step_path, "python")
+        preview_file(step_path, "python")
         utils.preview_dag_additions(dag_content, dag_path)
 
         # User message

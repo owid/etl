@@ -1,17 +1,17 @@
 """Meadow phase."""
+
 import os
 from pathlib import Path
 from typing import cast
 
 import streamlit as st
-from owid.catalog import Dataset
 from typing_extensions import Self
 
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
-from apps.wizard.etl_steps.utils import load_datasets
+from apps.wizard.etl_steps_old.utils import ADD_DAG_OPTIONS, COOKIE_MEADOW, MD_MEADOW, render_responsive_field_in_form
+from apps.wizard.utils.components import config_style_html, preview_file, st_wizard_page_link
 from etl.paths import BASE_DIR, DAG_DIR
-from etl.steps import load_from_uri
 
 #########################################################
 # CONSTANTS #############################################
@@ -29,7 +29,7 @@ CURRENT_DIR = Path(__file__).parent
 st.session_state["step_name"] = "meadow"
 APP_STATE = utils.AppState()
 # Config style
-utils.config_style_html()
+config_style_html()
 # DUMMY defaults
 dummy_values = {
     "namespace": "dummy",
@@ -46,7 +46,7 @@ dummy_values = {
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=utils.MD_MEADOW, mode="r") as f:
+    with open(file=MD_MEADOW, mode="r") as f:
         return f.read()
 
 
@@ -67,7 +67,7 @@ class MeadowForm(utils.StepForm):
 
     def __init__(self: Self, **data: str | bool) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
-        data["add_to_dag"] = data["dag_file"] != utils.ADD_DAG_OPTIONS[0]
+        data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
 
         # Handle custom namespace
         if "namespace_custom" in data:
@@ -102,38 +102,31 @@ def update_state() -> None:
 #########################################################
 # MAIN ##################################################
 #########################################################
-# PRE-LOAD METADATA
-st.selectbox(
-    label="Edit metadata from existing dataset",
-    options=load_datasets("://meadow/"),
-    placeholder="(Experimental) Edit metadata from existing dataset",
-    index=None,
-    help="You can fill the metadata fields with the metadata from an existing dataset or snapshot. This is useful when updating a step",
-    label_visibility="collapsed",
-    key="meadow.edit_dataset",
-)
-ds_edit = None
-if st.session_state["meadow.edit_dataset"]:
-    try:
-        ds_edit = cast(Dataset, load_from_uri(uri=st.session_state["meadow.edit_dataset"]))
-        APP_STATE.set_dataset_to_edit(ds_edit)
-    except Exception:
-        st.error(
-            f"Error loading metadata for {st.session_state['meadow.edit_dataset']}. Remember to run `etl run {st.session_state['meadow.edit_dataset']}` first."
-        )
-        st.stop()
-else:
-    APP_STATE.reset_dataset_to_edit()
+# # PRE-LOAD METADATA
+# ds_edit = None
+# if st.session_state["meadow.edit_dataset"]:
+#     try:
+#         ds_edit = cast(Dataset, load_from_uri(uri=st.session_state["meadow.edit_dataset"]))
+#         APP_STATE.set_dataset_to_edit(ds_edit)
+#     except Exception:
+#         st.error(
+#             f"Error loading metadata for {st.session_state['meadow.edit_dataset']}. Remember to run `etl run {st.session_state['meadow.edit_dataset']}` first."
+#         )
+#         st.stop()
+# else:
+#     APP_STATE.reset_dataset_to_edit()
 
 # TITLE
-if st.session_state["meadow.edit_dataset"]:
-    st.title(":material/nature: Meadow  **:gray[Edit step]**")
-else:
-    st.title(":material/nature: Meadow  **:gray[Create step]**")
+st.title(":material/nature: Meadow  **:gray[Create step]**")
+
+# Deprecate warning
+with st.container(border=True):
+    st.warning("This has been deprecated. Use the new version instead.", icon=":material/warning:")
+    st_wizard_page_link("data")
+
 
 # SIDEBAR
 with st.sidebar:
-    # utils.warning_metadata_unstable()
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
         st.markdown(text)
@@ -189,7 +182,7 @@ with form_widget.form("meadow"):
     APP_STATE.st_widget(
         st.selectbox,
         label="Add to DAG",
-        options=utils.ADD_DAG_OPTIONS,
+        options=ADD_DAG_OPTIONS,
         key="dag_file",
         help="Add ETL step to a DAG file. This will allow it to be tracked and executed by the `etl` command.",
     )
@@ -218,7 +211,7 @@ with form_widget.form("meadow"):
 
 
 # Render responsive namespace field
-utils.render_responsive_field_in_form(
+render_responsive_field_in_form(
     key="namespace",
     display_name="Namespace",
     field_1=namespace_field[0],
@@ -260,7 +253,7 @@ if submitted:
 
         # Create necessary files
         DATASET_DIR = generate_step_to_channel(
-            cookiecutter_path=utils.COOKIE_MEADOW, data=dict(**form.dict(), channel="meadow")
+            cookiecutter_path=COOKIE_MEADOW, data=dict(**form.dict(), channel="meadow")
         )
 
         step_path = DATASET_DIR / (form.short_name + ".py")
@@ -271,7 +264,7 @@ if submitted:
 
         # Preview generated
         st.subheader("Generated files")
-        utils.preview_file(step_path, "python")
+        preview_file(step_path, "python")
         if form.generate_notebook:
             with st.expander(f"File: `{notebook_path}`", expanded=False):
                 st.markdown("Open the file to see the generated notebook.")
@@ -302,7 +295,7 @@ if submitted:
                         st.markdown(f"Check the DAG `{dag_path}`.")
 
             st.markdown("#### 2. Proceed to next step")
-            utils.st_page_link("garden", use_container_width=True, border=True)
+            st_wizard_page_link("garden", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")
