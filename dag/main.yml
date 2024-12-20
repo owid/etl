@@ -874,9 +874,11 @@ steps:
   data://grapher/imf/2024-11-25/world_economic_outlook:
     - data://garden/imf/2024-11-25/world_economic_outlook
 
-
+  # ATUS - American Time Use Survey
   data://meadow/atus/2024-12-10/atus_0323:
     - snapshot://atus/2024-12-10/atus_who.zip
+    - snapshot://atus/2024-12-10/atus_activities.zip
+    - snapshot://atus/2024-12-10/activity_codes_2023.xls
 
 
 include:

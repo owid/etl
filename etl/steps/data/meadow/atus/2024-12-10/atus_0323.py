@@ -53,13 +53,13 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap_who = paths.load_snapshot("atus_who.zip")
     snap_act = paths.load_snapshot("atus_activities.zip")
-    snap_roster = paths.load_snapshot("atus_roster.zip")
-    snap_act_codes = paths.load_snapshot("atus_activity_codes.zip")
+    # snap_roster = paths.load_snapshot("atus_roster.zip")
+    snap_act_codes = paths.load_snapshot("activity_codes_2023.xls")
 
     # load tables:
     who_data = load_data_and_add_meta(snap_who, "atuswho_0323.dat")
     act_data = load_data_and_add_meta(snap_act, "atusact_0323.dat")
-    roster_data = load_data_and_add_meta(snap_roster, "atusrost_0323.dat")
+    # roster_data = load_data_and_add_meta(snap_roster, "atusrost_0323.dat")
 
     # Rename columns in WHO file
     who_data = who_data.rename(
@@ -74,11 +74,6 @@ def run(dest_dir: str) -> None:
 
     # add column for who was present with respondent
     who_data["who_string"] = who_data["who_code"].replace(WHO_CODES)
-
-    for col in who_data.columns:
-        who_data[col].metadata = tb_meta
-        who_data[col].metadata.origins = [snap_who.metadata.origin]
-    who_data.metadata = tb_meta
 
     #
     # Process data.
