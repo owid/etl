@@ -27,7 +27,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/surface_temperature.zip")
-    snap
+
     # Save data as a compressed temporary file.
     with tempfile.TemporaryDirectory() as temp_dir:
         output_file = Path(temp_dir) / "era5_monthly_t2m_eur.nc"
@@ -42,7 +42,7 @@ def main(upload: bool) -> None:
             "month": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
             "time": "00:00",
             "area": [90, -180, -90, 180],
-            "data_format": "netcdf",
+            "data_format": "grib",
             "download_format": "zip",
         }
 
