@@ -12,7 +12,7 @@ dataset:
   title: "Effective Fertility Rates (Malani and Jacob)"
 
 tables:
-  efr_malani_jacob:
+  aggregated:
     variables:
       efr_repr:
         title: Reproductive Effective Fertility rate (scaled by sex ratio)
@@ -77,3 +77,19 @@ tables:
 
           Read more details in the author's paper: https://www.nber.org/papers/w33175
         unit: ""
+
+  distribution:
+    variables:
+      efr:
+        title: Effective Fertility rate, distribution by age (year << birth_year >>)
+        description_short: |-
+          The EFR for a given age gives us an approximation of the average number of children from a woman that will live long enough to reach that age.
+        unit: "children per women"
+        description_processing: |-
+          For a given cohort year, we estimate the cumulative survival probability for a person to reach each age from 0 to 100. For example, the probability of a person born in 2000 reaching age 15, 16, 17, and so on. We have used HMD data for years before 1950, and UN's for years after 1950 (including).
+
+          We then estimate the Effective Fertility Rate (EFR) for each age group by multiplying the Total Fertility Rate (TFR) by the cumulative survival probability. The EFR for a given age gives us an approximation of the average number of children from a woman that will live long enough to reach that age.
+
+          For years before 1950, we have used HMD data, which does not provide TFR values. Instead, we have used an approximation of the TFR based on births and female population (in reproductive ages), as suggested by Jacob and Malani (2024).
+
+          Read more details in the author's paper: https://www.nber.org/papers/w33175

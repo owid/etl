@@ -42,6 +42,7 @@ UK_NATION_EXTRAPOLATION = {
 }
 # Countries that are in HMD but not in UN
 COUNTRIES_NOT_IN_UN = ["West Germany", "East Germany", "Taiwan"]
+YEARS_EFR_DISTR = [1950, 2023]
 
 
 def _clean_un_table(tb):
@@ -150,7 +151,6 @@ def run(dest_dir: str) -> None:
     tb_un = ds_un_lt.read("un_wpp_lt", reset_metadata="keep_origins")
     tb_un_proj = ds_un_lt.read("un_wpp_lt_proj", reset_metadata="keep_origins")
     tb_hmd = ds_hmd.read("life_tables", reset_metadata="keep_origins")
-    tb_tfr = ds_un_wpp.read("fertility_rate", reset_metadata="keep_origins")
 
     # Prepare UN table
     tb_un = _clean_un_table(tb_un)
@@ -168,35 +168,54 @@ def run(dest_dir: str) -> None:
     # 2/ Estimate EFR
     #
 
-    # TFR approximation
+    # 2.1 TFR approximation from HFD
     ## Get total births
-    tb_b = ds_hmd.read("births")
+    tb_b = ds_hmd.read("births", reset_metadata="keep_origins")
     ## Get population
-    tb_p = ds_hmd.read("population")
+    tb_p = ds_hmd.read("population", reset_metadata="keep_origins")
     ## Combine
     tb_tfr_apr = get_tfr_estimation(tb_b, tb_p)
 
-    # Load HFD data
+    # 2.2 Load TFR from UN
+    tb_tfr = ds_un_wpp.read("fertility_rate", reset_metadata="keep_origins")
     tb_tfr = tb_tfr.loc[
         (tb_tfr["sex"] == "all") & (tb_tfr["age"] == "all") & (tb_tfr["variant"].isin(["estimates", "medium"])),
         ["country", "year", "fertility_rate"],
     ]
 
-    # Combine HMD and UN data (tfr)
+    # 2.3 TFR: Combine HMD and UN data
     tb_tfr = combine_un_hmd(tb_tfr, tb_tfr_apr)
 
-    # Add EFR
+    # 2.4 Get EFR distribution (for each age)
     tb = estimate_efr(tb, tb_tfr)
 
-    # Format
-    tb = tb.format(["country", "year"], short_name="efr_malani_jacob")
+    #
+    # 3/ Create output tables
 
-    # Add extra origin
-    for col in tb.columns:
-        tb[col].metadata.origins = [origin] + tb[col].metadata.origins
+    # 3.1 Distribution indicators (EFR(age) in YEARS_EFR_DISTR)
+    tb_efr = tb.loc[tb["year"].isin(YEARS_EFR_DISTR) & (tb["sex"] == "total"), ["country", "year", "age", "efr"]]
+    tb_efr = tb_efr.rename(columns={"year": "birth_year"})
 
-    # Build list of tables
-    tables = [tb]
+    # 3.2 Obtain labor and reproductive EFRs
+    ## Keep only years of interest (15-65), further reduction of 50% rows (aggregate -50%)
+    tb_agg = tb.loc[(tb["age"] >= AGE_LAB_START) & (tb["age"] <= AGE_LAB_END)]
+    tb_agg = aggregate_efr(tb=tb_agg)
+
+    # 3.3 Format
+    tb_agg = tb_agg.format(["country", "year"], short_name="aggregated")
+    tb_efr = tb_efr.format(["country", "age", "birth_year"], short_name="distribution")
+
+    # 3.4 Add extra origin
+    for col in tb_agg.columns:
+        tb_agg[col].metadata.origins = [origin] + tb_agg[col].metadata.origins
+    for col in tb_efr.columns:
+        tb_efr[col].metadata.origins = [origin] + tb_efr[col].metadata.origins
+
+    # 3.5 Build list of tables
+    tables = [
+        tb,
+        tb_agg,
+    ]
 
     # Save outputs.
     #
@@ -232,8 +251,8 @@ def estimate_cum_survival(tb):
     tb = tb.sort_values(["country", "sex", "year", "age"], ignore_index=True)
     # Step 4: Estimate cumulative survival probability
     tb["cumulative_survival"] = tb.groupby(["country", "sex", "year"])["probability_of_survival"].cumprod()
-    # Step 5: Keep only years of interest (15-65), further reduction of 50% rows (aggregate -50%)
-    tb = tb.loc[(tb["age"] >= AGE_LAB_START) & (tb["age"] <= AGE_LAB_END)]
+    # Step 6: Drop unnecessary columns
+    tb = tb.drop(columns=["year_min"])
     return tb
 
 
@@ -244,6 +263,11 @@ def estimate_efr(tb, tb_tfr):
     # Estimate EFR
     tb["efr"] = tb["fertility_rate"] * tb["cumulative_survival"]
 
+    return tb
+
+
+def aggregate_efr(tb):
+    """Estimate labor and reproductive EFRs."""
     # Estimate metrics
     ## EFR-labor: Average number of daughters that make it to the reproductive age (15-49)
     ## EFR-reproductive: Average number of kids that make it to the labour age (15-65)
