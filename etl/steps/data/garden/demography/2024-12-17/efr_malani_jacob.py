@@ -42,7 +42,8 @@ UK_NATION_EXTRAPOLATION = {
 }
 # Countries that are in HMD but not in UN
 COUNTRIES_NOT_IN_UN = ["West Germany", "East Germany", "Taiwan"]
-YEARS_EFR_DISTR = [1950, 2023]
+# Add more years if you need distribution-indicators for a particular year.
+YEARS_EFR_DISTR = [1925, 1950, 1975, 2000, 2023]
 
 
 def _clean_un_table(tb):
@@ -213,7 +214,7 @@ def run(dest_dir: str) -> None:
 
     # 3.5 Build list of tables
     tables = [
-        tb,
+        tb_efr,
         tb_agg,
     ]
 

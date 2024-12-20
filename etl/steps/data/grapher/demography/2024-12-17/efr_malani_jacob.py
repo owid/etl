@@ -14,7 +14,14 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("efr_malani_jacob")
 
     # Read table from garden dataset.
-    tables = list(ds_garden)
+    tables = [
+        ds_garden.read("aggregated", reset_index=False),
+        ds_garden.read("distribution", reset_index=False).rename_index_names(
+            {
+                "age": "year",
+            }
+        ),
+    ]
 
     #
     # Save outputs.
