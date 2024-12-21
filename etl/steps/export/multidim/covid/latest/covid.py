@@ -35,8 +35,6 @@ def run(dest_dir: str) -> None:
     config["views"] += multidim.expand_views(config, {"place": "*"}, table, engine)  # type: ignore
     multidim.upsert_multidim_data_page(slug, config, engine)
 
-    print(1)
-
 
 def fname_to_slug(fname: str) -> str:
     return f"mdd-{fname.replace('.yml', '').replace('.', '-').replace('_', '-')}"

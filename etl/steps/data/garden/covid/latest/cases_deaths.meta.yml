@@ -202,15 +202,16 @@ tables:
         presentation:
           grapher_config:
             title: Week by week change of confirmed COVID-19 cases
-            subtitle: The weekly growth rate on any given date measures the percentage change in number of confirmed cases over the last seven days relative to the number in the previous seven days.
+            subtitle: The weekly growth rate measures the percentage change in confirmed cases over the past seven days compared to the seven days before.
             hasMapTab: true
             map:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [-200, -100, -50, -20, 0, 20, 50, 100, 200, 500]
+                customNumericValues: [-200, -100, -50, -20, 0, 20, 50, 100, 200, 1]
                 colorSchemeInvert: true
                 baseColorScheme: RdBu
+                customNumericMinValue: -1
         display:
           numDecimalPlaces: 2
           tolerance: 30
@@ -263,15 +264,16 @@ tables:
         presentation:
           grapher_config:
             title: Biweekly change of confirmed COVID-19 cases
-            subtitle: The biweekly growth rate on any given date measures the percentage change in the number of new confirmed cases over the last 14 days relative to the number in the previous 14 days.
+            subtitle: The biweekly growth rate measures the percentage change in confirmed cases over the past 14 days compared to the 14 days before.
             hasMapTab: true
             map:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [-200, -100, -40, 0, 40, 100, 200, 400, 1000]
+                customNumericValues: [-500, -100, -50, 0, 50, 100, 500, 1]
                 colorSchemeInvert: true
                 baseColorScheme: RdBu
+                customNumericMinValue: -1
 
       # Deaths
       ################
