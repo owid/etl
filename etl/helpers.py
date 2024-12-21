@@ -42,7 +42,6 @@ from etl import paths
 from etl.config import DEFAULT_GRAPHER_SCHEMA, TLS_VERIFY
 from etl.db import get_engine
 from etl.explorer import Explorer
-from etl.explorer_helpers import Explorer as ExplorerOld
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import load_dag
 
@@ -64,14 +63,6 @@ def downloaded(url: str) -> Iterator[str]:
                 tmp.write(chunk)
 
         yield tmp.name
-
-
-def get_latest_github_sha(org: str, repo: str, branch: str) -> str:
-    # Use Github's list-branches API to get the sha1 of the most recent commit
-    # https://docs.github.com/en/rest/reference/repos#list-branches
-    branches = _get_github_branches(org, repo)
-    (match,) = [b for b in branches if b["name"] == branch]
-    return cast(str, match["commit"]["sha"])
 
 
 def _get_github_branches(org: str, repo: str) -> List[Any]:

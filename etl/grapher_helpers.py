@@ -49,39 +49,6 @@ INT_TYPES = tuple(
 )
 
 
-def as_table(df: pd.DataFrame, table: catalog.Table) -> catalog.Table:
-    """Convert dataframe into Table and add metadata from other table if available."""
-    t = catalog.Table(df, metadata=table.metadata)
-    for col in set(df.columns) & set(table.columns):
-        t[col].metadata = table[col].metadata
-    return t
-
-
-def expand_dimensions(tb: catalog.Table) -> catalog.Table:
-    """Expands dataframe with extra dimensions beyond country and year into multiple tables.
-    For instance DataFrame with index names [country, year, sex, a] would expand into a table
-    with columns [country, year, a__sex_male, a__sex_female].
-
-    This function is not very memory efficient as it returns a table that will be very sparse.
-    """
-    # rename country to entity_id for the sake of `_yield_wide_table`
-    tb = tb.reset_index("country").rename(columns={"country": "entity_id"}).set_index("entity_id", append=True)
-    tables = list(_yield_wide_table(tb, na_action="drop", warn_null_variables=False))
-
-    # join all tables
-    # NOTE: we could also return individual tables to reduce memory usage
-    expanded_table = catalog.tables.concat(tables, axis=1)
-
-    # rename entity_id back to country
-    expanded_table = (
-        expanded_table.reset_index("entity_id")
-        .rename(columns={"entity_id": "country"})
-        .set_index("country", append=True)
-    )
-
-    return expanded_table
-
-
 def _yield_wide_table(
     table: catalog.Table,
     na_action: Literal["drop", "raise"] = "raise",
