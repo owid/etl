@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
+from deprecated import deprecated
 from structlog import get_logger
 
 from etl import config
@@ -13,6 +14,7 @@ from etl.paths import EXPLORERS_DIR
 log = get_logger()
 
 
+@deprecated("Use the etl.explorer.Explorer class instead.")
 class Explorer:
     """Explorer object that lets us parse an explorer file, create a new one, modify its content, and write a tsv file.
 

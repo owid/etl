@@ -2,12 +2,11 @@ from typing import List
 
 import pandas as pd
 import pyarrow.compute as pc
-from owid.catalog import Dataset, Table, TableMeta
+from owid.catalog import Dataset, License, Origin, Table, TableMeta
 from owid.catalog.utils import underscore_table
 from owid.walden import Catalog as WaldenCatalog
 from pyarrow import feather
 
-from etl.data_helpers.misc import add_origins_to_global_burden_of_disease
 from etl.steps.data.converters import convert_walden_metadata
 
 
@@ -115,3 +114,36 @@ def run_wrapper(dataset: str, metadata_path: str, namespace: str, version: str, 
 
     # finally save the dataset
     ds.save()
+
+
+def add_origins_to_global_burden_of_disease(tb_gbd: Table) -> Table:
+    tb_gbd = tb_gbd.copy()
+
+    # List all non-index columns in the WDI table.
+    data_columns = [column for column in tb_gbd.columns if column not in ["country", "year"]]
+
+    # For each indicator, add an origin (using information from the old source) and then remove the source.
+    for column in data_columns:
+        tb_gbd[column].metadata.sources = []
+        error = "Remove temporary solution where origins were manually created."
+        assert tb_gbd[column].metadata.origins == [], error
+        tb_gbd[column].metadata.origins = [
+            Origin(
+                title="Global Burden of Disease",
+                producer="Institute of Health Metrics and Evaluation",
+                url_main="https://vizhub.healthdata.org/gbd-results/",
+                date_accessed="2021-12-01",
+                date_published="2020-10-17",  # type: ignore
+                citation_full="Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2019 (GBD 2019). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2020.",
+                description="The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries, time, age, and sex. It quantifies health loss from hundreds of diseases, injuries, and risk factors, so that health systems can be improved and disparities eliminated. GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes. With these tools, decision-makers can compare different health issues and their effects.",
+                license=License(
+                    name="Free-of-Charge Non-commercial User Agreement",
+                    url="https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement",
+                ),
+            )
+        ]
+
+        # Remove sources from indicator.
+        tb_gbd[column].metadata.sources = []
+
+    return tb_gbd

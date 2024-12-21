@@ -133,7 +133,7 @@ def pretty_print_number(number):
         return f"{int(number)}"
 
 
-def print_population_score_examples(df_score_population: pd.DataFrame) -> None:
+def debug_population_score_examples(df_score_population: pd.DataFrame) -> None:
     # Prepare an empty list to store the output.
     output_list = []
 
@@ -186,7 +186,7 @@ def add_population_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     * The score should be 0.5 for regions that are not included in our population dataset (e.g. "Middle East").
 
     For reference, the result assigns the following scores (with population calculated on year 2023):
-    NOTE: The following lines can be recalculated using print_population_score_examples.
+    NOTE: The following lines can be recalculated using debug_population_score_examples.
     * Fiji (population ~924.1k): ~0.1
     * Gambia (population ~2.7M): ~0.2
     * Turkmenistan (population ~7.4M): ~0.3
@@ -262,7 +262,7 @@ def add_population_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
         max_score=max_population_score,
     )
     # FOR DEBUGGING: Uncomment to print examples for different scores and for reference countries.
-    # print_population_score_examples(df_score_population=df_score_population)
+    # debug_population_score_examples(df_score_population=df_score_population)
 
     # Add the population score to the scores dataframe.
     df_reduced = df_reduced.merge(df_score_population, on=["entity_name", "year"], how="left")
@@ -273,7 +273,7 @@ def add_population_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     return df_reduced
 
 
-def print_views_score_examples(df_score_analytics: pd.DataFrame) -> None:
+def debug_views_score_examples(df_score_analytics: pd.DataFrame) -> None:
     # Prepare an empty list to store the output.
     output_list = []
 
@@ -323,7 +323,7 @@ def add_analytics_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     NOTE: One could argue that we should rather use 0.1 for such variables. But variables that are not used in charts may be used in explorers, and we currently have no way to properly quantify those views.
 
     For reference, the result assigns the following scores:
-    NOTE: The following lines can be recalculated using print_views_score_examples.
+    NOTE: The following lines can be recalculated using debug_views_score_examples.
     * ~1.8k variables with maximum views ~14 have a score less than or equal to 0.1
     * ~1.3k variables with maximum views ~31 have a score between 0.1 and 0.2
     * ~1.8k variables with maximum views ~70 have a score between 0.2 and 0.3
@@ -392,7 +392,7 @@ def add_analytics_score(df_reduced: pd.DataFrame) -> pd.DataFrame:
     )
 
     # FOR DEBUGGING: Uncomment to print examples for different scores and for reference countries.
-    # print_views_score_examples(df_score_analytics=df_score_analytics)
+    # debug_views_score_examples(df_score_analytics=df_score_analytics)
 
     # Add the analytics score to the scores dataframe.
     df_reduced = df_reduced.merge(df_score_analytics, on=["variable_id"], how="left")
