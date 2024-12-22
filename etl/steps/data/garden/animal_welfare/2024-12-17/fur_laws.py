@@ -165,8 +165,7 @@ def prepare_fur_farming_ban_status(tb: Table) -> Table:
     # Check that when phase out is "YES", the ban status is empty.
     ####################################################################################################################
     # For Belgium, both columns "Fur farming ban" and "Phase-out due to stricter regulations" are "YES".
-    # This happens in the google sheet, but not in the PDF (where only "Fur farming ban" is "YES").
-    # So I assume the PDF is correct.
+    # In this case, assume the stronger status, which is banned.
     # NOTE: I confirmed this with Fur Free Alliance.
     error = (
         "Expected Belgium to have both a fur farming ban and a phase out due to stricter regulations. "
