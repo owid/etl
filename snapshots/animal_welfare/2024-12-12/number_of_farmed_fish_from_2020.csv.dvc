@@ -1,0 +1,19 @@
+meta:
+  origin:
+    title_snapshot: Estimated farmed finfish numbers (2020 onwards)
+    title: Estimated farmed finfish numbers
+    description_snapshot: |-
+      Estimated number of individual fish in annual aquaculture production from 2020.
+    producer: Fishcount
+    citation_full: |-
+      Fishcount.org.uk based on data from the Food and Agriculture Organization of the United Nations. Estimated farmed finfish numbers from 2020 by A Mood & P Brooke (2024).
+    url_main: http://fishcount.org.uk/
+    date_published: '2024'
+    date_accessed: 2024-12-12
+  license:
+    name: CC BY 4.0
+    url: https://fishcount.org.uk/estimates/farmedfishes/data01/fishcount_global_farmed_fish_estimate.php
+outs:
+  - md5: dc87fdd756f9c444fc659af48c51dac9
+    size: 18243
+    path: number_of_farmed_fish_from_2020.csv
