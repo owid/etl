@@ -14,7 +14,7 @@ from structlog import get_logger
 import etl.grapher_model as gm
 from apps.wizard.utils.cached import get_datasets_from_version_tracker
 from etl.git_helpers import get_changed_files
-from etl.grapher_io import get_all_datasets
+from etl.grapher.io import get_all_datasets
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEP_DIR
 from etl.steps import filter_to_subgraph, load_dag
 

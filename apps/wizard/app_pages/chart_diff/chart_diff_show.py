@@ -22,7 +22,7 @@ from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflict
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
 from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
-from etl.grapher_io import variable_metadata_df_from_s3
+from etl.grapher.io import variable_metadata_df_from_s3
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {

@@ -25,7 +25,7 @@ from etl import grapher_model as gm
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
 from etl.files import create_folder, upload_file_to_server
-from etl.grapher_io import variable_data_table_from_catalog
+from etl.grapher.io import variable_data_table_from_catalog
 
 log = structlog.get_logger()
 

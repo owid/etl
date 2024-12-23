@@ -10,7 +10,7 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-import etl.grapher_io as io
+import etl.grapher.io as io
 import etl.grapher_model as gm
 from apps.anomalist import detectors
 from apps.anomalist.anomalist_api import add_auxiliary_scores

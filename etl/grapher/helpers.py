@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 
 from etl.db import get_engine, read_sql
 from etl.files import yaml_dump
-from etl.grapher_io import add_entity_code_and_name, trim_long_variable_name
+from etl.grapher.io import add_entity_code_and_name, trim_long_variable_name
 
 log = structlog.get_logger()
 
