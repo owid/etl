@@ -301,6 +301,16 @@ steps:
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
+  # UN SDG - archive
+  data://meadow/un/2023-01-24/un_sdg:
+    - snapshot://un/2023-01-24/un_sdg.feather
+  data://garden/un/2023-01-24/un_sdg:
+    - data://meadow/un/2023-01-24/un_sdg
+    - snapshot://un/2023-01-24/un_sdg_unit.csv
+    - snapshot://un/2023-01-24/un_sdg_dimension.json
+  data://grapher/un/2023-01-24/un_sdg:
+    - data://garden/un/2023-01-24/un_sdg
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

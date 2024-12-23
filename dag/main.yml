@@ -63,9 +63,6 @@ steps:
 
   #
   # UN
-  data://grapher/un/2022-07-11/un_wpp:
-    - data://garden/un/2022-07-11/un_wpp
-
   # UN SDG - current
   data://meadow/un/2023-08-16/un_sdg:
     - snapshot://un/2023-08-16/un_sdg.feather
@@ -501,28 +498,6 @@ steps:
     - data://grapher/idmc/2024-08-02/internal_displacement
 
   ######################################################################################################################
-  # Older versions to be archived once they are not used by any other steps.
-
-  # UN SDG - archive
-  data://meadow/un/2023-01-24/un_sdg:
-    - snapshot://un/2023-01-24/un_sdg.feather
-  data://garden/un/2023-01-24/un_sdg:
-    - data://meadow/un/2023-01-24/un_sdg
-    - snapshot://un/2023-01-24/un_sdg_unit.csv
-    - snapshot://un/2023-01-24/un_sdg_dimension.json
-  data://grapher/un/2023-01-24/un_sdg:
-    - data://garden/un/2023-01-24/un_sdg
-
-  data://meadow/papers/2023-10-20/anthromes_input:
-    - snapshot://papers/2023-10-20/anthromes_input.zip
-  data://meadow/papers/2023-10-20/anthromes:
-    - snapshot://papers/2023-10-20/anthromes.csv
-  data://garden/papers/2023-10-20/anthromes:
-    - data://meadow/papers/2023-10-20/anthromes
-    - data://meadow/papers/2023-10-20/anthromes_input
-  data://grapher/papers/2024-01-05/anthromes:
-    - data://garden/papers/2023-10-20/anthromes
-  ######################################################################################################################
   # Map (Natural Earth)
   data://meadow/geography/2023-11-28/nat_earth_110:
     - snapshot://geography/2023-11-28/nat_earth_110.zip
@@ -531,7 +506,7 @@ steps:
 
   ######################################################################################################################
 
-  #Latitude
+  # Latitude
   data://grapher/geography/2024-07-18/latitude:
     - data://garden/geography/2023-11-28/nat_earth_110
 
@@ -553,11 +528,6 @@ steps:
     - data://meadow/news/2024-05-23/gdelt_v2
   data://grapher/news/2024-05-23/gdelt_v2:
     - data://garden/news/2024-05-23/gdelt_v2
-
-  ######################################################################################################################
-  # Older versions that should be archived once they are not used by any other steps.
-
-  ######################################################################################################################
 
   # World Development Indicators - WDI
   data://meadow/worldbank_wdi/2024-05-20/wdi:
@@ -648,12 +618,10 @@ steps:
   # WB income groups 2024-07-29
   data://meadow/wb/2024-07-29/income_groups:
     - snapshot://wb/2024-07-29/income_groups.xlsx
-
   data://garden/wb/2024-07-29/income_groups:
     - data://meadow/wb/2024-07-29/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
-
   data://grapher/wb/2024-07-29/income_groups:
     - data://garden/wb/2024-07-29/income_groups
 

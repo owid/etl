@@ -60,6 +60,8 @@ steps:
     - snapshot://un/2022-07-11/un_wpp.zip
   data://garden/un/2022-07-11/un_wpp:
     - data://meadow/un/2022-07-11/un_wpp
+  data://grapher/un/2022-07-11/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp
   data://explorers/un/2022/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
 
