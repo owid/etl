@@ -149,3 +149,10 @@ steps:
     - data://meadow/who/2023-03-09/gho_suicides
   data://grapher/who/2023-03-09/gho_suicides:
     - data://garden/who/2023-03-09/gho_suicides
+
+  # Malnutrition
+  data://grapher/malnutrition/2022-10-18/malnutrition:
+    - data://garden/malnutrition/2022-10-18/malnutrition
+  data://garden/malnutrition/2022-10-18/malnutrition:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/un/2022-07-11/un_wpp

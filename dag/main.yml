@@ -37,13 +37,7 @@ steps:
   data://meadow/oecd/2016-06-01/regional_wellbeing:
     - walden://oecd/2016-06-01/regional_wellbeing
 
-  # Malnutrition to archive
-  data://grapher/malnutrition/2022-10-18/malnutrition:
-    - data://garden/malnutrition/2022-10-18/malnutrition
-  data://garden/malnutrition/2022-10-18/malnutrition:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-    - data://garden/un/2022-07-11/un_wpp
-  # Malnutrition to update
+  # Malnutrition
   data://grapher/malnutrition/2024-12-16/malnutrition:
     - data://garden/malnutrition/2024-12-16/malnutrition
   data://garden/malnutrition/2024-12-16/malnutrition:
