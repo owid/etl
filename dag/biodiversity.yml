@@ -50,3 +50,13 @@ steps:
     - snapshot://biodiversity/2024-09-30/living_planet_index_completeness.csv
   data://grapher/biodiversity/2024-09-30/living_planet_index_completeness:
     - data://garden/biodiversity/2024-09-30/living_planet_index_completeness
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/biodiversity/2024-12-23/iucn_number_each_status:
+    - snapshot://biodiversity/2024-12-23/iucn_number_each_status.csv
+  data://garden/biodiversity/2024-12-23/iucn_number_each_status:
+    - data://meadow/biodiversity/2024-12-23/iucn_number_each_status
+  data://grapher/biodiversity/2024-12-23/iucn_number_each_status:
+    - data://garden/biodiversity/2024-12-23/iucn_number_each_status
