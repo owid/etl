@@ -91,7 +91,7 @@ def _get_github_branches(org: str, repo: str) -> List[Any]:
 
 def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
     """Check that the table is in the correct format for Grapher."""
-    from etl.grapher import grapher_helpers as gh
+    from etl.grapher import helpers as gh
 
     assert ds.metadata.title, "Dataset must have a title."
 
@@ -279,7 +279,7 @@ def create_dataset(
             raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
         used_short_names.add(table.metadata.short_name)
 
-        from etl.grapher import grapher_helpers as gh
+        from etl.grapher import helpers as gh
 
         # Default long_to_wide for grapher channel is true
         if long_to_wide is None:
