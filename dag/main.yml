@@ -18,10 +18,6 @@ steps:
     - data://grapher/regions/2023-01-01/regions
 
   # Gapminder
-  data://meadow/gapminder/2019-12-10/population:
-    - walden://gapminder/2019-12-10/population
-  data://garden/gapminder/2019-12-10/population:
-    - data://meadow/gapminder/2019-12-10/population
   data://meadow/gapminder/2023-03-31/population:
     - snapshot://gapminder/2023-03-31/population.xlsx
   data://garden/gapminder/2023-03-31/population:
