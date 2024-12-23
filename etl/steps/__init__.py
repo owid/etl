@@ -930,7 +930,7 @@ class GrapherStep(Step):
                     # generate table with entity_id, year and value for every column
                     futures.append(
                         thread_pool.submit(
-                            gi.upsert_table,
+                            db.upsert_table,
                             engine,
                             admin_api,
                             t,
@@ -959,7 +959,7 @@ class GrapherStep(Step):
             else:
                 checksum = "to_be_rerun"
 
-            gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
+            db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
 
     def checksum_output(self) -> str:
         """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
