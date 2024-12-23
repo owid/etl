@@ -1,0 +1,29 @@
+dataset:
+  title: Internet (various sources)
+  description: The Internet dataset by Our World in Data contains different Internet-related metrics.
+  update_period_days: 365
+
+tables:
+  internet:
+    title: Internet user statistics
+    description: Key user statistics related to Internet (e.g. number of individuals using the Internet).
+    variables:
+      num_internet_users:
+        title: Number of Internet users
+        short_unit: users
+        unit: users
+        description_short: |-
+          The number of individuals using the Internet.
+        description_processing: |-
+          The number of internet users is calculated by Our World in Data based on internet access figures as a share of the total population, published in the World Development Indicators by the World Bank and total population figures from the UN World Population Prospects, Gapminder and HYDE."
+        display:
+          name: Number of Internet users
+
+      share_internet_users:
+        title: Share of Internet users
+        short_unit: "%"
+        unit: "%"
+        description_short: |-
+          Share of the population using internet.
+        display:
+          name: Share of people using the Internet

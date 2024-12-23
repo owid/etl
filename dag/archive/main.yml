@@ -285,6 +285,22 @@ steps:
   data://grapher/owid/latest/key_indicators:
     - data://garden/owid/latest/key_indicators
 
+  # Internet
+  data://garden/technology/2022/internet:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/owid/latest/key_indicators
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/technology/2022/internet:
+    - data://garden/technology/2022/internet
+
+  # World Bank WDI
+  data://meadow/worldbank_wdi/2022-05-26/wdi:
+    - walden://worldbank_wdi/2022-05-26/wdi
+  data://garden/worldbank_wdi/2022-05-26/wdi:
+    - data://meadow/worldbank_wdi/2022-05-26/wdi
+  data://grapher/worldbank_wdi/2022-05-26/wdi:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

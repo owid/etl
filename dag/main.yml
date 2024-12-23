@@ -44,13 +44,6 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/un/2024-07-12/un_wpp
 
-  data://meadow/worldbank_wdi/2022-05-26/wdi:
-    - walden://worldbank_wdi/2022-05-26/wdi
-  data://garden/worldbank_wdi/2022-05-26/wdi:
-    - data://meadow/worldbank_wdi/2022-05-26/wdi
-  data://grapher/worldbank_wdi/2022-05-26/wdi:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-
   # Homicide - UNODC - to archive
   data://meadow/homicide/2023-07-04/unodc:
     - snapshot://homicide/2023-07-04/unodc.xlsx
@@ -59,7 +52,7 @@ steps:
   data://grapher/homicide/2023-07-04/unodc:
     - data://garden/homicide/2023-07-04/unodc
 
-    # Homicide - UNODC - update
+  # Homicide - UNODC - update
   data://meadow/homicide/2024-10-30/unodc:
     - snapshot://homicide/2024-10-30/unodc.xlsx
   data://garden/homicide/2024-10-30/unodc:
@@ -92,12 +85,13 @@ steps:
     - data-private://garden/ihme/2023-05-09/sdg
 
   # Internet
-  data://garden/technology/2022/internet:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-    - data://garden/owid/latest/key_indicators
+  data://garden/technology/2024-12-23/internet:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-  data://grapher/technology/2022/internet:
-    - data://garden/technology/2022/internet
+    - data://garden/wb/2024-03-11/income_groups
+  data://grapher/technology/2024-12-23/internet:
+    - data://garden/technology/2024-12-23/internet
 
   # UNDP
   data://meadow/un/2024-04-09/undp_hdr:
