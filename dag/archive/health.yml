@@ -104,6 +104,14 @@ steps:
   data://grapher/ihme_gbd/2019/gbd_mental_health:
     - data://garden/ihme_gbd/2019/gbd_mental_health
 
+  # IHME Global Burden of Disease - Risk factors
+  data://meadow/ihme_gbd/2019/gbd_risk:
+    - walden://ihme_gbd/2019/gbd_risk
+  data://garden/ihme_gbd/2019/gbd_risk:
+    - data://meadow/ihme_gbd/2019/gbd_risk
+  data://grapher/ihme_gbd/2019/gbd_risk:
+    - data://garden/ihme_gbd/2019/gbd_risk
+
   # WHO Mortality Database - 1st level causes
   data://meadow/who/2023-08-01/mortality_database:
     - snapshot://who/2023-08-01/mortality_database.csv
@@ -128,14 +136,6 @@ steps:
   data-private://grapher/antibiotics/2024-11-20/pathogen_bloodstream:
     - data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream
 
-  # IHME Global Burden of Disease - Risk factors
-  data://meadow/ihme_gbd/2019/gbd_risk:
-    - walden://ihme_gbd/2019/gbd_risk
-  data://garden/ihme_gbd/2019/gbd_risk:
-    - data://meadow/ihme_gbd/2019/gbd_risk
-  data://grapher/ihme_gbd/2019/gbd_risk:
-    - data://garden/ihme_gbd/2019/gbd_risk
-
   # Suicides based on GHO dataset
   data://garden/who/2024-02-14/gho_suicides:
     - data://garden/who/2024-01-03/gho
@@ -156,3 +156,14 @@ steps:
   data://garden/malnutrition/2022-10-18/malnutrition:
     - data://garden/worldbank_wdi/2022-05-26/wdi
     - data://garden/un/2022-07-11/un_wpp
+
+  # WHO Global Health Estimates
+  data://meadow/who/2022-09-30/ghe:
+    - snapshot://who/2022-09-30/ghe.feather
+  data://garden/who/2022-09-30/ghe:
+    - data://meadow/who/2022-09-30/ghe
+    - data://garden/un/2022-07-11/un_wpp
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://who/2023-07-14/standard_age_distribution.csv
+  data://grapher/who/2022-09-30/ghe:
+    - data://garden/who/2022-09-30/ghe
