@@ -185,7 +185,7 @@ def _sample_table() -> Table:
 
 def test_adapt_table_for_grapher_multiindex():
     with mock.patch("etl.grapher.helpers._get_entities_from_db") as mock_get_entities_from_db:
-        with mock.patch("etl.grapher_io._fetch_entities") as mock_fetch_entities:
+        with mock.patch("etl.grapher.io._fetch_entities") as mock_fetch_entities:
             mock_get_entities_from_db.return_value = {"Poland": 1, "France": 2}
             mock_fetch_entities.return_value = pd.DataFrame(
                 {
