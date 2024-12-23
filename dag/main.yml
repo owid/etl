@@ -22,42 +22,21 @@ steps:
     - snapshot://gapminder/2023-03-31/population.xlsx
   data://garden/gapminder/2023-03-31/population:
     - data://meadow/gapminder/2023-03-31/population
-  # UN WPP (2022)
-  data://meadow/un/2022-07-11/un_wpp:
-    - snapshot://un/2022-07-11/un_wpp.zip
-  data://garden/un/2022-07-11/un_wpp:
-    - data://meadow/un/2022-07-11/un_wpp
-  data://explorers/un/2022/un_wpp:
-    - data://garden/un/2022-07-11/un_wpp
-  # HYDE (2017)
-  data://meadow/hyde/2017/baseline:
-    - snapshot://hyde/2017/baseline.zip
-    - data://meadow/hyde/2017/general_files
-  data://meadow/hyde/2017/general_files:
-    - snapshot://hyde/2017/general_files.zip
-  data://garden/hyde/2017/baseline:
-    - data://meadow/hyde/2017/baseline
+
   # Others
-  data://meadow/living_planet/2020-09-10/lpd:
-    - walden://living_planet/2020-09-10/lpd
-  data://garden/living_planet/2020-09-10/lpd:
-    - data://meadow/living_planet/2020-09-10/lpd
   data://meadow/wb/2021-07-01/wb_income:
     - walden://wb/2021-07-01/wb_income
-  data://meadow/wb/2022-10-29/wb_gender:
-    - walden://wb/2022-10-29/wb_gender
   data://garden/wb/2021-07-01/wb_income:
     - data://meadow/wb/2021-07-01/wb_income
-  data://garden/wb/2022-10-29/wb_gender:
-    - data://meadow/wb/2022-10-29/wb_gender
-  data://grapher/wb/2022-10-29/wb_gender:
-    - data://garden/wb/2022-10-29/wb_gender
+
   data://garden/ggdc/2020-10-01/ggdc_maddison:
     - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
   data://grapher/ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
+
   data://meadow/oecd/2016-06-01/regional_wellbeing:
     - walden://oecd/2016-06-01/regional_wellbeing
+
   # Malnutrition to archive
   data://grapher/malnutrition/2022-10-18/malnutrition:
     - data://garden/malnutrition/2022-10-18/malnutrition
@@ -247,16 +226,6 @@ steps:
     - data://garden/wb/2024-03-11/income_groups
   data://grapher/happiness/2024-06-09/happiness:
     - data://garden/happiness/2024-06-09/happiness
-
-  # LGBTI Policy Index (Velasco, 2020)
-  data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
-    - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
-  data://garden/lgbt_rights/2023-04-27/lgbti_policy_index:
-    - data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/lgbt_rights/2023-04-27/lgbti_policy_index:
-    - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
 
   # Ethnic Power Relations Dataset
   data://meadow/eth/2023-03-15/growup:
@@ -490,20 +459,6 @@ steps:
   data://grapher/survey/2023-08-04/trust_surveys:
     - data://garden/survey/2023-08-04/trust_surveys
 
-  # World Bank GenderStats
-  data://meadow/wb/2024-06-10/gender_statistics:
-    - snapshot://wb/2024-06-10/gender_statistics.feather
-  data://garden/wb/2024-06-10/gender_statistics:
-    - data://meadow/wb/2024-06-10/gender_statistics
-  data://garden/wb/2024-06-10/gender_statistics_country_counts:
-    - data://garden/wb/2024-06-10/gender_statistics
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/wb/2024-06-10/gender_statistics:
-    - data://garden/wb/2024-06-10/gender_statistics
-  data://grapher/wb/2024-06-10/gender_statistics_country_counts:
-    - data://garden/wb/2024-06-10/gender_statistics_country_counts
-
   # Missing Data - Children out of school
   data://garden/missing_data/2024-03-26/children_out_of_school:
     - data://garden/wb/2024-06-10/gender_statistics
@@ -547,16 +502,6 @@ steps:
 
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
-
-  # Homosexuality criminalization data from Mignot (2022)
-  data://meadow/lgbt_rights/2024-06-11/criminalization_mignot:
-    - snapshot://lgbt_rights/2024-06-11/criminalization_mignot.csv
-  data://garden/lgbt_rights/2024-06-11/criminalization_mignot:
-    - data://meadow/lgbt_rights/2024-06-11/criminalization_mignot
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/lgbt_rights/2024-06-11/criminalization_mignot:
-    - data://garden/lgbt_rights/2024-06-11/criminalization_mignot
 
   # Refugee, Asylum and Migration Explorer:
   export://explorers/migration/2024-08-05/migration:
@@ -652,21 +597,6 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
-
-  # Equaldex dataset
-  data://meadow/lgbt_rights/2024-06-03/equaldex:
-    - snapshot://lgbt_rights/2024-06-03/equaldex.csv
-    - snapshot://lgbt_rights/2024-06-03/equaldex_current.csv
-    - snapshot://lgbt_rights/2024-06-03/equaldex_indices.csv
-
-  data://garden/lgbt_rights/2024-06-03/equaldex:
-    - data://meadow/lgbt_rights/2024-06-03/equaldex
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-    - data://garden/countries/2023-09-25/isd
-
-  data://grapher/lgbt_rights/2024-06-03/equaldex:
-    - data://garden/lgbt_rights/2024-06-03/equaldex
 
   # Public Finances in Modern History dataset (IMF)
   data://meadow/imf/2024-06-12/public_finances_modern_history:

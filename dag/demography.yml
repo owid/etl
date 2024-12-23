@@ -32,6 +32,7 @@ steps:
   data://grapher/demography/2024-07-15/population:
     - data://garden/demography/2024-07-15/population
 
+  # WPP ########################################
   # WPP (2024)
   data://meadow/un/2024-07-12/un_wpp:
     # Main indicators
@@ -54,6 +55,14 @@ steps:
   data://grapher/un/2024-07-12/un_wpp_full:
     - data://garden/un/2024-07-12/un_wpp
 
+  # UN WPP (2022)
+  data://meadow/un/2022-07-11/un_wpp:
+    - snapshot://un/2022-07-11/un_wpp.zip
+  data://garden/un/2022-07-11/un_wpp:
+    - data://meadow/un/2022-07-11/un_wpp
+  data://explorers/un/2022/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp
+
   # WPP Historical comparison
   data://garden/demography/2024-07-12/un_wpp_historical:
     - snapshot://fasttrack/latest/un_wpp_historical.csv
@@ -62,15 +71,13 @@ steps:
   data://grapher/demography/2024-07-12/un_wpp_historical:
     - data://garden/demography/2024-07-12/un_wpp_historical
 
-  # Population (Fariss et al.)
-  data://meadow/demography/2023-12-20/population_fariss:
-    - snapshot://demography/2023-12-20/population_fariss.rds
-  data://garden/demography/2023-12-20/population_fariss:
-    - data://meadow/demography/2023-12-20/population_fariss
-    - data://garden/countries/2024-01-08/gleditsch_no_population
-  data://grapher/demography/2023-12-20/population_fariss:
-    - data://garden/demography/2023-12-20/population_fariss
+  # UN WPP largest age-group per country
+  data://garden/un/2024-03-14/un_wpp_most:
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/un/2024-03-14/un_wpp_most:
+    - data://garden/un/2024-03-14/un_wpp_most
 
+  # HYDE ########################################
   # HYDE 3.3
   data://meadow/hyde/2024-01-02/all_indicators:
     - snapshot://hyde/2024-01-02/all_indicators.zip
@@ -80,6 +87,25 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/hyde/2024-01-02/all_indicators:
     - data://garden/hyde/2024-01-02/all_indicators
+
+  # HYDE (2017)
+  data://meadow/hyde/2017/baseline:
+    - snapshot://hyde/2017/baseline.zip
+    - data://meadow/hyde/2017/general_files
+  data://meadow/hyde/2017/general_files:
+    - snapshot://hyde/2017/general_files.zip
+  data://garden/hyde/2017/baseline:
+    - data://meadow/hyde/2017/baseline
+
+  # others #######################################
+  # Population (Fariss et al.)
+  data://meadow/demography/2023-12-20/population_fariss:
+    - snapshot://demography/2023-12-20/population_fariss.rds
+  data://garden/demography/2023-12-20/population_fariss:
+    - data://meadow/demography/2023-12-20/population_fariss
+    - data://garden/countries/2024-01-08/gleditsch_no_population
+  data://grapher/demography/2023-12-20/population_fariss:
+    - data://garden/demography/2023-12-20/population_fariss
 
   ## Population doubling times
   data://garden/demography/2024-07-18/population_doubling_times:
@@ -102,12 +128,6 @@ steps:
     - snapshot://ggdc/2024-01-19/maddison_federico_paper.xlsx
   data://garden/ggdc/2024-01-19/maddison_federico_paper:
     - data://meadow/ggdc/2024-01-19/maddison_federico_paper
-
-  # UN WPP largest age-group per country
-  data://garden/un/2024-03-14/un_wpp_most:
-    - data://garden/un/2024-07-12/un_wpp
-  data://grapher/un/2024-03-14/un_wpp_most:
-    - data://garden/un/2024-03-14/un_wpp_most
 
   ########################################################################
   # Life expectancy                                                      #
