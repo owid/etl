@@ -1,3 +1,8 @@
+"""THIS MODULE IS DEPRECATED AND SHOULD NOT BE IMPORTED.
+
+INSTEAD, USE etl.explorer
+"""
+
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
