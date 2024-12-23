@@ -219,7 +219,7 @@ else:
 
 
 @st.cache_data
-def load_data(placeholder: str) -> Tuple[pd.DataFrame, gpd.GeoDataFrame]:
+def load_data() -> Tuple[pd.DataFrame, gpd.GeoDataFrame]:
     """Load data for the game."""
     # Load population indicator
     ds = Dataset(DATA_DIR / "garden" / "un" / "2022-07-11" / "un_wpp")
@@ -354,7 +354,7 @@ def get_all_distances():
 
 
 # Get data
-DATA, GEO = load_data("cached")
+DATA, GEO = load_data()
 OPTIONS = sorted(DATA["location"].unique())
 # Distances
 DISTANCES = get_all_distances()

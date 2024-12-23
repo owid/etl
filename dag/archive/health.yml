@@ -104,6 +104,14 @@ steps:
   data://grapher/ihme_gbd/2019/gbd_mental_health:
     - data://garden/ihme_gbd/2019/gbd_mental_health
 
+  # IHME Global Burden of Disease - Risk factors
+  data://meadow/ihme_gbd/2019/gbd_risk:
+    - walden://ihme_gbd/2019/gbd_risk
+  data://garden/ihme_gbd/2019/gbd_risk:
+    - data://meadow/ihme_gbd/2019/gbd_risk
+  data://grapher/ihme_gbd/2019/gbd_risk:
+    - data://garden/ihme_gbd/2019/gbd_risk
+
   # WHO Mortality Database - 1st level causes
   data://meadow/who/2023-08-01/mortality_database:
     - snapshot://who/2023-08-01/mortality_database.csv
