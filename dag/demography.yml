@@ -4,13 +4,6 @@ steps:
   ########################################################################
 
   # Population OMM #############################
-  # 2022-12-08: HYDE 3.2 + Gapminder + UN WPP 2022
-  data://garden/demography/2022-12-08/population:
-    - data://garden/hyde/2017/baseline
-    - data://garden/gapminder/2019-12-10/population
-    - data://garden/un/2022-07-11/un_wpp
-    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
-
   # 2023-03-31: HYDE 3.2 + Gapminder + UN WPP 2022
   data://garden/demography/2023-03-31/population:
     - data://garden/hyde/2017/baseline
