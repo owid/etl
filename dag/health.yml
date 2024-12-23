@@ -20,14 +20,6 @@ steps:
   data://grapher/who/2022-07-17/who_vaccination:
     - data://garden/who/2022-07-17/who_vaccination
 
-  # WHO - Global Health Observatory (only suicides variable)
-  data://meadow/who/2023-03-09/gho_suicides:
-    - snapshot://who/2023-03-09/gho_suicides.json
-  data://garden/who/2023-03-09/gho_suicides:
-    - data://meadow/who/2023-03-09/gho_suicides
-  data://grapher/who/2023-03-09/gho_suicides:
-    - data://garden/who/2023-03-09/gho_suicides
-
   # IHME GBD Leading cause of  deaths - update
   data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
     - snapshot-private://ihme_gbd/2024-06-10/cause_hierarchy.csv
@@ -166,7 +158,6 @@ steps:
     - data://meadow/un/2023-08-02/comtrade_pandemics
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
-    - data://garden/owid/latest/key_indicators
   data://grapher/un/2023-08-10/comtrade_pandemics:
     - data://garden/un/2023-08-02/comtrade_pandemics
 
@@ -383,12 +374,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/who/2024-01-03/gho:
     - data://garden/who/2024-01-03/gho
-
-  # Suicides based on GHO dataset
-  data://garden/who/2024-02-14/gho_suicides:
-    - data://garden/who/2024-01-03/gho
-  data://grapher/who/2024-02-14/gho_suicides:
-    - data://garden/who/2024-02-14/gho_suicides
 
   # Suicides based on WHO Mortality Database
   data://meadow/who/2024-03-24/self_inflicted_injuries:

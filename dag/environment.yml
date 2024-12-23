@@ -13,7 +13,6 @@ steps:
     - snapshot://unep/2023-03-17/consumption_controlled_substances.other_fully_halogenated.xlsx
   data://garden/unep/2023-03-17/consumption_controlled_substances:
     - data://meadow/unep/2023-03-17/consumption_controlled_substances
-    - data://garden/owid/latest/key_indicators
   data://grapher/unep/2023-03-17/consumption_controlled_substances:
     - data://garden/unep/2023-03-17/consumption_controlled_substances
   # NASA Ozone Watch
