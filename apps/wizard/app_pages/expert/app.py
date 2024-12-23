@@ -178,10 +178,6 @@ with st.container(border=True):
     st.session_state.analytics = st.session_state.get("analytics", True)
     # with st.container():
     st.divider()
-    st.button(
-        label="Clear chat",
-        on_click=reset_messages,
-    )
     # st.divider()
     # st.toggle(
     #     label="Collect data for analytics",
@@ -230,6 +226,13 @@ with st.container(border=True):
         step=0.01,
         help="What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.",
     )
+
+    st.button(
+        label=":material/restart_alt: Clear chat",
+        on_click=reset_messages,
+        # type="tertiary",
+    )
+
 
 with container_chat:
     # API with OPENAI
