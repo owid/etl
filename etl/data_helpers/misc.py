@@ -18,7 +18,7 @@ from typing import Any, Iterable, List, Literal, Optional, Set, TypeVar, Union, 
 import owid.catalog.processing as pr
 import pandas as pd
 import plotly.express as px
-from owid.catalog import License, Origin, Table
+from owid.catalog import Table
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
