@@ -26,12 +26,6 @@ steps:
     - snapshot://gapminder/2023-03-31/population.xlsx
   data://garden/gapminder/2023-03-31/population:
     - data://meadow/gapminder/2023-03-31/population
-  # Key indicators
-  data://garden/owid/latest/key_indicators:
-    - data://garden/demography/2022-12-08/population
-    - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
   # UN WPP (2022)
   data://meadow/un/2022-07-11/un_wpp:
     - snapshot://un/2022-07-11/un_wpp.zip
