@@ -79,14 +79,14 @@ def create_units(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_attributes_description() -> Dict:
-    units_snapshot = paths.load_dependency(short_name="un_sdg_unit.csv", namespace="un")
+    units_snapshot = papaths.load_dataset(short_name="un_sdg_unit.csv", namespace="un")
     df_units = pd.read_csv(units_snapshot.path)
     dict_units = df_units.set_index("AttCode").to_dict()["AttValue"]
     return dict_units
 
 
 def get_dimension_description() -> dict[str, str]:
-    dimensions_snapshot = paths.load_dependency(short_name="un_sdg_dimension.json", namespace="un")
+    dimensions_snapshot = papaths.load_dataset(short_name="un_sdg_dimension.json", namespace="un")
     with open(dimensions_snapshot.path) as json_file:
         dims: dict[str, str] = json.load(json_file)
     # underscore to match the df column names
