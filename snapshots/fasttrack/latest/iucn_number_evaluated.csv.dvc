@@ -4,7 +4,7 @@ meta:
     title: International Union for Conservation of Nature Red List of Threatened Species
     citation_full: |-
       IUCN. 2024. The IUCN Red List of Threatened Species. Version 2024-2. https://www.iucnredlist.org. Accessed on [20 December 2024]
-    attribution: IUCN
+    attribution: International Union for Conservation of Nature Red List of Threatened Species (2024)
     attribution_short: IUCN
     url_main: https://www.iucnredlist.org/resources/summary-statistics#Summary%20Tables
     url_download: |-
@@ -21,6 +21,6 @@ meta:
     name: © International Union for Conservation of Nature and Natural Resources
     url: https://www.iucnredlist.org/terms/terms-of-use
 outs:
-  - md5: ed37271627dfe92f041896bf6c64e4f9
-    size: 1374
+  - md5: 14ca192777a0046722ad598cc21a6857
+    size: 1159
     path: iucn_number_evaluated.csv
