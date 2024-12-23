@@ -276,6 +276,8 @@ steps:
     - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/regions/2023-01-01/regions
+  data://grapher/owid/latest/key_indicators:
+    - data://garden/owid/latest/key_indicators
 
 include:
   # Include all active steps plus all archive steps.
