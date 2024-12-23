@@ -823,3 +823,4 @@ include:
   - dag/minerals.yml
   - dag/tourism.yml
   - dag/migration.yml
+  - dag/equality.yml
