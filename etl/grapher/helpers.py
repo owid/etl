@@ -319,7 +319,7 @@ def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[s
     """Load YAML file and render Jinja in all fields. Return a dictionary.
 
     Usage:
-        from etl import grapher_helpers as gh
+        from etl.grapher import helpers as gh
         from etl import paths
 
         tb = Dataset(paths.DATA_DIR / "garden/who/2024-07-30/ghe")['ghe']
@@ -334,7 +334,7 @@ def render_variable_meta(meta: catalog.VariableMeta, dim_dict: Dict[str, str]) -
 
     Usage:
         # Create a playground.ipynb next to YAML file and run this in notebook
-        from etl import grapher_helpers as gh
+        from etl.grapher import helpers as gh
         m = gh.render_yaml_file("ghe.meta.yml", dim_dict={"sex": "male"})
         m['tables']['ghe']['variables']['death_count']
     """
