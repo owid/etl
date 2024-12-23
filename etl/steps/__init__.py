@@ -856,17 +856,17 @@ class GrapherStep(Step):
         return self.data_step._output_dataset
 
     def is_dirty(self) -> bool:
-        import etl.grapher_import as gi
+        import etl.grapher.to_db as db
 
         if self.data_step.is_dirty():
             return True
 
         # dataset exists, but it is possible that we haven't inserted everything into DB
         dataset = self.dataset
-        return gi.fetch_db_checksum(dataset) != self.data_step.checksum_input()
+        return db.fetch_db_checksum(dataset) != self.data_step.checksum_input()
 
     def run(self) -> None:
-        import etl.grapher_import as gi
+        import etl.grapher.to_db as db
 
         if "DATA_API_ENV" not in os.environ:
             warnings.warn(f"DATA_API_ENV not set, using '{config.DATA_API_ENV}'")
@@ -880,7 +880,7 @@ class GrapherStep(Step):
         admin_api = AdminAPI(OWID_ENV)
 
         assert dataset.metadata.namespace
-        dataset_upsert_results = gi.upsert_dataset(
+        dataset_upsert_results = db.upsert_dataset(
             engine,
             dataset,
             dataset.metadata.namespace,
@@ -980,7 +980,7 @@ class GrapherStep(Step):
 
         Return True if cleanup was successfull, False otherwise.
         """
-        import etl.grapher_import as gi
+        import etl.grapher.to_db as db
 
         # convert catalog_paths to variable_ids
         with Session(engine) as session:
@@ -988,13 +988,13 @@ class GrapherStep(Step):
 
         # Try to cleanup ghost variables, but make sure to raise an error if they are used
         # in any chart
-        success = gi.cleanup_ghost_variables(
+        success = db.cleanup_ghost_variables(
             engine,
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
         )
 
-        gi.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, dataset_upserted_source_ids)
+        db.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, dataset_upserted_source_ids)
         # TODO: cleanup origins that are not used by any variable. We can do it in batch
         return success
 
