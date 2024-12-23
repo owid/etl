@@ -12,12 +12,7 @@ COLUMNS_RENAME = {
     "time": "year",
     "agegrpstart": "age",
 }
-COLUMNS_INDEX = [
-    "location",
-    "year",
-    "sex",
-    "age",
-]
+COLUMNS_INDEX = ["location", "year", "sex", "age", "variant"]
 COLUMNS_INDICATORS = [
     "central_death_rate",
     "probability_of_death",
@@ -30,6 +25,8 @@ COLUMNS_INDICATORS = [
     "life_expectancy",
     "average_survival_length",
 ]
+# Year threshold for projections
+YEAR_PROJ_START = 2024
 
 
 def run(dest_dir: str) -> None:
@@ -43,12 +40,16 @@ def run(dest_dir: str) -> None:
     paths.log.info("load tables, concatenate.")
     tb = pr.concat(
         [
-            ds_meadow["un_wpp_lt_all"].reset_index(),
-            ds_meadow["un_wpp_lt_f"].reset_index(),
-            ds_meadow["un_wpp_lt_m"].reset_index(),
+            ds_meadow.read("un_wpp_lt_all"),
+            ds_meadow.read("un_wpp_lt_f"),
+            ds_meadow.read("un_wpp_lt_m"),
+            ds_meadow.read("un_wpp_lt_proj_all"),
+            ds_meadow.read("un_wpp_lt_proj_f"),
+            ds_meadow.read("un_wpp_lt_proj_m"),
         ],
         short_name=paths.short_name,
-    ).reset_index()
+        ignore_index=True,
+    )
 
     #
     # Process data.
@@ -64,7 +65,7 @@ def run(dest_dir: str) -> None:
     # DTypes
     tb = tb.astype(
         {
-            "age": str,
+            "age": "string",
         }
     )
 
@@ -79,21 +80,35 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names.
     paths.log.info("harmonise country names.")
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, country_col="location")
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
+        country_col="location",
+    )
 
     # Harmonize sex sex
     tb["sex"] = tb["sex"].map({"Total": "total", "Male": "male", "Female": "female"})
     assert tb["sex"].notna().all(), "NaNs detected after mapping sex values!"
 
+    # Historical and Projection-only tables
+    tb_hist = tb.loc[tb["year"] < YEAR_PROJ_START]
+    tb_future = tb.loc[tb["year"] >= YEAR_PROJ_START]
+
     # Set index
-    tb = tb.set_index(COLUMNS_INDEX, verify_integrity=True)[COLUMNS_INDICATORS]
+    tables = [
+        tb_hist.format(COLUMNS_INDEX, short_name="un_wpp_lt"),
+        tb_future.format(COLUMNS_INDEX, short_name="un_wpp_lt_proj"),
+    ]
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
