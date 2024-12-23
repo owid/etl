@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -15,7 +16,7 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("iucn_number_each_status")
-
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.format(["country", "year"])
 
     #
