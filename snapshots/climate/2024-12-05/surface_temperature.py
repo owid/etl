@@ -1,4 +1,4 @@
-"""Script to create a snapshot of the precipitation data from 1950 to present from the Copernicus Climate Change Service.
+"""Script to create a snapshot of the monthly averaged surface temperature data from 1950 to present from the Copernicus Climate Change Service.
 
 The script assumes that the data is available on the CDS API.
 Instructions on how to access the API on a Mac are here: https://confluence.ecmwf.int/display/CKB/How+to+install+and+use+CDS+API+on+macOS
@@ -25,7 +25,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/total_precipitation.zip")
+    snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/surface_temperature.zip")
 
     # Save data as a compressed temporary file.
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -36,12 +36,12 @@ def main(upload: bool) -> None:
         dataset = "reanalysis-era5-single-levels-monthly-means"
         request = {
             "product_type": ["monthly_averaged_reanalysis"],
-            "variable": ["total_precipitation"],
+            "variable": ["2m_temperature"],
             "year": [str(year) for year in range(1940, 2025)],
             "month": ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"],
             "time": "00:00",
             "area": [90, -180, -90, 180],
-            "data_format": "netcdf",
+            "data_format": "grib",
             "download_format": "zip",
         }
 
