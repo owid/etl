@@ -602,7 +602,7 @@ def get_dataset_id(
     return dataset_id
 
 
-@deprecated("This function is deprecated. Its logic will be soon moved to etl.grapher_model.Dataset.")
+@deprecated("This function is deprecated. Its logic will be soon moved to etl.grapher.model.Dataset.")
 def get_variables_in_dataset(
     dataset_id: int, only_used_in_charts: bool = False, db_conn: Optional[pymysql.Connection] = None
 ) -> Any:
