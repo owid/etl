@@ -31,10 +31,10 @@ from tenacity.stop import stop_after_attempt
 from tenacity.wait import wait_fixed
 
 from etl import config
-from etl import grapher_model as gm
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_connection, read_sql
 from etl.files import checksum_str
+from etl.grapher import model as gm
 from etl.paths import CACHE_DIR, DATA_DIR
 
 log = structlog.get_logger()

@@ -7,7 +7,7 @@ import structlog
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore_table
 
-from etl import grapher_model as gm
+from etl.grapher import model as gm
 from etl.snapshot import Snapshot
 from etl.steps.data.converters import convert_grapher_dataset, convert_grapher_variable
 

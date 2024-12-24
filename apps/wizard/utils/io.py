@@ -11,7 +11,7 @@ from pymysql import OperationalError
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from apps.wizard.utils.cached import get_datasets_from_version_tracker
 from etl.git_helpers import get_changed_files
 from etl.grapher.io import get_all_datasets

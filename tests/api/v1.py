@@ -4,7 +4,7 @@ import yaml
 from fastapi.testclient import TestClient
 
 from api.main import app
-from etl import grapher_model as gm
+from etl.grapher import model as gm
 
 client = TestClient(app)
 

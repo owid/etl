@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 import etl.grapher.io as io
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from apps.anomalist import detectors
 from apps.anomalist.anomalist_api import add_auxiliary_scores
 from apps.anomalist.gp_detector import AnomalyGaussianProcessOutlier

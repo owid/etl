@@ -8,7 +8,7 @@ import pandas as pd
 import streamlit as st
 from structlog import get_logger
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.utils import set_states
 from apps.wizard.utils.cached import get_grapher_user_id

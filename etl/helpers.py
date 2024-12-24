@@ -37,7 +37,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 from sqlalchemy.orm import Session
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from etl import paths
 from etl.config import DEFAULT_GRAPHER_SCHEMA, TLS_VERIFY
 from etl.db import get_engine

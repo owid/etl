@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 
 from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config, paths
-from etl import grapher_model as gm
+from etl.grapher import model as gm
 from etl.command import main as etl_main
 from etl.db import get_engine
 from etl.files import yaml_dump

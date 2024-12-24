@@ -12,7 +12,7 @@ from apps.backport.datasync.data_metadata import (
 )
 from etl.db import get_engine
 from etl.grapher.io import variable_data_df_from_s3
-from etl.grapher_model import _infer_variable_type
+from etl.grapher.model import _infer_variable_type
 
 
 def _call_variable_metadata(variable_id: int, variable_df: pd.DataFrame, variable_meta: dict) -> dict:

@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, cast
 import streamlit as st
 from sqlalchemy.orm import Session
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
 )

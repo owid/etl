@@ -21,10 +21,10 @@ from apps.anomalist.detectors import (
 from apps.anomalist.gp_detector import AnomalyGaussianProcessOutlier
 from apps.wizard.utils.cached import load_latest_population
 from apps.wizard.utils.paths import WIZARD_ANOMALIES_RELATIVE
-from etl import grapher_model as gm
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
 from etl.files import create_folder, upload_file_to_server
+from etl.grapher import model as gm
 from etl.grapher.io import variable_data_table_from_catalog
 
 log = structlog.get_logger()

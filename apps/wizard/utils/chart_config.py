@@ -7,7 +7,7 @@ import numpy as np
 
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher.io import ensure_load_variable
-from etl.grapher_model import Variable
+from etl.grapher.model import Variable
 
 CONFIG_BASE = {
     # "title": "Placeholder",
