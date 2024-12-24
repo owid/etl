@@ -33,7 +33,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "waterbodycategory", "eeaIndicator"])
+    tb = tb.format(["country", "year", "waterbodycategory", "eeaindicator"])
 
     #
     # Save outputs.
