@@ -23,14 +23,13 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("space_track.csv")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
+    tb = snap.read()
 
     #
     # Process data.
     #
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb = tb.set_index(["gp_id"], verify_integrity=True)
+    tb = tb.format(["gp_id"])
 
     #
     # Save outputs.
