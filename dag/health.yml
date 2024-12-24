@@ -801,13 +801,6 @@ steps:
   data://grapher/antibiotics/2024-10-09/gram_children:
     - data://garden/antibiotics/2024-10-09/gram_children
 
-  # Cervical cancer incidence rates GCO - Cancer Over Time
-  data://meadow/cancer/2024-10-13/gco_cancer_over_time_cervical:
-    - snapshot://cancer/2024-10-13/gco_cancer_over_time_cervical.csv
-  data://garden/cancer/2024-10-13/gco_cancer_over_time_cervical:
-    - data://meadow/cancer/2024-10-13/gco_cancer_over_time_cervical
-  data://grapher/cancer/2024-10-13/gco_cancer_over_time_cervical:
-    - data://garden/cancer/2024-10-13/gco_cancer_over_time_cervical
 
   # Cervical cancer incidence rates GCO - Cancer Today (2022)
   data://meadow/cancer/2024-10-13/gco_cancer_today_cervical:

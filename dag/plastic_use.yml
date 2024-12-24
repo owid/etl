@@ -63,22 +63,6 @@ steps:
   data://grapher/oecd/2023-09-21/plastic_fate_regions_projections:
     - data://garden/oecd/2023-09-21/plastic_fate_regions_projections
 
-
-  data://meadow/oecd/2023-09-21/plastic_environment_leakage_projections:
-    - snapshot://oecd/2023-09-21/plastic_environment_leakage_projections.csv
-  data://garden/oecd/2023-09-21/plastic_environment_leakage_projections:
-    - data://meadow/oecd/2023-09-21/plastic_environment_leakage_projections
-  data://grapher/oecd/2023-09-21/plastic_environment_leakage_projections:
-    - data://garden/oecd/2023-09-21/plastic_environment_leakage_projections
-
-
-  data://meadow/oecd/2023-09-21/plastic_aquatic_leakage_projections:
-    - snapshot://oecd/2023-09-21/plastic_aquatic_leakage_projections.csv
-  data://garden/oecd/2023-09-21/plastic_aquatic_leakage_projections:
-    - data://meadow/oecd/2023-09-21/plastic_aquatic_leakage_projections
-  data://grapher/oecd/2023-09-21/plastic_aquatic_leakage_projections:
-    - data://garden/oecd/2023-09-21/plastic_aquatic_leakage_projections
-
   # Geyer et al. 2017 historical plastic production
   data://meadow/plastic_waste/2023-09-26/geyer_2017:
     - snapshot://plastic_waste/2023-09-26/geyer_2017.pdf
