@@ -319,6 +319,7 @@ include:
   - dag/archive/faostat.yml
   - dag/archive/energy.yml
   - dag/archive/emissions.yml
+  - dag/archive/health.yml
   - dag/archive/papers.yml
   - dag/archive/demography.yml
   - dag/archive/fasttrack.yml
