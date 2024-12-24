@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     tb = tidy_sex_dimension(tb)
     tb = tidy_age_dimension(tb)
 
-    tb = tb.set_index(["country", "year", "sex", "age_group"], verify_integrity=True)
+    tb = tb.format(["country", "year", "sex", "age_group"])
 
     #
     # Save outputs.

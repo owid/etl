@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
 
     tb = tb.rename(columns={"Country Name": "country"})
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year", "sex", "age_group"], verify_integrity=True).sort_index()
+    tb = tb.underscore().format(["country", "year", "sex", "age_group"])
 
     #
     # Save outputs.

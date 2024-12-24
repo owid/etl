@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
         tb[column].metadata.origins = [snap.metadata.origin]
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["name", "date"], verify_integrity=True).sort_index()
+    tb = tb.underscore().format(["name", "date"])
 
     #
     # Save outputs.
