@@ -785,19 +785,6 @@ steps:
     - data://garden/climate/2024-09-30/sea_ice_index
 
   #
-  # Global Wildfire Information System - Monthly burned area.
-  #
-  data://meadow/climate/2024-02-19/monthly_burned_area:
-    - snapshot://climate/2024-02-19/monthly_burned_area.zip
-  data://garden/climate/2024-02-19/monthly_burned_area:
-    - data://meadow/climate/2024-02-19/monthly_burned_area
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/climate/2024-02-19/monthly_burned_area:
-    - data://garden/climate/2024-02-19/monthly_burned_area
-  data://grapher/climate/2024-02-19/yearly_burned_area:
-    - data://garden/climate/2024-02-19/monthly_burned_area
-  #
   # Emissions from wildfires.
   #
   data://meadow/climate/2024-02-19/monthly_fire_emissions:
@@ -810,3 +797,6 @@ steps:
     - data://garden/climate/2024-02-19/monthly_fire_emissions
   data://grapher/climate/2024-02-19/yearly_fire_emissions:
     - data://garden/climate/2024-02-19/monthly_fire_emissions
+
+  data://grapher/climate/2024-02-19/monthly_burned_area:
+    - data://garden/climate/2024-02-19/monthly_burned_area
