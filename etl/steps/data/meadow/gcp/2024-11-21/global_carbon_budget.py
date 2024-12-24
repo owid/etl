@@ -24,10 +24,7 @@ paths = PathFinder(__file__)
 
 def prepare_fossil_co2(tb_fossil_co2: Table) -> Table:
     # Set an appropriate index and sort conveniently.
-    tb_fossil_co2 = tb_fossil_co2.format(["Country", "Year"], sort_columns=True)
-
-    # Ensure all columns are snake-case.
-    tb_fossil_co2 = tb_fossil_co2.underscore()
+    tb_fossil_co2 = tb_fossil_co2.format(["country", "year"], sort_columns=True)
 
     return tb_fossil_co2
 
