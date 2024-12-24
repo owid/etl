@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     # tb = tb.format(["Country or Area"])
-    tb = tb.format(["Country or Area"])
+    tb = tb.format(["country_or_area"])
 
     #
     # Save outputs.
