@@ -16,6 +16,6 @@ meta:
     The platform accommodates both qualitative and quantitative data which facilitates the tracking of global trends, spread, intensity, and impact of influenza. These data are made freely available to health policy makers in order to assist them in making informed decisions regarding the management of influenza.
 wdir: ../../../data/snapshots/who/latest
 outs:
-  - md5: 41e5777bce458f4f91066d60f95c28d3
-    size: 168768713
+  - md5: 71f3eb71989dacfb7389488edf184ba7
+    size: 168784956
     path: fluid.csv

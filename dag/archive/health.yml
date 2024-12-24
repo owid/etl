@@ -136,13 +136,26 @@ steps:
   data-private://grapher/antibiotics/2024-11-20/pathogen_bloodstream:
     - data-private://garden/antibiotics/2024-11-20/pathogen_bloodstream
 
-  # IHME Global Burden of Disease - Risk factors
-  data://meadow/ihme_gbd/2019/gbd_risk:
-    - walden://ihme_gbd/2019/gbd_risk
-  data://garden/ihme_gbd/2019/gbd_risk:
-    - data://meadow/ihme_gbd/2019/gbd_risk
-  data://grapher/ihme_gbd/2019/gbd_risk:
-    - data://garden/ihme_gbd/2019/gbd_risk
+  # Suicides based on GHO dataset
+  data://garden/who/2024-02-14/gho_suicides:
+    - data://garden/who/2024-01-03/gho
+  data://grapher/who/2024-02-14/gho_suicides:
+    - data://garden/who/2024-02-14/gho_suicides
+
+  # WHO - Global Health Observatory (only suicides variable)
+  data://meadow/who/2023-03-09/gho_suicides:
+    - snapshot://who/2023-03-09/gho_suicides.json
+  data://garden/who/2023-03-09/gho_suicides:
+    - data://meadow/who/2023-03-09/gho_suicides
+  data://grapher/who/2023-03-09/gho_suicides:
+    - data://garden/who/2023-03-09/gho_suicides
+
+  # Malnutrition
+  data://grapher/malnutrition/2022-10-18/malnutrition:
+    - data://garden/malnutrition/2022-10-18/malnutrition
+  data://garden/malnutrition/2022-10-18/malnutrition:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/un/2022-07-11/un_wpp
 
   # WHO Global Health Estimates
   data://meadow/who/2022-09-30/ghe:
