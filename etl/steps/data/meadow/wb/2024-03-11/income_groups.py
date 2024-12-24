@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     tb = tb.melt(id_vars=["country_code", "country"], var_name="year", value_name="classification")
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
