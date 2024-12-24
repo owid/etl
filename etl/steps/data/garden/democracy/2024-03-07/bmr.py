@@ -127,7 +127,7 @@ def run(dest_dir: str) -> None:
     tb_pop, tb_pop_years_consec = make_tables_population_counters(tb, ds_regions, ds_population)
 
     # Set index.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
