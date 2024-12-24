@@ -11,7 +11,7 @@ import streamlit as st
 from rapidfuzz import fuzz
 from sqlalchemy.exc import OperationalError
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from apps.wizard import utils
 from apps.wizard.etl_steps.forms import DataForm
 from apps.wizard.etl_steps.instructions import render_instructions

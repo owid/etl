@@ -1,4 +1,4 @@
-from etl import grapher_model as gm
+from etl.grapher import model as gm
 
 
 def test_source_description():

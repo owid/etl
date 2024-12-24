@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
 
     table = N.garden_dataset["multidimensional_poverty_index"]
 
-    # if your data is in long format, you can use `grapher_helpers.long_to_wide_tables`
+    # if your data is in long format, you can use `grapher.helpers.long_to_wide_tables`
     # to get into wide format
     dataset.add(table)
 

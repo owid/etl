@@ -17,7 +17,7 @@ from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
 from etl.explorer import Explorer
-from etl.grapher_model import Entity, Variable
+from etl.grapher.model import Entity, Variable
 from etl.paths import EXPLORERS_DIR
 
 # TODO:

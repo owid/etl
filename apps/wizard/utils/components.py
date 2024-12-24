@@ -13,7 +13,7 @@ import streamlit.components.v1 as components
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.chart_config import bake_chart_config
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher_model import Variable
+from etl.grapher.model import Variable
 
 HORIZONTAL_STYLE = """<style class="hide-element">
     /* Hides the style container and removes the extra spacing */

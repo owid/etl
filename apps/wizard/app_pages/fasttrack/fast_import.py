@@ -17,10 +17,10 @@ from structlog import get_logger
 from apps.utils.files import add_to_dag
 from apps.wizard import utils as wizard_utils
 from apps.wizard.app_pages.fasttrack.utils import _encrypt
-from etl import grapher_model as gm
 from etl.compare import diff_print
 from etl.db import get_engine
 from etl.files import apply_ruff_formatter_to_files, yaml_dump
+from etl.grapher import model as gm
 from etl.metadata_export import metadata_export
 from etl.paths import BASE_DIR, DAG_DIR, STEP_DIR
 from etl.snapshot import Snapshot, SnapshotMeta

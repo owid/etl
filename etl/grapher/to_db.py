@@ -34,9 +34,9 @@ from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 from etl import config
 from etl.db import get_engine, production_or_master_engine
+from etl.grapher import helpers as gh
 
-from . import grapher_helpers as gh
-from . import grapher_model as gm
+from . import model as gm
 
 log = structlog.get_logger()
 

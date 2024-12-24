@@ -44,7 +44,7 @@ from apps.wizard.utils.components import (
 )
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
-from etl.grapher_io import load_variables
+from etl.grapher.io import load_variables
 
 # PAGE CONFIG
 st.set_page_config(

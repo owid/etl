@@ -18,7 +18,7 @@ from rich_click.rich_group import RichGroup
 
 from etl import tempcompare
 from etl.db import get_engine, read_sql
-from etl.grapher_io import variable_data_df_from_s3
+from etl.grapher.io import variable_data_df_from_s3
 
 
 @click.group(name="compare", cls=RichGroup)
