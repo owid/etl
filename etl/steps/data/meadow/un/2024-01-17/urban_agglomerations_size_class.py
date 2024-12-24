@@ -38,11 +38,7 @@ def run(dest_dir: str) -> None:
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
 
     tb_melt = tb.melt(id_vars=["country", "Type of data", "Size class of urban settlement"], var_name="year")
-    tb_melt = (
-        tb_melt.underscore()
-        .set_index(["country", "year", "size_class_of_urban_settlement", "type_of_data"], verify_integrity=True)
-        .sort_index()
-    )
+    tb_melt = tb_melt.format(["country", "year", "size_class_of_urban_settlement", "type_of_data"])
     #
     # Save outputs.
     #

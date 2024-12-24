@@ -63,7 +63,7 @@ def run(dest_dir: str) -> None:
             future_projections = future_projections.drop(columns=[col])
 
     tb_merged = pr.merge(past_estimates, future_projections, on=["country", "year"], how="outer")
-    tb_merged = tb_merged.set_index(["country", "year"], verify_integrity=True)
+    tb_merged = tb_merged.format(["country", "year"])
 
     # Remove '__1950_2050' from column names
     for col in tb_merged.columns:
