@@ -175,3 +175,12 @@ steps:
     - data://meadow/health/2024-06-11/isaps_plastic_surgery
   data://grapher/health/2024-06-11/isaps_plastic_surgery:
     - data://garden/health/2024-06-11/isaps_plastic_surgery
+
+  # Missing Data - Neuropsychiatric Conditions
+  data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions:
+    - data://garden/who/2024-07-26/mortality_database
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/missing_data/2024-03-26/who_neuropsychiatric_conditions:
+    - data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions
