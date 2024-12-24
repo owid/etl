@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index and sort conveniently.
-    tb = tb.underscore().set_index(["measure_names", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["measure_names", "year"])
 
     #
     # Save outputs.

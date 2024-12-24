@@ -65,7 +65,7 @@ def run(dest_dir: str) -> None:
     tb = tb_co2.merge(tb_ch4, on="year", how="outer").merge(tb_n2o, on="year", how="outer", short_name=paths.short_name)
 
     # Set an appropriate index to each table and sort conveniently.
-    tb = tb.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(["year"], sort_columns=True)
 
     #
     # Save outputs.

@@ -45,7 +45,7 @@ def run(dest_dir: str) -> None:
     cols = ["country", "year", "Drug combination, Pre-SAC", "Drug combination, SAC"]
     # For some reason format doesn't work here
     # tb = tb.format(cols)
-    tb = tb.set_index(cols, verify_integrity=True)
+    tb = tb.format(cols)
 
     #
     # Save outputs.

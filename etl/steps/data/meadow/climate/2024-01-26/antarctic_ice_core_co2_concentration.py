@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case (and remove spurious spaces), set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["gasage__yr_bp"], verify_integrity=True).sort_index()
+    tb = tb.format(["gasage__yr_bp"])
 
     #
     # Save outputs.

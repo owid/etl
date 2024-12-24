@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
     tb["retired"] = tb["inventory"] - tb["stockpile"]
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(["country", "year"], sort_columns=True)
 
     #
     # Save outputs.

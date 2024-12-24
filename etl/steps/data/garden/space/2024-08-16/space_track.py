@@ -102,7 +102,7 @@ def run(dest_dir: str) -> None:
     final.metadata.short_name = "space_track"
 
     # Clean for ETL
-    final = final.rename(columns={"entity": "country"}).set_index(["country", "year"], verify_integrity=True)
+    final = final.rename(columns={"entity": "country"}).format(["country", "year"])
 
     #
     # Save outputs.
