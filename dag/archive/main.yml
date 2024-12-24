@@ -325,3 +325,8 @@ include:
   - dag/archive/climate.yml
   - dag/archive/environment.yml
   - dag/archive/equality.yml
+  - dag/archive/plastic_use.yml
+  - dag/archive/artificial_intelligence.yml
+  - dag/archive/artificial_intelligence.yml
+  - dag/archive/urbanization.yml
+  - dag/archive/education.yml
