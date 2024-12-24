@@ -37,7 +37,7 @@ def run(dest_dir: str) -> None:
         tb = tb.drop(columns="last_obs")
 
     # Reinstate the index
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country",)
 
     #
     # Save outputs.
