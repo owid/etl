@@ -39,14 +39,8 @@ HORIZONTAL_STYLE = """<style class="hide-element">
     }}
     /* Buttons and their parent container all have a width of 704px, which we need to override */
     div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) div {{
-        width: max-content !important;
+        width: auto !important; /* Previously set to max-content */
     }}
-    /* Just an example of how you would style buttons, if desired */
-    /*
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) button {{
-        border-color: red;
-    }}
-    */
 </style>
 """
 
@@ -58,8 +52,9 @@ def _generate_6char_hash():
 
 
 @contextmanager
-def st_horizontal(vertical_alignment="baseline", justify_content="flex-start"):
-    hash_string = _generate_6char_hash()
+def st_horizontal(vertical_alignment="baseline", justify_content="flex-start", hash_string=None):
+    if hash_string is None:
+        hash_string = _generate_6char_hash()
     h_style = HORIZONTAL_STYLE.format(
         hash=hash_string,
         vertical_alignment=vertical_alignment,
@@ -86,6 +81,7 @@ def grapher_chart(
     owid_env: OWIDEnv = OWID_ENV,
     selected_entities: Optional[list] = None,
     included_entities: Optional[list] = None,
+    tab: Optional[str] = None,
     height=600,
     **kwargs,
 ):
@@ -111,6 +107,8 @@ def grapher_chart(
         List of entities to plot, by default None. If None, a random sample of num_sample_selected_entities will be plotted. Use entity names!
     included_entities : Optional[list], optional
         NOT WORKING ATM AS EXPECTED ATM. List of entities to include in chart. The rest are excluded! This is equivalent to `includedEntities` in Grapher. Use entity IDs!
+    tab : str, optional
+        Default tab to show in the chart, by default None (which is equivalent to "chart")
     height : int, optional
         Height of the chart, by default 600
     """
@@ -122,6 +120,7 @@ def grapher_chart(
             variable=variable,
             selected_entities=selected_entities,
             included_entities=included_entities,
+            tab=tab,
             owid_env=owid_env,
         )
 
