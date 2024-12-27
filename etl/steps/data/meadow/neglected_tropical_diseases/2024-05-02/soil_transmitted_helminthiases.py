@@ -43,8 +43,6 @@ def run(dest_dir: str) -> None:
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     cols = ["country", "year", "Drug combination, Pre-SAC", "Drug combination, SAC"]
-    # For some reason format doesn't work here
-    # tb = tb.format(cols)
     tb = tb.format(cols)
 
     #
