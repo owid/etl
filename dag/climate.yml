@@ -32,7 +32,7 @@ steps:
   # Copernicus Climate Change Service - Surface temperature.
   #
   data://meadow/climate/2023-12-20/surface_temperature:
-  - snapshot://climate/2024-11-05/surface_temperature.zip
+  - snapshot://climate/2024-12-05/surface_temperature.zip
   - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2023-12-20/surface_temperature:
     - data://meadow/climate/2023-12-20/surface_temperature

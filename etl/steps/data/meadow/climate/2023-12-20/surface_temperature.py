@@ -1,6 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-import io
+import tempfile
 import zipfile
 
 import geopandas as gpd
@@ -25,16 +25,19 @@ log = get_logger()
 
 def _load_data_array(snap: Snapshot) -> xr.DataArray:
     log.info("load_data_array.start")
-    # Load data from snapshot.
     with zipfile.ZipFile(snap.path, "r") as zip_file:
-        # Iterate through all files in the zip archive
         for file_info in zip_file.infolist():
-            with zip_file.open(file_info) as file:
-                file_content = file.read()
-    # Create an in-memory bytes file and load the dataset
-    with io.BytesIO(file_content) as memfile:
-        da = xr.open_dataset(memfile).load()  # .load() ensures data is eagerly loaded
+            if file_info.filename.endswith((".grb", ".grib")):  # Filter GRIB files
+                with zip_file.open(file_info) as file:
+                    file_content = file.read()
 
+                # Write to a temporary file
+                with tempfile.NamedTemporaryFile(delete=True, suffix=".grib") as tmp_file:
+                    tmp_file.write(file_content)
+                    tmp_file.flush()  # Ensure all data is written
+
+                    # Load the GRIB file using xarray and cfgrib
+                    da = xr.open_dataset(tmp_file.name, engine="cfgrib").load()
     # Convert temperature from Kelvin to Celsius.
     da = da["t2m"] - 273.15
 
@@ -137,11 +140,11 @@ def run(dest_dir: str) -> None:
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
     # Define the start and end dates
-    da["date"] = pd.to_datetime(da["date"].astype(str), format="%Y%m%d")
+    da["valid_time"] = xr.DataArray(pd.to_datetime(da["valid_time"].values), dims=da["valid_time"].dims)
 
     # Now you can access the 'dt' accessor
-    start_time = da["date"].min().dt.date.astype(str).item()
-    end_time = da["date"].max().dt.date.astype(str).item()
+    start_time = da["valid_time"].min().dt.date.astype(str).item()
+    end_time = da["valid_time"].max().dt.date.astype(str).item()
 
     # Generate a date range from start_time to end_time with monthly frequency
     month_middles = pd.date_range(start=start_time, end=end_time, freq="MS") + pd.offsets.Day(14)
