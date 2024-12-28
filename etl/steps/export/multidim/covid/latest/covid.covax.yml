@@ -70,6 +70,7 @@ views:
       chartTypes: ["StackedDiscreteBar"]
       sortBy: column
       sortColumnSlug: "{definitions.table}#delivered"
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       dimensions:
         - property: y
           variableId: 988127
@@ -101,6 +102,7 @@ views:
       note: COVAX is a worldwide initiative aimed at equitable access to COVID-19 vaccines. It is directed by Gavi, CEPI, and the WHO. Gross domestic product is expressed in U.S. Dollars; it is sourced from the World Bank and OECD.
       originUrl: ourworldindata.org/coronavirus
       chartTypes: ["StackedDiscreteBar"]
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
 
   - dimensions:
       normalize: per_dose
@@ -116,6 +118,7 @@ views:
       note: COVAX is a worldwide initiative aimed at equitable access to COVID-19 vaccines. It is directed by Gavi, CEPI, and the WHO. Gross domestic product is expressed in U.S. Dollars; it is sourced from the World Bank and OECD.
       originUrl: ourworldindata.org/coronavirus
       chartTypes: ["StackedDiscreteBar"]
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
 
   - dimensions:
       normalize: per_gdp
@@ -131,3 +134,4 @@ views:
       note: COVAX is a worldwide initiative aimed at equitable access to COVID-19 vaccines. It is directed by Gavi, CEPI, and the WHO. Gross domestic product is expressed in U.S. Dollars; it is sourced from the World Bank and OECD.
       originUrl: ourworldindata.org/coronavirus
       chartTypes: ["StackedDiscreteBar"]
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
