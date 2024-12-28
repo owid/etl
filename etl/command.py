@@ -20,6 +20,7 @@ from os import environ
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional
 
+import pandas as pd
 import rich_click as click
 import structlog
 from ipdb import launch_ipdb_on_exception
@@ -42,7 +43,7 @@ config.enable_bugsnag()
 #   with owid libraries. It's better to wait for an official pandas 3.0 release and update
 #   it all at once.
 # Use string[pyarrow] by default, this will become True in pandas 3.0
-# pd.options.future.infer_string = True
+pd.options.future.infer_string = True
 
 # if the number of open files allowed is less than this, increase it
 LIMIT_NOFILE = 4096
