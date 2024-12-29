@@ -436,7 +436,7 @@ def process_fertility_births_single(tb: Table) -> Table:
     )
 
     # Keep data only every 5 years, and 2023
-    tb = tb.loc[(tb["year_as_dimension"] % 5 == 0) | tb["year_as_dimension"] == LAST_YEAR]
+    tb = tb.loc[(tb["year_as_dimension"] % 5 == 0) | (tb["year_as_dimension"] == LAST_YEAR)]
 
     # Format
     tb = tb.format(["country", "age", "year_as_dimension"], short_name="fertility_single")
