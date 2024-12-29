@@ -22,6 +22,6 @@ meta:
     license:
       name: 2023 International Society of Aesthetic Plastic Surgery
 outs:
-  - md5: 3471c612cf25681d0cc7e2f9a19e3a67
-    size: 22489
-    path: isaps_plastic_surgery.csv
+  - md5: eadc2a228bd63563bf7a3d4e955915d8
+    size: 63373
+    path: isaps_plastic_surgery.xlsx
