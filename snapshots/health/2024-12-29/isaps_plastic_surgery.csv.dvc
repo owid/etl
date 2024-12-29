@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: ISAPS Global Survey
+    description: |-
+      ISAPS annual Global Survey is the only international scientific study on aesthetic surgical and non-surgical procedures. Country-specific data are only shown for those countries with a sufficient survey response for the figures to be considered valid.
+
+      This is a manually transcribed compilation of reports from 2010 until 2023.
+    date_published: "2024-06-12"
+    # Citation
+    producer: International Society of Aesthetic Plastic Surgery
+    citation_full: |-
+      International Society of Aesthetic Plastic Surgery. (2010-2023). ISAPS international survey on anual aesthetic/cosmetic procedures performed.
+
+    # Files
+    url_main: https://isaps.org/discover/about-isaps/global-statistics/
+    date_accessed: 2024-12-29
+
+    # License
+    license:
+      name: 2023 International Society of Aesthetic Plastic Surgery
+outs:
+  - md5: 3471c612cf25681d0cc7e2f9a19e3a67
+    size: 22489
+    path: isaps_plastic_surgery.csv
