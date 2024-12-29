@@ -164,6 +164,14 @@ tables:
               The total fertility rate is the number of children that would be born to a woman if she were to live to the end of her child-bearing years and give birth to children at the current age-specific fertility rates.
               <%- endif %>
 
+  fertility_single:
+    variables:
+      fertility_rate:
+        title: "Fertility rate, by age - Year: << year_as_dimension >>"
+        description_short: |-
+          The average number of children a woman would have at each age if she experienced the fertility rates of year << year_as_dimension >>.
+        unit: "live births per 1,000 mothers"
+
   migration:
     variables:
       net_migration:
