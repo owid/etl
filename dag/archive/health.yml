@@ -167,3 +167,11 @@ steps:
     - snapshot://who/2023-07-14/standard_age_distribution.csv
   data://grapher/who/2022-09-30/ghe:
     - data://garden/who/2022-09-30/ghe
+
+  # ISAPS: Surgery
+  data://meadow/health/2024-06-11/isaps_plastic_surgery:
+    - snapshot://health/2024-06-11/isaps_plastic_surgery.xlsx
+  data://garden/health/2024-06-11/isaps_plastic_surgery:
+    - data://meadow/health/2024-06-11/isaps_plastic_surgery
+  data://grapher/health/2024-06-11/isaps_plastic_surgery:
+    - data://garden/health/2024-06-11/isaps_plastic_surgery

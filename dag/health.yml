@@ -598,12 +598,12 @@ steps:
     - data://garden/smoking/2024-05-30/cigarette_sales
 
   # ISAPS, Plastic Surgery (2010-2022)
-  data://meadow/health/2024-06-11/isaps_plastic_surgery:
-    - snapshot://health/2024-06-11/isaps_plastic_surgery.xlsx
-  data://garden/health/2024-06-11/isaps_plastic_surgery:
-    - data://meadow/health/2024-06-11/isaps_plastic_surgery
-  data://grapher/health/2024-06-11/isaps_plastic_surgery:
-    - data://garden/health/2024-06-11/isaps_plastic_surgery
+  data://meadow/health/2024-12-29/isaps_plastic_surgery:
+    - snapshot://health/2024-12-29/isaps_plastic_surgery.xlsx
+  data://garden/health/2024-12-29/isaps_plastic_surgery:
+    - data://meadow/health/2024-12-29/isaps_plastic_surgery
+  data://grapher/health/2024-12-29/isaps_plastic_surgery:
+    - data://garden/health/2024-12-29/isaps_plastic_surgery
 
   # Gapminder Maternal Mortality (long run dataset)
   data://meadow/gapminder/2024-07-08/maternal_mortality:
