@@ -170,7 +170,7 @@ tables:
         title: "Fertility rate, by age - Year: << year_as_dimension >>"
         description_short: |-
           The average number of children a woman would have at each age if she experienced the fertility rates of year << year_as_dimension >>.
-        unit: "live births per 1,000 mothers"
+        unit: "births per woman"
 
   migration:
     variables:

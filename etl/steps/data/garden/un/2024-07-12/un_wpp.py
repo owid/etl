@@ -435,6 +435,9 @@ def process_fertility_births_single(tb: Table) -> Table:
         }
     )
 
+    # Scale
+    tb["fertility_rate"] /= 1_000
+
     # Keep data only every 5 years, and 2023
     tb = tb.loc[(tb["year_as_dimension"] % 5 == 0) | (tb["year_as_dimension"] == LAST_YEAR)]
 
