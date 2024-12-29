@@ -418,10 +418,12 @@ def process_births(tb: Table, tb_rate: Table) -> Table:
 
 
 def process_fertility_births_single(tb: Table) -> Table:
+    LAST_YEAR = 2023
+
     # Standard processing
     tb = process_standard(tb)
     # Keep only data pre-2023 (no projections)
-    tb = tb.loc[tb["year"] <= 2023]
+    tb = tb.loc[tb["year"] <= LAST_YEAR]
     # Check
     assert set(tb["sex"].unique()) == {"all"}, "Unexpected sex group"
     # Drop unused columns
@@ -433,8 +435,8 @@ def process_fertility_births_single(tb: Table) -> Table:
         }
     )
 
-    # Keep data only every 5 years
-    tb = tb.loc[tb["year_as_dimension"] % 5 == 0]
+    # Keep data only every 5 years, and 2023
+    tb = tb.loc[(tb["year_as_dimension"] % 5 == 0) | tb["year_as_dimension"] == LAST_YEAR]
 
     # Format
     tb = tb.format(["country", "age", "year_as_dimension"], short_name="fertility_single")
