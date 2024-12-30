@@ -14,9 +14,11 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("isaps_plastic_surgery")
+    ds_un = paths.load_dataset("un_wpp")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("isaps_plastic_surgery")
+    tb_pop = ds_un.read("population")
 
     # Rename columns
     tb = tb.rename(
@@ -42,6 +44,12 @@ def run(dest_dir: str) -> None:
     columns = ["category_1", "category_2", "procedure_name"]
     tb[columns] = tb[columns].astype("string").fillna("all")
 
+    # Add per-capita
+    tb_pop = prepare_population(tb=tb_pop)
+    tb = tb.merge(tb_pop, on=["country", "year"], how="left")
+    tb["num_procedures_per_capita"] = 1_000 * tb["num_procedures"] / tb["population"]
+    tb = tb.drop(columns=["population"])
+
     #
     # Process data.
     #
@@ -60,3 +68,10 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def prepare_population(tb):
+    tb = tb.loc[
+        (tb["variant"] == "estimates") & (tb["age"] >= "all") & (tb["sex"] == "all"), ["country", "year", "population"]
+    ]
+    return tb
