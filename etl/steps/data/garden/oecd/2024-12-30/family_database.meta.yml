@@ -1,0 +1,118 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Marriages & Divorces
+    display:
+      numDecimalPlaces: 1
+
+  description_producer_empl:  &description_producer_empl
+    Employment rates for women (15–64-year-olds) with at least one child aged 0-14,  with ‘children’ defined as any children aged 0-14 inclusivewho live in the same household as the woman and who are reported as the child of the woman (including both biological children and step or adoptive children). Women with children who do not live in the same household are generally not included, nor are women with children aged 15 and over regardless of whether or not the child lives in the same household and/or is dependent on the mother. Exceptions to this definition are Canada, Korea and the United States, were children aged 0-17 are included. For Australia and Japan, data cover all women aged 15 and over, and for Korea married women aged 15-54.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  family_database:
+    variables:
+      child_poverty_rate:
+        title:  Child poverty rate
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of children under 18 living in households with incomes below the poverty line.
+        description_from_producer: The child relative income poverty rate, defined as the percentage of children (0-17 year-olds) with an equivalised household disposable income (i.e. an income after taxes and transfers adjusted for household size) below the poverty threshold. The poverty threshold is set here at 50% of the median disposable income in each country.
+
+      crude_divorce_rate__divorces_per_1000_people:
+        title: Crude divorce rate (divorces per 1,000 people)
+        unit: "per 1,000 people"
+        short_unit: "per 1,000 people"
+        description_short: Number of divorces during a given year per 1,000 people.
+        description_from_producer: The crude divorce rate is defined as the number of divorces during a given year per 1,000 people.
+
+      crude_marriage_rate__marriages_per_1000_people:
+        title: Crude marriage rate (marriages per 1,000 people)
+        unit: "per 1,000 people"
+        short_unit: "per 1,000 people"
+        description_short: Number of marriages during a given year per 1,000 people.
+        description_from_producer: The crude marriage rate is defined as the number of marriages during a given year per 1,000 people.
+
+      employment_rates__pct__for_all_mothers__15_64_year_olds__with_at_least_one_child_under_15:
+        title: Employment rates (%), for all mothers (15-64 year-olds) with at least one child under 15
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of mothers aged 15-64 with at least one child under 15 who are employed.
+
+      employment_rates__pct__for_partnered_mothers__15_64_year_olds__with_at_least_one_child_under_15:
+        title: Employment rates (%), for partnered mothers (15-64 year-olds) with at least one child under 15
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of partnered mothers aged 15-64 with at least one child under 15 who are employed.
+        description_from_producer: *description_producer_empl
+
+      employment_rates__pct__for_sole_parent_mothers__15_64_year_olds__with_at_least_one_child_under_15:
+        title: Employment rates (%), for sole parent mothers (15-64 year-olds) with at least one child under 15
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of sole parent mothers aged 15-64 with at least one child under 15 who are employed.
+        description_from_producer: *description_producer_empl
+
+      length_of_paid_maternity__parental_and_home_care_leave_available_to_mothers_in_weeks:
+        title: Length of paid maternity, parental and home care leave available to mothers
+        unit: "weeks"
+        short_unit: ""
+        description_short: The number of weeks of paid maternity, parental and home care leave available to mothers.
+
+
+      length_of_paid_paternity_and_parental_leave_reserved_for_fathers_in_weeks:
+        title: Length of paid paternity and parental leave reserved for fathers
+        unit: "weeks"
+        short_unit: ""
+        description_short: The number of weeks of paid paternity and parental leave reserved for fathers.
+
+      proportion__pct__of_children__aged_0_14__that_live_in_households_where_all_adults_are_in_employment__working:
+        title: Proportion of children aged 0-14 that live in households where all adults are in employment
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of children aged 0-14 that live in households where all adults are in employment.
+
+      proportion__pct__of_children__aged_0_17__living_in_other_types_of_household:
+        title: Proportion of children aged 0-17 living in other types of household
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of children aged 0-17 living in other types of household.
+
+      proportion__pct__of_children__aged_0_17__living_with_a_single_parent:
+        title: Proportion of children aged 0-17 living with a single parent
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of children aged 0-17 living with a single parent.
+
+      proportion__pct__of_children__aged_0_17__living_with_two_parents:
+        title: Proportion of children aged 0-17 living with two parents
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of children aged 0-17 living with two parents.
+
+
+      proportion__pct__of_children_aged_0_2_enrolled_in_formal_childcare_and_pre_school:
+        title: Proportion of children aged 0-2 enrolled in formal childcare and pre-school
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of children aged 0-2 enrolled in formal childcare and pre-school.
+
+
+      share_of_births_outside_of_marriage__pct_of_all_births:
+        title: Share of births outside of marriage (% of all births)
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of births that occur outside of marriage.
+
+      total_public_social_expenditure_on_families_as_a_pct_of_gdp:
+       title: Total public social expenditure on families as a % of GDP
+       unit: "%"
+       short_unit: "%"
+       description_short: Total public social expenditure on families as a percentage of GDP.
