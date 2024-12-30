@@ -83,20 +83,31 @@ tables:
         title: Proportion of children aged 0-17 living in other types of household
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of children aged 0-17 living in other types of household.
+        description_short: Refers to a situation where the child lives in a household where no adult is considered a parent.
+        presentation:
+          title_public: Share of children living without an adult parent.
+        display:
+          name: No adult is considered a parent
 
       proportion__pct__of_children__aged_0_17__living_with_a_single_parent:
         title: Proportion of children aged 0-17 living with a single parent
         unit: "%"
         short_unit: "%"
         description_short: The percentage of children aged 0-17 living with a single parent.
+        presentation:
+          title_public: Share of children living with a single parent.
+        display:
+          name: Single parent
 
       proportion__pct__of_children__aged_0_17__living_with_two_parents:
         title: Proportion of children aged 0-17 living with two parents
         unit: "%"
         short_unit: "%"
         description_short: The percentage of children aged 0-17 living with two parents.
-
+        presentation:
+          title_public: Share of children living with two parents.
+        display:
+          name: Two parents
 
       proportion__pct__of_children_aged_0_2_enrolled_in_formal_childcare_and_pre_school:
         title: Proportion of children aged 0-2 enrolled in formal childcare and pre-school
