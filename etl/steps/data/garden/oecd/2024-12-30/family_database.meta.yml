@@ -113,7 +113,7 @@ tables:
         title: Proportion of children aged 0-2 enrolled in formal childcare and pre-school
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of children aged 0-2 enrolled in formal childcare and pre-school.
+        description_short: The proportion of children under 3 enrolled in formal childcare or pre-school.
 
 
       share_of_births_outside_of_marriage__pct_of_all_births:
