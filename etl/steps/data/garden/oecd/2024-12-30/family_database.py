@@ -23,7 +23,6 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb = tb.pivot(index=["country", "year"], columns="indicator", values="value").reset_index()
-    print(tb.columns)
 
     columns_of_interest = [
         "Child poverty rate",
@@ -48,7 +47,6 @@ def run(dest_dir: str) -> None:
 
     tb = tb[["country", "year"] + columns_of_interest]
     tb = tb.format(["country", "year"])
-    print(tb.columns)
 
     #
     # Save outputs.
