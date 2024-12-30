@@ -23,6 +23,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb = tb.pivot(index=["country", "year"], columns="indicator", values="value").reset_index()
+    print(tb.columns)
 
     columns_of_interest = [
         "Child poverty rate",
@@ -39,11 +40,15 @@ def run(dest_dir: str) -> None:
         "Proportion (%) of children (aged 0-17) living with two parents",
         "Proportion (%) of children aged 0-2 enrolled in formal childcare and pre-school",
         "Share of births outside of marriage (% of all births)",
+        "Public social expenditure on services and in-kind benefits for families as a % of GDP",
+        "Public social expenditure on cash benefits for families as a % of GDP",
+        "Public social expenditure on tax breaks for families as a % of GDP",
         "Total public social expenditure on families as a % of GDP",
     ]
 
     tb = tb[["country", "year"] + columns_of_interest]
     tb = tb.format(["country", "year"])
+    print(tb.columns)
 
     #
     # Save outputs.

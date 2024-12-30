@@ -127,3 +127,24 @@ tables:
        unit: "%"
        short_unit: "%"
        description_short: Public spending on family benefits, measured as a percentage of GDP, covers cash transfers, childcare and family support services, and tax-based benefits, all designed to support families and children.
+
+      public_social_expenditure_on_services_and_in_kind_benefits_for_families_as_a_pct_of_gdp:
+        title: Public social expenditure on services and in-kind benefits for families as a % of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes funding for childcare, early education, youth assistance, residential facilities, and family services like center-based care and home help.
+        description_from_producer:  Includes the direct financing or subsidisation of childcare and early childhood education facilities, public childcare support through earmarked payments to parents, public spending on assistance for young people and residential facilities, and public spending on family services, including centre-based facilities and home help services for families in need.
+
+      public_social_expenditure_on_cash_benefits_for_families_as_a_pct_of_gdp:
+        title: Public social expenditure on cash benefits for families as a % of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes child allowances, parental leave income support, and single-parent family assistance.
+        description_from_producer: Includes child allowances (which are sometimes income-tested, and with payment levels that in some countries vary with the age or number of children (PF1.3) public income support payments during periods of parental leave, and, in some countries, income support for single-parent families
+
+      public_social_expenditure_on_tax_breaks_for_families_as_a_pct_of_gdp:
+        title: Financial support for families provided through the tax system as a % of GDP
+        unit: "%"
+        short_unit: "%"
+        description_short: Includes tax exemptions, child tax allowances, and child tax credits, with any excess credits refunded in cash classified as cash transfers.
+        description_from_producer: This includes tax exemptions (e.g. income from child benefits that is not included in the tax base); child tax allowances (amounts for children that are deducted from gross income and are not included in taxable income), and child tax credits (amounts that are deducted from the tax liability). If any excess of the child tax credit over the liability is returned to the taxpayer in cash, then the resulting cash payment is recorded under cash transfers above (the same applies to child tax credits that are paid out in cash to recipients as a general rule).
