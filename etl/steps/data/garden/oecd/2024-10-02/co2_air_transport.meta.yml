@@ -1,0 +1,119 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tourism
+    display:
+      numDecimalPlaces: 0
+
+  desc_short_int: &desc_short_int |-
+      International aviation emissions are assigned to the country of departure. CO₂ emissions from commercial passenger flights only.
+  desc_short_dom: &desc_short_dom |-
+      Domestic aviation represents flights which depart and arrive within the same country. CO₂ emissions from commercial passenger flights only.
+  desc_process_per_capita: &desc_process_per_capita |-
+      CO₂ emissions per capita from aviation are calculated by dividing emissions from aviation by the total population of the country. This allows us to understand the average amount of CO₂ emissions attributed to each individual as a result of air travel.
+  description_processing_tour_adj: &description_processing_tour_adj |-
+    - CO₂ emission footprints do not necessarily reflect the amount of travel by locals in a given location. This is especially true if a country has high tourist volumes - much of the departures will result from travellers rather than local residents.
+
+    - We have therefore also calculated 'adjusted' aviation footprints by multiplying international CO₂ emissions by an adjustment factor.
+
+    - This adjustment factor is taken as the ratio between outbound and inbound tourist trips.
+
+    - A high ratio of outbound-to-inbound tourist trips indicates that a country receives less visitors than its residents travel abroad. This results in a relatively lower burden of emissions from international flights being allocated to the country whose residents don't travel internationally as frequently.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  co2_air_transport:
+    variables:
+      ter_dom_a:
+        title: Annual CO₂ emissions from domestic aviation
+        description_short: *desc_short_dom
+        unit: tonnes
+        short_unit: t
+
+      ter_int_a:
+        title: Annual CO₂ emissions from international aviation
+        description_short: *desc_short_int
+        unit: tonnes
+        short_unit: t
+
+      per_capita_ter_dom_a:
+        title: Per capita CO₂ emissions from domestic aviation
+        unit: kilograms
+        description_short: *desc_short_dom
+        description_processing: *desc_process_per_capita
+        short_unit: kg
+
+      per_capita_ter_int_a:
+        title: Per capita CO₂ emissions from international aviation
+        description_short: *desc_short_int
+        description_processing: *desc_process_per_capita
+        unit: kilograms
+        short_unit: kg
+
+      int_inb_out_per_capita:
+        title: Per capita CO₂ emissions from international flights, international tourism-adjusted
+        description_short: International aviation emissions are allocated to the country of departure, then [adjusted for tourism](#dod:tourism-adjusted).
+        description_processing:  *description_processing_tour_adj
+        unit: kilograms
+        short_unit: kg
+
+      int_inb_out_tot:
+        title: CO₂ emissions from international flights, international tourism-adjusted
+        description_short: International aviation emissions are allocated to the country of departure, then [adjusted for tourism](#dod:tourism-adjusted).
+        description_processing: *description_processing_tour_adj
+        unit: kilograms
+        short_unit: kg
+
+      ter_dom_m:
+        title: Monthly CO₂ emissions from domestic aviation
+        description_short: *desc_short_dom
+        unit: tonnes
+        short_unit: t
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      ter_int_m:
+        title: Monthly CO₂ emissions from international aviation
+        description_short: *desc_short_int
+        unit: tonnes
+        short_unit: t
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      per_capita_ter_dom_m:
+        title: Monthly CO₂ emissions from domestic aviation per capita
+        description_short: *desc_short_dom
+        description_processing: *desc_process_per_capita
+        unit: kilograms
+        short_unit: kg
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      per_capita_ter_int_m:
+        title: Monthly CO₂ emissions from international aviation per capita
+        description_short: *desc_short_int
+        description_processing: *desc_process_per_capita
+        unit: kilograms
+        short_unit: kg
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
+      total_monthly_emissions:
+        title: Monthly CO₂ total emissions from aviation
+        description_short:  Includes emissions from both domestic and international aviation. International aviation emissions are assigned to the country of departure. CO₂ emissions from commercial passenger flights only.
+        unit: tonnes
+        short_unit: t
+        display:
+          zeroDay: '2019-01-01'
+          yearIsDay: true
+
