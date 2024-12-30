@@ -6,14 +6,16 @@ TODO: only works for ETL-based datasets.
 """
 
 from collections import defaultdict
+from typing import Any, Dict
 
 import pandas as pd
 import streamlit as st
 
-from apps.wizard.utils.components import grapher_chart, st_horizontal
+from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, st_tag
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher.io import load_variables_in_dataset
+from etl.grapher.model import Dataset
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids
 
 ICONS_DIMENSIONS = {
@@ -36,6 +38,20 @@ def get_charts_view():
     return df.set_index("slug").to_dict(orient="index")
 
 
+# @st.cache_data
+def get_datasets() -> Dict[int, Dict[str, Any]]:
+    df = Dataset.load_all_datasets()
+    df = df.dropna(subset="catalogPath")
+
+    # Set display name
+    df["display_name"] = df["name"] + " --- " + df["catalogPath"] + " [" + df["version"] + "]"
+    df = df.set_index("id", verify_integrity=True).sort_index(ascending=False)
+
+    # Build dictionary
+    dix = df.to_dict(orient="index")
+    return dix  # type: ignore
+
+
 class IndicatorArray:
     def __init__(self, indicators, key):
         self.indicators = indicators
@@ -55,6 +71,9 @@ class IndicatorSingleDimension(IndicatorArray):
     def get_dimension(self):
         return self.indicators[0]
 
+    def get_default(self):
+        raise self.get_dimension()
+
 
 class IndicatorWithDimensions(IndicatorArray):
     def __init__(self, indicators):
@@ -65,6 +84,10 @@ class IndicatorWithDimensions(IndicatorArray):
         super().__init__(indicators, self.check_and_extract_key(indicators))
         self.df = self.create_df()
         self.dimensions = self.get_dimensions()
+
+    def get_default(self):
+        dimensions = (d[0] for d in self.dimensions.values())
+        return self.get_dimension(dimensions)
 
     def check_and_extract_key(self, indicators):
         short_name = None
@@ -195,8 +218,41 @@ def _get_title_chart(chart):
     return chart.config["title"]
 
 
+def prompt_dataset_options():
+    # Update query params if dataset is selected
+    if "dataset_select" in st.session_state:
+        st.query_params["datasetId"] = str(st.session_state["dataset_select"])
+
+    # Collect Query params
+    dataset_id = st.query_params.get("datasetId")
+
+    # Correct dataset id
+    if dataset_id is None:
+        dataset_index = None
+    else:
+        dataset_id = int(dataset_id)
+        if dataset_id not in dataset_options:
+            st.error(f"Dataset with ID {dataset_id} not found. Please review the URL query parameters.")
+            dataset_index = None
+        else:
+            dataset_index = dataset_options.index(dataset_id)
+
+    # Show dropdown with options
+    dataset_id = st.selectbox(
+        label="Dataset",
+        options=dataset_options,
+        format_func=lambda x: DATASETS[x]["display_name"],
+        key="dataset_select",
+        placeholder="Select dataset",
+        index=dataset_index,  # type: ignore
+    )
+
+    return dataset_id
+
+
 @st.fragment
 def st_show_indicator(indicator, indicator_charts):
+    """Display indicator"""
     with st.container(border=False):
         # Allocate space for indicator title / URI
         st_header = st.container()
@@ -273,12 +329,16 @@ def st_show_indicator(indicator, indicator_charts):
         name = var.name
         iid = var.id
         with st_header:
-            with st_horizontal(vertical_alignment="center"):
-                st.markdown(f"[**{name}**]({OWID_ENV.indicator_admin_site(iid)})")
+            with st_horizontal():  # (vertical_alignment="center"):
+                st.markdown(f"#### [**{name}**]({OWID_ENV.indicator_admin_site(iid)})")
                 st.caption(var.catalogPath.replace("grapher/", ""))
+                if indicator.is_mdim:
+                    st_tag(tag_name="dimensions", color="primary", icon=":material/deployed_code")
 
         # Show chart (contains description, and other metadata fields)
         with st_metadata_left:
+            # if var.descriptionShort:
+            #     st.markdown(var.descriptionShort)
             grapher_chart(variable_id=iid, tab="map")  # type: ignore
 
 
@@ -289,64 +349,88 @@ st.set_page_config(
     page_icon="🪄",
     # initial_sidebar_state="collapsed",
 )
+PAGE_ITEMS_LIMIT = 25
 
+# Session state
+st.session_state.setdefault("indicator_selected", {})
 
+# Get analytics
 CHART_VIEWS = get_charts_view()
 
+# Get datasets
+DATASETS = get_datasets()
+dataset_options = list(DATASETS.keys())
 
-# with st.sidebar:
-default = st.query_params.get("datasetId")
-
-# default = 6813
-with st_horizontal():
-    DATASET_ID = st.text_input(
-        "Dataset id",
-        placeholder="6813",
-        value=default,
-    )
+# Show dataset search bar
+DATASET_ID = prompt_dataset_options()
 
 # DATASET_ID = 6869, 6813
 if DATASET_ID is not None:
+    dataset = DATASETS[DATASET_ID]
+
+    # 1/ Get indicators from dataset
+    indicators_raw = load_variables_in_dataset(dataset_id=[int(DATASET_ID)])
+
+    ## Chart info
+    indicator_charts = IndicatorsInCharts.from_indicators(indicators_raw)
+
+    ## Parse indicators
+    indicators = parse_indicators(indicators_raw)
+
+    # 2/ Get charts
+    charts = indicator_charts.chart_id_to_chart.values()
+    df_charts = (
+        pd.DataFrame(
+            {
+                # "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # type: ignore
+                "Id": [chart.id for chart in charts],  # type: ignore
+                "Chart": [_get_title_chart(chart) for chart in charts],  # type: ignore
+                # "Views (last 7 days)": [CHART_VIEWS.get(chart.slug)["views_7d"] for chart in charts],  # type: ignore
+                "Daily views (year-average)": [_get_average_daily_views(chart.slug) for chart in charts],  # type: ignore
+                "Edit": [OWID_ENV.chart_admin_site(chart.id) for chart in charts],  # type: ignore
+            }
+        )
+        .set_index("Id")
+        .sort_values("Daily views (year-average)", ascending=False)
+    )
+
+    # 3/ Present Dataset
+    title = dataset["name"]
+    st.header(f"[{title}]({OWID_ENV.dataset_admin_site(DATASET_ID)})")
+
+    with st_horizontal():
+        if dataset["isPrivate"] == 1:
+            st_tag("Private", color="blue", icon=":material/lock")
+        if dataset["isArchived"] == 1:
+            st_tag("Archived", color="red", icon=":material/delete_forever")
+
+        st.markdown(f":material/schedule: Last modified: {dataset['updatedAt'].strftime('%Y-%m-%d')}")
+        st.markdown(f"{len(indicators)} indicators")
+        st.markdown(f"{len(charts)} charts")
+
+    # Tabs
     tab_indicators, tab_charts = st.tabs(["Indicators", "Charts"])
 
     with tab_indicators:
-        # Load variables for given dataset
-        indicators_raw = load_variables_in_dataset(dataset_id=[int(DATASET_ID)])
-
-        # Chart info
-        indicator_charts = IndicatorsInCharts.from_indicators(indicators_raw)
-
-        # Parse indicators
-        indicators = parse_indicators(indicators_raw)
-
         # Apply filters / sorting
         indicators = filter_sort_indicators(indicators)
 
-        # ########################################
-        # # RENDER
-        # # TODO: show title based on selection
-        # ########################################
-        st.divider()
-        for indicator in indicators:
-            st_show_indicator(indicator, indicator_charts)
+        # Use pagination
+        pagination = Pagination(
+            items=indicators,
+            items_per_page=PAGE_ITEMS_LIMIT,
+            pagination_key="pagination-dataset-search",
+        )
+
+        if len(indicators) > PAGE_ITEMS_LIMIT:
+            pagination.show_controls(mode="bar")
+
+        # Show items (only current page)
+        for item in pagination.get_page_items():
+            st_show_indicator(item, indicator_charts)
             st.divider()
 
     with tab_charts:
-        charts = indicator_charts.chart_id_to_chart.values()
-        df_charts = (
-            pd.DataFrame(
-                {
-                    # "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # type: ignore
-                    "Id": [chart.id for chart in charts],  # type: ignore
-                    "Chart": [_get_title_chart(chart) for chart in charts],  # type: ignore
-                    # "Views (last 7 days)": [CHART_VIEWS.get(chart.slug)["views_7d"] for chart in charts],  # type: ignore
-                    "Daily views (year-average)": [_get_average_daily_views(chart.slug) for chart in charts],  # type: ignore
-                    "Edit": [OWID_ENV.chart_admin_site(chart.id) for chart in charts],  # type: ignore
-                }
-            )
-            .set_index("Id")
-            .sort_values("Daily views (year-average)", ascending=False)
-        )
         if not df_charts.empty:
             st.dataframe(
                 df_charts,
@@ -360,4 +444,4 @@ if DATASET_ID is not None:
                 },
                 use_container_width=True,
             )
-        st.text(f"{len(charts)} charts")
+        # st.text(f"{len(charts)} charts")
