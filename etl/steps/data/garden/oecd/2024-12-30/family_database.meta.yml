@@ -36,7 +36,7 @@ tables:
       crude_marriage_rate__marriages_per_1000_people:
         title: Crude marriage rate (marriages per 1,000 people)
         unit: "per 1,000 people"
-        short_unit: "per 1,000 people"
+        short_unit: ""
         description_short: Number of marriages during a given year per 1,000 people.
         description_from_producer: The crude marriage rate is defined as the number of marriages during a given year per 1,000 people.
 
