@@ -94,6 +94,7 @@ def run(dest_dir: str) -> None:
 
     # # Fertility rate
     tb_fertility, tb_births = make_tb_fertility_births(tb_main)
+    tb_fertility_births_single = make_tb_fertility_births_single_age()
 
     # Deaths
     tb_deaths = make_tb_deaths()
@@ -107,6 +108,7 @@ def run(dest_dir: str) -> None:
         tb_growth_rate,
         tb_nat_change,
         tb_fertility,
+        tb_fertility_births_single,
         tb_migration,
         tb_migration_rate,
         tb_deaths,
@@ -255,6 +257,18 @@ def make_tb_life_expectancy(tb_main: Table) -> Table:
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(COLUMNS_INDEX_FORMAT, short_name="life_expectancy")
 
+    return tb
+
+
+def make_tb_fertility_births_single_age():
+    # Read
+    tb = read_from_csv("un_wpp_fertility_single_age.csv")
+    # Clean
+    tb = clean_table_standard_csv(tb, metrics_rename={"ASFR": "fertility_rate", "Births": "births"})
+    # Add missing dimension
+    tb = tb.assign(sex="all")
+    # Format
+    tb = tb.format(COLUMNS_INDEX_FORMAT, short_name="fertility_births_single")
     return tb
 
 

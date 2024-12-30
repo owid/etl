@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
     tb.loc[(tb["Year"] == "2010"), "North Korea"] = "0"
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["year"], verify_integrity=True).sort_index()
+    tb = tb.format(["year"])
 
     #
     # Save outputs.

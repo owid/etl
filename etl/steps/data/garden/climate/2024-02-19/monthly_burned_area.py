@@ -61,7 +61,7 @@ def run(dest_dir: str) -> None:
 
     grouped_tb["all"] = grouped_tb[area_types].sum(axis=1)
 
-    grouped_tb = grouped_tb.set_index(["country", "year", "month", "days_since_2000"], verify_integrity=True)
+    grouped_tb = grouped_tb.format(["country", "year", "month", "days_since_2000"])
 
     #
     # Save outputs.

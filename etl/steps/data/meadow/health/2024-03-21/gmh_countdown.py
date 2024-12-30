@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={"Country (UNMS)": "country", "YEAR(Year)": "year", "Value_3": "value"})
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
 
-    tb = tb.underscore().set_index(["indicator", "country", "year"], verify_integrity=True).sort_index()
+    tb = tb.underscore().format(["indicator", "country", "year"])
 
     #
     # Save outputs.

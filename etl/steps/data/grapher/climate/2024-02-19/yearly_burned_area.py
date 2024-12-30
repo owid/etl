@@ -35,7 +35,7 @@ def run(dest_dir: str) -> None:
     )
 
     #  Use the days since colimn instead of year and month for grapher
-    grouped_tb = grouped_tb.set_index(["country", "year"], verify_integrity=True)
+    grouped_tb = grouped_tb.format(["country", "year"])
 
     #
     # Save outputs.

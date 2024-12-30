@@ -62,7 +62,7 @@ def run(dest_dir: str) -> None:
     tb_latest = tb_latest[tb_latest["year"] == tb_latest["year"].max()].drop(columns=["year"])
 
     # Set an appropriate index and sort conveniently.
-    tb_latest = tb_latest.set_index(["country"], verify_integrity=True).sort_index()
+    tb_latest = tb_latest.format(["country"])
 
     #
     # Save outputs.

@@ -32,7 +32,7 @@ steps:
   # Copernicus Climate Change Service - Surface temperature.
   #
   data://meadow/climate/2023-12-20/surface_temperature:
-  - snapshot://climate/2024-11-05/surface_temperature.zip
+  - snapshot://climate/2024-12-05/surface_temperature.zip
   - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2023-12-20/surface_temperature:
     - data://meadow/climate/2023-12-20/surface_temperature
@@ -66,6 +66,11 @@ steps:
   #
   data://explorers/climate/latest/climate_change_impacts:
     - data://garden/climate/2024-11-18/climate_change_impacts
+
+  #
+  # Weekly area burnt and emissions data on wildfires.
+  #
+
   #
   # Global Wildfire Information System - Monthly burned area.
   #
@@ -75,26 +80,9 @@ steps:
     - data://meadow/climate/2024-02-19/monthly_burned_area
     - data://garden/wb/2023-04-30/income_groups
     - data://garden/regions/2023-01-01/regions
-  data://grapher/climate/2024-02-19/monthly_burned_area:
-    - data://garden/climate/2024-02-19/monthly_burned_area
   data://grapher/climate/2024-02-19/yearly_burned_area:
     - data://garden/climate/2024-02-19/monthly_burned_area
-  #
-  # Emissions from wildfires.
-  #
-  data://meadow/climate/2024-02-19/monthly_fire_emissions:
-    - snapshot://climate/2024-02-19/monthly_fire_emissions.zip
-  data://garden/climate/2024-02-19/monthly_fire_emissions:
-    - data://meadow/climate/2024-02-19/monthly_fire_emissions
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/climate/2024-02-19/monthly_fire_emissions:
-    - data://garden/climate/2024-02-19/monthly_fire_emissions
-  data://grapher/climate/2024-02-19/yearly_fire_emissions:
-    - data://garden/climate/2024-02-19/monthly_fire_emissions
-  #
-  # Weekly area burnt and emissions data on wildfires.
-  #
+
   data://meadow/climate/latest/weekly_wildfires:
     - snapshot://climate/2024-02-22/weekly_wildfires_2003_2023.csv
     - snapshot://climate/latest/weekly_wildfires.csv

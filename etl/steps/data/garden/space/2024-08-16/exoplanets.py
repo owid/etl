@@ -59,7 +59,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={"discoverymethod": "country", "disc_year": "year"}).reset_index(drop=True)
     tb.metadata.short_name = "exoplanets"
 
-    tb = tb.set_index(["year", "country"], verify_integrity=True)
+    tb = tb.format(["year", "country"])
 
     #
     # Save outputs.

@@ -24,18 +24,19 @@ log = get_logger()
 def main(upload: bool) -> None:
     snapshot_paths = [
         # Main
-        "un_wpp_demographic_indicators.xlsx",
+        # "un_wpp_demographic_indicators.xlsx",
         # Population
-        "un_wpp_population_estimates.csv",
-        "un_wpp_population_low.csv",
-        "un_wpp_population_medium.csv",
-        "un_wpp_population_high.csv",
-        "un_wpp_population_constant_fertility.csv",
+        # "un_wpp_population_estimates.csv",
+        # "un_wpp_population_low.csv",
+        # "un_wpp_population_medium.csv",
+        # "un_wpp_population_high.csv",
+        # "un_wpp_population_constant_fertility.csv",
         # Fertility
-        "un_wpp_fertility.csv",
+        "un_wpp_fertility_single_age.csv",
+        # "un_wpp_fertility.csv",
         # Deaths
-        "un_wpp_deaths_estimates.csv",
-        "un_wpp_deaths_medium.csv",
+        # "un_wpp_deaths_estimates.csv",
+        # "un_wpp_deaths_medium.csv",
     ]
     for paths in snapshot_paths:
         log.info(f"Importing {paths[1]}.")

@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
     df_counts["countries"] = df_counts["countries"].astype(str).replace("<NA>", "No minimum population threshold")
 
     tb_counts = Table(df_counts).copy_metadata(tb)
-    tb_counts = tb_counts.set_index(["countries", "year"], verify_integrity=True)
+    tb_counts = tb_counts.format(["countries", "year"])
     #
     # Save outputs.
     #

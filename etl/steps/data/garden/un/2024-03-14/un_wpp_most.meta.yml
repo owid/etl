@@ -6,6 +6,9 @@ definitions:
         originUrl: "https://ourworldindata.org/population-growth"
         note: ""
 
+dataset:
+  title: Most populous age groups (UN WPP)
+
 tables:
   population_5_year_age_groups:
     variables:

@@ -196,7 +196,7 @@ def format_long_tables(
             )
 
         # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-        t = t.underscore().set_index(["country", "year", "survey_number", "survey"], verify_integrity=True).sort_index()
+        t = t.format(["country", "year", "survey_number", "survey"])
 
         tables.append(t)
 

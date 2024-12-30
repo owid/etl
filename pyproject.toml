@@ -68,6 +68,7 @@ dependencies = [
     "geopy>=2.4.1",
     "py7zr>=0.22.0",
     "pyreadr>=0.5.2",
+    "cfgrib>=0.9.15.0",
 ]
 
 [tool.uv.sources]

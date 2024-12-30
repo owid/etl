@@ -36,8 +36,7 @@ def run(dest_dir: str) -> None:
         # The function above creates NAs for some countrys that don't appear to be in the table e.g. Vatican, Melanesia, so dropping here
 
         tb_pop_filter = tb_pop_filter.drop(columns=["population"])
-        tb_pop_filter = tb_pop_filter.set_index(["country", "year"], verify_integrity=True)
-        tb_pop_filter.metadata.short_name = f"population_{age_group}_year_age_groups"
+        tb_pop_filter = tb_pop_filter.format(["country", "year"], short_name=f"population_{age_group}_year_age_groups")
         tb_list.append(tb_pop_filter)
     # Save outputs.
 
