@@ -217,14 +217,17 @@ if DATASET_ID is not None:
     st.header(f"[{title}]({OWID_ENV.dataset_admin_site(DATASET_ID)})")
 
     with st_horizontal():
-        if dataset["isPrivate"] == 1:
-            st_tag("Private", color="blue", icon=":material/lock")
-        if dataset["isArchived"] == 1:
-            st_tag("Archived", color="red", icon=":material/delete_forever")
-
         st.markdown(f":material/schedule: Last modified: {dataset['updatedAt'].strftime('%Y-%m-%d')}")
         st.markdown(f"{len(indicators)} indicators")
         st.markdown(f"{len(df_charts)} charts")
+
+        if dataset["isPrivate"] == 1:
+            st_tag("Private", color="blue", icon=":material/lock")
+        if dataset["isArchived"] == 1:
+            st_tag("Archived", color="gray", icon=":material/delete_forever")
+        # Any mdim?
+        if any(ind.is_mdim for ind in indicators):
+            st_tag(tag_name="indicators with dimensions", color="primary", icon=":material/deployed_code")
 
     # 4/ Tabs
     tab_indicators, tab_charts = st.tabs(["Indicators", "Charts"])
