@@ -30,11 +30,11 @@ def run(dest_dir: str) -> None:
     ]
 
     # Process distribution indicator
-    tb_dist = ds_garden["fertility_single"]
-    tb_dist = tb_dist.rename_index_names({"age": "year"})
+    # tb_dist = ds_garden["fertility_single"]
+    # tb_dist = tb_dist.rename_index_names({"age": "year"})
 
     # Add to list of tables
-    tables = tables + [tb_dist]
+    # tables = tables + [tb_dist]
 
     #
     # Save outputs.
