@@ -128,7 +128,7 @@ sections:
         alias: dataexp
         description: "Explore datasets and their metadata"
         maintainer: "@lucas"
-        entrypoint: app_pages/dataset_search.py
+        entrypoint: app_pages/dataset_preview/app.py
         icon: ":material/search:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
       - title: "Producer analytics"
