@@ -602,6 +602,7 @@ steps:
     - snapshot://health/2024-12-29/isaps_plastic_surgery.xlsx
   data://garden/health/2024-12-29/isaps_plastic_surgery:
     - data://meadow/health/2024-12-29/isaps_plastic_surgery
+    - data://garden/un/2024-07-12/un_wpp
   data://grapher/health/2024-12-29/isaps_plastic_surgery:
     - data://garden/health/2024-12-29/isaps_plastic_surgery
 
