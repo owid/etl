@@ -45,6 +45,7 @@ steps:
     - snapshot://un/2024-07-12/un_wpp_population_constant_fertility.csv
     # Fertility
     - snapshot://un/2024-07-12/un_wpp_fertility.csv
+    - snapshot://un/2024-07-12/un_wpp_fertility_single_age.csv
     # Deaths
     - snapshot://un/2024-07-12/un_wpp_deaths_estimates.csv
     - snapshot://un/2024-07-12/un_wpp_deaths_medium.csv
