@@ -744,6 +744,17 @@ steps:
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
 
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/un/2024-12-31/households:
+    - snapshot://un/2024-12-31/households.xlsx
+  data://garden/un/2024-12-31/households:
+    - data://meadow/un/2024-12-31/households
+  data://grapher/un/2024-12-31/households:
+    - data://garden/un/2024-12-31/households
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
