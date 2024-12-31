@@ -91,20 +91,12 @@ def get_users():
     return df
 
 
-def _get_average_daily_views(views, chart_slug):
+def get_average_daily_views(views, chart_slug):
     num_views = views.get(chart_slug)
 
     if num_views is not None:
         num_views = num_views["views_365d"]
         return round(num_views / 365, 2)
-
-
-def _get_average_chart_daily_views(chart_slug):
-    return _get_average_daily_views(CHART_VIEWS, chart_slug)
-
-
-def _get_average_explorer_daily_views(chart_slug):
-    return _get_average_daily_views(EXPLORER_VIEWS, chart_slug)
 
 
 def _get_title_chart(chart):
@@ -113,7 +105,7 @@ def _get_title_chart(chart):
     return chart.config["title"]
 
 
-def get_table_charts(indicator_charts, indicator_id=None):
+def get_table_charts(indicator_charts, users, chart_views, indicator_id=None):
     if indicator_id is None:
         charts = indicator_charts.chart_id_to_chart.values()
     else:
@@ -125,9 +117,9 @@ def get_table_charts(indicator_charts, indicator_id=None):
                 "Chart id": [chart.id for chart in charts],  # type: ignore
                 "Chart": [_get_title_chart(chart) for chart in charts],  # type: ignore
                 # "Views (last 7 days)": [CHART_VIEWS.get(chart.slug)["views_7d"] for chart in charts],  # type: ignore
-                "views": [_get_average_chart_daily_views(chart.slug) for chart in charts],  # type: ignore
+                "views": [get_average_daily_views(chart_views, chart.slug) for chart in charts],  # type: ignore
                 "Edit": [OWID_ENV.chart_admin_site(chart.id) for chart in charts],  # type: ignore
-                "User": [USERS[chart.lastEditedByUserId]["fullName"] for chart in charts],  # type: ignore
+                "User": [users[chart.lastEditedByUserId]["fullName"] for chart in charts],  # type: ignore
                 "Last edited": [chart.lastEditedAt for chart in charts],  # type: ignore
             }
         )
@@ -138,7 +130,7 @@ def get_table_charts(indicator_charts, indicator_id=None):
     return df_charts
 
 
-def get_table_explorers(indicator_explorers, indicator_id=None):
+def get_table_explorers(indicator_explorers, explorer_views, indicator_id=None):
     if indicator_id is None:
         explorers = indicator_explorers.explorers
     else:
@@ -152,7 +144,7 @@ def get_table_explorers(indicator_explorers, indicator_id=None):
             {
                 # "thumbnail": [OWID_ENV.thumb_url(chart.slug) for chart in charts],  # type: ignore
                 "Explorer slug": [e for e in explorers],  # type: ignore
-                "views": [_get_average_explorer_daily_views(slug) for slug in explorers],  # type: ignore
+                "views": [get_average_daily_views(explorer_views, slug) for slug in explorers],  # type: ignore
             }
         )
         .set_index("Explorer slug")
@@ -238,7 +230,24 @@ class IndicatorWithDimensions(IndicatorArray):
         """
         super().__init__(indicators, self.check_and_extract_key(indicators))
         self.df = self.create_df()
+        self.df_dims = self.df.reset_index()[self.df.index.names].drop_duplicates()
         self.dimensions = self.get_dimensions()
+
+    def get_dimensions_conditioned(self, dim_name, conditions=None):
+        if (conditions is None) or (conditions == {}) or ((len(conditions) == 1) and (dim_name in conditions)):
+            options = self.df_dims[dim_name].unique().tolist()
+        else:
+            # conditions = {
+            #     "sex": "all",
+            #     "age": "all",
+            # }
+            mask = True
+            for col, value in conditions.items():
+                if col == dim_name:
+                    continue
+                mask &= self.df_dims[col] == value
+            options = self.df_dims.loc[mask, dim_name].unique().tolist()
+        return options
 
     def get_default(self):
         dimensions = (d[0] for d in self.dimensions.values())
@@ -349,9 +358,3 @@ class IndicatorsInExplorers:
     def get_explorers(self, indicator_id):
         explorer_slugs = self.indicator_id_to_explorer_slug.get(indicator_id)
         return explorer_slugs
-
-
-# Get data from DB
-CHART_VIEWS = get_charts_views()
-EXPLORER_VIEWS = get_explorers_views()
-USERS = get_users()
