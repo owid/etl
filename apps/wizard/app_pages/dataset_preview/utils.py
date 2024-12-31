@@ -4,13 +4,14 @@ from typing import Any, Dict
 import pandas as pd
 import streamlit as st
 
+from apps.wizard.utils import TTL_DEFAULT
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher.model import Dataset
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids
 
 
-@st.cache_data
+@st.cache_data(show_spinner="Getting explorer data...", ttl=TTL_DEFAULT)
 def get_explorers(variable_ids):
     query = """select explorerSlug, variableId from explorer_variables where variableId in %s;"""
     param = (tuple(variable_ids),)
@@ -24,7 +25,7 @@ def get_explorers(variable_ids):
     return df
 
 
-@st.cache_data
+@st.cache_data(show_spinner="Getting chart analytics...", ttl=TTL_DEFAULT)
 def get_charts_views():
     """Get views of charts."""
     query = """SELECT SUBSTRING_INDEX(url, '/', -1) AS slug, views_7d, views_365d FROM analytics_pageviews WHERE url LIKE %s;"""
@@ -38,7 +39,7 @@ def get_charts_views():
     return df.set_index("slug").to_dict(orient="index")
 
 
-@st.cache_data
+@st.cache_data(show_spinner="Getting explorer analytics...", ttl=TTL_DEFAULT)
 def get_explorers_views():
     """Get views of explorers."""
     query = """SELECT url, SUBSTRING_INDEX(url, '/', -1) AS slug, views_7d, views_365d FROM analytics_pageviews WHERE url LIKE %s;"""
@@ -56,7 +57,7 @@ def get_explorers_views():
     return df.set_index("slug").to_dict(orient="index")
 
 
-@st.cache_data
+@st.cache_data(show_spinner="Getting datasets...", ttl=TTL_DEFAULT)
 def get_datasets() -> Dict[int, Dict[str, Any]]:
     """Get list of datasets.
 
@@ -74,7 +75,7 @@ def get_datasets() -> Dict[int, Dict[str, Any]]:
     return dix  # type: ignore
 
 
-@st.cache_data
+@st.cache_data(show_spinner="Getting users...", ttl=TTL_DEFAULT)
 def get_users():
     """Get users.
 

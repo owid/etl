@@ -54,6 +54,9 @@ __all__ = [
 # Logger
 log = get_logger()
 
+# TTL for cached functions
+TTL_DEFAULT = "2h"
+
 # Path to variable configs
 DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
 

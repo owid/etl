@@ -94,6 +94,7 @@ def prompt_dataset_options(dataset_options):
     # Correct dataset id
     if dataset_id is None:
         dataset_index = None
+        dataset_options = [dataset_id for dataset_id in dataset_options if DATASETS[dataset_id]["isArchived"] == 0]
     else:
         dataset_id = int(dataset_id)
         if dataset_id in dataset_options:
