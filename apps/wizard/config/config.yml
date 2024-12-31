@@ -124,7 +124,7 @@ sections:
         maintainer: "@pablo"
         icon: ":material/tv_gen:"
         image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
-      - title: "Datasets"
+      - title: "Dataset preview"
         alias: dataexp
         description: "Explore datasets and their metadata"
         maintainer: "@lucas"
