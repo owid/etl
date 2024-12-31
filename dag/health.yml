@@ -802,7 +802,6 @@ steps:
   data://grapher/antibiotics/2024-10-09/gram_children:
     - data://garden/antibiotics/2024-10-09/gram_children
 
-
   # Cervical cancer incidence rates GCO - Cancer Today (2022)
   data://meadow/cancer/2024-10-13/gco_cancer_today_cervical:
     - snapshot://cancer/2024-10-13/gco_cancer_today_cervical.csv
@@ -969,3 +968,13 @@ steps:
     - data://meadow/who/2024-12-10/vaccination_coverage
   data://grapher/who/2024-12-10/vaccination_coverage:
     - data://garden/who/2024-12-10/vaccination_coverage
+
+  #
+  # Human height
+  #
+  data://meadow/health/2024-12-31/height:
+    - snapshot://health/2024-12-31/height.xlsx
+  data://garden/health/2024-12-31/height:
+    - data://meadow/health/2024-12-31/height
+  data://grapher/health/2024-12-31/height:
+    - data://garden/health/2024-12-31/height
