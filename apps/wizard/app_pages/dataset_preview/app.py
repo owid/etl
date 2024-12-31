@@ -9,6 +9,7 @@ from collections import defaultdict
 
 import streamlit as st
 
+from apps.wizard.app_pages.dataset_preview.dependency_graph import load_dag_cached, show_modal_dependency_graph
 from apps.wizard.app_pages.dataset_preview.utils import (
     IndicatorsInCharts,
     IndicatorsInExplorers,
@@ -109,74 +110,21 @@ def prompt_dataset_options():
     return dataset_id
 
 
-@st.fragment
-def st_show_indicator(indicator, indicator_charts):
-    """Display indicator."""
-    with st.container(border=False):
-        # Allocate space for indicator title / URI
-        st_header = st.container()
-        st_metadata_left, st_metadata_right = st.columns(2)
-
-        with st_metadata_right:
-            # Show dimensions as pills -- TODO: add icons for recognized dimensions
-            if indicator.is_mdim:
-                # Dimensions
-                with st.container(border=True):
-                    st.markdown("**Dimensions**")
-                    # with st_horizontal():
-                    #     with st.container(border=True):
-                    dim_values = []
-                    dim_values_dix = {}
-                    for dim, options in indicator.dimensions.items():
-                        key_pills = f"dataset_pills_{indicator.key}_{dim}"
-                        st.pills(
-                            dim,
-                            options,
-                            key=key_pills,
-                            default=options[0],
-                        )
-
-                        dim_value_ = st.session_state.get(key_pills)
-                        dim_values.append(dim_value_)
-                        dim_values_dix[dim] = dim_value_
-                    dim_values = tuple(dim_values)
-
-                # Sanity check on dimensions
-                assert all(value is not None for value in dim_values)
-
-                # Get indicator-dimensions combination
-                var = indicator.get_dimension(dim_values)
-            else:
-                # st.markdown("No dimensions")
-                var = indicator.indicators[0]
-
-            # Charts
-            df_charts = get_table_charts(indicator_charts, USERS, CHART_VIEWS, var.id)
-            show_table_charts(df_charts)
-
-            # Explorers
-            df_explorers = get_table_explorers(indicator_explorers, EXPLORER_VIEWS, var.id)
-            show_table_explorers(df_explorers)
-
-        # Show indicator title and URI
-        name = var.name
-        iid = var.id
-        with st_header:
-            with st_horizontal():  # (vertical_alignment="center"):
-                st.markdown(f"#### [**{name}**]({OWID_ENV.indicator_admin_site(iid)})")
-                st.caption(var.catalogPath.replace("grapher/", ""))
-                if indicator.is_mdim:
-                    st_tag(tag_name="dimensions", color="primary", icon=":material/deployed_code")
-
-        # Show chart (contains description, and other metadata fields)
-        with st_metadata_left:
-            # if var.descriptionShort:
-            #     st.markdown(var.descriptionShort)
-            grapher_chart(variable_id=iid, tab="map")  # type: ignore
+def prompt_display_charts():
+    """Show charts or not."""
+    if "display_charts" in st.session_state:
+        st.query_params["displayCharts"] = str(st.session_state["display_charts"])
+    show_charts = st.query_params.get("displayCharts", "True") == "True"
+    return st.checkbox(
+        "Display charts",
+        key="display_charts",
+        help="Uncheck to show only indicator descriptions. This avoids rendering charts and can improve performance.",
+        value=show_charts,
+    )
 
 
 @st.fragment
-def st_show_indicator2(indicator, indicator_charts):
+def st_show_indicator(indicator, indicator_charts, display_charts=True):
     """Display indicator."""
     with st.container(border=False):
         # Allocate space for indicator title / URI
@@ -233,9 +181,11 @@ def st_show_indicator2(indicator, indicator_charts):
 
         # Show chart (contains description, and other metadata fields)
         with st_metadata_left:
-            # if var.descriptionShort:
-            #     st.markdown(var.descriptionShort)
-            grapher_chart(variable_id=iid, tab="map")  # type: ignore
+            if not display_charts:
+                if var.descriptionShort:
+                    st.markdown(var.descriptionShort)
+            else:
+                grapher_chart(variable_id=iid, tab="map")  # type: ignore
 
 
 # CONFIG
@@ -250,11 +200,12 @@ PAGE_ITEMS_LIMIT = 25
 # Session state
 st.session_state.setdefault("indicator_selected", {})
 
-# Get datasets from DB
+# Get datasets from DB / cached
 DATASETS = get_datasets()
 CHART_VIEWS = get_charts_views()
 EXPLORER_VIEWS = get_explorers_views()
 USERS = get_users()
+DAG = load_dag_cached()
 
 # Get datasets
 dataset_options = list(DATASETS.keys())
@@ -262,6 +213,7 @@ dataset_options = list(DATASETS.keys())
 # Show dataset search bar
 DATASET_ID = prompt_dataset_options()
 # DATASET_ID = 6617  # DEBUG
+DISPLAY_CHARTS = prompt_display_charts()
 
 # DATASET_ID = 6869, 6813
 if DATASET_ID is not None:
@@ -295,10 +247,20 @@ if DATASET_ID is not None:
         if dataset["isPrivate"] == 1:
             st_tag("Private", color="blue", icon=":material/lock")
         if dataset["isArchived"] == 1:
-            st_tag("Archived", color="gray", icon=":material/delete_forever")
+            st_tag("Archived", color="red", icon=":material/delete_forever")
         # Any mdim?
         if any(ind.is_mdim for ind in indicators):
             st_tag(tag_name="indicators with dimensions", color="primary", icon=":material/deployed_code")
+
+    @st.fragment
+    def show_button():
+        st.button(
+            "Dependency graph",
+            icon=":material/account_tree:",
+            on_click=lambda dataset=dataset: show_modal_dependency_graph(dataset, DAG),
+        )
+
+    show_button()
 
     # 4/ Tabs
     tab_indicators, tab_charts = st.tabs(["Indicators", "Charts"])
@@ -319,7 +281,7 @@ if DATASET_ID is not None:
 
         # Show items (only current page)
         for item in pagination.get_page_items():
-            st_show_indicator2(item, indicator_charts)
+            st_show_indicator(item, indicator_charts, DISPLAY_CHARTS)
             st.divider()
 
     with tab_charts:
