@@ -125,8 +125,8 @@ sections:
         icon: ":material/tv_gen:"
         image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
       - title: "Dataset preview"
-        alias: dataexp
-        description: "Explore datasets and their metadata"
+        alias: datasets
+        description: "Preview datasets and their indicators"
         maintainer: "@lucas"
         entrypoint: app_pages/dataset_preview/app.py
         icon: ":material/search:"
