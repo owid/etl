@@ -295,15 +295,15 @@ class ChartDiffShow:
         # Copy link
         if self.show_link:
             with col3:
-                query_params = f"page=chart-diff&chart_id={self.diff.chart_id}"
+                query_params = f"chart_id={self.diff.chart_id}"
                 # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
                 if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
                     st.caption(
-                        f"**{OWID_ENV.wizard_url_remote}?{query_params}**",
+                        f"**{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}**",
                         help=f"Shown is the link to the remote chart-diff.\n\n Alternatively, local link: {OWID_ENV.wizard_url}?{query_params}",
                     )
                 else:
-                    st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
+                    st.caption(f"**{OWID_ENV.wizard_url}/chart-diff?{query_params}**")
 
     def _show_metadata_diff(self) -> None:
         """Show metadata diff (if applicable).
