@@ -747,6 +747,17 @@ steps:
   data://grapher/imf/2024-11-25/world_economic_outlook:
     - data://garden/imf/2024-11-25/world_economic_outlook
 
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/un/2024-12-31/households:
+    - snapshot://un/2024-12-31/households.xlsx
+  data://garden/un/2024-12-31/households:
+    - data://meadow/un/2024-12-31/households
+  data://grapher/un/2024-12-31/households:
+    - data://garden/un/2024-12-31/households
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
