@@ -78,6 +78,7 @@ def bake_chart_config(
     selected_entities: Optional[list] = None,
     included_entities: Optional[list] = None,
     display: Optional[List[Any]] = None,
+    tab: Optional[str] = None,
     owid_env: OWIDEnv = OWID_ENV,
 ) -> Dict[str, Any]:
     """Bake a Grapher chart configuration.
@@ -120,4 +121,7 @@ def bake_chart_config(
         included_entities = [str(entity) for entity in included_entities]
         chart_config["includedEntities"] = included_entities
 
+    # Edit initial tab
+    if tab is not None:
+        chart_config["tab"] = tab
     return chart_config
