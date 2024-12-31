@@ -784,3 +784,4 @@ include:
   - dag/tourism.yml
   - dag/migration.yml
   - dag/equality.yml
+  - dag/families.yml
