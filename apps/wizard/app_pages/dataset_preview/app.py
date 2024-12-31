@@ -74,11 +74,16 @@ def filter_sort_indicators(indicators):
     return indicators
 
 
-def prompt_dataset_options():
+def prompt_dataset_options(dataset_options):
     """Ask user which dataset they want!
 
     It also syncs the selection with query params.
     """
+    # Get list with non-archived ones
+    # dataset_options_non_archived = [
+    #     dataset_id for dataset_id in dataset_options if DATASETS[dataset_id]["isArchived"] == 0
+    # ]
+
     # Update query params if dataset is selected
     if "dataset_select" in st.session_state:
         st.query_params["datasetId"] = str(st.session_state["dataset_select"])
@@ -91,11 +96,15 @@ def prompt_dataset_options():
         dataset_index = None
     else:
         dataset_id = int(dataset_id)
-        if dataset_id not in dataset_options:
+        if dataset_id in dataset_options:
+            if DATASETS[dataset_id]["isArchived"] == 0:
+                dataset_options = [
+                    dataset_id for dataset_id in dataset_options if DATASETS[dataset_id]["isArchived"] == 0
+                ]
+            dataset_index = dataset_options.index(dataset_id)
+        else:
             st.error(f"Dataset with ID {dataset_id} not found. Please review the URL query parameters.")
             dataset_index = None
-        else:
-            dataset_index = dataset_options.index(dataset_id)
 
     # Show dropdown with options
     dataset_id = st.selectbox(
@@ -105,6 +114,7 @@ def prompt_dataset_options():
         key="dataset_select",
         placeholder="Select dataset",
         index=dataset_index,  # type: ignore
+        help="By default, only non-archived datasets are shown. However, if you search for an archived one via QUERY PARAMS, the list will show all datasets, including archived ones. To use QUERY PARAMS, add `?datasetId=YOUR_DATASET_ID` to the URL.",
     )
 
     return dataset_id
@@ -207,11 +217,11 @@ EXPLORER_VIEWS = get_explorers_views()
 USERS = get_users()
 DAG = load_dag_cached()
 
-# Get datasets
+# Get datasets (only non-archived!)
 dataset_options = list(DATASETS.keys())
 
 # Show dataset search bar
-DATASET_ID = prompt_dataset_options()
+DATASET_ID = prompt_dataset_options(dataset_options)
 # DATASET_ID = 6617  # DEBUG
 DISPLAY_CHARTS = prompt_display_charts()
 
