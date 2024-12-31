@@ -747,9 +747,9 @@ steps:
   data://grapher/imf/2024-11-25/world_economic_outlook:
     - data://garden/imf/2024-11-25/world_economic_outlook
 
-  
+
   #
-  # TODO: add step name (just something recognizable)
+  # UN Household size data
   #
   data://meadow/un/2024-12-31/households:
     - snapshot://un/2024-12-31/households.xlsx
