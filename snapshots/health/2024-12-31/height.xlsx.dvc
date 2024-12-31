@@ -25,4 +25,4 @@ meta:
 outs:
   - md5: 304496b0c93fcb340f100f0b2ef9d3b8
     size: 277962
-    path: height.csv
+    path: height.xlsx
