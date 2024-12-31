@@ -219,76 +219,80 @@ DISPLAY_CHARTS = prompt_display_charts()
 if DATASET_ID is not None:
     dataset = DATASETS[DATASET_ID]
 
-    # 1/ Get indicators from dataset
-    indicators_raw = load_variables_in_dataset(dataset_id=[int(DATASET_ID)])
-
-    ## Chart info
-    indicator_charts = IndicatorsInCharts.from_indicators(indicators_raw)
-
-    ## Chart info
-    indicator_explorers = IndicatorsInExplorers.from_indicators(indicators_raw)
-
-    ## Parse indicators
-    indicators = parse_indicators(indicators_raw)
-
-    # 2/ Get charts
-    df_charts = get_table_charts(indicator_charts, USERS, CHART_VIEWS)
-    df_explorers = get_table_explorers(indicator_explorers, EXPLORER_VIEWS)
-
-    # 3/ Present Dataset
+    # 0/ Present Dataset
     title = dataset["name"]
     st.header(f"[{title}]({OWID_ENV.dataset_admin_site(DATASET_ID)})")
 
-    with st_horizontal():
-        st.markdown(f":material/schedule: Last modified: {dataset['updatedAt'].strftime('%Y-%m-%d')}")
-        st.markdown(f"{len(indicators)} indicators")
-        st.markdown(f"{len(df_charts)} charts")
+    # 1/ Get indicators from dataset
+    indicators_raw = load_variables_in_dataset(dataset_id=[int(DATASET_ID)])
 
-        if dataset["isPrivate"] == 1:
-            st_tag("Private", color="blue", icon=":material/lock")
-        if dataset["isArchived"] == 1:
-            st_tag("Archived", color="red", icon=":material/delete_forever")
-        # Any mdim?
-        if any(ind.is_mdim for ind in indicators):
-            st_tag(tag_name="indicators with dimensions", color="primary", icon=":material/deployed_code")
+    if indicators_raw == []:
+        st.warning("No indicators found in this dataset.")
+    else:
+        ## Chart info
+        indicator_charts = IndicatorsInCharts.from_indicators(indicators_raw)
 
-    @st.fragment
-    def show_button():
-        st.button(
-            "Dependency graph",
-            icon=":material/account_tree:",
-            on_click=lambda dataset=dataset: show_modal_dependency_graph(dataset, DAG),
-        )
+        ## Chart info
+        indicator_explorers = IndicatorsInExplorers.from_indicators(indicators_raw)
 
-    show_button()
+        ## Parse indicators
+        indicators = parse_indicators(indicators_raw)
 
-    # 4/ Tabs
-    tab_indicators, tab_charts = st.tabs(["Indicators", "Charts"])
+        # 2/ Get charts
+        df_charts = get_table_charts(indicator_charts, USERS, CHART_VIEWS)
+        df_explorers = get_table_explorers(indicator_explorers, EXPLORER_VIEWS)
 
-    with tab_indicators:
-        # Apply filters / sorting
-        indicators = filter_sort_indicators(indicators)
+        # 3/ Dataset metadata
+        with st_horizontal():
+            st.markdown(f":material/schedule: Last modified: {dataset['updatedAt'].strftime('%Y-%m-%d')}")
+            st.markdown(f"{len(indicators)} indicators")
+            st.markdown(f"{len(df_charts)} charts")
 
-        # Use pagination
-        pagination = Pagination(
-            items=indicators,
-            items_per_page=PAGE_ITEMS_LIMIT,
-            pagination_key="pagination-dataset-search",
-        )
+            if dataset["isPrivate"] == 1:
+                st_tag("Private", color="blue", icon=":material/lock")
+            if dataset["isArchived"] == 1:
+                st_tag("Archived", color="red", icon=":material/delete_forever")
+            # Any mdim?
+            if any(ind.is_mdim for ind in indicators):
+                st_tag(tag_name="indicators with dimensions", color="primary", icon=":material/deployed_code")
 
-        if len(indicators) > PAGE_ITEMS_LIMIT:
-            pagination.show_controls(mode="bar")
+        @st.fragment
+        def show_dependency_btn():
+            st.button(
+                "Dependency graph",
+                icon=":material/account_tree:",
+                on_click=lambda dataset=dataset: show_modal_dependency_graph(dataset, DAG),
+            )
 
-        # Show items (only current page)
-        for item in pagination.get_page_items():
-            st_show_indicator(item, indicator_charts, DISPLAY_CHARTS)
-            st.divider()
+        show_dependency_btn()
 
-    with tab_charts:
-        st.markdown("#### Charts")
-        show_table_charts(df_charts)
-        st.markdown("#### Explorers")
-        show_table_explorers(df_explorers)
-        st.markdown("#### Most frequent chart editors")
-        user_counts = df_charts["User"].value_counts()
-        st.dataframe(user_counts, use_container_width=True)
+        # 4/ Tabs
+        tab_indicators, tab_charts = st.tabs(["Indicators", "Charts"])
+
+        with tab_indicators:
+            # Apply filters / sorting
+            indicators = filter_sort_indicators(indicators)
+
+            # Use pagination
+            pagination = Pagination(
+                items=indicators,
+                items_per_page=PAGE_ITEMS_LIMIT,
+                pagination_key="pagination-dataset-search",
+            )
+
+            if len(indicators) > PAGE_ITEMS_LIMIT:
+                pagination.show_controls(mode="bar")
+
+            # Show items (only current page)
+            for item in pagination.get_page_items():
+                st_show_indicator(item, indicator_charts, DISPLAY_CHARTS)
+                st.divider()
+
+        with tab_charts:
+            st.markdown("#### Charts")
+            show_table_charts(df_charts)
+            st.markdown("#### Explorers")
+            show_table_explorers(df_explorers)
+            st.markdown("#### Most frequent chart editors")
+            user_counts = df_charts["User"].value_counts()
+            st.dataframe(user_counts, use_container_width=True)

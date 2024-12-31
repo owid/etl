@@ -26,14 +26,16 @@ COLOR_MAIN = "#81429A"
 def show_modal_dependency_graph(dataset, dag, downstream=False):
     # Get step uri
     step_uri = f"data://grapher/{dataset['catalogPath']}"
-    st.write(step_uri)
     with st.spinner(f"Generating graph {step_uri}..."):
         dag = filter_to_subgraph(dag, downstream=downstream, includes=[cast(str, step_uri)])
 
-        with st.expander("Show raw DAG"):
-            st.write(dag)
+        if dag == {}:
+            st.warning("Not in the DAG!")
+        else:
+            with st.popover("Show raw DAG"):
+                st.write(dag)
 
-        _ = generate_graph(dag, step_uri)
+            _ = generate_graph(dag, step_uri)
 
 
 @st.cache_data
