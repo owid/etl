@@ -16,23 +16,16 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     tb = snap.read(sheet_name="Data Long Format")
 
-    # Rename columns
-    tb = tb.rename(
-        columns={
-            "country.name": "country",
-        }
-    )
-
     # Sanity checks
-    assert tb.groupby("ccode")["country"].nunique().max() == 1, "ccode is not unique"
-    assert tb.groupby("country")["ccode"].nunique().max() == 1, "country is not unique"
+    assert tb.groupby("ccode")["country.name"].nunique().max() == 1, "ccode is not unique"
+    assert tb.groupby("country.name")["ccode"].nunique().max() == 1, "country.name is not unique"
 
     #
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [
-        tb.format(["country", "year"]),
+        tb.format(["country.name", "year"]),
     ]
 
     #
