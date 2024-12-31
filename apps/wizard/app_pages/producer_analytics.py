@@ -460,7 +460,7 @@ Analytics of charts using data by {producers_selected_str} between {min_date} an
 ########################################################################################################################
 
 # Streamlit app layout.
-st.title(":material/bar_chart: Producer analytics")
+st.title(":material/analytics: Producer analytics")
 st.markdown("Explore analytics of data producers.")
 
 # SEARCH BOX
