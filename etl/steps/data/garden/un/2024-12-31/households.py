@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -39,6 +41,9 @@ def run(dest_dir: str) -> None:
         "three_generation",
         "skip_generation",
     ]
+    # Replace ".." with NaN
+    tb = tb.replace("..", np.nan)
+
     tb = tb[columns_to_keep + ["country", "year"]]
     tb = tb.format(["country", "year"])
 
