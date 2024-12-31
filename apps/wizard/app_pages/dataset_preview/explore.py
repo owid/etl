@@ -1,8 +1,4 @@
-"""Explore a dataset from ETL.
-
-- [ ] See its dependencies
-- [ ] Preview its metadata
-"""
+"""This module is deprecated, but kept in case we want to use it later."""
 
 import tempfile
 from typing import Any, Dict, List, cast
