@@ -17,71 +17,12 @@ dataset:
 tables:
   marriage_data:
     variables:
-      consensual_union:
-        title: Share of <<sex.lower()>> aged <<age.lower()>> who are in a consensual union
-        unit: "%"
-        short_unit: "%"
-        description_short: A consensual union is a type of relationship in which two people live together as a couple without being legally married.
-
-      currently_not_married:
-        title: Share of <<sex.lower()>> aged <<age.lower()>> who are not currently married
-        unit: "%"
-        short_unit: "%"
-        description_short: This includes people who are single, divorced, separated, or widowe or in a consensual union.
-
-      currently_not_married_nor_in_consensual_union:
-        title: Share of <<sex.lower()>> aged <<age.lower()>> who are not currently married nor in a consensual union
-        unit: "%"
-        short_unit: "%"
-        description_short: This includes people who are single, divorced, separated, or widowed.
-
-      divorced:
-        title: Share of <<sex.lower()>> aged <<age.lower()>> who are divorced
-        unit: "%"
-        short_unit: "%"
-        description_short: Divorce is the legal dissolution of a marriage by a court or other competent body.
 
       divorced_or_separated:
         title: Share of <<sex.lower()>> aged <<age.lower()>> who are divorced or separated
         unit: "%"
         short_unit: "%"
         description_short: This includes people who are divorced or separated.
-
-      married:
-        title: Share of <<sex.lower()>> aged <<age.lower()>> who are married
-        unit: "%"
-        short_unit: "%"
-        description_short: Marriage is a legally recognized union between two people as partners in a personal relationship.
-
-      married_or_in_consensual_union:
-        title: Share of <<sex.lower()>> aged <<age.lower()>> who are married or in a consensual union
-        unit: "%"
-        short_unit: "%"
-        description_short: This includes people who are married or in a consensual union.
-
-      separated:
-        title: Share of <<sex.lower()>> aged <<age.lower()>> who are separated
-        unit: "%"
-        short_unit: "%"
-        description_short: Separation is a type of relationship in which two people live apart from each other while remaining legally married.
-
-      single:
-        title: Share of <<sex.lower()>> aged <<age.lower()>> who are single
-        unit: "%"
-        short_unit: "%"
-        description_short: Single is a type of relationship in which a person is not married or in a consensual union.
-
-      widowed:
-        title: Share of <<sex.lower()>> aged <<age.lower()>> who are widowed
-        unit: "%"
-        short_unit: "%"
-        description_short: Widowed is a type of relationship in which a person has lost their spouse through death.
-
-      widowed_or_divorced:
-        title: Share of <<sex.lower()>> aged <<age.lower()>> who are widowed or divorced
-        unit: "%"
-        short_unit: "%"
-        description_short: This includes people who are widowed or divorced.
 
       currently_married:
         title: Share of <<sex.lower()>> aged <<age.lower()>> who are currently married (includes consensual union)

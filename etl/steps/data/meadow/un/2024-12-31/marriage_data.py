@@ -114,6 +114,9 @@ def run(dest_dir: str) -> None:
     # # Define subset columns for duplicates
     subset_columns = ["country", "year", "sex", "age"]
 
+    tb_merged["country"] = tb_merged["country"].str.replace("Lao People's Dem. Republic", "Laos")
+    tb_merged["country"] = tb_merged["country"].str.replace("Lao People’s Democratic Republic", "Laos")
+
     # Define rules for resolving 'data_source' duplicates
     data_source_rules = [
         ({"DHS_STATcompiler", "DHS_HH"}, "DHS_STATcompiler"),
