@@ -1,0 +1,108 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Marriages & Divorces
+    display:
+      numDecimalPlaces: 1
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  marriage_data:
+    variables:
+      consensual_union:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are in a consensual union
+        unit: "%"
+        short_unit: "%"
+        description_short: A consensual union is a type of relationship in which two people live together as a couple without being legally married.
+
+      currently_not_married:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are not currently married
+        unit: "%"
+        short_unit: "%"
+        description_short: This includes people who are single, divorced, separated, or widowe or in a consensual union.
+
+      currently_not_married_nor_in_consensual_union:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are not currently married nor in a consensual union
+        unit: "%"
+        short_unit: "%"
+        description_short: This includes people who are single, divorced, separated, or widowed.
+
+      divorced:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are divorced
+        unit: "%"
+        short_unit: "%"
+        description_short: Divorce is the legal dissolution of a marriage by a court or other competent body.
+
+      divorced_or_separated:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are divorced or separated
+        unit: "%"
+        short_unit: "%"
+        description_short: This includes people who are divorced or separated.
+
+      married:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are married
+        unit: "%"
+        short_unit: "%"
+        description_short: Marriage is a legally recognized union between two people as partners in a personal relationship.
+
+      married_or_in_consensual_union:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are married or in a consensual union
+        unit: "%"
+        short_unit: "%"
+        description_short: This includes people who are married or in a consensual union.
+
+      separated:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are separated
+        unit: "%"
+        short_unit: "%"
+        description_short: Separation is a type of relationship in which two people live apart from each other while remaining legally married.
+
+      single:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are single
+        unit: "%"
+        short_unit: "%"
+        description_short: Single is a type of relationship in which a person is not married or in a consensual union.
+
+      widowed:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are widowed
+        unit: "%"
+        short_unit: "%"
+        description_short: Widowed is a type of relationship in which a person has lost their spouse through death.
+
+      widowed_or_divorced:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are widowed or divorced
+        unit: "%"
+        short_unit: "%"
+        description_short: This includes people who are widowed or divorced.
+
+      currently_married:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who are currently married (includes consensual union)
+        unit: "%"
+        short_unit: "%"
+        description_short: Currently married men and women are those who are married and not divorced, widowed, or separated, with consensual or customary unions often counted as married for easier comparison.
+
+      ever_married:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who have ever been married
+        unit: "%"
+        short_unit: "%"
+        description_short: Ever married men and women are those who have been married at least once in their lives, regardless of their current marital status.
+
+      never_married:
+        title: Share of <<sex.lower()>> aged <<age.lower()>> who have never been married
+        unit: "%"
+        short_unit: "%"
+        description_short: Never married men and women are those who have never been married in their lives.
+
+      smam:
+       title: Singulate mean age at marriage of <<sex.lower()>>
+       unit: years
+       description_short: Mean age at first marriage among persons who ever marry by a certain age limit, usually before the age of 50 years.
+       description_from_producer:  It measures the average number of years lived as single or “never married” by a hypothetical cohort of individuals for which the proportions never married at each age are the same as those observed at a moment in time for a given population.

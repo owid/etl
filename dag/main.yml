@@ -746,15 +746,6 @@ steps:
 
 
 
-  #
-  # UN Household size data
-  #
-  data://meadow/un/2024-12-31/households:
-    - snapshot://un/2024-12-31/households.xlsx
-  data://garden/un/2024-12-31/households:
-    - data://meadow/un/2024-12-31/households
-  data://grapher/un/2024-12-31/households:
-    - data://garden/un/2024-12-31/households
 
 include:
   - dag/open_numbers.yml
