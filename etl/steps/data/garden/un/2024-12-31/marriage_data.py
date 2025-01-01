@@ -20,11 +20,20 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
-
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    select_columns = [
+        "country",
+        "year",
+        "age",
+        "sex",
+        "divorced_or_separated",
+        "ever_married",
+        "currently_married",
+        "smam",
+    ]
+    tb = tb[select_columns]
     tb["never_married"] = 100 - tb["ever_married"]
+    print(tb.columns)
 
     tb = tb.format(["country", "year", "age", "sex"])
 
