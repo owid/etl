@@ -108,16 +108,64 @@ def run(dest_dir: str) -> None:
     #     print(f"Data Catalog Short Name: {data_source}, Available Age Ranges: {available_age_ranges}")
 
     # Keep only rows where data_source is UNSD
-    tb_merged = tb_merged[tb_merged["data_source"] == "UNSD"]
+    # tb_merged = tb_merged[tb_merged["data_source"] == "UNSD"]
+
+    # Define rules for resolving 'data_source' duplicates
+    # # Define subset columns for duplicates
+    subset_columns = ["country", "year", "sex", "age"]
+
+    # Define rules for resolving 'data_source' duplicates
+    data_source_rules = [
+        ({"DHS_STATcompiler", "DHS_HH"}, "DHS_STATcompiler"),
+        ({"MICS", "MICS_HH"}, "MICS"),
+        ({"DHS_STATcompiler", "UNSD"}, "UNSD"),
+        ({"National statistics", "MICS"}, "MICS"),
+        ({"UNSD", "US Census Bureau"}, "UNSD"),
+        ({"DHS_HH", "UNSD"}, "UNSD"),
+        ({"UNSD", "National statistics"}, "UNSD"),
+        ({"Eurostat", "UNSD"}, "UNSD"),
+        ({"IPUMS", "DHS_STATcompiler"}, "DHS_STATcompiler"),
+        ({"DHS_STATcompiler", "National statistics"}, "DHS_STATcompiler"),
+        ({"DHS_STATcompiler", "INED"}, "DHS_STATcompiler"),
+        ({"INED, MICS"}, "MICS"),
+        ({"DHS_STATcompiler", "MICS_HH"}, "DHS_STATcompiler"),
+        ({"INED", "MICS"}, "MICS"),
+        ({"DHS_HH", "National statistics"}, "DHS_HH"),
+        ({"MICS", "RHS"}, "MICS"),
+        ({"GGS", "UNSD"}, "UNSD"),
+    ]
 
     # Define rules for resolving 'data_process' duplicates
-    data_process_rules = [({"Census", "Estimate"}, "Census")]
+    datacatalog_shortname_rules = [
+        ({"2011 AIS", "2011 DHS"}, "2011 DHS"),
+        ({"2000 HS", "2004 DHS"}, "2004 DHS"),
+        ({"2012-2014 DHS", "2014 DHS"}, "2014 DHS"),
+        ({"2004 FHS", "2004 HLCS"}, "2004 FHS"),
+    ]
 
-    subset_columns = ["country", "year", "sex", "age"]
+    data_process_rules = [
+        ({"Census", "Estimate"}, "Census"),
+        ({"Census", "Survey"}, "Census"),
+        ({"Estimate", "Survey"}, "Survey"),
+        ({"Survey", "Dual record"}, "Survey"),
+    ]
+    # Process 'datacatalog_shortname' duplicates
+    tb_merged = resolve_duplicates(
+        tb_merged, subset_columns, datacatalog_shortname_rules, target_column="datacatalog_shortname"
+    )
+    # Process 'data_source' duplicates
+    tb_merged = resolve_duplicates(tb_merged, subset_columns, data_source_rules, target_column="data_source")
 
     # Process 'data_process' duplicates
     tb_merged = resolve_duplicates(tb_merged, subset_columns, data_process_rules, target_column="data_process")
 
+    duplicates = tb_merged[tb_merged.duplicated(subset=subset_columns, keep=False)]
+    if not duplicates.empty:
+        # Check if all duplicates are the same
+        unique_data = duplicates.groupby(["country", "year", "sex", "age"]).agg(
+            {"data_source": "unique", "datacatalog_shortname": "unique", "data_process": "unique"}
+        )
+        print(unique_data)
     tb_merged = tb_merged.drop(columns=["data_process", "datacatalog_shortname", "data_source"])
 
     tables = [tb_merged.format(["country", "year", "age", "sex"])]
