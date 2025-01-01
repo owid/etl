@@ -60,6 +60,8 @@ def run(dest_dir: str) -> None:
                 "DataProcess": "data_process",
             }
         )
+        if sheet_name == "EVER_MARRIED":
+            tb = tb.rename(columns={"ever_married": "ever_married_total"})
 
         if sheet_name == "SMAM":
             # Remove rows with specific text in the note_on_data column
