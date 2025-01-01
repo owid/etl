@@ -8,7 +8,7 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # List of age groups to keep
-AGE_GROUPS = ["all", "0-19", "20-29", "30-39", "40-49", "50-59", "60-69", "70+"]
+AGE_GROUPS = ["all", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54" "55-59", "60-64", "65+"]
 
 
 def run(dest_dir: str) -> None:
@@ -99,13 +99,11 @@ def run(dest_dir: str) -> None:
             on=["country", "year", "sex", "age", "datacatalog_shortname", "data_source", "data_process"],
             how="outer",
         )
-
-    # Check if 'currently_married' and 'married' columns are the same
-    if "currently_married" in tb_merged.columns and "married" in tb_merged.columns:
-        if tb_merged["currently_married"].equals(tb_merged["married"]):
-            print("The 'currently_married' and 'married' columns are the same.")
-        else:
-            print("The 'currently_married' and 'married' columns are different.")
+    # Find each combination of datacatalog_shortname and the available age ranges
+    # grouped = tb_merged.groupby("data_source")
+    # for data_source, group in grouped:
+    #     available_age_ranges = group["age"].unique()
+    #     print(f"Data Catalog Short Name: {data_source}, Available Age Ranges: {available_age_ranges}")
 
     # Keep only rows where data_source is UNSD
     tb_merged = tb_merged[tb_merged["data_source"] == "UNSD"]
