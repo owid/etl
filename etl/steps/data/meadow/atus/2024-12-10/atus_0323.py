@@ -85,7 +85,7 @@ WHO_CODE_CATEGORIES = {
 ACTIVITY_COL_DICT = {
     "TUCASEID": "case_id",
     "TUACTIVITY_N": "activity_number",
-    "TUACTDUR24": "activity_duration",
+    "TUACTDUR24": "activity_duration_24",
     "TUCC5": "own_hh_children_present",
     "TUCC5B": "other_hh_children_present",
     "TRTCCTOT_LN": "time_sec_cc_total",
@@ -152,9 +152,22 @@ def run(dest_dir: str) -> None:
     act_data = act_data.rename(columns=ACTIVITY_COL_DICT).reset_index()
 
     # add column for who was present with respondent
-    # using lambda instead of map to avoid error
-    who_data["who_string"] = who_data["who_code"].apply(lambda x: WHO_CODES[x])
-    who_data["who_category"] = who_data["who_code"].apply(lambda x: WHO_CODE_CATEGORIES[x])
+    # error arises from processing log implementation
+    try:
+        who_data["who_string"] = who_data["who_code"].map(WHO_CODES)
+        who_data["who_category"] = who_data["who_code"].map(WHO_CODE_CATEGORIES)
+
+    except AttributeError as e:
+        print("processing log is not fully implemented yet")
+        print(e)
+
+    # Merge activity and who data:
+    tb = act_data.merge(who_data, on=["case_id", "activity_number"], how="left")
+
+    # aggregate by category:
+    tb_agg = (
+        tb.groupby(["who_category", "case_id", "activity_number"]).agg("activity_duration_24", "first").reset_index()
+    )
 
     #
     # Process data.
