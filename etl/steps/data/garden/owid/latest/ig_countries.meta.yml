@@ -5,12 +5,11 @@ definitions:
       topic_tags:
         - Uncategorized
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
+  description: "This is for internal use."
 
 tables:
   ig_countries:
