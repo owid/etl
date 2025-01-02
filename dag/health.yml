@@ -810,14 +810,6 @@ steps:
   data://grapher/cancer/2024-10-13/gco_cancer_today_cervical:
     - data://garden/cancer/2024-10-13/gco_cancer_today_cervical
 
-  # Antibiotic resistance data - WHO GLASS
-  data://meadow/antibiotics/2024-10-18/who_glass:
-    - snapshot://antibiotics/2024-10-18/who_glass.zip
-  data://garden/antibiotics/2024-10-18/who_glass:
-    - data://meadow/antibiotics/2024-10-18/who_glass
-  data://grapher/antibiotics/2024-10-18/who_glass:
-    - data://garden/antibiotics/2024-10-18/who_glass
-
     # Antibiotic resistance data - WHO GLASS
   data://meadow/antibiotics/2024-10-18/who_glass_by_antibiotic:
     - snapshot://antibiotics/2024-10-18/who_glass_by_antibiotic.zip

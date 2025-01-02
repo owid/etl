@@ -184,3 +184,11 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/missing_data/2024-03-26/who_neuropsychiatric_conditions:
     - data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions
+
+  # Antibiotic resistance data - WHO GLASS
+  data://meadow/antibiotics/2024-10-18/who_glass:
+    - snapshot://antibiotics/2024-10-18/who_glass.zip
+  data://garden/antibiotics/2024-10-18/who_glass:
+    - data://meadow/antibiotics/2024-10-18/who_glass
+  data://grapher/antibiotics/2024-10-18/who_glass:
+    - data://garden/antibiotics/2024-10-18/who_glass
