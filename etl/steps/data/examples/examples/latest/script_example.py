@@ -24,11 +24,6 @@ def run(dest_dir: str) -> None:
     countries_regions = cast(Dataset, paths.load_dependency("regions"))["regions"]
     df["country"] = df.Code.map(countries_regions.name)
 
-    # NOTE: For simplicity we are loading population from Maddison, but in practive
-    # you would load it from `garden/owid/latest/key_indicators`, i.e.
-    # indicators = Dataset(DATA_DIR / "garden/owid/latest/key_indicators")
-    # population = indicators["population"]["population"].xs(2022, level="year")
-
     # Add population
     maddison = Dataset(DATA_DIR / "garden/ggdc/2020-10-01/ggdc_maddison")
     population = maddison["maddison_gdp"]["population"].xs(2018, level="year")

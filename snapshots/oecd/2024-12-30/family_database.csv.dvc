@@ -1,0 +1,27 @@
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: OECD Family Dabatabse
+    description: |-
+      The OECD Family Database provides cross-national indicators on family outcomes and family policies across the OECD countries, its enhanced engagement partners and EU member states. It includes 70 indicators under four main dimensions: (i) structure of families, (ii) labour market position of families, (iii) public policies for families and children and (iv) child outcomes.
+    date_published: 2024-03-27
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2024). OECD Family Database.
+
+    # Files
+    url_main: https://data-explorer.oecd.org/vis?tenant=archive&df[ds]=DisseminateArchiveDMZ&df[id]=DF_FAMILY&df[ag]=OECD&dq=..FAM14%2BFAM13%2BFAM15A%2BFAM15B%2BFAM10C%2BFAM10B%2BFAM10A%2BFAM9C%2BFAM9A%2BFAM9B%2BFAM7%2BFAM17%2BFAM8C%2BFAM8B%2BFAM11D%2BFAM11C%2BFAM11B%2BFAM11A%2BFAM8A%2BFAM5C%2BFAM5B%2BFAM5A%2BFAM4B%2BFAM12A%2BFAM12B%2BFAM4A%2BFAM3&pd=1960%2C2022&to[TIME_PERIOD]=false&vw=tb
+    url_download: https://sdmx.oecd.org/archive/rest/data/OECD,DF_FAMILY,/..FAM14+FAM13+FAM15A+FAM15B+FAM10C+FAM10B+FAM10A+FAM9C+FAM9A+FAM9B+FAM7+FAM17+FAM8C+FAM8B+FAM11D+FAM11C+FAM11B+FAM11A+FAM8A+FAM5C+FAM5B+FAM5A+FAM4B+FAM12A+FAM12B+FAM4A+FAM3?startPeriod=1960&endPeriod=2022&dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: 2024-12-30
+
+    # License
+    license:
+      name: OECD Terms of Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: 13a5061e7b4794ce209b2c139c7346f9
+    size: 4314783
+    path: family_database.csv

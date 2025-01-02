@@ -12,7 +12,7 @@ from apps.utils.files import generate_step
 from apps.wizard import utils
 from apps.wizard.etl_steps.forms import SnapshotForm
 from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT, MD_SNAPSHOT, SCHEMA_ORIGIN
-from apps.wizard.utils.components import preview_file, st_wizard_page_link
+from apps.wizard.utils.components import preview_file, st_horizontal, st_wizard_page_link
 from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 
@@ -69,18 +69,18 @@ if "snapshot_file" not in st.session_state:
 
 
 def _color_req_level(req_level: str) -> str:
+    colored_level = req_level
     if req_level == "required":
-        return f"**:red[{req_level}]**"
+        return f":red[{colored_level}]"
     elif "required" in req_level:
-        color = "red"
+        colored_level = colored_level.replace("required", ":red[required]")
     elif "recommended" in req_level:
-        color = "orange"
+        colored_level = colored_level.replace("recommended", ":blue[recommended]")
     elif "optional" in req_level:
-        return req_level
+        colored_level = "optional"
     else:
         raise ValueError(f"Unknown requirement level: {req_level}")
-    req_level = f":{color}[{req_level}]"
-    return req_level
+    return colored_level
 
 
 def create_display_name_init_section(name: str) -> str:
@@ -88,7 +88,7 @@ def create_display_name_init_section(name: str) -> str:
     # Get requirement level colored
     req_level = _color_req_level("required")
     # Create display name
-    display_name = f"{name} ┃ {req_level}"
+    display_name = f"**{name}** {req_level}"
     return display_name
 
 
@@ -101,7 +101,9 @@ def create_display_name_snap_section(
     # Create display name
     if not title:
         title = props["title"]
-    display_name = f"`{property_name}.{name}` ┃ {title} ┃ {req_level}"
+    # display_name = f"`{property_name}.{name}` ┃ {title} ┃ {req_level}"
+    # display_name = f"{property_name}.{name}, {req_level}"
+    display_name = f"**{property_name}.{name}** {req_level}".replace(".", "/")
     return display_name
 
 
@@ -149,47 +151,59 @@ def render_fields_init() -> List[str]:
     """Render fields to create directories and all."""
     form = []
 
-    # Text inputs
-    fields = [
-        {
-            "title": "Namespace",
-            "description": "## Description\n\nInstitution or topic name",
-            "placeholder": "'emdat', 'health'",
-        },
-        {
-            "title": "Snapshot version",
-            "description": "## Description\n\nVersion of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
-            "placeholder": f"'{utils.DATE_TODAY}'",
-            "value": utils.DATE_TODAY,
-        },
-        {
-            "title": "Short name",
-            "description": "## Description\n\nDataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
-            "placeholder": "'cherry_blossom'",
-        },
-        {
-            "title": "File extension",
-            "description": "## Description\n\nFile extension (without the '.') of the file to be downloaded.",
-            "placeholder": "'csv', 'xls', 'zip'",
-        },
-    ]
-    for field in fields:
-        key = field["title"].replace(" ", "_").lower()
-        if key == "namespace":
-            field = ["namespace", st.empty(), st.container()]
-        else:
-            args = {
-                "st_widget": st.text_input,
-                "label": create_display_name_init_section(field["title"]),
-                "help": field["description"],
-                "placeholder": f"Example: {field['placeholder']}",
-                "key": key,
-                "default_last": field.get("value", ""),
-            }
-            if APP_STATE.args.dummy_data:
-                args["value"] = dummy_values[key]
+    col1, col2, col3 = st.columns([2, 2, 1], vertical_alignment="bottom")
 
-            field = APP_STATE.st_widget(**args)
+    # namespace
+    with col1:
+        field = ["namespace", st.empty(), st.container()]
+        form.append(field)
+    # short name
+    with col2:
+        key = "short_name"
+        args = {
+            "st_widget": st.text_input,
+            "label": create_display_name_init_section("short name"),
+            "help": "## Description\n\nDataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
+            "placeholder": "Example: 'cherry_blossom'",
+            "key": key,
+            "default_last": "",
+        }
+        if APP_STATE.args.dummy_data:
+            args["value"] = dummy_values[key]
+
+        field = APP_STATE.st_widget(**args)
+        form.append(field)
+    # snapshot version
+    with col3:
+        key = "snapshot_version"
+        args = {
+            "st_widget": st.text_input,
+            "label": create_display_name_init_section("version"),
+            "help": "## Description\n\nVersion of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
+            "placeholder": f"Example: '{utils.DATE_TODAY}'",
+            "key": key,
+            "default_last": utils.DATE_TODAY,
+        }
+        if APP_STATE.args.dummy_data:
+            args["value"] = dummy_values[key]
+
+        field = APP_STATE.st_widget(**args)
+        form.append(field)
+
+    with st_horizontal(vertical_alignment="flex-end"):
+        key = "file_extension"
+        args = {
+            "st_widget": st.text_input,
+            "label": create_display_name_init_section("file extension"),
+            "help": "## Description\n\nFile extension (without the '.') of the file to be downloaded.",
+            "placeholder": "'csv', 'xls', 'zip'",
+            "key": key,
+            "default_last": "",
+        }
+        if APP_STATE.args.dummy_data:
+            args["value"] = dummy_values[key]
+
+        field = APP_STATE.st_widget(**args)
         form.append(field)
 
     # Private dataset?

@@ -9,7 +9,7 @@ from structlog import get_logger
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
 from etl.db import read_sql
-from etl.grapher_io import trim_long_variable_name
+from etl.grapher.io import trim_long_variable_name
 from etl.helpers import map_indicator_path_to_id
 
 # Initialize logger.

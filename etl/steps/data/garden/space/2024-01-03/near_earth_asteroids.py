@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow["near_earth_asteroids"].reset_index()
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

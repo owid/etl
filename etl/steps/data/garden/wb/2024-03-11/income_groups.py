@@ -44,7 +44,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["country_code"], errors="raise")
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     # Create an additional table for the classification of the latest year available.
     tb_latest = tb.reset_index().drop_duplicates(subset=["country"], keep="last")
@@ -62,7 +62,7 @@ def run(dest_dir: str) -> None:
     tb_latest = tb_latest[tb_latest["year"] == tb_latest["year"].max()].drop(columns=["year"])
 
     # Set an appropriate index and sort conveniently.
-    tb_latest = tb_latest.set_index(["country"], verify_integrity=True).sort_index()
+    tb_latest = tb_latest.format(["country"])
 
     #
     # Save outputs.

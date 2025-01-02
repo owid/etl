@@ -27,7 +27,7 @@ def run(dest_dir: str) -> None:
     tb = tb.groupby("Entity").apply(assign_previous_if_lower)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["entity", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["entity", "year"])
 
     #
     # Save outputs.

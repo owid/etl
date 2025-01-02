@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 
 from etl.db import get_engine, read_sql
 from etl.files import yaml_dump
-from etl.grapher_io import add_entity_code_and_name, trim_long_variable_name
+from etl.grapher.io import add_entity_code_and_name, trim_long_variable_name
 
 log = structlog.get_logger()
 
@@ -47,39 +47,6 @@ jinja_env.globals["raise"] = raise_helper
 INT_TYPES = tuple(
     {f"{n}{b}{p}" for n in ("int", "Int", "uint", "UInt") for b in ("8", "16", "32", "64") for p in ("", "[pyarrow]")}
 )
-
-
-def as_table(df: pd.DataFrame, table: catalog.Table) -> catalog.Table:
-    """Convert dataframe into Table and add metadata from other table if available."""
-    t = catalog.Table(df, metadata=table.metadata)
-    for col in set(df.columns) & set(table.columns):
-        t[col].metadata = table[col].metadata
-    return t
-
-
-def expand_dimensions(tb: catalog.Table) -> catalog.Table:
-    """Expands dataframe with extra dimensions beyond country and year into multiple tables.
-    For instance DataFrame with index names [country, year, sex, a] would expand into a table
-    with columns [country, year, a__sex_male, a__sex_female].
-
-    This function is not very memory efficient as it returns a table that will be very sparse.
-    """
-    # rename country to entity_id for the sake of `_yield_wide_table`
-    tb = tb.reset_index("country").rename(columns={"country": "entity_id"}).set_index("entity_id", append=True)
-    tables = list(_yield_wide_table(tb, na_action="drop", warn_null_variables=False))
-
-    # join all tables
-    # NOTE: we could also return individual tables to reduce memory usage
-    expanded_table = catalog.tables.concat(tables, axis=1)
-
-    # rename entity_id back to country
-    expanded_table = (
-        expanded_table.reset_index("entity_id")
-        .rename(columns={"entity_id": "country"})
-        .set_index("country", append=True)
-    )
-
-    return expanded_table
 
 
 def _yield_wide_table(
@@ -319,7 +286,7 @@ def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[s
     """Load YAML file and render Jinja in all fields. Return a dictionary.
 
     Usage:
-        from etl import grapher_helpers as gh
+        from etl.grapher import helpers as gh
         from etl import paths
 
         tb = Dataset(paths.DATA_DIR / "garden/who/2024-07-30/ghe")['ghe']
@@ -334,7 +301,7 @@ def render_variable_meta(meta: catalog.VariableMeta, dim_dict: Dict[str, str]) -
 
     Usage:
         # Create a playground.ipynb next to YAML file and run this in notebook
-        from etl import grapher_helpers as gh
+        from etl.grapher import helpers as gh
         m = gh.render_yaml_file("ghe.meta.yml", dim_dict={"sex": "male"})
         m['tables']['ghe']['variables']['death_count']
     """

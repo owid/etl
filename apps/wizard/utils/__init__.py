@@ -54,6 +54,9 @@ __all__ = [
 # Logger
 log = get_logger()
 
+# TTL for cached functions
+TTL_DEFAULT = "2h"
+
 # Path to variable configs
 DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
 
@@ -453,7 +456,7 @@ def clean_empty_dict(d: Union[Dict[str, Any], List[Any]]) -> Union[Dict[str, Any
         return {k: v for k, v in ((k, clean_empty_dict(v)) for k, v in d.items()) if v}
     if isinstance(d, list):
         return [v for v in map(clean_empty_dict, d) if v]
-    raise TypeError("Invalid type for argument `d`.")
+    return d
 
 
 def get_datasets_in_etl(

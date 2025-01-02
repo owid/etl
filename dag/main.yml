@@ -18,77 +18,31 @@ steps:
     - data://grapher/regions/2023-01-01/regions
 
   # Gapminder
-  data://meadow/gapminder/2019-12-10/population:
-    - walden://gapminder/2019-12-10/population
-  data://garden/gapminder/2019-12-10/population:
-    - data://meadow/gapminder/2019-12-10/population
   data://meadow/gapminder/2023-03-31/population:
     - snapshot://gapminder/2023-03-31/population.xlsx
   data://garden/gapminder/2023-03-31/population:
     - data://meadow/gapminder/2023-03-31/population
-  # Key indicators
-  data://garden/owid/latest/key_indicators:
-    - data://garden/demography/2022-12-08/population
-    - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-  # UN WPP (2022)
-  data://meadow/un/2022-07-11/un_wpp:
-    - snapshot://un/2022-07-11/un_wpp.zip
-  data://garden/un/2022-07-11/un_wpp:
-    - data://meadow/un/2022-07-11/un_wpp
-  data://explorers/un/2022/un_wpp:
-    - data://garden/un/2022-07-11/un_wpp
-  # HYDE (2017)
-  data://meadow/hyde/2017/baseline:
-    - snapshot://hyde/2017/baseline.zip
-    - data://meadow/hyde/2017/general_files
-  data://meadow/hyde/2017/general_files:
-    - snapshot://hyde/2017/general_files.zip
-  data://garden/hyde/2017/baseline:
-    - data://meadow/hyde/2017/baseline
+
   # Others
-  data://meadow/living_planet/2020-09-10/lpd:
-    - walden://living_planet/2020-09-10/lpd
-  data://garden/living_planet/2020-09-10/lpd:
-    - data://meadow/living_planet/2020-09-10/lpd
   data://meadow/wb/2021-07-01/wb_income:
     - walden://wb/2021-07-01/wb_income
-  data://meadow/wb/2022-10-29/wb_gender:
-    - walden://wb/2022-10-29/wb_gender
   data://garden/wb/2021-07-01/wb_income:
     - data://meadow/wb/2021-07-01/wb_income
-  data://garden/wb/2022-10-29/wb_gender:
-    - data://meadow/wb/2022-10-29/wb_gender
-  data://grapher/wb/2022-10-29/wb_gender:
-    - data://garden/wb/2022-10-29/wb_gender
+
   data://garden/ggdc/2020-10-01/ggdc_maddison:
     - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
   data://grapher/ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
-  data://grapher/owid/latest/key_indicators:
-    - data://garden/owid/latest/key_indicators
+
   data://meadow/oecd/2016-06-01/regional_wellbeing:
     - walden://oecd/2016-06-01/regional_wellbeing
-  # Malnutrition to archive
-  data://grapher/malnutrition/2022-10-18/malnutrition:
-    - data://garden/malnutrition/2022-10-18/malnutrition
-  data://garden/malnutrition/2022-10-18/malnutrition:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-    - data://garden/un/2022-07-11/un_wpp
-  # Malnutrition to update
+
+  # Malnutrition
   data://grapher/malnutrition/2024-12-16/malnutrition:
     - data://garden/malnutrition/2024-12-16/malnutrition
   data://garden/malnutrition/2024-12-16/malnutrition:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/un/2024-07-12/un_wpp
-
-  data://meadow/worldbank_wdi/2022-05-26/wdi:
-    - walden://worldbank_wdi/2022-05-26/wdi
-  data://garden/worldbank_wdi/2022-05-26/wdi:
-    - data://meadow/worldbank_wdi/2022-05-26/wdi
-  data://grapher/worldbank_wdi/2022-05-26/wdi:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
 
   # Homicide - UNODC - to archive
   data://meadow/homicide/2023-07-04/unodc:
@@ -98,7 +52,7 @@ steps:
   data://grapher/homicide/2023-07-04/unodc:
     - data://garden/homicide/2023-07-04/unodc
 
-    # Homicide - UNODC - update
+  # Homicide - UNODC - update
   data://meadow/homicide/2024-10-30/unodc:
     - snapshot://homicide/2024-10-30/unodc.xlsx
   data://garden/homicide/2024-10-30/unodc:
@@ -109,9 +63,6 @@ steps:
 
   #
   # UN
-  data://grapher/un/2022-07-11/un_wpp:
-    - data://garden/un/2022-07-11/un_wpp
-
   # UN SDG - current
   data://meadow/un/2023-08-16/un_sdg:
     - snapshot://un/2023-08-16/un_sdg.feather
@@ -131,12 +82,13 @@ steps:
     - data-private://garden/ihme/2023-05-09/sdg
 
   # Internet
-  data://garden/technology/2022/internet:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-    - data://garden/owid/latest/key_indicators
+  data://garden/technology/2024-12-23/internet:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-  data://grapher/technology/2022/internet:
-    - data://garden/technology/2022/internet
+    - data://garden/wb/2024-03-11/income_groups
+  data://grapher/technology/2024-12-23/internet:
+    - data://garden/technology/2024-12-23/internet
 
   # UNDP
   data://meadow/un/2024-04-09/undp_hdr:
@@ -259,16 +211,6 @@ steps:
     - data://garden/wb/2024-03-11/income_groups
   data://grapher/happiness/2024-06-09/happiness:
     - data://garden/happiness/2024-06-09/happiness
-
-  # LGBTI Policy Index (Velasco, 2020)
-  data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index:
-    - snapshot://lgbt_rights/2023-04-27/lgbti_policy_index.xlsx
-  data://garden/lgbt_rights/2023-04-27/lgbti_policy_index:
-    - data://meadow/lgbt_rights/2023-04-27/lgbti_policy_index
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/lgbt_rights/2023-04-27/lgbti_policy_index:
-    - data://garden/lgbt_rights/2023-04-27/lgbti_policy_index
 
   # Ethnic Power Relations Dataset
   data://meadow/eth/2023-03-15/growup:
@@ -502,20 +444,6 @@ steps:
   data://grapher/survey/2023-08-04/trust_surveys:
     - data://garden/survey/2023-08-04/trust_surveys
 
-  # World Bank GenderStats
-  data://meadow/wb/2024-06-10/gender_statistics:
-    - snapshot://wb/2024-06-10/gender_statistics.feather
-  data://garden/wb/2024-06-10/gender_statistics:
-    - data://meadow/wb/2024-06-10/gender_statistics
-  data://garden/wb/2024-06-10/gender_statistics_country_counts:
-    - data://garden/wb/2024-06-10/gender_statistics
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2024-07-15/population
-  data://grapher/wb/2024-06-10/gender_statistics:
-    - data://garden/wb/2024-06-10/gender_statistics
-  data://grapher/wb/2024-06-10/gender_statistics_country_counts:
-    - data://garden/wb/2024-06-10/gender_statistics_country_counts
-
   # Missing Data - Children out of school
   data://garden/missing_data/2024-03-26/children_out_of_school:
     - data://garden/wb/2024-06-10/gender_statistics
@@ -525,14 +453,6 @@ steps:
   data://grapher/missing_data/2024-03-26/children_out_of_school:
     - data://garden/missing_data/2024-03-26/children_out_of_school
 
-  # Missing Data - Neuropsychiatric Conditions
-  data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions:
-    - data://garden/who/2024-07-26/mortality_database
-    - data://garden/wb/2024-03-11/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/missing_data/2024-03-26/who_neuropsychiatric_conditions:
-    - data://garden/missing_data/2024-03-26/who_neuropsychiatric_conditions
 
   # Missing Data - Suicides
   data://garden/missing_data/2024-03-26/who_md_suicides:
@@ -560,16 +480,6 @@ steps:
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
 
-  # Homosexuality criminalization data from Mignot (2022)
-  data://meadow/lgbt_rights/2024-06-11/criminalization_mignot:
-    - snapshot://lgbt_rights/2024-06-11/criminalization_mignot.csv
-  data://garden/lgbt_rights/2024-06-11/criminalization_mignot:
-    - data://meadow/lgbt_rights/2024-06-11/criminalization_mignot
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/lgbt_rights/2024-06-11/criminalization_mignot:
-    - data://garden/lgbt_rights/2024-06-11/criminalization_mignot
-
   # Refugee, Asylum and Migration Explorer:
   export://explorers/migration/2024-08-05/migration:
     - data://grapher/unicef/2024-07-30/child_migration
@@ -580,28 +490,6 @@ steps:
     - data://grapher/idmc/2024-08-02/internal_displacement
 
   ######################################################################################################################
-  # Older versions to be archived once they are not used by any other steps.
-
-  # UN SDG - archive
-  data://meadow/un/2023-01-24/un_sdg:
-    - snapshot://un/2023-01-24/un_sdg.feather
-  data://garden/un/2023-01-24/un_sdg:
-    - data://meadow/un/2023-01-24/un_sdg
-    - snapshot://un/2023-01-24/un_sdg_unit.csv
-    - snapshot://un/2023-01-24/un_sdg_dimension.json
-  data://grapher/un/2023-01-24/un_sdg:
-    - data://garden/un/2023-01-24/un_sdg
-
-  data://meadow/papers/2023-10-20/anthromes_input:
-    - snapshot://papers/2023-10-20/anthromes_input.zip
-  data://meadow/papers/2023-10-20/anthromes:
-    - snapshot://papers/2023-10-20/anthromes.csv
-  data://garden/papers/2023-10-20/anthromes:
-    - data://meadow/papers/2023-10-20/anthromes
-    - data://meadow/papers/2023-10-20/anthromes_input
-  data://grapher/papers/2024-01-05/anthromes:
-    - data://garden/papers/2023-10-20/anthromes
-  ######################################################################################################################
   # Map (Natural Earth)
   data://meadow/geography/2023-11-28/nat_earth_110:
     - snapshot://geography/2023-11-28/nat_earth_110.zip
@@ -610,7 +498,7 @@ steps:
 
   ######################################################################################################################
 
-  #Latitude
+  # Latitude
   data://grapher/geography/2024-07-18/latitude:
     - data://garden/geography/2023-11-28/nat_earth_110
 
@@ -632,11 +520,6 @@ steps:
     - data://meadow/news/2024-05-23/gdelt_v2
   data://grapher/news/2024-05-23/gdelt_v2:
     - data://garden/news/2024-05-23/gdelt_v2
-
-  ######################################################################################################################
-  # Older versions that should be archived once they are not used by any other steps.
-
-  ######################################################################################################################
 
   # World Development Indicators - WDI
   data://meadow/worldbank_wdi/2024-05-20/wdi:
@@ -664,21 +547,6 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
-
-  # Equaldex dataset
-  data://meadow/lgbt_rights/2024-06-03/equaldex:
-    - snapshot://lgbt_rights/2024-06-03/equaldex.csv
-    - snapshot://lgbt_rights/2024-06-03/equaldex_current.csv
-    - snapshot://lgbt_rights/2024-06-03/equaldex_indices.csv
-
-  data://garden/lgbt_rights/2024-06-03/equaldex:
-    - data://meadow/lgbt_rights/2024-06-03/equaldex
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-    - data://garden/countries/2023-09-25/isd
-
-  data://grapher/lgbt_rights/2024-06-03/equaldex:
-    - data://garden/lgbt_rights/2024-06-03/equaldex
 
   # Public Finances in Modern History dataset (IMF)
   data://meadow/imf/2024-06-12/public_finances_modern_history:
@@ -742,12 +610,10 @@ steps:
   # WB income groups 2024-07-29
   data://meadow/wb/2024-07-29/income_groups:
     - snapshot://wb/2024-07-29/income_groups.xlsx
-
   data://garden/wb/2024-07-29/income_groups:
     - data://meadow/wb/2024-07-29/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2024-07-15/population
-
   data://grapher/wb/2024-07-29/income_groups:
     - data://garden/wb/2024-07-29/income_groups
 
@@ -924,3 +790,5 @@ include:
   - dag/minerals.yml
   - dag/tourism.yml
   - dag/migration.yml
+  - dag/equality.yml
+  - dag/families.yml

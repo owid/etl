@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
     grouped_tb = grouped_tb.drop(columns=["date"])
 
     cols_to_keep = ["co2", "pm25"]
-    grouped_tb = grouped_tb.set_index(["country", "year", "month", "days_since_2000"], verify_integrity=True)
+    grouped_tb = grouped_tb.format(["country", "year", "month", "days_since_2000"])
     grouped_tb = grouped_tb[cols_to_keep]
     #
     # Save outputs.

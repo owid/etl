@@ -20,33 +20,6 @@ steps:
   data://grapher/who/2022-07-17/who_vaccination:
     - data://garden/who/2022-07-17/who_vaccination
 
-  # WHO Global Health Estimates
-  data://meadow/who/2022-09-30/ghe:
-    - snapshot://who/2022-09-30/ghe.feather
-  data://garden/who/2022-09-30/ghe:
-    - data://meadow/who/2022-09-30/ghe
-    - data://garden/un/2022-07-11/un_wpp
-    - data://garden/regions/2023-01-01/regions
-    - snapshot://who/2023-07-14/standard_age_distribution.csv
-  data://grapher/who/2022-09-30/ghe:
-    - data://garden/who/2022-09-30/ghe
-
-  # WHO - Global Health Observatory (only suicides variable)
-  data://meadow/who/2023-03-09/gho_suicides:
-    - snapshot://who/2023-03-09/gho_suicides.json
-  data://garden/who/2023-03-09/gho_suicides:
-    - data://meadow/who/2023-03-09/gho_suicides
-  data://grapher/who/2023-03-09/gho_suicides:
-    - data://garden/who/2023-03-09/gho_suicides
-
-  # IHME Global Burden of Disease - Risk factors
-  data://meadow/ihme_gbd/2019/gbd_risk:
-    - walden://ihme_gbd/2019/gbd_risk
-  data://garden/ihme_gbd/2019/gbd_risk:
-    - data://meadow/ihme_gbd/2019/gbd_risk
-  data://grapher/ihme_gbd/2019/gbd_risk:
-    - data://garden/ihme_gbd/2019/gbd_risk
-
   # IHME GBD Leading cause of  deaths - update
   data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
     - snapshot-private://ihme_gbd/2024-06-10/cause_hierarchy.csv
@@ -185,7 +158,6 @@ steps:
     - data://meadow/un/2023-08-02/comtrade_pandemics
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
-    - data://garden/owid/latest/key_indicators
   data://grapher/un/2023-08-10/comtrade_pandemics:
     - data://garden/un/2023-08-02/comtrade_pandemics
 
@@ -402,12 +374,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/who/2024-01-03/gho:
     - data://garden/who/2024-01-03/gho
-
-  # Suicides based on GHO dataset
-  data://garden/who/2024-02-14/gho_suicides:
-    - data://garden/who/2024-01-03/gho
-  data://grapher/who/2024-02-14/gho_suicides:
-    - data://garden/who/2024-02-14/gho_suicides
 
   # Suicides based on WHO Mortality Database
   data://meadow/who/2024-03-24/self_inflicted_injuries:
@@ -632,12 +598,13 @@ steps:
     - data://garden/smoking/2024-05-30/cigarette_sales
 
   # ISAPS, Plastic Surgery (2010-2022)
-  data://meadow/health/2024-06-11/isaps_plastic_surgery:
-    - snapshot://health/2024-06-11/isaps_plastic_surgery.xlsx
-  data://garden/health/2024-06-11/isaps_plastic_surgery:
-    - data://meadow/health/2024-06-11/isaps_plastic_surgery
-  data://grapher/health/2024-06-11/isaps_plastic_surgery:
-    - data://garden/health/2024-06-11/isaps_plastic_surgery
+  data://meadow/health/2024-12-29/isaps_plastic_surgery:
+    - snapshot://health/2024-12-29/isaps_plastic_surgery.xlsx
+  data://garden/health/2024-12-29/isaps_plastic_surgery:
+    - data://meadow/health/2024-12-29/isaps_plastic_surgery
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/health/2024-12-29/isaps_plastic_surgery:
+    - data://garden/health/2024-12-29/isaps_plastic_surgery
 
   # Gapminder Maternal Mortality (long run dataset)
   data://meadow/gapminder/2024-07-08/maternal_mortality:
@@ -835,14 +802,6 @@ steps:
   data://grapher/antibiotics/2024-10-09/gram_children:
     - data://garden/antibiotics/2024-10-09/gram_children
 
-  # Cervical cancer incidence rates GCO - Cancer Over Time
-  data://meadow/cancer/2024-10-13/gco_cancer_over_time_cervical:
-    - snapshot://cancer/2024-10-13/gco_cancer_over_time_cervical.csv
-  data://garden/cancer/2024-10-13/gco_cancer_over_time_cervical:
-    - data://meadow/cancer/2024-10-13/gco_cancer_over_time_cervical
-  data://grapher/cancer/2024-10-13/gco_cancer_over_time_cervical:
-    - data://garden/cancer/2024-10-13/gco_cancer_over_time_cervical
-
   # Cervical cancer incidence rates GCO - Cancer Today (2022)
   data://meadow/cancer/2024-10-13/gco_cancer_today_cervical:
     - snapshot://cancer/2024-10-13/gco_cancer_today_cervical.csv
@@ -1009,3 +968,13 @@ steps:
     - data://meadow/who/2024-12-10/vaccination_coverage
   data://grapher/who/2024-12-10/vaccination_coverage:
     - data://garden/who/2024-12-10/vaccination_coverage
+
+  #
+  # Human height
+  #
+  data://meadow/health/2024-12-31/height:
+    - snapshot://health/2024-12-31/height.xlsx
+  data://garden/health/2024-12-31/height:
+    - data://meadow/health/2024-12-31/height
+  data://grapher/health/2024-12-31/height:
+    - data://garden/health/2024-12-31/height

@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     )
     tb = tb.rename(columns={"population__thousands": "population_capital"})
 
-    tb = tb.set_index(["country", "year", "urban_agglomeration", "rank_order"], verify_integrity=True)
+    tb = tb.format(["country", "year", "urban_agglomeration", "rank_order"])
 
     #
     # Save outputs.

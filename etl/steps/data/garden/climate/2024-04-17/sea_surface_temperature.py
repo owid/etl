@@ -38,7 +38,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["year", "month"], errors="raise")
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["location", "date"], verify_integrity=True).sort_index()
+    tb = tb.format(["location", "date"])
 
     #
     # Save outputs.

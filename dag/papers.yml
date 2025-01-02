@@ -71,6 +71,18 @@ steps:
   data://grapher/papers/2024-10-25/ipsos:
     - data://garden/papers/2024-10-25/ipsos
 
+  #
+  # Ellis et al. (2021), Anthromes
+  #
+  data://meadow/papers/2023-10-20/anthromes_input:
+    - snapshot://papers/2023-10-20/anthromes_input.zip
+  data://meadow/papers/2023-10-20/anthromes:
+    - snapshot://papers/2023-10-20/anthromes.csv
+  data://garden/papers/2023-10-20/anthromes:
+    - data://meadow/papers/2023-10-20/anthromes
+    - data://meadow/papers/2023-10-20/anthromes_input
+  data://grapher/papers/2024-01-05/anthromes:
+    - data://garden/papers/2023-10-20/anthromes
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.

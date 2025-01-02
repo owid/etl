@@ -240,3 +240,5 @@ steps:
     - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
   data://grapher/fasttrack/latest/antimicrobial_usage_livestock:
     - snapshot://fasttrack/latest/antimicrobial_usage_livestock.csv
+  data://grapher/fasttrack/latest/iucn_number_evaluated:
+    - snapshot://fasttrack/latest/iucn_number_evaluated.csv

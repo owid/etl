@@ -7,9 +7,9 @@ from apps.anomalist.anomalist_api import anomaly_detection
 from apps.anomalist.cli import load_datasets_new_ids
 from apps.wizard.app_pages.anomalist.utils import load_variable_mapping
 from apps.wizard.utils.io import get_new_grapher_datasets_and_their_previous_versions
-from etl import grapher_model as gm
 from etl.config import OWIDEnv
 from etl.db import read_sql
+from etl.grapher import model as gm
 
 log = get_logger()
 

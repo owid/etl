@@ -1,0 +1,44 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Mental Health
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  isaps_plastic_surgery:
+    variables:
+      num_procedures:
+        title: |-
+          <%- if (category_1 == 'all') -%>
+          Number of aesthetic procedures (surgical and non-surgical)
+          <%- elif (category_1 != 'all') and (category_2 == 'all') -%>
+          Number of aesthetic << category_1 >> procedures
+          <%- elif (category_1 != 'all') and (category_2 != 'all') and (procedure_name == 'all') -%>
+          Number of aesthetic << category_1 >> procedures, << category_2 >>
+          <%- else -%>
+          Number of aesthetic << category_1 >> procedures, << category_2 >>, << procedure_name.title() >>
+          <%- endif -%>
+        description_short: |-
+          Number of cosmetic procedures performed in a given year.
+        unit: procedures
+      num_procedures_per_capita:
+        title: |-
+          <%- if (category_1 == 'all') -%>
+          Number of aesthetic procedures (surgical and non-surgical) (per capita)
+          <%- elif (category_1 != 'all') and (category_2 == 'all') -%>
+          Number of aesthetic << category_1 >> procedures (per capita)
+          <%- elif (category_1 != 'all') and (category_2 != 'all') and (procedure_name == 'all') -%>
+          Number of aesthetic << category_1 >> procedures, << category_2 >> (per capita)
+          <%- else -%>
+          Number of aesthetic << category_1 >> procedures, << category_2 >>, << procedure_name.title() >> (per capita)
+          <%- endif -%>
+        description_short: |-
+          Number of cosmetic procedures performed in a given year divided by the total population.
+        unit: procedures

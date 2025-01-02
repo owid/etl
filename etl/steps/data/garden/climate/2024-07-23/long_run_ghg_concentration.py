@@ -74,7 +74,7 @@ def run(dest_dir: str) -> None:
     tb["location"] = "World"
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["location", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["location", "year"])
 
     #
     # Save outputs.

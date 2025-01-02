@@ -1494,7 +1494,7 @@ class Origin(Base):
     """Get CREATE TABLE statement for origins table with
     ```
     from sqlalchemy.schema import CreateTable
-    from etl.grapher_model import Origin
+    from etl.grapher.model import Origin
     print(str(CreateTable(Origin.__table__).compile(engine)))
     ```
     """

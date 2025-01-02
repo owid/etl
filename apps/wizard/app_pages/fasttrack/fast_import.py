@@ -17,10 +17,10 @@ from structlog import get_logger
 from apps.utils.files import add_to_dag
 from apps.wizard import utils as wizard_utils
 from apps.wizard.app_pages.fasttrack.utils import _encrypt
-from etl import grapher_model as gm
 from etl.compare import diff_print
 from etl.db import get_engine
 from etl.files import apply_ruff_formatter_to_files, yaml_dump
+from etl.grapher import model as gm
 from etl.metadata_export import metadata_export
 from etl.paths import BASE_DIR, DAG_DIR, STEP_DIR
 from etl.snapshot import Snapshot, SnapshotMeta
@@ -190,7 +190,8 @@ class FasttrackImport:
 
         exit_code = diff_print(
             df1=existing_data.set_index(["country", "year"]),
-            df2=self.data,
+            # reset and set in case there are dimensions
+            df2=self.data.reset_index().set_index(["country", "year"]),
             df1_label="existing",
             df2_label="imported",
             absolute_tolerance=0.00000001,

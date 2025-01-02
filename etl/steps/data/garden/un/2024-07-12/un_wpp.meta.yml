@@ -1,60 +1,48 @@
 definitions:
   global:
-    projections: <%- if (variant is defined) and (variant != 'estimates') -%>
+    projections: |-
+      <% if (variant is defined) and (variant != 'estimates') -%>
       Projections from 2024 onwards are based on the UN's << variant >> scenario.
       <%- endif -%>
     dimensions:
       title: |-
-        <%-if sex == 'all' and age == 'all' and variant == 'estimates' -%>
+        <% if sex == 'all' and age == 'all' and variant == 'estimates' %>
         total
-        <%-else -%>
-        <%- if sex != 'all' -%>
-        << sex >><%- if age != 'all' or variant != 'estimates' -%>, <%-endif -%>
-        <%- endif -%>
-        <%- if age == '0' -%>
-        at birth<%- if variant != 'estimates' -%>, <%-endif -%>
-        <%- elif '-' in age|string or '+' in age|string -%>
-        ages << age >><%- if variant != 'estimates' -%>, <%-endif -%>
-        <%- elif age != 'all' -%>
-        age << age >><%- if variant != 'estimates' -%>, <%-endif -%>
-        <%- endif -%>
-        <%- if variant != 'estimates' -%>
+        <%- else %>
+        <%- if sex != 'all' %>
+         << sex >>s<% if age != 'all' or variant != 'estimates' %>, <%endif %>
+        <%- endif %>
+        <%- if age == '0' %>
+        at birth<% if variant != 'estimates' %>, <%endif %>
+        <%- elif '-' in age|string or '+' in age|string %>
+        ages << age >><%- if variant != 'estimates' %>, <%endif %>
+        <%- elif age != 'all' %>
+        age << age >><%- if variant != 'estimates' %>, <%endif %>
+        <%- endif %>
+        <%- if variant != 'estimates' %>
         << variant >> projection
-        <%- endif -%>
-        <%-endif -%>
+        <%- endif %>
+        <%- endif %>
       description_short: |-
-        <%-if not (sex == 'all' and age == 'all') -%>
+        <% if not (sex == 'all' and age == 'all') %>
         This only includes
-        <%- if sex != 'all' -%>
-        << sex >>s
-        <%- elif sex != 'all' -%>
-        individuals
-        <%- endif -%>
-        <%- if age == '0' -%>
-        at birth
-        <%- elif '-' in age|string or '+' in age|string -%>
-        ages << age >>
-        <%- elif age != 'all' -%>
-        age << age >>
-        <%- endif -%>.
-        <%-endif -%>
-
-        {definitions.global.projections}
+        <%- if sex == 'all' %>
+         individuals<%- else %> << sex >>s<%- endif %>
+        <%- if age == '0' %> at birth<%- elif age != 'all' %> aged << age >><%- endif %>.
+        <%- endif %> {definitions.global.projections}
 
       description_short_births: |-
-        <%- if sex is defined -%>
-        <%-if not (sex == 'all' and age == 'all') -%>
+        <% if sex is defined %>
+        <% if not (sex == 'all' and age == 'all') %>
         This only includes
-        <%- if sex != 'all' -%>
-        << sex >> babies<%- if variant != 'estimates' -%>, and <%-endif -%>
-        <%- endif -%>
-        <%- if age != 'all' -%>
-        mothers aged << age >>
-        <%- endif -%>.
-        <%- endif -%>
-        <%- endif -%>
-
-        {definitions.global.projections}
+        <%- if sex != 'all' %>
+         << sex >> babies<% if age != 'all' %>, and<% endif %>
+        <%- endif %>
+        <%- if age != 'all' %>
+         mothers aged << age >>
+        <%- endif %>.
+        <%- endif %>
+        <%- endif %> {definitions.global.projections}
 
   common:
     presentation:
@@ -153,17 +141,17 @@ tables:
       fertility_rate:
         title: Fertility rate
         unit: |-
-          <%-if age == 'all' -%>
+          <% if age == 'all' %>
           live births per woman
-          <%-else -%>
+          <%- else %>
           live births per 1,000 mothers aged << age >>
-          <%-endif -%>
+          <%- endif %>
         description_short: |-
-          <%-if age == 'all' -%>
+          <% if age == 'all' %>
           The average number of live births a hypothetical cohort of women would have at the end of their reproductive period if they were subject during their whole lives to the fertility rates of a given period and if they were not subject to mortality. {definitions.global.dimensions.description_short}
-          <%-else -%>
+          <%- else %>
           The annual number of live births from mothers aged << age >> years. {definitions.global.dimensions.description_short}
-          <%-endif -%>
+          <%- endif %>
         description_key:
           - |-
             It is expressed as live births per woman. For age-specific fertility rates, it measures the number of births to women in a particular age group, divided by the number of women in that age group. The age groups used are: 15-19, 20-24, ..., 45-49. The data refer to annual civil calendar years from 1 January to 31 December.
@@ -172,9 +160,17 @@ tables:
             Fertility rate, {definitions.global.dimensions.title}
           grapher_config:
             note: |-
-              <%-if age == 'all' -%>
+              <% if age == 'all' %>
               The total fertility rate is the number of children that would be born to a woman if she were to live to the end of her child-bearing years and give birth to children at the current age-specific fertility rates.
-              <%-endif -%>
+              <%- endif %>
+
+  fertility_single:
+    variables:
+      fertility_rate:
+        title: "Fertility rate, by age - Year: << year_as_dimension >>"
+        description_short: |-
+          The average number of children a woman would have at each age if she experienced the fertility rates of year << year_as_dimension >>.
+        unit: "births per woman"
 
   migration:
     variables:
@@ -188,11 +184,11 @@ tables:
             Net migration, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              <%-if sex == "all" -%>
+              <% if sex == "all" %>
               The total number of immigrants (people moving into a given country) minus the number of emigrants (people moving out of the country).
-              <%-else -%>
+              <%- else %>
               The total number of << sex >> immigrants (people moving into a given country) minus the number of << sex >> emigrants (people moving out of the country).
-              <%-endif -%> {definitions.global.projections}
+              <%- endif %> {definitions.global.projections}
 
       net_migration_rate:
         title: Annual net migration rate
@@ -286,17 +282,16 @@ tables:
         unit: years
         short_unit: years
         description_short: |-
-          <%-if sex == 'all' -%>
-          <%-set individuals='individuals' -%>
-          <%-else -%>
-          <%-set individuals=sex+' individuals' -%>
-          <%-endif -%>
-
-          <%-if age == '0' -%>
+          <% if sex == 'all' %>
+          <%- set individuals='individuals' %>
+          <%- else %>
+          <%-set individuals=sex+' individuals' %>
+          <%- endif %>
+          <%- if age == '0' %>
           Period life expectancy for << individuals >> at birth.
-          <%-else -%>
+          <%- else %>
           Period life expectancy for << individuals >> who have reached age << age >>. Estimates are expressed as the expected age at death, not as years left to live.
-          <%-endif -%> {definitions.global.projections}
+          <%- endif %> {definitions.global.projections}
         presentation:
           title_public: |-
             Life Expectancy, {definitions.global.dimensions.title}
@@ -305,16 +300,16 @@ tables:
               {tables.life_expectancy.variables.life_expectancy.description_short}
 
             note: |-
-              <%-if sex == 'all' -%>
-              <%-set sex_name='' -%>
-              <%-else -%>
-              <%-set sex_name=' for ' + sex+'s' -%>
-              <%-endif -%>
-              <%- if age == '0' -%>
+              <% if sex == 'all' %>
+              <%- set sex_name='' %>
+              <%- else %>
+              <%- set sex_name=' for ' + sex+'s' %>
+              <%- endif %>
+              <%- if age == '0' %>
               Shown is the 'period life expectancy'<< sex_name >> at birth<< sex_name >>. This is the average number of years a newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
-              <%-else -%>
+              <%- else %>
               Shown is the 'period life expectancy'<< sex_name >> at age << age >>. This is the expected age at death, if age-specific mortality rates in the current year were to stay the same throughout its life.
-              <%- endif -%>
+              <%- endif %>
 
   sex_ratio:
     variables:
@@ -322,100 +317,100 @@ tables:
         title: Sex ratio
         unit: "males per 100 females"
         description_short: |-
-          <%-if age == '0' -%>
+          <% if age == '0' %>
           The number of male births per 100 female births. Biological birth ratios are slightly male-biased, with an expected ratio of 105 male births per 100 female births.
-          <%-elif age == 'all' -%>
+          <%- elif age == 'all' %>
           ​​The number of male population per 100 female population.
-          <%-else -%>
+          <%- else %>
           The number of male individuals per 100 female individuals, at age << age >>.
-          <%-endif -%> {definitions.global.projections}
+          <%- endif %> {definitions.global.projections}
         presentation:
           title_public: |-
             Sex ratio, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              <%-if age == 'all' -%>
+              <% if age == 'all' %>
               ​​The number of male population per 100 female population.
-              <%-elif age == '0' -%>
+              <%- elif age == '0' %>
               The number of male births per 100 female births. Biological birth ratios are slightly male biased, with an expected ratio of 105 male births per 100 female births.
-              <%-else -%>
+              <%- else %>
               The number of male individuals per 100 female individuals, at age << age >>.
-              <%-endif -%> {definitions.global.projections}
+              <%- endif %> {definitions.global.projections}
 
   dependency_ratio:
     variables:
       dependency_ratio:
         title: |-
-          <%-if age == "total" -%>
+          <% if age == "total" %>
           Total dependency ratio - Sex: << sex >> - Variant: << variant >>
-          <%-elif age == "youth" -%>
+          <%- elif age == "youth" %>
           Child dependency ratio - Sex: << sex >> - Variant: << variant >>
-          <%-else -%>
+          <%- else %>
           Old-age dependency ratio - Sex: << sex >> - Variant: << variant >>
-          <%-endif -%>
+          <%- endif %>
         unit: "%"
         description_short: |-
-          <%-if sex != "all" -%>
-          <%-set individuals = 'population'%>
-          <%-else -%>
-          <%-set individuals = sex + ' population'%>
-          <%-endif -%>
-          <%-if age == "total" -%>
+          <% if sex != "all" %>
+          <%- set individuals = 'population'%>
+          <%- else %>
+          <%- set individuals = sex + ' population'%>
+          <%- endif %>
+          <%- if age == "total" %>
           The ratio of the young << individuals >> (under age 15) and elderly << individuals >> (ages 65 and over) to the working-age population (ages 15 to 64).
-          <%-elif age == "youth" -%>
+          <%- elif age == "youth" %>
           The ratio of the young << individuals >> (under age 15) to the working-age << individuals >> (ages 15 to 64).
-          <%-else -%>
+          <%- else %>
           The ratio of the elderly << individuals >> (ages 65 and over) to the working-age << individuals >> (ages 15 to 64).
-          <%-endif -%>
+          <%- endif %>
         presentation:
           title_public: |-
-            <%-if age == "total" -%>
+            <% if age == "total" %>
             Total dependency ratio
-            <%-elif age == "youth" -%>
+            <%- elif age == "youth" %>
             Youth dependency ratio
-            <%-else -%>
+            <%- else %>
             Old-age dependency ratio
-            <%-endif -%>, {definitions.global.dimensions.title}
+            <%- endif %>, {definitions.global.dimensions.title}
 
   mortality_rate:
     variables:
       mortality_rate:
         title: |-
-          <%-if age == '0' -%>
+          <% if age == '0' %>
           Infant mortality rate - Sex: << sex >> - Variant: << variant >>
-          <%-else -%>
+          <%- else %>
           Child mortality rate - Sex: << sex >> - Variant: << variant >>
-          <%-endif -%>
+          <%- endif %>
         unit: |-
-          <%-if age == '0' -%>
+          <% if age == '0' %>
           % of infants
-          <%-else -%>
+          <%- else %>
           % of children
-          <%-endif -%>
+          <%- endif %>
         description_short: |-
-          <%-if age == '0' -%>
+          <% if age == '0' %>
           The share of newborns who die before reaching the age of one.
-          <%-else -%>
+          <%- else %>
           The share of children who die before reaching the age of 5.
-          <%-endif -%> {definitions.global.projections}
+          <%- endif %> {definitions.global.projections}
         presentation:
           title_public: |-
-            <%-if age == '0' -%>
+            <% if age == '0' %>
             Infant mortality rate
-            <%-else -%>
+            <%- else %>
             Child mortality rate
-            <%-endif -%>, {definitions.global.dimensions.title}
+            <%- endif %>, {definitions.global.dimensions.title}
           grapher_config:
             subtitle: |-
-              The share of <%-if sex != 'all' -%><< sex >><%-endif -%>
-              <%-if age == '0' -%>
+              The share of <%-if sex != 'all' %><< sex >><%-endif %>
+              <% if age == '0' %>
                children who die before reaching the age of one.
-              <%-else -%>
+              <%- else %>
                newborns who die before reaching the age of 5.
-              <%- endif -%> {definitions.global.projections}
+              <%- endif %> {definitions.global.projections}
             note: |-
-              <%-if age == '0' -%>
+              <% if age == '0' %>
               This is the probability of a child born in a specific year or period dying before reaching the age of one, if subject to age-specific mortality rates of that period. This is given as the share of live births.
-              <%-else -%>
+              <%- else %>
               This is the probability of a child born in a specific year or period dying before reaching the age of 5, if subject to age-specific mortality rates of that period. This is given as the share of live births.
-              <%- endif -%> {definitions.global.projections}
+              <%- endif %> {definitions.global.projections}

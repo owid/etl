@@ -9,7 +9,7 @@ from owid.catalog import Dataset
 from sqlalchemy.exc import OperationalError
 from typing_extensions import Self
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from apps.utils.files import add_to_dag, generate_step_to_channel
 from apps.wizard import utils
 from apps.wizard.etl_steps_old.utils import (
