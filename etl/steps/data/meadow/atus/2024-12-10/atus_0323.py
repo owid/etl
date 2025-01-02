@@ -78,6 +78,38 @@ WHO_CODE_CATEGORIES = {
     -3: "Not applicable",
 }
 
+SUM_COL_DICT = {
+    "TUCASEID": "case_id",
+    "GEMETSTA": "metropolitan_status",
+
+    "TEAGE": "age",
+    "TELFS": "labor_force_status",
+    "TEMJOT": "multiple_jobs", # 1 yes, 2 no
+    "TESCHENR": "school_enrollment", # 1 yes, 2 no
+    "TESCHLVL": "school_level", # 1 high school, 2 college/ university
+    "TESEX": "gender", # 1 male, 2 female
+    "TESPEMPNOT": "employment_status_spouse", # 1 employed, 2 not employed
+    "TRCHILDNUM": "num_hh_children",
+    "TRDPFTPT": "full_or_part_time", # 1 full time, 2 part time
+    "TRERNWA": "weekly_earnings", # implied decimals, topcoded at 288461 (2884.61 USD)
+    "TRHOLIDAY": "holiday", # 0 no, 1 yes
+    "TRSPFTPT": "full_or_part_time_spouse", # 1 full time, 2 part time
+    "TRSPPRES": "spouse_present", # 1 yes, 2 unmarried partner present, 3 no
+    "TRYHHCHILD": "youngest_hh_child_age",
+    "TUDIARYDAY": "diary_day", # 1 sunday, 2 monday, ... 7 saturday
+    "TUFNWGTP": "final_weight", # final statistical weight
+    "TEHRUSLT": "hours_worked_week",
+    "TUYEAR": "year",
+    "TU20FWGT": "stat_weight_2020", # 2020 weight
+
+
+TUCASEID
+GEMETSTA
+GTMETSTA
+PEEDUCA
+PEHSPNON
+PTDTRACE
+
 
 # TODO: figure out why line number is sometimes negative?
 
@@ -124,6 +156,7 @@ WHO_COL_DICT = {
 }
 
 
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -131,17 +164,17 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap_who = paths.load_snapshot("atus_who.zip")
     snap_act = paths.load_snapshot("atus_activities.zip")
-    snap_resp = paths.load_snapshot("atus_respondent.zip")
-    # snap_sum = paths.load_snapshot("atus_summary.zip")
+    #snap_resp = paths.load_snapshot("atus_respondent.zip")
+    snap_sum = paths.load_snapshot("atus_summary.zip")
     # snap_roster = paths.load_snapshot("atus_roster.zip")
     snap_act_codes = paths.load_snapshot("activity_codes_2023.xls")
 
     # load tables:
     who_data = load_data_and_add_meta(snap_who, "atuswho_0323.dat")
     act_data = load_data_and_add_meta(snap_act, "atusact_0323.dat")
-    resp_data = load_data_and_add_meta(snap_resp, "atusresp_0323.dat")
+    #resp_data = load_data_and_add_meta(snap_resp, "atusresp_0323.dat")
     act_codes = pr.read_excel(snap_act_codes.path, sheet_name="ATUS 2023 Lexicon", header=1)
-    # sum_data = load_data_and_add_meta(snap_sum, "atussum_0323.dat")
+    sum_data = load_data_and_add_meta(snap_sum, "atussum_0323.dat")
     # roster_data = load_data_and_add_meta(snap_roster, "atusrost_0323.dat")
 
     # format act codes:

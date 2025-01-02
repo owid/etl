@@ -16,7 +16,7 @@ meta:
     description_snapshot: |-
       The Activity file contains information about how ATUS respondents spent their diary day. It includes information such as activity codes, activity start and stop times, and locations for the ATUS 2003-2023.
 
-      For more information about this file, see the ATUS 2003-23 Interview Data Dictionary, available online at: https://www.bls.gov/tus/atusintcodebk0323.pdf.
+      For more information about this file, see the ATUS 2003-23 Interview Data Dictionary, available online at: https://www.bls.gov/tus/dictionaries/atusintcodebk0323.pdf 
 
     # Citation
     producer: U.S. Bureau of Labor Statistics
