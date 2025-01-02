@@ -23,15 +23,10 @@ def run(dest_dir: str) -> None:
     tb["date"] = pd.to_datetime(tb["date"])
     tb["year"] = tb["date"].dt.year
 
-    tb["week_of_year"] = ((tb["date"].dt.dayofyear - 1) // 7) + 1
-    # Adjust for weeks beyond 52
-    tb.loc[tb["week_of_year"] > 52, "year"] += 1
-    tb.loc[tb["week_of_year"] > 52, "week_of_year"] = 1
+    tb["week_of_year"] = tb["date"].dt.isocalendar().week
 
-    # Exclude weeks with NaNs
-    columns_to_exclude = ["year", "country", "week_of_year", "date"]  # Add any other columns to preserve
-    mask = tb.drop(columns=columns_to_exclude).notna().any(axis=1)
-    tb = tb[mask]
+    # Drop duplicates, keeping the latest entry
+    tb = tb.drop_duplicates(subset=["country", "year", "week_of_year"], keep="last")
 
     tb = tb.drop(columns=["date"], errors="raise")
 
