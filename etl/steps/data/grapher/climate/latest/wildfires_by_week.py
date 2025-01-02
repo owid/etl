@@ -24,9 +24,10 @@ def run(dest_dir: str) -> None:
     tb["year"] = tb["date"].dt.year
     tb["week_of_year"] = ((tb["date"].dt.dayofyear - 1) // 7) + 1
 
-    #
-    # Process data.
-    #
+    # Adjust for weeks beyond 52
+    tb.loc[tb["week_of_year"] > 52, "year"] += 1
+    tb.loc[tb["week_of_year"] > 52, "week_of_year"] = 1
+
     tb = tb.drop(columns=["date"], errors="raise")
 
     # Create an indicator for each year (week becomes the index)
