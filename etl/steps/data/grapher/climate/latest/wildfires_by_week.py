@@ -23,7 +23,6 @@ def run(dest_dir: str) -> None:
     tb["date"] = pd.to_datetime(tb["date"])
     tb["year"] = tb["date"].dt.year
 
-    # tb["week_of_year"] = ((tb["date"].dt.dayofyear - 1) // 7) + 1
     tb["week_of_year"] = tb["date"].dt.isocalendar().week
 
     tb = tb.drop(columns=["date"], errors="raise")
