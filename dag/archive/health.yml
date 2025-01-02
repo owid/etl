@@ -192,3 +192,17 @@ steps:
     - data://meadow/antibiotics/2024-10-18/who_glass
   data://grapher/antibiotics/2024-10-18/who_glass:
     - data://garden/antibiotics/2024-10-18/who_glass
+
+  # Soil-transmitted helminthiases
+  data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
+    - snapshot://neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases.xlsx
+
+    # Flu testing data
+  data://garden/who/2024-09-09/flu_test:
+    - data://meadow/who/latest/flunet
+  data://grapher/who/2024-09-09/flu_test:
+    - data://garden/who/2024-09-09/flu_test
+
+  #mpox data - Africa CDC
+  data://grapher/fasttrack/latest/africa_cdc:
+    - snapshot://fasttrack/latest/africa_cdc.csv

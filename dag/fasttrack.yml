@@ -214,8 +214,6 @@ steps:
     - snapshot://fasttrack/latest/nature_index_undp.csv
   data://grapher/fasttrack/latest/co2_intensity_undp:
     - snapshot://fasttrack/latest/co2_intensity_undp.csv
-  data://grapher/fasttrack/latest/africa_cdc:
-    - snapshot://fasttrack/latest/africa_cdc.csv
   data://grapher/fasttrack/latest/elephant_populations:
     - snapshot://fasttrack/latest/elephant_populations.csv
   data://grapher/fasttrack/latest/pivot_uk_public_spending:

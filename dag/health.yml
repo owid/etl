@@ -482,10 +482,6 @@ steps:
   data://grapher/neglected_tropical_diseases/2024-05-02/schistosomiasis:
     - data://garden/neglected_tropical_diseases/2024-05-02/schistosomiasis
 
-    # Soil-transmitted helminthiases
-  data://meadow/neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases:
-    - snapshot://neglected_tropical_diseases/2024-05-02/soil_transmitted_helminthiases.xlsx
-
   # Neglected Tropical Diseases Funding
   data://meadow/neglected_tropical_diseases/2024-05-18/funding:
     - snapshot://neglected_tropical_diseases/2024-05-18/funding.xlsx
@@ -745,12 +741,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/cancer/2024-09-06/gco_infections:
     - data://garden/cancer/2024-09-06/gco_infections
-
-  # Flu testing data
-  data://garden/who/2024-09-09/flu_test:
-    - data://meadow/who/latest/flunet
-  data://grapher/who/2024-09-09/flu_test:
-    - data://garden/who/2024-09-09/flu_test
 
   # Cancer diagnosis routes and survival rates
   data://meadow/cancer/2024-09-13/diagnosis_routes_by_route:
