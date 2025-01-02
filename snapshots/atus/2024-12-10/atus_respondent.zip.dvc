@@ -1,9 +1,5 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
-
-# You can download the data file manually at http://www.bls.gov/tus/datafiles/atuswho-0323.zip or https://www.bls.gov/tus/data/datafiles-0323.htm.
-# Trying an automatic download via script results in a 403 - forbidden error.
-
 meta:
   origin:
     # Data product / Snapshot
@@ -12,11 +8,11 @@ meta:
       The American Time Use Survey (ATUS) measures the amount of time people spend doing various activities, such as paid work, childcare, volunteering, and socializing. It provides nationally representative estimates of how, where, and with whom Americans spend their time, and is the only federal survey providing data on the full range of nonmarket activities, from childcare to volunteering.
     date_published: "2023"
     version_producer: 03-23
-    title_snapshot: American Time Use Survey - Activity file
+    title_snapshot: American Time Use Survey - Respondent file
     description_snapshot: |-
-      The Activity file contains information about how ATUS respondents spent their diary day. It includes information such as activity codes, activity start and stop times, and locations for the ATUS 2003-2023.
+      The Respondent file contains information about ATUS respondents, including their labor force status and earnings.
 
-      For more information about this file, see the ATUS 2003-23 Interview Data Dictionary, available online at: https://www.bls.gov/tus/atusintcodebk0323.pdf.
+      For more information about this file, see the ATUS 2003-23 Interview Data Dictionary, available online at:https://www.bls.gov/tus/atusintcodebk0323.pdf.
 
     # Citation
     producer: U.S. Bureau of Labor Statistics
@@ -28,13 +24,14 @@ meta:
     url_main: https://www.bls.gov/tus/data/datafiles-0323.htm
     #just for reference - snapshot is created from local file, since this link leads to 403 - forbidden error
     url_download: https://www.bls.gov/tus/datafiles/atusact-0323.zip
-    date_accessed: 2024-12-10
+    date_accessed: 2025-01-02
 
     # License
     license:
       name: Public Domain
       url: https://www.bls.gov/opub/copyright-information.htm
+
 outs:
-  - md5: 2d6a8158cc1f2f1a4c135235ff9e1f15
-    size: 82158871
-    path: atus_activities.zip
+  - md5: 6c42cbb74ba59183c695bd4a93f8d0df
+    size: 17370613
+    path: atus_respondent.zip

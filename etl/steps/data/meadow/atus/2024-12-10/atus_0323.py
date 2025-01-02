@@ -131,6 +131,7 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap_who = paths.load_snapshot("atus_who.zip")
     snap_act = paths.load_snapshot("atus_activities.zip")
+    snap_resp = paths.load_snapshot("atus_respondent.zip")
     # snap_sum = paths.load_snapshot("atus_summary.zip")
     # snap_roster = paths.load_snapshot("atus_roster.zip")
     snap_act_codes = paths.load_snapshot("activity_codes_2023.xls")
@@ -138,6 +139,7 @@ def run(dest_dir: str) -> None:
     # load tables:
     who_data = load_data_and_add_meta(snap_who, "atuswho_0323.dat")
     act_data = load_data_and_add_meta(snap_act, "atusact_0323.dat")
+    resp_data = load_data_and_add_meta(snap_resp, "atusresp_0323.dat")
     act_codes = pr.read_excel(snap_act_codes.path, sheet_name="ATUS 2023 Lexicon", header=1)
     # sum_data = load_data_and_add_meta(snap_sum, "atussum_0323.dat")
     # roster_data = load_data_and_add_meta(snap_roster, "atusrost_0323.dat")
@@ -153,20 +155,16 @@ def run(dest_dir: str) -> None:
 
     # add column for who was present with respondent
     # error arises from processing log implementation
-    try:
-        who_data["who_string"] = who_data["who_code"].map(WHO_CODES)
-        who_data["who_category"] = who_data["who_code"].map(WHO_CODE_CATEGORIES)
 
-    except AttributeError as e:
-        print("processing log is not fully implemented yet")
-        print(e)
+    who_data["who_string"] = who_data["who_code"].map(WHO_CODES)
+    who_data["who_category"] = who_data["who_code"].map(WHO_CODE_CATEGORIES)
 
     # Merge activity and who data:
     tb = act_data.merge(who_data, on=["case_id", "activity_number"], how="left")
 
     # aggregate by category:
     tb_agg = (
-        tb.groupby(["who_category", "case_id", "activity_number"]).agg("activity_duration_24", "first").reset_index()
+        tb.groupby(["who_category", "case_id", "activity_number"]).agg({"activity_duration_24": "first"}).reset_index()
     )
 
     #
@@ -188,6 +186,7 @@ def run(dest_dir: str) -> None:
 def load_data_and_add_meta(snap, file_name):
     zf = ZipFile(snap.path)
     tb = pr.read_csv(zf.open(file_name), origin=snap.metadata.origin)
+    print(tb.metadata)
 
     tb_meta = TableMeta(
         short_name=snap.metadata.short_name,
@@ -195,8 +194,8 @@ def load_data_and_add_meta(snap, file_name):
         description=snap.metadata.origin.description,
     )
     for col in tb.columns:
-        tb[col].metadata = tb_meta
+        # tb[col].metadata = tb_meta
         tb[col].metadata.origins = [snap.metadata.origin]
-    tb.metadata = tb_meta
+    # tb.metadata = tb_meta
 
     return tb

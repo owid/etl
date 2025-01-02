@@ -753,6 +753,7 @@ steps:
     - snapshot://atus/2024-12-10/atus_activities.zip
     - snapshot://atus/2024-12-10/atus_summary.zip
     - snapshot://atus/2024-12-10/activity_codes_2023.xls
+    - snapshot://atus/2024-12-10/atus_respondent.zip
 
 include:
   - dag/open_numbers.yml
