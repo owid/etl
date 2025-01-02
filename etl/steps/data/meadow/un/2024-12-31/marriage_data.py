@@ -1,0 +1,243 @@
+"""Load a snapshot and create a meadow dataset."""
+
+from owid.catalog import processing as pr
+
+from etl.helpers import PathFinder, create_dataset
+
+# Get paths and naming conventions for current step.
+paths = PathFinder(__file__)
+
+# List of age groups to keep
+AGE_GROUPS = [
+    "all",
+    "15-19",
+    "20-24",
+    "25-29",
+    "30-34",
+    "35-39",
+    "40-44",
+    "45-49",
+    "50-54" "55-59",
+    "60-64",
+    "65-69",
+    "70-74",
+    "75+",
+]
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Retrieve snapshot.
+    snap = paths.load_snapshot("marriage_data.xlsx")
+
+    # Load data from snapshot, starting from the row that contains the header "Country or Area"
+    sheet_names = ["MARITAL_STATUS_BY_AGE", "CURRENTLY MARRIED", "EVER_MARRIED", "SMAM"]
+    tables = [snap.read(sheet_name=sheet_name, skiprows=2) for sheet_name in sheet_names]
+
+    #
+    # Process data.
+    #
+    # List of columns to select if they exist
+    columns_to_select = [
+        "Country or area",
+        "YearEnd",
+        "Sex",
+        "AgeGroup",
+        "MaritalStatus",
+        "DataValue",
+        "DataCatalog ShortName",
+        "Data Source",
+        "Note on Data",
+        "DataProcess",
+    ]
+
+    processed_tbs = []
+    for sheet_name, tb in zip(sheet_names, tables):
+        # Select columns if they exist
+        existing_columns = [col for col in columns_to_select if col in tb.columns]
+        tb = tb[existing_columns]
+
+        # Rename columns
+        tb = tb.rename(
+            columns={
+                "Country or area": "country",
+                "AgeGroup": "age",
+                "YearEnd": "year",
+                "Sex": "sex",
+                "MaritalStatus": "marital_status",
+                "DataValue": sheet_name.lower(),
+                "DataCatalog ShortName": "datacatalog_shortname",
+                "Data Source": "data_source",
+                "Note on Data": "note_on_data",
+                "DataProcess": "data_process",
+            }
+        )
+        if sheet_name == "EVER_MARRIED":
+            tb = tb.rename(columns={"ever_married": "ever_married_total"})
+
+        if sheet_name == "SMAM":
+            # Remove rows with specific text in the note_on_data column
+            tb = tb[
+                ~tb["note_on_data"].str.contains(
+                    "Data presented do not sum up to 100 by more than 0.5 percentage points due to missing values.",
+                    na=False,
+                )
+            ]
+        tb = tb.drop(columns=["note_on_data"])
+
+        # Remove square brackets from the values in the AgeGroup column
+        if "age" in tb.columns:
+            tb["age"] = tb["age"].str.replace(r"\[|\]", "", regex=True)
+
+        # Add "all" to the AgeGroup column if it does not exist
+        if "age" not in tb.columns:
+            tb["age"] = "all"
+
+        tb = tb[tb["age"].isin(AGE_GROUPS)]
+
+        if "marital_status" in tb.columns:
+            tb = tb.pivot(
+                index=["country", "year", "age", "sex", "datacatalog_shortname", "data_source", "data_process"],
+                columns="marital_status",
+                values="marital_status_by_age",
+            ).reset_index()
+
+        processed_tbs.append(tb)
+
+    # Merge all processed Tables
+    tb_merged = processed_tbs[0]
+    for tb in processed_tbs[1:]:
+        tb_merged = pr.merge(
+            tb_merged,
+            tb,
+            on=["country", "year", "sex", "age", "datacatalog_shortname", "data_source", "data_process"],
+            how="outer",
+        )
+    # Find each combination of datacatalog_shortname and the available age ranges
+    # grouped = tb_merged.groupby("data_source")
+    # for data_source, group in grouped:
+    #     available_age_ranges = group["age"].unique()
+    #     print(f"Data Catalog Short Name: {data_source}, Available Age Ranges: {available_age_ranges}")
+
+    # Keep only rows where data_source is UNSD
+    # tb_merged = tb_merged[tb_merged["data_source"] == "UNSD"]
+
+    # Define rules for resolving 'data_source' duplicates
+    # # Define subset columns for duplicates
+    subset_columns = ["country", "year", "sex", "age"]
+
+    tb_merged["country"] = tb_merged["country"].str.replace("Lao People's Dem. Republic", "Laos")
+    tb_merged["country"] = tb_merged["country"].str.replace("Lao People’s Democratic Republic", "Laos")
+
+    # Define rules for resolving 'data_source' duplicates
+    data_source_rules = [
+        ({"DHS_STATcompiler", "DHS_HH"}, "DHS_STATcompiler"),
+        ({"MICS", "MICS_HH"}, "MICS"),
+        ({"DHS_STATcompiler", "UNSD"}, "UNSD"),
+        ({"National statistics", "MICS"}, "MICS"),
+        ({"UNSD", "US Census Bureau"}, "UNSD"),
+        ({"DHS_HH", "UNSD"}, "UNSD"),
+        ({"UNSD", "National statistics"}, "UNSD"),
+        ({"Eurostat", "UNSD"}, "UNSD"),
+        ({"IPUMS", "DHS_STATcompiler"}, "DHS_STATcompiler"),
+        ({"DHS_STATcompiler", "National statistics"}, "DHS_STATcompiler"),
+        ({"DHS_STATcompiler", "INED"}, "DHS_STATcompiler"),
+        ({"INED, MICS"}, "MICS"),
+        ({"DHS_STATcompiler", "MICS_HH"}, "DHS_STATcompiler"),
+        ({"INED", "MICS"}, "MICS"),
+        ({"DHS_HH", "National statistics"}, "DHS_HH"),
+        ({"MICS", "RHS"}, "MICS"),
+        ({"GGS", "UNSD"}, "UNSD"),
+    ]
+
+    # Define rules for resolving 'data_process' duplicates
+    datacatalog_shortname_rules = [
+        ({"2011 AIS", "2011 DHS"}, "2011 DHS"),
+        ({"2000 HS", "2004 DHS"}, "2004 DHS"),
+        ({"2012-2014 DHS", "2014 DHS"}, "2014 DHS"),
+        ({"2004 FHS", "2004 HLCS"}, "2004 FHS"),
+    ]
+
+    data_process_rules = [
+        ({"Census", "Estimate"}, "Census"),
+        ({"Census", "Survey"}, "Census"),
+        ({"Estimate", "Survey"}, "Survey"),
+        ({"Survey", "Dual record"}, "Survey"),
+    ]
+
+    # Process 'datacatalog_shortname' duplicates
+    tb_merged = resolve_duplicates(
+        tb_merged, subset_columns, datacatalog_shortname_rules, target_column="datacatalog_shortname"
+    )
+
+    # Process 'data_source' duplicates
+    tb_merged = resolve_duplicates(tb_merged, subset_columns, data_source_rules, target_column="data_source")
+
+    # Process 'data_process' duplicates
+    tb_merged = resolve_duplicates(tb_merged, subset_columns, data_process_rules, target_column="data_process")
+
+    duplicates = tb_merged[tb_merged.duplicated(subset=subset_columns, keep=False)]
+    if not duplicates.empty:
+        # Check if all duplicates are the same
+        unique_data = duplicates.groupby(["country", "year", "sex", "age"]).agg(
+            {"data_source": "unique", "datacatalog_shortname": "unique", "data_process": "unique"}
+        )
+        print(unique_data)
+
+    tables = [tb_merged.format(["country", "year", "age", "sex"])]
+
+    #
+    # Save outputs.
+    #
+    # Create a new meadow dataset with the same metadata as the snapshot.
+    ds_meadow = create_dataset(
+        dest_dir,
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=snap.metadata,
+    )
+
+    # Save changes in the new meadow dataset.
+    ds_meadow.save()
+
+
+def resolve_duplicates(tb, subset_columns, pairing_rules, target_column):
+    """
+    Resolve duplicates in a Table based on specified column rules.
+
+    Args:
+        tb: The table containing duplicates.
+        subset_columns (list): List of columns to check for duplicates.
+        pairing_rules (list): List of tuples with (set of conflicting values, preferred value).
+        target_column (str): Column to apply the rules to (e.g., 'data_source').
+
+    """
+    duplicates = tb[tb.duplicated(subset=subset_columns, keep=False)]
+
+    for conflicting_values, preferred_value in pairing_rules:
+        # Filter duplicates with the conflicting values
+        filtered_duplicates = duplicates[duplicates[target_column].isin(conflicting_values)]
+        duplicate_groups = (
+            filtered_duplicates.groupby(subset_columns)[target_column]
+            .unique()
+            .apply(lambda x: conflicting_values.issubset(x))
+        )
+
+        # Determine rows to drop
+        rows_to_drop = tb[
+            tb[target_column].isin(conflicting_values)
+            & tb.apply(
+                lambda row: (
+                    row[target_column] != preferred_value
+                    and tuple(row[col] for col in subset_columns) in duplicate_groups[duplicate_groups].index
+                ),
+                axis=1,
+            )
+        ].index
+
+        # Drop the identified rows
+        tb = tb.drop(rows_to_drop)
+
+    return tb

@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World Marriage Data
+    description: |-
+      The World Marriage Data 2019 provides a comparable and up-to-date set of data on the marital status of the population by age and sex for 232 countries or areas of the world.
+
+      The database contains data on four key indicators: the distribution of the population by marital status, the proportion currently married, the proportion ever married, and the singulate mean age at marriage (SMAM). For each of these indicators, data are presented starting from around 1950 to the most recent data available as of September 2019. Major sources of data on marital status presented in World Marriage Data 2019 are censuses, sample surveys and national estimates based on population register data or estimation methods using census data.
+    date_published: "2019"
+
+    # Citation
+    producer: United Nations
+    citation_full: |-
+      United Nations, Department of Economic and Social Affairs, Population Division (2019). World Marriage Data 2019 (POP/DB/Marr/Rev2019).
+    attribution_short: UN
+
+    # Files
+    url_main: https://www.un.org/development/desa/pd/data/world-marriage-data
+    url_download: https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2019_wmd_marital_status.xlsx
+    date_accessed: 2024-12-31
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2022_household_size_composition.pdf
+
+outs:
+  - md5: 1e9f0545c6f1d71d65ea85c08812e0fb
+    size: 26505433
+    path: marriage_data.xlsx
