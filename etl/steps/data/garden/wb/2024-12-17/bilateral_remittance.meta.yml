@@ -10,7 +10,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 4012 # no update expected
+  update_period_days: 0 # no update expected
 
 
 tables:
@@ -18,9 +18,17 @@ tables:
     variables:
       remittance_flows:
         title: Estimated bilateral remittance flows
-        description_short: The estimated bilateral remittance flows between countries. These estimates use migrant stocks, host country incomes, and origin country incomes.
+        description_short: |-
+          The estimated bilateral remittance outflows out of <<country_origin>>. These estimates use migrant stocks, host country incomes, and origin country incomes.
         description_key:
-          - Flows between India and Pakistan, Pakistan and India, Lebanon and Israel and vice versa, and Azerbaijan and Armenia and vice versa  are assumed to be zero given the political economy situations in these corridors.
+          - |-
+            <% if country_origin in ['India', 'Pakistan'] %>
+            Flows between India and Pakistan (and vice versa) are assumed to be zero given the political economy situations in these corridors.
+            <% elif country_origin in ['Lebanon', 'Israel'] %>
+            Flows between Lebanon and Israel (and vice versa) are assumed to be zero given the political economy situations in these corridors.
+            <% elif country_origin in ['Azerbaijan', 'Armenia'] %>
+            Flows between Azerbaijan and Armenia (and vice versa) are assumed to be zero given the political economy situations in these corridors.
+            <% endif %>
         description_from_producer: |-
           The caveats attached to this estimate are:
           (a) The migrant stock data is drawn from the Bilateral Migration Matrix, which is itself based on UN Population Division and National Census data. These are by nature updated infrequently and may not appropriately capture sudden changes in migrant stock;
