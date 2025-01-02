@@ -18,7 +18,7 @@ tables:
   marriage_data:
     variables:
 
-      divorced_or_separated:
+      divorced:
         title: Share of <<sex.lower()>> aged <<age.lower()>> who are divorced or separated
         unit: "%"
         short_unit: "%"
@@ -30,7 +30,7 @@ tables:
         short_unit: "%"
         description_short: Currently married men and women are those who are married and not divorced, widowed, or separated, with consensual or customary unions often counted as married for easier comparison.
 
-      ever_married:
+      ever_married_total:
         title: Share of <<sex.lower()>> aged <<age.lower()>> who have ever been married
         unit: "%"
         short_unit: "%"

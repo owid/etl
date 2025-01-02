@@ -8,7 +8,21 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # List of age groups to keep
-AGE_GROUPS = ["all", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50-54" "55-59", "60-64", "65+"]
+AGE_GROUPS = [
+    "all",
+    "15-19",
+    "20-24",
+    "25-29",
+    "30-34",
+    "35-39",
+    "40-44",
+    "45-49",
+    "50-54" "55-59",
+    "60-64",
+    "65-69",
+    "70-74",
+    "75+",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -152,10 +166,12 @@ def run(dest_dir: str) -> None:
         ({"Estimate", "Survey"}, "Survey"),
         ({"Survey", "Dual record"}, "Survey"),
     ]
+
     # Process 'datacatalog_shortname' duplicates
     tb_merged = resolve_duplicates(
         tb_merged, subset_columns, datacatalog_shortname_rules, target_column="datacatalog_shortname"
     )
+
     # Process 'data_source' duplicates
     tb_merged = resolve_duplicates(tb_merged, subset_columns, data_source_rules, target_column="data_source")
 
@@ -169,7 +185,6 @@ def run(dest_dir: str) -> None:
             {"data_source": "unique", "datacatalog_shortname": "unique", "data_process": "unique"}
         )
         print(unique_data)
-    tb_merged = tb_merged.drop(columns=["data_process", "datacatalog_shortname", "data_source"])
 
     tables = [tb_merged.format(["country", "year", "age", "sex"])]
 
