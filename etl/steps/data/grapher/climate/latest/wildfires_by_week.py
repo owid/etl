@@ -22,13 +22,13 @@ def run(dest_dir: str) -> None:
     #
     tb["date"] = pd.to_datetime(tb["date"])
     tb["year"] = tb["date"].dt.year
-    tb["week_of_year"] = ((tb["date"].dt.dayofyear - 1) // 7) + 1
 
-    # Adjust for weeks beyond 52
-    tb.loc[tb["week_of_year"] > 52, "year"] += 1
-    tb.loc[tb["week_of_year"] > 52, "week_of_year"] = 1
+    # tb["week_of_year"] = ((tb["date"].dt.dayofyear - 1) // 7) + 1
+    tb["week_of_year"] = tb["date"].dt.isocalendar().week
 
     tb = tb.drop(columns=["date"], errors="raise")
+    # Drop duplicates, keeping the latest entry
+    tb = tb.drop_duplicates(subset=["country", "year", "week_of_year"], keep="last")
 
     # Create an indicator for each year (week becomes the index)
     tb_pivot_area_cum = process_data(tb, "area_ha_cumulative", "Cumulative area burnt by wildfires in ")
