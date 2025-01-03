@@ -4,13 +4,6 @@ steps:
   ########################################################################
 
   # Population OMM #############################
-  # 2022-12-08: HYDE 3.2 + Gapminder + UN WPP 2022
-  data://garden/demography/2022-12-08/population:
-    - data://garden/hyde/2017/baseline
-    - data://garden/gapminder/2019-12-10/population
-    - data://garden/un/2022-07-11/un_wpp
-    - data://open_numbers/open_numbers/latest/gapminder__systema_globalis
-
   # 2023-03-31: HYDE 3.2 + Gapminder + UN WPP 2022
   data://garden/demography/2023-03-31/population:
     - data://garden/hyde/2017/baseline
@@ -39,6 +32,7 @@ steps:
   data://grapher/demography/2024-07-15/population:
     - data://garden/demography/2024-07-15/population
 
+  # WPP ########################################
   # WPP (2024)
   data://meadow/un/2024-07-12/un_wpp:
     # Main indicators
@@ -51,6 +45,7 @@ steps:
     - snapshot://un/2024-07-12/un_wpp_population_constant_fertility.csv
     # Fertility
     - snapshot://un/2024-07-12/un_wpp_fertility.csv
+    - snapshot://un/2024-07-12/un_wpp_fertility_single_age.csv
     # Deaths
     - snapshot://un/2024-07-12/un_wpp_deaths_estimates.csv
     - snapshot://un/2024-07-12/un_wpp_deaths_medium.csv
@@ -61,6 +56,16 @@ steps:
   data://grapher/un/2024-07-12/un_wpp_full:
     - data://garden/un/2024-07-12/un_wpp
 
+  # UN WPP (2022)
+  data://meadow/un/2022-07-11/un_wpp:
+    - snapshot://un/2022-07-11/un_wpp.zip
+  data://garden/un/2022-07-11/un_wpp:
+    - data://meadow/un/2022-07-11/un_wpp
+  data://grapher/un/2022-07-11/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp
+  data://explorers/un/2022/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp
+
   # WPP Historical comparison
   data://garden/demography/2024-07-12/un_wpp_historical:
     - snapshot://fasttrack/latest/un_wpp_historical.csv
@@ -69,15 +74,13 @@ steps:
   data://grapher/demography/2024-07-12/un_wpp_historical:
     - data://garden/demography/2024-07-12/un_wpp_historical
 
-  # Population (Fariss et al.)
-  data://meadow/demography/2023-12-20/population_fariss:
-    - snapshot://demography/2023-12-20/population_fariss.rds
-  data://garden/demography/2023-12-20/population_fariss:
-    - data://meadow/demography/2023-12-20/population_fariss
-    - data://garden/countries/2024-01-08/gleditsch_no_population
-  data://grapher/demography/2023-12-20/population_fariss:
-    - data://garden/demography/2023-12-20/population_fariss
+  # UN WPP largest age-group per country
+  data://garden/un/2024-03-14/un_wpp_most:
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/un/2024-03-14/un_wpp_most:
+    - data://garden/un/2024-03-14/un_wpp_most
 
+  # HYDE ########################################
   # HYDE 3.3
   data://meadow/hyde/2024-01-02/all_indicators:
     - snapshot://hyde/2024-01-02/all_indicators.zip
@@ -87,6 +90,25 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/hyde/2024-01-02/all_indicators:
     - data://garden/hyde/2024-01-02/all_indicators
+
+  # HYDE (2017)
+  data://meadow/hyde/2017/baseline:
+    - snapshot://hyde/2017/baseline.zip
+    - data://meadow/hyde/2017/general_files
+  data://meadow/hyde/2017/general_files:
+    - snapshot://hyde/2017/general_files.zip
+  data://garden/hyde/2017/baseline:
+    - data://meadow/hyde/2017/baseline
+
+  # others #######################################
+  # Population (Fariss et al.)
+  data://meadow/demography/2023-12-20/population_fariss:
+    - snapshot://demography/2023-12-20/population_fariss.rds
+  data://garden/demography/2023-12-20/population_fariss:
+    - data://meadow/demography/2023-12-20/population_fariss
+    - data://garden/countries/2024-01-08/gleditsch_no_population
+  data://grapher/demography/2023-12-20/population_fariss:
+    - data://garden/demography/2023-12-20/population_fariss
 
   ## Population doubling times
   data://garden/demography/2024-07-18/population_doubling_times:
@@ -109,12 +131,6 @@ steps:
     - snapshot://ggdc/2024-01-19/maddison_federico_paper.xlsx
   data://garden/ggdc/2024-01-19/maddison_federico_paper:
     - data://meadow/ggdc/2024-01-19/maddison_federico_paper
-
-  # UN WPP largest age-group per country
-  data://garden/un/2024-03-14/un_wpp_most:
-    - data://garden/un/2024-07-12/un_wpp
-  data://grapher/un/2024-03-14/un_wpp_most:
-    - data://garden/un/2024-03-14/un_wpp_most
 
   ########################################################################
   # Life expectancy                                                      #
@@ -145,6 +161,9 @@ steps:
     - snapshot://un/2024-12-02/un_wpp_lt_m.csv
     - snapshot://un/2024-12-02/un_wpp_lt_all.csv
     - snapshot://un/2024-12-02/un_wpp_lt_f.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_proj_m.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_proj_all.csv
+    - snapshot://un/2024-12-02/un_wpp_lt_proj_f.csv
   data://garden/un/2024-12-02/un_wpp_lt:
     - data://meadow/un/2024-12-02/un_wpp_lt
 
@@ -263,7 +282,7 @@ steps:
     - data://garden/hmd/2024-12-01/hmd
   data://grapher/hmd/2024-12-03/hmd_country:
     - data://garden/hmd/2024-12-03/hmd_country
-  
+
   # Patternal ages (Kai & Klüssner)
   data://meadow/demography/2024-12-05/paternal_ages:
     - snapshot://demography/2024-12-04/paternal_ages.rdata
@@ -271,11 +290,27 @@ steps:
     - data://meadow/demography/2024-12-05/paternal_ages
   data://grapher/demography/2024-12-05/paternal_ages:
     - data://garden/demography/2024-12-05/paternal_ages
-  
+
+  #
+  # Effective Fertility Rate (Malani & Jacob)
+  #
+  data://garden/demography/2024-12-17/efr_malani_jacob:
+    - data://garden/un/2024-12-02/un_wpp_lt
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/hmd/2024-12-01/hmd
+  data://grapher/demography/2024-12-17/efr_malani_jacob:
+    - data://garden/demography/2024-12-17/efr_malani_jacob
+
+  # Mean Age at childbirth (HFD + UN WPP)
+  data://garden/demography/2024-12-18/mean_age_childbearing:
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/hmd/2024-11-19/hfd
+  data://grapher/demography/2024-12-18/mean_age_childbearing:
+    - data://garden/demography/2024-12-18/mean_age_childbearing
+
   ########################################################################
   # OTHERS
   ########################################################################
-
   # Wittgenstein Centre (Projections)
   data://meadow/demography/2024-12-06/wittgenstein_human_capital_proj:
     - snapshot://demography/2024-12-06/wittgenstein_human_capital.zip

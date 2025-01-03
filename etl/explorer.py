@@ -17,7 +17,7 @@ from structlog import get_logger
 
 from etl import config
 from etl.files import download_file_from_server, run_command_on_server, upload_file_to_server
-from etl.grapher_io import get_variables_data
+from etl.grapher.io import get_variables_data
 from etl.paths import EXPLORERS_DIR
 
 # Initialize logger.

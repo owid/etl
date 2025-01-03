@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     pivot_tb = average_by_country.pivot(
         index=["country", "year"], columns="seriesdescription", values="value"
     ).reset_index()
-    pivot_tb = pivot_tb.underscore().set_index(["country", "year"], verify_integrity=True)
+    pivot_tb = pivot_tb.format(["country", "year"])
 
     pivot_tb.metadata = metadata
 

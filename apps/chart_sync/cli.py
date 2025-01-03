@@ -14,9 +14,9 @@ from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader, configs_are_equal
 from apps.wizard.utils import get_staging_creation_time
 from etl import config
-from etl import grapher_model as gm
 from etl.config import OWIDEnv, get_container_name
 from etl.datadiff import _dict_diff
+from etl.grapher import model as gm
 
 config.enable_bugsnag()
 

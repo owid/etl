@@ -19,7 +19,8 @@ dependencies = [
     "python-dotenv>=0.19.0",
     "regex>=2022.1.18",
     "wikipedia>=1.4.0",
-    "numpy>=1.22.1",
+    # sentence-transformers and torch don't yet support numpy 2
+    "numpy>=1.22.1, <2.0.0",
     "pydantic>=1.9.0",
     "structlog>=21.5.0",
     "rich>=12.1.0",
@@ -67,6 +68,7 @@ dependencies = [
     "geopy>=2.4.1",
     "py7zr>=0.22.0",
     "pyreadr>=0.5.2",
+    "cfgrib>=0.9.15.0",
 ]
 
 [tool.uv.sources]
@@ -83,8 +85,7 @@ dev-dependencies = [
     "pyyaml>=6.0.2",
     "argh>=0.31.3",
     "jupyter>=1.0.0",
-    # For some reason, ipython 8.18.0 was not working (it seems to be incompatible with prompt_toolkit).
-    "ipython>=8.14.0, <8.15.0",
+    "ipython>=8.14.0",
     "matplotlib>=3.9.1.post1",
     "plotly>=5.23.0",
     "cookiecutter>=2.6.0",

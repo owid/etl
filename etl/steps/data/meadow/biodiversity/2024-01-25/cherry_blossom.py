@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     tb = clean_data(tb)
     tb = pr.concat([tb, tb_recent], ignore_index=True)
     tb = convert_date(tb)
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"])
     #
     # Save outputs.
     #

@@ -89,7 +89,7 @@ def run(dest_dir: str) -> None:
     tb_proj_hyde_un = pr.concat([future_proj_combine_with_hyde, tb_hyde], ignore_index=True)
 
     tb_final = pr.merge(tb_proj_hyde_un, tb_merged, on=["year", "country"], how="outer")
-    tb_final = tb_final.set_index(["country", "year"], verify_integrity=True)
+    tb_final = tb_final.format(["country", "year"])
 
     #
     # Save outputs.

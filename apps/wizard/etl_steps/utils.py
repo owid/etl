@@ -2,7 +2,18 @@ import os
 
 import streamlit as st
 
+from apps.wizard.utils import WIZARD_DIR
+from etl.helpers import read_json_schema
+from etl.paths import DAG_DIR, SCHEMAS_DIR
 from etl.steps import load_dag
+
+# Step icons
+STEP_ICONS = {
+    "meadow": ":material/nature:",
+    "garden": ":material/deceased:",
+    "grapher": ":material/database:",
+}
+STEP_NAME_PRESENT = {k: f"{v} {k.capitalize()}" for k, v in STEP_ICONS.items()}
 
 
 @st.cache_data
@@ -152,3 +163,27 @@ def remove_playground_notebook(dataset_dir, notebook_name: str = "playground.ipy
     notebook_path = dataset_dir / notebook_name
     if notebook_path.is_file():
         os.remove(notebook_path)
+
+
+# Paths to cookiecutter files
+COOKIE_SNAPSHOT = WIZARD_DIR / "etl_steps" / "cookiecutter" / "snapshot"
+COOKIE_STEPS = {
+    "snapshot": COOKIE_SNAPSHOT,
+    "meadow": WIZARD_DIR / "etl_steps" / "cookiecutter" / "meadow",
+    "garden": WIZARD_DIR / "etl_steps" / "cookiecutter" / "garden",
+    "grapher": WIZARD_DIR / "etl_steps" / "cookiecutter" / "grapher",
+}
+# Paths to markdown templates
+MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"
+
+
+# DAG dropdown options
+dag_files = sorted([f for f in os.listdir(DAG_DIR) if f.endswith(".yml")])
+dag_not_add_option = "(do not add to DAG)"
+ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
+
+
+# Read schema
+SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
+# Get properties for origin in schema
+SCHEMA_ORIGIN = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]

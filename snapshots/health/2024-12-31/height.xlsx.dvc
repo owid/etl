@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Height
+    description: |-
+      This variable contains anthropometric information which can be used as an indicator for human health and welfare in 165 countries spanning the period 1810-1989, and a smaller number of countries 1500-1800.
+    date_published: "2014-03-27"
+    # Citation
+    producer: Baten and Blum
+    citation_full: |-
+      “Why are you tall while others are short? Agricultural production and other proximate determinants of global heights”, Joerg Baten and Matthias Blum, European Review of Economic History, Volume 18, Issue 2, May 2014, Pages 144–165, https://doi.org/10.1093/ereh/heu003
+
+      More details: https://clio-infra.eu/Indicators/Height.html
+
+    # Files
+    url_main: https://clio-infra.eu/Indicators/Height.html
+    url_download: https://clio-infra.eu/data/Height_Broad.xlsx
+    date_accessed: 2024-12-31
+
+    # License
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 304496b0c93fcb340f100f0b2ef9d3b8
+    size: 277962
+    path: height.xlsx

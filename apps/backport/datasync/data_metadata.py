@@ -229,7 +229,7 @@ def _move_population_origin_to_end(origins: List[Dict[str, Any]]) -> List[Dict[s
 def variable_metadata(session: Session, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
     """Fetch metadata for a single variable from database. This function was initially based on the
     one from owid-grapher repository and uses raw SQL commands. It'd be interesting to rewrite it
-    using SQLAlchemy ORM in grapher_model.py.
+    using SQLAlchemy ORM in grapher.model.py.
     """
     return _variable_metadata(
         db_variable_row=_load_variable(session, variable_id),

@@ -3,18 +3,18 @@
 import os
 import subprocess
 import traceback
-from datetime import datetime as dt
 from pathlib import Path
 from typing import Any, Dict, List, Optional, cast
 
 import streamlit as st
-from typing_extensions import Self
 
 from apps.utils.files import generate_step
 from apps.wizard import utils
+from apps.wizard.etl_steps.forms import SnapshotForm
+from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT, MD_SNAPSHOT, SCHEMA_ORIGIN
+from apps.wizard.utils.components import preview_file, st_horizontal, st_wizard_page_link
 from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
-from etl.helpers import read_json_schema
-from etl.paths import BASE_DIR, SCHEMAS_DIR, SNAPSHOTS_DIR
+from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -23,10 +23,6 @@ st.set_page_config(
     page_title="Wizard: Snapshot",
     page_icon="🪄",
 )
-# Read schema
-SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
-# Get properties for origin in schema
-schema_origin = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]
 # Lists with fields of special types. By default, fields are text inputs.
 FIELD_TYPES_TEXTAREA = [
     "origin.description_snapshot",
@@ -70,158 +66,21 @@ if "snapshot_file" not in st.session_state:
 #########################################################
 # FUNCTIONS & CLASSES ###################################
 #########################################################
-class SnapshotForm(utils.StepForm):
-    """Interface for snapshot form."""
-
-    step_name: str = "snapshot"
-
-    # config
-    namespace: str
-    snapshot_version: str
-    short_name: str
-    file_extension: str
-    is_private: bool
-    dataset_manual_import: bool
-
-    # origin
-    title: str
-    description: str
-    title_snapshot: str
-    description_snapshot: str
-    origin_version: str
-    date_published: str
-    producer: str
-    citation_full: str
-    attribution: Optional[str]
-    attribution_short: str
-    url_main: str
-    url_download: str
-    date_accessed: str
-
-    # license
-    license_url: str
-    license_name: str
-
-    def __init__(self: Self, **data: str | int) -> None:  # type: ignore[reportInvalidTypeVarUse]
-        """Construct form."""
-        # Change name for certain fields (and remove old ones)
-        data["license_url"] = data["origin.license.url"]
-        data["origin_version"] = data["origin.version_producer"]
-        data["dataset_manual_import"] = data["local_import"]
-
-        # Handle custom namespace
-        if "namespace_custom" in data:
-            data["namespace"] = str(data["namespace_custom"])
-
-        # Handle custom license
-        if "origin.license.name_custom" in data:
-            data["license_name"] = data["origin.license.name_custom"]
-        else:
-            data["license_name"] = data["origin.license.name"]
-
-        # Remove unused fields
-        data = {k: v for k, v in data.items() if k not in ["origin.license.url", "origin.license.name"]}
-        # Remove 'origin.' prefix from keys
-        data = {k.replace("origin.", ""): v for k, v in data.items()}
-
-        # Init object (includes schema validation)
-        super().__init__(**data)
-
-        # Handle custom attribution
-        if not self.errors:
-            if "attribution_custom" in data:
-                self.attribution = str(data["attribution_custom"])
-            else:
-                self.attribution = self.parse_attribution(data)
-
-    def parse_attribution(self: Self, data: Dict[str, str | int]) -> str | None:
-        """Parse the field attribution.
-
-        By default, the field attribution contains the format of the attribution, not the actual attribution. This function
-        renders the actual attribution.
-        """
-        attribution_template = cast(str, data["attribution"])
-        if attribution_template == "{producer} ({year})":
-            return None
-        data_extra = {
-            "year": dt.strptime(str(data["date_published"]), "%Y-%m-%d").year,
-            # "version_producer": data["origin_version"],
-        }
-        attribution = attribution_template.format(**data, **data_extra).replace("  ", " ")
-        return attribution
-
-    def validate(self: "SnapshotForm") -> None:
-        """Check that fields in form are valid.
-
-        - Add error message for each field (to be displayed in the form).
-        - Return True if all fields are valid, False otherwise.
-        """
-        # 1) Validate using schema
-        # This only applies to SnapshotMeta fields
-        self.validate_schema(SNAPSHOT_SCHEMA, ["meta"])
-
-        # 2) Check other fields (non meta)
-        fields_required = ["namespace", "snapshot_version", "short_name", "file_extension"]
-        fields_snake = ["namespace", "short_name"]
-        fields_version = ["snapshot_version"]
-
-        self.check_required(fields_required)
-        self.check_snake(fields_snake)
-        self.check_is_version(fields_version)
-
-        # License
-        if self.license_name == "":
-            self.errors["origin.license.name_custom"] = "Please introduce the name of the custom license!"
-
-        # Attribution
-        if self.attribution == "":
-            self.errors["origin.attribution_custom"] = "Please introduce the name of the custom attribute!"
-
-    @property
-    def metadata(self: Self) -> Dict[str, Any]:  # type: ignore[reportIncompatibleMethodOverride]
-        """Define metadata for easy YAML-export."""
-        license_field = {
-            "name": self.license_name,
-            "url": self.license_url,
-        }
-        meta = {
-            "meta": {
-                "origin": {
-                    "title": self.title,
-                    "description": self.description.replace("\n", "\n      "),
-                    "title_snapshot": self.title_snapshot,
-                    "description_snapshot": self.description_snapshot.replace("\n", "\n      "),
-                    "producer": self.producer,
-                    "citation_full": self.citation_full,
-                    "attribution": self.attribution,
-                    "attribution_short": self.attribution_short,
-                    "version_producer": self.origin_version,
-                    "url_main": self.url_main,
-                    "url_download": self.url_download,
-                    "date_published": self.date_published,
-                    "date_accessed": self.date_accessed,
-                    "license": license_field,
-                },
-                "is_public": not self.is_private,
-            }
-        }
-        meta = cast(Dict[str, Any], utils.clean_empty_dict(meta))
-        return meta
 
 
 def _color_req_level(req_level: str) -> str:
+    colored_level = req_level
     if req_level == "required":
-        return f"**:red[{req_level}]**"
+        return f":red[{colored_level}]"
     elif "required" in req_level:
-        color = "red"
+        colored_level = colored_level.replace("required", ":red[required]")
     elif "recommended" in req_level:
-        color = "orange"
+        colored_level = colored_level.replace("recommended", ":blue[recommended]")
     elif "optional" in req_level:
-        return req_level
+        colored_level = "optional"
     else:
         raise ValueError(f"Unknown requirement level: {req_level}")
-    req_level = f":{color}[{req_level}]"
-    return req_level
+    return colored_level
 
 
 def create_display_name_init_section(name: str) -> str:
@@ -229,7 +88,7 @@ def create_display_name_init_section(name: str) -> str:
     # Get requirement level colored
     req_level = _color_req_level("required")
     # Create display name
-    display_name = f"{name} ┃ {req_level}"
+    display_name = f"**{name}** {req_level}"
     return display_name
 
 
@@ -242,14 +101,16 @@ def create_display_name_snap_section(
     # Create display name
     if not title:
         title = props["title"]
-    display_name = f"`{property_name}.{name}` ┃ {title} ┃ {req_level}"
+    # display_name = f"`{property_name}.{name}` ┃ {title} ┃ {req_level}"
+    # display_name = f"{property_name}.{name}, {req_level}"
+    display_name = f"**{property_name}.{name}** {req_level}".replace(".", "/")
     return display_name
 
 
 @st.cache_data
 def load_instructions() -> str:
     """Load snapshot step instruction text."""
-    with open(file=utils.MD_SNAPSHOT, mode="r") as f:
+    with open(file=MD_SNAPSHOT, mode="r") as f:
         return f.read()
 
 
@@ -290,47 +151,59 @@ def render_fields_init() -> List[str]:
     """Render fields to create directories and all."""
     form = []
 
-    # Text inputs
-    fields = [
-        {
-            "title": "Namespace",
-            "description": "## Description\n\nInstitution or topic name",
-            "placeholder": "'emdat', 'health'",
-        },
-        {
-            "title": "Snapshot version",
-            "description": "## Description\n\nVersion of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
-            "placeholder": f"'{utils.DATE_TODAY}'",
-            "value": utils.DATE_TODAY,
-        },
-        {
-            "title": "Short name",
-            "description": "## Description\n\nDataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
-            "placeholder": "'cherry_blossom'",
-        },
-        {
-            "title": "File extension",
-            "description": "## Description\n\nFile extension (without the '.') of the file to be downloaded.",
-            "placeholder": "'csv', 'xls', 'zip'",
-        },
-    ]
-    for field in fields:
-        key = field["title"].replace(" ", "_").lower()
-        if key == "namespace":
-            field = ["namespace", st.empty(), st.container()]
-        else:
-            args = {
-                "st_widget": st.text_input,
-                "label": create_display_name_init_section(field["title"]),
-                "help": field["description"],
-                "placeholder": f"Example: {field['placeholder']}",
-                "key": key,
-                "default_last": field.get("value", ""),
-            }
-            if APP_STATE.args.dummy_data:
-                args["value"] = dummy_values[key]
+    col1, col2, col3 = st.columns([2, 2, 1], vertical_alignment="bottom")
 
-            field = APP_STATE.st_widget(**args)
+    # namespace
+    with col1:
+        field = ["namespace", st.empty(), st.container()]
+        form.append(field)
+    # short name
+    with col2:
+        key = "short_name"
+        args = {
+            "st_widget": st.text_input,
+            "label": create_display_name_init_section("short name"),
+            "help": "## Description\n\nDataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
+            "placeholder": "Example: 'cherry_blossom'",
+            "key": key,
+            "default_last": "",
+        }
+        if APP_STATE.args.dummy_data:
+            args["value"] = dummy_values[key]
+
+        field = APP_STATE.st_widget(**args)
+        form.append(field)
+    # snapshot version
+    with col3:
+        key = "snapshot_version"
+        args = {
+            "st_widget": st.text_input,
+            "label": create_display_name_init_section("version"),
+            "help": "## Description\n\nVersion of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
+            "placeholder": f"Example: '{utils.DATE_TODAY}'",
+            "key": key,
+            "default_last": utils.DATE_TODAY,
+        }
+        if APP_STATE.args.dummy_data:
+            args["value"] = dummy_values[key]
+
+        field = APP_STATE.st_widget(**args)
+        form.append(field)
+
+    with st_horizontal(vertical_alignment="flex-end"):
+        key = "file_extension"
+        args = {
+            "st_widget": st.text_input,
+            "label": create_display_name_init_section("file extension"),
+            "help": "## Description\n\nFile extension (without the '.') of the file to be downloaded.",
+            "placeholder": "'csv', 'xls', 'zip'",
+            "key": key,
+            "default_last": "",
+        }
+        if APP_STATE.args.dummy_data:
+            args["value"] = dummy_values[key]
+
+        field = APP_STATE.st_widget(**args)
         form.append(field)
 
     # Private dataset?
@@ -440,9 +313,9 @@ def render_fields_from_schema(
                         field = APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
                 elif container:
                     with container:
-                        field = APP_STATE.st_widget(st.text_input, **kwargs)
+                        field = APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
                 else:
-                    field = APP_STATE.st_widget(st.text_input, **kwargs)
+                    field = APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
             # Add field to list
             form_fields.append(cast(str, field))
     return form_fields
@@ -466,7 +339,7 @@ def render_license_field(form: List[Any]) -> List[str]:
     property_name = "origin.license"
     name = "name"
     prop_uri = f"{property_name}.{name}"
-    props_license = schema_origin["license"]
+    props_license = SCHEMA_ORIGIN["license"]
     props = props_license["properties"][name]
     display_name = create_display_name_snap_section(props, name, property_name)
 
@@ -548,7 +421,7 @@ def render_attribution_field(form: List[Any]) -> List[str]:
     parent = "origin"
     name = "attribution"
     prop_uri = f"{parent}.{name}"
-    props = schema_origin[name]
+    props = SCHEMA_ORIGIN[name]
     display_name = create_display_name_snap_section(props, name, parent, title="Attribution format")
 
     # Main decription
@@ -712,8 +585,6 @@ st.title(":material/photo_camera: Snapshot **:gray[Create step]**")
 
 # SIDEBAR
 with st.sidebar:
-    # utils.warning_metadata_unstable()
-
     # INSTRUCTIONS
     with st.expander("**Instructions**", expanded=True):
         text = load_instructions()
@@ -735,17 +606,17 @@ if st.session_state["show_form"]:
         #     "Fill the following fields to help us fill all the created files for you! Note that sometimes some fields might not be available (even if they are labelled as required)."
         # )
         # Get categories
-        for k, v in schema_origin.items():
+        for k, v in SCHEMA_ORIGIN.items():
             if "category" not in v:
                 print(k)
                 print(v)
                 # raise ValueError(f"Category not found for {k}")
-        categories_in_schema = {v["category"] for k, v in schema_origin.items()}
+        categories_in_schema = {v["category"] for k, v in SCHEMA_ORIGIN.items()}
         assert categories_in_schema == set(
             ACCEPTED_CATEGORIES
         ), f"Unknown categories in schema: {categories_in_schema - set(ACCEPTED_CATEGORIES)}"
 
-        form_metadata = render_fields_from_schema(schema_origin, "origin", [], categories=ACCEPTED_CATEGORIES)
+        form_metadata = render_fields_from_schema(SCHEMA_ORIGIN, "origin", [], categories=ACCEPTED_CATEGORIES)
 
         # 3) Submit
         submitted = st.form_submit_button("Submit", type="primary", use_container_width=True, on_click=update_state)
@@ -767,14 +638,14 @@ else:
 #########################################################
 if submitted:
     # Create form
-    form = cast(SnapshotForm, SnapshotForm.from_state())
+    form = SnapshotForm.from_state()
 
     if not form.errors:
         form_widget.empty()
 
         # Create files
         generate_step(
-            cookiecutter_path=utils.COOKIE_SNAPSHOT,
+            cookiecutter_path=COOKIE_SNAPSHOT,
             data=dict(**form.model_dump(), channel="snapshots"),
             target_dir=SNAPSHOTS_DIR,
         )
@@ -785,8 +656,8 @@ if submitted:
 
         # Preview generated
         st.subheader("Generated files")
-        utils.preview_file(ingest_path, "python")
-        utils.preview_file(meta_path, "yaml")
+        preview_file(ingest_path, "python")
+        preview_file(meta_path, "yaml")
 
         # Display next steps
         if form.dataset_manual_import:
@@ -816,9 +687,9 @@ if submitted:
             )
 
             st.markdown("#### 3. Proceed to next step")
-            utils.st_page_link("data", use_container_width=True, border=True)
+            st_wizard_page_link("data", use_container_width=True, border=True)
             # st.markdown("Or use **Express** mode to create a Meadow, Garden and Grapher steps at once.")
-            # utils.st_page_link("express", use_container_width=True, border=True)
+            # st_wizard_page_link("express", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")

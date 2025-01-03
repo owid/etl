@@ -12,7 +12,8 @@ def run(dest_dir: str) -> None:
     tb = snap.read_csv()
 
     # add table, update metadata from *.meta.yml and save
-    ds = create_dataset(dest_dir, tables=[tb.set_index(["country", "year"])], default_metadata=snap.metadata)
+    tb = tb.format(["country", "year"])
+    ds = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
     # override metadata if necessary
     meta_path = get_metadata_path(dest_dir).with_suffix(".override.yml")

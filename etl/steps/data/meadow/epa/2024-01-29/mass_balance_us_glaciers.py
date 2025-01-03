@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["Year"], verify_integrity=True).sort_index()
+    tb = tb.format(["year"])
 
     #
     # Save outputs.

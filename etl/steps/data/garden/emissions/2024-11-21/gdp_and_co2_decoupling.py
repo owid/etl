@@ -100,7 +100,7 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna(how="any").reset_index(drop=True)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country"], verify_integrity=True).sort_index()
+    tb = tb.format(["country"])
 
     #
     # Save outputs.

@@ -11,8 +11,8 @@ from apps.backport.datasync.data_metadata import (
     variable_metadata,
 )
 from etl.db import get_engine
-from etl.grapher_io import variable_data_df_from_s3
-from etl.grapher_model import _infer_variable_type
+from etl.grapher.io import variable_data_df_from_s3
+from etl.grapher.model import _infer_variable_type
 
 
 def _call_variable_metadata(variable_id: int, variable_df: pd.DataFrame, variable_meta: dict) -> dict:
@@ -206,7 +206,7 @@ def test_variable_data_df_from_s3():
     )
     s3_data = pd.DataFrame({"entities": [1, 1], "values": ["a", 2], "years": [2000, 2001]})
 
-    with mock.patch("etl.grapher_io._fetch_entities", return_value=entities):
+    with mock.patch("etl.grapher.io._fetch_entities", return_value=entities):
         with mock.patch("pandas.read_json", return_value=s3_data):
             df = variable_data_df_from_s3(engine, [123])
 

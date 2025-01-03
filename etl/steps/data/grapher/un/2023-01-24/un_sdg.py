@@ -11,7 +11,7 @@ from owid.catalog import Dataset, Source, Table, VariableMeta
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
-from etl import grapher_helpers as gh
+from etl.grapher import helpers as gh
 from etl.helpers import PathFinder
 
 log = getLogger()

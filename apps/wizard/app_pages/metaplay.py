@@ -9,7 +9,7 @@ from pathlib import Path
 import streamlit as st
 from streamlit_ace import st_ace
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from etl import config, paths
 from etl.command import main as etl_main
 from etl.db import get_session
