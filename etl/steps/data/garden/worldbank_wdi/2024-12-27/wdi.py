@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb_meadow = ds_meadow["wdi"].reset_index()
+    tb_meadow = ds_meadow.read("wdi", safe_types=False)
 
     tb = geo.harmonize_countries(
         df=tb_meadow,
