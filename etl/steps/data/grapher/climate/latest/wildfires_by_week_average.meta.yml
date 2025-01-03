@@ -74,34 +74,6 @@ tables:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
 
-        _2024_area_ha_cumulative:
-          title: Monthly cumulative area burnt by wildfires in 2024
-          unit: *unit_wildfires
-          short_unit: *short_unit_wildfires
-          description_short: *description_short_wildires_cumulative
-          description_key: *desc_wildfires
-
-        _2024_co2_cumulative:
-          title: Monthly cumulative carbon dioxide emissions from wildfires in 2024
-          unit: *unit_emissions
-          short_unit: *short_unit_emissions
-          description_short: *description_short_co2_cumulative
-          description_key: *description_key_co2
-
-        _2024_pm2_5_cumulative:
-          title: Monthly cumulative PM2.5 emissions from wildfires in 2024
-          unit: *unit_emissions
-          short_unit: *short_unit_emissions
-          description_short: *description_short_pm2_5_cumulative
-          description_key: *description_ke_pm2_5
-
-        _2024_share_cumulative_area:
-          title: Monthly cumulative share of the total land area burnt by wildfires in 2024
-          unit: *unit_share
-          short_unit: *short_unit_share
-          description_short: *description_short_share_wildfires_cumulative
-          description_processing: *description_processing_share
-
         avg_area_ha_cumulative_until_2024:
           title: Average cumulative area burnt by wildfires between 2012 and 2023
           unit: *unit_wildfires
