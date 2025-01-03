@@ -64,14 +64,27 @@ def get_datasets() -> Dict[int, Dict[str, Any]]:
     NOTE: Only datasets with a catalogPath are considered (i.e. ETL-era).
     """
     df = Dataset.load_all_datasets()
-    df = df.dropna(subset="catalogPath")
+    # df = df.dropna(subset="catalogPath")
 
     # Set display name
-    df["display_name"] = df["name"] + " --- " + df["catalogPath"] + " [" + df["version"] + "]"
+    # If dataset is in ETL: "name --- catalogPath [version]"
+    # If dataset is pre-ETL: "name --- pre-ETL [date added]"
+    df["display_name"] = (
+        df["name"]
+        + " --- "
+        + df["catalogPath"].fillna("pre-ETL")
+        + " ["
+        + df["version"].fillna("created " + pd.to_datetime(df["createdAt"]).dt.strftime("%Y-%m-%d"))
+        + "]"
+    )
     df = df.set_index("id", verify_integrity=True).sort_index(ascending=False)
 
     # Build dictionary
     dix = df.to_dict(orient="index")
+
+    # Debug
+    # st.dataframe(df)
+
     return dix  # type: ignore
 
 
@@ -197,10 +210,11 @@ def show_table_explorers(df):
 # CLASSES
 #
 class IndicatorArray:
-    def __init__(self, indicators, key):
+    def __init__(self, indicators, key, is_etl):
         self.indicators = indicators
         self.key = key
         self.dimensions = None
+        self.is_etl = is_etl
 
     @property
     def is_mdim(self):
@@ -212,7 +226,10 @@ class IndicatorSingleDimension(IndicatorArray):
 
     def __init__(self, indicator):
         """Object with a single indicator."""
-        super().__init__([indicator], indicator.catalogPath)
+        if isinstance(indicator.catalogPath, str):
+            super().__init__([indicator], indicator.catalogPath, is_etl=True)
+        else:
+            super().__init__([indicator], str(indicator.id), is_etl=False)
 
     def get_dimension(self):
         return self.indicators[0]
@@ -229,7 +246,7 @@ class IndicatorWithDimensions(IndicatorArray):
 
         indicators: List of Variable objects. They should all belong to the same indicator.
         """
-        super().__init__(indicators, self.check_and_extract_key(indicators))
+        super().__init__(indicators, self.check_and_extract_key(indicators), is_etl=True)
         self.df = self.create_df()
         self.df_dims = self.df.reset_index()[self.df.index.names].drop_duplicates()
         self.dimensions = self.get_dimensions()
