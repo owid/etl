@@ -44,14 +44,6 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/un/2024-07-12/un_wpp
 
-  # Homicide - UNODC - to archive
-  data://meadow/homicide/2023-07-04/unodc:
-    - snapshot://homicide/2023-07-04/unodc.xlsx
-  data://garden/homicide/2023-07-04/unodc:
-    - data://meadow/homicide/2023-07-04/unodc
-  data://grapher/homicide/2023-07-04/unodc:
-    - data://garden/homicide/2023-07-04/unodc
-
   # Homicide - UNODC - update
   data://meadow/homicide/2024-10-30/unodc:
     - snapshot://homicide/2024-10-30/unodc.xlsx
@@ -452,7 +444,6 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/missing_data/2024-03-26/children_out_of_school:
     - data://garden/missing_data/2024-03-26/children_out_of_school
-
 
   # Missing Data - Suicides
   data://garden/missing_data/2024-03-26/who_md_suicides:

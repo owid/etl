@@ -68,8 +68,6 @@ steps:
     - snapshot://fasttrack/2023-06-28/guinea_worm.csv
   data-private://grapher/fasttrack/latest/fiscal_top1_shares_country_standardized:
     - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
-  data://grapher/fasttrack/2023-04-30/paratz:
-    - snapshot://fasttrack/2023-04-30/paratz.csv
   data-private://grapher/fasttrack/latest/pain_hours_hen_systems:
     - snapshot-private://fasttrack/latest/pain_hours_hen_systems.csv
   data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
@@ -80,8 +78,6 @@ steps:
     - snapshot-private://fasttrack/latest/historical_france_mortality_cause.csv
   data-private://grapher/fasttrack/latest/welfare_broiler_chickens:
     - snapshot-private://fasttrack/latest/welfare_broiler_chickens.csv
-  data-private://grapher/fasttrack/2023-08-14/gbif_animal_presence:
-    - snapshot-private://fasttrack/2023-08-14/gbif_animal_presence.csv
   data://grapher/fasttrack/2023-08-21/survey_livestock_oklahoma:
     - snapshot://fasttrack/2023-08-21/survey_livestock_oklahoma.csv
   data://grapher/fasttrack/latest/sentience_institute:

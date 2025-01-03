@@ -3,3 +3,7 @@ steps:
     - snapshot://fasttrack/latest/democracy_lexical_index.csv
   data://grapher/fasttrack/latest/mineral_prices_usgs:
     - snapshot://fasttrack/latest/mineral_prices_usgs.csv
+  data://grapher/fasttrack/2023-04-30/paratz:
+    - snapshot://fasttrack/2023-04-30/paratz.csv
+  data-private://grapher/fasttrack/2023-08-14/gbif_animal_presence:
+    - snapshot-private://fasttrack/2023-08-14/gbif_animal_presence.csv
