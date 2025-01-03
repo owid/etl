@@ -203,10 +203,6 @@ steps:
   data://grapher/who/2024-09-09/flu_test:
     - data://garden/who/2024-09-09/flu_test
 
-  #mpox data - Africa CDC
-  data://grapher/fasttrack/latest/africa_cdc:
-    - snapshot://fasttrack/latest/africa_cdc.csv
-
   # Tuberculosis notifications - WHO
   data://meadow/tuberculosis/2023-12-11/notifications:
     - snapshot://tuberculosis/2023-12-11/notifications.csv
