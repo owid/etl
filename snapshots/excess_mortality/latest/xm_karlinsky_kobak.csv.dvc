@@ -21,3 +21,7 @@ meta:
     name: GPL-3.0
     url: https://github.com/dkobak/excess-mortality/blob/main/LICENSE
   access_notes: Contains data by age.
+outs:
+  - md5: 4f3aceb8263897e9a0aa899eb83a1982
+    size: 381804
+    path: xm_karlinsky_kobak.csv
