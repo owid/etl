@@ -22,11 +22,9 @@ def run(dest_dir: str) -> None:
     #
     tb["date"] = pd.to_datetime(tb["date"])
     tb["year"] = tb["date"].dt.year
-
-    tb["week_of_year"] = tb["date"].dt.isocalendar().week
-
-    # Drop duplicates, keeping the latest entry
-    tb = tb.drop_duplicates(subset=["country", "year", "week_of_year"], keep="last")
+    # Sort by date and get week numbers
+    tb = tb.sort_values("date")
+    tb["week_of_year"] = (tb.groupby("year").date.transform(lambda x: pd.qcut(x, 52, labels=range(1, 53)))).astype(int)
 
     tb = tb.drop(columns=["date"], errors="raise")
 
