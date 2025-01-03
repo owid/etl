@@ -305,6 +305,8 @@ class DatasetMeta(MetaBase):
     update_period_days: Optional[int] = None
     # prohibit redistribution (disable chart download)
     non_redistributable: bool = False
+    # OWID data managers
+    owid_data_managers: Optional[List[str]] = None
 
     # an md5 checksum of the ingredients used to make this dataset
     source_checksum: Optional[str] = None
