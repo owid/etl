@@ -286,6 +286,23 @@
           "examples_bad": [["2023-01-07"], ["monthly"], ["0.2"], ["1/365"]],
           "requirement_level": "required"
         },
+        "owid_data_managers": {
+          "type": "array",
+          "description": "List of allowed OWID author names.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "Edouard Mathieu",
+              "Lucas Rodés-Guirao",
+              "Pablo Rosado",
+              "Fiona Spooner",
+              "Tuna Acisu",
+              "Pablo Arriagada",
+              "Veronika Samborska",
+              "Mojmir Vinkler"
+            ]
+          }
+        },
         "non_redistributable": {
           "type": "boolean",
           "title": "Non-redistribution of dataset ",
