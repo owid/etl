@@ -181,17 +181,23 @@ def st_show_indicator(indicator, indicator_charts, display_charts=True):
             df_explorers = get_table_explorers(indicator_explorers, EXPLORER_VIEWS, var.id)
             show_table_explorers(df_explorers)
 
-        # Show indicator title and URI
+        # Show indicator title, URI, "dimensions" tag
         name = var.name
         iid = var.id
         with st_header:
-            with st_horizontal():  # (vertical_alignment="center"):
-                st.markdown(f"#### [**{name}**]({OWID_ENV.indicator_admin_site(iid)})")
+            st.markdown(f"#### [**{name}**]({OWID_ENV.indicator_admin_site(iid)})")
+            with st_horizontal(vertical_alignment="center"):  # (vertical_alignment="center"):
                 if indicator.is_etl:
                     st.caption(var.catalogPath.replace("grapher/", ""))
                 if indicator.is_mdim:
                     st_tag(tag_name="dimensions", color="primary", icon=":material/deployed_code")
-
+                if indicator.is_etl:
+                    st.link_button(
+                        "See data page",
+                        url=OWID_ENV.data_page_preview(iid),
+                        type="tertiary",
+                        icon=":material/transition_slide:",
+                    )
         # Show chart (contains description, and other metadata fields)
         with st_metadata_left:
             if not display_charts:
