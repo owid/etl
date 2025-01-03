@@ -2,6 +2,7 @@
 This script generates data from 2003-2023. The data for the year 2024 and above will be processed separately to avoid long processing times."""
 
 import datetime as dt
+from datetime import datetime
 from pathlib import Path
 
 import click
@@ -20,9 +21,14 @@ log = get_logger()
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
-# Define a range of years for which data will be processed.
 
-YEARS = [2024, 2025]
+# Get the current year
+CURRENT_YEAR = datetime.now().year
+
+# Define a range of years including a starting year and all years up to the current year
+START_YEAR = 2024  # Define the starting year
+YEARS = list(range(START_YEAR, CURRENT_YEAR + 1))
+
 
 TB_REGIONS = find(table="regions", dataset="regions").iloc[0].load().reset_index()
 TB_REGIONS = TB_REGIONS[TB_REGIONS.defined_by == "owid"]
