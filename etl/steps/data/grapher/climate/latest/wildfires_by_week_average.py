@@ -87,6 +87,6 @@ def run(dest_dir: str) -> None:
         dest_dir,
         tables=[tb],
         default_metadata=ds_grapher.metadata,
-        yaml_params={"date_accessed": last_date_accessed(tb)},
+        yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
     )
     ds_grapher.save()
