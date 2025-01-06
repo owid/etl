@@ -146,3 +146,7 @@ steps:
     - snapshot://who/2023-07-14/standard_age_distribution.csv
   data://grapher/who/2022-09-30/ghe:
     - data://garden/who/2022-09-30/ghe
+
+  # Mpox grapher step
+  data://grapher/who/latest/monkeypox:
+    - data://garden/who/latest/monkeypox

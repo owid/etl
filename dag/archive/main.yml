@@ -231,7 +231,6 @@ steps:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
 
-
     # UN IGME Child Mortality
   data://meadow/un/2023-08-16/igme:
     - snapshot://un/2023-08-16/igme.zip
@@ -270,6 +269,14 @@ steps:
     - data://meadow/imf/2024-05-02/world_economic_outlook
   data://grapher/imf/2024-05-02/world_economic_outlook:
     - data://garden/imf/2024-05-02/world_economic_outlook
+
+  # Homicides - UNODC
+  data://meadow/homicide/2023-07-04/unodc:
+    - snapshot://homicide/2023-07-04/unodc.xlsx
+  data://garden/homicide/2023-07-04/unodc:
+    - data://meadow/homicide/2023-07-04/unodc
+  data://grapher/homicide/2023-07-04/unodc:
+    - data://garden/homicide/2023-07-04/unodc
 
 include:
   # Include all active steps plus all archive steps.

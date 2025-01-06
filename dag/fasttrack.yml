@@ -4,8 +4,6 @@ steps:
   data-private://grapher/fasttrack/2022-11-29/ai_index:
     - snapshot-private://fasttrack/2022-11-29/ai_index.csv
   # Long-term homicide rates in Europe - Eisner (2014)
-  data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
-    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
   data-private://grapher/fasttrack/2022-11-01/lighting_efficiency_uk:
     - snapshot-private://fasttrack/2022-11-01/lighting_efficiency_uk.csv
   data-private://grapher/fasttrack/latest/metaculus__complementary_data:
@@ -60,16 +58,13 @@ steps:
     - snapshot-private://fasttrack/latest/lead_paint_regulation_who.csv
   data://grapher/fasttrack/latest/whm_treatment_gap_anxiety_disorders:
     - snapshot://fasttrack/latest/whm_treatment_gap_anxiety_disorders.csv
-  data://grapher/fasttrack/2023-05-31/cholera:
-    - snapshot://fasttrack/2023-05-31/cholera.csv
+
   data://grapher/fasttrack/2023-06-16/guinea_worm:
     - snapshot://fasttrack/2023-06-16/guinea_worm.csv
   data://grapher/fasttrack/2023-06-28/guinea_worm:
     - snapshot://fasttrack/2023-06-28/guinea_worm.csv
   data-private://grapher/fasttrack/latest/fiscal_top1_shares_country_standardized:
     - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
-  data://grapher/fasttrack/2023-04-30/paratz:
-    - snapshot://fasttrack/2023-04-30/paratz.csv
   data-private://grapher/fasttrack/latest/pain_hours_hen_systems:
     - snapshot-private://fasttrack/latest/pain_hours_hen_systems.csv
   data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
@@ -148,8 +143,6 @@ steps:
     - snapshot://fasttrack/latest/usa_weather_climate_noaa.csv
   data://grapher/fasttrack/latest/global_precipitation_anomaly_noaa:
     - snapshot://fasttrack/latest/global_precipitation_anomaly_noaa.csv
-  data://grapher/fasttrack/latest/gpei:
-    - snapshot://fasttrack/latest/gpei.csv
   data-private://grapher/fasttrack/latest/conflict_deaths_combined:
     - snapshot-private://fasttrack/latest/conflict_deaths_combined.csv
   data://grapher/fasttrack/2024-04-17/qubits:

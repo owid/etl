@@ -3,3 +3,11 @@ steps:
     - snapshot://fasttrack/latest/democracy_lexical_index.csv
   data://grapher/fasttrack/latest/mineral_prices_usgs:
     - snapshot://fasttrack/latest/mineral_prices_usgs.csv
+  data://grapher/fasttrack/latest/gpei:
+    - snapshot://fasttrack/latest/gpei.csv
+  data://grapher/fasttrack/2023-05-31/cholera:
+    - snapshot://fasttrack/2023-05-31/cholera.csv
+  data://grapher/fasttrack/2023-04-30/paratz:
+    - snapshot://fasttrack/2023-04-30/paratz.csv
+  data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
+    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv

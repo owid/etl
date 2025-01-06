@@ -695,8 +695,6 @@ steps:
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/health/latest/global_health_mpox
-  data://grapher/who/latest/monkeypox:
-    - data://garden/who/latest/monkeypox
   data://explorers/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
   export://github/who/latest/monkeypox:
