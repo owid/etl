@@ -44,13 +44,6 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/un/2024-07-12/un_wpp
 
-  data://meadow/worldbank_wdi/2022-05-26/wdi:
-    - walden://worldbank_wdi/2022-05-26/wdi
-  data://garden/worldbank_wdi/2022-05-26/wdi:
-    - data://meadow/worldbank_wdi/2022-05-26/wdi
-  data://grapher/worldbank_wdi/2022-05-26/wdi:
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-
     # Homicide - UNODC - update
   data://meadow/homicide/2024-10-30/unodc:
     - snapshot://homicide/2024-10-30/unodc.xlsx
