@@ -1,7 +1,10 @@
 """Load a snapshot and create a meadow dataset."""
 
+import itertools
 from zipfile import ZipFile
 
+import numpy as np
+import pandas as pd
 from owid.catalog import Table, TableMeta
 from owid.catalog import processing as pr
 
@@ -81,37 +84,34 @@ WHO_CODE_CATEGORIES = {
 SUM_COL_DICT = {
     "TUCASEID": "case_id",
     "GEMETSTA": "metropolitan_status",
-
+    "PEEDUCA": "education_level",  # 31-46
+    "PEHSPNON": "hispanic",  # 1 hispanic, 2 non-hispanic
+    "PTDTRACE": "race",  # topcoded 1-26
     "TEAGE": "age",
     "TELFS": "labor_force_status",
-    "TEMJOT": "multiple_jobs", # 1 yes, 2 no
-    "TESCHENR": "school_enrollment", # 1 yes, 2 no
-    "TESCHLVL": "school_level", # 1 high school, 2 college/ university
-    "TESEX": "gender", # 1 male, 2 female
-    "TESPEMPNOT": "employment_status_spouse", # 1 employed, 2 not employed
+    "TEMJOT": "multiple_jobs",  # 1 yes, 2 no
+    "TESCHENR": "school_enrollment",  # 1 yes, 2 no
+    "TESCHLVL": "school_level",  # 1 high school, 2 college/ university
+    "TESEX": "gender",  # 1 male, 2 female
+    "TESPEMPNOT": "employment_status_spouse",  # 1 employed, 2 not employed
     "TRCHILDNUM": "num_hh_children",
-    "TRDPFTPT": "full_or_part_time", # 1 full time, 2 part time
-    "TRERNWA": "weekly_earnings", # implied decimals, topcoded at 288461 (2884.61 USD)
-    "TRHOLIDAY": "holiday", # 0 no, 1 yes
-    "TRSPFTPT": "full_or_part_time_spouse", # 1 full time, 2 part time
-    "TRSPPRES": "spouse_present", # 1 yes, 2 unmarried partner present, 3 no
+    "TRDPFTPT": "full_or_part_time",  # 1 full time, 2 part time
+    "TRERNWA": "weekly_earnings",  # implied decimals, topcoded at 288461 (2884.61 USD)
+    "TRHOLIDAY": "holiday",  # 0 no, 1 yes
+    "TRSPFTPT": "full_or_part_time_spouse",  # 1 full time, 2 part time
+    "TRSPPRES": "spouse_present",  # 1 yes, 2 unmarried partner present, 3 no
     "TRYHHCHILD": "youngest_hh_child_age",
-    "TUDIARYDAY": "diary_day", # 1 sunday, 2 monday, ... 7 saturday
-    "TUFNWGTP": "final_weight", # final statistical weight
+    "TUDIARYDAY": "diary_day",  # 1 sunday, 2 monday, ... 7 saturday
+    "TUFNWGTP": "final_weight",  # final statistical weight
     "TEHRUSLT": "hours_worked_week",
     "TUYEAR": "year",
-    "TU20FWGT": "stat_weight_2020", # 2020 weight
-
-
-TUCASEID
-GEMETSTA
-GTMETSTA
-PEEDUCA
-PEHSPNON
-PTDTRACE
-
+    "TU20FWGT": "final_weight_2020",  # 2020 weight
+}
 
 # TODO: figure out why line number is sometimes negative?
+# are case numbers unique people? or people in a year?
+# how do i fix the metadata here
+# seperate this into meadow and garden steps also
 
 
 ACTIVITY_COL_DICT = {
@@ -156,7 +156,6 @@ WHO_COL_DICT = {
 }
 
 
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -164,7 +163,7 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap_who = paths.load_snapshot("atus_who.zip")
     snap_act = paths.load_snapshot("atus_activities.zip")
-    #snap_resp = paths.load_snapshot("atus_respondent.zip")
+    # snap_resp = paths.load_snapshot("atus_respondent.zip")
     snap_sum = paths.load_snapshot("atus_summary.zip")
     # snap_roster = paths.load_snapshot("atus_roster.zip")
     snap_act_codes = paths.load_snapshot("activity_codes_2023.xls")
@@ -172,7 +171,7 @@ def run(dest_dir: str) -> None:
     # load tables:
     who_data = load_data_and_add_meta(snap_who, "atuswho_0323.dat")
     act_data = load_data_and_add_meta(snap_act, "atusact_0323.dat")
-    #resp_data = load_data_and_add_meta(snap_resp, "atusresp_0323.dat")
+    # resp_data = load_data_and_add_meta(snap_resp, "atusresp_0323.dat")
     act_codes = pr.read_excel(snap_act_codes.path, sheet_name="ATUS 2023 Lexicon", header=1)
     sum_data = load_data_and_add_meta(snap_sum, "atussum_0323.dat")
     # roster_data = load_data_and_add_meta(snap_roster, "atusrost_0323.dat")
@@ -195,9 +194,91 @@ def run(dest_dir: str) -> None:
     # Merge activity and who data:
     tb = act_data.merge(who_data, on=["case_id", "activity_number"], how="left")
 
+    # filter summary data to relevant columns:
+    sum_data = sum_data.rename(columns=SUM_COL_DICT)
+    tb_sum = sum_data[["case_id", "age", "gender", "year", "final_weight", "final_weight_2020"]]
+
     # aggregate by category:
+    # result: table with duration of each activity for each case_id
     tb_agg = (
         tb.groupby(["who_category", "case_id", "activity_number"]).agg({"activity_duration_24": "first"}).reset_index()
+    )
+
+    # merge with summary data
+    tb_agg = tb_agg.merge(tb_sum, on="case_id", how="left")
+
+    # TEST STARTS HERE
+    tb_test = tb_agg[(tb_agg["year"] >= 2009) & (tb_agg["year"] <= 2019)]
+    tb_test = (
+        tb_test.groupby(["who_category", "age", "case_id"])
+        .agg({"activity_duration_24": "sum", "final_weight": "first"})
+        .reset_index()
+    )
+
+    age_dict = tb_test.set_index("case_id")["age"].to_dict()
+    weight_dict = tb_test.set_index("case_id")["final_weight"].to_dict()
+
+    categories = tb_test["who_category"].unique()
+    case_ids = tb_test["case_id"].unique()
+    new_index = pd.DataFrame(itertools.product(categories, case_ids), columns=["who_category", "case_id"])
+    new_index["age"] = new_index["case_id"].map(age_dict)
+    new_index["final_weight"] = new_index["case_id"].map(weight_dict)
+    new_index = new_index.set_index(["who_category", "case_id", "age", "final_weight"])
+
+    # remove co-worker category before 2010, since it gets recorded differently
+    tb_test = tb_test[~((tb_agg["year"] < 2010) & (tb_test["who_category"] == "Co-worker"))]
+
+    tb_test = (
+        tb_test.set_index(["who_category", "case_id", "age", "final_weight"])
+        .reindex(new_index.index)
+        .fillna({"activity_duration_24": 0})
+    ).reset_index()
+
+    tb_test = (
+        tb_test.groupby(["who_category", "age"])
+        .apply(
+            lambda x: pd.Series(
+                {"t": np.sum(x["activity_duration_24"] * x["final_weight"]) / np.sum(x["final_weight"])}
+            )
+        )
+        .reset_index()
+    )
+
+    # TEST ENDS HERE
+    # summarize data (by category and age) and normalize with weights
+
+    # test data to see if it works - only up to 2019 and removing co-worker category
+    tb_test = tb_agg[~((tb_agg["year"] < 2010) & (tb_agg["who_category"] == "Co-worker"))]
+    tb_test = tb_test[(tb_test["year"] >= 2009) & (tb_test["year"] <= 2019)]
+    tb_test = (
+        tb_test.groupby(["who_category", "age", "case_id"])
+        .agg({"activity_duration_24": "sum", "final_weight": "first"})
+        .reset_index()
+    )
+    # Fill missing categories with 0
+    categories = tb_test["who_category"].unique()
+    case_ids = tb_test["case_id"].unique()
+    index = pd.MultiIndex.from_product([categories, case_ids], names=["who_category", "case_id"])
+    tb_test = tb_test.set_index(["who_category", "case_id"]).reindex(index, fill_value=0).reset_index()
+
+    tb_test = (
+        tb_test.groupby(["who_category", "age"])
+        .apply(
+            lambda x: pd.Series(
+                {"t": np.sum(x["activity_duration_24"] * x["final_weight"]) / np.sum(x["final_weight"])}
+            )
+        )
+        .reset_index()
+    )
+
+    tb_agg = (
+        tb_agg.groupby(["who_category", "age"])
+        .apply(
+            lambda x: pd.Series(
+                {"t": np.sum(x["activity_duration_24"] * x["final_weight"]) / np.sum(x["final_weight"])}
+            )
+        )
+        .reset_index()
     )
 
     #
