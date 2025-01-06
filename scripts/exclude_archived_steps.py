@@ -1,7 +1,12 @@
 """Exclude archived steps from files tab and search in VSCode."""
 
 import json
+from collections import OrderedDict
+from pathlib import Path
 from typing import Set, Tuple
+
+import click
+import commentjson
 
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
 from etl.steps import load_dag
@@ -50,18 +55,51 @@ def steps_to_exclude(active_steps: Set[str]) -> Set[str]:
     return to_exclude
 
 
-def main():
+@click.command(help="Exclude archived steps with a chosen settings scope.")
+@click.option(
+    "--settings-scope",
+    type=click.Choice(["project", "user"], case_sensitive=False),
+    default="project",
+    help="Select whether to update project or user settings.",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    default=False,
+    help="Perform a dry run without making any changes.",
+)
+def main(settings_scope, dry_run):
     active_steps, active_snapshots = active_steps_and_snapshots()
 
     to_exclude = {s: True for s in sorted(snapshots_to_exclude(active_snapshots) | steps_to_exclude(active_steps))}
 
-    # Update .vscode/settings file
-    settings = json.loads((BASE_DIR / ".vscode/settings.json").read_text())
-    settings["files.exclude"].update(to_exclude)
-    settings["search.exclude"].update(to_exclude)
-    (BASE_DIR / ".vscode/settings.json").write_text(json.dumps(settings, indent=2))
+    if dry_run:
+        print(f"[Dry Run] Would exclude {len(to_exclude)} steps and snapshots")
+    else:
+        if settings_scope == "project":
+            settings_path = BASE_DIR / ".vscode/settings.json"
+        else:
+            settings_path = Path.home() / "Library/Application Support/Code/User/settings.json"
 
-    print(f"Excluded {len(to_exclude)} steps and snapshots")
+        # Update settings file
+        settings_text = settings_path.read_text()
+        settings = commentjson.loads(settings_text)
+
+        # Update exclusions
+        settings["files.exclude"].update(to_exclude)
+        settings["search.exclude"].update(to_exclude)
+
+        # Reorder settings to move 'files.exclude' and 'search.exclude' to the end
+        reordered_settings = OrderedDict()
+        for key, value in settings.items():
+            if key not in ["files.exclude", "search.exclude"]:
+                reordered_settings[key] = value
+        reordered_settings["files.exclude"] = settings["files.exclude"]
+        reordered_settings["search.exclude"] = settings["search.exclude"]
+
+        settings_path.write_text(commentjson.dumps(reordered_settings, indent=2))
+
+        print(f"Excluded {len(to_exclude)} steps and snapshots")
 
 
 if __name__ == "__main__":

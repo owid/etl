@@ -113,6 +113,7 @@ dev-dependencies = [
     "pandas-stubs==1.2.0.62",
     "ruff>=0.8.2",
     "ipdb>=0.13.13",
+    "commentjson>=0.9.0",
 ]
 
 [project.optional-dependencies]
