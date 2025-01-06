@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional
 
 import pandas as pd
@@ -15,6 +16,7 @@ class Chart(Doc):
     note: str
     tags: list[str]
     slug: str
+    created_at: Optional[datetime] = None
     views_7d: Optional[int] = None
     views_14d: Optional[int] = None
     views_365d: Optional[int] = None
@@ -23,6 +25,8 @@ class Chart(Doc):
 
 def get_raw_charts() -> pd.DataFrame:
     """Get all charts that exist in the database."""
+    # TODO: allow archived charts to be returned. Maybe add argument to function
+
     # Get all data indicators from the database.
     query = """
     with tags as (
@@ -37,6 +41,7 @@ def get_raw_charts() -> pd.DataFrame:
     )
     select
         c.id as chart_id,
+        c.createdAt as created_at,
         cf.slug,
         cf.full->>'$.title' as title,
         cf.full->>'$.subtitle' as subtitle,
