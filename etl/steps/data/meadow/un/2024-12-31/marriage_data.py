@@ -24,6 +24,61 @@ AGE_GROUPS = [
     "75+",
 ]
 
+DATA_SOURCE_RULES = [
+    # Prioritize "DHS_STATcompiler" over "DHS_HH" for cross-country comparability.
+    ({"DHS_STATcompiler", "DHS_HH"}, "DHS_STATcompiler"),
+    # Prioritize "MICS" over "MICS_HH" for cross-country comparability.
+    ({"MICS", "MICS_HH"}, "MICS"),
+    # Prioritize "UNSD" over "DHS_STATcompiler" for cross-country comparability.
+    ({"DHS_STATcompiler", "UNSD"}, "UNSD"),
+    # Prioritize "MICS" over "National statistics" for cross-country comparability.
+    ({"National statistics", "MICS"}, "MICS"),
+    # Prioritize "UNSD" over "US Census Bureau" for cross-country comparability.
+    ({"UNSD", "US Census Bureau"}, "UNSD"),
+    # Prioritize "UNSD" over "DHS_HH" for cross-country comparability.
+    ({"DHS_HH", "UNSD"}, "UNSD"),
+    # Prioritize "UNSD" over "National statistics" for cross-country comparability.
+    ({"UNSD", "National statistics"}, "UNSD"),
+    # Prioritize "UNSD" over "Eurostat" for cross-country comparability.
+    ({"Eurostat", "UNSD"}, "UNSD"),
+    # Prioritize "DHS_STATcompiler" over "IPUMS" for cross-country comparability.
+    ({"IPUMS", "DHS_STATcompiler"}, "DHS_STATcompiler"),
+    # Prioritize "DHS_STATcompiler" over "National statistics" for cross-country comparability.
+    ({"DHS_STATcompiler", "National statistics"}, "DHS_STATcompiler"),
+    # Prioritize "DHS_STATcompiler" over "INED" for cross-country comparability.
+    ({"DHS_STATcompiler", "INED"}, "DHS_STATcompiler"),
+    # Prioritize "MICS" over "INED" for standardized indicators.
+    ({"INED", "MICS"}, "MICS"),
+    # Prioritize "DHS_STATcompiler" over "MICS_HH" for cross-country comparability.
+    ({"DHS_STATcompiler", "MICS_HH"}, "DHS_STATcompiler"),
+    # Prioritize "DHS_HH" over "National statistics" for cross-country comparability.
+    ({"DHS_HH", "National statistics"}, "DHS_HH"),
+    # Prioritize "MICS" over "RHS" for broader coverage.
+    ({"MICS", "RHS"}, "MICS"),
+    # Prioritize "UNSD" over "GGS" for cross-country comparability.
+    ({"GGS", "UNSD"}, "UNSD"),
+    # Prioritize "MICS_HH" over "National statistics" for cross-country comparability.
+    ({"MICS_HH", "National statistics"}, "MICS_HH"),
+]
+# Define rules for resolving 'data_process' duplicates
+DATA_CATALOGUE_RULES = [
+    ({"2011 AIS", "2011 DHS"}, "2011 DHS"),  # Broader demographic focus
+    ({"2000 HS", "2004 DHS"}, "2004 DHS"),  # More recent data
+    ({"2012-2014 DHS", "2014 DHS"}, "2014 DHS"),  # More recent data
+    ({"2004 FHS", "2004 HLCS"}, "2004 FHS"),  # More comprehensive health survey
+]
+
+DATA_PROCESS_RULES = [
+    # Prioritize "Census" over "Estimate" for direct data collection.
+    ({"Census", "Estimate"}, "Census"),
+    # Prioritize "Census" over "Survey" for better population coverage.
+    ({"Census", "Survey"}, "Census"),
+    # Prioritize "Survey" over "Estimate" for direct data collection.
+    ({"Estimate", "Survey"}, "Survey"),
+    # Prioritize "Dual record" over "Survey" for its cross-verificaton.
+    ({"Survey", "Dual record"}, "Dual record"),
+]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -78,7 +133,7 @@ def run(dest_dir: str) -> None:
             tb = tb.rename(columns={"ever_married": "ever_married_total"})
 
         if sheet_name == "SMAM":
-            # Remove rows with specific text in the note_on_data column
+            # Remove rows with specific text in the note_on_data column (they are duplicates of the other rows with no note)
             tb = tb[
                 ~tb["note_on_data"].str.contains(
                     "Data presented do not sum up to 100 by more than 0.5 percentage points due to missing values.",
@@ -87,11 +142,11 @@ def run(dest_dir: str) -> None:
             ]
         tb = tb.drop(columns=["note_on_data"])
 
-        # Remove square brackets from the values in the AgeGroup column
+        # Remove square brackets from the values in the age column
         if "age" in tb.columns:
             tb["age"] = tb["age"].str.replace(r"\[|\]", "", regex=True)
 
-        # Add "all" to the AgeGroup column if it does not exist
+        # Add "all" to the age column if it does not exist
         if "age" not in tb.columns:
             tb["age"] = "all"
 
@@ -115,68 +170,25 @@ def run(dest_dir: str) -> None:
             on=["country", "year", "sex", "age", "datacatalog_shortname", "data_source", "data_process"],
             how="outer",
         )
-    # Find each combination of datacatalog_shortname and the available age ranges
-    # grouped = tb_merged.groupby("data_source")
-    # for data_source, group in grouped:
-    #     available_age_ranges = group["age"].unique()
-    #     print(f"Data Catalog Short Name: {data_source}, Available Age Ranges: {available_age_ranges}")
 
-    # Keep only rows where data_source is UNSD
-    # tb_merged = tb_merged[tb_merged["data_source"] == "UNSD"]
-
-    # Define rules for resolving 'data_source' duplicates
-    # # Define subset columns for duplicates
-    subset_columns = ["country", "year", "sex", "age"]
-
-    tb_merged["country"] = tb_merged["country"].str.replace("Lao People's Dem. Republic", "Laos")
-    tb_merged["country"] = tb_merged["country"].str.replace("Lao People’s Democratic Republic", "Laos")
-
-    # Define rules for resolving 'data_source' duplicates
-    data_source_rules = [
-        ({"DHS_STATcompiler", "DHS_HH"}, "DHS_STATcompiler"),
-        ({"MICS", "MICS_HH"}, "MICS"),
-        ({"DHS_STATcompiler", "UNSD"}, "UNSD"),
-        ({"National statistics", "MICS"}, "MICS"),
-        ({"UNSD", "US Census Bureau"}, "UNSD"),
-        ({"DHS_HH", "UNSD"}, "UNSD"),
-        ({"UNSD", "National statistics"}, "UNSD"),
-        ({"Eurostat", "UNSD"}, "UNSD"),
-        ({"IPUMS", "DHS_STATcompiler"}, "DHS_STATcompiler"),
-        ({"DHS_STATcompiler", "National statistics"}, "DHS_STATcompiler"),
-        ({"DHS_STATcompiler", "INED"}, "DHS_STATcompiler"),
-        ({"INED, MICS"}, "MICS"),
-        ({"DHS_STATcompiler", "MICS_HH"}, "DHS_STATcompiler"),
-        ({"INED", "MICS"}, "MICS"),
-        ({"DHS_HH", "National statistics"}, "DHS_HH"),
-        ({"MICS", "RHS"}, "MICS"),
-        ({"GGS", "UNSD"}, "UNSD"),
-    ]
-
-    # Define rules for resolving 'data_process' duplicates
-    datacatalog_shortname_rules = [
-        ({"2011 AIS", "2011 DHS"}, "2011 DHS"),
-        ({"2000 HS", "2004 DHS"}, "2004 DHS"),
-        ({"2012-2014 DHS", "2014 DHS"}, "2014 DHS"),
-        ({"2004 FHS", "2004 HLCS"}, "2004 FHS"),
-    ]
-
-    data_process_rules = [
-        ({"Census", "Estimate"}, "Census"),
-        ({"Census", "Survey"}, "Census"),
-        ({"Estimate", "Survey"}, "Survey"),
-        ({"Survey", "Dual record"}, "Survey"),
-    ]
-
-    # Process 'datacatalog_shortname' duplicates
-    tb_merged = resolve_duplicates(
-        tb_merged, subset_columns, datacatalog_shortname_rules, target_column="datacatalog_shortname"
+    # Ensure Laos is consistently named before removing duplicated data
+    tb_merged["country"] = tb_merged["country"].str.replace(
+        r"Lao People[’']?s (Democratic|Dem\.)? Republic", "Laos", regex=True
     )
 
-    # Process 'data_source' duplicates
-    tb_merged = resolve_duplicates(tb_merged, subset_columns, data_source_rules, target_column="data_source")
+    # Define subset columns for removing duplicates
+    subset_columns = ["country", "year", "sex", "age"]
 
-    # Process 'data_process' duplicates
-    tb_merged = resolve_duplicates(tb_merged, subset_columns, data_process_rules, target_column="data_process")
+    # Remove duplicated data different 'datacatalog_shortname' based on the predifined rules
+    tb_merged = resolve_duplicates(
+        tb_merged, subset_columns, DATA_CATALOGUE_RULES, target_column="datacatalog_shortname"
+    )
+
+    # Remove duplicated data different 'data_source' based on the predifined rules
+    tb_merged = resolve_duplicates(tb_merged, subset_columns, DATA_SOURCE_RULES, target_column="data_source")
+
+    # Remove duplicated data different 'data_process' based on the predifined rules
+    tb_merged = resolve_duplicates(tb_merged, subset_columns, DATA_PROCESS_RULES, target_column="data_process")
 
     duplicates = tb_merged[tb_merged.duplicated(subset=subset_columns, keep=False)]
     if not duplicates.empty:

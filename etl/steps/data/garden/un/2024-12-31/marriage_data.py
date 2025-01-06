@@ -33,9 +33,6 @@ def run(dest_dir: str) -> None:
     ]
     tb = tb[select_columns]
     tb["never_married"] = 100 - tb["ever_married_total"]
-    print(tb[tb["country"] == "Mexico"])
-
-    print(tb.columns)
 
     tb = tb.format(["country", "year", "age", "sex"])
 
