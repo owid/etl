@@ -499,10 +499,6 @@ class OWIDEnv:
         """Get indicator admin url."""
         return f"{self.admin_site}/variables/{variable_id}/"
 
-    def variable_admin_site(self, variable_id: str | int) -> str:
-        """Get variable admin url."""
-        return self.indicator_admin_site(variable_id)
-
     def chart_admin_site(self, chart_id: str | int) -> str:
         """Get chart admin url."""
         return f"{self.admin_site}/charts/{chart_id}/edit"
@@ -510,6 +506,10 @@ class OWIDEnv:
     def chart_site(self, slug: str) -> str:
         """Get chart url."""
         return f"{self.site}/grapher/{slug}"
+
+    def data_page_preview(self, variable_id: str | int) -> str:
+        """Get indicator admin url."""
+        return f"{self.admin_site}/datapage-preview/{variable_id}/"
 
     def thumb_url(self, slug: str):
         """

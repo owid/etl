@@ -12,7 +12,7 @@ start_time=$(date +%s)
 echo '--- Update wildfires'
 cd /home/owid/etl
 
-#uv run python snapshots/climate/latest/weekly_wildfires.py
+uv run python snapshots/climate/latest/weekly_wildfires.py
 
 # commit to master will trigger ETL which is gonna run the step
 echo '--- Commit and push changes'
