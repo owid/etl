@@ -7,7 +7,6 @@ import requests
 import structlog
 from rich import print
 from rich_click.rich_command import RichCommand
-from slack_sdk import WebClient
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
@@ -17,6 +16,7 @@ from etl import config
 from etl.config import OWIDEnv, get_container_name
 from etl.datadiff import _dict_diff
 from etl.grapher import model as gm
+from etl.slack_helpers import send_slack_message
 
 config.enable_bugsnag()
 
@@ -273,8 +273,7 @@ def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiff, dry_
 
     if config.SLACK_API_TOKEN and not dry_run:
         assert diff.target_chart
-        slack_client = WebClient(token=config.SLACK_API_TOKEN)
-        slack_client.chat_postMessage(channel="#data-architecture-github", text=message)
+        send_slack_message(channel="data-architecture-github", message=message)
 
 
 def _notify_slack_chart_create(source_chart_id: int, source: str, dry_run: bool) -> None:
@@ -286,8 +285,7 @@ def _notify_slack_chart_create(source_chart_id: int, source: str, dry_run: bool)
     print(message)
 
     if config.SLACK_API_TOKEN and not dry_run:
-        slack_client = WebClient(token=config.SLACK_API_TOKEN)
-        slack_client.chat_postMessage(channel="#data-architecture-github", text=message)
+        send_slack_message(channel="#data-architecture-github", message=message)
 
 
 def _matches_include_exclude(chart: gm.Chart, session: Session, include: Optional[str], exclude: Optional[str]):
