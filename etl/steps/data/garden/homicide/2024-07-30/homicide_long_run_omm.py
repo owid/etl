@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
     # Load data from fast track
     ds_eisner = paths.load_dataset("long_term_homicide_rates_in_europe")
     # Get the required table
-    tb_eisner = ds_eisner["long_term_homicide_rates_in_europe"]
+    tb_eisner = ds_eisner.read("long_term_homicide_rates_in_europe")
     tb_eisner = tb_eisner.rename(
         columns={"homicide_rate_in_europe_over_long_term__per_100_000": "death_rate_per_100_000_population"}
     )
