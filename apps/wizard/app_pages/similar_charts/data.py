@@ -1,8 +1,8 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional
 
 import pandas as pd
-import streamlit as st
 
 from apps.wizard.utils.embeddings import Doc
 from etl.db import read_sql
@@ -16,6 +16,7 @@ class Chart(Doc):
     note: str
     tags: list[str]
     slug: str
+    created_at: Optional[datetime] = None
     views_7d: Optional[int] = None
     views_14d: Optional[int] = None
     views_365d: Optional[int] = None
@@ -24,6 +25,8 @@ class Chart(Doc):
 
 def get_raw_charts() -> pd.DataFrame:
     """Get all charts that exist in the database."""
+    # TODO: allow archived charts to be returned. Maybe add argument to function
+
     # Get all data indicators from the database.
     query = """
     with tags as (
@@ -38,6 +41,7 @@ def get_raw_charts() -> pd.DataFrame:
     )
     select
         c.id as chart_id,
+        c.createdAt as created_at,
         cf.slug,
         cf.full->>'$.title' as title,
         cf.full->>'$.subtitle' as subtitle,
@@ -62,19 +66,3 @@ def get_raw_charts() -> pd.DataFrame:
     assert df["chart_id"].nunique() == df.shape[0]
 
     return df
-
-
-@st.cache_data(show_spinner=False, persist="disk")
-def get_charts() -> list[Chart]:
-    with st.spinner("Loading charts..."):
-        # Get charts from the database..
-        df = get_raw_charts()
-
-        charts = df.to_dict(orient="records")
-
-    ret = []
-    for c in charts:
-        c["tags"] = c["tags"].split(";") if c["tags"] else []
-        ret.append(Chart(**c))  # type: ignore
-
-    return ret
