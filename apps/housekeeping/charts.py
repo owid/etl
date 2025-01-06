@@ -7,6 +7,9 @@ from apps.wizard.app_pages.similar_charts import data
 from etl.config import OWID_ENV
 from etl.slack_helpers import send_slack_message
 
+CHANNEL_NAME = "#lucas-playground"
+SLACK_USERNAME = "housekeeper"
+
 
 def get_charts_to_review():
     df = data.get_raw_charts()
@@ -51,11 +54,11 @@ def ask_for_review():
 
     # Send message
     send_slack_message(
-        channel="#lucas-playground",
+        channel=CHANNEL_NAME,
         message=message,
         icon_emoji="sus-blue",
-        username="housekeeper2",
+        username=SLACK_USERNAME,
     )
 
     # Add chart to reviewed charts
-    add_reviews(object_type="chart", object_id=123)  # chart["chart_id"])
+    add_reviews(object_type="chart", object_id=chart["chart_id"])
