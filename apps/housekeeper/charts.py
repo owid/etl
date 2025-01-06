@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pandas as pd
 
-from apps.housekeeping.utils import add_reviews, get_reviews_id
-from apps.wizard.app_pages.similar_charts import data
+from apps.housekeeper.utils import add_reviews, get_reviews_id
+from apps.wizard.app_pages.similar_charts.data import get_raw_charts
 from etl.config import OWID_ENV
 from etl.slack_helpers import send_slack_message
 
@@ -12,7 +12,7 @@ SLACK_USERNAME = "housekeeper"
 
 
 def get_charts_to_review():
-    df = data.get_raw_charts()
+    df = get_raw_charts()
 
     # Keep only older-than-a-year charts
     TODAY = datetime.today()
@@ -36,7 +36,7 @@ def select_chart(df: pd.DataFrame):
     return chart
 
 
-def ask_for_review():
+def send_slack_chart_review(channel_name: str, slack_username: str, icon_emoji: str):
     # Get charts
     df = get_charts_to_review()
 
@@ -54,10 +54,10 @@ def ask_for_review():
 
     # Send message
     send_slack_message(
-        channel=CHANNEL_NAME,
+        channel=channel_name,
         message=message,
-        icon_emoji="sus-blue",
-        username=SLACK_USERNAME,
+        icon_emoji=icon_emoji,
+        username=slack_username,
     )
 
     # Add chart to reviewed charts
