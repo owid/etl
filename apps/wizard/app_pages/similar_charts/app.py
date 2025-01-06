@@ -90,7 +90,8 @@ def split_input_string(input_string: str) -> tuple[str, list[str], list[str]]:
 
 @st.cache_data(show_spinner=False, max_entries=1)
 def get_and_fit_model(charts: list[data.Chart]) -> scoring.ScoringModel:
-    scoring_model = scoring.ScoringModel(emb.get_model())
+    with st.spinner("Loading model..."):
+        scoring_model = scoring.ScoringModel(emb.get_model())
     scoring_model.fit(charts)
     return scoring_model
 
