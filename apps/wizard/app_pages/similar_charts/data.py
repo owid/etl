@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Optional
 
 import pandas as pd
-import streamlit as st
 
 from apps.wizard.utils.embeddings import Doc
 from etl.db import read_sql
@@ -62,19 +61,3 @@ def get_raw_charts() -> pd.DataFrame:
     assert df["chart_id"].nunique() == df.shape[0]
 
     return df
-
-
-@st.cache_data(show_spinner=False, persist="disk")
-def get_charts() -> list[Chart]:
-    with st.spinner("Loading charts..."):
-        # Get charts from the database..
-        df = get_raw_charts()
-
-        charts = df.to_dict(orient="records")
-
-    ret = []
-    for c in charts:
-        c["tags"] = c["tags"].split(";") if c["tags"] else []
-        ret.append(Chart(**c))  # type: ignore
-
-    return ret
