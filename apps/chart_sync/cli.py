@@ -273,7 +273,7 @@ def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiff, dry_
 
     if config.SLACK_API_TOKEN and not dry_run:
         assert diff.target_chart
-        send_slack_message(channel="data-architecture-github", message=message)
+        send_slack_message(channel="#data-architecture-github", message=message)
 
 
 def _notify_slack_chart_create(source_chart_id: int, source: str, dry_run: bool) -> None:

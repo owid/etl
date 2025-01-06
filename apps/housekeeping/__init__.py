@@ -8,8 +8,5 @@ These charts get few views but still "clog" our internal admin and search result
 
 TODOs:
 
-1) However, housekeeping can be applied to other areas of the codebase, such as datasets, tables, and other objects.
-
-2) Smarter track of "reviewed" objects. An option could be a structured table "suggested_reviews": id, type, date. Where
-type can be 'chart', 'dataset', etc.
+Add option of regular reviews of datasets, etc.
 """
