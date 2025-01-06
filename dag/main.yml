@@ -44,7 +44,14 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/un/2024-07-12/un_wpp
 
-  # Homicide - UNODC - update
+  data://meadow/worldbank_wdi/2022-05-26/wdi:
+    - walden://worldbank_wdi/2022-05-26/wdi
+  data://garden/worldbank_wdi/2022-05-26/wdi:
+    - data://meadow/worldbank_wdi/2022-05-26/wdi
+  data://grapher/worldbank_wdi/2022-05-26/wdi:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+
+    # Homicide - UNODC - update
   data://meadow/homicide/2024-10-30/unodc:
     - snapshot://homicide/2024-10-30/unodc.xlsx
   data://garden/homicide/2024-10-30/unodc:
@@ -576,9 +583,8 @@ steps:
 
   # Homicide - OMM
   data://garden/homicide/2024-07-30/homicide_long_run_omm:
-    - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
+    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
     - data://garden/homicide/2024-07-30/who_mort_db
-    - data://garden/homicide/2023-07-04/unodc
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm
 

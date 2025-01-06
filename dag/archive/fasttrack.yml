@@ -10,3 +10,9 @@ steps:
   #mpox data - Africa CDC
   data://grapher/fasttrack/latest/africa_cdc:
     - snapshot://fasttrack/latest/africa_cdc.csv
+  data://grapher/fasttrack/latest/gpei:
+    - snapshot://fasttrack/latest/gpei.csv
+  data://grapher/fasttrack/2023-05-31/cholera:
+    - snapshot://fasttrack/2023-05-31/cholera.csv
+  data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
+    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv

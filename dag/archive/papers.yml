@@ -70,3 +70,11 @@ steps:
     - data://meadow/papers/2024-03-26/ray_et_al_2019
   data://grapher/papers/2024-03-26/ray_et_al_2019:
     - data://garden/papers/2024-03-26/ray_et_al_2019
+
+  # Ipsos perils of perception, prejudice, and conspiracy theories.
+  data://meadow/papers/2024-10-25/ipsos:
+    - snapshot://papers/2024-10-25/ipsos.csv
+  data://garden/papers/2024-10-25/ipsos:
+    - data://meadow/papers/2024-10-25/ipsos
+  data://grapher/papers/2024-10-25/ipsos:
+    - data://garden/papers/2024-10-25/ipsos
