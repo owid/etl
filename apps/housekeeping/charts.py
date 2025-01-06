@@ -1,5 +1,8 @@
 from datetime import datetime
 
+import pandas as pd
+
+from apps.housekeeping.utils import add_reviews, get_reviews_id
 from apps.wizard.app_pages.similar_charts import data
 from etl.config import OWID_ENV
 from etl.slack_helpers import send_slack_message
@@ -14,15 +17,17 @@ def get_charts_to_review():
     df = df.loc[df["created_at"] < YEAR_AGO]
 
     # Discard charts already presented in the chat
+    reviews_id = get_reviews_id(object_type="chart")
+    df = df.loc[~df["chart_id"].isin(reviews_id)]
 
     return df
 
 
-def select_chart(df):
+def select_chart(df: pd.DataFrame):
     # Sort by views
     df = df.sort_values(["views_365d", "views_14d", "views_7d"])
 
-    # Select chart
+    # Select oldest chart
     chart = df.iloc[0]
 
     return chart
@@ -53,3 +58,4 @@ def ask_for_review():
     )
 
     # Add chart to reviewed charts
+    add_reviews(object_type="chart", object_id=123)  # chart["chart_id"])
