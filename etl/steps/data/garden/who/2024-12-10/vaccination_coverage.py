@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
     tb = tb.assign(denominator=tb["antigen"].map(DENOMINATOR))
 
     tb_number = calculate_one_year_olds_vaccinated(tb, ds_population)
-    tb = tb.format(["country", "year", "antigen"])
+    tb = tb.format(["country", "year", "antigen"], short_name="vaccination_coverage")
     tb_number = tb_number.format(["country", "year", "antigen"], short_name="number_of_one_year_olds")
     #
     # Save outputs.
