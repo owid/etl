@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("vaccination_coverage")
     ds_population = paths.load_dataset("un_wpp")
     # Read table from meadow dataset.
-    tb = ds_meadow.read("vaccination_coverage", reset_metadata="keep_origins")
+    tb = ds_meadow.read("vaccination_coverage")
 
     #
     # Process data.
@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
 
 
 def get_population_one_year_olds(ds_population: Dataset) -> Table:
-    tb_pop = ds_population.read("population")
+    tb_pop = ds_population.read("population", reset_metadata="keep_origins")
     tb_pop = tb_pop[(tb_pop["age"] == "1") & (tb_pop["variant"] == "estimates") & (tb_pop["sex"] == "all")]
     tb_pop = tb_pop[["country", "year", "sex", "age", "variant", "population"]]
     return tb_pop
