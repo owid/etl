@@ -471,9 +471,9 @@ tables:
         short_unit: '%'
         unit: '% of GNI'
       dc_oda_totl_kd:
-        title: Net ODA provided, total (constant 2020 US$)
+        title: Net ODA provided, total (constant 2021 US$)
         short_unit: $
-        unit: constant 2020 US$
+        unit: constant 2021 US$
       dt_dod_dect_cd:
         title: External debt stocks, total (DOD, current US$)
         short_unit: $
@@ -687,15 +687,15 @@ tables:
         short_unit: $
         unit: current US$
       dt_oda_alld_kd:
-        title: Net official development assistance and official aid received (constant 2020 US$)
+        title: Net official development assistance and official aid received (constant 2021 US$)
         short_unit: $
-        unit: constant 2020 US$
+        unit: constant 2021 US$
       dt_oda_oatl_cd:
         title: Net official aid received (current US$)
         short_unit: $
         unit: current US$
       dt_oda_oatl_kd:
-        title: Net official aid received (constant 2020 US$)
+        title: Net official aid received (constant 2021 US$)
       dt_oda_odat_cd:
         title: Net official development assistance received (current US$)
         short_unit: $
@@ -709,7 +709,7 @@ tables:
         short_unit: '%'
         unit: '% of GNI'
       dt_oda_odat_kd:
-        title: Net official development assistance received (constant 2020 US$)
+        title: Net official development assistance received (constant 2021 US$)
       dt_oda_odat_mp_zs:
         title: Net ODA received (% of imports of goods, services and primary income)
         short_unit: '%'
@@ -841,9 +841,9 @@ tables:
         short_unit: $
         unit: PPP $ per kg of oil equivalent
       eg_gdp_puse_ko_pp_kd:
-        title: GDP per unit of energy use (constant 2017 PPP $ per kg of oil equivalent)
+        title: GDP per unit of energy use (constant 2021 PPP $ per kg of oil equivalent)
         short_unit: $
-        unit: constant 2017 PPP $ per kg of oil equivalent
+        unit: constant 2021 PPP $ per kg of oil equivalent
       eg_imp_cons_zs:
         title: Energy imports, net (% of energy use)
         short_unit: '%'
@@ -857,8 +857,8 @@ tables:
         short_unit: '%'
         unit: '% of total'
       eg_use_comm_gd_pp_kd:
-        title: Energy use (kg of oil equivalent) per $1,000 GDP (constant 2017 PPP)
-        unit: constant 2017 PPP
+        title: Energy use (kg of oil equivalent) per $1,000 GDP (constant 2021 PPP)
+        unit: constant 2021 PPP
       eg_use_crnw_zs:
         title: Combustible renewables and waste (% of total energy)
         short_unit: '%'
@@ -1029,8 +1029,7 @@ tables:
         short_unit: '%'
         unit: '% of total fuel combustion'
       en_co2_othx_zs:
-        title: CO2 emissions from other sectors, excluding residential buildings and commercial and public services (% of
-          total fuel combustion)
+        title: CO2 emissions from other sectors, excluding residential buildings and commercial and public services (% of total fuel combustion)
         short_unit: '%'
         unit: '% of total fuel combustion'
       en_co2_tran_zs:
@@ -1261,48 +1260,39 @@ tables:
         short_unit: '%'
         unit: '% of GDP'
       fx_own_totl_40_zs:
-        title: Account ownership at a financial institution or with a mobile-money-service provider, poorest 40% (% of population
-          ages 15+)
+        title: Account ownership at a financial institution or with a mobile-money-service provider, poorest 40% (% of population ages 15+)
         short_unit: '%'
         unit: '% of population ages 15+'
       fx_own_totl_60_zs:
-        title: Account ownership at a financial institution or with a mobile-money-service provider, richest 60% (% of population
-          ages 15+)
+        title: Account ownership at a financial institution or with a mobile-money-service provider, richest 60% (% of population ages 15+)
         short_unit: '%'
         unit: '% of population ages 15+'
       fx_own_totl_fe_zs:
-        title: Account ownership at a financial institution or with a mobile-money-service provider, female (% of population
-          ages 15+)
+        title: Account ownership at a financial institution or with a mobile-money-service provider, female (% of population ages 15+)
         short_unit: '%'
         unit: '% of population ages 15+'
       fx_own_totl_ma_zs:
-        title: Account ownership at a financial institution or with a mobile-money-service provider, male (% of population
-          ages 15+)
+        title: Account ownership at a financial institution or with a mobile-money-service provider, male (% of population ages 15+)
         short_unit: '%'
         unit: '% of population ages 15+'
       fx_own_totl_ol_zs:
-        title: Account ownership at a financial institution or with a mobile-money-service provider, older adults (% of population
-          ages 25+)
+        title: Account ownership at a financial institution or with a mobile-money-service provider, older adults (% of population ages 25+)
         short_unit: '%'
         unit: '% of population ages 25+'
       fx_own_totl_pl_zs:
-        title: Account ownership at a financial institution or with a mobile-money-service provider, primary education or
-          less (% of population ages 15+)
+        title: Account ownership at a financial institution or with a mobile-money-service provider, primary education or less (% of population ages 15+)
         short_unit: '%'
         unit: '% of population ages 15+'
       fx_own_totl_so_zs:
-        title: Account ownership at a financial institution or with a mobile-money-service provider, secondary education or
-          more (% of population ages 15+)
+        title: Account ownership at a financial institution or with a mobile-money-service provider, secondary education or more (% of population ages 15+)
         short_unit: '%'
         unit: '% of population ages 15+'
       fx_own_totl_yg_zs:
-        title: Account ownership at a financial institution or with a mobile-money-service provider, young adults (% of population
-          ages 15-24)
+        title: Account ownership at a financial institution or with a mobile-money-service provider, young adults (% of population ages 15-24)
         short_unit: '%'
         unit: '% of population ages 15-24'
       fx_own_totl_zs:
-        title: Account ownership at a financial institution or with a mobile-money-service provider (% of population ages
-          15+)
+        title: Account ownership at a financial institution or with a mobile-money-service provider (% of population ages 15+)
         short_unit: '%'
         unit: '% age 15+'
       gb_xpd_rsdv_gd_zs:
@@ -1944,8 +1934,7 @@ tables:
         title: 'Logistics performance index: Overall (1=low to 5=high)'
         unit: 1=low to 5=high
       lp_lpi_time_xq:
-        title: 'Logistics performance index: Frequency with which shipments reach consignee within scheduled or expected time
-          (1=low to 5=high)'
+        title: 'Logistics performance index: Frequency with which shipments reach consignee within scheduled or expected time (1=low to 5=high)'
         unit: 1=low to 5=high
       lp_lpi_trac_xq:
         title: 'Logistics performance index: Ability to track and trace consignments (1=low to 5=high)'
@@ -2030,7 +2019,7 @@ tables:
         short_unit: $
         unit: current international $
       ne_con_prvt_pp_kd:
-        title: Households and NPISHs Final consumption expenditure, PPP (constant 2017 international $)
+        title: Households and NPISHs Final consumption expenditure, PPP (constant 2021 international $)
       ne_con_prvt_zs:
         title: Households and NPISHs final consumption expenditure (% of GDP)
         short_unit: '%'
@@ -2506,9 +2495,9 @@ tables:
         short_unit: $
         unit: current international $
       ny_gdp_mktp_pp_kd:
-        title: GDP, PPP (constant 2017 international $)
+        title: GDP, PPP (constant 2021 international $)
         short_unit: $
-        unit: international-$ in 2017 prices
+        unit: international-$ in 2021 prices
       ny_gdp_ngas_rt_zs:
         title: Natural gas rents (% of GDP)
         short_unit: '%'
@@ -2519,33 +2508,33 @@ tables:
         unit: current US$
         presentation:
           topic_tags:
-          - Economic Growth
+            - Economic Growth
       ny_gdp_pcap_cn:
         title: GDP per capita (current LCU)
         unit: current LCU
         presentation:
           topic_tags:
-          - Economic Growth
+            - Economic Growth
       ny_gdp_pcap_kd:
         title: GDP per capita (constant 2015 US$)
         short_unit: $
         unit: constant 2015 US$
         presentation:
           topic_tags:
-          - Economic Growth
+            - Economic Growth
       ny_gdp_pcap_kd_zg:
         title: GDP per capita growth (annual %)
         short_unit: '%'
         unit: annual %
         presentation:
           topic_tags:
-          - Economic Growth
+            - Economic Growth
       ny_gdp_pcap_kn:
         title: GDP per capita (constant LCU)
         unit: constant LCU
         presentation:
           topic_tags:
-          - Economic Growth
+            - Economic Growth
       ny_gdp_pcap_pp_cd:
         title: GDP per capita, PPP (current international $)
         short_unit: $
@@ -2557,11 +2546,11 @@ tables:
           title_public: GDP per capita
           title_variant: In current international $
           topic_tags:
-          - Economic Growth
+            - Economic Growth
       ny_gdp_pcap_pp_kd:
-        title: GDP per capita, PPP (constant 2017 international $)
+        title: GDP per capita, PPP (constant 2021 international $)
         short_unit: $
-        unit: international-$ in 2017 prices
+        unit: international-$ in 2021 prices
         display:
           name: GDP per capita
           tolerance: 5
@@ -2571,7 +2560,7 @@ tables:
           title_public: GDP per capita
           title_variant: In constant 2017 international $
           topic_tags:
-          - Economic Growth
+            - Economic Growth
       ny_gdp_petr_rt_zs:
         title: Oil rents (% of GDP)
         short_unit: '%'
@@ -2623,9 +2612,9 @@ tables:
         short_unit: $
         unit: current international $
       ny_gnp_mktp_pp_kd:
-        title: GNI, PPP (constant 2017 international $)
+        title: GNI, PPP (constant 2021 international $)
         short_unit: $
-        unit: international-$ in 2017 prices
+        unit: international-$ in 2021 prices
       ny_gnp_pcap_cd:
         title: GNI per capita, Atlas method (current US$)
         short_unit: $
@@ -2649,9 +2638,9 @@ tables:
         short_unit: $
         unit: current international $
       ny_gnp_pcap_pp_kd:
-        title: GNI per capita, PPP (constant 2017 international $)
+        title: GNI per capita, PPP (constant 2021 international $)
         short_unit: $
-        unit: international-$ in 2017 prices
+        unit: international-$ in 2021 prices
         display:
           name: GNI per capita
           numDecimalPlaces: 0
@@ -3369,13 +3358,11 @@ tables:
         short_unit: '%'
         unit: '% of GDP'
       sg_dmk_alld_fn_zs:
-        title: Women participating in the three decisions (own health care, major household purchases, and visiting family)
-          (% of women age 15-49)
+        title: Women participating in the three decisions (own health care, major household purchases, and visiting family) (% of women age 15-49)
         short_unit: '%'
         unit: '% of women age 15-49'
       sg_dmk_srcr_fn_zs:
-        title: Women making their own informed decisions regarding sexual relations, contraceptive use and reproductive health
-          care (% of women age 15-49)
+        title: Women making their own informed decisions regarding sexual relations, contraceptive use and reproductive health care (% of women age 15-49)
         short_unit: '%'
         unit: '% of women age 15-49'
       sg_gen_parl_zs:
@@ -3393,8 +3380,7 @@ tables:
         short_unit: '%'
         unit: '% of 24 hour day'
       sg_vaw_1549_zs:
-        title: Proportion of women subjected to physical and/or sexual violence in the last 12 months (% of ever-partnered
-          women ages 15-49)
+        title: Proportion of women subjected to physical and/or sexual violence in the last 12 months (% of ever-partnered women ages 15-49)
         short_unit: '%'
         unit: '% of women age 15-49'
       sg_vaw_argu_zs:
@@ -3422,8 +3408,7 @@ tables:
         short_unit: '%'
         unit: '%'
       sh_alc_pcap_fe_li:
-        title: Total alcohol consumption per capita, female (liters of pure alcohol, projected estimates, female 15+ years
-          of age)
+        title: Total alcohol consumption per capita, female (liters of pure alcohol, projected estimates, female 15+ years of age)
       sh_alc_pcap_li:
         title: Total alcohol consumption per capita (liters of pure alcohol, projected estimates, 15+ years of age)
         unit: liters of pure alcohol, projected estimates, 15+ years of age
@@ -3433,8 +3418,7 @@ tables:
           title_public: Total alcohol consumption per capit
           title_variant: In liters of pure alcohol, projected estimates, 15+ years of age
       sh_alc_pcap_ma_li:
-        title: Total alcohol consumption per capita, male (liters of pure alcohol, projected estimates, male 15+ years of
-          age)
+        title: Total alcohol consumption per capita, male (liters of pure alcohol, projected estimates, male 15+ years of age)
       sh_anm_allw_zs:
         title: Prevalence of anemia among women of reproductive age (% of women ages 15-49)
         short_unit: '%'
@@ -3677,11 +3661,9 @@ tables:
         title: Number of surgical procedures (per 100,000 population)
         unit: per 100,000 population
       sh_sta_airp_fe_p5:
-        title: Mortality rate attributed to household and ambient air pollution, age-standardized, female (per 100,000 female
-          population)
+        title: Mortality rate attributed to household and ambient air pollution, age-standardized, female (per 100,000 female population)
       sh_sta_airp_ma_p5:
-        title: Mortality rate attributed to household and ambient air pollution, age-standardized, male (per 100,000 male
-          population)
+        title: Mortality rate attributed to household and ambient air pollution, age-standardized, male (per 100,000 male population)
       sh_sta_airp_p5:
         title: Mortality rate attributed to household and ambient air pollution, age-standardized (per 100,000 population)
         unit: per 100,000 population
@@ -3873,23 +3855,19 @@ tables:
         title: Incidence of tuberculosis (per 100,000 people)
         unit: per 100,000 people
       sh_uhc_nop1_zs:
-        title: Proportion of population pushed below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure
-          (%)
+        title: Proportion of population pushed below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
         short_unit: '%'
         unit: '%'
       sh_uhc_nop2_zs:
-        title: Proportion of population pushed below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure
-          (%)
+        title: Proportion of population pushed below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
         short_unit: '%'
         unit: '%'
       sh_uhc_oopc_10_zs:
-        title: Proportion of population spending more than 10% of household consumption or income on out-of-pocket health
-          care expenditure (%)
+        title: Proportion of population spending more than 10% of household consumption or income on out-of-pocket health care expenditure (%)
         short_unit: '%'
         unit: '%'
       sh_uhc_oopc_25_zs:
-        title: Proportion of population spending more than 25% of household consumption or income on out-of-pocket health
-          care expenditure (%)
+        title: Proportion of population spending more than 25% of household consumption or income on out-of-pocket health care expenditure (%)
         short_unit: '%'
         unit: '%'
       sh_uhc_srvs_cv_xd:
@@ -4065,8 +4043,7 @@ tables:
         short_unit: $
         unit: 2017 PPP $
       si_spr_pc40_zg:
-        title: Annualized average growth rate in per capita real survey mean consumption or income, bottom 40% of population
-          (%)
+        title: Annualized average growth rate in per capita real survey mean consumption or income, bottom 40% of population (%)
         short_unit: '%'
         unit: '%'
       si_spr_pcap:
@@ -4196,9 +4173,9 @@ tables:
         title: Contributing family workers, total (% of total employment) (modeled ILO estimate)
         unit: modeled ILO estimate
       sl_gdp_pcap_em_kd:
-        title: GDP per person employed (constant 2017 PPP $)
+        title: GDP per person employed (constant 2021 PPP $)
         short_unit: $
-        unit: constant 2017 PPP $
+        unit: constant 2021 PPP $
         display:
           numDecimalPlaces: 0
       sl_ind_empl_fe_zs:
@@ -5098,18 +5075,15 @@ tables:
         short_unit: '%'
         unit: '% of total merchandise imports'
       tm_val_mrch_r2_zs:
-        title: Merchandise imports from low- and middle-income economies in Europe & Central Asia (% of total merchandise
-          imports)
+        title: Merchandise imports from low- and middle-income economies in Europe & Central Asia (% of total merchandise imports)
         short_unit: '%'
         unit: '% of total merchandise imports'
       tm_val_mrch_r3_zs:
-        title: Merchandise imports from low- and middle-income economies in Latin America & the Caribbean (% of total merchandise
-          imports)
+        title: Merchandise imports from low- and middle-income economies in Latin America & the Caribbean (% of total merchandise imports)
         short_unit: '%'
         unit: '% of total merchandise imports'
       tm_val_mrch_r4_zs:
-        title: Merchandise imports from low- and middle-income economies in Middle East & North Africa (% of total merchandise
-          imports)
+        title: Merchandise imports from low- and middle-income economies in Middle East & North Africa (% of total merchandise imports)
         short_unit: '%'
         unit: '% of total merchandise imports'
       tm_val_mrch_r5_zs:
@@ -5217,13 +5191,11 @@ tables:
         short_unit: '%'
         unit: '% of total merchandise exports'
       tx_val_mrch_r3_zs:
-        title: Merchandise exports to low- and middle-income economies in Latin America & the Caribbean (% of total merchandise
-          exports)
+        title: Merchandise exports to low- and middle-income economies in Latin America & the Caribbean (% of total merchandise exports)
         short_unit: '%'
         unit: '% of total merchandise exports'
       tx_val_mrch_r4_zs:
-        title: Merchandise exports to low- and middle-income economies in Middle East & North Africa (% of total merchandise
-          exports)
+        title: Merchandise exports to low- and middle-income economies in Middle East & North Africa (% of total merchandise exports)
         short_unit: '%'
         unit: '% of total merchandise exports'
       tx_val_mrch_r5_zs:
@@ -5364,11 +5336,9 @@ tables:
       rq_std_err:
         title: 'Regulatory Quality: Standard Error'
       se_lpv_prim:
-        title: 'Learning poverty: Share of Children at the End-of-Primary age below minimum reading proficiency adjusted by
-          Out-of-School Children (%)'
+        title: 'Learning poverty: Share of Children at the End-of-Primary age below minimum reading proficiency adjusted by Out-of-School Children (%)'
       se_lpv_prim_fe:
-        title: 'Learning poverty: Share of Female Children at the End-of-Primary age below minimum reading proficiency adjusted
-          by Out-of-School Children (%)'
+        title: 'Learning poverty: Share of Female Children at the End-of-Primary age below minimum reading proficiency adjusted by Out-of-School Children (%)'
       se_lpv_prim_ld:
         title: Pupils below minimum reading proficiency at end of primary (%). Low GAML threshold
       se_lpv_prim_ld_fe:
@@ -5376,8 +5346,7 @@ tables:
       se_lpv_prim_ld_ma:
         title: Male pupils below minimum reading proficiency at end of primary (%). Low GAML threshold
       se_lpv_prim_ma:
-        title: 'Learning poverty: Share of Male Children at the End-of-Primary age below minimum reading proficiency adjusted
-          by Out-of-School Children (%)'
+        title: 'Learning poverty: Share of Male Children at the End-of-Primary age below minimum reading proficiency adjusted by Out-of-School Children (%)'
       se_lpv_prim_sd:
         title: Primary school age children out-of-school (%)
       se_lpv_prim_sd_fe:
@@ -5385,26 +5354,19 @@ tables:
       se_lpv_prim_sd_ma:
         title: Male primary school age children out-of-school (%)
       sh_uhc_fbp1_zs:
-        title: Proportion of population pushed further below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket health care
-          expenditure (%)
+        title: Proportion of population pushed further below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
       sh_uhc_fbp2_zs:
-        title: Proportion of population pushed further below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket health care
-          expenditure (%)
+        title: Proportion of population pushed further below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
       sh_uhc_fbpr_zs:
-        title: Proportion of population pushed further below the 60% median consumption poverty line by out-of-pocket health
-          care expenditure (%)
+        title: Proportion of population pushed further below the 60% median consumption poverty line by out-of-pocket health care expenditure (%)
       sh_uhc_nopr_zs:
-        title: Proportion of population pushed below the 60% median consumption poverty line by out-of-pocket health expenditure
-          (%)
+        title: Proportion of population pushed below the 60% median consumption poverty line by out-of-pocket health expenditure (%)
       sh_uhc_tot1_zs:
-        title: Proportion of population pushed or further pushed below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket
-          health care expenditure (%)
+        title: Proportion of population pushed or further pushed below the $2.15 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
       sh_uhc_tot2_zs:
-        title: Proportion of population pushed or further pushed below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket
-          health care expenditure (%)
+        title: Proportion of population pushed or further pushed below the $3.65 ($ 2017 PPP) poverty line by out-of-pocket health care expenditure (%)
       sh_uhc_totr_zs:
-        title: Proportion of population pushed or further pushed below the 60% median consumption poverty line by out-of-pocket
-          health expenditure (%)
+        title: Proportion of population pushed or further pushed below the 60% median consumption poverty line by out-of-pocket health expenditure (%)
       va_est:
         title: 'Voice and Accountability: Estimate'
       va_no_src:
@@ -5417,3 +5379,129 @@ tables:
         title: 'Voice and Accountability: Percentile Rank, Upper Bound of 90% Confidence Interval'
       va_std_err:
         title: 'Voice and Accountability: Standard Error'
+      dc_dac_estl_cd:
+        title: Net bilateral aid flows from DAC donors, Estonia (current US$)
+      dc_dac_ltul_cd:
+        title: Net bilateral aid flows from DAC donors, Lithuania (current US$)
+      dt_nfl_cerf_cd:
+        title: Net official flows from UN agencies, CERF (current US$)
+      dt_nfl_sdgf_cd:
+        title: Net official flows from UN agencies, SDGFUND (current US$)
+      dt_nfl_sprp_cd:
+        title: Net official flows from UN agencies, SPRP (current US$)
+      dt_nfl_uncd_cd:
+        title: Net official flows from UN agencies, UNCDF (current US$)
+      dt_nfl_unctad_cd:
+        title: Net official flows from UN agencies, UNCTAD (current US$)
+      dt_nfl_uncv_cd:
+        title: Net official flows from UN agencies, UNCOVID (current US$)
+      dt_nfl_unido_cd:
+        title: Net official flows from UN agencies, UNIDO (current US$)
+      dt_nfl_unwn_cd:
+        title: Net official flows from UN agencies, UNWOMEN (current US$)
+      dt_nfl_witc_cd:
+        title: Net official flows from UN agencies, WTO-ITC (current US$)
+      it_net_user_fe_zs:
+        title: Internet users, female (%)
+      it_net_user_ma_zs:
+        title: Internet users, male (%)
+      si_pov_mpun:
+        title: Multidimensional poverty headcount ratio (UNDP) (% of population)
+      si_pov_mpwb:
+        title: Multidimensional poverty headcount ratio (World Bank) (% of population)
+      si_pov_sopo:
+        title: Poverty headcount ratio at societal poverty line (% of population)
+      si_spr_pgap:
+        title: Prosperity gap (average shortfall from a prosperity standard of $25/day)
+      sl_uem_neet_fe_me_zs:
+        title: Share of youth not in education, employment or training, female (% of female youth population) (modeled ILO estimate)
+      sl_uem_neet_ma_me_zs:
+        title: Share of youth not in education, employment or training, male (% of male youth population) (modeled ILO estimate)
+      sl_uem_neet_me_zs:
+        title: Share of youth not in education, employment or training, total (% of youth population) (modeled ILO estimate)
+      en_ghg_co2_lu_fl_mt_ce_ar5:
+        title: Carbon dioxide (CO2) net fluxes from LULUCF - Forest Land (Mt CO2e)
+      en_ghg_all_mt_ce_ar5:
+        title: Total greenhouse gas emissions excluding LULUCF (Mt CO2e)
+      en_ghg_n2o_ip_mt_ce_ar5:
+        title: Nitrous oxide (N2O) emissions from Industrial Processes (Mt CO2e)
+      en_ghg_co2_fe_mt_ce_ar5:
+        title: Carbon dioxide (CO2) emissions from Fugitive Emissions (Energy) (Mt CO2e)
+      en_ghg_ch4_wa_mt_ce_ar5:
+        title: Methane (CH4) emissions from Waste (Mt CO2e)
+      en_ghg_co2_ag_mt_ce_ar5:
+        title: Carbon dioxide (CO2) emissions from Agriculture (Mt CO2e)
+      en_ghg_ch4_ip_mt_ce_ar5:
+        title: Methane (CH4) emissions from Industrial Processes (Mt CO2e)
+      en_ghg_co2_tr_mt_ce_ar5:
+        title: Carbon dioxide (CO2) emissions from Transport (Energy) (Mt CO2e)
+      en_ghg_n2o_ic_mt_ce_ar5:
+        title: Nitrous oxide (N2O) emissions from Industrial Combustion (Energy) (Mt CO2e)
+      en_ghg_ch4_pi_mt_ce_ar5:
+        title: Methane (CH4) emissions from Power Industry (Energy) (Mt CO2e)
+      en_ghg_n2o_bu_mt_ce_ar5:
+        title: Nitrous oxide (N2O) emissions from Building (Energy) (Mt CO2e)
+      en_ghg_ch4_tr_mt_ce_ar5:
+        title: Methane (CH4) emissions from Transport (Energy) (Mt CO2e)
+      en_ghg_co2_lu_os_mt_ce_ar5:
+        title: Carbon dioxide (CO2) net fluxes from LULUCF - Organic Soil (Mt CO2e)
+      en_ghg_co2_pi_mt_ce_ar5:
+        title: Carbon dioxide (CO2) emissions from Power Industry (Energy) (Mt CO2e)
+      en_ghg_co2_zg_ar5:
+        title: Carbon dioxide (CO2) emissions (total) excluding LULUCF (% change from 1990)
+      en_ghg_co2_lu_ol_mt_ce_ar5:
+        title: Carbon dioxide (CO2) net fluxes from LULUCF - Other Land (Mt CO2e)
+      en_ghg_co2_wa_mt_ce_ar5:
+        title: Carbon dioxide (CO2) emissions from Waste (Mt CO2e)
+      en_ghg_all_lu_mt_ce_ar5:
+        title: Total greenhouse gas emissions including LULUCF (Mt CO2e)
+      en_ghg_ch4_fe_mt_ce_ar5:
+        title: Methane (CH4) emissions from Fugitive Emissions (Energy) (Mt CO2e)
+      en_ghg_co2_ic_mt_ce_ar5:
+        title: Carbon dioxide (CO2) emissions from Industrial Combustion (Energy) (Mt CO2e)
+      en_ghg_n2o_tr_mt_ce_ar5:
+        title: Nitrous oxide (N2O) emissions from Transport (Energy) (Mt CO2e)
+      en_ghg_ch4_zg_ar5:
+        title: Methane (CH4) emissions (total) excluding LULUCF (% change from 1990)
+      en_ghg_co2_pc_ce_ar5:
+        title: Carbon dioxide (CO2) emissions excluding LULUCF per capita (t CO2e/capita)
+      en_ghg_co2_bu_mt_ce_ar5:
+        title: Carbon dioxide (CO2) emissions from Building (Energy) (Mt CO2e)
+      en_ghg_co2_mt_ce_ar5:
+        title: Carbon dioxide (CO2) emissions (total) excluding LULUCF (Mt CO2e)
+      en_ghg_co2_ip_mt_ce_ar5:
+        title: Carbon dioxide (CO2) emissions from Industrial Processes (Mt CO2e)
+      en_ghg_co2_lu_df_mt_ce_ar5:
+        title: Carbon dioxide (CO2) net fluxes from LULUCF - Deforestation (Mt CO2e)
+      en_ghg_tot_zg_ar5:
+        title: Total greenhouse gas emissions excluding LULUCF (% change from 1990)
+      en_ghg_all_pc_ce_ar5:
+        title: Total greenhouse gas emissions excluding LULUCF per capita (t CO2e/capita)
+      en_ghg_n2o_fe_mt_ce_ar5:
+        title: Nitrous oxide (N2O) emissions from Fugitive Emissions (Energy) (Mt CO2e)
+      en_ghg_ch4_ag_mt_ce_ar5:
+        title: Methane (CH4) emissions from Agriculture (Mt CO2e)
+      en_ghg_ch4_bu_mt_ce_ar5:
+        title: Methane (CH4) emissions from Building (Energy) (Mt CO2e)
+      en_ghg_co2_lu_mt_ce_ar5:
+        title: Carbon dioxide (CO2) net fluxes from LULUCF - Total excluding non-tropical fires (Mt CO2e)
+      en_ghg_n2o_zg_ar5:
+        title: Nitrous oxide (N2O) emissions (total) excluding LULUCF (% change from 1990)
+      en_ghg_ch4_mt_ce_ar5:
+        title: Methane (CH4) emissions (total) excluding LULUCF (Mt CO2e)
+      en_ghg_co2_rt_gdp_pp_kd:
+        title: Carbon intensity of GDP (kg CO2e per 2021 PPP $ of GDP)
+      en_ghg_ch4_ic_mt_ce_ar5:
+        title: Methane (CH4) emissions from Industrial Combustion (Energy) (Mt CO2e)
+      en_ghg_n2o_pi_mt_ce_ar5:
+        title: Nitrous oxide (N2O) emissions from Power Industry (Energy) (Mt CO2e)
+      en_ghg_n2o_ag_mt_ce_ar5:
+        title: Nitrous oxide (N2O) emissions from Agriculture (Mt CO2e)
+      en_ghg_n2o_wa_mt_ce_ar5:
+        title: Nitrous oxide (N2O) emissions from Waste (Mt CO2e)
+      en_ghg_n2o_mt_ce_ar5:
+        title: Nitrous oxide (N2O) emissions (total) excluding LULUCF (Mt CO2e)
+      en_ghg_co2_rt_gdp_kd:
+        title: Carbon intensity of GDP (kg CO2e per constant 2015 US$ of GDP)
+      en_ghg_fgas_ip_mt_ce_ar5:
+        title: F-gases emissions from Industrial Processes (Mt CO2e)

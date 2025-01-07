@@ -37,7 +37,9 @@ def run(dest_dir: str) -> None:
 
     # converts columns and indicator_code to snake case
     df.columns = df.columns.map(lambda x: x if x in years else underscore(x))
+    orig_indicator_code = df["indicator_code"].copy()
     df["indicator_code"] = df["indicator_code"].astype("category").map(underscore)
+    indicator_code_map = dict(zip(df["indicator_code"], orig_indicator_code))
 
     assert df["country_name"].notnull().all()
     assert df["indicator_code"].notnull().all()
@@ -78,6 +80,9 @@ def run(dest_dir: str) -> None:
     # Add origin to all indicators
     for col in tb.columns:
         tb[col].m.origins = [snap.m.origin]
+
+        # Add original code as titles
+        tb[col].m.title = indicator_code_map[col]
 
     #
     # Save outputs.
