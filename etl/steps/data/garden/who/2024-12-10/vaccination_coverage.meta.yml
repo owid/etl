@@ -111,6 +111,8 @@ tables:
           - "Non-reporting countries represent ≈5% of the global 2023 cohort."
           - "These estimates are based on quantitative data: 1) Country reported coverage data (official and administrative coverage) and 2) survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate). As such, these estimates are affected by the availability and quality of the underlying data."
           - "{definitions.antigen_description_key}"
+        display:
+          numDecimalPlaces: 0
       unvaccinated_one_year_olds:
         title: Number of one-year-olds who have not received {definitions.number_description}
         description_short: The number of one-year-olds who have not received {definitions.antigen_description} in a given year.
@@ -121,3 +123,5 @@ tables:
           - "Non-reporting countries represent ≈5% of the global 2023 cohort."
           - "These estimates are based on quantitative data: 1) Country reported coverage data (official and administrative coverage) and 2) survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate). As such, these estimates are affected by the availability and quality of the underlying data."
           - "{definitions.antigen_description_key}"
+        display:
+          numDecimalPlaces: 0
