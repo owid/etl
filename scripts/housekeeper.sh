@@ -19,7 +19,7 @@ echo '--- Keep OWID clean'
 cd /home/owid/etl
 
 # Run commands
-if [ "$HOUR" -eq "13" ]; then
+if [ "$HOUR" -eq "14" ]; then
     echo "--- Suggesting chart reviews..."
     if [ -n "$1" ]; then
         uv run etl d housekeeper --review-type chart --channel "$1"
