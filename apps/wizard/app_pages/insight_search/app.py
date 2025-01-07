@@ -67,7 +67,8 @@ def get_authors_with_DIs(insights: list[data.Insight]) -> set[str]:
 @st.cache_data(show_spinner=False, max_entries=1)
 def get_and_fit_model(insights: list[data.Insight]) -> emb.EmbeddingsModel:
     # Get embedding model.
-    model = emb.EmbeddingsModel(emb.get_model())
+    with st.spinner("Loading model..."):
+        model = emb.EmbeddingsModel(emb.get_model())
     # Create an embedding for each insight.
     model.fit(insights)
     return model
