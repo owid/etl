@@ -18,7 +18,7 @@ import copy
 import io
 import json
 import random
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Union, get_args, overload
@@ -126,6 +126,52 @@ class Base(MappedAsDataclass, DeclarativeBase):
             cls.__table__.create(engine, checkfirst=False)  # type: ignore
         else:
             raise ValueError(f"Unrecognized value for if_exists: {if_exists}")
+
+
+class HousekeepingSuggestedReview(Base):
+    __tablename__ = "housekeeping_suggested_reviews"
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        init=False,
+        # autoincrement=True,
+        comment="Identifier of the review",
+    )
+    suggestedAt: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=True,
+        server_default=text("CURRENT_TIMESTAMP"),
+        comment="Date when the review was suggested",
+    )
+    objectType: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        comment="Type of the object to review (e.g., 'chart', 'dataset', etc.)",
+    )
+
+    objectId: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    @classmethod
+    def load_reviews(cls, session: Session, object_type: Optional[str] = None) -> list["HousekeepingSuggestedReview"]:
+        if object_type is None:
+            vars = session.scalars(select(cls)).all()
+            return list(vars)
+        else:
+            vars = session.scalars(select(cls).where(cls.objectType == object_type)).all()
+            return list(vars)
+
+    @classmethod
+    def load_reviews_object_id(cls, session: Session, object_type: str) -> list[int]:
+        vars = session.scalars(select(cls.objectId).where(cls.objectType == object_type)).all()
+        return list(vars)
+
+    @classmethod
+    def add_review(cls, session: Session, object_type: str, object_id: int):
+        new_review = cls(objectType=object_type, objectId=object_id, suggestedAt=datetime.now(timezone.utc))
+        session.add(new_review)
+        session.commit()
+        # return new_review
 
 
 class Entity(Base):

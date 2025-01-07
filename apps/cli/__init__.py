@@ -74,6 +74,7 @@ SUBGROUPS = {
             "map-datasets": "apps.utils.map_datasets.cli",
             "scan-chart-diff": "apps.utils.scan_chart_diff.cli",
             "profile": "apps.utils.profile.cli",
+            "housekeeper": "apps.housekeeper.cli.main",
         },
     },
     "b": {

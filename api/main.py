@@ -7,8 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.v1 import v1
 from etl import config
 from etl.db import get_engine
-
-from . import utils
+from etl.slack_helpers import format_slack_message, send_slack_message
 
 log = structlog.get_logger()
 
@@ -66,11 +65,9 @@ async def slack_middleware(request: Request, call_next):
 
     log.info("response", method=request.method, url=str(request.url), status_code=response.status_code, body=res_body)
 
-    utils.send_slack_message(
+    send_slack_message(
         "#metadata-updates",
-        utils.format_slack_message(
-            request.method, request.url, response.status_code, req_body.decode(), res_body.decode()
-        ),
+        format_slack_message(request.method, request.url, response.status_code, req_body.decode(), res_body.decode()),
     )
 
     return Response(
