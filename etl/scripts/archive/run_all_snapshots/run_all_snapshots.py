@@ -11,26 +11,42 @@ All results are stored in the accompanying file: snapshot_execution_times.json
 """
 
 import json
-import random
 import subprocess
 import time
+from typing import Set
 
+import click
 from owid.datautils.io import save_json
 from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR
+from etl.steps import load_dag
 
 log = get_logger()
 
-SNAPSHOT_SCRIPTS = sorted(list((BASE_DIR / "snapshots").glob("*/*/*.py")))
-random.shuffle(SNAPSHOT_SCRIPTS)
 # Kill a subprocess if it takes longer than this many seconds.
 TIMEOUT = 100
 OUTPUT_FILE = BASE_DIR / "etl" / "scripts" / "archive" / "run_all_snapshots" / "snapshot_execution_times.json"
 
 
-def main():
+def get_active_snapshots() -> Set[str]:
+    DAG = load_dag()
+
+    active_snapshots = set()
+
+    for s in set(DAG.keys()) | {x for v in DAG.values() for x in v}:
+        if s.startswith("snapshot"):
+            active_snapshots.add(s.split("://")[1])
+
+    # Strip extension
+    return {s.split(".")[0] + ".py" for s in active_snapshots}
+
+
+@click.command()
+@click.option("--dry-run", is_flag=True, help="Run the script in dry-run mode.")
+@click.option("--filter", type=str, help="Process only snapshots that include the given substring.")
+def main(dry_run, filter):
     # Create a dictionary to store the execution results: duration (in seconds) or "FAILED"
     if OUTPUT_FILE.exists():
         # Load existing results from the JSON file to allow resuming.
@@ -40,9 +56,13 @@ def main():
         # Initialize dictionary of results.
         execution_results = {}
 
+    active_snapshots = get_active_snapshots()
+    if filter:
+        active_snapshots = {s for s in active_snapshots if filter in s}
+
     # Loop over all snapshot scripts.
-    for snapshot_script in tqdm(SNAPSHOT_SCRIPTS):
-        snapshot_script_relative = str(snapshot_script.relative_to(SNAPSHOTS_DIR))
+    for snapshot_script_relative in tqdm(active_snapshots):
+        snapshot_script = SNAPSHOTS_DIR / snapshot_script_relative
 
         if str(snapshot_script) in execution_results:
             log.info(f"Skipping {snapshot_script} because it has already been processed.")
@@ -65,6 +85,12 @@ def main():
             continue
 
         execution_results[snapshot_script_relative] = {}
+
+        if dry_run:
+            log.info(f"[DRY-RUN] Would execute {snapshot_script_relative}.")
+            execution_results[snapshot_script_relative] = {"status": "DRY-RUN"}
+            save_json(data=execution_results, json_file=OUTPUT_FILE, indent=4, sort_keys=False)
+            continue
 
         try:
             # Try to execute snapshot.

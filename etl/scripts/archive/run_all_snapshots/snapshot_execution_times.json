@@ -438,5 +438,11 @@
     "who/latest/monkeypox.py": 2.430558443069458,
     "world_risk_poll/2023-06-26/wrp_2021.py": "FAILED",
     "worldbank_wdi/2023-05-29/wdi.py": "FAILED",
-    "worldbank_wdi/2024-05-20/wdi.py": "FAILED"
+    "worldbank_wdi/2024-05-20/wdi.py": "FAILED",
+    "artificial_intelligence/2024-12-05/epoch_compute_intensive.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-12-05/epoch.py": {
+        "status": "DRY-RUN"
+    }
 }

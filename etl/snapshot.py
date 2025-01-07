@@ -343,7 +343,7 @@ class SnapshotMeta(MetaBase):
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
-    def _meta_to_dict(self):
+    def _meta_to_dict(self) -> dict[str, Any]:
         d = self.to_dict()
 
         # exclude `outs` with md5, we reset it when saving new metadata
@@ -411,19 +411,6 @@ class SnapshotMeta(MetaBase):
             meta = self._meta_to_dict()
             with open(self.path, "w") as f:
                 f.write(yaml_dump({"meta": meta, "wdir": wdir, "outs": outs}))
-
-            # with open(self.path, "r") as f:
-
-            # with open(self.path, "r") as f:
-            #     meta = ruamel_load(f)
-
-            # for k, v in self._meta_to_dict()["origin"].items():
-            #     if meta["meta"]["origin"][k].strip() != v.strip():
-            #         __import__("ipdb").set_trace()
-            #         meta["meta"]["origin"][k] = v
-
-            # with open(self.path, "w") as f:
-            #     f.write(ruamel_dump(meta))
 
     @property
     def uri(self):
