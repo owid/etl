@@ -328,6 +328,22 @@ steps:
   data://grapher/un/2023-01-24/un_sdg:
     - data://garden/un/2023-01-24/un_sdg
 
+    # IHME SDG
+  data-private://meadow/ihme/2023-05-09/sdg:
+    - snapshot-private://ihme/2023-05-05/sdg.csv
+  data-private://garden/ihme/2023-05-09/sdg:
+    - data-private://meadow/ihme/2023-05-09/sdg
+  data-private://grapher/ihme/2023-05-09/sdg:
+    - data-private://garden/ihme/2023-05-09/sdg
+
+  # MICROBE - total deaths by pathogen and amr resistance
+  data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - snapshot-private://antibiotics/2024-12-02/total_pathogen_bloodstream_amr.csv
+  data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream
+    - data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream_amr
+  data-private://grapher/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream_amr
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

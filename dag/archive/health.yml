@@ -226,3 +226,12 @@ steps:
   # Mpox grapher step
   data://grapher/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
+
+  # MICROBE - neonatal deaths by pathogen and amr resistance
+  data-private://meadow/antibiotics/2024-12-05/microbe_neonatal_total_amr:
+    - snapshot-private://antibiotics/2024-12-05/microbe_neonatal_total_amr.csv
+  data-private://garden/antibiotics/2024-12-05/microbe_neonatal_total_amr:
+    - data-private://meadow/antibiotics/2024-12-05/microbe_neonatal_total_amr
+    - data-private://garden/antibiotics/2024-11-20/microbe
+  data-private://grapher/antibiotics/2024-12-05/microbe_neonatal_total_amr:
+    - data-private://garden/antibiotics/2024-12-05/microbe_neonatal_total_amr
