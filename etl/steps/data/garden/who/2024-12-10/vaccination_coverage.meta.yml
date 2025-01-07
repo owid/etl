@@ -52,6 +52,34 @@ definitions:
     <%- elif antigen == "IPV1" %>
     In countries utilizing an immunization schedule recommending either (i) a primary series of three doses of oral polio vaccine (OPV) plus at least one dose of IPV where OPV is included in routine immunization and/or campaign or (ii) a sequential schedule of IPV followed by OPV, WHO and UNICEF estimates for IPV1 reflect coverage with at least one routine dose of IPV among infants <1 year of age among countries. For countries utilizing IPV containing vaccine use only, i.e., no recommended dose of OPV, the WHO and UNICEF estimate for IPV1 corresponds to coverage for the 1st dose of IPV. Production of IPV coverage estimates, which begins in 2015, results in no change of the estimated coverage levels for the 3rd dose of polio (Pol3). For countries recommending routine immunization with a primary series of three doses of IPV alone, WHO and UNICEF estimated Pol3 coverage is equivalent to estimated coverage with three doses of IPV. For countries with a sequential schedule, estimated Pol3 coverage is based on that for the 3rd dose of polio vaccine regardless of vaccine type.
     <%- endif %>
+  number_description: |-
+    <% if antigen == "DTPCV1" %>
+    one dose of combined diphtheria, tetanus toxoid and pertussis- containing vaccine (DTP1)
+    <%- elif antigen == "DTPCV3" %>
+    three doses of combined diphtheria, tetanus toxoid and pertussis- containing vaccine (DTP3)
+    <%- elif antigen == "MCV1" %>
+    the first dose of measles-containing vaccine (MCV1)
+    <%- elif antigen == "POL3" %>
+    the third dose of either oral or inactivated polio vaccine (POL3)
+    <%- elif antigen == "RCV1" %>
+    one dose of rubella-containing vaccine (RCV1)
+    <%- elif antigen == "HEPB3" %>
+    three doses of Hepatitis B containing vaccine (HEPB3)
+    <%- elif antigen == "HIB3" %>
+    three doses of Haemophilus influenzae type b containing vaccine (HIB3)
+    <%- elif antigen == "ROTAC" %>
+    the final recommended dose (2nd or 3rd) of rotavirus vaccine (ROTAC)
+    <%- elif antigen == "PCV3" %>
+    the pneumococcal conjugate vaccine third dose (PCV3)
+    <%- elif antigen == "IPV1" %>
+    the first dose of inactivated polio containing vaccine (IPV1)
+    <%- elif antigen == "IPV2" %>
+    the second dose of inactivated polio containing vaccine (IPV2)
+    <%- elif antigen == "YFV" %>
+    one dose of yellow fever vaccine (YFV)
+    <%- elif antigen == "MENA_C" %>
+    the last dose of meningococcal A conjugate vaccine (MENA_C)
+    <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -71,3 +99,25 @@ tables:
           - "{definitions.antigen_description_key}"
         unit: "%"
         short_unit: "%"
+  number_of_one_year_olds:
+    variables:
+      vaccinated_one_year_olds:
+        title: Number of one-year-olds vaccinated with {definitions.number_description}
+        description_short: The number of one-year-olds who recieved {definitions.antigen_description} in a given year.
+        unit: "one-year-olds"
+        description_key:
+          - "The current release of the WUENIC with data up to 2023 (released in 2024) includes estimates for WHO Member States, including those that did not report 2023 data. For these non-reporting countries, estimates were extrapolated from the last point informed by empirical data."
+          - "Global and regional coverages, values were extrapolated from 2022 for non-reporting countries."
+          - "Non-reporting countries represent ≈5% of the global 2023 cohort."
+          - "These estimates are based on quantitative data: 1) Country reported coverage data (official and administrative coverage) and 2) survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate). As such, these estimates are affected by the availability and quality of the underlying data."
+          - "{definitions.antigen_description_key}"
+      unvaccinated_one_year_olds:
+        title: Number of one-year-olds who have not received {definitions.number_description}
+        description_short: The number of one-year-olds who have not received {definitions.antigen_description} in a given year.
+        unit: "one-year-olds"
+        description_key:
+          - "The current release of the WUENIC with data up to 2023 (released in 2024) includes estimates for WHO Member States, including those that did not report 2023 data. For these non-reporting countries, estimates were extrapolated from the last point informed by empirical data."
+          - "Global and regional coverages, values were extrapolated from 2022 for non-reporting countries."
+          - "Non-reporting countries represent ≈5% of the global 2023 cohort."
+          - "These estimates are based on quantitative data: 1) Country reported coverage data (official and administrative coverage) and 2) survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate). As such, these estimates are affected by the availability and quality of the underlying data."
+          - "{definitions.antigen_description_key}"

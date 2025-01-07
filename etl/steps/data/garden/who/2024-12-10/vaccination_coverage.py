@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog import Table
+from owid.catalog import Dataset, Table
+from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -8,11 +9,25 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Not sure how easy this will be to describe - might only be possible at global/regional levels
+# Denominator for each antigen based on https://worldhealthorg.shinyapps.io/wuenic-trends/
 DENOMINATOR = {
     "BCG": "Live births",  # live births
     "DTPCV1": "Surviving infants",  # the national annual number of infants surviving their first year of life
     "DTPCV3": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "MCV1": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "POL3": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "RCV1": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "HEPB3": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "HIB3": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "HEPB_BD": "Live births",  # live births
+    "MCV2": "Children",
+    "ROTAC": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "PCV3": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "IPV1": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "IPV2": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "YFV": "Surviving infants",  # the national annual number of infants surviving their first year of life
+    "MCV2X2": "Two-year-olds",
+    "MENA_C": "Surviving infants",  # the national annual number of infants surviving their first year of life
 }
 
 
@@ -22,7 +37,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("vaccination_coverage")
-
+    ds_population = paths.load_dataset("un_wpp")
     # Read table from meadow dataset.
     tb = ds_meadow.read("vaccination_coverage")
 
@@ -39,9 +54,12 @@ def run(dest_dir: str) -> None:
     # )
 
     tb = clean_data(tb)
+    # Add denominator column
+    tb = tb.assign(denominator=tb["antigen"].map(DENOMINATOR))
 
+    tb_number = calculate_one_year_olds_vaccinated(tb, ds_population)
     tb = tb.format(["country", "year", "antigen"])
-
+    tb_number = tb_number.format(["country", "year", "antigen"], short_name="number_of_one_year_olds")
     #
     # Save outputs.
     #
@@ -52,6 +70,30 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def get_population_one_year_olds(ds_population: Dataset) -> Table:
+    tb_pop = ds_population.read("population")
+    tb_pop = tb_pop[(tb_pop["age"] == "1") & (tb_pop["variant"] == "estimates") & (tb_pop["sex"] == "all")]
+    tb_pop = tb_pop[["country", "year", "sex", "age", "variant", "population"]]
+    return tb_pop
+
+
+def calculate_one_year_olds_vaccinated(tb: Table, ds_population: Dataset) -> Table:
+    """
+    Calculate the number of one-year-olds vaccinated for each antigen.
+    """
+
+    tb = tb[tb["denominator"] == "Surviving infants"]
+    tb_pop = get_population_one_year_olds(ds_population)
+
+    tb = pr.merge(tb, tb_pop, on=["country", "year"], how="left")
+    tb = tb.assign(
+        vaccinated_one_year_olds=tb["coverage"] / 100 * tb["population"],
+        unvaccinated_one_year_olds=(100 - tb["coverage"]) / 100 * tb["population"],
+    )
+    tb = tb[["country", "year", "antigen", "vaccinated_one_year_olds", "unvaccinated_one_year_olds"]]
+    return tb
 
 
 def use_only_wuenic_data(tb: Table) -> Table:
