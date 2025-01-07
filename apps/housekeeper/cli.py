@@ -14,7 +14,7 @@ REVIEW_TYPES = [
 ]
 
 # Config
-CHANNEL_NAME = "#lucas-playground"
+CHANNEL_NAME = "#chart-reviews"
 SLACK_USERNAME = "housekeeper"
 ICON_EMOJI = "sus-blue"
 

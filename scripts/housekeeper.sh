@@ -13,13 +13,11 @@ start_time=$(date +%s)
 # Get hour, useful to orchestrate
 HOUR=$(TZ=Europe/Berlin date +%H)
 
-echo '--- Keep OWID clean'
-
 # Go to relevant folder
 cd /home/owid/etl
 
 # Run commands
-if [ "$HOUR" -eq "14" ]; then
+if [ "$HOUR" -eq "06" ]; then
     echo "--- Suggesting chart reviews..."
     if [ -n "$1" ]; then
         uv run etl d housekeeper --review-type chart --channel "$1"
