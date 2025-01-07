@@ -47,17 +47,14 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
+    # Keep only data from WUENIC
     tb = use_only_wuenic_data(tb)
-
-    # antigen_dict = (
-    #    tb[["antigen", "antigen_description"]].drop_duplicates().set_index("antigen")["antigen_description"].to_dict()
-    # )
-
     tb = clean_data(tb)
     # Add denominator column
     tb = tb.assign(denominator=tb["antigen"].map(DENOMINATOR))
-
+    # Calculate the number of one-year-olds vaccinated for each antigen.
     tb_number = calculate_one_year_olds_vaccinated(tb, ds_population)
+    tb = tb.drop(columns=["denominator"])
     tb = tb.format(["country", "year", "antigen"], short_name="vaccination_coverage")
     tb_number = tb_number.format(["country", "year", "antigen"], short_name="number_of_one_year_olds")
     #
