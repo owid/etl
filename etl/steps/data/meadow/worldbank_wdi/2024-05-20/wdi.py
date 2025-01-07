@@ -28,8 +28,6 @@ def run(dest_dir: str) -> None:
     zf = zipfile.ZipFile(snap.path)
     df = pd.read_csv(zf.open("WDIData.csv"))
 
-    __import__("ipdb").set_trace()
-
     df.dropna(how="all", axis=1, inplace=True)
 
     # drops rows with only NaN values

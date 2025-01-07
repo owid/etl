@@ -1394,5 +1394,180 @@
     "rawName": "International Labour Organization. “Education and Mismatch Indicators database (EMI)” ILOSTAT. Accessed February 06, 2024. https://ilostat.ilo.org/data/.",
     "name": "International Labour Organization",
     "dataPublisherSource": "Education and Mismatch Indicators database (EMI) - International Labour Organization"
+  },
+  {
+    "rawName": "International Labour Organization. “ILO Modelled Estimates and Projections database ( ILOEST )” ILOSTAT. Accessed September 06, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "ILO Modelled Estimates and Projections Database (ILOEST) - International Labour Organization"
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision; (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics.",
+    "name": "Data compiled from multiple sources by World Bank",
+    "dataPublisherSource": "World Population Prospects - UN Population Division, National Statistical Offices, Eurostat"
+  },
+  {
+    "rawName": "International Labour Organization. “Labour Force Statistics database (LFS)” ILOSTAT. Accessed September 06, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Labour Force Statistics Database (LFS) - International Labour Organization"
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision; (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics; (4) United Nations Statistics Division. Population and Vital Statistics Reprot (various years).",
+    "name": "Data compiled from multiple sources by World Bank",
+    "dataPublisherSource": "World Population Prospects - UN Population Division, National Statistical Offices, Eurostat, UN Statistics Division"
+  },
+  {
+    "rawName": "International Labour Organization. “Wages and Working Time Statistics database (COND)” ILOSTAT. Accessed September 06, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Wages and Working Time Statistics Database (COND) - International Labour Organization"
+  },
+  {
+    "rawName": "Alkire, S., Kanagaratnam, U., and Suppa, N. (2023). ‘The global Multidimensional Poverty Index (MPI) 2023 country results and methodological note’, OPHI MPI Methodological Note 55, Oxford Poverty and Human Development Initiative (OPHI), University of Oxford. (https://ophi.org.uk/mpi-methodological-note-55-2/)",
+    "name": "Oxford Poverty and Human Development Initiative (OPHI), University of Oxford",
+    "dataPublisherSource": "Global Multidimensional Poverty Index (MPI) - OPHI"
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision; or derived from male and female life expectancy at birth from sources such as: (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics.",
+    "name": "Data compiled from multiple sources by World Bank",
+    "dataPublisherSource": "World Population Prospects - UN Population Division, National Statistical Offices, Eurostat"
+  },
+  {
+    "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, Geographical Distribution of Financial Flows to Developing Countries, Development Co-operation Report, and International Development Statistics database. Data are available online at: https://data-explorer.oecd.org/.",
+    "name": "Organisation for Economic Co-operation and Development (OECD)",
+    "dataPublisherSource": "Geographical Distribution of Financial Flows to Developing Countries - OECD"
+  },
+  {
+    "rawName": "National statistical offices or national database and publications compiled by United Nations Statistics Division.  The data were downloaded on April 4, 2024, from the Global SDG  API: https://unstats.un.org/sdgs/UNSDGAPIV5/swagger/index.html",
+    "name": "United Nations Statistics Division",
+    "dataPublisherSource": "Global SDG API - UN Statistics Division"
+  },
+  {
+    "rawName": "World Health Organization, World malaria report and Global Health Observatory Data Repository/World Health Statistics (http://apps.who.int/ghodata/).",
+    "name": "World Health Organization (via World Bank)",
+    "dataPublisherSource": "World Malaria Report, Global Health Observatory Data Repository - World Health Organization"
+  },
+  {
+    "rawName": "International Labour Organization. “ILO Modelled Estimates and Projections database (ILOEST)” ILOSTAT. Accessed June 18, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "ILO Modelled Estimates and Projections Database (ILOEST) - International Labour Organization"
+  },
+  {
+    "rawName": "World Health Organization Global Health Expenditure database (http://apps.who.int/nha/database). The data was retrieved on April 15, 2024.",
+    "name": "World Health Organization",
+    "dataPublisherSource": "Global Health Expenditure Database - World Health Organization"
+  },
+  {
+    "rawName": "National statistical offices or national database and publications compiled by United Nations Statistics Division. The data were downloaded on April 4, 2024, from the Global SDG  API: https://unstats.un.org/sdgs/UNSDGAPIV5/swagger/index.html",
+    "name": "United Nations Statistics Division",
+    "dataPublisherSource": "Global SDG API - UN Statistics Division"
+  },
+  {
+    "rawName": "UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed April 24, 2024. https://apiportal.uis.unesco.org/bdds.",
+    "name": "UNESCO Institute for Statistics",
+    "dataPublisherSource": "UIS.Stat Bulk Data Download Service - UNESCO"
+  },
+  {
+    "rawName": "World Bank’s Poverty and Inequality Platform: http://pip.worldbank.org.",
+    "name": "World Bank",
+    "dataPublisherSource": "Poverty and Inequality Platform - World Bank"
+  },
+  {
+    "rawName": "International Telecommunication Union.",
+    "name": "International Telecommunication Union",
+    "dataPublisherSource": "International Telecommunication Union"
+  },
+  {
+    "rawName": "Detailed documentation of the WGI, interactive tools for exploring the data, and full access to the underlying source data available at www.govindicators.org.The WGI are produced by Daniel Kaufmann (Natural Resource Governance Institute and Brookings Institution) and Aart Kraay (World Bank Development Research Group).  Please cite Kaufmann, Daniel, Aart Kraay and Massimo Mastruzzi (2010).  \"The Worldwide Governance Indicators:  Methodology and Analytical Issues\".  World Bank Policy Research Working Paper No. 5430 (http://papers.ssrn.com/sol3/papers.cfm?abstract_id=1682130).  The WGI do not reflect the official views of the Natural Resource Governance Institute, the Brookings Institution, the World Bank, its Executive Directors, or the countries they represent.",
+    "name": "World Bank",
+    "dataPublisherSource": "Worldwide Governance Indicators - World Bank"
+  },
+  {
+    "rawName": "Derived from total population. Population source: (1) United Nations Population Division. World Population Prospects: 2022 Revision; (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics; (4) United Nations Statistics Division. Population and Vital Statistics Reprot (various years).",
+    "name": "Data compiled from multiple sources by World Bank",
+    "dataPublisherSource": "World Population Prospects - UN Population Division, National Statistical Offices, Eurostat, UN Statistics Division"
+  },
+  {
+    "rawName": "International Labour Organization. “Labour Market-related SDG Indicators database (ILOSDG)” ILOSTAT. Accessed September 06, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Labour Market-related SDG Indicators Database (ILOSDG) - International Labour Organization"
+  },
+  {
+    "rawName": "International Labour Organization. “Education and Mismatch Indicators database (EMI)” ILOSTAT. Accessed September 06, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Education and Mismatch Indicators Database (EMI) - International Labour Organization"
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg79",
+    "name": "European Commission, Joint Research Centre (JRC), International Energy Agency (IEA)",
+    "dataPublisherSource": "EDGAR Community GHG Database - European Commission, JRC, IEA"
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg77",
+    "name": "European Commission, Joint Research Centre, and International Energy Agency",
+    "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg72",
+    "name": "European Commission, Joint Research Centre, and International Energy Agency",
+    "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
+  },
+  {
+    "rawName": "Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190605",
+    "name": "Grassi et al.",
+    "dataPublisherSource": "Carbon fluxes from land 2000–2020 - Grassi et al."
+  },
+  {
+    "rawName": "Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190602",
+    "name": "Grassi et al.",
+    "dataPublisherSource": "Carbon fluxes from land 2000–2020 - Grassi et al."
+  },
+  {
+    "rawName": "Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190603",
+    "name": "Grassi et al.",
+    "dataPublisherSource": "Carbon fluxes from land 2000–2020 - Grassi et al."
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg74",
+    "name": "European Commission, Joint Research Centre, and International Energy Agency",
+    "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg80",
+    "name": "European Commission, Joint Research Centre, and International Energy Agency",
+    "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg72; Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190601",
+    "name": "European Commission, Joint Research Centre, International Energy Agency, and Grassi et al.",
+    "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency; Carbon fluxes from land 2000–2020 - Grassi et al."
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg73",
+    "name": "European Commission, Joint Research Centre, and International Energy Agency",
+    "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg75",
+    "name": "European Commission, Joint Research Centre, and International Energy Agency",
+    "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg76",
+    "name": "European Commission, Joint Research Centre, and International Energy Agency",
+    "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
+  },
+  {
+    "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg78",
+    "name": "European Commission, Joint Research Centre, and International Energy Agency",
+    "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
+  },
+  {
+    "rawName": "Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190604",
+    "name": "Grassi et al.",
+    "dataPublisherSource": "Carbon fluxes from land 2000–2020 - Grassi et al."
+  },
+  {
+    "rawName": "Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190601",
+    "name": "Grassi et al.",
+    "dataPublisherSource": "Carbon fluxes from land 2000–2020 - Grassi et al."
   }
 ]

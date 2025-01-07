@@ -6,14 +6,19 @@ from typing import Any, Dict, Optional
 
 import owid.catalog.processing as pr
 import pandas as pd
+import requests
 import structlog
+from joblib import Memory
 from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+from etl.paths import CACHE_DIR
 
 log = structlog.get_logger()
+
+memory = Memory(CACHE_DIR, verbose=0)
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -430,7 +435,65 @@ def mk_custom_entities(df: Table) -> pd.DataFrame:
     return df_cust
 
 
-def load_variable_metadata() -> pd.DataFrame:
+@memory.cache
+def _fetch_metadata_for_indicator(indicator_code: str) -> Dict[str, str]:
+    indicator_code = indicator_code.replace("_", ".").upper()
+    api_url = f"https://api.worldbank.org/v2/indicator/{indicator_code}?format=json"
+    log.info("wdi.fetch_metadata", indicator_code=indicator_code)
+    js = requests.get(api_url).json()
+
+    # Metadata not available for indicators such as PER.SI.ALLSI.COV.Q3.TOT
+    if len(js) < 2:
+        raise ValueError(f"Metadata not available for indicator {indicator_code}")
+        # log.warning("wdi.fetch_metadata_failed", indicator_code=indicator_code)
+        # return {
+        #     "indicator_code": indicator_code,
+        #     "indicator_name": indicator_code,
+        #     "unit": "",
+        #     "source": "",
+        #     "topic": "",
+        # }
+
+    d = js[1]
+    assert len(d) == 1
+    d = d[0]
+
+    # There might be more fields, but we don't use them
+    return {
+        "indicator_code": indicator_code,
+        "indicator_name": d.pop("name"),
+        "unit": d.pop("unit"),
+        "source": d.pop("sourceOrganization"),
+        "topic": d.pop("topics")[0]["value"],
+    }
+
+
+# def _fetch_source_for_indicator(indicator_code: str) -> Optional[str]:
+#     indicator_code = indicator_code.replace("_", ".").upper()
+#     api_url = f"https://api.worldbank.org/v2/indicator/{indicator_code}?format=json"
+#     log.info("wdi.fetch_source", indicator_code=indicator_code)
+#     js = requests.get(api_url).json()
+#     return js[1][0]["sourceOrganization"]
+
+#     html = requests.get(
+#         f"https://databank.worldbank.org/metadataglossary/world-development-indicators/series/{indicator_code}"
+#     ).text
+
+#     # Parse the HTML
+#     soup = BeautifulSoup(html, "html.parser")
+
+#     # Find the 'Source' row and extract the text from the second <td>
+#     source_row = soup.find("td", string="Source")
+#     if source_row:
+#         source_name = source_row.find_next_sibling("td").get_text(strip=True)
+#         log.info("wdi.found_source", indicator_code=indicator_code)
+#         return source_name
+#     else:
+#         log.info("wdi.source_not_found", indicator_code=indicator_code)
+#         return None
+
+
+def load_variable_metadata(indicator_codes: list[str]) -> pd.DataFrame:
     snap = paths.load_snapshot()
     zf = zipfile.ZipFile(snap.path)
     df_vars = pd.read_csv(zf.open("WDISeries.csv"))
@@ -438,11 +501,41 @@ def load_variable_metadata() -> pd.DataFrame:
     df_vars.dropna(how="all", axis=1, inplace=True)
     df_vars.columns = df_vars.columns.map(underscore)
     df_vars.rename(columns={"series_code": "indicator_code"}, inplace=True)
-    df_vars["indicator_code"] = df_vars["indicator_code"].apply(underscore)
 
+    # Fetch missing indicator metadata
+    indicators_without_meta = set(indicator_codes) - set(df_vars["indicator_code"])
+
+    # Add indicators without sources
+    indicators_without_meta |= set(df_vars.loc[df_vars.source.isnull(), "indicator_code"])
+
+    # Add indicators without names
+    indicators_without_meta |= set(df_vars.loc[df_vars.indicator_name.isnull(), "indicator_code"])
+
+    # Fetch metadata for missing indicators
+    log.info("wdi.missing_metadata", n_indicators=len(indicators_without_meta))
+    df_missing = pd.DataFrame([_fetch_metadata_for_indicator(code) for code in indicators_without_meta])
+
+    # Merge missing metadata
+    df_vars = pd.concat([df_vars[~df_vars.indicator_code.isin(df_missing.indicator_code)], df_missing])
+
+    # Final checks
+    missing_indicator_codes = set(indicator_codes) - set(df_vars["indicator_code"])
+    if missing_indicator_codes:
+        raise ValueError(f"Missing metadata in WDISeries.csv for the following indicators: {missing_indicator_codes}")
+
+    if df_vars.indicator_name.isnull().any():
+        missing_names = df_vars.loc[df_vars.indicator_name.isnull(), "indicator_code"].unique()
+        raise RuntimeError(f"Missing names for indicators:\n{missing_names}")
+
+    if df_vars.source.isnull().any():
+        missing_sources = df_vars.loc[df_vars.source.isnull(), "indicator_code"].unique()
+        raise RuntimeError(f"Missing sources for indicators:\n{missing_sources}")
+
+    # Underscore indicator codes
+    df_vars["indicator_code"] = df_vars["indicator_code"].apply(underscore)
     df_vars["indicator_name"] = df_vars["indicator_name"].str.replace(r"\s+", " ", regex=True)
 
-    # remove non-breaking spaces
+    # Remove non-breaking spaces
     df_vars.source = df_vars.source.str.replace("\xa0", " ").replace("\u00a0", " ")
 
     return df_vars.set_index("indicator_code")
@@ -450,8 +543,13 @@ def load_variable_metadata() -> pd.DataFrame:
 
 def add_variable_metadata(table: Table) -> Table:
     var_codes = table.columns.tolist()
+    indicator_codes = [table[col].m.title for col in table.columns]
 
-    df_vars = load_variable_metadata()
+    df_vars = load_variable_metadata(indicator_codes)
+
+    missing_var_codes = set(var_codes) - set(df_vars.index)
+    if missing_var_codes:
+        raise RuntimeError(f"Missing metadata for the following variables: {missing_var_codes}")
 
     clean_source_mapping = load_clean_source_mapping()
 
