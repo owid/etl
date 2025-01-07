@@ -7,11 +7,16 @@
 
 set -e
 
+# For logging
 start_time=$(date +%s)
 
+# Get hour, useful to orchestrate
 HOUR=$(TZ=Europe/Berlin date +%H)
-echo '--- Keep OWID clean'
-# cd /home/owid/etl
+
+# Go to relevant folder
+cd /home/owid/etl
+
+# Run commands
 if [ "$HOUR" -eq "06" ]; then
     echo "--- Suggesting chart reviews..."
     if [ -n "$1" ]; then
