@@ -9,16 +9,12 @@ set -e
 
 start_time=$(date +%s)
 
+HOUR=$(TZ=Europe/Berlin date +%H)
 echo '--- Keep OWID clean'
 cd /home/owid/etl
-uv run python snapshots/covid/latest/cases_deaths.py
-
-# commit to master will trigger ETL which is gonna run the step
-echo '--- Commit and push changes'
-
-git add .
-git commit -m ":robot: update: covid-19 cases and deaths" || true
-git push origin master -q || true
+if [ "$HOUR" -eq "01" ]; then
+    uv run etl d housekeeper --review-type chart
+fi
 
 end_time=$(date +%s)
 
