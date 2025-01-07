@@ -755,6 +755,9 @@ steps:
     - snapshot://atus/2024-12-10/activity_codes_2023.xls
     - snapshot://atus/2024-12-10/atus_respondent.zip
 
+  data://garden/atus/2025-01-06/atus_who:
+    - data://meadow/atus/2024-12-10/atus_0323
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

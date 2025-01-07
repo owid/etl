@@ -5,7 +5,8 @@ from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Table, TableMeta
+
+# from owid.catalog import Table, TableMeta
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
@@ -15,6 +16,7 @@ paths = PathFinder(__file__)
 
 # Codes for who was present with respondent.
 # see also: https://www.bls.gov/tus/dictionaries/atusintcodebk23.pdf
+
 WHO_CODES = {
     18: "Alone",
     19: "Alone",  # no distinction between 18 and 19
@@ -191,107 +193,25 @@ def run(dest_dir: str) -> None:
     who_data["who_string"] = who_data["who_code"].map(WHO_CODES)
     who_data["who_category"] = who_data["who_code"].map(WHO_CODE_CATEGORIES)
 
-    # Merge activity and who data:
-    tb = act_data.merge(who_data, on=["case_id", "activity_number"], how="left")
-
     # filter summary data to relevant columns:
     sum_data = sum_data.rename(columns=SUM_COL_DICT)
-    tb_sum = sum_data[["case_id", "age", "gender", "year", "final_weight", "final_weight_2020"]]
+    sum_data = sum_data[["case_id", "age", "gender", "year", "final_weight", "final_weight_2020"]]
 
-    # aggregate by category:
-    # result: table with duration of each activity for each case_id
-    tb_agg = (
-        tb.groupby(["who_category", "case_id", "activity_number"]).agg({"activity_duration_24": "first"}).reset_index()
-    )
-
-    # merge with summary data
-    tb_agg = tb_agg.merge(tb_sum, on="case_id", how="left")
-
-    # TEST STARTS HERE
-    tb_test = tb_agg[(tb_agg["year"] >= 2009) & (tb_agg["year"] <= 2019)]
-    tb_test = (
-        tb_test.groupby(["who_category", "age", "case_id"])
-        .agg({"activity_duration_24": "sum", "final_weight": "first"})
-        .reset_index()
-    )
-
-    age_dict = tb_test.set_index("case_id")["age"].to_dict()
-    weight_dict = tb_test.set_index("case_id")["final_weight"].to_dict()
-
-    categories = tb_test["who_category"].unique()
-    case_ids = tb_test["case_id"].unique()
-    new_index = pd.DataFrame(itertools.product(categories, case_ids), columns=["who_category", "case_id"])
-    new_index["age"] = new_index["case_id"].map(age_dict)
-    new_index["final_weight"] = new_index["case_id"].map(weight_dict)
-    new_index = new_index.set_index(["who_category", "case_id", "age", "final_weight"])
-
-    # remove co-worker category before 2010, since it gets recorded differently
-    tb_test = tb_test[~((tb_agg["year"] < 2010) & (tb_test["who_category"] == "Co-worker"))]
-
-    tb_test = (
-        tb_test.set_index(["who_category", "case_id", "age", "final_weight"])
-        .reindex(new_index.index)
-        .fillna({"activity_duration_24": 0})
-    ).reset_index()
-
-    tb_test = (
-        tb_test.groupby(["who_category", "age"])
-        .apply(
-            lambda x: pd.Series(
-                {"t": np.sum(x["activity_duration_24"] * x["final_weight"]) / np.sum(x["final_weight"])}
-            )
-        )
-        .reset_index()
-    )
-
-    # TEST ENDS HERE
-    # summarize data (by category and age) and normalize with weights
-
-    # test data to see if it works - only up to 2019 and removing co-worker category
-    tb_test = tb_agg[~((tb_agg["year"] < 2010) & (tb_agg["who_category"] == "Co-worker"))]
-    tb_test = tb_test[(tb_test["year"] >= 2009) & (tb_test["year"] <= 2019)]
-    tb_test = (
-        tb_test.groupby(["who_category", "age", "case_id"])
-        .agg({"activity_duration_24": "sum", "final_weight": "first"})
-        .reset_index()
-    )
-    # Fill missing categories with 0
-    categories = tb_test["who_category"].unique()
-    case_ids = tb_test["case_id"].unique()
-    index = pd.MultiIndex.from_product([categories, case_ids], names=["who_category", "case_id"])
-    tb_test = tb_test.set_index(["who_category", "case_id"]).reindex(index, fill_value=0).reset_index()
-
-    tb_test = (
-        tb_test.groupby(["who_category", "age"])
-        .apply(
-            lambda x: pd.Series(
-                {"t": np.sum(x["activity_duration_24"] * x["final_weight"]) / np.sum(x["final_weight"])}
-            )
-        )
-        .reset_index()
-    )
-
-    tb_agg = (
-        tb_agg.groupby(["who_category", "age"])
-        .apply(
-            lambda x: pd.Series(
-                {"t": np.sum(x["activity_duration_24"] * x["final_weight"]) / np.sum(x["final_weight"])}
-            )
-        )
-        .reset_index()
-    )
-
-    #
-    # Process data.
-    #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = who_data.format(["index"])
+    who_data = who_data.reset_index().format(["index"], short_name="atus_who")
+    act_data = act_data.reset_index().format(["index"], short_name="atus_act")
+    sum_data = sum_data.format(["case_id"], short_name="atus_sum")
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap_who.metadata)
+    ds_meadow = create_dataset(
+        dest_dir,
+        tables=[who_data, act_data, sum_data],
+        check_variables_metadata=True,
+        default_metadata=snap_who.metadata,
+    )
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
@@ -302,11 +222,11 @@ def load_data_and_add_meta(snap, file_name):
     tb = pr.read_csv(zf.open(file_name), origin=snap.metadata.origin)
     print(tb.metadata)
 
-    tb_meta = TableMeta(
-        short_name=snap.metadata.short_name,
-        title=snap.metadata.origin.title,
-        description=snap.metadata.origin.description,
-    )
+    # tb_meta = TableMeta(
+    #    short_name=snap.metadata.short_name,
+    #    title=snap.metadata.origin.title,
+    #    description=snap.metadata.origin.description,
+    # )
     for col in tb.columns:
         # tb[col].metadata = tb_meta
         tb[col].metadata.origins = [snap.metadata.origin]
