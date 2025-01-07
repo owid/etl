@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("vaccination_coverage")
     ds_population = paths.load_dataset("un_wpp")
     # Read table from meadow dataset.
-    tb = ds_meadow.read("vaccination_coverage")
+    tb = ds_meadow.read("vaccination_coverage", reset_metadata="keep_origins")
 
     #
     # Process data.
