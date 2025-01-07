@@ -1,10 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-import itertools
 from zipfile import ZipFile
-
-import numpy as np
-import pandas as pd
 
 # from owid.catalog import Table, TableMeta
 from owid.catalog import processing as pr
