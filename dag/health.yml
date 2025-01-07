@@ -905,10 +905,13 @@ steps:
     - data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome
   data-private://grapher/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr:
     - data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr
+
+  # WHO Immunization coverage
   data://meadow/who/2024-12-10/vaccination_coverage:
     - snapshot://who/2024-12-10/vaccination_coverage.xlsx
   data://garden/who/2024-12-10/vaccination_coverage:
     - data://meadow/who/2024-12-10/vaccination_coverage
+    - data://garden/un/2024-07-12/un_wpp
   data://grapher/who/2024-12-10/vaccination_coverage:
     - data://garden/who/2024-12-10/vaccination_coverage
 
