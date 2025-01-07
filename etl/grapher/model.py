@@ -128,8 +128,8 @@ class Base(MappedAsDataclass, DeclarativeBase):
             raise ValueError(f"Unrecognized value for if_exists: {if_exists}")
 
 
-class HousekeepingSuggestedReview(Base):
-    __tablename__ = "housekeeping_suggested_reviews"
+class HousekeeperReview(Base):
+    __tablename__ = "housekeeper_reviews"
 
     id: Mapped[int] = mapped_column(
         Integer,
@@ -153,7 +153,7 @@ class HousekeepingSuggestedReview(Base):
     objectId: Mapped[int] = mapped_column(Integer, nullable=False)
 
     @classmethod
-    def load_reviews(cls, session: Session, object_type: Optional[str] = None) -> list["HousekeepingSuggestedReview"]:
+    def load_reviews(cls, session: Session, object_type: Optional[str] = None) -> list["HousekeeperReview"]:
         if object_type is None:
             vars = session.scalars(select(cls)).all()
             return list(vars)

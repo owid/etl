@@ -11,9 +11,14 @@ start_time=$(date +%s)
 
 HOUR=$(TZ=Europe/Berlin date +%H)
 echo '--- Keep OWID clean'
-cd /home/owid/etl
-if [ "$HOUR" -eq "01" ]; then
-    uv run etl d housekeeper --review-type chart
+# cd /home/owid/etl
+if [ "$HOUR" -eq "03" ]; then
+    echo "--- Suggesting chart reviews..."
+    if [ -n "$1" ]; then
+        uv run etl d housekeeper --review-type chart --channel "$1"
+    else
+        uv run etl d housekeeper --review-type chart
+    fi
 fi
 
 end_time=$(date +%s)
