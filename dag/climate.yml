@@ -32,7 +32,7 @@ steps:
   # Copernicus Climate Change Service - Surface temperature.
   #
   data://meadow/climate/2023-12-20/surface_temperature:
-  - snapshot://climate/2024-12-05/surface_temperature.zip
+  - snapshot://climate/2025-01-07/surface_temperature.zip
   - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2023-12-20/surface_temperature:
     - data://meadow/climate/2023-12-20/surface_temperature
@@ -54,13 +54,13 @@ steps:
   #
   # Copernicus Climate Change Service - Precipitation.
   #
-  data://meadow/climate/2024-11-19/total_precipitation:
-  - snapshot://climate/2024-11-19/total_precipitation.zip
+  data://meadow/climate/2025-01-07/total_precipitation:
+  - snapshot://climate/2025-01-07/total_precipitation.zip
   - snapshot://countries/2023-12-27/world_bank.zip
-  data://garden/climate/2024-11-19/total_precipitation:
-    - data://meadow/climate/2024-11-19/total_precipitation
-  data://grapher/climate/2024-11-19/total_precipitation_annual:
-    - data://garden/climate/2024-11-19/total_precipitation
+  data://garden/climate/2025-01-07/total_precipitation:
+    - data://meadow/climate/2025-01-07/total_precipitation
+  data://grapher/climate/2025-01-07/total_precipitation_annual:
+    - data://garden/climate/2025-01-07/total_precipitation
   #
   # Climate change impacts data explorer.
   #

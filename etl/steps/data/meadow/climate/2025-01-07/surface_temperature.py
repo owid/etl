@@ -140,12 +140,11 @@ def run(dest_dir: str) -> None:
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
     # Define the start and end dates
-    da["valid_time"] = xr.DataArray(pd.to_datetime(da["valid_time"].values), dims=da["valid_time"].dims)
+    da["time"] = xr.DataArray(pd.to_datetime(da["time"].values), dims=da["valid_time"].dims)
 
     # Now you can access the 'dt' accessor
-    start_time = da["valid_time"].min().dt.date.astype(str).item()
-    end_time = da["valid_time"].max().dt.date.astype(str).item()
-    print(end_time)
+    start_time = da["time"].min().dt.date.astype(str).item()
+    end_time = da["time"].max().dt.date.astype(str).item()
 
     # Generate a date range from start_time to end_time with monthly frequency
     month_middles = pd.date_range(start=start_time, end=end_time, freq="MS") + pd.offsets.Day(14)
