@@ -236,6 +236,7 @@ def create_gif_from_images(
     remove_duplicate_frames=True,
     repetitions_last_frame=0,
     duration_of_animation=False,
+    first_frame=0,
 ):
     # Prepare a list of image objects.
     images = prepare_images(
@@ -250,16 +251,28 @@ def create_gif_from_images(
     # There seems to be a PIL bug when specifying loops.
     if loops == 1:
         # Repeat loop only once.
-        images[0].save(output_file, save_all=True, append_images=images[1:], optimize=True, duration=duration)
+        images[first_frame].save(
+            output_file, save_all=True, append_images=images[first_frame + 1 :], optimize=True, duration=duration
+        )
     elif loops == 0:
         # Infinite loop.
-        images[0].save(
-            output_file, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops
+        images[first_frame].save(
+            output_file,
+            save_all=True,
+            append_images=images[first_frame + 1 :],
+            optimize=True,
+            duration=duration,
+            loop=loops,
         )
     else:
         # Repeat loop a fixed number of times.
-        images[0].save(
-            output_file, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops - 1
+        images[first_frame].save(
+            output_file,
+            save_all=True,
+            append_images=images[first_frame + 1 :],
+            optimize=True,
+            duration=duration,
+            loop=loops - 1,
         )
     log.info(f"GIF successfully created at {output_file}")
     return output_file
@@ -272,6 +285,7 @@ def create_mp4_from_images(
     remove_duplicate_frames=True,
     repetitions_last_frame=0,
     duration_of_animation=False,
+    first_frame=0,
 ):
     # Prepare a list of image objects.
     images = prepare_images(
@@ -287,7 +301,7 @@ def create_mp4_from_images(
     frame_rate = 1 / (duration / 1000)
 
     temp_image_paths = []
-    for idx, img in enumerate(images):
+    for idx, img in enumerate(images[first_frame:]):
         temp_path = f"/tmp/temp_image_{idx}.png"
         img.save(temp_path)
         temp_image_paths.append(temp_path)

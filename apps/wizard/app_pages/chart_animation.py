@@ -1,8 +1,10 @@
 from urllib.parse import parse_qs, urlparse
 
 import streamlit as st
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
+import etl.grapher.model as gm
 from apps.chart_animation.cli import (
     DOWNLOADS_DIR,
     MAX_NUM_YEARS,
@@ -15,6 +17,7 @@ from apps.chart_animation.cli import (
 )
 from apps.wizard.utils import set_states
 from apps.wizard.utils.components import grapher_chart_from_url, st_horizontal, st_info, url_persist
+from etl.config import OWID_ENV, OWIDEnv
 
 # Initialize log.
 log = get_logger()
@@ -56,14 +59,15 @@ def add_icons_to_tabs(tab_name):
     return f":material/{tab_name}: {tab_name}"
 
 
-def get_query_parameters_in_chart(chart_url, all_years, chart_tab=None):
+def get_query_parameters_in_chart(chart_url, slug, all_years):
     # Select default values.
     year_range_open = True
     year_start, year_end = min(all_years), max(all_years)
     tab = None
 
     # Attempt to get those parameters from the chart URL.
-    query_params = parse_qs(urlparse(chart_url).query)
+    url_parsed = urlparse(chart_url)
+    query_params = parse_qs(url_parsed.query)
     if "time" in query_params:
         time = query_params["time"][0]
         if ".." in time:
@@ -80,7 +84,10 @@ def get_query_parameters_in_chart(chart_url, all_years, chart_tab=None):
     if "tab" in query_params:
         tab = query_params["tab"][0]
 
-    tab = tab or chart_tab or TAB_DEFAULT
+    # EXTRA params:
+    chart_details = get_chart_details(slug=slug)
+
+    tab = tab or chart_details["tab"] or TAB_DEFAULT
 
     if tab not in TABS_ACCEPTED:
         st.error(f"Tab '{tab}' is not supported. Please select one of {TABS_ACCEPTED}.")
@@ -90,12 +97,14 @@ def get_query_parameters_in_chart(chart_url, all_years, chart_tab=None):
         "year_min": int(year_start),
         "year_max": int(year_end),
         "tab": tab,
+        "chart_type": chart_details["type"],
     }
 
     return params
 
 
 def remove_images():
+    """Remove all images in the local folder."""
     for image in st.session_state.chart_animation_image_paths:  # type: ignore
         image.unlink()
     # Update session state to reflect that images are deleted.
@@ -108,6 +117,24 @@ def remove_images():
     # Stop skipping button via query parameter
     if "animation_skip_button" in st.query_params:
         st.query_params.pop("animation_skip_button")
+
+
+def get_chart_details(slug):
+    """Get chart type from PROD database."""
+    # Get environment. If running in prod, just use LIVE db, otherwise use staging-site-master
+    if OWID_ENV.env_local == "production":
+        env = OWID_ENV
+    else:
+        env = OWIDEnv.from_staging("master")
+
+    with Session(env.engine) as session:
+        chart = gm.Chart.load_chart(session, slug=slug)
+
+    details = {
+        "type": chart.chart_config.chartType,
+        "tab": chart.chart_config.full.get("tab"),
+    }
+    return details
 
 
 ########################################################################################################################
@@ -188,9 +215,8 @@ if st.session_state.chart_animation_show_image_settings:
             st.caption("**Chart settings**")
             # Configure the chart (input to animation generation).
             query_parameters = get_query_parameters_in_chart(
-                chart_url, all_years=st.session_state.chart_animation_years
+                chart_url, slug, all_years=st.session_state.chart_animation_years
             )
-            # Actually get the tab value
 
             with st_horizontal():
                 tab = st.segmented_control(
@@ -309,6 +335,9 @@ if st.session_state.chart_animation_show_image_settings:
         for year in years
     ]
 
+    # Skip first frame for LineCharts, bc it renders a bar chart!
+    first_frame = 1 if (query_parameters["chart_type"] == "LineChart" and query_parameters["tab"] == "chart") else 0
+
     # GIF/Video generation.
     with st.spinner("Generating animation. This can take few seconds..."):
         if output_type == "GIF":
@@ -320,6 +349,7 @@ if st.session_state.chart_animation_show_image_settings:
                 remove_duplicate_frames=remove_duplicates,
                 repetitions_last_frame=repetitions_last_frame,
                 duration_of_animation=duration_of == "Entire animation",
+                first_frame=first_frame,
             )
             # GIF preview.
             st.image(str(st.session_state.chart_animation_gif_file), use_container_width=True)
@@ -332,6 +362,7 @@ if st.session_state.chart_animation_show_image_settings:
                 remove_duplicate_frames=remove_duplicates,
                 repetitions_last_frame=repetitions_last_frame,
                 duration_of_animation=duration_of == "Entire animation",
+                first_frame=first_frame,
             )
             # Video preview
             with open(str(st.session_state.chart_animation_gif_file), "rb") as video_file:
