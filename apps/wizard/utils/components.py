@@ -471,6 +471,12 @@ def url_persist(component: Any, default: Any = None) -> Any:
                 params = kwargs.pop("value")
 
             st.session_state[key] = params
+
+            if "options" in kwargs:
+                # Set default value in query params
+                if params not in kwargs["options"]:
+                    raise ValueError(f"Please review the URL query. Value {params} not in options {kwargs['options']}.")
+
         else:
             # Set the value in query params, but only if it isn't default
             if default is None or st.session_state[key] != default:
