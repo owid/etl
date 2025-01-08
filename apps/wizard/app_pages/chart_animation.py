@@ -191,7 +191,7 @@ if st.session_state.chart_animation_show_image_settings:
                 chart_url, all_years=st.session_state.chart_animation_years
             )
             # Actually get the tab value
-            st.write(query_parameters)
+
             with st_horizontal():
                 tab = st.segmented_control(
                     "Select tab", ["map", "chart"], format_func=add_icons_to_tabs, default=query_parameters["tab"]
@@ -301,7 +301,10 @@ if st.session_state.chart_animation_show_image_settings:
     image_paths_selected = [
         st.session_state.chart_animation_images_folder
         / create_image_file_name(
-            year=year, year_range_open=year_range_open, tab=tab, social_media_square=social_media_square
+            year=year,
+            year_range_open=year_range_open,
+            tab=tab,
+            social_media_square=social_media_square,
         )
         for year in years
     ]
