@@ -62,13 +62,22 @@ def create_autoupdate_pr(snapshot: str) -> None:
     # Add all files from snapshot_dir to git
     snapshot_dir = (SNAPSHOTS_DIR / snapshot).parent
 
+    # Stash changes
+    try:
+        repo.git.stash("save", "--include-untracked")
+        stashed = True
+    except GitCommandError:
+        stashed = False
+
     # Check-out to a new branch
     repo.git.checkout("master")
     try:
         repo.git.checkout("-b", branch_name)
-    except GitCommandError as e:
-        raise e
-        # repo.git.checkout(branch_name)
+    except GitCommandError:
+        repo.git.checkout(branch_name)
+
+    if stashed:
+        repo.git.stash("pop")
 
     repo.git.add(snapshot_dir)
     commit_msg = f"Update snapshot {snapshot}"
