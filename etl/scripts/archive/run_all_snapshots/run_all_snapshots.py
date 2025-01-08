@@ -66,35 +66,40 @@ def create_autoupdate_pr(snapshot: str):
         "Accept": "application/vnd.github.v3+json",
     }
 
-    __import__("ipdb").set_trace()
-
     # Get the latest commit SHA on master
     ref_resp = requests.get(f"{API_BASE}/git/ref/heads/master", headers=headers)
     ref_resp.raise_for_status()
     master_sha = ref_resp.json()["object"]["sha"]
 
-    # Create a new branch from master
-    data = {"ref": f"refs/heads/{branch_name}", "sha": master_sha}
-    create_ref_resp = requests.post(f"{API_BASE}/git/refs", json=data, headers=headers)
-    create_ref_resp.raise_for_status()
+    # Check if the branch already exists
+    branch_url = f"{API_BASE}/git/ref/heads/{branch_name}"
+    branch_exists = False
+    branch_resp = requests.get(branch_url, headers=headers)
+    if branch_resp.status_code == 200:
+        branch_exists = True
+
+    # Create a new branch
+    if not branch_exists:
+        create_ref_data = {"ref": f"refs/heads/{branch_name}", "sha": master_sha}
+        create_ref_resp = requests.post(f"{API_BASE}/git/refs", json=create_ref_data, headers=headers)
+        create_ref_resp.raise_for_status()
 
     # Gather files in snapshot_dir
-    snapshot_dir = os.path.dirname(snapshot)
+    snapshot_dir = (SNAPSHOTS_DIR / snapshot).parent
     tree_items = []
     for root, _, files in os.walk(snapshot_dir):
         for f in files:
             filepath = os.path.join(root, f)
-            with open(filepath, "rb") as fp:
-                content_b64 = base64.b64encode(fp.read()).decode()
+            with open(filepath, "r", encoding="utf-8") as fp:
+                content = fp.read()
             # Build the tree structure
-            repo_path = os.path.relpath(filepath, start=os.path.dirname(snapshot_dir))
+            repo_path = os.path.relpath(filepath, start=BASE_DIR)
             tree_items.append(
                 {
                     "path": repo_path,
                     "mode": "100644",
                     "type": "blob",
-                    "content": content_b64,
-                    "encoding": "base64",
+                    "content": content,
                 }
             )
 
