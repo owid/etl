@@ -38,10 +38,8 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
 
                     # Load the GRIB file using xarray and cfgrib
                     da = xr.open_dataset(tmp_file.name, engine="cfgrib").load()
-    # Convert temperature from Kelvin to Celsius.
-    da = da["t2m"] - 273.15
-
-    # Set the coordinate reference system for the temperature data to EPSG 4326.
+    da = da["tp"]
+    # Set the coordinate reference system for the precipitation data to EPSG 4326.
     da = da.rio.write_crs("epsg:4326")
 
     return da
@@ -62,12 +60,12 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("surface_temperature.zip")
+    snap = paths.load_snapshot("total_precipitation.zip")
 
-    # Read surface temperature data from snapshot
+    # Read data from snapshot
     da = _load_data_array(snap)
 
-    # Read the shapefile to extract country information
+    # Read the shapefile to extract country informaiton
     snap_geo = paths.load_snapshot("world_bank.zip")
     shapefile_name = "WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp"
 
@@ -83,17 +81,17 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    # Initialize an empty dictionary to store the country-wise average temperature.
+    # Initialize an empty dictionary to store the country-wise average precipitation.
     temp_country = {}
 
-    # Add Global mean temperature
+    # Add Global mean precipitation
     weights = np.cos(np.deg2rad(da.latitude))
     weights.name = "weights"
     clim_month_weighted = da.weighted(weights)
     global_mean = clim_month_weighted.mean(["longitude", "latitude"])
     temp_country["World"] = global_mean
 
-    # Initialize a list to keep track of small countries where temperature data extraction fails.
+    # Initialize a list to keep track of small countries where precipitation data extraction fails.
     small_countries = []
 
     # Iterate over each row in the shapefile data.
@@ -115,13 +113,13 @@ def run(dest_dir: str) -> None:
             weights = np.cos(np.deg2rad(clip.latitude))
             weights.name = "weights"
 
-            # Apply the weights to the clipped temperature data.
+            # Apply the weights to the clipped precipitation data.
             clim_month_weighted = clip.weighted(weights)
 
-            # Calculate the weighted mean temperature for the country.
+            # Calculate the weighted mean precipitation for the country.
             country_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
 
-            # Store the calculated mean temperature in the dictionary with the country's name as the key.
+            # Store the calculated mean precipitation in the dictionary with the country's name as the key.
             temp_country[country_name] = country_weighted_mean
 
             # Clean up the memory
@@ -135,17 +133,16 @@ def run(dest_dir: str) -> None:
             )  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.
             small_countries.append(shapefile.iloc[i]["WB_NAME"])
 
-    # Log information about countries for which temperature data could not be extracted.
+    # Log information about countries for which precipitation data could not be extracted.
     log.info(
-        f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
+        f"It wasn't possible to extract precipitation data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
     # Define the start and end dates
-    da["valid_time"] = xr.DataArray(pd.to_datetime(da["valid_time"].values), dims=da["valid_time"].dims)
+    da["time"] = xr.DataArray(pd.to_datetime(da["valid_time"].values), dims=da["valid_time"].dims)
 
     # Now you can access the 'dt' accessor
-    start_time = da["valid_time"].min().dt.date.astype(str).item()
-    end_time = da["valid_time"].max().dt.date.astype(str).item()
-    print(end_time)
+    start_time = da["time"].min().dt.date.astype(str).item()
+    end_time = da["time"].max().dt.date.astype(str).item()
 
     # Generate a date range from start_time to end_time with monthly frequency
     month_middles = pd.date_range(start=start_time, end=end_time, freq="MS") + pd.offsets.Day(14)
@@ -157,13 +154,13 @@ def run(dest_dir: str) -> None:
     df_temp = pd.DataFrame(temp_country)
     df_temp["time"] = month_starts_list
 
-    melted_df = df_temp.melt(id_vars=["time"], var_name="country", value_name="temperature_2m")
+    melted_df = df_temp.melt(id_vars=["time"], var_name="country", value_name="total_precipitation")
 
     # Create a new table and ensure all columns are snake-case and add relevant metadata.
     tb = Table(melted_df, short_name=paths.short_name, underscore=True)
-    tb = tb.set_index(["time", "country"], verify_integrity=True)
+    tb = tb.format(["time", "country"])
 
-    tb["temperature_2m"].metadata.origins = [snap.metadata.origin]
+    tb["total_precipitation"].metadata.origins = [snap.metadata.origin]
     #
     # Save outputs.
     #
