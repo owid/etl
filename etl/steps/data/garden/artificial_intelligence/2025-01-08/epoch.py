@@ -120,9 +120,9 @@ def run(dest_dir: str) -> None:
 
     tb["year"] = tb["publication_date"].dt.year
 
-    # Replace "Transformer" with "Transformer {year}"
+    # Replace "Transformer" with "Transformer (year)"
     tb["model"] = tb.apply(
-        lambda row: f"Transformer {row['year']}" if row["model"] == "Transformer" else row["model"], axis=1
+        lambda row: f"Transformer ({row['year']})" if row["model"] == "Transformer" else row["model"], axis=1
     )
 
     # Remove the year column
