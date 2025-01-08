@@ -1,18 +1,40 @@
 """Tools to assist with Slack interactions."""
 
 import json
+from typing import Optional
 
 from slack_sdk import WebClient
+from slack_sdk.web.slack_response import SlackResponse
 
 from etl import config
 
 slack_client = WebClient(token=config.SLACK_API_TOKEN)
 
 
-def send_slack_message(channel: str, message: str, **kwargs) -> None:
+def send_slack_message(channel: str, message: str, **kwargs) -> SlackResponse:
     """Send `message` to Slack channel `channel`."""
-    if config.SLACK_API_TOKEN:
-        slack_client.chat_postMessage(channel=channel, text=message, **kwargs)
+
+    response = slack_client.chat_postMessage(channel=channel, text=message, **kwargs)
+    return response
+
+
+def send_slack_image(channel: str, message: str, image_url, **kwargs) -> SlackResponse:
+    """Send `message` to Slack channel `channel`."""
+
+    response = slack_client.chat_postMessage(
+        channel=channel,
+        text=message,
+        attachments=[
+            {
+                "fallback": "Image preview not available",
+                "image_url": image_url,  # Image URL
+                "alt_text": "Image description",
+            }
+        ],
+        **kwargs,
+    )
+
+    return response
 
 
 def format_slack_message(method, url, status_code, req_body, res_body):
