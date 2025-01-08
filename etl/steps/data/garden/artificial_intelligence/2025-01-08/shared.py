@@ -40,7 +40,7 @@ def calculate_aggregates(tb: Table, agg_column: str, short_name: str, unused_col
     # Group total yearly counts and calculate cumulative count for total number of systems
     tb_total = tb.groupby(["year"]).size().reset_index(name="yearly_count")
     total_counts = tb_total.groupby("year")["yearly_count"].sum().reset_index()
-    total_counts[agg_column] = "Total"
+    total_counts[agg_column] = "All large-scale AI systems"
     total_counts["cumulative_count"] = total_counts["yearly_count"].cumsum()
 
     # Split the column to be aggregated by comma (several countries/domains can exist in each cell)
