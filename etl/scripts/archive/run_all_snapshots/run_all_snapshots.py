@@ -10,8 +10,10 @@ All results are stored in the accompanying file: snapshot_execution_times.json
 
 """
 
+import base64
 import hashlib
 import json
+import os
 import subprocess
 import time
 from typing import Set
@@ -47,6 +49,89 @@ def get_active_snapshots() -> Set[str]:
     return {s.split(".")[0] + ".py" for s in active_snapshots}
 
 
+# Adjust these to point to your repo and auth token
+REPO_OWNER = "owid"
+REPO_NAME = "etl"
+API_BASE = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}"
+
+
+def create_autoupdate_pr(snapshot: str):
+    name = os.path.basename(snapshot).replace(".py", "").replace("_", "-")
+    snapshot_hash = hashlib.md5(snapshot.encode()).hexdigest()[:3]
+    branch_name = f"auto-{name}-{snapshot_hash}"
+    title = f"🤖: Auto-update {snapshot.replace('.py', '')}"
+
+    headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+
+    __import__("ipdb").set_trace()
+
+    # Get the latest commit SHA on master
+    ref_resp = requests.get(f"{API_BASE}/git/ref/heads/master", headers=headers)
+    ref_resp.raise_for_status()
+    master_sha = ref_resp.json()["object"]["sha"]
+
+    # Create a new branch from master
+    data = {"ref": f"refs/heads/{branch_name}", "sha": master_sha}
+    create_ref_resp = requests.post(f"{API_BASE}/git/refs", json=data, headers=headers)
+    create_ref_resp.raise_for_status()
+
+    # Gather files in snapshot_dir
+    snapshot_dir = os.path.dirname(snapshot)
+    tree_items = []
+    for root, _, files in os.walk(snapshot_dir):
+        for f in files:
+            filepath = os.path.join(root, f)
+            with open(filepath, "rb") as fp:
+                content_b64 = base64.b64encode(fp.read()).decode()
+            # Build the tree structure
+            repo_path = os.path.relpath(filepath, start=os.path.dirname(snapshot_dir))
+            tree_items.append(
+                {
+                    "path": repo_path,
+                    "mode": "100644",
+                    "type": "blob",
+                    "content": content_b64,
+                    "encoding": "base64",
+                }
+            )
+
+    # Create a tree for all files
+    tree_data = {"base_tree": master_sha, "tree": tree_items}
+    create_tree_resp = requests.post(f"{API_BASE}/git/trees", json=tree_data, headers=headers)
+    create_tree_resp.raise_for_status()
+    tree_sha = create_tree_resp.json()["sha"]
+
+    # Create a commit
+    commit_data = {
+        "message": f"Update snapshot {snapshot}",
+        "tree": tree_sha,
+        "parents": [master_sha],
+    }
+    create_commit_resp = requests.post(f"{API_BASE}/git/commits", json=commit_data, headers=headers)
+    create_commit_resp.raise_for_status()
+    new_commit_sha = create_commit_resp.json()["sha"]
+
+    # Update the new branch to point to the new commit
+    update_ref_data = {"sha": new_commit_sha, "force": True}
+    update_ref_resp = requests.patch(f"{API_BASE}/git/refs/heads/{branch_name}", json=update_ref_data, headers=headers)
+    update_ref_resp.raise_for_status()
+
+    # Create a pull request
+    pr_data = {
+        "title": title,
+        "head": branch_name,
+        "base": "master",
+        "body": "",
+    }
+    pr_resp = requests.post(f"{API_BASE}/pulls", json=pr_data, headers=headers)
+    pr_resp.raise_for_status()
+    print(f"Pull request created: {pr_resp.json()['html_url']}")
+
+
+"""
 def create_autoupdate_pr(snapshot: str) -> None:
     # Create branch name
     name = snapshot.split("/")[-1].replace(".py", "").replace("_", "-")
@@ -102,6 +187,7 @@ def create_autoupdate_pr(snapshot: str) -> None:
         log.info(f"Pull request created: {js['html_url']}")
     else:
         raise click.ClickException(f"Failed to create pull request:\n{response.json()}")
+"""
 
 
 @click.command()
