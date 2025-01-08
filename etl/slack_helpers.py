@@ -21,15 +21,9 @@ def send_slack_message(
 ) -> SlackResponse:
     """Send `message` to Slack channel `channel`."""
     # Send message + image
-    if (image_url is not None) or (image_path is not None):
-        ## Upload image
-        img_response = upload_image(
-            image_url=image_url,
-            image_path=image_path,
-        )
-
-        ## Send message with image
-        if ("file" in img_response) and ("url_private" in img_response["file"]):
+    if image_url or image_path:
+        img_response = upload_image(image_url=image_url, image_path=image_path)
+        if img_response.get("file", {}).get("url_private"):
             blocks = [
                 {
                     "type": "section",
@@ -52,11 +46,13 @@ def send_slack_message(
                     channel=channel,
                     text=message,
                     blocks=blocks,
+                    **kwargs,
                 )
             except e.SlackApiError:
                 response = slack_client.chat_postMessage(
                     channel=channel,
                     text=message,
+                    **kwargs,
                 )
         else:
             response = slack_client.chat_postMessage(
