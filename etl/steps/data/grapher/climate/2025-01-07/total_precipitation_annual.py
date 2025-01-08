@@ -7,7 +7,7 @@ paths = PathFinder(__file__)
 
 
 # Year with incomplete data
-INCOMPLETE_YEAR = 2024
+INCOMPLETE_YEAR = 2025
 
 
 def run(dest_dir: str) -> None:
