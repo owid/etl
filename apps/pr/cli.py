@@ -57,14 +57,11 @@ from structlog import get_logger
 
 from apps.pr.categories import PR_CATEGORIES, PR_CATEGORIES_CHOICES
 from apps.utils.gpt import OpenAIWrapper
-from etl.config import GITHUB_TOKEN
+from etl.config import GITHUB_API_URL, GITHUB_TOKEN
 from etl.paths import BASE_DIR
 
 # Initialize logger.
 log = get_logger()
-
-# URL of the Github API, to be used to create a draft pull request in the ETL repos.
-GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
 
 # Style for questionary
 SHELL_FORM_STYLE = questionary.Style(
