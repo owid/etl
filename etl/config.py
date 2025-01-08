@@ -235,7 +235,8 @@ OWIDBOT_APP_INSTALLATION_ID = env.get("OWIDBOT_APP_INSTALLATION_ID", None)
 GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 
 # URL of the Github API, to be used to create a draft pull request in the ETL repos.
-GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
+GITHUB_API_BASE = "https://api.github.com/repos/owid/etl"
+GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 
 # IMPORTANT: only use locally, no production use!
 # Skip SSL verify
