@@ -52,61 +52,95 @@
     "artificial_intelligence/2023-06-14/papers_with_code_math.py": 2.476924180984497,
     "artificial_intelligence/2023-06-21/epoch.py": 3.5818674564361572,
     "artificial_intelligence/2023-07-07/semiconductors_cset.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 2.956303119659424
     },
     "artificial_intelligence/2023-07-25/cset.py": "FAILED",
     "artificial_intelligence/2024-01-30/yougov_job_automation.py": 1.4192826747894287,
     "artificial_intelligence/2024-01-30/yougov_robots.py": 1.9256367683410645,
     "artificial_intelligence/2024-03-22/papers_with_code_coding.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 3.4515321254730225
     },
     "artificial_intelligence/2024-03-22/papers_with_code_language.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 3.1814849376678467
     },
     "artificial_intelligence/2024-03-22/papers_with_code_math.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 3.928142786026001
     },
     "artificial_intelligence/2024-06-03/epoch.py": 1.3274271488189697,
     "artificial_intelligence/2024-06-19/epoch_compute_intensive.py": 1.4261436462402344,
     "artificial_intelligence/2024-06-28/ai_adoption.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 6.327739953994751
     },
     "artificial_intelligence/2024-06-28/ai_adoption_2023.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 6.6998677253723145
     },
     "artificial_intelligence/2024-06-28/ai_bills.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 6.3204779624938965
     },
     "artificial_intelligence/2024-06-28/ai_conferences.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 10.317985773086548
     },
     "artificial_intelligence/2024-06-28/ai_incidents.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 6.45625901222229
     },
     "artificial_intelligence/2024-06-28/ai_investment.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 23.12949299812317
     },
     "artificial_intelligence/2024-06-28/ai_jobs.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 7.414330005645752
     },
     "artificial_intelligence/2024-06-28/ai_phds.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 7.889322996139526
     },
     "artificial_intelligence/2024-06-28/ai_robots.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 17.512940168380737
     },
     "artificial_intelligence/2024-06-28/ai_strategies.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 6.460886001586914
     },
     "artificial_intelligence/2024-07-10/epoch.py": 1.3710997104644775,
     "artificial_intelligence/2024-07-23/papers_with_code_imagenet.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 4.927966117858887
     },
     "artificial_intelligence/2024-07-23/yougov_job_automation.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 5.31154203414917
     },
     "artificial_intelligence/2024-07-23/yougov_robots.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 5.442662954330444
     },
     "artificial_intelligence/2024-08-05/epoch.py": 1.219374418258667,
     "artificial_intelligence/2024-08-05/epoch_compute_intensive.py": 1.2773780822753906,
@@ -239,7 +273,9 @@
     "gcp/2023-12-05/global_carbon_budget.py": 1.5711934566497803,
     "gcp/2023-12-12/global_carbon_budget.py": 1.5210723876953125,
     "geography/2023-11-28/nat_earth_110.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 3.3616278171539307
     },
     "ggdc/2020-10-01/ggdc_maddison.py": 1.8235716819763184,
     "ggdc/2022-12-23/maddison_database.py": 1.4222254753112793,
@@ -476,9 +512,13 @@
     "worldbank_wdi/2023-05-29/wdi.py": "FAILED",
     "worldbank_wdi/2024-05-20/wdi.py": "FAILED",
     "artificial_intelligence/2024-12-05/epoch_compute_intensive.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 3.21915864944458
     },
     "artificial_intelligence/2024-12-05/epoch.py": {
-        "status": "DRY-RUN"
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 4.024456977844238
     }
 }
