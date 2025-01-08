@@ -1,3 +1,5 @@
+from urllib.parse import parse_qs, urlparse
+
 import streamlit as st
 from structlog import get_logger
 
@@ -9,11 +11,10 @@ from apps.chart_animation.cli import (
     create_mp4_from_images,
     get_chart_slug,
     get_images_from_chart_url,
-    get_query_parameters_in_chart,
     get_years_in_chart,
 )
 from apps.wizard.utils import set_states
-from apps.wizard.utils.components import grapher_chart_from_url, st_horizontal, st_info
+from apps.wizard.utils.components import grapher_chart_from_url, st_horizontal, st_info, url_persist
 
 # Initialize log.
 log = get_logger()
@@ -23,6 +24,10 @@ st.set_page_config(
     page_title="Wizard: Chart animation",
     page_icon="🪄",
 )
+
+# Global variables
+TABS_ACCEPTED = ["chart", "map"]
+TAB_DEFAULT = "map"
 
 # Session state config
 # Initialize session state for generated files.
@@ -51,6 +56,60 @@ def add_icons_to_tabs(tab_name):
     return f":material/{tab_name}: {tab_name}"
 
 
+def get_query_parameters_in_chart(chart_url, all_years, chart_tab=None):
+    # Select default values.
+    year_range_open = True
+    year_start, year_end = min(all_years), max(all_years)
+    tab = None
+
+    # Attempt to get those parameters from the chart URL.
+    query_params = parse_qs(urlparse(chart_url).query)
+    if "time" in query_params:
+        time = query_params["time"][0]
+        if ".." in time:
+            year_range_open = True
+            year_start, year_end = time.split("..")
+            if year_start == "earliest":
+                year_start = min(all_years)
+            if year_end == "latest":
+                year_end = max(all_years)
+        else:
+            year_range_open = False
+            year_start = int(time)
+            year_end = year_start
+    if "tab" in query_params:
+        tab = query_params["tab"][0]
+
+    tab = tab or chart_tab or TAB_DEFAULT
+
+    if tab not in TABS_ACCEPTED:
+        st.error(f"Tab '{tab}' is not supported. Please select one of {TABS_ACCEPTED}.")
+
+    params = {
+        "year_range_open": year_range_open,
+        "year_min": int(year_start),
+        "year_max": int(year_end),
+        "tab": tab,
+    }
+
+    return params
+
+
+def remove_images():
+    for image in st.session_state.chart_animation_image_paths:  # type: ignore
+        image.unlink()
+    # Update session state to reflect that images are deleted.
+    st.session_state.chart_animation_images_exist = False
+    st.toast("✅ Images deleted.")
+
+    # Reset button!
+    st.session_state.chart_animation_show_image_settings = False
+
+    # Stop skipping button via query parameter
+    if "animation_skip_button" in st.query_params:
+        st.query_params.pop("animation_skip_button")
+
+
 ########################################################################################################################
 # RENDER
 ########################################################################################################################
@@ -59,12 +118,25 @@ def add_icons_to_tabs(tab_name):
 st.title(":material/animated_images: Chart animation")
 
 # 1/ INPUT CHART & GET YEARS
-chart_url = st.text_input(
-    "Enter grapher URL",
-    "",
+chart_url = url_persist(st.text_input)(
+    label="Enter grapher URL",
+    value="",
     placeholder="https://ourworldindata.org/grapher/share-electricity-low-carbon?tab=chart&country=OWID_WRL~OWID_EUR~OWID_AFR",
-    help="Paste the URL of the chart you want to animate. Note that some parameters cannot be extracted from the URL (e.g. the type of tab view). But you can modify them afterwards.",
+    help="""Paste the URL of the chart you want to animate.
+
+**Considerations**:
+- Only production links work.
+- You can pass the full URL, or skip the https://ourworldindata.org/ bit.
+- Some parameters cannot be extracted from the URL (e.g. the type of tab view). But you can modify them afterwards.
+    - If coming from Admin, tab view will be extracted correctly!
+""",
+    key="animation_chart_url",
 )
+# Add base URL if not present
+if chart_url.startswith("/grapher"):
+    chart_url = f"https://ourworldindata.org{chart_url}"
+elif chart_url.startswith("grapher/"):
+    chart_url = f"https://ourworldindata.org/{chart_url}"
 
 # Get slug from URL.
 slug = get_chart_slug(chart_url=chart_url)
@@ -79,14 +151,21 @@ st.session_state.chart_animation_gif_file = DOWNLOADS_DIR / f"{slug}.gif"
 st.session_state.chart_animation_image_paths = image_paths
 st.session_state.chart_animation_images_exist = len(image_paths) > 0
 
+# Check if we want to skip the button and generate the Chart directly
+skip_button = st.query_params.get("animation_skip_button", False)
+
 # Button
-if st.button(
-    "Get chart",
-    type="primary",
+if (
+    st.button(
+        "Get chart",
+        type="primary",
+    )
+    or skip_button
 ):
     if not chart_url:
         st.error("Please enter a valid chart URL.")
         st.stop()
+
     # Embed the iframe in the app.
     set_states(
         {
@@ -111,6 +190,8 @@ if st.session_state.chart_animation_show_image_settings:
             query_parameters = get_query_parameters_in_chart(
                 chart_url, all_years=st.session_state.chart_animation_years
             )
+            # Actually get the tab value
+            st.write(query_parameters)
             with st_horizontal():
                 tab = st.segmented_control(
                     "Select tab", ["map", "chart"], format_func=add_icons_to_tabs, default=query_parameters["tab"]
@@ -255,13 +336,9 @@ if st.session_state.chart_animation_show_image_settings:
             st_info('Animation preview. Right click and "Save video as..." to download it.')
 
     # Button to delete all images in the folder.
-    if st.button(
+    st.button(
         "Delete images",
         disabled=not st.session_state.chart_animation_images_exist,
         help=f"To generate the animation, several chart images were downloaded and saved in in folder: `{st.session_state.chart_animation_images_folder}`. Click this button to delete them.",
-    ):
-        for image in st.session_state.chart_animation_image_paths:  # type: ignore
-            image.unlink()
-        # Update session state to reflect that images are deleted.
-        st.session_state.chart_animation_images_exist = False
-        st.toast("✅ Images deleted.")
+        on_click=remove_images,
+    )
