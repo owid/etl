@@ -1,11 +1,9 @@
 """Generate aggregated table for total yearly and cumulative number of compute intensive AI systems in each country."""
 
-import datetime as dt
-
 import shared as sh
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder, create_dataset, last_date_accessed
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -49,8 +47,6 @@ def run(dest_dir: str) -> None:
     # Set the index to year and country
     tb_agg = tb_agg.format(["year", "country"])
 
-    date_acessed = tb_agg.yearly_count.m.origins[0].date_accessed
-
     #
     # Save outputs.
     #
@@ -58,7 +54,7 @@ def run(dest_dir: str) -> None:
     ds_garden = create_dataset(
         dest_dir,
         tables=[tb_agg],
-        yaml_params={"date_accessed": dt.datetime.strptime(date_acessed, "%Y-%m-%d").strftime("%d %B %Y")},
+        yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
     )
 
     # Save changes in the new garden dataset.
