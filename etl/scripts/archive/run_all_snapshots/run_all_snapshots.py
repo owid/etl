@@ -167,16 +167,24 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int):
     if filter:
         active_snapshots = {s for s in active_snapshots if filter in s}
 
+    # Filter fasttrack snapshots
+    active_snapshots = {s for s in active_snapshots if not s.startswith("fasttrack/")}
+
     # Loop over all snapshot scripts.
     for snapshot in tqdm(active_snapshots):
         snapshot_script = SNAPSHOTS_DIR / snapshot
 
-        if str(snapshot_script) in execution_results:
-            log.info(f"Skipping {snapshot} because it has already been processed.")
-            continue
+        # TODO: enable this before merging
+        # if str(snapshot_script) in execution_results:
+        #     log.info(f"Skipping {snapshot} because it has already been processed.")
+        #     continue
 
         # Start timer.
         start_time = time.time()
+
+        if not snapshot_script.exists():
+            log.error(f"Snapshot script {snapshot_script} does not exist.")
+            continue
 
         # Read the script file.
         with open(snapshot_script, "r") as f:

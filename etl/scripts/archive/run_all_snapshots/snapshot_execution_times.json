@@ -51,29 +51,63 @@
     "artificial_intelligence/2023-06-14/papers_with_code_language.py": 1.622190237045288,
     "artificial_intelligence/2023-06-14/papers_with_code_math.py": 2.476924180984497,
     "artificial_intelligence/2023-06-21/epoch.py": 3.5818674564361572,
-    "artificial_intelligence/2023-07-07/semiconductors_cset.py": 1.419503927230835,
+    "artificial_intelligence/2023-07-07/semiconductors_cset.py": {
+        "status": "DRY-RUN"
+    },
     "artificial_intelligence/2023-07-25/cset.py": "FAILED",
     "artificial_intelligence/2024-01-30/yougov_job_automation.py": 1.4192826747894287,
     "artificial_intelligence/2024-01-30/yougov_robots.py": 1.9256367683410645,
-    "artificial_intelligence/2024-03-22/papers_with_code_coding.py": 2.2717678546905518,
-    "artificial_intelligence/2024-03-22/papers_with_code_language.py": 1.6728875637054443,
-    "artificial_intelligence/2024-03-22/papers_with_code_math.py": 1.8242127895355225,
+    "artificial_intelligence/2024-03-22/papers_with_code_coding.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-03-22/papers_with_code_language.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-03-22/papers_with_code_math.py": {
+        "status": "DRY-RUN"
+    },
     "artificial_intelligence/2024-06-03/epoch.py": 1.3274271488189697,
     "artificial_intelligence/2024-06-19/epoch_compute_intensive.py": 1.4261436462402344,
-    "artificial_intelligence/2024-06-28/ai_adoption.py": 5.2892022132873535,
-    "artificial_intelligence/2024-06-28/ai_adoption_2023.py": 5.08824348449707,
-    "artificial_intelligence/2024-06-28/ai_bills.py": 5.638111352920532,
-    "artificial_intelligence/2024-06-28/ai_conferences.py": 9.561504364013672,
-    "artificial_intelligence/2024-06-28/ai_incidents.py": 5.436772346496582,
-    "artificial_intelligence/2024-06-28/ai_investment.py": 19.403878688812256,
-    "artificial_intelligence/2024-06-28/ai_jobs.py": 5.743307590484619,
-    "artificial_intelligence/2024-06-28/ai_phds.py": 6.200832843780518,
-    "artificial_intelligence/2024-06-28/ai_robots.py": 11.767724752426147,
-    "artificial_intelligence/2024-06-28/ai_strategies.py": 5.694961071014404,
+    "artificial_intelligence/2024-06-28/ai_adoption.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-06-28/ai_adoption_2023.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-06-28/ai_bills.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-06-28/ai_conferences.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-06-28/ai_incidents.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-06-28/ai_investment.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-06-28/ai_jobs.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-06-28/ai_phds.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-06-28/ai_robots.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-06-28/ai_strategies.py": {
+        "status": "DRY-RUN"
+    },
     "artificial_intelligence/2024-07-10/epoch.py": 1.3710997104644775,
-    "artificial_intelligence/2024-07-23/papers_with_code_imagenet.py": 3.7444674968719482,
-    "artificial_intelligence/2024-07-23/yougov_job_automation.py": 1.9278593063354492,
-    "artificial_intelligence/2024-07-23/yougov_robots.py": 1.5214099884033203,
+    "artificial_intelligence/2024-07-23/papers_with_code_imagenet.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-07-23/yougov_job_automation.py": {
+        "status": "DRY-RUN"
+    },
+    "artificial_intelligence/2024-07-23/yougov_robots.py": {
+        "status": "DRY-RUN"
+    },
     "artificial_intelligence/2024-08-05/epoch.py": 1.219374418258667,
     "artificial_intelligence/2024-08-05/epoch_compute_intensive.py": 1.2773780822753906,
     "artificial_intelligence/2024-09-09/epoch.py": 1.4187591075897217,
@@ -204,7 +238,9 @@
     "gcp/2023-09-28/global_carbon_budget.py": 2.2779250144958496,
     "gcp/2023-12-05/global_carbon_budget.py": 1.5711934566497803,
     "gcp/2023-12-12/global_carbon_budget.py": 1.5210723876953125,
-    "geography/2023-11-28/nat_earth_110.py": 1.3235127925872803,
+    "geography/2023-11-28/nat_earth_110.py": {
+        "status": "DRY-RUN"
+    },
     "ggdc/2020-10-01/ggdc_maddison.py": 1.8235716819763184,
     "ggdc/2022-12-23/maddison_database.py": 1.4222254753112793,
     "ggdc/2024-04-26/maddison_project_database.py": 1.3218493461608887,
