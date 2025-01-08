@@ -1,7 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
 import numpy as np
-import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
 
