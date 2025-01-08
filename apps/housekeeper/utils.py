@@ -1,3 +1,4 @@
+from datetime import date
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -9,9 +10,9 @@ from etl.grapher import model as gm
 
 # System prompt to summarize chart information
 MODEL = "gpt-4o"
-SYSTEM_PROMPT = """We are reviewing a chart that was created some time ago, and that has few visits. We want to understand if we can remove it from the site, in order to reduce the amount of charts that we have (and hence helping with the maintenance). Your job is to briefly summarize what the chart is about, and to provide some context about the variables used in the chart. You can also check the chart's history to see if it has been edited recently.
+SYSTEM_PROMPT = f"""We are reviewing a chart that was created some time ago, and that has few visits. We want to understand if we can remove it from the site, in order to reduce the amount of charts that we have (and hence helping with the maintenance). Your job is to briefly summarize what the chart is about, and to provide some context about the variables used in the chart. You can also check the chart's history to see if it has been edited recently.
 
-In your response, provide three blocks:
+In your response, consider today's date {date.today().strftime("%Y-%m-%d")}, and provide three blocks:
 
 (i) Chart Description: To this end, look at the information given by the chart configuration parameters, and the different variables used in it. Don't get lost into the details. This should be at most ~3 sentences or so.
 (ii) Edits timeline: Summarize the various edits that the chart has had over time. We are interested in knowing who might be the owner of the chart, so look at the most recent major edits. Provide the list of *all* the edits, with the name of the person who made the edit, and the date (no need to add the hour) of the edit. Sort the list in descending order of the date.
@@ -19,18 +20,17 @@ In your response, provide three blocks:
 
 Each block should be formatted with a title in bold (just use one '*'), and a brief text. You can use the following template:
 
-```
-*▶ Chart Description*
+*→ Chart Description*
 This chart shows the evolution of the number of COVID-19 cases in the world, by continent. It uses data from the COVID-19 dataset.
 
-*▶ Edits timeline*
+*→ Edits timeline*
 This chart has been mostly edited by 'Max Roser' and 'Esteban Ortiz-Ospina'. The last edit was done on 2021-01-01 by 'Max Roser'.
 
 1. Edit by 'Max Roser' (date: 2021-01-01)
 2. Edit by 'Esteban Ortiz-Ospina' (date: 2020-12-01)
 ...
 
-*▶ General comment*
+*→ General comment*
 This chart...
 """
 
@@ -94,7 +94,7 @@ def get_chart_summary(chart):
             cost = round(gpt_response.cost, 4)
         else:
             cost = "unknown"
-        return f"🤖 *AI-generated ({MODEL})*\n{gpt_response.message_content}\n\n---\nCost: {cost} $"
+        return f"*🤖 Summary* (AI-generated with {MODEL})\n{gpt_response.message_content}\n\n(Cost: {cost} $)"
 
 
 def ask_gpt(user_prompt) -> GPTResponse | None:
