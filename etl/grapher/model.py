@@ -1304,6 +1304,16 @@ class Variable(Base):
         return list(results)
 
     @classmethod
+    def load_variables_in_chart(
+        cls,
+        session: Session,
+        chart_id: int,
+    ) -> List["Variable"]:
+        chart = Chart.load_chart(session, chart_id)
+        variables = chart.load_chart_variables(session)
+        return list(variables.values())
+
+    @classmethod
     @deprecated("Use from_id_or_path instead")
     def load_variable(cls, session: Session, variable_id: int) -> "Variable":
         """D"""
