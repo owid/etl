@@ -5,6 +5,7 @@ TODO:
     - Compare content and content_raw
     - Test it in Pablo's scripts
 """
+
 from copy import copy
 from io import StringIO
 from pathlib import Path
@@ -15,8 +16,8 @@ import pandas as pd
 from structlog import get_logger
 
 from etl import config
-from etl.files import upload_file_to_server
-from etl.grapher_io import get_variables_data
+from etl.files import download_file_from_server, run_command_on_server, upload_file_to_server
+from etl.grapher.io import get_variables_data
 from etl.paths import EXPLORERS_DIR
 
 # Initialize logger.
@@ -194,6 +195,10 @@ class Explorer:
         """
         path = (Path(EXPLORERS_DIR) / name).with_suffix(".explorer.tsv")
 
+        # If working on staging server, pull the file from there and replace the local owid-content version
+        if cls._on_staging():
+            download_file_from_server(path, f"owid@{config.DB_HOST}:~/owid-content/explorers/{name}.explorer.tsv")
+
         # Build explorer from file
         explorer = cls.from_file(str(path), name=name)
 
@@ -208,6 +213,10 @@ class Explorer:
         # Write parsed content to file.
         path.write_text(self.content)
 
+    @staticmethod
+    def _on_staging() -> bool:
+        return config.STAGING and "staging-site" in config.DB_HOST and "staging-site-master" not in config.DB_HOST  # type: ignore
+
     def to_owid_content(self, path: Optional[Union[str, Path]] = None):
         """Save your config in owid-content and push to server if applicable.
 
@@ -221,10 +230,14 @@ class Explorer:
         self.export(path)
 
         # Upload it to staging server.
-        if config.STAGING:
-            if isinstance(path, str):
-                path = Path(path)
-            upload_file_to_server(path, f"owid@{config.DB_HOST}:~/owid-content/explorers/")
+        if self._on_staging():
+            upload_file_to_server(Path(path), f"owid@{config.DB_HOST}:~/owid-content/explorers/")
+
+            # Commit on the staging server
+            run_command_on_server(
+                f"owid@{config.DB_HOST}",
+                "cd owid-content && git add . && git diff-index --quiet HEAD || git commit -m ':robot: Update explorer from ETL'",
+            )
 
     def save(self, path: Optional[Union[str, Path]] = None) -> None:
         """See docs for `to_owid_content`."""

@@ -1,5 +1,5 @@
-"""Grapher step for the primary energy consumption dataset.
-"""
+"""Grapher step for the primary energy consumption dataset."""
+
 from owid.catalog import Dataset
 
 from etl.helpers import PathFinder, create_dataset

@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+
 from typing import cast
 
 import owid.catalog.processing as pr

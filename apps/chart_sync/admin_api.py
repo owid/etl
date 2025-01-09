@@ -13,8 +13,8 @@ from requests.exceptions import HTTPError
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from etl import grapher_model as gm
 from etl.config import DEFAULT_GRAPHER_SCHEMA, GRAPHER_USER_ID, OWIDEnv
+from etl.grapher import model as gm
 
 log = structlog.get_logger()
 

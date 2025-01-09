@@ -120,6 +120,8 @@ definitions:
       <%- endif -%>
   footnote: |-
     <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+  annotation: |-
+    <% if cause == 'Maternal disorders' %>United States: Values from 2003–2017 affected by measurement change<%- endif -%>
 dataset:
   update_period_days: 1460
   non_redistributable: true
@@ -147,6 +149,8 @@ tables:
         display:
           numDecimalPlaces: |-
             <% if metric == 'Number' %>0<% else %>1<%- endif -%>
+          entityAnnotationsMap: |-
+            {definitions.annotation}
   gbd_cause_dalys:
     variables:
       value:

@@ -409,6 +409,7 @@
     - "C\u00f4te d'Ivoire"
     - "C\u00f4te d\u2019Ivoire"
     - "Ivory Coast"
+    - "C<U+00F4>te d<U+2019>Ivoire"
 
 - code: "HRV"
   name: "Croatia"

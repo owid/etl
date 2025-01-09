@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("living_planet_index_share")
 
     # Read table from meadow dataset.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     #
     # Process data.
     #

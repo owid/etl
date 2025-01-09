@@ -27,7 +27,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     # Demography
     - data://garden/demography/2024-07-15/population
-    - data://garden/demography/2023-10-09/life_expectancy
+    - data://garden/demography/2024-12-03/life_expectancy
     - data://garden/un/2024-07-12/un_wpp
     # Econ
     - data://garden/wb/2024-10-07/world_bank_pip
@@ -230,7 +230,7 @@ steps:
     - data://garden/excess_mortality/latest/xm_karlinsky_kobak
     - data://garden/excess_mortality/latest/wmd
     - data://garden/excess_mortality/latest/hmd_stmf
-    - data://garden/demography/2022-12-08/population
+    - data://garden/demography/2023-03-31/population
   data://grapher/excess_mortality/latest/excess_mortality:
     - data://garden/excess_mortality/latest/excess_mortality
 
@@ -288,19 +288,16 @@ steps:
   data://grapher/covid/latest/deaths_vax_status:
     - data://garden/covid/latest/deaths_vax_status
 
-  ######################################
-  # MULTIDIM
-  export://multidim/covid/latest/covid:
-    - grapher://grapher/covid/latest/cases_deaths
-    - grapher://grapher/covid/latest/hospital
-    - grapher://grapher/covid/latest/vaccinations_global
-    - grapher://grapher/covid/latest/vaccinations_manufacturer
-    - grapher://grapher/covid/latest/testing
-    - grapher://grapher/covid/latest/google_mobility
-    - grapher://grapher/excess_mortality/latest/excess_mortality
-    - grapher://grapher/covid/latest/covax
-    - grapher://grapher/covid/latest/infections_model
-    - grapher://grapher/covid/latest/xm_who
+  # Countries reporting data
+  data://meadow/covid/latest/countries_reporting:
+    - snapshot://covid/2024-11-05/github_stats_vax_reporting.csv
+  data://garden/covid/latest/countries_reporting:
+    - data://meadow/covid/latest/vaccinations_global
+    - data://meadow/covid/latest/countries_reporting
+  data://grapher/covid/latest/countries_reporting:
+    - data://garden/covid/latest/countries_reporting
+
+  # Contributions to GitHub
   data://meadow/covid/2024-11-05/github_stats:
     - snapshot://covid/2024-11-05/github_stats_issues.csv
     - snapshot://covid/2024-11-05/github_stats_issues_comments.csv
@@ -314,3 +311,17 @@ steps:
     - data://meadow/covid/2024-11-05/github_stats
   data://grapher/covid/2024-11-05/github_stats:
     - data://garden/covid/2024-11-05/github_stats
+
+  ######################################
+  # MULTIDIM
+  export://multidim/covid/latest/covid:
+    - grapher://grapher/covid/latest/cases_deaths
+    - grapher://grapher/covid/latest/hospital
+    - grapher://grapher/covid/latest/vaccinations_global
+    - grapher://grapher/covid/latest/vaccinations_manufacturer
+    - grapher://grapher/covid/latest/testing
+    - grapher://grapher/covid/latest/google_mobility
+    - grapher://grapher/excess_mortality/latest/excess_mortality
+    - grapher://grapher/covid/latest/covax
+    - grapher://grapher/covid/latest/infections_model
+    - grapher://grapher/covid/latest/xm_who

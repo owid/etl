@@ -1,6 +1,4 @@
-"""Common grapher step for all FAOSTAT domains.
-
-"""
+"""Common grapher step for all FAOSTAT domains."""
 
 from pathlib import Path
 

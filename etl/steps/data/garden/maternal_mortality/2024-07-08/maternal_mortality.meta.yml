@@ -37,8 +37,10 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
+          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
         description_key:
           - "{definitions.description_maternal_mortality}"
+
       mm_rate:
         title: Maternal mortality rate
         description_short: |-

@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshots and read their data.
     snap = paths.load_snapshot("food_availability.xls")
-    data = snap.read(sheet_name="Totals", skiprows=1)
+    data = snap.read(safe_types=False, sheet_name="Totals", skiprows=1)
 
     #
     # Process data.

@@ -60,8 +60,10 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
+          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
         description_from_producer: |-
           {definitions.description_methodology}
+
       mm_rate:
         title: Estimated maternal mortality rate
         description_short: |-
@@ -70,6 +72,8 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 1
+          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
+
         description_from_producer: |-
           {definitions.description_methodology}
         description_processing: The data is originally given in deaths per person-years for women of reproductive age. To make the figures comparable with other sources, we multiply it by 100,000 to get deaths per 100,000 person-years (corresponding roughly to 100,000 women of reproductive age).
@@ -143,6 +147,7 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
+          entityAnnotationsMap: 'United States: Values from 2003–2017 affected by measurement change'
         description_from_producer: |-
           {definitions.description_methodology}
 

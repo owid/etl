@@ -61,8 +61,15 @@ def run(dest_dir: str) -> None:
     # Rename columns, select columns
     tb = tb.rename(columns=COLUMNS_RENAME)
 
+    # DTypes
+    tb = tb.astype(
+        {
+            "age": str,
+        }
+    )
+
     # Change 100 -> 100+
-    tb.loc[tb["age"] == 100, "age"] = "100+"
+    tb.loc[tb["age"] == "100", "age"] = "100+"
 
     # Scale central death rates
     paths.log.info("scale indicators to make them more.")
@@ -77,13 +84,6 @@ def run(dest_dir: str) -> None:
     # Harmonize sex sex
     tb["sex"] = tb["sex"].map({"Total": "both", "Male": "male", "Female": "female"})
     assert tb["sex"].notna().all(), "NaNs detected after mapping sex values!"
-
-    # DTypes
-    tb = tb.astype(
-        {
-            "age": str,
-        }
-    )
 
     # Set index
     tb = tb.set_index(COLUMNS_INDEX, verify_integrity=True)[COLUMNS_INDICATORS]

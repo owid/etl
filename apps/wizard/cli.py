@@ -4,6 +4,7 @@ This module is implemented so that we can run the app with the `python` keyword:
 
 python cli.py
 """
+
 import logging
 import sys
 from typing import Iterable

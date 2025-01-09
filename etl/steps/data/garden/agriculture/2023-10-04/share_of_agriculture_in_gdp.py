@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     #
     snap = paths.load_snapshot()
-    tb = snap.read().set_index(["country", "year"])
+    tb = snap.read(safe_types=False).set_index(["country", "year"])
 
     #
     # Save outputs.

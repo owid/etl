@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -133,7 +134,7 @@ def run(dest_dir: str) -> None:
     # tb["year"] = tb["year"].replace(0, -1)
 
     # Set index
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

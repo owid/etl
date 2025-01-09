@@ -1,6 +1,5 @@
-"""Load renewable energy investments data from garden and create a grapher dataset.
+"""Load renewable energy investments data from garden and create a grapher dataset."""
 
-"""
 from etl.helpers import PathFinder, create_dataset
 
 # Load paths and naming conventions.

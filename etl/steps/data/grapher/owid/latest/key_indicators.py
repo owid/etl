@@ -1,7 +1,6 @@
 from copy import deepcopy
 from typing import Any, List
 
-import numpy as np
 from owid import catalog
 
 from etl.paths import DATA_DIR
@@ -91,18 +90,20 @@ def _add_metric_new(
     display_name_suffix: str,
     description: str = "",
 ) -> catalog.Table:
-    # Get dtype
-    dtype = table[metric].dtype
-    if np.issubdtype(table[metric].dtype, np.integer):
-        dtype = "Int64"
     metric_new = f"{metric}_{metric_suffix}"
     table.loc[mask, metric_new] = deepcopy(table.loc[mask, metric])
     table[metric_new].metadata = deepcopy(table[metric].metadata)
     if title_suffix:
         table[metric_new].metadata.title = f"{table[metric_new].metadata.title} {title_suffix}"
     if display_name_suffix:
-        table[metric_new].metadata.display[
-            "name"
-        ] = f"{table[metric_new].metadata.display['name']} {display_name_suffix}"
+        table[metric_new].metadata.display["name"] = (
+            f"{table[metric_new].metadata.display['name']} {display_name_suffix}"
+        )
     table[metric_new].metadata.description = description
+
+    # Get dtype
+    dtype = table[metric].dtype
+    if "int" in str(dtype).lower():
+        dtype = "Int64"
+
     return table.astype({metric_new: dtype})

@@ -1,4 +1,5 @@
 """Script to create a snapshot of dataset 'Excess mortality during the COVID-19 pandemic'."""
+
 from datetime import date
 from pathlib import Path
 

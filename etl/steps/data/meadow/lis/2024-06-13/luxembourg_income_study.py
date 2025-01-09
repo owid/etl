@@ -3,7 +3,6 @@ Load the three LIS snapshots and creates three tables in the luxembourg_income_s
 Country names are converted from iso-2 codes in this step and years are reformated from "YY" to "YYYY"
 """
 
-
 from typing import Dict
 
 import owid.catalog.processing as pr
@@ -76,7 +75,7 @@ def edit_snapshots_and_add_to_dataset(
         for tb_name, tb_ids in snapshots_dict.items():
             # Retrieve snapshot.
             snap = paths.load_snapshot(f"{tb_name}{age_suffix}.csv")
-            tb = snap.read()
+            tb = snap.read(safe_types=False)
 
             tb[[col for col in tb.columns if col not in tb_ids]] = tb[
                 [col for col in tb.columns if col not in tb_ids]

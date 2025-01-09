@@ -37,7 +37,7 @@ def run(dest_dir: str) -> None:
     # Drop unnecessary columns
     tb = tb.drop(columns=["definition", "sources"])
 
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

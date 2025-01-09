@@ -1,6 +1,4 @@
-"""Meadow step for Global Electricity Review (Ember, 2022).
-
-"""
+"""Meadow step for Global Electricity Review (Ember, 2022)."""
 
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta

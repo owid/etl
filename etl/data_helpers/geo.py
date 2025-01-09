@@ -10,6 +10,7 @@ from typing import Any, Dict, Hashable, List, Literal, Optional, Set, TypeVar, U
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
+from deprecated import deprecated
 from owid.catalog import Dataset, Table, Variable
 from owid.datautils.common import ExceptionFromDocstring, warn_on_list_of_entities
 from owid.datautils.dataframes import groupby_agg, map_series
@@ -601,7 +602,7 @@ def _add_population_to_dataframe(
 
     # Load population data.
     if ds_population is not None:
-        population = ds_population.read_table("population")
+        population = ds_population.read("population", safe_types=False)
     else:
         population = _load_population()
     population = population.rename(
@@ -653,6 +654,7 @@ def _add_population_to_dataframe(
     return cast(TableOrDataFrame, df_with_population)
 
 
+@deprecated("This function is deprecated. Use `etl.data_helpers.misc.interpolate_table` instead.")
 def interpolate_table(
     df: TableOrDataFrame,
     country_col: str,
@@ -1055,7 +1057,7 @@ def detect_overlapping_regions(
     # List all variables in data (ignoring index columns).
     variables = [column for column in df.columns if column not in index_columns]
     # List all country names found in data.
-    countries_in_data = df[country_col].unique().tolist()  # type: ignore
+    countries_in_data = set(df[country_col].unique().tolist())  # type: ignore
     # List all regions found in data.
     # TODO: Possible overlaps in custom regions are not considered here. I think it would be simple enough to include
     #   here custom regions and check for overlaps.
@@ -1363,7 +1365,7 @@ def make_table_population_daily(ds_population: Dataset, year_min: int, year_max:
     Uses linear interpolation.
     """
     # Load population table
-    population = ds_population.read_table("population")
+    population = ds_population.read("population", safe_types=False)
     # Filter only years of interest
     population = population[(population["year"] >= year_min) & (population["year"] <= year_max)]
     # Create date column

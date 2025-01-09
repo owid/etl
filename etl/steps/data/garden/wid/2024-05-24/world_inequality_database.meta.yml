@@ -6,7 +6,6 @@ definitions:
         - Economic Inequality
       grapher_config:
         originUrl: https://ourworldindata.org/economic-inequality
-        $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
     processing_level: major
 
 
@@ -94,6 +93,14 @@ tables:
               - South Africa
               - China
               - France
+
+      p90p100_share_wealth:
+        presentation:
+          title_public: Wealth share of the richest 10%
+
+      p99p100_share_wealth:
+        presentation:
+          title_public: Wealth share of the richest 1%
 
   world_inequality_database_fiscal:
     common:

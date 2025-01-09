@@ -173,9 +173,9 @@ def correct_country_names(tb: Table) -> Table:
     tb["country"] = tb["country"].astype("string")
     tb.loc[(tb["country"] == "Germany") & (tb["year"] <= 1990) & (tb["year"] >= 1949), "country"] = "West Germany"
     tb.loc[(tb["country"] == "Yemen") & (tb["year"] <= 1990) & (tb["year"] >= 1918), "country"] = "Yemen Arab Republic"
-    tb.loc[
-        (tb["country"] == "Vietnam") & (tb["year"] <= 1975) & (tb["year"] >= 1945), "country"
-    ] = "Democratic Republic of Vietnam"
+    tb.loc[(tb["country"] == "Vietnam") & (tb["year"] <= 1975) & (tb["year"] >= 1945), "country"] = (
+        "Democratic Republic of Vietnam"
+    )
     tb.loc[(tb["country"] == "Republic of Vietnam") & (tb["year"] < 1945), "country"] = "Vietnam"
     return tb
 

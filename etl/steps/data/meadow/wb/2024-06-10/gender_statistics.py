@@ -9,7 +9,7 @@ def run(dest_dir: str) -> None:
 
     # Load data from snapshot.
     tb = snap.read_feather()
-    tb = tb.underscore().set_index(["country", "year", "wb_seriescode"], verify_integrity=True)
+    tb = tb.format(["country", "year", "wb_seriescode"])
 
     # Drop indicator_name column series column as it should be roughgly the same as indicator_name column (long definition of the indicator)
     tb = tb.drop(columns=["series"])

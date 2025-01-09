@@ -1,9 +1,9 @@
 """Load a garden dataset and create a grapher dataset."""
+
 import re
 from copy import deepcopy
 from typing import Any, List
 
-import numpy as np
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
@@ -172,10 +172,6 @@ def _create_metric_version_from_mask(
     Table
         Table with the new column.
     """
-    # Get dtype
-    dtype = table[metric].dtype
-    if np.issubdtype(table[metric].dtype, np.integer):
-        dtype = "Int64"
     metric_new = f"{metric}_{metric_suffix}"
     table.loc[mask, metric_new] = deepcopy(table.loc[mask, metric])
     table[metric_new].metadata = deepcopy(table[metric].metadata)
@@ -190,4 +186,8 @@ def _create_metric_version_from_mask(
             display_name = table[metric_new].metadata.title
         table[metric_new].metadata.display["name"] = f"{display_name} {display_name_suffix}"
     table[metric_new].metadata.description = description
+    # Get dtype
+    dtype = table[metric].dtype
+    if "int" in str(dtype).lower():
+        dtype = "Int64"
     return table.astype({metric_new: dtype})

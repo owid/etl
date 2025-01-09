@@ -16,8 +16,8 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb_usr_contrib = ds_garden.read_table("user_contributions")
-    tb_contrib = ds_garden.read_table("contributions")
+    tb_usr_contrib = ds_garden.read("user_contributions")
+    tb_contrib = ds_garden.read("contributions")
 
     # Add entity
     tb_usr_contrib["country"] = "World"

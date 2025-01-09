@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("expenditure.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb = tb.drop(columns=["iso2", "iso3", "iso_numeric", "g_whoregion"])
 
     #

@@ -1,14 +1,6 @@
 # Biodiversity - cherry blossom dataset
 steps:
-  # TO archive
-  data://meadow/biodiversity/2023-01-11/cherry_blossom:
-    - snapshot://biodiversity/2023-01-11/cherry_blossom.csv
-  data://garden/biodiversity/2023-01-11/cherry_blossom:
-    - data://meadow/biodiversity/2023-01-11/cherry_blossom
-  data://grapher/biodiversity/2023-01-11/cherry_blossom:
-    - data://garden/biodiversity/2023-01-11/cherry_blossom
-
-  # Update
+  # Cherry blossom
   data://meadow/biodiversity/2024-01-25/cherry_blossom:
     - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
     - snapshot://biodiversity/2024-01-31/cherry_blossom.csv
@@ -16,13 +8,7 @@ steps:
     - data://meadow/biodiversity/2024-01-25/cherry_blossom
   data://grapher/biodiversity/2024-01-25/cherry_blossom:
     - data://garden/biodiversity/2024-01-25/cherry_blossom
-  # IUCN Red List dataset
-  data://meadow/biodiversity/2023-08-14/iucn_animal:
-    - snapshot://biodiversity/2023-08-14/iucn_animal.csv
-  data://garden/biodiversity/2023-08-14/iucn_animal:
-    - data://meadow/biodiversity/2023-08-14/iucn_animal
-  data://grapher/biodiversity/2023-08-14/iucn_animal:
-    - data://garden/biodiversity/2023-08-14/iucn_animal
+
   # Invasive species -  Seebens et al
   data://meadow/biodiversity/2024-08-12/invasive_species:
     - snapshot://biodiversity/2024-08-12/invasive_species.xlsx
@@ -39,14 +25,24 @@ steps:
   data://grapher/biodiversity/2024-09-30/living_planet_index:
     - data://garden/biodiversity/2024-09-30/living_planet_index
 
-# LPI - Share of populations increasing or decreasing
+  # LPI - Share of populations increasing or decreasing
   data://garden/biodiversity/2024-09-30/living_planet_index_share:
     - snapshot://biodiversity/2024-09-30/living_planet_index_share.csv
   data://grapher/biodiversity/2024-09-30/living_planet_index_share:
     - data://garden/biodiversity/2024-09-30/living_planet_index_share
 
-# LPI - Share of populations increasing or decreasing
+  # LPI - Share of populations increasing or decreasing
   data://garden/biodiversity/2024-09-30/living_planet_index_completeness:
     - snapshot://biodiversity/2024-09-30/living_planet_index_completeness.csv
   data://grapher/biodiversity/2024-09-30/living_planet_index_completeness:
     - data://garden/biodiversity/2024-09-30/living_planet_index_completeness
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/biodiversity/2024-12-23/iucn_number_each_status:
+    - snapshot://biodiversity/2024-12-23/iucn_number_each_status.csv
+  data://garden/biodiversity/2024-12-23/iucn_number_each_status:
+    - data://meadow/biodiversity/2024-12-23/iucn_number_each_status
+  data://grapher/biodiversity/2024-12-23/iucn_number_each_status:
+    - data://garden/biodiversity/2024-12-23/iucn_number_each_status

@@ -1,56 +1,68 @@
+import hashlib
 import json
+import random
 from contextlib import contextmanager
 from copy import deepcopy
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional
 
 import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
 
+from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.chart_config import bake_chart_config
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher_model import Variable
+from etl.grapher.model import Variable
 
 HORIZONTAL_STYLE = """<style class="hide-element">
     /* Hides the style container and removes the extra spacing */
-    .element-container:has(.hide-element) {
+    .element-container:has(.hide-element) {{
         display: none;
-    }
+    }}
     /*
         The selector for >.element-container is necessary to avoid selecting the whole
         body of the streamlit app, which is also a stVerticalBlock.
     */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) {
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) {{
         display: flex;
         flex-direction: row !important;
         flex-wrap: wrap;
         gap: 1rem;
-        align-items: baseline;
-    }
+        align-items: {vertical_alignment};
+        justify-content: {justify_content};
+    }}
     /* Override the default width of selectboxes in horizontal layout */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) select {
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) select {{
         min-width: 200px;  /* Set a minimum width for selectboxes */
         max-width: 400px;  /* Optional: Set a max-width to avoid overly wide selectboxes */
-    }
+    }}
     /* Buttons and their parent container all have a width of 704px, which we need to override */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) div {
-        width: max-content !important;
-    }
-    /* Just an example of how you would style buttons, if desired */
-    /*
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) button {
-        border-color: red;
-    }
-    */
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) div {{
+        width: auto !important; /* Previously set to max-content */
+    }}
 </style>
 """
 
 
+def _generate_6char_hash():
+    random_input = str(random.random()).encode()  # Random input as bytes
+    hash_object = hashlib.sha256(random_input)  # Generate hash
+    return hash_object.hexdigest()[:6]  # Return first 6 characters of the hash
+
+
 @contextmanager
-def st_horizontal():
-    st.markdown(HORIZONTAL_STYLE, unsafe_allow_html=True)
+def st_horizontal(vertical_alignment="baseline", justify_content="flex-start", hash_string=None):
+    if hash_string is None:
+        hash_string = _generate_6char_hash()
+    h_style = HORIZONTAL_STYLE.format(
+        hash=hash_string,
+        vertical_alignment=vertical_alignment,
+        justify_content=justify_content,
+    )
+    st.markdown(h_style, unsafe_allow_html=True)
     with st.container():
-        st.markdown('<span class="hide-element horizontal-marker"></span>', unsafe_allow_html=True)
+        st.markdown(f'<span class="hide-element horizontal-marker-{hash_string}"></span>', unsafe_allow_html=True)
         yield
 
 
@@ -69,6 +81,7 @@ def grapher_chart(
     owid_env: OWIDEnv = OWID_ENV,
     selected_entities: Optional[list] = None,
     included_entities: Optional[list] = None,
+    tab: Optional[str] = None,
     height=600,
     **kwargs,
 ):
@@ -76,7 +89,7 @@ def grapher_chart(
 
     You can either plot a given chart config (using chart_config) or plot an indicator with its default metadata using either catalog_path, variable_id or variable.
 
-    Note: You can find more details on our Grapher API at https://files.ourworldindata.org/schemas/grapher-schema.005.json.
+    Note: You can find more details on our Grapher API at https://files.ourworldindata.org/schemas/grapher-schema.latest.json.
 
     Parameters
     ----------
@@ -94,6 +107,8 @@ def grapher_chart(
         List of entities to plot, by default None. If None, a random sample of num_sample_selected_entities will be plotted. Use entity names!
     included_entities : Optional[list], optional
         NOT WORKING ATM AS EXPECTED ATM. List of entities to include in chart. The rest are excluded! This is equivalent to `includedEntities` in Grapher. Use entity IDs!
+    tab : str, optional
+        Default tab to show in the chart, by default None (which is equivalent to "chart")
     height : int, optional
         Height of the chart, by default 600
     """
@@ -105,10 +120,21 @@ def grapher_chart(
             variable=variable,
             selected_entities=selected_entities,
             included_entities=included_entities,
+            tab=tab,
             owid_env=owid_env,
         )
 
     _chart_html(chart_config, owid_env, height=height, **kwargs)
+
+
+def grapher_chart_from_url(chart_url: str, height=600):
+    """Plot a Grapher chart using the Grapher API."""
+    chart_animation_iframe_html = f"""
+    <iframe src="{chart_url}" loading="lazy"
+            style="width: 100%; height: 600px; border: 0px none;"
+            allow="web-share; clipboard-write"></iframe>
+    """
+    return st.components.v1.html(chart_animation_iframe_html, height=height)  # type: ignore
 
 
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
@@ -309,3 +335,155 @@ class Pagination:
                 on_change=_change_page,
                 key=self.pagination_key,
             )
+
+
+def st_multiselect_wider(num_px: int = 1000):
+    st.markdown(
+        f"""
+        <style>
+        .stMultiSelect [data-baseweb=select] span{{
+                max-width: {num_px}px;
+            }}
+        </style>""",
+        unsafe_allow_html=True,
+    )
+
+
+def st_info(text):
+    st.info(text, icon=":material/info:")
+
+
+def config_style_html() -> None:
+    """Increase font-size of expander headers."""
+    st.markdown(
+        """
+    <style>
+    .streamlit-expanderHeader {
+        font-size: x-large;
+    }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
+
+def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
+    """Link to page."""
+    if "page" not in kwargs:
+        kwargs["page"] = PAGES_BY_ALIAS[alias]["entrypoint"]
+    if "label" not in kwargs:
+        kwargs["label"] = PAGES_BY_ALIAS[alias]["title"]
+    if "icon" not in kwargs:
+        kwargs["icon"] = PAGES_BY_ALIAS[alias]["icon"]
+
+    if border:
+        with st.container(border=True):
+            st.page_link(**kwargs)
+    else:
+        st.page_link(**kwargs)
+
+
+def preview_file(
+    file_path: str | Path, prefix: str = "File", language: str = "python", custom_header: Optional[str] = None
+) -> None:
+    """Preview file in streamlit."""
+    with open(file_path, "r") as f:
+        code = f.read()
+    if custom_header is None:
+        custom_header = f"{prefix}: `{file_path}`"
+    with st.expander(custom_header, expanded=False):
+        st.code(code, language=language)
+
+
+def st_toast_error(message: str) -> None:
+    """Show error message."""
+    st.toast(f"❌ :red[{message}]")
+
+
+def st_toast_success(message: str) -> None:
+    """Show success message."""
+    st.toast(f"✅ :green[{message}]")
+
+
+def update_query_params(key):
+    def _update_query_params():
+        value = st.session_state[key]
+        if value:
+            st.query_params.update({key: value})
+        else:
+            st.query_params.pop(key, None)
+
+    return _update_query_params
+
+
+def url_persist(component: Any, default: Any = None) -> Any:
+    """Wrapper around streamlit components that persist values in the URL query string.
+
+    :param component: Streamlit component to wrap
+    :param default: Default value. If value is equal to default value, it will not be added to the query string.
+        This is useful to avoid cluttering the URL with default values.
+
+    Usage:
+        url_persist(st.multiselect)(
+          key="abc",
+          ...
+        )
+    """
+    # Component uses list of values
+    if component == st.multiselect:
+        repeated = True
+    else:
+        repeated = False
+
+    if component == st.checkbox:
+        convert_to_bool = True
+    else:
+        convert_to_bool = False
+
+    def _persist(*args, **kwargs):
+        assert "key" in kwargs, "key should be passed to persist"
+        # TODO: we could wrap on_change too to make it work
+        assert "on_change" not in kwargs, "on_change should not be passed to persist"
+
+        key = kwargs["key"]
+
+        # Set default value
+        if default is not None and key not in st.query_params:
+            st.session_state[key] = default
+
+        if not st.session_state.get(key):
+            if repeated:
+                params = st.query_params.get_all(key)
+                # convert to int if digit
+                params = [int(q) if q.isdigit() else q for q in params]
+            else:
+                params = st.query_params.get(key)
+                if params and params.isdigit():
+                    params = int(params)
+                elif params and params.replace(".", "", 1).isdigit():
+                    params = float(params)
+
+            if convert_to_bool:
+                params = params == "True"
+
+            # Use `value` from the component as a default value if available
+            if not params and "value" in kwargs:
+                params = kwargs.pop("value")
+
+            st.session_state[key] = params
+
+            if "options" in kwargs:
+                # Set default value in query params
+                if params not in kwargs["options"]:
+                    raise ValueError(f"Please review the URL query. Value {params} not in options {kwargs['options']}.")
+
+        else:
+            # Set the value in query params, but only if it isn't default
+            if default is None or st.session_state[key] != default:
+                update_query_params(key)()
+
+        kwargs["on_change"] = update_query_params(key)
+
+        return component(*args, **kwargs)
+
+    return _persist

@@ -58,11 +58,15 @@ def run(dest_dir: str) -> None:
     ds_garden_wdi = paths.load_dataset("wdi")
     tb_wdi = ds_garden_wdi["wdi"]
 
-    # Extract enrollment rates from the World Bank Education Dataset starting from 2010
-    enrolment_wb = extract_related_world_bank_data(tb_wdi)
+    # Load the UNESCO Education Dataset
+    ds_garden_unesco = paths.load_dataset("enrolment_rates")
+    tb_unesco = ds_garden_unesco["enrolment_rates"]
+
+    # Extract enrollment rates from the World Bank and UNESCO datasets starting from 2010
+    enrolment_recent = extract_recent_data(tb_wdi, tb_unesco)
 
     # Get the list of columns from the World Bank dataset
-    world_bank_indicators = enrolment_wb.columns
+    world_bank_indicators = enrolment_recent.columns
 
     #
     # Data Processing
@@ -101,7 +105,7 @@ def run(dest_dir: str) -> None:
 
     # Concatenate historical and more recent enrollment data
     hist_1985_tb = merged_tb[merged_tb["year"] < 1985]
-    tb_merged_enrollment = pr.concat([enrolment_wb, hist_1985_tb[world_bank_indicators]])
+    tb_merged_enrollment = pr.concat([enrolment_recent, hist_1985_tb[world_bank_indicators]])
     tb_merged_enrollment.set_index(["country", "year"], inplace=True)
     # Differentiate these columns from the original data
     tb_merged_enrollment.columns = tb_merged_enrollment.columns + "_combined_wb"
@@ -160,7 +164,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def extract_related_world_bank_data(tb_wb: Table):
+def extract_recent_data(tb_wb: Table, tb_unesco: Table) -> Table:
     """
     Extracts enrollment rate indicators from the World Bank dataset.
     The function specifically extracts net enrollment rates up to secondary education and gross enrollment rates for tertiary education.
@@ -171,10 +175,6 @@ def extract_related_world_bank_data(tb_wb: Table):
 
     # Define columns to select for enrolment rates
     select_enrolment_cols = [
-        # Primary enrollment columns
-        "se_prm_nenr",
-        "se_prm_nenr_fe",
-        "se_prm_nenr_ma",
         # Tertiary enrollment columns
         "se_ter_enrr",
         "se_ter_enrr_fe",
@@ -185,11 +185,18 @@ def extract_related_world_bank_data(tb_wb: Table):
         "se_sec_nenr_ma",
     ]
 
+    select_primary = [
+        # Primary enrollment columns
+        "total_net_enrolment_rate__primary__both_sexes__pct",
+        "total_net_enrolment_rate__primary__female__pct",
+        "total_net_enrolment_rate__primary__male__pct",
+    ]
+
     # Dictionary to rename columns to be consistent with Lee dataset
     dictionary_to_rename_and_combine = {
-        "se_prm_nenr": "mf_primary_enrollment_rates",
-        "se_prm_nenr_fe": "f_primary_enrollment_rates",
-        "se_prm_nenr_ma": "m_primary_enrollment_rates",
+        "total_net_enrolment_rate__primary__both_sexes__pct": "mf_primary_enrollment_rates",
+        "total_net_enrolment_rate__primary__female__pct": "f_primary_enrollment_rates",
+        "total_net_enrolment_rate__primary__male__pct": "m_primary_enrollment_rates",
         "se_ter_enrr": "mf_tertiary_enrollment_rates",
         "se_ter_enrr_fe": "f_tertiary_enrollment_rates",
         "se_ter_enrr_ma": "m_tertiary_enrollment_rates",
@@ -199,14 +206,15 @@ def extract_related_world_bank_data(tb_wb: Table):
     }
 
     # Select and rename columns
-    enrolment_wb = tb_wb[select_enrolment_cols]
-    enrolment_wb = enrolment_wb.rename(columns=dictionary_to_rename_and_combine)
+    enrolment_wb = tb_wb[select_enrolment_cols].reset_index()
+    enrolment_unesco = tb_unesco[select_primary].reset_index()
+    enrolment_recent = pr.merge(enrolment_wb, enrolment_unesco, on=["country", "year"], how="outer")
+    enrolment_recent = enrolment_recent.rename(columns=dictionary_to_rename_and_combine)
 
     # Select data above 1985
-    enrolment_wb = enrolment_wb[(enrolment_wb.index.get_level_values("year") >= 1985)]
-    enrolment_wb = enrolment_wb.reset_index()
+    enrolment_recent = enrolment_recent[enrolment_recent["year"] >= 1985]
 
-    return enrolment_wb
+    return enrolment_recent
 
 
 def melt_and_pivot(tb, id_vars: List[str], value_vars: List[str], index_vars: List[str], columns_vars: List[str]):

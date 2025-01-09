@@ -1,6 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset, grapher_checks
@@ -36,13 +37,13 @@ def run(dest_dir: str) -> None:
 
     # Update metadata
     for col in ["max_compute", "max_parameters", "max_data"]:
-        tb[col].metadata.origins = tb["system"].metadata.origins
+        tb[col].metadata.origins = tb["model"].metadata.origins
 
     # Drop year as we don't need it anymore
     tb = tb.drop("year", axis=1)
 
     # Rename for plotting model name as country in grapher
-    tb = tb.rename(columns={"system": "country", "days_since_1949": "year"})
+    tb = tb.rename(columns={"model": "country", "days_since_1949": "year"})
     tb = tb.format(["country", "year"])
 
     #
@@ -82,7 +83,7 @@ def find_max_label_and_concat(tb, column, label):
     rows_to_keep = []
 
     for _, row in tb.iterrows():
-        if row[column] > max_value:
+        if not pd.isna(row[column]) and row[column] > max_value:
             max_value = row[column]
             rows_to_keep.append(row)
 

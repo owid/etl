@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: GitHub stats on owid/covid-19-data repository
+    description: |-
+      During the global COVID-19 pandemic, Our World in Data had a key role in collecting, disseminating, and publishing various indicators. These included figures on vaccinations, testing, confirmed deaths and cases, and more.
+
+      This work was done in a GitHub repository, in the public eye. Our World in Data received numerous contributions from other actors who voluntarily helped collect all the data. Without their contribution, creating the dataset wouldn't have been possible.
+    title_snapshot: "GitHub stats on owid/covid-19-data repository: Users from Commits"
+    description_snapshot: |-
+      This snapshot contains the list of dates when OWID first obtained data for each country in the owid/covid-19-data GitHub repository.
+
+    date_published: 2024-11-13
+
+    # Citation
+    producer: Our World in Data
+    citation_full: |-
+      Our World in Data. (2024). COVID-19 Data. GitHub repository. https://github.com/owid/covid-19-data.
+
+    # Files
+    url_main: https://github.com/owid/covid-19-data
+    date_accessed: 2024-11-13
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: c5db7b864c4df639b6f66d595b0a0c6d
+    size: 25667
+    path: github_stats_vax_reporting.csv

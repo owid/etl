@@ -3,6 +3,7 @@ definitions:
     presentation:
       topic_tags:
         - Child & Infant Mortality
+      attribution: Gapminder (2020); UN Inter-agency Group for Child Mortality Estimation (2024)
 
 dataset:
   title: Long-run child mortality (Gapminder; UN IGME)

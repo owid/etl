@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+
 from owid.catalog import Table
 from owid.catalog import processing as pr
 from shared import add_variable_description_from_producer, removing_old_variables
@@ -36,7 +37,7 @@ def run(dest_dir: str) -> None:
     # Load income groups dataset.
     ds_income_groups = paths.load_dataset("income_groups")
     # Load data dictionary from snapshot.
-    dd = snap.read()
+    dd = snap.read(safe_types=False)
     # Read table from meadow dataset.
     tb = ds_meadow["notifications"].reset_index()
     #

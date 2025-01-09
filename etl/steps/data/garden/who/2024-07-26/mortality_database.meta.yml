@@ -5,8 +5,8 @@ definitions:
       topic_tags:
         - Causes of Death
     processing_level: minor
-
-# Learn more about the available fields:
+  annotation: |-
+    <% if cause == 'Maternal conditions' %>United States: Values from 2003–2017 affected by measurement change<%- endif -%>
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
@@ -22,6 +22,8 @@ tables:
         unit: deaths
         display:
           numDecimalPlaces: 0
+          entityAnnotationsMap: |-
+            {definitions.annotation}
         presentation:
           grapher_config:
             note: |-
@@ -39,12 +41,14 @@ tables:
             note: |-
               All deaths in a country may not have been registered with a [cause of death](#dod:underlying-cause-of-death).
       age_standardized_death_rate_per_100_000_standard_population:
-        title: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> per 100,000 people
-        description_short: Reported deaths from << cause.lower() >> in << sex.lower() >> per 100,000 people.
+        title: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people
+        description_short: Reported deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.
         description_key: ["The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>."]
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
+          entityAnnotationsMap: |-
+            {definitions.annotation}
         presentation:
           grapher_config:
             note: |-
@@ -56,6 +60,8 @@ tables:
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
+          entityAnnotationsMap: |-
+            {definitions.annotation}
         presentation:
           grapher_config:
             note: |-

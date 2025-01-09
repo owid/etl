@@ -13,6 +13,7 @@ Four sources are used overall:
         Provides data on former countries, and complements other sources with data on missing years for some countries.
         More on this dataset please refer to module gapminder_sg.
 """
+
 import os
 from copy import deepcopy
 from typing import List, cast

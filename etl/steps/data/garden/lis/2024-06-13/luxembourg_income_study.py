@@ -145,7 +145,7 @@ def make_table_wide(tb: Table, cols_to_wide: List[str]) -> Table:
     tb = tb.drop(columns=["dataset"])
 
     # Change names of equivalized variable, to create a distinguishable name
-    tb["eq"] = tb["eq"].replace({1: "eq", 0: "pc"})
+    tb["eq"] = tb["eq"].astype(int).replace({1: "eq", 0: "pc"}).astype("string[pyarrow]")
 
     # Create pivot table and join different levels of column
     tb = tb.pivot(index=["country", "year"], columns=cols_to_wide, join_column_levels_with="_").reset_index(drop=True)
@@ -155,7 +155,7 @@ def make_table_wide(tb: Table, cols_to_wide: List[str]) -> Table:
 
 # Load `keyvars` meadow dataset, rename and drop variables
 def load_keyvars(age: str, ds_meadow: Dataset) -> Table:
-    tb_keyvars = ds_meadow[f"lis_keyvars{age}"].reset_index()
+    tb_keyvars = ds_meadow.read(f"lis_keyvars{age}", safe_types=False)
 
     # Use less technical names for some variables
     tb_keyvars.columns = tb_keyvars.columns.str.replace("fgt0", "headcount_ratio")
@@ -214,7 +214,7 @@ def create_relative_pov_variables(tb_keyvars: Table, relative_povlines: List[int
 
 # Load `abs_poverty` meadow dataset, rename variables
 def load_abs_poverty(tb_keyvars: Table, age: str, ds_meadow: Dataset) -> Table:
-    tb_abs_poverty = ds_meadow[f"lis_abs_poverty{age}"].reset_index()
+    tb_abs_poverty = ds_meadow.read(f"lis_abs_poverty{age}", safe_types=False)
 
     # Add population variable from keyvars
     tb_abs_poverty = pr.merge(
@@ -260,7 +260,7 @@ def create_absolute_pov_variables(tb_abs_poverty: Table) -> Table:
 
 # Load `distribution` meadow dataset, rename variables
 def load_distribution(age: str, ds_meadow: Dataset) -> Table:
-    tb_distribution = ds_meadow[f"lis_distribution{age}"].reset_index()
+    tb_distribution = ds_meadow.read(f"lis_distribution{age}", safe_types=False)
 
     # Transform percentile variable to `pxx`
     tb_distribution["percentile"] = "p" + tb_distribution["percentile"].astype(str)
@@ -327,13 +327,13 @@ def create_distributional_variables(tb_distribution: Table, age: str, ds_meadow:
 
 def percentiles_table(tb_name: str, ds_meadow: Dataset, tb_keyvars: Table) -> Table:
     # Read table from meadow dataset.
-    tb = ds_meadow[tb_name].reset_index()
+    tb = ds_meadow.read(tb_name, safe_types=False)
 
     # Drop dataset variable
     tb = tb.drop(columns=["dataset"])
 
     # Change names of equivalized variable, to create a distinguishable name
-    tb["eq"] = tb["eq"].replace({1: "eq", 0: "pc"})
+    tb["eq"] = tb["eq"].astype(int).replace({1: "eq", 0: "pc"}).astype("string[pyarrow]")
 
     # Rename variable column to welfare
     tb = tb.rename(columns={"variable": "welfare", "eq": "equivalization"})

@@ -14,13 +14,13 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("thousand_bins_distribution.dta")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["year", "code", "region_code", "obs"], verify_integrity=True).sort_index()
+    tb = tb.format(["year", "code", "region_code", "obs"])
 
     #
     # Save outputs.

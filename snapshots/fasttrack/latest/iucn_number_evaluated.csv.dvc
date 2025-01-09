@@ -1,0 +1,26 @@
+meta:
+  origin:
+    producer: International Union for Conservation of Nature
+    title: International Union for Conservation of Nature Red List of Threatened Species
+    citation_full: |-
+      IUCN. 2024. The IUCN Red List of Threatened Species. Version 2024-2. https://www.iucnredlist.org. Accessed on [20 December 2024]
+    attribution: International Union for Conservation of Nature Red List of Threatened Species (2024)
+    attribution_short: IUCN
+    url_main: https://www.iucnredlist.org/resources/summary-statistics#Summary%20Tables
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vT1_r5TNWT9jDo4l9-arQ1J0l6OUlTG9SxdcjwaS96DQLQOGg3cVoZnP-qQY7FdQT2qFNuExDuj95W5/pub?output=csv
+    date_accessed: '2024-12-23'
+    date_published: '2024-10-28'
+    license:
+      name: © International Union for Conservation of Nature and Natural Resources
+      url: https://www.iucnredlist.org/terms/terms-of-use
+  name: Number of evaluated and threatened species
+  description: |-
+    Summary statistics (Table 1a): Number of species evaluated in relation to the overall number of described species, and numbers of threatened species by major groups of organisms.
+  license:
+    name: © International Union for Conservation of Nature and Natural Resources
+    url: https://www.iucnredlist.org/terms/terms-of-use
+outs:
+  - md5: 14ca192777a0046722ad598cc21a6857
+    size: 1159
+    path: iucn_number_evaluated.csv

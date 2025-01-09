@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     # Rename entity to country for the grapher step
     tb = tb.rename(columns={"entity": "country"})
 
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

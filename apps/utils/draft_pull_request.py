@@ -96,7 +96,7 @@ def _branch_exists_remotely(new_branch, remote_branches):
         return False
 
 
-@click.command(name="draft-pr", cls=RichCommand, help=__doc__)
+@click.command(name="pro", cls=RichCommand, help=__doc__)
 @click.argument(
     "new-branch",
     type=str,

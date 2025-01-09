@@ -1,0 +1,21 @@
+meta:
+  origin:
+    title_snapshot: ERA5 Monthly Averaged Data on Single Levels from 1940 to Present - Monthly Averages of Total Precipitation
+    title: ERA5 monthly averaged data on single levels from 1940 to present
+    description: |-
+      Monthly averages of total precipitation from the ERA5 reanalysis. The data is on single levels and covers the period from 1940 to present. The data is available at a spatial resolution of 0.25 degrees. The data is provided by the Copernicus Climate Change Service (C3S) Climate Data Store (CDS).
+    producer: Contains modified Copernicus Climate Change Service information
+    version_producer: 2
+    citation_full: |-
+      Hersbach, H., Bell, B., Berrisford, P., Biavati, G., Horányi, A., Muñoz Sabater, J., Nicolas, J., Peubey, C., Radu, R., Rozum, I., Schepers, D., Simmons, A., Soci, C., Dee, D., Thépaut, J-N. (2023): ERA5 monthly averaged data on single levels from 1940 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS), DOI: 10.24381/cds.f17050d7 (Accessed on 19-Nov-2024)
+    url_main: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview
+    date_accessed: 2025-01-07
+    date_published: 2025-01-07
+    license:
+      name: Copernicus License
+      url: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview
+
+outs:
+  - md5: 07775008f3a80c06fd2a4561e12f76c4
+    size: 1475671677
+    path: total_precipitation.zip

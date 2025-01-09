@@ -12,9 +12,9 @@ paths = PathFinder(__file__)
 def run(dest_dir: str) -> None:
     log.info("cherry_blossom.start")
 
-    # read dataset from meadow
+    # Read dataset from meadow.
     ds_meadow = paths.load_dataset("cherry_blossom")
-    tb = ds_meadow["cherry_blossom"].reset_index()
+    tb = ds_meadow.read("cherry_blossom")
 
     # Calculate a 20,40 and 50 year average
     tb = calculate_multiple_year_average(tb)
@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"])
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
 

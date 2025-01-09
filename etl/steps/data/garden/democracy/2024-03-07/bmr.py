@@ -127,7 +127,7 @@ def run(dest_dir: str) -> None:
     tb_pop, tb_pop_years_consec = make_tables_population_counters(tb, ds_regions, ds_population)
 
     # Set index.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
@@ -310,15 +310,15 @@ def add_years_in_democracy(tb: Table) -> Table:
         - num_years_in_democracy_ws: Total number of years in democracy with women's suffrage.
     """
     ### Count the number of years since the country first became a democracy. Transition NaN -> 1 is considered as 0 -> 1.
-    tb["num_years_in_democracy_consecutive"] = tb.groupby(["country", tb["regime"].fillna(0).eq(0).cumsum()])[
-        "regime"
-    ].cumsum()
+    tb["num_years_in_democracy_consecutive"] = tb.groupby(
+        ["country", tb["regime"].fillna(0).eq(0).astype(int).cumsum()]
+    )["regime"].cumsum()
     tb["num_years_in_democracy_consecutive"] = tb["num_years_in_democracy_consecutive"].astype(float)
     tb["num_years_in_democracy"] = tb.groupby("country")["regime"].cumsum()
     ## Add democracy age (including women's suffrage) / experience
     ### Count the number of years since the country first became a democracy. Transition NaN -> 1 is considered as 0 -> 1.
     tb["num_years_in_democracy_ws_consecutive"] = tb.groupby(
-        ["country", tb["regime_womsuffr"].fillna(0).eq(0).cumsum()]
+        ["country", tb["regime_womsuffr"].fillna(0).eq(0).astype(int).cumsum()]
     )["regime_womsuffr"].cumsum()
     tb["num_years_in_democracy_ws_consecutive"] = tb["num_years_in_democracy_ws_consecutive"].astype(float)
     tb["num_years_in_democracy_ws"] = tb.groupby("country")["regime_womsuffr"].cumsum()

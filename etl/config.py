@@ -6,6 +6,7 @@
 The environment variables and settings here are for publishing options, they're
 only important for OWID staff.
 """
+
 import os
 import pwd
 import re
@@ -43,6 +44,7 @@ def _normalise_branch(branch_name):
     return re.sub(r"[\/\._]", "-", branch_name)
 
 
+# NOTE: If you edit this function, make sure to update `get_container_name` in ops repo as well
 def get_container_name(branch_name):
     normalized_branch = _normalise_branch(branch_name)
 
@@ -50,7 +52,22 @@ def get_container_name(branch_name):
     normalized_branch = normalized_branch.replace("staging-site-", "")
 
     # Ensure the container name is less than 63 characters
-    container_name = f"staging-site-{normalized_branch[:50]}"
+    # however, we truncate it to 28 characters to be consistent with Cloudflare's
+    # 28 character limit (see https://community.cloudflare.com/t/algorithm-to-generate-a-preview-dns-subdomain-from-a-branch-name/477633)
+    # TODO: these ifs were added to be backward compatible with existing branches that are longer than 28 characters
+    #   remove them once they get merged
+    if normalized_branch in (
+        "variable-selector-catalog-path",
+        "grapher-page-dynamic-thumbnail",
+        "data-fertility-rate-effective",
+        "add-reset-metadata-origin-option",
+        "data-battery-cell-prices-private",
+    ):
+        limit = 50
+    else:
+        limit = 28
+
+    container_name = f"staging-site-{normalized_branch[:limit]}"
     # Remove trailing hyphens
     return container_name.rstrip("-")
 
@@ -222,7 +239,10 @@ GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.005.json"
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.006.json"
+
+# Google Cloud service account path (used for BigQuery)
+GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
 def enable_bugsnag() -> None:
@@ -479,10 +499,6 @@ class OWIDEnv:
         """Get indicator admin url."""
         return f"{self.admin_site}/variables/{variable_id}/"
 
-    def variable_admin_site(self, variable_id: str | int) -> str:
-        """Get variable admin url."""
-        return self.indicator_admin_site(variable_id)
-
     def chart_admin_site(self, chart_id: str | int) -> str:
         """Get chart admin url."""
         return f"{self.admin_site}/charts/{chart_id}/edit"
@@ -490,6 +506,10 @@ class OWIDEnv:
     def chart_site(self, slug: str) -> str:
         """Get chart url."""
         return f"{self.site}/grapher/{slug}"
+
+    def data_page_preview(self, variable_id: str | int) -> str:
+        """Get indicator admin url."""
+        return f"{self.admin_site}/datapage-preview/{variable_id}/"
 
     def thumb_url(self, slug: str):
         """

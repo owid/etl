@@ -1053,7 +1053,7 @@ def aggregate_coal(tb: Table) -> Table:
 
     # Visually compare the resulting series with the one from the Statistical Review of World Energy.
     # from etl.paths import DATA_DIR
-    # tb_sr = Dataset(DATA_DIR / "garden/energy_institute/2024-06-20/statistical_review_of_world_energy").read_table("statistical_review_of_world_energy")
+    # tb_sr = Dataset(DATA_DIR / "garden/energy_institute/2024-06-20/statistical_review_of_world_energy").read("statistical_review_of_world_energy")
     # tb_sr = tb_sr[["country", "year", 'coal_production_mt']].rename(columns={"coal_production_mt": "value"})
     # tb_sr["value"] *= 1e6
     # compare = pr.concat([tb_sr.assign(**{"source": "EI"}), tb_coal_sum.assign(**{"source": "BGS"})], ignore_index=True)
@@ -1132,7 +1132,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("world_mineral_statistics")
-    tb = ds_meadow.read_table("world_mineral_statistics")
+    tb = ds_meadow.read("world_mineral_statistics", safe_types=False)
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")

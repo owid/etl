@@ -53,7 +53,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     tb = process_and_combine_datasets(tb_wdi, tb_mpd, tb_md)
 
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

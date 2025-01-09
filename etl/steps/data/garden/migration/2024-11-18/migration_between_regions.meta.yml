@@ -1,0 +1,17 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+    description_processing: We aggregated migrants between different regions, using our definition of continents and the World Bank definition of regions.
+    processing_level: major
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Migration between regions
+
+

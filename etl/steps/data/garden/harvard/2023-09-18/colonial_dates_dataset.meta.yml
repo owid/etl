@@ -108,7 +108,7 @@ tables:
           grapher_config:
             hideAnnotationFieldsInTitle:
               time: true
-            hasChartTab: false
+            chartTypes: []
             hasMapTab: true
             tab: map
             map:

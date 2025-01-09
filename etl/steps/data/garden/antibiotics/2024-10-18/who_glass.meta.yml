@@ -1,0 +1,59 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+        - Antibiotics
+    display:
+      name: << syndrome.capitalize() >>
+  syndrome:
+    <%- if syndrome == "BLOOD" %>
+    bloodstream
+    <%- elif syndrome == "STOOL" %>
+    gastrointestinal
+    <%- elif syndrome == "URINE" %>
+    urinary tract
+    <%- elif syndrome == "UROGENITAL" %>
+    gonorrohea
+    <% endif %>
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  who_glass:
+    variables:
+      bcispermillion:
+        title: Samples tested and confirmed to be {definitions.syndrome} infections per million population
+        unit: "confirmed infections per million"
+        presentation:
+          title_public: Samples tested and confirmed to be {definitions.syndrome} infections per million population
+      totalspecimenisolates:
+        title: Total specimens collected of {definitions.syndrome} infections
+        unit: "specimens"
+        presentation:
+          title_public: Total specimen collected of {definitions.syndrome} infections
+      isolspermillion:
+        title: Samples tested and confirmed to be {definitions.syndrome} infections with antibiotic susceptibility test results per million population
+        unit: "confirmed infections per million"
+        presentation:
+          title_public: Samples tested and confirmed to be {definitions.syndrome} infections with antibiotic susceptibility test results per million population
+      totalspecimenisolateswithast:
+        title: Samples tested and confirmed to be {definitions.syndrome} infections with antibiotic susceptibility test results
+        unit: "confirmed infections"
+        presentation:
+          title_public: Samples tested and confirmed to be {definitions.syndrome} infections with antibiotic susceptibility test results
+      astresult:
+        title: Share of samples tested and confirmed to be {definitions.syndrome} infections with antibiotic susceptibility test results
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          title_public: Share of samples tested and confirmed to be {definitions.syndrome} infections with antibiotic susceptibility test results

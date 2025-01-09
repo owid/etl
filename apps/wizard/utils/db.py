@@ -5,6 +5,7 @@ NOTE: We are currently migrating some of the logic to our actual MySQL database.
 Some of the tools here rely on a local temporary sqlite database. This database is a custom and temporary database used to store data in a server. Not intended for production use.
 
 """
+
 import datetime as dt
 import hashlib
 import os
@@ -21,7 +22,7 @@ from sqlalchemy.orm import Session
 from apps.wizard.utils.paths import STREAMLIT_SECRETS, WIZARD_DB
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_engine, read_sql, to_sql
-from etl.grapher_model import Anomaly
+from etl.grapher.model import Anomaly
 
 log = structlog.get_logger()
 

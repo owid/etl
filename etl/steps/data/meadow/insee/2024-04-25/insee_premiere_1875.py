@@ -37,8 +37,8 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("insee_premiere_1875.xlsx")
 
     # Load data from snapshot.
-    tb_inequality = snap.read(sheet_name="Figure 2", skiprows=2)
-    tb_poverty = snap.read(sheet_name="Figure 3", skiprows=2)
+    tb_inequality = snap.read(safe_types=False, sheet_name="Figure 2", skiprows=2)
+    tb_poverty = snap.read(safe_types=False, sheet_name="Figure 3", skiprows=2)
 
     # Process data.
     tb_inequality = process_inequality_data(tb=tb_inequality, columns=COLUMNS_INEQUALITY, short_name="inequality")

@@ -14,11 +14,11 @@ def run(dest_dir: str) -> None:
     ## Attention (via tags)
     snap = paths.load_snapshot("guardian_mentions.csv")
     ## Load data from snapshot.
-    tb_tags = snap.read()
+    tb_tags = snap.read(safe_types=False)
     ## Attention (via mentions)
     snap = paths.load_snapshot("guardian_mentions_raw.csv")
     ## Load data from snapshot.
-    tb_mentions = snap.read()
+    tb_mentions = snap.read(safe_types=False)
 
     #
     # Process data.

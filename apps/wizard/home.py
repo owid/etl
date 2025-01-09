@@ -1,4 +1,5 @@
 """Home page of wizard."""
+
 from copy import deepcopy
 from typing import Any, Dict, List, Optional
 
@@ -6,7 +7,7 @@ import streamlit as st
 from streamlit_card import card
 
 from apps.wizard.config import WIZARD_CONFIG
-from apps.wizard.utils import set_staging_creation_time, st_page_link
+from apps.wizard.utils.components import st_wizard_page_link
 
 st.set_page_config(
     page_title="Wizard: Home",
@@ -24,14 +25,26 @@ def st_show_home():
         st.title("Wizard 🪄")
     with cols[1]:
         st.caption(f"streamlit {st.__version__}")
-    # Expert link
-    st_page_link(
-        "expert",
-        label="Questions about ETL or Grapher? Ask the expert!",
-        help="Ask the expert any documentation question!",
-        use_container_width=True,
-        border=True,
-    )
+
+    # Relevant links
+    with st.container(border=False):
+        cols = st.columns(2, vertical_alignment="center")
+        with cols[0]:
+            st_wizard_page_link(
+                "expert",
+                label="Questions about ETL or Grapher? Ask the expert!",
+                help="Ask the expert any documentation question!",
+                use_container_width=True,
+                border=True,
+            )
+        with cols[1]:
+            st_wizard_page_link(
+                "analytics",
+                label="OWID Analytics",
+                help="Learn more with the OWID Analytics dashboard. It redirects you to another internal site.",
+                use_container_width=True,
+                border=True,
+            )
 
     # Generic tools
     ## Default styling for the cards (Wizard apps are presented as cards)
@@ -93,35 +106,25 @@ def st_show_home():
     # 1. Classic: Snapshot -> Meadow -> Garden + Grapher
     # 2. Fast Track: Fast Track + Grapher
 
-    # 1/ First row for [Snapshot, Meadow, Garden, Grapher]
-    pages = [
-        {
-            "entrypoint": steps[step]["entrypoint"],
-            "title": steps[step]["title"],
-            "image_url": steps[step]["image_url"],
-            # "alias": step,
-        }
-        for step in ["snapshot", "meadow", "garden", "grapher"]
-        if steps[step]["enable"]
-    ]
-    if len(pages) > 0:
-        columns = st.columns(len(pages))
-        for i, page in enumerate(pages):
-            with columns[i]:
-                create_card(**page, small=True)
-
-    # 2 EXPRESS
+    # 1/ CLASSIC: Snapshot + Data
     if steps["fasttrack"]["enable"]:
         col1, col2 = st.columns([1, 3])
+        with col1:
+            create_card(
+                entrypoint=steps["snapshot"]["entrypoint"],
+                title=steps["snapshot"]["title"],
+                image_url=steps["snapshot"]["image_url"],
+                custom_styles={"height": "100px"},
+            )
         with col2:
             create_card(
-                entrypoint=steps["express"]["entrypoint"],
-                title=steps["express"]["title"],
-                image_url=steps["express"]["image_url"],
-                custom_styles={"height": "50px"},
+                entrypoint=steps["data"]["entrypoint"],
+                title=steps["data"]["title"],
+                image_url=steps["data"]["image_url"],
+                custom_styles={"height": "100px"},
             )
 
-    # 3/ FAST TRACK
+    # 2/ FAST TRACK
     if steps["fasttrack"]["enable"]:
         create_card(
             entrypoint=steps["fasttrack"]["entrypoint"],
@@ -156,11 +159,12 @@ def st_show_home():
                             image_url=app["image_url"],
                             text=text,
                         )
-    st.divider()
 
     #########################
     # Legacy
     #########################
+    st.divider()
+
     if "legacy" in WIZARD_CONFIG:
         section_legacy = WIZARD_CONFIG["legacy"]
         apps = [app for app in section_legacy["apps"] if app["enable"]]
@@ -198,9 +202,6 @@ def st_show_home():
                 if st.query_params["page"] == app["alias"]:
                     st.switch_page(app["entrypoint"])
 
-
-# Load some config parameters
-set_staging_creation_time()
 
 # Show the home page
 st_show_home()

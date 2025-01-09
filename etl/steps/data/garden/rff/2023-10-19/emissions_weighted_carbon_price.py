@@ -1,6 +1,4 @@
-"""Combine dataset on coverage of emissions with the average prices of emissions covered by an ETS or a carbon tax.
-
-"""
+"""Combine dataset on coverage of emissions with the average prices of emissions covered by an ETS or a carbon tax."""
 
 from typing import Set
 

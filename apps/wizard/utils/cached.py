@@ -1,16 +1,27 @@
+import json
+import logging
+import subprocess
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 import streamlit as st
+import structlog
 from owid.catalog import find
 from sqlalchemy.orm import Session
 
+import etl.grapher.model as gm
 from apps.utils.map_datasets import get_grapher_changes
-from etl import grapher_io as gio
 from etl.config import OWID_ENV, OWIDEnv
+from etl.db import get_engine
 from etl.git_helpers import get_changed_files
-from etl.grapher_model import Anomaly, Variable
+from etl.grapher import io as gio
+from etl.grapher.model import Anomaly, Variable
 from etl.version_tracker import VersionTracker
+
+log = structlog.get_logger()
+
+# silence WARNING streamlit.runtime.caching.cache_data_api: No runtime found, using MemoryCacheStorageManager
+logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.ERROR)
 
 
 @st.cache_data
@@ -162,3 +173,53 @@ def load_latest_population():
     ).rename(columns={"country": "entity_name"}, errors="raise")
 
     return population
+
+
+@st.cache_data
+def get_tailscale_ip_to_user_map():
+    """Get the mapping of Tailscale IPs to github usernames."""
+    proc = subprocess.run(["tailscale", "status", "--json"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    if proc.returncode != 0:
+        log.warning(f"Error getting Tailscale status: {proc.stderr}")
+        return {}
+
+    status = json.loads(proc.stdout)
+    ip_to_user = {}
+
+    # Map user IDs to display names
+    user_id_to_name = {}
+    for user_id, user_info in status.get("User", {}).items():
+        if "LoginName" in user_info:
+            user_id_to_name[int(user_id)] = user_info["LoginName"]
+
+    # Map IPs to user display names
+    for peer in status.get("Peer", {}).values():
+        user_id = peer.get("UserID")
+        login_name = user_id_to_name.get(user_id)
+        if login_name:
+            for ip in peer.get("TailscaleIPs", []):
+                ip_to_user[ip] = login_name
+
+    return ip_to_user
+
+
+@st.cache_data
+def get_grapher_user_id(user_ip: str) -> Optional[int]:
+    """Get the Grapher user ID associated with the given Tailscale IP address."""
+    # Get Tailscale IP-to-User mapping
+    ip_to_user_map = get_tailscale_ip_to_user_map()
+
+    # Get the Tailscale display name / github username associated with the client's IP address
+    github_user_name = ip_to_user_map.get(user_ip)
+
+    if not github_user_name:
+        return None
+
+    with Session(get_engine()) as session:
+        grapher_user = gm.User.load_user(session, github_user_name)
+
+    if grapher_user:
+        return grapher_user.id
+    else:
+        return None

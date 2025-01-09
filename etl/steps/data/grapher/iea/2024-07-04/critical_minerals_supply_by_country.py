@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -13,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("critical_minerals")
-    tb_supply_by_country_flat = ds_garden.read_table("supply_by_country")
+    tb_supply_by_country_flat = ds_garden.read("supply_by_country")
 
     #
     # Process data.

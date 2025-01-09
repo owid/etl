@@ -84,7 +84,7 @@ def make_table_population_daily(ds_population: Dataset, year_min: int, year_max:
     Uses linear interpolation.
     """
     # Load population table
-    population = ds_population.read_table("population")
+    population = ds_population.read("population")
     # Filter only years of interest
     population = population[(population["year"] >= year_min) & (population["year"] <= year_max)]
     # Create date column
@@ -179,7 +179,7 @@ def make_monotonic(tb: Table, max_removed_rows=10) -> Table:
 
     tb = tb.sort_values("date")
     metrics = ("total_vaccinations", "people_vaccinated", "people_fully_vaccinated")
-    tb[list(metrics)] = tb[list(metrics)].astype(float)
+    tb[list(metrics)] = tb[list(metrics)].astype("float64[pyarrow]")
     for metric in metrics:
         while not tb[metric].ffill().fillna(0).is_monotonic_increasing:
             diff = tb[metric].ffill().shift(-1) - tb[metric].ffill()

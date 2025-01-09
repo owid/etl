@@ -1,4 +1,5 @@
 """Generate documentation files dynamically"""
+
 import mkdocs_gen_files
 
 from etl.docs import render_dataset, render_indicator, render_origin, render_table
@@ -15,7 +16,7 @@ tags:
 
 - __[Indicator](#variable)__ (variable)
 - __[Origin](#origin)__
-- __[Table](#tables)__
+- __[Table](#table)__
 - __[Dataset](#dataset)__
 </div>
 

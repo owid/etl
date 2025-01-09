@@ -1,6 +1,5 @@
-"""Detect anomalies in a given grapher dataset.
+"""Detect anomalies in a given grapher dataset."""
 
-"""
 from typing import Dict, List, Optional, Tuple
 
 import click
@@ -11,8 +10,8 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-import etl.grapher_io as io
-import etl.grapher_model as gm
+import etl.grapher.io as io
+import etl.grapher.model as gm
 from apps.anomalist import detectors
 from apps.anomalist.anomalist_api import add_auxiliary_scores
 from apps.anomalist.gp_detector import AnomalyGaussianProcessOutlier
@@ -87,7 +86,7 @@ def load_data_for_dataset_id(dataset_id: int) -> Tuple[pd.DataFrame, List[gm.Var
     #     log.info(f"Loading data from local ETL file: {etl_file}")
     #     ds_etl = catalog.Dataset(etl_file)
     #     if ds_etl.table_names == [ds.shortName]:
-    #         df = pd.DataFrame(ds_etl.read_table(ds.shortName))  # type: ignore
+    #         df = pd.DataFrame(ds_etl.read(ds.shortName))  # type: ignore
     #     # Change column names to variable ids.
     #     df = df.rename(columns={column: ds_variable_ids[column] for column in df.columns if column in ds_variable_ids}, errors="raise").rename(columns={"country": "entity_name"}, errors="raise")
 

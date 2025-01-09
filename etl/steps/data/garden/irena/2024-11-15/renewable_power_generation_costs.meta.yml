@@ -1,0 +1,64 @@
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Energy
+
+dataset:
+  update_period_days: 365
+
+tables:
+  renewable_power_generation_costs:
+    title: Renewable power generation costs
+    common:
+      description_key:
+      - Levelized cost of energy (LCOE) estimates the average cost per unit of energy generated across the lifetime of a new power plant. It is measured in US$ per kilowatt-hour.
+    variables:
+      bioenergy:
+        title: Bioenergy levelized cost of energy
+        display:
+          name: Bioenergy
+        presentation:
+          title_public: Bioenergy levelized cost of energy
+      concentrated_solar_power:
+        title: Concentrated solar power levelized cost of energy
+        display:
+          name: Concentrated solar power
+        presentation:
+          title_public: Concentrated solar power levelized cost of energy
+      geothermal:
+        title: Geothermal levelized cost of energy
+        display:
+          name: Geothermal
+        presentation:
+          title_public: Geothermal levelized cost of energy
+      hydropower:
+        title: Hydropower levelized cost of energy
+        display:
+          name: Hydropower
+        presentation:
+          title_public: Hydropower levelized cost of energy
+      offshore_wind:
+        title: Offshore wind levelized cost of energy
+        display:
+          name: Offshore wind
+        presentation:
+          title_public: Offshore wind levelized cost of energy
+      onshore_wind:
+        title: Onshore wind levelized cost of energy
+        display:
+          name: Onshore wind
+        presentation:
+          title_public: Onshore wind levelized cost of energy
+      solar_photovoltaic:
+        title: Solar photovoltaic levelized cost of energy
+        display:
+          name: Solar photovoltaic
+        presentation:
+          title_public: Solar photovoltaic levelized cost of energy
+  solar_photovoltaic_module_prices:
+    title: Solar photovoltaic module prices
+    variables:
+      cost:
+        title: Solar photovoltaic module prices

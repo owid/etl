@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("war_mars.xls")
 
     # Read excel
-    tb = snap.read(sheet_name="ProjectMarsV1.1")
+    tb = snap.read(safe_types=False, sheet_name="ProjectMarsV1.1")
 
     #
     # Process data.

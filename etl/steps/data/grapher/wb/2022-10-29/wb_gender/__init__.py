@@ -4,7 +4,7 @@ import pandas as pd
 from owid import catalog
 from structlog import get_logger
 
-import etl.grapher_helpers as gh
+import etl.grapher.helpers as gh
 from etl.paths import DATA_DIR
 
 log = get_logger()

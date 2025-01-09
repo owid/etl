@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+
 import numpy as np
 from owid.catalog import Table
 from shared import add_variable_description_from_producer
@@ -32,7 +33,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("drug_resistance_surveillance")
     snap = paths.load_snapshot("data_dictionary.csv")
     # Load data dictionary from snapshot.
-    dd = snap.read()
+    dd = snap.read(safe_types=False)
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
     # Load income groups dataset.

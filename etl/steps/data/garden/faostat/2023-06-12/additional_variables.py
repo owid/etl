@@ -1,6 +1,4 @@
-"""Dataset that combines different variables of other FAOSTAT datasets.
-
-"""
+"""Dataset that combines different variables of other FAOSTAT datasets."""
 
 import numpy as np
 import pandas as pd

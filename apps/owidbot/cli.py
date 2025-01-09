@@ -9,7 +9,7 @@ from rich import print
 from rich_click.rich_command import RichCommand
 
 from apps.owidbot import anomalist, chart_diff, data_diff, grapher
-from etl.config import get_container_name
+from etl.config import OWIDBOT_ACCESS_TOKEN, get_container_name
 
 from . import github_utils as gh_utils
 
@@ -57,7 +57,7 @@ def cli(
     if repo_name not in get_args(REPOS):
         raise AssertionError("Invalid repo")
 
-    repo = gh_utils.get_repo(repo_name)
+    repo = gh_utils.get_repo(repo_name, access_token=OWIDBOT_ACCESS_TOKEN)
     pr = gh_utils.get_pr(repo, branch)
     if pr is None:
         log.warning(f"No open PR found for branch {branch}")
@@ -139,8 +139,8 @@ def create_comment_body(branch: str, services: Dict[str, str], start_time: float
 
     body = f"""
 <b>Quick links (staging server)</b>:
-[Site](http://{container_name}/) | [Admin](http://{container_name}/admin/login) | [Wizard](http://{container_name}/etl/wizard/) | [Docs](http://{container_name}/etl/docs/)
-|--------------------------------|---|---|---|
+[Site Dev](http://{container_name}/) | [Site Preview](https://{branch}.owid.pages.dev/) | [Admin](http://{container_name}/admin) | [Wizard](http://{container_name}/etl/wizard/) | [Docs](http://{container_name}/etl/docs/)
+|--------------------------------|----------------------------------|---|---|---|
 
 **Login**: `ssh owid@{container_name}`
 

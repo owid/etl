@@ -38,7 +38,7 @@ def run(dest_dir: str) -> None:
     snap_by_nature = paths.load_snapshot("aviation_statistics_by_nature.csv")
 
     # Load data from snapshots.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb_by_period = snap_by_period.read()
     tb_by_nature = snap_by_nature.read()
 

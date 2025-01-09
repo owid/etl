@@ -1,7 +1,6 @@
 ---
 tags:
   - 👷 Staff
-status: new
 ---
 
 !!! warning "This is a work in progress"

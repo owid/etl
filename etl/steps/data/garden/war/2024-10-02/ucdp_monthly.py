@@ -83,13 +83,13 @@ def run(dest_dir: str) -> None:
 
     # Read table from GW codes
     ds_gw = paths.load_dataset("gleditsch")
-    tb_regions = ds_gw.read_table("gleditsch_regions")
+    tb_regions = ds_gw.read("gleditsch_regions")
     tb_codes = ds_gw["gleditsch_countries"]
 
     # Load maps table
     short_name = "nat_earth_110"
     ds_maps = paths.load_dataset(short_name)
-    tb_maps = ds_maps.read_table(short_name)
+    tb_maps = ds_maps.read(short_name)
 
     # Load population
     ds_population = paths.load_dataset("population")
@@ -102,7 +102,7 @@ def run(dest_dir: str) -> None:
 
     # Load relevant tables
     tb_ged = (
-        ds_meadow.read_table("ucdp_ged")
+        ds_meadow.read("ucdp_ged")
         .reset_index()
         .astype(
             {
@@ -117,7 +117,7 @@ def run(dest_dir: str) -> None:
         )
     )
     tb_ced = (
-        ds_ced.read_table("ucdp_ced")
+        ds_ced.read("ucdp_ced")
         .reset_index()
         .astype(
             {
@@ -132,7 +132,7 @@ def run(dest_dir: str) -> None:
         )
     )
     tb_conflict = (
-        ds_meadow.read_table("ucdp_battle_related_conflict")
+        ds_meadow.read("ucdp_battle_related_conflict")
         .reset_index()
         .astype(
             {
@@ -142,7 +142,7 @@ def run(dest_dir: str) -> None:
             }
         )
     )
-    tb_prio = ds_meadow.read_table("ucdp_prio_armed_conflict")
+    tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
 
     # Extend codes to have data for latest years
     tb_codes = extend_latest_years(tb_codes)
@@ -159,7 +159,7 @@ def run(dest_dir: str) -> None:
     tb_ged = tb_ged.loc[tb_ged["active_year"] == 1]
 
     # Change region named "Asia" to "Asia and Oceania" (in GED)
-    tb_ged["region"] = tb_ged["region"].cat.rename_categories({"Asia": "Asia and Oceania"})
+    tb_ged["region"] = tb_ged["region"].replace({"Asia": "Asia and Oceania"})
 
     # Create `conflict_type` column
     paths.log.info("add field `conflict_type`")
@@ -365,6 +365,7 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
     )
     # Fill unknown types of violence
     mask = tb_ged["type_of_violence"] == 1  # these are state-based conflicts
+    tb_ged["type_of_conflict"] = tb_ged["type_of_conflict"].astype(object)
     tb_ged.loc[mask, "type_of_conflict"] = tb_ged.loc[mask, "type_of_conflict"].fillna("state-based (unknown)")
 
     # Assert that `type_of_conflict` was only added for state-based events
@@ -379,8 +380,9 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
     # Create `conflict_type` column as a combination of `type_of_violence` and `type_of_conflict`.
     tb_ged["conflict_type"] = (
         tb_ged["type_of_conflict"]
+        .astype(object)
         .replace(TYPE_OF_CONFLICT_MAPPING)
-        .fillna(tb_ged["type_of_violence"].replace(TYPE_OF_VIOLENCE_MAPPING))
+        .fillna(tb_ged["type_of_violence"].astype(object).replace(TYPE_OF_VIOLENCE_MAPPING))
     )
 
     # Sanity check
@@ -949,7 +951,7 @@ def estimate_metrics_participants_prio(tb_prio: Table, tb_codes: Table) -> Table
     tb_country["participated_in_conflict"].m.origins = tb_prio["gwno_a"].m.origins
 
     # Format conflict tyep
-    tb_country["conflict_type"] = tb_country["type_of_conflict"].replace(TYPE_OF_CONFLICT_MAPPING)
+    tb_country["conflict_type"] = tb_country["type_of_conflict"].astype(object).replace(TYPE_OF_CONFLICT_MAPPING)
     tb_country = tb_country.drop(columns=["type_of_conflict"])
 
     # Prepare GW table

@@ -22,6 +22,7 @@ We use various session state indicators to control the flow of the app:
     - Set to True: When the user clicks on "Finish (3/3)" in the third form.
     - Set to False:
 """
+
 import streamlit as st
 from structlog import get_logger
 
