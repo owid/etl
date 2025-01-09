@@ -921,9 +921,9 @@ steps:
     - data://meadow/health/2024-12-31/height
   data://grapher/health/2024-12-31/height:
     - data://garden/health/2024-12-31/height
-  
+
   #
-  # TODO: add step name (just something recognizable)
+  # WHO Vaccine Introductions
   #
   data://meadow/who/2025-01-09/vaccination_schedules:
     - snapshot://who/2025-01-09/vaccination_schedules.xlsx
