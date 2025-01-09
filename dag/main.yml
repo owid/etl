@@ -758,6 +758,9 @@ steps:
   data://garden/atus/2025-01-06/atus_who:
     - data://meadow/atus/2024-12-10/atus_0323
 
+  data://grapher/atus/2025-01-06/atus_who:
+    - data://garden/atus/2025-01-06/atus_who
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

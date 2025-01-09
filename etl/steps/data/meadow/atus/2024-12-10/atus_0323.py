@@ -67,12 +67,12 @@ WHO_CODE_CATEGORIES = {
     54: "Friend",
     55: "Co-worker",
     56: "Other",
-    57: "Other",  # Maybe also children?
+    57: "Other",
     58: "Other",
     59: "Co-worker",
     60: "Co-worker",
     61: "Co-worker",
-    62: "Other",  # should be co-worker
+    62: "Other",  # could be co-worker
     "NA": "Unknown",
     -1: "Not applicable",
     -2: "Not applicable",
@@ -216,7 +216,6 @@ def run(dest_dir: str) -> None:
 def load_data_and_add_meta(snap, file_name):
     zf = ZipFile(snap.path)
     tb = pr.read_csv(zf.open(file_name), origin=snap.metadata.origin)
-    print(tb.metadata)
 
     # tb_meta = TableMeta(
     #    short_name=snap.metadata.short_name,
@@ -226,6 +225,8 @@ def load_data_and_add_meta(snap, file_name):
     for col in tb.columns:
         # tb[col].metadata = tb_meta
         tb[col].metadata.origins = [snap.metadata.origin]
-    # tb.metadata = tb_meta
+
+    tb.metadata.title = snap.metadata.origin.title
+    tb.metadata.description = snap.metadata.origin.description
 
     return tb

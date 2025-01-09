@@ -6,6 +6,7 @@ definitions:
         - Time Use
 
 
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -15,44 +16,28 @@ dataset:
 tables:
   atus_who:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
-
+      t:
+        title: Time spent with other people throughout life - <<who_category>>
+        unit: "Minutes"
+        short_unit: "min"
+        description_short: |-
+          <% if who_category in ["Children", "Partner", "Family"] %>
+          Time spent with <<who_category.lower()>>, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2009 and 2019.
+          <% elif who_category in ["Friend", "Co-worker"] %>
+          Time spent with <<who_category.lower()>>s, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2009 and 2019.
+          <% elif who_category == "Alone" %>
+          Time spent alone, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2009 and 2019.
+          <% elif who_category == "Other" %>
+          Time spent with other people, by age. These include all people which aren't partners, friends, family or coworkers. This data is measured in minutes per day and based on averages from surveys in the United States between 2009 and 2019.
+          <% elif who_category == "Not applicable" %>
+          Time spent doing activities, where the American Time Use Survey does not ask for other people present. This includes sleeping and activities usually done alone, such as grooming oneself. This data is measured in minutes per day and based on averages from surveys in the United States between 2009 and 2019.
+          <%- endif -%>
+        description_key:
+          - Age is topcoded for age categories 80-84, and 85+. This means all individuals aged 80, 81, 82, 83 and 84 are included in the "age 80" category, and all individuals aged 85 and older are included in the "age 85" category.
+        description_processing: |-
+          - Some categories have been combined for presentation purposes: "children" include own and not own household children under 18, grandchildren and other related children under 18. "Friends" include roommates or lodgers. "Partner" includes spouse, boyfriend/girlfriend, and co-habiting partners.
+          - The "Other" category includes all other relationships not covered by the other categories, such as neighbors, customers or non-related, non-household children.
+          - Data points have been weighted to make them more representative of the population with the survey weights provided by ATUS in the original data.
+        presentation:
+          grapher_config:
+            note: 'Relationships used to categorize people are not exhaustive. Additionally, time spent with multiple people can be counted more than once (e.g., attending a party with friends and partner counts toward both "friends" and "partner").'
