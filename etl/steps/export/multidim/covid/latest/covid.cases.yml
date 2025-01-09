@@ -11,7 +11,7 @@ definitions:
 
 title:
   title: COVID-19 confirmed cases
-  titleVariant: by interval
+  titleVariant: ""
 defaultSelection:
   - World
   - Europe
