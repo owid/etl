@@ -7,7 +7,11 @@ tables:
   population_explore:
     variables:
       population:
-        title: Population
+        title: Population (f & t)
+        description_short: Population of countries
+        unit: "people"
+      population_v2:
+        title: Population (f & t), v2
         description_short: Population of countries
         unit: "people"
       population_omm:
@@ -30,6 +34,7 @@ tables:
         title: Population (UN)
         description_short: Population of countries
         unit: "people"
+
       diff:
         title: Population difference
         description_short: Population difference

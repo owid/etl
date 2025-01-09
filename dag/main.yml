@@ -700,6 +700,7 @@ steps:
 
   data-private://meadow/owid/latest/population_explore:
     - snapshot-private://owid/latest/population_explore.xlsx
+    - snapshot-private://owid/latest/population_explore_2025.xlsx
   data-private://garden/owid/latest/population_explore:
     - data-private://meadow/owid/latest/population_explore
     - data://garden/demography/2024-07-15/population

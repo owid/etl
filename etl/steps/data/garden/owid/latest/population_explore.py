@@ -169,7 +169,7 @@ def run(dest_dir: str) -> None:
         on=["country", "year"],
         how="outer",
     )
-    tb["diff"] = tb["population"] - tb["population_omm"]
+    tb["diff"] = tb["population_v2"] - tb["population_omm"]
 
     # Add cut versions
     tb["population_hyde_cut"] = tb.loc[tb["year"] <= 1800, "population_hyde"]

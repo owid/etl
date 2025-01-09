@@ -19,16 +19,24 @@ log = get_logger()
 ########################################################################################################################
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--path-to-file", type=str, help="Path to population local file.")
+@click.option("-f1", type=str, help="Path to population local file.")
+@click.option("-f2", type=str, help="Path to population local file.")
 def main(
     upload: bool,
-    path_to_file: str | None = None,
+    f1: str | None = None,
+    f2: str | None = None,
 ) -> None:
-    # Create a new snapshot.
-    snap = Snapshot(f"owid/{SNAPSHOT_VERSION}/population_explore.xlsx")
+    if f1 is not None:
+        # Create a new snapshot.
+        snap = Snapshot(f"owid/{SNAPSHOT_VERSION}/population_explore.xlsx")
 
-    # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
-    snap.create_snapshot(filename=path_to_file, upload=upload)
+        # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
+        snap.create_snapshot(filename=f1, upload=upload)
+    if f2 is not None:
+        snap = Snapshot(f"owid/{SNAPSHOT_VERSION}/population_explore_2025.xlsx")
+
+        # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
+        snap.create_snapshot(filename=f2, upload=upload)
 
 
 if __name__ == "__main__":
