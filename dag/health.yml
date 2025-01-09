@@ -921,3 +921,13 @@ steps:
     - data://meadow/health/2024-12-31/height
   data://grapher/health/2024-12-31/height:
     - data://garden/health/2024-12-31/height
+
+  #
+  # WHO Vaccine Introductions
+  #
+  data://meadow/who/2025-01-09/vaccination_schedules:
+    - snapshot://who/2025-01-09/vaccination_schedules.xlsx
+  data://garden/who/2025-01-09/vaccination_schedules:
+    - data://meadow/who/2025-01-09/vaccination_schedules
+  data://grapher/who/2025-01-09/vaccination_schedules:
+    - data://garden/who/2025-01-09/vaccination_schedules
