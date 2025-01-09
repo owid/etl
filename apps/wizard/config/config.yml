@@ -119,7 +119,7 @@ sections:
     description: |-
       Control panel for ETL steps.
     apps:
-      - title: "Steps dashboard"
+      - title: "ETL dashboard"
         alias: dashboard
         entrypoint: app_pages/dashboard/app.py
         description: Control panel for ETL steps
