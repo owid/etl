@@ -10,7 +10,8 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 from structlog import get_logger
 
 from apps.step_update.cli import StepUpdater, UpdateState
-from etl.config import ADMIN_HOST, ENV
+from apps.wizard.app_pages.dashboard.utils import NON_UPDATEABLE_IDENTIFIERS
+from etl.config import OWID_ENV
 from etl.db import can_connect
 
 st.set_page_config(
@@ -30,81 +31,6 @@ st.set_page_config(
 # This is used as the default version of new steps to be created.
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
-# List of identifiers of steps that should be considered as non-updateable.
-# NOTE: The identifier is the step name without the version (and without the "data://").
-NON_UPDATEABLE_IDENTIFIERS = [
-    # All population-related datasets.
-    "garden/demography/population",
-    "garden/gapminder/population",
-    "garden/hyde/baseline",
-    "garden/un/un_wpp",
-    "meadow/gapminder/population",
-    "meadow/hyde/baseline",
-    "meadow/hyde/general_files",
-    "meadow/un/un_wpp",
-    "open_numbers/open_numbers/gapminder__systema_globalis",
-    "open-numbers/ddf--gapminder--systema_globalis",
-    "snapshot/hyde/general_files.zip",
-    "snapshot/hyde/baseline.zip",
-    "snapshot/gapminder/population.xlsx",
-    "snapshot/un/un_wpp.zip",
-    # Regions dataset.
-    "garden/regions/regions",
-    # Old WB income groups.
-    "garden/wb/wb_income",
-    "meadow/wb/wb_income",
-    "walden/wb/wb_income",
-    # New WB income groups.
-    "garden/wb/income_groups",
-    "meadow/wb/income_groups",
-    "snapshot/wb/income_groups.xlsx",
-    # World Bank country shapes.
-    "snapshot/countries/world_bank.zip",
-    # World Bank WDI.
-    "snapshot/worldbank_wdi/wdi.zip",
-    "meadow/worldbank_wdi/wdi",
-    "garden/worldbank_wdi/wdi",
-    # Other steps we don't want to update (because the underlying data does not get updated).
-    # TODO: We need a better way to achieve this, for example adding update_period_days to all steps and snapshots.
-    #  A simpler alternative would be to move these steps to a separate file in a meaningful place.
-    #  Another option is to have "playlists", e.g. "climate_change_explorer" with the identifiers of steps to update.
-    "meadow/epa/ocean_heat_content",
-    "snapshot/epa/ocean_heat_content_annual_world_700m.csv",
-    "snapshot/epa/ocean_heat_content_annual_world_2000m.csv",
-    "garden/epa/ocean_heat_content",
-    "meadow/epa/ocean_heat_content",
-    "meadow/epa/ice_sheet_mass_balance",
-    "snapshot/epa/ice_sheet_mass_balance.csv",
-    "garden/epa/ice_sheet_mass_balance",
-    "meadow/epa/ice_sheet_mass_balance",
-    "meadow/epa/ghg_concentration",
-    "snapshot/epa/co2_concentration.csv",
-    "snapshot/epa/ch4_concentration.csv",
-    "snapshot/epa/n2o_concentration.csv",
-    "garden/epa/ghg_concentration",
-    "meadow/epa/ghg_concentration",
-    "meadow/epa/mass_balance_us_glaciers",
-    "snapshot/epa/mass_balance_us_glaciers.csv",
-    "garden/epa/mass_balance_us_glaciers",
-    "meadow/epa/mass_balance_us_glaciers",
-    "meadow/climate/antarctic_ice_core_co2_concentration",
-    "snapshot/climate/antarctic_ice_core_co2_concentration.xls",
-    "garden/climate/antarctic_ice_core_co2_concentration",
-    "meadow/climate/antarctic_ice_core_co2_concentration",
-    "meadow/climate/global_sea_level",
-    "snapshot/climate/global_sea_level.csv",
-    "garden/climate/global_sea_level",
-    "meadow/climate/global_sea_level",
-]
-
-# Define the base URL for the grapher datasets (which will be different depending on the environment).
-GRAPHER_DATASET_BASE_URL = f"{ADMIN_HOST}/admin/datasets/"
-if not GRAPHER_DATASET_BASE_URL.startswith(("http://", "https://")):
-    # Links in the steps table seem to only work if they start with "http://" or "https://".
-    # But ADMIN_HOST for staging servers starts with "staging-site-" and is not a valid URL.
-    # Therefore, prepend "http://" (not "https://" because the site is not secure, and the browser will block the link).
-    GRAPHER_DATASET_BASE_URL = f"http://{GRAPHER_DATASET_BASE_URL}"
-
 # Initialise session state
 ## Selected steps
 st.session_state.selected_steps = st.session_state.get("selected_steps", [])
@@ -122,7 +48,7 @@ log = get_logger()
 ########################################
 # TITLE and DESCRIPTION
 ########################################
-st.title(":material/tv_gen: ETL Dashboard **:grey[Control panel for ETL steps]**")
+st.title(":material/tv_gen: ETL Dashboard")
 st.markdown(
     """\
 Explore all active ETL steps, and, if you are working on your local machine, perform some actions.
@@ -194,7 +120,7 @@ def load_steps_df(reload_key: int) -> pd.DataFrame:
     # (and then hide db_dataset_id column), however, then using "group by" fails.
     # So this is a workaround to allows to have both clickable cells with names, and "group by".
     steps_df["db_dataset_name_and_url"] = [
-        f"[{row['db_dataset_name']}]({GRAPHER_DATASET_BASE_URL}{int(row['db_dataset_id'])})"
+        f"[{row['db_dataset_name']}]({OWID_ENV.dataset_admin_site(int(row['db_dataset_id']))})"
         if row["db_dataset_name"]
         else None
         for row in steps_df.to_dict(orient="records")
@@ -719,7 +645,7 @@ if st.session_state.selected_steps:
 
         # Button to execute the update command and show its output.
         if btn_submit:
-            if ENV == "production":
+            if OWID_ENV.env_local == "production":
                 st.error("The update command is not available in production. Update steps locally or in staging.")
                 st.stop()
             else:
@@ -828,7 +754,7 @@ if st.session_state.selected_steps:
 
         # Button to execute the update command and show its output.
         if btn_etl_run:
-            if ENV == "production":
+            if OWID_ENV.env_local == "production":
                 st.error("Running the ETL is not available in production. Run them locally or in staging.")
                 st.stop()
             else:
@@ -876,7 +802,7 @@ if st.session_state.selected_steps:
 
         # Button to execute the update command and show its output.
         if btn_archive:
-            if ENV == "production":
+            if OWID_ENV.env_local == "production":
                 st.error("Archiving is not available in production. Run them locally or in staging.")
                 st.stop()
             else:
