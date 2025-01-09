@@ -18,7 +18,7 @@ SCHEDULE_MAPPING = {
     "Yes (O)": "During outbreaks",
     "Yes (S)": "Administered sequentially",
     "Yes (OPV)": "When IPV and OPV are co-administered",
-    "High risk": "High risk areas",
+    "High risk area": "High risk areas",
     "Yes (D)": "Demonstration projects",
     "ND": pd.NA,
     "NR": pd.NA,
