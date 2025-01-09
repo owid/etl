@@ -10,7 +10,8 @@ from st_aggrid.grid_options_builder import GridOptionsBuilder
 from structlog import get_logger
 
 from apps.step_update.cli import StepUpdater, UpdateState
-from apps.wizard.app_pages.dashboard.utils import NON_UPDATEABLE_IDENTIFIERS
+from apps.wizard.app_pages.dashboard.utils import NON_UPDATEABLE_IDENTIFIERS, _create_html_button
+from apps.wizard.utils.components import st_horizontal
 from etl.config import OWID_ENV
 from etl.db import can_connect
 
@@ -46,30 +47,12 @@ log = get_logger()
 
 
 ########################################
-# TITLE and DESCRIPTION
+# HEADER: title, description
 ########################################
 st.title(":material/tv_gen: ETL Dashboard")
-st.markdown(
-    """\
-Explore all active ETL steps, and, if you are working on your local machine, perform some actions.
-
-🔨 To perform actions on some steps, select them from the _Steps table_ and add them to the _Operations list_ below.
-"""
-)
-
-
-def _create_html_button(text, border_color, background_color):
-    html = f"""\
-        <div style="border: 1px solid {border_color}; padding: 4px; display: inline-block; border-radius: 10px; background-color: {background_color}; cursor: pointer;">
-            {text}
-        </div>
-"""
-    return html
-
 
 tutorial_html = f"""
-<details>
-<summary>💡 Common example: Say you want to update a specific grapher dataset. Then:</summary>
+💡 Common example: Say you want to update a specific grapher dataset. Then:
 <ol>
     <li>Select that step from the <i>Steps table</i>.</li>
     <li>Click on{_create_html_button("Add selected steps to the <i>Operations list</i>", "#FE4446", "#FE4446")}.</li>
@@ -79,15 +62,21 @@ tutorial_html = f"""
     <li>Click on{_create_html_button("Run all ETL steps", "#FE4446", "#FE4446")} to run the ETL on the new steps.</li>
     <li>If a step fails, you can manually edit its code and try running ETL again.</li>
 </ol>
-</details>
 """
-st.markdown(tutorial_html, unsafe_allow_html=True)
 
-st.markdown("### Steps table")
+with st_horizontal():
+    st.markdown("Select an ETL step from the table below and perform actions on it.")
+
+    with st.popover("More details"):
+        st.markdown(
+            "The _Steps table_ lists all the active ETL steps. If you are running Wizard on your local machine, you can select steps from it to perform actions (e.g. archive a dataset)."
+        )
+        st.markdown(tutorial_html, unsafe_allow_html=True)
 
 ########################################
 # LOAD STEPS TABLE
 ########################################
+st.markdown("### Steps table")
 
 if not can_connect():
     st.error("Unable to connect to grapher DB.")

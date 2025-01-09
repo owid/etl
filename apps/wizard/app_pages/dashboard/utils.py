@@ -64,3 +64,13 @@ NON_UPDATEABLE_IDENTIFIERS = [
     "garden/climate/global_sea_level",
     "meadow/climate/global_sea_level",
 ]
+
+
+def _create_html_button(text, border_color, background_color):
+    html = f"""\
+        <div
+            style="border: 1px solid {border_color}; padding: 4px; display: inline-block; border-radius: 10px; background-color: {background_color}; cursor: pointer;">
+            {text}
+        </div>
+"""
+    return html
