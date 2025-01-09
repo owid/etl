@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -17,9 +19,9 @@ SCHEDULE_MAPPING = {
     "Yes (S)": "Administered sequentially",
     "Yes (OPV)": "When IPV and OPV are co-administered",
     "High risk": "High risk areas",
-    "No (D)": "Demonstration projects",
-    "ND": "",
-    "NR": "",
+    "Yes (D)": "Demonstration projects",
+    "ND": pd.NA,
+    "NR": pd.NA,
 }
 
 
