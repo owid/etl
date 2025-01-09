@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     table = make_table(ds_population)
 
     # Set an appropriate index and sort conveniently
-    table = table.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    table = table.format(["country", "year"], sort_columns=True)
 
     # Add table to dataset
     ds.add(table)

@@ -40,11 +40,20 @@ def remove_from_dag(step: str, dag_path: Path = DAG_WIZARD_PATH) -> None:
 
 
 def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Path) -> None:
+    # data["test"] = ["this", "is", "a", "test"]
+    print("--- Data Dictionary ---")
+    print(data)
     with tempfile.TemporaryDirectory() as temp_dir:
         # create config file with data for cookiecutter
         config_path = cookiecutter_path / "cookiecutter.json"
         with open(config_path, "w") as f:
             json.dump(data, f, default=str)
+
+        # Verify the contents of the JSON file
+        with open(config_path, "r") as f:
+            config_data = json.load(f)
+            print("--- JSON Config Data ---")
+            print(config_data)
 
         try:
             cookiecutter(
@@ -52,6 +61,7 @@ def generate_step(cookiecutter_path: Path, data: Dict[str, Any], target_dir: Pat
                 no_input=True,
                 output_dir=temp_dir,
                 overwrite_if_exists=True,
+                extra_context={"test": ["this", "is", "a", "test"]},
             )
         finally:
             config_path.unlink()

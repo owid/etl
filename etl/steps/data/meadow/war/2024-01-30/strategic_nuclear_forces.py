@@ -22,8 +22,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb_dyadic = tb_dyadic.underscore().set_index(["ccode1", "ccode2", "year"], verify_integrity=True).sort_index()
-    tb_monadic = tb_monadic.underscore().set_index(["ccode", "year"], verify_integrity=True).sort_index()
+    tb_dyadic = tb_dyadic.format(["ccode1", "ccode2", "year"])
+    tb_monadic = tb_monadic.format(["ccode", "year"])
 
     # Update table short names.
     tb_dyadic.metadata.short_name = "strategic_nuclear_forces_dyadic"

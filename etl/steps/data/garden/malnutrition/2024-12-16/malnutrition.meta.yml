@@ -1,0 +1,34 @@
+dataset:
+  title: Number of stunted, wasted and underweight children
+  description: |
+    Data on the prevalence of malnourishment is taken from the World Bank's World Development Indicators. It is measured in three metrics: i) Prevalence of stunting, height for age (% of children under 5); ii) Prevalence of wasting, weight for height (% of children under 5); iii) Prevalence of underweight, weight for age (% of children under 5)
+tables:
+  malnutrition:
+    variables:
+      number_of_stunted_children:
+        title: Number of stunted children
+        description_short: Prevalence of stunting is the percentage of children under age 5 whose height for age is more than two standard deviations below the median for the international reference population ages 0-59 months. For children up to two years old height is measured by recumbent length. For older children height is measured by stature while standing. The data are based on the WHO's new child growth standards released in 2006.
+        unit: stunted children
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of stunted children
+      number_of_underweight_children:
+        title: Number of underweight children
+        description_short: Prevalence of underweight children is the percentage of children under age 5 whose weight for age is more than two standard deviations below the median for the international reference population ages 0-59 months. The data are based on the WHO's child growth standards released in 2006.
+        unit: underweight children
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of underweight children
+      number_of_wasted_children:
+        title: Number of wasted children
+        description_short: Prevalence of wasting is the proportion of children under age 5 whose weight for height is more than two standard deviations below the median for the international reference population ages 0-59.
+        unit: wasted children
+        short_unit: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of wasted children

@@ -45,5 +45,10 @@
   "yaml.format.printWidth": 999,
   "ruff.path": [
     ".venv/bin/ruff"
+  ],
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": ".copilot-commit-message-instructions.md"
+    }
   ]
 }

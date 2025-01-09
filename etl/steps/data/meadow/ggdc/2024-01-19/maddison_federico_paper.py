@@ -53,7 +53,7 @@ def run(dest_dir: str) -> None:
 
     # Merge tables
     tb = pr.concat(tables, ignore_index=True, sort=False)
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     # Convert thousands into units
     tb["population"] = (tb["population"] * 1000).astype(int)

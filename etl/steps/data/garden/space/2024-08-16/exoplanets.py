@@ -1,9 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import datetime
-from typing import cast
 
-from owid.catalog import Dataset
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -21,7 +19,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = cast(Dataset, paths.load_dependency("exoplanets"))
+    ds_meadow = paths.load_dataset("exoplanets")
 
     # Read table from meadow dataset.
     tb = ds_meadow["exoplanets"].reset_index()
@@ -61,7 +59,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={"discoverymethod": "country", "disc_year": "year"}).reset_index(drop=True)
     tb.metadata.short_name = "exoplanets"
 
-    tb = tb.set_index(["year", "country"], verify_integrity=True)
+    tb = tb.format(["year", "country"])
 
     #
     # Save outputs.

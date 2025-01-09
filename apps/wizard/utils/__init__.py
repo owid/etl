@@ -14,12 +14,11 @@ import argparse
 import ast
 import datetime as dt
 import json
-import os
 import re
 import sys
 from datetime import date
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, cast
+from typing import Any, Callable, Dict, List, Optional, Union, cast
 
 import bugsnag
 import numpy as np
@@ -29,7 +28,6 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 from typing_extensions import Self
 
-from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
 from apps.wizard.utils.step_form import StepForm
 from etl.config import OWID_ENV, enable_bugsnag
@@ -56,17 +54,15 @@ __all__ = [
 # Logger
 log = get_logger()
 
+# TTL for cached functions
+TTL_DEFAULT = "2h"
+
 # Path to variable configs
 DAG_WIZARD_PATH = DAG_DIR / "wizard.yml"
 
 # Load latest dataset versions
 DATASET_POPULATION_URI = f"data://garden/demography/{LATEST_POPULATION_VERSION}/population"
 DATASET_REGIONS_URI = f"data://garden/regions/{LATEST_REGIONS_VERSION}/regions"
-
-# DAG dropdown options
-dag_files = sorted([f for f in os.listdir(DAG_DIR) if f.endswith(".yml")])
-dag_not_add_option = "(do not add to DAG)"
-ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 
 # Date today
 DATE_TODAY = dt.date.today().strftime("%Y-%m-%d")
@@ -77,30 +73,6 @@ CURRENT_DIR = Path(__file__).parent.parent
 # Wizard path
 WIZARD_DIR = APPS_DIR / "wizard"
 
-# Paths to cookiecutter files
-COOKIE_SNAPSHOT = WIZARD_DIR / "etl_steps" / "cookiecutter" / "snapshot"
-COOKIE_MEADOW = WIZARD_DIR / "etl_steps" / "cookiecutter" / "meadow"
-COOKIE_GARDEN = WIZARD_DIR / "etl_steps" / "cookiecutter" / "garden"
-COOKIE_GRAPHER = WIZARD_DIR / "etl_steps" / "cookiecutter" / "grapher"
-COOKIE_STEPS = {
-    "snapshot": COOKIE_SNAPSHOT,
-    "meadow": COOKIE_MEADOW,
-    "garden": COOKIE_GARDEN,
-    "grapher": COOKIE_GRAPHER,
-}
-# Paths to markdown templates
-MD_SNAPSHOT = WIZARD_DIR / "etl_steps" / "markdown" / "snapshot.md"
-MD_MEADOW = WIZARD_DIR / "etl_steps" / "markdown" / "meadow.md"
-MD_GARDEN = WIZARD_DIR / "etl_steps" / "markdown" / "garden.md"
-MD_GRAPHER = WIZARD_DIR / "etl_steps" / "markdown" / "grapher.md"
-MD_EXPRESS = WIZARD_DIR / "etl_steps" / "markdown" / "express.md"
-MD_STEPS = {
-    "snapshot": MD_SNAPSHOT,
-    "meadow": MD_MEADOW,
-    "garden": MD_GARDEN,
-    "grapher": MD_GRAPHER,
-    "express": MD_EXPRESS,
-}
 # Dummy data
 DUMMY_DATA = {
     "namespace": "dummy",
@@ -166,13 +138,14 @@ class classproperty(property):
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express"]
+    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data"]
     dataset_edit: Dict[str, Dataset | None] = {
         "snapshot": None,
         "meadow": None,
         "garden": None,
         "grapher": None,
         "express": None,
+        "data": None,
     }
     _previous_step: str | None = None
 
@@ -199,6 +172,9 @@ class AppState:
 
         self.default_steps["express"]["snapshot_version"] = DATE_TODAY
         self.default_steps["express"]["version"] = DATE_TODAY
+
+        self.default_steps["data"]["snapshot_version"] = DATE_TODAY
+        self.default_steps["data"]["version"] = DATE_TODAY
 
         self.default_steps["meadow"]["version"] = DATE_TODAY
         self.default_steps["meadow"]["snapshot_version"] = DATE_TODAY
@@ -242,7 +218,7 @@ class AppState:
         print(f"Updating {self.step}...")
         st.session_state["steps"][self.step] = self.get_variables_of_step()
 
-    def update_from_form(self, form: "StepForm") -> None:
+    def update_from_form(self, form: Any) -> None:
         self._check_step()
         st.session_state["steps"][self.step] = form.model_dump()
 
@@ -315,10 +291,10 @@ class AppState:
         """
         if self._previous_step is None:
             self._check_step()
-            if self.step not in {"explorer", "express"}:
+            if self.step not in {"explorer", "express", "data"}:
                 idx = max(self.steps.index(self.step) - 1, 0)
                 self._previous_step = self.steps[idx]
-            elif self.step == "express":
+            elif self.step in {"express", "data"}:
                 self._previous_step = "snapshot"
         return self._previous_step
 
@@ -336,6 +312,7 @@ class AppState:
         default_last: Optional[str | bool | int | date] = "",
         dataset_field_name: Optional[str] = None,
         default_value: Optional[str | bool | int | date] = None,
+        index_if_value_is_none: Optional[int] = 0,
         **kwargs: Optional[str | int | List[str] | date | Callable],
     ) -> None:
         """Wrap a streamlit widget with a default value."""
@@ -356,7 +333,7 @@ class AppState:
             # Default value for selectbox (and other widgets with selectbox-like behavior)
             if "options" in kwargs:
                 options = cast(List[str], kwargs["options"])
-                index = options.index(default_value) if default_value in options else 0  # type: ignore
+                index = options.index(default_value) if default_value in options else index_if_value_is_none  # type: ignore
                 kwargs["index"] = index
             # Default value for other widgets (if none is given)
             elif (
@@ -427,31 +404,10 @@ def extract(error_message: str) -> List[Any]:
     return re.findall(rex, error_message)[0]
 
 
-def config_style_html() -> None:
-    st.markdown(
-        """
-    <style>
-    .streamlit-expanderHeader {
-        font-size: x-large;
-    }
-    </style>
-    """,
-        unsafe_allow_html=True,
-    )
-
-
-def preview_file(file_path: str | Path, language: str = "python") -> None:
-    """Preview file in streamlit."""
-    with open(file_path, "r") as f:
-        code = f.read()
-    with st.expander(f"File: `{file_path}`", expanded=False):
-        st.code(code, language=language)
-
-
-def preview_dag_additions(dag_content: str, dag_path: str | Path, expanded: bool = False) -> None:
+def preview_dag_additions(dag_content: str, dag_path: str | Path, prefix: str = "File", expanded: bool = False) -> None:
     """Preview DAG additions."""
     if dag_content:
-        with st.expander(f"File: `{dag_path}`", expanded=expanded):
+        with st.expander(f"{prefix}: `{dag_path}`", expanded=expanded):
             st.code(dag_content, "yaml")
 
 
@@ -491,7 +447,7 @@ def _show_environment():
     )
 
 
-def clean_empty_dict(d: Dict[str, Any]) -> Dict[str, Any] | List[Any]:
+def clean_empty_dict(d: Union[Dict[str, Any], List[Any]]) -> Union[Dict[str, Any], List[Any]]:
     """Remove empty values from dict.
 
     REference: https://stackoverflow.com/a/27974027/5056599
@@ -503,60 +459,9 @@ def clean_empty_dict(d: Dict[str, Any]) -> Dict[str, Any] | List[Any]:
     return d
 
 
-def warning_metadata_unstable() -> None:
-    """Show warning on latest metadata definitions being available in Notion."""
-    st.warning(
-        "Documentation for new metadata is almost complete, but still being finalised based on feedback. Feel free to open a [new issue](https://github.com/owid/etl/issues/new) for any question of suggestion!"
-    )
-
-
-def render_responsive_field_in_form(
-    key: str,
-    display_name: str,
-    field_1: Any,
-    field_2: Any,
-    options: List[str],
-    custom_label: str,
-    help_text: str,
-    app_state: Any,
-    default_value: str,
-) -> None:
-    """Render the namespace field within the form.
-
-    We want the namespace field to be a selectbox, but with the option to add a custom namespace.
-
-    This is a workaround to have repsonsive behaviour within a form.
-
-    Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
-    """
-    # Main decription
-    help_text = "## Institution or topic name"
-
-    # Render and get element depending on selection in selectbox
-    with field_1:
-        field = app_state.st_widget(
-            st.selectbox,
-            label=display_name,
-            options=[custom_label] + options,
-            help=help_text,
-            key=key,
-            default_last=default_value,  # dummy_values[prop_uri],
-        )
-    with field_2:
-        if field == custom_label:
-            default_value = app_state.default_value(key)
-            field = app_state.st_widget(
-                st.text_input,
-                label="↳ *Use custom value*",
-                placeholder="",
-                help="Enter custom value.",
-                key=f"{key}_custom",
-                default_last=default_value,
-            )
-
-
 def get_datasets_in_etl(
     dag: Dict[str, Any] | None = None,
+    dag_path: Path | None = None,
     snapshots: bool = False,
     prefixes: List[str] | None = None,
     prefix_priorities: List[str] | None = None,
@@ -564,10 +469,16 @@ def get_datasets_in_etl(
     """Show a selectbox with all datasets available."""
     # Load dag
     if dag is None:
-        dag = load_dag()
+        if dag_path is not None:
+            dag = load_dag(dag_path)
+        else:
+            dag = load_dag()
 
     # Define list with options
-    options = sorted(list(dag.keys()))
+    if snapshots:
+        options = sorted(list(set(dag.keys()) | set([dd for d in dag.values() for dd in d])))
+    else:
+        options = sorted(list(dag.keys()))
     ## Optional: Show some options first based on their prefix. E.g. Show those that are Meadow (i.e. start with 'data://meadow') first.
     if prefix_priorities:
         options, options_left = [], options
@@ -599,22 +510,6 @@ def set_states(states_values: Dict[str, Any], logging: bool = False, also_if_not
             st.session_state[key] = st.session_state.get(key, value)
         else:
             st.session_state[key] = value
-
-
-def st_page_link(alias: str, border: bool = False, **kwargs) -> None:
-    """Link to page."""
-    if "page" not in kwargs:
-        kwargs["page"] = PAGES_BY_ALIAS[alias]["entrypoint"]
-    if "label" not in kwargs:
-        kwargs["label"] = PAGES_BY_ALIAS[alias]["title"]
-    if "icon" not in kwargs:
-        kwargs["icon"] = PAGES_BY_ALIAS[alias]["icon"]
-
-    if border:
-        with st.container(border=True):
-            st.page_link(**kwargs)
-    else:
-        st.page_link(**kwargs)
 
 
 def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | None = None, output: str = "") -> str:
@@ -673,16 +568,6 @@ def get_staging_creation_time(session: Session):
     return st.session_state[key]
 
 
-def st_toast_error(message: str) -> None:
-    """Show error message."""
-    st.toast(f"❌ :red[{message}]")
-
-
-def st_toast_success(message: str) -> None:
-    """Show success message."""
-    st.toast(f"✅ :green[{message}]")
-
-
 def default_converter(o):
     if isinstance(o, np.integer):  # ignore
         return int(o)
@@ -714,59 +599,3 @@ def as_list(s):
         except (ValueError, SyntaxError):
             return s
     return s
-
-
-def update_query_params(key):
-    def _update_query_params():
-        value = st.session_state[key]
-        if value:
-            st.query_params.update({key: value})
-        else:
-            st.query_params.pop(key, None)
-
-    return _update_query_params
-
-
-def url_persist(component: Any) -> Any:
-    """Wrapper around streamlit components that persist values in the URL query string.
-
-    Usage:
-        url_persist(st.multiselect)(
-          key="abc",
-          ...
-        )
-    """
-    # Component uses list of values
-    if component == st.multiselect:
-        repeated = True
-    else:
-        repeated = False
-
-    def _persist(*args, **kwargs):
-        assert "key" in kwargs, "key should be passed to persist"
-        # TODO: we could wrap on_change too to make it work
-        assert "on_change" not in kwargs, "on_change should not be passed to persist"
-
-        key = kwargs["key"]
-
-        if not st.session_state.get(key):
-            if repeated:
-                params = st.query_params.get_all(key)
-                # convert to int if digit
-                params = [int(q) if q.isdigit() else q for q in params]
-            else:
-                params = st.query_params.get(key)
-                if params and params.isdigit():
-                    params = int(params)
-
-            # Use `value` from the component as a default value if available
-            if not params and "value" in kwargs:
-                params = kwargs.pop("value")
-
-            st.session_state[key] = params
-
-        kwargs["on_change"] = update_query_params(key)
-
-        return component(*args, **kwargs)
-
-    return _persist

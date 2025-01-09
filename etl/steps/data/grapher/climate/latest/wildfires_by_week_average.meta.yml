@@ -24,7 +24,7 @@ definitions:
   desc_wildfires: &desc_wildfires
     - Wildfires are detected through the use of satellite imagery obtained from MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite). These satellite systems are capable of identifying thermal anomalies and alterations in landscape patterns, which are indicative of burning.
     - The data provider is presently engaged in a global accuracy assessment and acknowledged that they might be underestimating the genuine impact of wildfires, primarily due to constraints imposed by the spatial resolution of the sensors they employ.
-  desc_update: The 2024 data is incomplete and was last updated {date_accessed}.
+  desc_update: The {year} data is incomplete and was last updated {date_accessed}.
   description_short_wildires_cumulative: &description_short_wildires_cumulative  |-
     The cumulative area burnt by [wildfires](#dod:wildfires) in hectares. {definitions.desc_update}
   description_short_share_wildfires_cumulative: &description_short_share_wildfires_cumulative |-
@@ -73,34 +73,6 @@ tables:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
-
-        _2024_area_ha_cumulative:
-          title: Monthly cumulative area burnt by wildfires in 2024
-          unit: *unit_wildfires
-          short_unit: *short_unit_wildfires
-          description_short: *description_short_wildires_cumulative
-          description_key: *desc_wildfires
-
-        _2024_co2_cumulative:
-          title: Monthly cumulative carbon dioxide emissions from wildfires in 2024
-          unit: *unit_emissions
-          short_unit: *short_unit_emissions
-          description_short: *description_short_co2_cumulative
-          description_key: *description_key_co2
-
-        _2024_pm2_5_cumulative:
-          title: Monthly cumulative PM2.5 emissions from wildfires in 2024
-          unit: *unit_emissions
-          short_unit: *short_unit_emissions
-          description_short: *description_short_pm2_5_cumulative
-          description_key: *description_ke_pm2_5
-
-        _2024_share_cumulative_area:
-          title: Monthly cumulative share of the total land area burnt by wildfires in 2024
-          unit: *unit_share
-          short_unit: *short_unit_share
-          description_short: *description_short_share_wildfires_cumulative
-          description_processing: *description_processing_share
 
         avg_area_ha_cumulative_until_2024:
           title: Average cumulative area burnt by wildfires between 2012 and 2023

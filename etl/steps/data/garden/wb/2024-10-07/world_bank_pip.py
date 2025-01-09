@@ -1314,7 +1314,7 @@ def combine_tables_2011_2017(tb_2011: Table, tb_2017: Table, short_name: str) ->
     tb_2011_2017 = pr.merge(tb_2011, tb_2017, on=id_cols, validate="one_to_one", short_name=short_name)
 
     # Add index and sort
-    tb_2011_2017 = tb_2011_2017.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_2011_2017 = tb_2011_2017.format(["country", "year"])
 
     return tb_2011_2017
 

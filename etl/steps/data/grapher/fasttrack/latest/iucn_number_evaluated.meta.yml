@@ -1,0 +1,56 @@
+dataset:
+  title: Number of evaluated and threatened species
+  description: |-
+    Summary statistics (Table 1a): Number of species evaluated in relation to the overall number of described species, and numbers of threatened species by major groups of organisms.
+  licenses:
+    - name: © International Union for Conservation of Nature and Natural Resources
+      url: https://www.iucnredlist.org/terms/terms-of-use
+tables:
+  iucn_number_evaluated:
+    variables:
+      described_species:
+        title: Number of described species
+        unit: species
+        display:
+          numDecimalPlaces: 0
+        description: Estimated number of species that are scientifically described.
+      evaluated_species:
+        title: Number of species whose extinction risk has been evaluated
+        unit: species
+        display:
+          numDecimalPlaces: 0
+        description: Number of species whose extinction risk has been evaluated.
+      threatened_species:
+        title: Number of threatened species
+        unit: species
+        display:
+          numDecimalPlaces: 0
+        description: Number of species that have been evaluated as being threatened with extinction.
+      share_evaluated:
+        title: Share of described species that have been evaluated
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Share of described species that have had their extinction risk evaluated.
+      lower_share_threatened:
+        title: Lower estimate of share of species that are threatened
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Lower estimate for the share of species that are threatened with extinction.
+      best_share_threatened:
+        title: Best estimate of share of species that are threatened
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Best estimate for the share of species that are threatened with extinction.
+      upper_share_threatened:
+        title: Upper estimate of share of species that are threatened
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: Upper estimate for the share of species that are threatened with extinction.

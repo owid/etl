@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     tb = calculate_population_without_service(tb)
 
     tb = tb.drop(columns=["pop"])
-    tb = tb.set_index(["country", "year", "residence"], verify_integrity=True)
+    tb = tb.format(["country", "year", "residence"])
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.

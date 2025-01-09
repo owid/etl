@@ -18,7 +18,7 @@ from statsmodels.stats.multitest import multipletests
 from tqdm.auto import tqdm
 
 from apps.anomalist.detectors import AnomalyDetector
-from etl import grapher_model as gm
+from etl.grapher import model as gm
 from etl.paths import CACHE_DIR
 
 log = structlog.get_logger()

@@ -1,8 +1,5 @@
 dataset:
-  namespace: fasttrack
-  version: '2023-01-03'
-  short_name: long_term_homicide_rates_in_europe
-  title: DRAFT Long-term homicide rates in Europe - Eisner (2014)
+  title: Long-term homicide rates in Europe - Eisner (2014)
   description: |-
     The homicide rate data shown here is taken from Table 4 on pages 80-81 in Eisner (2015). In the table homicide rate estimates are given for a range of years, we present data for the mid-point year here. For example, if data is given for 1200-1299 we show this as 1250.
 
@@ -10,14 +7,8 @@ dataset:
 
     * For 1775 and 1862 the data for Switzerland are for the canton of Zurich only.
     * From 1825 onwards the estimates for Corsica and Sardinia are for Sardinia only.
-  sources:
-  - name: Eisner (2014)
-    published_by: 'Eisner, M. 2014. “From Swords to Words: Does Macro-Level Change
-      in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime
-      Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and
-      Justice: A Review of Research, edited by Michael Tonry. Chicago: University
-      of Chicago Press.'
-    url: https://www.hoplofobia.info/wp-content/uploads/2015/08/From-Swords-to-Words_Eisner2014.pdf
+  licenses:
+    - {}
 tables:
   long_term_homicide_rates_in_europe:
     variables:

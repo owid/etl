@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(
         columns={"waterbodycategory": "water_body_category", "eeaindicator": "indicator", "resultuom": "unit"}
     )
-    tb = tb.set_index(["country", "year", "water_body_category", "indicator", "unit"], verify_integrity=True)
+    tb = tb.format(["country", "year", "water_body_category", "indicator", "unit"])
 
     #
     # Save outputs.
