@@ -1,7 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import matpltlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
@@ -38,7 +40,6 @@ def run(dest_dir: str) -> None:
     tb_agg.loc[tb_agg["year"] == 2020, "final_weight"] = tb_agg.loc[tb_agg["year"] == 2020, "final_weight_2020"]
 
     # summarize data (first by case_id and category)
-    tb_agg = tb_agg[(tb_agg["year"] >= 2009) & (tb_agg["year"] <= 2019)]
     tb_agg = (
         tb_agg.groupby(["who_category", "age", "case_id"])
         .agg({"activity_duration_24": "sum", "final_weight": "first", "year": "first"})
@@ -48,33 +49,14 @@ def run(dest_dir: str) -> None:
     ## Fill missing "who-categories" with 0 duration for each case id
     tb_agg = fill_missing_values(tb_agg)
 
-    # remove co-worker category before 2010, since it gets recorded differently
-    tb_agg = tb_agg[~((tb_agg["year"] < 2010) & (tb_agg["who_category"] == "Co-worker"))]
-
-    # Now aggregate by category and age
-    # This gives final result: average duration spent with each who_category for each age
-    tb_agg = (
-        tb_agg.groupby(["who_category", "age"])
-        .apply(
-            lambda x: pd.Series(
-                {"t": np.sum(x["activity_duration_24"] * x["final_weight"]) / np.sum(x["final_weight"])}
-            )
-        )
-        .reset_index()
-    )
-    # add metadata:
-    tb_agg["t"] = tb_agg["t"].copy_metadata(tb_agg["age"])
-
-    # Add country information
-    tb_agg["country"] = "United States of America"
-
-    # Add information about time period recorded
-    tb_agg["year_start"] = 2009
-    tb_agg["year_end"] = 2019
+    # Aggregate data over age and time period
+    tb_agg_recreate = aggregate_over_age(tb_agg, start_year=2009, end_year=2019)
+    tb_agg_full = aggregate_over_age(tb_agg, start_year=2003, end_year=2023)
+    tb_agg_extended = aggregate_over_age(tb_agg, start_year=2009, end_year=2023)
 
     #
     # Process data.
-    tb = tb_agg.format(["country", "age", "who_category"], short_name="atus_who")
+    tb = tb_agg_recreate.format(["country", "age", "who_category"], short_name="atus_who")
 
     #
     # Save outputs.
@@ -117,3 +99,45 @@ def fill_missing_values(tb_agg):
     ).reset_index()
 
     return tb_agg
+
+
+def aggregate_over_age(tb_agg, start_year=2009, end_year=2019):
+    """Aggregate data over age and time period. Start and end year are inclusive, default is 2009-2019"""
+    # remove co-worker category before 2010, since it gets recorded differently
+    tb_agg = tb_agg[~((tb_agg["year"] < 2010) & (tb_agg["who_category"] == "Co-worker"))]
+
+    # filter data to timeframe
+    tb_agg = tb_agg[(tb_agg["year"] >= start_year) & (tb_agg["year"] <= end_year)]
+
+    # Now aggregate by category and age
+    # This gives final result: average duration spent with each who_category for each age
+    tb_agg = (
+        tb_agg.groupby(["who_category", "age"])
+        .apply(
+            lambda x: pd.Series(
+                {"t": np.sum(x["activity_duration_24"] * x["final_weight"]) / np.sum(x["final_weight"])}
+            )
+        )
+        .reset_index()
+    )
+    # add metadata:
+    tb_agg["t"] = tb_agg["t"].copy_metadata(tb_agg["age"])
+
+    # Add country information
+    tb_agg["country"] = "United States of America"
+
+    # Add information about time period recorded
+    tb_agg["timeframe"] = f"{start_year}-{end_year}"
+
+    return tb_agg
+
+
+def visualize(tb):
+    plt.figure(figsize=(10, 6))
+    sns.lineplot(data=tb, x="age", y="t", hue="who_category")
+    plt.title("Who we spend time with")
+    plt.xlabel("Age")
+    plt.ylabel("Time (minutes)")
+    plt.legend(title="Category", bbox_to_anchor=(1.05, 1), loc="upper left")
+    plt.tight_layout()
+    plt.show()
