@@ -2,7 +2,7 @@ definitions:
   table: grapher/covid/latest/cases_deaths/cases_deaths
   config: &config
     tab: map
-    originUrl: ourworldindata.org/coronavirusA
+    originUrl: ourworldindata.org/coronavirusB
     hideAnnotationFieldsInTitle:
       entity: true
       time: true
