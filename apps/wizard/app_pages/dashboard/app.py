@@ -57,11 +57,11 @@ tutorial_html = f"""
 💡 Common example: Say you want to update a specific grapher dataset. Then:
 <ol>
     <li>Select that step from the <i>Steps table</i>.</li>
-    <li>Click on{_create_html_button("Add selected steps to the <i>Operations list</i>", "#FE4446", "#FE4446")}.</li>
-    <li>Click on{_create_html_button("Add all dependencies", "#d3d3d3", "transparent")} (and optionally click on {_create_html_button("Remove non-updateable", "#d3d3d3", "transparent")}).</li>
-    <li>Click on{_create_html_button("Update X steps", "#FE4446", "#FE4446")} to bulk-update them all in one go.</li>
-    <li>Click on{_create_html_button("Replace steps with their latest version", "#d3d3d3", "transparent")} to populate the <i>Operations list</i> with the newly created steps.</li>
-    <li>Click on{_create_html_button("Run all ETL steps", "#FE4446", "#FE4446")} to run the ETL on the new steps.</li>
+    <li>Click on{_create_html_button("Add selected steps to the <i>Operations list</i>", "#002147", "#002147", "#FFFFFF")}.</li>
+    <li>Click on{_create_html_button("Add all dependencies", "#333333", "transparent", "#333333")} (and optionally click on {_create_html_button("Remove non-updateable", "#333333", "transparent", "#333333")}).</li>
+    <li>Click on{_create_html_button("Update X steps", "#002147", "#002147", "white")} to bulk-update them all in one go.</li>
+    <li>Click on{_create_html_button("Replace steps with their latest version", "#333333", "transparent", "#333333")} to populate the <i>Operations list</i> with the newly created steps.</li>
+    <li>Click on{_create_html_button("Run all ETL steps", "#002147", "#002147", "white")} to run the ETL on the new steps.</li>
     <li>If a step fails, you can manually edit its code and try running ETL again.</li>
 </ol>
 """
