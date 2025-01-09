@@ -1,3 +1,10 @@
+import pandas as pd
+import streamlit as st
+
+from apps.step_update.cli import StepUpdater
+from etl.config import OWID_ENV
+from etl.db import can_connect
+
 # List of identifiers of steps that should be considered as non-updateable.
 # NOTE: The identifier is the step name without the version (and without the "data://").
 NON_UPDATEABLE_IDENTIFIERS = [
@@ -74,3 +81,112 @@ def _create_html_button(text, border_color, background_color):
         </div>
 """
     return html
+
+
+def check_db():
+    if not can_connect():
+        st.error("Unable to connect to grapher DB.")
+
+
+@st.cache_data(show_spinner=False)
+def load_steps_df(reload_key: int) -> pd.DataFrame:
+    """Generate and load the steps dataframe.
+
+    This is just done once, at the beginning.
+    """
+    # Ensure that the function is re-run when the reload_key changes.
+    _ = reload_key
+
+    # Load steps dataframe.
+    steps_df = StepUpdater().steps_df
+
+    # Fix some columns.
+    steps_df["full_path_to_script"] = steps_df["full_path_to_script"].fillna("").astype(str)
+    steps_df["dag_file_path"] = steps_df["dag_file_path"].fillna("").astype(str)
+
+    # For convenience, convert days to an arbitrarily big number.
+    # Otherwise when sorting, nans are placed before negative numbers, and hence it's not easy to first see steps that
+    # need to be updated more urgently.
+    steps_df["days_to_update"] = steps_df["days_to_update"].fillna("9999")
+
+    # For convenience, combine dataset name and url in a single column.
+    # This will be useful when creating cells with the name of the dataset as a clickable link.
+    # In principle, one can access different columns of the dataframe with UrlCellRenderer
+    # (and then hide db_dataset_id column), however, then using "group by" fails.
+    # So this is a workaround to allows to have both clickable cells with names, and "group by".
+    steps_df["db_dataset_name_and_url"] = [
+        f"[{row['db_dataset_name']}]({OWID_ENV.dataset_admin_site(int(row['db_dataset_id']))})"
+        if row["db_dataset_name"]
+        else None
+        for row in steps_df.to_dict(orient="records")
+    ]
+
+    steps_df = steps_df.drop(columns=["db_dataset_name", "db_dataset_id"], errors="raise")
+
+    return steps_df
+
+
+@st.cache_data
+def load_steps_df_to_display(show_all_channels: bool, reload_key: int) -> pd.DataFrame:
+    """Load the steps dataframe, and filter it according to the user's choice."""
+    # Load all data
+    df = load_steps_df(reload_key=reload_key)
+
+    # If toggle is not shown, pre-filter the DataFrame to show only rows where "channel" equals "grapher"
+    if not show_all_channels:
+        df = df[df["channel"].isin(["grapher", "explorers"])]
+
+    # Sort displayed data conveniently.
+    df = df.sort_values(
+        by=["days_to_update", "n_chart_views_365d", "n_charts", "kind", "version"],
+        na_position="last",
+        ascending=[True, False, False, False, True],
+    )
+
+    # Prepare dataframe to be displayed in the dashboard.
+    df = df[
+        [
+            "step",
+            "db_dataset_name_and_url",
+            "days_to_update",
+            "update_state",
+            "n_charts",
+            # "n_chart_views_7d",
+            "n_chart_views_365d",
+            "update_period_days",
+            "date_of_next_update",
+            "namespace",
+            "version",
+            "channel",
+            "name",
+            "kind",
+            "dag_file_name",
+            "n_versions",
+            # "state",
+            "full_path_to_script",
+            "dag_file_path",
+            # "versions",
+            # "role",
+            # "all_usages",
+            # "direct_usages",
+            # "all_chart_ids",
+            # "all_chart_slugs",
+            # "all_chart_views_7d",
+            # "all_chart_views_365d",
+            # "all_active_dependencies",
+            # "all_active_usages",
+            # "direct_dependencies",
+            # "chart_ids",
+            # "same_steps_forward",
+            # "all_dependencies",
+            # "same_steps_all",
+            # "same_steps_latest",
+            # "latest_version",
+            # "identifier",
+            # "same_steps_backward",
+            # "n_newer_versions",
+            # "db_archived",
+            # "db_private",
+        ]
+    ]
+    return df
