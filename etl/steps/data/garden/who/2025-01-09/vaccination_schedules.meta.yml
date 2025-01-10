@@ -106,4 +106,4 @@ tables:
         description_short: The introduction status of {definitions.vaccine_name} vaccination schedule.
         unit: ""
         description_key:
-          - "{definitions.antigen_description_key}"
+          - "{definitions.vaccine_description_key}"
