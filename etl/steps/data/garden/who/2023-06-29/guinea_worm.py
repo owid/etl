@@ -130,9 +130,9 @@ def update_time_series_with_latest_information(df: Table) -> Table:
     assert any(df["year"].isin(years_to_add))
     df.loc[(df["country"] == "Angola") & (df["year"] >= 2020), "certification_status"] = "Endemic"
     df.loc[(df["country"] == "Kenya") & (df["year"] >= 2018), "certification_status"] = "Certified disease free"
-    df.loc[
-        (df["country"] == "Democratic Republic of Congo") & (df["year"] >= 2022), "certification_status"
-    ] = "Certified disease free"
+    df.loc[(df["country"] == "Democratic Republic of Congo") & (df["year"] >= 2022), "certification_status"] = (
+        "Certified disease free"
+    )
 
     return df
 

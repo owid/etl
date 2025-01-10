@@ -8,22 +8,22 @@ definitions:
   sex: |-
     <% if sex == "Both" %>
     individuals
-    <% elif sex == "Male" %>
+    <%- elif sex == "Male" %>
     males
-    <% elif sex == "Female" %>
+    <%- elif sex == "Female" %>
     females
-    <%- endif -%>
+    <%- endif %>
   value:
     unit: |-
       <% if metric == "Number" %>
       cases
-      <% elif metric == "Rate" %>
+      <%- elif metric == "Rate" %>
       cases per 100,000 people
-      <% elif metric == "Share" %>
+      <%- elif metric == "Share" %>
       %
-      <%- endif -%>
+      <%- endif %>
     short_unit: |-
-      <% if metric == "Share" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+      <% if metric == "Share" %>%<% elif metric == "Rate" or metric == "Number" %><% endif %>
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       Current cases of << cause.lower() >>, among {definitions.sex} aged << age >>
@@ -43,7 +43,7 @@ definitions:
       Age-standardized current cases of {definitions.sex} with << cause.lower() >>, per 100 people
       <% elif metric == "Share" and age == 'All ages'%>
       Total current number of {definitions.sex} with << cause.lower() >>, per 100 people
-      <%- endif -%>
+      <% endif %>
     description_short: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       The estimated prevalence of << cause.lower() >> in {definitions.sex} aged << age >>.
@@ -63,9 +63,9 @@ definitions:
       The estimated age-standardized prevalence of {definitions.sex} with << cause.lower() >>, per 100 people.
       <% elif metric == "Share" and age == 'All ages'%>
       The estimated prevalence of << cause.lower() >> in {definitions.sex}, per 100 people.
-      <%- endif -%>
+      <% endif %>
   footnote: |-
-    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% endif %>
 dataset:
   update_period_days: 1460
   non_redistributable: true
@@ -87,4 +87,4 @@ tables:
               {definitions.footnote}
         display:
           numDecimalPlaces: |-
-            <% if metric == 'Number' %>0<% else %>1<%- endif -%>
+            <% if metric == 'Number' %>0<% else %>1<% endif %>

@@ -3,7 +3,6 @@
 These functions are used when there are updates on variables. They are used in the chart revision process.
 """
 
-
 from copy import deepcopy
 from typing import Any, Dict, List, Set
 
@@ -11,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from etl.db import get_engine
 from etl.indicator_upgrade.schema import (
     fix_errors_in_schema,

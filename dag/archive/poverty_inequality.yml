@@ -54,3 +54,12 @@ steps:
     - data://meadow/wid/2024-05-24/world_inequality_database
   data://grapher/wid/2024-05-24/world_inequality_database:
     - data://garden/wid/2024-05-24/world_inequality_database
+
+  # Poverty projections from the World Bank
+  data://meadow/wb/2024-06-26/poverty_projections:
+    - snapshot://wb/2024-06-26/poverty_projections_number_global.csv
+    - snapshot://wb/2024-06-26/poverty_projections_share_regions.csv
+  data://garden/wb/2024-06-26/poverty_projections:
+    - data://meadow/wb/2024-06-26/poverty_projections
+  data://grapher/wb/2024-06-26/poverty_projections:
+    - data://garden/wb/2024-06-26/poverty_projections

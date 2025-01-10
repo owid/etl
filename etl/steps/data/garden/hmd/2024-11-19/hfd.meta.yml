@@ -26,6 +26,8 @@ definitions:
     title: |-
       <% if birth_order == 'total' %>
       << title >> - Total
+      <%- elif birth_order == '5p' %>
+      << title >> - Birth order: ≥5
       <%- else %>
       << title >> - Birth order: << birth_order >>
       <%- endif %>
@@ -33,6 +35,8 @@ definitions:
       <% set age_str = '≤12' if age == '12-' else age %>
       <% if birth_order == 'total' %>
       << title >> - Mother age: << age_str >> - All births
+      <% elif birth_order == '5p' %>
+      << title >> - Mother age: << age_str >> - Birth order: ≥5
       <%- else %>
       << title >> - Mother age: << age_str >> - Birth order: << birth_order >>
       <%- endif %>
@@ -54,7 +58,7 @@ tables:
     variables:
       tfr:
         title: |-
-          <% set title = "Period total fertility rates" %>
+          <% set title = "Period total fertility rate" %>
           {definitions.others.title}
         description_short: |-
           The average number of{definitions.others.bo_1} children a woman would have in her lifetime if she experienced the fertility rates of a specific year.
@@ -65,7 +69,7 @@ tables:
 
       tfr40:
         title: |-
-          <% set title = "Period total fertility rates by age 40" %>
+          <% set title = "Period total fertility rate by age 40" %>
           {definitions.others.title}
         description_short: |-
           The average number of{definitions.others.bo_1} children a woman would have by age 40 if she experienced the fertility rates of a specific year.
@@ -75,7 +79,7 @@ tables:
 
       adjtfr:
         title: |-
-          <% set title = "Tempo-adjusted total fertility rates" %>
+          <% set title = "Tempo-adjusted total fertility rate" %>
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
@@ -214,7 +218,39 @@ tables:
           {definitions.others.title}
         description_short: |-
           <% if birth_order == 'total' %>
-          The average number of children born to women in a specific cohort over their lifetime.
+          The average number of children born to women in the current cohort over their lifetime.
+          <%- else %>
+          The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
+          <%- endif %>
+        unit: "births per woman"
+        description_key:
+          - Represents the completed fertility of a cohort by the end of their reproductive years.
+          - Useful for comparing fertility across different cohorts.
+          - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
+
+      ccf_plus15y:
+        title: |-
+          <% set title = "Completed cohort fertility rate (adjusted +15 years)" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average number of children born to women in the 15-years-ago cohort over their lifetime.
+          <%- else %>
+          The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
+          <%- endif %>
+        unit: "births per woman"
+        description_key:
+          - Represents the completed fertility of a cohort by the end of their reproductive years.
+          - Useful for comparing fertility across different cohorts.
+          - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
+
+      ccf_plus30y:
+        title: |-
+          <% set title = "Completed cohort fertility rate (adjusted +30 years)" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average number of children born to women in the 30-years-ago cohort over their lifetime.
           <%- else %>
           The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
           <%- endif %>
@@ -304,7 +340,7 @@ tables:
 
       ppr:
         title: |-
-          Cohort parity progression ratios - << birth_order | int >> to << (birth_order | int) + 1 >> birth
+          Cohort parity progression ratio - << (birth_order | int) - 1 >> to << (birth_order | int) >> birth
         description_short: |-
           <% if birth_order == '1' %>
           Probability of giving birth to a first child.
@@ -324,7 +360,7 @@ tables:
     variables:
       asfr_period:
         title: |-
-          <% set title = "Period fertility rates" %>
+          <% set title = "Period fertility rate" %>
           {definitions.others.title_age}
         description_short: |-
           Age-specific fertility rates for each calendar year, measured in completed years of age.
@@ -338,7 +374,7 @@ tables:
     variables:
       asfr_cohort:
         title: |-
-          <% set title = "Cohort fertility rates" %>
+          <% set title = "Cohort fertility rate" %>
           {definitions.others.title_age}
         unit: "births per woman"
         description_short: |-
@@ -347,3 +383,78 @@ tables:
           - Represents fertility rates for a specific cohort as they age.
           - Useful for understanding how fertility behavior changes across different cohorts over time.
           - Presented in the form of horizontal parallelograms, allowing for the tracking of cohort-specific fertility patterns.
+
+      ccfr_cohort:
+        title: |-
+          <% set title = "Cumulative cohort fertility rate" %>
+          {definitions.others.title_age}
+        description_short: |-
+          It measures the average number of children born to a specific group of women (a cohort) by the age << age >>. It reflects the realized fertility of a generation, providing insights into long-term fertility trends and societal changes over time.
+        unit: "births per woman"
+        description_key:
+          - Represents fertility rates for each age group in a specific year.
+          - Useful for detailed analysis of fertility patterns by both age and year.
+          - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
+
+  period_ages_years:
+    variables:
+      asfr_period:
+        title: |-
+          Period fertility rate, by age (year << year_as_dimension >>)
+        description_short: |-
+          Distribution of the age-specific fertility rates for each calendar year.
+        unit: "births per woman"
+        description_key:
+          - Represents fertility rates for each age group in a specific year.
+          - Useful for detailed analysis of fertility patterns by both age and year.
+          - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
+
+  cohort_ages_years:
+    variables:
+      asfr_cohort:
+        title: |-
+          Cohort fertility rate, by age (cohort << cohort >>)
+        unit: "births per woman"
+        description_short: |-
+          Distribution of age-specific fertility rates for women in a specific birth cohort.
+        description_key:
+          - Represents fertility rates for a specific cohort as they age.
+          - Useful for understanding how fertility behavior changes across different cohorts over time.
+          - Presented in the form of horizontal parallelograms, allowing for the tracking of cohort-specific fertility patterns.
+
+      ccfr_cohort:
+        title: |-
+          Cumulative cohort fertility rate, by age (cohort << cohort >>)
+        unit: "births per woman"
+        description_short: |-
+          Distribution of cumulative cohort fertility rates for women in a specific birth cohort.
+
+  cohort_share_women:
+    variables:
+      share_women:
+        title: |-
+          <% if num_births == '0' %>
+          Share of women without births
+          <%- elif num_births == '4' %>
+          Share of women with 4 or more births
+          <%- else %>
+          Share of women with << num_births >> births
+          <% endif %>
+        description_short: |-
+          <% if num_births == '0' %>
+          Share of women born in a given year that did not give birth.
+          <%- elif num_births == '4' %>
+          Share of women born in a given year that had 4 or more births.
+          <%- else %>
+          Share of women born in a given year that had << num_births >> or more births.
+          <% endif %>
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          We have estimated the share of women with N births using the estimates on the cohort parity progression ratio (ppr). ppr(N) is an estimate on the probability of giving birth to an Nth child, conditioned on having had N-1 children before.
+
+          Considering all of this, we have estimated the share of women with N births as:
+
+          share of women with N births = ppr(1) * ppr(2) * ··· * ppr(N) * [1 - ppr(N+1)]
+
+          Note that we need the [1 - ppr(N+1)] term to not count women that had more than N births.

@@ -2,6 +2,7 @@
 
 Together with utils.db and utils.cached, it might need some rethinking on where it goes.
 """
+
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -10,11 +11,12 @@ from pymysql import OperationalError
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from apps.wizard.utils.cached import get_datasets_from_version_tracker
 from etl.git_helpers import get_changed_files
-from etl.grapher_io import get_all_datasets
-from etl.paths import BASE_DIR, STEP_DIR
+from etl.grapher.io import get_all_datasets
+from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEP_DIR
+from etl.steps import filter_to_subgraph, load_dag
 
 # Initialize logger.
 log = get_logger()
@@ -61,9 +63,8 @@ def get_steps_df(archived: bool = True):
 ########################################################################################################################
 
 
-def get_changed_grapher_steps(files_changed: Dict[str, Dict[str, str]]) -> List[str]:
-    """Get list of new grapher steps with their corresponding old steps."""
-    grapher_steps = []
+def get_changed_steps(files_changed: Dict[str, Dict[str, str]]) -> List[str]:
+    changed_steps = []
     for file_path, file_status in files_changed.items():
         # File status can be: D (deleted), A (added), M (modified).
         # NOTE: In principle, we could select only "A" files. But it is possible that the user adds a new grapher step, and then commits changes to it, in which case (I think) the status would be "M".
@@ -73,15 +74,26 @@ def get_changed_grapher_steps(files_changed: Dict[str, Dict[str, str]]) -> List[
             # Skip deleted files.
             continue
 
-        # Identify grapher data steps, and ignore the rest.
-        if file_path.startswith(STEP_DIR.relative_to(BASE_DIR).as_posix()) and file_path.endswith(".py"):
-            parts = Path(file_path).with_suffix("").as_posix().split("/")
-            if len(parts) == 4 and parts[-4] == "grapher":
-                grapher_steps.append(file_path)
+        # Identify potential recipes for data steps
+        if file_path.startswith(
+            (STEP_DIR.relative_to(BASE_DIR).as_posix(), SNAPSHOTS_DIR.relative_to(BASE_DIR).as_posix())
+        ):
+            changed_steps.append(file_path)
         else:
             continue
 
-    return grapher_steps
+    return changed_steps
+
+
+def get_changed_grapher_steps(files_changed: Dict[str, Dict[str, str]]) -> List[str]:
+    """Get list of new grapher steps with their corresponding old steps."""
+    steps = []
+    for step_path in get_changed_steps(files_changed):
+        if step_path.endswith(".py"):
+            parts = Path(step_path).with_suffix("").as_posix().split("/")
+            if len(parts) >= 4 and parts[-4] == "grapher":
+                steps.append(step_path)
+    return steps
 
 
 def get_new_grapher_datasets_and_their_previous_versions(session: Session) -> Dict[int, Optional[int]]:
@@ -137,3 +149,37 @@ def get_new_grapher_datasets_and_their_previous_versions(session: Session) -> Di
             new_datasets[ds_id] = previous_dataset
 
     return new_datasets
+
+
+def get_all_changed_catalog_paths(files_changed: Dict[str, Dict[str, str]]) -> List[str]:
+    """Get all changed steps and their downstream dependencies."""
+    dataset_catalog_paths = []
+
+    # Get catalog paths of all datasets with changed files.
+    for step_path in get_changed_steps(files_changed):
+        abs_step_path = BASE_DIR / Path(step_path)
+        try:
+            # TODO: use StepPath from https://github.com/owid/etl/pull/3165 to refactor this
+            if step_path.startswith("snapshots/"):
+                ds_path = abs_step_path.relative_to(SNAPSHOTS_DIR).with_suffix("").with_suffix("").as_posix()
+            else:
+                ds_path = abs_step_path.relative_to(STEP_DIR / "data").with_suffix("").with_suffix("").as_posix()
+            dataset_catalog_paths.append(ds_path)
+        except ValueError:
+            continue
+
+    # NOTE:
+    # This is OK, as it filters down the DAG a little bit. But using VersionTracker.steps_df would be much more precise. You could do:
+    # steps_df[(steps_df["step"].isin([...])]["all_active_usages"]
+    # And that would give you only the steps that are affected by the changed files. That would be ultimately what we need. But I
+    # understand that loading steps_df is very slow.
+
+    # Add all downstream dependencies of those datasets.
+    DAG = load_dag()
+    dag_steps = list(filter_to_subgraph(DAG, dataset_catalog_paths, downstream=True).keys())
+
+    # From data://... extract catalogPath
+    # TODO: use StepPath from https://github.com/owid/etl/pull/3165 to refactor this
+    catalog_paths = [step.split("://")[1] for step in dag_steps if step.startswith("data://")]
+
+    return catalog_paths

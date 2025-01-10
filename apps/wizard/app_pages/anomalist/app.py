@@ -32,12 +32,19 @@ from apps.wizard.app_pages.anomalist.utils import (
     get_datasets_and_mapping_inputs,
     get_scores,
 )
-from apps.wizard.utils import cached, set_states, url_persist
+from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.chart_config import bake_chart_config
-from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, st_multiselect_wider, tag_in_md
+from apps.wizard.utils.components import (
+    Pagination,
+    grapher_chart,
+    st_horizontal,
+    st_multiselect_wider,
+    tag_in_md,
+    url_persist,
+)
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
-from etl.grapher_io import load_variables
+from etl.grapher.io import load_variables
 
 # PAGE CONFIG
 st.set_page_config(
@@ -446,6 +453,9 @@ def show_anomaly_compact(index, df):
                 config = bake_chart_config(variable_id=indicator_id, selected_entities=entities)
             config["hideAnnotationFieldsInTitle"]["time"] = True
             config["hideFacetControl"] = False
+            config["hideShareButton"] = True
+            config["hideExploreTheDataButton"] = True
+            # config["isSocialMediaExport"] = False
 
             # Actually plot
             grapher_chart(chart_config=config, owid_env=OWID_ENV)
@@ -816,6 +826,7 @@ if st.session_state.anomalist_df is not None:
         # Show controls only if needed
         if len(items) > items_per_page:
             pagination.show_controls(mode="bar")
-
+else:
+    st.success("Ha! We did not find any no anomalies in the selected datasets! What were the odds of that?")
 # Reset state
 set_states({"anomalist_datasets_submitted": False})

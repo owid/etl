@@ -139,8 +139,8 @@ def run(dest_dir: str) -> None:
     )
 
     # Set an appropriate index and sort conveniently.
-    tb_dyadic = tb_dyadic.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-    tb_monadic = tb_monadic.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_dyadic = tb_dyadic.format(["country", "year"], sort_columns=True)
+    tb_monadic = tb_monadic.format(["country", "year"], sort_columns=True)
 
     #
     # Save outputs.

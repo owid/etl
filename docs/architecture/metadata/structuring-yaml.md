@@ -233,4 +233,41 @@ tables:
           {definitions.conflict_type_estimate}
 ```
 
-Be cautious with line breaks and trailing whitespace when utilizing templates. Despite using good defaults, you might end up experimenting a lot to get the desired result.
+Line breaks and whitespaces can be tricky when using Jinja templates. We use reasonable defaults and strip whitespaces, so in most cases you should be fine with using `<%` and `%>`, but in more complex cases, you might have to experiment with
+more fine grained [whitespace control](https://jinja.palletsprojects.com/en/stable/templates/#whitespace-control) using tags `<%-` and `-%>`. This is most often used in if-else blocks like this
+
+```yaml
+age: |-
+  <% if age_group == "ALLAges" %>
+  ...
+  <%- elif age_group == "Age-standardized" %>
+  ...
+  <%- else %>
+  ...
+  <%- endif %>
+```
+
+The most straightforward way to check your metadata is in Admin, although that means waiting for your step to finish. There's a faster way to check your YAML file directly. Create a `playground.ipynb` notebook in the same folder as your YAML file and copy this to the first cell:
+
+```python
+from etl.grapher import helpers as gh
+dim_dict = {
+  "age_group": "YEARS0-4", "sex": "Male", "cause": "Drug use disorders"
+}
+d = gh.render_yaml_file("ghe.meta.yml", dim_dict=dim_dict)
+d["tables"]["ghe"]["variables"]["death_count"]
+```
+
+An alternative is examining `VariableMeta`
+
+```python
+from etl.grapher import helpers as gh
+from etl import paths
+
+tb = Dataset(paths.DATA_DIR / "garden/who/2024-07-30/ghe")['ghe']
+
+# Sample a random row to get the dimension values
+dim_dict = dict(zip(tb.index.names, tb.sample(1).index[0]))
+
+gh.render_variable_meta(tb.death_count.m, dim_dict=dim_dict)
+```

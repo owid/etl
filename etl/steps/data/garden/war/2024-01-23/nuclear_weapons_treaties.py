@@ -172,8 +172,8 @@ def run(dest_dir: str) -> None:
     tb_counts.metadata.short_name = "nuclear_weapons_treaties_country_counts"
 
     # Make columns snake-case, set an appropriate index and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb_counts = tb_counts.underscore().set_index(["year", "status"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
+    tb_counts = tb_counts.format(["year", "status"])
 
     #
     # Save outputs.

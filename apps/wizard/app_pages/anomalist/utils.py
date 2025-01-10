@@ -1,4 +1,5 @@
 """Utils for chart revision tool."""
+
 import time
 from enum import Enum
 from typing import Dict, List, Optional, Tuple
@@ -9,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from apps.anomalist.anomalist_api import add_auxiliary_scores, combine_and_reduce_scores_df
 from apps.wizard.utils.db import WizardDB
 from apps.wizard.utils.io import get_new_grapher_datasets_and_their_previous_versions

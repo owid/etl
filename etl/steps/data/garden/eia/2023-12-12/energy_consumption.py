@@ -1,6 +1,4 @@
-"""Garden step for EIA total energy consumption.
-
-"""
+"""Garden step for EIA total energy consumption."""
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset

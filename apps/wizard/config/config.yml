@@ -36,7 +36,7 @@ main:
       - "@lucas"
       - "@daniel"
     entrypoint: app_pages/expert/app.py
-    icon: ":material/hotel_class:"
+    icon: ":material/lightbulb_2:"
   analytics:
     title: "Analytics (external)"
     description: "Learn more about OWID in Data!"
@@ -58,34 +58,16 @@ etl:
       image_url: "https://greatescapepublishing.com/wp-content/uploads/2019/11/30463274482_90aff8a230_c.jpg"
       disable:
         "production": True
-    express:
-      title: "Express"
-      entrypoint: etl_steps/express.py
-      icon: ":material/bolt:"
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
+        "staging": True
+    data:
+      title: "Data step"
+      entrypoint: etl_steps/data.py
+      icon: ":material/table:"
+      image_url: "https://media.gettyimages.com/id/1272610693/es/v%C3%ADdeo/muro-de-perspectiva-del-fondo-del-patr%C3%B3n-digital-del-c%C3%B3digo-binario.jpg?s=640x640&k=20&c=Pb4m4UbGiVZEuQ8egLm2IYtLLmQxncBFFa1zR87-St4%3D"
+      description: "Meadow, Garden, Grapher."
       disable:
         "production": True
-    meadow:
-      title: "Meadow"
-      entrypoint: etl_steps/meadow.py
-      icon: ":material/nature:"
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
-      disable:
-        "production": True
-    garden:
-      title: "Garden"
-      entrypoint: etl_steps/garden.py
-      icon: ":material/deceased:"
-      image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
-      disable:
-        "production": True
-    grapher:
-      title: "Grapher"
-      entrypoint: etl_steps/grapher.py
-      icon: ":material/database:"
-      image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
-      disable:
-        "production": True
+        "staging": True
     fasttrack:
       title: "Fast Track"
       alias: fasttrack
@@ -129,7 +111,7 @@ sections:
         alias: harmonizer
         description: "Harmonize a column of a table"
         maintainer: "@lucas"
-        entrypoint: app_pages/harmonizer.py
+        entrypoint: app_pages/harmonizer/app.py
         icon: ":material/music_note:"
         image_url: "https://www.shutterstock.com/image-vector/abstract-vector-musical-background-music-260nw-485443810.jpg"
 
@@ -144,13 +126,20 @@ sections:
         maintainer: "@pablo"
         icon: ":material/tv_gen:"
         image_url: "https://cdn.pixabay.com/photo/2018/09/04/17/02/indicator-3654257_960_720.jpg"
-      - title: "Datasets"
-        alias: dataexp
-        description: "Explore datasets and their metadata"
+      - title: "Dataset preview"
+        alias: datasets
+        description: "Preview datasets and their indicators"
         maintainer: "@lucas"
-        entrypoint: app_pages/dataset_explorer.py
+        entrypoint: app_pages/dataset_preview/app.py
         icon: ":material/search:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/c/c3/NGC_4414_%28NASA-med%29.jpg"
+      - title: "Producer analytics"
+        alias: producer-analytics
+        description: "Share analytics with data producers"
+        maintainer: "@pablo"
+        entrypoint: app_pages/producer_analytics.py
+        icon: ":material/analytics:"
+        image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Wikimedia_Product_Analytics_team_logo.svg/512px-Wikimedia_Product_Analytics_team_logo.svg.png"
 
   - title: "Explorers"
     description: |-
@@ -177,9 +166,9 @@ sections:
     apps:
       - title: "Insight search"
         alias: insight_search
-        description: "Browse data insights by their semantic similarity"
+        description: "Smart-browse DIs"
         maintainer: "@pablo"
-        entrypoint: app_pages/insight_search.py
+        entrypoint: app_pages/insight_search/app.py
         icon: ":material/search:"
         image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
       - title: "Insighter"
@@ -187,9 +176,22 @@ sections:
         description: "Data insights with GPT"
         maintainer: "@daniel"
         entrypoint: app_pages/datainsight_robot.py
-        icon: ":material/lightbulb:"
+        icon: ":material/stylus_note:"
         image_url: "https://cdn.cpdonline.co.uk/wp-content/uploads/2023/08/03153310/Starting-To-Become-A-Writer-1200x350.jpg"
-
+      - title: "Indicator search"
+        alias: indicator_search
+        description: "Browse data indicators by their semantic similarity"
+        maintainer: "@mojmir"
+        entrypoint: app_pages/indicator_search/app.py
+        icon: ":material/search:"
+        image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
+      - title: "Similar charts"
+        alias: similar_charts
+        description: "Find similar charts"
+        maintainer: "@mojmir"
+        entrypoint: app_pages/similar_charts/app.py
+        icon: ":material/bar_chart:"
+        image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
 
   - title: "Misc"
     description: |-
@@ -209,31 +211,74 @@ sections:
         entrypoint: app_pages/owidle.py
         icon: ":material/videogame_asset:"
         image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
+      - title: "Chart animation"
+        alias: chart-animation
+        description: "Animate charts (GIF/video)"
+        maintainer: "@pablo"
+        entrypoint: app_pages/chart_animation.py
+        icon: ":material/animated_images:"
+        image_url: "https://img.freepik.com/free-photo/abstract-yellow-smooth-wave-lines_1017-24863.jpg"
 
-  - title: "Metadata"
-    description: |-
-      Improve our metadata or learn how to use it.
-    apps:
-      - title: "Meta Upgrader"
-        description: "Migrate old metadata to new format."
-        maintainer: "@veronika / @lucas"
-        entrypoint: app_pages/metagpt.py
-        icon: ":material/upgrade:"
-        alias: metagpt
-        image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
-        disable:
-          "production": True
-          "staging": True
-      - title: "Meta Playground"
-        alias: metaplay
-        description: "How is metadata presented in data pages?"
-        maintainer: "@lucas"
-        entrypoint: app_pages/metaplay.py
-        icon: ":material/sports_volleyball:"
-        image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
-        disable:
-          "production": True
-          "staging": True
+  # - title: "Metadata"
+  #   description: |-
+  #     Improve our metadata or learn how to use it.
+  #   apps:
+  #     - title: "Meta Upgrader"
+  #       description: "Migrate old metadata to new format."
+  #       maintainer: "@veronika / @lucas"
+  #       entrypoint: app_pages/metagpt.py
+  #       icon: ":material/upgrade:"
+  #       alias: metagpt
+  #       image_url: "https://cdn.pixabay.com/photo/2016/12/04/18/58/instagram-1882329_1280.png"
+  #       disable:
+  #         "production": True
+  #         "staging": True
+  #     - title: "Meta Playground"
+  #       alias: metaplay
+  #       description: "How is metadata presented in data pages?"
+  #       maintainer: "@lucas"
+  #       entrypoint: app_pages/metaplay.py
+  #       icon: ":material/sports_volleyball:"
+  #       image_url: "https://upload.wikimedia.org/wikipedia/commons/d/d4/PlayEquipComboPlastic_wb.jpg"
+  #       disable:
+  #         "production": True
+  #         "staging": True
+
+  # - title: "ETL Steps (legacy)"
+  #   description: "Keeping this temporary"
+  #   apps:
+  #     - alias: express
+  #       title: "Express"
+  #       description: "Add all data steps."
+  #       entrypoint: etl_steps_old/express.py
+  #       icon: ":material/bolt:"
+  #       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
+  #       disable:
+  #         "production": True
+  #     - alias: meadow
+  #       title: "Meadow"
+  #       description: "Add meadow step."
+  #       entrypoint: etl_steps_old/meadow.py
+  #       icon: ":material/nature:"
+  #       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
+  #       disable:
+  #         "production": True
+  #     - alias: garden
+  #       title: "Garden"
+  #       description: "Add garden step."
+  #       entrypoint: etl_steps_old/garden.py
+  #       icon: ":material/deceased:"
+  #       image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
+  #       disable:
+  #         "production": True
+  #     - alias: grapher
+  #       title: "Grapher"
+  #       description: "Add grapher step."
+  #       entrypoint: etl_steps_old/grapher.py
+  #       icon: ":material/database:"
+  #       image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
+  #       disable:
+  #         "production": True
 # legacy:
 #   description: |-
 #     The pages below are legacy now. They are kept in case the new pages are not working properly.

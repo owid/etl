@@ -1,6 +1,4 @@
-"""Test functions in etl.data_helpers.misc module.
-
-"""
+"""Test functions in etl.data_helpers.misc module."""
 
 import numpy as np
 import pandas as pd

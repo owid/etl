@@ -1,4 +1,5 @@
 """Tools to load population data."""
+
 from typing import Any, Dict, Optional
 
 import pandas as pd

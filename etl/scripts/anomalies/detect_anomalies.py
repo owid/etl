@@ -1,6 +1,5 @@
-"""Detect anomalies in a given grapher dataset.
+"""Detect anomalies in a given grapher dataset."""
 
-"""
 from typing import Dict, List, Optional, Tuple
 
 import click
@@ -11,8 +10,8 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
-import etl.grapher_io as io
-import etl.grapher_model as gm
+import etl.grapher.io as io
+import etl.grapher.model as gm
 from apps.anomalist import detectors
 from apps.anomalist.anomalist_api import add_auxiliary_scores
 from apps.anomalist.gp_detector import AnomalyGaussianProcessOutlier

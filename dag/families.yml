@@ -1,0 +1,10 @@
+steps:
+  #
+  # OECD Family Database
+  #
+  data://meadow/oecd/2024-12-30/family_database:
+    - snapshot://oecd/2024-12-30/family_database.csv
+  data://garden/oecd/2024-12-30/family_database:
+    - data://meadow/oecd/2024-12-30/family_database
+  data://grapher/oecd/2024-12-30/family_database:
+    - data://garden/oecd/2024-12-30/family_database

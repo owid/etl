@@ -1,7 +1,13 @@
 meta:
-  namespace: fasttrack
-  short_name: long_term_homicide_rates_in_europe
-  name: DRAFT Long-term homicide rates in Europe - Eisner (2014)
+  source:
+    name: Eisner (2014)
+    url: https://www.hoplofobia.info/wp-content/uploads/2015/08/From-Swords-to-Words_Eisner2014.pdf
+    source_data_url: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSqMi2AJyqA9BgjU-t149eZSOp6MIqN77JZOB2HRK_oQiqgLR7hfpk-gWx9YerWcYLTGww7DmqRU_Ho/pub?output=csv
+    date_accessed: '2025-01-06'
+    published_by: |-
+      Eisner, M. 2014. “From Swords to Words: Does Macro-Level Change in Self-Control Predict Long-Term Variation in Levels of Homicide?” In Why Crime Rates Fall and Why They Don’t, edited by Michael Tonry. Vol. 43 of Crime and Justice: A Review of Research, edited by Michael Tonry. Chicago: University of Chicago Press.
+  name: Long-term homicide rates in Europe - Eisner (2014)
   description: |-
     The homicide rate data shown here is taken from Table 4 on pages 80-81 in Eisner (2015). In the table homicide rate estimates are given for a range of years, we present data for the mid-point year here. For example, if data is given for 1200-1299 we show this as 1250.
 
@@ -9,15 +15,8 @@ meta:
 
     * For 1775 and 1862 the data for Switzerland are for the canton of Zurich only.
     * From 1825 onwards the estimates for Corsica and Sardinia are for Sardinia only.
-  source_name: Google Sheet
-  url: https://www.hoplofobia.info/wp-content/uploads/2015/08/From-Swords-to-Words_Eisner2014.pdf
-  file_extension: csv
-  date_accessed: 2023-01-11
-  source_data_url: https://docs.google.com/spreadsheets/d/e/2PACX-1vSqMi2AJyqA9BgjU-t149eZSOp6MIqN77JZOB2HRK_oQiqgLR7hfpk-gWx9YerWcYLTGww7DmqRU_Ho/pub?output=csv
-  is_public: true
-  version: '2023-01-03'
-wdir: ../../../data/snapshots/fasttrack/2023-01-03
+  license: {}
 outs:
-- md5: 878c6031c03234033459e3b11dc18658
-  size: 3225
-  path: long_term_homicide_rates_in_europe.csv
+  - md5: 878c6031c03234033459e3b11dc18658
+    size: 3225
+    path: long_term_homicide_rates_in_europe.csv

@@ -27,6 +27,21 @@ def run(dest_dir: str) -> None:
                 "cohort": "year",
             }
         ),
+        ds_garden.read("period_ages_years", reset_index=False).rename_index_names(
+            {
+                "age": "year",
+            }
+        ),
+        ds_garden.read("cohort_ages_years", reset_index=False).rename_index_names(
+            {
+                "age": "year",
+            }
+        ),
+        ds_garden.read("cohort_share_women", reset_index=False).rename_index_names(
+            {
+                "cohort": "year",
+            }
+        ),
     ]
     #
     # Process data.
@@ -37,7 +52,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_garden.metadata, long_to_wide=False
     )
 
     # Save changes in the new grapher dataset.

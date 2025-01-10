@@ -77,6 +77,26 @@ def run(dest_dir: str) -> None:
         if origin_column in tb.columns:  # Check if the origin column exists
             for col in [f"avg_{group}_until_2024", f"upper_bound_{group}", f"lower_bound_{group}"]:
                 tb[col].origins = tb[origin_column].origins
+
+    # Only keep the columns with the averages and bounds as the other variables exist in the wildfires_by_week dataset.
+    tb = tb[
+        [
+            "country",
+            "year",
+            "avg_area_ha_cumulative_until_2024",
+            "upper_bound_area_ha_cumulative",
+            "lower_bound_area_ha_cumulative",
+            "avg_share_cumulative_area_until_2024",
+            "upper_bound_share_cumulative_area",
+            "lower_bound_share_cumulative_area",
+            "avg_co2_cumulative_until_2024",
+            "upper_bound_co2_cumulative",
+            "lower_bound_co2_cumulative",
+            "avg_pm2_5_cumulative_until_2024",
+            "upper_bound_pm2_5_cumulative",
+            "lower_bound_pm2_5_cumulative",
+        ]
+    ]
     tb = tb.format(["country", "year"])
 
     #
@@ -87,6 +107,6 @@ def run(dest_dir: str) -> None:
         dest_dir,
         tables=[tb],
         default_metadata=ds_grapher.metadata,
-        yaml_params={"date_accessed": last_date_accessed(tb)},
+        yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
     )
     ds_grapher.save()

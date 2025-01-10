@@ -19,9 +19,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Add a country column to the index of the table of counts.
-    tb_counts = (
-        tb_counts.reset_index().assign(**{"country": "World"}).set_index(["country", "year"], verify_integrity=True)
-    )
+    tb_counts = tb_counts.reset_index().assign(**{"country": "World"}).format(["country", "year"])
 
     #
     # Save outputs.

@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -22,7 +21,7 @@ def run(dest_dir: str) -> None:
     tb["MMLU avg"] *= 100
     tb["Architecture"] = tb["Architecture"].str.replace("Llama", "LLaMA", regex=True)
     tb["Organisation"] = tb["Organisation"].replace("DeepMind", "Google DeepMind")
-    tb = tb.underscore().set_index(["architecture", "year"], verify_integrity=True)
+    tb = tb.format(["architecture", "year"])
     #
     # Save outputs.
     #

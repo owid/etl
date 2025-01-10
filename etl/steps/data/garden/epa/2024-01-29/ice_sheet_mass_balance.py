@@ -81,7 +81,7 @@ def run(dest_dir: str) -> None:
     tb = separate_antarctica_and_greenland_data(tb=tb)
 
     # Set an appropriate index to each table and sort conveniently.
-    tb = tb.set_index(["location", "date"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(["location", "date"], sort_columns=True)
 
     #
     # Save outputs.

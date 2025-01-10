@@ -76,7 +76,7 @@ def run(dest_dir: str) -> None:
 
     # Concatenate all the DataFrames in the list
     final_tb = pr.concat(tbs, axis=0, ignore_index=True)
-    final_tb = final_tb.set_index(["country", "year", "indicator"], verify_integrity=True).sort_index()
+    final_tb = final_tb.format(["country", "year", "indicator"])
     final_tb["value"] = pd.to_numeric(final_tb["value"], errors="coerce")
 
     # Add origins metadata.
