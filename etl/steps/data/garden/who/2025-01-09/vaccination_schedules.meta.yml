@@ -10,7 +10,7 @@ definitions:
     <%- elif description == "IPV (Inactivated polio vaccine)" %>
     inactivated polio vaccine (IPV)
     <%- elif description == "Measles-containing vaccine 2nd dose" %>
-    measles-containing vaccine 2nd dose (MCV2)
+    measles-containing vaccine second dose (MCV2)
     <%- elif description == "YF (Yellow fever) vaccine" %>
     yellow fever vaccine (YFV)
     <%- elif description == "Mumps vaccine" %>
@@ -24,7 +24,7 @@ definitions:
     <%- elif description == "HepB birth dose" %>
     hepatitis B birth dose (HEPB_BD)
     <%- elif description == "IPV (Inactivated polio vaccine) 2nd dose" %>
-    inactivated polio vaccine 2nd dose (IPV2)
+    inactivated polio vaccine second dose (IPV2)
     <%- elif description == "Meningococcal meningitis vaccines (all strains)" %>
     meningococcal meningitis vaccines (all strains)
     <%- elif description == "PPV (Pneumococcal polysaccharide vaccine)" %>
@@ -39,21 +39,23 @@ definitions:
     pertussis vaccine (aP)
     <%- elif description == "Hepatitis A vaccine" %>
     hepatitis A vaccine
-    <%- elif description == "Typhoid" %>
+    <%- elif description == 'Typhoid' %>
     typhoid vaccine
     <%- elif description == "HPV (Human Papilloma Virus) vaccine" %>
     human papilloma virus vaccine (HPV)
-    <%- elif description == "Rotavirus vaccine'" %>
+    <%- elif description == "Rotavirus vaccine" %>
     rotavirus vaccine
     <%- elif description == "Malaria vaccine" %>
     malaria vaccine
+    <%- else %>
+    <<description.lower()>>
     <%- endif %>
   vaccine_description_key: |-
     <% if description == "Seasonal Influenza vaccine" %>
     Seasonal influenza is a contagious respiratory illness caused by influenza viruses, leading to symptoms like fever, cough, sore throat, muscle aches, and fatigue.
     <%- elif description == "IPV (Inactivated polio vaccine)" %>
     Polio is a highly infectious viral disease. The polio virus invades the nervous system and can cause irreversible paralysis.
-    <%- elif description == "Measles-containing vaccine 2nd dose" %>
+    <%- elif description == "Measles-containing vaccine second dose" %>
     Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhoea, and severe respiratory infections such as pneumonia.
     <%- elif description == "YF (Yellow fever) vaccine" %>
     Only countries with endemic yellow fever require the vaccine in routine immunization programs. Yellow fever is caused by a mosquito-transmitted virus, symptoms include fever, chills, headache, backache, and muscle ache.
@@ -83,11 +85,11 @@ definitions:
     Pertussis (whooping cough) is an infectious respiratory disease caused by bacteria in the throat and airways. This data relates to the acellular vaccine.
     <%- elif description == "Hepatitis A vaccine" %>
     Hepatitis A is a highly contagious viral infection that affects the liver, causing symptoms like fever, fatigue, nausea, abdominal pain, and jaundice.
-    <%- elif description == "Typhoid" %>
+    <%- elif description == 'Typhoid' %>
     Typhoid is a serious bacterial infection caused by Salmonella typhi, transmitted through contaminated food or water.
     <%- elif description == "HPV (Human Papilloma Virus) vaccine" %>
     Human papillomavirus (HPV) is a common viral infection that can cause genital warts and is linked to several cancers, including cervical, anal, and throat cancers. The HPV vaccine provides effective protection against the most high-risk types of the virus and helps prevent related cancers.
-    <%- elif description == "Rotavirus vaccine'" %>
+    <%- elif description == "Rotavirus vaccine" %>
     [Rotaviruses](#dod:rotavirus) are the most common cause of diarrheal disease in young children.
     <%- elif description == "Malaria vaccine" %>
     Malaria is a life-threatening disease caused by Plasmodium parasites, transmitted to humans through the bites of infected mosquitoes.
