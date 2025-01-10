@@ -53,25 +53,31 @@ def run(dest_dir: str) -> None:
     # Add denominator column
     tb = tb.assign(denominator=tb["antigen"].map(DENOMINATOR))
     # Calculate the number of one-year-olds vaccinated for each antigen.
-    tb_number = calculate_one_year_olds_vaccinated(tb, ds_population)
+    tb_one_year_olds = calculate_one_year_olds_vaccinated(tb, ds_population)
+    tb_newborns = calculate_newborns_vaccinated(tb, ds_population)
+
     tb = tb.drop(columns=["denominator"])
     tb = tb.format(["country", "year", "antigen"], short_name="vaccination_coverage")
-    tb_number = tb_number.format(["country", "year", "antigen"], short_name="number_of_one_year_olds")
+    tb_one_year_olds = tb_one_year_olds.format(["country", "year", "antigen"], short_name="number_of_one_year_olds")
+    tb_newborns = tb_newborns.format(["country", "year", "antigen"], short_name="number_of_newborns")
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb, tb_number], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=[tb, tb_one_year_olds, tb_newborns],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
 
 
-def get_population_one_year_olds(ds_population: Dataset) -> Table:
+def get_population_of_age_group(ds_population: Dataset, age=str) -> Table:
     tb_pop = ds_population.read("population", reset_metadata="keep_origins")
-    tb_pop = tb_pop[(tb_pop["age"] == "1") & (tb_pop["variant"] == "estimates") & (tb_pop["sex"] == "all")]
+    tb_pop = tb_pop[(tb_pop["age"] == age) & (tb_pop["variant"] == "estimates") & (tb_pop["sex"] == "all")]
     tb_pop = tb_pop[["country", "year", "sex", "age", "variant", "population"]]
     return tb_pop
 
@@ -82,7 +88,7 @@ def calculate_one_year_olds_vaccinated(tb: Table, ds_population: Dataset) -> Tab
     """
 
     tb = tb[tb["denominator"] == "Surviving infants"]
-    tb_pop = get_population_one_year_olds(ds_population)
+    tb_pop = get_population_of_age_group(ds_population=ds_population, age="1")
 
     tb = pr.merge(tb, tb_pop, on=["country", "year"], how="left")
     tb = tb.assign(
@@ -90,6 +96,23 @@ def calculate_one_year_olds_vaccinated(tb: Table, ds_population: Dataset) -> Tab
         unvaccinated_one_year_olds=(100 - tb["coverage"]) / 100 * tb["population"],
     )
     tb = tb[["country", "year", "antigen", "vaccinated_one_year_olds", "unvaccinated_one_year_olds"]]
+    return tb
+
+
+def calculate_newborns_vaccinated(tb: Table, ds_population: Dataset) -> Table:
+    """
+    Calculate the number of one-year-olds vaccinated for each antigen.
+    """
+
+    tb = tb[tb["denominator"] == "Live births"]
+    tb_pop = get_population_of_age_group(ds_population=ds_population, age="0")
+
+    tb = pr.merge(tb, tb_pop, on=["country", "year"], how="left")
+    tb = tb.assign(
+        vaccinated_newborns=tb["coverage"] / 100 * tb["population"],
+        unvaccinated_newborns=(100 - tb["coverage"]) / 100 * tb["population"],
+    )
+    tb = tb[["country", "year", "antigen", "vaccinated_newborns", "unvaccinated_newborns"]]
     return tb
 
 
