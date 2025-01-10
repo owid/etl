@@ -6,7 +6,7 @@ definitions:
         - Vaccination
   antigen_description: |-
     <% if antigen == "BCG" %>
-    births who receive one dose of the Bacille Calmette-Guérin (BCG) vaccine
+    newborns who receive one dose of the Bacille Calmette-Guérin (BCG) vaccine
     <%- elif antigen == "DTPCV1" %>
     one-year-olds who receive one dose of combined diphtheria, tetanus toxoid and pertussis- containing vaccine (DTP1)
     <%- elif antigen == "DTPCV3" %>
@@ -22,7 +22,7 @@ definitions:
     <%- elif antigen == "HIB3" %>
     one-year-olds who receive three doses of Haemophilus influenzae type b containing vaccine (HIB3)
     <%- elif antigen == "HEPB_BD" %>
-    births who receive a hepatitis B vaccine dose within the first 24 hours of delivery (HEPB_BD)
+    newborns who receive a hepatitis B vaccine dose within the first 24 hours of delivery (HEPB_BD)
     <%- elif antigen == "MCV2" %>
     children who receive two doses of measles-containing vaccine as per the national schedule (MCV2)
     <%- elif antigen == "ROTAC" %>
