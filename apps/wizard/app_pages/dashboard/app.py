@@ -208,7 +208,7 @@ with st.container(border=True):
     if st.session_state.selected_steps:
         for index, step in enumerate(st.session_state.selected_steps):
             # Define the layout of the list.
-            cols = st.columns([0.5, 3, 1, 1, 1, 1])
+            cols = st.columns(spec=[0.5, 3, 1, 1, 1, 1])
 
             # Define the columns in order (from left to right) as a list of tuples (message, key suffix, function).
             actions = [
@@ -257,6 +257,7 @@ with st.container(border=True):
                         key=unique_key,
                         on_click=lambda step=step: remove_step(step),
                         help=help_text,
+                        type="tertiary",
                     )
                 # Add related steps
                 else:
@@ -267,15 +268,6 @@ with st.container(border=True):
                         help=help_text,
                     )
 
-        # Add button to clear the operations list.
-        st.button(
-            "Clear _Operations list_",
-            help="Remove all steps currently in the _Operations list_.",
-            type="secondary",
-            key="clear_operations_list",
-            on_click=lambda: st.session_state.selected_steps.clear(),
-        )
-
         def remove_non_updateable_steps():
             # Remove steps that cannot be updated (because update_period_days is set to 0).
             # For convenience, also remove steps that a user most likely doesn't want to update.
@@ -285,15 +277,6 @@ with st.container(border=True):
             st.session_state.selected_steps = [
                 step for step in st.session_state.selected_steps if step not in non_updateable_steps
             ]
-
-        st.button(
-            "Remove non-updateable (e.g. population)",
-            help="Remove steps that cannot be updated (i.e. with `update_period_days=0`), and other auxiliary datasets, namely: "
-            + "\n- ".join(sorted(NON_UPDATEABLE_IDENTIFIERS)),
-            type="secondary",
-            key="remove_non_updateable",
-            on_click=remove_non_updateable_steps,
-        )
 
         def upgrade_steps_in_operations_list():
             new_list = []
@@ -311,13 +294,32 @@ with st.container(border=True):
 
             st.session_state.selected_steps = new_list
 
-        st.button(
-            "Replace steps with their latest versions",
-            help="Replace steps in the _Operations list_ by their latest version available. You may want to use this button after updating steps, to be able to operate on the newly created steps.",
-            type="secondary",
-            key="replace_with_latest",
-            on_click=upgrade_steps_in_operations_list,
-        )
+        with st_horizontal():
+            # Add button to clear the operations list.
+            st.button(
+                ":blue[:material/clear_all: Clear list]",
+                help="Remove all steps currently in the _Operations list_.",
+                type="tertiary",
+                key="clear_operations_list",
+                on_click=lambda: st.session_state.selected_steps.clear(),
+            )
+
+            st.button(
+                ":blue[:material/delete_outline: Remove non-updateable (e.g. population)]",
+                help="Remove steps that cannot be updated (i.e. with `update_period_days=0`), and other auxiliary datasets, namely: "
+                + "\n- ".join(sorted(NON_UPDATEABLE_IDENTIFIERS)),
+                type="tertiary",
+                key="remove_non_updateable",
+                on_click=remove_non_updateable_steps,
+            )
+
+            st.button(
+                ":blue[:material/autorenew: Replace steps with their latest versions]",
+                help="Replace steps in the _Operations list_ by their latest version available. You may want to use this button after updating steps, to be able to operate on the newly created steps.",
+                type="tertiary",
+                key="replace_with_latest",
+                on_click=upgrade_steps_in_operations_list,
+            )
 
     else:
         st.markdown(":grey[_No rows selected for operation..._]")
