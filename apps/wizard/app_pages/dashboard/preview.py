@@ -30,7 +30,8 @@ def render_preview_list(df: Optional[pd.DataFrame], steps_df: pd.DataFrame):
         # UI: Display details of selected steps
         # with st.container(border=True, height=DETAILS_LIST_CONTAINER_HEIGHT):
         for selected_step, selected_steps_info in selected_steps_info.items():
-            _render_step_in_list(selected_step, selected_steps_info)
+            with st.expander(f"Details for step {selected_step}"):
+                _render_step_in_list(selected_steps_info)
 
         # UI: Button to add selected steps to the Operations list.
         _show_button_add_to_operations(df)
@@ -60,21 +61,20 @@ def _get_selected_steps_info(df, steps_df) -> Dict[str, Any]:
     return selected_steps_info
 
 
-def _render_step_in_list(selected_step: str, selected_step_info: Any):
+def _render_step_in_list(selected_step_info: Any):
     """Show the various details of the selected step in a list."""
     # Display each selected row's data.
-    with st.expander(f"Details for step {selected_step}"):
-        for item, value in selected_step_info.items():
-            item_name = item.replace("_", " ").capitalize()
-            if isinstance(value, list):
-                list_html = (
-                    f"<details><summary> {item_name} ({len(value)}) </summary><ol>"
-                    + "".join([f"<li>{sub_value}</li>" for sub_value in value])
-                    + "</ol></details>"
-                )
-                st.markdown(list_html, unsafe_allow_html=True)
-            else:
-                st.text(f"{item_name}: {value}")
+    for item, value in selected_step_info.items():
+        item_name = item.replace("_", " ").capitalize()
+        if isinstance(value, list):
+            list_html = (
+                f"<details><summary> {item_name} ({len(value)}) </summary><ol>"
+                + "".join([f"<li>{sub_value}</li>" for sub_value in value])
+                + "</ol></details>"
+            )
+            st.markdown(list_html, unsafe_allow_html=True)
+        else:
+            st.text(f"{item_name}: {value}")
 
 
 def _show_button_add_to_operations(df):

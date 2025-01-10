@@ -114,7 +114,7 @@ render_preview_list(df_selected, steps_df)
 # User can add from checking in the steps table, but also there are some options to add dependencies, usages, etc.
 ########################################
 # Header
-render_operations_list(steps_df)
+render_operations_list(df_selected, steps_df)
 
 
 ########################################

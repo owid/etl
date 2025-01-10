@@ -1,18 +1,39 @@
+from typing import Optional
+
 import pandas as pd
 import streamlit as st
 from structlog import get_logger
 
+from apps.wizard.app_pages.dashboard.preview import _get_selected_steps_info, _render_step_in_list
 from apps.wizard.app_pages.dashboard.utils import NON_UPDATEABLE_IDENTIFIERS, _add_steps_to_operations, remove_step
 from apps.wizard.utils.components import st_horizontal
 
 log = get_logger()
 
 
-def render_operations_list(steps_df):
+def render_operations_list(df: Optional[pd.DataFrame], steps_df: pd.DataFrame):
     """Render operations list."""
+
+    # Title
     with st_horizontal():
         st.markdown("""### Operations list""")
-        st.markdown(f":primary-background[{len(st.session_state.selected_steps)} steps]")
+
+        # Show info on number of selected steps (if any)
+        if len(st.session_state.selected_steps) > 0:
+            st.markdown(f":primary-background[{len(st.session_state.selected_steps)} steps]")
+
+    # Show warning if no step is selected
+    if df is None:
+        st.warning("No rows selected. Please select at least one dataset from the table above.")
+        return
+
+    # Get details of selected steps
+    selected_steps_info = _get_selected_steps_info(df, steps_df)
+
+    st.write(selected_steps_info)
+    st.write(st.session_state.selected_steps)
+
+    # Show the actual "operations list"
     with st.container(border=True):
         # Create an operations list, that contains the steps (selected from the main steps table) we will operate upon.
         # Note: Selected steps might contain steps other those selected in the main steps table, based on user selections (e.g. dependencies).
@@ -37,14 +58,17 @@ def _show_row_with_step_details(steps_df, step, index):
         * Execute ETL step for only the current step.
         * Edit metadata for the current step.
     """
-    col1, col2 = st.columns([2.5, 4])
+    col1, col2 = st.columns([2.5, 4], vertical_alignment="center")
     with col1:
-        with st.container(height=40, border=False):
+        with st.container(height=None, border=False):
             # with col1:
             if step in st.session_state.selected_steps_table:
-                st.markdown(f"**{step.replace('data://', '')}**")
+                text = f"**{step.replace('data://', '')}**"
             else:
-                st.markdown(f"{step.replace('data://', '')}")
+                text = f"**{step.replace('data://', '')}**"
+            with st.popover(text, use_container_width=True):
+                # _render_step_in_list(selected_steps_info)
+                pass
     with col2:
         with st_horizontal(justify_content="space-between"):
             actions = [
