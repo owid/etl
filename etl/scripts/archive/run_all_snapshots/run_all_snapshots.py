@@ -34,8 +34,6 @@ log = get_logger()
 # Kill a subprocess if it takes longer than this many seconds.
 OUTPUT_FILE = BASE_DIR / "etl" / "scripts" / "archive" / "run_all_snapshots" / "snapshot_execution_times.json"
 
-GITHUB_API_BASE = "https://api.github.com/repos/owid/etl"
-
 
 def get_active_snapshots() -> Set[str]:
     DAG = load_dag()
@@ -180,7 +178,8 @@ def create_autoupdate_pr(snapshot: str):
 @click.option("--create-pr", is_flag=True, help="If there's an update, create a PR.")
 @click.option("--filter", type=str, help="Process only snapshots that include the given substring.")
 @click.option("--timeout", type=int, default=100, help="Timeout in seconds for each snapshot.")
-def main(dry_run: bool, create_pr: bool, filter: str, timeout: int):
+@click.option("--skip", is_flag=True, help="Skip snapshots that have already been processed.")
+def main(dry_run: bool, create_pr: bool, filter: str, timeout: int, skip: bool):
     # Create a dictionary to store the execution results: duration (in seconds) or "FAILED"
     if OUTPUT_FILE.exists():
         # Load existing results from the JSON file to allow resuming.
@@ -201,16 +200,16 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int):
     for snapshot in tqdm(active_snapshots):
         snapshot_script = SNAPSHOTS_DIR / snapshot
 
-        # TODO: enable this before merging
-        # if str(snapshot_script) in execution_results:
-        #     log.info(f"Skipping {snapshot} because it has already been processed.")
-        #     continue
+        # Skip snapshots that have already been processed.
+        if skip and snapshot in execution_results:
+            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="already processed")
+            continue
 
         # Start timer.
         start_time = time.time()
 
         if not snapshot_script.exists():
-            log.error(f"Snapshot script {snapshot_script} does not exist.")
+            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="script not found")
             continue
 
         # Read the script file.
@@ -219,11 +218,11 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int):
 
         # Skip script files that are not snapshots (or at least do not have an "--upload" flag explicitly defined).
         if "--upload" not in snapshot_text:
-            log.info(f"Skipping {snapshot} because it does not have --upload flag.")
+            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="no --upload flag")
             continue
         # Skip scripts that require the use of a local file.
         if ("--path-to-file" in snapshot_text) or ("-f " in snapshot_text):
-            log.info(f"Skipping {snapshot} because it requires a local file.")
+            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="requires local file")
             continue
 
         execution_results[snapshot] = {}
@@ -238,11 +237,15 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int):
             log.info(f"Executing {snapshot}.")
 
             # Find .dvc file belonging to the snapshot script
-            files = list(snapshot_script.parent.glob(f"{snapshot_script.stem}.*.dvc"))
-            assert len(files) == 1, f"Expected to find exactly one .dvc file, got {files}"
-            dvc_file = files[0]
+            dvc_files = list(snapshot_script.parent.glob(f"{snapshot_script.stem}.*.dvc"))
+            assert len(dvc_files) >= 1, f"Expected to find at least one .dvc file for {snapshot}"
 
-            subprocess.run(["git", "restore", "--", str(dvc_file)])
+            subprocess.run(["git", "restore", "--"] + [str(f) for f in dvc_files])
+
+            # Quite rare but possible to have multiple .dvc files for a single snapshot.
+            if len(dvc_files) > 1:
+                log.warning(f"Multiple .dvc files found for {snapshot}. Using the first one.")
+            dvc_file = dvc_files[0]
 
             # Load md5 and size from the .dvc file from YAML
             with open(dvc_file, "r") as f:
@@ -266,7 +269,7 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int):
 
             elif original_outs["size"] == new_outs["size"]:
                 execution_results[snapshot]["identical"] = True
-                subprocess.run(["git", "restore", "--", str(dvc_file)])
+                subprocess.run(["git", "restore", "--"] + [str(f) for f in dvc_files])
 
             else:
                 execution_results[snapshot]["identical"] = False

@@ -16,6 +16,6 @@ meta:
       name: © Energy Institute 2024
       url: https://www.energyinst.org/__data/assets/pdf_file/0006/1542714/EI_Stats_Review_2024_single_pages.pdf
 outs:
-  - md5: ecf2d0381761117e2796de36602c7dc0
-    size: 3469524
+  - md5: 88a1b98bb2d8734309872d40b5158625
+    size: 3469499
     path: statistical_review_of_world_energy.csv

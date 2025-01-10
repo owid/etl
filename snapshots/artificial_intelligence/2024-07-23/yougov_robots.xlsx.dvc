@@ -15,6 +15,6 @@ meta:
       url: https://today.yougov.com/about/terms
     version_producer: '2024-06-27'
 outs:
-  - md5: d217d403461f71743a2d1aebd17efea4
-    size: 28017
+  - md5: d9a8da7ef2a751e5fea6c20a11e4ebe6
+    size: 28941
     path: yougov_robots.xlsx

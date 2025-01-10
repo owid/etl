@@ -22,6 +22,6 @@ meta:
       url: https://jcmit.net/memoryprice.htm
 
 outs:
-  - md5: 54b3fcc2931bb60e428dc1dcc8fea034
-    size: 171246
+  - md5: a254fea6c6f6dca704fab596704d26e7
+    size: 173420
     path: computer_memory_storage.xlsx
