@@ -90,6 +90,7 @@ else:
 
 # LOGO
 st.logo(
-    str(DOCS_DIR / "assets/wizard-logo.png"),
+    str(DOCS_DIR / "assets/wizard-logo3.png"),
+    size="large",
     # link="https://google.com",  # TODO: would be cool if we could link to an internal page (and not only external). Check streamlit issues, and consider creating one.
 )
