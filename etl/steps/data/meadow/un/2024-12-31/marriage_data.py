@@ -179,24 +179,35 @@ def run(dest_dir: str) -> None:
     # Define subset columns for removing duplicates
     subset_columns = ["country", "year", "sex", "age"]
 
-    # Remove duplicated data different 'datacatalog_shortname' based on the predifined rules
-    tb_merged = resolve_duplicates(
-        tb_merged, subset_columns, DATA_CATALOGUE_RULES, target_column="datacatalog_shortname"
-    )
+    # Get all numeric columns (excluding the grouping columns)
+    numeric_columns = tb_merged.select_dtypes(include=["float64", "int64"]).columns
 
-    # Remove duplicated data different 'data_source' based on the predifined rules
-    tb_merged = resolve_duplicates(tb_merged, subset_columns, DATA_SOURCE_RULES, target_column="data_source")
+    # Calculate mean for numeric columns and keep first occurrence of non-numeric columns
+    agg_dict = {
+        col: "mean" if col in numeric_columns else "first" for col in tb_merged.columns if col not in subset_columns
+    }
 
-    # Remove duplicated data different 'data_process' based on the predifined rules
-    tb_merged = resolve_duplicates(tb_merged, subset_columns, DATA_PROCESS_RULES, target_column="data_process")
+    # Group by subset columns and aggregate
+    tb_merged = tb_merged.groupby(subset_columns, as_index=False).agg(agg_dict)
 
-    duplicates = tb_merged[tb_merged.duplicated(subset=subset_columns, keep=False)]
-    if not duplicates.empty:
-        # Check if all duplicates are the same
-        unique_data = duplicates.groupby(["country", "year", "sex", "age"]).agg(
-            {"data_source": "unique", "datacatalog_shortname": "unique", "data_process": "unique"}
-        )
-        print(unique_data)
+    # # Remove duplicated data different 'datacatalog_shortname' based on the predifined rules
+    # tb_merged = resolve_duplicates(
+    #     tb_merged, subset_columns, DATA_CATALOGUE_RULES, target_column="datacatalog_shortname"
+    # )
+
+    # # Remove duplicated data different 'data_source' based on the predifined rules
+    # tb_merged = resolve_duplicates(tb_merged, subset_columns, DATA_SOURCE_RULES, target_column="data_source")
+
+    # # Remove duplicated data different 'data_process' based on the predifined rules
+    # tb_merged = resolve_duplicates(tb_merged, subset_columns, DATA_PROCESS_RULES, target_column="data_process")
+
+    # duplicates = tb_merged[tb_merged.duplicated(subset=subset_columns, keep=False)]
+    # if not duplicates.empty:
+    #     # Check if all duplicates are the same
+    #     unique_data = duplicates.groupby(["country", "year", "sex", "age"]).agg(
+    #         {"data_source": "unique", "datacatalog_shortname": "unique", "data_process": "unique"}
+    #     )
+    #     print(unique_data)
 
     tables = [tb_merged.format(["country", "year", "age", "sex"])]
 
