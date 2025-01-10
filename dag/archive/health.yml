@@ -235,3 +235,12 @@ steps:
     - data-private://garden/antibiotics/2024-11-20/microbe
   data-private://grapher/antibiotics/2024-12-05/microbe_neonatal_total_amr:
     - data-private://garden/antibiotics/2024-12-05/microbe_neonatal_total_amr
+
+  # WHO vaccination coverage data
+  data://meadow/who/2022-07-17/who_vaccination:
+    - walden://who/2022-07-17/who_vaccination
+  data://garden/who/2022-07-17/who_vaccination:
+    - data://meadow/who/2022-07-17/who_vaccination
+    - data://garden/un/2022-07-11/un_wpp
+  data://grapher/who/2022-07-17/who_vaccination:
+    - data://garden/who/2022-07-17/who_vaccination
