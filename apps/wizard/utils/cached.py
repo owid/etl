@@ -29,6 +29,16 @@ def load_entity_ids(entity_ids: Optional[List[int]] = None):
     return gio.load_entity_mapping(entity_ids)
 
 
+@st.cache_data(show_spinner=False)
+def execute_bash_command(cmd):
+    """Execute a command and get its output."""
+    try:
+        result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        return e.stderr
+
+
 @st.cache_data
 def load_variables_display_in_dataset(
     dataset_uri: Optional[List[str]] = None,
