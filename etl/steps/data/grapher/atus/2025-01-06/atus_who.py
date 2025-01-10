@@ -16,11 +16,10 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden.read("atus_who")
 
-    # Use year for age to work in grapher
+    # Use year for age and timeframe for country to work in grapher
     tb = tb.rename(columns={"age": "year"})
-
-    # Remove year start and year end
-    tb = tb[["country", "year", "who_category", "t"]]
+    tb = tb.drop(columns=["country", "gender"])
+    tb = tb.rename(columns={"timeframe": "country"})
 
     # format
     tb = tb.format(["country", "year", "who_category"])

@@ -1,15 +1,15 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import matpltlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+SINGLE_YEARS = False
 
 
 def run(dest_dir: str) -> None:
@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
     # summarize data (first by case_id and category)
     tb_agg = (
         tb_agg.groupby(["who_category", "age", "case_id"])
-        .agg({"activity_duration_24": "sum", "final_weight": "first", "year": "first"})
+        .agg({"activity_duration_24": "sum", "final_weight": "first", "year": "first", "gender": "first"})
         .reset_index()
     )
 
@@ -54,9 +54,29 @@ def run(dest_dir: str) -> None:
     tb_agg_full = aggregate_over_age(tb_agg, start_year=2003, end_year=2023)
     tb_agg_extended = aggregate_over_age(tb_agg, start_year=2009, end_year=2023)
 
+    # tables for gender:
+    tb_agg_female = aggregate_over_age(tb_agg, start_year=2009, end_year=2019, gender="female")
+    tb_agg_male = aggregate_over_age(tb_agg, start_year=2009, end_year=2019, gender="male")
+
+    # concat all tables
+    tb_agg = pr.concat([tb_agg_recreate, tb_agg_full, tb_agg_extended])
+
+    # include gender tables
+    #tb_agg = pr.concat([tb_agg, tb_agg_female, tb_agg_male])
+
+    # add single year tables
+    if SINGLE_YEARS:
+        single_year_tb = []
+        for year in range(2003, 2024):
+            tb_agg_single_year = aggregate_over_age(tb_agg, start_year=year, end_year=year)
+            single_year_tb.append(tb_agg_single_year)
+        tb_agg_single_years = pr.concat(single_year_tb)
+        tb_agg = pr.concat([tb_agg, tb_agg_single_years])
+
     #
     # Process data.
-    tb = tb_agg_recreate.format(["country", "age", "who_category"], short_name="atus_who")
+    # tb = tb_agg_recreate.format(["country", "age", "who_category"], short_name="atus_who")
+    tb = tb_agg.format(["timeframe", "age", "who_category", "gender"], short_name="atus_who")
 
     #
     # Save outputs.
@@ -101,7 +121,7 @@ def fill_missing_values(tb_agg):
     return tb_agg
 
 
-def aggregate_over_age(tb_agg, start_year=2009, end_year=2019):
+def aggregate_over_age(tb_agg, start_year=2009, end_year=2019, gender="all"):
     """Aggregate data over age and time period. Start and end year are inclusive, default is 2009-2019"""
     # remove co-worker category before 2010, since it gets recorded differently
     tb_agg = tb_agg[~((tb_agg["year"] < 2010) & (tb_agg["who_category"] == "Co-worker"))]
@@ -109,35 +129,39 @@ def aggregate_over_age(tb_agg, start_year=2009, end_year=2019):
     # filter data to timeframe
     tb_agg = tb_agg[(tb_agg["year"] >= start_year) & (tb_agg["year"] <= end_year)]
 
+    if gender == "female":
+        tb_agg = tb_agg[tb_agg["gender"] == 2]
+    elif gender == "male":
+        tb_agg = tb_agg[tb_agg["gender"] == 1]
+
     # Now aggregate by category and age
     # This gives final result: average duration spent with each who_category for each age
-    tb_agg = (
-        tb_agg.groupby(["who_category", "age"])
-        .apply(
-            lambda x: pd.Series(
-                {"t": np.sum(x["activity_duration_24"] * x["final_weight"]) / np.sum(x["final_weight"])}
-            )
+    if gender != "all":
+        tb_agg = (
+            tb_agg.groupby(["who_category", "age"])
+            .apply(lambda x: pd.Series({"t": np.sum(x["activity_duration_24"])}))
+            .reset_index()
         )
-        .reset_index()
-    )
+
+    else:
+        tb_agg = (
+            tb_agg.groupby(["who_category", "age"])
+            .apply(
+                lambda x: pd.Series(
+                    {"t": np.sum(x["activity_duration_24"] * x["final_weight"]) / np.sum(x["final_weight"])}
+                )
+            )
+            .reset_index()
+        )
+
     # add metadata:
     tb_agg["t"] = tb_agg["t"].copy_metadata(tb_agg["age"])
 
-    # Add country information
+    # Add country and gender information
     tb_agg["country"] = "United States of America"
+    tb_agg["gender"] = gender
 
     # Add information about time period recorded
     tb_agg["timeframe"] = f"{start_year}-{end_year}"
 
     return tb_agg
-
-
-def visualize(tb):
-    plt.figure(figsize=(10, 6))
-    sns.lineplot(data=tb, x="age", y="t", hue="who_category")
-    plt.title("Who we spend time with")
-    plt.xlabel("Age")
-    plt.ylabel("Time (minutes)")
-    plt.legend(title="Category", bbox_to_anchor=(1.05, 1), loc="upper left")
-    plt.tight_layout()
-    plt.show()
