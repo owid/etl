@@ -125,3 +125,29 @@ tables:
           - "{definitions.antigen_description_key}"
         display:
           numDecimalPlaces: 0
+  number_of_newborns:
+    variables:
+      vaccinated_newborns:
+        title: Number of newborns vaccinated with {definitions.number_description}
+        description_short: The number of newborns who recieved {definitions.antigen_description} in a given year.
+        unit: "newborns"
+        description_key:
+          - "The current release of the WUENIC with data up to 2023 (released in 2024) includes estimates for WHO Member States, including those that did not report 2023 data. For these non-reporting countries, estimates were extrapolated from the last point informed by empirical data."
+          - "Global and regional coverages, values were extrapolated from 2022 for non-reporting countries."
+          - "Non-reporting countries represent ≈5% of the global 2023 cohort."
+          - "These estimates are based on quantitative data: 1) Country reported coverage data (official and administrative coverage) and 2) survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate). As such, these estimates are affected by the availability and quality of the underlying data."
+          - "{definitions.antigen_description_key}"
+        display:
+          numDecimalPlaces: 0
+      unvaccinated_newborns:
+        title: Number of newborns who have not received {definitions.number_description}
+        description_short: The number of newborns who have not received {definitions.antigen_description} in a given year.
+        unit: "unvaccinated newborns"
+        description_key:
+          - "The current release of the WUENIC with data up to 2023 (released in 2024) includes estimates for WHO Member States, including those that did not report 2023 data. For these non-reporting countries, estimates were extrapolated from the last point informed by empirical data."
+          - "Global and regional coverages, values were extrapolated from 2022 for non-reporting countries."
+          - "Non-reporting countries represent ≈5% of the global 2023 cohort."
+          - "These estimates are based on quantitative data: 1) Country reported coverage data (official and administrative coverage) and 2) survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate). As such, these estimates are affected by the availability and quality of the underlying data."
+          - "{definitions.antigen_description_key}"
+        display:
+          numDecimalPlaces: 0
