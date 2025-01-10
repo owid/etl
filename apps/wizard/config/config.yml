@@ -119,9 +119,9 @@ sections:
     description: |-
       Control panel for ETL steps.
     apps:
-      - title: "Dashboard"
+      - title: "ETL dashboard"
         alias: dashboard
-        entrypoint: app_pages/dashboard.py
+        entrypoint: app_pages/dashboard/app.py
         description: Control panel for ETL steps
         maintainer: "@pablo"
         icon: ":material/tv_gen:"

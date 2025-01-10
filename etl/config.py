@@ -437,6 +437,14 @@ class OWIDEnv:
             return f"{self.base_site}/admin"
 
     @property
+    def datasets_admin_site(self):
+        return f"{self.admin_site}/datasets"
+
+    @property
+    def indicators_admin_site(self):
+        return f"{self.admin_site}/variables"
+
+    @property
     def admin_api(self) -> str:
         """Get admin api url. This could be possibly merged with admin_site above.
         We'd just have to test when to use suffix `.tail6e23.ts.net` because of
@@ -493,11 +501,11 @@ class OWIDEnv:
 
     def dataset_admin_site(self, dataset_id: str | int) -> str:
         """Get dataset admin url."""
-        return f"{self.admin_site}/datasets/{dataset_id}/"
+        return f"{self.datasets_admin_site}/{dataset_id}/"
 
     def indicator_admin_site(self, variable_id: str | int) -> str:
         """Get indicator admin url."""
-        return f"{self.admin_site}/variables/{variable_id}/"
+        return f"{self.indicators_admin_site}/{variable_id}/"
 
     def chart_admin_site(self, chart_id: str | int) -> str:
         """Get chart admin url."""
