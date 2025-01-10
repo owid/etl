@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: WHO Immunization Data
+    title: WHO Immunization Data - Vaccination Schedules
     description: |
       The World Health Organization (WHO) provides data on the introduction of vaccines into vaccine schedules for countries around the world. The data is collected through the WHO/UNICEF Joint Reporting Form on Immunization.
 
