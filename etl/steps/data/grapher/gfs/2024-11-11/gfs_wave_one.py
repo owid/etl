@@ -73,6 +73,7 @@ def run(dest_dir: str) -> None:
             tb_res[col] = tb_res[col] * 100
             tb_res[col].m.unit = "%"
             tb_res[col].m.short_unit = "%"
+            tb_res[col].m.numSignificantFigures = 2
 
     tb_res = tb_res.format(["country", "year"])
 
