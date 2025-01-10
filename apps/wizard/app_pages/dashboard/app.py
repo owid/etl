@@ -143,25 +143,27 @@ if df_selected is not None:
         .set_index("step")
         .to_dict(orient="index")
     )
-    for selected_step, selected_steps_info in selected_steps_info.items():
-        # Display each selected row's data.
-        with st.expander(f"Details for step {selected_step}"):
-            for item, value in selected_steps_info.items():
-                item_name = item.replace("_", " ").capitalize()
-                if isinstance(value, list):
-                    list_html = (
-                        f"<details><summary> {item_name} ({len(value)}) </summary><ol>"
-                        + "".join([f"<li>{sub_value}</li>" for sub_value in value])
-                        + "</ol></details>"
-                    )
-                    st.markdown(list_html, unsafe_allow_html=True)
-                else:
-                    st.text(f"{item_name}: {value}")
+
+    with st.container(border=True, height=300):
+        for selected_step, selected_steps_info in selected_steps_info.items():
+            # Display each selected row's data.
+            with st.expander(f"Details for step {selected_step}"):
+                for item, value in selected_steps_info.items():
+                    item_name = item.replace("_", " ").capitalize()
+                    if isinstance(value, list):
+                        list_html = (
+                            f"<details><summary> {item_name} ({len(value)}) </summary><ol>"
+                            + "".join([f"<li>{sub_value}</li>" for sub_value in value])
+                            + "</ol></details>"
+                        )
+                        st.markdown(list_html, unsafe_allow_html=True)
+                    else:
+                        st.text(f"{item_name}: {value}")
 else:
     st.markdown(":grey[No rows selected for more details.]")
 
 # Button to add selected steps to the Operations list.
-if st.button("Add selected steps to the _Operations list_", type="primary"):
+if st.button("Add selected steps to the Operations list", type="primary"):
     if df_selected is None:
         st.error("No rows selected in table. Please select at least one dataset")
         st.stop()
@@ -208,65 +210,66 @@ with st.container(border=True):
     if st.session_state.selected_steps:
         for index, step in enumerate(st.session_state.selected_steps):
             # Define the layout of the list.
-            cols = st.columns(spec=[0.5, 3, 1, 1, 1, 1])
+            # cols = st.columns(spec=[0.5, 3, 1, 1, 1, 1])
+            col1, col2 = st.columns([2.5, 4])
+
+            with col1:
+                with st.container(height=40, border=False):
+                    # with col1:
+                    if step in st.session_state.selected_steps_table:
+                        st.markdown(f"**{step.replace('data://', '')}**")
+                    else:
+                        st.markdown(f"{step.replace('data://', '')}")
+            with col2:
+                with st_horizontal(justify_content="space-between"):
+                    actions = [
+                        (
+                            "Add direct dependencies",
+                            "direct_dependencies",
+                            "Add direct dependencies of this step to the **Operations list**. Direct dependencies are steps that are loaded directly by the current step.",
+                        ),
+                        (
+                            "Add all dependencies",
+                            "all_active_dependencies",
+                            "Add all dependencies (including indirect dependencies) of this step to the **Operations list**. Indirect dependencies are steps that are needed, but not directly loaded, by the current step. In other words: dependencies of dependencies.",
+                        ),
+                        (
+                            "Add direct usages",
+                            "direct_usages",
+                            "Add direct usages of this step to the **Operations list**. Direct usages are those steps that load the current step directly.",
+                        ),
+                        (
+                            "Add all usages",
+                            "all_active_usages",
+                            "Add all usages (including indirect usages) of this step to the **Operations list**. Indirect usages are those steps that need, but do not directly load, the current step. In other words: usages of usages.",
+                        ),
+                    ]
+                    unique_key = f"remove_{step}_{index}"
+                    st.button(
+                        label="🗑️",
+                        key=unique_key,
+                        on_click=lambda step=step: remove_step(step),
+                        help="Remove this step from the **Operations list**.",
+                        type="secondary",
+                    )
+                    # Display the operations list.
+                    for action_name, key_suffix, help_text in actions:
+                        # Create a unique key for the button (if any button is to be created).
+                        unique_key = f"{key_suffix}_{step}_{index}"
+                        # Add related steps
+                        st.button(
+                            label=f":blue[{action_name}]",
+                            key=unique_key,
+                            on_click=lambda step=step, key_suffix=key_suffix: include_related_steps(step, key_suffix),
+                            help=help_text,
+                            type="tertiary",
+                        )
 
             # Define the columns in order (from left to right) as a list of tuples (message, key suffix, function).
-            actions = [
-                ("🗑️", "remove", "Remove this step from the _Operations list_."),
-                (None, "write", ""),
-                (
-                    "Add direct dependencies",
-                    "direct_dependencies",
-                    "Add direct dependencies of this step to the _Operations list_. Direct dependencies are steps that are loaded directly by the current step.",
-                ),
-                (
-                    "Add all dependencies",
-                    "all_active_dependencies",
-                    "Add all dependencies (including indirect dependencies) of this step to the _Operations list_. Indirect dependencies are steps that are needed, but not directly loaded, by the current step. In other words: dependencies of dependencies.",
-                ),
-                (
-                    "Add direct usages",
-                    "direct_usages",
-                    "Add direct usages of this step to the _Operations list_. Direct usages are those steps that load the current step directly.",
-                ),
-                (
-                    "Add all usages",
-                    "all_active_usages",
-                    "Add all usages (including indirect usages) of this step to the _Operations list_. Indirect usages are those steps that need, but do not directly load, the current step. In other words: usages of usages.",
-                ),
-            ]
 
             # TODO: Consider adding step buttons to:
             #  * Execute ETL step for only the current step.
             #  * Edit metadata for the current step.
-
-            # Display the operations list.
-            for (action_name, key_suffix, help_text), col in zip(actions, cols):
-                # Create a unique key for the button (if any button is to be created).
-                unique_key = f"{key_suffix}_{step}_{index}"
-                # Write step URI
-                if key_suffix == "write":
-                    if step in st.session_state.selected_steps_table:
-                        col.markdown(f"**{step}**")
-                    else:
-                        col.markdown(step)
-                # Remove step
-                elif key_suffix == "remove":
-                    col.button(
-                        label=action_name,
-                        key=unique_key,
-                        on_click=lambda step=step: remove_step(step),
-                        help=help_text,
-                        type="tertiary",
-                    )
-                # Add related steps
-                else:
-                    col.button(
-                        label=action_name,
-                        key=unique_key,
-                        on_click=lambda step=step, key_suffix=key_suffix: include_related_steps(step, key_suffix),
-                        help=help_text,
-                    )
 
         def remove_non_updateable_steps():
             # Remove steps that cannot be updated (because update_period_days is set to 0).
@@ -297,26 +300,26 @@ with st.container(border=True):
         with st_horizontal():
             # Add button to clear the operations list.
             st.button(
-                ":blue[:material/clear_all: Clear list]",
-                help="Remove all steps currently in the _Operations list_.",
-                type="tertiary",
+                ":primary[:material/clear_all: Clear list]",
+                help="Remove all steps currently in the **Operations list**.",
+                # type="tertiary",
                 key="clear_operations_list",
                 on_click=lambda: st.session_state.selected_steps.clear(),
             )
 
             st.button(
-                ":blue[:material/delete_outline: Remove non-updateable (e.g. population)]",
+                ":primary[:material/delete_outline: Remove non-updateable (e.g. population)]",
                 help="Remove steps that cannot be updated (i.e. with `update_period_days=0`), and other auxiliary datasets, namely: "
                 + "\n- ".join(sorted(NON_UPDATEABLE_IDENTIFIERS)),
-                type="tertiary",
+                # type="tertiary",
                 key="remove_non_updateable",
                 on_click=remove_non_updateable_steps,
             )
 
             st.button(
-                ":blue[:material/autorenew: Replace steps with their latest versions]",
-                help="Replace steps in the _Operations list_ by their latest version available. You may want to use this button after updating steps, to be able to operate on the newly created steps.",
-                type="tertiary",
+                ":primary[:material/system_update_alt: Replace steps with their latest versions]",
+                help="Replace steps in the **Operations list** by their latest version available. You may want to use this button after updating steps, to be able to operate on the newly created steps.",
+                # type="tertiary",
                 key="replace_with_latest",
                 on_click=upgrade_steps_in_operations_list,
             )
@@ -330,12 +333,14 @@ with st.container(border=True):
 ########################################
 
 if st.session_state.selected_steps:
+    cols = st.columns(3, border=True)
     ####################################################################################################################
     # UPDATE STEPS
     ####################################################################################################################
     # Add an expander menu with additional parameters for the update command.
-    with st.container(border=True):
-        with st.expander("Additional parameters to update steps", expanded=False):
+    # with st.container(border=True):
+    with cols[0]:
+        with st.popover("More settings", icon=":material/settings:"):
             dry_run_update = st.toggle(
                 "Dry run",
                 True,
@@ -345,7 +350,7 @@ if st.session_state.selected_steps:
 
         btn_submit = st.button(
             f"Update {len(st.session_state.selected_steps)} steps",
-            help="Update all steps in the _Operations list_.",
+            help="Update all steps in the **Operations list**.",
             type="primary",
             use_container_width=True,
         )
@@ -384,8 +389,9 @@ if st.session_state.selected_steps:
     # EXECUTE SNAPSHOTS AND ETL STEPS
     ####################################################################################################################
     # Add an expander menu with additional parameters for the ETL command.
-    with st.container(border=True):
-        with st.expander("Additional parameters to run snapshots and ETL steps", expanded=False):
+    # with st.container(border=True):
+    with cols[1]:
+        with st.popover("More settings", icon=":material/settings:"):
             dry_run_etl = st.toggle(
                 "Dry run",
                 True,
@@ -399,12 +405,12 @@ if st.session_state.selected_steps:
             run_snapshots = st.toggle(
                 "Run snapshot scripts",
                 False,
-                help="If checked, run snapshot scripts (if any in the _Operations list_).",
+                help="If checked, run snapshot scripts (if any in the **Operations list**).",
             )
             run_grapher = st.toggle(
                 "Run grapher steps",
                 False,
-                help="If checked, run grapher steps with --grapher (if any in the _Operations list_).",
+                help="If checked, run grapher steps with --grapher (if any in the **Operations list**).",
             )
 
         def define_command_to_execute_snapshots_and_etl_steps(
@@ -454,7 +460,7 @@ if st.session_state.selected_steps:
 
         btn_etl_run = st.button(
             "Run all ETL steps",
-            help="Run ETL on all data steps in the _Operations list_ (and optionally also execute snapshots).",
+            help="Run ETL on all data steps in the **Operations list** (and optionally also execute snapshots).",
             type="primary",
             use_container_width=True,
         )
@@ -487,8 +493,9 @@ if st.session_state.selected_steps:
     # ARCHIVE STEPS
     ####################################################################################################################
     # Add an expander menu with additional parameters for the ETL command.
-    with st.container(border=True):
-        with st.expander("Additional parameters to archive steps", expanded=False):
+    # with st.container(border=True):
+    with cols[2]:
+        with st.popover("More settings", icon=":material/settings:"):
             dry_run_archive = st.toggle(
                 "Dry run",
                 True,
@@ -502,7 +509,7 @@ if st.session_state.selected_steps:
 
         btn_archive = st.button(
             "Archive steps (when possible)",
-            help="Move archivable steps in the _Operations list_ to their corresponding archive dag.",
+            help="Move archivable steps in the **Operations list** to their corresponding archive dag.",
             type="primary",
             use_container_width=True,
         )
