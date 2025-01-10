@@ -4,6 +4,73 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
+  vaccine_name: |-
+    <% if description == "Seasonal Influenza vaccine" %>
+    seasonal influenza vaccine
+    <%- elif description == "IPV (Inactivated polio vaccine)" %>
+    inactivated polio vaccine (IPV)
+    <%- elif description == "Measles-containing vaccine 2nd dose" %>
+    measles-containing vaccine 2nd dose (MCV2)
+    <%- elif description == "YF (Yellow fever) vaccine" %>
+    yellow fever vaccine (YFV)
+    <%- elif description == "Mumps vaccine" %>
+    mumps vaccine
+    <%- elif description == "Rubella vaccine" %>
+    rubella vaccine
+    <%- elif description == "Hepatitis B vaccine" %>
+    hepatitis B vaccine
+    <%- elif description == "Hib (Haemophilus influenzae type B) vaccine" %>
+    Haemophilus influenzae type B vaccine (Hib)
+    <%- elif description == "HepB birth dose" %>
+    hepatitis B birth dose (HEPB_BD)
+    <%- elif description == "IPV (Inactivated polio vaccine) 2nd dose" %>
+    inactivated polio vaccine 2nd dose (IPV2)
+    <%- elif description == "Meningococcal meningitis vaccines (all strains)" %>
+    meningococcal meningitis vaccines (all strains)
+    <%- elif description == "PPV (Pneumococcal polysaccharide vaccine)" %>
+    pneumococcal polysaccharide vaccine (PPV)
+    <%- elif description == "PCV (Pneumococcal conjugate vaccine)" %>
+    pneumococcal conjugate vaccine (PCV)
+    <%- elif description == "Japanese Encephalitis" %>
+    Japanese encephalitis vaccine
+    <%- elif description == "Varicella vaccine" %>
+    chickenpox vaccine (Varicella) vaccine
+    <%- elif description == "aP (acellular pertussis) vaccine" %>
+    pertussis vaccine (aP)
+    <%- elif description == "Hepatitis A vaccine" %>
+    hepatitis A vaccine
+    <%- elif description == "Typhoid" %>
+    typhoid vaccine
+    <%- elif description == "HPV (Human Papilloma Virus) vaccine" %>
+    human papilloma virus vaccine (HPV)
+    <%- elif description == "Rotavirus vaccine'" %>
+    rotavirus vaccine
+    <%- elif description == "Malaria vaccine" %>
+    malaria vaccine
+    <%- endif %>
+  vaccine_description_key: |-
+    <% if description == "Seasonal Influenza vaccine" %>
+    <%- elif description == "IPV (Inactivated polio vaccine)" %>
+    <%- elif description == "Measles-containing vaccine 2nd dose" %>
+    <%- elif description == "YF (Yellow fever) vaccine" %>
+    <%- elif description == "Mumps vaccine" %>
+    <%- elif description == "Rubella vaccine" %>
+    <%- elif description == "Hepatitis B vaccine" %>
+    <%- elif description == "Hib (Haemophilus influenzae type B) vaccine" %>
+    <%- elif description == "HepB birth dose" %>
+    <%- elif description == "IPV (Inactivated polio vaccine) 2nd dose" %>
+    <%- elif description == "Meningococcal meningitis vaccines (all strains)" %>
+    <%- elif description == "PPV (Pneumococcal polysaccharide vaccine)" %>
+    <%- elif description == "PCV (Pneumococcal conjugate vaccine)" %>
+    <%- elif description == "Japanese Encephalitis" %>
+    <%- elif description == "Varicella vaccine" %>
+    <%- elif description == "aP (acellular pertussis) vaccine" %>
+    <%- elif description == "Hepatitis A vaccine" %>
+    <%- elif description == "Typhoid" %>
+    <%- elif description == "HPV (Human Papilloma Virus) vaccine" %>
+    <%- elif description == "Rotavirus vaccine'" %>
+    <%- elif description == "Malaria vaccine" %>
+    <%- endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -14,6 +81,8 @@ tables:
   vaccination_schedules:
     variables:
       intro:
-        title: Vaccination schedule for the <<description.lower()>>
-        description_short: The introduction status of <<description.lower()>> vaccination schedule.
+        title: Vaccination schedule for the {definitions.vaccine_name}
+        description_short: The introduction status of {definitions.vaccine_name} vaccination schedule.
         unit: ""
+        description_key:
+          - "{definitions.antigen_description_key}"
