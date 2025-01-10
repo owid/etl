@@ -87,10 +87,11 @@ def make_agrid(steps_df_display):
     grid_response = AgGrid(
         data=steps_df_display,
         gridOptions=grid_options,
-        height=1000,
-        width="100%",
+        # height=1000,
+        # height="100%",
+        # width="100%",
         update_mode=GridUpdateMode.MODEL_CHANGED,
-        fit_columns_on_grid_load=False,
+        # fit_columns_on_grid_load=False,
         allow_unsafe_jscode=True,
         theme="streamlit",
         # The following ensures that the pagination controls are not cropped.
@@ -106,11 +107,18 @@ def make_agrid(steps_df_display):
 
 def make_grid_options(steps_df_display):
     # Initial build
-    gb = GridOptionsBuilder.from_dataframe(steps_df_display)
+    gb = GridOptionsBuilder.from_dataframe(
+        dataframe=steps_df_display,
+        editable=False,
+        groupable=True,
+        sortable=True,
+        filterable=True,
+        resizable=True,
+    )
 
     # General settings
     gb.configure_grid_options(
-        domLayout="autoHeight",
+        # domLayout="autoHeight",
         enableCellTextSelection=True,
     )
     gb.configure_selection(
@@ -121,19 +129,22 @@ def make_grid_options(steps_df_display):
         groupSelectsChildren=True,
         groupSelectsFiltered=True,
     )
-    gb.configure_default_column(
-        editable=False,
-        groupable=True,
-        sortable=True,
-        filterable=True,
-        resizable=True,
-    )
+    # gb.configure_side_bar(
+    #     filters_panel=True,
+    #     columns_panel=True,
+    # )
 
     # Configure columns
     gb = _config_grid_columns(gb)
 
     # Pagination settings
-    gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=20)
+    gb.configure_pagination(
+        paginationAutoPageSize=False,
+        # paginationPageSize=20,
+    )
+
+    # Auto-height
+    gb.configure_auto_height()
 
     # Build
     grid_options = gb.build()
@@ -144,46 +155,53 @@ def make_grid_options(steps_df_display):
 def _config_grid_columns(gb):
     """Grid configuration"""
     # Column settings
-    gb.configure_column(
+    _config_column(
+        gb,
         field="step",
-        headerName="Step",
         width=500,
         headerTooltip="Step URI, as it appears in the ETL DAG.",
+        filter="agTextColumnFilter",
     )
     gb.configure_column(
         field="channel",
         headerName="Channel",
         width=120,
         headerTooltip="Channel of the step (e.g. garden or grapher).",
+        filter="agTextColumnFilter",
     )
-    gb.configure_column(
+    _config_column(
+        gb,
         field="namespace",
-        headerName="Namespace",
         width=150,
         headerTooltip="Namespace of the step.",
+        filter="agTextColumnFilter",
     )
-    gb.configure_column(
+    _config_column(
+        gb,
         field="version",
-        headerName="Version",
         width=120,
         headerTooltip="Version of the step.",
+        filter="agTextColumnFilter",
     )
-    gb.configure_column(
+    _config_column(
+        gb,
         field="name",
         headerName="Step name",
         width=140,
         headerTooltip="Short name of the step.",
     )
-    gb.configure_column(
+    _config_column(
+        gb,
         field="kind",
-        headerName="Kind",
         width=100,
         headerTooltip="Kind of step (i.e. public or private).",
     )
-    gb.configure_column(
+    _config_column(
+        gb,
         field="n_charts",
         headerName="N. charts",
         width=120,
+        text_filter=False,
         headerTooltip="Number of charts that use data from the step.",
     )
     # gb.configure_column(
@@ -192,71 +210,99 @@ def _config_grid_columns(gb):
     #     width=140,
     #     headerTooltip="Number of views of charts that use data from the step in the last 7 days.",
     # )
-    gb.configure_column(
+    _config_column(
+        gb,
         field="n_chart_views_365d",
         headerName="365-day views",
+        text_filter=False,
         width=140,
         headerTooltip="Number of views of charts that use data from the step in the last 365 days.",
     )
-    gb.configure_column(
-        "date_of_next_update",
+    _config_column(
+        gb,
+        field="date_of_next_update",
         headerName="Next update",
+        text_filter=False,
         width=140,
         headerTooltip="Date of the next expected OWID update of the step.",
     )
-    gb.configure_column(
-        "update_period_days",
+    _config_column(
+        gb,
+        field="update_period_days",
         headerName="Update period",
+        text_filter=False,
         width=150,
         headerTooltip="Number of days between consecutive OWID updates of the step.",
     )
-    gb.configure_column(
-        "dag_file_name",
+    _config_column(
+        gb,
+        field="dag_file_name",
         headerName="Name of DAG file",
         width=160,
         headerTooltip="Name of the DAG file that defines the step.",
     )
-    gb.configure_column(
-        "full_path_to_script",
+    _config_column(
+        gb,
+        field="full_path_to_script",
         headerName="Path to script",
         width=150,
         headerTooltip="Path to the script that creates the ETL snapshot or dataset of this step.",
     )
-    gb.configure_column(
-        "dag_file_path",
+    _config_column(
+        gb,
+        field="dag_file_path",
         headerName="Path to DAG file",
         width=160,
         headerTooltip="Path to the DAG file that defines the step.",
     )
-    gb.configure_column(
-        "n_versions",
+    _config_column(
+        gb,
+        field="n_versions",
         headerName="N. versions",
         width=140,
         headerTooltip="Number of (active or archive) versions of the step.",
     )
     # Create a column with the number of days until the next expected update, colored according to its value.
-    gb.configure_columns(
-        "days_to_update",
+    _config_column(
+        gb,
+        field="days_to_update",
         cellStyle=JSCODE_UPDATE_DAYS,
-        headerName="Days to update",
         width=120,
         headerTooltip="Number of days until the next expected OWID update of the step (if negative, an update is due).",
     )
 
     # Create a column colored depending on the update state.
-    gb.configure_columns(
-        "update_state",
-        headerName="Update state",
+    _config_column(
+        gb,
+        field="update_state",
         cellStyle=JSCODE_UPDATE_STATE,
         width=150,
         headerTooltip=f'Update state of the step: "{UpdateState.UP_TO_DATE.value}" (up to date), "{UpdateState.MINOR_UPDATE.value}" (a dependency is outdated, but all origins are up to date), "{UpdateState.MAJOR_UPDATE.value}" (an origin is outdated), "{UpdateState.OUTDATED.value}" (there is a newer version of the step), "{UpdateState.ARCHIVABLE.value}" (the step is outdated and not used in charts, therefore can safely be archived).',
     )
     ## Create a column with grapher dataset names that are clickable and open in a new tab.
-    gb.configure_column(
-        "db_dataset_name_and_url",  # This will be the displayed column
+    _config_column(
+        gb,
+        field="db_dataset_name_and_url",  # This will be the displayed column
         headerName="Grapher dataset",
         cellRenderer=JSCODE_DATASET_GRAPHER,
         headerTooltip="Name of the grapher dataset (if any), linked to its corresponding dataset admin page.",
     )
+
+    return gb
+
+
+def _config_column(gb, field: str, text_filter: bool = True, **kwargs):
+    if "headerName" not in kwargs:
+        kwargs["headerName"] = field.replace("_", " ").capitalize()
+
+    params = {
+        "field": field,
+        **kwargs,
+    }
+    if text_filter:
+        params["filter"] = "agTextColumnFilter"
+
+    # Build column
+    gb.configure_column(**params)
 
     return gb

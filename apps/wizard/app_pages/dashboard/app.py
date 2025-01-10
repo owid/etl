@@ -98,6 +98,7 @@ with st.spinner("Loading steps details from ETL and DB..."):
 steps_df_display = load_steps_df_to_display(show_all_channels, reload_key=st.session_state["reload_key"])
 
 # Build and display the grid table with pagination.
+# st.write(steps_df_display.dtypes)
 grid_response = make_agrid(steps_df_display)
 
 ########################################
@@ -127,8 +128,9 @@ def _add_steps_to_operations(steps_related):
 
 
 st.markdown("### Details list")
-if grid_response["selected_rows"]:
-    selected_steps = [row["step"] for row in grid_response["selected_rows"]]
+df_selected = grid_response["selected_rows"]
+if df_selected is not None:
+    selected_steps = df_selected["step"].tolist()
     selected_steps_info = (
         steps_df[steps_df["step"].isin(selected_steps)][
             [
@@ -160,7 +162,10 @@ else:
 
 # Button to add selected steps to the Operations list.
 if st.button("Add selected steps to the _Operations list_", type="primary"):
-    new_selected_steps = [row["step"] for row in grid_response["selected_rows"]]
+    if df_selected is None:
+        st.error("No rows selected in table. Please select at least one dataset")
+        st.stop()
+    new_selected_steps = df_selected["step"].tolist()
     st.session_state.selected_steps_table += new_selected_steps
     _add_steps_to_operations(new_selected_steps)
 
