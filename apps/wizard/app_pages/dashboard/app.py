@@ -9,6 +9,7 @@ from apps.wizard.app_pages.dashboard.operations import render_operations_list
 from apps.wizard.app_pages.dashboard.preview import render_preview_list
 from apps.wizard.app_pages.dashboard.utils import (
     _create_html_button,
+    _get_steps_info,
     check_db,
     load_steps_df,
     load_steps_df_to_display,
@@ -84,6 +85,8 @@ show_all_channels = not st.toggle("Select only grapher and explorer steps", True
 with st.spinner("Loading steps details from ETL and DB..."):
     steps_df = load_steps_df(reload_key=st.session_state["reload_key"])
 
+# Simplify the steps dataframe to show only the relevant columns.
+steps_info = _get_steps_info(steps_df)
 
 ########################################
 # Display STEPS TABLE
@@ -103,8 +106,7 @@ grid_response = make_agrid(steps_df_display)
 ########################################
 
 
-df_selected = grid_response["selected_rows"]
-render_preview_list(df_selected, steps_df)
+# render_preview_list(df_selected, steps_df)
 
 
 ########################################
@@ -113,7 +115,7 @@ render_preview_list(df_selected, steps_df)
 # Add steps based on user selections.
 # User can add from checking in the steps table, but also there are some options to add dependencies, usages, etc.
 ########################################
-# Header
+df_selected = grid_response["selected_rows"]
 render_operations_list(df_selected, steps_df)
 
 

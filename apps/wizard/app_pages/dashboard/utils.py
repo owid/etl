@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Dict, List
 
 import pandas as pd
 import streamlit as st
@@ -211,3 +211,51 @@ def remove_step(step: str):
     st.session_state.selected_steps.remove(step)
     if step in st.session_state.selected_steps_table:
         st.session_state.selected_steps_table.remove(step)
+
+
+def _get_selected_steps_info(df, steps_df) -> Dict[str, Any]:
+    """From given list of selected steps, get details for each step.
+
+    df: DataFrame with selected steps. It is usually the grid_response["selected_rows"].
+    steps_df: DataFrame with all steps. Output of load_steps_df.
+    """
+    # Get list of selected steps
+    selected_steps = df["step"].tolist()
+    # Get details for selected steps
+    selected_steps_info = (
+        steps_df[steps_df["step"].isin(selected_steps)][
+            [
+                "step",
+                "all_active_dependencies",
+                "all_active_usages",
+                "updateable_dependencies",
+            ]
+        ]
+        .set_index("step")
+        .to_dict(orient="index")
+    )
+    return selected_steps_info
+
+
+@st.cache_data
+def _get_steps_info(steps_df) -> Dict[str, Any]:
+    """From given list of selected steps, get details for each step.
+
+    df: DataFrame with selected steps. It is usually the grid_response["selected_rows"].
+    steps_df: DataFrame with all steps. Output of load_steps_df.
+    """
+    # Get list of selected steps
+    # Get details for selected steps
+    selected_steps_info = (
+        steps_df[
+            [
+                "step",
+                "all_active_dependencies",
+                "all_active_usages",
+                "updateable_dependencies",
+            ]
+        ]
+        .set_index("step")
+        .to_dict(orient="index")
+    )
+    return selected_steps_info

@@ -4,7 +4,6 @@ import pandas as pd
 import streamlit as st
 from structlog import get_logger
 
-from apps.wizard.app_pages.dashboard.preview import _get_selected_steps_info, _render_step_in_list
 from apps.wizard.app_pages.dashboard.utils import NON_UPDATEABLE_IDENTIFIERS, _add_steps_to_operations, remove_step
 from apps.wizard.utils.components import st_horizontal
 
@@ -28,10 +27,10 @@ def render_operations_list(df: Optional[pd.DataFrame], steps_df: pd.DataFrame):
         return
 
     # Get details of selected steps
-    selected_steps_info = _get_selected_steps_info(df, steps_df)
-
-    st.write(selected_steps_info)
-    st.write(st.session_state.selected_steps)
+    # st.session_state.selected_steps = list(selected_steps_info.keys())
+    # st.write(selected_steps_info)
+    # st.write(st.session_state.selected_steps)
+    # st.write(selected_steps)
 
     # Show the actual "operations list"
     with st.container(border=True):
@@ -40,7 +39,8 @@ def render_operations_list(df: Optional[pd.DataFrame], steps_df: pd.DataFrame):
         if st.session_state.selected_steps:
             for index, step in enumerate(st.session_state.selected_steps):
                 # Define the layout of the list.
-                _show_row_with_step_details(steps_df, step, index)
+                selected_step_info = selected_steps_info[step]
+                _show_row_with_step_details(steps_df, step, index, selected_step_info)
 
             # Show main buttons in the operations list
             _show_main_operations_buttons(steps_df)
@@ -49,7 +49,7 @@ def render_operations_list(df: Optional[pd.DataFrame], steps_df: pd.DataFrame):
             st.markdown(":grey[_No rows selected for operation..._]")
 
 
-def _show_row_with_step_details(steps_df, step, index):
+def _show_row_with_step_details(steps_df, step, index, step_info):
     """Show row in the operations list with the details of the given step.
 
     # Define the columns in order (from left to right) as a list of tuples (message, key suffix, function).
@@ -67,8 +67,8 @@ def _show_row_with_step_details(steps_df, step, index):
             else:
                 text = f"**{step.replace('data://', '')}**"
             with st.popover(text, use_container_width=True):
-                # _render_step_in_list(selected_steps_info)
-                pass
+                _show_step_details(step_info)
+
     with col2:
         with st_horizontal(justify_content="space-between"):
             actions = [
@@ -195,3 +195,16 @@ def _upgrade_steps_in_operations_list(steps_df):
             new_list.append(step)
 
     st.session_state.selected_steps = new_list
+
+
+def _show_step_details(selected_step_info):
+    """Show the various details of the selected step in a list."""
+    # Display each selected row's data.
+    for item, value in selected_step_info.items():
+        item_name = item.replace("_", " ").capitalize()
+        if isinstance(value, list):
+            text = f"**{item_name} ({len(value)})**\n"
+            items = "\n".join([f"- {sub_value}" for sub_value in value])
+            st.markdown(text + items)
+        else:
+            st.text(f"{item_name}: {value}")
