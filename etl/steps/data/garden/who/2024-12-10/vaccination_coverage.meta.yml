@@ -55,6 +55,10 @@ definitions:
   number_description: |-
     <% if antigen == "DTPCV1" %>
     one dose of combined diphtheria, tetanus toxoid and pertussis- containing vaccine (DTP1)
+    <%- elif antigen == "BCG" %>
+    one dose of the Bacille Calmette-Guérin (BCG) vaccine
+    <%- elif antigen == "HEPB_BD" %>
+    a hepatitis B vaccine dose within the first 24 hours of delivery (HEPB_BD)
     <%- elif antigen == "DTPCV3" %>
     three doses of combined diphtheria, tetanus toxoid and pertussis- containing vaccine (DTP3)
     <%- elif antigen == "MCV1" %>
