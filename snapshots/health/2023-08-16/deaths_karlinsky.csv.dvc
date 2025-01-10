@@ -2,11 +2,9 @@ meta:
   name: International Completeness of Death Registration 2015-2019 (Karlinsky, 2023)
   publication_year: 2023
   source_name: Karlinsky (2023)
-  source_published_by: A. Karlinsky (2023). International Completeness of Death Registration
-    2015-2019. GitHub. https://github.com/akarlinsky/death_registration
+  source_published_by: A. Karlinsky (2023). International Completeness of Death Registration 2015-2019. GitHub. https://github.com/akarlinsky/death_registration
   url: https://github.com/akarlinsky/death_registration
-  source_data_url: 
-    https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv
+  source_data_url: https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv
   license_url: https://creativecommons.org/licenses/by/4.0/
   license_name: CC BY 4.0
   date_accessed: 2023-08-16
@@ -40,6 +38,6 @@ meta:
 
 wdir: ../../../data/snapshots/health/2023-08-16
 outs:
-- md5: 9c927dd9a691cec127149c3e0ade656f
-  size: 60431
-  path: deaths_karlinsky.csv
+  - md5: c57e02b53008fb359f2099fc07216fa5
+    size: 62229
+    path: deaths_karlinsky.csv
