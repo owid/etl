@@ -163,7 +163,7 @@ class Snapshot:
             meta = ruamel_load(f)
 
         # If the file already exists with the same md5, skip the upload
-        if meta["outs"] and meta["outs"][0]["md5"] == md5:
+        if "outs" in meta and meta["outs"][0]["md5"] == md5:
             log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
             return
 
