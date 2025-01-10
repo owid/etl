@@ -11,6 +11,7 @@ All results are stored in the accompanying file: snapshot_execution_times.json
 """
 
 import base64
+import datetime as dt
 import hashlib
 import json
 import subprocess
@@ -27,6 +28,7 @@ from tqdm.auto import tqdm
 
 from etl.config import GITHUB_API_BASE, GITHUB_TOKEN
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR
+from etl.snapshot import Snapshot
 from etl.steps import load_dag
 
 log = get_logger()
@@ -274,9 +276,16 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int, skip: bool):
             else:
                 execution_results[snapshot]["identical"] = False
 
+            # If the snapshot is different, update origin.date_accessed
+            if not execution_results[snapshot]["identical"]:
+                for f in dvc_files:
+                    snap = Snapshot(str(dvc_files[0].relative_to(SNAPSHOTS_DIR)).replace(".dvc", ""))
+                    if snap.m.origin:
+                        snap.update_metadata_file({"meta": {"origin": {"date_accessed": str(dt.date.today())}}})
+
             # Add duration time for successfully executed snapshot.
             duration = time.time() - start_time
-            execution_results[snapshot]["duration"] = duration
+            execution_results[snapshot]["duration"] = round(duration, 3)
 
             # If MD5 has changed, create a PR.
             if not execution_results[snapshot]["identical"]:

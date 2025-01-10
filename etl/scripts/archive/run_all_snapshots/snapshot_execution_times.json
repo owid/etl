@@ -220,5 +220,71 @@
         "status": "SUCCESS",
         "identical": true,
         "duration": 4.277403354644775
+    },
+    "hyde/2017/general_files.py": {
+        "status": "FAILED"
+    },
+    "education/2023-08-09/years_of_education_gini.py": {
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 3.4377169609069824
+    },
+    "demography/2024-11-26/multiple_births.py": {
+        "status": "FAILED"
+    },
+    "tuberculosis/2023-12-04/burden_disaggregated.py": {
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 3.39530086517334
+    },
+    "emissions/2023-10-10/net_zero_tracker.py": {
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 2.6063270568847656
+    },
+    "ggdc/2020-10-01/ggdc_maddison.py": {
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 3.7497971057891846
+    },
+    "wash/2024-02-15/bathing_water.py": {
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 3.7045130729675293
+    },
+    "hyde/2024-01-02/all_indicators.py": {
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 24.960139751434326
+    },
+    "education/2023-08-09/numeracy.py": {
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 3.1042380332946777
+    },
+    "health/2023-04-18/wgm_mental_health.py": {
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 3.4681031703948975
+    },
+    "statins/2023-10-05/bmj_2022.py": {
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 3.544543981552124
+    },
+    "education/2023-08-09/numeracy_gender.py": {
+        "status": "SUCCESS",
+        "identical": false,
+        "duration": 3.1787750720977783
+    },
+    "war/2023-09-21/war_brecke.py": {
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 4.0321691036224365
+    },
+    "countries/2023-12-27/world_bank.py": {
+        "status": "SUCCESS",
+        "identical": true,
+        "duration": 4.525876998901367
     }
 }

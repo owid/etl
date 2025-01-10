@@ -158,12 +158,8 @@ class Snapshot:
         # Calculate md5
         md5 = checksum_file(self.path)
 
-        # Get metadata file
-        with open(self.metadata_path, "r") as f:
-            meta = ruamel_load(f)
-
         # If the file already exists with the same md5, skip the upload
-        if "outs" in meta and meta["outs"][0]["md5"] == md5:
+        if self.metadata.outs and self.metadata.outs[0]["md5"] == md5:
             log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
             return
 
@@ -172,7 +168,23 @@ class Snapshot:
         assert self.metadata.is_public is not None
         s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
 
-        meta["outs"] = [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]
+        self.update_metadata_file({"outs": [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]})
+
+    def update_metadata_file(self, d: dict[str, Any]) -> None:
+        """Update metadata YAML file with given dictionary."""
+        with open(self.metadata_path, "r") as f:
+            meta = ruamel_load(f)
+
+        # TODO: this is ugly, we should make it more generic, but that would require rewriting ruamel
+        update_meta = d.pop("meta", {})
+        update_meta_origin = update_meta.pop("origin", {})
+
+        if update_meta_origin:
+            meta["meta"]["origin"].update(update_meta_origin)
+        if update_meta:
+            meta["meta"].update(update_meta)
+
+        meta.update(d)
 
         with open(self.metadata_path, "w") as f:
             f.write(ruamel_dump(meta))

@@ -17,7 +17,7 @@ meta:
     # Files
     url_main: https://www.who.int/teams/global-tuberculosis-programme/data
     url_download: https://extranet.who.int/tme/generateCSV.asp?ds=estimates_age_sex
-    date_accessed: 2023-12-04
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -26,6 +26,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-12-04
 outs:
-  - md5: b83fcce0fe2a54a64e7ac6098ba3c7d0
-    size: 560909
+  - md5: 90f1cec6fb18fb8cfa58fa8a495331bb
+    size: 471368
     path: burden_disaggregated.csv
