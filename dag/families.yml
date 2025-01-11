@@ -30,3 +30,10 @@ steps:
     - data://meadow/un/2025-01-14/married_women
   data://grapher/un/2025-01-14/married_women:
     - data://garden/un/2025-01-14/married_women
+
+  data://meadow/oecd/2025-01-11/mean_age_at_marriage:
+    - snapshot://oecd/2025-01-11/mean_age_at_marriage.xls
+  data://garden/oecd/2025-01-11/mean_age_at_marriage:
+    - data://meadow/oecd/2025-01-11/mean_age_at_marriage
+  data://grapher/oecd/2025-01-11/mean_age_at_marriage:
+    - data://garden/oecd/2025-01-11/mean_age_at_marriage
