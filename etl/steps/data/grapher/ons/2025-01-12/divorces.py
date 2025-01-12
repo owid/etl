@@ -14,7 +14,11 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("divorces")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("divorces", reset_index=False)
+    tb = ds_garden.read("divorces", reset_index=True)
+
+    tb = tb.rename(columns={"year": "year_of_marriage", "anniversary_year": "year"})
+
+    tb = tb.format(["country", "year_of_marriage", "year"])
 
     #
     # Save outputs.

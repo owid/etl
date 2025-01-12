@@ -16,11 +16,11 @@ tables:
   divorces:
     variables:
       cumulative_percentage:
-        title: Cumulative share of divorces at the <<anniversary_year.lower()>> anniversy year of marriage
+        title: Cumulative share of divorces of couples married in << year_of_marriage >> by anniversy year of marriage
         unit: "%"
         short_unit: "%"
         description_short: |-
-          The cumulative percentage of marriages that have ended in divorce by the <<anniversary_year.lower()>> anniversy year of marriage.
+          The cumulative percentage of marriages that have ended in divorce by the anniversy year of marriage.
         description_from_producer: |-
           The decrease in the number of divorces between 2017 and 2018, and the increase between 2018 and 2019 can be partly attributed to a delay in the processing of divorce applications by divorce centres. A backlog of divorce petitions made in 2017 were not processed until 2018, resulting in fewer completed divorces in 2018 and more completed divorces in 2019.
 
@@ -28,3 +28,5 @@ tables:
         processing_level: minor
         display:
           numDecimalPlaces: 1
+          name: << year_of_marriage >>
+
