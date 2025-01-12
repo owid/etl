@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Marriages & Divorces
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  divorces:
+    variables:
+      cumulative_percentage:
+        title: Cumulative share of divorces at the <<anniversary_year.lower()>> anniversy year of marriage
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The cumulative percentage of marriages that have ended in divorce by the <<anniversary_year.lower()>> anniversy year of marriage.
+        description_from_producer: |-
+          The decrease in the number of divorces between 2017 and 2018, and the increase between 2018 and 2019 can be partly attributed to a delay in the processing of divorce applications by divorce centres. A backlog of divorce petitions made in 2017 were not processed until 2018, resulting in fewer completed divorces in 2018 and more completed divorces in 2019.
+
+          Divorces data for 2022 and marriages data for 2020 are the latest data which have been used in the production of this table. Marriages data for 2021 are not currently available and so this table is not complete.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 1
