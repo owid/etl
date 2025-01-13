@@ -24,6 +24,6 @@ meta:
       url: https://www.un.org/en/about-us/terms-of-use
 
 outs:
-  - md5: 31f2c136ffcb48db5160908cdee14821
+  - md5: 4998a88b7307e0cc29446c4aef62443a
     size: 2672
     path: un_sdg_unit.csv

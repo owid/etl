@@ -29,7 +29,7 @@ meta:
     version_producer: v7
     url_main: http://gapm.io/dpop
     url_download: https://gapm.io/dl_popv7
-    date_accessed: 2023-03-31
+    date_accessed: '2025-01-10'
     date_published: 2022-10-19
     attribution: "Gapminder - Population v7 (2022)"
     attribution_short: "Gapminder"
@@ -38,6 +38,6 @@ meta:
       url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing
 wdir: ../../../data/snapshots/gapminder/2023-03-31
 outs:
-- md5: 2ff20af19edba61e69956c2e306e54f7
-  size: 3773746
-  path: population.xlsx
+  - md5: 26ac4aabdfb7ab892789b080ae39e0d2
+    size: 3787343
+    path: population.xlsx

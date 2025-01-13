@@ -20,7 +20,7 @@ meta:
     # Files
     url_main: https://www.who.int/teams/global-tuberculosis-programme/data
     url_download: https://extranet.who.int/tme/generateCSV.asp?ds=unhlm
-    date_accessed: 2023-12-12
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -29,6 +29,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-12-12
 outs:
-  - md5: b4cd70eff8bdff1dd6ce822f96e63e7a
-    size: 17817
+  - md5: 11d970af56410081dbb93b74c4d45a3c
+    size: 21119
     path: unhlm_commitments.csv

@@ -18,7 +18,7 @@ meta:
     # Files
     url_main: https://www.who.int/teams/global-tuberculosis-programme/data
     url_download: https://extranet.who.int/tme/generateCSV.asp?ds=labs
-    date_accessed: 2023-12-06
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -27,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-12-06
 outs:
-  - md5: df1b7fe4744cc5362dd7b5dd0d1b3b28
-    size: 382108
+  - md5: e638d534b15c230a4c285c1312623efb
+    size: 410626
     path: laboratories.csv

@@ -21,12 +21,12 @@ meta:
     # Files
     url_main: https://nhsd-ndrs.shinyapps.io/routes_to_diagnosis/
     url_download: https://nhsd-ndrs.shinyapps.io/routes_to_diagnosis/_w_592045af/session/4b06ebfd4a423f59069f6b657d53fede/download/dataDownloadSurv1?w=592045af
-    date_accessed: 2024-09-13
+    date_accessed: '2025-01-10'
 
     # License
     license:
       name: CC BY 4.0
 outs:
-  - md5: 7bf8e854aa17d7470d5e382e21accf99
-    size: 988932
+  - md5: a9c334cedfb5e9cfa4fbe6e89dfd7f26
+    size: 4452
     path: diagnosis_routes_survival.csv

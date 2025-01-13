@@ -16,12 +16,12 @@ meta:
     attribution_short: YouGov
     url_main: https://yougov.co.uk/topics/society/trackers/dietery-choices-of-brits-eg-vegeterian-flexitarian-meat-eater-etc
     url_download: https://yougov.co.uk/_pubapis/v5/uk/trackers/dietery-choices-of-brits-eg-vegeterian-flexitarian-meat-eater-etc/download/
-    date_accessed: 2024-04-01
+    date_accessed: '2025-01-10'
     license:
       name: Copyright © 2024 YouGov PLC
       url: https://yougov.co.uk/about/terms
 
 outs:
-  - md5: 0c6c04daa40179fe76d305f61f4ae4f0
-    size: 40107
+  - md5: 94e71e7772be4b5230c58d76c0e46646
+    size: 24693
     path: dietary_choices_uk.xlsx

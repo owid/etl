@@ -34,7 +34,7 @@ meta:
     # Files
     url_main: https://dataunodc.un.org/dp-intentional-homicide-victims
     url_download: https://dataunodc.un.org/sites/dataunodc.un.org/files/data_cts_intentional_homicide.xlsx
-    date_accessed: 2024-10-30
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -42,6 +42,6 @@ meta:
       url: https://dataunodc.un.org/termsofuse
 
 outs:
-  - md5: 5e376d6b833ce2c5b09a2a8f104c2a3e
-    size: 5671341
+  - md5: 461999b1ca1c1798719a0f282b772778
+    size: 5779802
     path: unodc.xlsx

@@ -18,7 +18,7 @@ meta:
     # Files
     url_main: https://www.who.int/teams/global-tuberculosis-programme/data
     url_download: https://extranet.who.int/tme/generateCSV.asp?ds=dr_surveillance
-    date_accessed: 2023-12-04
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -27,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-12-04
 outs:
-  - md5: 63549e2ab0f94513c92138e3724ec537
-    size: 170279
+  - md5: ccf45e615678f30f3e852559ac05e727
+    size: 197692
     path: drug_resistance_surveillance.csv

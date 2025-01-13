@@ -17,7 +17,7 @@ meta:
     # Files
     url_main: https://reproducibility.worldbank.org/index.php/catalog/189/
     url_download: https://reproducibility.worldbank.org/index.php/catalog/189/download/552/FR_WLD_2024_198.zip
-    date_accessed: 2024-12-03
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -25,6 +25,6 @@ meta:
       url: https://reproducibility.worldbank.org/index.php/catalog/189/#project_desc_container1674844764972
 
 outs:
-  - md5: 3a942e2ccc863f67d4879250d7468e57
-    size: 91787338
+  - md5: 0b701c024348d19d6592629afbce6145
+    size: 91550017
     path: reproducibility_package_poverty_prosperity_planet.zip
