@@ -68,7 +68,6 @@ def mock_population_load(*args, **kwargs):
     return mock_population
 
 
-@patch.object(geo, "_load_population", mock_population_load)
 class TestAddPopulationToDataframe:
     def test_all_countries_and_years_in_population(self):
         df_in = pd.DataFrame({"country": ["Country 2", "Country 1"], "year": [2019, 2021]})
