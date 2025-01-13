@@ -244,3 +244,11 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/who/2022-07-17/who_vaccination:
     - data://garden/who/2022-07-17/who_vaccination
+
+    # Polio vaccine schedule - to archive
+  data://meadow/who/2024-04-22/polio_vaccine_schedule:
+    - snapshot://who/2024-04-22/polio_vaccine_schedule.xlsx
+  data://garden/who/2024-04-22/polio_vaccine_schedule:
+    - data://meadow/who/2024-04-22/polio_vaccine_schedule
+  data://grapher/who/2024-04-22/polio_vaccine_schedule:
+    - data://garden/who/2024-04-22/polio_vaccine_schedule
