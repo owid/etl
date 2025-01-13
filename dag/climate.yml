@@ -101,7 +101,7 @@ steps:
 
  # Global Wildfire Information System - Monthly burned area. For Data Insight on how the data changed after week of Oct 14, 2024 snapshot.
   data://meadow/climate/2025-01-13/weekly_wildfires_di:
-    - snapshot://climate/latest/weekly_wildfires.csv
+    - snapshot://climate/2025-01-13/weekly_wildfires_di.csv
   data://garden/climate/2025-01-13/weekly_wildfires_di:
     - data://meadow/climate/2025-01-13/weekly_wildfires_di
     - data://garden/regions/2023-01-01/regions

@@ -13,10 +13,8 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot.
     # Load data from Oct 14, 2024 snapshot.
-    snap = Snapshot("climate/latest/weekly_wildfires.csv")
-    snap.metadata.outs[0]["md5"] = "57dcb430e9955011bac4bee57b635138"  # Oct 14, 2024
-    snap.metadata.outs[0]["size"] = 12521342
-    snap.pull()
+    snap = paths.load_snapshot("weekly_wildfires_di.csv")
+
     tb = snap.read()
     #
     # Process data.

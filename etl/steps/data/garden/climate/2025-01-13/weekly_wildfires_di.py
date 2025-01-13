@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("weekly_wildfires_di")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["weekly_wildfires"].reset_index()
+    tb = ds_meadow["weekly_wildfires_di"].reset_index()
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")

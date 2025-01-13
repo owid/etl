@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("weekly_wildfires_di")
-    tb = ds_garden["weekly_wildfires"].reset_index()
+    tb = ds_garden["weekly_wildfires_di"].reset_index()
 
     #
     # Process data.
