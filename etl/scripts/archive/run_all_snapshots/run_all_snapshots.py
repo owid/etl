@@ -202,6 +202,24 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int, skip: bool):
     for snapshot in tqdm(active_snapshots):
         snapshot_script = SNAPSHOTS_DIR / snapshot
 
+        # Find .dvc file belonging to the snapshot script
+        dvc_files = list(snapshot_script.parent.glob(f"{snapshot_script.stem}.*.dvc"))
+        assert len(dvc_files) >= 1, f"Expected to find at least one .dvc file for {snapshot}"
+
+        # Quite rare but possible to have multiple .dvc files for a single snapshot.
+        dvc_file = dvc_files[0]
+
+        # Check if autoupdate is enabled.
+        with open(dvc_file, "r") as f:
+            meta = yaml.safe_load(f)
+            if not meta.get("autoupdate"):
+                # log.info("run_all_snapshots.skip", snapshot=snapshot, reason="autoupdate not enabled")
+                continue
+
+        # Raise warning when using multiple .dvc files.
+        if len(dvc_files) > 1:
+            log.warning(f"Multiple .dvc files found for {snapshot}. Using the first one.")
+
         # Skip snapshots that have already been processed.
         if skip and snapshot in execution_results:
             log.info("run_all_snapshots.skip", snapshot=snapshot, reason="already processed")
@@ -238,16 +256,8 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int, skip: bool):
         try:
             log.info(f"Executing {snapshot}.")
 
-            # Find .dvc file belonging to the snapshot script
-            dvc_files = list(snapshot_script.parent.glob(f"{snapshot_script.stem}.*.dvc"))
-            assert len(dvc_files) >= 1, f"Expected to find at least one .dvc file for {snapshot}"
-
+            # Restore the .dvc file to its original state before running the snapshot.
             subprocess.run(["git", "restore", "--"] + [str(f) for f in dvc_files])
-
-            # Quite rare but possible to have multiple .dvc files for a single snapshot.
-            if len(dvc_files) > 1:
-                log.warning(f"Multiple .dvc files found for {snapshot}. Using the first one.")
-            dvc_file = dvc_files[0]
 
             # Load md5 and size from the .dvc file from YAML
             with open(dvc_file, "r") as f:
