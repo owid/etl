@@ -17,14 +17,14 @@ HOUR=$(TZ=Europe/Berlin date +%H)
 cd /home/owid/etl
 
 # Run commands
-if [ "$HOUR" -eq "06" ]; then
-    echo "--- Suggesting chart reviews..."
-    if [ -n "$1" ]; then
-        uv run etl d housekeeper --review-type chart --channel "$1"
-    else
-        uv run etl d housekeeper --review-type chart
-    fi
+# if [ "$HOUR" -eq "06" ]; then
+echo "--- Suggesting chart reviews..."
+if [ -n "$1" ]; then
+    uv run etl d housekeeper --review-type chart --channel "$1"
+else
+    uv run etl d housekeeper --review-type chart
 fi
+# fi
 
 end_time=$(date +%s)
 
