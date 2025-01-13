@@ -19,6 +19,8 @@ def run(dest_dir: str) -> None:
     # Calculate a 20,40 and 50 year average
     tb = calculate_multiple_year_average(tb)
 
+    tb["full_flowering_date"] += 10
+
     #
     # Save outputs.
     #
