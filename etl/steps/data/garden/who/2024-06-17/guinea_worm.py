@@ -52,9 +52,6 @@ def run(dest_dir: str) -> None:
     # fill N/As with 0 (this is how we handled this previously)
     tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].fillna(0)
 
-    # backfill certification status
-    tb = backfill_certification_status(tb)
-
     # add rows for current year
     tb = add_current_year(tb, tb_cases, year=CURRENT_YEAR)
 
@@ -72,23 +69,6 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset
     ds_garden.save()
-
-
-def backfill_certification_status(tb: Table) -> Table:
-    """
-    Backfill certification status for countries that were endemic in the past
-    """
-    tb = tb.sort_values(["country", "year"])
-    for cty in tb["country"].unique():
-        cty_rows = tb[tb["country"] == cty].copy().dropna(subset=["certification_status"])
-        if len(cty_rows) == 0:
-            continue
-        earliest_cert_status = cty_rows["certification_status"].iloc[0]
-        year_status = cty_rows["year"].iloc[0]
-        if earliest_cert_status == "Endemic":
-            tb.loc[(tb["country"] == cty) & (tb["year"] < year_status), "certification_status"] = "Endemic"
-            tb.loc[(tb["country"] == cty) & (tb["year"] < year_status), "year_certified"] = "Endemic"
-    return tb
 
 
 def add_current_year(tb: Table, tb_cases: Table, year: int = CURRENT_YEAR, changes_dict={}):

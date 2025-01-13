@@ -50,8 +50,8 @@ tables:
         description_short: |-
           Certification status of guinea worm disease over time. A country has to have no cases of guinea worm disease for three years to be "certified disease free".
         description_key:
-          - A country has to have no cases of guinea worm disease for three years to be "certified disease free".
-          - Countries in the surveillance period are "Pre-certification" and countries without cases, which are not yet under surveillance are "pending surveillance"
+          - A country has to have no cases of guinea worm disease for three years while being actively surveilled to be "certified disease free".
+          - A disease outbreak is endemic in a country if it is consistently present in the country. Countries labeled pre-certification are endemic countries that have reported zero indigenous cases in the calendar year. Countries labeled pending surveillance have not had sufficient testing to determine their status or the number of cases in the country.
         unit: ''
         description_from_producer: |-
           {definitions.certification}
