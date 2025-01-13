@@ -214,9 +214,7 @@ def _get_main_message_usage(chart, refs):
 def send_extra_messages(chart, refs, **kwargs):
     """Provide more context in the thread"""
     ## 1/ Similar charts
-    similar_messages = (
-        f"🕵️ <{OWID_ENV.wizard_url}similar_charts?chart_search_text={chart['slug']}| → Explore similar charts>"
-    )
+    similar_messages = f"🕵️ <{OWID_ENV.wizard_url}similar_charts?slug={chart['slug']}| → Explore similar charts>"
 
     ## 2/ AI: Chart description, chart edit timeline, suggestion
     log.info("Getting AI summary...")
