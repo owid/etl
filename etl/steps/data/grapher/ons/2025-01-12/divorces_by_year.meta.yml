@@ -9,6 +9,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: Share of marriages in England and Wales that ended in divorce by 5,10,20, and 30 years after marriage
   update_period_days: 365
 
 
@@ -16,7 +17,7 @@ tables:
   divorces:
     variables:
       cumulative_percentage:
-        title: Cumulative share of divorces of couples married in << year_of_marriage >> by anniversary year of marriage
+        title: Share of divorces by selected anniversary years
         unit: "%"
         short_unit: "%"
         description_short: |-
@@ -28,5 +29,4 @@ tables:
         processing_level: minor
         display:
           numDecimalPlaces: 1
-          name: << year_of_marriage >>
 

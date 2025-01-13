@@ -18,3 +18,5 @@ steps:
     - data://meadow/ons/2025-01-12/divorces
   data://grapher/ons/2025-01-12/divorces:
     - data://garden/ons/2025-01-12/divorces
+  data://grapher/ons/2025-01-12/divorces_by_year:
+    - data://garden/ons/2025-01-12/divorces
