@@ -28,7 +28,8 @@ def send_slack_chart_review(channel_name: str, slack_username: str, icon_emoji: 
     chart = select_chart(df)
     # DEBUGGING:
     # 2582 (wordpress link), 1609 (no references), 5689 (explorer, no post), 4288 (explorer, wp post), 2093 (no explorer, post), 3475 (explorer, post), (explorer, post + wp)
-    chart = df[df.chart_id == 3475].iloc[0]
+    # chart = df[df.chart_id == 3475].iloc[0]
+    chart = df.iloc[0]
 
     # Get references
     refs = get_references(chart["chart_id"])
