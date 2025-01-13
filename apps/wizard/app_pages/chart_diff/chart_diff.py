@@ -369,6 +369,7 @@ class ChartDiff:
             "is_rejected": self.is_rejected,
             "is_reviewed": self.is_reviewed,
             "is_new": self.is_new,
+            "change_types": self.change_types,
             "error": self.error,
         }
 

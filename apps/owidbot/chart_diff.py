@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 import pandas as pd
 from structlog import get_logger
 
@@ -8,6 +10,13 @@ from etl.db import production_or_master_engine
 from . import github_utils as gh_utils
 
 log = get_logger()
+
+
+@dataclass
+class ChartDiffStatus:
+    status_icon: str
+    status_title: str
+    status_conclusion: str
 
 
 def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_run: bool = False) -> None:
@@ -21,18 +30,7 @@ def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_r
     # Get the latest commit of the pull request
     latest_commit = pr.get_commits().reversed[0]
 
-    if charts_df.empty:
-        conclusion = "neutral"
-        title = "No charts for review"
-    elif charts_df[~charts_df.is_rejected].error.any():
-        conclusion = "failure"
-        title = "Some charts have errors"
-    elif charts_df.is_reviewed.all():
-        conclusion = "success"
-        title = "All charts are reviewed"
-    else:
-        conclusion = "failure"
-        title = "Some charts are not reviewed"
+    status = chart_diff_status(charts_df)
 
     if not dry_run:
         # Create the check run and complete it in a single command
@@ -40,33 +38,39 @@ def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_r
             name="owidbot/chart-diff",
             head_sha=latest_commit.sha,
             status="completed",
-            conclusion=conclusion,
+            conclusion=status.status_conclusion,
             output={
-                "title": title,
+                "title": status.status_title,
                 "summary": format_chart_diff(charts_df),
             },
         )
+
+
+def chart_diff_status(charts_df: pd.DataFrame) -> ChartDiffStatus:
+    # Ignore charts with no config changes
+    charts_df = charts_df[charts_df.change_types.map(lambda x: "config" in x)]
+
+    if charts_df.empty:
+        return ChartDiffStatus("✅", "No charts for review", "neutral")
+    elif charts_df[~charts_df.is_rejected].error.any():
+        return ChartDiffStatus("⚠️", "Some charts have errors", "failure")
+    elif charts_df.is_reviewed.all():
+        return ChartDiffStatus("✅", "All charts are reviewed", "success")
+    else:
+        return ChartDiffStatus("❌", "Some charts are not reviewed", "failure")
 
 
 def run(branch: str, charts_df: pd.DataFrame) -> str:
     container_name = get_container_name(branch) if branch else "dry-run"
 
     chart_diff = format_chart_diff(charts_df)
-
-    if charts_df.empty:
-        status = "✅"
-    elif charts_df[~charts_df.is_rejected].error.any():
-        status = "⚠️"
-    elif charts_df.is_reviewed.all():
-        status = "✅"
-    else:
-        status = "❌"
+    status = chart_diff_status(charts_df)
 
     # TODO: Should be using plain /chart-diff instead of query redirect (this is a workaround)
     # Waiting for https://github.com/streamlit/streamlit/issues/8388#issuecomment-2145524922 to be resolved
     body = f"""
 <details open>
-<summary><a href="http://{container_name}/etl/wizard/?page=chart-diff"><b>chart-diff</b></a>: {status}</summary>
+<summary><a href="http://{container_name}/etl/wizard/?page=chart-diff"><b>chart-diff</b></a>: {status.status_icon}</summary>
 {chart_diff}
 </details>
     """.strip()
@@ -80,14 +84,21 @@ def call_chart_diff(branch: str) -> pd.DataFrame:
 
     df = ChartDiffsLoader(source_engine, target_engine).get_diffs_summary_df(
         config=True,
-        metadata=False,
-        data=False,
+        metadata=True,
+        data=True,
     )
 
     return df
 
 
 def format_chart_diff(df: pd.DataFrame) -> str:
+    # Calculate number of data & metadata changes
+    num_charts_data_change = df.change_types.map(lambda x: "data" in x).sum()
+    num_charts_metadata_change = df.change_types.map(lambda x: "metadata" in x).sum()
+
+    # From now on, ignore charts with no config changes
+    df = df[df.change_types.map(lambda x: "config" in x)]
+
     if df.empty:
         return "No charts for review."
 
@@ -122,6 +133,8 @@ def format_chart_diff(df: pd.DataFrame) -> str:
     <li>Modified: {num_charts_modified_reviewed}/{num_charts_modified}</li>
     <li>New: {num_charts_new_reviewed}/{num_charts_new}</li>
     <li>Rejected: {num_charts_rejected}</li>
+    <li>Data changes: {num_charts_data_change}</li>
+    <li>Metadata changes: {num_charts_metadata_change}</li>
     {errors}
 </ul>
     """.strip()
