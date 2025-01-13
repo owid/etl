@@ -16,3 +16,10 @@ steps:
     - snapshot://fasttrack/2023-05-31/cholera.csv
   data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
     - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
+  # Guinea worm data
+  data://grapher/fasttrack/2023-06-16/guinea_worm:
+    - snapshot://fasttrack/2023-06-16/guinea_worm.csv
+  data://grapher/fasttrack/2024-06-17/guinea_worm:
+    - snapshot://fasttrack/2024-06-17/guinea_worm.csv
+  data://grapher/fasttrack/2023-06-28/guinea_worm:
+    - snapshot://fasttrack/2023-06-28/guinea_worm.csv
