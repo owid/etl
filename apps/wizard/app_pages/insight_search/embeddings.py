@@ -5,13 +5,11 @@ from typing import Any, Dict, Optional
 
 import streamlit as st
 import torch
-from joblib import Memory
 from sentence_transformers import SentenceTransformer, util
 from structlog import get_logger
 
+from etl.config import memory
 from etl.paths import CACHE_DIR
-
-memory = Memory(CACHE_DIR, verbose=0)
 
 # Initialize log.
 log = get_logger()

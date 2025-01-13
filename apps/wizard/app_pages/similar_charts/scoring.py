@@ -21,12 +21,16 @@ log = get_logger()
 
 # These are the default thresholds for the different scores.
 DEFAULT_WEIGHTS = {
-    "title": 0.4,
+    "title": 0.3,
     "subtitle": 0.1,
     "tags": 0.1,
-    "pageviews": 0.3,
     "share_indicator": 0.1,
+    "pageviews_score": 0.3,
+    "coviews_score": 0.1,
 }
+
+# Default regularization term for coviews
+DEFAULT_COVIEWS_REGULARIZATION = 0.0
 
 PREFIX_SYSTEM_PROMPT = """
 You are an expert in recommending visual data insights.
@@ -58,11 +62,14 @@ class ScoringModel:
     # Weights for the different scores
     weights: dict[str, float]
 
-    def __init__(self, model: SentenceTransformer, weights: Optional[dict[str, float]] = None) -> None:
+    def __init__(
+        self, model: SentenceTransformer, weights: Optional[dict[str, float]] = None, coviews_regularization: float = 0
+    ) -> None:
         self.model = model
         self.weights = weights or DEFAULT_WEIGHTS.copy()
+        self.coviews_regularization = coviews_regularization
 
-    def fit(self, charts: list[Chart]):
+    def fit(self, charts: list[Chart]) -> None:
         self.charts = charts
 
         # Get embeddings for title and subtitle
@@ -121,8 +128,9 @@ class ScoringModel:
                     "subtitle": subtitle_scores[i],
                     # score 1 if there is at least one tag in common, 0 otherwise
                     "tags": float(bool(set(c.tags) & set(chart.tags))),
-                    "pageviews": c.views_365d or 0,
                     "share_indicator": float(c.chart_id in charts_sharing_indicator),
+                    "pageviews": c.views_365d or 0,
+                    "coviews": c.coviews or 0,
                 }
             )
 
@@ -134,10 +142,9 @@ class ScoringModel:
         if chart.subtitle == "":
             ret["subtitle"] = 0
 
-        # Scale pageviews to [0, 1]
-        ret["pageviews"] = np.log(ret["pageviews"] + 1)
-        ret["pageviews"] = (ret["pageviews"] - ret["pageviews"].min()) / (
-            ret["pageviews"].max() - ret["pageviews"].min()
+        ret["pageviews_score"] = score_pageviews(ret["pageviews"])
+        ret["coviews_score"] = score_coviews(
+            ret["coviews"], ret["pageviews"], regularization=self.coviews_regularization
         )
 
         # Get weights and normalize them
@@ -148,14 +155,33 @@ class ScoringModel:
         ret = (ret * w).fillna(0)
 
         # Reorder
-        ret = ret[["title", "subtitle", "tags", "share_indicator", "pageviews"]]
+        ret = ret[["title", "subtitle", "tags", "share_indicator", "pageviews_score", "coviews_score"]]
 
         log.info("similarity_components.end", t=time.time() - t)
 
         return ret
 
 
-@st.cache_data(show_spinner=False, persist="disk")
+def score_pageviews(pageviews: pd.Series) -> pd.Series:
+    """Log transform pageviews and scale them to [0, 1]. Chart with the most pageviews gets score 1 and
+    chart with the least pageviews gets score 0.
+    """
+    pageviews = np.log(pageviews + 1)  # type: ignore
+    return (pageviews - pageviews.min()) / (pageviews.max() - pageviews.min())
+
+
+def score_coviews(coviews: pd.Series, pageviews: pd.Series, regularization: float) -> float:
+    """Score coviews. First, get ratio of coviews to pageviews. Add regularization term to pageviews
+    to penalize charts with high pageviews that tend to show up, despite being not very relevant.
+    Then, normalize the score to [0, 1].
+    """
+    # p = coviews / (pageviews + lam)
+    # return (p - p.min()) / (p.max() - p.min())
+    p = coviews - regularization * pageviews
+    return p / p.max()
+
+
+@st.cache_data(show_spinner=False, persist="disk", hash_funcs={Chart: lambda chart: chart.chart_id})
 def gpt_diverse_charts(
     chosen_chart: Chart, _charts: list[Chart], _n: int = 30, system_prompt=DEFAULT_SYSTEM_PROMPT
 ) -> dict[str, str]:
