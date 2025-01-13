@@ -48,7 +48,10 @@ def create_check_run(repo_name: str, branch: str, charts_df: pd.DataFrame, dry_r
 
 def chart_diff_status(charts_df: pd.DataFrame) -> ChartDiffStatus:
     # Ignore charts with no config changes
-    charts_df = charts_df[charts_df.change_types.map(lambda x: "config" in x)]
+    # TODO: Old staging servers might not have the change_types column, but fix this once
+    #   all staging servers are updated
+    if "change_types" in charts_df.columns:
+        charts_df = charts_df[charts_df.change_types.map(lambda x: "config" in x)]
 
     if charts_df.empty:
         return ChartDiffStatus("✅", "No charts for review", "neutral")
@@ -93,11 +96,17 @@ def call_chart_diff(branch: str) -> pd.DataFrame:
 
 def format_chart_diff(df: pd.DataFrame) -> str:
     # Calculate number of data & metadata changes
-    num_charts_data_change = df.change_types.map(lambda x: "data" in x).sum()
-    num_charts_metadata_change = df.change_types.map(lambda x: "metadata" in x).sum()
+    # TODO: Old staging servers might not have the change_types column, but fix this once
+    #    all staging servers are updated
+    if "change_types" in df.columns:
+        num_charts_data_change = df.change_types.map(lambda x: "data" in x).sum()
+        num_charts_metadata_change = df.change_types.map(lambda x: "metadata" in x).sum()
 
-    # From now on, ignore charts with no config changes
-    df = df[df.change_types.map(lambda x: "config" in x)]
+        # From now on, ignore charts with no config changes
+        df = df[df.change_types.map(lambda x: "config" in x)]
+    else:
+        num_charts_data_change = 0
+        num_charts_metadata_change = 0
 
     if df.empty:
         return "No charts for review."
