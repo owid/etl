@@ -43,6 +43,9 @@ all_sources:
       published_by: Dracunculiasis Eradication Portal, World Health Organization
       date_accessed: '2023-06-28'
       url: https://www.who.int/teams/control-of-neglected-tropical-diseases/dracunculiasis/dracunculiasis-eradication-portal
+
+
+
 dataset:
   title: Guinea worm reported cases and certification (WHO)
   licenses:
@@ -52,7 +55,7 @@ dataset:
   - *source_certification
   - *source_reported_cases
 tables:
-  guinea_worm:
+  guinea_worm_certification:
     variables:
       year_certified:
         title: Year country is certified free from guinea worm
@@ -66,10 +69,3 @@ tables:
         unit: ''
         description:
           *certification_description
-      guinea_worm_reported_cases:
-        title: Reported cases of guinea worm disease in humans
-        unit: 'reported cases'
-        description:
-          *reported_cases_description
-        display:
-          numDecimalPlaces: 0

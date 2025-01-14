@@ -318,7 +318,7 @@ steps:
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # UN SDG - archive
+  # UN SDG
   data://meadow/un/2023-01-24/un_sdg:
     - snapshot://un/2023-01-24/un_sdg.feather
   data://garden/un/2023-01-24/un_sdg:
