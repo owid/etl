@@ -97,7 +97,7 @@ def make_agrid(steps_df_display):
     grid_response = AgGrid(
         data=steps_df_display,
         gridOptions=grid_options,
-        # height=1000,
+        height=500,
         # height="100%",
         # width="100%",
         update_mode=GridUpdateMode.MODEL_CHANGED,
@@ -105,12 +105,12 @@ def make_agrid(steps_df_display):
         allow_unsafe_jscode=True,
         theme="streamlit",
         # The following ensures that the pagination controls are not cropped.
-        custom_css={
-            "#gridToolBar": {
-                "padding-bottom": "0px !important",
-            }
-        },
-        columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS,
+        # custom_css={
+        #     "#gridToolBar": {
+        #         "padding-bottom": "0px !important",
+        #     }
+        # },
+        # columns_auto_size_mode=ColumnsAutoSizeMode.FIT_CONTENTS,
     )
 
     return grid_response
@@ -152,12 +152,12 @@ def make_grid_options(steps_df_display):
 
     # Pagination settings
     gb.configure_pagination(
-        paginationAutoPageSize=False,
+        # paginationAutoPageSize=False,
         # paginationPageSize=20,
     )
 
     # Auto-height
-    gb.configure_auto_height()
+    # gb.configure_auto_height()
 
     # Build
     grid_options = gb.build()
