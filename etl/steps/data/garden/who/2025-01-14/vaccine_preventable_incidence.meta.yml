@@ -14,5 +14,5 @@ tables:
   vaccine_preventable_incidence:
     variables:
       incidence_rate:
-        title: Incidence rate of << disease_description.lower() >>
+        title: Incidence rate of << disease_description.lower() >> << denominator >>
         unit: << denominator >>
