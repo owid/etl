@@ -6,7 +6,6 @@ from structlog import get_logger
 from apps.wizard.app_pages.dashboard.actions import render_action_archive, render_action_execute, render_action_update
 from apps.wizard.app_pages.dashboard.agrid import make_agrid
 from apps.wizard.app_pages.dashboard.operations import render_operations_list
-from apps.wizard.app_pages.dashboard.preview import render_preview_list
 from apps.wizard.app_pages.dashboard.utils import (
     _create_html_button,
     _get_steps_info,
@@ -35,6 +34,8 @@ st.set_page_config(
 st.session_state.setdefault("selected_steps", [])
 ## Selected steps in table
 st.session_state.setdefault("selected_steps_table", [])
+## Selected steps extra
+st.session_state.setdefault("selected_steps_extra", [])
 # Initialize the cache key in the session state.
 # This key will be used to reload the steps table after making changes to the steps.
 st.session_state.setdefault("reload_key", 0)
@@ -97,7 +98,10 @@ steps_df_display = load_steps_df_to_display(show_all_channels, reload_key=st.ses
 # Build and display the grid table with pagination.
 # st.write(steps_df_display.dtypes)
 grid_response = make_agrid(steps_df_display)
+# if st.button("Clear selection"):
+#     from apps.wizard.app_pages.dashboard.agrid import clear_aggrid_selections
 
+#     clear_aggrid_selections()
 ########################################
 # DETAILS LIST
 #
@@ -115,8 +119,28 @@ grid_response = make_agrid(steps_df_display)
 # Add steps based on user selections.
 # User can add from checking in the steps table, but also there are some options to add dependencies, usages, etc.
 ########################################
+# Get selected steps from the grid table.
 df_selected = grid_response["selected_rows"]
-render_operations_list(df_selected, steps_df)
+
+# Update session_state of selected steps
+## Get steps selected from table
+if df_selected is not None:
+    st.session_state.selected_steps_table = df_selected["step"].tolist()
+else:
+    st.session_state.selected_steps_table = []
+
+## Combine with extra steps
+steps_extra = [
+    step for step in st.session_state.selected_steps_extra if step not in st.session_state.selected_steps_table
+]
+st.session_state.selected_steps = st.session_state.selected_steps_table + steps_extra
+
+# st.session_state.selected_steps = list(
+#     set(st.session_state.selected_steps_extra) | set(st.session_state.selected_steps_table)
+# )
+
+# Show the operations list
+render_operations_list(steps_df, steps_info)
 
 
 ########################################

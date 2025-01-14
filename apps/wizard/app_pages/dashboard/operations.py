@@ -1,16 +1,15 @@
-from typing import Optional
-
 import pandas as pd
 import streamlit as st
 from structlog import get_logger
 
+from apps.wizard.app_pages.dashboard.agrid import clear_aggrid_selections
 from apps.wizard.app_pages.dashboard.utils import NON_UPDATEABLE_IDENTIFIERS, _add_steps_to_operations, remove_step
 from apps.wizard.utils.components import st_horizontal
 
 log = get_logger()
 
 
-def render_operations_list(df: Optional[pd.DataFrame], steps_df: pd.DataFrame):
+def render_operations_list(steps_df: pd.DataFrame, steps_info):
     """Render operations list."""
 
     # Title
@@ -22,7 +21,7 @@ def render_operations_list(df: Optional[pd.DataFrame], steps_df: pd.DataFrame):
             st.markdown(f":primary-background[{len(st.session_state.selected_steps)} steps]")
 
     # Show warning if no step is selected
-    if df is None:
+    if st.session_state.selected_steps == []:
         st.warning("No rows selected. Please select at least one dataset from the table above.")
         return
 
@@ -39,7 +38,7 @@ def render_operations_list(df: Optional[pd.DataFrame], steps_df: pd.DataFrame):
         if st.session_state.selected_steps:
             for index, step in enumerate(st.session_state.selected_steps):
                 # Define the layout of the list.
-                selected_step_info = selected_steps_info[step]
+                selected_step_info = steps_info[step]
                 _show_row_with_step_details(steps_df, step, index, selected_step_info)
 
             # Show main buttons in the operations list
@@ -62,12 +61,15 @@ def _show_row_with_step_details(steps_df, step, index, step_info):
     with col1:
         with st.container(height=None, border=False):
             # with col1:
+            step_alias = step.replace("data://", "")
             if step in st.session_state.selected_steps_table:
-                text = f"**{step.replace('data://', '')}**"
+                text = f"**{step_alias}**"
+                with st.popover(text, use_container_width=False, icon=":material/table_chart:"):
+                    _show_step_details(step_info)
             else:
-                text = f"**{step.replace('data://', '')}**"
-            with st.popover(text, use_container_width=True):
-                _show_step_details(step_info)
+                text = step_alias
+                with st.popover(text, use_container_width=False):
+                    _show_step_details(step_info)
 
     with col2:
         with st_horizontal(justify_content="space-between"):
@@ -94,13 +96,23 @@ def _show_row_with_step_details(steps_df, step, index, step_info):
                 ),
             ]
             unique_key = f"remove_{step}_{index}"
-            st.button(
-                label="🗑️",
-                key=unique_key,
-                on_click=lambda step=step: remove_step(step),
-                help="Remove this step from the **Operations list**.",
-                type="secondary",
-            )
+            if step in st.session_state.selected_steps_table:
+                st.button(
+                    label="🗑️",
+                    key=unique_key,
+                    on_click=lambda step=step: remove_step(step),
+                    help="To remove this step, please unselect it from the table above.",
+                    type="secondary",
+                    disabled=True,
+                )
+            else:
+                st.button(
+                    label="🗑️",
+                    key=unique_key,
+                    on_click=lambda step=step: remove_step(step),
+                    help="Remove this step from the **Operations list**.",
+                    type="secondary",
+                )
             # Display the operations list.
             for action_name, key_suffix, help_text in actions:
                 # Create a unique key for the button (if any button is to be created).
@@ -124,15 +136,24 @@ def _show_main_operations_buttons(steps_df):
     - Remove non-updateable
     - Replace with latest versions
     """
+
+    def _clear_list():
+        st.session_state.selected_steps_table.clear()
+        st.session_state.selected_steps_extra.clear()
+
+        # Clear the selection in the ag-grid table
+        clear_aggrid_selections()
+
     with st_horizontal():
         # Add button to clear the operations list.
-        st.button(
+        if st.button(
             ":primary[:material/clear_all: Clear list]",
             help="Remove all steps currently in the **Operations list**.",
             # type="tertiary",
             key="clear_operations_list",
-            on_click=lambda: st.session_state.selected_steps.clear(),
-        )
+            # on_click=lambda: _clear_list(),
+        ):
+            _clear_list()
 
         st.button(
             label=":primary[:material/delete_outline: Remove non-updateable (e.g. population)]",

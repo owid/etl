@@ -203,7 +203,7 @@ def _add_steps_to_operations(steps_related: List[str]):
     # Remove those already in operations list
     new_selected_steps = [step for step in steps_related if step not in st.session_state.selected_steps]
     # Add new steps to the operations list.
-    st.session_state.selected_steps += new_selected_steps
+    st.session_state.selected_steps_extra += new_selected_steps
 
 
 def remove_step(step: str):

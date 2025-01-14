@@ -1,4 +1,5 @@
-from st_aggrid import AgGrid, GridUpdateMode, JsCode
+import streamlit.components.v1 as components
+from st_aggrid import AgGrid, ColumnsAutoSizeMode, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 from apps.step_update.cli import UpdateState
@@ -80,6 +81,15 @@ JSCODE_DATASET_GRAPHER = JsCode(
         }
         """
 )
+# Enable clearing selection via API
+JS_CODE_ENABLE_CLEAR_SELECTION = js = JsCode("""
+function(event) {
+    const api = event.api;
+    window.addEventListener('clear.rows', (e) => {
+        api.deselectAll();
+    });
+}
+""")
 
 
 def make_agrid(steps_df_display):
@@ -100,6 +110,7 @@ def make_agrid(steps_df_display):
                 "padding-bottom": "0px !important",
             }
         },
+        # selected_rows=[steps_df_display.iloc[0].to_dict()],
     )
 
     return grid_response
@@ -110,17 +121,22 @@ def make_grid_options(steps_df_display):
     gb = GridOptionsBuilder.from_dataframe(
         dataframe=steps_df_display,
         editable=False,
-        groupable=True,
+        # groupable=True,
         sortable=True,
-        filterable=True,
+        # filterable=True,
         resizable=True,
     )
 
     # General settings
+    ## Add event listener that can access the grid api when onFirstDataRendered lifecycle event is called
+
     gb.configure_grid_options(
         # domLayout="autoHeight",
+        ColumnsAutoSizeMode=ColumnsAutoSizeMode.FIT_CONTENTS,
         enableCellTextSelection=True,
+        onFirstDataRendered=JS_CODE_ENABLE_CLEAR_SELECTION,
     )
+
     gb.configure_selection(
         selection_mode="multiple",
         use_checkbox=True,
@@ -128,7 +144,14 @@ def make_grid_options(steps_df_display):
         suppressRowDeselection=False,
         groupSelectsChildren=True,
         groupSelectsFiltered=True,
+        pre_selected_rows=[1, 2, 3],
+        # header_checkbox=True,
+        # header_checkbox_filtered_only=True,
+        # headerCheckboxSelection=True,
+        # pre_selected_rows=list(range(10000)),
     )
+    # gb._GridOptionsBuilder__grid_options["preSelectedRows"] = [1, 2, 3]
+    # gb__grid_options["preSelectAllRows"] = [1, 2, 3]
     # gb.configure_side_bar(
     #     filters_panel=True,
     #     columns_panel=True,
@@ -160,28 +183,24 @@ def _config_grid_columns(gb):
         field="step",
         width=500,
         headerTooltip="Step URI, as it appears in the ETL DAG.",
-        filter="agTextColumnFilter",
     )
-    gb.configure_column(
+    _config_column(
+        gb,
         field="channel",
-        headerName="Channel",
         width=120,
         headerTooltip="Channel of the step (e.g. garden or grapher).",
-        filter="agTextColumnFilter",
     )
     _config_column(
         gb,
         field="namespace",
         width=150,
         headerTooltip="Namespace of the step.",
-        filter="agTextColumnFilter",
     )
     _config_column(
         gb,
         field="version",
         width=120,
         headerTooltip="Version of the step.",
-        filter="agTextColumnFilter",
     )
     _config_column(
         gb,
@@ -306,3 +325,19 @@ def _config_column(gb, field: str, text_filter: bool = True, **kwargs):
     gb.configure_column(**params)
 
     return gb
+
+
+def clear_aggrid_selections():
+    """Unselect all rows from AgGrid table.
+
+    Reference: https://discuss.streamlit.io/t/aggrid-unselect-all-rows/21367/11
+    """
+    clearJs = """<script>
+    ((e) => {
+        const iframe = window.parent.document.querySelectorAll('[title="st_aggrid.agGrid"]')[0] || null;
+        if(!iframe) return;
+        iframe.contentWindow.dispatchEvent( new Event('clear.rows'));
+    })()
+    </script>
+    """
+    components.html(clearJs)
