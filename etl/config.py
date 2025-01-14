@@ -10,10 +10,11 @@ only important for OWID staff.
 import os
 import pwd
 import re
+import warnings
 from dataclasses import dataclass, fields
 from os import environ as env
 from pathlib import Path
-from typing import Literal, Optional, cast
+from typing import List, Literal, Optional, cast
 
 import bugsnag
 import git
@@ -21,6 +22,7 @@ import pandas as pd
 import structlog
 from dotenv import dotenv_values, load_dotenv
 from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
 
 from etl.paths import BASE_DIR
 
@@ -437,6 +439,14 @@ class OWIDEnv:
             return f"{self.base_site}/admin"
 
     @property
+    def datasets_admin_site(self):
+        return f"{self.admin_site}/datasets"
+
+    @property
+    def indicators_admin_site(self):
+        return f"{self.admin_site}/variables"
+
+    @property
     def admin_api(self) -> str:
         """Get admin api url. This could be possibly merged with admin_site above.
         We'd just have to test when to use suffix `.tail6e23.ts.net` because of
@@ -493,19 +503,27 @@ class OWIDEnv:
 
     def dataset_admin_site(self, dataset_id: str | int) -> str:
         """Get dataset admin url."""
-        return f"{self.admin_site}/datasets/{dataset_id}/"
+        return f"{self.datasets_admin_site}/{dataset_id}/"
 
     def indicator_admin_site(self, variable_id: str | int) -> str:
         """Get indicator admin url."""
-        return f"{self.admin_site}/variables/{variable_id}/"
+        return f"{self.indicators_admin_site}/{variable_id}/"
 
     def chart_admin_site(self, chart_id: str | int) -> str:
         """Get chart admin url."""
         return f"{self.admin_site}/charts/{chart_id}/edit"
 
+    def explorer_admin_site(self, explorer_slug: str) -> str:
+        """Get explorer admin url."""
+        return f"{self.admin_site}/explorers/{explorer_slug}"
+
     def chart_site(self, slug: str) -> str:
         """Get chart url."""
         return f"{self.site}/grapher/{slug}"
+
+    def explorer_site(self, slug: str) -> str:
+        """Get explorer url."""
+        return f"{self.site}/explorers/{slug}"
 
     def data_page_preview(self, variable_id: str | int) -> str:
         """Get indicator admin url."""
@@ -523,6 +541,39 @@ class OWIDEnv:
 
     def indicator_data_url(self, variable_id):
         return f"{self.indicators_url}/{variable_id}.data.json"
+
+    def read_sql(self, sql: str, *args, **kwargs) -> pd.DataFrame:
+        """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
+        This adds overhead, so if you need performance, reuse the same connection and cursor.
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            if isinstance(self.engine, Engine):
+                with self.engine.connect() as con:
+                    return pd.read_sql(sql, con, *args, **kwargs)
+            elif isinstance(self.engine, Session):
+                return pd.read_sql(sql, self.engine.bind, *args, **kwargs)
+            else:
+                raise ValueError(f"Unsupported engine type {type(self.engine)}")
+
+    def read_sqls(self, sql: List[str], *args, **kwargs) -> List[pd.DataFrame]:
+        """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
+
+        It can read multiple sql queries, to exploit the same connection and cursor.
+
+        sql: List of various queries
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            if isinstance(self.engine, Engine):
+                with self.engine.connect() as con:
+                    result = [pd.read_sql(s, con, *args, **kwargs) for s in sql]
+                    return result
+            elif isinstance(self.engine, Session):
+                result = [pd.read_sql(s, self.engine.bind, *args, **kwargs) for s in sql]
+                return result
+            else:
+                raise ValueError(f"Unsupported engine type {type(self.engine)}")
 
 
 # Wrap envs in OWID_ENV

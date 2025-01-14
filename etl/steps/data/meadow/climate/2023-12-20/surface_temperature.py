@@ -145,6 +145,7 @@ def run(dest_dir: str) -> None:
     # Now you can access the 'dt' accessor
     start_time = da["valid_time"].min().dt.date.astype(str).item()
     end_time = da["valid_time"].max().dt.date.astype(str).item()
+    print(end_time)
 
     # Generate a date range from start_time to end_time with monthly frequency
     month_middles = pd.date_range(start=start_time, end=end_time, freq="MS") + pd.offsets.Day(14)

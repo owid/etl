@@ -121,7 +121,8 @@ def deduplicate_dimensions(indicators: list[data.Indicator]) -> list[data.Indica
 @st.cache_data(show_spinner=False, max_entries=1)
 def get_and_fit_model(_indicators: list[data.Indicator]) -> emb.EmbeddingsModel:
     # Get embedding model.
-    model = emb.EmbeddingsModel(emb.get_model())
+    with st.spinner("Loading model..."):
+        model = emb.EmbeddingsModel(emb.get_model())
     # Create an embedding for each indicator.
     with st.spinner("Creating embeddings..."):
         model.fit(_indicators)

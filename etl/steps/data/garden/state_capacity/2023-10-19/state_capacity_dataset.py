@@ -98,7 +98,6 @@ def regional_aggregations(tb: Table) -> Table:
             aggregations={"capacity_pop": "sum", "population": "sum"},
             countries_that_must_have_data=[],
             frac_allowed_nans_per_year=0.3,
-            population=tb_regions,
         )
 
     # Keep only regions

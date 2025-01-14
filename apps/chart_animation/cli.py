@@ -19,7 +19,7 @@ log = get_logger()
 DOWNLOADS_DIR = Path.home() / ".chart_animation"
 
 # Default maximum number of years to fetch images for.
-MAX_NUM_YEARS = 100
+MAX_NUM_YEARS = 151
 
 
 def get_chart_metadata(chart_url):
@@ -86,40 +86,6 @@ def get_years_in_chart(chart_url):
         )
     )
     return years
-
-
-def get_query_parameters_in_chart(chart_url, all_years):
-    # Select default values.
-    year_range_open = True
-    year_start, year_end = min(all_years), max(all_years)
-    tab = "map"
-
-    # Attempt to get those parameters from the chart URL.
-    query_params = parse_qs(urlparse(chart_url).query)
-    if "time" in query_params:
-        time = query_params["time"][0]
-        if ".." in time:
-            year_range_open = True
-            year_start, year_end = time.split("..")
-            if year_start == "earliest":
-                year_start = min(all_years)
-            if year_end == "latest":
-                year_end = max(all_years)
-        else:
-            year_range_open = False
-            year_start = int(time)
-            year_end = year_start
-    if "tab" in query_params:
-        tab = query_params["tab"][0]
-
-    params = {
-        "year_range_open": year_range_open,
-        "year_min": int(year_start),
-        "year_max": int(year_end),
-        "tab": tab,
-    }
-
-    return params
 
 
 def modify_chart_url(chart_url, year, year_range_open, tab, social_media_square):
@@ -270,6 +236,7 @@ def create_gif_from_images(
     remove_duplicate_frames=True,
     repetitions_last_frame=0,
     duration_of_animation=False,
+    first_frame=0,
 ):
     # Prepare a list of image objects.
     images = prepare_images(
@@ -284,16 +251,28 @@ def create_gif_from_images(
     # There seems to be a PIL bug when specifying loops.
     if loops == 1:
         # Repeat loop only once.
-        images[0].save(output_file, save_all=True, append_images=images[1:], optimize=True, duration=duration)
+        images[first_frame].save(
+            output_file, save_all=True, append_images=images[first_frame + 1 :], optimize=True, duration=duration
+        )
     elif loops == 0:
         # Infinite loop.
-        images[0].save(
-            output_file, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops
+        images[first_frame].save(
+            output_file,
+            save_all=True,
+            append_images=images[first_frame + 1 :],
+            optimize=True,
+            duration=duration,
+            loop=loops,
         )
     else:
         # Repeat loop a fixed number of times.
-        images[0].save(
-            output_file, save_all=True, append_images=images[1:], optimize=True, duration=duration, loop=loops - 1
+        images[first_frame].save(
+            output_file,
+            save_all=True,
+            append_images=images[first_frame + 1 :],
+            optimize=True,
+            duration=duration,
+            loop=loops - 1,
         )
     log.info(f"GIF successfully created at {output_file}")
     return output_file
@@ -306,6 +285,7 @@ def create_mp4_from_images(
     remove_duplicate_frames=True,
     repetitions_last_frame=0,
     duration_of_animation=False,
+    first_frame=0,
 ):
     # Prepare a list of image objects.
     images = prepare_images(
@@ -321,7 +301,7 @@ def create_mp4_from_images(
     frame_rate = 1 / (duration / 1000)
 
     temp_image_paths = []
-    for idx, img in enumerate(images):
+    for idx, img in enumerate(images[first_frame:]):
         temp_path = f"/tmp/temp_image_{idx}.png"
         img.save(temp_path)
         temp_image_paths.append(temp_path)

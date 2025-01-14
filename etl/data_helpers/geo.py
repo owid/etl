@@ -60,26 +60,12 @@ REFERENCE_YEAR = 2018
 ########################################################################################################################
 
 ########################################################################################################################
-# DEPRECATED: Default paths when silently loading population and income groups datasets.
+# DEPRECATED: Default paths when silently loading income groups datasets.
 # Paths to datasets used in this module. Feel free to update the versions or paths whenever there is a
 # new version of the datasets.
-# DATASET_POPULATION = DATA_DIR / "garden" / "demography" / "2023-03-31" / "population"
-DATASET_POPULATION = DATA_DIR / "garden" / "owid" / "latest" / "key_indicators"
-TNAME_KEY_INDICATORS = "population"
-# Path to Key Indicators dataset
 DATASET_WB_INCOME = DATA_DIR / "garden" / "wb" / "2021-07-01" / "wb_income"
 TNAME_WB_INCOME = "wb_income_group"
 ########################################################################################################################
-
-
-@functools.lru_cache
-def _load_population() -> Table:
-    ####################################################################################################################
-    # WARNING: This function is deprecated. All datasets should be loaded using PathFinder.
-    ####################################################################################################################
-    log.warning(f"Dataset {DATASET_POPULATION} is silently being loaded.")
-    population = Dataset(DATASET_POPULATION)[TNAME_KEY_INDICATORS]
-    return population.reset_index()
 
 
 @functools.lru_cache
@@ -160,12 +146,12 @@ def list_countries_in_region(
 
 def list_countries_in_region_that_must_have_data(
     region: str,
+    population: pd.DataFrame,
     reference_year: int = REFERENCE_YEAR,
     min_frac_individual_population: float = MIN_FRAC_INDIVIDUAL_POPULATION,
     min_frac_cumulative_population: float = MIN_FRAC_CUMULATIVE_POPULATION,
     countries_regions: Optional[pd.DataFrame] = None,
     income_groups: Optional[pd.DataFrame] = None,
-    population: Optional[pd.DataFrame] = None,
     verbose: bool = False,
 ) -> List[str]:
     """List countries of a region that are expected to have the largest contribution to any variable.
@@ -193,12 +179,12 @@ def list_countries_in_region_that_must_have_data(
         Minimum fraction of the total population of the region that each of the listed countries must exceed.
     min_frac_cumulative_population : float
         Minimum fraction of the total population of the region that the sum of the listed countries must exceed.
+    population : pd.DataFrame
+        Population dataframe to load
     countries_regions : pd.DataFrame or None
         Countries-regions dataset, or None, to load it from owid catalog.
     income_groups : pd.DataFrame or None
         Income-groups dataset, or None, to load it from the catalog.
-    population : pd.DataFrame or None
-        Population dataset, or None, to load it from owid catalog.
     verbose : bool
         True to print the number of countries (and percentage of cumulative population) that must have data.
 
@@ -214,10 +200,6 @@ def list_countries_in_region_that_must_have_data(
     if countries_regions is None:
         # NOTE: This should be avoided, and it will raise a warning if used.
         countries_regions = _load_countries_regions()
-
-    if population is None:
-        # NOTE: This should be avoided, and it will raise a warning if used.
-        population = _load_population()
 
     if income_groups is None:
         # NOTE: This should be avoided, and it will raise a warning if used.
@@ -278,7 +260,6 @@ def add_region_aggregates(
     year_col: str = "year",
     aggregations: Optional[Dict[str, Any]] = None,
     keep_original_region_with_suffix: Optional[str] = None,
-    population: Optional[pd.DataFrame] = None,
 ) -> TableOrDataFrame:
     """Add aggregate data for a specific region (e.g. a continent or an income group) to a table.
 
@@ -324,9 +305,6 @@ def add_region_aggregates(
         * If a list of countries is passed, those countries must have data for a particular variable and year. If any of
           those countries is not informed on a particular variable and year, the region will have nan for that particular
           variable and year.
-        * If "auto", a list of countries that must have data is automatically generated, based on population. When
-          choosing this option, explicitly pass population as an argument (otherwise it will be silently loaded).
-          See function list_countries_in_region_that_must_have_data for more details.
         * If None, nothing happens: An aggregate is constructed even if important countries are missing.
     num_allowed_nans_per_year : int or None
         * If a number is passed, this is the maximum number of nans that can be present in a particular variable and
@@ -352,10 +330,6 @@ def add_region_aggregates(
         * If not None, the original data for a region will be kept, with the same name, but having suffix
           keep_original_region_with_suffix appended to its name.
         * If None, the original data for a region will be replaced by aggregate data constructed by this function.
-    population : pd.DataFrame or None
-        Only relevant if countries_that_must_have_data is "auto", otherwise ignored.
-        * If not None, it should be the main population table from the population dataset.
-        * If None, the population table will be silently loaded.
 
     Returns
     -------
@@ -371,12 +345,6 @@ def add_region_aggregates(
 
     if countries_that_must_have_data is None:
         countries_that_must_have_data = []
-    elif countries_that_must_have_data == "auto":
-        # List countries that should present in the data (since they are expected to contribute the most).
-        countries_that_must_have_data = list_countries_in_region_that_must_have_data(
-            region=region,
-            population=population,
-        )
 
     if index_columns is None:
         index_columns = [country_col, year_col]
@@ -551,7 +519,7 @@ def harmonize_countries(
 
 def _add_population_to_dataframe(
     df: TableOrDataFrame,
-    ds_population: Optional[Dataset] = None,
+    tb_population: Table,
     country_col: str = "country",
     year_col: str = "year",
     population_col: str = "population",
@@ -571,8 +539,8 @@ def _add_population_to_dataframe(
     ----------
     df : TableOrDataFrame
         Original dataframe that contains a column of country names and years.
-    ds_population : Dataset or None
-        Population dataset.
+    tb_population : Table
+        Population table.
     country_col : str
         Name of column in original dataframe with country names.
     year_col : str
@@ -601,11 +569,7 @@ def _add_population_to_dataframe(
         log.warning("This function is deprecated. Use add_population_to_table instead.")
 
     # Load population data.
-    if ds_population is not None:
-        population = ds_population.read("population", safe_types=False)
-    else:
-        population = _load_population()
-    population = population.rename(
+    population = tb_population.rename(
         columns={
             "country": country_col,
             "year": year_col,
@@ -767,10 +731,13 @@ def add_population_to_table(
         Original table after adding a column with population values.
 
     """
+    # Load population
+    tb_population = ds_population.read("population", safe_types=False)
+
     # Create a dataframe with an additional population column.
     df_with_population = _add_population_to_dataframe(
         df=tb,
-        ds_population=ds_population,
+        tb_population=tb_population,
         country_col=country_col,
         year_col=year_col,
         population_col=population_col,

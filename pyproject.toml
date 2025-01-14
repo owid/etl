@@ -69,6 +69,7 @@ dependencies = [
     "py7zr>=0.22.0",
     "pyreadr>=0.5.2",
     "cfgrib>=0.9.15.0",
+    "streamlit-aggrid>=1.0.5",
 ]
 
 [tool.uv.sources]

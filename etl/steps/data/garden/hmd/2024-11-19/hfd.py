@@ -503,6 +503,9 @@ def run(dest_dir: str) -> None:
         fcn=add_shifted_to_cohort,
     )
 
+    # 2b/ Share of women with N kids
+    tb_share_women = make_table_share_women_with_n_kids(tb_cohort)
+
     # 3/ Period tables (by age)
     cols_index = ["country", "year", "age"]
     col_bo = "birth_order"
@@ -616,6 +619,7 @@ def run(dest_dir: str) -> None:
         tb_cohort_ages,
         tb_period_years,
         tb_cohort_years,
+        tb_share_women,
     ]
 
     #
@@ -862,3 +866,70 @@ def keep_relevant_ages(tb):
     ]
     tb = tb.loc[tb["age"].isin(AGES_RELEVANT)]
     return tb
+
+
+def make_table_share_women_with_n_kids(tb):
+    tb_share_women = tb.loc[:, ["ppr"]].reset_index()
+    tb_share_women = tb_share_women.dropna()
+
+    # Column renames
+    tb_share_women = tb_share_women.rename(
+        columns={
+            "birth_order": "num_births",
+            "ppr": "share_women",
+        }
+    )
+
+    # Check: Check that the number of years is consistent across countries and birth orders
+    # That is, there is no missing year
+    # I get the number of years per country, and check that that matches the year-difference.
+    x = tb_share_women.sort_values(["cohort", "num_births"])
+    x = x.groupby(["country", "num_births"])["cohort"].nunique()
+    y = tb_share_women.sort_values(["cohort", "num_births"])
+    y["diff"] = y.groupby(["country", "num_births"])["cohort"].diff()
+    y = y.groupby(["country", "num_births"])["diff"].sum() + 1
+    assert x.astype(int).equals(y.astype(int)), "Missing years!"
+
+    # Add 100% probability of having 0 kids
+    tb0 = tb_share_women.loc[:, ["country", "cohort"]].drop_duplicates()
+    tb0["num_births"] = 0
+    tb0["share_women"] = 1
+    tb_share_women = pr.concat([tb_share_women, tb0])
+    tb_share_women = tb_share_women.sort_values(["country", "num_births", "cohort"])
+
+    # Add conditioned probability to "not have more kids" given having N kids
+    tb_share_women["q"] = 1 - tb_share_women["share_women"]
+    ## Shift the value of q one up for each (country, cohort)
+    tb_share_women["q"] = tb_share_women.groupby(["country", "cohort"])["q"].shift(-1)
+    assert set(tb_share_women.loc[tb_share_women["q"].isna(), "num_births"].unique()) == {
+        "4"
+    }, "Unknown probability should only be there for 4"
+
+    # Share of women with N kids (cumulative)
+    tb_share_women["share_women"] = tb_share_women.groupby(["country", "cohort"], as_index=False)[
+        "share_women"
+    ].cumprod()
+
+    # Share of women with N kids
+    tb_share_women["share_women"] = tb_share_women["share_women"] * tb_share_women["q"].fillna(1)
+
+    # Sanity check
+    x = 1 - tb_share_women.groupby(["country", "cohort"]).share_women.sum()
+    assert (x < 1e-10).all(), "Probabilities don't add up to 100% for certain years!"
+
+    # Drop unused columns
+    tb_share_women = tb_share_women.drop(columns=["q"])
+
+    # Ensure dtype
+    tb_share_women["num_births"] = tb_share_women["num_births"].astype(int)
+
+    # Set index
+    tb_share_women = tb_share_women.format(["country", "num_births", "cohort"], short_name="cohort_share_women")
+
+    # Scale to %
+    tb_share_women["share_women"] *= 100
+
+    # Add origins
+    tb_share_women["share_women"].metadata.origins = tb["ppr"].metadata.origins
+
+    return tb_share_women

@@ -5,7 +5,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Generic, Optional, TypeVar
 
-import streamlit as st
 import torch
 from joblib import Memory
 from sentence_transformers import SentenceTransformer, util
@@ -44,8 +43,7 @@ DEVICE = set_device()
 @memory.cache
 def get_model(model_name: str = "all-MiniLM-L6-v2") -> SentenceTransformer:
     "Load the pre-trained model"
-    with st.spinner("Loading model..."):
-        model = SentenceTransformer(model_name)
+    model = SentenceTransformer(model_name)
     return model
 
 

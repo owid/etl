@@ -14,6 +14,8 @@ definitions:
     display: &common-display
       numDecimalPlaces: 1
       tolerance: 5
+      entityAnnotationsMap: |-
+        United Kingdom: England, Scotland, and Wales
     unit: "%"
     short_unit: "%"
 

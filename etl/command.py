@@ -308,6 +308,9 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
                 if dep.startswith("grapher://"):
                     dag[dep] = steps[dep]
 
+    # Validate the DAG
+    _check_dag_completeness(dag)
+
     return dag
 
 
@@ -671,6 +674,16 @@ def _check_public_private_steps(dag: DAG) -> None:
     common = private_steps & public_steps
     if common:
         raise ValueError(f"Dataset has both public and private version: {common}")
+
+
+def _check_dag_completeness(dag: DAG) -> None:
+    """Make sure the DAG is complete, i.e. all dependencies are there."""
+    for step, deps in dag.items():
+        for dep in deps:
+            if re.match(r"^(snapshot|walden|snapshot-private|walden-private|github|etag)://", dep):
+                pass
+            elif dep not in dag:
+                raise ValueError(f"Step {step} depends {dep} which is not in the DAG.")
 
 
 if __name__ == "__main__":

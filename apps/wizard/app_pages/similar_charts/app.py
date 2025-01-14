@@ -24,6 +24,22 @@ st.set_page_config(
 ########################################################################################################################
 
 
+@st.cache_data(show_spinner=False, persist="disk")
+def get_charts() -> list[data.Chart]:
+    with st.spinner("Loading charts..."):
+        # Get charts from the database..
+        df = data.get_raw_charts()
+
+        charts = df.to_dict(orient="records")
+
+    ret = []
+    for c in charts:
+        c["tags"] = c["tags"].split(";") if c["tags"] else []
+        ret.append(data.Chart(**c))  # type: ignore
+
+    return ret
+
+
 def st_chart_info(chart: data.Chart) -> None:
     chart_url = OWID_ENV.chart_site(chart.slug)
     title = f"#### [{chart.title}]({chart_url})"
@@ -74,14 +90,15 @@ def split_input_string(input_string: str) -> tuple[str, list[str], list[str]]:
 
 @st.cache_data(show_spinner=False, max_entries=1)
 def get_and_fit_model(charts: list[data.Chart]) -> scoring.ScoringModel:
-    scoring_model = scoring.ScoringModel(emb.get_model())
+    with st.spinner("Loading model..."):
+        scoring_model = scoring.ScoringModel(emb.get_model())
     scoring_model.fit(charts)
     return scoring_model
 
 
 ########################################################################################################################
 # Fetch all data indicators.
-charts = data.get_charts()
+charts = get_charts()
 # Get scoring model.
 scoring_model = get_and_fit_model(charts)
 

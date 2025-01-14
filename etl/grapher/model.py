@@ -18,7 +18,7 @@ import copy
 import io
 import json
 import random
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Union, get_args, overload
@@ -126,6 +126,52 @@ class Base(MappedAsDataclass, DeclarativeBase):
             cls.__table__.create(engine, checkfirst=False)  # type: ignore
         else:
             raise ValueError(f"Unrecognized value for if_exists: {if_exists}")
+
+
+class HousekeeperReview(Base):
+    __tablename__ = "housekeeper_reviews"
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        init=False,
+        # autoincrement=True,
+        comment="Identifier of the review",
+    )
+    suggestedAt: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=True,
+        server_default=text("CURRENT_TIMESTAMP"),
+        comment="Date when the review was suggested",
+    )
+    objectType: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        comment="Type of the object to review (e.g., 'chart', 'dataset', etc.)",
+    )
+
+    objectId: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    @classmethod
+    def load_reviews(cls, session: Session, object_type: Optional[str] = None) -> list["HousekeeperReview"]:
+        if object_type is None:
+            vars = session.scalars(select(cls)).all()
+            return list(vars)
+        else:
+            vars = session.scalars(select(cls).where(cls.objectType == object_type)).all()
+            return list(vars)
+
+    @classmethod
+    def load_reviews_object_id(cls, session: Session, object_type: str) -> list[int]:
+        vars = session.scalars(select(cls.objectId).where(cls.objectType == object_type)).all()
+        return list(vars)
+
+    @classmethod
+    def add_review(cls, session: Session, object_type: str, object_id: int):
+        new_review = cls(objectType=object_type, objectId=object_id, suggestedAt=datetime.now(timezone.utc))
+        session.add(new_review)
+        session.commit()
+        # return new_review
 
 
 class Entity(Base):
@@ -1256,6 +1302,16 @@ class Variable(Base):
             raise ValueError("Either dataset_uris or dataset_ids must be provided")
         results = session.scalars(query).all()
         return list(results)
+
+    @classmethod
+    def load_variables_in_chart(
+        cls,
+        session: Session,
+        chart_id: int,
+    ) -> List["Variable"]:
+        chart = Chart.load_chart(session, chart_id)
+        variables = chart.load_chart_variables(session)
+        return list(variables.values())
 
     @classmethod
     @deprecated("Use from_id_or_path instead")

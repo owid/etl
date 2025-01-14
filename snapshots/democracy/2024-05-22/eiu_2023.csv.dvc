@@ -30,6 +30,6 @@ meta:
       name: The Economist Intelligence Unit Limited
       url: https://www.eiu.com/n/terms/
 outs:
-  - md5: 9cb52886ce257775f015964cbe4f106e
-    size: 6996
+  - md5: cf87e0d395a3ac553ce96790796777fc
+    size: 7868
     path: eiu_2023.csv
