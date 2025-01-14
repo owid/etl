@@ -922,3 +922,13 @@ steps:
     - data://meadow/who/2025-01-09/vaccination_schedules
   data://grapher/who/2025-01-09/vaccination_schedules:
     - data://garden/who/2025-01-09/vaccination_schedules
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/who/2025-01-14/vaccine_preventable_incidence:
+    - snapshot://who/2025-01-14/vaccine_preventable_incidence.xlsx
+  data://garden/who/2025-01-14/vaccine_preventable_incidence:
+    - data://meadow/who/2025-01-14/vaccine_preventable_incidence
+  data://grapher/who/2025-01-14/vaccine_preventable_incidence:
+    - data://garden/who/2025-01-14/vaccine_preventable_incidence

@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: WHO Immunization data - reported incidence
+    description: |-
+      Reported cases and incidences of vaccine-preventable diseases are collected annually through the WHO/UNICEF Joint Reporting Form on Immunization (JRF). Country data (including historical data) are updated and made available as data is received. Global and regional aggregate data are released annually in mid-July and updated thereafter as country data is received.
+
+      These data are used to provide global trends over time and to inform the Strategic Advisory Group of Experts on Immunization (SAGE) and other advisory bodies to make evidence-based decisions as they deliberate different policies (for example, the need for booster doses and targeted ages).
+    date_published: "2024-03-01"
+
+    # Citation
+    producer: World Health Organization
+    citation_full: |-
+      Reported Incidence  -  WHO/UNICEF Joint Reporting Form on Immunization (2024), World Health Organization and  UNICEF.
+    attribution_short: WHO
+
+    # Files
+    url_main: https://immunizationdata.who.int/global?topic=Reported-cases-and-incidence&location=
+    url_download: https://srhdpeuwpubsa-geecgzbpd5h0fueu.z01.azurefd.net/whdh/WIISE/export/incidence-rate-data.xlsx
+    date_accessed: 2025-01-14
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+
+outs:
+  - md5: 54f6f4f9df9bbbee2a236960819f4a8d
+    size: 3294849
+    path: vaccine_preventable_incidence.xlsx
