@@ -16,3 +16,5 @@ tables:
       incidence_rate:
         title: Incidence rate of << disease_description.lower() >> << denominator >>
         unit: << denominator >>
+        display:
+          name: << disease_description >>
