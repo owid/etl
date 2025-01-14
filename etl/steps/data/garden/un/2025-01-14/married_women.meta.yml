@@ -1,0 +1,37 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Marriages & Divorces
+  projection: &projection
+    <% if dataprocess == "Projection" %>
+    true
+    <% elif dataprocess == "Estimate" %>
+    false
+    <%- endif -%>
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  married_women:
+    variables:
+      percentage_married_union:
+        title: Share of women aged << agegroup>> who are married or in union (<< dataprocess >>)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of women aged << agegroup>> who are married or in union.
+        display:
+          numDecimalPlaces: 1
+          isProjection: *projection
+
+      number_married_union:
+        title: Number of women aged << agegroup>> who are married or in union (<< dataprocess >>)
+        unit: people
+        description_short: Number of women aged << agegroup>> who are married or in union.
+        display:
+          numDecimalPlaces: 0
+          isProjection: *projection

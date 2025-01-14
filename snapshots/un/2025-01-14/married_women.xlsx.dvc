@@ -1,0 +1,44 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Estimates and projections of women of reproductive age who are married or in a union
+    description: |-
+      Estimates and projections of the number and the proportion of married or in-union women of reproductive-age (15-49 years) are provided for the period from 1970 to 2050 for 223 countries or areas, and for regions and development groups. The data are also presented by five-year age groups. The methodology is described in:
+
+      United Nations, Department of Economic and Social Affairs, Population Division (2013).  National, Regional and Global Estimates and Projections of the Number of Women Aged 15-49 Who Are Married or in a Union, 1970-2030.  Technical Paper No. 2013/2.  New York: United Nations.
+
+      Two sets of input data were used to produce estimates and projections for each country: the proportion of women who are married or in a union and the number of women of reproductive age.  Data from censuses and surveys on the proportions of women who are married or in a union, by five-year age group, were obtained from:
+
+      United Nations, Department of Economic and Social Affairs, Population Division (2019).  World Marriage Data 2019.  New York: United Nations. These data were complemented by the most recent data from Demographic and Health Surveys, Multiple Indicator Cluster Surveys, Performance Monitoring for Action (PMA) surveys, national surveys, censuses, and population registers.
+
+      Estimates and projections of the number of women of reproductive age, by five-year age group, were obtained from:
+
+      United Nations, Department of Economic and Social Affairs, Population Division (2024).  World Population Prospects: The 2024 Revision.  New York: United Nations.
+
+      This dataset was prepared by Rocío Peinador Roldán, with inputs from Vladimíra Kantorová and Joseph Molitoris. This work was supported by Grant No. INV-033016 Making Family Planning Count 3.0 from the Bill & Melinda Gates Foundation.
+
+      Note: The designations employed and the material presented in this publication do not imply the expression of any opinion whatsoever on the part of the Secretariat of the United Nations concerning the legal status of any country, territory or area or of its authorities, or concerning the delimitation of its frontiers or boundaries.  The term “country” as used in this publication also refers, as appropriate, to territories or areas.
+
+    date_published: "2024"
+
+    # Citation
+    producer: United Nations
+    citation_full: |-
+      United Nations Department of Economic and Social Affairs, Population Division (2024). Estimates and Projections of Women of Reproductive Age
+    attribution_short: UN
+
+    # Files
+    url_main: https://www.un.org/development/desa/pd/content/family-planning-0
+    url_download: https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2024_ds_1970-2030_fp_rev-2024.xlsx
+    date_accessed: 2025-01-14
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2022_household_size_composition.pdf
+outs:
+  - md5: 4a789c48ab8d2b118ed9722323962990
+    size: 10104867
+    path: married_women.xlsx

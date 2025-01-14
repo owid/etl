@@ -20,3 +20,13 @@ steps:
     - data://garden/ons/2025-01-12/divorces
   data://grapher/ons/2025-01-12/divorces_by_year:
     - data://garden/ons/2025-01-12/divorces
+
+  #
+  # UN Married or in a union women of reproductive age
+  #
+  data://meadow/un/2025-01-14/married_women:
+    - snapshot://un/2025-01-14/married_women.xlsx
+  data://garden/un/2025-01-14/married_women:
+    - data://meadow/un/2025-01-14/married_women
+  data://grapher/un/2025-01-14/married_women:
+    - data://garden/un/2025-01-14/married_women
