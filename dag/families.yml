@@ -22,7 +22,7 @@ steps:
     - data://garden/ons/2025-01-12/divorces
 
   #
-  # UN Married or in a union women of reproductive age
+  # UN Women of reproductive age who are married or in a union
   #
   data://meadow/un/2025-01-14/married_women:
     - snapshot://un/2025-01-14/married_women.xlsx

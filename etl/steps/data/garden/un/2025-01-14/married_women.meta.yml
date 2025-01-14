@@ -1,6 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: minor
     presentation:
       topic_tags:
         - Marriages & Divorces
@@ -24,14 +25,21 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: Percentage of women aged << agegroup>> who are married or in union.
+        presentation:
+          title_public: Share of women aged << agegroup>> > years old who are married or in a union
         display:
+          name: << agegroup>> years old
           numDecimalPlaces: 1
           isProjection: *projection
 
       number_married_union:
         title: Number of women aged << agegroup>> who are married or in union (<< dataprocess >>)
         unit: people
+
         description_short: Number of women aged << agegroup>> who are married or in union.
+        presentation:
+          title_public: Women aged << agegroup>> > years old who are married or in a union
         display:
+          name: << agegroup>> years old
           numDecimalPlaces: 0
           isProjection: *projection
