@@ -37,7 +37,7 @@ meta:
     # License
     license:
       name: CC BY 3.0 IGO
-      url: https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2022_household_size_composition.pdf
+      url: http://creativecommons.org/licenses/by/3.0/igo/
 outs:
   - md5: 4a789c48ab8d2b118ed9722323962990
     size: 10104867
