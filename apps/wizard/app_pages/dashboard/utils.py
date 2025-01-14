@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, Dict, List
 
 import pandas as pd
 import streamlit as st
@@ -198,16 +198,39 @@ def load_steps_df_to_display(show_all_channels: bool, reload_key: int) -> pd.Dat
     return df
 
 
-def _add_steps_to_operations(steps_related: List[str]):
-    """Add steps to the operations list."""
-    # Remove those already in operations list
+def _add_steps_to_selection(steps_related: List[str]):
+    """Add steps to the selection."""
+    # Remove those already in selection
     new_selected_steps = [step for step in steps_related if step not in st.session_state.selected_steps]
-    # Add new steps to the operations list.
+    # Add new steps to the selection
     st.session_state.selected_steps += new_selected_steps
 
 
 def remove_step(step: str):
-    """Remove a step from the operations list."""
+    """Remove a step from the selection."""
     st.session_state.selected_steps.remove(step)
     if step in st.session_state.selected_steps_table:
         st.session_state.selected_steps_table.remove(step)
+
+
+@st.cache_data
+def _get_steps_info(steps_df) -> Dict[str, Any]:
+    """From given list of selected steps, get details for each step.
+    df: DataFrame with selected steps. It is usually the grid_response["selected_rows"].
+    steps_df: DataFrame with all steps. Output of load_steps_df.
+    """
+    # Get list of selected steps
+    # Get details for selected steps
+    selected_steps_info = (
+        steps_df[
+            [
+                "step",
+                "all_active_dependencies",
+                "all_active_usages",
+                "updateable_dependencies",
+            ]
+        ]
+        .set_index("step")
+        .to_dict(orient="index")
+    )
+    return selected_steps_info
