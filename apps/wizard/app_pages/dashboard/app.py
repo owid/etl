@@ -4,7 +4,7 @@ import streamlit as st
 from structlog import get_logger
 
 from apps.wizard.app_pages.dashboard.actions import render_action_archive, render_action_execute, render_action_update
-from apps.wizard.app_pages.dashboard.agrid import make_agrid
+from apps.wizard.app_pages.dashboard.aggrid import make_agrid
 from apps.wizard.app_pages.dashboard.operations import render_operations_list
 from apps.wizard.app_pages.dashboard.preview import render_preview_list
 from apps.wizard.app_pages.dashboard.utils import (
