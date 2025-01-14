@@ -53,6 +53,14 @@ class AdminAPI(object):
         js = self._json_from_response(resp)
         return js
 
+    def get_chart_references(self, chart_id: int) -> dict:
+        resp = requests.get(
+            f"{self.owid_env.admin_api}/charts/{chart_id}.references.json",
+            cookies={"sessionid": self.session_id},
+        )
+        js = self._json_from_response(resp)
+        return js
+
     def create_chart(self, chart_config: dict, user_id: Optional[int] = None) -> dict:
         resp = requests.post(
             self.owid_env.admin_api + "/charts",

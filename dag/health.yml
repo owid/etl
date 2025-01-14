@@ -406,13 +406,13 @@ steps:
   data://grapher/health/2024-04-12/polio_free_countries:
     - data://garden/health/2024-04-12/polio_free_countries
 
-  # Polio vaccine schedule
-  data://meadow/who/2024-04-22/polio_vaccine_schedule:
-    - snapshot://who/2024-04-22/polio_vaccine_schedule.xlsx
-  data://garden/who/2024-04-22/polio_vaccine_schedule:
-    - data://meadow/who/2024-04-22/polio_vaccine_schedule
-  data://grapher/who/2024-04-22/polio_vaccine_schedule:
-    - data://garden/who/2024-04-22/polio_vaccine_schedule
+    # Polio vaccine schedule - update
+  data://meadow/who/2025-01-13/polio_vaccine_schedule:
+    - snapshot://who/2025-01-13/polio_vaccine_schedule.xlsx
+  data://garden/who/2025-01-13/polio_vaccine_schedule:
+    - data://meadow/who/2025-01-13/polio_vaccine_schedule
+  data://grapher/who/2025-01-13/polio_vaccine_schedule:
+    - data://garden/who/2025-01-13/polio_vaccine_schedule
 
   # Polio GPEI funding
   data://meadow/health/2024-04-22/gpei_funding:
