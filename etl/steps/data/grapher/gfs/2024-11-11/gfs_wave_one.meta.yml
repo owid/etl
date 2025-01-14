@@ -1,11 +1,6 @@
 
 definitions:
   common:
-    presentation:
-      topic_tags:
-        - Happiness & Life Satisfaction
-        - Loneliness & Social Connections
-        - Time Use
     processing_level: major
     display:
       numDecimalPlaces: 1
@@ -26,11 +21,11 @@ definitions:
     freedom: |-
       The full text of the question was: "I have the freedom in my life to pursue the things that are most important to me. How much do you agree with this statement, where 0 means "strongly disagree" and 10 means "strongly agree"?
     expenses: |-
-      The full text of the question was: "How often do you worry about being able to meet normal monthly living expenses? Please use a 0 to 10 scale where 10 means "do not ever worry" and 0 means "worry all of the time".
+      The full original text of the question was: "How often do you worry about being able to meet normal monthly living expenses? Please use a 0 to 10 scale where 10 means "do not ever worry" and 0 means "worry all of the time". We have reversed the scale (where 10 means "worry all of the time" and 0 means "do not ever worry") to make the interpretation more intuitive.
     hope: |-
       The full text of the question was "How much do you agree with the statement: "Despite challenges, I always remain hopeful about the future." Please use a 0 to 10 scale where 0 means "strongly disagree" and 10 means "strongly agree".
     lonely: |-
-      The full text of the question was "How often do you feel lonely? Please use a 0 to 10 scale where 10 means "never" and 0 means "always".
+      The full original text of the question was "How often do you feel lonely? Please use a 0 to 10 scale where 10 means "never" and 0 means "always". We have reversed the scale (where 10 means "always" and 0 means "never") to make the interpretation more intuitive.
     physical_health: |-
       The full text of the question was "How would you rate your physical health? Please use a 0 to 10 scale where 10 means "excellent physical health" and 0 means "poor physical health".
     mental_health: |-
@@ -40,8 +35,17 @@ definitions:
     wb_fiveyrs: |-
       The full text of the question was "Please imagine a ladder with steps numbered from zero at the bottom to ten at the top. Suppose we say that the top of the ladder at 10 represents the best possible life for you, and the bottom of the ladder at 0 represents the worst possible life for you. Just your best, on which step of the ladder do you think you will stand in the future, say about five years from now?"
     worry: |-
-      The full text of the question was "How often do you worry about safety, food, or housing? Please use a 0 to 10 scale where 10 means you "do not ever worry" and 0 means you "worry all of the time."
-
+      The full original text of the question was "How often do you worry about safety, food, or housing? Please use a 0 to 10 scale where 10 means you "do not ever worry" and 0 means you "worry all of the time." We have reversed the scale (where 10 means "worry all of the time" and 0 means "do not ever worry") to make the interpretation more intuitive.
+  processing_notes:
+    expenses: |-
+      {definitions.common.description_processing}
+      - The original survey question used a scale where 0 meant "worry all of the time" and 10 meant "do not ever worry". We have reversed the scale so that 0 is "never" and 10 is "always", to make the interpretation of the data more intuitive.
+    lonely: |-
+      {definitions.common.description_processing}
+      - The original survey question used a scale where 10 meant "never" and 0 meant "always". We have reversed the scale so that 10 is "always" and 0 is "never", to make the interpretation of the data more intuitive.
+    worry_safety: |-
+      {definitions.common.description_processing}
+      - The original survey question used a scale where 0 meant "worry all of the time" and 10 meant "do not ever worry". We have reversed the scale so that 0 is "never" and 10 is "always", to make the interpretation of the data more intuitive.
 
 
 # Learn more about the available fields:
@@ -54,58 +58,58 @@ tables:
   gfs_wave_one:
     variables:
       abused_yes_share:
-        title: Share of people who report having experienced abuse when growing up
+        title: Share of people who experienced abuse when growing up
         unit: "%"
         short_unit: "%"
-        description_short: Share of people who report that they have experienced physical or sexual abuse when growing up.
+        description_short: Share of respondents who said they had experienced physical or sexual abuse when growing up.
       abused_no_share:
-        title: Share of people who report not having experienced abuse when growing up
+        title: Share of people have not experienced abuse when growing up
         unit: "%"
         short_unit: "%"
-        description_short: Share of people who report that they have not experienced physical or sexual abuse when growing up.
+        description_short: Share of respondents who said they had not experienced physical or sexual abuse when growing up.
       abused_na_share:
-        title: Share of people who did not answer the question about abuse
+        title: Share of respondents who did not answer the question about abuse
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
-        description_short: Share of people who did not answer the question "Were you ever physically or sexually abused when you were growing up?"
+        description_short: Share of respondents who did not answer the question "Were you ever physically or sexually abused when you were growing up?"
       cigarettes_mean:
-        title: Average number of cigarettes smoked per day, self-reported
+        title: Cigarettes smoked per day
         unit: cigarettes
         short_unit: ""
-        description_short: Average number of cigarettes people report smoking per day. This average includes both smokers and non-smokers.
+        description_short: Average number of cigarettes respondents reported smoking per day, including both smokers and non-smokers.
       cigarettes_na_share:
-        title: Share of people who did not answer the question about smoking
+        title: Share of respondents who did not answer the question about smoking
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
-        description_short: Share of people who did not answer the question "On average, how many cigarettes do you smoke per day?"
+        description_short: Share of respondents who did not answer the question "On average, how many cigarettes do you smoke per day?"
       drinks_mean:
-        title: Average number of alcoholic drinks consumed in the last week, self-reported
+        title: Alcoholic drinks consumed in the last week
         unit: drinks
         short_unit: ""
-        description_short: Average number of alcoholic drinks people report consuming in the last week. A drink is defined as a glass of wine, a can or bottle of beer, or a shot of hard liquor. This average includes both people who report drinking alcohol and those who do not.
+        description_short: Average number of alcoholic drinks respondents reported consuming in the last week. This includes both people who reported drinking alcohol and those who did not.
       drinks_na_share:
-        title: Share of people who did not answer the question about alcohol consumption
+        title: Share of respondents who did not answer the question about alcohol consumption
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
-        description_short: Share of people who did not answer the question "On how many days did you drink alcohol in the last week?"
+        description_short: Share of respondents who did not answer the question "On how many days did you drink alcohol in the last week?"
       happy_mean:
         title: Self-reported happiness
         unit: ""
         short_unit: ""
         description_short: |-
-          Average answer to the question: "In general, how happy or unhappy do you usually feel?", with 0 being "extremely unhappy" and 10 being "extremely happy".
+          Average of responses to the question of how happy or unhappy the respondent usually feels in general, ranging from 0 ("extremely unhappy") to 10 ("extremely happy").
       happy_na_share:
-        title: Share of people who did not answer the happiness question
+        title: Share of respondents who did not answer the happiness question
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who did not answer the question "In general, how happy or unhappy do you usually feel?"
+          Share of respondents who did not answer the question "In general, how happy or unhappy do you usually feel?"
       happy_ans_0_share:
         title: Happiness - Share of people who answer 0
         unit: "%"
@@ -199,15 +203,15 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-          Average answer to the question: "Overall, how satisfied are you with your life as a whole these days?", with 0 being "not at all satisfied" and 10 being "completely satisfied".
+          Average of responses to the question of how satisfied the respondent is with their life as a whole these days, ranging from 0 ("not at all satisfied") to 10 ("completely satisfied").
       life_sat_na_share:
-        title: Share of people who did not answer the life satisfaction question
+        title: Share of respondents who did not answer the life satisfaction question
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-          Share of people who did not answer the question "Overall, how satisfied are you with your life as a whole these days?"
+          Share of respondents who did not answer the question "Overall, how satisfied are you with your life as a whole these days?"
       life_sat_ans_0_share:
         title: Life satisfaction - Share of people who answer 0
         unit: "%"
@@ -301,7 +305,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered "no" when asked, "Is there a special person you feel very close to?"
+          Share of respondents who said "no" when asked whether there is a special person they feel very close to.
         presentation:
           grapher_config:
             note: |-
@@ -312,39 +316,39 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered "yes" when asked, "Is there a special person you feel very close to?"
+          Share of respondents who said "yes" when asked whether there is a special person they feel very close to.
         presentation:
           grapher_config:
             note: |-
               The full question text is "Is there any one special person you know that you feel very close to?
               For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes."
       close_to_na_share:
-        title: Share of people who did not answer the question about feeling close to someone
+        title: Share of respondents who did not answer the question about feeling close to someone
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-          Share of people who did not answer the question "Is there a special person you feel very close to?"
+          Share of respondents who did not answer the question "Is there a special person you feel very close to?"
         presentation:
           grapher_config:
             note: |-
               The full question text is "Is there any one special person you know that you feel very close to?
               For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes."
       content_mean:
-        title: Self-reported happiness with relationships
+        title: Self-reported satisfaction with friendships and relationships
         unit: ""
         short_unit: ""
         description_short: |-
-          Average score people gave when asked to agree with the statement: "I am content with my friendships and relationships.", where 0 is "strongly disagree" and 10 is "strongly agree".
+          Average of responses to the statement "I am content with my friendships and relationships", ranging from 0 ("strongly disagree") to 10 ("strongly agree").
       content_na_share:
-        title: Share of people who did not answer the question about happiness with relationships
+        title: Share of respondents who did not answer the question about happiness with relationships
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-          Share of people who did not answer the question "I am content with my friendships and relationships."
+          Share of respondents who did not answer the question "I am content with my friendships and relationships."
       content_ans_0_share:
         title: Content with relationships - Share of people who answered 0
         unit: "%"
@@ -515,13 +519,13 @@ tables:
           grapher_config:
             note: "{definitions.survey_text.exercise}"
       days_exercise_na_share:
-        title: Share of people who did not answer the exercise question
+        title: Share of respondents who did not answer the exercise question
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-          Share of people who did not answer the question "On how many days did you exercise or engage in vigorous physical activities for 30 minutes or more in the past week?"
+          Share of respondents who did not answer the question "On how many days did you exercise or engage in vigorous physical activities for 30 minutes or more in the past week?"
       depressed_mean:
         title: Self-reported depression
         unit: ""
@@ -553,13 +557,13 @@ tables:
         description_short: |-
           Share of people who reported not feeling down, depressed or hopeless in the last two weeks."
       depressed_na_share:
-        title: Share of people who did not answer the question about depression
+        title: Share of respondents who did not answer the question about depression
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-          Share of people who did not answer the question "In the last two weeks, have you felt down, depressed or hopeless?"
+          Share of respondents who did not answer the question "In the last two weeks, have you felt down, depressed or hopeless?"
       discriminated_mean:
         title: Self-reported feeling of discrimination
         unit: ""
@@ -597,53 +601,57 @@ tables:
         description_short: |-
          Share of people who answered "never" when asked "How often do you feel discriminated against because of any group you are part of?"
       discriminated_na_share:
-        title: Share of people who did not answer the question about discrimination
+        title: Share of respondents who did not answer the question about discrimination
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "How often do you feel discriminated against because of any group you are part of?"
+         Share of respondents who did not answer the question "How often do you feel discriminated against because of any group you are part of?"
       donated_no_share:
-        title: Share of people who did not donate to charity in the last month
+        title: Share of people who did not recently donate to charity
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered "no" when asked "In the last month, have you donated money to a charity or non-profit organization?"
+         Share of respondents who said "no" when asked whether they had donated to a charity or non-profit in the last month.
       donated_yes_share:
-        title: Share of people who donated to charity in the last month
+        title: Share of people who recently donated to charity
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered "yes" when asked "In the last month, have you donated money to a charity or non-profit organization?"
+         Share of respondents who said "yes" when asked whether they had donated to a charity or non-profit in the last month.
       donated_na_share:
-        title: Share of people who did not answer the question about donating to charity
+        title: Share of respondents who did not answer the question about donating to charity
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "In the last month, have you donated money to a charity or non-profit organization?"
+          Share of respondents who did not answer the question "In the last month, have you donated money to a charity or non-profit organization?"
       expenses_mean:
-        title: Average worry about living expenses
+        title: Worries about living expenses
         unit: ""
         short_unit: ""
         description_short: |-
-         Average score people gave when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+          Average of responses to the question of how often the respondent worries about being able to meet normal monthly living expenses, ranging from 0 ("never") to 10 ("always").
+        description_processing: |-
+          {definitions.processing_notes.expenses}
       expenses_na_share:
-        title: Share of people who did not answer the question about living expenses
+        title: Share of respondents who did not answer the question about living expenses
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "How often do you worry about being able to meet normal monthly living expenses?"
+          Share of respondents who did not answer the question "How often do you worry about being able to meet normal monthly living expenses?"
       expenses_ans_0_share:
         title: Worry about living expenses - Share of people who answered 0
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 0 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+          Share of people who answered 0 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.expenses}
         description_key:
           - "{definitions.survey_text.expenses}"
       expenses_ans_1_share:
@@ -651,7 +659,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 1 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+          Share of people who answered 1 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.expenses}
         description_key:
           - "{definitions.survey_text.expenses}"
       expenses_ans_2_share:
@@ -659,7 +669,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 2 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+         Share of people who answered 2 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+         {definitions.processing_notes.expenses}
         description_key:
           - "{definitions.survey_text.expenses}"
       expenses_ans_3_share:
@@ -667,7 +679,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 3 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+          Share of people who answered 3 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.expenses}
         description_key:
           - "{definitions.survey_text.expenses}"
       expenses_ans_4_share:
@@ -675,7 +689,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 4 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+          Share of people who answered 4 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.expenses}
         description_key:
           - "{definitions.survey_text.expenses}"
       expenses_ans_5_share:
@@ -683,7 +699,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 5 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+          Share of people who answered 5 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.expenses}
         description_key:
           - "{definitions.survey_text.expenses}"
       expenses_ans_6_share:
@@ -691,7 +709,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 6 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+         Share of people who answered 6 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
         description_key:
           - "{definitions.survey_text.expenses}"
       expenses_ans_7_share:
@@ -699,7 +717,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 7 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+          Share of people who answered 7 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.expenses}
         description_key:
           - "{definitions.survey_text.expenses}"
       expenses_ans_8_share:
@@ -707,7 +727,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 8 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+         Share of people who answered 8 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.expenses}
         description_key:
           - "{definitions.survey_text.expenses}"
       expenses_ans_9_share:
@@ -715,7 +737,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 9 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+         Share of people who answered 9 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.expenses}
         description_key:
           - "{definitions.survey_text.expenses}"
       expenses_ans_10_share:
@@ -723,7 +747,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 10 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "always" and 10 is "never".
+         Share of people who answered 10 when asked "How often do you worry about being able to meet normal monthly living expenses?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.expenses}
         description_key:
           - "{definitions.survey_text.expenses}"
       feel_anxious_mean:
@@ -757,27 +783,27 @@ tables:
         description_short: |-
          Share of people who reported not feeling nervous, anxious or on edge in the last two weeks."
       feel_anxious_na_share:
-        title: Share of people who did not answer the question about anxiety
+        title: Share of respondents who did not answer the question about anxiety
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "In the last two weeks, how often have you felt nervous, anxious or on edge?"
+         Share of respondents who did not answer the question "In the last two weeks, how often have you felt nervous, anxious or on edge?"
       freedom_mean:
-        title: Self-reported freedom to make life choices
+        title: Self-reported freedom
         unit: ""
         short_unit: ""
         description_short: |-
-         Average score people gave when asked to agree with the statement "I have the freedom in my life to pursue the things that are most important to me.", where 0 is "strongly disagree" and 10 is "strongly agree".
+         Average of responses of how much the respondent agreed with the statement that they have the freedom to pursue the things that are important to them, ranging from 0 ("strongly disagree") to 10 ("strongly agree").
       freedom_na_share:
-        title: Share of people who did not answer the question about freedom to make life choices
+        title: Share of respondents who did not answer the question about freedom to make life choices
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "I have the freedom in my life to pursue the things that are most important to me."
+         Share of respondents who did not answer the question "I have the freedom in my life to pursue the things that are most important to me."
       freedom_ans_0_share:
         title: Freedom to make life choices - Share of people who answered 0
         unit: "%"
@@ -863,7 +889,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 10 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
+          Share of people who answered 10 when asked to rate how much they agree with the statement "I have the freedom in my life to pursue the things that are most important to me."
         description_key:
           - "{definitions.survey_text.freedom}"
       hope_future_mean:
@@ -871,15 +897,15 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-         Average score people gave when asked to agree with the statement "Despite challenges, I always remain hopeful about the future.", where 0 is "strongly disagree" and 10 is "strongly agree".
+          Average of responses of how much the respondent agreed with the statement that, despite challenges, they always remain hopeful about the future, ranging from 0 ("strongly disagree") to 10 ("strongly agree").
       hope_future_na_share:
-        title: Share of people who did not answer the question about hopefulness
+        title: Share of respondents who did not answer the question about hopefulness
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "Despite challenges, I always remain hopeful about the future."
+         Share of respondents who did not answer the question "Despite challenges, I always remain hopeful about the future."
       hope_future_ans_0_share:
         title: Hopefulness - Share of people who answered 0
         unit: "%"
@@ -973,13 +999,13 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-         Average answer people gave when asked "How would you rate your overall mental health?", where 0 is "poor mental health" and 10 is "excellent mental health".
+         Average of responses to the question of how the respondent would rate their overall mental health, ranging from 0 ("poor") to 10 ("excellent").
       mental_health_na_share:
-        title: Share of people who did not answer the question about mental health
+        title: Share of respondents who did not answer the question about mental health
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who did not answer the question "How would you rate your overall mental health?"
+         Share of respondents who did not answer the question "How would you rate your overall mental health?"
       mental_health_ans_0_share:
         title: Mental health - Share of people who answered 0
         unit: "%"
@@ -1073,21 +1099,25 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-         Average answer people gave when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+          Average of responses to the question of how often the respondent feels lonely, ranging from 0 ("never") to 10 ("always").
+        description_processing: |-
+          {definitions.processing_notes.lonely}
       lonely_na_share:
-        title: Share of people who did not answer the question about loneliness
+        title: Share of respondents who did not answer the question about loneliness
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "How often do you feel lonely?"
+         Share of respondents who did not answer the question "How often do you feel lonely?"
       lonely_ans_0_share:
         title: Loneliness - Share of people who answered 0
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 0 when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+         Share of people who answered 0 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.lonely}
         description_key:
           - "{definitions.survey_text.lonely}"
       lonely_ans_1_share:
@@ -1095,7 +1125,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 1 when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+         Share of people who answered 1 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.lonely}
         description_key:
           - "{definitions.survey_text.lonely}"
       lonely_ans_2_share:
@@ -1103,7 +1135,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 2 when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+         Share of people who answered 2 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.lonely}
         description_key:
           - "{definitions.survey_text.lonely}"
       lonely_ans_3_share:
@@ -1111,7 +1145,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 3 when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+         Share of people who answered 3 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.lonely}
         description_key:
           - "{definitions.survey_text.lonely}"
       lonely_ans_4_share:
@@ -1119,7 +1155,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 4 when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+         Share of people who answered 4 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.lonely}
         description_key:
           - "{definitions.survey_text.lonely}"
       lonely_ans_5_share:
@@ -1127,7 +1165,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 5 when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+         Share of people who answered 5 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.lonely}
         description_key:
           - "{definitions.survey_text.lonely}"
       lonely_ans_6_share:
@@ -1135,7 +1175,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 6 when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+         Share of people who answered 6 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.lonely}
         description_key:
           - "{definitions.survey_text.lonely}"
       lonely_ans_7_share:
@@ -1143,7 +1185,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 7 when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+         Share of people who answered 7 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.lonely}
         description_key:
           - "{definitions.survey_text.lonely}"
       lonely_ans_8_share:
@@ -1151,7 +1195,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 8 when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+         Share of people who answered 8 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.lonely}
         description_key:
           - "{definitions.survey_text.lonely}"
       lonely_ans_9_share:
@@ -1159,7 +1205,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 9 when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+         Share of people who answered 9 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.lonely}
         description_key:
           - "{definitions.survey_text.lonely}"
       lonely_ans_10_share:
@@ -1167,7 +1215,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 10 when asked "How often do you feel lonely?", where 0 is "always" and 10 is "never".
+         Share of people who answered 10 when asked "How often do you feel lonely?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.lonely}
         description_key:
           - "{definitions.survey_text.lonely}"
       physical_hlth_mean:
@@ -1175,13 +1225,13 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-         Average answer people gave when asked "How would you rate your overall physical health?", where 0 is "poor physical health" and 10 is "excellent physical health".
+         Average of responses to the question of how the respondent would rate their overall physical health, ranging from 0 ("poor") to 10 ("excellent").
       physical_hlth_na_share:
-        title: Share of people who did not answer the question about physical health
+        title: Share of respondents who did not answer the question about physical health
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who did not answer the question "How would you rate your overall physical health?"
+         Share of respondents who did not answer the question "How would you rate your overall physical health?"
       physical_hlth_ans_0_share:
         title: Physical health - Share of people who answered 0
         unit: "%"
@@ -1295,13 +1345,13 @@ tables:
         description_short: |-
          Share of people who answered "neither" when asked "Would you say you are religious, spiritual, neither, or both?"
       rel8_na_share:
-        title: Share of people who did not answer the question about religion and spirituality
+        title: Share of respondents who did not answer the question about religion and spirituality
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "Would you say you are religious, spiritual, neither, or both?"
+         Share of respondents who did not answer the question "Would you say you are religious, spiritual, neither, or both?"
       say_in_govt_ans_1_share:
         title: Share of people who feel they have a say in government
         unit: "%"
@@ -1321,13 +1371,13 @@ tables:
         description_short: |-
          Share of people who are unsure about whether "People like me have a say in what the government does."
       say_in_govt_na_share:
-        title: Share of people who did not answer the question about having a say in government
+        title: Share of respondents who did not answer the question about having a say in government
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "People like me have a say in what the government does."
+         Share of respondents who did not answer the question "People like me have a say in what the government does."
       trust_people_mean:
         title: Perceived trust in people
         unit: ""
@@ -1371,33 +1421,33 @@ tables:
         description_short: |-
          Share of people who answered "none" when asked "How many people in this country trust each other?"
       trust_people_na_share:
-        title: Share of people who did not answer the question about trust in people
+        title: Share of respondents who did not answer the question about trust in people
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "How many people in this country trust each other?"
+         Share of respondents who did not answer the question "How many people in this country trust each other?"
       volunteered_no_share:
-        title: Share of people who did not volunteer in the last month
+        title: Share of people who did not recently volunteer
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered "no" when asked "In the last month, have you volunteered your time to an organization?"
+         Share of respondents who said "no" when asked whether they had volunteered for an organization in the last month.
       volunteered_yes_share:
-        title: Share of people who volunteered in the last month
+        title: Share of people who recently volunteered
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered "yes" when asked "In the last month, have you volunteered your time to an organization?"
+          Share of respondents who said "yes" when asked whether they had volunteered for an organization in the last month.
       volunteered_na_share:
-        title: Share of people who did not answer the question about volunteering
+        title: Share of respondents who did not answer the question about volunteering
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "In the last month, have you volunteered your time to an organization?"
+         Share of respondents who did not answer the question "In the last month, have you volunteered your time to an organization?"
       wb_today_mean:
         title: Self-reported life evaluation score
         unit: ""
@@ -1405,13 +1455,13 @@ tables:
         description_short: |-
          Average score people gave when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
       wb_today_na_share:
-        title: Share of people who did not answer the life evaluation question
+        title: Share of respondents who did not answer the life evaluation question
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of people who did not answer the question "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+         Share of respondents who did not answer the question "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
       wb_today_ans_0_share:
         title: Life evaluation - Share of people who answered 0
         unit: "%"
@@ -1507,13 +1557,13 @@ tables:
         description_short: |-
           Average score people gave when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
       wb_fiveyrs_na_share:
-        title: Share of people who did not answer the life evaluation outlook question
+        title: Share of respondents who did not answer the life evaluation outlook question
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-          Share of people who did not answer the question "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of respondents who did not answer the question "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
       wb_fiveyrs_ans_0_share:
         title : Life evaluation outlook - Share of people who answered 0
         unit: "%"
@@ -1603,45 +1653,49 @@ tables:
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_improvement_yes_share:
-        title: Share of people who expect their life to improve in the next five years
+        title: Share of people who think their life will improve in the next years
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered that they will be on a higher step of the [cantril ladder](#dod:cantril-ladder) in five years than they are now."
+          Share of respondents who saw themselves on a higher step of the [cantril ladder](#dod:cantril-ladder) in five years than they are now."
       wb_improvement_no_share:
-        title: Share of people who do not expect their life to improve in the next five years
+        title: Share of people who do not think their life will improve in the next five years
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered that they will be on the same or a lower step of the [cantril ladder](#dod:cantril-ladder) in five years than they are now."
+          Share of respondents who saw themselves on a same or lower step of the [cantril ladder](#dod:cantril-ladder) in five years than they are now."
       wb_improvement_na_share:
-        title: Share of people who did not answer the question about life improvement
+        title: Share of respondents who did not answer the question about life improvement
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-          Share of people who did not answer the question "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of respondents who did not answer the question "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
       worry_safety_mean:
-        title: Average worry about safety
+        title: Worry about safety, food, or housing
         unit: ""
         short_unit: ""
         description_short: |-
-          Average score people gave when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Average of responses to the question of how often the respondent worries about safety, food, or housing, ranging from 0 ("never") to 10 ("always").
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
       worry_safety_na_share:
-        title: Share of people who did not answer the question about safety
+        title: Share of respondents who did not answer the question about safety
         unit: "%"
         short_unit: "%"
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-          Share of people who did not answer the question "How often do you worry about safety, food or housing?"
+          Share of respondents who did not answer the question "How often do you worry about safety, food or housing?"
       worry_safety_ans_0_share:
         title: Safety worry - Share of people who answered 0
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 0 when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Share of people who answered 0 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
         description_key:
           - "{definitions.survey_text.worry}"
       worry_safety_ans_1_share:
@@ -1649,7 +1703,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 1 when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Share of people who answered 1 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
         description_key:
           - "{definitions.survey_text.worry}"
       worry_safety_ans_2_share:
@@ -1657,7 +1713,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 2 when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Share of people who answered 2 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
         description_key:
           - "{definitions.survey_text.worry}"
       worry_safety_ans_3_share:
@@ -1665,7 +1723,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 3 when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Share of people who answered 3 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
         description_key:
           - "{definitions.survey_text.worry}"
       worry_safety_ans_4_share:
@@ -1673,7 +1733,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 4 when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Share of people who answered 4 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
         description_key:
           - "{definitions.survey_text.worry}"
       worry_safety_ans_5_share:
@@ -1681,7 +1743,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 5 when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Share of people who answered 5 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
         description_key:
           - "{definitions.survey_text.worry}"
       worry_safety_ans_6_share:
@@ -1689,7 +1753,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 6 when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Share of people who answered 6 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
         description_key:
           - "{definitions.survey_text.worry}"
       worry_safety_ans_7_share:
@@ -1697,7 +1763,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 7 when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Share of people who answered 7 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
         description_key:
           - "{definitions.survey_text.worry}"
       worry_safety_ans_8_share:
@@ -1705,7 +1773,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 8 when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Share of people who answered 8 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
         description_key:
           - "{definitions.survey_text.worry}"
       worry_safety_ans_9_share:
@@ -1713,7 +1783,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 9 when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Share of people who answered 9 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
         description_key:
           - "{definitions.survey_text.worry}"
       worry_safety_ans_10_share:
@@ -1721,7 +1793,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 10 when asked "How often do you worry about safety, food or housing?", where 0 is "always" and 10 is "never".
+          Share of people who answered 10 when asked "How often do you worry about safety, food or housing?", where 0 is "never" and 10 is "always".
+        description_processing: |-
+          {definitions.processing_notes.worry_safety}
         description_key:
           - "{definitions.survey_text.worry}"
 

@@ -210,30 +210,8 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
-    ds_meadow = paths.load_dataset("gfs_wave_one")
 
-    # Read table from meadow dataset.
-    tb = ds_meadow["gfs_wave_one"].reset_index()
 
-    # TODO: think about what to do for years
-    # probably setting 2023 for all of these is fine (>84% of data)
-    # for reference value counts: doi_annual
-    # 2023    170562
-    # 2022     32334
-    # 2024         2
-    # tb["year"] = 2023  # pd.to_datetime(tb["doi_annual"]).dt.year
-
-    tb["country"] = tb["country"].map(COUNTRY_MAPPING)
-
-    # cleaning nan values
-    for val in ["-98", "98", "99", -98, 98, 99, " ", ""]:
-        tb = tb.replace(val, np.nan)
-
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
-    # Custom column: people who think their life will get better in the next 5 years
-    tb["wb_improvement"] = tb.apply(get_ineq_nan, axis=1)  # 1 if yes, 2 if no
 
     # Calculate average scores/ shares of answers for all variables
     tb_scored_10 = average_scored(tb, cols=SCORED_10_COLS)
@@ -244,7 +222,7 @@ def run(dest_dir: str) -> None:
     tb_scored_other = average_scored(tb, cols=LOW_SCORED_COLS)
     tb_cat_other = share_categorical(tb, cols=LOW_SCORED_COLS)
 
-    # 97 is treated as 97 rather than 97+
+    # 97 is treated as 97 rather than 97+ (topcoded)
     # drinks: 116 rows
     # cigarettes: 45 rows
     tb_scored_97 = average_scored(tb, cols=["cigarettes", "drinks"])
@@ -254,8 +232,12 @@ def run(dest_dir: str) -> None:
         [tb_scored_10, tb_share_10, tb_binary, tb_cat, tb_scored_other, tb_cat_other, tb_scored_97]
     )
 
-    # see above - change when decision about year is made
-    tbs_full["year"] = 2023
+    # setting the year to 2023 for all data points (>84% of data)
+    # for reference value counts: doi_annual
+    # 2023    170562
+    # 2022     32334
+    # 2024         2
+    tbs_full["year"] = 2023  # alternative would be: pd.to_datetime(tb["doi_annual"]).dt.year
 
     tbs_full.metadata = tb.metadata
     tbs_full.m.short_name = "gfs_wave_one"
@@ -275,6 +257,17 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def reverse_score(tb, col):
+    """Reverse the score of a column with a numerical scale"""
+    scale_ls = COLUMNS_MAPPING[col].split("_")
+    if scale_ls[0] != "scored":
+        raise ValueError(f"Column {col} is not a scored variable")
+    else:
+        num_scale = int(scale_ls[1])
+        tb[col] = num_scale - tb[col]
+        return tb[col]
 
 
 def average_scored(tb, groups=["country"], cols=SCORED_10_COLS):
