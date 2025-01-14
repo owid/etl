@@ -2,11 +2,11 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: OECD Family Dabatabse - Mean age at marriage
+    title: OECD Family Database - Mean age at marriage
     description: |-
       The OECD Family Database provides cross-national indicators on family outcomes and family policies across the OECD countries, its enhanced engagement partners and EU member states. It includes 70 indicators under four main dimensions: (i) structure of families, (ii) labour market position of families, (iii) public policies for families and children and (iv) child outcomes.
     date_published: 2024-03-27
-    title_snapshot: OECD Family Dabatabse - Mean age at marriage
+    title_snapshot: OECD Family Database - Mean age at marriage
     description_snapshot: |-
       This dataset contains the data on mean age at first marriage, defined as the mean age in years of marrying persons at the time of marriage. This measure is disaggregated by sex with separate averages for men and women.
 
