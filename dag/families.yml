@@ -8,3 +8,15 @@ steps:
     - data://meadow/oecd/2024-12-30/family_database
   data://grapher/oecd/2024-12-30/family_database:
     - data://garden/oecd/2024-12-30/family_database
+
+  #
+  # ONS Divorces in England and Wales
+  #
+  data://meadow/ons/2025-01-12/divorces:
+    - snapshot://ons/2025-01-12/divorces.xlsx
+  data://garden/ons/2025-01-12/divorces:
+    - data://meadow/ons/2025-01-12/divorces
+  data://grapher/ons/2025-01-12/divorces:
+    - data://garden/ons/2025-01-12/divorces
+  data://grapher/ons/2025-01-12/divorces_by_year:
+    - data://garden/ons/2025-01-12/divorces
