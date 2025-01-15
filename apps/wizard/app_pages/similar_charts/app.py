@@ -208,7 +208,8 @@ sorted_charts = sorted(charts, key=lambda x: x.similarity, reverse=True)  # type
 
 # Postprocess charts with GPT and prioritize diversity
 if diversity_gpt:
-    slugs_to_reasons = scoring.gpt_diverse_charts(chosen_chart, sorted_charts, system_prompt=system_prompt)
+    with st.spinner("Diversifying chart results..."):
+        slugs_to_reasons = scoring.gpt_diverse_charts(chosen_chart, sorted_charts, system_prompt=system_prompt)
     for chart in sorted_charts:
         if chart.slug in slugs_to_reasons:
             chart.gpt_reason = slugs_to_reasons[chart.slug]
