@@ -416,50 +416,6 @@ def update_query_params(key):
     return _update_query_params
 
 
-def url_persist2(component: Any) -> Any:
-    """Wrapper around streamlit components that persist values in the URL query string.
-    Usage:
-        url_persist(st.multiselect)(
-          key="abc",
-          ...
-        )
-    """
-    # Component uses list of values
-    if component == st.multiselect:
-        repeated = True
-    else:
-        repeated = False
-
-    def _persist(*args, **kwargs):
-        assert "key" in kwargs, "key should be passed to persist"
-        # TODO: we could wrap on_change too to make it work
-        assert "on_change" not in kwargs, "on_change should not be passed to persist"
-
-        key = kwargs["key"]
-
-        if not st.session_state.get(key):
-            if repeated:
-                params = st.query_params.get_all(key)
-                # convert to int if digit
-                params = [int(q) if q.isdigit() else q for q in params]
-            else:
-                params = st.query_params.get(key)
-                if params and params.isdigit():
-                    params = int(params)
-
-            # Use `value` from the component as a default value if available
-            if not params and "value" in kwargs:
-                params = kwargs.pop("value")
-
-            st.session_state[key] = params
-
-        kwargs["on_change"] = update_query_params(key)
-
-        return component(*args, **kwargs)
-
-    return _persist
-
-
 def url_persist(component: Any, default: Any = None) -> Any:
     """Wrapper around streamlit components that persist values in the URL query string.
 
@@ -496,30 +452,15 @@ def url_persist(component: Any, default: Any = None) -> Any:
             st.session_state[key] = default
 
         if not st.session_state.get(key):
-            if repeated:
-                params = st.query_params.get_all(key)
-                # convert to int if digit
-                params = [int(q) if q.isdigit() else q for q in params]
-            else:
-                params = st.query_params.get(key)
-                if params and params.isdigit():
-                    params = int(params)
-                elif params and params.replace(".", "", 1).isdigit():
-                    params = float(params)
+            # Obtain params from query string
+            params = _get_params(repeated, convert_to_bool, key, kwargs)
 
-            if convert_to_bool:
-                params = params == "True"
-
-            # Use `value` from the component as a default value if available
-            if not params and "value" in kwargs:
-                params = kwargs.pop("value")
-
+            # Store params in session state
             st.session_state[key] = params
 
-            if "options" in kwargs:
-                # Set default value in query params
-                if params not in kwargs["options"]:
-                    raise ValueError(f"Please review the URL query. Value {params} not in options {kwargs['options']}.")
+            # Check if the value given for an option via the URL is actually accepted!
+            # Allow empty values! NOTE: Might want to re-evaluate this, and add a flag to the function, e.g. 'allow_empty'
+            _check_options_params(kwargs, params)
 
         else:
             # Set the value in query params, but only if it isn't default
@@ -531,3 +472,50 @@ def url_persist(component: Any, default: Any = None) -> Any:
         return component(*args, **kwargs)
 
     return _persist
+
+
+def _check_options_params(kwargs, params):
+    """Check that the options in the URL query are valid.
+
+    NOTE: Empty values are allowed.
+
+    Wrong values will raise a ValueError.
+    """
+    if "options" in kwargs:
+        print(type(params))
+        if isinstance(params, list):
+            not_expected = [p for p in params if p not in kwargs["options"]]
+            if (params != []) or (len(not_expected) != 0):
+                raise ValueError(
+                    f"Please review the URL query. Values {not_expected} not in options {kwargs['options']}."
+                )
+        elif params is not None:
+            # Set default value in query params
+            if params not in kwargs["options"]:
+                raise ValueError(f"Please review the URL query. Value {params} not in options {kwargs['options']}.")
+
+
+def _get_params(repeated, convert_to_bool, key, kwargs):
+    """Get params from query string.
+
+    Converts the params to the correct type if needed.
+    """
+    if repeated:
+        params = st.query_params.get_all(key)
+        # convert to int if digit
+        params = [int(q) if q.isdigit() else q for q in params]
+    else:
+        params = st.query_params.get(key)
+        if params and params.isdigit():
+            params = int(params)
+        elif params and params.replace(".", "", 1).isdigit():
+            params = float(params)
+
+    if convert_to_bool:
+        params = params == "True"
+
+    # Use `value` from the component as a default value if available
+    if not params and "value" in kwargs:
+        params = kwargs.pop("value")
+
+    return params
