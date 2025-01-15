@@ -88,6 +88,8 @@ def prompt_dataset_options(dataset_options):
 
     # Collect Query params
     dataset_id = st.query_params.get("datasetId")
+    if dataset_id == "None":
+        dataset_id = None
 
     # Correct dataset id
     ## If no dataset_id is provided, show only non-archived ETL datasets

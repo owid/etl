@@ -252,7 +252,7 @@ if option:
                 path_export = cast(str, harmonizer.output_file)
                 if ENV_IS_REMOTE:
                     # Submit button
-                    export_btn = st.form_submit_button(
+                    export_btn = st.button(
                         label="Generate mapping",
                         type="primary",
                     )

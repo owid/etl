@@ -304,8 +304,11 @@ def show_producers_grid(df_producers, min_date, max_date):
     )
 
     # Get the selected producers from the first table.
-    producers_selected = [row["producer"] for row in grid_response["selected_rows"]]
+    df = grid_response["selected_rows"]
+    if df is None:
+        return []
 
+    producers_selected = df["producer"].tolist()
     return producers_selected
 
 

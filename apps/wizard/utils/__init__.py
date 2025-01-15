@@ -404,16 +404,22 @@ class AppState:
     @classproperty
     def args(cls: "AppState") -> argparse.Namespace:
         """Get arguments passed from command line."""
-        if "args" in st.session_state:
-            return st.session_state["args"]
-        else:
-            parser = argparse.ArgumentParser()
-            parser.add_argument("--phase")
-            parser.add_argument("--run-checks", action="store_true")
-            parser.add_argument("--dummy-data", action="store_true")
-            args = parser.parse_args()
-            st.session_state["args"] = args
+        return parse_args_from_cmd()
+
+
+def parse_args_from_cmd() -> argparse.Namespace:
+    """Get arguments passed from command line."""
+    if "args" in st.session_state:
         return st.session_state["args"]
+    else:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--debug", action="store_true")
+        # parser.add_argument("--phase")
+        parser.add_argument("--run-checks", action="store_true")
+        parser.add_argument("--dummy-data", action="store_true")
+        args = parser.parse_args()
+        st.session_state["args"] = args
+    return st.session_state["args"]
 
 
 def extract(error_message: str) -> List[Any]:
