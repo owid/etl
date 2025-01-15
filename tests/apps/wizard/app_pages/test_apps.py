@@ -200,7 +200,9 @@ def _get_random_dataset():
 @pytest.mark.integration
 @pytest.mark.usefixtures("set_config")
 def test_app_producer_analytics():
-    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/producer_analytics.py"), default_timeout=DEFAULT_TIMEOUT).run()
+    at = AppTest.from_file(
+        str(WIZARD_DIR / "app_pages/producer_analytics/app.py"), default_timeout=DEFAULT_TIMEOUT
+    ).run()
 
     assert not at.exception
 
