@@ -266,6 +266,11 @@ if st.session_state.chart_animation_show_image_settings:
             ".gif" if output_type == "GIF" else ".mp4"
         )
 
+        if output_type == "GIF":
+            st.warning(
+                "GIF format may distort some of the chart colors. GIF supports up to 8 bits per pixel for each image, permitting a single image to reference its palette of up to 256 different colors selected from the 24-bit RGB color space. More details in [Wikipedia](https://en.wikipedia.org/wiki/GIF)."
+            )
+
         # If chart, show option to just show single year
         if tab == "chart":
             year_range_open = not st.toggle(
