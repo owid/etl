@@ -41,7 +41,6 @@ from apps.wizard.utils.components import (
     st_multiselect_wider,
     tag_in_md,
     url_persist,
-    url_persist,
 )
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
