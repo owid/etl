@@ -18,3 +18,10 @@ tables:
         unit: << denominator >>
         display:
           name: << disease_description >>
+  years_since_vaccine_introduction:
+    variables:
+      incidence_rate:
+        title: Incidence rate of << disease_description.lower() >> << denominator >> since vaccine introduction
+        unit: << denominator >>
+        display:
+          name: << disease_description >>
