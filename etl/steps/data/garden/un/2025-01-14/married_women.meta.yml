@@ -28,7 +28,7 @@ tables:
         short_unit: "%"
         description_short: Percentage of women aged << agegroup>> sharing a household with their partner, whether married, cohabiting, in consensual partnerships, or in other non-marital unions.
         presentation:
-          title_public: Share of women aged << agegroup>> > years old who are married or in a union
+          title_public: Share of women aged << agegroup>> years old who are married or in a union
         display:
           name: << agegroup>> years old
           numDecimalPlaces: 1
@@ -40,7 +40,7 @@ tables:
 
         description_short: Number of women aged << agegroup>> sharing a household with their partner, whether married, cohabiting, in consensual partnerships, or in other non-marital unions.
         presentation:
-          title_public: Women aged << agegroup>> > years old who are married or in a union
+          title_public: Women aged << agegroup>> years old who are married or in a union
         display:
           name: << agegroup>> years old
           numDecimalPlaces: 0
