@@ -31,7 +31,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["group", "code", "disease"])
     tb = tb.format(["country", "year", "disease_description", "denominator"])
     tb_intro = tb_intro.format(
-        ["country", "year", "disease_description"], short_name="years_since_vaccine_introduction"
+        ["country", "year", "disease_description", "denominator"], short_name="years_since_vaccine_introduction"
     )
 
     #
