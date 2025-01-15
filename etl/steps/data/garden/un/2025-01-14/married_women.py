@@ -21,6 +21,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    # dataprocess specifies wehter the data is estimated or a projection.
     tb = tb.format(["country", "year", "agegroup", "dataprocess"])
 
     #

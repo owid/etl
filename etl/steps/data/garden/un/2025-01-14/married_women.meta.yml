@@ -5,6 +5,8 @@ definitions:
     presentation:
       topic_tags:
         - Marriages & Divorces
+    description_from_producer: Women in a union refers to women living with their partner in the same household, including cohabiting unions, consensual unions, unmarried unions, or “living together.”
+    description_short: Women sharing a household with their partner, whether married, cohabiting, in consensual partnerships, or in other non-marital unions.
   projection: &projection
     <% if dataprocess == "Projection" %>
     true
