@@ -21,7 +21,7 @@ tables:
         title:  Mean age of <<gender.lower()>> at first marriage
         unit: years
         description_short: |-
-          The mean age of <<gender.lower()>> at first marriage. This is defined as the average age of all <<gender.lower()>> who got married this year for the first time.
+          Average age of <<gender.lower()>> who got married this year for the first time.
         description_from_producer: |-
           The mean age at first marriage, defined as the mean age in years of marrying persons at the time of marriage. This measure is disaggregated by sex with separate averages for men and women.
           For Australia, New Zealand and the United States, median age at first marriage. For Mexico, data refer to all marriages and not only first marriage.
