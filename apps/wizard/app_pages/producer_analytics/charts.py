@@ -15,10 +15,7 @@ from etl.version_tracker import VersionTracker
 
 
 @st.cache_data(show_spinner=False)
-def get_producer_analytics_per_chart(min_date, max_date, excluded_steps):
-    # Load the steps dataframe with producer data and analytics.
-    df_expanded = get_producer_charts_analytics(min_date=min_date, max_date=max_date, excluded_steps=excluded_steps)
-
+def get_producer_analytics_per_chart(df_expanded):
     # Create an expanded table with number of views per chart.
     df_renders_per_chart = df_expanded.dropna(subset=["grapher"]).fillna(0).reset_index(drop=True)
     df_renders_per_chart = df_renders_per_chart.sort_values("renders_custom", ascending=False).reset_index(drop=True)

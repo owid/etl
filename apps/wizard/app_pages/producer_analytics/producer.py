@@ -3,15 +3,11 @@ import streamlit as st
 from st_aggrid import AgGrid, GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 
-from apps.wizard.app_pages.producer_analytics.charts import get_producer_charts_analytics
 from apps.wizard.app_pages.producer_analytics.utils import columns_producer
 
 
 @st.cache_data(show_spinner=False)
-def get_producer_analytics_per_producer(min_date, max_date, excluded_steps):
-    # Load the steps dataframe with producer data and analytics.
-    df_expanded = get_producer_charts_analytics(min_date=min_date, max_date=max_date, excluded_steps=excluded_steps)
-
+def get_producer_analytics_per_producer(df_expanded):
     # st.toast("⌛ Adapting the data for presentation...")
     # Group by producer and get the full list of chart slugs for each producer.
     df_grouped = df_expanded.groupby("producer", observed=True, as_index=False).agg(
