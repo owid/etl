@@ -37,7 +37,7 @@ TAB_DEFAULT = "map"
 st.session_state.chart_animation_images_folder = st.session_state.get("chart_animation_images_folder", DOWNLOADS_DIR)
 st.session_state.chart_animation_image_paths = st.session_state.get("chart_animation_image_paths", None)
 st.session_state.chart_animation_images_exist = st.session_state.get("chart_animation_images_exist", False)
-st.session_state.chart_animation_gif_file = st.session_state.get("chart_animation_gif_file", None)
+st.session_state.chart_animation_file = st.session_state.get("chart_animation_file", None)
 st.session_state.chart_animation_iframe_html = st.session_state.get("chart_animation_iframe_html", None)
 st.session_state.chart_animation_show_image_settings = st.session_state.get(
     "chart_animation_show_image_settings", False
@@ -174,7 +174,7 @@ if not st.session_state.chart_animation_images_folder.exists():
     # Create the default output folder if it doesn't exist.
     st.session_state.chart_animation_images_folder.mkdir(parents=True)
 image_paths = [image for image in st.session_state.chart_animation_images_folder.iterdir() if image.suffix == ".png"]
-st.session_state.chart_animation_gif_file = DOWNLOADS_DIR / f"{slug}.gif"
+st.session_state.chart_animation_file = DOWNLOADS_DIR / f"{slug}.gif"
 st.session_state.chart_animation_image_paths = image_paths
 st.session_state.chart_animation_images_exist = len(image_paths) > 0
 
@@ -250,8 +250,8 @@ if st.session_state.chart_animation_show_image_settings:
             # Choose: GIF or Video
             output_type = st.segmented_control(
                 "Output format",
-                ["GIF", "Video"],
-                default="GIF",
+                ["Video", "GIF"],
+                default="Video",
             )
             # Social media?
             output_style = st.segmented_control(
@@ -262,7 +262,7 @@ if st.session_state.chart_animation_show_image_settings:
             )
             social_media_square = output_style == "Square format"
 
-        st.session_state.chart_animation_gif_file = st.session_state.chart_animation_gif_file.with_suffix(
+        st.session_state.chart_animation_file = st.session_state.chart_animation_file.with_suffix(
             ".gif" if output_type == "GIF" else ".mp4"
         )
 
@@ -341,9 +341,9 @@ if st.session_state.chart_animation_show_image_settings:
     # GIF/Video generation.
     with st.spinner("Generating animation. This can take few seconds..."):
         if output_type == "GIF":
-            st.session_state.chart_animation_gif_file = create_gif_from_images(
+            st.session_state.chart_animation_file = create_gif_from_images(
                 image_paths=image_paths_selected,
-                output_file=st.session_state.chart_animation_gif_file,
+                output_file=st.session_state.chart_animation_file,
                 duration=duration,
                 loops=loop_count,  # type: ignore
                 remove_duplicate_frames=remove_duplicates,
@@ -352,12 +352,12 @@ if st.session_state.chart_animation_show_image_settings:
                 first_frame=first_frame,
             )
             # GIF preview.
-            st.image(str(st.session_state.chart_animation_gif_file), use_container_width=True)
+            st.image(str(st.session_state.chart_animation_file), use_container_width=True)
             st_info('Animation preview. Right click and "Save Image As..." to download it.')
         else:
-            st.session_state.chart_animation_gif_file = create_mp4_from_images(
+            st.session_state.chart_animation_file = create_mp4_from_images(
                 image_paths=image_paths_selected,
-                output_file=st.session_state.chart_animation_gif_file,
+                output_file=st.session_state.chart_animation_file,
                 duration=duration,
                 remove_duplicate_frames=remove_duplicates,
                 repetitions_last_frame=repetitions_last_frame,
@@ -365,7 +365,7 @@ if st.session_state.chart_animation_show_image_settings:
                 first_frame=first_frame,
             )
             # Video preview
-            with open(str(st.session_state.chart_animation_gif_file), "rb") as video_file:
+            with open(str(st.session_state.chart_animation_file), "rb") as video_file:
                 st.video(video_file.read(), format="video/mp4", autoplay=True)
             st_info('Animation preview. Right click and "Save video as..." to download it.')
 
