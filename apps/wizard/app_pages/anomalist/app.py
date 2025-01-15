@@ -41,7 +41,7 @@ from apps.wizard.utils.components import (
     st_multiselect_wider,
     tag_in_md,
     url_persist,
-    url_persist2,
+    url_persist,
 )
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
@@ -709,7 +709,7 @@ if st.session_state.anomalist_df is not None:
                 indicator for indicator in INDICATORS_AVAILABLE if indicator in st.session_state.anomalist_indicators
             ]
 
-            url_persist2(st.multiselect)(
+            url_persist(st.multiselect)(
                 label="Indicators",
                 options=options,
                 format_func=st.session_state.anomalist_indicators.get,
@@ -720,7 +720,7 @@ if st.session_state.anomalist_df is not None:
 
         with col2:
             # Entity
-            url_persist2(st.multiselect)(
+            url_persist(st.multiselect)(
                 label="Entities",
                 options=ENTITIES_AVAILABLE,
                 help="Show anomalies affecting only a selection of entities.",
@@ -733,7 +733,7 @@ if st.session_state.anomalist_df is not None:
         with col1:
             cols = st.columns(2)
             with cols[0]:
-                url_persist2(st.multiselect)(
+                url_persist(st.multiselect)(
                     label="Sort by",
                     options=SORTING_STRATEGIES.keys(),
                     format_func=SORTING_STRATEGIES.get,
@@ -752,7 +752,7 @@ if st.session_state.anomalist_df is not None:
                     key="anomalist_sorting_strategy",
                 )
             with cols[1]:
-                url_persist2(st.multiselect)(
+                url_persist(st.multiselect)(
                     label="Detectors",
                     options=ANOMALY_TYPES_AVAILABLE,
                     format_func=ANOMALY_TYPE_NAMES.get,
