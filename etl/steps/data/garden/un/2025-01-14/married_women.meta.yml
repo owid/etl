@@ -6,7 +6,7 @@ definitions:
       topic_tags:
         - Marriages & Divorces
     description_from_producer: Women in a union refers to women living with their partner in the same household, including cohabiting unions, consensual unions, unmarried unions, or “living together.”
-    description_short: Women sharing a household with their partner, whether married, cohabiting, in consensual partnerships, or in other non-marital unions.
+
   projection: &projection
     <% if dataprocess == "Projection" %>
     true
@@ -26,7 +26,7 @@ tables:
         title: Share of women aged << agegroup>> who are married or in union (<< dataprocess >>)
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of women aged << agegroup>> who are married or in union.
+        description_short: Percentage of women aged << agegroup>> sharing a household with their partner, whether married, cohabiting, in consensual partnerships, or in other non-marital unions.
         presentation:
           title_public: Share of women aged << agegroup>> > years old who are married or in a union
         display:
@@ -38,7 +38,7 @@ tables:
         title: Number of women aged << agegroup>> who are married or in union (<< dataprocess >>)
         unit: people
 
-        description_short: Number of women aged << agegroup>> who are married or in union.
+        description_short: Number of women aged << agegroup>> sharing a household with their partner, whether married, cohabiting, in consensual partnerships, or in other non-marital unions.
         presentation:
           title_public: Women aged << agegroup>> > years old who are married or in a union
         display:
