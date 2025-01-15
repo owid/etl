@@ -613,7 +613,7 @@ name = "click"
 version = "8.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b9/2e/0090cbf739cee7d23781ad4b89a9894a41538e4fcf4c31dcdd705b78eb8b/click-8.1.8.tar.gz", hash = "sha256:ed53c9d8990d83c2a27deae68e4ee337473f6330c040a31d4225c9574d16096a", size = 226593 }
 wheels = [
@@ -1037,6 +1037,7 @@ wizard = [
     { name = "streamlit-extras" },
     { name = "streamlit-feedback" },
     { name = "torch" },
+    { name = "wfork-streamlit-profiler" },
 ]
 
 [package.dev-dependencies]
@@ -1150,6 +1151,7 @@ requires-dist = [
     { name = "uvicorn", extras = ["standard"], marker = "extra == 'api'", specifier = ">=0.25.0" },
     { name = "walden", editable = "lib/walden" },
     { name = "wbgapi", specifier = ">=1.0.12" },
+    { name = "wfork-streamlit-profiler", marker = "extra == 'wizard'", specifier = ">=0.2.7" },
     { name = "wikipedia", specifier = ">=1.4.0" },
     { name = "world-bank-data", specifier = ">=0.1.3" },
     { name = "xlrd", specifier = ">=2.0.1" },
@@ -2084,7 +2086,7 @@ name = "ipykernel"
 version = "6.29.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "appnope", marker = "platform_system == 'Darwin'" },
+    { name = "appnope", marker = "sys_platform == 'darwin'" },
     { name = "comm" },
     { name = "debugpy" },
     { name = "ipython" },
@@ -2897,7 +2899,7 @@ version = "1.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "ghp-import" },
     { name = "jinja2" },
     { name = "markdown" },
@@ -4362,6 +4364,24 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/c4/83/fa6f8fb7accb21f39e8f2b6a18f76f6d90626bdb0a5e5448e5cc9b8ab014/pyhumps-3.8.0.tar.gz", hash = "sha256:498026258f7ee1a8e447c2e28526c0bea9407f9a59c03260aee4bd6c04d681a3", size = 9018 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9e/11/a1938340ecb32d71e47ad4914843775011e6e9da59ba1229f181fef3119e/pyhumps-3.8.0-py3-none-any.whl", hash = "sha256:060e1954d9069f428232a1adda165db0b9d8dfdce1d265d36df7fbff540acfd6", size = 6095 },
+]
+
+[[package]]
+name = "pyinstrument"
+version = "4.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/dd/ce/a57ca0f728f1be95267ba3a2f9f06aab4045d83ad2424545b3995c41abc1/pyinstrument-4.2.0.tar.gz", hash = "sha256:6de7d015bc2caf07ee49e82f4a37331d5c40efe7ddf6ff82c19504d8d8ca9772", size = 373101 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/17/c6/e2e7a6f67ca81ecb12ce3cd53cbf3cad589a2c1ad3f3dbca16216cf4548d/pyinstrument-4.2.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:df7cd8a71e368694789517dd5466fd2573f59d912019b2928dd113e5408f3c2e", size = 100309 },
+    { url = "https://files.pythonhosted.org/packages/6c/c9/9441b3c925507d56b896253a96c35140a982acaf2c061abb25f45806df5c/pyinstrument-4.2.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:af08fe984cab0aa552a2feafc9a3417aee3181e170a24219e112555d0cc861e7", size = 95737 },
+    { url = "https://files.pythonhosted.org/packages/9c/48/28a191c381ec87e34f2fe57df21ba2f7e6fadb1aacdd3b151d06a385cbff/pyinstrument-4.2.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f2702f043e6ccc02720076fdc4bc86de50d2a465bd72393251dd5eea5a5ac821", size = 112455 },
+    { url = "https://files.pythonhosted.org/packages/67/b4/5ca2a425e64c400a717620a23c49743407bfb773a9c0affa60491c4af287/pyinstrument-4.2.0-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ea53704ffbbdc2235843c10ec5fa39a35220452f46ea4e7cb02d611b0161ced4", size = 111265 },
+    { url = "https://files.pythonhosted.org/packages/19/f3/e824e3352e4d38d722ee3ef39d1721c9084866bcceadef32bf78cbe173e5/pyinstrument-4.2.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:54dea5f138f02d42b298e9742a1e6123c6732427b26bae5da0535fb4eb57c226", size = 111950 },
+    { url = "https://files.pythonhosted.org/packages/b3/0e/e06ab615b28df733aa75eaba47101b56d7c0bd5124ebd32b954b95ee7898/pyinstrument-4.2.0-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:89ee3425f4804c1b8fe0cb740502a50a5825e400100dd07f4a245eeff99da6af", size = 115750 },
+    { url = "https://files.pythonhosted.org/packages/b7/5b/1de2fc79552068d577956ae667d9c36f8ca9e14675dc4a50a1903ea0e82d/pyinstrument-4.2.0-cp310-cp310-musllinux_1_1_i686.whl", hash = "sha256:c026868bd559ec5074618717b27528f1b1618946df8ece7ceda43a2828c911ec", size = 115116 },
+    { url = "https://files.pythonhosted.org/packages/d3/21/910cd2dd94a9dd0e8bd565427ae9c9ae8e0e759107fa00ca2acd95bcf38b/pyinstrument-4.2.0-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:233e258a440ca7da837b9b0e7db7ec67c6b979d074b27b9383cef127e4a1deac", size = 115656 },
+    { url = "https://files.pythonhosted.org/packages/8a/7e/f44b9fc583d56ded16c335e74654ebb151427e720a489058bbc4a999208d/pyinstrument-4.2.0-cp310-cp310-win32.whl", hash = "sha256:9b1c9fa015e6353d24a46d46aed3b970a94f5729dd140a4eb97fca1456cd754a", size = 98279 },
+    { url = "https://files.pythonhosted.org/packages/7d/c8/ebffe821a8470055a98f2c376d8ca1d6ac029cf0734a6c3f7e108e232d8d/pyinstrument-4.2.0-cp310-cp310-win_amd64.whl", hash = "sha256:b04f689897f4cbe301585231c0e94d42c5b1ea76a76b007a600d049dfc9b9073", size = 98986 },
 ]
 
 [[package]]
@@ -5837,7 +5857,7 @@ dependencies = [
     { name = "toml" },
     { name = "tornado" },
     { name = "typing-extensions" },
-    { name = "watchdog", marker = "platform_system != 'Darwin'" },
+    { name = "watchdog", marker = "sys_platform != 'darwin'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/78/33/14b5ac0369ecf0af675911e5e84b934e6fcc2cec850857d2390eb373b0a6/streamlit-1.41.1.tar.gz", hash = "sha256:6626d32b098ba1458b71eebdd634c62af2dd876380e59c4b6a1e828a39d62d69", size = 8712473 }
 wheels = [
@@ -6237,19 +6257,19 @@ dependencies = [
     { name = "fsspec" },
     { name = "jinja2" },
     { name = "networkx" },
-    { name = "nvidia-cublas-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
-    { name = "nvidia-cuda-cupti-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
-    { name = "nvidia-cuda-nvrtc-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
-    { name = "nvidia-cuda-runtime-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
-    { name = "nvidia-cudnn-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
-    { name = "nvidia-cufft-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
-    { name = "nvidia-curand-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
-    { name = "nvidia-cusolver-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
-    { name = "nvidia-cusparse-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
-    { name = "nvidia-nccl-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
-    { name = "nvidia-nvtx-cu12", marker = "platform_machine == 'x86_64' and platform_system == 'Linux'" },
+    { name = "nvidia-cublas-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "nvidia-cuda-cupti-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "nvidia-cuda-nvrtc-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "nvidia-cuda-runtime-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "nvidia-cudnn-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "nvidia-cufft-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "nvidia-curand-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "nvidia-cusolver-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "nvidia-cusparse-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "nvidia-nccl-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "nvidia-nvtx-cu12", marker = "platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "sympy" },
-    { name = "triton", marker = "python_full_version < '3.12' and platform_machine == 'x86_64' and platform_system == 'Linux'" },
+    { name = "triton", marker = "python_full_version < '3.12' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "typing-extensions" },
 ]
 wheels = [
@@ -6293,7 +6313,7 @@ name = "tqdm"
 version = "4.67.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "platform_system == 'Windows'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a8/4b/29b4ef32e036bb34e4ab51796dd745cdba7ed47ad142a9f4a1eb8e0c744d/tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2", size = 169737 }
 wheels = [
@@ -6813,6 +6833,19 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/13/97/b76979401f2373af1fe3e08f960b265cecab112e7dac803446fb98351a52/websockets-14.1-pp310-pypy310_pp73-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:660c308dabd2b380807ab64b62985eaccf923a78ebc572bd485375b9ca2b7dc7", size = 160681 },
     { url = "https://files.pythonhosted.org/packages/39/9c/16916d9a436c109a1d7ba78817e8fee357b78968be3f6e6f517f43afa43d/websockets-14.1-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:5a42d3ecbb2db5080fc578314439b1d79eef71d323dc661aa616fb492436af5d", size = 163316 },
     { url = "https://files.pythonhosted.org/packages/b0/0b/c7e5d11020242984d9d37990310520ed663b942333b83a033c2f20191113/websockets-14.1-py3-none-any.whl", hash = "sha256:4d4fc827a20abe6d544a119896f6b78ee13fe81cbfef416f3f2ddf09a03f0e2e", size = 156277 },
+]
+
+[[package]]
+name = "wfork-streamlit-profiler"
+version = "0.2.7"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyinstrument" },
+    { name = "streamlit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6a/2c/e1718c0b6ca9052daa15b6880a901e3551ce64d35b3843e5b306cd2892d4/wfork_streamlit_profiler-0.2.7.tar.gz", hash = "sha256:95b13de893b687d55adf1ac7cf7117de2fada9a2aa1e46683963511c178bc069", size = 3503 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/56/83/9dabd7d3d2029f6125b8f2553aea4bb7bc2589393cd854f608c978059e67/wfork_streamlit_profiler-0.2.7-py3-none-any.whl", hash = "sha256:e93882b0f5b1253f28e09a8b4dfee390a8c3f24bb5e28b882faa32989a5b6d84", size = 4127 },
 ]
 
 [[package]]

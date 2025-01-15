@@ -27,6 +27,7 @@ from owid.catalog import Dataset
 from sqlalchemy.orm import Session
 from structlog import get_logger
 from typing_extensions import Self
+from wfork_streamlit_profiler import Profiler
 
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
 from apps.wizard.utils.step_form import StepForm
@@ -91,6 +92,23 @@ DUMMY_DATA = {
 }
 # Session state to track staging creation time
 VARNAME_STAGING_CREATION_TIME = "staging_creation_time"
+
+
+def start_profiler() -> Profiler:
+    """Usage:
+    ```
+    # after imports and before any other code
+    PROFILER = start_profiler()
+
+    # app code
+    ...
+
+    # at the end of the app
+    PROFILER.stop()
+    """
+    profiler = Profiler()
+    profiler.start()
+    return profiler
 
 
 def get_namespaces(step_type: str) -> List[str]:
