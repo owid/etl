@@ -210,8 +210,25 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
+    # Load meadow dataset.
+    ds_meadow = paths.load_dataset("gfs_wave_one")
 
+    # Read table from meadow dataset.
+    tb = ds_meadow["gfs_wave_one"].reset_index()
 
+    tb["country"] = tb["country"].map(COUNTRY_MAPPING)
+
+    # cleaning nan values
+    for val in ["-98", "98", "99", -98, 98, 99, " ", ""]:
+        tb = tb.replace(val, np.nan)
+
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Custom column: people who think their life will get better in the next 5 years
+    tb["wb_improvement"] = tb.apply(get_ineq_nan, axis=1)  # 1 if yes, 2 if no
+
+    for col in ["expenses", "lonely", "worry_safety"]:
+        tb[col] = reverse_score(tb, col)
 
     # Calculate average scores/ shares of answers for all variables
     tb_scored_10 = average_scored(tb, cols=SCORED_10_COLS)
