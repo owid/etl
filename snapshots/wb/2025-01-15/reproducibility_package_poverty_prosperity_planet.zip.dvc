@@ -23,3 +23,7 @@ meta:
     license:
       name: Modified BSD3
       url: https://reproducibility.worldbank.org/index.php/catalog/189/#project_desc_container1674844764972
+outs:
+  - md5: 69c09933b05aa6331b3809724da45a73
+    size: 36338606
+    path: reproducibility_package_poverty_prosperity_planet.zip
