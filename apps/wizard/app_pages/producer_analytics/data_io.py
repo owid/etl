@@ -12,6 +12,7 @@ import streamlit as st
 
 from apps.utils.google import read_gbq
 from apps.wizard.app_pages.producer_analytics.utils import GRAPHERS_BASE_URL, MIN_DATE, TODAY
+from apps.wizard.utils.components import st_cache_data
 from etl.config import OWID_ENV
 from etl.snapshot import Snapshot
 from etl.version_tracker import VersionTracker
@@ -31,7 +32,7 @@ def get_analytics(min_date, max_date, excluded_steps):
     return df
 
 
-@st.cache_data(show_spinner=False)
+@st_cache_data(custom_text="Getting chart views analytics from BigQuery...")
 def get_chart_views(min_date: str, max_date: str) -> pd.DataFrame:
     """Get chart views analytics for different date ranges.
 
@@ -114,7 +115,7 @@ def get_chart_views_from_bq(
     return cast(pd.DataFrame, df_views)
 
 
-@st.cache_data(show_spinner=False)
+@st_cache_data(custom_text="Getting producers per chart from database...")
 def get_producers_per_chart(excluded_steps) -> pd.DataFrame:
     """Get producers per chart from the DB.
 
@@ -128,7 +129,7 @@ def get_producers_per_chart(excluded_steps) -> pd.DataFrame:
     query = """WITH t_base AS (
 	SELECT
 		cd.chartId chart_id,
-		JSON_EXTRACT(cf.full, '$.slug') chart_slug,
+		cf.slug chart_slug,
 		JSON_EXTRACT(cf.full, '$.isPublished') is_published,
 		cd.variableId variable_id,
 		v.name variable_name,
@@ -137,6 +138,7 @@ def get_producers_per_chart(excluded_steps) -> pd.DataFrame:
 		d.catalogPath dataset_uri,
 		ov.originId origin_id,
 		o.title origin_name,
+        o.urlMain origin_url,
 		o.producer producer
 	FROM chart_dimensions cd
 	LEFT JOIN charts c ON c.id = cd.chartId
@@ -151,6 +153,12 @@ WHERE origin_id IS NOT NULL
 AND is_published = true;
 """
     df = OWID_ENV.read_sql(query)
+
+    # Add caveat if source is "Various sources"
+    mask_various = df["producer"] == "Various sources"
+    df.loc[mask_various, "producer"] = (
+        df.loc[mask_various, "producer"] + " (" + df.loc[mask_various, "origin_url"] + ")"
+    )
 
     # Format as expected by following code
     df = df[["producer", "chart_slug"]].drop_duplicates()
