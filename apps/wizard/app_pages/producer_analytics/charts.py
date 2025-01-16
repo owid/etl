@@ -37,7 +37,8 @@ class UIChartProducerAnalytics:
         st.markdown("Number of views for each chart that uses data by the selected producers.")
 
         # Get data to display
-        df_total_daily_views, df_top_10_daily_views = self.get_chart_analytics(min_date, max_date)
+        with st.spinner("Getting producer-specific chart analytics..."):
+            df_total_daily_views, df_top_10_daily_views = self.get_chart_analytics(min_date, max_date)
 
         # Show chart
         self.show_chart(df_total_daily_views, df_top_10_daily_views)
@@ -168,7 +169,7 @@ class UIChartProducerAnalytics:
             x="day",
             y="renders",
             color="Chart slug",
-            title="Total daily views and views of top 10 charts",
+            title="Top 10 charts: daily views",
         ).update_layout(xaxis_title=None, yaxis_title=None)
 
         # Display the chart.
