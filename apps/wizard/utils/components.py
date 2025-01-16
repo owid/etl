@@ -482,7 +482,6 @@ def _check_options_params(kwargs, params):
     Wrong values will raise a ValueError.
     """
     if "options" in kwargs:
-        print(type(params))
         if isinstance(params, list):
             not_expected = [p for p in params if p not in kwargs["options"]]
             if (params != []) or (len(not_expected) != 0):
