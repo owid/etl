@@ -7,65 +7,85 @@ from st_aggrid import AgGrid, GridUpdateMode
 from apps.wizard.app_pages.producer_analytics.utils import columns_producer, make_grid
 
 
-@st.cache_data(show_spinner=False)
-def get_analytics_by_producer(df_expanded):
-    # st.toast("⌛ Adapting the data for presentation...")
-    # Group by producer and get the full list of chart slugs for each producer.
-    df_grouped = df_expanded.groupby("producer", observed=True, as_index=False).agg(
-        {
-            "grapher": lambda x: [item for item in x if pd.notna(item)],  # Filter out NaN values
-            "renders_365d": "sum",
-            "renders_30d": "sum",
-            "renders_custom": "sum",
+class UIProducerAnalytics:
+    """UI handler for producer section."""
+
+    def __init__(self, df):
+        self.df = _process_df(df)
+        self.producers_selection = []
+
+    def show(self, min_date, max_date, **kwargs):
+        """Render first section."""
+        st.markdown(
+            "Total number of charts and chart views for each producer. Producers selected in this table will be used to filter the producer-charts table below."
+        )
+
+        self.producers_selection = self.show_table(min_date, max_date)
+
+    def show_table(self, min_date, max_date):  # -> list[Any] | Any:
+        """Render the table with producers analytics."""
+        # Define columns UI.
+        COLUMNS_PRODUCERS = columns_producer(min_date, max_date)
+        # Configure individual columns with specific settings.
+        grid_options = make_grid(self.df, COLUMNS_PRODUCERS, selection=True)
+
+        # Custom CSS to ensure the table stretches across the page.
+        custom_css = {
+            ".ag-theme-streamlit": {
+                "max-width": "100% !important",
+                "width": "100% !important",
+                "margin": "0 auto !important",  # Centers the grid horizontally.
+            },
         }
-    )
-    df_grouped["n_charts"] = df_grouped["grapher"].apply(len)
+        # Display the grid table with the updated grid options.
+        grid_response = AgGrid(
+            data=self.df,
+            gridOptions=grid_options,
+            height=500,
+            width="100%",
+            update_mode=GridUpdateMode.MODEL_CHANGED,
+            fit_columns_on_grid_load=True,  # Automatically adjust columns when the grid loads.
+            allow_unsafe_jscode=True,
+            theme="streamlit",
+            custom_css=custom_css,
+            # excel_export_mode=ExcelExportMode.MANUAL,  # Doesn't work?
+        )
 
-    # Check if lists are unique. If not, make them unique in the previous line.
-    error = "Duplicated chart slugs found for a given producer."
-    assert df_grouped["grapher"].apply(lambda x: len(x) == len(set(x))).all(), error
+        # Get the selected producers from the first table.
+        df = grid_response["selected_rows"]
+        if df is None:
+            return []
 
-    # Drop unnecessary columns.
-    df_grouped = df_grouped.drop(columns=["grapher"])
-
-    # Sort conveniently.
-    df_grouped = df_grouped.sort_values(["renders_custom"], ascending=False).reset_index(drop=True)
-
-    return df_grouped
+        return df["producer"].tolist()
 
 
-def render_producers_table(df_producers, min_date, max_date):
-    """Show table with producers analytics."""
-    # Define columns UI.
-    COLUMNS_PRODUCERS = columns_producer(min_date, max_date)
-    # Configure individual columns with specific settings.
-    grid_options = make_grid(df_producers, COLUMNS_PRODUCERS, selection=True)
+@st.cache_data(show_spinner=False)
+def _process_df(df):
+    def _process(df):
+        # Group by producer and get the full list of chart slugs for each producer.
+        df = df.groupby("producer", observed=True, as_index=False).agg(
+            {
+                "grapher": lambda x: [item for item in x if pd.notna(item)],  # Filter out NaN values
+                "renders_365d": "sum",
+                "renders_30d": "sum",
+                "renders_custom": "sum",
+            }
+        )
+        df["n_charts"] = df["grapher"].apply(len)
 
-    # Custom CSS to ensure the table stretches across the page.
-    custom_css = {
-        ".ag-theme-streamlit": {
-            "max-width": "100% !important",
-            "width": "100% !important",
-            "margin": "0 auto !important",  # Centers the grid horizontally.
-        },
-    }
-    # Display the grid table with the updated grid options.
-    grid_response = AgGrid(
-        data=df_producers,
-        gridOptions=grid_options,
-        height=500,
-        width="100%",
-        update_mode=GridUpdateMode.MODEL_CHANGED,
-        fit_columns_on_grid_load=True,  # Automatically adjust columns when the grid loads.
-        allow_unsafe_jscode=True,
-        theme="streamlit",
-        custom_css=custom_css,
-        # excel_export_mode=ExcelExportMode.MANUAL,  # Doesn't work?
-    )
+        # Check if lists are unique. If not, make them unique in the previous line.
+        error = "Duplicated chart slugs found for a given producer."
+        assert df["grapher"].apply(lambda x: len(x) == len(set(x))).all(), error
 
-    # Get the selected producers from the first table.
-    df = grid_response["selected_rows"]
-    if df is None:
-        return []
+        # Drop unnecessary columns.
+        df = df.drop(columns=["grapher"])
 
-    return df["producer"].tolist()
+        # Sort conveniently.
+        df = df.sort_values(["renders_custom"], ascending=False).reset_index(drop=True)
+
+        return df
+
+    with st.spinner(
+        "Loading producer data from various sources (Big Query, VersionTracker, etc.) This can take few seconds..."
+    ):
+        return _process(df)
