@@ -3,6 +3,7 @@
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from plotly.graph_objects import Scatter
 from st_aggrid import AgGrid, JsCode
 
 from apps.wizard.app_pages.producer_analytics.data_io import get_chart_views_from_bq
@@ -190,18 +191,15 @@ class UIChartProducerAnalytics:
         )
 
         # Update traces to use custom hover text
-        # fig.update_traces(
-        #     hovertemplate="%{customdata}<extra></extra>",  # Use customdata for hover text
-        #     customdata=df_plot["custom_hover"],  # Assign custom hover text data
-        # )
-        # Update traces to use custom hover text
         for trace in fig.data:
-            chart_slug = trace.name  # Get the name of the line (Chart slug)
-            trace.customdata = [
-                f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
-            ]  # Custom hover text for each point
-            trace.hovertemplate = "%{customdata}<extra></extra>"  # Use the custom hover text
+            if isinstance(trace, Scatter) and (trace.y is not None):
+                chart_slug = trace.name  # Get the name of the line (Chart slug)
+                trace.customdata = [
+                    f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
+                ]  # Custom hover text for each point
+                trace.hovertemplate = "%{customdata}<extra></extra>"  # Use the custom hover text
 
+        # Update layout
         fig.update_layout(
             xaxis_title=None,
             yaxis_title=None,
