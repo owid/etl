@@ -167,15 +167,46 @@ class UIChartProducerAnalytics:
         )
         df_plot["Chart slug"] = df_plot["Chart slug"].apply(lambda x: x.split("/")[-1])
         df_plot["day"] = pd.to_datetime(df_plot["day"]).dt.strftime("%a. %Y-%m-%d")
+        df_plot = df_plot.rename(columns={"renders": "Views"})
+
+        # Custom hover
+        df_plot["custom_hover"] = (
+            "<b>" + df_plot["Chart slug"] + "</b>" + "<br>" + df_plot["Views"].astype(str) + " views"
+        )
 
         # Create figure to plot
         fig = px.line(
             df_plot,
             x="day",
-            y="renders",
+            y="Views",
             color="Chart slug",
             title="Top 10 charts: daily views",
-        ).update_layout(xaxis_title=None, yaxis_title=None)
+            # hover_data={
+            #     "day": False,
+            #     "Views": ":.0f",
+            #     "Chart slug": True,
+            # },
+            hover_data={"day": False, "Views": False, "Chart slug": False},
+        )
+
+        # Update traces to use custom hover text
+        # fig.update_traces(
+        #     hovertemplate="%{customdata}<extra></extra>",  # Use customdata for hover text
+        #     customdata=df_plot["custom_hover"],  # Assign custom hover text data
+        # )
+        # Update traces to use custom hover text
+        for trace in fig.data:
+            chart_slug = trace.name  # Get the name of the line (Chart slug)
+            trace.customdata = [
+                f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
+            ]  # Custom hover text for each point
+            trace.hovertemplate = "%{customdata}<extra></extra>"  # Use the custom hover text
+
+        fig.update_layout(
+            xaxis_title=None,
+            yaxis_title=None,
+            hovermode="x",
+        )
 
         # Display the chart.
         st.plotly_chart(fig, use_container_width=True)
