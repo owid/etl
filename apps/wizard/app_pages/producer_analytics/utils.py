@@ -10,11 +10,11 @@ GRAPHERS_BASE_URL = "https://ourworldindata.org/grapher/"
 # List of auxiliary steps to be (optionally) excluded from the DAG.
 # It may be convenient to ignore these steps because the analytics are heavily affected by a few producers (e.g. those that are involved in the population and income groups datasets).
 AUXILIARY_STEPS = [
-    "data://garden/demography/.*/population",
+    "demography/.*/population",
     # Primary energy consumption is loaded by GCB.
-    "data://garden/energy/.*/primary_energy_consumption",
-    "data://garden/ggdc/.*/maddison_project_database",
-    "data://garden/wb/.*/income_groups",
+    "energy/.*/primary_energy_consumption",
+    "ggdc/.*/maddison_project_database",
+    "wb/.*/income_groups",
 ]
 
 

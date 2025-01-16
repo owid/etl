@@ -154,6 +154,11 @@ AND is_published = true;
 """
     df = OWID_ENV.read_sql(query)
 
+    # Exclude certain steps
+    exclude_steps_regex = "|".join(excluded_steps)
+    excluded_rows = df["dataset_uri"].str.fullmatch(exclude_steps_regex)
+    df = df.loc[~excluded_rows]
+
     # Add caveat if source is "Various sources"
     mask_various = df["producer"] == "Various sources"
     df.loc[mask_various, "producer"] = (
