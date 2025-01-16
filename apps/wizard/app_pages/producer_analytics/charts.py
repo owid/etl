@@ -10,6 +10,7 @@ from apps.wizard.app_pages.producer_analytics.utils import (
     columns_producer,
     make_grid,
 )
+from apps.wizard.utils.components import st_cache_data
 
 
 class UIChartProducerAnalytics:
@@ -80,7 +81,9 @@ class UIChartProducerAnalytics:
         # Add analytics to object
         ## Get total number of views and average daily views.
         self.analytics["total_views"] = df_total_daily_views["renders"].sum()
-        self.analytics["average_daily_views"] = df_total_daily_views["renders"].mean()
+        self.analytics["average_daily_views"] = (
+            0 if self.analytics["total_views"] == 0 else df_total_daily_views["renders"].mean()
+        )
         ## Get total views of the top 10 charts in the selected date range.
         self.analytics["df_top_10_total_views"] = df_top_10_daily_views.groupby("grapher", as_index=False).agg(
             {"renders": "sum"}
@@ -88,6 +91,7 @@ class UIChartProducerAnalytics:
 
         return df_total_daily_views, df_top_10_daily_views
 
+    @st.fragment
     def show_table(self, min_date, max_date):
         """Show table with analytics on producer's charts."""
         # Configure and display the second table.
@@ -177,14 +181,10 @@ class UIChartProducerAnalytics:
         st.plotly_chart(fig, use_container_width=True)
 
 
-@st.cache_data(show_spinner=False)
+@st_cache_data(custom_text="Loading chart data. This can take few seconds...")
 def _process_df(df):
-    def _process(df):
-        # Create an expanded table with number of views per chart.
-        df = df.dropna(subset=["chart_url"]).fillna(0).reset_index(drop=True)
-        df = df.sort_values("views_custom", ascending=False).reset_index(drop=True)
+    # Create an expanded table with number of views per chart.
+    df = df.dropna(subset=["chart_url"]).fillna(0).reset_index(drop=True)
+    df = df.sort_values("views_custom", ascending=False).reset_index(drop=True)
 
-        return df
-
-    with st.spinner("Loading chart data. This can take few seconds..."):
-        return _process(df)
+    return df

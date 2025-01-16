@@ -33,12 +33,11 @@ min_date, max_date, excluded_steps = render_selection()
 # 1/ GET DATA
 ########################################################################################################################
 
-with st.spinner("Loading analytics from various sources (BigQuery, MySQL, etc.). This can take few seconds..."):
-    df = get_analytics(
-        min_date=min_date,
-        max_date=max_date,
-        excluded_steps=excluded_steps,
-    )
+df = get_analytics(
+    min_date=min_date,
+    max_date=max_date,
+    excluded_steps=excluded_steps,
+)
 
 ########################################################################################################################
 # 2/ PRODUCER ANALYTICS: Display main table, with analytics per producer.
