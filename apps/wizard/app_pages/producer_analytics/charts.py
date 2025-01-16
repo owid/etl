@@ -124,6 +124,7 @@ class UIChartProducerAnalytics:
                     "headerName": "Chart URL",
                     "headerTooltip": "URL of the chart in the grapher.",
                     "cellRenderer": grapher_slug_jscode,
+                    "filter": "agTextColumnFilter",
                 }
                 if column == "chart_url"
                 else COLUMNS_PRODUCERS[column]

@@ -24,6 +24,7 @@ def columns_producer(min_date, max_date):
         "producer": {
             "headerName": "Producer",
             "headerTooltip": "Name of the producer. This is NOT the name of the dataset.",
+            "filter": "agTextColumnFilter",
         },
         "n_charts": {
             "headerName": "Charts",
