@@ -19,6 +19,7 @@ def render_selection():
                 value=MIN_DATE,
                 key="min_date",
                 format="YYYY-MM-DD",
+                min_value=MIN_DATE,
             ).strftime(  # type: ignore
                 "%Y-%m-%d"
             )
@@ -27,6 +28,7 @@ def render_selection():
                 value=TODAY,
                 key="max_date",
                 format="YYYY-MM-DD",
+                min_value=min_date,
             ).strftime(  # type: ignore
                 "%Y-%m-%d"
             )
