@@ -25,7 +25,7 @@ def get_analytics(min_date, max_date, excluded_steps):
     df_charts = get_chart_views(min_date=min_date, max_date=max_date)
 
     # 3/ Combine, to have one table with chart analytics, together with producer of the chart data.
-    df = df.merge(df_charts, on="grapher", how="left").drop(columns=["all_chart_slugs"])
+    df = df.merge(df_charts, on="chart_url", how="left").drop(columns=["all_chart_slugs"])
 
     return df
 
@@ -45,9 +45,9 @@ def get_chart_views(min_date: str, max_date: str) -> pd.DataFrame:
     _30D_STR = (TODAY - timedelta(days=30)).strftime("%Y-%m-%d")
     _365D_STR = (TODAY - timedelta(days=365)).strftime("%Y-%m-%d")
     date_ranges = {
-        "renders_365d": (_365D_STR, TODAY_STR),
-        "renders_30d": (_30D_STR, TODAY_STR),
-        "renders_custom": (min_date, max_date),  # Use user-defined date range.
+        "views_365d": (_365D_STR, TODAY_STR),
+        "views_30d": (_30D_STR, TODAY_STR),
+        "views_custom": (min_date, max_date),  # Use user-defined date range.
     }
 
     # Get analytics for those ranges, for all Grapher URLs.
@@ -67,6 +67,7 @@ def get_chart_views(min_date: str, max_date: str) -> pd.DataFrame:
         on="grapher",
         how="outer",
     )
+    df = df.rename(columns={"grapher": "chart_url"})
 
     return df
 
@@ -158,6 +159,6 @@ def get_producers_per_chart(excluded_steps) -> pd.DataFrame:
     df = df.drop_duplicates(subset=["producer", "all_chart_slugs"]).reset_index(drop=True)
 
     # Add a column for grapher URL.
-    df["grapher"] = GRAPHERS_BASE_URL + df["all_chart_slugs"]
+    df["chart_url"] = GRAPHERS_BASE_URL + df["all_chart_slugs"]
 
     return df

@@ -65,23 +65,23 @@ def _process_df(df):
         # Group by producer and get the full list of chart slugs for each producer.
         df = df.groupby("producer", observed=True, as_index=False).agg(
             {
-                "grapher": lambda x: [item for item in x if pd.notna(item)],  # Filter out NaN values
-                "renders_365d": "sum",
-                "renders_30d": "sum",
-                "renders_custom": "sum",
+                "chart_url": lambda x: [item for item in x if pd.notna(item)],  # Filter out NaN values
+                "views_365d": "sum",
+                "views_30d": "sum",
+                "views_custom": "sum",
             }
         )
-        df["n_charts"] = df["grapher"].apply(len)
+        df["n_charts"] = df["chart_url"].apply(len)
 
         # Check if lists are unique. If not, make them unique in the previous line.
         error = "Duplicated chart slugs found for a given producer."
-        assert df["grapher"].apply(lambda x: len(x) == len(set(x))).all(), error
+        assert df["chart_url"].apply(lambda x: len(x) == len(set(x))).all(), error
 
         # Drop unnecessary columns.
-        df = df.drop(columns=["grapher"])
+        df = df.drop(columns=["chart_url"])
 
         # Sort conveniently.
-        df = df.sort_values(["renders_custom"], ascending=False).reset_index(drop=True)
+        df = df.sort_values(["views_custom"], ascending=False).reset_index(drop=True)
 
         return df
 

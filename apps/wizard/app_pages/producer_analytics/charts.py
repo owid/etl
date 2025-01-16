@@ -58,7 +58,7 @@ class UIChartProducerAnalytics:
         df = self.df_filtered
 
         # Get total daily views of selected producers.
-        grapher_urls_selected = df["grapher"].unique().tolist()  # type: ignore
+        grapher_urls_selected = df["chart_url"].unique().tolist()  # type: ignore
         df_total_daily_views = get_chart_views_from_bq(
             date_start=min_date,
             date_end=max_date,
@@ -68,7 +68,7 @@ class UIChartProducerAnalytics:
 
         # Get daily views of the top 10 charts.
         grapher_urls_top_10 = (
-            df.sort_values("renders_custom", ascending=False)["grapher"].unique().tolist()[0:10]  # type: ignore
+            df.sort_values("views_custom", ascending=False)["chart_url"].unique().tolist()[0:10]  # type: ignore
         )
         df_top_10_daily_views = get_chart_views_from_bq(
             date_start=min_date,
@@ -125,10 +125,10 @@ class UIChartProducerAnalytics:
                     "headerTooltip": "URL of the chart in the grapher.",
                     "cellRenderer": grapher_slug_jscode,
                 }
-                if column == "grapher"
+                if column == "chart_url"
                 else COLUMNS_PRODUCERS[column]
             )
-            for column in ["renders_custom", "producer", "renders_365d", "renders_30d", "grapher"]
+            for column in ["views_custom", "producer", "views_365d", "views_30d", "chart_url"]
         }
 
         # Get data to display
@@ -180,8 +180,8 @@ class UIChartProducerAnalytics:
 def _process_df(df):
     def _process(df):
         # Create an expanded table with number of views per chart.
-        df = df.dropna(subset=["grapher"]).fillna(0).reset_index(drop=True)
-        df = df.sort_values("renders_custom", ascending=False).reset_index(drop=True)
+        df = df.dropna(subset=["chart_url"]).fillna(0).reset_index(drop=True)
+        df = df.sort_values("views_custom", ascending=False).reset_index(drop=True)
 
         return df
 
