@@ -85,7 +85,5 @@ def _process_df(df):
 
         return df
 
-    with st.spinner(
-        "Loading producer data from various sources (Big Query, VersionTracker, etc.) This can take few seconds..."
-    ):
+    with st.spinner("Loading producer data from various sources (Big Query, MySQL, etc.) This can take few seconds..."):
         return _process(df)

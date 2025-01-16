@@ -26,7 +26,7 @@ def get_analytics(min_date, max_date, excluded_steps):
     df_charts = get_chart_views(min_date=min_date, max_date=max_date)
 
     # 3/ Combine, to have one table with chart analytics, together with producer of the chart data.
-    df = df.merge(df_charts, on="chart_url", how="left").drop(columns=["all_chart_slugs"])
+    df = df.merge(df_charts, on="chart_url", how="left")
 
     return df
 

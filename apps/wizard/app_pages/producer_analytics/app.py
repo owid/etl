@@ -33,9 +33,7 @@ min_date, max_date, excluded_steps = render_selection()
 # 1/ GET DATA
 ########################################################################################################################
 
-with st.spinner(
-    "Loading analytics from various sources (BigQuery, VersionTracker, etc.). This can take few seconds..."
-):
+with st.spinner("Loading analytics from various sources (BigQuery, MySQL, etc.). This can take few seconds..."):
     df = get_analytics(
         min_date=min_date,
         max_date=max_date,
