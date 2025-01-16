@@ -1,3 +1,5 @@
+"""Code to generate the chart analytics bit of the app."""
+
 from datetime import timedelta
 from typing import Optional, cast
 
@@ -6,10 +8,15 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 from st_aggrid import AgGrid, JsCode
-from st_aggrid.grid_options_builder import GridOptionsBuilder
 
 from apps.utils.google import read_gbq
-from apps.wizard.app_pages.producer_analytics.utils import GRAPHERS_BASE_URL, MIN_DATE, TODAY, columns_producer
+from apps.wizard.app_pages.producer_analytics.utils import (
+    GRAPHERS_BASE_URL,
+    MIN_DATE,
+    TODAY,
+    columns_producer,
+    make_grid,
+)
 from etl.snapshot import Snapshot
 from etl.version_tracker import VersionTracker
 
@@ -238,35 +245,13 @@ def show_producer_charts_grid(df, min_date, max_date):
         )
         for column in ["renders_custom", "producer", "renders_365d", "renders_30d", "grapher"]
     }
-    # Configure and display the second table.
-    gb2 = GridOptionsBuilder.from_dataframe(df)
-    gb2.configure_grid_options(
-        # domLayout="autoHeight",
-        enableCellTextSelection=True,
-    )
-    gb2.configure_default_column(
-        editable=False,
-        groupable=True,
-        sortable=True,
-        filterable=True,
-        resizable=True,
-    )
 
-    # Apply column configurations directly from the dictionary.
-    for column, config in COLUMNS_PRODUCER_CHARTS.items():
-        gb2.configure_column(column, **config)
-
-    # Configure pagination with dynamic page size.
-    gb2.configure_pagination(
-        # paginationAutoPageSize=False,
-        # paginationPageSize=20,
-    )
-    grid_options2 = gb2.build()
+    grid_options = make_grid(df, COLUMNS_PRODUCER_CHARTS, selection=False)
 
     # Display the grid.
     AgGrid(
         data=df,
-        gridOptions=grid_options2,
+        gridOptions=grid_options,
         height=500,
         width="100%",
         fit_columns_on_grid_load=True,

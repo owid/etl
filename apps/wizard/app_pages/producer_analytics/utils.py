@@ -1,5 +1,8 @@
 from datetime import datetime
 
+import pandas as pd
+from st_aggrid.grid_options_builder import GridOptionsBuilder
+
 # Date when the new views metric started to be recorded.
 MIN_DATE = datetime.strptime("2024-11-01", "%Y-%m-%d")
 TODAY = datetime.today()
@@ -40,3 +43,50 @@ def columns_producer(min_date, max_date):
         },
     }
     return cols_prod
+
+
+def make_grid(df: pd.DataFrame, column_config, selection: bool = False):
+    gb = GridOptionsBuilder.from_dataframe(
+        df,
+    )
+
+    gb.configure_grid_options(
+        # domLayout="autoHeight",
+        enableCellTextSelection=True,
+        suppressSizeToFit=False,  # Allows dynamic resizing to fit.
+    )
+
+    gb.configure_default_column(
+        editable=False,
+        groupable=True,
+        sortable=True,
+        filterable=True,
+        resizable=True,
+        autoSizeColumns=True,  # Ensures all columns can auto-size.
+    )
+
+    # OPTIONAL: Enable selection.
+    if selection:
+        gb.configure_selection(
+            selection_mode="multiple",
+            use_checkbox=True,
+            rowMultiSelectWithClick=True,
+            suppressRowDeselection=False,
+            groupSelectsChildren=True,
+            groupSelectsFiltered=True,
+        )
+
+    # Configure pagination with dynamic page size.
+    gb.configure_pagination(
+        # paginationAutoPageSize=False,
+        # paginationPageSize=20,
+    )
+
+    # Apply column configurations directly from the dictionary.
+    for column, config in column_config.items():
+        gb.configure_column(column, **config)
+
+    # Generate grid options
+    grid_options = gb.build()
+
+    return grid_options

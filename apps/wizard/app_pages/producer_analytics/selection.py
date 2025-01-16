@@ -1,3 +1,5 @@
+"""First part of the app, where user is asked to fill in a short search form."""
+
 import streamlit as st
 
 from apps.wizard.app_pages.producer_analytics.utils import AUXILIARY_STEPS, MIN_DATE, TODAY

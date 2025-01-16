@@ -7,7 +7,7 @@ from apps.wizard.app_pages.producer_analytics.charts import (
     plot_chart_analytics,
     show_producer_charts_grid,
 )
-from apps.wizard.app_pages.producer_analytics.producer import get_producer_analytics_per_producer, show_producers_grid
+from apps.wizard.app_pages.producer_analytics.producer import get_analytics_by_producer, render_producers_table
 from apps.wizard.app_pages.producer_analytics.selection import render_selection
 from apps.wizard.app_pages.producer_analytics.summary import prepare_summary
 
@@ -47,26 +47,26 @@ df_expanded = get_producer_charts_analytics(
 # 2/ PRODUCER ANALYTICS: Display main table, with analytics per producer.
 # Allow the user to select a subset of producers.
 ########################################################################################################################
-st.header("Analytics by producer")
+# st.header("Analytics by producer")
 st.markdown(
     "Total number of charts and chart views for each producer. Producers selected in this table will be used to filter the producer-charts table below."
 )
 
 # Load table content and select only columns to be shown.
 with st.spinner("Loading producer data. We are accessing various databases. This can take few seconds..."):
-    df_producers = get_producer_analytics_per_producer(df_expanded)
+    df_producers = get_analytics_by_producer(df_expanded)
 
 # Prepare and display the grid table with producer analytics.
-producers_selected = show_producers_grid(
+producers_selected = render_producers_table(
     df_producers=df_producers,
     min_date=min_date,
     max_date=max_date,
 )
 
 ########################################################################################################################
-# 2/ CHART ANALYTICS: Display a chart with the total number of daily views, and the daily views of the top performing charts.
+# 3/ CHART ANALYTICS: Display a chart with the total number of daily views, and the daily views of the top performing charts.
 ########################################################################################################################
-st.header("Analytics by chart")
+st.subheader("Analytics by chart")
 st.markdown("Number of views for each chart that uses data by the selected producers.")
 
 # Load detailed analytics per producer-chart.

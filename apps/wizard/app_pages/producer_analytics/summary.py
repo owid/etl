@@ -1,3 +1,6 @@
+"""Last bit, where a summary is prepared to be shared with the data producer."""
+
+
 def prepare_summary(
     df_top_10_total_views, producers_selected, total_views, average_daily_views, min_date, max_date
 ) -> str:

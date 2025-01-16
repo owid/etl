@@ -1,13 +1,14 @@
+"""Code to generate the table with producer analytics."""
+
 import pandas as pd
 import streamlit as st
 from st_aggrid import AgGrid, GridUpdateMode
-from st_aggrid.grid_options_builder import GridOptionsBuilder
 
-from apps.wizard.app_pages.producer_analytics.utils import columns_producer
+from apps.wizard.app_pages.producer_analytics.utils import columns_producer, make_grid
 
 
 @st.cache_data(show_spinner=False)
-def get_producer_analytics_per_producer(df_expanded):
+def get_analytics_by_producer(df_expanded):
     # st.toast("⌛ Adapting the data for presentation...")
     # Group by producer and get the full list of chart slugs for each producer.
     df_grouped = df_expanded.groupby("producer", observed=True, as_index=False).agg(
@@ -33,46 +34,13 @@ def get_producer_analytics_per_producer(df_expanded):
     return df_grouped
 
 
-def show_producers_grid(df_producers, min_date, max_date):
+def render_producers_table(df_producers, min_date, max_date):
     """Show table with producers analytics."""
-    gb = GridOptionsBuilder.from_dataframe(
-        df_producers,
-    )
-    gb.configure_grid_options(
-        # domLayout="autoHeight",
-        enableCellTextSelection=True,
-    )
-    gb.configure_selection(
-        selection_mode="multiple",
-        use_checkbox=True,
-        rowMultiSelectWithClick=True,
-        suppressRowDeselection=False,
-        groupSelectsChildren=True,
-        groupSelectsFiltered=True,
-    )
-    gb.configure_default_column(
-        editable=False,
-        groupable=True,
-        sortable=True,
-        filterable=True,
-        resizable=True,
-    )
-
-    # Enable column auto-sizing for the grid.
-    gb.configure_grid_options(suppressSizeToFit=False)  # Allows dynamic resizing to fit.
-    gb.configure_default_column(autoSizeColumns=True)  # Ensures all columns can auto-size.
-
-    # Configure individual columns with specific settings.
+    # Define columns UI.
     COLUMNS_PRODUCERS = columns_producer(min_date, max_date)
-    for column in COLUMNS_PRODUCERS:
-        gb.configure_column(column, **COLUMNS_PRODUCERS[column])
-    # Configure pagination with dynamic page size.
-    gb.configure_pagination(
-        # paginationAutoPageSize=False,
-        # paginationPageSize=40,
-    )
-    # Build the grid options.
-    grid_options = gb.build()
+    # Configure individual columns with specific settings.
+    grid_options = make_grid(df_producers, COLUMNS_PRODUCERS, selection=True)
+
     # Custom CSS to ensure the table stretches across the page.
     custom_css = {
         ".ag-theme-streamlit": {
@@ -100,5 +68,4 @@ def show_producers_grid(df_producers, min_date, max_date):
     if df is None:
         return []
 
-    producers_selected = df["producer"].tolist()
-    return producers_selected
+    return df["producer"].tolist()
