@@ -24,6 +24,6 @@ meta:
       url: https://www.who.int/about/policies/publishing/copyright
 
 outs:
-  - md5: d2d36689a7e2c555b0fd2f8d9c7e0c5b
-    size: 2223139
+  - md5: 3e4c01941cdcb02862d44144380ffb7f
+    size: 5026603
     path: vaccine_stock_out.xlsx
