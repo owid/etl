@@ -453,7 +453,8 @@ def url_persist(component: Any) -> Any:
                 params = default
 
             # Store params in session state
-            st.session_state[key] = params
+            if params is not None:
+                st.session_state[key] = params
 
             # Check if the value given for an option via the URL is actually accepted!
             # Allow empty values! NOTE: Might want to re-evaluate this, and add a flag to the function, e.g. 'allow_empty'
