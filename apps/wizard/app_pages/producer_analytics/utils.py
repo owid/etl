@@ -77,6 +77,7 @@ def make_grid(df: pd.DataFrame, column_config, selection: bool = False):
             groupSelectsFiltered=True,
         )
 
+    gb.configure_side_bar()
     # Configure pagination with dynamic page size.
     gb.configure_pagination(
         # paginationAutoPageSize=False,
