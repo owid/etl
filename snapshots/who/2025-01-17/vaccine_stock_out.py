@@ -1,4 +1,13 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+To download the dataset follow these steps:
+
+- Go here https://immunizationdata.who.int/global/wiise-detail-page/vaccine-supply-and-logistics
+- Set the years to the earliest and latest values
+- Click the "Download" button
+- Use this downloaded file for the Snapshot
+
+"""
 
 from pathlib import Path
 
