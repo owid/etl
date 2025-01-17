@@ -50,6 +50,17 @@ class Snapshot:
 
         self.metadata = SnapshotMeta.load_from_yaml(self.metadata_path)
 
+    @classmethod
+    def from_raw_uri(cls, raw_uri: str) -> "Snapshot":
+        """Create Snapshot from raw URI."""
+        if raw_uri.startswith("snapshot://"):
+            snap_uri = raw_uri.replace("snapshot://", "")
+        elif raw_uri.startswith("snapshot-private://"):
+            snap_uri = raw_uri.replace("snapshot-private://", "")
+        else:
+            raise ValueError(f"Invalid URI: {raw_uri}")
+        return cls(snap_uri)
+
     @property
     def m(self) -> "SnapshotMeta":
         """Metadata alias to save typing."""
