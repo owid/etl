@@ -1,0 +1,31 @@
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: OECD Family Database - Mean age at marriage
+    description: |-
+      The OECD Family Database provides cross-national indicators on family outcomes and family policies across the OECD countries, its enhanced engagement partners and EU member states. It includes 70 indicators under four main dimensions: (i) structure of families, (ii) labour market position of families, (iii) public policies for families and children and (iv) child outcomes.
+    date_published: 2024-03-27
+    title_snapshot: OECD Family Database - Mean age at marriage
+    description_snapshot: |-
+      This dataset contains the data on mean age at first marriage, defined as the mean age in years of marrying persons at the time of marriage. This measure is disaggregated by sex with separate averages for men and women.
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2024). OECD Family Database.
+
+    # Files
+    url_main: https://www.oecd.org/en/data/datasets/oecd-family-database.html
+    url_download: https://webfs.oecd.org/Els-com/Family_Database/SF_3_1_Marriage_divorce_rates.xlsx
+    date_accessed: 2025-01-11
+
+    # License
+    license:
+      name: OECD Terms of Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+
+outs:
+  - md5: 5fc292c5444e911eff9226faeb3cac98
+    size: 818646
+    path: mean_age_at_marriage.xls

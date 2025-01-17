@@ -137,7 +137,7 @@ sections:
         alias: producer-analytics
         description: "Share analytics with data producers"
         maintainer: "@pablo"
-        entrypoint: app_pages/producer_analytics.py
+        entrypoint: app_pages/producer_analytics/app.py
         icon: ":material/analytics:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Wikimedia_Product_Analytics_team_logo.svg/512px-Wikimedia_Product_Analytics_team_logo.svg.png"
 
