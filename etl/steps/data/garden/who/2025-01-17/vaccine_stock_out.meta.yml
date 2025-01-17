@@ -5,11 +5,11 @@ definitions:
       topic_tags:
         - Vaccination
   unit: |-
-    <% if description.include?("What was the duration of stock-out in months") %>
+    <% if "What was the duration of stock-out in months" in description %>
     months
     <%- else %>
     ""
-    <%- end %>
+    <%- endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -21,4 +21,5 @@ tables:
     variables:
       value:
         title: << description >>
-        unit: "{defintions.unit}"
+        unit: |-
+          {definitions.unit}
