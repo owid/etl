@@ -1,4 +1,11 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""
+This is to create a dataset that contains the GDP per capita and living conditions of countries.
+
+This data is used to create the static chart "How is life at different levels of GDP per capita?", available in this article: https://ourworldindata.org/global-economic-inequality-introduction
+
+Including this in the ETL facilitates creating new versions of the data in the future.
+
+"""
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
