@@ -27,8 +27,14 @@ class UIProducerAnalytics:
         """Render the table with producers analytics."""
         # Define columns UI.
         COLUMNS_PRODUCERS = columns_producer(min_date, max_date)
+        columns = COLUMNS_PRODUCERS | {
+            "views_per_chart": {
+                "headerName": "Views per chart",
+                "headerTooltip": "Average number of views of a chart using data from this producer.",
+            }
+        }
         # Configure individual columns with specific settings.
-        grid_options = make_grid(self.df, COLUMNS_PRODUCERS, selection=True)
+        grid_options = make_grid(self.df, columns, selection=True)
 
         # Custom CSS to ensure the table stretches across the page.
         custom_css = {
@@ -42,7 +48,7 @@ class UIProducerAnalytics:
         grid_response = AgGrid(
             data=self.df,
             gridOptions=grid_options,
-            height=500,
+            # height=500,
             width="100%",
             update_mode=GridUpdateMode.MODEL_CHANGED,
             fit_columns_on_grid_load=True,  # Automatically adjust columns when the grid loads.
@@ -74,6 +80,9 @@ def _process_df(df):
         }
     )
     df["n_charts"] = df["chart_url"].apply(len)
+
+    # Views per chart
+    df["views_per_chart"] = (df["views_custom"] / df["n_charts"]).astype(int)
 
     # Check if lists are unique. If not, make them unique in the previous line.
     error = "Duplicated chart slugs found for a given producer."
