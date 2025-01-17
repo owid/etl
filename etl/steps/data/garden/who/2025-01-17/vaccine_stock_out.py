@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -22,8 +24,8 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.drop(columns=["iso_3_code", "who_region", "indcode", "indcatcode", "indcat_description", "indsort"])
+    tb = tb.replace({"value": {"ND": pd.NA, "NR": pd.NA}})
     tb = tb.format(["country", "year", "description"])
-
     #
     # Save outputs.
     #
