@@ -167,7 +167,7 @@ class UIChartProducerAnalytics:
             columns={"grapher": "Chart slug"},
         )
         df_plot["Chart slug"] = df_plot["Chart slug"].apply(lambda x: x.split("/")[-1])
-        df_plot["day"] = pd.to_datetime(df_plot["day"]).dt.strftime("%a. %Y-%m-%d")
+        df_plot["day"] = pd.to_datetime(df_plot["day"]).dt.strftime("%Y-%m-%d")
         df_plot = df_plot.rename(columns={"renders": "Views"})
 
         # Custom hover
@@ -182,11 +182,6 @@ class UIChartProducerAnalytics:
             y="Views",
             color="Chart slug",
             title="Top 10 charts: daily views",
-            # hover_data={
-            #     "day": False,
-            #     "Views": ":.0f",
-            #     "Chart slug": True,
-            # },
             hover_data={"day": False, "Views": False, "Chart slug": False},
         )
 
@@ -194,16 +189,36 @@ class UIChartProducerAnalytics:
         for trace in fig.data:
             if isinstance(trace, Scatter) and (trace.y is not None):
                 chart_slug = trace.name  # Get the name of the line (Chart slug)
-                trace.customdata = [
-                    f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
-                ]  # Custom hover text for each point
-                trace.hovertemplate = "%{customdata}<extra></extra>"  # Use the custom hover text
+                if chart_slug == "Total":
+                    trace.update(
+                        legendgroup="Total",
+                        showlegend=True,
+                        name="<b>All charts</b>",
+                        customdata=[
+                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
+                        ],  # Custom hover text for each point
+                        hovertemplate="%{customdata}<extra></extra>",
+                    )
+                else:
+                    trace.update(
+                        legendgroup="Charts",
+                        showlegend=True,
+                        customdata=[
+                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
+                        ],  # Custom hover text for each point
+                        hovertemplate="%{customdata}<extra></extra>",
+                    )
 
         # Update layout
         fig.update_layout(
             xaxis_title=None,
             yaxis_title=None,
             hovermode="x",
+            legend=dict(title=None),
+            xaxis=dict(
+                tickmode="auto",  # Automatically calculate tick spacing
+                nticks=10,  # Reduce the number of ticks to 10
+            ),
         )
 
         # Display the chart.
