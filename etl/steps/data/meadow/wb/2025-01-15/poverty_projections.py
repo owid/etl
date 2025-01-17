@@ -28,27 +28,28 @@ def run(dest_dir: str) -> None:
 
     # Define empty list to store tables.
     tables = []
-    for table, table_config in TABLE_PARAMETERS.items():
-        # Load data from snapshot.
-        tb = snap.read_in_archive(f"{FILES_DIRECTORY}/{table_config['file']}")
+    with snap.open_archive():
+        for table, table_config in TABLE_PARAMETERS.items():
+            # Load data from snapshot.
+            tb = snap.read_in_archive(f"{FILES_DIRECTORY}/{table_config['file']}")
 
-        #
-        # Process data.
-        #
-        # Rename and add columns
-        if table == "region":
-            tb = tb.rename(columns={"region_pip": "country"})
-        elif table == "global":
-            tb["country"] = "World"
+            #
+            # Process data.
+            #
+            # Rename and add columns
+            if table == "region":
+                tb = tb.rename(columns={"region_pip": "country"})
+            elif table == "global":
+                tb["country"] = "World"
 
-        # Remove duplicates in the data
-        tb = tb.drop_duplicates(subset=INDEX_COLUMNS)
+            # Remove duplicates in the data
+            tb = tb.drop_duplicates(subset=INDEX_COLUMNS)
 
-        # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-        tb = tb.format(keys=INDEX_COLUMNS, short_name=table)
+            # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+            tb = tb.format(keys=INDEX_COLUMNS, short_name=table)
 
-        # Append table to list.
-        tables.append(tb)
+            # Append table to list.
+            tables.append(tb)
 
     #
     # Save outputs.
