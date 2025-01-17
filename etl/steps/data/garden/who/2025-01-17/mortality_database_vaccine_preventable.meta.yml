@@ -23,6 +23,7 @@ tables:
         unit: deaths
         display:
           numDecimalPlaces: 0
+          name: << cause >>
         presentation:
           grapher_config:
             note: |-
@@ -38,6 +39,7 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+          name: << cause >>
         presentation:
           grapher_config:
             note: |-
@@ -52,6 +54,7 @@ tables:
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
+          name: << cause >>
         presentation:
           grapher_config:
             note: |-
@@ -66,6 +69,7 @@ tables:
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
+          name: << cause >>
         presentation:
           grapher_config:
             note: |-
