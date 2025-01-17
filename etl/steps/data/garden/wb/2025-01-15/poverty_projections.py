@@ -70,9 +70,6 @@ def run(dest_dir: str) -> None:
     # Recover origins
     tb["scenario"] = tb["scenario"].copy_metadata(tb["country"])
 
-    # Make povertyline with 2 decimals
-    tb["povertyline"] = (tb["povertyline"] * 100).astype(int) / 100
-
     tb = tb.format(INDEX_COLUMNS, short_name="poverty_projections")
 
     #
