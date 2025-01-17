@@ -2,7 +2,7 @@
 
 import pandas as pd
 import streamlit as st
-from st_aggrid import AgGrid, ColumnsAutoSizeMode, GridUpdateMode
+from st_aggrid import AgGrid, GridUpdateMode
 
 from apps.wizard.app_pages.producer_analytics.utils import columns_producer, make_grid
 from apps.wizard.utils.components import st_cache_data
