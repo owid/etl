@@ -7,6 +7,9 @@ Including this in the ETL facilitates creating new versions of the data in the f
 
 """
 
+import owid.catalog.processing as pr
+from owid.catalog import Dataset, Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -30,6 +33,7 @@ def run(dest_dir: str) -> None:
     ds_unesco = paths.load_dataset("education_sdgs")
     ds_happiness = paths.load_dataset("happiness")
     ds_population = paths.load_dataset("population")
+    ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
     tb_wdi = ds_wdi.read("wdi")
@@ -109,18 +113,96 @@ def run(dest_dir: str) -> None:
         columns={"cantril_ladder_score": "happiness_score"}
     )
 
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    # Merge all the tables
+    tb = pr.multi_merge(
+        [tb_wdi, tb_un_wpp, tb_igme, tb_mortality, tb_wash, tb_unwto, tb_pwt, tb_edstats, tb_unesco, tb_happiness],
+        on=["country", "year"],
+        how="outer",
     )
-    tb = tb.format(["country", "year"])
+
+    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+
+    tb = select_most_recent_data(tb)
+
+    tb = add_regions_columns(tb, ds_regions)
+
+    tb = tb.format(["country"], short_name="gdppc_vs_living_conditions")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_wdi.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def select_most_recent_data(tb: Table) -> Table:
+    """
+    Select the most recent data for each indicator and country in the table.
+    """
+
+    tb = tb.sort_values(by=["country", "year"], ascending=False).reset_index(drop=True)
+
+    # Define the columns that are indicators (the columns that are not country or year)
+    indicators = tb.columns.difference(["country", "year"]).tolist()
+
+    tb_list = []
+
+    for indicator in indicators:
+        tb_indicator = tb[["country", "year", indicator]].copy()
+
+        # Drop rows with missing values
+        tb_indicator = tb_indicator.dropna(subset=[indicator]).reset_index(drop=True)
+
+        # Define latest year in the dataset
+        latest_year = tb_indicator["year"].max()
+
+        # Select all the rows with year higher or equal to latest_year - 10
+        tb_indicator = tb_indicator[tb_indicator["year"] >= latest_year - 10].reset_index(drop=True)
+
+        # Drop year column
+        tb_indicator = tb_indicator.drop(columns=["year"])
+
+        # For each country, select the row with the latest year
+        tb_indicator = tb_indicator.groupby("country").first().reset_index()
+
+        tb_list.append(tb_indicator)
+
+    tb = pr.multi_merge(tb_list, on=["country"], how="outer")
+
+    return tb
+
+
+def add_regions_columns(tb: Table, ds_regions: Dataset) -> Table:
+    """
+    Add region columns to the table.
+    """
+
+    tb_regions = geo.create_table_of_regions_and_subregions(ds_regions=ds_regions)
+
+    # Explode the regions table to have one row per country
+    tb_regions = tb_regions.explode("members").reset_index(drop=False)
+
+    # Select OWID regions
+    tb_regions = tb_regions[
+        tb_regions["region"].isin(["North America", "South America", "Europe", "Africa", "Asia", "Oceania"])
+    ].reset_index(drop=True)
+
+    # Merge the regions table with the table
+    tb = pr.merge(
+        tb,
+        tb_regions,
+        left_on="country",
+        right_on="members",
+        how="left",
+    )
+
+    # Delete the members column
+    tb = tb.drop(columns=["members"])
+
+    # Keep only the rows where region is not missing
+    tb = tb.dropna(subset=["region"]).reset_index(drop=True)
+
+    return tb
