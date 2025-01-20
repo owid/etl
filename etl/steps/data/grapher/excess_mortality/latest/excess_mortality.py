@@ -1,9 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import pandas as pd
-from owid.catalog import Dataset, Table
-
-from etl.helpers import PathFinder
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -17,37 +14,23 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("excess_mortality")
 
     # Read table from garden dataset.
-    tb_garden = ds_garden["excess_mortality"]
+    tb = ds_garden["excess_mortality"]
 
     #
     # Process data.
     #
     # Make grapher friendly
-    tb_garden = make_grapher_friendly(tb_garden)
+    # tb_garden = make_grapher_friendly(tb_garden)
+    tb = tb.rename_index_names({"entity": "country"})
 
     #
     # Save outputs.
     #
-    # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = Dataset.create_empty(dest_dir, ds_garden.metadata)
-
-    # Add table of processed data to the new dataset.
-    ds_grapher.add(tb_garden)
-
-    # Save changes in the new grapher dataset.
+    # Create a new grapher dataset.
+    ds_grapher = create_dataset(
+        dest_dir,
+        tables=[tb],
+        check_variables_metadata=True,
+        default_metadata=ds_garden.metadata,
+    )
     ds_grapher.save()
-
-
-def make_grapher_friendly(df: Table) -> Table:
-    df = df.reset_index()
-    # year
-    reference_date = pd.Timestamp(2020, 1, 1)
-    df["year"] = pd.to_datetime(df["date"])
-    df["year"] = (df["year"] - reference_date).dt.days
-    # country
-    df["country"] = df["entity"]
-    # drop unused columns
-    df = df.drop(columns=["date", "entity"])
-    # Set index
-    df = df.set_index(["country", "year"])
-    return df
