@@ -34,7 +34,6 @@ def run(dest_dir: str) -> None:
     tb_deaths = keep_only_relevant_dimensions(tb_deaths)
     tb_pop = keep_only_relevant_dimensions(tb_pop)
     tb_ratios = keep_only_relevant_dimensions(tb_ratios)
-    tb_deaths_agg = keep_only_relevant_dimensions(tb_deaths_agg)
 
     #
     # Save outputs.
