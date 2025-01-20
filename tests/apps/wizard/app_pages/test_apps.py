@@ -123,7 +123,7 @@ def test_app_fasttrack():
 @pytest.mark.integration
 @pytest.mark.usefixtures("set_config")
 def test_app_harmonizer():
-    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/harmonizer.py"), default_timeout=DEFAULT_TIMEOUT).run()
+    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/harmonizer/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
 
     # Show all datasets
     toggle = _pick_toggle_by_label(at, "Show all datasets")
