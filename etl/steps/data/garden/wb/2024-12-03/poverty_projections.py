@@ -51,6 +51,9 @@ def run(dest_dir: str) -> None:
     # Concatenate tables
     tb = pr.concat(tables, ignore_index=True)
 
+    # Round povertyline to 2 decimal places
+    tb["povertyline"] = tb["povertyline"].round(2)
+
     # Multiply poorpop by 1_000_000
     tb["poorpop"] = tb["poorpop"] * 1_000_000
 
