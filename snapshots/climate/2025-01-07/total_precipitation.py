@@ -5,7 +5,7 @@ Instructions on how to access the API on a Mac are here: https://confluence.ecmw
 
 More information on how to access the data is here: hhttps://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview
 
-The data is downloaded as a NetCDF file. Tutorials for using the Copernicus API are here and work with the NETCDF format are here: https://ecmwf-projects.github.io/copernicus-training-c3s/cds-tutorial.html
+The data is downloaded as a zip file. Tutorials for using the Copernicus API are here and work with the zip format are here: https://ecmwf-projects.github.io/copernicus-training-c3s/cds-tutorial.html
 """
 
 import tempfile
