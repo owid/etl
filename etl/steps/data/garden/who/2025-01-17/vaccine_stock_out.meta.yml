@@ -23,3 +23,7 @@ tables:
         title: << description >>
         unit: |-
           {definitions.unit}
+      any_national_vaccine_stockout:
+        title: Was there any national vaccine stock-out?
+        description_short: Whether or not there was stock-out at a national level of any vaccine.
+        unit: ""

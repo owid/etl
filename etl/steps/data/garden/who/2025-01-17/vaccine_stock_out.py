@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -36,3 +37,30 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+### Derived metrics
+
+
+def national_stockout_for_any_vaccine(tb: Table) -> Table:
+    """
+    Was there a vaccine stockout of any vaccine in the country in the given year?
+    """
+    # Get the rows relevant to national vaccine stockouts (i.e. not subnational, or stockouts of syringes)
+
+    tb_agg = tb[
+        tb["description"].str.contains("Was there a stock-out at the national level")
+        & (tb["description"].str.contains("vaccine"))
+    ]
+    tb_agg = tb_agg.dropna(subset=["value"])
+    tb_agg = (
+        tb_agg.assign(is_yes=tb_agg["value"].eq("Yes"))
+        .groupby(["country", "year"], as_index=False)["is_yes"]
+        .any()
+        .assign(any_national_vaccine_stockout=lambda df: df["is_yes"].map({True: "Yes", False: "No"}))
+        .drop(columns=["is_yes"])
+    )
+
+    tb = tb.merge(tb_agg, on=["country", "year"], how="left")
+
+    return tb
