@@ -402,3 +402,30 @@ tables:
           topic_tags:
             - Life Expectancy
             - Gender Ratio
+
+  death_rate:
+    common:
+      presentation:
+        topic_tags:
+          - Life Expectancy
+
+    variables:
+      death_rate:
+        title: "Central death rate - sex: <<sex>>"
+        description_short: |-
+          The death rate, calculated as the number of deaths divided by the average number of people alive during the year.
+        description_key:
+          - "The death rate is measured using the number of person-years lived during the interval."
+          - "Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years."
+          - "The death rate is slightly different from the 'probability of death' during the interval, because the 'probability of death' metric uses a different denominator: the number of people alive at that age at the start of the interval, while this indicator uses the average number of people alive during the interval."
+        unit: deaths per 1,000 people
+        processing_level: major
+        description_processing: |-
+          This indicator has been estimated by dividing the number of annual deaths by the population that year, as reported by the source.
+
+          Note that the source provides data on death rate only by age groups, and not for the total population.
+        presentation:
+          title_public: Central death rate
+          title_variant: << sex + 's, ' if sex != 'total' >>
+          topic_tags:
+            - Life Expectancy

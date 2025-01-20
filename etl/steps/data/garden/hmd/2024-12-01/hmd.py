@@ -106,6 +106,13 @@ def run(dest_dir: str) -> None:
     # 6/ Create table with differences and ratios
     tb_ratios = make_table_diffs_ratios(tb_lt)
 
+    # 7/ Death rate
+    tb_mort_all = tb_mort.groupby(["country", "year", "sex"], as_index=False)["deaths"].sum()
+    tb_pop_all = tb_pop.groupby(["country", "year", "sex"], as_index=False)["population"].sum()
+    tb_death_rate = tb_mort_all.merge(tb_pop_all, on=["country", "year", "sex"])
+    tb_death_rate["death_rate"] = tb_death_rate["deaths"] / tb_death_rate["population"] * 1_000
+    tb_death_rate = tb_death_rate.drop(columns=["deaths", "population"])
+
     # Create list with tables
     paths.log.info("saving tables")
     tables = [
@@ -115,6 +122,7 @@ def run(dest_dir: str) -> None:
         tb_pop.format(["country", "year", "sex", "age"]),
         tb_births.format(["country", "year", "sex"]),
         tb_ratios.format(["country", "year", "age", "type"], short_name="diff_ratios"),
+        tb_death_rate.format(["country", "year", "sex"], short_name="death_rate"),
     ]
 
     #
