@@ -119,4 +119,4 @@ class Instructions:
             meadow_step = None
         else:
             meadow_step = self.form.step_uri("meadow")
-        render_harmonizer(None)
+        render_harmonizer(step_uri=meadow_step)
