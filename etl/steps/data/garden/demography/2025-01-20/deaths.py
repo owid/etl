@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_hmd = paths.load_dataset("hmd")
-    tb_hmd = ds_hmd.read("death_rate")
+    tb_hmd = ds_hmd.read("deaths_all")
     ds_un = paths.load_dataset("un_wpp")
     tb_un = estimate_death_rate_from_un(ds_un)
 
@@ -27,20 +27,27 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Keep relevant columns
-    columns = ["country", "year", "sex", "death_rate"]
+    columns = ["country", "year", "sex", "death_rate", "deaths"]
     tb_un = tb_un.loc[:, columns]
     tb_hmd = tb_hmd.loc[:, columns]
 
+    # Harmonize sex dimension
+    tb_un["sex"] = tb_un["sex"].replace({"all": "total"})
+    assert set(tb_un["sex"].unique()) == {"female", "male", "total"}
+    assert set(tb_hmd["sex"].unique()) == {"female", "male", "total"}
+
     # Concatenate tables
     tb_hmd = tb_hmd.loc[tb_hmd["year"] < YEAR_UN_START]
-    tb = pr.concat([tb_hmd, tb_un], short_name="death_rate")
+    tb = pr.concat([tb_hmd, tb_un])
 
     # Add historical variant
     tb["death_rate_hist"] = tb["death_rate"].copy()
     tb.loc[tb["year"] >= YEAR_WPP_PROJ_START, "death_rate_hist"] = pd.NA
+    tb["deaths_hist"] = tb["deaths"].copy()
+    tb.loc[tb["year"] >= YEAR_WPP_PROJ_START, "deaths_hist"] = pd.NA
 
     # Format
-    tb = tb.format(["country", "year", "sex"])
+    tb = tb.format(["country", "year", "sex"], short_name="death_rate")
 
     #
     # Save outputs.

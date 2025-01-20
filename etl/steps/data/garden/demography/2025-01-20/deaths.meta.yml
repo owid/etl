@@ -9,13 +9,13 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-  title: Death rate (HFD; UN WPP)
+  title: Deaths and death rate (HFD; UN WPP)
 
 tables:
   death_rate:
     variables:
       death_rate:
-        title: "Death rate - sex: <<sex>>"
+        title: "Death rate - Sex: <<sex.title()>>"
         unit: deaths per 1,000 people
         description_short: |-
           The death rate, calculated as the number of deaths divided by the average number of people alive during the year. UN Medium projections for 2024-2100.
@@ -31,8 +31,25 @@ tables:
           title_public: |-
             Death rate
 
+      deaths:
+        title: "Deaths - Sex: <<sex.title()>>"
+        unit: deaths
+        description_short: |-
+          The number of people that died during a given year. UN Medium projections for 2024-2100.
+        description_processing: |-
+          This indicator is constructed by combining data from multiple sources:
+
+          - Before 1950: Historical estimates by Human Mortality Database (2024).
+
+          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+
+          - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
+        presentation:
+          title_public: |-
+            Deaths
+
       death_rate_hist:
-        title: "Death rate, historical - sex: <<sex>>"
+        title: "Death rate, historical - Sex: <<sex.title()>>"
         unit: deaths per 1,000 people
         description_short: |-
           The death rate, calculated as the number of deaths divided by the average number of people alive during the year.
@@ -45,3 +62,19 @@ tables:
         presentation:
           title_public: |-
             Death rate
+
+      deaths_hist:
+        title: "Deaths, historical - Sex: <<sex.title()>>"
+        unit: deaths
+        description_short: |-
+          The number of people that died during a given year.
+        description_processing: |-
+          This indicator is constructed by combining data from multiple sources:
+
+          - Before 1950: Historical estimates by Human Mortality Database (2024).
+
+          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+
+        presentation:
+          title_public: |-
+            Deaths

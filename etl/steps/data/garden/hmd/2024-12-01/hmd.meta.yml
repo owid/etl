@@ -410,7 +410,7 @@ tables:
           - Life Expectancy
 
     variables:
-      death_rate:
+      deaths_all:
         title: "Central death rate - sex: <<sex>>"
         description_short: |-
           The death rate, calculated as the number of deaths divided by the average number of people alive during the year.
@@ -429,3 +429,16 @@ tables:
           title_variant: << sex + 's, ' if sex != 'total' >>
           topic_tags:
             - Life Expectancy
+
+      deaths:
+        title: "Deaths - Sex: <<sex.title()>>"
+        unit: deaths
+        description_short: |-
+          <% if sex == 'total' %>
+          The total number of deaths at age << age >> in a given year.
+          <%- else %>
+          The total number of << sex >> deaths at age << age >> in a given year.
+          <%- endif %>
+        presentation:
+          title_public: Deaths
+          title_variant: << sex + 's, ' if sex != 'total' >>

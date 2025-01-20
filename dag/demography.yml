@@ -313,12 +313,12 @@ steps:
   ########################################################################
 
   # Death rate
-  data://garden/demography/2025-01-20/death_rate:
+  data://garden/demography/2025-01-20/deaths:
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/un/2024-12-02/un_wpp_lt
     - data://garden/hmd/2024-12-01/hmd
-  data://grapher/demography/2025-01-20/death_rate:
-    - data://garden/demography/2025-01-20/death_rate
+  data://grapher/demography/2025-01-20/deaths:
+    - data://garden/demography/2025-01-20/deaths
 
   ########################################################################
   # OTHERS
