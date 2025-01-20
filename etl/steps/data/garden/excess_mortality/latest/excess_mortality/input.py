@@ -57,6 +57,7 @@ def build_df(ds_hmd: Dataset, ds_wmd: Dataset, ds_kobak: Dataset) -> pd.DataFram
 
 
 def _build_estimates_df(ds_hmd: Dataset, ds_wmd: Dataset) -> pd.DataFrame:
+    """Some country data comes from HMD, other from WMD."""
     # Build dataframe
     df_hmd = ds_hmd.read("hmd_stmf", reset_index=True)
     df_hmd = df_hmd.rename(columns={"week": "time"}).assign(**{"time_unit": "weekly"})
