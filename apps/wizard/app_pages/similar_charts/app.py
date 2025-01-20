@@ -119,9 +119,10 @@ with col2:
         random_chart = st.button("Random chart", help="Get a random chart.")
 
         # Filter indicators
-        diversity_gpt = url_persist(st.checkbox, default=True)(
+        diversity_gpt = url_persist(st.checkbox)(
             "Diversity with GPT",
             key="diversity_gpt",
+            value=True,
             help="Use GPT to select 5 most diverse charts from the top 30 similar charts.",
         )
 
@@ -150,9 +151,10 @@ with col2:
     # Weights for each score
     with st.expander("Advanced options", expanded=st.session_state.sim_charts_expander_advanced_options):
         # Add text area for system prompt
-        system_prompt = url_persist(st.text_area, default=scoring.DEFAULT_SYSTEM_PROMPT)(
+        system_prompt = url_persist(st.text_area)(
             "GPT prompt for selecting diverse results",
             key="gpt_system_prompt",
+            value=scoring.DEFAULT_SYSTEM_PROMPT,
             height=150,
         )
 
@@ -165,12 +167,13 @@ with col2:
             if key not in st.session_state:
                 st.session_state[key] = scoring.DEFAULT_WEIGHTS[score_name]
 
-            url_persist(st.slider, default=scoring.DEFAULT_WEIGHTS[score_name])(
+            url_persist(st.slider)(
                 f"Weight for {score_name} score",
                 min_value=1e-9,
                 max_value=1.0,
                 # step=0.001,
                 key=key,
+                value=scoring.DEFAULT_WEIGHTS[score_name],
             )
 
             scoring_model.weights[score_name] = st.session_state[key]
