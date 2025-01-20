@@ -1167,7 +1167,7 @@ def generate_net_exports_as_share_of_supply(tb_fbsc: Table) -> Table:
     # I want to create a new indicator for the net trade balance as a share of consumption (or rather, domestic supply).
     # In other words, I want to calculate (Exports - Imports) / Domestic supply.
     # Here, note that we don't use "Food", since imports and exports include all agricultural products (including e.g. feed), whereas "Food" includes only food allocated for human consumption.
-    # "Domesetic supply" is the total supply of an item (including food, feed, and other uses) available for consumption.
+    # "Domestic supply" is the total supply of an item (including food, feed, and other uses) available for consumption.
     # However, I want to have this indicator for a global total, not for each item.
     # There is a grand total in the data, but only for "Fat supply quantity (t)", "Food available for consumption", "Food supply (kcal)", and "Protein supply quantity (t)".
     # We would need to create this total for Imports, Exports, and Domestic supply.
