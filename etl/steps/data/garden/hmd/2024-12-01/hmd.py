@@ -107,8 +107,12 @@ def run(dest_dir: str) -> None:
     tb_ratios = make_table_diffs_ratios(tb_lt)
 
     # 7/ Death aggregates (absolute and rate)
-    tb_mort_all = tb_mort.groupby(["country", "year", "sex"], as_index=False)["deaths"].sum()
-    tb_pop_all = tb_pop.groupby(["country", "year", "sex"], as_index=False)["population"].sum()
+    ## Aggregate deaths (only use single-year age groups, and not ranges, to avoid double-counting)
+    tb_mort_all = tb_mort.loc[tb_mort["age"].str.contains("-")]
+    tb_mort_all = tb_mort_all.groupby(["country", "year", "sex"], as_index=False)["deaths"].sum()
+    ## Population table already provides total population
+    tb_pop_all = tb_pop.loc[tb_pop["age"] == "total"]
+    ## Merge & estimate rate
     tb_deaths = tb_mort_all.merge(tb_pop_all, on=["country", "year", "sex"])
     tb_deaths["death_rate"] = tb_deaths["deaths"] / tb_deaths["population"] * 1_000
 
