@@ -44,7 +44,7 @@ tables:
   reason_for_stockout:
     variables:
       stockout:
-        title: Was there a vaccine stockout because of << reason_for_stockout >>?
-        description_short: Was there a vaccine stock-out because of << reason_for_stockout >>?
+        title: Was there a vaccine stockout because of << reason_for_stockout.lower() >>?
+        description_short: Was there a vaccine stock-out because of << reason_for_stockout.lower() >>?
         unit: ""
         processing_level: major
