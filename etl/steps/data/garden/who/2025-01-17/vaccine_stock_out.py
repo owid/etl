@@ -57,10 +57,13 @@ def national_stockout_for_any_vaccine(tb: Table) -> Table:
     tb_agg = tb_agg.dropna(subset=["value"])
     tb_agg = (
         tb_agg.assign(is_yes=tb_agg["value"].eq("Yes"))
-        .groupby(["country", "year"], as_index=False)["is_yes"]
-        .any()
-        .assign(any_national_vaccine_stockout=lambda df: df["is_yes"].map({True: "Yes", False: "No"}))
-        .drop(columns=["is_yes"])
+        .groupby(["country", "year"], as_index=False)
+        .agg(
+            any_yes=("is_yes", "any"),  # Whether there is any "Yes"
+            how_many_stockouts=("is_yes", "sum"),  # Count of "Yes" (True is treated as 1)
+        )
+        .assign(any_national_vaccine_stockout=lambda df: df["any_yes"].map({True: "Yes", False: "No"}))
+        .drop(columns=["any_yes"])
     )
 
     tb = tb.merge(tb_agg, on=["country", "year"], how="left")
