@@ -29,6 +29,11 @@ tables:
         description_short: Whether or not there was stock-out at a national level of any vaccine.
         unit: ""
         processing_level: major
+      how_many_national_stockouts:
+        title: How many national vaccine stock-outs were there?
+        description_short: The number of national vaccine stock-outs.
+        unit: ""
+        processing_level: major
       any_district_level_vaccine_stockout:
         title: Was there any district-level vaccine stock-out?
         description_short: Whether or not there was stock-out at a district level of any vaccine.

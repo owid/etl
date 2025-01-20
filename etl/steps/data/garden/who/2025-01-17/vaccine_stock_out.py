@@ -60,7 +60,7 @@ def national_stockout_for_any_vaccine(tb: Table) -> Table:
         .groupby(["country", "year"], as_index=False)
         .agg(
             any_yes=("is_yes", "any"),  # Whether there is any "Yes"
-            how_many_stockouts=("is_yes", "sum"),  # Count of "Yes" (True is treated as 1)
+            how_many_national_stockouts=("is_yes", "sum"),  # Count of "Yes" (True is treated as 1)
         )
         .assign(any_national_vaccine_stockout=lambda df: df["any_yes"].map({True: "Yes", False: "No"}))
         .drop(columns=["any_yes"])
