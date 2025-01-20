@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
-from owid.catalog import Table
+from owid.catalog import Origin, Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -22,21 +22,22 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
-    #
+    origins = tb["value"].origins
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.drop(columns=["iso_3_code", "who_region", "indcode", "indcatcode", "indcat_description", "indsort"])
     tb = tb.replace({"value": {"ND": pd.NA, "NR": pd.NA}})
 
-    tb_agg = calculate_derived_metrics(tb)
+    tb_agg, tb_cause = calculate_derived_metrics(tb, origins)
 
     tb = tb.format(["country", "year", "description"])
     tb_agg = tb_agg.format(["country", "year"], short_name="derived_metrics")
+    tb_cause = tb_cause.format(["country", "year", "reason_for_stockout"], short_name="reason_for_stockout")
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb, tb_agg], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb, tb_agg, tb_cause], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -46,11 +47,43 @@ def run(dest_dir: str) -> None:
 ### Derived metrics
 
 
-def calculate_derived_metrics(tb: Table) -> Table:
+def calculate_derived_metrics(tb: Table, origin: Origin) -> list[Table]:
     tb_nat = national_stockout_for_any_vaccine(tb)
     tb_district = district_level_stockout_for_any_vaccine(tb)
+    tb_cause = reason_for_stockout(tb, origin)
 
     tb_agg = tb_district.merge(tb_nat, on=["country", "year"], how="inner")
+
+    return [tb_agg, tb_cause]
+
+
+def reason_for_stockout(tb: Table, origin: Origin) -> Table:
+    """
+    Was there a stockout because of ___ for any vaccine?
+    """
+    tb_cause = tb[
+        (tb["description"].str.contains("What was the cause of the national stock-out"))
+        & (tb["description"].str.contains("vaccine"))
+    ]
+    # tb_cause = tb_cause.dropna(subset=["value"])
+    # Dropping rows where the values are 'Yes' or 'No' as they are incorrect
+    tb_cause = tb_cause[~tb_cause["value"].isin(["Yes", "No"])]
+    # Fix typo in the data
+    tb_cause["value"] = tb_cause["value"].replace("Inaccurtae forecasts", "Inaccurate forecasts")
+
+    tb_agg = (
+        tb_cause.assign(yes="Yes")
+        .pivot_table(index=["country", "year"], columns="value", values="yes", aggfunc="first")
+        .fillna("No")
+        .reset_index()
+    )
+    tb_agg = tb_agg.melt(
+        id_vars=["country", "year"],  # Columns to keep
+        var_name="reason_for_stockout",  # Name for the column created from the pivoted columns
+        value_name="stockout",  # Name for the values ("yes"/"no")
+    )
+    tb_agg["stockout"].metadata.origins = origin
+
     return tb_agg
 
 

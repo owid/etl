@@ -41,3 +41,10 @@ tables:
         description_short: Whether or not there was stock-out at a district level of any vaccine.
         unit: ""
         processing_level: major
+  reason_for_stockout:
+    variables:
+      stockout:
+        title: Was there a vaccine stockout because of << reason_for_stockout >>?
+        description_short: Was there a vaccine stock-out because of << reason_for_stockout >>?
+        unit: ""
+        processing_level: major
