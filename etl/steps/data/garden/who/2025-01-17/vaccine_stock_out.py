@@ -39,7 +39,10 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb, tb_agg, tb_cause], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir,
+        tables=[tb, tb_agg, tb_cause, tb_global],
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
@@ -53,7 +56,7 @@ def calculate_derived_metrics(tb: Table, origin: Origin) -> list[Table]:
     tb_nat = national_stockout_for_any_vaccine(tb)
     tb_district = district_level_stockout_for_any_vaccine(tb)
     tb_cause, tb_cause_number = derive_stockout_variables(tb, origin)
-    tb_global = how_many_countries_had_stockouts(tb)
+    tb_global = how_many_countries_had_stockouts(tb, origin)
 
     # Aggregate the data with similar formats
     tb_agg = tb_district.merge(tb_nat, on=["country", "year"], how="inner")
@@ -64,17 +67,18 @@ def calculate_derived_metrics(tb: Table, origin: Origin) -> list[Table]:
 
 def derive_stockout_variables(tb: Table, origin: Origin) -> list[Table]:
     tb_cause = reason_for_stockout(tb, origin)
-    tb_cause_number = number_of_reasons_for_stockout(tb_cause)
+    tb_cause_number = number_of_reasons_for_stockout(tb_cause, origin)
     return [tb_cause, tb_cause_number]
 
 
-def number_of_reasons_for_stockout(tb_cause: Table) -> Table:
+def number_of_reasons_for_stockout(tb_cause: Table, origin: Origin) -> Table:
     tb_stockouts = tb_cause[tb_cause["stockout"] == "Yes"].reset_index()
     tb_stockouts = (
         tb_stockouts.groupby(["country", "year"])
         .agg(num_causes_of_stockout=("reason_for_stockout", "nunique"))
         .reset_index()
     )
+    tb_stockouts["num_causes_of_stockout"].metadata.origins = origin
     return tb_stockouts
 
 
@@ -133,7 +137,7 @@ def national_stockout_for_any_vaccine(tb: Table) -> Table:
     return tb_agg
 
 
-def how_many_countries_had_stockouts(tb: Table) -> Table:
+def how_many_countries_had_stockouts(tb: Table, origin: Origin) -> Table:
     """
     At a global level, how many countries had stockouts in the given year?
     """
@@ -148,7 +152,7 @@ def how_many_countries_had_stockouts(tb: Table) -> Table:
     tb_all["description"] = "Any vaccine"
     tb_all["country"] = "World"
     tb_agg = pr.concat([tb_all, tb_each_vaccine], ignore_index=True)
-
+    tb_agg["num_countries_with_stockout"].metadata.origins = origin
     return tb_agg
 
 
