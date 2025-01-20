@@ -26,15 +26,17 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.drop(columns=["iso_3_code", "who_region", "indcode", "indcatcode", "indcat_description", "indsort"])
     tb = tb.replace({"value": {"ND": pd.NA, "NR": pd.NA}})
-    tb = national_stockout_for_any_vaccine(tb)
-    tb = district_level_stockout_for_any_vaccine(tb)
+
+    tb_agg = calculate_derived_metrics(tb)
+
     tb = tb.format(["country", "year", "description"])
+    tb_agg = tb_agg.format(["country", "year"], short_name="derived_metrics")
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb, tb_agg], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -42,6 +44,14 @@ def run(dest_dir: str) -> None:
 
 
 ### Derived metrics
+
+
+def calculate_derived_metrics(tb: Table) -> Table:
+    tb_nat = national_stockout_for_any_vaccine(tb)
+    tb_district = district_level_stockout_for_any_vaccine(tb)
+
+    tb_agg = tb_district.merge(tb_nat, on=["country", "year"], how="inner")
+    return tb_agg
 
 
 def national_stockout_for_any_vaccine(tb: Table) -> Table:
@@ -66,9 +76,9 @@ def national_stockout_for_any_vaccine(tb: Table) -> Table:
         .drop(columns=["any_yes"])
     )
 
-    tb = tb.merge(tb_agg, on=["country", "year"], how="left")
+    # tb = tb.merge(tb_agg, on=["country", "year"], how="left")
 
-    return tb
+    return tb_agg
 
 
 def district_level_stockout_for_any_vaccine(tb: Table) -> Table:
@@ -90,6 +100,6 @@ def district_level_stockout_for_any_vaccine(tb: Table) -> Table:
         .drop(columns=["is_yes"])
     )
 
-    tb = tb.merge(tb_agg, on=["country", "year"], how="left")
+    # tb = tb.merge(tb_agg, on=["country", "year"], how="left")
 
-    return tb
+    return tb_agg

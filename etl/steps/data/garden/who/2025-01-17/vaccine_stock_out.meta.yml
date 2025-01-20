@@ -24,6 +24,8 @@ tables:
         unit: |-
           {definitions.unit}
         processing_level: minor
+  derived_metrics:
+    variables:
       any_national_vaccine_stockout:
         title: Was there any national vaccine stock-out?
         description_short: Whether or not there was stock-out at a national level of any vaccine.
