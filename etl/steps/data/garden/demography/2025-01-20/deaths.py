@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_hmd = paths.load_dataset("hmd")
-    tb_hmd = ds_hmd.read("deaths_all")
+    tb_hmd = ds_hmd.read("deaths_agg")
     ds_un = paths.load_dataset("un_wpp")
     tb_un = estimate_death_rate_from_un(ds_un)
 
@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
     tb.loc[tb["year"] >= YEAR_WPP_PROJ_START, "deaths_hist"] = pd.NA
 
     # Format
-    tb = tb.format(["country", "year", "sex"], short_name="death_rate")
+    tb = tb.format(["country", "year", "sex"], short_name="deaths")
 
     #
     # Save outputs.

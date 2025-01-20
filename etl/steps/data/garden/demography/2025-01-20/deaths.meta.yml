@@ -12,7 +12,7 @@ dataset:
   title: Deaths and death rate (HFD; UN WPP)
 
 tables:
-  death_rate:
+  deaths:
     variables:
       death_rate:
         title: "Death rate - Sex: <<sex.title()>>"

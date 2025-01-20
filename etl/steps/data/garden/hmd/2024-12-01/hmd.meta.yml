@@ -403,14 +403,14 @@ tables:
             - Life Expectancy
             - Gender Ratio
 
-  death_rate:
+  deaths_agg:
     common:
       presentation:
         topic_tags:
           - Life Expectancy
 
     variables:
-      deaths_all:
+      death_rate:
         title: "Central death rate - sex: <<sex>>"
         description_short: |-
           The death rate, calculated as the number of deaths divided by the average number of people alive during the year.
