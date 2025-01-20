@@ -25,11 +25,11 @@ def run(dest_dir: str) -> None:
     # Process data.
     origins = tb["value"].origins
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.drop(columns=["iso_3_code", "who_region", "indcode", "indcatcode", "indcat_description", "indsort"])
-    tb = tb.replace({"value": {"ND": pd.NA, "NR": pd.NA}})
+    tb = clean_data(tb)
 
+    # Calculate derived metrics
     tb_agg, tb_cause, tb_global = calculate_derived_metrics(tb, origins)
-
+    # Format tables
     tb = tb.format(["country", "year", "description"])
     tb_agg = tb_agg.format(["country", "year"], short_name="derived_metrics")
     tb_cause = tb_cause.format(["country", "year", "reason_for_stockout"], short_name="reason_for_stockout")
@@ -47,6 +47,20 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def clean_data(tb: Table) -> Table:
+    """
+    - Drop extraneous columns
+    - Replace 'ND' and 'NR' with NA
+    - There are two variables for the yellow fever vaccine, which do not overlap in time-coverage.
+    I believe they are just two spellings of the same vaccine, so I will merge them.
+    """
+    tb = tb.drop(columns=["iso_3_code", "who_region", "indcode", "indcatcode", "indcat_description", "indsort"])
+    tb = tb.replace({"value": {"ND": pd.NA, "NR": pd.NA}})
+    tb["description"] = tb["description"].str.replace("YF (Yellow fever)", "Yellow fever")
+
+    return tb
 
 
 ### Derived metrics
