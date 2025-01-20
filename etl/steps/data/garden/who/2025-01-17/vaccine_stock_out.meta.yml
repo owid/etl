@@ -57,6 +57,6 @@ tables:
     variables:
       num_countries_with_stockout:
         title: How many countries had a national vaccine stock-out of << description.lower() >>?
-        description_short: How many countries had a national vaccine stock-out of << description.lower()?
+        description_short: How many countries had a national vaccine stock-out of << description.lower()>>?
         unit: "countries"
         processing_level: major
