@@ -18,7 +18,11 @@ tables:
         title: "Death rate - Sex: <<sex.title()>>"
         unit: deaths per 1,000 people
         description_short: |-
+          <% if sex == 'total' %>
           The death rate, calculated as the number of deaths divided by the average number of people alive during the year. UN Medium projections for 2024-2100.
+          <%- else %>
+          The death rate, calculated as the number of <<sex>> deaths divided by the average number of <<sex>>s alive during the year. UN Medium projections for 2024-2100.
+          <%- endif %>
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:
 
@@ -35,7 +39,11 @@ tables:
         title: "Deaths - Sex: <<sex.title()>>"
         unit: deaths
         description_short: |-
-          The number of people that died during a given year. UN Medium projections for 2024-2100.
+          <% if sex == 'total' %>
+          The total number of deaths at age << age >> in a given year. UN Medium projections for 2024-2100.
+          <%- else %>
+          The total number of << sex >> deaths at age << age >> in a given year. UN Medium projections for 2024-2100.
+          <%- endif %>
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:
 
@@ -52,7 +60,11 @@ tables:
         title: "Death rate, historical - Sex: <<sex.title()>>"
         unit: deaths per 1,000 people
         description_short: |-
+          <% if sex == 'total' %>
           The death rate, calculated as the number of deaths divided by the average number of people alive during the year.
+          <%- else %>
+          The death rate, calculated as the number of <<sex>> deaths divided by the average number of <<sex>>s alive during the year.
+          <%- endif %>
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:
 
@@ -67,7 +79,11 @@ tables:
         title: "Deaths, historical - Sex: <<sex.title()>>"
         unit: deaths
         description_short: |-
-          The number of people that died during a given year.
+          <% if sex == 'total' %>
+          The total number of deaths at age << age >> in a given year.
+          <%- else %>
+          The total number of << sex >> deaths at age << age >> in a given year.
+          <%- endif %>
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:
 

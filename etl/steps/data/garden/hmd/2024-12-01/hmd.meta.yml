@@ -413,7 +413,11 @@ tables:
       death_rate:
         title: "Central death rate - sex: <<sex>>"
         description_short: |-
+          <% if sex == 'total' %>
           The death rate, calculated as the number of deaths divided by the average number of people alive during the year.
+          <%- else %>
+          The death rate, calculated as the number of <<sex>> deaths divided by the average number of <<sex>>s alive during the year.
+          <%- endif %>
         description_key:
           - "The death rate is measured using the number of person-years lived during the interval."
           - "Person-years refers to the combined total time that a group of people has lived. For example, if 10 people each live for 2 years, they collectively contribute 20 person-years."
