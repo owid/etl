@@ -439,9 +439,9 @@ tables:
         unit: deaths
         description_short: |-
           <% if sex == 'total' %>
-          The total number of deaths at age << age >> in a given year.
+          The total number of deaths in a given year.
           <%- else %>
-          The total number of << sex >> deaths at age << age >> in a given year.
+          The total number of << sex >> deaths in a given year.
           <%- endif %>
         presentation:
           title_public: Deaths

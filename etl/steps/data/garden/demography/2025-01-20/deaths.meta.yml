@@ -40,9 +40,9 @@ tables:
         unit: deaths
         description_short: |-
           <% if sex == 'total' %>
-          The total number of deaths at age << age >> in a given year. UN Medium projections for 2024-2100.
+          The total number of deaths in a given year. UN Medium projections for 2024-2100.
           <%- else %>
-          The total number of << sex >> deaths at age << age >> in a given year. UN Medium projections for 2024-2100.
+          The total number of << sex >> deaths in a given year. UN Medium projections for 2024-2100.
           <%- endif %>
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:
@@ -80,9 +80,9 @@ tables:
         unit: deaths
         description_short: |-
           <% if sex == 'total' %>
-          The total number of deaths at age << age >> in a given year.
+          The total number of deaths in a given year.
           <%- else %>
-          The total number of << sex >> deaths at age << age >> in a given year.
+          The total number of << sex >> deaths in a given year.
           <%- endif %>
         description_processing: |-
           This indicator is constructed by combining data from multiple sources:
