@@ -57,6 +57,7 @@ def run(dest_dir: str) -> None:
 
 
 def estimate_death_rate_from_un(ds_un):
+    """We re-estimate the death rate bc the UN WPP does not provide it broken down by sex."""
     tb_pop = ds_un.read("population")
     tb_deaths = ds_un.read("deaths")
 
