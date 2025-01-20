@@ -13,9 +13,9 @@ paths = PathFinder(__file__)
 
 def run(dest_dir: str) -> None:
     # Load data from fast track
-    ds_eisner = paths.load_dataset("long_term_homicide_rates_in_europe")
+    snap_eisner = paths.load_snapshot("long_term_homicide_rates_in_europe.csv")
     # Get the required table
-    tb_eisner = ds_eisner["long_term_homicide_rates_in_europe"]
+    tb_eisner = snap_eisner.read()
     tb_eisner = tb_eisner.rename(
         columns={"homicide_rate_in_europe_over_long_term__per_100_000": "death_rate_per_100_000_population"}
     )
@@ -24,16 +24,14 @@ def run(dest_dir: str) -> None:
     eisner_entities = tb_eisner["country"].drop_duplicates()
     # Get both the WHO and UNODC datasets from garden
     tb_who = get_who_mortality_db()
-    tb_unodc = get_unodc()
 
     # Combine both datasets with Eisner
     tb_who_long = combine_datasets(tb_eisner, tb_who)
-    tb_unodc_long = combine_datasets(tb_eisner, tb_unodc)
 
     tb_eisner = tb_eisner.rename(
         columns={"death_rate_per_100_000_population": "death_rate_per_100_000_population_eisner"}
     ).drop(columns="source")
-    tb_combined = dataframes.multi_merge([tb_eisner, tb_who_long, tb_unodc_long], on=["country", "year"], how="outer")
+    tb_combined = dataframes.multi_merge([tb_eisner, tb_who_long], on=["country", "year"], how="outer")
 
     # We only want entities for which long-run data is available in grapher - so let's drop all the others
 
@@ -45,7 +43,7 @@ def run(dest_dir: str) -> None:
         dest_dir,
         tables=[tb],
         check_variables_metadata=True,
-        default_metadata=ds_eisner.metadata,
+        default_metadata=snap_eisner.metadata,
     )
 
     # Save changes in the new garden dataset.
@@ -67,22 +65,6 @@ def get_who_mortality_db() -> Table:
     tb_who = tb_who.dropna(subset="death_rate_per_100_000_population")
     tb_who["source"] = "WHO"
     return tb_who
-
-
-def get_unodc() -> Table:
-    """
-    Get the homicide rate from the UNODC
-    """
-
-    ds_unodc = paths.load_dataset("unodc")
-    tb_unodc = ds_unodc["total"].reset_index()
-    tb_unodc = tb_unodc[["country", "year", "rate_per_100_000_population_both_sexes_all_ages"]]
-    tb_unodc = tb_unodc.dropna(subset="rate_per_100_000_population_both_sexes_all_ages")
-    tb_unodc = tb_unodc.rename(
-        columns={"rate_per_100_000_population_both_sexes_all_ages": "death_rate_per_100_000_population"}
-    )
-    tb_unodc["source"] = "UNODC"
-    return tb_unodc
 
 
 def combine_datasets(eisner: Table, recent_df: Table) -> Table:

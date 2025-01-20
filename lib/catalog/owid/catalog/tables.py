@@ -38,7 +38,7 @@ from owid.datautils import dataframes
 from owid.repack import repack_frame
 
 from . import processing_log as pl
-from . import variables, warnings
+from . import utils, variables, warnings
 from .meta import (
     SOURCE_EXISTS_OPTIONS,
     DatasetMeta,
@@ -48,7 +48,6 @@ from .meta import (
     TableMeta,
     VariableMeta,
 )
-from .utils import underscore
 from .variables import Variable
 
 log = structlog.get_logger()
@@ -304,6 +303,12 @@ class Table(pd.DataFrame):
             try:
                 json.dump(metadata, ostream, indent=2, default=str, allow_nan=False)
             except ValueError as e:
+                # try to find a problematic field
+                for k, v in metadata["fields"].items():
+                    try:
+                        json.dumps(v, default=str, allow_nan=False)
+                    except ValueError as e2:
+                        raise ValueError(f"metadata field {k} contains NaNs:\n{v}") from e2
                 raise ValueError(f"metadata contains NaNs:\n{metadata}") from e
 
     @classmethod
@@ -708,7 +713,7 @@ class Table(pd.DataFrame):
         orig_cols = t.columns
 
         # underscore columns and resolve collisions
-        new_cols = pd.Index([underscore(c, camel_to_snake=camel_to_snake) for c in t.columns])
+        new_cols = pd.Index([utils.underscore(c, camel_to_snake=camel_to_snake) for c in t.columns])
         new_cols = _resolve_collisions(orig_cols, new_cols, collision)
 
         columns_map = {c_old: c_new for c_old, c_new in zip(orig_cols, new_cols)}
@@ -717,9 +722,9 @@ class Table(pd.DataFrame):
         else:
             t = t.rename(columns=columns_map)
 
-        t.index.names = [underscore(e, camel_to_snake=camel_to_snake) for e in t.index.names]
+        t.index.names = [utils.underscore(e, camel_to_snake=camel_to_snake) for e in t.index.names]
         t.metadata.primary_key = t.primary_key
-        t.metadata.short_name = underscore(t.metadata.short_name, camel_to_snake=camel_to_snake)
+        t.metadata.short_name = utils.underscore(t.metadata.short_name, camel_to_snake=camel_to_snake)
 
         # put original names as titles into metadata by default
         for c_old, c_new in columns_map.items():
@@ -781,6 +786,11 @@ class Table(pd.DataFrame):
         # Set index
         if keys is None:
             keys = ["country", "year"]
+        # Underscore keys
+        elif isinstance(keys, str):
+            keys = utils.underscore(keys)
+        else:
+            keys = [utils.underscore(k) for k in keys]
         ## Sanity check
         try:
             t = t.set_index(keys, verify_integrity=verify_integrity)

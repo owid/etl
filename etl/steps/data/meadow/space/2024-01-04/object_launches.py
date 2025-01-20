@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     tb["annual_launches"] = tb["annual_launches"].copy_metadata(tb["country"])
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

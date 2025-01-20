@@ -22,7 +22,7 @@ from sqlalchemy.orm import Session
 from apps.wizard.utils.paths import STREAMLIT_SECRETS, WIZARD_DB
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_engine, read_sql, to_sql
-from etl.grapher_model import Anomaly
+from etl.grapher.model import Anomaly
 
 log = structlog.get_logger()
 

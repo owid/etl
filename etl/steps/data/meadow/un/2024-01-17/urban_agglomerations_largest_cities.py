@@ -19,11 +19,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = (
-        tb.underscore()
-        .set_index(["country", "year", "urban_agglomeration", "rank_order"], verify_integrity=True)
-        .sort_index()
-    )
+    tb = tb.format(["country", "year", "urban_agglomeration", "rank_order"])
     #
     # Save outputs.
     #

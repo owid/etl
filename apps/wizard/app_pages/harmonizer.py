@@ -118,7 +118,7 @@ st.markdown(
 # show_all = False
 options = get_datasets_in_etl(
     snapshots=False,
-    prefixes=None if st.session_state.show_all else ["data://meadow"],
+    prefixes=None if st.session_state.show_all else ["data://meadow", "data-private://meadow"],
 )
 option = st.selectbox(
     label="Select a dataset",
@@ -252,7 +252,7 @@ if option:
                 path_export = cast(str, harmonizer.output_file)
                 if ENV_IS_REMOTE:
                     # Submit button
-                    export_btn = st.form_submit_button(
+                    export_btn = st.button(
                         label="Generate mapping",
                         type="primary",
                     )

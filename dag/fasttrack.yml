@@ -4,8 +4,6 @@ steps:
   data-private://grapher/fasttrack/2022-11-29/ai_index:
     - snapshot-private://fasttrack/2022-11-29/ai_index.csv
   # Long-term homicide rates in Europe - Eisner (2014)
-  data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
-    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
   data-private://grapher/fasttrack/2022-11-01/lighting_efficiency_uk:
     - snapshot-private://fasttrack/2022-11-01/lighting_efficiency_uk.csv
   data-private://grapher/fasttrack/latest/metaculus__complementary_data:
@@ -60,16 +58,8 @@ steps:
     - snapshot-private://fasttrack/latest/lead_paint_regulation_who.csv
   data://grapher/fasttrack/latest/whm_treatment_gap_anxiety_disorders:
     - snapshot://fasttrack/latest/whm_treatment_gap_anxiety_disorders.csv
-  data://grapher/fasttrack/2023-05-31/cholera:
-    - snapshot://fasttrack/2023-05-31/cholera.csv
-  data://grapher/fasttrack/2023-06-16/guinea_worm:
-    - snapshot://fasttrack/2023-06-16/guinea_worm.csv
-  data://grapher/fasttrack/2023-06-28/guinea_worm:
-    - snapshot://fasttrack/2023-06-28/guinea_worm.csv
   data-private://grapher/fasttrack/latest/fiscal_top1_shares_country_standardized:
     - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
-  data://grapher/fasttrack/2023-04-30/paratz:
-    - snapshot://fasttrack/2023-04-30/paratz.csv
   data-private://grapher/fasttrack/latest/pain_hours_hen_systems:
     - snapshot-private://fasttrack/latest/pain_hours_hen_systems.csv
   data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
@@ -80,8 +70,6 @@ steps:
     - snapshot-private://fasttrack/latest/historical_france_mortality_cause.csv
   data-private://grapher/fasttrack/latest/welfare_broiler_chickens:
     - snapshot-private://fasttrack/latest/welfare_broiler_chickens.csv
-  data-private://grapher/fasttrack/2023-08-14/gbif_animal_presence:
-    - snapshot-private://fasttrack/2023-08-14/gbif_animal_presence.csv
   data://grapher/fasttrack/2023-08-21/survey_livestock_oklahoma:
     - snapshot://fasttrack/2023-08-21/survey_livestock_oklahoma.csv
   data://grapher/fasttrack/latest/sentience_institute:
@@ -148,8 +136,6 @@ steps:
     - snapshot://fasttrack/latest/usa_weather_climate_noaa.csv
   data://grapher/fasttrack/latest/global_precipitation_anomaly_noaa:
     - snapshot://fasttrack/latest/global_precipitation_anomaly_noaa.csv
-  data://grapher/fasttrack/latest/gpei:
-    - snapshot://fasttrack/latest/gpei.csv
   data-private://grapher/fasttrack/latest/conflict_deaths_combined:
     - snapshot-private://fasttrack/latest/conflict_deaths_combined.csv
   data://grapher/fasttrack/2024-04-17/qubits:
@@ -192,8 +178,6 @@ steps:
   #   - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1980_2018_take2.csv
   # data-private://grapher/fasttrack/latest/draft_joe_top1share_diff_1980_2018:
   #   - snapshot-private://fasttrack/latest/draft_joe_top1share_diff_1980_2018.csv
-  data://grapher/fasttrack/2024-06-17/guinea_worm:
-    - snapshot://fasttrack/2024-06-17/guinea_worm.csv
   data://grapher/fasttrack/latest/emissions_energy_heating_cooling_iea:
     - snapshot://fasttrack/latest/emissions_energy_heating_cooling_iea.csv
   data-private://grapher/fasttrack/latest/voter_turnout_by_age__sheet1:
@@ -214,8 +198,6 @@ steps:
     - snapshot://fasttrack/latest/nature_index_undp.csv
   data://grapher/fasttrack/latest/co2_intensity_undp:
     - snapshot://fasttrack/latest/co2_intensity_undp.csv
-  data://grapher/fasttrack/latest/africa_cdc:
-    - snapshot://fasttrack/latest/africa_cdc.csv
   data://grapher/fasttrack/latest/elephant_populations:
     - snapshot://fasttrack/latest/elephant_populations.csv
   data://grapher/fasttrack/latest/pivot_uk_public_spending:
@@ -240,3 +222,5 @@ steps:
     - snapshot://fasttrack/2023-06-19/world_population_comparison.csv
   data://grapher/fasttrack/latest/antimicrobial_usage_livestock:
     - snapshot://fasttrack/latest/antimicrobial_usage_livestock.csv
+  data://grapher/fasttrack/latest/iucn_number_evaluated:
+    - snapshot://fasttrack/latest/iucn_number_evaluated.csv

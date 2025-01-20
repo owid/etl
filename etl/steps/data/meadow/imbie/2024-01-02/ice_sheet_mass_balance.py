@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
     tb = pr.concat(tables).underscore()
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["location", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(["location", "year"], sort_columns=True)
 
     # Update table name.
     tb.metadata.short_name = paths.short_name

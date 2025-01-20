@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     tb_counts = tb_counts.rename(columns={"status": "country"}, errors="raise")
 
     # Set an appropriate index for the counts table and sort conveniently.
-    tb_counts = tb_counts.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_counts = tb_counts.format(["country", "year"])
 
     #
     # Save outputs.

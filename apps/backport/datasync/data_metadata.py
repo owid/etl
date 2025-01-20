@@ -229,7 +229,7 @@ def _move_population_origin_to_end(origins: List[Dict[str, Any]]) -> List[Dict[s
 def variable_metadata(session: Session, variable_id: int, variable_data: pd.DataFrame) -> Dict[str, Any]:
     """Fetch metadata for a single variable from database. This function was initially based on the
     one from owid-grapher repository and uses raw SQL commands. It'd be interesting to rewrite it
-    using SQLAlchemy ORM in grapher_model.py.
+    using SQLAlchemy ORM in grapher.model.py.
     """
     return _variable_metadata(
         db_variable_row=_load_variable(session, variable_id),
@@ -259,7 +259,14 @@ def _convert_strings_to_numeric(lst: List[str]) -> List[Union[int, float, str]]:
 
 
 def _omit_nullable_values(d: dict) -> dict:
-    return {k: v for k, v in d.items() if v is not None and (isinstance(v, list) and len(v) or not pd.isna(v))}
+    out = {}
+    for k, v in d.items():
+        if isinstance(v, list):
+            if len(v) > 0:
+                out[k] = v
+        elif v is not None and not pd.isna(v):
+            out[k] = v
+    return out
 
 
 def filter_out_fields_in_metadata_for_checksum(meta: Dict[str, Any]) -> Dict[str, Any]:

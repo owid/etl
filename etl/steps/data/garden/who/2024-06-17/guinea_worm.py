@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from itertools import product
+
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
@@ -11,21 +13,27 @@ from etl.snapshot import Snapshot
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+CURRENT_YEAR = 2023
+
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
-    # fasttrack snapshot (with case numbers)
-    snap = Snapshot("fasttrack/2024-06-17/guinea_worm.csv")
+    # fasttrack snapshot (with case numbers for 2024)
+    snap_cases = Snapshot("fasttrack/2024-06-17/guinea_worm.csv")
+
+    tb_cases = snap_cases.read().astype({"year": int})
+
     # garden dataset (with certification status of countries)
-    ds_garden = paths.load_dataset(channel="garden", short_name="guinea_worm")
-    # Read tables
-    tb_cases = snap.read_csv()
-    tb_cert = ds_garden["guinea_worm"].reset_index()
+    ds_garden = paths.load_dataset(channel="garden", short_name="guinea_worm", version="2023-06-29")
+    # Read certification table
+    tb_cert = ds_garden["guinea_worm_certification"].reset_index()
 
     #
     # Process data.
     #
+    # add missing years (with no data) to fasttrack dataset
+    tb_cases = add_missing_years(tb_cases)
 
     # harmonize countries
     tb_cert = geo.harmonize_countries(
@@ -39,17 +47,16 @@ def run(dest_dir: str) -> None:
     tb_cert["year_certified"] = tb_cert["year_certified"].str.strip()
 
     # add year in which country was certified as disease free to all rows
-    tb_cert = add_year_certified(tb_cert)
+    tb = pr.merge(tb_cert, tb_cases, on=["country", "year"], how="outer")
+
+    # fill N/As with 0 (this is how we handled this previously)
+    tb["guinea_worm_reported_cases"] = tb["guinea_worm_reported_cases"].fillna(0)
 
     # add rows for current year
-    tb_cert = tb_cert[~(tb_cert["year"] == 2023)]  # data has some empty rows for 2023
-    tb = add_current_year(tb_cert, tb_cases, year=2023)
-
-    # fix data types
-    tb["year_certified"] = tb["year_certified"].astype(str)
+    tb = add_current_year(tb, tb_cases, year=CURRENT_YEAR)
 
     # format index
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name="guinea_worm")
 
     #
     # Save outputs.
@@ -64,20 +71,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_year_certified(tb: Table):
-    """add year in which country was certified as disease free
-    by looping over all rows and setting the year_certified column
-    to the maximum year_certified value for the country"""
-    for idx, row in tb.iterrows():
-        if row["certification_status"] == "Certified disease free":
-            tb_filter_country = tb[tb["country"] == row["country"]]
-            tb.at[idx, "year_certified"] = (
-                pd.to_numeric(tb_filter_country["year_certified"], errors="coerce").astype("Int64").fillna(0).max()
-            )
-    return tb
-
-
-def add_current_year(tb: Table, tb_cases: Table, year: int, changes_dict={}):
+def add_current_year(tb: Table, tb_cases: Table, year: int = CURRENT_YEAR, changes_dict={}):
     """
     Add rows with current certification status & case numbers for each country
     tb (Table): table with certification status & case numbers until last year
@@ -89,6 +83,9 @@ def add_current_year(tb: Table, tb_cases: Table, year: int, changes_dict={}):
     """
     country_list = tb["country"].unique()
     last_year = year - 1
+
+    # in case tb includes data for current year, remove it
+    tb = tb.loc[tb["year"] != year]
 
     row_dicts = []
 
@@ -120,5 +117,18 @@ def add_current_year(tb: Table, tb_cases: Table, year: int, changes_dict={}):
     )
 
     tb = pr.concat([tb, new_year_tb], ignore_index=True)
+
+    return tb
+
+
+def add_missing_years(tb: Table) -> Table:
+    """
+    Add full spectrum of year-country combinations to fast-track dataset so we have zeros where there is missing data
+    """
+    years = tb["year"].unique()
+    countries = tb["country"].unique()
+    comb_df = Table(pd.DataFrame(list(product(countries, years)), columns=["country", "year"]))
+
+    tb = Table(pr.merge(tb, comb_df, on=["country", "year"], how="outer"), short_name=paths.short_name)
 
     return tb

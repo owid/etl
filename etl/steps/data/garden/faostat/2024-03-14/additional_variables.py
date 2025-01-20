@@ -243,8 +243,7 @@ def generate_arable_land_per_crop_output(tb_rl: Table, tb_qi: Table) -> Table:
     )
 
     # Set an appropriate index and sort conveniently.
-    tb_combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb_combined.metadata.short_name = "arable_land_per_crop_output"
+    tb_combined = combined.format(["country", "year"], short_name="arable_land_per_crop_output")
 
     return tb_combined
 
@@ -359,8 +358,7 @@ def generate_percentage_of_sustainable_and_overexploited_fish(tb_sdgb: Table) ->
     tb_sdgb["overexploited_fish"] = 100 - tb_sdgb["sustainable_fish"]
 
     # Set an appropriate index and sort conveniently.
-    tb_fish = tb_sdgb.set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb_fish.metadata.short_name = "share_of_sustainable_and_overexploited_fish"
+    tb_fish = tb_sdgb.format(["country", "year"], short_name="share_of_sustainable_and_overexploited_fish")
 
     return tb_fish
 
@@ -438,8 +436,7 @@ def generate_spared_land_from_increased_yields(tb_qcl: Table) -> Table:
     )
 
     # Set an appropriate index and sort conveniently.
-    tb_spared_land = spared_land.set_index(["country", "year", "item"], verify_integrity=True).sort_index()
-    tb_spared_land.metadata.short_name = "land_spared_by_increased_crop_yields"
+    tb_spared_land = spared_land.format(["country", "year", "item"], short_name="land_spared_by_increased_crop_yields")
 
     return tb_spared_land
 
@@ -474,10 +471,9 @@ def generate_food_available_for_consumption(tb_fbsc: Table) -> Table:
     combined = pr.multi_merge(tables=tables, on=["country", "year"], how="outer")
 
     # Ensure all column names are snake-case, set an appropriate index and and sort conveniently.
-    tb_food_available_for_consumption = (
-        combined.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_food_available_for_consumption = combined.underscore().format(
+        ["country", "year"], short_name="food_available_for_consumption"
     )
-    tb_food_available_for_consumption.metadata.short_name = "food_available_for_consumption"
 
     # Prepare variable metadata.
     common_description = (
@@ -618,8 +614,7 @@ def generate_macronutrient_compositions(tb_fbsc: Table) -> Table:
     )
 
     # Ensure all column names are snake-case, set an appropriate index, and sort conveniently.
-    tb_combined = combined.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb_combined.metadata.short_name = "macronutrient_compositions"
+    tb_combined = combined.underscore().format(["country", "year"], short_name="macronutrient_compositions")
 
     return tb_combined
 
@@ -692,8 +687,7 @@ def generate_fertilizers(tb_rfn: Table, tb_rl: Table) -> Table:
         combined[f"{fertilizer}_use"] = combined[f"{fertilizer}_per_cropland"] * combined["cropland"] * KG_TO_TONNES
 
     # Set an appropriate index and sort conveniently.
-    tb_fertilizers = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb_fertilizers.metadata.short_name = "fertilizers"
+    tb_fertilizers = combined.format(["country", "year"], short_name="fertilizers")
 
     return tb_fertilizers
 
@@ -856,8 +850,7 @@ def generate_vegetable_oil_yields(tb_qcl: Table, tb_fbsc: Table) -> Table:
     combined = combined.replace(np.inf, np.nan)
 
     # Set an appropriate index and sort conveniently.
-    tb_vegetable_oil_yields = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb_vegetable_oil_yields.metadata.short_name = "vegetable_oil_yields"
+    tb_vegetable_oil_yields = combined.format(["country", "year"], short_name="vegetable_oil_yields")
 
     return tb_vegetable_oil_yields
 
@@ -913,10 +906,9 @@ def generate_agriculture_land_evolution(tb_rl: Table) -> Table:
     combined["year_one_decade_back"] = combined["year_one_decade_back"].copy_metadata(combined["year"])
 
     # Set an appropriate index and sort conveniently.
-    tb_agriculture_land_use_evolution = (
-        combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_agriculture_land_use_evolution = combined.format(
+        ["country", "year"], sort_columns=True, short_name="agriculture_land_use_evolution"
     )
-    tb_agriculture_land_use_evolution.metadata.short_name = "agriculture_land_use_evolution"
 
     return tb_agriculture_land_use_evolution
 
@@ -1007,10 +999,9 @@ def generate_hypothetical_meat_consumption(tb_qcl: Table) -> Table:
     combined["animals_global_hypothetical"] = combined["animals_per_capita"] * combined["global_population"]
 
     # Set an appropriate index and sort conveniently.
-    tb_hypothetical_meat_consumption = (
-        combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_hypothetical_meat_consumption = combined.format(
+        ["country", "year"], sort_columns=True, short_name="hypothetical_meat_consumption"
     )
-    tb_hypothetical_meat_consumption.metadata.short_name = "hypothetical_meat_consumption"
 
     return tb_hypothetical_meat_consumption
 
@@ -1063,8 +1054,7 @@ def generate_cereal_allocation(tb_fbsc: Table) -> Table:
         )
 
     # Set an appropriate index and sort conveniently.
-    tb_cereal_allocation = cereals.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-    tb_cereal_allocation.metadata.short_name = "cereal_allocation"
+    tb_cereal_allocation = cereals.format(["country", "year"], sort_columns=True, short_name="cereal_allocation")
 
     return tb_cereal_allocation
 
@@ -1107,10 +1097,7 @@ def generate_maize_and_wheat(tb_fbsc: Table) -> Table:
     )
 
     # Set an appropriate index and sort conveniently.
-    tb_maize_and_wheat = (
-        maize_and_wheat.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-    )
-    tb_maize_and_wheat.metadata.short_name = "maize_and_wheat"
+    tb_maize_and_wheat = maize_and_wheat.format(["country", "year"], sort_columns=True, short_name="maize_and_wheat")
 
     # Add minimal variable metadata (more metadata will be added at the grapher step).
     for column in tb_maize_and_wheat.columns:
@@ -1163,10 +1150,9 @@ def generate_fertilizer_exports(tb_rfn: Table) -> Table:
     fertilizer_exports = fertilizer_exports.drop(columns=["exports_global"], errors="raise")
 
     # Set an appropriate index and sort conveniently.
-    tb_fertilizer_exports = (
-        fertilizer_exports.set_index(["country", "year", "item"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_fertilizer_exports = fertilizer_exports.format(
+        ["country", "year", "item"], sort_columns=True, short_name="fertilizer_exports"
     )
-    tb_fertilizer_exports.metadata.short_name = "fertilizer_exports"
 
     # Add minimal variable metadata (more metadata will be added at the grapher step).
     tb_fertilizer_exports["share_of_exports"].metadata.unit = "%"

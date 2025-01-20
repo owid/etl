@@ -9,13 +9,13 @@ import structlog
 from owid.catalog import find
 from sqlalchemy.orm import Session
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from apps.utils.map_datasets import get_grapher_changes
-from etl import grapher_io as gio
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import get_engine
 from etl.git_helpers import get_changed_files
-from etl.grapher_model import Anomaly, Variable
+from etl.grapher import io as gio
+from etl.grapher.model import Anomaly, Variable
 from etl.version_tracker import VersionTracker
 
 log = structlog.get_logger()
@@ -27,6 +27,16 @@ logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.E
 @st.cache_data
 def load_entity_ids(entity_ids: Optional[List[int]] = None):
     return gio.load_entity_mapping(entity_ids)
+
+
+@st.cache_data(show_spinner=False)
+def execute_bash_command(cmd):
+    """Execute a command and get its output."""
+    try:
+        result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        return e.stderr
 
 
 @st.cache_data

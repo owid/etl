@@ -13,8 +13,8 @@ from requests.exceptions import HTTPError
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from etl import grapher_model as gm
 from etl.config import DEFAULT_GRAPHER_SCHEMA, GRAPHER_USER_ID, OWIDEnv
+from etl.grapher import model as gm
 
 log = structlog.get_logger()
 
@@ -48,6 +48,14 @@ class AdminAPI(object):
     def get_chart_config(self, chart_id: int) -> dict:
         resp = requests.get(
             f"{self.owid_env.admin_api}/charts/{chart_id}.config.json",
+            cookies={"sessionid": self.session_id},
+        )
+        js = self._json_from_response(resp)
+        return js
+
+    def get_chart_references(self, chart_id: int) -> dict:
+        resp = requests.get(
+            f"{self.owid_env.admin_api}/charts/{chart_id}.references.json",
             cookies={"sessionid": self.session_id},
         )
         js = self._json_from_response(resp)

@@ -55,9 +55,9 @@ def run(dest_dir: str) -> None:
     )
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb_co2 = tb_co2.underscore().set_index(["year"], verify_integrity=True).sort_index()
-    tb_ch4 = tb_ch4.underscore().set_index(["year"], verify_integrity=True).sort_index()
-    tb_n2o = tb_n2o.underscore().set_index(["year"], verify_integrity=True).sort_index()
+    tb_co2 = tb_co2.format(["year"])
+    tb_ch4 = tb_ch4.format(["year"])
+    tb_n2o = tb_n2o.format(["year"])
 
     #
     # Save outputs.

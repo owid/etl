@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     # Remove suffixes in region names
     tb["country"] = tb["country"].str.replace(r" \(.+\)", "", regex=True)
     # Set index
-    tb = tb.set_index(["year", "country", "conflict_type"])
+    tb = tb.format(["year", "country", "conflict_type"])
 
     # Get country-level data
     tb_participants = ds_garden["ucdp_country"]

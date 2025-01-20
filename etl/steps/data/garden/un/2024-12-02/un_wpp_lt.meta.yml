@@ -24,7 +24,7 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
-  un_wpp_lt:
+  un_wpp_lt: &table_metadata
     variables:
       central_death_rate:
         title: Central death rate
@@ -102,3 +102,5 @@ tables:
             <%- else -%>
             It refers to the remaining life expectancy for people who have already survived to the given age.
             <%- endif -%>
+
+  un_wpp_lt_proj: *table_metadata

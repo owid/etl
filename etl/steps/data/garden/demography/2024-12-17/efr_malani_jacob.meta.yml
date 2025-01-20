@@ -1,0 +1,95 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Fertility Rate
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: "Effective Fertility Rates (Malani and Jacob)"
+
+tables:
+  aggregated:
+    variables:
+      efr_repr:
+        title: Reproductive Effective Fertility rate (scaled by sex ratio)
+        description_short: |-
+          The number of children who live long enough to reproduce, per woman. This number is dependent on the survival of daughters to childbearing age (between 15 and 49 years old).
+        unit: "children per women"
+        description_processing: |-
+          For a given cohort year, we estimate the cumulative survival probability for a person to reach each age from 0 to 49. For example, the probability of a person born in 2000 reaching age 15, 16, 17, and so on up to 49. We have used HMD data for years before 1950, and UN's for years after 1950 (including).
+
+          We then estimate the Effective Fertility Rate (EFR) for each age group by multiplying the Total Fertility Rate (TFR) by the cumulative survival probability. The EFR for a given age gives us an approximation of the average number of children from a woman that will live long enough to reach that age.
+
+          For years before 1950, we have used HMD data, which does not provide TFR values. Instead, we have used an approximation of the TFR based on births and female population (in reproductive ages), as suggested by Jacob and Malani (2024).
+
+          The Reproductive Effective Fertility rate (EFR) is the average of the EFR over all reproductive ages (15-49).
+
+          Note that the Reproductive Effective Fertility rate (EFR) is an approximation of the number of daughters, so it uses the total fertility rate of female children, or equivalently, the TFR weighted by the sex ratio at birth.
+
+          So we have that: EFR_repr = (TFR * mean(EFR)) / (1 + SRB), where SRB is the male-to-female ratio and the mean is taken over all reproductive ages (15-49).
+
+          This indicator is scaled by the sex ratio to allow easy comparability with the Total Fertility Rate (TFR) and the Labor Effective Fertility rate (EFR_labor).
+
+          Read more details in the author's paper: https://www.nber.org/papers/w33175
+
+      efr_labor:
+        title: Labor Effective Fertility rate
+        description_short: |-
+          The number of children who live long enough to earn labor income, per woman. This number is dependent on the survival of daughters to childbearing age (between 15 and 49 years old).
+        unit: "children per women"
+        description_processing: |-
+          For a given cohort year, we estimate the cumulative survival probability for a person to reach each age age from 0 to 65. E.g. the probability of a person born in 2000 to reach age 15, 16, 17, ..., 65. We have used HMD data for years before 1950, and UN's for years after 1950 (including).
+
+          We then estimate the Effective Fertility Rate (EFR) for each age group by multiplying the Total Fertility Rate (TFR) by the cumulative survival probability. The EFR for a given age gives us an approximation of the average number of children from a women that will live long enough to reach that age.
+
+          For years before 1950, we have used HMD data, which does not provide TFR values. Instead, we have used an approximation of the TFR based on births and female population (in reproductive ages), as suggested by Jacob and Malani (2024).
+
+          The Labor Effective Fertility rate (EFR) is the average of the EFR over all labor ages (15-65).
+
+          So we have that: EFR_labor = (TFR * mean(EFR)), where the mean is taken over all labor ages (15-65).
+
+          Read more details in the author's paper: https://www.nber.org/papers/w33175
+
+      cumulative_survival_repr:
+        title: Cumulative survival probability to reproductive age
+        description_short: |-
+          The probability that a person born in a given year will live long enough to reach reproductive age (15-49).
+        description_processing: |-
+          For a given cohort year, we estimate the cumulative survival probability for a person to reach each age from 0 to 49. For example, the probability of a person born in 2000 reaching age 15, 16, 17, and so on up to 49. We have used HMD data for years before 1950, and UN's for years after 1950 (including).
+
+          This is done by multiplying the survival probability at various years, depending on the age of the person. For example, if born in 2000, we use the probability of surviving age 0 from 2000, the probability of surviving age 1 from 2001, etc.
+
+          Read more details in the author's paper: https://www.nber.org/papers/w33175
+        unit: ""
+
+      cumulative_survival_labor:
+        title: Cumulative survival probability to labor age
+        description_short: |-
+          The probability that a person born in a given year will live long enough to reach labor age (15-65).
+        description_processing: |-
+          For a given cohort year, we estimate the cumulative survival probability for a person to reach each age from 0 to 65. For example, the probability of a person born in 2000 reaching age 15, 16, 17, and so on up to 65. We have used HMD data for years before 1950, and UN's for years after 1950 (including).
+
+          This is done by multiplying the survival probability at various years, depending on the age of the person. For example, if born in 2000, we use the probability of surviving age 0 from 2000, the probability of surviving age 1 from 2001, etc.
+
+          Read more details in the author's paper: https://www.nber.org/papers/w33175
+        unit: ""
+
+  distribution:
+    variables:
+      efr:
+        title: Effective Fertility rate, distribution by age (year << birth_year >>)
+        description_short: |-
+          The EFR for a given age gives us an approximation of the average number of children from a woman that will live long enough to reach that age.
+        unit: "children per women"
+        description_processing: |-
+          For a given cohort year, we estimate the cumulative survival probability for a person to reach each age from 0 to 100. For example, the probability of a person born in 2000 reaching age 15, 16, 17, and so on. We have used HMD data for years before 1950, and UN's for years after 1950 (including).
+
+          We then estimate the Effective Fertility Rate (EFR) for each age group by multiplying the Total Fertility Rate (TFR) by the cumulative survival probability. The EFR for a given age gives us an approximation of the average number of children from a woman that will live long enough to reach that age.
+
+          For years before 1950, we have used HMD data, which does not provide TFR values. Instead, we have used an approximation of the TFR based on births and female population (in reproductive ages), as suggested by Jacob and Malani (2024).
+
+          Read more details in the author's paper: https://www.nber.org/papers/w33175

@@ -48,7 +48,7 @@ def run(dest_dir: str) -> None:
         combined_tb = pr.merge(combined_tb, tb, how="outer", on=["country", "year"])
 
     combined_tb.metadata = snap.to_table_metadata()
-    combined_tb = combined_tb.set_index(["country", "year"], verify_integrity=True)
+    combined_tb = combined_tb.format(["country", "year"])
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.

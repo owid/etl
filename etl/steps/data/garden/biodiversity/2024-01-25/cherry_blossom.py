@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"])
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
 

@@ -51,7 +51,7 @@ def run(dest_dir: str) -> None:
     }
     pivot_tb["group"] = pivot_tb["group"].replace(rename_entries)
 
-    pivot_tb = pivot_tb.underscore().set_index(["group", "days_since_2021"], verify_integrity=True)
+    pivot_tb = pivot_tb.format(["group", "days_since_2021"])
 
     #
     # Save outputs.

@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
         df=tb,
         countries_file=paths.country_mapping_path,
     )
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

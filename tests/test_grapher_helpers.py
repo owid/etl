@@ -11,7 +11,7 @@ from owid.catalog import (
     VariablePresentationMeta,
 )
 
-from etl import grapher_helpers as gh
+from etl.grapher import helpers as gh
 
 
 def test_yield_wide_table():
@@ -184,8 +184,8 @@ def _sample_table() -> Table:
 
 
 def test_adapt_table_for_grapher_multiindex():
-    with mock.patch("etl.grapher_helpers._get_entities_from_db") as mock_get_entities_from_db:
-        with mock.patch("etl.grapher_io._fetch_entities") as mock_fetch_entities:
+    with mock.patch("etl.grapher.helpers._get_entities_from_db") as mock_get_entities_from_db:
+        with mock.patch("etl.grapher.io._fetch_entities") as mock_fetch_entities:
             mock_get_entities_from_db.return_value = {"Poland": 1, "France": 2}
             mock_fetch_entities.return_value = pd.DataFrame(
                 {
@@ -245,3 +245,26 @@ def test_underscore_column_and_dimensions():
 def test_title_column_and_dimensions():
     assert gh._title_column_and_dimensions("A", {"age": "1"}) == "A - Age: 1"
     assert gh._title_column_and_dimensions("A", {"age_group": "15-18"}) == "A - Age group: 15-18"
+
+
+def test_long_to_wide():
+    df = pd.DataFrame(
+        {
+            "year": [2019, 2019, 2019, 2019],
+            "country": ["France", "France", "France", "France"],
+            "age": ["10-18", "19-25", "26-30", np.nan],
+            "deaths": [1, 2, 3, 4],
+        }
+    )
+    table = Table(df.set_index(["country", "year", "age"]))
+    table.deaths.metadata.unit = "people"
+    table.deaths.metadata.title = "Deaths"
+
+    wide = gh.long_to_wide(table)
+
+    assert list(wide.columns) == ["deaths", "deaths__age_10_18", "deaths__age_19_25", "deaths__age_26_30"]
+
+    assert wide["deaths"].m.title == "Deaths"
+    assert wide["deaths__age_10_18"].m.title == "Deaths - Age: 10-18"
+    assert wide["deaths__age_19_25"].m.title == "Deaths - Age: 19-25"
+    assert wide["deaths__age_26_30"].m.title == "Deaths - Age: 26-30"

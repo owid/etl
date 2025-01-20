@@ -27,7 +27,7 @@ tables:
         description_processing: |-
           The fertility data is constructed by combining data from multiple sources:
 
-          - Before 1949: Historical estimates by Human Fertility Database (2024).
+          - Before 1950: Historical estimates by Human Fertility Database (2024).
 
           - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
 
@@ -47,9 +47,24 @@ tables:
         description_processing: |-
           The fertility data is constructed by combining data from multiple sources:
 
-          - Before 1949: Historical estimates by Human Fertility Database (2024).
+          - Before 1950: Historical estimates by Human Fertility Database (2024).
 
           - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
         presentation:
           title_public: Fertility rate
           title_variant: period tables
+
+  fertility_rate_by_age:
+    variables:
+      asfr:
+        title: "Fertility rate, by age - Year: << year_as_dimension >>"
+        description_short: The average number of children a woman would have at each age if she experienced the fertility rates of year << year_as_dimension >>.
+        unit: births per women
+        description_processing: |-
+          The fertility data is constructed by combining data from multiple sources:
+
+          - Before 1950: Historical estimates by Human Fertility Database (2024).
+
+          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+
+          Note: Data for Northern Ireland, England & Wales, Scotland, East Germany and West Germany come entirely from the Human Fertility Database.

@@ -1,0 +1,41 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Marriages & Divorces
+      grapher_config:
+        note: For Australia, New Zealand, and the United States, the data represent the median age at first marriage. In Mexico, all marriages are included.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  mean_age_at_marriage:
+    variables:
+      mean_age_at_first_marriage:
+        title:  Mean age of <<gender.lower()>> at first marriage
+        unit: years
+        description_short: |-
+          Average age of <<gender.lower()>> who got married this year for the first time.
+        description_from_producer: |-
+          The mean age at first marriage, defined as the mean age in years of marrying persons at the time of marriage. This measure is disaggregated by sex with separate averages for men and women.
+          For Australia, New Zealand and the United States, median age at first marriage. For Mexico, data refer to all marriages and not only first marriage.
+          For Canada, data include the legal union of two persons of the same sex in some provinces and territories from 2003 onwards, and in all of Canada from 2005 onwards.
+          Data for New Zealand include civil unions. From 2007 onwards, data include those who transferred their civil union to a marriage.
+          The statistical data for Israel are supplied by and under the responsibility of the relevant Israeli authorities. The use of such data by the OECD is without prejudice to the status of the Golan Heights, East Jerusalem and Israeli settlements in the West Bank under the terms of international law.
+          Footnote for Turkey: the information in this document with reference to « Cyprus » relates to the southern part of the Island. There is no single authority representing both Turkish and Greek Cypriot people on the Island. Turkey recognizes the Turkish Republic of Northern Cyprus (TRNC). Until a lasting and equitable solution is found within the context of United Nations, Turkey shall preserve its position concerning the “Cyprus issue”.
+          Footnote for all the European Union Member States of the OECD and the European Commission: the Republic of Cyprus is recognized by all members of the United Nations with the exception of Turkey. The information in this document relates to the area under the effective control of the Government of the Republic of Cyprus.
+
+        display:
+          numDecimalPlaces: 1
+          entityAnnotationsMap: |-
+            Australia: median
+            New Zealand: median
+            United States: median
+            Mexico: all marriages
+

@@ -1,0 +1,39 @@
+steps:
+  #
+  # OECD Family Database
+  #
+  data://meadow/oecd/2024-12-30/family_database:
+    - snapshot://oecd/2024-12-30/family_database.csv
+  data://garden/oecd/2024-12-30/family_database:
+    - data://meadow/oecd/2024-12-30/family_database
+  data://grapher/oecd/2024-12-30/family_database:
+    - data://garden/oecd/2024-12-30/family_database
+
+  #
+  # ONS Divorces in England and Wales
+  #
+  data://meadow/ons/2025-01-12/divorces:
+    - snapshot://ons/2025-01-12/divorces.xlsx
+  data://garden/ons/2025-01-12/divorces:
+    - data://meadow/ons/2025-01-12/divorces
+  data://grapher/ons/2025-01-12/divorces:
+    - data://garden/ons/2025-01-12/divorces
+  data://grapher/ons/2025-01-12/divorces_by_year:
+    - data://garden/ons/2025-01-12/divorces
+
+  #
+  # UN Women of reproductive age who are married or in a union
+  #
+  data://meadow/un/2025-01-14/married_women:
+    - snapshot://un/2025-01-14/married_women.xlsx
+  data://garden/un/2025-01-14/married_women:
+    - data://meadow/un/2025-01-14/married_women
+  data://grapher/un/2025-01-14/married_women:
+    - data://garden/un/2025-01-14/married_women
+
+  data://meadow/oecd/2025-01-11/mean_age_at_marriage:
+    - snapshot://oecd/2025-01-11/mean_age_at_marriage.xls
+  data://garden/oecd/2025-01-11/mean_age_at_marriage:
+    - data://meadow/oecd/2025-01-11/mean_age_at_marriage
+  data://grapher/oecd/2025-01-11/mean_age_at_marriage:
+    - data://garden/oecd/2025-01-11/mean_age_at_marriage
