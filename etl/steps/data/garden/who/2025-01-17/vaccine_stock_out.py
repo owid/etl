@@ -2,6 +2,7 @@
 
 import pandas as pd
 from owid.catalog import Origin, Table
+from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -27,11 +28,12 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["iso_3_code", "who_region", "indcode", "indcatcode", "indcat_description", "indsort"])
     tb = tb.replace({"value": {"ND": pd.NA, "NR": pd.NA}})
 
-    tb_agg, tb_cause = calculate_derived_metrics(tb, origins)
+    tb_agg, tb_cause, tb_global = calculate_derived_metrics(tb, origins)
 
     tb = tb.format(["country", "year", "description"])
     tb_agg = tb_agg.format(["country", "year"], short_name="derived_metrics")
     tb_cause = tb_cause.format(["country", "year", "reason_for_stockout"], short_name="reason_for_stockout")
+    tb_global = tb_global.format(["country", "year", "description"], short_name="global_stockout")
     #
     # Save outputs.
     #
@@ -51,12 +53,13 @@ def calculate_derived_metrics(tb: Table, origin: Origin) -> list[Table]:
     tb_nat = national_stockout_for_any_vaccine(tb)
     tb_district = district_level_stockout_for_any_vaccine(tb)
     tb_cause, tb_cause_number = derive_stockout_variables(tb, origin)
+    tb_global = how_many_countries_had_stockouts(tb)
 
     # Aggregate the data with similar formats
     tb_agg = tb_district.merge(tb_nat, on=["country", "year"], how="inner")
     tb_agg = tb_agg.merge(tb_cause_number, on=["country", "year"], how="inner")
 
-    return [tb_agg, tb_cause]
+    return [tb_agg, tb_cause, tb_global]
 
 
 def derive_stockout_variables(tb: Table, origin: Origin) -> list[Table]:
@@ -127,8 +130,40 @@ def national_stockout_for_any_vaccine(tb: Table) -> Table:
         .drop(columns=["any_yes"])
     )
 
-    # tb = tb.merge(tb_agg, on=["country", "year"], how="left")
+    return tb_agg
 
+
+def how_many_countries_had_stockouts(tb: Table) -> Table:
+    """
+    At a global level, how many countries had stockouts in the given year?
+    """
+    tb_agg = tb[
+        tb["description"].str.contains("Was there a stock-out at the national level")
+        & (tb["description"].str.contains("vaccine"))
+    ]
+    tb_agg = tb_agg[tb_agg["value"] == "Yes"]
+
+    tb_each_vaccine = how_many_countries_had_stockouts_of_each_vaccine(tb_agg)
+    tb_all = tb_agg.groupby("year")["country"].nunique().reset_index(name="num_countries_with_stockout")
+    tb_all["description"] = "Any vaccine"
+    tb_all["country"] = "World"
+    tb_agg = pr.concat([tb_all, tb_each_vaccine], ignore_index=True)
+
+    return tb_agg
+
+
+def how_many_countries_had_stockouts_of_each_vaccine(tb_agg: Table) -> Table:
+    """
+    At a global level, how many countries had stockouts of each vaccine in the given year?
+    """
+    tb_agg["description"] = tb_agg["description"].str.replace(
+        "Was there a stock-out at the national level of ", "", regex=False
+    )
+    tb_agg["description"] = tb_agg["description"].str.replace("?", "", regex=False)
+    tb_agg = (
+        tb_agg.groupby(["year", "description"])["country"].nunique().reset_index(name="num_countries_with_stockout")
+    )
+    tb_agg["country"] = "World"
     return tb_agg
 
 
