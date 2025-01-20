@@ -50,11 +50,29 @@ def run(dest_dir: str) -> None:
 def calculate_derived_metrics(tb: Table, origin: Origin) -> list[Table]:
     tb_nat = national_stockout_for_any_vaccine(tb)
     tb_district = district_level_stockout_for_any_vaccine(tb)
-    tb_cause = reason_for_stockout(tb, origin)
+    tb_cause, tb_cause_number = derive_stockout_variables(tb, origin)
 
+    # Aggregate the data with similar formats
     tb_agg = tb_district.merge(tb_nat, on=["country", "year"], how="inner")
+    tb_agg = tb_agg.merge(tb_cause_number, on=["country", "year"], how="inner")
 
     return [tb_agg, tb_cause]
+
+
+def derive_stockout_variables(tb: Table, origin: Origin) -> list[Table]:
+    tb_cause = reason_for_stockout(tb, origin)
+    tb_cause_number = number_of_reasons_for_stockout(tb_cause)
+    return [tb_cause, tb_cause_number]
+
+
+def number_of_reasons_for_stockout(tb_cause: Table) -> Table:
+    tb_stockouts = tb_cause[tb_cause["stockout"] == "Yes"].reset_index()
+    tb_stockouts = (
+        tb_stockouts.groupby(["country", "year"])
+        .agg(num_causes_of_stockout=("reason_for_stockout", "nunique"))
+        .reset_index()
+    )
+    return tb_stockouts
 
 
 def reason_for_stockout(tb: Table, origin: Origin) -> Table:
