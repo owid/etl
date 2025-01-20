@@ -1,0 +1,47 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Life Expectancy
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Death rate (HFD; UN WPP)
+
+tables:
+  death_rate:
+    variables:
+      death_rate:
+        title: "Death rate - sex: <<sex>>"
+        unit: deaths per 1,000 people
+        description_short: |-
+          The death rate, calculated as the number of deaths divided by the average number of people alive during the year. UN Medium projections for 2024-2100.
+        description_processing: |-
+          This indicator is constructed by combining data from multiple sources:
+
+          - Before 1950: Historical estimates by Human Mortality Database (2024).
+
+          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+
+          - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
+        presentation:
+          title_public: |-
+            Death rate
+
+      death_rate_hist:
+        title: "Death rate, historical - sex: <<sex>>"
+        unit: deaths per 1,000 people
+        description_short: |-
+          The death rate, calculated as the number of deaths divided by the average number of people alive during the year.
+        description_processing: |-
+          This indicator is constructed by combining data from multiple sources:
+
+          - Before 1950: Historical estimates by Human Fertility Database (2024).
+
+          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+        presentation:
+          title_public: |-
+            Death rate
