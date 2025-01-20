@@ -115,6 +115,7 @@ def run(dest_dir: str) -> None:
     ## Merge & estimate rate
     tb_deaths = tb_mort_all.merge(tb_pop_all, on=["country", "year", "sex"])
     tb_deaths["death_rate"] = tb_deaths["deaths"] / tb_deaths["population"] * 1_000
+    tb_deaths = tb_deaths.drop(columns=["age", "population"])
 
     # Create list with tables
     paths.log.info("saving tables")
