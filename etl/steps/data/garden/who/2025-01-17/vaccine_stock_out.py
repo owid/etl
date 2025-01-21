@@ -28,12 +28,13 @@ def run(dest_dir: str) -> None:
     tb = clean_data(tb)
 
     # Calculate derived metrics
-    tb_agg, tb_cause, tb_global = calculate_derived_metrics(tb, origins)
+    tb_agg, tb_cause, tb_global, tb_global_cause = calculate_derived_metrics(tb, origins)
     # Format tables
     tb = tb.format(["country", "year", "description"])
     tb_agg = tb_agg.format(["country", "year"], short_name="derived_metrics")
     tb_cause = tb_cause.format(["country", "year", "reason_for_stockout"], short_name="reason_for_stockout")
     tb_global = tb_global.format(["country", "year", "description"], short_name="global_stockout")
+    tb_global_cause = tb_global_cause.format(["year", "reason_for_stockout"], short_name="global_cause")
     #
     # Save outputs.
     #
@@ -69,20 +70,31 @@ def clean_data(tb: Table) -> Table:
 def calculate_derived_metrics(tb: Table, origin: Origin) -> list[Table]:
     tb_nat = national_stockout_for_any_vaccine(tb)
     tb_district = district_level_stockout_for_any_vaccine(tb)
-    tb_cause, tb_cause_number = derive_stockout_variables(tb, origin)
+    tb_cause, tb_global_cause, tb_cause_number = derive_stockout_variables(tb, origin)
     tb_global = how_many_countries_had_stockouts(tb, origin)
 
     # Aggregate the data with similar formats
     tb_agg = tb_district.merge(tb_nat, on=["country", "year"], how="inner")
     tb_agg = tb_agg.merge(tb_cause_number, on=["country", "year"], how="inner")
 
-    return [tb_agg, tb_cause, tb_global]
+    return [tb_agg, tb_cause, tb_global, tb_global_cause]
 
 
 def derive_stockout_variables(tb: Table, origin: Origin) -> list[Table]:
     tb_cause = reason_for_stockout(tb, origin)
+    tb_global_cause = countries_with_stockouts_per_cause(tb_cause)
     tb_cause_number = number_of_reasons_for_stockout(tb_cause, origin)
-    return [tb_cause, tb_cause_number]
+    return [tb_cause, tb_global_cause, tb_cause_number]
+
+
+def countries_with_stockouts_per_cause(tb_cause: Table) -> Table:
+    """
+    How many countries had stockouts for each reason in the given year?
+    """
+    tb_cause = tb_cause[tb_cause["stockout"] == "Yes"]
+    tb_cause = tb_cause.groupby(["year", "reason_for_stockout"])["country"].nunique().reset_index(name="num_countries")
+    tb_cause["country"] = "World"
+    return tb_cause
 
 
 def number_of_reasons_for_stockout(tb_cause: Table, origin: Origin) -> Table:
@@ -104,7 +116,6 @@ def reason_for_stockout(tb: Table, origin: Origin) -> Table:
         (tb["description"].str.contains("What was the cause of the national stock-out"))
         & (tb["description"].str.contains("vaccine"))
     ]
-    # tb_cause = tb_cause.dropna(subset=["value"])
     # Dropping rows where the values are 'Yes' or 'No' as they are incorrect
     tb_cause = tb_cause[~tb_cause["value"].isin(["Yes", "No"])]
     # Fix typo in the data
@@ -121,6 +132,7 @@ def reason_for_stockout(tb: Table, origin: Origin) -> Table:
         var_name="reason_for_stockout",  # Name for the column created from the pivoted columns
         value_name="stockout",  # Name for the values ("yes"/"no")
     )
+
     tb_agg["stockout"].metadata.origins = origin
 
     return tb_agg
