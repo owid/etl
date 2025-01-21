@@ -20,6 +20,15 @@ steps:
     - data://garden/ons/2025-01-12/divorces
   data://grapher/ons/2025-01-12/divorces_by_year:
     - data://garden/ons/2025-01-12/divorces
+  #
+  # ONS Divorces in England and Wales
+  #
+  data://meadow/ons/2025-01-21/marriages:
+    - snapshot://ons/2025-01-21/marriages.xlsx
+  data://garden/ons/2025-01-21/marriages:
+    - data://meadow/ons/2025-01-21/marriages
+  data://grapher/ons/2025-01-21/marriages:
+    - data://garden/ons/2025-01-21/marriages
 
   #
   # UN Women of reproductive age who are married or in a union
