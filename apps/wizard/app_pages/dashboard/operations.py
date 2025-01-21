@@ -16,7 +16,7 @@ TODAY = datetime.now().strftime("%Y-%m-%d")
 
 def render_operations(steps_df):
     st.markdown("### Operations")
-    cols = st.columns(3, border=True)
+    cols = st.columns(2, border=True)
     ####################################################################################################################
     # UPDATE STEPS
     ####################################################################################################################
@@ -30,15 +30,15 @@ def render_operations(steps_df):
     ####################################################################################################################
     # Add an expander menu with additional parameters for the ETL command.
     # with st.container(border=True):
-    with cols[1]:
-        render_action_execute(steps_df)
+    # with cols[1]:
+    #     render_action_execute(steps_df)
 
     ####################################################################################################################
     # ARCHIVE STEPS
     ####################################################################################################################
     # Add an expander menu with additional parameters for the ETL command.
     # with st.container(border=True):
-    with cols[2]:
+    with cols[1]:
         render_action_archive()
 
 
