@@ -16,6 +16,9 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden.read("marriages", reset_index=True)
 
+    # Filter to keep only years 1900, 1910, 1920, etc.
+    tb = tb[tb["year"] % 10 == 0]
+
     tb = tb.rename(columns={"year": "birth_cohort", "age": "year", "gender": "country"})
 
     tb = tb.format(["country", "birth_cohort", "year"])
