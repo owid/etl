@@ -17,7 +17,7 @@ tables:
   atus_who:
     variables:
       t:
-        title: Time spent with other people throughout life - <<who_category>>
+        title: Time spent with other people throughout life - <<who_category>> - <<gender>> - <<timeframe>>
         unit: "Minutes"
         short_unit: "min"
         description_short: |-
@@ -34,8 +34,9 @@ tables:
           <%- endif -%>
         description_key:
           - Age is topcoded for age categories 80-84, and 85+. This means all individuals aged 80, 81, 82, 83 and 84 are included in the "age 80" category, and all individuals aged 85 and older are included in the "age 85" category.
+          - ATUS data were not collected about the period March 18, 2020 to May 9, 2020, which coincided with a time when most residents of the United States were encouraged to stay home to prevent the spread of COVID-19.
         description_processing: |-
-          - Some categories have been combined for presentation purposes: "children" include own and not own household children under 18, grandchildren and other related children under 18. "Friends" include roommates or lodgers. "Partner" includes spouse, boyfriend/girlfriend, and co-habiting partners.
+          - Some categories have been combined for presentation purposes: "children" include own and not own household children under 18, grandchildren and other related children under 18. "Friends" include roommates or lodgers. "Partner" includes spouses, boy-/girlfriends, and co-habiting partners.
           - The "Other" category includes all other relationships not covered by the other categories, such as neighbors, customers or non-related, non-household children.
           - Data points have been weighted to make them more representative of the population with the survey weights provided by ATUS in the original data.
         presentation:
