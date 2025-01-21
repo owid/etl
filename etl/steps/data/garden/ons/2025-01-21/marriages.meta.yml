@@ -16,7 +16,7 @@ tables:
   marriages:
     variables:
       cumulative_percentage_per_1000:
-        title: Proportions of << gender >> who had ever married by certain ages, for birth cohorts
+        title: Proportions of << gender >> who had ever married by certain ages for << birth_cohort >> birth_cohort
         unit: per 1,000 people
         description_short: |-
            Number of << gender >> per 1,000 men or women born in a specific year have ever married by a particular age.
@@ -27,7 +27,7 @@ tables:
           - Marital status estimates are derived from the Labour Force Survey (LFS).
         processing_level: minor
         presentation:
-          title_public: Proportions of << gender >> who had ever married
+          title_public: Proportions of << gender >> who had ever for << birth_cohort >> birth_cohort
         display:
           numDecimalPlaces: 1
           name: << birth_cohort >>
