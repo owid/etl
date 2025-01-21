@@ -15,6 +15,8 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("marriages")
+    tb["cumulative_percentage_per_100"] = tb["cumulative_percentage_per_1000"] / 10
+    tb = tb.drop(columns=["cumulative_percentage_per_1000"])
 
     tb = tb.format(["year", "age", "gender"])
 
