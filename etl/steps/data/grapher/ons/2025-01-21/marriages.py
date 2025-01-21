@@ -16,10 +16,9 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden.read("marriages", reset_index=True)
 
-    tb = tb.rename(columns={"year": "birth_cohort", "age": "year"})
-    tb["country"] = "England and Wales"
+    tb = tb.rename(columns={"year": "birth_cohort", "age": "year", "gender": "country"})
 
-    tb = tb.format(["country", "birth_cohort", "year", "gender"])
+    tb = tb.format(["country", "birth_cohort", "year"])
 
     #
     # Save outputs.
