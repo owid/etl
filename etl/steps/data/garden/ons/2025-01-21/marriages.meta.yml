@@ -28,7 +28,7 @@ tables:
           - Marital status estimates are derived from the Labour Force Survey (LFS).
         processing_level: minor
         presentation:
-          title_public: Proportions of people who had ever been married for << birth_cohort >> birth cohort
+          title_public: Share of men or women ever been married for << birth_cohort >> birth cohort by a certain age
         display:
           numDecimalPlaces: 1
           name: << birth_cohort >>
