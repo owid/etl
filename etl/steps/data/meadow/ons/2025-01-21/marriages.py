@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tables = []
-    for tb, gender in zip([tb_men, tb_women], ["men", "women"]):
+    for tb, gender in zip([tb_men, tb_women], ["Men", "Women"]):
         # Find the row where the first column contains "Year of birth"
         header_row = tb[tb.iloc[:, 0].str.contains("Year of birth", na=False)].index[0]
 
