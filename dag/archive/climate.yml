@@ -832,7 +832,8 @@ steps:
   data://grapher/climate/2023-12-20/surface_country_level_monthly_anomaly:
     - data://garden/climate/2023-12-20/surface_temperature
   data://grapher/climate/2023-12-20/surface_global_monthly_anomaly_all_countries:
-    - data://garden/climate/2023-12-20/surface_temperature  #
+    - data://garden/climate/2023-12-20/surface_temperature
+  #
   # GISS - Surface temperature analysis.
   #
   data://meadow/climate/2024-11-18/surface_temperature_analysis:
