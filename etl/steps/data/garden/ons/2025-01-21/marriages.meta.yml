@@ -26,6 +26,8 @@ tables:
           - The table includes final figures for 2022. For instance, men born in 2002 were tracked for marriages up to their 21st birthday in 2022.
           - Marital status estimates are derived from the Labour Force Survey (LFS).
         processing_level: minor
+        presentation:
+          title_public: Proportions of << gender >> who had ever married
         display:
           numDecimalPlaces: 1
           name: << birth_cohort >>

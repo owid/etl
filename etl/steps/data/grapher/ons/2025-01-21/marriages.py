@@ -18,7 +18,6 @@ def run(dest_dir: str) -> None:
 
     tb = tb.rename(columns={"year": "birth_cohort", "age": "year"})
     tb["country"] = "England and Wales"
-    print(tb)
 
     tb = tb.format(["country", "birth_cohort", "year", "gender"])
 
