@@ -53,6 +53,12 @@ def _generate_6char_hash():
 
 @contextmanager
 def st_horizontal(vertical_alignment="baseline", justify_content="flex-start", hash_string=None):
+    """This is not very efficient, and is OK for few elements. If you want to use it several times (e.g. for loop) consider an alternative.
+
+    Example alternatives:
+        - If you want a row of buttons, consider using st.pills or st.segmented_control.
+        - In the general case, you can just use st.columns
+    """
     if hash_string is None:
         hash_string = _generate_6char_hash()
     h_style = HORIZONTAL_STYLE.format(
