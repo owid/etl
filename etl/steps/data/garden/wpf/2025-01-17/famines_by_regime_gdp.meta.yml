@@ -1,0 +1,44 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    description_short: Famines that are estimated to have killed 100,000 people or more.
+    presentation:
+      topic_tags:
+        - Famines
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  famines:
+    variables:
+
+       wpf_authoritative_mortality_estimate:
+          title: Deaths from famines
+          unit: 'deaths'
+          short_unit: ''
+          description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
+          display:
+            numDecimalPlaces: 0
+
+       region:
+          title: Region
+          unit: ''
+
+       gdp_per_capita:
+          description_processing: When GDP data was missing for certain years but nearby estimates were available, we used the closest or most relevant data. For example, during Cuba's famine from 1895 to 1898, we used the GDP from 1892. For China’s famine from 1876 to 1879, we used the average GDP from 1870 to 1887. In special cases like Russia and Kazakhstan (1932 to 1934), we used the USSR’s average GDP from 1940 to 1946. For recent gaps, we used 2022 data for countries like the Central African Republic, Ethiopia, and Syria.
+
+       regime_redux_row_owid:
+        description_processing: Closed and electoral autocracies here were treated as “autocracies”. The regime classification is 0 for autocracies and 1 for democracies.
+
+       midpoint_year:
+          title: Midpoint year of famine
+          unit: ''
+          description_processing: The midpoint year of the famine is the year halfway between the start and end of the famine.
+
+       country_name:
+          title: Country
+          unit: ''
