@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("marriages.xlsx")
 
     # Load data from snapshot.
-    # Load just the sheet with cumulative percentage of marriages ending in divorce by year of marriage and by anniversary, England and Wales, 1963 to 2020.
+    # Load sheets on the proportions of men (14a) and women (14b) who had ever married by certain ages, for birth cohorts, England and Wales.
     tb_men = snap.read(sheet_name="14a")
     tb_women = snap.read(sheet_name="14b")
 
