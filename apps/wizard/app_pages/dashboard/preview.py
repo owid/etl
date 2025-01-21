@@ -27,7 +27,8 @@ def render_preview_list(selected_steps: List[str], steps_info):
         st.warning("No rows selected. Please select at least one dataset from the table above.")
         return
 
-    with st.container(border=True):
+    cont = st.container(border=True)
+    with cont:
         # UI: Display details of selected steps
         # with st.container(border=True, height=DETAILS_LIST_CONTAINER_HEIGHT):
         # for selected_step, selected_steps_info in selected_steps_info.items():
@@ -40,9 +41,7 @@ def render_preview_list(selected_steps: List[str], steps_info):
                 with st.popover(step_alias, icon=":material/info:"):
                     #     # _render_step_in_list(selected_step_info)
                     _show_step_details(selected_step_info)
-
-        # UI: Button to add selected steps to the Operations list.
-        _show_button_add_to_selection(selected_steps)
+    return cont
 
 
 def _get_selected_steps_info(df, steps_df) -> Dict[str, Any]:
@@ -98,7 +97,7 @@ def _show_step_details(selected_step_info):
             st.text(f"{item_name}: {value}")
 
 
-def _show_button_add_to_selection(selected_steps):
+def show_button_add_to_selection(selected_steps):
     """Display button to add selected steps to the selection."""
     # Button to add selected steps to the selection.
     num_steps = len(selected_steps)
