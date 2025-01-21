@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: NASA Goddard Institute for Space Studies
+    title: GISS Surface Temperature Analysis
+    title_snapshot: GISS Surface Temperature Analysis - Southern hemisphere
+    citation_full: NASA. GISS Surface Temperature Analysis (GISTEMP v4)
+    attribution: NASA Goddard Institute for Space Studies - GISS Surface Temperature Analysis (2025)
+    attribution_short: NASA
+    version_producer: v4
+    url_main: https://data.giss.nasa.gov/gistemp/
+    url_download: https://data.giss.nasa.gov/gistemp/tabledata_v4/SH.Ts+dSST.csv
+    date_accessed: '2025-01-21'
+    date_published: '2025-01-21'
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 372145a4cc4055afe127d7db87637290
+    size: 12715
+    path: surface_temperature_analysis_southern_hemisphere.csv
