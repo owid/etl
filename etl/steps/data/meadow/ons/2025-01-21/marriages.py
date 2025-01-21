@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
         tb.columns = tb.iloc[header_row]
         tb = tb.drop(index=range(header_row + 1)).reset_index(drop=True)
 
-        # Melt the DataFrame to create a 'year_of_birth' column
+        # Melt the Table to create a 'year_of_birth' column
         tb = tb.melt(id_vars=["Year of birth"], var_name="age", value_name="cumulative_percentage_per_1000")
 
         # Keep only numbers in the age column
