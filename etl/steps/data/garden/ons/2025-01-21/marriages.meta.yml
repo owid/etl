@@ -16,10 +16,10 @@ tables:
   marriages:
     variables:
       cumulative_percentage_per_1000:
-        title: Proportions of men or women who had ever married by certain ages for << birth_cohort >> birth cohort
+        title: Proportions of men or women who had ever married by a certain age for << birth_cohort >> birth cohort
         unit: per 1,000 people
         description_short: |-
-           Number of people per 1,000 people born in a specific year have ever married by a particular age and gender.
+          The number of men or women per 1,000 born in a specific year who have ever married by a certain age.
         description_key:
           - Ages are presented as "exact years," meaning "by age 30" includes marriages up to the day before the 30th birthday.
           - Since 2014, data includes marriages with opposite- and same-sex partners. Civil partnerships converted into marriages are also counted as "ever married," assuming a prior status of "never married or civil partnered" when prior marital status is unknown.
