@@ -14,6 +14,7 @@ from etl.config import OWID_ENV
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 
+@st.fragment
 def render_operations():
     st.markdown("### Operations")
     cols = st.columns(2, border=True)
