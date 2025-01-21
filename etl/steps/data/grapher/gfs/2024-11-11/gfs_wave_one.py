@@ -1,5 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import pandas as pd
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
@@ -38,10 +39,11 @@ REL_COL_VAR = [
 ]
 
 
-def rm_sparse_countries(tb, var, var_cols, threshold=0.1):
-    """Remove countries with 10% or more missing values."""
+def rm_mean_for_sparse_cty(tb, var, var_cols, threshold=0.1):
+    """Remove mean values for countries with 10% or more missing values."""
     tb_var = tb[var_cols].copy()
-    tb_var = tb_var[tb_var[f"{var}_na_share"] < threshold].drop(columns=[f"{var}_na_share"])
+    mean_cols = [col for col in var_cols if "mean" in col]
+    tb_var.loc[tb_var[f"{var}_na_share"] >= threshold, mean_cols] = pd.NA
     return tb_var
 
 
@@ -57,10 +59,11 @@ def run(dest_dir: str) -> None:
 
     tbs = []
 
-    # this is a bit more involved than it needs to be, to keep the option of removing countries with too many missing values
+    # removes means for countries with too many missing values
     for var in REL_COL_VAR:
         var_cols = [col for col in tb.columns if var in col]
-        tb_var = tb[var_cols].copy().reset_index()  # rm_sparse_countries(tb, var, var_cols).reset_index()
+        tb_var = rm_mean_for_sparse_cty(tb, var, var_cols).reset_index()
+        # alternative: tb_var = tb[var_cols].copy().reset_index()
         tbs.append(tb_var)
 
     tb_res = pr.multi_merge(tbs, on=["country", "year"], how="outer")
