@@ -75,7 +75,11 @@ If you are running Wizard on your local machine, you can select steps from it to
 
 
 @st.fragment
-def first_bit():
+def first_block_optimized_for_render():
+    """Group AgGrid and Preview list in a single block.
+
+    This way, we can use st.fragment smartly and optimize re-runs.
+    """
     ########################################
     # LOAD STEPS TABLE
     ########################################
@@ -118,7 +122,7 @@ def first_bit():
     return cont, steps_df, selected_steps
 
 
-cont, steps_df, selected_steps = first_bit()
+cont, steps_df, selected_steps = first_block_optimized_for_render()
 # UI: Button to add selected steps to the Operations list.
 if cont:
     with cont:
