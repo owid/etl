@@ -146,7 +146,7 @@ class ScoringModel:
         ret["coviews_score"] = score_coviews(
             ret["coviews"], ret["pageviews"], regularization=self.coviews_regularization
         )
-        ret["jaccard_score"] = score_jaccard(ret["coviews"], ret["pageviews"], chart.views_365d)
+        ret["jaccard_score"] = score_jaccard(ret["coviews"], ret["pageviews"], chart.views_365d or 0)
 
         # Get weights and normalize them
         w = pd.Series(self.weights)
