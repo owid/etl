@@ -1,0 +1,29 @@
+meta:
+  origin:
+    title: Global AIDS Update
+    description: |-
+      UNAIDS leads the world's most extensive data collection on HIV epidemiology, programme coverage and finance and publishes the most authoritative and up-to-date information on the HIV epidemic.
+
+      In some cases there is no data for some country and year. This can be a result of very small epidemics among women in the reproductive age which makes estimation of the mother to child transmission very unstable. Another reason for missing data is that relevant authorities may have asked UNAIDS not to share their estimates.
+
+      This UNAIDS 2024 report brings together new data and case studies which demonstrate that the decisions and policy choices taken by world leaders this year will decide the fate of millions of lives and whether the world's deadliest pandemic is overcome.
+    title_snapshot: Global AIDS Update, Global AIDS Monitoring
+    description_snapshot: |-
+      This framework encompasses a comprehensive set of indicators designed to assess progress towards achieving global HIV targets, as outlined in political declarations and strategic plans. The GAM indicators cover various aspects of the HIV response, including prevention, treatment, and support services. Countries report on these indicators annually to UNAIDS, facilitating global monitoring and accountability.
+
+    producer: Joint United Nations Programme on HIV/AIDS
+    citation_full: |-
+      The urgency of now: AIDS at a crossroads. Geneva: Joint United Nations Programme on HIV/AIDS; 2024. Licence: CC BY-NC-SA 3.0 IGO. Full report: https://www.unaids.org/sites/default/files/media_asset/2024-unaids-global-aids-update_en.pdf
+    attribution_short: UNAIDS
+    url_main: https://aidsinfo.unaids.org/
+
+    date_accessed: "2025-01-22"
+    date_published: "2024-07-22"
+
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
+outs:
+  - md5: 5bb5e463efefa996f48d3daeddfa8b53
+    size: 42239068
+    path: unaids_gam.csv

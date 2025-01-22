@@ -1,0 +1,29 @@
+meta:
+  origin:
+    title: Global AIDS Update
+    description: |-
+      UNAIDS leads the world's most extensive data collection on HIV epidemiology, programme coverage and finance and publishes the most authoritative and up-to-date information on the HIV epidemic.
+
+      In some cases there is no data for some country and year. This can be a result of very small epidemics among women in the reproductive age which makes estimation of the mother to child transmission very unstable. Another reason for missing data is that relevant authorities may have asked UNAIDS not to share their estimates.
+
+      This UNAIDS 2024 report brings together new data and case studies which demonstrate that the decisions and policy choices taken by world leaders this year will decide the fate of millions of lives and whether the world's deadliest pandemic is overcome.
+    title_snapshot: Global AIDS Update, Epidemic Indicators
+    description_snapshot: |-
+      These indicators provide data on the status and trends of the HIV epidemic within populations. They include metrics such as HIV prevalence, incidence rates, and AIDS-related mortality. Epidemiological indicators are essential for understanding the scope and dynamics of the epidemic, informing public health strategies, and allocating resources effectively.
+
+    producer: Joint United Nations Programme on HIV/AIDS
+    citation_full: |-
+      The urgency of now: AIDS at a crossroads. Geneva: Joint United Nations Programme on HIV/AIDS; 2024. Full report: https://www.unaids.org/sites/default/files/media_asset/2024-unaids-global-aids-update_en.pdf
+    attribution_short: UNAIDS
+    url_main: https://aidsinfo.unaids.org/
+
+    date_accessed: "2025-01-22"
+    date_published: "2024-07-22"
+
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
+outs:
+  - md5: 98ac6a2a0e1407ffa8d7946da3214419
+    size: 555058973
+    path: unaids_epi.csv
