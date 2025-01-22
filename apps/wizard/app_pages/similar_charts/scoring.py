@@ -146,16 +146,17 @@ class ScoringModel:
         ret["coviews_score"] = score_coviews(
             ret["coviews"], ret["pageviews"], regularization=self.coviews_regularization
         )
+        ret["jaccard_score"] = score_jaccard(ret["coviews"], ret["pageviews"], chart.views_365d)
 
         # Get weights and normalize them
         w = pd.Series(self.weights)
         w = w / w.sum()
 
         # Multiply scores by weights
-        ret = (ret * w).fillna(0)
+        ret[w.index] = (ret[w.index] * w).fillna(0)
 
         # Reorder
-        ret = ret[["title", "subtitle", "tags", "share_indicator", "pageviews_score", "coviews_score"]]
+        ret = ret[["title", "subtitle", "tags", "share_indicator", "pageviews_score", "coviews_score", "jaccard_score"]]
 
         log.info("similarity_components.end", t=time.time() - t)
 
@@ -179,6 +180,11 @@ def score_coviews(coviews: pd.Series, pageviews: pd.Series, regularization: floa
     # return (p - p.min()) / (p.max() - p.min())
     p = coviews - regularization * pageviews
     return p / p.max()
+
+
+def score_jaccard(coviews: pd.Series, pageviews: pd.Series, chosen_pageviews: float) -> pd.Series:
+    """Score coviews using Jaccard similarity. Normalize the score to [0, 1]."""
+    return coviews / (pageviews + chosen_pageviews - coviews)
 
 
 @st.cache_data(show_spinner=False, persist="disk", hash_funcs={Chart: lambda chart: chart.chart_id})
