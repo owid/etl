@@ -28,9 +28,7 @@ log = get_logger()
 engine = get_engine()
 
 # Get reviewer's name.
-grapher_user = get_grapher_user(st.context.headers.get("X-Forwarded-For"))
-assert grapher_user, "User not found"
-reviewer = grapher_user.fullName
+reviewer = get_grapher_user().fullName
 
 # PAGE CONFIG
 st.set_page_config(
