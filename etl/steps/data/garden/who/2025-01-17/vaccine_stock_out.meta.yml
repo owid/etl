@@ -1,0 +1,66 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+  unit: |-
+    <% if "What was the duration of stock-out in months" in description %>
+    months
+    <%- else %>
+    ""
+    <%- endif %>
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  vaccine_stock_out:
+    variables:
+      value:
+        title: << description >>
+        unit: |-
+          {definitions.unit}
+        processing_level: minor
+  derived_metrics:
+    variables:
+      any_national_vaccine_stockout:
+        title: Was there any national vaccine stock-out?
+        description_short: Whether or not there was stock-out at a national level of any vaccine.
+        unit: ""
+        processing_level: major
+      any_district_level_vaccine_stockout:
+        title: Was there any district-level vaccine stock-out?
+        description_short: Whether or not there was stock-out at a district level of any vaccine.
+        unit: ""
+        processing_level: major
+      num_causes_of_stockout:
+        title: How many causes of stock-out were there?
+        description_short: The number of causes of stock-out.
+        unit: ""
+        processing_level: major
+  reason_for_stockout:
+    variables:
+      stockout:
+        title: Was there a vaccine stockout because of << reason_for_stockout.lower() >>?
+        description_short: Was there a vaccine stock-out because of << reason_for_stockout.lower() >>?
+        unit: ""
+        processing_level: major
+  global_stockout:
+    variables:
+      num_countries_with_stockout:
+        title: How many countries had a national vaccine stock-out of << description.lower() >>?
+        description_short: How many countries had a national vaccine stock-out of << description.lower()>>?
+        unit: "countries"
+        processing_level: major
+  global_cause:
+    variables:
+      num_countries:
+        title: Number of countries with stock-out due to << reason_for_stockout.lower() >>
+        description_short: Number of countries with stock-out due to << reason_for_stockout.lower() >>
+        unit: "countries"
+        processing_level: major
+        display:
+          name: << reason_for_stockout >>
