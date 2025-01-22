@@ -62,3 +62,5 @@ tables:
         description_short: Number of countries with stock-out due to << reason_for_stockout.lower() >>
         unit: "countries"
         processing_level: major
+        display:
+          name: << reason_for_stockout >>
