@@ -55,3 +55,14 @@ steps:
     - data://meadow/un/2024-12-31/households
   data://grapher/un/2024-12-31/households:
     - data://garden/un/2024-12-31/households
+
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/us_census_bureau/2025-01-22/marriages_divorces:
+    - snapshot://us_census_bureau/2025-01-22/marriages_divorces.pdf
+  data://garden/us_census_bureau/2025-01-22/marriages_divorces:
+    - data://meadow/us_census_bureau/2025-01-22/marriages_divorces
+  data://grapher/us_census_bureau/2025-01-22/marriages_divorces:
+    - data://garden/us_census_bureau/2025-01-22/marriages_divorces
