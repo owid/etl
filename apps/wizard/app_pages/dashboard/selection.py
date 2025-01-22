@@ -58,10 +58,12 @@ def render_selection_list(steps_df):
             st.markdown("""### Selection""", help=HELP_TEXT)
             num_steps = len(st.session_state.selected_steps)
             if num_steps == 1:
-                text = ":primary-background[1 step]"
+                text = ":primary-background[1 step selected]"
             else:
-                text = f":primary-background[{len(st.session_state.selected_steps)} steps]"
+                text = f":primary-background[{len(st.session_state.selected_steps)} steps selected]"
             st.markdown(text)
+
+        import_steps_from_preview()
 
         with st.container(border=True):
             text = st.text_input(
@@ -86,7 +88,9 @@ def render_selection_list(steps_df):
             _show_main_buttons(steps_df)
 
     else:
-        st.markdown("""### Selection""", help=HELP_TEXT)
+        with st_horizontal():
+            st.markdown("""### Selection""", help=HELP_TEXT)
+        import_steps_from_preview()
         st.warning("No datasets selected. Please add at least one dataset from the preview list.")
 
 
@@ -127,7 +131,7 @@ def _on_operations_pills_change(unique_key: str, step: str, steps_df: pd.DataFra
     st.session_state[f"{unique_key}_pills"] = None
 
     # Perform operation
-    st.toast(f"`{step}`: You selected **{st.session_state[unique_key]}**")
+    # st.toast(f"`{step}`: You selected **{st.session_state[unique_key]}**")
 
     # Perform operation
     v = st.session_state[unique_key]
@@ -218,35 +222,35 @@ def _upgrade_steps_in_selection(steps_df):
 
 def import_steps_from_preview():
     """Display button to add selected steps to the selection."""
-    # Button to add selected steps to the selection.
+    # Don't show button if there are no steps selected
     num_steps = len(st.session_state.preview_steps)
-    if num_steps == 1:
-        text = "Select step"
-    else:
-        text = f"Select {num_steps} steps"
+    if num_steps == 0:
+        return
 
-    # Only if there are steps in the preview list and they are not in the selection list
+    # Get number of steps in preview that are not in the selection
     missing_steps = {step for step in st.session_state.preview_steps if step not in st.session_state.selected_steps}
-    num_steps_missing = len(missing_steps)
-    if num_steps_missing == 0:
-        kwargs = {
-            "label": "Already selected",
-            "type": "primary",
-            "help": "Nothing to import to the selection list. All steps in preview have already been selected!",
-            "disabled": True,
-        }
+    num_steps_missing_in_selection = len(missing_steps)
+
+    # Disable button if all steps are already in the selection
+    if num_steps_missing_in_selection == 0:  # & (num_steps_selected > 0):
+        return
     else:
-        if num_steps_missing != num_steps:
-            text = f"{text} ({num_steps_missing} missing)"
+        if num_steps_missing_in_selection != num_steps:
+            text = f"Import steps from preview ({num_steps_missing_in_selection} missing)"
+        else:
+            text = f"Import steps from preview ({num_steps_missing_in_selection} missing)"
+        missing_steps_str = "- " + "\n- ".join(missing_steps)
         kwargs = {
             "label": text,
-            "type": "primary",
-            "help": "Import steps to the selection list.",
+            "help": f"Import steps to the selection list. Steps to import are:\n\n{missing_steps_str}",
             "disabled": False,
+            "icon": ":material/add:",
         }
-    if st.button(**kwargs):
-        _add_steps_to_selection(st.session_state.preview_steps)
-        st.rerun()
+    st.button(
+        **kwargs,
+        type="secondary",
+        on_click=lambda: _add_steps_to_selection(st.session_state.preview_steps),
+    )
 
 
 def _add_steps_to_selection(steps_related: List[str]):

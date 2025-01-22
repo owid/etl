@@ -12,16 +12,27 @@ DETAILS_LIST_CONTAINER_HEIGHT = 300
 
 
 def render_preview_list(steps_info):
-    # UI: Display details of selected steps
-    with st_horizontal():
-        for selected_step in st.session_state.preview_steps:
-            preview_step_info = steps_info[selected_step]
-            step_alias = selected_step.replace("data://", "")
+    # Container for preview list
+    st.markdown(
+        "### Preview",
+        help="Preview of the selected steps.\n\nTo actually perform actions on them, please click on **Add steps** button.",
+    )
 
-            # st.write(selected_step)
-            with st.popover(step_alias, icon=":material/info:"):
-                #     # _render_step_in_list(selected_step_info)
-                _show_step_details(preview_step_info)
+    # Check that there are rows selected in the table.
+    if st.session_state.preview_steps == []:
+        st.warning("No rows selected. Please select at least one dataset from the table above.")
+    else:
+        with st.container(border=True):
+            # Render list
+            with st_horizontal():
+                for selected_step in st.session_state.preview_steps:
+                    preview_step_info = steps_info[selected_step]
+                    step_alias = selected_step.replace("data://", "")
+
+                    # st.write(selected_step)
+                    with st.popover(step_alias, icon=":material/info:"):
+                        #     # _render_step_in_list(selected_step_info)
+                        _show_step_details(preview_step_info)
 
 
 def _get_selected_steps_info(df, steps_df) -> Dict[str, Any]:

@@ -6,7 +6,7 @@ from structlog import get_logger
 from apps.wizard.app_pages.dashboard.aggrid import make_agrid
 from apps.wizard.app_pages.dashboard.operations import render_operations
 from apps.wizard.app_pages.dashboard.preview import render_preview_list
-from apps.wizard.app_pages.dashboard.selection import import_steps_from_preview, render_selection_list
+from apps.wizard.app_pages.dashboard.selection import render_selection_list
 from apps.wizard.app_pages.dashboard.utils import (
     _create_html_button,
     _get_steps_info,
@@ -88,60 +88,31 @@ with st.spinner("Loading steps details from ETL and DB..."):
 steps_info = _get_steps_info(steps_df)
 
 
-@st.fragment
-def first_block_optimized_for_render():
-    """Group AgGrid and Preview list in a single block.
+########################################
+# Display STEPS TABLE
+########################################
+# Streamlit UI to let users toggle the filter
+show_all_channels = not st.toggle("Select only grapher and explorer steps", True)
 
-    This way, we can use st.fragment smartly and optimize re-runs.
-    """
-    ########################################
-    # Display STEPS TABLE
-    ########################################
-    # Streamlit UI to let users toggle the filter
-    show_all_channels = not st.toggle("Select only grapher and explorer steps", True)
+# Get only columns to be shown
+steps_df_display = load_steps_df_to_display(show_all_channels, reload_key=st.session_state["reload_key"])
 
-    # Get only columns to be shown
-    steps_df_display = load_steps_df_to_display(show_all_channels, reload_key=st.session_state["reload_key"])
+# Build and display the grid table with pagination.
+grid_response = make_agrid(steps_df_display)
 
-    # Build and display the grid table with pagination.
-    # st.write(steps_df_display.dtypes)
-    # with st.container(border=True):
-    grid_response = make_agrid(steps_df_display)
+########################################
+# PREVIEW LIST
+#
+# Preview of the steps based on user selections.
+# Once happy, the user should click on "Add steps" button and proceed to the "Selection list".
+########################################
 
-    ########################################
-    # PREVIEW LIST
-    #
-    # Preview of the steps based on user selections.
-    # Once happy, the user should click on "Add steps" button and proceed to the "Selection list".
-    ########################################
+# Obtain list of steps in preview
+df_selected = grid_response["selected_rows"]
+st.session_state.preview_steps = df_selected["step"].tolist() if df_selected is not None else []
 
-    df_selected = grid_response["selected_rows"]
-    preview_steps = df_selected["step"].tolist() if df_selected is not None else []
-    st.session_state.preview_steps = preview_steps
-
-    # Container for preview list
-    st.markdown(
-        "### Preview",
-        help="Preview of the selected steps.\n\nTo actually perform actions on them, please click on **Add steps** button.",
-    )
-
-    # Check that there are rows selected in the table.
-    if preview_steps == []:
-        st.warning("No rows selected. Please select at least one dataset from the table above.")
-    else:
-        with st.container(border=True):
-            # Render list
-            render_preview_list(steps_info)
-
-            # Button to import
-            import_steps_from_preview()
-
-
-# Main table, list of selected steps
-num_steps = first_block_optimized_for_render()
-# UI: Button to add selected steps sto the Operations list.
-# show_button_add_to_selection(selected_steps)
-
+# Preview list
+render_preview_list(steps_info)
 
 ########################################
 # SELECTION LIST MANAGEMENT
