@@ -3,6 +3,7 @@ import json
 import random
 from contextlib import contextmanager
 from copy import deepcopy
+from functools import wraps
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional
 
@@ -514,3 +515,32 @@ def _get_params(component, key):
             return float(params)
         else:
             return params
+
+
+def st_cache_data(func=None, *, custom_text="Running...", show_spinner=False, **cache_kwargs):
+    """
+    A custom decorator that wraps `st.cache_data` and adds support for a `custom_text` argument.
+
+    Args:
+        func: The function to be cached.
+        custom_text (str): The custom spinner text to display.
+        show_spinner (bool): Whether to show the default Streamlit spinner message. Defaults to False.
+        **cache_kwargs: Additional arguments passed to `st.cache_data`.
+    """
+
+    def decorator(f):
+        # Wrap the function with st.cache_data and force show_spinner=False
+        cached_func = st.cache_data(show_spinner=show_spinner, **cache_kwargs)(f)
+
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            with st.spinner(custom_text):
+                return cached_func(*args, **kwargs)
+
+        return wrapper
+
+    # If used as @custom_cache_data without parentheses
+    if func is not None:
+        return decorator(func)
+
+    return decorator
