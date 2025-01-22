@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -13,9 +15,11 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("family_database")
+    ds_garden_us = paths.load_dataset("marriages_divorces")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("family_database")
+    tb_us_hist = ds_garden_us.read("marriages_divorces")
 
     #
     # Process data.
@@ -46,6 +50,15 @@ def run(dest_dir: str) -> None:
     ]
 
     tb = tb[["country", "year"] + columns_of_interest]
+
+    tb = tb.rename(
+        columns={
+            "Crude divorce rate (divorces per 1000 people)": "divorce_rate",
+            "Crude marriage rate (marriages per 1000 people)": "marriage_rate",
+        }
+    )
+    tb = pr.merge(tb, tb_us_hist, on=["country", "year", "marriage_rate", "divorce_rate"], how="outer")
+
     tb = tb.format(["country", "year"])
 
     #
