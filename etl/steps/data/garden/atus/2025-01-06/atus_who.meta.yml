@@ -4,6 +4,11 @@ definitions:
     presentation:
       topic_tags:
         - Time Use
+  processing:
+    notes: |-
+        - Some categories have been combined for presentation purposes: "children" include own and not own household children under 18, grandchildren and other related children under 18. "Friends" include roommates or lodgers. "Partner" includes spouses, boy-/girlfriends, and co-habiting partners.
+        - The "Other" category includes all other relationships not covered by the other categories, such as neighbors, customers or non-related, non-household children.
+        - Data points have been weighted to make them more representative of the population with the survey weights provided by ATUS in the original data.
 
 
 
@@ -17,28 +22,39 @@ tables:
   atus_who:
     variables:
       t:
-        title: Time spent with other people throughout life - <<who_category>> - <<gender>> - <<timeframe>>
+        title: Time spent with other people throughout life - <<who_category>> - <<gender>>
         unit: "Minutes"
         short_unit: "min"
         description_short: |-
           <% if who_category in ["Children", "Partner", "Family"] %>
-          Time spent with <<who_category.lower()>>, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2009 and 2019.
+          Time spent with <<who_category.lower()>>, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2024.
           <% elif who_category in ["Friend", "Co-worker"] %>
-          Time spent with <<who_category.lower()>>s, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2009 and 2019.
+          Time spent with <<who_category.lower()>>s, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2024.
           <% elif who_category == "Alone" %>
-          Time spent alone, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2009 and 2019.
+          Time spent alone, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2024.
           <% elif who_category == "Other" %>
-          Time spent with other people, by age. These include all people which aren't partners, friends, family or coworkers. This data is measured in minutes per day and based on averages from surveys in the United States between 2009 and 2019.
+          Time spent with other people, by age. These include all people which aren't partners, friends, family or coworkers. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2024.
           <% elif who_category == "Not applicable" %>
-          Time spent doing activities, where the American Time Use Survey does not ask for other people present. This includes sleeping and activities usually done alone, such as grooming oneself. This data is measured in minutes per day and based on averages from surveys in the United States between 2009 and 2019.
+          Time spent doing activities, where the American Time Use Survey does not ask for other people present. This includes sleeping and activities usually done alone, such as grooming oneself. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2024.
           <%- endif -%>
         description_key:
           - Age is topcoded for age categories 80-84, and 85+. This means all individuals aged 80, 81, 82, 83 and 84 are included in the "age 80" category, and all individuals aged 85 and older are included in the "age 85" category.
-          - ATUS data were not collected about the period March 18, 2020 to May 9, 2020, which coincided with a time when most residents of the United States were encouraged to stay home to prevent the spread of COVID-19.
         description_processing: |-
-          - Some categories have been combined for presentation purposes: "children" include own and not own household children under 18, grandchildren and other related children under 18. "Friends" include roommates or lodgers. "Partner" includes spouses, boy-/girlfriends, and co-habiting partners.
-          - The "Other" category includes all other relationships not covered by the other categories, such as neighbors, customers or non-related, non-household children.
-          - Data points have been weighted to make them more representative of the population with the survey weights provided by ATUS in the original data.
+          {definitions.processing.notes}
+          - Data for 2020 is excluded, since the American Time Use Survey was not conducted during the period March 18, 2020 to May 9, 2020. Therefore data collected for 2020 is not representative of the entire year.
         presentation:
           grapher_config:
             note: 'Relationships used to categorize people are not exhaustive. Additionally, time spent with multiple people can be counted more than once (e.g., attending a party with friends and partner counts toward both "friends" and "partner").'
+  atus_who_years:
+    variables:
+      t:
+        title: Time spent with other people over time - <<age_bracket>> - <<who_category>>
+        unit: "Minutes"
+        short_unit: "min"
+        description_short: |-
+          Average time <<age_bracket>> year olds spend with <<who_category.lower()>>. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
+        description_processing: |-
+          {definitions.processing.notes}
+        description_key:
+          - ATUS data were not collected about the period March 18, 2020 to May 9, 2020, which coincided with a time when most residents of the United States were encouraged to stay home to prevent the spread of COVID-19. Therefore, data collected for 2020 is not representative of the entire year.
+

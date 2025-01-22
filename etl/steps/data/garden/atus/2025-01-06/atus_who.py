@@ -50,45 +50,30 @@ def run(dest_dir: str) -> None:
     tb_agg = fill_missing_values(tb_agg)
 
     # Aggregate data over age and time period
-    tb_agg_recreate = aggregate_over_age(tb_agg, start_year=2009, end_year=2019)
-    tb_agg_full = aggregate_over_age(tb_agg, start_year=2003, end_year=2023)
-    tb_agg_extended = aggregate_over_age(tb_agg, start_year=2009, end_year=2023)
-    tb_rolling_dec = aggregate_over_age(tb_agg, start_year=2014, end_year=2023)
+    # data collection only started including work in 2010, so we start with 2010
+    tb_agg_full = aggregate_over_age(tb_agg.copy(), start_year=2010, end_year=2023)
 
-    # tables for gender, recreation:
-    tb_agg_female = aggregate_over_age(tb_agg, start_year=2009, end_year=2019, gender="female")
-    tb_agg_male = aggregate_over_age(tb_agg, start_year=2009, end_year=2019, gender="male")
-
-    # tables for gender, last decade:
-    tb_agg_female_14_23 = aggregate_over_age(tb_agg, start_year=2014, end_year=2023, gender="female")
-    tb_agg_male_14_23 = aggregate_over_age(tb_agg, start_year=2014, end_year=2023, gender="male")
+    # tables for gender, full:
+    tb_agg_female = aggregate_over_age(tb_agg, start_year=2010, end_year=2023, gender="female")
+    tb_agg_male = aggregate_over_age(tb_agg, start_year=2010, end_year=2023, gender="male")
 
     # concat all tables
-    tb_agg = pr.concat([tb_agg_recreate, tb_agg_full, tb_agg_extended, tb_rolling_dec])
+    tb_who_final = pr.concat([tb_agg_full, tb_agg_female, tb_agg_male])
 
-    # include gender tables
-    tb_agg = pr.concat([tb_agg, tb_agg_female, tb_agg_male, tb_agg_female_14_23, tb_agg_male_14_23])
-
-    # add single year tables
-    if SINGLE_YEARS:
-        single_year_tb = []
-        for year in range(2003, 2024):
-            tb_agg_single_year = aggregate_over_age(tb_agg, start_year=year, end_year=year)
-            single_year_tb.append(tb_agg_single_year)
-        tb_agg_single_years = pr.concat(single_year_tb)
-        tb_agg = pr.concat([tb_agg, tb_agg_single_years])
+    # Create table for development over time for age groups
+    tb_years = development_over_time_for_age_groups(tb_agg)
 
     #
     # Process data.
-    # tb = tb_agg_recreate.format(["country", "age", "who_category"], short_name="atus_who")
-    tb = tb_agg.format(["timeframe", "age", "who_category", "gender"], short_name="atus_who")
+    tb = tb_who_final.format(["timeframe", "age", "who_category", "gender"], short_name="atus_who")
+    tb_years = tb_years.format(["age_bracket", "who_category", "year"], short_name="atus_who_years")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb, tb_years], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -130,9 +115,10 @@ def fill_missing_values(tb_agg):
 
 def development_over_time_for_age_groups(tb_agg):
     # coding changed in 2010 for coworkers and not applicable
-    tb_agg = tb_agg[tb_agg["year"] >= 2010]
+    # tb_agg = tb_agg[tb_agg["year"] >= 2010]
 
-    age_brackets = [(0, 9), (10, 19), (20, 29), (30, 39), (40, 49), (50, 59), (60, 69), (70, 79)]
+    # age starts with 15, 80/85 is topcoded
+    age_brackets = [(15, 19), (20, 29), (30, 39), (40, 49), (50, 59), (60, 69), (70, 79), (80, 89)]
 
     tbs = []
 
@@ -160,9 +146,15 @@ def development_over_time_for_age_groups(tb_agg):
         )
         .reset_index()
     )
+
     tb_years["age_bracket"] = "all"
     tbs.append(tb_years)
     tb_years = pr.concat(tbs)
+
+    # add metadata:
+    tb_years["t"] = tb_years["t"].copy_metadata(tb_years["year"])
+
+    tb_years["country"] = "United States of America"
     return tb_years
 
 
