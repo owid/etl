@@ -244,10 +244,13 @@ def run(dest_dir: str) -> None:
     # cigarettes: 45 rows
     tb_scored_97 = average_scored(tb, cols=["cigarettes", "drinks"])
 
-    #
+    # Merge all tables and remove duplicate columns (na shares are calculated twice for some variables)
     tbs_full = pr.multi_merge(
-        [tb_scored_10, tb_share_10, tb_binary, tb_cat, tb_scored_other, tb_cat_other, tb_scored_97]
+        [tb_scored_10, tb_share_10, tb_binary, tb_cat, tb_scored_other, tb_cat_other, tb_scored_97],
+        on=["country"],
+        suffixes=["", "_DROP_COLUMN"],
     )
+    tbs_full = tbs_full.drop(columns=[col for col in tbs_full.columns if col.endswith("_DROP_COLUMN")])
 
     # setting the year to 2023 for all data points (>84% of data)
     # for reference value counts: doi_annual
