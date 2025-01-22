@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
+import pandas as pd
 
 # import pandas as pd
 from owid.catalog import processing as pr
@@ -288,14 +289,16 @@ def reverse_score(tb, col):
 
 
 def average_scored(tb, groups=["country"], cols=SCORED_10_COLS):
-    tb_avg = tb[groups + cols].copy()
+    tb_avg = tb[groups + cols + ["annual_weight1"]].copy()
     for col in cols:
         tb_avg[col] = tb_avg[col].astype("Int64")
+        tb_avg[col] = tb_avg[col] * tb_avg["annual_weight1"]
 
     tb_na = get_na_share(tb, groups, cols)
 
-    tb_avg = tb_avg.groupby(groups).mean()
-    tb_avg.columns = [f"{col}_mean" if col not in groups else col for col in tb_avg.columns]
+    tb_avg = tb_avg.groupby(groups).apply(lambda x: x[cols].sum() / x["annual_weight1"].sum())
+
+    tb_avg.columns = [f"{col}_mean" for col in cols]
     tb_avg = tb_avg.reset_index()
 
     tb_avg = pr.merge(tb_avg, tb_na, on=groups)
@@ -304,7 +307,7 @@ def average_scored(tb, groups=["country"], cols=SCORED_10_COLS):
 
 
 def share_binary(tb, groups=["country"], cols=BINARY_COLS):
-    tb_binary = tb[groups + cols].copy()
+    tb_binary = tb[groups + cols + ["annual_weight1"]].copy()
     # some of these have the extra option 97 - does not apply
     tb_binary = tb_binary.replace(97, np.nan)
     for col in cols:
@@ -315,7 +318,10 @@ def share_binary(tb, groups=["country"], cols=BINARY_COLS):
     col_ans = {1: "yes", 2: "no"}
     res_tbs = []
     for col in cols:
-        res = tb_binary.groupby(groups, dropna=False)[col].value_counts(normalize=True, dropna=False).unstack()
+        res = tb_binary.groupby(groups + [col], dropna=False)["annual_weight1"].sum()
+        denom = res.groupby(groups).sum()
+        res = (res / denom).unstack()
+
         col_names = [col_ans[x] if x in col_ans.keys() else "na" for x in res.columns]
         res.columns = [f"{col}_{x}_share" for x in col_names]
         res_tbs.append(res.reset_index())
@@ -324,10 +330,14 @@ def share_binary(tb, groups=["country"], cols=BINARY_COLS):
 
 
 def share_categorical(tb, groups: list = ["country"], cols: list = CAT_COLS):
-    tb_cat = tb[groups + cols].copy()
+    tb_cat = tb[groups + cols + ["annual_weight1"]].copy()
     res_tbs = []
     for col in cols:
-        res = tb_cat.groupby(groups, dropna=False)[col].value_counts(normalize=True, dropna=False).unstack()
+        # res = tb_cat.groupby(groups + [col], dropna=False)[col].value_counts(normalize=True, dropna=False).unstack()
+        res = tb_cat.groupby(groups + [col], dropna=False)["annual_weight1"].sum()
+        denom = res.groupby(groups).sum()
+        res = (res / denom).unstack()
+
         col_names = [f"ans_{int(x)}" if x == x else "na" for x in res.columns]
         res.columns = [f"{col}_{x}_share" for x in col_names]
         res = res.fillna(0)  # if one category does not appear for country, fill with 0
@@ -362,10 +372,12 @@ def get_na_share(tb, groups: list, cols: list):
 
     returns: Table tb_na with missing value share for each group and variable
     index"""
-    tb_na = tb[groups + cols].copy()
-    tb_na = tb_na.groupby(groups).apply(lambda x: x.isna().mean())
-    tb_na.columns = [f"{col}_na_share" if col not in groups else col for col in tb_na.columns]
-    tb_na = tb_na.drop(columns=groups)
+    tb_na = tb[groups + cols + ["annual_weight1"]].copy()
+    for col in cols:
+        tb_na[col] = tb_na[col].isna().astype("Int64") * tb_na["annual_weight1"]
+
+    tb_na = tb_na.groupby(groups).apply(lambda x: x[cols].sum() / x["annual_weight1"].sum())
+    tb_na.columns = [f"{col}_na_share" for col in cols]
     return tb_na.reset_index()
 
 
