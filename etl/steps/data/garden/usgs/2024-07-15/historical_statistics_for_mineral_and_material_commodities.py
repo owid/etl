@@ -706,6 +706,15 @@ def run(dest_dir: str) -> None:
     tb_flat.loc[
         (tb_flat["year"].isin(_years_with_zero_value)), "unit_value|Gemstones|Mine|constant 1998 US$ per tonne"
     ] = None
+
+    # Unit value of rare earths prior to 1961 is highly unstable, and goes from ~140k to ~40 and then ~100k in a few years. There are many possible reasons for this volatility (it was a small market during tumultuous times).
+    # For now, I'll simply remove those years.
+    error = "Unit value of rare earths was expected to be highly unstable prior to 1961. Remove this part of the code."
+    assert tb_flat.loc[
+        (tb_flat["country"] == "World") & (tb_flat["year"] < 1961),
+        "unit_value|Rare earths|Mine|constant 1998 US$ per tonne",
+    ].describe().loc[["min", "max"]].tolist() == [29.0, 145000.0], error
+    tb_flat.loc[(tb_flat["year"] < 1961), "unit_value|Rare earths|Mine|constant 1998 US$ per tonne"] = None
     ####################################################################################################################
 
     # Format tables conveniently.
