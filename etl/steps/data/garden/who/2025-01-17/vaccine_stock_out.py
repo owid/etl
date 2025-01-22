@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb, tb_agg, tb_cause, tb_global],
+        tables=[tb, tb_agg, tb_cause, tb_global, tb_global_cause],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )
