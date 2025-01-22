@@ -64,7 +64,6 @@ def run(dest_dir: str) -> None:
     )
     # Set US marriage rates before 1990 to None in main table and remove those numbers only from the marrige_rate column
     tb.loc[(tb["country"] == "United States") & (tb["year"] < 1990), "marriage_rate"] = None
-    tb = tb.dropna(subset=["marriage_rate"])
 
     # Filter 1945-1990 US data table
     tb_us_hist_1945_1990 = tb_us_hist_1945_1990[
@@ -75,6 +74,9 @@ def run(dest_dir: str) -> None:
     tb = pr.merge(tb, tb_us_hist_1886_1945, on=["country", "year", "marriage_rate", "divorce_rate"], how="outer")
 
     tb = pr.merge(tb, tb_us_hist_1945_1990, on=["country", "year", "marriage_rate"], how="outer")
+
+    # Remove NaN values from duplicate indices (because of the US data)
+    tb = tb.groupby(["country", "year"], as_index=False).first()
 
     tb = tb.format(["country", "year"])
 
