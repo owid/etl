@@ -16,8 +16,10 @@ To run this code from scratch,
     - Connect to the staging server of this pull request:
         - Hit Cmd + Shift + P and select Remote-SSH: Connect to Host
         - Type in owid@staging-site-{branch_name}
-    - Delete the files in the cache folder:
+    - Delete the files in the local cache folder:
         rm -rf .cache/*
+    - (If needed) Delete the files in R2:
+        rclone delete r2:owid-private/cache/ --fast-list --transfers 32 --checkers 32 --verbose
     - Check if you need to update the poverty lines in the functions `poverty_lines_countries` and `poverty_lines_regions`.
         - Check the list of countries without percentile data. It will show up as a list in the output (These countries are available in a common query but not in the percentile file:)
         - Open
