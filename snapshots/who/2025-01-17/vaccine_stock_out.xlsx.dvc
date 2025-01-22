@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: WHO Vaccine Supply and Logistics
+    description: |-
+      Vaccine supply and logistics, and supply chain management system for routine services data reported annually through the WHO/UNICEF Joint Reporting Form on Immunization (JRF). Data indicate vaccine availability and stock-outs for vaccines/supplies at national and district levels. Country data is updated and available as received.
+    date_published: "2024-03-01"
+
+    # Citation
+    producer: World Health Organization
+    citation_full: |-
+      Vaccine Supply and Logistics, World Health Organization (2024)
+    attribution_short: WHO
+
+    # Files
+    url_main: https://immunizationdata.who.int/global/wiise-detail-page/vaccine-supply-and-logistics?ISO_3_CODE=&YEAR=
+    date_accessed: 2025-01-17
+
+    # License
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://www.who.int/about/policies/publishing/copyright
+
+outs:
+  - md5: 3e4c01941cdcb02862d44144380ffb7f
+    size: 5026603
+    path: vaccine_stock_out.xlsx
