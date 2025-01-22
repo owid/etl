@@ -150,29 +150,21 @@ steps:
     - data://garden/un/2023-08-02/comtrade_pandemics
 
   # UNAIDS
-  data://meadow/health/2023-08-09/unaids:
-    - snapshot://health/2023-08-09/unaids.csv
-  data://meadow/health/2023-08-11/unaids_hiv_children:
-    - snapshot://health/2023-08-11/unaids_hiv_children.xlsx
-  data://meadow/health/2023-08-22/unaids_deaths_averted_art:
-    - snapshot://health/2023-08-22/unaids_deaths_averted_art.xlsx
-  data://meadow/health/2023-08-22/unaids_gap_art:
-    - snapshot://health/2023-08-22/unaids_gap_art.xlsx
-  data://meadow/health/2023-08-22/unaids_condom_msm:
-    - snapshot://health/2023-08-22/unaids_condom_msm.xlsx
+  data://meadow/health/2025-01-22/unaids:
+    - snapshot://health/2025-01-22/unaids.csv
 
-  data://garden/health/2023-08-09/unaids:
-    - data://meadow/health/2023-08-09/unaids
-    - data://meadow/health/2023-08-11/unaids_hiv_children
-    - data://meadow/health/2023-08-22/unaids_condom_msm
-    - data://meadow/health/2023-08-22/unaids_gap_art
-    - data://meadow/health/2023-08-22/unaids_deaths_averted_art
-    - data://garden/demography/2023-03-31/population
+  data://garden/health/2025-01-22/unaids:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://meadow/health/2025-01-22/unaids
+    # - data://meadow/health/2023-08-22/unaids_gap_art
+    # - data://meadow/health/2023-08-22/unaids_condom_msm
+    # - data://meadow/health/2023-08-22/unaids_deaths_averted_art
+    # - data://meadow/health/2023-08-11/unaids_hiv_children
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/demography/2024-07-15/population
 
-  data://grapher/health/2023-08-09/unaids:
-    - data://garden/health/2023-08-09/unaids
+  data://grapher/health/2025-01-22/unaids:
+    - data://garden/health/2025-01-22/unaids
 
   # OECD Road accidents & passenger travel
   data://meadow/oecd/2024-07-01/road_accidents:
@@ -941,3 +933,28 @@ steps:
     - data://meadow/who/2025-01-17/mortality_database_vaccine_preventable
   data://grapher/who/2025-01-17/mortality_database_vaccine_preventable:
     - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+
+  # UNAIDS (to archive)
+  data://meadow/health/2023-08-09/unaids:
+    - snapshot://health/2023-08-09/unaids.csv
+  data://meadow/health/2023-08-11/unaids_hiv_children:
+    - snapshot://health/2023-08-11/unaids_hiv_children.xlsx
+  data://meadow/health/2023-08-22/unaids_deaths_averted_art:
+    - snapshot://health/2023-08-22/unaids_deaths_averted_art.xlsx
+  data://meadow/health/2023-08-22/unaids_gap_art:
+    - snapshot://health/2023-08-22/unaids_gap_art.xlsx
+  data://meadow/health/2023-08-22/unaids_condom_msm:
+    - snapshot://health/2023-08-22/unaids_condom_msm.xlsx
+
+  data://garden/health/2023-08-09/unaids:
+    - data://meadow/health/2023-08-09/unaids
+    - data://meadow/health/2023-08-11/unaids_hiv_children
+    - data://meadow/health/2023-08-22/unaids_condom_msm
+    - data://meadow/health/2023-08-22/unaids_gap_art
+    - data://meadow/health/2023-08-22/unaids_deaths_averted_art
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+
+  data://grapher/health/2023-08-09/unaids:
+    - data://garden/health/2023-08-09/unaids
