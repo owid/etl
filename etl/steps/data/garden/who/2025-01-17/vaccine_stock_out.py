@@ -34,7 +34,7 @@ def run(dest_dir: str) -> None:
     tb_agg = tb_agg.format(["country", "year"], short_name="derived_metrics")
     tb_cause = tb_cause.format(["country", "year", "reason_for_stockout"], short_name="reason_for_stockout")
     tb_global = tb_global.format(["country", "year", "description"], short_name="global_stockout")
-    tb_global_cause = tb_global_cause.format(["year", "reason_for_stockout"], short_name="global_cause")
+    tb_global_cause = tb_global_cause.format(["country", "year", "reason_for_stockout"], short_name="global_cause")
     #
     # Save outputs.
     #
