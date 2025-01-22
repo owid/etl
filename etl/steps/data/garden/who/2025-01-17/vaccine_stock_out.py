@@ -82,18 +82,19 @@ def calculate_derived_metrics(tb: Table, origin: Origin) -> list[Table]:
 
 def derive_stockout_variables(tb: Table, origin: Origin) -> list[Table]:
     tb_cause = reason_for_stockout(tb, origin)
-    tb_global_cause = countries_with_stockouts_per_cause(tb_cause)
+    tb_global_cause = countries_with_stockouts_per_cause(tb_cause, origin)
     tb_cause_number = number_of_reasons_for_stockout(tb_cause, origin)
     return [tb_cause, tb_global_cause, tb_cause_number]
 
 
-def countries_with_stockouts_per_cause(tb_cause: Table) -> Table:
+def countries_with_stockouts_per_cause(tb_cause: Table, origin: Origin) -> Table:
     """
     How many countries had stockouts for each reason in the given year?
     """
     tb_cause = tb_cause[tb_cause["stockout"] == "Yes"]
     tb_cause = tb_cause.groupby(["year", "reason_for_stockout"])["country"].nunique().reset_index(name="num_countries")
     tb_cause["country"] = "World"
+    tb_cause["reason_for_stockout"].metadata.origins = origin
     return tb_cause
 
 
