@@ -45,7 +45,7 @@ tables:
         unit: "current US$ per kilowatt-hour"
         short_unit: "$/kWh"
         description_short: |-
-          Average price of battery cells per [kilowatt-hour](#dod:watt-hours) in US dollars, not adjusted for inflation. The data includes an annual average and quarterly average prices of different types of lithium ion batteries commonly used in electric vehicles and renewable energy storage.
+          Average price of [battery cells](#dod:battery-cell) per [kilowatt-hour](#dod:watt-hours) in US dollars, not adjusted for inflation. The data includes an annual average and quarterly average prices of different [lithium ion battery](#dod:lithium-ion-battery) chemistries commonly used in electric vehicles and renewable energy storage.
         description_key:
           - Lithium iron phosphate (LFP) and lithium nickel manganese cobalt oxide (NCM) are two types of rechargeable batteries commonly used in electric vehicles and renewable energy storage.
         display:
