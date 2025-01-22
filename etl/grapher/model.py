@@ -12,6 +12,8 @@ If you want to add a new table to ORM, add --tables mytable to the command above
 Another option is to run `show create table mytable;` in MySQL and then ask ChatGPT to convert it to SQLAlchemy 2 ORM.
 
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
+
+You might have to run `uv pip install mysqlclient` to install missing MySQLDb.
 """
 
 import copy
@@ -913,7 +915,7 @@ class PostsGdocs(Base):
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     revisionId: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
-    breadcrumbs: Mapped[Optional[dict]] = mapped_column(JSON)
+    manualBreadcrumbs: Mapped[Optional[dict]] = mapped_column(JSON)
     markdown: Mapped[Optional[str]] = mapped_column(LONGTEXT)
 
 

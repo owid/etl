@@ -130,8 +130,8 @@ def make_grid_options(steps_df_display):
     # General settings
     gb.configure_grid_options(
         # domLayout="autoHeight",
-        ColumnsAutoSizeMode=ColumnsAutoSizeMode.FIT_CONTENTS,
         enableCellTextSelection=True,
+        ColumnsAutoSizeMode=ColumnsAutoSizeMode.FIT_CONTENTS,
         onFirstDataRendered=JS_CODE_ENABLE_CLEAR_SELECTION,
     )
     gb.configure_selection(
