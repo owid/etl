@@ -8,7 +8,7 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy import text
 from tqdm.auto import tqdm
 
-from apps.wizard.app_pages.similar_charts import data, scoring
+from apps.wizard.app_pages.similar_charts import data
 from etl import config
 from etl.db import get_engine
 
