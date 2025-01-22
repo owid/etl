@@ -191,7 +191,7 @@ class UIChartProducerAnalytics:
                 chart_slug = trace.name  # Get the name of the line (Chart slug)
                 if chart_slug == "Total":
                     trace.update(
-                        legendgroup="Total",
+                        # legendgroup="Total",
                         showlegend=True,
                         name="<b>All charts</b>",
                         customdata=[
@@ -201,7 +201,7 @@ class UIChartProducerAnalytics:
                     )
                 else:
                     trace.update(
-                        legendgroup="Charts",
+                        # legendgroup="Charts",
                         showlegend=True,
                         customdata=[
                             f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
