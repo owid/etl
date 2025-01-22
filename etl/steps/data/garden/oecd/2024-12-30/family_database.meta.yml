@@ -26,19 +26,21 @@ tables:
         description_short: The percentage of children under 18 living in households with incomes below the poverty line.
         description_from_producer: The child relative income poverty rate, defined as the percentage of children (0-17 year-olds) with an equivalised household disposable income (i.e. an income after taxes and transfers adjusted for household size) below the poverty threshold. The poverty threshold is set here at 50% of the median disposable income in each country.
 
+
       divorce_rate:
         title: Crude divorce rate (divorces per 1,000 people)
         unit: "per 1,000 people"
         short_unit: "per 1,000 people"
         description_short: Number of divorces during a given year per 1,000 people.
         description_from_producer: The crude divorce rate is defined as the number of divorces during a given year per 1,000 people.
-
+        description_processing: Divorce rates in the United States between 1886 and 1945 are sourced from the US Census.
       marriage_rate:
         title: Crude marriage rate (marriages per 1,000 people)
         unit: "per 1,000 people"
         short_unit: ""
         description_short: Number of marriages during a given year per 1,000 people.
         description_from_producer: The crude marriage rate is defined as the number of marriages during a given year per 1,000 people.
+        description_processing: Marriage rates in the United States between 1886 and 1945 are sourced from the US Census, for years 1945 to 1990 they are sourced from the CDC. Recent data comes from OECD.
 
       employment_rates__pct__for_all_mothers__15_64_year_olds__with_at_least_one_child_under_15:
         title: Employment rates (%), for all mothers (15-64 year-olds) with at least one child under 15
