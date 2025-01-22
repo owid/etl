@@ -94,7 +94,7 @@ def countries_with_stockouts_per_cause(tb_cause: Table, origin: Origin) -> Table
     tb_cause = tb_cause[tb_cause["stockout"] == "Yes"]
     tb_cause = tb_cause.groupby(["year", "reason_for_stockout"])["country"].nunique().reset_index(name="num_countries")
     tb_cause["country"] = "World"
-    tb_cause["reason_for_stockout"].metadata.origins = origin
+    tb_cause["num_countries"].metadata.origins = origin
     return tb_cause
 
 
