@@ -62,20 +62,18 @@ def run(dest_dir: str) -> None:
             "Crude marriage rate (marriages per 1000 people)": "marriage_rate",
         }
     )
-    tb = pr.merge(tb, tb_us_hist_1886_1945, on=["country", "year", "marriage_rate", "divorce_rate"], how="outer")
+    # Set US marriage rates before 1990 to None in main table and remove those numbers only from the marrige_rate column
+    tb.loc[(tb["country"] == "United States") & (tb["year"] < 1990), "marriage_rate"] = None
+    tb = tb.dropna(subset=["marriage_rate"])
 
-    # Exclude United States rows for marriage_rates before 1990 in tb
-    tb = tb[~((tb["country"] == "United States") & (tb["year"] < 1990))]
-
-    # Exclude rows for the United States with year after 1990 and anything before 1945 in tb_us_hist_1945_1990
+    # Filter 1945-1990 US data table
     tb_us_hist_1945_1990 = tb_us_hist_1945_1990[
-        ~(
-            (tb_us_hist_1945_1990["country"] == "United States")
-            & ((tb_us_hist_1945_1990["year"] > 1989) | (tb_us_hist_1945_1990["year"] < 1946))
-        )
+        (tb_us_hist_1945_1990["country"] == "United States") & (tb_us_hist_1945_1990["year"].between(1946, 1989))
     ]
 
     # Combine the tables
+    tb = pr.merge(tb, tb_us_hist_1886_1945, on=["country", "year", "marriage_rate", "divorce_rate"], how="outer")
+
     tb = pr.merge(tb, tb_us_hist_1945_1990, on=["country", "year", "marriage_rate"], how="outer")
 
     tb = tb.format(["country", "year"])
