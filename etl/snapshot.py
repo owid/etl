@@ -2,6 +2,7 @@ import datetime as dt
 import json
 import re
 import tempfile
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, Union, cast
@@ -10,6 +11,7 @@ import owid.catalog.processing as pr
 import pandas as pd
 import structlog
 import yaml
+from deprecated import deprecated
 from owid.catalog import Table, s3_utils
 from owid.catalog.meta import (
     DatasetMeta,
@@ -35,6 +37,7 @@ log = structlog.get_logger()
 class Snapshot:
     uri: str
     metadata: "SnapshotMeta"
+    _unarchived_dir: Optional[Path] = None
 
     def __init__(self, uri: str) -> None:
         """
@@ -285,6 +288,8 @@ class Snapshot:
             self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
         )
 
+    # Methods to deal with archived files
+    @deprecated("This function will be deprecated. Use `open_archive` context manager instead.")
     def extract(self, output_dir: Path | str):
         decompress_file(self.path, output_dir)
 
@@ -292,7 +297,7 @@ class Snapshot:
         # Create temporary directory
         temp_dir = tempfile.TemporaryDirectory()
         # Extract file to temporary directory
-        self.extract(temp_dir.name)
+        decompress_file(self.path, temp_dir.name)
         # Return temporary directory
         return temp_dir
 
@@ -315,6 +320,50 @@ class Snapshot:
                 **kwargs,
             )
             return tb
+
+    @contextmanager
+    def open_archive(self):
+        """Use this context manager to read multiple files in an archive without unarchiving multiple times.
+
+        Example:
+
+        ```python
+        snap = Snapshot(...)
+
+        with snap.open_archive():
+            table1 = snap.read_from_archive("filename1.csv")
+            table2 = snap.read_from_archive("filename2.csv")
+        ```
+
+        It creates a temporary directory with the unarchived content. This temporary directory is saved in class attribute `_unarchived_dir` and is deleted when the context manager exits.
+        """
+        temp_dir = tempfile.TemporaryDirectory()
+        try:
+            decompress_file(self.path, temp_dir.name)
+            self._unarchived_dir = Path(temp_dir.name)
+            yield
+        finally:
+            temp_dir.cleanup()
+            self._unarchived_dir = None
+
+    def read_from_archive(self, filename: str, *args, **kwargs) -> Table:
+        """Read a file in an archive.
+
+        Use this function within a context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
+        """
+        if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
+            raise RuntimeError("Archive is not unarchived. Use 'with snap.unarchived()' context manager.")
+
+        new_extension = filename.split(".")[-1]
+        tb = read_table_from_snapshot(
+            *args,
+            path=self._unarchived_dir / filename,
+            table_metadata=self.to_table_metadata(),
+            snapshot_origin=self.metadata.origin,
+            file_extension=new_extension,
+            **kwargs,
+        )
+        return tb
 
 
 @pruned_json
