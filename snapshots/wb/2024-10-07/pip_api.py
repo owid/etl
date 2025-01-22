@@ -485,7 +485,7 @@ def pip_query_region(
 
     # Build query
     df = wb_api.fetch_csv(
-        f"/pip-grp?{popshare_or_povline}={value}&country={country_code}&year={year}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
+        f"/pip-grp?group_by=wb&{popshare_or_povline}={value}&country={country_code}&year={year}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
     )
 
     # Add PPP version as column
