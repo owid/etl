@@ -24,11 +24,14 @@ st.set_page_config(
 ########################################################################################################################
 
 
-@st.cache_data(show_spinner=False, persist="disk")
+@st.cache_data(show_spinner=False, ttl="1h")
 def get_charts() -> list[data.Chart]:
     with st.spinner("Loading charts..."):
         # Get charts from the database..
         df = data.get_raw_charts()
+
+        if len(df) == 0:
+            raise ValueError("No charts found in the database.")
 
         charts = df.to_dict(orient="records")
 
