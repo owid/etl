@@ -118,6 +118,13 @@ tables:
         description_short: Production of chromium, in tonnes. Based on mined, rather than [refined](#dod:refined-production), production.
         presentation:
           title_public: Chromium production
+      production_chromium_mine__gross_weight_tonnes:
+        title: production|Chromium|Mine, gross weight|tonnes
+        unit: tonnes
+        short_unit: t
+        description_short: Production of chromium, in tonnes of gross weight. Based on mined, rather than [refined](#dod:refined-production), production.
+        presentation:
+          title_public: Chromium production
       production_coal_mine_tonnes:
         title: production|Coal|Mine|tonnes
         unit: tonnes
