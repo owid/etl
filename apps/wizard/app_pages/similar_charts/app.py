@@ -260,13 +260,18 @@ def st_related_charts_table(
 
     reviewer_cols = list(pivot_df.columns)
 
+    # Move Coviews and Jaccard to the beginning
+    front_cols = ["🤖 Jaccard", "🤖 Coviews", "🤖 GPT", "🤖 Score"]
+    reviewer_cols = front_cols + [col for col in reviewer_cols if col not in front_cols]
+
     if reviewer in reviewer_cols:
-        print(pivot_df)
         pivot_df["favorite"] = pivot_df[reviewer] == "good"
+        pivot_df["dislike"] = pivot_df[reviewer] == "bad"
         del pivot_df[reviewer]
         reviewer_cols.remove(reviewer)
     else:
         pivot_df["favorite"] = False
+        pivot_df["dislike"] = False
 
     # 3) Map each label (good/bad/neutral) to an icon
     def label_to_icon(label: str) -> str:
@@ -285,10 +290,19 @@ def st_related_charts_table(
     # TODO: jump to anchor
     # pivot_df["link"] = pivot_df["slug"].apply(lambda x: f"#{x}")
 
-    # 7) Build the final column order
-    final_cols = ["link", "chart_id", "slug", "title", "views_365d", "coviews", "score"] + reviewer_cols + ["favorite"]
+    # TODO: DRY this with scores
+    pivot_df["jaccard"] = pivot_df.coviews / (pivot_df.views_365d + chosen_chart.views_365d - pivot_df.coviews)
 
-    pivot_df = pivot_df[final_cols].sort_values(["score"], ascending=False)
+    # 7) Build the final column order
+    final_cols = (
+        ["link", "chart_id", "slug", "title", "views_365d", "coviews"] + reviewer_cols + ["favorite", "dislike"]
+    )
+
+    # Sort by preferred score
+    pivot_df = pivot_df.sort_values(["jaccard"], ascending=False)[final_cols]
+
+    # Add reason, currently disabled
+    pivot_df["reason"] = ""
 
     # 8) Configure columns for st.dataframe
     column_config = {
@@ -299,19 +313,35 @@ def st_related_charts_table(
             display_text="Open",
         ),
         "favorite": st.column_config.CheckboxColumn(
-            "Your favorite?",
-            help="Select your **favorite** widgets",
+            "Like?",
+            help="Check if you like the related chart",
             default=False,
         ),
+        "dislike": st.column_config.CheckboxColumn(
+            "Dislike?",
+            help="Check if you dislike the related chart",
+            default=False,
+        ),
+        # "reason": st.column_config.TextColumn(
+        #     "Reason",
+        #     help="Add reason for liking / disliking the chart",
+        # ),
+        "reason": None,
+        "🤖 Jaccard": st.column_config.Column(help="Jaccard similarity from coviews"),
+        "🤖 Score": st.column_config.Column(help="Complex score without diversity"),
+        "🤖 GPT": st.column_config.Column(help="Complex score with diversity by GPT"),
+        "🤖 Coviews": st.column_config.Column(help="Most coviews"),
         "chart_id": None,
     }
     # You could also configure text columns or numeric columns (like "views_365d").
-    styled_df = pivot_df.style.format("{:.0%}", subset=["score"])
+    # styled_df = pivot_df.style.format("{:.0%}", subset=["score"]).format("{:.2%}", subset=["jaccard"])
+    styled_df = pivot_df.style
 
-    # Disable all columns except "favorite"
-    disabled_cols = [col for col in pivot_df.columns if col != "favorite"]
+    # Disable all columns except "favorite" and "dislike"
+    disabled_cols = [col for col in pivot_df.columns if col not in ("favorite", "dislike", "reason")]
 
     old_favorites = set(pivot_df[pivot_df["favorite"]].chart_id)
+    old_dislikes = set(pivot_df[pivot_df["dislike"]].chart_id)
 
     # 9) Show the result using st.data_editor
     updated_df = st.data_editor(
@@ -323,7 +353,9 @@ def st_related_charts_table(
     )
 
     new_favorites = set(updated_df[updated_df["favorite"]].chart_id)
+    new_dislikes = set(updated_df[updated_df["dislike"]].chart_id)
 
+    # Save favorites
     with Session(engine) as session:
         for chart_id in new_favorites - old_favorites:
             gm.RelatedChart(
@@ -334,6 +366,27 @@ def st_related_charts_table(
             ).upsert(session)
 
         for chart_id in old_favorites - new_favorites:
+            # TODO: we can delete it as well
+            gm.RelatedChart(
+                chartId=chosen_chart.chart_id,
+                relatedChartId=chart_id,
+                label="neutral",
+                reviewer=reviewer,
+            ).upsert(session)
+
+        session.commit()
+
+    # Save dislikes
+    with Session(engine) as session:
+        for chart_id in new_dislikes - old_dislikes:
+            gm.RelatedChart(
+                chartId=chosen_chart.chart_id,
+                relatedChartId=chart_id,
+                label="bad",
+                reviewer=reviewer,
+            ).upsert(session)
+
+        for chart_id in old_dislikes - new_dislikes:
             # TODO: we can delete it as well
             gm.RelatedChart(
                 chartId=chosen_chart.chart_id,
@@ -523,6 +576,22 @@ for chart_id in sim_components.sort_values("coviews_score", ascending=False).ind
             relatedChartId=c.chart_id,
             label="good",
             reviewer="🤖 Coviews",
+        )
+    )
+
+
+# Add coviews reviewer
+for chart_id in sim_components.sort_values("jaccard_score", ascending=False).index[:5]:
+    c = chart_map[chart_id]
+    # Don't recommend zero coviews
+    if c.coviews == 0:
+        continue
+    related_charts_db.append(
+        gm.RelatedChart(
+            chartId=chosen_chart.chart_id,
+            relatedChartId=c.chart_id,
+            label="good",
+            reviewer="🤖 Jaccard",
         )
     )
 
