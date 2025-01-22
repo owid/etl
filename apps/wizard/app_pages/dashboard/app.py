@@ -34,7 +34,7 @@ st.set_page_config(
 ## Selected steps
 st.session_state.setdefault("selected_steps", [])
 ## Selected steps in table
-st.session_state.setdefault("selected_steps_table", [])
+st.session_state.setdefault("preview_steps", [])
 # Initialize the cache key in the session state.
 # This key will be used to reload the steps table after making changes to the steps.
 st.session_state.setdefault("reload_key", 0)
@@ -73,14 +73,12 @@ If you are running Wizard on your local machine, you can select steps from it to
         )
         st.markdown(tutorial_html, unsafe_allow_html=True)
 
+
 ########################################
 # LOAD STEPS TABLE
 ########################################
 # Check if the database is accessible.
-check_db()
-
-# Streamlit UI to let users toggle the filter
-show_all_channels = not st.toggle("Select only grapher and explorer steps", True)
+_ = check_db()
 
 # Load the steps dataframe.
 with st.spinner("Loading steps details from ETL and DB..."):
@@ -89,43 +87,56 @@ with st.spinner("Loading steps details from ETL and DB..."):
 # Simplify the steps dataframe to show only the relevant columns.
 steps_info = _get_steps_info(steps_df)
 
+
 ########################################
 # Display STEPS TABLE
 ########################################
+# Streamlit UI to let users toggle the filter
+show_all_channels = not st.toggle("Select only grapher and explorer steps", True)
+
 # Get only columns to be shown
 steps_df_display = load_steps_df_to_display(show_all_channels, reload_key=st.session_state["reload_key"])
 
 # Build and display the grid table with pagination.
-# st.write(steps_df_display.dtypes)
-# with st.container(border=True):
 grid_response = make_agrid(steps_df_display)
 
 ########################################
-# DETAILS LIST
+# PREVIEW LIST
 #
 # Preview of the steps based on user selections.
 # Once happy, the user should click on "Add steps" button and proceed to the "Selection list".
 ########################################
 
-
+# Obtain list of steps in preview
 df_selected = grid_response["selected_rows"]
-selected_steps = df_selected["step"].tolist() if df_selected is not None else []
-render_preview_list(selected_steps, steps_info)
+st.session_state.preview_steps = df_selected["step"].tolist() if df_selected is not None else []
+
+# Preview list
+render_preview_list(steps_info)
 
 
 ########################################
-# SELECTION LIST MANAGEMENT
+# SELECTION LIST & OPERATIONS
 #
-# Add steps based on user selections.
-# User can add from checking in the steps table, but also there are some options to add dependencies, usages, etc.
 ########################################
-# Header
-render_selection_list(steps_df)
+@st.fragment
+def render_selection_opertions():
+    ########################################
+    # SELECTION LIST MANAGEMENT
+    #
+    # Add steps based on user selections.
+    # User can add from checking in the steps table, but also there are some options to add dependencies, usages, etc.
+    ########################################
+    # Header
+    # st.write(selected_steps)
+    render_selection_list(steps_df)
+
+    ########################################
+    # OPERATE ON STEPS (ACTIONS)
+    ########################################
+    # st.write(st.session_state.selected_steps)
+    if st.session_state.selected_steps:
+        render_operations()
 
 
-########################################
-# OPERATE ON STEPS (ACTIONS)
-########################################
-
-if st.session_state.selected_steps:
-    render_operations(steps_df)
+render_selection_opertions()
