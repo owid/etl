@@ -1,9 +1,11 @@
+from typing import List
+
 import pandas as pd
 import streamlit as st
 from rapidfuzz import fuzz
 from structlog import get_logger
 
-from apps.wizard.app_pages.dashboard.utils import NON_UPDATEABLE_IDENTIFIERS, _add_steps_to_selection, unselect_step
+from apps.wizard.app_pages.dashboard.utils import NON_UPDATEABLE_IDENTIFIERS, unselect_step
 from apps.wizard.utils.components import st_horizontal
 
 log = get_logger()
@@ -76,13 +78,9 @@ def render_selection_list(steps_df):
                     key=lambda step_name: fuzz.ratio(text, step_name),
                     reverse=True,
                 )
-                for step in st.session_state.selected_steps_sorted:
-                    # Define the layout of the list.
-                    _show_row_with_step_details(step, steps_df)
-            else:
-                for step in st.session_state.selected_steps:
-                    # Define the layout of the list.
-                    _show_row_with_step_details(step, steps_df)
+            for step in st.session_state.selected_steps_sorted:
+                # Define the layout of the list.
+                _show_row_with_step_details(step, steps_df)
 
             # Show main buttons in the selection
             _show_main_buttons(steps_df)
@@ -101,7 +99,7 @@ def _show_row_with_step_details(step, steps_df):
         * Execute ETL step for only the current step.
         * Edit metadata for the current step.
     """
-    if step in st.session_state.selected_steps_table:
+    if step in st.session_state.preview_steps:
         step_name = f":material/table_chart: **{step.replace('data://', '')}**"
     else:
         step_name = f"{step.replace('data://', '')}"
@@ -216,3 +214,44 @@ def _upgrade_steps_in_selection(steps_df):
             new_list.append(step)
 
     st.session_state.selected_steps = new_list
+
+
+def import_steps_from_preview():
+    """Display button to add selected steps to the selection."""
+    # Button to add selected steps to the selection.
+    num_steps = len(st.session_state.preview_steps)
+    if num_steps == 1:
+        text = "Select step"
+    else:
+        text = f"Select {num_steps} steps"
+
+    # Only if there are steps in the preview list and they are not in the selection list
+    missing_steps = {step for step in st.session_state.preview_steps if step not in st.session_state.selected_steps}
+    num_steps_missing = len(missing_steps)
+    if num_steps_missing == 0:
+        kwargs = {
+            "label": "Already selected",
+            "type": "primary",
+            "help": "Nothing to import to the selection list. All steps in preview have already been selected!",
+            "disabled": True,
+        }
+    else:
+        if num_steps_missing != num_steps:
+            text = f"{text} ({num_steps_missing} missing)"
+        kwargs = {
+            "label": text,
+            "type": "primary",
+            "help": "Import steps to the selection list.",
+            "disabled": False,
+        }
+    if st.button(**kwargs):
+        _add_steps_to_selection(st.session_state.preview_steps)
+        st.rerun()
+
+
+def _add_steps_to_selection(steps_related: List[str]):
+    """Add steps to the selection."""
+    # Remove those already in selection
+    new_selected_steps = [step for step in steps_related if step not in st.session_state.selected_steps]
+    # Add new steps to the selection
+    st.session_state.selected_steps += new_selected_steps

@@ -5,8 +5,8 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.dashboard.aggrid import make_agrid
 from apps.wizard.app_pages.dashboard.operations import render_operations
-from apps.wizard.app_pages.dashboard.preview import render_preview_list, show_button_add_to_selection
-from apps.wizard.app_pages.dashboard.selection import render_selection_list
+from apps.wizard.app_pages.dashboard.preview import render_preview_list
+from apps.wizard.app_pages.dashboard.selection import import_steps_from_preview, render_selection_list
 from apps.wizard.app_pages.dashboard.utils import (
     _create_html_button,
     _get_steps_info,
@@ -34,7 +34,7 @@ st.set_page_config(
 ## Selected steps
 st.session_state.setdefault("selected_steps", [])
 ## Selected steps in table
-st.session_state.setdefault("selected_steps_table", [])
+st.session_state.setdefault("preview_steps", [])
 # Initialize the cache key in the session state.
 # This key will be used to reload the steps table after making changes to the steps.
 st.session_state.setdefault("reload_key", 0)
@@ -74,6 +74,20 @@ If you are running Wizard on your local machine, you can select steps from it to
         st.markdown(tutorial_html, unsafe_allow_html=True)
 
 
+########################################
+# LOAD STEPS TABLE
+########################################
+# Check if the database is accessible.
+_ = check_db()
+
+# Load the steps dataframe.
+with st.spinner("Loading steps details from ETL and DB..."):
+    steps_df = load_steps_df(reload_key=st.session_state["reload_key"])
+
+# Simplify the steps dataframe to show only the relevant columns.
+steps_info = _get_steps_info(steps_df)
+
+
 @st.fragment
 def first_block_optimized_for_render():
     """Group AgGrid and Preview list in a single block.
@@ -81,24 +95,11 @@ def first_block_optimized_for_render():
     This way, we can use st.fragment smartly and optimize re-runs.
     """
     ########################################
-    # LOAD STEPS TABLE
+    # Display STEPS TABLE
     ########################################
-    # Check if the database is accessible.
-    _ = check_db()
-
     # Streamlit UI to let users toggle the filter
     show_all_channels = not st.toggle("Select only grapher and explorer steps", True)
 
-    # Load the steps dataframe.
-    with st.spinner("Loading steps details from ETL and DB..."):
-        steps_df = load_steps_df(reload_key=st.session_state["reload_key"])
-
-    # Simplify the steps dataframe to show only the relevant columns.
-    steps_info = _get_steps_info(steps_df)
-
-    ########################################
-    # Display STEPS TABLE
-    ########################################
     # Get only columns to be shown
     steps_df_display = load_steps_df_to_display(show_all_channels, reload_key=st.session_state["reload_key"])
 
@@ -115,18 +116,31 @@ def first_block_optimized_for_render():
     ########################################
 
     df_selected = grid_response["selected_rows"]
-    selected_steps = df_selected["step"].tolist() if df_selected is not None else []
+    preview_steps = df_selected["step"].tolist() if df_selected is not None else []
+    st.session_state.preview_steps = preview_steps
 
-    cont = render_preview_list(selected_steps, steps_info)
+    # Container for preview list
+    st.markdown(
+        "### Preview",
+        help="Preview of the selected steps.\n\nTo actually perform actions on them, please click on **Add steps** button.",
+    )
 
-    return cont, steps_df, selected_steps
+    # Check that there are rows selected in the table.
+    if preview_steps == []:
+        st.warning("No rows selected. Please select at least one dataset from the table above.")
+    else:
+        with st.container(border=True):
+            # Render list
+            render_preview_list(steps_info)
+
+            # Button to import
+            import_steps_from_preview()
 
 
-cont, steps_df, selected_steps = first_block_optimized_for_render()
-# UI: Button to add selected steps to the Operations list.
-if cont:
-    with cont:
-        show_button_add_to_selection(selected_steps)
+# Main table, list of selected steps
+num_steps = first_block_optimized_for_render()
+# UI: Button to add selected steps sto the Operations list.
+# show_button_add_to_selection(selected_steps)
 
 
 ########################################
@@ -136,6 +150,7 @@ if cont:
 # User can add from checking in the steps table, but also there are some options to add dependencies, usages, etc.
 ########################################
 # Header
+# st.write(selected_steps)
 render_selection_list(steps_df)
 
 
