@@ -654,6 +654,7 @@ def generate_percentiles_raw(wb_api: WB_API):
             welfare_type="all",
             reporting_level="all",
             ppp_version=2017,
+            download="true",
         )
 
         # Edit percentile file to get the list of different countries
@@ -1325,6 +1326,7 @@ def generate_relative_poverty(wb_api: WB_API):
         welfare_type="all",
         reporting_level="all",
         ppp_version=2017,
+        download="true",
     )
 
     # Patch medians
@@ -1397,7 +1399,7 @@ def generate_key_indicators(wb_api: WB_API):
             welfare_type="all",
             reporting_level="all",
             ppp_version=ppp_version,
-            download="false",
+            download="true",
         )
 
     def get_region_data(povline, ppp_version, versions):
@@ -1415,7 +1417,7 @@ def generate_key_indicators(wb_api: WB_API):
             welfare_type="all",
             reporting_level="all",
             ppp_version=ppp_version,
-            download="false",
+            download="true",
         )
 
     def concurrent_function():
@@ -1467,7 +1469,7 @@ def generate_key_indicators(wb_api: WB_API):
             welfare_type="all",
             reporting_level="national",
             ppp_version=ppp_version,
-            download="false",
+            download="true",
         )
 
     def concurrent_function_china_india():
