@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
 from apps.utils.map_datasets import get_grapher_changes
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import ENV_GRAPHER_USER_ID, OWID_ENV, OWIDEnv
 from etl.db import get_engine
 from etl.git_helpers import get_changed_files
 from etl.grapher import io as gio
@@ -215,21 +215,28 @@ def get_tailscale_ip_to_user_map():
 
 
 @st.cache_data
-def get_grapher_user_id(user_ip: str) -> Optional[int]:
-    """Get the Grapher user ID associated with the given Tailscale IP address."""
+def get_grapher_user(user_ip: Optional[str]) -> gm.User:
+    """Get the Grapher user associated with the given Tailscale IP address. If the
+    IP address is not provided (typically when working on localhost), the user ID
+    is taken from the environment variable.
+
+    Usage:
+        grapher_user = get_grapher_user(st.context.headers.get("X-Forwarded-For"))
+    """
+    # Use local env variable if user_ip is not provided (when on localhost)
+    if user_ip is None:
+        with Session(get_engine()) as session:
+            assert ENV_GRAPHER_USER_ID, "ENV_GRAPHER_USER_ID is not set!"
+            return gm.User.load_user(session, id=int(ENV_GRAPHER_USER_ID))
+
     # Get Tailscale IP-to-User mapping
     ip_to_user_map = get_tailscale_ip_to_user_map()
 
     # Get the Tailscale display name / github username associated with the client's IP address
-    github_user_name = ip_to_user_map.get(user_ip)
+    github_username = ip_to_user_map.get(user_ip)
 
-    if not github_user_name:
-        return None
+    if not github_username:
+        raise ValueError(f"No Github username found for IP address {user_ip}")
 
     with Session(get_engine()) as session:
-        grapher_user = gm.User.load_user(session, github_user_name)
-
-    if grapher_user:
-        return grapher_user.id
-    else:
-        return None
+        return gm.User.load_user(session, github_username=github_username)

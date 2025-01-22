@@ -310,8 +310,13 @@ class User(Base):
     lastSeen: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
     @classmethod
-    def load_user(cls, session: Session, github_username: str) -> Optional["User"]:
-        return session.scalars(select(cls).where(cls.githubUsername == github_username)).one_or_none()
+    def load_user(cls, session: Session, id: Optional[int] = None, github_username: Optional[str] = None) -> "User":
+        if id:
+            return session.scalars(select(cls).where(cls.id == id)).one()
+        elif github_username:
+            return session.scalars(select(cls).where(cls.githubUsername == github_username)).one()
+        else:
+            raise ValueError("Either id or github_username must be provided")
 
 
 class ChartRevisions(Base):
