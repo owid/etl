@@ -128,21 +128,21 @@ def safe_request():
 if __name__ == "__main__":
     main()
 
-df_ = pd.concat(objs=[d for d in df_links.values()])
-link = df_.loc[df_.Indicator_GId == "MSM_CONDOM_USE", "API"].values
-data = requests.get(link[0]).json()
-df = pd.DataFrame.from_records(data["Data"][0]["Observation"])
+# df_ = pd.concat(objs=[d for d in df_links.values()])
+# link = df_.loc[df_.Indicator_GId == "MSM_CONDOM_USE", "API"].values
+# data = requests.get(link[0]).json()
+# df = pd.DataFrame.from_records(data["Data"][0]["Observation"])
 
 
-df_ = pd.concat(objs=[d for d in df_links.values()])
-links = df_.loc[df_.Indicator_GId == "MSM_CONDOM_USE", "API"].values
-subgroups = df_.loc[df_.Indicator_GId == "MSM_CONDOM_USE", "Subgroup_Val_GId"].values
-for link, subgroup in zip(links, subgroups):
-    data = requests.get(link).json()
-    df = pd.DataFrame.from_records(data["Data"][0]["Observation"])
-    print(subgroup)
-    if df.empty:
-        print("!! ERROR !!")
-    else:
-        print(df.TIME_PERIOD.min())
-    print("------------")
+# df_ = pd.concat(objs=[d for d in df_links.values()])
+# links = df_.loc[df_.Indicator_GId == "MSM_CONDOM_USE", "API"].values
+# subgroups = df_.loc[df_.Indicator_GId == "MSM_CONDOM_USE", "Subgroup_Val_GId"].values
+# for link, subgroup in zip(links, subgroups):
+#     data = requests.get(link).json()
+#     df = pd.DataFrame.from_records(data["Data"][0]["Observation"])
+#     print(subgroup)
+#     if df.empty:
+#         print("!! ERROR !!")
+#     else:
+#         print(df.TIME_PERIOD.min())
+#     print("------------")
