@@ -17,6 +17,19 @@ steps:
     - data://meadow/oecd/2025-01-11/mean_age_at_marriage
   data://grapher/oecd/2025-01-11/mean_age_at_marriage:
     - data://garden/oecd/2025-01-11/mean_age_at_marriage
+
+  #
+  # US Census Bureau data on marriages and divorces between 1886-1945
+  #
+  data://meadow/us_census_bureau/2025-01-22/marriages_divorces:
+    - snapshot://us_census_bureau/2025-01-22/marriages_divorces.pdf
+
+  #
+  # CDC data on marriages in the US between 1900-2008
+  #
+  data://meadow/cdc/2025-01-22/marriages:
+    - snapshot://cdc/2025-01-22/marriages.pdf
+
   #
   # ONS Divorces in England and Wales
   #
