@@ -6,7 +6,8 @@ steps:
     - snapshot://oecd/2024-12-30/family_database.csv
   data://garden/oecd/2024-12-30/family_database:
     - data://meadow/oecd/2024-12-30/family_database
-    - data://garden/us_census_bureau/2025-01-22/marriages_divorces
+    - data://meadow/us_census_bureau/2025-01-22/marriages_divorces
+    - data://meadow/cdc/2025-01-22/marriages
   data://grapher/oecd/2024-12-30/family_database:
     - data://garden/oecd/2024-12-30/family_database
 
@@ -76,3 +77,9 @@ steps:
     - data://meadow/us_census_bureau/2025-01-22/marriages_divorces
   data://grapher/us_census_bureau/2025-01-22/marriages_divorces:
     - data://garden/us_census_bureau/2025-01-22/marriages_divorces
+
+  #
+  # Marriages in the US (CDC) 1900-2008
+  #
+  data://meadow/cdc/2025-01-22/marriages:
+    - snapshot://cdc/2025-01-22/marriages.pdf

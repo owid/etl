@@ -15,11 +15,16 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("family_database")
-    ds_garden_us = paths.load_dataset("marriages_divorces")
+    ds_meadow_us_census = paths.load_dataset("marriages_divorces")
+    ds_meadow_us_cdc = paths.load_dataset("marriages")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("family_database")
-    tb_us_hist = ds_garden_us.read("marriages_divorces")
+    tb_us_hist_1886_1945 = ds_meadow_us_census.read("marriages_divorces")
+    tb_us_hist_1945_1990 = ds_meadow_us_cdc.read("marriages")
+
+    # Drop the number_of_marriages column as it is not needed
+    tb_us_hist_1945_1990 = tb_us_hist_1945_1990.drop(columns={"number_of_marriages"})
 
     #
     # Process data.
@@ -57,7 +62,21 @@ def run(dest_dir: str) -> None:
             "Crude marriage rate (marriages per 1000 people)": "marriage_rate",
         }
     )
-    tb = pr.merge(tb, tb_us_hist, on=["country", "year", "marriage_rate", "divorce_rate"], how="outer")
+    # Exclude United States rows for marriage_rates before 1990 in tb
+    tb = tb[~((tb["country"] == "United States") & (tb["year"] < 1990))]
+
+    # Exclude rows for the United States with year after 1990 and anything before 1945 in tb_us_hist_1945_1990
+    tb_us_hist_1945_1990 = tb_us_hist_1945_1990[
+        ~(
+            (tb_us_hist_1945_1990["country"] == "United States")
+            & ((tb_us_hist_1945_1990["year"] > 1989) | (tb_us_hist_1945_1990["year"] < 1946))
+        )
+    ]
+
+    # Combine the tables
+    tb = pr.merge(tb, tb_us_hist_1945_1990, on=["country", "year", "marriage_rate"], how="outer")
+
+    tb = pr.merge(tb, tb_us_hist_1886_1945, on=["country", "year", "marriage_rate", "divorce_rate"], how="outer")
 
     tb = tb.format(["country", "year"])
 
