@@ -226,7 +226,7 @@ def get_grapher_user(user_ip: Optional[str]) -> gm.User:
     # Use local env variable if user_ip is not provided (when on localhost)
     if user_ip is None:
         with Session(get_engine()) as session:
-            assert ENV_GRAPHER_USER_ID, "ENV_GRAPHER_USER_ID is not set!"
+            assert ENV_GRAPHER_USER_ID, "GRAPHER_USER_ID is not set!"
             return gm.User.load_user(session, id=int(ENV_GRAPHER_USER_ID))
 
     # Get Tailscale IP-to-User mapping
