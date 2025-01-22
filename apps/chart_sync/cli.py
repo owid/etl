@@ -18,7 +18,7 @@ from etl.datadiff import _dict_diff
 from etl.grapher import model as gm
 from etl.slack_helpers import send_slack_message
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 log = structlog.get_logger()
 

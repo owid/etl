@@ -13,7 +13,7 @@ from owid.catalog import CHANNEL, LocalCatalog
 from etl import config
 from etl.paths import DATA_DIR
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 
 @click.command(name="reindex")

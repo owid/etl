@@ -1,8 +1,7 @@
-import bugsnag
 import structlog
-from bugsnag.asgi import BugsnagMiddleware
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 
 from api.v1 import v1
 from etl import config
@@ -11,9 +10,7 @@ from etl.slack_helpers import format_slack_message, send_slack_message
 
 log = structlog.get_logger()
 
-bugsnag.configure(
-    api_key=config.BUGSNAG_API_KEY,
-)
+config.enable_sentry()
 
 engine = get_engine()
 
@@ -30,7 +27,7 @@ def get_application():
     )
 
     _app.add_middleware(
-        BugsnagMiddleware,
+        SentryAsgiMiddleware,
     )
 
     return _app

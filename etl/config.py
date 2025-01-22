@@ -16,9 +16,9 @@ from os import environ as env
 from pathlib import Path
 from typing import List, Literal, Optional, cast
 
-import bugsnag
 import git
 import pandas as pd
+import sentry_sdk
 import structlog
 from dotenv import dotenv_values, load_dotenv
 from sqlalchemy.engine import Engine
@@ -224,7 +224,7 @@ ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING e
 # because that would resolve to LXC container instead of the actual server
 TAILSCALE_ADMIN_HOST = "http://owid-admin-prod.tail6e23.ts.net"
 
-BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
+SENTRY_DSN = env.get("SENTRY_DSN")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
 
@@ -251,11 +251,11 @@ DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schem
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
-def enable_bugsnag() -> None:
-    if BUGSNAG_API_KEY:
-        bugsnag.configure(
-            api_key=BUGSNAG_API_KEY,
-        )  # type: ignore
+def enable_sentry() -> None:
+    if SENTRY_DSN:
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+        )
 
 
 # Wizard config
