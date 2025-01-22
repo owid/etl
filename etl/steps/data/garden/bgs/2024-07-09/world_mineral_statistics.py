@@ -119,7 +119,7 @@ COMMODITY_MAPPING = {
     ("Chromium", "Metal"): None,
     # NOTE: The following has only imports/exports data.
     ("Chromium", "Ores & concentrates"): None,
-    ("Chromium ores and concentrates", "Unknown"): ("Chromium", "Mine"),
+    ("Chromium ores and concentrates", "Unknown"): ("Chromium", "Mine, gross weight"),
     # NOTE: All subcommodities of coal production will be summed up into one.
     ("Coal", "Anthracite"): ("Coal", "Mine, anthracite"),
     ("Coal", "Anthracite & Bituminous"): ("Coal", "Mine, anthracite & Bituminous"),
@@ -1195,7 +1195,7 @@ def run(dest_dir: str) -> None:
     # I'll remove them.
     tb.loc[
         (tb["commodity"] == "Chromium")
-        & (tb["sub_commodity"] == "Mine")
+        & (tb["sub_commodity"] == "Mine, gross weight")
         & (tb["country"] == "Colombia")
         & (tb["year"] <= 1976),
         "value",

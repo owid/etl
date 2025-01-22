@@ -49,7 +49,7 @@ production|Bauxite|Mine|tonnes:
   - Including nepheline concentrates and alunite.
 #   - Data for Alabama only.
 #   - Excluding data from August to December for the Republic of Croatia.
-production|Chromium|Mine|tonnes:
+production|Chromium|Mine, gross weight|tonnes:
   - In addition to the countries listed, Bulgaria, Democratic P.R. of Korea and Thailand are believed to produce chromite (1992 Onwards).
   - In addition to the countries listed, Bulgaria is believed to produce chromite (2000 Onwards).
   - Estimate.
