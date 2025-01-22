@@ -1,9 +1,8 @@
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import streamlit as st
 from structlog import get_logger
 
-from apps.wizard.app_pages.dashboard.utils import _add_steps_to_selection
 from apps.wizard.utils.components import st_horizontal
 
 log = get_logger()
@@ -12,37 +11,28 @@ log = get_logger()
 DETAILS_LIST_CONTAINER_HEIGHT = 300
 
 
-def render_preview_list(selected_steps: List[str], steps_info):
-    help_text = (
-        "Preview of the selected steps.\n\nTo actually perform actions on them, please click on **Add steps** button."
-    )
-
+def render_preview_list(steps_info):
+    # Container for preview list
     st.markdown(
         "### Preview",
-        help=help_text,
+        help="Preview of the selected steps.\n\nTo actually perform actions on them, please click on **Add steps** button.",
     )
 
     # Check that there are rows selected in the table.
-    if selected_steps == []:
+    if st.session_state.preview_steps == []:
         st.warning("No rows selected. Please select at least one dataset from the table above.")
-        return
+    else:
+        with st.container(border=True):
+            # Render list
+            with st_horizontal():
+                for selected_step in st.session_state.preview_steps:
+                    preview_step_info = steps_info[selected_step]
+                    step_alias = selected_step.replace("data://", "")
 
-    with st.container(border=True):
-        # UI: Display details of selected steps
-        # with st.container(border=True, height=DETAILS_LIST_CONTAINER_HEIGHT):
-        # for selected_step, selected_steps_info in selected_steps_info.items():
-        with st_horizontal():
-            for selected_step in selected_steps:
-                selected_step_info = steps_info[selected_step]
-                step_alias = selected_step.replace("data://", "")
-
-                # st.write(selected_step)
-                with st.popover(step_alias, icon=":material/info:"):
-                    #     # _render_step_in_list(selected_step_info)
-                    _show_step_details(selected_step_info)
-
-        # UI: Button to add selected steps to the Operations list.
-        _show_button_add_to_selection(selected_steps)
+                    # st.write(selected_step)
+                    with st.popover(step_alias, icon=":material/info:"):
+                        #     # _render_step_in_list(selected_step_info)
+                        _show_step_details(preview_step_info)
 
 
 def _get_selected_steps_info(df, steps_df) -> Dict[str, Any]:
@@ -96,16 +86,3 @@ def _show_step_details(selected_step_info):
             st.markdown(text + items)
         else:
             st.text(f"{item_name}: {value}")
-
-
-def _show_button_add_to_selection(selected_steps):
-    """Display button to add selected steps to the selection."""
-    # Button to add selected steps to the selection.
-    num_steps = len(selected_steps)
-    if num_steps == 1:
-        text = "Add 1 step"
-    else:
-        text = f"Add {num_steps} steps"
-    if st.button(text, type="primary", help="Add steps to the selection."):
-        st.session_state.selected_steps_table += selected_steps
-        _add_steps_to_selection(selected_steps)

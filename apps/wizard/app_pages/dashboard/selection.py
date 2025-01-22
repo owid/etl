@@ -1,40 +1,99 @@
+from typing import List
+
 import pandas as pd
 import streamlit as st
+from rapidfuzz import fuzz
 from structlog import get_logger
 
-from apps.wizard.app_pages.dashboard.utils import NON_UPDATEABLE_IDENTIFIERS, _add_steps_to_selection, remove_step
+from apps.wizard.app_pages.dashboard.utils import NON_UPDATEABLE_IDENTIFIERS, unselect_step
 from apps.wizard.utils.components import st_horizontal
 
 log = get_logger()
 
+# Operations allowed for each step
+OPERATIONS = [
+    (
+        ":material/delete_outline:",
+        "unselect_step",
+        "Unselect step and remove it from the selection list.",
+    ),
+    (
+        ":material/add: direct dependencies",
+        "direct_dependencies",
+        "Add direct dependencies of this step to the selection. Direct dependencies are steps that are loaded directly by the current step.",
+    ),
+    (
+        ":material/add: _all_ dependencies",
+        "all_active_dependencies",
+        "Add all dependencies (including indirect dependencies) of this step to the selection. Indirect dependencies are steps that are needed, but not directly loaded, by the current step. In other words: dependencies of dependencies.",
+    ),
+    (
+        ":material/add:  direct usages",
+        "direct_usages",
+        "Add direct usages of this step to the selection. Direct usages are those steps that load the current step directly.",
+    ),
+    (
+        ":material/add: _all_ usages",
+        "all_active_usages",
+        "Add all usages (including indirect usages) of this step to the selection. Indirect usages are those steps that need, but do not directly load, the current step. In other words: usages of usages.",
+    ),
+]
+# Display format for operations
+OPERATIONS_FORMAT = {op[1]: op[0] for op in OPERATIONS}
+OPERATIONS_NAMES = list(OPERATIONS_FORMAT.keys())
+# Help text
+HELP_TEXT = "List of steps to be operated on. You can add, remove, and update steps here. Accepted operations:\n"
+for op in OPERATIONS:
+    text = f"- **{op[0]}**: {op[2]}"
+    HELP_TEXT += f"\n{text}"
+
+HELP_TEXT += "\n\nSteps with ':material/table_chart:' and in bold come from the main table. This means that they were imported by selecting rows in the main table, and clicking on 'Add steps' from the preview section. Instead, steps added as dependencies or usage come in regular font and without any icon."
+
 
 def render_selection_list(steps_df):
     """Render selection list."""
-    help_text = "List of steps to be operated on. You can add, remove, and update steps here."
     if st.session_state.selected_steps:
         with st_horizontal():
-            st.markdown("""### Selection""", help=help_text)
+            st.markdown("""### Selection""", help=HELP_TEXT)
             num_steps = len(st.session_state.selected_steps)
             if num_steps == 1:
-                text = ":primary-background[1 step]"
+                text = ":primary-background[1 step selected]"
             else:
-                text = f":primary-background[{len(st.session_state.selected_steps)} steps]"
+                text = f":primary-background[{len(st.session_state.selected_steps)} steps selected]"
             st.markdown(text)
 
+        import_steps_from_preview()
+
         with st.container(border=True):
-            for index, step in enumerate(st.session_state.selected_steps):
+            text = st.text_input(
+                "Step",
+                value=None,
+                key="dashboard_step_search",
+                placeholder="Search step...",
+                label_visibility="collapsed",
+            )
+            st.session_state.selected_steps_sorted = st.session_state.selected_steps
+            if text is not None:
+                st.session_state.selected_steps_sorted = sorted(
+                    st.session_state.selected_steps,
+                    key=lambda step_name: fuzz.ratio(text, step_name),
+                    reverse=True,
+                )
+            for step in st.session_state.selected_steps_sorted:
                 # Define the layout of the list.
-                _show_row_with_step_details(steps_df, step, index)
+                _show_row_with_step_details(step, steps_df)
 
             # Show main buttons in the selection
             _show_main_buttons(steps_df)
 
     else:
-        st.markdown("""### Selection""", help=help_text)
+        with st_horizontal():
+            st.markdown("""### Selection""", help=HELP_TEXT)
+        import_steps_from_preview()
         st.warning("No datasets selected. Please add at least one dataset from the preview list.")
 
 
-def _show_row_with_step_details(steps_df, step, index):
+def _show_row_with_step_details(step, steps_df):
     """Show row in the selection list with the details of the given step.
 
     # Define the columns in order (from left to right) as a list of tuples (message, key suffix, function).
@@ -43,60 +102,42 @@ def _show_row_with_step_details(steps_df, step, index):
         * Execute ETL step for only the current step.
         * Edit metadata for the current step.
     """
-    col1, col2 = st.columns([2.5, 4])
-    with col1:
-        with st.container(height=40, border=False):
-            # with col1:
-            if step in st.session_state.selected_steps_table:
-                st.markdown(f"**{step.replace('data://', '')}**")
-            else:
-                st.markdown(f"{step.replace('data://', '')}")
-    with col2:
-        with st_horizontal(justify_content="space-between"):
-            actions = [
-                (
-                    "Add direct dependencies",
-                    "direct_dependencies",
-                    "Add direct dependencies of this step to the selection. Direct dependencies are steps that are loaded directly by the current step.",
-                ),
-                (
-                    "Add all dependencies",
-                    "all_active_dependencies",
-                    "Add all dependencies (including indirect dependencies) of this step to the selection. Indirect dependencies are steps that are needed, but not directly loaded, by the current step. In other words: dependencies of dependencies.",
-                ),
-                (
-                    "Add direct usages",
-                    "direct_usages",
-                    "Add direct usages of this step to the selection. Direct usages are those steps that load the current step directly.",
-                ),
-                (
-                    "Add all usages",
-                    "all_active_usages",
-                    "Add all usages (including indirect usages) of this step to the selection. Indirect usages are those steps that need, but do not directly load, the current step. In other words: usages of usages.",
-                ),
-            ]
-            unique_key = f"remove_{step}_{index}"
-            st.button(
-                label="🗑️",
-                key=unique_key,
-                on_click=lambda step=step: remove_step(step),
-                help="Remove this step from the selection.",
-                type="secondary",
-            )
-            # Display the selection list.
-            for action_name, key_suffix, help_text in actions:
-                # Create a unique key for the button (if any button is to be created).
-                unique_key = f"{key_suffix}_{step}_{index}"
-                # Add related steps
-                st.button(
-                    label=f":blue[{action_name}]",
-                    key=unique_key,
-                    on_click=lambda step=step, key_suffix=key_suffix: _include_related_steps(
-                        steps_df, step, key_suffix
-                    ),
-                    help=help_text,
-                    type="tertiary",
-                )
+    if step in st.session_state.preview_steps:
+        step_name = f":material/table_chart: **{step.replace('data://', '')}**"
+    else:
+        step_name = f"{step.replace('data://', '')}"
+
+    # Unique key for the row
+    unique_key = f"selection_{step}"
+
+    # with st.container(border=True):
+    cols = st.columns([1, 2])
+    with cols[0]:
+        st.markdown(step_name)
+    with cols[1]:
+        st.pills(
+            step_name,
+            options=OPERATIONS_NAMES,
+            format_func=lambda x: OPERATIONS_FORMAT.get(x, x),
+            on_change=lambda: _on_operations_pills_change(unique_key, step, steps_df),
+            key=f"{unique_key}_pills",
+            label_visibility="collapsed",
+        )
+
+
+def _on_operations_pills_change(unique_key: str, step: str, steps_df: pd.DataFrame):
+    st.session_state[unique_key] = st.session_state[f"{unique_key}_pills"]
+    st.session_state[f"{unique_key}_pills"] = None
+
+    # Perform operation
+    # st.toast(f"`{step}`: You selected **{st.session_state[unique_key]}**")
+
+    # Perform operation
+    v = st.session_state[unique_key]
+    if v == "unselect_step":
+        unselect_step(step)
+    else:
+        _include_related_steps(steps_df, step, v)
 
 
 def _show_main_buttons(steps_df):
@@ -143,9 +184,8 @@ def _include_related_steps(steps_df: pd.DataFrame, step: str, column_related: st
     if len(steps_related) == 0:
         log.error(f"Step {step} not found in the steps table.")
     elif len(steps_related) == 1:
-        steps_related = steps_df[steps_df["step"] == step][column_related].item()
         # Add steps to selection
-        _add_steps_to_selection(steps_related)
+        _add_steps_to_selection(steps_related[column_related].item())
     else:
         st.error(f"More than one step found with the same URI {step}!")
         st.stop()
@@ -177,3 +217,44 @@ def _upgrade_steps_in_selection(steps_df):
             new_list.append(step)
 
     st.session_state.selected_steps = new_list
+
+
+def import_steps_from_preview():
+    """Display button to add selected steps to the selection."""
+    # Don't show button if there are no steps selected
+    num_steps = len(st.session_state.preview_steps)
+    if num_steps == 0:
+        return
+
+    # Get number of steps in preview that are not in the selection
+    missing_steps = {step for step in st.session_state.preview_steps if step not in st.session_state.selected_steps}
+    num_steps_missing_in_selection = len(missing_steps)
+
+    # Disable button if all steps are already in the selection
+    if num_steps_missing_in_selection == 0:  # & (num_steps_selected > 0):
+        return
+    else:
+        if num_steps_missing_in_selection != num_steps:
+            text = f"Import steps from preview ({num_steps_missing_in_selection} missing)"
+        else:
+            text = f"Import steps from preview ({num_steps_missing_in_selection} missing)"
+        missing_steps_str = "- " + "\n- ".join(missing_steps)
+        kwargs = {
+            "label": text,
+            "help": f"Import steps to the selection list. Steps to import are:\n\n{missing_steps_str}",
+            "disabled": False,
+            "icon": ":material/add:",
+        }
+    st.button(
+        **kwargs,
+        type="secondary",
+        on_click=lambda: _add_steps_to_selection(st.session_state.preview_steps),
+    )
+
+
+def _add_steps_to_selection(steps_related: List[str]):
+    """Add steps to the selection."""
+    # Remove those already in selection
+    new_selected_steps = [step for step in steps_related if step not in st.session_state.selected_steps]
+    # Add new steps to the selection
+    st.session_state.selected_steps += new_selected_steps
