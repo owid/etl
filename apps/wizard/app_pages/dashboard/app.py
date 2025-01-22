@@ -114,20 +114,29 @@ st.session_state.preview_steps = df_selected["step"].tolist() if df_selected is 
 # Preview list
 render_preview_list(steps_info)
 
+
 ########################################
-# SELECTION LIST MANAGEMENT
+# SELECTION LIST & OPERATIONS
 #
-# Add steps based on user selections.
-# User can add from checking in the steps table, but also there are some options to add dependencies, usages, etc.
 ########################################
-# Header
-# st.write(selected_steps)
-render_selection_list(steps_df)
+@st.fragment
+def render_selection_opertions():
+    ########################################
+    # SELECTION LIST MANAGEMENT
+    #
+    # Add steps based on user selections.
+    # User can add from checking in the steps table, but also there are some options to add dependencies, usages, etc.
+    ########################################
+    # Header
+    # st.write(selected_steps)
+    render_selection_list(steps_df)
+
+    ########################################
+    # OPERATE ON STEPS (ACTIONS)
+    ########################################
+    # st.write(st.session_state.selected_steps)
+    if st.session_state.selected_steps:
+        render_operations()
 
 
-########################################
-# OPERATE ON STEPS (ACTIONS)
-########################################
-
-if st.session_state.selected_steps:
-    render_operations()
+render_selection_opertions()

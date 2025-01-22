@@ -50,7 +50,6 @@ for op in OPERATIONS:
 HELP_TEXT += "\n\nSteps with ':material/table_chart:' and in bold come from the main table. This means that they were imported by selecting rows in the main table, and clicking on 'Add steps' from the preview section. Instead, steps added as dependencies or usage come in regular font and without any icon."
 
 
-@st.fragment
 def render_selection_list(steps_df):
     """Render selection list."""
     if st.session_state.selected_steps:
