@@ -62,6 +62,8 @@ def run(dest_dir: str) -> None:
             "Crude marriage rate (marriages per 1000 people)": "marriage_rate",
         }
     )
+    tb = pr.merge(tb, tb_us_hist_1886_1945, on=["country", "year", "marriage_rate", "divorce_rate"], how="outer")
+
     # Exclude United States rows for marriage_rates before 1990 in tb
     tb = tb[~((tb["country"] == "United States") & (tb["year"] < 1990))]
 
@@ -75,8 +77,6 @@ def run(dest_dir: str) -> None:
 
     # Combine the tables
     tb = pr.merge(tb, tb_us_hist_1945_1990, on=["country", "year", "marriage_rate"], how="outer")
-
-    tb = pr.merge(tb, tb_us_hist_1886_1945, on=["country", "year", "marriage_rate", "divorce_rate"], how="outer")
 
     tb = tb.format(["country", "year"])
 
