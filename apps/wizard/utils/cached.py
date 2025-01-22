@@ -214,20 +214,14 @@ def get_tailscale_ip_to_user_map():
     return ip_to_user
 
 
-@st.cache_data
-def get_grapher_user(user_ip: Optional[str]) -> gm.User:
-    """Get the Grapher user associated with the given Tailscale IP address. If the
-    IP address is not provided (typically when working on localhost), the user ID
-    is taken from the environment variable.
+def get_grapher_user_from_ip(user_ip: Optional[str] = None) -> gm.User:
+    """Get the Grapher user associated with the given Tailscale IP address.
 
-    Usage:
-        grapher_user = get_grapher_user(st.context.headers.get("X-Forwarded-For"))
+    If no IP is given, it'll try to extract it from the header context.
     """
-    # Use local env variable if user_ip is not provided (when on localhost)
+    # Get ip if none is given
     if user_ip is None:
-        with Session(get_engine()) as session:
-            assert ENV_GRAPHER_USER_ID, "GRAPHER_USER_ID is not set!"
-            return gm.User.load_user(session, id=int(ENV_GRAPHER_USER_ID))
+        user_ip = st.context.headers.get("X-Forwarded-For")
 
     # Get Tailscale IP-to-User mapping
     ip_to_user_map = get_tailscale_ip_to_user_map()
@@ -240,3 +234,23 @@ def get_grapher_user(user_ip: Optional[str]) -> gm.User:
 
     with Session(get_engine()) as session:
         return gm.User.load_user(session, github_username=github_username)
+
+
+def get_grapher_user_from_env() -> gm.User:
+    """Get the Grapher user based on the environment variable.
+
+    This function is typically used when working in localhost.
+    """
+    # Use local env variable if user_ip is not provided (when on localhost)
+    with Session(get_engine()) as session:
+        assert ENV_GRAPHER_USER_ID, "GRAPHER_USER_ID is not set!"
+        return gm.User.load_user(session, id=int(ENV_GRAPHER_USER_ID))
+
+
+def get_grapher_user() -> gm.User:
+    """Get the Grapher user based on IP if working on staging server or from env
+    if working locally."""
+    if OWID_ENV.env_local == "dev":
+        return get_grapher_user_from_env()
+    else:
+        return get_grapher_user_from_ip()

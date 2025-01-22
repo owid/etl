@@ -96,7 +96,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
 def push_new_charts(charts: List[gm.Chart]) -> None:
     """Updating charts in the database."""
     # Use Tailscale user if it is available, otherwise use GRAPHER_USER_ID from env
-    grapher_user_id = get_grapher_user(st.context.headers.get("X-Forwarded-For")).id
+    grapher_user_id = get_grapher_user().id
 
     # API to interact with the admin tool
     api = AdminAPI(OWID_ENV, grapher_user_id=grapher_user_id)
