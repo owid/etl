@@ -51,7 +51,7 @@ def chart_diff_status(charts_df: pd.DataFrame) -> ChartDiffStatus:
     # TODO: Old staging servers might not have the change_types column, but fix this once
     #   all staging servers are updated
     if "change_types" in charts_df.columns:
-        charts_df = charts_df[charts_df.change_types.map(lambda x: "config" in x)]
+        charts_df = charts_df[charts_df.change_types.map(lambda x: "config" in x) | charts_df.is_new]
 
     if charts_df.empty:
         return ChartDiffStatus("✅", "No charts for review", "neutral")
@@ -103,7 +103,7 @@ def format_chart_diff(df: pd.DataFrame) -> str:
         num_charts_metadata_change = df.change_types.map(lambda x: "metadata" in x).sum()
 
         # From now on, ignore charts with no config changes
-        df = df[df.change_types.map(lambda x: "config" in x)]
+        df = df[df.change_types.map(lambda x: "config" in x) | df.is_new]
     else:
         num_charts_data_change = 0
         num_charts_metadata_change = 0
