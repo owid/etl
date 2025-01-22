@@ -31,7 +31,7 @@ from wfork_streamlit_profiler import Profiler
 
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
 from apps.wizard.utils.step_form import StepForm
-from etl.config import OWID_ENV, enable_sentry
+from etl.config import OWID_ENV, SENTRY_DSN, enable_sentry
 from etl.db import read_sql
 from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
@@ -560,6 +560,10 @@ def enable_sentry_for_streamlit():
     """Enable Sentry for streamlit. Uses this workaround
     https://github.com/streamlit/streamlit/issues/3426#issuecomment-1848429254
     """
+    # Quit if SENTRY_DSN is not set
+    if not SENTRY_DSN:
+        return
+
     enable_sentry()
 
     error_util = sys.modules["streamlit.error_util"]
@@ -570,7 +574,16 @@ def enable_sentry_for_streamlit():
         capture_exception(exception)
         return original_handler(exception)
 
-    error_util.handle_uncaught_app_exception = sentry_handler  # type: ignore
+    # Streamlit doesn't have exception hook, hack it by patching
+    # all places where handle_uncaught_app_exception is called
+    modules_to_patch = [
+        "streamlit.runtime.scriptrunner.exec_code",
+        "streamlit.error_util",
+    ]
+
+    for module_name in modules_to_patch:
+        module = sys.modules[module_name]
+        module.handle_uncaught_app_exception = sentry_handler  # type: ignore
 
 
 def _get_staging_creation_time(session: Session):
@@ -622,3 +635,7 @@ def as_list(s):
         except (ValueError, SyntaxError):
             return s
     return s
+
+
+# Enable sentry when apps.wizard.utils is loaded
+enable_sentry_for_streamlit()
