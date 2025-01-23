@@ -26,7 +26,7 @@ from etl.snapshot import Snapshot, SnapshotMeta
 
 from . import utils
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 log = structlog.get_logger()
 

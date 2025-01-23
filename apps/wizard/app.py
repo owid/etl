@@ -17,6 +17,9 @@ args = utils.parse_args_from_cmd()
 if args.debug:
     PROFILER = utils.start_profiler()
 
+# Enable Sentry if SENTRY_DSN is in .env
+utils.enable_sentry_for_streamlit()
+
 ###########################################
 # DEFINE PAGES
 ###########################################

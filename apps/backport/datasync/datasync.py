@@ -14,7 +14,7 @@ from etl import config
 
 log = structlog.get_logger()
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 
 def upload_gzip_dict(d: Dict[str, Any], s3_path: str, private: bool = False) -> None:

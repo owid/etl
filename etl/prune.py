@@ -10,7 +10,7 @@ from owid.catalog import CHANNEL, LocalCatalog
 from etl import config, paths
 from etl.command import construct_dag
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 log = structlog.get_logger()
 
