@@ -13,14 +13,14 @@ NOTE:
     EPI -- Epidemic indicators (https://aidsinfo.unaids.org/):
     These indicators provide data on the status and trends of the HIV epidemic within populations. They include metrics such as HIV prevalence, incidence rates, and AIDS-related mortality. Epidemiological indicators are essential for understanding the scope and dynamics of the epidemic, informing public health strategies, and allocating resources effectively.
 
-    GAM -- Global AIDS Monitoring:
+    GAM -- Global AIDS Monitoring (https://indicatorregistry.unaids.org):
     This framework encompasses a comprehensive set of indicators designed to assess progress towards achieving global HIV targets, as outlined in political declarations and strategic plans. The GAM indicators cover various aspects of the HIV response, including prevention, treatment, and support services. Countries report on these indicators annually to UNAIDS, facilitating global monitoring and accountability.
 
 
-    KPA -- Key Population Atlas:
+    KPA -- Key Population Atlas (https://kpatlas.unaids.org/dashboard):
     This category focuses on indicators related to key populations that are at higher risk of HIV infection, such as sex workers, men who have sex with men, people who inject drugs, transgender individuals, and prisoners. The Key Population Atlas provides data on the size, prevalence, and service coverage for these groups, supporting targeted interventions and resource allocation to address their specific needs.
 
-    NCPI -- National Commitments and Policy Instrument:
+    NCPI -- National Commitments and Policy Instrument (https://lawsandpolicies.unaids.org/)
     The NCPI is a tool used to evaluate the policy, legal, and programmatic environment of national HIV responses. It includes questions related to the implementation of laws, policies, and strategies that affect the effectiveness of HIV interventions. The NCPI helps identify structural barriers and enablers within countries, guiding improvements in the national response to HIV.
 
 2) We import all data, we will filter in later stages.
