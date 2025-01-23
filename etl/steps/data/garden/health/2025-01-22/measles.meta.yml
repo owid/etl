@@ -14,13 +14,13 @@ tables:
   measles:
     variables:
       countvalue:
-        title: Number of measles cases
+        title: Number of measles cases in << state >>
         unit: cases
       population:
-        title: Population
+        title: Population of << state >>
         unit: people
       case_rate:
-        title: Measles case rate
+        title: Measles case rate in << state >>
         description_short: The number of measles cases per 100,000 population
         unit: cases per 100,000 population
         processing_level: major
