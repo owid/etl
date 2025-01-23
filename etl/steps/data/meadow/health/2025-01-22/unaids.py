@@ -1,83 +1,96 @@
 """Load a snapshot and create a meadow dataset."""
 
-import ast
-
 import numpy as np
-from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-# Logger
-log = get_logger()
 
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Retrieve snapshot.
-    snap = paths.load_snapshot("unaids.csv")
-
-    # Load data from snapshot.
-    log.info("health.unaids: loading data from snapshot")
-    tb = snap.read(safe_types=False)
+    # Retrieve data from snapshots (~700 MB)
+    tb_epi = paths.read_snap_table("unaids_epi.csv")  # 2,103,487 rows, 551 MB
+    tb_gam = paths.read_snap_table("unaids_gam.csv")  # 166,550 rows, 42 MB
+    tb_kpa = paths.read_snap_table("unaids_kpa.csv")  # 38,240 rows, 10 MB
+    tb_ncpi = paths.read_snap_table("unaids_ncpi.csv")  # 263,428 rows, 80 MB
 
     #
     # Process data.
     #
     # Split columns of type dictionary in multiple columns
-    log.info("health.unaids: basic table cleaning")
-    # Fields as dictionaries
-    tb["INDICATOR"] = tb["INDICATOR"].apply(ast.literal_eval)
-    tb["SUBGROUP"] = tb["SUBGROUP"].apply(ast.literal_eval)
-    tb["AREA"] = tb["AREA"].apply(ast.literal_eval)
-    tb["UNIT"] = tb["UNIT"].apply(ast.literal_eval)
-    # Add new columns
-    tb["INDICATOR_DESCRIPTION"] = tb["INDICATOR"].apply(lambda x: x["value"])
-    tb["INDICATOR"] = tb["INDICATOR"].apply(lambda x: x["id"])
-    tb["SUBGROUP_DESCRIPTION"] = tb["SUBGROUP"].apply(lambda x: x["value"])
-    tb["SUBGROUP"] = tb["SUBGROUP"].apply(lambda x: x["id"])
-    tb["COUNTRY"] = tb["AREA"].apply(lambda x: x["value"])
-    tb["UNIT"] = tb["UNIT"].apply(lambda x: x["id"])
-    # Remove unused columns
-    tb = tb.drop(columns=["AREA"])
+    paths.log.info("health.unaids: basic table cleaning")
+    tb_epi = clean_table(tb_epi)  # 360 MB
+    tb_gam = clean_table(tb_gam)  # 25 MB
+    tb_kpa = clean_table(tb_kpa)  # 7.5 MB
+    tb_ncpi = clean_table(tb_ncpi)  # 67 MB
 
-    # Rename column for year
-    tb = tb.rename(columns={"TIME_PERIOD": "year"})
+    # TODO: Check is_text=True what is the value and correct
+    # tb_kpa[tb_kpa["is_text"]].value.unique()
+    # tb_kpa[(tb_kpa.value=="0") & (tb_kpa["is_text"])]
 
-    # Underscore columns
-    tb = tb.underscore()
-
-    # Remove duplicates
-    tb = tb.drop_duplicates(subset=["country", "year", "indicator", "subgroup"], keep="first")
-
-    # Set index
-    tb = tb.set_index(["country", "year", "indicator", "subgroup"], verify_integrity=True)
-
-    log.info("health.unaids: fix observed values (NaNs and typos)")
-    # Replace '...' with NaN
-    tb["obs_value"] = tb["obs_value"].replace("...", np.nan)
-    tb["obs_value"] = tb["obs_value"].replace("3488-56", np.nan)
     # Remove unwanted indicators
-    log.info("health.unaids: remove unwanted indicators")
-    id_desc_rm = [
-        "National AIDS strategy/policy",
-        "National AIDS strategy/policy includes dedicated budget for gender transformative interventions",
+    # id_desc_rm = [
+    #     "National AIDS strategy/policy",
+    #     "National AIDS strategy/policy includes dedicated budget for gender transformative interventions",
+    # ]
+    # tb = tb[~tb["indicator_description"].isin(id_desc_rm)]
+    # # Type
+    # tb = tb.astype(
+    #     {
+    #         "obs_value": float,
+    #     }
+    # )
+
+    # Format
+    tables = [
+        tb_epi.format(["country", "year", "indicator", "dimension"], short_name="epi"),
+        tb_gam.format(["country", "year", "indicator", "dimension"], short_name="gam"),
+        tb_kpa.format(["country", "year", "indicator", "dimension"], short_name="kpa"),
+        tb_ncpi.format(["country", "year", "indicator", "dimension"], short_name="ncpi"),
     ]
-    tb = tb[~tb["indicator_description"].isin(id_desc_rm)]
-    # Type
-    tb = tb.astype(
-        {
-            "obs_value": float,
-        }
-    )
+
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(
+        dest_dir,
+        tables=tables,
+    )
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
+
+
+def clean_table(tb):
+    """Minor table cleaning."""
+    paths.log.info(f"Formatting table {tb.m.short_name}")
+
+    # Rename columns, only keep relevant
+    columns = {
+        "TIME_PERIOD": "year",
+        "INDICATOR.id": "indicator",
+        "INDICATOR.value": "indicator_description",
+        "SUBGROUP.id": "dimension",
+        "SUBGROUP.value": "dimension_name",
+        # "AREA.id": "code",
+        "AREA.value": "country",
+        "UNIT.id": "unit",
+        "SOURCE": "source",
+        "IS_TEXTUALDATA": "is_text",
+        "OBS_VALUE": "value",
+    }
+    tb = tb.rename(columns=columns)[columns.values()]
+
+    # Drop duplicates
+    tb = tb.drop_duplicates(subset=["country", "year", "indicator", "dimension"], keep="first")
+
+    # Handle NaNs
+    tb["value"] = tb["value"].replace("...", np.nan)
+    tb = tb.dropna(subset=["value"])
+
+    return tb
