@@ -9,12 +9,19 @@ Including this in the ETL facilitates creating new versions of the data in the f
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
+from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Initialize logger
+log = get_logger()
+
+# Define most recent year, so we don't process projections
+MOST_RECENT_YEAR = 2024
 
 
 def run(dest_dir: str) -> None:
@@ -62,13 +69,13 @@ def run(dest_dir: str) -> None:
 
     # UN WPP
     tb_un_wpp = tb_un_wpp[
-        (tb_un_wpp["sex"] == "all") & (tb_un_wpp["age"] == "0") & (tb_un_wpp["variant"] == "estimates")
+        (tb_un_wpp["sex"] == "all") & (tb_un_wpp["age"] == 0) & (tb_un_wpp["variant"] == "estimates")
     ].reset_index(drop=True)
     tb_un_wpp = tb_un_wpp[["country", "year", "life_expectancy"]]
 
     # IGME
     tb_igme = tb_igme[
-        (tb_igme["obs_value"] == "Under five mortality rate")
+        (tb_igme["indicator"] == "Under-five mortality rate")
         & (tb_igme["sex"] == "Total")
         & (tb_igme["wealth_quintile"] == "Total")
         & (tb_igme["unit_of_measure"] == "Deaths per 100 live births")
@@ -161,8 +168,21 @@ def select_most_recent_data(tb: Table) -> Table:
         # Define latest year in the dataset
         latest_year = tb_indicator["year"].max()
 
-        # Select all the rows with year higher or equal to latest_year - 10
-        tb_indicator = tb_indicator[tb_indicator["year"] >= latest_year - 10].reset_index(drop=True)
+        if latest_year > MOST_RECENT_YEAR:
+            log.warning(
+                f"Indicator {indicator} has data for until year {latest_year}, which is higher than {MOST_RECENT_YEAR}. We keep only data until {MOST_RECENT_YEAR}."
+            )
+
+            # Drop rows with year higher than MOST_RECENT_YEAR
+            tb_indicator = tb_indicator[tb_indicator["year"] <= MOST_RECENT_YEAR].reset_index(drop=True)
+
+        # Calculate latest year again
+        latest_year = tb_indicator["year"].max()
+
+        log.info(f"The latest year for indicator {indicator} is {latest_year}.")
+
+        # Select all the rows where the data is at most 10 years old (MOST_RECENT_YEAR - 10)
+        tb_indicator = tb_indicator[tb_indicator["year"] >= MOST_RECENT_YEAR - 10].reset_index(drop=True)
 
         # Drop year column
         tb_indicator = tb_indicator.drop(columns=["year"])
