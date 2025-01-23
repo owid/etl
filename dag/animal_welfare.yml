@@ -57,15 +57,6 @@ steps:
   data://grapher/animal_welfare/2023-09-01/chick_culling_laws:
     - data://garden/animal_welfare/2023-09-01/chick_culling_laws
   #
-  # Fur laws (Fur Free Alliance, 2023).
-  #
-  data://meadow/animal_welfare/2023-10-24/fur_laws:
-    - snapshot://animal_welfare/2023-10-24/fur_laws.xlsx
-  data://garden/animal_welfare/2023-10-24/fur_laws:
-    - data://meadow/animal_welfare/2023-10-24/fur_laws
-  data://grapher/animal_welfare/2023-10-24/fur_laws:
-    - data://garden/animal_welfare/2023-10-24/fur_laws
-  #
   # Total number of slaughtered animals.
   #
   data://garden/animal_welfare/2024-05-20/animals_used_for_food:
@@ -81,22 +72,6 @@ steps:
     - data://meadow/animal_welfare/2024-06-04/bullfighting_laws
   data://grapher/animal_welfare/2024-06-04/bullfighting_laws:
     - data://garden/animal_welfare/2024-06-04/bullfighting_laws
-  #
-  # Fur laws (Fur Free Alliance).
-  #
-  data://meadow/animal_welfare/2024-09-13/fur_laws:
-    - snapshot://animal_welfare/2024-09-13/fur_laws.csv
-  #
-  # Fur laws (Fur Free Alliance).
-  #
-  data://garden/animal_welfare/2024-09-13/fur_laws:
-    - data://meadow/animal_welfare/2024-09-13/fur_laws
-    - data://garden/regions/2023-01-01/regions
-  #
-  # Fur laws (Fur Free Alliance).
-  #
-  data://grapher/animal_welfare/2024-09-13/fur_laws:
-    - data://garden/animal_welfare/2024-09-13/fur_laws
   #
   # Farmed finfishes used for food (Mood et al. 2023).
   #

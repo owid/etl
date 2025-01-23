@@ -34,3 +34,28 @@ steps:
     - data://garden/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food
   data://grapher/animal_welfare/2023-08-14/number_of_farmed_fish:
     - data://garden/animal_welfare/2023-08-14/number_of_farmed_fish
+  #
+  # Fur laws (Fur Free Alliance, 2023).
+  #
+  data://meadow/animal_welfare/2023-10-24/fur_laws:
+    - snapshot://animal_welfare/2023-10-24/fur_laws.xlsx
+  data://garden/animal_welfare/2023-10-24/fur_laws:
+    - data://meadow/animal_welfare/2023-10-24/fur_laws
+  data://grapher/animal_welfare/2023-10-24/fur_laws:
+    - data://garden/animal_welfare/2023-10-24/fur_laws
+  #
+  # Fur laws (Fur Free Alliance).
+  #
+  data://meadow/animal_welfare/2024-09-13/fur_laws:
+    - snapshot://animal_welfare/2024-09-13/fur_laws.csv
+  #
+  # Fur laws (Fur Free Alliance).
+  #
+  data://garden/animal_welfare/2024-09-13/fur_laws:
+    - data://meadow/animal_welfare/2024-09-13/fur_laws
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Fur laws (Fur Free Alliance).
+  #
+  data://grapher/animal_welfare/2024-09-13/fur_laws:
+    - data://garden/animal_welfare/2024-09-13/fur_laws
