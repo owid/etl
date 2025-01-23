@@ -23,68 +23,68 @@ tables:
           numDecimalPlaces: 0
 
       aids_mortality_1000_pop:
-        title: "AIDS mortality per 1000 population - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "AIDS mortality per 1000 population - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: ""
         description_short: ""
         processing_level: minor
 
       aids_orphans:
-        title: "Children orphaned due to AIDS deaths - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Children orphaned due to AIDS deaths - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "orphans"
         description_short: |-
           Number of children, aged 17 and under, orphaned by the death of one or both parents from AIDS.
         processing_level: minor
 
       art_none_preg_child_inf_preg:
-        title: "Did not receive ART during pregnancy; child infected during pregnancy - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Did not receive ART during pregnancy; child infected during pregnancy"
         unit: ""
         description_short: ""
         processing_level: minor
 
       art_start_before_preg_child_inf_bf:
-        title: "Started ART before the pregnancy; child infected during breastfeeding - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Started ART before the pregnancy; child infected during breastfeeding"
         unit: ""
         description_short: ""
         processing_level: minor
 
       art_start_before_preg_child_inf_preg:
-        title: "Started ART before the pregnancy; child infected during pregnancy - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Started ART before the pregnancy; child infected during pregnancy"
         unit: ""
         description_short: ""
         processing_level: minor
 
       art_start_during_preg_child_inf_bf:
-        title: "Started ART during in pregnancy; child infected during breastfeeding - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Started ART during in pregnancy; child infected during breastfeeding"
         unit: ""
         description_short: ""
         processing_level: minor
 
       art_start_child_inf_during_preg:
-        title: "Started ART during in pregnancy; child infected during pregnancy - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Started ART during in pregnancy; child infected during pregnancy"
         unit: ""
         description_short: ""
         processing_level: minor
 
       art_start_late_preg_child_inf_bf:
-        title: "Started ART late in pregnancy; child infected during breastfeeding - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Started ART late in pregnancy; child infected during breastfeeding"
         unit: ""
         description_short: ""
         processing_level: minor
 
       art_start_late_preg_child_inf_preg:
-        title: "Started ART late in pregnancy; child infected during pregnancy - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Started ART late in pregnancy; child infected during pregnancy"
         unit: ""
         description_short: ""
         processing_level: minor
 
       art_drop_bf_child_inf:
-        title: "Mother dropped off ART during breastfeeding; child infected during breastfeeding - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Mother dropped off ART during breastfeeding; child infected during breastfeeding"
         unit: ""
         description_short: ""
         processing_level: minor
 
       art_drop_preg_child_inf:
-        title: "Mother dropped off ART during pregnancy; child infected during pregnancy - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Mother dropped off ART during pregnancy; child infected during pregnancy"
         unit: ""
         description_short: ""
         processing_level: minor
@@ -92,17 +92,17 @@ tables:
       children_exposed_uninfected:
         title: "HIV-exposed children who are uninfected - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: ""
-        description_short: ""
+        description_short: "Number of children, aged 14 and under"
         processing_level: minor
 
       coverage_mothers_receiving_arv:
-        title: "Coverage of pregnant women who receive ARV for preventing MTCT - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Coverage of pregnant women who receive ARV for preventing MTCT - <<estimate.title()>> estimate"
         unit: "%"
         description_short: ""
         processing_level: minor
 
       deaths_averted_art:
-        title: "Deaths averted due to antiretroviral therapy - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Deaths averted due to antiretroviral therapy - <<estimate.title()>> estimate"
         unit: deaths
         description_short: |-
           Deaths that were prevented thanks to the usage of antiretroviral therapy (ART).
@@ -111,7 +111,7 @@ tables:
           numDecimalPlaces: 0
 
       deaths_plhiv_all_causes:
-        title: "Deaths among people living with HIV (all causes) - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Deaths among people living with HIV (all causes) - <<estimate.title()>> estimate"
         unit: ""
         description_short: ""
         processing_level: minor
@@ -136,13 +136,13 @@ tables:
         processing_level: minor
 
       imr:
-        title: "Incidence-to-mortality ratio - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Incidence-to-mortality ratio - <<estimate.title()>> estimate"
         unit: ""
         description_short: ""
         processing_level: minor
 
       infections_averted_pmtct:
-        title: "New HIV Infections averted due to PMTCT - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "New HIV Infections averted due to PMTCT - <<estimate.title()>> estimate"
         short_unit: ""
         unit: "infections"
         description_short: |-
@@ -150,37 +150,37 @@ tables:
         processing_level: minor
 
       ipr:
-        title: "Incidence-to-prevalence ratio - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Incidence-to-prevalence ratio - <<estimate.title()>> estimate"
         unit: ""
         description_short: ""
         processing_level: minor
 
       mother_child_inf_bf:
-        title: "Mother infected during breastfeeding; child infected during breastfeeding - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Mother infected during breastfeeding; child infected during breastfeeding"
         unit: ""
         description_short: ""
         processing_level: minor
 
       mother_child_inf_preg:
-        title: "Mother infected during pregnancy; child infected during pregnancy - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Mother infected during pregnancy; child infected during pregnancy"
         unit: ""
         description_short: ""
         processing_level: minor
 
       mothers_needing_arv_for_pmtct:
-        title: "Pregnant women needing ARV for preventing MTCT - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Pregnant women needing ARV for preventing MTCT - <<estimate.title()>> estimate"
         unit: ""
         description_short: ""
         processing_level: minor
 
       mothers_receiving_arv_for_pmtct:
-        title: "Pregnant women who received ARV for preventing MTCT - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Pregnant women who received ARV for preventing MTCT - <<estimate.title()>> estimate"
         unit: ""
         description_short: ""
         processing_level: minor
 
       mtct_rate:
-        title: "Mother-to-child transmission rate - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Mother-to-child transmission rate - <<estimate.title()>> estimate"
         unit: ""
         description_short: ""
         processing_level: minor
@@ -194,43 +194,43 @@ tables:
         processing_level: minor
 
       art_none_bf:
-        title: "Did not receive ART during breastfeeding; child infected during breastfeeding - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Did not receive ART during breastfeeding; child infected during breastfeeding"
         unit: ""
         description_short: ""
         processing_level: minor
 
       number_plhiv_knowledge_of_status:
-        title: "People living with HIV who know their status - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "People living with HIV who know their status - Age: <<age>> - Sex: <<sex>>"
         unit: ""
         description_short: ""
         processing_level: minor
 
       number_viral_suppression:
-        title: "People living with HIV who have suppressed viral loads - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "People living with HIV who have suppressed viral loads - Age: <<age>> - Sex: <<sex>>"
         unit: ""
         description_short: ""
         processing_level: minor
 
       pct_change_aids_deaths_2010:
-        title: "Percent change in AIDS-related deaths since 2010 - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Percent change in AIDS-related deaths since 2010 - Age: <<age>> - Sex: <<sex>>"
         unit: "%"
         description_short: ""
         processing_level: minor
 
       pct_change_new_infections_2010:
-        title: "Percent change in new HIV infections since 2010 - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Percent change in new HIV infections since 2010 - Age: <<age>> - Sex: <<sex>>"
         unit: "%"
         description_short: ""
         processing_level: minor
 
       people_receiving_art:
-        title: "People receiving antiretroviral therapy - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "People receiving antiretroviral therapy - Age: <<age>> - Sex: <<sex>>"
         unit: ""
         description_short: ""
         processing_level: minor
 
       people_unsupp_vl:
-        title: "People with unsuppressed viral load - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "People with unsuppressed viral load - Age: <<age>> - Sex: <<sex>>"
         unit: "%"
         description_short: ""
         processing_level: minor
@@ -241,7 +241,7 @@ tables:
         description_short: ""
         processing_level: minor
 
-      art_pct_vl_suppressed:
+      percent_art_vl_suppressed:
         title: "Percent of people on ART who achieve viral suppression - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "%"
         description_short: ""
