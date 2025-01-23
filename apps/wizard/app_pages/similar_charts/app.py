@@ -273,6 +273,8 @@ def st_related_charts_table(
         pivot_df["favorite"] = False
         pivot_df["dislike"] = False
 
+    print(pivot_df[["favorite", "dislike"]])
+
     # 3) Map each label (good/bad/neutral) to an icon
     def label_to_icon(label: str) -> str:
         if label == "neutral":
@@ -315,12 +317,12 @@ def st_related_charts_table(
         "favorite": st.column_config.CheckboxColumn(
             "Like?",
             help="Check if you like the related chart",
-            default=False,
+            # default=False,
         ),
         "dislike": st.column_config.CheckboxColumn(
             "Dislike?",
             help="Check if you dislike the related chart",
-            default=False,
+            # default=False,
         ),
         # "reason": st.column_config.TextColumn(
         #     "Reason",
@@ -336,13 +338,10 @@ def st_related_charts_table(
     }
     # You could also configure text columns or numeric columns (like "views_365d").
     # styled_df = pivot_df.style.format("{:.0%}", subset=["score"]).format("{:.2%}", subset=["jaccard"])
-    styled_df = pivot_df.style
+    styled_df = pivot_df
 
     # Disable all columns except "favorite" and "dislike"
     disabled_cols = [col for col in pivot_df.columns if col not in ("favorite", "dislike", "reason")]
-
-    old_favorites = set(pivot_df[pivot_df["favorite"]].chart_id)
-    old_dislikes = set(pivot_df[pivot_df["dislike"]].chart_id)
 
     # 9) Show the result using st.data_editor
     updated_df = st.data_editor(
@@ -353,8 +352,23 @@ def st_related_charts_table(
         disabled=disabled_cols,
     )
 
+    print("updated!")
+    print(updated_df[["favorite", "dislike"]])
+
+    update_likes_and_dislikes(pivot_df, updated_df, chosen_chart)
+
+
+def update_likes_and_dislikes(orig_df: pd.DataFrame, updated_df: pd.DataFrame, chosen_chart: data.Chart) -> None:
+    old_favorites = set(orig_df[orig_df["favorite"]].chart_id)
+    old_dislikes = set(orig_df[orig_df["dislike"]].chart_id)
+
     new_favorites = set(updated_df[updated_df["favorite"]].chart_id)
     new_dislikes = set(updated_df[updated_df["dislike"]].chart_id)
+
+    print("Old favorites", old_favorites)
+    print("New favorites", new_favorites)
+    print("Old dislikes", old_dislikes)
+    print("New dislikes", new_dislikes)
 
     # Save favorites
     with Session(engine) as session:
@@ -366,14 +380,21 @@ def st_related_charts_table(
                 reviewer=reviewer,
             ).upsert(session)
 
-        for chart_id in old_favorites - new_favorites:
-            # TODO: we can delete it as well
+        for chart_id in new_dislikes - old_dislikes:
             gm.RelatedChart(
                 chartId=chosen_chart.chart_id,
                 relatedChartId=chart_id,
-                label="neutral",
+                label="bad",
                 reviewer=reviewer,
             ).upsert(session)
+
+        for chart_id in (old_dislikes | old_favorites) - new_favorites - new_dislikes:
+            # Delete the related chart
+            session.query(gm.RelatedChart).filter_by(
+                chartId=chosen_chart.chart_id,
+                relatedChartId=chart_id,
+                reviewer=reviewer,
+            ).delete()
 
         session.commit()
 
@@ -388,13 +409,11 @@ def st_related_charts_table(
             ).upsert(session)
 
         for chart_id in old_dislikes - new_dislikes:
-            # TODO: we can delete it as well
-            gm.RelatedChart(
+            session.query(gm.RelatedChart).filter_by(
                 chartId=chosen_chart.chart_id,
                 relatedChartId=chart_id,
-                label="neutral",
                 reviewer=reviewer,
-            ).upsert(session)
+            ).delete()
 
         session.commit()
 
