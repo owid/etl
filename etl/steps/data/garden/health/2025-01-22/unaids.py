@@ -1,10 +1,14 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Processing of UNAIDS data.
+
+There are two main UNAIDS sources: EPI, GAM, KPA, NCPI. More details in the snapshot step.
+"""
 
 from typing import cast
 
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
+import yaml
 from owid.catalog import Dataset, Table
 from structlog import get_logger
 
@@ -30,96 +34,149 @@ REGIONS_TO_ADD = [
     "World",
 ]
 
+# tb.groupby("indicator").estimate.unique()
+# None: AIDS_DEATHS, HIV_INCIDENCE, HIV_PREVALENCE, NEW_INFECTIONS, PLWH
+# central 2: AIDS_MORTALITY_1000_POP
+COLUMNS_RENAME_EPI = {
+    "mother_dropped_off_art_during_breastfeeding_child_infected": "art_drop_bf_child_inf",
+    "mother_dropped_off_art_during_pregnancy_child_infected_duri": "art_drop_preg_child_inf",
+    "started_art_before_the_pregnancy_child_infected_during_brea": "art_start_before_preg_child_inf_bf",
+    "started_art_before_the_pregnancy_child_infected_during_preg": "art_start_before_preg_child_inf_preg",
+    "started_art_during_in_pregnancy_child_infected_during_breas": "art_start_during_preg_child_inf_bf",
+    "started_art_during_in_pregnancy_child_infected_during_pregn": "art_start_child_inf_during_preg",
+    "started_art_late_in_pregnancy_child_infected_during_breastf": "art_start_late_preg_child_inf_bf",
+    "started_art_late_in_pregnancy_child_infected_during_pregnan": "art_start_late_preg_child_inf_preg",
+    "did_not_receive_art_during_pregnancy_child_infected_during": "art_none_preg_child_inf_preg",
+    "no_receive_art_during_bf": "art_none_bf",
+    "percent_on_art_vl_suppressed": "art_pct_vl_suppressed",
+    "mother_infected_during_breastfeeding_child_infected_during": "mother_child_inf_bf",
+    "mother_infected_during_pregnancy_child_infected_during_preg": "mother_child_inf_preg",
+}
+
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    ## Load meadow dataset.
     ds_meadow = paths.load_dataset("unaids")
-
     # Load population dataset.
-    ds_population = paths.load_dataset("population")
-
-    # Load regions dataset.
-    ds_regions = paths.load_dependency("regions")
-
-    # Load income groups dataset.
-    ds_income_groups = paths.load_dependency("income_groups")
+    # ds_population = paths.load_dataset("population")
+    # ## Load regions dataset.
+    # ds_regions = paths.load_dependency("regions")
+    # ## Load income groups dataset.
+    # ds_income_groups = paths.load_dependency("income_groups")
 
     # Read tables from meadow datasets.
-    tb = ds_meadow["unaids"].reset_index()
+    tb = ds_meadow.read("epi")
 
-    #
-    # Process data.
-    #
-    log.info("health.unaids: handle NaNs")
-    tb = handle_nans(tb)
+    ###############################
+    # EPI
+    ###############################
 
-    # Harmonize country names (main table)
-    log.info("health.unaids: harmonize countries (main table)")
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    # Add dimensions
+    path = paths.side_file("unaids.dimensions.yml")
+    with open(path, "r") as f:
+        dimensions = yaml.safe_load(f)
+    tb = extract_and_add_dimensions(tb, dimensions["epi"])
 
-    # Pivot table
-    log.info("health.unaids: pivot table")
+    # Sanity checks
+    ## Check source
+    assert set(tb["source"].unique()) == {"UNAIDS_Estimates_"}, "Unexpected source!"
+    ## No textual data
+    assert not tb["is_text"].any(), "Some data is textual!"
+    ## Chec no NaNs
+    assert not tb.value.isna().any(), "Some NaNs were detected, but none were expected!"
+
+    # Save some fields (this might be useful later)
+    tb_meta = tb[["indicator", "indicator_description", "unit"]].drop_duplicates()
+    tb_meta["indicator"] = tb_meta["indicator"].str.lower()
+    assert not tb_meta["indicator"].duplicated().any(), "Multiple descriptions or units for a single indicator!"
+
+    # Harmonize
+    # tb = geo.harmonize_countries(
+    #     df=tb,
+    #     countries_file=paths.country_mapping_path,
+    #     excluded_countries_file=paths.excluded_countries_path,
+    # )
+
+    # Pivot table (and lower-case columns)
     tb = tb.pivot(
-        index=["country", "year", "subgroup_description"], columns="indicator", values="obs_value"
+        index=["country", "year", "age", "sex", "estimate"], columns="indicator", values="value"
     ).reset_index()
-
-    # Underscore column names
-    log.info("health.unaids: underscore column names")
     tb = tb.underscore()
 
-    # Scale indicators
-    indicators = [
-        "resource_avail_constant",
-        "resource_needs_ft",
-    ]
-    scale_factor = 1e6
-    tb[indicators] *= scale_factor
-    # Complement table with auxiliary data
-    log.info("health.unaids: complement with auxiliary data")
-    tb = complement_with_auxiliary_data(tb)
-
     # Rename columns
-    log.info("health.unaids: rename columns")
-    tb = tb.rename(columns={"subgroup_description": "disaggregation"})
+    tb = tb.rename(columns=COLUMNS_RENAME_EPI)
 
-    # Dtypes
-    log.info("health.unaids: set dtypes")
-    tb = tb.astype(
-        {
-            "domestic_spending_fund_source": float,
-            "hiv_prevalence": float,
-            "deaths_averted_art": float,
-            "aids_deaths": float,
-        }
-    )
-
-    # Add per_capita
-    log.info("health.unaids: add per_capita")
-    tb = add_per_capita_variables(tb, ds_population)
-
-    # Add region aggregates for TB variables
-    log.info("health.unaids: add region aggregates for TB variables")
-    tb = add_regions_to_tuberculosis_vars(tb, ds_regions, ds_income_groups)
-    # Set index
-    log.info("health.unaids: set index")
-    tb = tb.set_index(["country", "year", "disaggregation"], verify_integrity=True)
+    # Estimate regional data (only when unit == NUMBER)
 
     # Drop all NaN rows
     tb = tb.dropna(how="all")
 
+    # Format
+    tb = tb.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
+
+    #########################33
+    #
+    # Process data.
+    #
+    # log.info("health.unaids: handle NaNs")
+    # tb = handle_nans(tb)
+
+    # # Harmonize country names (main table)
+    # log.info("health.unaids: harmonize countries (main table)")
+    # tb = geo.harmonize_countries(
+    #     df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    # )
+
+    # # Pivot table
+    # log.info("health.unaids: pivot table")
+    # tb = tb.pivot(
+    #     index=["country", "year", "subgroup_description"], columns="indicator", values="obs_value"
+    # ).reset_index()
+
+    # # Underscore column names
+    # log.info("health.unaids: underscore column names")
+    # tb = tb.underscore()
+
+    # Scale indicators
+    # indicators = [
+    #     "resource_avail_constant",
+    #     "resource_needs_ft",
+    # ]
+    # scale_factor = 1e6
+    # tb[indicators] *= scale_factor
+    # # Complement table with auxiliary data
+    # log.info("health.unaids: complement with auxiliary data")
+    # tb = complement_with_auxiliary_data(tb)
+
+    # Add per_capita
+    # log.info("health.unaids: add per_capita")
+    # tb = add_per_capita_variables(tb, ds_population)
+
+    # Add region aggregates for TB variables
+    # log.info("health.unaids: add region aggregates for TB variables")
+    # tb = add_regions_to_tuberculosis_vars(tb, ds_regions, ds_income_groups)
+    # Set index
+    # log.info("health.unaids: set index")
+    # tb = tb.set_index(["country", "year", "disaggregation"], verify_integrity=True)
+
+    # Drop all NaN rows
+    # tb = tb.dropna(how="all")
+
     # Set table's short_name
-    tb.metadata.short_name = paths.short_name
+    # tb.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(
+        dest_dir,
+        tables=[tb],
+        default_metadata=ds_meadow.metadata,
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -274,5 +331,23 @@ def combine_tables(tb: Table, tb_hiv_child: Table, tb_gap_art: Table, tb_deaths_
 
     # Drop auxiliary columns
     tb = tb.drop(columns=["msm_condom_use__aux", "deaths_averted_art__aux", "gap_on_art__aux"])
+
+    return tb
+
+
+def extract_and_add_dimensions(tb, dimensions):
+    """Add sex, age, estimate dimensions.
+
+    sex: female, male, total
+    age: age group range
+    estimate: estimate, lower, upper
+    """
+    # Add new dimension columns
+    dim_values = {dim: {k: v[dim] for k, v in dimensions.items()} for dim in ["sex", "age", "estimate"]}
+    for dim in ["sex", "age", "estimate"]:
+        tb[dim] = tb["dimension"].map(dim_values[dim])
+
+    # Drop old dimensions column
+    tb = tb.drop(columns=["dimension", "dimension_name"])
 
     return tb
