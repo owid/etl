@@ -447,18 +447,6 @@ wheels = [
 ]
 
 [[package]]
-name = "bugsnag"
-version = "4.7.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "webob" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/dd/ee/6ce7a0a7c0b882543e3417df54b12a4fcfc94ba6997201175710b8ca3183/bugsnag-4.7.1.tar.gz", hash = "sha256:98408fe17d4a7f300a56535407a6448b9844d9b528c44527908868fc3646e873", size = 73492 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/59/72/ba7771ae6495a25c158e733ad3854b4ab77e3e2e445cff24c3cdf87669e8/bugsnag-4.7.1-py3-none-any.whl", hash = "sha256:4537ff3c200890d26e28079e31729c041a9ffe84a803860ea8adefe535aac7df", size = 45784 },
-]
-
-[[package]]
 name = "cachetools"
 version = "5.5.0"
 source = { registry = "https://pypi.org/simple" }
@@ -952,7 +940,6 @@ name = "etl"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "bugsnag" },
     { name = "cdsapi" },
     { name = "cfgrib" },
     { name = "click" },
@@ -997,6 +984,7 @@ dependencies = [
     { name = "scikit-learn" },
     { name = "scipy" },
     { name = "selenium" },
+    { name = "sentry-sdk" },
     { name = "sh" },
     { name = "shapely" },
     { name = "simplejson" },
@@ -1075,7 +1063,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bugsnag", specifier = ">=4.2.1" },
     { name = "cdsapi", specifier = ">=0.7.0" },
     { name = "cfgrib", specifier = ">=0.9.15.0" },
     { name = "click", specifier = ">=8.0.1" },
@@ -1128,6 +1115,7 @@ requires-dist = [
     { name = "scipy", specifier = ">=1.11.2" },
     { name = "selenium", specifier = ">=4.15.1" },
     { name = "sentence-transformers", marker = "extra == 'wizard'", specifier = ">=2.2.2" },
+    { name = "sentry-sdk", specifier = ">=2.20.0" },
     { name = "sh", specifier = "==1.14.3" },
     { name = "shapely", specifier = ">=2.0.3" },
     { name = "simplejson", specifier = ">=3.17.6" },
@@ -5530,6 +5518,19 @@ wheels = [
 ]
 
 [[package]]
+name = "sentry-sdk"
+version = "2.20.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "certifi" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/68/e8/6a366c0cd5e129dda6ecb20ff097f70b18182c248d4c27e813c21f98992a/sentry_sdk-2.20.0.tar.gz", hash = "sha256:afa82713a92facf847df3c6f63cec71eb488d826a50965def3d7722aa6f0fdab", size = 300125 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/0f/6f7e6cd0f4a141752caef3f79300148422fdf2b8b68b531f30b2b0c0cbda/sentry_sdk-2.20.0-py2.py3-none-any.whl", hash = "sha256:c359a1edf950eb5e80cffd7d9111f3dbeef57994cb4415df37d39fda2cf22364", size = 322576 },
+]
+
+[[package]]
 name = "setuptools"
 version = "75.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -6767,15 +6768,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0b/02/ae6ceac1baeda530866a85075641cec12989bd8d31af6d5ab4a3e8c92f47/webencodings-0.5.1.tar.gz", hash = "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923", size = 9721 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f4/24/2a3e3df732393fed8b3ebf2ec078f05546de641fe1b667ee316ec1dcf3b7/webencodings-0.5.1-py2.py3-none-any.whl", hash = "sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78", size = 11774 },
-]
-
-[[package]]
-name = "webob"
-version = "1.8.9"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/85/0b/1732085540b01f65e4e7999e15864fe14cd18b12a95731a43fd6fd11b26a/webob-1.8.9.tar.gz", hash = "sha256:ad6078e2edb6766d1334ec3dee072ac6a7f95b1e32ce10def8ff7f0f02d56589", size = 279775 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/50/bd/c336448be43d40be28e71f2e0f3caf7ccb28e2755c58f4c02c065bfe3e8e/WebOb-1.8.9-py2.py3-none-any.whl", hash = "sha256:45e34c58ed0c7e2ecd238ffd34432487ff13d9ad459ddfd77895e67abba7c1f9", size = 115364 },
 ]
 
 [[package]]

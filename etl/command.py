@@ -36,7 +36,7 @@ from etl.steps import (
     select_dirty_steps,
 )
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 # NOTE: I tried enabling this, but ran into weird errors with unit tests and inconsistencies
 #   with owid libraries. It's better to wait for an official pandas 3.0 release and update
