@@ -24,6 +24,6 @@ meta:
       name: CC BY-NC-SA 3.0 IGO
       url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
 outs:
-  - md5: 98ac6a2a0e1407ffa8d7946da3214419
-    size: 555058973
+  - md5: 372b1bbdbdc897ec23c28c5550141c52
+    size: 353065798
     path: unaids_epi.csv
