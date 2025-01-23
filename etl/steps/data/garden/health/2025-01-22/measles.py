@@ -38,6 +38,7 @@ def run(dest_dir: str) -> None:
     # Combine with population
     tb = tb.merge(tb_pop, left_on=["state", "year"], right_on=["state", "year"], how="left")
     tb["case_rate"] = tb["countvalue"] / tb["population"] * 100000
+    tb = tb.rename(columns={"countryname": "country"})
 
     # tb.metadata = metadata
     tb = tb.format(["countryname", "state", "year"], short_name="measles")
