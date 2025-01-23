@@ -874,6 +874,11 @@ class Table(pd.DataFrame):
 
         return t
 
+    @property
+    def mb(self) -> "Table":
+        """Return size in MB of the table."""
+        return self.memory_usage(deep=True).sum() / 1e6
+
     @overload
     def dropna(self, *, inplace: Literal[True], **kwargs) -> None: ...
 
