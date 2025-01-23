@@ -15,7 +15,7 @@ tables:
   number_of_farmed_crustaceans:
     variables:
       n_farmed_crustaceans_low:
-        title: Estimated number of crustaceans (lower bound)
+        title: Estimated number of farmed crustaceans (lower bound)
         unit: crustaceans
         short_unit: ''
         description_short: Lower bound estimate of the annual number of farmed crustaceans slaughtered for food.
@@ -30,7 +30,7 @@ tables:
         short_unit: ''
         description_short: Upper bound estimate of the annual number of farmed crustaceans slaughtered for food.
       n_farmed_crustaceans_low_per_capita:
-        title: Estimated number of crustaceans per capita (lower bound)
+        title: Estimated number of farmed crustaceans per capita (lower bound)
         unit: crustaceans per person
         short_unit: ''
         description_short: Lower bound estimate of the annual number of farmed crustaceans slaughtered for food per person.
