@@ -5,14 +5,6 @@ steps:
     - data://explorers/wid/latest/world_inequality_database
     - data://explorers/lis/latest/luxembourg_income_study
 
-  # Poverty and inequality file for inequality comparisons at OWID
-  data://garden/poverty_inequality/2025-01-22/poverty_inequality_file:
-    - data://garden/wb/2024-10-07/world_bank_pip
-    - data://garden/wid/2024-05-24/world_inequality_database
-    - data://garden/lis/2024-06-13/luxembourg_income_study
-    - data://garden/wb/2024-01-22/thousand_bins_distribution
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-
   # World Bank Poverty and Inequality Platform
   data://meadow/wb/2024-10-07/world_bank_pip:
     - snapshot://wb/2024-10-07/world_bank_pip.csv
@@ -59,6 +51,20 @@ steps:
     - data://garden/lis/2024-06-13/luxembourg_income_study
   data://explorers/lis/latest/luxembourg_income_study:
     - data://garden/lis/2024-06-13/luxembourg_income_study
+
+  # Poverty and inequality file for inequality comparisons at OWID
+  data://garden/poverty_inequality/2025-01-22/poverty_inequality_file:
+    - data://garden/wb/2024-10-07/world_bank_pip
+    - data://garden/wid/2024-05-24/world_inequality_database
+    - data://garden/lis/2024-06-13/luxembourg_income_study
+    - data://garden/wb/2024-01-22/thousand_bins_distribution
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+
+  # Inequality comparison data
+  data://garden/poverty_inequality/2025-01-22/inequality_comparison:
+    - data://garden/poverty_inequality/2025-01-22/poverty_inequality_file
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
 
   # Global Multidimensional Poverty Index
   data://meadow/ophi/2024-10-28/multidimensional_poverty_index:
