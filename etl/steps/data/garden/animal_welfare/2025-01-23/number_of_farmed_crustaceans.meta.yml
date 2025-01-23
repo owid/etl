@@ -1,0 +1,46 @@
+definitions:
+  common:
+    description_key:
+      - "This indicator is estimated using data on aquaculture production tonnages and mean weights from crustaceans size data. For species categories where no estimated mean weight was obtained, a generic mean weight was used."
+    presentation:
+      grapher_config:
+        note: Upper and lower-bound estimates are shown due to large uncertainties. The map shows midpoint values.
+    display:
+      numSignificantFigures: 2
+  presentation:
+    topic_tags:
+    - Animal Welfare
+
+tables:
+  number_of_farmed_crustaceans:
+    variables:
+      n_farmed_crustaceans_low:
+        title: Estimated number of crustaceans (lower bound)
+        unit: crustaceans
+        short_unit: ''
+        description_short: Lower bound estimate of the annual number of farmed crustaceans slaughtered for food.
+      n_farmed_crustaceans:
+        title: Estimated number of farmed crustaceans
+        unit: crustaceans
+        short_unit: ''
+        description_short: Midpoint estimate of the number of farmed crustaceans slaughtered for food.
+      n_farmed_crustaceans_high:
+        title: Estimated number of farmed crustaceans (upper bound)
+        unit: crustaceans
+        short_unit: ''
+        description_short: Upper bound estimate of the annual number of farmed crustaceans slaughtered for food.
+      n_farmed_crustaceans_low_per_capita:
+        title: Estimated number of crustaceans per capita (lower bound)
+        unit: crustaceans per person
+        short_unit: ''
+        description_short: Lower bound estimate of the annual number of farmed crustaceans slaughtered for food per person.
+      n_farmed_crustaceans_per_capita:
+        title: Estimated number of farmed crustaceans per capita
+        unit: crustaceans per person
+        short_unit: ''
+        description_short: Midpoint estimate of the number of farmed crustaceans slaughtered for food per person.
+      n_farmed_crustaceans_high_per_capita:
+        title: Estimated number of farmed crustaceans per capita (upper bound)
+        unit: crustaceans per person
+        short_unit: ''
+        description_short: Upper bound estimate of the annual number of farmed crustaceans slaughtered for food per person.
