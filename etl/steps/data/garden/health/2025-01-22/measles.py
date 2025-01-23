@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={"countryname": "country"})
 
     # tb.metadata = metadata
-    tb = tb.format(["countryname", "state", "year"], short_name="measles")
+    tb = tb.format(["country", "state", "year"], short_name="measles")
 
     #
     # Save outputs.
