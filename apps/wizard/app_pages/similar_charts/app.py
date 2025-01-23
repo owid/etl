@@ -261,7 +261,7 @@ def st_related_charts_table(
     reviewer_cols = list(pivot_df.columns)
 
     # Move Coviews and Jaccard to the beginning
-    front_cols = ["🤖 Jaccard", "🤖 Coviews", "🤖 GPT", "🤖 Score"]
+    front_cols = [c for c in ["🤖 Jaccard", "🤖 Coviews", "🤖 GPT", "🤖 Score", "🤖 Current"] if c in reviewer_cols]
     reviewer_cols = front_cols + [col for col in reviewer_cols if col not in front_cols]
 
     if reviewer in reviewer_cols:
@@ -331,6 +331,7 @@ def st_related_charts_table(
         "🤖 Score": st.column_config.Column(help="Complex score without diversity"),
         "🤖 GPT": st.column_config.Column(help="Complex score with diversity by GPT"),
         "🤖 Coviews": st.column_config.Column(help="Most coviews"),
+        "🤖 Current": st.column_config.Column(help="What we currently show"),
         "chart_id": None,
     }
     # You could also configure text columns or numeric columns (like "views_365d").
@@ -531,69 +532,59 @@ for c in charts:
 # Sort by similarity
 sorted_charts = sorted(charts, key=lambda x: x.similarity, reverse=True)  # type: ignore
 
-# Add reviews to top charts by similarity
-for c in sorted_charts[:6]:
-    if c.chart_id == chosen_chart.chart_id:
-        continue
-    # Add to related charts
-    related_charts_db.append(
-        gm.RelatedChart(
-            chartId=chosen_chart.chart_id,
-            relatedChartId=c.chart_id,
-            label="good",
-            reviewer="🤖 Score",
+
+def get_reviews(scores: pd.Series, reviewer: str, k=5) -> list[gm.RelatedChart]:
+    # Add reviews to top charts by similarity
+    related_charts = []
+
+    for chart_id, _ in scores.sort_values(ascending=False).items():
+        c = chart_map[chart_id]
+
+        if c.chart_id == chosen_chart.chart_id:  # type: ignore
+            continue
+
+        # Add to related charts
+        related_charts.append(
+            gm.RelatedChart(
+                chartId=chosen_chart.chart_id,  # type: ignore
+                relatedChartId=c.chart_id,
+                label="good",
+                reviewer=reviewer,
+            )
         )
-    )
+
+        if len(related_charts) >= k:
+            return related_charts
+
+    return related_charts
+
+
+score = pd.Series(sim_dict)
+related_charts_db += get_reviews(score, reviewer="🤖 Score")
+
 
 # Possibly re-rank with GPT for diversity
 if diversity_gpt:
     with st.spinner("Diversifying chart results..."):
         slugs_to_reasons = scoring.gpt_diverse_charts(chosen_chart, sorted_charts, system_prompt=system_prompt)
+
+    gpt_candidates = []
     for c in sorted_charts:
         if c.slug in slugs_to_reasons:
             c.gpt_reason = slugs_to_reasons[c.slug]
+            gpt_candidates.append(c.chart_id)
 
-            # Add to related charts
-            related_charts_db.append(
-                gm.RelatedChart(
-                    chartId=chosen_chart.chart_id,
-                    relatedChartId=c.chart_id,
-                    label="good",
-                    reviewer="🤖 GPT",
-                )
-            )
+    related_charts_db += get_reviews(score.loc[gpt_candidates], reviewer="🤖 GPT")
 
+scores = sim_components["coviews_score"]
+related_charts_db += get_reviews(scores, reviewer="🤖 Coviews")
 
-# Add coviews reviewer
-for chart_id in sim_components.sort_values("coviews_score", ascending=False).index[:5]:
-    c = chart_map[chart_id]
-    # Don't recommend zero coviews
-    if c.coviews == 0:
-        continue
-    related_charts_db.append(
-        gm.RelatedChart(
-            chartId=chosen_chart.chart_id,
-            relatedChartId=c.chart_id,
-            label="good",
-            reviewer="🤖 Coviews",
-        )
-    )
+scores = sim_components["jaccard_score"]
+related_charts_db += get_reviews(scores, reviewer="🤖 Jaccard")
 
+scores = sim_components.loc[sim_components["share_indicator"] > 0, "share_indicator"]
+related_charts_db += get_reviews(scores, reviewer="🤖 Current")
 
-# Add coviews reviewer
-for chart_id in sim_components.sort_values("jaccard_score", ascending=False).index[:5]:
-    c = chart_map[chart_id]
-    # Don't recommend zero coviews
-    if c.coviews == 0:
-        continue
-    related_charts_db.append(
-        gm.RelatedChart(
-            chartId=chosen_chart.chart_id,
-            relatedChartId=c.chart_id,
-            label="good",
-            reviewer="🤖 Jaccard",
-        )
-    )
 
 # Display chosen chart
 with col1:

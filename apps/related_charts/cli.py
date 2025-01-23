@@ -46,7 +46,8 @@ def load_data(chart_slug: Optional[str]) -> tuple[pd.DataFrame, pd.DataFrame]:
     coviews_df = coviews_df[coviews_df.index.get_level_values("slug1").isin(charts.index)]
 
     # Add pageviews of slug2 to coviews dataframe
-    coviews_df["pageviews"] = charts["views_365d"].reindex(coviews_df.index.get_level_values("slug2")).values
+    coviews_df["pageviews_1"] = charts["views_365d"].reindex(coviews_df.index.get_level_values("slug1")).values
+    coviews_df["pageviews_2"] = charts["views_365d"].reindex(coviews_df.index.get_level_values("slug2")).values
 
     return charts, coviews_df
 
@@ -57,6 +58,7 @@ def compute_recommendations(
     chart_slug: Optional[str],
     top: int,
     regularization: float,
+    score_method: str,
 ) -> pd.DataFrame:
     """
     Given charts and coview data, compute a DataFrame of recommended pairs:
@@ -71,6 +73,7 @@ def compute_recommendations(
         chart_slug: Optional single slug to process; otherwise compute for all slugs.
         top: How many top-related charts to retrieve for each slug.
         regularization: Factor to penalize high-view charts.
+        score_method: Scoring method to use for recommendations.
 
     Returns:
         A DataFrame of recommended chart pairs (chosen_chart, related_chart, score, etc.).
@@ -80,8 +83,12 @@ def compute_recommendations(
         return pd.DataFrame()
 
     # Compute the score
-    coviews_df["score"] = coviews_df["coviews"] - regularization * coviews_df["pageviews"]
-
+    if score_method == "coviews":
+        coviews_df["score"] = coviews_df["coviews"] - regularization * coviews_df["pageviews_2"]
+    elif score_method == "jaccard":
+        coviews_df["score"] = coviews_df["coviews"] / (
+            coviews_df["pageviews_1"] + coviews_df["pageviews_2"] - coviews_df["coviews"]
+        )
     # If a single chart slug is requested, ensure we only keep those rows
     if chart_slug:
         if chart_slug not in coviews_df.index.get_level_values("slug1"):
@@ -167,11 +174,17 @@ def write_recommendations(
     "--regularization", type=float, default=0.001, help="Factor by which to penalize charts with high pageviews."
 )
 @click.option(
+    "--score",
+    type=click.Choice(["jaccard", "coviews"]),
+    default="jaccard",
+    help="Scoring method to use for recommendations.",
+)
+@click.option(
     "--dry-run/--no-dry-run",
     default=False,
     help="If set, no changes will be written to the database.",
 )
-def cli(chart_slug: Optional[str], top: int, regularization: float, dry_run: bool) -> None:
+def cli(chart_slug: Optional[str], top: int, regularization: float, score: str, dry_run: bool) -> None:
     """
     Generates a table of related charts (by coviews) and optionally writes them
     to the database. If a single chart slug is provided, only that chart’s
@@ -183,7 +196,7 @@ def cli(chart_slug: Optional[str], top: int, regularization: float, dry_run: boo
     charts, coviews_df = load_data(chart_slug)
 
     # 2. Compute recommendations (score is applied here)
-    recommended_df = compute_recommendations(charts, coviews_df, chart_slug, top, regularization)
+    recommended_df = compute_recommendations(charts, coviews_df, chart_slug, top, regularization, score)
 
     if recommended_df.empty:
         log.info("No recommendations generated. Exiting.")
