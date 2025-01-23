@@ -276,7 +276,6 @@ class Harmonizer:
 
         # Mapping
         self._mapping = None
-        self.countries_mapped_automatic = None
         self.excluded = []
 
     def _get_geo(self, tb, colname, indicator):

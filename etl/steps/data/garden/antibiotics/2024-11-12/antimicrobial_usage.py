@@ -131,7 +131,7 @@ def aggregate_antimicrobial_classes(tb: Table) -> Table:
     )
     tb_combined = pr.concat([tb, tb_anti_tb])
 
-    tb_combined.set_index(["country", "year", "antimicrobialclass"], verify_integrity=True)
+    tb_combined.format(["country", "year", "antimicrobialclass"])
 
     return tb_combined, tb_notes
 

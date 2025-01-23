@@ -27,6 +27,21 @@ def run(dest_dir: str) -> None:
                 "cohort": "year",
             }
         ),
+        ds_garden.read("period_ages_years", reset_index=False).rename_index_names(
+            {
+                "age": "year",
+            }
+        ),
+        ds_garden.read("cohort_ages_years", reset_index=False).rename_index_names(
+            {
+                "age": "year",
+            }
+        ),
+        ds_garden.read("cohort_share_women", reset_index=False).rename_index_names(
+            {
+                "cohort": "year",
+            }
+        ),
     ]
     #
     # Process data.

@@ -1,0 +1,40 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+    processing_level: minor
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0 # no update expected
+
+
+tables:
+  bilateral_remittance:
+    variables:
+      remittance_flows:
+        title: Estimated bilateral remittance flows
+        description_short: |-
+          The estimated bilateral remittance outflows out of <<country_origin>>. These estimates use migrant stocks, host country incomes, and origin country incomes.
+        description_key:
+          - |-
+            <% if country_origin in ['India', 'Pakistan'] %>
+            Flows between India and Pakistan (and vice versa) are assumed to be zero given the political economy situations in these corridors.
+            <% elif country_origin in ['Lebanon', 'Israel'] %>
+            Flows between Lebanon and Israel (and vice versa) are assumed to be zero given the political economy situations in these corridors.
+            <% elif country_origin in ['Azerbaijan', 'Armenia'] %>
+            Flows between Azerbaijan and Armenia (and vice versa) are assumed to be zero given the political economy situations in these corridors.
+            <% endif %>
+        description_from_producer: |-
+          The caveats attached to this estimate are:
+          (a) The migrant stock data is drawn from the Bilateral Migration Matrix, which is itself based on UN Population Division and National Census data. These are by nature updated infrequently and may not appropriately capture sudden changes in migrant stock;
+          (b) The incomes of migrants abroad and the costs of living in the migrants' country of origin are both proxied by per capita incomes in PPP terms, which is only a rough proxy;
+          (c) Remittance behavior of second-generation migrants who may be recorded as native-born in the remittance source country are not accounted for;
+          (d) There is no way to capture remittances flowing  through informal, unrecorded channels;
+          (e) It does not account for cases where remittances may be miscalculated due to accounting errors arising from confusion with trade and tourism receipts;
+        unit: current US$
+        short_unit: $

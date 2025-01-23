@@ -1,15 +1,20 @@
+import hashlib
 import json
+import random
 from contextlib import contextmanager
 from copy import deepcopy
+from functools import wraps
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional
 
 import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
 
+from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.chart_config import bake_chart_config
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher_model import Variable
+from etl.grapher.model import Variable
 
 HORIZONTAL_STYLE = """<style class="hide-element">
     /* Hides the style container and removes the extra spacing */
@@ -20,38 +25,51 @@ HORIZONTAL_STYLE = """<style class="hide-element">
         The selector for >.element-container is necessary to avoid selecting the whole
         body of the streamlit app, which is also a stVerticalBlock.
     */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) {{
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) {{
         display: flex;
         flex-direction: row !important;
         flex-wrap: wrap;
         gap: 1rem;
         align-items: {vertical_alignment};
+        justify-content: {justify_content};
     }}
     /* Override the default width of selectboxes in horizontal layout */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) select {{
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) select {{
         min-width: 200px;  /* Set a minimum width for selectboxes */
         max-width: 400px;  /* Optional: Set a max-width to avoid overly wide selectboxes */
     }}
     /* Buttons and their parent container all have a width of 704px, which we need to override */
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) div {{
-        width: max-content !important;
+    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker-{hash}) div {{
+        width: auto !important; /* Previously set to max-content */
     }}
-    /* Just an example of how you would style buttons, if desired */
-    /*
-    div[data-testid="stVerticalBlock"]:has(> .element-container .horizontal-marker) button {{
-        border-color: red;
-    }}
-    */
 </style>
 """
 
 
+def _generate_6char_hash():
+    random_input = str(random.random()).encode()  # Random input as bytes
+    hash_object = hashlib.sha256(random_input)  # Generate hash
+    return hash_object.hexdigest()[:6]  # Return first 6 characters of the hash
+
+
 @contextmanager
-def st_horizontal(vertical_alignment="baseline"):
-    h_style = HORIZONTAL_STYLE.format(vertical_alignment=vertical_alignment)
+def st_horizontal(vertical_alignment="baseline", justify_content="flex-start", hash_string=None):
+    """This is not very efficient, and is OK for few elements. If you want to use it several times (e.g. for loop) consider an alternative.
+
+    Example alternatives:
+        - If you want a row of buttons, consider using st.pills or st.segmented_control.
+        - In the general case, you can just use st.columns
+    """
+    if hash_string is None:
+        hash_string = _generate_6char_hash()
+    h_style = HORIZONTAL_STYLE.format(
+        hash=hash_string,
+        vertical_alignment=vertical_alignment,
+        justify_content=justify_content,
+    )
     st.markdown(h_style, unsafe_allow_html=True)
     with st.container():
-        st.markdown('<span class="hide-element horizontal-marker"></span>', unsafe_allow_html=True)
+        st.markdown(f'<span class="hide-element horizontal-marker-{hash_string}"></span>', unsafe_allow_html=True)
         yield
 
 
@@ -70,6 +88,7 @@ def grapher_chart(
     owid_env: OWIDEnv = OWID_ENV,
     selected_entities: Optional[list] = None,
     included_entities: Optional[list] = None,
+    tab: Optional[str] = None,
     height=600,
     **kwargs,
 ):
@@ -95,6 +114,8 @@ def grapher_chart(
         List of entities to plot, by default None. If None, a random sample of num_sample_selected_entities will be plotted. Use entity names!
     included_entities : Optional[list], optional
         NOT WORKING ATM AS EXPECTED ATM. List of entities to include in chart. The rest are excluded! This is equivalent to `includedEntities` in Grapher. Use entity IDs!
+    tab : str, optional
+        Default tab to show in the chart, by default None (which is equivalent to "chart")
     height : int, optional
         Height of the chart, by default 600
     """
@@ -106,6 +127,7 @@ def grapher_chart(
             variable=variable,
             selected_entities=selected_entities,
             included_entities=included_entities,
+            tab=tab,
             owid_env=owid_env,
         )
 
@@ -336,3 +358,195 @@ def st_multiselect_wider(num_px: int = 1000):
 
 def st_info(text):
     st.info(text, icon=":material/info:")
+
+
+def config_style_html() -> None:
+    """Increase font-size of expander headers."""
+    st.markdown(
+        """
+    <style>
+    .streamlit-expanderHeader {
+        font-size: x-large;
+    }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
+
+def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
+    """Link to page."""
+    if "page" not in kwargs:
+        kwargs["page"] = PAGES_BY_ALIAS[alias]["entrypoint"]
+    if "label" not in kwargs:
+        kwargs["label"] = PAGES_BY_ALIAS[alias]["title"]
+    if "icon" not in kwargs:
+        kwargs["icon"] = PAGES_BY_ALIAS[alias]["icon"]
+
+    if border:
+        with st.container(border=True):
+            st.page_link(**kwargs)
+    else:
+        st.page_link(**kwargs)
+
+
+def preview_file(
+    file_path: str | Path, prefix: str = "File", language: str = "python", custom_header: Optional[str] = None
+) -> None:
+    """Preview file in streamlit."""
+    with open(file_path, "r") as f:
+        code = f.read()
+    if custom_header is None:
+        custom_header = f"{prefix}: `{file_path}`"
+    with st.expander(custom_header, expanded=False):
+        st.code(code, language=language)
+
+
+def st_toast_error(message: str) -> None:
+    """Show error message."""
+    st.toast(f"❌ :red[{message}]")
+
+
+def st_toast_success(message: str) -> None:
+    """Show success message."""
+    st.toast(f"✅ :green[{message}]")
+
+
+def update_query_params(key):
+    def _update_query_params():
+        value = st.session_state[key]
+        if value is not None:
+            st.query_params.update({key: value})
+        else:
+            st.query_params.pop(key, None)
+
+    return _update_query_params
+
+
+def remove_query_params(key):
+    st.query_params.pop(key, None)
+
+
+def url_persist(component: Any) -> Any:
+    """Wrapper around streamlit components that persist values in the URL query string.
+    If value is equal to default value, it will not be added to the query string.
+    This is useful to avoid cluttering the URL with default values.
+
+    :param component: Streamlit component to wrap
+
+    Usage:
+        url_persist(st.multiselect)(
+          key="abc",
+          ...
+        )
+    """
+
+    def _persist(*args, **kwargs):
+        assert "key" in kwargs, "key should be passed to persist"
+        # TODO: we could wrap on_change too to make it work
+        assert "on_change" not in kwargs, "on_change should not be passed to persist"
+
+        key = kwargs["key"]
+
+        # Get default from `value` field
+        default = kwargs.pop("value", None)
+
+        # If parameter is in session state, set it to the value in the query string
+        if st.session_state.get(key) is None:
+            if key in st.query_params:
+                # Obtain params from query string
+                params = _get_params(component, key)
+            else:
+                params = default
+
+            # Store params in session state
+            if params is not None:
+                st.session_state[key] = params
+
+            # Check if the value given for an option via the URL is actually accepted!
+            # Allow empty values! NOTE: Might want to re-evaluate this, and add a flag to the function, e.g. 'allow_empty'
+            _check_options_params(kwargs, params)
+
+        else:
+            # Set the value in query params, but only if it isn't default
+            if default is None or st.session_state.get(key) != default:
+                update_query_params(key)()
+            elif st.session_state[key] == default:
+                remove_query_params(key)
+
+        kwargs["on_change"] = update_query_params(key)
+
+        return component(*args, **kwargs)
+
+    return _persist
+
+
+def _check_options_params(kwargs, params):
+    """Check that the options in the URL query are valid.
+
+    NOTE: Empty values are allowed.
+
+    Wrong values will raise a ValueError.
+    """
+    if "options" in kwargs:
+        if isinstance(params, list):
+            not_expected = [p for p in params if p not in kwargs["options"]]
+            if (params != []) or (len(not_expected) != 0):
+                raise ValueError(
+                    f"Please review the URL query. Values {not_expected} not in options {kwargs['options']}."
+                )
+        elif params is not None:
+            # Set default value in query params
+            if params not in kwargs["options"]:
+                raise ValueError(f"Please review the URL query. Value {params} not in options {kwargs['options']}.")
+
+
+def _get_params(component, key):
+    """Get params from query string.
+
+    Converts the params to the correct type if needed.
+    """
+    if component == st.multiselect:
+        params = st.query_params.get_all(key)
+        # convert to int if digit
+        return [int(q) if q.isdigit() else q for q in params]
+    elif component == st.checkbox:
+        params = st.query_params.get(key)
+        return params == "True"
+    else:
+        params = st.query_params.get(key)
+        if params and params.isdigit():
+            return int(params)
+        elif params and params.replace(".", "", 1).isdigit():
+            return float(params)
+        else:
+            return params
+
+
+def st_cache_data(func=None, *, custom_text="Running...", show_spinner=False, **cache_kwargs):
+    """
+    A custom decorator that wraps `st.cache_data` and adds support for a `custom_text` argument.
+
+    Args:
+        func: The function to be cached.
+        custom_text (str): The custom spinner text to display.
+        show_spinner (bool): Whether to show the default Streamlit spinner message. Defaults to False.
+        **cache_kwargs: Additional arguments passed to `st.cache_data`.
+    """
+
+    def decorator(f):
+        # Wrap the function with st.cache_data and force show_spinner=False
+        cached_func = st.cache_data(show_spinner=show_spinner, **cache_kwargs)(f)
+
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            with st.spinner(custom_text):
+                return cached_func(*args, **kwargs)
+
+        return wrapper
+
+    # If used as @custom_cache_data without parentheses
+    if func is not None:
+        return decorator(func)
+
+    return decorator

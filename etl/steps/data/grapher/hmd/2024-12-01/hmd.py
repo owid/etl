@@ -26,6 +26,7 @@ def run(dest_dir: str) -> None:
     tb_pop = ds_garden.read("population")
     tb_births = ds_garden.read("births")
     tb_ratios = ds_garden.read("diff_ratios")
+    tb_deaths_agg = ds_garden.read("deaths_agg")
 
     # Filter relevant dimensions
     tb_lt = keep_only_relevant_dimensions(tb_lt)
@@ -45,6 +46,7 @@ def run(dest_dir: str) -> None:
         tb_pop.format(["country", "year", "sex", "age"]),
         tb_births.format(["country", "year", "sex"]),
         tb_ratios.format(["country", "year", "age", "type"]),
+        tb_deaths_agg.format(["country", "year", "sex"]),
     ]
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(

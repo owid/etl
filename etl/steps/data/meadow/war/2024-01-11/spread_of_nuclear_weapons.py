@@ -55,7 +55,7 @@ def run(dest_dir: str) -> None:
     tb = snap.read_from_records(columns=columns, data=data)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country"], verify_integrity=True).sort_index()
+    tb = tb.format(["country"])
 
     #
     # Save outputs.

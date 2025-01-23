@@ -38,10 +38,10 @@ from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl import config, files, git_helpers, paths
-from etl import grapher_helpers as gh
-from etl import grapher_model as gm
 from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
+from etl.grapher import helpers as gh
+from etl.grapher import model as gm
 from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
@@ -353,14 +353,14 @@ def load_from_uri(uri: str) -> catalog.Dataset | Snapshot | WaldenDataset:
         try:
             dataset = Snapshot(path)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Snapshot not found for URI '{uri}'. You may want to run `python {path}` first")
+            raise FileNotFoundError(f"Snapshot not found for URI '{uri}'. Please run `python snapshot {path}` first")
     # Data
     else:
         path = f"{attributes['channel']}/{attributes['namespace']}/{attributes['version']}/{attributes['name']}"
         try:
             dataset = catalog.Dataset(paths.DATA_DIR / path)
         except FileNotFoundError:
-            raise FileNotFoundError(f"Dataset not found for URI '{uri}'. You may want to run `etl {uri}` first")
+            raise FileNotFoundError(f"Dataset not found for URI '{uri}'. Please run `etlr {uri}` first")
     return dataset
 
 
@@ -856,17 +856,17 @@ class GrapherStep(Step):
         return self.data_step._output_dataset
 
     def is_dirty(self) -> bool:
-        import etl.grapher_import as gi
+        import etl.grapher.to_db as db
 
         if self.data_step.is_dirty():
             return True
 
         # dataset exists, but it is possible that we haven't inserted everything into DB
         dataset = self.dataset
-        return gi.fetch_db_checksum(dataset) != self.data_step.checksum_input()
+        return db.fetch_db_checksum(dataset) != self.data_step.checksum_input()
 
     def run(self) -> None:
-        import etl.grapher_import as gi
+        import etl.grapher.to_db as db
 
         if "DATA_API_ENV" not in os.environ:
             warnings.warn(f"DATA_API_ENV not set, using '{config.DATA_API_ENV}'")
@@ -880,7 +880,7 @@ class GrapherStep(Step):
         admin_api = AdminAPI(OWID_ENV)
 
         assert dataset.metadata.namespace
-        dataset_upsert_results = gi.upsert_dataset(
+        dataset_upsert_results = db.upsert_dataset(
             engine,
             dataset,
             dataset.metadata.namespace,
@@ -930,7 +930,7 @@ class GrapherStep(Step):
                     # generate table with entity_id, year and value for every column
                     futures.append(
                         thread_pool.submit(
-                            gi.upsert_table,
+                            db.upsert_table,
                             engine,
                             admin_api,
                             t,
@@ -959,7 +959,7 @@ class GrapherStep(Step):
             else:
                 checksum = "to_be_rerun"
 
-            gi.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
+            db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
 
     def checksum_output(self) -> str:
         """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
@@ -980,7 +980,7 @@ class GrapherStep(Step):
 
         Return True if cleanup was successfull, False otherwise.
         """
-        import etl.grapher_import as gi
+        import etl.grapher.to_db as db
 
         # convert catalog_paths to variable_ids
         with Session(engine) as session:
@@ -988,13 +988,13 @@ class GrapherStep(Step):
 
         # Try to cleanup ghost variables, but make sure to raise an error if they are used
         # in any chart
-        success = gi.cleanup_ghost_variables(
+        success = db.cleanup_ghost_variables(
             engine,
             dataset_upsert_results.dataset_id,
             upserted_variable_ids,
         )
 
-        gi.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, dataset_upserted_source_ids)
+        db.cleanup_ghost_sources(engine, dataset_upsert_results.dataset_id, dataset_upserted_source_ids)
         # TODO: cleanup origins that are not used by any variable. We can do it in batch
         return success
 

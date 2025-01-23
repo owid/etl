@@ -12,10 +12,10 @@ from structlog import get_logger
 
 from apps.wizard.utils import get_staging_creation_time
 from apps.wizard.utils.io import get_all_changed_catalog_paths
-from etl import grapher_model as gm
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files, log_time
+from etl.grapher import model as gm
 
 log = get_logger()
 
@@ -369,6 +369,7 @@ class ChartDiff:
             "is_rejected": self.is_rejected,
             "is_reviewed": self.is_reviewed,
             "is_new": self.is_new,
+            "change_types": self.change_types,
             "error": self.error,
         }
 

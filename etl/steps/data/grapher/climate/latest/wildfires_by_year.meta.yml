@@ -10,7 +10,7 @@ definitions:
   desc_wildfires: &desc_wildfires
     - Wildfires are detected through the use of satellite imagery obtained from MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite). These satellite systems are capable of identifying thermal anomalies and alterations in landscape patterns, which are indicative of burning.
     - The data provider is presently engaged in a global accuracy assessment and acknowledged that they might be underestimating the genuine impact of wildfires, primarily due to constraints imposed by the spatial resolution of the sensors they employ.
-  desc_update: The 2024 data is incomplete and was last updated {date_accessed}.
+  desc_update: The {year} data is incomplete and was last updated {date_accessed}.
 
 tables:
   weekly_wildfires:

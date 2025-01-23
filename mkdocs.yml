@@ -215,6 +215,7 @@ nav:
           - Updating data: "guides/data-work/update-data.md"
           - Update charts: "guides/data-work/update-charts.md"
           - Export data: "guides/data-work/export-data.md"
+          - Access archived data: "guides/data-work/access-archived-data.md"
       - Admin:
           - Wizard: "guides/wizard.md"
           - CLI: "guides/etl-cli.md"

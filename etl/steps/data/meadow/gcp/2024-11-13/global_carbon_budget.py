@@ -24,7 +24,7 @@ paths = PathFinder(__file__)
 
 def prepare_fossil_co2(tb_fossil_co2: Table) -> Table:
     # Set an appropriate index and sort conveniently.
-    tb_fossil_co2 = tb_fossil_co2.set_index(["Country", "Year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_fossil_co2 = tb_fossil_co2.format(["country", "year"], sort_columns=True)
 
     # Ensure all columns are snake-case.
     tb_fossil_co2 = tb_fossil_co2.underscore()
@@ -62,7 +62,7 @@ def prepare_historical_budget(tb_historical: Table) -> Table:
     tb_historical["country"] = "World"
 
     # Set an index and sort row and columns conveniently.
-    tb_historical = tb_historical.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_historical = tb_historical.format(["country", "year"], sort_columns=True)
 
     # Rename table.
     tb_historical.metadata.short_name = "global_carbon_budget_historical_budget"
@@ -103,7 +103,7 @@ def prepare_land_use_emissions(tb_land_use: Table) -> Table:
     tb_land_use = tb_land_use.melt(id_vars="year", var_name="country", value_name="emissions")
 
     # Set an index and sort row and columns conveniently.
-    tb_land_use = tb_land_use.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_land_use = tb_land_use.format(["country", "year"], sort_columns=True)
 
     # Rename table.
     tb_land_use.metadata.short_name = "global_carbon_budget_land_use_change"
@@ -148,7 +148,7 @@ def prepare_national_emissions(tb: Table, column_name: str) -> Table:
     tb = tb.melt(id_vars=["year"]).rename(columns={"variable": "country", "value": column_name})
 
     # Set an index and sort row and columns conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(["country", "year"], sort_columns=True)
 
     # Rename table.
     tb.metadata.short_name = f"global_carbon_budget_{column_name}"

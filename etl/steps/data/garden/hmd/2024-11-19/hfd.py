@@ -224,7 +224,7 @@ C 3c: code, cohort, age [COHORT]
         Total          B1          B2          B3          B4         B5p
 
     ccfrVH
-        Cumulative cohort fertility rates (horizontal parallelograms
+        Cumulative cohort fertility rates (horizontal parallelograms)
         CCFR
     ccfrVHbo
         Cumulative cohort fertility rates by birth order (horizontal parallelograms
@@ -438,6 +438,7 @@ REGEX_PERIOD_AGE_BO = {}
 # Tables to process for COHORT country-year-age
 TABLES_COHORT_AGE = [
     "asfrvh",
+    "ccfrvh",
 ]
 TABLES_COHORT_AGE_W_PARITY = {}
 REGEX_COHORT_AGE_BO = {}
@@ -502,6 +503,9 @@ def run(dest_dir: str) -> None:
         fcn=add_shifted_to_cohort,
     )
 
+    # 2b/ Share of women with N kids
+    tb_share_women = make_table_share_women_with_n_kids(tb_cohort)
+
     # 3/ Period tables (by age)
     cols_index = ["country", "year", "age"]
     col_bo = "birth_order"
@@ -519,13 +523,36 @@ def run(dest_dir: str) -> None:
         tbs=tbs,
         cols_index_out=cols_index + [col_bo],
         short_name="period_ages",
-        fcn=keep_relevant_ages,
+        # fcn=keep_relevant_ages,
+        formatting=False,
     )
     tb_period_ages = tb_period_ages.rename(
         columns={
             "asfr": "asfr_period",
         }
     )
+
+    # Special table: Distribution of period metrics
+    ## Keep only birth_order = total
+    tb_period_years = tb_period_ages.loc[(tb_period_ages["birth_order"] == "total")].drop(columns=["birth_order"])
+    ## Keep only cohorts that are multiples of 5 (from year_min to year_max)
+    year_min = tb_period_years.loc[tb_period_years["year"] % 5 == 0, "year"].min()
+    year_max = tb_period_years["year"].max() + 1
+    years = list(range(year_min, year_max, 5))
+    tb_period_years = tb_period_years.loc[tb_period_years["year"].isin(years)]
+    ## Change age group names 12- -> 12, 55+ -> 55
+    tb_period_years["age"] = tb_period_years["age"].str.replace("-", "").str.replace("+", "").astype("UInt8")
+    ## HOTFIX: Name of the dimension
+    tb_period_years = tb_period_years.rename(
+        columns={
+            "year": "year_as_dimension",
+        }
+    )
+    tb_period_years = tb_period_years.format(["country", "age", "year_as_dimension"], short_name="period_ages_years")
+
+    # Resume normal processing
+    tb_period_ages = keep_relevant_ages(tb_period_ages)
+    tb_period_ages = tb_period_ages.format(cols_index + [col_bo], short_name="period_ages")
 
     # 4/ Cohort tables (by age)
     cols_index = ["country", "cohort", "age"]
@@ -539,20 +566,48 @@ def run(dest_dir: str) -> None:
         col_bo=col_bo,
         regex_bo=REGEX_COHORT_AGE_BO,
         check_integration=False,
-        check_integration_limit=143,
+        check_integration_limit={
+            "asfr": 143,
+            "ccfr": 84,
+        },
     )
     ## Consolidate
     tb_cohort_ages = consolidate_table_from_list(
         tbs=tbs,
         cols_index_out=cols_index + [col_bo],
         short_name="cohort_ages",
-        fcn=keep_relevant_ages,
+        # fcn=keep_relevant_ages,
+        formatting=False,
     )
     tb_cohort_ages = tb_cohort_ages.rename(
         columns={
             "asfr": "asfr_cohort",
+            "ccfr": "ccfr_cohort",
         }
     )
+
+    # Special table: Distribution of cohort metrics
+    ## Keep only birth_order = total
+    tb_cohort_years = tb_cohort_ages.loc[(tb_cohort_ages["birth_order"] == "total")].drop(columns=["birth_order"])
+    ## Keep only cohorts that are multiples of 5 (from year_min to year_max)
+    year_min = tb_cohort_years.loc[tb_cohort_years["cohort"] % 5 == 0, "cohort"].min()
+    year_max = tb_cohort_years["cohort"].max() + 1
+    years = list(range(year_min, year_max, 5))
+    tb_cohort_years = tb_cohort_years.loc[tb_cohort_years["cohort"].isin(years)]
+    ## Change age group names 12- -> 12, 55+ -> 55
+    tb_cohort_years["age"] = tb_cohort_years["age"].str.replace("-", "").str.replace("+", "").astype("UInt8")
+    # 'asfr_cohort' and 'ccfr_cohort' don't always use the same names for the same age groups. E.g. 12- vs 12, 55+ vs 55 etc.
+    # Therefore, these age groups are not aligned after the merge. We fix this by grouping + averaging.
+    # The following check ensures that this is actually the case, so that the groupby.mean makes sense!
+    assert tb_cohort_years.groupby(["country", "cohort", "age"])["asfr_cohort"].nunique().max() == 1
+    assert tb_cohort_years.groupby(["country", "cohort", "age"])["ccfr_cohort"].nunique().max() == 1
+    tb_cohort_years = tb_cohort_years.groupby(["country", "cohort", "age"], as_index=False).mean()
+    # Format
+    tb_cohort_years = tb_cohort_years.format(["country", "age", "cohort"], short_name="cohort_ages_years")
+
+    # Resume normal processing
+    tb_cohort_ages = keep_relevant_ages(tb_cohort_ages)
+    tb_cohort_ages = tb_cohort_ages.format(cols_index + [col_bo], short_name="cohort_ages")
 
     #
     # Process data.
@@ -562,6 +617,9 @@ def run(dest_dir: str) -> None:
         tb_cohort,
         tb_period_ages,
         tb_cohort_ages,
+        tb_period_years,
+        tb_cohort_years,
+        tb_share_women,
     ]
 
     #
@@ -630,6 +688,13 @@ def make_table_list(
             core_indicators = tables_w_parity[tname]["indicators"]
             tb = make_table_with_birth_order(tb, cols_index, core_indicators, col_bo, regex)
 
+        dtypes = {}
+        if "age" in tb.columns:
+            dtypes["age"] = "string"
+        if "birth_order" in tb.columns:
+            dtypes["birth_order"] = "string"
+        tb = tb.astype(dtypes)
+
         # Add formatted table to the list of tables.
         tbs.append(tb)
 
@@ -683,15 +748,27 @@ def integrate_bo(tb, tb_bo, cols_index, core_indicators, check=True, check_limit
     for col in core_indicators:
         # Check that we can integrate them!
         TOLERANCE = 5e-3
-        if check:
+
+        # Check per column
+        do_check = check
+        if isinstance(check, dict):
+            do_check = check.get(col, True)
+
+        if do_check:
             assert (
                 (((tb[col] - tb[f"{col}__bo"]) / tb[col]).dropna().abs() < TOLERANCE).all()
             ).all(), f"Integration failed for {col}. Core indicator is not equivalent between main and `bo` tables."
         elif check_limit_wrong is not None:
+            max_allowed = check_limit_wrong
+            if isinstance(check_limit_wrong, dict):
+                if col not in check_limit_wrong:
+                    raise ValueError(f"Missing limit for {col} in check_limit_wrong!")
+                max_allowed = check_limit_wrong[col]
+
             num = (~(((tb[col] - tb[f"{col}__bo"]) / tb[col]).dropna().abs() < TOLERANCE)).sum()
             assert (
-                num == check_limit_wrong
-            ), f"Integration failed for {col}. There are too many allowed miss-matches ({check_limit_wrong})!"
+                num == max_allowed
+            ), f"Integration failed for {col}. There are too many ({num}) allowed miss-matches ({check_limit_wrong})!"
         # Actual integration
         tb[col] = tb[col].fillna(tb[f"{col}__bo"])
         tb = tb.drop(columns=[f"{col}__bo"])
@@ -749,7 +826,7 @@ def make_table_with_birth_order(tb, cols_index, core_indicators, col_bo="birth_o
     return tb
 
 
-def consolidate_table_from_list(tbs, cols_index_out, short_name, fcn=None) -> geo.Table:
+def consolidate_table_from_list(tbs, cols_index_out, short_name, fcn=None, formatting=True) -> geo.Table:
     ## Sanity check: no column is named the same
     _sanity_check_colnames(tbs, cols_index_out)
 
@@ -761,7 +838,8 @@ def consolidate_table_from_list(tbs, cols_index_out, short_name, fcn=None) -> ge
         tb = fcn(tb)
 
     # Format
-    tb = tb.format(cols_index_out, short_name=short_name)
+    if formatting:
+        tb = tb.format(cols_index_out, short_name=short_name)
     return tb
 
 
@@ -788,3 +866,70 @@ def keep_relevant_ages(tb):
     ]
     tb = tb.loc[tb["age"].isin(AGES_RELEVANT)]
     return tb
+
+
+def make_table_share_women_with_n_kids(tb):
+    tb_share_women = tb.loc[:, ["ppr"]].reset_index()
+    tb_share_women = tb_share_women.dropna()
+
+    # Column renames
+    tb_share_women = tb_share_women.rename(
+        columns={
+            "birth_order": "num_births",
+            "ppr": "share_women",
+        }
+    )
+
+    # Check: Check that the number of years is consistent across countries and birth orders
+    # That is, there is no missing year
+    # I get the number of years per country, and check that that matches the year-difference.
+    x = tb_share_women.sort_values(["cohort", "num_births"])
+    x = x.groupby(["country", "num_births"])["cohort"].nunique()
+    y = tb_share_women.sort_values(["cohort", "num_births"])
+    y["diff"] = y.groupby(["country", "num_births"])["cohort"].diff()
+    y = y.groupby(["country", "num_births"])["diff"].sum() + 1
+    assert x.astype(int).equals(y.astype(int)), "Missing years!"
+
+    # Add 100% probability of having 0 kids
+    tb0 = tb_share_women.loc[:, ["country", "cohort"]].drop_duplicates()
+    tb0["num_births"] = 0
+    tb0["share_women"] = 1
+    tb_share_women = pr.concat([tb_share_women, tb0])
+    tb_share_women = tb_share_women.sort_values(["country", "num_births", "cohort"])
+
+    # Add conditioned probability to "not have more kids" given having N kids
+    tb_share_women["q"] = 1 - tb_share_women["share_women"]
+    ## Shift the value of q one up for each (country, cohort)
+    tb_share_women["q"] = tb_share_women.groupby(["country", "cohort"])["q"].shift(-1)
+    assert set(tb_share_women.loc[tb_share_women["q"].isna(), "num_births"].unique()) == {
+        "4"
+    }, "Unknown probability should only be there for 4"
+
+    # Share of women with N kids (cumulative)
+    tb_share_women["share_women"] = tb_share_women.groupby(["country", "cohort"], as_index=False)[
+        "share_women"
+    ].cumprod()
+
+    # Share of women with N kids
+    tb_share_women["share_women"] = tb_share_women["share_women"] * tb_share_women["q"].fillna(1)
+
+    # Sanity check
+    x = 1 - tb_share_women.groupby(["country", "cohort"]).share_women.sum()
+    assert (x < 1e-10).all(), "Probabilities don't add up to 100% for certain years!"
+
+    # Drop unused columns
+    tb_share_women = tb_share_women.drop(columns=["q"])
+
+    # Ensure dtype
+    tb_share_women["num_births"] = tb_share_women["num_births"].astype(int)
+
+    # Set index
+    tb_share_women = tb_share_women.format(["country", "num_births", "cohort"], short_name="cohort_share_women")
+
+    # Scale to %
+    tb_share_women["share_women"] *= 100
+
+    # Add origins
+    tb_share_women["share_women"].metadata.origins = tb["ppr"].metadata.origins
+
+    return tb_share_women

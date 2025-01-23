@@ -1,0 +1,7 @@
+steps:
+  data://meadow/wb/2022-10-29/wb_gender:
+    - walden://wb/2022-10-29/wb_gender
+  data://garden/wb/2022-10-29/wb_gender:
+    - data://meadow/wb/2022-10-29/wb_gender
+  data://grapher/wb/2022-10-29/wb_gender:
+    - data://garden/wb/2022-10-29/wb_gender

@@ -40,7 +40,7 @@ def prepare_item_prices_table(tb_prices: Table, item_name: str) -> Table:
     tb_item_prices.metadata.short_name = f"statistical_review_of_world_energy_{item_name}"
 
     # Set an appropriate index and sort conveniently.
-    tb_item_prices = tb_item_prices.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_item_prices = tb_item_prices.format(["country", "year"])
 
     return tb_item_prices
 

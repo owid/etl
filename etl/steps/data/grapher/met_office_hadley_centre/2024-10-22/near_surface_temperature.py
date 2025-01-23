@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     tb_garden = tb_garden.rename(columns={"region": "country"})
 
     # Set an appropriate index and sort conveniently.
-    tb_garden = tb_garden.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_garden = tb_garden.format(["country", "year"], sort_columns=True)
 
     #
     # Save outputs.

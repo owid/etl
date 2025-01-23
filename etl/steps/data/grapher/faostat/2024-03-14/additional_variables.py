@@ -79,7 +79,7 @@ def prepare_maize_and_wheat_in_the_context_of_the_ukraine_war(tb_maize_and_wheat
     )
 
     # Set an appropriate index and sort conveniently.
-    combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    combined = combined.format(["country", "year"], sort_columns=True)
 
     # Adapt metadata.
     combined.metadata.short_name = "maize_and_wheat_in_the_context_of_the_ukraine_war"
@@ -151,6 +151,7 @@ def run(dest_dir: str) -> None:
     tb_cereal_allocation = ds_garden["cereal_allocation"]
     tb_maize_and_wheat = ds_garden["maize_and_wheat"].reset_index()
     tb_fertilizer_exports = ds_garden["fertilizer_exports"]
+    tb_net_exports_as_share_of_supply = ds_garden["net_exports_as_share_of_supply"]
 
     #
     # Process data.
@@ -159,19 +160,17 @@ def run(dest_dir: str) -> None:
     tb_area_used_per_crop_type = (
         tb_area_used_per_crop_type.reset_index()
         .rename(columns={"item": "country"}, errors="raise")
-        .set_index(["country", "year"], verify_integrity=True)
-        .sort_index()
+        .format(["country", "year"])
     )
 
     # For land spared by increased crop yields, for the moment we only need global data, by crop type.
     # And again, change "item" to "country" to fit grapher DB needs.
     tb_land_spared_by_increased_crop_yields = tb_land_spared_by_increased_crop_yields.reset_index()
     tb_land_spared_by_increased_crop_yields = (
-        tb_land_spared_by_increased_crop_yields[tb_land_spared_by_increased_crop_yields["country"] == "World"]
+        tb_land_spared_by_increased_crop_yields.loc[tb_land_spared_by_increased_crop_yields["country"] == "World"]
         .drop(columns=["country"], errors="raise")
         .rename(columns={"item": "country"}, errors="raise")
-        .set_index(["country", "year"], verify_integrity=True)
-        .sort_index()
+        .format(["country", "year"])
     )
 
     # Prepare maize and what data in the context of the Ukraine war.
@@ -204,6 +203,7 @@ def run(dest_dir: str) -> None:
             tb_cereal_allocation,
             tb_maize_and_wheat_in_the_context_of_the_ukraine_war,
             tb_fertilizer_exports_in_the_context_of_the_ukraine_war,
+            tb_net_exports_as_share_of_supply,
         ],
         default_metadata=ds_garden.metadata,
         check_variables_metadata=True,

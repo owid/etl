@@ -21,7 +21,7 @@ from owid.datautils.dataframes import map_series
 from structlog import get_logger
 
 from etl.db import get_connection
-from etl.grapher_io import get_dataset_id, get_variables_in_dataset
+from etl.grapher.io import get_dataset_id, get_variables_in_dataset
 
 # from etl.chart_revision.v2.core import create_and_submit_charts_revisions
 from etl.paths import DATA_DIR

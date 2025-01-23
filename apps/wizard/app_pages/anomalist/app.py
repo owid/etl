@@ -32,12 +32,19 @@ from apps.wizard.app_pages.anomalist.utils import (
     get_datasets_and_mapping_inputs,
     get_scores,
 )
-from apps.wizard.utils import cached, set_states, url_persist
+from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.chart_config import bake_chart_config
-from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, st_multiselect_wider, tag_in_md
+from apps.wizard.utils.components import (
+    Pagination,
+    grapher_chart,
+    st_horizontal,
+    st_multiselect_wider,
+    tag_in_md,
+    url_persist,
+)
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
-from etl.grapher_io import load_variables
+from etl.grapher.io import load_variables
 
 # PAGE CONFIG
 st.set_page_config(
@@ -126,11 +133,13 @@ st.session_state.anomalist_trigger_detection = st.session_state.get("anomalist_t
 # Only anomalies with scores above the following thresholds will be shown by default.
 # NOTE: For some reason, streamlit raises an error when the minimum is zero.
 #  To avoid this, set it to a positive number (above, e.g. 1e-9).
-st.session_state.anomalist_min_anomaly_score = st.session_state.get("anomalist_min_anomaly_score", 0.3)
-st.session_state.anomalist_min_weighted_score = st.session_state.get("anomalist_min_weighted_score", 0.1)
-st.session_state.anomalist_min_population_score = st.session_state.get("anomalist_min_population_score", 1e-9)
-st.session_state.anomalist_min_analytics_score = st.session_state.get("anomalist_min_analytics_score", 1e-9)
-st.session_state.anomalist_min_scale_score = st.session_state.get("anomalist_min_scale_score", 1e-9)
+DEFAULT_ANOMALIST_WEIGHTS = {
+    "anomalist_min_anomaly_score": 0.3,
+    "anomalist_min_weighted_score": 0.1,
+    "anomalist_min_population_score": 1e-9,
+    "anomalist_min_analytics_score": 1e-9,
+    "anomalist_min_scale_score": 1e-9,
+}
 
 # Advanced expander.
 st.session_state.anomalist_expander_advanced_options = st.session_state.get(
@@ -781,6 +790,7 @@ if st.session_state.anomalist_df is not None:
                     max_value=1.0,
                     # step=0.001,
                     key=f"anomalist_min_{score_name}_score",
+                    value=DEFAULT_ANOMALIST_WEIGHTS[f"anomalist_min_{score_name}_score"],
                 )
 
     # 4.3/ APPLY FILTERS

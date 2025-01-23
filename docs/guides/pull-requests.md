@@ -38,5 +38,5 @@ You can find an example [here](https://github.com/owid/etl/pull/3563).
 
 <figure markdown="span">
     <img src="../../assets/pr-2.png" alt="Chart Upgrader" style="width:100%;">
-    <figcaption>[GitHub acction comment](https://github.com/owid/etl/pull/3563#issuecomment-2485414940), as of 19th November 2024</figcaption>
+    <figcaption>[GitHub action comment](https://github.com/owid/etl/pull/3563#issuecomment-2485414940), as of 19th November 2024</figcaption>
 </figure>

@@ -11,6 +11,183 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# List of food groups created by OWID for FBSC (combination of FBS and FBSH).
+# Each food group contains one or more "item groups", defined in dataset by FAOSTAT.
+# Each item group contains one or more "item", defined by FAOSTAT.
+# The complete list of items coincides exactly with the complete list of items of FAOSTAT item group "Grand Total"
+# (with item group code 2901).
+# So all existing food items in FBSC are contained here, and there are no repetitions.
+# Notes:
+# * There are a few item groups that are not included here, namely "Vegetal Products" (item group code 2903),
+#   and "Animal Products" (item group code 2941). But their items are contained in other item groups, so including
+#   them would cause unnecessary repetition of items.
+# * To check for the components of an individual item group:
+# from etl.paths import DATA_DIR
+# metadata = Dataset(DATA_DIR / "meadow/faostat/2023-02-22/faostat_metadata")
+# item_groups = metadata["faostat_fbs_item_group"]
+# set(item_groups.loc[2941]["item"])
+FOOD_GROUPS_FBSC = {
+    "Cereals and grains": [
+        "00002905",  # Cereals, Excluding Beer
+        # Item group contains:
+        # 'Barley and products',
+        # 'Cereals, Other',
+        # 'Maize and products',
+        # 'Millet and products',
+        # 'Oats',
+        # 'Rice and products',
+        # 'Rye and products',
+        # 'Sorghum and products',
+        # 'Wheat and products',
+    ],
+    "Pulses": [
+        "00002911",  # Pulses
+        # Item group contains:
+        # 'Beans',
+        # 'Peas',
+        # 'Pulses, Other and products',
+    ],
+    "Starchy roots": [
+        "00002907",  # Starchy Roots
+        # Item group contains:
+        # 'Cassava and products',
+        # 'Potatoes and products',
+        # 'Roots, Other',
+        # 'Sweet potatoes',
+        # 'Yams',
+    ],
+    "Fruits and vegetables": [
+        "00002919",  # Fruits - Excluding Wine
+        # Item group contains:
+        # 'Apples and products',
+        # 'Bananas',
+        # 'Citrus, Other',
+        # 'Dates',
+        # 'Fruits, other',
+        # 'Grapefruit and products',
+        # 'Grapes and products (excl wine)',
+        # 'Lemons, Limes and products',
+        # 'Oranges, Mandarines',
+        # 'Pineapples and products',
+        # 'Plantains',
+        "00002918",  # Vegetables
+        # Item group contains:
+        # 'Onions',
+        # 'Tomatoes and products',
+        # 'Vegetables, other',
+    ],
+    "Oils and fats": [
+        "00002914",  # Vegetable Oils
+        # Item group contains:
+        # 'Coconut Oil',
+        # 'Cottonseed Oil',
+        # 'Groundnut Oil',
+        # 'Maize Germ Oil',
+        # 'Oilcrops Oil, Other',
+        # 'Olive Oil',
+        # 'Palm Oil',
+        # 'Palmkernel Oil',
+        # 'Rape and Mustard Oil',
+        # 'Ricebran Oil',
+        # 'Sesameseed Oil',
+        # 'Soyabean Oil',
+        # 'Sunflowerseed Oil'
+        "00002946",  # Animal fats group
+        # Item group contains:
+        # 'Butter, Ghee',
+        # 'Cream',
+        # 'Fats, Animals, Raw',
+        # 'Fish, Body Oil',
+        # 'Fish, Liver Oil'
+        "00002913",  # Oilcrops
+        # Item group contains:
+        # 'Coconuts - Incl Copra',
+        # 'Cottonseed',
+        # 'Groundnuts',
+        # 'Oilcrops, Other',
+        # 'Olives (including preserved)',
+        # 'Palm kernels',
+        # 'Rape and Mustardseed',
+        # 'Sesame seed',
+        # 'Soyabeans',
+        # 'Sunflower seed'
+        "00002912",  # Treenuts
+        # Item group contains:
+        # 'Nuts and products',
+    ],
+    "Sugar": [
+        "00002909",  # Sugar & Sweeteners
+        # Item group contains:
+        # 'Honey',
+        # 'Sugar (Raw Equivalent)',
+        # 'Sugar non-centrifugal',
+        # 'Sweeteners, Other',
+        "00002908",  # Sugar crops
+        # Item group contains:
+        # 'Sugar beet',
+        # 'Sugar cane',
+    ],
+    "Meat": [
+        "00002960",  # Fish and seafood
+        # Item group contains:
+        # 'Aquatic Animals, Others',
+        # 'Cephalopods',
+        # 'Crustaceans',
+        # 'Demersal Fish',
+        # 'Freshwater Fish',
+        # 'Marine Fish, Other',
+        # 'Molluscs, Other',
+        # 'Pelagic Fish',
+        "00002943",  # Meat, total
+        # Item group contains:
+        # 'Bovine Meat',
+        # 'Meat, Other',
+        # 'Mutton & Goat Meat',
+        # 'Pigmeat',
+        # 'Poultry Meat',
+    ],
+    "Dairy and eggs": [
+        "00002948",  # Milk - Excluding Butter
+        # Item group contains:
+        # 'Milk - Excluding Butter',
+        "00002949",  # Eggs
+        # Item group contains:
+        # 'Eggs',
+    ],
+    "Alcoholic beverages": [
+        "00002924",  # Alcoholic Beverages
+        # Item group contains:
+        # 'Alcohol, Non-Food',
+        # 'Beer',
+        # 'Beverages, Alcoholic',
+        # 'Beverages, Fermented',
+        # 'Wine',
+    ],
+    "Other": [
+        "00002928",  # Miscellaneous
+        # Item group contains:
+        # 'Infant food',
+        # 'Miscellaneous',
+        "00002923",  # Spices
+        # Item group contains:
+        # 'Cloves',
+        # 'Pepper',
+        # 'Pimento',
+        # 'Spices, Other',
+        "00002922",  # Stimulants
+        # Item group contains:
+        # 'Cocoa Beans and products',
+        # 'Coffee and products',
+        # 'Tea (including mate)',
+        "00002945",  # Offals
+        # Item group contains:
+        # 'Offals, Edible',
+        "00002961",  # Aquatic Products, Other
+        # 'Aquatic Plants',
+        # 'Meat, Aquatic Mammals',
+    ],
+}
+
 
 def generate_arable_land_per_crop_output(tb_rl: Table, tb_qi: Table) -> Table:
     # Item code for item "Arable land" of faostat_rl dataset.
@@ -66,8 +243,7 @@ def generate_arable_land_per_crop_output(tb_rl: Table, tb_qi: Table) -> Table:
     )
 
     # Set an appropriate index and sort conveniently.
-    tb_combined = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb_combined.metadata.short_name = "arable_land_per_crop_output"
+    tb_combined = combined.format(["country", "year"], short_name="arable_land_per_crop_output")
 
     return tb_combined
 
@@ -182,8 +358,7 @@ def generate_percentage_of_sustainable_and_overexploited_fish(tb_sdgb: Table) ->
     tb_sdgb["overexploited_fish"] = 100 - tb_sdgb["sustainable_fish"]
 
     # Set an appropriate index and sort conveniently.
-    tb_fish = tb_sdgb.set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb_fish.metadata.short_name = "share_of_sustainable_and_overexploited_fish"
+    tb_fish = tb_sdgb.format(["country", "year"], short_name="share_of_sustainable_and_overexploited_fish")
 
     return tb_fish
 
@@ -261,8 +436,7 @@ def generate_spared_land_from_increased_yields(tb_qcl: Table) -> Table:
     )
 
     # Set an appropriate index and sort conveniently.
-    tb_spared_land = spared_land.set_index(["country", "year", "item"], verify_integrity=True).sort_index()
-    tb_spared_land.metadata.short_name = "land_spared_by_increased_crop_yields"
+    tb_spared_land = spared_land.format(["country", "year", "item"], short_name="land_spared_by_increased_crop_yields")
 
     return tb_spared_land
 
@@ -280,202 +454,26 @@ def generate_food_available_for_consumption(tb_fbsc: Table) -> Table:
     error = "Units for food available for consumption have changed."
     assert list(tb_fbsc["unit"].unique()) == [CONSUMPTION_UNIT], error
 
-    # List of food groups created by OWID.
-    # Each food group contains one or more "item groups", defined by FAOSTAT.
-    # Each item group contains one or more "item", defined by FAOSTAT.
-    # The complete list of items coincides exactly with the complete list of items of FAOSTAT item group "Grand Total"
-    # (with item group code 2901).
-    # So all existing food items in FBSC are contained here, and there are no repetitions.
-    # Notes:
-    # * There are a few item groups that are not included here, namely "Vegetal Products" (item group code 2903),
-    #   and "Animal Products" (item group code 2941). But their items are contained in other item groups, so including
-    #   them would cause unnecessary repetition of items.
-    # * To check for the components of an individual item group:
-    # from etl.paths import DATA_DIR
-    # metadata = Dataset(DATA_DIR / "meadow/faostat/2023-02-22/faostat_metadata")
-    # item_groups = metadata["faostat_fbs_item_group"]
-    # set(item_groups.loc[2941]["item"])
-    FOOD_GROUPS = {
-        "Cereals and grains": [
-            "00002905",  # Cereals, Excluding Beer
-            # Item group contains:
-            # 'Barley and products',
-            # 'Cereals, Other',
-            # 'Maize and products',
-            # 'Millet and products',
-            # 'Oats',
-            # 'Rice and products',
-            # 'Rye and products',
-            # 'Sorghum and products',
-            # 'Wheat and products',
-        ],
-        "Pulses": [
-            "00002911",  # Pulses
-            # Item group contains:
-            # 'Beans',
-            # 'Peas',
-            # 'Pulses, Other and products',
-        ],
-        "Starchy roots": [
-            "00002907",  # Starchy Roots
-            # Item group contains:
-            # 'Cassava and products',
-            # 'Potatoes and products',
-            # 'Roots, Other',
-            # 'Sweet potatoes',
-            # 'Yams',
-        ],
-        "Fruits and vegetables": [
-            "00002919",  # Fruits - Excluding Wine
-            # Item group contains:
-            # 'Apples and products',
-            # 'Bananas',
-            # 'Citrus, Other',
-            # 'Dates',
-            # 'Fruits, other',
-            # 'Grapefruit and products',
-            # 'Grapes and products (excl wine)',
-            # 'Lemons, Limes and products',
-            # 'Oranges, Mandarines',
-            # 'Pineapples and products',
-            # 'Plantains',
-            "00002918",  # Vegetables
-            # Item group contains:
-            # 'Onions',
-            # 'Tomatoes and products',
-            # 'Vegetables, other',
-        ],
-        "Oils and fats": [
-            "00002914",  # Vegetable Oils
-            # Item group contains:
-            # 'Coconut Oil',
-            # 'Cottonseed Oil',
-            # 'Groundnut Oil',
-            # 'Maize Germ Oil',
-            # 'Oilcrops Oil, Other',
-            # 'Olive Oil',
-            # 'Palm Oil',
-            # 'Palmkernel Oil',
-            # 'Rape and Mustard Oil',
-            # 'Ricebran Oil',
-            # 'Sesameseed Oil',
-            # 'Soyabean Oil',
-            # 'Sunflowerseed Oil'
-            "00002946",  # Animal fats group
-            # Item group contains:
-            # 'Butter, Ghee',
-            # 'Cream',
-            # 'Fats, Animals, Raw',
-            # 'Fish, Body Oil',
-            # 'Fish, Liver Oil'
-            "00002913",  # Oilcrops
-            # Item group contains:
-            # 'Coconuts - Incl Copra',
-            # 'Cottonseed',
-            # 'Groundnuts',
-            # 'Oilcrops, Other',
-            # 'Olives (including preserved)',
-            # 'Palm kernels',
-            # 'Rape and Mustardseed',
-            # 'Sesame seed',
-            # 'Soyabeans',
-            # 'Sunflower seed'
-            "00002912",  # Treenuts
-            # Item group contains:
-            # 'Nuts and products',
-        ],
-        "Sugar": [
-            "00002909",  # Sugar & Sweeteners
-            # Item group contains:
-            # 'Honey',
-            # 'Sugar (Raw Equivalent)',
-            # 'Sugar non-centrifugal',
-            # 'Sweeteners, Other',
-            "00002908",  # Sugar crops
-            # Item group contains:
-            # 'Sugar beet',
-            # 'Sugar cane',
-        ],
-        "Meat": [
-            "00002960",  # Fish and seafood
-            # Item group contains:
-            # 'Aquatic Animals, Others',
-            # 'Cephalopods',
-            # 'Crustaceans',
-            # 'Demersal Fish',
-            # 'Freshwater Fish',
-            # 'Marine Fish, Other',
-            # 'Molluscs, Other',
-            # 'Pelagic Fish',
-            "00002943",  # Meat, total
-            # Item group contains:
-            # 'Bovine Meat',
-            # 'Meat, Other',
-            # 'Mutton & Goat Meat',
-            # 'Pigmeat',
-            # 'Poultry Meat',
-        ],
-        "Dairy and eggs": [
-            "00002948",  # Milk - Excluding Butter
-            # Item group contains:
-            # 'Milk - Excluding Butter',
-            "00002949",  # Eggs
-            # Item group contains:
-            # 'Eggs',
-        ],
-        "Alcoholic beverages": [
-            "00002924",  # Alcoholic Beverages
-            # Item group contains:
-            # 'Alcohol, Non-Food',
-            # 'Beer',
-            # 'Beverages, Alcoholic',
-            # 'Beverages, Fermented',
-            # 'Wine',
-        ],
-        "Other": [
-            "00002928",  # Miscellaneous
-            # Item group contains:
-            # 'Infant food',
-            # 'Miscellaneous',
-            "00002923",  # Spices
-            # Item group contains:
-            # 'Cloves',
-            # 'Pepper',
-            # 'Pimento',
-            # 'Spices, Other',
-            "00002922",  # Stimulants
-            # Item group contains:
-            # 'Cocoa Beans and products',
-            # 'Coffee and products',
-            # 'Tea (including mate)',
-            "00002945",  # Offals
-            # Item group contains:
-            # 'Offals, Edible',
-            "00002961",  # Aquatic Products, Other
-            # 'Aquatic Plants',
-            # 'Meat, Aquatic Mammals',
-        ],
-    }
-
     # Sanity check.
     error = "Not all expected item codes are found in the data."
-    assert set([item_code for group in FOOD_GROUPS.values() for item_code in group]) <= set(tb_fbsc["item_code"]), error
+    assert set([item_code for group in FOOD_GROUPS_FBSC.values() for item_code in group]) <= set(
+        tb_fbsc["item_code"]
+    ), error
 
     # Create a list of tables, one for each food group.
     tables = [
-        tb_fbsc[tb_fbsc["item_code"].isin(FOOD_GROUPS[group])]
+        tb_fbsc[tb_fbsc["item_code"].isin(FOOD_GROUPS_FBSC[group])]
         .groupby(["country", "year"], as_index=False, observed=True)
         .agg({"value": "sum"})
         .rename(columns={"value": group}, errors="raise")
-        for group in FOOD_GROUPS
+        for group in FOOD_GROUPS_FBSC
     ]
     combined = pr.multi_merge(tables=tables, on=["country", "year"], how="outer")
 
     # Ensure all column names are snake-case, set an appropriate index and and sort conveniently.
-    tb_food_available_for_consumption = (
-        combined.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_food_available_for_consumption = combined.underscore().format(
+        ["country", "year"], short_name="food_available_for_consumption"
     )
-    tb_food_available_for_consumption.metadata.short_name = "food_available_for_consumption"
 
     # Prepare variable metadata.
     common_description = (
@@ -484,8 +482,8 @@ def generate_food_available_for_consumption(tb_fbsc: Table) -> Table:
         "household or consumption level, so they may not directly reflect the quantity of food finally consumed by a "
         "given individual.\n\nSpecific food commodities have been grouped into higher-level categories."
     )
-    for group in FOOD_GROUPS:
-        item_names = list(tb_fbsc[tb_fbsc["item_code"].isin(FOOD_GROUPS[group])]["item"].unique())
+    for group in FOOD_GROUPS_FBSC:
+        item_names = list(tb_fbsc[tb_fbsc["item_code"].isin(FOOD_GROUPS_FBSC[group])]["item"].unique())
         description = (
             common_description
             + f" Food group '{group}' includes the FAO item groups: '"
@@ -616,8 +614,7 @@ def generate_macronutrient_compositions(tb_fbsc: Table) -> Table:
     )
 
     # Ensure all column names are snake-case, set an appropriate index, and sort conveniently.
-    tb_combined = combined.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb_combined.metadata.short_name = "macronutrient_compositions"
+    tb_combined = combined.underscore().format(["country", "year"], short_name="macronutrient_compositions")
 
     return tb_combined
 
@@ -690,8 +687,7 @@ def generate_fertilizers(tb_rfn: Table, tb_rl: Table) -> Table:
         combined[f"{fertilizer}_use"] = combined[f"{fertilizer}_per_cropland"] * combined["cropland"] * KG_TO_TONNES
 
     # Set an appropriate index and sort conveniently.
-    tb_fertilizers = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb_fertilizers.metadata.short_name = "fertilizers"
+    tb_fertilizers = combined.format(["country", "year"], short_name="fertilizers")
 
     return tb_fertilizers
 
@@ -854,8 +850,7 @@ def generate_vegetable_oil_yields(tb_qcl: Table, tb_fbsc: Table) -> Table:
     combined = combined.replace(np.inf, np.nan)
 
     # Set an appropriate index and sort conveniently.
-    tb_vegetable_oil_yields = combined.set_index(["country", "year"], verify_integrity=True).sort_index()
-    tb_vegetable_oil_yields.metadata.short_name = "vegetable_oil_yields"
+    tb_vegetable_oil_yields = combined.format(["country", "year"], short_name="vegetable_oil_yields")
 
     return tb_vegetable_oil_yields
 
@@ -911,10 +906,9 @@ def generate_agriculture_land_evolution(tb_rl: Table) -> Table:
     combined["year_one_decade_back"] = combined["year_one_decade_back"].copy_metadata(combined["year"])
 
     # Set an appropriate index and sort conveniently.
-    tb_agriculture_land_use_evolution = (
-        combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_agriculture_land_use_evolution = combined.format(
+        ["country", "year"], sort_columns=True, short_name="agriculture_land_use_evolution"
     )
-    tb_agriculture_land_use_evolution.metadata.short_name = "agriculture_land_use_evolution"
 
     return tb_agriculture_land_use_evolution
 
@@ -1005,10 +999,9 @@ def generate_hypothetical_meat_consumption(tb_qcl: Table) -> Table:
     combined["animals_global_hypothetical"] = combined["animals_per_capita"] * combined["global_population"]
 
     # Set an appropriate index and sort conveniently.
-    tb_hypothetical_meat_consumption = (
-        combined.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_hypothetical_meat_consumption = combined.format(
+        ["country", "year"], sort_columns=True, short_name="hypothetical_meat_consumption"
     )
-    tb_hypothetical_meat_consumption.metadata.short_name = "hypothetical_meat_consumption"
 
     return tb_hypothetical_meat_consumption
 
@@ -1061,8 +1054,7 @@ def generate_cereal_allocation(tb_fbsc: Table) -> Table:
         )
 
     # Set an appropriate index and sort conveniently.
-    tb_cereal_allocation = cereals.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-    tb_cereal_allocation.metadata.short_name = "cereal_allocation"
+    tb_cereal_allocation = cereals.format(["country", "year"], sort_columns=True, short_name="cereal_allocation")
 
     return tb_cereal_allocation
 
@@ -1105,10 +1097,7 @@ def generate_maize_and_wheat(tb_fbsc: Table) -> Table:
     )
 
     # Set an appropriate index and sort conveniently.
-    tb_maize_and_wheat = (
-        maize_and_wheat.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
-    )
-    tb_maize_and_wheat.metadata.short_name = "maize_and_wheat"
+    tb_maize_and_wheat = maize_and_wheat.format(["country", "year"], sort_columns=True, short_name="maize_and_wheat")
 
     # Add minimal variable metadata (more metadata will be added at the grapher step).
     for column in tb_maize_and_wheat.columns:
@@ -1161,10 +1150,9 @@ def generate_fertilizer_exports(tb_rfn: Table) -> Table:
     fertilizer_exports = fertilizer_exports.drop(columns=["exports_global"], errors="raise")
 
     # Set an appropriate index and sort conveniently.
-    tb_fertilizer_exports = (
-        fertilizer_exports.set_index(["country", "year", "item"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_fertilizer_exports = fertilizer_exports.format(
+        ["country", "year", "item"], sort_columns=True, short_name="fertilizer_exports"
     )
-    tb_fertilizer_exports.metadata.short_name = "fertilizer_exports"
 
     # Add minimal variable metadata (more metadata will be added at the grapher step).
     tb_fertilizer_exports["share_of_exports"].metadata.unit = "%"
@@ -1173,6 +1161,63 @@ def generate_fertilizer_exports(tb_rfn: Table) -> Table:
     tb_fertilizer_exports["exports"].metadata.short_unit = "t"
 
     return tb_fertilizer_exports
+
+
+def generate_net_exports_as_share_of_supply(tb_fbsc: Table) -> Table:
+    # I want to create a new indicator for the net trade balance as a share of consumption (or rather, domestic supply).
+    # In other words, I want to calculate (Exports - Imports) / Domestic supply.
+    # Here, note that we don't use "Food", since imports and exports include all agricultural products (including e.g. feed), whereas "Food" includes only food allocated for human consumption.
+    # "Domestic supply" is the total supply of an item (including food, feed, and other uses) available for consumption.
+    # However, I want to have this indicator for a global total, not for each item.
+    # There is a grand total in the data, but only for "Fat supply quantity (t)", "Food available for consumption", "Food supply (kcal)", and "Protein supply quantity (t)".
+    # We would need to create this total for Imports, Exports, and Domestic supply.
+    # To do that, I can simply sum those elements over all items in FOOD_GROUPS.
+
+    # Element code for "Exports".
+    ELEMENT_CODE_FOR_EXPORTS = "005911"
+    # Element code for "Imports".
+    ELEMENT_CODE_FOR_IMPORTS = "005611"
+    # Element code for "Domestic supply quantity".
+    ELEMENT_CODE_FOR_DOMESTIC_SUPPLY = "005301"
+    # Gather the items that make up all foods.
+    all_items = sum(FOOD_GROUPS_FBSC.values(), [])
+
+    # Select the relevant items/elements.
+    tb = tb_fbsc[
+        (tb_fbsc["item_code"].isin(all_items))
+        & (
+            tb_fbsc["element_code"].isin(
+                [ELEMENT_CODE_FOR_EXPORTS, ELEMENT_CODE_FOR_IMPORTS, ELEMENT_CODE_FOR_DOMESTIC_SUPPLY]
+            )
+        )
+    ][["country", "year", "item", "element", "value", "unit"]].reset_index(drop=True)
+
+    # Sanity check.
+    error = "Units have changed."
+    assert list(tb["unit"].unique()) == ["tonnes"], error
+    tb = tb.drop(columns="unit", errors="raise")
+
+    # Visually inspect how many item groups are informed for each element.
+    # tb.groupby(["element", "item"], observed=True, as_index=False).size().sort_values(["item", "element"])
+    # I see that, for all item groups, there is roughly a similar number of imports, exports, and food.
+    # It is possible that supply is better informed that imports and exports, but if so, it's not by a significant percentage.
+
+    # Add up the total of imports, exports and food for each country and year.
+    tb = tb.groupby(["country", "year", "element"], observed=True, as_index=False).agg({"value": "sum"})
+
+    # Transpose data and rename columns conveniently.
+    tb = tb.pivot(index=["country", "year"], columns="element", values="value", join_column_levels_with="_")
+
+    # Create a new column for food trade balance relative to domestic supply, defined as net exports as a share of domestic supply.
+    tb["net_exports_as_share_of_supply"] = 100 * (tb["Exports"] - tb["Imports"]) / tb["Domestic supply"]
+
+    # Remove unnecessary columns.
+    tb = tb.drop(columns=["Exports", "Imports", "Domestic supply"], errors="raise")
+
+    # Improve table format.
+    tb = tb.format(short_name="net_exports_as_share_of_supply")
+
+    return tb
 
 
 def run(dest_dir: str) -> None:
@@ -1245,6 +1290,9 @@ def run(dest_dir: str) -> None:
     # Create table for fertilizer exports (used in the context of the Ukraine war).
     tb_fertilizer_exports = generate_fertilizer_exports(tb_rfn=tb_rfn)
 
+    # Create table for food trade as a share of consumption.
+    tb_net_exports_as_share_of_supply = generate_net_exports_as_share_of_supply(tb_fbsc=tb_fbsc)
+
     #
     # Save outputs.
     #
@@ -1265,6 +1313,7 @@ def run(dest_dir: str) -> None:
             tb_cereal_allocation,
             tb_maize_and_wheat,
             tb_fertilizer_exports,
+            tb_net_exports_as_share_of_supply,
         ],
         check_variables_metadata=True,
     )

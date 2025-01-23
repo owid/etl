@@ -21,6 +21,10 @@ def run(dest_dir: str) -> None:
     ds_hfd = paths.load_dataset("hfd")
     ds_un = paths.load_dataset("un_wpp")
 
+    #
+    # 1/ Combine fertility rate from HFD and UN WPP datasets.
+    #
+
     # Read table from meadow dataset.
     tb_hfd = ds_hfd.read("period")
     tb_un = ds_un.read("fertility_rate")
@@ -36,9 +40,10 @@ def run(dest_dir: str) -> None:
         ((tb_hfd["birth_order"] == "total") & (tb_hfd["year"] < YEAR_WPP_START)), ["country", "year", "tfr"]
     ].rename(columns={"tfr": "fertility_rate"})
 
-    #
-    # Process data.
-    #
+    # Sanity check: UN starts at 1950
+    assert tb_un["year"].min() == YEAR_WPP_START, f"UN WPP data does not start at {YEAR_WPP_START}."
+
+    # Combine
     tb = pr.concat([tb_hfd, tb_un], ignore_index=True, short_name="fertility_rate")
 
     # Add historical variant
@@ -49,12 +54,47 @@ def run(dest_dir: str) -> None:
     tb = tb.format(["country", "year"])
 
     #
+    # 2/ Combine fertility rate by age (distribution)
+    #
+
+    # Read table from meadow dataset.
+    tb_hfd = ds_hfd.read("period_ages_years")
+    tb_un = ds_un.read("fertility_single")
+
+    # Rename columns
+    tb_un = tb_un.rename(columns={"fertility_rate": "asfr"})
+    tb_hfd = tb_hfd.rename(columns={"asfr_period": "asfr"})
+
+    # # Adjust metrics
+    # tb_un["asfr"] /= 1_000
+
+    # Filter: Keep HFD for >1950, but include countries not in UN
+    countries_hfd = set(tb_hfd["country"].unique())
+    countries_un = set(tb_un["country"].unique())
+    countries_not_in_un = countries_hfd - countries_un
+    tb_hfd = tb_hfd.loc[(tb_hfd["year_as_dimension"] < YEAR_WPP_START) | (tb_hfd["country"].isin(countries_not_in_un))]
+
+    # Ensure min year in UN is 1950
+    assert tb_un["year_as_dimension"].min() == YEAR_WPP_START, f"UN WPP data does not start at {YEAR_WPP_START}."
+
+    # Combine
+    tb_by_age = pr.concat([tb_hfd, tb_un], ignore_index=True)
+
+    # Format
+    tb_by_age = tb_by_age.format(["country", "age", "year_as_dimension"], short_name="fertility_rate_by_age")
+
+    #
     # Save outputs.
     #
+    tables = [
+        tb,
+        tb_by_age,
+    ]
+
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb],
+        tables=tables,
         check_variables_metadata=True,
     )
 

@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, cast
 import streamlit as st
 from sqlalchemy.orm import Session
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from apps.backport.datasync.data_metadata import (
     filter_out_fields_in_metadata_for_checksum,
 )
@@ -22,7 +22,7 @@ from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflict
 from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
 from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
-from etl.grapher_io import variable_metadata_df_from_s3
+from etl.grapher.io import variable_metadata_df_from_s3
 
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {
@@ -295,15 +295,15 @@ class ChartDiffShow:
         # Copy link
         if self.show_link:
             with col3:
-                query_params = f"page=chart-diff&chart_id={self.diff.chart_id}"
+                query_params = f"chart_id={self.diff.chart_id}"
                 # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
                 if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
                     st.caption(
-                        f"**{OWID_ENV.wizard_url_remote}?{query_params}**",
+                        f"**{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}**",
                         help=f"Shown is the link to the remote chart-diff.\n\n Alternatively, local link: {OWID_ENV.wizard_url}?{query_params}",
                     )
                 else:
-                    st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
+                    st.caption(f"**{OWID_ENV.wizard_url}/chart-diff?{query_params}**")
 
     def _show_metadata_diff(self) -> None:
         """Show metadata diff (if applicable).

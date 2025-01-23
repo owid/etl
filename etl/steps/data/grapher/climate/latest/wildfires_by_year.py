@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
         dest_dir,
         tables=[tb],
         default_metadata=ds_garden.metadata,
-        yaml_params={"date_accessed": last_date_accessed(tb)},
+        yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
     )
 
     ds_grapher.metadata.title = "Seasonal wildfire trends by year"

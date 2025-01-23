@@ -1,6 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from etl.grapher_helpers import adapt_table_with_dates_to_grapher
+from etl.grapher.helpers import adapt_table_with_dates_to_grapher
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     tb = adapt_table_with_dates_to_grapher(tb)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

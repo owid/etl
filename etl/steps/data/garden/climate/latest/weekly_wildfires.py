@@ -97,7 +97,7 @@ def run(dest_dir: str) -> None:
         tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
-        yaml_params={"date_accessed": last_date_accessed(tb)},
+        yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
     )
 
     # Save changes in the new garden dataset.
