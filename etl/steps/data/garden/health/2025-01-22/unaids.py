@@ -48,7 +48,7 @@ COLUMNS_RENAME_EPI = {
     "started_art_late_in_pregnancy_child_infected_during_pregnan": "art_start_late_preg_child_inf_preg",
     "did_not_receive_art_during_pregnancy_child_infected_during": "art_none_preg_child_inf_preg",
     "no_receive_art_during_bf": "art_none_bf",
-    "percent_on_art_vl_suppressed": "art_pct_vl_suppressed",
+    "percent_on_art_vl_suppressed": "percent_art_vl_suppressed",
     "mother_infected_during_breastfeeding_child_infected_during": "mother_child_inf_bf",
     "mother_infected_during_pregnancy_child_infected_during_preg": "mother_child_inf_preg",
 }
