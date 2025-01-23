@@ -73,16 +73,6 @@ steps:
   data://grapher/animal_welfare/2024-06-04/bullfighting_laws:
     - data://garden/animal_welfare/2024-06-04/bullfighting_laws
   #
-  # Farmed finfishes used for food (Mood et al. 2023).
-  #
-  data://meadow/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
-    - snapshot://animal_welfare/2023-08-08/farmed_finfishes_used_for_food.zip
-  data://garden/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
-    - data://meadow/animal_welfare/2023-08-08/farmed_finfishes_used_for_food
-    - data://garden/demography/2023-03-31/population
-  data://grapher/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
-    - data://garden/animal_welfare/2023-08-08/farmed_finfishes_used_for_food
-  #
   # Mood et al. 2023 - Farmed finfishes used for food.
   #
   data://meadow/animal_welfare/2024-12-12/farmed_finfishes_used_for_food:
