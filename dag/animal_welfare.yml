@@ -34,20 +34,6 @@ steps:
   data://grapher/animal_welfare/2023-08-03/share_of_cage_free_eggs:
     - data://garden/animal_welfare/2023-08-03/share_of_cage_free_eggs
   #
-  # Number of decapod crustaceans (Fishcount, 2018).
-  #
-  data://meadow/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
-    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2015.xlsx
-    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2016.xlsx
-    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2017.xlsx
-  data://garden/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
-    - data://meadow/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
-    - data://garden/demography/2023-03-31/population
-  data://grapher/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
-    - data://garden/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans
-  #
   # Chick culling laws (Various sources, 2023).
   #
   data://meadow/animal_welfare/2023-09-01/chick_culling_laws:
@@ -109,6 +95,18 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food:
     - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+  #
+  # Fishcount - Number of farmed crustaceans killed for food.
+  #
+  data://meadow/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
+    - snapshot://animal_welfare/2025-01-23/number_of_farmed_crustaceans.csv
+  data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
+    - data://meadow/animal_welfare/2025-01-23/number_of_farmed_crustaceans
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/demography/2024-07-15/population
+  data://grapher/animal_welfare/2025-01-23/number_of_farmed_crustaceans:
+    - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
   #
   # Fur laws (Fur Free Alliance).
   #
