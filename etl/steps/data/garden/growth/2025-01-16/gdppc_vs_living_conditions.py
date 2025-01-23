@@ -95,7 +95,7 @@ def run(dest_dir: str) -> None:
 
     # WHO
     tb_wash = tb_wash[tb_wash["residence"] == "Total"].reset_index(drop=True)
-    tb_wash = tb_wash[["country", "year", "wat_imp"]].rename(columns={"wat_imp": "access_to_improve_drinking_water"})
+    tb_wash = tb_wash[["country", "year", "wat_imp"]].rename(columns={"wat_imp": "access_to_improved_drinking_water"})
 
     # UNWTO
     tb_unwto = tb_unwto[["country", "year", "out_tour_departures_ovn_vis_tourists_per_1000"]].rename(
@@ -176,19 +176,20 @@ def select_most_recent_data(tb: Table) -> Table:
             # Drop rows with year higher than MOST_RECENT_YEAR
             tb_indicator = tb_indicator[tb_indicator["year"] <= MOST_RECENT_YEAR].reset_index(drop=True)
 
-        # Calculate latest year again
-        latest_year = tb_indicator["year"].max()
-
-        log.info(f"The latest year for indicator {indicator} is {latest_year}.")
-
         # Select all the rows where the data is at most 10 years old (MOST_RECENT_YEAR - 10)
         tb_indicator = tb_indicator[tb_indicator["year"] >= MOST_RECENT_YEAR - 10].reset_index(drop=True)
 
-        # Drop year column
-        tb_indicator = tb_indicator.drop(columns=["year"])
-
         # For each country, select the row with the latest year
         tb_indicator = tb_indicator.groupby("country").first().reset_index()
+
+        # Calculate latest year again and earliest year
+        latest_year = tb_indicator["year"].max()
+        earliest_year = tb_indicator["year"].min()
+
+        log.info(f"The indicator {indicator} ranges between {earliest_year} and {latest_year}.")
+
+        # Drop year column
+        tb_indicator = tb_indicator.drop(columns=["year"])
 
         tb_list.append(tb_indicator)
 
