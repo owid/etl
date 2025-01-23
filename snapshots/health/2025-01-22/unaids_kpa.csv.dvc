@@ -24,6 +24,6 @@ meta:
       name: CC BY-NC-SA 3.0 IGO
       url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
 outs:
-  - md5: 004fb73be31d20f373e1f28384f339f6
-    size: 10779785
+  - md5: af9540e31788764801d781313fe9e167
+    size: 7108656
     path: unaids_kpa.csv

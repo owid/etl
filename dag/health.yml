@@ -151,7 +151,10 @@ steps:
 
   # UNAIDS
   data://meadow/health/2025-01-22/unaids:
-    - snapshot://health/2025-01-22/unaids.csv
+    - snapshot://health/2025-01-22/unaids_kpa.csv
+    - snapshot://health/2025-01-22/unaids_gam.csv
+    - snapshot://health/2025-01-22/unaids_epi.csv
+    - snapshot://health/2025-01-22/unaids_ncpi.csv
 
   data://garden/health/2025-01-22/unaids:
     - data://garden/regions/2023-01-01/regions

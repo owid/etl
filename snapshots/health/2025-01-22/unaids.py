@@ -92,7 +92,7 @@ def get_all_data_from_api(path: str, sheet_name: str) -> pd.DataFrame:
             data.extend(result)
 
     # Combine all records into single dataframe
-    df = pd.DataFrame.from_records(data)
+    df = pd.json_normalize(data)
 
     return df
 

@@ -24,6 +24,6 @@ meta:
       name: CC BY-NC-SA 3.0 IGO
       url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
 outs:
-  - md5: e7a39053557c6caf5eb394e81f8c2c53
-    size: 81261206
+  - md5: 7fe6ba914aeb07340d81a2c4e6c779ee
+    size: 55993308
     path: unaids_ncpi.csv
