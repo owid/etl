@@ -27,7 +27,6 @@ dependencies = [
     "rich-click>=1.7.3",
     "tenacity>=8.0.1",
     "simplejson>=3.17.6",
-    "bugsnag>=4.2.1",
     "xlrd>=2.0.1",
     "PyPDF2>=2.11.1",
     "ruamel.yaml>=0.17.21",
@@ -70,6 +69,7 @@ dependencies = [
     "pyreadr>=0.5.2",
     "cfgrib>=0.9.15.0",
     "streamlit-aggrid>=1.0.5",
+    "sentry-sdk>=2.20.0",
 ]
 
 [tool.uv.sources]

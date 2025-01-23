@@ -1,0 +1,20 @@
+meta:
+  origin:
+    title: Number of individual wild fish killed for food
+    description: |-
+      Estimated numbers of individual finfishes caught annually from the wild for food, feed (often in the form of fishmeal and oil) and bait.
+    title_snapshot: Number of individual wild fish killed for food - Global numbers
+    producer: Mood and Brooke
+    citation_full: |-
+      Mood A, Brooke P. Estimating global numbers of fishes caught from the wild annually from 2000 to 2019. Animal Welfare. 2024;33:e6. doi:10.1017/awf.2024.7
+    url_main: https://www.cambridge.org/core/journals/animal-welfare/article/estimating-global-numbers-of-fishes-caught-from-the-wild-annually-from-2000-to-2019/83F1B933E8691F3A552636620E8C7A01
+    url_download: https://static.cambridge.org/content/id/urn%3Acambridge.org%3Aid%3Aarticle%3AS0962728624000071/resource/name/S0962728624000071sup004.pdf
+    date_published: 2024-02-08
+    date_accessed: 2024-12-12
+  license:
+    name: CC BY
+    url: https://s100.copyright.com/AppDispatchServlet?publisherName=CUP&publication=AWF&title=Estimating%20global%20numbers%20of%20fishes%20caught%20from%20the%20wild%20annually%20from%202000%20to%202019
+outs:
+  - md5: ae68222d6aca31ef083562dde8111955
+    size: 196957
+    path: number_of_wild_fish_killed_for_food_global.pdf

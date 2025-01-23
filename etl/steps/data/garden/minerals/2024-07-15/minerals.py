@@ -148,7 +148,7 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
     # NOTE: We decided to remove "Clays" altogether.
     # "production|Clays|Mine, kaolin|tonnes",
     # Reasonable global agreement, except for Turkey and Finland, where USGS is significantly larger.
-    "production|Chromium|Mine|tonnes",
+    "production|Chromium|Mine, gross weight|tonnes",
     # Reasonable global agreement, except for DRC, that is much larger than World on certain years.
     # TODO: This should be investigated.
     # "production|Cobalt|Mine|tonnes",
@@ -238,7 +238,8 @@ COMBINE_BGS_AND_USGS_COLUMNS = [
 ]
 # Columns to plot with the individual data sources differentiated.
 PLOT_TO_COMPARE_DATA_SOURCES = [
-    # "production|Rhenium|Mine|tonnes",
+    # "production|Chromium|Mine|tonnes",
+    # "production|Chromium|Mine, gross weight|tonnes",
 ]
 
 
