@@ -12,7 +12,7 @@ meta:
     # Citation
     producer: UK Office for National Statistics
     citation_full: |-
-      Office for National Statistics (ONS), released 06 June 2024, ONS website, dataset, Marriages in England and Wales, UK. Retrieved 21 January 2025.
+      Office for National Statistics (ONS), released 06 June 2020, ONS website, dataset, Marriages in England and Wales, UK. Retrieved 21 January 2025.
     attribution_short: UK ONS
 
     # Files
@@ -23,7 +23,7 @@ meta:
     # License
     license:
       name: Open Government Licence v3.0
-      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+      url: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/marriagecohabitationandcivilpartnerships/datasets/marriagesinenglandandwales2013
 outs:
   - md5: 575dae27814b9734c7e7e542ffd67a92
     size: 698419
