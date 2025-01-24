@@ -1,4 +1,9 @@
 """
+This code is used to select observations from PIP, WID or LIS datasets that match a pair of reference years.
+It selects the closest observation to the reference year, and in the case of PIP, trying to ensure that is, in this order:
+    1. The same welfare concept (first income, then consumption)
+    2. The same reporting level (first national, then urban, then rural)
+
 This is an adaptation of the original script created by Pablo A and Joe for Joe's PhD project, available at https://github.com/owid/notebooks/blob/main/JoeHasell/PhD_2024/paper2/select_and_prepare_observations.py
 We want to process this data inside the ETL now.
 """
@@ -23,6 +28,11 @@ log = get_logger()
 # Specify pairs of reference years in a list
 REF_YRS_LIST = [[1980, 2018], [1993, 2018]]
 
+REFERENCE_YEARS = {
+    1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
+    2018: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+}
+
 
 def run(dest_dir: str) -> None:
     # Load dataset and table
@@ -31,6 +41,9 @@ def run(dest_dir: str) -> None:
     ds_regions = paths.load_dataset("regions")
 
     tb = ds_pov_ineq.read("keyvars")
+
+    # Change types of some columns to avoid issues with filering and missing values on merge
+    tb = tb.astype({"pipreportinglevel": "object", "pipwelfare": "object", "series_code": "object"})
 
     tb_population = ds_population.read("population")
     tb_population = tb_population[["country", "year", "population"]]
@@ -310,9 +323,9 @@ def match_ref_years(
 
     reference_years_list = []
     for y in reference_years:
-        # keep reference year in a list
+        # Keep reference year in a list
         reference_years_list.append(y)
-        print(reference_years_list)
+
         # Filter tb_series according to reference year and maximum distance from it
         tb_year = tb_series[
             (tb_series["year"] <= y + reference_years[y]["maximum_distance"])
@@ -453,13 +466,6 @@ def match_ref_years(
     # If set in the function arguments, filter for only those countries
     #  avaiable in all series.
     if only_all_series:
-        # A very strange bug was happening where the following code was looking across
-        # all values of series_code available in the original feather files –
-        # not just those that are in tb_match.
-        # To get round this I just read in the exported file, which seems to avoid the problem.
-        tb_match.to_csv("data/selected_reference_year_obs.csv", index=False)
-        tb_match = pd.read_csv("data/selected_reference_year_obs.csv")
-
         # Identify countries present for every unique series_code
         countries_per_series_code = tb_match.groupby("series_code")["country"].unique()
         all_countries = set(tb_match["country"])
@@ -471,7 +477,6 @@ def match_ref_years(
 
         # Filter the dataframe to keep only rows where country is in the identified set
         tb_match = tb_match[tb_match["country"].isin(countries_in_all_series)]
-
     # Add regions
     tb_match = add_regions_columns(tb=tb_match, ds_regions=ds_regions)
 
