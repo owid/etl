@@ -48,7 +48,7 @@ def run(dest_dir: str) -> None:
 
     # tb.metadata = metadata
     tb = tb.format(["country", "state", "year"], short_name="measles")
-    tb_usa = tb_usa.format(["country"], short_name="national_measles")
+    tb_usa = tb_usa.format(["country", "year"], short_name="national_measles")
     #
     # Save outputs.
     #
