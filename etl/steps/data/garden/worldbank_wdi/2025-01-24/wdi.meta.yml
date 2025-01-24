@@ -4,8 +4,6 @@ dataset:
 tables:
   wdi:
     variables:
-      ag_agr_trac_no:
-        title: Agricultural machinery, tractors
       ag_con_fert_pt_zs:
         title: Fertilizer consumption (% of fertilizer production)
         short_unit: '%'
@@ -92,8 +90,6 @@ tables:
         title: Urban land area (sq. km)
         short_unit: sq. km
         unit: sq. km
-      ag_lnd_trac_zs:
-        title: Agricultural machinery, tractors per 100 sq. km of arable land
       ag_prd_crel_mt:
         title: Cereal production (metric tons)
         unit: metric tons
@@ -871,116 +867,6 @@ tables:
         title: Energy use (kg of oil equivalent per capita)
         short_unit: kg of oil equivalent
         unit: kg of oil equivalent per capita
-      en_atm_co2e_eg_zs:
-        title: CO2 intensity (kg per kg of oil equivalent energy use)
-        short_unit: kg
-        unit: kg per kg of oil equivalent energy use
-      en_atm_co2e_gf_kt:
-        title: CO2 emissions from gaseous fuel consumption (kt)
-        short_unit: kt
-        unit: kt
-      en_atm_co2e_gf_zs:
-        title: CO2 emissions from gaseous fuel consumption (% of total)
-        short_unit: '%'
-        unit: '% of total'
-      en_atm_co2e_kd_gd:
-        title: CO2 emissions (kg per 2015 US$ of GDP)
-        short_unit: kg
-        unit: kg per 2015 US$ of GDP
-      en_atm_co2e_kt:
-        title: CO2 emissions (kt)
-        short_unit: kt
-        unit: kt
-      en_atm_co2e_lf_kt:
-        title: CO2 emissions from liquid fuel consumption (kt)
-        short_unit: kt
-        unit: kt
-      en_atm_co2e_lf_zs:
-        title: CO2 emissions from liquid fuel consumption (% of total)
-        short_unit: '%'
-        unit: '% of total'
-      en_atm_co2e_pc:
-        title: CO2 emissions (metric tons per capita)
-        short_unit: metric tons
-        unit: metric tons per capita
-      en_atm_co2e_pp_gd:
-        title: CO2 emissions (kg per PPP $ of GDP)
-        short_unit: kg
-        unit: kg per PPP $ of GDP
-      en_atm_co2e_pp_gd_kd:
-        title: CO2 emissions (kg per 2017 PPP $ of GDP)
-        short_unit: kg
-        unit: kg per 2017 PPP $ of GDP
-      en_atm_co2e_sf_kt:
-        title: CO2 emissions from solid fuel consumption (kt)
-        short_unit: kt
-        unit: kt
-      en_atm_co2e_sf_zs:
-        title: CO2 emissions from solid fuel consumption (% of total)
-        short_unit: '%'
-        unit: '% of total'
-      en_atm_ghgo_kt_ce:
-        title: Other greenhouse gas emissions, HFC, PFC and SF6 (thousand metric tons of CO2 equivalent)
-        unit: thousand metric tons of CO2 equivalent
-      en_atm_ghgo_zg:
-        title: Other greenhouse gas emissions (% change from 1990)
-        short_unit: '%'
-        unit: '% change from 1990'
-      en_atm_ghgt_kt_ce:
-        title: Total greenhouse gas emissions (kt of CO2 equivalent)
-        unit: kt of CO2 equivalent
-      en_atm_ghgt_zg:
-        title: Total greenhouse gas emissions (% change from 1990)
-        short_unit: '%'
-        unit: '% change from 1990'
-      en_atm_hfcg_kt_ce:
-        title: HFC gas emissions (thousand metric tons of CO2 equivalent)
-        unit: thousand metric tons of CO2 equivalent
-      en_atm_meth_ag_kt_ce:
-        title: Agricultural methane emissions (thousand metric tons of CO2 equivalent)
-        unit: thousand metric tons of CO2 equivalent
-      en_atm_meth_ag_zs:
-        title: Agricultural methane emissions (% of total)
-        short_unit: '%'
-        unit: '% of total'
-      en_atm_meth_eg_kt_ce:
-        title: Methane emissions in energy sector (thousand metric tons of CO2 equivalent)
-        unit: thousand metric tons of CO2 equivalent
-      en_atm_meth_eg_zs:
-        title: Energy related methane emissions (% of total)
-        short_unit: '%'
-        unit: '% of total'
-      en_atm_meth_kt_ce:
-        title: Methane emissions (kt of CO2 equivalent)
-        unit: kt of CO2 equivalent
-      en_atm_meth_zg:
-        title: Methane emissions (% change from 1990)
-        short_unit: '%'
-        unit: '% change from 1990'
-      en_atm_noxe_ag_kt_ce:
-        title: Agricultural nitrous oxide emissions (thousand metric tons of CO2 equivalent)
-        unit: thousand metric tons of CO2 equivalent
-      en_atm_noxe_ag_zs:
-        title: Agricultural nitrous oxide emissions (% of total)
-        short_unit: '%'
-        unit: '% of total'
-      en_atm_noxe_eg_kt_ce:
-        title: Nitrous oxide emissions in energy sector (thousand metric tons of CO2 equivalent)
-        unit: thousand metric tons of CO2 equivalent
-      en_atm_noxe_eg_zs:
-        title: Nitrous oxide emissions in energy sector (% of total)
-        short_unit: '%'
-        unit: '% of total'
-      en_atm_noxe_kt_ce:
-        title: Nitrous oxide emissions (thousand metric tons of CO2 equivalent)
-        unit: thousand metric tons of CO2 equivalent
-      en_atm_noxe_zg:
-        title: Nitrous oxide emissions (% change from 1990)
-        short_unit: '%'
-        unit: '% change from 1990'
-      en_atm_pfcg_kt_ce:
-        title: PFC gas emissions (thousand metric tons of CO2 equivalent)
-        unit: thousand metric tons of CO2 equivalent
       en_atm_pm25_mc_m3:
         title: PM2.5 air pollution, mean annual exposure (micrograms per cubic meter)
         short_unit: micrograms
@@ -1001,41 +887,15 @@ tables:
         title: PM2.5 air pollution, population exposed to levels exceeding WHO guideline value (% of total)
         short_unit: '%'
         unit: '% of total'
-      en_atm_sf6g_kt_ce:
-        title: SF6 gas emissions (thousand metric tons of CO2 equivalent)
-        unit: thousand metric tons of CO2 equivalent
       en_bir_thrd_no:
         title: Bird species, threatened
       en_clc_drsk_xq:
         title: Disaster risk reduction progress score (1-5 scale; 5=best)
         unit: 1-5 scale; 5=best
-      en_clc_ghgr_mt_ce:
-        title: GHG net emissions/removals by LUCF (Mt of CO2 equivalent)
-        unit: Mt of CO2 equivalent
       en_clc_mdat_zs:
         title: Droughts, floods, extreme temperatures (% of population, average 1990-2009)
         short_unit: '%'
         unit: '% of population, average 1990-1990'
-      en_co2_bldg_zs:
-        title: CO2 emissions from residential buildings and commercial and public services (% of total fuel combustion)
-        short_unit: '%'
-        unit: '% of total fuel combustion'
-      en_co2_etot_zs:
-        title: CO2 emissions from electricity and heat production, total (% of total fuel combustion)
-        short_unit: '%'
-        unit: '% of total fuel combustion'
-      en_co2_manf_zs:
-        title: CO2 emissions from manufacturing industries and construction (% of total fuel combustion)
-        short_unit: '%'
-        unit: '% of total fuel combustion'
-      en_co2_othx_zs:
-        title: CO2 emissions from other sectors, excluding residential buildings and commercial and public services (% of total fuel combustion)
-        short_unit: '%'
-        unit: '% of total fuel combustion'
-      en_co2_tran_zs:
-        title: CO2 emissions from transport (% of total fuel combustion)
-        short_unit: '%'
-        unit: '% of total fuel combustion'
       en_fsh_thrd_no:
         title: Fish species, threatened
       en_hpt_thrd_no:
@@ -1076,14 +936,6 @@ tables:
         title: Population in urban agglomerations of more than 1 million (% of total population)
         short_unit: '%'
         unit: '% of total population'
-      ep_pmp_desl_cd:
-        title: Pump price for diesel fuel (US$ per liter)
-        short_unit: $
-        unit: US$ per liter
-      ep_pmp_sgas_cd:
-        title: Pump price for gasoline (US$ per liter)
-        short_unit: $
-        unit: US$ per liter
       er_fsh_aqua_mt:
         title: Aquaculture production (metric tons)
         unit: metric tons
@@ -1838,19 +1690,6 @@ tables:
       iq_cpa_tran_xq:
         title: CPIA transparency, accountability, and corruption in the public sector rating (1=low to 6=high)
         unit: 1=low to 6=high
-      iq_sci_mthd:
-        title: Methodology assessment of statistical capacity (scale 0 - 100)
-        unit: scale 0 - 100
-      iq_sci_ovrl:
-        title: Statistical Capacity Score (Overall Average) (scale 0 - 100)
-        display:
-          numDecimalPlaces: 1
-      iq_sci_prdc:
-        title: Periodicity and timeliness assessment of statistical capacity (scale 0 - 100)
-        unit: scale 0 - 100
-      iq_sci_srce:
-        title: Source data assessment of statistical capacity (scale 0 - 100)
-        unit: scale 0 - 100
       iq_spi_ovrl:
         title: 'Statistical performance indicators (SPI): Overall score (scale 0-100)'
       iq_spi_pil1:
@@ -3415,7 +3254,7 @@ tables:
         display:
           name: Alcohol consumption
         presentation:
-          title_public: Total alcohol consumption per capit
+          title_public: Total alcohol consumption per capita
           title_variant: In liters of pure alcohol, projected estimates, 15+ years of age
       sh_alc_pcap_ma_li:
         title: Total alcohol consumption per capita, male (liters of pure alcohol, projected estimates, male 15+ years of age)
@@ -4000,22 +3839,6 @@ tables:
         title: Poverty gap at $3.65 a day (2017 PPP) (%)
         short_unit: '%'
         unit: '%'
-      si_pov_mdim:
-        title: Multidimensional poverty headcount ratio (% of total population)
-      si_pov_mdim_17:
-        title: Multidimensional poverty headcount ratio, children (% of child population)
-      si_pov_mdim_17_xq:
-        title: Multidimensional poverty index, children (scale 0-1)
-      si_pov_mdim_fe:
-        title: Multidimensional poverty headcount ratio, female (% of female population)
-      si_pov_mdim_hh:
-        title: Multidimensional poverty headcount ratio, household (% of total households)
-      si_pov_mdim_it:
-        title: Multidimensional poverty intensity
-      si_pov_mdim_ma:
-        title: Multidimensional poverty headcount ratio, male (% of male population)
-      si_pov_mdim_xq:
-        title: Multidimensional poverty index (scale 0-1)
       si_pov_nahc:
         title: Poverty headcount ratio at national poverty lines (% of population)
         short_unit: '%'
@@ -5266,8 +5089,6 @@ tables:
       vc_ihr_psrc_p5:
         title: Intentional homicides (per 100,000 people)
         unit: per 100,000 people
-      dt_nfl_unid_cd:
-        title: Net official flows from UN agencies, UNIDIR (current US$)
       omm_urb_pop_slum: {}
       omm_urb_pop_nonslum: {}
       omm_share_service_exports: {}
