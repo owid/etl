@@ -33,8 +33,7 @@ def run(dest_dir: str) -> None:
     tb = ds_pov_ineq.read("keyvars")
 
     tb_population = ds_population.read("population")
-    tb_population = tb_population[['country', 'year', 'population']]
-
+    tb_population = tb_population[["country", "year", "population"]]
 
     #### SET REF YEARS AND THEN RUN ####
 
@@ -78,7 +77,6 @@ def run(dest_dir: str) -> None:
         owid_data = owid_data.pivot_table(
             index=["country", "year"], columns="series_code", values="value", aggfunc="first"
         ).reset_index()
-
 
         # Save a version for the appendix table – excluding WID extrapolated data
 
@@ -128,43 +126,43 @@ def run(dest_dir: str) -> None:
 
         # Step 1 – Only matching data points, non-extrapolated data for WID
         # (NB only_all_series = True)
-        output_wid_non_extrap = match_ref_years(
-            tb=tb,
-            series=[
-                "gini_pip_disposable_perCapita",
-                "p99p100Share_pip_disposable_perCapita",
-                "p90p100Share_pip_disposable_perCapita",
-                "headcountRatio50Median_pip_disposable_perCapita",
-                "gini_wid_pretaxNational_perAdult",
-                "p99p100Share_wid_pretaxNational_perAdult",
-                "p90p100Share_wid_pretaxNational_perAdult",
-                "headcountRatio50Median_wid_pretaxNational_perAdult",
-            ],
-            reference_years=reference_years,
-            only_all_series=True,
-            tb_population=tb_population,
-            ds_regions=ds_regions,
-        )
+        # output_wid_non_extrap = match_ref_years(
+        #     tb=tb,
+        #     series=[
+        #         "gini_pip_disposable_perCapita",
+        #         "p99p100Share_pip_disposable_perCapita",
+        #         "p90p100Share_pip_disposable_perCapita",
+        #         "headcountRatio50Median_pip_disposable_perCapita",
+        #         "gini_wid_pretaxNational_perAdult",
+        #         "p99p100Share_wid_pretaxNational_perAdult",
+        #         "p90p100Share_wid_pretaxNational_perAdult",
+        #         "headcountRatio50Median_wid_pretaxNational_perAdult",
+        #     ],
+        #     reference_years=reference_years,
+        #     only_all_series=True,
+        #     tb_population=tb_population,
+        #     ds_regions=ds_regions,
+        # )
 
         # Step 2 Only matching data points, with extrapolated data for WID
         # (NB only_all_series = True)
-        output_wid_extrap = match_ref_years(
-            tb=tb,
-            series=[
-                "gini_pip_disposable_perCapita",
-                "p99p100Share_pip_disposable_perCapita",
-                "p90p100Share_pip_disposable_perCapita",
-                "headcountRatio50Median_pip_disposable_perCapita",
-                "gini_widExtrapolated_pretaxNational_perAdult",
-                "p99p100Share_widExtrapolated_pretaxNational_perAdult",
-                "p90p100Share_widExtrapolated_pretaxNational_perAdult",
-                "headcountRatio50Median_widExtrapolated_pretaxNational_perAdult",
-            ],
-            reference_years=reference_years,
-            only_all_series=True,
-            tb_population=tb_population,
-            ds_regions=ds_regions,
-        )
+        # output_wid_extrap = match_ref_years(
+        #     tb=tb,
+        #     series=[
+        #         "gini_pip_disposable_perCapita",
+        #         "p99p100Share_pip_disposable_perCapita",
+        #         "p90p100Share_pip_disposable_perCapita",
+        #         "headcountRatio50Median_pip_disposable_perCapita",
+        #         "gini_widExtrapolated_pretaxNational_perAdult",
+        #         "p99p100Share_widExtrapolated_pretaxNational_perAdult",
+        #         "p90p100Share_widExtrapolated_pretaxNational_perAdult",
+        #         "headcountRatio50Median_widExtrapolated_pretaxNational_perAdult",
+        #     ],
+        #     reference_years=reference_years,
+        #     only_all_series=True,
+        #     tb_population=tb_population,
+        #     ds_regions=ds_regions,
+        # )
 
         #
         output_wid_extrap["series_code"] = output_wid_extrap["series_code"].str.replace("Extrapolated", "", regex=False)
@@ -209,8 +207,6 @@ def run(dest_dir: str) -> None:
 
         # Drop the count column
         output_matched = output_matched.drop(columns=["count"])
-
-
 
         # Reshape wider
         #
@@ -297,12 +293,12 @@ def run(dest_dir: str) -> None:
         output_all_obs = output_all_obs.reindex(columns=desired_column_order)
 
 
-
-
 ##############################################
 
 
-def match_ref_years(tb: Table, series: list, reference_years: dict, only_all_series: bool, tb_population: Table, ds_regions:Dataset) -> pd.DataFrame:
+def match_ref_years(
+    tb: Table, series: list, reference_years: dict, only_all_series: bool, tb_population: Table, ds_regions: Dataset
+) -> pd.DataFrame:
     """
     Match series to reference years.
     This is the main function that finds pairs of matching observations
@@ -330,8 +326,6 @@ def match_ref_years(tb: Table, series: list, reference_years: dict, only_all_ser
         # Calculate the distance between the observation year and the reference year (absolute value)
         tb_year["distance"] = abs(tb_year["year"] - y)
 
-        tb_year.to_csv(f"tb_year_{y}.csv", index=False)
-
         # Merge the different reference year tables into a single dataframe
 
         if tb_match.empty:
@@ -340,12 +334,10 @@ def match_ref_years(tb: Table, series: list, reference_years: dict, only_all_ser
             tb_match = pr.merge(
                 tb_match,
                 tb_year,
-                how="inner",  # NOTE: I have modfiied this from 'outer' to 'inner' to avoid the creation of NaNs
+                how="outer",
                 on=["country", "series_code"],
                 suffixes=("", f"_{y}"),
             )
-
-            tb_match.to_csv("tb_match.csv", index=False)
 
             # References to column names work differently depending on if there are 2 or more reference years. Treat these cases separately.
             if len(reference_years_list) == 2:
@@ -531,7 +523,7 @@ def cat_reportinglevel(row, col1, col2):
 
 # Note WID extrapolated or not in a boolean
 # Define the function to determine the value of 'wid_is_extrapolated'
-def determine_wid_is_extrapolated(row):
+def determine_wid_is_extrapolated(row, ref_yrs):
     if pd.isna(row[f"value_{ref_yrs[0]}_wid"]):
         return np.nan
     return 1 if row["key"] == "wid_extrapolated" else 0
