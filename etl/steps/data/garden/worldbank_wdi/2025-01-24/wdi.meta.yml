@@ -2397,7 +2397,7 @@ tables:
           numDecimalPlaces: 0
         presentation:
           title_public: GDP per capita
-          title_variant: In constant 2017 international $
+          title_variant: In constant 2021 international $
           topic_tags:
             - Economic Growth
       ny_gdp_petr_rt_zs:
@@ -2484,7 +2484,7 @@ tables:
           name: GNI per capita
           numDecimalPlaces: 0
         presentation:
-          title_public: GNI per capita, PPP (constant 2017 international $)
+          title_public: GNI per capita, PPP (constant 2021 international $)
       ny_gns_ictr_cd:
         title: Gross savings (current US$)
         short_unit: $
@@ -5326,3 +5326,5 @@ tables:
         title: Carbon intensity of GDP (kg CO2e per constant 2015 US$ of GDP)
       en_ghg_fgas_ip_mt_ce_ar5:
         title: F-gases emissions from Industrial Processes (Mt CO2e)
+      dt_nfl_unid_cd:
+        title: Net official flows from UN agencies, UNIDIR (current US$)
