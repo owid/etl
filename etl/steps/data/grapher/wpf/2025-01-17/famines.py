@@ -22,6 +22,11 @@ def run(dest_dir: str) -> None:
 
     # Unravel the 'date' column so that there is only one value per row. Years separated by commas are split into separate rows.
     tb = tb.assign(date=tb["date"].str.split(",")).explode("date").drop_duplicates().reset_index(drop=True)
+
+    # Drop rows where the Chinese famine is broken down by year (only China 1958-1962 should exist)
+    famine_names_to_drop = ["China 1958", "China 1959", "China 1960", "China 1961", "China 1962"]
+    tb = tb[~tb["famine_name"].isin(famine_names_to_drop)]
+
     # Keep only the earliest date for each country
     tb = tb.sort_values(by="date").drop_duplicates(subset=["famine_name"], keep="first").reset_index(drop=True)
 

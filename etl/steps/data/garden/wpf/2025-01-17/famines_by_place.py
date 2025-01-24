@@ -19,11 +19,16 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("famines")
     # Read table from meadow dataset.
     tb = ds_meadow["famines"].reset_index()
-    tb = tb[["date", "country", "wpf_authoritative_mortality_estimate"]]
+    tb = tb[["famine_name", "date", "country", "wpf_authoritative_mortality_estimate"]]
 
     #
     # Process data.
     #
+    # Drop rows where the Chinese famine is not broken down by year
+    famine_names_to_drop = ["China 1958-1962"]
+    tb = tb[~tb["famine_name"].isin(famine_names_to_drop)]
+    tb = tb.drop(columns=["famine_name"])
+
     # Divide each row's 'wpf_authoritative_mortality_estimate' by the length of the corresponding 'Date' value to assume a uniform distribution of deaths over the period
     tb["wpf_authoritative_mortality_estimate"] = tb.apply(
         lambda row: row["wpf_authoritative_mortality_estimate"] / len(row["date"].split(","))

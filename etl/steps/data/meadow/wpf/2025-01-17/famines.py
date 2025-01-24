@@ -40,7 +40,7 @@ NAMES = {
     "USSR (Russia)": "Russia",
     "USSR (Russia and Western Soviet States)": "USSR",
     "Greece": "Greece",
-    "East Asia": "East Asia",
+    "East Asia": "Japan",
     "Indonesia": "Indonesia",
     "India (India, West Bengal, Bangladesh)": "India, Bangladesh",
     "Vietnam": "Vietnam",
@@ -121,16 +121,16 @@ def run(dest_dir: str) -> None:
     # Simplify names - will later use it for titles with years combined
     tb["simplified_place"] = tb["Place"].replace(NAMES, regex=False)
 
-    # Combine famines for the African Red Sea Region and Hungerplan as the mortality estimate exists for just the total rather than each entry
-    tb = combine_entries(tb)
-
     # Add 'Sub region' to 'Place' column if 'Sub region' is "Ghettos, Concentration camps"
-    tb["Place"] = tb.apply(
-        lambda row: f"{row['Place']}, (ghettos and concentration camps)"
+    tb["simplified_place"] = tb.apply(
+        lambda row: f"{row['Place']} (ghettos and concentration camps)"
         if row["Sub region"] == "Ghettos, Concentration camps"
-        else row["Place"],
+        else row["simplified_place"],
         axis=1,
     )
+
+    # Combine famines for the African Red Sea Region and Hungerplan as the mortality estimate exists for just the total rather than each entry
+    tb = combine_entries(tb)
 
     # Drop the 'Sub region' column as it's no longer needed
     tb = tb.drop(columns=["Sub region"])
@@ -138,7 +138,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={"Place": "country"})
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["date", "country"])
+    tb = tb.format(["date", "simplified_place"])
 
     #
     # Save outputs.

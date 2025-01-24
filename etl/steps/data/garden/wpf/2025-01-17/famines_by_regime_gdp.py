@@ -38,10 +38,12 @@ CUSTOM_REGIMES = {
     ("Tanzania", range(1905, 1908)): 3,
     ("Russia, Western Soviet States", range(1941, 1945)): 3,
     ("Moldova, Ukraine, Russia, Belarus", range(1946, 1948)): 3,
-    ("Ukraine", range(1932, 1946)): 3,
+    ("Ukraine", range(1931, 1946)): 3,
     ("Vietnam", range(1944, 1946)): 3,
-    ("USSR", range(1941, 1945)): 3,
+    ("USSR", range(1939, 1947)): 3,
+    ("Russia, Western Soviet States", range(1939, 1948)): 3,
     ("Somaliland, African Red Sea Region", range(1910, 2020)): 3,
+    ("Sudan", range(1888, 1893)): 3,
 }
 
 
@@ -88,7 +90,6 @@ def run(dest_dir: str) -> None:
     tb["regime_redux_row_owid"] = tb["regime_redux_row_owid"].replace({3: 0, 2: 1})
 
     # Drop unused in this dataset columns columns.
-    tb = tb.drop(columns=["country", "conflict", "government_policy_overall", "external_factors"])
     tb = tb.format(["famine_name", "year"])
 
     #

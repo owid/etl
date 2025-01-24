@@ -36,7 +36,8 @@ CUSTOM_REGION_DICT = {
     "Somaliland, African Red Sea Region": "Africa",
     "USSR (Kazakhstan)": "Asia",
     "USSR (Southern Russia)": "Asia",
-    "German occupied USSR ": "Asia ",
+    "German occupied USSR ": "Asia",
+    "Poland (ghettos and concentration camps)": "Europe",
 }
 
 
@@ -116,7 +117,5 @@ def add_regions(tb: Table, ds_regions: Dataset) -> Table:
 
         # Add region to the table.
         tb.loc[tb["simplified_place"].isin(countries_in_region), "region"] = region
-    # Show rows where region is NaN
-    nan_region_rows = tb[tb["region"].isna()]
-    print(nan_region_rows)
+
     return tb
