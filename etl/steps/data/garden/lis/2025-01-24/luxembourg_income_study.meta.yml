@@ -1,0 +1,24 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Poverty
+        - Economic Inequality
+    processing_level: major
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 90
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  luxembourg_income_study:
+    # Learn more about the available fields:
+    # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
+    variables:
+      {}

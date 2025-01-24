@@ -43,22 +43,22 @@ steps:
     - data://garden/wid/2024-05-24/world_inequality_database
 
   # Luxembourg Income Study
-  data://meadow/lis/2024-06-13/luxembourg_income_study:
-    - snapshot://lis/2024-06-13/lis_keyvars.csv
-    - snapshot://lis/2024-06-13/lis_distribution_adults.csv
-    - snapshot://lis/2024-06-13/lis_keyvars_adults.csv
-    - snapshot://lis/2024-06-13/lis_abs_poverty.csv
-    - snapshot://lis/2024-06-13/lis_distribution.csv
-    - snapshot://lis/2024-06-13/lis_abs_poverty_adults.csv
-    - snapshot://lis/2024-06-13/lis_percentiles.csv
-    - snapshot://lis/2024-06-13/lis_percentiles_adults.csv
-    - data://garden/regions/2023-01-01/regions
-  data://garden/lis/2024-06-13/luxembourg_income_study:
-    - data://meadow/lis/2024-06-13/luxembourg_income_study
-  data://grapher/lis/2024-06-13/luxembourg_income_study:
-    - data://garden/lis/2024-06-13/luxembourg_income_study
+  data://meadow/lis/2025-01-24/luxembourg_income_study:
+    - snapshot://lis/2025-01-24/lis_keyvars.csv
+    - snapshot://lis/2025-01-24/lis_abs_poverty.csv
+    - snapshot://lis/2025-01-24/lis_distribution.csv
+    - snapshot://lis/2025-01-24/lis_keyvars_adults.csv
+    - snapshot://lis/2025-01-24/lis_abs_poverty_adults.csv
+    - snapshot://lis/2025-01-24/lis_distribution_adults.csv
+    - snapshot://lis/2025-01-24/lis_percentiles.csv
+    - snapshot://lis/2025-01-24/lis_percentiles_adults.csv
+    - data://garden/regions/2025-01-24/regions
+  data://garden/lis/2025-01-24/luxembourg_income_study:
+    - data://meadow/lis/2025-01-24/luxembourg_income_study
+  data://grapher/lis/2025-01-24/luxembourg_income_study:
+    - data://garden/lis/2025-01-24/luxembourg_income_study
   data://explorers/lis/latest/luxembourg_income_study:
-    - data://garden/lis/2024-06-13/luxembourg_income_study
+    - data://garden/lis/2025-01-24/luxembourg_income_study
 
   # Global Multidimensional Poverty Index
   data://meadow/ophi/2024-10-28/multidimensional_poverty_index:
