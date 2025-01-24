@@ -1,0 +1,19 @@
+meta:
+  origin:
+    title: Number of individual farmed crustaceans
+    description: |-
+      Estimated number of individual crustaceans in annual aquaculture production.
+    producer: Fishcount
+    citation_full: |
+      A Mood and P Brooke. Fishcount.org.uk based on data from the Food and Agriculture Organization of the United Nations.
+    url_main: http://fishcount.org.uk/
+    date_published: "2024"
+    date_accessed: 2025-01-23
+  license:
+    name: CC BY 4.0
+    url: https://fishcount.org.uk/estimates/farmedcrustaceans/data02/fishcount_global_farmed_crustacean_estimate.php?selyear=2020&selcountry=pleaseselect&selspecies=*+All+species+*&selsort=Number
+
+outs:
+  - md5: acb0fffcb0625beb5fcb60dd3fcac5df
+    size: 8477
+    path: number_of_farmed_crustaceans.csv
