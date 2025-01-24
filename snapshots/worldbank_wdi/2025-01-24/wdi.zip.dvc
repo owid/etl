@@ -5,12 +5,12 @@ meta:
     description: |-
       The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates.
     citation_full: World Bank's World Development Indicators (WDI).
-    attribution: Multiple sources compiled by World Bank (2024)
+    attribution: Multiple sources compiled by World Bank (2025)
     url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
     url_download: |-
       https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0045575/WDI_CSV_2024_10_24.zip?versionId=2024-12-18T05:42:41.1131485Z
-    date_accessed: '2024-12-27'
-    date_published: '2024-10-28'
+    date_accessed: '2025-01-24'
+    date_published: '2025-01-15'
     license:
       name: Creative Commons Attribution 4.0
   name: World Development Indicators - World Bank (2024.12.16)
