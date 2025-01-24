@@ -38,7 +38,7 @@ REGIONS_TO_ADD = [
 # None: AIDS_DEATHS, HIV_INCIDENCE, HIV_PREVALENCE, NEW_INFECTIONS, PLWH
 # central 2: AIDS_MORTALITY_1000_POP
 COLUMNS_RENAME_EPI = {
-    "mother_dropped_off_art_during_breastfeeding_child_infected": "art_drop_bf_child_inf",
+    "mother_dropped_off_art_during_breastfeeding_child_infected_": "art_drop_bf_child_inf",
     "mother_dropped_off_art_during_pregnancy_child_infected_duri": "art_drop_preg_child_inf",
     "started_art_before_the_pregnancy_child_infected_during_brea": "art_start_before_preg_child_inf_bf",
     "started_art_before_the_pregnancy_child_infected_during_preg": "art_start_before_preg_child_inf_preg",
@@ -46,10 +46,10 @@ COLUMNS_RENAME_EPI = {
     "started_art_during_in_pregnancy_child_infected_during_pregn": "art_start_child_inf_during_preg",
     "started_art_late_in_pregnancy_child_infected_during_breastf": "art_start_late_preg_child_inf_bf",
     "started_art_late_in_pregnancy_child_infected_during_pregnan": "art_start_late_preg_child_inf_preg",
-    "did_not_receive_art_during_pregnancy_child_infected_during": "art_none_preg_child_inf_preg",
+    "did_not_receive_art_during_pregnancy_child_infected_during_": "art_none_preg_child_inf_preg",
     "no_receive_art_during_bf": "art_none_bf",
     "percent_on_art_vl_suppressed": "percent_art_vl_suppressed",
-    "mother_infected_during_breastfeeding_child_infected_during": "mother_child_inf_bf",
+    "mother_infected_during_breastfeeding_child_infected_during_": "mother_child_inf_bf",
     "mother_infected_during_pregnancy_child_infected_during_preg": "mother_child_inf_preg",
 }
 
@@ -80,6 +80,9 @@ def run(dest_dir: str) -> None:
         dimensions = yaml.safe_load(f)
     tb = extract_and_add_dimensions(tb, dimensions["epi"])
 
+    # Harmonize indicator names
+    tb["indicator"] = tb["indicator"].str.lower().apply(lambda x: COLUMNS_RENAME_EPI.get(x, x))
+
     # Sanity checks
     ## Check source
     assert set(tb["source"].unique()) == {"UNAIDS_Estimates_"}, "Unexpected source!"
@@ -90,7 +93,7 @@ def run(dest_dir: str) -> None:
 
     # Save some fields (this might be useful later)
     tb_meta = tb[["indicator", "indicator_description", "unit"]].drop_duplicates()
-    tb_meta["indicator"] = tb_meta["indicator"].str.lower()
+    tb_meta["indicator"] = tb_meta["indicator"]
     assert not tb_meta["indicator"].duplicated().any(), "Multiple descriptions or units for a single indicator!"
 
     # Harmonize

@@ -1,4 +1,25 @@
 definitions:
+  art_description: |-
+    Antiretroviral therapy (ART) has proven effective in lowering HIV-related illness and death rates among people living with HIV, as well as preventing the virus's transmission. Research indicates that starting treatment early, irrespective of an individual's CD4 cell count, maximizes benefits and saves lives. The World Health Organization (WHO) now advises ART for everyone diagnosed with HIV.
+
+  people_dimension: |-
+    <<sex+' ' if sex != 'total' else ''>>people<<' aged ' + age if age != 'total' else ''>>
+  people_term: |-
+    <% if age == 'total' %>
+    People
+    <%- elif age == '0-14' %>
+    Children
+    <%- else %>
+    Adults
+    <%- endif %>
+  people_term_lower: |-
+    <% if age == 'total' %>
+    people
+    <%- elif age == '0-14' %>
+    children
+    <%- else %>
+    adults
+    <%- endif %>
   common:
     presentation:
       topic_tags:
@@ -6,267 +27,496 @@ definitions:
 
 tables:
   epi:
+    common:
+      processing_level: minor
+      presentation:
+        title_variant: |-
+          <<sex+'s, ' if sex != 'total'>><<"aged " + age + ", " if age != "total">><<estimate.title()>> estimate
     variables:
+      #
+      # DEATHS
+      #
       aids_deaths:
         title: "AIDS-related deaths - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: deaths
+        description_short: |-
+          <% if (sex == 'total') and (age == 'total') %>
+          Total number of people dying from AIDS-related causes, <<estimate>> estimate.
+          <%- else %>
+          Number of <<sex+' ' if sex != 'total' else ''>>people <<'aged ' + age + ' ' if age != 'total' else ''>>dying from AIDS-related causes, <<estimate>> estimate.
+          <%- endif %>
         description_from_producer: |-
           The number of people dying from AIDS-related causes can be obtained using a variety of measures, including through a vital registration system adjusted for misreporting, as part of a facility- or population-based survey that may include verbal autopsy and through mathematical modelling using such tools as Spectrum. Modelling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying. In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be incorporated into these models to derive estimates of the number of AIDS-related deaths.
 
           The source of the estimate is requested. Countries providing the number of people dying from AIDS-related causes derived from a source other than Spectrum should provide any accompanying estimates of uncertainty around this number and upload an electronic copy of the report describing how the number was calculated.
 
           Countries should preferably report a modelled estimate rather than one derived from their vital registration system unless this system has been recently evaluated as one of high quality. Users can now opt to use their Spectrum estimate or enter nationally representative population-level data. If Spectrum estimates are chosen, the values will be pulled directly from the software once the national file is finalized.
-        description_short: |-
-          Number of people dying from AIDS-related causes. This is measured annually and is disaggregated by sex, and age group.
-        processing_level: minor
         display:
           numDecimalPlaces: 0
+        presentation:
+          title_public: "AIDS-related deaths"
 
       aids_mortality_1000_pop:
-        title: "AIDS mortality per 1000 population - Sex: <<sex>> - <<estimate.title()>> estimate"
-        unit: ""
-        description_short: ""
-        processing_level: minor
+        title: "AIDS mortality - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "deaths per 100,000 people"
+        description_short: |-
+          Total number of <<sex+' ' if sex != 'total' else ''>>people <<'aged ' + age + ' ' if age != 'total' else ''>>who have died from AIDS-related causes, per 100 000 people. This is the <<estimate.title()>> estimate.
+        description_from_producer: |-
+          The number of people dying from AIDS-related causes can be obtained using a variety of measures, including through a vital registration system adjusted for misreporting, as part of a facility- or population-based survey that may include verbal autopsy and through mathematical modelling using such tools as Spectrum. Modelling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying. In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be incorporated into these models to derive estimates of the number of AIDS-related deaths.
+
+          More details:
+          - Consolidated guidelines on person-centred HIV strategic information: strengthening routine data for impact. Geneva: World Health Organization; 2022 (https://www.who.int/publications/i/item/9789240055315)
+          - Spectrum software. Glastonbury (CT): Avenir Health; 2024 (http://www.avenirhealth.org/software-spectrum.php).
+        presentation:
+          title_public: "AIDS mortality per 100,000 people"
 
       aids_orphans:
-        title: "Children orphaned due to AIDS deaths - Sex: <<sex>> - <<estimate.title()>> estimate"
-        unit: "orphans"
+        title: "Children (0-17) orphaned due to AIDS deaths - <<estimate.title()>> estimate"
+        unit: "children"
         description_short: |-
-          Number of children, aged 17 and under, orphaned by the death of one or both parents from AIDS.
-        processing_level: minor
+          Number of children, aged 17 and under, who have been orphaned by the death of one or both parents from AIDS at any point in their lives. This is the <<estimate.title()>> estimate.
+        description_key:
+          - An orphan is defined as a child under 18 years old who has lost at least one parent. A child who has lost their mother is called a maternal orphan, while a child who has lost their father is referred to as a paternal orphan. A child who has lost both parents is known as a double orphan.
+        presentation:
+          title_public: "Children orphaned due to AIDS deaths"
 
+      deaths_plhiv_all_causes:
+        title: "Deaths among people living with HIV (all causes) - <<estimate.title()>> estimate"
+        unit: "deaths"
+        description_short: |-
+          Deaths occurring among individuals diagnosed with HIV, regardless of the direct cause. It encompasses all-cause mortality within the HIV-positive population, providing a comprehensive view of the mortality burden in this group. This is the <<estimate.title()>> estimate.
+        description_key:
+          - Reflects the overall mortality burden within the HIV-positive population.
+          - Includes deaths from all causes, not limited to AIDS-related illnesses.
+          - Helps in assessing the effectiveness of comprehensive care and treatment programs for people living with HIV.
+        presentation:
+          title_public: "Deaths among people living with HIV"
+
+      #
+      # ART
+      #
+      ## Pregnancy (full), no ART
       art_none_preg_child_inf_preg:
-        title: "Did not receive ART during pregnancy; child infected during pregnancy"
-        unit: ""
+        title: "Number of children infected with HIV during pregnancy, when mother did not receive ART during pregnancy"
+        unit: "children"
         description_short: ""
-        processing_level: minor
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy
+          title_variant: Mother did not receive ART during pregnancy
 
-      art_start_before_preg_child_inf_bf:
-        title: "Started ART before the pregnancy; child infected during breastfeeding"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      art_start_before_preg_child_inf_preg:
-        title: "Started ART before the pregnancy; child infected during pregnancy"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      art_start_during_preg_child_inf_bf:
-        title: "Started ART during in pregnancy; child infected during breastfeeding"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      art_start_child_inf_during_preg:
-        title: "Started ART during in pregnancy; child infected during pregnancy"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      art_start_late_preg_child_inf_bf:
-        title: "Started ART late in pregnancy; child infected during breastfeeding"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      art_start_late_preg_child_inf_preg:
-        title: "Started ART late in pregnancy; child infected during pregnancy"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      art_drop_bf_child_inf:
-        title: "Mother dropped off ART during breastfeeding; child infected during breastfeeding"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
+      ## Pregnancy (full), dropped ART
       art_drop_preg_child_inf:
-        title: "Mother dropped off ART during pregnancy; child infected during pregnancy"
-        unit: ""
+        title: Number of children infected with HIV during pregnancy, when mother dropped off ART during pregnancy
+        unit: "children"
         description_short: ""
-        processing_level: minor
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy
+          title_variant: Mother dropped off ART during pregnancy
 
-      children_exposed_uninfected:
-        title: "HIV-exposed children who are uninfected - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
-        unit: ""
-        description_short: "Number of children, aged 14 and under"
-        processing_level: minor
-
-      coverage_mothers_receiving_arv:
-        title: "Coverage of pregnant women who receive ARV for preventing MTCT - <<estimate.title()>> estimate"
-        unit: "%"
+      ## Pregnancy (full), ART late
+      art_start_late_preg_child_inf_preg:
+        title: "Number of children infected with HIV during pregnancy, when mother started ART late in pregnancy"
+        unit: "children"
         description_short: ""
-        processing_level: minor
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy
+          title_variant: Mother started ART late in pregnancy
 
+      ## Pregnancy (full), ART during
+      art_start_child_inf_during_preg:
+        title: "Number of children infected with HIV during pregnancy, when mother started ART during in pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy
+          title_variant: Mother started ART during in pregnancy
+
+      ## Pregnancy (full), ART before
+      art_start_before_preg_child_inf_preg:
+        title: "Number of children infected with HIV during pregnancy, when mother started ART before the pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy
+          title_variant: Mother started ART before the pregnancy
+
+      ## Pregnancy (full), both infected
+      mother_child_inf_preg:
+        title: Number of children infected with HIV during pregnancy, along with their mothers
+        unit: "infections"
+        description_short: ""
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy, along with their mothers
+          title_variant: ""
+
+      ## Breastfeeding (full), no ART
+      art_none_bf:
+        title: "Number of children infected with HIV during breastfeeding, when mother did not receive ART during breastfeeding"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding
+          title_variant: Mother did not receive ART during breastfeeding
+
+      ## Breastfeeding (full), dropped ART
+      art_drop_bf_child_inf:
+        title: Number of children infected with HIV during breastfeeding, when mother dropped off ART during breastfeeding
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding
+          title_variant: Mother dropped off ART during breastfeeding
+
+      ## Breastfeeding, ART late
+      art_start_late_preg_child_inf_bf:
+        title: "Number of children infected with HIV during breastfeeding, when mother started ART late in pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding
+          title_variant: Mother started ART late in pregnancy
+
+      ## Breastfeeding, ART during
+      art_start_during_preg_child_inf_bf:
+        title: "Number of children infected with HIV during breastfeeding, when mother started ART during in pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding
+          title_variant: Mother started ART during in pregnancy
+
+      ## Breastfeeding, ART before
+      art_start_before_preg_child_inf_bf:
+        title: "Number of children infected with HIV during breastfeeding, when mother started ART before the pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding
+          title_variant: Mother started ART before the pregnancy
+
+      ## Breastfeeding (full), both
+      mother_child_inf_bf:
+        title: Number of children infected with HIV during breastfeeding, along with their mothers
+        unit: "infections"
+        description_short: ""
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding, along with their mothers
+          title_variant: ""
+
+      ## Others
       deaths_averted_art:
         title: "Deaths averted due to antiretroviral therapy - <<estimate.title()>> estimate"
         unit: deaths
         description_short: |-
-          Deaths that were prevented thanks to the usage of antiretroviral therapy (ART).
-        processing_level: minor
+          The number of deaths prevented as a direct result of Antiretroviral Therapy (ART) among people living with HIV. It is calculated by comparing the observed mortality rates in individuals receiving ART to the estimated mortality rates in the absence of such treatment. This is the <<estimate.title()>> estimate.
+        description_key:
+          - "{definitions.art_description}"
+          - Antiretroviral therapy (ART) has significantly reduced the number of AIDS-related deaths since its introduction in 1996.
+          - By suppressing HIV replication, ART improves the health and longevity of people living with HIV, thereby preventing deaths that would have occurred in its absence.
         display:
           numDecimalPlaces: 0
+        presentation:
+          title_public: "Lives saved due to ART"
 
-      deaths_plhiv_all_causes:
-        title: "Deaths among people living with HIV (all causes) - <<estimate.title()>> estimate"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      hiv_incidence:
-        title: "HIV Incidence per 1000 population - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
-        short_unit: ""
-        unit: "infections per 1000 uninfected population"
+      people_receiving_art:
+        title: "People receiving antiretroviral therapy - Age: <<age>> - Sex: <<sex>>"
+        unit: "people"
+        description_short: |-
+          Number of {definitions.people_dimension} living with HIV on antiretroviral therapy. This is the <<estimate.title()>> estimate.
         description_from_producer: |-
-          Number of new HIV infections per 1000 uninfected population. The incidence rate is the number of new cases per populationat risk in a given time period. Numerator: Number of new HIV infections. Denominator: Uninfected population (which isthe total population minus people living with HIV).
+          The number of adults and children who are on antiretroviral therapy at the end of the reporting period. It should include people on antiretroviral therapy in the private sector (if these data are available). The count should include pregnant women living with HIV who are receiving lifelong antiretroviral therapy.
+
+          More details: https://indicatorregistry.unaids.org/indicator/people-living-hiv-antiretroviral-therapy
         description_key:
-          - |-
-            The indicator is disaggregated by age groups (0−14, 15−24, 15−49, 50+ years, less than 25 years, 25+ years), general population, key populations (men who have sex with men,sex workers, people who inject drugs, transgender people, prisoners, mode of transmission for children (includingmother-to-child transmission), geographic location, sex.
-        processing_level: minor
+          - "{definitions.art_description}"
+
+        presentation:
+          title_public: "{definitions.people_term} living with HIV receiving antiretroviral therapy"
+
+      percent_plwh:
+        title: "Coverage of people living with HIV receiving ART - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "%"
+        description_short: |-
+          The percentage of individuals diagnosed with HIV who are currently receiving antiretroviral therapy. This is the <<estimate.title()>> estimate.
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: "Coverage of {definitions.people_term_lower} living with HIV receiving ART"
+
+      #
+      # PMTCT / MTCT
+      #
+      infections_averted_pmtct:
+        title: "New HIV Infections averted due to PMTCT - <<estimate.title()>> estimate"
+        unit: "infections"
+        description_short: |-
+          New HIV infections among children (aged 0-14 years) prevented through the implementation of Prevention of Mother-to-Child Transmission (PMTCT) programs. This is the <<estimate.title()>> estimate.
+        description_key:
+          - PMTCT programs include the provision of antiretroviral therapy to pregnant and breastfeeding women living with HIV, which significantly reduces the risk of HIV transmission to their infants.
+        presentation:
+          title_public: "Infections averted due to PMTCT"
+          title_variant: ""
+
+      mothers_needing_arv_for_pmtct:
+        title: "Pregnant women needing ARV for preventing MTCT - <<estimate.title()>> estimate"
+        unit: "women"
+        description_short: |-
+          Number of HIV-positive pregnant women who require antiretroviral (ARV) treatments to prevent mother-to-child transmission (MTCT) of HIV during pregnancy, childbirth, and breastfeeding.
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Pregnant women needing ARV for preventing mother-to-child transmission of HIV
+          title_variant: ""
+
+      mothers_receiving_arv_for_pmtct:
+        title: "Pregnant women who received ARV for preventing MTCT"
+        unit: "women"
+        description_short: |-
+          Number of HIV-positive pregnant women who delivered and received antiretroviral (ARV) treatments to reduce the risk of mother-to-child transmission during pregnancy, childbirth, and breastfeeding.
+        description_from_producer: |-
+          The source of this information is national program records aggregated from program monitoring tools, such as patient registers and summary reporting forms. The numerator can be generated by counting the number of HIV-positive pregnant women who received antiretrovirals to reduce MTCT in the reporting period, by regimen.
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: Pregnant women who received ARV for preventing mother-to-child transmission of HIV
+          title_variant: ""
+
+      coverage_mothers_receiving_arv:
+        title: "Coverage of pregnant women who receive ARV for preventing MTCT - <<estimate.title()>> estimate"
+        unit: "%"
+        description_short: |-
+          Share of pregnant women who received antiretroviral for preventing mother-to-child transmission. This is the <<estimate.title()>> estimate.
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: "Women (%) receiving ARV for preventing mother-to-child transmission"
+
+      mtct_rate:
+        title: "Mother-to-child HIV transmission rate - <<estimate.title()>> estimate"
+        unit: "infected children per 1,000 children"
+        description_short: |-
+          The number of children born to HIV-positive mothers who acquire HIV during pregnancy, labor, delivery, or breastfeeding, per 1,000 children. This is the <<estimate.title()>> estimate.
+        description_from_producer: |-
+          The mother-to-child transmission probability differs with the antiretroviral drug regimen received and infant-feeding practices. The transmission can be calculated by using the Spectrum model.
+
+          The Spectrum computer programme uses the information on:
+
+          a. the distribution of HIV-positive pregnant women receiving different antiretroviral regimens prior to and during delivery (peripartum) by CD4 category of the mother
+          b. the distribution of women and children receiving antiretrovirals after delivery (postpartum) by CD4 category of the mother.
+          c. the percent of infants who are not breastfeeding in PMTCT programmes by age of the child
+          d. mother-to-child transmission of HIV probabilities based on various categories of antiretroviral drug regimen and infant feeding practices
+
+          The estimated national transmission rate is reported in the PMTCT summary display in Spectrum. This variable can also be calculated using the variables in Spectrum on “New HIV infections” for children 0-14 years and dividing this by the variable “Women in need of PMTCT”
+
+          There is not enough information available about other HIV transmission routes for children to include such infections in the model. In addition other modes of transmission are believed to be a small fraction of the overall infections among children. The Spectrum output variable “New HIV infections for children 0-1 years” is not used because some infections due to breastfeeding will take place after age 1 year
+        presentation:
+          title_public: "Mother-to-child HIV transmission rate"
+          title_variant: ""
+
+      #
+      # CHILDREN
+      #
+      children_exposed_uninfected:
+        title: "HIV-exposed children (0-14) who are uninfected - <<estimate.title()>> estimate"
+        unit: "children"
+        description_short: |-
+          Number of children, aged 14 and under, who have been exposed to HIV but haven't been infected. This is the <<estimate.title()>> estimate.
+        presentation:
+          title_public: "HIV-exposed children who are uninfected"
+
+      #
+      # HIV infections
+      #
+      hiv_incidence:
+        title: "HIV Incidence per 1,000 population - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "infections per 1,000 uninfected people"
+        description_from_producer: |-
+          Number of {definitions.people_dimension} newly infected with HIV in the reporting period per 1,000 uninfected people. This is the <<estimate.title()>> estimate.
+        description_key:
+          - The main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
+          - This indicator is a crucial metric in the WHO 2022 Consolidated guidelines on person-centered HIV strategic information.
+        description_processing: |-
+          Methods for monitoring incidence can vary depending on the epidemic setting and are typically categorized either as direct or indirect measures. Direct measurement at a population level is preferred but can often be difficult to obtain. As a result, most if not all countries rely on indirect measures or triangulate direct and indirect methods.
+
+          Strategies for directly measuring HIV incidence include longitudinal follow-up and repeat testing among individuals who do not have HIV infection and estimation using a laboratory test for recent HIV infection and clinical data in the population. Longitudinal monitoring is often costly and difficult to perform at a population level. Laboratory testing of individuals to determine the recency of infection also raises cost and complexity challenges since a nationally representative population-based survey is typically required to obtain estimates.
+
+          Indirect methods most frequently rely on estimates constructed from mathematical modelling tools, such as Spectrum or the AIDS Epidemic Model. These models may incorporate geographical and population-specific HIV surveys, surveillance, case reporting, mortality, programme and clinical data and, in some instances, assumptions about risk behavior and HIV transmission. In some instances, countries may wish to triangulate these data with other sources of estimates of the number of people newly infected, including from serial population-based HIV prevalence estimates or estimates of HIV prevalence in young, recently exposed populations.
+
+          Note that case-based surveillance systems capturing newly reported people acquiring HIV infection should not be used as a direct source of estimating the number of people newly infected with HIV in the reporting year. Because of reporting delays and under-diagnosis, newly reported cases may not reflect the actual rate of people becoming newly infected. This information may be useful, however, for triangulation or validation purposes, especially when combined with tests for the recency of HIV infection.
+
+          Disaggregated data reported for the numerator should be used to monitor progress towards eliminating new child infections and reducing the number of new HIV infections among adolescent girls and young women to below 100,000 per year.
+
+        presentation:
+          title_public: "HIV incidence per 1,000 population"
 
       hiv_prevalence:
         title: "HIV Prevalence - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Percentage of people in a specific key population who test positive for HIV.
-        processing_level: minor
-
-      imr:
-        title: "Incidence-to-mortality ratio - <<estimate.title()>> estimate"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      infections_averted_pmtct:
-        title: "New HIV Infections averted due to PMTCT - <<estimate.title()>> estimate"
-        short_unit: ""
-        unit: "infections"
-        description_short: |-
-          New HIV infections averted from prevention of mother-to-child transmission.
-        processing_level: minor
-
-      ipr:
-        title: "Incidence-to-prevalence ratio - <<estimate.title()>> estimate"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      mother_child_inf_bf:
-        title: "Mother infected during breastfeeding; child infected during breastfeeding"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      mother_child_inf_preg:
-        title: "Mother infected during pregnancy; child infected during pregnancy"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      mothers_needing_arv_for_pmtct:
-        title: "Pregnant women needing ARV for preventing MTCT - <<estimate.title()>> estimate"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      mothers_receiving_arv_for_pmtct:
-        title: "Pregnant women who received ARV for preventing MTCT - <<estimate.title()>> estimate"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      mtct_rate:
-        title: "Mother-to-child transmission rate - <<estimate.title()>> estimate"
-        unit: ""
-        description_short: ""
-        processing_level: minor
+          Share of {definitions.people_dimension} who test positive for HIV at a given time. This is the HIV Prevalence estimate.
+        description_key:
+          - It is estimated by dividing the number of people in a given group who tested positive for HIV by all the people were tested.
+          - Reflects the overall burden of HIV within a specific population.
+          - Provides insight into the scale of the epidemic and is essential for planning and resource allocation.
+        presentation:
+          title_public: "HIV prevalence"
 
       new_infections:
         title: "New HIV Infections - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
-        short_unit: ""
         unit: "infections"
         description_short: |-
-          Number of newly HIV infected people in a year.
-        processing_level: minor
-
-      art_none_bf:
-        title: "Did not receive ART during breastfeeding; child infected during breastfeeding"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      number_plhiv_knowledge_of_status:
-        title: "People living with HIV who know their status - Age: <<age>> - Sex: <<sex>>"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      number_viral_suppression:
-        title: "People living with HIV who have suppressed viral loads - Age: <<age>> - Sex: <<sex>>"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      pct_change_aids_deaths_2010:
-        title: "Percent change in AIDS-related deaths since 2010 - Age: <<age>> - Sex: <<sex>>"
-        unit: "%"
-        description_short: ""
-        processing_level: minor
-
-      pct_change_new_infections_2010:
-        title: "Percent change in new HIV infections since 2010 - Age: <<age>> - Sex: <<sex>>"
-        unit: "%"
-        description_short: ""
-        processing_level: minor
-
-      people_receiving_art:
-        title: "People receiving antiretroviral therapy - Age: <<age>> - Sex: <<sex>>"
-        unit: ""
-        description_short: ""
-        processing_level: minor
-
-      people_unsupp_vl:
-        title: "People with unsuppressed viral load - Age: <<age>> - Sex: <<sex>>"
-        unit: "%"
-        description_short: ""
-        processing_level: minor
-
-      percent_know_status_on_art:
-        title: "Percent of people who know their status who are on ART - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
-        unit: "%"
-        description_short: ""
-        processing_level: minor
-
-      percent_art_vl_suppressed:
-        title: "Percent of people on ART who achieve viral suppression - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
-        unit: "%"
-        description_short: ""
-        processing_level: minor
-
-      percent_plwh:
-        title: "Coverage of people living with HIV receiving ART - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
-        unit: "%"
-        description_short: ""
-        processing_level: minor
-
-      plhiv_knowledge_of_status:
-        title: "Percent of people living with HIV who know their status - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
-        unit: "%"
-        description_short: ""
-        processing_level: minor
+          The number of {definitions.people_dimension} newly infected with HIV in the last 12 months. This is the <<estimate.title()>> estimate.
+        description_key:
+          - By tracking new infections, health organizations can assess whether prevention efforts are successfully reducing HIV transmission rates or if emerging challenges are creating new infection pathways.
+          - The precision of this metric depends on robust surveillance systems, comprehensive testing programs, and sophisticated epidemiological modeling techniques. Accurate reporting requires consistent data collection, advanced statistical methods, and a nuanced understanding of population-level transmission patterns.
+        presentation:
+          title_public: "New HIV infections"
 
       plwh:
         title: "People living with HIV - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "people"
+        description_short: |-
+          Number of {definitions.people_dimension} living with HIV at the end of the reporting period. This is the <<estimate.title()>> estimate.
+        presentation:
+          title_public: People living with HIV
+
+      #
+      # HIV incidence-to-X ratios
+      #
+      imr:
+        title: "HIV incidence-to-mortality ratio - <<estimate.title()>> estimate"
         unit: ""
-        description_short: ""
-        processing_level: minor
+        description_short: |-
+          The ratio of new HIV infections to AIDS-related deaths within a specific time frame. This is the <<estimate.title()>> estimate.
+        description_key:
+          - An Incidence-to-Mortality Ratio (IMR) below 1.0 indicates that the number of new HIV infections is less than the number of deaths among people living with HIV, suggesting a declining epidemic.
+          - The IMR is used to assess the progress towards controlling the HIV epidemic and is considered alongside other metrics such as the incidence-prevalence ratio.
+        presentation:
+          title_public: "HIV incidence-to-mortality ratio"
+          title_variant: ""
+
+      ipr:
+        title: "HIV incidence-to-prevalence ratio - <<estimate.title()>> estimate"
+        unit: ""
+        description_short: |-
+          The ratio of new HIV infections (incidence) to the total number of people living with HIV (prevalence) within a specific time frame. This is the <<estimate.title()>> estimate.
+        description_key:
+          - A declining incidence-to-prevalence ratio indicates progress in controlling the HIV epidemic, as it reflects a decrease in new infections relative to the existing number of people living with HIV.
+        presentation:
+          title_public: HIV incidence-to-prevalence ratio
+          title_variant: ""
+
+      # KNOW THEIR STATUS
+      number_plhiv_knowledge_of_status:
+        title: "People living with HIV who know their status - Age: <<age>> - Sex: <<sex>>"
+        unit: "people"
+        description_short: |-
+          Number of {definitions.people_dimension} living with HIV who know their HIV status at the end of the reporting period.
+        description_from_producer: |-
+          People living with HIV who know their HIV status will be able to access the HIV care and treatment services required to live healthy, productive lives and to reduce the potential of transmitting HIV to other people. The most effective way to ensure that people living with HIV are aware of their HIV status is to offer HIV testing services at locations and among populations with the highest HIV burden.
+
+          More details: https://indicatorregistry.unaids.org/indicator/people-living-hiv-who-know-their-status
+        description_key:
+          - "This measure is the first 95 of the UNAIDS 95-95-95 target: that 95% of the people living with HIV know their HIV status by 2025."
+          - This indicator is pivotal in the HIV response strategy. Knowing one's HIV status is more than just a medical statistic—it's a transformative moment that opens doors to comprehensive care and personal health management.
+          - "The gap between total HIV infections and diagnosed cases represents a significant challenge in global health. Many individuals may be unaware of their status due to various barriers, including: Limited access to testing facilities, stigma and discrimination, lack of awareness, financial constraints, cultural or personal hesitation about testing, etc."
+        presentation:
+          title_public: "{definitions.people_term} living with HIV who know their status"
+
+      plhiv_knowledge_of_status:
+        title: "Share of people living with HIV who know their status - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "%"
+        description_short: |-
+          Share of {definitions.people_dimension} living with HIV who know their HIV status at the end of the reporting period.
+        presentation:
+          title_public: "{definitions.people_term} (%) living with HIV who know their status"
+
+      percent_know_status_on_art:
+        title: "Share of people living with HIV and on ART who know their status - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "%"
+        description_short: |-
+          Share of {definitions.people_dimension} living with HIV and on ART who know their HIV status at the end of the reporting period.
+        presentation:
+          title_public: "{definitions.people_term} (%) living with HIV and on ART who know their status"
+
+      # VIRAL LOAD
+      number_viral_suppression:
+        title: "People living with HIV who have suppressed viral loads - Age: <<age>> - Sex: <<sex>>"
+        unit: "people"
+        description_short: |-
+          Number of {definitions.people_dimension} living with HIV who have suppressed viral loads at the end of the reporting period.
+        description_from_producer: |-
+          Individual-level viral load is the recommended measure of antiretroviral therapy efficacy and indicates treatment adherence and the risk of transmitting HIV. A viral load threshold of <1000 copies/mL defines treatment success according to the 2016 World Health Organization (WHO) Consolidated guidelines on the use of antiretroviral drugs for treating and preventing HIV infection. People with viral load test results below the threshold should be considered as having suppressed viral loads.
+
+          More details: https://indicatorregistry.unaids.org/indicator/people-living-hiv-who-have-suppressed-viral-loads
+        description_key:
+          - Viral load suppression is a key medical achievement that transforms HIV from a life-threatening condition to a manageable chronic illness. It shows that the virus is under control and the risk of transmission is low.
+          - According to WHO guidelines, a viral load below 1,000 copies/mL is considered suppressed, indicating effective treatment and adherence.
+        presentation:
+          title_public: "{definitions.people_term} living with HIV who have suppressed viral loads"
+
+      people_unsupp_vl:
+        title: "Share of adults (15+) with unsuppressed viral load - Sex: <<sex>>"
+        unit: "%"
+        description_short: |-
+          The share of {definitions.people_dimension} living with HIV whose viral load remains detectable above the suppression threshold, indicating ongoing challenges in maintaining effective HIV treatment and potential risks of disease progression and transmission. This is the <<estimate.title()>> estimate.
+        presentation:
+          title_public: "Share of adults with unsuppressed viral load"
 
       viral_load_suppression:
-        title: "Percent of people living with HIV who have suppressed viral loads - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Share of people living with HIV who have suppressed viral loads - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "%"
-        description_short: ""
-        processing_level: minor
+        description_short: |-
+          The share of {definitions.people_dimension} living with HIV who have achieved viral suppression, representing the proportion of patients successfully managing their HIV through effective antiretroviral therapy. This is the <<estimate.title()>> estimate.
+        description_key:
+          - Viral suppression represents the third and final 90 of the global target, aiming to ensure that patients on ART achieve and maintain viral suppression. This minimizes their risk of disease progression and HIV transmission. Achieving viral suppression is crucial for service quality, as an unsuppressed viral load may indicate suboptimal treatment adherence and the potential for developing and spreading drug resistance.
+        presentation:
+          title_public: "Share of {definitions.people_term} living with HIV who have suppressed viral loads"
+
+      percent_art_vl_suppressed:
+        title: "Share of people on ART who achieve viral suppression - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "%"
+        description_short: |-
+          The share of {definitions.people_dimension} receiving antiretroviral therapy (ART) who successfully achieve viral suppression, measuring the clinical efficacy of HIV treatment at the individual patient level. This is the <<estimate.title()>> estimate.
+        presentation:
+          title_public: "Share of {definitions.people_term} on ART who achieve viral suppression"
+
+      # COMPARISON WITH 2010
+      pct_change_aids_deaths_2010:
+        title: Change (%) in AIDS-related deaths since 2010
+        unit: "%"
+        description_short: |-
+          A comparative measurement of the change in the number of AIDS-related deaths between the current reporting period and the baseline year of 2010, expressed as a percentage.
+        presentation:
+          title_public: "Change (%) in AIDS-related deaths since 2010"
+          title_variant: ""
+
+      pct_change_new_infections_2010:
+        title: Change (%) in new HIV infections since 2010
+        unit: "%"
+        description_short: |-
+          A comparative measurement of the change in the number of AIDS-related infections between the current reporting period and the baseline year of 2010, expressed as a percentage.
+        presentation:
+          title_public: "Change (%) in AIDS-related infections since 2010"
+          title_variant: ""
