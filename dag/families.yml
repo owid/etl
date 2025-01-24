@@ -30,6 +30,9 @@ steps:
   data://meadow/cdc/2025-01-22/marriages:
     - snapshot://cdc/2025-01-22/marriages.pdf
 
+  data://meadow/cdc/2025-01-22/marriages_divorces:
+    - snapshot://cdc/2025-01-22/marriages_divorces.pdf
+
   #
   # ONS Divorces in England and Wales
   #
