@@ -118,7 +118,7 @@ def development_over_time_for_age_groups(tb_agg):
     # tb_agg = tb_agg[tb_agg["year"] >= 2010]
 
     # age starts with 15, 80/85 is topcoded
-    age_brackets = [(15, 19), (20, 29), (30, 39), (40, 49), (50, 59), (60, 69), (70, 79), (80, 89)]
+    age_brackets = [(15, 29), (30, 44), (45, 59), (60, 85)]
 
     tbs = []
 
