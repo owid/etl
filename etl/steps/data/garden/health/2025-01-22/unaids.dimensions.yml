@@ -421,3 +421,54 @@ epi:
     age: 50+
     sex: male
     estimate: low
+
+gam:
+  # TOTAL
+  ALL_AGES:
+    sex: total
+    age: total
+  ALL_SEXES:
+    sex: total
+    age: total
+  ESTIMATE:
+    sex: total
+    age: total
+  TOTAL:
+    sex: total
+    age: total
+
+  # MALE
+  MALES:
+    sex: male
+    age: total
+
+  # indicator: SEX_WORKERS_HIV_PREVALENCE (dims: TOTAL, CATEGORY1)
+  CATEGORY1: #
+    sex: total
+    age: total
+
+  # indicator: DOMESTIC_SPENDING_FUND_SOURCE (dims: as below + 'TOTAL')
+  DOMESTIC_PUBLIC:
+    sex: total
+    age: total
+    estimate: TODO
+  GLOBAL_FUND:
+    sex: total
+    age: total
+  INTERNATIONAL:
+    sex: total
+    age: total
+  OTHER_INTERNATIONAL:
+    sex: total
+    age: total
+  PEPFAR:
+    sex: total
+    age: total
+  PRIVATE:
+    sex: total
+    age: total
+
+  # indicators: COUNTRY_OFFICES (dims: as below), GEOGRAPHICAL_REGIONS (dims: as below)
+  PROGRAM_DATA:
+    sex: total
+    age: total

@@ -67,60 +67,50 @@ def run(dest_dir: str) -> None:
     # ## Load income groups dataset.
     # ds_income_groups = paths.load_dependency("income_groups")
 
-    # Read tables from meadow datasets.
-    tb = ds_meadow.read("epi")
-
     ###############################
     # EPI
     ###############################
+    tb_epi = ds_meadow.read("epi")  ## 1,687,587 rows
+    tb_epi = make_table_epi(tb_epi)
+    tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
 
-    # Add dimensions
-    path = paths.side_file("unaids.dimensions.yml")
-    with open(path, "r") as f:
-        dimensions = yaml.safe_load(f)
-    tb = extract_and_add_dimensions(tb, dimensions["epi"])
+    ###############################
+    # GAM
+    ###############################
+    tb = ds_meadow.read("gam")  # 128,614 rows
+    territories_extra = {
+        "Liechtenstein",
+        "Holy See",
+        "Saint-Martin (French part)",
+        "Martinique",
+        "Saint Helena",
+        "French Guiana",
+        "Isle of Man",
+        "Guadeloupe",
+        "Western Sahara",
+        "Jersey",
+        "Guernsey",
+    }
+    # Drop areas that are not countries (we look for areas appearing very few times)
+    territories = tb["country"].value_counts().sort_values(ascending=False)
+    territories = set(territories[territories >= 88].index)
+    tb = tb.loc[(tb["country"].isin(territories | territories_extra))]
 
-    # Harmonize indicator names
-    tb["indicator"] = tb["indicator"].str.lower().apply(lambda x: COLUMNS_RENAME_EPI.get(x, x))
-
-    # Sanity checks
-    ## Check source
-    assert set(tb["source"].unique()) == {"UNAIDS_Estimates_"}, "Unexpected source!"
-    ## No textual data
-    assert not tb["is_text"].any(), "Some data is textual!"
-    ## Chec no NaNs
-    assert not tb.value.isna().any(), "Some NaNs were detected, but none were expected!"
-
-    # Save some fields (this might be useful later)
-    tb_meta = tb[["indicator", "indicator_description", "unit"]].drop_duplicates()
-    tb_meta["indicator"] = tb_meta["indicator"]
-    assert not tb_meta["indicator"].duplicated().any(), "Multiple descriptions or units for a single indicator!"
+    # Drop special indicators
+    INDICATORS_GAM_REMOVE = ["GEOGRAPHICAL_REGIONS", "COUNTRY_OFFICES"]
+    tb = tb.loc[~tb["indicator"].isin(INDICATORS_GAM_REMOVE)]
 
     # Harmonize
-    # tb = geo.harmonize_countries(
-    #     df=tb,
-    #     countries_file=paths.country_mapping_path,
-    #     excluded_countries_file=paths.excluded_countries_path,
-    # )
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
+        make_missing_countries_nan=True,
+    )
 
-    # Pivot table (and lower-case columns)
-    tb = tb.pivot(
-        index=["country", "year", "age", "sex", "estimate"], columns="indicator", values="value"
-    ).reset_index()
-    tb = tb.underscore()
+    # tb_gam = make_table_gam(tb_gam)
+    # tb_gam = tb_gam.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
 
-    # Rename columns
-    tb = tb.rename(columns=COLUMNS_RENAME_EPI)
-
-    # Estimate regional data (only when unit == NUMBER)
-
-    # Drop all NaN rows
-    tb = tb.dropna(how="all")
-
-    # Format
-    tb = tb.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
-
-    #########################33
     #
     # Process data.
     #
@@ -183,6 +173,54 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def make_table_epi(tb):
+    # Add dimensions
+    path = paths.side_file("unaids.dimensions.yml")
+    with open(path, "r") as f:
+        dimensions = yaml.safe_load(f)
+    tb = extract_and_add_dimensions(tb, dimensions["epi"])
+
+    # Harmonize indicator names
+    tb["indicator"] = tb["indicator"].str.lower().apply(lambda x: COLUMNS_RENAME_EPI.get(x, x))
+
+    # Sanity checks
+    ## Check source
+    assert set(tb["source"].unique()) == {"UNAIDS_Estimates_"}, "Unexpected source!"
+    ## No textual data
+    assert not tb["is_text"].any(), "Some data is textual!"
+    ## Chec no NaNs
+    assert not tb.value.isna().any(), "Some NaNs were detected, but none were expected!"
+
+    # Save some fields (this might be useful later)
+    tb_meta = tb[["indicator", "indicator_description", "unit"]].drop_duplicates()
+    tb_meta["indicator"] = tb_meta["indicator"]
+    assert not tb_meta["indicator"].duplicated().any(), "Multiple descriptions or units for a single indicator!"
+
+    # Harmonize
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
+    )
+
+    # Pivot table (and lower-case columns)
+    tb = tb.pivot(
+        index=["country", "year", "age", "sex", "estimate"], columns="indicator", values="value"
+    ).reset_index()
+    tb = tb.underscore()
+
+    # Rename columns
+    tb = tb.rename(columns=COLUMNS_RENAME_EPI)
+
+    # Estimate regional data (only when unit == NUMBER)
+    # TODO
+
+    # Drop all NaN rows
+    tb = tb.dropna(how="all")
+
+    return tb
 
 
 def add_regions_to_tuberculosis_vars(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
