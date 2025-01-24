@@ -5326,5 +5326,3 @@ tables:
         title: Carbon intensity of GDP (kg CO2e per constant 2015 US$ of GDP)
       en_ghg_fgas_ip_mt_ce_ar5:
         title: F-gases emissions from Industrial Processes (Mt CO2e)
-      dt_nfl_unid_cd:
-        title: Net official flows from UN agencies, UNIDIR (current US$)
