@@ -950,5 +950,6 @@ steps:
   data://garden/health/2025-01-22/measles:
     - data://meadow/health/2025-01-22/measles
     - data://garden/demography/2025-01-23/us_state_population
+    - data://garden/demography/2024-07-15/population
   data://grapher/health/2025-01-22/measles:
     - data://garden/health/2025-01-22/measles

@@ -16,11 +16,12 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("measles")
     ds_pop = paths.load_dataset("us_state_population")
+    ds_us_pop = paths.load_dataset("population")  # population for the whole of the United States
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("measles")
     tb_pop = ds_pop.read("us_state_population")
-
+    tb_us_pop = ds_us_pop.read("population")
     #
     # Process data.
     #
@@ -35,20 +36,25 @@ def run(dest_dir: str) -> None:
     tb["year"] = tb["periodstartdate"].dt.year
 
     tb = tb.groupby(["countryname", "state", "year"])["countvalue"].sum().reset_index()
+    tb_usa = tb.groupby(["countryname", "year"])["countvalue"].sum().reset_index()
     # Combine with population
     tb = tb.merge(tb_pop, left_on=["state", "year"], right_on=["state", "year"], how="left")
+    tb_usa = tb_usa.merge(tb_us_pop, left_on=["countryname", "year"], right_on=["country", "year"], how="left")
+
     tb["case_rate"] = tb["countvalue"] / tb["population"] * 100000
+    tb_usa["case_rate"] = tb_usa["countvalue"] / tb_usa["population"] * 100000
     tb = tb.rename(columns={"countryname": "country"})
+    tb_usa = tb_usa.drop(columns=["countryname", "population", "source", "world_pop_share"])
 
     # tb.metadata = metadata
     tb = tb.format(["country", "state", "year"], short_name="measles")
-
+    tb_usa = tb_usa.format(["country"], short_name="national_measles")
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb, tb_usa], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
