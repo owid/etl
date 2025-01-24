@@ -55,13 +55,3 @@ steps:
     - data://meadow/un/2024-12-31/households
   data://grapher/un/2024-12-31/households:
     - data://garden/un/2024-12-31/households
-
-  #
-  # UN Marriage data
-  #
-  data://meadow/un/2024-12-31/marriage_data:
-    - snapshot://un/2024-12-31/marriage_data.xlsx
-  data://garden/un/2024-12-31/marriage_data:
-    - data://meadow/un/2024-12-31/marriage_data
-  data://grapher/un/2024-12-31/marriage_data:
-    - data://garden/un/2024-12-31/marriage_data
