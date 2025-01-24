@@ -100,6 +100,7 @@ def run(dest_dir: str) -> None:
     INDICATORS_GAM_REMOVE = ["GEOGRAPHICAL_REGIONS", "COUNTRY_OFFICES"]
     tb = tb.loc[~tb["indicator"].isin(INDICATORS_GAM_REMOVE)]
 
+    # TODO: review dimensions per indicator
     # Harmonize
     tb = geo.harmonize_countries(
         df=tb,
