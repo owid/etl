@@ -20,7 +20,7 @@ meta:
     # Files
     url_main: https://www.who.int/teams/control-of-neglected-tropical-diseases/data-platforms/pct-databank/schistosomiasis
     url_download: https://apps.who.int/neglected_diseases/ntddata/data/SCH_data.xlsx?ua=1
-    date_accessed: 2024-05-02
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -28,6 +28,6 @@ meta:
       url: https://www.who.int/about/policies/publishing/copyright
 
 outs:
-  - md5: b8e16cc7fb3aec5f8cdae5466123d914
-    size: 87864
+  - md5: 0022aa3896ecdefc8fde91942d4b1acc
+    size: 92217
     path: schistosomiasis.xlsx

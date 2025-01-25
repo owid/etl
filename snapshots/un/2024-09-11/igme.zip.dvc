@@ -20,7 +20,7 @@ meta:
     # Files
     url_main: https://childmortality.org/all-cause-mortality/data
     url_download: https://childmortality.org/wp-content/uploads/2024/03/UN-IGME-2023.zip
-    date_accessed: 2024-09-11
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -28,6 +28,6 @@ meta:
       url: https://www.unicef.org/legal#copyright
 
 outs:
-  - md5: 4373ec656cd0b192b21c4b96d8c6a4c1
-    size: 20903643
+  - md5: 55ce4803e8dc81606a53c590502735b5
+    size: 22505684
     path: igme.zip

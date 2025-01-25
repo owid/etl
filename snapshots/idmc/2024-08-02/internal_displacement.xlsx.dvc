@@ -18,7 +18,7 @@ meta:
     # Files
     url_main: https://www.internal-displacement.org/database/displacement-data/
     url_download: https://helix-tools-api.idmcdb.org/external-api/gidd/displacements/displacement-export/?release_environment=RELEASE&start_year=2008&end_year=2023&client_id=IDMCWSHSOLO009&release_environment=RELEASE
-    date_accessed: 2024-08-02
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -26,6 +26,6 @@ meta:
       url: https://www.internal-displacement.org/terms-of-use/
 
 outs:
-  - md5: fc00e59f00fc434ddd18fdf12ade753b
-    size: 355737
+  - md5: 12c87e744c0a319f9daa024dc31779fa
+    size: 355734
     path: internal_displacement.xlsx

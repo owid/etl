@@ -20,7 +20,7 @@ meta:
     # Files
     url_main: https://www.unhcr.org/refugee-statistics/download/?url=q0TpTi
     url_download: https://api.unhcr.org/population/v1/population/?limit=20&dataset=population&displayType=totals&columns%5B%5D=refugees&columns%5B%5D=asylum_seekers&columns%5B%5D=idps&columns%5B%5D=oip&columns%5B%5D=stateless&columns%5B%5D=hst&columns%5B%5D=ooc&yearFrom=1951&yearTo=2023&coo_all=true&coa_all=true&uat=refugee-statistics%2Fbuild&download=true&_gl=1*hmdfmv*_ga*MTUyMDQ1MDk2NS4xNzIxMjExMTUz*_ga_BHDVL2BSVK*MTcyMTkyMDU3NC40LjEuMTcyMTkyMDcxMS42MC4wLjA.*_rup_ga*MTUyMDQ1MDk2NS4xNzIxMjExMTUz*_rup_ga_EVDQTJ4LMY*MTcyMTkyMDU3NC4zLjEuMTcyMTkyMDcxMS4zNC4wLjA.
-    date_accessed: 2024-07-25
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -28,6 +28,6 @@ meta:
       url: https://www.unhcr.org/what-we-do/reports-and-publications/data-and-statistics/terms-use-datasets
 
 outs:
-  - md5: 969822946407c5f4101b7291a8118762
-    size: 924774
+  - md5: bd3cdd2c84120a609b4e2a94f79a1918
+    size: 924769
     path: refugee_data.zip

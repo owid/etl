@@ -2,12 +2,7 @@ meta:
   origin:
     producer: Various sources
     title: Chick culling laws
-    description_snapshot: Male baby chicks are commonly killed in laying hens hatcheries
-      all around the world, as they provide no value for the egg production industry.
-      Only a minority of country has laws to ban this practice. This dataset is a
-      compilation of evidence (from official institutions and in some cases from the
-      news) of chick culling taking place in a country, and, in some cases, of existing
-      laws banning it.
+    description_snapshot: Male baby chicks are commonly killed in laying hens hatcheries all around the world, as they provide no value for the egg production industry. Only a minority of country has laws to ban this practice. This dataset is a compilation of evidence (from official institutions and in some cases from the news) of chick culling taking place in a country, and, in some cases, of existing laws banning it.
     citation_full: >-
       Evidence of laws banning chick culling, and evidence of chick culling being
       practiced without any ban, has been gathered
@@ -117,8 +112,7 @@ meta:
     date_published: '2023-09-01'
   license:
     name: CC BY 4.0
-wdir: ../../../data/snapshots/animal_welfare/2023-09-01
 outs:
-- md5: 2afcdd6c0c3ade182cf69b24ab684db3
-  size: 6886
-  path: chick_culling_laws.csv
+  - md5: 2afcdd6c0c3ade182cf69b24ab684db3
+    size: 6886
+    path: chick_culling_laws.csv

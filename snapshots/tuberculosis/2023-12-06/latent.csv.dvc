@@ -18,7 +18,7 @@ meta:
     # Files
     url_main: https://www.who.int/teams/global-tuberculosis-programme/data
     url_download: https://extranet.who.int/tme/generateCSV.asp?ds=ltbi_estimates
-    date_accessed: 2023-12-06
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -27,6 +27,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-12-06
 outs:
-  - md5: 17d8d4ed0e40ae3f1817884f5f7ecf87
-    size: 23231
+  - md5: f4cd215de9f41915acae669906b45dfb
+    size: 203993
     path: latent.csv

@@ -14,6 +14,6 @@ meta:
       url: https://today.yougov.com/about/terms
     version_producer: '2024-07-11'
 outs:
-  - md5: ced546927422f332791fd30e92dd9611
-    size: 29658
+  - md5: 9844d6d119cfa3b4c4a5ddb07e87f749
+    size: 26462
     path: yougov_job_automation.xlsx

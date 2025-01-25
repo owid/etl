@@ -17,7 +17,7 @@ meta:
     # Files
     url_main: https://www.who.int/teams/global-tuberculosis-programme/data
     url_download: https://extranet.who.int/tme/generateCSV.asp?ds=expenditure_utilisation
-    date_accessed: 2023-12-05
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -26,6 +26,6 @@ meta:
 
 wdir: ../../../data/snapshots/tuberculosis/2023-12-05
 outs:
-  - md5: f636f0f57e3f1c2e2f1db8a48b5cc80d
-    size: 219422
+  - md5: d23fbf06501ffb9ca0b7064278302eaf
+    size: 255651
     path: expenditure.csv

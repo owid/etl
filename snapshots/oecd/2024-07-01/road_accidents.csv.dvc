@@ -18,7 +18,7 @@ meta:
     # Files
     url_main: https://data.oecd.org/transport/road-accidents.htm
     url_download: https://sdmx.oecd.org/public/rest/data/OECD.ITF,DSD_TRENDS@DF_TRENDSSAFETY,1.0/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
-    date_accessed: 2024-07-01
+    date_accessed: '2025-01-10'
 
     # License
     license:
@@ -26,6 +26,6 @@ meta:
       url: https://www.oecd.org/termsandconditions.html
 
 outs:
-  - md5: fe6a0df7389ec3fd698bba3a6253d8ee
-    size: 1643494
+  - md5: 6f7227d3adeae523b49866fb489e2b19
+    size: 1758923
     path: road_accidents.csv

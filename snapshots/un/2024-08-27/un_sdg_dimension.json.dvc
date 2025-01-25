@@ -24,6 +24,6 @@ meta:
       url: https://www.un.org/en/about-us/terms-of-use
 
 outs:
-  - md5: 90b4c0abd8317af637e1ca4176c5a1ed
-    size: 348509
+  - md5: 853672e5fb4724012c102e25343fbc7c
+    size: 355091
     path: un_sdg_dimension.json

@@ -17,13 +17,13 @@ meta:
     # Files
     url_main: https://data-explorer.oecd.org/vis?df[ds]=DisseminateFinalDMZ&df[id]=DSD_NAMAIN10%40DF_TABLE4&df[ag]=OECD.SDD.NAD&dq=A.AUS%2BAUT%2BBEL%2BCAN%2BCHL%2BCOL%2BCRI%2BCZE%2BDNK%2BEST%2BFIN%2BFRA%2BDEU%2BGRC%2BHUN%2BISL%2BIRL%2BISR%2BITA%2BJPN%2BKOR%2BLVA%2BLTU%2BLUX%2BMEX%2BNLD%2BNZL%2BNOR%2BPOL%2BPRT%2BSVK%2BSVN%2BESP%2BSWE%2BCHE%2BTUR%2BGBR%2BUSA...PPP_B1GQ.......&lom=LASTNPERIODS&lo=10&to[TIME_PERIOD]=false&ly[cl]=TIME_PERIOD&ly[rw]=REF_AREA%2CCOMBINED_UNIT_MEASURE&vw=tb
     url_download: https://sdmx.oecd.org/public/rest/data/OECD.SDD.NAD,DSD_NAMAIN10@DF_TABLE4,/A.ZMB+ZAF+SGP+SRB+SEN+RUS+SAU+ROU+MKD+MLT+MAR+MDG+IDN+HKG+IND+CYP+GEO+HRV+CHN+CMR+CPV+BGR+BRA+ALB+ARG+WXOECD+EU27_2020+EA20+AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA...EXC_E+EXC_A+PPP_P41+PPP_P31S14+PPP_B1GQ.......?startPeriod=1960&endPeriod=2023&dimensionAtObservation=AllDimensions&format=csvfilewithlabels
-    date_accessed: 2024-08-09
+    date_accessed: '2025-01-10'
 
     # License
     license:
       name: OECD Terms of Conditions
       url: https://www.oecd.org/en/about/terms-conditions.html
 outs:
-  - md5: 7c8806adc0c992ec21f68ce0950b07ee
-    size: 6883521
+  - md5: e060ebd62f8073f430c04b896002a93e
+    size: 6871793
     path: ppp_exchange_rates.csv

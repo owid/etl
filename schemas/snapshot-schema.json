@@ -74,6 +74,9 @@
     "wdir": {
       "type": "string"
     },
+    "autoupdate": {
+      "type": "boolean"
+    },
     "outs": {
       "type": "array",
       "items": [
