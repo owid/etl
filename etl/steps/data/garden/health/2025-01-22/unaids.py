@@ -67,11 +67,16 @@ def run(dest_dir: str) -> None:
     # ## Load income groups dataset.
     # ds_income_groups = paths.load_dependency("income_groups")
 
+    # Load dimensions
+    path = paths.side_file("unaids.dimensions.yml")
+    with open(path, "r") as f:
+        dimensions = yaml.safe_load(f)
+
     ###############################
     # EPI
     ###############################
     tb_epi = ds_meadow.read("epi")  ## 1,687,587 rows
-    tb_epi = make_table_epi(tb_epi)
+    tb_epi = make_table_epi(tb_epi, dimensions["epi"])
     tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
 
     ###############################
@@ -176,12 +181,10 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def make_table_epi(tb):
+def make_table_epi(tb, dimensions):
     # Add dimensions
-    path = paths.side_file("unaids.dimensions.yml")
-    with open(path, "r") as f:
-        dimensions = yaml.safe_load(f)
-    tb = extract_and_add_dimensions(tb, dimensions["epi"])
+
+    tb = extract_and_add_dimensions(tb, dimensions)
 
     # Harmonize indicator names
     tb["indicator"] = tb["indicator"].str.lower().apply(lambda x: COLUMNS_RENAME_EPI.get(x, x))
