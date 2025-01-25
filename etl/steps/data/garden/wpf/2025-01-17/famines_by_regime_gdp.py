@@ -235,13 +235,15 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
         "Russia, Ukraine": [1915, 1916, 1917, 1918, 1919, 1920, 1921, 1922],
         "Russia, Western Soviet States": [1941, 1942, 1943, 1944],
         "Moldova, Ukraine, Russia, Belarus": [1946, 1947],
-        "Ukraine": [1932, 1933, 1934, 1941, 1942, 1943, 1944, 1945, 1946, 1947],
+        "Ukraine": [1931, 1932, 1933, 1934, 1941, 1942, 1943, 1944, 1945, 1946, 1947],
     }
 
     for countries, years in special_cases.items():
         for year in years:
             if year in [1941, 1942, 1943, 1944, 1945]:
                 gdp_value = calculate_average_gdp(tb_gdp, "USSR", [1940, 1946])
+            if year in [1915, 1916, 1917, 1918, 1919, 1920, 1921, 1922]:
+                gdp_value = calculate_average_gdp(tb_gdp, "Russia", [1915, 1922])
             else:
                 gdp_value = tb_gdp[(tb_gdp["country"] == "USSR") & (tb_gdp["year"] == year)]["gdp_per_capita"].values[0]
             replace_gdp(tb, tb_gdp, countries, [year], gdp_value)
