@@ -30,7 +30,7 @@ tables:
         title: Reported number of measles cases in the United States
         unit: cases
       case_rate:
-        title: Reported casese of measles in the United States per 100,000 population
+        title: Reported cases of measles in the United States per 100,000 population
         description_short: The number of measles cases per 100,000 population
         unit: cases per 100,000 population
         processing_level: major

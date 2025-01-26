@@ -1,0 +1,21 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Total, threatened and extinct and extinct in the wild endemic species in each country
+    date_published: "2024-10-28"
+
+    # Citation
+    producer: IUCN Red List of Threatened Species
+    citation_full: |-
+      IUCN. 2024. The IUCN Red List of Threatened Species. Version 2024-2. https://www.iucnredlist.org. Accessed on 23rd December 2024.
+
+    # Files
+    url_main: https://www.iucnredlist.org/statistics
+    date_accessed: 2024-12-23
+
+    # License
+    license:
+      name: © International Union for Conservation of Nature and Natural Resources
+      url: https://www.iucnredlist.org/terms/terms-of-use
