@@ -953,3 +953,11 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/health/2025-01-22/measles:
     - data://garden/health/2025-01-22/measles
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/cdc/2025-01-26/measles:
+    - snapshot://cdc/2025-01-26/measles.txt
+  data://garden/cdc/2025-01-26/measles:
+    - data://meadow/cdc/2025-01-26/measles
