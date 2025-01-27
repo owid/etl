@@ -1,6 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
+from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -24,6 +26,9 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("measles")
+    tb_cdc_archive = ds_measles_cdc_archive.read_csv()
+    tb_cdc_state = ds_measles_cdc.read("state_measles")
+    tb_cdc_national = ds_measles_cdc.read("national_measles")
     tb_pop = ds_pop.read("us_state_population")
     tb_us_pop = ds_us_pop.read("population")
     #
@@ -41,17 +46,20 @@ def run(dest_dir: str) -> None:
 
     tb = tb.groupby(["countryname", "state", "year"])["countvalue"].sum().reset_index()
     tb_usa = tb.groupby(["countryname", "year"])["countvalue"].sum().reset_index()
+    # Combine the tables from the different sources into one table.
+    tb = combine_state_tables(tb, tb_cdc_archive, tb_cdc_state)
+    tb_usa = combine_national_tables(tb_usa, tb_cdc_archive, tb_cdc_national)
     # Combine with population
-    tb = tb.merge(tb_pop, left_on=["state", "year"], right_on=["state", "year"], how="left")
-    tb_usa = tb_usa.merge(tb_us_pop, left_on=["countryname", "year"], right_on=["country", "year"], how="left")
+    tb = tb.merge(tb_pop, left_on=["country", "year"], right_on=["state", "year"], how="left")
+    tb_usa = tb_usa.merge(tb_us_pop, left_on=["country", "year"], right_on=["country", "year"], how="left")
 
-    tb["case_rate"] = tb["countvalue"] / tb["population"] * 100000
-    tb_usa["case_rate"] = tb_usa["countvalue"] / tb_usa["population"] * 100000
-    tb = tb.rename(columns={"countryname": "country"})
-    tb_usa = tb_usa.drop(columns=["countryname", "population", "source", "world_pop_share"])
+    tb["case_rate"] = tb["case_count"] / tb["population"] * 100000
+    tb_usa["case_rate"] = tb_usa["case_count"] / tb_usa["population"] * 100000
+    tb = tb.drop(columns=["state", "population"])
+    tb_usa = tb_usa.drop(columns=["population", "source", "world_pop_share"])
 
     # tb.metadata = metadata
-    tb = tb.format(["country", "state", "year"], short_name="measles")
+    tb = tb.format(["country", "year"], short_name="measles")
     tb_usa = tb_usa.format(["country", "year"], short_name="national_measles")
     #
     # Save outputs.
@@ -63,3 +71,51 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def combine_national_tables(tb_usa: Table, tb_cdc_archive: Table, tb_cdc_national: Table) -> Table:
+    """
+    Combine the tables from the different sources into one table.
+    - Project Tycho: 1888-2001 (tb_usa)
+    - CDC archive: 2002-2015 (tb_cdc_archive)
+    - CDC NNDSS: 2016-2022 (tb_cdc_national)
+    """
+    # Standardize the column names
+    tb_usa = tb_usa.rename(columns={"countvalue": "case_count", "countryname": "country"})
+
+    # Drop state-level data and type of case (indigenous vs imported) from the CDC archive
+    tb_cdc_archive = tb_cdc_archive[["country", "year", "total_measles_cases"]]
+    tb_cdc_archive = tb_cdc_archive.rename(columns={"total_measles_cases": "case_count"})
+    tb_cdc_archive = tb_cdc_archive[tb_cdc_archive["country"] == "United States"]
+
+    # Format the CDC current data to match
+    tb_cdc_national = tb_cdc_national[tb_cdc_national["disease"] == "Total"]
+    tb_cdc_national = tb_cdc_national[["country", "year", "case_count"]]
+
+    combined_tb = pr.concat([tb_usa, tb_cdc_archive, tb_cdc_national])
+    return combined_tb
+
+
+def combine_state_tables(tb: Table, tb_cdc_archive: Table, tb_cdc_state: Table) -> Table:
+    """
+    Combine the tables from the different sources into one table.
+    - Project Tycho: 1888-2001 (tb)
+    - CDC archive: 2002-2015 (tb_cdc_archive)
+    - CDC NNDSS: 2016-2022 (tb_cdc_state)
+    """
+    # Format the Project Tycho data to match the CDC data
+    tb = tb[["state", "year", "countvalue"]]
+    tb = tb.rename(columns={"countvalue": "case_count", "state": "country"})
+
+    # Drop national data and type of case (indigenous vs imported) from the CDC archive
+    tb_cdc_archive = tb_cdc_archive[["country", "year", "total_measles_cases"]]
+    tb_cdc_archive = tb_cdc_archive.rename(columns={"total_measles_cases": "case_count"})
+    tb_cdc_archive = tb_cdc_archive[tb_cdc_archive["country"] != "United States"]
+
+    # Format the CDC current data to match
+    tb_cdc_state = tb_cdc_state[tb_cdc_state["disease"] == "Total"]
+    tb_cdc_state = tb_cdc_state[["country", "year", "case_count"]]
+
+    combined_tb = pr.concat([tb, tb_cdc_archive, tb_cdc_state])
+
+    return combined_tb
