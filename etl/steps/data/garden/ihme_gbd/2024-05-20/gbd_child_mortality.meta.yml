@@ -11,7 +11,11 @@ definitions:
   description_key: |-
     <% if cause == "Conflict and terrorism" %>When precise information is unavailable, IHME splits the impacts of conflict and terrorism evenly across years, and across countries based on their populations.<% endif %>
   cause: |-
-    <% if cause.start_with?("HIV/AIDS") %>cause<% else %><%- cause.lower() %><% end %>
+    <% if cause.startswith("HIV/AIDS") %>
+    << cause >>
+    <% else %>
+    << cause.lower() >>
+    <%- endif -%>
   value_deaths:
     unit: |-
       <% if metric == "Number" %>deaths<% elif metric == "Rate" %>deaths per 100,000 people<% elif metric == "Percent" %>%<%- endif -%>
