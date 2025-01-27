@@ -115,9 +115,21 @@ def combine_state_tables(tb: Table, tb_cdc_archive: Table, tb_cdc_state: Table) 
     tb_cdc_archive = tb_cdc_archive[tb_cdc_archive["country"] != "United States"]
 
     # Format the CDC current data to match
+    tb_cdc_state = combine_new_yorks(tb_cdc_state)
     tb_cdc_state = tb_cdc_state[tb_cdc_state["disease"] == "Total"]
     tb_cdc_state = tb_cdc_state[["country", "year", "case_count"]]
 
     combined_tb = pr.concat([tb, tb_cdc_archive, tb_cdc_state])
 
     return combined_tb
+
+
+def combine_new_yorks(tb_cdc_state: Table) -> Table:
+    """
+    Combine the data for New York City and New York State
+    """
+    tb_ny = tb_cdc_state[tb_cdc_state["country"].isin(["New York City", "New York (excluding New York City)"])]
+    tb_ny = tb_ny.groupby(["year", "disease"])["case_count"].sum().reset_index()
+    tb_ny["country"] = "New York"
+
+    return tb_ny
