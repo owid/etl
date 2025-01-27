@@ -52,6 +52,22 @@ COLUMNS_RENAME_EPI = {
     "mother_infected_during_breastfeeding_child_infected_during_": "mother_child_inf_bf",
     "mother_infected_during_pregnancy_child_infected_during_preg": "mother_child_inf_preg",
 }
+# GAM
+INDICATORS_GAM_CATEGORICAL = [
+    "q_a_120",
+    "q_a_121",
+    "q_a_123",
+    "q_a_125",
+    "q_a_65",
+    "q_a_67",
+    "q_a_68",
+    "q_a_6b",
+    "q_a_70",
+]
+INDICATORS_GAM_DROP = [
+    "income_status",
+    "unaids_rsts",
+]
 
 
 def run(dest_dir: str) -> None:
@@ -68,9 +84,11 @@ def run(dest_dir: str) -> None:
     # ds_income_groups = paths.load_dependency("income_groups")
 
     # Load dimensions
-    path = paths.side_file("unaids.dimensions.yml")
-    with open(path, "r") as f:
+    with paths.side_file("unaids.dimensions.yml").open() as f:
         dimensions = yaml.safe_load(f)
+
+    with paths.side_file("unaids.indicators_to_dimensions.yml").open() as f:
+        dimensions_collapse = yaml.safe_load(f)
 
     ###############################
     # EPI
@@ -114,6 +132,110 @@ def run(dest_dir: str) -> None:
         make_missing_countries_nan=True,
     )
 
+    # Collapse original indicators into indicator + dimension
+    dix = {}
+    for dim in dimensions_collapse["gam"]:
+        _dix = {k: {**v, "name": dim["name"]} for k, v in dim["indicators_origin"].items()}
+        dix |= _dix
+    tb["dimension_0"] = tb["indicator"].map(lambda x: dix[x]["dimension"] if x in dix else None)
+    tb["indicator"] = tb["indicator"].map(lambda x: dix[x]["name"] if x in dix else x)
+    ## Lower case indicator names
+    tb["indicator"] = tb["indicator"].str.lower()
+
+    # Drop non-relevant (or non-supported) indicators
+    tb = tb.loc[~tb["indicator"].isin(INDICATORS_GAM_DROP + INDICATORS_GAM_CATEGORICAL)]
+    tb = tb.loc[~((tb["indicator"] == "population") & (tb["dimension"] == "TOTAL"))]
+
+    # Work In Progress
+    tb = extract_and_add_dimensions(
+        tb, dimensions["gam"], dimension_names=["sex", "age", "group", "hepatitis", "estimate"], drop=False
+    )
+
+    #######
+    ####### SEPARATE DATA HEPATITIS / ESTIMATES
+    #######
+    # Separate hepatitis data
+    indicators_hepatitis = set(tb.dropna(subset="hepatitis")["indicator"].unique())
+    assert indicators_hepatitis == {"viral_hepatitis"}, "Unexpected extra indicators!"
+    mask_hepatitis = tb["indicator"].isin(indicators_hepatitis)
+    tb_hepatitis = tb.loc[mask_hepatitis]
+    # Checks
+    assert set(tb_hepatitis["sex"].unique()) == {"female", "male", "total"}
+    assert set(tb_hepatitis["age"].unique()) == {"0-25", "25+", "total"}
+    assert set(tb_hepatitis["hepatitis"].unique()) == {"B", "C"}
+    assert tb_hepatitis["group"].notna().sum() == 4, "Unexpected not-NAs"
+    # Drop columns
+    tb_hepatitis = tb_hepatitis.drop(columns=["estimate"])
+    # Add group
+    tb_hepatitis = tb_hepatitis.loc[tb_hepatitis["group"].isna()]
+    tb_hepatitis["group"] = tb_hepatitis["dimension_0"].fillna("total")
+
+    # Separate estimate data
+    indicators_estimate = set(tb.dropna(subset="estimate")["indicator"].unique())
+    assert indicators_estimate == {
+        "population",
+        "tb_related_deaths",
+        "incident_tb_cases",
+        "hiv_new_tb_cases",
+        "comanagement_tb_hiv",
+    }, "Unexpected extra indicators"
+    mask_estimate = tb["indicator"].isin(indicators_estimate)
+    tb_estimate = tb.loc[mask_estimate]
+    # Checks
+    assert set(tb_estimate["sex"].unique()) == {None, "total"}
+    assert set(tb_estimate["age"].unique()) == {None, "total"}
+    assert tb_estimate["group"].isna().all()
+    # Drop columns
+    tb_estimate = tb_estimate.drop(columns=["sex", "age", "hepatitis"])
+    # Add group
+    tb_estimate["group"] = tb_estimate["dimension_0"].fillna("total")
+
+    ##############
+
+    # Back to main table
+    tb = tb.loc[~(mask_hepatitis | mask_estimate)]
+    assert tb["hepatitis"].isna().all()
+    assert tb["estimate"].isna().all()
+    tb = tb.drop(columns=["hepatitis", "estimate"])
+
+    # FIX dimensions
+    ## sex
+    # tb.sex.value_counts(dropna=False)
+    ## age
+    # tb.age.value_counts(dropna=False)
+
+    ## group
+    tb["group"] = tb["group"].fillna(tb["dimension_0"])
+    mask = (tb["group"].notna()) & (tb["group"] == "total") & (tb["dimension_0"].notna())
+    tb.loc[mask, "group"] = tb.loc[mask, "dimension_0"]
+    ## TODO: Find solution for (tb["group"].notna()) & (tb["group"] == "total") & (tb["dimension_0"].notna())
+    # tb[(tb.group.notna()) & (tb.group != "total") & (tb.dimension_0.notna())].indicator.unique()
+    # array(['hiv_tests', 'hiv_prevalence', 'condom_use',
+    #    'hiv_status_awareness', 'hiv_programmes_coverage',
+    #    'avoidance_care', 'art_coverage', 'syphilis_prevalence'],
+    #   dtype=object)
+    # TODO:
+    # 1) hiv_tests -> new table
+    # 2) The rest, keep and join as "group, dimension_0". Look at the data for transgender/transwoman/transman/transother
+
+    # Explore
+    # 1) Nothing in group, nothing in dimension_0 => NO ACTION
+    tb_1 = tb[(tb.group.isna()) & (tb.dimension_0.isna())]
+    print(len(tb_1))
+
+    # 2) Something in group, nothing in dimension_0 => NO ACTION
+    tb_2 = tb[(tb.group.notna()) & (tb.dimension_0.isna())]
+    print(len(tb_2))
+
+    # 2) Nothing in group, something in dimension_0 => EASY REPLACE
+    tb_3 = tb[(tb.group.isna()) & (tb.dimension_0.notna())]
+    print(len(tb_3))
+
+    # 4) Something in group, something in dimension_0 => HARD REPLACE
+    tb_4 = tb[(tb.group.notna()) & (tb.dimension_0.notna())]
+    print(len(tb_4))
+
+    # 'unaids_rsts']
     # tb_gam = make_table_gam(tb_gam)
     # tb_gam = tb_gam.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
 
@@ -380,19 +502,22 @@ def combine_tables(tb: Table, tb_hiv_child: Table, tb_gap_art: Table, tb_deaths_
     return tb
 
 
-def extract_and_add_dimensions(tb, dimensions):
+def extract_and_add_dimensions(tb, dimensions, dimension_names=None, drop=True):
     """Add sex, age, estimate dimensions.
 
     sex: female, male, total
     age: age group range
     estimate: estimate, lower, upper
     """
+    if dimension_names is None:
+        dimension_names = ["sex", "age", "estimate"]
     # Add new dimension columns
-    dim_values = {dim: {k: v[dim] for k, v in dimensions.items()} for dim in ["sex", "age", "estimate"]}
-    for dim in ["sex", "age", "estimate"]:
+    dim_values = {dim: {k: v.get(dim) for k, v in dimensions.items()} for dim in dimension_names}
+    for dim in dimension_names:
         tb[dim] = tb["dimension"].map(dim_values[dim])
 
     # Drop old dimensions column
-    tb = tb.drop(columns=["dimension", "dimension_name"])
+    if drop:
+        tb = tb.drop(columns=["dimension", "dimension_name"])
 
     return tb

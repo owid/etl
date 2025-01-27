@@ -423,52 +423,317 @@ epi:
     estimate: low
 
 gam:
-  # TOTAL
-  ALL_AGES:
+  0_14:
     sex: total
+    age: 0-14
+  10_14:
+    age: 10-14
+  15_19:
+    age: 15-19
+  15_49:
+    age: 15-49
+  1_9:
+    age: 1-9
+  20_24:
+    age: 20-24
+  25_49:
+    age: 25-49
+  25_AND_UP:
+    age: 25+
+  30_49:
+    age: 30-49
+  50_AND_UP:
+    age: 50+
+  ALL_AGES:
     age: total
   ALL_SEXES:
     sex: total
-    age: total
+  ALL_SEXES_15_24_ALL_QUESTIONS:
+    age: 15-24
+    sex: total
+  ALL_SEXES_15_49:
+    sex: "total"
+    age: "15-49"
+  DISTRIBUTED:
+    sex: "total"
+    age: "total" # CHECK
+    group: "distributed"
+  DOMESTIC:
+    group: "domestic"
+  DOMESTIC_PUBLIC:
+    group: "domestic public"
   ESTIMATE:
     sex: total
     age: total
-  TOTAL:
-    sex: total
-    age: total
-
-  # MALE
-  MALES:
-    sex: male
-    age: total
-
-  # indicator: SEX_WORKERS_HIV_PREVALENCE (dims: TOTAL, CATEGORY1)
-  CATEGORY1: #
-    sex: total
-    age: total
-
-  # indicator: DOMESTIC_SPENDING_FUND_SOURCE (dims: as below + 'TOTAL')
-  DOMESTIC_PUBLIC:
-    sex: total
-    age: total
-    estimate: TODO
+    estimate: central
+  FEMALES:
+    sex: "female"
+    age: "total"
+  FEMALES_15_19:
+    sex: "female"
+    age: "15-19"
+  FEMALES_15_19_NO_ALL_QUESTIONS:
+    sex: "female"
+    age: "15-19"
+    group: all questions
+  FEMALES_15_19_NO_QUESTION_1:
+    sex: "female"
+    age: "15-19"
+    group: "question 1"
+  FEMALES_15_19_NO_QUESTION_2:
+    sex: "female"
+    age: "15-19"
+    group: "question 2"
+  FEMALES_15_24_ALL_QUESTIONS:
+    sex: "female"
+    age: "15-24"
+    group: "all questions"
+  FEMALES_15_49:
+    sex: "female"
+    age: "15-49"
+  FEMALES_20_24:
+    sex: "female"
+    age: "20-24"
+  FEMALES_20_24_NO_ALL_QUESTIONS:
+    sex: "female"
+    age: "20-24"
+    group: "all questions"
+  FEMALES_20_24_NO_QUESTION_1:
+    sex: "female"
+    age: "20-24"
+    group: "question 1"
+  FEMALES_20_24_NO_QUESTION_2:
+    sex: "female"
+    age: "20-24"
+    group: "question 2"
+  FEMALES_25_49:
+    sex: "female"
+    age: "25-49"
+  FEMALES_25_49_NO_ALL_QUESTIONS:
+    sex: "female"
+    age: "25-49"
+    group: "all questions"
+  FEMALES_25_49_NO_QUESTION_1:
+    sex: "female"
+    age: "25-49"
+    group: "question 1"
+  FEMALES_25_49_NO_QUESTION_2:
+    sex: "female"
+    age: "25-49"
+    group: "question 2"
+  FEMALES_NO_ALL_QUESTIONS:
+    sex: "female"
+    age: "total"
+    group: "all questions"
+  FEMALES_NO_QUESTION_1:
+    sex: "female"
+    age: "total"
+    group: "question 1"
+  FEMALES_NO_QUESTION_2:
+    sex: "female"
+    age: "total"
+    group: "question 2"
+  FEMALE_ADULTS:
+    sex: "female"
+    age: "15+"
+  FEMALE_CONDOMS_NGO:
+    sex: "female"
+    age: "total"
+    group: "NGO"
+  FEMALE_CONDOMS_PRIVATE:
+    sex: "female"
+    age: "total"
+    group: "private"
+  FEMALE_CONDOMS_PUBLIC:
+    sex: "female"
+    age: "total"
+    group: "public"
+  FEMALE_CONDOMS_TOTAL:
+    sex: "female"
+    age: "total"
+    group: "total"
+  FORMAL_HEALTHCARE:
+    group: "formal healthcare"
   GLOBAL_FUND:
-    sex: total
-    age: total
+    group: "global fund"
+  HEPATITIS_B_FEMALES:
+    sex: "female"
+    age: "total"
+    hepatitis: "B"
+  HEPATITIS_B_GTE_25:
+    sex: "total"
+    age: "25+"
+    hepatitis: "B"
+  HEPATITIS_B_LT_25:
+    sex: "total"
+    age: "0-25"
+    hepatitis: "B"
+  HEPATITIS_B_MALES:
+    sex: "male"
+    age: "total"
+    hepatitis: "B"
+  HEPATITIS_B_TOTAL:
+    sex: "total"
+    age: "total"
+    hepatitis: "B"
+  HEPATITIS_C_FEMALES:
+    sex: "female"
+    age: "total"
+    hepatitis: "C"
+  HEPATITIS_C_GTE_25:
+    sex: "total"
+    age: "25+"
+    hepatitis: "C"
+  HEPATITIS_C_LT_25:
+    sex: "total"
+    age: "0-25"
+    hepatitis: "C"
+  HEPATITIS_C_MALES:
+    sex: "male"
+    age: "total"
+    hepatitis: "C"
+  HEPATITIS_C_TOTAL:
+    sex: "total"
+    age: "total"
+    hepatitis: "C"
+  HEPATITIS_C_TRANSGENDER:
+    sex: "total"
+    age: "total"
+    group: transgender
+    hepatitis: "C"
+  HIGH_ESTIMATE:
+    estimate: "high"
+  HIV_RELATED:
+    group: "hiv-related"
   INTERNATIONAL:
-    sex: total
-    age: total
+    group: "international"
+  LESS_1:
+    age: "0-1"
+  LESS_25:
+    age: "0-25"
+  LOW_ESTIMATE:
+    estimate: "low"
+  MALES:
+    sex: "male"
+    age: "total"
+  MALES_15_19:
+    sex: "male"
+    age: "15-19"
+  MALES_15_19_NO_ALL_QUESTIONS:
+    sex: "male"
+    age: "15-19"
+  MALES_15_19_NO_QUESTION_1:
+    sex: "male"
+    age: "15-19"
+  MALES_15_19_NO_QUESTION_2:
+    sex: "male"
+    age: "15-19"
+  MALES_15_24_ALL_QUESTIONS:
+    sex: "male"
+    age: "15-24"
+  MALES_15_49:
+    sex: "male"
+    age: "15-49"
+  MALES_20_24:
+    sex: "male"
+    age: "20-24"
+  MALES_20_24_NO_ALL_QUESTIONS:
+    sex: "male"
+    age: "20-24"
+  MALES_20_24_NO_QUESTION_1:
+    sex: "male"
+    age: "20-24"
+  MALES_20_24_NO_QUESTION_2:
+    sex: "male"
+    age: "20-24"
+    group: ""
+  MALES_25_49:
+    sex: "male"
+    age: "25-49"
+  MALES_25_49_NO_ALL_QUESTIONS:
+    sex: "male"
+    age: "25-49"
+    group: "all questions"
+  MALES_25_49_NO_QUESTION_1:
+    sex: "male"
+    age: "25-49"
+    group: "question 1"
+  MALES_25_49_NO_QUESTION_2:
+    sex: "male"
+    age: "25-49"
+    group: "question 2"
+  MALES_NO_ALL_QUESTIONS:
+    sex: "male"
+    age: "total"
+    group: "all questions"
+  MALES_NO_QUESTION_1:
+    sex: "male"
+    age: "total"
+    group: "question 1"
+  MALES_NO_QUESTION_2:
+    sex: "male"
+    age: "total"
+    group: "question 2"
+  MALE_ADULTS:
+    sex: "male"
+    age: "15+"
+  MALE_CONDOMS_NGO:
+    sex: "male"
+    age: "total"
+    group: "NGO"
+  MALE_CONDOMS_PRIVATE:
+    sex: "male"
+    age: "total"
+    group: "private"
+  MALE_CONDOMS_PUBLIC:
+    sex: "male"
+    age: "total"
+    group: "public"
+  MALE_CONDOMS_TOTAL:
+    sex: "male"
+    age: "total"
+    group: "total"
+  NON_HIV_RELATED:
+    group: "non-HIV related"
   OTHER_INTERNATIONAL:
-    sex: total
-    age: total
+    group: "other internaltional"
   PEPFAR:
-    sex: total
-    age: total
+    group: "PEPFAR"
   PRIVATE:
-    sex: total
-    age: total
-
-  # indicators: COUNTRY_OFFICES (dims: as below), GEOGRAPHICAL_REGIONS (dims: as below)
-  PROGRAM_DATA:
-    sex: total
-    age: total
+    group: "private"
+  PROCURED:
+    sex: "total"
+    age: "total"
+    group: "procured"
+  RURAL:
+    group: "rural"
+  TOTAL:
+    sex: "total"
+    age: "total"
+    group: "total"
+  TOTAL_NO_ALL_QUESTIONS:
+    sex: "total"
+    age: "total"
+    group: "all questions"
+  TOTAL_NO_QUESTION_1:
+    sex: "total"
+    age: "total"
+    group: "question 1"
+  TOTAL_NO_QUESTION_2:
+    sex: "total"
+    age: "total"
+    group: "question 2"
+  TRADITIONAL:
+    group: "traditional"
+  TRANSGENDER:
+    group: "transgender"
+  TRANSMAN:
+    group: "transman"
+  TRANSOTHER:
+    group: "transother"
+  TRANSWOMAN:
+    group: "transwoman"
+  URBAN:
+    group: "urban"
+  US_BILATERAL:
+    group: "US bilateral"
