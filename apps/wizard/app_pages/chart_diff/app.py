@@ -10,7 +10,7 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_grapher
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
-from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
+from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines, indicators_in_charts
 from apps.wizard.utils import set_states
 from apps.wizard.utils.components import Pagination
 from etl.config import OWID_ENV
@@ -82,11 +82,8 @@ def get_chart_diffs():
         )
     )
 
-    # Get a list of used indicators in chart diffs
-    with Session(SOURCE_ENGINE) as session:
-        indicator_ids = gm.ChartDimensions.indicators_in_charts(session, list(st.session_state.chart_diffs.keys()))
-        rows = gm.Variable.from_id(session, variable_id=list(indicator_ids), columns=["id", "name"])
-        st.session_state.indicators_in_charts = {r.id: r.name for r in rows}
+    # Get indicators used in charts
+    st.session_state.indicators_in_charts = indicators_in_charts(list(st.session_state.chart_diffs.keys()))
 
     # Init, can be changed by the toggle
     st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
