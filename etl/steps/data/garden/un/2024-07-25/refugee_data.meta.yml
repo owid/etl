@@ -117,7 +117,7 @@ tables:
       refugees_under_unhcrs_mandate_asylum:
         title: Refugees by destination
         description_short: |-
-          Cross-border [refugees](#dod:refugee) by the country they live in. This includes all refugees living in this country, not just the new refugees arriving this year.
+          Total number of cross-border [refugees](#dod:refugee) by the country they live in. This includes all refugees living in this country, not just the new refugees arriving this year.
         description_from_producer: "{definitions.description_refugee}"
         description_key:
           - "{definitions.description_refugee_general}"
