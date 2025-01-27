@@ -35,15 +35,9 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path, country_col="countryname")
-    tb["state"] = tb["admin1name"].str.title()
-    tb["periodstartdate"] = pd.to_datetime(tb["periodstartdate"], errors="coerce")
-    tb["periodenddate"] = pd.to_datetime(tb["periodenddate"], errors="coerce")
-
-    tb["diff"] = tb["periodenddate"] - tb["periodstartdate"]
-    # Check we are using the correct data, we are expecting a 6 day difference
-    assert all(tb["diff"] == "6 days")
-    tb["year"] = tb["periodstartdate"].dt.year
-
+    # Clean up the data
+    tb = clean_project_tycho(tb)
+    # Calculate annual cases
     tb = tb.groupby(["countryname", "state", "year"])["countvalue"].sum().reset_index()
     tb_usa = tb.groupby(["countryname", "year"])["countvalue"].sum().reset_index()
     # Combine the tables from the different sources into one table.
@@ -71,6 +65,20 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def clean_project_tycho(tb: Table) -> Table:
+    tb["state"] = tb["admin1name"].str.title()
+    tb["periodstartdate"] = pd.to_datetime(tb["periodstartdate"], errors="coerce")
+    tb["periodenddate"] = pd.to_datetime(tb["periodenddate"], errors="coerce")
+
+    tb["diff"] = tb["periodenddate"] - tb["periodstartdate"]
+    # Check we are using the correct data, we are expecting a 6 day difference
+    assert all(tb["diff"] == "6 days")
+    tb["year"] = tb["periodstartdate"].dt.year
+    # Standardize the state names
+    tb["state"] = tb["state"].replace({"District Of Columbia": "District of Columbia"})
+    return tb
 
 
 def combine_national_tables(tb_usa: Table, tb_cdc_archive: Table, tb_cdc_national: Table) -> Table:
