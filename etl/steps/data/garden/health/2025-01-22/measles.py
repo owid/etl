@@ -54,7 +54,7 @@ def run(dest_dir: str) -> None:
     tb_usa = tb_usa.merge(tb_us_pop, left_on=["country", "year"], right_on=["country", "year"], how="left")
 
     tb["case_rate"] = tb["case_count"] / tb["population"] * 100000
-    tb_usa["case_rate"] = tb_usa["case_count"] / tb_usa["population"] * 100000
+    tb_usa["national_case_rate"] = tb_usa["national_case_count"] / tb_usa["population"] * 100000
     tb = tb.drop(columns=["state", "population"])
     tb_usa = tb_usa.drop(columns=["population", "source", "world_pop_share"])
 
@@ -93,6 +93,8 @@ def combine_national_tables(tb_usa: Table, tb_cdc_archive: Table, tb_cdc_nationa
     tb_cdc_national = tb_cdc_national[["country", "year", "case_count"]]
 
     combined_tb = pr.concat([tb_usa, tb_cdc_archive, tb_cdc_national])
+
+    combined_tb = combined_tb.rename(columns={"case_count": "national_case_count"})
     return combined_tb
 
 
