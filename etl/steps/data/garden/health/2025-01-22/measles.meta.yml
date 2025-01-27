@@ -13,12 +13,9 @@ dataset:
 tables:
   measles:
     variables:
-      countvalue:
+      case_count:
         title: Reported number of measles cases in << state >>
         unit: cases
-      population:
-        title: Population of << state >>
-        unit: people
       case_rate:
         title: Measles case rate in << state >> per 100,000 population
         description_short: The number of measles cases per 100,000 population.
@@ -26,7 +23,7 @@ tables:
         processing_level: major
   national_measles:
     variables:
-      countvalue:
+      case_count:
         title: Reported number of measles cases in the United States
         unit: cases
       case_rate:
