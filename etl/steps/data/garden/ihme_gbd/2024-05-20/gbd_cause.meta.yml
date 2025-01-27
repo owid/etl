@@ -8,6 +8,8 @@ definitions:
     processing_level: minor
   description_key: |-
     <% if cause == "Conflict and terrorism" %>When precise information is unavailable, IHME splits the impacts of conflict and terrorism evenly across years, and across countries based on their populations.<% endif %>
+  cause: |-
+    <% if cause == "HIV/AIDS"%>HIV/AIDS<% else %> << cause.lower() >> <%- endif -%>
   value_deaths:
     unit: |-
       <% if metric == "Number" %>
@@ -21,43 +23,43 @@ definitions:
       <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      Deaths from << cause.lower() >>, among individuals aged << age >>
+      Deaths from {definitions.cause}, among individuals aged << age >>
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      Age-standardized deaths from << cause.lower() >>
+      Age-standardized deaths from {definitions.cause}
       <% elif metric == "Number" and age == 'All ages'%>
-      Total number of deaths from << cause.lower() >>
+      Total number of deaths from {definitions.cause}
       <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      Deaths from << cause.lower() >>, among individuals aged << age >> per 100,000 people
+      Deaths from {definitions.cause}, among individuals aged << age >> per 100,000 people
       <% elif metric == "Rate" and age == 'Age-standardized'%>
-      Age-standardized deaths from << cause.lower() >> per 100,000 people
+      Age-standardized deaths from {definitions.cause} per 100,000 people
       <% elif metric == "Rate" and age == 'All ages'%>
-      Deaths from << cause.lower() >> per 100,000 people
+      Deaths from {definitions.cause} per 100,000 people
       <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
-      Share of total deaths of individuals aged << age >> from << cause.lower() >>
+      Share of total deaths of individuals aged << age >> from {definitions.cause}
       <% elif metric == "Percent" and age == 'Age-standardized'%>
-      Share of total age-standardized deaths that are from << cause.lower() >>
+      Share of total age-standardized deaths that are from {definitions.cause}
       <% elif metric == "Percent" and age == 'All ages'%>
-      Share of total deaths that are from << cause.lower() >>
+      Share of total deaths that are from {definitions.cause}
       <%- endif -%>
     description_short: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of deaths from << cause.lower() >> in those aged << age >>.
+      The estimated number of deaths from {definitions.cause} in those aged << age >>.
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated number of age-standardized deaths from << cause.lower() >>.
+      The estimated number of age-standardized deaths from {definitions.cause}.
       <% elif metric == "Number" and age == 'All ages'%>
-      The estimated number of deaths from << cause.lower() >>.
+      The estimated number of deaths from {definitions.cause}.
       <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of deaths from << cause.lower() >> in those aged << age >>, per 100,000 people.
+      The estimated number of deaths from {definitions.cause} in those aged << age >>, per 100,000 people.
       <% elif metric == "Rate" and age == 'Age-standardized'%>
-      The estimated number of age-standardized deaths from << cause.lower() >>, per 100,000 people.
+      The estimated number of age-standardized deaths from {definitions.cause}, per 100,000 people.
       <% elif metric == "Rate" and age == 'All ages'%>
-      The estimated number of deaths from << cause.lower() >>, per 100,000 people.
+      The estimated number of deaths from {definitions.cause}, per 100,000 people.
       <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated share of deaths from << cause.lower() >> in those aged << age >>.
+      The estimated share of deaths from {definitions.cause} in those aged << age >>.
       <% elif metric == "Percent" and age == 'Age-standardized'%>
-      The estimated share of age-standardized deaths from << cause.lower() >>.
+      The estimated share of age-standardized deaths from {definitions.cause}.
       <% elif metric == "Percent" and age == 'All ages'%>
-      The estimated share of deaths from << cause.lower() >>.
+      The estimated share of deaths from {definitions.cause}.
       <%- endif -%>
     description_processing: |-
       <% if cause == "All forms of violence" %>
@@ -80,43 +82,43 @@ definitions:
       <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      DALYs from << cause.lower() >>, among individuals aged << age >>
+      DALYs from {definitions.cause}, among individuals aged << age >>
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      Age-standardized DALYs from << cause.lower() >>
+      Age-standardized DALYs from {definitions.cause}
       <% elif metric == "Number" and age == 'All ages'%>
-      Total number of DALYs from << cause.lower() >>
+      Total number of DALYs from {definitions.cause}
       <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      DALYs from << cause.lower() >>, among individuals aged << age >> per 100,000 people
+      DALYs from {definitions.cause}, among individuals aged << age >> per 100,000 people
       <% elif metric == "Rate" and age == 'Age-standardized'%>
-      Age-standardized DALYs from << cause.lower() >> per 100,000 people
+      Age-standardized DALYs from {definitions.cause} per 100,000 people
       <% elif metric == "Rate" and age == 'All ages'%>
-      DALYs from << cause.lower() >> per 100,000 people
+      DALYs from {definitions.cause} per 100,000 people
       <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
-      Share of total DALYs of individuals aged << age >> from << cause.lower() >>
+      Share of total DALYs of individuals aged << age >> from {definitions.cause}
       <% elif metric == "Percent" and age == 'Age-standardized'%>
-      Share of total age-standardized DALYs that are from << cause.lower() >>
+      Share of total age-standardized DALYs that are from {definitions.cause}
       <% elif metric == "Percent" and age == 'All ages'%>
-      Share of total DALYs that are from << cause.lower() >>
+      Share of total DALYs that are from {definitions.cause}
       <%- endif -%>
     description_short: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >> in those aged << age >>.
+      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} in those aged << age >>.
       <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated number of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
+      The estimated number of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause}.
       <% elif metric == "Number" and age == 'All ages'%>
-      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
+      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause}.
       <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >> in those aged << age >>, per 100,000 people.
+      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} in those aged << age >>, per 100,000 people.
       <% elif metric == "Rate" and age == 'Age-standardized'%>
-      The estimated number of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>, per 100,000 people.
+      The estimated number of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause}, per 100,000 people.
       <% elif metric == "Rate" and age == 'All ages'%>
-      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>, per 100,000 people.
+      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause}, per 100,000 people.
       <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >> in those aged << age >>.
+      The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} in those aged << age >>.
       <% elif metric == "Percent" and age == 'Age-standardized'%>
-      The estimated share of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
+      The estimated share of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause}.
       <% elif metric == "Percent" and age == 'All ages'%>
-      The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
+      The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause}.
       <%- endif -%>
   footnote: |-
     <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
