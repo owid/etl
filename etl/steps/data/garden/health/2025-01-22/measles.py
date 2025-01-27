@@ -136,8 +136,13 @@ def combine_new_yorks(tb_cdc_state: Table) -> Table:
     """
     Combine the data for New York City and New York State
     """
-    tb_ny = tb_cdc_state[tb_cdc_state["country"].isin(["New York City", "New York (excluding New York City)"])]
+    msk = tb_cdc_state["country"].isin(["New York City", "New York (excluding New York City)"])
+    tb_ny = tb_cdc_state[msk]
+    tb_not_ny = tb_cdc_state[~msk]
+
     tb_ny = tb_ny.groupby(["year", "disease"])["case_count"].sum().reset_index()
     tb_ny["country"] = "New York"
 
-    return tb_ny
+    tb_cdc_state = pr.concat([tb_not_ny, tb_ny])
+
+    return tb_cdc_state
