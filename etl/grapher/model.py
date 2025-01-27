@@ -1401,10 +1401,12 @@ class Variable(Base):
     ) -> "Variable" | List["Variable"]:
         """Load a variable from the DB by its catalog path."""
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+        # Return Variable if columns is None and return Row object if columns is provided
+        execute = session.execute if columns else session.scalars
         if isinstance(catalog_path, str):
-            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath == catalog_path)).one()
+            return execute(_select_columns(cls, columns).where(cls.catalogPath == catalog_path)).one()  # type: ignore
         elif isinstance(catalog_path, list):
-            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
+            return execute(_select_columns(cls, columns).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
 
     @overload
     @classmethod
@@ -1421,10 +1423,13 @@ class Variable(Base):
         cls, session: Session, variable_id: int | List[int], columns: Optional[List[str]] = None
     ) -> "Variable" | List["Variable"]:
         """Load a variable (or list of variables) from the DB by its ID path."""
+        # Return Variable if columns is None and return Row object if columns is provided
+        execute = session.execute if columns else session.scalars
+
         if isinstance(variable_id, int):
-            return session.scalars(_select_columns(cls, columns).where(cls.id == variable_id)).one()
+            return execute(_select_columns(cls, columns).where(cls.id == variable_id)).one()  # type: ignore
         elif isinstance(variable_id, list):
-            return session.scalars(_select_columns(cls, columns).where(cls.id.in_(variable_id))).all()  # type: ignore
+            return execute(_select_columns(cls, columns).where(cls.id.in_(variable_id))).all()  # type: ignore
 
     @classmethod
     def catalog_paths_to_variable_ids(cls, session: Session, catalog_paths: List[str]) -> Dict[str, int]:
@@ -1551,6 +1556,18 @@ class ChartDimensions(Base):
     variableId: Mapped[int] = mapped_column(Integer)
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
+
+    @classmethod
+    def chart_ids_with_indicators(cls, session: Session, indicator_ids: list[int]) -> list[int]:
+        """Return a list of chart IDs that have any of the given indicators."""
+        query = select(cls.chartId).where(cls.variableId.in_(indicator_ids))
+        return list(session.scalars(query).all())
+
+    @classmethod
+    def indicators_in_charts(cls, session: Session, chart_ids: list[int]) -> set[int]:
+        """Return a list of indicator IDs that are in any of the given charts."""
+        query = select(cls.variableId).where(cls.chartId.in_(chart_ids))
+        return set(session.scalars(query).all())
 
 
 class Origin(Base):
