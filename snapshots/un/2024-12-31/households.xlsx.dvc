@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Household Size and Composition
+    description: |-
+      This database presents a compilation of indicators on household size and membership composition around the world, estimated using both tabulated data and household roster micro-data from censuses and household surveys. The estimates are based on 1,059 unique data sources from 196 countries or areas, representing approximately 98 per cent of the world’s population in 2022, with reference dates ranging from 1960 to 2021. The 2022 database includes estimates from 209 Multiple Indicator Cluster Surveys (MICS), representing 98 countries or areas, which were not available in the previous versions.
+
+      Standard estimation procedures were used to ensure comparability of the estimates between countries and over time.
+    date_published: "2022"
+
+    # Citation
+    producer: United Nations
+    citation_full: |-
+      United Nations, Department of Economic and Social Affairs, Population Division (2022).  Database on Household Size and Composition 2022.
+    attribution_short: UN
+
+    # Files
+    url_main: https://www.un.org/development/desa/pd/data/household-size-and-composition
+    url_download: https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2022_hh-size-composition.xlsx
+    date_accessed: 2024-12-31
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2022_household_size_composition.pdf
+
+outs:
+  - md5: 24391b9acd0473763b133d9073e8016c
+    size: 342176
+    path: households.xlsx
