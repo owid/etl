@@ -48,8 +48,6 @@ DAG_FASTTRACK_PATH = DAG_DIR / "fasttrack.yml"
 config_style_html()
 # Logger
 log = get_logger()
-# Bugsnag
-wizard_utils.enable_bugsnag_for_streamlit()
 
 
 # Initialize session state

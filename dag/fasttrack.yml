@@ -224,3 +224,5 @@ steps:
     - snapshot://fasttrack/latest/antimicrobial_usage_livestock.csv
   data://grapher/fasttrack/latest/iucn_number_evaluated:
     - snapshot://fasttrack/latest/iucn_number_evaluated.csv
+  data://grapher/fasttrack/latest/cdc_measles:
+    - snapshot://fasttrack/latest/cdc_measles.csv

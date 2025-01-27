@@ -105,9 +105,11 @@ COMMODITY_MAPPING = {
     ("Cement", "Clinker capacity, estimated"): None,
     # NOTE: Chromium mine production in USGS historical is different to USGS current
     # (see notes in USGS historical garden step).
-    ("Chromium", "Mine production, marketable chromite ore"): ("Chromium", "Mine"),
-    ("Chromium", "Mne production, grosss weight, marketable chromite ore"): ("Chromium", "Mine"),
-    ("Chromium", "Mne production, marketable chromite ore, gross weight"): ("Chromium", "Mine"),
+    # NOTE: Production is in gross weight, but reserves is in tonnes of "shipping-grade chromite ore".
+    # We will have to manually change this later on.
+    ("Chromium", "Mine production, marketable chromite ore"): ("Chromium", "Mine, gross weight"),
+    ("Chromium", "Mne production, grosss weight, marketable chromite ore"): ("Chromium", "Mine, gross weight"),
+    ("Chromium", "Mne production, marketable chromite ore, gross weight"): ("Chromium", "Mine, gross weight"),
     # NOTE: The following could be mapped to ("Clays", "Mine, bentonite"). We decided to remove "Clays".
     ("Clays", "Bentonite, mine production"): None,
     # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
@@ -405,7 +407,7 @@ FOOTNOTES = {
     # "reserves|Zeolites|Mine|tonnes": "Values refer to natural zeolites.",
     "production|Bismuth|Refinery|tonnes": "Values are reported in tonnes of metal content.",
     "reserves|Platinum group metals|Mine, platinum|tonnes": "Reserves include all platinum group metals.",
-    "production|Chromium|Mine|tonnes": "Values are reported in tonnes of gross weight of marketable chromite ore.",
+    "production|Chromium|Mine, gross weight|tonnes": "Values are reported in tonnes of gross weight of marketable chromite ore.",
 }
 
 # Dictionary of special units.
@@ -1140,6 +1142,12 @@ def run(dest_dir: str) -> None:
     tb_flat.loc[(tb_flat["country"] == "Kazakhstan") & (tb_flat["year"] == 2020), "production|Asbestos|Mine|tonnes"] = (
         None
     )
+
+    # As explained above (in the mapping) Chromium production is in gross weight, but reserves are not.
+    tb_flat = tb_flat.rename(
+        columns={"reserves|Chromium|Mine, gross weight|tonnes": "reserves|Chromium|Mine|tonnes"}, errors="raise"
+    )
+    tb_flat["reserves|Chromium|Mine|tonnes"].metadata.title = "reserves|Chromium|Mine|tonnes"
     ####################################################################################################################
 
     # Format tables conveniently.

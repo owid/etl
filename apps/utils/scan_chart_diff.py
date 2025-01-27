@@ -8,7 +8,7 @@ from structlog import get_logger
 from apps.owidbot.cli import cli as owidbot_cli
 from etl import config
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 log = get_logger()
 
@@ -71,9 +71,13 @@ def get_prs_from_repo(repo):
     active_prs = []
     # Start with the first page
     url = f"https://api.github.com/repos/owid/{repo}/pulls?per_page=100"
+    if config.OWIDBOT_ACCESS_TOKEN:
+        headers = {"Authorization": f"token {config.OWIDBOT_ACCESS_TOKEN}"}
+    else:
+        headers = {}
 
     while url:
-        response = requests.get(url)
+        response = requests.get(url, headers=headers)
         response.raise_for_status()  # To handle HTTP errors
         js = response.json()
 
