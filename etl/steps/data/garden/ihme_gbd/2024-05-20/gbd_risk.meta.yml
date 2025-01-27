@@ -7,11 +7,7 @@ definitions:
         - Causes of Death
     processing_level: minor
   cause: |-
-    <% if cause.startswith("HIV/AIDS") %>
-    << cause >>
-    <% else %>
-    << cause.lower() >>
-    <%- endif -%>
+    <% if cause.startswith("HIV/AIDS") %><< cause >><% else %><< cause.lower() >><%- endif -%>
   value_deaths:
     unit: |-
       <% if metric == "Number" %>deaths<% elif metric == "Rate" %>deaths per 100,000 people<% elif metric == "Percent" %>%<%- endif -%>
