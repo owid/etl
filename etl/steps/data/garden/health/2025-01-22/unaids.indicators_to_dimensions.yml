@@ -1,547 +1,167 @@
 gam:
-  # HIV PREVALENCE (5)
-  TG_HIV_PREVALENCE:
-    name: HIV prevalence among transgender people
-    indicator_group:
-    dimensions:
-  MSM_HIV_PREVALENCE:
-    name: HIV prevalence among men who have sex with men
-    indicator_group:
-    dimensions:
-  SEX_WORKERS_HIV_PREVALENCE:
-    name: HIV prevalence among sex workers
-    indicator_group:
-    dimensions:
-  PWID_HIV_PREVALENCE:
-    name: HIV prevalence among people who inject drugs
-    indicator_group:
-    dimensions:
-  PRISONERS_HIV_PREVALENCE:
-    name: HIV prevalence among prisoners
-    indicator_group:
-    dimensions:
+  - name: hiv_prevalence
+    long_name: HIV prevalence
+    indicators_origin:
+      TG_HIV_PREVALENCE:
+        dimension: transgender
+      MSM_HIV_PREVALENCE:
+        dimension: men who have sex with men
+      SEX_WORKERS_HIV_PREVALENCE:
+        dimension: sex workers
+      PWID_HIV_PREVALENCE:
+        dimension: people who inject drugs
+      PRISONERS_HIV_PREVALENCE:
+        dimension: prisoners
 
-  # SYPHILIS
-  SW_SYPHILIS:
-    name: Syphilis prevalence among sex workers
-    indicator_group:
-    dimensions:
-  MSM_SYPHILIS:
-    name: Syphilis prevalence among men who have sex with men
-    indicator_group:
-    dimensions:
+  - name: syphilis_prevalence
+    long_name: Syphilis prevalence
+    indicators_origin:
+      SW_SYPHILIS:
+        dimension: sex workers
+      MSM_SYPHILIS:
+        dimension: men who have sex with men
 
-  # HEPATITIS
-  TG_HEPATITIS:
-    name: Viral hepatitis among transgender people
-    indicator_group:
-    dimensions:
-  MSM_HEPATITIS:
-    name: Viral hepatitis among men who have sex with men
-    indicator_group:
-    dimensions:
-  SW_HEPATITIS:
-    name: Viral hepatitis among sex workers
-    indicator_group:
-    dimensions:
-  PWID_HEPATITIS:
-    name: Viral hepatitis among people who inject drugs
-    indicator_group:
-    dimensions:
+  - name: viral_hepatitis
+    long_name: Viral hepatitis
+    indicators_origin:
+      TG_HEPATITIS:
+        dimension: transgender
+      MSM_HEPATITIS:
+        dimension: men who have sex with men
+      SW_HEPATITIS:
+        dimension: sex workers
+      PWID_HEPATITIS:
+        dimension: people who inject drugs
 
-  # POPULATION (6)
-  POPULATION:
-    name: Population
-    indicator_group:
-    dimensions:
-  SEX_WORKERS_POPULATION_SIZE:
-    name: "Sex workers: Population size estimate"
-    indicator_group:
-    dimensions:
-  TG_POPULATION_SIZE:
-    name: "Transgender people: Population size estimate"
-    indicator_group:
-    dimensions:
-  PWID_POPULATION_SIZE:
-    name: "People who inject drugs: Population size estimate"
-    indicator_group:
-    dimensions:
-  PRISONERS_POPULATION_SIZE:
-    name: "Prisoners: Population size estimate"
-    indicator_group:
-    dimensions:
-  MSM_POPULATION_SIZE:
-    name: "Men who have sex with men: Population size estimate"
-    indicator_group:
-    dimensions:
+  - name: population
+    long_name: Population size
+    indicators_origin:
+      POPULATION:
+        dimension:
+      SEX_WORKERS_POPULATION_SIZE:
+        dimension: sex workers
+      TG_POPULATION_SIZE:
+        dimension: transgender
+      PWID_POPULATION_SIZE:
+        dimension: people who inject drugs
+      PRISONERS_POPULATION_SIZE:
+        dimension: prisoners
+      MSM_POPULATION_SIZE:
+        dimension: men who have sex with men
 
-  # CONDOMS DISTRIBUTED (4)
-  CONDOMS_DISTRIBUTED:
-    name: Annual number of condoms distributed
-    indicator_group:
-    dimensions:
-  SW_CONDOMS_DISTRIBUTED:
-    name: Condoms distributed per person in prevention programmes for sex workers
-    indicator_group:
-    dimensions:
-  PRISONERS_CONDOMS_DISTRIBUTED:
-    name: Condoms distributed to prisoners
-    indicator_group:
-    dimensions:
-  MSM_CONDOMS_DISTRIBUTED:
-    name: Condoms distributed per person in prevention programmes for men who have sex with men
-    indicator_group:
-    dimensions:
+  - name: condoms_distributed_pp
+    long_name: Condoms distributed per person
+    indicators_origin:
+      SW_CONDOMS_DISTRIBUTED:
+        dimension: sex workers
+      PRISONERS_CONDOMS_DISTRIBUTED: # NOTE: not in prevention programme
+        dimension: prisoners
+      MSM_CONDOMS_DISTRIBUTED:
+        dimension: men who have sex with men
 
-  # ART COVERAGE (5)
-  PWID_ART_COVERAGE:
-    name: Antiretroviral therapy coverage among people who inject drugs
-    indicator_group:
-    dimensions:
-  PRISONERS_ART_COVERAGE:
-    name: Antiretroviral therapy coverage among prisoners living with HIV
-    indicator_group:
-    dimensions:
-  MSM_ART_COVERAGE:
-    name: Antiretroviral therapy coverage among men who have sex with men living with HIV
-    indicator_group:
-    dimensions:
-  TG_ART_COVERAGE:
-    name: Antiretroviral therapy coverage among transgender people
-    indicator_group:
-    dimensions:
-  SEX_WORKERS_ART_COVERAGE:
-    name: Antiretroviral therapy coverage among sex workers living with HIV
-    indicator_group:
-    dimensions:
+  - name: art_coverage
+    long_name: Antiretroviral therapy coverage
+    indicators_origin:
+      SEX_WORKERS_ART_COVERAGE:
+        dimension: sex workers
+      MSM_ART_COVERAGE:
+        dimension: men who have sex with men
+      PWID_ART_COVERAGE:
+        dimension: people who inject drugs
+      TG_ART_COVERAGE:
+        dimension: transgender
+      PRISONERS_ART_COVERAGE:
+        dimension: prisoners
 
-  # CONDOM USE (5)
-  CONDOM_USE:
-    name: Condom use at last high-risk sex
-    indicator_group:
-    dimensions:
-  SEX_WORKERS_CONDOM_USE:
-    name: Condom use among sex workers
-    indicator_group:
-    dimensions:
-  TG_CONDOM_USE:
-    name: Condom use among transgender people
-    indicator_group:
-    dimensions:
-  PWID_CONDOM_USE:
-    name: Condom use among people who inject drugs
-    indicator_group:
-    dimensions:
-  MSM_CONDOM_USE:
-    name: Condom use among men who have sex with men
-    indicator_group:
-    dimensions:
+  - name: condom_use
+    long_name: Condom use
+    indicators_origin:
+      CONDOM_USE:
+        dimension: high-risk sex
+      SEX_WORKERS_CONDOM_USE:
+        dimension: sex workers
+      TG_CONDOM_USE:
+        dimension: transgender
+      PWID_CONDOM_USE:
+        dimension: people who inject drugs
+      MSM_CONDOM_USE:
+        dimension: men who have sex with men
 
-  # PREVENTION PROGRAMMES (4)
-  TG_PROGRAMMES:
-    name: Coverage of HIV prevention programmes among transgender people
-    indicator_group:
-    dimensions:
-  SW_PROGRAMMES:
-    name: Coverage of HIV prevention programmes among sex workers
-    indicator_group:
-    dimensions:
-  PWID_PROGRAMMES:
-    name: Coverage of HIV prevention programmes among people who inject drugs
-    indicator_group:
-    dimensions:
-  MSM_PROGRAMMES:
-    name: Coverage of HIV prevention programmes among men who have sex with men
-    indicator_group:
-    dimensions:
+  - name: hiv_programmes
+    long_name: Coverage of HIV prevention programmes
+    indicators_origin:
+      TG_PROGRAMMES:
+        dimension: transgender
+      SW_PROGRAMMES:
+        dimension: sex workers
+      PWID_PROGRAMMES:
+        dimension: people who inject drugs
+      MSM_PROGRAMMES:
+        dimension: men who have sex with men
 
-  # HIV STATUS (5)
-  TG_HIV_STATUS:
-    name: HIV testing and status awareness among transgender people
-    indicator_group:
-    dimensions:
-  SW_HIV_STATUS:
-    name: HIV testing and status awareness among sex workers
-    indicator_group:
-    dimensions:
-  PWID_HIV_STATUS:
-    name: HIV testing and status awareness among people who inject drugs
-    indicator_group:
-    dimensions:
-  MSM_HIV_STATUS:
-    name: HIV testing and status awareness among men who have sex with men
-    indicator_group:
-    dimensions:
+  - name: hiv_programmes_coverage
+    long_name: Coverage of HIV prevention programmes
+    indicators_origin:
+      TG_PROGRAMMES:
+        dimension: transgender
+      SW_PROGRAMMES:
+        dimension: sex workers
+      PWID_PROGRAMMES:
+        dimension: people who inject drugs
+      MSM_PROGRAMMES:
+        dimension: men who have sex with men
 
-  # AVOIDANCE OF CARE BC OF STIGMA (4)
-  SW_AVOIDANCE_CARE:
-    name: "Sex workers: Avoidance of health care because of stigma and discrimination"
-    indicator_group:
-    dimensions:
-  PWID_AVOIDANCE_CARE:
-    name: "People who inject drugs: Avoidance of health care because of stigma and discrimination"
-    indicator_group:
-    dimensions:
-  TG_AVOIDED_HEALTHCARE_FACILITY:
-    name: "Transgender people: Avoidance of health care because of stigma and discrimination"
-    indicator_group:
-    dimensions:
-  MSM_AFRAID_TO_SEEK_HEALTH_SERVICES:
-    name: "Men who have sex with men: Avoidance of health care because of stigma and discrimination"
-    indicator_group:
-    dimensions:
+  - name: hiv_status_awareness
+    long_name: HIV testing and status awareness
+    indicators_origin:
+      TG_HIV_STATUS:
+        dimension: transgender
+      SW_HIV_STATUS:
+        dimension: sex workers
+      PWID_HIV_STATUS:
+        dimension: people who inject drugs
+      MSM_HIV_STATUS:
+        dimension: men who have sex with men
 
-  # EXPERIENCE OF STIGMA (4)
-  SW_KP_REPORT_EXP_SD:
-    name: Experience of stigma and discrimination among sex workers
-    indicator_group:
-    dimensions:
-  TG_KP_REPORT_EXP_SD:
-    name: Experience of stigma and discrimination among transgender people
-    indicator_group:
-    dimensions:
-  IDU_KP_REPORT_EXP_SD:
-    name: Experience of stigma and discrimination among people who inject drugs
-    indicator_group:
-    dimensions:
-  MSM_KP_REPORT_EXP_SD:
-    name: Experience of stigma and discrimination among men who have sex with men
-    indicator_group:
-    dimensions:
+  - name: avoidance_care
+    # AVOIDANCE OF CARE BC OF STIGMA (4)
+    long_name: Avoidance of health care because of stigma and discrimination
+    indicators_origin:
+      SW_AVOIDANCE_CARE:
+        dimension: sex workers
+      PWID_AVOIDANCE_CARE:
+        dimension: people who inject drugs
+      TG_AVOIDED_HEALTHCARE_FACILITY:
+        dimension: transgender
+      MSM_AFRAID_TO_SEEK_HEALTH_SERVICES:
+        dimension: men who have sex with men
 
-# EXPERIENCE WITH VIOLENCE (2)
-SW_EXP_PHYS_SV:
-  name: Experience of sexual and/or physical violence among sex workers
-  indicator_group:
-  dimensions:
-IDU_EXP_PHYS_SV:
-  name: Experience of sexual and/or physical violence among people who inject drugs
-  indicator_group:
-  dimensions:
+  - name: experience_stigma
+    long_name: Experience of stigma and discrimination
+    indicators_origin:
+      SW_KP_REPORT_EXP_SD:
+        dimension: sex workers
+      TG_KP_REPORT_EXP_SD:
+        dimension: transgender
+      IDU_KP_REPORT_EXP_SD:
+        dimension: people who inject drugs
+      MSM_KP_REPORT_EXP_SD:
+        dimension: men who have sex with men
 
-# LAWS FOR ACCESS HIV TESTING (2)
-Q_A_123:
-  name: Laws requiring parental consent for adolescents to access HIV testing
-  indicator_group:
-  dimensions:
-Q_A_125:
-  name: Laws requiring spousal consent for married women to access sexual and reproductive health services
-  indicator_group:
-  dimensions:
+  - name: experience_violence
+    long_name: Experience of sexual and/or physical violence
+    indicators_origin:
+      SW_EXP_PHYS_SV:
+        dimension: sex workers
+      IDU_EXP_PHYS_SV:
+        dimension: people who inject drugs
 
-# CRIMINALIZATION OF ... (3)
-Q_A_65:
-  name: Criminalization/prosecution of transgender people
-  indicator_group:
-  dimensions:
-Q_A_67:
-  name: Criminalization of sex work
-  indicator_group:
-  dimensions:
-Q_A_68:
-  name: Criminalization of same sex sexual acts
-  indicator_group:
-  dimensions:
-
-# NEEDLES DISTRIBUTED (2)
-PWID_NEEDLES:
-  name: Needles and syringes distributed per person who inject drugs
-  indicator_group:
-  dimensions:
-PWID_NEEDLES_DISTRIBUTED:
-  name: Clean needles distributed to prisoners
-  indicator_group:
-  dimensions:
-
-# HIV TESTS (3)
-HIV_TESTS_VOL:
-  name: HIV tests (volume)
-  indicator_group:
-  dimensions:
-HIV_SELF_TESTS:
-  name: HIV self-tests
-  indicator_group:
-  dimensions:
-HIV_TESTING_TB_PATIENTS:
-  name: HIV testing among TB patients
-  indicator_group:
-  dimensions:
-
-####################################################
-# CLASSIFIED, BUT MAYBE NOT MDIM
-####################################################
-
-# INFECTIONS IN PRISONERS (2)
-PRISONERS_HEPATITIS_C:
-  name: Hepatitis C (HCV) infection among prisoners
-  indicator_group:
-  dimensions:
-PRISONERS_TB:
-  name: Tuberculosis (TB) infection among prisoners
-  indicator_group:
-  dimensions:
-
-# PROPORTIONS OF PEOPLE WITH HIV THAT ... (3)
-PLHIV_CURRENT_TB_PREVENTATIVE:
-  name: Proportion of people living with HIV currently enrolled in HIV treatment receiving TB preventive therapy
-  indicator_group:
-  dimensions:
-PLHIV_IN_CARE_WITH_ACTIVE_TB:
-  name: Proportion of people living with HIV newly enrolled in HIV treatment with active tuberculosis (TB) disease
-  indicator_group:
-  dimensions:
-PLHIV_RECEIVING_TB_PREVENTIVE_THERAPY:
-  name: Proportion of people living with HIV newly enrolled in HIV treatment started on TB preventive therapy
-  indicator_group:
-  dimensions:
-
-# PEOPLE NEWLY IN HIV TREATMENT (4)
-HIV_CARE:
-  name: People newly enrolled in HIV treatment
-  indicator_group:
-  dimensions:
-HIV_TB_DIAGNOSIS:
-  name: People newly enrolled in HIV treatment diagnosed as having TB during the reporting period
-  indicator_group:
-  dimensions:
-HIV_TB_PATIENTS_UNDER_IPT:
-  name: People living with HIV newly enrolled in HIV treatment started on isoniazid preventive therapy (IPT)
-  indicator_group:
-  dimensions:
-NEWLY_ENROLLED_CARE:
-  name: Adults and children newly enrolled in HIV treatment during the year (10.3 denominator)
-  indicator_group:
-  dimensions:
-
-# PEOPLE CURRENTLY IN HIV TREATMENT (2)
-PLHIV_CURRENT_ENROLLED:
-  name: People currently enrolled in HIV treatment
-  indicator_group:
-  dimensions:
-PLHIV_CURRENT_TREATMENT_TB:
-  name: People living with HIV currently enrolled in HIV treatment who start treatment for latent TB infection during the reporting period
-  indicator_group:
-  dimensions:
-
-# META (NO MDIMS)
-UNAIDS_RSTS:
-  name: UNAIDS Regional Support Teams
-  indicator_group:
-  dimensions:
-COUNTRY_OFFICES:
-  name: UNAIDS Country Offices
-  indicator_group:
-  dimensions:
-GEOGRAPHICAL_REGIONS:
-  name: UNAIDS geographical regions
-  indicator_group:
-  dimensions:
-
-# VIOLENCE [NO MIDM]
-ATT_TOW_WIFE_BEATING:
-  name: Attitudes towards violence against women
-  indicator_group:
-  dimensions:
-PREVALENCE_IPV:
-  name: Prevalence of recent intimate partner violence
-  indicator_group:
-  dimensions:
-
-# CIRCUMCISION [NO MDIMS]
-PREVALENCE_MALE_CIRCUMCISION:
-  name: Prevalence of male circumcision
-  indicator_group:
-  dimensions:
-MALE_CIRCUMCISIONS_PERFORMED:
-  name: Annual number of males voluntarily circumcised
-  indicator_group:
-  dimensions:
-
-# OTHER LAWS (4) [NOT MDIM!]
-Q_A_120:
-  name: Laws criminalizing transmission of, non-disclosure of or exposure to HIV transmission
-  indicator_group:
-  dimensions:
-Q_A_121:
-  name: Laws restricting entry, stay and residence of people living with HIV
-  indicator_group:
-  dimensions:
-Q_A_6B:
-  name: Law specifying HIV testing is mandatory before marriage, for work or residence permits or for certain groups
-  indicator_group:
-  dimensions:
-Q_A_70:
-  name: Drug use or possession for personal use an offence
-  indicator_group:
-  dimensions:
-
-####################################################
-# OTHERS: TO CLASIFY
-####################################################
-
-# CORE [NO MDIMS]
-HIV_POS_RATE:
-  name: HIV positivity rate
-  indicator_group:
-  dimensions:
-HIV_NEW_TB_CASES:
-  name: Estimated HIV in new TB cases
-  indicator_group:
-  dimensions:
-HIV_TB_PATIENTS_RECEIVING_ART:
-  name: TB patients living with HIV receiving ART
-  indicator_group:
-  dimensions:
-HIV_TB_PATIENTS_RECEIVING_CPT:
-  name: TB patients living with HIV receiving CPT
-  indicator_group:
-  dimensions:
-
-# ART
-NUM_ART_COMPLT_TPT:
-  name: Number of people on antiretroviral treatment who completed TPT among those who initiated any course of TPT during the previous year
-  indicator_group:
-  dimensions:
-NUM_ART_INIT_TPT:
-  name: Number of people on antiretroviral treatment who initiated any course of TPT during the previous year
-  indicator_group:
-  dimensions:
-PEOPLE_ART_ELIG_TPT:
-  name: People on ART who were eligible for TB preventive treatment (TPT)
-  indicator_group:
-  dimensions:
-PEOPLE_ART_ELIG_TPT_STRT:
-  name: People on ART who were eligible for TB preventive treatment (TPT) that started TPT
-  indicator_group:
-  dimensions:
-PEOPLE_NEW_ART_ELIG_TPT_STRT:
-  name: People newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
-  indicator_group:
-  dimensions:
-
-# PEOPLE ON ART [NO MDIMS]
-PROP_ART_TPT_START:
-  name: Proportion of people on ART who were eligible for TB preventive treatment (TPT) that started TPT
-  indicator_group:
-  dimensions:
-PROP_NEW_ART_TPT_STRT:
-  name: Proportion of people newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
-  indicator_group:
-  dimensions:
-
-# PRISONERS [NO MDIMS]
-PWID_OST_COVERAGE:
-  name: Coverage of opioid substitution therapy
-  indicator_group:
-  dimensions:
-PRISONERS_OST:
-  name: Prisoners receiving opioid substitution therapy
-  indicator_group:
-  dimensions:
-
-# PWID [NO MDIMS]
-PWID_SAFETY:
-  name: Safe injecting practices among people who inject drugs
-  indicator_group:
-  dimensions:
-
-# RESOURCES
-RESOURCE_AVAIL_CONSTANT:
-  name: Estimated HIV resource availability for low- and middle-income countries in constant 2019 USD
-  indicator_group:
-  dimensions:
-RESOURCE_NEEDS_FT:
-  name: Estimated resource needs
-  indicator_group:
-  dimensions:
-
-# CERVICAL CANCER [NO MDIMS]
-SURVEY_CERVICAL_CANCER:
-  name: Survey-based data on cervical cancer screening among women living with HIV
-  indicator_group:
-  dimensions:
-PROGRAMME_CERVICAL_CANCER:
-  name: Programmatic data on cervical cancer screening among women living with HIV
-  indicator_group:
-  dimensions:
-
-# TUBERCULOSIS [NO MDIMS]
-TB_EXPENDITURE:
-  name: Total TB expenditure
-  indicator_group:
-  dimensions:
-TB_PATIENTS_DOCUMENTED_HIV_POSITIVE_STATUS:
-  name: Proportion of registered new and relapse TB patients with documented HIV-positive status
-  indicator_group:
-  dimensions:
-TB_PATIENTS_DOCUMENTED_HIV_STATUS:
-  name: Proportion of registered new and relapse TB patients with documented HIV status
-  indicator_group:
-  dimensions:
-TB_PATIENTS_TESTED_POSITIVE_HIV:
-  name: TB patients tested positive for HIV
-  indicator_group:
-  dimensions:
-TB_RELATED_DEATHS:
-  name: Estimated TB-related deaths among people living with HIV
-  indicator_group:
-  dimensions:
-
-# OTHERS
-INCIDENT_TB_CASES:
-  name: Incident TB cases in people living with HIV
-  indicator_group:
-  dimensions:
-INCOME_STATUS:
-  name: Income Status
-  indicator_group:
-  dimensions:
-KNOWLEDGE_IN_YOUNG_PEOPLE:
-  name: Knowledge about HIV prevention in young people
-  indicator_group:
-  dimensions:
-
-NEW_RELAPSE_TB_CASES:
-  name: Total new and relapse TB cases
-  indicator_group:
-  dimensions:
-NOTIFIED_TB_CASES:
-  name: Total notified TB cases
-  indicator_group:
-  dimensions:
-COMANAGEMENT_TB_HIV:
-  name: Co-management of tuberculosis and HIV treatment
-  indicator_group:
-  dimensions:
-DEMAND_FAMILY_PLANNING:
-  name: Demand for family planning satisfied by modern methods
-  indicator_group:
-  dimensions:
-DENIED_SERVICES_HIV_STATUS:
-  name: Discrimination in healthcare settings
-  indicator_group:
-  dimensions:
-DISCRIMINATION_HC_SETTINGS:
-  name: Experience of HIV-related discrimination in healthcare settings
-  indicator_group:
-  dimensions:
-DISCRIMINATORY_ATTITUDES:
-  name: Discriminatory attitudes towards people living with HIV
-  indicator_group:
-  dimensions:
-DOMESTIC_SPENDING_FUND_SOURCE:
-  name: Country-reported HIV expenditure by funding source
-  indicator_group:
-  dimensions:
-EXPENDITURE_TB_HIV_ACTIVITIES:
-  name: Expenditure on collaborative TB/HIV activities
-  indicator_group:
-  dimensions:
-PEOPLE_ON_PREP:
-  name: People receiving pre-exposure prophylaxis (PrEP)
-  indicator_group:
-  dimensions:
-PER_TPT_ART_CMPLT:
-  name: Percentage of people living with HIV initiating TB preventive treatment (TPT) and on antiretroviral therapy who completed a course of TPT
-  indicator_group:
-  dimensions:
+  - name: hiv_tests
+    long_name: HIV testing
+    indicators_origin:
+      HIV_TESTS_VOL:
+        dimension:
+      HIV_SELF_TESTS:
+        dimension: self-tests
+      HIV_TESTING_TB_PATIENTS:
+        dimension: TB-patients
