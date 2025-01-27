@@ -12,6 +12,8 @@ import streamlit as st
 
 from apps.utils.google import read_gbq
 from apps.wizard.app_pages.producer_analytics.utils import GRAPHERS_BASE_URL, MIN_DATE, TODAY
+from apps.wizard.utils.components import st_cache_data
+from etl.config import OWID_ENV
 from etl.snapshot import Snapshot
 from etl.version_tracker import VersionTracker
 
@@ -25,12 +27,12 @@ def get_analytics(min_date, max_date, excluded_steps):
     df_charts = get_chart_views(min_date=min_date, max_date=max_date)
 
     # 3/ Combine, to have one table with chart analytics, together with producer of the chart data.
-    df = df.merge(df_charts, on="chart_url", how="left").drop(columns=["all_chart_slugs"])
+    df = df.merge(df_charts, on="chart_url", how="left")
 
     return df
 
 
-@st.cache_data(show_spinner=False)
+@st_cache_data(custom_text="Getting chart views analytics from BigQuery...")
 def get_chart_views(min_date: str, max_date: str) -> pd.DataFrame:
     """Get chart views analytics for different date ranges.
 
@@ -113,8 +115,68 @@ def get_chart_views_from_bq(
     return cast(pd.DataFrame, df_views)
 
 
-@st.cache_data(show_spinner=False)
+@st_cache_data(custom_text="Getting producers per chart from database...")
 def get_producers_per_chart(excluded_steps) -> pd.DataFrame:
+    """Get producers per chart from the DB.
+
+    Query traces back the details of the chart:
+    chart -> variable -> producer.
+
+    Additionally, it incorporates the dataset URI and the dataset name of the variable in use by the chart. This will help us exclude certain steps (e.g. population).
+
+    TODO: add support to exclude steps.
+    """
+    query = """WITH t_base AS (
+	SELECT
+		cd.chartId chart_id,
+		cf.slug chart_slug,
+		JSON_EXTRACT(cf.full, '$.isPublished') is_published,
+		cd.variableId variable_id,
+		v.name variable_name,
+		d.id dataset_id,
+		d.name dataset_name,
+		d.catalogPath dataset_uri,
+		ov.originId origin_id,
+		o.title origin_name,
+        o.urlMain origin_url,
+		o.producer producer
+	FROM chart_dimensions cd
+	LEFT JOIN charts c ON c.id = cd.chartId
+	LEFT JOIN chart_configs cf ON cf.id = c.configId
+	LEFT JOIN origins_variables ov ON ov.variableId = cd.variableId
+	LEFT JOIN origins o ON o.id = ov.originId
+	LEFT JOIN variables v ON cd.variableId = v.id
+	LEFT JOIN datasets d ON d.id = v.datasetId
+)
+SELECT * FROM t_base
+WHERE origin_id IS NOT NULL
+AND is_published = true;
+"""
+    df = OWID_ENV.read_sql(query)
+
+    # Exclude certain steps
+    exclude_steps_regex = "|".join(excluded_steps)
+    excluded_rows = df["dataset_uri"].str.fullmatch(exclude_steps_regex)
+    df = df.loc[~excluded_rows]
+
+    # Add caveat if source is "Various sources"
+    mask_various = df["producer"] == "Various sources"
+    df.loc[mask_various, "producer"] = (
+        df.loc[mask_various, "producer"] + " (" + df.loc[mask_various, "origin_url"] + ")"
+    )
+
+    # Format as expected by following code
+    df = df[["producer", "chart_slug"]].drop_duplicates()
+
+    # Edit chart slug to match the grapher URL
+    df["chart_url"] = GRAPHERS_BASE_URL + df["chart_slug"]
+    df = df.drop(columns=["chart_slug"])
+
+    return df
+
+
+@st.cache_data(show_spinner=False)
+def get_producers_per_chart_old(excluded_steps) -> pd.DataFrame:
     # Load steps dataframe.
     df = VersionTracker(exclude_steps=excluded_steps).steps_df
 

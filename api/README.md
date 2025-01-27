@@ -15,7 +15,7 @@ It doesn't work for old non-ETL datasets and older steps that don't use `create_
 
 ## Observability
 
-If env `SLACK_API_TOKEN` is set, it'll send all requests & responses to a slack channel (with highlighted warnings). There's also a bugsnag integration for error monitoring.
+If env `SLACK_API_TOKEN` is set, it'll send all requests & responses to a slack channel (with highlighted warnings). There's also a sentry integration for error monitoring.
 
 ## Instructions
 

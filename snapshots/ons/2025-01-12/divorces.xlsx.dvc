@@ -10,10 +10,10 @@ meta:
     date_published: "2024-02-22"
 
     # Citation
-    producer: Office for National Statistics
+    producer: UK Office for National Statistics
     citation_full: |-
-      Office for National Statistics (ONS), released22 February 2024, ONS website, dataset, Divorces in England and Wales, UK. Retrieved 12 January 2025.
-    attribution_short: ONS
+      Office for National Statistics (ONS), released 22 February 2024, ONS website, dataset, Divorces in England and Wales, UK. Retrieved 12 January 2025.
+    attribution_short: UK ONS
 
     # Files
     url_main: https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/datasets/divorcesinenglandandwales

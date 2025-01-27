@@ -729,6 +729,21 @@ steps:
   data://grapher/imf/2024-11-25/world_economic_outlook:
     - data://garden/imf/2024-11-25/world_economic_outlook
 
+  # GDP per capita vs. living conditions indicators
+  data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2024-09-11/igme
+    - data://garden/who/2024-07-26/mortality_database
+    - data://garden/wash/2024-01-06/who
+    - data://garden/tourism/2024-08-17/unwto
+    - data://garden/ggdc/2022-11-28/penn_world_table
+    - data://garden/wb/2024-11-04/edstats
+    - data://garden/unesco/2024-06-25/education_sdgs
+    - data://garden/happiness/2024-06-09/happiness
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

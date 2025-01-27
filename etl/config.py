@@ -16,9 +16,9 @@ from os import environ as env
 from pathlib import Path
 from typing import List, Literal, Optional, cast
 
-import bugsnag
 import git
 import pandas as pd
+import sentry_sdk
 import structlog
 from dotenv import dotenv_values, load_dotenv
 from sqlalchemy.engine import Engine
@@ -97,12 +97,16 @@ R2_SNAPSHOTS_PRIVATE = "owid-snapshots-private"
 R2_SNAPSHOTS_PUBLIC_READ = "https://snapshots.owid.io"
 
 # publishing to grapher's MySQL db
-GRAPHER_USER_ID = env.get("GRAPHER_USER_ID")
+GRAPHER_USER_ID = int(env["GRAPHER_USER_ID"]) if "GRAPHER_USER_ID" in env else None
 DB_NAME = env.get("DB_NAME", "grapher")
 DB_HOST = env.get("DB_HOST", "localhost")
 DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
+
+# save original GRAPHER_USER_ID from env for later use, because it'll be overwritten when
+# we use staging servers
+ENV_GRAPHER_USER_ID = GRAPHER_USER_ID
 
 DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
@@ -220,7 +224,7 @@ ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING e
 # because that would resolve to LXC container instead of the actual server
 TAILSCALE_ADMIN_HOST = "http://owid-admin-prod.tail6e23.ts.net"
 
-BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
+SENTRY_DSN = env.get("SENTRY_DSN")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
 
@@ -247,11 +251,11 @@ DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schem
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
-def enable_bugsnag() -> None:
-    if BUGSNAG_API_KEY:
-        bugsnag.configure(
-            api_key=BUGSNAG_API_KEY,
-        )  # type: ignore
+def enable_sentry() -> None:
+    if SENTRY_DSN:
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+        )
 
 
 # Wizard config
@@ -267,7 +271,7 @@ OWIDEnvType = Literal["production", "dev", "staging", "unknown"]
 class Config:
     """Configuration for OWID environment which is a subset of etl.config."""
 
-    GRAPHER_USER_ID: int | str | None
+    GRAPHER_USER_ID: int | None
     DB_USER: str
     DB_NAME: str
     DB_PASS: str

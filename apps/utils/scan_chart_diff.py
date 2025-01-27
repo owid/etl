@@ -8,7 +8,7 @@ from structlog import get_logger
 from apps.owidbot.cli import cli as owidbot_cli
 from etl import config
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 log = get_logger()
 

@@ -11,7 +11,7 @@ from structlog import get_logger
 import etl.grapher.model as gm
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.utils import set_states
-from apps.wizard.utils.cached import get_grapher_user_id
+from apps.wizard.utils.cached import get_grapher_user
 from apps.wizard.utils.components import st_toast_error, st_wizard_page_link
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
@@ -96,10 +96,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
 def push_new_charts(charts: List[gm.Chart]) -> None:
     """Updating charts in the database."""
     # Use Tailscale user if it is available, otherwise use GRAPHER_USER_ID from env
-    if "X-Forwarded-For" in st.context.headers:
-        grapher_user_id = get_grapher_user_id(st.context.headers["X-Forwarded-For"])
-    else:
-        grapher_user_id = None
+    grapher_user_id = get_grapher_user().id
 
     # API to interact with the admin tool
     api = AdminAPI(OWID_ENV, grapher_user_id=grapher_user_id)

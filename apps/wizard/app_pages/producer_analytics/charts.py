@@ -3,6 +3,7 @@
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from plotly.graph_objects import Scatter
 from st_aggrid import AgGrid, JsCode
 
 from apps.wizard.app_pages.producer_analytics.data_io import get_chart_views_from_bq
@@ -10,6 +11,7 @@ from apps.wizard.app_pages.producer_analytics.utils import (
     columns_producer,
     make_grid,
 )
+from apps.wizard.utils.components import st_cache_data
 
 
 class UIChartProducerAnalytics:
@@ -80,7 +82,9 @@ class UIChartProducerAnalytics:
         # Add analytics to object
         ## Get total number of views and average daily views.
         self.analytics["total_views"] = df_total_daily_views["renders"].sum()
-        self.analytics["average_daily_views"] = df_total_daily_views["renders"].mean()
+        self.analytics["average_daily_views"] = (
+            0 if self.analytics["total_views"] == 0 else df_total_daily_views["renders"].mean()
+        )
         ## Get total views of the top 10 charts in the selected date range.
         self.analytics["df_top_10_total_views"] = df_top_10_daily_views.groupby("grapher", as_index=False).agg(
             {"renders": "sum"}
@@ -88,6 +92,7 @@ class UIChartProducerAnalytics:
 
         return df_total_daily_views, df_top_10_daily_views
 
+    @st.fragment
     def show_table(self, min_date, max_date):
         """Show table with analytics on producer's charts."""
         # Configure and display the second table.
@@ -162,29 +167,68 @@ class UIChartProducerAnalytics:
             columns={"grapher": "Chart slug"},
         )
         df_plot["Chart slug"] = df_plot["Chart slug"].apply(lambda x: x.split("/")[-1])
-        df_plot["day"] = pd.to_datetime(df_plot["day"]).dt.strftime("%a. %Y-%m-%d")
+        df_plot["day"] = pd.to_datetime(df_plot["day"]).dt.strftime("%Y-%m-%d")
+        df_plot = df_plot.rename(columns={"renders": "Views"})
+
+        # Custom hover
+        df_plot["custom_hover"] = (
+            "<b>" + df_plot["Chart slug"] + "</b>" + "<br>" + df_plot["Views"].astype(str) + " views"
+        )
 
         # Create figure to plot
         fig = px.line(
             df_plot,
             x="day",
-            y="renders",
+            y="Views",
             color="Chart slug",
             title="Top 10 charts: daily views",
-        ).update_layout(xaxis_title=None, yaxis_title=None)
+            hover_data={"day": False, "Views": False, "Chart slug": False},
+        )
+
+        # Update traces to use custom hover text
+        for trace in fig.data:
+            if isinstance(trace, Scatter) and (trace.y is not None):
+                chart_slug = trace.name  # Get the name of the line (Chart slug)
+                if chart_slug == "Total":
+                    trace.update(
+                        # legendgroup="Total",
+                        showlegend=True,
+                        name="<b>All charts</b>",
+                        customdata=[
+                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
+                        ],  # Custom hover text for each point
+                        hovertemplate="%{customdata}<extra></extra>",
+                    )
+                else:
+                    trace.update(
+                        # legendgroup="Charts",
+                        showlegend=True,
+                        customdata=[
+                            f"<b>{chart_slug}</b><br>{int(views)} views" for views in trace.y
+                        ],  # Custom hover text for each point
+                        hovertemplate="%{customdata}<extra></extra>",
+                    )
+
+        # Update layout
+        fig.update_layout(
+            xaxis_title=None,
+            yaxis_title=None,
+            hovermode="x",
+            legend=dict(title=None),
+            xaxis=dict(
+                tickmode="auto",  # Automatically calculate tick spacing
+                nticks=10,  # Reduce the number of ticks to 10
+            ),
+        )
 
         # Display the chart.
         st.plotly_chart(fig, use_container_width=True)
 
 
-@st.cache_data(show_spinner=False)
+@st_cache_data(custom_text="Loading chart data. This can take few seconds...")
 def _process_df(df):
-    def _process(df):
-        # Create an expanded table with number of views per chart.
-        df = df.dropna(subset=["chart_url"]).fillna(0).reset_index(drop=True)
-        df = df.sort_values("views_custom", ascending=False).reset_index(drop=True)
+    # Create an expanded table with number of views per chart.
+    df = df.dropna(subset=["chart_url"]).fillna(0).reset_index(drop=True)
+    df = df.sort_values("views_custom", ascending=False).reset_index(drop=True)
 
-        return df
-
-    with st.spinner("Loading chart data. This can take few seconds..."):
-        return _process(df)
+    return df
