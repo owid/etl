@@ -1,0 +1,26 @@
+meta:
+  origin:
+    producer: Centers for Disease Prevention and Control
+    title: CDC Summary of Notifiable Infectious Diseases - Measles
+    description: |-
+      Reported cases of measles by state, for the United States. The cases are split by those that are indigenous (those that were infected in the United States) and imported (those that were infected outside of the United States).
+    citation_full: |-
+      Centers for Disease Control and Prevention. National Notifiable Diseases Surveillance System (NNDSS) Annual Summary Data for years 2016-2022, United States, CDC WONDER online database. Accessed at http://wonder.cdc.gov/nndss-annual-summary.html on Jan 26, 2025 5:53:12 AM.
+    attribution: |-
+      Centers for Disease Control and Prevention. National Notifiable Diseases Surveillance System (NNDSS) Annual Summary Data for years 2016-2022, United States, CDC WONDER online database. Accessed at http://wonder.cdc.gov/nndss-annual-summary.html on Jan 26, 2025 5:53:12 AM.
+    attribution_short: CDC
+    url_main: https://www.cdc.gov/mmwr/mmwr_nd/index.html
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSlDQPLtCteA_s1eNjTu1ZphTnuva0Zfs5zGs34BlFQuanv8I25tEpRKdzwMPMpcmKq99MVxysaqT4p/pub?output=csv
+    date_accessed: '2025-01-27'
+    date_published: '2016'
+    license:
+      url: https://wonder.cdc.gov/wonder/help/faq.html#8
+  name: CDC Summary of Notifiable Infectious Diseases - Measles
+  description: ''
+  license:
+    url: https://wonder.cdc.gov/wonder/help/faq.html#8
+outs:
+  - md5: f22a05e7e8d8ba595d1bee232d61089c
+    size: 5997
+    path: cdc_measles.csv

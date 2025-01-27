@@ -35,8 +35,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    tb = tb.format(["country", "year"])
-    tb_usa = tb_usa.format(["country", "year"])
+    tb = tb.format(["country", "disease", "year"], short_name="state_measles")
+    tb_usa = tb_usa.format(["country", "disease", "year"], short_name="national_measles")
     #
     # Save outputs.
     #

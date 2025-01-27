@@ -10,6 +10,7 @@ from typing import Any, Callable, Dict, List, Literal, Optional
 import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
+import streamlit.errors
 
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.chart_config import bake_chart_config
@@ -383,11 +384,16 @@ def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
     if "icon" not in kwargs:
         kwargs["icon"] = PAGES_BY_ALIAS[alias]["icon"]
 
-    if border:
-        with st.container(border=True):
+    try:
+        if border:
+            with st.container(border=True):
+                st.page_link(**kwargs)
+        else:
             st.page_link(**kwargs)
-    else:
-        st.page_link(**kwargs)
+    except streamlit.errors.StreamlitPageNotFoundError:
+        # it must be run as a multi-page app to display the link, show warning
+        # if run via `streamlit .../app.py`
+        st.warning(f"App must be run via `make wizard` to display link to `{alias}`.")
 
 
 def preview_file(
