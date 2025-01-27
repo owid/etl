@@ -25,13 +25,32 @@ paths = PathFinder(__file__)
 # Initialize logger
 log = get_logger()
 
-# Specify pairs of reference years in a list
-REF_YRS_LIST = [[1980, 2018], [1993, 2018]]
+# Define columns that we want to analyze
+INDICATORS_FOR_ANALYSIS = [
+    "gini_pip_disposable_perCapita",
+    "p90p100Share_pip_disposable_perCapita",
+    "gini_wid_pretaxNational_perAdult",
+    "p99p100Share_wid_pretaxNational_perAdult",
+    "p90p100Share_wid_pretaxNational_perAdult",
+    "gini_wid_posttaxNational_perAdult",
+    "p99p100Share_wid_posttaxNational_perAdult",
+    "p90p100Share_wid_posttaxNational_perAdult",
+]
 
-REFERENCE_YEARS = {
-    1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-    2018: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
-}
+
+# Define reference years and parameters for matching
+# maximum_distance: maximum distance from the reference year that an observation can be
+# tie_break_strategy: how to break ties when there are multiple observations at the same distance from the reference year
+REFERENCE_YEARS = [
+    {
+        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
+        2018: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+    },
+    {
+        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
+        2018: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+    },
+]
 
 
 def run(dest_dir: str) -> None:
@@ -49,261 +68,46 @@ def run(dest_dir: str) -> None:
     tb_population = tb_population[["country", "year", "population"]]
 
     #### SET REF YEARS AND THEN RUN ####
+    # Define an empty list of tables
+    tables = []
 
-    for ref_yrs in REF_YRS_LIST:
-        reference_years = {
-            ref_yrs[0]: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-            ref_yrs[1]: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
-        }
-
-        # Version 1 – All data points (for both WID extrap and non-extrap series)
-        # (NB only_all_series = False)
-        tb_main = match_ref_years(
+    for reference_years in REFERENCE_YEARS:
+        # Version 1 – All data points (only_all_series = False)
+        tb_all_data_points = match_ref_years(
             tb=tb,
-            series=[
-                "gini_pip_disposable_perCapita",
-                # "p99p100Share_pip_disposable_perCapita",
-                # "p90p100Share_pip_disposable_perCapita",
-                # "headcountRatio50Median_pip_disposable_perCapita",
-                # "gini_widExtrapolated_pretaxNational_perAdult",
-                # "p99p100Share_widExtrapolated_pretaxNational_perAdult",
-                # "p90p100Share_widExtrapolated_pretaxNational_perAdult",
-                # "headcountRatio50Median_widExtrapolated_pretaxNational_perAdult",
-                # "gini_wid_pretaxNational_perAdult",
-                # "p99p100Share_wid_pretaxNational_perAdult",
-                # "p90p100Share_wid_pretaxNational_perAdult",
-                # "headcountRatio50Median_wid_pretaxNational_perAdult",
-            ],
+            series=INDICATORS_FOR_ANALYSIS,
             reference_years=reference_years,
             only_all_series=False,
             tb_population=tb_population,
             ds_regions=ds_regions,
         )
 
-        # Make a version for OWID plot
-        # Reshape from wide to long format
-        owid_data = pd.wide_to_long(
-            tb_main, ["value", "year", "population"], i=["country", "series_code"], j="ref_year", sep="_"
-        ).reset_index()
+        # Append the table to the list
+        tables.append(tb_all_data_points)
 
-        # Pivot from long to wide format, creating a column for each series_code
-        owid_data = owid_data.pivot_table(
-            index=["country", "year"], columns="series_code", values="value", aggfunc="first"
-        ).reset_index()
-
-        # Save a version for the appendix table – excluding WID extrapolated data
-
-        # Reshape wider
-
-        # Drop extrapolated WID series
-
-        # Drop rows where series_code includes 'Extrapolated'
-        tb_main = tb_main[~tb_main["series_code"].str.contains("widExtrapolated", na=False)]
-
-        # Replace series_code with 'pip' or 'wid'
-        tb_main["series_code"] = tb_main["series_code"].apply(lambda x: "pip" if "pip" in x else "wid")
-
-        # Identify the columns that need to be reshaped
-        varying_columns = [
-            f"year_{ref_yrs[0]}",
-            f"value_{ref_yrs[0]}",
-            f"year_{ref_yrs[1]}",
-            f"value_{ref_yrs[1]}",
-            f"pipwelfare_{ref_yrs[0]}",
-            f"pipwelfare_{ref_yrs[1]}",
-            f"pipreportinglevel_{ref_yrs[0]}",
-            f"pipreportinglevel_{ref_yrs[1]}",
-        ]
-        non_varying_columns = ["region", f"population_{ref_yrs[0]}", f"population_{ref_yrs[1]}"]
-
-        # Use pivot to reshape the data
-        tb_main_wide = tb_main.pivot_table(
-            index=["indicator_name", "country"], columns="series_code", values=varying_columns, aggfunc="first"
-        ).reset_index()
-
-        # Flatten the MultiIndex in columns
-        tb_main_wide.columns = ["_".join(col).strip() if col[1] else col[0] for col in tb_main_wide.columns.values]
-
-        # Merge the non-varying columns back to the reshaped dataframe
-        tb_main_non_varying = tb_main.drop_duplicates(subset=["indicator_name", "country"])[
-            non_varying_columns + ["indicator_name", "country"]
-        ]
-
-        tb_main_reshaped = pd.merge(tb_main_non_varying, tb_main_wide, on=["indicator_name", "country"])
-
-        # Sort rows
-        tb_main_reshaped = tb_main_reshaped.sort_values(by=["indicator_name", "country"], ascending=[True, True])
-
-        # I then make a wider dataset that matches PIP and WID datapoints
-        # – first excluding extrapolated WID data (which should match the above), then adding any additional extrapolated data points in
-
-        # Step 1 – Only matching data points, non-extrapolated data for WID
-        # (NB only_all_series = True)
-        # output_wid_non_extrap = match_ref_years(
-        #     tb=tb,
-        #     series=[
-        #         "gini_pip_disposable_perCapita",
-        #         "p99p100Share_pip_disposable_perCapita",
-        #         "p90p100Share_pip_disposable_perCapita",
-        #         "headcountRatio50Median_pip_disposable_perCapita",
-        #         "gini_wid_pretaxNational_perAdult",
-        #         "p99p100Share_wid_pretaxNational_perAdult",
-        #         "p90p100Share_wid_pretaxNational_perAdult",
-        #         "headcountRatio50Median_wid_pretaxNational_perAdult",
-        #     ],
-        #     reference_years=reference_years,
-        #     only_all_series=True,
-        #     tb_population=tb_population,
-        #     ds_regions=ds_regions,
-        # )
-
-        # Step 2 Only matching data points, with extrapolated data for WID
-        # (NB only_all_series = True)
-        # output_wid_extrap = match_ref_years(
-        #     tb=tb,
-        #     series=[
-        #         "gini_pip_disposable_perCapita",
-        #         "p99p100Share_pip_disposable_perCapita",
-        #         "p90p100Share_pip_disposable_perCapita",
-        #         "headcountRatio50Median_pip_disposable_perCapita",
-        #         "gini_widExtrapolated_pretaxNational_perAdult",
-        #         "p99p100Share_widExtrapolated_pretaxNational_perAdult",
-        #         "p90p100Share_widExtrapolated_pretaxNational_perAdult",
-        #         "headcountRatio50Median_widExtrapolated_pretaxNational_perAdult",
-        #     ],
-        #     reference_years=reference_years,
-        #     only_all_series=True,
-        #     tb_population=tb_population,
-        #     ds_regions=ds_regions,
-        # )
-
-        #
-        output_wid_extrap["series_code"] = output_wid_extrap["series_code"].str.replace("Extrapolated", "", regex=False)
-
-        # Step 3 – add in the any additional observations available in the extrapolated data to the non-extrpolated data
-
-        # Drop the population and region cols from the non_extrap data perpared above (aso that we can recalculate the pop weights based on the new sample)
-        # Find columns in tb2 that are not in tb1
-        columns_to_drop = output_wid_non_extrap.columns.difference(output_wid_extrap.columns)
-
-        #
-        # Drop these columns from tb2
-        output_wid_non_extrap = output_wid_non_extrap.drop(columns=columns_to_drop)
-
-        #
-        # Append the extrap and non-extrap outputs, adding a key
-        output_matched = pd.concat(
-            [output_wid_non_extrap, output_wid_extrap], axis=0, keys=["wid_not_extrapolated", "wid_extrapolated"]
+        # Version 2 - Only countries with data in all series (only_all_series = True)
+        tb_data_in_all_series = match_ref_years(
+            tb=tb,
+            series=INDICATORS_FOR_ANALYSIS,
+            reference_years=reference_years,
+            only_all_series=True,
+            tb_population=tb_population,
+            ds_regions=ds_regions,
         )
 
-        #
+        # Append the table to the list
+        tables.append(tb_data_in_all_series)
 
-        # Reset the index to make the keys a separate column
-        output_matched.reset_index(level=0, inplace=True)
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
+    )
 
-        # Rename the 'level_0' column to 'key'
-        output_matched.rename(columns={"level_0": "key"}, inplace=True)
-
-        # Reset the index to make it sequential
-        output_matched.reset_index(drop=True, inplace=True)
-
-        #
-        # count number of observations by series_code and country
-        columns_to_consider = ["series_code", "country"]
-        output_matched["count"] = output_matched.groupby(columns_to_consider)[columns_to_consider[0]].transform("count")
-
-        #
-        # Drop the extrpolated data if the count is 2 (i.e. if there is an observation from the non extrap data)
-        output_matched = output_matched[
-            (output_matched["count"] == 1) | (output_matched["key"] == "wid_not_extrapolated")
-        ]
-
-        # Drop the count column
-        output_matched = output_matched.drop(columns=["count"])
-
-        # Reshape wider
-        #
-        # Replace series_code with 'pip' or 'wid'
-        output_matched["series_code"] = output_matched["series_code"].apply(lambda x: "pip" if "pip" in x else "wid")
-
-        # Identify the columns that need to be reshaped
-        # varying_columns are as above
-        non_varying_columns = (
-            ["key"] + non_varying_columns
-        )  # non_varying_columns now has a 'key' column reporting whether the wid data is from the extrapolated data matches or not
-
-        # Use pivot to reshape the data
-        output_matched_wide = output_matched.pivot_table(
-            index=["indicator_name", "country"], columns="series_code", values=varying_columns, aggfunc="first"
-        ).reset_index()
-
-        # Flatten the MultiIndex in columns
-        output_matched_wide.columns = [
-            "_".join(col).strip() if col[1] else col[0] for col in output_matched_wide.columns.values
-        ]
-
-        # Merge the non-varying columns back to the reshaped dataframe
-        output_matched_non_varying = output_matched.drop_duplicates(subset=["indicator_name", "country"])[
-            non_varying_columns + ["indicator_name", "country"]
-        ]
-
-        output_matched_reshaped = pd.merge(
-            output_matched_non_varying, output_matched_wide, on=["indicator_name", "country"]
-        )
-
-        # Sort rows
-        output_matched_reshaped = output_matched_reshaped.sort_values(
-            by=["indicator_name", "country"], ascending=[True, True]
-        )
-
-        # I then append the 'main' and 'matched' sets of observtions, deduplicating
-        output_all_obs = pd.concat([tb_main_reshaped, output_matched_reshaped], axis=0)
-        output_all_obs = output_all_obs.sort_values(by=["indicator_name", "country"], ascending=[True, True])
-
-        #
-        # count number of observations by series_code and country
-        columns_to_consider = ["indicator_name", "country"]
-        output_all_obs["count"] = output_all_obs.groupby(columns_to_consider)[columns_to_consider[0]].transform("count")
-
-        #
-        # Keep the matched data (in which case, key is not NaN) if the count is 2 (the matched data contains additional observations)
-        output_all_obs = output_all_obs[(output_all_obs["count"] == 1) | (output_all_obs["key"].notna())]
-
-        output_all_obs_test = output_all_obs.copy()
-
-        # Apply the function to each row to create the new column
-        output_all_obs["wid_is_extrapolated"] = output_all_obs.apply(determine_wid_is_extrapolated, axis=1)
-
-        #
-        # Drop the count and key columns
-        output_all_obs = output_all_obs.drop(columns=["count", "key"])
-
-        # reorder columns slightly
-
-        # Sort columns
-        desired_column_order = [
-            "indicator_name",
-            "country",
-            f"year_{ref_yrs[0]}_pip",
-            f"value_{ref_yrs[0]}_pip",
-            f"pipwelfare_{ref_yrs[0]}_pip",
-            f"year_{ref_yrs[1]}_pip",
-            f"value_{ref_yrs[1]}_pip",
-            f"pipwelfare_{ref_yrs[1]}_pip",
-            f"year_{ref_yrs[0]}_wid",
-            f"value_{ref_yrs[0]}_wid",
-            f"year_{ref_yrs[1]}_wid",
-            f"value_{ref_yrs[1]}_wid",
-            "wid_is_extrapolated",
-            "region",
-            f"population_{ref_yrs[0]}",
-            f"population_{ref_yrs[1]}",
-            f"pipreportinglevel_{ref_yrs[0]}_pip",
-            f"pipreportinglevel_{ref_yrs[1]}_pip",
-        ]
-
-        # Reorder the DataFrame columns
-        output_all_obs = output_all_obs.reindex(columns=desired_column_order)
+    # Save changes in the new garden dataset.
+    ds_garden.save()
 
 
 ##############################################
@@ -311,7 +115,7 @@ def run(dest_dir: str) -> None:
 
 def match_ref_years(
     tb: Table, series: list, reference_years: dict, only_all_series: bool, tb_population: Table, ds_regions: Dataset
-) -> pd.DataFrame:
+) -> Table:
     """
     Match series to reference years.
     This is the main function that finds pairs of matching observations
@@ -319,7 +123,7 @@ def match_ref_years(
     """
 
     tb_match = pd.DataFrame()
-    tb_series = tb[tb["series_code"].isin(series)].reset_index(drop=True)
+    tb_series = tb[tb["series_code"].isin(series)].copy().reset_index(drop=True)
 
     reference_years_list = []
     for y in reference_years:
@@ -351,7 +155,6 @@ def match_ref_years(
                 on=["country", "series_code"],
                 suffixes=("", f"_{y}"),
             )
-
             # References to column names work differently depending on if there are 2 or more reference years. Treat these cases separately.
             if len(reference_years_list) == 2:
                 # Categorize the pipwelfare match
@@ -371,7 +174,7 @@ def match_ref_years(
                     cat_welfare, args=(f"pipwelfare_{reference_years_list[-2]}", f"pipwelfare_{y}"), axis=1
                 )
 
-                # Categorise the pipreportinglevel match
+                # Categorize the pipreportinglevel match
                 tb_match["pipreportinglevelcat"] = tb_match.apply(
                     cat_reportinglevel,
                     args=(f"pipreportinglevel_{reference_years_list[-2]}", f"pipreportinglevel_{y}"),
@@ -490,6 +293,25 @@ def match_ref_years(
 
         tb_match = tb_match.rename(columns={"population": f"population_{y}"})
 
+    # Make a version for OWID plot
+    # Reshape from wide to long format
+    tb_match = pd.wide_to_long(
+        tb_match, ["value", "year", "population"], i=["country", "series_code"], j="ref_year", sep="_"
+    ).reset_index(drop=False)
+
+    # Pivot from long to wide format, creating a column for each series_code
+    tb_match = tb_match.pivot(
+        index=["country", "year", "ref_year", "population", "region"],
+        columns="series_code",
+        values="value",
+        join_column_levels_with="_",
+    ).reset_index(drop=True)
+
+    # Save format and short name of table
+    tb_match = tb_match.format(
+        short_name=f"matched_{reference_years_list[0]}_{reference_years_list[1]}_all_series_{only_all_series}"
+    )
+
     return tb_match
 
 
@@ -503,7 +325,9 @@ def cat_welfare(row, col1, col2):
     """
     'Scores' PIP data pairs of years as to their welfare concept. A pair of income observations is best, a pair of consumption observations is second best and non-matching welfare is ranked third.
     """
-    if row[col1] == "income" and row[col2] == "income":
+    if pd.isna(row[col1]) or pd.isna(row[col2]):
+        return 3
+    elif row[col1] == "income" and row[col2] == "income":
         return 1
     elif row[col1] == "consumption" and row[col2] == "consumption":
         return 2
@@ -516,7 +340,9 @@ def cat_reportinglevel(row, col1, col2):
     'Scores' PIP data pairs of years as to their 'reporting_level' (urban, rural, or national).
     A pair of national observations is best, a pair of urban observations is second best, a pair of rural observations is third best, and non-matching observations is ranked fourth.
     """
-    if row[col1] == "national" and row[col2] == "national":
+    if pd.isna(row[col1]) or pd.isna(row[col2]):
+        return 4
+    elif row[col1] == "national" and row[col2] == "national":
         return 1
     elif row[col1] == "urban" and row[col2] == "urban":
         return 2
@@ -524,14 +350,6 @@ def cat_reportinglevel(row, col1, col2):
         return 3
     else:
         return 4
-
-
-# Note WID extrapolated or not in a boolean
-# Define the function to determine the value of 'wid_is_extrapolated'
-def determine_wid_is_extrapolated(row, ref_yrs):
-    if pd.isna(row[f"value_{ref_yrs[0]}_wid"]):
-        return np.nan
-    return 1 if row["key"] == "wid_extrapolated" else 0
 
 
 def add_regions_columns(tb: Table, ds_regions: Dataset) -> Table:
