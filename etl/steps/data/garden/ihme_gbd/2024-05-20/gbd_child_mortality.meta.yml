@@ -10,6 +10,8 @@ definitions:
     <% if sex == "Both" %>individuals <% elif sex == "Male" %>males <% elif sex == "Female" %>females <%- endif -%>
   description_key: |-
     <% if cause == "Conflict and terrorism" %>When precise information is unavailable, IHME splits the impacts of conflict and terrorism evenly across years, and across countries based on their populations.<% endif %>
+  cause: |-
+    <% if cause.start_with?("HIV/AIDS") %>cause<% else %><%- cause.lower() %><% end %>
   value_deaths:
     unit: |-
       <% if metric == "Number" %>deaths<% elif metric == "Rate" %>deaths per 100,000 people<% elif metric == "Percent" %>%<%- endif -%>
@@ -17,19 +19,19 @@ definitions:
       <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
     title: |-
       <% if metric == "Number"%>
-      Deaths from << cause.lower() >>, among {definitions.sex} aged << age >>
+      Deaths from {definitions.cause}, among {definitions.sex} aged << age >>
       <% elif metric == "Rate"%>
-      Deaths from << cause.lower() >>, among {definitions.sex} aged << age >> per 100,000 people
+      Deaths from {definitions.cause}, among {definitions.sex} aged << age >> per 100,000 people
       <% elif metric == "Percent" %>
-      Share of total deaths of among {definitions.sex} aged << age >> from << cause.lower() >>
+      Share of total deaths of among {definitions.sex} aged << age >> from {definitions.cause}
       <%- endif -%>
     description_short: |-
       <% if metric == "Number"%>
-      The estimated number of deaths from << cause.lower() >> among {definitions.sex} aged << age >>.
+      The estimated number of deaths from {definitions.cause} among {definitions.sex} aged << age >>.
       <% elif metric == "Rate" %>
-      The estimated number of deaths from << cause.lower() >> among {definitions.sex} aged << age >>, per 100,000 people.
+      The estimated number of deaths from {definitions.cause} among {definitions.sex} aged << age >>, per 100,000 people.
       <% elif metric == "Percent" %>
-      The estimated share of deaths from << cause.lower() >> among {definitions.sex} aged << age >>.
+      The estimated share of deaths from {definitions.cause} among {definitions.sex} aged << age >>.
       <%- endif -%>
     description_processing: |-
       <% if cause == "All forms of violence" %>
@@ -52,19 +54,19 @@ definitions:
       <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
     title: |-
       <% if metric == "Number" %>
-      DALYs from << cause.lower() >>, among {definitions.sex} aged << age >>
+      DALYs from {definitions.cause}, among {definitions.sex} aged << age >>
       <% elif metric == "Rate" %>
-      DALYs from << cause.lower() >>, among {definitions.sex} aged << age >> per 100,000 people
+      DALYs from {definitions.cause}, among {definitions.sex} aged << age >> per 100,000 people
       <% elif metric == "Percent" %>
-      Share of total DALYs of {definitions.sex} aged << age >> from << cause.lower() >>
+      Share of total DALYs of {definitions.sex} aged << age >> from {definitions.cause}
       <%- endif -%>
     description_short: |-
       <% if metric == "Number" %>
-      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >> among {definitions.sex} aged << age >>.
+      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} among {definitions.sex} aged << age >>.
       <% elif metric == "Rate" %>
-      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) among {definitions.sex} from << cause.lower() >> in those aged << age >>, per 100,000 people.
+      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) among {definitions.sex} from {definitions.cause} in those aged << age >>, per 100,000 people.
       <% elif metric == "Percent" %>
-      The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) among {definitions.sex} from << cause.lower() >> in those aged << age >>.
+      The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) among {definitions.sex} from {definitions.cause} in those aged << age >>.
       <%- endif -%>
   footnote: |-
     <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
