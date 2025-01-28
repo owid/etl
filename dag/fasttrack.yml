@@ -226,3 +226,5 @@ steps:
     - snapshot://fasttrack/latest/iucn_number_evaluated.csv
   data://grapher/fasttrack/latest/cdc_measles:
     - snapshot://fasttrack/latest/cdc_measles.csv
+  data://grapher/fasttrack/latest/try_fast_track_in_donor_costs:
+    - snapshot://fasttrack/latest/try_fast_track_in_donor_costs.csv
