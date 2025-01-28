@@ -2,7 +2,9 @@
 definitions:
   common:
     description_short: Famines that are estimated to have killed 100,000 people or more.
-    description_processing: The deaths were assumed to have been distributed evenly over the duration of the famine.
+    description_processing: The deaths were assumed to be evenly distributed over the duration of each famine, except for the famine in China between 1958 and 1962, where the source provides a year-by-year breakdown of mortality.
+    description_from_producer: |-
+        Famines are assessed based on severity, magnitude, and duration. Magnitude, measured as the total number of excess deaths, was used to determine inclusion in the catalogue. A threshold of 100,000 deaths was applied due to limited demographic research on proportional death rate increases.
     presentation:
       topic_tags:
         - Famines
