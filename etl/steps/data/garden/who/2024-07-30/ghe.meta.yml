@@ -51,9 +51,9 @@ definitions:
     75-84 year olds
     <% elif age_group == "YEARS85PLUS" %>
     85+ year olds
-    <%- endif %>
+    <%- endif -%>
   sex: |-
-    <% if sex == "Both sexes" %>both sexes<% elif sex == "Male" %>males<% elif sex == "Female" %>females<% endif %>
+    <% if sex == "Both sexes" %>both sexes<% elif sex == "Male" %>males<% elif sex == "Female" %>females<%- endif -%>
   deaths_title: |-
     <% if age_group == "ALLAges" %>
     Total deaths from {definitions.cause} among {definitions.sex}
@@ -61,7 +61,7 @@ definitions:
     Age-standardized deaths from {definitions.cause} among {definitions.sex}
     <% else %>
     Deaths from {definitions.cause} among {definitions.sex} aged {definitions.age}
-    <%- endif %>
+    <%- endif -%>
   deaths_description: |-
     <% if age_group == "ALLAges" %>
     Estimated number of deaths from {definitions.cause} in {definitions.sex}.
@@ -69,7 +69,7 @@ definitions:
     Estimated number of age-standardized deaths from {definitions.cause} in {definitions.sex}.
     <% else %>
     Estimated number of deaths from {definitions.cause} among {definitions.sex} aged {definitions.age}.
-    <%- endif %>
+    <%- endif -%>
   death_rate_title: |-
     <% if age_group == "ALLAges" %>
     Death rate from {definitions.cause} among {definitions.sex}
@@ -77,7 +77,7 @@ definitions:
     Age-standardized death rate from {definitions.cause} among {definitions.sex}
     <% else %>
     Death rate from {definitions.cause} among {definitions.sex} aged {definitions.age}
-    <%- endif %>
+    <%- endif -%>
   death_rate_description: |-
     <% if age_group == "ALLAges" %>
     Estimated number of deaths from {definitions.cause} in {definitions.sex}, per 100,000 people.
@@ -85,7 +85,7 @@ definitions:
     Estimated number of age-standardized deaths from {definitions.cause} in {definitions.sex}, per 100,000 people.
     <% else %>
     Estimated number of deaths from {definitions.cause} among {definitions.sex} aged {definitions.age}, per 100,000 people.
-    <%- endif %>
+    <%- endif -%>
   dalys_title: |-
     <% if age_group == "ALLAges" %>
     DALYs from {definitions.cause} among {definitions.sex}
@@ -93,7 +93,7 @@ definitions:
     Age-standardized DALYs from {definitions.cause} among {definitions.sex}
     <% else %>
     DALYs from {definitions.cause} among {definitions.sex} aged {definitions.age}
-    <%- endif %>
+    <%- endif -%>
   dalys_description: |-
     <% if age_group == "ALLAges" %>
     Estimated number of [DALYs](#dod:dalys) from {definitions.cause} in {definitions.sex}.
@@ -101,7 +101,7 @@ definitions:
     Estimated number of age-standardized [DALYs](#dod:dalys) from {definitions.cause} in {definitions.sex}.
     <% else %>
     Estimated number of [DALYs](#dod:dalys) from {definitions.cause} among {definitions.sex} aged {definitions.age}.
-    <%- endif %>
+    <%- endif -%>
   dalys_rate_title: |-
     <% if age_group == "ALLAges" %>
     DALYs from {definitions.cause}, among {definitions.sex} per 100,000 people
@@ -109,7 +109,7 @@ definitions:
     Age-standardized DALYs from {definitions.cause} among {definitions.sex}, per 100,000 people
     <% else %>
     DALYs from {definitions.cause} among {definitions.sex} aged {definitions.age}, per 100,000 people
-    <%- endif %>
+    <%- endif -%>
   dalys_rate_description: |-
     <% if age_group == "ALLAges" %>
     Estimated number of [DALYs](#dod:dalys) from {definitions.cause} in {definitions.sex}, per 100,000 people.
@@ -117,9 +117,11 @@ definitions:
     Estimated number of age-standardized [DALYs](#dod:dalys) from {definitions.cause} in {definitions.sex}, per 100,000 people.
     <% else %>
     Estimated number of [DALYs](#dod:dalys) from {definitions.cause} among {definitions.sex} aged {definitions.age}, per 100,000 people.
-    <%- endif %>
+    <%- endif -%>
   footnote: |-
-    <% if age_group is defined and age_group == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% endif %>
+    <% if age_group is defined and age_group == "Age-standardized" %>
+    To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
+    <%- endif -%>
 tables:
   ghe:
     variables:
