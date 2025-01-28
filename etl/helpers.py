@@ -65,21 +65,6 @@ def downloaded(url: str) -> Iterator[str]:
         yield tmp.name
 
 
-def _get_github_branches(org: str, repo: str) -> List[Any]:
-    import requests
-
-    url = f"https://api.github.com/repos/{org}/{repo}/branches?per_page=100"
-    resp = requests.get(url, headers={"Accept": "application/vnd.github.v3+json"}, verify=TLS_VERIFY)
-    if resp.status_code != 200:
-        raise Exception(f"got {resp.status_code} from {url}")
-
-    branches = cast(List[Any], resp.json())
-    if len(branches) == 100:
-        raise Exception("reached single page limit, should paginate request")
-
-    return branches
-
-
 def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
     """Check that the table is in the correct format for Grapher."""
     from etl.grapher import helpers as gh
