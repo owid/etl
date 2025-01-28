@@ -20,6 +20,7 @@ tables:
        region:
         title: Region
         unit: ''
+        description_short: Region where the famine occurred.
 
        wpf_authoritative_mortality_estimate:
           title: Deaths from famines
