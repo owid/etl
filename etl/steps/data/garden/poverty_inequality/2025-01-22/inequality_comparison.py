@@ -10,7 +10,6 @@ We want to process this data inside the ETL now.
 
 from typing import Dict, List
 
-import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -41,6 +40,7 @@ INDICATORS_FOR_ANALYSIS = [
 # Define reference years and parameters for matching
 # maximum_distance: maximum distance from the reference year that an observation can be
 # tie_break_strategy: how to break ties when there are multiple observations at the same distance from the reference year
+# min_interval: minimum distance between the observation year and the reference year
 REFERENCE_YEARS = [
     {
         1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
@@ -49,6 +49,30 @@ REFERENCE_YEARS = [
     {
         1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
         2018: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+    },
+    {
+        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
+        2019: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+    },
+    {
+        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
+        2019: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+    },
+    {
+        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
+        2020: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
+    },
+    {
+        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
+        2020: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
+    },
+    {
+        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
+        2023: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+    },
+    {
+        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
+        2023: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
     },
 ]
 
@@ -114,7 +138,12 @@ def run(dest_dir: str) -> None:
 
 
 def match_ref_years(
-    tb: Table, series: list, reference_years: dict, only_all_series: bool, tb_population: Table, ds_regions: Dataset
+    tb: Table,
+    series: List[str],
+    reference_years: Dict[int, Dict[str, int]],
+    only_all_series: bool,
+    tb_population: Table,
+    ds_regions: Dataset,
 ) -> Table:
     """
     Match series to reference years.
@@ -122,7 +151,7 @@ def match_ref_years(
     In the case of PIP data, it calls the special functions above to handle the additional dimensions of that dataset (region, welfare measure)
     """
 
-    tb_match = pd.DataFrame()
+    tb_match = Table(pd.DataFrame())
     tb_series = tb[tb["series_code"].isin(series)].copy().reset_index(drop=True)
 
     reference_years_list = []
@@ -218,21 +247,25 @@ def match_ref_years(
     # Filter tb_match according to tie_break_strategy
     for y in reference_years_list:
         # Calculate the minimum of distance for each country-series_code
-        min_per_group = tb_match.groupby(["country", "series_code"])[f"distance_{y}"].transform("min")
+        tb_match["min_per_group"] = tb_match.groupby(["country", "series_code"])[f"distance_{y}"].transform("min")
 
         # Keep only the rows where distance is equal to the group minimum
-        tb_match = tb_match[tb_match[f"distance_{y}"] == min_per_group]
+        tb_match = tb_match[tb_match[f"distance_{y}"] == tb_match["min_per_group"]].reset_index(drop=True)
 
         # count how many different years got matched to the reference year
         tb_match["unique_years_count"] = tb_match.groupby(["country", "series_code"])[f"year_{y}"].transform("nunique")
 
         if reference_years[y]["tie_break_strategy"] == "lower":
             # drop observations where the year is above the reference year, when there is more than one year that has been matched
-            tb_match = tb_match[(tb_match["unique_years_count"] == 1) | (tb_match[f"year_{y}"] < y)]
+            tb_match = tb_match[(tb_match["unique_years_count"] == 1) | (tb_match[f"year_{y}"] < y)].reset_index(
+                drop=True
+            )
 
         elif reference_years[y]["tie_break_strategy"] == "higher":
             # drop observations where the year is below the reference year, when there is more than one year that has been matched
-            tb_match = tb_match[(tb_match["unique_years_count"] == 1) | (tb_match[f"year_{y}"] > y)]
+            tb_match = tb_match[(tb_match["unique_years_count"] == 1) | (tb_match[f"year_{y}"] > y)].reset_index(
+                drop=True
+            )
         else:
             raise ValueError("tie_break_strategy must be either 'lower' or 'higher'")
 
@@ -266,8 +299,7 @@ def match_ref_years(
     # Sort by country and year_y
     tb_match = tb_match.sort_values(by=["series_code", "country"] + year_y_list).reset_index(drop=True)
 
-    # If set in the function arguments, filter for only those countries
-    #  avaiable in all series.
+    # If set in the function arguments, filter for only those countries available in all series.
     if only_all_series:
         # Identify countries present for every unique series_code
         countries_per_series_code = tb_match.groupby("series_code")["country"].unique()
@@ -279,7 +311,7 @@ def match_ref_years(
             countries_in_all_series &= set(countries)
 
         # Filter the dataframe to keep only rows where country is in the identified set
-        tb_match = tb_match[tb_match["country"].isin(countries_in_all_series)]
+        tb_match = tb_match[tb_match["country"].isin(countries_in_all_series)].reset_index(drop=True)
     # Add regions
     tb_match = add_regions_columns(tb=tb_match, ds_regions=ds_regions)
 
@@ -293,7 +325,6 @@ def match_ref_years(
 
         tb_match = tb_match.rename(columns={"population": f"population_{y}"})
 
-    # Make a version for OWID plot
     # Reshape from wide to long format
     tb_match = pd.wide_to_long(
         tb_match, ["value", "year", "population"], i=["country", "series_code"], j="ref_year", sep="_"
@@ -309,7 +340,7 @@ def match_ref_years(
 
     # Save format and short name of table
     tb_match = tb_match.format(
-        short_name=f"matched_{reference_years_list[0]}_{reference_years_list[1]}_all_series_{only_all_series}"
+        short_name=f"matched_{reference_years_list[0]}_{reference_years_list[1]}_only_all_series_{only_all_series}"
     )
 
     return tb_match
