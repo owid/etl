@@ -242,7 +242,14 @@ class Pagination:
 
     """
 
-    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str, on_click: Optional[Callable] = None):
+    def __init__(
+        self,
+        items: list[Any],
+        items_per_page: int,
+        pagination_key: str,
+        on_click: Optional[Callable] = None,
+        save_in_query: bool = False,
+    ):
         """Construct Pagination.
 
         Parameters
@@ -255,16 +262,23 @@ class Pagination:
             Key to store the current page in session state.
         on_click : Optional[Callable], optional
             Action to perform when interacting with any of the buttons, by default None
+        save_in_query : bool, optional
+            Whether to save the current page in the query string, by default False
         """
         self.items = items
         self.items_per_page = items_per_page
         self.pagination_key = pagination_key
+        self.save_in_query = save_in_query
         # Action to perform when interacting with any of the buttons.
         ## Example: Change the value of certain state in session_state
         self.on_click = on_click
         # Initialize session state for the current page
         if self.pagination_key not in st.session_state:
-            self.page = 1
+            # Get page from query parameters
+            if self.save_in_query and self.pagination_key in st.query_params:
+                self.page = int(st.query_params[self.pagination_key])
+            else:
+                self.page = 1
 
     @property
     def page(self):
@@ -329,6 +343,11 @@ class Pagination:
     def show_controls_bar(self) -> None:
         def _change_page():
             # Internal action
+            if self.save_in_query:
+                if self.page == 1:
+                    st.query_params.pop(self.pagination_key)
+                else:
+                    st.query_params.update({self.pagination_key: self.page})
 
             # External action
             if self.on_click is not None:
