@@ -445,14 +445,6 @@ def _fetch_metadata_for_indicator(indicator_code: str) -> Dict[str, str]:
     # Metadata not available for indicators such as PER.SI.ALLSI.COV.Q3.TOT
     if len(js) < 2:
         raise ValueError(f"Metadata not available for indicator {indicator_code}")
-        # log.warning("wdi.fetch_metadata_failed", indicator_code=indicator_code)
-        # return {
-        #     "indicator_code": indicator_code,
-        #     "indicator_name": indicator_code,
-        #     "unit": "",
-        #     "source": "",
-        #     "topic": "",
-        # }
 
     d = js[1]
     assert len(d) == 1
@@ -466,31 +458,6 @@ def _fetch_metadata_for_indicator(indicator_code: str) -> Dict[str, str]:
         "source": d.pop("sourceOrganization"),
         "topic": d.pop("topics")[0]["value"],
     }
-
-
-# def _fetch_source_for_indicator(indicator_code: str) -> Optional[str]:
-#     indicator_code = indicator_code.replace("_", ".").upper()
-#     api_url = f"https://api.worldbank.org/v2/indicator/{indicator_code}?format=json"
-#     log.info("wdi.fetch_source", indicator_code=indicator_code)
-#     js = requests.get(api_url).json()
-#     return js[1][0]["sourceOrganization"]
-
-#     html = requests.get(
-#         f"https://databank.worldbank.org/metadataglossary/world-development-indicators/series/{indicator_code}"
-#     ).text
-
-#     # Parse the HTML
-#     soup = BeautifulSoup(html, "html.parser")
-
-#     # Find the 'Source' row and extract the text from the second <td>
-#     source_row = soup.find("td", string="Source")
-#     if source_row:
-#         source_name = source_row.find_next_sibling("td").get_text(strip=True)
-#         log.info("wdi.found_source", indicator_code=indicator_code)
-#         return source_name
-#     else:
-#         log.info("wdi.source_not_found", indicator_code=indicator_code)
-#         return None
 
 
 def load_variable_metadata(indicator_codes: list[str]) -> pd.DataFrame:
