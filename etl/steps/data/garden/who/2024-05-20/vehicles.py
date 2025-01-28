@@ -1,38 +1,21 @@
-from pathlib import Path
-
 from owid import catalog
 from owid.catalog import Dataset, Table, Variable
 
-from etl.helpers import PathFinder
-
-CURRENT_DIR = Path(__file__).parent
-METADATA_PATH = CURRENT_DIR / "vehicles.meta.yml"
-SHORT_NAME = "vehicles"
-NAMESPACE = "who"
-VERSION = "2024-05-20"
+from etl.helpers import PathFinder, create_dataset
 
 paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    ds = Dataset.create_empty(dest_dir)
+    ds_meadow = paths.load_dataset("vehicles")
     ds_population = paths.load_dataset("population")
     # Create and add table
     table = make_table(ds_population)
 
     # Set an appropriate index and sort conveniently
-    table = table.format(["country", "year"], sort_columns=True)
+    tb = table.format(["country", "year"], sort_columns=True)
 
-    # Add table to dataset
-    ds.add(table)
-
-    # Add metadata to dataset.
-    ds.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
-    ds.metadata.short_name = SHORT_NAME
-    ds.metadata.namespace = NAMESPACE
-    ds.metadata.version = VERSION
-
-    # Save
+    ds = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
     ds.save()
 
 
@@ -44,7 +27,6 @@ def make_table(ds_population: Dataset) -> Table:
     tb_population = tb_population[["country", "year", "population"]]
     # Combine sources
     table = make_combined(table_gho, tb_population)
-    table.update_metadata_from_yaml(METADATA_PATH, "vehicles")
     return table
 
 

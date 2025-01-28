@@ -111,7 +111,6 @@ def run(dest_dir: str) -> None:
     ds_explorers = create_dataset(
         dest_dir=dest_dir, tables=tables, default_metadata=ds_garden.metadata, formats=["csv"]
     )
-    ds_explorers.metadata.short_name = "food_explorer"
 
     # Create new explorers dataset.
     ds_explorers.save()
