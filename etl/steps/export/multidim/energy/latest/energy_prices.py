@@ -87,7 +87,7 @@ def run(dest_dir: str) -> None:
                         "config": {
                             "chartTypes": ["StackedBar"],
                             "tab": "chart",
-                            "title": f"Components of {source} price for {consumer.replace('_', '-')} consumers",
+                            "title": f"{source.capitalize()} price components for {consumer.replace('_', '-')}s",
                             "subtitle": subtitle,
                         },
                     },

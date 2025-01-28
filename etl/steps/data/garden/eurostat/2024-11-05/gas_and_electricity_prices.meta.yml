@@ -540,7 +540,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Electricity price component for household consumers - Total price including taxes
+          title_public: Electricity prices for households, including taxes
         description_key:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
@@ -551,7 +551,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Electricity price component for non-household consumers - Total price including taxes
+          title_public: Electricity prices for non-households, including taxes
         description_key:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
@@ -562,7 +562,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Gas price component for household consumers - Total price including taxes
+          title_public: Gas prices for households, including taxes
         description_key:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_gas_component_total_price_including_taxes}"
@@ -573,7 +573,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Gas price component for non-household consumers - Total price including taxes
+          title_public: Gas prices for non-households, including taxes
         description_key:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_gas_component_total_price_including_taxes}"
@@ -1071,7 +1071,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Total price including taxes
+          title_public: Electricity prices (PPS) for households, including taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -1083,7 +1083,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Electricity price component (PPS) for non-household consumers - Total price including taxes
+          title_public: Electricity prices (PPS) for non-households, including taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -1095,7 +1095,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Gas price component (PPS) for household consumers - Total price including taxes
+          title_public: Gas prices (PPS) for households, including taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -1107,7 +1107,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Gas price component (PPS) for non-household consumers - Total price including taxes
+          title_public: Gas prices (PPS) for non-households, including taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
