@@ -5,8 +5,12 @@ definitions:
     presentation:
       topic_tags:
         - Economic Inequality
-    description_processing: |
-      We obtained the series for each indicator by extracting the closest observations to <<year_1>> and <<year_2>>. The maximum distance between the year obtained and the year of reference is 5 years.
+    description_processing: |-
+      We obtained the series for each indicator by extracting the closest observations to <<year_1>> and <<year_2>>. The maximum distance between the year available and the year of reference is 5 years.
+
+      Additionally, for the World Bank Poverty and Inequality Platform dataset, we rank multiple matchings following this order of preference:
+        1. The same welfare concept (first income, then consumption).
+        2. The same reporting level (first national, then urban, then rural).
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
