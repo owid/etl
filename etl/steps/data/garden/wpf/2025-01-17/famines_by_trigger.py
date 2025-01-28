@@ -94,7 +94,9 @@ def run(dest_dir: str) -> None:
 
     # Calculate decadal deaths
     tb["decade"] = (tb["year"] // 10) * 10
-    tb["decadal_famine_deaths"] = tb.groupby(["region", "decade"], observed=False)["famine_deaths"].transform("sum")
+    tb["decadal_famine_deaths"] = tb.groupby(["region", "decade", "principal_cause"], observed=False)[
+        "famine_deaths"
+    ].transform("sum")
 
     # Set NaN everywhere except the start of a decade
     tb["decadal_famine_deaths"] = tb["decadal_famine_deaths"].where(tb["year"] % 10 == 0, np.nan)
