@@ -96,9 +96,6 @@ def run(dest_dir: str) -> None:
     # Change types of some columns to avoid issues with filering and missing values on merge
     tb = tb.astype({"pipreportinglevel": "object", "pipwelfare": "object", "series_code": "object"})
 
-    tb_population = ds_population.read("population")
-    tb_population = tb_population[["country", "year", "population"]]
-
     #### SET REF YEARS AND THEN RUN ####
     # Define an empty list of tables
     tables = []
@@ -110,8 +107,6 @@ def run(dest_dir: str) -> None:
             series=INDICATORS_FOR_ANALYSIS.keys(),
             reference_years=reference_years,
             only_all_series=False,
-            tb_population=tb_population,
-            ds_regions=ds_regions,
         )
 
         # Append the table to the list
@@ -123,8 +118,6 @@ def run(dest_dir: str) -> None:
             series=INDICATORS_FOR_ANALYSIS.keys(),
             reference_years=reference_years,
             only_all_series=True,
-            tb_population=tb_population,
-            ds_regions=ds_regions,
         )
 
         # Append the table to the list
@@ -137,6 +130,15 @@ def run(dest_dir: str) -> None:
     tb = add_metadata_from_original_tables(
         tb=tb, indicator_match=INDICATORS_FOR_ANALYSIS, tb_pip=tb_pip, tb_wid=tb_wid, tb_lis=tb_lis
     )
+
+    # # Add regions
+    # tb = add_regions_columns(tb=tb, ds_regions=ds_regions)
+
+    # Add population
+    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, year_col="ref_year")
+
+    # Drop ref_year column
+    tb = tb.drop(columns="ref_year")
 
     # Format the table
     tb = tb.format(keys=["country", "year", "year_1", "year_2", "only_all_series"], short_name="inequality_comparison")
@@ -161,8 +163,6 @@ def match_ref_years(
     series: List[str],
     reference_years: Dict[int, Dict[str, int]],
     only_all_series: bool,
-    tb_population: Table,
-    ds_regions: Dataset,
 ) -> Table:
     """
     Match series to reference years.
@@ -322,7 +322,6 @@ def match_ref_years(
     if only_all_series:
         # Identify countries present for every unique series_code
         countries_per_series_code = tb_match.groupby("series_code")["country"].unique()
-        all_countries = set(tb_match["country"])
 
         # Find countries that are present in every series_code
         countries_in_all_series = set(countries_per_series_code.iloc[0])
@@ -331,27 +330,15 @@ def match_ref_years(
 
         # Filter the dataframe to keep only rows where country is in the identified set
         tb_match = tb_match[tb_match["country"].isin(countries_in_all_series)].reset_index(drop=True)
-    # Add regions
-    tb_match = add_regions_columns(tb=tb_match, ds_regions=ds_regions)
-
-    # Add population
-
-    for y in reference_years_list:
-        tb_pop_year = tb_population[tb_population["year"] == y].copy().reset_index(drop=True)
-        tb_pop_year = tb_pop_year.drop(columns="year")
-
-        tb_match = pr.merge(tb_match, tb_pop_year, how="left")
-
-        tb_match = tb_match.rename(columns={"population": f"population_{y}"})
 
     # Reshape from wide to long format
     tb_match = pd.wide_to_long(
-        tb_match, ["value", "year", "population"], i=["country", "series_code"], j="ref_year", sep="_"
+        tb_match, ["value", "year"], i=["country", "series_code"], j="ref_year", sep="_"
     ).reset_index(drop=False)
 
     # Pivot from long to wide format, creating a column for each series_code
     tb_match = tb_match.pivot(
-        index=["country", "year", "ref_year", "population", "region"],
+        index=["country", "year", "ref_year"],
         columns="series_code",
         values="value",
         join_column_levels_with="_",
