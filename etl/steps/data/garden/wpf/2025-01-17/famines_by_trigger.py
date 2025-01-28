@@ -102,7 +102,6 @@ def run(dest_dir: str) -> None:
     tb["decadal_famine_deaths"] = tb["decadal_famine_deaths"].where(tb["year"] % 10 == 0, np.nan)
     tb = tb.drop(columns=["decade"])
     tb = tb.rename(columns={"region": "country"})
-    print(tb["principal_cause"].unique())
 
     tb = tb.format(["year", "country", "principal_cause"], short_name=paths.short_name)
     for col in [
