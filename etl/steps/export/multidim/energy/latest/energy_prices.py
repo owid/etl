@@ -66,7 +66,12 @@ def run(dest_dir: str) -> None:
             price_components.append("nuclear_taxes")
         for consumer in ["household", "non_household"]:
             for unit in ["euro", "pps"]:
+                title = f"{source.capitalize()} price components for {consumer.replace('_', '-')}s"
                 subtitle = "Prices are given in euros per [megawatt-hour](#dod:watt-hours)."
+                indicators = [f"annual_{source}_{consumer}_{component}_{unit}" for component in price_components]
+                description_keys = list(
+                    dict.fromkeys(sum([tb_annual[indicator].metadata.description_key for indicator in indicators], []))
+                )
                 if unit == "euro":
                     subtitle += " They are not adjusted for inflation or differences in living costs between countries."
                 config["views"].append(
@@ -79,16 +84,19 @@ def run(dest_dir: str) -> None:
                             "unit": unit,
                         },
                         "indicators": {
-                            "y": [
-                                f"{table_name}/energy_prices_annual#annual_{source}_{consumer}_{component}_{unit}"
-                                for component in price_components
-                            ],
+                            "y": [f"{table_name}/energy_prices_annual#{indicator}" for indicator in indicators],
                         },
                         "config": {
                             "chartTypes": ["StackedBar"],
                             "tab": "chart",
-                            "title": f"{source.capitalize()} price components for {consumer.replace('_', '-')}s",
+                            "title": title,
                             "subtitle": subtitle,
+                        },
+                        # Currently, the stacked area chart uses multiple indicators, but the data page shows only the metadata of the first one. We need to override that metadata with the combination of the metadata of all indicators shown.
+                        "metadata": {
+                            "descriptionShort": subtitle,
+                            "descriptionKey": description_keys,
+                            "presentation": {"titlePublic": title},
                         },
                     },
                 )
