@@ -42,6 +42,7 @@ def run(dest_dir: str) -> None:
 
     tb = tb.rename(columns={"date": "year"})
     tb["year"] = tb["year"].astype(int)
+    tb["country"] = tb["country"].astype(str)
 
     # Define the main countries with the most famines
     main_countries = [
@@ -61,22 +62,19 @@ def run(dest_dir: str) -> None:
     # Separate main countries and others
     tb_main = tb[tb["country"].isin(main_countries)].copy()
     tb_other = tb[~tb["country"].isin(main_countries)].copy()
-    tb_main["country"] = (
-        tb_main["country"]
-        .astype(str)
-        .replace(
-            {
-                "Russia": "USSR/Russia",
-                "Ukraine": "USSR/Russia",
-                "Russia, Ukraine": "USSR/Russia",
-                "Germany, USSR": "USSR/Russia",
-                "Moldova, Ukraine, Russia, Belarus": "USSR/Russia",
-                "Russia, Western Soviet States": "USSR/Russia",
-                "Russia, Kazakhstan": "USSR/Russia",
-                "USSR": "USSR/Russia",
-                "India, Bangladesh": "India",
-            }
-        )
+    tb_main["country"] = tb_main["country"].replace(
+        {
+            "Russia": "USSR/Russia",
+            "Ukraine": "USSR/Russia",
+            "Russia, Ukraine": "USSR/Russia",
+            "Germany, USSR": "USSR/Russia",
+            "Moldova, Ukraine, Russia, Belarus": "USSR/Russia",
+            "Russia, Western Soviet States": "USSR/Russia",
+            "Russia, Kazakhstan": "USSR/Russia",
+            "USSR": "USSR/Russia",
+            "India, Bangladesh": "India",
+            "Kazakhstan": "USSR/Russia",
+        }
     )
 
     # Sum deaths for other countries by year
