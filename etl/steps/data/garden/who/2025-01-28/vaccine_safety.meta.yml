@@ -37,9 +37,9 @@ tables:
       national_policy_waste:
         title: Does the country have a national policy for the disposal of immunization waste?
       national_system_monitor_adverse_events:
-        title: Does the country have a national system to monitor adverse events following immunization?
+        title: National system to monitor vaccine adverse events
         description_from_producer: |-
-          "A national system must include ALL of the following: 1) written guidelines on monitoring and investigation of reported adverse events; 2) a written list of events to monitor; 3) an established mechanism to communicate data for regulatory action; and 4) implementation of points 1, 2 and 3. If any of the four conditions are not met, countries are instructed to report 'No'. How many total adverse events, including suspected or confirmed, were reported to the national level? Countries are instructed to include ALL cases that are documented from ALL sources, i.e. cases that have at least a reporting form and/or are line listed from routine, campaigns, immunization weeks, school health programs, etc."
+          A national system must include ALL of the following: 1) written guidelines on monitoring and investigation of reported adverse events; 2) a written list of events to monitor; 3) an established mechanism to communicate data for regulatory action; and 4) implementation of points 1, 2 and 3. If any of the four conditions are not met, countries are instructed to report 'No'. How many total adverse events, including suspected or confirmed, were reported to the national level? Countries are instructed to include ALL cases that are documented from ALL sources, i.e. cases that have at least a reporting form and/or are line listed from routine, campaigns, immunization weeks, school health programs, etc.
       other_recommended_practices:
         title: Are there other recommended practices for disposal of immunization waste?
         description_short: Other refers to any waste-disposal policy or practice that is not listed elsewhere.
@@ -47,7 +47,7 @@ tables:
         title: Is recycling a recommended practice for disposal of immunization waste?
         description_short: "If a recycling programme exists, items can be reused (i.e.: glassware can be given to laboratories, mechanical items given to scrap dealers) or recycled (if facilities are available). Depending on the type of material and its proposed reuse, appropriate treatment, such as cleaning or disinfection, may be needed."
       serious_adverse_events:
-        title: How many serious adverse events were reported to the national level?
+        title: Serious adverse events reported
         description_short: "An adverse event from immunization is serious if it results in death, is life-threatening, requires in-patient hospitalization or prolongation of existing hospitalization, results in persistent or significant incapacity, or causes a congenital anomaly/birth defect."
         unit: adverse events
         description_from_producer: |-
@@ -61,7 +61,7 @@ tables:
         description_from_producer: |-
           Where the reports were sourced from for AEFI cases, the "EPI program" or the 'National Regulatory Authority'? Countries are instructed to select 'Both EPI and NRA jointly' if the data from both sources have been pooled together. If it is obtained from another source (such as a National Pharmacovigilance center or manufacturer), instructions state to select 'Other'.
       total_adverse_events_reported:
-        title: "How many total adverse events, including suspected or confirmed, were reported to the national level?"
+        title: Adverse events reported
       vaccine_adverse_events_review_committee:
-        title: Does the country have a vaccine adverse events review committee?
+        title: Vaccine adverse events review committee'
         description_from_producer: Adverse events review committee is an independent committee of recognized experts that provides technical advice and recommendations to the government regarding vaccine safety issues. The adverse events review committee is a tool that enables the government to assess vaccine safety issues through a transparent, systematic process. The adverse events review committees are composed of recognized national experts, independent from the immunization program and the national regulatory authority, and their primary function should focus on offering technical recommendations.
