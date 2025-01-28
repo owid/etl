@@ -73,8 +73,10 @@ def run(dest_dir: str) -> None:
                 )
                 if unit == "euro":
                     subtitle = "Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries."
+                    title_variant = None
                 else:
-                    subtitle = "Prices are given in purchasing power standard (PPS) per [megawatt-hour](#dod:watt-hours). They are adjusted for differences in living costs between countries, but they are not adjusted for inflation."
+                    subtitle = "Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). They are adjusted for differences in living costs between countries, but they are not adjusted for inflation."
+                    title_variant = "PPS"
                 config["views"].append(
                     {
                         "dimensions": {
@@ -97,7 +99,7 @@ def run(dest_dir: str) -> None:
                         "metadata": {
                             "descriptionShort": subtitle,
                             "descriptionKey": description_keys,
-                            "presentation": {"titlePublic": title},
+                            "presentation": {"titlePublic": title, "titleVariant": title_variant},
                         },
                     },
                 )

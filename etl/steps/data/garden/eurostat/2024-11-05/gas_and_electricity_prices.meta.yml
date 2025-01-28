@@ -590,7 +590,7 @@ tables:
   gas_and_electricity_price_components_pps_flat:
     title: Gas and electricity price components in Europe (PPS)
     common:
-      description_short: Prices are given in purchasing power standard (PPS) per [megawatt-hour](#dod:watt-hours).
+      description_short: Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours).
       unit: "purchasing power standard per megawatt-hour"
       short_unit: "PPS/MWh"
     variables:
@@ -599,7 +599,7 @@ tables:
         display:
           name: Capacity taxes
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Capacity taxes
+          title_public: Electricity price component for household consumers - Capacity taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -611,7 +611,7 @@ tables:
         display:
           name: Capacity taxes
         presentation:
-          title_public: Electricity price component (PPS) for non-household consumers - Capacity taxes
+          title_public: Electricity price component for non-household consumers - Capacity taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -623,7 +623,7 @@ tables:
         display:
           name: Capacity taxes allowances
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Capacity taxes allowances
+          title_public: Electricity price component for household consumers - Capacity taxes allowances
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -635,7 +635,7 @@ tables:
         display:
           name: Energy and supply
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Energy and supply
+          title_public: Electricity price component for household consumers - Energy and supply
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -647,7 +647,7 @@ tables:
         display:
           name: Energy and supply
         presentation:
-          title_public: Electricity price component (PPS) for non-household consumers - Energy and supply
+          title_public: Electricity price component for non-household consumers - Energy and supply
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -659,7 +659,7 @@ tables:
         display:
           name: Environmental taxes
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Environmental taxes
+          title_public: Electricity price component for household consumers - Environmental taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -671,7 +671,7 @@ tables:
         display:
           name: Environmental taxes
         presentation:
-          title_public: Electricity price component (PPS) for non-household consumers - Environmental taxes
+          title_public: Electricity price component for non-household consumers - Environmental taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -683,7 +683,7 @@ tables:
         display:
           name: Environmental taxes allowance
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Environmental taxes allowance
+          title_public: Electricity price component for household consumers - Environmental taxes allowance
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -695,7 +695,7 @@ tables:
         display:
           name: Network costs
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Network costs
+          title_public: Electricity price component for household consumers - Network costs
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -707,7 +707,7 @@ tables:
         display:
           name: Network costs
         presentation:
-          title_public: Electricity price component (PPS) for non-household consumers - Network costs
+          title_public: Electricity price component for non-household consumers - Network costs
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -719,7 +719,7 @@ tables:
         display:
           name: Nuclear taxes
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Nuclear taxes
+          title_public: Electricity price component for household consumers - Nuclear taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -731,7 +731,7 @@ tables:
         display:
           name: Nuclear taxes
         presentation:
-          title_public: Electricity price component (PPS) for non-household consumers - Nuclear taxes
+          title_public: Electricity price component for non-household consumers - Nuclear taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -743,7 +743,7 @@ tables:
         display:
           name: Nuclear taxes allowance
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Nuclear taxes allowance
+          title_public: Electricity price component for household consumers - Nuclear taxes allowance
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -755,7 +755,7 @@ tables:
         display:
           name: Other
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Other
+          title_public: Electricity price component for household consumers - Other
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -767,7 +767,7 @@ tables:
         display:
           name: Other
         presentation:
-          title_public: Electricity price component (PPS) for non-household consumers - Other
+          title_public: Electricity price component for non-household consumers - Other
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -779,7 +779,7 @@ tables:
         display:
           name: Other allowance
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Other allowance
+          title_public: Electricity price component for household consumers - Other allowance
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -791,7 +791,7 @@ tables:
         display:
           name: Renewable taxes
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Renewable taxes
+          title_public: Electricity price component for household consumers - Renewable taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -803,7 +803,7 @@ tables:
         display:
           name: Renewable taxes
         presentation:
-          title_public: Electricity price component (PPS) for non-household consumers - Renewable taxes
+          title_public: Electricity price component for non-household consumers - Renewable taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -815,7 +815,7 @@ tables:
         display:
           name: Renewable taxes allowance
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Renewable taxes allowance
+          title_public: Electricity price component for household consumers - Renewable taxes allowance
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -827,7 +827,7 @@ tables:
         display:
           name: Taxes, fees, levies, and charges
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Taxes, fees, levies, and charges
+          title_public: Electricity price component for household consumers - Taxes, fees, levies, and charges
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -839,7 +839,7 @@ tables:
         display:
           name: Taxes, fees, levies, and charges
         presentation:
-          title_public: Electricity price component (PPS) for non-household consumers - Taxes, fees, levies, and charges
+          title_public: Electricity price component for non-household consumers - Taxes, fees, levies, and charges
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -851,7 +851,7 @@ tables:
         display:
           name: Value added tax (VAT)
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Value added tax (VAT)
+          title_public: Electricity price component for household consumers - Value added tax (VAT)
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -863,7 +863,7 @@ tables:
         display:
           name: Value added tax (VAT)
         presentation:
-          title_public: Electricity price component (PPS) for non-household consumers - Value added tax (VAT)
+          title_public: Electricity price component for non-household consumers - Value added tax (VAT)
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -875,7 +875,7 @@ tables:
         display:
           name: Capacity taxes
         presentation:
-          title_public: Gas price component (PPS) for household consumers - Capacity taxes
+          title_public: Gas price component for household consumers - Capacity taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -887,7 +887,7 @@ tables:
         display:
           name: Energy and supply
         presentation:
-          title_public: Gas price component (PPS) for household consumers - Energy and supply
+          title_public: Gas price component for household consumers - Energy and supply
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -899,7 +899,7 @@ tables:
         display:
           name: Environmental taxes
         presentation:
-          title_public: Gas price component (PPS) for household consumers - Environmental taxes
+          title_public: Gas price component for household consumers - Environmental taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -911,7 +911,7 @@ tables:
         display:
           name: Network costs
         presentation:
-          title_public: Gas price component (PPS) for household consumers - Network costs
+          title_public: Gas price component for household consumers - Network costs
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -923,7 +923,7 @@ tables:
         display:
           name: Other
         presentation:
-          title_public: Gas price component (PPS) for household consumers - Other
+          title_public: Gas price component for household consumers - Other
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -935,7 +935,7 @@ tables:
         display:
           name: Renewable taxes
         presentation:
-          title_public: Gas price component (PPS) for household consumers - Renewable taxes
+          title_public: Gas price component for household consumers - Renewable taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -947,7 +947,7 @@ tables:
         display:
           name: Taxes, fees, levies, and charges
         presentation:
-          title_public: Gas price component (PPS) for household consumers - Taxes, fees, levies, and charges
+          title_public: Gas price component for household consumers - Taxes, fees, levies, and charges
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -959,7 +959,7 @@ tables:
         display:
           name: Value added tax (VAT)
         presentation:
-          title_public: Gas price component (PPS) for household consumers - Value added tax (VAT)
+          title_public: Gas price component for household consumers - Value added tax (VAT)
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -971,7 +971,7 @@ tables:
         display:
           name: Capacity taxes
         presentation:
-          title_public: Gas price component (PPS) for non-household consumers - Capacity taxes
+          title_public: Gas price component for non-household consumers - Capacity taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -983,7 +983,7 @@ tables:
         display:
           name: Energy and supply
         presentation:
-          title_public: Gas price component (PPS) for non-household consumers - Energy and supply
+          title_public: Gas price component for non-household consumers - Energy and supply
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -995,7 +995,7 @@ tables:
         display:
           name: Environmental taxes
         presentation:
-          title_public: Gas price component (PPS) for non-household consumers - Environmental taxes
+          title_public: Gas price component for non-household consumers - Environmental taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -1007,7 +1007,7 @@ tables:
         display:
           name: Network costs
         presentation:
-          title_public: Gas price component (PPS) for non-household consumers - Network costs
+          title_public: Gas price component for non-household consumers - Network costs
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -1019,7 +1019,7 @@ tables:
         display:
           name: Other
         presentation:
-          title_public: Gas price component (PPS) for non-household consumers - Other
+          title_public: Gas price component for non-household consumers - Other
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -1031,7 +1031,7 @@ tables:
         display:
           name: Renewable taxes
         presentation:
-          title_public: Gas price component (PPS) for non-household consumers - Renewable taxes
+          title_public: Gas price component for non-household consumers - Renewable taxes
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -1043,7 +1043,7 @@ tables:
         display:
           name: Taxes, fees, levies, and charges
         presentation:
-          title_public: Gas price component (PPS) for non-household consumers - Taxes, fees, levies, and charges
+          title_public: Gas price component for non-household consumers - Taxes, fees, levies, and charges
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -1055,7 +1055,7 @@ tables:
         display:
           name: Value added tax (VAT)
         presentation:
-          title_public: Gas price component (PPS) for non-household consumers - Value added tax (VAT)
+          title_public: Gas price component for non-household consumers - Value added tax (VAT)
           title_variant: PPS
         description_key:
           - "{definitions.description_key_non_household_consumer}"
@@ -1067,7 +1067,7 @@ tables:
         display:
           name: Taxes, fees, levies, and charges allowance
         presentation:
-          title_public: Electricity price component (PPS) for household consumers - Taxes, fees, levies, and charges allowance
+          title_public: Electricity price component for household consumers - Taxes, fees, levies, and charges allowance
           title_variant: PPS
         description_key:
           - "{definitions.description_key_household_consumer}"
@@ -1079,7 +1079,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Electricity prices (PPS) for households, including taxes
+          title_public: Electricity prices for households, including taxes
           title_variant: PPS
           grapher_config:
             note: *foonote-different-prices
@@ -1093,7 +1093,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Electricity prices (PPS) for non-households, including taxes
+          title_public: Electricity prices for non-households, including taxes
           title_variant: PPS
           grapher_config:
             note: *foonote-different-prices
@@ -1107,7 +1107,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Gas prices (PPS) for households, including taxes
+          title_public: Gas prices for households, including taxes
           title_variant: PPS
           grapher_config:
             note: *foonote-different-prices
@@ -1121,7 +1121,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Gas prices (PPS) for non-households, including taxes
+          title_public: Gas prices for non-households, including taxes
           title_variant: PPS
           grapher_config:
             note: *foonote-different-prices
@@ -1236,7 +1236,7 @@ tables:
   gas_and_electricity_prices_pps_flat:
     title: Gas and electricity prices in Europe (PPS)
     common:
-      description_short: Prices are given in purchasing power standard (PPS) per [megawatt-hour](#dod:watt-hours).
+      description_short: Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours).
       unit: "purchasing power standard per megawatt-hour"
       short_unit: "PPS/MWh"
     variables:
