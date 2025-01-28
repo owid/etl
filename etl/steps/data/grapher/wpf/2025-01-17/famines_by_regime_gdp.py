@@ -24,8 +24,6 @@ def run(dest_dir: str) -> None:
     famine_names_to_drop = ["China 1958", "China 1959", "China 1960", "China 1961", "China 1962"]
     tb = tb[~tb["famine_name"].isin(famine_names_to_drop)]
 
-    tb = tb.drop(columns={"country"})
-
     tb = tb.rename({"famine_name": "country", "country": "country_name"}, axis=1)
 
     # Keep the first year for each famine (country)
