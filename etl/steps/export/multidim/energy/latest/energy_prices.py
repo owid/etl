@@ -67,13 +67,14 @@ def run(dest_dir: str) -> None:
         for consumer in ["household", "non_household"]:
             for unit in ["euro", "pps"]:
                 title = f"{source.capitalize()} price components for {consumer.replace('_', '-')}s"
-                subtitle = "Prices are given in euros per [megawatt-hour](#dod:watt-hours)."
                 indicators = [f"annual_{source}_{consumer}_{component}_{unit}" for component in price_components]
                 description_keys = list(
                     dict.fromkeys(sum([tb_annual[indicator].metadata.description_key for indicator in indicators], []))
                 )
                 if unit == "euro":
-                    subtitle += " They are not adjusted for inflation or differences in living costs between countries."
+                    subtitle = "Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries."
+                else:
+                    subtitle = "Prices are given in purchasing power standard (PPS) per [megawatt-hour](#dod:watt-hours). They are adjusted for differences in living costs between countries, but they are not adjusted for inflation."
                 config["views"].append(
                     {
                         "dimensions": {
