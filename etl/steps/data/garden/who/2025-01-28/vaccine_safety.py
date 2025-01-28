@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -42,8 +44,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    tb = tb.drop(columns=["iso_3_code", "who_region", "indcode", "indcatcode", "indcat_description", "indsort"])
-
+    tb = clean_data(tb)
     tb["description"] = tb["description"].replace(DESCRIPTION_SHORT)
     tb = tb.pivot(index=["country", "year"], columns="description", values="value").reset_index()
 
@@ -59,3 +60,16 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def clean_data(tb: Table) -> Table:
+    """
+    - Drop extraneous columns
+    - Replace 'ND' and 'NR' with NA
+    - There are two variables for the yellow fever vaccine, which do not overlap in time-coverage.
+    I believe they are just two spellings of the same vaccine, so I will merge them.
+    """
+    tb = tb.drop(columns=["iso_3_code", "who_region", "indcode", "indcatcode", "indcat_description", "indsort"])
+    tb = tb.replace({"value": {"ND": pd.NA, "NR": pd.NA}})
+
+    return tb

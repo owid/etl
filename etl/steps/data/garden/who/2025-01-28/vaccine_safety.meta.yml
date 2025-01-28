@@ -5,6 +5,8 @@ definitions:
       topic_tags:
         - Vaccination
     unit: ""
+    display:
+      numDecimalPlaces: 0
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
