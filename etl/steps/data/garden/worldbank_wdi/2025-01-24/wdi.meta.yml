@@ -530,10 +530,6 @@ tables:
         title: Present value of external debt (% of exports of goods, services and income)
         short_unit: '%'
         unit: '% of exports of goods, services and income'
-      dt_dod_pvlx_gn_zs:
-        title: Present value of external debt (% of GNI)
-        short_unit: '%'
-        unit: '% of GNI'
       dt_nfl_blat_cd:
         title: Net financial flows, bilateral (NFL, current US$)
         short_unit: $
@@ -5223,9 +5219,9 @@ tables:
       dt_nfl_witc_cd:
         title: Net official flows from UN agencies, WTO-ITC (current US$)
       it_net_user_fe_zs:
-        title: Internet users, female (%)
+        title: Individuals using the Internet, female (% of female population)
       it_net_user_ma_zs:
-        title: Internet users, male (%)
+        title: Individuals using the Internet, male (% of male population)
       si_pov_mpun:
         title: Multidimensional poverty headcount ratio (UNDP) (% of population)
       si_pov_mpwb:
@@ -5297,7 +5293,7 @@ tables:
       en_ghg_tot_zg_ar5:
         title: Total greenhouse gas emissions excluding LULUCF (% change from 1990)
       en_ghg_all_pc_ce_ar5:
-        title: Total greenhouse gas emissions excluding LULUCF per capita (t CO2e/capita)
+        title: Total greenhouse gas emissions per capita excluding LULUCF (t CO2e/capita)
       en_ghg_n2o_fe_mt_ce_ar5:
         title: Nitrous oxide (N2O) emissions from Fugitive Emissions (Energy) (Mt CO2e)
       en_ghg_ch4_ag_mt_ce_ar5:
@@ -5311,7 +5307,7 @@ tables:
       en_ghg_ch4_mt_ce_ar5:
         title: Methane (CH4) emissions (total) excluding LULUCF (Mt CO2e)
       en_ghg_co2_rt_gdp_pp_kd:
-        title: Carbon intensity of GDP (kg CO2e per 2021 PPP $ of GDP)
+        title: Carbon intensity of GDP (kg CO2e per 2021 PPP $)
       en_ghg_ch4_ic_mt_ce_ar5:
         title: Methane (CH4) emissions from Industrial Combustion (Energy) (Mt CO2e)
       en_ghg_n2o_pi_mt_ce_ar5:
@@ -5323,6 +5319,6 @@ tables:
       en_ghg_n2o_mt_ce_ar5:
         title: Nitrous oxide (N2O) emissions (total) excluding LULUCF (Mt CO2e)
       en_ghg_co2_rt_gdp_kd:
-        title: Carbon intensity of GDP (kg CO2e per constant 2015 US$ of GDP)
+        title: Carbon intensity of GDP (kg CO2e per constant 2021 US$ of GDP)
       en_ghg_fgas_ip_mt_ce_ar5:
-        title: F-gases emissions from Industrial Processes (Mt CO2e)
+        title: Fluorinated greenhouse gases (F-gases) emissions from Industrial Processes (Mt CO2e)

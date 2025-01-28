@@ -1569,5 +1569,65 @@
     "rawName": "Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190601",
     "name": "Grassi et al.",
     "dataPublisherSource": "Carbon fluxes from land 2000–2020 - Grassi et al."
+  },
+  {
+    "rawName": "United Nations Population Division. World Population Prospects: 2024 Revision.",
+    "name": "UN Population Division (via World Bank)",
+    "dataPublisherSource": "World Population Prospects - UN Population Division (2024)"
+  },
+  {
+    "rawName": "World Bank staff estimates using the World Integrated Trade Solution system, based on tariff data from the United Nations Conference on Trade and Development's Trade and Development's Trade Analysis and Information System (TRAINS) database and global imports data from the United Nations Statistics Division's Comtrade database.",
+    "name": "World Bank based on data from UNCTAD and UN Statistics Division",
+    "dataPublisherSource": "World Integrated Trade Solution - World Bank, TRAINS Database - UNCTAD, Comtrade Database - UN Statistics Division"
+  },
+  {
+    "rawName": "World Bank staff estimates based on age/sex distributions of United Nations Population Division's World Population Prospects: 2024 Revision.",
+    "name": "World Bank based on data from the UN Population Division",
+    "dataPublisherSource": "World Bank based on World Population Prospects - UN Population Division (2024)"
+  },
+  {
+    "rawName": "International Labour Organization. “Education and Mismatch Indicators database (EMI)” ILOSTAT. Accessed October 16, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Education and Mismatch Indicators Database (EMI) - International Labour Organization"
+  },
+  {
+    "rawName": "International Labour Organization. “Labour Market-related SDG Indicators database (ILOSDG)” ILOSTAT. Accessed October 16, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Labour Market-related SDG Indicators Database (ILOSDG) - International Labour Organization"
+  },
+  {
+    "rawName": "World Bank staff estimates using the World Bank's total population and age/sex distributions of the United Nations Population Division's World Population Prospects: 2024 Revision.",
+    "name": "World Bank based on data from the UN Population Division",
+    "dataPublisherSource": "World Bank based on World Population Prospects - UN Population Division (2024)"
+  },
+  {
+    "rawName": "(1) United Nations Population Division. World Population Prospects: 2024 Revision; (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics; (4) United Nations Statistics Division. Population and Vital Statistics Report (various years).",
+    "name": "United Nations Population Division, Eurostat, and National Statistical Offices",
+    "dataPublisherSource": "World Population Prospects - UN Population Division (2024), Demographic Statistics - Eurostat, Population and Vital Statistics Report - UN Statistics Division"
+  },
+  {
+    "rawName": "International Labour Organization. “Labour Force Statistics database (LFS)” ILOSTAT. Accessed October 16, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Labour Force Statistics Database (LFS) - International Labour Organization"
+  },
+  {
+    "rawName": "International Labour Organization. “Wages and Working Time Statistics database (COND)” ILOSTAT. Accessed October 16, 2024. https://ilostat.ilo.org/data/.",
+    "name": "International Labour Organization (via World Bank)",
+    "dataPublisherSource": "Wages and Working Time Statistics Database (COND) - International Labour Organization"
+  },
+  {
+    "rawName": "Derived from total population. Population source: (1) United Nations Population Division. World Population Prospects: 2024 Revision; (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics; (4) United Nations Statistics Division. Population and Vital Statistics Report (various years).",
+    "name": "United Nations Population Division, Eurostat, and National Statistical Offices",
+    "dataPublisherSource": "World Population Prospects - UN Population Division (2024), Demographic Statistics - Eurostat, Population and Vital Statistics Report - UN Statistics Division"
+  },
+  {
+    "rawName": "UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed September 30, 2024. https://apiportal.uis.unesco.org/bdds.",
+    "name": "UNESCO Institute for Statistics",
+    "dataPublisherSource": "UIS.Stat Bulk Data Download Service - UNESCO Institute for Statistics"
+  },
+  {
+    "rawName": "World Bank staff estimates based on age distributions of United Nations Population Division's World Population Prospects: 2024 Revision.",
+    "name": "World Bank based on data from the UN Population Division",
+    "dataPublisherSource": "World Bank based on World Population Prospects - UN Population Division (2024)"
   }
 ]
