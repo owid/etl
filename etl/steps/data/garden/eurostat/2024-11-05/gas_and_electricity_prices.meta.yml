@@ -69,7 +69,14 @@ definitions:
     Prices include the base cost of energy and non-recoverable taxes and levies. They exclude VAT and other recoverable taxes.
   description_key_price_including_all_taxes: |-
     Prices represent the total price paid by end consumers, including all taxes, levies, and VAT.
-
+  description_short_household_euros: &description_short_household_euros |-
+    Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries. Households refer to residential consumers using energy for domestic purposes like heating and lighting.
+  description_short_non_household_euros: &description_short_non_household_euros |-
+    Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries. Non-household consumers include commercial and industrial uses like services, offices, and agriculture.
+  description_short_household_pps: &description_short_household_pps |-
+    Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). They are adjusted for differences in living costs between countries, but not for inflation. Households refer to residential consumers using energy for domestic purposes like heating and lighting.
+  description_short_non_household_pps: &description_short_non_household_pps |-
+    Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). They are adjusted for differences in living costs between countries, but not for inflation. Non-household consumers include commercial and industrial uses like services, offices, and agriculture.
 
 dataset:
   update_period_days: 365
@@ -537,6 +544,7 @@ tables:
 
       electricity_household_total_price_including_taxes_euro:
         title: Electricity price component (euros) for household consumers - Total price including taxes
+        description_short: *description_short_household_euros
         display:
           name: Total price including taxes
         presentation:
@@ -550,6 +558,7 @@ tables:
 
       electricity_non_household_total_price_including_taxes_euro:
         title: Electricity price component (euros) for non-household consumers - Total price including taxes
+        description_short: *description_short_non_household_euros
         display:
           name: Total price including taxes
         presentation:
@@ -1076,6 +1085,7 @@ tables:
 
       electricity_household_total_price_including_taxes_pps:
         title: Electricity price component (PPS) for household consumers - Total price including taxes
+        description_short: *description_short_household_pps
         display:
           name: Total price including taxes
         presentation:
@@ -1090,6 +1100,7 @@ tables:
 
       electricity_non_household_total_price_including_taxes_pps:
         title: Electricity price component (PPS) for non-household consumers - Total price including taxes
+        description_short: *description_short_non_household_pps
         display:
           name: Total price including taxes
         presentation:
@@ -1104,6 +1115,7 @@ tables:
 
       gas_household_total_price_including_taxes_pps:
         title: Gas price component (PPS) for household consumers - Total price including taxes
+        description_short: *description_short_household_pps
         display:
           name: Total price including taxes
         presentation:
@@ -1118,6 +1130,7 @@ tables:
 
       gas_non_household_total_price_including_taxes_pps:
         title: Gas price component (PPS) for non-household consumers - Total price including taxes
+        description_short: *description_short_non_household_pps
         display:
           name: Total price including taxes
         presentation:
