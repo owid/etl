@@ -65,6 +65,9 @@ steps:
     - data://garden/poverty_inequality/2025-01-22/poverty_inequality_file
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-10-07/world_bank_pip
+    - data://garden/wid/2024-05-24/world_inequality_database
+    - data://garden/lis/2024-06-13/luxembourg_income_study
 
   # Global Multidimensional Poverty Index
   data://meadow/ophi/2024-10-28/multidimensional_poverty_index:

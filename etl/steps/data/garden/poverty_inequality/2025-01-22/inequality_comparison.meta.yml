@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Economic Inequality
+    description_processing: |
+      We obtained the series for each indicator by extracting the closest observations to <<year_1>> and <<year_2>>. The maximum distance between the year obtained and the year of reference is 5 years.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Inequality comparisons across time and datasets
+  update_period_days: 365
+
+tables:
+  inequality_comparison:
+    variables:
+      gini_pip_disposable_percapita:
+        title: Gini coefficient (World Bank PIP) (<<year_1>> - <<year_2>>) - <<only_all_series>>
+      gini_wid_posttaxnational_peradult:
+        title: Gini coefficient (WID) (<<year_1>> - <<year_2>>) - <<only_all_series>> (post-tax)
+      gini_wid_pretaxnational_peradult:
+        title: Gini coefficient (WID) (<<year_1>> - <<year_2>>) - <<only_all_series>> (pre-tax)
+      p90p100share_pip_disposable_percapita:
+        title: Income share of the richest 10% (World Bank PIP) (<<year_1>> - <<year_2>>) - <<only_all_series>>
+      p90p100share_wid_posttaxnational_peradult:
+        title: Income share of the richest 10% (WID) (<<year_1>> - <<year_2>>) - <<only_all_series>> (post-tax)
+      p90p100share_wid_pretaxnational_peradult:
+        title: Income share of the richest 10% (WID) (<<year_1>> - <<year_2>>) - <<only_all_series>> (pre-tax)
+      p99p100share_wid_posttaxnational_peradult:
+        title: Income share of the richest 1% (WID) (<<year_1>> - <<year_2>>) - <<only_all_series>> (post-tax)
+      p99p100share_wid_pretaxnational_peradult:
+        title: Income share of the richest 1% (WID) (<<year_1>> - <<year_2>>) - <<only_all_series>> (pre-tax)

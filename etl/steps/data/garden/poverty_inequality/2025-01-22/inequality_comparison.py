@@ -25,16 +25,16 @@ paths = PathFinder(__file__)
 log = get_logger()
 
 # Define columns that we want to analyze
-INDICATORS_FOR_ANALYSIS = [
-    "gini_pip_disposable_perCapita",
-    "p90p100Share_pip_disposable_perCapita",
-    "gini_wid_pretaxNational_perAdult",
-    "p99p100Share_wid_pretaxNational_perAdult",
-    "p90p100Share_wid_pretaxNational_perAdult",
-    "gini_wid_posttaxNational_perAdult",
-    "p99p100Share_wid_posttaxNational_perAdult",
-    "p90p100Share_wid_posttaxNational_perAdult",
-]
+INDICATORS_FOR_ANALYSIS = {
+    "gini_pip_disposable_perCapita": "gini",
+    "p90p100Share_pip_disposable_perCapita": "decile10_share",
+    "gini_wid_pretaxNational_perAdult": "p0p100_gini_pretax",
+    "p99p100Share_wid_pretaxNational_perAdult": "p99p100_share_pretax",
+    "p90p100Share_wid_pretaxNational_perAdult": "p90p100_share_pretax",
+    "gini_wid_posttaxNational_perAdult": "p0p100_gini_posttax_nat",
+    "p99p100Share_wid_posttaxNational_perAdult": "p99p100_share_posttax_nat",
+    "p90p100Share_wid_posttaxNational_perAdult": "p90p100_share_posttax_nat",
+}
 
 
 # Define reference years and parameters for matching
@@ -82,8 +82,16 @@ def run(dest_dir: str) -> None:
     ds_pov_ineq = paths.load_dataset("poverty_inequality_file")
     ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
+    ds_pip = paths.load_dataset("world_bank_pip")
+    ds_wid = paths.load_dataset("world_inequality_database")
+    ds_lis = paths.load_dataset("luxembourg_income_study")
 
     tb = ds_pov_ineq.read("keyvars")
+
+    # Load tables from PIP, WID, and LIS datasets (for metadata)
+    tb_pip = ds_pip["income_consumption_2017_unsmoothed"].reset_index()
+    tb_wid = ds_wid["world_inequality_database"].reset_index()
+    tb_lis = ds_lis["luxembourg_income_study"].reset_index()
 
     # Change types of some columns to avoid issues with filering and missing values on merge
     tb = tb.astype({"pipreportinglevel": "object", "pipwelfare": "object", "series_code": "object"})
@@ -99,7 +107,7 @@ def run(dest_dir: str) -> None:
         # Version 1 – All data points (only_all_series = False)
         tb_all_data_points = match_ref_years(
             tb=tb,
-            series=INDICATORS_FOR_ANALYSIS,
+            series=INDICATORS_FOR_ANALYSIS.keys(),
             reference_years=reference_years,
             only_all_series=False,
             tb_population=tb_population,
@@ -112,7 +120,7 @@ def run(dest_dir: str) -> None:
         # Version 2 - Only countries with data in all series (only_all_series = True)
         tb_data_in_all_series = match_ref_years(
             tb=tb,
-            series=INDICATORS_FOR_ANALYSIS,
+            series=INDICATORS_FOR_ANALYSIS.keys(),
             reference_years=reference_years,
             only_all_series=True,
             tb_population=tb_population,
@@ -122,12 +130,23 @@ def run(dest_dir: str) -> None:
         # Append the table to the list
         tables.append(tb_data_in_all_series)
 
+    # Concatenate tables
+    tb = pr.concat(tables, ignore_index=True)
+
+    # Add metadata from original tables
+    tb = add_metadata_from_original_tables(
+        tb=tb, indicator_match=INDICATORS_FOR_ANALYSIS, tb_pip=tb_pip, tb_wid=tb_wid, tb_lis=tb_lis
+    )
+
+    # Format the table
+    tb = tb.format(keys=["country", "year", "year_1", "year_2", "only_all_series"], short_name="inequality_comparison")
+
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -338,10 +357,14 @@ def match_ref_years(
         join_column_levels_with="_",
     ).reset_index(drop=True)
 
-    # Save format and short name of table
-    tb_match = tb_match.format(
-        short_name=f"matched_{reference_years_list[0]}_{reference_years_list[1]}_only_all_series_{only_all_series}"
-    )
+    # Add dimensional identifiers for match
+    tb_match["year_1"] = reference_years_list[0]
+    tb_match["year_2"] = reference_years_list[1]
+    tb_match["only_all_series"] = only_all_series
+
+    # Replace only_all_series with a more descriptive name
+    tb_match["only_all_series"] = tb_match["only_all_series"].replace({True: "Only countries with data in all series"})
+    tb_match["only_all_series"] = tb_match["only_all_series"].replace({False: "All data points for each series"})
 
     return tb_match
 
@@ -412,5 +435,30 @@ def add_regions_columns(tb: Table, ds_regions: Dataset) -> Table:
 
     # Keep only the rows where region is not missing
     tb = tb.dropna(subset=["region"]).reset_index(drop=True)
+
+    return tb
+
+
+def add_metadata_from_original_tables(
+    tb: Table, indicator_match: Dict[str, str], tb_pip: Table, tb_wid: Table, tb_lis: Table
+) -> Table:
+    """
+    Add the original metadata we have in the garden steps of the main metadata.
+    This way we can add origins and indicator-based metadata
+    """
+
+    for col, match in indicator_match.items():
+        # If col contains "pip"
+        if "pip" in col:
+            # Get the metadata from the PIP table
+            tb[col] = tb[col].copy_metadata(tb_pip[match])
+        # If col contains "wid"
+        elif "wid" in col:
+            # Get the metadata from the WID table
+            tb[col] = tb[col].copy_metadata(tb_wid[match])
+        # If col contains "lis"
+        elif "lis" in col:
+            # Get the metadata from the LIS table
+            tb[col] = tb[col].copy_metadata(tb_lis[match])
 
     return tb
