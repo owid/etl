@@ -5,7 +5,6 @@ Loads the latest PIP, WID and LIS explorer steps and stores a table (as a csv fi
 """
 
 import owid.catalog.processing as pr
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -27,17 +26,32 @@ def run(dest_dir: str) -> None:
 
     # Merge explorer datasets and assign a short name
     tb_explorer = pr.merge(
-        tb_wid, tb_lis, on=["country", "year"], how="outer", validate="one_to_one", short_name="poverty_inequality"
+        tb_wid,
+        tb_lis,
+        on=["country", "year"],
+        how="outer",
+        validate="one_to_one",
+        short_name="poverty_inequality",
     )
     tb_explorer = pr.merge(
-        tb_explorer, tb_pip, on=["country", "year"], how="outer", validate="one_to_one", short_name="poverty_inequality"
+        tb_explorer,
+        tb_pip,
+        on=["country", "year"],
+        how="outer",
+        validate="one_to_one",
+        short_name="poverty_inequality",
     )
 
     # Drop null rows in all columns except country and year
-    tb_explorer = tb_explorer.dropna(how="all", subset=[x for x in tb_explorer.columns if x not in ["country", "year"]])
+    tb_explorer = tb_explorer.dropna(
+        how="all",
+        subset=[x for x in tb_explorer.columns if x not in ["country", "year"]],
+    )
 
     # Verify index and sort
-    tb_explorer = tb_explorer.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_explorer = tb_explorer.set_index(
+        ["country", "year"], verify_integrity=True
+    ).sort_index()
 
     # Create explorer dataset with merged table in csv format
     ds_explorer = create_dataset(dest_dir, tables=[tb_explorer], formats=["csv"])
