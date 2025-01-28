@@ -541,6 +541,8 @@ tables:
           name: Total price including taxes
         presentation:
           title_public: Electricity prices for households, including taxes
+          grapher_config:
+            note: &foonote-different-prices Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
         description_key:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
@@ -552,6 +554,8 @@ tables:
           name: Total price including taxes
         presentation:
           title_public: Electricity prices for non-households, including taxes
+          grapher_config:
+            note: *foonote-different-prices
         description_key:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
@@ -563,6 +567,8 @@ tables:
           name: Total price including taxes
         presentation:
           title_public: Gas prices for households, including taxes
+          grapher_config:
+            note: *foonote-different-prices
         description_key:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_gas_component_total_price_including_taxes}"
@@ -574,6 +580,8 @@ tables:
           name: Total price including taxes
         presentation:
           title_public: Gas prices for non-households, including taxes
+          grapher_config:
+            note: *foonote-different-prices
         description_key:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_gas_component_total_price_including_taxes}"
@@ -1073,6 +1081,8 @@ tables:
         presentation:
           title_public: Electricity prices (PPS) for households, including taxes
           title_variant: PPS
+          grapher_config:
+            note: *foonote-different-prices
         description_key:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
@@ -1085,6 +1095,8 @@ tables:
         presentation:
           title_public: Electricity prices (PPS) for non-households, including taxes
           title_variant: PPS
+          grapher_config:
+            note: *foonote-different-prices
         description_key:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
@@ -1097,6 +1109,8 @@ tables:
         presentation:
           title_public: Gas prices (PPS) for households, including taxes
           title_variant: PPS
+          grapher_config:
+            note: *foonote-different-prices
         description_key:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_gas_component_total_price_including_taxes}"
@@ -1109,6 +1123,8 @@ tables:
         presentation:
           title_public: Gas prices (PPS) for non-households, including taxes
           title_variant: PPS
+          grapher_config:
+            note: *foonote-different-prices
         description_key:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_gas_component_total_price_including_taxes}"
