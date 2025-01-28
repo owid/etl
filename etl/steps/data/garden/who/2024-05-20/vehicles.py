@@ -7,33 +7,20 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    ds_meadow = paths.load_dataset("vehicles")
+    ds_gho = paths.load_dataset("gho")
+    tb_gho = ds_gho.read("number_of_registered_vehicles").loc[:, ["country", "year", "number_of_registered_vehicles"]]
+
     ds_population = paths.load_dataset("population")
+    tb_population = ds_population.read("population").loc[:, ["country", "year", "population"]]
+
     # Create and add table
-    table = make_table(ds_population)
+    table = make_combined(tb_gho, tb_population)
 
     # Set an appropriate index and sort conveniently
     tb = table.format(["country", "year"], sort_columns=True)
 
-    ds = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds = create_dataset(dest_dir, tables=[tb])
     ds.save()
-
-
-def make_table(ds_population: Dataset) -> Table:
-    # Load WHO GHO data
-    table_gho = load_gho()
-    # Load population data
-    tb_population = ds_population["population"].reset_index()
-    tb_population = tb_population[["country", "year", "population"]]
-    # Combine sources
-    table = make_combined(table_gho, tb_population)
-    return table
-
-
-def load_gho() -> Table:
-    gho = catalog.find_latest(dataset="gho", table="number_of_registered_vehicles").reset_index()
-    gho = gho[["country", "year", "number_of_registered_vehicles"]]
-    return gho
 
 
 def make_combined(table_gho: Table, table_population: Table) -> Table:
@@ -48,5 +35,8 @@ def make_combined(table_gho: Table, table_population: Table) -> Table:
         ),
     )
     # Filter columns and drop NA values
-    table = table[["registered_vehicles_per_thousand"]].dropna(subset=["registered_vehicles_per_thousand"], how="all")
+    table = table.loc[:, ["registered_vehicles_per_thousand"]].dropna(
+        subset=["registered_vehicles_per_thousand"], how="all"
+    )
+    table.m.short_name = "vehicles"
     return table.reset_index()
