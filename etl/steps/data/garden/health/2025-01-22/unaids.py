@@ -967,7 +967,7 @@ def _debug_highlight_none(tb, indicator_name, column):
     )
     condition = tb[column].isna()
     x = x.style.apply(highlight_row, condition=condition, axis=1)
-    display(x)
+    # display(x)
 
 
 def safe_replace_NAs(tb, set_map, dimension, value):
