@@ -1,5 +1,4 @@
-from owid import catalog
-from owid.catalog import Dataset, Table, Variable
+from owid.catalog import Table, Variable
 
 from etl.helpers import PathFinder, create_dataset
 
