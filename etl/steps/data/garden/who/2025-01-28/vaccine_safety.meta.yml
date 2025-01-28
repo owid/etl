@@ -1,0 +1,47 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+    unit: ""
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  vaccine_safety:
+    variables:
+      burial_recommended:
+        title: Is burial a recommended practice for disposal of immunization waste?
+      burning_recommended:
+        title: Is burning in open containers a recommended practice for disposal of immunization waste?
+      encapsulation_recommended:
+        title: Is encapsulation a recommended practice for disposal of immunization waste?
+      engineered_sanitary_landfill_recommended:
+        title: Is engineered sanitary landfill a recommended practice for disposal of immunization waste?
+      incineration_recommended:
+        title: Is incineration a recommended practice for disposal of immunization waste?
+      inertization_recommended:
+        title: Is inertization a recommended practice for disposal of immunization waste?
+      national_policy_waste:
+        title: Does the country have a national policy for the disposal of immunization waste?
+      national_system_monitor_adverse_events:
+        title: Does the country have a national system to monitor adverse events following immunization?
+      other_recommended_practices:
+        title: Are there other recommended practices for disposal of immunization waste?
+      recycling_recommended:
+        title: Is recycling a recommended practice for disposal of immunization waste?
+      serious_adverse_events:
+        title: How many serious adverse events were reported to the national level?
+        unit: adverse events
+      source_data_serious_adverse_events:
+        title: What is the source of data for the total number of serious adverse events reported?
+      source_data_total_adverse_events:
+        title: What is the source of data for the total number of adverse events reported?
+      total_adverse_events_reported:
+        title: "How many total adverse events, including suspected or confirmed, were reported to the national level?"
+      vaccine_adverse_events_review_committee:
+        title: Does the country have a vaccine adverse events review committee?

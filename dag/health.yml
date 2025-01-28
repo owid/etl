@@ -941,3 +941,13 @@ steps:
     - data://meadow/who/2025-01-17/mortality_database_vaccine_preventable
   data://grapher/who/2025-01-17/mortality_database_vaccine_preventable:
     - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/who/2025-01-28/vaccine_safety:
+    - snapshot://who/2025-01-28/vaccine_safety.xlsx
+  data://garden/who/2025-01-28/vaccine_safety:
+    - data://meadow/who/2025-01-28/vaccine_safety
+  data://grapher/who/2025-01-28/vaccine_safety:
+    - data://garden/who/2025-01-28/vaccine_safety
