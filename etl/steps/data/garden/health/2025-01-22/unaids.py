@@ -203,7 +203,6 @@ def run(dest_dir: str) -> None:
     def pivot_and_format(tb, columns, short_name):
         # 1/ Save some fields (this might be useful later)
         tb_meta = tb[["indicator", "indicator_description", "unit"]].drop_duplicates()
-        tb_meta["indicator"] = tb_meta["indicator"]
         assert (
             not tb_meta[["indicator", "indicator_description"]].duplicated().any()
         ), "Multiple descriptions or units for a single indicator!"
@@ -231,6 +230,13 @@ def run(dest_dir: str) -> None:
         pivot_and_format(tb_no_age, ["country", "year", "sex", "group"], "gam_sex_group"),
         pivot_and_format(tb_no_dim, ["country", "year"], "gam"),
     ]
+
+    tbx = tb_no_dim
+    tb_meta = tbx[["indicator", "indicator_description", "unit"]].drop_duplicates()
+    for _, row in tb_meta.iterrows():
+        print(
+            f"{row.indicator}:\n\ttitle: {row.indicator_description}\n\tunit: {row['unit']}\n\tdescription_short: ''\n\tdescription_from_producer: ''"
+        )
 
     ####################
     # tbx = tb.groupby("indicator", as_index=False).agg(
@@ -333,7 +339,6 @@ def make_table_epi(tb, dimensions):
 
     # Save some fields (this might be useful later)
     tb_meta = tb[["indicator", "indicator_description", "unit"]].drop_duplicates()
-    tb_meta["indicator"] = tb_meta["indicator"]
     assert not tb_meta["indicator"].duplicated().any(), "Multiple descriptions or units for a single indicator!"
 
     # Harmonize

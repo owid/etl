@@ -520,3 +520,171 @@ tables:
         presentation:
           title_public: "Change (%) in AIDS-related infections since 2010"
           title_variant: ""
+
+  gam:
+    variables:
+      new_relapse_tb_cases:
+        title: Total new and relapse TB cases
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      notified_tb_cases:
+        title: Total notified TB cases
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      expenditure_tb_hiv_activities:
+        title: Expenditure on collaborative TB/HIV activities
+        unit: USD
+        description_short: ""
+        description_from_producer: ""
+      tb_expenditure:
+        title: Total TB expenditure
+        unit: USD
+        description_short: ""
+        description_from_producer: ""
+      tb_patients_documented_hiv_status:
+        title: Proportion of registered new and relapse TB patients with documented HIV status
+        unit: PERCENT
+        description_short: ""
+        description_from_producer: ""
+      hiv_tb_patients_receiving_art:
+        title: TB patients living with HIV receiving ART
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      hiv_tb_patients_receiving_cpt:
+        title: TB patients living with HIV receiving CPT
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      hiv_tb_patients_under_ipt:
+        title: People living with HIV newly enrolled in HIV treatment started on isoniazid preventive therapy (IPT)
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      tb_patients_tested_positive_hiv:
+        title: TB patients tested positive for HIV
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      tb_patients_documented_hiv_positive_status:
+        title: Proportion of registered new and relapse TB patients with documented HIV-positive status
+        unit: PERCENT
+        description_short: ""
+        description_from_producer: ""
+      pwid_needles:
+        title: Needles and syringes distributed per person who inject drugs
+        unit: RATE
+        description_short: ""
+        description_from_producer: ""
+      hiv_care:
+        title: People newly enrolled in HIV treatment
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      newly_enrolled_care:
+        title: Adults and children newly enrolled in HIV treatment during the year (10.3 denominator)
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      plhiv_receiving_tb_preventive_therapy:
+        title: Proportion of people living with HIV newly enrolled in HIV treatment started on TB preventive therapy
+        unit: PERCENT
+        description_short: ""
+        description_from_producer: ""
+      hiv_tb_diagnosis:
+        title: People newly enrolled in HIV treatment diagnosed as having TB during the reporting period
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      plhiv_in_care_with_active_tb:
+        title: Proportion of people living with HIV newly enrolled in HIV treatment with active tuberculosis (TB) disease
+        unit: PERCENT
+        description_short: ""
+        description_from_producer: ""
+      prisoners_tb:
+        title: Tuberculosis (TB) infection among prisoners
+        unit: PERCENT
+        description_short: ""
+        description_from_producer: ""
+      prisoners_ost:
+        title: Prisoners receiving opioid substitution therapy
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      num_art_init_tpt:
+        title: Number of people on antiretroviral treatment who initiated any course of TPT during the previous year
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      plhiv_current_tb_preventative:
+        title: Proportion of people living with HIV currently enrolled in HIV treatment receiving TB preventive therapy
+        unit: PERCENT
+        description_short: ""
+        description_from_producer: ""
+      people_on_prep:
+        title: People receiving pre-exposure prophylaxis (PrEP)
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      resource_needs_ft:
+        title: Estimated resource needs
+        unit: CONSTANT_USD
+        description_short: ""
+        description_from_producer: ""
+      plhiv_current_enrolled:
+        title: People currently enrolled in HIV treatment
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      plhiv_current_treatment_tb:
+        title: People living with HIV currently enrolled in HIV treatment who start treatment for latent TB infection during the reporting period
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      people_art_elig_tpt:
+        title: People on ART who were eligible for TB preventive treatment (TPT)
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      people_art_elig_tpt_strt:
+        title: People on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      prop_art_tpt_start:
+        title: Proportion of people on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      denied_services_hiv_status:
+        title: Discrimination in healthcare settings
+        unit: PERCENT
+        description_short: ""
+        description_from_producer: ""
+      per_tpt_art_cmplt:
+        title: Percentage of people living with HIV initiating TB preventive treatment (TPT) and on antiretroviral therapy who completed a course of TPT
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      num_art_complt_tpt:
+        title: Number of people on antiretroviral treatment who completed TPT among those who initiated any course of TPT during the previous year
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      people_new_art_elig_tpt_strt:
+        title: People newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      prop_new_art_tpt_strt:
+        title: Proportion of people newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
+      pwid_needles_distributed:
+        title: Clean needles distributed to prisoners
+        unit: NUMBER
+        description_short: ""
+        description_from_producer: ""
