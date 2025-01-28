@@ -34,7 +34,7 @@ definitions:
   description_key_gas_component_taxes_fees_levies_and_charges: &description_key_gas_component_taxes_fees_levies_and_charges |-
     "Taxes, fees, levies, and charges" include value-added tax (VAT), renewable taxes, capacity taxes, environmental taxes, and all other taxes, fees, levies, or charges.
   description_key_gas_component_vat: &description_key_gas_component_vat |-
-    "Value-added tax (VAT)" is a consumption tax applied to the final price of gas or electricity, as defined in Council Directive 2006/112/EC.
+    "Value-added tax (VAT)" is a consumption tax applied to the final price paid by consumers. It is charged as a percentage of the total cost, including any other taxes or fees.
   description_key_gas_component_renewable_taxes: &description_key_gas_component_renewable_taxes |-
     "Renewable taxes" are taxes, fees, levies, or charges that promote renewable energy sources, energy efficiency, and combined heat and power (CHP) generation.
   description_key_gas_component_capacity_taxes: |-
