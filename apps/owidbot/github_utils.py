@@ -193,15 +193,15 @@ def get_git_branch_from_commit_sha(commit_sha: str) -> str:
         raise ValueError(f"No closed pull requests found for commit {commit_sha}")
 
 
-def get_prs_from_repo(repo: str) -> list[dict]:
-    active_prs = []
+def get_prs_from_repo(repo_name: str) -> list[dict]:
     # Start with the first page
-    url = f"https://api.github.com/repos/owid/{repo}/pulls?per_page=100"
+    url = f"https://api.github.com/repos/owid/{repo_name}/pulls?per_page=100"
     if config.OWIDBOT_ACCESS_TOKEN:
         headers = {"Authorization": f"token {config.OWIDBOT_ACCESS_TOKEN}"}
     else:
         headers = {}
 
+    active_prs = []
     while url:
         response = requests.get(url, headers=headers)
         response.raise_for_status()  # To handle HTTP errors
