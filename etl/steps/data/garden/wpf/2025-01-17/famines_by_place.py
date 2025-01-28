@@ -59,20 +59,24 @@ def run(dest_dir: str) -> None:
     ]
 
     # Separate main countries and others
-    tb_main = tb[tb["country"].isin(main_countries)]
-    tb_other = tb[~tb["country"].isin(main_countries)]
-    tb_main["country"] = tb_main["country"].replace(
-        {
-            "Russia": "USSR/Russia",
-            "Ukraine": "USSR/Russia",
-            "Russia, Ukraine": "USSR/Russia",
-            "Germany, USSR": "USSR/Russia",
-            "Moldova, Ukraine, Russia, Belarus": "USSR/Russia",
-            "Russia, Western Soviet States": "USSR/Russia",
-            "Russia, Kazakhstan": "USSR/Russia",
-            "USSR": "USSR/Russia",
-            "India, Bangladesh": "India",
-        }
+    tb_main = tb[tb["country"].isin(main_countries)].copy()
+    tb_other = tb[~tb["country"].isin(main_countries)].copy()
+    tb_main["country"] = (
+        tb_main["country"]
+        .astype(str)
+        .replace(
+            {
+                "Russia": "USSR/Russia",
+                "Ukraine": "USSR/Russia",
+                "Russia, Ukraine": "USSR/Russia",
+                "Germany, USSR": "USSR/Russia",
+                "Moldova, Ukraine, Russia, Belarus": "USSR/Russia",
+                "Russia, Western Soviet States": "USSR/Russia",
+                "Russia, Kazakhstan": "USSR/Russia",
+                "USSR": "USSR/Russia",
+                "India, Bangladesh": "India",
+            }
+        )
     )
 
     # Sum deaths for other countries by year

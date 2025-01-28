@@ -191,7 +191,7 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
     """
 
     # Replace 'former Sudan' with 'Sudan' in the 'country' column of tb_gdp
-    tb_gdp["country"] = tb_gdp["country"].replace("Former Sudan", "Sudan")
+    tb_gdp["country"] = tb_gdp["country"].astype(str).replace("Former Sudan", "Sudan")
 
     tb = pr.merge(tb, tb_gdp, on=["country", "year"], how="left")
 
