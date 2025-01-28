@@ -423,24 +423,24 @@ epi:
     estimate: low
 
 gam:
-  0_14:
+  "0_14":
     sex: total
     age: 0-14
-  10_14:
+  "10_14":
     age: 10-14
-  15_19:
+  "15_19":
     age: 15-19
-  15_49:
+  "15_49":
     age: 15-49
-  1_9:
+  "1_9":
     age: 1-9
-  20_24:
+  "20_24":
     age: 20-24
-  25_49:
+  "25_49":
     age: 25-49
   25_AND_UP:
     age: 25+
-  30_49:
+  "30_49":
     age: 30-49
   50_AND_UP:
     age: 50+
@@ -451,6 +451,7 @@ gam:
   ALL_SEXES_15_24_ALL_QUESTIONS:
     age: 15-24
     sex: total
+    group: all questions
   ALL_SEXES_15_49:
     sex: "total"
     age: "15-49"
@@ -622,15 +623,19 @@ gam:
   MALES_15_19_NO_ALL_QUESTIONS:
     sex: "male"
     age: "15-19"
+    group: "all questions"
   MALES_15_19_NO_QUESTION_1:
     sex: "male"
     age: "15-19"
+    group: "question 1"
   MALES_15_19_NO_QUESTION_2:
     sex: "male"
     age: "15-19"
+    group: "question 2"
   MALES_15_24_ALL_QUESTIONS:
     sex: "male"
     age: "15-24"
+    group: "all questions"
   MALES_15_49:
     sex: "male"
     age: "15-49"
@@ -640,13 +645,15 @@ gam:
   MALES_20_24_NO_ALL_QUESTIONS:
     sex: "male"
     age: "20-24"
+    group: "all questions"
   MALES_20_24_NO_QUESTION_1:
     sex: "male"
     age: "20-24"
+    group: "question 1"
   MALES_20_24_NO_QUESTION_2:
     sex: "male"
     age: "20-24"
-    group: ""
+    group: "question 2"
   MALES_25_49:
     sex: "male"
     age: "25-49"
