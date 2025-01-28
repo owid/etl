@@ -68,11 +68,11 @@ REFERENCE_YEARS = [
     },
     {
         1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2023: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+        2023: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
     },
     {
         1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2023: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+        2023: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
     },
 ]
 
