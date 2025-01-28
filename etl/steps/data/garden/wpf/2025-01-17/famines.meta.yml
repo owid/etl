@@ -34,11 +34,10 @@ tables:
        principal_cause:
         title: Principal cause
         unit: ''
-        description_from_producer: |-
-          Famine causes are classified into four main triggers: climatic adversity, government policies, armed conflict, and genocide. These simplified categories, drawn from academic research, often overlap with political and economic factors. For example, the El Niño famines of the late 19th century were worsened by imperial conquest, while the 1984–85 Sudan famine, triggered by drought, was intensified by an exploitative political system.
-
-          Some cases are difficult to classify. The 1932–33 Holodomor famine in Ukraine is debated, with some attributing it to Stalin’s genocidal intent and others to poor policies. It is classified here as "genocide." Similarly, the Darfur crisis (2003–05) is widely recognized as genocide, while the Tigray famine (2020–22) is currently labeled "armed conflict" pending further research.
-
-          The concept of "famine crimes," where hunger is intentionally used as a weapon, is also included in the dataset. These cases highlight the deliberate nature of some famines and their devastating consequences.
-
-          As a living document, the catalogue evolves with new data and expert input, aiming to refine its classifications and analyses to reflect the latest research.
+        description_key:
+        - Famines were classified into four main triggers - adverse climate, government policies, armed conflict, or genocide - though in reality, multiple factors, especially human decisions, almost always play a significant role in their development and severity.
+        - Historical examples demonstrate this complexity, such as when El Niño-related famines in the late 19th century were made worse by imperial conquest, and when the 1984-85 Sudan famine, initially triggered by drought, was intensified by exploitative politics.
+        - The 1932-33 Ukrainian Holodomor is a subject of some controversy, with interpretations divided between Stalin’s genocidal intent and Soviet claims of unintentional policy failures; however, most scholars now classify it as genocide.
+        - The Darfur crisis (2003-2005) also faced initial controversy before achieving scholarly consensus as genocide.
+        - More recently, the Tigray famine (2020-2022) has been categorized as "armed conflict," though ongoing research may shift its classification.
+        - The classification system continues to evolve as new research emerges and experts provide additional insights.

@@ -739,6 +739,11 @@ steps:
   data://grapher/wpf/2025-01-17/famines_by_place:
     - data://garden/wpf/2025-01-17/famines_by_place
 
+  data://garden/wpf/2025-01-17/famines_by_trigger:
+    - data://garden/wpf/2025-01-17/famines
+  data://grapher/wpf/2025-01-17/famines_by_trigger:
+    - data://garden/wpf/2025-01-17/famines_by_trigger
+
   data-private://meadow/owid/latest/ig_countries:
     - snapshot-private://owid/latest/ig_countries.csv
   data-private://garden/owid/latest/ig_countries:

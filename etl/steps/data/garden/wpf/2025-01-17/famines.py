@@ -76,7 +76,7 @@ def run(dest_dir: str) -> None:
     tb["famine_name"] = tb["simplified_place"] + " " + tb["date_range"]
 
     # Rename the cause from natural calamity to climatic adversity (as suggested by the source)
-    tb["principal_cause"] = tb["principal_cause"].str.replace("Natural calamity", "Climatic adversity")
+    tb["principal_cause"] = tb["principal_cause"].str.replace("Natural calamity", "Adverse climate")
 
     # Add origins metadata to new columns.
     for col in [
