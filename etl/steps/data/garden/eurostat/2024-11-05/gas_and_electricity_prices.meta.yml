@@ -553,7 +553,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Electricity prices for non-households, including taxes
+          title_public: Electricity prices for non-household consumers, including taxes
           grapher_config:
             note: *foonote-different-prices
         description_key:
@@ -579,7 +579,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Gas prices for non-households, including taxes
+          title_public: Gas prices for non-household consumers, including taxes
           grapher_config:
             note: *foonote-different-prices
         description_key:
@@ -1093,7 +1093,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Electricity prices for non-households, including taxes
+          title_public: Electricity prices for non-household consumers, including taxes
           title_variant: PPS
           grapher_config:
             note: *foonote-different-prices
@@ -1121,7 +1121,7 @@ tables:
         display:
           name: Total price including taxes
         presentation:
-          title_public: Gas prices for non-households, including taxes
+          title_public: Gas prices for non-household consumers, including taxes
           title_variant: PPS
           grapher_config:
             note: *foonote-different-prices

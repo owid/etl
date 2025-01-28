@@ -66,7 +66,7 @@ def run(dest_dir: str) -> None:
             price_components.append("nuclear_taxes")
         for consumer in ["household", "non_household"]:
             for unit in ["euro", "pps"]:
-                title = f"{source.capitalize()} price components for {consumer.replace('_', '-')}s"
+                title = f"{source.capitalize()} price components for {consumer.replace('_', '-')} consumers"
                 indicators = [f"annual_{source}_{consumer}_{component}_{unit}" for component in price_components]
                 description_keys = list(
                     dict.fromkeys(sum([tb_annual[indicator].metadata.description_key for indicator in indicators], []))

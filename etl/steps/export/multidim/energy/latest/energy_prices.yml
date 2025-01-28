@@ -42,10 +42,10 @@ dimensions:
     choices:
       - slug: "household"
         name: "Households"
-        description: "Household consumers"
+        description: "Residential consumers using energy for domestic purposes like heating and lighting"
       - slug: "non_household"
         name: "Non-households"
-        description: "Non-household consumers"
+        description: "Commercial and industrial consumers, including services, offices, and agriculture"
       - slug: "all"
         name: "All consumers"
         description: "All consumers"
