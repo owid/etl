@@ -91,7 +91,7 @@ tables:
   gas_and_electricity_price_components_euro_flat:
     title: Gas and electricity price components in Europe
     common:
-      description_short: Price components are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries.
+      description_short: Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries.
       unit: 'current euros per megawatt-hour'
       short_unit: "€/MWh"
     variables:
@@ -582,7 +582,7 @@ tables:
   gas_and_electricity_price_components_pps_flat:
     title: Gas and electricity price components in Europe (PPS)
     common:
-      description_short: Price components are given in purchasing power standard (PPS) per [megawatt-hour](#dod:watt-hours).
+      description_short: Prices are given in purchasing power standard (PPS) per [megawatt-hour](#dod:watt-hours).
       unit: "purchasing power standard per megawatt-hour"
       short_unit: "PPS/MWh"
     variables:

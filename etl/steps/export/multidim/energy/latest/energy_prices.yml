@@ -23,59 +23,20 @@ dimensions:
       - slug: "gas"
         name: "Gas"
   - slug: "price_component"
-    name: "Price component"
+    name: "Price type"
     choices:
       - slug: "total_price_including_taxes"
-        name: "Total consumer price"
-        description: "Total consumer price including all taxes and levies"
-        group: Overview
+        name: "Consumer price"
+        description: "Consumer price including all taxes and levies"
+        group: Total price
       - slug: "wholesale"
         name: "Wholesale price"
         description: "Wholesale price"
-        group: Overview
-      - slug: "energy_and_supply"
-        name: "Energy and supply"
-        description: "Energy and supply"
-        group: Individual price components
-      - slug: "network_costs"
-        name: "Network costs"
-        description: "Network costs"
-        group: Individual price components
-      - slug: "capacity_taxes"
-        name: "Capacity taxes"
-        description: "Capacity taxes"
-        group: Individual price components
-      - slug: "value_added_tax_vat"
-        name: "Value added tax (VAT)"
-        description: "Value added tax (VAT)"
-        group: Individual price components
-      - slug: "environmental_taxes"
-        name: "Environmental taxes"
-        description: "Environmental taxes"
-        group: Individual price components
-      - slug: "nuclear_taxes"
-        name: "Nuclear taxes"
-        description: "Nuclear taxes"
-        group: Individual price components
-      - slug: "renewable_taxes"
-        name: "Renewable taxes"
-        description: "Renewable taxes"
-        group: Individual price components
-      - slug: "taxes_fees_levies_and_charges"
-        name: "All taxes, fees, levies and charges"
-        description: "All taxes, fees, levies and charges"
-        group: Individual price components
-      - slug: "other"
-        name: "Other costs"
-        description: "Other costs"
-        group: Individual price components
-      # Other available price components:
-      # 'capacity_taxes_allowances',
-      # 'environmental_taxes_allowance',
-      # 'nuclear_taxes_allowance',
-      # 'renewable_taxes_allowance',
-      # 'taxes_fees_levies_and_charges_allowance',
-      # 'other_allowance',
+        group: Total price
+      - slug: "consumer_price_components"
+        name: "Consumer price components"
+        description: "Consumer price separated in its individual components"
+        group: Price components disaggregated
   - slug: "consumer"
     name: "Consumer type"
     choices:
