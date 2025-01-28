@@ -81,7 +81,7 @@ def run(dest_dir: str) -> None:
     # Load dataset and table
     ds_pov_ineq = paths.load_dataset("poverty_inequality_file")
     ds_population = paths.load_dataset("population")
-    ds_regions = paths.load_dataset("regions")
+    # ds_regions = paths.load_dataset("regions")
     ds_pip = paths.load_dataset("world_bank_pip")
     ds_wid = paths.load_dataset("world_inequality_database")
     ds_lis = paths.load_dataset("luxembourg_income_study")
