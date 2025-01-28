@@ -2,6 +2,8 @@
 
 import re
 
+from owid.catalog import Table
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -14,7 +16,6 @@ NAMES = {
     "India": "India",
     "Brazil": "Brazil",
     "Congo Free State (Democratic Republic of Congo)": "Congo Free State",
-    "Sudan and Ethiopia": "Sudan, Ethiopia",
     "Russia": "Russia",
     "Ottoman Empire (Turkey)": "Ottoman Empire",
     "Cuba": "Cuba",
@@ -30,12 +31,10 @@ NAMES = {
     "Ottoman Empire (Turkey, Armenians)": "Ottoman Empire",
     "Austria-Hungary (Poland)": "Poland",
     "Greater Syria": "Greater Syria",
-    "Russia and Ukraine": "Russia, Ukraine",
     "Germany": "Germany",
     "Persia": "Persia",
     "Armenia": "Armenia",
     "USSR (Ukraine)": "Ukraine",
-    "USSR (Russia, Kazakhstan)": "Russia, Kazakhstan",
     "Germany/USSR": "Germany, USSR",
     "USSR (Russia)": "Russia",
     "USSR (Russia and Western Soviet States)": "USSR",
@@ -65,6 +64,7 @@ NAMES = {
     "Nigeria": "Nigeria",
     "Yemen": "Yemen",
     "CAR": "Central African Republic",
+    "USSR (southern Russia & Ukraine)": "USSR (Southern Russia & Ukraine)",
 }
 
 
@@ -81,13 +81,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Find the index of the specific entry where summary table by cause is provided in the 'Unnamed: 0' column
-    # trigger_index = tb[
-    #    tb["Unnamed: 0"] == "Number of famines in which the following factor was a trigger cause, among others:"
-    # ].index[0]
-
-    # Select all rows up to that index
-    # tb = tb.iloc[:trigger_index]
 
     columns = [
         "Date_unify",
@@ -104,7 +97,6 @@ def run(dest_dir: str) -> None:
 
     # Ensure the 'Date' column is treated as a string
     tb["Date"] = tb["Date"].astype(str)
-    tb["Principal Cause"] = tb["Principal Cause"].astype(str)
 
     # Clean the 'Date' column
     tb["Date"] = tb["Date"].apply(clean_and_expand_years)
@@ -129,13 +121,18 @@ def run(dest_dir: str) -> None:
         axis=1,
     )
 
-    # Combine famines for the African Red Sea Region and Hungerplan as the mortality estimate exists for just the total rather than each entry
+    # Combine famines for the African Red Sea Region as the mortality estimate exists for just the total rather than each entry
     tb = combine_entries(tb)
 
     # Drop the 'Sub region' column as it's no longer needed
     tb = tb.drop(columns=["Sub region"])
 
     tb = tb.rename(columns={"Place": "country"})
+
+    # Ensure there are no NaNs in the mortality estimates
+    assert (
+        not tb["WPF authoritative mortality estimate"].isna().any()
+    ), "There are NaN values in the mortality estimates"
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["date", "simplified_place"])
@@ -176,19 +173,19 @@ def clean_and_expand_years(year):
     return year
 
 
-def combine_entries(df):
+def combine_entries(tb: Table) -> Table:
     """
-    Combine multiple entries in the DataFrame into a single entry.
+    Combine famines for the African Red Sea Region as the mortality estimate exists for just the total rather than each entry.
     """
-    # Filter rows to combine the Haraame Cune ("the years of eating the unclean") and African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, Djibouti)) as the mortality estimate only exists for the total
+    # Filter rows to combine British Somaliland and African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, Djibouti) as the mortality estimate only exists for the total
     famines = ["British Somaliland", "African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, Djibouti)"]
+    rows_to_combine = tb[tb["Place"].apply(lambda x: any(sub in x for sub in famines))]
 
-    # Filter rows to combine
-    rows_to_combine = df[df["Place"].apply(lambda x: any(sub in x for sub in famines))]
-
-    # Combine dates and causes
+    # Combine dates and principle causes
     combined_dates = ",".join(rows_to_combine["Date"].unique())
-    combined_cause = ",".join(rows_to_combine["Principal Cause"])
+
+    # Filter out NaN values and join the remaining strings
+    combined_cause = ",".join(rows_to_combine["Principal Cause"].dropna())
 
     # Calculate the sum of the 'WPF authoritative mortality estimate' column
     mortality_estimate = rows_to_combine["WPF authoritative mortality estimate"].sum()
@@ -203,7 +200,7 @@ def combine_entries(df):
     }
 
     # Add new combined entry
-    df = df._append(new_entry, ignore_index=True)
-    df = df.drop(rows_to_combine.index)
+    tb = tb._append(new_entry, ignore_index=True)
+    tb = tb.drop(rows_to_combine.index)
 
-    return df
+    return tb

@@ -57,10 +57,6 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    # Replace "USSR (southern Russia & Ukraine)" with "USSR (Southern Russia & Ukraine)"
-    tb["simplified_place"] = tb["simplified_place"].replace(
-        "USSR (southern Russia & Ukraine)", "USSR (Southern Russia & Ukraine)"
-    )
 
     # Add regions to the table.
     tb = add_regions(tb, ds_regions)

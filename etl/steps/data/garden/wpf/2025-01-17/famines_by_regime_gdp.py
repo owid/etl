@@ -80,15 +80,10 @@ def run(dest_dir: str) -> None:
     # Add GDP data.
     tb = add_gdp(tb, tb_gdp)
 
-    # Extract the text before the year from the famine_name column
-    tb["country_name"] = tb["famine_name"].apply(lambda x: re.split(r"\s+\d{4}", x)[0])
-
-    # Remove (Hungerplan) from famine_name
-    tb["country_name"] = tb["country_name"].str.replace(r"\s*\(Hungerplan\)", "", regex=True)
+    #  Add midpoint date for Bastian and code democracy as 1 and autocracy as 0
     tb["midpoint_year"] = tb["famine_name"].apply(extract_years)
 
     tb["regime_redux_row_owid"] = tb["regime_redux_row_owid"].replace({3: 0, 2: 1})
-
     # Drop unused in this dataset columns columns.
     tb = tb.format(["famine_name", "year"])
 
@@ -217,6 +212,7 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
         {"country": "Iran", "years": [1917, 1918, 1919], "ref_year": 1913},
         {"country": "Turkey, Armenians", "years": [1915, 1916], "year_range": [1913, 1918]},
         {"country": "Vietnam", "years": [1944, 1945], "ref_year": 1950},
+        {"country": "Indonesia", "years": [1942, 1946], "ref_year": 1941},
     ]
 
     # Apply replacement rules
@@ -229,21 +225,22 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
             gdp_value = calculate_average_gdp(tb_gdp, rule["country"], rule["year_range"])
         replace_gdp(tb, tb_gdp, rule["country"], rule["years"], gdp_value)
 
-    # Special cases for multiple countries
+    # Special cases for USSR
     special_cases = {
-        "Russia, Kazakhstan": [1932, 1933, 1934],
+        "Kazakhstan": [1931, 1932, 1933],
         "Russia, Ukraine": [1915, 1916, 1917, 1918, 1919, 1920, 1921, 1922],
         "Russia, Western Soviet States": [1941, 1942, 1943, 1944],
-        "Moldova, Ukraine, Russia, Belarus": [1946, 1947],
-        "Ukraine": [1931, 1932, 1933, 1934, 1941, 1942, 1943, 1944, 1945, 1946, 1947],
+        "Ukraine": [1931, 1932, 1933],
     }
 
     for countries, years in special_cases.items():
         for year in years:
-            if year in [1941, 1942, 1943, 1944, 1945]:
-                gdp_value = calculate_average_gdp(tb_gdp, "USSR", [1940, 1946])
-            elif year in [1915, 1916, 1917, 1918, 1919, 1920, 1921, 1922]:
+            if year in range(1915, 1923):
                 gdp_value = calculate_average_gdp(tb_gdp, "Russia", [1915, 1922])
+            elif year in range(1941, 1945):
+                gdp_value = calculate_average_gdp(tb_gdp, "USSR", [1941, 1944])
+            elif year in range(1931, 1934):
+                gdp_value = calculate_average_gdp(tb_gdp, "USSR", [1931, 1933])
             else:
                 gdp_value = tb_gdp[(tb_gdp["country"] == "USSR") & (tb_gdp["year"] == year)]["gdp_per_capita"].values[0]
             replace_gdp(tb, tb_gdp, countries, [year], gdp_value)

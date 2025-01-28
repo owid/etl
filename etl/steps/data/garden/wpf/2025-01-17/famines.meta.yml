@@ -24,11 +24,19 @@ tables:
        wpf_authoritative_mortality_estimate:
           title: Deaths from famines
           unit: 'deaths'
-          short_unit: ''
+          description_short: Deaths in famines that are estimated to have killed 100,000 people or more.
           display:
             numDecimalPlaces: 0
 
        principal_cause:
         title: Principal cause
         unit: ''
+        description_from_producer: |-
+          The authors classify famine causes into four main triggers: climatic adversity, government policies, armed conflict, and genocide. These categories simplify complex events and are drawn from academic research, though they don’t capture every detail or relationship between causes. For example, climatic adversity often includes political or economic elements. The El Niño famines of the late 19th century were triggered by drought, but imperial conquest worsened the suffering. Similarly, the 1984-85 famine in Sudan began with drought but was intensified by an exploitative political system.
+
+          Some cases are harder to classify. The 1932-33 Holodomor famine in Ukraine is debated: some see it as Stalin’s genocide, while others blame poor policies without genocidal intent. The authors lean toward “genocide.” More recent debates include the Darfur crisis (2003-05) and the Tigray famine (2020-22). Darfur is widely seen as genocide, while Tigray needs further study, so it is labeled as “armed conflict.”
+
+          The dataset also incorporates the concept of “famine crimes,” where hunger is deliberately used as a tool of harm. These cases are controversial but underscore the gravity of intentional acts.
+
+          This catalogue is a living document, designed to adapt with expert input and updates to its data and analysis.
 

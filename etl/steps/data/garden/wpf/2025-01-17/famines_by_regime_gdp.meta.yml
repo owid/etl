@@ -40,6 +40,6 @@ tables:
           unit: ''
           description_processing: The midpoint year of the famine is the year halfway between the start and end of the famine.
 
-       country_name:
+       country:
           title: Country
           unit: ''

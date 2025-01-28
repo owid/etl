@@ -26,7 +26,7 @@ def run(dest_dir: str) -> None:
 
     tb = tb.drop(columns={"country"})
 
-    tb = tb.rename({"famine_name": "country"}, axis=1)
+    tb = tb.rename({"famine_name": "country", "country": "country_name"}, axis=1)
 
     # Keep the first year for each famine (country)
     tb = tb.sort_values(by="year").drop_duplicates(subset="country", keep="first")

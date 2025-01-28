@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Drop rows where the Chinese famine is not broken down by year
+    # Drop rows where the Chinese famine is not broken down by year (used for other datasets but for this one we need the breakdown)
     famine_names_to_drop = ["China 1958-1962"]
     tb = tb[~tb["famine_name"].isin(famine_names_to_drop)]
     tb = tb.drop(columns=["famine_name"])
