@@ -71,6 +71,10 @@ def run(dest_dir: str) -> None:
                 description_keys = list(
                     dict.fromkeys(sum([tb_annual[indicator].metadata.description_key for indicator in indicators], []))
                 )
+                # Include an additional key description to clarify why some components can be negative.
+                description_keys += [
+                    'Some price components can be negative. For example, a negative "All other taxes" component may occur when governments introduce compensation measures during periods of high electricity prices to reduce costs for consumers.'
+                ]
                 if unit == "euro":
                     subtitle = "Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries."
                     title_variant = None

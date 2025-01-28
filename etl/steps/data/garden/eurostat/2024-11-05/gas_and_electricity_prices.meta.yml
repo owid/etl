@@ -40,7 +40,7 @@ definitions:
   description_key_gas_component_capacity_taxes: |-
     "Capacity taxes" are charges related to maintaining energy security and the gas distribution system. They include taxes or fees for strategic gas stockpiles, payments to ensure sufficient supply capacity, costs for supporting energy regulatory authorities or system operators, and levies to cover past infrastructure investments (stranded costs).
   description_key_gas_component_environmental_taxes: &description_key_gas_component_environmental_taxes |-
-    "Environmental taxes" are charges aimed at addressing environmental concerns, such as improving air quality and reducing greenhouse gas emissions (e.g., CO₂ taxes). This category also includes excise duties—specific taxes applied to goods or activities like fuels and energy use, which contribute to environmental impacts.
+    "Environmental taxes" are charges designed to help protect the environment, such as improving air quality and reducing greenhouse gas emissions (e.g., CO₂ taxes).
   description_key_gas_component_other_taxes: &description_key_gas_component_other_taxes |-
     "All other taxes" include fees, levies, or charges not covered by other tax components. They may relate to district heating support, local or regional fiscal charges, island compensation, concession fees for licenses, or fees for occupying land or property with networks or other devices.
   description_key_gas_component_total_price_including_taxes: &description_key_gas_component_total_price_including_taxes |-
@@ -55,7 +55,7 @@ definitions:
   description_key_electricity_component_environmental_taxes: *description_key_gas_component_environmental_taxes
   description_key_electricity_component_other_taxes: *description_key_gas_component_other_taxes
   description_key_electricity_component_nuclear_taxes: |-
-    "Nuclear taxes" are charges related to the nuclear sector, including decommissioning, inspections, and fees for nuclear installations.
+    "Nuclear taxes" are charges associated with the nuclear sector, including fees for decommissioning, safety inspections, and nuclear installation maintenance.
   description_key_electricity_component_total_price_including_taxes: *description_key_gas_component_total_price_including_taxes
   description_key_electricity_component_taxes_fees_levies_and_charges: *description_key_gas_component_taxes_fees_levies_and_charges
   # Definitions of price levels:
@@ -241,7 +241,7 @@ tables:
       electricity_household_other_euro:
         title: Electricity price component (euros) for household consumers - Other
         display:
-          name: Other
+          name: All other taxes
         presentation:
           title_public: Electricity price component for household consumers - Other
         description_key:
@@ -252,7 +252,7 @@ tables:
       electricity_non_household_other_euro:
         title: Electricity price component (euros) for non-household consumers - Other
         display:
-          name: Other
+          name: All other taxes
         presentation:
           title_public: Electricity price component for non-household consumers - Other
         description_key:
@@ -395,7 +395,7 @@ tables:
       gas_household_other_euro:
         title: Gas price component (euros) for household consumers - Other
         display:
-          name: Other
+          name: All other taxes
         presentation:
           title_public: Gas price component for household consumers - Other
         description_key:
@@ -483,7 +483,7 @@ tables:
       gas_non_household_other_euro:
         title: Gas price component (euros) for non-household consumers - Other
         display:
-          name: Other
+          name: All other taxes
         presentation:
           title_public: Gas price component for non-household consumers - Other
         description_key:
@@ -753,7 +753,7 @@ tables:
       electricity_household_other_pps:
         title: Electricity price component (PPS) for household consumers - Other
         display:
-          name: Other
+          name: All other taxes
         presentation:
           title_public: Electricity price component for household consumers - Other
           title_variant: PPS
@@ -765,7 +765,7 @@ tables:
       electricity_non_household_other_pps:
         title: Electricity price component (PPS) for non-household consumers - Other
         display:
-          name: Other
+          name: All other taxes
         presentation:
           title_public: Electricity price component for non-household consumers - Other
           title_variant: PPS
@@ -921,7 +921,7 @@ tables:
       gas_household_other_pps:
         title: Gas price component (PPS) for household consumers - Other
         display:
-          name: Other
+          name: All other taxes
         presentation:
           title_public: Gas price component for household consumers - Other
           title_variant: PPS
@@ -1017,7 +1017,7 @@ tables:
       gas_non_household_other_pps:
         title: Gas price component (PPS) for non-household consumers - Other
         display:
-          name: Other
+          name: All other taxes
         presentation:
           title_public: Gas price component for non-household consumers - Other
           title_variant: PPS
