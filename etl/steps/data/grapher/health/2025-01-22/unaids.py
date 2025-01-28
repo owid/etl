@@ -16,7 +16,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tables = list(ds_garden)
+    tables = [
+        ds_garden["epi"],
+        ds_garden["gam"],
+    ]
 
     #
     # Save outputs.
