@@ -229,7 +229,6 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
     special_cases = {
         "Kazakhstan": [1931, 1932, 1933],
         "Russia, Ukraine": [1915, 1916, 1917, 1918, 1919, 1920, 1921, 1922],
-        "Russia, Western Soviet States": [1941, 1942, 1943, 1944],
         "Ukraine": [1931, 1932, 1933],
     }
 

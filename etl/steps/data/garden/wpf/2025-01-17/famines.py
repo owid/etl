@@ -75,6 +75,9 @@ def run(dest_dir: str) -> None:
     # Create a new column with famine names that combines dates and simplified places
     tb["famine_name"] = tb["simplified_place"] + " " + tb["date_range"]
 
+    # Rename the cause from natural calamity to climatic adversity (as suggested by the source)
+    tb["principal_cause"] = tb["principal_cause"].str.replace("Natural calamity", "Climatic adversity")
+
     # Add origins metadata to new columns.
     for col in [
         "wpf_authoritative_mortality_estimate",
