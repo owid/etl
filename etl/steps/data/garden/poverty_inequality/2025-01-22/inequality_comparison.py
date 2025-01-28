@@ -137,11 +137,10 @@ def run(dest_dir: str) -> None:
     # Add population
     tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, year_col="ref_year")
 
-    # Drop ref_year column
-    tb = tb.drop(columns="ref_year")
-
     # Format the table
-    tb = tb.format(keys=["country", "year", "year_1", "year_2", "only_all_series"], short_name="inequality_comparison")
+    tb = tb.format(
+        keys=["country", "year", "ref_year", "year_1", "year_2", "only_all_series"], short_name="inequality_comparison"
+    )
 
     #
     # Save outputs.
