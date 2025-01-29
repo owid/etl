@@ -1344,29 +1344,155 @@ tables:
           The numerator included respondents who expressed agreement with one or more of the situations.
         presentation:
           title_public: Attitudes towards violence against women
-          title_variant: <<sex + "s" if sex != "total">><<", " if (age != "total") and (sex != "total")>><<"aged " + age if age != "total">>
+          title_variant: <<"from " + sex + "s, " if sex != "total">>aged << age if age != "total" else "15-49">>
           grapher_config:
-            title: Attitudes <<"from " + sex + "s" if sex != "total">>towards violence against women<<", " + sex + "s" if sex != "total">><<", aged " + age if age != "total">>
+            title: Attitudes <<"from " + sex + "s " if sex != "total">>towards violence against women, aged << age if age != "total" else "15-49">>
 
       demand_family_planning:
-        title: Demand for family planning satisfied by modern methods
+        title: "Demand for family planning satisfied by modern methods - Women aged: <<age>>"
         unit: "%"
-        description_short: ""
-        description_from_producer: ""
+        description_short: |-
+          <% if age == "15-49" %>
+          Percentage of women of reproductive age (15-49) who have their demand for family planning satisfied with modern methods.
+          <%- else %>
+          Percentage of women of aged <<age>> years old who have their demand for family planning satisfied with modern methods.
+          <%- endif %>
+        description_from_producer: |-
+          This indicator assesses progress towards increasing the capacity of women and adolescent girls to access sexual and reproductive health services and being able to exercise their right to control and freely decide on matters related to their sexuality and sexual and reproductive health. It reflects the right of women and adolescent girls to decide whether and when to have children and having the methods to implement this decision.
+
+          This indicator is also used to measure progress towards Sustainable Development Goals target 3.7, which aims to ensure universal access to sexual and reproductive health-care services, including for family planning, information and education, and integrating reproductive health into national strategies and programmes by 2030.
+
+          Sexual and reproductive health services are also an entry point for HIV prevention, treatment, care and support services, and their integration will be key to ensuring the sustainability of HIV-related services.
+
+          More details: https://indicatorregistry.unaids.org/indicator/demand-family-planning-satisfied-modern-methods
+        description_key:
+          - Estimated as the number of women aged <<age>> who are using modern contraceptive methods from all those with a demand for family planning.
+          - Women are considered to have a demand for family planning if they want to delay, space or limit childbearing.
+          - "The following are considered modern contraceptive methods: The pill (oral contraceptives), Intrauterine device (IUD), Injectables, Female sterilization, Male sterilization, Female condoms, Male condoms, Implants, Emergency contraception, Standard days method, Lactational amenorrhoea method (LAM), The diaphragm, Foam or jelly."
+        presentation:
+          title_public: Share of women with satisfied demand for family planning by modern methods
+          title_variant: aged <<age>>
+
       prevalence_ipv:
-        title: Prevalence of recent intimate partner violence
+        title: "Prevalence of recent intimate partner violence - Women aged: <<age>>"
         unit: "%"
-        description_short: ""
-        description_from_producer: ""
+        description_short: |-
+          Proportion of ever-married or partnered women <<age>> years old who experienced physical or sexual violence from a male intimate partner in the past 12 months.
+        description_from_producer: |-
+          Globally, high rates of HIV infection among women have brought into sharp focus the problem of violence against women. There is growing recognition that deep-rooted, pervasive gender inequalities, especially violence against women and girls, shape their risk of and vulnerability to HIV infection. Violence and HIV have been linked through direct and indirect pathways. Studies in many countries indicate that many women have experienced violence in some form or another at some point in their life. WHO estimates that one in three women globally has experienced intimate partner violence and/or non-partner sexual violence.
+
+          Calculated as: Numerator / Denominator, where
+
+          Numerator: Women <<age>> years old who have or have ever had an intimate partner and report experiencing physical or sexual violence from at least one of these partners in the past 12 months.
+          Denominator: Total number of women <<age>> years old surveyed who currently have or have had an intimate partner
+
+          Method of measurement:
+          Population-based surveys already being used within countries, such as WHO multicountry surveys, Demographic and Health Surveys or AIDS Indicator Surveys (domestic violence module) and the International Violence against Women Surveys.
+
+          Collecting data on violence against women requires special methods ensuring that information is gathered in a manner adhering to ethical and safety standards, that does not pose a risk to study participants and maximizes data validity and reliability.
+        description_key:
+          - Share of women aged <<age>> years old who have or have ever had an intimate partner and report experiencing physical or sexual violence from at least one of these partners in the past 12 months.
+          - "Method: Ever-married or -partnered women aged <<age>> include those who have ever been married or have had an intimate partner. Women are asked whether they have experienced physical or sexual violence from a male intimate partner in the past 12 months."
+          - "Physical or sexual violence is determined by reporting that their partner did any of the following: Slapped her or threw something that could hurt her; Pushed or shoved her; Hit her with a fist or something else that could hurt her; Kicked, dragged or beat her up; Choked or burned her; Threatened or used a gun, knife or other weapon against her; Physically forced her to have sexual intercourse against her will; Forced her to do something sexual she found degrading or humiliating; Made her afraid of what would happen if she did not have sexual intercourse."
+
+        presentation:
+          title_public: Share of women aged <<age>> who experienced physical or sexual violence
+
       pwid_ost_coverage:
-        title: Coverage of opioid substitution therapy
+        title: "Coverage of opioid substitution therapy - Age: <<age>> - Sex: <<sex>>"
         unit: "%"
-        description_short: ""
-        description_from_producer: ""
+        description_short: |-
+          Percentage of <<sex + " " if sex != "total">>people <<"aged " + age + " " if age != "total">>who inject drugs receiving opioid agonist maintenance therapy.
+        description_from_producer: |-
+          Opioid agonist maintenance therapy represents a commitment to treat opioid dependence and reduce the frequency of injecting, preferably to zero. It is the most effective, evidence-based public health tool for reducing use among the people who inject opioids. Opioid agonist maintenance therapy provides crucial support for treating other health conditions, including HIV, tuberculosis and viral hepatitis.
+        description_key:
+          - Opioid agonist maintenance therapy is an effective, evidence-based treatment for opioid dependence, aiming to reduce injecting and improve public health outcomes.
+          - It also supports the treatment of other health conditions, such as HIV, tuberculosis, and viral hepatitis.
+        presentation:
+          title_public: |-
+            Share of <<sex + " " if sex != "total">>people who inject drugs receiving opioid agonist therapy
+          title_variant: <<"aged " + age if age != "total">>
+          grapher_config:
+            title: |-
+              Share of <<sex + " " if sex != "total">>people <<"aged " + age + " " if age != "total">>who inject drugs receiving opioid agonist therapy
 
       hiv_pos_rate:
-        title: HIV positivity rate
+        title: "HIV positivity rate - Sex: <<sex>> - Age: <<age>>"
         unit: "%"
         description_short: ""
         description_from_producer: ""
-  # gam_age_sex_group:
+        presentation:
+          title_public: HIV positivity rate
+          title_variant: <<sex + "s, " if sex != "total">>aged <<age>>
+          grapher_config:
+            title: HIV positivity rate, <<sex + "s, " if sex != "total">>aged <<age>>
+
+  gam_age_sex_group:
+    variables:
+      art_coverage:
+        title: Antiretroviral therapy coverage among <<group>> living with HIV
+        unit: "%"
+        description_short: https://indicatorregistry.unaids.org/indicator/antiretroviral-therapy-coverage-among-people-living-hiv-key-populations-e
+        description_from_producer: ""
+
+      avoidance_care:
+        title: "Avoidance of health care because of stigma and discrimination - Group: <<group>>"
+        unit: "%"
+        description_short: https://indicatorregistry.unaids.org/indicator/avoidance-hiv-services-because-stigma-and-discrimination-among-key-populations-d
+        description_from_producer: ""
+
+      condom_use:
+        title: Condom use among <<group>>
+        unit: "%"
+        description_short: |-
+          - MSM: https://indicatorregistry.unaids.org/indicator/men-who-have-sex-men-condom-use
+          - TRANS: https://indicatorregistry.unaids.org/indicator/condom-use-among-transgender-people
+          - PWID: https://indicatorregistry.unaids.org/indicator/people-who-inject-drugs-condom-use
+          - SW: https://indicatorregistry.unaids.org/indicator/sex-workers-condom-use
+          - High risk: https://indicatorregistry.unaids.org/indicator/condom-use-last-high-risk-sex
+        description_from_producer: ""
+
+      discriminatory_attitudes:
+        title: Discriminatory attitudes towards people living with HIV
+        unit: "%"
+        description_short: https://indicatorregistry.unaids.org/indicator/discriminatory-attitudes-towards-people-living-hiv
+        description_from_producer: ""
+
+      experience_stigma:
+        title: Experience of stigma and discrimination among <<group>>
+        unit: "%"
+        description_short: https://indicatorregistry.unaids.org/indicator/stigma-and-discrimination-experienced-key-populations
+        description_from_producer: ""
+
+      hiv_prevalence:
+        title: HIV prevalence among <<group>>
+        unit: "%"
+        description_short: https://indicatorregistry.unaids.org/indicator/hiv-prevalence-among-key-populations-e
+        description_from_producer: ""
+
+      hiv_programmes_coverage:
+        title: Coverage of HIV prevention programmes among <<group>>
+        unit: "%"
+        description_short: https://indicatorregistry.unaids.org/indicator/coverage-hiv-prevention-programmes-among-key-populations-d
+        description_from_producer: ""
+
+      hiv_status_awareness:
+        title: HIV testing and status awareness among <<group>>
+        unit: "%"
+        description_short: https://indicatorregistry.unaids.org/indicator/knowledge-hiv-status-among-key-populations-d
+        description_from_producer: ""
+
+      hiv_tests:
+        title: HIV tests
+        # title: HIV testing among TB patients
+        # title: Safe injecting practices among people who inject drugs
+        unit: tests
+        description_short: |-
+          https://indicatorregistry.unaids.org/indicator/hiv-testing-volume-and-positivity-0
+
+        description_from_producer: ""
+
+      pwid_safety:
+        title: "Safe injecting practices among people who inject drugs"
+        unit: "%"
+        description_short: https://indicatorregistry.unaids.org/indicator/people-who-inject-drugs-safe-injecting-practices
