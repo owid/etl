@@ -208,7 +208,7 @@ def run(dest_dir: str) -> None:
 
         return tb
 
-    tbr = tb.copy()
+    # tbr = tb.copy()
 
     tb = pivot_and_format(tb, ["country", "year", "age", "sex", "group"], "gam_age_sex_group")
     tb_hepatitis = pivot_and_format(
@@ -222,6 +222,20 @@ def run(dest_dir: str) -> None:
     tb_age_group = pivot_and_format(tb_age_group, ["country", "year", "age", "group"], "gam_age_group")
     tb_sex_group = pivot_and_format(tb_sex_group, ["country", "year", "sex", "group"], "gam_sex_group")
     tb_no_dim = pivot_and_format(tb_no_dim, ["country", "year"], "gam")
+
+    # SANITY CHECK
+    assert set(tb.columns) == {
+        "art_coverage",
+        "avoidance_care",
+        "condom_use",
+        "discriminatory_attitudes",
+        "experience_stigma",
+        "hiv_prevalence",
+        "hiv_programmes_coverage",
+        "hiv_status_awareness",
+        "hiv_tests",
+        "pwid_safety",
+    }
 
     # TABLE GROUPS
     paths.log.info("GAM: pivoting and formatting")
@@ -237,20 +251,22 @@ def run(dest_dir: str) -> None:
         tb_sex_group,
         tb_no_dim,
     ]
-    tb_meta = tbr[["indicator", "indicator_description", "unit"]].drop_duplicates().sort_values("indicator")
-    for _, row in tb_meta.iterrows():
-        print(
-            f"{row.indicator}:\n\ttitle: {row.indicator_description}\n\tunit: {row['unit']}\n\tdescription_short: ''\n\tdescription_from_producer: ''"
-        )
-    tb_meta
 
-    x = tb.copy()
-    cols_idx = list(x.index.names)
-    x = x.reset_index()
-    x = x.melt(id_vars=cols_idx).dropna(subset="value", axis=0)
-    cols = [col for col in cols_idx if col not in ["country", "year"]]
-    x = x[["variable"] + cols].drop_duplicates().sort_values(["variable"] + cols)
-    x
+    # tb_meta = tbr[["indicator", "indicator_description", "unit"]].drop_duplicates().sort_values("indicator")
+    # for _, row in tb_meta.iterrows():
+    #     print(
+    #         f"{row.indicator}:\n\ttitle: {row.indicator_description}\n\tunit: {row['unit']}\n\tdescription_short: ''\n\tdescription_from_producer: ''"
+    #     )
+    # tb_meta
+
+    # x = tb.copy()
+    # cols_idx = list(x.index.names)
+    # x = x.reset_index()
+    # x = x.melt(id_vars=cols_idx).dropna(subset="value", axis=0)
+    # cols = [col for col in cols_idx if col not in ["country", "year"]]
+    # x = x[["variable"] + cols].drop_duplicates().sort_values(["variable"] + cols)
+    # x
+
     ####################
     # tbx = tb.groupby("indicator", as_index=False).agg(
     #     {
