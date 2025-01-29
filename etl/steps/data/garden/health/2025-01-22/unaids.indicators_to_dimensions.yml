@@ -54,8 +54,6 @@ gam:
     indicators_origin:
       SW_CONDOMS_DISTRIBUTED:
         dimension: sex workers
-      PRISONERS_CONDOMS_DISTRIBUTED: # NOTE: not in prevention programme
-        dimension: prisoners
       MSM_CONDOMS_DISTRIBUTED:
         dimension: men who have sex with men
 

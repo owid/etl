@@ -127,18 +127,18 @@ def run(dest_dir: str) -> None:
     tb_hepatitis, mask_hepatitis = extract_hepatitis_table_gam(tb)
 
     # 2.1/ [estimate]. Separate estimate data.
-    tb_only_estimate, mask_only_estimate = extract_estimate_table_gam(tb)
+    tb_estimate, mask_estimate = extract_estimate_table_gam(tb)
     # 2.2/ [group]. Separate data with no sex and no age.
-    tb_only_group, mask_only_group = extract_only_group_table_gam(tb)
+    tb_group, mask_only_group = extract_group_table_gam(tb)
     # 2.3/ [age]. Separate data with no sex and group.
-    tb_only_age, mask_only_age = extract_only_age_table_gam(tb)
+    tb_age, mask_only_age = extract_age_table_gam(tb)
     # 2.4/ [sex]. Separate data with no age and group.
-    tb_only_sex, mask_only_sex = extract_only_sex_table_gam(tb)
+    tb_sex, mask_only_sex = extract_sex_table_gam(tb)
 
     # 3.1/ [age, sex]. Separate data with NO group data.
-    tb_no_group, mask_no_group = extract_no_group_table_gam(tb)
+    tb_age_sex, mask_no_group = extract_age_sex_table_gam(tb)
     # 3.2/ [age, group]. Separate data with NO sex.
-    tb_no_sex, mask_no_sex = extract_no_sex_table_gam(tb)
+    tb_age_group, mask_no_sex = extract_age_group_table_gam(tb)
 
     # 4/ []. Separate data with NO dimension.
     tb_no_dim, mask_no_dim = extract_no_dim_table_gam(tb)
@@ -147,7 +147,7 @@ def run(dest_dir: str) -> None:
     tb = tb.loc[
         ~(
             mask_hepatitis
-            | mask_only_estimate
+            | mask_estimate
             | mask_only_group
             | mask_only_age
             | mask_only_sex
@@ -172,15 +172,19 @@ def run(dest_dir: str) -> None:
     # This was not done in step "SEPARATE DATA", because we want to benefit from some of the processing done in this step. In particular, of the combination of `dimension_0` and `group`.
 
     # 3.3/ [sex, group]. Separate data with NO age
-    tb_no_age, mask_no_age = extract_no_age_table_gam(tb)
+    tb_sex_group, mask_no_age = extract_no_age_table_gam(tb)
     ## Correction
-    mask = (tb_no_age.country == "China") & (tb_no_age.year == 2021)
-    x = tb_no_age.loc[mask]
+    mask = (tb_sex_group.country == "China") & (tb_sex_group.year == 2021)
+    x = tb_sex_group.loc[mask]
     assert len(x) == 2
     assert set(x["value"].unique()) == {4.1}
     assert set(x["dimension"].unique()) == {"TOTAL", "ALL_AGES"}
-    tb_no_age = tb_no_age.loc[
-        ~((tb_no_age["country"] == "China") & (tb_no_age["year"] == 2021) & (tb_no_age["dimension"] == "TOTAL"))
+    tb_sex_group = tb_sex_group.loc[
+        ~(
+            (tb_sex_group["country"] == "China")
+            & (tb_sex_group["year"] == 2021)
+            & (tb_sex_group["dimension"] == "TOTAL")
+        )
     ]
     # Remove from main table!
     tb = tb.loc[~mask_no_age]
@@ -204,19 +208,19 @@ def run(dest_dir: str) -> None:
 
         return tb
 
-    # tbr = tb_hepatitis.copy()
+    tbr = tb_sex_group.copy()
 
     tb = pivot_and_format(tb, ["country", "year", "age", "sex", "group"], "gam_age_sex_group")
     tb_hepatitis = pivot_and_format(
         tb_hepatitis, ["country", "year", "age", "sex", "group", "hepatitis"], "gam_hepatitis"
     )
-    tb_only_estimate = pivot_and_format(tb_only_estimate, ["country", "year", "estimate"], "gam_estimates")
-    tb_only_group = pivot_and_format(tb_only_group, ["country", "year", "group"], "gam_group")
-    tb_only_age = pivot_and_format(tb_only_age, ["country", "year", "age"], "gam_age")
-    tb_only_sex = pivot_and_format(tb_only_sex, ["country", "year", "sex"], "gam_sex")
-    tb_no_group = pivot_and_format(tb_no_group, ["country", "year", "age", "sex"], "gam_age_sex")
-    tb_no_sex = pivot_and_format(tb_no_sex, ["country", "year", "age", "group"], "gam_age_group")
-    tb_no_age = pivot_and_format(tb_no_age, ["country", "year", "sex", "group"], "gam_sex_group")
+    tb_estimate = pivot_and_format(tb_estimate, ["country", "year", "estimate"], "gam_estimates")
+    tb_group = pivot_and_format(tb_group, ["country", "year", "group"], "gam_group")
+    tb_age = pivot_and_format(tb_age, ["country", "year", "age"], "gam_age")
+    tb_sex = pivot_and_format(tb_sex, ["country", "year", "sex"], "gam_sex")
+    tb_age_sex = pivot_and_format(tb_age_sex, ["country", "year", "age", "sex"], "gam_age_sex")
+    tb_age_group = pivot_and_format(tb_age_group, ["country", "year", "age", "group"], "gam_age_group")
+    tb_sex_group = pivot_and_format(tb_sex_group, ["country", "year", "sex", "group"], "gam_sex_group")
     tb_no_dim = pivot_and_format(tb_no_dim, ["country", "year"], "gam")
 
     # TABLE GROUPS
@@ -224,21 +228,20 @@ def run(dest_dir: str) -> None:
     tables_gam = [
         tb,
         tb_hepatitis,
-        tb_only_estimate,
-        tb_only_group,
-        tb_only_age,
-        tb_only_sex,
-        tb_no_group,
-        tb_no_sex,
-        tb_no_age,
+        tb_estimate,
+        tb_group,
+        tb_age,
+        tb_sex,
+        tb_age_sex,
+        tb_age_group,
+        tb_sex_group,
         tb_no_dim,
     ]
-    # tbx = tb_only_estimate
-    # tb_meta = tbx[["indicator", "indicator_description", "unit"]].drop_duplicates().sort_values("indicator")
-    # for _, row in tb_meta.iterrows():
-    #     print(
-    #         f"{row.indicator}:\n\ttitle: {row.indicator_description}\n\tunit: {row['unit']}\n\tdescription_short: ''\n\tdescription_from_producer: ''"
-    #     )
+    tb_meta = tbr[["indicator", "indicator_description", "unit"]].drop_duplicates().sort_values("indicator")
+    for _, row in tb_meta.iterrows():
+        print(
+            f"{row.indicator}:\n\ttitle: {row.indicator_description}\n\tunit: {row['unit']}\n\tdescription_short: ''\n\tdescription_from_producer: ''"
+        )
 
     ####################
     # tbx = tb.groupby("indicator", as_index=False).agg(
@@ -421,7 +424,8 @@ def handle_dimensions_clean_gam(tb, dimensions, dimensions_collapse_gam):
 
     # SEX: set sex="male" and sex="others" when applicable
     ### Set to "male"
-    tb.loc[tb["dimension_0"] == "men who have sex with men", "sex"] = "male"
+    mask = (tb["dimension_0"] == "men who have sex with men") & (tb["indicator"] != "condoms_distributed_pp")
+    tb.loc[mask, "sex"] = "male"
 
     ### Set to "other"
     tb.loc[
@@ -525,15 +529,24 @@ def extract_estimate_table_gam(tb):
     return tb_estimate, mask_estimate
 
 
-def extract_only_group_table_gam(tb):
+def extract_group_table_gam(tb):
     """Separate indicators with data without sex or age (only group)."""
     indicators_only_group = [
-        "discrimination_hc_settings",  # only group
-        "domestic_spending_fund_source",  # only group
-        "resource_avail_constant",  # only group
+        "discrimination_hc_settings",
+        "domestic_spending_fund_source",
+        "resource_avail_constant",
+        "condoms_distributed_pp",
     ]
     mask_only_group = tb["indicator"].isin(indicators_only_group)
     tb_new = tb.loc[mask_only_group]
+
+    # Fix group for indicator "condoms_distributed_pp"
+    mask = tb_new["indicator"] == "condoms_distributed_pp"
+    assert tb_new.loc[mask, "dimension_0"].notna().all()
+    assert set(tb_new.loc[mask, "group"].unique()) == {None, "total"}
+    tb_new.loc[mask, "group"] = tb_new.loc[mask, "dimension_0"]
+    tb_new.loc[mask, "dimension_0"] = None
+
     # Checks
     assert set(tb_new["sex"].unique()) == {None, "total"}
     assert set(tb_new["age"].unique()) == {None, "total"}
@@ -548,7 +561,7 @@ def extract_only_group_table_gam(tb):
     return tb_new, mask_only_group
 
 
-def extract_only_age_table_gam(tb):
+def extract_age_table_gam(tb):
     """Separate indicators with data without sex or group (only age)."""
     indicators = {
         "male_circumcisions_performed",
@@ -569,7 +582,7 @@ def extract_only_age_table_gam(tb):
     return tb_new, mask
 
 
-def extract_only_sex_table_gam(tb):
+def extract_sex_table_gam(tb):
     """Separate indicators with data without age or group (only sex)."""
     indicators = {
         "knowledge_in_young_people",
@@ -589,7 +602,7 @@ def extract_only_sex_table_gam(tb):
     return tb_new, mask
 
 
-def extract_no_group_table_gam(tb):
+def extract_age_sex_table_gam(tb):
     """Separate indicators with no group data (only sex and age)."""
     indicators_no_group = {
         "att_tow_wife_beating",
@@ -602,7 +615,7 @@ def extract_no_group_table_gam(tb):
     tb_new = tb.loc[mask]
     # Fill None values in `sex`
     # tb_new.loc[tb_new["sex"].isna(), "indicator"].unique()
-    # _debug_highlight_none(tb_no_group, "att_tow_wife_beating", "sex")
+    # _debug_highlight_none(tb_age_sex, "att_tow_wife_beating", "sex")
     tb_new = safe_replace_NAs(
         tb=tb_new,
         set_map={"pwid_ost_coverage": {"LESS_25", "25_AND_UP"}, "att_tow_wife_beating": {"ALL_AGES"}},
@@ -622,7 +635,7 @@ def extract_no_group_table_gam(tb):
     return tb_new, mask
 
 
-def extract_no_sex_table_gam(tb):
+def extract_age_group_table_gam(tb):
     """Separate indicators with no sex data (only group and age)."""
     indicators = {
         "hiv_self_tests",
@@ -688,6 +701,7 @@ def extract_no_dim_table_gam(tb):
         "plhiv_receiving_tb_preventive_therapy",
         "prisoners_ost",
         "prisoners_tb",
+        "prisoners_condoms_distributed",
         "prop_art_tpt_start",
         "prop_new_art_tpt_strt",
         "pwid_needles",
@@ -716,7 +730,6 @@ def extract_no_dim_table_gam(tb):
 def extract_no_age_table_gam(tb):
     """Generate table with indicators that have no age information."""
     indicators = {
-        "condoms_distributed_pp",
         "condoms_distributed",
         "experience_violence",
         "population",
@@ -816,6 +829,7 @@ def handle_nulls_in_dimensions_gam(tb):
 
     Instead, we should use "total" when the value is not available.
     """
+    # 1/ Fill `sex`
     # _debug_highlight_none(tb, "art_coverage", "sex")
     ## keys: Indicators to set sex -> "total". values: dimensions expected to be None/NA
     set_sex_to_total = {
@@ -855,7 +869,7 @@ def handle_nulls_in_dimensions_gam(tb):
 
     tb = safe_replace_NAs(tb, set_sex_to_total, "sex", "total")
 
-    # 3/ Fill `age`
+    # 2/ Fill `age`
     # _debug_highlight_none(tb, "syphilis_prevalence", "age")
     set_age_to_total = {
         "art_coverage": {
