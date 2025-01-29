@@ -21,14 +21,14 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-  title: Deaths from famines by principal cause
+  title: Deaths from famines by main trigger
 
 
 tables:
   famines_by_trigger:
     variables:
        famine_deaths:
-          title: Deaths from famines where << principal_cause.lower() >> was the main cause
+          title: Deaths from famines where << principal_cause.lower() >> was the main trigger
           unit: 'deaths'
           display:
             name: << principal_cause >>
@@ -38,7 +38,7 @@ tables:
 
 
        decadal_famine_deaths:
-          title: Deaths from famines by decade where << principal_cause.lower() >> was the main cause
+          title: Deaths from famines by decade where << principal_cause.lower() >> was the main trigger
           unit: 'deaths'
           display:
             name: << principal_cause >>
