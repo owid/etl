@@ -10,7 +10,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-  title: Deaths from famines by regime and GDP
+  title: Deaths from famines by regime, GDP and population growth
 
 tables:
   famines:
@@ -31,6 +31,13 @@ tables:
        regime_redux_row_owid:
         description_processing: Closed and electoral autocracies here were treated as “autocracies”. The regime classification is 0 for autocracies and 1 for democracies.
 
+       population_growth:
+         title: Population growth rate 20 years prior to famine
+         unit: '%'
+         short_unit: '%'
+         description_short: The average annual population growth rate in the 20 years before the famine.
+         description_processing: The population growth rate was calculated by taking the population in the year of the famine and dividing it by the population 20 years prior, subtracting 1, and multiplying by 100.
+
        midpoint_year:
           title: Midpoint year of famine
           unit: ''
@@ -40,3 +47,4 @@ tables:
           title: Country
           unit: ''
           description_short: Country where the famine occurred.
+

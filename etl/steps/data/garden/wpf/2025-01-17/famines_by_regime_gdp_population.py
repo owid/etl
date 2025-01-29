@@ -3,8 +3,10 @@
 import re
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.catalog import Dataset, Table
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -63,6 +65,8 @@ def run(dest_dir: str) -> None:
     tb_gdp = ds_gdp["maddison_project_database"].reset_index()
     tb_gdp = tb_gdp[["year", "country", "gdp_per_capita"]]
 
+    ds_population = paths.load_dataset("population")
+
     # Split the 'date' column into separate rows for each year.
     tb_famines = (
         tb_famines.assign(date=tb_famines["date"].str.split(","))
@@ -80,10 +84,13 @@ def run(dest_dir: str) -> None:
     # Add GDP data.
     tb = add_gdp(tb, tb_gdp)
 
+    tb = add_population_growth(tb, ds_population)
+
     #  Add midpoint date for Bastian and code democracy as 1 and autocracy as 0
     tb["midpoint_year"] = tb["famine_name"].apply(extract_years)
 
     tb["regime_redux_row_owid"] = tb["regime_redux_row_owid"].replace({3: 0, 2: 1})
+
     # Drop unused in this dataset columns columns.
     tb = tb.format(["famine_name", "year"])
 
@@ -195,7 +202,7 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
 
     tb = pr.merge(tb, tb_gdp, on=["country", "year"], how="left")
 
-    # Define replacement rules
+    # Define replacement rules - for these years GDP per capita isn't available so we replace them with the closest available year or an average of the surrounding years
     replacement_rules = [
         {"country": "Cuba", "years": [1895, 1896, 1897, 1898], "ref_year": 1892},
         {"country": "China", "years": [1876, 1877, 1878, 1879], "year_range": [1870, 1887]},
@@ -210,7 +217,6 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
         {"country": "Poland", "years": [1940, 1941, 1942, 1943, 1944, 1945], "year_range": [1938, 1948]},
         {"country": "Iran", "years": [1871, 1872], "ref_year": 1870},
         {"country": "Iran", "years": [1917, 1918, 1919], "ref_year": 1913},
-        {"country": "Turkey, Armenians", "years": [1915, 1916], "year_range": [1913, 1918]},
         {"country": "Vietnam", "years": [1944, 1945], "ref_year": 1950},
         {"country": "Indonesia", "years": [1942, 1946], "ref_year": 1941},
     ]
@@ -225,7 +231,7 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
             gdp_value = calculate_average_gdp(tb_gdp, rule["country"], rule["year_range"])
         replace_gdp(tb, tb_gdp, rule["country"], rule["years"], gdp_value)
 
-    # Special cases for USSR
+    # Special cases for USSR/Russian Empire  - these countries were a part of the USSR/Russian Empire at the time so use the GDP of the USSR/Russia; some years aren't available so use an average of the surrounding years
     special_cases = {
         "Kazakhstan": [1931, 1932, 1933],
         "Russia, Ukraine": [1915, 1916, 1917, 1918, 1919, 1920, 1921, 1922],
@@ -258,6 +264,67 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
             "gdp_per_capita"
         ].values[0]
         replace_gdp(tb, tb_gdp, case["country"], [case["year"]], gdp_value)
+
+    return tb
+
+
+def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
+    """
+    Add population growth rate 20 years before the famine.
+
+    Parameters:
+    tb (Table): The original table containing famine data.
+    ds_population (Dataset): The dataset containing population data.
+
+    Returns:
+    Table: The updated table with population growth information added.
+    """
+    # Find the earliest year for each combination of country and famine_name
+    earliest_years = tb.groupby(["country", "famine_name"])["year"].min().reset_index()
+
+    # Create a new table with years extending back to -20 from the earliest year
+    extended_years = []
+
+    for _, row in earliest_years.iterrows():
+        country = row["country"]
+        famine_name = row["famine_name"]
+        earliest_year = row["year"]
+        for year in range(earliest_year - 20, earliest_year + 1):
+            extended_years.append({"country": country, "famine_name": famine_name, "year": year})
+
+    # Convert the list to a DataFrame and create a Table
+    extended_years_df = pd.DataFrame(extended_years)
+    tb_ext = Table(extended_years_df)
+    # Find the earliest and latest year for each combination of country and famine_name
+    earliest_years = tb_ext.groupby(["country", "famine_name"])["year"].min().reset_index()
+    latest_years = tb_ext.groupby(["country", "famine_name"])["year"].max().reset_index()
+
+    # Merge the earliest and latest years to the original table
+    tb_ext = pr.merge(tb_ext, earliest_years, on=["country", "famine_name"], suffixes=("", "_earliest"))
+    tb_ext = pr.merge(tb_ext, latest_years, on=["country", "famine_name"], suffixes=("", "_latest"))
+
+    # Add population data to the extended table
+    tb_ext = geo.add_population_to_table(tb_ext, ds_population)
+
+    origins = tb_ext["population"].metadata.origins
+
+    # Calculate the population growth between the earliest and latest year
+    population_growth = (
+        tb_ext[tb_ext["year"] == tb_ext["year_latest"]]["population"].values
+        / tb_ext[tb_ext["year"] == tb_ext["year_earliest"]]["population"].values
+        - 1
+    ) * 100
+    # Remove columns with the -20 year for each famine start but keep the latest year column (actual start date of the famine)
+    tb_ext = tb_ext.drop(columns=["year_earliest", "year", "population"])
+    tb_ext = tb_ext.rename(columns={"year_latest": "year"})
+    tb_ext = tb_ext.drop_duplicates(subset=["country", "famine_name", "year"])
+
+    # Add the population growth to the original table
+    tb_ext["population_growth"] = population_growth
+
+    tb = pr.merge(tb, tb_ext, on=["country", "famine_name", "year"], how="left")
+
+    tb["population_growth"].metadata.origins = origins
 
     return tb
 
