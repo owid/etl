@@ -11,10 +11,8 @@ dimensions:
     choices:
       - slug: "annual"
         name: "Annual"
-        description: "Annual data"
       - slug: "monthly"
         name: "Monthly"
-        description: "Monthly data"
   - slug: "source"
     name: "Energy source"
     choices:
@@ -31,7 +29,7 @@ dimensions:
         group: Total price
       - slug: "wholesale"
         name: "Wholesale price"
-        description: "Wholesale price"
+        description: "Market price of electricity before taxes and fees"
         group: Total price
       - slug: "consumer_price_components"
         name: "Consumer price components"
