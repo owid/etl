@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The WPF Famine Dataset
+    description: |-
+      The dataset is a catalogue of famines and instances of mass starvation around the world since 1870 that are estimated to have killed 100,000 people or more. The dataset includes date, location, estimate for excess deaths, and causes (proximate, underlying, and contributory, along with a classification of the role of political intent).
+
+    date_published: "2025"
+
+    # Citation
+    producer: World Peace Foundation
+    citation_full: |-
+      Historic Famines dataset. World Peace Foundation (2025).
+
+    # Files
+    url_main: https://worldpeacefoundation.org/
+    date_accessed: 2025-10-03
+
+    # License
+    license:
+      name: permission obtained from the authors
+outs:
+  - md5: e3bf16ac1a5584ff6101cce4b5155bbb
+    size: 385723
+    path: famines.xlsx
