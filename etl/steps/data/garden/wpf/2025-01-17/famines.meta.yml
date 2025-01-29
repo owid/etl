@@ -26,6 +26,8 @@ tables:
           title: Deaths from famines
           unit: 'deaths'
           description_short: Deaths in famines that are estimated to have killed 100,000 people or more.
+          description_key:
+            - WPF defines a famine as mass mortality due to mass starvation, with mass starvation being the "destruction, deprivation or loss of objects and activities required for survival".
           description_from_producer: |-
             Famines are assessed based on severity, magnitude, and duration. Magnitude, measured as the total number of excess deaths, was used to determine inclusion in the catalogue. A threshold of 100,000 deaths was applied due to limited demographic research on proportional death rate increases.
           display:

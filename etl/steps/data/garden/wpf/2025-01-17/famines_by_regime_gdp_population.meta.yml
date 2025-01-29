@@ -16,15 +16,6 @@ tables:
   famines:
     variables:
 
-       wpf_authoritative_mortality_estimate:
-          title: Deaths from famines
-          unit: 'deaths'
-          description_short: Famines that are estimated to have killed 100,000 people or more.
-          short_unit: ''
-          display:
-            numDecimalPlaces: 0
-
-
        gdp_per_capita:
           description_processing: When GDP data was missing for certain years but nearby estimates were available, we used the closest or most relevant data. For example, during Cuba's famine from 1895 to 1898, we used the GDP from 1892. For China’s famine from 1876 to 1879, we used the average GDP from 1870 to 1887. In special cases like Russia and Kazakhstan (1932 to 1934), we used the USSR’s average GDP from 1940 to 1946. For recent gaps, we used 2022 data for countries like the Central African Republic, Ethiopia, and Syria.
 
