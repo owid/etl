@@ -703,7 +703,7 @@ gam:
   NON_HIV_RELATED:
     group: "non-HIV related"
   OTHER_INTERNATIONAL:
-    group: "other internaltional"
+    group: "other international"
   PEPFAR:
     group: "PEPFAR"
   PRIVATE:

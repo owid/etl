@@ -522,169 +522,369 @@ tables:
           title_variant: ""
 
   gam:
+    common:
+      processing_level: minor
     variables:
-      new_relapse_tb_cases:
-        title: Total new and relapse TB cases
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      notified_tb_cases:
-        title: Total notified TB cases
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
+      # low quality
       expenditure_tb_hiv_activities:
         title: Expenditure on collaborative TB/HIV activities
-        unit: USD
-        description_short: ""
-        description_from_producer: ""
-      tb_expenditure:
-        title: Total TB expenditure
-        unit: USD
-        description_short: ""
-        description_from_producer: ""
-      tb_patients_documented_hiv_status:
-        title: Proportion of registered new and relapse TB patients with documented HIV status
-        unit: PERCENT
-        description_short: ""
-        description_from_producer: ""
-      hiv_tb_patients_receiving_art:
-        title: TB patients living with HIV receiving ART
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      hiv_tb_patients_receiving_cpt:
-        title: TB patients living with HIV receiving CPT
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      hiv_tb_patients_under_ipt:
-        title: People living with HIV newly enrolled in HIV treatment started on isoniazid preventive therapy (IPT)
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      tb_patients_tested_positive_hiv:
-        title: TB patients tested positive for HIV
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      tb_patients_documented_hiv_positive_status:
-        title: Proportion of registered new and relapse TB patients with documented HIV-positive status
-        unit: PERCENT
-        description_short: ""
-        description_from_producer: ""
-      pwid_needles:
-        title: Needles and syringes distributed per person who inject drugs
-        unit: RATE
-        description_short: ""
-        description_from_producer: ""
+        unit: US$
+        short_unit: $
+        description_short: |-
+          Financial resources allocated to integrated services aimed at reducing the dual burden of tuberculosis (TB) and HIV. This includes funding for prevention, diagnosis, treatment, and care for individuals affected by or at risk of both diseases.
+
+      # Newly enrolled to HIV treatment
       hiv_care:
         title: People newly enrolled in HIV treatment
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      newly_enrolled_care:
-        title: Adults and children newly enrolled in HIV treatment during the year (10.3 denominator)
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      plhiv_receiving_tb_preventive_therapy:
-        title: Proportion of people living with HIV newly enrolled in HIV treatment started on TB preventive therapy
-        unit: PERCENT
+        unit: people
         description_short: ""
         description_from_producer: ""
       hiv_tb_diagnosis:
         title: People newly enrolled in HIV treatment diagnosed as having TB during the reporting period
-        unit: NUMBER
+        unit: people
+        description_short: ""
+        description_from_producer: ""
+      hiv_tb_patients_under_ipt:
+        title: People living with HIV newly enrolled in HIV treatment started on isoniazid preventive therapy (IPT)
+        unit: people
+        description_short: ""
+        description_from_producer: ""
+      newly_enrolled_care:
+        title: Adults and children newly enrolled in HIV treatment during the year (10.3 denominator)
+        unit: people
         description_short: ""
         description_from_producer: ""
       plhiv_in_care_with_active_tb:
         title: Proportion of people living with HIV newly enrolled in HIV treatment with active tuberculosis (TB) disease
-        unit: PERCENT
+        unit: people
+        description_short: |-
+          https://indicatorregistry.unaids.org/indicator/proportion-people-living-hiv-newly-enrolled-hiv-care-active-tb-disease
+        description_from_producer: ""
+      plhiv_receiving_tb_preventive_therapy:
+        title: Proportion of people living with HIV newly enrolled in HIV treatment started on TB preventive therapy
+        unit: people
         description_short: ""
         description_from_producer: ""
-      prisoners_tb:
-        title: Tuberculosis (TB) infection among prisoners
-        unit: PERCENT
-        description_short: ""
-        description_from_producer: ""
-      prisoners_ost:
-        title: Prisoners receiving opioid substitution therapy
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      num_art_init_tpt:
-        title: Number of people on antiretroviral treatment who initiated any course of TPT during the previous year
-        unit: NUMBER
+
+      # Currently enrolled to HIV treatment
+      plhiv_current_enrolled:
+        title: People currently enrolled in HIV treatment
+        unit: people
         description_short: ""
         description_from_producer: ""
       plhiv_current_tb_preventative:
         title: Proportion of people living with HIV currently enrolled in HIV treatment receiving TB preventive therapy
-        unit: PERCENT
+        unit: "%"
         description_short: ""
         description_from_producer: ""
-      people_on_prep:
-        title: People receiving pre-exposure prophylaxis (PrEP)
-        unit: NUMBER
+      plhiv_current_treatment_tb:
+        title: People living with HIV currently enrolled in HIV treatment who start treatment for latent TB infection during the reporting period
+        unit: people
         description_short: ""
         description_from_producer: ""
+
+      hiv_tb_patients_receiving_art:
+        title: TB patients living with HIV receiving ART
+        unit: patients
+        description_short: ""
+        description_from_producer: ""
+      hiv_tb_patients_receiving_cpt:
+        title: TB patients living with HIV receiving CPT
+        unit: patients
+        description_short: ""
+        description_from_producer: ""
+
+      new_relapse_tb_cases:
+        title: Total new and relapse TB cases
+        unit: cases
+        description_short: ""
+        description_from_producer: ""
+
+      notified_tb_cases:
+        title: Total notified TB cases
+        unit: cases
+        description_short: ""
+        description_from_producer: ""
+
+      # TPT, ART
+      people_art_elig_tpt:
+        title: People on ART who were eligible for TB preventive treatment (TPT)
+        unit: people
+        description_short: ""
+        description_from_producer: ""
+      people_art_elig_tpt_strt:
+        title: People on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: people
+        description_short: ""
+        description_from_producer: ""
+      people_new_art_elig_tpt_strt:
+        title: People newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: people
+        description_short: ""
+        description_from_producer: ""
+      num_art_complt_tpt:
+        title: People on ART who completed TPT among those who initiated any course of TPT during the previous year
+        unit: people
+        description_short: ""
+        description_from_producer: ""
+      num_art_init_tpt:
+        title: People on ART who initiated any course of TPT during the previous year
+        unit: people
+        description_short: ""
+        description_from_producer: ""
+      prop_art_tpt_start:
+        title: Proportion of people on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: "%"
+        description_short: ""
+        description_from_producer: ""
+      prop_new_art_tpt_strt:
+        title: Proportion of people newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: "%"
+        description_short: ""
+        description_from_producer: ""
+
+      # Others
       resource_needs_ft:
         title: Estimated resource needs
         unit: CONSTANT_USD
         description_short: ""
         description_from_producer: ""
-      plhiv_current_enrolled:
-        title: People currently enrolled in HIV treatment
-        unit: NUMBER
+
+      tb_expenditure:
+        title: Total TB expenditure
+        unit: US$
+        short_unit: "$"
         description_short: ""
         description_from_producer: ""
-      plhiv_current_treatment_tb:
-        title: People living with HIV currently enrolled in HIV treatment who start treatment for latent TB infection during the reporting period
-        unit: NUMBER
+
+      #######################3
+      # DONE
+      #######################3
+
+      # Prisoners
+      prisoners_ost:
+        title: Prisoners receiving opioid substitution therapy
+        unit: people
+        description_short: Number of people in prisons and other closed settings receiving opioid agonist maintenance therapy.
+        description_from_producer: |-
+          People in prisons and other closed settings are often at risk for acquiring HIV when they are released and living in the community. This is especially true for people involved with illicit drug use or where selling sex is illegal. Offering HIV prevention and treatment services in prisons can reduce HIV transmission risk both within the prison and in the community on release. A strong national HIV response will include such services to people in prisons and other closed settings.
+      prisoners_tb:
+        title: Tuberculosis (TB) infection among prisoners
+        unit: people
         description_short: ""
-        description_from_producer: ""
-      people_art_elig_tpt:
-        title: People on ART who were eligible for TB preventive treatment (TPT)
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      people_art_elig_tpt_strt:
-        title: People on ART who were eligible for TB preventive treatment (TPT) that started TPT
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      prop_art_tpt_start:
-        title: Proportion of people on ART who were eligible for TB preventive treatment (TPT) that started TPT
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      denied_services_hiv_status:
-        title: Discrimination in healthcare settings
-        unit: PERCENT
-        description_short: ""
-        description_from_producer: ""
+
+      people_on_prep:
+        title: People receiving pre-exposure prophylaxis (PrEP)
+        unit: people
+        description_short: Number of people who received pre-exposure prophylaxis (PrEP) at least once during the reporting period.
+        description_from_producer: |-
+          This indicator is key to assessing the availability and uptake of pre-exposure prophylaxis (PrEP), especially among people at substantial risk of HIV infection. Through data disaggregation, this indicator will also attempt to monitor the availability and use by population (based on age, gender and key population). The use of antiretroviral medicines by people who are HIV-negative before they are exposed to HIV can prevent HIV infection. In 2015, the World Health Organization (WHO) recommended that oral PrEP containing tenofovir (TDF) be offered as an additional prevention choice for people at substantial risk of HIV infection as part of combination HIV prevention approaches. In 2021, WHO recommended the dapivirine vaginal ring (DVR) as an additional PrEP option to be offered to cisgender women at substantial risk of HIV. In 2022, WHO recommended that long-acting injectable cabotegravir (CAB-LA) may be offered as an additional PrEP option to people at substantial risk of HIV.
+
+          In 2024, WHO updated the guidance on oral PrEP dosing regimens, which are determined by a combination of factors based on a person’scharacteristics, circumstances and route of exposure. The guidance no longer uses the term “event-driven PrEP” (ED-PrEP), given the variation possible within oral PrEP dosing.
+
+          Implementation of PrEP should be informed by several contextual factors. These include national and subnational epidemiological trends; programmatic feasibility and demand; and consideration of the social environment for people living with HIV and people from key populations and their access to services. PrEP implementation criteria may vary by country.
+
+          More details: https://indicatorregistry.unaids.org/indicator/people-receiving-pre-exposure-prophylaxis-prep
+
       per_tpt_art_cmplt:
         title: Percentage of people living with HIV initiating TB preventive treatment (TPT) and on antiretroviral therapy who completed a course of TPT
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      num_art_complt_tpt:
-        title: Number of people on antiretroviral treatment who completed TPT among those who initiated any course of TPT during the previous year
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      people_new_art_elig_tpt_strt:
-        title: People newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
-      prop_new_art_tpt_strt:
-        title: Proportion of people newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
-        unit: NUMBER
-        description_short: ""
-        description_from_producer: ""
+        unit: "%"
+        description_short: |-
+          Percentage of people living with HIV currently on antiretroviral therapy initiating tuberculosis (TB) preventive treatment and who completed a course of TB preventive treatment.
+
+      # Needles
+      pwid_needles:
+        title: Needles and syringes distributed per person who inject drugs
+        unit: needles per person
+        description_short: |-
+          Number of needles and syringes distributed per person who injects drugs per year by needle-syringe programmes.
+        description_key: &pwdi_needles
+          - Injecting drug use is a significant route of HIV transmission globally. Addressing HIV transmission through injecting drug use is crucial in reducing the overall HIV burden.
+          - Needle-syringe programs are a key health sector intervention recommended by the World Health Organization (WHO) for HIV and hepatitis C prevention and treatment among key populations, as outlined in the [2022 Consolidated guidelines on HIV prevention](https://www.who.int/publications/i/item/9789240052390), diagnosis, treatment, and care for key populations.
+          - These programs are highly effective in preventing HIV transmission among people who inject drugs, supported by extensive scientific evidence.
+        presentation:
+          title_public: Needles and Syringes per person who injects drugs
       pwid_needles_distributed:
-        title: Clean needles distributed to prisoners
-        unit: NUMBER
+        title: Needles and syringes distributed to people who inject drugs
+        unit: needles
+        description_short: |-
+          Number of needles and syringes distributed to people who injects drugs per year by needle-syringe programmes.
+        description_key: *pwdi_needles
+        presentation:
+          title_public: "Needles and Syringes distributed to people who inject drugs"
+
+      # TB patients with HIV documented status
+      tb_patients_documented_hiv_status:
+        title: Proportion of registered new and relapse TB patients with documented HIV status
+        unit: "%"
+        description_short: |-
+          Percentage of new and relapse TB cases with documented HIV status.
+        description_from_producer: |-
+          This indicator measures the performance of the TB program in ensuring that TB cases know their HIV status.
+
+          Numerator: Number of new and relapsed TB cases with documented HIV status, during the reporting period
+          Denominator: Total number of new and relapsed TB cases, during the reporting period
+
+          The numerator and denominator can be obtained from basic management unit TB registers as well as additional data collection sources (i.e., HIV testing registers) that may contain relevant information (i.e., HIV test results, enrollment in HIV care programs). Programs should modify the register as needed to easily capture this information (<1 F, <1 M, 1-4 F, 1-4 M, 5-9 F, 5-9 M, 10-14 F, 10-14 M, 15-19 F, 15-19 M, 20-24 F, 20-24 M, 25-29 F, 25-29 M, 30-34 F, 30-34 M, 35-39 F, 35-39 M, 40-44 F, 40-44 M, 45-49 F, 45-49 M, 50+ F, 50+ M, Unknown age F, Unknown age M) and (Known HIV-positive at service entry).
+
+          The data source is the TB register. There is a risk of double counting as TB patients could be tested multiple times during their TB treatment, therefore partners should ensure a data collection and reporting system is in place to minimize double counting. There is also a risk of undercounting if those patients who already knew their HIV status prior to attending TB clinic are not documented, therefore the TB register at a minimum should document “Known HIV-positive at service entry; Newly tested HIV-positive; Tested HIV negative.”
+
+          More details:
+          https://indicatorregistry.unaids.org/indicator/tbstat-includes-tbstatpospercentage-new-and-relapse-tb-cases-documented-hiv-status
+        presentation:
+          title_public: Percentage of new and relapse TB cases with documented HIV status
+      tb_patients_documented_hiv_positive_status:
+        title: Proportion of registered new and relapse TB patients with documented HIV-positive status
+        unit: "%"
+        description_short: |-
+          Percentage of new and relapse TB cases with documented HIV-positive status.
+        description_from_producer: |-
+          More details:
+          https://indicatorregistry.unaids.org/indicator/tbstat-includes-tbstatpospercentage-new-and-relapse-tb-cases-documented-hiv-status
+        presentation:
+          title_public: Percentage of new and relapse TB cases with documented HIV-positive status
+
+      # Can't find
+      tb_patients_tested_positive_hiv:
+        title: TB patients tested positive for HIV
+        unit: people
         description_short: ""
         description_from_producer: ""
+
+  gam_sex:
+    common:
+      processing_level: minor
+    variables:
+      knowledge_in_young_people:
+        title: Knowledge about HIV prevention
+        unit: "%"
+        description_short: |-
+          <% if sex == 'total' %>
+          Percentage of young people aged 15-24 who correctly identify both methods of preventing the sexual transmission of HIV and reject major misconceptions about HIV transmission.
+          <%- else %>
+          Percentage of young <<sex>>s aged 15-24 who correctly identify both ways of preventing the sexual transmission of HIV and reject major misconceptions about HIV transmission.
+          <%- endif %>
+        description_from_producer: |-
+          This indicator measures the percentage of respondents that answered "YES" to all the responses below:
+
+          1. Can the risk of HIV transmission be reduced by having sex with only one uninfected partner who has no other partners?
+          2. Can a person reduce the risk of getting HIV by using a condom every time they have sex?
+          3. Can a healthy-looking person have HIV?
+          4. Can a person get HIV from mosquito bites?
+          5. Can a person get HIV by sharing food with someone who is infected?
+
+          The first three questions should not be altered. Questions 4 and 5 ask about local misconceptions and may be replaced by the most common misconceptions in your country. Examples include: “Can a person get HIV by hugging or shaking hands with a person who is infected?” and “Can a person get HIV through supernatural means?”
+
+          Those who have never heard of HIV and AIDS should be excluded from the numerator but included in the denominator. An answer of “don’t know” should be recorded as an incorrect answer.
+
+          Scores for each of the individual questions (based on the same denominator) are required as well as the score for the composite indicator.
+
+        description_key:
+          - The ongoing spread of HIV is largely driven by sexual transmission among young people. Comprehensive knowledge about HIV and AIDS is essential for adopting behaviors that reduce the risk of transmission.
+        presentation:
+          title_public: Knowledge about HIV prevention<<" by " + sex + "s" if sex != 'total' else ''>>
+
+  gam_age:
+    common:
+      processing_level: minor
+    variables:
+      male_circumcisions_performed:
+        title: Annual number of males voluntarily circumcised
+        description_short: |-
+          <% if age == "total" %>
+          Number of male circumcisions performed according to national standards during the past 12 months.
+          <%- else %>
+          Number of male circumcisions (aged <<age>>) performed according to national standards during the past 12 months.
+          <%- endif %>
+        unit: people
+        description_from_producer: |-
+          Three randomized controlled trials - plus post-trial studies - have shown that male circumcision provided by well-trained health professionals in properly equipped settings is safe and can reduce the risk of acquiring HIV. Other benefits of medical male circumcision include the reduced risk of some other STIs, including human papillomavirus, the cause of cervical cancer. The World Health Organization (WHO) and UNAIDS recommendations emphasize that voluntary medical male circumcision should be provided as part of a package of prevention interventions including safer sex education, condom education and provision, HIV testing and linkages to care and treatment, and management of sexually transmitted infections.
+
+          WHO recommends that voluntary medical male circumcision should continue to be provided as an additional efficacious HIV prevention option within combination prevention for adolescents 15 years and older and adult men in settings with generalized epidemics. Decisions on offering voluntary medical male circumcision to younger adolescents 10-14 years must consider several factors based on new evidence, human rights and national and local context.
+
+          More details: https://indicatorregistry.unaids.org/indicator/annual-number-men-voluntarily-circumcised
+        presentation:
+          title_public: Annual number of males voluntarily circumcised
+          title_variant: |-
+            <% if age == "total" %>
+            total population
+            <%- else %>
+            aged <<age>>
+            <%- endif %>
+
+  gam_group:
+    common:
+      processing_level: minor
+    variables:
+      discrimination_hc_settings:
+        title: "Experience of HIV-related discrimination in healthcare settings - Health service: <<group>>"
+        description_short: |-
+          <% if group == "total" %>
+          Percentage of people living with HIV who report experiences of HIV-related discrimination in healthcare settings.
+          <%- elif group == "hiv-related" %>
+          Percentage of people living with HIV (and receiving a HIV-related health service) who report experiences of HIV-related discrimination in healthcare settings.
+          <%- else %>
+          Percentage of people living with HIV (and receiving a non-HIV-related health service) who report experiences of HIV-related discrimination in healthcare settings.
+          <% endif %>
+        unit: "%"
+        description_from_producer: |-
+          Discrimination is a human rights violation and is prohibited by international human rights law and most national constitutions. In the context of HIV, discrimination refers to unfair or unjust treatment of an individual (either through actions or by failure to act) based on his or her real or perceived HIV status. Discrimination exacerbates risks and deprives people of their rights and entitlements, thus fueling the HIV epidemic.
+
+          Stigma is the attribution of undesirable characteristics to an individual or group that reduces their status in the eyes of society. It frequently drives experiences of discrimination. The indicator measures HIV-related discrimination experienced in health-care settings. HIV is often associated with a range of behaviours that are viewed as socially deviant or immoral, such as injecting drug use and sexual promiscuity. Because of these underlying societal beliefs, people living with HIV often are viewed as shameful and are thought to be responsible for having contracted HIV. This shaming process has repercussions beyond the individual because it greatly reduces incentives to be tested for HIV or, in the event the test result is positive, to disclose HIV status to sexual partners or family members.
+
+          The health sector is one of the main settings where people living with HIV—and those perceived to be living with HIV—experience discrimination. This indicator directly measures discrimination experienced by people living with HIV when seeking services in health-care settings.
+
+          The composite indicator can be monitored as a measure of the prevalence of HIV-related discrimination experienced in the health sector by people living with HIV. This indicator could provide further understanding of HIV-related health outcomes and improve interventions to reduce and mitigate HIV-related stigma and discrimination experienced along the treatment and care cascade by (a) showing change over time in the percentage of people living with HIV who experience discrimination in health-care settings and (b) indicating priority areas for action.
+
+          More details: https://indicatorregistry.unaids.org/indicator/experience-hiv-related-discrimination-health-care-settings-0
+        presentation:
+          title_public: |-
+            "Experience of HIV-related discrimination in healthcare settings"
+          title_variant: |-
+            <% if group == "total" %>
+            all health services
+            <%- elif group == "hiv-related" %>
+            HIV-related health service
+            <%- else %>
+            non-HIV-related health service
+            <% endif %>
+
+      domestic_spending_fund_source:
+        title: "HIV expenditure by origin of resources - Origin: <<group>>"
+        description_short: |-
+          <% if group == "total" %>
+          Total in-country spending on HIV programs and services. The reported HIV expenditures by program or service should align with the number of individuals who received these services, as documented in other sections of Global AIDS Monitoring.
+          <%- else %>
+          In-country spending on HIV programs and services categorized, from source '<<group>>'. The reported HIV expenditures by program or service should align with the number of individuals who received these services, as documented in other sections of Global AIDS Monitoring.
+          <% endif %>
+        unit: constant 2019 US$
+        short_unit: "$"
+        description_from_producer: |-
+          The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources. There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
+
+          By the end of 2020, the international and domestic resource availability for the HIV response reached an estimated US$ 21.5 billion (in constant 2019 dollars) in low- and middle-income countries. Achieving country and global targets requires increased focus, resources, programme effectiveness and efficiency to provide the HIV care, treatment and prevention to reduce HIV incidence and extend life.
+
+          It is critical to identify long-term, sustainable financing sources, including domestic resource mobilization, to maintain and build upon the success achieved. However, filling the financing gap and pursuing efficient resource allocation can only be achieved by assessing and managing the resources available and their use.
+
+          The quantification of financing flows and expenditures helps to examine the questions of who benefits from HIV programmes and to determine the current state of allocations for HIV programmes and services that focus on key or other specific populations.
+
+          The vast majority of the AIDS Spending Categories (or ASCs, per National AIDS Spending Assessment [NASA] classifications) or the sub-indicators are drawn from existing frameworks and are now structured around the 2021 Political Declaration on Ending AIDS. The resource needs for low- and middle-income countries resulted in a target to mobilize at least US$ 29 billion (in constant 2019 US dollars) by 2025.
+
+          More details: https://indicatorregistry.unaids.org/indicator/aids-spending
+        presentation:
+          title_public: HIV expenditure by origin of resources
+          title_variant: << group >>
+
+      resource_avail_constant:
+        title: "Estimated HIV resource availability for low- and middle-income countries - Origin: <<group>>"
+        description_short: |-
+          <% if group == "total" %>
+          Volume of financial resources from domestic and international sources allocated to HIV programs in low- and middle-income countries for a specified period.
+          <%- else %>
+          Volume of financial resources from domestic and international sources allocated to HIV programs in low- and middle-income countries for a specified period. Only resource "<<group>>" considered.
+          <%- endif %>
+        unit: constant 2019 US$
+        short_unit: "$"
+        presentation:
+          title_public: Estimated HIV resource availability for low- and middle-income countries
+          title_variant: "origin: <<group>>"

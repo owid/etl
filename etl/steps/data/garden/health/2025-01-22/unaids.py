@@ -132,7 +132,6 @@ def run(dest_dir: str) -> None:
     tb_only_group, mask_only_group = extract_only_group_table_gam(tb)
     # 2.3/ [age]. Separate data with no sex and group.
     tb_only_age, mask_only_age = extract_only_age_table_gam(tb)
-
     # 2.4/ [sex]. Separate data with no age and group.
     tb_only_sex, mask_only_sex = extract_only_sex_table_gam(tb)
 
@@ -231,12 +230,12 @@ def run(dest_dir: str) -> None:
         pivot_and_format(tb_no_dim, ["country", "year"], "gam"),
     ]
 
-    tbx = tb_no_dim
-    tb_meta = tbx[["indicator", "indicator_description", "unit"]].drop_duplicates()
-    for _, row in tb_meta.iterrows():
-        print(
-            f"{row.indicator}:\n\ttitle: {row.indicator_description}\n\tunit: {row['unit']}\n\tdescription_short: ''\n\tdescription_from_producer: ''"
-        )
+    # tbx = tb_no_dim
+    # tb_meta = tbx[["indicator", "indicator_description", "unit"]].drop_duplicates().sort_values("indicator")
+    # for _, row in tb_meta.iterrows():
+    #     print(
+    #         f"{row.indicator}:\n\ttitle: {row.indicator_description}\n\tunit: {row['unit']}\n\tdescription_short: ''\n\tdescription_from_producer: ''"
+    #     )
 
     ####################
     # tbx = tb.groupby("indicator", as_index=False).agg(
@@ -435,6 +434,9 @@ def handle_dimensions_clean_gam(tb, dimensions, dimensions_collapse_gam):
     assert set(tb.loc[mask, "dimension_0"].unique()) == {"self-tests"}
     tb.loc[mask, "indicator"] = "hiv_self_tests"
     tb.loc[mask, "dimension_0"] = np.nan
+
+    # denied_services_hiv_status should be "discrimination_hc_settings", with `group`="total"
+    tb.loc[tb["indicator"] == "denied_services_hiv_status", "indicator"] = "discrimination_hc_settings"
 
     return tb
 
