@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     tb_us_hist_1945_1990 = ds_meadow_us_cdc.read("marriages")
 
     # Drop the number_of_marriages column as it is not needed
-    tb_us_hist_1945_1990 = tb_us_hist_1945_1990.drop(columns={"number_of_marriages"})
+    tb_us_hist_1945_1990 = tb_us_hist_1945_1990.drop(columns={"number_of_marriages", "divorce_rate"})
 
     #
     # Process data.
@@ -71,7 +71,7 @@ def run(dest_dir: str) -> None:
     ]
 
     # Combine the tables
-    tb = pr.merge(tb, tb_us_hist_1886_1945, on=["country", "year", "marriage_rate", "divorce_rate"], how="outer")
+    tb = pr.merge(tb, tb_us_hist_1886_1945, on=["country", "year", "marriage_rate"], how="outer")
 
     tb = pr.merge(tb, tb_us_hist_1945_1990, on=["country", "year", "marriage_rate"], how="outer")
 

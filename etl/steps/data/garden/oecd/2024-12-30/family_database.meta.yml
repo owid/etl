@@ -32,7 +32,6 @@ tables:
         unit: "per 1,000 people"
         description_short: Number of divorces during a given year per 1,000 people.
         description_from_producer: The crude divorce rate is defined as the number of divorces during a given year per 1,000 people.
-        description_processing: Divorce rates in the United States between 1886 and 1945 are sourced from the US Census.
 
       marriage_rate:
         title: Crude marriage rate (marriages per 1,000 people)
