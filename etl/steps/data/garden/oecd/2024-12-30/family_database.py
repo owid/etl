@@ -24,7 +24,8 @@ def run(dest_dir: str) -> None:
     tb_us_hist_1945_1990 = ds_meadow_us_cdc.read("marriages")
 
     # Drop the number_of_marriages column as it is not needed
-    tb_us_hist_1945_1990 = tb_us_hist_1945_1990.drop(columns={"number_of_marriages", "divorce_rate"})
+    tb_us_hist_1945_1990 = tb_us_hist_1945_1990.drop(columns={"number_of_marriages"})
+    tb_us_hist_1886_1945 = tb_us_hist_1886_1945.drop(columns={"divorce_rate"})
 
     #
     # Process data.
