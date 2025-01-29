@@ -888,3 +888,10 @@ tables:
         presentation:
           title_public: Estimated HIV resource availability for low- and middle-income countries
           title_variant: "origin: <<group>>"
+
+  # gam_hepatitis:
+  # gam_estimate:
+  # gam_age_sex:
+  # gam_age_group:
+  # gam_sex_group:
+  # gam_age_sex_group:
