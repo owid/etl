@@ -5,6 +5,7 @@ Loads the latest PIP, WID and LIS explorer steps and stores a table (as a csv fi
 """
 
 import owid.catalog.processing as pr
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -49,9 +50,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Verify index and sort
-    tb_explorer = tb_explorer.set_index(
-        ["country", "year"], verify_integrity=True
-    ).sort_index()
+    tb_explorer = tb_explorer.set_index(["country", "year"], verify_integrity=True).sort_index()
 
     # Create explorer dataset with merged table in csv format
     ds_explorer = create_dataset(dest_dir, tables=[tb_explorer], formats=["csv"])
