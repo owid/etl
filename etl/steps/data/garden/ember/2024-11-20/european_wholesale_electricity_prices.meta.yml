@@ -4,6 +4,10 @@ definitions:
       topic_tags:
         - Energy
     processing_level: minor
+    description_key:
+      - Wholesale electricity prices are the average spot prices in the day-ahead market, where electricity is traded for delivery to consumers the following day. These prices fluctuate based on supply and demand and are typically set on an hourly basis.
+      - Prices are measured in euros per [megawatt-hour](#dod:watt-hours).
+      - These are the prices paid to electricity producers and do not represent the final cost for households or businesses, which also includes additional costs like distribution, transmission, and taxes.
 
 dataset:
   update_period_days: 365
@@ -16,7 +20,7 @@ tables:
         unit: "current euros per megawatt-hour"
         short_unit: "€/MWh"
         description_short: |-
-          Monthly average day-ahead spot prices per [megawatt-hour](#dod:watt-hours) of electricity sold.
+          Monthly average wholesale price per [megawatt-hour](#dod:watt-hours) of electricity sold.
   european_wholesale_electricity_prices_annual:
     variables:
       price:
@@ -24,4 +28,4 @@ tables:
         unit: "current euros per megawatt-hour"
         short_unit: "€/MWh"
         description_short: |-
-          Annual average day-ahead spot prices per [megawatt-hour](#dod:watt-hours) of electricity sold.
+          Annual average wholesale price per [megawatt-hour](#dod:watt-hours) of electricity sold.

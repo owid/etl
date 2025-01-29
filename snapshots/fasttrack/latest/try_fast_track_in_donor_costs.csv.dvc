@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Unknown
+    title: Unknown
+    citation_full: Unknown
+    version_producer: Local CSV
+    url_main: https://unknown.com
+    url_download: Try fast-track in-donor costs.csv
+    date_accessed: '2025-01-28'
+    date_published: '2025-01-28'
+  name: DRAFT Try fast-track in-donor costs
+  description: ''
+outs:
+  - md5: c36824b6bbd7225916856d7e987d2419
+    size: 961
+    path: try_fast_track_in_donor_costs.csv

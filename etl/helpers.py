@@ -65,21 +65,6 @@ def downloaded(url: str) -> Iterator[str]:
         yield tmp.name
 
 
-def _get_github_branches(org: str, repo: str) -> List[Any]:
-    import requests
-
-    url = f"https://api.github.com/repos/{org}/{repo}/branches?per_page=100"
-    resp = requests.get(url, headers={"Accept": "application/vnd.github.v3+json"}, verify=TLS_VERIFY)
-    if resp.status_code != 200:
-        raise Exception(f"got {resp.status_code} from {url}")
-
-    branches = cast(List[Any], resp.json())
-    if len(branches) == 100:
-        raise Exception("reached single page limit, should paginate request")
-
-    return branches
-
-
 def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
     """Check that the table is in the correct format for Grapher."""
     from etl.grapher import helpers as gh
@@ -688,7 +673,8 @@ class PathFinder:
             short_name=short_name,
             is_private=is_private,
         )
-        matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+        deps = self.dependencies
+        matches = _match_dependencies(pattern, deps)
 
         # If no step was found and is_private was not specified, try again assuming step is private.
         if (len(matches) == 0) and (is_private is None):
@@ -700,7 +686,7 @@ class PathFinder:
                 short_name=short_name,
                 is_private=True,
             )
-            matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+            matches = _match_dependencies(pattern, self.dependencies)
 
         # If not step was found and channel is "grapher", try again assuming this is a grapher://grapher step.
         if (len(matches) == 0) and (channel == "grapher"):
@@ -712,7 +698,7 @@ class PathFinder:
                 short_name=short_name,
                 is_private=is_private,
             )
-            matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+            matches = _match_dependencies(pattern, self.dependencies)
 
         if len(matches) == 0:
             raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
@@ -796,6 +782,11 @@ class PathFinder:
             path = self.mdim_path
         config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
         return config
+
+
+def _match_dependencies(pattern: str, dependencies: List[str]) -> List[str]:
+    regex = re.compile(pattern)
+    return [dependency for dependency in dependencies if regex.match(dependency)]
 
 
 def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:

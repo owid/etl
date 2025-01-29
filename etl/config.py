@@ -56,18 +56,13 @@ def get_container_name(branch_name):
     # Ensure the container name is less than 63 characters
     # however, we truncate it to 28 characters to be consistent with Cloudflare's
     # 28 character limit (see https://community.cloudflare.com/t/algorithm-to-generate-a-preview-dns-subdomain-from-a-branch-name/477633)
-    # TODO: these ifs were added to be backward compatible with existing branches that are longer than 28 characters
-    #   remove them once they get merged
-    if normalized_branch in (
-        "variable-selector-catalog-path",
-        "grapher-page-dynamic-thumbnail",
-        "data-fertility-rate-effective",
-        "add-reset-metadata-origin-option",
-        "data-battery-cell-prices-private",
-    ):
-        limit = 50
-    else:
-        limit = 28
+    #
+    # This function is duplicated in these places, make sure to change all of them:
+    #     https://github.com/owid/ops/blob/main/templates/lxc-manager/prune_staging_containers.py
+    #     https://github.com/owid/ops/blob/main/templates/lxc-manager/shared
+    #     https://github.com/owid/etl/blob/master/etl/config.py#L50
+
+    limit = 28
 
     container_name = f"staging-site-{normalized_branch[:limit]}"
     # Remove trailing hyphens
