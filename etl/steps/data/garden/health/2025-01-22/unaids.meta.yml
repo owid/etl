@@ -911,6 +911,7 @@ tables:
             aged <<age>>
             <%- endif %>
           grapher_config:
+            title: Annual number of males<<" aged " + age if age != "total" else " ">> voluntarily circumcised
             hasMapTab: true
             tab: map
             map:
@@ -951,6 +952,14 @@ tables:
             non-HIV-related health service
             <% endif %>
           grapher_config:
+            title: |-
+              <% if group == "total" %>
+              Experience of HIV-related discrimination in healthcare settings
+              <%- elif group == "hiv-related" %>
+              Experience of HIV-related discrimination in healthcare settings for a HIV-related health service
+              <%- else %>
+              Experience of HIV-related discrimination in healthcare settings for a non-HIV-related health service
+              <% endif %>
             hasMapTab: true
             tab: map
             map:
@@ -982,24 +991,33 @@ tables:
           title_public: HIV expenditure by origin of resources
           title_variant: << group >>
           grapher_config:
+            title: |-
+              HIV expenditure<<" of resources from " + group if group != "total">>
             hasMapTab: true
             tab: map
             map:
               timeTolerance: 1
 
       resource_avail_constant:
-        title: "Estimated HIV resource availability for low- and middle-income countries - Origin: <<group>>"
+        title: "Availability of HIV resources for low- and middle-income countries - Origin: <<group>>"
         description_short: |-
           <% if group == "total" %>
           Volume of financial resources from domestic and international sources allocated to HIV programs in low- and middle-income countries for a specified period.
           <%- else %>
-          Volume of financial resources from domestic and international sources allocated to HIV programs in low- and middle-income countries for a specified period. Only resource "<<group>>" considered.
+          Volume of financial resources from <<group>> sources allocated to HIV programs in low- and middle-income countries for a specified period.
           <%- endif %>
         unit: constant 2019 US$
         short_unit: "$"
         presentation:
-          title_public: Estimated HIV resource availability for low- and middle-income countries
+          title_public: Availability HIV resources for low- and middle-income countries
           title_variant: "origin: <<group>>"
+          grapher_config:
+            title: |-
+              <% if group == "total" %>
+              Availability of HIV resources for low- and middle-income countries
+              <%- else %>
+              Availability of HIV resources from <<group>> sources for low- and middle-income countries
+              <%- endif %>
 
       condoms_distributed_pp:
         title: Condoms distributed per person in prevention programmes for <<group>>
@@ -1010,6 +1028,33 @@ tables:
         presentation:
           title_public: Condoms distributed per person in prevention programmes
           title_variant: << group >>
+          grapher_config:
+            title: Condoms distributed in prevention programmes for <<group>>
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 1
+
+      population:
+        title: Population of <<group>>
+        unit: people
+        description_short: "Estimates of the size of the population of <<group>>"
+        description_from_producer: |-
+          Programme planning for key populations can be more efficient if the size of these populations can be accurately estimated. The figures enable national AIDS programmes, health ministries, donors and not-for-profit and multilateral organizations to efficiently allocate resources to adequately meet the prevention needs of specific populations at higher risk. Size estimates are also important for modelling the HIV epidemic.
+
+          To better understand the size estimates submitted, we request that the following additional information be included in the comment box:
+
+          - Definition used for the population, and inclusion criteria used in the study/survey, as applicable.
+          - Method to derive the size estimate.
+          - Site-specific estimates for all available estimates.
+
+          In keeping with efforts to provide more granular data presentations, the latter will offer the opportunity for mapping denominator data with programme data if they are collected in the same survey areas.
+
+          If there are subnational data available, please provide the disaggregation by administrative area, city, or site in the space provided. You may also upload an Excel spreadsheet of these data instead of entering them in the online tool. Submit the digital version of any available size estimation reports using the upload tool.
+
+          More details: https://indicatorregistry.unaids.org/indicator/size-estimations-key-populations
+        presentation:
+          title_public: Population of <<group>>
           grapher_config:
             hasMapTab: true
             tab: map
@@ -1028,7 +1073,7 @@ tables:
         title: Co-management of tuberculosis and HIV treatment - <<estimate.title()>> estimate
         unit: "%"
         description_short: |-
-          Percentage of people living with HIV estimated to have incident tuberculosis (TB) that received treatment for both TB and HIV
+          <<estimate.title()>> estimate of the percentage of people living with HIV estimated to have incident tuberculosis (TB) that received treatment for both TB and HIV
         description_from_producer: |-
           TB is a leading cause of morbidity and mortality among people living with HIV, including those receiving antiretroviral therapy. Prompt TB treatment and early antiretroviral therapy are critical for reducing the mortality due to HIV-associated TB and must be the highest-priority activity for both the AIDS Programme and National TB Programme. A measure of the percentage of HIV-positive TB patients that access appropriate treatment for their TB and HIV is therefore very important.
 
@@ -1051,13 +1096,13 @@ tables:
       hiv_new_tb_cases:
         title: Estimated HIV in new TB cases - <<estimate.title()>> estimate
         unit: "%"
-        description_short: ""
+        description_short: "<<estimate.title()>> estimate"
         presentation:
           title_public: Estimated HIV in new TB cases
       incident_tb_cases:
         title: Incident TB cases in people living with HIV - <<estimate.title()>> estimate
         unit: cases
-        description_short: ""
+        description_short: "<<estimate.title()>> estimate"
         display:
           numDecimalPlaces: 0
         presentation:
@@ -1065,7 +1110,7 @@ tables:
       tb_related_deaths:
         title: Estimated TB-related deaths among people living with HIV - <<estimate.title()>> estimate
         unit: deaths
-        description_short: Number of deaths from people living with HIV that are related to tuberculosis.
+        description_short: <<estimate.title()>> estimate of the number of deaths from people living with HIV that are related to tuberculosis.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -1094,6 +1139,7 @@ tables:
           title_public: "Prevalence of hepatitis <<hepatitis>> and HIV"
           title_variant: <<group>><<", " + sex + "s" if sex not in ["total", "other"] else "">><<", aged " + age if age != "total" else "">>
           grapher_config:
+            title: Prevalence of hepatitis <<hepatitis>> and HIV in <<group>><<", " + sex + "s" if sex not in ["total", "other"] else "">><<", aged " + age if age != "total" else "">>
             hasMapTab: true
             tab: map
 
@@ -1109,7 +1155,7 @@ tables:
       prevalence_male_circumcision:
         title: "Prevalence of male circumcision - Age: <<age>> - Procedure: <<group>>"
         description_short: |-
-          Percentage of men 15-49 that are circumcised.
+          Percentage of men <<"15-49" if age == "total" else age>> that are circumcised.
         unit: "%"
         description_from_producer: |-
           Three randomized controlled trials have shown that male circumcision provided by well-trained health professionals in properly equipped settings is safe and can reduce the risk of acquiring HIV. Other benefits of medical male circumcision include the reduced risk of some other STIs, including human papillomavirus, the cause of cervical cancer. The World Health Organization (WHO) and UNAIDS recommendations emphasize that voluntary medical male circumcision should continue to be provided as an additional efficacious HIV prevention option within combination prevention for adolescents 15 years and older and adult men in settings with generalized epidemics to reduce the risk of heterosexually acquired HIV infection. Voluntary medical male circumcision services should be provided as part of a package of prevention interventions including safer sex education, condom education and provision, HIV testing and linkages to care and treatment, and management of sexually transmitted infections.
@@ -1125,8 +1171,10 @@ tables:
           title_variant: |-
             <% if age != "total" %>aged <<age>><% if group != "total" %>, <% endif %><% endif %><% if group != "total" %><<group>> procedure<% endif %>
           grapher_config:
+            title: Prevalence of male circumcision<<", aged " + age if age != "total">><<", " + group + " procedure" if group != "total">>
             map:
               timeTolerance: 5
+
       hiv_self_tests:
         title: HIV self-tests - <<group>>
         description_short: |-
@@ -1143,6 +1191,13 @@ tables:
           numDecimalPlaces: 0
 
   gam_sex_group:
+    common:
+      presentation:
+        grapher_config:
+          hasMapTab: true
+          tab: map
+          map:
+            timeTolerance: 3
     variables:
       condoms_distributed:
         title: "Annual number of <<sex>> condoms distributed - Provider: <<group>>"
@@ -1180,27 +1235,138 @@ tables:
             <%- endif %>
         presentation:
           title_public: Annual number of <<sex>> condoms distributed
-          title_variant: <<group + " providers" if group != "total" else "">>
+          title_variant: <<"by " + group + " providers" if group != "total" else "">>
+          grapher_config:
+            title: Annual number of <<sex>> condoms distributed<<" by " + group + " providers" if group != "total" else "">>
         display:
           numDecimalPlaces: 0
 
       experience_violence:
-        title: Experience of sexual and/or physical violence among X
+        title: "Physical and/or sexual violence experienced by <<group>> (%) - Sex: <<sex>>"
         unit: "%"
-        description_short: ""
-        description_from_producer: ""
+        description_short: |-
+          <% if group == "people who inject drugs" %>
+          Percentage of <<sex + "s" if sex != "total" else "people">> who inject drugs that report having experienced physical and/or sexual violence in the last 12 months.
+          <%- else %>
+          Percentage of <<sex if sex != "total" else "">> <<group>> who report having experienced physical and/or sexual violence in the last 12 months.
+          <% endif %>
+        description_from_producer: |-
+          Globally, high rates of HIV infection among key populations - including sex workers, gay men and other men who have sex with men, people who inject drugs and transgender people - have brought into sharp focus the problem of gender-based violence. There is growing recognition that deep-rooted, pervasive gender inequalities, reflected in gender-based violence, shape their risk of and vulnerability to HIV infection.
 
-      population:
-        title: Population
-        unit: people
-        description_short: ""
-        description_from_producer: ""
+          Violence and HIV have been linked through direct and indirect pathways, and studies in a range of countries indicate that many sex workers, gay men and other men who have sex with men, people who inject drugs and transgender people have experienced violence in some form or another at some point in their lives. Violence has also been demonstrated to impede HIV prevention, care and treatment services among key populations.
+
+          Calculation: Numerator / Denominator
+
+          Numerator: Number of people in a key population group (sex workers, gay men and other men who have sex with men, people who inject drugs or transgender people) who reported that either of the incidents happened to them at least once in the last 12 months.
+          Denominator: Total number of respondents from a key population group.
+
+          Method of measurement:
+          Behavioural surveillance or other special surveys. Indicators A-D are constructed from responses to the following questions among respondents who report belonging to a key population group (i.e., sex workers, gay men and other men who have sex with men, people who inject drugs and transgender people).
+
+          (1) In the last 12 months, how many times has anyone physically hurt you, such as hit or choked you or threatened you with a knife or other weapon (this has not happened in the last 12 months, once, 2-5 times, 6-10 times, 10 or more times, don't know, refuse to answer)?
+
+          and/or
+
+          (2) In the last 12 months, how many times has someone tricked you, lied to you or threatened you in order to make you have sex when you didn't want to (this has not happened in the last 12 months, once, 2-5 times, 6-10 times, 10 or more times, don't know, refuse to answer)?
+
+          More details: https://indicatorregistry.unaids.org/indicator/experience-physical-andor-sexual-violence-among-key-populations
+        presentation:
+          title_public: |-
+            <% if group == "people who inject drugs" %>
+            Share of <<sex + "s" if sex != "total" else "people">> who inject drugs who experienced physical and/or sexual violence
+            <%- else %>
+            Share of <<sex + " " if sex != "total" else "">>sex workers who experienced physical and/or sexual violence
+            <% endif %>
 
       syphilis_prevalence:
-        title: Syphilis prevalence among X
+        title: "Prevalence of syphilis among <<group>> - Sex: <<sex>>"
+        unit: "%"
+        description_short: |-
+          <% if group == "transgender, sex workers" %>
+          Share of sex workers who are transgender with syphilis.
+          <% else %>
+          Share of <<sex + " " if ((sex not in ["total", "other"]) and (group != "men who have sex with men"))>><<group>> with syphilis.
+          <% endif %>
+        description_from_producer: |-
+          The prevalence of syphilis is typically much higher in key populations than in the general population. Reducing the prevalence of syphilis among key populations is important for the health of the population and also a critical measure of the national-level response to syphilis.
+
+          The increasing use of rapid tests for testing (screening) individuals for syphilis has increased access to syphilis testing in settings that were previously without capacity. As a result, this indicator has been expanded to syphilis prevalence rather than focusing solely on active syphilis.
+
+          Testing for syphilis in key populations is a component of second-generation HIV surveillance.
+
+          Calculated as: Numerator / Denominator, where
+
+          Numerator: Number of people in a key population who test positive for syphilis
+          Denominator: Number of people in a key population tested for syphilis
+
+          Method of measurement:
+          This indicator is calculated using data from syphilis tests conducted among respondents in sentinel site(s) or participants in biobehavioural surveys or regular sexually transmitted infection screening services. The sentinel surveillance sites used for calculating this indicator should remain constant to allow for tracking changes over time.
+
+          Screening may be done with either a nontreponemal test (e.g., venereal disease research laboratory [VDRL] or rapid plasma reagin [RPR]) or a treponemal test (e.g., Treponema pallidum haemagglutination assay [TPHA], Treponema pallidum particle agglutination assay [TPPA], enzyme immunoassay or rapid treponemal test). While nontreponemal serologic tests are sensitive, they lack specificity and can result in false positive cases. Treponemal tests are more specific but cannot differentiate between current and past infection or treated and untreated infection. For the purpose of this indicator (intended to measure seropositivity), reporting positivity based on a single test result is acceptable. However, if both treponemal and nontreponemal test results for an individual person are available, then syphilis positivity should be defined as having positive results on both tests. Countries are required to report the testing algorithm used to determine positivity so prevalence estimates can be adjusted to look at trends over time and generate regional and global estimates.
+
+          More details: https://indicatorregistry.unaids.org/indicator/syphilis-prevalence-among-key-populations-b-d
+        presentation:
+          title_public: Prevalence of syphilis among <<sex + " " if ((sex not in ["total", "other"]) and (group != "men who have sex with men"))>><<group>>
+
+  gam_age_sex:
+    common:
+      presentation:
+        grapher_config:
+          hasMapTab: true
+          tab: map
+          map:
+            timeTolerance: 3
+    variables:
+      att_tow_wife_beating:
+        title: "Attitudes towards violence against women - Age: <<age>> - Sex: <<sex>>"
+        unit: "%"
+        description_short: |-
+          The percentage of << "women" if sex == "female" else "men" if sex == "male" else "men and women" >> aged <<age if age != "total" else "15-49">> years who believe that a husband is justified in hitting or beating his wife for
+        description_from_producer: |-
+          Gender inequality continues to stand in the way of global goals to end AIDS by 2030. Inequitable gender norms that confine women and men to specific roles in society - together with gender disparities in education and employment - greatly limit HIV prevention strategies among women, girls, and gender and sexual minorities. Fear, experiences of violence and power imbalances in relationships also increase vulnerability to HIV among these groups, limiting their access to HIV services and reducing their adherence to HIV prevention or treatment technologies. This leaves them disproportionately affected by HIV. Scaling up programmes to increase gender equity and intensifying efforts to achieve gender equality is therefore critical for ending AIDS as a global public health threat by 2030.
+
+          Calculation: Numerator / Denominator, where
+
+          Numerator: Number of respondents who agree with at least one of the statements
+          Denominator: Total number of respondents
+
+          Method of measurement:
+          Population-based surveys. This indicator is constructed from responses to the following question among respondents:
+
+          In your opinion, is a husband justified in hitting or beating his wife in the following situations?
+
+          a. If she goes out without telling him? (yes, no, don't know)
+          b. If she neglects the children? (yes, no, don't know)
+          c. If she argues with him? (yes, no, don't know)
+          d. If she refuses to have sex with him? (yes, no, don't know)
+          e. If she burns the food? (yes, no, don't know)
+
+          The numerator included respondents who expressed agreement with one or more of the situations.
+        presentation:
+          title_public: Attitudes towards violence against women
+          title_variant: <<sex + "s" if sex != "total">><<", " if (age != "total") and (sex != "total")>><<"aged " + age if age != "total">>
+          grapher_config:
+            title: Attitudes <<"from " + sex + "s" if sex != "total">>towards violence against women<<", " + sex + "s" if sex != "total">><<", aged " + age if age != "total">>
+
+      demand_family_planning:
+        title: Demand for family planning satisfied by modern methods
+        unit: "%"
+        description_short: ""
+        description_from_producer: ""
+      prevalence_ipv:
+        title: Prevalence of recent intimate partner violence
+        unit: "%"
+        description_short: ""
+        description_from_producer: ""
+      pwid_ost_coverage:
+        title: Coverage of opioid substitution therapy
         unit: "%"
         description_short: ""
         description_from_producer: ""
 
-  # gam_age_sex:
+      hiv_pos_rate:
+        title: HIV positivity rate
+        unit: "%"
+        description_short: ""
+        description_from_producer: ""
   # gam_age_sex_group:
