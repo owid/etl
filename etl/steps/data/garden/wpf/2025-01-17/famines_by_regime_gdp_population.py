@@ -84,6 +84,7 @@ def run(dest_dir: str) -> None:
     # Add GDP data.
     tb = add_gdp(tb, tb_gdp)
 
+    # Add population growth data.
     tb = add_population_growth(tb, ds_population)
 
     #  Add midpoint date for Bastian and code democracy as 1 and autocracy as 0
@@ -186,15 +187,11 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
 
     Replacement Rules:
     - For each country and specified years, replace the GDP value with the GDP from a reference year or the average GDP over a specified range of years.
-    - Special cases handle multiple countries and individual countries separately, ensuring accurate and consistent GDP data.
+    - Special cases handle multiple countries and individual countries separately.
 
     Example:
     - For Cuba, the GDP values for the years 1895 to 1898 are replaced with the GDP value from 1892.
     - For China, the GDP values for the years 1876 to 1879 are replaced with the average GDP from 1870 to 1887.
-    - Special cases include handling GDP values for "Russia, Kazakhstan" for the years 1932 to 1934 with the average GDP of the USSR from 1940 to 1946.
-
-    Returns:
-    - The updated famine table with the added and replaced GDP information.
     """
 
     # Replace 'former Sudan' with 'Sudan' in the 'country' column of tb_gdp
@@ -278,6 +275,17 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
 
     Returns:
     Table: The updated table with population growth information added.
+
+    The function performs the following steps:
+    1. Find the earliest year for each combination of country and famine_name.
+    2. Create a new table with years extending back to -20 from the earliest year.
+    4. Find the earliest and latest year for each combination of country and famine_name in the extended table.
+    5. Merge the earliest and latest years to the original table.
+    6. Add population data to the extended table.
+    7. Calculate the population growth between the earliest and latest year.
+    9. Add the population growth information to the original table.
+    10. Merge the updated information back to the original table.
+
     """
     # Find the earliest year for each combination of country and famine_name
     earliest_years = tb.groupby(["country", "famine_name"])["year"].min().reset_index()
@@ -295,6 +303,7 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
     # Convert the list to a DataFrame and create a Table
     extended_years_df = pd.DataFrame(extended_years)
     tb_ext = Table(extended_years_df)
+
     # Find the earliest and latest year for each combination of country and famine_name
     earliest_years = tb_ext.groupby(["country", "famine_name"])["year"].min().reset_index()
     latest_years = tb_ext.groupby(["country", "famine_name"])["year"].max().reset_index()
@@ -306,6 +315,7 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
     # Add population data to the extended table
     tb_ext = geo.add_population_to_table(tb_ext, ds_population)
 
+    # Store the origins metadata for the population column.
     origins = tb_ext["population"].metadata.origins
 
     # Calculate the population growth between the earliest and latest year
@@ -314,6 +324,7 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
         / tb_ext[tb_ext["year"] == tb_ext["year_earliest"]]["population"].values
         - 1
     ) * 100
+
     # Remove columns with the -20 year for each famine start but keep the latest year column (actual start date of the famine)
     tb_ext = tb_ext.drop(columns=["year_earliest", "year", "population"])
     tb_ext = tb_ext.rename(columns={"year_latest": "year"})
