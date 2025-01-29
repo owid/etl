@@ -19,6 +19,9 @@ def run(dest_dir: str) -> None:
     tables = [
         ds_garden["epi"],
         ds_garden["gam"],
+        ds_garden["gam_sex"],
+        ds_garden["gam_age"],
+        ds_garden["gam_group"],
     ]
 
     #
