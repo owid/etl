@@ -32,6 +32,9 @@ tables:
       presentation:
         title_variant: |-
           <<sex+'s, ' if sex != 'total'>><<"aged " + age + ", " if age != "total">><<estimate.title()>> estimate
+        grapher_config:
+          hasMapTab: true
+          tab: map
     variables:
       #
       # DEATHS
@@ -77,6 +80,8 @@ tables:
           Number of children, aged 17 and under, who have been orphaned by the death of one or both parents from AIDS at any point in their lives. This is the <<estimate.title()>> estimate.
         description_key:
           - An orphan is defined as a child under 18 years old who has lost at least one parent. A child who has lost their mother is called a maternal orphan, while a child who has lost their father is referred to as a paternal orphan. A child who has lost both parents is known as a double orphan.
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: "Children orphaned due to AIDS deaths"
 
@@ -89,6 +94,8 @@ tables:
           - Reflects the overall mortality burden within the HIV-positive population.
           - Includes deaths from all causes, not limited to AIDS-related illnesses.
           - Helps in assessing the effectiveness of comprehensive care and treatment programs for people living with HIV.
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: "Deaths among people living with HIV"
 
@@ -102,6 +109,8 @@ tables:
         description_short: ""
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during pregnancy
           title_variant: Mother did not receive ART during pregnancy
@@ -113,6 +122,8 @@ tables:
         description_short: ""
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during pregnancy
           title_variant: Mother dropped off ART during pregnancy
@@ -124,6 +135,8 @@ tables:
         description_short: ""
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during pregnancy
           title_variant: Mother started ART late in pregnancy
@@ -135,6 +148,8 @@ tables:
         description_short: ""
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during pregnancy
           title_variant: Mother started ART during in pregnancy
@@ -146,6 +161,8 @@ tables:
         description_short: ""
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during pregnancy
           title_variant: Mother started ART before the pregnancy
@@ -155,6 +172,8 @@ tables:
         title: Number of children infected with HIV during pregnancy, along with their mothers
         unit: "infections"
         description_short: ""
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during pregnancy, along with their mothers
           title_variant: ""
@@ -166,6 +185,8 @@ tables:
         description_short: ""
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during breastfeeding
           title_variant: Mother did not receive ART during breastfeeding
@@ -177,6 +198,8 @@ tables:
         description_short: ""
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during breastfeeding
           title_variant: Mother dropped off ART during breastfeeding
@@ -188,6 +211,8 @@ tables:
         description_short: ""
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during breastfeeding
           title_variant: Mother started ART late in pregnancy
@@ -199,6 +224,8 @@ tables:
         description_short: ""
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during breastfeeding
           title_variant: Mother started ART during in pregnancy
@@ -210,6 +237,8 @@ tables:
         description_short: ""
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during breastfeeding
           title_variant: Mother started ART before the pregnancy
@@ -219,6 +248,8 @@ tables:
         title: Number of children infected with HIV during breastfeeding, along with their mothers
         unit: "infections"
         description_short: ""
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Number of children infected with HIV during breastfeeding, along with their mothers
           title_variant: ""
@@ -247,6 +278,8 @@ tables:
           The number of adults and children who are on antiretroviral therapy at the end of the reporting period. It should include people on antiretroviral therapy in the private sector (if these data are available). The count should include pregnant women living with HIV who are receiving lifelong antiretroviral therapy.
 
           More details: https://indicatorregistry.unaids.org/indicator/people-living-hiv-antiretroviral-therapy
+        display:
+          numDecimalPlaces: 0
         description_key:
           - "{definitions.art_description}"
 
@@ -273,6 +306,8 @@ tables:
           New HIV infections among children (aged 0-14 years) prevented through the implementation of Prevention of Mother-to-Child Transmission (PMTCT) programs. This is the <<estimate.title()>> estimate.
         description_key:
           - PMTCT programs include the provision of antiretroviral therapy to pregnant and breastfeeding women living with HIV, which significantly reduces the risk of HIV transmission to their infants.
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: "Infections averted due to PMTCT"
           title_variant: ""
@@ -284,6 +319,8 @@ tables:
           Number of HIV-positive pregnant women who require antiretroviral (ARV) treatments to prevent mother-to-child transmission (MTCT) of HIV during pregnancy, childbirth, and breastfeeding.
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Pregnant women needing ARV for preventing mother-to-child transmission of HIV
           title_variant: ""
@@ -297,6 +334,8 @@ tables:
           The source of this information is national program records aggregated from program monitoring tools, such as patient registers and summary reporting forms. The numerator can be generated by counting the number of HIV-positive pregnant women who received antiretrovirals to reduce MTCT in the reporting period, by regimen.
         description_key:
           - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: Pregnant women who received ARV for preventing mother-to-child transmission of HIV
           title_variant: ""
@@ -341,6 +380,8 @@ tables:
         unit: "children"
         description_short: |-
           Number of children, aged 14 and under, who have been exposed to HIV but haven't been infected. This is the <<estimate.title()>> estimate.
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: "HIV-exposed children who are uninfected"
 
@@ -390,6 +431,8 @@ tables:
         description_key:
           - By tracking new infections, health organizations can assess whether prevention efforts are successfully reducing HIV transmission rates or if emerging challenges are creating new infection pathways.
           - The precision of this metric depends on robust surveillance systems, comprehensive testing programs, and sophisticated epidemiological modeling techniques. Accurate reporting requires consistent data collection, advanced statistical methods, and a nuanced understanding of population-level transmission patterns.
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: "New HIV infections"
 
@@ -398,6 +441,8 @@ tables:
         unit: "people"
         description_short: |-
           Number of {definitions.people_dimension} living with HIV at the end of the reporting period. This is the <<estimate.title()>> estimate.
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: People living with HIV
 
@@ -441,6 +486,8 @@ tables:
           - "This measure is the first 95 of the UNAIDS 95-95-95 target: that 95% of the people living with HIV know their HIV status by 2025."
           - This indicator is pivotal in the HIV response strategy. Knowing one's HIV status is more than just a medical statistic—it's a transformative moment that opens doors to comprehensive care and personal health management.
           - "The gap between total HIV infections and diagnosed cases represents a significant challenge in global health. Many individuals may be unaware of their status due to various barriers, including: Limited access to testing facilities, stigma and discrimination, lack of awareness, financial constraints, cultural or personal hesitation about testing, etc."
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: "{definitions.people_term} living with HIV who know their status"
 
@@ -473,6 +520,8 @@ tables:
         description_key:
           - Viral load suppression is a key medical achievement that transforms HIV from a life-threatening condition to a manageable chronic illness. It shows that the virus is under control and the risk of transmission is low.
           - According to WHO guidelines, a viral load below 1,000 copies/mL is considered suppressed, indicating effective treatment and adherence.
+        display:
+          numDecimalPlaces: 0
         presentation:
           title_public: "{definitions.people_term} living with HIV who have suppressed viral loads"
 
@@ -524,6 +573,12 @@ tables:
   gam:
     common:
       processing_level: minor
+      presentation:
+        grapher_config:
+          hasMapTab: true
+          tab: map
+          map:
+            timeTolerance: 1
     variables:
       # low quality
       expenditure_tb_hiv_activities:
@@ -538,40 +593,47 @@ tables:
         title: People newly enrolled in HIV treatment
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       hiv_tb_diagnosis:
         title: People newly enrolled in HIV treatment diagnosed as having TB during the reporting period
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       hiv_tb_patients_under_ipt:
         title: People living with HIV newly enrolled in HIV treatment started on isoniazid preventive therapy (IPT)
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       newly_enrolled_care:
         title: Adults and children newly enrolled in HIV treatment during the year (10.3 denominator)
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       plhiv_in_care_with_active_tb:
         title: Proportion of people living with HIV newly enrolled in HIV treatment with active tuberculosis (TB) disease
         unit: people
         description_short: |-
           https://indicatorregistry.unaids.org/indicator/proportion-people-living-hiv-newly-enrolled-hiv-care-active-tb-disease
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       plhiv_receiving_tb_preventive_therapy:
         title: Proportion of people living with HIV newly enrolled in HIV treatment started on TB preventive therapy
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
 
       # Currently enrolled to HIV treatment
       plhiv_current_enrolled:
         title: People currently enrolled in HIV treatment
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       plhiv_current_tb_preventative:
         title: Proportion of people living with HIV currently enrolled in HIV treatment receiving TB preventive therapy
         unit: "%"
@@ -581,57 +643,67 @@ tables:
         title: People living with HIV currently enrolled in HIV treatment who start treatment for latent TB infection during the reporting period
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
 
       hiv_tb_patients_receiving_art:
         title: TB patients living with HIV receiving ART
         unit: patients
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       hiv_tb_patients_receiving_cpt:
         title: TB patients living with HIV receiving CPT
         unit: patients
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
 
       new_relapse_tb_cases:
         title: Total new and relapse TB cases
         unit: cases
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
 
       notified_tb_cases:
         title: Total notified TB cases
         unit: cases
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
 
       # TPT, ART
       people_art_elig_tpt:
         title: People on ART who were eligible for TB preventive treatment (TPT)
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       people_art_elig_tpt_strt:
         title: People on ART who were eligible for TB preventive treatment (TPT) that started TPT
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       people_new_art_elig_tpt_strt:
         title: People newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       num_art_complt_tpt:
         title: People on ART who completed TPT among those who initiated any course of TPT during the previous year
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       num_art_init_tpt:
         title: People on ART who initiated any course of TPT during the previous year
         unit: people
         description_short: ""
-        description_from_producer: ""
+        display:
+          numDecimalPlaces: 0
       prop_art_tpt_start:
         title: Proportion of people on ART who were eligible for TB preventive treatment (TPT) that started TPT
         unit: "%"
@@ -646,13 +718,20 @@ tables:
       # Others
       resource_needs_ft:
         title: Estimated resource needs
-        unit: CONSTANT_USD
-        description_short: ""
-        description_from_producer: ""
+        short_unit: "$"
+        unit: "constant 2019 US$"
+        description_short: "Estimated resource needs for HIV in low- and middle-income countries in constant 2019 USD."
+        display:
+          name: Estimated resource needs to meet HIV targets
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            hasMapTab: false
+            tab: chart
 
       tb_expenditure:
         title: Total TB expenditure
-        unit: US$
+        unit: constant 2019 US$
         short_unit: "$"
         description_short: ""
         description_from_producer: ""
@@ -668,10 +747,14 @@ tables:
         description_short: Number of people in prisons and other closed settings receiving opioid agonist maintenance therapy.
         description_from_producer: |-
           People in prisons and other closed settings are often at risk for acquiring HIV when they are released and living in the community. This is especially true for people involved with illicit drug use or where selling sex is illegal. Offering HIV prevention and treatment services in prisons can reduce HIV transmission risk both within the prison and in the community on release. A strong national HIV response will include such services to people in prisons and other closed settings.
+        display:
+          numDecimalPlaces: 0
       prisoners_tb:
         title: Tuberculosis (TB) infection among prisoners
         unit: people
         description_short: ""
+        display:
+          numDecimalPlaces: 0
 
       people_on_prep:
         title: People receiving pre-exposure prophylaxis (PrEP)
@@ -685,6 +768,8 @@ tables:
           Implementation of PrEP should be informed by several contextual factors. These include national and subnational epidemiological trends; programmatic feasibility and demand; and consideration of the social environment for people living with HIV and people from key populations and their access to services. PrEP implementation criteria may vary by country.
 
           More details: https://indicatorregistry.unaids.org/indicator/people-receiving-pre-exposure-prophylaxis-prep
+        display:
+          numDecimalPlaces: 0
 
       per_tpt_art_cmplt:
         title: Percentage of people living with HIV initiating TB preventive treatment (TPT) and on antiretroviral therapy who completed a course of TPT
@@ -704,6 +789,8 @@ tables:
           - These programs are highly effective in preventing HIV transmission among people who inject drugs, supported by extensive scientific evidence.
         presentation:
           title_public: Needles and Syringes per person who injects drugs
+        display:
+          numDecimalPlaces: 0
       pwid_needles_distributed:
         title: Needles and syringes distributed to people who inject drugs
         unit: needles
@@ -712,6 +799,8 @@ tables:
         description_key: *pwdi_needles
         presentation:
           title_public: "Needles and Syringes distributed to people who inject drugs"
+        display:
+          numDecimalPlaces: 0
 
       # TB patients with HIV documented status
       tb_patients_documented_hiv_status:
@@ -744,12 +833,14 @@ tables:
         presentation:
           title_public: Percentage of new and relapse TB cases with documented HIV-positive status
 
-      # Can't find
+      # possible source: https://media.psi.org/wp-content/uploads/2020/06/31001419/who-consolidated-strategic-information-guidelines-for-hiv-in-the-health-sector.pdf
+      # Annex 1, code "HTS.6", page 255
       tb_patients_tested_positive_hiv:
         title: TB patients tested positive for HIV
-        unit: people
-        description_short: ""
-        description_from_producer: ""
+        unit: patients
+        description_short: "Number of tuberculosis (new and relapsed) patients that tested positive for HIV."
+        display:
+          numDecimalPlaces: 0
 
   gam_sex:
     common:
@@ -783,6 +874,11 @@ tables:
           - The ongoing spread of HIV is largely driven by sexual transmission among young people. Comprehensive knowledge about HIV and AIDS is essential for adopting behaviors that reduce the risk of transmission.
         presentation:
           title_public: Knowledge about HIV prevention<<" by " + sex + "s" if sex != 'total' else ''>>
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 1
 
   gam_age:
     common:
@@ -811,6 +907,11 @@ tables:
             <%- else %>
             aged <<age>>
             <%- endif %>
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 1
 
   gam_group:
     common:
@@ -848,6 +949,11 @@ tables:
             <%- else %>
             non-HIV-related health service
             <% endif %>
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 2
 
       domestic_spending_fund_source:
         title: "HIV expenditure by origin of resources - Origin: <<group>>"
@@ -874,6 +980,11 @@ tables:
         presentation:
           title_public: HIV expenditure by origin of resources
           title_variant: << group >>
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 1
 
       resource_avail_constant:
         title: "Estimated HIV resource availability for low- and middle-income countries - Origin: <<group>>"
@@ -889,8 +1000,87 @@ tables:
           title_public: Estimated HIV resource availability for low- and middle-income countries
           title_variant: "origin: <<group>>"
 
-  # gam_hepatitis:
-  # gam_estimate:
+  gam_estimates:
+    common:
+      presentation:
+        title_variant: <<estimate.title()>> estimate
+        grapher_config:
+          hasMapTab: true
+          tab: map
+    variables:
+      comanagement_tb_hiv:
+        title: Co-management of tuberculosis and HIV treatment - <<estimate.title()>> estimate
+        unit: "%"
+        description_short: |-
+          Percentage of people living with HIV estimated to have incident tuberculosis (TB) that received treatment for both TB and HIV
+        description_from_producer: |-
+          TB is a leading cause of morbidity and mortality among people living with HIV, including those receiving antiretroviral therapy. Prompt TB treatment and early antiretroviral therapy are critical for reducing the mortality due to HIV-associated TB and must be the highest-priority activity for both the AIDS Programme and National TB Programme. A measure of the percentage of HIV-positive TB patients that access appropriate treatment for their TB and HIV is therefore very important.
+
+          Calculated as `Numerator/denominator`, where:
+
+          Numerator: Number of people living with HIV with new or relapse TB started on TB treatment during the reporting period who were already on antiretroviral therapy or started on antiretroviral therapy during TB treatment within the reporting year
+
+          Denominator: Estimated number of people living with HIV with incident TB cases
+
+          For the numerator: Facility antiretroviral therapy registers and reports; programme monitoring tools. Count the total number of HIV-positive new and relapse TB patients who were started on TB treatment (as recorded in the TB register) and antiretroviral therapy, or those already on antiretroviral therapy (as recorded in the antiretroviral therapy register). The information should be reconciled quarterly and annually with the TB registers in the relevant basic management units before consolidation and reporting.
+
+          For the denominator: Programme data and estimates of the number of people living with HIV with incident TB. WHO calculates annual estimates of the number of people living with HIV with incident TB. The denominator become available only in August of the reporting year and do not need to be provided at the time of reporting. The estimates for 2023 are available at https://www.who.int/teams/global-tuberculosis-programme/data
+
+          More details: https://indicatorregistry.unaids.org/indicator/co-management-of-tuberculosis-and-hiv-treatment
+        description_key:
+          - Prompt initiation of TB treatment alongside early antiretroviral therapy is critical to reduce HIV-associated TB mortality. Tracking the percentage of HIV-positive TB patients who receive appropriate treatment for both conditions is therefore essential for improving overall patient outcomes.
+        presentation:
+          title_public: Co-management of tuberculosis and HIV treatment
+
+      hiv_new_tb_cases:
+        title: Estimated HIV in new TB cases - <<estimate.title()>> estimate
+        unit: "%"
+        description_short: ""
+        presentation:
+          title_public: Estimated HIV in new TB cases
+      incident_tb_cases:
+        title: Incident TB cases in people living with HIV - <<estimate.title()>> estimate
+        unit: cases
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Incident TB cases in people living with HIV
+      tb_related_deaths:
+        title: Estimated TB-related deaths among people living with HIV - <<estimate.title()>> estimate
+        unit: deaths
+        description_short: Number of deaths from people living with HIV that are related to tuberculosis.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Estimated TB-related deaths among people living with HIV
+
+  gam_hepatitis:
+    variables:
+      viral_hepatitis:
+        title: "Prevalence of hepatitis <<hepatitis>> and HIV - Key population: <<group>> - Sex: <<sex>> - Age: <<age>>"
+        description_short: |-
+          Share of tested people with hepatitis <<hepatitis>> and HIV coinfection among <<group>><<", " + sex + "s" if sex not in ["total", "both"] else "">><<", aged " + age if age != "total" else "">>.
+        unit: "%"
+        description_from_producer: |-
+          Appreciation of hepatitis and HIV coinfection has improved recently. Many people living with HIV receiving antiretroviral therapy are dying from liver disease resulting from untreated viral hepatitis. HIV treatment regimens can be adjusted to treat chronic hepatitis B infection as well. New, highly effective hepatitis C treatment is available and has a high rate of virus clearance regardless of hepatitis C virus subtype. Measuring the hepatitis burden among key populations living with HIV can help national planners determine the resources needed to address the syndemic.
+
+          Calculation: Numerator / Denominator, where:
+
+          Numerator: Number of people in a key population who test positive for both HIV and hepatitis <<"C virus" if hepatitis == "C" else "B surface antigen">>
+          Denominator: Number of respondents tested for both HIV and one or both of hepatitis B and C
+
+          Strengths and weaknesses:
+          Probability-based estimates of coinfection with HIV and hepatitis C virus or HIV and hepatitis B virus among key populations are generally unavailable, although several biobehavioural surveys have conducted hepatitis antibody testing. Improving knowledge about coinfection will help to improve treatment programmes and help to maximize the survival of the affected populations. The numbers of people coinfected are likely to be small, with the possible exception of people who inject drugs, so the confidence intervals will be large.
+
+          More details: https://indicatorregistry.unaids.org/indicator/viral-hepatitis-among-key-populations
+        presentation:
+          title_public: "Prevalence of hepatitis <<hepatitis>> and HIV"
+          title_variant: <<group>><<", " + sex + "s" if sex not in ["total", "other"] else "">><<", aged " + age if age != "total" else "">>
+          grapher_config:
+            hasMapTab: true
+            tab: map
+
   # gam_age_sex:
   # gam_age_group:
   # gam_sex_group:

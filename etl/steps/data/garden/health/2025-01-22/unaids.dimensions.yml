@@ -605,7 +605,7 @@ gam:
   HIGH_ESTIMATE:
     estimate: "high"
   HIV_RELATED:
-    group: "hiv-related"
+    group: "HIV-related"
   INTERNATIONAL:
     group: "international"
   LESS_1:
