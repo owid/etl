@@ -13,7 +13,7 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    # Load WID explorer step
+    # Load WID explorer step.
     ds_wid = paths.load_dataset("world_inequality_database")
     tb_wid = ds_wid["world_inequality_database"].reset_index()
 
