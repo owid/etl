@@ -839,7 +839,7 @@ tables:
           More details: https://indicatorregistry.unaids.org/indicator/experience-hiv-related-discrimination-health-care-settings-0
         presentation:
           title_public: |-
-            "Experience of HIV-related discrimination in healthcare settings"
+            Experience of HIV-related discrimination in healthcare settings
           title_variant: |-
             <% if group == "total" %>
             all health services
