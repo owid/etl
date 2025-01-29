@@ -27,7 +27,7 @@ RELATIVE_POVERTY_DESCRIPTION = "This data has been estimated by calculating the 
 
 PROCESSING_DESCRIPTION = """We extract estimations of Gini, mean, percentile thresholds, averages, and shares via the [`wid` Stata command](https://github.com/thomasblanchet/wid-stata-tool). We calculate threshold and share ratios by dividing different thresholds and shares, respectively."""
 
-PPP_DESCRIPTION = f"The data is measured in international-$ at {PPP_YEAR} prices – this adjusts for inflation and for differences in the cost of living between countries."
+PPP_DESCRIPTION = f"The data is measured in international-$ at {PPP_YEAR} prices – this adjusts for inflation and for differences in living costs between countries."
 
 # These are parameters specifically defined for each type of variable
 VAR_DICT = {
