@@ -36,7 +36,10 @@ tables:
          unit: '%'
          short_unit: '%'
          description_short: The average annual population growth rate in the 20 years before the famine.
-         description_processing: The population growth rate was calculated by taking the population in the year of the famine and dividing it by the population 20 years prior, subtracting 1, and multiplying by 100.
+         description_processing: |-
+            The population growth rate was calculated by taking the population in the year of the famine and dividing it by the population 20 years prior, subtracting 1, and multiplying by 100.
+
+            For famines that occurred in Soviet states while they were part of the USSR, we used the population growth of the USSR. Similarly, for famines in Ukraine during its time under the Russian Empire, we used the population growth of the Russian Empire.
 
        midpoint_year:
           title: Midpoint year of famine

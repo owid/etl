@@ -226,7 +226,7 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
             ].values[0]
         elif "year_range" in rule:
             gdp_value = calculate_average_gdp(tb_gdp, rule["country"], rule["year_range"])
-        replace_gdp(tb, tb_gdp, rule["country"], rule["years"], gdp_value)
+        replace_gdp(tb, rule["country"], rule["years"], gdp_value)
 
     # Special cases for USSR/Russian Empire  - these countries were a part of the USSR/Russian Empire at the time so use the GDP of the USSR/Russia; some years aren't available so use an average of the surrounding years
     special_cases = {
@@ -247,7 +247,7 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
                 gdp_value = calculate_average_gdp(tb_gdp, "USSR", [1940, 1946])
             else:
                 gdp_value = tb_gdp[(tb_gdp["country"] == "USSR") & (tb_gdp["year"] == year)]["gdp_per_capita"].values[0]
-            replace_gdp(tb, tb_gdp, countries, [year], gdp_value)
+            replace_gdp(tb, countries, [year], gdp_value)
 
     # Special cases for individual countries with GDP values for 2023 replaced with GDP values from 2022
     special_individual_cases = [
@@ -260,7 +260,7 @@ def add_gdp(tb: Table, tb_gdp: Table) -> Table:
         gdp_value = tb_gdp[(tb_gdp["country"] == case["country"]) & (tb_gdp["year"] == case["ref_year"])][
             "gdp_per_capita"
         ].values[0]
-        replace_gdp(tb, tb_gdp, case["country"], [case["year"]], gdp_value)
+        replace_gdp(tb, case["country"], [case["year"]], gdp_value)
 
     return tb
 
@@ -280,7 +280,7 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
     1. Find the earliest year for each combination of country and famine_name.
     2. Create a new table with years extending back to -20 from the earliest year.
     4. Find the earliest and latest year for each combination of country and famine_name in the extended table.
-    5. Merge the earliest and latest years to the original table.
+    5. Merge the earliest and latest years to the original table and rename countries that were a part of USSR to USSR for the purposes of calculating population growth.
     6. Add population data to the extended table.
     7. Calculate the population growth between the earliest and latest year.
     9. Add the population growth information to the original table.
@@ -312,8 +312,23 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
     tb_ext = pr.merge(tb_ext, earliest_years, on=["country", "famine_name"], suffixes=("", "_earliest"))
     tb_ext = pr.merge(tb_ext, latest_years, on=["country", "famine_name"], suffixes=("", "_latest"))
 
+    tb_ext = tb_ext.rename(columns={"country": "original_country"})
+
+    # Mapping dictionary to rename specified countries to "USSR"
+    country_mapping = {
+        "Kazakhstan": "USSR",
+        "Russia, Ukraine": "Russia",  # Ukrane was a part of the Russian Emprie
+        "Russia, Western Soviet States": "USSR",
+        "Moldova, Ukraine, Russia, Belarus": "USSR",
+    }
+
+    # Create a new column with the renamed countries
+    tb_ext["country"] = tb_ext["original_country"].replace(country_mapping)
+
     # Add population data to the extended table
     tb_ext = geo.add_population_to_table(tb_ext, ds_population)
+    tb_ext = tb_ext.drop(columns={"country"})
+    tb_ext = tb_ext.rename(columns={"original_country": "country"})
 
     # Store the origins metadata for the population column.
     origins = tb_ext["population"].metadata.origins
@@ -340,7 +355,7 @@ def add_population_growth(tb: Table, ds_population: Dataset) -> Table:
     return tb
 
 
-def replace_gdp(tb, tb_gdp, country, years, gdp_value):
+def replace_gdp(tb, country, years, gdp_value):
     for year in years:
         tb.loc[(tb["country"] == country) & (tb["year"] == year), "gdp_per_capita"] = gdp_value
 
