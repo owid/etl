@@ -21,6 +21,7 @@ definitions:
     adults
     <%- endif %>
   common:
+    processing_level: minor
     presentation:
       topic_tags:
         - HIV/AIDS
@@ -28,7 +29,6 @@ definitions:
 tables:
   epi:
     common:
-      processing_level: minor
       presentation:
         title_variant: |-
           <<sex+'s, ' if sex != 'total'>><<"aged " + age + ", " if age != "total">><<estimate.title()>> estimate
@@ -572,7 +572,6 @@ tables:
 
   gam:
     common:
-      processing_level: minor
       presentation:
         grapher_config:
           hasMapTab: true
@@ -643,6 +642,14 @@ tables:
         title: People living with HIV currently enrolled in HIV treatment who start treatment for latent TB infection during the reporting period
         unit: people
         description_short: ""
+        display:
+          numDecimalPlaces: 0
+
+      # Condoms distributed to prisoners
+      prisoners_condoms_distributed:
+        title: Number of condoms distributed to prisoners
+        unit: condoms
+        description_short: Number of condoms distributed to prisoners in the last year.
         display:
           numDecimalPlaces: 0
 
@@ -843,8 +850,6 @@ tables:
           numDecimalPlaces: 0
 
   gam_sex:
-    common:
-      processing_level: minor
     variables:
       knowledge_in_young_people:
         title: Knowledge about HIV prevention
@@ -881,8 +886,6 @@ tables:
               timeTolerance: 1
 
   gam_age:
-    common:
-      processing_level: minor
     variables:
       male_circumcisions_performed:
         title: Annual number of males voluntarily circumcised
@@ -914,8 +917,6 @@ tables:
               timeTolerance: 1
 
   gam_group:
-    common:
-      processing_level: minor
     variables:
       discrimination_hc_settings:
         title: "Experience of HIV-related discrimination in healthcare settings - Health service: <<group>>"
@@ -1000,6 +1001,21 @@ tables:
           title_public: Estimated HIV resource availability for low- and middle-income countries
           title_variant: "origin: <<group>>"
 
+      condoms_distributed_pp:
+        title: Condoms distributed per person in prevention programmes for <<group>>
+        # title: Condoms distributed per person in prevention programmes for men who have sex with men
+        # title: Condoms distributed per person in prevention programmes for sex workers
+        unit: condoms per person
+        description_short: Number of condoms distributed per person in prevention programmes for <<group>>.
+        presentation:
+          title_public: Condoms distributed per person in prevention programmes
+          title_variant: << group >>
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 1
+
   gam_estimates:
     common:
       presentation:
@@ -1068,7 +1084,7 @@ tables:
           Calculation: Numerator / Denominator, where:
 
           Numerator: Number of people in a key population who test positive for both HIV and hepatitis <<"C virus" if hepatitis == "C" else "B surface antigen">>
-          Denominator: Number of respondents tested for both HIV and one or both of hepatitis B and C
+          Denominator: Number of respondents tested for both HIV and one or both hepatitis B and C
 
           Strengths and weaknesses:
           Probability-based estimates of coinfection with HIV and hepatitis C virus or HIV and hepatitis B virus among key populations are generally unavailable, although several biobehavioural surveys have conducted hepatitis antibody testing. Improving knowledge about coinfection will help to improve treatment programmes and help to maximize the survival of the affected populations. The numbers of people coinfected are likely to be small, with the possible exception of people who inject drugs, so the confidence intervals will be large.
@@ -1081,7 +1097,110 @@ tables:
             hasMapTab: true
             tab: map
 
+  gam_age_group:
+    common:
+      presentation:
+        grapher_config:
+          hasMapTab: true
+          tab: map
+          map:
+            timeTolerance: 1
+    variables:
+      prevalence_male_circumcision:
+        title: "Prevalence of male circumcision - Age: <<age>> - Procedure: <<group>>"
+        description_short: |-
+          Percentage of men 15-49 that are circumcised.
+        unit: "%"
+        description_from_producer: |-
+          Three randomized controlled trials have shown that male circumcision provided by well-trained health professionals in properly equipped settings is safe and can reduce the risk of acquiring HIV. Other benefits of medical male circumcision include the reduced risk of some other STIs, including human papillomavirus, the cause of cervical cancer. The World Health Organization (WHO) and UNAIDS recommendations emphasize that voluntary medical male circumcision should continue to be provided as an additional efficacious HIV prevention option within combination prevention for adolescents 15 years and older and adult men in settings with generalized epidemics to reduce the risk of heterosexually acquired HIV infection. Voluntary medical male circumcision services should be provided as part of a package of prevention interventions including safer sex education, condom education and provision, HIV testing and linkages to care and treatment, and management of sexually transmitted infections.
+
+          Strengths and weaknesses:
+          A programme may or may not change the rate of male circumcision. For example, changing societal norms not caused by a programme may lead to changing rates of male circumcision. This indicator measures the total change in the population, regardless of the reasons.
+
+          Existing population-based surveys (such as Demographic and Health Surveys) may not accurately measure true male circumcision status because people may lack knowledge of what male circumcision is, be confused about their circumcision status or perceive the social desirability of circumcision status. Other approaches to determining circumcision status might be used: for example, using photographs or drawings (drawings may be more culturally appropriate), prompts or even direct examination. Modelling how changing rates of male circumcision can potential affect HIV incidence requires accurate knowledge of male circumcision status over time.
+
+          More details: https://indicatorregistry.unaids.org/indicator/male-circumcision-prevalence
+        presentation:
+          title_public: "Prevalence of male circumcision"
+          title_variant: |-
+            <% if age != "total" %>aged <<age>><% if group != "total" %>, <% endif %><% endif %><% if group != "total" %><<group>> procedure<% endif %>
+          grapher_config:
+            map:
+              timeTolerance: 5
+      hiv_self_tests:
+        title: HIV self-tests - <<group>>
+        description_short: |-
+          The number of HIV tests <<group>> in the calendar year.
+          <%- if group == "procured" %>
+           Procured self-test kits represent the total number of self-test kits purchased within a year by the national government, including those funded by donors. Kits procured through other channels, such as the private sector, are excluded.
+          <%- else %>
+           Self-test kits distributed refers to the total number of individual self-test kits handed out in a year. This figure does not represent the total number of people who self-tested or the total number of people who received a self-test, as individuals may obtain more than one kit within a year.
+          <%- endif %>
+        unit: "self-tests kits"
+        presentation:
+          title_public: "Number of <<group>> HIV self-tests"
+        display:
+          numDecimalPlaces: 0
+
+  gam_sex_group:
+    variables:
+      condoms_distributed:
+        title: "Annual number of <<sex>> condoms distributed - Provider: <<group>>"
+        unit: condoms
+        description_short: |-
+          <% if group == "total" %>
+          Number of condoms distributed during the past 12 months.
+          <%- elif group == "NGO" %>
+          Number of condoms sold at subsidized rates through social marketing (nongovernmental organizations as providers) during the past 12 months.
+          <%- elif group == "private" %>
+          Number of condoms sold through the commercial sector (private sector providers).
+          <%- elif group == "public" %>
+          Number of condoms distributed for free by the public sector during the last 12 months.
+          <%- endif %>
+        description_from_producer: |-
+          Condoms have been shown to be one of the most effective methods in preventing the sexual transmission of HIV, other sexually transmitted infections (STIs) and unintended pregnancy, with effectiveness that increases with consistent and correct use. The World Health Organization (WHO) and UNAIDS recommendations emphasize that condom distribution and promotion is an efficacious intervention and a critical component of combination HIV prevention.
+
+          Count of the number of male and female condoms that left the central or regional warehouses for onward distribution in the previous calendar year. Data should include condoms distributed for free (public providers), condoms sold at subsidized rates through social marketing (nongovernmental organizations as providers) and condoms sold through the commercial sector (private sector providers). There should be no double-counting of condoms in case of overlap. If condoms from public sector warehouses are given to nongovernmental organizations or community workers for distribution, condoms should be accounted for in the public sector.
+        description_key:
+          - |-
+            <% if group == "total" %>
+            Measures the total quantity of <<sex>> condoms distributed from central/regional warehouses during the previous year, regardless of distribution channel or price point.
+            <%- endif %>
+          - |-
+            <% if group == "total" %>
+            Tracks three distinct distribution channels: free condoms through public providers, subsidized condoms via social marketing/NGOs, and commercial sales through private sector.
+            <%- endif %>
+          - |-
+            <% if group == "total" %>
+            Requires careful accounting to avoid double-counting when condoms move between distribution channels (e.g., from public sector to NGOs).
+            <%- endif %>
+          - |-
+            <% if group == "total" %>
+            For condoms provided to NGOs or community workers from public sector warehouses, attribution should remain with the public sector to maintain accurate tracking.
+            <%- endif %>
+        presentation:
+          title_public: Annual number of <<sex>> condoms distributed
+          title_variant: <<group + " providers" if group != "total" else "">>
+        display:
+          numDecimalPlaces: 0
+
+      experience_violence:
+        title: Experience of sexual and/or physical violence among X
+        unit: "%"
+        description_short: ""
+        description_from_producer: ""
+
+      population:
+        title: Population
+        unit: people
+        description_short: ""
+        description_from_producer: ""
+
+      syphilis_prevalence:
+        title: Syphilis prevalence among X
+        unit: "%"
+        description_short: ""
+        description_from_producer: ""
+
   # gam_age_sex:
-  # gam_age_group:
-  # gam_sex_group:
   # gam_age_sex_group:
