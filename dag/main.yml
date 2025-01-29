@@ -746,7 +746,7 @@ steps:
 
   # GDP per capita vs. living conditions indicators
   data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
-    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/worldbank_wdi/2025-01-24/wdi
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/un/2024-09-11/igme
     - data://garden/who/2024-07-26/mortality_database
