@@ -1428,21 +1428,50 @@ tables:
             title: HIV positivity rate, <<sex + "s, " if sex != "total">>aged <<age>>
 
   gam_age_sex_group:
+    common:
+      presentation:
+        grapher_config:
+          hasMapTab: true
+          tab: map
     variables:
       art_coverage:
-        title: Antiretroviral therapy coverage among <<group>> living with HIV
+        title: "Antiretroviral therapy coverage (%) among people living with HIV - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
         unit: "%"
-        description_short: https://indicatorregistry.unaids.org/indicator/antiretroviral-therapy-coverage-among-people-living-hiv-key-populations-e
-        description_from_producer: ""
+        description_short: |-
+          <% if group == "men who have sex with men" %>
+          Percentage of men <<"(aged " + age + ") " if age != "total">>who have sex with men living with HIV receiving antiretroviral therapy in the past 12 months.
+          <%- elif group == "people who inject drugs" %>
+          Percentage of <<sex + "s" if sex != "total" else "people">> <<"aged " + age + " " if age != "total">>who inject drugs living with HIV receiving antiretroviral therapy in the past 12 months.
+          <%- elif "trans" in group %>
+          Percentage of <<group>> <<"aged " + age + " " if age != "total">>living with HIV receiving antiretroviral therapy in the past 12 months.
+          <%- else %>
+          Percentage of <<sex + " " if sex != "total">><<group>> <<"aged " + age + " " if age != "total">>who inject drugs living with HIV receiving antiretroviral therapy in the past 12 months.
+          <%- endif %>
+        description_from_producer: |-
+          Antiretroviral therapy has been shown to reduce HIV-related morbidity and mortality among people living with HIV and to reduce the transmission of HIV. People living with HIV in key populations should be able to access mainstream services that provide antiretroviral therapy without fear of facing stigma or discrimination and to be able to receive care from health-care workers who have the clinical knowledge to meet their specific needs. Ideally, all of these mainstream services should meet the standards for becoming sensitized to the needs of key populations. Accordingly, antiretroviral therapy coverage is a crucial way of assessing access to mainstream services.
+
+          Calculated as: Numerator / Denominator, where
+
+          Numerator: Number of respondents living with HIV who report receiving antiretroviral therapy in the past 12 months
+          Denominator: Number of respondents living with HIV
+
+          Method of measurement: Behavioural surveillance or other special surveys.
+
+          More details: https://indicatorregistry.unaids.org/indicator/antiretroviral-therapy-coverage-among-people-living-hiv-key-populations-e
+        presentation:
+          title_public: Share of people living with HIV receiving antiretroviral therapy
+          title_variant: <<group>><<", " + sex if sex not in ["total", "other"]>><<", aged " + age if age != "total" >>
+          grapher_config:
+            title: Share of people living with HIV receiving antiretroviral therapy, <<group>><<", " + sex if sex not in ["total", "other"]>><<", aged " + age if age != "total" >>
 
       avoidance_care:
-        title: "Avoidance of health care because of stigma and discrimination - Group: <<group>>"
+        title: "Avoidance of health care because of stigma and discrimination"
         unit: "%"
         description_short: https://indicatorregistry.unaids.org/indicator/avoidance-hiv-services-because-stigma-and-discrimination-among-key-populations-d
         description_from_producer: ""
 
       condom_use:
-        title: Condom use among <<group>>
+        title: "Condom use among <<group>> - Sex: <<sex>> - Age: <<age>>"
         unit: "%"
         description_short: |-
           - MSM: https://indicatorregistry.unaids.org/indicator/men-who-have-sex-men-condom-use
@@ -1453,31 +1482,31 @@ tables:
         description_from_producer: ""
 
       discriminatory_attitudes:
-        title: Discriminatory attitudes towards people living with HIV
+        title: "Discriminatory attitudes towards people living with HIV - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
         unit: "%"
         description_short: https://indicatorregistry.unaids.org/indicator/discriminatory-attitudes-towards-people-living-hiv
         description_from_producer: ""
 
       experience_stigma:
-        title: Experience of stigma and discrimination among <<group>>
+        title: "Experience of stigma and discrimination among <<group>> - Sex: <<sex>> - Age: <<age>>"
         unit: "%"
         description_short: https://indicatorregistry.unaids.org/indicator/stigma-and-discrimination-experienced-key-populations
         description_from_producer: ""
 
       hiv_prevalence:
-        title: HIV prevalence among <<group>>
+        title: "HIV prevalence - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
         unit: "%"
         description_short: https://indicatorregistry.unaids.org/indicator/hiv-prevalence-among-key-populations-e
         description_from_producer: ""
 
       hiv_programmes_coverage:
-        title: Coverage of HIV prevention programmes among <<group>>
+        title: "Coverage of HIV prevention programmes - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
         unit: "%"
         description_short: https://indicatorregistry.unaids.org/indicator/coverage-hiv-prevention-programmes-among-key-populations-d
         description_from_producer: ""
 
       hiv_status_awareness:
-        title: HIV testing and status awareness among <<group>>
+        title: "HIV testing and status awareness - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
         unit: "%"
         description_short: https://indicatorregistry.unaids.org/indicator/knowledge-hiv-status-among-key-populations-d
         description_from_producer: ""
