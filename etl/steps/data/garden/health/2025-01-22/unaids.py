@@ -172,7 +172,7 @@ def run(dest_dir: str) -> None:
     # This was not done in step "SEPARATE DATA", because we want to benefit from some of the processing done in this step. In particular, of the combination of `dimension_0` and `group`.
 
     # 3.3/ [sex, group]. Separate data with NO age
-    tb_sex_group, mask_no_age = extract_no_age_table_gam(tb)
+    tb_sex_group, mask_no_age = extract_sex_group_table_gam(tb)
     ## Correction
     mask = (tb_sex_group.country == "China") & (tb_sex_group.year == 2021)
     x = tb_sex_group.loc[mask]
@@ -208,7 +208,7 @@ def run(dest_dir: str) -> None:
 
         return tb
 
-    tbr = tb_sex_group.copy()
+    tbr = tb_age_sex.copy()
 
     tb = pivot_and_format(tb, ["country", "year", "age", "sex", "group"], "gam_age_sex_group")
     tb_hepatitis = pivot_and_format(
@@ -237,12 +237,20 @@ def run(dest_dir: str) -> None:
         tb_sex_group,
         tb_no_dim,
     ]
-    tb_meta = tbr[["indicator", "indicator_description", "unit"]].drop_duplicates().sort_values("indicator")
+    tb_meta = tbr[["indicator", "indicator_description", "unit", "source"]].drop_duplicates().sort_values("indicator")
     for _, row in tb_meta.iterrows():
         print(
             f"{row.indicator}:\n\ttitle: {row.indicator_description}\n\tunit: {row['unit']}\n\tdescription_short: ''\n\tdescription_from_producer: ''"
         )
+    tb_meta
 
+    x = tb_age_sex.copy()
+    cols_idx = list(x.index.names)
+    x = x.reset_index()
+    x = x.melt(id_vars=cols_idx).dropna(subset="value", axis=0)
+    cols = [col for col in cols_idx if col not in ["country", "year"]]
+    x = x[["variable"] + cols].drop_duplicates().sort_values(["variable"] + cols)
+    x
     ####################
     # tbx = tb.groupby("indicator", as_index=False).agg(
     #     {
@@ -424,7 +432,11 @@ def handle_dimensions_clean_gam(tb, dimensions, dimensions_collapse_gam):
 
     # SEX: set sex="male" and sex="others" when applicable
     ### Set to "male"
-    mask = (tb["dimension_0"] == "men who have sex with men") & (tb["indicator"] != "condoms_distributed_pp")
+    mask = (
+        (tb["dimension_0"] == "men who have sex with men")
+        & (tb["indicator"] != "condoms_distributed_pp")
+        & (tb["indicator"] != "population")
+    )
     tb.loc[mask, "sex"] = "male"
 
     ### Set to "other"
@@ -536,6 +548,7 @@ def extract_group_table_gam(tb):
         "domestic_spending_fund_source",
         "resource_avail_constant",
         "condoms_distributed_pp",
+        "population",
     ]
     mask_only_group = tb["indicator"].isin(indicators_only_group)
     tb_new = tb.loc[mask_only_group]
@@ -547,8 +560,15 @@ def extract_group_table_gam(tb):
     tb_new.loc[mask, "group"] = tb_new.loc[mask, "dimension_0"]
     tb_new.loc[mask, "dimension_0"] = None
 
+    # Fix group for indicator "population"
+    mask = tb_new["indicator"] == "population"
+    assert tb_new.loc[mask, "dimension_0"].notna().all()
+    assert tb_new.loc[mask, "group"].isna().all()
+    tb_new.loc[mask, "group"] = tb_new.loc[mask, "dimension_0"]
+    tb_new.loc[mask, "dimension_0"] = None
+
     # Checks
-    assert set(tb_new["sex"].unique()) == {None, "total"}
+    assert set(tb_new["sex"].unique()) == {None, "other", "total"}
     assert set(tb_new["age"].unique()) == {None, "total"}
     assert tb_new["hepatitis"].isna().all()
     assert tb_new["estimate"].isna().all()
@@ -727,12 +747,11 @@ def extract_no_dim_table_gam(tb):
     return tb_new, mask
 
 
-def extract_no_age_table_gam(tb):
+def extract_sex_group_table_gam(tb):
     """Generate table with indicators that have no age information."""
     indicators = {
         "condoms_distributed",
         "experience_violence",
-        "population",
         "syphilis_prevalence",
     }
     mask = tb["indicator"].isin(indicators)
@@ -742,12 +761,10 @@ def extract_no_age_table_gam(tb):
         "NGO",
         "men who have sex with men",
         "people who inject drugs",
-        "prisoners",
         "private",
         "public",
         "sex workers",
         "total",
-        "transgender",
         "transgender, sex workers",
     }
     assert set(tb_new["sex"]) == {
