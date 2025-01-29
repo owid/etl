@@ -10,6 +10,7 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 0
+          color: "#e7adca"
         processing_level: minor
         presentation:
           topic_tags:
@@ -23,8 +24,6 @@ tables:
               min: 70
             selectedEntityNames:
               - Japan
-            selectedEntityColors:
-              Japan: "#E7ADCA"
       average_20_years:
         title: Twenty-year average day of the year with peak cherry blossom
         description_short: A twenty year moving average of the day of the year with peak cherry blossom (Prunus jamasakura species). Only calculated for 20-year periods with at least five years of data.
@@ -32,6 +31,7 @@ tables:
         short_unit: ""
         display:
           numDecimalPlaces: 2
+          color: "#c15065"
         processing_level: major
         presentation:
           topic_tags:
@@ -45,5 +45,3 @@ tables:
               min: 70
             selectedEntityNames:
               - Japan
-            selectedEntityColors:
-              Japan: "#C15065"
