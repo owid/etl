@@ -505,6 +505,7 @@ steps:
     - data://garden/news/2024-05-23/gdelt_v2
 
   # World Development Indicators - WDI
+  # TO BE ARCHIVED
   data://meadow/worldbank_wdi/2024-05-20/wdi:
     - snapshot://worldbank_wdi/2024-05-20/wdi.zip
 
@@ -517,6 +518,20 @@ steps:
 
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
+
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2025-01-24/wdi:
+    - snapshot://worldbank_wdi/2025-01-24/wdi.zip
+
+  data://garden/worldbank_wdi/2025-01-24/wdi:
+    - snapshot://worldbank_wdi/2025-01-24/wdi.zip
+    - data://meadow/worldbank_wdi/2025-01-24/wdi
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+
+  data://grapher/worldbank_wdi/2025-01-24/wdi:
+    - data://garden/worldbank_wdi/2025-01-24/wdi
 
   #
   # Aviation Safety Network - Aviation Statistics.
