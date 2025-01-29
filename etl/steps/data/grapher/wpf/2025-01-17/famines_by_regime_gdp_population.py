@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("famines_by_regime_gdp_population")
 
     # Read table from garden dataset.
-    tb = ds_garden["famines"].reset_index()
+    tb = ds_garden.read("famines", reset_index=True)
 
     #
     # Process data.

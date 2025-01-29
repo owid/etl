@@ -51,7 +51,7 @@ def run(dest_dir: str) -> None:
     ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["famines"].reset_index()
+    tb = ds_meadow.read("famines")
 
     #
     # Process data.

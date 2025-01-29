@@ -53,16 +53,17 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
-    ds_garden = paths.load_dataset("famines")
-    tb_famines = ds_garden["famines"].reset_index()
+    # Load the famines dataset.
+    ds_famines = paths.load_dataset("famines")
+    tb_famines = ds_famines.read("famines")
 
     # Load regimes.
     ds_regime = paths.load_dataset("vdem")
 
     # Load GDP.
     ds_gdp = paths.load_dataset("maddison_project_database")
-    tb_gdp = ds_gdp["maddison_project_database"].reset_index()
+    tb_gdp = ds_gdp.read("maddison_project_database")
+
     tb_gdp = tb_gdp[["year", "country", "gdp_per_capita"]]
 
     ds_population = paths.load_dataset("population")
@@ -100,7 +101,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_famines.metadata
     )
 
     # Save changes in the new garden dataset.

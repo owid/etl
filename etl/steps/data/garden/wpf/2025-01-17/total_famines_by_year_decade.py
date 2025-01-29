@@ -18,12 +18,15 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
-    ds_meadow = paths.load_dataset("famines")
+    # Load the dataset.
+    ds_garden = paths.load_dataset("famines")
+
+    # Read table from the dataset.
+    tb = ds_garden.read("famines")
+
+    # Load the population dataset.
     ds_population = paths.load_dataset("population")
 
-    # Read table from meadow dataset.
-    tb = ds_meadow["famines"].reset_index()
     origins = tb["famine_name"].metadata.origins
 
     #
@@ -118,7 +121,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new garden dataset.

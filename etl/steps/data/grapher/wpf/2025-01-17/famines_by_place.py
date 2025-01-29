@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("famines_by_place")
 
     # Read table from garden dataset.
-    tb = ds_garden["famines_by_place"]
+    tb = ds_garden.read("famines_by_place", reset_index=False)
 
     #
     # Save outputs.
