@@ -1,8 +1,12 @@
 """
 This code is used to select observations from PIP, WID or LIS datasets that match a pair of reference years.
-It selects the closest observation to the reference year, and in the case of PIP, trying to ensure that is, in this order:
+It selects the closest observation to each reference year, and in the case of PIP, trying to ensure that is, in this order:
     1. The same welfare concept (first income, then consumption)
     2. The same reporting level (first national, then urban, then rural)
+
+The script uses as input a poverty/inequality file that combined PIP, WID and LIS in a standardized format.
+
+The output is used to compare inequality measures across different years and datasets.
 
 This is an adaptation of the original script created by Pablo A and Joe for Joe's PhD project, available at https://github.com/owid/notebooks/blob/main/JoeHasell/PhD_2024/paper2/select_and_prepare_observations.py
 We want to process this data inside the ETL now.
@@ -80,7 +84,8 @@ REFERENCE_YEARS = [
 def run(dest_dir: str) -> None:
     # Load dataset and table
     ds_pov_ineq = paths.load_dataset("poverty_inequality_file")
-    ds_population = paths.load_dataset("population")
+    # NOTE: For now I am keeping the population and regions datasets commented out, because I might use them in the future
+    # ds_population = paths.load_dataset("population")
     # ds_regions = paths.load_dataset("regions")
     ds_pip = paths.load_dataset("world_bank_pip")
     ds_wid = paths.load_dataset("world_inequality_database")
@@ -131,11 +136,13 @@ def run(dest_dir: str) -> None:
         tb=tb, indicator_match=INDICATORS_FOR_ANALYSIS, tb_pip=tb_pip, tb_wid=tb_wid, tb_lis=tb_lis
     )
 
+    # NOTE: For now I am keeping the population and regions addition commented out, because I might use them in the future
+
     # # Add regions
     # tb = add_regions_columns(tb=tb, ds_regions=ds_regions)
 
-    # Add population
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, year_col="ref_year")
+    # # Add population
+    # tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, year_col="ref_year")
 
     # Format the table
     tb = tb.format(
