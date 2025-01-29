@@ -22,6 +22,8 @@ def run(dest_dir: str) -> None:
         ds_garden["gam_sex"],
         ds_garden["gam_age"],
         ds_garden["gam_group"],
+        ds_garden["gam_estimates"],
+        ds_garden["gam_hepatitis"],
     ]
 
     #

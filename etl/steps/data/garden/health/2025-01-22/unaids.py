@@ -185,20 +185,9 @@ def run(dest_dir: str) -> None:
     # Remove from main table!
     tb = tb.loc[~mask_no_age]
 
-    # 4/ Checks
-    paths.log.info("GAM: Checking dimensions")
-    _ = tb.format(["country", "year", "indicator", "group", "sex", "age"])
-    _ = tb_hepatitis.format(["country", "year", "indicator", "group", "sex", "age", "hepatitis"])
-    _ = tb_only_estimate.format(["country", "year", "indicator", "estimate"])
-    _ = tb_only_group.format(["country", "year", "indicator", "group"])
-    _ = tb_only_age.format(["country", "year", "indicator", "age"])
-    _ = tb_only_sex.format(["country", "year", "indicator", "sex"])  # TODO: review
-    _ = tb_no_group.format(["country", "year", "indicator", "sex", "age"])
-    _ = tb_no_sex.format(["country", "year", "indicator", "group", "group", "age"])
-    _ = tb_no_age.format(["country", "year", "indicator", "group", "sex"])
-    _ = tb_no_dim.format(["country", "year", "indicator"])
+    # RESHAPE (and check)
+    paths.log.info("GAM: Format (and check)")
 
-    # RESHAPE
     def pivot_and_format(tb, columns, short_name):
         # 1/ Save some fields (this might be useful later)
         tb_meta = tb[["indicator", "indicator_description", "unit"]].drop_duplicates()
@@ -215,22 +204,36 @@ def run(dest_dir: str) -> None:
 
         return tb
 
+    # tbr = tb_hepatitis.copy()
+
+    tb = pivot_and_format(tb, ["country", "year", "age", "sex", "group"], "gam_age_sex_group")
+    tb_hepatitis = pivot_and_format(
+        tb_hepatitis, ["country", "year", "age", "sex", "group", "hepatitis"], "gam_hepatitis"
+    )
+    tb_only_estimate = pivot_and_format(tb_only_estimate, ["country", "year", "estimate"], "gam_estimates")
+    tb_only_group = pivot_and_format(tb_only_group, ["country", "year", "group"], "gam_group")
+    tb_only_age = pivot_and_format(tb_only_age, ["country", "year", "age"], "gam_age")
+    tb_only_sex = pivot_and_format(tb_only_sex, ["country", "year", "sex"], "gam_sex")
+    tb_no_group = pivot_and_format(tb_no_group, ["country", "year", "age", "sex"], "gam_age_sex")
+    tb_no_sex = pivot_and_format(tb_no_sex, ["country", "year", "age", "group"], "gam_age_group")
+    tb_no_age = pivot_and_format(tb_no_age, ["country", "year", "sex", "group"], "gam_sex_group")
+    tb_no_dim = pivot_and_format(tb_no_dim, ["country", "year"], "gam")
+
     # TABLE GROUPS
     paths.log.info("GAM: pivoting and formatting")
     tables_gam = [
-        pivot_and_format(tb, ["country", "year", "age", "sex", "group"], "gam_age_sex_group"),
-        pivot_and_format(tb_hepatitis, ["country", "year", "age", "sex", "group", "hepatitis"], "gam_hepatitis"),
-        pivot_and_format(tb_only_estimate, ["country", "year", "estimate"], "gam_estimates"),
-        pivot_and_format(tb_only_group, ["country", "year", "group"], "gam_group"),
-        pivot_and_format(tb_only_age, ["country", "year", "age"], "gam_age"),
-        pivot_and_format(tb_only_sex, ["country", "year", "sex"], "gam_sex"),
-        pivot_and_format(tb_no_group, ["country", "year", "age", "sex"], "gam_age_sex"),
-        pivot_and_format(tb_no_sex, ["country", "year", "age", "group"], "gam_age_group"),
-        pivot_and_format(tb_no_age, ["country", "year", "sex", "group"], "gam_sex_group"),
-        pivot_and_format(tb_no_dim, ["country", "year"], "gam"),
+        tb,
+        tb_hepatitis,
+        tb_only_estimate,
+        tb_only_group,
+        tb_only_age,
+        tb_only_sex,
+        tb_no_group,
+        tb_no_sex,
+        tb_no_age,
+        tb_no_dim,
     ]
-
-    # tbx = tb_no_dim
+    # tbx = tb_only_estimate
     # tb_meta = tbx[["indicator", "indicator_description", "unit"]].drop_duplicates().sort_values("indicator")
     # for _, row in tb_meta.iterrows():
     #     print(
