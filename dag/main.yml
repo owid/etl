@@ -211,7 +211,7 @@ steps:
   data://garden/research_development/2024-05-20/patents_articles:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/demography/2023-03-31/population
-  data://grapher/research_development/2024-05-20/patents_articles:
+  data://grapher/research_development/2024-05-20/patents_wdi_unwpp:
     - data://garden/research_development/2024-05-20/patents_articles
 
   # World Bank's Women, Business and the Law additional data

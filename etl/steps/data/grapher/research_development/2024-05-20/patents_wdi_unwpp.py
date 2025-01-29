@@ -22,9 +22,5 @@ def run(dest_dir: str) -> None:
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=ds_garden.metadata)
 
-    # NOTE: this is bad practice, dataset short_name should be always equal to the path
-    #   we should fix this in new version
-    ds_grapher.m.short_name = "patents_wdi_unwpp"
-
     # Save changes in the new grapher dataset.
     ds_grapher.save()
