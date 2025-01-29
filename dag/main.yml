@@ -681,38 +681,6 @@ steps:
   data://grapher/un/2024-10-21/census_dates:
     - data://garden/un/2024-10-21/census_dates
 
-  #  World Peace Foundation - Famines
-  data://meadow/wpf/2024-10-03/famines:
-    - snapshot://wpf/2024-10-03/famines.xlsx
-  data://garden/wpf/2024-10-03/famines:
-    - data://meadow/wpf/2024-10-03/famines
-    - data://garden/regions/2023-01-01/regions
-
-  data://grapher/wpf/2024-10-03/famines:
-    - data://garden/wpf/2024-10-03/famines
-  data://garden/wpf/2024-10-03/total_famines_by_year_decade:
-    - data://garden/wpf/2024-10-03/famines
-    - data://garden/demography/2024-07-15/population
-  data://grapher/wpf/2024-10-03/total_famines_by_year_decade:
-    - data://garden/wpf/2024-10-03/total_famines_by_year_decade
-
-  data://garden/wpf/2024-10-03/famines_by_regime_gdp:
-    - data://garden/wpf/2024-10-03/famines
-    - data://garden/democracy/2024-03-07/vdem
-    - data://garden/ggdc/2024-04-26/maddison_project_database
-  data://grapher/wpf/2024-10-03/famines_by_regime_gdp:
-    - data://garden/wpf/2024-10-03/famines_by_regime_gdp
-
-  data://garden/wpf/2024-10-03/famines_by_factor:
-    - data://garden/wpf/2024-10-03/famines
-  data://grapher/wpf/2024-10-03/famines_by_factor:
-    - data://garden/wpf/2024-10-03/famines_by_factor
-
-  data://garden/wpf/2024-10-03/famines_by_place:
-    - data://garden/wpf/2024-10-03/famines
-  data://grapher/wpf/2024-10-03/famines_by_place:
-    - data://garden/wpf/2024-10-03/famines_by_place
-
   #  World Peace Foundation - Famines (2025)
   data://meadow/wpf/2025-01-17/famines:
     - snapshot://wpf/2025-01-17/famines.xlsx
