@@ -11,7 +11,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-  title: Famine deaths by country and region
+  title: Famine deaths by region
 
 
 tables:
