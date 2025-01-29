@@ -2,7 +2,7 @@
 definitions:
   common:
     description_processing: The deaths were assumed to be evenly distributed over the duration of each famine, except for the famine in China between 1958 and 1962, where the source provides a year-by-year breakdown of mortality.
-    description_short: Deaths from famines that are estimated to have killed 100,000 people or more. Although categorized into four main triggers here, famines almost always result from a web of factors, with human decisions frequently influencing their severity and outcomes.
+    description_short: Deaths from famines that are estimated to have killed 100,000 people or more. Although categorized into four main triggers here, famines almost always result from a complex interplay of factors, with human decisions frequently influencing their severity and outcomes.
     description_key:
       - Famines were classified into four main triggers - adverse climate, government policies, armed conflict, or genocide - though in reality, multiple factors, especially human decisions, almost always play a significant role in their development and severity.
       - Historical examples demonstrate this complexity, such as when El Niño-related famines in the late 19th century were made worse by imperial conquest, and when the 1984-85 Sudan famine, initially triggered by drought, was intensified by exploitative politics.
