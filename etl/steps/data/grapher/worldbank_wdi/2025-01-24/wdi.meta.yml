@@ -386,7 +386,6 @@ tables:
               - China
               - India
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       ny_gdp_mktp_pp_kd:
         sources: []
         origins:
@@ -439,7 +438,7 @@ tables:
                   - 1000000000000
                   - 3000000000000
                   - 10000000000000
-                  - 30000000000000
+                  - 1
             selectedEntityNames:
               - China
               - United States
@@ -451,7 +450,6 @@ tables:
               - Russia
               - France
               - Mexico
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
       eg_cft_accs_zs:
         sources: []
