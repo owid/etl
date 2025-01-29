@@ -11,11 +11,7 @@ definitions:
           - World
     processing_level: major
   cause: |-
-    <%- if cause.startswith("HIV/AIDS") %>
-    << cause >>
-    <%- else %>
-    << cause.lower() >>
-    <%- endif -%>
+    <%- if cause.startswith("HIV/AIDS") %><< cause >><%- else %><< cause.lower() >><%- endif -%>
   age: |-
     <% if age_group == "ALLAges" %>
     all ages
