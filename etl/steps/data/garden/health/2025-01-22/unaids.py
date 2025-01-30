@@ -3,13 +3,11 @@
 There are two main UNAIDS sources: EPI, GAM, KPA, NCPI. More details in the snapshot step.
 """
 
-from typing import cast
-
 import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 import yaml
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -95,14 +93,15 @@ def run(dest_dir: str) -> None:
         dimensions_collapse = yaml.safe_load(f)
 
     ###############################
-    # EPI
+    # EPI data
     ###############################
     tb_epi = ds_meadow.read("epi")  ## 1,687,587 rows
     tb_epi = make_table_epi(tb_epi, dimensions["epi"])
+    tb_epi = add_old_art_averted_deaths_data(tb_epi)
     tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
 
     ###############################
-    # GAM
+    # GAM data
     ###############################
     tb = ds_meadow.read("gam")  # 128,614 rows
 
@@ -189,10 +188,6 @@ def run(dest_dir: str) -> None:
     # Remove from main table!
     tb = tb.loc[~mask_no_age]
 
-    # SCALING
-    tb["resource_needs_ft"] *= 1e6
-    tb_group["resource_avail_constant"] *= 1e6
-
     # RESHAPE (and check)
     paths.log.info("GAM: Format (and check)")
 
@@ -212,7 +207,8 @@ def run(dest_dir: str) -> None:
 
         return tb
 
-    tbr = tb.copy()
+    # DEBUGGING
+    # tbr = tb.copy()
 
     tb = pivot_and_format(tb, ["country", "year", "age", "sex", "group"], "gam_age_sex_group")
     tb_hepatitis = pivot_and_format(
@@ -226,6 +222,10 @@ def run(dest_dir: str) -> None:
     tb_age_group = pivot_and_format(tb_age_group, ["country", "year", "age", "group"], "gam_age_group")
     tb_sex_group = pivot_and_format(tb_sex_group, ["country", "year", "sex", "group"], "gam_sex_group")
     tb_no_dim = pivot_and_format(tb_no_dim, ["country", "year"], "gam")
+
+    # SCALING
+    tb_no_dim["resource_needs_ft"] *= 1e6
+    tb_group["resource_avail_constant"] *= 1e6
 
     # SANITY CHECK
     assert set(tb.columns) == {
@@ -256,85 +256,21 @@ def run(dest_dir: str) -> None:
         tb_no_dim,
     ]
 
-    tb_meta = tbr[["indicator", "indicator_description", "unit"]].drop_duplicates().sort_values("indicator")
-    # for _, row in tb_meta.iterrows():
-    #     print(
-    #         f"{row.indicator}:\n\ttitle: {row.indicator_description}\n\tunit: {row['unit']}\n\tdescription_short: ''\n\tdescription_from_producer: ''"
-    #     )
-    tb_meta
+    # FOR DEBUGGING
+    # tb_meta = tbr[["indicator", "indicator_description", "unit"]].drop_duplicates().sort_values("indicator")
+    # # for _, row in tb_meta.iterrows():
+    # #     print(
+    # #         f"{row.indicator}:\n\ttitle: {row.indicator_description}\n\tunit: {row['unit']}\n\tdescription_short: ''\n\tdescription_from_producer: ''"
+    # #     )
+    # tb_meta
 
-    x = tb.copy()
-    cols_idx = list(x.index.names)
-    x = x.reset_index()
-    x = x.melt(id_vars=cols_idx).dropna(subset="value", axis=0)
-    cols = [col for col in cols_idx if col not in ["country", "year"]]
-    x = x[["variable"] + cols].drop_duplicates().sort_values(["variable"] + cols)
-    x
-
-    ####################
-    # tbx = tb.groupby("indicator", as_index=False).agg(
-    #     {
-    #         "age": ("unique", "nunique"),
-    #         "sex": ("unique", "nunique"),
-    #         "group": ("unique", "nunique"),
-    #     }
-    # )
-    # tbx.columns = [f"{col[0]}_{col[1]}" if col[1] != "" else col[0] for col in tbx.columns]
-    # tbx = tbx.sort_values(["age_nunique", "sex_nunique", "group_nunique"])
-    # tbx
-
-    # tbx[(tbx.age_nunique == 1) & (tbx.sex_nunique == 1) & (tbx.group_nunique == 1)]
-    # sorted(tbx.loc[(tbx["age_nunique"] == 1) & (tbx["sex_nunique"] == 1) & (tbx["group_nunique"] == 1), "indicator"])
-
-    #
-    # Process data.
-    #
-    # log.info("health.unaids: handle NaNs")
-    # tb = handle_nans(tb)
-
-    # # Harmonize country names (main table)
-    # log.info("health.unaids: harmonize countries (main table)")
-    # tb = geo.harmonize_countries(
-    #     df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    # )
-
-    # # Pivot table
-    # log.info("health.unaids: pivot table")
-    # tb = tb.pivot(
-    #     index=["country", "year", "subgroup_description"], columns="indicator", values="obs_value"
-    # ).reset_index()
-
-    # # Underscore column names
-    # log.info("health.unaids: underscore column names")
-    # tb = tb.underscore()
-
-    # Scale indicators
-    # indicators = [
-    #     "resource_avail_constant",
-    #     "resource_needs_ft",
-    # ]
-    # scale_factor = 1e6
-    # tb[indicators] *= scale_factor
-    # # Complement table with auxiliary data
-    # log.info("health.unaids: complement with auxiliary data")
-    # tb = complement_with_auxiliary_data(tb)
-
-    # Add per_capita
-    # log.info("health.unaids: add per_capita")
-    # tb = add_per_capita_variables(tb, ds_population)
-
-    # Add region aggregates for TB variables
-    # log.info("health.unaids: add region aggregates for TB variables")
-    # tb = add_regions_to_tuberculosis_vars(tb, ds_regions, ds_income_groups)
-    # Set index
-    # log.info("health.unaids: set index")
-    # tb = tb.set_index(["country", "year", "disaggregation"], verify_integrity=True)
-
-    # Drop all NaN rows
-    # tb = tb.dropna(how="all")
-
-    # Set table's short_name
-    # tb.metadata.short_name = paths.short_name
+    # x = tb.copy()
+    # cols_idx = list(x.index.names)
+    # x = x.reset_index()
+    # x = x.melt(id_vars=cols_idx).dropna(subset="value", axis=0)
+    # cols = [col for col in cols_idx if col not in ["country", "year"]]
+    # x = x[["variable"] + cols].drop_duplicates().sort_values(["variable"] + cols)
+    # x
 
     #
     # Save outputs.
@@ -390,8 +326,7 @@ def make_table_epi(tb, dimensions):
     # Rename columns
     tb = tb.rename(columns=COLUMNS_RENAME_EPI)
 
-    # Estimate regional data (only when unit == NUMBER)
-    # TODO
+    # Add older ART-prevented deaths data
 
     # Drop all NaN rows
     tb = tb.dropna(how="all")
@@ -939,10 +874,6 @@ def handle_nulls_in_dimensions_gam(tb):
             "TRANSMAN",
             "TRANSWOMAN",
         },
-        # "prevalence_male_circumcision": {
-        #     "FORMAL_HEALTHCARE",
-        #     "TRADITIONAL",
-        # },
         "pwid_safety": {
             "TRANSGENDER",
         },
@@ -963,12 +894,6 @@ def handle_nulls_in_dimensions_gam(tb):
             "FEMALE_ADULTS",
             "MALE_ADULTS",
         },
-        # "prevalence_male_circumcision": {
-        #     "15_19",
-        #     "15_49",
-        #     "20_24",
-        #     "25_49",
-        # },
         "pwid_safety": {
             "LESS_25",
             "25_AND_UP",
@@ -1056,118 +981,34 @@ def safe_replace_NAs(tb, set_map, dimension, value):
 ##########################################################################################
 
 
-def add_regions_to_tuberculosis_vars(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
-    """
-    Adding regional aggregates for all tuberculosis variables.
-    """
-    cols = ["hiv_tb_patients_receiving_art", "tb_patients_tested_positive_hiv", "tb_related_deaths"]
-
-    # Split table into 'agg' and 'no_agg'
-    tb_agg = tb[["country", "year", "disaggregation"] + cols]
-    tb_no_agg = tb.drop(columns=cols)
-    # Removing existing aggregates
-    tb_agg = tb_agg[~tb_agg["country"].isin(REGIONS_TO_ADD)]
-    tb_agg = tb_agg.dropna(subset=cols, how="all")
-    # Group tb_agg by disaggregation to allow us to add regions for each disaggregation value
-    tb_agg_groups = tb_agg.groupby("disaggregation")
-
-    # Create a table for each disaggregation value
-    tbs = []
-    for group_name, tb_agg_group in tb_agg_groups:
-        tb_agg_group_with_regions = geo.add_regions_to_table(
-            tb_agg_group.drop(columns="disaggregation"),
-            ds_regions,
-            ds_income_groups,
-            REGIONS_TO_ADD,
-            min_num_values_per_year=1,
-            frac_allowed_nans_per_year=0.3,
-        )
-        tb_agg_group_with_regions["disaggregation"] = group_name
-        tbs.append(tb_agg_group_with_regions)
-
-    # Combine all 'agg' tables
-    tb_agg = pr.concat(tbs, ignore_index=True)
-    # Merge with table without aggregates
-    tb = pr.merge(tb_no_agg, tb_agg, on=["country", "year", "disaggregation"], how="outer").reset_index(drop=True)
-
-    return tb
-
-
-def handle_nans(tb: Table) -> Table:
-    """Handle NaNs in the dataset.
-
-    - Replace '...' with NaN
-    - Ensure no NaNs for non-textual data
-    - Drop NaNs & check that all textual data has been removed
-    """
-    # Replace '...' with NaN
-    tb["obs_value"] = tb["obs_value"].replace("...", np.nan)
-    # Ensure no NaNs for non-textual data
-    assert not tb.loc[-tb["is_textualdata"], "obs_value"].isna().any(), "NaN values detected for not textual data"
-    # Drop NaNs & check that all textual data has been removed
-    tb = tb.dropna(subset="obs_value")
-    assert tb["is_textualdata"].sum() == 0, "NaN"
-
-    return tb
-
-
-def add_per_capita_variables(tb: Table, ds_population: Dataset) -> Table:
-    """Add per-capita variables.
-
-    Parameters
-    ----------
-    tb : Table
-        Primary data.
-    ds_population : Dataset
-        Population dataset.
-
-    Returns
-    -------
-    tb : Table
-        Data after adding per-capita variables.
-
-    """
-    tb = tb.copy()
-
-    # Estimate per-capita variables.
-    ## Only consider variable "domestic_spending_fund_source"
-    mask = tb["domestic_spending_fund_source"].isna()
-
-    ## Add population variable
-    tb_fund = geo.add_population_to_table(tb[~mask], ds_population, expected_countries_without_population=[])
-
-    ## Estimate ratio
-    tb_fund["domestic_spending_fund_source_per_capita"] = (
-        tb_fund["domestic_spending_fund_source"] / tb_fund["population"]
-    )
-
-    ## Combine tables again
-    tb = pr.concat([tb_fund, tb[mask]], ignore_index=True)
-
-    # Drop unnecessary column.
-    tb = tb.drop(columns=["population"])
-
-    return tb
-
-
-def complement_with_auxiliary_data(tb: Table) -> Table:
+def add_old_art_averted_deaths_data(tb: Table) -> Table:
     """Complement data with tables shared by UNAIDS via mail correspondance."""
-    # Load auxiliary tables
-    log.info("health.unaids: load auxiliary table with HIV prevalence estimates for children (0-14)")
-    tb_hiv_child = load_aux_table("unaids_hiv_children")
+    # Read ART prevented deaths table
+    tb_aux = load_aux_table("unaids_deaths_averted_art")
 
-    log.info("health.unaids: load auxiliary table with gap to target ART coverage (old years)")
-    tb_gap_art = load_aux_table("unaids_gap_art")
+    # Checks
+    metric = "deaths_averted_art"
+    assert metric in tb_aux.columns
+    assert metric in tb.columns
 
-    log.info("health.unaids: Load auxiliary table with condom usage among men that have sex with men (old years)")
-    tb_condom = load_aux_table("unaids_condom_msm")
-
-    log.info("health.unaids: Load auxiliary table with deaths averted due to ART coverage (old years)")
-    tb_deaths_art = load_aux_table("unaids_deaths_averted_art")
+    # Minor formatting
+    tb_aux = tb_aux.rename(columns={"subgroup_description": "estimate"})
+    tb_aux["sex"] = "total"
+    tb_aux["age"] = "total"
+    estimates_renaming = {
+        "estimate": "central",
+        "upper estimate": "high",
+        "lower estimate": "low",
+    }
+    assert set(tb_aux["estimate"].unique()) == set(estimates_renaming)
+    tb_aux["estimate"] = tb_aux["estimate"].replace(estimates_renaming)
 
     # Combine tables
-    log.info("health.unaids: combine main table with auxiliary tables")
-    tb = combine_tables(tb, tb_hiv_child, tb_gap_art, tb_deaths_art, tb_condom)
+    tb = tb.merge(tb_aux, on=["country", "year", "estimate", "sex", "age"], how="outer", suffixes=("", "__aux"))
+    tb[metric] = tb[metric].fillna(pd.Series(tb[f"{metric}__aux"]))
+
+    # Drop auxiliary columns
+    tb = tb.drop(columns=[f"{metric}__aux"])
 
     return tb
 
@@ -1178,13 +1019,13 @@ def load_aux_table(short_name: str) -> Table:
     An auxiliary table is a table coming from a dataset that was not sourced from the official API.
     """
     # Load dataset
-    ds = cast(Dataset, paths.load_dependency(short_name))
-    # Etract table
-    tb = ds[short_name].reset_index()
+    ds = paths.load_dataset(short_name)
+    # Read table
+    tb = ds.read(short_name)
 
     # Harmonize country names
     log.info(f"health.unaids: harmonize countries ({short_name})")
-    tb: Table = geo.harmonize_countries(
+    tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
     return tb

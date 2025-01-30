@@ -762,7 +762,7 @@ tables:
         title: Total TB expenditure
         unit: constant 2019 US$
         short_unit: "$"
-        description_short: ""
+        description_short: "Expenditure in TB prevention and care."
         description_from_producer: ""
 
       #######################3
@@ -1034,7 +1034,8 @@ tables:
         description_processing: Source data is given in millions.
         presentation:
           title_public: Availability HIV resources for low- and middle-income countries
-          title_variant: "origin: <<group>>"
+          title_variant: |-
+            <<"origin: " + group if group != "total">>
           grapher_config:
             title: |-
               <% if group == "total" %>
