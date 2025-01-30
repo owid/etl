@@ -189,6 +189,10 @@ def run(dest_dir: str) -> None:
     # Remove from main table!
     tb = tb.loc[~mask_no_age]
 
+    # SCALING
+    tb["resource_needs_ft"] *= 1e6
+    tb_group["resource_avail_constant"] *= 1e6
+
     # RESHAPE (and check)
     paths.log.info("GAM: Format (and check)")
 
