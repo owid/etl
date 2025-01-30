@@ -291,7 +291,7 @@ tables:
           title_public: "Lives saved due to ART"
 
       people_receiving_art:
-        title: "People receiving antiretroviral therapy - Age: <<age>> - Sex: <<sex>>"
+        title: "People living with HIV receiving ART - Age: <<age>> - Sex: <<sex>>"
         unit: "people"
         description_short: |-
           Number of {definitions.people_dimension} living with HIV on antiretroviral therapy. This is the <<estimate.title()>> estimate.
@@ -308,10 +308,10 @@ tables:
           title_public: "{definitions.people_term} living with HIV receiving antiretroviral therapy"
 
       percent_plwh:
-        title: "Coverage of people living with HIV receiving ART - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "Share of people living with HIV receiving ART - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "%"
         description_short: |-
-          The percentage of individuals diagnosed with HIV who are currently receiving antiretroviral therapy. This is the <<estimate.title()>> estimate.
+          Percentage of individuals diagnosed with HIV who are currently receiving antiretroviral therapy. This is the <<estimate.title()>> estimate.
         description_key:
           - "{definitions.art_description}"
         presentation:
@@ -411,7 +411,7 @@ tables:
       #
       hiv_incidence:
         title: "HIV Incidence per 1,000 population - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
-        unit: "infections per 1,000 uninfected people"
+        unit: "infections per 1,000 people"
         description_from_producer: |-
           Number of {definitions.people_dimension} newly infected with HIV in the reporting period per 1,000 uninfected people. This is the <<estimate.title()>> estimate.
         description_key:
@@ -749,6 +749,7 @@ tables:
         short_unit: "$"
         unit: "constant 2019 US$"
         description_short: "Estimated resource needs for HIV in low- and middle-income countries in constant 2019 USD."
+        description_processing: Source data is given in millions.
         display:
           name: Estimated resource needs to meet HIV targets
           numDecimalPlaces: 0
@@ -874,7 +875,7 @@ tables:
   gam_sex:
     variables:
       knowledge_in_young_people:
-        title: Knowledge about HIV prevention
+        title: Knowledge about HIV prevention in young people (15-24)
         unit: "%"
         description_short: |-
           <% if sex == 'total' %>
@@ -893,14 +894,14 @@ tables:
 
           The first three questions should not be altered. Questions 4 and 5 ask about local misconceptions and may be replaced by the most common misconceptions in your country. Examples include: “Can a person get HIV by hugging or shaking hands with a person who is infected?” and “Can a person get HIV through supernatural means?”
 
-          Those who have never heard of HIV and AIDS should be excluded from the numerator but included in the denominator. An answer of “don’t know” should be recorded as an incorrect answer.
+          Those who have never heard of HIV and AIDS should be excluded from the numerator but included in the denominator. An answer of “don't know” should be recorded as an incorrect answer.
 
           Scores for each of the individual questions (based on the same denominator) are required as well as the score for the composite indicator.
 
         description_key:
           - The ongoing spread of HIV is largely driven by sexual transmission among young people. Comprehensive knowledge about HIV and AIDS is essential for adopting behaviors that reduce the risk of transmission.
         presentation:
-          title_public: Knowledge about HIV prevention<<" by " + sex + "s" if sex != 'total' else ''>>
+          title_public: Knowledge about HIV prevention<<" by young " + sex + "s" if sex != 'total' else ' in young people'>>
           grapher_config:
             hasMapTab: true
             tab: map
@@ -1030,6 +1031,7 @@ tables:
           <%- endif %>
         unit: constant 2019 US$
         short_unit: "$"
+        description_processing: Source data is given in millions.
         presentation:
           title_public: Availability HIV resources for low- and middle-income countries
           title_variant: "origin: <<group>>"
@@ -1346,7 +1348,7 @@ tables:
         title: "Attitudes towards violence against women - Age: <<age>> - Sex: <<sex>>"
         unit: "%"
         description_short: |-
-          The percentage of << "women" if sex == "female" else "men" if sex == "male" else "men and women" >> aged <<age if age != "total" else "15-49">> years who believe that a husband is justified in hitting or beating his wife for
+          Percentage of << "women" if sex == "female" else "men" if sex == "male" else "men and women" >> aged <<age if age != "total" else "15-49">> years who believe that a husband is justified in hitting or beating his wife for
         description_from_producer: |-
           Gender inequality continues to stand in the way of global goals to end AIDS by 2030. Inequitable gender norms that confine women and men to specific roles in society - together with gender disparities in education and employment - greatly limit HIV prevention strategies among women, girls, and gender and sexual minorities. Fear, experiences of violence and power imbalances in relationships also increase vulnerability to HIV among these groups, limiting their access to HIV services and reducing their adherence to HIV prevention or treatment technologies. This leaves them disproportionately affected by HIV. Scaling up programmes to increase gender equity and intensifying efforts to achieve gender equality is therefore critical for ending AIDS as a global public health threat by 2030.
 
