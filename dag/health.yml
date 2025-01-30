@@ -159,9 +159,9 @@ steps:
   data://garden/health/2025-01-22/unaids:
     - data://garden/regions/2023-01-01/regions
     - data://meadow/health/2025-01-22/unaids
+    - data://meadow/health/2023-08-22/unaids_deaths_averted_art
     # - data://meadow/health/2023-08-22/unaids_gap_art
     # - data://meadow/health/2023-08-22/unaids_condom_msm
-    # - data://meadow/health/2023-08-22/unaids_deaths_averted_art
     # - data://meadow/health/2023-08-11/unaids_hiv_children
     - data://garden/wb/2024-07-29/income_groups
     - data://garden/demography/2024-07-15/population
