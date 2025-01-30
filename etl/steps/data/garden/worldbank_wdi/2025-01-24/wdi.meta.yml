@@ -768,6 +768,8 @@ tables:
           title_public: Share of population with access to clean fuels and technologies for cooking
       eg_egy_prim_pp_kd:
         title: Energy intensity level of primary energy (MJ/$2017 PPP GDP)
+        unit: "megajoules per international-$ in 2017 prices"
+        short_unit: MJ/$
       eg_elc_accs_ru_zs:
         title: Access to electricity, rural (% of rural population)
         short_unit: '%'

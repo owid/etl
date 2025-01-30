@@ -320,6 +320,7 @@ tables:
                   https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
       ny_gdp_pcap_pp_kd:
         sources: []
         origins:
@@ -331,10 +332,10 @@ tables:
           name: GDP per capita
           numDecimalPlaces: 0
           tolerance: 5
-        description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_short: This data is adjusted for inflation and for differences in living costs between countries.
         description_key:
           - This GDP per capita indicator provides information on economic growth and income levels from 1990.
-          - This data is adjusted for inflation and for differences in the cost of living between countries.
+          - This data is adjusted for inflation and for differences in living costs between countries.
           - This data is expressed in international-$ at 2021 prices.
           - For GDP per capita estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison).
         description_from_producer: |
@@ -350,7 +351,7 @@ tables:
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: GDP per capita
-            subtitle: This data is adjusted for inflation and for differences in the cost of living between countries.
+            subtitle: This data is adjusted for inflation and for differences in living costs between countries.
             variantName: World Bank, constant international-$
             originUrl: https://ourworldindata.org/economic-growth
             hasMapTab: true
@@ -386,7 +387,7 @@ tables:
               - China
               - India
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
       ny_gdp_mktp_pp_kd:
         sources: []
         origins:
@@ -398,10 +399,10 @@ tables:
           name: GDP
           numDecimalPlaces: 0
           tolerance: 5
-        description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
+        description_short: This data is adjusted for inflation and for differences in living costs between countries.
         description_key:
           - This GDP indicator provides information on economic growth and income levels from 1990.
-          - This data is adjusted for inflation and for differences in the cost of living between countries.
+          - This data is adjusted for inflation and for differences in living costs between countries.
           - This data is expressed in international-$ at 2021 prices.
         description_from_producer: |
           PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2021 international dollars.
@@ -417,7 +418,7 @@ tables:
           grapher_config:
             title: Gross domestic product (GDP)
             subtitle: |
-              This data is adjusted for inflation and differences in the cost of living between countries.
+              This data is adjusted for inflation and differences in living costs between countries.
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
             hideRelativeToggle: false
             hasMapTab: true
@@ -439,7 +440,7 @@ tables:
                   - 1000000000000
                   - 3000000000000
                   - 10000000000000
-                  - 30000000000000
+                  - 1
             selectedEntityNames:
               - China
               - United States
@@ -451,7 +452,65 @@ tables:
               - Russia
               - France
               - Mexico
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+      ny_gnp_pcap_pp_kd:
+        sources: []
+        origins:
+          - *wdi_origin
+        title: GNI per capita, PPP (constant 2021 international $)
+        unit: international-$ in 2021 prices
+        short_unit: $
+        display:
+          name: GNI per capita
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: This data is adjusted for inflation and for differences in living costs between countries.
+        description_key:
+          - This data is adjusted for inflation and for differences in living costs between countries.
+          - This data is expressed in international-$ at 2021 prices.
+        processing_level: minor
+        presentation:
+          title_public: Gross national income (GNI) per capita
+          attribution_short: World Bank
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Gross national income (GNI) per capita
+            subtitle: Gross national income (GNI) measures the total income earned by residents of a country, including income earned abroad. This data is adjusted for inflation and differences in living costs between countries.
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+            variantName: World Bank
+            originUrl: https://ourworldindata.org/economic-growth
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: BuGn
+                customNumericValues:
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 50000
+                  - 100000
+            selectedEntityNames:
+              - United States
+              - Germany
+              - France
+              - United Kingdom
+              - South Korea
+              - Japan
+              - India
+              - China
+            yAxis:
+              canChangeScaleType: true
+              min: 0
+            tab: map
+            hideRelativeToggle: false
+            hasMapTab: true
+
+
+
 
       eg_cft_accs_zs:
         sources: []
