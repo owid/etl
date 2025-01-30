@@ -320,6 +320,7 @@ tables:
                   https://ourworldindata.org/grapher/share-of-children-younger-than-5-who-suffer-from-stunting#faqs
                 text: FAQs on this data
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
       ny_gdp_pcap_pp_kd:
         sources: []
         origins:
@@ -386,6 +387,7 @@ tables:
               - China
               - India
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+
       ny_gdp_mktp_pp_kd:
         sources: []
         origins:
@@ -450,6 +452,65 @@ tables:
               - Russia
               - France
               - Mexico
+
+      ny_gnp_pcap_pp_kd:
+        sources: []
+        origins:
+          - *wdi_origin
+        title: GNI per capita, PPP (constant 2021 international $)
+        unit: international-$ in 2021 prices
+        short_unit: $
+        display:
+          name: GNI per capita
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: This data is adjusted for inflation and for differences in living costs between countries.
+        description_key:
+          - This data is adjusted for inflation and for differences in living costs between countries.
+          - This data is expressed in international-$ at 2021 prices.
+        processing_level: minor
+        presentation:
+          title_public: Gross national income (GNI) per capita
+          attribution_short: World Bank
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Gross national income (GNI) per capita
+            subtitle: Gross national income (GNI) measures the total income earned by residents of a country, including income earned abroad. This data is adjusted for inflation and differences in living costs between countries.
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+            variantName: World Bank
+            originUrl: https://ourworldindata.org/economic-growth
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: BuGn
+                customNumericValues:
+                  - 1000
+                  - 2000
+                  - 5000
+                  - 10000
+                  - 20000
+                  - 50000
+                  - 100000
+            selectedEntityNames:
+              - United States
+              - Germany
+              - France
+              - United Kingdom
+              - South Korea
+              - Japan
+              - India
+              - China
+            yAxis:
+              canChangeScaleType: true
+              min: 0
+            tab: map
+            hideRelativeToggle: false
+            hasMapTab: true
+
+
+
 
       eg_cft_accs_zs:
         sources: []
