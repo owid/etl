@@ -1774,11 +1774,49 @@ tables:
               <%- endif %>
 
       hiv_programmes_coverage:
-        title: "Coverage of HIV prevention programmes - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
+        title: "Coverage (%) of HIV prevention programmes - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
         unit: "%"
-        description_short: ""
+        description_short: |-
+          Percentage of {definitions.gam_groups.variable} reporting having received a combined set (at least two) of HIV prevention interventions in the past three months.
         description_from_producer: |-
+          Successfully confronting the HIV epidemic requires combining preventive behaviour and antiretroviral therapy. Coverage with evidence-informed prevention programming is a critical component of the response, the importance of which is reflected in the UNAIDS Strategy.
+
+          Calculated as: Numerator/denominator
+
+          Numerator: Number of people in a key population who report receiving two or more of the prevention interventions listed in the past three months
+
+          Denominator: Number of people in a key population responding to the survey
+
+          Method of measurement: Percentage of respondents who report receiving at least two of the following HIV prevention services from a non-governmental organization, health-care provider or other sources.
+
+          - In the past three months, have you been given condoms and lubricant (for example, through an outreach service, drop-in centre or sexual health clinic)?
+
+          - In the past three months, have you received counselling on condom use and safe sex (for example, through an outreach service, drop-in centre or sexual health clinic)?
+
+          - Have you been tested for sexually transmitted infections in the past three months (sex workers, transgender people and gay men and other men who have sex with men)?
+
+          - Have you received new, clean needles or syringes in the past three months (people who inject drugs)?
+
           More details: https://indicatorregistry.unaids.org/indicator/coverage-hiv-prevention-programmes-among-key-populations-d
+        presentation:
+          title_public: Share of people in HIV prevention programmes
+          title_variant: |-
+            <<group>>
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            , <<sex>>s
+            <%- endif %>
+            <%- if age != "total" %>
+            , aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Share of people in HIV prevention programmes, <<group>>
+              <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
 
       hiv_status_awareness:
         title: "HIV testing and status awareness - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
