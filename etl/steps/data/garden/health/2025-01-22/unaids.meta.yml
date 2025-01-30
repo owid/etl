@@ -20,6 +20,27 @@ definitions:
     <%- else %>
     adults
     <%- endif %>
+
+  gam_groups:
+    msm: "men<<' aged ' + age if age != 'total'>> who have sex with men"
+    pwid: "<<sex + 's' if sex != 'total' else 'people'>> who inject drugs<<' aged ' + age if age != 'total'>>"
+    sw: "<<sex + ' ' if sex != 'total'>>sex workers<<' aged ' + age if age != 'total'>>"
+    trans: |-
+      <<group>><<" people" if group == "transgender">><<" aged " + age if age != "total">>
+    other: <<sex + ' ' if sex not in ['total', 'other']>><<group>><<" aged " + age if age != "total">>
+    variable: |-
+      <% if group == "men who have sex with men" %>
+      {definitions.gam_groups.msm}
+      <%- elif group == "people who inject drugs" %>
+      {definitions.gam_groups.pwid}
+      <%- elif group == "sex workers" %>
+      {definitions.gam_groups.sw}
+      <%- elif group == "transgender" %>
+      {definitions.gam_groups.trans}
+      <%- else %>
+      {definitions.gam_groups.other}
+      <%- endif %>
+
   common:
     processing_level: minor
     presentation:
@@ -819,6 +840,7 @@ tables:
           This indicator measures the performance of the TB program in ensuring that TB cases know their HIV status.
 
           Numerator: Number of new and relapsed TB cases with documented HIV status, during the reporting period
+
           Denominator: Total number of new and relapsed TB cases, during the reporting period
 
           The numerator and denominator can be obtained from basic management unit TB registers as well as additional data collection sources (i.e., HIV testing registers) that may contain relevant information (i.e., HIV test results, enrollment in HIV care programs). Programs should modify the register as needed to easily capture this information (<1 F, <1 M, 1-4 F, 1-4 M, 5-9 F, 5-9 M, 10-14 F, 10-14 M, 15-19 F, 15-19 M, 20-24 F, 20-24 M, 25-29 F, 25-29 M, 30-34 F, 30-34 M, 35-39 F, 35-39 M, 40-44 F, 40-44 M, 45-49 F, 45-49 M, 50+ F, 50+ M, Unknown age F, Unknown age M) and (Known HIV-positive at service entry).
@@ -1129,6 +1151,7 @@ tables:
           Calculation: Numerator / Denominator, where:
 
           Numerator: Number of people in a key population who test positive for both HIV and hepatitis <<"C virus" if hepatitis == "C" else "B surface antigen">>
+
           Denominator: Number of respondents tested for both HIV and one or both hepatitis B and C
 
           Strengths and weaknesses:
@@ -1258,6 +1281,7 @@ tables:
           Calculation: Numerator / Denominator
 
           Numerator: Number of people in a key population group (sex workers, gay men and other men who have sex with men, people who inject drugs or transgender people) who reported that either of the incidents happened to them at least once in the last 12 months.
+
           Denominator: Total number of respondents from a key population group.
 
           Method of measurement:
@@ -1297,6 +1321,7 @@ tables:
           Calculated as: Numerator / Denominator, where
 
           Numerator: Number of people in a key population who test positive for syphilis
+
           Denominator: Number of people in a key population tested for syphilis
 
           Method of measurement:
@@ -1328,6 +1353,7 @@ tables:
           Calculation: Numerator / Denominator, where
 
           Numerator: Number of respondents who agree with at least one of the statements
+
           Denominator: Total number of respondents
 
           Method of measurement:
@@ -1384,6 +1410,7 @@ tables:
           Calculated as: Numerator / Denominator, where
 
           Numerator: Women <<age>> years old who have or have ever had an intimate partner and report experiencing physical or sexual violence from at least one of these partners in the past 12 months.
+
           Denominator: Total number of women <<age>> years old surveyed who currently have or have had an intimate partner
 
           Method of measurement:
@@ -1439,13 +1466,11 @@ tables:
         unit: "%"
         description_short: |-
           <% if group == "men who have sex with men" %>
-          Percentage of men <<"(aged " + age + ") " if age != "total">>who have sex with men living with HIV receiving antiretroviral therapy in the past 12 months.
+          Percentage of {definitions.gam_groups.msm} living with HIV receiving antiretroviral therapy in the past 12 months.
           <%- elif group == "people who inject drugs" %>
-          Percentage of <<sex + "s" if sex != "total" else "people">> <<"aged " + age + " " if age != "total">>who inject drugs living with HIV receiving antiretroviral therapy in the past 12 months.
-          <%- elif "trans" in group %>
-          Percentage of <<group>> <<"aged " + age + " " if age != "total">>living with HIV receiving antiretroviral therapy in the past 12 months.
+          Percentage of {definitions.gam_groups.pwid} living with HIV receiving antiretroviral therapy in the past 12 months.
           <%- else %>
-          Percentage of <<sex + " " if sex != "total">><<group>> <<"aged " + age + " " if age != "total">>who inject drugs living with HIV receiving antiretroviral therapy in the past 12 months.
+          Percentage of {definitions.gam_groups.other} living with HIV receiving antiretroviral therapy in the past 12 months.
           <%- endif %>
         description_from_producer: |-
           Antiretroviral therapy has been shown to reduce HIV-related morbidity and mortality among people living with HIV and to reduce the transmission of HIV. People living with HIV in key populations should be able to access mainstream services that provide antiretroviral therapy without fear of facing stigma or discrimination and to be able to receive care from health-care workers who have the clinical knowledge to meet their specific needs. Ideally, all of these mainstream services should meet the standards for becoming sensitized to the needs of key populations. Accordingly, antiretroviral therapy coverage is a crucial way of assessing access to mainstream services.
@@ -1453,6 +1478,7 @@ tables:
           Calculated as: Numerator / Denominator, where
 
           Numerator: Number of respondents living with HIV who report receiving antiretroviral therapy in the past 12 months
+
           Denominator: Number of respondents living with HIV
 
           Method of measurement: Behavioural surveillance or other special surveys.
@@ -1462,54 +1488,304 @@ tables:
           title_public: Share of people living with HIV receiving antiretroviral therapy
           title_variant: <<group>><<", " + sex if sex not in ["total", "other"]>><<", aged " + age if age != "total" >>
           grapher_config:
-            title: Share of people living with HIV receiving antiretroviral therapy, <<group>><<", " + sex if sex not in ["total", "other"]>><<", aged " + age if age != "total" >>
+            title: |-
+              Share of people living with HIV receiving antiretroviral therapy, <<group>>
+              <%- if sex not in ["other", "total"] %>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
 
       avoidance_care:
         title: "Avoidance of health care because of stigma and discrimination"
         unit: "%"
-        description_short: https://indicatorregistry.unaids.org/indicator/avoidance-hiv-services-because-stigma-and-discrimination-among-key-populations-d
-        description_from_producer: ""
+        description_short: |-
+          <% if group == "men who have sex with men" %>
+          Avoidance of health care among {definitions.gam_groups.msm} because of stigma and discrimination.
+          <%- elif group == "people who inject drugs" %>
+          Avoidance of health care among {definitions.gam_groups.pwid} because of stigma and discrimination.
+          <%- else %>
+          Avoidance of health care among {definitions.gam_groups.other} because of stigma and discrimination.
+          <% endif %>
+        description_from_producer: |-
+          Discrimination is a human rights violation and is prohibited by international human rights law and most national constitutions. In the context of HIV, discrimination refers to unfair or unjust treatment of an individual (either through actions or by failure to act) based on his or her real or perceived HIV status. Discrimination exacerbates risks and deprives people of their rights and entitlements, thus fueling the HIV epidemic. HIV-related stigma refers to negative beliefs, feelings and attitudes towards people living with HIV, groups associated with people living with HIV (e.g., the families of people living with HIV) and other key populations at higher risk of HIV infection, such as people who inject drugs, sex workers, gay men and other men who have sex with men and transgender people. In addition to HIV-related stigma, people from key populations experience further discrimination because of the stigma relating to same-sex attraction and sexual behaviour, engagement in sex work, drug use and non-conforming or diverse gender expression.
+
+          This indicator is important for providing a measure of the proportion of members of key populations who have avoided accessing general healthcare services, due to fear of stigma and discrimination. Related reasons for avoiding such services may include (but are not limited to) the following: a lack (or perceived lack of) confidentiality within health-care settings; negative attitudes and behaviours among health-care providers; and fears of disclosing or hinting at individual behaviours and sexual preference/orientation.
+
+          Data related to the avoidance of health-care services are important in measuring the proportion of key populations who are not fulfilling their basic health-care needs (such as routine medical check-ups) and thus may be less likely to attend health-care settings for more specialized services and care (such as HIV testing, treatment and medical care). This indicator is important for understanding and addressing the barriers to achieving the 95-95-95 targets among members of key populations. Data from this indicator directly measure fear of stigma or discrimination.
+
+          This indicator could provide further understanding and improve interventions in reducing HIV stigma and discrimination by (1) showing change over time in the percentage of people who fear experiencing stigma, (2) enabling comparisons between national, provincial, state and more local administrations, and (3) indicating priority areas for action
+
+
+          More details: https://indicatorregistry.unaids.org/indicator/avoidance-hiv-services-because-stigma-and-discrimination-among-key-populations-d
+        presentation:
+          title_public: Share of <<group>> avoiding health care due to stigma and discrimination
+          title_variant: |-
+            <%- if sex not in ["other", "total"] %>
+            <<sex>>s<<", " if age != "total">>
+            <%- endif %>
+            <%- if age != "total" %>
+            aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Share of <<group>> avoiding health care due to stigma and discrimination
+              <%- if sex not in ["other", "total"] %>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
 
       condom_use:
-        title: "Condom use among <<group>> - Sex: <<sex>> - Age: <<age>>"
+        title: "Condom use among - Group: <<group>> - Sex: <<sex>> - Age: <<age>>"
         unit: "%"
         description_short: |-
-          - MSM: https://indicatorregistry.unaids.org/indicator/men-who-have-sex-men-condom-use
-          - TRANS: https://indicatorregistry.unaids.org/indicator/condom-use-among-transgender-people
-          - PWID: https://indicatorregistry.unaids.org/indicator/people-who-inject-drugs-condom-use
-          - SW: https://indicatorregistry.unaids.org/indicator/sex-workers-condom-use
-          - High risk: https://indicatorregistry.unaids.org/indicator/condom-use-last-high-risk-sex
-        description_from_producer: ""
+          <% if group == "men who have sex with men" %>
+          Percentage of {definitions.gam_groups.msm} reporting using a condom the last time they had anal sex with a male partner.
+          <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
+          Percentage of {definitions.gam_groups.trans} reporting using a condom during their most recent sexual intercourse or anal sex.
+          <%- elif group == "people who inject drugs" %>
+          Percentage of {definitions.gam_groups.pwid} reporting using a condom the last time they had sexual intercourse.
+          <%- elif group == "sex workers" %>
+          Percentage of {definitions.gam_groups.sw} reporting using a condom with their most recent client.
+          <%- elif group == "high-risk sex" %>
+          Percentage of respondents who say they used a condom the last time they had sex with a non-marital, non-cohabiting partner, of those who have had sex with such a partner in the last 12 months.
+          <%- endif %>
+        description_from_producer: |-
+          <% if group == "men who have sex with men" %>
+          Condoms can substantially reduce the risk of sexually transmitting HIV. Consistently and correctly using condoms is therefore important for men who have sex with men because of the high risk of HIV transmission during unprotected anal sex. In addition, men who have anal sex with other men may also have female partners, who could become infected as well. Condom use with the most recent male partner is considered a reliable indicator of longer-term behaviour.
+
+          Note: countries with generalized epidemics may also have a concentrated subepidemic among gay men and other men who have sex with men. If so, calculating and reporting on this indicator for this population would be valuable.
+
+          Method of measurement: Behavioural surveillance or other special surveys
+
+          In a behavioural survey of a sample of gay men and other men who have sex with men, respondents are asked about sexual partnerships in the past six months, about anal sex within these partnerships and about condom use when they last had anal sex. Condom use applies whether the respondent is the receptive and insertive partner.
+
+          Whenever possible, data for gay men and other men who have sex with men should be collected with civil society organizations that have worked closely with this population in the field.
+
+          Access to gay men and other men who have sex with men and the data collected from them must remain confidential and secure.
+
+          More details: https://indicatorregistry.unaids.org/indicator/men-who-have-sex-men-condom-use
+          <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
+          Condoms can substantially reduce the risk of sexually transmitting HIV. Consistently and correctly using condoms is therefore important for transgender people, particularly trans-women, because of the high risk of HIV transmission during unprotected anal sex. Condom use with the most recent penetrative sex partner is considered a reliable indicator of longer-term behaviour.
+
+          Method of measurement: Behavioural surveillance or other special surveys
+
+          Respondents are asked the following question: "Did you use a condom during your most recent sexual intercourse or anal sex?"
+
+          Whenever possible, data for transgender people should be collected with civil society organizations that have worked closely with this population in the field. Access to transgender people and the data collected from them must remain confidential and secure.
+
+          More details: https://indicatorregistry.unaids.org/indicator/condom-use-among-transgender-people
+
+          <%- elif group == "people who inject drugs" %>
+          Safer injecting and sexual practices among people who inject drugs are essential, even in countries in which other modes of HIV transmission predominate, because the risk of HIV transmission from contaminated injecting equipment is extremely high, and people who inject drugs can spread HIV (such as through sexual transmission) to the wider population.
+
+          Note: countries with generalized epidemics may also have a concentrated subepidemic among people who inject drugs. If so, calculating and reporting on this indicator for this population would be valuable.
+
+          Method of measurement: Behavioural surveillance or other special surveys
+
+          People who inject drugs are asked the following sequence of questions:
+
+          1. "Have you injected drugs at any time in the past month?"
+          2. "If yes, have you had sexual intercourse in the past month?"
+
+          If they answer yes to both 1 and 2:
+          3. "Did you use a condom when you last had sexual intercourse?"
+
+          Whenever possible, data for people who inject drugs should be collected with civil society organizations that have worked closely with this population in the field.
+
+          Access to survey respondents and the data collected from them must remain confidential and secure.
+
+          More details: https://indicatorregistry.unaids.org/indicator/people-who-inject-drugs-condom-use
+          <%- elif group == "sex workers" %>
+          Various factors increase the risk of exposure to HIV among sex workers, including multiple, non-regular partners and more frequent sexual intercourse. However, sex workers can substantially reduce the risk of HIV transmission, both from clients and to clients, by consistently and correctly using condoms.
+
+          Note: countries with generalized epidemics may also have a concentrated subepidemic among sex workers. If so, calculating and reporting on this indicator for this population would be valuable.
+
+          Method of measurement: Behavioural surveillance or other special surveys
+
+          Respondents are asked the following question: "Did you use a condom with your most recent client with whom you had sexual intercourse?"
+
+          Whenever possible, data for sex workers should be collected through or with civil society organizations that have worked closely with this population in the field. Access to sex workers and the data collected from them must remain confidential and secure.
+
+          More details: https://indicatorregistry.unaids.org/indicator/sex-workers-condom-use
+          <%- elif group == "high-risk sex" %>
+          Condom use is an important way of protecting against HIV, especially among people with non-regular sexual partners.
+
+          Method of measurement: Population-based surveys (Demographic Health Survey, AIDS Indicator Survey, Multiple Indicator Cluster Survey or other representative survey)
+
+          Respondents' sexual histories are obtained. Analysis of sexual history is used to determine whether the respondent had sex with a non-marital, non-cohabiting partner in the past 12 months and, if so, whether the respondent used a condom the last time the respondent had sexual intercourse with such a partner.
+
+          More details: https://indicatorregistry.unaids.org/indicator/condom-use-last-high-risk-sex
+          <%- endif %>
+        presentation:
+          title_public: |-
+            <% if group == "high-risk sex" %>
+            Share of people using a condom at last high-risk sex
+            <% else %>
+            Share of <<group>> using a condom
+            <% endif %>
+          title_variant: |-
+            <%- if sex not in ["other", "total"] %>
+            <<sex>>s<<", " if age != "total">>
+            <%- endif %>
+            <%- if age != "total" %>
+            aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              <% if group == "high-risk sex" %>
+              Share of people using a condom at last high-risk sex
+              <%- else %>
+              Share of <<group>> using a condom
+              <%- endif %>
+              <%- if sex not in ["other", "total"] %>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
 
       discriminatory_attitudes:
-        title: "Discriminatory attitudes towards people living with HIV - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
+        title: |-
+          Discriminatory attitudes towards people living with HIV - Sex: <<sex>> - Age: <<age>> -
+          <%- if group == "question 1" %>
+           Wouldn't buy vegetables if vendor with HIV
+          <%- elif group == "question 2" %>
+           Children with HIV no school
+          <%- elif group == "all questions" %>
+           Wouldn't buy vegetables if vendor with HIV OR Children with HIV no school
+          <%- endif %>
         unit: "%"
-        description_short: https://indicatorregistry.unaids.org/indicator/discriminatory-attitudes-towards-people-living-hiv
-        description_from_producer: ""
+        description_short: |-
+          Percentage of <<"people" if sex == "total" else "men" if sex == "male" else "women">><<" aged " + age if age != "total">> who responded NO to
+          <%- if group == "question 1" %>
+           "Would you buy fresh vegetables from a shopkeeper or vendor if you knew that this person had HIV?"
+          <%- elif group == "question 2" %>
+           "Do you think that children living with HIV should be able to attend school with children who are HIV negative?"
+          <%- elif group == "all questions" %>
+           either "Would you buy fresh vegetables from a shopkeeper or vendor if you knew that this person had HIV?" AND/OR "Do you think that children living with HIV should be able to attend school with children who are HIV negative?"
+          <%- endif %>
+        description_from_producer: |-
+          Discrimination is a human rights violation prohibited by international human rights law and most national constitutions. Discrimination in the context of HIV refers to unfair or unjust treatment (an act or an omission) of an individual based on his or her real or perceived HIV status. Discrimination exacerbates risks and deprives people of their rights and entitlements, fuelling the HIV epidemic. This indicator does not directly measure discrimination but rather measures discriminatory attitudes that may result in discriminatory acts (or omissions). One item in the indicator measures the potential support by respondents for discrimination that takes place at an institution and the other measures social distancing or behavioural expressions of prejudice. The composite indicator can be monitored as a measure of a key manifestation of HIV-related stigma and the potential for HIV-related discrimination within the general population. This indicator could provide further understanding and improve interventions in HIV discrimination by: showing change over time in the percentage of people with discriminatory attitudes; allowing comparisons between national, provincial, state and more local administrations; and indicating priority areas for action.
+
+          Method of measurement: Population-based surveys (Demographic and Health Survey, AIDS Indicator Survey, Multiple Indicator Cluster Survey or other representative survey). This indicator is constructed from responses to the following questions in a general population survey from respondents who have heard of HIV.
+
+          - Would you buy fresh vegetables from a shopkeeper or vendor if you knew that this person had HIV? (yes, no, don't know/not sure/it depends)
+
+          - Do you think that children living with HIV should be able to attend school with children who are HIV negative? (yes, no, don't know/not sure/it depends)
+
+          The respondents who have never heard of HIV and AIDS should be excluded from the estimation. Participants who respond don't know/not sure/it depends and those who refuse to answer should also be excluded.
+
+          Yes and no responses to each question may not add up to 100% if any participants respond “don't know” or values are missing. Calculating the percentage of people responding no to this question by subtracting the percentage of yes responses from 100% would therefore be inaccurate.
+
+
+          More details: https://indicatorregistry.unaids.org/indicator/discriminatory-attitudes-towards-people-living-hiv
+        presentation:
+          title_public: Discriminatory attitudes towards people living with HIV
+          title_variant: |-
+            <%- if sex not in ["other", "total"] %>
+            , <<sex>>s
+            <%- endif %>
+            <%- if age != "total" %>
+            , aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Share of people using a condom at last high-risk sex
+              <%- if sex not in ["other", "total"] %>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
 
       experience_stigma:
-        title: "Experience of stigma and discrimination among <<group>> - Sex: <<sex>> - Age: <<age>>"
+        title: "Experience of stigma and discrimination - Group: <<group>> - Sex: <<sex>> - Age: <<age>>"
         unit: "%"
-        description_short: https://indicatorregistry.unaids.org/indicator/stigma-and-discrimination-experienced-key-populations
-        description_from_producer: ""
+        description_short: |-
+          Percentage of {definitions.gam_groups.variable} who report having experienced stigma and discrimination in the last six months.
+        description_from_producer: |-
+          Key population stigma is a negative stereotype based on an individual belonging to a key population group. Stigma is a well-documented barrier to the HIV care continuum, creating gaps across the prevention and treatment cascades, particularly for key populations (including sex workers, gay men and other men who have sex with men, people who inject drugs and transgender people). Key population stigma results from a range of drivers and facilitators, including: negative and judgmental attitudes towards key populations; shame related to an individual's ooccupation, drug use, or sexual and gender identity; and social, cultural and gender norms. These manifest in a range of stigmatizing practices and experiences, including discrimination, that deny key populations full social acceptance, consequently reducing their life chances, deterring them from accessing essential services and fuelling social inequalities.
+
+          Reducing HIV stigma and discrimination experienced by key populations is critical for increasing HIV testing, uptake of and adherence to antiretroviral therapy, and viral suppression, all of which will improve their health outcomes.
+
+          Method of measurement: Behavioural surveillance or other special surveys. This indicator is constructed based on the number of people who report that one or more of three experiences has happened to them in the last six months because of their key population status:
+
+          - Have you ever felt excluded from family activities because you [sell sex; have sex with men; inject drugs; are transgender]? (no; yes, in the last six months; yes, but not in the last six months; don't know).
+
+          - Has someone ever scolded you because you [sell sex; have sex with men; inject drugs; are transgender]? (no; yes, in the last six months; yes, but not in the last six months; don't know).
+
+          - Has someone ever blackmailed you because you [sell sex; have sex with men; inject drugs; are transgender]? (no; yes, in the last six months; yes, but not in the last six months; don't know).
+
+
+          More details: https://indicatorregistry.unaids.org/indicator/stigma-and-discrimination-experienced-key-populations
+        description_key:
+          - Key population stigma acts as a significant barrier to HIV care, manifesting through negative stereotypes and discrimination against specific groups like sex workers, men who have sex with men, people who inject drugs, and transgender individuals.
+          - Multiple factors drive this stigma, including societal attitudes, personal shame, and established social/cultural norms, which together create obstacles for accessing healthcare services and lead to social inequalities
+          - The impact of stigma directly affects HIV treatment outcomes by deterring individuals from seeking testing, reducing adherence to antiretroviral therapy, and hampering viral suppression efforts
+
+        presentation:
+          title_public: Experience of stigma and discrimination
+          title_variant: |-
+            <<group>>
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            , <<sex>>s
+            <%- endif %>
+            <%- if age != "total" %>
+            , aged <<age>>
+            <%- endif %>
 
       hiv_prevalence:
-        title: "HIV prevalence - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
+        title: "HIV prevalence - Group: <<group>> - Sex: <<sex>> - Age: <<age>>"
         unit: "%"
-        description_short: https://indicatorregistry.unaids.org/indicator/hiv-prevalence-among-key-populations-e
-        description_from_producer: ""
+        description_short: |-
+          Percentage of {definitions.gam_groups.variable} living with HIV.
+        description_from_producer: |-
+          Sex workers, gay men and other men who have sex with men, people who inject drugs, transgender people and people in prisons and other closed settings typically have higher HIV prevalence than the general population in all  epidemic contexts. Addressing HIV among these populations is an important component of the national response.
+
+          <% if group == "prisoners" %>
+          This indicator is calculated using data from HIV tests conducted by prisons and other closed settings. HIV testing programme data are acceptable. Conducting surveys can be challenging and should therefore not be relied on. Testing should be conducted only with the consent of the people in prisons and other closed settings.
+          <% else %>
+          A-D.This indicator is calculated using data from HIV tests conducted among respondents in the sentinel site(s) or participants in biobehavioural surveys. The sentinel surveillance sites used for calculating this indicator should remain constant to allow for tracking changes over time.
+          <% endif %>
+
+          More details: https://indicatorregistry.unaids.org/indicator/hiv-prevalence-among-key-populations-e
+        presentation:
+          title_public: "HIV Prevalence"
+          title_variant: |-
+            <<group>>
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            , <<sex>>s
+            <%- endif %>
+            <%- if age != "total" %>
+            , aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              HIV Prevalence, <<group>>
+              <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
 
       hiv_programmes_coverage:
         title: "Coverage of HIV prevention programmes - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
         unit: "%"
-        description_short: https://indicatorregistry.unaids.org/indicator/coverage-hiv-prevention-programmes-among-key-populations-d
-        description_from_producer: ""
+        description_short: ""
+        description_from_producer: |-
+          More details: https://indicatorregistry.unaids.org/indicator/coverage-hiv-prevention-programmes-among-key-populations-d
 
       hiv_status_awareness:
         title: "HIV testing and status awareness - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
         unit: "%"
-        description_short: https://indicatorregistry.unaids.org/indicator/knowledge-hiv-status-among-key-populations-d
-        description_from_producer: ""
+        description_short: ""
+        description_from_producer: |-
+          More details: https://indicatorregistry.unaids.org/indicator/knowledge-hiv-status-among-key-populations-d
 
       hiv_tests:
         title: HIV tests
@@ -1524,4 +1800,6 @@ tables:
       pwid_safety:
         title: "Safe injecting practices among people who inject drugs"
         unit: "%"
-        description_short: https://indicatorregistry.unaids.org/indicator/people-who-inject-drugs-safe-injecting-practices
+        description_short: ""
+        description_from_producer: |-
+          More details: https://indicatorregistry.unaids.org/indicator/people-who-inject-drugs-safe-injecting-practices

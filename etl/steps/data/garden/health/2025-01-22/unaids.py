@@ -208,7 +208,7 @@ def run(dest_dir: str) -> None:
 
         return tb
 
-    # tbr = tb.copy()
+    tbr = tb.copy()
 
     tb = pivot_and_format(tb, ["country", "year", "age", "sex", "group"], "gam_age_sex_group")
     tb_hepatitis = pivot_and_format(
@@ -252,20 +252,20 @@ def run(dest_dir: str) -> None:
         tb_no_dim,
     ]
 
-    # tb_meta = tbr[["indicator", "indicator_description", "unit"]].drop_duplicates().sort_values("indicator")
+    tb_meta = tbr[["indicator", "indicator_description", "unit"]].drop_duplicates().sort_values("indicator")
     # for _, row in tb_meta.iterrows():
     #     print(
     #         f"{row.indicator}:\n\ttitle: {row.indicator_description}\n\tunit: {row['unit']}\n\tdescription_short: ''\n\tdescription_from_producer: ''"
     #     )
-    # tb_meta
+    tb_meta
 
-    # x = tb.copy()
-    # cols_idx = list(x.index.names)
-    # x = x.reset_index()
-    # x = x.melt(id_vars=cols_idx).dropna(subset="value", axis=0)
-    # cols = [col for col in cols_idx if col not in ["country", "year"]]
-    # x = x[["variable"] + cols].drop_duplicates().sort_values(["variable"] + cols)
-    # x
+    x = tb.copy()
+    cols_idx = list(x.index.names)
+    x = x.reset_index()
+    x = x.melt(id_vars=cols_idx).dropna(subset="value", axis=0)
+    cols = [col for col in cols_idx if col not in ["country", "year"]]
+    x = x[["variable"] + cols].drop_duplicates().sort_values(["variable"] + cols)
+    x
 
     ####################
     # tbx = tb.groupby("indicator", as_index=False).agg(
