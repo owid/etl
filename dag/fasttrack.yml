@@ -234,3 +234,5 @@ steps:
     - snapshot://fasttrack/latest/_2__2023_in_donor_individual_countries__sheet1.csv
   data://grapher/fasttrack/latest/_3__oda_per_refugee__sheet1:
     - snapshot://fasttrack/latest/_3__oda_per_refugee__sheet1.csv
+  data://grapher/fasttrack/latest/_1__2018_2023_in_donor_costs_dac_countries__sheet1__1:
+    - snapshot://fasttrack/latest/_1__2018_2023_in_donor_costs_dac_countries__sheet1__1.csv
