@@ -90,7 +90,7 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
     return indicator_mapping
 
 
-@st.cache_data
+@st.cache_data(ttl=30 * 60)
 def _get_params_cached(
     dataset_old_id,
     dataset_new_id,
