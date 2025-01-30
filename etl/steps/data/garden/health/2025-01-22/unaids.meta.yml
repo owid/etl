@@ -1821,9 +1821,43 @@ tables:
       hiv_status_awareness:
         title: "HIV testing and status awareness - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
         unit: "%"
-        description_short: ""
+        description_short: |-
+          Percentage of {definitions.gam_groups.variable} who report having tested negative for HIV in the past 12 months, or who know that they are living with HIV.
         description_from_producer: |-
+          Ensuring that people living with HIV receive the care and treatment required to live healthy, productive lives and reduce the chance of transmitting HIV, requires that they know their HIV status. In many countries, targeting testing and counselling for locations and populations with the highest HIV burden is the most efficient way to reach people living with HIV and ensure that they know their HIV status. This indicator captures the effectiveness of HIV testing interventions in reaching populations at higher risk of HIV infection.
+
+          Method of measurement: Behavioural surveillance or other special surveys
+
+          Respondents are asked the following questions:
+
+          1. Do you know your HIV status from an HIV test? a. No, I have never been tested; b. Yes, I have been tested
+
+          2. If yes, when were you last tested? a. In the last 6 months; b. In the last 6–12 months; c. More than 12 months ago
+
+          3. Was the result of your last test: a. Positive; b. Negative
+
+          Calculated as ((1b->2a->* + 1b->2b->* + 1b->2c->3a) / 1b)
+
           More details: https://indicatorregistry.unaids.org/indicator/knowledge-hiv-status-among-key-populations-d
+        presentation:
+          title_public: Share of people that tested for HIV who know their status
+          title_variant: |-
+            <<group>>
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            , <<sex>>s
+            <%- endif %>
+            <%- if age != "total" %>
+            , aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Share of people that tested for HIV who know their status, <<group>>
+              <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
 
       hiv_tests:
         title: HIV tests
@@ -1831,13 +1865,55 @@ tables:
         # title: Safe injecting practices among people who inject drugs
         unit: tests
         description_short: |-
-          https://indicatorregistry.unaids.org/indicator/hiv-testing-volume-and-positivity-0
-
-        description_from_producer: ""
+          The number of HIV tests conducted (testing volume) to
+          <%- if group == "TB-patients" %>
+           <<sex if sex != "total">>TB patients
+          <%- else %>
+           <<"people" if sex == "total" else sex + "s">>
+          <%- endif %><<" aged " + age if age != "total">> in the last 12 months.
+        description_from_producer: |-
+          More details: https://indicatorregistry.unaids.org/indicator/hiv-testing-volume-and-positivity-0
+        presentation:
+          title_public: Number of HIV tests conducted<<" in " + group if group != "total">>
+          title_variant: |-
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            <<sex>>s<<", " if age != "total">>
+            <%- endif %>
+            <%- if age != "total" %>
+            aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Number of HIV tests conducted<<", " + group if group != "total">>
+              <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
 
       pwid_safety:
         title: "Safe injecting practices among people who inject drugs"
         unit: "%"
-        description_short: ""
+        description_short: |-
+          Percentage of <<group + " " if group != "total">>people<<" aged " + age if age != "total">> who inject drugs reporting using sterile injecting equipment the last time they injected.
         description_from_producer: |-
           More details: https://indicatorregistry.unaids.org/indicator/people-who-inject-drugs-safe-injecting-practices
+        presentation:
+          title_public: Share of <<group + " " if group != "total">>people who inject drugs using sterile equipment
+          title_variant: |-
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            <<sex>>s<<"," if age != "total">>
+            <%- endif %>
+            <%- if age != "total" %>
+            aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Share of people who inject drugs using sterile equipment<<", " + group if group != "total">>
+              <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
