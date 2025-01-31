@@ -23,7 +23,7 @@ import random
 from datetime import date, datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union, get_args, overload
+from typing import Any, Dict, List, Literal, Optional, Set, Union, get_args, overload
 
 import humps
 import numpy as np
@@ -1558,16 +1558,22 @@ class ChartDimensions(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
     @classmethod
-    def chart_ids_with_indicators(cls, session: Session, indicator_ids: list[int]) -> list[int]:
+    def chart_ids_with_indicators(cls, session: Session, indicator_ids: List[int]) -> List[int]:
         """Return a list of chart IDs that have any of the given indicators."""
         query = select(cls.chartId).where(cls.variableId.in_(indicator_ids))
         return list(session.scalars(query).all())
 
     @classmethod
-    def indicators_in_charts(cls, session: Session, chart_ids: list[int]) -> set[int]:
+    def indicators_in_charts(cls, session: Session, chart_ids: List[int]) -> Set[int]:
         """Return a list of indicator IDs that are in any of the given charts."""
         query = select(cls.variableId).where(cls.chartId.in_(chart_ids))
         return set(session.scalars(query).all())
+
+    @classmethod
+    def filter_indicators_used_in_charts(cls, session: Session, indicator_ids: List[int]) -> List[int]:
+        """Reduce the input list of indicator IDs to only those used in charts."""
+        query = select(cls.variableId).where(cls.variableId.in_(indicator_ids))
+        return list(set(session.scalars(query).all()))
 
 
 class Origin(Base):
