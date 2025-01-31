@@ -41,15 +41,15 @@ HOW TO EXECUTE:
 	- lis_percentiles_pc_adults_i.csv (menu_option = 4, equivalized = 0, age = "adults", percentile_file = i)
 10. Repeat the process for the different settings you want to extract.
 11. Once all the files have been created, copy them into the lis snapshot directory in the ETL, run concat_files.py and then update the snapshot, by using these comands one by one:
-	python snapshots/lis/2024-06-13/concat_files.py
-	python snapshots/lis/2024-06-13/lis_keyvars.py --path-to-file snapshots/lis/2024-06-13/lis_keyvars.csv
-	python snapshots/lis/2024-06-13/lis_abs_poverty.py --path-to-file snapshots/lis/2024-06-13/lis_abs_poverty.csv
-	python snapshots/lis/2024-06-13/lis_distribution.py --path-to-file snapshots/lis/2024-06-13/lis_distribution.csv
-	python snapshots/lis/2024-06-13/lis_percentiles.py --path-to-file snapshots/lis/2024-06-13/lis_percentiles.csv
-	python snapshots/lis/2024-06-13/lis_keyvars_adults.py --path-to-file snapshots/lis/2024-06-13/lis_keyvars_adults.csv
-	python snapshots/lis/2024-06-13/lis_abs_poverty_adults.py --path-to-file snapshots/lis/2024-06-13/lis_abs_poverty_adults.csv
-	python snapshots/lis/2024-06-13/lis_distribution_adults.py --path-to-file snapshots/lis/2024-06-13/lis_distribution_adults.csv
-	python snapshots/lis/2024-06-13/lis_percentiles_adults.py --path-to-file snapshots/lis/2024-06-13/lis_percentiles_adults.csv
+	python snapshots/lis/2025-01-24/concat_files.py
+	python snapshots/lis/2025-01-24/lis_keyvars.py --path-to-file snapshots/lis/2025-01-24/lis_keyvars.csv
+	python snapshots/lis/2025-01-24/lis_abs_poverty.py --path-to-file snapshots/lis/2025-01-24/lis_abs_poverty.csv
+	python snapshots/lis/2025-01-24/lis_distribution.py --path-to-file snapshots/lis/2025-01-24/lis_distribution.csv
+	python snapshots/lis/2025-01-24/lis_percentiles.py --path-to-file snapshots/lis/2025-01-24/lis_percentiles.csv
+	python snapshots/lis/2025-01-24/lis_keyvars_adults.py --path-to-file snapshots/lis/2025-01-24/lis_keyvars_adults.csv
+	python snapshots/lis/2025-01-24/lis_abs_poverty_adults.py --path-to-file snapshots/lis/2025-01-24/lis_abs_poverty_adults.csv
+	python snapshots/lis/2025-01-24/lis_distribution_adults.py --path-to-file snapshots/lis/2025-01-24/lis_distribution_adults.csv
+	python snapshots/lis/2025-01-24/lis_percentiles_adults.py --path-to-file snapshots/lis/2025-01-24/lis_percentiles_adults.csv
 
 	(Change the date for future updates)
 

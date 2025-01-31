@@ -32,8 +32,6 @@ steps:
     - snapshot://lis/2024-06-13/lis_abs_poverty.csv
     - snapshot://lis/2024-06-13/lis_distribution.csv
     - snapshot://lis/2024-06-13/lis_abs_poverty_adults.csv
-    - snapshot://lis/2024-06-13/lis_percentiles.csv
-    - snapshot://lis/2024-06-13/lis_percentiles_adults.csv
     - data://garden/regions/2023-01-01/regions
   data://garden/lis/2024-06-13/luxembourg_income_study:
     - data://meadow/lis/2024-06-13/luxembourg_income_study
