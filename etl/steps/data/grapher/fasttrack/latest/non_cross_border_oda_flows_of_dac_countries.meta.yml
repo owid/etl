@@ -1,0 +1,42 @@
+dataset:
+  title: DRAFT Non-cross-border ODA flows of DAC countries
+  description: ''
+tables:
+  non_cross_border_oda_flows_of_dac_countries:
+    variables:
+      donor:
+        title: "\uFEFFDONOR"
+        unit: ''
+      part:
+        title: PART
+        unit: ''
+      part3:
+        title: Part3
+        unit: ''
+      aidtype:
+        title: AIDTYPE
+        unit: ''
+      aid_type:
+        title: Aid type
+        unit: ''
+      flows:
+        title: FLOWS
+        unit: ''
+      fund_flows:
+        title: Fund flows
+        unit: ''
+      amounttype:
+        title: AMOUNTTYPE
+        unit: ''
+      amount_type:
+        title: Amount type
+        unit: ''
+      time:
+        title: TIME
+        unit: ''
+      value:
+        title: Value
+        unit: ''
+      flags:
+        title: Flags
+        unit: ''

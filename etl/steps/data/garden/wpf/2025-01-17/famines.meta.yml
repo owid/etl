@@ -1,0 +1,46 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Famines
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Famine deaths by region
+
+
+tables:
+  famines:
+    variables:
+       region:
+        title: Region
+        unit: ''
+        description_short: Region where the famine occurred.
+
+       wpf_authoritative_mortality_estimate:
+          title: Deaths from famines
+          unit: 'deaths'
+          description_short: Deaths in famines that are estimated to have killed 100,000 people or more.
+          description_key:
+            - WPF defines a famine as mass mortality due to mass starvation, with mass starvation being the "destruction, deprivation or loss of objects and activities required for survival".
+            - The 1910–1919 famine in British Somaliland and the African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, and Djibouti) is treated as a single event because the 100,000+ mortality estimate applies to the entire region, not individual areas.
+            - For the Ottoman Empire (1894–1896), East Africa (1896–1900), and the combined Somaliland–African Red Sea Region famine (1910–1919), the 100,000 death estimate is a **minimum**, meaning the actual death toll was likely higher.
+          description_from_producer: |-
+            Famines were included in the catalogue based on the total number of excess deaths (magnitude), not the percentage of the population affected. A minimum threshold of 100,000 deaths was set because there is limited research on how famines impacted death rates relative to population size. This means famines with at least 100,000 deaths are included, regardless of the total population of the affected area.
+          display:
+            numDecimalPlaces: 0
+
+       principal_cause:
+        title: Principal cause
+        unit: ''
+        description_key:
+        - Famines were classified into four main triggers - adverse climate, government policies, armed conflict, or genocide - though in reality, multiple factors, especially human decisions, almost always play a significant role in their development and severity.
+        - Historical examples demonstrate this complexity, such as when El Niño-related famines in the late 19th century were made worse by imperial conquest, and when the 1984-85 Sudan famine, initially triggered by drought, was intensified by exploitative politics.
+        - The Ukrainian Holodomor (1931-1933) is a subject of some controversy, with interpretations divided between Stalin’s genocidal intent and Soviet claims of unintentional policy failures; however, most scholars now classify it as genocide.
+        - The Darfur crisis (2003-2005) also faced initial controversy before achieving scholarly consensus as genocide.
+        - More recently, the Tigray famine (2020-2022) has been categorized as "armed conflict," though ongoing research may shift its classification.
+        - The classification system continues to evolve as new research emerges and experts provide additional insights.
