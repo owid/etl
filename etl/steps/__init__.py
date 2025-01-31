@@ -661,10 +661,22 @@ class DataStep(Step):
         if self.checksum_output() != ds_meta["source_checksum"]:
             return False
 
-        # only download DEFAULT_FORMATS
-        include = [".meta.json"] + [f".{format}" for format in DEFAULT_FORMATS]
-
         r2 = s3_utils.connect_r2_cached()
+
+        # Get available formats of a dataset
+        s3_files = s3_utils.list_s3_objects(f"s3://owid-catalog/{self.path}/", client=s3_utils.connect_r2_cached())
+        available_formats = {f.split(".")[-1] for f in s3_files} - {"json"}
+
+        # if one of the format is in DEFAULT_FORMATS, download it
+        if set(available_formats) & set(DEFAULT_FORMATS):
+            download_formats = DEFAULT_FORMATS
+        # otherwise download all available formats
+        # NOTE: explorers only publish .csv format which might not be in DEFAULT_FORMATS
+        else:
+            download_formats = available_formats
+
+        include = [".meta.json"] + [f".{format}" for format in download_formats]
+
         s3_utils.download_s3_folder(
             f"s3://owid-catalog/{self.path}/",
             self._dest_dir,

@@ -250,7 +250,7 @@ age: |-
 The most straightforward way to check your metadata is in Admin, although that means waiting for your step to finish. There's a faster way to check your YAML file directly. Create a `playground.ipynb` notebook in the same folder as your YAML file and copy this to the first cell:
 
 ```python
-from etl.grapher import helpers as gh
+import etl.grapher.helpers as gh
 dim_dict = {
   "age_group": "YEARS0-4", "sex": "Male", "cause": "Drug use disorders"
 }
@@ -262,7 +262,7 @@ An alternative is examining `VariableMeta`
 
 ```python
 from owid.catalog import Dataset
-from etl.grapher import helpers as gh
+import etl.grapher.helpers as gh
 from etl import paths
 
 tb = Dataset(paths.DATA_DIR / "garden/who/2024-07-30/ghe")['ghe']

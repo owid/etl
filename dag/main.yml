@@ -211,7 +211,7 @@ steps:
   data://garden/research_development/2024-05-20/patents_articles:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/demography/2023-03-31/population
-  data://grapher/research_development/2024-05-20/patents_articles:
+  data://grapher/research_development/2024-05-20/patents_wdi_unwpp:
     - data://garden/research_development/2024-05-20/patents_articles
 
   # World Bank's Women, Business and the Law additional data
@@ -458,7 +458,7 @@ steps:
   data://garden/growth/2024-05-16/gdp_historical:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
-    - data://grapher/worldbank_wdi/2024-05-20/wdi
+    - data://grapher/worldbank_wdi/2025-01-24/wdi
 
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
@@ -505,6 +505,7 @@ steps:
     - data://garden/news/2024-05-23/gdelt_v2
 
   # World Development Indicators - WDI
+  # TO BE ARCHIVED
   data://meadow/worldbank_wdi/2024-05-20/wdi:
     - snapshot://worldbank_wdi/2024-05-20/wdi.zip
 
@@ -517,6 +518,20 @@ steps:
 
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
+
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2025-01-24/wdi:
+    - snapshot://worldbank_wdi/2025-01-24/wdi.zip
+
+  data://garden/worldbank_wdi/2025-01-24/wdi:
+    - snapshot://worldbank_wdi/2025-01-24/wdi.zip
+    - data://meadow/worldbank_wdi/2025-01-24/wdi
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+
+  data://grapher/worldbank_wdi/2025-01-24/wdi:
+    - data://garden/worldbank_wdi/2025-01-24/wdi
 
   #
   # Aviation Safety Network - Aviation Statistics.
@@ -666,37 +681,37 @@ steps:
   data://grapher/un/2024-10-21/census_dates:
     - data://garden/un/2024-10-21/census_dates
 
-  #  World Peace Foundation - Famines
-  data://meadow/wpf/2024-10-03/famines:
-    - snapshot://wpf/2024-10-03/famines.xlsx
-  data://garden/wpf/2024-10-03/famines:
-    - data://meadow/wpf/2024-10-03/famines
+  #  World Peace Foundation - Famines (2025)
+  data://meadow/wpf/2025-01-17/famines:
+    - snapshot://wpf/2025-01-17/famines.xlsx
+  data://garden/wpf/2025-01-17/famines:
+    - data://meadow/wpf/2025-01-17/famines
     - data://garden/regions/2023-01-01/regions
-
-  data://grapher/wpf/2024-10-03/famines:
-    - data://garden/wpf/2024-10-03/famines
-  data://garden/wpf/2024-10-03/total_famines_by_year_decade:
-    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2025-01-17/famines:
+    - data://garden/wpf/2025-01-17/famines
+  data://garden/wpf/2025-01-17/total_famines_by_year_decade:
+    - data://garden/wpf/2025-01-17/famines
     - data://garden/demography/2024-07-15/population
-  data://grapher/wpf/2024-10-03/total_famines_by_year_decade:
-    - data://garden/wpf/2024-10-03/total_famines_by_year_decade
+  data://grapher/wpf/2025-01-17/total_famines_by_year_decade:
+    - data://garden/wpf/2025-01-17/total_famines_by_year_decade
 
-  data://garden/wpf/2024-10-03/famines_by_regime_gdp:
-    - data://garden/wpf/2024-10-03/famines
+  data://garden/wpf/2025-01-17/famines_by_regime_gdp_population:
+    - data://garden/wpf/2025-01-17/famines
     - data://garden/democracy/2024-03-07/vdem
     - data://garden/ggdc/2024-04-26/maddison_project_database
-  data://grapher/wpf/2024-10-03/famines_by_regime_gdp:
-    - data://garden/wpf/2024-10-03/famines_by_regime_gdp
+    - data://garden/demography/2024-07-15/population
+  data://grapher/wpf/2025-01-17/famines_by_regime_gdp_population:
+    - data://garden/wpf/2025-01-17/famines_by_regime_gdp_population
 
-  data://garden/wpf/2024-10-03/famines_by_factor:
-    - data://garden/wpf/2024-10-03/famines
-  data://grapher/wpf/2024-10-03/famines_by_factor:
-    - data://garden/wpf/2024-10-03/famines_by_factor
+  data://garden/wpf/2025-01-17/famines_by_place:
+    - data://garden/wpf/2025-01-17/famines
+  data://grapher/wpf/2025-01-17/famines_by_place:
+    - data://garden/wpf/2025-01-17/famines_by_place
 
-  data://garden/wpf/2024-10-03/famines_by_place:
-    - data://garden/wpf/2024-10-03/famines
-  data://grapher/wpf/2024-10-03/famines_by_place:
-    - data://garden/wpf/2024-10-03/famines_by_place
+  data://garden/wpf/2025-01-17/famines_by_trigger:
+    - data://garden/wpf/2025-01-17/famines
+  data://grapher/wpf/2025-01-17/famines_by_trigger:
+    - data://garden/wpf/2025-01-17/famines_by_trigger
 
   data-private://meadow/owid/latest/ig_countries:
     - snapshot-private://owid/latest/ig_countries.csv
@@ -731,7 +746,7 @@ steps:
 
   # GDP per capita vs. living conditions indicators
   data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
-    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/worldbank_wdi/2025-01-24/wdi
     - data://garden/un/2024-07-12/un_wpp
     - data://garden/un/2024-09-11/igme
     - data://garden/who/2024-07-26/mortality_database
