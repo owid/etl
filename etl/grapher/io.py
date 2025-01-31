@@ -23,6 +23,9 @@ import structlog
 import validators
 from deprecated import deprecated
 from owid.catalog import Dataset, Table
+from sqlalchemy import (
+    select,
+)
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 from tenacity import Retrying
@@ -103,16 +106,23 @@ def load_variables(
     """Load variable.
 
     If id_or_path is str, it'll be used as catalog path.
-
-    TODO: this should be merged with load_variable!
     """
     with Session(owid_env.engine) as session:
-        variable = gm.Variable.from_id_or_path(
+        variables = gm.Variable.from_id_or_path(
             session=session,
             id_or_path=ids_or_paths,
         )
 
-    return variable
+    return variables
+
+
+def filter_indicators_used_in_charts(indicator_ids: List[int]) -> List[int]:
+    """Return a list with only the IDs of the variables used in charts."""
+    with Session(OWID_ENV.engine) as session:
+        indicator_ids_filtered = gm.ChartDimensions.filter_indicators_used_in_charts(
+            session=session, indicator_ids=indicator_ids
+        )
+        return indicator_ids_filtered
 
 
 ##############################################################################################
