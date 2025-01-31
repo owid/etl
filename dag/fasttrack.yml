@@ -224,3 +224,15 @@ steps:
     - snapshot://fasttrack/latest/antimicrobial_usage_livestock.csv
   data://grapher/fasttrack/latest/iucn_number_evaluated:
     - snapshot://fasttrack/latest/iucn_number_evaluated.csv
+  data://grapher/fasttrack/latest/cdc_measles:
+    - snapshot://fasttrack/latest/cdc_measles.csv
+  data://grapher/fasttrack/latest/try_fast_track_in_donor_costs:
+    - snapshot://fasttrack/latest/try_fast_track_in_donor_costs.csv
+  data://grapher/fasttrack/latest/_1__2018_2023_in_donor_costs_dac_countries__sheet1:
+    - snapshot://fasttrack/latest/_1__2018_2023_in_donor_costs_dac_countries__sheet1.csv
+  data://grapher/fasttrack/latest/_2__2023_in_donor_individual_countries__sheet1:
+    - snapshot://fasttrack/latest/_2__2023_in_donor_individual_countries__sheet1.csv
+  data://grapher/fasttrack/latest/_3__oda_per_refugee__sheet1:
+    - snapshot://fasttrack/latest/_3__oda_per_refugee__sheet1.csv
+  data://grapher/fasttrack/latest/_1__2018_2023_in_donor_costs_dac_countries__sheet1__1:
+    - snapshot://fasttrack/latest/_1__2018_2023_in_donor_costs_dac_countries__sheet1__1.csv
