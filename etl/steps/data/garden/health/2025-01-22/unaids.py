@@ -80,10 +80,10 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("unaids")
     # Load population dataset.
     # ds_population = paths.load_dataset("population")
-    # ## Load regions dataset.
-    # ds_regions = paths.load_dependency("regions")
-    # ## Load income groups dataset.
-    # ds_income_groups = paths.load_dependency("income_groups")
+    ## Load regions dataset.
+    ds_regions = paths.load_dependency("regions")
+    ## Load income groups dataset.
+    ds_income_groups = paths.load_dependency("income_groups")
 
     # Load dimensions
     with paths.side_file("unaids.dimensions.yml").open() as f:
@@ -96,8 +96,12 @@ def run(dest_dir: str) -> None:
     # EPI data
     ###############################
     tb_epi = ds_meadow.read("epi")  ## 1,687,587 rows
-    tb_epi = make_table_epi(tb_epi, dimensions["epi"])
-    tb_epi = add_old_art_averted_deaths_data(tb_epi)
+    tb_epi = make_table_epi(
+        tb_epi,
+        dimensions["epi"],
+        ds_regions,
+        ds_income_groups,
+    )
     tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
 
     ###############################
@@ -191,18 +195,28 @@ def run(dest_dir: str) -> None:
     # RESHAPE (and check)
     paths.log.info("GAM: Format (and check)")
 
-    def pivot_and_format(tb, columns, short_name):
+    def pivot_and_format(tb, columns, short_name, regions_agg=True):
         # 1/ Save some fields (this might be useful later)
-        tb_meta = tb[["indicator", "indicator_description", "unit"]].drop_duplicates()
-        assert (
-            not tb_meta[["indicator", "indicator_description"]].duplicated().any()
-        ), "Multiple descriptions or units for a single indicator!"
+        tb_meta = tb[["indicator", "unit"]].drop_duplicates()
+        assert not tb_meta[["indicator"]].duplicated().any(), "Multiple units for a single indicator!"
 
         # 2/ Pivot
         tb = tb.pivot(index=columns, columns="indicator", values="value").reset_index()
         tb = tb.underscore()
         tb = tb.dropna(how="all")
 
+        # (OPTIONAL) Add regional aggregates
+        # if columns_agg is not None:
+        if regions_agg:
+            columns_agg = tb_meta.loc[tb_meta["unit"] == "NUMBER", "indicator"].tolist()
+            if columns_agg != []:
+                tb = add_regional_aggregates(
+                    tb,
+                    ds_regions,
+                    ds_income_groups,
+                    columns_agg=columns_agg,
+                )
+        # 3/ Format
         tb = tb.format(columns, short_name=short_name)
 
         return tb
@@ -214,14 +228,22 @@ def run(dest_dir: str) -> None:
     tb_hepatitis = pivot_and_format(
         tb_hepatitis, ["country", "year", "age", "sex", "group", "hepatitis"], "gam_hepatitis"
     )
-    tb_estimate = pivot_and_format(tb_estimate, ["country", "year", "estimate"], "gam_estimates")
+    tb_estimate = pivot_and_format(
+        tb_estimate,
+        ["country", "year", "estimate"],
+        "gam_estimates",
+    )
     tb_group = pivot_and_format(tb_group, ["country", "year", "group"], "gam_group")
     tb_age = pivot_and_format(tb_age, ["country", "year", "age"], "gam_age")
     tb_sex = pivot_and_format(tb_sex, ["country", "year", "sex"], "gam_sex")
     tb_age_sex = pivot_and_format(tb_age_sex, ["country", "year", "age", "sex"], "gam_age_sex")
     tb_age_group = pivot_and_format(tb_age_group, ["country", "year", "age", "group"], "gam_age_group")
     tb_sex_group = pivot_and_format(tb_sex_group, ["country", "year", "sex", "group"], "gam_sex_group")
-    tb_no_dim = pivot_and_format(tb_no_dim, ["country", "year"], "gam")
+    tb_no_dim = pivot_and_format(
+        tb_no_dim,
+        ["country", "year"],
+        "gam",
+    )
 
     # SCALING
     tb_no_dim["resource_needs_ft"] *= 1e6
@@ -290,7 +312,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def make_table_epi(tb, dimensions):
+def make_table_epi(tb, dimensions, ds_regions, ds_income_groups):
     # Add dimensions
 
     tb = expand_raw_dimension(tb, dimensions)
@@ -327,9 +349,20 @@ def make_table_epi(tb, dimensions):
     tb = tb.rename(columns=COLUMNS_RENAME_EPI)
 
     # Add older ART-prevented deaths data
+    tb = add_old_art_averted_deaths_data(tb)
 
     # Drop all NaN rows
     tb = tb.dropna(how="all")
+
+    # Add regional data
+    columns_agg = tb_meta.loc[tb_meta["unit"] == "NUMBER", "indicator"].tolist()
+    if columns_agg != []:
+        tb = add_regional_aggregates(
+            tb,
+            ds_regions,
+            ds_income_groups,
+            columns_agg=columns_agg,
+        )
 
     return tb
 
@@ -972,6 +1005,47 @@ def safe_replace_NAs(tb, set_map, dimension, value):
         )
     mask = tb["indicator"].isin(set_map.keys())
     tb.loc[mask, dimension] = tb.loc[mask, dimension].fillna(value)
+
+    return tb
+
+
+def add_regional_aggregates(tb: Table, ds_regions, ds_income_groups, columns_agg) -> Table:
+    """
+    Adding regional aggregates for all tuberculosis variables.
+    """
+    COLUMNS_INDEX_BASE = [
+        "country",
+        "year",
+        "sex",
+        "age",
+        "group",
+        "hepatitis",
+        "estimate",
+    ]
+    index_columns = list(tb.columns.intersection(COLUMNS_INDEX_BASE))
+
+    # Split table into 'agg' and 'no_agg'
+    tb_agg = tb[index_columns + columns_agg]
+    tb_no_agg = tb.drop(columns=columns_agg)
+
+    # Removing existing aggregates
+    tb_agg = tb_agg[~tb_agg["country"].isin(REGIONS_TO_ADD)]
+    tb_agg = tb_agg.dropna(subset=columns_agg, how="all")
+
+    # Create a table for each disaggregation value
+    # Add region aggregates.
+    tb_agg = geo.add_regions_to_table(
+        tb=tb_agg,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        regions=REGIONS_TO_ADD,
+        index_columns=index_columns,
+        min_num_values_per_year=1,
+        frac_allowed_nans_per_year=0.3,
+    )
+
+    # Merge with table without aggregates
+    tb = pr.merge(tb_no_agg, tb_agg, on=index_columns, how="outer").reset_index(drop=True)
 
     return tb
 
