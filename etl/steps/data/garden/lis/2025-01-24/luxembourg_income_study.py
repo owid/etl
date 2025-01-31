@@ -2,7 +2,7 @@
 Load the three LIS meadow datasets and create one garden dataset, `luxembourg_income_study`.
 
 NOTE: To extract the log of the process (to review sanity checks, for example), run the following command in the terminal:
-    nohup uv run etl run luxembourg_income_study > output.log 2>&1 &
+    nohup uv run etl run luxembourg_income_study > output_lis.log 2>&1 &
 
 """
 
