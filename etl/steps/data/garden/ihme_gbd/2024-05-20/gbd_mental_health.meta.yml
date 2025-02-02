@@ -5,67 +5,13 @@ definitions:
       topic_tags:
         - Mental Health
     processing_level: major
-  sex: |-
-    <% if sex == "Both" %>
-    individuals
-    <%- elif sex == "Male" %>
-    males
-    <%- elif sex == "Female" %>
-    females
-    <%- endif %>
+  sex: << jinja_sex(metric) >>
   value:
-    unit: |-
-      <% if metric == "Number" %>
-      cases
-      <%- elif metric == "Rate" %>
-      cases per 100,000 people
-      <%- elif metric == "Share" %>
-      %
-      <%- endif %>
-    short_unit: |-
-      <% if metric == "Share" %>%<% elif metric == "Rate" or metric == "Number" %><% endif %>
-    title: |-
-      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      Current cases of << cause.lower() >>, among {definitions.sex} aged << age >>
-      <% elif metric == "Number" and age == 'Age-standardized'%>
-      Age-standardized current number of {definitions.sex} with << cause.lower() >>
-      <% elif metric == "Number" and age == 'All ages'%>
-      Total current number of {definitions.sex} with << cause.lower() >>
-      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      Current cases of << cause.lower() >>, among {definitions.sex} aged << age >>, per 100,000 people
-      <% elif metric == "Rate" and age == 'Age-standardized'%>
-      Age-standardized current cases of {definitions.sex} with << cause.lower() >>, per 100,000 people
-      <% elif metric == "Rate" and age == 'All ages'%>
-      Total current number of {definitions.sex} with << cause.lower() >>, per 100,000 people
-      <% elif metric == "Share" and (age != 'Age-standardized' and age != 'All ages')%>
-      Current cases of << cause.lower() >>, among {definitions.sex} aged << age >>, per 100 people
-      <% elif metric == "Share" and age == 'Age-standardized'%>
-      Age-standardized current cases of {definitions.sex} with << cause.lower() >>, per 100 people
-      <% elif metric == "Share" and age == 'All ages'%>
-      Total current number of {definitions.sex} with << cause.lower() >>, per 100 people
-      <% endif %>
-    description_short: |-
-      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex} aged << age >>.
-      <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated age-standardized prevalence of {definitions.sex} with << cause.lower() >>.
-      <% elif metric == "Number" and age == 'All ages'%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex}.
-      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex} aged << age >>, per 100,000 people.
-      <% elif metric == "Rate" and age == 'Age-standardized'%>
-      The estimated age-standardized prevalence of {definitions.sex} with << cause.lower() >>, per 100,000 people.
-      <% elif metric == "Rate" and age == 'All ages'%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex}, per 100,000 people.
-      <% elif metric == "Share" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex} aged << age >>, per 100 people.
-      <% elif metric == "Share" and age == 'Age-standardized'%>
-      The estimated age-standardized prevalence of {definitions.sex} with << cause.lower() >>, per 100 people.
-      <% elif metric == "Share" and age == 'All ages'%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex}, per 100 people.
-      <% endif %>
-  footnote: |-
-    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% endif %>
+    unit: << jinja_unit(metric) >>
+    short_unit: << jinja_short_unit(metric) >>
+    title: << jinja_title(metric) >>
+    description_short: << jinja_description_short(metric) >>
+  footnote: << jinja_footnote(metric) >>
 dataset:
   update_period_days: 1460
   non_redistributable: true

@@ -3,6 +3,7 @@
 from shared import add_regional_aggregates, add_share_population
 
 from etl.data_helpers import geo
+from etl.grapher import helpers as gh
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -38,7 +39,10 @@ def run(dest_dir: str) -> None:
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
-    tb = ds_meadow["gbd_mental_health"].reset_index()
+    tb = ds_meadow.read("gbd_mental_health")
+
+    tb = tb[tb.cause == "Alcohol use disorders"]
+
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb = add_regional_aggregates(

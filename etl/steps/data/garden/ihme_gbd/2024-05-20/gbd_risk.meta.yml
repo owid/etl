@@ -12,7 +12,7 @@ definitions:
     unit: |-
       <% if metric == "Number" %>deaths<% elif metric == "Rate" %>deaths per 100,000 people<% elif metric == "Percent" %>%<%- endif -%>
     short_unit: |-
-      <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
+      << jinja_short_unit(metric) >>
     title: |-
       <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
       Deaths from {definitions.cause} attributed to << rei.lower() >> among individuals aged << age >>

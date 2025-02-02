@@ -282,6 +282,50 @@ def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
         return obj
 
 
+from importlib import import_module
+from pathlib import Path
+from typing import Callable
+
+from etl import paths
+
+
+def _jinja_functions(yaml_path: str) -> list[Callable]:
+    module_path = (
+        Path(yaml_path.replace(".meta.yml", "")).absolute().relative_to(paths.BASE_DIR).as_posix().replace("/", ".")
+    )
+    run_module = import_module(module_path)
+
+    # Automatically add all functions from jinja_helpers to Jinja
+    funcs = []
+    for name in dir(run_module):
+        if name.startswith("jinja"):
+            func = getattr(run_module, name)
+            if callable(func):  # Only add callable functions
+                funcs.append(func)
+
+    return funcs
+
+
+def register_jinja_functions(funcs: list[Callable]) -> None:
+    """Register Jinja functions in the global environment. They can be then used
+    in YAML file.
+
+    Usage:
+        # in step module
+        from etl.grapher import helpers as gh
+
+        def jinja_unit(metric):
+            return "kg"
+
+        gh.register_jinja_functions([jinja_unit])
+
+        # in YAML file
+        unit: << jinja_unit(metric) >>
+    """
+    for func in funcs:
+        jinja_env.globals[func.__name__] = func
+
+
 def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[str, Any]:
     """Load YAML file and render Jinja in all fields. Return a dictionary.
 
@@ -293,6 +337,11 @@ def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[s
         gh.render_variable_meta(tb.my_col.m, dim_dict={"sex": "male"})
     """
     meta = dynamic_yaml_to_dict(dynamic_yaml_load(path))
+
+    # Add jinja_ functions defined in the module
+    for func in _jinja_functions(str(path)):
+        jinja_env.globals[func.__name__] = func
+
     return _expand_jinja(meta, dim_dict)
 
 

@@ -18,9 +18,16 @@ AGE_GROUPS_RANGES = {
 }
 
 
+def jinja_short_unit(metric):
+    if metric == "Percent":
+        return "%"
+    elif metric == "Rate" or metric == "Number":
+        return ""
+
+
 def run(dest_dir: str) -> None:
     #
-    # Load inputs.
+    # Load inputs
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("gbd_risk")
