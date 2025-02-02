@@ -233,6 +233,10 @@ tables:
           {definitions.conflict_type_estimate}
 ```
 
+It's also possible to do the same with Jinja `macros`. Check out section below and pick your favorite.
+
+### Whitespaces
+
 Line breaks and whitespaces can be tricky when using Jinja templates. We use reasonable defaults and strip whitespaces, so in most cases you should be fine with using `<%` and `%>`, but in more complex cases, you might have to experiment with
 more fine grained [whitespace control](https://jinja.palletsprojects.com/en/stable/templates/#whitespace-control) using tags `<%-` and `-%>`. This is most often used in if-else blocks like this
 
@@ -246,6 +250,8 @@ age: |-
   ...
   <%- endif %>
 ```
+
+### Checking Metadata
 
 The most straightforward way to check your metadata is in Admin, although that means waiting for your step to finish. There's a faster way to check your YAML file directly. Create a `playground.ipynb` notebook in the same folder as your YAML file and copy this to the first cell:
 
@@ -271,3 +277,34 @@ dim_dict = dict(zip(tb.index.names, tb.sample(1).index[0]))
 
 gh.render_variable_meta(tb.death_count.m, dim_dict=dim_dict)
 ```
+
+### Jinja Macros
+
+Jinja macros could often be a good way to avoid repetition in your metadata. Define macros in field `macros:` and then import them with `{macros}`. For example:
+
+```yaml
+macros: |-
+  <% macro conflict_type_estimate(conflict_type, estimate) %>
+    <% if conflict_type == "all" %>
+    The << estimate >> estimate of the number of deaths...
+    <% elif conflict_type == "inter-state" %>
+    ...
+    <% endif %>
+  <% endmacro %>
+
+tables:
+  ucdp:
+    variables:
+      number_deaths_ongoing_conflicts_high:
+        description_processing: |-
+          {macros}
+          << conflict_type_estimate(conflict_type, "high") >>
+      number_deaths_ongoing_conflicts_low:
+        description_processing: |-
+          {macros}
+          << conflict_type_estimate(conflict_type, "low") >>
+```
+
+!!! tip "Reusing definitions across tables through shared.meta.yml"
+
+    If you have multiple `*.meta.yml` files that share the same metadata, you can put shared `definitions:` and `macros:` into `shared.meta.yml` file. All other `*.meta.yml` files can then use them.
