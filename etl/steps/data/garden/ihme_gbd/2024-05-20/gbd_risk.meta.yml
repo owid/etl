@@ -6,121 +6,49 @@ definitions:
         - Global Health
         - Causes of Death
     processing_level: minor
-  cause: |-
-    <% if cause.startswith("HIV/AIDS") %><< cause >><% else %><< cause.lower() >><%- endif -%>
-  value_deaths:
-    unit: |-
-      <% if metric == "Number" %>deaths<% elif metric == "Rate" %>deaths per 100,000 people<% elif metric == "Percent" %>%<%- endif -%>
-    short_unit: |-
-      <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
-    title: |-
-      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      Deaths from {definitions.cause} attributed to << rei.lower() >> among individuals aged << age >>
-      <% elif metric == "Number" and age == 'Age-standardized'%>
-      Age-standardized deaths from {definitions.cause} attributed to << rei.lower() >>
-      <% elif metric == "Number" and age == 'All ages'%>
-      Total number of deaths from {definitions.cause} attributed to << rei.lower() >>
-      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      Deaths from {definitions.cause} attributed to << rei.lower() >> among individuals aged << age >> per 100,000 people
-      <% elif metric == "Rate" and age == 'Age-standardized'%>
-      Age-standardized deaths from {definitions.cause} attributed to << rei.lower() >> per 100,000 people
-      <% elif metric == "Rate" and age == 'All ages'%>
-      Deaths from {definitions.cause} attributed to << rei.lower() >> per 100,000 people
-      <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
-      Share of total deaths of individuals aged << age >> from {definitions.cause} attributed to << rei.lower() >>
-      <% elif metric == "Percent" and age == 'Age-standardized'%>
-      Share of total age-standardized deaths that are from {definitions.cause} attributed to << rei.lower() >>
-      <% elif metric == "Percent" and age == 'All ages'%>
-      Share of total deaths that are from {definitions.cause} attributed to << rei.lower() >>
-      <%- endif -%>
-    description_short: |-
-      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of deaths from {definitions.cause} attributed to << rei.lower() >> in those aged << age >>.
-      <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated number of age-standardized deaths from {definitions.cause} attributed to << rei.lower() >>.
-      <% elif metric == "Number" and age == 'All ages'%>
-      The estimated number of deaths from {definitions.cause} attributed to << rei.lower() >>.
-      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of deaths from {definitions.cause} attributed to << rei.lower() >> in those aged << age >>, per 100,000 people.
-      <% elif metric == "Rate" and age == 'Age-standardized'%>
-      The estimated number of age-standardized deaths from {definitions.cause} attributed to << rei.lower() >>, per 100,000 people.
-      <% elif metric == "Rate" and age == 'All ages'%>
-      The estimated number of deaths from {definitions.cause} attributed to << rei.lower() >>, per 100,000 people.
-      <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated share of deaths from {definitions.cause} attributed to << rei.lower() >> in those aged << age >>.
-      <% elif metric == "Percent" and age == 'Age-standardized'%>
-      The estimated share of age-standardized deaths from {definitions.cause} attributed to << rei.lower() >>.
-      <% elif metric == "Percent" and age == 'All ages'%>
-      The estimated share of deaths from {definitions.cause} attributed to << rei.lower() >>.
-      <%- endif -%>
-  value_dalys:
-    unit: |-
-      <% if metric == "Number" %>
-      DALYs
-      <% elif metric == "Rate" %>
-      DALYs per 100,000 people
-      <% elif metric == "Percent" %>
-      share of total DALYs
-      <%- endif -%>
-    short_unit: |-
-      <% if metric == "Percent" %>%<% elif metric == "Rate" or metric == "Number" %><%- endif -%>
-    title: |-
-      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      DALYs from {definitions.cause} attributed to << rei.lower() >> among individuals aged << age >>
-      <% elif metric == "Number" and age == 'Age-standardized'%>
-      Age-standardized DALYs from {definitions.cause} attributed to << rei.lower() >>
-      <% elif metric == "Number" and age == 'All ages'%>
-      Total number of DALYs from {definitions.cause} attributed to << rei.lower() >>
-      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      DALYs from {definitions.cause} attributed to << rei.lower() >> among individuals aged << age >> per 100,000 people
-      <% elif metric == "Rate" and age == 'Age-standardized'%>
-      Age-standardized DALYs from {definitions.cause} attributed to << rei.lower() >> per 100,000 people
-      <% elif metric == "Rate" and age == 'All ages'%>
-      DALYs from {definitions.cause} attributed to << rei.lower() >> per 100,000 people
-      <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
-      Share of total DALYs of individuals aged << age >> attributed to << rei.lower() >> from {definitions.cause}
-      <% elif metric == "Percent" and age == 'Age-standardized'%>
-      Share of total age-standardized DALYs that are from {definitions.cause} attributed to << rei.lower() >>
-      <% elif metric == "Percent" and age == 'All ages'%>
-      Share of total DALYs that are from {definitions.cause} attributed to << rei.lower() >>
-      <%- endif -%>
-    description_short: |-
-      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} attributed to << rei.lower() >> in those aged << age >>.
-      <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated number of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} attributed to << rei.lower() >>.
-      <% elif metric == "Number" and age == 'All ages'%>
-      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} attributed to << rei.lower() >>.
-      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} attributed to << rei.lower() >> in those aged << age >>, per 100,000 people.
-      <% elif metric == "Rate" and age == 'Age-standardized'%>
-      The estimated number of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} attributed to << rei.lower() >>, per 100,000 people.
-      <% elif metric == "Rate" and age == 'All ages'%>
-      The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} attributed to << rei.lower() >>, per 100,000 people.
-      <% elif metric == "Percent" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} attributed to << rei.lower() >> in those aged << age >>.
-      <% elif metric == "Percent" and age == 'Age-standardized'%>
-      The estimated share of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} attributed to << rei.lower() >>.
-      <% elif metric == "Percent" and age == 'All ages'%>
-      The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from {definitions.cause} attributed to << rei.lower() >>.
-      <%- endif -%>
-  footnote: |-
-    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
+
 dataset:
   update_period_days: 1460
   non_redistributable: true
+
 tables:
   gbd_risk:
     variables:
       value:
         title: |-
-          <% if measure == 'Deaths'%>{definitions.value_deaths.title}<% else %>{definitions.value_dalys.title}<%- endif -%>
+          {macros}
+          <% if measure == 'Deaths'%>
+            << format_title(metric, age, format_cause(cause), rei, 'Deaths') >>
+          <% else %>
+            << format_title(metric, age, format_cause(cause), rei, 'DALYs') >>
+          <%- endif -%>
         unit: |-
-          <% if measure == 'Deaths'%>{definitions.value_deaths.unit}<% else %>{definitions.value_dalys.unit}<%- endif -%>
+          <% if measure == 'Deaths'%>
+            <% if metric == "Number" %>
+            deaths
+            <% elif metric == "Rate" %>
+            deaths per 100,000 people
+            <% elif metric == "Percent" %>
+            %
+            <%- endif -%>
+          <% else %>
+            <% if metric == "Number" %>
+            DALYs
+            <% elif metric == "Rate" %>
+            DALYs per 100,000 people
+            <% elif metric == "Percent" %>
+            share of total DALYs
+            <%- endif -%>
+          <%- endif -%>
         short_unit: |-
-          <% if measure == 'Deaths'%>{definitions.value_deaths.short_unit}<% else %>{definitions.value_dalys.short_unit}<%- endif -%>
+          {definitions.short_unit}
         description_short: |-
-          <% if measure == 'Deaths'%>{definitions.value_deaths.description_short}<% else %>{definitions.value_dalys.description_short}<%- endif -%>
+          {macros}
+          <% if measure == 'Deaths'%>
+            << format_description_short(metric, age, format_cause(cause), rei, "deaths") >>
+          <% else %>
+            << format_description_short(metric, age, format_cause(cause), rei, "[Disability Adjusted Life Years (DALYs)](#dod:dalys)") >>
+          <%- endif -%>
         presentation:
           grapher_config:
             note: |-
