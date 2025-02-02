@@ -1,34 +1,10 @@
-definitions:
-  # NOTE: we'd like to move this to snapshot, but it's impractical because there are
-  # tons of other downstream datasets that still use sources
-  wdi_origin: &wdi_origin
-    producer: World Bank
-    title: World Bank World Development Indicators
-    description: |-
-      The World Development Indicators (WDI) is the World Bank's primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
-
-      [Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)]
-    citation_full: World Development Indicators, The World Bank (2025).
-    url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-    url_download: |-
-      https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0045575/WDI_CSV_2024_10_24.zip?versionId=2024-12-18T05:42:41.1131485Z
-    date_accessed: '2025-01-24'
-    date_published: '2025-01-15'
-    license:
-      name: Creative Commons Attribution 4.0
-      url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-
 dataset:
   update_period_days: 365
-  sources: []
 
 tables:
   wdi:
     variables:
       it_net_user_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Individuals using the Internet (% of population)
         description_short: Share of the population who used the Internet in the last three months.
         description_from_producer: >-
@@ -137,9 +113,6 @@ tables:
               - Latin America and Caribbean (WB)
               - World
       sh_sta_stnt_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Share of children who are stunted
         unit: '% of children under 5'
         short_unit: '%'
@@ -229,9 +202,6 @@ tables:
                 text: FAQs on this data
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       sh_sta_stnt_me_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Share of children who are stunted (modeled estimates)
         unit: '% of children under 5'
         short_unit: '%'
@@ -322,9 +292,6 @@ tables:
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
       ny_gdp_pcap_pp_kd:
-        sources: []
-        origins:
-          - *wdi_origin
         title: GDP per capita, PPP (constant 2021 international $)
         unit: international-$ in 2021 prices
         short_unit: $
@@ -389,9 +356,6 @@ tables:
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
 
       ny_gdp_mktp_pp_kd:
-        sources: []
-        origins:
-          - *wdi_origin
         title: GDP, PPP (constant 2021 international $)
         unit: international-$ in 2021 prices
         short_unit: $
@@ -454,9 +418,6 @@ tables:
               - Mexico
 
       ny_gnp_pcap_pp_kd:
-        sources: []
-        origins:
-          - *wdi_origin
         title: GNI per capita, PPP (constant 2021 international $)
         unit: international-$ in 2021 prices
         short_unit: $
@@ -513,9 +474,6 @@ tables:
 
 
       eg_cft_accs_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Access to clean fuels and technologies for cooking (% of population)
         unit: '% of population'
         short_unit: '%'
@@ -536,9 +494,6 @@ tables:
             - Energy
         processing_level: minor
       eg_elc_accs_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Access to electricity (% of population)
         unit: '% of population'
         short_unit: '%'
@@ -558,9 +513,6 @@ tables:
             - Energy
         processing_level: minor
       sn_itk_defc_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Prevalence of undernourishment (% of population)
         unit: '% of population'
         short_unit: '%'
