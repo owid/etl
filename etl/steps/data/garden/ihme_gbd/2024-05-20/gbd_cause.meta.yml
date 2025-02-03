@@ -11,9 +11,9 @@ definitions:
   cause: |-
     <% if cause.startswith("HIV/AIDS") %>
     << cause >>
-    <% else %>
+    <%- else %>
     << cause.lower() >>
-    <%- endif -%>
+    <%- endif %>
   value_deaths:
     unit: |-
       <% if metric == "Number" %>

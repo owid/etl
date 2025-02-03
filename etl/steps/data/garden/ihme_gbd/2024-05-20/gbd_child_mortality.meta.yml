@@ -15,7 +15,7 @@ definitions:
     << cause >>
     <%- else %>
     << cause.lower() >>
-    <%- endif -%>
+    <%- endif %>
   value_deaths:
     unit: |-
       <% if metric == "Number" %>deaths<%- elif metric == "Rate" %>deaths per 100,000 people<%- elif metric == "Percent" %>%<%- endif -%>
