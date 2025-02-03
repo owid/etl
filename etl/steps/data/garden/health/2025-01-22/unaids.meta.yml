@@ -1098,7 +1098,7 @@ tables:
         title: Co-management of tuberculosis and HIV treatment - <<estimate.title()>> estimate
         unit: "%"
         description_short: |-
-          <<estimate.title()>> estimate of the percentage of people living with HIV estimated to have incident tuberculosis (TB) that received treatment for both TB and HIV
+          <<estimate.title()>> estimate of the percentage of people living with HIV estimated to have incident tuberculosis (TB) that received treatment for both TB and HIV.
         description_from_producer: |-
           TB is a leading cause of morbidity and mortality among people living with HIV, including those receiving antiretroviral therapy. Prompt TB treatment and early antiretroviral therapy are critical for reducing the mortality due to HIV-associated TB and must be the highest-priority activity for both the AIDS Programme and National TB Programme. A measure of the percentage of HIV-positive TB patients that access appropriate treatment for their TB and HIV is therefore very important.
 
@@ -1121,13 +1121,13 @@ tables:
       hiv_new_tb_cases:
         title: Estimated HIV in new TB cases - <<estimate.title()>> estimate
         unit: "%"
-        description_short: "<<estimate.title()>> estimate"
+        description_short: "<<estimate.title()>> estimate."
         presentation:
           title_public: Estimated HIV in new TB cases
       incident_tb_cases:
         title: Incident TB cases in people living with HIV - <<estimate.title()>> estimate
         unit: cases
-        description_short: "<<estimate.title()>> estimate"
+        description_short: "<<estimate.title()>> estimate."
         display:
           numDecimalPlaces: 0
         presentation:
