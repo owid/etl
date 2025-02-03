@@ -240,3 +240,5 @@ steps:
     - snapshot://fasttrack/latest/road_miles_uk.csv
   data://grapher/fasttrack/2024-11-18/supercomputers:
     - snapshot://fasttrack/2024-11-18/supercomputers.csv
+  data://grapher/fasttrack/latest/in_donor_foreign_aid_categories_dac_countries:
+    - snapshot://fasttrack/latest/in_donor_foreign_aid_categories_dac_countries.csv
