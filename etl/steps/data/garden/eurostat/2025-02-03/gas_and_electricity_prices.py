@@ -843,11 +843,13 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load meadow dataset and read its table.
     ds_meadow = paths.load_dataset("gas_and_electricity_prices")
-
-    # Read table from meadow dataset.
     tb = ds_meadow.read("gas_and_electricity_prices")
+
+    # Load HICP data and read its table.
+    ds_hicp = paths.load_dataset("harmonised_index_of_consumer_prices")
+    tb_hicp = ds_hicp.read("harmonised_index_of_consumer_prices")
 
     #
     # Process data.
@@ -869,6 +871,27 @@ def run(dest_dir: str) -> None:
 
     # Select and prepare relevant data.
     tb = select_and_prepare_relevant_data(tb=tb)
+
+    # We want to use the HICP data to adjust the prices for inflation.
+    # There are many options in the "Classification of individual consumption by purpose (COICOP)" column.
+    # As recommended by Eurostat, we will use only the following:
+    # [TOT_X_NRG] Overall index excluding energy
+    # Excluding the energy component helps in depicting the prices adjusted for the underlying inflationary trends, without being distorted by the volatility typically associated with energy commodities. In this respect, adjusted prices will include the impact of the energy cost changes.
+    tb_hicp = tb_hicp[tb_hicp["coicop"] == "TOT_X_NRG"].reset_index(drop=True)
+
+    # Calculate average HICP for each country and year.
+    tb_hicp["year"] = tb_hicp["date"].str[0:4].astype(int)
+    tb_hicp = (
+        tb_hicp.groupby(["country", "year"], observed=True, as_index=False)
+        .agg({"value": "mean"})
+        .rename(columns={"value": "hicp"}, errors="raise")
+    )
+
+    # Add rows for prices adjusted for differences in living costs and adjusted for inflation.
+    # TODO: Implement.
+
+    # Add HICP column to main table.
+    tb = tb.merge(tb_hicp, how="left", on=["country", "year"])
 
     # Sanity check outputs.
     sanity_check_outputs(tb=tb)
