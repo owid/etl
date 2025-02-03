@@ -1095,10 +1095,9 @@ class Variable(Base):
             name="variables_sourceId_31fce80a_fk_sources_id",
         ),
         Index("idx_catalogPath", "catalogPath", unique=True),
-        Index("unique_short_name_per_dataset", "shortName", "datasetId", unique=True),
         Index("variables_code_fk_dst_id_7bde8c2a_uniq", "code", "datasetId", unique=True),
         Index("variables_datasetId_50a98bfd_fk_datasets_id", "datasetId"),
-        Index("variables_name_fk_dst_id_f7453c33_uniq", "name", "datasetId", unique=True),
+        Index("idx_name_dataset", "name", "datasetId"),
         Index("variables_sourceId_31fce80a_fk_sources_id", "sourceId"),
     )
 
@@ -1148,53 +1147,11 @@ class Variable(Base):
 
         cls = self.__class__
 
-        # NOTE: matching on catalogPath would be better, but we still have
-        # index `variables.unique_short_name_per_dataset` in MySQL which
-        # doesn't let us do that
-        # q = select(cls).where(
-        #     cls.catalogPath == self.catalogPath,
-        #     cls.datasetId == self.datasetId,
-        # )
-        # ds = session.scalars(q).one_or_none()
-
-        # try matching on shortName first
         q = select(cls).where(
-            or_(
-                cls.shortName == self.shortName,
-                # NOTE: we used to slugify shortName which replaced double underscore by a single underscore
-                # this was a bug, we should have kept the double underscore
-                # match even those variables and correct their shortName
-                cls.shortName == self.shortName.replace("__", "_"),
-            ),
+            cls.catalogPath == self.catalogPath,
             cls.datasetId == self.datasetId,
         )
         ds = session.scalars(q).one_or_none()
-
-        # try matching on name if there was no match on shortName
-        if not ds:
-            q = select(cls).where(
-                cls.name == self.name,
-                cls.datasetId == self.datasetId,
-            )
-            ds = session.scalars(q).one_or_none()
-
-        # there's a unique index on `name` which can cause conflict if we swap names of two variables
-        # in that case, we append "(conflict)" to the name of the conflicting variable (it will be cleaned
-        # after all variables are upserted)
-        # we wouldn't need this if we dropped the requirement for unique index on `name`, but I'm afraid
-        # of other functions in owid-grapher that could rely on it
-        if ds and ds.shortName:
-            q = select(cls).where(
-                cls.name == self.name,
-                cls.shortName != self.shortName,
-                cls.datasetId == self.datasetId,
-            )
-            conflict = session.scalars(q).one_or_none()
-            if conflict:
-                # modify the conflicting variable name, it'll be cleaned up later
-                conflict.name = f"{conflict.name} (conflict {random.randint(0, 1000)})"
-                session.add(conflict)
-                session.commit()
 
         if not ds:
             ds = self
