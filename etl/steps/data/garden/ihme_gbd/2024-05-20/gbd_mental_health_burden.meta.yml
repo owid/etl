@@ -9,60 +9,60 @@ definitions:
     unit: |-
       <% if metric == "Rate" %>
       cases per 100,000 people
-      <% elif metric == "Share" %>
+      <%- elif metric == "Share" %>
       %
-      <%- endif -%>
+      <%- endif %>
     short_unit: |-
       <% if metric == "Share" %>%<% elif metric == "Rate"%><%- endif -%>
     title: |-
       <% if metric == "Rate" and age == 'Age-standardized'%>
       Age-standardized current cases of << cause.lower() >>, per 100,000 people
-      <% elif metric == "Rate" and age == 'All ages'%>
+      <%- elif metric == "Rate" and age == 'All ages'%>
       Total current number of individuals with << cause.lower() >>, per 100,000 people
-      <% elif metric == "Share" and age == 'Age-standardized'%>
+      <%- elif metric == "Share" and age == 'Age-standardized'%>
       Age-standardized current cases of << cause.lower() >>, per 100 people
-      <% elif metric == "Share" and age == 'All ages'%>
+      <%- elif metric == "Share" and age == 'All ages'%>
       Total current number of individuals with << cause.lower() >>, per 100 people
-      <%- endif -%>
+      <%- endif %>
     description_short: |-
       <% if metric == "Rate" and age == 'Age-standardized'%>
       The estimated age-standardized prevalence of << cause.lower() >>, per 100,000 people.
-      <% elif metric == "Rate" and age == 'All ages'%>
+      <%- elif metric == "Rate" and age == 'All ages'%>
       The estimated prevalence of << cause.lower() >>, per 100,000 people.
-      <% elif metric == "Share" and age == 'Age-standardized'%>
+      <%- elif metric == "Share" and age == 'Age-standardized'%>
       The estimated age-standardized prevalence of << cause.lower() >>, per 100 people.
-      <% elif metric == "Share" and age == 'All ages'%>
+      <%- elif metric == "Share" and age == 'All ages'%>
       The estimated prevalence of << cause.lower() >> per 100 people.
-      <%- endif -%>
+      <%- endif %>
   dalys:
     unit: |-
       <% if metric == "Rate" %>
       DALYs per 100,000 people
-      <% elif metric == "Share" %>
+      <%- elif metric == "Share" %>
       share of total DALYs
-      <%- endif -%>
+      <%- endif %>
     short_unit: |-
       <% if metric == "Share" %>%<% elif metric == "Rate"%><%- endif -%>
     title: |-
       <% if metric == "Rate" and age == 'Age-standardized'%>
       Age-standardized DALYs from << cause.lower() >> per 100,000 people
-      <% elif metric == "Rate" and age == 'All ages'%>
+      <%- elif metric == "Rate" and age == 'All ages'%>
       DALYs from << cause.lower() >> per 100,000 people
-      <% elif metric == "Share" and age == 'Age-standardized'%>
+      <%- elif metric == "Share" and age == 'Age-standardized'%>
       Share of total age-standardized DALYs that are from << cause.lower() >>
-      <% elif metric == "Share" and age == 'All ages'%>
+      <%- elif metric == "Share" and age == 'All ages'%>
       Share of total DALYs that are from << cause.lower() >>
-      <%- endif -%>
+      <%- endif %>
     description_short: |-
       <% if metric == "Rate" and age == 'Age-standardized'%>
       The estimated number of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>, per 100,000 people.
-      <% elif metric == "Rate" and age == 'All ages'%>
+      <%- elif metric == "Rate" and age == 'All ages'%>
       The estimated number of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>, per 100,000 people.
-      <% elif metric == "Share" and age == 'Age-standardized'%>
+      <%- elif metric == "Share" and age == 'Age-standardized'%>
       The estimated share of age-standardized [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
-      <% elif metric == "Share" and age == 'All ages'%>
+      <%- elif metric == "Share" and age == 'All ages'%>
       The estimated share of [Disability Adjusted Life Years (DALYs)](#dod:dalys) from << cause.lower() >>.
-      <%- endif -%>
+      <%- endif %>
   footnote: |-
     <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<%- endif -%>
 dataset:
@@ -85,8 +85,8 @@ tables:
           numDecimalPlaces: 1
       prevalence_share:
         title: Current share of population with each mental illness
-        unit: '%'
-        short_unit: '%'
+        unit: "%"
+        short_unit: "%"
         description_short: Current share of population with each mental illness
         display:
           numDecimalPlaces: 1
