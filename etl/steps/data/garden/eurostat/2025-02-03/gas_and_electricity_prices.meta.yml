@@ -81,6 +81,9 @@ definitions:
     Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
   footnote_different_prices_pps: &foonote-different-prices-pps |-
     PPS have been adjusted for inflation, expressed in 2015 prices, using the Harmonised Index of Consumer Prices. Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
+  description_processing_pps: &description-processing-pps |-
+    PPS prices from Eurostat are adjusted for differences in living costs between countries but not for inflation. To account for inflation, these prices have been divided by the Harmonised Index of Consumer Prices (and multiplied by 100) set to 100 for 2015, excluding the energy component. This way, prices are adjusted for the underlying inflation trends without distortion from energy price volatility.
+
 
 dataset:
   update_period_days: 365
@@ -606,6 +609,7 @@ tables:
       description_short: Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours).
       unit: "purchasing power standard per megawatt-hour"
       short_unit: "PPS/MWh"
+      description_processing: *description-processing-pps
     variables:
       electricity_household_capacity_taxes_pps:
         title: Electricity price component (PPS) for household consumers - Capacity taxes
@@ -618,6 +622,7 @@ tables:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_electricity_component_capacity_taxes}"
           - "{definitions.description_key_all_consumer_bands}"
+        description_processing: *description-processing-pps
 
       electricity_non_household_capacity_taxes_pps:
         title: Electricity price component (PPS) for non-household consumers - Capacity taxes
@@ -1256,6 +1261,7 @@ tables:
       description_short: Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours).
       unit: "purchasing power standard per megawatt-hour"
       short_unit: "PPS/MWh"
+      description_processing: *description-processing-pps
     variables:
       electricity_household_all_taxes_and_levies_included_pps:
         title: Electricity price (PPS) for household consumers - All taxes and levies included

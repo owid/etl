@@ -45,6 +45,16 @@ def run(dest_dir: str) -> None:
     tb_annual = pr.multi_merge(
         tables=[tb_eurostat_euro, tb_eurostat_pps, tb_ember_annual], on=["country", "year"], how="outer"
     )
+    ####################################################################################################################
+    # Add combined description processing for PPS indicators (since propagation does not support this):
+    description_processing_pps = tb_eurostat_pps[
+        "annual_electricity_household_total_price_including_taxes_pps"
+    ].metadata.description_processing
+    for column in tb_annual.columns:
+        if "pps" in column:
+            assert tb_annual[column].metadata.description_processing is None
+            tb_annual[column].metadata.description_processing = description_processing_pps
+    ####################################################################################################################
     tb_annual = tb_annual.format(short_name="energy_prices_annual")
 
     # Create a combined monthly table.
