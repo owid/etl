@@ -887,11 +887,11 @@ def run(dest_dir: str) -> None:
         .rename(columns={"value": "hicp"}, errors="raise")
     )
 
-    # Add rows for prices adjusted for differences in living costs and adjusted for inflation.
-    # TODO: Implement.
-
     # Add HICP column to main table.
     tb = tb.merge(tb_hicp, how="left", on=["country", "year"])
+
+    # Adjust PPS prices for inflation.
+    tb["price_pps"] = tb["price_pps"] / tb["hicp"] * 100
 
     # Sanity check outputs.
     sanity_check_outputs(tb=tb)
