@@ -238,3 +238,5 @@ steps:
     - snapshot://fasttrack/latest/_1__2018_2023_in_donor_costs_dac_countries__sheet1__1.csv
   data://grapher/fasttrack/latest/road_miles_uk:
     - snapshot://fasttrack/latest/road_miles_uk.csv
+  data://grapher/fasttrack/2024-11-18/supercomputers:
+    - snapshot://fasttrack/2024-11-18/supercomputers.csv
