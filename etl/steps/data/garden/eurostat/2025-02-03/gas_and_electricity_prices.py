@@ -86,12 +86,12 @@ INDEXES_MAPPING = {
     # NOTE: Flag definitions are right below the data table in that page.
     "flag": {
         "e": "estimated",
-        "c": "confidential",
+        # "c": "confidential",
         "d": "definition differs",
         "b": "break in time series",
         "p": "provisional",
         "u": "low reliability",
-        "cd": "confidential, definition differs",
+        # "cd": "confidential, definition differs",
         # NOTE: I couldn't find the meaning of the following flag.
         # It happens for "Electricity prices for non-household consumers" for Cyprus in 2024 (for MWH_GE150000), and all values are zero.
         "n": "unknown flag",
