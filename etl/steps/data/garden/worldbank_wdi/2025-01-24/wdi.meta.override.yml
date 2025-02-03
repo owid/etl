@@ -1,6 +1,3 @@
-dataset:
-  update_period_days: 365
-
 tables:
   wdi:
     variables:
