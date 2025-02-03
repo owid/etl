@@ -86,7 +86,7 @@ VAR_DICT = {
     },
     "income_gap_ratio": {
         "title": "Average shortfall (%)",
-        "description": "This is the average shortfall expressed as a share of the poverty line, sometimes called the 'income gap ratio'. It captures the depth of poverty in which those below {povline} are living.",
+        "description": 'This is the average shortfall expressed as a share of the poverty line, sometimes called the "income gap ratio". It captures the depth of poverty in which those below {povline} are living.',
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
@@ -183,19 +183,19 @@ INC_CONS_DICT = {
         "name": "Disposable household income",
         "type": "income",
         "verb": "received",
-        "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received.",
+        "description": 'Income is "post-tax" — measured after taxes have been paid and most government benefits have been received.',
     },
     "dhci": {
         "name": "Disposable household cash income",
         "type": "income",
         "verb": "received",
-        "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received and excluding fringe benefits, home production, in-kind benefits and transfers.",
+        "description": 'Income is "post-tax" — measured after taxes have been paid and most government benefits have been received and excluding fringe benefits, home production, in-kind benefits and transfers.',
     },
     "mi": {
         "name": "Market income",
         "type": "income",
         "verb": "received",
-        "description": "Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received.",
+        "description": 'Income is "pre-tax" — measured before taxes have been paid and most government benefits have been received.',
     },
     # # Omitted until changing the code to include this variable
     # "hcexp": {
@@ -548,11 +548,11 @@ VAR_DICT_DISTRIBUTION = {
 
 WELFARE_DEFINITIONS = """Data refers to three types of welfare measures:
 
-- `welfare = "mi"` is market income, ‘pre-tax’ income — measured before taxes have been paid and most government benefits have been received.
+- `welfare = "mi"` is market income, \"pre-tax\" income — measured before taxes have been paid and most government benefits have been received.
 
-- `welfare = "dhi"` is disposable household income, ‘post-tax’ income — measured after taxes have been paid and most government benefits have been received.
+- `welfare = "dhi"` is disposable household income, \"post-tax\" income — measured after taxes have been paid and most government benefits have been received.
 
-- `welfare = "dhci"` is disposable household cash income ‘post-tax’ income — measured after taxes have been paid and most government benefits have been received and excluding fringe benefits, home production, in-kind benefits and transfers.
+- `welfare = "dhci"` is disposable household cash income \"post-tax\" income — measured after taxes have been paid and most government benefits have been received and excluding fringe benefits, home production, in-kind benefits and transfers.
 
 """
 
