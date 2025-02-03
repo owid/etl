@@ -81,9 +81,9 @@ def run(dest_dir: str) -> None:
     # Load population dataset.
     # ds_population = paths.load_dataset("population")
     ## Load regions dataset.
-    ds_regions = paths.load_dependency("regions")
+    ds_regions = paths.load_dataset("regions")
     ## Load income groups dataset.
-    ds_income_groups = paths.load_dependency("income_groups")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     # Load dimensions
     with paths.side_file("unaids.dimensions.yml").open() as f:
@@ -92,15 +92,19 @@ def run(dest_dir: str) -> None:
     with paths.side_file("unaids.indicators_to_dimensions.yml").open() as f:
         dimensions_collapse = yaml.safe_load(f)
 
+    # Load list with all countries
+    countries_all = get_all_countries(ds_regions, ds_income_groups)
+
     ###############################
     # EPI data
     ###############################
     tb_epi = ds_meadow.read("epi")  ## 1,687,587 rows
     tb_epi = make_table_epi(
-        tb_epi,
-        dimensions["epi"],
-        ds_regions,
-        ds_income_groups,
+        tb=tb_epi,
+        dimensions=dimensions["epi"],
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        countries_all=countries_all,
     )
     tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
 
@@ -209,12 +213,14 @@ def run(dest_dir: str) -> None:
         # if columns_agg is not None:
         if regions_agg:
             columns_agg = tb_meta.loc[tb_meta["unit"] == "NUMBER", "indicator"].tolist()
+            # columns_agg = []
             if columns_agg != []:
                 tb = add_regional_aggregates(
                     tb,
                     ds_regions,
                     ds_income_groups,
                     columns_agg=columns_agg,
+                    countries_all=countries_all,
                 )
         # 3/ Format
         tb = tb.format(columns, short_name=short_name)
@@ -312,9 +318,8 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def make_table_epi(tb, dimensions, ds_regions, ds_income_groups):
+def make_table_epi(tb, dimensions, ds_regions, ds_income_groups, countries_all):
     # Add dimensions
-
     tb = expand_raw_dimension(tb, dimensions)
 
     # Harmonize indicator names
@@ -362,6 +367,7 @@ def make_table_epi(tb, dimensions, ds_regions, ds_income_groups):
             ds_regions,
             ds_income_groups,
             columns_agg=columns_agg,
+            countries_all=countries_all,
         )
 
     return tb
@@ -1009,7 +1015,7 @@ def safe_replace_NAs(tb, set_map, dimension, value):
     return tb
 
 
-def add_regional_aggregates(tb: Table, ds_regions, ds_income_groups, columns_agg) -> Table:
+def add_regional_aggregates(tb: Table, ds_regions, ds_income_groups, columns_agg, countries_all) -> Table:
     """
     Adding regional aggregates for all tuberculosis variables.
     """
@@ -1032,6 +1038,15 @@ def add_regional_aggregates(tb: Table, ds_regions, ds_income_groups, columns_agg
     tb_agg = tb_agg[~tb_agg["country"].isin(REGIONS_TO_ADD)]
     tb_agg = tb_agg.dropna(subset=columns_agg, how="all")
 
+    # Add NAs
+    countries_all = pd.Index(countries_all, dtype="string")
+    cols = ["country", *[col for col in index_columns if col != "country"]]
+    index = pd.MultiIndex.from_product(
+        [countries_all, *[tb[col].unique() for col in cols[1:]]],
+        names=cols,
+    )
+    tb = tb.set_index(cols).reindex(index).reset_index()
+
     # Create a table for each disaggregation value
     # Add region aggregates.
     tb_agg = geo.add_regions_to_table(
@@ -1040,9 +1055,20 @@ def add_regional_aggregates(tb: Table, ds_regions, ds_income_groups, columns_agg
         ds_income_groups=ds_income_groups,
         regions=REGIONS_TO_ADD,
         index_columns=index_columns,
-        min_num_values_per_year=1,
+        # min_num_values_per_year=1,
         frac_allowed_nans_per_year=0.3,
+        countries_that_must_have_data={
+            "Asia": ["China", "India"],
+            "North America": ["United States", "Canada", "Mexico"],
+            "Europe": ["Germany", "France", "United Kingdom", "Italy", "Spain"],
+            "Africa": ["Nigeria", "Ethiopia", "Kenya"],
+            "South America": ["Brazil", "Argentina", "Colombia"],
+            "Oceania": ["Australia", "New Zealand"],
+        },
     )
+
+    # Drop unnecessary rows
+    tb_agg = tb_agg.dropna(subset=columns_agg, how="all")
 
     # Merge with table without aggregates
     tb = pr.merge(tb_no_agg, tb_agg, on=index_columns, how="outer").reset_index(drop=True)
@@ -1122,3 +1148,17 @@ def combine_tables(tb: Table, tb_hiv_child: Table, tb_gap_art: Table, tb_deaths_
     tb = tb.drop(columns=["msm_condom_use__aux", "deaths_averted_art__aux", "gap_on_art__aux"])
 
     return tb
+
+
+def get_all_countries(ds_regions, ds_income_groups):
+    countries_all = []
+    for region in REGIONS_TO_ADD:
+        members = geo.list_members_of_region(
+            region=region,
+            ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+            exclude_historical_countries=True,
+        )
+        countries_all.extend(members)
+    countries_all = set(countries_all)
+    return list(countries_all)
