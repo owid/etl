@@ -29,8 +29,12 @@ REGIONS_TO_ADD = [
     "Upper-middle-income countries",
     "Lower-middle-income countries",
     "High-income countries",
-    "World",
+    # "World",
 ]
+# TODO: UNAIDS already provides estimates for "World" for certain indicators
+# Combining it with ours can be confusing for the user: "which are from UNAIDS" and which not?
+# Also, it is technically challenging to only group for those indicator-dimensions for which we don't have "World" estimates by UNAIDS.
+# A solution could be to label UNAIDS' with a different label, e.g. "World (UNAIDS)"
 
 # tb.groupby("indicator").estimate.unique()
 # None: AIDS_DEATHS, HIV_INCIDENCE, HIV_PREVALENCE, NEW_INFECTIONS, PLWH
