@@ -70,19 +70,21 @@ definitions:
   description_key_price_including_all_taxes: |-
     Prices represent the total price paid by end consumers, including all taxes, levies, and VAT.
   description_short_household_euros: &description_short_household_euros |-
-    Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries. Households refer to residential consumers using energy for domestic purposes like heating and lighting.
+    Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are adjusted for inflation but not for differences in living costs between countries. Households refer to residential consumers using energy for domestic purposes like heating and lighting.
   description_short_non_household_euros: &description_short_non_household_euros |-
-    Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries. Non-household consumers include commercial and industrial uses like services, offices, and agriculture.
+    Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are adjusted for inflation but not for differences in living costs between countries. Non-household consumers include commercial and industrial uses like services, offices, and agriculture.
   description_short_household_pps: &description_short_household_pps |-
     Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). This data is adjusted for inflation and differences in living costs between countries. Households refer to residential consumers using energy for domestic purposes like heating and lighting.
   description_short_non_household_pps: &description_short_non_household_pps |-
     Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). This data is adjusted for inflation and differences in living costs between countries. Non-household consumers include commercial and industrial uses like services, offices, and agriculture.
   footnote_different_prices_euros: &foonote-different-prices-euros |-
-    Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
+    This data is expressed in constant 2015 euros, deflated using the Harmonised Index of Consumer Prices. Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
   footnote_different_prices_pps: &foonote-different-prices-pps |-
     PPS have been adjusted for inflation, expressed in 2015 prices, using the Harmonised Index of Consumer Prices. Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
   description_processing_pps: &description-processing-pps |-
     PPS prices from Eurostat are adjusted for differences in living costs between countries but not for inflation. To account for inflation, these prices have been divided by the Harmonised Index of Consumer Prices (and multiplied by 100) set to 100 for 2015, excluding the energy component. This way, prices are adjusted for the underlying inflation trends without distortion from energy price volatility.
+  description_processing_euros: &description-processing-euros |-
+    To account for inflation, prices have been divided by the Harmonised Index of Consumer Prices (and multiplied by 100) set to 100 for 2015, excluding the energy component. This way, prices are adjusted for the underlying inflation trends without distortion from energy price volatility.
   description_key_pps: |-
     The [Purchasing Power Standard (PPS)](#dod:pps) is a currency used to compare economic data across European countries, adjusted for differences in price levels. PPS prices have also been adjusted for inflation, expressed in 2015 euros, using the Harmonised Index of Consumer Prices.
 
@@ -107,9 +109,10 @@ tables:
   gas_and_electricity_price_components_euro_flat:
     title: Gas and electricity price components in Europe
     common:
-      description_short: Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries.
-      unit: 'current euros per megawatt-hour'
+      description_short: Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are adjusted for inflation but do not account for differences in living costs between countries.
+      unit: 'constant 2015 euros per megawatt-hour'
       short_unit: "€/MWh"
+      description_processing: *description-processing-euros
     variables:
       electricity_household_capacity_taxes_euro:
         title: Electricity price component (euros) for household consumers - Capacity taxes
@@ -1203,6 +1206,7 @@ tables:
       description_short: Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries.
       unit: "current euros per megawatt-hour"
       short_unit: "€/MWh"
+      description_processing: *description-processing-euros
     variables:
       electricity_household_all_taxes_and_levies_included_euro:
         title: Electricity price (euros) for household consumers - All taxes and levies included

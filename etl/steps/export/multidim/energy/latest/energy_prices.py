@@ -76,9 +76,9 @@ def run(dest_dir: str) -> None:
                     'Some price components can be negative. For example, a negative "All other taxes" component may occur when governments introduce compensation measures during periods of high electricity prices to reduce costs for consumers.'
                 ]
                 if unit == "euro":
-                    subtitle = "Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries."
+                    subtitle = "Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are adjusted for inflation but not for differences in living costs between countries."
                     title_variant = None
-                    footnote = ""
+                    footnote = "This data is expressed in constant 2015 euros, deflated using the Harmonised Index of Consumer Prices."
                 else:
                     subtitle = "Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). This data is adjusted for inflation and differences in living costs between countries."
                     title_variant = "PPS"

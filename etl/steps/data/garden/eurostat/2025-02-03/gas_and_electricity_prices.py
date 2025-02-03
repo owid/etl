@@ -890,7 +890,8 @@ def run(dest_dir: str) -> None:
     # Add HICP column to main table.
     tb = tb.merge(tb_hicp, how="left", on=["country", "year"])
 
-    # Adjust PPS prices for inflation.
+    # Adjust prices for inflation.
+    tb["price_euro"] = tb["price_euro"] / tb["hicp"] * 100
     tb["price_pps"] = tb["price_pps"] / tb["hicp"] * 100
 
     # Sanity check outputs.
