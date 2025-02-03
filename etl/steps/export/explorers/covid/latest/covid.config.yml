@@ -62,20 +62,20 @@ views:
     tab: "map"
 
   # Cumulative (last 12 months)
-  - indicator:
-      - grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist#cumulative_estimated_daily_excess_deaths_last12m
-      - grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot_last12m
-      - grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top_last12m
-      - grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_last12m
-    options:
-      - Excess mortality (estimates)
-      - Cumulative (last 12 months)
-    title: Estimated cumulative excess deaths during COVID-19 in the last 12 months
-    subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown.
-    hasMapTab: False
-    selectedFacetStrategy: entity
-    facetYDomain: independent
-    note: For some countries, all-cause deaths and COVID-19 deaths use different date schemes, in which one refers to when the death occurred and the other to when it was reported. This difference could produce an artificial lag between the two time series.
+  # - indicator:
+  #     - grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist#cumulative_estimated_daily_excess_deaths_last12m
+  #     - grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot_last12m
+  #     - grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top_last12m
+  #     - grapher/covid/latest/cases_deaths/cases_deaths#total_deaths_last12m
+  #   options:
+  #     - Excess mortality (estimates)
+  #     - Cumulative (last 12 months)
+  #   title: Estimated cumulative excess deaths during COVID-19 in the last 12 months
+  #   subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown.
+  #   hasMapTab: False
+  #   selectedFacetStrategy: entity
+  #   facetYDomain: independent
+  #   note: For some countries, all-cause deaths and COVID-19 deaths use different date schemes, in which one refers to when the death occurred and the other to when it was reported. This difference could produce an artificial lag between the two time series.
 
   - indicator:
       - grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist#cumulative_estimated_daily_excess_deaths_per_100k_last12m
