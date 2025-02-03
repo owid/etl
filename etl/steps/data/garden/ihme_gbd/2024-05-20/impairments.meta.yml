@@ -6,46 +6,46 @@ definitions:
         - Global Health
     processing_level: minor
 
-  macros:
-    <% macro title(metric, age, cause, impairment) %>
+macros:
+  <% macro title(metric, age, cause, impairment) %>
+    <% if metric == "Number" %>
+        <% if age != 'Age-standardized' and age != 'All ages' %>
+            Number of individuals aged << age >> with << impairment >> due to << cause >>
+        <% elif age == 'Age-standardized' %>
+            Age-standardized number of individuals with << impairment >> due to << cause >>
+        <% elif age == 'All ages' %>
+            Total number of individuals with << impairment >> due to << cause >>
+        <% endif %>
+    <% elif metric == "Rate" %>
+        <% if age != 'Age-standardized' and age != 'All ages' %>
+            Rate of individuals aged << age >> with << impairment >> due to << cause >>, per 100,000 people
+        <% elif age == 'Age-standardized' %>
+            Age-standardized rate of individuals with << impairment >> due to << cause >>, per 100,000 people
+        <% elif age == 'All ages' %>
+            Rate of individuals with << impairment >> due to << cause >>, per 100,000 people
+        <% endif %>
+    <% endif %>
+  <% endmacro %>
+
+  <% macro description_short(metric, age, cause, impairment) %>
       <% if metric == "Number" %>
           <% if age != 'Age-standardized' and age != 'All ages' %>
-              Number of individuals aged << age >> with << impairment >> due to << cause >>
+              The estimated number of individuals aged << age >> with << impairment >> due to << cause >>.
           <% elif age == 'Age-standardized' %>
-              Age-standardized number of individuals with << impairment >> due to << cause >>
+              The estimated number of individuals with << impairment >> due to << cause >>.
           <% elif age == 'All ages' %>
-              Total number of individuals with << impairment >> due to << cause >>
+              The estimated number of individuals with << impairment >> due to << cause >>.
           <% endif %>
       <% elif metric == "Rate" %>
           <% if age != 'Age-standardized' and age != 'All ages' %>
-              Rate of individuals aged << age >> with << impairment >> due to << cause >>, per 100,000 people
+              The estimated number of individuals aged << age >> with << impairment >> due to << cause >>, per 100,000 people.
           <% elif age == 'Age-standardized' %>
-              Age-standardized rate of individuals with << impairment >> due to << cause >>, per 100,000 people
+              The estimated number of individuals with << impairment >> due to << cause >>, per 100,000 people.
           <% elif age == 'All ages' %>
-              Rate of individuals with << impairment >> due to << cause >>, per 100,000 people
+              The estimated number of individuals with << impairment >> due to << cause >>, per 100,000 people.
           <% endif %>
       <% endif %>
-    <% endmacro %>
-
-    <% macro description_short(metric, age, cause, impairment) %>
-        <% if metric == "Number" %>
-            <% if age != 'Age-standardized' and age != 'All ages' %>
-                The estimated number of individuals aged << age >> with << impairment >> due to << cause >>.
-            <% elif age == 'Age-standardized' %>
-                The estimated number of individuals with << impairment >> due to << cause >>.
-            <% elif age == 'All ages' %>
-                The estimated number of individuals with << impairment >> due to << cause >>.
-            <% endif %>
-        <% elif metric == "Rate" %>
-            <% if age != 'Age-standardized' and age != 'All ages' %>
-                The estimated number of individuals aged << age >> with << impairment >> due to << cause >>, per 100,000 people.
-            <% elif age == 'Age-standardized' %>
-                The estimated number of individuals with << impairment >> due to << cause >>, per 100,000 people.
-            <% elif age == 'All ages' %>
-                The estimated number of individuals with << impairment >> due to << cause >>, per 100,000 people.
-            <% endif %>
-        <% endif %>
-    <% endmacro %>
+  <% endmacro %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
