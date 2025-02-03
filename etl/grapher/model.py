@@ -19,7 +19,6 @@ You might have to run `uv pip install mysqlclient` to install missing MySQLDb.
 import copy
 import io
 import json
-import random
 from datetime import date, datetime, timezone
 from enum import Enum
 from pathlib import Path
