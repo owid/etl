@@ -74,9 +74,13 @@ definitions:
   description_short_non_household_euros: &description_short_non_household_euros |-
     Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries. Non-household consumers include commercial and industrial uses like services, offices, and agriculture.
   description_short_household_pps: &description_short_household_pps |-
-    Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). They are adjusted for differences in living costs between countries, but not for inflation. Households refer to residential consumers using energy for domestic purposes like heating and lighting.
+    Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). This data is adjusted for inflation and differences in living costs between countries. Households refer to residential consumers using energy for domestic purposes like heating and lighting.
   description_short_non_household_pps: &description_short_non_household_pps |-
-    Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). They are adjusted for differences in living costs between countries, but not for inflation. Non-household consumers include commercial and industrial uses like services, offices, and agriculture.
+    Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). This data is adjusted for inflation and differences in living costs between countries. Non-household consumers include commercial and industrial uses like services, offices, and agriculture.
+  footnote_different_prices_euros: &foonote-different-prices-euros |-
+    Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
+  footnote_different_prices_pps: &foonote-different-prices-pps |-
+    PPS have been adjusted for inflation, expressed in 2015 prices, using the Harmonised Index of Consumer Prices. Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
 
 dataset:
   update_period_days: 365
@@ -550,7 +554,7 @@ tables:
         presentation:
           title_public: Electricity prices for households, including taxes
           grapher_config:
-            note: &foonote-different-prices Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
+            note: *foonote-different-prices-euros
         description_key:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
@@ -564,7 +568,7 @@ tables:
         presentation:
           title_public: Electricity prices for non-household consumers, including taxes
           grapher_config:
-            note: *foonote-different-prices
+            note: *foonote-different-prices-euros
         description_key:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
@@ -577,7 +581,7 @@ tables:
         presentation:
           title_public: Gas prices for households, including taxes
           grapher_config:
-            note: *foonote-different-prices
+            note: *foonote-different-prices-euros
         description_key:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_gas_component_total_price_including_taxes}"
@@ -590,7 +594,7 @@ tables:
         presentation:
           title_public: Gas prices for non-household consumers, including taxes
           grapher_config:
-            note: *foonote-different-prices
+            note: *foonote-different-prices-euros
         description_key:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_gas_component_total_price_including_taxes}"
@@ -1092,7 +1096,7 @@ tables:
           title_public: Electricity prices for households, including taxes
           title_variant: PPS
           grapher_config:
-            note: *foonote-different-prices
+            note: *foonote-different-prices-pps
         description_key:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
@@ -1107,7 +1111,7 @@ tables:
           title_public: Electricity prices for non-household consumers, including taxes
           title_variant: PPS
           grapher_config:
-            note: *foonote-different-prices
+            note: *foonote-different-prices-pps
         description_key:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_electricity_component_total_price_including_taxes}"
@@ -1122,7 +1126,7 @@ tables:
           title_public: Gas prices for households, including taxes
           title_variant: PPS
           grapher_config:
-            note: *foonote-different-prices
+            note: *foonote-different-prices-pps
         description_key:
           - "{definitions.description_key_household_consumer}"
           - "{definitions.description_key_gas_component_total_price_including_taxes}"
@@ -1137,7 +1141,7 @@ tables:
           title_public: Gas prices for non-household consumers, including taxes
           title_variant: PPS
           grapher_config:
-            note: *foonote-different-prices
+            note: *foonote-different-prices-pps
         description_key:
           - "{definitions.description_key_non_household_consumer}"
           - "{definitions.description_key_gas_component_total_price_including_taxes}"
