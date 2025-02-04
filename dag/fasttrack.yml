@@ -242,3 +242,5 @@ steps:
     - snapshot://fasttrack/2024-11-18/supercomputers.csv
   data://grapher/fasttrack/latest/in_donor_foreign_aid_categories_dac_countries:
     - snapshot://fasttrack/latest/in_donor_foreign_aid_categories_dac_countries.csv
+  data://grapher/fasttrack/latest/poverty_latam_idb:
+    - snapshot://fasttrack/latest/poverty_latam_idb.csv
