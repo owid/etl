@@ -6,9 +6,13 @@ definitions:
         - Time Use
   processing:
     notes: |-
-        - Some categories have been combined for presentation purposes: "children" include own and not own household children under 18, grandchildren and other related children under 18. "Friends" include roommates or lodgers. "Partner" includes spouses, boy-/girlfriends, and co-habiting partners.
-        - The "Other" category includes all other relationships not covered by the other categories, such as neighbors, customers or non-related, non-household children.
-        - Data points have been weighted to make them more representative of the population with the survey weights provided by ATUS in the original data.
+      Data points have been weighted to make them more representative of the population with the survey weights provided by ATUS in the original data.
+    key_notes: |-
+      This data is based on the American Time Use Survey (ATUS), which is conducted by the U.S. Bureau of Labor Statistics. The ATUS is an annual, cross-sectional survey that measures the amount of time people spend doing various activities, such as paid work, childcare, volunteering, and socializing and who they spend this time with.
+      - We have combined some categories for presentation purposes: "children" include own and not own household children under 18, grandchildren and other related children under 18. "Friends" include roommates or lodgers. "Partner" includes spouses, boy-/girlfriends, and co-habiting partners.
+      - Time spent with multiple people can be counted more than once (e.g., attending a party with friends and partner counts toward both "friends" and "partner").
+      - The "Other" category includes all other relationships not covered by the other categories, such as neighbors, customers or non-related, non-household children.
+      - Activities such as sleeping, grooming, and personal care are not included in the data, as the ATUS does not ask about other people present during these activities. They fall in the "Not applicable" category, which is not shown here.
 
 
 
@@ -27,20 +31,22 @@ tables:
         short_unit: "min"
         description_short: |-
           <% if who_category in ["Children", "Partner", "Family"] %>
-          Time spent with <<who_category.lower()>>, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2024.
+          Time spent with <<who_category.lower()>>, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
           <% elif who_category in ["Friend", "Co-worker"] %>
-          Time spent with <<who_category.lower()>>s, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2024.
+          Time spent with <<who_category.lower()>>s, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
           <% elif who_category == "Alone" %>
-          Time spent alone, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2024.
+          Time spent alone, by age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
           <% elif who_category == "Other" %>
-          Time spent with other people, by age. These include all people which aren't partners, friends, family or coworkers. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2024.
+          Time spent with other people, by age. These include all people which aren't partners, friends, family or coworkers. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
           <% elif who_category == "Not applicable" %>
-          Time spent doing activities, where the American Time Use Survey does not ask for other people present. This includes sleeping and activities usually done alone, such as grooming oneself. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2024.
+          Time spent doing activities, where the American Time Use Survey does not ask for other people present. This includes sleeping and activities usually done alone, such as grooming oneself. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
           <%- endif -%>
         description_key:
+          - '{definitions.processing.key_notes}'
+          - "This survey examines a cross-section of society, since they query a new sample from the U.S. population every year. This means that we are actually seeing the result of two underlying trends: the effect of aging on social connections, but also the effect of cohort trends (in which older generations in the US today tend to be healthier and richer, and might also have different expectations, preferences, and opportunities than in the past)."
           - Age is topcoded for age categories 80-84, and 85+. This means all individuals aged 80, 81, 82, 83 and 84 are included in the "age 80" category, and all individuals aged 85 and older are included in the "age 85" category.
         description_processing: |-
-          {definitions.processing.notes}
+          - {definitions.processing.notes}
           - Data for 2020 is excluded, since the American Time Use Survey was not conducted during the period March 18, 2020 to May 9, 2020. Therefore data collected for 2020 is not representative of the entire year.
         presentation:
           grapher_config:
@@ -54,7 +60,8 @@ tables:
         description_short: |-
           Average time <<age_bracket>> year olds spend with <<who_category.lower()>>. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
         description_processing: |-
-          {definitions.processing.notes}
+          - {definitions.processing.notes}
         description_key:
+          - '{definitions.processing.key_notes}'
           - ATUS data were not collected about the period March 18, 2020 to May 9, 2020, which coincided with a time when most residents of the United States were encouraged to stay home to prevent the spread of COVID-19. Therefore, data collected for 2020 is not representative of the entire year.
 
