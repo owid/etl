@@ -30,6 +30,27 @@ def run(dest_dir: str) -> None:
         ds_garden["gam_age_sex_group"],
     ]
 
+    # tbs = []
+    # for tb in tables:
+    #     print(tb.m.short_name)
+    #     uri = tb.m.short_name
+    #     index_cols = tb.index.names
+
+    #     tbx = tb.reset_index()
+    #     tbx = tbx.melt(index_cols, var_name="indicator", value_name="value")
+    #     tbx = tbx.dropna(subset=["value"])
+
+    #     group_cols = ["indicator"] + [col for col in index_cols if col not in ["country", "year"]]
+    #     tbx = tbx.groupby(group_cols).agg({"country": "nunique", "value": "count"}).reset_index()
+    #     tbx["indicator"] = str(uri) + "#" + tbx["indicator"]
+
+    #     tbs.append(tbx)
+    # import owid.catalog.processing as pr
+    # tbx = pr.concat(tbs)
+    # cols_last = ["value", "country"]
+    # tbx = tbx[[col for col in tbx.columns if col not in cols_last] + cols_last]
+    # tbx = tbx.sort_values(["value", "country"], ascending=False)
+
     #
     # Save outputs.
     #
