@@ -23,3 +23,7 @@ steps:
     - snapshot://fasttrack/2024-06-17/guinea_worm.csv
   data://grapher/fasttrack/2023-06-28/guinea_worm:
     - snapshot://fasttrack/2023-06-28/guinea_worm.csv
+
+  # Others
+  data-private://grapher/fasttrack/latest/metaculus__complementary_data:
+    - snapshot-private://fasttrack/latest/metaculus__complementary_data.csv

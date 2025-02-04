@@ -6,8 +6,6 @@ steps:
   # Long-term homicide rates in Europe - Eisner (2014)
   data-private://grapher/fasttrack/2022-11-01/lighting_efficiency_uk:
     - snapshot-private://fasttrack/2022-11-01/lighting_efficiency_uk.csv
-  data-private://grapher/fasttrack/latest/metaculus__complementary_data:
-    - snapshot-private://fasttrack/latest/metaculus__complementary_data.csv
   data-private://grapher/fasttrack/latest/global_extreme_poverty_future_scenario:
     - snapshot-private://fasttrack/latest/global_extreme_poverty_future_scenario.csv
   data-private://grapher/fasttrack/latest/child_mortality_future_projections:
