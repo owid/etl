@@ -310,8 +310,8 @@ tables:
         description_key:
           - "{definitions.gdp} {definitions.gdp_per_capita}"
           - This GDP per capita indicator provides information on economic growth and income levels from 1990.
-          - {definitions.ppp_adjustment}
-          - {definitions.ppp_prices}
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
           - For GDP per capita estimates in the long run, explore the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison).
         processing_level: minor
         presentation:
@@ -372,10 +372,10 @@ tables:
           tolerance: 5
         description_short: This data is adjusted for inflation and for differences in living costs between countries.
         description_key:
-          - {definitions.gdp}
+          - "{definitions.gdp}"
           - This GDP indicator provides information on economic growth and income levels from 1990.
-          - {definitions.ppp_adjustment}
-          - {definitions.ppp_prices}
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
           - For GDP estimates in the long run, explore the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-maddison-project-database).
         processing_level: minor
         presentation:
@@ -437,8 +437,8 @@ tables:
         description_key:
           - "{definitions.gni} {definitions.gni_per_capita}"
           - This GNI per capita indicator provides information on economic growth and income levels from 1990.
-          - {definitions.ppp_adjustment}
-          - {definitions.ppp_prices}
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
         processing_level: minor
         presentation:
           title_public: Gross national income (GNI) per capita
@@ -493,10 +493,10 @@ tables:
           tolerance: 5
         description_short: This data is adjusted for inflation and for differences in living costs between countries.
         description_key:
-          - {definitions.gni}
+          - "{definitions.gni}"
           - This GNI indicator provides information on economic growth and income levels from 1990.
-          - {definitions.ppp_adjustment}
-          - {definitions.ppp_prices}
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
         processing_level: minor
         presentation:
           title_public: Gross national income (GNI)
@@ -520,8 +520,8 @@ tables:
         description_key:
           - "{definitions.gdp} {definitions.gdp_per_capita}"
           - This GDP per capita indicator provides information on economic growth and income levels from 1960.
-          - {definitions.inflation_adjustment}
-          - {definitions.inflation_prices}
+          - "{definitions.inflation_adjustment}"
+          - "{definitions.inflation_prices}"
           - For GDP per capita estimates that account for both inflation and differences in the cost of living between countries, see [GDP per capita in constant international-$](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
         processing_level: minor
         presentation:
@@ -578,10 +578,10 @@ tables:
           tolerance: 5
         description_short: This data is adjusted for inflation but does not account for differences in living costs between countries.
         description_key:
-          - {definitions.gdp}
+          - "{definitions.gdp}"
           - This GDP indicator provides information on economic growth and income levels from 1960.
-          - {definitions.inflation_adjustment}
-          - {definitions.inflation_prices}
+          - "{definitions.inflation_adjustment}"
+          - "{definitions.inflation_prices}"
           - For GDP estimates that account for both inflation and differences in the cost of living between countries, see [GDP in constant international-$](https://ourworldindata.org/grapher/gdp-worldbank).
         processing_level: minor
         presentation:
