@@ -8,7 +8,7 @@ definitions:
     notes: |-
       Data points have been weighted to make them more representative of the population with the survey weights provided by ATUS in the original data.
     atus_survey: This data is based on the American Time Use Survey (ATUS), which is conducted by the U.S. Bureau of Labor Statistics. This is an annual, cross-sectional survey that measures how people spend their time and who they spend it with.
-    categories: 'We have combined some categories for presentation purposes: "children" include own and not own household children under 18, grandchildren and other related children under 18, "friends" include roommates or lodgers and "partner" includes spouses, boy-/girlfriends, and co-habiting partners.'
+    categories: 'We have combined some categories for presentation purposes: "children" include related and household children under 18, grandchildren and other related children under 18, "friends" include roommates or lodgers and "partner" includes spouses, boy-/girlfriends, and co-habiting partners.'
     multiple_people: Time spent with multiple people can be counted more than once (e.g., attending a party with friends and partner counts toward both "friends" and "partner").
     other: The "Other" category includes all other relationships not covered by the other categories, such as neighbors, customers or non-related, non-household children.
     n_a: Activities such as sleeping, grooming, and personal care are not included in the data, as the ATUS does not ask about other people present during these activities.
