@@ -200,7 +200,6 @@ tables:
         presentation:
           title_public: Population
           title_variant: Historical data
-          attribution_short: Maddison Project Database
 
       region:
         title: Maddison Project Database region
@@ -215,5 +214,4 @@ tables:
         presentation:
           title_public: World regions according to Maddison Project Database
           title_variant: Historical data
-          attribution_short: Maddison Project Database
 
