@@ -2,6 +2,7 @@ definitions:
   common:
     processing_level: minor
     presentation:
+      attribution_short: UNDP
       topic_tags:
         - Human Development Index (HDI)
       grapher_config:

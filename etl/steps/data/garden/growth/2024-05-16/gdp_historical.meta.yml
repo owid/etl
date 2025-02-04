@@ -4,17 +4,21 @@ definitions:
     presentation:
       topic_tags:
         - Economic Growth
-      title_variant: Historical data
-      attribution_short: World Bank, Maddison Project Database, Maddison Database
+      title_variant: In constant international-$. Historical data
+      attribution_short: Maddison Database, Maddison Project Database, World Bank
     processing_level: major
+    description_from_producer: ""
 
     description_processing: |-
-      The data presented here from 1990 onwards is from the World Bank. Data before 1990 is constructed using the 1990 World Bank observation and applying the growth rates implied by the Maddison Project Database. Similarly, data before 1820 is built using the adjusted 1820 estimate calculated by the previous method and applying the growth rates implied by the Maddison Database. These steps are necessary because World Bank data adjusted for inflation and the cost of living between countries is only available from 1990 onwards and also because the three datasets estimate GDP with different prices.
+      The data presented here from 1990 onwards is from the World Bank. We constructed the data before 1990 using the 1990 World Bank observation and applying the growth rates implied by the Maddison Project Database. Similarly, we built the data before 1820 using the adjusted 1820 estimate calculated by the previous method and applying the growth rates implied by the Maddison Database. These steps are necessary because World Bank data adjusted for inflation and the cost of living between countries is only available from 1990 onwards and also because the three datasets estimate GDP with different prices.
 
-      The adjusted results before 1990 have been rounded to address uncertainty in the underlying data. GDP data is rounded to the nearest million, and GDP is rounded to the nearest hundred.
+      We rounded the adjusted results before 1990 to address uncertainty in the underlying data. We rounded GDP data to the nearest million, and GDP to the nearest hundred.
 
-  description_adjustment: This data is adjusted for inflation and for differences in the cost of living between countries.
-  description_unit_merge: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices, merging data from the World Bank, backwards extended with growth rates from Maddison Project Database and Maddison Database.
+  description_gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
+  description_gdp_per_capita: GDP per capita is GDP divided by population.
+  description_long_run: This indicator provides information on _global_ economic growth and income levels in the very long run. Estimates are available as far back as 1 CE.
+  description_ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
+  description_ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices, combining data from the Maddison Database, Maddison Project Database and World Bank.
 
 
 # Learn more about the available fields:
@@ -41,9 +45,10 @@ tables:
         description_short: Total output of the world economy. This data is adjusted for inflation and differences in the cost
           of living between countries.
         description_key:
-          - This GDP indicator provides information on global economic growth and income levels in the very long run. Estimates are available as far back as 1 CE.
-          - "{definitions.description_adjustment}"
-          - "{definitions.description_unit_merge}"
+          - "{definitions.description_gdp}"
+          - "{definitions.description_long_run}"
+          - "{definitions.description_ppp_adjustment}"
+          - "{definitions.description_ppp_prices}"
         presentation:
           title_public: Global GDP over the long run
           faqs:
@@ -76,9 +81,10 @@ tables:
           numDecimalPlaces: 0
         description_short: This data is adjusted for inflation and differences in the cost of living between countries.
         description_key:
-          - This GDP per capita indicator provides information on global economic growth and income levels in the very long run. Estimates are available as far back as 1 CE.
-          - "{definitions.description_adjustment}"
-          - "{definitions.description_unit_merge}"
+          - "{definitions.description_gdp} {definitions.description_gdp_per_capita}"
+          - "{definitions.description_long_run}"
+          - "{definitions.description_ppp_adjustment}"
+          - "{definitions.description_ppp_prices}"
         presentation:
           title_public: Global average GDP per capita over the long run
           faqs:
