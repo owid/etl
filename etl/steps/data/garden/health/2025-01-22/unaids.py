@@ -1068,6 +1068,10 @@ def add_regional_aggregates(tb: Table, ds_regions, ds_income_groups, columns_agg
             "Africa": ["Nigeria", "Ethiopia", "Kenya"],
             "South America": ["Brazil", "Argentina", "Colombia"],
             "Oceania": ["Australia", "New Zealand"],
+            "High-income countries": ["United States", "Germany", "Japan", "United Kingdom", "France"],
+            "Upper-middle-income countries": ["China", "Brazil", "Mexico", "South Africa", "Indonesia"],
+            "Lower-middle-income countries": ["India", "Pakistan", "Bangladesh", "Philippines", "Nigeria", "Kenya"],
+            "Low-income countries": ["Ethiopia", "Uganda"],
         },
     )
 
