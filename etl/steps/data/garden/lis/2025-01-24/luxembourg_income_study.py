@@ -138,9 +138,11 @@ def run(dest_dir: str) -> None:
 #########################################################################
 
 
-# This function makes the table wide and modifies some columns before that
 # It is applied to the three LIS datasets
 def make_table_wide(tb: Table, cols_to_wide: List[str]) -> Table:
+    """
+    Make table wide and modify the equivalization variable to make it distinguishable
+    """
     # Drop dataset variable, to not see it multiplied
     tb = tb.drop(columns=["dataset"])
 
@@ -153,8 +155,11 @@ def make_table_wide(tb: Table, cols_to_wide: List[str]) -> Table:
     return tb
 
 
-# Load `keyvars` meadow dataset, rename and drop variables
 def load_keyvars(age: str, ds_meadow: Dataset) -> Table:
+    """
+    Load `keyvars` table, rename and drop variables
+    This table contains mean, median, gini and relative poverty variables
+    """
     tb_keyvars = ds_meadow.read(f"lis_keyvars{age}", safe_types=False)
 
     # Use less technical names for some variables
@@ -181,6 +186,9 @@ def load_keyvars(age: str, ds_meadow: Dataset) -> Table:
 
 # Create additional (relative) poverty variables
 def create_relative_pov_variables(tb_keyvars: Table, relative_povlines: List[int]) -> Table:
+    """
+    Create additional relative poverty variables: number in poverty, income gap ratio, average shortfall and total shortfall
+    """
     for povline in relative_povlines:
         # Rename relative poverty variables suffix from 40/50/60 to 40/50/60_median
         tb_keyvars.columns = tb_keyvars.columns.str.replace(f"{povline}", f"{povline}_median")
@@ -212,8 +220,11 @@ def create_relative_pov_variables(tb_keyvars: Table, relative_povlines: List[int
     return tb_keyvars
 
 
-# Load `abs_poverty` meadow dataset, rename variables
 def load_abs_poverty(tb_keyvars: Table, age: str, ds_meadow: Dataset) -> Table:
+    """
+    Load `abs_poverty` table, rename variables
+    This table contains absolute poverty variables
+    """
     tb_abs_poverty = ds_meadow.read(f"lis_abs_poverty{age}", safe_types=False)
 
     # Add population variable from keyvars
@@ -228,8 +239,10 @@ def load_abs_poverty(tb_keyvars: Table, age: str, ds_meadow: Dataset) -> Table:
     return tb_abs_poverty
 
 
-# Calculate additional absolute poverty variables
 def create_absolute_pov_variables(tb_abs_poverty: Table) -> Table:
+    """
+    Calculate additional absolute poverty variables: number in poverty, income gap ratio, average shortfall and total shortfall
+    """
     # Calculate number in poverty
     tb_abs_poverty["headcount"] = tb_abs_poverty["headcount_ratio"] / 100 * tb_abs_poverty["pop"]
     tb_abs_poverty["headcount"] = tb_abs_poverty["headcount"].round(0)
@@ -258,8 +271,11 @@ def create_absolute_pov_variables(tb_abs_poverty: Table) -> Table:
     return tb_abs_poverty
 
 
-# Load `distribution` meadow dataset, rename variables
 def load_distribution(age: str, ds_meadow: Dataset) -> Table:
+    """
+    Load distribution table, rename variables
+    The distribution table contains estimations by decile
+    """
     tb_distribution = ds_meadow.read(f"lis_distribution{age}", safe_types=False)
 
     # Transform percentile variable to `pxx`
@@ -273,8 +289,10 @@ def load_distribution(age: str, ds_meadow: Dataset) -> Table:
     return tb_distribution
 
 
-# Calculate income ratios and decile averages
 def create_distributional_variables(tb_distribution: Table, age: str, ds_meadow: Dataset) -> Table:
+    """
+    Calculate distributional variables, such as income ratios and decile averages
+    """
     # Calculate Palma ratio and other average/share ratios
     tb_distribution["palma_ratio"] = tb_distribution["share_p100"] / (
         tb_distribution["share_p10"]
@@ -326,6 +344,10 @@ def create_distributional_variables(tb_distribution: Table, age: str, ds_meadow:
 
 
 def percentiles_table(tb_name: str, ds_meadow: Dataset, tb_keyvars: Table) -> Table:
+    """
+    Import and process percentiles table.
+    This table contains distributional indicators by percentile.
+    """
     # Read table from meadow dataset.
     tb = ds_meadow.read(tb_name, safe_types=False)
 
