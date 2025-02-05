@@ -20,16 +20,16 @@ from etl.git_helpers import log_time
 
 ITEMS_PER_PAGE = 20
 
-# Initialize log.
+# Initialize logger.
 log = get_logger()
 
 # Database engine.
 engine = get_engine()
 
-# Get reviewer's name.
+# Get reviewer's name (if needed).
 reviewer = get_grapher_user().fullName
 
-# PAGE CONFIG
+# Page configuration.
 st.set_page_config(
     page_title="Wizard: Similar Charts",
     page_icon="🪄",
@@ -43,26 +43,24 @@ st.set_page_config(
 
 @st.cache_data(show_spinner=False, ttl="1h")
 def get_charts() -> list[data.Chart]:
+    """Fetch chart metadata from the database and return a list of Chart objects."""
     with st.spinner("Loading charts..."):
         df = data.get_raw_charts()
-
         if len(df) == 0:
             raise ValueError("No charts found in the database.")
-
         charts = df.to_dict(orient="records")
 
-    ret = []
+    results = []
     for c in charts:
         c["tags"] = c["tags"].split(";") if c["tags"] else []
-        ret.append(data.Chart(**c))  # type: ignore
-
-    return ret
+        results.append(data.Chart(**c))  # type: ignore
+    return results
 
 
 @log_time
 @st.cache_data(show_spinner=False)
 def get_coviews() -> pd.Series:
-    # Load coviews for all charts for the past 365 days.
+    """Return a Series with the number of coviewed sessions for each chart over the last 365 days."""
     with st.spinner("Loading coviews..."):
         return data.get_coviews_sessions(after_date=str(dt.date.today() - dt.timedelta(days=365)), min_sessions=3)
 
@@ -70,24 +68,25 @@ def get_coviews() -> pd.Series:
 @log_time
 @st.cache_data(show_spinner=False)
 def get_directional_coviews() -> pd.DataFrame:
-    df = pd.read_feather(paths.BASE_DIR / "apps/wizard/app_pages/similar_charts/playground_coviews.feather")
-    return df
+    """Load pre-processed directional coviews from a Feather file."""
+    return pd.read_feather(paths.BASE_DIR / "apps/wizard/app_pages/similar_charts/playground_coviews.feather")
 
 
-def st_chart_info(chart: data.Chart, show_coviews=True) -> None:
-    """Displays general info about a single chart."""
+def st_chart_info(chart: data.Chart, show_coviews: bool = True) -> None:
+    """Display title, subtitle, tags, pageviews, and optional coviews of a given chart."""
     chart_url = OWID_ENV.chart_site(chart.slug)
-    # title = f"#### [{chart.title}]({chart_url})"
     title = f"[{chart.title}]({chart_url})"
+    # Add GPT marker if present
     if chart.gpt_reason:
         title += " 🤖"
+
     st.subheader(title, anchor=chart.slug)
-    st.markdown(f"Slug: {chart.slug}")
-    st.markdown(f"Subtitle: {chart.subtitle}")
-    st.markdown(f"Tags: **{', '.join(chart.tags)}**")
-    st.markdown(f"Pageviews: **{chart.views_365d}**")
+    st.markdown(f"**Slug**: {chart.slug}")
+    st.markdown(f"**Subtitle**: {chart.subtitle}")
+    st.markdown(f"**Tags**: {', '.join(chart.tags)}")
+    st.markdown(f"**Pageviews (365d)**: {chart.views_365d}")
     if show_coviews:
-        st.markdown(f"Coviews: **{chart.coviews}**")
+        st.markdown(f"**Coviews**: {chart.coviews}")
 
 
 @log_time
@@ -97,6 +96,7 @@ def st_chart_info(chart: data.Chart, show_coviews=True) -> None:
     hash_funcs={list[data.Chart]: lambda charts: len(charts)},
 )
 def get_and_fit_model(charts: list[data.Chart]) -> scoring.ScoringModel:
+    """Load an embedding model and fit it to the charts for similarity scoring."""
     with st.spinner("Loading model..."):
         scoring_model = scoring.ScoringModel(emb.get_model())
     with st.spinner("Fitting model..."):
@@ -104,22 +104,32 @@ def get_and_fit_model(charts: list[data.Chart]) -> scoring.ScoringModel:
     return scoring_model
 
 
-########################################################################################################################
-# NEW COMPONENTS
-########################################################################################################################
+def st_related_charts_table(
+    df: pd.DataFrame, n: int = 6, drop_cols: list[str] = ["score", "coviews_AB", "coviews_BA"]
+) -> None:
+    """
+    Displays a table of related charts, sorted by `score`.
 
-
-def st_related_charts_table(df: pd.DataFrame, n=6) -> None:
-    # 1) Convert the list of RelatedChart objects to a DataFrame
-
-    # Sort by preferred score
-    df = df.sort_values(["score"], ascending=False).iloc[:n]
+    Columns displayed in the table:
+    - Link to open the chart
+    - Chart ID (hidden in config)
+    - Slug
+    - Title
+    - Tags
+    - Views (365d)
+    - Coviews
+    - Coviews_AB
+    - Coviews_BA
+    - Score
+    - Rank
+    """
+    # Sort by the existing `score` column, descending
+    df = df.sort_values("score", ascending=False).head(n).copy()  # type: ignore
     df["rank"] = range(1, len(df) + 1)
 
-    # 6) Create a new column "link"
+    # Create a clickable link
     df["link"] = df["slug"].apply(lambda x: OWID_ENV.chart_site(x))
 
-    # 7) Build the final column order
     final_cols = [
         "link",
         "chart_id",
@@ -135,16 +145,15 @@ def st_related_charts_table(df: pd.DataFrame, n=6) -> None:
     ]
     df = df[final_cols]
 
-    # 8) Configure columns for st.dataframe
+    # Drop optional cols
+    df = df.drop(columns=drop_cols)
+
+    # Link column config
     column_config = {
-        "link": st.column_config.LinkColumn(
-            "Open",
-            display_text="Open",
-        ),
-        "chart_id": None,
+        "link": st.column_config.LinkColumn("Open", display_text="Open"),
+        "chart_id": None,  # hide column name
     }
 
-    # 9) Show the result using st.data_editor
     st.dataframe(
         df,
         use_container_width=True,
@@ -154,6 +163,10 @@ def st_related_charts_table(df: pd.DataFrame, n=6) -> None:
 
 
 def add_coviews_to_charts(charts: List[data.Chart], chosen_chart: data.Chart, coviews: pd.Series) -> List[data.Chart]:
+    """
+    For the chosen chart, fetch its coview info from a coview Series and attach
+    to each chart object as `chart.coviews`.
+    """
     try:
         chosen_chart_coviews = coviews.loc[chosen_chart.slug].to_dict()
     except KeyError:
@@ -166,25 +179,24 @@ def add_coviews_to_charts(charts: List[data.Chart], chosen_chart: data.Chart, co
 
 
 ########################################################################################################################
-# FETCH DATA & MODEL
+# DATA & MODEL
 ########################################################################################################################
 
 charts = get_charts()
 coviews = get_coviews()
 
 scoring_model = get_and_fit_model(charts)
-# Re-set charts if the model comes from cache
+# Ensure `charts` property is set on the model, especially if loaded from cache
 scoring_model.charts = charts
 
-
-# Build a chart map for quick lookups by chart_id
+# Create a map for quick lookups by chart_id (optional usage)
 chart_map = {chart.chart_id: chart for chart in charts}
 
-# Pick top 100 charts by pageviews.
-top_100_charts: list[data.Chart] = sorted(charts, key=lambda x: x.views_365d, reverse=True)[:100]  # type: ignore
+# Pick top 100 charts by pageviews
+top_100_charts = sorted(charts, key=lambda x: x.views_365d, reverse=True)[:100]  # type: ignore
 
 ########################################################################################################################
-# RENDER
+# SIDEBAR / SEARCH
 ########################################################################################################################
 
 st.title(":material/search: Similar charts")
@@ -193,23 +205,20 @@ col1, col2 = st.columns(2)
 with col2:
     st_multiselect_wider()
     with st_horizontal():
-        random_chart = st.button("Random chart", help="Get a random chart.")
-        random_100_chart = st.button("Random top 100 chart", help="Get a random chart from the top 100 charts.")
+        random_chart = st.button("Random chart", help="Pick a random chart, weighted by views.")
+        random_100_chart = st.button("Random top 100 chart", help="Pick a random chart from the top 100 charts.")
 
-    # Random chart was pressed or no search text
+    # If "Random chart" or no slug is provided, choose a random chart
     if random_chart or not st.query_params.get("slug"):
-        # weighted by views
         weights = np.array([c.views_365d for c in charts])
         weights = np.nan_to_num(weights, nan=0)
         chart = random.choices(charts, weights=weights, k=1)[0]  # type: ignore
-        # non-weighted sample
-        # chart = random.sample(charts, 1)[0]
         st.session_state["slug"] = chart.slug
     elif random_100_chart:
         chart_slug = random.sample(top_100_charts, 1)[0].slug
         st.session_state["slug"] = chart_slug
 
-    # Dropdown select for chart.
+    # Main selectbox for charts
     slug = url_persist(st.selectbox)(
         "Select a chart",
         key="slug",
@@ -221,7 +230,7 @@ with col2:
         "sim_charts_expander_advanced_options", False
     )
     with st.expander("Advanced options", expanded=st.session_state.sim_charts_expander_advanced_options):
-        # Regularization for coviews
+        # Number of recommendations to show
         url_persist(st.slider)(
             "# of recommendations",
             key="nr_recommendations",
@@ -233,117 +242,102 @@ with col2:
         )
         nr_recommendations = st.session_state["nr_recommendations"]
 
-# Find a chart
-chosen_chart = next(
-    (chart for chart in charts if chart.slug == slug or str(chart.chart_id) == slug),
-    None,
-)
+# Find the chosen chart
+chosen_chart = next((c for c in charts if c.slug == slug or str(c.chart_id) == slug), None)
 if not chosen_chart:
-    st.error(f"Chart with slug {slug} not found.")
+    st.error(f"Chart with slug `{slug}` not found.")
     st.stop()
 
-# Add coviews
+# Attach coviews to each chart object
 charts = add_coviews_to_charts(charts, chosen_chart, coviews)
 
-# Compute various scores for all charts
+# Compute similarity components for all charts
 sim_components = scoring_model.similarity_components(chosen_chart)
 
-# Create dataframe from charts
-charts_df = pd.DataFrame([chart.to_dict() for chart in charts]).set_index("chart_id")
+# Convert charts to a DataFrame
+charts_df = pd.DataFrame([c.to_dict() for c in charts]).set_index("chart_id")
 
-# Join charts with scores
+# Join charts with similarity scores
 charts_df = charts_df.join(sim_components)
 
-# Exclude chosen chart
-charts_df = charts_df[charts_df.index != chosen_chart.chart_id]
+# Exclude the chosen chart itself
+charts_df = charts_df.loc[charts_df.index != chosen_chart.chart_id]
 
 # Join directional coviews
 dir_cov = get_directional_coviews()
 charts_df["coviews_AB"] = (
-    dir_cov[dir_cov.slug1 == chosen_chart.slug].set_index("slug2")["sessions_coviewed"].reindex(charts_df.slug).values
+    dir_cov[dir_cov.slug1 == chosen_chart.slug]
+    .set_index("slug2")["sessions_coviewed"]
+    .reindex(charts_df["slug"])
+    .values
 )
 charts_df["coviews_BA"] = (
-    dir_cov[dir_cov.slug2 == chosen_chart.slug].set_index("slug1")["sessions_coviewed"].reindex(charts_df.slug).values
+    dir_cov[dir_cov.slug2 == chosen_chart.slug]
+    .set_index("slug1")["sessions_coviewed"]
+    .reindex(charts_df["slug"])
+    .values
 )
 
-# Display chosen chart
+########################################################################################################################
+# DISPLAY
+########################################################################################################################
+
 with col1:
     st_chart_info(chosen_chart, show_coviews=False)
 
 
-class OthersViewedBlock:
-    def __init__(self, df: pd.DataFrame):
-        self.df = df
+def show_section_others_viewed(df: pd.DataFrame, n: int) -> None:
+    st.markdown("---")
+    st.header("Others also viewed")
+    st.markdown(
+        "These charts have the **highest number of coviews** (undirected) with the current chart. "
+        "For completeness, the directed coview counts are also shown as coviews_AB and coviews_BA."
+    )
 
-    def display(self):
-        st.markdown("---")
-        st.header("Other people also viewed")
-        st.markdown("""
-        Choose charts with the most coviews (undirected). Directed coviews are also shown in the table.
-        """)
-
-        df = self.df
-        df["score"] = df["coviews"]
-
-        st_related_charts_table(df, n=nr_recommendations)
+    df = df.copy()
+    df["score"] = df["coviews"]
+    st_related_charts_table(df, n=n, drop_cols=["score"])
 
 
-class OtherProvidersBlock:
-    def __init__(self, df: pd.DataFrame):
-        self.df = df
+def show_section_related_charts(df: pd.DataFrame, n: int) -> None:
+    st.markdown("---")
+    st.header("Related charts by title/subtitle")
+    st.markdown("This section shows charts with **high semantic similarity** in their titles and subtitles.")
 
-    def display(self):
-        st.markdown("---")
-        st.header("Other providers")
-        st.markdown("""
-        Choose charts with extremely similar titles. Choosing different providers of the same data is harder than expected and would need either
-        GPT or relation graph with providers.
-        """)
-
-        df = self.df
-        df["score"] = df["title_score"]
-
-        # Only keep very close matches
-        df = df[df["score"] > 0.985]
-
-        st_related_charts_table(df, n=nr_recommendations)
+    df = df.copy()
+    df["score"] = (df["title_score"] + df["subtitle_score"]) * 0.5
+    st_related_charts_table(df, n=n)
 
 
-class RelatedChartsBlock:
-    def __init__(self, df: pd.DataFrame):
-        self.df = df
+def show_section_other_providers(df: pd.DataFrame, n: int) -> None:
+    st.markdown("---")
+    st.header("Other providers")
+    st.markdown(
+        "Identifying other providers is a hard problem. Here we show charts with **very similar titles**."
+        "More precise identification would require GPT or deeper data relationships."
+    )
 
-    def display(self):
-        st.markdown("---")
-        st.header("Related charts")
-        st.markdown("Choose charts with high semantic similarity of title and subtitle")
-
-        df = self.df
-        df["score"] = (df["title_score"] + df["subtitle_score"]) * 0.5
-
-        st_related_charts_table(df, n=nr_recommendations)
-
-
-class ExploreChartsIncludeDataBlock:
-    def __init__(self, df: pd.DataFrame):
-        self.df = df
-
-    def display(self):
-        st.markdown("---")
-        st.header("Explore charts that include this data")
-        st.markdown("Show charts sharing an indicator (what we currently show on data page)")
-
-        df = self.df
-        df = df[df["share_indicator"] == 1]
-        df["score"] = df["share_indicator"]
-
-        st_related_charts_table(df, n=nr_recommendations)
+    df = df.copy()
+    # Filter to only extremely close title matches
+    df = df[df["title_score"] > 0.985]
+    df["score"] = df["title_score"]
+    st_related_charts_table(df, n=n)
 
 
-# Blocks
-OthersViewedBlock(charts_df.reset_index().copy()).display()
-RelatedChartsBlock(charts_df.reset_index().copy()).display()
-OtherProvidersBlock(charts_df.reset_index().copy()).display()
-ExploreChartsIncludeDataBlock(charts_df.reset_index().copy()).display()
+def show_section_explore_included_data(df: pd.DataFrame, n: int) -> None:
+    st.markdown("---")
+    st.header("Explore charts that include this data")
+    st.markdown("These charts **share at least one indicator** (the same data) with the current chart.")
 
-# PROFILER.stop()
+    df = df.copy()
+    df = df[df["share_indicator"] == 1]
+    df["score"] = df["share_indicator"]
+    st_related_charts_table(df, n=n)
+
+
+# Render the different sections
+reset_df = charts_df.reset_index()
+show_section_others_viewed(reset_df, nr_recommendations)
+show_section_related_charts(reset_df, nr_recommendations)
+show_section_other_providers(reset_df, nr_recommendations)
+show_section_explore_included_data(reset_df, nr_recommendations)
