@@ -1,12 +1,18 @@
 definitions:
   gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
   gdp_per_capita: GDP per capita is GDP divided by population.
-  gni: Gross national income (GNI) is a measure of the total income earned by residents of a country each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
+  gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
   gni_per_capita: GNI per capita is GNI divided by population.
   ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
   ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
   inflation_adjustment: This data is adjusted by inflation but _does not_ account for differences in living costs between countries.
   inflation_prices: This data is expressed in constant 2015 US$.
+
+  description_short_gdp: Total economic output of a country or region per year.
+  description_short_gdp_per_capita: Average economic output per person in a country or region per year.
+  description_short_gni: Total income earned by residents of a country or region, including income earned abroad.
+  description_short_gni_per_capita: Average income per person earned by residents of a country or region, including income earned abroad.
+
 
 tables:
   wdi:
@@ -119,6 +125,7 @@ tables:
               - Europe and Central Asia (WB)
               - Latin America and Caribbean (WB)
               - World
+
       sh_sta_stnt_zs:
         title: Share of children who are stunted
         unit: '% of children under 5'
@@ -306,7 +313,7 @@ tables:
           name: GDP per capita
           numDecimalPlaces: 0
           tolerance: 5
-        description_short: This data is adjusted for inflation and for differences in living costs between countries.
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.ppp_adjustment}"
         description_key:
           - "{definitions.gdp} {definitions.gdp_per_capita}"
           - This GDP per capita indicator provides information on economic growth and income levels from 1990.
@@ -370,7 +377,7 @@ tables:
           name: GDP
           numDecimalPlaces: 0
           tolerance: 5
-        description_short: This data is adjusted for inflation and for differences in living costs between countries.
+        description_short: "{definitions.description_short_gdp} {definitions.ppp_adjustment}"
         description_key:
           - "{definitions.gdp}"
           - This GDP indicator provides information on economic growth and income levels from 1990.
@@ -433,7 +440,7 @@ tables:
           name: GNI per capita
           numDecimalPlaces: 0
           tolerance: 5
-        description_short: This data is adjusted for inflation and for differences in living costs between countries.
+        description_short: "{definitions.description_short_gni_per_capita} {definitions.ppp_adjustment}"
         description_key:
           - "{definitions.gni} {definitions.gni_per_capita}"
           - This GNI per capita indicator provides information on economic growth and income levels from 1990.
@@ -491,7 +498,7 @@ tables:
           name: GNI
           numDecimalPlaces: 0
           tolerance: 5
-        description_short: This data is adjusted for inflation and for differences in living costs between countries.
+        description_short: "{definitions.description_short_gni} {definitions.ppp_adjustment}"
         description_key:
           - "{definitions.gni}"
           - This GNI indicator provides information on economic growth and income levels from 1990.
@@ -516,7 +523,7 @@ tables:
           name: GDP per capita
           numDecimalPlaces: 0
           tolerance: 5
-        description_short: This data is adjusted for inflation but does not account for differences in living costs between countries.
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.inflation_adjustment}"
         description_key:
           - "{definitions.gdp} {definitions.gdp_per_capita}"
           - This GDP per capita indicator provides information on economic growth and income levels from 1960.
@@ -576,7 +583,7 @@ tables:
           name: GDP
           numDecimalPlaces: 0
           tolerance: 5
-        description_short: This data is adjusted for inflation but does not account for differences in living costs between countries.
+        description_short: "{definitions.description_short_gdp} {definitions.inflation_adjustment}"
         description_key:
           - "{definitions.gdp}"
           - This GDP indicator provides information on economic growth and income levels from 1960.
