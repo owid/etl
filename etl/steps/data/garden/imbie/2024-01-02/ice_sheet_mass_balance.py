@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
     tb = convert_decimal_year_to_date(tb=tb)
 
     # Set an appropriate index to each table and sort conveniently.
-    tb = tb.set_index(["location", "date"], verify_integrity=True).sort_index()
+    tb = tb.format(["location", "date"])
 
     #
     # Save outputs.

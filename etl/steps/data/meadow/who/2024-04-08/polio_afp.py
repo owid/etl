@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("polio_afp.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb = tb.rename(columns={"Country / Territory / Region": "country", "Year": "year"})
     #
     # Process data.

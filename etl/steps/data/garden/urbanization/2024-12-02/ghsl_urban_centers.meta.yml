@@ -1,0 +1,290 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Urbanization
+    display:
+      numDecimalPlaces:
+        0
+
+    processing_level: minor
+    description_key:
+    - |-
+      The European Commission integrates satellite imagery with national census data to delineate the boundaries of capital cities and estimate their populations.
+      To predict future urbanization (2025 and 2030), both static (land features) and dynamic (past satellite images) components are used to project growth. DEGURBA defines cities by population, not administrative borders, aligning with UN guidelines, though fixed thresholds may not always capture local differences.
+
+  desc_short_density_capital: &desc_short_density_capital |-
+    The number of people per km² of land area for the country's capital city.
+  desc_short_density_top_100: &desc_short_density_top_100 |-
+    The number of people per km² of land area for cities ranked among the top 100 most populous in 2020.
+
+  desc_short_pop_capital: &desc_short_pop_capital |-
+    The total number of people living in the country's capital city.
+  desc_short_pop_top_100: &desc_short_pop_top_100 |-
+    The total number of people living in cities ranked among the top 100 most populous in 2020.
+  desc_short_pop_1mil: &desc_short_pop_1mil |-
+    The total number of people living in cities with more than 1 million inhabitants.
+
+  desc_short_1m_total : &desc_short_1m_total |-
+    The percentage of the total population living in cities with more than 1 million inhabitants.
+  desc_short_1m_urb: &desc_short_1m_urb |-
+    The percentage of the urban population living in cities with more than 1 million inhabitants.
+
+  desc_processing_density:  &desc_processing_density |-
+    Population density was calculated by dividing the population of the city by the total area it covers, providing a measure of the number of people living in each km².
+
+  entityAnnotationsMapCapitals: &entityAnnotationsMapCapitals |-
+      Afghanistan: Kabul
+      Albania: Tirana
+      Algeria: Algiers
+      Angola: Luanda
+      Argentina: Buenos Aires
+      Armenia: Yerevan
+      Aruba: Oranjestad
+      Australia: North Canberra [Canberra]
+      Austria: Vienna
+      Azerbaijan: Baku
+      Bahamas: Nassau
+      Bahrain: Manama
+      Bangladesh: Dhaka
+      Barbados: Bridgetown
+      Belarus: Minsk
+      Belgium: Brussels
+      Benin: Porto-Novo
+      Bolivia: La Paz
+      Bosnia and Herzegovina: Sarajevo
+      Botswana: Gaborone
+      Brazil: Brasilia
+      Brunei: Bandar Seri Begawan
+      Bulgaria: Sofia
+      Burkina Faso: Ouagadougou
+      Burundi: Gitega
+      Cambodia: Phnom Penh
+      Cameroon: Yaoundé
+      Canada: Ottawa
+      Central African Republic: Bangui
+      Chad: N'Djamena
+      Chile: Santiago
+      China: Beijing
+      Colombia: Bogota
+      Comoros: Moroni
+      Costa Rica: San José
+      Croatia: Zagreb
+      Cuba: Havana
+      Curacao: Willemstad
+      Cyprus: Strovolos [Nicosia]
+      Czechia: Prague
+      Cote d'Ivoire: Yamoussoukro
+      Democratic Republic of Congo: Kinshasa
+      Denmark: Copenhagen
+      Djibouti: Djibouti
+      Dominican Republic: Santo Domingo
+      Ecuador: Quito
+      Egypt: Cairo
+      El Salvador: San Salvador
+      Equatorial Guinea: Malabo
+      Eritrea: Asmara
+      Estonia: Tallinn
+      Ethiopia: Addis Ababa
+      Fiji: Suva
+      Finland: Helsinki
+      France: Paris
+      French Guiana: Cayenne
+      French Polynesia: Papeete
+      Gabon: Libreville
+      Georgia: Tbilisi
+      Germany: Berlin
+      Ghana: Accra
+      Greece: Athens
+      Guatemala: Guatemala City
+      Guinea-Bissau: Bissau
+      Guyana: Georgetown
+      Haiti: Port-au-Prince
+      Honduras: Tegucigalpa
+      Hungary: Budapest
+      Iceland: Reykjavik
+      India: New Delhi
+      Indonesia: Jakarta
+      Iran: Tehran
+      Iraq: Baghdad
+      Ireland: Dublin
+      Israel: Jerusalem
+      Italy: Rome
+      Jamaica: Kingston
+      Japan: Tokyo
+      Jersey: St. Helier
+      Jordan: Amman
+      Kazakhstan: Astana
+      Kenya: Nairobi
+      Kosovo: Pristina
+      Kuwait: Kuwait City
+      Kyrgyzstan: Bishkek
+      Laos: Vientiane
+      Latvia: Riga
+      Lebanon: Beirut
+      Lesotho: Maseru
+      Liberia: Monrovia
+      Libya: Tripoli
+      Lithuania: Vilnius
+      Luxembourg: Luxembourg
+      Madagascar: Antananarivo
+      Malawi: Lilongwe
+      Malaysia: Kuala Lumpur
+      Maldives: Malé
+      Mali: Bamako
+      Malta: Valletta
+      Mauritania: Nouakchott
+      Mauritius: Port Louis
+      Mayotte: Mamoudzou
+      Moldova: Chișinău
+      Mongolia: Ulaanbaatar
+      Montenegro: Podgorica
+      Morocco: Rabat
+      Mozambique: Maputo
+      Myanmar: Pyinmana [Nay Pyi Taw]
+      Mexico: Mexico City
+      Namibia: Windhoek
+      Nepal: Kathmandu
+      Netherlands: Amsterdam
+      New Caledonia: Nouméa
+      New Zealand: Wellington
+      Nicaragua: Managua
+      Niger: Niamey
+      Nigeria: Abuja
+      North Korea: P'yŏngyang
+      North Macedonia: Skopje
+      Northern Cyprus: Nicosia
+      Norway: Oslo
+      Oman: Muscat
+      Pakistan: Islamabad
+      Palestine: Ramallah
+      Panama: Panama City
+      Papua New Guinea: Port Moresby
+      Paraguay: Asuncion
+      Peru: Lima
+      Philippines: Manila
+      Poland: Warsaw
+      Portugal: Lisbon
+      Puerto Rico: Bayamón [San Juan]
+      Qatar: Doha
+      Congo: Brazzaville
+      Romania: Bucharest
+      Russia: Moscow
+      Rwanda: Kigali
+      Reunion: Saint-Denis
+      Samoa: Apia
+      Saudi Arabia: Riyadh
+      Senegal: Dakar
+      Serbia: Belgrade
+      Sierra Leone: Freetown
+      Singapore: Singapore
+      Slovakia: Bratislava
+      Slovenia: Ljubljana
+      Solomon Islands: Honiara
+      Somalia: Mogadishu
+      South Africa: Cape Town
+      South Korea: Seoul
+      South Sudan: Juba
+      Spain: Madrid
+      Sri Lanka: Colombo [Sri Jayawardenepura Kotte]
+      Sudan: Khartoum
+      Suriname: Paramaribo
+      Sweden: Stockholm
+      Switzerland: Bern
+      Syria: Damascus
+      Sao Tome and Principe: São Tomé
+      Taiwan: Taipei
+      Tajikistan: Dushanbe
+      Tanzania: Dodoma
+      Thailand: Bangkok
+      East Timor: Dili
+      Togo: Lomé
+      Tonga: Nuku'alofa
+      Trinidad and Tobago: Port of Spain
+      Tunisia: Tunis
+      Turkey: Ankara
+      Turkmenistan: Ashgabat
+      Uganda: Kampala
+      Ukraine: Kyiv
+      United Arab Emirates: Abu Dhabi
+      United Kingdom: London
+      United States: Washington
+      Uruguay: Montevideo
+      Uzbekistan: Tashkent
+      Vanuatu: Port Vila
+      Venezuela: Caracas
+      Vietnam: Hanoi
+      Yemen: Sana'a
+      Zambia: Lusaka
+      Zimbabwe: Harare
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+
+tables:
+  ghsl_urban_centers:
+    variables:
+
+     urban_pop_projections:
+        title: Population of the capital city (projected)
+        unit: 'people'
+        description_short: *desc_short_pop_capital
+        display:
+          entityAnnotationsMap: *entityAnnotationsMapCapitals
+          isProjection: true
+
+     urban_density_projections:
+        title: Population density of the capital city (projected)
+        unit: 'people/km²'
+        description_short: *desc_short_density_capital
+        description_processing: *desc_processing_density
+        display:
+          entityAnnotationsMap: *entityAnnotationsMapCapitals
+          isProjection: true
+
+     urban_pop_estimates:
+        title: Population of the capital city
+        unit: 'people'
+        description_short: *desc_short_pop_capital
+        display:
+          entityAnnotationsMap: *entityAnnotationsMapCapitals
+
+     urban_density_estimates:
+        title: Population density of the capital city
+        unit: 'people/km²'
+        description_short: *desc_short_density_capital
+        description_processing: *desc_processing_density
+        display:
+          entityAnnotationsMap: *entityAnnotationsMapCapitals
+
+     urban_density_top_100_projections:
+        title: Population density of the top 100 most populous cities (projected)
+        unit: 'people/km²'
+        description_short: *desc_short_density_top_100
+        description_processing: *desc_processing_density
+        display:
+          isProjection: true
+
+     urban_density_top_100_estimates:
+        title: Population density of the top 100 most populous cities
+        unit: 'people/km²'
+        description_short: *desc_short_density_top_100
+        description_processing: *desc_processing_density
+
+     urban_pop_top_100_estimates:
+        title: Population of the top 100 most populous cities
+        unit: 'people'
+        description_short: *desc_short_pop_top_100
+
+     urban_pop_top_100_projections:
+        title: Population of the top 100 most populous cities (projected)
+        unit: 'people'
+        description_short: *desc_short_pop_top_100
+        display:
+          isProjection: true

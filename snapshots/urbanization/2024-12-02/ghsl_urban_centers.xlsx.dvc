@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Global Human Settlement Layer Dataset -  Stats in the City Database
+    description: |-
+      The "Stats in the City Database" offers harmonized data on population and population density for 11,422 urban centres.
+
+      This data, based on the Global Human Settlement Layer Dataset, uses the Degree of Urbanisation framework to delineate spatial entities and integrates geospatial data from a variety of open-source datasets. It represents one of the most comprehensive resources for understanding urban population patterns and densities worldwide
+    date_published: "2024"
+
+    # Citation
+    producer: European Commission, Joint Research Centre (JRC)
+    citation_full: |-
+      Center For International Earth Science Information Network-CIESIN-Columbia University. 2018. “Gridded Population of the World, Version 4 (GPWv4): Population Count, Revision 11.” Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). https://doi.org/10.7927/H4JW8BX5
+      Pesaresi M., Politis P. (2023): GHS-BUILT-V R2023A - GHS built-up volume grids derived from joint assessment of Sentinel2, Landsat, and global DEM data, multitemporal (1975-2030).European Commission, Joint Research Centre (JRC) PID: http://data.europa.eu/89h/ab2f107a-03cd-47a3-85e5-139d8ec63283, doi:10.2905/AB2F107A-03CD-47A3-85E5-139D8EC63283
+      Pesaresi M., Politis P. (2023): GHS-BUILT-S R2023A - GHS built-up surface grid, derived from Sentinel2 composite and Landsat, multitemporal (1975-2030)European Commission, Joint Research Centre (JRC) PID: http://data.europa.eu/89h/9f06f36f-4b11-47ec-abb0-4f8b7b1d72ea, doi:10.2905/9F06F36F-4B11-47EC-ABB0-4F8B7B1D72EA
+      Schiavina M., Freire S., Carioli A., MacManus K. (2023): GHS-POP R2023A - GHS population grid multitemporal (1975-2030).European Commission, Joint Research Centre (JRC) PID: http://data.europa.eu/89h/2ff68a52-5b5b-4a22-8f40-c41da8332cfe, doi:10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE
+      Schiavina M., Freire S., Carioli A., MacManus K. (2023): GHS-POP R2023A - GHS population grid multitemporal (1975-2030).European Commission, Joint Research Centre (JRC) PID: http://data.europa.eu/89h/2ff68a52-5b5b-4a22-8f40-c41da8332cfe, doi:10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE
+      Schiavina M., Melchiorri M., Pesaresi M. (2023): GHS-SMOD R2023A - GHS settlement layers, application of the Degree of Urbanisation methodology (stage I) to GHS-POP R2023A and GHS-BUILT-S R2023A, multitemporal (1975-2030)European Commission, Joint Research Centre (JRC) PID: http://data.europa.eu/89h/a0df7a6f-49de-46ea-9bde-563437a6e2ba, doi:10.2905/A0DF7A6F-49DE-46EA-9BDE-563437A6E2BA
+
+    url_main: https://human-settlement.emergency.copernicus.eu/ghs_ucdb_2024.php
+    date_accessed: 2024-12-02
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://commission.europa.eu/legal-notice_en
+outs:
+  - md5: 78dbc4fc3cbcbe24cd51fe4f884319e2
+    size: 2963003
+    path: ghsl_urban_centers.xlsx

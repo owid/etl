@@ -1,18 +1,25 @@
+"""THIS MODULE IS DEPRECATED AND SHOULD NOT BE IMPORTED.
+
+INSTEAD, USE etl.explorer
+"""
+
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
+from deprecated import deprecated
 from structlog import get_logger
 
 from etl import config
 from etl.files import upload_file_to_server
-from etl.grapher_io import get_variables_data
+from etl.grapher.io import get_variables_data
 from etl.paths import EXPLORERS_DIR
 
 # Initialize logger.
 log = get_logger()
 
 
+@deprecated("Use the etl.explorer.Explorer class instead.")
 class Explorer:
     """Explorer object that lets us parse an explorer file, create a new one, modify its content, and write a tsv file.
 

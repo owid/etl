@@ -28,6 +28,6 @@ meta:
       url: https://www.usgs.gov/centers/national-minerals-information-center/historical-statistics-mineral-and-material-commodities
 
 outs:
-  - md5: bae42fc20438313cb7dd37a93682f6e6
-    size: 7838597
+  - md5: 13a7622cbcb1e671075622d8c022b295
+    size: 8750002
     path: historical_statistics_for_mineral_and_material_commodities.zip

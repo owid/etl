@@ -14,7 +14,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("ppp_exchange_rates.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     columns_to_use = ["Reference area", "Transaction", "TIME_PERIOD", "OBS_VALUE"]
 
     tb = tb[columns_to_use]

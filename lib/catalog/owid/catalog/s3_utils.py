@@ -74,11 +74,15 @@ def download(s3_url: str, filename: str, quiet: bool = False, client: Optional[B
 def download_s3_folder(
     s3_folder: str,
     local_dir: Path,
-    ignore: Optional[str] = None,
+    exclude: List[str] = [],
+    include: List[str] = [],
     client: Optional[BaseClient] = None,
     max_workers: int = 20,
+    delete: bool = False,
 ) -> None:
     """Download all files in the given S3 folder to the local directory."""
+    assert s3_folder.endswith("/"), "s3_folder must end with a slash"
+
     client = client or connect_r2()
 
     bucket, _ = s3_bucket_key(s3_folder)
@@ -88,8 +92,11 @@ def download_s3_folder(
 
     s3_keys = list_s3_objects(s3_folder, client=client)
 
-    if ignore:
-        s3_keys = [key for key in s3_keys if ignore not in key]
+    if exclude:
+        s3_keys = [key for key in s3_keys if not any(pattern in key for pattern in exclude)]
+
+    if include:
+        s3_keys = [key for key in s3_keys if any(pattern in key for pattern in include)]
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = []
@@ -102,6 +109,13 @@ def download_s3_folder(
             )
 
         concurrent.futures.wait(futures)
+
+    if delete:
+        local_files = set(local_dir.glob("*"))
+        downloaded_files = set(local_dir / Path(s3_key).name for s3_key in s3_keys)
+        files_to_delete = local_files - downloaded_files
+        for file in files_to_delete:
+            file.unlink()
 
 
 def upload(s3_url: str, filename: str, public: bool = False, quiet: bool = False) -> None:

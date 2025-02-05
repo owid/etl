@@ -23,7 +23,8 @@ dependencies = [
     "pydrive2>=1.15.0",
     "pyarrow>=10.0.1",
     "urllib3<2",
-    "click>=8.1.7"
+    "click>=8.1.7",
+    "py7zr>=0.22.0",
 ]
 
 [tool.uv]
@@ -40,7 +41,7 @@ dev-dependencies = [
     "openpyxl>=3.0.10",
     "lxml>=4.9.1",
     "pyright==1.1.373",
-    "ruff==0.1.6"
+    "ruff==0.8.2"
 ]
 
 [tool.ruff]

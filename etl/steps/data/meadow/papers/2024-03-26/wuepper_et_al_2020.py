@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot and read its data.
     snap = paths.load_snapshot("wuepper_et_al_2020.xlsx")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

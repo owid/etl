@@ -16,8 +16,10 @@ To run this code from scratch,
     - Connect to the staging server of this pull request:
         - Hit Cmd + Shift + P and select Remote-SSH: Connect to Host
         - Type in owid@staging-site-{branch_name}
-    - Delete the files in the cache folder:
+    - Delete the files in the local cache folder:
         rm -rf .cache/*
+    - (If needed) Delete the files in R2:
+        rclone delete r2:owid-private/cache/ --fast-list --transfers 32 --checkers 32 --verbose
     - Check if you need to update the poverty lines in the functions `poverty_lines_countries` and `poverty_lines_regions`.
         - Check the list of countries without percentile data. It will show up as a list in the output (These countries are available in a common query but not in the percentile file:)
         - Open
@@ -43,7 +45,6 @@ Copy these files to this folder and run in the terminal:
 You can delete the files after this.
 
 """
-
 
 import io
 import time
@@ -484,7 +485,7 @@ def pip_query_region(
 
     # Build query
     df = wb_api.fetch_csv(
-        f"/pip-grp?{popshare_or_povline}={value}&country={country_code}&year={year}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
+        f"/pip-grp?group_by=wb&{popshare_or_povline}={value}&country={country_code}&year={year}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
     )
 
     # Add PPP version as column
@@ -655,6 +656,7 @@ def generate_percentiles_raw(wb_api: WB_API):
             welfare_type="all",
             reporting_level="all",
             ppp_version=2017,
+            download="true",
         )
 
         # Edit percentile file to get the list of different countries
@@ -1326,6 +1328,7 @@ def generate_relative_poverty(wb_api: WB_API):
         welfare_type="all",
         reporting_level="all",
         ppp_version=2017,
+        download="true",
     )
 
     # Patch medians
@@ -1398,7 +1401,7 @@ def generate_key_indicators(wb_api: WB_API):
             welfare_type="all",
             reporting_level="all",
             ppp_version=ppp_version,
-            download="false",
+            download="true",
         )
 
     def get_region_data(povline, ppp_version, versions):
@@ -1416,7 +1419,7 @@ def generate_key_indicators(wb_api: WB_API):
             welfare_type="all",
             reporting_level="all",
             ppp_version=ppp_version,
-            download="false",
+            download="true",
         )
 
     def concurrent_function():
@@ -1468,7 +1471,7 @@ def generate_key_indicators(wb_api: WB_API):
             welfare_type="all",
             reporting_level="national",
             ppp_version=ppp_version,
-            download="false",
+            download="true",
         )
 
     def concurrent_function_china_india():

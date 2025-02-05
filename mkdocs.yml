@@ -93,6 +93,8 @@ extra:
       link: https://ourworldindata.org
     - icon: fontawesome/brands/instagram
       link: https://instagram.com/ourworldindata
+    - icon: fontawesome/brands/bluesky
+      link: https://bsky.app/profile/ourworldindata.org
     - icon: fontawesome/brands/x-twitter
       link: https://twitter.com/ourworldindata
 
@@ -112,8 +114,7 @@ markdown_extensions:
   - pymdownx.critic
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator:
-        !!python/name:materialx.emoji.to_svg # The Details extension supercharges the Admonition extension, making the resulting call-outs collapsible, allowing them to be opened and closed by the user. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#details
+      emoji_generator: !!python/name:materialx.emoji.to_svg # The Details extension supercharges the Admonition extension, making the resulting call-outs collapsible, allowing them to be opened and closed by the user. ref: https://squidfunk.github.io/mkdocs-material/setup/extensions/python-markdown-extensions/#details
 
 
   - pymdownx.details
@@ -149,9 +150,12 @@ plugins:
   - git-authors:
       show_email_address: false
       # authorship_threshold_percent: 1
-      # show_contribution: true
+      show_contribution: true
       # show_line_count: true
       # count_empty_lines: true
+      ignore_authors:
+        - owidbot
+      sort_authors_by: contribution
   - git-revision-date-localized
   - tags:
       tags_file: tags.md
@@ -205,23 +209,35 @@ nav:
       - Contributing: "contributing.md"
   - Guides:
       - "guides/index.md"
-      - Data work:
+      - Adding data:
           - "guides/data-work/index.md"
-          - Adding data: "guides/data-work/add-data.md"
+          - New data: "guides/data-work/add-data.md"
           - Updating data: "guides/data-work/update-data.md"
           - Update charts: "guides/data-work/update-charts.md"
-      - Wizard: "guides/wizard.md"
-      - CLI: "guides/etl-cli.md"
-      - Harmonize country names: "guides/harmonize-countries.md"
-      - Using different environments: "guides/environment.md"
-      - Staging servers: "guides/staging-servers.md"
-      - Private dataset import to ETL: "guides/private-import.md"
-      - Automate regular updates: "guides/auto-regular-updates.md"
-      - Backport a dataset to ETL: "guides/backport.md"
-      - Metadata in data pages: "guides/metadata-play.md"
-      - Edit the documentation: "dev/docs.md"
-      - OpenAI setup: "guides/openai.md"
-      - Sharing with external people: "guides/sharing-external.md"
+          - Export data: "guides/data-work/export-data.md"
+          - Access archived data: "guides/data-work/access-archived-data.md"
+      - Admin:
+          - Wizard: "guides/wizard.md"
+          - CLI: "guides/etl-cli.md"
+      - Tools:
+          - Harmonize country names: "guides/harmonize-countries.md"
+          - Backport from database: "guides/backport.md"
+          - Regular updates: "guides/auto-regular-updates.md"
+          - Pull requests: "guides/pull-requests.md"
+      - Servers & settings:
+          - Upgrade Python version: "guides/upgrade-python-version.md"
+          - Environments: "guides/environment.md"
+          - Staging servers: "guides/staging-servers.md"
+          - Public servers: "guides/sharing-external.md"
+          - Private datasets: "guides/private-import.md"
+          - Types in Tables: "guides/types-tables.md"
+          - OpenAI setup: "guides/openai.md"
+
+      - Tips when working with ETL: "guides/etl-tips.md"
+
+      - Others:
+          - Edit the documentation: "dev/docs.md"
+          - Metadata in data pages: "guides/metadata-play.md"
 
   - Design principles:
       - Design principles & workflow: architecture/index.md

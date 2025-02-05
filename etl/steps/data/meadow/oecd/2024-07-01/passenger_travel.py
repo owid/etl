@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("passenger_travel.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # drop columns not needed
     tb = tb[COLS_TO_KEEP.keys()]

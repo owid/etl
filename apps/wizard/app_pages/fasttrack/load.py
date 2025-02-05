@@ -2,6 +2,7 @@
 
 Relies on Streamlit to print messages.
 """
+
 import concurrent.futures
 import datetime as dt
 import json
@@ -21,7 +22,7 @@ from owid.catalog import (
 from owid.catalog.utils import underscore
 
 from apps.wizard.app_pages.fasttrack.utils import _decrypt
-from etl.grapher_helpers import INT_TYPES
+from etl.grapher.helpers import INT_TYPES
 from etl.paths import SNAPSHOTS_DIR
 from etl.snapshot import SnapshotMeta
 
@@ -294,7 +295,7 @@ def _parse_sources(sources_meta_df: pd.DataFrame) -> Optional[Source]:
     source = sources[0]
 
     if pd.isnull(source.get("date_accessed")):
-        source.pop("date_accessed")
+        source.pop("date_accessed", None)
 
     if pd.isnull(source.get("publication_year")):
         source.pop("publication_year")

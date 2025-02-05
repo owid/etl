@@ -74,12 +74,12 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("food_prices_for_nutrition")
-    tb = ds_meadow.read_table("food_prices_for_nutrition")
+    tb = ds_meadow.read("food_prices_for_nutrition")
 
     # Load the World Development Indicators (WDI) dataset to get the U.S. Consumer Price Index (CPI),
     # which will be used to correct for inflation and express costs in constant 2021 PPP$.
     ds_wdi = paths.load_dataset("wdi")
-    tb_wdi = ds_wdi.read_table("wdi")
+    tb_wdi = ds_wdi.read("wdi")
 
     #
     # Process data.

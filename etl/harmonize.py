@@ -120,11 +120,15 @@ def harmonize_ipython(
     # Run automatic harmonization
     harmonizer.run_automatic(logging="ipython")
 
-    # Need user input
-    harmonizer.run_interactive_ipython(
-        institution=institution,
-        num_suggestions=num_suggestions,
-    )
+    # Export mapping immediately after automatic harmonization
+    harmonizer.export_mapping()
+
+    # If there are ambiguous countries, proceed with interactive harmonization
+    if harmonizer.ambiguous:
+        harmonizer.run_interactive_ipython(
+            institution=institution,
+            num_suggestions=num_suggestions,
+        )
 
 
 def read_table(input_file: str) -> pd.DataFrame:
@@ -272,7 +276,6 @@ class Harmonizer:
 
         # Mapping
         self._mapping = None
-        self.countries_mapped_automatic = None
         self.excluded = []
 
     def _get_geo(self, tb, colname, indicator):

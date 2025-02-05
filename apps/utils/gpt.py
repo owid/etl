@@ -1,4 +1,5 @@
 """Auxiliary classes, functions and variables."""
+
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -214,6 +215,21 @@ class OpenAIWrapper(OpenAI):
         if isinstance(chat_completion, ChatCompletion):
             response = GPTResponse(chat_completion)
             return response
+        else:
+            raise ValueError("message_content is expected to be a string!")
+
+    def query_gpt_fast(self, user_prompt: str, system_prompt: str, model: str = MODEL_DEFAULT) -> str:
+        """Query Chat GPT to get message content from the chat completion."""
+        query = GPTQuery(
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+        )
+        response = self.query_gpt(query=query, model=model)
+
+        if isinstance(response, GPTResponse):
+            return response.message_content
         else:
             raise ValueError("message_content is expected to be a string!")
 

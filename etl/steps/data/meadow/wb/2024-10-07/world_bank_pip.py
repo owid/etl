@@ -13,15 +13,15 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshots.
     # For key indicators
     snap = paths.load_snapshot("world_bank_pip.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # For percentiles
     snap_percentiles = paths.load_snapshot("world_bank_pip_percentiles.csv")
-    tb_percentiles = snap_percentiles.read()
+    tb_percentiles = snap_percentiles.read(safe_types=False)
 
     # For regional definitions
     snap_regions = paths.load_snapshot("world_bank_pip_regions.csv")
-    tb_regions = snap_regions.read()
+    tb_regions = snap_regions.read(safe_types=False)
 
     #
     # Process data.

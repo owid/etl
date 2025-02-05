@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     tb = add_all_countries_and_years(tb=tb, tb_regions=tb_regions)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(["country", "year"], sort_columns=True)
 
     # Update table name.
     tb.metadata.short_name = paths.short_name
@@ -52,6 +52,7 @@ def run(dest_dir: str) -> None:
         .groupby(["status", "year"], as_index=False)
         .count()
         .pivot(index="year", columns="status", join_column_levels_with="_")
+        .rename(columns={"year_<NA>": "year"})
     )
 
     # Rename columns conveniently.
@@ -69,7 +70,7 @@ def run(dest_dir: str) -> None:
     tb_counts = tb_counts.fillna(0).astype(int)
 
     # Set an appropriate index and sort conveniently.
-    tb_counts = tb_counts.set_index(["year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb_counts = tb_counts.format(["year"], sort_columns=True)
 
     # Rename table conveniently.
     tb_counts.metadata.short_name = "nuclear_weapons_proliferation_counts"

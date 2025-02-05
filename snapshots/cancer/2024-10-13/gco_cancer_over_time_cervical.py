@@ -2,6 +2,7 @@
 To download the csv file go to https://gco.iarc.fr/overtime/en/dataviz/trends?populations=752_32_36_40_48_112_124_152_156_170_188_191_196_203_208_218_233_246_250_276_352_356_372_380_376_392_414_428_410_440_470_474_528_554_578_608_616_630_634_705_724_756_764_792_800_840_8260_8261_8262_8263_8401_8402&sexes=2&types=0&multiple_populations=1&group_populations=0&cancers=16
 and click on the Downloads button --> csv.
 """
+
 from pathlib import Path
 
 import click

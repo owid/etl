@@ -1,24 +1,20 @@
 meta:
-  namespace: fasttrack
-  short_name: lead_paint_regulation_who
-  file_extension: csv
-  date_accessed: 2023-05-31
+  source:
+    name: Lead paint regulations (WHO, 2023)
+    url: https://www.who.int/data/gho/data/themes/topics/indicator-groups/legally-binding-controls-on-lead-paint
+    source_data_url: |-
+      gAAAAABnRY1UxjQRqqtwi3k4YRi5i2a_AmviR0K1Yq7lWpp5mQ8zmhp0sOt2x_D-aN8W2WkMf8tCvbcZ2Bi41ergSpO1KCkDtsaTcT24IcGVC16eX9TpV0AkYs4TAXg4LbY31u0XeecK9mQ7uw7nzqkQLsEbEDXTz7izPL1kz58WSwNQE8WCvzhV2kv3mddI_ycEwFGUFSypG0QXyYHreQLjP3n5CsnC2vGymzKGwdQUmiK0r2nipPcCj4vh3O6qbvSj0W_hcA5j
+    date_accessed: '2024-11-26'
+    publication_year: 2023
+    published_by: World Health Organization (WHO)
   name: Lead paint regulations (WHO, 2023)
   description: |-
     The WHO collects data on which countries have legally-binding controls on lead paint. It sources this data from surveys conducted by WHO and UNEP of national authorities. The World Health Organization (WHO) tracks the introduction of legally-binding controls on lead concentrations in paint. Paint is a main contributor to harmful lead exposure.
 
     The stringency of controls on lead paint can vary by country. Maximum concentrations of lead can differ, and may only apply to particular types of paint (for example, products used in households).
-  source_name: Google Sheet
-  url: 
-    https://www.who.int/data/gho/data/themes/topics/indicator-groups/legally-binding-controls-on-lead-paint
-  source_published_by: Google Sheet
-  source_data_url: 
-    gAAAAABkdy33dfUqbIoFH4JceoCGzD0jhxgG7WWfCuXNbU3fqjWI0eFoNybQuugGLBO2bR-HGEAAMlzhGcAweillVjqC8fv2ZuiG5kSeLgbLGBbZc2AiBucQz5QwuPOh-_mMD0qMPTnsiDvHsfGp91drLXO4da3usmBrcIJbn0vv2bknY0iuDYbnyOf4HKHcbLM_9iazUXMeIvIzuvEHq3iu4QZHaTHgbP66JFYwGhM0EiP_mxGKNbart9M1j3zVkXRESjdxKTnA
+  license: {}
   is_public: false
-  version: latest
-  publication_year: 2023
-wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 1699f03673a329af3bf555a0b4e6e8a0
-  size: 2935
-  path: lead_paint_regulation_who.csv
+  - md5: 1699f03673a329af3bf555a0b4e6e8a0
+    size: 2935
+    path: lead_paint_regulation_who.csv

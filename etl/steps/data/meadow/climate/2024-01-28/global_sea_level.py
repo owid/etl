@@ -53,7 +53,7 @@ def run(dest_dir: str) -> None:
     tb = fix_date_column(tb=tb)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["date"], verify_integrity=True).sort_index()
+    tb = tb.format(["date"])
 
     #
     # Save outputs.

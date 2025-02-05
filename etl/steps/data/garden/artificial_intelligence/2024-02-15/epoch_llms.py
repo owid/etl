@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -16,13 +15,13 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("epoch_llms.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb["training_computation_petaflop"] = tb["Approx Compute (FLOP)"] / 1e15
     tb = tb.drop("Approx Compute (FLOP)", axis=1)
     tb["MMLU avg"] *= 100
     tb["Architecture"] = tb["Architecture"].str.replace("Llama", "LLaMA", regex=True)
     tb["Organisation"] = tb["Organisation"].replace("DeepMind", "Google DeepMind")
-    tb = tb.underscore().set_index(["architecture", "year"], verify_integrity=True)
+    tb = tb.format(["architecture", "year"])
     #
     # Save outputs.
     #

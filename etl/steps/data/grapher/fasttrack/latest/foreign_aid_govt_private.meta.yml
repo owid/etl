@@ -1,0 +1,15 @@
+dataset:
+  title: Foreign aid by governments and private donors
+  description: ''
+  licenses:
+    - {}
+tables:
+  foreign_aid_govt_private:
+    variables:
+      foreign_aid_given:
+        title: Foreign aid given
+        unit: $
+        short_unit: $
+      country_or_private:
+        title: country_or_private
+        unit: ''

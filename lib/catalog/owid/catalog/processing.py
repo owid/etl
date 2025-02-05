@@ -1,6 +1,5 @@
-"""Common operations performed on tables and variables.
+"""Common operations performed on tables and variables."""
 
-"""
 from .tables import (
     ExcelFile,
     concat,
@@ -20,6 +19,7 @@ from .tables import (
     read_json,
     read_parquet,
     read_rda,
+    read_rda_multiple,
     read_rds,
     read_stata,
     to_numeric,
@@ -42,6 +42,7 @@ __all__ = [
     "read_fwf",
     "read_stata",
     "read_rda",
+    "read_rda_multiple",
     "read_rds",
     "read_df",
     "read_parquet",

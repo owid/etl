@@ -1,4 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
+
 import numpy as np
 from owid.catalog import Table
 from owid.catalog import processing as pr
@@ -20,7 +21,7 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("who.csv")
     snap_regions = paths.load_snapshot("who_regions.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb_reg = snap_regions.read()
     # Prepare data.
     tb = tb.drop(columns=["iso3"], axis=1)

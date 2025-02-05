@@ -10,7 +10,7 @@ definitions:
   desc_wildfires: &desc_wildfires
     - Wildfires are detected through the use of satellite imagery obtained from MODIS (Moderate Resolution Imaging Spectroradiometer) and VIIRS (Visible Infrared Imaging Radiometer Suite). These satellite systems are capable of identifying thermal anomalies and alterations in landscape patterns, which are indicative of burning.
     - The data provider is presently engaged in a global accuracy assessment and acknowledged that they might be underestimating the genuine impact of wildfires, primarily due to constraints imposed by the spatial resolution of the sensors they employ.
-  desc_update: The 2024 data is incomplete and was last updated {date_accessed}.
+  desc_update: The {year} data is incomplete and was last updated {date_accessed}.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
@@ -102,27 +102,3 @@ tables:
           description_key:
             - CO₂ emissions contribute to the greenhouse effect, influencing global warming and climate change.
 
-        area_ha_per_wildfire:
-          title: Area burnt per wildfire
-          unit: hectares
-          short_unit: ha
-          description_short: The average area burnt per [wildfire](#dod:wildfires), in hectares. {definitions.desc_update}
-          description_processing: The area burnt per wildfire is calculated by dividing the area burnt by wildfires by the number of fires.
-          description_key: *desc_wildfires
-
-
-        co2_ha_per_area:
-          title: Carbon dioxide emissions per hectare burnt
-          unit: tonnes
-          short_unit: t
-          description_short: Carbon dioxide emissions per hectare burnt by [wildfires](#dod:wildfires), in tonnes. {definitions.desc_update}
-          description_processing: The carbon dioxide emissions per hectare is calculated by dividing the carbon dioxide emissions by the area burnt by wildfires.
-          description_key: *desc_wildfires
-
-        pm2_5_ha_per_area:
-          title: PM2.5 emissions per hectare burnt
-          unit: tonnes
-          short_unit: t
-          description_short: PM2.5 emissions per hectare burnt by [wildfires](#dod:wildfires), in tonnes. {definitions.desc_update}
-          description_processing: The PM2.5 emissions per hectare is calculated by dividing the PM2.5 emissions by the area burnt by wildfires.
-          description_key: *desc_wildfires

@@ -1,13 +1,19 @@
 import json
+from itertools import product
 
 import pandas as pd
 import yaml
 from sqlalchemy.engine import Engine
+from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
 from etl.db import read_sql
+from etl.grapher.io import trim_long_variable_name
 from etl.helpers import map_indicator_path_to_id
+
+# Initialize logger.
+log = get_logger()
 
 
 def upsert_multidim_data_page(slug: str, config: dict, engine: Engine) -> None:
@@ -162,3 +168,103 @@ def fetch_variables_from_table(table: str, engine: Engine) -> pd.DataFrame:
     df_dims = pd.DataFrame(dims, index=df.index)
 
     return df.join(df_dims)
+
+
+def generate_views_for_dimensions(
+    dimensions, tables, dimensions_order_in_slug=None, additional_config=None, warn_on_missing_combinations=True
+):
+    """Generate individual views for all possible combinations of dimensions in a list of flattened tables.
+
+    Parameters
+    ----------
+    dimensions : List[Dict[str, Any]]
+        Dimensions, as given in the configuration of the multidim step, e.g.
+        [
+            {'slug': 'frequency', 'name': 'Frequency', 'choices': [{'slug': 'annual','name': 'Annual'}, {'slug': 'monthly', 'name': 'Monthly'}]},
+            {'slug': 'source', 'name': 'Energy source', 'choices': [{'slug': 'electricity', 'name': 'Electricity'}, {'slug': 'gas', 'name': 'Gas'}]},
+            ...
+        ]
+    tables : List[Table]
+        Tables whose indicator views will be generated.
+    dimensions_order_in_slug : Tuple[str], optional
+        Dimension names, as they appear in "dimensions", and in the order in which they are spelled out in indicator names. For example, if indicator names are, e.g. annual_electricity_euros, then dimensions_order_in_slug would be ("frequency", "source", "unit").
+    additional_config : _type_, optional
+        Additional config fields to add to each view, e.g.
+        {"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"}
+    warn_on_missing_combinations : bool, optional
+        True to warn if any combination of dimensions is not found among the indicators in the given tables.
+
+    Returns
+    -------
+    results : List[Dict[str, Any]]
+        Views configuration, e.g.
+        [
+            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'euro'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_euro'},
+            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'pps'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_pps'},
+            ...
+        ]
+
+    """
+    # Extract all choices for each dimension as (slug, choice_slug) pairs.
+    choices = {dim["slug"]: [choice["slug"] for choice in dim["choices"]] for dim in dimensions}
+    dimension_slugs_in_config = set(choices.keys())
+
+    # Sanity check for dimensions_order_in_slug.
+    if dimensions_order_in_slug:
+        dimension_slugs_in_order = set(dimensions_order_in_slug)
+
+        # Check if any slug in the order is missing from the config.
+        missing_slugs = dimension_slugs_in_order - dimension_slugs_in_config
+        if missing_slugs:
+            raise ValueError(
+                f"The following dimensions are in 'dimensions_order_in_slug' but not in the config: {missing_slugs}"
+            )
+
+        # Check if any slug in the config is missing from the order.
+        extra_slugs = dimension_slugs_in_config - dimension_slugs_in_order
+        if extra_slugs:
+            log.warning(
+                f"The following dimensions are in the config but not in 'dimensions_order_in_slug': {extra_slugs}"
+            )
+
+        # Reorder choices to match the specified order.
+        choices = {dim: choices[dim] for dim in dimensions_order_in_slug if dim in choices}
+
+    # Generate all combinations of the choices.
+    all_combinations = list(product(*choices.values()))
+
+    # Create the views.
+    results = []
+    for combination in all_combinations:
+        # Map dimension slugs to the chosen values.
+        dimension_mapping = {dim_slug: choice for dim_slug, choice in zip(choices.keys(), combination)}
+        slug_combination = "_".join(combination)
+
+        # Find relevant tables for the current combination.
+        relevant_table = []
+        for table in tables:
+            if slug_combination in table:
+                relevant_table.append(table)
+
+        # Handle missing or multiple table matches.
+        if len(relevant_table) == 0:
+            if warn_on_missing_combinations:
+                log.warning(f"Combination {slug_combination} not found in tables")
+            continue
+        elif len(relevant_table) > 1:
+            log.warning(f"Combination {slug_combination} found in multiple tables: {relevant_table}")
+
+        # Construct the indicator path.
+        indicator_path = f"{relevant_table[0].metadata.dataset.uri}/{relevant_table[0].metadata.short_name}#{trim_long_variable_name(slug_combination)}"
+        indicators = {
+            "y": indicator_path,
+        }
+        # Append the combination to results.
+        results.append({"dimensions": dimension_mapping, "indicators": indicators})
+
+    if additional_config:
+        # Include additional fields in all results.
+        for result in results:
+            result.update({"config": additional_config})
+
+    return results

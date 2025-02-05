@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -56,8 +57,8 @@ def run(dest_dir: str) -> None:
     tb_combined_full = pr.merge(tb_combined_full, tb_surviving, on=["country", "year"], how="left")
 
     # Save outputs.
-    tb_combined_full = tb_combined_full.drop(columns=["source"]).set_index(["country", "year"], verify_integrity=True)
-    tb_combined_sel = tb_combined_sel.drop(columns=["source"]).set_index(["country", "year"], verify_integrity=True)
+    tb_combined_full = tb_combined_full.drop(columns=["source"]).format(["country", "year"])
+    tb_combined_sel = tb_combined_sel.drop(columns=["source"]).format(["country", "year"])
 
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.

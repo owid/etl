@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from functools import wraps
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 from dataclasses_json import dataclass_json
 
@@ -50,12 +50,10 @@ class LogEntry:
     parents: Tuple[str, ...] = field(default_factory=tuple)
     comment: Optional[str] = None
 
-    def to_dict(self) -> Dict[str, Any]:
-        ...
+    def to_dict(self) -> Dict[str, Any]: ...
 
     @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "LogEntry":
-        ...
+    def from_dict(d: Dict[str, Any]) -> "LogEntry": ...
 
     def clone(self, **kwargs):
         """Clone the log entry, optionally overriding some attributes."""
@@ -68,7 +66,7 @@ class ProcessingLog(List[LogEntry]):
     # hack for dataclasses_json
     __args__ = (LogEntry,)
 
-    def __init__(self, entries: List[LogEntry | Dict[str, Any]] = []):
+    def __init__(self, entries: List[Union[LogEntry, Dict[str, Any]]] = []):
         # Accept both LogEntry and dict when initializing, i.e. ProcessingLog([{"variable": "foo", ...}]) returns a list
         # of LogEntry objects.
         super().__init__([entry if isinstance(entry, LogEntry) else LogEntry.from_dict(entry) for entry in entries])

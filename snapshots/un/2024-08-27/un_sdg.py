@@ -1,7 +1,8 @@
 """Script to create a snapshot of dataset 'United Nations Sustainable Development Goals (2024)'.
-    As well as a snapshot of the data we collect a snapshot of the dimensions and attributes of the data.
-    These often change as the dataset contains many different variables with many different dimensions and values/attributes.
+As well as a snapshot of the data we collect a snapshot of the dimensions and attributes of the data.
+These often change as the dataset contains many different variables with many different dimensions and values/attributes.
 """
+
 import datetime as dt
 import json
 import os

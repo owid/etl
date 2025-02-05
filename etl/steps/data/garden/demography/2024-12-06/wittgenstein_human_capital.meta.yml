@@ -1,0 +1,530 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display:
+      numDecimalPlaces: 2
+  others:
+    education: |-
+      <<education.replace('_', ' ').title()>>
+    title: |-
+      << title >> - Scenario: SSP<<scenario>>
+    title_age: |-
+      << title >> - Scenario: SSP<<scenario>> -
+      <%- if age == 'total' %>
+       All population
+      <%- else %>
+       Age: <<age>>
+      <%- endif %>
+    title_sex: |-
+      << title >> - Scenario: SSP<<scenario>> -
+      <%- if sex == 'total' %>
+       All population
+      <%- else %>
+       Sex: <<sex.title()>>s
+      <%- endif %>
+    title_edu: |-
+      << title >> - Scenario: SSP<<scenario>> -
+      <%- if education == 'total' %>
+       All population
+      <%- elif education == 'no_education' %>
+       Education: None
+      <%- else %>
+       Education: {definitions.others.education}
+      <%- endif %>
+    title_sex_age: |-
+      << title >> - Scenario: SSP<<scenario>> -
+      <%- if (sex == 'total') and (age == 'total') %>
+       All population
+      <% else %>
+      <%- if (sex == 'total') %>
+       Sex: All -
+      <% else %>
+       Sex: <<sex.title()>>s -
+      <%- endif %>
+      <%- if (age == 'total') %>
+       Age: All
+      <% else %>
+       Age: <<age>>
+      <%- endif %>
+      <%- endif %>
+    title_age_edu: |-
+      << title >> - Scenario: SSP<<scenario>> -
+      <%- if (age == 'total') and (education == 'total') %>
+       All population
+      <% else %>
+      <%- if (age == 'total') %>
+       Age: All -
+      <% else %>
+       Age: <<age>> -
+      <%- endif %>
+      <%- if (education == 'total') %>
+       Education: All
+      <% elif (education == "no_education") %>
+        Education: None
+      <% else %>
+       Education: {definitions.others.education}
+      <%- endif %>
+      <%- endif %>
+    title_sex_age_edu: |-
+      << title >> - Scenario: SSP<<scenario>> -
+      <%- if (age == 'total') and (sex == 'total') and (education == 'total') %>
+       All population
+      <% else %>
+      <%- if (sex == 'total') %>
+       Sex: All -
+      <% else %>
+       Sex: <<sex.title()>>s -
+      <%- endif %>
+      <%- if (age == 'total') %>
+       Age: All -
+      <% else %>
+       Age: <<age>> -
+      <%- endif %>
+      <%- if (education == 'total') %>
+       Education: All
+      <% elif (education == "no_education") %>
+        Education: None
+      <% else %>
+       Education: {definitions.others.education}
+      <%- endif %>
+      <%- endif %>
+    projections: |-
+      Projections from 2025 onwards are based on the << scenario >> scenario
+    dim_ssp: |-
+      <% if scenario == "1" %>
+      **Population Component of Rapid Development (SSP1)**: This scenario assumes a future that is moving toward a more sustainable path, with educational and health investments accelerating the demographic transition, leading to a relatively low world population. The emphasis is on strengthening human wellbeing. This is associated with high education, low mortality and low fertility. Migration levels are assumed to be medium for all countries under this SSP.
+      <%- elif scenario == "2" %>
+      **Population Component of Medium (SSP2)**: This is the middle of the road scenario that can also be seen as the most likely path for each country. It combines for all countries medium fertility with medium mortality, medium migration, and the Global Education Trend (GET) education scenario.
+      <%- elif scenario == "3" %>
+      **Population Component of Stalled Development (SSP3)**: This scenario portrays a world separated into regions characterized by extreme poverty, pockets of moderate wealth, and many countries struggling to maintain living standards for rapidly growing populations. This is associated with low education, high mortality and high fertility. Due to the emphasis on security and barriers to international exchange, migration is assumed to be low for all countries.
+      <%- elif scenario == "4" %>
+      **Population Component of Inequality (SSP4)**: This scenario assumes increasing inequalities and stratification both across and within countries. It assumes high fertility and mortality scenarios in high-fertility countries and low fertility and medium mortality scenarios in low-fertility countries combined with medium migration scenario. In terms of education the SSP3 education transitions (CER) are decreased by 10% for levels up to lower secondary education, keeping the SSP2 (GET) education transitions for upper and post-secondary education.
+      <%- elif scenario == "5" %>
+      **Population Component of Conventional Development (SSP5)**: This scenario is similar to SSP1 for the fertility, mortality and education assumptions except that it combines them with high migration scenario in a context of widespread globalization.
+      <%- endif %>
+    dim_edu: |-
+      <% if education == "total" %>
+      Over all education categories.
+      <% elif education == "under_15" %>
+      Population below 15 years old.
+      <% elif education == "no_education" %>
+      Highest level of education attained: No level and Grade 1 of ISCED 1 not completed.
+      <% elif education == "incomplete_primary" %>
+      Highest level of education attained: Incomplete ISCED 1.
+      <% elif education == "primary" %>
+      Highest level of education attained: Completed ISCED 1 and incomplete ISCED 2.
+      <% elif education == "lower_secondary" %>
+      Highest level of education attained: Completed ISCED 2 and incomplete ISCED 3.
+      <% elif education == "upper_secondary" %>
+      Highest level of education attained: Completed ISCED 3 and incomplete ISCED 4 5 or 6.
+      <% elif education == "post_secondary" %>
+      Highest level of education attained: Completed ISCED 4 5 6 7 or 8.
+      <% endif %>
+    dim_edu_all: |-
+      Under-15: Population below 15 years old.
+      No education: Highest level of education attained: No level and Grade 1 of ISCED 1 not completed.
+      Incomplete primary: Highest level of education attained: Incomplete ISCED 1.
+      Primary: Highest level of education attained: Completed ISCED 1 and incomplete ISCED 2.
+      Lower secondary: Highest level of education attained: Completed ISCED 2 and incomplete ISCED 3.
+      Upper secondary: Highest level of education attained: Completed ISCED 3 and incomplete ISCED 4 5 or 6.
+      Post secondary: Highest level of education attained: Completed ISCED 4 5 6 7 or 8.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 730
+  title: Wittgenstein Centre, Human Capital (Historical data + Projections)
+
+tables:
+  main:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
+    variables:
+      # Population
+      growth:
+        title: |-
+          <% set title = "Average Annual Growth Rate" %>
+          {definitions.others.title}
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Rate of growth of the population over the period of one year. {definitions.others.projections}.
+        presentation:
+          topic_tags:
+            - Population Growth
+      nirate:
+        title: |-
+          <% set title = "Average Annual Rate of Natural Increase" %>
+          {definitions.others.title}
+        unit: "per 1,000 people"
+        description_short: |-
+          Represents the portion of population growth (or decline) determined exclusively by births and deaths. {definitions.others.projections}.
+        display:
+          numDecimalPlaces: 1
+        presentation:
+          topic_tags:
+            - Population Growth
+
+      # Years
+      ggapmys15:
+        title: |-
+          <% set title = "Gender Gap in Mean Years Schooling (15+)" %>
+          {definitions.others.title}
+        unit: years
+        description_short: |-
+          The difference between female and male mean years of schooling for the population over 15 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Global Education
+      ggapmys25:
+        title: |-
+          <% set title = "Gender Gap in Mean Years Schooling (25+)" %>
+          {definitions.others.title}
+        unit: years
+        description_short: |-
+          The difference between female and male mean years of schooling for population over 25 years of age. {definitions.others.projections}. Negative values indicate that women spent fewer years in school.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          topic_tags:
+            - Global Education
+      mage:
+        title: |-
+          <% set title = "Population Median Age" %>
+          {definitions.others.title}
+        unit: years
+        description_short: |-
+          Age that divides the population in two parts of equal size, that is, there are as many persons with ages above the median as there are with ages below the median. {definitions.others.projections}.
+        presentation:
+          topic_tags:
+            - Population Growth
+
+      # Rates (Births, Deaths)
+      cbr:
+        title: |-
+          <% set title = "Crude Birth Rate" %>
+          {definitions.others.title}
+        unit: births per 1,000 people
+        description_short: |-
+          Number of live births recorded over the last 5-year period, divided by population-years. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.others.projections}.
+        presentation:
+          topic_tags:
+            - Fertility Rate
+            - Population Growth
+
+      cdr:
+        title: |-
+          <% set title = "Crude Death Rate" %>
+          {definitions.others.title}
+        unit: deaths per 1,000 people
+        description_short: |-
+          Number of deaths recorded in the last 5-year period, divided by population-years. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.others.projections}.
+        presentation:
+          topic_tags:
+            - Population Growth
+            - Life Expectancy
+
+      # Ratios
+      tdr:
+        title: |-
+          <% set title = "Total Dependency Ratio" %>
+          {definitions.others.title}
+        unit: "%"
+        description_short: |-
+          The ratio of the youth (0-14) and elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
+        description_processing: |-
+          The source gives the values as the number of young and elderly persons per person of working age. We have scaled the figures to have percentages instead.
+        presentation:
+          topic_tags:
+            - Age Structure
+      ydr:
+        title: |-
+          <% set title = "Youth Dependency Ratio" %>
+          {definitions.others.title}
+        unit: "%"
+        description_short: |-
+          The ratio of the youth (0-14) population over the working age (15-64) population. {definitions.others.projections}.
+        description_processing: |-
+          The source gives the values as the number of young persons per person of working age. We have scaled the figures to have percentages instead.
+        presentation:
+          topic_tags:
+            - Age Structure
+
+      odr:
+        title: |-
+          <% set title = "Old-age Dependency Ratio" %>
+          {definitions.others.title}
+        unit: "%"
+        description_short: |-
+          The ratio of the elderly (65+) population over the working age (15-64) population. {definitions.others.projections}.
+        description_processing: |-
+          The source gives the values as the number of elderly persons per person of working age. We have scaled the figures to have percentages instead.
+        presentation:
+          topic_tags:
+            - Age Structure
+
+  by_age:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
+    variables:
+      sexratio:
+        title: |-
+          <% set title = "Sex ratio" %>
+          {definitions.others.title_age}
+        unit: "males per 100 females"
+        description_short: |-
+          <% if age == "total" %>
+          The number of male population per 100 female population. {definitions.others.projections}.
+          <%- else %>
+          The number of male population per 100 female population (aged << age >>). {definitions.others.projections}.
+          <%- endif %>
+        presentation:
+          topic_tags:
+            - Gender Ratio
+
+  by_sex:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
+    variables:
+      e0:
+        title: |-
+          <% set title = "Life expectancy" %>
+          {definitions.others.title_sex}
+        unit: "years"
+        description_short: |-
+          <% if sex == "total" %>
+          The number of years a newborn is expected to live. {definitions.others.projections}.
+          <%- else %>
+          The number of years a << sex >> newborn is expected to live. {definitions.others.projections}.
+          <% endif %>
+        presentation:
+          topic_tags:
+            - Life Expectancy
+      ryl15:
+        title: |-
+          <% set title = "Age when remaining Life Expectancy is below 15 years" %>
+          {definitions.others.title_sex}
+        unit: "years"
+        description_short: |-
+          <% if sex == "total" %>
+          The age of a person in a population when remaining life expectancy is 15 years. {definitions.others.projections}.
+          <%- else %>
+          The age of a << sex >> person in a population when remaining life expectancy is 15 years. {definitions.others.projections}.
+          <%- endif %>
+        description_processing: |-
+          Source: [Lutz et al. 2008](https://previous.iiasa.ac.at/web/home/research/researchPrograms/WorldPopulation/PublicationsMediaCoverage/POPNETNewsletter/popnet39.pdf#page=4)
+        presentation:
+          topic_tags:
+            - Life Expectancy
+      pryl15:
+        title: |-
+          <% set title = "Proportion of population with a remaining Life Expectancy below 15 Years" %>
+          {definitions.others.title_sex}
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          <% if sex == "total" %>
+          Proportion of the population with a remaining life expectancy below 15 years in the total population. {definitions.others.projections}.
+          <%- else %>
+          Proportion of the << sex >> population with a remaining life expectancy below 15 years in the total population. {definitions.others.projections}.
+          <%- endif %>
+        description_processing: |-
+          Source: [Sanderson and Scherbov 2010](https://dataexplorer.wittgensteincentre.org/wcde-v3/www.iiasa.ac.at/web/home/research/researchPrograms/WorldPopulation/PublicationsMediaCoverage/POPNETNewsletter/popnet42.pdf#page=6)
+        presentation:
+          topic_tags:
+            - Life Expectancy
+
+  by_edu:
+    variables:
+      ggapedu15:
+        title: |-
+          <% set title = "Gender gap in Educational Attainment (15+)" %>
+          {definitions.others.title_edu}
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The difference between the proportion of females and the proportion of males in the population over 15 years of age achieving education level "{definitions.others.education}". {definitions.others.projections}.
+        presentation:
+          topic_tags:
+            - Global Education
+      ggapedu25:
+        title: |-
+          <% set title = "Gender gap in Educational Attainment (25+)" %>
+          {definitions.others.title_edu}
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The difference between the proportion of females and the proportion of males in the population over 25 years of age achieving education level "{definitions.others.education}". {definitions.others.projections}.
+        presentation:
+          topic_tags:
+            - Global Education
+      # macb:
+      #   title: |-
+      #     <% set title = "Mean age at childbearing" %>
+      #     {definitions.others.title_edu}
+      #   unit: "years"
+      #   short_unit: "years"
+      #   description_short: |-
+      #     <% if education == "total" %>
+      #     The mean age of mothers at the birth of their children observed in the last five-year period. {definitions.others.projections}.
+      #     <%- else %>
+      #     The mean age of mothers at the birth of their children observed in the last five-year period. Data for people with education level "{definitions.others.education}". {definitions.others.projections}.
+      #     <%- endif %>
+      #   presentation:
+      #     topic_tags:
+      #       - Fertility Rate
+      tfr:
+        title: |-
+          <% set title = "Total Fertility Rate" %>
+          {definitions.others.title_edu}
+        unit: "births per woman in last 5 years"
+        description_short: |-
+          <% if education == "total" %>
+          The average number of children born in the last 5-year period to the women of reproductive age (15-49).
+          <%- else %>
+          The average number of children born in the last 5-year period to the women of reproductive age (15-49). Data for people with education level "{definitions.others.education}". {definitions.others.projections}.
+          <%- endif %>
+        presentation:
+          topic_tags:
+            - Fertility Rate
+      # net:
+      #   title: |-
+      #     <% set title = "Net migration" %>
+      #     {definitions.others.title_edu}
+      #   unit: "people"
+      #   description_short: |-
+      #     <% if education == "total" %>
+      #     The number of immigrants minus the number of emigrants over the last five-year period. {definitions.others.projections}.
+      #     <%- else %>
+      #     The number of immigrants minus the number of emigrants over the last five-year period. Data for migrants with education level "{definitions.others.education}". {definitions.others.projections}.
+      #     <%- endif %>
+      #   presentation:
+      #     topic_tags:
+      #       - Migration
+
+  by_sex_age:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
+    variables:
+      mys:
+        title: |-
+          <% set title = "Mean years of schooling" %>
+          {definitions.others.title_sex_age}
+        unit: years
+        description_short: |-
+          <%- if (age == "total") and (sex == "total") %>
+          Mean number of years spent in school. {definitions.others.projections}.
+          <%- elif (age != "total") and (sex == "total") %>
+          Mean number of years spent in school (aged <<age>>). {definitions.others.projections}.
+          <%- elif (age == "total") and (sex != "total") %>
+          Mean number of years spent in school (<<sex>>s). {definitions.others.projections}.
+          <%- else %>
+          Mean number of years spent in school (aged <<age>>, <<sex>>s). {definitions.others.projections}.
+          <%- endif %>
+        presentation:
+          topic_tags:
+            - Global Education
+
+  by_age_edu:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
+    variables:
+      asfr:
+        title: |-
+          <% set title = "Age-Specific Fertility Rate" %>
+          {definitions.others.title_age_edu}
+        unit: births per 1,000 women
+        description_short: |-
+          <%- if (education == "total") %>
+          Number of births occurring to women aged <<age>> in the last five years, divided by the number of women in the age group. {definitions.others.projections}.
+          <%- elif (education == "no_education") %>
+          Number of births occurring to women aged <<age>> and no education in the last five years, divided by the number of women in that same group. {definitions.others.projections}.
+          <%- else %>
+          Number of births occurring to women aged <<age>> and {definitions.others.education}-level education in the last five years, divided by the number of women in that age group. {definitions.others.projections}.
+          <%- endif %>
+        presentation:
+          topic_tags:
+            - Global Education
+            - Fertility Rate
+
+  by_sex_age_edu:
+    common:
+      description_key:
+        - "{definitions.others.dim_ssp}"
+
+    variables:
+      assr:
+        title: |-
+          <% set title = "Age-Specific Survival Ratio" %>
+          {definitions.others.title_sex_age_edu}
+        unit: "%"
+        description_short: |-
+          <%- if (education == "total") %>
+          <%- if (age == "newborn") %>
+          The percentage of the <<sex>> newborn who are alive after the last five-year period. {definitions.others.projections}.
+          <%- else %>
+          The percentage of the <<sex>> population aged <<age>> who are alive after the last five-year period. {definitions.others.projections}.
+          <%- endif %>
+          <%- elif (education == "no_education") %>
+          The percentage of the <<sex>> population aged <<age>> with no education who are alive after the last five-year period. {definitions.others.projections}.
+          <%- else %>
+          The percentage of the <<sex>> population aged <<age>> with <<education>> education who are alive after the last five-year period. {definitions.others.projections}.
+          <%- endif %>
+        presentation:
+          topic_tags:
+            - Life Expectancy
+
+      pop:
+        title: |-
+          <% set title = "Population" %>
+          {definitions.others.title_sex_age_edu}
+        unit: "people"
+        description_short: |-
+          De facto population
+          <%- if (sex != "total") %>
+           of <<sex>>s
+          <%- endif %>
+          <%- if (age != "total") %>
+           aged <<age>>
+          <%- endif %>
+          <%- if (education != "total") %>
+           with <%- if (education == "no_education") %>no education<%- else %><<education>> education<%- endif %>
+          <%- endif %>
+           in a country or region.
+        presentation:
+          topic_tags:
+            - Population Growth
+
+      prop:
+        title: |-
+          <% set title = "Educational Attainment Distribution" %>
+          {definitions.others.title_sex_age_edu}
+        unit: "%"
+        description_short: |-
+          De facto share of population
+          <%- if (sex != "total") %>
+           of <<sex>>s
+          <%- endif %>
+          <%- if (age != "total") %>
+           aged <<age>>
+          <%- endif %>
+          <%- if (education != "total") %>
+           with <%- if (education == "no_education") %>no education<%- elif (education == "some_education") %>some formal education<%- else %><<education>> education<%- endif %>
+          <%- endif %>
+           in a country or region.
+        description_processing: |-
+          We have estimated this indicator with the population values from this source.
+        presentation:
+          topic_tags:
+            - Global Education

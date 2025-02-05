@@ -66,6 +66,7 @@ Yes|On-grid |Wind                |Offshore wind       |Offshore wind energy     
 Yes|On-grid |Wind                |Onshore wind        |Onshore wind energy       -> On-grid |Onshore wind
 
 """
+
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.datautils.dataframes import map_series
@@ -334,7 +335,7 @@ def run(dest_dir: str) -> None:
     #
     # Load dataset from Meadow and read its main table.
     ds_meadow = paths.load_dataset("renewable_capacity_statistics")
-    tb = ds_meadow.read_table("renewable_capacity_statistics")
+    tb = ds_meadow.read("renewable_capacity_statistics")
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")

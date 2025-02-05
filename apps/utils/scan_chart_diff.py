@@ -1,13 +1,14 @@
 import click
-import requests
+import streamlit as st
 from rich_click.rich_command import RichCommand
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from structlog import get_logger
 
+from apps.owidbot import github_utils as gh_utils
 from apps.owidbot.cli import cli as owidbot_cli
 from etl import config
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 log = get_logger()
 
@@ -23,7 +24,7 @@ def cli(dry_run: bool) -> None:
     """Scan all open PRs in the etl repository and run
     `etl owidbot etl/branch --services chart-diff` against them.
     """
-    active_prs = get_prs_from_repo("etl")
+    active_prs = gh_utils.get_prs_from_repo("etl")
 
     log.info("scan-chart-diff.init", active_prs=active_prs)
 
@@ -34,6 +35,9 @@ def cli(dry_run: bool) -> None:
             args.append("--dry-run")
 
         try:
+            # Make sure to clear state, otherwise we'd be using cached state from previous
+            # branch.
+            st.session_state.clear()
             owidbot_cli(args, standalone_mode=False)
         except ProgrammingError as e:
             # MySQL is being refreshed and tables are not ready
@@ -61,31 +65,3 @@ def cli(dry_run: bool) -> None:
                 continue
             else:
                 raise e
-
-
-def get_prs_from_repo(repo):
-    active_prs = []
-    # Start with the first page
-    url = f"https://api.github.com/repos/owid/{repo}/pulls?per_page=100"
-
-    while url:
-        response = requests.get(url)
-        response.raise_for_status()  # To handle HTTP errors
-        js = response.json()
-
-        # Collect PR head refs from the current page
-        for d in js:
-            # only owid PRs
-            if d["head"]["label"].startswith("owid:"):
-                active_prs.append(d["head"]["ref"])
-
-        # Check for the 'next' page link in the headers
-        if "next" in response.links:
-            url = response.links["next"]["url"]
-        else:
-            url = None  # No more pages
-
-    # exclude dependabot PRs
-    active_prs = [pr for pr in active_prs if "dependabot" not in pr]
-
-    return active_prs

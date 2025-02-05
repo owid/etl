@@ -1,5 +1,43 @@
 steps:
-  data-private://grapher/fasttrack/2023-03-27/global_warming_contributions:
-  - snapshot-private://fasttrack/2023-03-27/global_warming_contributions.csv
-  data-private://grapher/fasttrack/2023-01-19/food_expenditures_by_country:
-  - snapshot-private://fasttrack/2023-01-19/food_expenditures_by_country.csv
+  data://grapher/fasttrack/latest/democracy_lexical_index:
+    - snapshot://fasttrack/latest/democracy_lexical_index.csv
+  data://grapher/fasttrack/latest/mineral_prices_usgs:
+    - snapshot://fasttrack/latest/mineral_prices_usgs.csv
+  data://grapher/fasttrack/2023-04-30/paratz:
+    - snapshot://fasttrack/2023-04-30/paratz.csv
+  data-private://grapher/fasttrack/2023-08-14/gbif_animal_presence:
+    - snapshot-private://fasttrack/2023-08-14/gbif_animal_presence.csv
+  #mpox data - Africa CDC
+  data://grapher/fasttrack/latest/africa_cdc:
+    - snapshot://fasttrack/latest/africa_cdc.csv
+  data://grapher/fasttrack/latest/gpei:
+    - snapshot://fasttrack/latest/gpei.csv
+  data://grapher/fasttrack/2023-05-31/cholera:
+    - snapshot://fasttrack/2023-05-31/cholera.csv
+  data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe:
+    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
+  # Guinea worm data
+  data://grapher/fasttrack/2023-06-16/guinea_worm:
+    - snapshot://fasttrack/2023-06-16/guinea_worm.csv
+  data://grapher/fasttrack/2024-06-17/guinea_worm:
+    - snapshot://fasttrack/2024-06-17/guinea_worm.csv
+  data://grapher/fasttrack/2023-06-28/guinea_worm:
+    - snapshot://fasttrack/2023-06-28/guinea_worm.csv
+
+  # Others
+  data-private://grapher/fasttrack/latest/metaculus__complementary_data:
+    - snapshot-private://fasttrack/latest/metaculus__complementary_data.csv
+  data://grapher/fasttrack/2023-05-03/qubits:
+    - snapshot://fasttrack/2023-05-03/qubits.csv
+  data://grapher/fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024:
+    - snapshot://fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024.csv
+  data-private://grapher/fasttrack/latest/literate_population:
+    - snapshot-private://fasttrack/latest/literate_population.csv
+  data-private://grapher/fasttrack/latest/germany_hypothetical_constant_nuclear:
+    - snapshot-private://fasttrack/latest/germany_hypothetical_constant_nuclear.csv
+  data-private://grapher/fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef:
+    - snapshot-private://fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef.csv
+  data-private://grapher/fasttrack/latest/fiscal_top1_shares_country_standardized:
+    - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
+  data://grapher/fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1:
+    - snapshot://fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1.csv

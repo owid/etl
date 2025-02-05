@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     #
     tb = tb.rename(columns={"assessment_domain": "country"})
     tb = tb.drop(columns=["benchmark"])
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"])
     #
     # Save outputs.
     #

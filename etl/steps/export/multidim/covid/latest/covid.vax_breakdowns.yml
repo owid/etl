@@ -55,7 +55,6 @@ views:
         - "{definitions.table}#total_vaccinations__vaccine_skycovione"
         - "{definitions.table}#total_vaccinations__vaccine_valneva"
     config:
-      type: "StackedArea"
+      chartTypes: ["StackedArea"]
       selectedEntityNames:
         - European Union (27)
-

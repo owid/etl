@@ -1,6 +1,5 @@
-"""Load snapshot of Ember's Yearly Electricity Data and create a raw data table.
+"""Load snapshot of Ember's Yearly Electricity Data and create a raw data table."""
 
-"""
 from etl.helpers import PathFinder, create_dataset
 
 # Get naming conventions.
@@ -13,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Load snapshot and read its data.
     snap = paths.load_snapshot("yearly_electricity.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

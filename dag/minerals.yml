@@ -68,6 +68,11 @@ steps:
   data://grapher/minerals/2024-07-15/minerals:
     - data://garden/minerals/2024-07-15/minerals
   #
+  # Minerals - Minerals.
+  #
+  data://grapher/minerals/2024-07-15/global_mine_production_by_mineral:
+    - data://garden/minerals/2024-07-15/minerals
+  #
   # Minerals - Minerals explorer.
   #
   export://explorers/minerals/latest/minerals:

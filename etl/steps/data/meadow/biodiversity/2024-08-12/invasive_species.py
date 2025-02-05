@@ -18,11 +18,11 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("invasive_species.xlsx")
     origins = [snap.metadata.origin]
 
-    tb_cont = snap.read(sheet_name="ContinentalTrends")
+    tb_cont = snap.read(safe_types=False, sheet_name="ContinentalTrends")
     tb_cont = format_continental_trends(tb_cont)
     tb_cont = tb_cont.format(["year", "continent"], short_name="continental")
 
-    tb_glob = snap.read(sheet_name="GlobalTrends")
+    tb_glob = snap.read(safe_types=False, sheet_name="GlobalTrends")
     tb_glob["country"] = "World"
     tb_glob = tb_glob.format(["country", "year"], short_name="global")
     # Adding the origins in

@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -50,7 +49,7 @@ def run(dest_dir: str) -> None:
         not tb["assessment_domain"].isnull().any()
     ), "There are NaN values in the 'assessment_domain' column. Make sure you've mapped all benchmarks to their respective assessment domains."
 
-    tb = tb.set_index(["benchmark", "year"], verify_integrity=True)
+    tb = tb.format(["benchmark", "year"])
 
     #
     # Save outputs.

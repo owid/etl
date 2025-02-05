@@ -1,0 +1,45 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      title_public: Birth rate
+      topic_tags:
+        - Fertility Rate
+    display:
+      name: |-
+        Birth rate
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Birth Rate (HMD; UN WPP)
+  update_period_days: 365
+
+tables:
+  birth_rate:
+    variables:
+      birth_rate:
+        title: Birth rate
+        unit: births per 1,000 people
+        description_short: |-
+          The total number of births per 1,000 people in a given year.
+        description_processing: |-
+          The birth data is constructed by combining data from multiple sources:
+
+          - Before 1950: Historical estimates by Human Mortality Database (2024).
+
+          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+
+          - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
+
+      birth_rate_hist:
+        title: Birth rate (historical)
+        unit: births per 1,000 people
+        description_short: |-
+          The total number of births per 1,000 people in a given year.
+        description_processing: |-
+          The birth data is constructed by combining data from multiple sources:
+
+          - Before 1950: Historical estimates by Human Mortality Database (2024).
+
+          - 1950-2023: Population records by the UN World Population Prospects (2024 revision).

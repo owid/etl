@@ -8,6 +8,10 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+TABLES_EXCLUDE = [
+    "fertility_single",
+]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -15,10 +19,11 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("un_wpp")
+
     #
     # Process data.
     #
-    tables = [reshape_table(ds_garden[tb_name]) for tb_name in ds_garden.table_names]
+    tables = [reshape_table(ds_garden[tb_name]) for tb_name in ds_garden.table_names if tb_name not in TABLES_EXCLUDE]
 
     # Edit title
     ds_garden.metadata.title = cast(str, ds_garden.metadata.title) + " (projections full timeseries)"

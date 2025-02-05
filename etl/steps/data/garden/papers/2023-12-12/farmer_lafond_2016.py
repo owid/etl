@@ -1,6 +1,4 @@
-"""Harmonize data from Farmer & Lafond (2016) paper on the evolution of the cost of different technologies.
-
-"""
+"""Harmonize data from Farmer & Lafond (2016) paper on the evolution of the cost of different technologies."""
 
 from etl.helpers import PathFinder, create_dataset
 

@@ -670,3 +670,19 @@ tables:
   # All metadata for maize_and_wheat and fertilizer_exports is prepared via script.
   # maize_and_wheat:
   # fertilizer_exports:
+  net_exports_as_share_of_supply:
+    variables:
+      net_exports_as_share_of_supply:
+        title: Net trade of food products as a share of domestic supply
+        unit: "%"
+        short_unit: "%"
+        description_short: |
+          Net exported tonnes of food products expressed as a share of domestic supply. This includes items primarily intended for human consumption, but some may also be used for non-food purposes such as biofuels or animal feed. Positive values mean that countries are net exporters and negative values mean they are net importers.
+        description_key:
+          - "The data includes food items across the following groups: cereals and grains, pulses, starchy roots, fruits and vegetables, oils and fats, sugar, meat, dairy and eggs, alcoholic beverages, and other products. The latter group includes miscellaneous items such as spices, offals, and other minor commodities."
+          - "Note that while these items are primarily for food consumption, they may also be used for non-food purposes such as biofuels or animal feed."
+        description_processing: |
+          - This indicator is calculated as 100 x (exports - imports) / domestic supply.
+          - Imports, exports, and domestic supply encompass the total of all items across the following groups: cereals and grains, pulses, starchy roots, fruits and vegetables, oils and fats, sugar, meat, dairy and eggs, alcoholic beverages, and an other products. The latter group includes miscellaneous items such as spices, offals, and other minor commodities.
+        display:
+          numDecimalPlaces: 1

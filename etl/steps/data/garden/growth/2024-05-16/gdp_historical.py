@@ -1,6 +1,6 @@
 """
 This code combines the data of three different sources of GDP and GDP per capita:
-    - World Bank (WDI), in 2017 PPPs (coverage from 1990 to the most recent year available)
+    - World Bank (WDI), in 2021 PPPs (coverage from 1990 to the most recent year available)
     - Maddison Project Database, in 2011 PPPs (coverage from 1820 to the most recent year available)
     - Maddison Database, in 1990 PPPs (coverage from 1 CE to 2008)
 
@@ -179,7 +179,7 @@ def create_estimations_from_growth(
             tb[f"{var}_estimated"] = to_adjust_value * tb[f"{var}_scalar"]
 
             # Rename the estimated variables without the suffix
-            tb[f"{var}"] = tb[f"{var}{to_adjust_var_suffix}"].fillna(tb[f"{var}_estimated"])
+            tb[f"{var}"] = tb[f"{var}{to_adjust_var_suffix}"].astype("Float64").fillna(tb[f"{var}_estimated"])
 
     # Specify "World" entity for each row
     tb["country"] = "World"

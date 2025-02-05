@@ -7,6 +7,7 @@ import datetime as dt
 import re
 import sys
 import tempfile
+import time
 from collections.abc import Generator
 from contextlib import contextmanager
 from functools import cache
@@ -36,12 +37,11 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 from sqlalchemy.orm import Session
 
-import etl.grapher_model as gm
+import etl.grapher.model as gm
 from etl import paths
 from etl.config import DEFAULT_GRAPHER_SCHEMA, TLS_VERIFY
 from etl.db import get_engine
 from etl.explorer import Explorer
-from etl.explorer_helpers import Explorer as ExplorerOld
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import load_dag
 
@@ -65,32 +65,9 @@ def downloaded(url: str) -> Iterator[str]:
         yield tmp.name
 
 
-def get_latest_github_sha(org: str, repo: str, branch: str) -> str:
-    # Use Github's list-branches API to get the sha1 of the most recent commit
-    # https://docs.github.com/en/rest/reference/repos#list-branches
-    branches = _get_github_branches(org, repo)
-    (match,) = [b for b in branches if b["name"] == branch]
-    return cast(str, match["commit"]["sha"])
-
-
-def _get_github_branches(org: str, repo: str) -> List[Any]:
-    import requests
-
-    url = f"https://api.github.com/repos/{org}/{repo}/branches?per_page=100"
-    resp = requests.get(url, headers={"Accept": "application/vnd.github.v3+json"}, verify=TLS_VERIFY)
-    if resp.status_code != 200:
-        raise Exception(f"got {resp.status_code} from {url}")
-
-    branches = cast(List[Any], resp.json())
-    if len(branches) == 100:
-        raise Exception("reached single page limit, should paginate request")
-
-    return branches
-
-
 def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
     """Check that the table is in the correct format for Grapher."""
-    from etl import grapher_helpers as gh
+    from etl.grapher import helpers as gh
 
     assert ds.metadata.title, "Dataset must have a title."
 
@@ -100,7 +77,7 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
                 year = tab["year"]
             else:
                 year = tab.index.get_level_values("year")
-            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {tab['year'].dtype}"
+            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {year.dtype}"
         elif {"date", "country"} <= set(tab.all_columns):
             pass
         else:
@@ -200,6 +177,7 @@ def create_dataset(
     default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
     underscore_table: bool = True,
     camel_to_snake: bool = False,
+    long_to_wide: Optional[bool] = None,
     formats: List[FileFormat] = DEFAULT_FORMATS,
     check_variables_metadata: bool = False,
     run_grapher_checks: bool = True,
@@ -221,6 +199,7 @@ def create_dataset(
     :param default_metadata: The default metadata to use for the dataset, could be either SnapshotMeta or DatasetMeta.
     :param underscore_table: Whether to underscore the table name before adding it to the dataset.
     :param camel_to_snake: Whether to convert camel case to snake case for the table name.
+    :param long_to_wide: Convert data in long format (with dimensions) to wide format (flattened).
     :param check_variables_metadata: Check that all variables in tables have metadata; raise a warning otherwise.
     :param run_grapher_checks: Run grapher checks on the dataset, only applies to grapher channel.
     :param yaml_params: Dictionary of parameters that can be used in the metadata yaml file.
@@ -262,6 +241,11 @@ def create_dataset(
 
     ds = _set_metadata_from_dest_dir(ds, dest_dir)
 
+    meta_path = get_metadata_path(str(dest_dir))
+
+    # Raise an error if there's a variable in YAML that is not in the dataset
+    extra_variables = "raise"
+
     # add tables to dataset
     used_short_names = set()
     for table in tables:
@@ -270,16 +254,48 @@ def create_dataset(
         if table.metadata.short_name in used_short_names:
             raise ValueError(f"Table short name `{table.metadata.short_name}` is already in use.")
         used_short_names.add(table.metadata.short_name)
+
+        from etl.grapher import helpers as gh
+
+        # Default long_to_wide for grapher channel is true
+        if long_to_wide is None:
+            long_to_wide = ds.metadata.channel == "grapher"
+
+        # Expand long to wide
+        if long_to_wide:
+            if ds.metadata.channel != "grapher":
+                log.warning("It is recommended to use long_to_wide=True only in the grapher channel")
+
+            dim_names = set(table.index.names) - {"country", "code", "year", "date", None}
+            if dim_names:
+                # First pass to update metadata from YAML
+                if meta_path.exists():
+                    table.update_metadata_from_yaml(meta_path, table.m.short_name)  # type: ignore
+                log.info("long_to_wide.start", shape=table.shape, short_name=table.m.short_name, dim_names=dim_names)
+                t = time.time()
+                table = gh.long_to_wide(table)
+                log.info("long_to_wide.end", shape=table.shape, short_name=table.m.short_name, t=time.time() - t)
+
+                # Ignore extra variables for the following pass of metadata
+                extra_variables = "ignore"
+            else:
+                log.info("long_to_wide.skip", short_name=table.m.short_name)
+
         ds.add(table, formats=formats, repack=repack)
 
-    meta_path = get_metadata_path(str(dest_dir))
     if meta_path.exists():
-        ds.update_metadata(meta_path, if_origins_exist=if_origins_exist, yaml_params=yaml_params, errors=errors)
+        ds.update_metadata(
+            meta_path,
+            if_origins_exist=if_origins_exist,
+            yaml_params=yaml_params,
+            errors=errors,
+            extra_variables=extra_variables,
+        )
 
     # another override YAML file with higher priority
     meta_override_path = get_metadata_path(str(dest_dir)).with_suffix(".override.yml")
     if meta_override_path.exists():
-        ds.update_metadata(meta_override_path, if_origins_exist=if_origins_exist)
+        ds.update_metadata(meta_override_path, if_origins_exist=if_origins_exist, extra_variables=extra_variables)
 
     # run grapher checks
     if ds.metadata.channel == "grapher" and run_grapher_checks:
@@ -594,7 +610,7 @@ class PathFinder:
         if channel_type.startswith(("walden", "snapshot")):
             channel = channel_type
             namespace, version, short_name = path.split("/")
-        elif channel_type.startswith(("data",)):
+        elif channel_type.startswith(("data", "export")):
             channel, namespace, version, short_name = path.split("/")
         else:
             raise WrongStepName
@@ -657,7 +673,8 @@ class PathFinder:
             short_name=short_name,
             is_private=is_private,
         )
-        matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+        deps = self.dependencies
+        matches = _match_dependencies(pattern, deps)
 
         # If no step was found and is_private was not specified, try again assuming step is private.
         if (len(matches) == 0) and (is_private is None):
@@ -669,7 +686,7 @@ class PathFinder:
                 short_name=short_name,
                 is_private=True,
             )
-            matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+            matches = _match_dependencies(pattern, self.dependencies)
 
         # If not step was found and channel is "grapher", try again assuming this is a grapher://grapher step.
         if (len(matches) == 0) and (channel == "grapher"):
@@ -681,7 +698,7 @@ class PathFinder:
                 short_name=short_name,
                 is_private=is_private,
             )
-            matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+            matches = _match_dependencies(pattern, self.dependencies)
 
         if len(matches) == 0:
             raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
@@ -765,6 +782,11 @@ class PathFinder:
             path = self.mdim_path
         config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
         return config
+
+
+def _match_dependencies(pattern: str, dependencies: List[str]) -> List[str]:
+    regex = re.compile(pattern)
+    return [dependency for dependency in dependencies if regex.match(dependency)]
 
 
 def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:
@@ -1141,30 +1163,6 @@ def create_dag_archive_file(dag_file_archive: Path) -> None:
         file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")
 
 
-def create_explorer_old(
-    dest_dir: Union[str, Path],
-    config: Dict[str, Any],
-    df_graphers: pd.DataFrame,
-    df_columns: Optional[pd.DataFrame] = None,
-) -> ExplorerOld:
-    # Extract information about this step from dest_dir.
-    channel, namespace, version, short_name = str(dest_dir).split("/")[-4:]
-    # Initialize explorer.
-    explorer = ExplorerOld(short_name)
-    # Add a comment to avoid manual edits.
-    explorer.comments = [
-        f"# DO NOT EDIT THIS FILE MANUALLY. IT WAS GENERATED BY ETL step '{channel}/{namespace}/{version}/{short_name}'."
-    ]
-    # Update its config.
-    explorer.config.update(config)
-    # Update its graphers and columns tables.
-    explorer.df_graphers = df_graphers
-    if df_columns is not None:
-        explorer.df_columns = df_columns
-
-    return explorer
-
-
 def create_explorer(
     dest_dir: Union[str, Path],
     config: Dict[str, Any],
@@ -1206,7 +1204,7 @@ def map_indicator_path_to_id(catalog_path: str) -> str | int:
 def get_schema_from_url(schema_url: str) -> dict:
     """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
 
-    https://files.ourworldindata.org/schemas/grapher-schema.005.json
+    https://files.ourworldindata.org/schemas/grapher-schema.006.json
 
     More details on available versions can be found
     at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema.

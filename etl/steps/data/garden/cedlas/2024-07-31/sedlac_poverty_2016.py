@@ -36,8 +36,8 @@ def run(dest_dir: str) -> None:
     # Remove duplicate rows and spells from tables, for Grapher datasets
     tb_no_spells = remove_spells_duplicates_and_add_urban(tb=tb, short_name="sedlac_no_spells")
 
-    tb = tb.set_index(["country", "year", "survey_number", "survey", "table"], verify_integrity=True)
-    tb_no_spells = tb_no_spells.set_index(["country", "year", "table"], verify_integrity=True)
+    tb = tb.format(["country", "year", "survey_number", "survey", "table"])
+    tb_no_spells = tb_no_spells.format(["country", "year", "table"])
 
     #
     # Save outputs.

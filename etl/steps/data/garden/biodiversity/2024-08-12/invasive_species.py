@@ -16,10 +16,10 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("invasive_species")
 
     # Read table from meadow dataset.
-    tb_cont = ds_meadow["continental"].reset_index()
+    tb_cont = ds_meadow.read("continental")
     tb_cont = tb_cont.rename(columns={"continent": "country"})
 
-    tb_glob = ds_meadow["global"].reset_index()
+    tb_glob = ds_meadow.read("global")
     # Combine the global and continental datasets
     tb = pr.concat([tb_cont, tb_glob])
     # Not clear from the paper what this group includes, and there aren't many of them so I'll drop it for now

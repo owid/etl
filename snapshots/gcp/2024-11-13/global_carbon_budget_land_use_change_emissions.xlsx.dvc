@@ -17,12 +17,13 @@ meta:
     attribution: Global Carbon Budget (2024)
     attribution_short: GCB
     url_main: https://globalcarbonbudget.org/
+    url_download: https://globalcarbonbudgetdata.org/downloads/jGJH0-data/National_LandUseChange_Carbon_Emissions_2024v1.0.xlsx
     date_accessed: '2024-11-13'
     date_published: '2024-11-13'
     license:
       name: CC BY 4.0
       url: https://www.icos-cp.eu/data-services/about-data-portal/data-license
 outs:
-  - md5: 0ac3b67c3f24414f983913a5d227f1cd
-    size: 1592979
+  - md5: 3415714f06bf3c00dbd675e40a73152b
+    size: 1257748
     path: global_carbon_budget_land_use_change_emissions.xlsx

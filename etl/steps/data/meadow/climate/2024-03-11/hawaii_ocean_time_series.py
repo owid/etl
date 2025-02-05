@@ -1,6 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -19,7 +18,7 @@ def run(dest_dir: str) -> None:
     #
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["date"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(["date"], sort_columns=True)
 
     #
     # Save outputs.

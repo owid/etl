@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Global Antimicrobial Resitsance and Use Surveillance System (GLASS)
+    title: Global Antimicrobial Resistance and Use Surveillance System (GLASS)
     description: |-
       GLASS provides a standardized approach to the collection, analysis, interpretation and sharing of data by countries and seeks to actively support capacity building and monitor the status of existing and new national surveillance systems. Furthermore, GLASS promotes a shift from surveillance approaches based solely on laboratory data to a system that includes epidemiological, clinical, and population-level data. GLASS has been conceived to progressively incorporate data from surveillance of AMR in humans, such as monitoring of resistance and the use of antimicrobial medicines, including AMR in the food chain and in the environment.
     date_published: "2024-09-16"
@@ -14,7 +14,7 @@ meta:
     # Citation
     producer: World Health Organization
     citation_full: |-
-      Global AMR data - Global Antimicrobial Resitsance and Use Surveillance System (GLASS), World Health Organization (2024)
+      Global AMR data - Global Antimicrobial Resistance and Use Surveillance System (GLASS), World Health Organization (2024)
 
     attribution_short: WHO
 
@@ -28,6 +28,6 @@ meta:
       url: https://www.who.int/about/policies/terms-of-use
 
 outs:
-  - md5: 12d197f03c1dc917f7e27662bd2e581b
+  - md5: b1c4d820b37417b77214db814348233f
     size: 55169
     path: who_glass.zip

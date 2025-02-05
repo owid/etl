@@ -1,0 +1,22 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Human Height
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Human Height (Blum and Baten)
+
+tables:
+  height:
+    variables:
+      height:
+        title: Human height
+        unit: cm
+        short_unit: cm
+        description_short: Reconstruction of human heights by birth decade using a variety of different sources.
+        processing_level: minor

@@ -1,0 +1,34 @@
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Human Fertility Database
+    description: |-
+      The HFD is entirely based on one and the same type of initial data - officially registered birth counts by calendar year, mother's age (and/or cohort) and (whenever possible) biological birth order. These data, together with total female population exposure from the Human Mortality Database (www.mortality.org) and parity-specific female population exposure from selected population censuses, population registers, or large-scale surveys, are further processed using a uniform set of methods. The major HFD output includes detailed data on births, unconditional and conditional fertility rates, cohort and period fertility tables as well as selected aggregate indicators such as total fertility rates, mean ages at childbearing, and parity progression ratios.
+
+      For each country, there are four blocks of data provided:
+
+      - Summary Indicators
+      - Age-Specific Data
+      - Fertility Tables
+      - Input Data
+
+      More details at https://www.humanfertility.org/Data/ExplanatoryNotes, and https://www.humanfertility.org/File/GetDocumentFree/Docs/methods.pdf.
+    date_published: 2024-05-23
+    # Citation
+    producer: Human Fertility Database
+    citation_full: |-
+      Human Fertility Database. Max Planck Institute for Demographic Research (Germany) and Vienna Institute of Demography (Austria). Available at www.humanfertility.org (data downloaded on 2024-11-19).
+    attribution_short: HFD
+    # Files
+    url_main: https://www.humanfertility.org/Home/Index
+    url_download: https://www.humanfertility.org/File/Download/Files/zip/HFD.zip
+    date_accessed: 2024-11-19
+
+    # License
+    license:
+      url: https://www.mortality.org/Data/UserAgreement
+      name: CC BY 4.0
+outs:
+  - md5: e09ca5adeceb3c66996aa526ffa992c6
+    size: 38391495
+    path: hfd.zip

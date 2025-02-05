@@ -47,7 +47,7 @@ def run(dest_dir: str) -> None:
     tb = tb[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["region", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["region", "year"])
 
     #
     # Save outputs.

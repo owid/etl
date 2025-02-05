@@ -47,8 +47,8 @@ COMMODITY_MAPPING = {
     ("Cement", "Total"): ("Cement", "Processing"),
     # NOTE: The following could be mapped to ("Cesium", "Mine"), but it has only global data until 1977.
     ("Cesium", "Total"): None,
-    # NOTE: It's not clear what the following means.
-    #  According to the Word document in the excel file,
+    # NOTE: Chromium data is a bit problematic:
+    #  According to the Word document in the excel file of historical data,
     # "World production is an estimate of world chromite ore mine production measured in contained chromium.
     #  World production reported in gross weight was converted to contained chromium by assuming that its chromic oxide
     #  content was the same as that of chromite ore imported into the United States.
@@ -58,10 +58,9 @@ COMMODITY_MAPPING = {
     # World production of Ferrochromium, in tonnes of gross weight, has similar values to the previous.
     # In any case, USGS current only provides production data for chromite, as:
     # "Units are thousand metric tons, gross weight, of marketable chromite ore."
-    # Maybe both USGS historical and current report chromite, but the main difference is that USGS historical is in
-    # "contained chromium", whereas USGS current is in "contained chromium".
-    # But for now, we will keep only USGS current data.
-    ("Chromium", "Total"): None,
+    # So they cannot be combined, since USGS historical is in "contained chromium", whereas USGS current is in "gross weight". Numerically, they are significantly different.
+    # Therefore, we will keep the USGS historical data as "mine", and USGS current + BGS data as "mine, gross weight".
+    ("Chromium", "Total"): ("Chromium", "Mine"),
     # NOTE: Cobalt total is only used for unit value.
     ("Cobalt", "Total"): ("Cobalt", "Value"),
     # NOTE: Extracted from "world_mine_production".
@@ -86,10 +85,13 @@ COMMODITY_MAPPING = {
     # NOTE: The following could be mapped to ("Clays", "Mine, fuller's earth"). We decided to remove "Clays".
     ("Fuller's earth", "Total"): None,
     ("Gallium", "Total"): ("Gallium", "Refinery"),
+    ("Gemstones", "Total"): ("Gemstones", "Mine"),
     ("Germanium", "Total"): ("Germanium", "Refinery"),
     ("Gold", "Total"): ("Gold", "Mine"),
     ("Graphite", "Total"): ("Graphite", "Mine"),
     ("Gypsum", "Total"): ("Gypsum", "Mine"),
+    # In USGS current data, "Hafnium" is not reported, only "Zirconium and Hafnium".
+    ("Hafnium", "Total"): None,
     ("Helium", "Total"): ("Helium", "Mine"),
     ("Indium", "Total"): ("Indium", "Refinery"),
     # NOTE: Industrial diamond production includes natural and synthetic diamonds.
@@ -97,13 +99,18 @@ COMMODITY_MAPPING = {
     ("Industrial diamond", "Total"): ("Diamond", "Mine and synthetic, industrial"),
     ("Industrial garnet", "Total"): ("Garnet", "Mine"),
     ("Industrial sand and gravel", "Total"): ("Sand and gravel", "Mine, industrial"),
+    ("Iodine", "Total"): ("Iodine", "Mine"),
     ("Iron Oxide Pigments", "Total"): None,
+    ("Iron and Steel Scrap", "Total"): None,
     ("Iron and Steel Slag", "Total"): None,
     ("Iron ore", "Total"): ("Iron ore", "Mine, crude ore"),
     # NOTE: The following could be mapped to ("Clays", "Mine, kaolin"). We decided to remove "Clays".
     ("Kaolin", "Total"): None,
+    ("Kyanite", "Total"): None,
     ("Lead", "Total"): ("Lead", "Mine"),
     ("Lime", "Total"): ("Lime", "Processing"),
+    ("Lithium statistics", "Total"): ("Lithium", "Mine"),
+    ("Lumber", "Total"): None,
     ("Magnesium compounds", "Total"): ("Magnesium compounds", "Mine"),
     ("Magnesium metal", "Total"): ("Magnesium metal", "Smelter"),
     ("Manganese", "Total"): ("Manganese", "Mine"),
@@ -114,23 +121,34 @@ COMMODITY_MAPPING = {
     # NOTE: The following could be mapped to ("Clays", "Mine, miscellaneous"). We decided to remove "Clays".
     ("Miscellaneous clay", "Total"): None,
     ("Molybdenum", "Total"): ("Molybdenum", "Mine"),
+    ("Natural & Synthetic Rutile", "Total"): None,
     ("Nickel", "Total"): ("Nickel", "Mine"),
     ("Niobium", "Total"): ("Niobium", "Mine"),
     # NOTE: Extracted from "world_mine_production".
     ("Niobium", "Mine"): ("Niobium", "Mine"),
     ("Nitrogen (Fixed)-Ammonia", "Total"): ("Nitrogen", "Fixed ammonia"),
+    ("Other industrial wood products", "Total"): None,
+    ("Paper and board", "Total"): None,
     # NOTE: The following could be mapped to ("Peat", "Mine"). We decided to remove "Peat".
     ("Peat", "Total"): None,
     ("Perlite", "Total"): ("Perlite", "Mine"),
     ("Phosphate rock", "Total"): ("Phosphate rock", "Mine"),
     ("Pig Iron", "Total"): ("Iron", "Smelter, pig iron"),
+    # In USGS current data, PGM are broken down into palladium and platinum.
+    ("Platinum-group metals", "Total"): None,
+    ("Plywood and veneer", "Total"): None,
+    ("Potash", "Total"): ("Potash", "Mine"),
     ("Pumice and Pumicite", "Total"): ("Pumice and pumicite", "Mine"),
+    ("Quartz crystal", "Total"): None,
+    ("Rare earths", "Total"): ("Rare earths", "Mine"),
+    ("Rhenium", "Total"): ("Rhenium", "Mine"),
     ("Salt", "Total"): ("Salt", "Mine"),
     ("Selenium", "Total"): ("Selenium", "Refinery"),
     ("Silicon", "Total"): ("Silicon", "Processing"),
     ("Silicon carbide", "Total"): None,
     ("Silver", "Total"): ("Silver", "Mine"),
     ("Soda ash", "Total"): ("Soda ash", "Natural and synthetic"),
+    ("Sodium sulfate", "Total"): None,
     ("Steel", "Total"): ("Steel", "Processing, crude"),
     ("Strontium", "Total"): ("Strontium", "Mine"),
     ("Sulfur", "Total"): ("Sulfur", "Processing"),
@@ -138,6 +156,8 @@ COMMODITY_MAPPING = {
     ("Tantalum", "Total"): ("Tantalum", "Mine"),
     # NOTE: The following could be mapped to ("Tellurium", "Refinery"). However, we decided to discard Tellurium.
     ("Tellurium", "Total"): None,
+    ("Thallium", "Total"): None,
+    ("Thorium", "Total"): None,
     ("Tin", "Total"): ("Tin", "Mine"),
     # NOTE: For titanium there is no global data.
     ("Titanium dioxide", "Total"): None,
@@ -147,9 +167,15 @@ COMMODITY_MAPPING = {
     #  To avoid confusion, remove this total.
     ("Total clay", "Total"): None,
     ("Total manufactured abrasives ", "Total"): None,
+    ("Total forestry", "Total"): None,
     ("Tungsten", "Total"): ("Tungsten", "Mine"),
     ("Vanadium", "Total"): ("Vanadium", "Mine"),
+    ("Vermiculite", "Total"): None,
+    ("Wollastonite", "Total"): None,
+    ("Wood panel products", "Total"): None,
     ("Zinc", "Total"): ("Zinc", "Mine"),
+    # In USGS current data, "Hafnium" is not reported, only "Zirconium and Hafnium".
+    ("Zirconium", "Total"): None,
 }
 
 # Units can either be "metric tonnes" or "metric tonnes of gross weight".
@@ -199,6 +225,8 @@ MINERALS_TO_CONVERT_TO_TONNES = [
     # NOTE: Bismuth is in gross weight for the US, but metal content for the World.
     #  However, data for the US contains only nans and zeros, and will be removed later on.
     "Bismuth",
+    "Gemstones",
+    "Iodine",
 ]
 
 # Footnotes (that will appear in the footer of charts) to add to the flattened tables (production and unit value).
@@ -210,9 +238,11 @@ FOOTNOTES_PRODUCTION = {
     # "production|Clays|Mine, bentonite|tonnes": "Values are reported as gross weight.",
     # "production|Clays|Mine, ball clay|tonnes": "Values are reported as gross weight.",
     # "production|Clays|Mine, fire clay|tonnes": "Values are reported as gross weight.",
-    # "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
+    "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
     "production|Cobalt|Refinery|tonnes": "Values are reported as tonnes of cobalt content.",
     "production|Bismuth|Mine|tonnes": "Values are reported as tonnes of metal content.",
+    "production|Lithium|Mine|tonnes": "Values are reported as tonnes of lithium content.",
+    "production|Gemstones|Mine|tonnes": "Values are reported as tonnes of gemstone-quality diamonds.",
 }
 FOOTNOTES_UNIT_VALUE = {
     "unit_value|Silicon|Processing|constant 1998 US$ per tonne": "Values refer to constant 1998 US$ per tonne of silicon content in ferrosilicon or silicon metal.",
@@ -325,12 +355,13 @@ def prepare_us_production(tb: Table, tb_metadata: Table) -> Table:
     # For now, we'll only keep "production".
     tb_us_production = tb[["commodity", "year", "production", "unit"]].assign(**{"country": "United States"})
     # Remove spurious footnotes like "W".
+    # Also, zirconiummineral_concentrates contains rows of "< 100,000". It's unclear which value should be assigned here, so we will remove these (two) rows.
     tb_us_production["production"] = map_series(
         tb_us_production["production"],
-        mapping={"W": None},
+        mapping={"W": None, "< 100,000": None},
         warn_on_missing_mappings=False,
         warn_on_unused_mappings=True,
-    ).astype({"production": float})
+    ).astype({"production": "float64[pyarrow]"})
     # Add notes to the table, using the extracted metadata.
     for column in ["production"]:
         mask = tb_metadata[column].notnull()
@@ -490,10 +521,8 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("historical_statistics_for_mineral_and_material_commodities")
 
     # Read tables of data and extracted metadata from meadow dataset.
-    tb = ds_meadow.read_table("historical_statistics_for_mineral_and_material_commodities")
-    tb_metadata = ds_meadow.read_table("historical_statistics_for_mineral_and_material_commodities_metadata").astype(
-        "string"
-    )
+    tb = ds_meadow.read("historical_statistics_for_mineral_and_material_commodities")
+    tb_metadata = ds_meadow.read("historical_statistics_for_mineral_and_material_commodities_metadata").astype("string")
 
     #
     # Process data.
@@ -642,6 +671,49 @@ def run(dest_dir: str) -> None:
         (tb_flat["country"].isin(["World"])) & (tb_flat["year"].isin([1974, 1999])),
         "production|Magnesium metal|Smelter|tonnes",
     ] = None
+
+    # Lithium production in the US is only given until 1954. From then on, the data is "W" (which means withheld to avoid disclosing company proprietary data). To avoid confusion, simply remove all this data.
+    error = "Expected lithium US production data to end in 1954. Remove this part of the code."
+    assert (
+        tb_flat.loc[
+            (tb_flat["country"] == "United States") & (tb_flat["production|Lithium|Mine|tonnes"].notnull()), "year"
+        ].max()
+        == 1954
+    ), error
+    tb_flat.loc[(tb_flat["country"] == "United States"), "production|Lithium|Mine|tonnes"] = None
+    # Similarly, unit value from 1900 to 1951 is only informed in 1936 (and in terms of production, it's only informed in terms of gross weight, not lithium content). This creates a significant decline in unit value in line charts (between 1936 and 1952) which is unclear if it's real or not. To avoid confusion, ignore that data point and start the series in 1952.
+    error = (
+        "Expected lithium unit value data to only be informed in 1936 (prior to 1952). Remove this part of the code."
+    )
+    assert tb_flat[
+        (tb_flat["unit_value|Lithium|Mine|constant 1998 US$ per tonne"].notnull()) & (tb_flat["year"] < 1952)
+    ]["year"].tolist() == [1936], error
+    tb_flat.loc[(tb_flat["year"] < 1952), "unit_value|Lithium|Mine|constant 1998 US$ per tonne"] = None
+
+    # Gemstones unit values is zero in a range of years.
+    # The documentation says "Unit value data for 1922–28 were estimated by interpolation of imports value data, and rounded to two significant figures".
+    # In practice, the unit values for those years are exactly zero, which are probably spurious.
+    # Remove those zeros.
+    _years_with_zero_value = [1922, 1923, 1924, 1925, 1926, 1927, 1928]
+    error = "Expected gemstones unit value to be zero in a range of years. Remove this part of the code."
+    assert set(
+        tb_flat.loc[
+            (tb_flat["year"].isin(_years_with_zero_value)) & (tb_flat["country"] == "World"),
+            "unit_value|Gemstones|Mine|constant 1998 US$ per tonne",
+        ]
+    ) == {0.0}, error
+    tb_flat.loc[
+        (tb_flat["year"].isin(_years_with_zero_value)), "unit_value|Gemstones|Mine|constant 1998 US$ per tonne"
+    ] = None
+
+    # Unit value of rare earths prior to 1961 is highly unstable, and goes from ~140k to ~40 and then ~100k in a few years. There are many possible reasons for this volatility (it was a small market during tumultuous times).
+    # For now, I'll simply remove those years.
+    error = "Unit value of rare earths was expected to be highly unstable prior to 1961. Remove this part of the code."
+    assert tb_flat.loc[
+        (tb_flat["country"] == "World") & (tb_flat["year"] < 1961),
+        "unit_value|Rare earths|Mine|constant 1998 US$ per tonne",
+    ].describe().loc[["min", "max"]].tolist() == [29.0, 145000.0], error
+    tb_flat.loc[(tb_flat["year"] < 1961), "unit_value|Rare earths|Mine|constant 1998 US$ per tonne"] = None
     ####################################################################################################################
 
     # Format tables conveniently.

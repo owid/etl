@@ -1,14 +1,5 @@
 steps:
   #
-  # Fur laws (Fur Free Alliance, 2023).
-  #
-  data://meadow/animal_welfare/2023-09-08/fur_laws:
-    - snapshot://animal_welfare/2023-09-08/fur_laws.pdf
-  data://garden/animal_welfare/2023-09-08/fur_laws:
-    - data://meadow/animal_welfare/2023-09-08/fur_laws
-  data://grapher/animal_welfare/2023-09-08/fur_laws:
-    - data://garden/animal_welfare/2023-09-08/fur_laws
-  #
   # Bullfighting laws (Various sources, 2023).
   #
   data://meadow/animal_welfare/2023-09-05/bullfighting_laws:
@@ -17,3 +8,78 @@ steps:
     - data://meadow/animal_welfare/2023-09-05/bullfighting_laws
   data://grapher/animal_welfare/2023-09-05/bullfighting_laws:
     - data://garden/animal_welfare/2023-09-05/bullfighting_laws
+  #
+  # Number of wild-caught fish killed for food.
+  #
+  data://meadow/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
+    - snapshot://animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food.xlsx
+  #
+  # Number of farmed fish (Fishcount, 2018).
+  #
+  data://meadow/animal_welfare/2023-08-14/number_of_farmed_fish:
+    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2016.xlsx
+    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2015.xlsx
+    - snapshot://animal_welfare/2023-08-14/number_of_farmed_fish_2017.xlsx
+  data://garden/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
+    - data://meadow/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://garden/animal_welfare/2023-08-14/number_of_farmed_fish:
+    - data://meadow/animal_welfare/2023-08-14/number_of_farmed_fish
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food:
+    - data://garden/animal_welfare/2023-08-16/number_of_wild_fish_killed_for_food
+  data://grapher/animal_welfare/2023-08-14/number_of_farmed_fish:
+    - data://garden/animal_welfare/2023-08-14/number_of_farmed_fish
+  #
+  # Fur laws (Fur Free Alliance, 2023).
+  #
+  data://meadow/animal_welfare/2023-10-24/fur_laws:
+    - snapshot://animal_welfare/2023-10-24/fur_laws.xlsx
+  data://garden/animal_welfare/2023-10-24/fur_laws:
+    - data://meadow/animal_welfare/2023-10-24/fur_laws
+  data://grapher/animal_welfare/2023-10-24/fur_laws:
+    - data://garden/animal_welfare/2023-10-24/fur_laws
+  #
+  # Fur laws (Fur Free Alliance).
+  #
+  data://meadow/animal_welfare/2024-09-13/fur_laws:
+    - snapshot://animal_welfare/2024-09-13/fur_laws.csv
+  #
+  # Fur laws (Fur Free Alliance).
+  #
+  data://garden/animal_welfare/2024-09-13/fur_laws:
+    - data://meadow/animal_welfare/2024-09-13/fur_laws
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Fur laws (Fur Free Alliance).
+  #
+  data://grapher/animal_welfare/2024-09-13/fur_laws:
+    - data://garden/animal_welfare/2024-09-13/fur_laws
+  #
+  # Farmed finfishes used for food (Mood et al. 2023).
+  #
+  data://meadow/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
+    - snapshot://animal_welfare/2023-08-08/farmed_finfishes_used_for_food.zip
+  data://garden/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
+    - data://meadow/animal_welfare/2023-08-08/farmed_finfishes_used_for_food
+    - data://garden/demography/2023-03-31/population
+  data://grapher/animal_welfare/2023-08-08/farmed_finfishes_used_for_food:
+    - data://garden/animal_welfare/2023-08-08/farmed_finfishes_used_for_food
+  #
+  # Number of decapod crustaceans (Fishcount, 2018).
+  #
+  data://meadow/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
+    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2015.xlsx
+    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2016.xlsx
+    - snapshot://animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans_2017.xlsx
+  data://garden/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
+    - data://meadow/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/demography/2023-03-31/population
+  data://grapher/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
+    - data://garden/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans

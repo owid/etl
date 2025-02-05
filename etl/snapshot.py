@@ -2,14 +2,16 @@ import datetime as dt
 import json
 import re
 import tempfile
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterator, Optional, Union
+from typing import Any, Dict, Iterator, Optional, Union, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
 import structlog
 import yaml
+from deprecated import deprecated
 from owid.catalog import Table, s3_utils
 from owid.catalog.meta import (
     DatasetMeta,
@@ -22,6 +24,7 @@ from owid.catalog.meta import (
 )
 from owid.datautils import dataframes
 from owid.datautils.io import decompress_file
+from owid.repack import to_safe_types
 from owid.walden import files
 
 from etl import config, paths
@@ -34,6 +37,7 @@ log = structlog.get_logger()
 class Snapshot:
     uri: str
     metadata: "SnapshotMeta"
+    _unarchived_dir: Optional[Path] = None
 
     def __init__(self, uri: str) -> None:
         """
@@ -45,6 +49,17 @@ class Snapshot:
             raise FileNotFoundError(f"Metadata file {self.metadata_path} not found, but {uri} is in DAG.")
 
         self.metadata = SnapshotMeta.load_from_yaml(self.metadata_path)
+
+    @classmethod
+    def from_raw_uri(cls, raw_uri: str) -> "Snapshot":
+        """Create Snapshot from raw URI."""
+        if raw_uri.startswith("snapshot://"):
+            snap_uri = raw_uri.replace("snapshot://", "")
+        elif raw_uri.startswith("snapshot-private://"):
+            snap_uri = raw_uri.replace("snapshot-private://", "")
+        else:
+            raise ValueError(f"Invalid URI: {raw_uri}")
+        return cls(snap_uri)
 
     @property
     def m(self) -> "SnapshotMeta":
@@ -59,11 +74,7 @@ class Snapshot:
     @property
     def metadata_path(self) -> Path:
         """Path to metadata file."""
-        archive_path = Path(f"{paths.SNAPSHOTS_DIR_ARCHIVE / self.uri}.dvc")
-        if archive_path.exists():
-            return archive_path
-        else:
-            return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
+        return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
     def _download_dvc_file(self, md5: str) -> None:
         """Download file from remote to self.path."""
@@ -232,6 +243,29 @@ class Snapshot:
         """Read R data .rda file into a Table and populate it with metadata."""
         return pr.read_rda(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
 
+    def read_rda_multiple(self, *args, **kwargs) -> Dict[str, Table]:
+        """Read R data .rda file into multiple Tables and populate it with metadata.
+
+        RData objects can contain multiple dataframes.
+
+        Read specific dataframes from an RData file:
+
+        ```python
+        tables = snap.read_rda_multiple(["tname1", "tname2"])
+        ```
+
+        If you don't provide any table names, all tables will be read:
+
+        ```python
+        tables = snap.read_rda_multiple()
+        ```
+
+        where tables is a key-value dictionary, and keys are the names of the tables (same as table short_names too).
+        """
+        return pr.read_rda_multiple(
+            self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
+        )
+
     def read_fwf(self, *args, **kwargs) -> Table:
         """Read a table of fixed-width formatted lines with metadata."""
         return pr.read_fwf(self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs)
@@ -254,6 +288,8 @@ class Snapshot:
             self.path, *args, metadata=self.to_table_metadata(), origin=self.metadata.origin, **kwargs
         )
 
+    # Methods to deal with archived files
+    @deprecated("This function will be deprecated. Use `open_archive` context manager instead.")
     def extract(self, output_dir: Path | str):
         decompress_file(self.path, output_dir)
 
@@ -261,7 +297,7 @@ class Snapshot:
         # Create temporary directory
         temp_dir = tempfile.TemporaryDirectory()
         # Extract file to temporary directory
-        self.extract(temp_dir.name)
+        decompress_file(self.path, temp_dir.name)
         # Return temporary directory
         return temp_dir
 
@@ -284,6 +320,50 @@ class Snapshot:
                 **kwargs,
             )
             return tb
+
+    @contextmanager
+    def open_archive(self):
+        """Use this context manager to read multiple files in an archive without unarchiving multiple times.
+
+        Example:
+
+        ```python
+        snap = Snapshot(...)
+
+        with snap.open_archive():
+            table1 = snap.read_from_archive("filename1.csv")
+            table2 = snap.read_from_archive("filename2.csv")
+        ```
+
+        It creates a temporary directory with the unarchived content. This temporary directory is saved in class attribute `_unarchived_dir` and is deleted when the context manager exits.
+        """
+        temp_dir = tempfile.TemporaryDirectory()
+        try:
+            decompress_file(self.path, temp_dir.name)
+            self._unarchived_dir = Path(temp_dir.name)
+            yield
+        finally:
+            temp_dir.cleanup()
+            self._unarchived_dir = None
+
+    def read_from_archive(self, filename: str, *args, **kwargs) -> Table:
+        """Read a file in an archive.
+
+        Use this function within a context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
+        """
+        if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
+            raise RuntimeError("Archive is not unarchived. Use 'with snap.unarchived()' context manager.")
+
+        new_extension = filename.split(".")[-1]
+        tb = read_table_from_snapshot(
+            *args,
+            path=self._unarchived_dir / filename,
+            table_metadata=self.to_table_metadata(),
+            snapshot_origin=self.metadata.origin,
+            file_extension=new_extension,
+            **kwargs,
+        )
+        return tb
 
 
 @pruned_json
@@ -484,6 +564,7 @@ def read_table_from_snapshot(
     table_metadata: TableMeta,
     snapshot_origin: Union[Origin, None],
     file_extension: str,
+    safe_types: bool = True,
     *args,
     **kwargs,
 ) -> Table:
@@ -500,23 +581,28 @@ def read_table_from_snapshot(
     }
     # Read table
     if file_extension == "csv":
-        return pr.read_csv(*args, **kwargs)
+        tb = pr.read_csv(*args, **kwargs)
     elif file_extension == "feather":
-        return pr.read_feather(*args, **kwargs)
+        tb = pr.read_feather(*args, **kwargs)
     elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
-        return pr.read_excel(*args, **kwargs)
+        tb = pr.read_excel(*args, **kwargs)
     elif file_extension == "json":
-        return pr.read_json(*args, **kwargs)
+        tb = pr.read_json(*args, **kwargs)
     elif file_extension == "dta":
-        return pr.read_stata(*args, **kwargs)
+        tb = pr.read_stata(*args, **kwargs)
     elif file_extension == "rds":
-        return pr.read_rds(*args, **kwargs)
+        tb = pr.read_rds(*args, **kwargs)
     elif file_extension == "rda":
-        return pr.read_rda(*args, **kwargs)
+        tb = pr.read_rda(*args, **kwargs)
     elif file_extension == "parquet":
-        return pr.read_parquet(*args, **kwargs)
+        tb = pr.read_parquet(*args, **kwargs)
     else:
         raise ValueError(f"Unknown extension {file_extension}")
+
+    if safe_types:
+        tb = cast(Table, to_safe_types(tb))
+
+    return tb
 
 
 def add_snapshot(

@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
     # Transform health expenditure, saved originally in millions of dollars
     tb["ppp_dollars"] *= 1e6
 
-    tb = tb.set_index(["country", "year", "financing_scheme"], verify_integrity=True)
+    tb = tb.format(["country", "year", "financing_scheme"])
 
     #
     # Save outputs.

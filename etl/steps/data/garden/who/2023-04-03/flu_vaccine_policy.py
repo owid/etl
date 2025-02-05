@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
@@ -36,7 +37,7 @@ def run(dest_dir: str) -> None:
         df=df, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
     # Replacing value codes with either missing data or a more descriptive value
-    df = df.replace({"ND": np.NaN, "nan": np.NaN, "NR": "Not relevant", "Unknown": np.NaN})
+    df = df.replace({"ND": np.nan, "nan": np.nan, "NR": "Not relevant", "Unknown": np.nan})
     # Removing strings from some values e.g. commas in numbers but not full-stops
     df["how_many_doses_of_influenza_vaccine_were_distributed"] = df[
         "how_many_doses_of_influenza_vaccine_were_distributed"
@@ -68,7 +69,7 @@ def clean_binary_colums(df: pd.DataFrame) -> pd.DataFrame:
     # Select out the columns that start with 'is', 'are', 'were' or 'does
     binary_cols = df.columns[df.columns.str.startswith(("is", "are", "were"))]
     dict_map = {"Yes": "Yes", "No": "No"}
-    df[binary_cols] = df[binary_cols].applymap(dict_map.get).fillna(np.NaN)
+    df[binary_cols] = df[binary_cols].applymap(dict_map.get).fillna(np.nan)
 
     return df
 
@@ -84,7 +85,7 @@ def clean_hemisphere_formulation(df: pd.DataFrame) -> pd.DataFrame:
 
     assert all(
         df["what_vaccine_formulation_is_used"].isin(
-            [np.NaN, "Not relevant", "Both", "Northern Hemisphere", "Southern Hemisphere"]
+            [np.nan, "Not relevant", "Both", "Northern Hemisphere", "Southern Hemisphere"]
         )
     )
 
@@ -96,6 +97,6 @@ def remove_erroneous_zeros(df: pd.DataFrame) -> pd.DataFrame:
     Remove the handful of zeros that are found in columns where it is not clear what they mean.
     """
     cols = df.columns.drop("how_many_doses_of_influenza_vaccine_were_distributed")
-    df[cols] = df[cols].replace(0, np.NaN)
+    df[cols] = df[cols].replace(0, np.nan)
 
     return df

@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     tb = tb.dropna().reset_index(drop=True)
 
     # Set an appropriate index to each table and sort conveniently.
-    tb = tb.set_index(["location", "year"], verify_integrity=True).sort_index().sort_index(axis=1)
+    tb = tb.format(["location", "year"], sort_columns=True)
 
     #
     # Save outputs.

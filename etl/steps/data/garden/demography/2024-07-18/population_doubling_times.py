@@ -8,6 +8,7 @@ NOTE 1: For now, this step and its Grapher counterpart are only capturing this d
 NOTE 2: In the future, we might want to have other countries and regions in this dataset. In that scenario, please review all the code below and Grapher's.
 
 """
+
 from typing import cast
 
 import numpy as np
@@ -130,7 +131,7 @@ def get_target_years(tb: Table) -> Table:
     ## 2. Check if the sign of the population error changes (from negative to positive)
     ## Keep start and end year of target-crossing
     ## Tag target-crossing with a number (so that we know that the start- and end-years belong to the same target-crossing)
-    tb["target_crossing"] = np.sign(tb["population_error"]).diff() > 0
+    tb["target_crossing"] = np.sign(tb["population_error"]).diff().fillna(0) > 0
     tb["target_crossing"] = np.where(tb["target_crossing"], tb["target_crossing"].cumsum(), 0)
     tb["target_crossing"] = tb["target_crossing"] + tb["target_crossing"].shift(-1).fillna(0)
 

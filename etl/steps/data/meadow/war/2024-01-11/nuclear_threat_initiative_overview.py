@@ -12,13 +12,13 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot and read its main table.
     snap = paths.load_snapshot("nuclear_threat_initiative_overview.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

@@ -2,8 +2,6 @@
 
 import datetime
 
-from owid.catalog import Table
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -58,7 +56,7 @@ def run(dest_dir: str) -> None:
     tb = tb.pivot(columns="series_id", values="value", index="year").assign(country="United States").reset_index()
 
     # Create a new table with the processed data.
-    tb_garden = Table(tb, short_name="us_consumer_prices").set_index(["country", "year"], verify_integrity=True)
+    tb_garden = tb.format(["country", "year"], short_name="us_consumer_prices")
 
     # Ensure metadata is correctly associated.
     for column in tb_garden.columns:

@@ -204,7 +204,6 @@ def add_regional_aggregations(df: pd.DataFrame) -> pd.DataFrame:
             region=region,
             aggregations=aggregations,
             countries_that_must_have_data=[],
-            population=df,
             num_allowed_nans_per_year=None,
             frac_allowed_nans_per_year=0.2,
         )
@@ -251,10 +250,7 @@ def run(dest_dir: str) -> None:
     ds_meadow: Dataset = paths.load_dependency("growup")
 
     # Read table from meadow dataset.
-    tb_meadow = ds_meadow["growup"]
-
-    # Create a dataframe with data from the table.
-    df = pd.DataFrame(tb_meadow).reset_index()
+    df = pd.DataFrame(ds_meadow.read("growup", safe_types=False))
 
     #
     # Process data.

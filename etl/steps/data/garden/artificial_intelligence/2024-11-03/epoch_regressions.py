@@ -10,6 +10,7 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+# Constants for defining the time periods
 DL_ERA_START = 2010
 START_DATE = 1950
 END_DATE = 2025.2
@@ -72,67 +73,63 @@ def fit_exponential(models, metric):
 
 def run_regression(tb):
     """Run regression analysis on the given table and return the updated table."""
+    # Add fractional year for sorting and processing
     publication_dates = tb["publication_date"]
     tb.loc[:, "frac_year"] = (
         publication_dates.dt.year + (publication_dates.dt.month - 1) / 12 + (publication_dates.dt.day - 1) / 365
     )
     tb = tb.sort_values(by="frac_year")
 
+    # Define periods dynamically
+    periods = {
+        f"{START_DATE}–{DL_ERA_START}": (tb["frac_year"] < DL_ERA_START),
+        f"{DL_ERA_START}–{int(END_DATE)}": ((tb["frac_year"] >= DL_ERA_START) & (tb["frac_year"] < END_DATE)),
+    }
+    # Define year grids dynamically
+    year_grids = {
+        f"{START_DATE}–{DL_ERA_START}": np.array([START_DATE, DL_ERA_START]),
+        f"{DL_ERA_START}–{int(END_DATE)}": np.array([DL_ERA_START, END_DATE]),
+    }
+
     metrics = ["training_computation_petaflop", "parameters", "training_dataset_size__datapoints"]
     new_tables = []
 
-    for m, metric in enumerate(metrics):
+    for metric in metrics:
         # Filter out models without the metric information
         tb_metric = tb[pd.notnull(tb[metric])]
+        dfs = []
 
-        # Fit exponential models for pre-DL and DL eras
-        pre_dl_models = tb_metric[tb_metric["frac_year"] < DL_ERA_START]
-        pre_dl_fit = fit_exponential(pre_dl_models, metric)
-        pre_dl_oom_per_year = pre_dl_fit[1]
+        for period_name, condition in periods.items():
+            # Subset data for the current period
+            period_data = tb_metric[condition]
 
-        dl_models = tb_metric[tb_metric["frac_year"] >= DL_ERA_START]
-        dl_fit = fit_exponential(dl_models, metric)
-        dl_oom_per_year = dl_fit[1]
+            # Fit exponential model
+            fit = fit_exponential(period_data, metric)
+            oom_per_year = fit[1]
+            info = f"{10**oom_per_year:.1f}x/year"
 
-        # Log the results
-        pre_dl_info = f"{10**pre_dl_oom_per_year:.1f}x/year"
-        dl_info = f"{10**dl_oom_per_year:.1f}x/year"
-        paths.log.info(f"Pre Deep Learning Era ({metric}): {pre_dl_info}")
-        paths.log.info(f"Deep Learning Era ({metric}): {dl_info}")
+            # Log the results
+            paths.log.info(f"{period_name} ({metric}): {info}")
 
-        # Define the year grids for the periods 1950 to 2010 and 2010 to 2025 with just two points
-        pre_dl_year_grid = np.array([START_DATE, DL_ERA_START])
-        dl_year_grid = np.array([DL_ERA_START, END_DATE])
+            # Calculate the regression line for the current period
+            year_grid = year_grids[period_name]
+            line = 10 ** (fit[0] + year_grid * fit[1])
 
-        # Calculate the lines for each period using the fitted exponential models
-        pre_dl_line = 10 ** (pre_dl_fit[0] + pre_dl_year_grid * pre_dl_fit[1])
-        dl_line = 10 ** (dl_fit[0] + dl_year_grid * dl_fit[1])
+            # Create DataFrame for the current period
+            df = pd.DataFrame(
+                {
+                    "days_since_1949": [
+                        period_data["days_since_1949"].min(),
+                        period_data["days_since_1949"].max(),
+                    ],
+                    f"{metric}": [line[0], line[-1]],
+                    "system": [f"{info} between {period_name}"] * 2,
+                }
+            )
+            dfs.append(df)
 
-        # Create new DataFrames for pre-deep learning and deep learning era trends with only necessary columns
-        pre_dl_df = pd.DataFrame(
-            {
-                "days_since_1949": [
-                    tb_metric["days_since_1949"].min(),
-                    tb_metric[tb_metric["frac_year"] < DL_ERA_START]["days_since_1949"].max(),
-                ],
-                f"{metric}": [pre_dl_line[0], pre_dl_line[-1]],
-                "system": [f"{pre_dl_info}"] * 2,
-            }
-        )
-
-        dl_df = pd.DataFrame(
-            {
-                "days_since_1949": [
-                    tb_metric[tb_metric["frac_year"] >= DL_ERA_START]["days_since_1949"].min(),
-                    tb_metric["days_since_1949"].max(),
-                ],
-                f"{metric}": [dl_line[0], dl_line[-1]],
-                "system": [f"{dl_info}"] * 2,
-            }
-        )
-
-        # Combine the pre-deep learning and deep learning era DataFrames
-        df_combined = pd.concat([pre_dl_df, dl_df], ignore_index=True)
+        # Combine the DataFrames for all periods for the current metric
+        df_combined = pd.concat(dfs, ignore_index=True)
         new_tables.append(df_combined)
 
     # Merge all the new DataFrames

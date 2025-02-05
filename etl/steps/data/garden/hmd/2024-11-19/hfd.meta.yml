@@ -1,0 +1,460 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  others:
+    bo_1: |-
+      <% if birth_order == '1' %>
+       first
+      <%- elif birth_order == '2' %>
+       second
+      <%- elif birth_order == '3' %>
+       third
+      <%- elif birth_order == '4' %>
+       fourth
+      <%- elif birth_order == '5p' %>
+       fifth (or greater)
+      <% endif %>
+    bo_1_m1: |-
+      <% if birth_order == '2' %>
+       second
+      <%- elif birth_order == '3' %>
+       third
+      <%- elif birth_order == '4' %>
+       fourth
+      <%- elif birth_order == '5p' %>
+       fifth (or greater)
+      <% endif %>
+    title: |-
+      <% if birth_order == 'total' %>
+      << title >> - Total
+      <%- elif birth_order == '5p' %>
+      << title >> - Birth order: ≥5
+      <%- else %>
+      << title >> - Birth order: << birth_order >>
+      <%- endif %>
+    title_age: |-
+      <% set age_str = '≤12' if age == '12-' else age %>
+      <% if birth_order == 'total' %>
+      << title >> - Mother age: << age_str >> - All births
+      <% elif birth_order == '5p' %>
+      << title >> - Mother age: << age_str >> - Birth order: ≥5
+      <%- else %>
+      << title >> - Mother age: << age_str >> - Birth order: << birth_order >>
+      <%- endif %>
+  common:
+    presentation:
+      topic_tags:
+        - Fertility Rate
+    display:
+      numDecimalPlaces: 2
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Human Fertility Database
+
+tables:
+  period:
+    variables:
+      tfr:
+        title: |-
+          <% set title = "Period total fertility rate" %>
+          {definitions.others.title}
+        description_short: |-
+          The average number of{definitions.others.bo_1} children a woman would have in her lifetime if she experienced the fertility rates of a specific year.
+        unit: "births per woman"
+        description_key:
+          - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
+          - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
+
+      tfr40:
+        title: |-
+          <% set title = "Period total fertility rate by age 40" %>
+          {definitions.others.title}
+        description_short: |-
+          The average number of{definitions.others.bo_1} children a woman would have by age 40 if she experienced the fertility rates of a specific year.
+        unit: "births per woman"
+        description_key:
+          - Useful for understanding early and mid-reproductive age fertility patterns.
+
+      adjtfr:
+        title: |-
+          <% set title = "Tempo-adjusted total fertility rate" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The total fertility rate adjusted to account for delays or advances in childbearing.
+          <%- else %>
+          The total fertility rate for{definitions.others.bo_1} births adjusted to account for delays or advances in having a{definitions.others.bo_1} child.
+          <%- endif %>
+        unit: "births per woman"
+        description_key:
+          - The TFR has been adjusted using a method proposed by [Bongaarts-Feeney](https://en.wikipedia.org/wiki/Sub-replacement_fertility). It sums order-specific TFRs and adjusts for changes in the mean age of order-specific fertility schedule.
+          - The tempo-adjusted TFR adjusts for timing shifts in childbearing, such as postponement of births.
+          - The tempo-adjusted TFR helps to distinguish between changes in the number of children women have and changes in the timing of when they have them.
+          - The tempo-adjusted TFR often displays large year-to-year fluctuations ([Sobotka 2003](https://www.demographic-research.org/articles/volume/8/6)), which can make its use for specific years problematic. Therefore, three- or five-year moving averages are often used to smooth out fluctuations.
+          - Requires careful interpretation, as the adjustment is based on specific assumptions about timing effects.
+
+      patfr:
+        title: |-
+          <% set title = "Parity- and age-adjusted total fertility rate" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The total fertility rate adjusted for both the age of the mother and the number of children she already has.
+          <%- else %>
+          The total fertility rate for{definitions.others.bo_1} births adjusted for the age of the mother.
+          <%- endif %>
+        unit: "births per woman"
+        description_key:
+          - The Parity- and age-adjusted TFR accounts for both the age structure and parity distribution of the female population.
+
+      # Mean ages at birth, and at 40
+      mab:
+        title: |-
+          <% set title = "Period mean ages at birth" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average age of mothers when they give birth in a specific year. It is standardized for the age structure of the female population of reproductive age.
+          <%- else %>
+          The average age of mothers when they have their{definitions.others.bo_1} child in a specific year. It is standardized for the age structure of the female population of reproductive age.
+          <%- endif %>
+        unit: "years"
+
+      mab40:
+        title: |-
+          <% set title = "Period mean ages at birth by age 40" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average age of mothers under 40 when they give birth. It is standardized for the age structure of the female population of reproductive age.
+          <%- else %>
+          The average age of mothers under 40 when they have their{definitions.others.bo_1} child in a specific year. It is standardized for the age structure of the female population of reproductive age.
+          <%- endif %>
+        unit: "years"
+        description_key:
+          - Focuses on childbearing occurring before age 40, providing insights into early fertility patterns.
+
+      sdmab:
+        title: |-
+          <% set title = "Standard deviation in period mean ages at birth" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          Variation in the ages of mothers when they give birth in a specific year.
+          <%- else %>
+          Variation in the ages of mothers when they have their{definitions.others.bo_1} child in a specific year.
+          <%- endif %>
+        unit: "years"
+        description_key:
+          - Measures the spread of ages at which women give birth.
+          - A low standard deviation indicates that most births occur around the same age, while a high standard deviation suggests a wider range of ages.
+          - Useful for understanding the diversity of reproductive timing.
+
+      sdmab40:
+        title: |-
+          <% set title = "Standard deviation in period mean ages at birth by age 40" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          Variation in the ages of mothers under 40 when they give birth.
+          <%- else %>
+          Variation in the ages of mothers under 40 when they have their{definitions.others.bo_1} child in a specific year.
+          <%- endif %>
+        unit: "years"
+        description_key:
+          - Reflects variability in the timing of births up to age 40.
+          - Helps to understand how concentrated or spread out early childbearing is within the population.
+
+      tmab:
+        title: |-
+          <% set title = "Period table mean ages at birth" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average age of mothers at birth, considering the number of children they already have.
+          <%- else %>
+          The average age of mothers at the birth of their{definitions.others.bo_1} child.
+          <%- endif %>
+        unit: "years"
+        description_key:
+          - Derived from fertility tables that account for both age and parity.
+          - Provides a more detailed understanding of the timing of births across different birth orders.
+
+      # Births and birth rate
+      cbr:
+        title: |-
+          <% set title = "Crude birth rate" %>
+          {definitions.others.title}
+        description_short: |-
+          The number of{definitions.others.bo_1} live births per 1,000 people in a given year. It is not standardized for the age structure of the population.
+        unit: "births per 1,000 people"
+        description_key:
+          - The rate is calculated by dividing the total number of{definitions.others.bo_1} live births occurring in a given year by person-years lived by all population in that year.
+          - Simple measure of birth intensity, not adjusted for age or parity.
+          - It is influenced by the age structure of the population, which can make comparisons between populations challenging.
+
+      b:
+        title: |-
+          <% set title = "Total live births" %>
+          {definitions.others.title}
+        description_short: The total number of{definitions.others.bo_1} live births recorded in a given year.
+        unit: "births"
+        description_key:
+          - Represents the total number of{definitions.others.bo_1} live births without considering age or parity.
+          - Serves as a foundational statistic for calculating other fertility measures.
+          - Can be influenced by population size and structure.
+        display:
+          numDecimalPlaces: 0
+
+  cohort:
+    variables:
+      # Fertility
+
+      ccf:
+        title: |-
+          <% set title = "Completed cohort fertility rate" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average number of children born to women in the current cohort over their lifetime.
+          <%- else %>
+          The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
+          <%- endif %>
+        unit: "births per woman"
+        description_key:
+          - Represents the completed fertility of a cohort by the end of their reproductive years.
+          - Useful for comparing fertility across different cohorts.
+          - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
+
+      ccf_plus15y:
+        title: |-
+          <% set title = "Completed cohort fertility rate (adjusted +15 years)" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average number of children born to women in the 15-years-ago cohort over their lifetime.
+          <%- else %>
+          The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
+          <%- endif %>
+        unit: "births per woman"
+        description_key:
+          - Represents the completed fertility of a cohort by the end of their reproductive years.
+          - Useful for comparing fertility across different cohorts.
+          - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
+
+      ccf_plus30y:
+        title: |-
+          <% set title = "Completed cohort fertility rate (adjusted +30 years)" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average number of children born to women in the 30-years-ago cohort over their lifetime.
+          <%- else %>
+          The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
+          <%- endif %>
+        unit: "births per woman"
+        description_key:
+          - Represents the completed fertility of a cohort by the end of their reproductive years.
+          - Useful for comparing fertility across different cohorts.
+          - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
+
+      ccf40:
+        title: |-
+          <% set title = "Completed cohort fertility rate by the age 40" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average number of children born to women under 40 in a specific cohort.
+          <%- else %>
+          The average number of{definitions.others.bo_1} children born to women under 40 in a specific cohort.
+          <%- endif %>
+        unit: "births per woman"
+        description_key:
+          - Represents the fertility of a cohort up to age 40.
+          - Provides insights into early and mid-reproductive age fertility patterns.
+
+      # Mean age at birth
+      cmab:
+        title: |-
+          <% set title = "Cohort mean ages at birth" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average age at which women in a specific birth cohort have children. It is standardized for the age structure of the female population of reproductive age.
+          <%- else %>
+          The average age at which women in a specific birth cohort have their{definitions.others.bo_1} child. It is standardized for the age structure of the female population of reproductive age.
+          <%- endif %>
+        unit: "years"
+        description_key:
+          - Represents the average age at which women from a particular cohort give birth.
+          - Helps understand generational differences in fertility timing.
+          - Calculated from observed fertility rates across the reproductive lifespan of the cohort.
+
+      cmab40:
+        title: |-
+          <% set title = "Cohort mean ages at birth by the age 40" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          The average age at which women under 40 in a specific cohort have children.
+          <%- else %>
+          The average age at which women under 40 in a specific cohort have their{definitions.others.bo_1} child.
+          <%- endif %>
+        unit: "years"
+        description_key:
+          - Focuses on births occurring before age 40, providing insights into early fertility patterns for the cohort.
+          - Useful for comparing early reproductive behavior across different cohorts.
+
+      sdcmab:
+        title: |-
+          <% set title = "Standard deviation in cohort mean ages at birth" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          Variation in the ages at which women in a specific cohort have children.
+          <%- else %>
+          Variation in the ages at which women in a specific cohort have their{definitions.others.bo_1} child.
+          <%- endif %>
+        unit: "years"
+        description_key:
+          - Measures the spread of ages at which women in a cohort give birth.
+          - A lower value indicates concentrated timing, while a higher value suggests more variation in childbearing ages.
+          - Helps to understand the diversity of reproductive timing within a cohort.
+
+      sdcmab40:
+        title: |-
+          <% set title = "Standard deviation in cohort mean ages at 40" %>
+          {definitions.others.title}
+        description_short: |-
+          <% if birth_order == 'total' %>
+          How much variation there is in the ages at which women in a specific cohort have children, calculated only up to age 40.
+          <%- else %>
+          How much variation there is in the ages at which women in a specific cohort have their{definitions.others.bo_1} child, calculated only up to age 40.
+          <%- endif %>
+        unit: "years"
+        description_key:
+          - Reflects variability in the timing of births up to age 40 within a cohort.
+          - Helps to understand how concentrated or spread out early childbearing is within the cohort.
+
+      ppr:
+        title: |-
+          Cohort parity progression ratio - << (birth_order | int) - 1 >> to << (birth_order | int) >> birth
+        description_short: |-
+          <% if birth_order == '1' %>
+          Probability of giving birth to a first child.
+          <%- elif birth_order == '2' %>
+          Probability of giving birth to a second child, conditioned on having had a first child.
+          <%- elif birth_order == '3' %>
+          Probability of giving birth to a third child, conditioned on having had a second child.
+          <%- elif birth_order == '4' %>
+          Probability of giving birth to a fourth child, conditioned on having had a third child.
+          <% endif %>
+        unit: ""
+        description_key:
+          - Measures the likelihood that a woman with a given number of children will go on to have another child.
+          - It is useful for understanding family-building dynamics and changes in reproductive behavior over time.
+
+  period_ages:
+    variables:
+      asfr_period:
+        title: |-
+          <% set title = "Period fertility rate" %>
+          {definitions.others.title_age}
+        description_short: |-
+          Age-specific fertility rates for each calendar year, measured in completed years of age.
+        unit: "births per woman"
+        description_key:
+          - Represents fertility rates for each age group in a specific year.
+          - Useful for detailed analysis of fertility patterns by both age and year.
+          - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
+
+  cohort_ages:
+    variables:
+      asfr_cohort:
+        title: |-
+          <% set title = "Cohort fertility rate" %>
+          {definitions.others.title_age}
+        unit: "births per woman"
+        description_short: |-
+          Age-specific fertility rates for women in a specific birth cohort, measured by their age in completed years.
+        description_key:
+          - Represents fertility rates for a specific cohort as they age.
+          - Useful for understanding how fertility behavior changes across different cohorts over time.
+          - Presented in the form of horizontal parallelograms, allowing for the tracking of cohort-specific fertility patterns.
+
+      ccfr_cohort:
+        title: |-
+          <% set title = "Cumulative cohort fertility rate" %>
+          {definitions.others.title_age}
+        description_short: |-
+          It measures the average number of children born to a specific group of women (a cohort) by the age << age >>. It reflects the realized fertility of a generation, providing insights into long-term fertility trends and societal changes over time.
+        unit: "births per woman"
+        description_key:
+          - Represents fertility rates for each age group in a specific year.
+          - Useful for detailed analysis of fertility patterns by both age and year.
+          - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
+
+  period_ages_years:
+    variables:
+      asfr_period:
+        title: |-
+          Period fertility rate, by age (year << year_as_dimension >>)
+        description_short: |-
+          Distribution of the age-specific fertility rates for each calendar year.
+        unit: "births per woman"
+        description_key:
+          - Represents fertility rates for each age group in a specific year.
+          - Useful for detailed analysis of fertility patterns by both age and year.
+          - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
+
+  cohort_ages_years:
+    variables:
+      asfr_cohort:
+        title: |-
+          Cohort fertility rate, by age (cohort << cohort >>)
+        unit: "births per woman"
+        description_short: |-
+          Distribution of age-specific fertility rates for women in a specific birth cohort.
+        description_key:
+          - Represents fertility rates for a specific cohort as they age.
+          - Useful for understanding how fertility behavior changes across different cohorts over time.
+          - Presented in the form of horizontal parallelograms, allowing for the tracking of cohort-specific fertility patterns.
+
+      ccfr_cohort:
+        title: |-
+          Cumulative cohort fertility rate, by age (cohort << cohort >>)
+        unit: "births per woman"
+        description_short: |-
+          Distribution of cumulative cohort fertility rates for women in a specific birth cohort.
+
+  cohort_share_women:
+    variables:
+      share_women:
+        title: |-
+          <% if num_births == '0' %>
+          Share of women without births
+          <%- elif num_births == '4' %>
+          Share of women with 4 or more births
+          <%- else %>
+          Share of women with << num_births >> births
+          <% endif %>
+        description_short: |-
+          <% if num_births == '0' %>
+          Share of women born in a given year that did not give birth.
+          <%- elif num_births == '4' %>
+          Share of women born in a given year that had 4 or more births.
+          <%- else %>
+          Share of women born in a given year that had << num_births >> or more births.
+          <% endif %>
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          We have estimated the share of women with N births using the estimates on the cohort parity progression ratio (ppr). ppr(N) is an estimate on the probability of giving birth to an Nth child, conditioned on having had N-1 children before.
+
+          Considering all of this, we have estimated the share of women with N births as:
+
+          share of women with N births = ppr(1) * ppr(2) * ··· * ppr(N) * [1 - ppr(N+1)]
+
+          Note that we need the [1 - ppr(N+1)] term to not count women that had more than N births.

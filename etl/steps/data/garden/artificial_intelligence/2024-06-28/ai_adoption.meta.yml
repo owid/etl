@@ -13,6 +13,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  title: AI Index Report - Share of companies using AI technology
 
 
 tables:

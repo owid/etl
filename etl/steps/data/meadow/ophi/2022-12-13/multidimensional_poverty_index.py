@@ -1,5 +1,4 @@
-"""Load snapshot of Multidimensional Poverty Index data and prepare a table with basic metadata.
-"""
+"""Load snapshot of Multidimensional Poverty Index data and prepare a table with basic metadata."""
 
 import pandas as pd
 from owid.catalog import Dataset, Table, TableMeta

@@ -1,12 +1,13 @@
 """Tools to generate chart configs."""
+
 from copy import deepcopy
 from typing import Any, Dict, List, Optional
 
 import numpy as np
 
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher_io import ensure_load_variable
-from etl.grapher_model import Variable
+from etl.grapher.io import ensure_load_variable
+from etl.grapher.model import Variable
 
 CONFIG_BASE = {
     # "title": "Placeholder",
@@ -31,7 +32,7 @@ CONFIG_BASE = {
     "hideLegend": False,
     "tab": "chart",
     "logo": "owid",
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.006.json",
     "showYearLabels": False,
     "id": 807,
     "selectedFacetStrategy": "none",
@@ -41,7 +42,7 @@ CONFIG_BASE = {
     "version": 14,
     "sortOrder": "desc",
     "maxTime": "latest",
-    "type": "LineChart",
+    "chartTypes": ["LineChart"],
     "hideRelativeToggle": True,
     "addCountryMode": "add-country",
     "hideAnnotationFieldsInTitle": {"entity": False, "changeInPrefix": False, "time": False},
@@ -65,7 +66,6 @@ CONFIG_BASE = {
     "missingDataStrategy": "auto",
     "isPublished": False,
     "timelineMinTime": "earliest",
-    "hasChartTab": True,
     "timelineMaxTime": "latest",
     "sortBy": "total",
 }
@@ -78,13 +78,14 @@ def bake_chart_config(
     selected_entities: Optional[list] = None,
     included_entities: Optional[list] = None,
     display: Optional[List[Any]] = None,
+    tab: Optional[str] = None,
     owid_env: OWIDEnv = OWID_ENV,
 ) -> Dict[str, Any]:
     """Bake a Grapher chart configuration.
 
     Bakes a very basic config, which will be enough most of the times. If you want a more complex config, use this as a baseline to adjust to your needs.
 
-    Note: You can find more details on our Grapher API at https://files.ourworldindata.org/schemas/grapher-schema.005.json.
+    Note: You can find more details on our Grapher API at https://files.ourworldindata.org/schemas/grapher-schema.latest.json.
 
     """
     # Define chart config
@@ -120,4 +121,7 @@ def bake_chart_config(
         included_entities = [str(entity) for entity in included_entities]
         chart_config["includedEntities"] = included_entities
 
+    # Edit initial tab
+    if tab is not None:
+        chart_config["tab"] = tab
     return chart_config

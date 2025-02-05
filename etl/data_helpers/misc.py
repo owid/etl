@@ -18,7 +18,7 @@ from typing import Any, Iterable, List, Literal, Optional, Set, TypeVar, Union, 
 import owid.catalog.processing as pr
 import pandas as pd
 import plotly.express as px
-from owid.catalog import License, Origin, Table
+from owid.catalog import Table
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
@@ -74,7 +74,7 @@ def interpolate_table(
     time_col: str
         Name of the column with years.
     mode: str
-        How to compelte time series. 'full_range' for complete range, 'full_range_entity' for complete range within an entity, 'reduced' for only time values appearing in the data. Use 'none' to interpolate with existing values.
+        How to complete time series. 'full_range' for complete range, 'full_range_entity' for complete range within an entity, 'reduced' for only time values appearing in the data. Use 'none' to interpolate with existing values.
     """
     SINGLE_ENTITY = isinstance(entity_col, str)
     MULTIPLE_ENTITY = isinstance(entity_col, list)
@@ -406,76 +406,6 @@ def explode_rows_by_time_range(
     tb = tb.loc[(tb[col_time] >= tb[col_time_start]) & (tb[col_time] < tb[col_time_end])]
 
     return tb
-
-
-########################################################################################################################
-# TODO: Remote this temporary function once WDI has origins.
-def add_origins_to_mortality_database(tb_who: Table) -> Table:
-    tb_who = tb_who.copy()
-
-    # List all non-index columns in the WDI table.
-    data_columns = [column for column in tb_who.columns if column not in ["country", "year"]]
-
-    # For each indicator, add an origin (using information from the old source) and then remove the source.
-    for column in data_columns:
-        tb_who[column].metadata.sources = []
-        error = "Remove temporary solution where origins where manually created."
-        assert tb_who[column].metadata.origins == [], error
-        tb_who[column].metadata.origins = [
-            Origin(
-                title="Mortality Database",
-                producer="World Health Organisation",
-                url_main="https://platform.who.int/mortality/themes/theme-details/MDB/all-causes",
-                date_accessed="2023-08-01",
-                date_published="2023-08-01",  # type: ignore
-                citation_full="Mortality Database, World Health Organization. Licence: CC BY-NC-SA 3.0 IGO.",
-                description="The WHO mortality database is a collection death registration data including cause-of-death information from member states. Where they are collected, death registration data are the best source of information on key health indicators, such as life expectancy, and death registration data with cause-of-death information are the best source of information on mortality by cause, such as maternal mortality and suicide mortality. WHO requests from all countries annual data by age, sex, and complete ICD code (e.g., 4-digit code if the 10th revision of ICD was used). Countries have reported deaths by cause of death, year, sex, and age for inclusion in the WHO Mortality Database since 1950. Data are included only for countries reporting data properly coded according to the International Classification of Diseases (ICD). Today the database is maintained by the WHO Division of Data, Analytics and Delivery for Impact (DDI) and contains data from over 120 countries and areas. Data reported by member states and selected areas are displayed in this portal’s interactive visualizations if the data are reported to the WHO mortality database in the requested format and at least 65% of deaths were recorded in each country and year.",
-                license=License(name="CC BY 4.0"),
-            )
-        ]
-
-        # Remove sources from indicator.
-        tb_who[column].metadata.sources = []
-
-    return tb_who
-
-
-##################################################################################
-# TODO: Remote this temporary function once WDI has origins.
-def add_origins_to_global_burden_of_disease(tb_gbd: Table) -> Table:
-    tb_gbd = tb_gbd.copy()
-
-    # List all non-index columns in the WDI table.
-    data_columns = [column for column in tb_gbd.columns if column not in ["country", "year"]]
-
-    # For each indicator, add an origin (using information from the old source) and then remove the source.
-    for column in data_columns:
-        tb_gbd[column].metadata.sources = []
-        error = "Remove temporary solution where origins were manually created."
-        assert tb_gbd[column].metadata.origins == [], error
-        tb_gbd[column].metadata.origins = [
-            Origin(
-                title="Global Burden of Disease",
-                producer="Institute of Health Metrics and Evaluation",
-                url_main="https://vizhub.healthdata.org/gbd-results/",
-                date_accessed="2021-12-01",
-                date_published="2020-10-17",  # type: ignore
-                citation_full="Global Burden of Disease Collaborative Network. Global Burden of Disease Study 2019 (GBD 2019). Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2020.",
-                description="The Global Burden of Disease (GBD) provides a comprehensive picture of mortality and disability across countries, time, age, and sex. It quantifies health loss from hundreds of diseases, injuries, and risk factors, so that health systems can be improved and disparities eliminated. GBD research incorporates both the prevalence of a given disease or risk factor and the relative harm it causes. With these tools, decision-makers can compare different health issues and their effects.",
-                license=License(
-                    name="Free-of-Charge Non-commercial User Agreement",
-                    url="https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement",
-                ),
-            )
-        ]
-
-        # Remove sources from indicator.
-        tb_gbd[column].metadata.sources = []
-
-    return tb_gbd
-
-
-########################################################################################################################
 
 
 def bard(a, b, eps=1e-8):

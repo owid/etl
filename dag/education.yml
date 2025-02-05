@@ -1,17 +1,4 @@
 steps:
-  # World Bank EdStats
-  data://meadow/wb/2023-07-10/education:
-    - snapshot://wb/2023-07-10/education.csv
-
-  data://garden/wb/2023-07-10/education:
-    - data://meadow/wb/2023-07-10/education
-    - data://garden/education/2017-09-30/public_expenditure
-    - data://garden/education/2018-04-18/literacy_rates
-
-  data://grapher/wb/2023-07-10/education:
-    - data://garden/wb/2023-07-10/education
-
-
   # Barro and Lee projections dataset
   data://meadow/education/2023-07-17/education_barro_lee_projections:
     - snapshot://education/2023-07-17/education_barro_lee_projections.csv
@@ -20,10 +7,9 @@ steps:
     - data://meadow/education/2023-07-17/education_barro_lee_projections
     - data://garden/regions/2023-01-01/regions
     - data://garden/education/2023-07-17/education_lee_lee
-    - data://garden/demography/2022-12-08/population
+    - data://garden/demography/2023-03-31/population
   data://grapher/education/2023-07-17/education_barro_lee_projections:
     - data://garden/education/2023-07-17/education_barro_lee_projections
-
 
   # Barro and Lee historical estimates
   data://meadow/education/2023-07-17/education_lee_lee:
@@ -32,13 +18,13 @@ steps:
   data://garden/education/2023-07-17/education_lee_lee:
     - data://meadow/education/2023-07-17/education_lee_lee
     - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
     - data://garden/worldbank_wdi/2024-05-20/wdi
-    - data://garden/demography/2022-12-08/population
+    - data://garden/unesco/2024-11-21/enrolment_rates
   data://grapher/education/2023-07-17/education_lee_lee:
     - data://garden/education/2023-07-17/education_lee_lee
 
-
-# OECD historical education data
+  # CLIO/INFRA
   data://meadow/education/2023-08-09/clio_infra_education:
     - snapshot://education/2023-08-09/years_of_education.xlsx
     - snapshot://education/2023-08-09/years_of_education_gini.xlsx
@@ -50,14 +36,16 @@ steps:
   data://grapher/education/2023-08-09/clio_infra_education:
     - data://garden/education/2023-08-09/clio_infra_education
 
+  # OECD historical education data
   data://meadow/education/2023-08-14/oecd_education:
     - snapshot://education/2023-08-14/oecd_education.csv
   data://garden/education/2023-08-14/oecd_education:
     - data://meadow/education/2023-08-14/oecd_education
-    - data://garden/wb/2023-07-10/education
+    - data://garden/wb/2024-11-04/edstats
   data://grapher/education/2023-08-14/oecd_education:
     - data://garden/education/2023-08-14/oecd_education
 
+  # ILOstat Unemployment
   data://meadow/ilostat/2023-09-19/unemployment:
     - snapshot://ilostat/2023-09-19/unemployment.csv
   data://garden/ilostat/2023-09-19/unemployment:
@@ -65,6 +53,7 @@ steps:
   data://grapher/ilostat/2023-09-19/unemployment:
     - data://garden/ilostat/2023-09-19/unemployment
 
+  # ILOstat Employment
   data://meadow/ilostat/2023-09-19/employment:
     - snapshot://ilostat/2023-09-19/employment.csv
   data://garden/ilostat/2023-09-19/employment:
@@ -72,6 +61,7 @@ steps:
   data://grapher/ilostat/2023-09-19/employment:
     - data://garden/ilostat/2023-09-19/employment
 
+  # ILOstat Average Work Hours
   data://meadow/ilostat/2023-09-19/average_work_hours:
     - snapshot://ilostat/2023-09-19/average_work_hours.csv
   data://garden/ilostat/2023-09-19/average_work_hours:
@@ -92,15 +82,12 @@ steps:
   data://grapher/oecd/2023-12-06/pisa:
     - data://garden/oecd/2023-12-06/pisa
 
-  # Wittgenstein Center Population and Human Capital Projections - Educational Attainment
-  data://meadow/education/2023-12-15/wittgenstein_center:
-    - snapshot://education/2023-12-15/wittgenstein_center_data.csv
-    - snapshot://education/2023-12-15/wittgenstein_center_dictionary.csv
-  data://garden/education/2023-12-15/wittgenstein_center:
-    - data://meadow/education/2023-12-15/wittgenstein_center
+  # OECD + Wittgenstein: People with education (long-run)
+  data://garden/education/2024-12-11/people_with_education:
+    - data://garden/demography/2024-12-06/wittgenstein_human_capital
     - data://garden/education/2023-08-14/oecd_education
-  data://grapher/education/2023-12-15/wittgenstein_center:
-    - data://garden/education/2023-12-15/wittgenstein_center
+  data://grapher/education/2024-12-11/people_with_education:
+    - data://garden/education/2024-12-11/people_with_education
 
   # UNESCO data on other policy related education indicators
   data://meadow/unesco/2024-06-16/education_opri:
@@ -119,3 +106,23 @@ steps:
     - snapshot://wb/2024-06-18/edstats_metadata.xls
   data://grapher/unesco/2024-06-25/education_sdgs:
     - data://garden/unesco/2024-06-25/education_sdgs
+
+  # UNESCO data on other policy related education indicators
+  data://meadow/unesco/2024-11-21/enrolment_rates:
+    - snapshot://unesco/2024-11-21/enrolment_rates.csv
+  data://garden/unesco/2024-11-21/enrolment_rates:
+    - data://meadow/unesco/2024-11-21/enrolment_rates
+    - snapshot://wb/2024-06-18/edstats_metadata.xls
+  data://grapher/unesco/2024-11-21/enrolment_rates:
+    - data://garden/unesco/2024-11-21/enrolment_rates
+
+  # World Bank EdStats
+  data://meadow/wb/2024-11-04/edstats:
+    - snapshot://wb/2024-11-04/edstats.csv
+  data://garden/wb/2024-11-04/edstats:
+    - data://meadow/wb/2024-11-04/edstats
+    - data://garden/education/2017-09-30/public_expenditure
+    - data://garden/education/2018-04-18/literacy_rates
+
+  data://grapher/wb/2024-11-04/edstats:
+    - data://garden/wb/2024-11-04/edstats

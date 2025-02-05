@@ -10,7 +10,7 @@ from rapidfuzz import fuzz
 from structlog import get_logger
 
 from etl.db import get_connection
-from etl.grapher_io import get_dataset_id, get_variables_in_dataset
+from etl.grapher.io import get_dataset_id, get_variables_in_dataset
 
 # If True, identical variables will be matched automatically (by string comparison).
 # If False, variables with identical names will appear in comparison.

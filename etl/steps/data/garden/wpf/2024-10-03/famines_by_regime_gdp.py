@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import re
 
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
@@ -77,6 +78,15 @@ def run(dest_dir: str) -> None:
     # Add GDP data.
     tb = add_gdp(tb, tb_gdp)
 
+    # Extract the text before the year from the famine_name column
+    tb["country_name"] = tb["famine_name"].apply(lambda x: re.split(r"\s+\d{4}", x)[0])
+
+    # Remove (Hungerplan) from famine_name
+    tb["country_name"] = tb["country_name"].str.replace(r"\s*\(Hungerplan\)", "", regex=True)
+    tb["midpoint_year"] = tb["famine_name"].apply(extract_years)
+
+    tb["regime_redux_row_owid"] = tb["regime_redux_row_owid"].replace({3: 0, 2: 1})
+
     # Drop unused in this dataset columns columns.
     tb = tb.drop(columns=["country", "conflict", "government_policy_overall", "external_factors"])
     tb = tb.format(["famine_name", "year"])
@@ -91,6 +101,18 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def extract_years(famine_name):
+    # Extract start and end years from famine_name and calculate midpoint
+    years = re.findall(r"\d{4}", famine_name)
+    if len(years) == 2:
+        start_year, end_year = map(int, years)
+        return (start_year + end_year) // 2
+    elif len(years) == 1:
+        return int(years[0])
+    else:
+        return None
 
 
 def add_regime(tb_famines: Table, ds_regime: Dataset) -> Table:
