@@ -161,18 +161,14 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap_who = paths.load_snapshot("atus_who.zip")
     snap_act = paths.load_snapshot("atus_activities.zip")
-    # snap_resp = paths.load_snapshot("atus_respondent.zip")
     snap_sum = paths.load_snapshot("atus_summary.zip")
-    # snap_roster = paths.load_snapshot("atus_roster.zip")
     snap_act_codes = paths.load_snapshot("activity_codes_2023.xls")
 
     # load tables:
     who_data = load_data_and_add_meta(snap_who, "atuswho_0323.dat")
     act_data = load_data_and_add_meta(snap_act, "atusact_0323.dat")
-    # resp_data = load_data_and_add_meta(snap_resp, "atusresp_0323.dat")
     act_codes = pr.read_excel(snap_act_codes.path, sheet_name="ATUS 2023 Lexicon", header=1)
     sum_data = load_data_and_add_meta(snap_sum, "atussum_0323.dat")
-    # roster_data = load_data_and_add_meta(snap_roster, "atusrost_0323.dat")
 
     # format act codes:
     act_codes = act_codes.rename(columns={"6-digit activity code": "activity_code", "Activity": "activity_name"})
@@ -217,13 +213,7 @@ def load_data_and_add_meta(snap, file_name):
     zf = ZipFile(snap.path)
     tb = pr.read_csv(zf.open(file_name), origin=snap.metadata.origin)
 
-    # tb_meta = TableMeta(
-    #    short_name=snap.metadata.short_name,
-    #    title=snap.metadata.origin.title,
-    #    description=snap.metadata.origin.description,
-    # )
     for col in tb.columns:
-        # tb[col].metadata = tb_meta
         tb[col].metadata.origins = [snap.metadata.origin]
 
     tb.metadata.title = snap.metadata.origin.title

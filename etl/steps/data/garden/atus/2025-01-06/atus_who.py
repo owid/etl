@@ -114,9 +114,8 @@ def fill_missing_values(tb_agg):
 
 
 def development_over_time_for_age_groups(tb_agg):
-    # coding changed in 2010 for coworkers and not applicable
-    # tb_agg = tb_agg[tb_agg["year"] >= 2010]
-
+    """Capture changes in time spent with different categories over time for different age groups
+    Result: table with average time spend with each category for each age group for each year. This is not separated by gender."""
     # age starts with 15, 80/85 is topcoded
     age_brackets = [(15, 29), (30, 44), (45, 59), (60, 85)]
 
@@ -158,9 +157,10 @@ def development_over_time_for_age_groups(tb_agg):
     return tb_years
 
 
-def aggregate_over_age(tb_agg, start_year=2009, end_year=2019, gender="all"):
-    """Aggregate data over age and time period. Start and end year are inclusive, default is 2009-2019"""
+def aggregate_over_age(tb_agg, start_year, end_year, gender="all"):
+    """Aggregate data over age and time period. Start and end year are inclusive."""
     # remove co-worker category before 2010, since it gets recorded differently
+    # this is not relevant since we use 2010-2023 timeframe, but kept for posterity
     tb_agg = tb_agg[~((tb_agg["year"] < 2010) & (tb_agg["who_category"] == "Co-worker"))]
 
     # remove 2020 data since it does not include march-may data
@@ -173,6 +173,7 @@ def aggregate_over_age(tb_agg, start_year=2009, end_year=2019, gender="all"):
         tb_agg = tb_agg[tb_agg["gender"] == 2]
     elif gender == "male":
         tb_agg = tb_agg[tb_agg["gender"] == 1]
+
     # Now aggregate by category and age
     # This gives final result: average duration spent with each who_category for each age
     tb_agg = (

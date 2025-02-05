@@ -70,5 +70,5 @@ tables:
           - '{definitions.processing.multiple_people}'
           - '{definitions.processing.other}'
           - '{definitions.processing.n_a}'
-          - ATUS data were not collected about the period March 18, 2020 to May 9, 2020, which coincided with a time when most residents of the United States were encouraged to stay home to prevent the spread of COVID-19. Therefore, data collected for 2020 is not representative of the entire year.
+          - ATUS data were not collected during the period March 18, 2020 to May 9, 2020, which coincided with a time when most residents of the United States were encouraged to stay home to prevent the spread of COVID-19. Therefore, data collected for 2020 is not representative of the entire year.
 
