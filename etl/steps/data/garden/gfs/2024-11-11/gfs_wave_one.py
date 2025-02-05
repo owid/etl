@@ -1,8 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import numpy as np
-
-# import pandas as pd
+import pandas as pd
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -340,7 +339,7 @@ def share_categorical(tb, groups: list = ["country"], cols: list = CAT_COLS):
         denom = res.groupby(groups).sum()
         res = (res / denom).unstack()
 
-        col_names = [f"ans_{int(x)}" if x == x else "na" for x in res.columns]
+        col_names = ["na" if pd.isna(x) else f"ans_{int(x)}" for x in res.columns]
         res.columns = [f"{col}_{x}_share" for x in col_names]
         res = res.fillna(0)  # if one category does not appear for country, fill with 0
         res = check_for_missing_answer(res, col)
@@ -385,7 +384,7 @@ def get_na_share(tb, groups: list, cols: list):
 
 def get_ineq_nan(tb_row):
     """Return truth value of tb["wb_fiveyrs"] < tb["wb_today"] if both are not nan, else return nan"""
-    if tb_row["wb_fiveyrs"] == tb_row["wb_fiveyrs"] and tb_row["wb_today"] == tb_row["wb_today"]:
-        return float(tb_row["wb_fiveyrs"] < tb_row["wb_today"]) + 1  # 1 if yes, 2 if no
-    else:
+    if pd.isna(tb_row["wb_fiveyrs"]) or pd.isna(tb_row["wb_today"]):
         return np.nan
+    else:
+        return float(tb_row["wb_fiveyrs"] < tb_row["wb_today"]) + 1  # 1 if yes, 2 if no
