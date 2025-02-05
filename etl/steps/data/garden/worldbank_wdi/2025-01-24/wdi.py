@@ -648,8 +648,6 @@ def adjust_current_to_constant_usd(tb: Table, indicators: List[str], base_year: 
         suffixes=("", "_base_year"),
     )
 
-    print(tb_adjusted)
-
     # Divide the deflator by the deflator in the base year
     tb_adjusted[f"{deflator_indicator}_adjusted"] = (
         tb_adjusted[deflator_indicator] / tb_adjusted[f"{deflator_indicator}_base_year"]
