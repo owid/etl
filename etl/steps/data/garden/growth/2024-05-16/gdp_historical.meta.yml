@@ -41,7 +41,7 @@ tables:
     variables:
       gdp:
         title: GDP
-        unit: international-$ in 2017 prices
+        unit: international-$ in 2021 prices
         short_unit: $
         display:
           name: GDP
@@ -77,7 +77,7 @@ tables:
 
       gdp_per_capita:
         title: GDP per capita
-        unit: international-$ in 2017 prices
+        unit: international-$ in 2021 prices
         short_unit: $
         display:
           name: GDP per capita
