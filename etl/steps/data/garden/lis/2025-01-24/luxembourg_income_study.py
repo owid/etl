@@ -39,7 +39,9 @@ def run(dest_dir: str) -> None:
     # Create a new garden dataset
     ds_meadow = paths.load_dataset("luxembourg_income_study")
 
+    # Create a list to store the tables
     tables = []
+    # Load and save tables for each age group
     for age, age_suffix in AGE_DICT.items():
         # Load inputs.
 
