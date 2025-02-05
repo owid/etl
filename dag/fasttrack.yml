@@ -228,3 +228,5 @@ steps:
     - snapshot://fasttrack/latest/in_donor_foreign_aid_categories_dac_countries.csv
   data://grapher/fasttrack/latest/poverty_latam_idb:
     - snapshot://fasttrack/latest/poverty_latam_idb.csv
+  data://grapher/fasttrack/latest/foreign_aid_govt_private:
+    - snapshot://fasttrack/latest/foreign_aid_govt_private.csv
