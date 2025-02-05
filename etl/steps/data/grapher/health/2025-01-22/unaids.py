@@ -30,6 +30,10 @@ def run(dest_dir: str) -> None:
         ds_garden["gam_age_sex_group"],
     ]
 
+    ##################################################################################################
+    #
+    # DEBUG: The following lines provide insights on which indicators are most complete.
+    #
     # tbs = []
     # for tb in tables:
     #     print(tb.m.short_name)
@@ -50,6 +54,14 @@ def run(dest_dir: str) -> None:
     # cols_last = ["value", "country"]
     # tbx = tbx[[col for col in tbx.columns if col not in cols_last] + cols_last]
     # tbx = tbx.sort_values(["value", "country"], ascending=False)
+
+    # tbg = tbx.groupby("indicator", as_index=False).agg({
+    #     "value": ["mean", "size"],
+    #     "country": "mean",
+    # })
+    # tbg.columns = ["indicator", "num_values", "num_dimensions", "num_countries"]
+    # tbg = tbg.sort_values(["num_values", "num_countries"], ascending=False)
+    ##################################################################################################
 
     #
     # Save outputs.

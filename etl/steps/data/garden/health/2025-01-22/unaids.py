@@ -75,6 +75,34 @@ INDICATORS_GAM_DROP = [
     "SURVEY_CERVICAL_CANCER",  # Unclear metadata
 ]
 
+# ANOMALIES
+ANOMALIES = {
+    "epi": [
+        {
+            "indicator": "aids_orphans",
+            "country": "Uzbekistan",
+        }
+    ],
+    "gam_group": [
+        {
+            "indicator": "resource_avail_constant",
+            "country": "World",
+            "dimensions": {"group": "other international"},
+            "year": 2015,
+        }
+    ],
+    # Example
+    # "table_name": [
+    #     {
+    #         "indicator": "indicator_name",
+    #         "country": "country_name",
+    #         # OPTIONAL
+    #         # "year": 2021, OR "year": [2020, 2021] OR "year": list(range(2000, 2022))
+    #         # "dimensions": {"age": "0"} OR {"age": ["0", "15-24"]}
+    #     }
+    # ],
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -103,6 +131,7 @@ def run(dest_dir: str) -> None:
     # EPI data
     ###############################
     tb_epi = ds_meadow.read("epi")  ## 1,687,587 rows
+    # Make table
     tb_epi = make_table_epi(
         tb=tb_epi,
         dimensions=dimensions["epi"],
@@ -110,6 +139,7 @@ def run(dest_dir: str) -> None:
         ds_income_groups=ds_income_groups,
         countries_all=countries_all,
     )
+    # Format
     tb_epi = tb_epi.format(["country", "year", "age", "sex", "estimate"], short_name="epi")
 
     ###############################
@@ -213,7 +243,13 @@ def run(dest_dir: str) -> None:
         tb = tb.underscore()
         tb = tb.dropna(how="all")
 
-        # (OPTIONAL) Add regional aggregates
+        # 3/ Remove anomalies
+        if short_name in ANOMALIES:
+            paths.log.info(f"Removing anomalies from table: {short_name}")
+            anomalies = ANOMALIES[short_name]
+            tb = remove_anomalies(tb, anomalies)
+
+        # 4/ (OPTIONAL) Add regional aggregates
         # if columns_agg is not None:
         if regions_agg:
             columns_agg = tb_meta.loc[tb_meta["unit"] == "NUMBER", "indicator"].tolist()
@@ -226,7 +262,8 @@ def run(dest_dir: str) -> None:
                     columns_agg=columns_agg,
                     countries_all=countries_all,
                 )
-        # 3/ Format
+
+        # 5/ Format
         tb = tb.format(columns, short_name=short_name)
 
         return tb
@@ -362,6 +399,12 @@ def make_table_epi(tb, dimensions, ds_regions, ds_income_groups, countries_all):
 
     # Drop all NaN rows
     tb = tb.dropna(how="all")
+
+    # Remove anomalies
+    if "epi" in ANOMALIES:
+        paths.log.info(f"Removing anomalies from table: 'epi'")
+        anomalies = ANOMALIES["epi"]
+        tb = remove_anomalies(tb, anomalies)
 
     # Add regional data
     columns_agg = tb_meta.loc[tb_meta["unit"] == "NUMBER", "indicator"].tolist()
@@ -1084,9 +1127,41 @@ def add_regional_aggregates(tb: Table, ds_regions, ds_income_groups, columns_agg
     return tb
 
 
-##########################################################################################
-# OTHERS (might deprecate)
-##########################################################################################
+def remove_anomalies(tb, anomalies):
+    """Remove anomalies in the table."""
+    for anomaly in anomalies:
+        # Sanity checks
+        assert "indicator" in anomaly
+        assert "country" in anomaly
+        assert anomaly["indicator"] in tb.columns, f"Indicator '{anomaly['indicator']}' not found in table!"
+        # Create mask
+        mask = (
+            (tb["country"] == anomaly["country"])
+        )
+
+        if "year" in anomaly:
+            if isinstance(anomaly["year"], int):
+                mask &= (tb["year"] == anomaly["year"])
+            elif isinstance(anomaly["year"], list):
+                mask &= (tb["year"].isin(anomaly["year"]))
+            else:
+                raise TypeError("Unexpected type for 'year' in anomaly! Must be INT or LIST[INT].")
+
+        if "dimensions" in anomaly:
+            assert isinstance(anomaly["dimensions"], dict), "Unexpected type for 'dimensions' in anomaly! Must be a DICT."
+            for dim, value in anomaly["dimensions"].items():
+                if isinstance(value, list):
+                    mask &= (tb[dim].isin(value))
+                else:
+                    mask &= (tb[dim] == value)
+
+        # Remove anomalies
+        tb.loc[mask, anomaly["indicator"]] = np.nan
+
+    # Drop all NaN rows
+    tb = tb.dropna(how="all")
+
+    return tb
 
 
 def add_old_art_averted_deaths_data(tb: Table) -> Table:
@@ -1136,25 +1211,6 @@ def load_aux_table(short_name: str) -> Table:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    return tb
-
-
-def combine_tables(tb: Table, tb_hiv_child: Table, tb_gap_art: Table, tb_deaths_art: Table, tb_condom: Table) -> Table:
-    """Combine all tables."""
-    tb = pr.concat([tb, tb_hiv_child], ignore_index=True)
-
-    # Add remaining data from auxiliary tables
-
-    # Indicator names and their corresponding auxiliary tables
-    indicators = ["msm_condom_use", "deaths_averted_art", "gap_on_art"]
-    tables = [tb_condom, tb_deaths_art, tb_gap_art]
-    for metric, tb_aux in zip(indicators, tables):
-        tb = tb.merge(tb_aux, on=["country", "year", "subgroup_description"], how="outer", suffixes=("", "__aux"))
-        tb[metric] = tb[metric].fillna(pd.Series(tb[f"{metric}__aux"]))
-
-    # Drop auxiliary columns
-    tb = tb.drop(columns=["msm_condom_use__aux", "deaths_averted_art__aux", "gap_on_art__aux"])
-
     return tb
 
 
