@@ -636,10 +636,19 @@ def adjust_current_to_constant_usd(tb: Table, indicators: List[str], base_year: 
 
     tb_adjusted = tb[["country", "year"] + indicators + [deflator_indicator]].copy()
 
-    # For each country, calculate the deflator for the base year and copy it to all years
-    tb_adjusted[f"{deflator_indicator}_base_year"] = tb_adjusted.loc[
-        tb_adjusted["year"] == base_year, deflator_indicator
-    ]
+    # Create a new table with the data only for the base year
+    tb_base_year = tb_adjusted[tb_adjusted["year"] == base_year].reset_index(drop=True)
+
+    # Merge the two tables, only keeping the deflator for the base year
+    tb_adjusted = pr.merge(
+        tb_adjusted,
+        tb_base_year[["country", deflator_indicator]],
+        on="country",
+        how="left",
+        suffixes=("", "_base_year"),
+    )
+
+    print(tb_adjusted)
 
     # Divide the deflator by the deflator in the base year
     tb_adjusted[f"{deflator_indicator}_adjusted"] = (
