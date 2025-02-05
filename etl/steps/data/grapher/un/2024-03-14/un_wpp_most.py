@@ -15,13 +15,13 @@ def run(dest_dir: str) -> None:
 
     # Read five-year age-group table from garden dataset.
     tb_five = ds_garden["population_5_year_age_groups"].reset_index()
-    tb_five = tb_five.rename(columns={"location": "country"})
-    tb_five = tb_five.set_index(["country", "year"], verify_integrity=True)
+    # tb_five = tb_five.rename(columns={"location": "country"})
+    tb_five = tb_five.format(["country", "year"])
 
     # Read ten-year age-group table from garden dataset.
     tb_ten = ds_garden["population_10_year_age_groups"].reset_index()
-    tb_ten = tb_ten.rename(columns={"location": "country"})
-    tb_ten = tb_ten.set_index(["country", "year"], verify_integrity=True)
+    # tb_ten = tb_ten.rename(columns={"location": "country"})
+    tb_ten = tb_ten.format(["country", "year"])
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.

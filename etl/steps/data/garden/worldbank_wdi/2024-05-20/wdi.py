@@ -4,6 +4,7 @@ import zipfile
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+import owid.catalog.processing as pr
 import pandas as pd
 import structlog
 from owid.catalog import Dataset, Table, VariableMeta
@@ -27,6 +28,8 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset()
     ds_population = paths.load_dataset("population")
+    ds_regions = paths.load_dataset("regions")
+    ds_income_groups = paths.load_dataset("income_groups")
 
     #
     # Process data.
@@ -63,6 +66,9 @@ def run(dest_dir: str) -> None:
     # add armed personnel as share of population
     tb_garden = add_armed_personnel_as_share_of_population(tb_garden, ds_population)
 
+    # add regions to remittance data
+    tb_garden = add_regions_to_remittance_data(tb_garden, ds_regions, ds_income_groups)
+
     ####################################################################################################################
 
     #
@@ -75,6 +81,96 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
     log.info("wdi.end")
+
+
+def add_regions_to_remittance_data(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
+    """
+    Add regions to remittance data, if more than 75% of remittance volume sent/ received is covered by cost data.
+
+    notes for indicators:
+    - si_rmt_cost_ib_zs: % cost of receiving remittances (inbound)
+    - si_rmt_cost_ob_zs: % cost of sending remittances (outbound)
+    - bx_trf_pwkr_cd_dt: total remittances received by country
+    - bm_trf_pwkr_cd_dt: total remittances sent by country
+    """
+
+    tb = tb.reset_index()
+
+    # create a copy so other indicators are not affected
+    regions_tb = tb.copy()
+
+    # create new columns for total remittances (only for countries where remittance cost is available)
+    # this is needed to calculate share of remittance volume covered by cost data
+    regions_tb["total_received_remittances"] = regions_tb["bx_trf_pwkr_cd_dt"].where(
+        regions_tb["si_rmt_cost_ib_zs"].notna()
+    )
+    regions_tb["total_sent_remittances"] = regions_tb["bm_trf_pwkr_cd_dt"].where(
+        regions_tb["si_rmt_cost_ob_zs"].notna()
+    )
+
+    # calculate total cost of remittance for each country
+    regions_tb["total_cost_of_receiving_remittances"] = (
+        regions_tb["si_rmt_cost_ib_zs"] * regions_tb["total_received_remittances"]
+    )
+    regions_tb["total_cost_of_sending_remittances"] = (
+        regions_tb["si_rmt_cost_ob_zs"] * regions_tb["total_sent_remittances"]
+    )
+
+    # aggregation for regions
+    agg = {
+        "total_cost_of_receiving_remittances": "sum",
+        "total_cost_of_sending_remittances": "sum",
+        "total_received_remittances": "sum",
+        "total_sent_remittances": "sum",
+        "bx_trf_pwkr_cd_dt": "sum",
+        "bm_trf_pwkr_cd_dt": "sum",
+    }
+
+    # add regions to table
+    regions_tb = geo.add_regions_to_table(
+        regions_tb,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        aggregations=agg,
+        min_num_values_per_year=1,
+    )
+
+    # calculate cost of remittances per region
+    regions_tb["calc_cost_received_for_regions"] = (
+        regions_tb["total_cost_of_receiving_remittances"] / regions_tb["total_received_remittances"]
+    )
+    regions_tb["calc_cost_sent_for_regions"] = (
+        regions_tb["total_cost_of_sending_remittances"] / regions_tb["total_sent_remittances"]
+    )
+
+    # calculate share of remittances covered by cost
+    regions_tb["perc_covered_by_cost_received"] = (
+        regions_tb["total_received_remittances"] / regions_tb["bx_trf_pwkr_cd_dt"]
+    )
+    regions_tb["perc_covered_by_cost_sent"] = regions_tb["total_sent_remittances"] / regions_tb["bm_trf_pwkr_cd_dt"]
+
+    # only keep cost for regions if >75% of remittance volumne sent/ received is covered by cost
+    regions_tb["si_rmt_cost_ib_zs"] = regions_tb["calc_cost_received_for_regions"].where(
+        regions_tb["perc_covered_by_cost_received"] > 0.75
+    )
+    regions_tb["si_rmt_cost_ob_zs"] = regions_tb["calc_cost_sent_for_regions"].where(
+        regions_tb["perc_covered_by_cost_sent"] > 0.75
+    )
+
+    col_to_replace = [
+        "si_rmt_cost_ib_zs",
+        "si_rmt_cost_ob_zs",
+        "bx_trf_pwkr_cd_dt",
+        "bm_trf_pwkr_cd_dt",
+    ]
+
+    col_rest = [col for col in tb.columns if col not in col_to_replace]
+
+    tb = pr.merge(tb[col_rest], regions_tb[col_to_replace + ["country", "year"]], on=["country", "year"], how="outer")
+
+    tb = tb.format(["country", "year"])
+
+    return tb
 
 
 def mk_omms(table: Table) -> Table:

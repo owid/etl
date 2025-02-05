@@ -1,8 +1,11 @@
 meta:
-  namespace: fasttrack
-  short_name: cholera
-  file_extension: csv
-  date_accessed: 2023-06-01
+  source:
+    name: World Health Organization (2023)
+    url: nan
+    source_data_url: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSlmIK_QFOjnb3DSPq6AoEeVFCPhsvKBE4yiUKrOogGhyu98SqoJutDR_3CEI43nvslvYIcJjICn-qI/pub?output=csv
+    date_accessed: '2024-11-26'
+    published_by: World Health Organization
   name: Cholera reported cases, deaths and case fatality rate (WHO, 2023)
   description: |-
     The data is created by combining multiple WHO Weekly Epidemiological Reports for cholera reported cases, deaths and case fatality rate.
@@ -18,15 +21,8 @@ meta:
     2020: https://web.archive.org/web/20230326231135/http://apps.who.int/iris/bitstream/handle/10665/345271/WER9637-445-454-eng-fre.pdf?sequence=1&isAllowed=y
 
     2021: https://web.archive.org/web/20230526223955/https://apps.who.int/iris/bitstream/handle/10665/362858/WER9737-453-464-eng-fre.pdf?sequence=1&isAllowed=y
-  source_name: Google Sheet
-  url: ''
-  source_published_by: Google Sheet
-  source_data_url: 
-    https://docs.google.com/spreadsheets/d/e/2PACX-1vSlmIK_QFOjnb3DSPq6AoEeVFCPhsvKBE4yiUKrOogGhyu98SqoJutDR_3CEI43nvslvYIcJjICn-qI/pub?output=csv
-  is_public: true
-  version: '2023-05-31'
-wdir: ../../../data/snapshots/fasttrack/2023-05-31
+  license: {}
 outs:
-- md5: 035a7f6ada3274928cffda95091de105
-  size: 4449
-  path: cholera.csv
+  - md5: 39d2f683da32e151413ab8d2dbfc7582
+    size: 4141
+    path: cholera.csv

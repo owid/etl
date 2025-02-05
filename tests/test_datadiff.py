@@ -1,3 +1,6 @@
+import os
+from unittest.mock import patch
+
 import pandas as pd
 from owid.catalog import Dataset, DatasetMeta, Table
 
@@ -19,6 +22,7 @@ def _create_datasets(tmp_path):
     return ds_a, ds_b
 
 
+@patch.dict(os.environ, {"OWID_STRICT": ""})
 def test_DatasetDiff_summary(tmp_path):
     ds_a, ds_b = _create_datasets(tmp_path)
 
@@ -43,6 +47,7 @@ def test_DatasetDiff_summary(tmp_path):
     ]
 
 
+@patch.dict(os.environ, {"OWID_STRICT": ""})
 def test_new_data(tmp_path):
     ds_a, ds_b = _create_datasets(tmp_path)
 
@@ -62,5 +67,5 @@ def test_new_data(tmp_path):
         "\t\t[yellow]~ Dim [b]country[/b]",
         "\t\t\t\t[violet]+ New values: 1 / 3 (33.33%)\n\t\t\t\t[violet]  country\n\t\t\t\t[violet]       FR",
         "\t\t[yellow]~ Column [b]a[/b] (new [u]data[/u], changed [u]data[/u])",
-        "\t\t\t\t[violet]+ New values: 1 / 3 (33.33%)\n\t\t\t\t[violet]  country  a\n\t\t\t\t[violet]       FR  3\n\t\t\t\t[violet]~ Changed values: 1 / 3 (33.33%)\n\t\t\t\t[violet]  country  a -  a +\n\t\t\t\t[violet]       US  3.0    2",
+        "\t\t\t\t[violet]+ New values: 1 / 3 (33.33%)\n\t\t\t\t[violet]  country  a\n\t\t\t\t[violet]       FR  3\n\t\t\t\t[violet]~ Changed values: 1 / 3 (33.33%)\n\t\t\t\t[violet]  country  a -  a +\n\t\t\t\t[violet]       US    3    2",
     ]

@@ -13,9 +13,9 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from etl import config
-from etl import grapher_model as gm
 from etl.command import main as etl_main
 from etl.db import get_engine, read_sql
+from etl.grapher import model as gm
 from etl.metadata_export import merge_or_create_yaml, reorder_fields
 from etl.paths import BASE_DIR, DAG_FILE, DATA_DIR, STEP_DIR
 
@@ -209,9 +209,9 @@ def cli(
 
         # empty fields to be filled
         vars[col]["presentation"] = {}
-        vars[col]["presentation"][
-            "title_public"
-        ] = "TBD - Indicator title to be shown in data pages, that overrides the indicator's title."
+        vars[col]["presentation"]["title_public"] = (
+            "TBD - Indicator title to be shown in data pages, that overrides the indicator's title."
+        )
         vars[col]["presentation"]["title_variant"] = "TBD - Indicator's title variant"
         vars[col]["presentation"]["attribution_short"] = "TBD - Indicator's attribution (shorter version)"
         vars[col]["presentation"]["faqs"] = [

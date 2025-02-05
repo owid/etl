@@ -1,13 +1,24 @@
+definitions:
+  common:
+    presentation:
+      grapher_config:
+        subtitle: ""
+        originUrl: "https://ourworldindata.org/population-growth"
+        note: ""
+
+dataset:
+  title: Most populous age groups (UN WPP)
+
 tables:
   population_5_year_age_groups:
     variables:
-      age:
+      age_group_five:
         title: Five year age-group with the highest population
         unit: ""
         description_short: |-
           Five-year age group with the highest population.
         type: ordinal
-        sort:
+        sort: # May need additional groups when data is updated
           - 0-4
           - 5-9
           - 10-14
@@ -23,22 +34,18 @@ tables:
           - 60-64
           - 65-69
           - 70-74
-      value:
-        title: Population of the most populous five-year age group
-        unit: "people"
-        description_short: |-
-          Population of the most populous five-year age-group.
-        display:
-          numDecimalPlaces: 0
+          - 75-79
+        presentation:
+          title_public: Five year age-group with the highest population
   population_10_year_age_groups:
     variables:
-      age_group:
+      age_group_ten:
         title: Ten year age-group with the highest population
         unit: ""
         description_short: |-
           Ten-year age group with the highest population.
         type: ordinal
-        sort:
+        sort: # May need additional groups when data is updated
           - 0-9
           - 10-19
           - 20-29
@@ -46,10 +53,6 @@ tables:
           - 40-49
           - 50-59
           - 60-69
-      value:
-        title: Population of the most populous ten year age group
-        unit: "people"
-        description_short: |-
-          Population of the most populous ten-year age-group.
-        display:
-          numDecimalPlaces: 0
+          - 70-79
+        presentation:
+          title_public: Ten year age-group with the highest population

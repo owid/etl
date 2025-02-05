@@ -195,6 +195,12 @@ class Variable(pd.Series):
         return self.__mul__(other)
 
     def __truediv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+        if is_nullable_series(self) or is_nullable_series(other):
+            # 0/0 should return pd.NA, not np.nan
+            zero_div_zero = (other == 0) & (self == 0)
+            if zero_div_zero.any():
+                other = other.replace({0: pd.NA})  # type: ignore
+
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__truediv__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="/", name=variable_name)
@@ -569,13 +575,11 @@ def combine_variables_metadata(
 
 
 @overload
-def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Literal[False] = False) -> Variable:
-    ...
+def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Literal[False] = False) -> Variable: ...
 
 
 @overload
-def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Literal[True] = True) -> None:
-    ...
+def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Literal[True] = True) -> None: ...
 
 
 def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool = False) -> Optional[Variable]:
@@ -585,3 +589,24 @@ def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool 
         new_variable = to_variable.copy()
         new_variable.metadata = from_variable.metadata.copy()
         return new_variable
+
+
+def is_nullable_series(s: Any) -> bool:
+    """Check if a series has a nullable pandas dtype."""
+    if not hasattr(s, "dtype"):
+        return False
+
+    nullable_types = {
+        "Int8",
+        "Int16",
+        "Int32",
+        "Int64",
+        "UInt8",
+        "UInt16",
+        "UInt32",
+        "UInt64",
+        "Float32",
+        "Float64",
+        "boolean",
+    }
+    return str(s.dtype) in nullable_types

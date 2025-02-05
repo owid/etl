@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     # optionally set additional dimensions
     # table = table.set_index(["sex", "income_group"], append=True)
 
-    # if your data is in long format, you can use `grapher_helpers.long_to_wide_tables`
+    # if your data is in long format, you can use `grapher.helpers.long_to_wide_tables`
     # to get into wide format
     dataset.add(table)
 

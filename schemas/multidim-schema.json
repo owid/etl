@@ -139,8 +139,8 @@
                                 "type": "string",
                                 "description": "Url of the concrete schema version to use to validate this document",
                                 "format": "uri",
-                                "default": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-                                "const": "https://files.ourworldindata.org/schemas/grapher-schema.005.json"
+                                "default": "https://files.ourworldindata.org/schemas/grapher-schema.006.json",
+                                "const": "https://files.ourworldindata.org/schemas/grapher-schema.006.json"
                             },
                             "id": {
                                 "type": "integer",
@@ -266,11 +266,6 @@
                                 "type": "boolean",
                                 "default": false,
                                 "description": "Exclude entities that do not belong in any color group"
-                            },
-                            "hasChartTab": {
-                                "type": "boolean",
-                                "default": true,
-                                "description": "Whether to show the (non-map) chart tab"
                             },
                             "hideLegend": {
                                 "type": "boolean",
@@ -564,20 +559,23 @@
                                 "type": "string",
                                 "description": "Big title text of the chart"
                             },
-                            "type": {
-                                "type": "string",
-                                "description": "Which type of chart should be shown (hasMapChart can be used to always also show a map chart)",
-                                "default": "LineChart",
-                                "enum": [
-                                    "LineChart",
-                                    "ScatterPlot",
-                                    "StackedArea",
-                                    "DiscreteBar",
-                                    "StackedDiscreteBar",
-                                    "SlopeChart",
-                                    "StackedBar",
-                                    "Marimekko"
-                                ]
+                            "chartTypes": {
+                                "type": "array",
+                                "description": "Which types of chart should be shown",
+                                "default": ["LineChart"],
+                                "items": {
+                                  "type": "string",
+                                  "enum": [
+                                      "LineChart",
+                                      "ScatterPlot",
+                                      "StackedArea",
+                                      "DiscreteBar",
+                                      "StackedDiscreteBar",
+                                      "SlopeChart",
+                                      "StackedBar",
+                                      "Marimekko"
+                                  ]
+                                }
                             },
                             "hasMapTab": {
                                 "type": "boolean",

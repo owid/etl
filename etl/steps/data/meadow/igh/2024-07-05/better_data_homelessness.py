@@ -1,6 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -46,7 +45,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("better_data_homelessness.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(sheet_name="BDP 2024")
+    tb = snap.read(safe_types=False, sheet_name="BDP 2024")
 
     #
     # Process data.

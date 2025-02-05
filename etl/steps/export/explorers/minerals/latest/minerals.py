@@ -3,7 +3,7 @@
 import pandas as pd
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_explorer_old
+from etl.helpers import PathFinder, create_explorer
 
 # Initialize log.
 log = get_logger()
@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     #
     # Load minerals grapher dataset and read its main table.
     ds = paths.load_dataset("minerals")
-    tb = ds.read_table("minerals")
+    tb = ds.read("minerals")
 
     #
     # Process data.
@@ -190,5 +190,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new explorers dataset and tsv file.
-    ds_explorer = create_explorer_old(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
+    ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
     ds_explorer.save()

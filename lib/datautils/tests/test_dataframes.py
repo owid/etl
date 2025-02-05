@@ -1,6 +1,4 @@
-"""Test functions in owid.datautils.dataframes module.
-
-"""
+"""Test functions in owid.datautils.dataframes module."""
 
 import tempfile
 from pathlib import Path
@@ -326,13 +324,14 @@ class TestGroupbyAggregate:
             }
         ).set_index("year")
         df_out["value_03"] = df_out["value_03"].astype(object)
-        assert dataframes.groupby_agg(
+        result = dataframes.groupby_agg(
             df_in,
             ["year"],
             aggregations=None,
             num_allowed_nans=None,
             frac_allowed_nans=None,
-        ).equals(df_out)
+        )
+        assert result.equals(df_out)
 
     def test_default_aggregate_with_num_allowed_nans_zero(self):
         df_in = pd.DataFrame(

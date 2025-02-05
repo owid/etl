@@ -1072,11 +1072,6 @@
                           "default": false,
                           "description": "Exclude entities that do not belong in any color group"
                         },
-                        "hasChartTab": {
-                          "type": "boolean",
-                          "default": true,
-                          "description": "Whether to show the (non-map) chart tab"
-                        },
                         "data": {
                           "type": "object",
                           "description": "Obsolete name - used only to store the available entities",
@@ -1287,21 +1282,24 @@
                             ]
                           ]
                         },
-                        "type": {
-                          "type": "string",
-                          "description": "Which type of chart should be shown (hasMapChart can be used to always also show a map chart)",
-                          "default": "LineChart",
-                          "enum": [
-                            "LineChart",
-                            "ScatterPlot",
-                            "StackedArea",
-                            "DiscreteBar",
-                            "StackedDiscreteBar",
-                            "SlopeChart",
-                            "StackedBar",
-                            "WorldMap",
-                            "Marimekko"
-                          ]
+                        "chartTypes": {
+                          "type": "array",
+                          "description": "Which types of chart should be shown",
+                          "default": ["LineChart"],
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "LineChart",
+                              "ScatterPlot",
+                              "StackedArea",
+                              "DiscreteBar",
+                              "StackedDiscreteBar",
+                              "SlopeChart",
+                              "StackedBar",
+                              "WorldMap",
+                              "Marimekko"
+                            ]
+                          }
                         },
                         "hasMapTab": {
                           "type": "boolean",

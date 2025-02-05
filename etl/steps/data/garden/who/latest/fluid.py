@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
 from datetime import datetime
 
 import numpy as np
@@ -72,7 +71,7 @@ def clean_sari_inpatient(df: pd.DataFrame) -> pd.DataFrame:
         0
     ]
     log.info(f"Removing {remove_inpatients} rows where the number of inpatients is below the number of SARI cases...")
-    df["inpatients"][(df["case_info"] == "SARI") & (df["reported_cases"] > df["inpatients"])] = np.NaN
+    df["inpatients"][(df["case_info"] == "SARI") & (df["reported_cases"] > df["inpatients"])] = np.nan
 
     return df
 
@@ -238,9 +237,9 @@ def clean_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
         f"{over_100_sari} rows with sari_cases_per_hundred_inpatients greater than or equal to 100. We'll set these to NA."
     )
 
-    df.loc[df["ili_cases_per_thousand_outpatients"] >= 1000, "ili_cases_per_thousand_outpatients"] = np.NaN
-    df.loc[df["ari_cases_per_thousand_outpatients"] >= 1000, "ari_cases_per_thousand_outpatients"] = np.NaN
-    df.loc[df["sari_cases_per_hundred_inpatients"] >= 100, "sari_cases_per_hundred_inpatients"] = np.NaN
+    df.loc[df["ili_cases_per_thousand_outpatients"] >= 1000, "ili_cases_per_thousand_outpatients"] = np.nan
+    df.loc[df["ari_cases_per_thousand_outpatients"] >= 1000, "ari_cases_per_thousand_outpatients"] = np.nan
+    df.loc[df["sari_cases_per_hundred_inpatients"] >= 100, "sari_cases_per_hundred_inpatients"] = np.nan
 
     df["ili_cases_per_thousand_outpatients"] = df.groupby("country", group_keys=False)[
         "ili_cases_per_thousand_outpatients"
@@ -262,7 +261,7 @@ def remove_values_with_only_extremes(group: pd.Series, min: int, max: int) -> pd
     If all values in the group are less than {min} or greater than {max}, or NA then replace all values for that group with NA.
     """
     if all((x <= min) | (x >= max) | (np.isnan(x)) for x in group):
-        return pd.Series([np.NaN if x <= min or x >= max else x for x in group], index=group.index, dtype="float64")
+        return pd.Series([np.nan if x <= min or x >= max else x for x in group], index=group.index, dtype="float64")
     else:
         return group
 

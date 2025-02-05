@@ -14,13 +14,13 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("bmr.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.underscore().format(["country", "year"])
 
     #
     # Save outputs.

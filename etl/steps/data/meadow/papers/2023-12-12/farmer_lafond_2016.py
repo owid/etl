@@ -1,6 +1,4 @@
-"""Load snapshot of Farmer & Lafond (2016) data and create a table.
-
-"""
+"""Load snapshot of Farmer & Lafond (2016) data and create a table."""
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -14,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Load snapshot.
     snap = paths.load_snapshot("farmer_lafond_2016.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Prepare data.

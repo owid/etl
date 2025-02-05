@@ -72,23 +72,30 @@ Additionally, Expert can also help out create Datasette queries!
   <figcaption>Asking the Expert to generate a Datasette query to get the charts with most views.</figcaption>
 </figure>
 
-### Data tools
+### Data curation
 
 Pages to help us improve our charts (e.g. keeping them up to date). The current pages are:
 
 - [**Indicator Upgrader**](update-charts/#indicator-upgrader): Upgrade old indicators with their corresponding new versions to keep the charts up to date. You will need to (mostly) manually map "old indicators" to "new indicators". Then, the tool will update all affected charts with the new indicators. These modified charts can be reviewed with **Chart diff**.
+- **Anomalist**: Presents all anomalies detected in a given selected dataset. By default, it attempts to load anomalies from the newly added datasets (and, if applicable, it also compares the new indicators with the old counterparts).
 - [**Chart diff**](update-charts/#chart-diff): Shows all charts in your environment (e.g. staging server) that have been modified compared to the production. This is useful to review the changes before they are pushed to the production.
 - [**Harmonizer**](harmonize-countries): Harmonize the entity names of a table.
 
 !!! info "Learn more about [updating charts](data-work/update-charts.md) section"
 
-### Monitoring
+### Data monitoring
 
 - **Dashboard**: Monitor all our datasets and update them quickly!
 - **Dataset Explorer**: A tool to explore the datasets in the ETL catalog. You can check the step dependancies and its metadata. If it is a Garden step, you can also perform some actions with it.
 
+### Explorers
+
+- **Map Bracketer**: Define map brackets for explorers smartly.
+- **ID to Path**: Convert an explorer that is ID-based to a path-based explorer.
+
 ### Research
 
+- **Insight search**: Browse insights from our archive by semantic similarity. This is helpful if you want to explore if there are any insights related to a specific topic.
 - **Insighter**: Generate insights from a chart using LLMs.
 
 ### Misc

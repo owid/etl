@@ -10,6 +10,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  title: AI Index Report - AI investment in generative AI and newly-founded AI companies
 
 
 tables:
@@ -21,15 +22,15 @@ tables:
         short_unit: '$'
         description_short: Generative AI refers to AI systems that can create new content, such as images, text, or music, based on patterns learned from existing data.
         description_processing: |-
-          - Reporting a time series of AI investments in nominal prices (i.e., without adjusting for inflation) means it makes little sense to compare observations across time; it is therefore not very useful. To make comparisons across time possible, one has to take into account that prices change (e.g., there is inflation).
-          - It is not obvious how to adjust this time series for inflation, and we debated it at some length within our team.
-          - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services that these investments purchased. This would make it possible to calculate a volume measure of AI investments, and it would tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost for some crucial AI technology has fallen rapidly in price.
-          - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. In the end we decided to use the US Consumer Price Index (CPI).
-          - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments therefore lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+          - Reporting a time series of AI investments in nominal prices would make it difficult to compare observations across time. To make these comparisons possible, one has to take into account that prices change (inflation).
+          - It is not obvious how to adjust this time series for inflation, and our team discussed the best solutions at our disposal.
+          - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services purchased through these investments. This would make it possible to calculate a volume measure of AI investments and tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost of some crucial AI technology has fallen rapidly in price.
+          - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. Ultimately, we decided to use the US Consumer Price Index (CPI).
+          - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments, therefore, lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
         description_key:
-        - One-time events like large acquisitions can skew yearly figures, and broader economic factors like interest rates or market sentiment can also affect AI investment trends independently of AI-specific developments.
-        - The dataset’s methodology doesn’t specify which types of AI investments are included, so it may overlook important areas of AI investment, such as those from public companies (e.g., NVIDIA, TSMC), corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
-        - The dataset likely underestimates the total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
+        - The data likely underestimates total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
+        - The source does not fully disclose its methodology and what's included or excluded. This means it may not fully capture important areas of AI investment, such as those from publicly traded companies, corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
+        - One-time events, such as large acquisitions, can distort yearly figures, while broader economic factors like interest rates and market sentiment can influence investment trends independently of AI-specific developments.
 
         presentation:
           grapher_config:

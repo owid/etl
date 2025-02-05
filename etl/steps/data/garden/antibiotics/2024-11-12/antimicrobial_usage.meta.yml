@@ -1,0 +1,133 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+  aware_description: <% if awarelabel == "Access" %>
+    Access antibiotics have activity against a wide range of common pathogens and show lower resistance potential than antibiotics in the other groups.
+    <% elif awarelabel == "Watch" %>
+    Watch antibiotic have higher resistance potential and include most of the highest priority agents among the Critically Important Antimicrobials for Human Medicine and/or antibiotics that are at relatively high risk of bacterial resistance.
+    <% elif awarelabel == "Reserve" %>
+    Reserve antibiotics  should be reserved for treatment of confirmed or suspected infections due to multi-drug-resistant organisms. Reserve group antibiotics should be treated as “last resort” options.
+    <% elif awarelabel == "Not classified/recommended" %>
+    The use of the Not classified/Not recommended antibiotics is not evidence-based, nor recommended in high-quality international guidelines.  WHO does not recommend the use of these antibiotics in clinical practice.
+    <% endif %>
+  routeofadministration: <% if routeofadministration == "O" %>
+    orally administered
+    <% elif routeofadministration == "P" %>
+    parentearally administered
+    <% elif routeofadministration == "R" %>
+    rectally administered4
+    <% elif routeofadministration == "I" %>
+    inhaled
+    <% endif %>
+  antimicrobialclass:
+    <% if antimicrobialclass == "Antibacterials (ATC J01, A07AA, P01AB, ATC J04A)" %>
+    antibiotics including antituberculosis drugs
+    <% elif antimicrobialclass == "Antimalarials (ATC P01B)" %>
+    antimalarials
+    <% elif antimicrobialclass == "Antimycotics and antifungals for systemic use (J02, D01B)" %>
+    antifungals
+    <% elif antimicrobialclass == "Antivirals for systemic use (ATC J05)" %>
+    antivirals
+    <% elif antimicrobialclass == "Drugs for the treatment of tuberculosis (ATC J04A)" %>
+    antituberculosis drugs
+    <% endif %>
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  class:
+    variables:
+      ddd:
+        title: Defined daily doses of {definitions.routeofadministration}  << antimicrobialclass.lower()>> - << atc4name.lower() >>  used
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antimicrobials used in a given year.
+        unit: defined daily doses
+        display:
+          numDecimalPlaces: 0
+      did:
+        title: Defined daily doses per 1000 inhabitants per day of {definitions.routeofadministration} << antimicrobialclass>> - << atc4name.lower() >> used
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antimicrobials used per 1000 inhabitants per day.
+        unit: defined daily doses per 1000 inhabitants per day
+        display:
+          numDecimalPlaces: 1
+  class_aggregated:
+    variables:
+      ddd_anti_malarials:
+        title: Defined daily doses of antimalarials used
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antimalarials used in a given year.
+        unit: defined daily doses
+        display:
+          numDecimalPlaces: 0
+      ddd_antibacterials_and_antituberculosis:
+        title: Defined daily doses of antibiotics and antituberculosis drugs used
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antibiotics and antituberculosis drugs used in a given year.
+        unit: defined daily doses
+        display:
+          numDecimalPlaces: 0
+      ddd_antifungals:
+        title: Defined daily doses of antifungals used
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antifungals used in a given year.
+        unit: defined daily doses
+        display:
+          numDecimalPlaces: 0
+      ddd_antituberculosis:
+        title: Defined daily doses of antituberculosis drugs used
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antituberculosis drugs used in a given year.
+        unit: defined daily doses
+        display:
+          numDecimalPlaces: 0
+      ddd_antivirals:
+        title: Defined daily doses of antivirals used
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antivirals used in a given year.
+        unit: defined daily doses
+        display:
+          numDecimalPlaces: 0
+      did_anti_malarials:
+        title: Defined daily doses of antimalarials used per 1,000 inhabitants per day
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antimalarials used in a given year per 1,000 inhabitants per day.
+        unit: defined daily doses per 1,000 inhabitants per day
+        display:
+          numDecimalPlaces: 1
+      did_antibacterials_and_antituberculosis:
+        title: Defined daily doses of antibiotics and antituberculosis drugs used per 1,000 inhabitants per day
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antibiotics and antituberculosis drugs used in a given year per 1,000 inhabitants per day.
+        unit: defined daily doses per 1,000 inhabitants per day
+        display:
+          numDecimalPlaces: 1
+      did_antifungals:
+        title: Defined daily doses of antifungals used per 1,000 inhabitants per day
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antifungals used in a given year per 1,000 inhabitants per day.
+        unit: defined daily doses per 1,000 inhabitants per day
+        display:
+          numDecimalPlaces: 1
+      did_antituberculosis:
+        title: Defined daily doses of antituberculosis drugs used per 1,000 inhabitants per day
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antituberculosis drugs used in a given year per 1,000 inhabitants per day.
+        unit: defined daily doses per 1,000 inhabitants per day
+        display:
+          numDecimalPlaces: 1
+      did_antivirals:
+        title: Defined daily doses of antivirals used per 1,000 inhabitants per day
+        description_short: Total [defined daily doses](#dod:defined-daily-doses) of antivirals used in a given year per 1,000 inhabitants per day.
+        unit: defined daily doses per 1,000 inhabitants per day
+        display:
+          numDecimalPlaces: 1
+  aware:
+    variables:
+      ddd:
+        title: Defined daily doses of << awarelabel >> antibiotics used
+        description_short: "Total [defined daily doses](#dod:defined-daily-doses) of AWaRe category: << awarelabel >> antibiotics used in a given year. {definitions.aware_description}"
+        unit: defined daily doses
+        display:
+          numDecimalPlaces: 0
+      did:
+        title: Defined daily doses per 1000 inhabitants per day of << awarelabel>> antibiotics used
+        description_short: "Total [defined daily doses](#dod:defined-daily-doses) of AWaRe category: <<awarelabel>> used per 1000 inhabitants per day. {definitions.aware_description}"
+        unit: defined daily doses per 1000 inhabitants per day
+        display:
+          numDecimalPlaces: 1

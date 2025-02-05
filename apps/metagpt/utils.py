@@ -1,4 +1,5 @@
 """Auxiliary utils for metagpt app."""
+
 from pathlib import Path
 from typing import Dict, List
 

@@ -1,6 +1,4 @@
-"""Load a snapshot and create a meadow dataset.
-
-"""
+"""Load a snapshot and create a meadow dataset."""
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -14,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot and read data.
     snap = paths.load_snapshot("fur_laws.xlsx")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

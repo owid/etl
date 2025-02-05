@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     snap_indices = paths.load_snapshot("equaldex_indices.csv")
 
     # Load data from snapshots.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb_current = snap_current.read()
     tb_indices = snap_indices.read()
 

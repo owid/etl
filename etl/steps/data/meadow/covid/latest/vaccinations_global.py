@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     snap_who = paths.load_snapshot("vaccinations_global_who.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb_who = snap_who.read()
 
     #

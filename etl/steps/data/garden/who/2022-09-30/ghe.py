@@ -50,7 +50,7 @@ def run(dest_dir: str) -> None:
     regions = paths.load_dataset("regions")["regions"]
     # Load WHO Standard population
     snap = paths.load_snapshot("standard_age_distribution.csv")
-    who_standard = snap.read()
+    who_standard = snap.read(safe_types=False)
     who_standard = format_who_standard(who_standard)
     # Read population dataset
     ds_population = paths.load_dataset("un_wpp")

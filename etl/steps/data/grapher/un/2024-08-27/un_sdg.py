@@ -1,4 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
+
 import json
 import os
 import re
@@ -11,7 +12,7 @@ from owid.catalog import Dataset, License, Origin, Table, VariableMeta
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
-from etl import grapher_helpers as gh
+from etl.grapher import helpers as gh
 from etl.helpers import PathFinder, create_dataset
 
 log = getLogger()
@@ -51,7 +52,7 @@ def run(dest_dir: str) -> None:
 
         log.info("un_sdg.process", table_name=var)
 
-        tb = ds_garden.read_table(var)
+        tb = ds_garden.read(var, safe_types=False)
 
         tb = create_table(tb)
 

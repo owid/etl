@@ -1,6 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-
 import numpy as np
 
 from etl.helpers import PathFinder, create_dataset
@@ -17,7 +16,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("soil_transmitted_helminthiases.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
     tb = tb.drop(columns="country_code")
 
     #
@@ -44,9 +43,7 @@ def run(dest_dir: str) -> None:
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     cols = ["country", "year", "Drug combination, Pre-SAC", "Drug combination, SAC"]
-    # For some reason format doesn't work here
-    # tb = tb.format(cols)
-    tb = tb.set_index(cols, verify_integrity=True)
+    tb = tb.format(cols)
 
     #
     # Save outputs.

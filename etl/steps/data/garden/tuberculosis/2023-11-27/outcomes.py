@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+
 from shared import add_variable_description_from_producer, removing_old_variables
 
 from etl.data_helpers import geo
@@ -16,7 +17,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("outcomes")
     snap = paths.load_snapshot("data_dictionary.csv")
     # Load data dictionary from snapshot.
-    dd = snap.read()
+    dd = snap.read(safe_types=False)
     # Read table from meadow dataset.
     tb = ds_meadow["outcomes"].reset_index()
 

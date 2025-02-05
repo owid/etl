@@ -1,9 +1,6 @@
-"""Grapher step for the Electricity Mix (Energy Institute & Ember) dataset.
+"""Grapher step for the Electricity Mix (Energy Institute & Ember) dataset."""
 
-"""
-
-
-from etl.grapher_helpers import add_columns_for_multiindicator_chart
+from etl.grapher.helpers import add_columns_for_multiindicator_chart
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.

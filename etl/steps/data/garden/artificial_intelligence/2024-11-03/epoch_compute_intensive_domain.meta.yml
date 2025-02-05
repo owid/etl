@@ -1,6 +1,6 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
-  desc_update: The 2024 data is incomplete and was last updated {TODAY}.
+  desc_update: The 2024 data is incomplete and was last updated {date_accessed}.
   common:
     processing_level: major
     presentation:

@@ -1,6 +1,5 @@
 """Script to create a snapshot of dataset 'Parameter, Compute and Data Trends in Machine Learning (Epoch, 2023)'."""
 
-
 from pathlib import Path
 
 import click

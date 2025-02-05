@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table, Variable
 from owid.datautils.dataframes import map_series
@@ -49,8 +48,10 @@ SHARE_VARIABLES = [
 PER_CAPITA_VARIABLES = [
     "annual_emissions_ch4_total_co2eq",
     "annual_emissions_co2_total",
+    "annual_emissions_co2_fossil",
     "annual_emissions_n2o_total_co2eq",
     "annual_emissions_ghg_total_co2eq",
+    "annual_emissions_ghg_fossil_co2eq",
 ]
 
 # Regions to be added by aggregating data from their member countries.

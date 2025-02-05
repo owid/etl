@@ -4,7 +4,7 @@ import json
 from typing import List
 
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow: Dataset = paths.load_dependency("consumption_controlled_substances")
+    ds_meadow = paths.load_dataset("consumption_controlled_substances")
 
     # Read table from meadow dataset.
     tb_meadow = ds_meadow["consumption_controlled_substances"]
@@ -99,11 +99,17 @@ def add_regions(df: pd.DataFrame) -> pd.DataFrame:
     df_pivot = df.pivot(index=id_vars, columns=[var_name], values=value_name).reset_index()
     # Add continent data
     regions = ["Asia", "Africa", "North America", "South America", "Oceania"]
+    # Load population
+    population = paths.load_dataset("population").read("population")
     for region in regions:
+        countries_that_must_have_data = geo.list_countries_in_region_that_must_have_data(
+            region=region,
+            population=population,
+        )
         df_pivot = add_region_aggregates(
             df_pivot,
             region=region,
-            countries_that_must_have_data="auto",
+            countries_that_must_have_data=countries_that_must_have_data,
             frac_allowed_nans_per_year=0.2,
             num_allowed_nans_per_year=None,
         )

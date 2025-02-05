@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
 
     tb["country"] = "State of the art"
     tb = tb.drop("name", axis=1)
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

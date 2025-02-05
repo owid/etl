@@ -1,0 +1,62 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Health
+    display:
+      numSignificantFigures: 3
+  pathogen_type: <%- if pathogen_type == "Fungi" -%>
+    fungus
+    <%- elif pathogen_type == "Viruses" -%>
+    virus
+    <%- else  -%>
+    << pathogen_type.lower() >>
+    <%- endif -%>
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  microbe:
+    variables:
+      value:
+        title: Neonatal deaths from << pathogen >> infections
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3
+          name: << pathogen >>
+      upper:
+        title: Upper bound of neonatal deaths from << pathogen >> infections
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3
+          name: << pathogen >>
+      lower:
+        title: Lower bound of neonatal deaths from << pathogen >> infections
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+        display:
+          roundingMode: significantFigures
+          numSignificantFigures: 3
+          name: << pathogen >>
+  pathogen_entity:
+    variables:
+      value:
+        title: Global neonatal deaths from bloodstream infections, by pathogen
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from bloodstream infections.
+      upper:
+        title: Upper bound of global neonatal deaths from bloodstream infections, by pathogen
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from bloodstream infections.
+      lower:
+        title: Lower bound of global neonatal deaths from bloodstream infections, by pathogen
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from bloodstream infections.

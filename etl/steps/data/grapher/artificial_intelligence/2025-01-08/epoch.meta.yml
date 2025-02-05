@@ -1,0 +1,18 @@
+definitions:
+  common:
+    unit: ''
+    short_unit: ''
+    display:
+      zeroDay: '1949-01-01'
+      yearIsDay: true
+
+tables:
+  epoch:
+    variables:
+      max_compute:
+        title: Maximum compute
+      max_data:
+        title: Maximum data
+      max_parameters:
+        title: Maximum parameters
+

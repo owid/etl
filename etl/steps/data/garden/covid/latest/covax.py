@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("covax")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read_table("covax")
+    tb = ds_meadow.read("covax")
 
     #
     # Process data.

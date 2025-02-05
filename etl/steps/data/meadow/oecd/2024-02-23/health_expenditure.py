@@ -16,18 +16,14 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("health_expenditure.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.
     tb = keep_relevant_columns(tb)
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = (
-        tb.underscore()
-        .set_index(["country", "year", "indicator", "financing_scheme"], verify_integrity=True)
-        .sort_index()
-    )
+    tb = tb.format(["country", "year", "indicator", "financing_scheme"])
 
     #
     # Save outputs.

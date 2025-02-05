@@ -40,7 +40,7 @@ def update_metadata_from_yaml(
 
     tb.metadata.short_name = table_name
 
-    t_annot = annot["tables"][table_name]
+    t_annot = annot.get("tables", {}).get(table_name, {})
 
     # validation
     if extra_variables == "raise":
@@ -127,7 +127,7 @@ def _validate_variables(t_annot: dict, tb: Table) -> None:
     table_variable_names = tb.columns
     extra_variable_names = yaml_variable_names - table_variable_names
     if extra_variable_names:
-        raise ValueError(f"Table {tb.metadata.short_name} has extra variables: {extra_variable_names}")
+        raise ValueError(f"Table {tb.metadata.short_name} has extra variables: {sorted(list(extra_variable_names))}")
 
 
 def _flatten(lst: List[Any]) -> List[str]:

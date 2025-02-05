@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("data_dictionary.csv")
     # Read table from meadow dataset.
     tb = ds_meadow["expenditure"].reset_index()
-    dd = snap.read()
+    dd = snap.read(safe_types=False)
     #
     # Process data.
     #

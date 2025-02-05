@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("un_members")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["un_members"].reset_index()
+    tb = ds_meadow.read("un_members")
 
     #
     # Process data.
@@ -66,7 +66,7 @@ def data_processing(tb: Table) -> Table:
     # Create membership_status column, which is "Member" when year is greater or equal to admission year, and "Not a member" otherwise.
     # I copy the admission column first to keep metadata
 
-    tb["membership_status"] = tb["admission"].copy()
+    tb["membership_status"] = tb["admission"].copy().astype(object)
     tb.loc[tb["year"] < tb["admission"], "membership_status"] = "Not a member"
     tb.loc[tb["year"] >= tb["admission"], "membership_status"] = "Member"
 

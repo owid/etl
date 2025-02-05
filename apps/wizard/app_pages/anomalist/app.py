@@ -32,12 +32,19 @@ from apps.wizard.app_pages.anomalist.utils import (
     get_datasets_and_mapping_inputs,
     get_scores,
 )
-from apps.wizard.utils import cached, set_states, url_persist
+from apps.wizard.utils import cached, set_states
 from apps.wizard.utils.chart_config import bake_chart_config
-from apps.wizard.utils.components import Pagination, grapher_chart, st_horizontal, st_multiselect_wider, tag_in_md
+from apps.wizard.utils.components import (
+    Pagination,
+    grapher_chart,
+    st_horizontal,
+    st_multiselect_wider,
+    tag_in_md,
+    url_persist,
+)
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
-from etl.grapher_io import load_variables
+from etl.grapher.io import load_variables
 
 # PAGE CONFIG
 st.set_page_config(
@@ -126,11 +133,13 @@ st.session_state.anomalist_trigger_detection = st.session_state.get("anomalist_t
 # Only anomalies with scores above the following thresholds will be shown by default.
 # NOTE: For some reason, streamlit raises an error when the minimum is zero.
 #  To avoid this, set it to a positive number (above, e.g. 1e-9).
-st.session_state.anomalist_min_anomaly_score = st.session_state.get("anomalist_min_anomaly_score", 0.3)
-st.session_state.anomalist_min_weighted_score = st.session_state.get("anomalist_min_weighted_score", 0.1)
-st.session_state.anomalist_min_population_score = st.session_state.get("anomalist_min_population_score", 1e-9)
-st.session_state.anomalist_min_analytics_score = st.session_state.get("anomalist_min_analytics_score", 1e-9)
-st.session_state.anomalist_min_scale_score = st.session_state.get("anomalist_min_scale_score", 1e-9)
+DEFAULT_ANOMALIST_WEIGHTS = {
+    "anomalist_min_anomaly_score": 0.3,
+    "anomalist_min_weighted_score": 0.1,
+    "anomalist_min_population_score": 1e-9,
+    "anomalist_min_analytics_score": 1e-9,
+    "anomalist_min_scale_score": 1e-9,
+}
 
 # Advanced expander.
 st.session_state.anomalist_expander_advanced_options = st.session_state.get(
@@ -158,6 +167,19 @@ def llm_ask(df: pd.DataFrame):
         on_click=lambda: llm_dialog(df),
         icon=":material/robot:",
         help=f"Ask GPT {MODEL_NAME} to summarize the anomalies. This is experimental.",
+    )
+
+
+@st.fragment()
+def download_anomalies(df: pd.DataFrame):
+    csv_data = convert_df_to_csv(df)
+    st.download_button(
+        "Export data (CSV)",
+        data=csv_data,
+        file_name="data.csv",
+        mime="text/csv",
+        icon=":material/download:",
+        help="Download the anomalies as a CSV file. Selected filters apply!",
     )
 
 
@@ -360,6 +382,13 @@ def _sort_df(df: pd.DataFrame, sort_strategy: Union[str, List[str]]) -> Tuple[pd
     return df, columns_sort
 
 
+# Function to convert DataFrame to CSV
+@st.cache_data
+def convert_df_to_csv(df):
+    df["indicator_uri"] = df["indicator_id"].apply(lambda x: st.session_state.anomalist_indicators.get(x))
+    return df.to_csv(index=False).encode("utf-8")
+
+
 # Functions to show the anomalies
 @st.fragment
 def show_anomaly_compact(index, df):
@@ -425,6 +454,11 @@ def show_anomaly_compact(index, df):
             else:
                 config = bake_chart_config(variable_id=indicator_id, selected_entities=entities)
             config["hideAnnotationFieldsInTitle"]["time"] = True
+            config["hideFacetControl"] = False
+            config["hideShareButton"] = True
+            config["hideExploreTheDataButton"] = True
+            # config["isSocialMediaExport"] = False
+
             # Actually plot
             grapher_chart(chart_config=config, owid_env=OWID_ENV)
 
@@ -756,6 +790,7 @@ if st.session_state.anomalist_df is not None:
                     max_value=1.0,
                     # step=0.001,
                     key=f"anomalist_min_{score_name}_score",
+                    value=DEFAULT_ANOMALIST_WEIGHTS[f"anomalist_min_{score_name}_score"],
                 )
 
     # 4.3/ APPLY FILTERS
@@ -769,8 +804,11 @@ if st.session_state.anomalist_df is not None:
 
     # Show anomalies with time and version changes
     if not df.empty:
-        # LLM summary option
-        llm_ask(df)
+        # Top option buttons
+        with st_horizontal():
+            # LLM summary option
+            llm_ask(df)
+            download_anomalies(df)
 
         # st.dataframe(df_change)
         groups = df.groupby(["indicator_id", "type"], sort=False, observed=True)
@@ -791,6 +829,7 @@ if st.session_state.anomalist_df is not None:
         # Show controls only if needed
         if len(items) > items_per_page:
             pagination.show_controls(mode="bar")
-
+else:
+    st.success("Ha! We did not find any no anomalies in the selected datasets! What were the odds of that?")
 # Reset state
 set_states({"anomalist_datasets_submitted": False})

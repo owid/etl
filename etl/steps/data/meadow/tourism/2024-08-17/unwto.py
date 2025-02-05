@@ -40,7 +40,7 @@ def run(dest_dir: str) -> None:
 
     tbs = []
     for sheet_name in sheet_names_to_load:
-        tb = snap.read(sheet_name=sheet_name, header=2)
+        tb = snap.read(safe_types=False, sheet_name=sheet_name, header=2)
 
         # Drop unnecessary columns
         columns_to_drop = ["C.", "S.", "C. & S.", "Units", "Notes", "Series", "Unnamed: 38", "Unnamed: 39"]

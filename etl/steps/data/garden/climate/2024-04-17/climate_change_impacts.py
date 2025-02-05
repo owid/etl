@@ -1,6 +1,4 @@
-"""Create a garden dataset with all climate change impacts data.
-
-"""
+"""Create a garden dataset with all climate change impacts data."""
 
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
@@ -163,8 +161,8 @@ def run(dest_dir: str) -> None:
     tb_annual.metadata.short_name = "climate_change_impacts_annual"
 
     # Set an appropriate index to monthly and annual tables, and sort conveniently.
-    tb_monthly = tb_monthly.set_index(["location", "date"], verify_integrity=True).sort_index()
-    tb_annual = tb_annual.set_index(["location", "year"], verify_integrity=True).sort_index()
+    tb_monthly = tb_monthly.format(["location", "date"])
+    tb_annual = tb_annual.format(["location", "year"])
 
     #
     # Save outputs.

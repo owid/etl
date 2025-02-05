@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
 
     # retrieve snapshot
     snap = Snapshot("biodiversity/2023-01-11/cherry_blossom.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # clean and transform data
     tb = clean_data(tb)

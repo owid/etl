@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("maternal_mortality.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # drop source & comment columns
     tb = tb.drop(
@@ -64,9 +64,9 @@ def run(dest_dir: str) -> None:
     tb.loc[(tb["year"] == "1967") & (tb["Country"] == "Sweden") & (tb["Maternal deaths"] == 39), "year"] = "1957"
 
     # wrong entry for US (duplicate 1967 -> should be 1957)
-    tb.loc[
-        (tb["year"] == "1967") & (tb["Country"] == "United States") & (tb["Live Births"] == 4308000), "year"
-    ] = "1957"
+    tb.loc[(tb["year"] == "1967") & (tb["Country"] == "United States") & (tb["Live Births"] == 4308000), "year"] = (
+        "1957"
+    )
 
     # wrong entry for Belgium (duplicate 1973 -> should be 1873)
     tb.loc[(tb["year"] == "1973") & (tb["Country"] == "Belgium") & (tb["Maternal deaths"] == 1283), "year"] = "1873"

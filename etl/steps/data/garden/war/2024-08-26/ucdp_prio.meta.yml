@@ -2,6 +2,7 @@
 definitions:
   all:
     description_short: |-
+      <% set per_capita = "" %>
       <%- if conflict_type == "all" -%>
       The << estimate >> estimate of the number of deaths of combatants and civilians due to fighting in interstate, intrastate, extrasystemic, non-state conflicts, and one-sided violence that were ongoing that year<< per_capita >>.
 

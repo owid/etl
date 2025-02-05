@@ -7,6 +7,7 @@ What do we do here?
 - Format the tables to have them in long format
 - Set indices and verify integrity
 """
+
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
@@ -83,6 +84,7 @@ def run(dest_dir: str) -> None:
     tb_death_rate = clean_table_standard_xlsx(tb_main, "Crude Death Rate (deaths per 1,000 population)", "death_rate")
     tb_birth_rate = clean_table_standard_xlsx(tb_main, "Crude Birth Rate (births per 1,000 population)", "birth_rate")
     tb_median_age = clean_table_standard_xlsx(tb_main, "Median Age, as of 1 July (years)", "median_age")
+    tb_macb = clean_table_standard_xlsx(tb_main, "Mean Age Childbearing (years)", "mean_age_childbearing")
     tb_mortality = make_tb_mortality(tb_main)
     tb_le = make_tb_life_expectancy(tb_main)
 
@@ -92,6 +94,7 @@ def run(dest_dir: str) -> None:
 
     # # Fertility rate
     tb_fertility, tb_births = make_tb_fertility_births(tb_main)
+    tb_fertility_births_single = make_tb_fertility_births_single_age()
 
     # Deaths
     tb_deaths = make_tb_deaths()
@@ -105,6 +108,7 @@ def run(dest_dir: str) -> None:
         tb_growth_rate,
         tb_nat_change,
         tb_fertility,
+        tb_fertility_births_single,
         tb_migration,
         tb_migration_rate,
         tb_deaths,
@@ -114,7 +118,7 @@ def run(dest_dir: str) -> None:
         tb_median_age,
         tb_le,
         tb_mortality,
-        # tb_childbearing_age,
+        tb_macb,
         # tb_population_doubling,
     ]
     # Create a new meadow dataset with the same metadata as the snapshot.
@@ -256,6 +260,18 @@ def make_tb_life_expectancy(tb_main: Table) -> Table:
     return tb
 
 
+def make_tb_fertility_births_single_age():
+    # Read
+    tb = read_from_csv("un_wpp_fertility_single_age.csv")
+    # Clean
+    tb = clean_table_standard_csv(tb, metrics_rename={"ASFR": "fertility_rate", "Births": "births"})
+    # Add missing dimension
+    tb = tb.assign(sex="all")
+    # Format
+    tb = tb.format(COLUMNS_INDEX_FORMAT, short_name="fertility_births_single")
+    return tb
+
+
 def make_tb_fertility_births(tb_main: Table) -> Tuple[Table, Table]:
     """Make Births and Fertility tables.
 
@@ -350,10 +366,10 @@ def read_from_xlsx(short_name: str) -> Table:
     # Read snap
     snap = paths.load_snapshot(short_name)
     # Read tables
-    tb_estimates = snap.read(sheet_name="Estimates", skiprows=16)
-    tb_projections_medium = snap.read(sheet_name="Medium variant", skiprows=16)
-    tb_projections_low = snap.read(sheet_name="Low variant", skiprows=16)
-    tb_projections_high = snap.read(sheet_name="High variant", skiprows=16)
+    tb_estimates = snap.read(safe_types=False, sheet_name="Estimates", skiprows=16)
+    tb_projections_medium = snap.read(safe_types=False, sheet_name="Medium variant", skiprows=16)
+    tb_projections_low = snap.read(safe_types=False, sheet_name="Low variant", skiprows=16)
+    tb_projections_high = snap.read(safe_types=False, sheet_name="High variant", skiprows=16)
     # Merge tables
     tb = concat(
         [

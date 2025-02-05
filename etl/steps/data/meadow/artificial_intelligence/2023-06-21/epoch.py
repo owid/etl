@@ -1,6 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-
 import numpy as np
 from owid.catalog import Table
 from structlog import get_logger
@@ -24,7 +23,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("epoch.csv")
 
     # Read snapshot
-    df = snap.read()
+    df = snap.read(safe_types=False)
     #
     # Process data.
     #

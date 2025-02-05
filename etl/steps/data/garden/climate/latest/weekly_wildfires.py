@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
-import numpy as np
 import owid.catalog.processing as pr
 import pandas as pd
 
@@ -87,15 +85,6 @@ def run(dest_dir: str) -> None:
     tb["share_area_ha"] = (tb["area_ha"] / tb["total_area_ha"]) * 100
     tb["share_area_ha_cumulative"] = (tb["area_ha_cumulative"] / tb["total_area_ha"]) * 100
 
-    # Area per wildfire
-    tb["area_ha_per_wildfire"] = tb["area_ha"] / tb["events"]
-    tb["co2_ha_per_area"] = tb["CO2"] / tb["area_ha"]
-    tb["pm2_5_ha_per_area"] = tb["PM2.5"] / tb["area_ha"]
-
-    tb[["co2_ha_per_area", "pm2_5_ha_per_area"]] = tb[["co2_ha_per_area", "pm2_5_ha_per_area"]].replace(
-        [float("inf"), -float("inf")], np.nan
-    )
-
     tb = tb.drop(columns=["total_area_ha"])
     tb = tb.set_index(["country", "date"], verify_integrity=True)
 
@@ -108,7 +97,7 @@ def run(dest_dir: str) -> None:
         tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
-        yaml_params={"date_accessed": last_date_accessed(tb)},
+        yaml_params={"date_accessed": last_date_accessed(tb), "year": last_date_accessed(tb)[-4:]},
     )
 
     # Save changes in the new garden dataset.

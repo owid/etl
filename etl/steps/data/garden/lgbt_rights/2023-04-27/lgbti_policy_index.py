@@ -56,7 +56,7 @@ def run(dest_dir: str) -> None:
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["lgbti_policy_index"].reset_index()
+    tb = ds_meadow.read("lgbti_policy_index")
 
     #
     # Process data.

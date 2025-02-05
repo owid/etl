@@ -106,7 +106,7 @@ def load_tables_from_snapshot(snap: Snapshot, sheets: Dict) -> List[Table]:
     """Load all the sheets from the snapshot."""
     tables = []
     for sheet in sheets:
-        tb = snap.read(sheet_name=sheet, header=sheets[sheet]["header"])
+        tb = snap.read(safe_types=False, sheet_name=sheet, header=sheets[sheet]["header"])
         tb.metadata.short_name = sheets[sheet]["short_name"]
 
         tables.append(tb)
@@ -196,7 +196,7 @@ def format_long_tables(
             )
 
         # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-        t = t.underscore().set_index(["country", "year", "survey_number", "survey"], verify_integrity=True).sort_index()
+        t = t.format(["country", "year", "survey_number", "survey"])
 
         tables.append(t)
 

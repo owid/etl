@@ -1,4 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
+
 from typing import Any, Dict
 
 from owid.catalog import Table
@@ -17,7 +18,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("infections_model")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read_table("infections_model")
+    tb = ds_meadow.read("infections_model")
 
     #
     # Process data.

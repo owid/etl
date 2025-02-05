@@ -2,12 +2,21 @@ definitions:
   common:
     processing_level: minor
     presentation:
+      attribution_short: UNDP
       topic_tags:
         - Human Development Index (HDI)
       grapher_config:
         tab: map
         selectedEntityNames:
           - World
+
+  gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
+  gni_per_capita: GNI per capita is GNI divided by population.
+  ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
+  ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
+
+  description_short_gni: Total income earned by residents of a country or region, including income earned abroad.
+  description_short_gni_per_capita: Average income per person earned by residents of a country or region, including income earned abroad.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -405,7 +414,12 @@ tables:
         short_unit: $
         unit: international-$ in 2017 prices
         description_short: |-
-          Measures the total income earned by residents of a country, including income earned abroad. This data is adjusted for inflation and differences in the cost of living between countries.
+          "{definitions.description_short_gni_per_capita} {definitions.ppp_adjustment}"
+        description_key:
+          - "{definitions.gni} {definitions.gni_per_capita}"
+          - This GNI per capita indicator provides information on economic growth and income levels from 1990.
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
         description_from_producer: &description_prod_gnipc |-
           UNDP relies on IMF (2023), UNDESA (2023), United Nations Statistics Division (2023), World Bank (2023).
 
@@ -414,6 +428,8 @@ tables:
           For several countries without a value of GNI per capita in constant 2017 PPP terms for 20 22 reported in the World Development Indicators database, real growth rates of GDP per capita available in the World Development Indicators database or in the International Monetary Fund's Economic Outlook database are applied to the most recent GNI values in constant PPP terms.
 
           Official PPP conversion rates are produced by the International Comparison Program, whose surveys periodically collect thousands of prices of matched goods and services in many countries. The last round of this exercise refers to 2017 and covered 176 economies.
+        presentation:
+          title_variant: In constant international-$
       gni_pc_m:
         title: Gross national income per capita (male)
         short_unit: $

@@ -25,8 +25,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
-
+  title: Routes to Diagnosis - Stage of Diagnosis by Route
 
 tables:
   diagnosis_routes_by_route:

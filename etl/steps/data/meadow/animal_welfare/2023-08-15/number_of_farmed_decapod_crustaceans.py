@@ -39,7 +39,7 @@ def process_yearly_data(tb_i: Table, year: int) -> Table:
             # It is unclear whether the following mapping is correct, but we will not use these columns anyway.
             "mean weight (lower)": "Weighted estimated mean weight (lower)",
             # There is a typo in a column of the 2015 file.
-            "mean weight (upprr)": "Weighted estimated mean weight (upper)",
+            "mean weight (upper)": "Weighted estimated mean weight (upper)",
         },
         errors="ignore",
     )

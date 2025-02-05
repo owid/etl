@@ -1,0 +1,40 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Antibiotics
+    display:
+      numSignificantFigures: 3
+      name: << pathogen >>
+
+  pathogen_type:
+    <% if pathogen_type == "Fungi" %>
+    fungus
+    <% elif pathogen_type == "Viruses" %>
+    virus
+    <% else  %>
+    << pathogen_type.lower() >>
+    <% endif %>
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  pathogen_bloodstream:
+    variables:
+      value:
+        title: Neonatal deaths from << pathogen >> infections
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+      upper:
+        title: Upper bound of neonatal deaths from << pathogen >> infections
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.
+      lower:
+        title: Lower bound of neonatal deaths from << pathogen >> infections
+        unit: deaths
+        description_short: Estimated number of [neonates](#dod:neonatal) – newborns under 28 days of age –  who die each year from << pathogen >> infections. << pathogen >> is a {definitions.pathogen_type}.

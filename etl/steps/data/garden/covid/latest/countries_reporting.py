@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-
 from owid.catalog import Table
 
 from etl.data_helpers.misc import expand_time_column
@@ -19,8 +18,8 @@ def run(dest_dir: str) -> None:
     ds_vax = paths.load_dataset("vaccinations_global")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read_table("vaccinations")
-    tb_latest = ds_vax.read_table("vaccinations_global")
+    tb = ds_meadow.read("vaccinations", safe_types=False)
+    tb_latest = ds_vax.read("vaccinations_global", safe_types=False)
 
     # 1/ LATEST DATA
     ## 1.1/ Process main table

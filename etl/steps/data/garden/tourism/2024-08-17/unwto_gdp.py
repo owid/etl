@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("unwto_gdp")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read_table("unwto_gdp")
+    tb = ds_meadow.read("unwto_gdp")
     #
     # Process data.
     #

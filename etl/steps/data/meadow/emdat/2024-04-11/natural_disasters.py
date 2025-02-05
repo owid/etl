@@ -1,6 +1,5 @@
-"""Load snapshot of EM-DAT natural disasters data and prepare a table with basic metadata.
+"""Load snapshot of EM-DAT natural disasters data and prepare a table with basic metadata."""
 
-"""
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -42,7 +41,7 @@ def run(dest_dir: str) -> None:
     #
     # Load snapshot.
     snap = paths.load_snapshot("natural_disasters.xlsx")
-    tb = snap.read(sheet_name="EM-DAT Data")
+    tb = snap.read(safe_types=False, sheet_name="EM-DAT Data")
 
     #
     # Process data.

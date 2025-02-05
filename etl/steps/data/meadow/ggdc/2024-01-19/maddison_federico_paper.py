@@ -17,11 +17,11 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("maddison_federico_paper.xlsx")
 
     # Load data from snapshot.
-    tb_africa = snap.read(sheet_name="Africa", skiprows=3)
-    tb_americas = snap.read(sheet_name="Americas", skiprows=3)
-    tb_asia = snap.read(sheet_name="Asia", skiprows=3)
-    tb_europe = snap.read(sheet_name="Europe", skiprows=3)
-    tb_oceania = snap.read(sheet_name="Oceania", skiprows=3)
+    tb_africa = snap.read(safe_types=False, sheet_name="Africa", skiprows=3)
+    tb_americas = snap.read(safe_types=False, sheet_name="Americas", skiprows=3)
+    tb_asia = snap.read(safe_types=False, sheet_name="Asia", skiprows=3)
+    tb_europe = snap.read(safe_types=False, sheet_name="Europe", skiprows=3)
+    tb_oceania = snap.read(safe_types=False, sheet_name="Oceania", skiprows=3)
 
     #
     # Process data.
@@ -53,7 +53,7 @@ def run(dest_dir: str) -> None:
 
     # Merge tables
     tb = pr.concat(tables, ignore_index=True, sort=False)
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     # Convert thousands into units
     tb["population"] = (tb["population"] * 1000).astype(int)

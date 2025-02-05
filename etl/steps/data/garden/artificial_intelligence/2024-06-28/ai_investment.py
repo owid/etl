@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("ai_investment.csv")
 
     # Load data from snapshot.
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     # Read US consumer prices table from garden dataset.
     ds_us_cpi = paths.load_dataset("us_consumer_prices")

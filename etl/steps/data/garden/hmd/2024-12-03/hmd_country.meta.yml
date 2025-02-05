@@ -1,0 +1,111 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Fertility Rate
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Birth rate by month (HMD)
+  update_period_days: 365
+
+tables:
+  birth_rate:
+    variables:
+      birth_rate:
+        title: Birth rate, on a monthly basis
+        unit: births per 1,000 people
+        description_short: |-
+          The total number of births per 1,000 people in a given month.
+        display:
+          name: |-
+            Birth rate
+
+      birth_rate_per_day:
+        title: Birth rate per day, on a monthly basis
+        unit: births per million people
+        description_short: |-
+          The average daily number of births, per million people, calculated monthly.
+        display:
+          name: |-
+            Birth rate, per day
+
+      birth_rate_lead_9months:
+        title: Birth rate, on a monthly basis, by estimated month of conception
+        unit: births per 1,000 people
+        description_short: |-
+          The total number of births per 1,000 people in a given month.
+        display:
+          name: |-
+            Birth rate
+
+      birth_rate_per_day_lead_9months:
+        title: Birth rate per day, on a monthly basis, by estimated month of conception
+        unit: births per 1,000 people
+        description_short: |-
+          The average daily number of births, per million people, calculated monthly.
+        display:
+          name: |-
+            Birth rate, per day
+
+  birth_rate_month:
+    variables:
+      birth_rate:
+        title: Birth rate, in << month >>
+        unit: births per 1,000 people
+        description_short: |-
+          The total number of births per 1,000 people in <<month>>.
+        display:
+          name: |-
+            Birth rate
+
+      birth_rate_per_day:
+        title: Birth rate per day, in << month >>
+        unit: births per million people
+        description_short: |-
+          The average daily number of births, per million people, calculated for <<month>>.
+        display:
+          name: |-
+            Birth rate, per day
+
+  birth_rate_month_max:
+    variables:
+      month_max:
+        title: Month ordinal with peak daily birth rate
+        unit: ""
+        description_short: |-
+          Number corresponding to the month with the highest daily birth rate.
+      month_max_name:
+        title: Month name with peak daily birth rate
+        unit: ""
+        description_short: |-
+          Month with the highest daily birth rate.
+      birth_rate_per_day_max:
+        title: Peak birth rate per day, on a monthly basis
+        unit: births per million people
+        description_short: |-
+          The highest average daily number of births, per million people, recorded in the given year.
+        display:
+          name: |-
+            Maximum birth rate, per day
+
+      month_max_lead_9months:
+        title: Month ordinal with peak daily birth rate in 9 months
+        unit: ""
+        description_short: |-
+          Number corresponding to the month with the highest daily birth rate.
+      month_max_name_lead_9months:
+        title: Month name with peak daily birth rate in 9 months
+        unit: ""
+        description_short: |-
+          Month with the highest daily birth rate.
+      birth_rate_per_day_max_lead_9months:
+        title: Peak birth rate per day, on a monthly basis, in 9 months
+        unit: births per million people
+        description_short: |-
+          The highest average daily number of births, per million people, recorded in the given year.
+        display:
+          name: |-
+            Maximum birth rate, per day

@@ -1,41 +1,4 @@
 steps:
-  # Homicide - UNODC
-  data://meadow/homicide/2023-01-04/unodc:
-    - snapshot://homicide/2023-01-04/unodc.xlsx
-  data://garden/homicide/2023-01-04/unodc:
-    - data://meadow/homicide/2023-01-04/unodc
-  #
-  # Met Office Hadley Centre - Near surface temperature anomaly (2023-01-02).
-  #
-  data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature:
-    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_global.csv
-    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_northern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2023-01-02/near_surface_temperature_southern_hemisphere.csv
-  data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2023-01-02/near_surface_temperature
-  data://grapher/met_office_hadley_centre/2023-01-02/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2023-01-02/near_surface_temperature
-  #
-  # Met Office Hadley Centre - Near surface temperature anomaly (2023-01-17).
-  #
-  data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_global.csv
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_northern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2023-01-17/near_surface_temperature_southern_hemisphere.csv
-  data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2023-01-17/near_surface_temperature
-  data://grapher/met_office_hadley_centre/2023-01-17/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2023-01-17/near_surface_temperature
-
-
-  # Homicide - UNODC - to archive
-  data://meadow/homicide/2023-01-27/unodc:
-  - snapshot://homicide/2023-01-27/unodc.xlsx
-  data://garden/homicide/2023-01-27/unodc:
-  - data://meadow/homicide/2023-01-27/unodc
-  data://grapher/homicide/2023-01-27/unodc:
-  - data://garden/homicide/2023-01-27/unodc
-
   # SDG dataset assmebled from https://sdg-tracker.org/
   # This is commented now to avoid `etl.helpers.LatestVersionOfStepShouldBeActive` error
   # data://garden/sdg/latest/sdg:
@@ -68,28 +31,6 @@ steps:
   #   - backport://backport/owid/latest/dataset_829_food_security__suite_of_food_security_indicators__fao__2017
   #   - backport://backport/owid/latest/dataset_943_sexual_violence__unicef__2017
   #   - data://garden/worldbank_wdi/2022-05-26/wdi
-
-  #
-  # EM-DAT Natural disasters (2022).
-  #
-  data://meadow/emdat/2022-11-24/natural_disasters:
-    - snapshot://emdat/2022-11-24/natural_disasters.xlsx
-  # The following dataset has a table for yearly data and another for decadal data.
-  data://garden/emdat/2022-11-24/natural_disasters:
-    - data://meadow/emdat/2022-11-24/natural_disasters
-    - data://garden/owid/latest/key_indicators
-    - data://garden/wb/2021-07-01/wb_income
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/worldbank_wdi/2022-05-26/wdi
-  # The following dataset has all (yearly and decadal) variables together.
-  data://grapher/emdat/2022-11-24/natural_disasters:
-    - data://garden/emdat/2022-11-24/natural_disasters
-  # The following dataset has only global data, and entity corresponds to the type of disaster.
-  data://grapher/emdat/2022-11-24/natural_disasters_global_by_type:
-    - data://garden/emdat/2022-11-24/natural_disasters
-  # Natural disasters explorer.
-  data://explorers/emdat/2022-12-07/natural_disasters:
-    - data://garden/emdat/2022-11-24/natural_disasters
 
   # International Monetary Fund, World Economic Outlook
   data://meadow/imf/2023-05-02/world_economic_outlook:
@@ -238,6 +179,13 @@ steps:
     - data://garden/homicide/2023-07-04/unodc
   data://grapher/homicide/2023-01-03/homicide_long_run_omm:
     - data://garden/homicide/2023-01-03/homicide_long_run_omm
+    # Homicide - UNODC - to archive
+  data://meadow/homicide/2023-07-04/unodc:
+    - snapshot://homicide/2023-07-04/unodc.xlsx
+  data://garden/homicide/2023-07-04/unodc:
+    - data://meadow/homicide/2023-07-04/unodc
+  data://grapher/homicide/2023-07-04/unodc:
+    - data://garden/homicide/2023-07-04/unodc
 
   # CO2 emissions from air transport (OECD)
   data://meadow/oecd/2023-05-18/co2_air_transport:
@@ -248,6 +196,16 @@ steps:
     - data://garden/demography/2022-12-08/population
   data://grapher/oecd/2023-05-19/co2_air_transport:
     - data://garden/oecd/2023-05-19/co2_air_transport
+
+  data://meadow/oecd/2024-08-21/co2_air_transport:
+    - snapshot://oecd/2024-08-21/co2_air_transport.csv
+  data://garden/oecd/2024-08-21/co2_air_transport:
+    - data://meadow/oecd/2024-08-21/co2_air_transport
+    - data://garden/tourism/2024-08-17/unwto
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/oecd/2024-08-21/co2_air_transport:
+    - data://garden/oecd/2024-08-21/co2_air_transport
 
   # Tourism datasets
   # UNWTO key indicators
@@ -290,8 +248,7 @@ steps:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
 
-
-    # UN IGME Child Mortality
+  # UN IGME Child Mortality
   data://meadow/un/2023-08-16/igme:
     - snapshot://un/2023-08-16/igme.zip
   data://garden/un/2023-08-16/igme:
@@ -300,13 +257,19 @@ steps:
   data://grapher/un/2023-08-16/igme:
     - data://garden/un/2023-08-16/igme
 
-    # Long-run child mortality, Gapminder + UN IGME
+  # Long-run child mortality, Gapminder + UN IGME
   data://garden/un/2023-08-29/long_run_child_mortality:
     - data://garden/un/2023-08-16/igme
     - data://garden/gapminder/2023-09-18/under_five_mortality
     - data://garden/gapminder/2023-09-21/under_five_mortality
   data://grapher/un/2023-09-19/long_run_child_mortality:
     - data://garden/un/2023-08-29/long_run_child_mortality
+
+  # Gapminder population
+  data://meadow/gapminder/2019-12-10/population:
+    - walden://gapminder/2019-12-10/population
+  data://garden/gapminder/2019-12-10/population:
+    - data://meadow/gapminder/2019-12-10/population
 
   # Oil Spills
   data://meadow/itopf/2023-05-18/oil_spills:
@@ -316,6 +279,113 @@ steps:
   data://grapher/itopf/2023-05-18/oil_spills:
     - data://garden/itopf/2023-05-18/oil_spills
 
+  data://garden/countries/2023-09-25/gleditsch:
+    - data://meadow/countries/2023-09-25/gleditsch
+    - data://garden/demography/2023-03-31/population
+  data://grapher/countries/2023-10-01/gleditsch:
+    - data://garden/countries/2023-09-25/gleditsch
+
+  # International Monetary Fund, World Economic Outlook
+  data://meadow/imf/2024-05-02/world_economic_outlook:
+    - snapshot://imf/2024-05-02/world_economic_outlook.xls
+  data://garden/imf/2024-05-02/world_economic_outlook:
+    - data://meadow/imf/2024-05-02/world_economic_outlook
+  data://grapher/imf/2024-05-02/world_economic_outlook:
+    - data://garden/imf/2024-05-02/world_economic_outlook
+
+  # Key indicators
+  data://garden/owid/latest/key_indicators:
+    - data://garden/demography/2022-12-08/population
+    - data://open_numbers/open_numbers/latest/open_numbers__world_development_indicators
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/owid/latest/key_indicators:
+    - data://garden/owid/latest/key_indicators
+
+  # Internet
+  data://garden/technology/2022/internet:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+    - data://garden/owid/latest/key_indicators
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/technology/2022/internet:
+    - data://garden/technology/2022/internet
+
+  # World Bank WDI
+  data://meadow/worldbank_wdi/2022-05-26/wdi:
+    - walden://worldbank_wdi/2022-05-26/wdi
+  data://garden/worldbank_wdi/2022-05-26/wdi:
+    - data://meadow/worldbank_wdi/2022-05-26/wdi
+  data://grapher/worldbank_wdi/2022-05-26/wdi:
+    - data://garden/worldbank_wdi/2022-05-26/wdi
+
+  # UN SDG
+  data://meadow/un/2023-01-24/un_sdg:
+    - snapshot://un/2023-01-24/un_sdg.feather
+  data://garden/un/2023-01-24/un_sdg:
+    - data://meadow/un/2023-01-24/un_sdg
+    - snapshot://un/2023-01-24/un_sdg_unit.csv
+    - snapshot://un/2023-01-24/un_sdg_dimension.json
+  data://grapher/un/2023-01-24/un_sdg:
+    - data://garden/un/2023-01-24/un_sdg
+
+    # IHME SDG
+  data-private://meadow/ihme/2023-05-09/sdg:
+    - snapshot-private://ihme/2023-05-05/sdg.csv
+  data-private://garden/ihme/2023-05-09/sdg:
+    - data-private://meadow/ihme/2023-05-09/sdg
+  data-private://grapher/ihme/2023-05-09/sdg:
+    - data-private://garden/ihme/2023-05-09/sdg
+
+  # MICROBE - total deaths by pathogen and amr resistance
+  data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - snapshot-private://antibiotics/2024-12-02/total_pathogen_bloodstream_amr.csv
+  data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream
+    - data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream_amr
+  data-private://grapher/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream_amr
+
+  #  World Peace Foundation - Famines
+  data://meadow/wpf/2024-10-03/famines:
+    - snapshot://wpf/2024-10-03/famines.xlsx
+  data://garden/wpf/2024-10-03/famines:
+    - data://meadow/wpf/2024-10-03/famines
+    - data://garden/regions/2023-01-01/regions
+
+  data://grapher/wpf/2024-10-03/famines:
+    - data://garden/wpf/2024-10-03/famines
+  data://garden/wpf/2024-10-03/total_famines_by_year_decade:
+    - data://garden/wpf/2024-10-03/famines
+    - data://garden/demography/2024-07-15/population
+  data://grapher/wpf/2024-10-03/total_famines_by_year_decade:
+    - data://garden/wpf/2024-10-03/total_famines_by_year_decade
+
+  data://garden/wpf/2024-10-03/famines_by_regime_gdp:
+    - data://garden/wpf/2024-10-03/famines
+    - data://garden/democracy/2024-03-07/vdem
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+  data://grapher/wpf/2024-10-03/famines_by_regime_gdp:
+    - data://garden/wpf/2024-10-03/famines_by_regime_gdp
+
+  data://garden/wpf/2024-10-03/famines_by_factor:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_factor:
+    - data://garden/wpf/2024-10-03/famines_by_factor
+
+  data://garden/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines_by_place
+
+  # Missing Data - Children out of school
+  data://garden/missing_data/2024-03-26/children_out_of_school:
+    - data://garden/wb/2024-06-10/gender_statistics
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/missing_data/2024-03-26/children_out_of_school:
+    - data://garden/missing_data/2024-03-26/children_out_of_school
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
@@ -324,8 +394,15 @@ include:
   - dag/archive/faostat.yml
   - dag/archive/energy.yml
   - dag/archive/emissions.yml
+  - dag/archive/health.yml
   - dag/archive/papers.yml
   - dag/archive/demography.yml
   - dag/archive/fasttrack.yml
   - dag/archive/climate.yml
   - dag/archive/environment.yml
+  - dag/archive/equality.yml
+  - dag/archive/plastic_use.yml
+  - dag/archive/artificial_intelligence.yml
+  - dag/archive/urbanization.yml
+  - dag/archive/education.yml
+  - dag/archive/biodiversity.yml

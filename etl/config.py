@@ -6,20 +6,23 @@
 The environment variables and settings here are for publishing options, they're
 only important for OWID staff.
 """
+
 import os
 import pwd
 import re
+import warnings
 from dataclasses import dataclass, fields
 from os import environ as env
 from pathlib import Path
-from typing import Literal, Optional, cast
+from typing import List, Literal, Optional, cast
 
-import bugsnag
 import git
 import pandas as pd
+import sentry_sdk
 import structlog
 from dotenv import dotenv_values, load_dotenv
 from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
 
 from etl.paths import BASE_DIR
 
@@ -43,6 +46,7 @@ def _normalise_branch(branch_name):
     return re.sub(r"[\/\._]", "-", branch_name)
 
 
+# NOTE: If you edit this function, make sure to update `get_container_name` in ops repo as well
 def get_container_name(branch_name):
     normalized_branch = _normalise_branch(branch_name)
 
@@ -50,7 +54,17 @@ def get_container_name(branch_name):
     normalized_branch = normalized_branch.replace("staging-site-", "")
 
     # Ensure the container name is less than 63 characters
-    container_name = f"staging-site-{normalized_branch[:50]}"
+    # however, we truncate it to 28 characters to be consistent with Cloudflare's
+    # 28 character limit (see https://community.cloudflare.com/t/algorithm-to-generate-a-preview-dns-subdomain-from-a-branch-name/477633)
+    #
+    # This function is duplicated in these places, make sure to change all of them:
+    #     https://github.com/owid/ops/blob/main/templates/lxc-manager/prune_staging_containers.py
+    #     https://github.com/owid/ops/blob/main/templates/lxc-manager/shared
+    #     https://github.com/owid/etl/blob/master/etl/config.py#L50
+
+    limit = 28
+
+    container_name = f"staging-site-{normalized_branch[:limit]}"
     # Remove trailing hyphens
     return container_name.rstrip("-")
 
@@ -78,12 +92,16 @@ R2_SNAPSHOTS_PRIVATE = "owid-snapshots-private"
 R2_SNAPSHOTS_PUBLIC_READ = "https://snapshots.owid.io"
 
 # publishing to grapher's MySQL db
-GRAPHER_USER_ID = env.get("GRAPHER_USER_ID")
+GRAPHER_USER_ID = int(env["GRAPHER_USER_ID"]) if "GRAPHER_USER_ID" in env else None
 DB_NAME = env.get("DB_NAME", "grapher")
 DB_HOST = env.get("DB_HOST", "localhost")
 DB_PORT = int(env.get("DB_PORT", "3306"))
 DB_USER = env.get("DB_USER", "root")
 DB_PASS = env.get("DB_PASS", "")
+
+# save original GRAPHER_USER_ID from env for later use, because it'll be overwritten when
+# we use staging servers
+ENV_GRAPHER_USER_ID = GRAPHER_USER_ID
 
 DB_IS_PRODUCTION = DB_NAME == "live_grapher"
 
@@ -201,7 +219,7 @@ ADMIN_HOST = env.get("ADMIN_HOST", f"http://staging-site-{STAGING}" if STAGING e
 # because that would resolve to LXC container instead of the actual server
 TAILSCALE_ADMIN_HOST = "http://owid-admin-prod.tail6e23.ts.net"
 
-BUGSNAG_API_KEY = env.get("BUGSNAG_API_KEY")
+SENTRY_DSN = env.get("SENTRY_DSN")
 
 OPENAI_API_KEY = env.get("OPENAI_API_KEY", None)
 
@@ -222,14 +240,17 @@ GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.005.json"
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.006.json"
+
+# Google Cloud service account path (used for BigQuery)
+GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
-def enable_bugsnag() -> None:
-    if BUGSNAG_API_KEY:
-        bugsnag.configure(
-            api_key=BUGSNAG_API_KEY,
-        )  # type: ignore
+def enable_sentry() -> None:
+    if SENTRY_DSN:
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+        )
 
 
 # Wizard config
@@ -245,7 +266,7 @@ OWIDEnvType = Literal["production", "dev", "staging", "unknown"]
 class Config:
     """Configuration for OWID environment which is a subset of etl.config."""
 
-    GRAPHER_USER_ID: int | str | None
+    GRAPHER_USER_ID: int | None
     DB_USER: str
     DB_NAME: str
     DB_PASS: str
@@ -417,6 +438,14 @@ class OWIDEnv:
             return f"{self.base_site}/admin"
 
     @property
+    def datasets_admin_site(self):
+        return f"{self.admin_site}/datasets"
+
+    @property
+    def indicators_admin_site(self):
+        return f"{self.admin_site}/variables"
+
+    @property
     def admin_api(self) -> str:
         """Get admin api url. This could be possibly merged with admin_site above.
         We'd just have to test when to use suffix `.tail6e23.ts.net` because of
@@ -473,23 +502,31 @@ class OWIDEnv:
 
     def dataset_admin_site(self, dataset_id: str | int) -> str:
         """Get dataset admin url."""
-        return f"{self.admin_site}/datasets/{dataset_id}/"
+        return f"{self.datasets_admin_site}/{dataset_id}/"
 
     def indicator_admin_site(self, variable_id: str | int) -> str:
         """Get indicator admin url."""
-        return f"{self.admin_site}/variables/{variable_id}/"
-
-    def variable_admin_site(self, variable_id: str | int) -> str:
-        """Get variable admin url."""
-        return self.indicator_admin_site(variable_id)
+        return f"{self.indicators_admin_site}/{variable_id}/"
 
     def chart_admin_site(self, chart_id: str | int) -> str:
         """Get chart admin url."""
         return f"{self.admin_site}/charts/{chart_id}/edit"
 
+    def explorer_admin_site(self, explorer_slug: str) -> str:
+        """Get explorer admin url."""
+        return f"{self.admin_site}/explorers/{explorer_slug}"
+
     def chart_site(self, slug: str) -> str:
         """Get chart url."""
         return f"{self.site}/grapher/{slug}"
+
+    def explorer_site(self, slug: str) -> str:
+        """Get explorer url."""
+        return f"{self.site}/explorers/{slug}"
+
+    def data_page_preview(self, variable_id: str | int) -> str:
+        """Get indicator admin url."""
+        return f"{self.admin_site}/datapage-preview/{variable_id}/"
 
     def thumb_url(self, slug: str):
         """
@@ -503,6 +540,39 @@ class OWIDEnv:
 
     def indicator_data_url(self, variable_id):
         return f"{self.indicators_url}/{variable_id}.data.json"
+
+    def read_sql(self, sql: str, *args, **kwargs) -> pd.DataFrame:
+        """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
+        This adds overhead, so if you need performance, reuse the same connection and cursor.
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            if isinstance(self.engine, Engine):
+                with self.engine.connect() as con:
+                    return pd.read_sql(sql, con, *args, **kwargs)
+            elif isinstance(self.engine, Session):
+                return pd.read_sql(sql, self.engine.bind, *args, **kwargs)
+            else:
+                raise ValueError(f"Unsupported engine type {type(self.engine)}")
+
+    def read_sqls(self, sql: List[str], *args, **kwargs) -> List[pd.DataFrame]:
+        """Wrapper around pd.read_sql that creates a connection and closes it after reading the data.
+
+        It can read multiple sql queries, to exploit the same connection and cursor.
+
+        sql: List of various queries
+        """
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            if isinstance(self.engine, Engine):
+                with self.engine.connect() as con:
+                    result = [pd.read_sql(s, con, *args, **kwargs) for s in sql]
+                    return result
+            elif isinstance(self.engine, Session):
+                result = [pd.read_sql(s, self.engine.bind, *args, **kwargs) for s in sql]
+                return result
+            else:
+                raise ValueError(f"Unsupported engine type {type(self.engine)}")
 
 
 # Wrap envs in OWID_ENV

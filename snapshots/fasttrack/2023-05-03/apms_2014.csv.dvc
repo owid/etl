@@ -1,26 +1,21 @@
 meta:
-  namespace: fasttrack
-  short_name: apms_2014
-  file_extension: csv
-  date_accessed: 2023-05-03
+  source:
+    name: Adult Psychiatric Morbidity Survey 2014, England (2016)
+    url: https://www.gov.uk/government/statistics/adult-psychiatric-morbidity-survey-mental-health-and-wellbeing-england-2014
+    source_data_url: |-
+      gAAAAABnRYjm-BZi3Nqs7In2gpZhuG03kWo5SiR_xJvXwncMzCmm--o4Z8FRFP55gIjTYun0AkKER23bHIUepBVraLszkW61lTi6JF3H7H0letw5MoLXJDe4S8UEwvkcq5h37pnxrcSJnzImSFrTQOuHF8l2kjJAF1QscQkYd_LGafvd9rWKkokdPPVLBf7iopl1gdm1gu7njbwKkauTdZyUbskGamH5fblFVs2LZv_GOGMQTv9yc4C-7dcXaRivHu-c-oU0j61D
+    date_accessed: '2024-11-26'
+    publication_year: 2016
+    published_by: |-
+      "McManus S, Bebbington P, Jenkins R, Brugha T. (eds.) (2016) Mental health and wellbeing in England: Adult Psychiatric Morbidity Survey 2014. Leeds: NHS Digital"
   name: Current depression in England by age and gender (APMS, 2014)
-  description: This is a dataset of the prevalence of current depression in the general
-    population in England, living in private households. Households were sampled randomly
-    and individuals were interviewed using the revised Clinical Interview Schedule
-    (CIS-R), which is a diagnostic structured interview format to determine whether
-    people had common mental disorders in the past week. In this dataset, presence
-    of a current episode of major depression was determined.
-  source_name: Google Sheet
-  url: https://www.gov.uk/government/statistics/adult-psychiatric-morbidity-survey-mental-health-and-wellbeing-england-2014
-  source_published_by: Google Sheet
-  source_data_url: https://docs.google.com/spreadsheets/d/e/2PACX-1vR8UNjna5w3mHijBNhbtk2vWPh_d2tYa4CrOZc2WFKeYP-ChcOCxNttPyv5izWcjnsZZv3CY2f98sd3/pub?output=csv
-  license_url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
-  license_name: Open Government Licence v3.0
+  description: |-
+    This is a dataset of the prevalence of current depression in the general population in England, living in private households. Households were sampled randomly and individuals were interviewed using the revised Clinical Interview Schedule (CIS-R), which is a diagnostic structured interview format to determine whether people had common mental disorders in the past week. In this dataset, presence of a current episode of major depression was determined.
+  license:
+    name: Open Government Licence v3.0
+    url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
   is_public: false
-  version: '2023-05-03'
-  publication_year: 2016
-wdir: ../../../data/snapshots/fasttrack/2023-05-03
 outs:
-- md5: 7a42c7cee959d16ae9d981f4b8b7ade1
-  size: 288
-  path: apms_2014.csv
+  - md5: 7a42c7cee959d16ae9d981f4b8b7ade1
+    size: 288
+    path: apms_2014.csv

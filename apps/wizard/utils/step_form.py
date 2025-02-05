@@ -33,7 +33,6 @@ class StepForm(BaseModel):
         """Build object from session_state variables."""
         session_state = cast(Dict[str, Any], dict(st.session_state))
         data = cls.filter_relevant_fields(step_name=st.session_state["step_name"], data=session_state)
-        # st.write(data)
         return cls(**data)
 
     def validate(self: Self) -> None:  # type: ignore[reportIncompatibleMethodOverride]

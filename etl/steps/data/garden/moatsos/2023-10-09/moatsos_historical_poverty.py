@@ -35,7 +35,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("moatsos_historical_poverty")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["moatsos_historical_poverty"].reset_index()
+    tb = ds_meadow.read("moatsos_historical_poverty", safe_types=False)
 
     #
     # Process data.
@@ -113,10 +113,12 @@ def smooth_estimates(tb: Table, poverty_lines: list) -> Table:
 
     # Select decadal years, FIRST_YEAR and LAST_YEAR (HISTORICAL AND FULL)
     tb_smooth = tb_smooth[
-        (tb_smooth["year"] % 10 == 0) | (tb_smooth["year"] == FIRST_YEAR) | (tb_smooth["year"] == LAST_YEAR_HISTORICAL)
+        (tb_smooth["year"].astype(int) % 10 == 0)
+        | (tb_smooth["year"] == FIRST_YEAR)
+        | (tb_smooth["year"] == LAST_YEAR_HISTORICAL)
     ].reset_index(drop=True)
     tb_smooth_cbn = tb_smooth_cbn[
-        (tb_smooth_cbn["year"] % 10 == 0)
+        (tb_smooth_cbn["year"].astype(int) % 10 == 0)
         | (tb_smooth_cbn["year"] == FIRST_YEAR)
         | (tb_smooth_cbn["year"] == LAST_YEAR_FULL)
     ].reset_index(drop=True)

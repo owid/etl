@@ -1,0 +1,108 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    display: &common-display
+      tolerance: 0
+      entityAnnotationsMap: |-
+        Other high income countries (PIP): e.g. US, Western Europe, Australia, Japan, South Korea and Saudi Arabia
+    presentation:
+      topic_tags:
+        - Poverty
+
+  description_key_povertyline: |-
+    <% if povertyline == "2.15" %>
+    Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
+    <% elif povertyline == "3.65" %>
+    A poverty line of $3.65 a day represents definitions of national poverty lines in lower-middle-income countries.
+    <% elif povertyline == "6.85" %>
+    A poverty line of $6.85 a day represents definitions of national poverty lines in upper-middle-income countries.
+    <%- endif -%>
+
+  description_key_ppp: |-
+    The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+
+  description_key_income_consumption: |-
+    Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. "Per capita" means that the income of each household is attributed equally to each member of the household (including children).
+
+  description_key_nonmarket_income: |-
+    Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+
+  description_key_scenarios: |-
+    <% if scenario == "Historical estimates" %>
+    Estimates are based on household surveys or extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+    <% elif scenario == "Current forecast + historical growth projections" %>
+    This data is a projection of the estimates based on GDP growth projections from the World Bank's Global Economic Prospects and the the Macro Poverty Outlook, together with IMF's World Economic Outlook, in the period 2025-2029. For the period 2030-2050, the data is projected using the average annual historical GDP per capita growth over 2010-2019.
+    <% elif scenario == "Historical estimates + projections" %>
+    This data combines data based on household surveys or extrapolated up until the year of the data release using GDP growth estimates and forecasts, with projections based on GDP growth projections from the World Bank's Global Economic Prospects and the the Macro Poverty Outlook, together with IMF's World Economic Outlook, in the period 2025-2029. For the period 2030-2050, the data is projected using the average annual historical GDP per capita growth over 2010-2019.
+    <% elif scenario == "2% growth projections" %>
+    This data is a projection of the estimates based on a scenario of 2% average GDP per capita growth, while keeping income inequality constant.
+    <% elif scenario == "2% growth + Gini reduction 1% projections" %>
+    This data is a projection of the estimates based on a scenatio of 2% average GDP per capita growth, while reducing income inequality by 1% of the Gini coefficient per year.
+    <% elif scenario == "2% growth + Gini reduction 2% projections" %>
+    This data is a projection of the estimates based on a scenatio of 2% average GDP per capita growth, while reducing income inequality by 2% of the Gini coefficient per year.
+    <% elif scenario == "4% growth projections" %>
+    This data is a projection of the estimates based on a scenario of 4% average GDP per capita growth, while keeping income inequality constant.
+    <% elif scenario == "6% growth projections" %>
+    This data is a projection of the estimates based on a scenario of 6% average GDP per capita growth, while keeping income inequality constant.
+    <% elif scenario == "8% growth projections" %>
+    This data is a projection of the estimates based on a scenario of 8% average GDP per capita growth, while keeping income inequality constant.
+    <%- endif -%>
+
+  isprojection_by_scenario: |-
+    <% if scenario == "Historical estimates" or scenario == "Historical estimates + projections" %>
+    false
+    <% else %>
+    true
+    <%- endif -%>
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Poverty projections by the World Bank
+  update_period_days: 681
+
+
+tables:
+  poverty_projections:
+    variables:
+      fgt0:
+        title: $<<povertyline>> a day - Share of population in poverty (<<scenario>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: "Percentage of population living in households with an income or consumption per person below $<<povertyline>> a day"
+        description_key:
+          - "{definitions.description_key_povertyline}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_nonmarket_income}"
+          - "{definitions.description_key_scenarios}"
+        presentation:
+          title_public: Share of population living in poverty
+          title_variant: $<<povertyline>> a day, <<scenario>>
+        display:
+          name: Share of population living below $<<povertyline>> a day (<<scenario>>)
+          numDecimalPlaces: 1
+          isProjection: "{definitions.isprojection_by_scenario}"
+          <<: *common-display
+
+      poorpop:
+        title: $<<povertyline>> a day - Number of people in poverty (<<scenario>>)
+        unit: "people"
+        short_unit: ""
+        description_short: "Number of people living in households with an income or consumption per person below $<<povertyline>> a day"
+        description_key:
+          - "{definitions.description_key_povertyline}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_income_consumption}"
+          - "{definitions.description_key_nonmarket_income}"
+          - "{definitions.description_key_scenarios}"
+        presentation:
+          title_public: Number of people living in poverty
+          title_variant: $<<povertyline>> a day, <<scenario>>
+        display:
+          name: Number of people living below $<<povertyline>> a day (<<scenario>>)
+          numDecimalPlaces: 0
+          isProjection: "{definitions.isprojection_by_scenario}"
+          <<: *common-display

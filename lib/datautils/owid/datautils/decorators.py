@@ -1,6 +1,5 @@
 """Library decorators."""
 
-
 import functools
 import tempfile
 from typing import Any, Callable, Optional

@@ -1,6 +1,4 @@
-"""Load snapshot of Nemet (2009) data and create a table.
-
-"""
+"""Load snapshot of Nemet (2009) data and create a table."""
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -22,7 +20,7 @@ def run(dest_dir: str) -> None:
     #
     # Load snapshot.
     snap = paths.load_snapshot("nemet_2009.csv")
-    tb = snap.read()
+    tb = snap.read(safe_types=False)
 
     #
     # Process data.

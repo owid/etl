@@ -12,13 +12,13 @@ def run(dest_dir: str) -> None:
     #
     # Retrieve snapshot and load data.
     snap = paths.load_snapshot("antarctic_ice_core_co2_concentration.xls")
-    tb = snap.read(sheet_name="CO2 Composite", skiprows=14)
+    tb = snap.read(safe_types=False, sheet_name="CO2 Composite", skiprows=14)
 
     #
     # Process data.
     #
     # Ensure all columns are snake-case (and remove spurious spaces), set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["gasage__yr_bp"], verify_integrity=True).sort_index()
+    tb = tb.format(["gasage__yr_bp"])
 
     #
     # Save outputs.

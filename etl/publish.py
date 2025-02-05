@@ -23,7 +23,7 @@ from owid.catalog.s3_utils import connect_r2
 from etl import config, files
 from etl.paths import DATA_DIR
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 
 class CannotPublish(Exception):

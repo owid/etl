@@ -59,10 +59,12 @@ def repack_frame(
 
 
 def repack_series(s: pd.Series) -> pd.Series:
-    if s.dtype.name in ("Int64", "int64", "UInt64", "uint64"):
-        return shrink_integer(s)
+    dtype_name = s.dtype.name.replace("[pyarrow]", "").replace("[pyarrow_numpy]", "").lower()
 
-    if s.dtype.name in ("object", "string", "float64", "Float64"):
+    if dtype_name in ("int64", "uint64"):
+        return shrink_integer(s.astype("Int64"))
+
+    if dtype_name in ("object", "str", "string", "float64"):
         for strategy in [to_int, to_float, to_category]:
             try:
                 return strategy(s)
@@ -72,11 +74,22 @@ def repack_series(s: pd.Series) -> pd.Series:
     return s
 
 
+def _to_float(s: pd.Series) -> pd.Series:
+    """Convert series to Float64. Replace numpy NaNs with NA. This can
+    happen when original series is an object and contains 'nan' string."""
+    r = s.astype("Float64")
+    if s.dtype == "object":
+        r = r.mask(np.isnan(r), pd.NA)
+    return r
+
+
 def to_int(s: pd.Series) -> pd.Series:
     # values could be integers or strings
-    v = s.astype("float64").astype("Int64")
+    s = _to_float(s)
+    v = s.astype("Int64")
 
-    if not series_eq(v, s, cast=float):
+    # casting to float converts strings to floats, that doesn't work with float64[pyarrow]
+    if not series_eq(v, s):
         raise ValueError()
 
     # it's an integer, now pack it smaller
@@ -87,21 +100,16 @@ def shrink_integer(s: pd.Series) -> pd.Series:
     """
     Take an Int64 series and make it as small as possible.
     """
-    assert s.dtype.name in ("Int64", "int64", "UInt64", "uint64")
+    assert s.dtype == "Int64"
 
     if s.isnull().all():
         # shrink all NaNs to Int8
         return s.astype("Int8")
-    elif s.isnull().any():
+    else:
         if s.min() < 0:
             series = ["Int32", "Int16", "Int8"]
         else:
             series = ["UInt32", "UInt16", "UInt8"]
-    else:
-        if s.min() < 0:
-            series = ["int32", "int16", "int8"]
-        else:
-            series = ["uint32", "uint16", "uint8"]
 
     for dtype in series:
         v = s.astype(dtype)
@@ -114,11 +122,20 @@ def shrink_integer(s: pd.Series) -> pd.Series:
 
 
 def to_float(s: pd.Series) -> pd.Series:
-    options = ["float32", "float64"]
+    return shrink_float(_to_float(s))
+
+
+def shrink_float(s: pd.Series) -> pd.Series:
+    """
+    Take a Float64 series and make it as small as possible.
+    """
+    assert s.dtype.name.replace("[pyarrow]", "") in ("float64", "Float64", "double"), s.dtype
+
+    options = ["Float32", "Float64"]
     for dtype in options:
         v = s.astype(dtype)
 
-        if series_eq(s, v, float):
+        if series_eq(s, v):
             return v
 
     raise ValueError()
@@ -133,7 +150,7 @@ def to_category(s: pd.Series) -> pd.Series:
     return s.astype("category")
 
 
-def series_eq(lhs: pd.Series, rhs: pd.Series, cast: Any, rtol: float = 1e-5, atol: float = 1e-8) -> bool:
+def series_eq(lhs: pd.Series, rhs: pd.Series, rtol: float = 1e-5, atol: float = 1e-8) -> bool:
     """
     Check that series are equal, but unlike normal floating point checks where
     NaN != NaN, we want missing or null values to be reported as equal to each
@@ -144,11 +161,33 @@ def series_eq(lhs: pd.Series, rhs: pd.Series, cast: Any, rtol: float = 1e-5, ato
     if len(lhs) != len(rhs):
         return False
 
-    # improve performance by calling native astype method
-    if cast == float:
-        func = lambda s: s.astype(float)  # noqa: E731
-    else:
-        # NOTE: this would be extremely slow in practice
-        func = lambda s: s.apply(cast)  # noqa: E731
+    return np.allclose(lhs, rhs, rtol=rtol, atol=atol, equal_nan=True)
 
-    return np.allclose(func(lhs), func(rhs), rtol=rtol, atol=atol, equal_nan=True)
+
+def _safe_dtype(dtype: Any) -> str:
+    """Determine the appropriate dtype string based on pandas dtype."""
+    if pd.api.types.is_integer_dtype(dtype):
+        return "Int64"
+    elif pd.api.types.is_float_dtype(dtype):
+        return "Float64"
+    elif pd.api.types.is_bool_dtype(dtype):
+        return "boolean"
+    elif isinstance(dtype, pd.CategoricalDtype):
+        return "string[pyarrow]"
+    elif dtype == "object":
+        return "string[pyarrow]"
+    else:
+        return dtype
+
+
+def to_safe_types(t: pd.DataFrame) -> pd.DataFrame:
+    """Convert numeric columns to Float64 and Int64 and categorical
+    columns to string[pyarrow]."""
+    t = t.astype({col: _safe_dtype(t[col].dtype) for col in t.columns})
+
+    if isinstance(t.index, pd.MultiIndex):
+        t.index = t.index.set_levels([level.astype(_safe_dtype(level.dtype)) for level in t.index.levels])
+    else:
+        t.index = t.index.astype(_safe_dtype(t.index.dtype))
+
+    return t

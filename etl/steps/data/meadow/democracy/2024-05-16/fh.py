@@ -18,12 +18,12 @@ def run(dest_dir: str) -> None:
     #
     # Load ratings snapshot as a table
     snap = paths.load_snapshot("fh_ratings.xlsx")
-    tb_ratings_countries = snap.read(sheet_name="Country Ratings, Statuses ", header=[1, 2])
-    tb_ratings_territories = snap.read(sheet_name="Territory Ratings, Statuses", header=[1, 2])
+    tb_ratings_countries = snap.read(safe_types=False, sheet_name="Country Ratings, Statuses ", header=[1, 2])
+    tb_ratings_territories = snap.read(safe_types=False, sheet_name="Territory Ratings, Statuses", header=[1, 2])
 
     # Load scores snapshot as a table
     snap = paths.load_snapshot("fh_scores.xlsx")
-    tb_scores = snap.read(sheet_name="FIW06-24")
+    tb_scores = snap.read(safe_types=False, sheet_name="FIW06-24")
 
     #
     # Process data.

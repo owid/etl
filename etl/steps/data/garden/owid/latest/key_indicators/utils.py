@@ -1,4 +1,5 @@
 """Utils for key_indicators module."""
+
 import pandas as pd
 
 from etl.data_helpers import geo
@@ -21,6 +22,10 @@ def add_regions(df: pd.DataFrame, population: pd.DataFrame) -> pd.DataFrame:
     ]
     df = df.loc[-df.country.isin(regions)]
     for region in regions:
+        countries_that_must_have_data = geo.list_countries_in_region_that_must_have_data(
+            region=region,
+            population=population,
+        )
         # TODO: this should be ideally
         # countries_in_region = geo.list_members_of_region(region=region, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
         # df = geo.add_region_aggregates(df=df, region=region, countries_in_region=countries_in_region, population=population)
@@ -29,8 +34,7 @@ def add_regions(df: pd.DataFrame, population: pd.DataFrame) -> pd.DataFrame:
         df = geo.add_region_aggregates(
             df=df,
             region=region,
-            population=population,
-            countries_that_must_have_data="auto",
+            countries_that_must_have_data=countries_that_must_have_data,
             num_allowed_nans_per_year=None,
             frac_allowed_nans_per_year=0.2,
         )

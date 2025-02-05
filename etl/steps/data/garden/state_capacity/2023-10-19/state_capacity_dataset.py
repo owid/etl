@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("state_capacity_dataset")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["state_capacity_dataset"].reset_index()
+    tb = ds_meadow.read("state_capacity_dataset")
 
     #
     # Process data.
@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
 def regional_aggregations(tb: Table) -> Table:
     # Load population data.
     tb_pop = paths.load_dataset("population")
-    tb_pop = tb_pop["population"].reset_index()
+    tb_pop = tb_pop.read("population")
 
     tb_regions = tb.copy()
 
@@ -98,7 +98,6 @@ def regional_aggregations(tb: Table) -> Table:
             aggregations={"capacity_pop": "sum", "population": "sum"},
             countries_that_must_have_data=[],
             frac_allowed_nans_per_year=0.3,
-            population=tb_regions,
         )
 
     # Keep only regions

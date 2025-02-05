@@ -1,7 +1,6 @@
 import json
 from typing import Any, Dict
 
-from apps.wizard.utils.step_form import StepForm
 from etl.paths import BASE_DIR
 
 # PATH WIZARD CONFIG
@@ -46,7 +45,7 @@ def create_wizard_defaults(defaults: Dict[str, Any], overwrite: bool = False) ->
             json.dump(defaults, f)
 
 
-def update_wizard_defaults_from_form(form: StepForm) -> None:
+def update_wizard_defaults_from_form(form: Any) -> None:
     """Update wizard defaults file."""
     # Load config
     config = load_wizard_defaults()

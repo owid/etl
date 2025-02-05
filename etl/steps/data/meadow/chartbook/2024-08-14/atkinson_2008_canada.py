@@ -16,9 +16,9 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("atkinson_2008_canada.xls")
 
     # Load data from snapshot.
-    tb_oecd_lms = snap.read(sheet_name="Table C.3 (OECD LMS)", usecols="C,G", skiprows=2)
-    tb_census = snap.read(sheet_name="Table C.4 (Census)", usecols="C,Y", skiprows=3)
-    tb_manufacturing = snap.read(sheet_name="Table C.5 (Manf)", usecols="C,I", skiprows=2)
+    tb_oecd_lms = snap.read(safe_types=False, sheet_name="Table C.3 (OECD LMS)", usecols="C,G", skiprows=2)
+    tb_census = snap.read(safe_types=False, sheet_name="Table C.4 (Census)", usecols="C,Y", skiprows=3)
+    tb_manufacturing = snap.read(safe_types=False, sheet_name="Table C.5 (Manf)", usecols="C,I", skiprows=2)
 
     #
     # Process data.

@@ -114,3 +114,29 @@ steps:
     - data://garden/countries/2023-09-25/gleditsch
   data://grapher/war/2023-10-24/ucdp_prio:
     - data://garden/war/2023-09-21/ucdp_prio
+  data://grapher/war/2023-09-21/prio_v31:
+    - data://garden/war/2023-09-21/prio_v31
+
+  # UCDP (candidate data)
+  data://meadow/war/2024-10-02/ucdp_ced:
+    - snapshot://war/2024-10-02/ucdp_ced.csv
+  data://garden/war/2024-10-02/ucdp_monthly:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/war/2024-08-26/ucdp
+    - data://garden/countries/2024-08-27/gleditsch
+    - data://meadow/war/2024-10-02/ucdp_ced
+    - data://garden/geography/2023-11-28/nat_earth_110
+  data://grapher/war/2024-10-02/ucdp_monthly:
+    - data://garden/war/2024-10-02/ucdp_monthly
+
+  # # Global Military Spending Dataset (only one snapshot was modified)
+  # data://meadow/harvard/2024-07-22/global_military_spending_dataset:
+  #   - snapshot://harvard/2024-07-22/global_military_spending_dataset.rds
+  #   - snapshot://harvard/2024-07-22/global_military_spending_dataset_burden.rds
+  # data://garden/harvard/2024-07-22/global_military_spending_dataset:
+  #   - data://meadow/harvard/2024-07-22/global_military_spending_dataset
+  #   - data://garden/demography/2024-07-15/population
+  #   - data://garden/countries/2024-08-27/gleditsch
+  #   - data://garden/cow/2024-07-26/national_material_capabilities
+  # data://grapher/harvard/2024-07-22/global_military_spending_dataset:
+  #   - data://garden/harvard/2024-07-22/global_military_spending_dataset

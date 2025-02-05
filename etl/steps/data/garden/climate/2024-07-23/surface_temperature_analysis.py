@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
     tb = pr.concat(list(tables.values()), ignore_index=True, short_name=paths.short_name)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["location", "date"], verify_integrity=True).sort_index()
+    tb = tb.format(["location", "date"])
 
     #
     # Save outputs.

@@ -8,6 +8,7 @@ It harmonizes and further processes meadow data, and uses the following auxiliar
 - WorldBank's Income groups, to generate aggregates for different income groups.
 
 """
+
 import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
@@ -150,11 +151,11 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset and read all its tables.
     ds_meadow = paths.load_dataset("global_carbon_budget")
-    tb_co2 = ds_meadow.read_table("global_carbon_budget_fossil_co2_emissions")
-    tb_historical = ds_meadow.read_table("global_carbon_budget_historical_budget")
-    tb_consumption = ds_meadow.read_table("global_carbon_budget_consumption_emissions")
-    tb_production = ds_meadow.read_table("global_carbon_budget_production_emissions")
-    tb_land_use = ds_meadow.read_table("global_carbon_budget_land_use_change")
+    tb_co2 = ds_meadow.read("global_carbon_budget_fossil_co2_emissions", safe_types=False)
+    tb_historical = ds_meadow.read("global_carbon_budget_historical_budget", safe_types=False)
+    tb_consumption = ds_meadow.read("global_carbon_budget_consumption_emissions", safe_types=False)
+    tb_production = ds_meadow.read("global_carbon_budget_production_emissions", safe_types=False)
+    tb_land_use = ds_meadow.read("global_carbon_budget_land_use_change", safe_types=False)
 
     # Load primary energy consumption dataset and read its main table.
     ds_energy = paths.load_dataset("primary_energy_consumption")
@@ -1124,9 +1125,9 @@ def combine_data_and_add_variables(
     added_variables = tb_co2_with_regions.drop(
         columns=["country", "year"] + COLUMNS_THAT_MUST_HAVE_DATA
     ).columns.tolist()
-    tb_co2_with_regions.loc[
-        (tb_co2_with_regions["country"].str.contains(" (GCP)", regex=False)), added_variables
-    ] = np.nan
+    tb_co2_with_regions.loc[(tb_co2_with_regions["country"].str.contains(" (GCP)", regex=False)), added_variables] = (
+        np.nan
+    )
 
     # Remove uninformative rows (those that have only data for, say, gdp, but not for variables related to emissions).
     tb_co2_with_regions = tb_co2_with_regions.dropna(subset=COLUMNS_THAT_MUST_HAVE_DATA, how="all").reset_index(
