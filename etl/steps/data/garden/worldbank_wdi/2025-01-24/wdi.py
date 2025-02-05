@@ -2,7 +2,7 @@ import json
 import re
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -73,6 +73,14 @@ def run(dest_dir: str) -> None:
 
     # add regions to remittance data
     tb_garden = add_regions_to_remittance_data(tb_garden, ds_regions, ds_income_groups)
+
+    # Adjust GDP indicators in current US$ to constant US$ using GDP deflator
+    tb_garden = adjust_current_to_constant_usd(
+        tb=tb_garden,
+        indicators=["ny_gdp_mktp_cd", "ny_gdp_pcap_cd"],
+        base_year=2015,
+        deflator_indicator="ny_gdp_defl_zs_ad",
+    )
 
     ####################################################################################################################
 
@@ -604,5 +612,51 @@ def add_armed_personnel_as_share_of_population(tb: Table, ds_population: Dataset
 
     # Set index again
     tb = tb.format(["country", "year"])
+
+    return tb
+
+
+def adjust_current_to_constant_usd(tb: Table, indicators: List[str], base_year: int, deflator_indicator: str) -> Table:
+    """
+    Adjust current US$ indicators to constant US$ using a deflator indicator and the base year.
+    The indicators to use have to be in current US$ for this to work.
+    The function works equally if the deflator is CPI or a GDP deflator, or any other deflator.
+
+    Available deflator indicators in WDI:
+    ny_gdp_defl_kd_zg_ad, Inflation, GDP deflator: linked series (annual %)
+    ny_gdp_defl_kd_zg, Inflation, GDP deflator (annual %)
+    ny_gdp_defl_zs_ad, GDP deflator: linked series (base year varies by country)
+    ny_gdp_defl_zs, GDP deflator (base year varies by country)
+
+    fp_cpi_totl_zg, Inflation, consumer prices (annual %)
+    fp_cpi_totl, Consumer price index (2010 = 100)
+    """
+
+    tb = tb.copy().reset_index()
+
+    tb_adjusted = tb[["country", "year"] + indicators + [deflator_indicator]].copy()
+
+    # For each country, calculate the deflator for the base year and copy it to all years
+    tb_adjusted[f"{deflator_indicator}_base_year"] = tb_adjusted.loc[
+        tb_adjusted["year"] == base_year, deflator_indicator
+    ]
+
+    # Divide the deflator by the deflator in the base year
+    tb_adjusted[f"{deflator_indicator}_adjusted"] = (
+        tb_adjusted[deflator_indicator] / tb_adjusted[f"{deflator_indicator}_base_year"]
+    )
+
+    # Adjust the indicators to constant US$
+    new_indicators = []
+    for indicator in indicators:
+        new_indicator_name = f"{indicator}_adjusted"
+        tb_adjusted[new_indicator_name] = tb_adjusted[indicator] / tb_adjusted[f"{deflator_indicator}_adjusted"]
+        new_indicators.append(new_indicator_name)
+
+    # Merge the adjusted indicators back to the original table
+    tb = pr.merge(tb, tb_adjusted[["country", "year"] + new_indicators], on=["country", "year"], how="outer")
+
+    # Reformat again
+    tb = tb.format()
 
     return tb
