@@ -88,7 +88,7 @@ def get_chart_views_from_bq(
         grapher_filter = f"AND grapher IN ({grapher_urls_formatted})"
     else:
         # If no list is given, consider all grapher URLs.
-        grapher_filter = f"AND grapher LIKE '{GRAPHERS_BASE_URL}%'"
+        grapher_filter = f"AND grapher LIKE '%%{GRAPHERS_BASE_URL}%%'"
 
     if not groupby:
         # If a groupby list is not given, assume the simplest case, which gives total views for each grapher.
