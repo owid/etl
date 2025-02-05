@@ -16,8 +16,11 @@ definitions:
   description_key_gdp_per_capita: GDP per capita is GDP divided by population.
   description_key_long_run: This indicator provides information on economic growth and income levels in the _very long run_. Some country estimates are available as far back as 1 CE, and regional estimates as far back as 1820 CE.
   description_key_ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
-  description_key_ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices, using a combination of 2011 and 1990 prices for historical data.
+  description_key_ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices, using a combination of 2011 and 1990 PPPs for historical data.
   description_key_former: Time series for former countries and territories are calculated forward in time by estimating values based on their last official borders.
+
+  description_short_gdp: Total economic output of a country or region per year.
+  description_short_gdp_per_capita: Average economic output per person in a country or region per year.
 
 
 
@@ -34,7 +37,7 @@ tables:
         title: Gross domestic product (GDP)
         unit: international-$ in 2011 prices
         short_unit: $
-        description_short: This data is adjusted for inflation and differences in living costs between countries.
+        description_short: "{definitions.description_short_gdp} {definitions.description_key_ppp_adjustment}"
         description_key:
           - "{definitions.description_key_attribution}"
           - "{definitions.description_key_gdp}"
@@ -99,7 +102,7 @@ tables:
         title: GDP per capita
         unit: international-$ in 2011 prices
         short_unit: $
-        description_short: This data is adjusted for inflation and differences in the cost of living between countries.
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
         description_key:
           - "{definitions.description_key_attribution}"
           - "{definitions.description_key_gdp} {definitions.description_key_gdp_per_capita}"

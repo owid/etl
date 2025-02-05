@@ -16,9 +16,13 @@ definitions:
 
   description_gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
   description_gdp_per_capita: GDP per capita is GDP divided by population.
-  description_long_run: This indicator provides information on _global_ economic growth and income levels in the very long run. Estimates are available as far back as 1 CE.
+  description_long_run_gdp: This global GDP indicator provides information on global economic growth and income levels in the very long run. Estimates are available as far back as 1 CE.
+  description_long_run_gdp_per_capita: This global average GDP per capita indicator provides information on global economic growth and income levels in the very long run. Estimates are available as far back as 1 CE.
   description_ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
-  description_ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices, combining data from the Maddison Database, Maddison Project Database and World Bank.
+  description_ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices, combining data from the Maddison Database, Maddison Project Database, and World Bank.
+
+  description_short_gdp: Total economic output of the world economy.
+  description_short_gdp_per_capita: Average economic output per person in the world economy.
 
 
 # Learn more about the available fields:
@@ -42,11 +46,10 @@ tables:
         display:
           name: GDP
           numDecimalPlaces: 0
-        description_short: Total output of the world economy. This data is adjusted for inflation and differences in the cost
-          of living between countries.
+        description_short: "{definitions.description_gdp} {definitions.description_ppp_adjustment}"
         description_key:
           - "{definitions.description_gdp}"
-          - "{definitions.description_long_run}"
+          - "{definitions.description_long_run_gdp}"
           - "{definitions.description_ppp_adjustment}"
           - "{definitions.description_ppp_prices}"
         presentation:
@@ -79,10 +82,10 @@ tables:
         display:
           name: GDP per capita
           numDecimalPlaces: 0
-        description_short: This data is adjusted for inflation and differences in the cost of living between countries.
+        description_short: "{definitions.description_gdp_per_capita} {definitions.description_ppp_adjustment}"
         description_key:
           - "{definitions.description_gdp} {definitions.description_gdp_per_capita}"
-          - "{definitions.description_long_run}"
+          - "{definitions.description_long_run_gdp_per_capita}"
           - "{definitions.description_ppp_adjustment}"
           - "{definitions.description_ppp_prices}"
         presentation:
