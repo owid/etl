@@ -414,7 +414,7 @@ tables:
         short_unit: $
         unit: international-$ in 2017 prices
         description_short: |-
-          "{definitions.description_short_gni_per_capita} {definitions.ppp_adjustment}}"
+          "{definitions.description_short_gni_per_capita} {definitions.ppp_adjustment}"
         description_key:
           - "{definitions.gni} {definitions.gni_per_capita}"
           - This GNI per capita indicator provides information on economic growth and income levels from 1990.
