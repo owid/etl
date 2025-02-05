@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from typing import Optional
 
@@ -24,6 +24,9 @@ class Chart(Doc):
     views_365d: Optional[int] = None
     gpt_reason: Optional[str] = None
     coviews: Optional[int] = None
+
+    def to_dict(self) -> dict:
+        return asdict(self)
 
 
 def get_raw_charts() -> pd.DataFrame:

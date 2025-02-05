@@ -12,7 +12,7 @@ from apps.wizard.app_pages.similar_charts import data
 from etl import config
 from etl.db import get_engine
 
-config.enable_bugsnag()
+config.enable_sentry()
 log = structlog.get_logger()
 
 

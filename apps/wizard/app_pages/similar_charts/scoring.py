@@ -1,6 +1,5 @@
 import json
 import time
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -59,14 +58,8 @@ class ScoringModel:
     emb_title: emb.EmbeddingsModel
     emb_subtitle: emb.EmbeddingsModel
 
-    # Weights for the different scores
-    weights: dict[str, float]
-
-    def __init__(
-        self, model: SentenceTransformer, weights: Optional[dict[str, float]] = None, coviews_regularization: float = 0
-    ) -> None:
+    def __init__(self, model: SentenceTransformer, coviews_regularization: float = 0) -> None:
         self.model = model
-        self.weights = weights or DEFAULT_WEIGHTS.copy()
         self.coviews_regularization = coviews_regularization
 
     def fit(self, charts: list[Chart]) -> None:
@@ -78,21 +71,6 @@ class ScoringModel:
 
         self.emb_subtitle = emb.EmbeddingsModel(self.model, model_name="sim_charts_subtitle")
         self.emb_subtitle.fit(charts, text=lambda d: d.subtitle)
-
-    def set_weights(self, weights: dict[str, float]):
-        self.weights = weights
-
-    def similarity(self, chart: Chart) -> dict[int, float]:
-        assert self.weights is not None, "Weights must be set before calling similarity"
-
-        scores = self.similarity_components(chart)
-
-        # Get weights and normalize them
-        # w = pd.Series(self.weights)
-        # w = w / w.sum()
-
-        # Calculate total score
-        return scores.sum(axis=1).to_dict()
 
     def similar_chart_by_title(self, title: str) -> int:
         title_scores = self.emb_title.calculate_similarity(title)
@@ -124,10 +102,10 @@ class ScoringModel:
             ret.append(
                 {
                     "chart_id": c.chart_id,
-                    "title": title_scores[i],
-                    "subtitle": subtitle_scores[i],
+                    "title_score": title_scores[i],
+                    "subtitle_score": subtitle_scores[i],
                     # score 1 if there is at least one tag in common, 0 otherwise
-                    "tags": float(bool(set(c.tags) & set(chart.tags))),
+                    "tags_score": float(bool(set(c.tags) & set(chart.tags))),
                     "share_indicator": float(c.chart_id in charts_sharing_indicator),
                     "pageviews": c.views_365d or 0,
                     "coviews": c.coviews or 0,
@@ -148,15 +126,18 @@ class ScoringModel:
         )
         ret["jaccard_score"] = score_jaccard(ret["coviews"], ret["pageviews"], chart.views_365d or 0)
 
-        # Get weights and normalize them
-        w = pd.Series(self.weights)
-        w = w / w.sum()
-
-        # Multiply scores by weights
-        ret[w.index] = (ret[w.index] * w).fillna(0)
-
         # Reorder
-        ret = ret[["title", "subtitle", "tags", "share_indicator", "pageviews_score", "coviews_score", "jaccard_score"]]
+        ret = ret[
+            [
+                "title_score",
+                "subtitle_score",
+                "tags_score",
+                "share_indicator",
+                "pageviews_score",
+                "coviews_score",
+                "jaccard_score",
+            ]
+        ]
 
         log.info("similarity_components.end", t=time.time() - t)
 
