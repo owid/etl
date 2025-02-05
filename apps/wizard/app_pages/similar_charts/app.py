@@ -105,7 +105,7 @@ def get_and_fit_model(charts: list[data.Chart]) -> scoring.ScoringModel:
 
 
 def st_related_charts_table(
-    df: pd.DataFrame, n: int = 6, drop_cols: list[str] = ["score", "coviews_AB", "coviews_BA"]
+    df: pd.DataFrame, n: int = 6, drop_cols: list[str] = ["score", "coviews_after", "coviews_before"]
 ) -> None:
     """
     Displays a table of related charts, sorted by `score`.
@@ -113,13 +113,13 @@ def st_related_charts_table(
     Columns displayed in the table:
     - Link to open the chart
     - Chart ID (hidden in config)
-    - Slug
     - Title
+    - Slug
     - Tags
     - Views (365d)
     - Coviews
-    - Coviews_AB
-    - Coviews_BA
+    - Coviews_after
+    - Coviews_before
     - Score
     - Rank
     """
@@ -133,13 +133,13 @@ def st_related_charts_table(
     final_cols = [
         "link",
         "chart_id",
-        "slug",
         "title",
+        "slug",
         "tags",
         "views_365d",
         "coviews",
-        "coviews_AB",
-        "coviews_BA",
+        "coviews_after",
+        "coviews_before",
         "score",
         "rank",
     ]
@@ -152,6 +152,7 @@ def st_related_charts_table(
     column_config = {
         "link": st.column_config.LinkColumn("Open", display_text="Open"),
         "chart_id": None,  # hide column name
+        "slug": None,  # hide column name
     }
 
     st.dataframe(
@@ -265,13 +266,13 @@ charts_df = charts_df.loc[charts_df.index != chosen_chart.chart_id]
 
 # Join directional coviews
 dir_cov = get_directional_coviews()
-charts_df["coviews_AB"] = (
+charts_df["coviews_after"] = (
     dir_cov[dir_cov.slug1 == chosen_chart.slug]
     .set_index("slug2")["sessions_coviewed"]
     .reindex(charts_df["slug"])
     .values
 )
-charts_df["coviews_BA"] = (
+charts_df["coviews_before"] = (
     dir_cov[dir_cov.slug2 == chosen_chart.slug]
     .set_index("slug1")["sessions_coviewed"]
     .reindex(charts_df["slug"])
@@ -291,7 +292,7 @@ def show_section_others_viewed(df: pd.DataFrame, n: int) -> None:
     st.header("Others also viewed")
     st.markdown(
         "These charts have the **highest number of coviews** (undirected) with the current chart. "
-        "For completeness, the directed coview counts are also shown as coviews_AB and coviews_BA."
+        "For completeness, we also split total coviews into coviews_before the selected chart and coviews_after."
     )
 
     df = df.copy()
