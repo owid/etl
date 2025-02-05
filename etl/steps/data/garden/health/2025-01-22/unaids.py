@@ -402,7 +402,7 @@ def make_table_epi(tb, dimensions, ds_regions, ds_income_groups, countries_all):
 
     # Remove anomalies
     if "epi" in ANOMALIES:
-        paths.log.info(f"Removing anomalies from table: 'epi'")
+        paths.log.info("Removing anomalies from table: 'epi'")
         anomalies = ANOMALIES["epi"]
         tb = remove_anomalies(tb, anomalies)
 
@@ -1135,25 +1135,25 @@ def remove_anomalies(tb, anomalies):
         assert "country" in anomaly
         assert anomaly["indicator"] in tb.columns, f"Indicator '{anomaly['indicator']}' not found in table!"
         # Create mask
-        mask = (
-            (tb["country"] == anomaly["country"])
-        )
+        mask = tb["country"] == anomaly["country"]
 
         if "year" in anomaly:
             if isinstance(anomaly["year"], int):
-                mask &= (tb["year"] == anomaly["year"])
+                mask &= tb["year"] == anomaly["year"]
             elif isinstance(anomaly["year"], list):
-                mask &= (tb["year"].isin(anomaly["year"]))
+                mask &= tb["year"].isin(anomaly["year"])
             else:
                 raise TypeError("Unexpected type for 'year' in anomaly! Must be INT or LIST[INT].")
 
         if "dimensions" in anomaly:
-            assert isinstance(anomaly["dimensions"], dict), "Unexpected type for 'dimensions' in anomaly! Must be a DICT."
+            assert isinstance(
+                anomaly["dimensions"], dict
+            ), "Unexpected type for 'dimensions' in anomaly! Must be a DICT."
             for dim, value in anomaly["dimensions"].items():
                 if isinstance(value, list):
-                    mask &= (tb[dim].isin(value))
+                    mask &= tb[dim].isin(value)
                 else:
-                    mask &= (tb[dim] == value)
+                    mask &= tb[dim] == value
 
         # Remove anomalies
         tb.loc[mask, anomaly["indicator"]] = np.nan
