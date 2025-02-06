@@ -5,6 +5,10 @@ steps:
   data://garden/regions/2023-01-01/regions:
   data://grapher/regions/2023-01-01/regions:
     - data://garden/regions/2023-01-01/regions
+  # WARNING: The following step exists for backward compatibility and should eventually be removed.
+  # Consider using external/owid_grapher/latest/regions instead.
+  data://grapher/regions/latest/regions:
+    - data://garden/regions/2023-01-01/regions
   # Create a step with regions data used by the owid-grapher repository.
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions

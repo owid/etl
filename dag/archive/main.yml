@@ -386,10 +386,6 @@ steps:
   data://grapher/missing_data/2024-03-26/children_out_of_school:
     - data://garden/missing_data/2024-03-26/children_out_of_school
 
-  # Switched to external/owid_grapher/latest/regions for external (e.g. owid-grapher) use-cases.
-  data://grapher/regions/latest/regions:
-    - data://garden/regions/2023-01-01/regions
-
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
