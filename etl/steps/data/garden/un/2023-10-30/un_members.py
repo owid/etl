@@ -6,6 +6,7 @@ from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+from etl.steps.data.grapher.regions.latest.regions import MAPPABLE_COUNTRIES
 
 log = get_logger()
 
@@ -84,7 +85,12 @@ def add_missing_countries(tb: Table) -> Table:
     # Load region dataset
     ds_regions = paths.load_dataset("regions")
     tb_regions = ds_regions.read("regions")
-    tb_regions = tb_regions[(tb_regions["region_type"] == "country") & ~(tb_regions["is_historical"])]
+    tb_regions = tb_regions[
+        (tb_regions["region_type"] == "country")
+        & ~(tb_regions["is_historical"])
+        # Countries that are mappable in Grapher.
+        & tb_regions.code.isin(MAPPABLE_COUNTRIES)
+    ]
 
     countries_available = tb["country"].unique().tolist()
     countries_regions_dataset = tb_regions["name"].unique().tolist()
