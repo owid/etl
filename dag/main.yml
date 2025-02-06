@@ -5,10 +5,6 @@ steps:
   data://garden/regions/2023-01-01/regions:
   data://grapher/regions/2023-01-01/regions:
     - data://garden/regions/2023-01-01/regions
-  # WARNING: The following step exists for backward compatibility and should eventually be removed.
-  # Consider using external/owid_grapher/latest/regions instead.
-  data://grapher/regions/latest/regions:
-    - data://garden/regions/2023-01-01/regions
   # Create a step with regions data used by the owid-grapher repository.
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
@@ -338,7 +334,6 @@ steps:
     - data://meadow/un/2023-10-30/un_members
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/regions/2023-01-01/regions
-    - data://grapher/regions/latest/regions
     - data://garden/demography/2023-03-31/population
   data://grapher/un/2023-10-30/un_members:
     - data://garden/un/2023-10-30/un_members
