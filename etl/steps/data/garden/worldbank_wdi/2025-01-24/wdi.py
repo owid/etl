@@ -77,10 +77,21 @@ def run(dest_dir: str) -> None:
     # Adjust GDP indicators in current US$ to constant US$ using GDP deflator
     tb_garden = adjust_current_to_constant_usd(
         tb=tb_garden,
+        indicators=["ny_gdp_mktp_cd", "ny_gdp_pcap_cd"],
+        base_year=2015,
+        deflator_indicator="ny_gdp_defl_zs",
+        conversion_indicator="pa_nus_fcrf",
+        local_currency_units=False,
+    )
+
+    # Adjust GDP indicators in current LCU to constant US$ using GDP deflator and exchange rate
+    tb_garden = adjust_current_to_constant_usd(
+        tb=tb_garden,
         indicators=["ny_gdp_mktp_cn", "ny_gdp_pcap_cn"],
         base_year=2015,
-        deflator_indicator="ny_gdp_defl_zs_ad",
-        adjustment_indicator="pa_nus_fcrf",
+        deflator_indicator="ny_gdp_defl_zs",
+        conversion_indicator="pa_nus_fcrf",
+        local_currency_units=True,
     )
 
     ####################################################################################################################
@@ -618,7 +629,12 @@ def add_armed_personnel_as_share_of_population(tb: Table, ds_population: Dataset
 
 
 def adjust_current_to_constant_usd(
-    tb: Table, indicators: List[str], base_year: int, deflator_indicator: str, adjustment_indicator: str
+    tb: Table,
+    indicators: List[str],
+    base_year: int,
+    deflator_indicator: str,
+    conversion_indicator: str,
+    local_currency_units: bool,
 ) -> Table:
     """
     Adjust current LCU indicators to constant US$/int-$ using a deflator indicator and the base year.
@@ -626,6 +642,7 @@ def adjust_current_to_constant_usd(
     The function works equally if the deflator is CPI or a GDP deflator, or any other deflator.
 
     Available deflator indicators in WDI:
+
     GDP deflators
         ny_gdp_defl_kd_zg_ad, Inflation, GDP deflator: linked series (annual %)
         ny_gdp_defl_kd_zg, Inflation, GDP deflator (annual %)
@@ -636,7 +653,8 @@ def adjust_current_to_constant_usd(
         fp_cpi_totl_zg, Inflation, consumer prices (annual %)
         fp_cpi_totl, Consumer price index (2010 = 100)
 
-    Available adjustment indicators in WDI:
+    Available conversion indicators in WDI:
+
     Exchange rates
         pa_nus_fcrf, Official exchange rate (LCU per US$, period average)
         px_rex_reer, Real effective exchange rate index (2010 = 100)
@@ -648,14 +666,17 @@ def adjust_current_to_constant_usd(
 
     tb = tb.copy().reset_index()
 
-    tb_adjusted = tb[["country", "year"] + indicators + [deflator_indicator] + [adjustment_indicator]].copy()
+    tb_adjusted = tb[["country", "year"] + indicators + [deflator_indicator] + [conversion_indicator]].copy()
 
     # Create a new table with the data only for the base year
     tb_base_year = tb_adjusted[tb_adjusted["year"] == base_year].reset_index(drop=True)
 
-    # Merge the two tables, only keeping the deflator for the base year
-    tb_adjusted = pr.merge(
-        tb_adjusted,
+    # Filter only for the US
+    tb_us = tb_adjusted[tb_adjusted["country"] == "United States"].reset_index(drop=True)
+
+    # Merge the two tables
+    tb_adjusted_us = pr.merge(
+        tb_us,
         tb_base_year[["country", deflator_indicator]],
         on="country",
         how="left",
@@ -663,17 +684,31 @@ def adjust_current_to_constant_usd(
     )
 
     # Divide the deflator by the deflator in the base year
-    tb_adjusted[f"{deflator_indicator}_adjusted"] = (
-        tb_adjusted[deflator_indicator] / tb_adjusted[f"{deflator_indicator}_base_year"]
+    tb_adjusted_us[f"{deflator_indicator}_adjusted"] = (
+        tb_adjusted_us[deflator_indicator] / tb_adjusted_us[f"{deflator_indicator}_base_year"]
+    )
+
+    # Merge the two tables, only keeping the deflator for the base year
+    tb_adjusted = pr.merge(
+        tb_adjusted,
+        tb_adjusted_us[["year", f"{deflator_indicator}_adjusted"]],
+        on="year",
+        how="left",
     )
 
     # Adjust the indicators to constant US$
     new_indicators = []
     for indicator in indicators:
         new_indicator_name = f"{indicator}_adjusted"
-        tb_adjusted[new_indicator_name] = (
-            tb_adjusted[indicator] / tb_adjusted[adjustment_indicator] / tb_adjusted[f"{deflator_indicator}_adjusted"]
-        )
+        if local_currency_units:
+            tb_adjusted[new_indicator_name] = (
+                tb_adjusted[indicator]
+                / tb_adjusted[f"{deflator_indicator}_adjusted"]
+                / tb_adjusted[conversion_indicator]
+            )
+        else:
+            tb_adjusted[new_indicator_name] = tb_adjusted[indicator] / tb_adjusted[f"{deflator_indicator}_adjusted"]
+
         new_indicators.append(new_indicator_name)
 
     # Merge the adjusted indicators back to the original table
