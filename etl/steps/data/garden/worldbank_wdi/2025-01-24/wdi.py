@@ -77,9 +77,10 @@ def run(dest_dir: str) -> None:
     # Adjust GDP indicators in current US$ to constant US$ using GDP deflator
     tb_garden = adjust_current_to_constant_usd(
         tb=tb_garden,
-        indicators=["ny_gdp_mktp_cd", "ny_gdp_pcap_cd"],
+        indicators=["ny_gdp_mktp_cn", "ny_gdp_pcap_cn"],
         base_year=2015,
         deflator_indicator="ny_gdp_defl_zs_ad",
+        adjustment_indicator="pa_nus_fcrf",
     )
 
     ####################################################################################################################
@@ -616,25 +617,38 @@ def add_armed_personnel_as_share_of_population(tb: Table, ds_population: Dataset
     return tb
 
 
-def adjust_current_to_constant_usd(tb: Table, indicators: List[str], base_year: int, deflator_indicator: str) -> Table:
+def adjust_current_to_constant_usd(
+    tb: Table, indicators: List[str], base_year: int, deflator_indicator: str, adjustment_indicator: str
+) -> Table:
     """
-    Adjust current US$ indicators to constant US$ using a deflator indicator and the base year.
-    The indicators to use have to be in current US$ for this to work.
+    Adjust current LCU indicators to constant US$/int-$ using a deflator indicator and the base year.
+    The indicators to use have to be in local currency units for this to work.
     The function works equally if the deflator is CPI or a GDP deflator, or any other deflator.
 
     Available deflator indicators in WDI:
-    ny_gdp_defl_kd_zg_ad, Inflation, GDP deflator: linked series (annual %)
-    ny_gdp_defl_kd_zg, Inflation, GDP deflator (annual %)
-    ny_gdp_defl_zs_ad, GDP deflator: linked series (base year varies by country)
-    ny_gdp_defl_zs, GDP deflator (base year varies by country)
+    GDP deflators
+        ny_gdp_defl_kd_zg_ad, Inflation, GDP deflator: linked series (annual %)
+        ny_gdp_defl_kd_zg, Inflation, GDP deflator (annual %)
+        ny_gdp_defl_zs_ad, GDP deflator: linked series (base year varies by country)
+        ny_gdp_defl_zs, GDP deflator (base year varies by country)
 
-    fp_cpi_totl_zg, Inflation, consumer prices (annual %)
-    fp_cpi_totl, Consumer price index (2010 = 100)
+    CPI deflators
+        fp_cpi_totl_zg, Inflation, consumer prices (annual %)
+        fp_cpi_totl, Consumer price index (2010 = 100)
+
+    Available adjustment indicators in WDI:
+    Exchange rates
+        pa_nus_fcrf, Official exchange rate (LCU per US$, period average)
+        px_rex_reer, Real effective exchange rate index (2010 = 100)
+
+    PPP conversion factors
+        pa_nus_ppp, PPP conversion factor, GDP (LCU per international $)
+        pa_nus_prvt_pp, PPP conversion factor, private consumption (LCU per international $)
     """
 
     tb = tb.copy().reset_index()
 
-    tb_adjusted = tb[["country", "year"] + indicators + [deflator_indicator]].copy()
+    tb_adjusted = tb[["country", "year"] + indicators + [deflator_indicator] + [adjustment_indicator]].copy()
 
     # Create a new table with the data only for the base year
     tb_base_year = tb_adjusted[tb_adjusted["year"] == base_year].reset_index(drop=True)
@@ -657,7 +671,9 @@ def adjust_current_to_constant_usd(tb: Table, indicators: List[str], base_year: 
     new_indicators = []
     for indicator in indicators:
         new_indicator_name = f"{indicator}_adjusted"
-        tb_adjusted[new_indicator_name] = tb_adjusted[indicator] / tb_adjusted[f"{deflator_indicator}_adjusted"]
+        tb_adjusted[new_indicator_name] = (
+            tb_adjusted[indicator] / tb_adjusted[adjustment_indicator] / tb_adjusted[f"{deflator_indicator}_adjusted"]
+        )
         new_indicators.append(new_indicator_name)
 
     # Merge the adjusted indicators back to the original table

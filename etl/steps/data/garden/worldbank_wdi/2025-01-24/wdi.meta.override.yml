@@ -350,12 +350,12 @@ tables:
           hideRelativeToggle: false
           hasMapTab: true
 
-      ny_gdp_mktp_cd_adjusted:
+      ny_gdp_mktp_cn_adjusted:
         title: GDP (adjusted for inflation)
         unit: US$
         short_unit: $
 
-      ny_gdp_pcap_cd_adjusted:
+      ny_gdp_pcap_cn_adjusted:
         title: GDP per capita (adjusted for inflation)
         unit: US$
         short_unit: $
