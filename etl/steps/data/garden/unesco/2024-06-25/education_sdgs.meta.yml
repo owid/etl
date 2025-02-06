@@ -9,3 +9,4 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  title: UNESCO Institute for Statistics (UIS) - Education (SDGs)

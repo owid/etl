@@ -17,6 +17,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  title: AI Index Report - AI PhD graduates
 
 
 tables:

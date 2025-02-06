@@ -27,8 +27,10 @@ tables:
           description_short: Deaths in famines that are estimated to have killed 100,000 people or more.
           description_key:
             - WPF defines a famine as mass mortality due to mass starvation, with mass starvation being the "destruction, deprivation or loss of objects and activities required for survival".
+            - WPF coded the most credible estimate of the number of deaths across sources. If there were several equally credible estimates, WPF used their median.
             - The 1910–1919 famine in British Somaliland and the African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, and Djibouti) is treated as a single event because the 100,000+ mortality estimate applies to the entire region, not individual areas.
             - For the Ottoman Empire (1894–1896), East Africa (1896–1900), and the combined Somaliland–African Red Sea Region famine (1910–1919), the 100,000 death estimate is a **minimum**, meaning the actual death toll was likely higher.
+
           description_from_producer: |-
             Famines were included in the catalogue based on the total number of excess deaths (magnitude), not the percentage of the population affected. A minimum threshold of 100,000 deaths was set because there is limited research on how famines impacted death rates relative to population size. This means famines with at least 100,000 deaths are included, regardless of the total population of the affected area.
           display:

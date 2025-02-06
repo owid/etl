@@ -6,24 +6,14 @@ steps:
   # Long-term homicide rates in Europe - Eisner (2014)
   data-private://grapher/fasttrack/2022-11-01/lighting_efficiency_uk:
     - snapshot-private://fasttrack/2022-11-01/lighting_efficiency_uk.csv
-  data-private://grapher/fasttrack/latest/metaculus__complementary_data:
-    - snapshot-private://fasttrack/latest/metaculus__complementary_data.csv
   data-private://grapher/fasttrack/latest/global_extreme_poverty_future_scenario:
     - snapshot-private://fasttrack/latest/global_extreme_poverty_future_scenario.csv
   data-private://grapher/fasttrack/latest/child_mortality_future_projections:
     - snapshot-private://fasttrack/latest/child_mortality_future_projections.csv
-  data-private://grapher/fasttrack/latest/literate_population:
-    - snapshot-private://fasttrack/latest/literate_population.csv
-  data-private://grapher/fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef:
-    - snapshot-private://fasttrack/latest/battery_costs_per_kwh__ziegler_et_al__and_bnef.csv
   data-private://grapher/fasttrack/latest/biosafety_level_4_facilities:
     - snapshot-private://fasttrack/latest/biosafety_level_4_facilities.csv
-  data-private://grapher/fasttrack/latest/germany_hypothetical_constant_nuclear:
-    - snapshot-private://fasttrack/latest/germany_hypothetical_constant_nuclear.csv
   data-private://grapher/fasttrack/latest/oil_prices:
     - snapshot-private://fasttrack/latest/oil_prices.csv
-  data://grapher/fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1:
-    - snapshot://fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1.csv
   data-private://grapher/fasttrack/latest/evs_per_charger:
     - snapshot-private://fasttrack/latest/evs_per_charger.csv
   data-private://grapher/fasttrack/latest/who_standard_pop:
@@ -58,8 +48,6 @@ steps:
     - snapshot-private://fasttrack/latest/lead_paint_regulation_who.csv
   data://grapher/fasttrack/latest/whm_treatment_gap_anxiety_disorders:
     - snapshot://fasttrack/latest/whm_treatment_gap_anxiety_disorders.csv
-  data-private://grapher/fasttrack/latest/fiscal_top1_shares_country_standardized:
-    - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
   data-private://grapher/fasttrack/latest/pain_hours_hen_systems:
     - snapshot-private://fasttrack/latest/pain_hours_hen_systems.csv
   data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
@@ -108,8 +96,6 @@ steps:
     - snapshot://fasttrack/latest/public_support_climate_andre.csv
   data://grapher/fasttrack/latest/public_support_climate_vlasceanu:
     - snapshot://fasttrack/latest/public_support_climate_vlasceanu.csv
-  data://grapher/fasttrack/2023-05-03/qubits:
-    - snapshot://fasttrack/2023-05-03/qubits.csv
   data://grapher/fasttrack/latest/completeness_disaster_emdat:
     - snapshot://fasttrack/latest/completeness_disaster_emdat.csv
   data-private://grapher/fasttrack/latest/vdem_women_executives:
@@ -148,8 +134,6 @@ steps:
     - snapshot-private://fasttrack/2024-04-25/joe_phd_short_period.csv
   data://grapher/fasttrack/latest/air_pollution_ceds:
     - snapshot://fasttrack/latest/air_pollution_ceds.csv
-  data://grapher/fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024:
-    - snapshot://fasttrack/latest/air_pollution_emissions_by_sector__ceds__2024.csv
   data://grapher/fasttrack/latest/air_pollution_ceds_by_sector:
     - snapshot://fasttrack/latest/air_pollution_ceds_by_sector.csv
   data://grapher/fasttrack/latest/lives_saved_vaccination_who:
@@ -242,3 +226,7 @@ steps:
     - snapshot://fasttrack/2024-11-18/supercomputers.csv
   data://grapher/fasttrack/latest/in_donor_foreign_aid_categories_dac_countries:
     - snapshot://fasttrack/latest/in_donor_foreign_aid_categories_dac_countries.csv
+  data://grapher/fasttrack/latest/poverty_latam_idb:
+    - snapshot://fasttrack/latest/poverty_latam_idb.csv
+  data://grapher/fasttrack/latest/foreign_aid_govt_private:
+    - snapshot://fasttrack/latest/foreign_aid_govt_private.csv

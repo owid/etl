@@ -113,6 +113,9 @@ definitions:
 dataset:
   update_period_days: 1460
   non_redistributable: true
+  title: Global Burden of Disease - Drug Abuse Risk Factors
+
+
 tables:
   gbd_drug_risk:
     variables:

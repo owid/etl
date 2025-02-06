@@ -1,34 +1,23 @@
 definitions:
-  # NOTE: we'd like to move this to snapshot, but it's impractical because there are
-  # tons of other downstream datasets that still use sources
-  wdi_origin: &wdi_origin
-    producer: World Bank
-    title: World Bank World Development Indicators
-    description: |-
-      The World Development Indicators (WDI) is the World Bank's primary collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available and includes national, regional, and global estimates.
+  gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
+  gdp_per_capita: GDP per capita is GDP divided by population.
+  gni: Gross national income (GNI) is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
+  gni_per_capita: GNI per capita is GNI divided by population.
+  ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
+  ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+  inflation_adjustment: This data is adjusted by inflation but _does not_ account for differences in living costs between countries.
+  inflation_prices: This data is expressed in constant 2015 US$.
 
-      [Text from [World Bank data catalog](https://datacatalog.worldbank.org/dataset/world-development-indicators)]
-    citation_full: World Development Indicators, The World Bank (2025).
-    url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-    url_download: |-
-      https://datacatalogfiles.worldbank.org/ddh-published/0037712/DR0045575/WDI_CSV_2024_10_24.zip?versionId=2024-12-18T05:42:41.1131485Z
-    date_accessed: '2025-01-24'
-    date_published: '2025-01-15'
-    license:
-      name: Creative Commons Attribution 4.0
-      url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+  description_short_gdp: Total economic output of a country or region per year.
+  description_short_gdp_per_capita: Average economic output per person in a country or region per year.
+  description_short_gni: Total income earned by residents of a country or region, including income earned abroad.
+  description_short_gni_per_capita: Average income per person earned by residents of a country or region, including income earned abroad.
 
-dataset:
-  update_period_days: 365
-  sources: []
 
 tables:
   wdi:
     variables:
       it_net_user_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Individuals using the Internet (% of population)
         description_short: Share of the population who used the Internet in the last three months.
         description_from_producer: >-
@@ -136,10 +125,8 @@ tables:
               - Europe and Central Asia (WB)
               - Latin America and Caribbean (WB)
               - World
+
       sh_sta_stnt_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Share of children who are stunted
         unit: '% of children under 5'
         short_unit: '%'
@@ -229,9 +216,6 @@ tables:
                 text: FAQs on this data
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
       sh_sta_stnt_me_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Share of children who are stunted (modeled estimates)
         unit: '% of children under 5'
         short_unit: '%'
@@ -322,9 +306,6 @@ tables:
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
 
       ny_gdp_pcap_pp_kd:
-        sources: []
-        origins:
-          - *wdi_origin
         title: GDP per capita, PPP (constant 2021 international $)
         unit: international-$ in 2021 prices
         short_unit: $
@@ -332,27 +313,27 @@ tables:
           name: GDP per capita
           numDecimalPlaces: 0
           tolerance: 5
-        description_short: This data is adjusted for inflation and for differences in living costs between countries.
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.ppp_adjustment}"
         description_key:
+          - "{definitions.gdp} {definitions.gdp_per_capita}"
           - This GDP per capita indicator provides information on economic growth and income levels from 1990.
-          - This data is adjusted for inflation and for differences in living costs between countries.
-          - This data is expressed in international-$ at 2021 prices.
-          - For GDP per capita estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison).
-        description_from_producer: |
-          GDP per capita based on purchasing power parity (PPP). PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP at purchaser's prices is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2021 international dollars.
-
-          For the concept and methodology of 2021 PPP, please refer to the [International Comparison Program (ICP)’s website](https://www.worldbank.org/en/programs/icp).
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
+          - For GDP per capita estimates in the long run, explore the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison).
         processing_level: minor
         presentation:
           title_public: GDP per capita
+          title_variant: In constant international-$
           attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: GDP per capita
             subtitle: This data is adjusted for inflation and for differences in living costs between countries.
-            variantName: World Bank, constant international-$
+            variantName: In constant international-$ – World Bank
             originUrl: https://ourworldindata.org/economic-growth
             hasMapTab: true
             tab: map
@@ -375,7 +356,7 @@ tables:
                   - 10000
                   - 20000
                   - 50000
-                  - 100000
+                  - 1
                 customNumericMinValue: 0
             selectedEntityNames:
               - United States
@@ -389,9 +370,6 @@ tables:
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
 
       ny_gdp_mktp_pp_kd:
-        sources: []
-        origins:
-          - *wdi_origin
         title: GDP, PPP (constant 2021 international $)
         unit: international-$ in 2021 prices
         short_unit: $
@@ -399,19 +377,20 @@ tables:
           name: GDP
           numDecimalPlaces: 0
           tolerance: 5
-        description_short: This data is adjusted for inflation and for differences in living costs between countries.
+        description_short: "{definitions.description_short_gdp} {definitions.ppp_adjustment}"
         description_key:
+          - "{definitions.gdp}"
           - This GDP indicator provides information on economic growth and income levels from 1990.
-          - This data is adjusted for inflation and for differences in living costs between countries.
-          - This data is expressed in international-$ at 2021 prices.
-        description_from_producer: |
-          PPP GDP is gross domestic product converted to international dollars using purchasing power parity rates. An international dollar has the same purchasing power over GDP as the U.S. dollar has in the United States. GDP is the sum of gross value added by all resident producers in the country plus any product taxes and minus any subsidies not included in the value of the products. It is calculated without making deductions for depreciation of fabricated assets or for depletion and degradation of natural resources. Data are in constant 2021 international dollars.
-
-          For the concept and methodology of 2021 PPP, please refer to the [International Comparison Program (ICP)’s website](https://www.worldbank.org/en/programs/icp).
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
+          - For GDP estimates in the long run, explore the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-maddison-project-database).
         processing_level: minor
         presentation:
           title_public: Gross domestic product (GDP)
+          title_variant: In constant international-$
           attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -423,7 +402,7 @@ tables:
             hideRelativeToggle: false
             hasMapTab: true
             tab: map
-            variantName: World Bank, constant international-$
+            variantName: In constant international-$ – World Bank
             originUrl: https://ourworldindata.org/economic-growth
             yAxis:
               min: 0
@@ -454,9 +433,6 @@ tables:
               - Mexico
 
       ny_gnp_pcap_pp_kd:
-        sources: []
-        origins:
-          - *wdi_origin
         title: GNI per capita, PPP (constant 2021 international $)
         unit: international-$ in 2021 prices
         short_unit: $
@@ -464,14 +440,19 @@ tables:
           name: GNI per capita
           numDecimalPlaces: 0
           tolerance: 5
-        description_short: This data is adjusted for inflation and for differences in living costs between countries.
+        description_short: "{definitions.description_short_gni_per_capita} {definitions.ppp_adjustment}"
         description_key:
-          - This data is adjusted for inflation and for differences in living costs between countries.
-          - This data is expressed in international-$ at 2021 prices.
+          - "{definitions.gni} {definitions.gni_per_capita}"
+          - This GNI per capita indicator provides information on economic growth and income levels from 1990.
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
         processing_level: minor
         presentation:
           title_public: Gross national income (GNI) per capita
+          title_variant: In constant international-$
           attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -492,7 +473,7 @@ tables:
                   - 10000
                   - 20000
                   - 50000
-                  - 100000
+                  - 1
             selectedEntityNames:
               - United States
               - Germany
@@ -509,13 +490,152 @@ tables:
             hideRelativeToggle: false
             hasMapTab: true
 
+      ny_gnp_mktp_pp_kd:
+        title: GNI, PPP (constant 2021 international $)
+        unit: international-$ in 2021 prices
+        short_unit: $
+        display:
+          name: GNI
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gni} {definitions.ppp_adjustment}"
+        description_key:
+          - "{definitions.gni}"
+          - This GNI indicator provides information on economic growth and income levels from 1990.
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
+        processing_level: minor
+        presentation:
+          title_public: Gross national income (GNI)
+          title_variant: In constant international-$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
 
+      ny_gdp_pcap_kd:
+        title: GDP per capita (constant 2015 US$)
+        unit: constant 2015 US$
+        short_unit: $
+        display:
+          name: GDP per capita
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.inflation_adjustment}"
+        description_key:
+          - "{definitions.gdp} {definitions.gdp_per_capita}"
+          - This GDP per capita indicator provides information on economic growth and income levels from 1960.
+          - "{definitions.inflation_adjustment}"
+          - "{definitions.inflation_prices}"
+          - For GDP per capita estimates that account for both inflation and differences in the cost of living between countries, see [GDP per capita in constant international-$](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
+        processing_level: minor
+        presentation:
+          title_public: GDP per capita
+          title_variant: In constant US$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+        grapher_config:
+          title: GDP per capita
+          subtitle: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in living costs between countries.
+          note: This data is expressed in constant 2015 US$.
+          variantName: In constant US$ - World Bank
+          originUrl: https://ourworldindata.org/economic-growth
+          map:
+            colorScale:
+              binningStrategy: manual
+              baseColorScheme: GnBu
+              customNumericValues:
+                - 1000
+                - 2000
+                - 5000
+                - 10000
+                - 20000
+                - 50000
+                - 1
+        selectedEntityNames:
+          - United States
+          - Germany
+          - United Kingdom
+          - South Korea
+          - France
+          - Japan
+          - China
+          - India
+        yAxis:
+          canChangeScaleType: true
+          min: 0
+        tab: map
+        hideRelativeToggle: false
+        hasMapTab: true
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
 
+      ny_gdp_mktp_kd:
+        title: GDP (constant 2015 US$)
+        unit: constant 2015 US$
+        short_unit: $
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gdp} {definitions.inflation_adjustment}"
+        description_key:
+          - "{definitions.gdp}"
+          - This GDP indicator provides information on economic growth and income levels from 1960.
+          - "{definitions.inflation_adjustment}"
+          - "{definitions.inflation_prices}"
+          - For GDP estimates that account for both inflation and differences in the cost of living between countries, see [GDP in constant international-$](https://ourworldindata.org/grapher/gdp-worldbank).
+        processing_level: minor
+        presentation:
+          title_public: Gross domestic product (GDP)
+          title_variant: In constant US$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+        grapher_config:
+          title: Gross domestic product (GDP)
+          subtitle: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in living costs between countries.
+          note: This data is expressed in constant 2015 US$.
+          variantName: In constant US$ - World Bank
+          originUrl: https://ourworldindata.org/economic-growth
+          map:
+            colorScale:
+              binningStrategy: manual
+              baseColorScheme: PuBu
+              customNumericMinValue: 0
+              customNumericValues:
+                - 10000000000
+                - 30000000000
+                - 100000000000
+                - 300000000000
+                - 1000000000000
+                - 3000000000000
+                - 10000000000000
+                - 1
+          selectedEntityNames:
+            - United States
+            - China
+            - India
+            - Mexico
+            - France
+            - Japan
+            - Germany
+            - Russia
+            - Brazil
+            - United Kingdom
+          yAxis:
+            canChangeScaleType: true
+            min: 0
+          tab: map
+          hideRelativeToggle: false
+          hasMapTab: true
 
       eg_cft_accs_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Access to clean fuels and technologies for cooking (% of population)
         unit: '% of population'
         short_unit: '%'
@@ -535,10 +655,8 @@ tables:
             - Access to Energy
             - Energy
         processing_level: minor
+
       eg_elc_accs_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Access to electricity (% of population)
         unit: '% of population'
         short_unit: '%'
@@ -557,10 +675,8 @@ tables:
             - Access to Energy
             - Energy
         processing_level: minor
+
       sn_itk_defc_zs:
-        sources: []
-        origins:
-          - *wdi_origin
         title: Prevalence of undernourishment (% of population)
         unit: '% of population'
         short_unit: '%'

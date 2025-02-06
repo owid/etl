@@ -7,10 +7,21 @@ definitions:
       tolerance: 5
       entityAnnotationsMap: "Western offshoots (MPD): United States, Canada, Australia and New Zealand"
     presentation:
+      attribution_short: Maddison Project Database
       topic_tags:
         - Economic Growth
 
   description_key_attribution: The Maddison Project Database is based on the work of many researchers who have produced estimates of economic growth and population for individual countries. The full list of sources for this historical data is given in [the original dataset](https://dataverse.nl/api/access/datafile/421302).
+  description_key_gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
+  description_key_gdp_per_capita: GDP per capita is GDP divided by population.
+  description_key_long_run: This indicator provides information on economic growth and income levels in the _very long run_. Some country estimates are available as far back as 1 CE, and regional estimates as far back as 1820 CE.
+  description_key_ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
+  description_key_ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices, using a combination of 2011 and 1990 PPPs for historical data.
+  description_key_former: Time series for former countries and territories are calculated forward in time by estimating values based on their last official borders.
+
+  description_short_gdp: Total economic output of a country or region per year.
+  description_short_gdp_per_capita: Average economic output per person in a country or region per year.
+
 
 
 # Learn more about the available fields:
@@ -26,14 +37,15 @@ tables:
         title: Gross domestic product (GDP)
         unit: international-$ in 2011 prices
         short_unit: $
-        description_short: This data is adjusted for inflation and differences in the cost of living between countries.
+        description_short: "{definitions.description_short_gdp} {definitions.description_key_ppp_adjustment}"
         description_key:
           - "{definitions.description_key_attribution}"
-          - This GDP indicator provides information on economic growth and income levels in the very long run. Some country estimates are available as far back as 1 CE and regional estimates as far back as 1820 CE.
-          - This data is adjusted for inflation and for differences in the cost of living between countries.
-          - This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices, using a combination of 2011 and 1990 PPPs for historical data.
-          - Time series for former countries and territories are calculated forward in time by estimating values based on their last official borders.
-          - For more regularly updated estimates of GDP, see the [World Bank's indicator](https://ourworldindata.org/grapher/national-gdp-wb).
+          - "{definitions.description_key_gdp}"
+          - "{definitions.description_key_long_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices}"
+          - "{definitions.description_key_former}"
+          - For more regularly updated estimates of GDP per capita since 1990, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-worldbank).
         processing_level: major
         description_processing: Estimates of GDP are not provided directly from the source, so we obtained them by multiplying GDP per capita by population.
         display:
@@ -41,8 +53,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: Gross domestic product (GDP)
-          title_variant: Historical data
-          attribution_short: Maddison Project Database
+          title_variant: In constant international-$. Historical data
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -57,7 +68,7 @@ tables:
             hideRelativeToggle: false
             hasMapTab: true
             tab: map
-            variantName: Maddison Project Database, constant international-$
+            variantName: In constant international-$. Historical data - Maddison Project Database
             originUrl: https://ourworldindata.org/economic-growth
             yAxis:
               min: 0
@@ -74,7 +85,7 @@ tables:
                   - 1000000000000
                   - 3000000000000
                   - 10000000000000
-                  - 30000000000000
+                  - 1
             selectedEntityNames:
               - United States
               - India
@@ -86,20 +97,21 @@ tables:
               - United Kingdom
               - France
               - Mexico
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.004.json
 
       gdp_per_capita:
         title: GDP per capita
         unit: international-$ in 2011 prices
         short_unit: $
-        description_short: This data is adjusted for inflation and differences in the cost of living between countries.
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
         description_key:
           - "{definitions.description_key_attribution}"
-          - This GDP per capita indicator provides information on economic growth and income levels in the very long run. Some country estimates are available as far back as 1 CE and regional estimates as far back as 1820 CE.
-          - This data is adjusted for inflation and for differences in the cost of living between countries.
-          - This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2011 prices, using a combination of 2011 and 1990 PPPs for historical data.
-          - Time series for former countries and territories are calculated forward in time by estimating values based on their last official borders.
-          - For more regularly updated estimates of GDP per capita, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
+          - "{definitions.description_key_gdp} {definitions.description_key_gdp_per_capita}"
+          - "{definitions.description_key_long_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices}"
+          - "{definitions.description_key_former}"
+          - For more regularly updated estimates of GDP per capita since 1990, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
+
         description_from_producer: |-
           Real GDP per capita in 2011$
 
@@ -127,8 +139,7 @@ tables:
           <<: *common-display
         presentation:
           title_public: GDP per capita
-          title_variant: Historical data
-          attribution_short: Maddison Project Database
+          title_variant: In constant international-$. Historical data
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -161,7 +172,7 @@ tables:
                   - 10000
                   - 20000
                   - 50000
-                  - 100000
+                  - 1
             selectedEntityNames:
               - World
               - South and South-East Asia (MPD)
@@ -172,7 +183,6 @@ tables:
               - Middle East (MPD)
               - East Asia (MPD)
               - Western offshoots (MPD)
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.004.json
 
       population:
         title: Population
@@ -193,7 +203,6 @@ tables:
         presentation:
           title_public: Population
           title_variant: Historical data
-          attribution_short: Maddison Project Database
 
       region:
         title: Maddison Project Database region
@@ -208,5 +217,4 @@ tables:
         presentation:
           title_public: World regions according to Maddison Project Database
           title_variant: Historical data
-          attribution_short: Maddison Project Database
 

@@ -25,6 +25,19 @@ steps:
   data://explorers/lis/latest/luxembourg_income_study:
     - data://garden/lis/2023-08-30/luxembourg_income_study
 
+  data://meadow/lis/2024-06-13/luxembourg_income_study:
+    - snapshot://lis/2024-06-13/lis_keyvars.csv
+    - snapshot://lis/2024-06-13/lis_distribution_adults.csv
+    - snapshot://lis/2024-06-13/lis_keyvars_adults.csv
+    - snapshot://lis/2024-06-13/lis_abs_poverty.csv
+    - snapshot://lis/2024-06-13/lis_distribution.csv
+    - snapshot://lis/2024-06-13/lis_abs_poverty_adults.csv
+    - data://garden/regions/2023-01-01/regions
+  data://garden/lis/2024-06-13/luxembourg_income_study:
+    - data://meadow/lis/2024-06-13/luxembourg_income_study
+  data://grapher/lis/2024-06-13/luxembourg_income_study:
+    - data://garden/lis/2024-06-13/luxembourg_income_study
+
   # World Bank Poverty and Inequality Platform
   data://meadow/wb/2024-03-27/world_bank_pip:
     - snapshot://wb/2024-03-27/world_bank_pip.csv
