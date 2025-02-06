@@ -43,7 +43,6 @@ def run(dest_dir: str) -> None:
     tb_lang_by_status["total"] = tb_lang_by_status["living"] + tb_lang_by_status["extinct"]
     # Tidy up and add origins back in
     tb_lang_by_status = tb_lang_by_status.format(["country", "year"], short_name="languages_by_status")
-    tb_lang_by_status = tb_lang_by_status.drop(columns=["population"])
     for col in tb_lang_by_status.columns:
         tb_lang_by_status[col].metadata.origins = origins
     # Save outputs.
