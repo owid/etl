@@ -41,3 +41,31 @@ steps:
     - snapshot-private://fasttrack/latest/fiscal_top1_shares_country_standardized.csv
   data://grapher/fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1:
     - snapshot://fasttrack/latest/table_5__threatened_species_in_each_major_group_by_country__show_all__1.csv
+  data://grapher/fasttrack/2023-08-21/survey_livestock_oklahoma:
+    - snapshot://fasttrack/2023-08-21/survey_livestock_oklahoma.csv
+  data://grapher/fasttrack/latest/plastic_waste_meijer_2021:
+    - snapshot://fasttrack/latest/plastic_waste_meijer_2021.csv
+  data-private://grapher/fasttrack/latest/oil_prices:
+    - snapshot-private://fasttrack/latest/oil_prices.csv
+  data-private://grapher/fasttrack/latest/lead_paint_regulation__who__2023:
+    - snapshot-private://fasttrack/latest/lead_paint_regulation__who__2023.csv
+  data://grapher/fasttrack/latest/co2_intensity_undp:
+    - snapshot://fasttrack/latest/co2_intensity_undp.csv
+  data://grapher/fasttrack/latest/rock_metal_ratio_nassar:
+    - snapshot://fasttrack/latest/rock_metal_ratio_nassar.csv
+  data://grapher/fasttrack/latest/hdi_per_land_use:
+    - snapshot://fasttrack/latest/hdi_per_land_use.csv
+  data-private://grapher/fasttrack/latest/global_extreme_poverty_future_scenario:
+    - snapshot-private://fasttrack/latest/global_extreme_poverty_future_scenario.csv
+  data-private://grapher/fasttrack/latest/child_mortality_future_projections:
+    - snapshot-private://fasttrack/latest/child_mortality_future_projections.csv
+  # data-private://grapher/fasttrack/latest/draft_joe_gini_diff_1980_2018:
+  #   - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1980_2018.csv
+  # data-private://grapher/fasttrack/latest/draft_joe_gini_diff_1980_2018_take2:
+  #   - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1980_2018_take2.csv
+  # data-private://grapher/fasttrack/latest/draft_joe_top1share_diff_1980_2018:
+  #   - snapshot-private://fasttrack/latest/draft_joe_top1share_diff_1980_2018.csv
+  data://grapher/fasttrack/latest/pepfar_patients_currently_receiving_art_formatted:
+    - snapshot://fasttrack/latest/pepfar_patients_currently_receiving_art_formatted.csv
+  data-private://grapher/fasttrack/latest/conflict_deaths_combined:
+    - snapshot-private://fasttrack/latest/conflict_deaths_combined.csv

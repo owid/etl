@@ -389,13 +389,6 @@ steps:
   data://grapher/technology/2024-05-13/computer_memory_storage:
     - data://garden/technology/2024-05-13/computer_memory_storage
 
-  # European Social Survey - Trust questions
-  data://meadow/ess/2023-08-02/ess_trust:
-    - snapshot://ess/2023-08-02/ess_trust.csv
-    - data://garden/regions/2023-01-01/regions
-  data://garden/ess/2023-08-02/ess_trust:
-    - data://meadow/ess/2023-08-02/ess_trust
-
   # Latinobarómetro survey - Trust
   data://meadow/survey/2023-08-04/latinobarometro_trust:
     - snapshot://survey/2023-08-04/latinobarometro_trust.csv
@@ -415,6 +408,13 @@ steps:
     - data://garden/ess/2023-08-02/ess_trust
   data://grapher/survey/2023-08-04/trust_surveys:
     - data://garden/survey/2023-08-04/trust_surveys
+
+  # European Social Survey - Trust questions
+  data://meadow/ess/2023-08-02/ess_trust:
+    - snapshot://ess/2023-08-02/ess_trust.csv
+    - data://garden/regions/2023-01-01/regions
+  data://garden/ess/2023-08-02/ess_trust:
+    - data://meadow/ess/2023-08-02/ess_trust
 
   # Missing Data - Suicides
   data://garden/missing_data/2024-03-26/who_md_suicides:
