@@ -6,14 +6,8 @@ steps:
   # Long-term homicide rates in Europe - Eisner (2014)
   data-private://grapher/fasttrack/2022-11-01/lighting_efficiency_uk:
     - snapshot-private://fasttrack/2022-11-01/lighting_efficiency_uk.csv
-  data-private://grapher/fasttrack/latest/global_extreme_poverty_future_scenario:
-    - snapshot-private://fasttrack/latest/global_extreme_poverty_future_scenario.csv
-  data-private://grapher/fasttrack/latest/child_mortality_future_projections:
-    - snapshot-private://fasttrack/latest/child_mortality_future_projections.csv
   data-private://grapher/fasttrack/latest/biosafety_level_4_facilities:
     - snapshot-private://fasttrack/latest/biosafety_level_4_facilities.csv
-  data-private://grapher/fasttrack/latest/oil_prices:
-    - snapshot-private://fasttrack/latest/oil_prices.csv
   data-private://grapher/fasttrack/latest/evs_per_charger:
     - snapshot-private://fasttrack/latest/evs_per_charger.csv
   data-private://grapher/fasttrack/latest/who_standard_pop:
@@ -42,8 +36,6 @@ steps:
     - snapshot-private://fasttrack/latest/owid_upload_top1_percent_compare_1980.csv
   data://grapher/fasttrack/latest/treatment_gap_anxiety_disorders_world_mental_health_surveys:
     - snapshot://fasttrack/latest/treatment_gap_anxiety_disorders_world_mental_health_surveys.csv
-  data-private://grapher/fasttrack/latest/lead_paint_regulation__who__2023:
-    - snapshot-private://fasttrack/latest/lead_paint_regulation__who__2023.csv
   data-private://grapher/fasttrack/latest/lead_paint_regulation_who:
     - snapshot-private://fasttrack/latest/lead_paint_regulation_who.csv
   data://grapher/fasttrack/latest/whm_treatment_gap_anxiety_disorders:
@@ -70,8 +62,6 @@ steps:
     - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
   data://grapher/fasttrack/latest/under_five_mortality_lmics:
     - snapshot://fasttrack/latest/under_five_mortality_lmics.csv
-  data://grapher/fasttrack/latest/plastic_waste_meijer_2021:
-    - snapshot://fasttrack/latest/plastic_waste_meijer_2021.csv
   data://grapher/fasttrack/2023-09-29/un_space_objects:
     - snapshot://fasttrack/2023-09-29/un_space_objects.csv
   data://grapher/fasttrack/2023-10-05/great_pacific_garbage_lebreton:
@@ -164,8 +154,6 @@ steps:
     - snapshot://fasttrack/latest/emissions_energy_heating_cooling_iea.csv
   data-private://grapher/fasttrack/latest/voter_turnout_by_age__sheet1:
     - snapshot-private://fasttrack/latest/voter_turnout_by_age__sheet1.csv
-  data://grapher/fasttrack/latest/rock_metal_ratio_nassar:
-    - snapshot://fasttrack/latest/rock_metal_ratio_nassar.csv
   data://grapher/fasttrack/latest/electricity_material_footprint_wang:
     - snapshot://fasttrack/latest/electricity_material_footprint_wang.csv
   data://grapher/fasttrack/latest/breakdown_material_footprint_wang:
@@ -174,12 +162,8 @@ steps:
     - snapshot://fasttrack/latest/rock_metal_ratio_nassar_wang.csv
   data://grapher/fasttrack/latest/hdi_per_co2:
     - snapshot://fasttrack/latest/hdi_per_co2.csv
-  data://grapher/fasttrack/latest/hdi_per_land_use:
-    - snapshot://fasttrack/latest/hdi_per_land_use.csv
   data://grapher/fasttrack/latest/nature_index_undp:
     - snapshot://fasttrack/latest/nature_index_undp.csv
-  data://grapher/fasttrack/latest/co2_intensity_undp:
-    - snapshot://fasttrack/latest/co2_intensity_undp.csv
   data://grapher/fasttrack/latest/elephant_populations:
     - snapshot://fasttrack/latest/elephant_populations.csv
   data://grapher/fasttrack/latest/pivot_uk_public_spending:
