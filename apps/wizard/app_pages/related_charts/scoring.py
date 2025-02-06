@@ -1,13 +1,10 @@
-import json
 import time
 
 import numpy as np
 import pandas as pd
-import streamlit as st
 from sentence_transformers import SentenceTransformer
 from structlog import get_logger
 
-from apps.utils.gpt import GPTQuery, OpenAIWrapper
 from apps.wizard.app_pages.related_charts.data import Chart
 from apps.wizard.utils import embeddings as emb
 from etl.db import read_sql
@@ -16,38 +13,6 @@ DEVICE = "cpu"
 
 # Initialize log.
 log = get_logger()
-
-
-# These are the default thresholds for the different scores.
-DEFAULT_WEIGHTS = {
-    "title": 0.3,
-    "subtitle": 0.1,
-    "tags": 0.1,
-    "share_indicator": 0.1,
-    "pageviews_score": 0.3,
-    "coviews_score": 0.1,
-}
-
-# Default regularization term for coviews
-DEFAULT_COVIEWS_REGULARIZATION = 0.0
-
-PREFIX_SYSTEM_PROMPT = """
-You are an expert in recommending visual data insights.
-Your task: From a given chosen chart and a list of candidate charts, recommend up to 5 charts that are most relevant.
-
-Requirements:
-"""
-
-DEFAULT_SYSTEM_PROMPT = """
-- Relevance should be based on thematic or conceptual similarity, but **avoid charts with very similar titles**.
-- If fewer than 5 good matches are found, select only those that are truly relevant.
-- Ensure diversity among the chosen charts.
-- Provide concise reasoning for each recommendation.
-""".strip()
-
-SUFFIX_SYSTEM_PROMPT = """
-The response should be in valid JSON format, mapping chart_slugs to their reasons for selection.
-"""
 
 
 class ScoringModel:
@@ -166,45 +131,3 @@ def score_coviews(coviews: pd.Series, pageviews: pd.Series, regularization: floa
 def score_jaccard(coviews: pd.Series, pageviews: pd.Series, chosen_pageviews: float) -> pd.Series:
     """Score coviews using Jaccard similarity. Normalize the score to [0, 1]."""
     return coviews / (pageviews + chosen_pageviews - coviews)
-
-
-@st.cache_data(show_spinner=False, persist="disk", hash_funcs={Chart: lambda chart: chart.chart_id})
-def gpt_diverse_charts(
-    chosen_chart: Chart, _charts: list[Chart], _n: int = 30, system_prompt=DEFAULT_SYSTEM_PROMPT
-) -> dict[str, str]:
-    """Get diverse charts using GPT-4o. Return a dictionary with chart slugs as keys and reasons as values."""
-    n = _n
-    charts = _charts
-
-    system_prompt = "\n".join([PREFIX_SYSTEM_PROMPT, system_prompt, SUFFIX_SYSTEM_PROMPT])
-
-    user_prompt = f"""
-    Please consider the chosen chart and the following {n} candidate charts.
-
-    Identify 5 of the most relevant candidates according to the system's requirements.
-    Output a JSON object with the chosen chart_slugs as keys and a brief reason for selection as values.
-
-    Chosen chart:
-    {json.dumps({"title": chosen_chart.title, "subtitle": chosen_chart.subtitle, "chart_slug": chosen_chart.slug}, indent=2)}
-
-    Preselected charts:
-    {json.dumps([{"title": c.title, "subtitle": c.subtitle, "chart_slug": c.slug} for c in charts[:n]], indent=2)}
-    """
-
-    api = OpenAIWrapper()
-    query = GPTQuery(
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0,
-    )
-    log.info("add_gpt_diversity.start")
-    t = time.time()
-    response = api.query_gpt(query=query, model="gpt-4o", response_format={"type": "json"})
-    assert response
-    log.info("add_gpt_diversity.end", cost=response.cost, t=time.time() - t)
-
-    js = json.loads(response.choices[0].message.content.replace("```json", "").replace("```", ""))  # type: ignore
-
-    return js

@@ -60,9 +60,6 @@ def get_raw_charts() -> pd.DataFrame:
     join chart_configs as cf on c.configId = cf.id
     left join analytics_pageviews as a on cf.slug = SUBSTRING_INDEX(a.url, '/', -1) and a.url like '%%/grapher/%%'
     left join tags as t on c.id = t.chart_id
-    -- TODO: remove in prod
-    -- test it on charts with 'human' in the title
-    -- where lower(cf.full->>'$.title') like '%%human%%'
     -- exclude drafts
     where cf.full->>'$.isPublished' != 'false'
     """
