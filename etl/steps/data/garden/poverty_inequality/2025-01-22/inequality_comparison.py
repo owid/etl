@@ -94,9 +94,9 @@ def run(dest_dir: str) -> None:
     tb = ds_pov_ineq.read("keyvars")
 
     # Load tables from PIP, WID, and LIS datasets (for metadata)
-    tb_pip = ds_pip["income_consumption_2017_unsmoothed"].reset_index()
-    tb_wid = ds_wid["world_inequality_database"].reset_index()
-    tb_lis = ds_lis["luxembourg_income_study"].reset_index()
+    tb_pip = ds_pip.read("income_consumption_2017_unsmoothed")
+    tb_wid = ds_wid.read("world_inequality_database")
+    tb_lis = ds_lis.read("luxembourg_income_study")
 
     # Change types of some columns to avoid issues with filering and missing values on merge
     tb = tb.astype({"pipreportinglevel": "object", "pipwelfare": "object", "series_code": "object"})
@@ -176,8 +176,8 @@ def match_ref_years(
     In the case of PIP data, it calls the special functions above to handle the additional dimensions of that dataset (region, welfare measure)
     """
 
-    tb_match = Table(pd.DataFrame())
-    tb_series = tb[tb["series_code"].isin(series)].copy().reset_index(drop=True)
+    tb_match = Table()
+    tb_series = tb[tb["series_code"].isin(series)].reset_index(drop=True)
 
     reference_years_list = []
     for y in reference_years:
@@ -266,7 +266,8 @@ def match_ref_years(
             "value": f"value_{reference_years_list[0]}",
             "pipwelfare": f"pipwelfare_{reference_years_list[0]}",
             "pipreportinglevel": f"pipreportinglevel_{reference_years_list[0]}",
-        }
+        },
+        errors="raise",
     )
 
     # Filter tb_match according to tie_break_strategy
@@ -319,7 +320,7 @@ def match_ref_years(
     # Keep the columns I need
     tb_match = tb_match[
         ["country", "series_code", "indicator_name"] + year_value_y_list + pipwelfare_y_list + pipreportinglevel_y_list
-    ].reset_index(drop=True)
+    ]
 
     # Sort by country and year_y
     tb_match = tb_match.sort_values(by=["series_code", "country"] + year_y_list).reset_index(drop=True)
