@@ -110,8 +110,6 @@ steps:
     - snapshot://fasttrack/latest/usa_weather_climate_noaa.csv
   data://grapher/fasttrack/latest/global_precipitation_anomaly_noaa:
     - snapshot://fasttrack/latest/global_precipitation_anomaly_noaa.csv
-  data-private://grapher/fasttrack/latest/conflict_deaths_combined:
-    - snapshot-private://fasttrack/latest/conflict_deaths_combined.csv
   data://grapher/fasttrack/2024-04-17/qubits:
     - snapshot://fasttrack/2024-04-17/qubits.csv
   data://grapher/fasttrack/latest/pig_production_bartlett:
@@ -144,12 +142,6 @@ steps:
     - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1993_2018.csv
   data-private://grapher/fasttrack/latest/draft_joe_top1_diff_1993_2018:
     - snapshot-private://fasttrack/latest/draft_joe_top1_diff_1993_2018.csv
-  # data-private://grapher/fasttrack/latest/draft_joe_gini_diff_1980_2018:
-  #   - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1980_2018.csv
-  # data-private://grapher/fasttrack/latest/draft_joe_gini_diff_1980_2018_take2:
-  #   - snapshot-private://fasttrack/latest/draft_joe_gini_diff_1980_2018_take2.csv
-  # data-private://grapher/fasttrack/latest/draft_joe_top1share_diff_1980_2018:
-  #   - snapshot-private://fasttrack/latest/draft_joe_top1share_diff_1980_2018.csv
   data://grapher/fasttrack/latest/emissions_energy_heating_cooling_iea:
     - snapshot://fasttrack/latest/emissions_energy_heating_cooling_iea.csv
   data-private://grapher/fasttrack/latest/voter_turnout_by_age__sheet1:
@@ -176,8 +168,6 @@ steps:
     - snapshot-private://fasttrack/latest/de_sanjose_2019_hpv_cancers.csv
   data-private://grapher/fasttrack/latest/wei_2024_invasive_cervical_cancer_hpv_types:
     - snapshot-private://fasttrack/latest/wei_2024_invasive_cervical_cancer_hpv_types.csv
-  data://grapher/fasttrack/latest/pepfar_patients_currently_receiving_art_formatted:
-    - snapshot://fasttrack/latest/pepfar_patients_currently_receiving_art_formatted.csv
   data://grapher/fasttrack/latest/pepfar_patients_receiving_art:
     - snapshot://fasttrack/latest/pepfar_patients_receiving_art.csv
   data://grapher/fasttrack/latest/simon_ehrlich_wager:
