@@ -3,20 +3,17 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Uncategorized
+        - State Capacity
     processing_level: major
     display:
       numDecimalPlaces: 0
     description_processing: Languages are aggregated to the continent level with each language being counted only once for each region it is spoken in.
-
-
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
   non_redistributable: true
-
 
 tables:
   languages_by_status:
