@@ -21,14 +21,17 @@ import pandas as pd
 import sentry_sdk
 import structlog
 from dotenv import dotenv_values, load_dotenv
+from joblib import Memory
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from etl.paths import BASE_DIR
+from etl.paths import BASE_DIR, CACHE_DIR
 
 log = structlog.get_logger()
 
 ENV_FILE = Path(env.get("ENV_FILE", BASE_DIR / ".env"))
+
+memory = Memory(CACHE_DIR, verbose=0)
 
 
 def get_username():
