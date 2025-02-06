@@ -37,6 +37,11 @@ def run(dest_dir: str) -> None:
                 "age": "year",
             }
         ),
+        ds_garden.read("cohort_share_women", reset_index=False).rename_index_names(
+            {
+                "cohort": "year",
+            }
+        ),
     ]
     #
     # Process data.

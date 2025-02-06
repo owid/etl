@@ -47,8 +47,8 @@ COMMODITY_MAPPING = {
     ("Cement", "Total"): ("Cement", "Processing"),
     # NOTE: The following could be mapped to ("Cesium", "Mine"), but it has only global data until 1977.
     ("Cesium", "Total"): None,
-    # NOTE: It's not clear what the following means.
-    #  According to the Word document in the excel file,
+    # NOTE: Chromium data is a bit problematic:
+    #  According to the Word document in the excel file of historical data,
     # "World production is an estimate of world chromite ore mine production measured in contained chromium.
     #  World production reported in gross weight was converted to contained chromium by assuming that its chromic oxide
     #  content was the same as that of chromite ore imported into the United States.
@@ -58,10 +58,9 @@ COMMODITY_MAPPING = {
     # World production of Ferrochromium, in tonnes of gross weight, has similar values to the previous.
     # In any case, USGS current only provides production data for chromite, as:
     # "Units are thousand metric tons, gross weight, of marketable chromite ore."
-    # Maybe both USGS historical and current report chromite, but the main difference is that USGS historical is in
-    # "contained chromium", whereas USGS current is in "contained chromium".
-    # But for now, we will keep only USGS current data.
-    ("Chromium", "Total"): None,
+    # So they cannot be combined, since USGS historical is in "contained chromium", whereas USGS current is in "gross weight". Numerically, they are significantly different.
+    # Therefore, we will keep the USGS historical data as "mine", and USGS current + BGS data as "mine, gross weight".
+    ("Chromium", "Total"): ("Chromium", "Mine"),
     # NOTE: Cobalt total is only used for unit value.
     ("Cobalt", "Total"): ("Cobalt", "Value"),
     # NOTE: Extracted from "world_mine_production".
@@ -239,7 +238,7 @@ FOOTNOTES_PRODUCTION = {
     # "production|Clays|Mine, bentonite|tonnes": "Values are reported as gross weight.",
     # "production|Clays|Mine, ball clay|tonnes": "Values are reported as gross weight.",
     # "production|Clays|Mine, fire clay|tonnes": "Values are reported as gross weight.",
-    # "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
+    "production|Chromium|Mine|tonnes": "Values are reported as tonnes of contained chromium.",
     "production|Cobalt|Refinery|tonnes": "Values are reported as tonnes of cobalt content.",
     "production|Bismuth|Mine|tonnes": "Values are reported as tonnes of metal content.",
     "production|Lithium|Mine|tonnes": "Values are reported as tonnes of lithium content.",
@@ -706,6 +705,15 @@ def run(dest_dir: str) -> None:
     tb_flat.loc[
         (tb_flat["year"].isin(_years_with_zero_value)), "unit_value|Gemstones|Mine|constant 1998 US$ per tonne"
     ] = None
+
+    # Unit value of rare earths prior to 1961 is highly unstable, and goes from ~140k to ~40 and then ~100k in a few years. There are many possible reasons for this volatility (it was a small market during tumultuous times).
+    # For now, I'll simply remove those years.
+    error = "Unit value of rare earths was expected to be highly unstable prior to 1961. Remove this part of the code."
+    assert tb_flat.loc[
+        (tb_flat["country"] == "World") & (tb_flat["year"] < 1961),
+        "unit_value|Rare earths|Mine|constant 1998 US$ per tonne",
+    ].describe().loc[["min", "max"]].tolist() == [29.0, 145000.0], error
+    tb_flat.loc[(tb_flat["year"] < 1961), "unit_value|Rare earths|Mine|constant 1998 US$ per tonne"] = None
     ####################################################################################################################
 
     # Format tables conveniently.

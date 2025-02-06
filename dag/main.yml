@@ -44,15 +44,7 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/un/2024-07-12/un_wpp
 
-  # Homicide - UNODC - to archive
-  data://meadow/homicide/2023-07-04/unodc:
-    - snapshot://homicide/2023-07-04/unodc.xlsx
-  data://garden/homicide/2023-07-04/unodc:
-    - data://meadow/homicide/2023-07-04/unodc
-  data://grapher/homicide/2023-07-04/unodc:
-    - data://garden/homicide/2023-07-04/unodc
-
-  # Homicide - UNODC - update
+    # Homicide - UNODC - update
   data://meadow/homicide/2024-10-30/unodc:
     - snapshot://homicide/2024-10-30/unodc.xlsx
   data://garden/homicide/2024-10-30/unodc:
@@ -72,14 +64,6 @@ steps:
     - snapshot://un/2023-08-16/un_sdg_dimension.json
   data://grapher/un/2023-08-16/un_sdg:
     - data://garden/un/2023-08-16/un_sdg
-
-  # IHME SDG
-  data-private://meadow/ihme/2023-05-09/sdg:
-    - snapshot-private://ihme/2023-05-05/sdg.csv
-  data-private://garden/ihme/2023-05-09/sdg:
-    - data-private://meadow/ihme/2023-05-09/sdg
-  data-private://grapher/ihme/2023-05-09/sdg:
-    - data-private://garden/ihme/2023-05-09/sdg
 
   # Internet
   data://garden/technology/2024-12-23/internet:
@@ -106,7 +90,7 @@ steps:
   data://garden/ggdc/2022-12-23/maddison_database:
     - data://meadow/ggdc/2022-12-23/maddison_database
 
-  #Penn World Table
+  # Penn World Table
   data://meadow/ggdc/2022-11-28/penn_world_table:
     - walden://ggdc/2021-06-18/penn_world_table
   data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts:
@@ -117,14 +101,6 @@ steps:
     - data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts
   data://grapher/ggdc/2022-11-28/penn_world_table:
     - data://garden/ggdc/2022-11-28/penn_world_table
-
-  # Global mobile money dataset (GSMA)
-  data://meadow/technology/2024-05-30/mobile_money:
-    - snapshot://technology/2024-05-30/mobile_money.xlsx
-  data://garden/technology/2024-05-30/mobile_money:
-    - data://meadow/technology/2024-05-30/mobile_money
-  data://grapher/technology/2024-05-30/mobile_money:
-    - data://garden/technology/2024-05-30/mobile_money
 
   # Democracy and Human rights - V-Dem index
   data://meadow/democracy/2023-03-02/vdem:
@@ -227,7 +203,7 @@ steps:
   data://garden/research_development/2024-05-20/patents_articles:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/demography/2023-03-31/population
-  data://grapher/research_development/2024-05-20/patents_articles:
+  data://grapher/research_development/2024-05-20/patents_wdi_unwpp:
     - data://garden/research_development/2024-05-20/patents_articles
 
   # World Bank's Women, Business and the Law additional data
@@ -444,16 +420,6 @@ steps:
   data://grapher/survey/2023-08-04/trust_surveys:
     - data://garden/survey/2023-08-04/trust_surveys
 
-  # Missing Data - Children out of school
-  data://garden/missing_data/2024-03-26/children_out_of_school:
-    - data://garden/wb/2024-06-10/gender_statistics
-    - data://garden/wb/2024-03-11/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/missing_data/2024-03-26/children_out_of_school:
-    - data://garden/missing_data/2024-03-26/children_out_of_school
-
-
   # Missing Data - Suicides
   data://garden/missing_data/2024-03-26/who_md_suicides:
     - data://garden/who/2024-03-24/self_inflicted_injuries
@@ -475,7 +441,7 @@ steps:
   data://garden/growth/2024-05-16/gdp_historical:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
-    - data://grapher/worldbank_wdi/2024-05-20/wdi
+    - data://grapher/worldbank_wdi/2025-01-24/wdi
 
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
@@ -522,6 +488,7 @@ steps:
     - data://garden/news/2024-05-23/gdelt_v2
 
   # World Development Indicators - WDI
+  # TO BE ARCHIVED
   data://meadow/worldbank_wdi/2024-05-20/wdi:
     - snapshot://worldbank_wdi/2024-05-20/wdi.zip
 
@@ -534,6 +501,20 @@ steps:
 
   data://grapher/worldbank_wdi/2024-05-20/wdi:
     - data://garden/worldbank_wdi/2024-05-20/wdi
+
+  # World Development Indicators - WDI
+  data://meadow/worldbank_wdi/2025-01-24/wdi:
+    - snapshot://worldbank_wdi/2025-01-24/wdi.zip
+
+  data://garden/worldbank_wdi/2025-01-24/wdi:
+    - snapshot://worldbank_wdi/2025-01-24/wdi.zip
+    - data://meadow/worldbank_wdi/2025-01-24/wdi
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+
+  data://grapher/worldbank_wdi/2025-01-24/wdi:
+    - data://garden/worldbank_wdi/2025-01-24/wdi
 
   #
   # Aviation Safety Network - Aviation Statistics.
@@ -585,9 +566,8 @@ steps:
 
   # Homicide - OMM
   data://garden/homicide/2024-07-30/homicide_long_run_omm:
-    - data://grapher/fasttrack/2023-01-03/long_term_homicide_rates_in_europe
+    - snapshot://fasttrack/2023-01-03/long_term_homicide_rates_in_europe.csv
     - data://garden/homicide/2024-07-30/who_mort_db
-    - data://garden/homicide/2023-07-04/unodc
   data://grapher/homicide/2024-07-30/homicide_long_run_omm:
     - data://garden/homicide/2024-07-30/homicide_long_run_omm
 
@@ -684,37 +664,37 @@ steps:
   data://grapher/un/2024-10-21/census_dates:
     - data://garden/un/2024-10-21/census_dates
 
-  #  World Peace Foundation - Famines
-  data://meadow/wpf/2024-10-03/famines:
-    - snapshot://wpf/2024-10-03/famines.xlsx
-  data://garden/wpf/2024-10-03/famines:
-    - data://meadow/wpf/2024-10-03/famines
+  #  World Peace Foundation - Famines (2025)
+  data://meadow/wpf/2025-01-17/famines:
+    - snapshot://wpf/2025-01-17/famines.xlsx
+  data://garden/wpf/2025-01-17/famines:
+    - data://meadow/wpf/2025-01-17/famines
     - data://garden/regions/2023-01-01/regions
-
-  data://grapher/wpf/2024-10-03/famines:
-    - data://garden/wpf/2024-10-03/famines
-  data://garden/wpf/2024-10-03/total_famines_by_year_decade:
-    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2025-01-17/famines:
+    - data://garden/wpf/2025-01-17/famines
+  data://garden/wpf/2025-01-17/total_famines_by_year_decade:
+    - data://garden/wpf/2025-01-17/famines
     - data://garden/demography/2024-07-15/population
-  data://grapher/wpf/2024-10-03/total_famines_by_year_decade:
-    - data://garden/wpf/2024-10-03/total_famines_by_year_decade
+  data://grapher/wpf/2025-01-17/total_famines_by_year_decade:
+    - data://garden/wpf/2025-01-17/total_famines_by_year_decade
 
-  data://garden/wpf/2024-10-03/famines_by_regime_gdp:
-    - data://garden/wpf/2024-10-03/famines
+  data://garden/wpf/2025-01-17/famines_by_regime_gdp_population:
+    - data://garden/wpf/2025-01-17/famines
     - data://garden/democracy/2024-03-07/vdem
     - data://garden/ggdc/2024-04-26/maddison_project_database
-  data://grapher/wpf/2024-10-03/famines_by_regime_gdp:
-    - data://garden/wpf/2024-10-03/famines_by_regime_gdp
+    - data://garden/demography/2024-07-15/population
+  data://grapher/wpf/2025-01-17/famines_by_regime_gdp_population:
+    - data://garden/wpf/2025-01-17/famines_by_regime_gdp_population
 
-  data://garden/wpf/2024-10-03/famines_by_factor:
-    - data://garden/wpf/2024-10-03/famines
-  data://grapher/wpf/2024-10-03/famines_by_factor:
-    - data://garden/wpf/2024-10-03/famines_by_factor
+  data://garden/wpf/2025-01-17/famines_by_place:
+    - data://garden/wpf/2025-01-17/famines
+  data://grapher/wpf/2025-01-17/famines_by_place:
+    - data://garden/wpf/2025-01-17/famines_by_place
 
-  data://garden/wpf/2024-10-03/famines_by_place:
-    - data://garden/wpf/2024-10-03/famines
-  data://grapher/wpf/2024-10-03/famines_by_place:
-    - data://garden/wpf/2024-10-03/famines_by_place
+  data://garden/wpf/2025-01-17/famines_by_trigger:
+    - data://garden/wpf/2025-01-17/famines
+  data://grapher/wpf/2025-01-17/famines_by_trigger:
+    - data://garden/wpf/2025-01-17/famines_by_trigger
 
   data-private://meadow/owid/latest/ig_countries:
     - snapshot-private://owid/latest/ig_countries.csv
@@ -747,19 +727,20 @@ steps:
   data://grapher/imf/2024-11-25/world_economic_outlook:
     - data://garden/imf/2024-11-25/world_economic_outlook
 
-  # ATUS - American Time Use Survey
-  data://meadow/atus/2024-12-10/atus_0323:
-    - snapshot://atus/2024-12-10/atus_who.zip
-    - snapshot://atus/2024-12-10/atus_activities.zip
-    - snapshot://atus/2024-12-10/atus_summary.zip
-    - snapshot://atus/2024-12-10/activity_codes_2023.xls
-    - snapshot://atus/2024-12-10/atus_respondent.zip
-
-  data://garden/atus/2025-01-06/atus_who:
-    - data://meadow/atus/2024-12-10/atus_0323
-
-  data://grapher/atus/2025-01-06/atus_who:
-    - data://garden/atus/2025-01-06/atus_who
+  # GDP per capita vs. living conditions indicators
+  data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
+    - data://garden/worldbank_wdi/2025-01-24/wdi
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/un/2024-09-11/igme
+    - data://garden/who/2024-07-26/mortality_database
+    - data://garden/wash/2024-01-06/who
+    - data://garden/tourism/2024-08-17/unwto
+    - data://garden/ggdc/2022-11-28/penn_world_table
+    - data://garden/wb/2024-11-04/edstats
+    - data://garden/unesco/2024-06-25/education_sdgs
+    - data://garden/happiness/2024-06-09/happiness
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
 
 include:
   - dag/open_numbers.yml
@@ -799,3 +780,4 @@ include:
   - dag/migration.yml
   - dag/equality.yml
   - dag/families.yml
+  - dag/technology.yml

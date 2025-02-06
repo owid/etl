@@ -24,6 +24,25 @@ st.set_page_config(
 ########################################################################################################################
 
 
+@st.cache_data(show_spinner=False, ttl="1h")
+def get_charts() -> list[data.Chart]:
+    with st.spinner("Loading charts..."):
+        # Get charts from the database..
+        df = data.get_raw_charts()
+
+        if len(df) == 0:
+            raise ValueError("No charts found in the database.")
+
+        charts = df.to_dict(orient="records")
+
+    ret = []
+    for c in charts:
+        c["tags"] = c["tags"].split(";") if c["tags"] else []
+        ret.append(data.Chart(**c))  # type: ignore
+
+    return ret
+
+
 def st_chart_info(chart: data.Chart) -> None:
     chart_url = OWID_ENV.chart_site(chart.slug)
     title = f"#### [{chart.title}]({chart_url})"
@@ -74,14 +93,15 @@ def split_input_string(input_string: str) -> tuple[str, list[str], list[str]]:
 
 @st.cache_data(show_spinner=False, max_entries=1)
 def get_and_fit_model(charts: list[data.Chart]) -> scoring.ScoringModel:
-    scoring_model = scoring.ScoringModel(emb.get_model())
+    with st.spinner("Loading model..."):
+        scoring_model = scoring.ScoringModel(emb.get_model())
     scoring_model.fit(charts)
     return scoring_model
 
 
 ########################################################################################################################
 # Fetch all data indicators.
-charts = data.get_charts()
+charts = get_charts()
 # Get scoring model.
 scoring_model = get_and_fit_model(charts)
 
@@ -102,9 +122,10 @@ with col2:
         random_chart = st.button("Random chart", help="Get a random chart.")
 
         # Filter indicators
-        diversity_gpt = url_persist(st.checkbox, default=True)(
+        diversity_gpt = url_persist(st.checkbox)(
             "Diversity with GPT",
             key="diversity_gpt",
+            value=True,
             help="Use GPT to select 5 most diverse charts from the top 30 similar charts.",
         )
 
@@ -133,9 +154,10 @@ with col2:
     # Weights for each score
     with st.expander("Advanced options", expanded=st.session_state.sim_charts_expander_advanced_options):
         # Add text area for system prompt
-        system_prompt = url_persist(st.text_area, default=scoring.DEFAULT_SYSTEM_PROMPT)(
+        system_prompt = url_persist(st.text_area)(
             "GPT prompt for selecting diverse results",
             key="gpt_system_prompt",
+            value=scoring.DEFAULT_SYSTEM_PROMPT,
             height=150,
         )
 
@@ -148,12 +170,13 @@ with col2:
             if key not in st.session_state:
                 st.session_state[key] = scoring.DEFAULT_WEIGHTS[score_name]
 
-            url_persist(st.slider, default=scoring.DEFAULT_WEIGHTS[score_name])(
+            url_persist(st.slider)(
                 f"Weight for {score_name} score",
                 min_value=1e-9,
                 max_value=1.0,
                 # step=0.001,
                 key=key,
+                value=scoring.DEFAULT_WEIGHTS[score_name],
             )
 
             scoring_model.weights[score_name] = st.session_state[key]
@@ -191,7 +214,8 @@ sorted_charts = sorted(charts, key=lambda x: x.similarity, reverse=True)  # type
 
 # Postprocess charts with GPT and prioritize diversity
 if diversity_gpt:
-    slugs_to_reasons = scoring.gpt_diverse_charts(chosen_chart, sorted_charts, system_prompt=system_prompt)
+    with st.spinner("Diversifying chart results..."):
+        slugs_to_reasons = scoring.gpt_diverse_charts(chosen_chart, sorted_charts, system_prompt=system_prompt)
     for chart in sorted_charts:
         if chart.slug in slugs_to_reasons:
             chart.gpt_reason = slugs_to_reasons[chart.slug]

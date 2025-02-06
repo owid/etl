@@ -31,46 +31,46 @@ steps:
   #
   # Copernicus Climate Change Service - Surface temperature.
   #
-  data://meadow/climate/2023-12-20/surface_temperature:
-  - snapshot://climate/2024-12-05/surface_temperature.zip
+  data://meadow/climate/2025-01-07/surface_temperature:
+  - snapshot://climate/2025-01-07/surface_temperature.zip
   - snapshot://countries/2023-12-27/world_bank.zip
-  data://garden/climate/2023-12-20/surface_temperature:
-    - data://meadow/climate/2023-12-20/surface_temperature
-  data://grapher/climate/2023-12-20/surface_temperature_anomalies:
-    - data://garden/climate/2023-12-20/surface_temperature
-  data://grapher/climate/2023-12-20/surface_temperature_monthly:
-    - data://garden/climate/2023-12-20/surface_temperature
-  data://grapher/climate/2023-12-20/surface_global_monthly_anomaly:
-    - data://garden/climate/2023-12-20/surface_temperature
-  data://grapher/climate/2023-12-20/surface_temperature:
-    - data://garden/climate/2023-12-20/surface_temperature
-  data://grapher/climate/2023-12-20/surface_temperature_annual_average:
-    - data://garden/climate/2023-12-20/surface_temperature
-  data://grapher/climate/2023-12-20/surface_country_level_monthly_anomaly:
-    - data://garden/climate/2023-12-20/surface_temperature
-  data://grapher/climate/2023-12-20/surface_global_monthly_anomaly_all_countries:
-    - data://garden/climate/2023-12-20/surface_temperature
+  data://garden/climate/2025-01-07/surface_temperature:
+    - data://meadow/climate/2025-01-07/surface_temperature
+  data://grapher/climate/2025-01-07/surface_temperature_anomalies:
+    - data://garden/climate/2025-01-07/surface_temperature
+  data://grapher/climate/2025-01-07/surface_temperature_monthly:
+    - data://garden/climate/2025-01-07/surface_temperature
+  data://grapher/climate/2025-01-07/surface_global_monthly_anomaly:
+    - data://garden/climate/2025-01-07/surface_temperature
+  data://grapher/climate/2025-01-07/surface_temperature:
+    - data://garden/climate/2025-01-07/surface_temperature
+  data://grapher/climate/2025-01-07/surface_temperature_annual_average:
+    - data://garden/climate/2025-01-07/surface_temperature
+  data://grapher/climate/2025-01-07/surface_country_level_monthly_anomaly:
+    - data://garden/climate/2025-01-07/surface_temperature
+  data://grapher/climate/2025-01-07/surface_global_monthly_anomaly_all_countries:
+    - data://garden/climate/2025-01-07/surface_temperature
 
   #
   # Copernicus Climate Change Service - Precipitation.
   #
-  data://meadow/climate/2024-11-19/total_precipitation:
-  - snapshot://climate/2024-11-19/total_precipitation.zip
+  data://meadow/climate/2025-01-07/total_precipitation:
+  - snapshot://climate/2025-01-07/total_precipitation.zip
   - snapshot://countries/2023-12-27/world_bank.zip
-  data://garden/climate/2024-11-19/total_precipitation:
-    - data://meadow/climate/2024-11-19/total_precipitation
-  data://grapher/climate/2024-11-19/total_precipitation_annual:
-    - data://garden/climate/2024-11-19/total_precipitation
+  data://garden/climate/2025-01-07/total_precipitation:
+    - data://meadow/climate/2025-01-07/total_precipitation
+  data://grapher/climate/2025-01-07/total_precipitation_annual:
+    - data://garden/climate/2025-01-07/total_precipitation
   #
   # Climate change impacts data explorer.
   #
   data://explorers/climate/latest/climate_change_impacts:
-    - data://garden/climate/2024-11-18/climate_change_impacts
+    - data://garden/climate/2025-01-21/climate_change_impacts
+
 
   #
   # Weekly area burnt and emissions data on wildfires.
   #
-
   #
   # Global Wildfire Information System - Monthly burned area.
   #
@@ -121,146 +121,146 @@ steps:
   data://garden/epa/2024-04-17/mass_balance_us_glaciers:
     - data://meadow/epa/2024-04-17/mass_balance_us_glaciers
   #
-  #  School of Ocean and Earth Science and Technology - Hawaii Ocean Time-series (HOT).
-  #
-  data://meadow/climate/2024-11-18/hawaii_ocean_time_series:
-    - snapshot://climate/2024-11-18/hawaii_ocean_time_series.csv
-  #
-  # NSIDC - Arctic sea ice extent.
-  #
-  data://meadow/climate/2024-11-18/sea_ice_index:
-    - snapshot://climate/2024-11-18/sea_ice_index.xlsx
-  #
-  # GISS - Surface temperature analysis.
-  #
-  data://meadow/climate/2024-11-18/surface_temperature_analysis:
-    - snapshot://climate/2024-11-18/surface_temperature_analysis_world.csv
-    - snapshot://climate/2024-11-18/surface_temperature_analysis_southern_hemisphere.csv
-    - snapshot://climate/2024-11-18/surface_temperature_analysis_northern_hemisphere.csv
-  #
-  # NOAA Global Monitoring Laboratory - GHG concentration.
-  #
-  data://meadow/climate/2024-11-18/ghg_concentration:
-    - snapshot://climate/2024-11-18/n2o_concentration_monthly.csv
-    - snapshot://climate/2024-11-18/co2_concentration_monthly.csv
-    - snapshot://climate/2024-11-18/ch4_concentration_monthly.csv
-  #
-  # Met Office Hadley Centre - Sea surface temperature.
-  #
-  data://meadow/climate/2024-11-18/sea_surface_temperature:
-    - snapshot://climate/2024-11-18/sea_surface_temperature_world.csv
-    - snapshot://climate/2024-11-18/sea_surface_temperature_southern_hemisphere.csv
-    - snapshot://climate/2024-11-18/sea_surface_temperature_northern_hemisphere.csv
-  #
   # Rutgers University Global Snow Lab - Snow Cover Extent.
   #
-  data://meadow/climate/2024-11-18/snow_cover_extent:
-    - snapshot://climate/2024-11-18/snow_cover_extent_northern_hemisphere.csv
-    - snapshot://climate/2024-11-18/snow_cover_extent_north_america.csv
-  #
-  # NOAA National Centers for Environmental Information - Ocean Heat Content.
-  #
-  data://meadow/climate/2024-11-18/ocean_heat_content:
-    - snapshot://climate/2024-11-18/ocean_heat_content_monthly_world_2000m.csv
-    - snapshot://climate/2024-11-18/ocean_heat_content_annual_world_700m.csv
-    - snapshot://climate/2024-11-18/ocean_heat_content_monthly_world_700m.csv
-    - snapshot://climate/2024-11-18/ocean_heat_content_annual_world_2000m.csv
+  data://meadow/climate/2025-01-21/snow_cover_extent:
+    - snapshot://climate/2025-01-21/snow_cover_extent_northern_hemisphere.csv
+    - snapshot://climate/2025-01-21/snow_cover_extent_north_america.csv
   #
   #  School of Ocean and Earth Science and Technology - Hawaii Ocean Time-series (HOT).
   #
-  data://garden/climate/2024-11-18/ocean_ph_levels:
-    - data://meadow/climate/2024-11-18/hawaii_ocean_time_series
-  #
-  # NSIDC - Arctic sea ice extent.
-  #
-  data://garden/climate/2024-11-18/sea_ice_index:
-    - data://meadow/climate/2024-11-18/sea_ice_index
-  #
-  # GISS - Surface temperature analysis.
-  #
-  data://garden/climate/2024-11-18/surface_temperature_analysis:
-    - data://meadow/climate/2024-11-18/surface_temperature_analysis
+  data://meadow/climate/2025-01-21/hawaii_ocean_time_series:
+    - snapshot://climate/2025-01-21/hawaii_ocean_time_series.csv
   #
   # NOAA Global Monitoring Laboratory - GHG concentration.
   #
-  data://garden/climate/2024-11-18/ghg_concentration:
-    - data://meadow/climate/2024-11-18/ghg_concentration
+  data://meadow/climate/2025-01-21/ghg_concentration:
+    - snapshot://climate/2025-01-21/n2o_concentration_monthly.csv
+    - snapshot://climate/2025-01-21/co2_concentration_monthly.csv
+    - snapshot://climate/2025-01-21/ch4_concentration_monthly.csv
   #
-  # Met Office Hadley Centre - Sea surface temperature.
+  # NSIDC - Arctic sea ice extent.
   #
-  data://garden/climate/2024-11-18/sea_surface_temperature:
-    - data://meadow/climate/2024-11-18/sea_surface_temperature
-  #
-  # Rutgers University Global Snow Lab - Snow Cover Extent.
-  #
-  data://garden/climate/2024-11-18/snow_cover_extent:
-    - data://meadow/climate/2024-11-18/snow_cover_extent
+  data://meadow/climate/2025-01-21/sea_ice_index:
+    - snapshot://climate/2025-01-21/sea_ice_index.xlsx
   #
   # NOAA National Centers for Environmental Information - Ocean Heat Content.
   #
-  data://garden/climate/2024-11-18/ocean_heat_content:
-    - data://meadow/climate/2024-11-18/ocean_heat_content
+  data://meadow/climate/2025-01-21/ocean_heat_content:
+    - snapshot://climate/2025-01-21/ocean_heat_content_annual_world_700m.csv
+    - snapshot://climate/2025-01-21/ocean_heat_content_annual_world_2000m.csv
+    - snapshot://climate/2025-01-21/ocean_heat_content_monthly_world_2000m.csv
+    - snapshot://climate/2025-01-21/ocean_heat_content_monthly_world_700m.csv
+  #
+  # GISS - Surface temperature analysis.
+  #
+  data://meadow/climate/2025-01-21/surface_temperature_analysis:
+    - snapshot://climate/2025-01-21/surface_temperature_analysis_northern_hemisphere.csv
+    - snapshot://climate/2025-01-21/surface_temperature_analysis_world.csv
+    - snapshot://climate/2025-01-21/surface_temperature_analysis_southern_hemisphere.csv
+  #
+  # Met Office Hadley Centre - Sea surface temperature.
+  #
+  data://meadow/climate/2025-01-21/sea_surface_temperature:
+    - snapshot://climate/2025-01-21/sea_surface_temperature_world.csv
+    - snapshot://climate/2025-01-21/sea_surface_temperature_northern_hemisphere.csv
+    - snapshot://climate/2025-01-21/sea_surface_temperature_southern_hemisphere.csv
+  #
+  # Rutgers University Global Snow Lab - Snow Cover Extent.
+  #
+  data://garden/climate/2025-01-21/snow_cover_extent:
+    - data://meadow/climate/2025-01-21/snow_cover_extent
+  #
+  #  School of Ocean and Earth Science and Technology - Hawaii Ocean Time-series (HOT).
+  #
+  data://garden/climate/2025-01-21/ocean_ph_levels:
+    - data://meadow/climate/2025-01-21/hawaii_ocean_time_series
+  #
+  # NOAA Global Monitoring Laboratory - GHG concentration.
+  #
+  data://garden/climate/2025-01-21/ghg_concentration:
+    - data://meadow/climate/2025-01-21/ghg_concentration
+  #
+  # NSIDC - Arctic sea ice extent.
+  #
+  data://garden/climate/2025-01-21/sea_ice_index:
+    - data://meadow/climate/2025-01-21/sea_ice_index
+  #
+  # NOAA National Centers for Environmental Information - Ocean Heat Content.
+  #
+  data://garden/climate/2025-01-21/ocean_heat_content:
+    - data://meadow/climate/2025-01-21/ocean_heat_content
+  #
+  # GISS - Surface temperature analysis.
+  #
+  data://garden/climate/2025-01-21/surface_temperature_analysis:
+    - data://meadow/climate/2025-01-21/surface_temperature_analysis
+  #
+  # Met Office Hadley Centre - Sea surface temperature.
+  #
+  data://garden/climate/2025-01-21/sea_surface_temperature:
+    - data://meadow/climate/2025-01-21/sea_surface_temperature
   #
   # Various sources - Long-run greenhouse gas concentration.
   #
-  data://garden/climate/2024-11-18/long_run_ghg_concentration:
-    - data://garden/climate/2024-11-18/ghg_concentration
+  data://garden/climate/2025-01-21/long_run_ghg_concentration:
     - data://garden/epa/2024-04-17/ghg_concentration
+    - data://garden/climate/2025-01-21/ghg_concentration
   #
   # Various sources - Climate change impacts.
   #
-  data://garden/climate/2024-11-18/climate_change_impacts:
-    - data://garden/climate/2024-11-18/snow_cover_extent
-    - data://garden/climate/2024-11-18/sea_surface_temperature
-    - data://garden/climate/2024-11-18/ghg_concentration
-    - data://garden/climate/2024-11-18/ocean_ph_levels
-    - data://garden/climate/2024-11-18/long_run_ghg_concentration
-    - data://garden/climate/2024-11-18/sea_ice_index
-    - data://garden/climate/2024-11-18/surface_temperature_analysis
+  data://garden/climate/2025-01-21/climate_change_impacts:
+    - data://garden/climate/2025-01-21/ocean_ph_levels
+    - data://garden/climate/2025-01-21/ghg_concentration
+    - data://garden/climate/2025-01-21/ocean_heat_content
     - data://garden/epa/2024-04-17/ocean_heat_content
-    - data://garden/epa/2024-04-17/mass_balance_us_glaciers
     - data://garden/climate/2024-01-28/global_sea_level
+    - data://garden/climate/2025-01-21/long_run_ghg_concentration
     - data://garden/epa/2024-04-17/ice_sheet_mass_balance
-    - data://garden/climate/2024-11-18/ocean_heat_content
+    - data://garden/climate/2025-01-21/snow_cover_extent
+    - data://garden/climate/2025-01-21/sea_ice_index
+    - data://garden/climate/2025-01-21/sea_surface_temperature
+    - data://garden/climate/2025-01-21/surface_temperature_analysis
+    - data://garden/epa/2024-04-17/mass_balance_us_glaciers
   #
   # Various sources - Climate change impacts (monthly).
   #
-  data://grapher/climate/2024-11-18/climate_change_impacts_monthly:
-    - data://garden/climate/2024-11-18/climate_change_impacts
+  data://grapher/climate/2025-01-21/climate_change_impacts_monthly:
+    - data://garden/climate/2025-01-21/climate_change_impacts
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://meadow/met_office_hadley_centre/2025-01-21/near_surface_temperature:
+    - snapshot://met_office_hadley_centre/2025-01-21/near_surface_temperature_southern_hemisphere.csv
+    - snapshot://met_office_hadley_centre/2025-01-21/near_surface_temperature_global.csv
+    - snapshot://met_office_hadley_centre/2025-01-21/near_surface_temperature_northern_hemisphere.csv
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://garden/met_office_hadley_centre/2025-01-21/near_surface_temperature:
+    - data://meadow/met_office_hadley_centre/2025-01-21/near_surface_temperature
+  #
+  # Met Office Hadley Centre - Near surface temperature anomaly.
+  #
+  data://grapher/met_office_hadley_centre/2025-01-21/near_surface_temperature:
+    - data://garden/met_office_hadley_centre/2025-01-21/near_surface_temperature
   #
   # Various sources - Climate change impacts (annual).
   #
-  data://grapher/climate/2024-11-18/climate_change_impacts_annual:
-    - data://garden/climate/2024-11-18/climate_change_impacts
-  #
-  # NSIDC - Monthly sea ice extent ("country" for years, "year" for month number, one indicator per hemisphere).
-  #
-  data://grapher/climate/2024-11-18/sea_ice_extent_by_year:
-    - data://garden/climate/2024-11-18/sea_ice_index
+  data://grapher/climate/2025-01-21/climate_change_impacts_annual:
+    - data://garden/climate/2025-01-21/climate_change_impacts
   #
   # NSIDC - Monthly sea ice extent ("country" for decades and latest year, "year" for month number, one indicator per hemisphere).
   #
-  data://grapher/climate/2024-11-18/sea_ice_extent_by_decade:
-    - data://garden/climate/2024-11-18/sea_ice_index
-  #
-  # Met Office Hadley Centre - Near surface temperature anomaly.
-  #
-  data://meadow/met_office_hadley_centre/2024-11-18/near_surface_temperature:
-    - snapshot://met_office_hadley_centre/2024-11-18/near_surface_temperature_global.csv
-    - snapshot://met_office_hadley_centre/2024-11-18/near_surface_temperature_southern_hemisphere.csv
-    - snapshot://met_office_hadley_centre/2024-11-18/near_surface_temperature_northern_hemisphere.csv
-  #
-  # Met Office Hadley Centre - Near surface temperature anomaly.
-  #
-  data://garden/met_office_hadley_centre/2024-11-18/near_surface_temperature:
-    - data://meadow/met_office_hadley_centre/2024-11-18/near_surface_temperature
-  #
-  # Met Office Hadley Centre - Near surface temperature anomaly.
-  #
-  data://grapher/met_office_hadley_centre/2024-11-18/near_surface_temperature:
-    - data://garden/met_office_hadley_centre/2024-11-18/near_surface_temperature
+  data://grapher/climate/2025-01-21/sea_ice_extent_by_decade:
+    - data://garden/climate/2025-01-21/sea_ice_index
   #
   # NSIDC - Monthly sea ice anomalies ("country" for month names, "year" for years, one indicator per hemisphere).
   #
-  data://grapher/climate/2024-11-18/sea_ice_anomalies_by_month:
-    - data://garden/climate/2024-11-18/sea_ice_index
+  data://grapher/climate/2025-01-21/sea_ice_anomalies_by_month:
+    - data://garden/climate/2025-01-21/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice extent ("country" for years, "year" for month number, one indicator per hemisphere).
+  #
+  data://grapher/climate/2025-01-21/sea_ice_extent_by_year:
+    - data://garden/climate/2025-01-21/sea_ice_index

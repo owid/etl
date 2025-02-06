@@ -54,8 +54,6 @@ def parse_indicators(indicators_raw):
             indicators_with_dim[key].append(indicator)
         # Does not have dimensions
         else:
-            assert isinstance(indicator.catalogPath, str), f"`catalogPath` is empty for variable {indicator.id}"
-            key = indicator.catalogPath
             indicators.append(IndicatorSingleDimension(indicator))
 
     # Prepare objects with indicator-collection
@@ -90,14 +88,18 @@ def prompt_dataset_options(dataset_options):
 
     # Collect Query params
     dataset_id = st.query_params.get("datasetId")
+    if dataset_id == "None":
+        dataset_id = None
 
     # Correct dataset id
+    ## If no dataset_id is provided, show only non-archived ETL datasets
     if dataset_id is None:
         dataset_index = None
         dataset_options = [dataset_id for dataset_id in dataset_options if DATASETS[dataset_id]["isArchived"] == 0]
     else:
         dataset_id = int(dataset_id)
         if dataset_id in dataset_options:
+            ## If dataset is not archived, show only non-archived datasets
             if DATASETS[dataset_id]["isArchived"] == 0:
                 dataset_options = [
                     dataset_id for dataset_id in dataset_options if DATASETS[dataset_id]["isArchived"] == 0
@@ -106,6 +108,7 @@ def prompt_dataset_options(dataset_options):
         else:
             st.error(f"Dataset with ID {dataset_id} not found. Please review the URL query parameters.")
             dataset_index = None
+            dataset_options = [dataset_id for dataset_id in dataset_options if DATASETS[dataset_id]["isArchived"] == 0]
 
     # Show dropdown with options
     dataset_id = st.selectbox(
@@ -115,7 +118,7 @@ def prompt_dataset_options(dataset_options):
         key="dataset_select",
         placeholder="Select dataset",
         index=dataset_index,  # type: ignore
-        help="By default, only non-archived datasets are shown. However, if you search for an archived one via QUERY PARAMS, the list will show all datasets, including archived ones. To use QUERY PARAMS, add `?datasetId=YOUR_DATASET_ID` to the URL.",
+        help="By default, only non-archived datasets from ETL are shown. However, if you search for an archived (or pre-ETL) one via QUERY PARAMS, the list will show all datasets. To use QUERY PARAMS, add `?datasetId=YOUR_DATASET_ID` to the URL.",
     )
 
     return dataset_id
@@ -180,16 +183,23 @@ def st_show_indicator(indicator, indicator_charts, display_charts=True):
             df_explorers = get_table_explorers(indicator_explorers, EXPLORER_VIEWS, var.id)
             show_table_explorers(df_explorers)
 
-        # Show indicator title and URI
+        # Show indicator title, URI, "dimensions" tag
         name = var.name
         iid = var.id
         with st_header:
-            with st_horizontal():  # (vertical_alignment="center"):
-                st.markdown(f"#### [**{name}**]({OWID_ENV.indicator_admin_site(iid)})")
-                st.caption(var.catalogPath.replace("grapher/", ""))
+            st.markdown(f"#### [**{name}**]({OWID_ENV.indicator_admin_site(iid)})")
+            with st_horizontal(vertical_alignment="center"):  # (vertical_alignment="center"):
+                if indicator.is_etl:
+                    st.caption(var.catalogPath.replace("grapher/", ""))
                 if indicator.is_mdim:
                     st_tag(tag_name="dimensions", color="primary", icon=":material/deployed_code")
-
+                if indicator.is_etl:
+                    st.link_button(
+                        "See data page",
+                        url=OWID_ENV.data_page_preview(iid),
+                        type="tertiary",
+                        icon=":material/transition_slide:",
+                    )
         # Show chart (contains description, and other metadata fields)
         with st_metadata_left:
             if not display_charts:

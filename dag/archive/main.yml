@@ -179,6 +179,13 @@ steps:
     - data://garden/homicide/2023-07-04/unodc
   data://grapher/homicide/2023-01-03/homicide_long_run_omm:
     - data://garden/homicide/2023-01-03/homicide_long_run_omm
+    # Homicide - UNODC - to archive
+  data://meadow/homicide/2023-07-04/unodc:
+    - snapshot://homicide/2023-07-04/unodc.xlsx
+  data://garden/homicide/2023-07-04/unodc:
+    - data://meadow/homicide/2023-07-04/unodc
+  data://grapher/homicide/2023-07-04/unodc:
+    - data://garden/homicide/2023-07-04/unodc
 
   # CO2 emissions from air transport (OECD)
   data://meadow/oecd/2023-05-18/co2_air_transport:
@@ -240,7 +247,6 @@ steps:
   data://garden/growth/2024-04-29/gdp_historical:
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/ggdc/2022-12-23/maddison_database
-
 
   # UN IGME Child Mortality
   data://meadow/un/2023-08-16/igme:
@@ -312,7 +318,7 @@ steps:
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # UN SDG - archive
+  # UN SDG
   data://meadow/un/2023-01-24/un_sdg:
     - snapshot://un/2023-01-24/un_sdg.feather
   data://garden/un/2023-01-24/un_sdg:
@@ -321,6 +327,64 @@ steps:
     - snapshot://un/2023-01-24/un_sdg_dimension.json
   data://grapher/un/2023-01-24/un_sdg:
     - data://garden/un/2023-01-24/un_sdg
+
+    # IHME SDG
+  data-private://meadow/ihme/2023-05-09/sdg:
+    - snapshot-private://ihme/2023-05-05/sdg.csv
+  data-private://garden/ihme/2023-05-09/sdg:
+    - data-private://meadow/ihme/2023-05-09/sdg
+  data-private://grapher/ihme/2023-05-09/sdg:
+    - data-private://garden/ihme/2023-05-09/sdg
+
+  # MICROBE - total deaths by pathogen and amr resistance
+  data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - snapshot-private://antibiotics/2024-12-02/total_pathogen_bloodstream_amr.csv
+  data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream
+    - data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream_amr
+  data-private://grapher/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
+    - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream_amr
+
+  #  World Peace Foundation - Famines
+  data://meadow/wpf/2024-10-03/famines:
+    - snapshot://wpf/2024-10-03/famines.xlsx
+  data://garden/wpf/2024-10-03/famines:
+    - data://meadow/wpf/2024-10-03/famines
+    - data://garden/regions/2023-01-01/regions
+
+  data://grapher/wpf/2024-10-03/famines:
+    - data://garden/wpf/2024-10-03/famines
+  data://garden/wpf/2024-10-03/total_famines_by_year_decade:
+    - data://garden/wpf/2024-10-03/famines
+    - data://garden/demography/2024-07-15/population
+  data://grapher/wpf/2024-10-03/total_famines_by_year_decade:
+    - data://garden/wpf/2024-10-03/total_famines_by_year_decade
+
+  data://garden/wpf/2024-10-03/famines_by_regime_gdp:
+    - data://garden/wpf/2024-10-03/famines
+    - data://garden/democracy/2024-03-07/vdem
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+  data://grapher/wpf/2024-10-03/famines_by_regime_gdp:
+    - data://garden/wpf/2024-10-03/famines_by_regime_gdp
+
+  data://garden/wpf/2024-10-03/famines_by_factor:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_factor:
+    - data://garden/wpf/2024-10-03/famines_by_factor
+
+  data://garden/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines_by_place
+
+  # Missing Data - Children out of school
+  data://garden/missing_data/2024-03-26/children_out_of_school:
+    - data://garden/wb/2024-06-10/gender_statistics
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/missing_data/2024-03-26/children_out_of_school:
+    - data://garden/missing_data/2024-03-26/children_out_of_school
 
 include:
   # Include all active steps plus all archive steps.
@@ -341,3 +405,4 @@ include:
   - dag/archive/artificial_intelligence.yml
   - dag/archive/urbanization.yml
   - dag/archive/education.yml
+  - dag/archive/biodiversity.yml

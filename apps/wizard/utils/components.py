@@ -3,12 +3,14 @@ import json
 import random
 from contextlib import contextmanager
 from copy import deepcopy
+from functools import wraps
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Literal, Optional
 
 import numpy as np
 import streamlit as st
 import streamlit.components.v1 as components
+import streamlit.errors
 
 from apps.wizard.config import PAGES_BY_ALIAS
 from apps.wizard.utils.chart_config import bake_chart_config
@@ -53,6 +55,12 @@ def _generate_6char_hash():
 
 @contextmanager
 def st_horizontal(vertical_alignment="baseline", justify_content="flex-start", hash_string=None):
+    """This is not very efficient, and is OK for few elements. If you want to use it several times (e.g. for loop) consider an alternative.
+
+    Example alternatives:
+        - If you want a row of buttons, consider using st.pills or st.segmented_control.
+        - In the general case, you can just use st.columns
+    """
     if hash_string is None:
         hash_string = _generate_6char_hash()
     h_style = HORIZONTAL_STYLE.format(
@@ -234,7 +242,14 @@ class Pagination:
 
     """
 
-    def __init__(self, items: list[Any], items_per_page: int, pagination_key: str, on_click: Optional[Callable] = None):
+    def __init__(
+        self,
+        items: list[Any],
+        items_per_page: int,
+        pagination_key: str,
+        on_click: Optional[Callable] = None,
+        save_in_query: bool = False,
+    ):
         """Construct Pagination.
 
         Parameters
@@ -247,16 +262,23 @@ class Pagination:
             Key to store the current page in session state.
         on_click : Optional[Callable], optional
             Action to perform when interacting with any of the buttons, by default None
+        save_in_query : bool, optional
+            Whether to save the current page in the query string, by default False
         """
         self.items = items
         self.items_per_page = items_per_page
         self.pagination_key = pagination_key
+        self.save_in_query = save_in_query
         # Action to perform when interacting with any of the buttons.
         ## Example: Change the value of certain state in session_state
         self.on_click = on_click
         # Initialize session state for the current page
         if self.pagination_key not in st.session_state:
-            self.page = 1
+            # Get page from query parameters
+            if self.save_in_query and self.pagination_key in st.query_params:
+                self.page = int(st.query_params[self.pagination_key])
+            else:
+                self.page = 1
 
     @property
     def page(self):
@@ -321,6 +343,11 @@ class Pagination:
     def show_controls_bar(self) -> None:
         def _change_page():
             # Internal action
+            if self.save_in_query:
+                if self.page == 1:
+                    st.query_params.pop(self.pagination_key)
+                else:
+                    st.query_params.update({self.pagination_key: self.page})
 
             # External action
             if self.on_click is not None:
@@ -376,11 +403,16 @@ def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
     if "icon" not in kwargs:
         kwargs["icon"] = PAGES_BY_ALIAS[alias]["icon"]
 
-    if border:
-        with st.container(border=True):
+    try:
+        if border:
+            with st.container(border=True):
+                st.page_link(**kwargs)
+        else:
             st.page_link(**kwargs)
-    else:
-        st.page_link(**kwargs)
+    except streamlit.errors.StreamlitPageNotFoundError:
+        # it must be run as a multi-page app to display the link, show warning
+        # if run via `streamlit .../app.py`
+        st.warning(f"App must be run via `make wizard` to display link to `{alias}`.")
 
 
 def preview_file(
@@ -408,7 +440,7 @@ def st_toast_success(message: str) -> None:
 def update_query_params(key):
     def _update_query_params():
         value = st.session_state[key]
-        if value:
+        if value is not None:
             st.query_params.update({key: value})
         else:
             st.query_params.pop(key, None)
@@ -416,12 +448,16 @@ def update_query_params(key):
     return _update_query_params
 
 
-def url_persist(component: Any, default: Any = None) -> Any:
+def remove_query_params(key):
+    st.query_params.pop(key, None)
+
+
+def url_persist(component: Any) -> Any:
     """Wrapper around streamlit components that persist values in the URL query string.
+    If value is equal to default value, it will not be added to the query string.
+    This is useful to avoid cluttering the URL with default values.
 
     :param component: Streamlit component to wrap
-    :param default: Default value. If value is equal to default value, it will not be added to the query string.
-        This is useful to avoid cluttering the URL with default values.
 
     Usage:
         url_persist(st.multiselect)(
@@ -429,16 +465,6 @@ def url_persist(component: Any, default: Any = None) -> Any:
           ...
         )
     """
-    # Component uses list of values
-    if component == st.multiselect:
-        repeated = True
-    else:
-        repeated = False
-
-    if component == st.checkbox:
-        convert_to_bool = True
-    else:
-        convert_to_bool = False
 
     def _persist(*args, **kwargs):
         assert "key" in kwargs, "key should be passed to persist"
@@ -447,37 +473,105 @@ def url_persist(component: Any, default: Any = None) -> Any:
 
         key = kwargs["key"]
 
-        # Set default value
-        if default is not None and key not in st.query_params:
-            st.session_state[key] = default
+        # Get default from `value` field
+        default = kwargs.pop("value", None)
 
-        if not st.session_state.get(key):
-            if repeated:
-                params = st.query_params.get_all(key)
-                # convert to int if digit
-                params = [int(q) if q.isdigit() else q for q in params]
+        # If parameter is in session state, set it to the value in the query string
+        if st.session_state.get(key) is None:
+            if key in st.query_params:
+                # Obtain params from query string
+                params = _get_params(component, key)
             else:
-                params = st.query_params.get(key)
-                if params and params.isdigit():
-                    params = int(params)
-                elif params and params.replace(".", "", 1).isdigit():
-                    params = float(params)
+                params = default
 
-            if convert_to_bool:
-                params = params == "True"
+            # Store params in session state
+            if params is not None:
+                st.session_state[key] = params
 
-            # Use `value` from the component as a default value if available
-            if not params and "value" in kwargs:
-                params = kwargs.pop("value")
+            # Check if the value given for an option via the URL is actually accepted!
+            # Allow empty values! NOTE: Might want to re-evaluate this, and add a flag to the function, e.g. 'allow_empty'
+            _check_options_params(kwargs, params)
 
-            st.session_state[key] = params
         else:
             # Set the value in query params, but only if it isn't default
-            if default is None or st.session_state[key] != default:
+            if default is None or st.session_state.get(key) != default:
                 update_query_params(key)()
+            elif st.session_state[key] == default:
+                remove_query_params(key)
 
         kwargs["on_change"] = update_query_params(key)
 
         return component(*args, **kwargs)
 
     return _persist
+
+
+def _check_options_params(kwargs, params):
+    """Check that the options in the URL query are valid.
+
+    NOTE: Empty values are allowed.
+
+    Wrong values will raise a ValueError.
+    """
+    if "options" in kwargs:
+        if isinstance(params, list):
+            not_expected = [p for p in params if p not in kwargs["options"]]
+            if (params != []) or (len(not_expected) != 0):
+                raise ValueError(
+                    f"Please review the URL query. Values {not_expected} not in options {kwargs['options']}."
+                )
+        elif params is not None:
+            # Set default value in query params
+            if params not in kwargs["options"]:
+                raise ValueError(f"Please review the URL query. Value {params} not in options {kwargs['options']}.")
+
+
+def _get_params(component, key):
+    """Get params from query string.
+
+    Converts the params to the correct type if needed.
+    """
+    if component == st.multiselect:
+        params = st.query_params.get_all(key)
+        # convert to int if digit
+        return [int(q) if q.isdigit() else q for q in params]
+    elif component == st.checkbox:
+        params = st.query_params.get(key)
+        return params == "True"
+    else:
+        params = st.query_params.get(key)
+        if params and params.isdigit():
+            return int(params)
+        elif params and params.replace(".", "", 1).isdigit():
+            return float(params)
+        else:
+            return params
+
+
+def st_cache_data(func=None, *, custom_text="Running...", show_spinner=False, **cache_kwargs):
+    """
+    A custom decorator that wraps `st.cache_data` and adds support for a `custom_text` argument.
+
+    Args:
+        func: The function to be cached.
+        custom_text (str): The custom spinner text to display.
+        show_spinner (bool): Whether to show the default Streamlit spinner message. Defaults to False.
+        **cache_kwargs: Additional arguments passed to `st.cache_data`.
+    """
+
+    def decorator(f):
+        # Wrap the function with st.cache_data and force show_spinner=False
+        cached_func = st.cache_data(show_spinner=show_spinner, **cache_kwargs)(f)
+
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            with st.spinner(custom_text):
+                return cached_func(*args, **kwargs)
+
+        return wrapper
+
+    # If used as @custom_cache_data without parentheses
+    if func is not None:
+        return decorator(func)
+
+    return decorator

@@ -428,3 +428,33 @@ tables:
         unit: "births per woman"
         description_short: |-
           Distribution of cumulative cohort fertility rates for women in a specific birth cohort.
+
+  cohort_share_women:
+    variables:
+      share_women:
+        title: |-
+          <% if num_births == '0' %>
+          Share of women without births
+          <%- elif num_births == '4' %>
+          Share of women with 4 or more births
+          <%- else %>
+          Share of women with << num_births >> births
+          <% endif %>
+        description_short: |-
+          <% if num_births == '0' %>
+          Share of women born in a given year that did not give birth.
+          <%- elif num_births == '4' %>
+          Share of women born in a given year that had 4 or more births.
+          <%- else %>
+          Share of women born in a given year that had << num_births >> or more births.
+          <% endif %>
+        unit: "%"
+        short_unit: "%"
+        description_processing: |-
+          We have estimated the share of women with N births using the estimates on the cohort parity progression ratio (ppr). ppr(N) is an estimate on the probability of giving birth to an Nth child, conditioned on having had N-1 children before.
+
+          Considering all of this, we have estimated the share of women with N births as:
+
+          share of women with N births = ppr(1) * ppr(2) * ··· * ppr(N) * [1 - ppr(N+1)]
+
+          Note that we need the [1 - ppr(N+1)] term to not count women that had more than N births.

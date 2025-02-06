@@ -58,6 +58,7 @@ etl:
       image_url: "https://greatescapepublishing.com/wp-content/uploads/2019/11/30463274482_90aff8a230_c.jpg"
       disable:
         "production": True
+        "staging": True
     data:
       title: "Data step"
       entrypoint: etl_steps/data.py
@@ -66,6 +67,7 @@ etl:
       description: "Meadow, Garden, Grapher."
       disable:
         "production": True
+        "staging": True
     fasttrack:
       title: "Fast Track"
       alias: fasttrack
@@ -117,9 +119,9 @@ sections:
     description: |-
       Control panel for ETL steps.
     apps:
-      - title: "Dashboard"
+      - title: "ETL dashboard"
         alias: dashboard
-        entrypoint: app_pages/dashboard.py
+        entrypoint: app_pages/dashboard/app.py
         description: Control panel for ETL steps
         maintainer: "@pablo"
         icon: ":material/tv_gen:"
@@ -135,7 +137,7 @@ sections:
         alias: producer-analytics
         description: "Share analytics with data producers"
         maintainer: "@pablo"
-        entrypoint: app_pages/producer_analytics.py
+        entrypoint: app_pages/producer_analytics/app.py
         icon: ":material/analytics:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Wikimedia_Product_Analytics_team_logo.svg/512px-Wikimedia_Product_Analytics_team_logo.svg.png"
 

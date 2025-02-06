@@ -108,6 +108,7 @@ def upsert_dataset(
             "upsert_dataset.upsert_dataset.end",
             short_name=short_name,
             id=ds.id,
+            url=f"http://{engine.url.host}/admin/datasets/{ds.id}",
         )
 
         source_ids: Dict[int, int] = dict()

@@ -17,7 +17,7 @@ tables:
         unit: kilocalories per day
         short_unit: kcal
         description_key:
-          - This data shows per capita daily calorie supply, which is the amount of calories available to an average person, and does necessarily correspond to the calories actually consumed by that person.
+          - This data shows per capita daily calorie supply, which is the amount of calories available to an average person, and does not necessarily correspond to the calories actually consumed by that person.
           - Calorie supply is always larger than actual calorie consumption, since there may be waste at the household level.
           - For historical data, daily calorie supply and consumption are sometimes used interchangeably, due to poor data availability.
           - "This data does not give a complete picture of nutrition - for a healthy diet [we need much more](https://ourworldindata.org/micronutrient-deficiency) than just energy. But as the most basic criteria of food security, getting enough calories is an important measure. It is used as input for the most important metrics used to assess global malnutrition: [undernourishment](https://ourworldindata.org/undernourishment-definition)."

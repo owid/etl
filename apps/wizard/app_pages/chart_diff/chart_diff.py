@@ -248,7 +248,7 @@ class ChartDiff:
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
 
         # Get all slugs from target
-        slugs_in_target = cls._get_chart_slugs(target_session)
+        slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
 
         # Build chart diffs
         chart_diffs = []
@@ -369,13 +369,24 @@ class ChartDiff:
             "is_rejected": self.is_rejected,
             "is_reviewed": self.is_reviewed,
             "is_new": self.is_new,
+            "change_types": self.change_types,
             "error": self.error,
         }
 
     @staticmethod
-    def _get_chart_slugs(target_session: Session) -> set[str]:
-        slugs_redirects = set(read_sql("SELECT slug FROM chart_slug_redirects", target_session)["slug"])
-        slugs = set(read_sql("SELECT slug FROM chart_configs", target_session)["slug"])
+    def _get_chart_slugs(target_session: Session, slugs: Optional[set[str]] = None) -> set[str]:
+        """Get all chart slugs. Use `slugs` to filter slugs as this can be slow otherwise."""
+        if slugs is not None:
+            where = "WHERE slug IN %(slugs)s"
+            params = {"slugs": tuple(slugs)}
+        else:
+            where = ""
+            params = {}
+
+        slugs_redirects = set(
+            read_sql(f"SELECT slug FROM chart_slug_redirects {where}", target_session, params=params)["slug"]
+        )
+        slugs = set(read_sql(f"SELECT slug FROM chart_configs {where}", target_session, params=params)["slug"])
         return slugs | slugs_redirects
 
     @staticmethod
