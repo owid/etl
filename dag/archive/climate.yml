@@ -801,22 +801,21 @@ steps:
   data://grapher/climate/2024-02-19/monthly_burned_area:
     - data://garden/climate/2024-02-19/monthly_burned_area
 
-
   #
   # Copernicus Climate Change Service - Surface temperature and precipitation.
   #
 
   data://meadow/climate/2024-11-19/total_precipitation:
-  - snapshot://climate/2024-11-19/total_precipitation.zip
-  - snapshot://countries/2023-12-27/world_bank.zip
+    - snapshot://climate/2024-11-19/total_precipitation.zip
+    - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2024-11-19/total_precipitation:
     - data://meadow/climate/2024-11-19/total_precipitation
   data://grapher/climate/2024-11-19/total_precipitation_annual:
     - data://garden/climate/2024-11-19/total_precipitation
 
   data://meadow/climate/2023-12-20/surface_temperature:
-  - snapshot://climate/2023-12-20/surface_temperature.zip
-  - snapshot://countries/2023-12-27/world_bank.zip
+    - snapshot://climate/2023-12-20/surface_temperature.zip
+    - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2023-12-20/surface_temperature:
     - data://meadow/climate/2023-12-20/surface_temperature
   data://grapher/climate/2023-12-20/surface_temperature_anomalies:
