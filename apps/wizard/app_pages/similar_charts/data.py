@@ -1,12 +1,10 @@
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
 import pandas as pd
 
-from apps.utils.google import read_gbq
 from apps.wizard.utils.embeddings import Doc
-from etl.config import memory
 from etl.db import read_sql
 
 
@@ -23,10 +21,6 @@ class Chart(Doc):
     views_14d: Optional[int] = None
     views_365d: Optional[int] = None
     gpt_reason: Optional[str] = None
-    coviews: Optional[int] = None
-
-    def to_dict(self) -> dict:
-        return asdict(self)
 
 
 def get_raw_charts() -> pd.DataFrame:
@@ -72,33 +66,3 @@ def get_raw_charts() -> pd.DataFrame:
     assert df["chart_id"].nunique() == df.shape[0]
 
     return df
-
-
-@memory.cache
-def get_coviews_sessions(after_date: str, min_sessions: int = 5) -> pd.Series:
-    """
-    Count of sessions in which a pair of URLs are both visited, aggregated daily
-
-    note: this is a nondirectional network. url1 and url2 are string sorted and
-    do not indicate anything about whether url1 was visited before/after url2 in
-    the session.
-    """
-    query = f"""
-        SELECT
-            REGEXP_EXTRACT(url1, r'grapher/([^/]+)') AS slug1,
-            REGEXP_EXTRACT(url2, r'grapher/([^/]+)') AS slug2,
-            SUM(sessions_coviewed) AS total_sessions
-        FROM prod_google_analytics4.coviews_by_day_page
-        WHERE day >= '{after_date}'
-            AND url1 LIKE 'https://ourworldindata.org/grapher%'
-            AND url2 LIKE 'https://ourworldindata.org/grapher%'
-        GROUP BY slug1, slug2
-        HAVING total_sessions >= {min_sessions}
-    """
-    df = read_gbq(query, project_id="owid-analytics")
-
-    # concat with reversed slug1 and slug2
-    df = pd.concat([df, df.rename(columns={"slug1": "slug2", "slug2": "slug1"})])
-
-    # set index for faster lookups
-    return df.set_index(["slug1", "slug2"]).sort_index()["total_sessions"]

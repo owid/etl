@@ -1,35 +1,18 @@
-import datetime as dt
 import random
-from typing import List
 
-import numpy as np
 import pandas as pd
 import streamlit as st
 from structlog import get_logger
 
 from apps.wizard.app_pages.similar_charts import data, scoring
 from apps.wizard.utils import embeddings as emb
-from apps.wizard.utils.cached import get_grapher_user
-from apps.wizard.utils.components import st_horizontal, st_multiselect_wider, url_persist
-from etl import paths
+from apps.wizard.utils.components import Pagination, st_horizontal, st_multiselect_wider, url_persist
 from etl.config import OWID_ENV
-from etl.db import get_engine
-from etl.git_helpers import log_time
 
-# PROFILER = start_profiler()
-
-ITEMS_PER_PAGE = 20
-
-# Initialize logger.
+# Initialize log.
 log = get_logger()
 
-# Database engine.
-engine = get_engine()
-
-# Get reviewer's name (if needed).
-reviewer = get_grapher_user().fullName
-
-# Page configuration.
+# PAGE CONFIG
 st.set_page_config(
     page_title="Wizard: Similar Charts",
     page_icon="🪄",
@@ -37,308 +20,223 @@ st.set_page_config(
 )
 
 ########################################################################################################################
-# CONSTANTS & FUNCTIONS
+# FUNCTIONS
 ########################################################################################################################
 
 
 @st.cache_data(show_spinner=False, ttl="1h")
 def get_charts() -> list[data.Chart]:
-    """Fetch chart metadata from the database and return a list of Chart objects."""
     with st.spinner("Loading charts..."):
+        # Get charts from the database..
         df = data.get_raw_charts()
+
         if len(df) == 0:
             raise ValueError("No charts found in the database.")
+
         charts = df.to_dict(orient="records")
 
-    results = []
+    ret = []
     for c in charts:
         c["tags"] = c["tags"].split(";") if c["tags"] else []
-        results.append(data.Chart(**c))  # type: ignore
-    return results
+        ret.append(data.Chart(**c))  # type: ignore
+
+    return ret
 
 
-@log_time
-@st.cache_data(show_spinner=False)
-def get_coviews() -> pd.Series:
-    """Return a Series with the number of coviewed sessions for each chart over the last 365 days."""
-    with st.spinner("Loading coviews..."):
-        return data.get_coviews_sessions(after_date=str(dt.date.today() - dt.timedelta(days=365)), min_sessions=3)
-
-
-@log_time
-@st.cache_data(show_spinner=False)
-def get_directional_coviews() -> pd.DataFrame:
-    """Load pre-processed directional coviews from a Feather file."""
-    return pd.read_feather(paths.BASE_DIR / "apps/wizard/app_pages/similar_charts/playground_coviews.feather")
-
-
-def st_chart_info(chart: data.Chart, show_coviews: bool = True) -> None:
-    """Display title, subtitle, tags, pageviews, and optional coviews of a given chart."""
+def st_chart_info(chart: data.Chart) -> None:
     chart_url = OWID_ENV.chart_site(chart.slug)
-    title = f"[{chart.title}]({chart_url})"
-    # Add GPT marker if present
+    title = f"#### [{chart.title}]({chart_url})"
     if chart.gpt_reason:
         title += " 🤖"
-
-    st.subheader(title, anchor=chart.slug)
-    st.markdown(f"**Slug**: {chart.slug}")
-    st.markdown(f"**Subtitle**: {chart.subtitle}")
-    st.markdown(f"**Tags**: {', '.join(chart.tags)}")
-    st.markdown(f"**Pageviews (365d)**: {chart.views_365d}")
-    if show_coviews:
-        st.markdown(f"**Coviews**: {chart.coviews}")
+    st.markdown(title)
+    st.markdown(f"Slug: {chart.slug}")
+    st.markdown(f"Subtitle: {chart.subtitle}")
+    st.markdown(f"Tags: **{', '.join(chart.tags)}**")
+    st.markdown(f"Pageviews: **{chart.views_365d}**")
 
 
-@log_time
-@st.cache_data(
-    show_spinner=False,
-    max_entries=1,
-    hash_funcs={list[data.Chart]: lambda charts: len(charts)},
-)
+def st_chart_scores(chart: data.Chart, sim_components: pd.DataFrame) -> None:
+    st.markdown(f"#### Similarity: {chart.similarity:.0%}")
+    st.table(sim_components.loc[chart.chart_id].to_frame("score").style.format("{:.0%}"))
+    if chart.gpt_reason:
+        st.markdown(f"**GPT Diversity Reason**:\n{chart.gpt_reason}")
+
+
+def st_display_chart(
+    chart: data.Chart,
+    sim_components: pd.DataFrame = pd.DataFrame(),
+) -> None:
+    with st.container(border=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            st_chart_info(chart)
+        with col2:
+            st_chart_scores(chart, sim_components)
+
+
+def split_input_string(input_string: str) -> tuple[str, list[str], list[str]]:
+    """Break input string into query, includes and excludes."""
+    # Break input string into query, includes and excludes
+    query = []
+    includes = []
+    excludes = []
+    for term in input_string.split():
+        if term.startswith("+"):
+            includes.append(term[1:].lower())
+        elif term.startswith("-"):
+            excludes.append(term[1:].lower())
+        else:
+            query.append(term)
+
+    return " ".join(query), includes, excludes
+
+
+@st.cache_data(show_spinner=False, max_entries=1)
 def get_and_fit_model(charts: list[data.Chart]) -> scoring.ScoringModel:
-    """Load an embedding model and fit it to the charts for similarity scoring."""
     with st.spinner("Loading model..."):
         scoring_model = scoring.ScoringModel(emb.get_model())
-    with st.spinner("Fitting model..."):
-        scoring_model.fit(charts)
+    scoring_model.fit(charts)
     return scoring_model
 
 
-def st_related_charts_table(
-    df: pd.DataFrame, n: int = 6, drop_cols: list[str] = ["score", "coviews_after", "coviews_before"]
-) -> None:
-    """
-    Displays a table of related charts, sorted by `score`.
-
-    Columns displayed in the table:
-    - Link to open the chart
-    - Chart ID (hidden in config)
-    - Title
-    - Slug
-    - Tags
-    - Views (365d)
-    - Coviews
-    - Coviews_after
-    - Coviews_before
-    - Score
-    - Rank
-    """
-    # Sort by the existing `score` column, descending
-    df = df.sort_values("score", ascending=False).head(n).copy()  # type: ignore
-    df["rank"] = range(1, len(df) + 1)
-
-    # Create a clickable link
-    df["link"] = df["slug"].apply(lambda x: OWID_ENV.chart_site(x))
-
-    final_cols = [
-        "link",
-        "chart_id",
-        "title",
-        "slug",
-        "tags",
-        "views_365d",
-        "coviews",
-        "coviews_after",
-        "coviews_before",
-        "score",
-        "rank",
-    ]
-    df = df[final_cols]
-
-    # Drop optional cols
-    df = df.drop(columns=drop_cols)
-
-    # Link column config
-    column_config = {
-        "link": st.column_config.LinkColumn("Open", display_text="Open"),
-        "chart_id": None,  # hide column name
-        "slug": None,  # hide column name
-    }
-
-    st.dataframe(
-        df,
-        use_container_width=True,
-        hide_index=True,
-        column_config=column_config,
-    )
-
-
-def add_coviews_to_charts(charts: List[data.Chart], chosen_chart: data.Chart, coviews: pd.Series) -> List[data.Chart]:
-    """
-    For the chosen chart, fetch its coview info from a coview Series and attach
-    to each chart object as `chart.coviews`.
-    """
-    try:
-        chosen_chart_coviews = coviews.loc[chosen_chart.slug].to_dict()
-    except KeyError:
-        chosen_chart_coviews = {}
-
-    for c in charts:
-        c.coviews = chosen_chart_coviews.get(c.slug, 0)
-
-    return charts
-
-
 ########################################################################################################################
-# DATA & MODEL
-########################################################################################################################
-
+# Fetch all data indicators.
 charts = get_charts()
-coviews = get_coviews()
-
+# Get scoring model.
 scoring_model = get_and_fit_model(charts)
-# Ensure `charts` property is set on the model, especially if loaded from cache
-scoring_model.charts = charts
-
-# Create a map for quick lookups by chart_id (optional usage)
-chart_map = {chart.chart_id: chart for chart in charts}
-
-# Pick top 100 charts by pageviews
-top_100_charts = sorted(charts, key=lambda x: x.views_365d, reverse=True)[:100]  # type: ignore
 
 ########################################################################################################################
-# SIDEBAR / SEARCH
+
+
+########################################################################################################################
+# RENDER
 ########################################################################################################################
 
+# Streamlit app layout.
 st.title(":material/search: Similar charts")
 
 col1, col2 = st.columns(2)
 with col2:
     st_multiselect_wider()
     with st_horizontal():
-        random_chart = st.button("Random chart", help="Pick a random chart, weighted by views.")
-        random_100_chart = st.button("Random top 100 chart", help="Pick a random chart from the top 100 charts.")
+        random_chart = st.button("Random chart", help="Get a random chart.")
 
-    # If "Random chart" or no slug is provided, choose a random chart
-    if random_chart or not st.query_params.get("slug"):
-        weights = np.array([c.views_365d for c in charts])
-        weights = np.nan_to_num(weights, nan=0)
-        chart = random.choices(charts, weights=weights, k=1)[0]  # type: ignore
-        st.session_state["slug"] = chart.slug
-    elif random_100_chart:
-        chart_slug = random.sample(top_100_charts, 1)[0].slug
-        st.session_state["slug"] = chart_slug
+        # Filter indicators
+        diversity_gpt = url_persist(st.checkbox)(
+            "Diversity with GPT",
+            key="diversity_gpt",
+            value=True,
+            help="Use GPT to select 5 most diverse charts from the top 30 similar charts.",
+        )
 
-    # Main selectbox for charts
-    slug = url_persist(st.selectbox)(
+    # Random chart was pressed or no search text
+    if random_chart or not st.query_params.get("chart_search_text"):
+        chart_slug = random.sample(charts, 1)[0].slug
+        st.session_state["chart_search_text"] = chart_slug
+
+    # chart_search_text = url_persist(st.text_input)(
+    #     key="chart_search_text",
+    #     label="Chart slug or ID",
+    #     placeholder="Type something...",
+    # )
+
+    chart_search_text = url_persist(st.selectbox)(
         "Select a chart",
-        key="slug",
+        key="chart_search_text",
         options=[c.slug for c in charts],
     )
 
-    # Advanced options
+    # Advanced expander.
     st.session_state.sim_charts_expander_advanced_options = st.session_state.get(
         "sim_charts_expander_advanced_options", False
     )
+
+    # Weights for each score
     with st.expander("Advanced options", expanded=st.session_state.sim_charts_expander_advanced_options):
-        # Number of recommendations to show
-        url_persist(st.slider)(
-            "# of recommendations",
-            key="nr_recommendations",
-            min_value=5,
-            max_value=20,
-            value=6,
-            step=1,
-            format="%.0f",
+        # Add text area for system prompt
+        system_prompt = url_persist(st.text_area)(
+            "GPT prompt for selecting diverse results",
+            key="gpt_system_prompt",
+            value=scoring.DEFAULT_SYSTEM_PROMPT,
+            height=150,
         )
-        nr_recommendations = st.session_state["nr_recommendations"]
 
-# Find the chosen chart
-chosen_chart = next((c for c in charts if c.slug == slug or str(c.chart_id) == slug), None)
+        for score_name in ["title", "subtitle", "tags", "pageviews", "share_indicator"]:
+            # For some reason, if the slider minimum value is zero, streamlit raises an error when the slider is
+            # dragged to the minimum. Set it to a small, non-zero number.
+            key = f"w_{score_name}"
+
+            # Set default values
+            if key not in st.session_state:
+                st.session_state[key] = scoring.DEFAULT_WEIGHTS[score_name]
+
+            url_persist(st.slider)(
+                f"Weight for {score_name} score",
+                min_value=1e-9,
+                max_value=1.0,
+                # step=0.001,
+                key=key,
+                value=scoring.DEFAULT_WEIGHTS[score_name],
+            )
+
+            scoring_model.weights[score_name] = st.session_state[key]
+
+
+# Find a chart based on inputs
+chosen_chart = next(
+    (chart for chart in charts if chart.slug == chart_search_text or str(chart.chart_id) == chart_search_text),
+    None,
+)
 if not chosen_chart:
-    st.error(f"Chart with slug `{slug}` not found.")
-    st.stop()
+    st.error(f"Chart with slug {chart_search_text} not found.")
 
-# Attach coviews to each chart object
-charts = add_coviews_to_charts(charts, chosen_chart, coviews)
+    # # Find a chart by title
+    # chart_id = scoring_model.similar_chart_by_title(chart_search_text)
+    # chosen_chart = next((chart for chart in charts if chart.chart_id == chart_id), None)
 
-# Compute similarity components for all charts
+assert chosen_chart
+
+# Display chosen chart
+with col1:
+    st_chart_info(chosen_chart)
+
+
+# Horizontal divider
+st.markdown("---")
+
+sim_dict = scoring_model.similarity(chosen_chart)
 sim_components = scoring_model.similarity_components(chosen_chart)
 
-# Convert charts to a DataFrame
-charts_df = pd.DataFrame([c.to_dict() for c in charts]).set_index("chart_id")
+for chart in charts:
+    chart.similarity = sim_dict[chart.chart_id]
 
-# Join charts with similarity scores
-charts_df = charts_df.join(sim_components)
+sorted_charts = sorted(charts, key=lambda x: x.similarity, reverse=True)  # type: ignore
 
-# Exclude the chosen chart itself
-charts_df = charts_df.loc[charts_df.index != chosen_chart.chart_id]
+# Postprocess charts with GPT and prioritize diversity
+if diversity_gpt:
+    with st.spinner("Diversifying chart results..."):
+        slugs_to_reasons = scoring.gpt_diverse_charts(chosen_chart, sorted_charts, system_prompt=system_prompt)
+    for chart in sorted_charts:
+        if chart.slug in slugs_to_reasons:
+            chart.gpt_reason = slugs_to_reasons[chart.slug]
 
-# Join directional coviews
-dir_cov = get_directional_coviews()
-charts_df["coviews_after"] = (
-    dir_cov[dir_cov.slug1 == chosen_chart.slug]
-    .set_index("slug2")["sessions_coviewed"]
-    .reindex(charts_df["slug"])
-    .values
+    # Put charts that are diverse at the top
+    # sorted_charts = sorted(sorted_charts, key=lambda x: (x.gpt_reason is not None, x.similarity), reverse=True)
+
+# Use pagination
+items_per_page = 20
+pagination = Pagination(
+    items=sorted_charts,
+    items_per_page=items_per_page,
+    pagination_key=f"pagination-di-search-{chosen_chart.slug}",
 )
-charts_df["coviews_before"] = (
-    dir_cov[dir_cov.slug2 == chosen_chart.slug]
-    .set_index("slug1")["sessions_coviewed"]
-    .reindex(charts_df["slug"])
-    .values
-)
 
-########################################################################################################################
-# DISPLAY
-########################################################################################################################
+if len(charts) > items_per_page:
+    pagination.show_controls(mode="bar")
 
-with col1:
-    st_chart_info(chosen_chart, show_coviews=False)
-
-
-def show_section_others_viewed(df: pd.DataFrame, n: int) -> None:
-    st.markdown("---")
-    st.header("Others also viewed")
-    st.markdown(
-        "These charts have the **highest number of coviews** (undirected) with the current chart. "
-        "For completeness, we also split total coviews into coviews_before the selected chart and coviews_after."
-    )
-
-    df = df.copy()
-    df["score"] = df["coviews"]
-    st_related_charts_table(df, n=n, drop_cols=["score"])
-
-
-def show_section_related_charts(df: pd.DataFrame, n: int) -> None:
-    st.markdown("---")
-    st.header("Related charts by title/subtitle")
-    st.markdown("This section shows charts with **high semantic similarity** in their titles and subtitles.")
-
-    df = df.copy()
-    df["score"] = (df["title_score"] + df["subtitle_score"]) * 0.5
-    st_related_charts_table(df, n=n)
-
-
-def show_section_other_providers(df: pd.DataFrame, n: int) -> None:
-    st.markdown("---")
-    st.header("Other providers")
-    st.markdown(
-        "Identifying other providers is a hard problem. Here we show charts with **very similar titles**."
-        "More precise identification would require GPT or deeper data relationships."
-    )
-
-    df = df.copy()
-    # Filter to only extremely close title matches
-    df = df[df["title_score"] > 0.985]
-    df["score"] = df["title_score"]
-    st_related_charts_table(df, n=n)
-
-
-def show_section_explore_included_data(df: pd.DataFrame, n: int) -> None:
-    st.markdown("---")
-    st.header("Explore charts that include this data")
-    st.markdown("These charts **share at least one indicator** (the same data) with the current chart.")
-
-    df = df.copy()
-    df = df[df["share_indicator"] == 1]
-    df["score"] = df["share_indicator"]
-    st_related_charts_table(df, n=n)
-
-
-# Render the different sections
-reset_df = charts_df.reset_index()
-show_section_others_viewed(reset_df, nr_recommendations)
-show_section_related_charts(reset_df, nr_recommendations)
-show_section_other_providers(reset_df, nr_recommendations)
-show_section_explore_included_data(reset_df, nr_recommendations)
+# Show items (only current page)
+for item in pagination.get_page_items():
+    # Don't show the chosen chart
+    if item.slug == chosen_chart.slug:
+        continue
+    st_display_chart(item, sim_components)

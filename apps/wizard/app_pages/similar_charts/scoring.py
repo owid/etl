@@ -1,5 +1,6 @@
 import json
 import time
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -8,7 +9,7 @@ from sentence_transformers import SentenceTransformer
 from structlog import get_logger
 
 from apps.utils.gpt import GPTQuery, OpenAIWrapper
-from apps.wizard.app_pages.related_charts.data import Chart
+from apps.wizard.app_pages.similar_charts.data import Chart
 from apps.wizard.utils import embeddings as emb
 from etl.db import read_sql
 
@@ -20,16 +21,12 @@ log = get_logger()
 
 # These are the default thresholds for the different scores.
 DEFAULT_WEIGHTS = {
-    "title": 0.3,
+    "title": 0.4,
     "subtitle": 0.1,
     "tags": 0.1,
+    "pageviews": 0.3,
     "share_indicator": 0.1,
-    "pageviews_score": 0.3,
-    "coviews_score": 0.1,
 }
-
-# Default regularization term for coviews
-DEFAULT_COVIEWS_REGULARIZATION = 0.0
 
 PREFIX_SYSTEM_PROMPT = """
 You are an expert in recommending visual data insights.
@@ -58,11 +55,14 @@ class ScoringModel:
     emb_title: emb.EmbeddingsModel
     emb_subtitle: emb.EmbeddingsModel
 
-    def __init__(self, model: SentenceTransformer, coviews_regularization: float = 0) -> None:
-        self.model = model
-        self.coviews_regularization = coviews_regularization
+    # Weights for the different scores
+    weights: dict[str, float]
 
-    def fit(self, charts: list[Chart]) -> None:
+    def __init__(self, model: SentenceTransformer, weights: Optional[dict[str, float]] = None) -> None:
+        self.model = model
+        self.weights = weights or DEFAULT_WEIGHTS.copy()
+
+    def fit(self, charts: list[Chart]):
         self.charts = charts
 
         # Get embeddings for title and subtitle
@@ -71,6 +71,21 @@ class ScoringModel:
 
         self.emb_subtitle = emb.EmbeddingsModel(self.model, model_name="sim_charts_subtitle")
         self.emb_subtitle.fit(charts, text=lambda d: d.subtitle)
+
+    def set_weights(self, weights: dict[str, float]):
+        self.weights = weights
+
+    def similarity(self, chart: Chart) -> dict[int, float]:
+        assert self.weights is not None, "Weights must be set before calling similarity"
+
+        scores = self.similarity_components(chart)
+
+        # Get weights and normalize them
+        # w = pd.Series(self.weights)
+        # w = w / w.sum()
+
+        # Calculate total score
+        return scores.sum(axis=1).to_dict()
 
     def similar_chart_by_title(self, title: str) -> int:
         title_scores = self.emb_title.calculate_similarity(title)
@@ -102,13 +117,12 @@ class ScoringModel:
             ret.append(
                 {
                     "chart_id": c.chart_id,
-                    "title_score": title_scores[i],
-                    "subtitle_score": subtitle_scores[i],
+                    "title": title_scores[i],
+                    "subtitle": subtitle_scores[i],
                     # score 1 if there is at least one tag in common, 0 otherwise
-                    "tags_score": float(bool(set(c.tags) & set(chart.tags))),
-                    "share_indicator": float(c.chart_id in charts_sharing_indicator),
+                    "tags": float(bool(set(c.tags) & set(chart.tags))),
                     "pageviews": c.views_365d or 0,
-                    "coviews": c.coviews or 0,
+                    "share_indicator": float(c.chart_id in charts_sharing_indicator),
                 }
             )
 
@@ -120,55 +134,28 @@ class ScoringModel:
         if chart.subtitle == "":
             ret["subtitle"] = 0
 
-        ret["pageviews_score"] = score_pageviews(ret["pageviews"])
-        ret["coviews_score"] = score_coviews(
-            ret["coviews"], ret["pageviews"], regularization=self.coviews_regularization
+        # Scale pageviews to [0, 1]
+        ret["pageviews"] = np.log(ret["pageviews"] + 1)
+        ret["pageviews"] = (ret["pageviews"] - ret["pageviews"].min()) / (
+            ret["pageviews"].max() - ret["pageviews"].min()
         )
-        ret["jaccard_score"] = score_jaccard(ret["coviews"], ret["pageviews"], chart.views_365d or 0)
+
+        # Get weights and normalize them
+        w = pd.Series(self.weights)
+        w = w / w.sum()
+
+        # Multiply scores by weights
+        ret = (ret * w).fillna(0)
 
         # Reorder
-        ret = ret[
-            [
-                "title_score",
-                "subtitle_score",
-                "tags_score",
-                "share_indicator",
-                "pageviews_score",
-                "coviews_score",
-                "jaccard_score",
-            ]
-        ]
+        ret = ret[["title", "subtitle", "tags", "share_indicator", "pageviews"]]
 
         log.info("similarity_components.end", t=time.time() - t)
 
         return ret
 
 
-def score_pageviews(pageviews: pd.Series) -> pd.Series:
-    """Log transform pageviews and scale them to [0, 1]. Chart with the most pageviews gets score 1 and
-    chart with the least pageviews gets score 0.
-    """
-    pageviews = np.log(pageviews + 1)  # type: ignore
-    return (pageviews - pageviews.min()) / (pageviews.max() - pageviews.min())
-
-
-def score_coviews(coviews: pd.Series, pageviews: pd.Series, regularization: float) -> float:
-    """Score coviews. First, get ratio of coviews to pageviews. Add regularization term to pageviews
-    to penalize charts with high pageviews that tend to show up, despite being not very relevant.
-    Then, normalize the score to [0, 1].
-    """
-    # p = coviews / (pageviews + lam)
-    # return (p - p.min()) / (p.max() - p.min())
-    p = coviews - regularization * pageviews
-    return p / p.max()
-
-
-def score_jaccard(coviews: pd.Series, pageviews: pd.Series, chosen_pageviews: float) -> pd.Series:
-    """Score coviews using Jaccard similarity. Normalize the score to [0, 1]."""
-    return coviews / (pageviews + chosen_pageviews - coviews)
-
-
-@st.cache_data(show_spinner=False, persist="disk", hash_funcs={Chart: lambda chart: chart.chart_id})
+@st.cache_data(show_spinner=False, persist="disk")
 def gpt_diverse_charts(
     chosen_chart: Chart, _charts: list[Chart], _n: int = 30, system_prompt=DEFAULT_SYSTEM_PROMPT
 ) -> dict[str, str]:

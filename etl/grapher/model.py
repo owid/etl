@@ -53,7 +53,6 @@ from sqlalchemy import (
 )
 from sqlalchemy import JSON as _JSON
 from sqlalchemy.dialects.mysql import (
-    DOUBLE,
     ENUM,
     LONGBLOB,
     LONGTEXT,
@@ -1787,68 +1786,6 @@ class ChartDiffConflicts(Base):
         assert len(chart_ids) == len(conflicts), "Length of chart_ids and conflicts must be the same."
 
         return conflicts
-
-
-RELATED_CHART_LABEL = Literal["good", "bad", "neutral"]
-
-
-class RelatedChart(Base):
-    __tablename__ = "related_charts"
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["chartId"], ["charts.id"], ondelete="CASCADE", onupdate="CASCADE", name="related_charts_ibfk_1"
-        ),
-        ForeignKeyConstraint(
-            ["relatedChartId"], ["charts.id"], ondelete="CASCADE", onupdate="CASCADE", name="related_charts_ibfk_2"
-        ),
-        # Existing Index on chartId
-        Index("idx_related_charts_chartId", "chartId"),
-        # 1) Unique index on (chartId, relatedChartId, reviewer)
-        Index("uq_chartId_relatedChartId_reviewer", "chartId", "relatedChartId", "reviewer", unique=True),
-    )
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
-    chartId: Mapped[int] = mapped_column(Integer, nullable=False)
-    relatedChartId: Mapped[int] = mapped_column(Integer, nullable=False)
-    label: Mapped[RELATED_CHART_LABEL] = mapped_column(VARCHAR(255), nullable=False)
-    reviewer: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
-    score: Mapped[Optional[float]] = mapped_column(DOUBLE, default=None)
-    reason: Mapped[Optional[str]] = mapped_column(TEXT, default=None)
-    updatedAt: Mapped[datetime] = mapped_column(DateTime, default=func.utc_timestamp())
-
-    @classmethod
-    def load(cls, session: Session, chart_id: Optional[int] = None) -> list["RelatedChart"]:
-        # Exclude "production" reviewer which is generated automatically
-        stm = select(cls).where(cls.reviewer != "production")
-
-        if chart_id is None:
-            records = session.scalars(stm).all()
-        else:
-            records = session.scalars(stm.where(cls.chartId == chart_id)).all()
-        return list(records)
-
-    def upsert(
-        self,
-        session: Session,
-    ) -> "RelatedChart":
-        cls = self.__class__
-
-        ds = session.scalars(
-            select(cls).where(
-                cls.chartId == self.chartId, cls.relatedChartId == self.relatedChartId, cls.reviewer == self.reviewer
-            )
-        ).one_or_none()
-
-        if not ds:
-            ds = self
-        else:
-            ds.label = self.label
-            ds.reason = self.reason
-            ds.updatedAt = func.utc_timestamp()
-
-        session.add(ds)
-        session.flush()
-        return ds
 
 
 class MultiDimDataPage(Base):
