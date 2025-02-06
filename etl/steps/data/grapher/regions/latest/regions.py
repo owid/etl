@@ -21,6 +21,8 @@ paths = PathFinder(__file__)
 
 
 # Countries that are mappable in Grapher.
+# NOTE: The list was copied from etl/steps/data/external/owid_grapher/latest/regions.py
+#  We should revisit whether this is list is necessary for this step on the next update.
 MAPPABLE_COUNTRIES = [
     "AFG",
     "AGO",
