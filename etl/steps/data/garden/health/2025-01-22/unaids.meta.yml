@@ -436,7 +436,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of {definitions.people_dimension} who test positive for HIV at a given time. This is the HIV Prevalence estimate.
+          Share of {definitions.people_dimension} who test positive for HIV at a given time. This is the << estimate >> estimate.
         description_key:
           - It is estimated by dividing the number of people in a given group who tested positive for HIV by all the people were tested.
           - Reflects the overall burden of HIV within a specific population.
