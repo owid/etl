@@ -1,0 +1,26 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  producer_prices_in_industry:
+    variables:
+      value:
+        title: Index value
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Index value of the producer prices in industry.
+      flag:
+        title: Data flag
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Flag assigned by Eurostat for a given value in the data.

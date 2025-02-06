@@ -270,6 +270,16 @@ steps:
   data://garden/eurostat/2025-02-03/harmonised_index_of_consumer_prices:
     - data://meadow/eurostat/2025-02-03/harmonised_index_of_consumer_prices
   #
+  # Eurostat - Producer prices in industry
+  #
+  data://meadow/eurostat/2025-02-03/producer_prices_in_industry:
+    - snapshot://eurostat/2025-02-03/producer_prices_in_industry.gz
+  #
+  # Eurostat - Producer prices in industry
+  #
+  data://garden/eurostat/2025-02-03/producer_prices_in_industry:
+    - data://meadow/eurostat/2025-02-03/producer_prices_in_industry
+  #
   # Eurostat - Energy statistics, prices of natural gas and electricity
   #
   data://meadow/eurostat/2025-02-03/gas_and_electricity_prices:
@@ -290,6 +300,7 @@ steps:
   #
   data://garden/ember/2025-02-03/european_wholesale_electricity_prices:
     - data://meadow/ember/2025-02-03/european_wholesale_electricity_prices
+    - data://garden/eurostat/2025-02-03/producer_prices_in_industry
   #
   # Energy prices
   #
