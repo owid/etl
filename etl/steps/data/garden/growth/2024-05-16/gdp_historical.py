@@ -1,6 +1,6 @@
 """
 This code combines the data of three different sources of GDP and GDP per capita:
-    - World Bank (WDI), in 2017 PPPs (coverage from 1990 to the most recent year available)
+    - World Bank (WDI), in 2021 PPPs (coverage from 1990 to the most recent year available)
     - Maddison Project Database, in 2011 PPPs (coverage from 1820 to the most recent year available)
     - Maddison Database, in 1990 PPPs (coverage from 1 CE to 2008)
 

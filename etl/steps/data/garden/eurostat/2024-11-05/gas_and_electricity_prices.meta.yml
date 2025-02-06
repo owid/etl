@@ -12,7 +12,7 @@ definitions:
     A non-household consumer of gas or electricity is a business or organization using energy for purposes like industry, services, offices, or agriculture.
   # Definitions of consumer bands:
   description_key_all_consumer_bands: |-
-    Prices are a weighted average across all consumption bands, from low to high energy consumers, based on the relative consumption shares reported by each country.
+    Prices are an average across all levels of energy consumption, from small to large users. In each country, the average is weighted based on the share of energy used by each consumption level.
   # Definitions of price components:
   # Eurostat's definitions can be found:
   # * For gas: https://ec.europa.eu/eurostat/cache/metadata/en/nrg_pc_202_sims.htm
@@ -44,7 +44,7 @@ definitions:
   description_key_gas_component_other_taxes: &description_key_gas_component_other_taxes |-
     "All other taxes" include fees, levies, or charges not covered by other tax components. They may relate to district heating support, local or regional fiscal charges, island compensation, concession fees for licenses, or fees for occupying land or property with networks or other devices.
   description_key_gas_component_total_price_including_taxes: &description_key_gas_component_total_price_including_taxes |-
-    "Total price including taxes" is the sum of all price components, including energy and supply, network costs, taxes, fees, levies and charges.
+    The total price covers all components and taxes. This includes energy and supply, network costs, taxes, fees, levies and charges.
   description_key_electricity_component_energy_and_supply: |-
     "Energy and supply" is the cost of electricity generation, aggregation, balancing, and other supply-related activities, including end-user costs such as customer services and after-sales management.
   description_key_electricity_component_network_cost: *description_key_gas_component_network_cost

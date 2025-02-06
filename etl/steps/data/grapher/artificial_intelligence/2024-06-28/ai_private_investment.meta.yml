@@ -29,6 +29,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  title: AI Index Report - AI investment in private companies
 
 tables:
   ai_private_investment:
