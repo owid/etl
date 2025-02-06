@@ -5,6 +5,7 @@ from typing import List
 import numpy as np
 import pandas as pd
 import streamlit as st
+from owid.catalog import s3_utils
 from structlog import get_logger
 
 from apps.wizard.app_pages.related_charts import data, scoring
@@ -28,6 +29,13 @@ engine = get_engine()
 
 # Get reviewer's name (if needed).
 reviewer = get_grapher_user().fullName
+
+# Download coviews from R2 if they don't exist
+# NOTE: this is temporary, if it proves to be useful, it should be loaded dynamically
+COVIEWS_PATH = paths.BASE_DIR / "apps/wizard/app_pages/similar_charts/playground_coviews.feather"
+if not COVIEWS_PATH.exists():
+    log.info("Downloading coviews from S3")
+    s3_utils.download("s3://owid-private/mojmir/related_charts/playground_coviews.feather", COVIEWS_PATH.as_posix())
 
 # Page configuration.
 st.set_page_config(
@@ -69,7 +77,7 @@ def get_coviews() -> pd.Series:
 @st.cache_data(show_spinner=False)
 def get_directional_coviews() -> pd.DataFrame:
     """Load pre-processed directional coviews from a Feather file."""
-    return pd.read_feather(paths.BASE_DIR / "apps/wizard/app_pages/similar_charts/playground_coviews.feather")
+    return pd.read_feather(COVIEWS_PATH)
 
 
 def st_chart_info(chart: data.Chart, show_coviews: bool = True) -> None:
