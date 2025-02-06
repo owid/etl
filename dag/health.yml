@@ -179,6 +179,9 @@ steps:
   data://grapher/oecd/2024-07-01/road_accidents:
     - data://garden/oecd/2024-07-01/road_accidents
 
+  data://garden/oecd/2018-03-11/road_deaths_and_injuries:
+    - snapshot://oecd/2018-03-11/road_deaths_and_injuries.feather
+
   # Kucharski
   data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski:
     - snapshot://health/2023-08-14/avian_influenza_h5n1_kucharski.xlsx
