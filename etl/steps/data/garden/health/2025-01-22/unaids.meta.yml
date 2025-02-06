@@ -412,8 +412,8 @@ tables:
       hiv_incidence:
         title: "HIV Incidence per 1,000 population - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "infections per 1,000 people"
-        description_from_producer: |-
-          Number of {definitions.people_dimension} newly infected with HIV in the reporting period per 1,000 uninfected people. This is the <<estimate.title()>> estimate.
+        description_short: |-
+          Number of {definitions.people_dimension} newly infected with HIV in the last year per 1,000 uninfected people. This is the <<estimate.title()>> estimate.
         description_key:
           - The main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
           - This indicator is a crucial metric in the WHO 2022 Consolidated guidelines on person-centered HIV strategic information.
