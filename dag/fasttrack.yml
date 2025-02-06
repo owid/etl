@@ -58,8 +58,6 @@ steps:
     - snapshot-private://fasttrack/latest/historical_france_mortality_cause.csv
   data-private://grapher/fasttrack/latest/welfare_broiler_chickens:
     - snapshot-private://fasttrack/latest/welfare_broiler_chickens.csv
-  data://grapher/fasttrack/2023-08-21/survey_livestock_oklahoma:
-    - snapshot://fasttrack/2023-08-21/survey_livestock_oklahoma.csv
   data://grapher/fasttrack/latest/sentience_institute:
     - snapshot://fasttrack/latest/sentience_institute.csv
   data://grapher/fasttrack/latest/smallpox_cases:
