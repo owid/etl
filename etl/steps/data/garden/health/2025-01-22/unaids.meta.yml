@@ -1546,15 +1546,15 @@ tables:
         unit: "%"
         description_short: |-
           <% if group == "men who have sex with men" %>
-          Percentage of {definitions.gam_groups.msm} reporting using a condom the last time they had anal sex with a male partner.
+          Share of {definitions.gam_groups.msm} reporting using a condom the last time they had anal sex with a male partner.
           <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
-          Percentage of {definitions.gam_groups.trans} reporting using a condom during their most recent sexual intercourse or anal sex.
+          Share of {definitions.gam_groups.trans} reporting using a condom during their most recent sexual intercourse or anal sex.
           <%- elif group == "people who inject drugs" %>
-          Percentage of {definitions.gam_groups.pwid} reporting using a condom the last time they had sexual intercourse.
+          Share of {definitions.gam_groups.pwid} reporting using a condom the last time they had sexual intercourse.
           <%- elif group == "sex workers" %>
-          Percentage of {definitions.gam_groups.sw} reporting using a condom with their most recent client.
+          Share of {definitions.gam_groups.sw} reporting using a condom with their most recent client.
           <%- elif group == "high-risk sex" %>
-          Percentage of respondents who say they used a condom the last time they had sex with a non-marital, non-cohabiting partner, of those who have had sex with such a partner in the last 12 months.
+          Share of respondents who say they used a condom the last time they had sex with a non-marital, non-cohabiting partner, of those who have had sex with such a partner in the last 12 months.
           <%- endif %>
         description_from_producer: |-
           <% if group == "men who have sex with men" %>
