@@ -197,12 +197,6 @@ GROUPS = (
                 "anomalist": "apps.anomalist.cli.cli",
             },
         },
-        {
-            "name": "Related Charts",
-            "commands": {
-                "related-charts": "apps.related_charts.cli.cli",
-            },
-        },
     ]
     # Add subgroups (don't modify)
     + subgroups
