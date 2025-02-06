@@ -23,6 +23,26 @@ memory = Memory(CACHE_DIR, verbose=0)
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define deflator and conversion indicator
+
+# Deflator indicator can be
+# GDP deflators
+# ny_gdp_defl_zs_ad, GDP deflator: linked series (base year varies by country)
+# ny_gdp_defl_zs, GDP deflator (base year varies by country)
+
+# CPI deflators
+#     fp_cpi_totl, Consumer price index (2010 = 100)
+DEFLATOR_INDICATOR = "ny_gdp_defl_zs_ad"
+
+# Conversion indicator can be
+# Exchange rates
+#     pa_nus_fcrf, Official exchange rate (LCU per US$, period average)
+
+# PPP conversion factors
+#     pa_nus_ppp, PPP conversion factor, GDP (LCU per international $)
+#     pa_nus_prvt_pp, PPP conversion factor, private consumption (LCU per international $)
+CONVERSION_INDICATOR = "pa_nus_fcrf"
+
 
 def run(dest_dir: str) -> None:
     log.info("wdi.start")
@@ -79,8 +99,8 @@ def run(dest_dir: str) -> None:
         tb=tb_garden,
         indicators=["ny_gdp_mktp_cd", "ny_gdp_pcap_cd"],
         base_year=2015,
-        deflator_indicator="ny_gdp_defl_zs",
-        conversion_indicator="pa_nus_fcrf",
+        deflator_indicator=DEFLATOR_INDICATOR,
+        conversion_indicator=CONVERSION_INDICATOR,
         local_currency_units=False,
     )
 
@@ -89,8 +109,8 @@ def run(dest_dir: str) -> None:
         tb=tb_garden,
         indicators=["ny_gdp_mktp_cn", "ny_gdp_pcap_cn"],
         base_year=2015,
-        deflator_indicator="ny_gdp_defl_zs",
-        conversion_indicator="pa_nus_fcrf",
+        deflator_indicator=DEFLATOR_INDICATOR,
+        conversion_indicator=CONVERSION_INDICATOR,
         local_currency_units=True,
     )
 
@@ -644,20 +664,16 @@ def adjust_current_to_constant_usd(
     Available deflator indicators in WDI:
 
     GDP deflators
-        ny_gdp_defl_kd_zg_ad, Inflation, GDP deflator: linked series (annual %)
-        ny_gdp_defl_kd_zg, Inflation, GDP deflator (annual %)
         ny_gdp_defl_zs_ad, GDP deflator: linked series (base year varies by country)
         ny_gdp_defl_zs, GDP deflator (base year varies by country)
 
     CPI deflators
-        fp_cpi_totl_zg, Inflation, consumer prices (annual %)
         fp_cpi_totl, Consumer price index (2010 = 100)
 
     Available conversion indicators in WDI:
 
     Exchange rates
         pa_nus_fcrf, Official exchange rate (LCU per US$, period average)
-        px_rex_reer, Real effective exchange rate index (2010 = 100)
 
     PPP conversion factors
         pa_nus_ppp, PPP conversion factor, GDP (LCU per international $)
