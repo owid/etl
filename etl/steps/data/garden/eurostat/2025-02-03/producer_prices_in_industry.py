@@ -14,7 +14,7 @@ COLUMNS = {
     "nace_r2": "classification",
     "geo": "country",
     "time": "date",
-    "value": "value",
+    "value": "ppi",
 }
 
 # NOTE: The description of the flags is given below the main table in
@@ -32,8 +32,8 @@ FLAGS = {
 
 
 def sanity_check_outputs(tb: Table) -> None:
-    assert tb["value"].notnull().all(), "Some values are missing."
-    assert (tb["value"] >= 0).all(), "Negative values are not allowed."
+    assert tb["ppi"].notnull().all(), "Some values are missing."
+    assert (tb["ppi"] >= 0).all(), "Negative values are not allowed."
 
 
 def run(dest_dir: str) -> None:
@@ -56,9 +56,9 @@ def run(dest_dir: str) -> None:
     )
 
     # Separate flags from values.
-    tb["flag"] = tb["value"].astype("string").str.extract(r"([a-z]+)", expand=False)
+    tb["flag"] = tb["ppi"].astype("string").str.extract(r"([a-z]+)", expand=False)
     tb["flag"] = tb["flag"].map(FLAGS).fillna("")
-    tb["value"] = tb["value"].str.replace(r"[a-z]", "", regex=True).str.strip().astype("Float64")
+    tb["ppi"] = tb["ppi"].str.replace(r"[a-z]", "", regex=True).str.strip().astype("Float64")
 
     # Run sanity checks on outputs.
     sanity_check_outputs(tb=tb)

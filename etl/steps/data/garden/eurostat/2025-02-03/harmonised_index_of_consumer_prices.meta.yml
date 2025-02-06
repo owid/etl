@@ -12,7 +12,7 @@ dataset:
 tables:
   harmonised_index_of_consumer_prices:
     variables:
-      value:
+      hicp:
         title: Index value
         unit: ""
         short_unit: ""

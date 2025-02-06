@@ -18,11 +18,13 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load meadow dataset, and read its main table.
     ds_meadow = paths.load_dataset("european_wholesale_electricity_prices")
-
-    # Read table from meadow dataset.
     tb_monthly = ds_meadow.read("european_wholesale_electricity_prices")
+
+    # Load Eurostat Producer Prices in Industry dataset, and read its main table.
+    ds_ppi = paths.load_dataset("producer_prices_in_industry")
+    tb_ppi = ds_ppi.read("producer_prices_in_industry")
 
     #
     # Process data.
@@ -32,6 +34,20 @@ def run(dest_dir: str) -> None:
 
     # Harmonize country names.
     tb_monthly = geo.harmonize_countries(df=tb_monthly, countries_file=paths.country_mapping_path)
+
+    # Select Producer Prices Index for classification "[MIG_NRG] MIG - energy".
+    tb_ppi = tb_ppi[tb_ppi["classification"] == "MIG_NRG"].drop(columns=["classification"]).reset_index(drop=True)
+
+    # Adapt dates in PPI dataset to match the monthly electricity prices.
+    tb_ppi["date"] = tb_ppi["date"].str.strip() + "-01"
+    assert tb_ppi["date"].str.len().eq(10).all(), "Unexpected date format in PPI dataset."
+
+    # Combine energy prices table with PPI table.
+    tb_monthly = tb_monthly.merge(tb_ppi, on=["country", "date"], how="left")
+
+    # Adjust monthly prices for inflation.
+    # NOTE: When doing this, many prices will be lost (e.g. UK data from 2020 onwards).
+    tb_monthly["price"] = tb_monthly["price"] * 100 / tb_monthly["ppi"]
 
     # Ember provides monthly data, so we can create a monthly table of wholesale electricity prices.
     # But we also need to create an annual table of average wholesale electricity prices.

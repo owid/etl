@@ -12,7 +12,7 @@ dataset:
 tables:
   producer_prices_in_industry:
     variables:
-      value:
+      ppi:
         title: Index value
         unit: ""
         short_unit: ""

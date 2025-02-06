@@ -10,10 +10,10 @@ paths = PathFinder(__file__)
 
 # Columns to keep and how to rename them.
 COLUMNS = {
-    "coicop": "coicop",
+    "coicop": "classification",
     "geo": "country",
     "time": "date",
-    "value": "value",
+    "value": "hicp",
 }
 
 # NOTE: The description of the flags is given below the main table in
@@ -25,8 +25,8 @@ FLAGS = {"b": "break in time series", "u": "low reliability", "d": "definition d
 
 
 def sanity_check_outputs(tb: Table) -> None:
-    assert tb["value"].notnull().all(), "Some values are missing."
-    assert (tb["value"] >= 0).all(), "Negative values are not allowed."
+    assert tb["hicp"].notnull().all(), "Some values are missing."
+    assert (tb["hicp"] >= 0).all(), "Negative values are not allowed."
 
 
 def run(dest_dir: str) -> None:
@@ -49,15 +49,15 @@ def run(dest_dir: str) -> None:
     )
 
     # Separate flags from values.
-    tb["flag"] = tb["value"].astype("string").str.extract(r"([a-z]+)", expand=False)
+    tb["flag"] = tb["hicp"].astype("string").str.extract(r"([a-z]+)", expand=False)
     tb["flag"] = tb["flag"].map(FLAGS).fillna("")
-    tb["value"] = tb["value"].str.replace(r"[a-z]", "", regex=True).str.strip().astype("Float64")
+    tb["hicp"] = tb["hicp"].str.replace(r"[a-z]", "", regex=True).str.strip().astype("Float64")
 
     # Run sanity checks on outputs.
     sanity_check_outputs(tb=tb)
 
     # Improve main table format.
-    tb = tb.format(keys=["country", "date", "coicop"])
+    tb = tb.format(keys=["country", "date", "classification"])
 
     #
     # Save outputs.

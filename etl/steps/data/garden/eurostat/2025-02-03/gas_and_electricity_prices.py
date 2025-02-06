@@ -877,15 +877,11 @@ def run(dest_dir: str) -> None:
     # As recommended by Eurostat, we will use only the following:
     # [TOT_X_NRG] Overall index excluding energy
     # Excluding the energy component helps in depicting the prices adjusted for the underlying inflationary trends, without being distorted by the volatility typically associated with energy commodities. In this respect, adjusted prices will include the impact of the energy cost changes.
-    tb_hicp = tb_hicp[tb_hicp["coicop"] == "TOT_X_NRG"].reset_index(drop=True)
+    tb_hicp = tb_hicp[tb_hicp["classification"] == "TOT_X_NRG"].reset_index(drop=True)
 
     # Calculate average HICP for each country and year.
     tb_hicp["year"] = tb_hicp["date"].str[0:4].astype(int)
-    tb_hicp = (
-        tb_hicp.groupby(["country", "year"], observed=True, as_index=False)
-        .agg({"value": "mean"})
-        .rename(columns={"value": "hicp"}, errors="raise")
-    )
+    tb_hicp = tb_hicp.groupby(["country", "year"], observed=True, as_index=False).agg({"hicp": "mean"})
 
     # Add HICP column to main table.
     tb = tb.merge(tb_hicp, how="left", on=["country", "year"])
