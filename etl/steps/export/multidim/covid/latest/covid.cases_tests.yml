@@ -24,6 +24,7 @@ views:
       x: grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right
     config:
       chartTypes: ["ScatterPlot"]
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
   - dimensions:
       normalize: per_capita
     indicators:
@@ -31,6 +32,7 @@ views:
       x: grapher/covid/latest/cases_deaths/cases_deaths#new_cases_per_million_7_day_avg_right
       color: 123
     config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       chartTypes: ["ScatterPlot"]
       map:
         colorScale:

@@ -2,15 +2,16 @@ definitions:
   table: grapher/covid/latest/cases_deaths/cases_deaths
   config: &config
     tab: map
-    originUrl: ourworldindata.org/coronavirus
+    originUrl: ourworldindata.org/coronavirusB
     hideAnnotationFieldsInTitle:
       entity: true
       time: true
       changeInPrefix: true
+    $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
 
 title:
   title: COVID-19 confirmed cases
-  titleVariant: by interval
+  titleVariant: ""
 defaultSelection:
   - World
   - Europe

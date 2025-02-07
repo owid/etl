@@ -38,6 +38,7 @@ views:
         - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
 
     config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       title: "Daily new estimated COVID-19 infections from the ICL model"
       subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
       note: This chart shows the model estimates dated 25 December 2022.
@@ -56,6 +57,7 @@ views:
         - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
 
     config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       title: "Daily new estimated COVID-19 infections from the IHME model"
       subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
       note: This chart shows the model estimates dated 16 December 2022.
@@ -74,6 +76,7 @@ views:
         - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
 
     config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       title: "Daily new estimated COVID-19 infections from the LSHTM model"
       subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
       note: This chart shows the model estimates dated 25 August 2020.
@@ -92,6 +95,7 @@ views:
         - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
 
     config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       title: "Daily new estimated COVID-19 infections from the YYG model"
       subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
       note: This chart shows the model estimates dated 4 October 2020. YYG announced that this is the final model update.

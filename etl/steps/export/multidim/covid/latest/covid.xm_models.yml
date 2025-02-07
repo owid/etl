@@ -43,12 +43,12 @@ views:
         - "{definitions.indicator_confirmed}"
 
     config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       title: "Estimated cumulative excess deaths during COVID-19"
       subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
       originUrl: ourworldindata.org/coronavirus
       hideAnnotationFieldsInTitle:
         time: true
-
 
   # The Economist
   - dimensions:
@@ -61,6 +61,7 @@ views:
         - "{definitions.indicator_confirmed}"
 
     config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       title: "Estimated cumulative excess deaths during COVID-19"
       subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
       originUrl: ourworldindata.org/coronavirus
@@ -78,6 +79,7 @@ views:
         - "{definitions.indicator_confirmed}"
 
     config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       title: "Estimated cumulative excess deaths during COVID-19"
       subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
       originUrl: ourworldindata.org/coronavirus
@@ -95,6 +97,7 @@ views:
         - "{definitions.indicator_confirmed}"
 
     config:
+      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       title: "Estimated cumulative excess deaths during COVID-19"
       subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
       originUrl: ourworldindata.org/coronavirus

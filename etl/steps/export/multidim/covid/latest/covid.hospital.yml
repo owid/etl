@@ -1,12 +1,12 @@
 definitions:
   table: grapher/covid/latest/hospital/hospital
   config: &config
+    $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
     hideAnnotationFieldsInTitle:
       entity: true
       time: true
       changeInPrefix: true
     originUrl: ourworldindata.org/coronavirus
-
 
 title:
   title: COVID-19 hospitalisations
