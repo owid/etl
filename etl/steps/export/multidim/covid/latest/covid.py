@@ -23,9 +23,14 @@ def run(dest_dir: str) -> None:
     ]
     # Load YAML file
     for fname in filenames:
+        paths.log.info(fname)
         config = paths.load_mdim_config(fname)
         slug = fname_to_slug(fname)
-        multidim.upsert_multidim_data_page(slug, config, engine)
+        multidim.upsert_multidim_data_page(
+            slug,
+            config,
+            engine,
+        )
 
     # Automatic ones (they have dimensions in the tables)
     fname = "covid.mobility.yml"

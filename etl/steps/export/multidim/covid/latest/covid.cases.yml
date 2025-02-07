@@ -51,7 +51,7 @@ views:
       y:
         catalogPath: "{definitions.table}#weekly_cases"
         display:
-          name: "something"
+          name: whatever
     config: *config
   - dimensions:
       interval: weekly

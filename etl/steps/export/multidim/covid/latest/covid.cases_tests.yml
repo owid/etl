@@ -30,7 +30,7 @@ views:
     indicators:
       y: grapher/covid/latest/testing/testing#new_tests_per_thousand_7day_smoothed
       x: grapher/covid/latest/cases_deaths/cases_deaths#new_cases_per_million_7_day_avg_right
-      color: 123
+      color: grapher/regions/2023-01-01/regions/regions#owid_region
     config:
       $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       chartTypes: ["ScatterPlot"]
