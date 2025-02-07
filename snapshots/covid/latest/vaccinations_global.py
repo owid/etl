@@ -55,7 +55,7 @@ def modify_metadata(snap: Snapshot) -> Snapshot:
     # Get access date
     snap.metadata.origin.date_accessed = date.today()  # type: ignore
     # Set publication date
-    snap.metadata.origin.publication_date = date.today()  # type: ignore
+    snap.metadata.origin.date_published = date.today()  # type: ignore
     # Save
     snap.metadata.save()
     return snap
