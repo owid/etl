@@ -13,6 +13,11 @@ COLUMNS = {
     "price__eur_mwhe": "price",
 }
 
+# Minimum number of countries that must be informed per month (applied to PPI data).
+# If the number is smaller than this, the month is removed from the data.
+# We do this to avoid having very sparse data (especially on the latest informed month).
+MIN_NUM_COUNTRIES_INFORMED_PER_MONTH = 10
+
 
 def run(dest_dir: str) -> None:
     #
@@ -41,6 +46,12 @@ def run(dest_dir: str) -> None:
     # Adapt dates in PPI dataset to match the monthly electricity prices.
     tb_ppi["date"] = tb_ppi["date"].str.strip() + "-01"
     assert tb_ppi["date"].str.len().eq(10).all(), "Unexpected date format in PPI dataset."
+
+    # Remove months for which we don't have enough countries.
+    # This happens at least to the most recently informed month, where only a few countries are displayed.
+    tb_ppi = tb_ppi[
+        tb_ppi.groupby(["date"])["country"].transform("count") > MIN_NUM_COUNTRIES_INFORMED_PER_MONTH
+    ].reset_index(drop=True)
 
     # Combine energy prices table with PPI table.
     tb_monthly = tb_monthly.merge(tb_ppi, on=["country", "date"], how="left")
