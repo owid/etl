@@ -26,6 +26,9 @@ paths = PathFinder(__file__)
 # Define GDP/GDP per capita indicators in current US$ and their counterpart in constant LCU
 GDP_INDICATORS = {"ny_gdp_mktp_cd": "ny_gdp_mktp_kn", "ny_gdp_pcap_cd": "ny_gdp_pcap_kn"}
 
+# Define base year to calculate constant 2021 US$ GDPs to compare with constant 2021 int-$ GDPs
+BASE_YEAR_FOR_CONSTANT_USD_GDP = 2021
+
 
 def run(dest_dir: str) -> None:
     log.info("wdi.start")
@@ -83,7 +86,7 @@ def run(dest_dir: str) -> None:
             tb=tb_garden,
             indicator_current_usd=gdp_current_usd,
             indicator_constant_lcu=gdp_constant_lcu,
-            base_year=2015,
+            base_year=BASE_YEAR_FOR_CONSTANT_USD_GDP,
         )
 
     ####################################################################################################################
