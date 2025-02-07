@@ -52,6 +52,7 @@ def _extract_catalog_path(indicator_raw):
     else:
         raise ValueError(f"Unexpected indicator property type: {indicator_raw}")
 
+
 def validate_multidim_config(config: dict, engine: Engine) -> None:
     # Ensure that all views are in choices
     for dim in config["dimensions"]:
