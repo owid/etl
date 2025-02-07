@@ -135,15 +135,15 @@ views:
       - Excess mortality (count)
       - Cumulative
       - True
-  - indicator: grapher/excess_mortality/latest/excess_mortality/excess_mortality#cum_excess_proj_all_ages_last12m
-    options:
-      - Excess mortality (count)
-      - Cumulative (last 12 months)
-  - indicator: grapher/excess_mortality/latest/excess_mortality/excess_mortality#cum_excess_per_million_proj_all_ages_last12m
-    options:
-      - Excess mortality (count)
-      - Cumulative (last 12 months)
-      - True
+  # - indicator: grapher/excess_mortality/latest/excess_mortality/excess_mortality#cum_excess_proj_all_ages_last12m
+  #   options:
+  #     - Excess mortality (count)
+  #     - Cumulative (last 12 months)
+  # - indicator: grapher/excess_mortality/latest/excess_mortality/excess_mortality#cum_excess_per_million_proj_all_ages_last12m
+  #   options:
+  #     - Excess mortality (count)
+  #     - Cumulative (last 12 months)
+  #     - True
 
   #######################
   # Excess mortality (%)

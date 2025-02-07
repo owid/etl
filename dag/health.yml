@@ -11,15 +11,6 @@ steps:
   data://grapher/health/2023-08-16/deaths_karlinsky:
     - data://garden/health/2023-08-16/deaths_karlinsky
 
-  # WHO Vaccination data
-  data://meadow/who/2022-07-17/who_vaccination:
-    - walden://who/2022-07-17/who_vaccination
-  data://garden/who/2022-07-17/who_vaccination:
-    - data://meadow/who/2022-07-17/who_vaccination
-    - data://garden/un/2022-07-11/un_wpp
-  data://grapher/who/2022-07-17/who_vaccination:
-    - data://garden/who/2022-07-17/who_vaccination
-
   # IHME GBD Leading cause of  deaths - update
   data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
     - snapshot-private://ihme_gbd/2024-06-10/cause_hierarchy.csv
@@ -126,16 +117,13 @@ steps:
     - data://garden/unicef/2023-06-16/diarrhea
 
   # Guinea worm
-  data://meadow/who/2023-06-29/guinea_worm:
+  data://meadow/who/2023-06-29/guinea_worm_certification:
     - snapshot://who/2023-06-29/guinea_worm.csv
-  data://garden/who/2023-06-29/guinea_worm:
-    - data://meadow/who/2023-06-29/guinea_worm
-    - data://grapher/fasttrack/2023-06-28/guinea_worm
-  data://grapher/who/2023-06-30/guinea_worm:
-    - data://garden/who/2023-06-29/guinea_worm
+  data://garden/who/2023-06-29/guinea_worm_certification:
+    - data://meadow/who/2023-06-29/guinea_worm_certification
 
   data://garden/who/2024-06-17/guinea_worm:
-    - data://garden/who/2023-06-29/guinea_worm
+    - data://garden/who/2023-06-29/guinea_worm_certification
     - snapshot://fasttrack/2024-06-17/guinea_worm.csv
   data://grapher/who/2024-06-17/guinea_worm:
     - data://garden/who/2024-06-17/guinea_worm
@@ -199,6 +187,9 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/oecd/2024-07-01/road_accidents:
     - data://garden/oecd/2024-07-01/road_accidents
+
+  data://garden/oecd/2018-03-11/road_deaths_and_injuries:
+    - snapshot://oecd/2018-03-11/road_deaths_and_injuries.feather
 
   # Kucharski
   data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski:
@@ -415,13 +406,13 @@ steps:
   data://grapher/health/2024-04-12/polio_free_countries:
     - data://garden/health/2024-04-12/polio_free_countries
 
-  # Polio vaccine schedule
-  data://meadow/who/2024-04-22/polio_vaccine_schedule:
-    - snapshot://who/2024-04-22/polio_vaccine_schedule.xlsx
-  data://garden/who/2024-04-22/polio_vaccine_schedule:
-    - data://meadow/who/2024-04-22/polio_vaccine_schedule
-  data://grapher/who/2024-04-22/polio_vaccine_schedule:
-    - data://garden/who/2024-04-22/polio_vaccine_schedule
+    # Polio vaccine schedule - update
+  data://meadow/who/2025-01-13/polio_vaccine_schedule:
+    - snapshot://who/2025-01-13/polio_vaccine_schedule.xlsx
+  data://garden/who/2025-01-13/polio_vaccine_schedule:
+    - data://meadow/who/2025-01-13/polio_vaccine_schedule
+  data://grapher/who/2025-01-13/polio_vaccine_schedule:
+    - data://garden/who/2025-01-13/polio_vaccine_schedule
 
   # Polio GPEI funding
   data://meadow/health/2024-04-22/gpei_funding:
@@ -905,10 +896,13 @@ steps:
     - data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome
   data-private://grapher/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr:
     - data-private://garden/antibiotics/2024-12-05/microbe_total_deaths_by_syndrome_amr
+
+  # WHO Immunization coverage
   data://meadow/who/2024-12-10/vaccination_coverage:
     - snapshot://who/2024-12-10/vaccination_coverage.xlsx
   data://garden/who/2024-12-10/vaccination_coverage:
     - data://meadow/who/2024-12-10/vaccination_coverage
+    - data://garden/un/2024-07-12/un_wpp
   data://grapher/who/2024-12-10/vaccination_coverage:
     - data://garden/who/2024-12-10/vaccination_coverage
 
@@ -921,3 +915,32 @@ steps:
     - data://meadow/health/2024-12-31/height
   data://grapher/health/2024-12-31/height:
     - data://garden/health/2024-12-31/height
+
+  #
+  # WHO Vaccine Introductions
+  #
+  data://meadow/who/2025-01-09/vaccination_schedules:
+    - snapshot://who/2025-01-09/vaccination_schedules.xlsx
+  data://garden/who/2025-01-09/vaccination_schedules:
+    - data://meadow/who/2025-01-09/vaccination_schedules
+  data://grapher/who/2025-01-09/vaccination_schedules:
+    - data://garden/who/2025-01-09/vaccination_schedules
+
+  #
+  # WHO vaccine stock out
+  #
+  data://meadow/who/2025-01-17/vaccine_stock_out:
+    - snapshot://who/2025-01-17/vaccine_stock_out.xlsx
+  data://garden/who/2025-01-17/vaccine_stock_out:
+    - data://meadow/who/2025-01-17/vaccine_stock_out
+  data://grapher/who/2025-01-17/vaccine_stock_out:
+    - data://garden/who/2025-01-17/vaccine_stock_out
+
+  #
+  # WHO Mortality Database - Vaccine Preventable
+  data://meadow/who/2025-01-17/mortality_database_vaccine_preventable:
+    - snapshot://who/2025-01-17/mortality_database_vaccine_preventable.csv
+  data://garden/who/2025-01-17/mortality_database_vaccine_preventable:
+    - data://meadow/who/2025-01-17/mortality_database_vaccine_preventable
+  data://grapher/who/2025-01-17/mortality_database_vaccine_preventable:
+    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable

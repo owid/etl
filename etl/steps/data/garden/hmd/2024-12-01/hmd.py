@@ -106,6 +106,17 @@ def run(dest_dir: str) -> None:
     # 6/ Create table with differences and ratios
     tb_ratios = make_table_diffs_ratios(tb_lt)
 
+    # 7/ Death aggregates (absolute and rate)
+    ## Aggregate deaths (only use single-year age groups, and not ranges, to avoid double-counting)
+    tb_mort_all = tb_mort.loc[tb_mort["age"].str.contains("-")]
+    tb_mort_all = tb_mort_all.groupby(["country", "year", "sex"], as_index=False)["deaths"].sum()
+    ## Population table already provides total population
+    tb_pop_all = tb_pop.loc[tb_pop["age"] == "total"]
+    ## Merge & estimate rate
+    tb_deaths = tb_mort_all.merge(tb_pop_all, on=["country", "year", "sex"])
+    tb_deaths["death_rate"] = tb_deaths["deaths"] / tb_deaths["population"] * 1_000
+    tb_deaths = tb_deaths.drop(columns=["age", "population"])
+
     # Create list with tables
     paths.log.info("saving tables")
     tables = [
@@ -115,6 +126,7 @@ def run(dest_dir: str) -> None:
         tb_pop.format(["country", "year", "sex", "age"]),
         tb_births.format(["country", "year", "sex"]),
         tb_ratios.format(["country", "year", "age", "type"], short_name="diff_ratios"),
+        tb_deaths.format(["country", "year", "sex"], short_name="deaths_agg"),
     ]
 
     #

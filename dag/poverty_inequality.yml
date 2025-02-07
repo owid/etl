@@ -5,14 +5,6 @@ steps:
     - data://explorers/wid/latest/world_inequality_database
     - data://explorers/lis/latest/luxembourg_income_study
 
-  # Poverty and inequality file for Joe's PhD
-  data://explorers/poverty_inequality/latest/poverty_inequality_export:
-    - data://garden/wb/2024-10-07/world_bank_pip
-    - data://garden/wid/2024-05-24/world_inequality_database
-    - data://garden/lis/2024-06-13/luxembourg_income_study
-    - data://garden/wb/2024-01-22/thousand_bins_distribution
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-
   # World Bank Poverty and Inequality Platform
   data://meadow/wb/2024-10-07/world_bank_pip:
     - snapshot://wb/2024-10-07/world_bank_pip.csv
@@ -43,22 +35,41 @@ steps:
     - data://garden/wid/2024-05-24/world_inequality_database
 
   # Luxembourg Income Study
-  data://meadow/lis/2024-06-13/luxembourg_income_study:
-    - snapshot://lis/2024-06-13/lis_keyvars.csv
-    - snapshot://lis/2024-06-13/lis_distribution_adults.csv
-    - snapshot://lis/2024-06-13/lis_keyvars_adults.csv
-    - snapshot://lis/2024-06-13/lis_abs_poverty.csv
-    - snapshot://lis/2024-06-13/lis_distribution.csv
-    - snapshot://lis/2024-06-13/lis_abs_poverty_adults.csv
+  data://meadow/lis/2025-01-24/luxembourg_income_study:
+    - snapshot://lis/2025-01-24/lis_keyvars.csv
+    - snapshot://lis/2025-01-24/lis_abs_poverty.csv
+    - snapshot://lis/2025-01-24/lis_distribution.csv
+    - snapshot://lis/2025-01-24/lis_keyvars_adults.csv
+    - snapshot://lis/2025-01-24/lis_abs_poverty_adults.csv
+    - snapshot://lis/2025-01-24/lis_distribution_adults.csv
     - snapshot://lis/2024-06-13/lis_percentiles.csv
     - snapshot://lis/2024-06-13/lis_percentiles_adults.csv
     - data://garden/regions/2023-01-01/regions
-  data://garden/lis/2024-06-13/luxembourg_income_study:
-    - data://meadow/lis/2024-06-13/luxembourg_income_study
-  data://grapher/lis/2024-06-13/luxembourg_income_study:
-    - data://garden/lis/2024-06-13/luxembourg_income_study
+  data://garden/lis/2025-01-24/luxembourg_income_study:
+    - data://meadow/lis/2025-01-24/luxembourg_income_study
+  data://grapher/lis/2025-01-24/luxembourg_income_study:
+    - data://garden/lis/2025-01-24/luxembourg_income_study
   data://explorers/lis/latest/luxembourg_income_study:
-    - data://garden/lis/2024-06-13/luxembourg_income_study
+    - data://garden/lis/2025-01-24/luxembourg_income_study
+
+  # Poverty and inequality file for inequality comparisons at OWID
+  data://garden/poverty_inequality/2025-01-22/poverty_inequality_file:
+    - data://garden/wb/2024-10-07/world_bank_pip
+    - data://garden/wid/2024-05-24/world_inequality_database
+    - data://garden/lis/2025-01-24/luxembourg_income_study
+    - data://garden/wb/2024-01-22/thousand_bins_distribution
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+  data://grapher/poverty_inequality/2025-01-22/inequality_comparison:
+    - data://garden/poverty_inequality/2025-01-22/inequality_comparison
+
+  # Inequality comparison data
+  data://garden/poverty_inequality/2025-01-22/inequality_comparison:
+    - data://garden/poverty_inequality/2025-01-22/poverty_inequality_file
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-10-07/world_bank_pip
+    - data://garden/wid/2024-05-24/world_inequality_database
+    - data://garden/lis/2025-01-24/luxembourg_income_study
 
   # Global Multidimensional Poverty Index
   data://meadow/ophi/2024-10-28/multidimensional_poverty_index:
@@ -123,9 +134,10 @@ steps:
     - data://garden/igh/2024-07-05/better_data_homelessness
 
   # Poverty projections from the Poverty, Prosperity and Planet Report 2024
-  data://meadow/wb/2024-12-03/poverty_projections:
-    - snapshot://wb/2024-12-03/reproducibility_package_poverty_prosperity_planet.zip
-  data://garden/wb/2024-12-03/poverty_projections:
-    - data://meadow/wb/2024-12-03/poverty_projections
-  data://grapher/wb/2024-12-03/poverty_projections:
-    - data://garden/wb/2024-12-03/poverty_projections
+  data://meadow/wb/2025-01-15/poverty_projections:
+    - snapshot://wb/2025-01-15/reproducibility_package_poverty_prosperity_planet.zip
+  data://garden/wb/2025-01-15/poverty_projections:
+    - data://meadow/wb/2025-01-15/poverty_projections
+  data://grapher/wb/2025-01-15/poverty_projections:
+    - data://garden/wb/2025-01-15/poverty_projections
+

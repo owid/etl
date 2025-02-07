@@ -169,3 +169,57 @@ def commit_file_to_github(
         log.info(f"Would have committed {file_path} to {repo_name} on branch {branch}.")
     else:
         log.info(f"Committed {file_path} to {repo_name} on branch {branch}.")
+
+
+def get_git_branch_from_commit_sha(commit_sha: str) -> str:
+    """Get the branch name from a merged pull request commit sha. This is useful for Buildkite jobs where we only have the commit sha."""
+    if config.OWIDBOT_ACCESS_TOKEN:
+        headers = {"Authorization": f"token {config.OWIDBOT_ACCESS_TOKEN}"}
+    else:
+        headers = {}
+
+    # get all pull requests for the commit
+    pull_requests = requests.get(
+        f"https://api.github.com/repos/owid/etl/commits/{commit_sha}/pulls", headers=headers
+    ).json()
+
+    # filter the closed ones
+    closed_pull_requests = [pr for pr in pull_requests if pr["state"] == "closed"]
+
+    # get the branch of the most recent one
+    if closed_pull_requests:
+        return closed_pull_requests[0]["head"]["ref"]
+    else:
+        raise ValueError(f"No closed pull requests found for commit {commit_sha}")
+
+
+def get_prs_from_repo(repo_name: str) -> list[dict]:
+    # Start with the first page
+    url = f"https://api.github.com/repos/owid/{repo_name}/pulls?per_page=100"
+    if config.OWIDBOT_ACCESS_TOKEN:
+        headers = {"Authorization": f"token {config.OWIDBOT_ACCESS_TOKEN}"}
+    else:
+        headers = {}
+
+    active_prs = []
+    while url:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # To handle HTTP errors
+        js = response.json()
+
+        # Collect PR head refs from the current page
+        for d in js:
+            # only owid PRs
+            if d["head"]["label"].startswith("owid:"):
+                active_prs.append(d["head"]["ref"])
+
+        # Check for the 'next' page link in the headers
+        if "next" in response.links:
+            url = response.links["next"]["url"]
+        else:
+            url = None  # No more pages
+
+    # exclude dependabot PRs
+    active_prs = [pr for pr in active_prs if "dependabot" not in pr]
+
+    return active_prs

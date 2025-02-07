@@ -3,12 +3,12 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Immunization data
+    title: WHO Immunization Data - Vaccination coverage
     description: |-
-      These estimates are based on quantitative data: 
+      These estimates are based on quantitative data:
 
-      1) Country-reported coverage data (official and administrative coverage) 
-      2) survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate). 
+      1) Country-reported coverage data (official and administrative coverage)
+      2) survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate).
 
       As such, these estimates are affected by the availability and quality of the underlying empirical data.
     date_published: "2024-07-15"
@@ -17,9 +17,8 @@ meta:
     # Citation
     producer: WHO & UNICEF
     citation_full: |-
-      WHO/UNICEF Estimates of National Immunization Coverage (WUENIC), 2023 Revision (completed 15 July 2024), data from 1980-2023. 
+      WHO/UNICEF Estimates of National Immunization Coverage (WUENIC), 2023 Revision (completed 15 July 2024), data from 1980-2023.
     attribution_short: WHO/UNICEF
-
     # Files
     url_main: https://immunizationdata.who.int/global?topic=Vaccination-coverage&location=
     url_download: https://srhdpeuwpubsa-geecgzbpd5h0fueu.z01.azurefd.net/whdh/WIISE/export/coverage-data.xlsx
@@ -31,6 +30,6 @@ meta:
       url: https://www.who.int/about/policies/terms-of-use
 
 outs:
-  - md5: d34d5dbff1a1f304b08e78d75c07fb6c
-    size: 17287024
+  - md5: ed9a0373711bffcfb39714457d1280fd
+    size: 17324597
     path: vaccination_coverage.xlsx

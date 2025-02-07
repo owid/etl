@@ -118,7 +118,7 @@ def download_chart_png(png_url, output_file):
 
     # Skip download if the file already exists.
     if output_file.exists():
-        log.info(f"File {output_file} already exists. Skipping download.")
+        # log.info(f"File {output_file} already exists. Skipping download.")
         return output_file
 
     # Ensure the directory exists.
@@ -188,7 +188,7 @@ def get_images_from_chart_url(
         return None
 
     # Download PNGs in parallel.
-    log.info("Downloading images in parallel.")
+    # log.info("Downloading images in parallel.")
     image_paths = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {

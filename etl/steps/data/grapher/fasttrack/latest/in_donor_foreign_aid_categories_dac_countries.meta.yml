@@ -1,0 +1,27 @@
+dataset:
+  title: DRAFT In-donor foreign aid categories DAC countries
+  description: ''
+tables:
+  in_donor_foreign_aid_categories_dac_countries:
+    variables:
+      debt_relief:
+        title: Debt_Relief
+        unit: ''
+      in_donor_student_costs:
+        title: In_Donor_Student_Costs
+        unit: ''
+      development_awareness:
+        title: Development_Awareness
+        unit: ''
+      in_donor_refugee_costs:
+        title: In_Donor_Refugee_Costs
+        unit: ''
+      total:
+        title: Total
+        unit: ''
+      in_donor_research:
+        title: In_Donor_Research
+        unit: ''
+      administrative_costs:
+        title: Administrative_Costs
+        unit: ''

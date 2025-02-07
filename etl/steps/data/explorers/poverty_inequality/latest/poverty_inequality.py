@@ -13,7 +13,7 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    # Load WID explorer step
+    # Load WID explorer step.
     ds_wid = paths.load_dataset("world_inequality_database")
     tb_wid = ds_wid["world_inequality_database"].reset_index()
 
@@ -27,14 +27,27 @@ def run(dest_dir: str) -> None:
 
     # Merge explorer datasets and assign a short name
     tb_explorer = pr.merge(
-        tb_wid, tb_lis, on=["country", "year"], how="outer", validate="one_to_one", short_name="poverty_inequality"
+        tb_wid,
+        tb_lis,
+        on=["country", "year"],
+        how="outer",
+        validate="one_to_one",
+        short_name="poverty_inequality",
     )
     tb_explorer = pr.merge(
-        tb_explorer, tb_pip, on=["country", "year"], how="outer", validate="one_to_one", short_name="poverty_inequality"
+        tb_explorer,
+        tb_pip,
+        on=["country", "year"],
+        how="outer",
+        validate="one_to_one",
+        short_name="poverty_inequality",
     )
 
     # Drop null rows in all columns except country and year
-    tb_explorer = tb_explorer.dropna(how="all", subset=[x for x in tb_explorer.columns if x not in ["country", "year"]])
+    tb_explorer = tb_explorer.dropna(
+        how="all",
+        subset=[x for x in tb_explorer.columns if x not in ["country", "year"]],
+    )
 
     # Verify index and sort
     tb_explorer = tb_explorer.set_index(["country", "year"], verify_integrity=True).sort_index()

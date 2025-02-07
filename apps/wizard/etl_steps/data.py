@@ -502,6 +502,13 @@ if step_selected:
 else:
     st.warning("Select at least one step to create.")
 
+with st.sidebar:
+    with st.popover("Preview instructions after generating files"):
+        st.markdown(
+            "This is a preview of the instructions that will be shown after generating the files. It uses generic namings like `namespace`, `short_name`, etc. The instructions with actual valid names are shown after submitting the form."
+        )
+        render_instructions(key="auxiliary")
+
 #########################################################
 # SUBMISSION ############################################
 #########################################################

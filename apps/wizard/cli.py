@@ -7,14 +7,15 @@ python cli.py
 
 import logging
 import sys
-from typing import Iterable
 
+# from typing import Iterable
 import rich_click as click
 import streamlit.web.cli as stcli
 from rich_click.rich_command import RichCommand
 
 from apps.utils.style import set_rich_click_style
-from apps.wizard.config import WIZARD_PHASES
+
+# from apps.wizard.config import WIZARD_PHASES
 from apps.wizard.utils import CURRENT_DIR
 from apps.wizard.utils.paths import WIZARD_ANOMALIES
 from etl.config import WIZARD_PORT
@@ -31,10 +32,16 @@ set_rich_click_style()
 # NOTE: Any new arguments here need to be in sync with the arguments defined in
 # wizard.utils.APP_STATE.args property method
 @click.command(cls=RichCommand, context_settings=dict(show_default=True))
-@click.argument(
-    "phase",
-    type=click.Choice(WIZARD_PHASES),
-    default="all",
+# @click.argument(
+#     "phase",
+#     type=click.Choice(WIZARD_PHASES),
+#     default="all",
+# )
+@click.option(
+    "--debug",
+    is_flag=True,
+    show_default=True,
+    help="Use this flag to enable debug mode and see analytics.",
 )
 @click.option(
     "--run-checks/--skip-checks",
@@ -55,7 +62,8 @@ set_rich_click_style()
     help="Application port.",
 )
 def cli(
-    phase: Iterable[str],
+    # phase: Iterable[str],
+    debug: bool,
     run_checks: bool,
     dummy_data: bool,
     port: int,
@@ -88,9 +96,11 @@ def cli(
         "--server.port",
         str(port),
         "--",
-        "--phase",
-        phase,
+        # "--phase",
+        # phase,
     ]
+    if debug:
+        args.append("--debug")
     if run_checks:
         args.append("--run-checks")
     if dummy_data:

@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The WPF Famine Dataset
+    description: |-
+      The World Peace Foundation has compiled a comprehensive dataset cataloging famines and mass starvation events since 1870. Their main dataset focuses on events that caused 100,000 or more deaths.
+
+      The dataset faces several methodological challenges that require careful consideration. Historical data quality varies significantly across different periods and regions, making direct comparisons challenging. Different measurement methods and inconsistent data collection practices further complicate the analysis. A particularly notable observation is that the worse a humanitarian emergency becomes, the more difficult it becomes to gather reliable data about it. These challenges are compounded by the complexity of defining famine boundaries and categorizing different types of mass starvation events.
+
+      The framework for defining famines in this dataset encompasses three main categories: conventional famines driven by food crises, mass starvation caused by war or genocide, and massive humanitarian emergencies. These events are distinguished from chronic poverty by being distinct episodes rather than ongoing conditions. The methodology uses a threshold of 100,000 deaths for practical purposes, considering both direct starvation deaths and related health crisis mortality. The dataset has evolved from using "lowest credible estimate" to "most credible estimate" for death tolls, and employs placeholder estimates of "100,000+" when exact figures are unavailable.
+
+      The classification of famine causes follows a structured approach, identifying immediate triggers, contributory factors, and structural causes. The dataset recognizes four main triggers: adverse climate, government policies, armed conflict, and genocide. Importantly, the authors note that famine causes are often complex and interconnected, rarely attributable to a single factor.
+
+      Given these methodological considerations, the authors emphasize that this compilation should be viewed more as a catalogue than a strict dataset, suitable for drawing general conclusions rather than precise statistical analyses. The dataset remains open for expert review and input, functioning as a living document that can be updated as new information becomes available.
+    date_published: "2025"
+
+    # Citation
+    producer: World Peace Foundation
+    citation_full: |-
+      Historic Famines dataset. World Peace Foundation (2025).
+
+    # Files
+    url_main: https://worldpeacefoundation.org/
+    date_accessed: 2025-10-03
+
+    # License
+    license:
+      name: permission obtained from the authors
+outs:
+  - md5: e3bf16ac1a5584ff6101cce4b5155bbb
+    size: 385723
+    path: famines.xlsx
