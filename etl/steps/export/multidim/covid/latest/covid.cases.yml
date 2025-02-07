@@ -48,10 +48,7 @@ views:
       interval: weekly
       metric: absolute
     indicators:
-      y:
-        catalogPath: "{definitions.table}#weekly_cases"
-        display:
-          name: whatever
+      y: "{definitions.table}#weekly_cases"
     config: *config
   - dimensions:
       interval: weekly
