@@ -68,7 +68,7 @@ tables:
           title: Extended family households
           unit: "%"
           short_unit: "%"
-          description_short: Percentage of households that are not couple only, couple with children or single parent with children households and in which all household members are related to each other
+          description_short: Percentage of households that are not couple only, couple with children or single parent with children households and in which all household members are related to each other.
 
        non_relatives:
           title: Non-relatives households
@@ -107,8 +107,8 @@ tables:
          description_short: Percentage of households that consist of grandparents and their grandchildren, but none of the parents of the grandchildren.
 
        other:
-         title: Extended family, non-relatives or other
+         title: Extended family and non-relatives households
          unit: "%"
          short_unit: "%"
-         description_short: Percentage of households that are not one-person, couple only, couple with children or single parent with children.
-         description_processing: The percentage of households classified as extended family, non-relatives, or other was calculated by subtracting the combined percentages of specific household categories (one-person, couple only, couple with children, single parent with children, extended family, non-relatives, and unknown) from 100%.
+         description_short: Percentage of households that include two or more members who are either related or not related to each other, excluding households consisting solely of couples, couples with children, or single parents with children.
+         description_processing: The percentage of extended family and non-relative households is calculated by summing the percentages of both household types.

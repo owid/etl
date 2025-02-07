@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+from owid.catalog import Table
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
@@ -47,6 +48,35 @@ def run(dest_dir: str) -> None:
     # Replace ".." with NaN
     tb = tb.replace("..", np.nan)
 
+    # Add "other" category to the household types
+    tb = create_other_category(tb)
+
+    tb = tb[columns_to_keep + ["country", "year"]]
+    tb = tb.format(["country", "year"])
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    )
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
+
+
+def create_other_category(tb: Table) -> Table:
+    """
+    Ensure that the relevant household columns add up to around 100 for each country and year, and create an 'other' category.
+
+    Parameters:
+    tb (Table): The original table containing household data.
+
+    Returns:
+    Table: The updated table with the 'other' category added and cleaned data.
+    """
+    # Make s
     # Make sure these columns add up to around 100 for each country and year
     # Some years don't have all the data so we want to make those NaNs to exclude them.
     columns_to_sum = [
@@ -65,7 +95,7 @@ def run(dest_dir: str) -> None:
     # Calculate the sum of the specified columns
     tb["sum_households"] = tb[columns_to_sum].sum(axis=1)
 
-    # Check which rows don't add up to around 100 (using a tolerance, e.g., ±0.5)
+    # Check which rows don't add up to around 100 (using a tolerance, e.g., ±0.1)
     tolerance = 0.5
     rows_not_around_100 = tb[(tb["sum_households"] < 100 - tolerance) | (tb["sum_households"] > 100 + tolerance)]
     # Make the values NaN for the columns in the rows that don't add up to around 100
@@ -75,24 +105,13 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["sum_households"])
     # Some years don't have all the data so we want to make those NaNs to exclude them.
     columns_for_other = [
-        "unknown",
-        "single_parent_with_children",
-        "couple_with_children",
-        "couple_only",
-        "one_person",
+        "extended_family",
+        "non_relatives",
     ]
-    tb["other"] = 100 - tb[columns_for_other].sum(axis=1)
+    tb["other"] = tb[columns_for_other].sum(axis=1)
+    # Remove rows where "other" == 0 because of the summing of the columns
+    tb = tb[tb["other"] != 0]
+    # Remove rows where "other" < 0
+    tb = tb[tb["other"] >= 0]
 
-    tb = tb[columns_to_keep + ["country", "year"]]
-    tb = tb.format(["country", "year"])
-
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
-
-    # Save changes in the new garden dataset.
-    ds_garden.save()
+    return tb
