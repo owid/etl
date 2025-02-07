@@ -23,6 +23,9 @@ memory = Memory(CACHE_DIR, verbose=0)
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define GDP/GDP per capita indicators in current US$ and their counterpart in constant LCU
+GDP_INDICATORS = {"ny_gdp_mktp_cd": "ny_gdp_mktp_kn", "ny_gdp_pcap_cd": "ny_gdp_pcap_kn"}
+
 # Define deflator and conversion indicator
 
 # Deflator indicator can be
@@ -95,25 +98,34 @@ def run(dest_dir: str) -> None:
     # add regions to remittance data
     tb_garden = add_regions_to_remittance_data(tb_garden, ds_regions, ds_income_groups)
 
-    # Adjust GDP indicators in current US$ to constant US$ using GDP deflator
-    tb_garden = adjust_current_to_constant_usd(
-        tb=tb_garden,
-        indicators=["ny_gdp_mktp_cd", "ny_gdp_pcap_cd"],
-        base_year=2015,
-        deflator_indicator=DEFLATOR_INDICATOR,
-        conversion_indicator=CONVERSION_INDICATOR,
-        local_currency_units=False,
-    )
+    # # Adjust GDP indicators in current US$ to constant US$ using GDP deflator
+    # tb_garden = adjust_current_to_constant_usd(
+    #     tb=tb_garden,
+    #     indicators=["ny_gdp_mktp_cd", "ny_gdp_pcap_cd"],
+    #     base_year=2015,
+    #     deflator_indicator=DEFLATOR_INDICATOR,
+    #     conversion_indicator=CONVERSION_INDICATOR,
+    #     local_currency_units=False,
+    # )
 
-    # Adjust GDP indicators in current LCU to constant US$ using GDP deflator and exchange rate
-    tb_garden = adjust_current_to_constant_usd(
-        tb=tb_garden,
-        indicators=["ny_gdp_mktp_cn", "ny_gdp_pcap_cn"],
-        base_year=2015,
-        deflator_indicator=DEFLATOR_INDICATOR,
-        conversion_indicator=CONVERSION_INDICATOR,
-        local_currency_units=True,
-    )
+    # # Adjust GDP indicators in current LCU to constant US$ using GDP deflator and exchange rate
+    # tb_garden = adjust_current_to_constant_usd(
+    #     tb=tb_garden,
+    #     indicators=["ny_gdp_mktp_cn", "ny_gdp_pcap_cn"],
+    #     base_year=2015,
+    #     deflator_indicator=DEFLATOR_INDICATOR,
+    #     conversion_indicator=CONVERSION_INDICATOR,
+    #     local_currency_units=True,
+    # )
+
+    for gdp_current_usd, gdp_constant_lcu in GDP_INDICATORS.items():
+        # Adjust GDP indicators in current US$ to constant US$ using the growth of the same indicator in LCU
+        tb_garden = adjust_current_to_constant_usd(
+            tb=tb_garden,
+            indicator_current_usd=gdp_current_usd,
+            indicator_constant_lcu=gdp_constant_lcu,
+            base_year=2015,
+        )
 
     ####################################################################################################################
 
@@ -649,13 +661,179 @@ def add_armed_personnel_as_share_of_population(tb: Table, ds_population: Dataset
     return tb
 
 
+# def adjust_current_to_constant_usd(
+#     tb: Table,
+#     indicators: List[str],
+#     base_year: int,
+#     deflator_indicator: str,
+#     conversion_indicator: str,
+#     local_currency_units: bool,
+# ) -> Table:
+#     """
+#     Adjust current LCU indicators to constant US$/int-$ using a deflator indicator and the base year.
+#     The indicators to use have to be in local currency units for this to work.
+#     The function works equally if the deflator is CPI or a GDP deflator, or any other deflator.
+
+#     Available deflator indicators in WDI:
+
+#     GDP deflators
+#         ny_gdp_defl_zs_ad, GDP deflator: linked series (base year varies by country)
+#         ny_gdp_defl_zs, GDP deflator (base year varies by country)
+
+#     CPI deflators
+#         fp_cpi_totl, Consumer price index (2010 = 100)
+
+#     Available conversion indicators in WDI:
+
+#     Exchange rates
+#         pa_nus_fcrf, Official exchange rate (LCU per US$, period average)
+#         pa_nus_atls, DEC alternative conversion factor (LCU per US$)
+
+#     PPP conversion factors
+#         pa_nus_ppp, PPP conversion factor, GDP (LCU per international $)
+#         pa_nus_prvt_pp, PPP conversion factor, private consumption (LCU per international $)
+#     """
+
+#     tb = tb.copy().reset_index()
+
+#     tb_adjusted = tb[["country", "year"] + indicators + [deflator_indicator] + [conversion_indicator]].copy()
+
+#     # Create a new table with the data only for the base year
+#     tb_base_year = tb_adjusted[tb_adjusted["year"] == base_year].reset_index(drop=True)
+
+#     # Filter only for the US
+#     tb_us = tb_adjusted[tb_adjusted["country"] == "United States"].reset_index(drop=True)
+
+#     # Merge the two tables
+#     tb_adjusted_us = pr.merge(
+#         tb_us,
+#         tb_base_year[["country", deflator_indicator]],
+#         on="country",
+#         how="left",
+#         suffixes=("", "_base_year"),
+#     )
+
+#     # Divide the deflator by the deflator in the base year
+#     tb_adjusted_us[f"{deflator_indicator}_adjusted"] = (
+#         tb_adjusted_us[deflator_indicator] / tb_adjusted_us[f"{deflator_indicator}_base_year"]
+#     )
+
+#     # Merge the two tables, only keeping the deflator for the base year
+#     tb_adjusted = pr.merge(
+#         tb_adjusted,
+#         tb_adjusted_us[["year", f"{deflator_indicator}_adjusted"]],
+#         on="year",
+#         how="left",
+#     )
+
+#     # Adjust the indicators to constant US$
+#     new_indicators = []
+#     for indicator in indicators:
+#         new_indicator_name = f"{indicator}_adjusted"
+#         if local_currency_units:
+#             tb_adjusted[new_indicator_name] = (
+#                 tb_adjusted[indicator]
+#                 / tb_adjusted[f"{deflator_indicator}_adjusted"]
+#                 / tb_adjusted[conversion_indicator]
+#             )
+#         else:
+#             tb_adjusted[new_indicator_name] = tb_adjusted[indicator] / tb_adjusted[f"{deflator_indicator}_adjusted"]
+
+#         new_indicators.append(new_indicator_name)
+
+#     # Merge the adjusted indicators back to the original table
+#     tb = pr.merge(tb, tb_adjusted[["country", "year"] + new_indicators], on=["country", "year"], how="outer")
+
+#     # Reformat again
+#     tb = tb.format()
+
+#     return tb
+
+
+# NOTE: Version with GDP deflators for every country
+# def adjust_current_to_constant_usd(
+#     tb: Table,
+#     indicators: List[str],
+#     base_year: int,
+#     deflator_indicator: str,
+#     conversion_indicator: str,
+#     local_currency_units: bool,
+# ) -> Table:
+#     """
+#     Adjust current LCU indicators to constant US$/int-$ using a deflator indicator and the base year.
+#     The indicators to use have to be in local currency units for this to work.
+#     The function works equally if the deflator is CPI or a GDP deflator, or any other deflator.
+
+#     Available deflator indicators in WDI:
+
+#     GDP deflators
+#         ny_gdp_defl_zs_ad, GDP deflator: linked series (base year varies by country)
+#         ny_gdp_defl_zs, GDP deflator (base year varies by country)
+
+#     CPI deflators
+#         fp_cpi_totl, Consumer price index (2010 = 100)
+
+#     Available conversion indicators in WDI:
+
+#     Exchange rates
+#         pa_nus_fcrf, Official exchange rate (LCU per US$, period average)
+#         pa_nus_atls, DEC alternative conversion factor (LCU per US$)
+
+#     PPP conversion factors
+#         pa_nus_ppp, PPP conversion factor, GDP (LCU per international $)
+#         pa_nus_prvt_pp, PPP conversion factor, private consumption (LCU per international $)
+#     """
+
+#     tb = tb.copy().reset_index()
+
+#     tb_adjusted = tb[["country", "year"] + indicators + [deflator_indicator] + [conversion_indicator]].copy()
+
+#     # Create a new table with the data only for the base year
+#     tb_base_year = tb_adjusted[tb_adjusted["year"] == base_year].reset_index(drop=True)
+
+#     # Merge the two tables
+#     tb_adjusted = pr.merge(
+#         tb_adjusted,
+#         tb_base_year[["country", deflator_indicator]],
+#         on="country",
+#         how="left",
+#         suffixes=("", "_base_year"),
+#     )
+
+#     # Divide the deflator by the deflator in the base year
+#     tb_adjusted[f"{deflator_indicator}_adjusted"] = (
+#         tb_adjusted[deflator_indicator] / tb_adjusted[f"{deflator_indicator}_base_year"]
+#     )
+
+#     # Adjust the indicators to constant US$
+#     new_indicators = []
+#     for indicator in indicators:
+#         new_indicator_name = f"{indicator}_adjusted"
+#         if local_currency_units:
+#             tb_adjusted[new_indicator_name] = (
+#                 tb_adjusted[indicator]
+#                 / tb_adjusted[f"{deflator_indicator}_adjusted"]
+#                 / tb_adjusted[conversion_indicator]
+#             )
+#         else:
+#             tb_adjusted[new_indicator_name] = tb_adjusted[indicator] / tb_adjusted[f"{deflator_indicator}_adjusted"]
+
+#         new_indicators.append(new_indicator_name)
+
+#     # Merge the adjusted indicators back to the original table
+#     tb = pr.merge(tb, tb_adjusted[["country", "year"] + new_indicators], on=["country", "year"], how="outer")
+
+#     # Reformat again
+#     tb = tb.format()
+
+#     return tb
+
+
 def adjust_current_to_constant_usd(
     tb: Table,
-    indicators: List[str],
+    indicator_current_usd: str,
+    indicator_constant_lcu: str,
     base_year: int,
-    deflator_indicator: str,
-    conversion_indicator: str,
-    local_currency_units: bool,
 ) -> Table:
     """
     Adjust current LCU indicators to constant US$/int-$ using a deflator indicator and the base year.
@@ -682,55 +860,39 @@ def adjust_current_to_constant_usd(
         pa_nus_prvt_pp, PPP conversion factor, private consumption (LCU per international $)
     """
 
-    tb = tb.copy().reset_index()
+    tb = tb.reset_index()
 
-    tb_adjusted = tb[["country", "year"] + indicators + [deflator_indicator] + [conversion_indicator]].copy()
+    tb_adjusted = tb[["country", "year"] + [indicator_current_usd] + [indicator_constant_lcu]].copy()
 
     # Create a new table with the data only for the base year
     tb_base_year = tb_adjusted[tb_adjusted["year"] == base_year].reset_index(drop=True)
 
-    # Filter only for the US
-    tb_us = tb_adjusted[tb_adjusted["country"] == "United States"].reset_index(drop=True)
-
     # Merge the two tables
-    tb_adjusted_us = pr.merge(
-        tb_us,
-        tb_base_year[["country", deflator_indicator]],
+    tb_adjusted = pr.merge(
+        tb_adjusted,
+        tb_base_year[["country", indicator_constant_lcu]],
         on="country",
         how="left",
         suffixes=("", "_base_year"),
     )
 
-    # Divide the deflator by the deflator in the base year
-    tb_adjusted_us[f"{deflator_indicator}_adjusted"] = (
-        tb_adjusted_us[deflator_indicator] / tb_adjusted_us[f"{deflator_indicator}_base_year"]
+    # Divide the indicator in constant LCU by the indicator in constant LCU in the base year
+    tb_adjusted[f"{indicator_constant_lcu}_adjusted"] = (
+        tb_adjusted[indicator_constant_lcu] / tb_adjusted[f"{indicator_constant_lcu}_base_year"]
     )
 
-    # Merge the two tables, only keeping the deflator for the base year
-    tb_adjusted = pr.merge(
-        tb_adjusted,
-        tb_adjusted_us[["year", f"{deflator_indicator}_adjusted"]],
-        on="year",
-        how="left",
+    # Adjust the indicator to constant US$
+    tb_adjusted[f"{indicator_current_usd}_adjusted"] = (
+        tb_adjusted[indicator_current_usd] / tb_adjusted[f"{indicator_constant_lcu}_adjusted"]
     )
-
-    # Adjust the indicators to constant US$
-    new_indicators = []
-    for indicator in indicators:
-        new_indicator_name = f"{indicator}_adjusted"
-        if local_currency_units:
-            tb_adjusted[new_indicator_name] = (
-                tb_adjusted[indicator]
-                / tb_adjusted[f"{deflator_indicator}_adjusted"]
-                / tb_adjusted[conversion_indicator]
-            )
-        else:
-            tb_adjusted[new_indicator_name] = tb_adjusted[indicator] / tb_adjusted[f"{deflator_indicator}_adjusted"]
-
-        new_indicators.append(new_indicator_name)
 
     # Merge the adjusted indicators back to the original table
-    tb = pr.merge(tb, tb_adjusted[["country", "year"] + new_indicators], on=["country", "year"], how="outer")
+    tb = pr.merge(
+        tb,
+        tb_adjusted[["country", "year"] + [f"{indicator_current_usd}_adjusted"]],
+        on=["country", "year"],
+        how="outer",
+    )
 
     # Reformat again
     tb = tb.format()
