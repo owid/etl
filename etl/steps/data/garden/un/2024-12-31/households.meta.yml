@@ -105,3 +105,10 @@ tables:
          unit: "%"
          short_unit: "%"
          description_short: Percentage of households that consist of grandparents and their grandchildren, but none of the parents of the grandchildren.
+
+       other:
+         title: Extended family, non-relatives or other
+         unit: "%"
+         short_unit: "%"
+         description_short: Percentage of households that are not one-person, couple only, couple with children or single parent with children.
+         description_processing: The percentage of households classified as extended family, non-relatives, or other was calculated by subtracting the combined percentages of specific household categories (one-person, couple only, couple with children, single parent with children, extended family, non-relatives, and unknown) from 100%.

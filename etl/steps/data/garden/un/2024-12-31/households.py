@@ -72,6 +72,15 @@ def run(dest_dir: str) -> None:
 
     # Drop the sum_households column if needed
     tb = tb.drop(columns=["sum_households"])
+    # Some years don't have all the data so we want to make those NaNs to exclude them.
+    columns_for_other = [
+        "unknown",
+        "single_parent_with_children",
+        "couple_with_children",
+        "couple_only",
+        "one_person",
+    ]
+    tb["other"] = 100 - tb[columns_for_other].sum(axis=1)
 
     tb = tb[columns_to_keep + ["country", "year"]]
     tb = tb.format(["country", "year"])
