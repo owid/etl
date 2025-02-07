@@ -360,15 +360,6 @@ tables:
         unit: US$
         short_unit: $
 
-      # ny_gdp_mktp_cn_adjusted:
-      #   title: GDP (adjusted for inflation from current LCU)
-      #   unit: US$
-      #   short_unit: $
-
-      # ny_gdp_pcap_cn_adjusted:
-      #   title: GDP per capita (adjusted for inflation from current LCU)
-      #   unit: US$
-      #   short_unit: $
       ####################################################################################################
 
       it_net_user_zs:
