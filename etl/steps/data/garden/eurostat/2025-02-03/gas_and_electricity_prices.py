@@ -64,7 +64,7 @@ COLUMNS = {
     "tax": "price_level",
     "currency": "currency",
     "geo": "country",
-    "time": "year",
+    "time": "time",
     "dataset_code": "dataset_code",
     "nrg_prc": "price_component",
     "value": "value",
@@ -300,6 +300,24 @@ def sanity_check_inputs(tb: Table) -> None:
         assert set(tb[field].dropna()) == set(mapping), error
 
 
+def adapt_dates(tb: Table) -> Table:
+    # For the date column:
+    # * For the first semester, use April 1st.
+    # * For the second semester, use October 1st.
+    # * For annual data, use July 1st.
+    semester_1_mask = tb["year-semester"].str.contains("S1")
+    semester_2_mask = tb["year-semester"].str.contains("S2")
+    annual_mask = tb["year-semester"].str.isdigit()
+    error = "Unexpected values in field 'year-semester'."
+    assert (semester_1_mask | semester_2_mask | annual_mask).all(), error
+    # tb["date"] = pd.to_datetime(tb["year"].astype(str) + "-07-01")
+    tb["date"] = pd.to_datetime(tb["year-semester"].str[0:4].astype(str) + "-07-01")
+    tb.loc[semester_1_mask, "date"] = pd.to_datetime(tb[semester_1_mask]["year-semester"].str[0:4] + "-04-01")
+    tb.loc[semester_2_mask, "date"] = pd.to_datetime(tb[semester_2_mask]["year-semester"].str[0:4] + "-10-01")
+
+    return tb
+
+
 def prepare_inputs(tb: Table) -> Table:
     # Values sometimes include a letter, which is a flag. Extract those letters and create a separate column with them.
     # Note that sometimes there can be multiple letters (which means multiple flags).
@@ -312,21 +330,15 @@ def prepare_inputs(tb: Table) -> Table:
     # Assign a proper type to the column of values.
     tb["value"] = tb["value"].astype(float)
 
-    # Create a clean column of years, and another of dates.
-    tb["year-semester"] = tb["year"].str.strip().copy()
+    # Create a column for year (e.g. 2020) and another for year-semester (which can be e.g. "2020" or "2020-S1").
+    tb["year-semester"] = tb["time"].str.strip().copy()
     tb["year"] = tb["year-semester"].str[0:4].astype(int)
-    # For the date column:
-    # * For the first semester, use April 1st.
-    # * For the second semester, use October 1st.
-    # * For annual data, use July 1st.
-    semester_1_mask = tb["year-semester"].str.contains("S1")
-    semester_2_mask = tb["year-semester"].str.contains("S2")
-    annual_mask = tb["year-semester"].str.isdigit()
-    error = "Unexpected values in field 'year-semester'."
-    assert (semester_1_mask | semester_2_mask | annual_mask).all(), error
-    tb["date"] = pd.to_datetime(tb["year"].astype(str) + "-07-01")
-    tb.loc[semester_1_mask, "date"] = pd.to_datetime(tb[semester_1_mask]["year"].astype(str) + "-04-01")
-    tb.loc[semester_2_mask, "date"] = pd.to_datetime(tb[semester_2_mask]["year"].astype(str) + "-10-01")
+
+    # Drop unnecessary column.
+    tb = tb.drop(columns=["time"], errors="raise")
+
+    # Create a clean column of years, and another of dates.
+    tb = adapt_dates(tb=tb)
 
     return tb
 
@@ -839,6 +851,45 @@ def sanity_check_outputs(tb: Table) -> None:
     # compared.sort_values("dev", ascending=False).head(60)
 
 
+def prepare_hicp(tb_hicp: Table) -> Table:
+    # We want to use the HICP data to adjust the prices for inflation.
+    # There are many options in the "Classification of individual consumption by purpose (COICOP)" column.
+    # As recommended by Eurostat, we will use only the following:
+    # [TOT_X_NRG] Overall index excluding energy
+    # Excluding the energy component helps in depicting the prices adjusted for the underlying inflationary trends, without being distorted by the volatility typically associated with energy commodities. In this respect, adjusted prices will include the impact of the energy cost changes.
+    tb_hicp = tb_hicp[tb_hicp["classification"] == "TOT_X_NRG"].reset_index(drop=True)
+
+    # Add column for year (e.g. "2020") and for year-semester (e.g. "2020-S1")
+    tb_hicp["year"] = tb_hicp["date"].str[0:4]
+    tb_hicp["semester"] = (
+        tb_hicp["year"].astype(str)
+        + "-"
+        + tb_hicp["date"].str[5:].astype(int).apply(lambda x: "S1" if x <= 6 else "S2")
+    )
+
+    # Calculate average HICP for each country and year.
+    tb_hicp_year = tb_hicp.groupby(["country", "year"], observed=True, as_index=False).agg({"hicp": "mean"})
+    # Calculate average HICP for each country and semester.
+    tb_hicp_semester = tb_hicp.groupby(["country", "semester"], observed=True, as_index=False).agg({"hicp": "mean"})
+
+    # Combine year and semester averages.
+    tb_hicp = pr.concat(
+        [
+            tb_hicp_year.rename(columns={"year": "year-semester"}),
+            tb_hicp_semester.rename(columns={"semester": "year-semester"}),
+        ],
+        ignore_index=True,
+    )
+
+    # Adapt time column to be the same as in the prices table.
+    tb_hicp = adapt_dates(tb=tb_hicp)
+
+    # Drop unnecessary column.
+    tb_hicp = tb_hicp.drop(columns=["year-semester"], errors="raise")
+
+    return tb_hicp
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -872,19 +923,11 @@ def run(dest_dir: str) -> None:
     # Select and prepare relevant data.
     tb = select_and_prepare_relevant_data(tb=tb)
 
-    # We want to use the HICP data to adjust the prices for inflation.
-    # There are many options in the "Classification of individual consumption by purpose (COICOP)" column.
-    # As recommended by Eurostat, we will use only the following:
-    # [TOT_X_NRG] Overall index excluding energy
-    # Excluding the energy component helps in depicting the prices adjusted for the underlying inflationary trends, without being distorted by the volatility typically associated with energy commodities. In this respect, adjusted prices will include the impact of the energy cost changes.
-    tb_hicp = tb_hicp[tb_hicp["classification"] == "TOT_X_NRG"].reset_index(drop=True)
-
-    # Calculate average HICP for each country and year.
-    tb_hicp["year"] = tb_hicp["date"].str[0:4].astype(int)
-    tb_hicp = tb_hicp.groupby(["country", "year"], observed=True, as_index=False).agg({"hicp": "mean"})
+    # Prepare HICP to have average annual and semester prices, of a relevant classification.
+    tb_hicp = prepare_hicp(tb_hicp=tb_hicp)
 
     # Add HICP column to main table.
-    tb = tb.merge(tb_hicp, how="left", on=["country", "year"])
+    tb = tb.merge(tb_hicp, how="left", on=["country", "date"])
 
     # Adjust prices for inflation.
     tb["price_euro"] = tb["price_euro"] / tb["hicp"] * 100
