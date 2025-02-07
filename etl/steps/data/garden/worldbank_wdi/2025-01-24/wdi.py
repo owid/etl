@@ -31,17 +31,18 @@ paths = PathFinder(__file__)
 # ny_gdp_defl_zs, GDP deflator (base year varies by country)
 
 # CPI deflators
-#     fp_cpi_totl, Consumer price index (2010 = 100)
+# fp_cpi_totl, Consumer price index (2010 = 100)
 DEFLATOR_INDICATOR = "ny_gdp_defl_zs_ad"
 
 # Conversion indicator can be
 # Exchange rates
-#     pa_nus_fcrf, Official exchange rate (LCU per US$, period average)
+# pa_nus_fcrf, Official exchange rate (LCU per US$, period average)
+# pa_nus_atls, DEC alternative conversion factor (LCU per US$)
 
 # PPP conversion factors
-#     pa_nus_ppp, PPP conversion factor, GDP (LCU per international $)
-#     pa_nus_prvt_pp, PPP conversion factor, private consumption (LCU per international $)
-CONVERSION_INDICATOR = "pa_nus_fcrf"
+# pa_nus_ppp, PPP conversion factor, GDP (LCU per international $)
+# pa_nus_prvt_pp, PPP conversion factor, private consumption (LCU per international $)
+CONVERSION_INDICATOR = "pa_nus_atls"
 
 
 def run(dest_dir: str) -> None:
@@ -674,6 +675,7 @@ def adjust_current_to_constant_usd(
 
     Exchange rates
         pa_nus_fcrf, Official exchange rate (LCU per US$, period average)
+        pa_nus_atls, DEC alternative conversion factor (LCU per US$)
 
     PPP conversion factors
         pa_nus_ppp, PPP conversion factor, GDP (LCU per international $)
