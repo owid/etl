@@ -1,6 +1,3 @@
-definitions:
-  table: grapher/energy/2024-05-08/primary_energy_consumption/primary_energy_consumption
-
 title:
   title: Energy use
   titleVariant: by energy source
@@ -80,13 +77,13 @@ views:
       metric: total
     indicators:
       y:
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#coal__twh"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#oil__twh"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#gas__twh"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#nuclear__twh__equivalent"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#hydro__twh__equivalent"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#solar__twh__equivalent"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#wind__twh__equivalent"
+        - "energy_mix#coal__twh"
+        - "energy_mix#oil__twh"
+        - "energy_mix#gas__twh"
+        - "energy_mix#nuclear__twh__equivalent"
+        - "energy_mix#hydro__twh__equivalent"
+        - "energy_mix#solar__twh__equivalent"
+        - "energy_mix#wind__twh__equivalent"
     config:
       $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
       chartTypes: ["StackedArea"]
@@ -98,13 +95,13 @@ views:
       metric: per_capita
     indicators:
       y:
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#coal_per_capita__kwh"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#oil_per_capita__kwh"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#gas_per_capita__kwh"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#nuclear_per_capita__kwh__equivalent"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#hydro_per_capita__kwh__equivalent"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#solar_per_capita__kwh__equivalent"
-        - "grapher/energy/2024-06-20/energy_mix/energy_mix#wind_per_capita__kwh__equivalent"
+        - "energy_mix#coal_per_capita__kwh"
+        - "energy_mix#oil_per_capita__kwh"
+        - "energy_mix#gas_per_capita__kwh"
+        - "energy_mix#nuclear_per_capita__kwh__equivalent"
+        - "energy_mix#hydro_per_capita__kwh__equivalent"
+        - "energy_mix#solar_per_capita__kwh__equivalent"
+        - "energy_mix#wind_per_capita__kwh__equivalent"
     config:
       $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
       chartTypes: ["StackedArea"]
@@ -112,7 +109,7 @@ views:
       source: all
       metric: total
     indicators:
-      y: "{definitions.table}#primary_energy_consumption__twh"
+      y: "primary_energy_consumption#primary_energy_consumption__twh"
     config:
       $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
       yAxis:
@@ -121,7 +118,7 @@ views:
       source: all
       metric: per_capita
     indicators:
-      y: "{definitions.table}#primary_energy_consumption_per_capita__kwh"
+      y: "primary_energy_consumption#primary_energy_consumption_per_capita__kwh"
     config:
       $schema: https://files.ourworldindata.org/schemas/grapher-schema.005.json
       yAxis:
@@ -134,11 +131,11 @@ views:
       source: all
       metric: proportional_change
     indicators:
-      y: "{definitions.table}#annual_change_in_primary_energy_consumption__pct"
+      y: "primary_energy_consumption#annual_change_in_primary_energy_consumption__pct"
   - dimensions:
       source: all
       metric: absolute_change
     indicators:
-      y: "{definitions.table}#annual_change_in_primary_energy_consumption__twh"
+      y: "primary_energy_consumption#annual_change_in_primary_energy_consumption__twh"
 
   # the rest is added programatically
