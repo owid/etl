@@ -11,7 +11,7 @@ definitions:
 
 title:
   title: COVID-19 confirmed deaths
-  titleVariant: by interval
+  titleVariant: ""
 defaultSelection:
   - World
   - Europe
@@ -20,8 +20,8 @@ topicTags:
   - COVID-19
 
 dimensions:
-  - slug: interval
-    name: Interval
+  - slug: period
+    name: Period
     choices:
       - slug: weekly
         name: Weekly
@@ -40,42 +40,42 @@ dimensions:
         name: Per million people
         description: null
       - slug: change
-        name: Change from previous interval
+        name: Change from previous period
         description: null
 
 views:
   - dimensions:
-      interval: weekly
+      period: weekly
       metric: absolute
     indicators:
       y: "{definitions.table}#weekly_deaths"
     config: *config
   - dimensions:
-      interval: weekly
+      period: weekly
       metric: per_capita
     indicators:
       y: "{definitions.table}#weekly_deaths_per_million"
     config: *config
   - dimensions:
-      interval: weekly
+      period: weekly
       metric: change
     indicators:
       y: "{definitions.table}#weekly_pct_growth_deaths"
     config: *config
   - dimensions:
-      interval: biweekly
+      period: biweekly
       metric: absolute
     indicators:
       y: "{definitions.table}#biweekly_deaths"
     config: *config
   - dimensions:
-      interval: biweekly
+      period: biweekly
       metric: per_capita
     indicators:
       y: "{definitions.table}#biweekly_deaths_per_million"
     config: *config
   - dimensions:
-      interval: biweekly
+      period: biweekly
       metric: change
     indicators:
       y: "{definitions.table}#biweekly_pct_growth_deaths"
