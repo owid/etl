@@ -41,6 +41,7 @@ def run(dest_dir: str) -> None:
         "multi_generation",
         "three_generation",
         "skip_generation",
+        "other",
     ]
 
     # Replace ".." with NaN
