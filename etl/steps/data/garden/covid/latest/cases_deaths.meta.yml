@@ -163,6 +163,8 @@ tables:
       weekly_cases:
         title: Weekly cases
         unit: "cases"
+        description_short: |-
+          Cumulative number of confirmed cases of COVID-19 over the previous week. Counts can include probable cases, where reported.
         display:
           numDecimalPlaces: 0
           tolerance: 30
@@ -180,6 +182,8 @@ tables:
       weekly_cases_per_million:
         title: "Weekly cases per million people"
         unit: "cases per million people"
+        description_short: _-
+          Cumulative number of confirmed cases of COVID-19 over the previous week, per million people. Counts can include probable cases, where reported.
         description_processing: *daily_population
         presentation:
           grapher_config:
@@ -199,6 +203,8 @@ tables:
         title: Weekly case growth (%)
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          The weekly growth rate measures the percentage change in confirmed cases over the past seven days compared to the seven days before.
         presentation:
           grapher_config:
             title: Week by week change of confirmed COVID-19 cases
@@ -221,6 +227,8 @@ tables:
       biweekly_cases:
         title: Biweekly cases
         unit: "cases"
+        description_short: |-
+          Cumulative number of confirmed cases of COVID-19 over the previous two weeks. Counts can include probable cases, where reported.
         display:
           numDecimalPlaces: 0
           tolerance: 30
@@ -238,6 +246,8 @@ tables:
       biweekly_cases_per_million:
         title: "Biweekly cases per million people"
         unit: "cases per million people"
+        description_short: |-
+          Cumulative number of confirmed cases of COVID-19 over the previous two weeks. Counts can include probable cases, where reported.
         description_processing: *daily_population
         display:
           numDecimalPlaces: 0
@@ -257,6 +267,8 @@ tables:
         title: Biweekly case growth (%)
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          The weekly growth rate measures the percentage change in confirmed cases over the past 14 days compared to the 14 days before.
         display:
           numDecimalPlaces: 1
           tolerance: 30
@@ -341,7 +353,9 @@ tables:
       new_deaths:
         title: Daily new confirmed deaths due to COVID-19
         description_short: |-
-          New deaths attributed to COVID-19. Counts can include probable deaths, where reported. In rare cases where our source reports a negative daily change due to a data correction, we set this metric to NA.
+          New deaths attributed to COVID-19. Counts can include probable deaths, where reported.
+        description_processing: |-
+          In rare cases where our source reports a negative daily change due to a data correction, we set this metric to NA.
         unit: "deaths"
         display:
           numDecimalPlaces: 0
