@@ -27,7 +27,7 @@ paths = PathFinder(__file__)
 GDP_INDICATORS = {"ny_gdp_mktp_cd": "ny_gdp_mktp_kn", "ny_gdp_pcap_cd": "ny_gdp_pcap_kn"}
 
 # Define base year to calculate constant 2021 US$ GDPs to compare with constant 2021 int-$ GDPs
-BASE_YEAR_FOR_CONSTANT_USD_GDP = 2015
+BASE_YEAR_FOR_CONSTANT_USD_GDP = 2021
 
 # Define regions for population weighted aggregations of GDP
 REGIONS = [
