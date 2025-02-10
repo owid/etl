@@ -9,8 +9,8 @@ definitions:
     originUrl: ourworldindata.org/coronavirus
 
 title:
-  title: COVID-19 hospitalisations
-  titleVariant: by type
+  title: COVID-19 hospitalizations
+  titleVariant: ""
 defaultSelection:
   - Belgium
   - Canada
@@ -29,7 +29,7 @@ dimensions:
     name: Type
     choices:
       - slug: hospital
-        name: Hospitalisations
+        name: Hospitalizations
         description: null
       - slug: icu
         name: Intensive care unit (ICU)

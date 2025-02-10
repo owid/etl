@@ -34,12 +34,12 @@ def run(dest_dir: str) -> None:
         )
 
     # Automatic ones (they have dimensions in the tables)
-    fname = "covid.mobility.yml"
-    config = paths.load_mdim_config(fname)
-    slug = fname_to_slug(fname)
-    table = "grapher/covid/latest/google_mobility/google_mobility"
-    config["views"] += multidim.expand_views(config, {"place": "*"}, table, engine)  # type: ignore
-    multidim.upsert_multidim_data_page(slug, config, engine)
+    # fname = "covid.mobility.yml"
+    # config = paths.load_mdim_config(fname)
+    # slug = fname_to_slug(fname)
+    # table = "grapher/covid/latest/google_mobility/google_mobility"
+    # config["views"] += multidim.expand_views(config, {"place": "*"}, table, engine)  # type: ignore
+    # multidim.upsert_multidim_data_page(slug, config, engine)
 
 
 def fname_to_slug(fname: str) -> str:

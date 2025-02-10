@@ -27,7 +27,7 @@ tables:
       # Occupancy in hospital
       daily_occupancy_hosp:
         title: Daily hospital occupancy
-        description_short: Number of COVID-19 patients in hospital on a given day
+        description_short: Number of COVID-19 patients in hospital on a given day.
         unit: "patients"
         display:
           numDecimalPlaces: 0
