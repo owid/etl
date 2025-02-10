@@ -88,6 +88,7 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
         else:
             view["indicators"]["y"] = _expand(view["indicators"]["y"])
 
+
 def _extract_catalog_path(indicator_raw):
     "Indicator spec can come either as a plain string, or a dictionary."
     if isinstance(indicator_raw, str):
