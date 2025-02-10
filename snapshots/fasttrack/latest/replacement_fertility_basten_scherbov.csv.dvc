@@ -9,7 +9,7 @@ meta:
     attribution: Gietel-Basten and Scherbov (2020)
     url_main: https://link.springer.com/article/10.1007/s11113-019-09561-y
     url_download: |-
-      gAAAAABnqfPSHWTwOo1Ix3oK1W2UptECtPZHz81lA8xtW4XrkEd6lsPzDvzXfol0r7oss-ClRVuEJJWc5QpoL8FHr4sBTofB1fJZa_SC3_AGb0cJHciMEJdLDrYozETNLL0REXEpj9yWgV4fpxzgxU7E4GLtFEPlP0dvBFPFLA0jpb8wANmVftZoWKJPbWM2onTzqbgnV_U4BMadyY8zOfCFd3kckxmzTP8A4YdZKZIs5iSK4TYkKSx854jGQnREw7Gs-Wwe0_Bx
+      gAAAAABnqfRFpzlqScHAh90aJ1UZcy9IyMpJf_jH3rot5w68tBB-Qq28GShjKfoR-VCSeT0wGod2HhlQWHdwynRG7zcq3n9mtinqeNYZctNuwezmG1EoQHc_pKIkxLfoJuIgRQ8qdJOOQ1vbfxw3m_jeeDgdkOh-VQmpNEbHmXrKPJ1wblAREVbXKH7L4utPnBrgKcB3MLf6CFEanG6_pf_5Acq8o4KpDh8d_O6gqM8CWGxp8InL8s6_L9lnColtitoesrrOAakN
     date_accessed: '2025-02-10'
     date_published: '2019'
   name: Replacement rate of fertility - Gietel-Basten and Scherbov (2019)
@@ -17,6 +17,6 @@ meta:
   license: {}
   is_public: false
 outs:
-  - md5: 2db2984aafcc407fdacc143b71e83d83
-    size: 62956
+  - md5: cdcb9054610b15b7c40b988311eaf35c
+    size: 63136
     path: replacement_fertility_basten_scherbov.csv

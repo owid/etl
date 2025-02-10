@@ -10,13 +10,11 @@ tables:
         title: Replacement fertility rate
         unit: ''
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 1.0
         description: Estimated total fertility rate required to retain the same population size, after accounting for early
           life mortality.
       replacement_fertility_rate_projection:
         title: Replacement fertility rate (projection)
         unit: ''
-        display:
-          numDecimalPlaces: 1
         description: |-
-          Estimated total fertility rate required to retain the same population size, after accounting for early life mortality, using UN projections of the fertility rates and lifetables up to 2100.
+          Estimated total fertility rate required to retain the same population size, after accounting for early life mortality, using UN projections of fertility rates and lifetables up to 2100.
