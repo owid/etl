@@ -47,6 +47,7 @@ def run(dest_dir: str) -> None:
     # Filter out just the bits of the data we want
     tb = filter_data(tb)
     tb = round_down_year(tb)
+
     # add regional data for count variables
     tb = add_regional_totals_for_counts(tb, ds_regions)
     # add regional population weighted averages for rate variables
@@ -119,37 +120,52 @@ def add_regional_totals_for_counts(tb: Table, ds_regions: Dataset) -> Table:
     return tb
 
 
-def add_population_weighted_regional_averages_for_rates(
-    tb: Table, ds_population: Dataset, ds_regions: Dataset
+def population_weighted_regional_averages(
+    tb: Table, ds_population: Dataset, ds_regions: Dataset, threshold: float = 0.8
 ) -> Table:
-    """
-    Adding population-weighted averages for the death rates
-    """
-    tb_rates = tb[tb["unit_of_measure"] != "Number of deaths"]
-    tb_rates = geo.add_population_to_table(tb_rates, ds_population)
-    msk = tb_rates["population"].isna()
-    # Dropping out regions that don't have a population
-    tb_rates = tb_rates[~msk]
+    """Adds population-weighted averages of death rates for the regions. Only includes year and regions where enough countries have data such that the population coverage is above the threshold."""
+    tb_full = tb.copy(deep=True)
 
-    tb_rates["obs_value_pop"] = tb_rates["obs_value"] * tb_rates["population"]
-    tb_rates = tb_rates.drop(columns=["lower_bound", "upper_bound"])
-    tb_all_regions = Table()
-    for region in REGIONS:
-        regions = geo.list_members_of_region(region=region, ds_regions=ds_regions)
-        tb_region = tb_rates[tb_rates["country"].isin(regions)]
-        tb_region = (
-            tb_region.groupby(["year", "indicator", "sex", "wealth_quintile", "unit_of_measure"])[
-                ["obs_value_pop", "population"]
-            ]
-            .sum()
-            .reset_index()
-        )
-        tb_region["country"] = region
-        tb_region["obs_value"] = tb_region["obs_value_pop"] / tb_region["population"]
-        tb_region = tb_region.drop(columns=["obs_value_pop", "population"])
-        tb_all_regions = pr.concat([tb_all_regions, tb_region])
+    tb = tb[tb["unit_of_measure"] != "Number of deaths"]
 
-    tb = pr.concat([tb, tb_all_regions])
+    # adding population to the table and dropping rows with missing population
+    tb = geo.add_population_to_table(tb, ds_population)
+    tb = tb.dropna(subset=["population"])
+
+    # calculating column for population weighted death rates
+    tb["obs_value_pop"] = tb["obs_value"] * tb["population"]
+    tb = tb.drop(columns=["lower_bound", "upper_bound"])
+
+    # adding regions to the table (summing obs_value_pop, obs_value and population)
+    tb = geo.add_regions_to_table(
+        tb, ds_regions, index_columns=["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile"]
+    )
+
+    # renaming population column and adding total population (for regions)
+    tb = tb.rename(columns={"population": "population_covered"})
+    tb = geo.add_population_to_table(tb, ds_population, population_col="total_population")
+
+    # calculating population weighted death rates & share of population covered
+    tb["obs_value_rates"] = tb["obs_value_pop"] / tb["population_covered"]
+    tb["share_of_population"] = tb["population_covered"] / tb["total_population"]
+
+    # filtering out regions where the share of population covered is below the threshold
+    tb = tb[tb["share_of_population"] >= threshold]
+
+    # dropping unnecessary columns
+    tb = tb.drop(
+        columns=["obs_value", "obs_value_pop", "population_covered", "total_population", "share_of_population"]
+    )
+
+    # merging the full table to restore upper and lower bound and obs_value for countries
+    tb = pr.merge(
+        tb, tb_full, on=["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile"], how="outer"
+    )
+
+    # filling in missing values (=regions) with the population weighted rates
+    tb["obs_value"] = tb["obs_value"].fillna(tb["obs_value_rates"])
+
+    tb = tb.drop(columns=["obs_value_rates"])
 
     return tb
 
