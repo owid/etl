@@ -54,6 +54,8 @@ NAN_VALUES = [
     "…",
 ]
 
+PRIORITY_OF_REGIONS = ["World Bank", "WHO", "UNICEF", "UN", "UN SDG"]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -69,7 +71,6 @@ def run(dest_dir: str) -> None:
 
         # Read table from meadow dataset.
         tb = ds_meadow[label]
-
         # Exclude archived indicators from garden
         if "_archived" in label or tb.m.title.endswith("(archived)"):
             continue
@@ -204,9 +205,20 @@ def check_overlapping_names(tb: Table) -> None:
         raise ValueError(f"index names are overlapping with column names: {overlapping_names}")
 
 
+def drop_excess_region_sources(tb: Table, priority_regions: list[str]) -> Table:
+    """Drop specific region sources if there are more than two different sources for a given indicator, in the order of preference given below"""
+    if tb["region_source"].nunique() > 2:
+        unique_sources = tb["region_source"].dropna().unique().tolist()
+        unique_sources.sort(key=lambda x: priority_regions.index(x) if x in priority_regions else float("inf"))
+        sources_to_keep = unique_sources[:2]
+        tb = tb[tb["region_source"].isin(sources_to_keep)]
+    return tb
+
+
 def add_region_source_suffix(tb: Table) -> Table:
     """Add region source as suffix to region name, e.g. Africa (WHO)"""
     if "region_source" in tb.columns:
+        tb = drop_excess_region_sources(tb, PRIORITY_OF_REGIONS)
         ix = tb.region_source.notnull() & (tb.country != "World")
         if ix.any():
             tb["country"] = tb["country"].astype(str)
