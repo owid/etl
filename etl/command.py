@@ -292,8 +292,21 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    # if export is not set, remove all steps
-    if not export:
+    if export:
+        # If there were any "export://multidim" steps, keep them in the dag, to be executed.
+        for step in list(dag.keys()):
+            if step.startswith("export://multidim/"):
+                # We want to execute export steps after any grapher://grapher steps,
+                # to ensure that any indicators required by the mdim step are already pushed to DB.
+                # To achieve that, replace "data://grapher" dependencies with "grapher://grapher".
+                # NOTE: If any dependency of the export step is a data-private://grapher step, it will need to be run with the "--private" flag, otherwise the export step may fail.
+                dag[step] = [re.sub(r"^(data|data-private)://", "grapher://", dep) if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep) else dep for dep in dag[step]]
+
+        # Finally, ensure that the added grapher://grapher steps will be executed,
+        # by activating the "grapher" flag.
+        grapher = True
+    else:
+        # If there were any "export://" steps in the dag, remove them.
         dag = {step: deps for step, deps in dag.items() if not step.startswith("export://")}
 
     # If --grapher is set, add all steps for upserting to DB
