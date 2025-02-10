@@ -11,7 +11,6 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
-from etl.helpers import map_indicator_path_to_id
 from etl.paths import DATA_DIR
 
 # Initialize logger.
@@ -22,30 +21,12 @@ def upsert_multidim_data_page(slug: str, config: dict, engine: Engine, dependenc
     """
     :param dependencies: List of dependencies for mdim. In most cases just use `dependencies=paths.dependencies`.
     """
-
+    # Expand catalog paths (if needed)
+    ## Configs may only specify table#indicator. Instead, we need the full dataset URI.
     expand_catalog_paths(config, dependencies=dependencies)
 
+    # Validate config
     validate_multidim_config(config, engine)
-
-    # TODO: Improve this. Could also go into etl.helpers.load_mdim_config
-    # Change catalogPaths into variable IDs
-    if "views" in config:
-        views = config["views"]
-        for view in views:
-            if "config" in view:
-                if "sortColumnSlug" in view["config"]:
-                    # Check if catalogPath
-                    # Map to variable ID
-                    raise NotImplementedError("looks like legacy code?")
-                    view["config"]["sortColumnSlug"] = str(map_indicator_path_to_id(view["config"]["sortColumnSlug"]))
-                if "dimensions" in view["config"]:
-                    dimensions = view["config"]["dimensions"]
-                    for dim in dimensions:
-                        if "variableId" in dim:
-                            # Check if catalogPath
-                            # Map to variable ID
-                            raise NotImplementedError("looks like legacy code?")
-                            dim["variableId"] = map_indicator_path_to_id(dim["variableId"])
 
     # Upsert config via Admin API
     admin_api = AdminAPI(OWID_ENV)
