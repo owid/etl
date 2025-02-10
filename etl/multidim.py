@@ -51,12 +51,13 @@ def upsert_multidim_data_page(slug: str, config: dict, engine: Engine, dependenc
 
 
 def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
-    """
-    Expand catalog paths in views to full dataset URIs.
+    """Expand catalog paths in views to full dataset URIs.
+
     This function updates the given configuration dictionary in-place by modifying the "y"
     entries under "indicators" in each view. If an entry does not contain a '/',
     it is assumed to be a table name that must be expanded to a full dataset URI based on
     the provided dependencies.
+
     Args:
         config (dict): Configuration dictionary containing views.
         dependencies (list[str]): List of dependency URIs in the form "data://<path>".
