@@ -2,7 +2,7 @@ import json
 import re
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -27,7 +27,21 @@ paths = PathFinder(__file__)
 GDP_INDICATORS = {"ny_gdp_mktp_cd": "ny_gdp_mktp_kn", "ny_gdp_pcap_cd": "ny_gdp_pcap_kn"}
 
 # Define base year to calculate constant 2021 US$ GDPs to compare with constant 2021 int-$ GDPs
-BASE_YEAR_FOR_CONSTANT_USD_GDP = 2021
+BASE_YEAR_FOR_CONSTANT_USD_GDP = 2015
+
+# Define regions for population weighted aggregations of GDP
+REGIONS = [
+    "Asia",
+    "Europe",
+    "Africa",
+    "North America",
+    "South America",
+    "Oceania",
+    "World",
+]
+
+# Define the fraction of allowed NaNs per year for the population weighted aggregations
+FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
 
 def run(dest_dir: str) -> None:
@@ -87,6 +101,8 @@ def run(dest_dir: str) -> None:
             indicator_current_usd=gdp_current_usd,
             indicator_constant_lcu=gdp_constant_lcu,
             base_year=BASE_YEAR_FOR_CONSTANT_USD_GDP,
+            ds_regions=ds_regions,
+            ds_population=ds_population,
         )
 
     ####################################################################################################################
@@ -628,6 +644,8 @@ def adjust_current_to_constant_usd(
     indicator_current_usd: str,
     indicator_constant_lcu: str,
     base_year: int,
+    ds_regions: Dataset,
+    ds_population: Dataset,
 ) -> Table:
     """
     Adjust current LCU indicators to constant US$/int-$ using a deflator indicator and the base year.
@@ -680,6 +698,13 @@ def adjust_current_to_constant_usd(
         tb_adjusted[f"{indicator_current_usd}_base_year"] * tb_adjusted[f"{indicator_constant_lcu}_ratio"]
     )
 
+    tb_adjusted = add_population_weighted_aggregations(
+        tb=tb_adjusted,
+        indicator=f"{indicator_current_usd}_adjusted",
+        ds_regions=ds_regions,
+        ds_population=ds_population,
+    )
+
     # Merge the adjusted indicators back to the original table
     tb = pr.merge(
         tb,
@@ -690,5 +715,50 @@ def adjust_current_to_constant_usd(
 
     # Reformat again
     tb = tb.format()
+
+    return tb
+
+
+def add_population_weighted_aggregations(
+    tb: Table, indicator: str, ds_regions: Dataset, ds_population: Dataset
+) -> Table:
+    """
+    Add population weighted aggregations for the given indicator.
+    This is used together with the adjust_current_to_constant_usd function to calculate constant US$ indicators.
+    """
+    tb = tb.copy()
+
+    # Remove regions from table
+    tb = tb[~tb["country"].isin(REGIONS)].reset_index(drop=True)
+
+    # Add population to the table
+    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+
+    # Multiply the indicator by the population to get the weighted value
+    tb[f"{indicator}_weighted"] = tb[indicator] * tb["population"]
+
+    # Add regional aggregates for these indicators
+    tb_regions = geo.add_regions_to_table(
+        tb=tb,
+        aggregations={
+            f"{indicator}_weighted": "sum",
+            "population": "sum",
+        },
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
+    )
+
+    # Filter only by regions
+    tb_regions = tb_regions[tb_regions["country"].isin(REGIONS)].reset_index(drop=True)
+
+    # Divide the weighted indicator by the population to get the weighted average
+    tb_regions[indicator] = tb_regions[f"{indicator}_weighted"] / tb_regions["population"]
+
+    # Keep only the columns we need
+    tb_regions = tb_regions[["country", "year", indicator]]
+
+    # Merge the regional data back to the original table
+    tb = pr.concat([tb, tb_regions], ignore_index=True)
 
     return tb
