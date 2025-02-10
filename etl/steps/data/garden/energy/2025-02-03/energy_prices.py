@@ -60,6 +60,10 @@ def run(dest_dir: str) -> None:
         elif "euro" in column:
             assert tb_annual[column].metadata.description_processing is None
             tb_annual[column].metadata.description_processing = description_processing_euros
+    # Add combined description processing for wholesale prices.
+    tb_annual["annual_electricity_all_wholesale_euro"].metadata.description_processing = tb_ember_annual[
+        "annual_electricity_all_wholesale_euro"
+    ].metadata.description_processing
     ####################################################################################################################
     tb_annual = tb_annual.format(short_name="energy_prices_annual")
 

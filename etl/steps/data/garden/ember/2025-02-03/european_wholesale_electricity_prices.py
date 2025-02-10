@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import pandas as pd
+from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -28,28 +29,11 @@ MIN_NUM_COUNTRIES_INFORMED_PER_MONTH = 10
 # NOTE: We will also assert that the minimum date in Ember is fully covered by PPI data.
 PPI_ALLOWED_MONTHS_OF_LAG = 2
 
+# Base year for the PPI data.
+PPI_EUROS_YEAR = 2021
 
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Load meadow dataset, and read its main table.
-    ds_meadow = paths.load_dataset("european_wholesale_electricity_prices")
-    tb_monthly = ds_meadow.read("european_wholesale_electricity_prices")
 
-    # Load Eurostat Producer Prices in Industry dataset, and read its main table.
-    ds_ppi = paths.load_dataset("producer_prices_in_industry")
-    tb_ppi = ds_ppi.read("producer_prices_in_industry")
-
-    #
-    # Process data.
-    #
-    # Select and rename columns.
-    tb_monthly = tb_monthly[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
-
-    # Harmonize country names.
-    tb_monthly = geo.harmonize_countries(df=tb_monthly, countries_file=paths.country_mapping_path)
-
+def adjust_prices_for_inflation(tb_monthly: Table, tb_ppi: Table) -> Table:
     # Select Producer Prices Index for classification "[MIG_NRG] MIG - energy".
     tb_ppi = tb_ppi[tb_ppi["classification"] == "MIG_NRG"].drop(columns=["classification"]).reset_index(drop=True)
 
@@ -79,11 +63,20 @@ def run(dest_dir: str) -> None:
     # Check that the minimum date of PPI fully covers the data in the energy prices table.
     error = "PPI data does not cover the minimum date of energy prices."
     assert ember_first_month >= ppi_first_month, error
+    error = "Base year is not as expected"
+    import re
+
+    base_year = re.search(r"\b(20\d{2}|19\d{2})\b", tb_ppi["ppi"].metadata.description_short).group(0)
+    assert base_year == str(PPI_EUROS_YEAR), error
 
     # Adjust monthly prices for inflation.
     # NOTE: When doing this, many prices will be lost (e.g. UK data).
     tb_monthly["price"] = tb_monthly["price"] * 100 / tb_monthly["ppi"]
 
+    return tb_monthly
+
+
+def prepare_annual_data(tb_monthly: Table) -> Table:
     # Ember provides monthly data, so we can create a monthly table of wholesale electricity prices.
     # But we also need to create an annual table of average wholesale electricity prices.
     tb_annual = tb_monthly.copy()
@@ -94,6 +87,36 @@ def run(dest_dir: str) -> None:
         tb_annual[n_months == 12].groupby(["country", "year"], observed=True, as_index=False).agg({"price": "mean"})
     )
 
+    return tb_annual
+
+
+def run(dest_dir: str) -> None:
+    #
+    # Load inputs.
+    #
+    # Load meadow dataset, and read its main table.
+    ds_meadow = paths.load_dataset("european_wholesale_electricity_prices")
+    tb_monthly = ds_meadow.read("european_wholesale_electricity_prices")
+
+    # Load Eurostat Producer Prices in Industry dataset, and read its main table.
+    ds_ppi = paths.load_dataset("producer_prices_in_industry")
+    tb_ppi = ds_ppi.read("producer_prices_in_industry")
+
+    #
+    # Process data.
+    #
+    # Select and rename columns.
+    tb_monthly = tb_monthly[list(COLUMNS)].rename(columns=COLUMNS, errors="raise")
+
+    # Harmonize country names.
+    tb_monthly = geo.harmonize_countries(df=tb_monthly, countries_file=paths.country_mapping_path)
+
+    # Adjust prices for inflation.
+    tb_monthly = adjust_prices_for_inflation(tb_monthly=tb_monthly, tb_ppi=tb_ppi)
+
+    # Prepare annual data.
+    tb_annual = prepare_annual_data(tb_monthly=tb_monthly)
+
     # Improve table formats.
     tb_monthly = tb_monthly.format(["country", "date"], short_name="european_wholesale_electricity_prices_monthly")
     tb_annual = tb_annual.format(short_name="european_wholesale_electricity_prices_annual")
@@ -102,7 +125,12 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_monthly, tb_annual], check_variables_metadata=True)
+    ds_garden = create_dataset(
+        dest_dir,
+        tables=[tb_monthly, tb_annual],
+        check_variables_metadata=True,
+        yaml_params={"EUROS_YEAR": PPI_EUROS_YEAR},
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()

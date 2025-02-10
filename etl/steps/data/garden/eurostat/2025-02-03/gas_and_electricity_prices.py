@@ -998,8 +998,6 @@ def run(dest_dir: str) -> None:
     tb["price_pps_deflated"] = tb["price_pps"] / tb["hicp"] * 100
 
     # Sanity check outputs.
-    # TODO: Add sanity check to ensure we know which countries are missing data after deflation.
-    # TODO: Update metadata (explain rebasing in description_processing).
     sanity_check_outputs(tb=tb)
 
     # First, ensure that the old base year is as expected.
