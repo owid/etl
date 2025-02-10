@@ -13,6 +13,11 @@ definitions:
   description_short_gni: Total income earned by residents of a country or region, including income earned abroad.
   description_short_gni_per_capita: Average income per person earned by residents of a country or region, including income earned abroad.
 
+  description_processing_gdp_constant: |-
+    We constructed estimates of GDP and GDP per capita in constant 2021 US$ by taking the corresponding series in current US$ and applying them the growth rates of the series in constant local currency units, adjusted by the base year (2021). This is [the same methodology](https://datahelpdesk.worldbank.org/knowledgebase/articles/114943-how-do-you-derive-constant-price-series-in-usd) followed by the World Bank to obtain the series in constant 2015 US$.
+
+    We obtain this indicator to have a more meaningful comparison between exchange-rate-based and PPP-based GDP estimates in the same reference year.
+
 
 tables:
   wdi:
@@ -351,14 +356,52 @@ tables:
           hasMapTab: true
 
       ny_gdp_mktp_cd_adjusted:
-        title: GDP (adjusted for inflation from current US$)
-        unit: US$
+        title: GDP (constant 2021 US$)
+        unit: constant 2021 US$
         short_unit: $
+        display:
+          name: GDP
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gdp} {definitions.inflation_adjustment}"
+        description_key:
+          - "{definitions.gdp}"
+          - This GDP indicator provides information on economic growth and income levels from 1960.
+          - "{definitions.inflation_adjustment}"
+          - This data is expressed in constant 2021 US$.
+          - For GDP estimates that account for both inflation and differences in the cost of living between countries, see [GDP in constant international-$](https://ourworldindata.org/grapher/gdp-worldbank).
+        processing_level: major
+        description_processing: "{definitions.description_processing_gdp_constant}"
+        presentation:
+          title_public: Gross domestic product (GDP)
+          title_variant: In constant 2021 US$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
 
       ny_gdp_pcap_cd_adjusted:
-        title: GDP per capita (adjusted for inflation from current US$)
-        unit: US$
+        title: GDP per capita (constant 2021 US$)
+        unit: constant 2021 US$
         short_unit: $
+        display:
+          name: GDP per capita
+          numDecimalPlaces: 0
+          tolerance: 5
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.inflation_adjustment}"
+        description_key:
+          - "{definitions.gdp} {definitions.gdp_per_capita}"
+          - This GDP per capita indicator provides information on economic growth and income levels from 1960.
+          - "{definitions.inflation_adjustment}"
+          - This data is expressed in constant 2021 US$.
+          - For GDP per capita estimates that account for both inflation and differences in the cost of living between countries, see [GDP per capita in constant international-$](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
+        processing_level: major
+        description_processing: "{definitions.description_processing_gdp_constant}"
+        presentation:
+          title_public: GDP per capita
+          title_variant: In constant 2021 US$
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
 
       ####################################################################################################
 
