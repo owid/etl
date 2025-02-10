@@ -5,10 +5,6 @@ steps:
   data://garden/regions/2023-01-01/regions:
   data://grapher/regions/2023-01-01/regions:
     - data://garden/regions/2023-01-01/regions
-  # WARNING: The following step exists for backward compatibility and should eventually be removed.
-  # Consider using external/owid_grapher/latest/regions instead.
-  data://grapher/regions/latest/regions:
-    - data://garden/regions/2023-01-01/regions
   # Create a step with regions data used by the owid-grapher repository.
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
@@ -90,7 +86,7 @@ steps:
   data://garden/ggdc/2022-12-23/maddison_database:
     - data://meadow/ggdc/2022-12-23/maddison_database
 
-  #Penn World Table
+  # Penn World Table
   data://meadow/ggdc/2022-11-28/penn_world_table:
     - walden://ggdc/2021-06-18/penn_world_table
   data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts:
@@ -101,14 +97,6 @@ steps:
     - data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts
   data://grapher/ggdc/2022-11-28/penn_world_table:
     - data://garden/ggdc/2022-11-28/penn_world_table
-
-  # Global mobile money dataset (GSMA)
-  data://meadow/technology/2024-05-30/mobile_money:
-    - snapshot://technology/2024-05-30/mobile_money.xlsx
-  data://garden/technology/2024-05-30/mobile_money:
-    - data://meadow/technology/2024-05-30/mobile_money
-  data://grapher/technology/2024-05-30/mobile_money:
-    - data://garden/technology/2024-05-30/mobile_money
 
   # Democracy and Human rights - V-Dem index
   data://meadow/democracy/2023-03-02/vdem:
@@ -346,7 +334,6 @@ steps:
     - data://meadow/un/2023-10-30/un_members
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/regions/2023-01-01/regions
-    - data://grapher/regions/latest/regions
     - data://garden/demography/2023-03-31/population
   data://grapher/un/2023-10-30/un_members:
     - data://garden/un/2023-10-30/un_members
@@ -401,13 +388,6 @@ steps:
   data://grapher/technology/2024-05-13/computer_memory_storage:
     - data://garden/technology/2024-05-13/computer_memory_storage
 
-  # European Social Survey - Trust questions
-  data://meadow/ess/2023-08-02/ess_trust:
-    - snapshot://ess/2023-08-02/ess_trust.csv
-    - data://garden/regions/2023-01-01/regions
-  data://garden/ess/2023-08-02/ess_trust:
-    - data://meadow/ess/2023-08-02/ess_trust
-
   # Latinobarómetro survey - Trust
   data://meadow/survey/2023-08-04/latinobarometro_trust:
     - snapshot://survey/2023-08-04/latinobarometro_trust.csv
@@ -428,14 +408,12 @@ steps:
   data://grapher/survey/2023-08-04/trust_surveys:
     - data://garden/survey/2023-08-04/trust_surveys
 
-  # Missing Data - Children out of school
-  data://garden/missing_data/2024-03-26/children_out_of_school:
-    - data://garden/wb/2024-06-10/gender_statistics
-    - data://garden/wb/2024-03-11/income_groups
+  # European Social Survey - Trust questions
+  data://meadow/ess/2023-08-02/ess_trust:
+    - snapshot://ess/2023-08-02/ess_trust.csv
     - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/missing_data/2024-03-26/children_out_of_school:
-    - data://garden/missing_data/2024-03-26/children_out_of_school
+  data://garden/ess/2023-08-02/ess_trust:
+    - data://meadow/ess/2023-08-02/ess_trust
 
   # Missing Data - Suicides
   data://garden/missing_data/2024-03-26/who_md_suicides:
@@ -619,7 +597,6 @@ steps:
     - snapshot-private://language/2024-07-17/ethnologue.zip
   data-private://garden/language/2024-07-17/ethnologue:
     - data-private://meadow/language/2024-07-17/ethnologue
-    - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
@@ -759,9 +736,6 @@ steps:
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
 
-
-
-
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
@@ -800,3 +774,4 @@ include:
   - dag/migration.yml
   - dag/equality.yml
   - dag/families.yml
+  - dag/technology.yml

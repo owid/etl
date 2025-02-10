@@ -667,8 +667,8 @@ def create_percentiles_file_lis(tb: Table, adults: bool) -> Table:
     tb = tb[tb["welfare"] != "dhci"].reset_index(drop=True)
 
     # Rename welfare, equivalization and indicator_name columns
-    tb["welfare"] = tb["welfare"].replace({"mi": "market", "dhi": "disposable"})
-    tb["equivalization"] = tb["equivalization"].replace({"eq": "equivalized", "pc": pc_notation})
+    tb["welfare"] = tb["welfare"].cat.rename_categories({"mi": "market", "dhi": "disposable"})
+    tb["equivalization"] = tb["equivalization"].cat.rename_categories({"eq": "equivalized", "pc": pc_notation})
     tb["indicator_name"] = tb["indicator_name"].replace({"thr": "threshold", "avg": "average"})
 
     # Add column prices, and assign it the value 2017 PPPs, at 2017 prices only for indicator names different from share
@@ -700,8 +700,8 @@ def create_percentiles_file_lis(tb: Table, adults: bool) -> Table:
 
     tb["prices"] = tb["prices"].replace({"2017ppp2017": "2017 PPPs, at 2017 prices"})
 
-    tb["welfare"] = tb["welfare"].replace({"market": "Market income", "disposable": "Disposable income"})
-    tb["equivalization"] = tb["equivalization"].replace(
+    tb["welfare"] = tb["welfare"].cat.rename_categories({"market": "Market income", "disposable": "Disposable income"})
+    tb["equivalization"] = tb["equivalization"].cat.rename_categories(
         {"equivalized": "Equivalized", "perCapita": pc_notation_human_readable}
     )
 
@@ -746,7 +746,7 @@ def create_percentiles_file_wid(tb) -> Table:
     tb = tb[tb["welfare"].isin(["pretax", "posttax_nat"])].reset_index(drop=True)
 
     # Rename welfare and indicator_name columns
-    tb["welfare"] = tb["welfare"].replace({"pretax": "pretaxNational", "posttax_nat": "posttaxNational"})
+    tb["welfare"] = tb["welfare"].cat.rename_categories({"pretax": "pretaxNational", "posttax_nat": "posttaxNational"})
 
     # In indicator_name, replace values that contain avg with average and thr with threshold
     tb["indicator_name"] = tb["indicator_name"].replace(
@@ -798,7 +798,7 @@ def create_percentiles_file_wid(tb) -> Table:
     # Replace names for descriptive columns
 
     tb["prices"] = tb["prices"].replace({"2011ppp2023": "2011 PPPs, at 2023 prices"})
-    tb["welfare"] = tb["welfare"].replace(
+    tb["welfare"] = tb["welfare"].cat.rename_categories(
         {"pretaxNational": "Pretax national income", "posttax_nat": "Post-tax national income"}
     )
     tb["resource_sharing"] = tb["resource_sharing"].replace({"perAdult": "Per adult"})

@@ -2319,7 +2319,6 @@ tables:
       ny_gdp_mktp_kd:
         title: GDP (constant 2015 US$)
         short_unit: $
-        unit: constant 2015 US$
       ny_gdp_mktp_kd_zg:
         title: GDP growth (annual %)
         short_unit: '%'
@@ -2334,7 +2333,6 @@ tables:
       ny_gdp_mktp_pp_kd:
         title: GDP, PPP (constant 2021 international $)
         short_unit: $
-        unit: international-$ in 2021 prices
       ny_gdp_ngas_rt_zs:
         title: Natural gas rents (% of GDP)
         short_unit: '%'
@@ -2355,10 +2353,6 @@ tables:
       ny_gdp_pcap_kd:
         title: GDP per capita (constant 2015 US$)
         short_unit: $
-        unit: constant 2015 US$
-        presentation:
-          topic_tags:
-            - Economic Growth
       ny_gdp_pcap_kd_zg:
         title: GDP per capita growth (annual %)
         short_unit: '%'
@@ -2387,17 +2381,6 @@ tables:
       ny_gdp_pcap_pp_kd:
         title: GDP per capita, PPP (constant 2021 international $)
         short_unit: $
-        unit: international-$ in 2021 prices
-        display:
-          name: GDP per capita
-          tolerance: 5
-          isProjection: false
-          numDecimalPlaces: 0
-        presentation:
-          title_public: GDP per capita
-          title_variant: In constant 2021 international $
-          topic_tags:
-            - Economic Growth
       ny_gdp_petr_rt_zs:
         title: Oil rents (% of GDP)
         short_unit: '%'
@@ -2451,7 +2434,6 @@ tables:
       ny_gnp_mktp_pp_kd:
         title: GNI, PPP (constant 2021 international $)
         short_unit: $
-        unit: international-$ in 2021 prices
       ny_gnp_pcap_cd:
         title: GNI per capita, Atlas method (current US$)
         short_unit: $
@@ -2477,12 +2459,6 @@ tables:
       ny_gnp_pcap_pp_kd:
         title: GNI per capita, PPP (constant 2021 international $)
         short_unit: $
-        unit: international-$ in 2021 prices
-        display:
-          name: GNI per capita
-          numDecimalPlaces: 0
-        presentation:
-          title_public: GNI per capita, PPP (constant 2021 international $)
       ny_gns_ictr_cd:
         title: Gross savings (current US$)
         short_unit: $
