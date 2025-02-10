@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: Stuart Gietel-Basten and Sergei Scherbov
+    title: Replacement rate of fertility - Gietel-Basten and Scherbov (2020)
+    description: |-
+      Estimated total fertility rate required to retain the same population size, after accounting for early life mortality. This is based on estimates of the total fertility rate and life tables from the UN World Population Prospects (2017).
+    citation_full: |-
+      Gietel-Basten, S., & Scherbov, S. (2020). Exploring the ‘True Value’ of Replacement Rate Fertility. Population Research and Policy Review, 39(4), 763–772. https://doi.org/10.1007/s11113-019-09561-y
+    attribution: Gietel-Basten and Scherbov (2020)
+    url_main: https://link.springer.com/article/10.1007/s11113-019-09561-y
+    url_download: |-
+      gAAAAABnqeuwvhL0r_pvNZ3TtMjshKklQ1S87L9fQ0cT9wrzR3fhvSLMmTUHotilTajZjbeb8p7WTT7t29UEUI4iqxOl8l-o-Ei0dtOLHE01ulmAQLw1p1FLb7_suoLIEL1P07nD79cUGfFkife11CStPl7dNOtRaGAAVGvNB2vpga8IMUsSD2V5XqWe1hSnwzw_J_4tm3XSsD9xY92hpjezwGoipE8mC7QtxBx65N_6IsMlOj_i2SMm-K1swuZf6gI_m0maP5Nd
+    date_accessed: '2025-02-10'
+    date_published: '2019'
+  name: Replacement rate of fertility - Gietel-Basten and Scherbov (2019)
+  description: ''
+  license: {}
+  is_public: false
+outs:
+  - md5: 5a1aa6f90909cf30d514ed89729ee77b
+    size: 60023
+    path: replacement_fertility_basten_scherbov.csv
