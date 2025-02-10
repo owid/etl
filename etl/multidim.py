@@ -53,8 +53,7 @@ def upsert_multidim_data_page(slug: str, config: dict, engine: Engine, dependenc
 
 
 def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
-    """
-    Expand catalog paths in views to full dataset URIs.
+    """Expand catalog paths in views to full dataset URIs.
 
     This function updates the given configuration dictionary in-place by modifying the "y"
     entries under "indicators" in each view. If an entry does not contain a '/',
@@ -93,6 +92,17 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
             view["indicators"]["y"] = _expand(view["indicators"]["y"])
 
 
+def _extract_catalog_path(indicator_raw):
+    "Indicator spec can come either as a plain string, or a dictionary."
+    if isinstance(indicator_raw, str):
+        return indicator_raw
+    elif isinstance(indicator_raw, dict):
+        assert "catalogPath" in indicator_raw
+        return indicator_raw["catalogPath"]
+    else:
+        raise ValueError(f"Unexpected indicator property type: {indicator_raw}")
+
+
 def validate_multidim_config(config: dict, engine: Engine) -> None:
     # Ensure that all views are in choices
     for dim in config["dimensions"]:
@@ -108,10 +118,18 @@ def validate_multidim_config(config: dict, engine: Engine) -> None:
     # Get all used indicators
     indicators = []
     for view in config["views"]:
-        if isinstance(view["indicators"]["y"], list):
-            indicators += view["indicators"]["y"]
-        else:
-            indicators.append(view["indicators"]["y"])
+        dimensions = ["y", "x", "size", "color"]  # These are the expected possible dimensions
+        for prop in dimensions:
+            if prop in view["indicators"]:
+                indicator_raw = view["indicators"][prop]
+                if isinstance(indicator_raw, list):
+                    assert prop == "y", "Only `y` can come as a list"
+                    indicators += [_extract_catalog_path(ind) for ind in indicator_raw]
+                else:
+                    indicators.append(_extract_catalog_path(indicator_raw))
+
+    # Make sure indicators are unique
+    indicators = list(set(indicators))
 
     # Validate duplicate views
     seen_dims = set()
