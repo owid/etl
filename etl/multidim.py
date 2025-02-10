@@ -3,6 +3,7 @@ from itertools import product
 
 import pandas as pd
 import yaml
+from owid.catalog import Dataset
 from sqlalchemy.engine import Engine
 from structlog import get_logger
 
@@ -11,12 +12,19 @@ from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
 from etl.helpers import map_indicator_path_to_id
+from etl.paths import DATA_DIR
 
 # Initialize logger.
 log = get_logger()
 
 
-def upsert_multidim_data_page(slug: str, config: dict, engine: Engine) -> None:
+def upsert_multidim_data_page(slug: str, config: dict, engine: Engine, dependencies: list[str] = []) -> None:
+    """
+    :param dependencies: List of dependencies for mdim. In most cases just use `dependencies=paths.dependencies`.
+    """
+
+    expand_catalog_paths(config, dependencies=dependencies)
+
     validate_multidim_config(config, engine)
 
     # TODO: Improve this. Could also go into etl.helpers.load_mdim_config
@@ -41,6 +49,44 @@ def upsert_multidim_data_page(slug: str, config: dict, engine: Engine) -> None:
     admin_api = AdminAPI(OWID_ENV)
     admin_api.put_mdim_config(slug, config)
 
+
+def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
+    """
+    Expand catalog paths in views to full dataset URIs.
+    This function updates the given configuration dictionary in-place by modifying the "y"
+    entries under "indicators" in each view. If an entry does not contain a '/',
+    it is assumed to be a table name that must be expanded to a full dataset URI based on
+    the provided dependencies.
+    Args:
+        config (dict): Configuration dictionary containing views.
+        dependencies (list[str]): List of dependency URIs in the form "data://<path>".
+    """
+
+    def _expand(y: str) -> str:
+        if "/" in y:
+            return y
+        else:
+            return table_to_dataset_uri[y.split("#")[0]] + "/" + y
+
+    # Get mapping from table names to dataset URIs
+    table_to_dataset_uri = {}
+    for dep in dependencies:
+        if not dep.startswith("data://"):
+            continue
+
+        uri = dep.replace("data://", "")
+        ds = Dataset(DATA_DIR / uri)
+        for table_name in ds.table_names:
+            if table_name in table_to_dataset_uri:
+                raise ValueError(f"Table name `{table_name}` is not unique in dependencies")
+            table_to_dataset_uri[table_name] = uri
+
+    # Go through all views and expand catalog paths
+    for view in config["views"]:
+        if isinstance(view["indicators"]["y"], list):
+            view["indicators"]["y"] = [_expand(y) for y in view["indicators"]["y"]]
+        else:
+            view["indicators"]["y"] = _expand(view["indicators"]["y"])
 
 def _extract_catalog_path(indicator_raw):
     "Indicator spec can come either as a plain string, or a dictionary."
