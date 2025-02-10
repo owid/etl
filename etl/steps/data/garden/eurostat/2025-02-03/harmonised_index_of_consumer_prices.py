@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import re
+
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -27,6 +29,27 @@ FLAGS = {"b": "break in time series", "u": "low reliability", "d": "definition d
 def sanity_check_outputs(tb: Table) -> None:
     assert tb["hicp"].notnull().all(), "Some values are missing."
     assert (tb["hicp"] >= 0).all(), "Negative values are not allowed."
+    # Extract the base year from the metadata.
+    base_year = re.search(r"\b(20\d{2}|19\d{2})\b", tb["hicp"].metadata.description_short)
+    assert base_year is not None, "Base year not found in the meadow tb['hicp'].metadata.description_short."
+    base_year = base_year.group(0)
+    # For all classifications, check that the average HICP in the base year is 100
+    # (only for countries that have 12 months in that year for that classification).
+    selection = tb["date"].str.startswith(base_year)
+    countries_completed = (
+        tb[selection].groupby(["country", "classification"], as_index=False, observed=True).agg({"hicp": "count"})
+    )
+    countries_completed = countries_completed[countries_completed["hicp"] == 12][
+        ["classification", "country"]
+    ].drop_duplicates()
+    check = tb.merge(countries_completed, on=["classification", "country"], how="inner")
+    mean_hicp = (
+        check[(check["date"].str.startswith(base_year))]
+        .groupby(["country", "classification"], as_index=False, observed=True)
+        .agg({"hicp": "mean"})
+    )
+    error = f"The mean HICPC of each country (and classification) does not equal 100 in {base_year}."
+    assert (mean_hicp["hicp"].round(1) == 100).all(), error
 
 
 def run(dest_dir: str) -> None:

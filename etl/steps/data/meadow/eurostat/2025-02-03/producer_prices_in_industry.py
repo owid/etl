@@ -39,8 +39,10 @@ def run(dest_dir: str) -> None:
     # We choose base 2021, which has more recent data.
     tb = tb[tb["unit"] == "I21"].reset_index(drop=True)
     tb = tb.drop(columns=["unit"], errors="raise")
-    # Clafity this choice in the metadata (to avoid confusion in the garden step).
-    tb["value"].description_short = "Index value of the producer prices in industry, expressed relative to 2021."
+    # Clarify this choice in the metadata (to avoid confusion in the garden step).
+    tb[
+        "value"
+    ].description_short = "Index value of the producer prices in industry, assuming a base value of 100 for 2021."
 
     # The "freq" field is unnecessary (since all data is monthly).
     assert set(tb["freq"]) == {"M"}, "Unexpected option in 'freq' column."

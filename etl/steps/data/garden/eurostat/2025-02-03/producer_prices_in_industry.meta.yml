@@ -18,7 +18,7 @@ tables:
         short_unit: ""
         # The short description is set at the meadow step, where the choice of base year is made.
         # description_short: |-
-        #   Index value of the producer prices in industry, expressed relative to 2021.
+        #   Index value of the producer prices in industry, assuming a base value of 100 for 2021.
       flag:
         title: Data flag
         unit: ""

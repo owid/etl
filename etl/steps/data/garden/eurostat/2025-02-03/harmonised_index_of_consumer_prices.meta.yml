@@ -16,8 +16,9 @@ tables:
         title: Index value
         unit: ""
         short_unit: ""
-        description_short: |-
-          Harmonized index of consumer price, assuming a base value of 100 for 2015.
+        # The short description is set at the meadow step, where the choice of base year is made.
+        # description_short: |-
+        #   Harmonized index of consumer price, assuming a base value of 100 for 2015.
       flag:
         title: Data flag
         unit: ""

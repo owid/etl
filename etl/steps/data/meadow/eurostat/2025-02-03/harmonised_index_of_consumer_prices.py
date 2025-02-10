@@ -39,6 +39,10 @@ def run(dest_dir: str) -> None:
     # We will only use the latest currency reference.
     tb = tb[tb["unit"] == "I15"].reset_index(drop=True)
     tb = tb.drop(columns=["unit"])
+    # Clarify this choice in the metadata (to avoid confusion in the garden step).
+    tb[
+        "value"
+    ].metadata.description_short = "Harmonized index of consumer price, assuming a base value of 100 for 2015."
 
     # The "freq" field is unnecessary (since all data is monthly).
     assert set(tb["freq"]) == {"M"}, "Unexpected option in 'freq' column."
