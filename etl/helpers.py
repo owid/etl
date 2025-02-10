@@ -775,7 +775,7 @@ class PathFinder:
         assert len(deps) == 1
         return deps[0].replace("etag://", "https://")
 
-    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, str]:
+    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
         if filename is not None:
             path = self.directory / Path(filename)
         elif path is None:
