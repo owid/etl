@@ -5,6 +5,11 @@ definitions:
     description_processing: The deaths were assumed to be evenly distributed over the duration of each famine, except for the famine in China between 1958 and 1962, where the source provides a year-by-year breakdown of mortality.
     description_from_producer: |-
         Famines are assessed based on severity, magnitude, and duration. Magnitude, measured as the total number of excess deaths, was used to determine inclusion in the catalogue. A threshold of 100,000 deaths was applied due to limited demographic research on proportional death rate increases.
+    description_key:
+      - WPF defines a famine as mass mortality due to mass starvation, with mass starvation being the "destruction, deprivation or loss of objects and activities required for survival".
+      - WPF coded the most credible estimate of the number of deaths across sources. If there were several equally credible estimates, WPF used their median.
+      - The 1910–1919 famine in British Somaliland and the African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, and Djibouti) is treated as a single event because the 100,000+ mortality estimate applies to the entire region, not individual areas.
+      - For the Ottoman Empire (1894–1896), East Africa (1896–1900), and the combined Somaliland–African Red Sea Region famine (1910–1919), the 100,000 death estimate is a **minimum**, meaning the actual death toll was likely higher.
 
     presentation:
       topic_tags:
