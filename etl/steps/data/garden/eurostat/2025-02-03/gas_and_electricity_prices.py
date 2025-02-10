@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import re
 from typing import Dict
 
 import owid.catalog.processing as pr
@@ -18,8 +19,10 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Base year to use for HICP prices (for code convenience, as a string).
+# Base year to use for HICP prices, after rebasing (for code convenience, as a string).
 HICP_BASE_YEAR_NEW = "2021"
+# Original base year of the HICP data (for code convenience, as a string).
+HICP_BASE_YEAR_ORIGINAL = "2015"
 
 # Dataset codes to select, and their corresponding names.
 DATASET_CODES_AND_NAMES = {
@@ -894,7 +897,7 @@ def prepare_hicp(tb_hicp: Table) -> Table:
         + tb_hicp["date"].str[5:].astype(int).apply(lambda x: "S1" if x <= 6 else "S2")
     )
 
-    # Calculate rebase factors, to convert HICP index values from the old (2015) to the new base (2021).
+    # Calculate rebase factors, to convert HICP index values from the old base year to the new one.
     rebase_factors = (
         tb_hicp[tb_hicp["year"] == HICP_BASE_YEAR_NEW]
         .groupby(["country", "year"], observed=True, as_index=False)
@@ -999,6 +1002,11 @@ def run(dest_dir: str) -> None:
     # TODO: Update metadata (explain rebasing in description_processing).
     sanity_check_outputs(tb=tb)
 
+    # First, ensure that the old base year is as expected.
+    base_year = re.search(r"\b(20\d{2}|19\d{2})\b", tb_hicp["hicp"].metadata.description_short)
+    assert base_year is not None, "Base year not found in the meadow tb['hicp'].metadata.description_short."
+    assert base_year.group(0) == HICP_BASE_YEAR_ORIGINAL, "Original base year is not as expected."
+
     # For simplicity (after sanity checks are executed) keep only deflated euros.
     tb = tb.drop(columns=["price_euro", "price_pps", "hicp"], errors="raise").rename(
         columns={"price_euro_deflated": "price_euro", "price_pps_deflated": "price_pps"}, errors="raise"
@@ -1028,5 +1036,6 @@ def run(dest_dir: str) -> None:
         tables=[tb, tb_prices_euro, tb_prices_pps, tb_price_components_euro, tb_price_components_pps],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
+        yaml_params={"EUROS_YEAR": HICP_BASE_YEAR_NEW, "EUROS_YEAR_ORIGINAL": HICP_BASE_YEAR_ORIGINAL},
     )
     ds_garden.save()

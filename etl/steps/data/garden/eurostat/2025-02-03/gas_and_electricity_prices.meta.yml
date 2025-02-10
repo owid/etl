@@ -78,18 +78,17 @@ definitions:
   description_short_non_household_pps: &description_short_non_household_pps |-
     Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). This data is adjusted for inflation and differences in living costs between countries. Non-household consumers include commercial and industrial uses like services, offices, and agriculture.
   footnote_different_prices_euros: &footnote-different-prices-euros |-
-    This data is expressed in constant 2015 euros, deflated using the Harmonised Index of Consumer Prices. Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
+    This data is expressed in constant {EUROS_YEAR} euros, deflated using the Harmonised Index of Consumer Prices. Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
   footnote_different_prices_pps: &footnote-different-prices-pps |-
-    PPS have been adjusted for inflation, expressed in 2015 prices, using the Harmonised Index of Consumer Prices. Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
+    PPS have been adjusted for inflation, expressed in {EUROS_YEAR} prices, using the Harmonised Index of Consumer Prices. Differences in consumer prices between countries often reflect taxes, subsidies, and network costs, rather than just generation costs.
   description_processing_pps: &description-processing-pps |-
-    PPS prices from Eurostat are adjusted for differences in living costs between countries but not for inflation. To account for inflation, these prices have been divided by the Harmonised Index of Consumer Prices (and multiplied by 100) set to 100 for 2015, excluding the energy component. This way, prices are adjusted for the underlying inflation trends without distortion from energy price volatility.
+    - The original PPS prices from Eurostat are adjusted for differences in living costs between countries but not for inflation. We adjusted those prices for inflation using the Harmonised Index of Consumer Prices, excluding the energy component. This way, prices are adjusted for the underlying inflation trends without distortion from energy price volatility. To convert the original PPS prices to constant {EUROS_YEAR} euros, they were divided by the HICP values (referenced to {EUROS_YEAR_ORIGINAL}) and then multiplied by the annual average HICP of {EUROS_YEAR}.
   description_processing_euros: &description-processing-euros |-
-    To account for inflation, prices have been divided by the Harmonised Index of Consumer Prices (and multiplied by 100) set to 100 for 2015, excluding the energy component. This way, prices are adjusted for the underlying inflation trends without distortion from energy price volatility.
+    - Prices have been adjusted for inflation using the Harmonised Index of Consumer Prices (HICP), excluding the energy component. This ensures prices reflect underlying inflation trends without distortion from energy price volatility. To convert the original prices in current euros to constant {EUROS_YEAR} euros, they were divided by the HICP values referenced to {EUROS_YEAR_ORIGINAL} and then multiplied by the annual average HICP of {EUROS_YEAR}.
   description_key_pps: |-
-    The [Purchasing Power Standard (PPS)](#dod:pps) is a currency used to compare economic data across European countries, adjusted for differences in price levels. PPS prices have also been adjusted for inflation, expressed in 2015 euros, using the Harmonised Index of Consumer Prices.
+    The [Purchasing Power Standard (PPS)](#dod:pps) is a currency used to compare economic data across European countries, adjusted for differences in price levels. PPS prices have also been adjusted for inflation, expressed in {EUROS_YEAR} euros, using the Harmonised Index of Consumer Prices.
   description_key_euros: |-
-    To account for inflation, prices have been adjusted using the Harmonised Index of Consumer Prices (HICP), excluding energy, with 2015 as the reference year. This removes distortions from energy price volatility and reflects underlying inflation trends.
-
+    Prices are shown in constant {EUROS_YEAR} euros, adjusted for inflation using the Harmonised Index of Consumer Prices (HICP), excluding energy. This helps account for general price trends without being affected by energy price fluctuations.
 
 dataset:
   update_period_days: 365
@@ -112,7 +111,7 @@ tables:
     title: Gas and electricity price components in Europe
     common:
       description_short: Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are adjusted for inflation but do not account for differences in living costs between countries.
-      unit: 'constant 2015 euros per megawatt-hour'
+      unit: 'constant {EUROS_YEAR} euros per megawatt-hour'
       short_unit: "€/MWh"
       description_processing: *description-processing-euros
     variables:
