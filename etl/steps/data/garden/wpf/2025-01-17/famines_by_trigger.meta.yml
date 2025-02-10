@@ -5,6 +5,9 @@ definitions:
     description_short: Deaths from famines that are estimated to have killed 100,000 people or more. Although categorized into four main triggers here, famines almost always result from a complex interplay of factors, with human decisions frequently influencing their severity and outcomes.
     description_key:
       - WPF defines a famine as mass mortality due to mass starvation, with mass starvation being the "destruction, deprivation or loss of objects and activities required for survival".
+      - WPF coded the most credible estimate of the number of deaths across sources. If there were several equally credible estimates, WPF used their median.
+      - The 1910–1919 famine in British Somaliland and the African Red Sea Region (Sudan, Northern Ethiopia, Eritrea, and Djibouti) is treated as a single event because the 100,000+ mortality estimate applies to the entire region, not individual areas.
+      - For the Ottoman Empire (1894–1896), East Africa (1896–1900), and the combined Somaliland–African Red Sea Region famine (1910–1919), the 100,000 death estimate is a **minimum**, meaning the actual death toll was likely higher.
       - Famines were classified into four main triggers - adverse climate, government policies, armed conflict, or genocide - though in reality, multiple factors, especially human decisions, almost always play a significant role in their development and severity.
       - Historical examples demonstrate this complexity, such as when El Niño-related famines in the late 19th century were made worse by imperial conquest, and when the 1984-85 Sudan famine, initially triggered by drought, was intensified by exploitative politics.
       - The Ukrainian Holodomor (1931-1933) is a subject of some controversy, with interpretations divided between Stalin’s genocidal intent and Soviet claims of unintentional policy failures; however, most scholars now classify it as genocide.

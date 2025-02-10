@@ -16,3 +16,8 @@ dataset:
   update_period_days: 365
   title: Deaths from famines by top countries and by decade
 
+tables:
+  famines_by_place:
+    variables:
+     decadal_famine_deaths:
+        title: Deaths from famines by top countries by decade
