@@ -205,13 +205,24 @@ def check_overlapping_names(tb: Table) -> None:
         raise ValueError(f"index names are overlapping with column names: {overlapping_names}")
 
 
-def drop_excess_region_sources(tb: Table, priority_regions: list[str]) -> Table:
-    """Drop specific region sources if there are more than two different sources for a given indicator, in the order of preference given below"""
-    if tb["region_source"].nunique() > 2:
+def drop_excess_region_sources(tb: pd.DataFrame, priority_regions: list[str]) -> pd.DataFrame:
+    """
+    Drop specific region sources if there are more than two different sources for a given indicator,
+    in the order of preference given in `priority_regions`.
+    Keep rows where `region_source` is NaN.
+    """
+    if tb["region_source"].nunique(dropna=True) > 2:  # Only count non-NaN values
         unique_sources = tb["region_source"].dropna().unique().tolist()
+
+        # Sort sources based on priority list
         unique_sources.sort(key=lambda x: priority_regions.index(x) if x in priority_regions else float("inf"))
+
+        # Keep only the top 2 priority sources
         sources_to_keep = unique_sources[:2]
-        tb = tb[tb["region_source"].isin(sources_to_keep)]
+
+        # Filter the DataFrame but KEEP NaN values
+        tb = tb[tb["region_source"].isin(sources_to_keep) | tb["region_source"].isna()]
+
     return tb
 
 
