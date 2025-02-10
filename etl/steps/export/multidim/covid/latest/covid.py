@@ -30,6 +30,7 @@ def run(dest_dir: str) -> None:
             slug,
             config,
             engine,
+            paths.dependencies,
         )
 
     # Automatic ones (they have dimensions in the tables)

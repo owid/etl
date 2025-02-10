@@ -1,5 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  common_death_note: |-
+    Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
   common_display: &common_display
     zeroDay: "2020-01-21"
     yearIsDay: true
@@ -304,7 +306,7 @@ tables:
         presentation:
           grapher_config:
             title: Cumulative confirmed COVID-19 deaths
-            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: "{definitions.common_death_note}"
             hasMapTab: true
             map:
               colorScale:
@@ -320,7 +322,7 @@ tables:
         presentation:
           grapher_config:
             title: Cumulative confirmed COVID-19 deaths per million people
-            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: "{definitions.common_death_note}"
             hasMapTab: true
             map:
               colorScale:
@@ -341,7 +343,7 @@ tables:
         presentation:
           grapher_config:
             title: Cumulative confirmed COVID-19 deaths per 100,000 people
-            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: "{definitions.common_death_note}"
         display:
           numDecimalPlaces: 3
           tolerance: 9999
@@ -364,7 +366,7 @@ tables:
         presentation:
           grapher_config:
             title: Daily new confirmed COVID-19 deaths
-            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: "{definitions.common_death_note}"
             hasMapTab: true
             map:
               colorScale:
@@ -380,7 +382,7 @@ tables:
         presentation:
           grapher_config:
             title: Daily new confirmed COVID-19 deaths per million people
-            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: "{definitions.common_death_note}"
             hasMapTab: true
             map:
               colorScale:
@@ -407,7 +409,7 @@ tables:
         presentation:
           grapher_config:
             title: Daily new confirmed COVID-19 deaths
-            subtitle: 7-day rolling average. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: 7-day rolling average. {definitions.common_death_note}
             hasMapTab: true
             map:
               colorScale:
@@ -427,7 +429,7 @@ tables:
         presentation:
           grapher_config:
             title: Daily new confirmed COVID-19 deaths per million people
-            subtitle: 7-day rolling average. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: 7-day rolling average. {definitions.common_death_note}
             hasMapTab: true
             map:
               colorScale:
@@ -464,6 +466,8 @@ tables:
       weekly_deaths:
         title: Weekly deaths
         unit: "deaths"
+        description_short: |-
+          Cumulative number of confirmed deaths over the previous week. {definitions.common_death_note}
         display:
           numDecimalPlaces: 0
           tolerance: 30
@@ -471,7 +475,7 @@ tables:
         presentation:
           grapher_config:
             title: Weekly confirmed COVID-19 deaths
-            subtitle: Weekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: Weekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. {definitions.common_death_note}
             hasMapTab: true
             tab: map
             map:
@@ -482,11 +486,13 @@ tables:
       weekly_deaths_per_million:
         title: "Weekly deaths per million people"
         unit: "deaths per million people"
+        description_short: |-
+          Cumulative number of confirmed deaths over the previous week. {definitions.common_death_note}
         description_processing: *daily_population
         presentation:
           grapher_config:
             title: Weekly confirmed COVID-19 deaths per million people
-            subtitle: Weekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: Weekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. {definitions.common_death_note}
             hasMapTab: true
             tab: map
             map:
@@ -502,10 +508,12 @@ tables:
         title: Weekly death growth (%)
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          It measures the percentage change in number of confirmed deaths over the last seven days relative to the number in the previous seven days. {definitions.common_death_note}
         presentation:
           grapher_config:
             title: Week by week change of confirmed COVID-19 deaths
-            subtitle: The weekly growth rate on any given date measures the percentage change in number of confirmed deaths over the last seven days relative to the number in the previous seven days. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: The weekly growth rate on any given date measures the percentage change in number of confirmed deaths over the last seven days relative to the number in the previous seven days. {definitions.common_death_note}
             hasMapTab: true
             tab: map
             map:
@@ -532,7 +540,7 @@ tables:
         presentation:
           grapher_config:
             title: Biweekly confirmed COVID-19 deaths
-            subtitle: Biweekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous two weeks. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: Biweekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous two weeks. {definitions.common_death_note}
             hasMapTab: true
             map:
               colorScale:
@@ -551,7 +559,7 @@ tables:
         presentation:
           grapher_config:
             title: Biweekly confirmed COVID-19 deaths per million people
-            subtitle: Biweekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: Biweekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. {definitions.common_death_note}
             hasMapTab: true
             map:
               colorScale:
@@ -570,7 +578,7 @@ tables:
         presentation:
           grapher_config:
             title: Biweekly change of confirmed COVID-19 deaths
-            subtitle: The biweekly growth rate on any given date measures the percentage change in the number of new confirmed deaths over the last 14 days relative to the number in the previous 14 days. Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: The biweekly growth rate on any given date measures the percentage change in the number of new confirmed deaths over the last 14 days relative to the number in the previous 14 days. {definitions.common_death_note}
             hasMapTab: true
             map:
               colorScale:
@@ -596,7 +604,7 @@ tables:
         presentation:
           grapher_config:
             title: Cumulative confirmed COVID-19 deaths in the last 12 months
-            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: "{definitions.common_death_note}"
             hasMapTab: true
             map:
               colorScale:
@@ -613,7 +621,7 @@ tables:
         presentation:
           grapher_config:
             title: Cumulative confirmed COVID-19 deaths per million people in the last 12 months
-            subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
+            subtitle: "{definitions.common_death_note}"
             hasMapTab: true
             map:
               colorScale:
