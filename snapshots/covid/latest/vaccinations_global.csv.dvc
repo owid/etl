@@ -10,8 +10,7 @@ meta:
       This dataset includes some subnational locations (England, Northern Ireland, Scotland, Wales, Northern Cyprus…) and international aggregates (World, continents, European Union…).
 
       The data produced by third parties and made available by Our World in Data is subject to the license terms from the original third-party authors. We will always indicate the original source of the data in our database, and you should always check the license of any such third-party data before use.
-    date_published: "2024-08-14"
-
+    date_published: "2025"
     # Citation
     producer: Official data collated by Our World in Data
     citation_full: |-
