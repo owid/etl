@@ -533,6 +533,8 @@ tables:
       biweekly_deaths:
         title: Biweekly deaths
         unit: "deaths"
+        description_short: |-
+          Cumulative number of confirmed deaths over the previous two weeks. {definitions.common_death_note}
         display:
           numDecimalPlaces: 0
           tolerance: 30
@@ -551,6 +553,8 @@ tables:
       biweekly_deaths_per_million:
         title: "Biweekly deaths per million people"
         unit: "deaths per million people"
+        description_short: |-
+          Cumulative number of confirmed deaths over the previous two weeks. {definitions.common_death_note}
         description_processing: *daily_population
         display:
           numDecimalPlaces: 2
@@ -571,6 +575,8 @@ tables:
         title: Biweekly death growth (%)
         unit: "%"
         short_unit: "%"
+        description_short: |-
+          It measures the percentage change in number of confirmed deaths over the last seven days relative to the number in the previous 14 days. {definitions.common_death_note}
         display:
           numDecimalPlaces: 1
           tolerance: 30
