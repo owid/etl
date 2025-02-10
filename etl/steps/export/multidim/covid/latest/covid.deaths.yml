@@ -1,4 +1,5 @@
 definitions:
+  table: grapher/covid/latest/cases_deaths/cases_deaths
   config: &config
     $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
     tab: map
@@ -47,35 +48,35 @@ views:
       period: weekly
       metric: absolute
     indicators:
-      y: "cases_deaths#weekly_deaths"
+      y: "{definitions.table}#weekly_deaths"
     config: *config
   - dimensions:
       period: weekly
       metric: per_capita
     indicators:
-      y: "cases_deaths#weekly_deaths_per_million"
+      y: "{definitions.table}#weekly_deaths_per_million"
     config: *config
   - dimensions:
       period: weekly
       metric: change
     indicators:
-      y: "cases_deaths#weekly_pct_growth_deaths"
+      y: "{definitions.table}#weekly_pct_growth_deaths"
     config: *config
   - dimensions:
       period: biweekly
       metric: absolute
     indicators:
-      y: "cases_deaths#biweekly_deaths"
+      y: "{definitions.table}#biweekly_deaths"
     config: *config
   - dimensions:
       period: biweekly
       metric: per_capita
     indicators:
-      y: "cases_deaths#biweekly_deaths_per_million"
+      y: "{definitions.table}#biweekly_deaths_per_million"
     config: *config
   - dimensions:
       period: biweekly
       metric: change
     indicators:
-      y: "cases_deaths#biweekly_pct_growth_deaths"
+      y: "{definitions.table}#biweekly_pct_growth_deaths"
     config: *config

@@ -315,7 +315,7 @@ steps:
   ######################################
   # MULTIDIM
   export://multidim/covid/latest/covid:
-    - data://grapher/covid/latest/cases_deaths
+    - grapher://grapher/covid/latest/cases_deaths
     - grapher://grapher/covid/latest/hospital
     - grapher://grapher/covid/latest/vaccinations_global
     - grapher://grapher/covid/latest/vaccinations_manufacturer
