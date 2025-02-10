@@ -4,11 +4,6 @@ definitions:
     display:
       numDecimalPlaces: 0
     description_short: Deaths in famines that are estimated to have killed 100,000 people or more.
-    description_key:
-      - WPF defines a famine as mass mortality due to mass starvation, with mass starvation being the "destruction, deprivation or loss of objects and activities required for survival".
-    description_processing: The deaths were assumed to be evenly distributed over the duration of each famine, except for the famine in China between 1958 and 1962, where the source provides a year-by-year breakdown of mortality.
-    description_from_producer: |-
-      Famines are assessed based on severity, magnitude, and duration. Magnitude, measured as the total number of excess deaths, was used to determine inclusion in the catalogue. A threshold of 100,000 deaths was applied due to limited demographic research on proportional death rate increases.
     presentation:
       topic_tags:
         - Famines
@@ -21,12 +16,3 @@ dataset:
   update_period_days: 365
   title: Deaths from famines by top countries and by decade
 
-tables:
-  famines_by_place:
-    variables:
-     decadal_famine_deaths:
-        title: Deaths from famines by top countries by decade
-        unit: 'deaths'
-        presentation:
-          grapher_config:
-            note: Decadal figures represent data averaged over each ten-year period (e.g., 1990–1999 for the 1990s). The 2020s figure is provisional and includes data only up to and including 2023.
