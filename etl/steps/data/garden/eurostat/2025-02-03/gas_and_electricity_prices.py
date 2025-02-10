@@ -7,12 +7,19 @@ import pandas as pd
 import plotly.express as px
 from owid.catalog import Table
 from owid.datautils.dataframes import map_series
+from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
+# Initialize log.
+log = get_logger()
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Base year to use for HICP prices (for code convenience, as a string).
+HICP_BASE_YEAR_NEW = "2021"
 
 # Dataset codes to select, and their corresponding names.
 DATASET_CODES_AND_NAMES = {
@@ -267,6 +274,10 @@ COMPONENTS_THAT_ADD_UP_TO_TOTAL = ["Energy and supply", "Network costs", "Taxes,
 
 # Label to use for the calculated total price based on the sum of the main components.
 COMPONENTS_TOTAL_PRICE_LABEL = "Total price, including taxes"
+
+# Allow HICP data to lag a certain number of months behind, and warn if that lag is larger than expected.
+# NOTE: We will also assert that the minimum date in Eurostat prices is fully covered by HICP data.
+HICP_ALLOWED_MONTHS_OF_LAG = 2
 
 
 def sanity_check_inputs(tb: Table) -> None:
@@ -850,6 +861,22 @@ def sanity_check_outputs(tb: Table) -> None:
     assert compared[(compared["price_euro_original"] > 7) & (compared["dev"] > 2)].empty, error
     # compared.sort_values("dev", ascending=False).head(60)
 
+    # Sanity check: check that the maximum date of HICP is only a certain number of months behind prices data.
+    # NOTE: This check needs to be executed before correcting prices for inflation.
+    prices_first_month = tb[tb["price_euro"].notnull()]["date"].min()
+    prices_latest_month = tb[tb["price_euro"].notnull()]["date"].max()
+    hicp_first_month = tb[tb["hicp"].notnull()]["date"].min()
+    hicp_latest_month = tb[tb["hicp"].notnull()]["date"].max()
+    if pd.to_datetime(hicp_latest_month) < pd.to_datetime(prices_latest_month) - pd.DateOffset(
+        months=HICP_ALLOWED_MONTHS_OF_LAG
+    ):
+        log.warning(
+            f"HICP data is lagging behind more than {HICP_ALLOWED_MONTHS_OF_LAG} months behind Eurostat prices data."
+        )
+    # Check that the minimum date of HICP fully covers the data in the energy prices table.
+    error = "HICP data does not cover the minimum date of energy prices."
+    assert prices_first_month >= hicp_first_month, error
+
 
 def prepare_hicp(tb_hicp: Table) -> Table:
     # We want to use the HICP data to adjust the prices for inflation.
@@ -867,8 +894,40 @@ def prepare_hicp(tb_hicp: Table) -> Table:
         + tb_hicp["date"].str[5:].astype(int).apply(lambda x: "S1" if x <= 6 else "S2")
     )
 
+    # Calculate rebase factors, to convert HICP index values from the old (2015) to the new base (2021).
+    rebase_factors = (
+        tb_hicp[tb_hicp["year"] == HICP_BASE_YEAR_NEW]
+        .groupby(["country", "year"], observed=True, as_index=False)
+        .agg({"hicp": "mean"})
+        .drop(columns=["year"], errors="raise")
+        .rename(columns={"hicp": "rebase_factor"})
+    )
+
+    # Convert HICP indexes to the new base year.
+    tb_hicp = tb_hicp.merge(rebase_factors, how="left", on="country")
+    tb_hicp["hicp"] = tb_hicp["hicp"] / tb_hicp["rebase_factor"] * 100
+
+    # Sanity check: for all classifications, check that the average HICP in the base year is 100
+    # (only for countries that have 12 months in that year for that classification).
+    selection = tb_hicp["date"].str.startswith(HICP_BASE_YEAR_NEW)
+    countries_completed = (
+        tb_hicp[selection].groupby(["country", "classification"], as_index=False, observed=True).agg({"hicp": "count"})
+    )
+    countries_completed = countries_completed[countries_completed["hicp"] == 12][
+        ["classification", "country"]
+    ].drop_duplicates()
+    check = tb_hicp.merge(countries_completed, on=["classification", "country"], how="inner")
+    mean_hicp = (
+        check[(check["date"].str.startswith(HICP_BASE_YEAR_NEW))]
+        .groupby(["country", "classification"], as_index=False, observed=True)
+        .agg({"hicp": "mean"})
+    )
+    error = f"The mean HICPC of each country (and classification) does not equal 100 in {HICP_BASE_YEAR_NEW}."
+    assert (mean_hicp["hicp"].round(1) == 100).all(), error
+
     # Calculate average HICP for each country and year.
     tb_hicp_year = tb_hicp.groupby(["country", "year"], observed=True, as_index=False).agg({"hicp": "mean"})
+
     # Calculate average HICP for each country and semester.
     tb_hicp_semester = tb_hicp.groupby(["country", "semester"], observed=True, as_index=False).agg({"hicp": "mean"})
 
@@ -929,12 +988,24 @@ def run(dest_dir: str) -> None:
     # Add HICP column to main table.
     tb = tb.merge(tb_hicp, how="left", on=["country", "date"])
 
+    tb[tb["price_euro"].isnull()].index
+
     # Adjust prices for inflation.
-    tb["price_euro"] = tb["price_euro"] / tb["hicp"] * 100
-    tb["price_pps"] = tb["price_pps"] / tb["hicp"] * 100
+    tb["price_euro_deflated"] = tb["price_euro"] / tb["hicp"] * 100
+    tb["price_pps_deflated"] = tb["price_pps"] / tb["hicp"] * 100
 
     # Sanity check outputs.
+    # TODO: Add sanity check to ensure we know which countries are missing data after deflation.
+    # TODO: Update metadata (explain rebasing in description_processing).
     sanity_check_outputs(tb=tb)
+
+    # For simplicity (after sanity checks are executed) keep only deflated euros.
+    tb = tb.drop(columns=["price_euro", "price_pps", "hicp"], errors="raise").rename(
+        columns={"price_euro_deflated": "price_euro", "price_pps_deflated": "price_pps"}, errors="raise"
+    )
+
+    # Remove rows without prices.
+    tb = tb.dropna(subset=["price_euro", "price_pps"], how="all").reset_index(drop=True)
 
     # Uncomment to plot a comparison (for each country, source, and consumer type) between the prices and the components data.
     # NOTE: Some of the biggest discrepancies happen where prices data is given only for one of the semesters. This is the case of Georgia household electricity in 2021 and 2022, where we can't see the value of the missing semester (which could explain why the components data is significantly higher).
