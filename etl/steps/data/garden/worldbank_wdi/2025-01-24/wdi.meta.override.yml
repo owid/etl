@@ -18,6 +18,8 @@ definitions:
 
     We obtain this indicator to have a more meaningful comparison between exchange-rate-based and PPP-based GDP estimates in the same reference year.
 
+    We have also obtained [Our World in Data regional aggregations](https://ourworldindata.org/world-region-map-definitions) of these indicators by calculating a population-weighted average by region. You can see more information about the population data in [this dedicated article about sources](https://ourworldindata.org/population-sources).
+
 
 tables:
   wdi:
