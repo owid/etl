@@ -36,9 +36,11 @@ def run(dest_dir: str) -> None:
     # [I21] Index, 2021=100
     # [I15] Index, 2015=100
     # [I10] Index, 2010=100
-    # Ideally, we could use 2021, but, for consistency with the HICP (where the maximum is 2015), we will use 2015.
-    tb = tb[tb["unit"] == "I15"].reset_index(drop=True)
+    # We choose base 2021, which has more recent data.
+    tb = tb[tb["unit"] == "I21"].reset_index(drop=True)
     tb = tb.drop(columns=["unit"], errors="raise")
+    # Clafity this choice in the metadata (to avoid confusion in the garden step).
+    tb["value"].description_short = "Index value of the producer prices in industry, expressed relative to 2021."
 
     # The "freq" field is unnecessary (since all data is monthly).
     assert set(tb["freq"]) == {"M"}, "Unexpected option in 'freq' column."

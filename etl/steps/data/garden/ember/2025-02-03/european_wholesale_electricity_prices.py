@@ -1,7 +1,13 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
+from structlog import get_logger
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
+
+# Initialize logger.
+log = get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -17,6 +23,10 @@ COLUMNS = {
 # If the number is smaller than this, the month is removed from the data.
 # We do this to avoid having very sparse data (especially on the latest informed month).
 MIN_NUM_COUNTRIES_INFORMED_PER_MONTH = 10
+
+# Allow PPI data to lag a certain number of months behind, and warn if that lag is larger than expected.
+# NOTE: We will also assert that the minimum date in Ember is fully covered by PPI data.
+PPI_ALLOWED_MONTHS_OF_LAG = 2
 
 
 def run(dest_dir: str) -> None:
@@ -56,8 +66,22 @@ def run(dest_dir: str) -> None:
     # Combine energy prices table with PPI table.
     tb_monthly = tb_monthly.merge(tb_ppi, on=["country", "date"], how="left")
 
+    # Sanity checks.
+    # Check that the maximum date of PPI is only a certain number of months behind Ember data.
+    ember_first_month = tb_monthly[tb_monthly["price"].notnull()]["date"].min()
+    ember_latest_month = tb_monthly[tb_monthly["price"].notnull()]["date"].max()
+    ppi_first_month = tb_monthly[tb_monthly["ppi"].notnull()]["date"].min()
+    ppi_latest_month = tb_monthly[tb_monthly["ppi"].notnull()]["date"].max()
+    if pd.to_datetime(ppi_latest_month) < pd.to_datetime(ember_latest_month) - pd.DateOffset(
+        months=PPI_ALLOWED_MONTHS_OF_LAG
+    ):
+        log.warning(f"PPI data is lagging behind more than {PPI_ALLOWED_MONTHS_OF_LAG} months behind Ember's data.")
+    # Check that the minimum date of PPI fully covers the data in the energy prices table.
+    error = "PPI data does not cover the minimum date of energy prices."
+    assert ember_first_month >= ppi_first_month, error
+
     # Adjust monthly prices for inflation.
-    # NOTE: When doing this, many prices will be lost (e.g. UK data from 2020 onwards).
+    # NOTE: When doing this, many prices will be lost (e.g. UK data).
     tb_monthly["price"] = tb_monthly["price"] * 100 / tb_monthly["ppi"]
 
     # Ember provides monthly data, so we can create a monthly table of wholesale electricity prices.
