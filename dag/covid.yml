@@ -316,12 +316,12 @@ steps:
   # MULTIDIM
   export://multidim/covid/latest/covid:
     - data://grapher/covid/latest/cases_deaths
-    - grapher://grapher/covid/latest/hospital
-    - grapher://grapher/covid/latest/vaccinations_global
-    - grapher://grapher/covid/latest/vaccinations_manufacturer
-    - grapher://grapher/covid/latest/testing
-    - data://grapher/covid/latest/google_mobility
-    - grapher://grapher/excess_mortality/latest/excess_mortality
-    - grapher://grapher/covid/latest/covax
-    - grapher://grapher/covid/latest/infections_model
-    - grapher://grapher/covid/latest/xm_who
+    - data://grapher/covid/latest/hospital
+    - data://grapher/covid/latest/vaccinations_global
+    - data://grapher/covid/latest/vaccinations_manufacturer
+    - data://grapher/covid/latest/testing
+    # - data://grapher/covid/latest/google_mobility
+    - data://grapher/excess_mortality/latest/excess_mortality
+    - data://grapher/covid/latest/covax
+    - data://grapher/covid/latest/infections_model
+    - data://grapher/covid/latest/xm_who
