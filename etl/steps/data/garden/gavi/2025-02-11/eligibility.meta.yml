@@ -16,3 +16,4 @@ tables:
       phase:
         title: Phase of vaccine eligibility
         description_short: The phase of vaccine eligibility for Gavi assistance.
+        unit: ""
