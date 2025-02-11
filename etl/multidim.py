@@ -1,5 +1,6 @@
 import json
 from itertools import product
+from typing import Dict, Union
 
 import pandas as pd
 import yaml
@@ -12,7 +13,6 @@ from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
 from etl.paths import DATA_DIR
-from typing import Union, Dict
 
 # Initialize logger.
 log = get_logger()
