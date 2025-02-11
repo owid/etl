@@ -12,6 +12,7 @@ from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
 from etl.paths import DATA_DIR
+from typing import Union, Dict
 
 # Initialize logger.
 log = get_logger()
@@ -46,12 +47,22 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
         dependencies (list[str]): List of dependency URIs in the form "data://<path>".
     """
 
-    def _expand(y: str) -> str:
-        catalog_path = _extract_catalog_path(y)
-        if "/" in catalog_path:
-            return catalog_path
-        else:
-            return table_to_dataset_uri[catalog_path.split("#")[0]] + "/" + catalog_path
+    def _expand_catalog_path(y: Union[str, Dict[str, str]]) -> Union[str, Dict[str, str]]:
+        """Return same indicator, but with complete catalog path."""
+        def _expand(y: str):
+            if "/" in y:
+                return y
+            else:
+                return table_to_dataset_uri[y.split("#")[0]] + "/" + y
+
+        # Expand catalog path if it's a string
+        if isinstance(y, str):
+            return _expand(y)
+        # Expand catalog path if it's a dictionary
+        elif isinstance(y, dict):
+            assert "catalogPath" in y, "Expected 'catalogPath' key in indicator dictionary"
+            y["catalogPath"] = _expand(y["catalogPath"])
+            return y
 
     # Get mapping from table names to dataset URIs
     table_to_dataset_uri = {}
@@ -69,9 +80,9 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
     # Go through all views and expand catalog paths
     for view in config["views"]:
         if isinstance(view["indicators"]["y"], list):
-            view["indicators"]["y"] = [_expand(y) for y in view["indicators"]["y"]]
+            view["indicators"]["y"] = [_expand_catalog_path(y) for y in view["indicators"]["y"]]
         else:
-            view["indicators"]["y"] = _expand(view["indicators"]["y"])
+            view["indicators"]["y"] = _expand_catalog_path(view["indicators"]["y"])
 
 
 def _extract_catalog_path(indicator_raw):
