@@ -8,7 +8,7 @@ definitions:
     originUrl: ourworldindata.org/coronavirus
 
 title:
-  title: COVID-19 vaccine boosters administered
+  title: COVID-19 vaccines administered
   titleVariant: ""
 defaultSelection:
   - Belgium
@@ -24,23 +24,46 @@ topicTags:
   - COVID-19
 
 dimensions:
-  - slug: normalize
+  - slug: indicator
     name: Indicator
+    choices:
+      - slug: total
+        name: All doses
+        description: null
+      - slug: booster
+        name: Booster doses
+        description: null
+  - slug: normalize
+    name: Normalize
     choices:
       - slug: absolute
         name: Absolute number
         description: null
       - slug: per_capita
-        name: Per million people
+        name: Per hundred people
         description: null
 
 views:
   - dimensions:
+      indicator: total
+      normalize: absolute
+    indicators:
+      y: "vaccinations_global#total_vaccinations"
+    config: *config
+  - dimensions:
+      indicator: total
+      normalize: per_capita
+    indicators:
+      y: "vaccinations_global#total_vaccinations_per_hundred"
+    config: *config
+  - dimensions:
+      indicator: booster
       normalize: absolute
     indicators:
       y: "vaccinations_global#total_boosters"
     config: *config
   - dimensions:
+      indicator: booster
       normalize: per_capita
     indicators:
       y: "vaccinations_global#total_boosters_per_hundred"

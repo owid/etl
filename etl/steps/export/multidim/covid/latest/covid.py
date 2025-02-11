@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
         "covid.cases.yml",
         "covid.deaths.yml",
         "covid.hospital.yml",
-        "covid.boosters.yml",
+        "covid.vax.yml",
         "covid.vax_breakdowns.yml",
         "covid.xm.yml",
         "covid.cases_tests.yml",

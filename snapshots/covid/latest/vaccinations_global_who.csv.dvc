@@ -5,7 +5,7 @@ meta:
     # Data product / Snapshot
     title: COVID-19, vaccinations (WHO)
     description: |-
-      COVID-19 vaccination data are collected via WHO regional office-specific systems for monitoring COVID-19 vaccination uptake.  These data are pooled from numerous sources, including direct reports from Member States, WHO review of publicly available official data, or data collated and published by third-party sites. Data published by third-party sites have not been validated by WHO, and WHO cannot comment on accuracy or completeness. Differences in counts may occur compared to other sources, due to different inclusion criteria and data cut-off times.
+      COVID-19 vaccination data are collected via WHO regional office-specific systems for monitoring COVID-19 vaccination uptake. These data are pooled from numerous sources, including direct reports from Member States, WHO review of publicly available official data, or data collated and published by third-party sites. Data published by third-party sites have not been validated by WHO, and WHO cannot comment on accuracy or completeness. Differences in counts may occur compared to other sources, due to different inclusion criteria and data cut-off times.
 
     date_published: "2025"
 

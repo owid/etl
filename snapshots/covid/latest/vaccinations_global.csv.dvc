@@ -16,7 +16,7 @@ meta:
     citation_full: |-
       Mathieu, E., Ritchie, H., Ortiz-Ospina, E. et al. A global database of COVID-19 vaccinations. Nat Hum Behav (2021). https://doi.org/10.1038/s41562-021-01122-8
 
-      The data has been obtained from different sources depending on the country:
+      The data has been obtained from different sources depending on the country. Find below a list of the sources last use for each country. Note that this list may not be exhaustive and that the data sources may have changed prior to the last update (find the complete list on [Our World in Data GitHub repository](https://github.com/owid/covid-19-data/tree/d8fae5631e2130270532951400fa449a9b20d00b/public/data/vaccinations/country_data)).
 
       - Afghanistan: World Health Organization (https://data.who.int/dashboards/covid19/)
       - Albania: World Health Organization (https://data.who.int/dashboards/covid19/)
