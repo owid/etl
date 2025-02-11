@@ -37,7 +37,7 @@ def run(dest_dir: str) -> None:
 
     # Add binary eligibility
     tb["is_eligible"] = tb["phase"].isin(
-        ["Initial self-financing", "Preparatory transition phase", "Accelerated transition"]
+        ["Initial self-financing", "Preparatory transition phase", "Accelerated transition phase"]
     )
     tb["is_eligible"] = tb["is_eligible"].replace({True: "Eligible", False: "Not eligible"})
     tb = tb.format(["country", "year"], short_name="eligibility")
