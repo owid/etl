@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow.read("eligibility")
     tb_regions = ds_regions.read("regions")
     # Not completely sure we should be listing _all_ other countries as not eligible, but Gavi only lists countries which are so we must assume a little
-    tb_regions = tb_regions[(tb_regions["region_type"] == "country") & (tb_regions["is_historical"] == False)]
+    tb_regions = tb_regions.query("region_type == 'country' and not is_historical")
     assert len(tb["year"].unique()) == 1, "More than one year in the Gavi dataset"
     tb_regions["year"] = tb["year"].unique()[0]
     tb_all_countries = tb_regions[["name", "year"]]
