@@ -16,7 +16,8 @@ from typing import Union, Dict
 
 # Initialize logger.
 log = get_logger()
-
+# Dimensions: These are the expected possible dimensions
+DIMENSIONS = ["y", "x", "size", "color"]
 
 def upsert_multidim_data_page(slug: str, config: dict, engine: Engine, dependencies: list[str] = []) -> None:
     """
@@ -47,22 +48,22 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
         dependencies (list[str]): List of dependency URIs in the form "data://<path>".
     """
 
-    def _expand_catalog_path(y: Union[str, Dict[str, str]]) -> Union[str, Dict[str, str]]:
+    def _expand_catalog_path(indicator: Union[str, Dict[str, str]]) -> Union[str, Dict[str, str]]:
         """Return same indicator, but with complete catalog path."""
-        def _expand(y: str):
-            if "/" in y:
-                return y
+        def _expand(indicator: str):
+            if "/" in indicator:
+                return indicator
             else:
-                return table_to_dataset_uri[y.split("#")[0]] + "/" + y
+                return table_to_dataset_uri[indicator.split("#")[0]] + "/" + indicator
 
         # Expand catalog path if it's a string
-        if isinstance(y, str):
-            return _expand(y)
+        if isinstance(indicator, str):
+            return _expand(indicator)
         # Expand catalog path if it's a dictionary
-        elif isinstance(y, dict):
-            assert "catalogPath" in y, "Expected 'catalogPath' key in indicator dictionary"
-            y["catalogPath"] = _expand(y["catalogPath"])
-            return y
+        elif isinstance(indicator, dict):
+            assert "catalogPath" in indicator, "Expected 'catalogPath' key in indicator dictionary"
+            indicator["catalogPath"] = _expand(indicator["catalogPath"])
+            return indicator
 
     # Get mapping from table names to dataset URIs
     table_to_dataset_uri = {}
@@ -79,10 +80,12 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
 
     # Go through all views and expand catalog paths
     for view in config["views"]:
-        if isinstance(view["indicators"]["y"], list):
-            view["indicators"]["y"] = [_expand_catalog_path(y) for y in view["indicators"]["y"]]
-        else:
-            view["indicators"]["y"] = _expand_catalog_path(view["indicators"]["y"])
+        for dim in DIMENSIONS:
+            if dim in view["indicators"]:
+                if isinstance(view["indicators"][dim], list):
+                    view["indicators"][dim] = [_expand_catalog_path(dim) for dim in view["indicators"][dim]]
+                else:
+                    view["indicators"][dim] = _expand_catalog_path(view["indicators"][dim])
 
 
 def _extract_catalog_path(indicator_raw):
@@ -111,8 +114,7 @@ def validate_multidim_config(config: dict, engine: Engine) -> None:
     # Get all used indicators
     indicators = []
     for view in config["views"]:
-        dimensions = ["y", "x", "size", "color"]  # These are the expected possible dimensions
-        for prop in dimensions:
+        for prop in DIMENSIONS:
             if prop in view["indicators"]:
                 indicator_raw = view["indicators"][prop]
                 if isinstance(indicator_raw, list):
