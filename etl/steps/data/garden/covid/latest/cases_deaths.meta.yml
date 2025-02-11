@@ -1,5 +1,33 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  common_deaths_pm_key: &common_deaths_pm_key
+    - The actual death toll from COVID-19 is likely to be higher than the number of confirmed deaths – this is due to limited testing, [poorly functioning death registries](#dod:crvs), challenges in determining the cause of death, and disruptions during the pandemic. The difference between reported confirmed deaths and actual deaths varies between countries.
+    - "[Excess mortality](https://ourworldindata.org/excess-mortality-covid) is a more comprehensive measure of the total mortality impact of the pandemic, compared to the number of confirmed COVID-19 deaths. This is because it captures not only confirmed deaths, but also COVID-19 deaths that were not accurately diagnosed."
+    - COVID-19 deaths may be recorded in different ways between countries (e.g., some countries may only count hospital deaths, whilst others also include deaths in homes).
+    - Data are presented by the date of reporting rather than symptom onset, and retrospective updates by countries can sometimes lead to sudden spikes or even negative values.
+    - WHO encourages weekly reporting to reduce inconsistencies in daily reporting frequencies across countries and help minimize the risk of misinterpreting periods of zero reporting as zero deaths.
+    - There are often large differences in the population size between countries. Therefore, to compare deaths between countries, it is more insightful to look at the number of confirmed deaths as a rate per million people.
+    - "We provide more detail on these points in [Deaths from COVID-19: background](https://ourworldindata.org/covid-deaths#deaths-from-covid-19-background)."
+  common_deaths_key: &common_deaths_key
+    - The actual death toll from COVID-19 is likely to be higher than the number of confirmed deaths – this is due to limited testing, [poorly functioning death registries](#dod:crvs), challenges in determining the cause of death, and disruptions during the pandemic. The difference between reported confirmed deaths and actual deaths varies between countries.
+    - "[Excess mortality](https://ourworldindata.org/excess-mortality-covid) is a more comprehensive measure of the total mortality impact of the pandemic, compared to the number of confirmed COVID-19 deaths. This is because it captures not only confirmed deaths, but also COVID-19 deaths that were not accurately diagnosed."
+    - COVID-19 deaths may be recorded in different ways between countries (e.g., some countries may only count hospital deaths, whilst others also include deaths in homes).
+    - Data are presented by the date of reporting rather than symptom onset, and retrospective updates by countries can sometimes lead to sudden spikes or even negative values.
+    - WHO encourages weekly reporting to reduce inconsistencies in daily reporting frequencies across countries and help minimize the risk of misinterpreting periods of zero reporting as zero deaths.
+    - "We provide more detail on these points in [Deaths from COVID-19: background](https://ourworldindata.org/covid-deaths#deaths-from-covid-19-background)."
+
+  common_cases_key: &common_cases_key
+    - _Confirmed_ cases represent the number of laboratory-confirmed COVID-19 infections as reported to WHO, but may not capture the true scale of infection due to varying testing strategies, case definitions, and underreporting.
+    - Data are presented by date of reporting rather than symptom onset, and retrospective updates or corrections by countries can lead to sudden spikes or negative values.
+    - Since WHO relies on Member State reporting, differences in local definitions, testing capacities, and reporting practices can affect international comparisons and trending over time.
+    - "We provide more detail on these points in [Cases of COVID-19: background](https://ourworldindata.org/covid-cases#cases-of-covid-19-background)."
+  common_cases_pm_key: &common_cases_pm_key
+    - _Confirmed_ cases represent the number of laboratory-confirmed COVID-19 infections as reported to WHO, but may not capture the true scale of infection due to varying testing strategies, case definitions, and underreporting.
+    - Data are presented by date of reporting rather than symptom onset, and retrospective updates or corrections by countries can lead to sudden spikes or negative values.
+    - Since WHO relies on Member State reporting, differences in local definitions, testing capacities, and reporting practices can affect international comparisons and trending over time.
+    - There are often large differences in the population size between countries. Therefore, to compare cases between countries, it is more insightful to look at the number of confirmed cases as a rate per million people.
+    - "We provide more detail on these points in [Cases of COVID-19: background](https://ourworldindata.org/covid-cases#cases-of-covid-19-background)."
+
   common_death_note: |-
     Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
   common_display: &common_display
@@ -171,10 +199,11 @@ tables:
           numDecimalPlaces: 0
           tolerance: 30
           <<: *common_display
+        description_key: *common_cases_key
         presentation:
           grapher_config:
             title: Weekly confirmed COVID-19 cases
-            subtitle: Weekly confirmed cases refer to the cumulative number of confirmed cases over the previous week.
+            subtitle: Cumulative number of confirmed cases of COVID-19 over the previous week.
             hasMapTab: true
             map:
               colorScale:
@@ -184,13 +213,14 @@ tables:
       weekly_cases_per_million:
         title: "Weekly cases per million people"
         unit: "cases per million people"
-        description_short: _-
+        description_short: |-
           Cumulative number of confirmed cases of COVID-19 over the previous week, per million people. Counts can include probable cases, where reported.
         description_processing: *daily_population
+        description_key: *common_cases_pm_key
         presentation:
           grapher_config:
             title: Weekly confirmed COVID-19 cases per million people
-            subtitle: Weekly confirmed cases refer to the cumulative number of confirmed cases over the previous week.
+            subtitle: Cumulative number of confirmed cases of COVID-19 over the previous week, per million people.
             hasMapTab: true
             map:
               colorScale:
@@ -205,12 +235,13 @@ tables:
         title: Weekly case growth (%)
         unit: "%"
         short_unit: "%"
-        description_short: |-
+        description_short: &w_relative |-
           The weekly growth rate measures the percentage change in confirmed cases over the past seven days compared to the seven days before.
+        description_key: *common_cases_key
         presentation:
           grapher_config:
             title: Week by week change of confirmed COVID-19 cases
-            subtitle: The weekly growth rate measures the percentage change in confirmed cases over the past seven days compared to the seven days before.
+            subtitle: *w_relative
             hasMapTab: true
             map:
               colorScale:
@@ -235,10 +266,11 @@ tables:
           numDecimalPlaces: 0
           tolerance: 30
           <<: *common_display
+        description_key: *common_cases_key
         presentation:
           grapher_config:
             title: Biweekly confirmed COVID-19 cases
-            subtitle: Biweekly confirmed cases refer to the cumulative number of confirmed cases over the previous two weeks.
+            subtitle: Cumulative number of confirmed cases of COVID-19 over the previous two weeks.
             hasMapTab: true
             map:
               colorScale:
@@ -251,6 +283,7 @@ tables:
         description_short: |-
           Cumulative number of confirmed cases of COVID-19 over the previous two weeks. Counts can include probable cases, where reported.
         description_processing: *daily_population
+        description_key: *common_cases_pm_key
         display:
           numDecimalPlaces: 0
           tolerance: 30
@@ -258,7 +291,7 @@ tables:
         presentation:
           grapher_config:
             title: Biweekly confirmed COVID-19 cases per million people
-            subtitle: Biweekly confirmed cases refer to the cumulative number of confirmed cases over the previous two weeks.
+            subtitle: Cumulative number of confirmed cases of COVID-19 over the previous two weeks.
             hasMapTab: true
             map:
               colorScale:
@@ -269,8 +302,9 @@ tables:
         title: Biweekly case growth (%)
         unit: "%"
         short_unit: "%"
-        description_short: |-
+        description_short: &biw_relative |-
           The weekly growth rate measures the percentage change in confirmed cases over the past 14 days compared to the 14 days before.
+        description_key: *common_cases_key
         display:
           numDecimalPlaces: 1
           tolerance: 30
@@ -278,7 +312,7 @@ tables:
         presentation:
           grapher_config:
             title: Biweekly change of confirmed COVID-19 cases
-            subtitle: The biweekly growth rate measures the percentage change in confirmed cases over the past 14 days compared to the 14 days before.
+            subtitle: *biw_relative
             hasMapTab: true
             map:
               colorScale:
@@ -466,8 +500,9 @@ tables:
       weekly_deaths:
         title: Weekly deaths
         unit: "deaths"
-        description_short: |-
+        description_short: &w_deaths |-
           Cumulative number of confirmed deaths over the previous week. {definitions.common_death_note}
+        description_key: *common_deaths_key
         display:
           numDecimalPlaces: 0
           tolerance: 30
@@ -475,7 +510,7 @@ tables:
         presentation:
           grapher_config:
             title: Weekly confirmed COVID-19 deaths
-            subtitle: Weekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. {definitions.common_death_note}
+            subtitle: *w_deaths
             hasMapTab: true
             tab: map
             map:
@@ -486,13 +521,14 @@ tables:
       weekly_deaths_per_million:
         title: "Weekly deaths per million people"
         unit: "deaths per million people"
-        description_short: |-
+        description_short: &w_deaths_pm |-
           Cumulative number of confirmed deaths over the previous week. {definitions.common_death_note}
+        description_key: *common_deaths_pm_key
         description_processing: *daily_population
         presentation:
           grapher_config:
             title: Weekly confirmed COVID-19 deaths per million people
-            subtitle: Weekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. {definitions.common_death_note}
+            subtitle: *w_deaths_pm
             hasMapTab: true
             tab: map
             map:
@@ -510,6 +546,7 @@ tables:
         short_unit: "%"
         description_short: |-
           It measures the percentage change in number of confirmed deaths over the last seven days relative to the number in the previous seven days. {definitions.common_death_note}
+        description_key: *common_deaths_key
         presentation:
           grapher_config:
             title: Week by week change of confirmed COVID-19 deaths
@@ -533,8 +570,9 @@ tables:
       biweekly_deaths:
         title: Biweekly deaths
         unit: "deaths"
-        description_short: |-
+        description_short: &biw_deaths |-
           Cumulative number of confirmed deaths over the previous two weeks. {definitions.common_death_note}
+        description_key: *common_deaths_key
         display:
           numDecimalPlaces: 0
           tolerance: 30
@@ -542,7 +580,7 @@ tables:
         presentation:
           grapher_config:
             title: Biweekly confirmed COVID-19 deaths
-            subtitle: Biweekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous two weeks. {definitions.common_death_note}
+            subtitle: *biw_deaths
             hasMapTab: true
             map:
               colorScale:
@@ -553,8 +591,9 @@ tables:
       biweekly_deaths_per_million:
         title: "Biweekly deaths per million people"
         unit: "deaths per million people"
-        description_short: |-
+        description_short: &biw_deaths_pm |-
           Cumulative number of confirmed deaths over the previous two weeks. {definitions.common_death_note}
+        description_key: *common_deaths_pm_key
         description_processing: *daily_population
         display:
           numDecimalPlaces: 2
@@ -563,7 +602,7 @@ tables:
         presentation:
           grapher_config:
             title: Biweekly confirmed COVID-19 deaths per million people
-            subtitle: Biweekly confirmed deaths refer to the cumulative number of confirmed deaths over the previous week. {definitions.common_death_note}
+            subtitle: *biw_deaths_pm
             hasMapTab: true
             map:
               colorScale:
@@ -577,6 +616,7 @@ tables:
         short_unit: "%"
         description_short: |-
           It measures the percentage change in number of confirmed deaths over the last seven days relative to the number in the previous 14 days. {definitions.common_death_note}
+        description_key: *common_deaths_key
         display:
           numDecimalPlaces: 1
           tolerance: 30
