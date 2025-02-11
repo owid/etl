@@ -1,5 +1,4 @@
 definitions:
-  table: grapher/covid/latest/hospital/hospital
   config: &config
     $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
     hideAnnotationFieldsInTitle:
@@ -61,28 +60,28 @@ views:
       measure: patients
       normalize: absolute
     indicators:
-      y: "{definitions.table}#daily_occupancy_hosp"
+      y: "hospital#daily_occupancy_hosp"
     config: *config
   - dimensions:
       type: hospital
       measure: patients
       normalize: per_capita
     indicators:
-      y: "{definitions.table}#daily_occupancy_hosp_per_1m"
+      y: "hospital#daily_occupancy_hosp_per_1m"
     config: *config
   - dimensions:
       type: hospital
       measure: admissions
       normalize: absolute
     indicators:
-      y: "{definitions.table}#weekly_admissions_hosp"
+      y: "hospital#weekly_admissions_hosp"
     config: *config
   - dimensions:
       type: hospital
       measure: admissions
       normalize: per_capita
     indicators:
-      y: "{definitions.table}#weekly_admissions_hosp_per_1m"
+      y: "hospital#weekly_admissions_hosp_per_1m"
     config: *config
 
   - dimensions:
@@ -90,26 +89,26 @@ views:
       measure: patients
       normalize: absolute
     indicators:
-      y: "{definitions.table}#daily_occupancy_icu"
+      y: "hospital#daily_occupancy_icu"
     config: *config
   - dimensions:
       type: icu
       measure: patients
       normalize: per_capita
     indicators:
-      y: "{definitions.table}#daily_occupancy_icu_per_1m"
+      y: "hospital#daily_occupancy_icu_per_1m"
     config: *config
   - dimensions:
       type: icu
       measure: admissions
       normalize: absolute
     indicators:
-      y: "{definitions.table}#weekly_admissions_icu"
+      y: "hospital#weekly_admissions_icu"
     config: *config
   - dimensions:
       type: icu
       measure: admissions
       normalize: per_capita
     indicators:
-      y: "{definitions.table}#weekly_admissions_icu_per_1m"
+      y: "hospital#weekly_admissions_icu_per_1m"
     config: *config
