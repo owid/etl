@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.catalog import processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
@@ -13,17 +15,26 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("eligibility")
-
+    ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
     tb = ds_meadow.read("eligibility")
-
+    tb_regions = ds_regions.read("regions")
+    # Not completely sure we should be listing _all_ other countries as not eligible, but Gavi only lists countries which are so we must assume a little
+    tb_regions = tb_regions[(tb_regions["region_type"] == "country") & (tb_regions["is_historical"] == False)]
+    assert len(tb["year"].unique()) == 1, "More than one year in the Gavi dataset"
+    tb_regions["year"] = tb["year"].unique()[0]
+    tb_all_countries = tb_regions[["name", "year"]]
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
-    tb = tb.format(["country", "year"])
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Combine countries
+    tb = pr.merge(tb_all_countries, tb, left_on=["name", "year"], right_on=["country", "year"], how="left")
+    tb["phase"] = tb["phase"].fillna("Not eligible")
+    tb = tb.drop(columns=["country"])
+    tb = tb.rename(columns={"name": "country"})
+    tb = tb.format(["country", "year"], short_name="eligibility")
 
     #
     # Save outputs.
