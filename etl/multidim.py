@@ -47,10 +47,11 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
     """
 
     def _expand(y: str) -> str:
-        if "/" in y:
-            return y
+        catalog_path = _extract_catalog_path(y)
+        if "/" in catalog_path:
+            return catalog_path
         else:
-            return table_to_dataset_uri[y.split("#")[0]] + "/" + y
+            return table_to_dataset_uri[catalog_path.split("#")[0]] + "/" + catalog_path
 
     # Get mapping from table names to dataset URIs
     table_to_dataset_uri = {}
