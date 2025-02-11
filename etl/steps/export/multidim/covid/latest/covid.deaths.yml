@@ -31,16 +31,16 @@ dimensions:
         description: null
 
   - slug: metric
-    name: Metric
+    name: Indicator
     choices:
       - slug: absolute
-        name: Absolute
+        name: Absolute number
         description: null
       - slug: per_capita
         name: Per million people
         description: null
       - slug: change
-        name: Change from previous period
+        name: Relative change
         description: null
 
 views:
