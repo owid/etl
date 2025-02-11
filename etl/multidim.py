@@ -19,6 +19,7 @@ log = get_logger()
 # Dimensions: These are the expected possible dimensions
 DIMENSIONS = ["y", "x", "size", "color"]
 
+
 def upsert_multidim_data_page(slug: str, config: dict, engine: Engine, dependencies: list[str] = []) -> None:
     """
     :param dependencies: List of dependencies for mdim. In most cases just use `dependencies=paths.dependencies`.
@@ -50,6 +51,7 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
 
     def _expand_catalog_path(indicator: Union[str, Dict[str, str]]) -> Union[str, Dict[str, str]]:
         """Return same indicator, but with complete catalog path."""
+
         def _expand(indicator: str):
             if "/" in indicator:
                 return indicator
