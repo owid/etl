@@ -1,5 +1,11 @@
 definitions:
-  table: grapher/covid/latest/vaccinations_global/vaccinations_global
+  config: &config
+    $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
+    hideAnnotationFieldsInTitle:
+      entity: true
+      time: true
+      changeInPrefix: true
+    originUrl: ourworldindata.org/coronavirus
 
 title:
   title: COVID-19 vaccine boosters administered
@@ -19,10 +25,10 @@ topicTags:
 
 dimensions:
   - slug: normalize
-    name: Normalize
+    name: Indicator
     choices:
       - slug: absolute
-        name: None
+        name: Absolute number
         description: null
       - slug: per_capita
         name: Per million people
@@ -32,8 +38,10 @@ views:
   - dimensions:
       normalize: absolute
     indicators:
-      y: "{definitions.table}#total_boosters"
+      y: "vaccinations_global#total_boosters"
+    config: *config
   - dimensions:
       normalize: per_capita
     indicators:
-      y: "{definitions.table}#total_boosters_per_hundred"
+      y: "vaccinations_global#total_boosters_per_hundred"
+    config: *config
