@@ -7,11 +7,10 @@ meta:
     description: |-
       Eligibility for Gavi support is determined by countries' national income. Gavi aims to focus its support on the world's poorest countries and therefore bases eligibility on national income. In 2024, countries become eligible for Gavi support if their most recent gross national income (GNI) per capita was less than or equal to US$ 1,810 (according to the latest World Bank data published in July each year). Since 1 January 2011, the eligibility threshold is adjusted for inflation on an annual basis.
     date_published: "2024-10-18"
-
     # Citation
-    producer: Gavi
+    producer: Global Alliance for Vaccines and Immunizations
     citation_full: |-
-      Gavi eligibility (2024). Gavi - The Vaccine Alliance.
+      Gavi eligibility (2024). Global Alliance for Vaccines and Immunizations.
 
     # Files
     url_main: https://www.gavi.org/types-support/sustainability/eligibility
