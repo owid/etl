@@ -60,12 +60,6 @@ def run(dest_dir: str) -> None:
     # Combine with full Gapminder dataset
     tb_combined_full = pr.merge(tb_combined_full, tb_surviving, on=["country", "year"], how="left")
 
-    # filter out regions < 1950 temporarily
-    tb_combined_full = tb_combined_full[
-        (tb_combined_full["year"] >= 1950) | (~tb_combined_full["country"].isin(REGIONS))
-    ]
-    tb_combined_sel = tb_combined_sel[(tb_combined_sel["year"] >= 1950) | (~tb_combined_sel["country"].isin(REGIONS))]
-
     # Save outputs.
     tb_combined_full = tb_combined_full.drop(columns=["source"]).format(["country", "year"])
     tb_combined_sel = tb_combined_sel.drop(columns=["source"]).format(["country", "year"])
