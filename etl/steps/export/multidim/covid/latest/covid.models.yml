@@ -1,4 +1,9 @@
 definitions:
+  confirmed_infections: &confirmed_infections
+    catalogPath: cases_deaths#new_cases_7_day_avg_right
+    display:
+      name: Confirmed cases, 7-day average
+      color: "#000000"
   config: &config_base
     $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
     subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
@@ -37,10 +42,16 @@ views:
       model: icl
     indicators:
       y:
-        - infections_model#icl_infections__estimate_mean
-        - infections_model#icl_infections__estimate_low
-        - infections_model#icl_infections__estimate_upper
-        - cases_deaths#new_cases_7_day_avg_right
+        - catalogPath: infections_model#icl_infections__estimate_mean
+          display:
+            color: "#4C6A9C"
+        - catalogPath: infections_model#icl_infections__estimate_low
+          display:
+            color: "#B6C7DE"
+        - catalogPath: infections_model#icl_infections__estimate_upper
+          display:
+            color: "#B6C7DE"
+        - *confirmed_infections
 
     config:
       <<: *config_base
@@ -53,16 +64,17 @@ views:
     indicators:
       y:
         - catalogPath: infections_model#ihme_infections__estimate_mean
+          display:
+            color: "#2C8465"
         - catalogPath: infections_model#ihme_infections__estimate_low
           display:
-            plotMarkersOnlyInLineChart: true
+            # plotMarkersOnlyInLineChart: true
+            color: "#A4C5B8"
         - catalogPath: infections_model#ihme_infections__estimate_upper
           display:
-            plotMarkersOnlyInLineChart: true
-        - catalogPath: cases_deaths#new_cases_7_day_avg_right
-          display:
-            name: "Confirmed cases, 7-day average"
-            color: "#000000"
+            # plotMarkersOnlyInLineChart: true
+            color: "#A4C5B8"
+        - *confirmed_infections
 
     config:
       <<: *config_base
@@ -74,10 +86,16 @@ views:
       model: lshtm
     indicators:
       y:
-        - infections_model#lshtm_infections__estimate_median
-        - infections_model#lshtm_infections__estimate_low
-        - infections_model#lshtm_infections__estimate_upper
-        - cases_deaths#new_cases_7_day_avg_right
+        - catalogPath: infections_model#lshtm_infections__estimate_median
+          display:
+            color: "#B13507"
+        - catalogPath: infections_model#lshtm_infections__estimate_low
+          display:
+            color: "#DCAC9B"
+        - catalogPath: infections_model#lshtm_infections__estimate_upper
+          display:
+            color: "#DCAC9B"
+        - *confirmed_infections
 
     config:
       <<: *config_base
@@ -89,10 +107,16 @@ views:
       model: yyg
     indicators:
       y:
-        - infections_model#yyg_infections__estimate_mean
-        - infections_model#yyg_infections__estimate_low
-        - infections_model#yyg_infections__estimate_upper
-        - cases_deaths#new_cases_7_day_avg_right
+        - catalogPath: infections_model#yyg_infections__estimate_mean
+          display:
+            color: "#996D39"
+        - catalogPath: infections_model#yyg_infections__estimate_low
+          display:
+            color: "#CFBFAF"
+        - catalogPath: infections_model#yyg_infections__estimate_upper
+          display:
+            color: "#CFBFAF"
+        - *confirmed_infections
 
     config:
       <<: *config_base
