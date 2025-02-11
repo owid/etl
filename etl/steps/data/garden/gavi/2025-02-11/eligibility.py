@@ -34,6 +34,12 @@ def run(dest_dir: str) -> None:
     tb["phase"] = tb["phase"].fillna("Not eligible")
     tb = tb.drop(columns=["country"])
     tb = tb.rename(columns={"name": "country"})
+
+    # Add binary eligibility
+    tb["is_eligible"] = tb["phase"].isin(
+        ["Initial self-financing", "Preparatory transition phase", "Accelerated transition"]
+    )
+    tb["is_eligible"] = tb["is_eligible"].replace({True: "Eligible", False: "Not eligible"})
     tb = tb.format(["country", "year"], short_name="eligibility")
 
     #

@@ -23,3 +23,7 @@ tables:
           - "Accelerated transition phase"
           - "Preparatory transition phase"
           - "Initial self-financing"
+      is_eligible:
+        title: Gavi eligibility status
+        description_short: Whether a country is eligible for Gavi support.
+        unit: ""
