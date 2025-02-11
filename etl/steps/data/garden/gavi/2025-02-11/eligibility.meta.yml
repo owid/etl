@@ -17,3 +17,9 @@ tables:
         title: Phase of vaccine eligibility
         description_short: The phase of vaccine eligibility for Gavi assistance.
         unit: ""
+        type: ordinal
+        sort:
+          - "Not eligible"
+          - "Accelerated transition phase"
+          - "Preparatory transition phase"
+          - "Initial self-financing"
