@@ -63,14 +63,18 @@ steps:
   data://garden/papers/2024-03-26/mueller_et_al_2012:
     - data://meadow/papers/2024-03-26/mueller_et_al_2012
 
-  # Ipsos perils of perception, prejudice, and conspiracy theories.
-  data://meadow/papers/2024-10-25/ipsos:
-    - snapshot://papers/2024-10-25/ipsos.csv
-  data://garden/papers/2024-10-25/ipsos:
-    - data://meadow/papers/2024-10-25/ipsos
-  data://grapher/papers/2024-10-25/ipsos:
-    - data://garden/papers/2024-10-25/ipsos
-
+  #
+  # Ellis et al. (2021), Anthromes
+  #
+  data://meadow/papers/2023-10-20/anthromes_input:
+    - snapshot://papers/2023-10-20/anthromes_input.zip
+  data://meadow/papers/2023-10-20/anthromes:
+    - snapshot://papers/2023-10-20/anthromes.csv
+  data://garden/papers/2023-10-20/anthromes:
+    - data://meadow/papers/2023-10-20/anthromes
+    - data://meadow/papers/2023-10-20/anthromes_input
+  data://grapher/papers/2024-01-05/anthromes:
+    - data://garden/papers/2023-10-20/anthromes
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.

@@ -4,7 +4,7 @@ import yaml
 from fastapi.testclient import TestClient
 
 from api.main import app
-from etl import grapher_model as gm
+from etl.grapher import model as gm
 
 client = TestClient(app)
 
@@ -15,7 +15,7 @@ def test_health():
     assert response.json() == {"status": "ok"}
 
 
-@patch("etl.grapher_model.Variable.from_catalog_path")
+@patch("etl.grapher.model.Variable.from_catalog_path")
 def test_update_indicator(mock_from_catalog_path):
     mock_from_catalog_path.return_value = gm.Variable(
         datasetId=1,

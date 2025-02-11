@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["month", "year"])
     #  Use the days since colimn instead of year and month for grapher
     tb = tb.rename(columns={"days_since_2000": "year"})
-    tb = tb.set_index(["country", "year"], verify_integrity=True)
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

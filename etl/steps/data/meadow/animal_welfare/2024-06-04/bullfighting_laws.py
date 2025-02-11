@@ -1,6 +1,4 @@
-"""Load a snapshot and create a meadow dataset.
-
-"""
+"""Load a snapshot and create a meadow dataset."""
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -19,7 +17,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country"], verify_integrity=True).sort_index()
+    tb = tb.format(["country"])
 
     #
     # Save outputs.

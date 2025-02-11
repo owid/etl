@@ -1,6 +1,4 @@
-"""Helper tool to create map brackets for all indicators in an indicator-based explorer.
-
-"""
+"""Helper tool to create map brackets for all indicators in an indicator-based explorer."""
 
 import json
 from pathlib import Path
@@ -18,8 +16,8 @@ from structlog import get_logger
 from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
-from etl.explorer_helpers import Explorer
-from etl.grapher_model import Entity, Variable
+from etl.explorer import Explorer
+from etl.grapher.model import Entity, Variable
 from etl.paths import EXPLORERS_DIR
 
 # TODO:
@@ -284,7 +282,7 @@ class MapBracketer:
         self.brackets_selected = self.brackets_all[self.bracket_type].tolist()
         # Define the grapher version of the selected brackets, which needs a minimum value and a list of brackets.
         self.brackets_selected_grapher_min_value = None
-        self.brackets_selected_grapher_values = self.brackets_selected.copy()
+        self.brackets_selected_grapher_values = self.brackets_selected.copy()  # type: ignore
 
     @property
     def brackets(self):
@@ -584,7 +582,7 @@ class MapBracketer:
         self._update_grapher_brackets()
 
     def _update_grapher_brackets(self):
-        self.brackets_selected_grapher_values = self.brackets_selected.copy()
+        self.brackets_selected_grapher_values = self.brackets_selected.copy()  # type: ignore
         if self.lower_bracket_open:
             # To ensure the lower bracket is open, use a large value of "customNumericMinValue".
             self.brackets_selected_grapher_min_value = self.max_value
@@ -952,7 +950,8 @@ elif use_type == USE_TYPE_EXPLORERS:
         )
 
         # Load and parse explorer content.
-        explorer = Explorer(name=explorer_name)
+        path = str((Path(EXPLORERS_DIR) / explorer_name).with_suffix(".explorer.tsv"))
+        explorer = Explorer.from_file(path=path)
 
         # Gather all variable ids of indicators with a map tab. In yVariableIds there can be variable ids or etl paths, so be careful going forward
         variable_ids = list(

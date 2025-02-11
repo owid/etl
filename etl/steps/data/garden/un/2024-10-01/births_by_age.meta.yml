@@ -1,10 +1,12 @@
 definitions:
-   common:
+  common:
     presentation:
       attribution_short: UN WPP
       grapher_config:
         originUrl: "https://ourworldindata.org/population-growth"
 
+dataset:
+  title: Births by age of mother (UN WPP)
 
 # this metadata file is not used in garden step, but in grapher step
 tables:

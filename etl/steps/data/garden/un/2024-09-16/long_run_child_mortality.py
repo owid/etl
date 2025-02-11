@@ -1,11 +1,15 @@
 """Load a meadow dataset and create a garden dataset."""
+
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+REGIONS = geo.REGIONS
 
 
 def run(dest_dir: str) -> None:
@@ -39,6 +43,7 @@ def run(dest_dir: str) -> None:
     tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "under_five_mortality"})
     tb_gap_full["source"] = "gapminder"
     tb_gap_full["under_five_mortality"] = tb_gap_full["under_five_mortality"].div(10)
+
     # Load Gapminder data v7 - has the source of the data (unlike v11)
     # We've removed some years from the v7 data, for years where the source was 'Guesstimate' or 'Model based on Life Expectancy'
     tb_gap_sel = ds_gapminder_v7["under_five_mortality_selected"].reset_index()
@@ -55,9 +60,15 @@ def run(dest_dir: str) -> None:
     # Combine with full Gapminder dataset
     tb_combined_full = pr.merge(tb_combined_full, tb_surviving, on=["country", "year"], how="left")
 
+    # filter out regions < 1950 temporarily
+    tb_combined_full = tb_combined_full[
+        (tb_combined_full["year"] >= 1950) | (~tb_combined_full["country"].isin(REGIONS))
+    ]
+    tb_combined_sel = tb_combined_sel[(tb_combined_sel["year"] >= 1950) | (~tb_combined_sel["country"].isin(REGIONS))]
+
     # Save outputs.
-    tb_combined_full = tb_combined_full.drop(columns=["source"]).set_index(["country", "year"], verify_integrity=True)
-    tb_combined_sel = tb_combined_sel.drop(columns=["source"]).set_index(["country", "year"], verify_integrity=True)
+    tb_combined_full = tb_combined_full.drop(columns=["source"]).format(["country", "year"])
+    tb_combined_sel = tb_combined_sel.drop(columns=["source"]).format(["country", "year"])
 
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.

@@ -1,0 +1,8 @@
+steps:
+  # Global mobile money dataset (GSMA)
+  data://meadow/technology/2024-05-30/mobile_money:
+    - snapshot://technology/2024-05-30/mobile_money.xlsx
+  data://garden/technology/2024-05-30/mobile_money:
+    - data://meadow/technology/2024-05-30/mobile_money
+  data://grapher/technology/2024-05-30/mobile_money:
+    - data://garden/technology/2024-05-30/mobile_money

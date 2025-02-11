@@ -1,0 +1,29 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  eligibility:
+    variables:
+      phase:
+        title: Gavi supported countries
+        description_short: The phase of vaccine eligibility for Gavi assistance.
+        unit: ""
+        type: ordinal
+        sort:
+          - "Not eligible"
+          - "Accelerated transition phase"
+          - "Preparatory transition phase"
+          - "Initial self-financing"
+      is_eligible:
+        title: Gavi eligibility status
+        description_short: Whether a country is eligible for Gavi support.
+        unit: ""

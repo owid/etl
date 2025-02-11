@@ -66,6 +66,7 @@ Yes|On-grid |Wind                |Offshore wind       |Offshore wind energy     
 Yes|On-grid |Wind                |Onshore wind        |Onshore wind energy       -> On-grid |Onshore wind
 
 """
+
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.datautils.dataframes import map_series

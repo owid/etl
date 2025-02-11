@@ -1,6 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -12,14 +11,14 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("avian_influenza_ah5n1.csv")
-
-    # Load data from snapshot.
-    tb = snap.read(safe_types=False)
+    tb = paths.read_snap_table("avian_influenza_ah5n1.csv")  # safe_types=False
 
     #
     # Process data.
     #
+    # Drop NAs
+    tb = tb.dropna(subset="Range")
+
     # Unpivot
     tb = tb.melt(id_vars=["Range", "Month"], var_name="country", value_name="avian_cases")
 
@@ -36,7 +35,10 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(
+        dest_dir,
+        tables=[tb],
+    )
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

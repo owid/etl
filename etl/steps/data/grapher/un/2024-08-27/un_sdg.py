@@ -1,4 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
+
 import json
 import os
 import re
@@ -11,7 +12,7 @@ from owid.catalog import Dataset, License, Origin, Table, VariableMeta
 from owid.catalog.utils import underscore
 from structlog import getLogger
 
-from etl import grapher_helpers as gh
+from etl.grapher import helpers as gh
 from etl.helpers import PathFinder, create_dataset
 
 log = getLogger()
@@ -20,13 +21,11 @@ paths = PathFinder(__file__)
 
 pd.options.mode.chained_assignment = None
 
-
 # only include tables containing INCLUDE string, this is useful for debugging
 # but should be None before merging to master!!
 # TODO: set this to None before merging to master
-# INCLUDE = "_6_1_1|_6_2_1"
+# INCLUDE = "_6_1_1|_6_2_1|_16|_2_4"
 INCLUDE = None
-
 
 # for origins
 DATE_ACCESSED = "2024-08-27"
@@ -135,7 +134,7 @@ def get_source(raw_source: pd.Series) -> str:
     return title
 
 
-def create_metadata_desc(indicator: str, series_code: str, source_desc: dict, series_description: str) -> str:
+def create_metadata_desc(indicator, series_code, source_desc, series_description):
     """
     If series code is in the source description json then combine it with the string showing the metadata url.
     If it's not in the source description json just return the metadata url.
@@ -191,7 +190,7 @@ def add_metadata_and_prepare_for_grapher(tb: Table, ds_garden: Dataset, source_d
     tb["meta"] = VariableMeta(
         title=tb["variable_name_meta"].iloc[0],
         description_short=series_description,
-        description_from_producer=source_desc,
+        description_from_producer=str(source_desc),
         origins=[origin],
         unit=tb["long_unit"].iloc[0].lower(),
         short_unit=tb["short_unit"].iloc[0],

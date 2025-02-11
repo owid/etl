@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
     # Rename
     tb = tb.rename(columns={"region": "country"}, errors="raise")
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(["country", "year"])
 
     #
     # Process country codes
@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
     tb_codes_countries = tb_codes_countries[~mask]
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb_codes_countries = tb_codes_countries.underscore().set_index(["iso_code"], verify_integrity=True).sort_index()
+    tb_codes_countries = tb_codes_countries.format(["iso_code"])
     # Unique table short name
     tb_codes_countries.metadata.short_name = "country_codes"
 

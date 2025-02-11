@@ -7,6 +7,7 @@ What do we do here?
 - Format the tables to have them in long format
 - Set indices and verify integrity
 """
+
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.catalog.tables import concat

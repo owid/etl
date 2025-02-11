@@ -13,19 +13,19 @@ definitions:
     force_usage: &force_usage |-
       A threat of force can be unspecified, or entail threatening to declare war or to occupy territory; a display of force can entail shows of force or border violations; a use of force can entail attacks, clashes, or battles.
     conflict_type:
-      <%- if hostility == "all" -%>
+      <%- if hostility_level == "all" -%>
       Included are conflicts between states where force was threatened, displayed, used, or escalated to a war that year
 
-      <%- elif hostility == "Threat to use force" -%>
+      <%- elif hostility_level == "Threat to use force" -%>
       Included are conflicts between states where, at most, use of force was threatened that year
 
-      <%- elif hostility == "Display of force" -%>
+      <%- elif hostility_level == "Display of force" -%>
       Included are conflicts between states where, at most, force was displayed that year
 
-      <%- elif hostility == "Use of force" -%>
+      <%- elif hostility_level == "Use of force" -%>
       Included are conflicts between states where, at most, force was used that year, but there were fewer than 1,000 combatant deaths
 
-      <%- elif hostility == "War" -%>
+      <%- elif hostility_level == "War" -%>
       Included are interstate wars that were ongoing that year
 
       <%- endif -%>
@@ -41,10 +41,10 @@ definitions:
 
   number_new_conflicts:
     description_short: |-
-      <%- if hostility == "Use of force" -%>
+      <%- if hostility_level == "Use of force" -%>
       Included are conflicts between states where, at most, force was used that year for the first time, but there were fewer than 1,000 combatant deaths.
 
-      <%- elif hostility == "War" -%>
+      <%- elif hostility_level == "War" -%>
       Included are interstate wars that started that year.
 
       <% else %>
@@ -60,6 +60,7 @@ definitions:
 
   number_deaths:
     description_short: |-
+      <% set per_capita = "" %>
       The << estimate >> estimate of the number of deaths of combatants due to fighting between states that year<< per_capita >>.
     description_short_per_capita:
       <% set per_capita = ", per 100,000 people" %>

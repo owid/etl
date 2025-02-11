@@ -37,7 +37,7 @@ def load_and_process_dataset(
     else:
         tb_to_save = group_sort_filter(tb, column_to_process[0])
 
-    tb_to_save = tb_to_save.set_index(["days_since", "name"], verify_integrity=True).sort_index()
+    tb_to_save = tb_to_save.format(["days_since", "name"])
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb_to_save], default_metadata=ds_meadow.metadata)

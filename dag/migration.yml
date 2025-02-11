@@ -1,0 +1,54 @@
+steps:
+  # Migration UN DESA
+  data://meadow/un/2024-07-16/migrant_stock:
+    - snapshot://un/2024-07-16/migrant_stock_dest_origin.xlsx
+    - snapshot://un/2024-07-16/migrant_stock_origin.xlsx
+    - snapshot://un/2024-07-16/migrant_stock_dest.xlsx
+    - snapshot://un/2024-07-16/migrant_stock_age_sex.xlsx
+  data://garden/un/2024-07-16/migrant_stock:
+    - data://meadow/un/2024-07-16/migrant_stock
+  data://grapher/un/2024-07-16/migrant_stock:
+    - data://garden/un/2024-07-16/migrant_stock
+
+  # Internal displacement monitoring centre
+  data://meadow/idmc/2024-08-02/internal_displacement:
+    - snapshot://idmc/2024-08-02/internal_displacement.xlsx
+    - data://garden/demography/2024-07-15/population
+  data://grapher/idmc/2024-08-02/internal_displacement:
+    - data://meadow/idmc/2024-08-02/internal_displacement
+
+  # UNHCR refugee data
+  data://meadow/un/2024-07-25/refugee_data:
+    - snapshot://un/2024-07-25/refugee_data.zip
+  data://garden/un/2024-07-25/refugee_data:
+    - data://meadow/un/2024-07-25/refugee_data
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-25/resettlement
+  data://grapher/un/2024-07-25/refugee_data:
+    - data://garden/un/2024-07-25/refugee_data
+
+  # UNHCR resettlement data
+  data://meadow/un/2024-07-25/resettlement:
+    - snapshot://un/2024-07-25/resettlement.zip
+  data://garden/un/2024-07-25/resettlement:
+    - data://meadow/un/2024-07-25/resettlement
+    - data://garden/demography/2024-07-15/population
+
+  # Child migration (UNICEF)
+  data://meadow/unicef/2024-07-30/child_migration:
+    - snapshot://unicef/2024-07-30/child_migration.csv
+  data://garden/unicef/2024-07-30/child_migration:
+    - data://meadow/unicef/2024-07-30/child_migration
+    - data://garden/demography/2024-07-15/population
+  data://grapher/unicef/2024-07-30/child_migration:
+    - data://garden/unicef/2024-07-30/child_migration
+
+  #KNOMAD
+  data://meadow/wb/2024-12-17/knomad:
+    - snapshot://wb/2024-12-17/knomad.xlsx
+  data://garden/wb/2024-12-17/bilateral_remittance:
+    - data://meadow/wb/2024-12-17/knomad
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+  data://grapher/wb/2024-12-17/bilateral_remittance:
+    - data://garden/wb/2024-12-17/bilateral_remittance

@@ -13,7 +13,7 @@ nowcast_regions_description = "Regional and global estimates are extrapolated up
 
 relative_poverty_description = "This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country."
 
-ppp_description = "The data is measured in international-$ at {ppp} prices – this adjusts for inflation and for differences in the cost of living between countries."
+ppp_description = "The data is measured in international-$ at {ppp} prices – this adjusts for inflation and for differences in living costs between countries."
 
 prosperity_gap_description = "The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone reaches a standard of prosperity, which is defined as $25 per person per day. This gives a sense of how far global incomes are from a basic prosperity standard."
 

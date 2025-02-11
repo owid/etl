@@ -9,7 +9,7 @@ from rich import print
 from rich_click.rich_command import RichCommand
 
 from apps.owidbot import anomalist, chart_diff, data_diff, grapher
-from etl.config import get_container_name
+from etl.config import OWIDBOT_ACCESS_TOKEN, get_container_name
 
 from . import github_utils as gh_utils
 
@@ -57,7 +57,7 @@ def cli(
     if repo_name not in get_args(REPOS):
         raise AssertionError("Invalid repo")
 
-    repo = gh_utils.get_repo(repo_name)
+    repo = gh_utils.get_repo(repo_name, access_token=OWIDBOT_ACCESS_TOKEN)
     pr = gh_utils.get_pr(repo, branch)
     if pr is None:
         log.warning(f"No open PR found for branch {branch}")

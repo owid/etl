@@ -63,9 +63,6 @@ from etl.paths import BASE_DIR
 # Initialize logger.
 log = get_logger()
 
-# URL of the Github API, to be used to create a draft pull request in the ETL repos.
-GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
-
 # Style for questionary
 SHELL_FORM_STYLE = questionary.Style(
     [
@@ -102,7 +99,7 @@ SHELL_FORM_STYLE = questionary.Style(
 @click.option(
     "--scope",
     "-s",
-    help="Scope of the PR (only relevant if --title is given). This text will be preprended to the PR title. \n\n**Examples**: 'demography' for data work on this field, 'etl.db' if working on specific modules, 'wizard', etc.",
+    help="Scope of the PR (only relevant if --title is given). This text will be preprended to the PR title. **Examples**: 'demography' for data work on this field, 'etl.db' if working on specific modules, 'wizard', etc.",
     default=None,
 )
 @click.option(
@@ -332,7 +329,7 @@ def create_pr(repo, work_branch, base_branch, pr_title):
         "body": "",
         "draft": True,
     }
-    response = requests.post(GITHUB_API_URL, json=data, headers=headers)
+    response = requests.post("https://api.github.com/repos/owid/etl/pulls", json=data, headers=headers)
     if response.status_code == 201:
         js = response.json()
         log.info(f"Draft pull request created successfully at {js['html_url']}.")
@@ -373,7 +370,7 @@ def bake_branch_name(repo, pr_title, no_llm, remote_branches):
     category = pr_title.category
 
     # Get input title (without emoji, scope, etc.)
-    title = _extract_relevant_title_for_branch_name(pr_title.title, not no_llm)
+    title = _extract_relevant_title_for_branch_name(pr_title.title, category, not no_llm)
 
     # Bake complete PR branch name
     # name = f"{user}-{category}-{title}"
@@ -383,13 +380,14 @@ def bake_branch_name(repo, pr_title, no_llm, remote_branches):
     # if name in remote_branches:
     #     log.info("Generating a hash for this branch name to prevent name collisions.")
     #     name = f"{name}-{user}"
-    if name in remote_branches:
+    local_branches = [branch.name for branch in repo.branches]
+    if (name in remote_branches) or (name in local_branches):
         log.info("Generating a hash for this branch name to prevent name collisions.")
         name = f"{name}-{generate_short_hash()}"
     return name
 
 
-def _extract_relevant_title_for_branch_name(text_in: str, use_llm) -> str:
+def _extract_relevant_title_for_branch_name(text_in: str, category: str, use_llm) -> str:
     """
     Process the input string by:
     1. Removing all symbols, keeping only letters and numbers.
@@ -411,8 +409,13 @@ def _extract_relevant_title_for_branch_name(text_in: str, use_llm) -> str:
 
     # Split into tokens/words
     tokens = cleaned_text.split()
+
+    # Clean if there is word included in category
+    tokens = [t for t in tokens if t.lower() != category]
+
     # Keep only the first 3 tokens
     tokens = tokens[:3]
+
     # Combine tokens with '-'
     name = "-".join(tokens).lower()
 

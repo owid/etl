@@ -2,6 +2,7 @@
 
 ref: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_do
 """
+
 from typing import Union, cast
 
 import numpy as np
@@ -79,9 +80,9 @@ def initial_cleaning(tb: Table) -> Table:
     # Assign historical names
     tb["country"] = tb["country"].astype("string")
     tb.loc[(tb["country"] == "Yemen") & (tb["year"] <= 1990) & (tb["year"] >= 1918), "country"] = "Yemen Arab Republic"
-    tb.loc[
-        (tb["country"] == "Vietnam") & (tb["year"] <= 1975) & (tb["year"] >= 1945), "country"
-    ] = "Democratic Republic of Vietnam"
+    tb.loc[(tb["country"] == "Vietnam") & (tb["year"] <= 1975) & (tb["year"] >= 1945), "country"] = (
+        "Democratic Republic of Vietnam"
+    )
     tb.loc[(tb["country"] == "Germany") & (tb["year"] <= 1990) & (tb["year"] >= 1949), "country"] = "West Germany"
     tb["country"] = tb["country"].astype("category")
 

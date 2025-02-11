@@ -34,11 +34,7 @@ def run(dest_dir: str) -> None:
     tb = pr.concat(data, ignore_index=True, short_name=paths.short_name)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = (
-        tb.underscore()
-        .set_index(["treaty", "date", "state", "action", "depositary"], verify_integrity=True)
-        .sort_index()
-    )
+    tb = tb.format(["treaty", "date", "state", "action", "depositary"])
 
     #
     # Save outputs.

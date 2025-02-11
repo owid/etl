@@ -1,0 +1,51 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+
+tables:
+  fur_laws:
+    variables:
+      fur_farming_status:
+        title: Fur farming status
+        unit: ''
+        short_unit: ''
+        description_short: 'Countries that have banned fur farming at a national level.'
+        processing_level: minor
+        presentation:
+          grapher_config:
+            title: Which countries have banned fur farming?
+            map:
+              hideTimeline: true
+            note: "Partially banned means that farming is phasing out due to strong regulation, that there are bans at sub-national level, or that only certain species are banned."
+      fur_trading_status:
+        title: Fur trade status
+        unit: ''
+        short_unit: ''
+        description_short: 'Countries that have banned fur trading at a national level.'
+        processing_level: minor
+        presentation:
+          grapher_config:
+            title: Which countries have banned fur trading?
+            map:
+              hideTimeline: true
+            note: "Partially banned means that there are bans at sub-national level or that only certain species are banned."
+      ban_effective_year:
+        title: Ban effective year
+        unit: ''
+        short_unit: ''
+        description_short: 'Year when the ban becomes effective. If the year is in the future, the ban is enacted but not yet in effect.'
+        processing_level: minor
+      fur_farms_active:
+        title: Active fur farms
+        unit: ''
+        short_unit: ''
+        description_short: 'Countries that have operating fur farms.'
+        processing_level: minor
+        presentation:
+          grapher_config:
+            title: Which countries have active fur farms?
+            map:
+              hideTimeline: true
+

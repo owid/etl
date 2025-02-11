@@ -1,0 +1,74 @@
+steps:
+  #
+  # OECD Family Database
+  #
+  data://meadow/oecd/2024-12-30/family_database:
+    - snapshot://oecd/2024-12-30/family_database.csv
+  data://garden/oecd/2024-12-30/family_database:
+    - data://meadow/oecd/2024-12-30/family_database
+    - data://meadow/us_census_bureau/2025-01-22/marriages_divorces
+    - data://meadow/cdc/2025-01-22/marriages
+  data://grapher/oecd/2024-12-30/family_database:
+    - data://garden/oecd/2024-12-30/family_database
+
+  data://meadow/oecd/2025-01-11/mean_age_at_marriage:
+    - snapshot://oecd/2025-01-11/mean_age_at_marriage.xls
+  data://garden/oecd/2025-01-11/mean_age_at_marriage:
+    - data://meadow/oecd/2025-01-11/mean_age_at_marriage
+  data://grapher/oecd/2025-01-11/mean_age_at_marriage:
+    - data://garden/oecd/2025-01-11/mean_age_at_marriage
+
+  #
+  # US Census Bureau data on marriages and divorces between 1886-1945
+  #
+  data://meadow/us_census_bureau/2025-01-22/marriages_divorces:
+    - snapshot://us_census_bureau/2025-01-22/marriages_divorces.pdf
+
+  #
+  # CDC data on marriages in the US between 1900-2008
+  #
+  data://meadow/cdc/2025-01-22/marriages:
+    - snapshot://cdc/2025-01-22/marriages.pdf
+
+
+  #
+  # ONS Divorces in England and Wales
+  #
+  data://meadow/ons/2025-01-12/divorces:
+    - snapshot://ons/2025-01-12/divorces.xlsx
+  data://garden/ons/2025-01-12/divorces:
+    - data://meadow/ons/2025-01-12/divorces
+  data://grapher/ons/2025-01-12/divorces:
+    - data://garden/ons/2025-01-12/divorces
+  data://grapher/ons/2025-01-12/divorces_by_year:
+    - data://garden/ons/2025-01-12/divorces
+  #
+  # ONS Marriages in England and Wales
+  #
+  data://meadow/ons/2025-01-21/marriages:
+    - snapshot://ons/2025-01-21/marriages.xlsx
+  data://garden/ons/2025-01-21/marriages:
+    - data://meadow/ons/2025-01-21/marriages
+  data://grapher/ons/2025-01-21/marriages:
+    - data://garden/ons/2025-01-21/marriages
+
+  #
+  # UN Women of reproductive age who are married or in a union
+  #
+  data://meadow/un/2025-01-14/married_women:
+    - snapshot://un/2025-01-14/married_women.xlsx
+  data://garden/un/2025-01-14/married_women:
+    - data://meadow/un/2025-01-14/married_women
+  data://grapher/un/2025-01-14/married_women:
+    - data://garden/un/2025-01-14/married_women
+
+
+  # UN Household size data
+  #
+  data://meadow/un/2024-12-31/households:
+    - snapshot://un/2024-12-31/households.xlsx
+  data://garden/un/2024-12-31/households:
+    - data://meadow/un/2024-12-31/households
+  data://grapher/un/2024-12-31/households:
+    - data://garden/un/2024-12-31/households
+

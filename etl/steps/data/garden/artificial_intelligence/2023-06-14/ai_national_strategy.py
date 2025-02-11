@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     tb_regions = tb_regions[tb_regions["defined_by"] == "owid"]
     countries_national_ai = pd.DataFrame(tb_regions["name"])
     countries_national_ai.reset_index(drop=True, inplace=True)
-    countries_national_ai["released"] = np.NaN
+    countries_national_ai["released"] = np.nan
     # Generate the column names from "2017" to "2022"
     column_names = [str(year) for year in range(2017, 2023)]
 

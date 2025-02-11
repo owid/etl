@@ -32,6 +32,7 @@ def run(dest_dir: str) -> None:
     tb_growth_rate = ds_meadow["growth_rate"].reset_index()
     tb_nat_change = ds_meadow["natural_change_rate"].reset_index()
     tb_fertility = ds_meadow["fertility_rate"].reset_index()
+    tb_fertility_births_single = ds_meadow.read("fertility_births_single")
     tb_migration = ds_meadow["net_migration"].reset_index()
     tb_migration_rate = ds_meadow["net_migration_rate"].reset_index()
     tb_deaths = ds_meadow["deaths"].reset_index()
@@ -41,7 +42,7 @@ def run(dest_dir: str) -> None:
     tb_median_age = ds_meadow["median_age"].reset_index()
     tb_le = ds_meadow["life_expectancy"].reset_index()
     tb_mortality = ds_meadow["mortality_rate"].reset_index()
-    # tb_childbearing_age = ds_meadow["childbearing_age"].reset_index()
+    tb_childbearing_age = ds_meadow["mean_age_childbearing"].reset_index()
 
     #
     # Process data.
@@ -97,6 +98,9 @@ def run(dest_dir: str) -> None:
     tb_fertility = set_variant_to_estimates(tb_fertility)
     tb_fertility = tb_fertility.format(COLUMNS_INDEX)
 
+    ## Fertility by age (distribution)
+    tb_fertility_births_single = process_fertility_births_single(tb_fertility_births_single)
+
     ## Life Expectancy
     tb_le = process_le(tb_le)
     tb_le = set_variant_to_estimates(tb_le)
@@ -106,6 +110,11 @@ def run(dest_dir: str) -> None:
     tb_mortality = process_mortality(tb_mortality)
     tb_mortality = set_variant_to_estimates(tb_mortality)
     tb_mortality = tb_mortality.format(COLUMNS_INDEX)
+
+    ## Mean age at childbearing
+    tb_childbearing_age = process_standard(tb_childbearing_age)
+    tb_childbearing_age = set_variant_to_estimates(tb_childbearing_age)
+    tb_childbearing_age = tb_childbearing_age.format(COLUMNS_INDEX)
 
     # Build tables list for dataset
     tables = [
@@ -121,6 +130,8 @@ def run(dest_dir: str) -> None:
         tb_sex_ratio,
         tb_mortality,
         tb_dependency,
+        tb_childbearing_age,
+        tb_fertility_births_single,
     ]
 
     #
@@ -402,6 +413,39 @@ def process_births(tb: Table, tb_rate: Table) -> Table:
     # Drop 55-59 age group in births (is all zero!)
     assert (tb.loc[tb["age"] == "55-59", "births"] == 0).all(), "Unexpected non-zero births values for age group 55-59."
     tb = tb.loc[tb["age"] != "55-59"]
+
+    return tb
+
+
+def process_fertility_births_single(tb: Table) -> Table:
+    LAST_YEAR = 2023
+
+    # Standard processing
+    tb = process_standard(tb)
+    # Keep only data pre-2023 (no projections)
+    tb = tb.loc[tb["year"] <= LAST_YEAR]
+    # Check
+    assert set(tb["sex"].unique()) == {"all"}, "Unexpected sex group"
+    # Drop unused columns
+    tb = tb.drop(columns=["variant", "sex"])
+    # Rename year column (will be used as secondary dimension)
+    tb = tb.rename(
+        columns={
+            "year": "year_as_dimension",
+        }
+    )
+
+    # Scale
+    tb["fertility_rate"] /= 1_000
+
+    # Keep data only every 5 years, and 2023
+    tb = tb.loc[(tb["year_as_dimension"] % 5 == 0) | (tb["year_as_dimension"] == LAST_YEAR)]
+
+    # Format
+    tb = tb.format(["country", "age", "year_as_dimension"], short_name="fertility_single")
+
+    # Keep relevant columns
+    tb = tb.loc[:, ["fertility_rate"]]
 
     return tb
 

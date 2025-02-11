@@ -97,9 +97,9 @@ def add_polio_region_certification(
             # tb_who_region["status"] = "WHO Region certified polio-free"
             tb = pr.merge(tb, tb_who_region, on=["country", "year"], how="outer")
             # Set the status for all relevant countries and years
-            tb.loc[
-                tb["country"].isin(country_list) & (tb["year"] >= year_certified_int), "status"
-            ] = "WHO Region certified polio-free"
+            tb.loc[tb["country"].isin(country_list) & (tb["year"] >= year_certified_int), "status"] = (
+                "WHO Region certified polio-free"
+            )
 
     return tb
 

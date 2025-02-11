@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     tb = snap.read(safe_types=False)
 
     # Process data.
-    tb = tb.set_index(["Series ID", "Year", "Period"], verify_integrity=True)
+    tb = tb.format(["series_id", "year", "period"])
 
     #
     # Save outputs.

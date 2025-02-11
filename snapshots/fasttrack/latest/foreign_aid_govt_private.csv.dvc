@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: OECD
+    title: foreign_aid_govt_private
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTS8P48gCF-EVE-VPaFZGc-_M0l1SWiiFaBVMim_37CdES3vMAacU6oppFJ2cKJuKqYyncxE6tLpRsk/pub?output=csv
+    date_accessed: '2025-02-05'
+  name: Foreign aid by governments and private donors
+  description: ''
+  license: {}
+outs:
+  - md5: 1973e716bf34b2d8c58ce83b045a5335
+    size: 3315
+    path: foreign_aid_govt_private.csv

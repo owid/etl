@@ -13,8 +13,8 @@ from requests.exceptions import HTTPError
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from etl import grapher_model as gm
-from etl.config import DEFAULT_GRAPHER_SCHEMA, GRAPHER_USER_ID, OWIDEnv
+from etl.config import DEFAULT_GRAPHER_SCHEMA, ENV_GRAPHER_USER_ID, OWIDEnv
+from etl.grapher import model as gm
 
 log = structlog.get_logger()
 
@@ -25,7 +25,7 @@ def is_502_error(exception):
 
 
 class AdminAPI(object):
-    def __init__(self, owid_env: OWIDEnv, grapher_user_id: Optional[int] = GRAPHER_USER_ID):
+    def __init__(self, owid_env: OWIDEnv, grapher_user_id: Optional[int] = ENV_GRAPHER_USER_ID):
         self.owid_env = owid_env
         self.session_id = create_session_id(owid_env, grapher_user_id)
 
@@ -48,6 +48,14 @@ class AdminAPI(object):
     def get_chart_config(self, chart_id: int) -> dict:
         resp = requests.get(
             f"{self.owid_env.admin_api}/charts/{chart_id}.config.json",
+            cookies={"sessionid": self.session_id},
+        )
+        js = self._json_from_response(resp)
+        return js
+
+    def get_chart_references(self, chart_id: int) -> dict:
+        resp = requests.get(
+            f"{self.owid_env.admin_api}/charts/{chart_id}.references.json",
             cookies={"sessionid": self.session_id},
         )
         js = self._json_from_response(resp)
@@ -131,8 +139,8 @@ def create_session_id(owid_env: OWIDEnv, grapher_user_id: int) -> str:
         user = session.get(gm.User, grapher_user_id)
         # User is not in a database, use GRAPHER_USER_ID from .env
         if not user:
-            user = session.get(gm.User, GRAPHER_USER_ID)
-            assert user, f"User with id {GRAPHER_USER_ID} not found in the database. Initially tried to use user with id {grapher_user_id}."
+            user = session.get(gm.User, ENV_GRAPHER_USER_ID)
+            assert user, f"User with id {ENV_GRAPHER_USER_ID} not found in the database. Initially tried to use user with id {grapher_user_id}."
         session_id = _create_user_session(session, user.email)
         session.commit()
 

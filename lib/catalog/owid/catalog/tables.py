@@ -38,7 +38,7 @@ from owid.datautils import dataframes
 from owid.repack import repack_frame
 
 from . import processing_log as pl
-from . import variables, warnings
+from . import utils, variables, warnings
 from .meta import (
     SOURCE_EXISTS_OPTIONS,
     DatasetMeta,
@@ -48,7 +48,6 @@ from .meta import (
     TableMeta,
     VariableMeta,
 )
-from .utils import underscore
 from .variables import Variable
 
 log = structlog.get_logger()
@@ -192,12 +191,10 @@ class Table(pd.DataFrame):
         return table
 
     @overload
-    def to_csv(self, path: None = None, **kwargs: Any) -> str:
-        ...
+    def to_csv(self, path: None = None, **kwargs: Any) -> str: ...
 
     @overload
-    def to_csv(self, path: Any, **kwargs: Any) -> None:
-        ...
+    def to_csv(self, path: Any, **kwargs: Any) -> None: ...
 
     def to_csv(self, path: Optional[Any] = None, **kwargs: Any) -> Union[None, str]:
         """
@@ -306,6 +303,12 @@ class Table(pd.DataFrame):
             try:
                 json.dump(metadata, ostream, indent=2, default=str, allow_nan=False)
             except ValueError as e:
+                # try to find a problematic field
+                for k, v in metadata["fields"].items():
+                    try:
+                        json.dumps(v, default=str, allow_nan=False)
+                    except ValueError as e2:
+                        raise ValueError(f"metadata field {k} contains NaNs:\n{v}") from e2
                 raise ValueError(f"metadata contains NaNs:\n{metadata}") from e
 
     @classmethod
@@ -445,16 +448,13 @@ class Table(pd.DataFrame):
         *,
         inplace: Literal[True],
         **kwargs: Any,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
-    def rename(self, mapper: Any = None, *, inplace: Literal[False], **kwargs: Any) -> "Table":
-        ...
+    def rename(self, mapper: Any = None, *, inplace: Literal[False], **kwargs: Any) -> "Table": ...
 
     @overload
-    def rename(self, *args: Any, **kwargs: Any) -> "Table":
-        ...
+    def rename(self, *args: Any, **kwargs: Any) -> "Table": ...
 
     def rename(self, *args: Any, **kwargs: Any) -> Optional["Table"]:
         """Rename columns while keeping their metadata."""
@@ -559,16 +559,13 @@ class Table(pd.DataFrame):
         *,
         inplace: Literal[True],
         **kwargs: Any,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
-    def set_index(self, keys: Union[str, List[str]], *, inplace: Literal[False], **kwargs: Any) -> "Table":
-        ...
+    def set_index(self, keys: Union[str, List[str]], *, inplace: Literal[False], **kwargs: Any) -> "Table": ...
 
     @overload
-    def set_index(self, keys: Union[str, List[str]], **kwargs: Any) -> "Table":
-        ...
+    def set_index(self, keys: Union[str, List[str]], **kwargs: Any) -> "Table": ...
 
     def set_index(
         self,
@@ -588,16 +585,13 @@ class Table(pd.DataFrame):
             return cast(Table, t)
 
     @overload
-    def reset_index(self, level=None, *, inplace: Literal[True], **kwargs) -> None:
-        ...
+    def reset_index(self, level=None, *, inplace: Literal[True], **kwargs) -> None: ...
 
     @overload
-    def reset_index(self, level=None, *, inplace: Literal[False], **kwargs) -> "Table":
-        ...
+    def reset_index(self, level=None, *, inplace: Literal[False], **kwargs) -> "Table": ...
 
     @overload
-    def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> "Table":
-        ...
+    def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> "Table": ...
 
     def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> Optional["Table"]:  # type: ignore
         """Fix type signature of reset_index."""
@@ -617,16 +611,13 @@ class Table(pd.DataFrame):
         return cast(Table, t)
 
     @overload
-    def drop_duplicates(self, *, inplace: Literal[True], **kwargs) -> None:
-        ...
+    def drop_duplicates(self, *, inplace: Literal[True], **kwargs) -> None: ...
 
     @overload
-    def drop_duplicates(self, *, inplace: Literal[False], **kwargs) -> "Table":
-        ...
+    def drop_duplicates(self, *, inplace: Literal[False], **kwargs) -> "Table": ...
 
     @overload
-    def drop_duplicates(self, **kwargs) -> "Table":
-        ...
+    def drop_duplicates(self, **kwargs) -> "Table": ...
 
     def drop_duplicates(self, *args, **kwargs) -> Optional["Table"]:
         return super().drop_duplicates(*args, **kwargs)
@@ -722,7 +713,7 @@ class Table(pd.DataFrame):
         orig_cols = t.columns
 
         # underscore columns and resolve collisions
-        new_cols = pd.Index([underscore(c, camel_to_snake=camel_to_snake) for c in t.columns])
+        new_cols = pd.Index([utils.underscore(c, camel_to_snake=camel_to_snake) for c in t.columns])
         new_cols = _resolve_collisions(orig_cols, new_cols, collision)
 
         columns_map = {c_old: c_new for c_old, c_new in zip(orig_cols, new_cols)}
@@ -731,9 +722,9 @@ class Table(pd.DataFrame):
         else:
             t = t.rename(columns=columns_map)
 
-        t.index.names = [underscore(e, camel_to_snake=camel_to_snake) for e in t.index.names]
+        t.index.names = [utils.underscore(e, camel_to_snake=camel_to_snake) for e in t.index.names]
         t.metadata.primary_key = t.primary_key
-        t.metadata.short_name = underscore(t.metadata.short_name, camel_to_snake=camel_to_snake)
+        t.metadata.short_name = utils.underscore(t.metadata.short_name, camel_to_snake=camel_to_snake)
 
         # put original names as titles into metadata by default
         for c_old, c_new in columns_map.items():
@@ -795,6 +786,11 @@ class Table(pd.DataFrame):
         # Set index
         if keys is None:
             keys = ["country", "year"]
+        # Underscore keys
+        elif isinstance(keys, str):
+            keys = utils.underscore(keys)
+        else:
+            keys = [utils.underscore(k) for k in keys]
         ## Sanity check
         try:
             t = t.set_index(keys, verify_integrity=verify_integrity)
@@ -817,16 +813,13 @@ class Table(pd.DataFrame):
         return t
 
     @overload
-    def dropna(self, *, inplace: Literal[True], **kwargs) -> None:
-        ...
+    def dropna(self, *, inplace: Literal[True], **kwargs) -> None: ...
 
     @overload
-    def dropna(self, *, inplace: Literal[False], **kwargs) -> "Table":
-        ...
+    def dropna(self, *, inplace: Literal[False], **kwargs) -> "Table": ...
 
     @overload
-    def dropna(self, **kwargs) -> "Table":
-        ...
+    def dropna(self, **kwargs) -> "Table": ...
 
     def dropna(self, *args, **kwargs) -> Optional["Table"]:
         tb = super().dropna(*args, **kwargs)
@@ -1036,7 +1029,7 @@ class Table(pd.DataFrame):
         if value is not None:
             tb = super().fillna(value, **kwargs)
 
-            if type(value) == type(self):
+            if type(value) is type(self):
                 for column in tb.columns:
                     if column in value.columns:
                         tb._fields[column] = variables.combine_variables_metadata(
@@ -1072,12 +1065,10 @@ class TableGroupBy:
         self._fields = fields
 
     @overload
-    def __getattr__(self, name: Literal["count", "size", "sum", "mean", "median"]) -> Callable[[], "Table"]:
-        ...
+    def __getattr__(self, name: Literal["count", "size", "sum", "mean", "median"]) -> Callable[[], "Table"]: ...
 
     @overload
-    def __getattr__(self, name: str) -> "VariableGroupBy":
-        ...
+    def __getattr__(self, name: str) -> "VariableGroupBy": ...
 
     def __getattr__(self, name: str) -> Union[Callable[..., "Table"], "VariableGroupBy"]:
         # Calling method on the groupby object
@@ -1108,12 +1099,10 @@ class TableGroupBy:
             return VariableGroupBy(getattr(self.groupby, name), name, self._fields[name], self.metadata)
 
     @overload
-    def __getitem__(self, key: str) -> "VariableGroupBy":
-        ...
+    def __getitem__(self, key: str) -> "VariableGroupBy": ...
 
     @overload
-    def __getitem__(self, key: list) -> "TableGroupBy":
-        ...
+    def __getitem__(self, key: list) -> "TableGroupBy": ...
 
     def __getitem__(self, key: Union[str, list]) -> Union["VariableGroupBy", "TableGroupBy"]:
         if isinstance(key, list):
@@ -1159,9 +1148,9 @@ class TableGroupBy:
         df = self.groupby.apply(f, *args, include_groups=include_groups)
         if not mem:
             return Table(df)
-        elif type(mem["table"]) == pd.DataFrame:
+        elif type(mem["table"]) is pd.DataFrame:
             return _create_table(df, self.metadata, self._fields)
-        elif type(mem["table"]) == pd.Series:
+        elif type(mem["table"]) is pd.Series:
             if isinstance(df, Table):
                 return _create_table(df, self.metadata, self._fields)
             else:
@@ -1768,6 +1757,51 @@ def read_rda(
     table = Table(converted[table_name], underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
+
+
+def read_rda_multiple(
+    filepath_or_buffer: Union[str, Path, IO[AnyStr]],
+    table_names: Optional[List[str]] = None,
+    metadata: Optional[TableMeta] = None,
+    origin: Optional[Origin] = None,
+    underscore: bool = False,
+) -> Dict[str, Table]:
+    # Read RData
+    parsed = rdata.parser.parse_file(filepath_or_buffer)  # type: ignore
+    converted = rdata.conversion.convert(parsed)
+
+    # Init output dictionary
+    tables = {}
+
+    if table_names is not None:
+        # If table names are given, read them
+        for tname in table_names:
+            # Check that name exists in RDA file
+            if tname not in converted:
+                raise ValueError(f"Table {tname} not found in RDA file.")
+            # Load object
+            table = converted[tname]
+            # Check that object is a DataFrame (otherwise raise error!). NOTE: here we raise an error, bc user explicitly asked us to load this table.
+            if isinstance(table, pd.DataFrame):
+                raise ValueError(f"Table {tname} is not a DataFrame.")
+            # Parse object to Table, and add metadata
+            table = Table(converted[tname], underscore=underscore)
+            table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+            table.metadata.short_name = tname
+            # Safe table in main dictionary object
+            tables[tname] = cast(Table, table)
+    else:
+        # Read them all (only those objects that are Dataframes)
+        for fname, data in converted.items():
+            if isinstance(data, pd.DataFrame):
+                # Parse object to Table, and add metadata
+                table = Table(data, underscore=underscore)
+                table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
+                table.metadata.short_name = fname
+                # Safe table in main dictionary object
+                tables[fname] = cast(Table, table)
+
+    return tables
 
 
 def read_rds(

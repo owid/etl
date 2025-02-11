@@ -1,6 +1,5 @@
-"""Garden step for EIA total energy consumption.
+"""Garden step for EIA total energy consumption."""
 
-"""
 from typing import Dict, List, Optional, Union
 
 import numpy as np

@@ -1,6 +1,4 @@
-"""Load garden dataset for Farmer & Lafond (2016) data and create a grapher dataset.
-
-"""
+"""Load garden dataset for Farmer & Lafond (2016) data and create a grapher dataset."""
 
 from etl.helpers import PathFinder, create_dataset
 

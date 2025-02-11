@@ -1,6 +1,4 @@
-"""Test functions in etl.data_helpers.geo module.
-
-"""
+"""Test functions in etl.data_helpers.geo module."""
 
 import json
 import unittest
@@ -70,7 +68,6 @@ def mock_population_load(*args, **kwargs):
     return mock_population
 
 
-@patch.object(geo, "_load_population", mock_population_load)
 class TestAddPopulationToDataframe:
     def test_all_countries_and_years_in_population(self):
         df_in = pd.DataFrame({"country": ["Country 2", "Country 1"], "year": [2019, 2021]})
@@ -81,7 +78,7 @@ class TestAddPopulationToDataframe:
                 "population": [30, 20],
             }
         )
-        assert geo._add_population_to_dataframe(df=df_in).equals(df_out)
+        assert geo._add_population_to_dataframe(df=df_in, tb_population=mock_population).equals(df_out)
 
     def test_countries_and_years_in_population_just_one(self):
         df_in = pd.DataFrame({"country": ["Country 2", "Country 2"], "year": [2020, 2019]})
@@ -92,7 +89,7 @@ class TestAddPopulationToDataframe:
                 "population": [40, 30],
             }
         )
-        assert geo._add_population_to_dataframe(df=df_in).equals(df_out)
+        assert geo._add_population_to_dataframe(df=df_in, tb_population=mock_population).equals(df_out)
 
     def test_one_country_in_and_another_not_in_population(self):
         df_in = pd.DataFrame({"country": ["Country 1", "Country 3"], "year": [2020, 2021]})
@@ -103,7 +100,7 @@ class TestAddPopulationToDataframe:
                 "population": [10, np.nan],
             }
         )
-        assert geo._add_population_to_dataframe(df=df_in).equals(df_out)
+        assert geo._add_population_to_dataframe(df=df_in, tb_population=mock_population).equals(df_out)
 
     def test_no_countries_in_population(self):
         df_in = pd.DataFrame({"country": ["Country_04", "Country_04"], "year": [2000, 2000]})
@@ -114,7 +111,9 @@ class TestAddPopulationToDataframe:
                 "population": [np.nan, np.nan],
             }
         )
-        assert geo._add_population_to_dataframe(df=df_in, warn_on_missing_countries=False).equals(df_out)
+        assert geo._add_population_to_dataframe(
+            df=df_in, tb_population=mock_population, warn_on_missing_countries=False
+        ).equals(df_out)
 
     def test_countries_in_population_but_not_for_given_years(self):
         df_in = pd.DataFrame({"country": ["Country 2", "Country 1"], "year": [2000, 2000]})
@@ -125,7 +124,7 @@ class TestAddPopulationToDataframe:
                 "population": [np.nan, np.nan],
             }
         )
-        assert geo._add_population_to_dataframe(df=df_in).equals(df_out)
+        assert geo._add_population_to_dataframe(df=df_in, tb_population=mock_population).equals(df_out)
 
     def test_countries_in_population_but_a_year_in_and_another_not_in_population(self):
         df_in = pd.DataFrame({"country": ["Country 2", "Country 1"], "year": [2019, 2000]})
@@ -136,7 +135,7 @@ class TestAddPopulationToDataframe:
                 "population": [30, np.nan],
             }
         )
-        assert geo._add_population_to_dataframe(df=df_in).equals(df_out)
+        assert geo._add_population_to_dataframe(df=df_in, tb_population=mock_population).equals(df_out)
 
     def test_change_country_and_year_column_names(self):
         df_in = pd.DataFrame({"Country": ["Country 2", "Country 1"], "Year": [2019, 2021]})
@@ -147,7 +146,9 @@ class TestAddPopulationToDataframe:
                 "population": [30, 20],
             }
         )
-        assert geo._add_population_to_dataframe(df=df_in, country_col="Country", year_col="Year").equals(df_out)
+        assert geo._add_population_to_dataframe(
+            df=df_in, tb_population=mock_population, country_col="Country", year_col="Year"
+        ).equals(df_out)
 
     def test_warn_if_countries_missing(self):
         df_in = pd.DataFrame({"country": ["Country_04", "Country_04"], "year": [2000, 2000]})
@@ -159,7 +160,9 @@ class TestAddPopulationToDataframe:
             }
         )
         with warns(UserWarning):
-            geo._add_population_to_dataframe(df=df_in, warn_on_missing_countries=True).equals(df_out)
+            geo._add_population_to_dataframe(
+                df=df_in, tb_population=mock_population, warn_on_missing_countries=True
+            ).equals(df_out)
 
 
 @patch("builtins.open", new=mock_opens)

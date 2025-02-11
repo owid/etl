@@ -1,5 +1,6 @@
 import datetime as dt
 import difflib
+import json
 import pprint
 from typing import Any, Dict, List, Optional
 
@@ -10,9 +11,11 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.wizard.utils import get_staging_creation_time
-from etl import grapher_model as gm
+from apps.wizard.utils.io import get_all_changed_catalog_paths
 from etl.config import OWID_ENV
 from etl.db import read_sql
+from etl.git_helpers import get_changed_files, log_time
+from etl.grapher import model as gm
 
 log = get_logger()
 
@@ -200,7 +203,9 @@ class ChartDiff:
                         self._change_types.append("data")
                     if self.modified_checksum["metadataChecksum"].any():
                         self._change_types.append("metadata")
-                if self.target_chart and not self.configs_are_equal():
+                # NOTE: configs might differ and edited_in_staging is False if the chart had just
+                #   data / metadata changes
+                if self.edited_in_staging and self.target_chart and not self.configs_are_equal():
                     self._change_types.append("config")
 
                 # TODO: Should uncomment this maybe?
@@ -243,7 +248,7 @@ class ChartDiff:
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
 
         # Get all slugs from target
-        slugs_in_target = cls._get_chart_slugs(target_session)
+        slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
 
         # Build chart diffs
         chart_diffs = []
@@ -353,7 +358,7 @@ class ChartDiff:
     def configs_are_equal(self) -> bool:
         """Compare two chart configs, ignoring version, id and isPublished."""
         assert self.target_chart is not None, "Target chart is None!"
-        return configs_are_equal(self.source_chart.config, self.target_chart.config)
+        return configs_are_equal(self.source_chart.config, self.target_chart.config, verbose=False)
 
     @property
     def details(self):
@@ -364,13 +369,24 @@ class ChartDiff:
             "is_rejected": self.is_rejected,
             "is_reviewed": self.is_reviewed,
             "is_new": self.is_new,
+            "change_types": self.change_types,
             "error": self.error,
         }
 
     @staticmethod
-    def _get_chart_slugs(target_session: Session) -> set[str]:
-        slugs_redirects = set(read_sql("SELECT slug FROM chart_slug_redirects", target_session)["slug"])
-        slugs = set(read_sql("SELECT slug FROM chart_configs", target_session)["slug"])
+    def _get_chart_slugs(target_session: Session, slugs: Optional[set[str]] = None) -> set[str]:
+        """Get all chart slugs. Use `slugs` to filter slugs as this can be slow otherwise."""
+        if slugs is not None:
+            where = "WHERE slug IN %(slugs)s"
+            params = {"slugs": tuple(slugs)}
+        else:
+            where = ""
+            params = {}
+
+        slugs_redirects = set(
+            read_sql(f"SELECT slug FROM chart_slug_redirects {where}", target_session, params=params)["slug"]
+        )
+        slugs = set(read_sql(f"SELECT slug FROM chart_configs {where}", target_session, params=params)["slug"])
         return slugs | slugs_redirects
 
     @staticmethod
@@ -535,6 +551,7 @@ class ChartDiffsLoader:
         return pd.DataFrame(summary)
 
 
+@log_time
 def _modified_data_metadata_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
@@ -585,6 +602,19 @@ def _modified_data_metadata_on_staging(
     if source_df.empty:
         return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited"]).set_index("chartId")
 
+    # Get all changed files and their catalog paths, including downstream dependencies.
+    files_changed = get_changed_files()
+    catalog_paths = get_all_changed_catalog_paths(files_changed)
+
+    # Exclude variables that haven't been changed by updating the files. This is to prevent showing
+    # spurious changes from lagging behind master.
+    dataset_paths = source_df.catalogPath.str.split("/").str[:4].str.join("/")
+    source_df = source_df[dataset_paths.isin(catalog_paths)]
+
+    # no charts, return empty dataframe
+    if source_df.empty:
+        return pd.DataFrame(columns=["chartId", "dataEdited", "metadataEdited"]).set_index("chartId")
+
     # read those variables from target
     where = """
         v.catalogPath in %(catalog_paths)s
@@ -626,6 +656,7 @@ def _modified_data_metadata_on_staging(
     return diff
 
 
+@log_time
 def _modified_chart_configs_on_staging(
     source_session: Session, target_session: Session, chart_ids: Optional[List[int]] = None
 ) -> pd.DataFrame:
@@ -636,6 +667,7 @@ def _modified_chart_configs_on_staging(
     select
         c.id as chartId,
         MD5(cc.full) as chartChecksum,
+        cc.full as chartConfig,
         c.lastEditedByUserId as chartLastEditedByUserId,
         c.publishedByUserId as chartPublishedByUserId,
         c.lastEditedAt as chartLastEditedAt
@@ -681,6 +713,20 @@ def _modified_chart_configs_on_staging(
 
     diff = source_df.copy()
     diff["configEdited"] = source_df["chartChecksum"] != target_df["chartChecksum"]
+
+    # Go through edited configs and do a more detailed comparison
+    ix = diff["configEdited"] & target_df["chartChecksum"].notnull()
+    equal_configs = []
+    for chart_id, row in diff.loc[ix].iterrows():
+        source_config = json.loads(row["chartConfig"])
+        target_config = json.loads(target_df.loc[chart_id, "chartConfig"])
+
+        # Compare configs
+        if configs_are_equal(source_config, target_config):
+            equal_configs.append(chart_id)
+
+    # Exclude configs that have different chartChecksum, but are actually the same (e.g. have just different version)
+    diff = diff[~diff.index.isin(equal_configs)]
 
     # Add flag 'edited in staging'
     diff["chartEditedInStaging"] = True

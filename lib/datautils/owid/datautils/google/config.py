@@ -1,4 +1,5 @@
 """Google configuration functions."""
+
 import os
 from pathlib import Path
 from shutil import copyfile

@@ -84,6 +84,7 @@ definitions:
 
   number_deaths:
     description_short: |-
+      <% set per_capita = "" %>
       <%- if conflict_type == "all" -%>
       Included are deaths of combatants due to fighting, disease, and starvation in wars that were ongoing that year<< per_capita >>.
 

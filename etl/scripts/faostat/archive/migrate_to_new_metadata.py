@@ -5,6 +5,7 @@ NOTE: This script should only be used once, to generate the files for the first 
 In future updates we will need to adapt the scripts or etl steps to be able to easily update metadata.
 
 """
+
 import argparse
 import json
 
@@ -12,7 +13,7 @@ from owid import catalog
 from structlog import get_logger
 
 from etl.files import yaml_dump
-from etl.grapher_io import get_dataset_id, get_variables_in_dataset
+from etl.grapher.io import get_dataset_id, get_variables_in_dataset
 from etl.paths import DATA_DIR, STEP_DIR
 
 # Initialize logger.

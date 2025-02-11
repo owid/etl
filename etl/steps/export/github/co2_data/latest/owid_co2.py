@@ -14,16 +14,19 @@ Outputs that will be committed to a branch in the co2-data repository:
 * The README file.
 
 """
+
 import os
 import tempfile
 from pathlib import Path
 
+import git
 import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
 from apps.owidbot import github_utils as gh
 from etl.helpers import PathFinder
+from etl.paths import BASE_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -211,13 +214,15 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # If you want to really commit the data, use `CO2_BRANCH=my-branch etlr github/co2_data --export`
-    if os.environ.get("CO2_BRANCH"):
-        dry_run = False
-        branch = os.environ["CO2_BRANCH"]
-    else:
+    branch = git.Repo(BASE_DIR).active_branch.name
+
+    if branch == "master":
+        log.warning("You are on master branch, using dry mode.")
         dry_run = True
-        branch = "master"
+    else:
+        log.info(f"Committing files to branch {branch}")
+        # Load DRY_RUN from env or use False as default.
+        dry_run = bool(int(os.environ.get("DRY_RUN", 0)))
 
     # Uncomment to inspect changes.
     # from etl.data_helpers.misc import compare_tables
@@ -233,6 +238,8 @@ def run(dest_dir: str) -> None:
 
         prepare_and_save_outputs(tb, codebook=codebook, temp_dir_path=temp_dir_path)
 
+        gh.create_branch_if_not_exists(repo_name="co2-data", branch=branch, dry_run=dry_run)
+
         # Commit csv files to the repos.
         for file_name in ["owid-co2-data.csv", "owid-co2-codebook.csv", "README.md"]:
             with (temp_dir_path / file_name).open("r") as file_content:
@@ -244,3 +251,8 @@ def run(dest_dir: str) -> None:
                     branch=branch,
                     dry_run=dry_run,
                 )
+
+    if not dry_run:
+        log.info(
+            f"Files committed successfully to branch {branch}. Create a PR here https://github.com/owid/co2-data/compare/master...{branch}."
+        )

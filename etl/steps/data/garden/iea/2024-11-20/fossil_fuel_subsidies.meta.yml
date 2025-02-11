@@ -1,0 +1,45 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+        - Fossil Fuels
+      grapher_config:
+        note: This data is expressed in constant {dollar_year} US$.
+    processing_level: minor
+    unit: constant {dollar_year} US$
+    short_unit: "$"
+    description_short: |-
+      This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in living costs between countries.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  fossil_fuel_subsidies:
+    variables:
+      coal_subsidy:
+        title: Subsidies to coal
+      electricity_subsidy:
+        title: Subsidies to electricity
+      gas_subsidy:
+        title: Subsidies to gas
+      oil_subsidy:
+        title: Subsidies to oil
+      total_subsidy:
+        title: Total subsidies
+      transport_oil_subsidy:
+        title: Subsidies to oil in transport
+      subsidization_rate:
+        title: Subsidization rate
+        unit: "%"
+        short_unit: "%"
+      subsidy_per_capita:
+        title: Subsidy per capita
+        unit: constant {dollar_year} US$ per person
+        short_unit: "$/person"
+      subsidy_as_share_of_gdp:
+        title: Subsidy as share of GDP
+        unit: "%"
+        short_unit: "%"
+

@@ -1,4 +1,5 @@
 """Auxiliary classes, functions and variables."""
+
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 

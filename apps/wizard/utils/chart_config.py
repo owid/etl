@@ -1,12 +1,13 @@
 """Tools to generate chart configs."""
+
 from copy import deepcopy
 from typing import Any, Dict, List, Optional
 
 import numpy as np
 
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher_io import ensure_load_variable
-from etl.grapher_model import Variable
+from etl.grapher.io import ensure_load_variable
+from etl.grapher.model import Variable
 
 CONFIG_BASE = {
     # "title": "Placeholder",
@@ -77,6 +78,7 @@ def bake_chart_config(
     selected_entities: Optional[list] = None,
     included_entities: Optional[list] = None,
     display: Optional[List[Any]] = None,
+    tab: Optional[str] = None,
     owid_env: OWIDEnv = OWID_ENV,
 ) -> Dict[str, Any]:
     """Bake a Grapher chart configuration.
@@ -119,4 +121,7 @@ def bake_chart_config(
         included_entities = [str(entity) for entity in included_entities]
         chart_config["includedEntities"] = included_entities
 
+    # Edit initial tab
+    if tab is not None:
+        chart_config["tab"] = tab
     return chart_config
