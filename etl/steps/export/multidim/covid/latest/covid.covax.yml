@@ -1,5 +1,24 @@
 definitions:
-  table: grapher/covid/latest/covax/covax
+  note: &note |-
+    COVAX is a worldwide initiative aimed at equitable access to COVID-19 vaccines. It is directed by Gavi, CEPI, and the WHO
+  config_base: &config_base
+    originUrl: ourworldindata.org/coronavirus
+    chartTypes: ["StackedDiscreteBar"]
+    $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
+    note: "{definitions.note}."
+  subtitle: |-
+    Doses donated to the COVAX initiative by each country
+  title: |-
+    COVID-19 vaccine doses donated to COVAX
+  display_delivered: &display_delivered
+    color: "#3182bd"
+    name: "Shipped by COVAX"
+  display_only_donated: &display_only_donated
+    color: "#9ecae1"
+    name: "Donated to COVAX"
+  display_only_announced: &display_only_announced
+    color: "#deebf7"
+    name: "Donations to COVAX announced"
 
 title:
   title: COVID-19 vaccine doses donated to COVAX
@@ -41,7 +60,7 @@ dimensions:
     name: Normalization
     choices:
       - slug: absolute
-        name: None
+        name: Absolute numbers
         description: null
       - slug: per_capita
         name: Per capita
@@ -58,80 +77,63 @@ views:
       normalize: absolute
     indicators:
       y:
-        - "{definitions.table}#delivered"
-        - "{definitions.table}#only_donated"
-        - "{definitions.table}#only_announced"
-
+        - catalogPath: "covax#delivered"
+          display: *display_delivered
+        - catalogPath: "covax#only_donated"
+          display: *display_only_donated
+        - catalogPath: "covax#only_announced"
+          display: *display_only_announced
     config:
-      title: "COVID-19 vaccine doses donated to COVAX"
-      subtitle: Doses donated to the COVAX initiative by each country.
-      note: COVAX is a worldwide initiative aimed at equitable access to COVID-19 vaccines. It is directed by Gavi, CEPI, and the WHO.
-      originUrl: ourworldindata.org/coronavirus
-      chartTypes: ["StackedDiscreteBar"]
-      sortBy: column
-      sortColumnSlug: "{definitions.table}#delivered"
-      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
-      dimensions:
-        - property: y
-          variableId: 988127
-          display:
-            includeInTable: true
-            color: "#3182bd"
-        - property: y
-          variableId: 988128
-          display:
-            includeInTable: true
-            color: "#9ecae1"
-        - property: y
-          variableId: 988129
-          display:
-            includeInTable: true
-            color: "#deebf7"
+      title: "{definitions.title}"
+      subtitle: "{definitions.subtitle}."
+      <<: *config_base
+      # sortBy: column
+      # sortColumnSlug: "covax#delivered"
 
   - dimensions:
       normalize: per_capita
     indicators:
       y:
-        - "{definitions.table}#delivered_per_capita"
-        - "{definitions.table}#only_donated_per_capita"
-        - "{definitions.table}#only_announced_per_capita"
+        - catalogPath: "covax#delivered_per_capita"
+          display: *display_delivered
+        - catalogPath: "covax#only_donated_per_capita"
+          display: *display_only_donated
+        - catalogPath: "covax#only_announced_per_capita"
+          display: *display_only_announced
 
     config:
-      title: "COVID-19 vaccine doses donated to COVAX, per capita"
-      subtitle: Doses donated to the COVAX initiative by each country, per person living in the donating country.
-      note: COVAX is a worldwide initiative aimed at equitable access to COVID-19 vaccines. It is directed by Gavi, CEPI, and the WHO. Gross domestic product is expressed in U.S. Dollars; it is sourced from the World Bank and OECD.
-      originUrl: ourworldindata.org/coronavirus
-      chartTypes: ["StackedDiscreteBar"]
-      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
+      title: "{definitions.title}, per capita"
+      subtitle: "{definitions.subtitle}, per person living in the donating country."
+      <<: *config_base
 
   - dimensions:
       normalize: per_dose
     indicators:
       y:
-        - "{definitions.table}#delivered_per_used"
-        - "{definitions.table}#only_donated_per_used"
-        - "{definitions.table}#only_announced_per_used"
-
+        - catalogPath: "covax#delivered_per_used"
+          display: *display_delivered
+        - catalogPath: "covax#only_donated_per_used"
+          display: *display_only_donated
+        - catalogPath: "covax#only_announced_per_used"
+          display: *display_only_announced
     config:
-      title: "COVID-19 vaccine doses donated to COVAX, per dose administered"
-      subtitle: Doses donated to the COVAX initiative by each country, per dose administered domestically.
-      note: COVAX is a worldwide initiative aimed at equitable access to COVID-19 vaccines. It is directed by Gavi, CEPI, and the WHO. Gross domestic product is expressed in U.S. Dollars; it is sourced from the World Bank and OECD.
-      originUrl: ourworldindata.org/coronavirus
-      chartTypes: ["StackedDiscreteBar"]
-      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
+      title: "{definitions.title}, per dose administered"
+      subtitle: "{definitions.subtitle}, per dose administered domestically."
+      <<: *config_base
 
   - dimensions:
       normalize: per_gdp
     indicators:
       y:
-        - "{definitions.table}#delivered_per_gdp"
-        - "{definitions.table}#only_donated_per_gdp"
-        - "{definitions.table}#only_announced_per_gdp"
-
+        - catalogPath: "covax#delivered_per_gdp"
+          display: *display_delivered
+        - catalogPath: "covax#only_donated_per_gdp"
+          display: *display_only_donated
+        - catalogPath: "covax#only_announced_per_gdp"
+          display: *display_only_announced
     config:
-      title: "COVID-19 vaccine doses donated to COVAX, per million dollars of GDP"
-      subtitle: Doses donated to the COVAX initiative by each country, per million dollars of GDP of the donating country.
-      note: COVAX is a worldwide initiative aimed at equitable access to COVID-19 vaccines. It is directed by Gavi, CEPI, and the WHO. Gross domestic product is expressed in U.S. Dollars; it is sourced from the World Bank and OECD.
-      originUrl: ourworldindata.org/coronavirus
-      chartTypes: ["StackedDiscreteBar"]
-      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
+      title: "{definitions.title}, per million dollars of GDP"
+      subtitle: "{definitions.subtitle}, per million dollars of GDP of the donating country."
+      note: |-
+        {definitions.note}. Gross domestic product is expressed in U.S. Dollars; it is sourced from the World Bank and OECD.
+      <<: *config_base
