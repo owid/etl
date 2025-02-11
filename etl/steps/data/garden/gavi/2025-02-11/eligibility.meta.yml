@@ -14,7 +14,7 @@ tables:
   eligibility:
     variables:
       phase:
-        title: Phase of vaccine eligibility
+        title: Gavi supported countries
         description_short: The phase of vaccine eligibility for Gavi assistance.
         unit: ""
         type: ordinal
