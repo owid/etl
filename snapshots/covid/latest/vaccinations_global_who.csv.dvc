@@ -7,14 +7,13 @@ meta:
     description: |-
       COVID-19 vaccination data are collected via WHO regional office-specific systems for monitoring COVID-19 vaccination uptake.  These data are pooled from numerous sources, including direct reports from Member States, WHO review of publicly available official data, or data collated and published by third-party sites. Data published by third-party sites have not been validated by WHO, and WHO cannot comment on accuracy or completeness. Differences in counts may occur compared to other sources, due to different inclusion criteria and data cut-off times.
 
-    date_published: "2024-08-14"
+    date_published: "2025"
 
     # Citation
     producer: World Health Organisation
     citation_full: |-
       WHO COVID-19 Dashboard. Geneva: World Health Organization, 2020. Available online: https://covid19.who.int/
     attribution_short: WHO
-
     # Files
     url_main: https://covid19.who.int/
     date_accessed: 2024-08-14
