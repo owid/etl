@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import re
 from typing import Dict
 
 import owid.catalog.processing as pr
@@ -7,12 +8,21 @@ import pandas as pd
 import plotly.express as px
 from owid.catalog import Table
 from owid.datautils.dataframes import map_series
+from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
+# Initialize log.
+log = get_logger()
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Base year to use for HICP prices, after rebasing (for code convenience, as a string).
+HICP_BASE_YEAR_NEW = "2021"
+# Original base year of the HICP data (for code convenience, as a string).
+HICP_BASE_YEAR_ORIGINAL = "2015"
 
 # Dataset codes to select, and their corresponding names.
 DATASET_CODES_AND_NAMES = {
@@ -64,7 +74,7 @@ COLUMNS = {
     "tax": "price_level",
     "currency": "currency",
     "geo": "country",
-    "time": "year",
+    "time": "time",
     "dataset_code": "dataset_code",
     "nrg_prc": "price_component",
     "value": "value",
@@ -86,12 +96,12 @@ INDEXES_MAPPING = {
     # NOTE: Flag definitions are right below the data table in that page.
     "flag": {
         "e": "estimated",
-        "c": "confidential",
+        # "c": "confidential",
         "d": "definition differs",
         "b": "break in time series",
         "p": "provisional",
         "u": "low reliability",
-        "cd": "confidential, definition differs",
+        # "cd": "confidential, definition differs",
         # NOTE: I couldn't find the meaning of the following flag.
         # It happens for "Electricity prices for non-household consumers" for Cyprus in 2024 (for MWH_GE150000), and all values are zero.
         "n": "unknown flag",
@@ -268,6 +278,10 @@ COMPONENTS_THAT_ADD_UP_TO_TOTAL = ["Energy and supply", "Network costs", "Taxes,
 # Label to use for the calculated total price based on the sum of the main components.
 COMPONENTS_TOTAL_PRICE_LABEL = "Total price, including taxes"
 
+# Allow HICP data to lag a certain number of months behind, and warn if that lag is larger than expected.
+# NOTE: We will also assert that the minimum date in Eurostat prices is fully covered by HICP data.
+HICP_ALLOWED_MONTHS_OF_LAG = 2
+
 
 def sanity_check_inputs(tb: Table) -> None:
     # Ensure all relevant dataset codes are present.
@@ -300,6 +314,24 @@ def sanity_check_inputs(tb: Table) -> None:
         assert set(tb[field].dropna()) == set(mapping), error
 
 
+def adapt_dates(tb: Table) -> Table:
+    # For the date column:
+    # * For the first semester, use April 1st.
+    # * For the second semester, use October 1st.
+    # * For annual data, use July 1st.
+    semester_1_mask = tb["year-semester"].str.contains("S1")
+    semester_2_mask = tb["year-semester"].str.contains("S2")
+    annual_mask = tb["year-semester"].str.isdigit()
+    error = "Unexpected values in field 'year-semester'."
+    assert (semester_1_mask | semester_2_mask | annual_mask).all(), error
+    # tb["date"] = pd.to_datetime(tb["year"].astype(str) + "-07-01")
+    tb["date"] = pd.to_datetime(tb["year-semester"].str[0:4].astype(str) + "-07-01")
+    tb.loc[semester_1_mask, "date"] = pd.to_datetime(tb[semester_1_mask]["year-semester"].str[0:4] + "-04-01")
+    tb.loc[semester_2_mask, "date"] = pd.to_datetime(tb[semester_2_mask]["year-semester"].str[0:4] + "-10-01")
+
+    return tb
+
+
 def prepare_inputs(tb: Table) -> Table:
     # Values sometimes include a letter, which is a flag. Extract those letters and create a separate column with them.
     # Note that sometimes there can be multiple letters (which means multiple flags).
@@ -312,21 +344,15 @@ def prepare_inputs(tb: Table) -> Table:
     # Assign a proper type to the column of values.
     tb["value"] = tb["value"].astype(float)
 
-    # Create a clean column of years, and another of dates.
-    tb["year-semester"] = tb["year"].str.strip().copy()
+    # Create a column for year (e.g. 2020) and another for year-semester (which can be e.g. "2020" or "2020-S1").
+    tb["year-semester"] = tb["time"].str.strip().copy()
     tb["year"] = tb["year-semester"].str[0:4].astype(int)
-    # For the date column:
-    # * For the first semester, use April 1st.
-    # * For the second semester, use October 1st.
-    # * For annual data, use July 1st.
-    semester_1_mask = tb["year-semester"].str.contains("S1")
-    semester_2_mask = tb["year-semester"].str.contains("S2")
-    annual_mask = tb["year-semester"].str.isdigit()
-    error = "Unexpected values in field 'year-semester'."
-    assert (semester_1_mask | semester_2_mask | annual_mask).all(), error
-    tb["date"] = pd.to_datetime(tb["year"].astype(str) + "-07-01")
-    tb.loc[semester_1_mask, "date"] = pd.to_datetime(tb[semester_1_mask]["year"].astype(str) + "-04-01")
-    tb.loc[semester_2_mask, "date"] = pd.to_datetime(tb[semester_2_mask]["year"].astype(str) + "-10-01")
+
+    # Drop unnecessary column.
+    tb = tb.drop(columns=["time"], errors="raise")
+
+    # Create a clean column of years, and another of dates.
+    tb = adapt_dates(tb=tb)
 
     return tb
 
@@ -838,16 +864,105 @@ def sanity_check_outputs(tb: Table) -> None:
     assert compared[(compared["price_euro_original"] > 7) & (compared["dev"] > 2)].empty, error
     # compared.sort_values("dev", ascending=False).head(60)
 
+    # Sanity check: check that the maximum date of HICP is only a certain number of months behind prices data.
+    # NOTE: This check needs to be executed before correcting prices for inflation.
+    prices_first_month = tb[tb["price_euro"].notnull()]["date"].min()
+    prices_latest_month = tb[tb["price_euro"].notnull()]["date"].max()
+    hicp_first_month = tb[tb["hicp"].notnull()]["date"].min()
+    hicp_latest_month = tb[tb["hicp"].notnull()]["date"].max()
+    if pd.to_datetime(hicp_latest_month) < pd.to_datetime(prices_latest_month) - pd.DateOffset(
+        months=HICP_ALLOWED_MONTHS_OF_LAG
+    ):
+        log.warning(
+            f"HICP data is lagging behind more than {HICP_ALLOWED_MONTHS_OF_LAG} months behind Eurostat prices data."
+        )
+    # Check that the minimum date of HICP fully covers the data in the energy prices table.
+    error = "HICP data does not cover the minimum date of energy prices."
+    assert prices_first_month >= hicp_first_month, error
+
+
+def prepare_hicp(tb_hicp: Table) -> Table:
+    # We want to use the HICP data to adjust the prices for inflation.
+    # There are many options in the "Classification of individual consumption by purpose (COICOP)" column.
+    # As recommended by Eurostat, we will use only the following:
+    # [TOT_X_NRG] Overall index excluding energy
+    # Excluding the energy component helps in depicting the prices adjusted for the underlying inflationary trends, without being distorted by the volatility typically associated with energy commodities. In this respect, adjusted prices will include the impact of the energy cost changes.
+    tb_hicp = tb_hicp[tb_hicp["classification"] == "TOT_X_NRG"].reset_index(drop=True)
+
+    # Add column for year (e.g. "2020") and for year-semester (e.g. "2020-S1")
+    tb_hicp["year"] = tb_hicp["date"].str[0:4]
+    tb_hicp["semester"] = (
+        tb_hicp["year"].astype(str)
+        + "-"
+        + tb_hicp["date"].str[5:].astype(int).apply(lambda x: "S1" if x <= 6 else "S2")
+    )
+
+    # Calculate rebase factors, to convert HICP index values from the old base year to the new one.
+    rebase_factors = (
+        tb_hicp[tb_hicp["year"] == HICP_BASE_YEAR_NEW]
+        .groupby(["country", "year"], observed=True, as_index=False)
+        .agg({"hicp": "mean"})
+        .drop(columns=["year"], errors="raise")
+        .rename(columns={"hicp": "rebase_factor"})
+    )
+
+    # Convert HICP indexes to the new base year.
+    tb_hicp = tb_hicp.merge(rebase_factors, how="left", on="country")
+    tb_hicp["hicp"] = tb_hicp["hicp"] / tb_hicp["rebase_factor"] * 100
+
+    # Sanity check: for all classifications, check that the average HICP in the base year is 100
+    # (only for countries that have 12 months in that year for that classification).
+    selection = tb_hicp["date"].str.startswith(HICP_BASE_YEAR_NEW)
+    countries_completed = (
+        tb_hicp[selection].groupby(["country", "classification"], as_index=False, observed=True).agg({"hicp": "count"})
+    )
+    countries_completed = countries_completed[countries_completed["hicp"] == 12][
+        ["classification", "country"]
+    ].drop_duplicates()
+    check = tb_hicp.merge(countries_completed, on=["classification", "country"], how="inner")
+    mean_hicp = (
+        check[(check["date"].str.startswith(HICP_BASE_YEAR_NEW))]
+        .groupby(["country", "classification"], as_index=False, observed=True)
+        .agg({"hicp": "mean"})
+    )
+    error = f"The mean HICPC of each country (and classification) does not equal 100 in {HICP_BASE_YEAR_NEW}."
+    assert (mean_hicp["hicp"].round(1) == 100).all(), error
+
+    # Calculate average HICP for each country and year.
+    tb_hicp_year = tb_hicp.groupby(["country", "year"], observed=True, as_index=False).agg({"hicp": "mean"})
+
+    # Calculate average HICP for each country and semester.
+    tb_hicp_semester = tb_hicp.groupby(["country", "semester"], observed=True, as_index=False).agg({"hicp": "mean"})
+
+    # Combine year and semester averages.
+    tb_hicp = pr.concat(
+        [
+            tb_hicp_year.rename(columns={"year": "year-semester"}),
+            tb_hicp_semester.rename(columns={"semester": "year-semester"}),
+        ],
+        ignore_index=True,
+    )
+
+    # Adapt time column to be the same as in the prices table.
+    tb_hicp = adapt_dates(tb=tb_hicp)
+
+    # Drop unnecessary column.
+    tb_hicp = tb_hicp.drop(columns=["year-semester"], errors="raise")
+
+    return tb_hicp
+
 
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
+    # Load meadow dataset and read its table.
     ds_meadow = paths.load_dataset("gas_and_electricity_prices")
-
-    # Read table from meadow dataset.
     tb = ds_meadow.read("gas_and_electricity_prices")
+
+    # Load HICP data and read its table.
+    ds_hicp = paths.load_dataset("harmonised_index_of_consumer_prices")
+    tb_hicp = ds_hicp.read("harmonised_index_of_consumer_prices")
 
     #
     # Process data.
@@ -870,8 +985,33 @@ def run(dest_dir: str) -> None:
     # Select and prepare relevant data.
     tb = select_and_prepare_relevant_data(tb=tb)
 
+    # Prepare HICP to have average annual and semester prices, of a relevant classification.
+    tb_hicp = prepare_hicp(tb_hicp=tb_hicp)
+
+    # Add HICP column to main table.
+    tb = tb.merge(tb_hicp, how="left", on=["country", "date"])
+
+    tb[tb["price_euro"].isnull()].index
+
+    # Adjust prices for inflation.
+    tb["price_euro_deflated"] = tb["price_euro"] / tb["hicp"] * 100
+    tb["price_pps_deflated"] = tb["price_pps"] / tb["hicp"] * 100
+
     # Sanity check outputs.
     sanity_check_outputs(tb=tb)
+
+    # First, ensure that the old base year is as expected.
+    base_year = re.search(r"\b(20\d{2}|19\d{2})\b", tb_hicp["hicp"].metadata.description_short)
+    assert base_year is not None, "Base year not found in the meadow tb['hicp'].metadata.description_short."
+    assert base_year.group(0) == HICP_BASE_YEAR_ORIGINAL, "Original base year is not as expected."
+
+    # For simplicity (after sanity checks are executed) keep only deflated euros.
+    tb = tb.drop(columns=["price_euro", "price_pps", "hicp"], errors="raise").rename(
+        columns={"price_euro_deflated": "price_euro", "price_pps_deflated": "price_pps"}, errors="raise"
+    )
+
+    # Remove rows without prices.
+    tb = tb.dropna(subset=["price_euro", "price_pps"], how="all").reset_index(drop=True)
 
     # Uncomment to plot a comparison (for each country, source, and consumer type) between the prices and the components data.
     # NOTE: Some of the biggest discrepancies happen where prices data is given only for one of the semesters. This is the case of Georgia household electricity in 2021 and 2022, where we can't see the value of the missing semester (which could explain why the components data is significantly higher).
@@ -894,5 +1034,6 @@ def run(dest_dir: str) -> None:
         tables=[tb, tb_prices_euro, tb_prices_pps, tb_price_components_euro, tb_price_components_pps],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
+        yaml_params={"EUROS_YEAR": HICP_BASE_YEAR_NEW, "EUROS_YEAR_ORIGINAL": HICP_BASE_YEAR_ORIGINAL},
     )
     ds_garden.save()
