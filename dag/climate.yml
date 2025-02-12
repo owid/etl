@@ -264,3 +264,15 @@ steps:
   #
   data://grapher/climate/2025-01-21/sea_ice_extent_by_year:
     - data://garden/climate/2025-01-21/sea_ice_index
+
+  #
+  # Southern Oscillation Index.
+  #
+  data://meadow/climate/2025-02-12/southern_oscillation_index:
+    - snapshot://climate/2025-02-12/southern_oscillation_index.csv
+  data://garden/climate/2025-02-12/southern_oscillation_index:
+    - data://meadow/climate/2025-02-12/southern_oscillation_index
+  data://grapher/climate/2025-02-12/southern_oscillation_index_monthly:
+    - data://garden/climate/2025-02-12/southern_oscillation_index
+  data://grapher/climate/2025-02-12/southern_oscillation_index_annual:
+    - data://garden/climate/2025-02-12/southern_oscillation_index

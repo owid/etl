@@ -70,6 +70,7 @@ dependencies = [
     "cfgrib>=0.9.15.0",
     "streamlit-aggrid>=1.0.5",
     "sentry-sdk>=2.20.0",
+    "streamlit>=1.41.1",
 ]
 
 [tool.uv.sources]
