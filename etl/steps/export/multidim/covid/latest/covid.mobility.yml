@@ -1,3 +1,13 @@
+definitions:
+  config_base: &config_base
+    subtitle: "This data shows how community movement in specific locations has changed relative to the period before the pandemic."
+    note: "It's not recommended to compare levels across countries; local differences in categories could be misleading."
+    originUrl: "ourworldindata.org/coronavirus"
+    minTime: "earliest"
+    maxTime: "latest"
+    hideAnnotationFieldsInTitle: { "time": True }
+    addCountryMode: "change-country"
+
 title:
   title: Mobility during COVID-19 pandemic
   titleVariant: by place
@@ -46,3 +56,40 @@ views:
 
     config:
       title: "How did the number of visitors change since the beginning of the pandemic?"
+      <<: *config_base
+
+  - dimensions:
+      place: grocery_and_pharmacy
+    indicators:
+      y: "google_mobility#trend__place_grocery_and_pharmacy"
+    config: *config_base
+
+  - dimensions:
+      place: parks
+    indicators:
+      y: "google_mobility#trend__place_parks"
+    config: *config_base
+
+  - dimensions:
+      place: residential
+    indicators:
+      y: "google_mobility#trend__place_residential"
+    config: *config_base
+
+  - dimensions:
+      place: retail_and_recreation
+    indicators:
+      y: "google_mobility#trend__place_retail_and_recreation"
+    config: *config_base
+
+  - dimensions:
+      place: transit_stations
+    indicators:
+      y: "google_mobility#trend__place_transit_stations"
+    config: *config_base
+
+  - dimensions:
+      place: workplaces
+    indicators:
+      y: "google_mobility#trend__place_workplaces"
+    config: *config_base
