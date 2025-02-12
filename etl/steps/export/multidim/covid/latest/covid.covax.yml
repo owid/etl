@@ -66,13 +66,13 @@ dimensions:
         description: null
       - slug: per_capita
         name: Per capita
-        description: null
+        description: Normalized by people living in the country
       - slug: per_dose
         name: Per dose administered
-        description: null
+        description: Normalized by total doses administered domestically
       - slug: per_gdp
         name: Per million dollars of GDP
-        description: null
+        description: Normalized by the GDP of the country (in million dollars)
 
 views:
   - dimensions:

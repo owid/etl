@@ -1,4 +1,11 @@
 definitions:
+  common_indicators:
+    confirmed: &confirmed
+      catalogPath: "cases_deaths#total_deaths"
+      display:
+        name: "Confirmed deaths"
+        color: "#000000"
+
   config: &config_base
     $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
     title: "Estimated cumulative excess deaths during COVID-19"
@@ -31,11 +38,11 @@ dimensions:
     name: Normalization
     choices:
       - slug: total
-        name: Total
+        name: Absolute number
         description: null
       - slug: per_100k
-        name: Per 100k
-        description: null
+        name: Per 100,000 people
+        description: Normalize by 100,000 people living in the country or region
 
 views:
   # The Economist + WHO
@@ -44,13 +51,31 @@ views:
       normalize: total
     indicators:
       y:
-        - "excess_mortality_economist#cumulative_estimated_daily_excess_deaths"
-        - "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top"
-        - "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot"
-        - "xm_who#cumul_excess_mean"
-        - "xm_who#cumul_excess_high"
-        - "xm_who#cumul_excess_low"
-        - "cases_deaths#total_deaths"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths"
+          display:
+            name: "The Economist (central)"
+            color: "#B13507"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top"
+          display:
+            name: "The Economist (high)"
+            color: "#DAAE9E"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot"
+          display:
+            name: "The Economist (low)"
+            color: "#DAAE9E"
+        - catalogPath: "xm_who#cumul_excess_mean"
+          display:
+            name: "WHO (mean)"
+            color: "#4C6A9C"
+        - catalogPath: "xm_who#cumul_excess_high"
+          display:
+            name: "WHO (high)"
+            color: "#AABBDA"
+        - catalogPath: "xm_who#cumul_excess_low"
+          display:
+            name: "WHO (low)"
+            color: "#AABBDA"
+        - *confirmed
 
     config: *config_base
 
@@ -60,23 +85,44 @@ views:
       normalize: total
     indicators:
       y:
-        - "excess_mortality_economist#cumulative_estimated_daily_excess_deaths"
-        - "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top"
-        - "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot"
-        - "cases_deaths#total_deaths"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths"
+          display:
+            name: "Central estimate"
+            color: "#B13507"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top"
+          display:
+            name: "95% CI top"
+            color: "#DAAE9E"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot"
+          display:
+            name: "95% CI bottom"
+            color: "#DAAE9E"
+        - *confirmed
 
     config: *config_base
 
-  # The Economist
+  # The Economist (100k)
   - dimensions:
       model: econ
       normalize: per_100k
     indicators:
       y:
-        - "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_per_100k"
-        - "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k"
-        - "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k"
-        - "cases_deaths#total_deaths"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_per_100k"
+          display:
+            name: "Central estimate"
+            color: "#B13507"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k"
+          display:
+            name: "95% CI top"
+            color: "#DAAE9E"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k"
+          display:
+            name: "95% CI bottom"
+            color: "#DAAE9E"
+        - catalogPath: "cases_deaths#total_deaths_per_100k"
+          display:
+            name: "Confirmed deaths"
+            color: "#000000"
 
     config: *config_base
 
@@ -86,10 +132,19 @@ views:
       normalize: total
     indicators:
       y:
-        - "xm_who#cumul_excess_mean"
-        - "xm_who#cumul_excess_high"
-        - "xm_who#cumul_excess_low"
-        - "cases_deaths#total_deaths"
+        - catalogPath: "xm_who#cumul_excess_mean"
+          display:
+            name: "Mean estimate"
+            color: "#4C6A9C"
+        - catalogPath: "xm_who#cumul_excess_high"
+          display:
+            name: "High estimate"
+            color: "#AABBDA"
+        - catalogPath: "xm_who#cumul_excess_low"
+          display:
+            name: "Low estimate"
+            color: "#AABBDA"
+        - *confirmed
 
     config: *config_base
 

@@ -10,16 +10,16 @@ def run(dest_dir: str) -> None:
     engine = get_engine()
 
     filenames = [
-        "covid.cases.yml",
-        "covid.deaths.yml",
-        "covid.hospital.yml",
-        "covid.vax.yml",
-        "covid.vax_breakdowns.yml",
-        "covid.xm.yml",
-        "covid.cases_tests.yml",
-        "covid.covax.yml",
-        "covid.models.yml",
+        # "covid.cases.yml",
+        # "covid.deaths.yml",
+        # "covid.hospital.yml",
+        # "covid.vax.yml",
+        # "covid.xm.yml",
+        # "covid.covax.yml",
+        # "covid.models.yml",
         "covid.xm_models.yml",
+        # "covid.cases_tests.yml",
+        # "covid.vax_breakdowns.yml",
     ]
     # Load YAML file
     for fname in filenames:
