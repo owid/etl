@@ -190,5 +190,5 @@ try:
     TAGS_DEFAULT = DATASET_SCHEMA["properties"]["tables"]["additionalProperties"]["properties"]["variables"][
         "additionalProperties"
     ]["properties"]["presentation"]["properties"]["topic_tags"]["items"]["enum"]
-except:
+except Exception:
     TAGS_DEFAULT = TAGS_DEFAULT_FALLBACK
