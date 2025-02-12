@@ -17,7 +17,10 @@ tables:
   sst:
     variables:
       nino_classification:
-       title: El Niño or La Niña for every month and year
+       title: El Niño or La Niña (by month)
+       presentation:
+        title_public: El Niño or La Niña
        display:
         yearIsDay: True
         zeroDay: "1949-01-01"
+        name: El Niño or La Niña
