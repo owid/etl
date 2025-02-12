@@ -12,6 +12,7 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
+from etl.helpers import map_indicator_path_to_id
 from etl.paths import DATA_DIR
 
 # Initialize logger.
@@ -23,6 +24,10 @@ DIMENSIONS = ["y", "x", "size", "color"]
 def upsert_multidim_data_page(slug: str, config: dict, engine: Engine, dependencies: list[str] = []) -> None:
     """
     :param dependencies: List of dependencies for mdim. In most cases just use `dependencies=paths.dependencies`.
+
+    TODO: There might be other fields which might make references to indicators:
+        - config.map.columnSlug
+        - config.focusedSeriesNames
     """
     # Expand catalog paths (if needed)
     ## Configs may only specify table#indicator. Instead, we need the full dataset URI.
@@ -31,18 +36,25 @@ def upsert_multidim_data_page(slug: str, config: dict, engine: Engine, dependenc
     # Validate config
     validate_multidim_config(config, engine)
 
+    # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
+    # TODO: I think we could move this to the Grapher side.
+    config = replace_catalog_paths_with_ids(config)
+
+
     # Upsert config via Admin API
     admin_api = AdminAPI(OWID_ENV)
     admin_api.put_mdim_config(slug, config)
 
-
 def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
     """Expand catalog paths in views to full dataset URIs.
 
-    This function updates the given configuration dictionary in-place by modifying the "y"
-    entries under "indicators" in each view. If an entry does not contain a '/',
+    This function updates the given configuration dictionary in-place by modifying the dimension ('y', 'x', 'size', 'color') entries under "indicators" in each view. If an entry does not contain a '/',
     it is assumed to be a table name that must be expanded to a full dataset URI based on
     the provided dependencies.
+
+    NOTE: Possible improvements for internal function `_expand`:
+        - we should make this function a bit more robust when checking the URIs.
+        - currently we only allow for 'table#indicator' format. We should also allow for other cases that could be useful in the event of name collisions, e.g. 'dataset/indicator#subindicator'.
 
     Args:
         config (dict): Configuration dictionary containing views.
@@ -53,10 +65,20 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
         """Return same indicator, but with complete catalog path."""
 
         def _expand(indicator: str):
+            assert "#" in indicator, f"Missing '#' in indicator! '{indicator}'"
+
+            # Complete dataset URI
             if "/" in indicator:
                 return indicator
+            # table#indicator format
             else:
-                return table_to_dataset_uri[indicator.split("#")[0]] + "/" + indicator
+                indicator_split = indicator.split("#")
+                # Check format is actually table#indicator
+                assert (len(indicator_split) == 2) & (indicator_split[0] != ""), f"Expected 'table#indicator' format. Instead found {indicator}"
+                # Check table is in any of the datasets!
+                assert indicator_split[0] in table_to_dataset_uri, f"Table name `{indicator_split[0]}` not found in dependency tables! Available tables are: {', '.join(table_to_dataset_uri.keys())}"
+
+                return table_to_dataset_uri[indicator_split[0]] + "/" + indicator
 
         # Expand catalog path if it's a string
         if isinstance(indicator, str):
@@ -82,12 +104,24 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
 
     # Go through all views and expand catalog paths
     for view in config["views"]:
+        # Update indicators for each dimension
         for dim in DIMENSIONS:
             if dim in view["indicators"]:
                 if isinstance(view["indicators"][dim], list):
                     view["indicators"][dim] = [_expand_catalog_path(dim) for dim in view["indicators"][dim]]
                 else:
                     view["indicators"][dim] = _expand_catalog_path(view["indicators"][dim])
+
+        # Update indicators from sortColumnSlug
+        if "config" in view:
+            if "sortColumnSlug" in view["config"]:
+                view["config"]["sortColumnSlug"] = _expand_catalog_path(view["config"]["sortColumnSlug"])
+
+        # Update indicators from map.columnSlug
+        if "config" in view:
+            if "map" in view["config"]:
+                if "columnSlug" in view["config"]["map"]:
+                    view["config"]["map"]["columnSlug"] = _expand_catalog_path(view["config"]["map"]["columnSlug"])
 
 
 def _extract_catalog_path(indicator_raw):
@@ -116,17 +150,40 @@ def validate_multidim_config(config: dict, engine: Engine) -> None:
     # Get all used indicators
     indicators = []
     for view in config["views"]:
+        indicators_view = []
+        indicators_extra = []
+        # Get indicators from dimensions
         for prop in DIMENSIONS:
             if prop in view["indicators"]:
                 indicator_raw = view["indicators"][prop]
                 if isinstance(indicator_raw, list):
                     assert prop == "y", "Only `y` can come as a list"
-                    indicators += [_extract_catalog_path(ind) for ind in indicator_raw]
+                    indicators_view += [_extract_catalog_path(ind) for ind in indicator_raw]
                 else:
-                    indicators.append(_extract_catalog_path(indicator_raw))
+                    indicators_view.append(_extract_catalog_path(indicator_raw))
+
+        # Get indicators from sortColumnSlug
+        if "config" in view:
+            if "sortColumnSlug" in view["config"]:
+                indicators_extra.append(_extract_catalog_path(view["config"]["sortColumnSlug"]))
+
+        # Update indicators from map.columnSlug
+        if "config" in view:
+            if "map" in view["config"]:
+                if "columnSlug" in view["config"]["map"]:
+                    indicators_extra.append(_extract_catalog_path(view["config"]["map"]["columnSlug"]))
+
+        # All indicators in indicators_extra should be in indicators!
+        ## E.g. the indicator used to sort, should be in use in the chart! Or, the indicator in the map tab should be in use in the chart!
+        invalid_indicators = set(indicators_extra).difference(set(indicators_view))
+        if invalid_indicators:
+            raise ValueError(f"Extra indicators not in use. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}")
+
+        indicators.extend(indicators_view)
 
     # Make sure indicators are unique
     indicators = list(set(indicators))
+
 
     # Validate duplicate views
     seen_dims = set()
@@ -155,6 +212,39 @@ def validate_multidim_config(config: dict, engine: Engine) -> None:
     missing_indicators = set(indicators) - set(df["catalogPath"])
     if missing_indicators:
         raise ValueError(f"Missing indicators in DB: {missing_indicators}")
+
+
+def replace_catalog_paths_with_ids(config):
+    """Replace special metadata fields with their corresponding IDs in the database.
+
+    In ETL, we allow certain fields in the config file to reference indicators by their catalog path. However, this is not yet supported in the Grapher API, so we need to replace these fields with the corresponding indicator IDs.
+
+    NOTE: I think this is something that we should discuss changing on the Grapher side. So I see this function as a temporary workaround.
+
+    Currently, affected fields are:
+
+    - views[].config.sortColumnSlug
+
+    These fields above are treated like fields in `dimensions`, and also accessed from:
+    - `expand_catalog_paths`: To expand the indicator URI to be in its complete form.
+    - `validate_multidim_config`: To validate that the indicators exist in the database.
+
+    """
+    if "views" in config:
+        views = config["views"]
+        for view in views:
+            if "config" in view:
+                # Update sortColumnSlug
+                if "sortColumnSlug" in view["config"]:
+                    # Check if catalogPath
+                    # Map to variable ID
+                    view["config"]["sortColumnSlug"] = str(map_indicator_path_to_id(view["config"]["sortColumnSlug"]))
+                # Update map.columnSlug
+                if "map" in view["config"]:
+                    if "columnSlug" in view["config"]["map"]:
+                        view["config"]["map"]["columnSlug"] = str(map_indicator_path_to_id(view["config"]["map"]["columnSlug"]))
+
+    return config
 
 
 def expand_views(config: dict, combinations: dict[str, str], table: str, engine: Engine) -> list[dict]:
