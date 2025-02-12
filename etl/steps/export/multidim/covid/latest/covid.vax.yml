@@ -41,7 +41,7 @@ dimensions:
         description: null
       - slug: per_capita
         name: Per hundred people
-        description: Normalized by hunded people living in the country or region
+        description: Normalized by hundred people living in the country or region
 
 views:
   - dimensions:
