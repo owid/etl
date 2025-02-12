@@ -9,7 +9,7 @@ definitions:
     sortBy: column
     hasMapTab: true
   subtitle: |-
-    Doses donated to the COVAX initiative by each country
+    Doses donated to the COVAX initiative by each country or region
   title: |-
     COVID-19 vaccine doses donated to COVAX
   display_delivered: &display_delivered
@@ -23,8 +23,8 @@ definitions:
     name: "Donations to COVAX announced"
 
 title:
-  title: Vaccines donated to COVAX
-  titleVariant: "COVID-19 vaccine doses that were donated to COVAX"
+  title: Vaccine doses donated to COVAX
+  titleVariant: "COVID-19 vaccine doses that were donated to COVAX by countries"
 defaultSelection:
   - France
   - Spain
@@ -104,7 +104,7 @@ views:
 
     config:
       title: "{definitions.title}, per capita"
-      subtitle: "{definitions.subtitle}, per person living in the donating country."
+      subtitle: "{definitions.subtitle}, per person living in the donating country or region."
       sortColumnSlug: "covax#delivered_per_capita"
       <<: *config_base
 
@@ -136,7 +136,7 @@ views:
           display: *display_only_announced
     config:
       title: "{definitions.title}, per million dollars of GDP"
-      subtitle: "{definitions.subtitle}, per million dollars of GDP of the donating country."
+      subtitle: "{definitions.subtitle}, per million dollars of GDP of the donating country or region."
       note: |-
         {definitions.note}. Gross domestic product is expressed in U.S. Dollars; it is sourced from the World Bank and OECD.
       sortColumnSlug: "covax#delivered_per_gdp"
