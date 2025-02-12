@@ -27,8 +27,8 @@ def load_datasets(included_str) -> list[str]:
 
 
 # Get list of available tags from DB (only those used as topic pages)
-# If can't connect to DB, use TAGS_DEFAULT instead
-TAGS_DEFAULT = [
+# If can't connect to DB, and for some reason can't access the schema (set TAGS_DEFAULT)
+TAGS_DEFAULT_FALLBACK = [
     "Uncategorized",
     "Access to Energy",
     "Age Structure",
@@ -185,5 +185,11 @@ ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 
 # Read schema
 SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
+DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
 # Get properties for origin in schema
 SCHEMA_ORIGIN = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]
+# Tags
+try:
+    TAGS_DEFAULT = DATASET_SCHEMA["properties"]["tables"]["additionalProperties"]["properties"]["variables"]["additionalProperties"]["properties"]["presentation"]["properties"]["topic_tags"]["items"]["enum"]
+except:
+    TAGS_DEFAULT = TAGS_DEFAULT_FALLBACK
