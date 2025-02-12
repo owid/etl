@@ -9,6 +9,110 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Sector mapping.
+# This mapping can be found on page 12 of their version comparison document:
+# https://github.com/JGCRI/CEDS/blob/master/documentation/Version_comparison_figures_v_2024_07_08_vs_v_2021_04_20.pdf
+SECTOR_MAPPING = {
+    # Sector originally called "Agriculture (AGR)".
+    "Agriculture": [
+        "3B_Manure-management",
+        "3D_Rice-Cultivation",
+        "3D_Soil-emissions",
+        "3E_Enteric-fermentation",
+        "3I_Agriculture-other",
+    ],
+    # "Aviation".
+    "Aviation": [
+        "1A3ai_International-aviation",
+        "1A3aii_Domestic-aviation",
+    ],
+    # "Residential, Commercial, Other (DOM)".
+    "Residential, commercial, and other": [
+        "1A4a_Commercial-institutional",
+        "1A4b_Residential",
+        "1A4c_Agriculture-forestry-fishing",
+        "1A5_Other-unspecified",
+    ],
+    # "Energy Transformation and Production (ENE)".
+    "Energy transformation and production": [
+        "1A1a_Electricity-autoproducer",
+        "1A1a_Electricity-public",
+        "1A1a_Heat-production",
+        "1A1bc_Other-transformation",
+        "1B1_Fugitive-solid-fuels",
+        # In the document, there was "1B2_Fugitive-petr-and-gas", but in the data I only see:
+        "1B2_Fugitive-petr",
+        "1B2d_Fugitive-other-energy",
+        "7A_Fossil-fuel-fires",
+    ],
+    # "Industry (IND)".
+    "Industry": [
+        "1A2a_Ind-Comb-Iron-steel",
+        "1A2b_Ind-Comb-Non-ferrous-metals",
+        "1A2c_Ind-Comb-Chemicals",
+        "1A2d_Ind-Comb-Pulp-paper",
+        "1A2e_Ind-Comb-Food-tobacco",
+        "1A2f_Ind-Comb-Non-metalic-minerals",
+        "1A2g_Ind-Comb-Construction",
+        "1A2g_Ind-Comb-machinery",
+        "1A2g_Ind-Comb-mining-quarying",
+        "1A2g_Ind-Comb-other",
+        "1A2g_Ind-Comb-textile-leather",
+        "1A2g_Ind-Comb-transpequip",
+        "1A2g_Ind-Comb-wood-products",
+        "2A1_Cement-production",
+        "2A2_Lime-production",
+        # In the document, there was "2A3_Other-minerals", but in the data I see:
+        "2Ax_Other-minerals",
+        "2B_Chemical-industry",
+        # In the document, there was "2C_Metal-production", but in the data I see the following three:
+        "2C1_Iron-steel-alloy-prod",
+        "2C3_Aluminum-production",
+        "2C4_Non-Ferrous-other-metals",
+        "2H_Pulp-and-paper-food-beverage-wood",
+        # In the document, there was "2L_Other-process-emissions", but it does not appear in the data
+        # "2L_Other-process-emissions",
+    ],
+    # "Solvents (SLV)".
+    "Solvents": [
+        "2D_Degreasing-Cleaning",
+        "2D_Paint-application",
+        # In the document, there was "2D3_Chemical-products-manufacture-processing", but in the data I see:
+        "2D_Chemical-products-manufacture-processing",
+        # In the document, there was "2D3_Other-product-use", but in the data I see:
+        "2D_Other-product-use",
+    ],
+    # "Transportation (TRA)".
+    "Transportation": [
+        "1A3b_Road",
+        "1A3c_Rail",
+        "1A3dii_Domestic-navigation",
+        "1A3eii_Other-transp",
+    ],
+    # "Int. Shipping".
+    "International shipping": [
+        "1A3di_International-shipping",
+        "1A3di_Oil_Tanker_Loading",
+    ],
+    # "Waste (WST)".
+    "Waste": [
+        "5A_Solid-waste-disposal",
+        # In the document, there was "5C_Waste-incineration", but in the data I see:
+        "5C_Waste-combustion",
+        "5D_Wastewater-handling",
+        "5E_Other-waste-handling",
+        "6A_Other-in-total",
+    ],
+}
+
+# TODO: Add the following sectors to the mapping (they appeared in the data but not in the mapping):
+# {'1B2b_Fugitive-NG-distr',
+#  '1B2b_Fugitive-NG-prod',
+#  '2B2_Chemicals-Nitric-acid',
+#  '2B3_Chemicals-Adipic-acid',
+#  '6B_Other-not-in-total',
+#  '7BC_Indirect-N2O-non-agricultural-N'}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -53,11 +157,12 @@ def run(dest_dir: str) -> None:
     )
 
     # We don't need the detailed sectorial information.
-    # Instead, we want to map these detailed sectors into broader sector categories, e.g. "Energy", "Agriculture".
-    # This mapping can be found on page 12 of their version comparison document:
-    # https://github.com/JGCRI/CEDS/blob/master/documentation/Version_comparison_figures_v_2024_07_08_vs_v_2021_04_20.pdf
+    # Instead, we want to map these detailed sectors into broader sector categories, e.g. "Transportation", "Agriculture".
+    all_subsectors = sum(list(SECTOR_MAPPING.values()), [])
+    set(tb_detailed["sector"]) - set(all_subsectors)
+    set(all_subsectors) - set(tb_detailed["sector"])
 
-    # TODO: Create a mapping for sectors and another for pollutants.
+    # TODO: Create a mapping for pollutants.
     # TODO: Maybe after the remapping we don't need to keep categoricals.
 
     # Restructure detailed table to have year as a column.
