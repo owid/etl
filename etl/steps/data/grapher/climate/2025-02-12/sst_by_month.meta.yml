@@ -18,3 +18,6 @@ tables:
     variables:
       nino_classification:
        title: El Niño or La Niña for every month and year
+       display:
+        yearIsDay: True
+        zeroDay: "1949-01-01"
