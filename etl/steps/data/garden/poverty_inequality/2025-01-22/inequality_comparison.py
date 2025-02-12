@@ -47,36 +47,43 @@ INDICATORS_FOR_ANALYSIS = {
 # min_interval: minimum distance between the observation year and the reference year
 REFERENCE_YEARS = [
     {
-        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2018: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
+        2019: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0, "excluded_years": []},
     },
     {
-        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2018: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+        1993: {"maximum_distance": 3, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
+        2019: {"maximum_distance": 3, "tie_break_strategy": "higher", "min_interval": 0, "excluded_years": []},
     },
     {
-        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2019: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+        1993: {"maximum_distance": 2, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
+        2019: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0, "excluded_years": []},
     },
     {
-        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2019: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
+        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
+        2019: {
+            "maximum_distance": 5,
+            "tie_break_strategy": "higher",
+            "min_interval": 0,
+            "excluded_years": [2020, 2021, 2022, 2023, 2024],
+        },
     },
     {
-        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2020: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
+        1993: {"maximum_distance": 3, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
+        2019: {
+            "maximum_distance": 3,
+            "tie_break_strategy": "higher",
+            "min_interval": 0,
+            "excluded_years": [2020, 2021, 2022],
+        },
     },
     {
-        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2020: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
-    },
-    {
-        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2023: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
-    },
-    {
-        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2023: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
+        1993: {"maximum_distance": 2, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
+        2019: {
+            "maximum_distance": 2,
+            "tie_break_strategy": "higher",
+            "min_interval": 0,
+            "excluded_years": [2020, 2021],
+        },
     },
 ]
 
@@ -193,6 +200,9 @@ def match_ref_years(
         assert not tb_year.empty, log.error(
             f"No data found for reference year {y}. Please check `maximum_distance` ({reference_years[y]['maximum_distance']})."
         )
+
+        # Filter tb_year according to excluded years
+        tb_year = tb_year[~tb_year["year"].isin(reference_years[y]["excluded_years"])].reset_index(drop=True)
 
         # Calculate the distance between the observation year and the reference year (absolute value)
         tb_year["distance"] = abs(tb_year["year"] - y)
@@ -355,6 +365,8 @@ def match_ref_years(
     tb_match["year_1"] = reference_years_list[0]
     tb_match["year_2"] = reference_years_list[1]
     tb_match["only_all_series"] = only_all_series
+
+    # For excluded years, if list is empty, set to "None"
 
     # Replace only_all_series with a more descriptive name
     tb_match["only_all_series"] = tb_match["only_all_series"].replace({True: "Only countries with data in all series"})
