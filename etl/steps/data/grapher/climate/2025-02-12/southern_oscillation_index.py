@@ -1,6 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import owid.catalog.processing as pr
+import pandas as pd
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -17,17 +17,14 @@ def run(dest_dir: str) -> None:
 
     # Read table from garden dataset.
     tb = ds_garden.read("southern_oscillation_index")
-
-    tb = tb.drop(columns={"date", "soi"})
+    tb = tb.drop(columns={"year", "annual"})
     # Drop rows with NaN values
     tb = tb.dropna()
 
-    ds_anomalies = paths.load_dataset("surface_temperature")
-    tb_anomalies = ds_anomalies.read("surface_temperature")
-
-    tb_anomalies = format_surface_temerpature_data(tb_anomalies)
-
-    tb = pr.merge(tb, tb_anomalies, on=["country", "year"], how="left")
+    # Calculate the number of days since 1949
+    tb["days_since_1941"] = (tb["date"] - pd.to_datetime("1949-01-01")).dt.days
+    tb = tb.rename(columns={"days_since_1941": "year"})
+    tb = tb.drop(columns=["date"])
 
     tb = tb.format(["country", "year"])
 
@@ -41,21 +38,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
-
-
-def format_surface_temerpature_data(tb):
-    #
-    # Process data.
-    #
-    tb["year"] = tb["time"].astype(str).str[0:4]
-    tb["month"] = tb["time"].astype(str).str[5:7]
-
-    # Filter to include only global data
-    tb_global = tb[tb["country"] == "World"]
-
-    # Group the data by year and calculate the mean temperature anomaly for each year
-    tb = tb_global.groupby("year")["temperature_anomaly"].mean().reset_index()
-    tb["country"] = "World"
-    tb["year"] = tb["year"].astype(int)
-
-    return tb
