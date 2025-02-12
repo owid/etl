@@ -1,0 +1,20 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+    processing_level: major
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 31
+  title: El Niño or La Niña for every month and year
+
+
+tables:
+  sst:
+    variables:
+      nino_classification:
+       title: El Niño or La Niña for every month and year

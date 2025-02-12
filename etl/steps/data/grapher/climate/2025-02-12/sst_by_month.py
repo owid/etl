@@ -1,5 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import pandas as pd
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -17,23 +19,17 @@ def run(dest_dir: str) -> None:
     tb = ds_garden.read("sst")
 
     # Name month column "country" foro grapher purposes
-    tb = tb.drop(columns={"country"})
-    month_map = {
-        1: "January",
-        2: "February",
-        3: "March",
-        4: "April",
-        5: "May",
-        6: "June",
-        7: "July",
-        8: "August",
-        9: "September",
-        10: "October",
-        11: "November",
-        12: "December",
-    }
-    tb["month"] = tb["month"].map(month_map)
-    tb = tb.rename(columns={"month": "country"})
+
+    # Combine month and year into a single column
+    tb["date"] = pd.to_datetime(tb["year"].astype(str) + "-" + tb["month"].astype(str) + "-01")
+    tb["date"] = tb["date"] + pd.offsets.Day(14)
+    tb["days_since_1941"] = (tb["date"] - pd.to_datetime("1949-01-01")).dt.days
+
+    # Drop the original year and month columns
+    tb = tb.drop(columns=["year", "month", "date"])
+
+    # Rename the date column to year for grapher purposes
+    tb = tb.rename(columns={"days_since_1941": "year"})
 
     tb = tb.format(["year", "country"])
     #
