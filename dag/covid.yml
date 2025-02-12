@@ -320,11 +320,11 @@ steps:
     - data://grapher/covid/latest/vaccinations_global
     - data://grapher/covid/latest/vaccinations_manufacturer
     - data://grapher/covid/latest/testing
-    # - data://grapher/covid/latest/google_mobility
     - data://grapher/excess_mortality/latest/excess_mortality
     - data-private://grapher/excess_mortality/latest/excess_mortality_economist
     - data://grapher/covid/latest/xm_who
     - data://grapher/covid/latest/cases_deaths
     - data://grapher/covid/latest/covax
     - data://grapher/covid/latest/infections_model
+    - data://grapher/covid/latest/google_mobility
     - data://grapher/regions/2023-01-01/regions
