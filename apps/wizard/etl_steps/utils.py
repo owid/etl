@@ -29,16 +29,15 @@ def load_datasets(included_str) -> list[str]:
 # Get list of available tags from DB (only those used as topic pages)
 # If can't connect to DB, and for some reason can't access the schema (set TAGS_DEFAULT)
 TAGS_DEFAULT_FALLBACK = [
-    "Uncategorized",
     "Access to Energy",
     "Age Structure",
     "Agricultural Production",
     "Air Pollution",
     "Alcohol Consumption",
     "Animal Welfare",
+    "Antibiotics & Antibiotic Resistance",
     "Artificial Intelligence",
     "Biodiversity",
-    "Biological & Chemical Weapons",
     "Books",
     "Burden of Disease",
     "CO2 & Greenhouse Gas Emissions",
@@ -70,10 +69,10 @@ TAGS_DEFAULT_FALLBACK = [
     "Farm Size",
     "Fertility Rate",
     "Fertilizers",
-    "Financing Healthcare",
     "Fish & Overfishing",
     "Food Prices",
     "Food Supply",
+    "Foreign Aid",
     "Forests & Deforestation",
     "Fossil Fuels",
     "Gender Ratio",
@@ -82,6 +81,7 @@ TAGS_DEFAULT_FALLBACK = [
     "Government Spending",
     "HIV/AIDS",
     "Happiness & Life Satisfaction",
+    "Healthcare Spending",
     "Homelessness",
     "Homicides",
     "Human Development Index (HDI)",
@@ -104,13 +104,13 @@ TAGS_DEFAULT_FALLBACK = [
     "Maternal Mortality",
     "Meat & Dairy Production",
     "Mental Health",
+    "Metals & Minerals",
     "Micronutrient Deficiency",
     "Migration",
     "Military Personnel & Spending",
     "Mpox (monkeypox)",
     "Natural Disasters",
     "Neglected Tropical Diseases",
-    "Neurodevelopmental Disorders",
     "Nuclear Energy",
     "Nuclear Weapons",
     "Obesity",
@@ -124,9 +124,6 @@ TAGS_DEFAULT_FALLBACK = [
     "Polio",
     "Population Growth",
     "Poverty",
-    "Pre-Primary Education",
-    "Primary & Secondary Education",
-    "Quality of Education",
     "Renewable Energy",
     "Research & Development",
     "Sanitation",
@@ -138,7 +135,6 @@ TAGS_DEFAULT_FALLBACK = [
     "Taxation",
     "Technological Change",
     "Terrorism",
-    "Tertiary Education",
     "Tetanus",
     "Time Use",
     "Tourism",
@@ -146,6 +142,7 @@ TAGS_DEFAULT_FALLBACK = [
     "Transport",
     "Trust",
     "Tuberculosis",
+    "Uncategorized",
     "Urbanization",
     "Vaccination",
     "Violence Against Children & Children's Rights",
@@ -190,6 +187,8 @@ DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
 SCHEMA_ORIGIN = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]
 # Tags
 try:
-    TAGS_DEFAULT = DATASET_SCHEMA["properties"]["tables"]["additionalProperties"]["properties"]["variables"]["additionalProperties"]["properties"]["presentation"]["properties"]["topic_tags"]["items"]["enum"]
+    TAGS_DEFAULT = DATASET_SCHEMA["properties"]["tables"]["additionalProperties"]["properties"]["variables"][
+        "additionalProperties"
+    ]["properties"]["presentation"]["properties"]["topic_tags"]["items"]["enum"]
 except:
     TAGS_DEFAULT = TAGS_DEFAULT_FALLBACK
