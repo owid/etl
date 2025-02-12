@@ -29,7 +29,7 @@ dimensions:
     choices:
       - slug: total
         name: All doses
-        description: null
+        description: All doses, including booster doses
       - slug: booster
         name: Booster doses
         description: null
@@ -41,7 +41,7 @@ dimensions:
         description: null
       - slug: per_capita
         name: Per hundred people
-        description: null
+        description: Normalized by hunded people living in the country or region
 
 views:
   - dimensions:

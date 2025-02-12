@@ -25,16 +25,16 @@ dimensions:
     choices:
       - slug: icl
         name: ICL
-        description: null
+        description: Imperial College London
       - slug: ihme
         name: IHME
-        description: null
+        description: Institute for Health and Metrics Evaluation
       - slug: lshtm
         name: LSHTM
-        description: null
+        description: London School of Hygiene and Tropical Medicine
       - slug: yyg
         name: YYG
-        description: null
+        description: Youyang Gu (2020)
 
 views:
   # ICL

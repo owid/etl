@@ -37,7 +37,7 @@ dimensions:
         description: null
       - slug: per_capita
         name: Per million people
-        description: null
+        description: Normalized by million people living in the country or region
       - slug: change
         name: Relative change
         description: null

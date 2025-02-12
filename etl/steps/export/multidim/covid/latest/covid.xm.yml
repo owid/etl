@@ -25,14 +25,14 @@ dimensions:
     name: Normalization
     choices:
       - slug: absolute
-        name: None
+        name: Absolute number
         description: null
       - slug: per_capita
         name: Per million people
-        description: null
+        description: Normalized by million people living in the country or region
       - slug: percentage
-        name: Percentage
-        description: null
+        name: Percentage (%)
+        description: "As percentage difference between excess deaths and projected deaths"
 
 views:
   - dimensions:
