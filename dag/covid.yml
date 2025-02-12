@@ -327,4 +327,3 @@ steps:
     - data://grapher/covid/latest/cases_deaths
     - data://grapher/covid/latest/covax
     - data://grapher/covid/latest/infections_model
-    - data://grapher/covid/latest/xm_who
