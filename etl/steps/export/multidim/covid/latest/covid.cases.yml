@@ -39,8 +39,8 @@ dimensions:
         name: Per million people
         description: Normalized by million people living in the country or region
       - slug: change
-        name: Relative change
-        description: null
+        name: Relative change (%)
+        description: Growth rate compared to the previous period
 
 views:
   - dimensions:
