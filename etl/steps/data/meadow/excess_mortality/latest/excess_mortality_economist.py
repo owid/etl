@@ -9,11 +9,6 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Base URL for Economist excess mortality data.
-BASE_URL = (
-    "https://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data"
-)
-
 
 def run(dest_dir: str) -> None:
     #
@@ -42,8 +37,8 @@ def run(dest_dir: str) -> None:
 
 def _load_country_data():
     # load in the data
-    country_wk = pd.read_csv(
-        f"{BASE_URL}/export_country.csv",
+    country_wk = paths.read_snap_table(
+        "xm_econ_country.csv",
         usecols=[
             "iso3c",
             "date",
@@ -52,8 +47,8 @@ def _load_country_data():
             "estimated_daily_excess_deaths_ci_95_bot",
         ],  # type: ignore
     )
-    country_wk_100k = pd.read_csv(
-        f"{BASE_URL}/export_country_per_100k.csv",
+    country_wk_100k = paths.read_snap_table(
+        "xm_econ_country_100k.csv",
         usecols=[
             "iso3c",
             "date",
@@ -63,8 +58,8 @@ def _load_country_data():
         ],  # type: ignore
     )
 
-    country_cum = pd.read_csv(
-        f"{BASE_URL}/export_country_cumulative.csv",
+    country_cum = paths.read_snap_table(
+        "xm_econ_country_cum.csv",
         usecols=[
             "iso3c",
             "date",
@@ -73,8 +68,8 @@ def _load_country_data():
             "cumulative_estimated_daily_excess_deaths_ci_95_bot",
         ],  # type: ignore
     )
-    country_cum_100k = pd.read_csv(
-        f"{BASE_URL}/export_country_per_100k_cumulative.csv",
+    country_cum_100k = paths.read_snap_table(
+        "xm_econ_country_cum_100k",
         usecols=[
             "iso3c",
             "date",
@@ -85,7 +80,7 @@ def _load_country_data():
     )
 
     # this file tells whether reported data is available
-    reported = pd.read_csv(f"{BASE_URL}/output-for-interactive/by_location_full_data.csv")
+    reported = paths.read_snap_table("xm_econ_location.csv")
     report_select = reported[reported["type"] == "daily_excess_deaths"][["iso3c", "date", "known_excess_deaths"]]
 
     # get rid of NA rows
@@ -104,8 +99,8 @@ def _load_country_data():
 
 
 def _load_world_data():
-    world_wk = pd.read_csv(
-        f"{BASE_URL}/export_world.csv",
+    world_wk = paths.read_snap_table(
+        "xm_econ_world.csv",
         usecols=[
             "world",
             "date",
@@ -114,8 +109,8 @@ def _load_world_data():
             "estimated_daily_excess_deaths_ci_95_bot",
         ],  # type: ignore
     )
-    world_wk_100k = pd.read_csv(
-        f"{BASE_URL}/export_world_per_100k.csv",
+    world_wk_100k = paths.read_snap_table(
+        "xm_econ_world_100k.csv",
         usecols=[
             "world",
             "date",
@@ -125,8 +120,8 @@ def _load_world_data():
         ],  # type: ignore
     )
 
-    world_cum = pd.read_csv(
-        f"{BASE_URL}/export_world_cumulative.csv",
+    world_cum = paths.read_snap_table(
+        "xm_econ_world_cum.csv",
         usecols=[
             "world",
             "date",
@@ -135,8 +130,8 @@ def _load_world_data():
             "cumulative_estimated_daily_excess_deaths_ci_95_bot",
         ],  # type: ignore
     )
-    world_cum_100k = pd.read_csv(
-        f"{BASE_URL}/export_world_per_100k_cumulative.csv",
+    world_cum_100k = paths.read_snap_table(
+        "xm_econ_world_cum_100k.csv",
         usecols=[
             "world",
             "date",
