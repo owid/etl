@@ -40,10 +40,10 @@ def upsert_multidim_data_page(slug: str, config: dict, engine: Engine, dependenc
     # TODO: I think we could move this to the Grapher side.
     config = replace_catalog_paths_with_ids(config)
 
-
     # Upsert config via Admin API
     admin_api = AdminAPI(OWID_ENV)
     admin_api.put_mdim_config(slug, config)
+
 
 def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
     """Expand catalog paths in views to full dataset URIs.
@@ -74,9 +74,13 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
             else:
                 indicator_split = indicator.split("#")
                 # Check format is actually table#indicator
-                assert (len(indicator_split) == 2) & (indicator_split[0] != ""), f"Expected 'table#indicator' format. Instead found {indicator}"
+                assert (len(indicator_split) == 2) & (
+                    indicator_split[0] != ""
+                ), f"Expected 'table#indicator' format. Instead found {indicator}"
                 # Check table is in any of the datasets!
-                assert indicator_split[0] in table_to_dataset_uri, f"Table name `{indicator_split[0]}` not found in dependency tables! Available tables are: {', '.join(table_to_dataset_uri.keys())}"
+                assert (
+                    indicator_split[0] in table_to_dataset_uri
+                ), f"Table name `{indicator_split[0]}` not found in dependency tables! Available tables are: {', '.join(table_to_dataset_uri.keys())}"
 
                 return table_to_dataset_uri[indicator_split[0]] + "/" + indicator
 
@@ -177,13 +181,14 @@ def validate_multidim_config(config: dict, engine: Engine) -> None:
         ## E.g. the indicator used to sort, should be in use in the chart! Or, the indicator in the map tab should be in use in the chart!
         invalid_indicators = set(indicators_extra).difference(set(indicators_view))
         if invalid_indicators:
-            raise ValueError(f"Extra indicators not in use. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}")
+            raise ValueError(
+                f"Extra indicators not in use. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}"
+            )
 
         indicators.extend(indicators_view)
 
     # Make sure indicators are unique
     indicators = list(set(indicators))
-
 
     # Validate duplicate views
     seen_dims = set()
@@ -242,7 +247,9 @@ def replace_catalog_paths_with_ids(config):
                 # Update map.columnSlug
                 if "map" in view["config"]:
                     if "columnSlug" in view["config"]["map"]:
-                        view["config"]["map"]["columnSlug"] = str(map_indicator_path_to_id(view["config"]["map"]["columnSlug"]))
+                        view["config"]["map"]["columnSlug"] = str(
+                            map_indicator_path_to_id(view["config"]["map"]["columnSlug"])
+                        )
 
     return config
 
