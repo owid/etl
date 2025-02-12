@@ -5,7 +5,6 @@ definitions:
       name: Confirmed cases, 7-day average
       color: "#000000"
   config: &config_base
-    $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
     subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
     originUrl: ourworldindata.org/covid-models
     hideAnnotationFieldsInTitle:
@@ -21,7 +20,7 @@ topicTags:
 
 dimensions:
   - slug: model
-    name: Model
+    name: Statistical model
     choices:
       - slug: icl
         name: ICL

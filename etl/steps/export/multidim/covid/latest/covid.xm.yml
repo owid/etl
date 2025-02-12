@@ -1,6 +1,5 @@
 definitions:
   config: &config
-    $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
     hideAnnotationFieldsInTitle:
       entity: true
       time: true

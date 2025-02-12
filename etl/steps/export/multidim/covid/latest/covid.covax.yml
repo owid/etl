@@ -4,10 +4,8 @@ definitions:
   config_base: &config_base
     originUrl: ourworldindata.org/coronavirus
     chartTypes: ["StackedDiscreteBar"]
-    $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
     note: "{definitions.note}."
     sortBy: column
-    hasMapTab: true
   subtitle: |-
     Doses donated to the COVAX initiative by each country or region
   title: |-

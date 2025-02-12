@@ -47,7 +47,6 @@ views:
         - "{definitions.table}#trend__place_workplaces"
 
     config:
-      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
       title: "How did the number of visitors change since the beginning of the pandemic?"
       subtitle: This data shows how community movement in specific locations has changed relative to the period before the pandemic.
       note: It's not recommended to compare levels across countries; local differences in categories could be misleading.

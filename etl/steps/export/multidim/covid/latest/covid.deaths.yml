@@ -1,6 +1,5 @@
 definitions:
   config: &config
-    $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
     tab: map
     originUrl: ourworldindata.org/coronavirus
     hideAnnotationFieldsInTitle:
