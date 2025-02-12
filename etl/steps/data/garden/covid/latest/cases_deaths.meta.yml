@@ -303,7 +303,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: &biw_relative |-
-          The weekly growth rate measures the percentage change in confirmed cases over the past 14 days compared to the 14 days before.
+          The biweekly growth rate measures the percentage change in confirmed cases over the past 14 days compared to the 14 days before.
         description_key: *common_cases_key
         display:
           numDecimalPlaces: 1
