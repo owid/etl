@@ -1,4 +1,5 @@
 import json
+import re
 from itertools import product
 from typing import Dict, Union
 
@@ -96,10 +97,10 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
     # Get mapping from table names to dataset URIs
     table_to_dataset_uri = {}
     for dep in dependencies:
-        if not dep.startswith("data://"):
+        if not (re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep)):
             continue
 
-        uri = dep.replace("data://", "")
+        uri = re.sub(r"^(data|data-private)://", "", dep)
         ds = Dataset(DATA_DIR / uri)
         for table_name in ds.table_names:
             if table_name in table_to_dataset_uri:
