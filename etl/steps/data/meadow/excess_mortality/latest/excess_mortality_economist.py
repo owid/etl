@@ -3,6 +3,7 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
+import owid.catalog.processing as pr
 
 log = get_logger()
 
@@ -16,14 +17,13 @@ def run(dest_dir: str) -> None:
     #
     country_all = _load_country_data()
     world_all = _load_world_data()
-    df = _combine_data(country_all, world_all)
+    tb = _combine_data(country_all, world_all)
 
     #
     # Process data.
     #
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb = tb.set_index(["country", "date"], verify_integrity=True)
+    # Format
+    tb = tb.format(["country", "date"], short_name=paths.short_name)
 
     #
     # Save outputs.
@@ -35,7 +35,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def _load_country_data():
+def _load_country_data() -> Table:
     # load in the data
     country_wk = paths.read_snap_table(
         "xm_econ_country.csv",
@@ -87,10 +87,10 @@ def _load_country_data():
     report_select = report_select[report_select["iso3c"].notna()]
 
     # merge all the data
-    country_wk_merge = pd.merge(country_wk, country_wk_100k, on=["iso3c", "date"], how="outer")
-    country_cum_merge = pd.merge(country_cum, country_cum_100k, on=["iso3c", "date"], how="outer")
-    country_almost = pd.merge(country_cum_merge, country_wk_merge, on=["iso3c", "date"], how="outer")
-    country_all = pd.merge(country_almost, report_select, on=["iso3c", "date"], how="outer")
+    country_wk_merge = pr.merge(country_wk, country_wk_100k, on=["iso3c", "date"], how="outer")
+    country_cum_merge = pr.merge(country_cum, country_cum_100k, on=["iso3c", "date"], how="outer")
+    country_almost = pr.merge(country_cum_merge, country_wk_merge, on=["iso3c", "date"], how="outer")
+    country_all = pr.merge(country_almost, report_select, on=["iso3c", "date"], how="outer")
 
     # the most recent date can have null known_excess_deaths, fill them with False
     country_all["known_excess_deaths"] = country_all["known_excess_deaths"].fillna(False)
@@ -98,7 +98,7 @@ def _load_country_data():
     return country_all
 
 
-def _load_world_data():
+def _load_world_data() -> Table:
     world_wk = paths.read_snap_table(
         "xm_econ_world.csv",
         usecols=[
@@ -141,20 +141,20 @@ def _load_world_data():
         ],  # type: ignore
     )
 
-    world_wk_merge = pd.merge(world_wk, world_wk_100k, on=["world", "date"], how="outer")
-    world_cum_merge = pd.merge(world_cum, world_cum_100k, on=["world", "date"], how="outer")
+    world_wk_merge = pr.merge(world_wk, world_wk_100k, on=["world", "date"], how="outer")
+    world_cum_merge = pr.merge(world_cum, world_cum_100k, on=["world", "date"], how="outer")
 
-    world_all = pd.merge(world_cum_merge, world_wk_merge, on=["world", "date"], how="outer")
+    world_all = pr.merge(world_cum_merge, world_wk_merge, on=["world", "date"], how="outer")
 
     return world_all
 
 
-def _combine_data(country_all: pd.DataFrame, world_all: pd.DataFrame) -> pd.DataFrame:
+def _combine_data(country_all: Table, world_all: Table) -> Table:
     # rename columns and bind rows into one
-    country_all.rename(columns={"iso3c": "country"}, inplace=True)
-    world_all.rename(columns={"world": "country"}, inplace=True)
+    country_all = country_all.rename(columns={"iso3c": "country"})
+    world_all = world_all.rename(columns={"world": "country"})
 
-    combined_data = pd.concat([country_all, world_all], ignore_index=True)
+    combined_data = pr.concat([country_all, world_all], ignore_index=True)
 
     # these should be replaced with FALSE values
     combined_data["known_excess_deaths"].fillna(False, inplace=True)
