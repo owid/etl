@@ -1,12 +1,12 @@
 """Script to create a snapshot of dataset."""
 
-from pathlib import Path
 import time
+from pathlib import Path
 
 import click
+from structlog import get_logger
 
 from etl.snapshot import Snapshot
-from structlog import get_logger
 
 log = get_logger()
 

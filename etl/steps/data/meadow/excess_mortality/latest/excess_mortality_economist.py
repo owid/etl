@@ -1,12 +1,11 @@
-import pandas as pd
+import owid.catalog.processing as pr
 from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
-import owid.catalog.processing as pr
 
+# Get logger
 log = get_logger()
-
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
