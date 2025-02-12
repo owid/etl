@@ -276,3 +276,12 @@ steps:
     - data://garden/climate/2025-02-12/southern_oscillation_index
   data://grapher/climate/2025-02-12/southern_oscillation_index_annual:
     - data://garden/climate/2025-02-12/southern_oscillation_index
+  #
+  # Nino4 and Nino3.4. inidices to classify El Niño and La Niña.
+  #
+  data://meadow/climate/2025-02-12/sst:
+    - snapshot://climate/2025-02-12/sst.csv
+  data://garden/climate/2025-02-12/sst:
+    - data://meadow/climate/2025-02-12/sst
+  data://grapher/climate/2025-02-12/sst:
+    - data://garden/climate/2025-02-12/sst

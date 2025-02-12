@@ -1,0 +1,39 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+    processing_level: major
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 31
+
+
+tables:
+  sst:
+    variables:
+      nino_classification:
+       title: El Niño or La Niña
+       unit: ''
+       description_short: The classification of the El Niño-Southern Oscillation (ENSO) state.
+       description_key:
+        - El Niño-Southern Oscillation (ENSO) is a climate pattern in the equatorial Pacific that influences global weather.
+        - "It has two main phases: El Niño (warmer SSTs) and La Niña (cooler SSTs). ENSO affects rainfall, temperature, and atmospheric circulation worldwide."
+        - The Niño 3.4 region (170°W–120°W) is the most commonly used area for monitoring ENSO.
+        - It covers part of the equatorial cold tongue where SST changes significantly influence global weather patterns.
+        - The Oceanic Niño Index (ONI) defines El Niño when the 3-month running average SST anomaly is ≥ +0.5°C and La Niña when it is ≤ -0.5°C, sustained for five consecutive months.
+        - It is a good predictor for El Niño events because warming in this region disrupts convection and global atmospheric circulation.
+        - The Niño 4 region (160°E–150°W) is farther west, closer to the central Pacific.
+        - This region maintains warm SSTs (~28°C) year-round, making it a better indicator for La Niña conditions.
+        - A -0.5°C anomaly in Niño 4 can drop SSTs below the deep convection threshold, causing a westward shift in tropical convection.
+        - Since La Niña often develops in the western Pacific, Niño 4 may be a better measure for its effects compared to Niño 3.4, which focuses more on El Niño.
+        - Niño 3.4 is better for El Niño, as warming here strongly influences atmospheric circulation.
+        - Niño 4 is better for La Niña, as it captures cooling where deep convection shifts westward, influencing tropical rainfall and global climate.
+       description_processing: We've classified ENSO phases as El Niño when the Niño 3.4 anomaly ≥ 0.5°C, La Niña when the Niño 4 anomaly ≤ -0.5°C, and Neutral otherwise.
+       display:
+          numDecimalPlaces: 0
+
+
