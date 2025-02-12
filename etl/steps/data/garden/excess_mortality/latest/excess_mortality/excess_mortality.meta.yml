@@ -22,11 +22,11 @@ definitions:
         baseColorScheme: RdYlBu
         customNumericValues:
           - -50
-          - -25
+          - -20
           - -10
           - 0
           - 10
-          - 25
+          - 20
           - 50
           - 100
   origins:
@@ -427,6 +427,7 @@ tables:
             map:
               colorScale:
                 <<: *color_scale_counts
+                customNumericMinValue: 0
                 customNumericValues:
                   - 0
                   - 100000
