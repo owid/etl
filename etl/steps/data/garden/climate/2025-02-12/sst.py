@@ -63,8 +63,8 @@ def run(dest_dir: str) -> None:
 def classify_nino_anomaly(row):
     # Classify NINO3.4 and NINO4 anomaly values
     if row["nino3_4_anomaly"] >= 0.5:
-        return "El Niño"
+        return 1  # "El Niño"
     elif row["nino4_anomaly"] <= -0.5:
-        return "La Niña"
+        return 2  # "La Niña"
     else:
-        return "Neutral"
+        return 0  # "Neutral"
