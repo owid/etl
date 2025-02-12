@@ -673,17 +673,19 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
 
     # Remove groups (of country-year-dataset-currency) from the components dataset for which certain components (e.g. "Energy and supply") are not included.
     # For example, Albania doesn't have "Energy and supply" costs for household electricity, but it does have other components (e.g. "Network costs").
+    # First, remove rows with missing values.
+    tb = tb.dropna(subset=["value"]).reset_index(drop=True)
+    # Now, make None all rows for country-year-dataset-currency that don't have a value for each of the mandatory price components.
     tb.loc[
         (tb["dataset_code"].isin(DATASET_CODES_COMPONENTS))
         & (
-            ~tb.groupby(["country", "year", "currency"])["price_component_or_level"].transform(
+            ~tb.groupby(["country", "year", "currency", "dataset_code"])["price_component_or_level"].transform(
                 lambda x: all(comp in x.tolist() for comp in MANDATORY_PRICE_COMPONENTS)
             )
         ),
         "value",
     ] = None
-
-    # Remove empty rows.
+    # Finally, remove those rows we just made None.
     tb = tb.dropna(subset=["value"]).reset_index(drop=True)
 
     # Remove data with certain flags.

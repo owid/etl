@@ -8,6 +8,8 @@ definitions:
       numDecimalPlaces: 0
     processing_level: minor
     unit: cases
+dataset:
+  title: Global Tuberculosis Report - Case Notifications
 tables:
   notifications:
     variables:

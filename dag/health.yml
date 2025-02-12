@@ -954,3 +954,14 @@ steps:
     - data://meadow/who/2025-01-28/vaccine_safety
   data://grapher/who/2025-01-28/vaccine_safety:
     - data://garden/who/2025-01-28/vaccine_safety
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/gavi/2025-02-11/eligibility:
+    - snapshot://gavi/2025-02-11/eligibility.csv
+  data://garden/gavi/2025-02-11/eligibility:
+    - data://meadow/gavi/2025-02-11/eligibility
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/gavi/2025-02-11/eligibility:
+    - data://garden/gavi/2025-02-11/eligibility
