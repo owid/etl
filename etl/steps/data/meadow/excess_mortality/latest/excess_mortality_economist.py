@@ -11,7 +11,7 @@ paths = PathFinder(__file__)
 
 # Base URL for Economist excess mortality data.
 BASE_URL = (
-    "https://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data"
+    "https://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/refs/heads/main/output-data"
 )
 
 
