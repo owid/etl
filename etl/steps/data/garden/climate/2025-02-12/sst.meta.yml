@@ -17,7 +17,7 @@ tables:
     variables:
       nino_classification:
        title: El Niño or La Niña
-       unit: ''
+       unit: ""
        description_short: The classification of the El Niño-Southern Oscillation (ENSO) state.
        description_key:
         - El Niño-Southern Oscillation (ENSO) is a climate pattern in the equatorial Pacific that influences global weather.
@@ -35,5 +35,9 @@ tables:
        description_processing: We've classified ENSO phases as El Niño when the Niño 3.4 anomaly ≥ 0.5°C, La Niña when the Niño 4 anomaly ≤ -0.5°C, and Neutral otherwise.
        display:
           numDecimalPlaces: 0
+      nino_classification_3_4:
+       title: El Niño or La Niña (according to the Niño 3.4 region)
+       unit: ""
+
 
 
