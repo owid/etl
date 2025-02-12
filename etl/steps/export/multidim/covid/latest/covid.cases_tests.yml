@@ -1,6 +1,56 @@
+definitions:
+  config_base: &config_base
+    chartTypes: ["ScatterPlot"]
+    minTime: "latest"
+    note: ""
+    subtitle: 7-day rolling average. Comparisons across countries are affected by
+      differences in testing policies and reporting methods.
+    # No details in title
+    hideAnnotationFieldsInTitle:
+      entity: true
+      time: true
+      changeInPrefix: true
+    # Log
+    yAxis:
+      scaleType: log
+      canChangeScaleType: true
+      min: 0
+    xAxis:
+      scaleType: log
+      canChangeScaleType: true
+    comparisonLines:
+      - label: Positive rate = 100%
+        yEquals: x
+      - label: 50%
+        yEquals: 2*x
+      - label: 20%
+        yEquals: 5*x
+      - label: 10%
+        yEquals: 10*x
+      - label: 5%
+        yEquals: 20*x
+      - label: 2%
+        yEquals: 50*x
+      - label: 1%
+        yEquals: 100*x
+      - label: 0.5%
+        yEquals: 200*x
+      - label: 0.2%
+        yEquals: 500*x
+      - label: 0.1%
+        yEquals: 1000*x
+      - label: 0.02%
+        yEquals: 5000*x
+    # Related Q
+    relatedQuestions:
+      - url: https://ourworldindata.org/covid-testing-data-archived
+        text: Data on tests is no longer updated since June 2022
+    # Origin URL
+    originUrl: ourworldindata.org/coronavirus
+
 title:
-  title: "COVID-19: Daily tests vs. daily new confirmed cases"
-  titleVariant: ""
+  title: "COVID-19: Tests and confirmed cases"
+  titleVariant: "Number of daily tests vs. daily new confirmed cases"
 defaultSelection: []
 topicTags:
   - COVID-19
@@ -10,83 +60,47 @@ dimensions:
     name: Normalization
     choices:
       - slug: absolute
-        name: None
+        name: Absolute numbers
         description: null
       - slug: per_capita
         name: Per million people
-        description: null
+        description: "Normalized by million people living in the country or region"
 
 views:
   - dimensions:
       normalize: absolute
     indicators:
-      y: grapher/covid/latest/testing/testing#new_tests_7day_smoothed
-      x: grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right
+      y:
+        catalogPath: testing#new_tests_7day_smoothed
+        display:
+          name: Daily tests
+      x:
+        catalogPath: cases_deaths#new_cases_7_day_avg_right
+        display:
+          name: Daily new confirmed cases due to COVID-19
+      color: regions#owid_region
     config:
-      chartTypes: ["ScatterPlot"]
-      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
+      <<: *config_base
+      title: "COVID-19: Daily tests vs. daily new confirmed cases"
+
   - dimensions:
       normalize: per_capita
     indicators:
-      y: grapher/covid/latest/testing/testing#new_tests_per_thousand_7day_smoothed
-      x: grapher/covid/latest/cases_deaths/cases_deaths#new_cases_per_million_7_day_avg_right
-      color: grapher/regions/2023-01-01/regions/regions#owid_region
+      y:
+        catalogPath: testing#new_tests_per_thousand_7day_smoothed
+        display:
+          conversionFactor: 1000
+          name: Daily tests per million
+      x:
+        catalogPath: cases_deaths#new_cases_per_million_7_day_avg_right
+        display:
+          name: Daily confirmed cases per million people
+      color: regions#owid_region
     config:
-      $schema: https://files.ourworldindata.org/schemas/grapher-schema.006.json
-      chartTypes: ["ScatterPlot"]
-      map:
-        colorScale:
-          binningStrategy: equalInterval
-      maxTime: 884
-      yAxis:
-        scaleType: log
-        canChangeScaleType: true
-        min: 0
-      colorScale:
-        binningStrategy: equalInterval
-      minTime: 884
-      hideAnnotationFieldsInTitle:
-        entity: true
-        time: true
-        changeInPrefix: true
-      xAxis:
-        scaleType: log
-        canChangeScaleType: true
-      slug: covid-19-daily-tests-vs-daily-new-confirmed-cases-per-million
-      title: "COVID-19: Daily tests vs. daily new confirmed cases per million"
-      subtitle: 7-day rolling average. Comparisons across countries are affected by
-        differences in testing policies and reporting methods.
-      note: Our data on COVID-19 tests and positive rate is no longer updated since 23
-        June 2022.
-      originUrl: ourworldindata.org/coronavirus
+      <<: *config_base
+      title: "COVID-19: Daily tests vs. daily new confirmed cases per million people"
       selectedEntityNames: []
       excludedEntities:
         - 97
         - 201
         - 21
-      comparisonLines:
-        - label: Positive rate = 100%
-          yEquals: x
-        - label: 50%
-          yEquals: 2*x
-        - label: 20%
-          yEquals: 5*x
-        - label: 10%
-          yEquals: 10*x
-        - label: 5%
-          yEquals: 20*x
-        - label: 2%
-          yEquals: 50*x
-        - label: 1%
-          yEquals: 100*x
-        - label: 0.5%
-          yEquals: 200*x
-        - label: 0.2%
-          yEquals: 500*x
-        - label: 0.1%
-          yEquals: 1000*x
-        - label: 0.02%
-          yEquals: 5000*x
-      relatedQuestions:
-        - url: https://ourworldindata.org/covid-testing-data-archived
-          text: Data on tests is no longer updated since June 2022
