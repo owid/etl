@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Only keep the nino4 anomaly
-    tb = tb[["year", "month", "nino4_anomaly", "nino3_4_anomaly"]]
+    tb = tb[["year", "month", "nino4_anomaly", "nino3_4_anomaly", "oni_anomaly"]]
     tb["country"] = "World"
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.

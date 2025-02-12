@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -19,22 +21,12 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    tb["nino4_anomaly_3mo_mean"] = tb["nino4_anomaly"].rolling(window=3).mean()
-    tb["nino3_4_anomaly_3mo_mean"] = tb["nino3_4_anomaly"].rolling(window=3).mean()
 
     tb["nino_classification"] = tb.apply(classify_nino_anomaly, axis=1)
-    tb["nino_classification_3_4"] = tb.apply(classify_nino_3_4_anomaly, axis=1)
-    for col in ["nino_classification", "nino_classification_3_4"]:
+    for col in ["nino_classification"]:
         tb[col].metadata.origins = tb["nino3_4_anomaly"].metadata.origins
 
-    tb = tb.drop(
-        columns={
-            "nino4_anomaly",
-            "nino3_4_anomaly",
-            "nino4_anomaly_3mo_mean",
-            "nino3_4_anomaly_3mo_mean",
-        }
-    )
+    tb = tb.drop(columns={"nino4_anomaly", "nino3_4_anomaly", "oni_anomaly"})
 
     tb = tb.format(["country", "year", "month"])
 
@@ -51,20 +43,12 @@ def run(dest_dir: str) -> None:
 
 
 def classify_nino_anomaly(row):
+    # Fill NA values with a number that won't affect classification
+    row = row.fillna(0)
     # Classify NINO3.4 and NINO4 anomaly values
-    if row["nino3_4_anomaly_3mo_mean"] >= 0.5:
+    if row["oni_anomaly"] > 0.5:
         return 1  # "El Niño"
-    elif row["nino4_anomaly_3mo_mean"] <= -0.5:
-        return 2  # "La Niña"
-    else:
-        return 0  # "Neutral"
-
-
-def classify_nino_3_4_anomaly(row):
-    # Classify NINO3.4 and NINO4 anomaly values
-    if row["nino3_4_anomaly_3mo_mean"] > 0.5:
-        return 1  # "El Niño"
-    elif row["nino3_4_anomaly_3mo_mean"] < -0.5:
+    elif row["oni_anomaly"] < -0.5:
         return 2  # "La Niña"
     else:
         return 0  # "Neutral"

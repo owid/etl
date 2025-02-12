@@ -17,16 +17,9 @@ tables:
   sst:
     variables:
       nino_classification:
-       title: El Niño or La Niña (Niño 3.4 and Nino 4 regions) by month
+       title: El Niño or La Niña by month
        presentation:
-        title_public: El Niño or La Niña (Niño 3.4 and Nino 4 regions)
+        title_public: El Niño or La Niña
        display:
         yearIsDay: True
         zeroDay: "1949-01-01"
-      nino_classification_3_4:
-        title: El Niño or La Niña (according to the Niño 3.4 region) by month
-        presentation:
-          title_public: El Niño or La Niña (Niño 3.4 region)
-        display:
-          yearIsDay: True
-          zeroDay: "1949-01-01"
