@@ -41,6 +41,9 @@ def run(dest_dir: str) -> None:
     )
     tb["colour_date"].metadata.origins = tb["oni_anomaly"].metadata.origins
 
+    # Create date_as_country column (keep uncommented but might use in the future)
+    # tb["date_as_country"] = tb["date"].dt.strftime("%B %Y")
+
     # Drop the original year and month columns
     tb = tb.drop(columns=["year", "month", "date"])
 

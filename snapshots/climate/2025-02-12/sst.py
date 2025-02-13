@@ -62,6 +62,8 @@ def main(upload: bool) -> None:
             columns = ["month", "year", "oni", "oni_anomaly"]
             df.columns = columns
             df["month"] = df["month"].apply(season_to_month)
+            # Add 1 to the year if the month is January because of the way the data is structured
+            df.loc[df["month"] == 1, "year"] += 1
         else:
             # Assign column names
             columns = [
