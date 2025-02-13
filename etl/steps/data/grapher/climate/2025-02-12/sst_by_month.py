@@ -23,12 +23,13 @@ def run(dest_dir: str) -> None:
     tb["date"] = tb["date"] + pd.offsets.Day(14)
     tb["days_since_1941"] = (tb["date"] - pd.to_datetime("1949-01-01")).dt.days
 
-    # Create colour_date column based on decades
-    def year_to_decade(year):
-        return (year - 1950) // 10 + 1
+    tb["colour_date"] = 0
 
-    tb["colour_date"] = tb["year"].apply(year_to_decade)
-    print(tb["colour_date"])
+    # Set colour_date to 1 for rows where nino_classification is 1 and year is above 2000
+    tb.loc[(tb["nino_classification"] == 2) & (tb["year"] > 2000), "colour_date"] = 1
+    # Set colour_date to 1 for rows where nino_classification is 2 and year is below 2000
+    tb.loc[(tb["nino_classification"] == 2) & (tb["year"] < 2000), "colour_date"] = 2
+
     tb["colour_date"].metadata.origins = tb["oni_anomaly"].metadata.origins
 
     # Drop the original year and month columns
