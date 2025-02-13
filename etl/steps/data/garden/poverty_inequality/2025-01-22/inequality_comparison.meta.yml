@@ -29,27 +29,27 @@ tables:
         title: Gini coefficient (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (post-tax)
         display:
           name: Gini coefficient around <<ref_year>>
-      gini_wid_pretaxnational_peradult:
-        title: Gini coefficient (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (pre-tax)
-        display:
-          name: Gini coefficient around <<ref_year>>
-      p90p100share_pip_disposable_percapita:
-        title: Income share of the richest 10% (World Bank PIP) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>>
-        display:
-          name: Income share of the richest 10% around <<ref_year>>
-      p90p100share_wid_posttaxnational_peradult:
-        title: Income share of the richest 10% (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (post-tax)
-        display:
-          name: Income share of the richest 10% around <<ref_year>>
-      p90p100share_wid_pretaxnational_peradult:
-        title: Income share of the richest 10% (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (pre-tax)
-        display:
-          name: Income share of the richest 10% around <<ref_year>>
-      p99p100share_wid_posttaxnational_peradult:
-        title: Income share of the richest 1% (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (post-tax)
-        display:
-          name: Income share of the richest 1% around <<ref_year>>
-      p99p100share_wid_pretaxnational_peradult:
-        title: Income share of the richest 1% (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (pre-tax)
-        display:
-          name: Income share of the richest 1% around <<ref_year>>
+      # gini_wid_pretaxnational_peradult:
+      #   title: Gini coefficient (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (pre-tax)
+      #   display:
+      #     name: Gini coefficient around <<ref_year>>
+      # p90p100share_pip_disposable_percapita:
+      #   title: Income share of the richest 10% (World Bank PIP) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>>
+      #   display:
+      #     name: Income share of the richest 10% around <<ref_year>>
+      # p90p100share_wid_posttaxnational_peradult:
+      #   title: Income share of the richest 10% (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (post-tax)
+      #   display:
+      #     name: Income share of the richest 10% around <<ref_year>>
+      # p90p100share_wid_pretaxnational_peradult:
+      #   title: Income share of the richest 10% (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (pre-tax)
+      #   display:
+      #     name: Income share of the richest 10% around <<ref_year>>
+      # p99p100share_wid_posttaxnational_peradult:
+      #   title: Income share of the richest 1% (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (post-tax)
+      #   display:
+      #     name: Income share of the richest 1% around <<ref_year>>
+      # p99p100share_wid_pretaxnational_peradult:
+      #   title: Income share of the richest 1% (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (pre-tax)
+      #   display:
+      #     name: Income share of the richest 1% around <<ref_year>>

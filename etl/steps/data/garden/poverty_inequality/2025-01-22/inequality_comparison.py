@@ -31,13 +31,13 @@ log = get_logger()
 # Define columns that we want to analyze
 INDICATORS_FOR_ANALYSIS = {
     "gini_pip_disposable_perCapita": "gini",
-    "p90p100Share_pip_disposable_perCapita": "decile10_share",
-    "gini_wid_pretaxNational_perAdult": "p0p100_gini_pretax",
-    "p99p100Share_wid_pretaxNational_perAdult": "p99p100_share_pretax",
-    "p90p100Share_wid_pretaxNational_perAdult": "p90p100_share_pretax",
+    # "p90p100Share_pip_disposable_perCapita": "decile10_share",
+    # "gini_wid_pretaxNational_perAdult": "p0p100_gini_pretax",
+    # "p99p100Share_wid_pretaxNational_perAdult": "p99p100_share_pretax",
+    # "p90p100Share_wid_pretaxNational_perAdult": "p90p100_share_pretax",
     "gini_wid_posttaxNational_perAdult": "p0p100_gini_posttax_nat",
-    "p99p100Share_wid_posttaxNational_perAdult": "p99p100_share_posttax_nat",
-    "p90p100Share_wid_posttaxNational_perAdult": "p90p100_share_posttax_nat",
+    # "p99p100Share_wid_posttaxNational_perAdult": "p99p100_share_posttax_nat",
+    # "p90p100Share_wid_posttaxNational_perAdult": "p90p100_share_posttax_nat",
 }
 
 
@@ -153,7 +153,19 @@ def run(dest_dir: str) -> None:
 
     # Format the table
     tb = tb.format(
-        keys=["country", "year", "ref_year", "year_1", "year_2", "only_all_series"], short_name="inequality_comparison"
+        keys=[
+            "country",
+            "year",
+            "ref_year",
+            "year_1",
+            "year_2",
+            "excluded_years_1",
+            "excluded_years_2",
+            "maximum_distance_1",
+            "maximum_distance_2",
+            "only_all_series",
+        ],
+        short_name="inequality_comparison",
     )
 
     #
@@ -366,11 +378,20 @@ def match_ref_years(
     tb_match["year_2"] = reference_years_list[1]
     tb_match["only_all_series"] = only_all_series
 
-    # For excluded years, if list is empty, set to "None"
+    # For excluded years, if list is empty, set to "No excluded years"
+    for y in [0, 1]:
+        excluded_years_list = reference_years[reference_years_list[y]]["excluded_years"]
+        if not excluded_years_list:
+            tb_match[f"excluded_years_{y+1}"] = "No"
+        else:
+            tb_match[f"excluded_years_{y+1}"] = "Yes"
+
+        maximum_distance = reference_years[reference_years_list[y]]["maximum_distance"]
+        tb_match[f"maximum_distance_{y+1}"] = maximum_distance
 
     # Replace only_all_series with a more descriptive name
-    tb_match["only_all_series"] = tb_match["only_all_series"].replace({True: "Only countries with data in all series"})
-    tb_match["only_all_series"] = tb_match["only_all_series"].replace({False: "All data points for each series"})
+    tb_match["only_all_series"] = tb_match["only_all_series"].replace({True: "Only countries in all sources"})
+    tb_match["only_all_series"] = tb_match["only_all_series"].replace({False: "All data points"})
 
     return tb_match
 
