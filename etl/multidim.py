@@ -255,7 +255,7 @@ def replace_catalog_paths_with_ids(config):
     return config
 
 
-def expand_views(config: dict, combinations: dict[str, str], table: str, engine: Engine) -> list[dict]:
+def expand_views_with_access_db(config: dict, combinations: dict[str, str], table: str, engine: Engine) -> list[dict]:
     """Use dimensions from multidim config file and create views from all possible
     combinations of dimensions. Grapher table must use the same dimensions as the
     multidim config file. If the dimension is missing from groupby, it will be set to "all".

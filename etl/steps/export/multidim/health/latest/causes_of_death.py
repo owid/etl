@@ -22,9 +22,11 @@ def run(dest_dir: str) -> None:
     # Add views for all dimensions
     table = "grapher/ihme_gbd/2024-05-20/gbd_cause/gbd_cause_deaths"
     # Individual causes
-    config["views"] += multidim.expand_views(config, {"metric": "*", "age": "*", "cause": "*"}, table, engine)
+    config["views"] += multidim.expand_views_with_access_db(
+        config, {"metric": "*", "age": "*", "cause": "*"}, table, engine
+    )
     # Show all causes in a single view
-    config["views"] += multidim.expand_views(
+    config["views"] += multidim.expand_views_with_access_db(
         config, {"metric": "*", "age": "*", "cause": "Side-by-side comparison of causes"}, table, engine
     )
 
