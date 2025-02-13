@@ -28,16 +28,16 @@ def run(dest_dir: str) -> None:
     engine = get_engine()
 
     filenames = [
-        "covid.cases.yml",
-        "covid.deaths.yml",
-        "covid.hospital.yml",
-        "covid.vax.yml",
-        "covid.xm.yml",
-        "covid.covax.yml",
-        "covid.models.yml",
-        "covid.xm_models.yml",
-        "covid.vax_breakdowns.yml",
-        "covid.cases_tests.yml",
+        # "covid.cases.yml",
+        # "covid.deaths.yml",
+        # "covid.hospital.yml",
+        # "covid.vax.yml",
+        # "covid.xm.yml",
+        # "covid.covax.yml",
+        # "covid.models.yml",
+        # "covid.xm_models.yml",
+        # "covid.vax_breakdowns.yml",
+        # "covid.cases_tests.yml",
         # "covid.mobility.yml",
     ]
     # Load YAML file
@@ -53,7 +53,20 @@ def run(dest_dir: str) -> None:
         )
 
     # Simple multidim
-    config = paths.load_mdim_config("covid.mobility2.yml")
+    config = paths.load_mdim_config("covid.population.yml")
+
+    config_new = expand_views(
+        config=config,
+        tb=tb,
+        indicator_name="population",
+    )
+
+    multidim.upsert_multidim_data_page(
+        "mdd-population",
+        config_new,
+        engine,
+        paths.dependencies,
+    )
 
 
 def fname_to_slug(fname: str) -> str:
@@ -190,35 +203,30 @@ def expand_views(
     ]
 
     # EXPAND DIMENSIONS
-    config_dimensions = []
     # Support dimension is None
     if dimensions is None:
         dimensions = [col for col in df_dims.columns if col not in ["short_name"]]
-    # Support dimensions is a list
-    if isinstance(dimensions, list):
-        for dim in dimensions:
-            dim_values = list(df_dims[dim].unique())
-            choices = [
-                {
-                    "slug": val,
-                    "name": val,
-                    "description": None,
-                }
-                for val in dim_values
-            ]
-            dimension = {
-                "slug": dim,
-                "name": dim,
-                "choices": choices,
-            }
-            config_dimensions.append(dimension)
-    # Support dimensions is a dictionary
-    elif isinstance(dimensions, dict):
-        for dim, dim_values in dimensions.items():
-            choices = []
-            if dim_values == "*":
-                dim_values = list(df_dims[dim].unique())
 
+    # Support dimensions is a list/dict
+    config_dimensions = []
+    if isinstance(dimensions, (list, dict)):
+        # Sanity check: All dimension names should be present in the list or dictionary
+        dimensions_missing = set(dimension_names) - set(dimensions)
+        if dimensions_missing:
+            raise ValueError(f"Missing dimensions: {', '.join(dimensions_missing)}")
+
+        # Add dimension entry and add it to dimensions
+        for dim in dimensions:
+            # If list, we don't care about dimension value order
+            if isinstance(dimensions, list):
+                dim_values = list(df_dims[dim].unique())
+            # If dictionary, let's use the order (unless '*' is used)!
+            else:
+                dim_values = dimensions[dim]
+                if dim_values == "*":
+                    dim_values = list(df_dims[dim].unique())
+
+            # Build choices for given dimension
             choices = [
                 {
                     "slug": val,
@@ -227,12 +235,17 @@ def expand_views(
                 }
                 for val in dim_values
             ]
+
+            # Build dimension
             dimension = {
                 "slug": dim,
                 "name": dim,
                 "choices": choices,
             }
+
+            # Add dimension to config
             config_dimensions.append(dimension)
+    config["dimensions"] = config_dimensions
 
     # TODO: Overwrite dimensions if anything is given in metadata
 
