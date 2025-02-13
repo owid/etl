@@ -1,3 +1,6 @@
+dataset:
+  title: Global annual temperature anomalies
+
 tables:
   surface_global_monthly_anomaly:
     variables:
