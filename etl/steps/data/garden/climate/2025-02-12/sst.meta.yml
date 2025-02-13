@@ -5,7 +5,17 @@ definitions:
       topic_tags:
         - Climate Change
     processing_level: major
-
+    description_key:
+      - The Oceanic Niño Index (ONI) is a tool used by the National Oceanic and Atmospheric Administration (NOAA) to monitor and track the presence and intensity of El Niño and La Niña events.
+      - These events are part of the broader El Niño-Southern Oscillation (ENSO), a natural climate pattern that affects global weather patterns, including rainfall, droughts, and hurricane activity.
+      - The ONI measures deviations in sea surface temperatures (SSTs) in a specific area of the Pacific Ocean, known as the Niño 3.4 region. This region spans from 120°W to 170°W longitude, along the equator, in the east-central tropical Pacific.
+      - NOAA calculates the ONI by taking a 3-month running mean of SST anomalies. An anomaly is the difference between observed SSTs and the 30-year climatological average for the same period. NOAA periodically updates the baseline period to ensure consistency with long-term climate trends. For example, the 1991–2020 average is often used.
+      - El Niño (ONI ≥ +0.5°C) Warmer-than-usual SSTs in the Niño 3.4 region, often bringing drier conditions to Asia and Australia, wetter weather to the southern U.S., and weakened trade winds.
+      - El Niño (ONI ≥ +0.5°C) occurs when sea surface temperatures in the Niño 3.4 region are warmer than usual, often bringing drier conditions to Asia and Australia, wetter weather to the southern United States, and weakened trade winds.
+      - Neutral (−0.5°C < ONI < +0.5°C) means sea surface temperatures are near average, with no significant ENSO event.
+      - La Niña (ONI ≤ −0.5°C) happens when sea surface temperatures are cooler than usual, often causing drier conditions in South America, increased rainfall in Indonesia and northern Australia, and stronger trade winds.
+      - El Niño can lead to weaker Atlantic hurricane seasons but stronger and more frequent Pacific hurricanes.
+      - La Niña tends to cause more hurricanes in the Atlantic and drought conditions in the southern U.S.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -18,7 +28,7 @@ tables:
       nino_classification:
        title: El Niño or La Niña
        unit: ""
-       description_short: The classification of the El Niño-Southern Oscillation (ENSO) state.
+       description_short: The classification of the El Niño-Southern Oscillation (ENSO) state based on the Oceanic Niño Index (ONI).
        display:
           numDecimalPlaces: 0
       oni_anomaly:
