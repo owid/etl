@@ -965,3 +965,13 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/gavi/2025-02-11/eligibility:
     - data://garden/gavi/2025-02-11/eligibility
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/health/2025-02-13/vaccine_confidence:
+    - snapshot://health/2025-02-13/vaccine_confidence.csv
+  data://garden/health/2025-02-13/vaccine_confidence:
+    - data://meadow/health/2025-02-13/vaccine_confidence
+  data://grapher/health/2025-02-13/vaccine_confidence:
+    - data://garden/health/2025-02-13/vaccine_confidence

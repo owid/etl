@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  vaccine_confidence:
+    variables:
+      children:
+        title: Share who agree vaccines are important for children
+        description_short: Share of respondents who somewhat or strongly agree that vaccines are important for children.
+        unit: "%"
+        short_unit: "%"
+      safe:
+        title: Share who agree vaccines are safe
+        description_short: Share of respondents who somewhat or strongly agree that vaccines are safe.
+        unit: "%"
+        short_unit: "%"
+      effective:
+        title: Share who agree vaccines are effective
+        description_short: Share of respondents who somewhat or strongly agree that vaccines are effective.
+        unit: "%"
+        short_unit: "%"
+      beliefs:
+        title: Share who agree vaccines are compatible with their beliefs
+        description_short: Share of respondents who somewhat or strongly agree that vaccines are compatible with their beliefs.
+        unit: "%"
+        short_unit: "%"
