@@ -1,8 +1,8 @@
 macros: |-
   <% macro format_cause(cause) -%>
-    <% if cause.startswith("HIV/AIDS") -%>
+    <% if cause.startswith("HIV/AIDS") %>
       << cause >>
-    <% else -%>
+    <% else %>
       << cause.lower() >>
     <%- endif -%>
   <% endmacro %>
@@ -22,11 +22,11 @@ macros: |-
   <% endmacro %>
 
   <% macro format_sex(sex) -%>
-    <%- if sex == "Both" -%>
+    <% if sex == "Both" %>
     individuals
-    <%- elif sex == "Male" -%>
+    <% elif sex == "Male" %>
     males
-    <%- elif sex == "Female" -%>
+    <% elif sex == "Female" %>
     females
     <%- endif -%>
   <% endmacro %>
