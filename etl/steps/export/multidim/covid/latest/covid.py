@@ -17,6 +17,8 @@ MOBILITY_CONFIG_DEFAULT = {
 
 
 def run(dest_dir: str) -> None:
+    ds = paths.load_dataset("google_mobility")
+    tb = ds["google_mobility"].reset_index()
     engine = get_engine()
 
     filenames = [
