@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
     tb["colour_date"] = tb["year"].apply(year_to_decade)
 
     tb["colour_date"] = tb.apply(
-        lambda row: row["colour_date"] + 9
+        lambda row: row["colour_date"] + 8
         if (row["nino_classification"] == 1 and 1 <= row["colour_date"] <= 9)
         else row["colour_date"],
         axis=1,
