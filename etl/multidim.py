@@ -5,6 +5,7 @@ from typing import Dict, Union
 
 import pandas as pd
 import yaml
+from deprecated import deprecated
 from owid.catalog import Dataset
 from sqlalchemy.engine import Engine
 from structlog import get_logger
@@ -255,6 +256,9 @@ def replace_catalog_paths_with_ids(config):
     return config
 
 
+@deprecated(
+    "This function relies on DB-access. Instead we should rely only on ETL local files. Use `expand_views` instead."
+)
 def expand_views_with_access_db(config: dict, combinations: dict[str, str], table: str, engine: Engine) -> list[dict]:
     """Use dimensions from multidim config file and create views from all possible
     combinations of dimensions. Grapher table must use the same dimensions as the
