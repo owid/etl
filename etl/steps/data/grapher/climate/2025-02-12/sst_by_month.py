@@ -18,17 +18,19 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden.read("sst")
 
-    # Name month column "country" foro grapher purposes
-
     # Combine month and year into a single column
     tb["date"] = pd.to_datetime(tb["year"].astype(str) + "-" + tb["month"].astype(str) + "-01")
     tb["date"] = tb["date"] + pd.offsets.Day(14)
     tb["days_since_1941"] = (tb["date"] - pd.to_datetime("1949-01-01")).dt.days
-    # Normalize days_since_1941 to create colour_date
-    tb["colour_date"] = (tb["days_since_1941"] - tb["days_since_1941"].min()) / (
-        tb["days_since_1941"].max() - tb["days_since_1941"].min()
-    )
+
+    # Create colour_date column based on decades
+    def year_to_decade(year):
+        return (year - 1950) // 10 + 1
+
+    tb["colour_date"] = tb["year"].apply(year_to_decade)
+    print(tb["colour_date"])
     tb["colour_date"].metadata.origins = tb["oni_anomaly"].metadata.origins
+
     # Drop the original year and month columns
     tb = tb.drop(columns=["year", "month", "date"])
 
