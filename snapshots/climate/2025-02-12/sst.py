@@ -27,18 +27,18 @@ def season_to_month(season: str) -> int:
     int: The corresponding month (1-12).
     """
     season_to_month_map = {
-        "DJF": 1,  # December-January-February -> January
-        "JFM": 2,  # January-February-March -> February
-        "FMA": 3,  # February-March-April -> March
-        "MAM": 4,  # March-April-May -> April
-        "AMJ": 5,  # April-May-June -> May
-        "MJJ": 6,  # May-June-July -> June
-        "JJA": 7,  # June-July-August -> July
-        "JAS": 8,  # July-August-September -> August
-        "ASO": 9,  # August-September-October -> September
-        "SON": 10,  # September-October-November -> October
-        "OND": 11,  # October-November-December -> November
-        "NDJ": 12,  # November-December-January -> December
+        "DJF": 2,  # December-January-February -> January
+        "JFM": 3,  # January-February-March -> February
+        "FMA": 4,  # February-March-April -> March
+        "MAM": 5,  # March-April-May -> April
+        "AMJ": 6,  # April-May-June -> May
+        "MJJ": 7,  # May-June-July -> June
+        "JJA": 8,  # June-July-August -> July
+        "JAS": 9,  # July-August-September -> August
+        "ASO": 10,  # August-September-October -> September
+        "SON": 11,  # September-October-November -> October
+        "OND": 12,  # October-November-December -> November
+        "NDJ": 1,  # November-December-January -> December
     }
     return season_to_month_map[season]
 
