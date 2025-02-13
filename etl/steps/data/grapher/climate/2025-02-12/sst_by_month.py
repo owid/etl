@@ -29,12 +29,16 @@ def run(dest_dir: str) -> None:
 
     tb["colour_date"] = tb["year"].apply(year_to_decade)
 
-    # Set colour_date based on nino_classification and decade, otherwise set to zero
     tb["colour_date"] = tb.apply(
-        lambda row: row["colour_date"] if (row["nino_classification"] == 2 and 1 <= row["colour_date"] <= 8) else 0,
+        lambda row: row["colour_date"] + 9
+        if (row["nino_classification"] == 1 and 1 <= row["colour_date"] <= 9)
+        else row["colour_date"],
         axis=1,
     )
-
+    tb["colour_date"] = tb.apply(
+        lambda row: 0 if row["nino_classification"] == 0 else row["colour_date"],
+        axis=1,
+    )
     tb["colour_date"].metadata.origins = tb["oni_anomaly"].metadata.origins
 
     # Drop the original year and month columns
