@@ -24,6 +24,10 @@ def run(dest_dir: str) -> None:
     tb["date"] = pd.to_datetime(tb["year"].astype(str) + "-" + tb["month"].astype(str) + "-01")
     tb["date"] = tb["date"] + pd.offsets.Day(14)
     tb["days_since_1941"] = (tb["date"] - pd.to_datetime("1949-01-01")).dt.days
+    # Normalize days_since_1941 to create colour_date
+    tb["colour_date"] = (tb["days_since_1941"] - tb["days_since_1941"].min()) / (
+        tb["days_since_1941"].max() - tb["days_since_1941"].min()
+    )
 
     # Drop the original year and month columns
     tb = tb.drop(columns=["year", "month", "date"])

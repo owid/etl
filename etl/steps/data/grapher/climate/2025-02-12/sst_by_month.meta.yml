@@ -31,3 +31,11 @@ tables:
         display:
           yearIsDay: True
           zeroDay: "1949-01-01"
+      colour_date:
+        title: Date colour code
+        unit: ""
+        presentation:
+          title_public: Date
+        display:
+          yearIsDay: True
+          zeroDay: "1949-01-01"
