@@ -23,3 +23,13 @@ tables:
        display:
         yearIsDay: True
         zeroDay: "1949-01-01"
+      oni_anomaly:
+        title: Oceanic Niño Index (ONI) anomaly by month
+        unit: ""
+        presentation:
+          title_public: Oceanic Niño Index (ONI) anomaly
+        description_short: The Oceanic Niño Index (ONI) anomaly is a measure of the sea surface temperature anomalies in the east-central tropical Pacific Ocean.
+        display:
+          numDecimalPlaces: 1
+          yearIsDay: True
+          zeroDay: "1949-01-01"
