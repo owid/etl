@@ -127,6 +127,35 @@ BUNKERS_SECTORS = [
     "1A3di_International-shipping",
 ]
 
+# Mapping of pollutants.
+POLLUTANTS_MAPPING = {
+    "CO2": "CO₂",
+    "CH4": "CH₄",
+    "NMVOC": "NMVOC",
+    "N2O": "N₂O",
+    "SO2": "SO₂",
+    "CO": "CO",
+    "BC": "BC",
+    "NH3": "NH₃",
+    "OC": "OC",
+    "NOx": "NOₓ",
+}
+
+# Expected units for each pollutant.
+# NOTE: Units will be assigned using the metadata yaml file.
+EXPECTED_UNITS = {
+    "BC": "ktC",
+    "CH4": "ktCH4",
+    "CO": "ktCO",
+    "CO2": "ktCO2",
+    "N2O": "ktN2O",
+    "NH3": "ktNH3",
+    "NMVOC": "ktNMVOC",
+    "NOx": "ktNO2",
+    "OC": "ktC",
+    "SO2": "ktSO2",
+}
+
 
 def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     error = "Columns in detailed table have changed."
@@ -207,6 +236,8 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
             & (tb_bunkers[[c for c in tb_bunkers.columns if c.startswith("x")]].sum(axis=1) > 0)
         ]["sector"]
     ), error
+    error = "Pollutant units have changed."
+    assert tb_detailed[["em", "units"]].drop_duplicates().set_index(["em"])["units"].to_dict() == EXPECTED_UNITS, error
 
 
 def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -> Table:
@@ -231,9 +262,35 @@ def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -
 
     tb = pr.concat([tb_detailed, tb_bunkers], short_name=paths.short_name)
 
+    # Remove units column.
+    # NOTE: In the sanity checks, we asserted that they were as expected.
+    tb = tb.drop(columns=["units"], errors="raise")
+
     # Sanity check.
     error = "There are duplicated rows in the combined table."
     assert tb[tb.duplicated(subset=["em", "country", "sector"], keep=False)].empty, error
+
+    return tb
+
+
+def remap_table_categories(tb: Table) -> Table:
+    # We don't need the detailed sectorial information, and we don't need to keep the fuel information either.
+    # So, map detailed subsectors into broader sectors, e.g. "Transportation", "Agriculture".
+    subsector_to_sector = {
+        subsector: sector for sector, subsectors in SECTOR_MAPPING.items() for subsector in subsectors
+    }
+    tb["sector"] = map_series(
+        tb["sector"], mapping=subsector_to_sector, warn_on_missing_mappings=True, warn_on_unused_mappings=True
+    )
+    tb = tb.groupby(["em", "country", "sector"], as_index=False, observed=True).sum()
+
+    # Rename columns conveniently.
+    tb = tb.rename(columns={"em": "pollutant"}, errors="raise")
+
+    # Map pollutants.
+    tb["pollutant"] = map_series(
+        tb["pollutant"], mapping=POLLUTANTS_MAPPING, warn_on_missing_mappings=True, warn_on_unused_mappings=True
+    )
 
     return tb
 
@@ -270,39 +327,18 @@ def run(dest_dir: str) -> None:
     # Combine detailed and bunkers tables.
     tb = combine_detailed_and_bunkers_tables(tb_detailed=tb_detailed, tb_bunkers=tb_bunkers)
 
-    def remap_table_categories(tb: Table) -> Table:
-        # We don't need the detailed sectorial information, and we don't need to keep the fuel information either.
-        # So, map detailed subsectors into broader sectors, e.g. "Transportation", "Agriculture".
-        subsector_to_sector = {
-            subsector: sector for sector, subsectors in SECTOR_MAPPING.items() for subsector in subsectors
-        }
-        tb["sector"] = map_series(
-            tb["sector"], mapping=subsector_to_sector, warn_on_missing_mappings=True, warn_on_unused_mappings=True
-        )
-        tb = tb.groupby(["em", "country", "sector", "units"], as_index=False, observed=True).sum()
-
-        return tb
-
     # Simplify subsectors into broader categories, and remove the "fuel" dimension, which for now we don't need.
     tb = remap_table_categories(tb=tb)
 
-    # TODO: Create a mapping for pollutants.
-    # TODO: Maybe after the remapping we don't need to keep categoricals.
-
     # Restructure table to have year as a column.
     tb = tb.rename(columns={column: int(column[1:]) for column in tb.columns if column.startswith("x")})
-    tb = tb.melt(id_vars=["em", "country", "sector", "units"], var_name="year", value_name="value")
+    tb = tb.melt(id_vars=["pollutant", "country", "sector"], var_name="year", value_name="value")
 
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # TODO: Define a dictionary of pollutant: units, and remove the units column.
-    tb = tb.drop(columns=["units"], errors="raise")
-
     # Improve table format.
-    tb = tb.format(["em", "country", "sector", "year"])
-
-    tb["value"].m
+    tb = tb.format(["country", "year", "pollutant", "sector"])
 
     #
     # Save outputs.
