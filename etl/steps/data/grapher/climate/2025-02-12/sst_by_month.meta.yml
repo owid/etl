@@ -17,9 +17,9 @@ tables:
   sst:
     variables:
       nino_classification:
-       title: El Niño or La Niña by month
+       title: El Niño or La Niña according to Oceanic Niño Index (ONI) by month
        presentation:
-        title_public: El Niño or La Niña
+        title_public: El Niño or La Niña according to Oceanic Niño Index (ONI)
        display:
         yearIsDay: True
         zeroDay: "1949-01-01"
@@ -29,6 +29,5 @@ tables:
         presentation:
           title_public: Oceanic Niño Index (ONI) anomaly
         display:
-          numDecimalPlaces: 1
           yearIsDay: True
           zeroDay: "1949-01-01"

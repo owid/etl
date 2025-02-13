@@ -26,7 +26,7 @@ tables:
   sst:
     variables:
       nino_classification:
-       title: El Niño or La Niña
+       title:  El Niño or La Niña according to Oceanic Niño Index (ONI)
        unit: ""
        description_short: The classification of the El Niño-Southern Oscillation (ENSO) state based on the Oceanic Niño Index (ONI).
        display:
@@ -36,7 +36,7 @@ tables:
         unit: ""
         description_short: The Oceanic Niño Index (ONI) anomaly is a measure of the sea surface temperature anomalies in the east-central tropical Pacific Ocean.
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
 
 
 
