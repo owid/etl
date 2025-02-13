@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     for col in ["nino_classification"]:
         tb[col].metadata.origins = tb["nino3_4_anomaly"].metadata.origins
 
-    tb = tb.drop(columns={"nino4_anomaly", "nino3_4_anomaly", "oni_anomaly"})
+    tb = tb.drop(columns={"nino4_anomaly", "nino3_4_anomaly"})
 
     tb = tb.format(["country", "year", "month"])
 

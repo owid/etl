@@ -21,6 +21,12 @@ tables:
        description_short: The classification of the El Niño-Southern Oscillation (ENSO) state.
        display:
           numDecimalPlaces: 0
+      oni_anomaly:
+        title: Oceanic Niño Index (ONI) anomaly
+        unit: ""
+        description_short: The Oceanic Niño Index (ONI) anomaly is a measure of the sea surface temperature anomalies in the east-central tropical Pacific Ocean.
+        display:
+          numDecimalPlaces: 1
 
 
 
