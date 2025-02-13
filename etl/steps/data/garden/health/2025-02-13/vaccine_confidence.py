@@ -22,7 +22,9 @@ def run(dest_dir: str) -> None:
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.format(["country", "year"])
-
+    # convert the score to a percentage
+    for col in tb.columns:
+        tb[col] = tb[col] * 100
     #
     # Save outputs.
     #
