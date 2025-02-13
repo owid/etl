@@ -18,13 +18,13 @@ tables:
     variables:
       children:
         title: Share who agree vaccines are important for children
-        description_short: Share of respondents who somewhat or strongly agree that vaccines are important for children.
+        description_short: The share of people who responded that they "strongly agree" or "somewhat agree" with the statement 'I think vaccines are important for children to have'.
       safe:
         title: Share who agree vaccines are safe
-        description_short: Share of respondents who somewhat or strongly agree that vaccines are safe.
+        description_short: The share of people who responded that they "strongly agree" or "somewhat agree" with the statement 'I think vaccines are safe'.
       effective:
         title: Share who agree vaccines are effective
-        description_short: Share of respondents who somewhat or strongly agree that vaccines are effective.
+        description_short: The share of people who responded that they "strongly agree" or "somewhat agree" with the statement 'I think vaccines are effective'.
       beliefs:
         title: Share who agree vaccines are compatible with their beliefs
-        description_short: Share of respondents who somewhat or strongly agree that vaccines are compatible with their beliefs.
+        description_short: The share of people who responded that they "strongly agree" or "somewhat agree" with the statement 'I think vaccines are compatible with my religious beliefs'.
