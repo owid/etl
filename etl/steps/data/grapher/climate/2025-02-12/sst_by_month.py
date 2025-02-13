@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     tb["colour_date"] = (tb["days_since_1941"] - tb["days_since_1941"].min()) / (
         tb["days_since_1941"].max() - tb["days_since_1941"].min()
     )
-
+    tb["colour_date"].metadata.origins = tb["oni_anomaly"].metadata.origins
     # Drop the original year and month columns
     tb = tb.drop(columns=["year", "month", "date"])
 
