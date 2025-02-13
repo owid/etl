@@ -1,10 +1,6 @@
 macros: |-
   <% macro format_cause(cause) -%>
-    <% if cause.startswith("HIV/AIDS") %>
-      << cause >>
-    <% else %>
-      << cause.lower() >>
-    <%- endif -%>
+    <% if cause.startswith("HIV/AIDS") %><< cause >><% else %><< cause.lower() >><%- endif -%>
   <% endmacro %>
 
   <% macro format_unit(metric, prefix) %>
