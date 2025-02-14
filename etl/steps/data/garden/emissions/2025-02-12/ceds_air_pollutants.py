@@ -238,6 +238,9 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     ), error
     error = "Pollutant units have changed."
     assert tb_detailed[["em", "units"]].drop_duplicates().set_index(["em"])["units"].to_dict() == EXPECTED_UNITS, error
+    # Specifically, check that they are all in kilotonnes.
+    error = "Expected units to be in kilotonnes."
+    assert all([unit.startswith("kt") for unit in EXPECTED_UNITS.values()]), error
 
 
 def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -> Table:
@@ -342,6 +345,30 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # Convert units from kilotonnes to tonnes.
+    tb["emissions"] *= 1e3
+
+    # Create an "All sectors" aggregate.
+    tb = pr.concat(
+        [
+            tb,
+            tb.groupby(["pollutant", "country", "year"], as_index=False, observed=True)
+            .agg({"emissions": "sum"})
+            .assign(**{"sector": "All sectors"})
+            .assign(**{"sector": "All sectors"}),
+        ]
+    )
+
+    # Create an "All pollutants" aggregate.
+    tb = pr.concat(
+        [
+            tb,
+            tb.groupby(["sector", "country", "year"], as_index=False, observed=True)
+            .agg({"emissions": "sum"})
+            .assign(**{"pollutant": "All pollutants"}),
+        ]
+    )
+
     # Add region aggregates.
     tb = geo.add_regions_to_table(
         tb=tb,
@@ -353,8 +380,7 @@ def run(dest_dir: str) -> None:
     # Add per capita variables.
     tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
     tb["emissions_per_capita"] = tb["emissions"] / tb["population"]
-
-    # TODO: Create an "all sectors" aggregate sector, and an "All pollutants" aggregate pollutant.
+    tb = tb.drop(columns=["population"])
 
     # Improve table format.
     tb = tb.format(["country", "year", "pollutant", "sector"])
