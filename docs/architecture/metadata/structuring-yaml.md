@@ -308,3 +308,29 @@ tables:
 !!! tip "Reusing definitions across tables through shared.meta.yml"
 
     If you have multiple `*.meta.yml` files that share the same metadata, you can put shared `definitions:` and `macros:` into `shared.meta.yml` file. All other `*.meta.yml` files can then use them.
+
+    For example, define a macro for formatting sex in `shared.meta.yml`:
+
+    ```yaml
+    macros: |-
+      <% macro format_sex(sex) %>
+        <%- if sex == "Both" -%>
+        individuals
+        <%- elif sex == "Male" -%>
+        males
+        <%- elif sex == "Female" -%>
+        females
+        <%- endif -%>
+      <% endmacro %>
+    ```
+
+    Then, in your `*.meta.yml` files, call it as a function
+
+    ```yaml
+    tables:
+      gbd_prevalence:
+        variables:
+          prevalence:
+            description_short: |-
+              The prevalence of << cause >> in << format_sex(sex) >>.
+    ```

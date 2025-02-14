@@ -1,27 +1,23 @@
 macros: |-
-  <% macro format_cause(cause) -%>
-    <% if cause.startswith("HIV/AIDS") -%>
-      << cause >>
-    <% else -%>
-      << cause.lower() >>
-    <%- endif -%>
+  <% macro format_cause(cause) %>
+    <%- if cause.startswith("HIV/AIDS") -%><< cause >><%- else -%><< cause.lower() >><%- endif -%>
   <% endmacro %>
 
   <% macro format_unit(metric, prefix) %>
-    <% if metric == "Number" %>
+    <%- if metric == "Number" -%>
       << prefix >>
-    <% elif metric == "Rate" %>
+    <%- elif metric == "Rate" -%>
       << prefix >> per 100,000 people
-    <% elif metric == "Share" %>
+    <%- elif metric == "Share" -%>
       << prefix >> per 100 people
-    <% elif metric == "Percent" and prefix == "DALYs" %>
+    <%- elif metric == "Percent" and prefix == "DALYs" -%>
       share of total DALYs
-    <% elif metric == "Percent" %>
+    <%- elif metric == "Percent" -%>
       %
-    <% endif %>
+    <%- endif -%>
   <% endmacro %>
 
-  <% macro format_sex(sex) -%>
+  <% macro format_sex(sex) %>
     <%- if sex == "Both" -%>
     individuals
     <%- elif sex == "Male" -%>
@@ -102,11 +98,11 @@ macros: |-
 
 definitions:
   short_unit: |-
-    <% if metric == "Share" %>
+    <%- if metric == "Share" -%>
     %
-    <%- elif metric == "Percent"%>
+    <%- elif metric == "Percent" -%>
     %
-    <%- elif metric == "Rate" or metric == "Number" %>
+    <%- elif metric == "Rate" or metric == "Number" -%>
     <%- endif %>
 
   footnote: |-
