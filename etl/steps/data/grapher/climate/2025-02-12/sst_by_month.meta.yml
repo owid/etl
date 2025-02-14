@@ -5,6 +5,7 @@ definitions:
       topic_tags:
         - Climate Change
     display:
+        yearIsDay: true
         zeroDay: "1949-01-01"
     processing_level: minor
 
