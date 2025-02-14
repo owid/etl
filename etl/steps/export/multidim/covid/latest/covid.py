@@ -168,102 +168,122 @@ def expand_views(
             - IDEA: We could do this by passing string values directly to dimensions, e.g. dimensions='alphabetical_desc'
         - Support out-of-the box sorting for dimension values. This could be alphabetically ascending or descending, or numerically ascending or descending.
             - IDEA: We could pass strings as values directly to the keys in dimensions dictionary, e.g. `dimensions={"sex": "alphabetical_desc", "age": "numerical_desc", "cause": ["aids", "cancer"]}`. To some extent, we already support the function "*" (i.e. show all values without sorting).
-        - Possible issue: What if there is no intersection for the selected dimensions.
         - Support using charts with 'x', 'size' and 'color' indicators. Also support display settings for each indicator.
         - How can we add tweaks to the dimension description?
             - IDEA: Maybe dimensions argument should rather allow for Dict[str, Dict[str, Any]]. Where for each dimension value we provide description details.
     """
-    # GET DATAFRAME WITH INFO ON INDICATOR-DIMENSIONS
-    df_dims = _build_df_dims(tb)
-    # List with names of indicators and dimensions
-    indicator_names = list(df_dims["indicator"].unique())
-    dimension_names = [col for col in df_dims.columns if col not in ["indicator", "short_name"]]
-
-    # SANITY CHECKS
-    # If no indicator name is provided, there should only be one in the table!
-    if indicator_name is None:
-        if len(indicator_names) != 1:
-            raise ValueError("There are multiple indicators, but no `indicator_name` was provided.")
-        # If only one indicator available, set it as the indicator name
-        indicator_name = indicator_names[0]
-    # If indicator name is given, make sure it is present in the table!
-    if indicator_name not in indicator_names:
-        raise ValueError(
-            f"Indicator `{indicator_name}` not found in the table. Available are: {', '.join(indicator_names)}"
-        )
-
-    # Keep dimensions only for relevant indicator
-    df_dims = df_dims.loc[df_dims["indicator"] == indicator_name].drop(columns=["indicator"])
-
-    # Ad-hoc tweak to debug
-    df_dims = df_dims.loc[
-        df_dims["age"].isin(["0-24", "25-64", "all"])
-        & df_dims["sex"].isin(["male", "female"])
-        & df_dims["variant"].isin(["low", "high"])
-    ]
+    # Initiate expander object
+    expander = MDIMExpander(tb, indicator_name)
 
     # EXPAND DIMENSIONS
-    # Support dimension is None
-    if dimensions is None:
-        dimensions = [col for col in df_dims.columns if col not in ["short_name"]]
-
-    # Support dimensions is a list/dict
-    config_dimensions = []
-    if isinstance(dimensions, (list, dict)):
-        # Sanity check: All dimension names should be present in the list or dictionary
-        dimensions_missing = set(dimension_names) - set(dimensions)
-        if dimensions_missing:
-            raise ValueError(f"Missing dimensions: {', '.join(dimensions_missing)}")
-
-        # Add dimension entry and add it to dimensions
-        for dim in dimensions:
-            # If list, we don't care about dimension value order
-            if isinstance(dimensions, list):
-                dim_values = list(df_dims[dim].unique())
-            # If dictionary, let's use the order (unless '*' is used)!
-            else:
-                dim_values = dimensions[dim]
-                if dim_values == "*":
-                    dim_values = list(df_dims[dim].unique())
-
-            # Build choices for given dimension
-            choices = [
-                {
-                    "slug": val,
-                    "name": val,
-                    "description": None,
-                }
-                for val in dim_values
-            ]
-
-            # Build dimension
-            dimension = {
-                "slug": dim,
-                "name": dim,
-                "choices": choices,
-            }
-
-            # Add dimension to config
-            config_dimensions.append(dimension)
-    config["dimensions"] = config_dimensions
+    config["dimensions"] = expander.build_dimensions(
+        dimensions=dimensions,
+    )
 
     # TODO: Overwrite dimensions if anything is given in metadata
 
     # EXPAND VIEWS
-    config_views = []
-    for _, indicator in df_dims.iterrows():
-        view = {
-            "dimensions": {dim_name: indicator[dim_name] for dim_name in dimension_names},
-            "indicators": {
-                "y": f"{tb.m.short_name}#{indicator.short_name}",  # TODO: Add support for (i) support "x", "color", "size"; (ii) display settings
-            },
-        }
-        if additional_config:
-            view["config"] = additional_config
-        config_views.append(view)
-    config["views"] = config_views
+    config["views"] = expander.build_views(
+        additional_config=additional_config,
+    )
 
     return config
+
+
+class MDIMExpander:
+    def __init__(self, tb: Table, indicator_name: Optional[str] = None):
+        self.df_dims = self.get_df_dims(tb, indicator_name)
+        self.short_name = tb.m.short_name
+
+    def get_df_dims(self, tb, indicator_name):
+        """Build dataframe with dimensional information from table tb.
+
+        Refer to docstring from `_build_df_dims` for more details."""
+        df_dims = _build_df_dims(tb)
+        # SANITY CHECKS
+        _sanity_checks(indicator_name, df_dims)
+
+        # Keep dimensions only for relevant indicator
+        df_dims = df_dims.loc[df_dims["indicator"] == indicator_name].drop(columns=["indicator"])
+
+        # TODO: REMOVE THIS ONCE TESTING IS OVER
+        # Ad-hoc tweak to debug
+        df_dims = df_dims.loc[
+            df_dims["age"].isin(["0-24", "25-64", "all"])
+            & df_dims["sex"].isin(["male", "female"])
+            & df_dims["variant"].isin(["low", "high"])
+        ]
+        return df_dims
+
+    @property
+    def dimension_names(self):
+        return [col for col in self.df_dims.columns if col not in ["indicator", "short_name"]]
+
+    def build_dimensions(
+        self,
+        dimensions,
+    ):
+        """Create the specs for each dimension."""
+        # Support dimension is None
+        if dimensions is None:
+            dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]
+
+        # Support dimensions is a list/dict
+        config_dimensions = []
+        if isinstance(dimensions, (list, dict)):
+            # Sanity check: All dimension names should be present in the list or dictionary
+            dimensions_missing = set(self.dimension_names) - set(dimensions)
+            if dimensions_missing:
+                raise ValueError(f"Missing dimensions: {', '.join(dimensions_missing)}")
+
+            # Add dimension entry and add it to dimensions
+            for dim in dimensions:
+                # If list, we don't care about dimension value order
+                if isinstance(dimensions, list):
+                    dim_values = list(self.df_dims[dim].unique())
+                # If dictionary, let's use the order (unless '*' is used)!
+                else:
+                    dim_values = dimensions[dim]
+                    if dim_values == "*":
+                        dim_values = list(self.df_dims[dim].unique())
+
+                # Build choices for given dimension
+                choices = [
+                    {
+                        "slug": val,
+                        "name": val,
+                        "description": None,
+                    }
+                    for val in dim_values
+                ]
+
+                # Build dimension
+                dimension = {
+                    "slug": dim,
+                    "name": dim,
+                    "choices": choices,
+                }
+
+                # Add dimension to config
+                config_dimensions.append(dimension)
+
+        return config_dimensions
+
+    def build_views(self, additional_config):
+        """Generate one view for each indicator in the table."""
+        config_views = []
+        for _, indicator in self.df_dims.iterrows():
+            view = {
+                "dimensions": {dim_name: indicator[dim_name] for dim_name in self.dimension_names},
+                "indicators": {
+                    "y": f"{self.short_name}#{indicator.short_name}",  # TODO: Add support for (i) support "x", "color", "size"; (ii) display settings
+                },
+            }
+            if additional_config:
+                view["config"] = additional_config
+            config_views.append(view)
+
+        return config_views
 
 
 def _build_df_dims(tb):
@@ -314,3 +334,21 @@ def _build_df_dims(tb):
     cols_dims = [col for col in df_dims.columns if col not in ["indicator", "short_name"]]
     df_dims = df_dims[["indicator"] + sorted(cols_dims) + ["short_name"]]
     return df_dims
+
+
+def _sanity_checks(indicator_name, df_dims):
+    """Sanity checks of df_Dims."""
+    # List with names of indicators and dimensions
+    indicator_names = list(df_dims["indicator"].unique())
+
+    # If no indicator name is provided, there should only be one in the table!
+    if indicator_name is None:
+        if len(indicator_names) != 1:
+            raise ValueError("There are multiple indicators, but no `indicator_name` was provided.")
+        # If only one indicator available, set it as the indicator name
+        indicator_name = indicator_names[0]
+    # If indicator name is given, make sure it is present in the table!
+    if indicator_name not in indicator_names:
+        raise ValueError(
+            f"Indicator `{indicator_name}` not found in the table. Available are: {', '.join(indicator_names)}"
+        )
