@@ -22,9 +22,9 @@ def run(dest_dir: str) -> None:
     # 3: Combine both sources (basically dimensions and views)
     config["dimensions"] = multidim.combine_config_dimensions(
         config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config["dimensions"],
+        config_dimensions_yaml=config.get("dimensions", {}),
     )
-    config["views"] = config["views"] + config_new["views"]
+    config["views"] = config.get("views", []) + config_new["views"]
 
     # 4: Upsert to DB
     multidim.upsert_multidim_data_page(
