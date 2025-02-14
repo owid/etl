@@ -343,3 +343,6 @@ steps:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital_proj
   data://grapher/demography/2024-12-06/wittgenstein_human_capital:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital
+
+  export://multidim/un/latest/un_wpp_population:
+    - data://grapher/un/2024-07-12/un_wpp
