@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
 
     # 4: Upsert to DB
     multidim.upsert_multidim_data_page(
-        fname_to_slug("covid.mobility.yml"),
+        "mdd-population-un",
         config,
         engine,
         paths.dependencies,
