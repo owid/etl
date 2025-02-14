@@ -165,3 +165,8 @@ steps:
   #
   data://grapher/emissions/2025-02-12/ceds_air_pollutants:
     - data://garden/emissions/2025-02-12/ceds_air_pollutants
+  #
+  # Emissions - Air pollution explorer
+  #
+  export://explorers/emissions/latest/air_pollution:
+    - data://grapher/emissions/2025-02-12/ceds_air_pollutants
