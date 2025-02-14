@@ -56,12 +56,12 @@ def run(dest_dir: str) -> None:
     )
 
     # Combine dimension info from YAML + programmatically obtained
-    config_new["dimensions"] = multidim.combine_config_dimensions(
+    config["dimensions"] = multidim.combine_config_dimensions(
         config_dimensions=config_new["dimensions"],
         config_dimensions_yaml=config["dimensions"],
     )
 
-    # # Combine views info from YAML + programmatically obtained
+    # Combine views info from YAML + programmatically obtained
     config["views"] = config["views"] + config_new["views"]
 
     # Upsert to DB
