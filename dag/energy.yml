@@ -177,7 +177,9 @@ steps:
   # Multi-dim indicators
   #
   export://multidim/energy/latest/energy:
-    - grapher://grapher/energy/2024-06-20/primary_energy_consumption
+    - data://grapher/energy/2024-06-20/primary_energy_consumption
+    - data://grapher/energy/2024-06-20/energy_mix
+
   #
   # IRENA - Renewable electricity capacity.
   #

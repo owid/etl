@@ -1,8 +1,6 @@
 from pathlib import Path
 from typing import Any
 
-from owid.catalog import utils
-
 from etl import multidim
 from etl.db import get_engine
 from etl.helpers import PathFinder
@@ -14,13 +12,13 @@ CURRENT_DIR = Path(__file__).parent
 
 
 def run(dest_dir: str) -> None:
-    # Load YAML file
-    config = utils.dynamic_yaml_to_dict(utils.dynamic_yaml_load(CURRENT_DIR / "energy.yml"))
+    # Load configuration from adjacent yaml file.
+    config = paths.load_mdim_config()
 
     config["views"] += create_views()
 
     # Upsert it to MySQL
-    multidim.upsert_multidim_data_page("mdd-energy", config, get_engine())
+    multidim.upsert_multidim_data_page("mdd-energy", config, get_engine(), dependencies=paths.dependencies)
 
 
 def create_views() -> list[dict]:
@@ -87,7 +85,7 @@ def create_views() -> list[dict]:
                 {
                     "dimensions": {"source": source, "metric": metric},
                     "indicators": {
-                        "y": f"grapher/energy/2024-06-20/energy_mix/energy_mix#{indicator}",
+                        "y": f"energy_mix#{indicator}",
                     },
                     "config": grapher_config,
                 }
