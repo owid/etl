@@ -8,6 +8,8 @@ definitions:
       numDecimalPlaces: 0
     processing_level: minor
     unit: cases
+dataset:
+  title: Global Tuberculosis Report - Treatment Outcomes
 tables:
   outcomes:
     variables:
