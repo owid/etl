@@ -956,7 +956,7 @@ steps:
     - data://garden/who/2025-01-28/vaccine_safety
 
   #
-  # TODO: add step name (just something recognizable)
+  # GAVI Eligibility
   #
   data://meadow/gavi/2025-02-11/eligibility:
     - snapshot://gavi/2025-02-11/eligibility.csv
@@ -965,9 +965,9 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/gavi/2025-02-11/eligibility:
     - data://garden/gavi/2025-02-11/eligibility
-  
+
   #
-  # TODO: add step name (just something recognizable)
+  # Vaccine confidence
   #
   data://meadow/health/2025-02-13/vaccine_confidence:
     - snapshot://health/2025-02-13/vaccine_confidence.csv
