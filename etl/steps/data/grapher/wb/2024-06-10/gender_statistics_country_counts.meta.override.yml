@@ -11,3 +11,13 @@ tables:
             The value of different jobs can be measured by looking at factors like skills, effort, responsibility, and working conditions. However, proving that jobs are of equal value can be difficult because different roles may require different expertise, take place in different environments, or have historically been valued unequally.
           - |-
             For example, in the UK legal case of Julie Hayward v. Cammell Laird Shipbuilders (1988), a female cook argued that her job was just as valuable as those of male painters and joiners working in the shipyard, who were paid more. She won her case, but only after an independent expert carefully assessed the demands of each role.
+      sg_law_eqrm_wk_no_pop:
+        description_key:
+          - |-
+            "Equal pay for work of equal value" means that employees should be paid the same by their employer if their jobs require similar skills, effort, responsibility, and working conditions, even if the jobs themselves are different. This is also called "pay equity."
+          - |-
+            "Pay equity" goes further than "equal pay for equal work," which only ensures that employees in the same job get the same pay.
+          - |-
+            The value of different jobs can be measured by looking at factors like skills, effort, responsibility, and working conditions. However, proving that jobs are of equal value can be difficult because different roles may require different expertise, take place in different environments, or have historically been valued unequally.
+          - |-
+            For example, in the UK legal case of Julie Hayward v. Cammell Laird Shipbuilders (1988), a female cook argued that her job was just as valuable as those of male painters and joiners working in the shipyard, who were paid more. She won her case, but only after an independent expert carefully assessed the demands of each role.
