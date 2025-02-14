@@ -17,6 +17,7 @@ def run(dest_dir: str) -> None:
     config = paths.load_mdim_config()
 
     # Add views for all dimensions
+    # NOTE: using load_data=False which only loads metadata significantly speeds this up
     table = paths.load_dataset("gbd_cause").read("gbd_cause_deaths", load_data=False)
 
     # Individual causes
