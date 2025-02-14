@@ -17,7 +17,7 @@ def run(dest_dir: str) -> None:
     config = paths.load_mdim_config()
 
     # Add views for all dimensions
-    table = paths.load_dataset("gbd_cause").read("gbd_cause_deaths")
+    table = paths.load_dataset("gbd_cause").read("gbd_cause_deaths", load_data=False)
 
     # Individual causes
     config["views"] += multidim.expand_views(config, {"metric": "*", "age": "*", "cause": "*"}, table, engine)
