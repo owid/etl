@@ -1,0 +1,39 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Climate Change
+    display:
+        yearIsDay: true
+        zeroDay: "1949-01-01"
+    processing_level: minor
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 31
+  title: Equatorial Pacific Sea Surface Temperatures (SST) data - El Niño or La Niña by month
+
+
+tables:
+  sst:
+    variables:
+      nino_classification:
+       title: El Niño or La Niña according to Oceanic Niño Index (ONI) by month
+       presentation:
+        title_public: El Niño or La Niña according to Oceanic Niño Index (ONI)
+
+      oni_anomaly:
+        title: Oceanic Niño Index (ONI) anomaly by month
+        unit: ""
+        presentation:
+          title_public: Oceanic Niño Index (ONI) anomaly
+
+      colour_date:
+        title: Date colour code
+        unit: ""
+        presentation:
+          title_public: Date
+
+
