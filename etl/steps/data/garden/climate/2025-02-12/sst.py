@@ -20,7 +20,16 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    tb["nino_classification"] = tb.apply(classify_nino_anomaly, axis=1)
+    # Fill NA values with a number that won't affect classification
+    tb["oni_anomaly"] = tb["oni_anomaly"].fillna(0)
+
+    # Classify NINO3.4 and NINO4 anomaly values
+    tb["nino_classification"] = tb["oni_anomaly"].copy()
+    tb.loc[tb["oni_anomaly"] > 0.5, "nino_classification"] = 1
+    tb.loc[tb["oni_anomaly"] < -0.5, "nino_classification"] = 2
+    tb.loc[(tb["oni_anomaly"] >= -0.5) & (tb["oni_anomaly"] <= 0.5), "nino_classification"] = 0
+    tb["nino_classification"] = tb["nino_classification"].astype(int)
+
     for col in ["nino_classification"]:
         tb[col].metadata.origins = tb["nino3_4_anomaly"].metadata.origins
 
@@ -38,15 +47,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-
-def classify_nino_anomaly(row):
-    # Fill NA values with a number that won't affect classification
-    row = row.fillna(0)
-    # Classify NINO3.4 and NINO4 anomaly values
-    if row["oni_anomaly"] > 0.5:
-        return 1  # "El Niño"
-    elif row["oni_anomaly"] < -0.5:
-        return 2  # "La Niña"
-    else:
-        return 0  # "Neutral"

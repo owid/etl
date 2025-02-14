@@ -4,7 +4,9 @@ definitions:
     presentation:
       topic_tags:
         - Climate Change
-    processing_level: major
+    display:
+        zeroDay: "1949-01-01"
+    processing_level: minor
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -20,22 +22,17 @@ tables:
        title: El Niño or La Niña according to Oceanic Niño Index (ONI) by month
        presentation:
         title_public: El Niño or La Niña according to Oceanic Niño Index (ONI)
-       display:
-        yearIsDay: True
-        zeroDay: "1949-01-01"
+
       oni_anomaly:
         title: Oceanic Niño Index (ONI) anomaly by month
         unit: ""
         presentation:
           title_public: Oceanic Niño Index (ONI) anomaly
-        display:
-          yearIsDay: True
-          zeroDay: "1949-01-01"
+
       colour_date:
         title: Date colour code
         unit: ""
         presentation:
           title_public: Date
-        display:
-          yearIsDay: True
-          zeroDay: "1949-01-01"
+
+

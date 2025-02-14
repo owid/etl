@@ -39,8 +39,7 @@ def run(dest_dir: str) -> None:
         lambda row: 0 if row["nino_classification"] == 0 else row["colour_date"],
         axis=1,
     )
-    tb["colour_date"].metadata.origins = tb["oni_anomaly"].metadata.origins
-
+    tb["colour_date"] = tb["colour_date"].copy_metadata(tb["oni_anomaly"])
     # Create date_as_country column (keep uncommented but might use in the future)
     # tb["date_as_country"] = tb["date"].dt.strftime("%B %Y")
 

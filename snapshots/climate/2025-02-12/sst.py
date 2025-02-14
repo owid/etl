@@ -19,6 +19,7 @@ BASE_URL = "https://www.cpc.ncep.noaa.gov/data/indices/sstoi.indices"
 def season_to_month(season: str) -> int:
     """
     Convert the season string to the corresponding month.
+    We are mapping to the last month as the La Niña and El Niño events are classified based on the average temperature of the ocean surface in the previous three months.
 
     Parameters:
     season (str): The season string (e.g., "DJF").

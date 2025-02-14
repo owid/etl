@@ -4,18 +4,22 @@ definitions:
     presentation:
       topic_tags:
         - Climate Change
-    processing_level: major
+    processing_level: minor
     description_key:
       - The Oceanic Niño Index (ONI) is a tool used by the National Oceanic and Atmospheric Administration (NOAA) to monitor and track the presence and intensity of El Niño and La Niña events.
       - These events are part of the broader El Niño-Southern Oscillation (ENSO), a natural climate pattern that affects global weather patterns, including rainfall, droughts, and hurricane activity.
       - The ONI measures deviations in sea surface temperatures (SSTs) in a specific area of the Pacific Ocean, known as the Niño 3.4 region. This region spans from 120°W to 170°W longitude, along the equator, in the east-central tropical Pacific.
       - NOAA calculates the ONI by taking a 3-month running mean of SST anomalies. An anomaly is the difference between observed SSTs and the 30-year climatological average for the same period. NOAA periodically updates the baseline period to ensure consistency with long-term climate trends. For example, the 1991–2020 average is often used.
-      - El Niño (ONI ≥ +0.5°C) Warmer-than-usual SSTs in the Niño 3.4 region, often bringing drier conditions to Asia and Australia, wetter weather to the southern U.S., and weakened trade winds.
       - El Niño (ONI ≥ +0.5°C) occurs when sea surface temperatures in the Niño 3.4 region are warmer than usual, often bringing drier conditions to Asia and Australia, wetter weather to the southern United States, and weakened trade winds.
+      - El Niño can lead to weaker Atlantic hurricane seasons but stronger and more frequent Pacific hurricanes.
       - Neutral (−0.5°C < ONI < +0.5°C) means sea surface temperatures are near average, with no significant ENSO event.
       - La Niña (ONI ≤ −0.5°C) happens when sea surface temperatures are cooler than usual, often causing drier conditions in South America, increased rainfall in Indonesia and northern Australia, and stronger trade winds.
-      - El Niño can lead to weaker Atlantic hurricane seasons but stronger and more frequent Pacific hurricanes.
       - La Niña tends to cause more hurricanes in the Atlantic and drought conditions in the southern U.S.
+    description_from_producer: |-
+     - El Niño (La Niña) is a phenomenon in the equatorial Pacific Ocean characterized by a five consecutive 3-month running mean of sea surface temperature (SST) anomalies in the Niño 3.4 region that is above (below) the threshold of +0.5°C (-0.5°C). This standard of measure is known as the Oceanic Niño Index (ONI).
+     - Historically, scientists have classified the intensity of El Niño based on SST anomalies exceeding a pre-selected threshold in a certain region of the equatorial Pacific. The most commonly used region is the Niño 3.4 region, and the most commonly used threshold is a positive SST departure from normal greater than or equal to +0.5°C. Since this region encompasses the western half of the equatorial cold tongue region, it provides a good measure of important changes in SST and SST gradients that result in changes in the pattern of deep tropical convection and atmospheric circulation. The criteria, that is often used to classify El Niño episodes, is that five consecutive 3-month running mean SST anomalies exceed the threshold.
+     - Studies have shown that a necessary condition for the development and persistence of deep convection (enhanced cloudiness and precipitation) in the Tropics is that the local SST be 28°C or greater. Once the pattern of deep convection has been altered due to anomalous SSTs, the tropical and subtropical atmospheric circulation adjusts to the new pattern of tropical heating, resulting in anomalous patterns of precipitation and temperature that extend well beyond the region of the equatorial Pacific. An SST anomaly of +0.5°C in the Niño 3.4 region is sufficient to reach this threshold from late March to mid-June. During the remainder of the year a larger SST anomaly, up to +1.5°C in November-December-January, is required in order to reach the threshold to support persistent deep convection in that region.
+     - SST values in the Niño 3.4 region may not be the best choice for determining La Niña episodes but, for consistency, the index has been defined by negative anomalies in this area. A better choice might be the Niño 4 region, since that region normally has SSTs at or above the threshold for deep convection throughout the year. An SST anomaly of -0.5°C in that region would be sufficient to bring water temperatures below the 28°C threshold, which would result in a significant westward shift in the pattern of deep convection in the tropical Pacific.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
