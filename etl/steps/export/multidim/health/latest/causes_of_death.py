@@ -21,9 +21,11 @@ def run(dest_dir: str) -> None:
     table = paths.load_dataset("gbd_cause").read("gbd_cause_deaths", load_data=False)
 
     # Individual causes
-    config["views"] += multidim.expand_views(config, {"metric": "*", "age": "*", "cause": "*"}, table, engine)
+    config["views"] += multidim.expand_views_with_access_db(
+        config, {"metric": "*", "age": "*", "cause": "*"}, table, engine
+    )
     # Show all causes in a single view
-    config["views"] += multidim.expand_views(
+    config["views"] += multidim.expand_views_with_access_db(
         config, {"metric": "*", "age": "*", "cause": "Side-by-side comparison of causes"}, table, engine
     )
 
