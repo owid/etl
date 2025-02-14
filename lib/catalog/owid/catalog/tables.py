@@ -335,8 +335,13 @@ class Table(pd.DataFrame):
         return self
 
     @classmethod
-    def _add_metadata(cls, tb: "Table", path: str, primary_key: Optional[list[str]] = None) -> None:
+    def _add_metadata(
+        cls, tb: "Table", path: str, primary_key: Optional[list[str]] = None, load_data: bool = True
+    ) -> None:
         """Read metadata from JSON sidecar and add it to the dataframe."""
+        if not load_data:
+            log.warning("Using load_data=False is only supported when reading feather format.")
+
         metadata = cls._read_metadata(path)
 
         if primary_key is None:
