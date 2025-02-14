@@ -30,7 +30,7 @@ def run(dest_dir: str) -> None:
         "covid.covax.yml",
         "covid.models.yml",
         "covid.xm_models.yml",
-        "covid.vax_breakdowns.yml",
+        # "covid.vax_breakdowns.yml",
         "covid.cases_tests.yml",
     ]
     for fname in filenames:
