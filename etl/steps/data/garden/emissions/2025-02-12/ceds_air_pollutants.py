@@ -359,16 +359,6 @@ def run(dest_dir: str) -> None:
         ]
     )
 
-    # Create an "All pollutants" aggregate.
-    tb = pr.concat(
-        [
-            tb,
-            tb.groupby(["sector", "country", "year"], as_index=False, observed=True)
-            .agg({"emissions": "sum"})
-            .assign(**{"pollutant": "All pollutants"}),
-        ]
-    )
-
     # Add region aggregates.
     tb = geo.add_regions_to_table(
         tb=tb,
