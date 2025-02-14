@@ -157,6 +157,9 @@ steps:
   #
   data://garden/emissions/2025-02-12/ceds_air_pollutants:
     - data://meadow/emissions/2025-02-12/ceds_air_pollutants
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/demography/2024-07-15/population
   #
   # Hoesly et al. (2024): CEDS air pollutants
   #

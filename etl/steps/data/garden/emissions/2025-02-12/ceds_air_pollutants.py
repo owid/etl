@@ -302,6 +302,11 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("ceds_air_pollutants")
 
+    # Load auxiliary dataset of regions, income groups, and population.
+    ds_regions = paths.load_dataset("regions")
+    ds_income_groups = paths.load_dataset("income_groups")
+    ds_population = paths.load_dataset("population")
+
     # Read tables from meadow dataset.
     # The "detailed" table contains emissions for each pollutant, country, sector, fuel, and year (a column for each year). There is an additional column for units, but they are always the same for each pollutant.
     # The "bunkers" table contains only data on international aviation and shipping, and domestic aviation, at the country level.
@@ -332,10 +337,24 @@ def run(dest_dir: str) -> None:
 
     # Restructure table to have year as a column.
     tb = tb.rename(columns={column: int(column[1:]) for column in tb.columns if column.startswith("x")})
-    tb = tb.melt(id_vars=["pollutant", "country", "sector"], var_name="year", value_name="value")
+    tb = tb.melt(id_vars=["pollutant", "country", "sector"], var_name="year", value_name="emissions")
 
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Add region aggregates.
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        index_columns=["country", "year", "pollutant", "sector"],
+    )
+
+    # Add per capita variables.
+    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+    tb["emissions_per_capita"] = tb["emissions"] / tb["population"]
+
+    # TODO: Create an "all sectors" aggregate sector, and an "All pollutants" aggregate pollutant.
 
     # Improve table format.
     tb = tb.format(["country", "year", "pollutant", "sector"])
