@@ -61,16 +61,44 @@ def run(dest_dir: str) -> None:
     df_graphers["Per capita Checkbox"] = per_capita_checkbox
     df_graphers["hasMapTab"] = map_tab
 
-    # Impose that all line charts start at zero.
-    df_graphers["yAxisMin"] = 0
-
     # Sanity check.
     error = "Duplicated rows in explorer."
     assert df_graphers[
         df_graphers.duplicated(subset=["Pollutant Dropdown", "Sector Dropdown", "Per capita Checkbox"], keep=False)
     ].empty, error
 
+    # Create view for all pollutants.
+    # Omit CH4 and N20 in this view.
+    for per_capita in [False, True]:
+        _columns = [
+            f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"
+            for column in tb.columns
+            if column.endswith("all_sectors")
+            if (("per_capita" in column) == per_capita)
+            if "_ch4_" not in column
+            if "_n2o_" not in column
+        ]
+        df_graphers = pd.concat(
+            [
+                df_graphers,
+                pd.DataFrame(
+                    {
+                        "yVariableIds": [_columns],
+                        "Pollutant Dropdown": "All pollutants",
+                        "Sector Dropdown": "All sectors",
+                        "Per capita Checkbox": per_capita,
+                        "hasMapTab": False,
+                        "selectedFacetStrategy": "metric",
+                        "facetYDomain": "independent",
+                    }
+                ),
+            ]
+        )
+
     # TODO: Consider creating breakdown by sector.
+
+    # Impose that all line charts start at zero.
+    df_graphers["yAxisMin"] = 0
 
     # Sort rows conveniently.
     df_graphers = df_graphers.sort_values(["Pollutant Dropdown", "Sector Dropdown", "Per capita Checkbox"]).reset_index(

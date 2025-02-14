@@ -345,6 +345,10 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
+    # TODO: It seems that CH4 and N20 have only non-zero data from 1970 onwards, and all data is exactly zero right before this year.
+    # These are probably spurious zeros. So, assert that prior to 1970 all data for these two pollutants is zero, and remove those points.
+    # TODO: I noticed that World is smaller than individual countries, e.g. for NOx all sectors. What's going on here, is "global" only given for certain sectors? If so, recalculate aggregate.
+
     # Convert units from kilotonnes to tonnes.
     tb["emissions"] *= 1e3
 
