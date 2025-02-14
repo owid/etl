@@ -31,7 +31,8 @@ def run(dest_dir: str) -> None:
         "covid.models.yml",
         "covid.xm_models.yml",
         "covid.cases_tests.yml",
-        # "covid.vax_breakdowns.yml",    ]
+        # "covid.vax_breakdowns.yml",
+    ]
     for fname in filenames:
         paths.log.info(fname)
         multidim.upsert_multidim_data_page(
