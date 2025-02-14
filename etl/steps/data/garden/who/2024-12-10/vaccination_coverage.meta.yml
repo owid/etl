@@ -55,13 +55,13 @@ definitions:
     <%- endif %>
   antigen_description_key: |-
     <% if antigen == "MCV1" %>
-    In countries where the national schedule recommends the 1st dose of MCV at 12 months or later based on the epidemiology of disease in the country, coverage estimates reflect the percentage of children who received the 1st dose of MCV as recommended.
+    In countries where the national schedule recommends their first dose measles vaccine at 12 months or later based on the epidemiology of disease in the country, coverage estimates reflect the percentage of children who received their first dose of measles vaccine as recommended.
     <%- elif antigen == "RCV1" %>
     Coverage estimates are based on WHO and UNICEF estimates of coverage for the dose of measles containing vaccine that corresponds to the first measles-rubella combination vaccine.
     <%- elif antigen == "HEPB_BD" %>
     Estimates of hepatitis B birth dose coverage are produced only for countries with a universal birth dose policy. Estimates are not produced for countries that recommend a birth dose to infants born to HepB virus-infected mothers only or where there is insufficient information to determine whether vaccination is within 24 hours of birth.
     <%- elif antigen == "PCV3" %>
-    In countries where the national schedule recommends two doses during infancy and a booster dose at 12 months or later based on the epidemiology of disease in the country, coverage estimates may reflect the percentage of surviving infants who received two doses of PcV prior to the 1st birthday.
+    In countries where the national schedule recommends two doses during infancy and a booster dose at 12 months or later based on the epidemiology of disease in the country, coverage estimates may reflect the percentage of surviving infants who received two doses of pneumococcal conjugate vaccine prior to their 1st birthday.
     <%- elif antigen == "IPV1" %>
     In countries utilizing an immunization schedule recommending either (i) a primary series of three doses of oral polio vaccine (OPV) plus at least one dose of IPV where OPV is included in routine immunization and/or campaign or (ii) a sequential schedule of IPV followed by OPV, WHO and UNICEF estimates for IPV1 reflect coverage with at least one routine dose of IPV among infants <1 year of age among countries. For countries utilizing IPV containing vaccine use only, i.e., no recommended dose of OPV, the WHO and UNICEF estimate for IPV1 corresponds to coverage for the 1st dose of IPV. Production of IPV coverage estimates, which begins in 2015, results in no change of the estimated coverage levels for the 3rd dose of polio (Pol3). For countries recommending routine immunization with a primary series of three doses of IPV alone, WHO and UNICEF estimated Pol3 coverage is equivalent to estimated coverage with three doses of IPV. For countries with a sequential schedule, estimated Pol3 coverage is based on that for the 3rd dose of polio vaccine regardless of vaccine type.
     <%- endif %>
