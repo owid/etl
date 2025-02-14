@@ -222,6 +222,10 @@
         }
       }
     },
+    "macros": {
+      "type": "string",
+      "description": "Custom Jinja macros. Can be imported with {macros}."
+    },
     "dataset": {
       "type": "object",
       "description": "An ETL dataset is a collection of tables. The dataset metadata fields are the attributes of the `DatasetMeta` object in ETL.",
