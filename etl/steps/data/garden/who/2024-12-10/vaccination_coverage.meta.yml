@@ -12,10 +12,8 @@ definitions:
   description_key_standard_one: |-
     The current release of the WUENIC with data up to 2023 (released in 2024) includes estimates for WHO Member States, including those that did not report 2023 data. For these non-reporting countries, estimates were extrapolated from the last point informed by empirical data.
   description_key_standard_two: |-
-    Global and regional coverages, values were extrapolated from 2022 for non-reporting countries.
+    Global and regional coverages, values were extrapolated from 2022 for non-reporting countries. Non-reporting countries represent approximately 5% of the global 2023 cohort.
   description_key_standard_three: |-
-    Non-reporting countries represent approximately 5% of the global 2023 cohort.
-  description_key_standard_four: |-
     These estimates are based on quantitative data: 1) Country reported coverage data (official and administrative coverage) and 2) survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate). As such, these estimates are affected by the availability and quality of the underlying data.
   antigen_description: |-
     <% if antigen == "BCG" %>
@@ -112,7 +110,6 @@ tables:
           - "{definitions.description_key_standard_one}"
           - "{definitions.description_key_standard_two}"
           - "{definitions.description_key_standard_three}"
-          - "{definitions.description_key_standard_four}"
           - "{definitions.antigen_description_key}"
         unit: "%"
         short_unit: "%"
@@ -126,7 +123,6 @@ tables:
           - "{definitions.description_key_standard_one}"
           - "{definitions.description_key_standard_two}"
           - "{definitions.description_key_standard_three}"
-          - "{definitions.description_key_standard_four}"
           - "{definitions.antigen_description_key}"
         display:
           numDecimalPlaces: 0
@@ -138,7 +134,6 @@ tables:
           - "{definitions.description_key_standard_one}"
           - "{definitions.description_key_standard_two}"
           - "{definitions.description_key_standard_three}"
-          - "{definitions.description_key_standard_four}"
           - "{definitions.antigen_description_key}"
         display:
           numDecimalPlaces: 0
@@ -152,7 +147,6 @@ tables:
           - "{definitions.description_key_standard_one}"
           - "{definitions.description_key_standard_two}"
           - "{definitions.description_key_standard_three}"
-          - "{definitions.description_key_standard_four}"
           - "{definitions.antigen_description_key}"
         display:
           numDecimalPlaces: 0
@@ -164,7 +158,6 @@ tables:
           - "{definitions.description_key_standard_one}"
           - "{definitions.description_key_standard_two}"
           - "{definitions.description_key_standard_three}"
-          - "{definitions.description_key_standard_four}"
           - "{definitions.antigen_description_key}"
         display:
           numDecimalPlaces: 0
