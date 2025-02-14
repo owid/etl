@@ -1,0 +1,67 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+    unit: ""
+    display:
+      numDecimalPlaces: 0
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  vaccine_safety:
+    variables:
+      burial_recommended:
+        title: Is burial a recommended practice for disposal of immunization waste?
+        description_short: Burial is the burying of waste materials in a secured and fenced-off burial site.
+      burning_recommended:
+        title: Is burning in open containers a recommended practice for disposal of immunization waste?
+        description_short: Burning of waste in open containers is not encouraged and should be considered as a last resort to dispose packaging, paper, cardboard. It is not an acceptable practice for PVC, plastics or pharmaceutical products.
+      encapsulation_recommended:
+        title: Is encapsulation a recommended practice for disposal of immunization waste?
+        description_short: Encapsulation involves filling a plastic or steel drum with solid and semi-solid wastes up to 75% capacity and pouring in impervious material (i.e. cement or cement/lime mixture, plastic foam or bituminous sand) to immobilize the wastes.
+      engineered_sanitary_landfill_recommended:
+        title: Is engineered sanitary landfill a recommended practice for disposal of immunization waste?
+        description_short: Engineered sanitary landfill involves safely disposing wastes into a properly constructed and operated landfill designed to protect the aquifer. An appropriate landfill consists of an evacuated pit isolated from watercourses and above the water table.
+      incineration_recommended:
+        title: Is incineration a recommended practice for disposal of immunization waste?
+        description_short: Incineration is the controlled burning of vials in a furnace/ incinerator at temperatures >800C.
+      inertization_recommended:
+        title: Is inertization a recommended practice for disposal of immunization waste?
+        description_short: Inertization is the removal of the packaging materials, paper, cardboard and plastic, from the pharmaceutical products, then grounding and mixing water, lime and cement to form a paste. The paste is transported and poured into the normal urban waste.
+      national_policy_waste:
+        title: Does the country have a national policy for the disposal of immunization waste?
+      national_system_monitor_adverse_events:
+        title: National system to monitor vaccine adverse events
+        description_from_producer: |-
+          A national system must include ALL of the following: 1) written guidelines on monitoring and investigation of reported adverse events; 2) a written list of events to monitor; 3) an established mechanism to communicate data for regulatory action; and 4) implementation of points 1, 2 and 3. If any of the four conditions are not met, countries are instructed to report 'No'. How many total adverse events, including suspected or confirmed, were reported to the national level? Countries are instructed to include ALL cases that are documented from ALL sources, i.e. cases that have at least a reporting form and/or are line listed from routine, campaigns, immunization weeks, school health programs, etc.
+      other_recommended_practices:
+        title: Are there other recommended practices for disposal of immunization waste?
+        description_short: Other refers to any waste-disposal policy or practice that is not listed elsewhere.
+      recycling_recommended:
+        title: Is recycling a recommended practice for disposal of immunization waste?
+        description_short: "If a recycling programme exists, items can be reused (i.e.: glassware can be given to laboratories, mechanical items given to scrap dealers) or recycled (if facilities are available). Depending on the type of material and its proposed reuse, appropriate treatment, such as cleaning or disinfection, may be needed."
+      serious_adverse_events:
+        title: Serious adverse events reported
+        description_short: "An adverse event from immunization is serious if it results in death, is life-threatening, requires in-patient hospitalization or prolongation of existing hospitalization, results in persistent or significant incapacity, or causes a congenital anomaly/birth defect."
+        unit: adverse events
+        description_from_producer: |-
+          An adverse event from immunization will be considered serious if it results in death, is life-threatening, requires in-patient hospitalization or prolongation of existing hospitalization, results in persistent or significant disability/incapacity, or is a congenital anomaly/birth defect. Other situations, such as other important medical events that may jeopardize the patient or may require intervention to prevent one of the outcomes above, should also be considered serious after applying medical and scientific judgment.
+      source_data_serious_adverse_events:
+        title: What is the source of data for the total number of serious adverse events reported?
+        description_from_producer: |-
+          Where the reports were sourced from for AEFI cases, the "EPI program" or the 'National Regulatory Authority'? Countries are instructed to select 'Both EPI and NRA jointly' if the data from both sources have been pooled together. If it is obtained from another source (such as a National Pharmacovigilance center or manufacturer), instructions state to select 'Other'.
+      source_data_total_adverse_events:
+        title: What is the source of data for the total number of adverse events reported?
+        description_from_producer: |-
+          Where the reports were sourced from for AEFI cases, the "EPI program" or the 'National Regulatory Authority'? Countries are instructed to select 'Both EPI and NRA jointly' if the data from both sources have been pooled together. If it is obtained from another source (such as a National Pharmacovigilance center or manufacturer), instructions state to select 'Other'.
+      total_adverse_events_reported:
+        title: Adverse events reported
+      vaccine_adverse_events_review_committee:
+        title: Vaccine adverse events review committee'
+        description_from_producer: Adverse events review committee is an independent committee of recognized experts that provides technical advice and recommendations to the government regarding vaccine safety issues. The adverse events review committee is a tool that enables the government to assess vaccine safety issues through a transparent, systematic process. The adverse events review committees are composed of recognized national experts, independent from the immunization program and the national regulatory authority, and their primary function should focus on offering technical recommendations.

@@ -1,7 +1,11 @@
 definitions:
   common:
     processing_level: major
+    display: &common-display
+      numDecimalPlaces: 0
+      tolerance: 5
     presentation:
+      attribution_short: Penn World Table
       topic_tags:
         - Economic Growth
     sources: []
@@ -21,6 +25,16 @@ definitions:
         license:
           name: Creative Commons BY 4.0
           url: https://www.rug.nl/ggdc/productivity/pwt
+
+  description_key_gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
+  description_key_gdp_per_capita: GDP per capita is GDP divided by population.
+  description_key_medium_run: This indicator provides information on economic growth and income levels in the _medium run_. Some country estimates are available as far back as 1950.
+  description_key_ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
+  description_key_ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices, using a multiple benchmark approach that incorporates PPP estimates from all available benchmark years.
+
+  description_short_gdp: Total economic output of a country or region per year.
+  description_short_gdp_per_capita: Average economic output per person in a country or region per year.
+
 dataset:
   update_period_days: 550
   sources: []
@@ -33,32 +47,34 @@ tables:
         short_unit: $
         display:
           name: GDP per capita
-          numDecimalPlaces: 0
-        description_short: This data is adjusted for inflation and for differences in the cost of living between countries.
+          <<: *common-display
+        description_short: "{definitions.description_short_gdp_per_capita} {definitions.description_key_ppp_adjustment}"
         description_key:
-          - This GDP per capita indicator provides information on economic growth and income levels in the medium run. Some country estimates are available as far back as 1950.
-          - This data is adjusted for inflation and for differences in the cost of living between countries.
-          - This data is expressed in international-$ at 2017 prices, using multiple benchmark years to adjust for differences in the cost of living between countries over time.
-          - For GDP per capita estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison).
-          - For more up-to-date estimates of GDP per capita, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
+          - "{definitions.description_key_gdp} {definitions.description_key_gdp_per_capita}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices}"
+          - For GDP per capita estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-per-capita-maddison-project-database).
+          - For more regularly updated estimates of GDP per capita since 1990, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-per-capita-worldbank).
         description_from_producer: Output-side real GDP at chained PPPs (in mil. 2017US$) [From GDP description]
         description_processing: |
-          Estimated as the GDP (output, multiple price benchmarks) divided by the population of each country.
+          We estimated this indicator as the GDP (output, multiple price benchmarks) divided by the population of each country.
 
           This variable uses ICP PPP benchmarks from multiple years to correct for changing prices over time.
 
-          Values for Bermuda have been replaced by estimates on GDP per capita (output, single price benchmark) due to the unusual changes on prices in this country.
+          We replaced values for Bermuda with estimates on GDP per capita (output, single price benchmark) due to the unusual changes on prices in this country.
 
-          Values considered outliers from the original dataset (`i_outlier = "Outlier"`) have been excluded from the dataset, due to implausible relative prices (PPPs divided by exchange rates).
+          We excluded values considered outliers in the original dataset (`i_outlier = "Outlier"`), due to implausible relative prices (PPPs divided by exchange rates).
         presentation:
           title_public: GDP per capita
-          attribution_short: Penn World Table
+          title_variant: In constant international-$
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
             title: GDP per capita
             subtitle: This data is adjusted for inflation and for differences in the cost of living between countries.
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices, using multiple benchmark years to adjust for differences in the cost of living between countries over time.
             variantName: Penn World Table, constant international-$
             originUrl: https://ourworldindata.org/economic-growth
             hasMapTab: true
@@ -79,7 +95,7 @@ tables:
                   - 10000
                   - 20000
                   - 50000
-                  - 100000
+                  - 1
                 customNumericMinValue: 0
             selectedEntityNames:
               - Germany
@@ -90,5 +106,66 @@ tables:
               - India
               - France
               - South Korea
-            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices, using multiple benchmark years to adjust for differences in the cost of living between countries over time.
-            $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
+
+      rgdpo:
+        title: GDP (output, multiple price benchmarks)
+        unit: international-$ in 2017 prices
+        short_unit: $
+        display:
+          name: GDP
+          <<: *common-display
+        description_short: "{definitions.description_short_gdp} {definitions.description_key_ppp_adjustment}"
+        description_key:
+          - "{definitions.description_key_gdp}"
+          - "{definitions.description_key_medium_run}"
+          - "{definitions.description_key_ppp_adjustment}"
+          - "{definitions.description_key_ppp_prices}"
+          - For GDP estimates in the very long run, see the [Maddison Project Database's indicator](https://ourworldindata.org/grapher/gdp-maddison-project-database).
+          - For more regularly updated estimates of GDP since 1990, see the [World Bank's indicator](https://ourworldindata.org/grapher/gdp-worldbank).
+        description_from_producer: Output-side real GDP at chained PPPs (in mil. 2017US$)
+        presentation:
+          title_public: Gross domestic product (GDP)
+          title_variant: In constant international-$
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+          grapher_config:
+            title: Gross domestic product (GDP)
+            subtitle: This data is adjusted for inflation and differences in living costs between countries.
+            note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices, using multiple benchmark years to adjust for differences in living costs between countries over time.
+            variantName: Penn World Table, constant international-$
+            originUrl: https://ourworldindata.org/economic-growth
+            map:
+              colorScale:
+                binningStrategy: manual
+                baseColorScheme: PuBu
+                customNumericValues:
+                  - 10000000000
+                  - 30000000000
+                  - 100000000000
+                  - 300000000000
+                  - 1000000000000
+                  - 3000000000000
+                  - 10000000000000
+                  - 1
+            selectedEntityNames:
+              - China
+              - United States
+              - India
+              - Japan
+              - Germany
+              - Russia
+              - Brazil
+              - United Kingdom
+              - France
+              - Mexico
+              - Venezuela
+            yAxis:
+              canChangeScaleType: true
+              min: 0
+            tab: map
+            hideRelativeToggle: false
+            hasMapTab: true
+
+
