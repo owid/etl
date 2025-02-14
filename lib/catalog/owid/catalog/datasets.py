@@ -161,6 +161,7 @@ class Dataset:
         reset_index: bool = True,
         safe_types: bool = True,
         reset_metadata: Literal["keep", "keep_origins", "reset"] = "keep",
+        load_data: bool = True,
     ) -> tables.Table:
         """Read dataset's table from disk. Alternative to ds[table_name], but
         with more options to optimize the reading.
@@ -173,15 +174,17 @@ class Dataset:
             - "keep": Leave metadata unchanged (default).
             - "keep_origins": Reset variable metadata but retain the 'origins' attribute.
             - "reset": Reset all variable metadata.
+        :param load_data: If false, only load metadata and not the actual data. This can be useful
+            when you only need to read metadata from a large dataset.
         """
         stem = self.path / Path(name)
 
         for format in SUPPORTED_FORMATS:
             path = stem.with_suffix(f".{format}")
             if path.exists():
-                t = tables.Table.read(path, primary_key=[] if reset_index else None)
+                t = tables.Table.read(path, primary_key=[] if reset_index else None, load_data=load_data)
                 t.metadata.dataset = self.metadata
-                if safe_types:
+                if safe_types and load_data:
                     t = cast(tables.Table, to_safe_types(t))
                 if reset_metadata in ["keep_origins", "reset"]:  # Handles "keep_origins" and "reset"
                     t.metadata = TableMeta()

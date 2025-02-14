@@ -351,7 +351,7 @@ class Table(pd.DataFrame):
             tb.set_index(primary_key, inplace=True)
 
     @classmethod
-    def read_feather(cls, path: Union[str, Path], **kwargs) -> "Table":
+    def read_feather(cls, path: Union[str, Path], load_data: bool = True, **kwargs) -> "Table":
         """
         Read the table from feather plus accompanying JSON sidecar.
 
@@ -364,7 +364,13 @@ class Table(pd.DataFrame):
             raise ValueError(f'filename must end in ".feather": {path}')
 
         # load the data and add metadata
-        df = Table(pd.read_feather(path))
+        if not load_data:
+            metadata = cls._read_metadata(path)
+            columns = list(metadata["fields"].keys())
+            df = Table(pd.DataFrame(columns=columns))
+        else:
+            df = Table(pd.read_feather(path))
+
         cls._add_metadata(df, path, **kwargs)
         return df
 

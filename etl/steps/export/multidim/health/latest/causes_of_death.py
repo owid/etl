@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import yaml
-
 from etl import multidim
 from etl.db import get_engine
 from etl.helpers import PathFinder
@@ -15,12 +13,12 @@ CURRENT_DIR = Path(__file__).parent
 def run(dest_dir: str) -> None:
     engine = get_engine()
 
-    # Load YAML file
-    with open(CURRENT_DIR / "causes_of_death.yml") as istream:
-        config = yaml.safe_load(istream)
+    # Load configuration from adjacent yaml file.
+    config = paths.load_mdim_config()
 
     # Add views for all dimensions
-    table = "grapher/ihme_gbd/2024-05-20/gbd_cause/gbd_cause_deaths"
+    table = paths.load_dataset("gbd_cause").read("gbd_cause_deaths")
+
     # Individual causes
     config["views"] += multidim.expand_views(config, {"metric": "*", "age": "*", "cause": "*"}, table, engine)
     # Show all causes in a single view

@@ -3,7 +3,7 @@ from itertools import product
 
 import pandas as pd
 import yaml
-from owid.catalog import Dataset
+from owid.catalog import Dataset, Table
 from sqlalchemy.engine import Engine
 from structlog import get_logger
 
@@ -141,7 +141,7 @@ def validate_multidim_config(config: dict, engine: Engine) -> None:
         raise ValueError(f"Missing indicators in DB: {missing_indicators}")
 
 
-def expand_views(config: dict, combinations: dict[str, str], table: str, engine: Engine) -> list[dict]:
+def expand_views(config: dict, combinations: dict[str, str], table: Table, engine: Engine) -> list[dict]:
     """Use dimensions from multidim config file and create views from all possible
     combinations of dimensions. Grapher table must use the same dimensions as the
     multidim config file. If the dimension is missing from groupby, it will be set to "all".
@@ -149,7 +149,7 @@ def expand_views(config: dict, combinations: dict[str, str], table: str, engine:
     :params config: multidim config file
     :params combinations: dictionary with dimension names as keys and values as dimension values, use * for all values
         e.g. {"metric": "*", "age": "*", "cause": "All causes"}
-    :params table: catalog path of the grapher table
+    :params table: Table object
     :params engine: SQLAlchemy engine
     """
 
@@ -161,7 +161,7 @@ def expand_views(config: dict, combinations: dict[str, str], table: str, engine:
             allowed_values.append(choice["name"])
         choices[choice_dict["slug"]] = allowed_values
 
-    df = fetch_variables_from_table(table, engine)
+    df = get_variables_from_table(table, engine)
 
     # Filter by allowed values
     for dim_name, allowed_values in choices.items():
@@ -192,7 +192,12 @@ def expand_views(config: dict, combinations: dict[str, str], table: str, engine:
     return views
 
 
-def fetch_variables_from_table(table: str, engine: Engine) -> pd.DataFrame:
+def get_variables_from_table(table: Table) -> pd.DataFrame:
+    # get metadata from variables
+    for col in table.columns:
+        table[col].m.catalogPath
+        table[col].m.dimensions
+
     # fetch variables from MySQL
     q = f"""
     select
