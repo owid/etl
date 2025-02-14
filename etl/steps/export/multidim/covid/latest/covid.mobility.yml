@@ -23,22 +23,22 @@ dimensions:
       - slug: all
         name: All places
         description: "See all places"
-      - slug: grocery_and_pharmacy
+      - slug: Grocery and pharmacy
         name: Grocery and pharmacy
         description: Grocery markets, food warehouses, farmers markets, specialty food shops, drug stores, and pharmacies.
-      - slug: parks
+      - slug: Parks
         name: Parks
         description: Local parks, national parks, public beaches, marinas, dog parks, plazas, and public gardens
-      - slug: residential
+      - slug: Residential
         name: Residential
         description: Places of residence
-      - slug: retail_and_recreation
+      - slug: Retail and recreation
         name: Retail and recreation
         description: Restaurants, cafes, shopping centers, theme parks, museums, libraries, and movie theaters
-      - slug: transit_stations
+      - slug: Transit stations
         name: Transit stations
         description: Public transport hubs such as subway, bus, and train stations
-      - slug: workplaces
+      - slug: Workplaces
         name: Workplaces
         description: Places of work
 
@@ -57,39 +57,3 @@ views:
     config:
       title: "How did the number of visitors change since the beginning of the pandemic?"
       <<: *config_base
-
-  - dimensions:
-      place: grocery_and_pharmacy
-    indicators:
-      y: "google_mobility#trend__place_grocery_and_pharmacy"
-    config: *config_base
-
-  - dimensions:
-      place: parks
-    indicators:
-      y: "google_mobility#trend__place_parks"
-    config: *config_base
-
-  - dimensions:
-      place: residential
-    indicators:
-      y: "google_mobility#trend__place_residential"
-    config: *config_base
-
-  - dimensions:
-      place: retail_and_recreation
-    indicators:
-      y: "google_mobility#trend__place_retail_and_recreation"
-    config: *config_base
-
-  - dimensions:
-      place: transit_stations
-    indicators:
-      y: "google_mobility#trend__place_transit_stations"
-    config: *config_base
-
-  - dimensions:
-      place: workplaces
-    indicators:
-      y: "google_mobility#trend__place_workplaces"
-    config: *config_base
