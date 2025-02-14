@@ -18,6 +18,9 @@ REGIONS = [
     "Europe",
     "Oceania",
 ]
+# Year ranges
+YEAR_MAX = 2025
+YEAR_MIN = 1997
 
 
 def run(dest_dir: str) -> None:
@@ -77,8 +80,8 @@ def run(dest_dir: str) -> None:
     tb_year["year"] = tb_year["year"].astype(str).astype(int)
 
     # Sanity check
-    assert tb_year["year"].max() == 2024
-    assert tb_year["year"].min() == 1997
+    assert tb_year["year"].max() == YEAR_MAX
+    assert tb_year["year"].min() == YEAR_MIN
 
     # Set index
     tb_month = tb_month.format(["country", "date"])
@@ -102,7 +105,7 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_regions(tb: Table, ds_regions: Dataset) -> Table:
+def add_regions(tb, ds_regions: Dataset) -> Table:
     "Add regions to the table."
     for region in REGIONS:
         # List of countries in region.
