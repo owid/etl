@@ -158,25 +158,27 @@ EXPECTED_UNITS = {
 
 
 def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
+    # Define list of data columns
+    data_columns = [column for column in tb_detailed.columns if column.startswith("x")]
     error = "Columns in detailed table have changed."
-    assert [column for column in tb_detailed.columns if not column.startswith("x")] == [
+    assert [column for column in tb_detailed.columns if column not in data_columns] == [
         "em",
         "country",
         "sector",
         "fuel",
         "units",
     ], error
-    assert set([int(column.replace("x", "")) for column in tb_detailed.columns if column.startswith("x")]) <= set(
+    assert set([int(column.replace("x", "")) for column in data_columns]) <= set(
         range(1750, 2023)
     ), error
     error = "Columns in bunkers table have changed."
-    assert [column for column in tb_bunkers.columns if not column.startswith("x")] == [
+    assert [column for column in tb_bunkers.columns if column not in data_columns] == [
         "em",
         "iso",
         "sector",
         "units",
     ], error
-    assert set([int(column.replace("x", "")) for column in tb_bunkers.columns if column.startswith("x")]) <= set(
+    assert set([int(column.replace("x", "")) for column in data_columns]) <= set(
         range(1750, 2023)
     ), error
     error = "List of subsectors in the detailed table has changed."
@@ -233,7 +235,7 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     assert set(
         tb_bunkers[
             (tb_bunkers["iso"] == "global")
-            & (tb_bunkers[[c for c in tb_bunkers.columns if c.startswith("x")]].sum(axis=1) > 0)
+            & (tb_bunkers[[c for c in data_columns]].sum(axis=1) > 0)
         ]["sector"]
     ), error
     error = "Pollutant units have changed."
@@ -241,6 +243,17 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     # Specifically, check that they are all in kilotonnes.
     error = "Expected units to be in kilotonnes."
     assert all([unit.startswith("kt") for unit in EXPECTED_UNITS.values()]), error
+
+    # Check where there is nonzero global data in the detailed table.
+    # In principle, I understood that only international aviation and shipping should be informed for "global" in the detailed table.
+    # However, it seems that also 1A3di_Oil_Tanker_Loading is informed.
+    # This will be included as part of international shipping.
+    # TODO: Note that, for NMVOC, this is informed from 1960, and exactly zero before that. This create an abrupt jump in international shipping (but probably small in the true global total of NMVOC).
+    # TODO: It seems that also other pollutants are nonzero from 1960 in the detailed table for "global". By eye, they seem to be a very small contribution, possibly spurious.
+    # So, add the appropriate sanity checks and consider removing these points or adding them as "Other".
+    # global_data = tb_detailed[(tb_detailed["country"]=="global") & (tb_detailed[data_columns] > 0).any(axis=1) & (~tb_detailed["sector"].isin(["1A3ai_International-aviation", "1A3di_International-shipping"]))]
+    # error = "Expected global data to be "
+    # assert global_data[[column for column in data_columns if int(column.replace("x", "")) < 1960]].sum().sum() == 0
 
 
 def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -> Table:
