@@ -3,7 +3,7 @@ from itertools import product
 
 import pandas as pd
 import yaml
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset
 from sqlalchemy.engine import Engine
 from structlog import get_logger
 
