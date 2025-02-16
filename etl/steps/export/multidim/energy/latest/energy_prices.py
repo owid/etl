@@ -115,4 +115,5 @@ def run(dest_dir: str) -> None:
     multidim.upsert_multidim_data_page(
         slug="mdd-energy-prices",
         config=config,
+        dependencies=paths.dependencies,
     )

@@ -146,7 +146,9 @@ def expand_config(
     return config_partial
 
 
-def upsert_multidim_data_page(slug: str, config: dict, owid_env: Optional[OWIDEnv] = None) -> None:
+def upsert_multidim_data_page(
+    slug: str, config: dict, dependencies: list[str] = [], owid_env: Optional[OWIDEnv] = None
+) -> None:
     """Import MDIM config to DB.
 
     Args:
@@ -159,6 +161,14 @@ def upsert_multidim_data_page(slug: str, config: dict, owid_env: Optional[OWIDEn
     owid_env: Optional[OWIDEnv]
         Environment where to publish the MDIM page.
     """
+    # Edit views
+    expand_catalog_paths(config, dependencies=dependencies)
+
+    # Upser to DB
+    _upsert_multidim_data_page(slug, config, owid_env)
+
+
+def _upsert_multidim_data_page(slug: str, config: dict, owid_env: Optional[OWIDEnv] = None) -> None:
     # Ensure we have an environment set
     if owid_env is None:
         owid_env = OWID_ENV

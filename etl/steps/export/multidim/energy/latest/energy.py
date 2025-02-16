@@ -20,6 +20,7 @@ def run(dest_dir: str) -> None:
     multidim.upsert_multidim_data_page(
         "mdd-energy",
         config,
+        dependencies=paths.dependencies,
     )
 
 
