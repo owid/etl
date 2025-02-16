@@ -59,7 +59,7 @@ class MDIMHandler:
 
         return config
 
-    def upsert_data_page(self, slug: str, config: dict):
+    def upsert_data_page(self, slug: str, config: dict, expand_paths: bool = False):
         """Upsert MDIM config to DB.
 
         - Validates that indicators are in DB.
@@ -67,6 +67,8 @@ class MDIMHandler:
         - Uses AdminAPI to push changes to DB.
 
         """
+        if expand_paths:
+            expand_catalog_paths(config, self.paths.dependencies)
         upsert_multidim_data_page(slug, config, self.owid_env.engine)
 
 
