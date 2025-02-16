@@ -264,3 +264,17 @@ steps:
   #
   data://grapher/climate/2025-01-21/sea_ice_extent_by_year:
     - data://garden/climate/2025-01-21/sea_ice_index
+
+  #
+  # Equatorial Pacific Sea Surface Temperatures (SST) data - El Niño or La Niña
+  #
+  data://meadow/climate/2025-02-12/sst:
+    - snapshot://climate/2025-02-12/sst.csv
+  data://garden/climate/2025-02-12/sst:
+    - data://meadow/climate/2025-02-12/sst
+  data://grapher/climate/2025-02-12/sst:
+    - data://garden/climate/2025-02-12/sst
+  data://grapher/climate/2025-02-12/sst_by_month:
+    - data://garden/climate/2025-02-12/sst
+
+
