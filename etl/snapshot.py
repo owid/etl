@@ -128,7 +128,9 @@ class Snapshot:
         if self.metadata.outs is None:
             raise Exception(f"File {self.metadata_path} has not been added to DVC. Run snapshot script to add it.")
 
-        assert len(self.metadata.outs) == 1, ".dvc file is missing 'outs' field. Have you run the snapshot?"
+        assert (
+            len(self.metadata.outs) == 1
+        ), f".dvc file is missing 'outs' field. Have you run the snapshot? {self.metadata}"
         file_size = self.path.stat().st_size
         # Compare file size if it's larger than 20MB, otherwise compare md5
         # This should be pretty safe and speeds up the process significantly

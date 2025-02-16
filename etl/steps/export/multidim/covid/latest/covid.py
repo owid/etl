@@ -1,9 +1,10 @@
 from etl import multidim
-from etl.db import get_engine
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+mdim_handler = multidim.MDIMHandler(paths)
+
 # Default config for GOOGLE MOBILITY
 MOBILITY_CONFIG_DEFAULT = {
     "subtitle": "This data shows how community movement in specific locations has changed relative to the period before the pandemic.",
@@ -17,8 +18,6 @@ MOBILITY_CONFIG_DEFAULT = {
 
 
 def run(dest_dir: str) -> None:
-    engine = get_engine()
-
     # PART 1: MDIMs entirely from YAML files
     # Load MDIM configurations from YAML files
     filenames = [
@@ -35,11 +34,11 @@ def run(dest_dir: str) -> None:
     ]
     for fname in filenames:
         paths.log.info(fname)
-        multidim.upsert_multidim_data_page(
+        config = mdim_handler.load_config_from_yaml(fname)
+
+        mdim_handler.upsert_data_page(
             fname_to_slug(fname),
-            paths.load_mdim_config(fname),
-            engine,
-            paths.dependencies,
+            config,
         )
 
     # PART 2: MDIMs hybridly generated (mix of YAML file + data)
@@ -47,7 +46,7 @@ def run(dest_dir: str) -> None:
     tb = ds.read("google_mobility")
 
     # Simple multidim
-    config = paths.load_mdim_config("covid.mobility.yml")
+    config = mdim_handler.load_config_from_yaml("covid.mobility.yml")
 
     # Generate config from indicator
     config_new = multidim.expand_config(
@@ -65,11 +64,9 @@ def run(dest_dir: str) -> None:
     config["views"] = config["views"] + config_new["views"]
 
     # Upsert to DB
-    multidim.upsert_multidim_data_page(
+    mdim_handler.upsert_data_page(
         fname_to_slug("covid.mobility.yml"),
         config,
-        engine,
-        paths.dependencies,
     )
 
 

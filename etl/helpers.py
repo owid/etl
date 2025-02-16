@@ -515,6 +515,7 @@ class PathFinder:
 
     @property
     def mdim_path(self) -> Path:
+        """TODO: worth aligning with `metadata_path` (add missing '.meta'), maybe even just deprecate this and use `metadata_path`."""
         assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
         return self.directory / (self.short_name + ".yml")
 

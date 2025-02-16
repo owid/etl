@@ -2,23 +2,26 @@ from pathlib import Path
 from typing import Any
 
 from etl import multidim
-from etl.db import get_engine
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+mdim_handler = multidim.MDIMHandler(paths)
 
 CURRENT_DIR = Path(__file__).parent
 
 
 def run(dest_dir: str) -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = mdim_handler.load_config_from_yaml()
 
     config["views"] += create_views()
 
     # Upsert it to MySQL
-    multidim.upsert_multidim_data_page("mdd-energy", config, get_engine(), dependencies=paths.dependencies)
+    mdim_handler.upsert_data_page(
+        "mdd-energy",
+        config,
+    )
 
 
 def create_views() -> list[dict]:
