@@ -2,7 +2,6 @@ import json
 import re
 from copy import deepcopy
 from itertools import product
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
@@ -16,66 +15,13 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
-from etl.helpers import PathFinder, map_indicator_path_to_id
+from etl.helpers import map_indicator_path_to_id
 from etl.paths import DATA_DIR
 
 # Initialize logger.
 log = get_logger()
 # Dimensions: These are the expected possible dimensions
 DIMENSIONS = ["y", "x", "size", "color"]
-
-
-class MDIMHandler:
-    """Use this class to handle MDIM config."""
-
-    def __init__(self, paths: PathFinder, owid_env: Optional[OWIDEnv] = None):
-        self.paths = paths
-        if owid_env is None:
-            self.owid_env = OWID_ENV
-        else:
-            self.owid_env = owid_env
-
-    def load_config_from_yaml(self, filename: Optional[str] = None, file_path: Optional[str | Path] = None) -> dict:
-        """Load configuration from YAML file.
-
-        It loads the configuration from the MDIM yaml metadata file. The config YAML file is assumed to be next to the script file and named `short_name.yml`. Alternatively, you can provide a specific filename, or even an absolute path.
-
-        In addition, the function expands catalog paths in views to full indicator URIs. This is needed because the configuration may only specify table#indicator, but we need the full dataset URI.
-
-        Args:
-            paths : PathFinder
-                PathFinder object for the current step.
-            filename : str (optional)
-                Name of the YAML file. Defaults to None.
-            file_path : str | Path (optional)
-                Path to the YAML file. Defaults to None.
-        """
-        # Load configuration from YAML
-        config = self.paths.load_mdim_config(filename, file_path)
-
-        # Expand catalog paths (if needed)
-        ## Configs may only specify table#indicator. Instead, we need the full dataset URI.
-        expand_catalog_paths(config, dependencies=self.paths.dependencies)
-
-        return config
-
-    def adjust(self):
-        """This is intermediate processing."""
-        # Expand catalog paths
-        # Adjust metadata if there are views with multiple indicators
-        pass
-
-    def upsert_data_page(self, slug: str, config: dict, expand_paths: bool = False):
-        """Upsert MDIM config to DB.
-
-        - Validates that indicators are in DB.
-        - Replace special metadata fields with their corresponding IDs in the database.
-        - Uses AdminAPI to push changes to DB.
-
-        """
-        if expand_paths:
-            expand_catalog_paths(config, self.paths.dependencies)
-        upsert_multidim_data_page(slug, config, self.owid_env.engine)
 
 
 def expand_config(
@@ -200,21 +146,32 @@ def expand_config(
     return config_partial
 
 
-def upsert_multidim_data_page(slug: str, config: dict, engine: Engine) -> None:
+def upsert_multidim_data_page(slug: str, config: dict, owid_env: Optional[OWIDEnv] = None) -> None:
+    """Import MDIM config to DB.
+
+    Args:
+    -----
+
+    slug: str
+        Slug of the MDIM page. MDIM will be published at /slug
+    config: dict
+        MDIM configuration.
+    owid_env: Optional[OWIDEnv]
+        Environment where to publish the MDIM page.
     """
-    TODO: There might be other fields which might make references to indicators:
-        - config.map.columnSlug
-        - config.focusedSeriesNames
-    """
+    # Ensure we have an environment set
+    if owid_env is None:
+        owid_env = OWID_ENV
+
     # Validate config
-    validate_multidim_config(config, engine)
+    validate_multidim_config(config, owid_env.engine)
 
     # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
     # TODO: I think we could move this to the Grapher side.
     config = replace_catalog_paths_with_ids(config)
 
     # Upsert config via Admin API
-    admin_api = AdminAPI(OWID_ENV)
+    admin_api = AdminAPI(owid_env)
     admin_api.put_mdim_config(slug, config)
 
 
@@ -407,6 +364,9 @@ def replace_catalog_paths_with_ids(config):
     - `expand_catalog_paths`: To expand the indicator URI to be in its complete form.
     - `validate_multidim_config`: To validate that the indicators exist in the database.
 
+    TODO: There might be other fields which might make references to indicators:
+        - config.map.columnSlug
+        - config.focusedSeriesNames
     """
     if "views" in config:
         views = config["views"]

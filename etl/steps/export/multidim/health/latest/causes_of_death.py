@@ -5,13 +5,12 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-mdim_handler = multidim.MDIMHandler(paths)
 CURRENT_DIR = Path(__file__).parent
 
 
 def run(dest_dir: str) -> None:
     # Load configuration from adjacent yaml file.
-    config = mdim_handler.load_config_from_yaml()
+    config = paths.load_mdim_config()
 
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
@@ -30,4 +29,4 @@ def run(dest_dir: str) -> None:
         table,
     )
 
-    mdim_handler.upsert_data_page("mdd-causes-of-death", config)
+    multidim.upsert_multidim_data_page("mdd-causes-of-death", config)

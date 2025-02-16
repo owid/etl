@@ -1,10 +1,8 @@
 from etl import multidim
-from etl.db import get_engine
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-mdim_handler = multidim.MDIMHandler(paths)
 
 
 def run(dest_dir: str) -> None:
@@ -22,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Load configuration from adjacent yaml file.
-    config = mdim_handler.load_config_from_yaml()
+    config = paths.load_mdim_config()
 
     # Create views.
     config["views"] = multidim.generate_views_for_dimensions(
@@ -114,8 +112,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    mdim_handler.upsert_data_page(
+    multidim.upsert_multidim_data_page(
         slug="mdd-energy-prices",
         config=config,
-        expand_paths=True,
     )

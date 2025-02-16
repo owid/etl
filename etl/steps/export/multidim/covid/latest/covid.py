@@ -3,7 +3,6 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-mdim_handler = multidim.MDIMHandler(paths)
 
 # Default config for GOOGLE MOBILITY
 MOBILITY_CONFIG_DEFAULT = {
@@ -34,9 +33,9 @@ def run(dest_dir: str) -> None:
     ]
     for fname in filenames:
         paths.log.info(fname)
-        config = mdim_handler.load_config_from_yaml(fname)
+        config = paths.load_mdim_config(fname)
 
-        mdim_handler.upsert_data_page(
+        multidim.upsert_multidim_data_page(
             fname_to_slug(fname),
             config,
         )
@@ -46,7 +45,7 @@ def run(dest_dir: str) -> None:
     tb = ds.read("google_mobility")
 
     # Simple multidim
-    config = mdim_handler.load_config_from_yaml("covid.mobility.yml")
+    config = paths.load_mdim_config("covid.mobility.yml")
 
     # Generate config from indicator
     config_new = multidim.expand_config(
@@ -64,7 +63,7 @@ def run(dest_dir: str) -> None:
     config["views"] = config["views"] + config_new["views"]
 
     # Upsert to DB
-    mdim_handler.upsert_data_page(
+    multidim.upsert_multidim_data_page(
         fname_to_slug("covid.mobility.yml"),
         config,
     )

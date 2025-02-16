@@ -6,22 +6,20 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-mdim_handler = multidim.MDIMHandler(paths)
 
 CURRENT_DIR = Path(__file__).parent
 
 
 def run(dest_dir: str) -> None:
     # Load configuration from adjacent yaml file.
-    config = mdim_handler.load_config_from_yaml()
+    config = paths.load_mdim_config()
 
     config["views"] += create_views()
 
     # Upsert it to MySQL
-    mdim_handler.upsert_data_page(
+    multidim.upsert_multidim_data_page(
         "mdd-energy",
         config,
-        expand_paths=True,
     )
 
 
