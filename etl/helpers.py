@@ -660,9 +660,10 @@ class PathFinder:
 
         return self.dag[self.step]
 
+    @property
     def dependencies_by_table_name(
         self,
-    ) -> dict:
+    ) -> Dict[str, List[Dict[str, Union[str, Table]]]]:
         if self.__dependencies_by_table_name is None:
             # Get mapping from table names to dataset URIs
             self.__dependencies_by_table_name = defaultdict(list)

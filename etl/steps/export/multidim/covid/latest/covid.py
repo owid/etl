@@ -64,6 +64,9 @@ def run(dest_dir: str) -> None:
     # Combine views info from YAML + programmatically obtained
     config["views"] = config["views"] + config_new["views"]
 
+    # WIP: DEBUGGING
+    # multidim.adjust_mdim_views(config, paths.dependencies_by_table_name)
+
     # Upsert to DB
     multidim.upsert_multidim_data_page(
         fname_to_slug("covid.mobility.yml"),

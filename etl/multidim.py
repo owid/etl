@@ -160,7 +160,7 @@ def upsert_multidim_data_page(slug: str, config: dict, paths: PathFinder, owid_e
         Environment where to publish the MDIM page.
     """
     # Edit views
-    expand_catalog_paths(config, dependencies=paths.dependencies)
+    adjust_mdim_views(config, dependencies_by_table=paths.dependencies_by_table_name)
 
     # Upser to DB
     _upsert_multidim_data_page(slug, config, owid_env)
@@ -183,7 +183,14 @@ def _upsert_multidim_data_page(slug: str, config: dict, owid_env: Optional[OWIDE
     admin_api.put_mdim_config(slug, config)
 
 
-def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
+def adjust_mdim_views(config: dict, dependencies_by_table: Dict[str, List[Any]]):
+    # Go through all views and expand catalog paths
+    for view in config["views"]:
+        # Update indicators for each dimension, making sure they have the complete URI
+        expand_catalog_paths(view, dependencies_by_table=dependencies_by_table)
+
+
+def expand_catalog_paths(view: Dict[Any, Any], dependencies_by_table: Dict[str, List[Any]]) -> Dict[Any, Any]:
     """Expand catalog paths in views to full dataset URIs.
 
     This function updates the given configuration dictionary in-place by modifying the dimension ('y', 'x', 'size', 'color') entries under "indicators" in each view. If an entry does not contain a '/',
@@ -198,6 +205,12 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
         config (dict): Configuration dictionary containing views.
         dependencies (list[str]): List of dependency URIs in the form "data://<path>".
     """
+    table_to_dataset_uri = {}
+    for k, v in dependencies_by_table.items():
+        if len(v) == 1:
+            table_to_dataset_uri[k] = v[0]["dataset_uri"]
+        else:
+            table_to_dataset_uri[k] = None
 
     def _expand_catalog_path(indicator: Union[str, Dict[str, str]]) -> Union[str, Dict[str, str]]:
         """Return same indicator, but with complete catalog path."""
@@ -220,6 +233,9 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
                     indicator_split[0] in table_to_dataset_uri
                 ), f"Table name `{indicator_split[0]}` not found in dependency tables! Available tables are: {', '.join(table_to_dataset_uri.keys())}"
 
+                assert (
+                    table_to_dataset_uri[indicator_split[0]] is not None
+                ), f"There are multiple dependencies (datasets) with a table named {indicator_split[0]}. Please use the complete dataset URI in this case."
                 return table_to_dataset_uri[indicator_split[0]] + "/" + indicator
 
         # Expand catalog path if it's a string
@@ -231,39 +247,26 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
             indicator["catalogPath"] = _expand(indicator["catalogPath"])
             return indicator
 
-    # Get mapping from table names to dataset URIs / table metadata
-    table_to_dataset_uri = {}
-    for dep in dependencies:
-        if not (re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep)):
-            continue
+    # Update indicators for each dimension
+    for dim in DIMENSIONS:
+        if dim in view["indicators"]:
+            if isinstance(view["indicators"][dim], list):
+                view["indicators"][dim] = [_expand_catalog_path(dim) for dim in view["indicators"][dim]]
+            else:
+                view["indicators"][dim] = _expand_catalog_path(view["indicators"][dim])
 
-        uri = re.sub(r"^(data|data-private)://", "", dep)
-        ds = Dataset(DATA_DIR / uri)
-        for table_name in ds.table_names:
-            if table_name in table_to_dataset_uri:
-                raise ValueError(f"Table name `{table_name}` is not unique in dependencies")
-            table_to_dataset_uri[table_name] = uri
+    # Update indicators from sortColumnSlug
+    if "config" in view:
+        if "sortColumnSlug" in view["config"]:
+            view["config"]["sortColumnSlug"] = _expand_catalog_path(view["config"]["sortColumnSlug"])
 
-    # Go through all views and expand catalog paths
-    for view in config["views"]:
-        # Update indicators for each dimension
-        for dim in DIMENSIONS:
-            if dim in view["indicators"]:
-                if isinstance(view["indicators"][dim], list):
-                    view["indicators"][dim] = [_expand_catalog_path(dim) for dim in view["indicators"][dim]]
-                else:
-                    view["indicators"][dim] = _expand_catalog_path(view["indicators"][dim])
+    # Update indicators from map.columnSlug
+    if "config" in view:
+        if "map" in view["config"]:
+            if "columnSlug" in view["config"]["map"]:
+                view["config"]["map"]["columnSlug"] = _expand_catalog_path(view["config"]["map"]["columnSlug"])
 
-        # Update indicators from sortColumnSlug
-        if "config" in view:
-            if "sortColumnSlug" in view["config"]:
-                view["config"]["sortColumnSlug"] = _expand_catalog_path(view["config"]["sortColumnSlug"])
-
-        # Update indicators from map.columnSlug
-        if "config" in view:
-            if "map" in view["config"]:
-                if "columnSlug" in view["config"]["map"]:
-                    view["config"]["map"]["columnSlug"] = _expand_catalog_path(view["config"]["map"]["columnSlug"])
+    return view
 
 
 def _extract_catalog_path(indicator_raw):
