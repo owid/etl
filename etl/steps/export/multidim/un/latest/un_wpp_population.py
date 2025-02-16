@@ -33,7 +33,3 @@ def run(dest_dir: str) -> None:
         engine,
         paths.dependencies,
     )
-
-
-def fname_to_slug(fname: str) -> str:
-    return f"mdd-{fname.replace('.yml', '').replace('.', '-').replace('_', '-')}"
