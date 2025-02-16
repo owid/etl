@@ -59,6 +59,12 @@ class MDIMHandler:
 
         return config
 
+    def adjust(self):
+        """This is intermediate processing."""
+        # Expand catalog paths
+        # Adjust metadata if there are views with multiple indicators
+        pass
+
     def upsert_data_page(self, slug: str, config: dict, expand_paths: bool = False):
         """Upsert MDIM config to DB.
 
