@@ -21,6 +21,7 @@ def run(dest_dir: str) -> None:
     mdim_handler.upsert_data_page(
         "mdd-energy",
         config,
+        expand_paths=True,
     )
 
 
