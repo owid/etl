@@ -15,7 +15,7 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
-from etl.helpers import map_indicator_path_to_id
+from etl.helpers import PathFinder, map_indicator_path_to_id
 from etl.paths import DATA_DIR
 
 # Initialize logger.
@@ -146,9 +146,7 @@ def expand_config(
     return config_partial
 
 
-def upsert_multidim_data_page(
-    slug: str, config: dict, dependencies: list[str] = [], owid_env: Optional[OWIDEnv] = None
-) -> None:
+def upsert_multidim_data_page(slug: str, config: dict, paths: PathFinder, owid_env: Optional[OWIDEnv] = None) -> None:
     """Import MDIM config to DB.
 
     Args:
@@ -162,7 +160,7 @@ def upsert_multidim_data_page(
         Environment where to publish the MDIM page.
     """
     # Edit views
-    expand_catalog_paths(config, dependencies=dependencies)
+    expand_catalog_paths(config, dependencies=paths.dependencies)
 
     # Upser to DB
     _upsert_multidim_data_page(slug, config, owid_env)
@@ -233,7 +231,7 @@ def expand_catalog_paths(config: dict, dependencies: list[str]) -> None:
             indicator["catalogPath"] = _expand(indicator["catalogPath"])
             return indicator
 
-    # Get mapping from table names to dataset URIs
+    # Get mapping from table names to dataset URIs / table metadata
     table_to_dataset_uri = {}
     for dep in dependencies:
         if not (re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep)):

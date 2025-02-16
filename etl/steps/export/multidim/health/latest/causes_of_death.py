@@ -29,4 +29,4 @@ def run(dest_dir: str) -> None:
         table,
     )
 
-    multidim.upsert_multidim_data_page("mdd-causes-of-death", config)
+    multidim.upsert_multidim_data_page("mdd-causes-of-death", config, paths=paths)

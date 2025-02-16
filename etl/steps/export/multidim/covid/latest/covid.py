@@ -31,6 +31,7 @@ def run(dest_dir: str) -> None:
         "covid.cases_tests.yml",
         # "covid.vax_breakdowns.yml",
     ]
+
     for fname in filenames:
         paths.log.info(fname)
         config = paths.load_mdim_config(fname)
@@ -38,7 +39,7 @@ def run(dest_dir: str) -> None:
         multidim.upsert_multidim_data_page(
             fname_to_slug(fname),
             config,
-            dependencies=paths.dependencies,
+            paths=paths,
         )
 
     # PART 2: MDIMs hybridly generated (mix of YAML file + data)
@@ -67,7 +68,7 @@ def run(dest_dir: str) -> None:
     multidim.upsert_multidim_data_page(
         fname_to_slug("covid.mobility.yml"),
         config,
-        dependencies=paths.dependencies,
+        paths=paths,
     )
 
 
