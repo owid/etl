@@ -8,6 +8,7 @@ import re
 import sys
 import tempfile
 import time
+from collections import defaultdict
 from collections.abc import Generator
 from contextlib import contextmanager
 from functools import cache
@@ -42,6 +43,7 @@ from etl import paths
 from etl.config import DEFAULT_GRAPHER_SCHEMA, TLS_VERIFY
 from etl.db import get_engine
 from etl.explorer import Explorer
+from etl.paths import DATA_DIR
 from etl.snapshot import Snapshot, SnapshotMeta
 from etl.steps import load_dag
 
@@ -471,6 +473,9 @@ class PathFinder:
         # Default logger
         self.log = structlog.get_logger(step=f"{self.namespace}/{self.channel}/{self.version}/{self.short_name}")
 
+        # Map table_name to table metadata and dataset URI
+        self.__dependencies_by_table_name = None
+
     @property
     def dag(self):
         """Lazy loading of DAG."""
@@ -654,6 +659,29 @@ class PathFinder:
             raise CurrentStepMustBeInDag
 
         return self.dag[self.step]
+
+    def dependencies_by_table_name(
+        self,
+    ) -> dict:
+        if self.__dependencies_by_table_name is None:
+            # Get mapping from table names to dataset URIs
+            self.__dependencies_by_table_name = defaultdict(list)
+
+            for dep in self.dependencies:
+                if not (re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep)):
+                    continue
+
+                uri = re.sub(r"^(data|data-private)://", "", dep)
+                ds = catalog.Dataset(DATA_DIR / uri)
+                for table_name in ds.table_names:
+                    self.__dependencies_by_table_name[table_name].append(
+                        {
+                            "dataset_uri": uri,
+                            "table": ds.read(table_name, load_data=False),
+                        }
+                    )
+
+        return self.__dependencies_by_table_name
 
     def get_dependency_step_name(
         self,
