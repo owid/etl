@@ -1,6 +1,4 @@
-import copy
 from pathlib import Path
-from typing import Any
 
 from etl import multidim
 from etl.db import get_engine
@@ -30,7 +28,7 @@ def run(dest_dir: str) -> None:
     ]
 
     # Group age and metric views under "Side-by-side comparison of causes"
-    grouped_views = group_views(config_new["views"], by=["age", "metric"])
+    grouped_views = multidim.group_views(config_new["views"], by=["age", "metric"])
     for view in grouped_views:
         view["dimensions"]["cause"] = "Side-by-side comparison of causes"
 
@@ -39,26 +37,3 @@ def run(dest_dir: str) -> None:
     config["views"] += grouped_views
 
     multidim.upsert_multidim_data_page("mdd-causes-of-death", config, engine, dependencies=paths.dependencies)
-
-
-def group_views(views: dict[str, Any], by: list[str]) -> list[dict[str, Any]]:
-    """
-    Group views by the specified dimensions. Concatenate indicators for the same group.
-    """
-    views = copy.deepcopy(views)
-
-    grouped_views = {}
-    for view in views:
-        # Group key
-        key = tuple(view["dimensions"][dim] for dim in by)  # type: ignore
-
-        if key not in grouped_views:
-            # Turn indicators into a list
-            view["indicators"]["y"] = [view["indicators"]["y"]]  # type: ignore
-
-            # Add to dictionary
-            grouped_views[key] = view
-        else:
-            grouped_views[key]["indicators"]["y"].append(view["indicators"]["y"])  # type: ignore
-
-    return list(grouped_views.values())

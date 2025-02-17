@@ -791,3 +791,26 @@ def _check_intersection_iters(
         raise ValueError(
             f"Unexpected items: {', '.join([f'`{d}`' for d in items_unexpected])}. Please review `{key_name}`!"
         )
+
+
+def group_views(views: dict[str, Any], by: list[str]) -> list[dict[str, Any]]:
+    """
+    Group views by the specified dimensions. Concatenate indicators for the same group.
+    """
+    views = deepcopy(views)
+
+    grouped_views = {}
+    for view in views:
+        # Group key
+        key = tuple(view["dimensions"][dim] for dim in by)  # type: ignore
+
+        if key not in grouped_views:
+            # Turn indicators into a list
+            view["indicators"]["y"] = [view["indicators"]["y"]]  # type: ignore
+
+            # Add to dictionary
+            grouped_views[key] = view
+        else:
+            grouped_views[key]["indicators"]["y"].append(view["indicators"]["y"])  # type: ignore
+
+    return list(grouped_views.values())
