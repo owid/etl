@@ -95,7 +95,37 @@ def run(dest_dir: str) -> None:
             ]
         )
 
-    # TODO: Consider creating breakdown by sector.
+    # Create breakdown by sector.
+    for pollutant in df_graphers["Pollutant Dropdown"].unique():
+        _columns_for_pollutant = []
+        # TODO: Generalize per capita.
+        per_capita = False
+        print(pollutant)
+        for column in tb.drop(columns=["country", "year"]).columns:
+            dimensions = tb[column].metadata.additional_info["dimensions"]
+            if dimensions["originalShortName"] == "emissions":
+                for filter in dimensions["filters"]:
+                    if (filter["name"] == "pollutant") and (filter["value"] == pollutant):
+                        if not column.endswith("all_sectors"):
+                            _columns_for_pollutant.append(f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}")
+        if len(_columns_for_pollutant) == 0:
+            continue
+        df_graphers = pd.concat(
+            [
+                df_graphers,
+                pd.DataFrame(
+                    {
+                        "yVariableIds": [_columns_for_pollutant],
+                        "Pollutant Dropdown": pollutant,
+                        "Sector Dropdown": "Breakdown by sector",
+                        "Per capita Checkbox": per_capita,
+                        "hasMapTab": False,
+                        "selectedFacetStrategy": "entity",
+                        "facetYDomain": "independent",
+                    }
+                ),
+            ]
+        )
 
     # Impose that all line charts start at zero.
     df_graphers["yAxisMin"] = 0
