@@ -640,11 +640,16 @@ class MDIMConfigExpander:
         trend	    Workplaces	            trend__place_workplaces
         """
         df_dims = self._build_df_dims(tb)
+
         # SANITY CHECKS
         self.indicator_name = self._sanity_checks_df_dims(indicator_name, df_dims)
 
         # Keep dimensions only for relevant indicator
-        self.df_dims = df_dims.loc[df_dims["indicator"] == indicator_name].drop(columns=["indicator"])
+        self.df_dims = df_dims.loc[df_dims["indicator"] == self.indicator_name].drop(columns=["indicator"])
+
+        # Final checks
+        assert isinstance(self.indicator_name, str), "Indicator name should be a string!"
+        assert not self.df_dims.empty, "df_dims can't be empty!"
 
     def _build_df_dims(self, tb):
         """Build dataframe with dimensional information from table tb."""
