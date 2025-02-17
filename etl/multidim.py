@@ -1,4 +1,3 @@
-import json
 import re
 from collections import defaultdict
 from copy import deepcopy
@@ -7,7 +6,6 @@ from typing import Any, Dict, List, Optional, Set, Union
 
 import pandas as pd
 import yaml
-from deprecated import deprecated
 from owid.catalog import Dataset, Table
 from sqlalchemy.engine import Engine
 from structlog import get_logger
@@ -148,7 +146,7 @@ def expand_config(
 
 
 def upsert_multidim_data_page(
-    slug: str, config: dict, dependencies: Set[str], owid_env: Optional[OWIDEnv] = None
+    slug: str, config: dict, dependencies: Set[str] = set(), owid_env: Optional[OWIDEnv] = None
 ) -> None:
     """Import MDIM config to DB.
 
@@ -827,95 +825,6 @@ def _check_intersection_iters(
 ####################################################################################################
 # DEPRECATED FUNCTIONS
 ####################################################################################################
-@deprecated(
-    "This function relies on DB-access. Instead we should rely only on ETL local files. Use `expand_config` instead."
-)
-def expand_views_with_access_db(
-    config: dict, combinations: dict[str, str], table: str, engine: Optional[Engine] = None
-) -> list[dict]:
-    """Use dimensions from multidim config file and create views from all possible
-    combinations of dimensions. Grapher table must use the same dimensions as the
-    multidim config file. If the dimension is missing from groupby, it will be set to "all".
-
-    :params config: multidim config file
-    :params combinations: dictionary with dimension names as keys and values as dimension values, use * for all values
-        e.g. {"metric": "*", "age": "*", "cause": "All causes"}
-    :params table: catalog path of the grapher table
-    :params engine: SQLAlchemy engine
-    """
-    if engine is None:
-        engine = OWID_ENV.engine
-
-    # Get all allowed values from choices
-    choices = {}
-    for choice_dict in config["dimensions"]:
-        allowed_values = []
-        for choice in choice_dict["choices"]:
-            allowed_values.append(choice["name"])
-        choices[choice_dict["slug"]] = allowed_values
-
-    df = fetch_variables_from_table(table, engine)
-
-    # Filter by allowed values
-    for dim_name, allowed_values in choices.items():
-        df = df[df[dim_name].isin(allowed_values)]
-
-    groupby = [k for k, v in combinations.items() if v == "*"]
-
-    views = []
-    for key, group in df.groupby(groupby):
-        dims = {dim_name: dim_value for dim_name, dim_value in zip(groupby, key)}
-
-        # Add values that are not * to dimensions
-        for k, v in combinations.items():
-            if v != "*":
-                dims[k] = v
-
-        # Create view with catalog paths
-        catalog_paths = group["catalogPath"].tolist()
-        views.append(
-            {
-                "dimensions": dims,
-                "indicators": {
-                    "y": catalog_paths if len(catalog_paths) > 1 else catalog_paths[0],
-                },
-            }
-        )
-
-    return views
-
-
-@deprecated(
-    "This function relies on DB-access. Instead we should rely only on ETL local files. Use `expand_config` instead."
-)
-def fetch_variables_from_table(table: str, engine: Engine) -> pd.DataFrame:
-    # fetch variables from MySQL
-    q = f"""
-    select
-        id,
-        catalogPath,
-        dimensions
-    from variables
-    where catalogPath like '{table}%%'
-    """
-    df = read_sql(q, engine)
-
-    if df.empty:
-        raise ValueError(f"No data found for table {table}")
-
-    # add dimensions as columns
-    dims = []
-    for r in df.itertuples():
-        d = {}
-        for dim_filter in json.loads(r.dimensions)["filters"]:  # type: ignore
-            d[dim_filter["name"]] = dim_filter["value"]
-        dims.append(d)
-
-    df_dims = pd.DataFrame(dims, index=df.index)
-
-    return df.join(df_dims)
-
-
 @deprecated("This function relies on specific column naming convention. Use `expand_config` instead.")
 def generate_views_for_dimensions(
     dimensions, tables, dimensions_order_in_slug=None, additional_config=None, warn_on_missing_combinations=True
@@ -1015,3 +924,36 @@ def generate_views_for_dimensions(
             result.update({"config": additional_config})
 
     return results
+
+
+def group_views(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:
+    """
+    Group views by the specified dimensions. Concatenate indicators for the same group.
+
+    :param views: List of views dictionaries.
+    :param by: List of dimensions to group by.
+    """
+    views = deepcopy(views)
+
+    grouped_views = {}
+    for view in views:
+        # Group key
+        key = tuple(view["dimensions"][dim] for dim in by)
+
+        if key not in grouped_views:
+            # Ensure 'y' is a single indicator before turning it into a list
+            assert not isinstance(view["indicators"]["y"], list), "Expected 'y' to be a single indicator, not a list"
+
+            if set(view["indicators"].keys()) != {"y"}:
+                raise NotImplementedError(
+                    "Only 'y' indicator is supported in groupby. Adapt the code for other fields."
+                )
+
+            view["indicators"]["y"] = [view["indicators"]["y"]]
+
+            # Add to dictionary
+            grouped_views[key] = view
+        else:
+            grouped_views[key]["indicators"]["y"].append(view["indicators"]["y"])
+
+    return list(grouped_views.values())

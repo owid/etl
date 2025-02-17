@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
+      grapher_config:
+        note: "Not all countries report data on vaccine stock-outs. The data presented here is based on the countries that do report data."
   unit: |-
     <% if "What was the duration of stock-out in months" in description %>
     months
@@ -28,38 +30,38 @@ tables:
     variables:
       any_national_vaccine_stockout:
         title: Was there any national vaccine stock-out?
-        description_short: Whether or not there was stock-out at a national level of any vaccine.
+        description_short: Whether or not there was [stock-out](#dod:vaccine-stockout) at a national level of any vaccine.
         unit: ""
         processing_level: major
       any_district_level_vaccine_stockout:
         title: Was there any district-level vaccine stock-out?
-        description_short: Whether or not there was stock-out at a district level of any vaccine.
+        description_short: Whether or not there was [stock-out](#dod:vaccine-stockout) at a district level of any vaccine.
         unit: ""
         processing_level: major
       num_causes_of_stockout:
         title: How many causes of stock-out were there?
-        description_short: The number of causes of stock-out.
+        description_short: The number of causes of [stock-out](#dod:vaccine-stockout).
         unit: ""
         processing_level: major
   reason_for_stockout:
     variables:
       stockout:
         title: Was there a vaccine stockout because of << reason_for_stockout.lower() >>?
-        description_short: Was there a vaccine stock-out because of << reason_for_stockout.lower() >>?
+        description_short: Was there a vaccine [stock-out](#dod:vaccine-stockout) because of << reason_for_stockout.lower() >>?
         unit: ""
         processing_level: major
   global_stockout:
     variables:
       num_countries_with_stockout:
         title: How many countries had a national vaccine stock-out of << description.lower() >>?
-        description_short: How many countries had a national vaccine stock-out of << description.lower()>>?
+        description_short: How many countries had a national vaccine [stock-out](#dod:vaccine-stockout) of << description.lower()>>?
         unit: "countries"
         processing_level: major
   global_cause:
     variables:
       num_countries:
         title: Number of countries with stock-out due to << reason_for_stockout.lower() >>
-        description_short: Number of countries with stock-out due to << reason_for_stockout.lower() >>
+        description_short: Number of countries with [stock-out](#dod:vaccine-stockout) due to << reason_for_stockout.lower() >>
         unit: "countries"
         processing_level: major
         display:
