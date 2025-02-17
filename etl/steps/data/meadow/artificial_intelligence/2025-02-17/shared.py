@@ -1,5 +1,4 @@
 import owid.catalog.processing as pr
-from structlog import get_logger
 
 from etl.snapshot import Snapshot
 
