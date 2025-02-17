@@ -159,6 +159,10 @@ EXPECTED_UNITS = {
     "SO2": "ktSO2",
 }
 
+# Name for the additional "country" representing unallocated emissions (e.g. those included as "global" in the bunkers file).
+# TODO: In the metadata, we should clarify that "Other" doesn't mean "Other countries", but rather "Not possible to allocate to individual countries".
+ENTITY_FOR_UNALLOCATED_EMISSIONS = "Other"
+
 # Regions to create when aggregating data.
 REGIONS = {
     # Default continents.
@@ -176,8 +180,8 @@ REGIONS = {
     # Other special regions.
     "European Union (27)": {},
     # Global aggregate.
-    # TODO: Define "Other" as a global variable above, in case it gets renamed.
-    "World": {"additional_members": ["Other"]},
+    # Include unallocated emissions in the global total.
+    "World": {"additional_members": [ENTITY_FOR_UNALLOCATED_EMISSIONS]},
 }
 
 
@@ -381,10 +385,7 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
         ["OC", "usa", "process"],
     ], error
     # Oil tanker loading is zero for most countries-pollutants. It's only nonzero for the US (BC and OC) and for "global" (NMVOC). It doesn't make sense to have zero NMVOC from all countries, and yet have a "global" nonzero contribution. So it seems safe to consider this "global" contribution also as "Other".
-    # NOTE: In the metadata, we should clarify that "Other" doesn't mean "Other countries", but rather "Not possible to allocate to individual countries".
-    # TODO: Ensure that's clear from the metadata.
     # -> Rename all remaining "global" data in the detailed table as "Other".
-    # TODO: Note that, NMVOC oil tanker loading is informed from 1960, and exactly zero before that. This create an abrupt jump in international shipping (but maybe small in the true global total of NMVOC).
 
 
 def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -> Table:
@@ -421,33 +422,30 @@ def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -
     # The "global" emissions in the bunkers table are the difference between total shipping fuel consumption (as estimated by the International Maritime Organization and other sources) and fuel consumption as reported by IEA. This additional fuel cannot be allocated to specific iso's. This correction to total fuel consumption is modest in recent years, but becomes much larger in earlier years.
     # In fact, the only nonzero "global" emissions in the bunkers table is for international shipping.
     # So, rename "global" in the bunkers table to "Other" (since it corresponds to a difference between estimates, that cannot be allocated to any country).
-    tb_bunkers["country"] = tb_bunkers["country"].cat.rename_categories(lambda x: "Other" if x == "global" else x)
+    tb_bunkers["country"] = tb_bunkers["country"].cat.rename_categories(
+        lambda x: ENTITY_FOR_UNALLOCATED_EMISSIONS if x == "global" else x
+    )
     # We already removed "global" domestic aviation emissions from the bunkers table (which were zero), so now remove also international aviation emissions (which are also zero).
     tb_bunkers = tb_bunkers[
-        ~((tb_bunkers["country"] == "Other") & (tb_bunkers["sector"].isin([SUBSECTOR_INTERNATIONAL_AVIATION])))
+        ~(
+            (tb_bunkers["country"] == ENTITY_FOR_UNALLOCATED_EMISSIONS)
+            & (tb_bunkers["sector"].isin([SUBSECTOR_INTERNATIONAL_AVIATION]))
+        )
     ].reset_index(drop=True)
     # Sanity check.
     assert tb_bunkers[tb_bunkers["country"] == "global"].empty
-    assert set(tb_bunkers[tb_bunkers["country"] == "Other"]["sector"]) == set([SUBSECTOR_INTERNATIONAL_SHIPPING])
+    assert set(tb_bunkers[tb_bunkers["country"] == ENTITY_FOR_UNALLOCATED_EMISSIONS]["sector"]) == set(
+        [SUBSECTOR_INTERNATIONAL_SHIPPING]
+    )
 
     # Similarly, in the detailed table, after removing aviation and shipping, there is still some (almost negligible) "global" contribution in certain pollutants and sectors.
     # They may be spurious (and add up to less than 0.03% of the aggregate of all countries for each year-sector-pollutant).
     # There is only one exception: "global" oil tanker loading NMVOC is not negligible (and in fact, "global" is the only nonzero country).
     # So, instead of removing all those "global", we can simply rename them as "Other" (meaning: "Not allocated to any individual country").
-    tb_detailed["country"] = tb_detailed["country"].cat.rename_categories(lambda x: "Other" if x == "global" else x)
+    tb_detailed["country"] = tb_detailed["country"].cat.rename_categories(
+        lambda x: ENTITY_FOR_UNALLOCATED_EMISSIONS if x == "global" else x
+    )
     assert tb_detailed[tb_detailed["country"] == "global"].empty
-
-    # TODO: Consider removing, we can simply create all aggregates once, after combining the two tables.
-    # # Manually create "global" aggregates for domestic aviation, international aviation, and international shipping in the bunkers table.
-    # tb_bunkers = pr.concat(
-    #     [
-    #         tb_bunkers,
-    #         tb_bunkers.drop(columns=["country"])
-    #         .groupby(["em", "sector", "units"], as_index=False, observed=True)
-    #         .sum()
-    #         .assign(**{"country": "global"}),
-    #     ]
-    # )
 
     # Combine detailed table (where domestic aviation, international aviation, and international shipping were removed) and bunkers tables (which now contains all national and global data on domesetic aviation, international aviation, and international shipping).
     tb = pr.concat([tb_detailed, tb_bunkers], short_name=paths.short_name)
@@ -525,8 +523,10 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # TODO: It seems that CH4 and N20 have only non-zero data from 1970 onwards, and all data is exactly zero right before this year.
-    # These are probably spurious zeros. So, assert that prior to 1970 all data for these two pollutants is zero, and remove those points.
+    # TODO: I have found a few data issues:
+    # * It seems that CH4 and N20 have only non-zero data from 1970 onwards, and all data is exactly zero right before this year. These are probably spurious zeros. So, assert that prior to 1970 all data for these two pollutants is zero, and remove those points.
+    # * BC waste becomes flat from 2014 onwards.
+    # * Note that, NMVOC oil tanker loading is informed from 1960, and exactly zero before that. This create an abrupt jump in international shipping (but maybe small in the true global total of NMVOC).
 
     # Convert units from kilotonnes to tonnes.
     tb["emissions"] *= 1e3
