@@ -356,7 +356,6 @@ class PathFinder:
         channel: CHANNEL | None = None,
         namespace: str | None = None,
         version: int | str | None = None,
-        is_private: bool | None = False,
         step_type: str = "data",
     ) -> str:
         """Create the step name (as it appears in the dag) given its attributes.
@@ -371,18 +370,18 @@ class PathFinder:
             # If version is not specified, catch any version, which could be either a date, a year, or "latest".
             version = r"(?:\d{4}\-\d{2}\-\d{2}|\d{4}|latest)"
 
-        # Suffix to add to, e.g. "data" if step is private.
-        is_private_suffix = "-private" if is_private else ""
+        # Optional suffix: allow optional "-private" for any channel.
+        private_pattern = r"(?:-private)?"
 
         if step_type == "export":
-            step_name = f"export://{channel}/{namespace}/{version}/{short_name}"
+            step_name = f"export://{channel}{private_pattern}/{namespace}/{version}/{short_name}"
         elif channel == "snapshot":
             # match also on snapshot short_names without extension
-            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
+            step_name = f"{channel}{private_pattern}://{namespace}/{version}/{short_name}(.\\w+)?"
         elif channel in CHANNEL.__args__:
-            step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
+            step_name = f"data{private_pattern}://{channel}/{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data{is_private_suffix}://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
+            step_name = rf"(?:snapshot{private_pattern}:/|walden{private_pattern}:/|data{private_pattern}://meadow|data{private_pattern}://garden|data{private_pattern}://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
         else:
             raise UnknownChannel
 
@@ -394,7 +393,6 @@ class PathFinder:
             channel=self.channel,
             namespace=self.namespace,
             version=self.version,
-            is_private=self.is_private,
             step_type=self.step_type,
         )
 
@@ -465,7 +463,6 @@ class PathFinder:
         channel: CHANNEL | None = None,
         namespace: str | None = None,
         version: str | int | None = None,
-        is_private: bool | None = None,
     ) -> str:
         """Get dependency step name (as it appears in the dag) given its attributes (at least its short name)."""
 
@@ -475,24 +472,11 @@ class PathFinder:
             namespace=namespace,
             version=version,
             short_name=short_name,
-            is_private=is_private,
         )
         deps = self.dependencies
         matches = _match_dependencies(pattern, deps)
 
-        # If no step was found and is_private was not specified, try again assuming step is private.
-        if (len(matches) == 0) and (is_private is None):
-            pattern = self.create_step_name(
-                step_type=step_type,
-                channel=channel,
-                namespace=namespace,
-                version=version,
-                short_name=short_name,
-                is_private=True,
-            )
-            matches = _match_dependencies(pattern, self.dependencies)
-
-        # If not step was found and channel is "grapher", try again assuming this is a grapher://grapher step.
+        # If no step was found and channel is "grapher", try again assuming this is a grapher://grapher step.
         if (len(matches) == 0) and (channel == "grapher"):
             pattern = self.create_step_name(
                 step_type=step_type,
@@ -500,7 +484,6 @@ class PathFinder:
                 namespace=namespace,
                 version=version,
                 short_name=short_name,
-                is_private=is_private,
             )
             matches = _match_dependencies(pattern, self.dependencies)
 
@@ -520,7 +503,6 @@ class PathFinder:
         channel: CHANNEL | None = None,
         namespace: str | None = None,
         version: str | int | None = None,
-        is_private: bool | None = None,
     ) -> catalog.Dataset | Snapshot | CollectionSet:
         """Load a (dataset or export) dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
@@ -529,7 +511,6 @@ class PathFinder:
             channel=channel,
             namespace=namespace,
             version=version,
-            is_private=is_private,
         )
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
         if dependency["channel"] == "snapshot":
