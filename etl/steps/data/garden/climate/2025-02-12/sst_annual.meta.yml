@@ -1,9 +1,6 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    presentation:
-      topic_tags:
-        - Climate Change
     processing_level: major
     description_processing: |-
       Annual anomalies of the Oceanic Niño Index (ONI) are calculated by taking the average of the monthly ONI values for a given year.
