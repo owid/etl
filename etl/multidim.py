@@ -1,8 +1,9 @@
 import json
 import re
+from collections import defaultdict
 from copy import deepcopy
 from itertools import product
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Set, Union
 
 import pandas as pd
 import yaml
@@ -15,7 +16,7 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
-from etl.helpers import PathFinder, map_indicator_path_to_id
+from etl.helpers import map_indicator_path_to_id
 from etl.paths import DATA_DIR
 
 # Initialize logger.
@@ -146,7 +147,9 @@ def expand_config(
     return config_partial
 
 
-def upsert_multidim_data_page(slug: str, config: dict, paths: PathFinder, owid_env: Optional[OWIDEnv] = None) -> None:
+def upsert_multidim_data_page(
+    slug: str, config: dict, dependencies: Set[str], owid_env: Optional[OWIDEnv] = None
+) -> None:
     """Import MDIM config to DB.
 
     Args:
@@ -160,13 +163,43 @@ def upsert_multidim_data_page(slug: str, config: dict, paths: PathFinder, owid_e
         Environment where to publish the MDIM page.
     """
     # Edit views
-    adjust_mdim_views(config, dependencies_by_table=paths.dependencies_by_table_name)
+    process_mdim_views(config, dependencies=dependencies)
+
+    # TODO: Possibly add other edits (to dimensions?)
 
     # Upser to DB
     _upsert_multidim_data_page(slug, config, owid_env)
 
 
+def process_mdim_views(config: dict, dependencies: Set[str]):
+    """Process views in MDIM configuration.
+
+    This includes:
+        - Make sure that catalog paths for indicators are complete.
+        - TODO: Process views with multiple indicators to have adequate metadata
+    """
+    # Get table information by table name, and table URI
+    tables_by_name = get_tables_by_name_mapping(dependencies)
+    # tables_by_uri = get_tables_by_uri_mapping(tables_by_name)  # This is to be used when processing views with multiple indicators
+
+    # Go through all views and expand catalog paths
+    for view in config["views"]:
+        # Update indicators for each dimension, making sure they have the complete URI
+        expand_catalog_paths(view, tables_by_name=tables_by_name)
+
+        # Combine metadata in views which contain multiple indicators
+        indicators = get_indicators_in_view(view)
+        if (len(indicators) > 1) and ("metadata" not in view):  # Check if view "contains multiple indicators"
+            # TODO
+            # view["metadata"] = build_view_metadata_multi(indicators, tables_by_uri)
+            log.info(
+                f"View with multiple indicators detected. You should edit its `metadata` field to reflect that! This will be done programmatically in the future. Check view with dimensions {view['dimensions']}"
+            )
+            pass
+
+
 def _upsert_multidim_data_page(slug: str, config: dict, owid_env: Optional[OWIDEnv] = None) -> None:
+    """Actual upsert to DB."""
     # Ensure we have an environment set
     if owid_env is None:
         owid_env = OWID_ENV
@@ -183,14 +216,65 @@ def _upsert_multidim_data_page(slug: str, config: dict, owid_env: Optional[OWIDE
     admin_api.put_mdim_config(slug, config)
 
 
-def adjust_mdim_views(config: dict, dependencies_by_table: Dict[str, List[Any]]):
-    # Go through all views and expand catalog paths
-    for view in config["views"]:
-        # Update indicators for each dimension, making sure they have the complete URI
-        expand_catalog_paths(view, dependencies_by_table=dependencies_by_table)
+def build_view_metadata_multi(indicators: List[Dict[str, str]], tables_by_uri: Dict[str, Table]):
+    """TODO: Combine the metadata from the indicators in the view.
+
+    Ideas:
+    -----
+    `indicators` contains the URIs of all indicators used in the view. `tables_by_uri` contains the table objects (and therefore their metadata) easily accessible by their URI. With this information, we can get the metadata of each indicator as:
+
+    ```
+    for indicator in indicators:
+        # Get indicator metadata
+        table_uri, indicator_name = indicator["path"].split("#)
+        metadata = tables_by_uri[table_uri][indicator_name].metadata
+
+        # We also have access on how this indicator was in use (was it for dimension 'y', or 'x'?)
+        dimension = indicator["dimension"] # This can be 'y', 'x', 'size', 'color', etc.
+    ```
+
+    Arguments:
+    ----------
+
+    indicators : List[Dict[str, str]]
+        List of indicators in the view. Each element comes as a record {"path": "...", "dimension": "..."}. The path is the complete URI of the indicator.
+    tables_by_uri : Dict[str, Table]
+        Mapping of table URIs to table objects.
+    """
+    pass
 
 
-def expand_catalog_paths(view: Dict[Any, Any], dependencies_by_table: Dict[str, List[Any]]) -> Dict[Any, Any]:
+def get_tables_by_uri_mapping(tables_by_name: Dict[str, List[Table]]) -> Dict[str, Table]:
+    """Mapping table URIs (complete) to table objects."""
+    mapping = {}
+    for table_name, tables in tables_by_name.items():
+        for table in tables:
+            uri = table.dataset.uri + "/" + table_name
+            mapping[uri] = table
+    return mapping
+
+
+def get_tables_by_name_mapping(dependencies: Set[str]) -> Dict[str, List[Table]]:
+    """Dictionary mapping table short name to table object.
+
+    Note that the format is {"table_name": [tb], ...}. This is because there could be collisions where multiple table names are mapped to the same table (e.g. two datasets could have a table with the same name).
+    """
+    tb_name_to_tb = defaultdict(list)
+
+    for dep in dependencies:
+        ## Ignore non-grapher dependencies
+        if not re.match(r"^(data|data-private)://grapher/", dep):
+            continue
+
+        uri = re.sub(r"^(data|data-private)://", "", dep)
+        ds = Dataset(DATA_DIR / uri)
+        for table_name in ds.table_names:
+            tb_name_to_tb[table_name].append(ds.read(table_name, load_data=False))
+
+    return tb_name_to_tb
+
+
+def expand_catalog_paths(view: Dict[Any, Any], tables_by_name: Dict[str, List[Table]]) -> Dict[Any, Any]:
     """Expand catalog paths in views to full dataset URIs.
 
     This function updates the given configuration dictionary in-place by modifying the dimension ('y', 'x', 'size', 'color') entries under "indicators" in each view. If an entry does not contain a '/',
@@ -203,14 +287,8 @@ def expand_catalog_paths(view: Dict[Any, Any], dependencies_by_table: Dict[str, 
 
     Args:
         config (dict): Configuration dictionary containing views.
-        dependencies (list[str]): List of dependency URIs in the form "data://<path>".
+        tables_by_name (Dict[str, List[Table]]): Mapping of table short names to tables.
     """
-    table_to_dataset_uri = {}
-    for k, v in dependencies_by_table.items():
-        if len(v) == 1:
-            table_to_dataset_uri[k] = v[0]["dataset_uri"]
-        else:
-            table_to_dataset_uri[k] = None
 
     def _expand_catalog_path(indicator: Union[str, Dict[str, str]]) -> Union[str, Dict[str, str]]:
         """Return same indicator, but with complete catalog path."""
@@ -224,19 +302,28 @@ def expand_catalog_paths(view: Dict[Any, Any], dependencies_by_table: Dict[str, 
             # table#indicator format
             else:
                 indicator_split = indicator.split("#")
+
                 # Check format is actually table#indicator
                 assert (len(indicator_split) == 2) & (
                     indicator_split[0] != ""
                 ), f"Expected 'table#indicator' format. Instead found {indicator}"
+
                 # Check table is in any of the datasets!
                 assert (
-                    indicator_split[0] in table_to_dataset_uri
-                ), f"Table name `{indicator_split[0]}` not found in dependency tables! Available tables are: {', '.join(table_to_dataset_uri.keys())}"
+                    indicator_split[0] in tables_by_name
+                ), f"Table name `{indicator_split[0]}` not found in dependency tables! Available tables are: {', '.join(tables_by_name.keys())}"
 
+                # Check table name to table mapping is unique
                 assert (
-                    table_to_dataset_uri[indicator_split[0]] is not None
+                    len(tables_by_name[indicator_split[0]]) == 1
                 ), f"There are multiple dependencies (datasets) with a table named {indicator_split[0]}. Please use the complete dataset URI in this case."
-                return table_to_dataset_uri[indicator_split[0]] + "/" + indicator
+
+                # Check dataset in table metadata is not None
+                tb = tables_by_name[indicator_split[0]][0]
+                assert tb.m.dataset is not None, f"Dataset not found for table {indicator_split[0]}"
+
+                # Build URI
+                return tb.m.dataset.uri + "/" + indicator
 
         # Expand catalog path if it's a string
         if isinstance(indicator, str):
@@ -280,6 +367,45 @@ def _extract_catalog_path(indicator_raw):
         raise ValueError(f"Unexpected indicator property type: {indicator_raw}")
 
 
+def get_indicators_in_view(view):
+    """Get the list of indicators in use in a view.
+
+    It returns the list as a list of records:
+
+    [
+        {
+            "path": "data://path/to/dataset#indicator",
+            "dimension": "y"
+        },
+        ...
+    ]
+
+    TODO: This is being called twice, maybe there is a way to just call it once. Maybe if it is an attribute of a class?
+    """
+    indicators_view = []
+    # Get indicators from dimensions
+    for dim in DIMENSIONS:
+        if dim in view["indicators"]:
+            indicator_raw = view["indicators"][dim]
+            if isinstance(indicator_raw, list):
+                assert dim == "y", "Only `y` can come as a list"
+                indicators_view += [
+                    {
+                        "path": _extract_catalog_path(ind),
+                        "dimension": dim,
+                    }
+                    for ind in indicator_raw
+                ]
+            else:
+                indicators_view.append(
+                    {
+                        "path": _extract_catalog_path(indicator_raw),
+                        "dimension": dim,
+                    }
+                )
+    return indicators_view
+
+
 def validate_multidim_config(config: dict, engine: Engine) -> None:
     # Ensure that all views are in choices
     for dim in config["dimensions"]:
@@ -295,17 +421,10 @@ def validate_multidim_config(config: dict, engine: Engine) -> None:
     # Get all used indicators
     indicators = []
     for view in config["views"]:
-        indicators_view = []
-        indicators_extra = []
         # Get indicators from dimensions
-        for prop in DIMENSIONS:
-            if prop in view["indicators"]:
-                indicator_raw = view["indicators"][prop]
-                if isinstance(indicator_raw, list):
-                    assert prop == "y", "Only `y` can come as a list"
-                    indicators_view += [_extract_catalog_path(ind) for ind in indicator_raw]
-                else:
-                    indicators_view.append(_extract_catalog_path(indicator_raw))
+        indicators_view = get_indicators_in_view(view)
+        indicators_view = [ind["path"] for ind in indicators_view]
+        indicators_extra = []
 
         # Get indicators from sortColumnSlug
         if "config" in view:
@@ -318,7 +437,7 @@ def validate_multidim_config(config: dict, engine: Engine) -> None:
                 if "columnSlug" in view["config"]["map"]:
                     indicators_extra.append(_extract_catalog_path(view["config"]["map"]["columnSlug"]))
 
-        # All indicators in indicators_extra should be in indicators!
+        # All indicators in `indicators_extra` should be in `indicators`! E.g. you can't sort by an indicator that is not in the chart!
         ## E.g. the indicator used to sort, should be in use in the chart! Or, the indicator in the map tab should be in use in the chart!
         invalid_indicators = set(indicators_extra).difference(set(indicators_view))
         if invalid_indicators:
