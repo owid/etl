@@ -300,12 +300,12 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
                 # to ensure that any indicators required by the mdim step are already pushed to DB.
                 # To achieve that, replace "data://grapher" dependencies with "grapher://grapher".
                 # NOTE: If any dependency of the export step is a data-private://grapher step, it will need to be run with the "--private" flag, otherwise the export step may fail.
-                dag[step] = [
+                dag[step] = {
                     re.sub(r"^(data|data-private)://", "grapher://", dep)
                     if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep)
                     else dep
                     for dep in dag[step]
-                ]
+                }
 
         # Finally, ensure that the added grapher://grapher steps will be executed,
         # by activating the "grapher" flag.

@@ -18,10 +18,9 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden.read("sst")
 
-    # Combine month and year into a single column
+    # Combine month and year into a single column.
     tb["date"] = pd.to_datetime(tb["year"].astype(str) + "-" + tb["month"].astype(str) + "-01")
     tb["date"] = tb["date"] + pd.offsets.Day(14)
-    tb["days_since_1941"] = (tb["date"] - pd.to_datetime("1949-01-01")).dt.days
 
     # Create colour_date column based on decades
     def year_to_decade(year):
@@ -44,12 +43,9 @@ def run(dest_dir: str) -> None:
     # tb["date_as_country"] = tb["date"].dt.strftime("%B %Y")
 
     # Drop the original year and month columns
-    tb = tb.drop(columns=["year", "month", "date"])
+    tb = tb.drop(columns=["year", "month"])
 
-    # Rename the date column to year for grapher purposes
-    tb = tb.rename(columns={"days_since_1941": "year"})
-
-    tb = tb.format(["year", "country"])
+    tb = tb.format(["date", "country"])
     #
     # Save outputs.
     #
