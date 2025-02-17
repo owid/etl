@@ -4,9 +4,6 @@ definitions:
     presentation:
       topic_tags:
         - Climate Change
-    display:
-        yearIsDay: true
-        zeroDay: "1949-01-01"
     processing_level: minor
 
 # Learn more about the available fields:
