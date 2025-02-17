@@ -160,6 +160,8 @@ EXPECTED_UNITS = {
 def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     # Define list of data columns
     data_columns = [column for column in tb_detailed.columns if column.startswith("x")]
+
+    # Check that columns are as expected.
     error = "Columns in detailed table have changed."
     assert [column for column in tb_detailed.columns if column not in data_columns] == [
         "em",
@@ -168,9 +170,7 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
         "fuel",
         "units",
     ], error
-    assert set([int(column.replace("x", "")) for column in data_columns]) <= set(
-        range(1750, 2023)
-    ), error
+    assert set([int(column.replace("x", "")) for column in data_columns]) <= set(range(1750, 2023)), error
     error = "Columns in bunkers table have changed."
     assert [column for column in tb_bunkers.columns if column not in data_columns] == [
         "em",
@@ -178,15 +178,17 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
         "sector",
         "units",
     ], error
-    assert set([int(column.replace("x", "")) for column in data_columns]) <= set(
-        range(1750, 2023)
-    ), error
+    assert set([int(column.replace("x", "")) for column in data_columns]) <= set(range(1750, 2023)), error
+
+    # Check that sectors are as expected.
     error = "List of subsectors in the detailed table has changed."
     all_subsectors = sum(list(SECTOR_MAPPING.values()), [])
     assert set(tb_detailed["sector"]) == set(all_subsectors), error
     error = "List of subsectors in the bunkers table has changed."
     assert set(tb_bunkers["sector"]) == set(BUNKERS_SECTORS), error
     assert set(BUNKERS_SECTORS) < set(all_subsectors), error
+
+    # Check that units are as expected.
     error = "Each pollutant was expected to have just one unit."
     assert (
         tb_detailed.groupby("em", as_index=False, observed=True).agg({"units": "nunique"})["units"] == 1
@@ -194,13 +196,45 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     assert (
         tb_bunkers.groupby("em", as_index=False, observed=True).agg({"units": "nunique"})["units"] == 1
     ).all(), error
+    error = "Pollutant units have changed."
+    assert tb_detailed[["em", "units"]].drop_duplicates().set_index(["em"])["units"].to_dict() == EXPECTED_UNITS, error
+    # Specifically, check that all units are in kilotonnes.
+    error = "Expected units to be in kilotonnes."
+    assert all([unit.startswith("kt") for unit in EXPECTED_UNITS.values()]), error
+
+    # Check that countries are as expected.
     error = "Detailed table was expected to have all countries in the bunkers table. This has changed (not important, simply check it and redefine this assertion)."
     assert set(tb_detailed["country"]) - set(tb_bunkers["iso"]) == set(), error
     error = "Bunkers table was expected to have all countries in the detailed table, except Palestine. This has changed (not important, simply check it redefine this assertion)."
     assert set(tb_bunkers["iso"]) - set(tb_detailed["country"]) == set(["pse"]), error
-    # Check that domestic aviation emissions given in the bunkers table are the same as the ones given in the detailed table.
+
+    # Check that in the detailed table, domestic aviation emissions for "global" are exactly zero.
+    error = (
+        "Expected 'global' emissions for domestic aviation to be zero in the detailed table and in the bunkers table."
+    )
+    assert (
+        tb_detailed[(tb_detailed["sector"] == SUBSECTOR_DOMESTIC_AVIATION) & (tb_detailed["country"] == "global")][
+            data_columns
+        ]
+        .sum()
+        .sum()
+        == 0
+    ), error
+    assert (
+        tb_bunkers[(tb_bunkers["sector"] == SUBSECTOR_DOMESTIC_AVIATION) & (tb_bunkers["iso"] == "global")][
+            data_columns
+        ]
+        .sum()
+        .sum()
+        == 0
+    ), error
+    # -> We can safely remove "global" domestic aviation from both tables.
+    # TODO: Ensure at the end there is an aggregated global total for domestic emissions.
+
+    # Check that national domestic aviation emissions given in the bunkers table are the same as the ones given in the detailed table.
+    # NOTE: Here, ignore "pse" (Palestine) in bunkers, which is not informed in the detailed table.
     detailed_domestic_aviation = (
-        tb_detailed[(tb_detailed["sector"] == SUBSECTOR_DOMESTIC_AVIATION) & (~tb_detailed["country"].isin(["global"]))]
+        tb_detailed[(tb_detailed["sector"] == SUBSECTOR_DOMESTIC_AVIATION)]
         .drop(columns=["fuel"])
         .groupby(["em", "country", "sector", "units"], as_index=False, observed=True)
         .sum()
@@ -208,7 +242,7 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
         .reset_index(drop=True)
     )
     bunkers_domestic_aviation = (
-        tb_bunkers[(tb_bunkers["sector"] == SUBSECTOR_DOMESTIC_AVIATION) & (~tb_bunkers["iso"].isin(["global", "pse"]))]
+        tb_bunkers[(tb_bunkers["sector"] == SUBSECTOR_DOMESTIC_AVIATION) & (~tb_bunkers["iso"].isin(["pse"]))]
         .rename(columns={"iso": "country"})
         .sort_values(["em", "country", "sector", "units"])
         .reset_index(drop=True)
@@ -219,30 +253,55 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     )
     for column in detailed_domestic_aviation.columns:
         if column.startswith("x"):
-            error = f"Data from detailed table differs from bunkers table more than expected (column {column})."
+            error = f"Domestic aviation data from detailed table differs from bunkers table more than expected (column {column})."
             assert (
                 100
                 * abs(detailed_domestic_aviation[column] - bunkers_domestic_aviation[column].fillna(0.0))
                 / (detailed_domestic_aviation[column] + 1e-7)
             ).max() < 1e-4, error
+    # -> We can safely remove all domestic aviations from the detailed table, since the bunkers table contains all national data (plus Palestine).
 
-    # Check that the details table contains international aviation and shipping only for "global".
+    # Check that the detailed table contains international aviation and shipping only for "global".
     error = "International aviation and shipping was expected to be informed only for 'global' in the detailed table."
     for sector in ["1A3ai_International-aviation", "1A3di_International-shipping"]:
         assert set(tb_detailed[tb_detailed["sector"] == sector]["country"]) == set(["global"]), error
 
+    # Check that the only nonzero "global" information in the bunkers table is for international shipping (representing "Other" emissions that cannot be allocated to any country).
     error = "Expected 'global' in the bunkers table to be nonzero only for international shipping."
     assert set(
-        tb_bunkers[
-            (tb_bunkers["iso"] == "global")
-            & (tb_bunkers[[c for c in data_columns]].sum(axis=1) > 0)
-        ]["sector"]
-    ), error
-    error = "Pollutant units have changed."
-    assert tb_detailed[["em", "units"]].drop_duplicates().set_index(["em"])["units"].to_dict() == EXPECTED_UNITS, error
-    # Specifically, check that they are all in kilotonnes.
-    error = "Expected units to be in kilotonnes."
-    assert all([unit.startswith("kt") for unit in EXPECTED_UNITS.values()]), error
+        tb_bunkers[(tb_bunkers["iso"] == "global") & (tb_bunkers[[c for c in data_columns]].sum(axis=1) > 0)]["sector"]
+    ) == set(["1A3di_International-shipping"]), error
+    # -> We can rename "global" emissions in the bunkers table as "Other" for international shipping, and remove all other "global" emissions (which are zero, namely for domestic and international aviation).
+
+    # Check that the "global" emissions in the detailed table for international shipping and international aviation are the sum of all national emissions (given in the bunkers table).
+    bunkers_international_transport = (
+        tb_bunkers[tb_bunkers["sector"].isin(["1A3ai_International-aviation", "1A3di_International-shipping"])]
+        .drop(columns=["iso"])
+        .groupby(["em", "sector", "units"])
+        .sum()
+    )
+    detailed_international_transport = (
+        tb_detailed[(tb_detailed["sector"].isin(["1A3ai_International-aviation", "1A3di_International-shipping"]))]
+        .drop(columns=["country", "fuel"])
+        .groupby(["em", "sector", "units"])
+        .sum()
+    )
+    bunkers_international_transport.equals(detailed_international_transport)
+    assert bunkers_international_transport.shape == detailed_international_transport.shape
+    for column in detailed_international_transport.columns:
+        if column.startswith("x"):
+            error = f"International transport data from detailed table differs from bunkers table more than expected (column {column})."
+            assert (
+                100
+                * abs(detailed_international_transport[column] - bunkers_international_transport[column].fillna(0.0))
+                / (detailed_international_transport[column] + 1e-7)
+            ).max() < 1e-4, error
+    # -> We can safely remove international aviation and shipping from the detailed table, since the bunkers table contains all national data. We will create a region aggregate afterwards to account for global emissions.
+
+    # So, combining all the conclusions above:
+    # -> We can safely remove all data for domestic aviation, international aviation, and international shipping from the detailed table.
+
+    # TODO: In the detailed table, check that there is a "global" aggregate for all sectors, and that it adds up to exactly the same as the sum of all countries (except for international shipping and aviation, where it doesn't exist at the national level).
 
     # Check where there is nonzero global data in the detailed table.
     # In principle, I understood that only international aviation and shipping should be informed for "global" in the detailed table.
@@ -257,25 +316,61 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
 
 
 def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -> Table:
-    # The bunkers table contains a "global" country. But note that, according to the README inside the bunkers zip folder,
-    # * The "global" emissions in the detailed table contain bunker emission (international shipping, domestic aviation, and international aviation).
-    # * The "global" emissions in the bunkers table (already contained in the detailed "global" emissions) are the difference between total shipping fuel consumption (as estimated by the International Maritime Organization and other sources) and fuel consumption as reported by IEA. This additional fuel cannot be allocated to specific iso's. This correction to total fuel consumption is modest in recent years, but becomes much larger in earlier years.
-    # So, we can draw the following conclusions:
-    # 1. We don't need to add bunker emissions to the detailed "global" emissions.
-    # 2. We can rename the bunkers "global" emissions as "Other", given that these emissions are not allocated to any country. If this causes too much confusion, we can consider deleting them.
-    # 3. Domestic aviation for each country is exactly the same in the detailed table and in the bunkers table (except that the latter contains data for Palestine). Therefore, delete domestic aviation from the detailed table.
-    # 4. International aviation in the detailed table is only informed for "global". So, when combining with the bunkers table, there will be no duplicates problem.
-    # 5. International shipping (sector) in the detailed table includes international shipping (subsector, which contains only "global") and oil tanker loading (which contains data for other countries). Bunkers table contains International shipping (subsector). Therefore, when combining both tables, there will be duplicates for all countries (one row corresponding to the oil tankers data from the detailed table, and another from the international shipping from the bunkers table).
+    # This function combines the detailed and bunkers tables.
+    # The decisions are based on the results of "sanity_check_inputs" and the content of the README file in the bunkers zip folder.
+
+    # Firstly, we don't need to keep the fuel information from the detailed table.
+    # Drop the fuel column and sum over all other dimensions.
+    # NOTE: This needs to be done before combining with bunkers, given that the latter does not contain fuel information.
+    tb_detailed = (
+        tb_detailed.drop(columns=["fuel"])
+        .groupby(["em", "country", "sector", "units"], as_index=False, observed=True)
+        .sum()
+    )
 
     # Rename bunkers table consistently with the detailed table.
     tb_bunkers = tb_bunkers.rename(columns={"iso": "country"}, errors="raise")
 
-    # Rename "global" in the bunkers table to "Other" (since it corresponds to a difference between estimates, that cannot be allocated to any country).
-    # NOTE: In sanity checks, we asserted that bunkers 'global' is only informed (and non-zero) for international shipping.
-    tb_bunkers["country"] = tb_bunkers["country"].cat.rename_categories(lambda x: "Other" if x == "global" else x)
-    # Now, remove domestic aviation from the detailed table (which is identical to the one in the bunkers table, except that the later contains Palestine).
-    tb_detailed = tb_detailed[tb_detailed["sector"] != SUBSECTOR_DOMESTIC_AVIATION].reset_index(drop=True)
+    # The main source of confusion between both tables is related to (domestic and international) aviation and international shipping.
+    # We concluded that this data can safely be removed from the detailed table, since
+    # * For international aviation and shipping, the detailed table contains only "global" data, which is the sum of all national data in the bunkers table.
+    # * For domestic aviation, the detailed table contains the same data as the bunkers table (except that the latter contains data for Palestine).
+    # TODO: Create global variables for international aviation and shipping sector names and replace them everywhere.
+    tb_detailed = tb_detailed[
+        ~tb_detailed["sector"].isin(
+            [SUBSECTOR_DOMESTIC_AVIATION, "1A3ai_International-aviation", "1A3di_International-shipping"]
+        )
+    ].reset_index(drop=True)
 
+    # The "global" domestic aviation emissions are exactly zero on both tables, so we can safely remove them from the bunkers table.
+    tb_bunkers = tb_bunkers[
+        ~((tb_bunkers["sector"] == SUBSECTOR_DOMESTIC_AVIATION) & (tb_bunkers["country"] == "global"))
+    ].reset_index(drop=True)
+
+    # The "global" emissions in the bunkers table are the difference between total shipping fuel consumption (as estimated by the International Maritime Organization and other sources) and fuel consumption as reported by IEA. This additional fuel cannot be allocated to specific iso's. This correction to total fuel consumption is modest in recent years, but becomes much larger in earlier years.
+    # In fact, the only nonzero "global" emissions in the bunkers table is for international shipping.
+    # So, rename "global" in the bunkers table to "Other" (since it corresponds to a difference between estimates, that cannot be allocated to any country).
+    tb_bunkers["country"] = tb_bunkers["country"].cat.rename_categories(lambda x: "Other" if x == "global" else x)
+    # We already removed "global" domestic aviation emissions from the bunkers table (which were zero), so now remove also international aviation emissions (which are also zero).
+    tb_bunkers = tb_bunkers[
+        ~((tb_bunkers["country"] == "Other") & (tb_bunkers["sector"].isin(["1A3ai_International-aviation"])))
+    ].reset_index(drop=True)
+    # Sanity check.
+    assert tb_bunkers[tb_bunkers["country"] == "global"].empty
+    assert set(tb_bunkers[tb_bunkers["country"] == "Other"]["sector"]) == set(["1A3di_International-shipping"])
+
+    # Manually create "global" aggregates for domestic aviation, international aviation, and international shipping in the bunkers table.
+    tb_bunkers = pr.concat(
+        [
+            tb_bunkers,
+            tb_bunkers.drop(columns=["country"])
+            .groupby(["em", "sector", "units"], as_index=False, observed=True)
+            .sum()
+            .assign(**{"country": "global"}),
+        ]
+    )
+
+    # Combine detailed table (where domestic aviation, international aviation, and international shipping were removed) and bunkers tables (which now contains all national and global data on domesetic aviation, international aviation, and international shipping).
     tb = pr.concat([tb_detailed, tb_bunkers], short_name=paths.short_name)
 
     # Remove units column.
@@ -335,15 +430,6 @@ def run(dest_dir: str) -> None:
     #
     # Sanity checks inputs.
     sanity_check_inputs(tb_detailed=tb_detailed, tb_bunkers=tb_bunkers)
-
-    # We don't need to keep the fuel information from the detailed table.
-    # Drop the fuel column and sum over all other dimensions.
-    # NOTE: This needs to be done before combining with bunkers, given that the latter does not contain fuel information.
-    tb_detailed = (
-        tb_detailed.drop(columns=["fuel"])
-        .groupby(["em", "country", "sector", "units"], as_index=False, observed=True)
-        .sum()
-    )
 
     # Combine detailed and bunkers tables.
     tb = combine_detailed_and_bunkers_tables(tb_detailed=tb_detailed, tb_bunkers=tb_bunkers)
