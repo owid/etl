@@ -25,10 +25,10 @@ tables:
         title: Gini coefficient (World Bank PIP) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>>
         display:
           name: Gini coefficient around <<ref_year>>
-      gini_wid_posttaxnational_peradult:
-        title: Gini coefficient (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (post-tax)
-        display:
-          name: Gini coefficient around <<ref_year>>
+      # gini_wid_posttaxnational_peradult:
+      #   title: Gini coefficient (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (post-tax)
+      #   display:
+      #     name: Gini coefficient around <<ref_year>>
       # gini_wid_pretaxnational_peradult:
       #   title: Gini coefficient (WID) for the year <<ref_year>> (<<year_1>>-<<year_2>> comparison) - <<only_all_series>> (pre-tax)
       #   display:

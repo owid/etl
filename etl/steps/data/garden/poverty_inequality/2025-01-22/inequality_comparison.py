@@ -31,11 +31,11 @@ log = get_logger()
 # Define columns that we want to analyze
 INDICATORS_FOR_ANALYSIS = {
     "gini_pip_disposable_perCapita": "gini",
-    # "p90p100Share_pip_disposable_perCapita": "decile10_share",
-    # "gini_wid_pretaxNational_perAdult": "p0p100_gini_pretax",
-    # "p99p100Share_wid_pretaxNational_perAdult": "p99p100_share_pretax",
-    # "p90p100Share_wid_pretaxNational_perAdult": "p90p100_share_pretax",
-    "gini_wid_posttaxNational_perAdult": "p0p100_gini_posttax_nat",
+    "p90p100Share_pip_disposable_perCapita": "decile10_share",
+    "gini_wid_pretaxNational_perAdult": "p0p100_gini_pretax",
+    "p99p100Share_wid_pretaxNational_perAdult": "p99p100_share_pretax",
+    "p90p100Share_wid_pretaxNational_perAdult": "p90p100_share_pretax",
+    # "gini_wid_posttaxNational_perAdult": "p0p100_gini_posttax_nat",
     # "p99p100Share_wid_posttaxNational_perAdult": "p99p100_share_posttax_nat",
     # "p90p100Share_wid_posttaxNational_perAdult": "p90p100_share_posttax_nat",
 }
@@ -47,42 +47,12 @@ INDICATORS_FOR_ANALYSIS = {
 # min_interval: minimum distance between the observation year and the reference year
 REFERENCE_YEARS = [
     {
-        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
-        2019: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0, "excluded_years": []},
-    },
-    {
-        1993: {"maximum_distance": 3, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
-        2019: {"maximum_distance": 3, "tie_break_strategy": "higher", "min_interval": 0, "excluded_years": []},
-    },
-    {
-        1993: {"maximum_distance": 2, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
-        2019: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0, "excluded_years": []},
-    },
-    {
-        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
+        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": [1988, 1989]},
         2019: {
             "maximum_distance": 5,
             "tie_break_strategy": "higher",
             "min_interval": 0,
             "excluded_years": [2020, 2021, 2022, 2023, 2024],
-        },
-    },
-    {
-        1993: {"maximum_distance": 3, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
-        2019: {
-            "maximum_distance": 3,
-            "tie_break_strategy": "higher",
-            "min_interval": 0,
-            "excluded_years": [2020, 2021, 2022],
-        },
-    },
-    {
-        1993: {"maximum_distance": 2, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": []},
-        2019: {
-            "maximum_distance": 2,
-            "tie_break_strategy": "higher",
-            "min_interval": 0,
-            "excluded_years": [2020, 2021],
         },
     },
 ]
@@ -105,7 +75,7 @@ def run(dest_dir: str) -> None:
     tb_wid = ds_wid.read("world_inequality_database")
     tb_lis = ds_lis.read("luxembourg_income_study")
 
-    # Change types of some columns to avoid issues with filering and missing values on merge
+    # Change types of some columns to avoid issues with filtering and missing values on merge
     tb = tb.astype({"pipreportinglevel": "object", "pipwelfare": "object", "series_code": "object"})
 
     #### SET REF YEARS AND THEN RUN ####
