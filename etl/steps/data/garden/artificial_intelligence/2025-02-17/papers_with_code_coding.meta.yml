@@ -13,7 +13,7 @@ definitions:
 tables:
   papers_with_code_coding:
     variables:
-      performance_code_any_interview:
+      performance_code_any_competition:
         title: Coding competitions
         description_key:
           - This benchmark measures the accuracy of models in coding competitions based on the APPS benchmark. The APPS benchmark focuses on coding ability and problem-solving in a natural language context. It aims to replicate the evaluation process used for human programmers by presenting coding problems in unrestricted natural language and assessing the correctness of solutions.
@@ -21,7 +21,7 @@ tables:
           - The coding tasks included in this benchmark are sourced from open-access coding websites such as Codeforces and Kattis. These tasks span a range of difficulty levels, from introductory to collegiate competition level. The benchmark evaluates the accuracy of models in solving programming tasks specifically designed for coding competitions.
 
 
-      performance_code_any_competition:
+      performance_code_any_interview:
         title: Coding interviews
         description_key:
           - This benchmark assesses the accuracy of models in coding interviews based on the APPS benchmark. The APPS benchmark focuses on coding ability and problem-solving in a natural language context, simulating the evaluation process employed during human programmer interviews. It presents coding problems in unrestricted natural language and evaluates the correctness of solutions.
