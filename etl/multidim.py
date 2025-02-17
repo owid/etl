@@ -1,3 +1,10 @@
+"""TODO:
+
+- Structure MDIM config and related objects in a more pythonic way (e.g. dataclass).
+- Need to be able to quickly validate the configs against schemas.
+- We should try to keep explorers in mind, and see this tooling as something we may want to use for them, too.
+"""
+
 import re
 from collections import defaultdict
 from copy import deepcopy
