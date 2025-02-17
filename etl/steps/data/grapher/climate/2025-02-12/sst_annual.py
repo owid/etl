@@ -14,7 +14,9 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("sst_annual")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("sst", reset_index=False)
+    tb = ds_garden.read("sst", reset_index=True)
+    tb["country"] = tb["country"].replace({"World": "Global"})
+    tb = tb.format(["year", "country"])
 
     #
     # Save outputs.

@@ -8,7 +8,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 31
-  title: Equatorial Pacific Sea Surface Temperatures (SST) data - El Niño or La Niña
+  title: Equatorial Pacific Sea Surface Temperatures (SST) data - El Niño or La Niña Annual Anomaly
 
 tables:
   sst:
