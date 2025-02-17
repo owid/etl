@@ -156,6 +156,27 @@ EXPECTED_UNITS = {
     "SO2": "ktSO2",
 }
 
+# Regions to create when aggregating data.
+REGIONS = {
+    # Default continents.
+    "Africa": {},
+    "Asia": {},
+    "Europe": {},
+    "North America": {},
+    "Oceania": {},
+    "South America": {},
+    # Income groups.
+    "Low-income countries": {},
+    "Upper-middle-income countries": {},
+    "Lower-middle-income countries": {},
+    "High-income countries": {},
+    # Other special regions.
+    "European Union (27)": {},
+    # Global aggregate.
+    # TODO: Define "Other" as a global variable above, in case it gets renamed.
+    "World": {"additional_members": ["Other"]},
+}
+
 
 def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     # Define list of data columns
@@ -229,7 +250,6 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
         == 0
     ), error
     # -> We can safely remove "global" domestic aviation from both tables.
-    # TODO: Ensure at the end there is an aggregated global total for domestic emissions.
 
     # Check that national domestic aviation emissions given in the bunkers table are the same as the ones given in the detailed table.
     # NOTE: Here, ignore "pse" (Palestine) in bunkers, which is not informed in the detailed table.
@@ -273,7 +293,8 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     ) == set(["1A3di_International-shipping"]), error
     # -> We can rename "global" emissions in the bunkers table as "Other" for international shipping, and remove all other "global" emissions (which are zero, namely for domestic and international aviation).
 
-    # Check that the "global" emissions in the detailed table for international shipping and international aviation are the sum of all national emissions (given in the bunkers table).
+    # Check that the "global" emissions in the detailed table for international shipping and international aviation are the sum of all national emissions given in the bunkers table.
+    # NOTE: Here, the sum in bunkers international shipping will include the "global" component (which will be renamed "Other", as it corresponds to unallocated emissions).
     bunkers_international_transport = (
         tb_bunkers[tb_bunkers["sector"].isin(["1A3ai_International-aviation", "1A3di_International-shipping"])]
         .drop(columns=["iso"])
@@ -301,18 +322,66 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     # So, combining all the conclusions above:
     # -> We can safely remove all data for domestic aviation, international aviation, and international shipping from the detailed table.
 
-    # TODO: In the detailed table, check that there is a "global" aggregate for all sectors, and that it adds up to exactly the same as the sum of all countries (except for international shipping and aviation, where it doesn't exist at the national level).
+    # Once domestic aviation, international aviation, and international shipping are removed, we would expect that there is no "global" data in the detailed table. However, that's not the case. There seems to be other sectors with nonzero "global" contribution in the detailed table.
+    # One of those sectors is "1A3di_Oil_Tanker_Loading", which contains a significant amount of emissions (and will be mapped within international shipping later). I will sanity check this one later.
+    # For now, ignore oil tanker loading, and compare the rest of those potentially spurious "global" emissions with the aggregate of all other countries.
+    global_exceptions = tb_detailed[
+        ~(
+            tb_detailed["sector"].isin(
+                [
+                    "1A3ai_International-aviation",
+                    "1A3di_International-shipping",
+                    SUBSECTOR_DOMESTIC_AVIATION,
+                    "1A3di_Oil_Tanker_Loading",
+                ]
+            )
+        )
+        & (tb_detailed["country"] == "global")
+        & (tb_detailed[data_columns] > 0).any(axis=1)
+    ].drop(columns=["country", "fuel"])
+    aggregate_exceptions = (
+        tb_detailed[(tb_detailed["country"] != "global")]
+        .drop(columns=["country", "fuel"])
+        .groupby(["em", "sector", "units"], as_index=False, observed=True)
+        .sum()
+    )
+    compared = global_exceptions.merge(
+        aggregate_exceptions, how="inner", on=["em", "sector", "units"], suffixes=("_global", "_aggregate")
+    )
+    global_exceptions_values = compared[[column for column in compared.columns if column.endswith("_global")]].values
+    aggregate_exceptions_values = compared[
+        [column for column in compared.columns if column.endswith("_aggregate")]
+    ].values
+    error = "Expected that, when aggregating all emissions and getting a total of zero, 'global' (potentially spurious) emissions should also be zero. That's no longer the case."
+    assert (
+        len(global_exceptions_values[(global_exceptions_values != 0) & (aggregate_exceptions_values == 0)]) == 0
+    ), error
+    error = "Expected that the given (potentially spurious) global emissions should be a small percentage of the aggregate of emissions (except for oil tanker loading, and international shipping and aviation). That's no longer the case."
+    assert (
+        max(
+            100
+            * global_exceptions_values[aggregate_exceptions_values > 0]
+            / aggregate_exceptions_values[aggregate_exceptions_values > 0]
+        )
+        < 0.03
+    ), error
+    # -> All "global" emissions in the detailed table (except for oil tanker loading, domestic aviation, international aviation, and international shipping) are < 0.03% of the aggregate of all emissions. So we can rename them as "Other".
 
-    # Check where there is nonzero global data in the detailed table.
-    # In principle, I understood that only international aviation and shipping should be informed for "global" in the detailed table.
-    # However, it seems that also 1A3di_Oil_Tanker_Loading is informed.
-    # This will be included as part of international shipping.
-    # TODO: Note that, for NMVOC, this is informed from 1960, and exactly zero before that. This create an abrupt jump in international shipping (but probably small in the true global total of NMVOC).
-    # TODO: It seems that also other pollutants are nonzero from 1960 in the detailed table for "global". By eye, they seem to be a very small contribution, possibly spurious.
-    # So, add the appropriate sanity checks and consider removing these points or adding them as "Other".
-    # global_data = tb_detailed[(tb_detailed["country"]=="global") & (tb_detailed[data_columns] > 0).any(axis=1) & (~tb_detailed["sector"].isin(["1A3ai_International-aviation", "1A3di_International-shipping"]))]
-    # error = "Expected global data to be "
-    # assert global_data[[column for column in data_columns if int(column.replace("x", "")) < 1960]].sum().sum() == 0
+    # Find nonzero contributions to oil tanker loading in the detailed table.
+    oil_tanker = tb_detailed[
+        (tb_detailed["sector"] == "1A3di_Oil_Tanker_Loading") & (tb_detailed[data_columns] > 0).any(axis=1)
+    ][["em", "country", "fuel"]].drop_duplicates()
+    error = "Nonzero data for oil tanker loading has changed. Adapt this sanity check."
+    assert oil_tanker.values.tolist() == [
+        ["BC", "usa", "process"],
+        ["NMVOC", "global", "process"],
+        ["OC", "usa", "process"],
+    ], error
+    # Oil tanker loading is zero for most countries-pollutants. It's only nonzero for the US (BC and OC) and for "global" (NMVOC). It doesn't make sense to have zero NMVOC from all countries, and yet have a "global" nonzero contribution. So it seems safe to consider this "global" contribution also as "Other".
+    # NOTE: In the metadata, we should clarify that "Other" doesn't mean "Other countries", but rather "Not possible to allocate to individual countries".
+    # TODO: Ensure that's clear from the metadata.
+    # -> Rename all remaining "global" data in the detailed table as "Other".
+    # TODO: Note that, NMVOC oil tanker loading is informed from 1960, and exactly zero before that. This create an abrupt jump in international shipping (but maybe small in the true global total of NMVOC).
 
 
 def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -> Table:
@@ -335,7 +404,7 @@ def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -
     # We concluded that this data can safely be removed from the detailed table, since
     # * For international aviation and shipping, the detailed table contains only "global" data, which is the sum of all national data in the bunkers table.
     # * For domestic aviation, the detailed table contains the same data as the bunkers table (except that the latter contains data for Palestine).
-    # TODO: Create global variables for international aviation and shipping sector names and replace them everywhere.
+    # TODO: Create global variables for international aviation, shipping sector, and oil tanker loading sector names and replace them everywhere.
     tb_detailed = tb_detailed[
         ~tb_detailed["sector"].isin(
             [SUBSECTOR_DOMESTIC_AVIATION, "1A3ai_International-aviation", "1A3di_International-shipping"]
@@ -359,16 +428,24 @@ def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -
     assert tb_bunkers[tb_bunkers["country"] == "global"].empty
     assert set(tb_bunkers[tb_bunkers["country"] == "Other"]["sector"]) == set(["1A3di_International-shipping"])
 
-    # Manually create "global" aggregates for domestic aviation, international aviation, and international shipping in the bunkers table.
-    tb_bunkers = pr.concat(
-        [
-            tb_bunkers,
-            tb_bunkers.drop(columns=["country"])
-            .groupby(["em", "sector", "units"], as_index=False, observed=True)
-            .sum()
-            .assign(**{"country": "global"}),
-        ]
-    )
+    # Similarly, in the detailed table, after removing aviation and shipping, there is still some (almost negligible) "global" contribution in certain pollutants and sectors.
+    # They may be spurious (and add up to less than 0.03% of the aggregate of all countries for each year-sector-pollutant).
+    # There is only one exception: "global" oil tanker loading NMVOC is not negligible (and in fact, "global" is the only nonzero country).
+    # So, instead of removing all those "global", we can simply rename them as "Other" (meaning: "Not allocated to any individual country").
+    tb_detailed["country"] = tb_detailed["country"].cat.rename_categories(lambda x: "Other" if x == "global" else x)
+    assert tb_detailed[tb_detailed["country"] == "global"].empty
+
+    # TODO: Consider removing, we can simply create all aggregates once, after combining the two tables.
+    # # Manually create "global" aggregates for domestic aviation, international aviation, and international shipping in the bunkers table.
+    # tb_bunkers = pr.concat(
+    #     [
+    #         tb_bunkers,
+    #         tb_bunkers.drop(columns=["country"])
+    #         .groupby(["em", "sector", "units"], as_index=False, observed=True)
+    #         .sum()
+    #         .assign(**{"country": "global"}),
+    #     ]
+    # )
 
     # Combine detailed table (where domestic aviation, international aviation, and international shipping were removed) and bunkers tables (which now contains all national and global data on domesetic aviation, international aviation, and international shipping).
     tb = pr.concat([tb_detailed, tb_bunkers], short_name=paths.short_name)
@@ -377,15 +454,17 @@ def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -
     # NOTE: In the sanity checks, we asserted that they were as expected.
     tb = tb.drop(columns=["units"], errors="raise")
 
-    # Sanity check.
+    # Sanity checks.
     error = "There are duplicated rows in the combined table."
     assert tb[tb.duplicated(subset=["em", "country", "sector"], keep=False)].empty, error
+    error = "Expected no 'global' data in the combined table. Something is wrong in the processing."
+    assert tb[tb["country"] == "global"].empty, error
 
     return tb
 
 
 def remap_table_categories(tb: Table) -> Table:
-    # We don't need the detailed sectorial information, and we don't need to keep the fuel information either.
+    # We don't need the detailed sectorial information.
     # So, map detailed subsectors into broader sectors, e.g. "Transportation", "Agriculture".
     subsector_to_sector = {
         subsector: sector for sector, subsectors in SECTOR_MAPPING.items() for subsector in subsectors
@@ -428,13 +507,13 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Sanity checks inputs.
+    # Sanity check inputs.
     sanity_check_inputs(tb_detailed=tb_detailed, tb_bunkers=tb_bunkers)
 
-    # Combine detailed and bunkers tables.
+    # Combine detailed and bunkers tables (and remove the "fuel" dimension, which for now we don't need).
     tb = combine_detailed_and_bunkers_tables(tb_detailed=tb_detailed, tb_bunkers=tb_bunkers)
 
-    # Simplify subsectors into broader categories, and remove the "fuel" dimension, which for now we don't need.
+    # Simplify subsectors into broader categories.
     tb = remap_table_categories(tb=tb)
 
     # Restructure table to have year as a column.
@@ -446,7 +525,6 @@ def run(dest_dir: str) -> None:
 
     # TODO: It seems that CH4 and N20 have only non-zero data from 1970 onwards, and all data is exactly zero right before this year.
     # These are probably spurious zeros. So, assert that prior to 1970 all data for these two pollutants is zero, and remove those points.
-    # TODO: I noticed that World is smaller than individual countries, e.g. for NOx all sectors. What's going on here, is "global" only given for certain sectors? If so, recalculate aggregate.
 
     # Convert units from kilotonnes to tonnes.
     tb["emissions"] *= 1e3
@@ -457,7 +535,6 @@ def run(dest_dir: str) -> None:
             tb,
             tb.groupby(["pollutant", "country", "year"], as_index=False, observed=True)
             .agg({"emissions": "sum"})
-            .assign(**{"sector": "All sectors"})
             .assign(**{"sector": "All sectors"}),
         ]
     )
@@ -465,6 +542,7 @@ def run(dest_dir: str) -> None:
     # Add region aggregates.
     tb = geo.add_regions_to_table(
         tb=tb,
+        regions=REGIONS,
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         index_columns=["country", "year", "pollutant", "sector"],
