@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Set, Union
 
 import pandas as pd
 import yaml
+from deprecated import deprecated
 from owid.catalog import Dataset, Table
 from sqlalchemy.engine import Engine
 from structlog import get_logger
