@@ -793,24 +793,34 @@ def _check_intersection_iters(
         )
 
 
-def group_views(views: dict[str, Any], by: list[str]) -> list[dict[str, Any]]:
+def group_views(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:
     """
     Group views by the specified dimensions. Concatenate indicators for the same group.
+
+    :param views: List of views dictionaries.
+    :param by: List of dimensions to group by.
     """
     views = deepcopy(views)
 
     grouped_views = {}
     for view in views:
         # Group key
-        key = tuple(view["dimensions"][dim] for dim in by)  # type: ignore
+        key = tuple(view["dimensions"][dim] for dim in by)
 
         if key not in grouped_views:
-            # Turn indicators into a list
-            view["indicators"]["y"] = [view["indicators"]["y"]]  # type: ignore
+            # Ensure 'y' is a single indicator before turning it into a list
+            assert not isinstance(view["indicators"]["y"], list), "Expected 'y' to be a single indicator, not a list"
+
+            if set(view["indicators"].keys()) != {"y"}:
+                raise NotImplementedError(
+                    "Only 'y' indicator is supported in groupby. Adapt the code for other fields."
+                )
+
+            view["indicators"]["y"] = [view["indicators"]["y"]]
 
             # Add to dictionary
             grouped_views[key] = view
         else:
-            grouped_views[key]["indicators"]["y"].append(view["indicators"]["y"])  # type: ignore
+            grouped_views[key]["indicators"]["y"].append(view["indicators"]["y"])
 
     return list(grouped_views.values())
