@@ -11,6 +11,12 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # Sector mapping.
+# Define the name of the domestic aviation subsector (which will need to be handled separately).
+SUBSECTOR_INTERNATIONAL_AVIATION = "1A3ai_International-aviation"
+SUBSECTOR_INTERNATIONAL_SHIPPING = "1A3di_International-shipping"
+SUBSECTOR_DOMESTIC_AVIATION = "1A3aii_Domestic-aviation"
+SUBSECTOR_OIL_TANKER_LOADING = "1A3di_Oil_Tanker_Loading"
+
 # This mapping can be found on page 12 of their version comparison document:
 # https://github.com/JGCRI/CEDS/blob/master/documentation/Version_comparison_figures_v_2024_07_08_vs_v_2021_04_20.pdf
 SECTOR_MAPPING = {
@@ -24,11 +30,11 @@ SECTOR_MAPPING = {
     ],
     # In the document, they had a sector "Aviation", containing international aviation and domestic aviation. But I think it's better to separate them.
     # "Aviation": [
-    #     "1A3ai_International-aviation",
-    #     "1A3aii_Domestic-aviation",
+    #     SUBSECTOR_INTERNATIONAL_AVIATION,
+    #     SUBSECTOR_DOMESTIC_AVIATION,
     # ],
-    "International aviation": ["1A3ai_International-aviation"],
-    "Domestic aviation": ["1A3aii_Domestic-aviation"],
+    "International aviation": [SUBSECTOR_INTERNATIONAL_AVIATION],
+    "Domestic aviation": [SUBSECTOR_DOMESTIC_AVIATION],
     # "Residential, Commercial, Other (DOM)".
     "Residential, commercial, and other": [
         "1A4a_Commercial-institutional",
@@ -38,8 +44,8 @@ SECTOR_MAPPING = {
     ],
     # "Int. Shipping".
     "International shipping": [
-        "1A3di_International-shipping",
-        "1A3di_Oil_Tanker_Loading",
+        SUBSECTOR_INTERNATIONAL_SHIPPING,
+        SUBSECTOR_OIL_TANKER_LOADING,
     ],
     # "Energy Transformation and Production (ENE)".
     "Energy transformation and production": [
@@ -117,14 +123,11 @@ SECTOR_MAPPING = {
     ],
 }
 
-# Define the name of the domestic aviation subsector (which will need to be handled separately).
-SUBSECTOR_DOMESTIC_AVIATION = "1A3aii_Domestic-aviation"
-
 # Subsectors expected in the bunkers table.
 BUNKERS_SECTORS = [
-    "1A3ai_International-aviation",
+    SUBSECTOR_INTERNATIONAL_AVIATION,
     SUBSECTOR_DOMESTIC_AVIATION,
-    "1A3di_International-shipping",
+    SUBSECTOR_INTERNATIONAL_SHIPPING,
 ]
 
 # Mapping of pollutants.
@@ -283,26 +286,26 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
 
     # Check that the detailed table contains international aviation and shipping only for "global".
     error = "International aviation and shipping was expected to be informed only for 'global' in the detailed table."
-    for sector in ["1A3ai_International-aviation", "1A3di_International-shipping"]:
+    for sector in [SUBSECTOR_INTERNATIONAL_AVIATION, SUBSECTOR_INTERNATIONAL_SHIPPING]:
         assert set(tb_detailed[tb_detailed["sector"] == sector]["country"]) == set(["global"]), error
 
     # Check that the only nonzero "global" information in the bunkers table is for international shipping (representing "Other" emissions that cannot be allocated to any country).
     error = "Expected 'global' in the bunkers table to be nonzero only for international shipping."
     assert set(
         tb_bunkers[(tb_bunkers["iso"] == "global") & (tb_bunkers[[c for c in data_columns]].sum(axis=1) > 0)]["sector"]
-    ) == set(["1A3di_International-shipping"]), error
+    ) == set([SUBSECTOR_INTERNATIONAL_SHIPPING]), error
     # -> We can rename "global" emissions in the bunkers table as "Other" for international shipping, and remove all other "global" emissions (which are zero, namely for domestic and international aviation).
 
     # Check that the "global" emissions in the detailed table for international shipping and international aviation are the sum of all national emissions given in the bunkers table.
     # NOTE: Here, the sum in bunkers international shipping will include the "global" component (which will be renamed "Other", as it corresponds to unallocated emissions).
     bunkers_international_transport = (
-        tb_bunkers[tb_bunkers["sector"].isin(["1A3ai_International-aviation", "1A3di_International-shipping"])]
+        tb_bunkers[tb_bunkers["sector"].isin([SUBSECTOR_INTERNATIONAL_AVIATION, SUBSECTOR_INTERNATIONAL_SHIPPING])]
         .drop(columns=["iso"])
         .groupby(["em", "sector", "units"])
         .sum()
     )
     detailed_international_transport = (
-        tb_detailed[(tb_detailed["sector"].isin(["1A3ai_International-aviation", "1A3di_International-shipping"]))]
+        tb_detailed[(tb_detailed["sector"].isin([SUBSECTOR_INTERNATIONAL_AVIATION, SUBSECTOR_INTERNATIONAL_SHIPPING]))]
         .drop(columns=["country", "fuel"])
         .groupby(["em", "sector", "units"])
         .sum()
@@ -323,16 +326,16 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     # -> We can safely remove all data for domestic aviation, international aviation, and international shipping from the detailed table.
 
     # Once domestic aviation, international aviation, and international shipping are removed, we would expect that there is no "global" data in the detailed table. However, that's not the case. There seems to be other sectors with nonzero "global" contribution in the detailed table.
-    # One of those sectors is "1A3di_Oil_Tanker_Loading", which contains a significant amount of emissions (and will be mapped within international shipping later). I will sanity check this one later.
+    # One of those sectors is oil tanker loading, which contains a significant amount of emissions (and will be mapped within international shipping later). I will sanity check this one later.
     # For now, ignore oil tanker loading, and compare the rest of those potentially spurious "global" emissions with the aggregate of all other countries.
     global_exceptions = tb_detailed[
         ~(
             tb_detailed["sector"].isin(
                 [
-                    "1A3ai_International-aviation",
-                    "1A3di_International-shipping",
+                    SUBSECTOR_INTERNATIONAL_AVIATION,
+                    SUBSECTOR_INTERNATIONAL_SHIPPING,
                     SUBSECTOR_DOMESTIC_AVIATION,
-                    "1A3di_Oil_Tanker_Loading",
+                    SUBSECTOR_OIL_TANKER_LOADING,
                 ]
             )
         )
@@ -369,7 +372,7 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
 
     # Find nonzero contributions to oil tanker loading in the detailed table.
     oil_tanker = tb_detailed[
-        (tb_detailed["sector"] == "1A3di_Oil_Tanker_Loading") & (tb_detailed[data_columns] > 0).any(axis=1)
+        (tb_detailed["sector"] == SUBSECTOR_OIL_TANKER_LOADING) & (tb_detailed[data_columns] > 0).any(axis=1)
     ][["em", "country", "fuel"]].drop_duplicates()
     error = "Nonzero data for oil tanker loading has changed. Adapt this sanity check."
     assert oil_tanker.values.tolist() == [
@@ -404,10 +407,9 @@ def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -
     # We concluded that this data can safely be removed from the detailed table, since
     # * For international aviation and shipping, the detailed table contains only "global" data, which is the sum of all national data in the bunkers table.
     # * For domestic aviation, the detailed table contains the same data as the bunkers table (except that the latter contains data for Palestine).
-    # TODO: Create global variables for international aviation, shipping sector, and oil tanker loading sector names and replace them everywhere.
     tb_detailed = tb_detailed[
         ~tb_detailed["sector"].isin(
-            [SUBSECTOR_DOMESTIC_AVIATION, "1A3ai_International-aviation", "1A3di_International-shipping"]
+            [SUBSECTOR_DOMESTIC_AVIATION, SUBSECTOR_INTERNATIONAL_AVIATION, SUBSECTOR_INTERNATIONAL_SHIPPING]
         )
     ].reset_index(drop=True)
 
@@ -422,11 +424,11 @@ def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -
     tb_bunkers["country"] = tb_bunkers["country"].cat.rename_categories(lambda x: "Other" if x == "global" else x)
     # We already removed "global" domestic aviation emissions from the bunkers table (which were zero), so now remove also international aviation emissions (which are also zero).
     tb_bunkers = tb_bunkers[
-        ~((tb_bunkers["country"] == "Other") & (tb_bunkers["sector"].isin(["1A3ai_International-aviation"])))
+        ~((tb_bunkers["country"] == "Other") & (tb_bunkers["sector"].isin([SUBSECTOR_INTERNATIONAL_AVIATION])))
     ].reset_index(drop=True)
     # Sanity check.
     assert tb_bunkers[tb_bunkers["country"] == "global"].empty
-    assert set(tb_bunkers[tb_bunkers["country"] == "Other"]["sector"]) == set(["1A3di_International-shipping"])
+    assert set(tb_bunkers[tb_bunkers["country"] == "Other"]["sector"]) == set([SUBSECTOR_INTERNATIONAL_SHIPPING])
 
     # Similarly, in the detailed table, after removing aviation and shipping, there is still some (almost negligible) "global" contribution in certain pollutants and sectors.
     # They may be spurious (and add up to less than 0.03% of the aggregate of all countries for each year-sector-pollutant).
