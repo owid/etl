@@ -536,3 +536,48 @@ steps:
     - data://meadow/artificial_intelligence/2023-06-08/yougov_end_of_humanity
   data://grapher/artificial_intelligence/2023-06-08/yougov_end_of_humanity:
     - data://garden/artificial_intelligence/2023-06-08/yougov_end_of_humanity
+
+  # YouGov AI surveys
+  data://meadow/artificial_intelligence/2024-07-23/yougov_robots:
+    - snapshot://artificial_intelligence/2024-07-23/yougov_robots.xlsx
+  data://garden/artificial_intelligence/2024-07-23/yougov_robots:
+    - data://meadow/artificial_intelligence/2024-07-23/yougov_robots
+  data://grapher/artificial_intelligence/2024-07-23/yougov_robots:
+    - data://garden/artificial_intelligence/2024-07-23/yougov_robots
+
+  data://meadow/artificial_intelligence/2024-07-23/yougov_job_automation:
+    - snapshot://artificial_intelligence/2024-07-23/yougov_job_automation.xlsx
+  data://garden/artificial_intelligence/2024-07-23/yougov_job_automation:
+    - data://meadow/artificial_intelligence/2024-07-23/yougov_job_automation
+  data://grapher/artificial_intelligence/2024-07-23/yougov_job_automation:
+    - data://garden/artificial_intelligence/2024-07-23/yougov_job_automation
+
+  # Artificial Intelligence Papers with Code (benchmarks) - 2024
+  data://meadow/artificial_intelligence/2024-03-22/papers_with_code_coding:
+    - snapshot://artificial_intelligence/2024-03-22/papers_with_code_coding.html
+  data://garden/artificial_intelligence/2024-03-22/papers_with_code_coding:
+    - data://meadow/artificial_intelligence/2024-03-22/papers_with_code_coding
+  data://grapher/artificial_intelligence/2024-03-22/papers_with_code_coding:
+    - data://garden/artificial_intelligence/2024-03-22/papers_with_code_coding
+
+  data://meadow/artificial_intelligence/2024-03-22/papers_with_code_language:
+    - snapshot://artificial_intelligence/2024-03-22/papers_with_code_language.html
+  data://garden/artificial_intelligence/2024-03-22/papers_with_code_language:
+    - data://meadow/artificial_intelligence/2024-03-22/papers_with_code_language
+  data://grapher/artificial_intelligence/2024-03-22/papers_with_code_language:
+    - data://garden/artificial_intelligence/2024-03-22/papers_with_code_language
+
+  data://meadow/artificial_intelligence/2024-03-22/papers_with_code_math:
+    - snapshot://artificial_intelligence/2024-03-22/papers_with_code_math.html
+  data://garden/artificial_intelligence/2024-03-22/papers_with_code_math:
+    - data://meadow/artificial_intelligence/2024-03-22/papers_with_code_math
+  data://grapher/artificial_intelligence/2024-03-22/papers_with_code_math:
+    - data://garden/artificial_intelligence/2024-03-22/papers_with_code_math
+
+  # ImageNet
+  data://meadow/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - snapshot://artificial_intelligence/2024-07-23/papers_with_code_imagenet.html
+  data://garden/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - data://meadow/artificial_intelligence/2024-07-23/papers_with_code_imagenet
+  data://grapher/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - data://garden/artificial_intelligence/2024-07-23/papers_with_code_imagenet
