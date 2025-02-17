@@ -4,7 +4,7 @@ definitions:
     processing_level: minor
     presentation:
       topic_tags:
-        - Financing Healthcare
+        - Healthcare Spending
     description_from_producer: |-
       <% if financing_scheme == "Government/compulsory schemes" %>
       This category includes all schemes aimed at ensuring access to basic health care for the whole society, a large part of it, or at least some vulnerable groups. Included are: government schemes, social health insurance, compulsory private insurance and compulsory medical saving accounts.

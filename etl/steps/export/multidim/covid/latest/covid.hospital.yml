@@ -1,5 +1,4 @@
 definitions:
-  table: grapher/covid/latest/hospital/hospital
   config: &config
     hideAnnotationFieldsInTitle:
       entity: true
@@ -7,10 +6,9 @@ definitions:
       changeInPrefix: true
     originUrl: ourworldindata.org/coronavirus
 
-
 title:
-  title: COVID-19 hospitalisations
-  titleVariant: by type
+  title: COVID-19 hospitalizations
+  titleVariant: ""
 defaultSelection:
   - Belgium
   - Canada
@@ -29,7 +27,7 @@ dimensions:
     name: Type
     choices:
       - slug: hospital
-        name: Hospitalisations
+        name: Hospitalizations
         description: null
       - slug: icu
         name: Intensive care unit (ICU)
@@ -40,20 +38,20 @@ dimensions:
     choices:
       - slug: patients
         name: Patients
-        description: null
+        description: Current number of patients in hospital or ICU
       - slug: admissions
         name: Weekly admissions
-        description: null
+        description: New weekly admissions to the hospital or ICU
 
   - slug: normalize
     name: Normalization
     choices:
       - slug: absolute
-        name: None
+        name: Absolute number
         description: null
       - slug: per_capita
         name: Per million people
-        description: null
+        description: Normalized by million people living in the country or region
 
 views:
   - dimensions:
@@ -61,28 +59,28 @@ views:
       measure: patients
       normalize: absolute
     indicators:
-      y: "{definitions.table}#daily_occupancy_hosp"
+      y: "hospital#daily_occupancy_hosp"
     config: *config
   - dimensions:
       type: hospital
       measure: patients
       normalize: per_capita
     indicators:
-      y: "{definitions.table}#daily_occupancy_hosp_per_1m"
+      y: "hospital#daily_occupancy_hosp_per_1m"
     config: *config
   - dimensions:
       type: hospital
       measure: admissions
       normalize: absolute
     indicators:
-      y: "{definitions.table}#weekly_admissions_hosp"
+      y: "hospital#weekly_admissions_hosp"
     config: *config
   - dimensions:
       type: hospital
       measure: admissions
       normalize: per_capita
     indicators:
-      y: "{definitions.table}#weekly_admissions_hosp_per_1m"
+      y: "hospital#weekly_admissions_hosp_per_1m"
     config: *config
 
   - dimensions:
@@ -90,26 +88,26 @@ views:
       measure: patients
       normalize: absolute
     indicators:
-      y: "{definitions.table}#daily_occupancy_icu"
+      y: "hospital#daily_occupancy_icu"
     config: *config
   - dimensions:
       type: icu
       measure: patients
       normalize: per_capita
     indicators:
-      y: "{definitions.table}#daily_occupancy_icu_per_1m"
+      y: "hospital#daily_occupancy_icu_per_1m"
     config: *config
   - dimensions:
       type: icu
       measure: admissions
       normalize: absolute
     indicators:
-      y: "{definitions.table}#weekly_admissions_icu"
+      y: "hospital#weekly_admissions_icu"
     config: *config
   - dimensions:
       type: icu
       measure: admissions
       normalize: per_capita
     indicators:
-      y: "{definitions.table}#weekly_admissions_icu_per_1m"
+      y: "hospital#weekly_admissions_icu_per_1m"
     config: *config

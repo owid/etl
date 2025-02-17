@@ -6,13 +6,6 @@ defaultSelection:
 topicTags:
   - "Energy"
 dimensions:
-  - slug: "frequency"
-    name: "Frequency"
-    choices:
-      - slug: "annual"
-        name: "Annual"
-      - slug: "monthly"
-        name: "Monthly"
   - slug: "source"
     name: "Energy source"
     choices:
@@ -20,6 +13,13 @@ dimensions:
         name: "Electricity"
       - slug: "gas"
         name: "Gas"
+  - slug: "frequency"
+    name: "Frequency"
+    choices:
+      - slug: "annual"
+        name: "Annual"
+      - slug: "monthly"
+        name: "Monthly"
   - slug: "price_component"
     name: "Price type"
     choices:
@@ -36,7 +36,7 @@ dimensions:
         description: "Consumer price separated in its individual components"
         group: Price components disaggregated
   - slug: "consumer"
-    name: "Consumer type"
+    name: "User type"
     choices:
       - slug: "household"
         name: "Households"
@@ -45,17 +45,17 @@ dimensions:
         name: "Non-households"
         description: "Commercial and industrial consumers, including services, offices, and agriculture"
       - slug: "all"
-        name: "All consumers"
-        description: "All consumers"
+        name: "Electricity market"
+        # description: "All consumers"
   - slug: "unit"
     name: "Unit"
     choices:
       - slug: "euro"
         name: "Euro"
-        description: "Price in euros"
+        description: "Price in euros, adjusted for inflation"
       - slug: "pps"
         name: "PPS"
-        description: "Price in Purchasing Power Standard"
+        description: "Price in Purchasing Power Standard, adjusted for inflation and cost of living"
 views:
   # Views will be filled out programmatically.
   []

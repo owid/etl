@@ -236,15 +236,15 @@ steps:
 
   # Economist excess mortality
   data://meadow/excess_mortality/latest/excess_mortality_economist:
-    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_country.csv
-    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_country_per_100k.csv
-    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_country_cumulative.csv
-    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_country_per_100k_cumulative.csv
-    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_world.csv
-    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_world_per_100k.csv
-    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_world_cumulative.csv
-    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/export_world_per_100k_cumulative.csv
-    - etag://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data/output-for-interactive/by_location_full_data.csv
+    - snapshot://covid/latest/xm_econ_country.csv
+    - snapshot://covid/latest/xm_econ_country_cum.csv
+    - snapshot://covid/latest/xm_econ_country_100k.csv
+    - snapshot://covid/latest/xm_econ_country_cum_100k.csv
+    - snapshot://covid/latest/xm_econ_world.csv
+    - snapshot://covid/latest/xm_econ_world_cum.csv
+    - snapshot://covid/latest/xm_econ_world_100k.csv
+    - snapshot://covid/latest/xm_econ_world_cum_100k.csv
+    - snapshot://covid/latest/xm_econ_location.csv
   data://garden/excess_mortality/latest/excess_mortality_economist:
     - data://meadow/excess_mortality/latest/excess_mortality_economist
   data-private://grapher/excess_mortality/latest/excess_mortality_economist:
@@ -315,13 +315,16 @@ steps:
   ######################################
   # MULTIDIM
   export://multidim/covid/latest/covid:
-    - grapher://grapher/covid/latest/cases_deaths
-    - grapher://grapher/covid/latest/hospital
-    - grapher://grapher/covid/latest/vaccinations_global
-    - grapher://grapher/covid/latest/vaccinations_manufacturer
-    - grapher://grapher/covid/latest/testing
-    - grapher://grapher/covid/latest/google_mobility
-    - grapher://grapher/excess_mortality/latest/excess_mortality
-    - grapher://grapher/covid/latest/covax
-    - grapher://grapher/covid/latest/infections_model
-    - grapher://grapher/covid/latest/xm_who
+    - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/hospital
+    - data://grapher/covid/latest/vaccinations_global
+    - data://grapher/covid/latest/vaccinations_manufacturer
+    - data://grapher/covid/latest/testing
+    - data://grapher/excess_mortality/latest/excess_mortality
+    - data-private://grapher/excess_mortality/latest/excess_mortality_economist
+    - data://grapher/covid/latest/xm_who
+    - data://grapher/covid/latest/cases_deaths
+    - data://grapher/covid/latest/covax
+    - data://grapher/covid/latest/infections_model
+    - data://grapher/covid/latest/google_mobility
+    - data://grapher/regions/2023-01-01/regions

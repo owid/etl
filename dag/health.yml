@@ -659,8 +659,8 @@ steps:
     - data://garden/health/2024-08-23/eurostat_cancer
 
   # Multi-dim indicators
-  export://multidim/health/latest/causes_of_death:
-    - grapher://grapher/ihme_gbd/2024-05-20/gbd_cause
+  # export://multidim/health/latest/causes_of_death:
+  #   - data-private://grapher/ihme_gbd/2024-05-20/gbd_cause
 
   # GBD 2021 - GBD Risk Factors cancer specific
   data-private://meadow/ihme_gbd/2024-08-26/gbd_risk_cancer:
@@ -935,6 +935,36 @@ steps:
     - data://meadow/who/2025-01-17/mortality_database_vaccine_preventable
   data://grapher/who/2025-01-17/mortality_database_vaccine_preventable:
     - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+  #
+  # WHO Vaccine Safety
+  #
+  data://meadow/who/2025-01-28/vaccine_safety:
+    - snapshot://who/2025-01-28/vaccine_safety.xlsx
+  data://garden/who/2025-01-28/vaccine_safety:
+    - data://meadow/who/2025-01-28/vaccine_safety
+  data://grapher/who/2025-01-28/vaccine_safety:
+    - data://garden/who/2025-01-28/vaccine_safety
+
+  #
+  # GAVI Eligibility
+  #
+  data://meadow/gavi/2025-02-11/eligibility:
+    - snapshot://gavi/2025-02-11/eligibility.csv
+  data://garden/gavi/2025-02-11/eligibility:
+    - data://meadow/gavi/2025-02-11/eligibility
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/gavi/2025-02-11/eligibility:
+    - data://garden/gavi/2025-02-11/eligibility
+
+  #
+  # Vaccine confidence
+  #
+  data://meadow/health/2025-02-13/vaccine_confidence:
+    - snapshot://health/2025-02-13/vaccine_confidence.csv
+  data://garden/health/2025-02-13/vaccine_confidence:
+    - data://meadow/health/2025-02-13/vaccine_confidence
+  data://grapher/health/2025-02-13/vaccine_confidence:
+    - data://garden/health/2025-02-13/vaccine_confidence
 
   # UNAIDS (to archive)
   data://meadow/health/2023-08-09/unaids:

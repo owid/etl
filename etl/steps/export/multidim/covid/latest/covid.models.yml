@@ -1,5 +1,14 @@
 definitions:
-  table: grapher/covid/latest/infections_model/infections_model
+  confirmed_infections: &confirmed_infections
+    catalogPath: cases_deaths#new_cases_7_day_avg_right
+    display:
+      name: Confirmed cases, 7-day average
+      color: "#000000"
+  config: &config_base
+    subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
+    originUrl: ourworldindata.org/covid-models
+    hideAnnotationFieldsInTitle:
+      time: true
 
 title:
   title: Daily new estimated COVID-19 infections
@@ -11,20 +20,20 @@ topicTags:
 
 dimensions:
   - slug: model
-    name: Model
+    name: Statistical model
     choices:
       - slug: icl
         name: ICL
-        description: null
+        description: Imperial College London
       - slug: ihme
         name: IHME
-        description: null
+        description: Institute for Health and Metrics Evaluation
       - slug: lshtm
         name: LSHTM
-        description: null
+        description: London School of Hygiene and Tropical Medicine
       - slug: yyg
         name: YYG
-        description: null
+        description: Youyang Gu (2020)
 
 views:
   # ICL
@@ -32,69 +41,83 @@ views:
       model: icl
     indicators:
       y:
-        - "{definitions.table}#icl_infections__estimate_mean"
-        - "{definitions.table}#icl_infections__estimate_low"
-        - "{definitions.table}#icl_infections__estimate_upper"
-        - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
+        - catalogPath: infections_model#icl_infections__estimate_mean
+          display:
+            color: "#4C6A9C"
+        - catalogPath: infections_model#icl_infections__estimate_low
+          display:
+            color: "#B6C7DE"
+        - catalogPath: infections_model#icl_infections__estimate_upper
+          display:
+            color: "#B6C7DE"
+        - *confirmed_infections
 
     config:
+      <<: *config_base
       title: "Daily new estimated COVID-19 infections from the ICL model"
-      subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
       note: This chart shows the model estimates dated 25 December 2022.
-      originUrl: ourworldindata.org/covid-models
-      hideAnnotationFieldsInTitle:
-        time: true
 
   # IHME
   - dimensions:
       model: ihme
     indicators:
       y:
-        - "{definitions.table}#ihme_infections__estimate_mean"
-        - "{definitions.table}#ihme_infections__estimate_low"
-        - "{definitions.table}#ihme_infections__estimate_upper"
-        - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
+        - catalogPath: infections_model#ihme_infections__estimate_mean
+          display:
+            color: "#2C8465"
+        - catalogPath: infections_model#ihme_infections__estimate_low
+          display:
+            # plotMarkersOnlyInLineChart: true
+            color: "#A4C5B8"
+        - catalogPath: infections_model#ihme_infections__estimate_upper
+          display:
+            # plotMarkersOnlyInLineChart: true
+            color: "#A4C5B8"
+        - *confirmed_infections
 
     config:
+      <<: *config_base
       title: "Daily new estimated COVID-19 infections from the IHME model"
-      subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
       note: This chart shows the model estimates dated 16 December 2022.
-      originUrl: ourworldindata.org/covid-models
-      hideAnnotationFieldsInTitle:
-        time: true
 
   # LSHTM
   - dimensions:
       model: lshtm
     indicators:
       y:
-        - "{definitions.table}#lshtm_infections__estimate_median"
-        - "{definitions.table}#lshtm_infections__estimate_low"
-        - "{definitions.table}#lshtm_infections__estimate_upper"
-        - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
+        - catalogPath: infections_model#lshtm_infections__estimate_median
+          display:
+            color: "#B13507"
+        - catalogPath: infections_model#lshtm_infections__estimate_low
+          display:
+            color: "#DCAC9B"
+        - catalogPath: infections_model#lshtm_infections__estimate_upper
+          display:
+            color: "#DCAC9B"
+        - *confirmed_infections
 
     config:
+      <<: *config_base
       title: "Daily new estimated COVID-19 infections from the LSHTM model"
-      subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
       note: This chart shows the model estimates dated 25 August 2020.
-      originUrl: ourworldindata.org/covid-models
-      hideAnnotationFieldsInTitle:
-        time: true
 
   # YYG
   - dimensions:
       model: yyg
     indicators:
       y:
-        - "{definitions.table}#yyg_infections__estimate_mean"
-        - "{definitions.table}#yyg_infections__estimate_low"
-        - "{definitions.table}#yyg_infections__estimate_upper"
-        - "grapher/covid/latest/cases_deaths/cases_deaths#new_cases_7_day_avg_right"
+        - catalogPath: infections_model#yyg_infections__estimate_mean
+          display:
+            color: "#996D39"
+        - catalogPath: infections_model#yyg_infections__estimate_low
+          display:
+            color: "#CFBFAF"
+        - catalogPath: infections_model#yyg_infections__estimate_upper
+          display:
+            color: "#CFBFAF"
+        - *confirmed_infections
 
     config:
+      <<: *config_base
       title: "Daily new estimated COVID-19 infections from the YYG model"
-      subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
       note: This chart shows the model estimates dated 4 October 2020. YYG announced that this is the final model update.
-      originUrl: ourworldindata.org/covid-models
-      hideAnnotationFieldsInTitle:
-        time: true

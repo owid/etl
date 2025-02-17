@@ -202,3 +202,7 @@ steps:
     - snapshot://fasttrack/latest/poverty_latam_idb.csv
   data://grapher/fasttrack/latest/foreign_aid_govt_private:
     - snapshot://fasttrack/latest/foreign_aid_govt_private.csv
+  data://grapher/fasttrack/latest/right_wrong_track_data:
+    - snapshot://fasttrack/latest/right_wrong_track_data.csv
+  data-private://grapher/fasttrack/latest/replacement_fertility_basten_scherbov:
+    - snapshot-private://fasttrack/latest/replacement_fertility_basten_scherbov.csv

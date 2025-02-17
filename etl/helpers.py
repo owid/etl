@@ -650,7 +650,7 @@ class PathFinder:
         return self.directory / filename
 
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> set[str]:
         # Current step should be in the dag.
         if self.step not in self.dag:
             raise CurrentStepMustBeInDag
@@ -708,7 +708,7 @@ class PathFinder:
         elif len(matches) > 1:
             raise MultipleMatchingStepsAmongDependencies(step_name=self.step_name)
 
-        dependency = matches[0]
+        dependency = next(iter(matches))
 
         return dependency
 
@@ -778,7 +778,7 @@ class PathFinder:
         assert len(deps) == 1
         return deps[0].replace("etag://", "https://")
 
-    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, str]:
+    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
         if filename is not None:
             path = self.directory / Path(filename)
         elif path is None:
@@ -787,9 +787,9 @@ class PathFinder:
         return config
 
 
-def _match_dependencies(pattern: str, dependencies: List[str]) -> List[str]:
+def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
     regex = re.compile(pattern)
-    return [dependency for dependency in dependencies if regex.match(dependency)]
+    return {dependency for dependency in dependencies if regex.match(dependency)}
 
 
 def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:

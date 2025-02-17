@@ -10,7 +10,6 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.related_charts import data, scoring
 from apps.wizard.utils import embeddings as emb
-from apps.wizard.utils.cached import get_grapher_user
 from apps.wizard.utils.components import st_horizontal, st_multiselect_wider, url_persist
 from etl import paths
 from etl.config import OWID_ENV
@@ -26,9 +25,6 @@ log = get_logger()
 
 # Database engine.
 engine = get_engine()
-
-# Get reviewer's name (if needed).
-reviewer = get_grapher_user().fullName
 
 # Download coviews from R2 if they don't exist
 # NOTE: this is temporary, if it proves to be useful, it should be loaded dynamically
