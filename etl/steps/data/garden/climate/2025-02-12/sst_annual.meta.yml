@@ -17,11 +17,4 @@ tables:
         unit: ""
         description_processing: |-
           Annual anomalies of the Oceanic Niño Index (ONI) are calculated by taking the average of the monthly ONI values for a given year.
-      annual_nino_classification:
-        title: Annual El Niño or La Niña classification
-        unit: ""
-        description_processing: |-
-          The annual classification of the El Niño-Southern Oscillation (ENSO) state based on the Oceanic Niño Index (ONI) is determined by the majority of the monthly ONI values for a given year.
-
-
 

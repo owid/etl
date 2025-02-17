@@ -21,24 +21,7 @@ def run(dest_dir: str) -> None:
     #
     # Calculate the annual average for the dataset
     tb_annual = tb.groupby(["country", "year"]).mean().reset_index()
-
-    # Classify the year based on nino_classification
-    def classify_year(group):
-        if (group["nino_classification"] == 1).sum() > 6:
-            return 1
-        elif (group["nino_classification"] == 2).sum() > 6:
-            return 2
-        else:
-            return 0
-
-    tb_annual["annual_nino_classification"] = (
-        tb.groupby(["country", "year"]).apply(classify_year).reset_index(drop=True)
-    )
     tb_annual = tb_annual.rename(columns={"oni_anomaly": "annual_oni_anomaly"})
-    tb_annual["annual_nino_classification"] = tb_annual["annual_nino_classification"].copy_metadata(
-        tb["nino_classification"]
-    )
-
     tb_annual = tb_annual.drop(columns={"month", "nino_classification"})
 
     tb_annual = tb_annual.format(["country", "year"])
