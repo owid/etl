@@ -151,7 +151,7 @@ def traverse(graph: Graph, nodes: Set[str]) -> Graph:
     return dict(reachable)
 
 
-def load_dag(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> Dict[str, Any]:
+def load_dag(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> Graph:
     return _load_dag(filename, {})
 
 
