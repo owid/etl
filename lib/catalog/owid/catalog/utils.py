@@ -4,7 +4,7 @@ import hashlib
 import re
 from dataclasses import fields, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional, Type, TypeVar, Union, get_args, get_origin, overload
+from typing import Any, Dict, Optional, TextIO, Type, TypeVar, Union, get_args, get_origin, overload
 
 import dynamic_yaml
 import pytz
@@ -184,9 +184,22 @@ def validate_underscore(name: Optional[str], object_name: str = "Name") -> None:
         raise NameError(f"{object_name} must be snake_case. Change `{name}` to `{underscore(name, validate=False)}`")
 
 
-def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
-    with open(path) as istream:
-        yd = dynamic_yaml.load(istream)
+def dynamic_yaml_load(source: Union[Path, str, TextIO], params: Dict = {}) -> dict:
+    """
+    Loads a YAML file from a path, string, or StringIO-like object, and updates it with given parameters.
+
+    Args:
+        source (Union[Path, str, TextIO]): File path, string, or a file-like object (e.g., StringIO).
+        params (dict): Parameters to update in the loaded YAML.
+
+    Returns:
+        dict: The parsed YAML data with updated parameters.
+    """
+    if isinstance(source, (str, Path)):
+        with open(source) as istream:
+            yd = dynamic_yaml.load(istream)
+    else:  # Assume it's a file-like object (StringIO, BytesIO, etc.)
+        yd = dynamic_yaml.load(source)
 
     yd.update(params)
 

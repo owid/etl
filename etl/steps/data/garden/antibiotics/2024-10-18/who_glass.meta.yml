@@ -4,7 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Global Health
-        - Antibiotics
+        - Antibiotics & Antibiotic Resistance
     display:
       name: << syndrome.capitalize() >>
   syndrome:

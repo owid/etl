@@ -1,5 +1,8 @@
 definitions:
-  table: grapher/covid/latest/vaccinations_manufacturer/vaccinations_manufacturer
+  config: &config_base
+    originUrl: ourworldindata.org/coronavirus
+    hideAnnotationFieldsInTitle:
+      time: true
 
 title:
   title: COVID-19 vaccines
@@ -9,6 +12,7 @@ defaultSelection:
   - Upper-middle-income countries
   - Lower-middle-income countries
   - Low-income countries
+
 topicTags:
   - COVID-19
 
@@ -18,43 +22,49 @@ dimensions:
     choices:
       - slug: income_group
         name: Income group
-        description: null
+        description: "Doses per 100 people by income group"
       - slug: manufacturer
         name: Manufacturer
-        description: null
-
+        description: "Doses administered by vaccine manufacturer"
 
 views:
   - dimensions:
       breakdown: income_group
     indicators:
-      y: "grapher/covid/latest/vaccinations_global/vaccinations_global#total_vaccinations_per_hundred"
+      y: "vaccinations_global#total_vaccinations_per_hundred"
     config:
+      <<: *config_base
       addCountryMode: "disabled"
       selectedEntityNames:
         - High-income countries
         - Upper-middle-countriesincome countries
         - Lower-middle-income countries
         - Low-income
+      selectedEntityColors:
+        High-income countries: "#0D8553"
+        Upper-middle-income countries: "#A1CB81"
+        Lower-middle-income countries: "#DF9FDB"
+        Low-income countries: "#974E94"
   - dimensions:
       breakdown: manufacturer
     indicators:
       y:
-        - "{definitions.table}#total_vaccinations__vaccine_pfizer_biontech"
-        - "{definitions.table}#total_vaccinations__vaccine_moderna"
-        - "{definitions.table}#total_vaccinations__vaccine_oxford_astrazeneca"
-        - "{definitions.table}#total_vaccinations__vaccine_johnson_and_johnson"
-        - "{definitions.table}#total_vaccinations__vaccine_sputnik_v"
-        - "{definitions.table}#total_vaccinations__vaccine_sinovac"
-        - "{definitions.table}#total_vaccinations__vaccine_sinopharm_beijing"
-        - "{definitions.table}#total_vaccinations__vaccine_cansino"
-        - "{definitions.table}#total_vaccinations__vaccine_novavax"
-        - "{definitions.table}#total_vaccinations__vaccine_covaxin"
-        - "{definitions.table}#total_vaccinations__vaccine_medicago"
-        - "{definitions.table}#total_vaccinations__vaccine_sanofi_gsk"
-        - "{definitions.table}#total_vaccinations__vaccine_skycovione"
-        - "{definitions.table}#total_vaccinations__vaccine_valneva"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_pfizer_biontech"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_moderna"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_oxford_astrazeneca"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_johnson_and_johnson"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_sputnik_v"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_sinovac"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_sinopharm_beijing"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_cansino"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_novavax"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_covaxin"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_medicago"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_sanofi_gsk"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_skycovione"
+        - "vaccinations_manufacturer#total_vaccinations__vaccine_valneva"
     config:
+      <<: *config_base
       chartTypes: ["StackedArea"]
       selectedEntityNames:
         - European Union (27)

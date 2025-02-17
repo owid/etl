@@ -284,9 +284,9 @@ def add_last12m_to_metric(tb: Table, column_metric: str, column_country: str = "
 
     # Compute the difference, obtain last12m metric
     tb = tb.merge(tb_tmp, on=[column_country], how="left")
-    tb[column_metric_12m] = tb[column_metric] - tb[column_metric_12m]
+    tb.loc[:, column_metric_12m] = tb[column_metric] - tb[column_metric_12m]
 
     # Assign NaN to >1 year old data
-    tb[column_metric_12m].loc[tb["date"] < date_cutoff] = np.nan
+    tb.loc[tb["date"] < date_cutoff, column_metric_12m] = np.nan
 
     return tb

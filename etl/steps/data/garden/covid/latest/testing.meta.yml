@@ -259,6 +259,12 @@ tables:
           numDecimalPlaces: 0
           tolerance: 10
           <<: *display_common
+        description_key: &tests_key
+          - Testing is a key tool for identifying infections, guiding treatment, isolating positive cases, tracing contacts, and allocating healthcare resources.
+          - "The number of COVID-19 tests is not measured uniformly across countries: some track 'tests performed', while others count 'people tested'."
+          - Most reported data includes PCR and antigen tests; antibody tests are generally excluded since they are less relevant for current infection tracking.
+          - At-home self-tests may be counted if reported nationally, but many countries still rely primarily on laboratory tests for confirmation.
+          - Varying reporting standards and test definitions can complicate international comparisons and the interpretation of testing statistics.
         presentation:
           grapher_config:
             title: Daily new COVID-19 tests
@@ -282,6 +288,7 @@ tables:
           tolerance: 10
           name: New tests (per 1,000)
           <<: *display_common
+        description_key: *tests_key
         presentation:
           grapher_config:
             title: Daily new COVID-19 tests per 1,000 people
