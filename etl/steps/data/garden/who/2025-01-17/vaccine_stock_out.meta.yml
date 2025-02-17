@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
+      grapher_config:
+        note: "Not all countries report data on vaccine stock-outs. The data presented here is based on the countries that do report data."
   unit: |-
     <% if "What was the duration of stock-out in months" in description %>
     months
