@@ -23,6 +23,10 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Remove specific groups from the group column (likely small sample sizes for some of these resulting in strange values sometimes)
+    groups_to_remove = ["Middle Eastern", "Native American", "Other", "Asian", "Black", "Hispanic", "Two or more races"]
+    tb = tb[~tb["group"].isin(groups_to_remove)]
+
     tb = sh.preprocess_data(
         tb,
         index_columns=["group", "date"],
