@@ -272,9 +272,13 @@ steps:
     - snapshot://climate/2025-02-12/sst.csv
   data://garden/climate/2025-02-12/sst:
     - data://meadow/climate/2025-02-12/sst
+  data://garden/climate/2025-02-12/sst_annual:
+    - data://garden/climate/2025-02-12/sst
   data://grapher/climate/2025-02-12/sst:
     - data://garden/climate/2025-02-12/sst
   data://grapher/climate/2025-02-12/sst_by_month:
     - data://garden/climate/2025-02-12/sst
+  data://grapher/climate/2025-02-12/sst_annual:
+    - data://garden/climate/2025-02-12/sst_annual
 
 
