@@ -2,8 +2,7 @@
 definitions:
   common:
     processing_level: major
-    description_processing: |-
-      Annual anomalies of the Oceanic Niño Index (ONI) are calculated by taking the average of the monthly ONI values for a given year.
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -16,6 +15,13 @@ tables:
       annual_oni_anomaly:
         title: Annual Oceanic Niño Index (ONI) anomaly
         unit: ""
+        description_processing: |-
+          Annual anomalies of the Oceanic Niño Index (ONI) are calculated by taking the average of the monthly ONI values for a given year.
+      annual_nino_classification:
+        title: Annual El Niño or La Niña classification
+        unit: ""
+        description_processing: |-
+          The annual classification of the El Niño-Southern Oscillation (ENSO) state based on the Oceanic Niño Index (ONI) is determined by the majority of the monthly ONI values for a given year.
 
 
 
