@@ -29,6 +29,8 @@ def run(dest_dir: str) -> None:
     sector_dropdown = []
     per_capita_checkbox = []
     map_tab = []
+    # Auxiliary list of pollutants as they appear in column names.
+    pollutant_short_names = []
     for column in tb.drop(columns=["country", "year"]).columns:
         dimensions = tb[column].metadata.additional_info["dimensions"]
         if dimensions["originalShortName"] == "emissions":
@@ -40,7 +42,8 @@ def run(dest_dir: str) -> None:
 
         for filter in dimensions["filters"]:
             if filter["name"] == "pollutant":
-                pollutant = filter["value"]
+                pollutant_short_name = filter["value"]
+                pollutant = f'{tb[column].metadata.display["name"]} ({filter["value"]})'
             elif filter["name"] == "sector":
                 sector = filter["value"]
             else:
@@ -52,6 +55,7 @@ def run(dest_dir: str) -> None:
         sector_dropdown.append(sector)
         per_capita_checkbox.append(per_capita)
         map_tab.append(True)
+        pollutant_short_names.append(pollutant_short_name)
 
     # Create graphers table.
     df_graphers = pd.DataFrame()
@@ -96,7 +100,7 @@ def run(dest_dir: str) -> None:
         )
 
     # Create breakdown by sector.
-    for pollutant in df_graphers["Pollutant Dropdown"].unique():
+    for pollutant, pollutant_short_name in zip(pollutant_dropdown, pollutant_short_names):
         for per_capita in [False, True]:
             _columns_for_pollutant = []
             for column in tb.drop(columns=["country", "year"]).columns:
@@ -105,7 +109,7 @@ def run(dest_dir: str) -> None:
                     per_capita and dimensions["originalShortName"] == "emissions_per_capita"
                 ):
                     for filter in dimensions["filters"]:
-                        if (filter["name"] == "pollutant") and (filter["value"] == pollutant):
+                        if (filter["name"] == "pollutant") and (filter["value"] == pollutant_short_name):
                             if not column.endswith("all_sectors"):
                                 _columns_for_pollutant.append(f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}")
             if len(_columns_for_pollutant) == 0:
