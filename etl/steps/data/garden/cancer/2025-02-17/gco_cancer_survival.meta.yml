@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Cancer
+    processing_level: minor
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  gco_cancer_survival:
+    variables:
+      net_survival:
+        title: |-
+          <% if gender != 'All' %>
+          Net survival rates of patients with << cancer.lower >> cancer after << survival_year.lower >> years
+          <% elif gender != 'All' %>
+          Net survival rates of << gender >> patients with << cancer.lower >> cancer after << survival_year.lower >> years
+          <%- endif -%>
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of patients still alive at a certain time after diagnosis, assuming cancer is the only cause of death.
+        description_key:
+          - The percentage of patients still alive at a certain time after diagnosis, assuming cancer is the only cause of death.
+          - Net survival estimates survival by removing the effect of other causes of death.
+          - It represents the theoretical survival of cancer patients if they could only die from cancer-related causes.
+          - This measure allows fair comparisons between groups with different probabilities of non-cancer death.
+        display:
+          numDecimalPlaces: 1
