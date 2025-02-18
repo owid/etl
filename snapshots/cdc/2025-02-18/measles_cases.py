@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import click
-import requests
 
 from etl.snapshot import Snapshot
 
