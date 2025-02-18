@@ -18,6 +18,10 @@ tables:
       total_vaccinations:
         title: COVID-19 doses (cumulative) - Manufacturer << vaccine >>
         description_short: Total number of << vaccine >> COVID-19 vaccination doses administered.
+        description_key:
+          - During the COVID-19 pandemic, there were various manufacturers providing vaccines. This indicator counts those doses by << vaccine >>.
+          - Differences in vaccine availability, distribution agreements, and production capacity mean that some manufacturers' vaccines may be more widely used in specific regions.
+          - Data on doses administered by manufacturer may be incomplete due to varied reporting standards, data sharing agreements, or privacy considerations.
         unit: "doses"
         display:
           numDecimalPlaces: 0

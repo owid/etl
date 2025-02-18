@@ -15,96 +15,7 @@ dimensions:
       - description: Aggregate of all causes
         name: All causes
         slug: All causes
-      - description: null
-        name: Cardiovascular diseases
-        slug: Cardiovascular diseases
-      - description: null
-        name: Neoplasms
-        slug: Neoplasms
-      - description: null
-        name: Chronic respiratory diseases
-        slug: Chronic respiratory diseases
-      - description: null
-        name: Digestive diseases
-        slug: Digestive diseases
-      - description: null
-        name: Lower respiratory infections
-        slug: Lower respiratory infections
-      - description: null
-        name: Neonatal disorders
-        slug: Neonatal disorders
-      - description: null
-        name: Alzheimer's disease and other dementias
-        slug: Alzheimer's disease and other dementias
-      - description: null
-        name: Diabetes mellitus
-        slug: Diabetes mellitus
-      - description: null
-        name: Diarrheal diseases
-        slug: Diarrheal diseases
-      - description: null
-        name: Meningitis
-        slug: Meningitis
-      - description: null
-        name: Parkinson's disease
-        slug: Parkinson's disease
-      - description: null
-        name: Nutritional deficiencies
-        slug: Nutritional deficiencies
-      - description: null
-        name: Malaria
-        slug: Malaria
-      - description: null
-        name: Drowning
-        slug: Drowning
-      - description: null
-        name: Interpersonal violence
-        slug: Interpersonal violence
-      - description: null
-        name: Maternal disorders
-        slug: Maternal disorders
-      - description: null
-        name: HIV/AIDS
-        slug: HIV/AIDS
-      - description: null
-        name: Drug use disorders
-        slug: Drug use disorders
-      - description: null
-        name: Tuberculosis
-        slug: Tuberculosis
-      - description: null
-        name: Alcohol use disorders
-        slug: Alcohol use disorders
-      - description: null
-        name: Self-harm
-        slug: Self-harm
-      - description: null
-        name: Exposure to forces of nature
-        slug: Exposure to forces of nature
-      - description: null
-        name: Environmental heat and cold exposure
-        slug: Environmental heat and cold exposure
-      - description: null
-        name: Conflict and terrorism
-        slug: Conflict and terrorism
-      - description: null
-        name: Chronic kidney disease
-        slug: Chronic kidney disease
-      - description: null
-        name: Poisonings
-        slug: Poisonings
-      - description: null
-        name: Road injuries
-        slug: Road injuries
-      - description: null
-        name: Fire, heat, and hot substances
-        slug: Fire, heat, and hot substances
-      - description: null
-        name: Acute hepatitis
-        slug: Acute hepatitis
-      - description: null
-        name: COVID-19
-        slug: COVID-19
+      # Additional causes will be added programmatically.
   - name: Age group
     slug: age
     choices:
@@ -141,7 +52,5 @@ dimensions:
       - description: null
         name: Rate
         slug: Rate
-dimensions_title: by cause
-name: Causes of death
 
 views: []

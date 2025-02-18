@@ -1,5 +1,4 @@
 from etl import multidim
-from etl.db import get_engine
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -42,7 +41,6 @@ def run(dest_dir: str) -> None:
     )
 
     # Create special view for the stacked area chart of total consumer price by components.
-    table_name = paths.get_dependency_step_name("energy_prices").replace("data://", "")
     for source in ["electricity", "gas"]:
         price_components = [
             # The total price is (to a very good approximation) equivalent to the combination of "Energy and supply", "Network costs", and "Taxes, fees, levies, and charges".
@@ -93,7 +91,7 @@ def run(dest_dir: str) -> None:
                             "unit": unit,
                         },
                         "indicators": {
-                            "y": [f"{table_name}/energy_prices_annual#{indicator}" for indicator in indicators],
+                            "y": [f"energy_prices_annual#{indicator}" for indicator in indicators],
                         },
                         "config": {
                             "chartTypes": ["StackedBar"],
@@ -114,4 +112,8 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    multidim.upsert_multidim_data_page(slug="mdd-energy-prices", config=config, engine=get_engine())
+    multidim.upsert_multidim_data_page(
+        slug="mdd-energy-prices",
+        config=config,
+        dependencies=paths.dependencies,
+    )

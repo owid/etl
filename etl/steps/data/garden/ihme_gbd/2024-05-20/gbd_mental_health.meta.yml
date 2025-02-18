@@ -1,71 +1,64 @@
-# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
     presentation:
       topic_tags:
         - Mental Health
     processing_level: major
-  sex: |-
-    <% if sex == "Both" %>
-    individuals
-    <%- elif sex == "Male" %>
-    males
-    <%- elif sex == "Female" %>
-    females
-    <%- endif %>
-  value:
-    unit: |-
-      <% if metric == "Number" %>
-      cases
-      <%- elif metric == "Rate" %>
-      cases per 100,000 people
-      <%- elif metric == "Share" %>
-      %
-      <%- endif %>
-    short_unit: |-
-      <% if metric == "Share" %>%<% elif metric == "Rate" or metric == "Number" %><% endif %>
-    title: |-
-      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      Current cases of << cause.lower() >>, among {definitions.sex} aged << age >>
-      <% elif metric == "Number" and age == 'Age-standardized'%>
-      Age-standardized current number of {definitions.sex} with << cause.lower() >>
-      <% elif metric == "Number" and age == 'All ages'%>
-      Total current number of {definitions.sex} with << cause.lower() >>
-      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      Current cases of << cause.lower() >>, among {definitions.sex} aged << age >>, per 100,000 people
-      <% elif metric == "Rate" and age == 'Age-standardized'%>
-      Age-standardized current cases of {definitions.sex} with << cause.lower() >>, per 100,000 people
-      <% elif metric == "Rate" and age == 'All ages'%>
-      Total current number of {definitions.sex} with << cause.lower() >>, per 100,000 people
-      <% elif metric == "Share" and (age != 'Age-standardized' and age != 'All ages')%>
-      Current cases of << cause.lower() >>, among {definitions.sex} aged << age >>, per 100 people
-      <% elif metric == "Share" and age == 'Age-standardized'%>
-      Age-standardized current cases of {definitions.sex} with << cause.lower() >>, per 100 people
-      <% elif metric == "Share" and age == 'All ages'%>
-      Total current number of {definitions.sex} with << cause.lower() >>, per 100 people
+
+macros: |-
+  <% macro title(metric, age, cause, sex) %>
+      <% if age == 'Age-standardized' %>
+          <% if metric == "Number" %>
+              <% set base = "Age-standardized current number of " ~ sex ~ " with " ~ cause %>
+          <% else %>
+              <% set base = "Age-standardized current cases of " ~ sex ~ " with " ~ cause %>
+          <% endif %>
+      <% elif age == 'All ages' %>
+          <% set base = "Total current number of " ~ sex ~ " with " ~ cause %>
+      <% else %>
+          <% set base = "Current cases of " ~ cause ~ ", among " ~ sex ~ " aged " ~ age %>
       <% endif %>
-    description_short: |-
-      <% if metric == "Number" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex} aged << age >>.
-      <% elif metric == "Number" and age == 'Age-standardized'%>
-      The estimated age-standardized prevalence of {definitions.sex} with << cause.lower() >>.
-      <% elif metric == "Number" and age == 'All ages'%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex}.
-      <% elif metric == "Rate" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex} aged << age >>, per 100,000 people.
-      <% elif metric == "Rate" and age == 'Age-standardized'%>
-      The estimated age-standardized prevalence of {definitions.sex} with << cause.lower() >>, per 100,000 people.
-      <% elif metric == "Rate" and age == 'All ages'%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex}, per 100,000 people.
-      <% elif metric == "Share" and (age != 'Age-standardized' and age != 'All ages')%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex} aged << age >>, per 100 people.
-      <% elif metric == "Share" and age == 'Age-standardized'%>
-      The estimated age-standardized prevalence of {definitions.sex} with << cause.lower() >>, per 100 people.
-      <% elif metric == "Share" and age == 'All ages'%>
-      The estimated prevalence of << cause.lower() >> in {definitions.sex}, per 100 people.
+
+      <% if metric == "Rate" %>
+          <% set suffix = ", per 100,000 people" %>
+      <% elif metric == "Share" %>
+          <% set suffix = ", per 100 people" %>
+      <% else %>
+          <% set suffix = "" %>
       <% endif %>
-  footnote: |-
-    <% if age == "Age-standardized" %>To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).<% endif %>
+
+      << base ~ suffix >>
+  <% endmacro %>
+
+
+  <% macro description_short(metric, age, cause, sex) %>
+      <% if age != 'Age-standardized' and age != 'All ages' %>
+          <% if metric == "Number" %>
+              The estimated prevalence of << cause >> in << sex >> aged << age >>.
+          <% elif metric == "Rate" %>
+              The estimated prevalence of << cause >> in << sex >> aged << age >>, per 100,000 people.
+          <% elif metric == "Share" %>
+              The estimated prevalence of << cause >> in << sex >> aged << age >>, per 100 people.
+          <% endif %>
+      <% elif age == 'Age-standardized' %>
+          <% if metric == "Number" %>
+              The estimated age-standardized prevalence of << sex >> with << cause >>.
+          <% elif metric == "Rate" %>
+              The estimated age-standardized prevalence of << sex >> with << cause >>, per 100,000 people.
+          <% elif metric == "Share" %>
+              The estimated age-standardized prevalence of << sex >> with << cause >>, per 100 people.
+          <% endif %>
+      <% elif age == 'All ages' %>
+          <% if metric == "Number" %>
+              The estimated prevalence of << cause >> in << sex >>.
+          <% elif metric == "Rate" %>
+              The estimated prevalence of << cause >> in << sex >>, per 100,000 people.
+          <% elif metric == "Share" %>
+              The estimated prevalence of << cause >> in << sex >>, per 100 people.
+          <% endif %>
+      <% endif %>
+  <% endmacro %>
+
 dataset:
   update_period_days: 1460
   non_redistributable: true
@@ -74,13 +67,21 @@ tables:
     variables:
       value:
         title: |-
-          {definitions.value.title}
+          {macros}
+          << title(metric, age, format_cause(cause), format_sex(sex)) >>
         unit: |-
-          {definitions.value.unit}
+          <% if metric == "Number" %>
+            cases
+          <%- elif metric == "Rate" %>
+            cases per 100,000 people
+          <%- elif metric == "Share" %>
+            %
+          <%- endif %>
         short_unit: |-
-          {definitions.value.short_unit}
+          {definitions.short_unit}
         description_short: |-
-          {definitions.value.description_short}
+          {macros}
+          << description_short(metric, age, format_cause(cause), format_sex(sex)) >>
         presentation:
           grapher_config:
             note: |-

@@ -1,18 +1,13 @@
-import pandas as pd
+import owid.catalog.processing as pr
 from owid.catalog import Table
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
 
+# Get logger
 log = get_logger()
-
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-# Base URL for Economist excess mortality data.
-BASE_URL = (
-    "https://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/main/output-data"
-)
 
 
 def run(dest_dir: str) -> None:
@@ -21,14 +16,13 @@ def run(dest_dir: str) -> None:
     #
     country_all = _load_country_data()
     world_all = _load_world_data()
-    df = _combine_data(country_all, world_all)
+    tb = _combine_data(country_all, world_all)
 
     #
     # Process data.
     #
-    # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
-    tb = tb.set_index(["country", "date"], verify_integrity=True)
+    # Format
+    tb = tb.format(["country", "date"], short_name=paths.short_name)
 
     #
     # Save outputs.
@@ -40,10 +34,10 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def _load_country_data():
+def _load_country_data() -> Table:
     # load in the data
-    country_wk = pd.read_csv(
-        f"{BASE_URL}/export_country.csv",
+    country_wk = paths.read_snap_table(
+        "xm_econ_country.csv",
         usecols=[
             "iso3c",
             "date",
@@ -52,8 +46,8 @@ def _load_country_data():
             "estimated_daily_excess_deaths_ci_95_bot",
         ],  # type: ignore
     )
-    country_wk_100k = pd.read_csv(
-        f"{BASE_URL}/export_country_per_100k.csv",
+    country_wk_100k = paths.read_snap_table(
+        "xm_econ_country_100k.csv",
         usecols=[
             "iso3c",
             "date",
@@ -63,8 +57,8 @@ def _load_country_data():
         ],  # type: ignore
     )
 
-    country_cum = pd.read_csv(
-        f"{BASE_URL}/export_country_cumulative.csv",
+    country_cum = paths.read_snap_table(
+        "xm_econ_country_cum.csv",
         usecols=[
             "iso3c",
             "date",
@@ -73,8 +67,8 @@ def _load_country_data():
             "cumulative_estimated_daily_excess_deaths_ci_95_bot",
         ],  # type: ignore
     )
-    country_cum_100k = pd.read_csv(
-        f"{BASE_URL}/export_country_per_100k_cumulative.csv",
+    country_cum_100k = paths.read_snap_table(
+        "xm_econ_country_cum_100k",
         usecols=[
             "iso3c",
             "date",
@@ -85,17 +79,17 @@ def _load_country_data():
     )
 
     # this file tells whether reported data is available
-    reported = pd.read_csv(f"{BASE_URL}/output-for-interactive/by_location_full_data.csv")
+    reported = paths.read_snap_table("xm_econ_location.csv")
     report_select = reported[reported["type"] == "daily_excess_deaths"][["iso3c", "date", "known_excess_deaths"]]
 
     # get rid of NA rows
     report_select = report_select[report_select["iso3c"].notna()]
 
     # merge all the data
-    country_wk_merge = pd.merge(country_wk, country_wk_100k, on=["iso3c", "date"], how="outer")
-    country_cum_merge = pd.merge(country_cum, country_cum_100k, on=["iso3c", "date"], how="outer")
-    country_almost = pd.merge(country_cum_merge, country_wk_merge, on=["iso3c", "date"], how="outer")
-    country_all = pd.merge(country_almost, report_select, on=["iso3c", "date"], how="outer")
+    country_wk_merge = pr.merge(country_wk, country_wk_100k, on=["iso3c", "date"], how="outer")
+    country_cum_merge = pr.merge(country_cum, country_cum_100k, on=["iso3c", "date"], how="outer")
+    country_almost = pr.merge(country_cum_merge, country_wk_merge, on=["iso3c", "date"], how="outer")
+    country_all = pr.merge(country_almost, report_select, on=["iso3c", "date"], how="outer")
 
     # the most recent date can have null known_excess_deaths, fill them with False
     country_all["known_excess_deaths"] = country_all["known_excess_deaths"].fillna(False)
@@ -103,9 +97,9 @@ def _load_country_data():
     return country_all
 
 
-def _load_world_data():
-    world_wk = pd.read_csv(
-        f"{BASE_URL}/export_world.csv",
+def _load_world_data() -> Table:
+    world_wk = paths.read_snap_table(
+        "xm_econ_world.csv",
         usecols=[
             "world",
             "date",
@@ -114,8 +108,8 @@ def _load_world_data():
             "estimated_daily_excess_deaths_ci_95_bot",
         ],  # type: ignore
     )
-    world_wk_100k = pd.read_csv(
-        f"{BASE_URL}/export_world_per_100k.csv",
+    world_wk_100k = paths.read_snap_table(
+        "xm_econ_world_100k.csv",
         usecols=[
             "world",
             "date",
@@ -125,8 +119,8 @@ def _load_world_data():
         ],  # type: ignore
     )
 
-    world_cum = pd.read_csv(
-        f"{BASE_URL}/export_world_cumulative.csv",
+    world_cum = paths.read_snap_table(
+        "xm_econ_world_cum.csv",
         usecols=[
             "world",
             "date",
@@ -135,8 +129,8 @@ def _load_world_data():
             "cumulative_estimated_daily_excess_deaths_ci_95_bot",
         ],  # type: ignore
     )
-    world_cum_100k = pd.read_csv(
-        f"{BASE_URL}/export_world_per_100k_cumulative.csv",
+    world_cum_100k = paths.read_snap_table(
+        "xm_econ_world_cum_100k.csv",
         usecols=[
             "world",
             "date",
@@ -146,20 +140,20 @@ def _load_world_data():
         ],  # type: ignore
     )
 
-    world_wk_merge = pd.merge(world_wk, world_wk_100k, on=["world", "date"], how="outer")
-    world_cum_merge = pd.merge(world_cum, world_cum_100k, on=["world", "date"], how="outer")
+    world_wk_merge = pr.merge(world_wk, world_wk_100k, on=["world", "date"], how="outer")
+    world_cum_merge = pr.merge(world_cum, world_cum_100k, on=["world", "date"], how="outer")
 
-    world_all = pd.merge(world_cum_merge, world_wk_merge, on=["world", "date"], how="outer")
+    world_all = pr.merge(world_cum_merge, world_wk_merge, on=["world", "date"], how="outer")
 
     return world_all
 
 
-def _combine_data(country_all: pd.DataFrame, world_all: pd.DataFrame) -> pd.DataFrame:
+def _combine_data(country_all: Table, world_all: Table) -> Table:
     # rename columns and bind rows into one
-    country_all.rename(columns={"iso3c": "country"}, inplace=True)
-    world_all.rename(columns={"world": "country"}, inplace=True)
+    country_all = country_all.rename(columns={"iso3c": "country"})
+    world_all = world_all.rename(columns={"world": "country"})
 
-    combined_data = pd.concat([country_all, world_all], ignore_index=True)
+    combined_data = pr.concat([country_all, world_all], ignore_index=True)
 
     # these should be replaced with FALSE values
     combined_data["known_excess_deaths"].fillna(False, inplace=True)
