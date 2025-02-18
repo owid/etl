@@ -1,10 +1,23 @@
 definitions:
+  pollutant_name: |-
+    <% if pollutant == "BC" %>Black carbon <% elif pollutant == "CH₄" %>Methane <% elif pollutant == "CO" %>Carbon monoxide <% elif pollutant == "CO₂" %>Carbon dioxide <% elif pollutant == "N₂O" %>Nitrous oxide <% elif pollutant == "NH₃" %>Ammonia <% elif pollutant == "NMVOC" %>Non-methane volatile organic compounds <% elif pollutant == "NOₓ" %>Nitrogen oxides <% elif pollutant == "OC" %>Organic carbon <% elif pollutant == "SO₂" %>Sulfur dioxide <%- endif -%>
+  pollutant_description_short: |-
+    <% if pollutant == "BC" %>Black carbon (BC) is a soot-like pollutant formed from the burning of biomass and fossil fuels. It is a major contributor to particulate matter pollution, and contributes to climate change by absorbing sunlight.
+    <% elif pollutant == "CH₄" %>Methane (CH₄) is a greenhouse gas that contributes to the formation of ground-level ozone, a harmful air pollutant. Key sources of methane include agriculture, landfills, and fossil fuel extraction.
+    <% elif pollutant == "CO" %>Carbon monoxide (CO) is a pollutant produced from the incomplete combustion of carbon-based fuels such as oil, gas, wood, and coal.
+    <% elif pollutant == "CO₂" %>Carbon dioxide (CO₂) is a greenhouse gas that indirectly worsens air pollution by driving climate change, which increases ground-level ozone and other pollutants. Major sources include fossil fuel combustion, industry, and deforestation.
+    <% elif pollutant == "N₂O" %>Nitrous oxide (N₂O) is a greenhouse gas that contributes to air pollution by depleting the stratospheric ozone layer and influencing atmospheric chemistry. Major sources include agriculture, industrial processes, and fossil fuel combustion.
+    <% elif pollutant == "NH₃" %>Ammonia (NH₃) is a gas which can mix with other gases - such as nitrogen oxides and sulphur dioxide - to form particulate matter. Its main sources are the use of manure and fertilizers in agriculture, and emissions from industry.
+    <% elif pollutant == "NMVOC" %>Non-methane volatile organic compounds (NMVOCs) are pollutants formed from the burning of biomass and fossil fuels. NMVOCs can lead to the formation of other local air pollutants, such as ozone.
+    <% elif pollutant == "NOₓ" %>Nitrogen oxides (NOₓ) are gases that are mainly formed during the burning of fossil fuels. Exposure to NOₓ gases can have negative impacts on respiratory health. NOₓ gases can also lead to the formation of ozone - another air pollutant.
+    <% elif pollutant == "OC" %>Organic carbon molecules are formed from the incomplete burning of organic materials. This can come from the burning of fossil fuels (which are carbon-based organic material) or biomass. Organic carbon aerosols can also be suspended in the air from sources such as vehicle tyres and roads. Organic carbon molecules can contribute to particulate matter pollution, with negative impacts on human health.
+    <% elif pollutant == "SO₂" %>Sulphur dioxide (SO₂) is an air pollutant formed from the burning of fuels that contain sulphur, such as coal. SO₂ is one of the main chemicals that forms acid rain.
+    <%- endif -%>
   common:
     presentation:
       topic_tags:
         - Air Pollution
     processing_level: major
-
 
 dataset:
   update_period_days: 365
@@ -14,8 +27,31 @@ tables:
   ceds_air_pollutants:
     variables:
       emissions:
-        title: "Emissions of air pollutants"
-        unit: "TODO"
+        title: |-
+          {definitions.pollutant_name} emissions from << sector.lower() >>
+        description_short: |-
+          {definitions.pollutant_description_short}
+        unit: |-
+          tonnes
+        short_unit: t
+        display:
+          name: "{definitions.pollutant_name}"
+          shortUnit: t
+          numDecimalPlaces: 0
+        presentation:
+          title_public: |-
+            {definitions.pollutant_name} emissions from << sector.lower() >>
       emissions_per_capita:
-        title: "Emissions of air pollutants per capita"
-        unit: "TODO (per capita)"
+        title: |-
+          Per capita {definitions.pollutant_name} emissions from << sector.lower() >>
+        description_short: |-
+          {definitions.pollutant_description_short}
+        unit: kilograms per person
+        short_unit: kg/person
+        display:
+          name: "{definitions.pollutant_name}"
+          shortUnit: kg
+          numDecimalPlaces: 0
+        presentation:
+          title_public: |-
+            Per capita {definitions.pollutant_name} emissions from << sector.lower() >>

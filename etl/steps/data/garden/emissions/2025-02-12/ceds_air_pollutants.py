@@ -528,9 +528,6 @@ def run(dest_dir: str) -> None:
     # * BC waste becomes flat from 2014 onwards.
     # * Note that, NMVOC oil tanker loading is informed from 1960, and exactly zero before that. This create an abrupt jump in international shipping (but maybe small in the true global total of NMVOC).
 
-    # Convert units from kilotonnes to tonnes.
-    tb["emissions"] *= 1e3
-
     # Create an "All sectors" aggregate.
     tb = pr.concat(
         [
@@ -554,6 +551,12 @@ def run(dest_dir: str) -> None:
     tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
     tb["emissions_per_capita"] = tb["emissions"] / tb["population"]
     tb = tb.drop(columns=["population"])
+
+    # Convert emissions units from kilotonnes to tonnes.
+    tb["emissions"] *= 1e3
+
+    # Convert per capita emissions units from kilotonnes to kilograms.
+    tb["emissions_per_capita"] *= 1e6
 
     # Improve table format.
     tb = tb.format(["country", "year", "pollutant", "sector"])
