@@ -52,7 +52,7 @@ tables:
     common:
       presentation:
         title_variant: |-
-          <<sex+'s, ' if sex != 'total'>><<"aged " + age + ", " if age != "total">><<estimate.title()>> estimate
+          <<sex+'s, ' if sex != 'total'>><<"aged " + age + ", " if age != "total">><<estimate.lower()>> estimate
         grapher_config:
           hasMapTab: true
           tab: map
@@ -415,8 +415,8 @@ tables:
         description_short: |-
           Number of {definitions.people_dimension} newly infected with HIV in the last year per 1,000 uninfected people. This is the <<estimate.title()>> estimate.
         description_key:
-          - The main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
-          - This indicator is a crucial metric in the WHO 2022 Consolidated guidelines on person-centered HIV strategic information.
+          - This indicator is a crucial metric in the [WHO 2022 Consolidated guidelines](https://www.who.int/publications/i/item/9789240055315) on person-centered HIV strategic information.
+          - According to the _WHO 2022 Consolidated guidelines_, the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
         description_processing: |-
           Methods for monitoring incidence can vary depending on the epidemic setting and are typically categorized either as direct or indirect measures. Direct measurement at a population level is preferred but can often be difficult to obtain. As a result, most if not all countries rely on indirect measures or triangulate direct and indirect methods.
 
@@ -432,17 +432,16 @@ tables:
           title_public: "HIV incidence per 1,000 population"
 
       hiv_prevalence:
-        title: "HIV Prevalence - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        title: "HIV prevalence - Sex: <<sex>> - Age: <<age>> - <<estimate.title()>> estimate"
         unit: "%"
         short_unit: "%"
         description_short: |-
           Share of {definitions.people_dimension} who test positive for HIV at a given time. This is the << estimate >> estimate.
         description_key:
-          - It is estimated by dividing the number of people in a given group who tested positive for HIV by all the people were tested.
-          - Reflects the overall burden of HIV within a specific population.
-          - Provides insight into the scale of the epidemic and is essential for planning and resource allocation.
+          - Known as "HIV prevalence", it is estimated by dividing the number of people in a given group who tested positive for HIV by all the people that were tested.
+          - It reflects the overall burden of HIV within a specific population and provides insight into the scale of the epidemic, which is essential for planning and resource allocation.
         presentation:
-          title_public: "HIV prevalence"
+          title_public: "Share of the population living with HIV"
 
       new_infections:
         title: "New HIV Infections - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
@@ -1742,10 +1741,10 @@ tables:
             <%- endif %>
 
       hiv_prevalence:
-        title: "HIV prevalence - Group: <<group>> - Sex: <<sex>> - Age: <<age>>"
+        title: "HIV prevalence - Age: <<age>> - Sex: <<sex>> - Group: <<group>>"
         unit: "%"
         description_short: |-
-          Percentage of {definitions.gam_groups.variable} living with HIV.
+          Share of {definitions.gam_groups.variable} living with HIV.
         description_from_producer: |-
           Sex workers, gay men and other men who have sex with men, people who inject drugs, transgender people and people in prisons and other closed settings typically have higher HIV prevalence than the general population in all  epidemic contexts. Addressing HIV among these populations is an important component of the national response.
 
@@ -1757,7 +1756,7 @@ tables:
 
           More details: https://indicatorregistry.unaids.org/indicator/hiv-prevalence-among-key-populations-e
         presentation:
-          title_public: "HIV Prevalence"
+          title_public: "Share of the population living with HIV"
           title_variant: |-
             <<group>>
             <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
