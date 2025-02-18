@@ -17,13 +17,13 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("gco_cancer_survival")
 
-    tb = tb[["country", "year", "gender", "cancer", "survival_year", "net_survival"]]
-
     #
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.format(["country", "year", "gender", "cancer", "survival_year"])
+    tb = tb[tb["survival_year"] == 5]
+    tb = tb.drop("survival_year", axis=1)
+    tb = tb.format(["country", "year", "gender", "cancer"])
 
     #
     # Save outputs.

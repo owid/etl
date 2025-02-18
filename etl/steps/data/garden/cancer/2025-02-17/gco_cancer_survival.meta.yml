@@ -4,6 +4,9 @@ definitions:
     presentation:
       topic_tags:
         - Cancer
+      grapher_config:
+        note: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
+
     processing_level: minor
 
 
@@ -19,9 +22,9 @@ tables:
       net_survival:
         title: |-
           <% if gender == 'All' %>
-          Net survival rates of patients with << cancer.lower() >> cancer after << survival_year >> years
+          Net survival rates of patients with << cancer.lower() >> cancer after 5 years
           <% elif gender != 'All' %>
-          Net survival rates of << gender.lower() >>  with << cancer.lower() >> cancer after << survival_year >> years
+          Net survival rates of << gender.lower() >>  with << cancer.lower() >> cancer after 5 years
           <%- endif -%>
         unit: "%"
         short_unit: "%"
@@ -31,18 +34,80 @@ tables:
           - Net survival estimates survival by removing the effect of other causes of death.
           - It represents the theoretical survival of cancer patients if they could only die from cancer-related causes.
           - This measure allows fair comparisons between groups with different probabilities of non-cancer death.
+          - Net survival rates that are age-standardized using the International Cancer Survival Standard (ICSS) weights.
         presentation:
           title_public: |-
             <% if gender == 'All' %>
-            Net survival rates of patients with << cancer.lower() >> cancer after << survival_year >> years
+            Net survival rates of patients with << cancer.lower() >> cancer after 5 years
             <% elif gender != 'All' %>
-            Net survival rates of << gender.lower() >>  with << cancer.lower() >> cancer after << survival_year >> years
+            Net survival rates of << gender.lower() >>  with << cancer.lower() >> cancer after 5 years
             <%- endif -%>
         display:
           numDecimalPlaces: 1
           name:  |-
             <% if gender == 'All' %>
-            << cancer >> cancer after << survival_year >> years
+            << cancer >> cancer
             <% elif gender != 'All' %>
-            << cancer >> cancer after << survival_year >> years among << gender.lower() >>
+            << cancer >> cancer among << gender.lower() >>
+            <%- endif -%>
+
+      incidence__asr:
+        title: |-
+          <% if gender == 'All' %>
+          Age-standardized incidence rates of << cancer.lower() >> cancer
+          <% elif gender != 'All' %>
+          Age-standardized incidence rates of << cancer.lower() >> cancer amongst << gender.lower() >>
+          <%- endif -%>
+        unit: "%"
+        short_unit: "%"
+        description_short: The probability of developing cancer in a given population in a given year.
+        description_key:
+          - Cancer incidence is the number of new cancer cases arising in a specified population over a given period of time (typically 1 year).
+          - It can be expressed as an absolute number of cases within the entire population per year or as a rate per 100, 000 persons per year.
+          - Incidence information is collected routinely by cancer registries.
+          - Rates are age-standardized using the World Standard Population.
+        presentation:
+          title_public: |-
+            <% if gender == 'All' %>
+            Incidence rates of << cancer.lower() >> cancer
+            <% elif gender != 'All' %>
+            Incidence rates of << cancer.lower() >> cancer amongst
+            <%- endif -%>
+        display:
+          numDecimalPlaces: 1
+          name:  |-
+            <% if gender == 'All' %>
+            << cancer >> cancer
+            <% elif gender != 'All' %>
+            << cancer >> cancer among << gender.lower() >>
+            <%- endif -%>
+      mortality__asr:
+        title: |-
+          <% if gender == 'All' %>
+          Age-standardized mortality rates of << cancer.lower() >> cancer
+          <% elif gender != 'All' %>
+          Age-standardized mortality rates of << cancer.lower() >> cancer amongst << gender.lower() >>
+          <%- endif -%>
+        unit: "%"
+        short_unit: "%"
+        description_short: The probability of dying from cancer in a given population in a given year.
+        description_key:
+          - Cancer mortality is the number of deaths due to cancer occurring in a specified population in a given year.
+          - It can be expressed as an absolute number of deaths within the entire population per year or as a rate per 100 000 persons per year.
+          - Mortality data are provided by national statistical offices.
+          - Rates are age-standardized using the World Standard Population.
+        presentation:
+          title_public: |-
+            <% if gender == 'All' %>
+            Incidence rates of << cancer.lower() >> cancer
+            <% elif gender != 'All' %>
+            Incidence rates of << cancer.lower() >> cancer amongst
+            <%- endif -%>
+        display:
+          numDecimalPlaces: 1
+          name:  |-
+            <% if gender == 'All' %>
+            << cancer >> cancer
+            <% elif gender != 'All' %>
+            << cancer >> cancer among << gender.lower() >>
             <%- endif -%>
