@@ -31,5 +31,13 @@ tables:
           - Net survival estimates survival by removing the effect of other causes of death.
           - It represents the theoretical survival of cancer patients if they could only die from cancer-related causes.
           - This measure allows fair comparisons between groups with different probabilities of non-cancer death.
+        presentation:
+          title_public: |-
+            <% if gender == 'All' %>
+            Net survival rates of patients with << cancer.lower() >> cancer after << survival_year >> years
+            <% elif gender != 'All' %>
+            Net survival rates of << gender.lower() >>  with << cancer.lower() >> cancer after << survival_year >> years
+            <%- endif -%>
         display:
           numDecimalPlaces: 1
+          name:  << gender.lower() >>  with << cancer.lower() >> cancer after << survival_year >> years
