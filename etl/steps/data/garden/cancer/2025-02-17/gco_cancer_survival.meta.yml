@@ -19,9 +19,9 @@ tables:
       net_survival:
         title: |-
           <% if gender == 'All' %>
-          Net survival rates of patients with << cancer.lower >> cancer after << survival_year >> years
+          Net survival rates of patients with << cancer.lower() >> cancer after << survival_year >> years
           <% elif gender != 'All' %>
-          Net survival rates of << gender >> patients with << cancer.lower >> cancer after << survival_year >> years
+          Net survival rates of << gender.lower() >>  with << cancer.lower() >> cancer after << survival_year >> years
           <%- endif -%>
         unit: "%"
         short_unit: "%"
