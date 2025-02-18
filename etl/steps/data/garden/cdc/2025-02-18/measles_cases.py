@@ -16,13 +16,13 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("measles_cases")
-
+    tb = tb[tb["filter"] == "1985-Present*"]
+    assert tb["filter"].unique() == ["1985-Present*"]
+    tb = tb.drop(columns=["filter", "outbreaks_range", "outbreaks_cases"])
     #
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.format(["country", "year"])
 
     #

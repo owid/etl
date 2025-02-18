@@ -975,9 +975,9 @@ steps:
     - data://meadow/health/2025-02-13/vaccine_confidence
   data://grapher/health/2025-02-13/vaccine_confidence:
     - data://garden/health/2025-02-13/vaccine_confidence
-  
+
   #
-  # TODO: add step name (just something recognizable)
+  # CDC Measles Cases 1985-present
   #
   data://meadow/cdc/2025-02-18/measles_cases:
     - snapshot://cdc/2025-02-18/measles_cases.json
