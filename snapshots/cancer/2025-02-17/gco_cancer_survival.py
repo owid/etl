@@ -33,7 +33,7 @@ def main(upload: bool) -> None:
     download_dir = os.path.dirname(snap.path)
 
     # Create a new snapshot.
-    # download_data(download_dir, log)
+    download_data(download_dir, log)
     df = process_data(download_dir)
     df_to_file(df, file_path=snap.path)
 
@@ -55,7 +55,7 @@ def download_data(download_dir, log):
     cancer_sites = ["Liver", "Colon", "Colorectal", "Lung", "Oesophagus", "Pancreas", "Stomach", "Ovary", "Rectum"]
     countries = ["Norway", "Australia", "Canada", "Denmark", "Ireland", "New Zealand", "United Kingdom"]
     genders = ["All", "Males", "Females"]
-    survival_years = [1, 3, 5]
+    survival_years = [5]
 
     total_iterations = len(cancer_sites) * len(countries) * len(survival_years) * len(genders)
 
@@ -75,7 +75,7 @@ def download_data(download_dir, log):
                                 )
                             )
 
-                            element = WebDriverWait(driver, 20).until(
+                            element = WebDriverWait(driver, 30).until(
                                 EC.element_to_be_clickable((By.XPATH, "/html/body/div[4]/ul/li[2]/ul/li[1]/a"))
                             )
                             driver.execute_script("arguments[0].scrollIntoView();", element)

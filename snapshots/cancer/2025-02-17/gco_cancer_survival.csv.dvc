@@ -27,6 +27,6 @@ meta:
       name: Protocol 2 of the Universal Copyright Convention
       url: https://gco.iarc.fr/overtime/en/about#web-reference
 outs:
-  - md5: 4f1004c8c808cf61bcc517f1031e5164
-    size: 472917
+  - md5: 4725e39fe0afc42e5fbda79a768b4c45
+    size: 157949
     path: gco_cancer_survival.csv
