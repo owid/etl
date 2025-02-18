@@ -415,9 +415,11 @@ tables:
         description_short: |-
           Number of {definitions.people_dimension} newly infected with HIV in the last year per 1,000 uninfected people. This is the <<estimate.title()>> estimate.
         description_key:
+          - HIV incidence measures progress towards ending the AIDS epidemic.
           - This indicator is a crucial metric in the [WHO 2022 Consolidated guidelines](https://www.who.int/publications/i/item/9789240055315) on person-centered HIV strategic information.
-          - According to the _WHO 2022 Consolidated guidelines_, the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
-        description_processing: |-
+          - According to the [WHO 2022 Consolidated guidelines](https://www.who.int/publications/i/item/9789240055315), the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
+        description_from_producer: |-
+          Method of measurement:
           Methods for monitoring incidence can vary depending on the epidemic setting and are typically categorized either as direct or indirect measures. Direct measurement at a population level is preferred but can often be difficult to obtain. As a result, most if not all countries rely on indirect measures or triangulate direct and indirect methods.
 
           Strategies for directly measuring HIV incidence include longitudinal follow-up and repeat testing among individuals who do not have HIV infection and estimation using a laboratory test for recent HIV infection and clinical data in the population. Longitudinal monitoring is often costly and difficult to perform at a population level. Laboratory testing of individuals to determine the recency of infection also raises cost and complexity challenges since a nationally representative population-based survey is typically required to obtain estimates.
