@@ -43,7 +43,7 @@ tables:
             Net survival rates of << gender.lower() >>  with << cancer.lower() >> cancer after 5 years
             <%- endif -%>
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 0
           name:  |-
             <% if gender == 'All' %>
             << cancer >> cancer
