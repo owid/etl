@@ -40,4 +40,9 @@ tables:
             <%- endif -%>
         display:
           numDecimalPlaces: 1
-          name:  << gender.lower() >>  with << cancer.lower() >> cancer after << survival_year >> years
+          name:  |-
+            <% if gender == 'All' %>
+            << cancer >> after << survival_year >> years
+            <% elif gender != 'All' %>
+            << cancer >> after << survival_year >> years among << gender.lower() >>
+            <%- endif -%>
