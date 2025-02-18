@@ -23,6 +23,20 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb[tb["survival_year"] == 5]
     tb = tb.drop("survival_year", axis=1)
+    # Replace specific values in the "cancer" column
+    tb["cancer"] = tb["cancer"].replace(
+        {
+            "Colon": "colon",
+            "Colorectal": "colorectal",
+            "Liver": "liver",
+            "Lung": "lung",
+            "Oesophagus": "oesophageal",
+            "Pancreas": "pancreatic",
+            "Rectum": "rectal",
+            "Ovary": "ovarian",
+            "Stomach": "stomach",
+        }
+    )
     tb = tb.format(["country", "year", "gender", "cancer"])
 
     #

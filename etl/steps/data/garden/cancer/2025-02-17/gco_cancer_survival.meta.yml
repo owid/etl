@@ -28,7 +28,7 @@ tables:
           <%- endif -%>
         unit: "%"
         short_unit: "%"
-        description_short: The percentage of patients still alive at a certain time after diagnosis, assuming cancer is the only cause of death.
+        description_short: The percentage of patients still alive 5 years after the diagnosis, assuming cancer is the only cause of death.
         description_key:
           - The percentage of patients still alive at a certain time after diagnosis, assuming cancer is the only cause of death.
           - Net survival estimates survival by removing the effect of other causes of death.
@@ -71,7 +71,7 @@ tables:
             <% if gender == 'All' %>
             Incidence rates of << cancer.lower() >> cancer
             <% elif gender != 'All' %>
-            Incidence rates of << cancer.lower() >> cancer amongst
+            Incidence rates of << cancer.lower() >> cancer amongst << gender.lower() >>
             <%- endif -%>
         display:
           numDecimalPlaces: 1
@@ -101,7 +101,7 @@ tables:
             <% if gender == 'All' %>
             Incidence rates of << cancer.lower() >> cancer
             <% elif gender != 'All' %>
-            Incidence rates of << cancer.lower() >> cancer amongst
+            Incidence rates of << cancer.lower() >> cancer amongst << gender.lower() >>
             <%- endif -%>
         display:
           numDecimalPlaces: 1
