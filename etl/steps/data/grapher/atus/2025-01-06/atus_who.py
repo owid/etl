@@ -17,15 +17,33 @@ def run(dest_dir: str) -> None:
     tb = ds_garden.read("atus_who")
     tb_years = ds_garden.read("atus_who_years")
 
-    # Use year for age to work in grapher
-    tb = tb.rename(columns={"age": "year"})
+    # change wording of gender categories
+    tb["gender"] = tb["gender"].replace({"all": "All people", "female": "Women", "male": "Men"})
+    tb_years["gender"] = tb_years["gender"].replace({"all": "All people", "female": "Women", "male": "Men"})
+
+    # Use year for age and gender for country to work in grapher
+    tb = tb.drop(columns=["country"])
+    tb = tb.rename(columns={"age": "year", "gender": "country"})
+
+    tb_years["age_bracket"] = tb_years["age_bracket"].replace(
+        {
+            "all": "All ages",
+            "15-29": "15-29 years",
+            "30-44": "30-44 years",
+            "45-59": "45-59 years",
+            "60-85": "60+ years",
+        }
+    )
+
+    tb_years = tb_years.drop(columns=["country"])
+    tb_years = tb_years.rename(columns={"gender": "country"})
 
     # Drop timeframe column
     tb = tb.drop(columns=["timeframe"])
 
     # format
-    tb = tb.format(["country", "year", "gender", "who_category"])
-    tb_years = tb_years.format(["country", "year", "age_bracket", "who_category"])
+    tb = tb.format(["country", "year", "who_category"])
+    tb_years = tb_years.format(["country", "year", "who_category", "age_bracket"])
 
     #
     # Save outputs.

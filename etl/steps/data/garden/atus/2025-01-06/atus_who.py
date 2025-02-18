@@ -62,11 +62,19 @@ def run(dest_dir: str) -> None:
 
     # Create table for development over time for age groups
     tb_years = development_over_time_for_age_groups(tb_agg)
+    tb_years_female = development_over_time_for_age_groups(tb_agg, gender="female")
+    tb_years_male = development_over_time_for_age_groups(tb_agg, gender="male")
+
+    tb_years = pr.concat([tb_years, tb_years_female, tb_years_male])
+
+    # convert time to hours
+    tb_who_final["t"] = tb_who_final["t"] / 60
+    tb_years["t"] = tb_years["t"] / 60
 
     #
     # Process data.
     tb = tb_who_final.format(["timeframe", "age", "who_category", "gender"], short_name="atus_who")
-    tb_years = tb_years.format(["age_bracket", "who_category", "year"], short_name="atus_who_years")
+    tb_years = tb_years.format(["age_bracket", "who_category", "year", "gender"], short_name="atus_who_years")
 
     #
     # Save outputs.
@@ -113,13 +121,18 @@ def fill_missing_values(tb_agg):
     return tb_agg
 
 
-def development_over_time_for_age_groups(tb_agg):
+def development_over_time_for_age_groups(tb_agg, gender="all"):
     """Capture changes in time spent with different categories over time for different age groups
     Result: table with average time spend with each category for each age group for each year. This is not separated by gender."""
     # age starts with 15, 80/85 is topcoded
     age_brackets = [(15, 29), (30, 44), (45, 59), (60, 85)]
 
     tbs = []
+
+    if gender == "female":
+        tb_agg = tb_agg[tb_agg["gender"] == 2]
+    elif gender == "male":
+        tb_agg = tb_agg[tb_agg["gender"] == 1]
 
     # aggregate over year and age
     for age_b in age_brackets:
@@ -134,6 +147,8 @@ def development_over_time_for_age_groups(tb_agg):
             .reset_index()
         )
         tb_age["age_bracket"] = f"{age_b[0]}-{age_b[1]}"
+        tb_age["gender"] = gender
+
         tbs.append(tb_age.copy())
 
     tb_years = (
@@ -147,6 +162,7 @@ def development_over_time_for_age_groups(tb_agg):
     )
 
     tb_years["age_bracket"] = "all"
+    tb_years["gender"] = gender
     tbs.append(tb_years)
     tb_years = pr.concat(tbs)
 

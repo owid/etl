@@ -4,6 +4,12 @@ definitions:
     presentation:
       topic_tags:
         - Time Use
+      grapher_config:
+        note: |-
+          Activities such as sleeping, grooming, and personal care are not included in the data. Relationships used to categorize people are not exhaustive and time spent with multiple people counts towards all (e.g., attending a party with friends and partner counts toward both "friends" and "partner").'
+        originUrl: https://ourworldindata.org/time-use
+    display:
+      numSignificantFigures: 2
   processing:
     notes: |-
       Data points have been weighted to make them more representative of the population with the survey weights provided by ATUS in the original data.
@@ -11,7 +17,6 @@ definitions:
     categories: 'We have combined some categories for presentation purposes: "children" include related and household children under 18, grandchildren and other related children under 18, "friends" include roommates or lodgers and "partner" includes spouses, boy-/girlfriends, and co-habiting partners.'
     multiple_people: Time spent with multiple people can be counted more than once (e.g., attending a party with friends and partner counts toward both "friends" and "partner").
     other: The "Other" category includes all other relationships not covered by the other categories, such as neighbors, customers or non-related, non-household children.
-    n_a: Activities such as sleeping, grooming, and personal care are not included in the data, as the ATUS does not ask about other people present during these activities.
 
 
 
@@ -25,43 +30,43 @@ tables:
   atus_who:
     variables:
       t:
-        title: Time spent with other people throughout life - <<who_category>> - <<gender>>
-        unit: "Minutes"
-        short_unit: "min"
+        title: Time spent with other people throughout life - <<who_category>>
+        unit: "Hours"
+        short_unit: "h"
         description_short: |-
           <% if who_category in ["Children", "Partner", "Family"] %>
-          Time spent with <<who_category.lower()>>, by gender and age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
+          Time spent with <<who_category.lower()>>, by gender and age. This data is measured in hours per day and based on averages from surveys in the United States between 2010 and 2023.
           <% elif who_category in ["Friend", "Co-worker"] %>
-          Time spent with <<who_category.lower()>>s, by gender and age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
+          Time spent with <<who_category.lower()>>s, by gender and age. This data is measured in hours per day and based on averages from surveys in the United States between 2010 and 2023.
           <% elif who_category == "Alone" %>
-          Time spent alone, by gender and age. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
+          Time spent alone, by gender and age. This data is measured in hours per day and based on averages from surveys in the United States between 2010 and 2023.
           <% elif who_category == "Other" %>
-          Time spent with other people, by gender and age. These include all people which aren't partners, friends, family or coworkers. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
+          Time spent with other people, by gender and age. These include all people which aren't partners, friends, family or coworkers. This data is measured in hours per day and based on averages from surveys in the United States between 2010 and 2023.
           <% elif who_category == "Not applicable" %>
-          Time spent doing activities, where the American Time Use Survey does not ask for other people present. This includes sleeping and activities usually done alone, such as grooming oneself. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
+          Time spent doing activities, where the American Time Use Survey does not ask for other people present. This includes sleeping and activities usually done alone, such as grooming oneself. This data is measured in hours per day and based on averages from surveys in the United States between 2010 and 2023.
           <%- endif -%>
         description_key:
           - '{definitions.processing.atus_survey}'
           - '{definitions.processing.categories}'
           - '{definitions.processing.multiple_people}'
           - '{definitions.processing.other}'
-          - '{definitions.processing.n_a}'
           - "Since this is a cross-sectional survey, it queries a new sample from the U.S. population every year. This means that we are actually seeing the result of two underlying trends: the effect of aging on social connections, but also the effect of cohort trends. Different generations have different experiences, preferences and social norms, which are reflected in the data."
-          - Age is topcoded for people aged 80+ years. All individuals aged 80-84 are included in the "age 80" category, and all individuals aged 85 and older are included in the "age 85" category.
+          - All individuals aged 80-84 are included in the "age 80" category.
+          # Individuals aged 85 and older are coded as "age 85", but this data is not shown on the charts.
         description_processing: |-
           - {definitions.processing.notes}
           - Data for 2020 is excluded, since the American Time Use Survey was not conducted during the period March 18, 2020 to May 9, 2020. Therefore data collected for 2020 is not representative of the entire year.
-        presentation:
-          grapher_config:
-            note: 'Relationships used to categorize people are not exhaustive. Additionally, time spent with multiple people can be counted more than once (e.g., attending a party with friends and partner counts toward both "friends" and "partner").'
+        display:
+          name: With <<who_category>>
+
   atus_who_years:
     variables:
       t:
         title: Time spent with other people over time - <<age_bracket>> - <<who_category>>
-        unit: "Minutes"
-        short_unit: "min"
+        unit: "Hours"
+        short_unit: "h"
         description_short: |-
-          Average time <<age_bracket>> year olds spend with <<who_category.lower()>>. This data is measured in minutes per day and based on averages from surveys in the United States between 2010 and 2023.
+          Average time Americans spend with <<who_category.lower()>>. This data is measured in hours per day and based on averages from surveys in the United States between 2010 and 2023.
         description_processing: |-
           - {definitions.processing.notes}
         description_key:
@@ -69,6 +74,5 @@ tables:
           - '{definitions.processing.categories}'
           - '{definitions.processing.multiple_people}'
           - '{definitions.processing.other}'
-          - '{definitions.processing.n_a}'
           - ATUS data were not collected during the period March 18, 2020 to May 9, 2020, which coincided with a time when most residents of the United States were encouraged to stay home to prevent the spread of COVID-19. Therefore, data collected for 2020 is not representative of the entire year.
 
