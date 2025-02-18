@@ -26,15 +26,15 @@ def run(dest_dir: str) -> None:
     # Replace specific values in the "cancer" column
     tb["cancer"] = tb["cancer"].replace(
         {
-            "Colon": "colon",
-            "Colorectal": "colorectal",
-            "Liver": "liver",
-            "Lung": "lung",
-            "Oesophagus": "oesophageal",
-            "Pancreas": "pancreatic",
-            "Rectum": "rectal",
-            "Ovary": "ovarian",
-            "Stomach": "stomach",
+            "Colon": "Colon",
+            "Colorectal": "Colorectal",
+            "Liver": "Liver",
+            "Lung": "Lung",
+            "Oesophagus": "Oesophageal",
+            "Pancreas": "Pancreatic",
+            "Rectum": "Rectal",
+            "Ovary": "Ovarian",
+            "Stomach": "Stomach",
         }
     )
     tb = tb.format(["country", "year", "gender", "cancer"])
