@@ -60,6 +60,8 @@ def clean_data(tb: Table) -> Table:
     tb = tb.drop(columns=["iso_3_code", "who_region", "indcode", "indcatcode", "indcat_description", "indsort"])
     tb = tb.replace({"value": {"ND": pd.NA, "NR": pd.NA}})
     tb["description"] = tb["description"].str.replace("YF (Yellow fever)", "Yellow fever")
+    # Drop data for years before 2011 as it is very sparse
+    tb = tb[tb["year"] >= 2011]
 
     return tb
 

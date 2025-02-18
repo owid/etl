@@ -1690,6 +1690,8 @@ tables:
         unit: 1=low to 6=high
       iq_spi_ovrl:
         title: 'Statistical performance indicators (SPI): Overall score (scale 0-100)'
+        display:
+          numDecimalPlaces: 1
       iq_spi_pil1:
         title: 'Statistical performance indicators (SPI): Pillar 1 data use score (scale 0-100)'
       iq_spi_pil2:

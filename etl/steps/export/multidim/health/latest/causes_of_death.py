@@ -20,13 +20,20 @@ def run(dest_dir: str) -> None:
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     table = paths.load_dataset("gbd_cause").read("gbd_cause_deaths", load_data=False)
 
-    # Individual causes
-    config["views"] += multidim.expand_views_with_access_db(
-        config, {"metric": "*", "age": "*", "cause": "*"}, table, engine
-    )
-    # Show all causes in a single view
-    config["views"] += multidim.expand_views_with_access_db(
-        config, {"metric": "*", "age": "*", "cause": "Side-by-side comparison of causes"}, table, engine
-    )
+    # Get all combinations of dimensions
+    config_new = multidim.expand_config(table, dimensions=["cause", "age", "metric"])
 
-    multidim.upsert_multidim_data_page("mdd-causes-of-death", config, engine)
+    config["dimensions"][0]["choices"] += [
+        c for c in config_new["dimensions"][0]["choices"] if c["slug"] != "All causes"
+    ]
+
+    # Group age and metric views under "Side-by-side comparison of causes"
+    grouped_views = multidim.group_views(config_new["views"], by=["age", "metric"])
+    for view in grouped_views:
+        view["dimensions"]["cause"] = "Side-by-side comparison of causes"
+
+    # Add views to config
+    config["views"] += config_new["views"]
+    config["views"] += grouped_views
+
+    multidim.upsert_multidim_data_page("mdd-causes-of-death", config, engine, dependencies=paths.dependencies)

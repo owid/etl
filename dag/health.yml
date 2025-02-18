@@ -659,8 +659,8 @@ steps:
     - data://garden/health/2024-08-23/eurostat_cancer
 
   # Multi-dim indicators
-  # export://multidim/health/latest/causes_of_death:
-  #   - data-private://grapher/ihme_gbd/2024-05-20/gbd_cause
+  export://multidim/health/latest/causes_of_death:
+    - data-private://grapher/ihme_gbd/2024-05-20/gbd_cause
 
   # GBD 2021 - GBD Risk Factors cancer specific
   data-private://meadow/ihme_gbd/2024-08-26/gbd_risk_cancer:
