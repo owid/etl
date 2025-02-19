@@ -983,3 +983,11 @@ steps:
     - snapshot://cdc/2025-02-18/measles_cases.json
   data://garden/cdc/2025-02-18/measles_cases:
     - data://meadow/cdc/2025-02-18/measles_cases
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/health/2025-02-19/measles_historical:
+    - snapshot://health/2025-02-19/measles_historical.csv
+  data://garden/health/2025-02-19/measles_historical:
+    - data://meadow/health/2025-02-19/measles_historical

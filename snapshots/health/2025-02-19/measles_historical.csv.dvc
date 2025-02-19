@@ -44,6 +44,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: e15ea54bcf34c2c8c8387fe875d746db
-    size: 2995
+  - md5: 8c6be10bba15a4d419027d218c5d1d0e
+    size: 3717
     path: measles_historical.csv

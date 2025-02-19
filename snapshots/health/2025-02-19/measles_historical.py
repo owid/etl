@@ -11,16 +11,45 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
 # Data for 1919
-DATA_1919 = pd.DataFrame({"year": [1919], "cases": [179829], "source": ["https://www.jstor.org/stable/4575902?seq=25"]})
+DATA_1919 = pd.DataFrame(
+    {
+        "country": ["United States"],
+        "year": [1919],
+        "cases": [179829],
+        "source": ["https://www.jstor.org/stable/4575902?seq=25"],
+    }
+)
 # Data  for 1921
-DATA_1921 = pd.DataFrame({"year": [1921], "cases": [280930], "source": ["https://www.jstor.org/stable/4576538"]})
+DATA_1921 = pd.DataFrame(
+    {
+        "country": ["United States"],
+        "year": [1921],
+        "cases": [280930],
+        "source": ["https://www.jstor.org/stable/4576538"],
+    }
+)
 # Data for 1924
-DATA_1924 = pd.DataFrame({"year": [1924], "cases": [511305], "source": ["https://www.jstor.org/stable/4577735?seq=34"]})
+DATA_1924 = pd.DataFrame(
+    {
+        "country": ["United States"],
+        "year": [1924],
+        "cases": [511305],
+        "source": ["https://www.jstor.org/stable/4577735?seq=34"],
+    }
+)
 # Data for 1925
-DATA_1925 = pd.DataFrame({"year": [1925], "cases": [225027], "source": ["https://www.jstor.org/stable/4578131?seq=2"]})
+DATA_1925 = pd.DataFrame(
+    {
+        "country": ["United States"],
+        "year": [1925],
+        "cases": [225027],
+        "source": ["https://www.jstor.org/stable/4578131?seq=2"],
+    }
+)
 # Data for 1938-1943
 DATA_1938_1943 = pd.DataFrame(
     {
+        "country": ["United States"] * 6,
         "year": [1938, 1939, 1940, 1941, 1942, 1943],
         "cases": [822811, 403317, 291162, 894134, 547393, 633627],
         "source": ["https://www.census.gov/library/publications/1945/compendia/statab/66ed.html"] * 6,
@@ -29,6 +58,7 @@ DATA_1938_1943 = pd.DataFrame(
 # Data for 1944-1984
 DATA_1944_1984 = pd.DataFrame(
     {
+        "country": ["United States"] * 41,
         "year": range(1944, 1985),
         "cases": [
             630291,
