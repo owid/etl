@@ -37,9 +37,9 @@ def run(dest_dir: str) -> None:
         config = paths.load_mdim_config(fname)
 
         multidim.upsert_multidim_data_page(
-            fname_to_slug(fname),
-            config,
-            dependencies=paths.dependencies,
+            config=config,
+            paths=paths,
+            mdim_name=fname_to_mdim_name(fname),
         )
 
     # PART 2: MDIMs hybridly generated (mix of YAML file + data)
@@ -69,11 +69,11 @@ def run(dest_dir: str) -> None:
 
     # Upsert to DB
     multidim.upsert_multidim_data_page(
-        fname_to_slug("covid.mobility.yml"),
-        config,
-        dependencies=paths.dependencies,
+        config=config,
+        paths=paths,
+        mdim_name=fname_to_mdim_name("covid.mobility.yml"),
     )
 
 
-def fname_to_slug(fname: str) -> str:
-    return f"mdd-{fname.replace('.yml', '').replace('.', '-').replace('_', '-')}"
+def fname_to_mdim_name(fname: str) -> str:
+    return f"{fname.replace('.yml', '').replace('.', '_')}"

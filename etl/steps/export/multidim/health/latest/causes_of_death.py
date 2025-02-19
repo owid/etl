@@ -1,11 +1,8 @@
-from pathlib import Path
-
 from etl import multidim
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-CURRENT_DIR = Path(__file__).parent
 
 
 def run(dest_dir: str) -> None:
@@ -33,7 +30,6 @@ def run(dest_dir: str) -> None:
     config["views"] += grouped_views
 
     multidim.upsert_multidim_data_page(
-        "mdd-causes-of-death",
-        config,
-        dependencies=paths.dependencies,
+        config=config,
+        paths=paths,
     )
