@@ -5,5 +5,4 @@ tables:
         title: Number of measles cases
         unit: cases
         display:
-          isProjection: true
           entityAnnotationsMap: "United States: Data for 2025 is incomplete"
