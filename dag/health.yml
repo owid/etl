@@ -983,3 +983,13 @@ steps:
     - snapshot://cdc/2025-02-18/measles_cases.json
   data://garden/cdc/2025-02-18/measles_cases:
     - data://meadow/cdc/2025-02-18/measles_cases
+
+  #
+  # Cancer survival rates (GCO)
+  #
+  data://meadow/cancer/2025-02-17/gco_cancer_survival:
+    - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
+  data://garden/cancer/2025-02-17/gco_cancer_survival:
+    - data://meadow/cancer/2025-02-17/gco_cancer_survival
+  data://grapher/cancer/2025-02-17/gco_cancer_survival:
+    - data://garden/cancer/2025-02-17/gco_cancer_survival
