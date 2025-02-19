@@ -13,8 +13,8 @@ def run(dest_dir: str) -> None:
     ds_grapher = paths.load_dataset("energy_prices")
 
     # Read table of prices in euros.
-    tb_annual = ds_grapher.read("energy_prices_annual")
-    tb_monthly = ds_grapher.read("energy_prices_monthly")
+    tb_annual = ds_grapher.read("energy_prices_annual", reset_index=False)
+    tb_monthly = ds_grapher.read("energy_prices_monthly", reset_index=False)
 
     #
     # Process data.
@@ -22,23 +22,39 @@ def run(dest_dir: str) -> None:
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()
 
-    # Create views.
-    config["views"] = multidim.generate_views_for_dimensions(
-        dimensions=config["dimensions"],
-        tables=[tb_annual, tb_monthly],
-        dimensions_order_in_slug=("frequency", "source", "consumer", "price_component", "unit"),
-        warn_on_missing_combinations=False,
-        additional_config={
-            "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-            "chartTypes": ["LineChart"],
-            "hasMapTab": True,
-            "tab": "map",
-            "map": {
-                "projection": "Europe",
-                "colorScale": {"baseColorScheme": "YlOrBr"},
-            },
+    dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
+
+    # Add dimensions to the metadata of the table.
+    # e.g. annual_gas_household_other_pps -> gas, household, other, pps
+    for tb in [tb_annual, tb_monthly]:
+        for col in tb:
+            tb[col].metadata.additional_info = {
+                "dimensions": {
+                    "originalShortName": col.split("_")[0],
+                    "short_name": col,
+                    "filters": [{"name": dim, "value": v} for dim, v in zip(dimensions, col.split("_"))],
+                }
+            }
+
+    common_view_config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+        "chartTypes": ["LineChart"],
+        "hasMapTab": True,
+        "tab": "map",
+        "map": {
+            "projection": "Europe",
+            "colorScale": {"baseColorScheme": "YlOrBr"},
         },
+    }
+
+    # Create views.
+    annual_config = multidim.expand_config(
+        tb_annual, indicator_name="annual", dimensions=dimensions, common_view_config=common_view_config
     )
+    monthly_config = multidim.expand_config(
+        tb_monthly, indicator_name="monthly", dimensions=dimensions, common_view_config=common_view_config
+    )
+    config["views"] = annual_config["views"] + monthly_config["views"]
 
     # Create special view for the stacked area chart of total consumer price by components.
     for source in ["electricity", "gas"]:
