@@ -24,15 +24,26 @@ def run(dest_dir: str) -> None:
 
     dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
 
+    # Get possible dimension values
+    dim_options = {}
+    for dim in config["dimensions"]:
+        dim_options[dim["slug"]] = [c["slug"] for c in dim["choices"]]
+
     # Add dimensions to the metadata of the table.
     # e.g. annual_gas_household_other_pps -> gas, household, other, pps
     for tb in [tb_annual, tb_monthly]:
         for col in tb:
+            filters = []
+            for dim in dimensions:
+                print(dim)
+                print(dim_options[dim])
+                filters.append({"name": dim, "value": [v for v in dim_options[dim] if v in col][0]})
+
             tb[col].metadata.additional_info = {
                 "dimensions": {
                     "originalShortName": col.split("_")[0],
                     "short_name": col,
-                    "filters": [{"name": dim, "value": v} for dim, v in zip(dimensions, col.split("_"))],
+                    "filters": filters,
                 }
             }
 
