@@ -17,8 +17,8 @@ def run(dest_dir: str) -> None:
     tb = ds_garden.read("measles_long_run", reset_index=True)
 
     # Create two tables, one for the main data and one for the incomplete years data.
-    tb_incomplete = tb[tb["year"] >= tb["year"].max()]
-    tb = tb[tb["year"] < tb["year"].max()]
+    tb_incomplete = tb[tb["year"] >= tb["year"].max() - 1]
+    tb = tb[tb["year"] < tb["year"].max() - 1]
 
     tb_incomplete = tb_incomplete.format(["country", "year"], short_name="measles_incomplete")
     tb = tb.format(["country", "year"], short_name="measles_long_run")
