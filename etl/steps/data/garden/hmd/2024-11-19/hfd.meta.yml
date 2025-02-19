@@ -223,10 +223,10 @@ tables:
           The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
           <%- endif %>
         unit: "births per woman"
-        description_key:
-          - Represents the completed fertility of a cohort by the end of their reproductive years.
-          - Useful for comparing fertility across different cohorts.
-          - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
+        description_key: &ccf_description_key
+          - Shows the total number of children that women born in the same year have by the end of their childbearing years.
+          - Helps compare how many children different generations of women have on average.
+          - Calculated using the actual number of births recorded at different ages throughout a woman's childbearing years.
 
       ccf_plus15y:
         title: |-
@@ -239,11 +239,7 @@ tables:
           The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
           <%- endif %>
         unit: "births per woman"
-        description_key:
-          - Represents the completed fertility of a cohort by the end of their reproductive years.
-          - Useful for comparing fertility across different cohorts.
-          - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
-
+        description_key: *ccf_description_key
       ccf_plus30y:
         title: |-
           <% set title = "Completed cohort fertility rate (adjusted +30 years)" %>
@@ -255,10 +251,7 @@ tables:
           The average number of{definitions.others.bo_1} children born to women in a specific cohort over their lifetime.
           <%- endif %>
         unit: "births per woman"
-        description_key:
-          - Represents the completed fertility of a cohort by the end of their reproductive years.
-          - Useful for comparing fertility across different cohorts.
-          - Calculated from age-specific fertility rates observed throughout the cohort's reproductive lifespan.
+        description_key: *ccf_description_key
 
       ccf40:
         title: |-
@@ -288,9 +281,9 @@ tables:
           <%- endif %>
         unit: "years"
         description_key:
-          - Represents the average age at which women from a particular cohort give birth.
-          - Helps understand generational differences in fertility timing.
-          - Calculated from observed fertility rates across the reproductive lifespan of the cohort.
+          - Shows the average age when women in a specific group have their children.
+          - Highlights how the timing of childbirth differs from one generation to the next.
+          - Calculated from the actual rates at which women have children during their reproductive years.
 
       cmab40:
         title: |-
@@ -368,7 +361,7 @@ tables:
         description_key:
           - Represents fertility rates for each age group in a specific year.
           - Useful for detailed analysis of fertility patterns by both age and year.
-          - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
+          # - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
 
   cohort_ages:
     variables:
@@ -382,7 +375,7 @@ tables:
         description_key:
           - Represents fertility rates for a specific cohort as they age.
           - Useful for understanding how fertility behavior changes across different cohorts over time.
-          - Presented in the form of horizontal parallelograms, allowing for the tracking of cohort-specific fertility patterns.
+          # - Presented in the form of horizontal parallelograms, allowing for the tracking of cohort-specific fertility patterns.
 
       ccfr_cohort:
         title: |-
@@ -394,7 +387,7 @@ tables:
         description_key:
           - Represents fertility rates for each age group in a specific year.
           - Useful for detailed analysis of fertility patterns by both age and year.
-          - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
+          # - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
 
   period_ages_years:
     variables:
@@ -407,7 +400,7 @@ tables:
         description_key:
           - Represents fertility rates for each age group in a specific year.
           - Useful for detailed analysis of fertility patterns by both age and year.
-          - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
+          # - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
 
   cohort_ages_years:
     variables:
@@ -418,9 +411,9 @@ tables:
         description_short: |-
           Distribution of age-specific fertility rates for women in a specific birth cohort.
         description_key:
-          - Represents fertility rates for a specific cohort as they age.
+          - Represents fertility rates for a specific cohort as individuals in it age.
           - Useful for understanding how fertility behavior changes across different cohorts over time.
-          - Presented in the form of horizontal parallelograms, allowing for the tracking of cohort-specific fertility patterns.
+          # - Presented in the form of horizontal parallelograms, allowing for the tracking of cohort-specific fertility patterns.
 
       ccfr_cohort:
         title: |-
