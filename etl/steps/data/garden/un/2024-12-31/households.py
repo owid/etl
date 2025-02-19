@@ -93,14 +93,14 @@ def create_other_category(tb: Table) -> Table:
         100 - tb.loc[rows_not_around_100.index, "sum_households"]
     )
     # Ensure if the "unknown" column row is 100, then others are 0
-    tb.loc[tb["unknown"] == 100, columns_to_sum] = np.nan
+    tb.loc[tb["unknown"] == 100, columns_to_sum] = 0
     tb.loc[tb["unknown"] == 100, "unknown"] = 100
 
     # Drop the sum_households column if needed
     tb = tb.drop(columns=["sum_households"])
 
     # Ensure other columns are not NaN for rows where "unknown" is not NaN
-    tb.loc[tb["unknown"].notna(), columns_to_sum] = tb.loc[tb["unknown"].notna(), columns_to_sum].fillna(0)
+    # tb.loc[tb["unknown"].notna(), columns_to_sum] = tb.loc[tb["unknown"].notna(), columns_to_sum].fillna(0)
 
     # If all values are zero for each of the columns in columns_to_sum, set them to NaN (avoid plotting just 0s)
     tb.loc[(tb[columns_to_sum] == 0).all(axis=1), columns_to_sum] = np.nan
