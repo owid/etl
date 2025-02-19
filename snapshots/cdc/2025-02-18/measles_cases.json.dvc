@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: CDC Yearly measles cases (1985-present)
+    description: |-
+      Annual measles cases as reported by the Centers for Disease Control and Prevention (CDC).
+    date_published: "2025-02-06"
+    # Citation
+    producer: Centers for Disease Control and Prevention (CDC)
+    citation_full: |-
+      Measles Cases and Outbreaks (2025). Centers for Disease Control and Prevention (CDC).
+    attribution_short: CDC
+    # Files
+    url_main: https://www.cdc.gov/measles/data-research/
+    url_download: https://www.cdc.gov/wcms/vizdata/measles/MeaslesCasesYear.json
+    date_accessed: 2025-02-18
+
+    # License
+    license:
+      name: Public domain
+      url: https://www.cdc.gov/other/agencymaterials.html
+outs:
+  - md5: 5a1d6f55a0458423d8de43855516c74f
+    size: 10286
+    path: measles_cases.json

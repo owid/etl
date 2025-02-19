@@ -515,6 +515,7 @@ class PathFinder:
 
     @property
     def mdim_path(self) -> Path:
+        """TODO: worth aligning with `metadata_path` (add missing '.meta'), maybe even just deprecate this and use `metadata_path`."""
         assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
         return self.directory / (self.short_name + ".yml")
 
@@ -587,7 +588,7 @@ class PathFinder:
         elif channel == "walden":
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
+            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data{is_private_suffix}://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
         else:
             raise UnknownChannel
 

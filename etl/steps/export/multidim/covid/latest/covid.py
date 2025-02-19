@@ -1,9 +1,9 @@
 from etl import multidim
-from etl.db import get_engine
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
 # Default config for GOOGLE MOBILITY
 MOBILITY_CONFIG_DEFAULT = {
     "subtitle": "This data shows how community movement in specific locations has changed relative to the period before the pandemic.",
@@ -17,8 +17,6 @@ MOBILITY_CONFIG_DEFAULT = {
 
 
 def run(dest_dir: str) -> None:
-    engine = get_engine()
-
     # PART 1: MDIMs entirely from YAML files
     # Load MDIM configurations from YAML files
     filenames = [
@@ -33,13 +31,15 @@ def run(dest_dir: str) -> None:
         "covid.cases_tests.yml",
         # "covid.vax_breakdowns.yml",
     ]
+
     for fname in filenames:
         paths.log.info(fname)
+        config = paths.load_mdim_config(fname)
+
         multidim.upsert_multidim_data_page(
             fname_to_slug(fname),
-            paths.load_mdim_config(fname),
-            engine,
-            paths.dependencies,
+            config,
+            dependencies=paths.dependencies,
         )
 
     # PART 2: MDIMs hybridly generated (mix of YAML file + data)
@@ -64,12 +64,14 @@ def run(dest_dir: str) -> None:
     # Combine views info from YAML + programmatically obtained
     config["views"] = config["views"] + config_new["views"]
 
+    # WIP: DEBUGGING
+    # multidim.adjust_mdim_views(config, paths.dependencies_by_table_name)
+
     # Upsert to DB
     multidim.upsert_multidim_data_page(
         fname_to_slug("covid.mobility.yml"),
         config,
-        engine,
-        paths.dependencies,
+        dependencies=paths.dependencies,
     )
 
 

@@ -19,6 +19,7 @@ dataset:
 tables:
   households:
     variables:
+
        one_person:
          title: One person households
          unit: "%"
@@ -36,6 +37,16 @@ tables:
           unit: "%"
           short_unit: "%"
           description_short: Percentage of households comprised of a married or in-partnership couple and their children (biological, step, and adopted/foster children), irrespective of children’s ages, and no one else.
+
+       single_parent_with_children_separate:
+          title: Single parent with children households (for grapher)
+          unit: "%"
+          short_unit: "%"
+          description_short: Percentage of households comprised of a single parent and his or her children (biological, step, and adopted/foster children), irrespective of children’s ages, and no one else
+          presentation:
+            title_public: Single parent with children households
+          display:
+            name: Single parent with children households
 
        single_parent_with_children:
           title: Single parent with children households
