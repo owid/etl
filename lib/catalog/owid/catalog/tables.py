@@ -225,7 +225,8 @@ class Table(pd.DataFrame):
         Return a codebook for this table.
         """
         # Define how to show attributions and URLs in the sources column.
-        prepare_attributions = lambda attribution, url_main: f"{attribution} ( {url_main} )"
+        def _prepare_attributions(attribution: str, url_main: str) -> str:
+            return f"{attribution} ( {url_main} )"
 
         # Initialize lists to store the codebook information.
         columns = []
@@ -241,7 +242,7 @@ class Table(pd.DataFrame):
             sources.append(
                 "; ".join(
                     dict.fromkeys(
-                        prepare_attributions(
+                        _prepare_attributions(
                             origin.attribution if origin.attribution else origin.producer, origin.url_main
                         )
                         for origin in md.origins
@@ -256,7 +257,7 @@ class Table(pd.DataFrame):
 
     def to_excel(
         self,
-        excel_writer: "FilePath | WriteExcelBuffer | ExcelWriter",  # type: ignore
+        excel_writer: Any,
         with_metadata=True,
         sheet_name="data",
         metadata_sheet_name="metadata",
