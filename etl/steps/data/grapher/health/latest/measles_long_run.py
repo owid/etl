@@ -1,6 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import datetime as dt
 from datetime import datetime
 
 from etl.helpers import PathFinder, create_dataset
