@@ -39,6 +39,10 @@ def run(dest_dir: str) -> None:
     # Replace ".." with NaN
     tb = tb.replace("..", np.nan)
 
+    # Copy the single parent with children column to a new column as we modify it to 0 to trick the grapher for
+    # vizualizing relative share of households by type
+    tb["single_parent_with_children_separate"] = tb["single_parent_with_children"]
+
     # Add "other" category to the household types
     tb = create_other_category(tb)
 
@@ -60,6 +64,7 @@ def run(dest_dir: str) -> None:
 def create_other_category(tb: Table) -> Table:
     """
     Ensure that the relevant household columns add up to around 100 for each country and year, and create an 'other' category.
+    Note that this will make some values 0 for some categories when they are actually NaN, but this is necessary for the grapher to plot the data correctly.
 
     Parameters:
     tb (Table): The original table containing household data.
@@ -100,7 +105,7 @@ def create_other_category(tb: Table) -> Table:
     tb = tb.drop(columns=["sum_households"])
 
     # Ensure other columns are not NaN for rows where "unknown" is not NaN
-    # tb.loc[tb["unknown"].notna(), columns_to_sum] = tb.loc[tb["unknown"].notna(), columns_to_sum].fillna(0)
+    tb.loc[tb["unknown"].notna(), columns_to_sum] = tb.loc[tb["unknown"].notna(), columns_to_sum].fillna(0)
 
     # If all values are zero for each of the columns in columns_to_sum, set them to NaN (avoid plotting just 0s)
     tb.loc[(tb[columns_to_sum] == 0).all(axis=1), columns_to_sum] = np.nan
