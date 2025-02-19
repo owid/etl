@@ -1,18 +1,14 @@
 from pathlib import Path
 
 from etl import multidim
-from etl.db import get_engine
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
 CURRENT_DIR = Path(__file__).parent
 
 
 def run(dest_dir: str) -> None:
-    engine = get_engine()
-
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()
 
@@ -36,4 +32,8 @@ def run(dest_dir: str) -> None:
     config["views"] += config_new["views"]
     config["views"] += grouped_views
 
-    multidim.upsert_multidim_data_page("mdd-causes-of-death", config, engine, dependencies=paths.dependencies)
+    multidim.upsert_multidim_data_page(
+        "mdd-causes-of-death",
+        config,
+        dependencies=paths.dependencies,
+    )

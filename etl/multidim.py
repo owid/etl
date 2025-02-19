@@ -1,16 +1,25 @@
+"""TODO:
+
+- Structure MDIM config and related objects in a more pythonic way (e.g. dataclass).
+- Need to be able to quickly validate the configs against schemas.
+- We should try to keep explorers in mind, and see this tooling as something we may want to use for them, too.
+"""
+
 import re
+from collections import defaultdict
 from copy import deepcopy
 from itertools import product
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Set, Union
 
 import pandas as pd
 import yaml
+from deprecated import deprecated
 from owid.catalog import Dataset, Table
 from sqlalchemy.engine import Engine
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.config import OWID_ENV
+from etl.config import OWID_ENV, OWIDEnv
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
 from etl.helpers import map_indicator_path_to_id
@@ -22,349 +31,13 @@ log = get_logger()
 DIMENSIONS = ["y", "x", "size", "color"]
 
 
-def upsert_multidim_data_page(slug: str, config: dict, engine: Engine, dependencies: set[str] = set()) -> None:
-    """
-    :param dependencies: List of dependencies for mdim. In most cases just use `dependencies=paths.dependencies`.
-
-    TODO: There might be other fields which might make references to indicators:
-        - config.map.columnSlug
-        - config.focusedSeriesNames
-    """
-    # Expand catalog paths (if needed)
-    ## Configs may only specify table#indicator. Instead, we need the full dataset URI.
-    expand_catalog_paths(config, dependencies=dependencies)
-
-    # Validate config
-    validate_multidim_config(config, engine)
-
-    # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
-    # TODO: I think we could move this to the Grapher side.
-    config = replace_catalog_paths_with_ids(config)
-
-    # Upsert config via Admin API
-    admin_api = AdminAPI(OWID_ENV)
-    admin_api.put_mdim_config(slug, config)
-
-
-def expand_catalog_paths(config: dict, dependencies: set[str]) -> None:
-    """Expand catalog paths in views to full dataset URIs.
-
-    This function updates the given configuration dictionary in-place by modifying the dimension ('y', 'x', 'size', 'color') entries under "indicators" in each view. If an entry does not contain a '/',
-    it is assumed to be a table name that must be expanded to a full dataset URI based on
-    the provided dependencies.
-
-    NOTE: Possible improvements for internal function `_expand`:
-        - we should make this function a bit more robust when checking the URIs.
-        - currently we only allow for 'table#indicator' format. We should also allow for other cases that could be useful in the event of name collisions, e.g. 'dataset/indicator#subindicator'.
-
-    Args:
-        config (dict): Configuration dictionary containing views.
-        dependencies (list[str]): List of dependency URIs in the form "data://<path>".
-    """
-
-    def _expand_catalog_path(indicator: Union[str, Dict[str, str]]) -> Union[str, Dict[str, str]]:
-        """Return same indicator, but with complete catalog path."""
-
-        def _expand(indicator: str):
-            assert "#" in indicator, f"Missing '#' in indicator! '{indicator}'"
-
-            # Complete dataset URI
-            if "/" in indicator:
-                return indicator
-            # table#indicator format
-            else:
-                indicator_split = indicator.split("#")
-                # Check format is actually table#indicator
-                assert (len(indicator_split) == 2) & (
-                    indicator_split[0] != ""
-                ), f"Expected 'table#indicator' format. Instead found {indicator}"
-                # Check table is in any of the datasets!
-                assert (
-                    indicator_split[0] in table_to_dataset_uri
-                ), f"Table name `{indicator_split[0]}` not found in dependency tables! Available tables are: {', '.join(table_to_dataset_uri.keys())}"
-
-                return table_to_dataset_uri[indicator_split[0]] + "/" + indicator
-
-        # Expand catalog path if it's a string
-        if isinstance(indicator, str):
-            return _expand(indicator)
-        # Expand catalog path if it's a dictionary
-        elif isinstance(indicator, dict):
-            assert "catalogPath" in indicator, "Expected 'catalogPath' key in indicator dictionary"
-            indicator["catalogPath"] = _expand(indicator["catalogPath"])
-            return indicator
-
-    # Get mapping from table names to dataset URIs
-    table_to_dataset_uri = {}
-    for dep in dependencies:
-        if not (re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep)):
-            continue
-
-        uri = re.sub(r"^(data|data-private)://", "", dep)
-        ds = Dataset(DATA_DIR / uri)
-        for table_name in ds.table_names:
-            if table_name in table_to_dataset_uri:
-                raise ValueError(f"Table name `{table_name}` is not unique in dependencies")
-            table_to_dataset_uri[table_name] = uri
-
-    # Go through all views and expand catalog paths
-    for view in config["views"]:
-        # Update indicators for each dimension
-        for dim in DIMENSIONS:
-            if dim in view["indicators"]:
-                if isinstance(view["indicators"][dim], list):
-                    view["indicators"][dim] = [_expand_catalog_path(dim) for dim in view["indicators"][dim]]
-                else:
-                    view["indicators"][dim] = _expand_catalog_path(view["indicators"][dim])
-
-        # Update indicators from sortColumnSlug
-        if "config" in view:
-            if "sortColumnSlug" in view["config"]:
-                view["config"]["sortColumnSlug"] = _expand_catalog_path(view["config"]["sortColumnSlug"])
-
-        # Update indicators from map.columnSlug
-        if "config" in view:
-            if "map" in view["config"]:
-                if "columnSlug" in view["config"]["map"]:
-                    view["config"]["map"]["columnSlug"] = _expand_catalog_path(view["config"]["map"]["columnSlug"])
-
-
-def _extract_catalog_path(indicator_raw):
-    "Indicator spec can come either as a plain string, or a dictionary."
-    if isinstance(indicator_raw, str):
-        return indicator_raw
-    elif isinstance(indicator_raw, dict):
-        assert "catalogPath" in indicator_raw
-        return indicator_raw["catalogPath"]
-    else:
-        raise ValueError(f"Unexpected indicator property type: {indicator_raw}")
-
-
-def validate_multidim_config(config: dict, engine: Engine) -> None:
-    # Ensure that all views are in choices
-    for dim in config["dimensions"]:
-        allowed_slugs = [choice["slug"] for choice in dim["choices"]]
-
-        for view in config["views"]:
-            for dim_name, dim_value in view["dimensions"].items():
-                if dim_name == dim["slug"] and dim_value not in allowed_slugs:
-                    raise ValueError(
-                        f"Slug `{dim_value}` does not exist in dimension `{dim_name}`. View:\n\n{yaml.dump(view)}"
-                    )
-
-    # Get all used indicators
-    indicators = []
-    for view in config["views"]:
-        indicators_view = []
-        indicators_extra = []
-        # Get indicators from dimensions
-        for prop in DIMENSIONS:
-            if prop in view["indicators"]:
-                indicator_raw = view["indicators"][prop]
-                if isinstance(indicator_raw, list):
-                    assert prop == "y", "Only `y` can come as a list"
-                    indicators_view += [_extract_catalog_path(ind) for ind in indicator_raw]
-                else:
-                    indicators_view.append(_extract_catalog_path(indicator_raw))
-
-        # Get indicators from sortColumnSlug
-        if "config" in view:
-            if "sortColumnSlug" in view["config"]:
-                indicators_extra.append(_extract_catalog_path(view["config"]["sortColumnSlug"]))
-
-        # Update indicators from map.columnSlug
-        if "config" in view:
-            if "map" in view["config"]:
-                if "columnSlug" in view["config"]["map"]:
-                    indicators_extra.append(_extract_catalog_path(view["config"]["map"]["columnSlug"]))
-
-        # All indicators in indicators_extra should be in indicators!
-        ## E.g. the indicator used to sort, should be in use in the chart! Or, the indicator in the map tab should be in use in the chart!
-        invalid_indicators = set(indicators_extra).difference(set(indicators_view))
-        if invalid_indicators:
-            raise ValueError(
-                f"Extra indicators not in use. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}"
-            )
-
-        indicators.extend(indicators_view)
-
-    # Make sure indicators are unique
-    indicators = list(set(indicators))
-
-    # Validate duplicate views
-    seen_dims = set()
-    for view in config["views"]:
-        dims = tuple(view["dimensions"].items())
-        if dims in seen_dims:
-            raise ValueError(f"Duplicate view:\n\n{yaml.dump(view['dimensions'])}")
-        seen_dims.add(dims)
-
-    # NOTE: this is allowed, some views might contain other views
-    # Check uniqueness
-    # inds = pd.Series(indicators)
-    # vc = inds.value_counts()
-    # if vc[vc > 1].any():
-    #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
-
-    # Check that all indicators exist
-    q = """
-    select
-        id,
-        catalogPath
-    from variables
-    where catalogPath in %(indicators)s
-    """
-    df = read_sql(q, engine, params={"indicators": tuple(indicators)})
-    missing_indicators = set(indicators) - set(df["catalogPath"])
-    if missing_indicators:
-        raise ValueError(f"Missing indicators in DB: {missing_indicators}")
-
-
-def replace_catalog_paths_with_ids(config):
-    """Replace special metadata fields with their corresponding IDs in the database.
-
-    In ETL, we allow certain fields in the config file to reference indicators by their catalog path. However, this is not yet supported in the Grapher API, so we need to replace these fields with the corresponding indicator IDs.
-
-    NOTE: I think this is something that we should discuss changing on the Grapher side. So I see this function as a temporary workaround.
-
-    Currently, affected fields are:
-
-    - views[].config.sortColumnSlug
-
-    These fields above are treated like fields in `dimensions`, and also accessed from:
-    - `expand_catalog_paths`: To expand the indicator URI to be in its complete form.
-    - `validate_multidim_config`: To validate that the indicators exist in the database.
-
-    """
-    if "views" in config:
-        views = config["views"]
-        for view in views:
-            if "config" in view:
-                # Update sortColumnSlug
-                if "sortColumnSlug" in view["config"]:
-                    # Check if catalogPath
-                    # Map to variable ID
-                    view["config"]["sortColumnSlug"] = str(map_indicator_path_to_id(view["config"]["sortColumnSlug"]))
-                # Update map.columnSlug
-                if "map" in view["config"]:
-                    if "columnSlug" in view["config"]["map"]:
-                        view["config"]["map"]["columnSlug"] = str(
-                            map_indicator_path_to_id(view["config"]["map"]["columnSlug"])
-                        )
-
-    return config
-
-
-def generate_views_for_dimensions(
-    dimensions, tables, dimensions_order_in_slug=None, additional_config=None, warn_on_missing_combinations=True
-):
-    """Generate individual views for all possible combinations of dimensions in a list of flattened tables.
-
-    Parameters
-    ----------
-    dimensions : List[Dict[str, Any]]
-        Dimensions, as given in the configuration of the multidim step, e.g.
-        [
-            {'slug': 'frequency', 'name': 'Frequency', 'choices': [{'slug': 'annual','name': 'Annual'}, {'slug': 'monthly', 'name': 'Monthly'}]},
-            {'slug': 'source', 'name': 'Energy source', 'choices': [{'slug': 'electricity', 'name': 'Electricity'}, {'slug': 'gas', 'name': 'Gas'}]},
-            ...
-        ]
-    tables : List[Table]
-        Tables whose indicator views will be generated.
-    dimensions_order_in_slug : Tuple[str], optional
-        Dimension names, as they appear in "dimensions", and in the order in which they are spelled out in indicator names. For example, if indicator names are, e.g. annual_electricity_euros, then dimensions_order_in_slug would be ("frequency", "source", "unit").
-    additional_config : _type_, optional
-        Additional config fields to add to each view, e.g.
-        {"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"}
-    warn_on_missing_combinations : bool, optional
-        True to warn if any combination of dimensions is not found among the indicators in the given tables.
-
-    Returns
-    -------
-    results : List[Dict[str, Any]]
-        Views configuration, e.g.
-        [
-            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'euro'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_euro'},
-            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'pps'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_pps'},
-            ...
-        ]
-
-    """
-    # Extract all choices for each dimension as (slug, choice_slug) pairs.
-    choices = {dim["slug"]: [choice["slug"] for choice in dim["choices"]] for dim in dimensions}
-    dimension_slugs_in_config = set(choices.keys())
-
-    # Sanity check for dimensions_order_in_slug.
-    if dimensions_order_in_slug:
-        dimension_slugs_in_order = set(dimensions_order_in_slug)
-
-        # Check if any slug in the order is missing from the config.
-        missing_slugs = dimension_slugs_in_order - dimension_slugs_in_config
-        if missing_slugs:
-            raise ValueError(
-                f"The following dimensions are in 'dimensions_order_in_slug' but not in the config: {missing_slugs}"
-            )
-
-        # Check if any slug in the config is missing from the order.
-        extra_slugs = dimension_slugs_in_config - dimension_slugs_in_order
-        if extra_slugs:
-            log.warning(
-                f"The following dimensions are in the config but not in 'dimensions_order_in_slug': {extra_slugs}"
-            )
-
-        # Reorder choices to match the specified order.
-        choices = {dim: choices[dim] for dim in dimensions_order_in_slug if dim in choices}
-
-    # Generate all combinations of the choices.
-    all_combinations = list(product(*choices.values()))
-
-    # Create the views.
-    results = []
-    for combination in all_combinations:
-        # Map dimension slugs to the chosen values.
-        dimension_mapping = {dim_slug: choice for dim_slug, choice in zip(choices.keys(), combination)}
-        slug_combination = "_".join(combination)
-
-        # Find relevant tables for the current combination.
-        relevant_table = []
-        for table in tables:
-            if slug_combination in table:
-                relevant_table.append(table)
-
-        # Handle missing or multiple table matches.
-        if len(relevant_table) == 0:
-            if warn_on_missing_combinations:
-                log.warning(f"Combination {slug_combination} not found in tables")
-            continue
-        elif len(relevant_table) > 1:
-            log.warning(f"Combination {slug_combination} found in multiple tables: {relevant_table}")
-
-        # Construct the indicator path.
-        indicator_path = f"{relevant_table[0].metadata.dataset.uri}/{relevant_table[0].metadata.short_name}#{trim_long_variable_name(slug_combination)}"
-        indicators = {
-            "y": indicator_path,
-        }
-        # Append the combination to results.
-        results.append({"dimensions": dimension_mapping, "indicators": indicators})
-
-    if additional_config:
-        # Include additional fields in all results.
-        for result in results:
-            result.update({"config": additional_config})
-
-    return results
-
-
-## LOGIC TO EXPAND INDICATORS, BUILD CONFIG, ETC.
-
-
 def expand_config(
     tb: Table,
     indicator_name: Optional[str] = None,
     dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
     common_view_config: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    """Create partial config (dimensions and views) from multi-dimensional indicators in table `tb`.
+    """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
 
     This method returns the configuration generated from the table `tb`. It assumes that it only has one indicator, unless `indicator_name` is provided. It will expand all dimensions and their values, unless `dimensions` is provided.
 
@@ -387,7 +60,7 @@ def expand_config(
         multidim.upsert_multidim_data_page(...)
         ```
 
-     HOWEVER, there is a helper function `combine_config_dimensions` that can help you with combining dimensions.
+    HOWEVER, there is a helper function `combine_config_dimensions` that can help you with combining dimensions.
 
 
     3) List of future improvement candidates:
@@ -480,9 +153,382 @@ def expand_config(
     return config_partial
 
 
+def upsert_multidim_data_page(
+    slug: str, config: dict, dependencies: Set[str] = set(), owid_env: Optional[OWIDEnv] = None
+) -> None:
+    """Import MDIM config to DB.
+
+    Args:
+    -----
+
+    slug: str
+        Slug of the MDIM page. MDIM will be published at /slug
+    config: dict
+        MDIM configuration.
+    owid_env: Optional[OWIDEnv]
+        Environment where to publish the MDIM page.
+    """
+    # Edit views
+    process_mdim_views(config, dependencies=dependencies)
+
+    # TODO: Possibly add other edits (to dimensions?)
+
+    # Upser to DB
+    _upsert_multidim_data_page(slug, config, owid_env)
+
+
+def process_mdim_views(config: dict, dependencies: Set[str]):
+    """Process views in MDIM configuration.
+
+    This includes:
+        - Make sure that catalog paths for indicators are complete.
+        - TODO: Process views with multiple indicators to have adequate metadata
+    """
+    # Get table information by table name, and table URI
+    tables_by_name = get_tables_by_name_mapping(dependencies)
+    # tables_by_uri = get_tables_by_uri_mapping(tables_by_name)  # This is to be used when processing views with multiple indicators
+
+    # Go through all views and expand catalog paths
+    for view in config["views"]:
+        # Update indicators for each dimension, making sure they have the complete URI
+        expand_catalog_paths(view, tables_by_name=tables_by_name)
+
+        # Combine metadata in views which contain multiple indicators
+        indicators = get_indicators_in_view(view)
+        if (len(indicators) > 1) and ("metadata" not in view):  # Check if view "contains multiple indicators"
+            # TODO
+            # view["metadata"] = build_view_metadata_multi(indicators, tables_by_uri)
+            log.info(
+                f"View with multiple indicators detected. You should edit its `metadata` field to reflect that! This will be done programmatically in the future. Check view with dimensions {view['dimensions']}"
+            )
+            pass
+
+
+def _upsert_multidim_data_page(slug: str, config: dict, owid_env: Optional[OWIDEnv] = None) -> None:
+    """Actual upsert to DB."""
+    # Ensure we have an environment set
+    if owid_env is None:
+        owid_env = OWID_ENV
+
+    # Validate config
+    validate_multidim_config(config, owid_env.engine)
+
+    # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
+    # TODO: I think we could move this to the Grapher side.
+    config = replace_catalog_paths_with_ids(config)
+
+    # Upsert config via Admin API
+    admin_api = AdminAPI(owid_env)
+    admin_api.put_mdim_config(slug, config)
+
+
+def build_view_metadata_multi(indicators: List[Dict[str, str]], tables_by_uri: Dict[str, Table]):
+    """TODO: Combine the metadata from the indicators in the view.
+
+    Ideas:
+    -----
+    `indicators` contains the URIs of all indicators used in the view. `tables_by_uri` contains the table objects (and therefore their metadata) easily accessible by their URI. With this information, we can get the metadata of each indicator as:
+
+    ```
+    for indicator in indicators:
+        # Get indicator metadata
+        table_uri, indicator_name = indicator["path"].split("#)
+        metadata = tables_by_uri[table_uri][indicator_name].metadata
+
+        # We also have access on how this indicator was in use (was it for dimension 'y', or 'x'?)
+        dimension = indicator["dimension"] # This can be 'y', 'x', 'size', 'color', etc.
+    ```
+
+    Arguments:
+    ----------
+
+    indicators : List[Dict[str, str]]
+        List of indicators in the view. Each element comes as a record {"path": "...", "dimension": "..."}. The path is the complete URI of the indicator.
+    tables_by_uri : Dict[str, Table]
+        Mapping of table URIs to table objects.
+    """
+    pass
+
+
+def get_tables_by_uri_mapping(tables_by_name: Dict[str, List[Table]]) -> Dict[str, Table]:
+    """Mapping table URIs (complete) to table objects."""
+    mapping = {}
+    for table_name, tables in tables_by_name.items():
+        for table in tables:
+            uri = table.dataset.uri + "/" + table_name
+            mapping[uri] = table
+    return mapping
+
+
+def get_tables_by_name_mapping(dependencies: Set[str]) -> Dict[str, List[Table]]:
+    """Dictionary mapping table short name to table object.
+
+    Note that the format is {"table_name": [tb], ...}. This is because there could be collisions where multiple table names are mapped to the same table (e.g. two datasets could have a table with the same name).
+    """
+    tb_name_to_tb = defaultdict(list)
+
+    for dep in dependencies:
+        ## Ignore non-grapher dependencies
+        if not re.match(r"^(data|data-private)://grapher/", dep):
+            continue
+
+        uri = re.sub(r"^(data|data-private)://", "", dep)
+        ds = Dataset(DATA_DIR / uri)
+        for table_name in ds.table_names:
+            tb_name_to_tb[table_name].append(ds.read(table_name, load_data=False))
+
+    return tb_name_to_tb
+
+
+def expand_catalog_paths(view: Dict[Any, Any], tables_by_name: Dict[str, List[Table]]) -> Dict[Any, Any]:
+    """Expand catalog paths in views to full dataset URIs.
+
+    This function updates the given configuration dictionary in-place by modifying the dimension ('y', 'x', 'size', 'color') entries under "indicators" in each view. If an entry does not contain a '/',
+    it is assumed to be a table name that must be expanded to a full dataset URI based on
+    the provided dependencies.
+
+    NOTE: Possible improvements for internal function `_expand`:
+        - we should make this function a bit more robust when checking the URIs.
+        - currently we only allow for 'table#indicator' format. We should also allow for other cases that could be useful in the event of name collisions, e.g. 'dataset/indicator#subindicator'.
+
+    Args:
+        config (dict): Configuration dictionary containing views.
+        tables_by_name (Dict[str, List[Table]]): Mapping of table short names to tables.
+    """
+
+    def _expand_catalog_path(indicator: Union[str, Dict[str, str]]) -> Union[str, Dict[str, str]]:
+        """Return same indicator, but with complete catalog path."""
+
+        def _expand(indicator: str):
+            assert "#" in indicator, f"Missing '#' in indicator! '{indicator}'"
+
+            # Complete dataset URI
+            if "/" in indicator:
+                return indicator
+            # table#indicator format
+            else:
+                indicator_split = indicator.split("#")
+
+                # Check format is actually table#indicator
+                assert (len(indicator_split) == 2) & (
+                    indicator_split[0] != ""
+                ), f"Expected 'table#indicator' format. Instead found {indicator}"
+
+                # Check table is in any of the datasets!
+                assert (
+                    indicator_split[0] in tables_by_name
+                ), f"Table name `{indicator_split[0]}` not found in dependency tables! Available tables are: {', '.join(tables_by_name.keys())}"
+
+                # Check table name to table mapping is unique
+                assert (
+                    len(tables_by_name[indicator_split[0]]) == 1
+                ), f"There are multiple dependencies (datasets) with a table named {indicator_split[0]}. Please use the complete dataset URI in this case."
+
+                # Check dataset in table metadata is not None
+                tb = tables_by_name[indicator_split[0]][0]
+                assert tb.m.dataset is not None, f"Dataset not found for table {indicator_split[0]}"
+
+                # Build URI
+                return tb.m.dataset.uri + "/" + indicator
+
+        # Expand catalog path if it's a string
+        if isinstance(indicator, str):
+            return _expand(indicator)
+        # Expand catalog path if it's a dictionary
+        elif isinstance(indicator, dict):
+            assert "catalogPath" in indicator, "Expected 'catalogPath' key in indicator dictionary"
+            indicator["catalogPath"] = _expand(indicator["catalogPath"])
+            return indicator
+
+    # Update indicators for each dimension
+    for dim in DIMENSIONS:
+        if dim in view["indicators"]:
+            if isinstance(view["indicators"][dim], list):
+                view["indicators"][dim] = [_expand_catalog_path(dim) for dim in view["indicators"][dim]]
+            else:
+                view["indicators"][dim] = _expand_catalog_path(view["indicators"][dim])
+
+    # Update indicators from sortColumnSlug
+    if "config" in view:
+        if "sortColumnSlug" in view["config"]:
+            view["config"]["sortColumnSlug"] = _expand_catalog_path(view["config"]["sortColumnSlug"])
+
+    # Update indicators from map.columnSlug
+    if "config" in view:
+        if "map" in view["config"]:
+            if "columnSlug" in view["config"]["map"]:
+                view["config"]["map"]["columnSlug"] = _expand_catalog_path(view["config"]["map"]["columnSlug"])
+
+    return view
+
+
+def _extract_catalog_path(indicator_raw):
+    "Indicator spec can come either as a plain string, or a dictionary."
+    if isinstance(indicator_raw, str):
+        return indicator_raw
+    elif isinstance(indicator_raw, dict):
+        assert "catalogPath" in indicator_raw
+        return indicator_raw["catalogPath"]
+    else:
+        raise ValueError(f"Unexpected indicator property type: {indicator_raw}")
+
+
+def get_indicators_in_view(view):
+    """Get the list of indicators in use in a view.
+
+    It returns the list as a list of records:
+
+    [
+        {
+            "path": "data://path/to/dataset#indicator",
+            "dimension": "y"
+        },
+        ...
+    ]
+
+    TODO: This is being called twice, maybe there is a way to just call it once. Maybe if it is an attribute of a class?
+    """
+    indicators_view = []
+    # Get indicators from dimensions
+    for dim in DIMENSIONS:
+        if dim in view["indicators"]:
+            indicator_raw = view["indicators"][dim]
+            if isinstance(indicator_raw, list):
+                assert dim == "y", "Only `y` can come as a list"
+                indicators_view += [
+                    {
+                        "path": _extract_catalog_path(ind),
+                        "dimension": dim,
+                    }
+                    for ind in indicator_raw
+                ]
+            else:
+                indicators_view.append(
+                    {
+                        "path": _extract_catalog_path(indicator_raw),
+                        "dimension": dim,
+                    }
+                )
+    return indicators_view
+
+
+def validate_multidim_config(config: dict, engine: Engine) -> None:
+    # Ensure that all views are in choices
+    for dim in config["dimensions"]:
+        allowed_slugs = [choice["slug"] for choice in dim["choices"]]
+
+        for view in config["views"]:
+            for dim_name, dim_value in view["dimensions"].items():
+                if dim_name == dim["slug"] and dim_value not in allowed_slugs:
+                    raise ValueError(
+                        f"Slug `{dim_value}` does not exist in dimension `{dim_name}`. View:\n\n{yaml.dump(view)}"
+                    )
+
+    # Get all used indicators
+    indicators = []
+    for view in config["views"]:
+        # Get indicators from dimensions
+        indicators_view = get_indicators_in_view(view)
+        indicators_view = [ind["path"] for ind in indicators_view]
+        indicators_extra = []
+
+        # Get indicators from sortColumnSlug
+        if "config" in view:
+            if "sortColumnSlug" in view["config"]:
+                indicators_extra.append(_extract_catalog_path(view["config"]["sortColumnSlug"]))
+
+        # Update indicators from map.columnSlug
+        if "config" in view:
+            if "map" in view["config"]:
+                if "columnSlug" in view["config"]["map"]:
+                    indicators_extra.append(_extract_catalog_path(view["config"]["map"]["columnSlug"]))
+
+        # All indicators in `indicators_extra` should be in `indicators`! E.g. you can't sort by an indicator that is not in the chart!
+        ## E.g. the indicator used to sort, should be in use in the chart! Or, the indicator in the map tab should be in use in the chart!
+        invalid_indicators = set(indicators_extra).difference(set(indicators_view))
+        if invalid_indicators:
+            raise ValueError(
+                f"Extra indicators not in use. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}"
+            )
+
+        indicators.extend(indicators_view)
+
+    # Make sure indicators are unique
+    indicators = list(set(indicators))
+
+    # Validate duplicate views
+    seen_dims = set()
+    for view in config["views"]:
+        dims = tuple(view["dimensions"].items())
+        if dims in seen_dims:
+            raise ValueError(f"Duplicate view:\n\n{yaml.dump(view['dimensions'])}")
+        seen_dims.add(dims)
+
+    # NOTE: this is allowed, some views might contain other views
+    # Check uniqueness
+    # inds = pd.Series(indicators)
+    # vc = inds.value_counts()
+    # if vc[vc > 1].any():
+    #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
+
+    # Check that all indicators exist
+    q = """
+    select
+        id,
+        catalogPath
+    from variables
+    where catalogPath in %(indicators)s
+    """
+    df = read_sql(q, engine, params={"indicators": tuple(indicators)})
+    missing_indicators = set(indicators) - set(df["catalogPath"])
+    if missing_indicators:
+        raise ValueError(f"Missing indicators in DB: {missing_indicators}")
+
+
+def replace_catalog_paths_with_ids(config):
+    """Replace special metadata fields with their corresponding IDs in the database.
+
+    In ETL, we allow certain fields in the config file to reference indicators by their catalog path. However, this is not yet supported in the Grapher API, so we need to replace these fields with the corresponding indicator IDs.
+
+    NOTE: I think this is something that we should discuss changing on the Grapher side. So I see this function as a temporary workaround.
+
+    Currently, affected fields are:
+
+    - views[].config.sortColumnSlug
+
+    These fields above are treated like fields in `dimensions`, and also accessed from:
+    - `expand_catalog_paths`: To expand the indicator URI to be in its complete form.
+    - `validate_multidim_config`: To validate that the indicators exist in the database.
+
+    TODO: There might be other fields which might make references to indicators:
+        - config.map.columnSlug
+        - config.focusedSeriesNames
+    """
+    if "views" in config:
+        views = config["views"]
+        for view in views:
+            if "config" in view:
+                # Update sortColumnSlug
+                if "sortColumnSlug" in view["config"]:
+                    # Check if catalogPath
+                    # Map to variable ID
+                    view["config"]["sortColumnSlug"] = str(map_indicator_path_to_id(view["config"]["sortColumnSlug"]))
+                # Update map.columnSlug
+                if "map" in view["config"]:
+                    if "columnSlug" in view["config"]["map"]:
+                        view["config"]["map"]["columnSlug"] = str(
+                            map_indicator_path_to_id(view["config"]["map"]["columnSlug"])
+                        )
+
+    return config
+
+
+####################################################################################################
+# Config auto-expander: Expand configuration from a table. This config is partial!
+####################################################################################################
 class MDIMConfigExpander:
     def __init__(self, tb: Table, indicator_name: Optional[str] = None):
-        self.df_dims, self.indicator_name = build_df_dims(tb, indicator_name)
+        self.build_df_dims(tb, indicator_name)
         self.short_name = tb.m.short_name
 
     @property
@@ -573,89 +619,85 @@ class MDIMConfigExpander:
 
         return config_views
 
+    def build_df_dims(self, tb, indicator_name):
+        """Build dataframe with dimensional information from table tb.
 
-def build_df_dims(tb, indicator_name):
-    """Build dataframe with dimensional information from table tb.
+        It contains the following columns:
+            - indicator: Values in this column refer to an 'actual' indicator.
+            - dimension1Name: Values in this column provide the dimension value for dimension1Name. E.g. '10-20' in case dimension1Name is 'age'.
+            - dimensionXName: Same as dimension1Name. There can be several...
+            ...
+            - short_name: Name of the column in the original table.
 
-    Refer to docstring from `_build_df_dims` for more details."""
-    df_dims = _build_df_dims(tb)
-    # SANITY CHECKS
-    indicator_name = _sanity_checks_df_dims(indicator_name, df_dims)
+        Example:
 
-    # Keep dimensions only for relevant indicator
-    df_dims = df_dims.loc[df_dims["indicator"] == indicator_name].drop(columns=["indicator"])
+        indicator	place	                short_name
+        trend	    Grocery and pharmacy	trend__place_grocery_and_pharmacy
+        trend	    Parks	                trend__place_parks
+        trend	    Residential	            trend__place_residential
+        trend	    Retail and recreation	trend__place_retail_and_recreation
+        trend	    Transit stations	    trend__place_transit_stations
+        trend	    Workplaces	            trend__place_workplaces
+        """
+        df_dims = self._build_df_dims(tb)
 
-    return df_dims, indicator_name
+        # SANITY CHECKS
+        self.indicator_name = self._sanity_checks_df_dims(indicator_name, df_dims)
 
+        # Keep dimensions only for relevant indicator
+        self.df_dims = df_dims.loc[df_dims["indicator"] == self.indicator_name].drop(columns=["indicator"])
 
-def _build_df_dims(tb):
-    """Build dataframe with dimensional information from table tb.
+        # Final checks
+        assert isinstance(self.indicator_name, str), "Indicator name should be a string!"
+        assert not self.df_dims.empty, "df_dims can't be empty!"
 
-    It contains the following columns:
-        - indicator: Values in this column refer to an 'actual' indicator.
-        - dimension1Name: Values in this column provide the dimension value for dimension1Name. E.g. '10-20' in case dimension1Name is 'age'.
-        - dimensionXName: Same as dimension1Name. There can be several...
-        ...
-        - short_name: Name of the column in the original table.
+    def _build_df_dims(self, tb):
+        """Build dataframe with dimensional information from table tb."""
+        records = []
+        for col in tb.columns:
+            if tb[col].metadata.additional_info and ("dimensions" in tb[col].metadata.additional_info):
+                dims = tb[col].metadata.additional_info["dimensions"]
 
-    Example:
+                assert "originalShortName" in dims, "Missing indicator name in dimensions metadata!"
+                row = {
+                    "indicator": dims["originalShortName"],
+                    "short_name": col,
+                }
+                # Add dimensional info
+                assert "filters" in dims, "Missing filters in dimensions metadata!"
+                filters = dims["filters"]
+                for f in filters:
+                    row[f["name"]] = f["value"]
 
-    indicator	place	                short_name
-    trend	    Grocery and pharmacy	trend__place_grocery_and_pharmacy
-    trend	    Parks	                trend__place_parks
-    trend	    Residential	            trend__place_residential
-    trend	    Retail and recreation	trend__place_retail_and_recreation
-    trend	    Transit stations	    trend__place_transit_stations
-    trend	    Workplaces	            trend__place_workplaces
+                # Add entry to records
+                records.append(row)
 
+        # Build dataframe with dimensional information
+        df_dims = pd.DataFrame(records)
 
-    """
-    records = []
-    for col in tb.columns:
-        if tb[col].metadata.additional_info and ("dimensions" in tb[col].metadata.additional_info):
-            dims = tb[col].metadata.additional_info["dimensions"]
+        # Re-order columns
+        cols_dims = [col for col in df_dims.columns if col not in ["indicator", "short_name"]]
+        df_dims = df_dims[["indicator"] + sorted(cols_dims) + ["short_name"]]
+        return df_dims
 
-            assert "originalShortName" in dims, "Missing indicator name in dimensions metadata!"
-            row = {
-                "indicator": dims["originalShortName"],
-                "short_name": col,
-            }
-            # Add dimensional info
-            assert "filters" in dims, "Missing filters in dimensions metadata!"
-            filters = dims["filters"]
-            for f in filters:
-                row[f["name"]] = f["value"]
+    def _sanity_checks_df_dims(self, indicator_name, df_dims):
+        """Sanity checks of df_dims."""
+        # List with names of indicators and dimensions
+        indicator_names = list(df_dims["indicator"].unique())
 
-            # Add entry to records
-            records.append(row)
+        # If no indicator name is provided, there should only be one in the table!
+        if indicator_name is None:
+            if len(indicator_names) != 1:
+                raise ValueError("There are multiple indicators, but no `indicator_name` was provided.")
+            # If only one indicator available, set it as the indicator name
+            indicator_name = indicator_names[0]
+        # If indicator name is given, make sure it is present in the table!
+        if indicator_name not in indicator_names:
+            raise ValueError(
+                f"Indicator `{indicator_name}` not found in the table. Available are: {', '.join(indicator_names)}"
+            )
 
-    # Build dataframe with dimensional information
-    df_dims = pd.DataFrame(records)
-
-    # Re-order columns
-    cols_dims = [col for col in df_dims.columns if col not in ["indicator", "short_name"]]
-    df_dims = df_dims[["indicator"] + sorted(cols_dims) + ["short_name"]]
-    return df_dims
-
-
-def _sanity_checks_df_dims(indicator_name, df_dims):
-    """Sanity checks of df_dims."""
-    # List with names of indicators and dimensions
-    indicator_names = list(df_dims["indicator"].unique())
-
-    # If no indicator name is provided, there should only be one in the table!
-    if indicator_name is None:
-        if len(indicator_names) != 1:
-            raise ValueError("There are multiple indicators, but no `indicator_name` was provided.")
-        # If only one indicator available, set it as the indicator name
-        indicator_name = indicator_names[0]
-    # If indicator name is given, make sure it is present in the table!
-    if indicator_name not in indicator_names:
-        raise ValueError(
-            f"Indicator `{indicator_name}` not found in the table. Available are: {', '.join(indicator_names)}"
-        )
-
-    return indicator_name
+        return indicator_name
 
 
 def combine_config_dimensions(
@@ -791,6 +833,110 @@ def _check_intersection_iters(
         raise ValueError(
             f"Unexpected items: {', '.join([f'`{d}`' for d in items_unexpected])}. Please review `{key_name}`!"
         )
+
+
+####################################################################################################
+# DEPRECATED FUNCTIONS
+####################################################################################################
+@deprecated("This function relies on specific column naming convention. Use `expand_config` instead.")
+def generate_views_for_dimensions(
+    dimensions, tables, dimensions_order_in_slug=None, additional_config=None, warn_on_missing_combinations=True
+):
+    """Generate individual views for all possible combinations of dimensions in a list of flattened tables.
+
+    Parameters
+    ----------
+    dimensions : List[Dict[str, Any]]
+        Dimensions, as given in the configuration of the multidim step, e.g.
+        [
+            {'slug': 'frequency', 'name': 'Frequency', 'choices': [{'slug': 'annual','name': 'Annual'}, {'slug': 'monthly', 'name': 'Monthly'}]},
+            {'slug': 'source', 'name': 'Energy source', 'choices': [{'slug': 'electricity', 'name': 'Electricity'}, {'slug': 'gas', 'name': 'Gas'}]},
+            ...
+        ]
+    tables : List[Table]
+        Tables whose indicator views will be generated.
+    dimensions_order_in_slug : Tuple[str], optional
+        Dimension names, as they appear in "dimensions", and in the order in which they are spelled out in indicator names. For example, if indicator names are, e.g. annual_electricity_euros, then dimensions_order_in_slug would be ("frequency", "source", "unit").
+    additional_config : _type_, optional
+        Additional config fields to add to each view, e.g.
+        {"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"}
+    warn_on_missing_combinations : bool, optional
+        True to warn if any combination of dimensions is not found among the indicators in the given tables.
+
+    Returns
+    -------
+    results : List[Dict[str, Any]]
+        Views configuration, e.g.
+        [
+            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'euro'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_euro'},
+            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'pps'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_pps'},
+            ...
+        ]
+
+    """
+    # Extract all choices for each dimension as (slug, choice_slug) pairs.
+    choices = {dim["slug"]: [choice["slug"] for choice in dim["choices"]] for dim in dimensions}
+    dimension_slugs_in_config = set(choices.keys())
+
+    # Sanity check for dimensions_order_in_slug.
+    if dimensions_order_in_slug:
+        dimension_slugs_in_order = set(dimensions_order_in_slug)
+
+        # Check if any slug in the order is missing from the config.
+        missing_slugs = dimension_slugs_in_order - dimension_slugs_in_config
+        if missing_slugs:
+            raise ValueError(
+                f"The following dimensions are in 'dimensions_order_in_slug' but not in the config: {missing_slugs}"
+            )
+
+        # Check if any slug in the config is missing from the order.
+        extra_slugs = dimension_slugs_in_config - dimension_slugs_in_order
+        if extra_slugs:
+            log.warning(
+                f"The following dimensions are in the config but not in 'dimensions_order_in_slug': {extra_slugs}"
+            )
+
+        # Reorder choices to match the specified order.
+        choices = {dim: choices[dim] for dim in dimensions_order_in_slug if dim in choices}
+
+    # Generate all combinations of the choices.
+    all_combinations = list(product(*choices.values()))
+
+    # Create the views.
+    results = []
+    for combination in all_combinations:
+        # Map dimension slugs to the chosen values.
+        dimension_mapping = {dim_slug: choice for dim_slug, choice in zip(choices.keys(), combination)}
+        slug_combination = "_".join(combination)
+
+        # Find relevant tables for the current combination.
+        relevant_table = []
+        for table in tables:
+            if slug_combination in table:
+                relevant_table.append(table)
+
+        # Handle missing or multiple table matches.
+        if len(relevant_table) == 0:
+            if warn_on_missing_combinations:
+                log.warning(f"Combination {slug_combination} not found in tables")
+            continue
+        elif len(relevant_table) > 1:
+            log.warning(f"Combination {slug_combination} found in multiple tables: {relevant_table}")
+
+        # Construct the indicator path.
+        indicator_path = f"{relevant_table[0].metadata.dataset.uri}/{relevant_table[0].metadata.short_name}#{trim_long_variable_name(slug_combination)}"
+        indicators = {
+            "y": indicator_path,
+        }
+        # Append the combination to results.
+        results.append({"dimensions": dimension_mapping, "indicators": indicators})
+
+    if additional_config:
+        # Include additional fields in all results.
+        for result in results:
+            result.update({"config": additional_config})
+
+    return results
 
 
 def group_views(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:
