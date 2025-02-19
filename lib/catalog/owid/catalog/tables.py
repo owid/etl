@@ -238,14 +238,30 @@ class Table(pd.DataFrame):
             titles.append(getattr(md.presentation, "title_public", None) or md.title)
             # Use short description (after removing details on demand, if any).
             descriptions.append(utils.remove_details_on_demand(md.description_short))
-            sources.append("; ".join(dict.fromkeys(prepare_attributions(origin.attribution if origin.attribution else origin.producer, origin.url_main) for origin in md.origins)))
+            sources.append(
+                "; ".join(
+                    dict.fromkeys(
+                        prepare_attributions(
+                            origin.attribution if origin.attribution else origin.producer, origin.url_main
+                        )
+                        for origin in md.origins
+                    )
+                )
+            )
 
         # Create a DataFrame with the codebook.
-        codebook = pd.DataFrame({'column': columns, 'title': titles, 'description': descriptions, 'sources': sources})
+        codebook = pd.DataFrame({"column": columns, "title": titles, "description": descriptions, "sources": sources})
 
         return codebook
 
-    def to_excel(self, excel_writer: 'FilePath | WriteExcelBuffer | ExcelWriter', with_metadata=True, sheet_name="data", metadata_sheet_name="metadata", **kwargs: Any) -> None:
+    def to_excel(
+        self,
+        excel_writer: "FilePath | WriteExcelBuffer | ExcelWriter",  # type: ignore
+        with_metadata=True,
+        sheet_name="data",
+        metadata_sheet_name="metadata",
+        **kwargs: Any,
+    ) -> None:
         # Save data and codebook to an excel file.
         with pd.ExcelWriter(excel_writer) as writer:
             super().to_excel(writer, sheet_name=sheet_name, **kwargs)
