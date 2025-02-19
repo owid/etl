@@ -630,18 +630,6 @@ steps:
   data://grapher/un/2024-08-27/un_sdg:
     - data://garden/un/2024-08-27/un_sdg
 
-  # OECD Official Development Assistance (ODA)
-  data://meadow/oecd/2024-08-21/official_development_assistance:
-    - snapshot://oecd/2024-08-21/official_development_assistance_dac1.zip
-    - snapshot://oecd/2024-08-21/official_development_assistance_dac2a.zip
-    - snapshot://oecd/2024-08-21/official_development_assistance_dac5.zip
-    - snapshot://oecd/2024-08-21/official_development_assistance_crs.zip
-  data://garden/oecd/2024-08-21/official_development_assistance:
-    - data://meadow/oecd/2024-08-21/official_development_assistance
-    - data://garden/demography/2024-07-15/population
-  data://grapher/oecd/2024-08-21/official_development_assistance:
-    - data://garden/oecd/2024-08-21/official_development_assistance
-
   # Oil Spills
   data://meadow/itopf/2024-10-16/oil_spills:
     - snapshot://itopf/2024-10-16/oil_spills.pdf
@@ -735,6 +723,20 @@ steps:
     - data://garden/happiness/2024-06-09/happiness
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
+
+  # OECD Official Development Assistance (ODA)
+  data://meadow/oecd/2025-02-19/official_development_assistance:
+    - snapshot://oecd/2025-02-19/official_development_assistance_crs.zip
+    - snapshot://oecd/2025-02-19/official_development_assistance_dac5.zip
+    - snapshot://oecd/2025-02-19/official_development_assistance_dac1.zip
+    - snapshot://oecd/2025-02-19/official_development_assistance_dac2a.zip
+
+  data://garden/oecd/2025-02-19/official_development_assistance:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/oecd/2025-02-19/official_development_assistance
+
+  data://grapher/oecd/2025-02-19/official_development_assistance:
+    - data://garden/oecd/2025-02-19/official_development_assistance
 
 include:
   - dag/open_numbers.yml
