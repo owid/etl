@@ -4,8 +4,6 @@ tables:
   measles_long_run:
     variables:
       cases:
-        title: Measles cases
         description_short: Reported number of measles cases. {definitions.desc_update}
-        unit: cases
         display:
           entityAnnotationsMap: "United States: Data for 2025 is incomplete"

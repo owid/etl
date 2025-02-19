@@ -1,0 +1,10 @@
+tables:
+  measles_long_run:
+    variables:
+      cases:
+        title: Measles cases
+        unit: cases
+        display:
+          entityAnnotationsMap: "United States: Data for 2025 is incomplete"
+        presentation:
+          attribution: Public Health Reports (1919-1925); US Census Bureau (1945); Centers for Disease Control and Prevention (1994; 2025)
