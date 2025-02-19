@@ -14,14 +14,20 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("measles_long_run")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("measles_long_run", reset_index=False)
+    tb = ds_garden.read("measles_long_run", reset_index=True)
 
+    # Create two tables, one for the main data and one for the incomplete years data.
+    tb_incomplete = tb[tb["year"] >= tb["year"].max()]
+    tb = tb[tb["year"] < tb["year"].max()]
+
+    tb_incomplete = tb_incomplete.format(["country", "year"], short_name="measles_incomplete")
+    tb = tb.format(["country", "year"], short_name="measles_long_run")
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=[tb, tb_incomplete], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new grapher dataset.

@@ -1,0 +1,21 @@
+definitions:
+  common:
+    presentation:
+      grapher_config:
+        note: |-
+          Data for the most recent year is incomplete and subject to revision.
+tables:
+  measles_incomplete:
+    variables:
+      cases:
+        title: Number of measles cases - incomplete data
+        unit: cases
+        display:
+          isProjection: true
+  measles_long_run:
+    variables:
+      cases:
+        title: Number of measles cases
+        unit: cases
+        display:
+          isProjection: false
