@@ -24,7 +24,6 @@ Notes:
             5 = Americas (GWNo: 2-199)
 """
 
-from datetime import datetime
 from typing import List, Optional
 
 import geopandas as gpd
