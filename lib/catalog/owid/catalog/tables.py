@@ -224,6 +224,7 @@ class Table(pd.DataFrame):
         """
         Return a codebook for this table.
         """
+
         # Define how to show attributions and URLs in the sources column.
         def _prepare_attributions(attribution: str, url_main: str) -> str:
             return f"{attribution} ( {url_main} )"
@@ -264,7 +265,7 @@ class Table(pd.DataFrame):
         **kwargs: Any,
     ) -> None:
         # Save data and codebook to an excel file.
-        with pd.ExcelWriter(excel_writer) as writer:
+        with pd.ExcelWriter(excel_writer) as writer:  # type: ignore
             super().to_excel(writer, sheet_name=sheet_name, **kwargs)
             if with_metadata:
                 self.codebook.to_excel(writer, sheet_name=metadata_sheet_name)
