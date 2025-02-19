@@ -45,6 +45,32 @@ CATEGORIES = {
                 "new_name": "iv_private_flows_market_terms",
             },
             "V. Net Private Grants (V.1 minus V.2)": {"new_name": "v_net_private_grants"},
+            "I.A.1. Budget support": {"new_name": "i_a_1_budget_support"},
+            "I.A.2. Bilateral core contributions & pooled programmes & funds": {
+                "new_name": "i_a_2_bilateral_core_contributions_pooled_programmes_funds",
+            },
+            "I.A.3. Project-type interventions": {"new_name": "i_a_3_project_type_interventions"},
+            "I.A.4. Experts and other technical assistance": {
+                "new_name": "i_a_4_experts_other_technical_assistance",
+            },
+            "I.A.5. Scholarships and student costs in donor countries": {
+                "new_name": "i_a_5_scholarships_student_costs_donor_countries",
+            },
+            "I.A.6. Debt relief": {"new_name": "i_a_6_debt_relief"},
+            "I.A.7. Administrative costs not included elsewhere": {
+                "new_name": "i_a_7_administrative_costs_not_included_elsewhere",
+            },
+            "I.A.8. Other in-donor expenditures": {"new_name": "i_a_8_other_in_donor_expenditures"},
+            "I.A.8.1. Development awareness": {"new_name": "i_a_8_1_development_awareness"},
+            "I.A.8.2. Refugees in donor countries": {"new_name": "i_a_8_2_refugees_in_donor_countries"},
+            "I.A.9. Recoveries on bilateral ODA grants / negative commitments": {
+                "new_name": "i_a_9_recoveries_bilateral_oda_grants_negative_commitments",
+            },
+            "I.A.10. Other loans repayments": {"new_name": "i_a_10_other_loans_repayments"},
+            "I.A.11. Private sector instruments": {"new_name": "i_a_11_private_sector_instruments"},
+            "I.A.12. Other ODA not assigned to the above categories (historical series)": {
+                "new_name": "i_a_12_other_oda_not_assigned_to_the_above_categories_historical_series",
+            },
             "Population": {"new_name": "population"},
             "GNI": {"new_name": "gni"},
         },
