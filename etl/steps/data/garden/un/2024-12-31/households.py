@@ -34,6 +34,7 @@ def run(dest_dir: str) -> None:
         "extended_family",
         "non_relatives",
         "unknown",
+        "single_parent_with_children_separate",
     ]
 
     # Replace ".." with NaN
