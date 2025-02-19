@@ -77,6 +77,8 @@ REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 LAST_YEAR_STABLE = 2023
 LAST_YEAR_CED = 2024
 LAST_YEAR = 2023
+#
+EXTEND_TO_YEAR = LAST_YEAR_CED  # datetime.now().year
 
 
 def run(dest_dir: str) -> None:
@@ -139,6 +141,14 @@ def run(dest_dir: str) -> None:
         }
     )
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
+
+    # Sanity check years
+    assert (
+        tb_conflict["year"].max() == LAST_YEAR_STABLE
+    ), f"Unexpected max year in `ucdp_battle_related_conflict` ({tb_conflict['year'].max()})!"
+    assert (
+        tb_prio["year"].max() == LAST_YEAR_STABLE
+    ), f"Unexpected max year in `ucdp_prio_armed_conflict` ({tb_prio['year'].max()})!"
 
     # Extend codes to have data for latest years
     tb_codes = extend_latest_years(tb_codes)
@@ -1377,7 +1387,7 @@ def extend_latest_years(tb: Table) -> Table:
     mask = tb["year"] == LAST_YEAR_STABLE
 
     # Get year to extend to
-    current_year = datetime.now().year
+    current_year = EXTEND_TO_YEAR
 
     tb_all_years = Table(pd.RangeIndex(LAST_YEAR_STABLE + 1, current_year + 1), columns=["year"])
     tb_last = tb[mask].drop(columns="year").merge(tb_all_years, how="cross")
