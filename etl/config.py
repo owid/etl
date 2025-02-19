@@ -592,13 +592,11 @@ OWID_ENV = OWIDEnv(
 
 
 # Validate config
-def no_trailing_slash(url: str) -> None:
-    if url.endswith("/"):
+def no_trailing_slash(url: str | None) -> None:
+    if url is not None and url.endswith("/"):
         raise ValueError(f"Env {url} should not have a trailing slash.")
 
 
-no_trailing_slash(ADMIN_HOST)
-no_trailing_slash(TAILSCALE_ADMIN_HOST)
-no_trailing_slash(DATA_API_URL)
-no_trailing_slash(BAKED_VARIABLES_PATH)
-no_trailing_slash(R2_SNAPSHOTS_PUBLIC_READ)
+env_vars = [ADMIN_HOST, TAILSCALE_ADMIN_HOST, DATA_API_URL, BAKED_VARIABLES_PATH, R2_SNAPSHOTS_PUBLIC_READ]
+for env_var in env_vars:
+    no_trailing_slash(env_var)
