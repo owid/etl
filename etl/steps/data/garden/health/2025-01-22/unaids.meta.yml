@@ -75,6 +75,9 @@ tables:
           The source of the estimate is requested. Countries providing the number of people dying from AIDS-related causes derived from a source other than Spectrum should provide any accompanying estimates of uncertainty around this number and upload an electronic copy of the report describing how the number was calculated.
 
           Countries should preferably report a modelled estimate rather than one derived from their vital registration system unless this system has been recently evaluated as one of high quality. Users can now opt to use their Spectrum estimate or enter nationally representative population-level data. If Spectrum estimates are chosen, the values will be pulled directly from the software once the national file is finalized.
+        description_key:
+          - AIDS-related deaths are estimated using multiple methods, including vital registration systems, surveys with verbal autopsies, and mathematical modeling tools like Spectrum.
+          - Mathematical models integrate various data sources, such as demographic data, HIV prevalence, antiretroviral therapy coverage, and survival assumptions, sometimes incorporating adjustments for misreporting.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -100,7 +103,13 @@ tables:
         description_short: |-
           Number of children, aged 17 and under, who have been orphaned by the death of one or both parents from AIDS at any point in their lives. This is the <<estimate.title()>> estimate.
         description_key:
-          - An orphan is defined as a child under 18 years old who has lost at least one parent. A child who has lost their mother is called a maternal orphan, while a child who has lost their father is referred to as a paternal orphan. A child who has lost both parents is known as a double orphan.
+          - |-
+            An orphan is defined as a child under 18 years old who has lost at least one parent:
+              - A child who has lost their mother is called a maternal orphan, while a child who has lost their father is referred to as a paternal orphan.
+              - A child who has lost both parents is known as a double orphan.
+          - "**Scale of the crisis:** Sub-Saharan Africa faces the gravest orphan crisis, with an estimate of 10 million children (0-17) losing one or both parents due to AIDS by 2023."
+          - "**Vulnerability and impact:** Orphaned children often experience extreme poverty, disruption in schooling, and psychosocial distress, exposing them to heightened risks of exploitation and abuse."
+          - "**Preferred family-based care:** Emphasis is placed on keeping these children within a family environment—often headed by surviving parents, grandparents, or relatives—rather than resorting to institutional orphanages."
         display:
           numDecimalPlaces: 0
         presentation:
@@ -415,9 +424,8 @@ tables:
         description_short: |-
           Number of {definitions.people_dimension} newly infected with HIV in the last year per 1,000 uninfected people. This is the <<estimate.title()>> estimate.
         description_key:
-          - HIV incidence measures progress towards ending the AIDS epidemic.
-          - This indicator is a crucial metric in the [WHO 2022 Consolidated guidelines](https://www.who.int/publications/i/item/9789240055315) on person-centered HIV strategic information.
-          - According to the [WHO 2022 Consolidated guidelines](https://www.who.int/publications/i/item/9789240055315), the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
+          - HIV incidence measures progress towards ending the AIDS epidemic and is a crucial metric in the [WHO 2022 Consolidated guidelines](https://www.who.int/publications/i/item/9789240055315) on person-centered HIV strategic information.
+          - According to the WHO 2022 Consolidated guidelines, the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
         description_from_producer: |-
           Method of measurement:
           Methods for monitoring incidence can vary depending on the epidemic setting and are typically categorized either as direct or indirect measures. Direct measurement at a population level is preferred but can often be difficult to obtain. As a result, most if not all countries rely on indirect measures or triangulate direct and indirect methods.
@@ -431,7 +439,7 @@ tables:
           Disaggregated data reported for the numerator should be used to monitor progress towards eliminating new child infections and reducing the number of new HIV infections among adolescent girls and young women to below 100,000 per year.
 
         presentation:
-          title_public: "HIV incidence per 1,000 population"
+          title_public: "HIV new infections per 1,000 individuals"
 
       hiv_prevalence:
         title: "HIV prevalence - Sex: <<sex>> - Age: <<age>> - <<estimate.title()>> estimate"
@@ -451,12 +459,13 @@ tables:
         description_short: |-
           The number of {definitions.people_dimension} newly infected with HIV in the last 12 months. This is the <<estimate.title()>> estimate.
         description_key:
-          - By tracking new infections, health organizations can assess whether prevention efforts are successfully reducing HIV transmission rates or if emerging challenges are creating new infection pathways.
-          - The precision of this metric depends on robust surveillance systems, comprehensive testing programs, and sophisticated epidemiological modeling techniques. Accurate reporting requires consistent data collection, advanced statistical methods, and a nuanced understanding of population-level transmission patterns.
+          - Also known as "HIV incidence", help health organizations assess whether prevention efforts are successfully reducing HIV transmission rates or if emerging challenges are creating new infection pathways.
+          - This indicator measures progress towards ending the AIDS epidemic and is a crucial metric in the [WHO 2022 Consolidated guidelines](https://www.who.int/publications/i/item/9789240055315) on person-centered HIV strategic information.
+          - According to the WHO 2022 Consolidated guidelines, the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
         display:
           numDecimalPlaces: 0
         presentation:
-          title_public: "New HIV infections"
+          title_public: "HIV new infections"
 
       plwh:
         title: "People living with HIV - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
@@ -870,6 +879,10 @@ tables:
         title: TB patients tested positive for HIV
         unit: patients
         description_short: "Number of tuberculosis (new and relapsed) patients that tested positive for HIV."
+        description_key:
+          - "**Coinfection risk**: People with TB are strongly advised to be tested for HIV because HIV weakens the immune system, increasing vulnerability to TB and complicating treatment outcomes."
+          - "**Indicator of integrated care**: The proportion of TB patients testing positive for HIV reflects how well HIV-TB coinfection is being identified in clinical settings, guiding coordinated treatment and prevention."
+          - "**Critical for reducing mortality**: Early detection of HIV in TB patients enables timely antiretroviral therapy and TB treatment, which can significantly lower the risk of severe illness and death."
         display:
           numDecimalPlaces: 0
 
@@ -999,6 +1012,9 @@ tables:
           <% endif %>
         unit: constant 2019 US$
         short_unit: "$"
+        description_key:
+          - "This indicator captures*in-country HIV programme expenditures from various financing sources (e.g., domestic, international, etc.), ensuring standardized tracking of how much is spent and where."
+          - "The expenditures reported should align with the numbers of people receiving HIV services, providing actionable data for **resource allocation and mobilization** decisions."
         description_from_producer: |-
           The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources. There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
 
@@ -1012,11 +1028,11 @@ tables:
 
           More details: https://indicatorregistry.unaids.org/indicator/aids-spending
         presentation:
-          title_public: HIV expenditure by origin of resources
-          title_variant: << group >>
+          title_public: HIV expenditure on prevention and treatment
+          title_variant: <<"sourced from " + group if group != "total">>
           grapher_config:
             title: |-
-              HIV expenditure<<" of resources from " + group if group != "total">>
+              HIV expenditure of resources<<" from " + group if group != "total">>
             hasMapTab: true
             tab: map
             map:
@@ -1090,7 +1106,7 @@ tables:
   gam_estimates:
     common:
       presentation:
-        title_variant: <<estimate.title()>> estimate
+        title_variant: <<estimate.lower()>> estimate
         grapher_config:
           hasMapTab: true
           tab: map
@@ -1134,13 +1150,17 @@ tables:
         presentation:
           title_public: Incident TB cases in people living with HIV
       tb_related_deaths:
-        title: Estimated TB-related deaths among people living with HIV - <<estimate.title()>> estimate
+        title: Tuberculosis-related deaths among people living with HIV - <<estimate.title()>> estimate
         unit: deaths
         description_short: <<estimate.title()>> estimate of the number of deaths from people living with HIV that are related to tuberculosis.
         display:
           numDecimalPlaces: 0
+        description_key:
+          - Tuberculosis (TB) is the top cause of death among people living with HIV despite being preventable and treatable. Lack of integrated TB-HIV services and low uptake of preventive treatments contribute to these avoidable deaths.
+          - "People-centred approaches that combine TB and HIV screening, diagnosis, and treatment—as well as address other comorbidities—can significantly reduce TB-related deaths among people living with HIV ([GLOBAL AIDS STRATEGY 2021-2026](https://www.unaids.org/en/resources/documents/2021/2021-2026-global-AIDS-strategy))."
+          - "Inequalities undermine care: Key and vulnerable groups, including children and young people, often face barriers to holistic HIV-TB services, underscoring the need for community-based support and targeted strategies to bridge these gaps."
         presentation:
-          title_public: Estimated TB-related deaths among people living with HIV
+          title_public: Tuberculosis-related deaths among people living with HIV
 
   gam_hepatitis:
     variables:
@@ -1557,6 +1577,44 @@ tables:
           <%- elif group == "high-risk sex" %>
           Share of respondents who say they used a condom the last time they had sex with a non-marital, non-cohabiting partner, of those who have had sex with such a partner in the last 12 months.
           <%- endif %>
+        description_key:
+          - |-
+            <% if group == "men who have sex with men" %>
+            Consistent and correct condom use is critical for men who have sex with men, as it significantly reduces HIV transmission risk—particularly for anal intercourse, which carries a high transmission probability.
+            <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
+            Regular and proper condom use is critical for transgender individuals (especially trans women) to lower HIV transmission risks, particularly during anal sex.
+            <%- elif group == "people who inject drugs" %>
+            People who inject drugs can transmit HIV both through shared injecting equipment and through unprotected sex, making safer injecting and consistent condom use essential.
+            <%- elif group == "sex workers" %>
+            Sex workers face increased HIV transmission risk due to multiple non-regular partners and frequent sexual encounters; however, consistent and correct condom use significantly reduces this risk.
+            <%- elif group == "high-risk sex" %>
+            Individuals with non-marital, non-cohabiting sexual partners face increased HIV exposure risk, making consistent condom use critical.
+            <%- endif %>
+          - |-
+            <% if group == "men who have sex with men" %>
+            Some men who have sex with men may also have female partners, so regular condom use helps prevent potential HIV spread to them as well.
+            <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
+            Condom use with one's most recent partner (whether vaginal or anal penetration) provides a practical proxy for assessing longer-term protective practices.
+            <%- elif group == "people who inject drugs" %>
+            Respondents who have injected in the past month and had sex in the same timeframe are asked about condom use during their last sexual encounter to gauge protective behavior.
+            <%- elif group == "sex workers" %>
+            Condom use with the most recent client is a practical proxy for assessing broader protective practices and provides valuable data on HIV prevention gaps.
+            <%- elif group == "high-risk sex" %>
+            Representative surveys (e.g., DHS, AIS, MICS) help identify those with higher-risk sexual behavior (non-regular partner in the past year) and measure condom use with the last partner.
+            <%- endif %>
+          - |-
+            <% if group == "men who have sex with men" %>
+            Reporting condom use during last anal sex is often used as a proxy measure for habitual condom use, and data collection should be done confidentially, preferably in collaboration with trusted community organizations.
+            <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
+            Surveys and data collection should involve trusted civil society partners and ensure that respondent identity and information remain confidential.
+            <%- elif group == "people who inject drugs" %>
+            Gathering information should involve civil society partners, ensuring confidentiality and trust within this high-risk population.
+            <%- elif group == "sex workers" %>
+            Collaborations with trusted civil society organizations, plus strict confidentiality measures, are critical for safe and accurate data gathering among sex workers.
+            <%- elif group == "high-risk sex" %>
+            Asking about condom use during the most recent high-risk encounter provides a straightforward snapshot of protective practices and helps detect gaps in prevention strategies.
+            <%- endif %>
+
         description_from_producer: |-
           <% if group == "men who have sex with men" %>
           Condoms can substantially reduce the risk of sexually transmitting HIV. Consistently and correctly using condoms is therefore important for men who have sex with men because of the high risk of HIV transmission during unprotected anal sex. In addition, men who have anal sex with other men may also have female partners, who could become infected as well. Condom use with the most recent male partner is considered a reliable indicator of longer-term behaviour.
