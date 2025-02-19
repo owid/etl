@@ -93,7 +93,7 @@ def create_other_category(tb: Table) -> Table:
         100 - tb.loc[rows_not_around_100.index, "sum_households"]
     )
     # Ensure if the "unknown" column row is 100, then others are 0
-    tb.loc[tb["unknown"] == 100, columns_to_sum] = 0
+    tb.loc[tb["unknown"] == 100, columns_to_sum] = np.nan
     tb.loc[tb["unknown"] == 100, "unknown"] = 100
 
     # Drop the sum_households column if needed
