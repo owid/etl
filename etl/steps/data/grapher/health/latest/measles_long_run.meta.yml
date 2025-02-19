@@ -1,8 +1,11 @@
+definitions:
+  desc_update: The {year} data is incomplete and was last updated {update_date}.
 tables:
   measles_long_run:
     variables:
       cases:
-        title: Number of measles cases
+        title: Measles cases
+        description_short: Reported number of measles cases. {definitions.desc_update}
         unit: cases
         display:
           entityAnnotationsMap: "United States: Data for 2025 is incomplete"

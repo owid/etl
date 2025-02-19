@@ -19,13 +19,16 @@ def run(dest_dir: str) -> None:
     tb = ds_garden.read("measles_long_run", reset_index=False)
     assert tb["cases"].metadata.origins[1].title == "CDC Yearly measles cases (1985-present)"
     publication_date = tb["cases"].metadata.origins[1].date_published
-    desc_short = format_description_short(publication_date)
-    tb["cases"].metadata.description_short = desc_short
+    year, update_date = format_description_short(publication_date)
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir,
+        tables=[tb],
+        check_variables_metadata=True,
+        default_metadata=ds_garden.metadata,
+        yaml_params={"year": year, "update_date": update_date},
     )
 
     # Save changes in the new grapher dataset.
@@ -35,5 +38,6 @@ def run(dest_dir: str) -> None:
 def format_description_short(publication_date: str) -> str:
     date_obj = datetime.strptime(publication_date, "%Y-%m-%d")
     formatted_date = date_obj.strftime("%d %B %Y")
-
-    return f"Reported measles cases. The date for {datetime.now().year} is incomplete and was last updated {formatted_date}"
+    year = datetime.now().year
+    update_date = formatted_date
+    return year, update_date
