@@ -979,10 +979,10 @@ steps:
   #
   # CDC Measles Cases 1985-present
   #
-  data://meadow/cdc/2025-02-18/measles_cases:
-    - snapshot://cdc/2025-02-18/measles_cases.json
-  data://garden/cdc/2025-02-18/measles_cases:
-    - data://meadow/cdc/2025-02-18/measles_cases
+  #data://meadow/cdc/2025-02-18/measles_cases:
+  #  - snapshot://cdc/2025-02-18/measles_cases.json
+  #data://garden/cdc/2025-02-18/measles_cases:
+  #  - data://meadow/cdc/2025-02-18/measles_cases
 
   # CDC Measles Cases 1985-present - autoupdate
   data://meadow/cdc/latest/measles_cases:
