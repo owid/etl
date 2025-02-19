@@ -21,7 +21,6 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    print(tb[(tb["country"] == "Australia") & (tb["cancer"] == "Stomach") & (tb["survival_year"] == 5)])
 
     tb = tb[tb["survival_year"] == 5]
     # Print rows where country is Australia and cancer is Stomach
