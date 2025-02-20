@@ -1,3 +1,5 @@
+dataset:
+  title: Long-run reported cases of measles in the United States
 tables:
   measles_long_run:
     variables:
