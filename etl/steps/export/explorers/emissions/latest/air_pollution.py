@@ -82,6 +82,8 @@ def run(dest_dir: str) -> None:
                 pd.DataFrame(
                     {
                         "yVariableIds": [_columns],
+                        "title": "Emissions of air pollutants from all sectors",
+                        "subtitle": "Measured in tonnes and split by major pollutant.",
                         "Pollutant Dropdown": "All pollutants",
                         "Sector Dropdown": "All sectors",
                         "Per capita Checkbox": per_capita,
