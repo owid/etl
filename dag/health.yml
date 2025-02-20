@@ -1014,3 +1014,8 @@ steps:
     - snapshot://health/2025-02-20/measles_deaths_historical.csv
   data://garden/health/2025-02-20/measles_deaths_historical:
     - data://meadow/health/2025-02-20/measles_deaths_historical
+
+  # Measles deaths long run
+  data://garden/health/2025-02-20/measles_deaths_long_run:
+    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+    - data://garden/health/2025-02-20/measles_deaths_historical
