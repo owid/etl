@@ -1,0 +1,63 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical Measles Deaths - United States
+    description: |-
+      Data on historical measles deaths in the United States, compiled from a selection of sources.
+
+      Sources for each year are as follows:
+
+      * 1919: Public Health Reports, Vol. 36, No. 8 - [The Notifiable Diseases: Prevalence during 1919 in States](https://www.jstor.org/stable/4575902)
+
+      * 1921: Public Health Reports, Vol. 37, No. 41 - [The Notifiable Diseases: Prevalence during 1921 in States. Anthrax, Cerebrospinal Meningitis, Dengue, Diphtheria, Gonorrhea, Influenza, Malaria, Measles, Pneumonia, Poliomyelitis, Rabies, Rocky Mountain Spotted Fever, Scarlet Fever, Septic Sore Throat, Smallpox, Syphilis, Tuberculosis (All Forms and Pulmonary), Typhoid Fever, and Typhus Fever](https://www.jstor.org/stable/4576538)
+
+      * 1924: Public Health Reports, Vol. 40, No. 51 - [The Notifiable Diseases: Prevalence during 1924 in States](https://www.jstor.org/stable/4577735)
+
+      * 1925: Public Health Reports, Vol. 42, No. 1 - [The Notifiable Diseases: Prevalence during 1925 in States](https://www.jstor.org/stable/4578131)
+
+      * 1937: Public Health Reports, Vol. 53, No. 44 - [Health Conditions in the United States as Indicated by Mortality Rates, 1929-38](https://stacks.cdc.gov/view/cdc/69651/cdc_69651_DS1.pdf)
+
+      * 1938: Public Health Reports, Vol. 55, No. 10 - [Notifiable Diseases in the United States, 1938: Morbidity and Mortality Summaries for Certain Important Communicable Diseases](https://www.jstor.org/stable/4583204)
+
+      * 1939: Public Health Reports, Vol. 56, No. 7 - [Notifiable Diseases in the United States, 1939: Morbidity and Mortality Summaries for Certain Important Communicable Diseases](https://www.jstor.org/stable/4583620)
+
+      * 1940: Public Health Reports, Vol. 57, No. 7 - [Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases](https://www.jstor.org/stable/4584013)
+
+      * 1949: Statistical Abstract of the United States: 1952, United States Census Bureau - [Part 2 - Vital Statistics and Health and Medical Care](https://www.census.gov/library/publications/1952/compendia/statab/73ed.html)
+
+    date_published: "1952-09-01"
+
+    # Citation
+    producer: Public Health Reports; US Census Bureau
+    citation_full: |-
+      Public Health Reports, Vol. 36, No. 8. The Notifiable Diseases: Prevalence during 1919 in States.
+
+      Public Health Reports Vol. 37, No. 41. The Notifiable Diseases: Prevalence during 1921 in States. Anthrax, Cerebrospinal Meningitis, Dengue, Diphtheria, Gonorrhea, Influenza, Malaria, Measles, Pneumonia, Poliomyelitis, Rabies, Rocky Mountain Spotted Fever, Scarlet Fever, Septic Sore Throat, Smallpox, Syphilis, Tuberculosis (All Forms and Pulmonary), Typhoid Fever, and Typhus Fever.
+
+      Public Health Reports Vol. 40, No. 51. The Notifiable Diseases: Prevalence during 1924 in States.
+
+      Public Health Reports, Vol. 42, No. 1 - The Notifiable Diseases: Prevalence during 1925 in States.
+
+      Public Health Reports, Vol. 53, No. 44 - Health Conditions in the United States as Indicated by Mortality Rates, 1929-38.
+
+      Public Health Reports, Vol. 55, No. 10 - Notifiable Diseases in the United States, 1938: Morbidity and Mortality Summaries for Certain Important Communicable Diseases.
+
+      Public Health Reports, Vol. 56, No. 7 - Notifiable Diseases in the United States, 1939: Morbidity and Mortality Summaries for Certain Important Communicable Diseases.
+
+      Public Health Reports, Vol. 57, No. 7 - Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States 1944-45.
+
+    # Files
+    url_main: https://www.jstor.org/stable/4575902; https://www.jstor.org/stable/4576538; https://www.jstor.org/stable/4577735; https://www.jstor.org/stable/4578131; https://stacks.cdc.gov/view/cdc/69651/cdc_69651_DS1.pdf; https://www.jstor.org/stable/4583204; https://www.jstor.org/stable/4583620; https://www.jstor.org/stable/4584013; https://www.census.gov/library/publications/1952/compendia/statab/73ed.html
+    date_accessed: 2025-02-20
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: 98ba368f16e82a1b20bdc56eb33bf494
+    size: 640
+    path: measles_deaths_historical.csv

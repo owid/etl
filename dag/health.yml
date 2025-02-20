@@ -1006,3 +1006,11 @@ steps:
     - data://meadow/cancer/2025-02-17/gco_cancer_survival
   data://grapher/cancer/2025-02-17/gco_cancer_survival:
     - data://garden/cancer/2025-02-17/gco_cancer_survival
+
+  #
+  # Measles deaths historical
+  #
+  data://meadow/health/2025-02-20/measles_deaths_historical:
+    - snapshot://health/2025-02-20/measles_deaths_historical.csv
+  data://garden/health/2025-02-20/measles_deaths_historical:
+    - data://meadow/health/2025-02-20/measles_deaths_historical
