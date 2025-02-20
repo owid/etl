@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb_hist = ds_meadow_hist.read("measles_deaths_historical")
-    tb_pres = ds_who_mort.read("mortality_database_vaccine_preventable")
+    tb_pres = ds_who_mort.read("mortality_database_vaccine_preventable", reset_metadata="keep_origins")
     tb_pres = tb_pres[
         (tb_pres["cause"] == "Measles")
         & (tb_pres["age_group"] == "all ages")
