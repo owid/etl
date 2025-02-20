@@ -108,6 +108,8 @@ def run(dest_dir: str) -> None:
     for pollutant, pollutant_short_name in list(dict.fromkeys(zip(pollutant_dropdown, pollutant_short_names))):
         for per_capita in [False, True]:
             _columns_for_pollutant = []
+            _pollutant_title = []
+            _pollutant_subtitle = []
             for column in tb.drop(columns=["country", "year"]).columns:
                 dimensions = tb[column].metadata.additional_info["dimensions"]
                 if (not per_capita and dimensions["originalShortName"] == "emissions") or (
@@ -117,14 +119,26 @@ def run(dest_dir: str) -> None:
                         if (filter["name"] == "pollutant") and (filter["value"] == pollutant_short_name):
                             if not column.endswith("all_sectors"):
                                 _columns_for_pollutant.append(f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}")
+                                _pollutant_title.append(tb[column].metadata.display["name"])
+                                _pollutant_subtitle.append(tb[column].metadata.description_short)
             if len(_columns_for_pollutant) == 0:
                 continue
+            assert len(set(_pollutant_title)) == 1, "Multiple pollutants with the same display name."
+            assert len(set(_pollutant_subtitle)) == 1, "Multiple pollutants with the same description."
+            title = (
+                f"Per capita {_pollutant_title[0].lower()} emissions by sector"
+                if per_capita
+                else f"{_pollutant_title[0]} emissions by sector"
+            )
+            subtitle = _pollutant_subtitle[0]
             df_graphers = pd.concat(
                 [
                     df_graphers,
                     pd.DataFrame(
                         {
                             "yVariableIds": [_columns_for_pollutant],
+                            "title": title,
+                            "subtitle": subtitle,
                             "Pollutant Dropdown": pollutant,
                             "Sector Dropdown": BREAKDOWN_BY_SECTOR_LABEL,
                             "Per capita Checkbox": per_capita,
