@@ -994,6 +994,7 @@ steps:
   data://garden/health/latest/measles_long_run:
     - data://garden/cdc/latest/measles_cases
     - data://garden/health/2025-02-19/measles_historical
+    - data://garden/demography/2024-07-15/population
   data://grapher/health/latest/measles_long_run:
     - data://garden/health/latest/measles_long_run
 

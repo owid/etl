@@ -1,6 +1,0 @@
-tables:
-  measles_long_run:
-    variables:
-      cases:
-        title: Measles cases
-        unit: cases
