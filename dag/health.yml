@@ -996,3 +996,13 @@ steps:
     - data://garden/health/2025-02-19/measles_historical
   data://grapher/health/latest/measles_long_run:
     - data://garden/health/latest/measles_long_run
+
+  #
+  # Cancer survival rates (GCO)
+  #
+  data://meadow/cancer/2025-02-17/gco_cancer_survival:
+    - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
+  data://garden/cancer/2025-02-17/gco_cancer_survival:
+    - data://meadow/cancer/2025-02-17/gco_cancer_survival
+  data://grapher/cancer/2025-02-17/gco_cancer_survival:
+    - data://garden/cancer/2025-02-17/gco_cancer_survival

@@ -340,3 +340,13 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
             init_args[field_name] = v
 
     return cls(**init_args)
+
+
+def remove_details_on_demand(text: str) -> str:
+    # Remove references to details on demand from a text.
+    # Example: "This is a [description](#dod:something)." -> "This is a description."
+    regex = r"\(\#dod\:.*\)"
+    if "(#dod:" in text:
+        text = re.sub(regex, "", text).replace("[", "").replace("]", "")
+
+    return text
