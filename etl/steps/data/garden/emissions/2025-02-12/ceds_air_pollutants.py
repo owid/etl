@@ -27,6 +27,14 @@ SECTOR_MAPPING = {
         "3D_Soil-emissions",
         "3E_Enteric-fermentation",
         "3I_Agriculture-other",
+        # NOTE: The following subsectors 7BC and 1A4c were found in the data, but not in the mapping. I found this other document:
+        # https://essd.copernicus.org/preprints/essd-2023-306/essd-2023-306-supplement.pdf
+        # which places these subsectors under "Agriculture soils".
+        # Regarding 7BC, I understand that, despite originating from non-agricultural Nitrogen sources, these emissions are closely linked to the broader nitrogen cycle, which is heavily influenced by agricultural activities.
+        "7BC_Indirect-N2O-non-agricultural-N",
+        # Regarding 1A4C, I understand that "Agriculture" is mostly about emissions from biological processes, whereas 1A4C is about energy processes in farming, forestry and fishing. However, 1A4C is still more closely related to agriculture than energy or any other sector.
+        # Another option would be to create a separate sector for "Farming, forestry and fishing", but I think that would not be very useful.
+        "1A4c_Agriculture-forestry-fishing",
     ],
     # In the document, they had a sector "Aviation", containing international aviation and domestic aviation. But I think it's better to separate them.
     # "Aviation": [
@@ -35,11 +43,18 @@ SECTOR_MAPPING = {
     # ],
     "International aviation": [SUBSECTOR_INTERNATIONAL_AVIATION],
     "Domestic aviation": [SUBSECTOR_DOMESTIC_AVIATION],
-    # "Residential, Commercial, Other (DOM)".
-    "Residential, commercial, and other": [
+    # In the document, they had a sector "Residential, Commercial, Other (DOM)", containing:
+    # "1A4a_Commercial-institutional",
+    # "1A4b_Residential",
+    # "1A4c_Agriculture-forestry-fishing",
+    # "1A5_Other-unspecified",
+    # However, this is not a particularly useful categorization.
+    # Instead, I'll create a "Buildings" category, move "1A4c_Agriculture-forestry-fishing" into "Agriculture" and create a new "Other fuel use" sector.
+    "Buildings": [
         "1A4a_Commercial-institutional",
         "1A4b_Residential",
-        "1A4c_Agriculture-forestry-fishing",
+    ],
+    "Other fuel use": [
         "1A5_Other-unspecified",
     ],
     # "Int. Shipping".
@@ -61,7 +76,6 @@ SECTOR_MAPPING = {
         # NOTE: The following were found in the data, but not in the mapping. I'm assuming they belong here (because of their similarity with other subsectors and because of the context).
         "1B2b_Fugitive-NG-distr",
         "1B2b_Fugitive-NG-prod",
-        "7BC_Indirect-N2O-non-agricultural-N",
     ],
     # "Industry (IND)".
     "Industry": [
