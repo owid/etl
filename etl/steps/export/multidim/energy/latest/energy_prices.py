@@ -1,3 +1,7 @@
+from typing import Dict, List
+
+from owid.catalog import Table
+
 from etl import multidim
 from etl.helpers import PathFinder
 
@@ -22,30 +26,17 @@ def run(dest_dir: str) -> None:
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()
 
-    dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
-
     # Get possible dimension values
     dim_options = {}
     for dim in config["dimensions"]:
         dim_options[dim["slug"]] = [c["slug"] for c in dim["choices"]]
 
-    # Add dimensions to the metadata of the table.
-    # e.g. annual_gas_household_other_pps -> gas, household, other, pps
-    for tb in [tb_annual, tb_monthly]:
-        for col in tb:
-            filters = []
-            for dim in dimensions:
-                print(dim)
-                print(dim_options[dim])
-                filters.append({"name": dim, "value": [v for v in dim_options[dim] if v in col][0]})
+    # TODO: construct indicator names from dimensions and if it is there, add dimensions info
 
-            tb[col].metadata.additional_info = {
-                "dimensions": {
-                    "originalShortName": col.split("_")[0],
-                    "short_name": col,
-                    "filters": filters,
-                }
-            }
+    # Add dimensions to the metadata of the table.
+    # e.g. annual_gas_household_other_pps -> annual, gas, household, other, pps
+    use_cols_annual = add_dimensions_to_metadata(tb_annual, dim_options)
+    use_cols_monthly = add_dimensions_to_metadata(tb_monthly, dim_options)
 
     common_view_config = {
         "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
@@ -59,12 +50,21 @@ def run(dest_dir: str) -> None:
     }
 
     # Create views.
+    dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
+
     annual_config = multidim.expand_config(
-        tb_annual, indicator_name="annual", dimensions=dimensions, common_view_config=common_view_config
+        tb_annual.loc[:, use_cols_annual],
+        indicator_name="annual",
+        dimensions=dimensions,
+        common_view_config=common_view_config,
     )
     monthly_config = multidim.expand_config(
-        tb_monthly, indicator_name="monthly", dimensions=dimensions, common_view_config=common_view_config
+        tb_monthly.loc[:, use_cols_monthly],
+        indicator_name="monthly",
+        dimensions=dimensions,
+        common_view_config=common_view_config,
     )
+    print(annual_config["views"])
     config["views"] = annual_config["views"] + monthly_config["views"]
 
     # Create special view for the stacked area chart of total consumer price by components.
@@ -144,3 +144,27 @@ def run(dest_dir: str) -> None:
         config=config,
         dependencies=paths.dependencies,
     )
+
+
+def add_dimensions_to_metadata(tb: Table, dim_options: Dict[str, List[str]]) -> List[str]:
+    use_cols = []
+    for col in tb:
+        filters = []
+        try:
+            for dim, values in dim_options.items():
+                filters.append({"name": dim, "value": [v for v in values if v in col][0]})
+        # If the column does not contain any of the dimension values, skip it.
+        except IndexError:
+            continue
+
+        tb[col].metadata.additional_info = {
+            "dimensions": {
+                "originalShortName": col.split("_")[0],
+                "short_name": col,
+                "filters": filters,
+            }
+        }
+
+        use_cols.append(col)
+
+    return use_cols
