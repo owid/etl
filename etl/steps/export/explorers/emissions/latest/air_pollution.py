@@ -20,6 +20,18 @@ ALL_SECTORS_LABEL = "All sectors"
 # Label to use for all pollutants in the pollutants dropdown.
 ALL_POLLUTANTS_LABEL = "All pollutants"
 
+POLLUTANT_NAME = {
+    "BC": "Black carbon",
+    "CH₄": "Methane",
+    "CO": "Carbon monoxide",
+    "NH₃": "Ammonia",
+    "NOₓ": "Nitrogen oxides",
+    "N₂O": "Nitrous oxide",
+    "OC": "Organic carbon",
+    "SO₂": "Sulfur dioxide",
+    "NMVOC": "Non-methane volatile organic compounds",
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -52,7 +64,7 @@ def run(dest_dir: str) -> None:
         for filter in dimensions["filters"]:
             if filter["name"] == "pollutant":
                 pollutant_short_name = filter["value"]
-                pollutant = f'{tb[column].metadata.display["name"]} ({filter["value"]})'
+                pollutant = POLLUTANT_NAME[pollutant_short_name]
             elif filter["name"] == "sector":
                 sector = filter["value"]
             else:
@@ -119,11 +131,11 @@ def run(dest_dir: str) -> None:
                         if (filter["name"] == "pollutant") and (filter["value"] == pollutant_short_name):
                             if not column.endswith("all_sectors"):
                                 _columns_for_pollutant.append(f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}")
-                                _pollutant_title.append(tb[column].metadata.display["name"])
+                                _pollutant_title.append(POLLUTANT_NAME[pollutant_short_name])
                                 _pollutant_subtitle.append(tb[column].metadata.description_short)
             if len(_columns_for_pollutant) == 0:
                 continue
-            assert len(set(_pollutant_title)) == 1, "Multiple pollutants with the same display name."
+            assert len(set(_pollutant_title)) == 1, "Multiple pollutants with the same title."
             assert len(set(_pollutant_subtitle)) == 1, "Multiple pollutants with the same description."
             title = (
                 f"Per capita {_pollutant_title[0].lower()} emissions by sector"

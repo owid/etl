@@ -1,6 +1,8 @@
 definitions:
   pollutant_name: |-
     <% if pollutant == "BC" %>Black carbon <% elif pollutant == "CH₄" %>Methane <% elif pollutant == "CO" %>Carbon monoxide <% elif pollutant == "N₂O" %>Nitrous oxide <% elif pollutant == "NH₃" %>Ammonia <% elif pollutant == "NMVOC" %>Non-methane volatile organic compounds <% elif pollutant == "NOₓ" %>Nitrogen oxides <% elif pollutant == "OC" %>Organic carbon <% elif pollutant == "SO₂" %>Sulfur dioxide <% endif -%>
+  pollutant_name_lower: |-
+    <% if pollutant == "BC" %>black carbon <% elif pollutant == "CH₄" %>methane <% elif pollutant == "CO" %>carbon monoxide <% elif pollutant == "N₂O" %>nitrous oxide <% elif pollutant == "NH₃" %>ammonia <% elif pollutant == "NMVOC" %>non-methane volatile organic compounds <% elif pollutant == "NOₓ" %>nitrogen oxides <% elif pollutant == "OC" %>organic carbon <% elif pollutant == "SO₂" %>sulfur dioxide <% endif -%>
   pollutant_description_short: |-
     <% if pollutant == "BC" %>Black carbon (BC) is a soot-like pollutant formed from the burning of biomass and fossil fuels. It is a major contributor to particulate matter pollution, and contributes to climate change by absorbing sunlight.
     <% elif pollutant == "CH₄" %>Methane (CH₄) is a greenhouse gas that contributes to the formation of ground-level ozone, a harmful air pollutant. Key sources of methane include agriculture, landfills, and fossil fuel extraction.
@@ -34,7 +36,8 @@ tables:
           tonnes
         short_unit: t
         display:
-          name: "{definitions.pollutant_name}"
+          name: |-
+            <% if sector == "All sectors" %>{definitions.pollutant_name}<% else %><< sector >><% endif %>
           shortUnit: t
           numDecimalPlaces: 0
         presentation:
@@ -42,15 +45,16 @@ tables:
             {definitions.pollutant_name} emissions from << sector.lower() >>
       emissions_per_capita:
         title: |-
-          Per capita {definitions.pollutant_name} emissions from << sector.lower() >>
+          Per capita {definitions.pollutant_name_lower} emissions from << sector.lower() >>
         description_short: |-
           {definitions.pollutant_description_short}
         unit: kilograms per person
         short_unit: kg/person
         display:
-          name: "{definitions.pollutant_name}"
+          name: |-
+            <% if sector == "All sectors" %>{definitions.pollutant_name}<% else %><< sector >><% endif %>
           shortUnit: kg
           numDecimalPlaces: 0
         presentation:
           title_public: |-
-            Per capita {definitions.pollutant_name} emissions from << sector.lower() >>
+            Per capita {definitions.pollutant_name_lower} emissions from << sector.lower() >>
