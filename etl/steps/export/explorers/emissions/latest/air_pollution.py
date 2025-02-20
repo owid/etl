@@ -11,6 +11,15 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Label to use for the breakdown by sector in the sector dropdown.
+BREAKDOWN_BY_SECTOR_LABEL = "Breakdown by sector"
+
+# Label to use for all sectors in the sector dropdown.
+ALL_SECTORS_LABEL = "All sectors"
+
+# Label to use for all pollutants in the pollutants dropdown.
+ALL_POLLUTANTS_LABEL = "All pollutants"
+
 
 def run(dest_dir: str) -> None:
     #
@@ -84,8 +93,8 @@ def run(dest_dir: str) -> None:
                         "yVariableIds": [_columns],
                         "title": "Emissions of air pollutants from all sectors",
                         "subtitle": "Measured in tonnes and split by major pollutant.",
-                        "Pollutant Dropdown": "All pollutants",
-                        "Sector Dropdown": "All sectors",
+                        "Pollutant Dropdown": ALL_POLLUTANTS_LABEL,
+                        "Sector Dropdown": ALL_SECTORS_LABEL,
                         "Per capita Checkbox": per_capita,
                         "hasMapTab": False,
                         "selectedFacetStrategy": "metric",
@@ -117,7 +126,7 @@ def run(dest_dir: str) -> None:
                         {
                             "yVariableIds": [_columns_for_pollutant],
                             "Pollutant Dropdown": pollutant,
-                            "Sector Dropdown": "Breakdown by sector",
+                            "Sector Dropdown": BREAKDOWN_BY_SECTOR_LABEL,
                             "Per capita Checkbox": per_capita,
                             "hasMapTab": False,
                             "selectedFacetStrategy": "entity",
@@ -137,6 +146,14 @@ def run(dest_dir: str) -> None:
     df_graphers["yAxisMin"] = 0
 
     # Sort rows conveniently.
+    sector_categories = [ALL_SECTORS_LABEL, BREAKDOWN_BY_SECTOR_LABEL] + sorted(
+        set(df_graphers["Sector Dropdown"]) - {ALL_SECTORS_LABEL, BREAKDOWN_BY_SECTOR_LABEL}
+    )
+    df_graphers["Sector Dropdown"] = pd.Categorical(
+        df_graphers["Sector Dropdown"],
+        categories=sector_categories,
+        ordered=True,
+    )
     df_graphers = df_graphers.sort_values(["Pollutant Dropdown", "Sector Dropdown", "Per capita Checkbox"]).reset_index(
         drop=True
     )
@@ -144,8 +161,8 @@ def run(dest_dir: str) -> None:
     # Choose which indicator to show by default when opening the explorer.
     df_graphers["defaultView"] = False
     df_graphers.loc[
-        (df_graphers["Pollutant Dropdown"] == "All pollutants")
-        & (df_graphers["Sector Dropdown"] == "All sectors")
+        (df_graphers["Pollutant Dropdown"] == ALL_POLLUTANTS_LABEL)
+        & (df_graphers["Sector Dropdown"] == ALL_SECTORS_LABEL)
         & (~df_graphers["Per capita Checkbox"]),
         "defaultView",
     ] = True
