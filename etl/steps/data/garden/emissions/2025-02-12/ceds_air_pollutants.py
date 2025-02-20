@@ -47,8 +47,8 @@ SECTOR_MAPPING = {
         SUBSECTOR_INTERNATIONAL_SHIPPING,
         SUBSECTOR_OIL_TANKER_LOADING,
     ],
-    # "Energy Transformation and Production (ENE)".
-    "Energy transformation and production": [
+    # In the document, they had a sector called "Energy Transformation and Production (ENE)". We will simply call it "Energy".
+    "Energy": [
         "1A1a_Electricity-autoproducer",
         "1A1a_Electricity-public",
         "1A1a_Heat-production",
