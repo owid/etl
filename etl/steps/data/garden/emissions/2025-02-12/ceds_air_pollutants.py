@@ -54,9 +54,6 @@ SECTOR_MAPPING = {
         "1A4a_Commercial-institutional",
         "1A4b_Residential",
     ],
-    "Other fuel use": [
-        "1A5_Other-unspecified",
-    ],
     # "Int. Shipping".
     "International shipping": [
         SUBSECTOR_INTERNATIONAL_SHIPPING,
@@ -76,6 +73,10 @@ SECTOR_MAPPING = {
         # NOTE: The following were found in the data, but not in the mapping. I'm assuming they belong here (because of their similarity with other subsectors and because of the context).
         "1B2b_Fugitive-NG-distr",
         "1B2b_Fugitive-NG-prod",
+        # NOTE: The following was found in the data, but not in the mapping. However, I found it in:
+        # https://essd.copernicus.org/preprints/essd-2023-306/essd-2023-306-supplement.pdf
+        # It was categorized under Power generation. So I suppose it makes sense to include it under "Energy".
+        "1A5_Other-unspecified",
     ],
     # "Industry (IND)".
     "Industry": [
