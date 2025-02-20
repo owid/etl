@@ -4,3 +4,6 @@ tables:
       cases:
         title: Measles cases
         unit: cases
+      case_rate:
+        title: Measles case rate
+        unit: cases per 100,000 people
