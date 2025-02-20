@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     tb_pres = tb_pres[["country", "year", "number"]]
     tb_pres = tb_pres.rename(columns={"number": "deaths"})
 
-    tb = pr.concat([tb_hist, tb_pres])
+    tb = pr.concat([tb_hist, tb_pres], short_name="measles_deaths_long_run", ignore_index=True)
     tb = tb.format(["country", "year"])
 
     #
