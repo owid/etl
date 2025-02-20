@@ -42,6 +42,7 @@ definitions:
       <%- endif %>
   common:
     presentation:
+      attribution_short: HFD
       topic_tags:
         - Fertility Rate
     display:
@@ -202,9 +203,8 @@ tables:
         description_short: The total number of{definitions.others.bo_1} live births recorded in a given year.
         unit: "births"
         description_key:
-          - Represents the total number of{definitions.others.bo_1} live births without considering age or parity.
-          - Serves as a foundational statistic for calculating other fertility measures.
-          - Can be influenced by population size and structure.
+          - Shows the total number of{definitions.others.bo_1} live births, considering all mothers (regardless of their age) and all their parities (regardless of the order).
+          - This indicator serves as a foundational statistic for calculating other fertility measures.
         display:
           numDecimalPlaces: 0
 
@@ -265,7 +265,7 @@ tables:
           <%- endif %>
         unit: "births per woman"
         description_key:
-          - Represents the fertility of a cohort up to age 40.
+          - Shows the fertility of a cohort up to age 40.
           - Provides insights into early and mid-reproductive age fertility patterns.
 
       # Mean age at birth
@@ -359,7 +359,7 @@ tables:
           Age-specific fertility rates for each calendar year, measured in completed years of age.
         unit: "births per woman"
         description_key:
-          - Represents fertility rates for each age group in a specific year.
+          - Shows fertility rates for each age group in a specific year.
           - Useful for detailed analysis of fertility patterns by both age and year.
           # - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
 
@@ -373,7 +373,7 @@ tables:
         description_short: |-
           Age-specific fertility rates for women in a specific birth cohort, measured by their age in completed years.
         description_key:
-          - Represents fertility rates for a specific cohort as they age.
+          - Shows fertility rates for a specific cohort as they age.
           - Useful for understanding how fertility behavior changes across different cohorts over time.
           # - Presented in the form of horizontal parallelograms, allowing for the tracking of cohort-specific fertility patterns.
 
@@ -385,7 +385,7 @@ tables:
           It measures the average number of children born to a specific group of women (a cohort) by the age << age >>. It reflects the realized fertility of a generation, providing insights into long-term fertility trends and societal changes over time.
         unit: "births per woman"
         description_key:
-          - Represents fertility rates for each age group in a specific year.
+          - Shows fertility rates for each age group in a specific year.
           - Useful for detailed analysis of fertility patterns by both age and year.
           # - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
 
@@ -398,7 +398,7 @@ tables:
           Distribution of the age-specific fertility rates for each calendar year.
         unit: "births per woman"
         description_key:
-          - Represents fertility rates for each age group in a specific year.
+          - Shows fertility rates for each age group in a specific year.
           - Useful for detailed analysis of fertility patterns by both age and year.
           # - Presented in the form of Lexis squares, which provide a snapshot of fertility behavior over time.
 
@@ -411,7 +411,7 @@ tables:
         description_short: |-
           Distribution of age-specific fertility rates for women in a specific birth cohort.
         description_key:
-          - Represents fertility rates for a specific cohort as individuals in it age.
+          - Shows fertility rates for a specific cohort as individuals in it age.
           - Useful for understanding how fertility behavior changes across different cohorts over time.
           # - Presented in the form of horizontal parallelograms, allowing for the tracking of cohort-specific fertility patterns.
 
