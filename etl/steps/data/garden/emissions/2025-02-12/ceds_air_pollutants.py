@@ -131,8 +131,8 @@ BUNKERS_SECTORS = [
 ]
 
 # Mapping of pollutants.
+# NOTE: Map to None to ignore any of the pollutants.
 POLLUTANTS_MAPPING = {
-    "CO2": "CO₂",
     "CH4": "CH₄",
     "NMVOC": "NMVOC",
     "N2O": "N₂O",
@@ -142,6 +142,10 @@ POLLUTANTS_MAPPING = {
     "NH3": "NH₃",
     "OC": "OC",
     "NOx": "NOₓ",
+    # We will not include CO2. Even though it can contribute to local air pollution in a very secondary way, its impact is very low.
+    # CO2's main concern is climate change, for which we already have a different explorer.
+    # NOTE: the same logic does not apply to methane, which is a greenhouse gas but also a more significant contributor to local air pollution. There's a direct pathway for methane to produce O3, which doesn't happen to CO2.
+    "CO2": None,
 }
 
 # Expected units for each pollutant.
@@ -481,6 +485,8 @@ def remap_table_categories(tb: Table) -> Table:
     tb["pollutant"] = map_series(
         tb["pollutant"], mapping=POLLUTANTS_MAPPING, warn_on_missing_mappings=True, warn_on_unused_mappings=True
     )
+    # Remove any rows with pollutant None.
+    tb = tb[tb["pollutant"].notnull()].reset_index(drop=True)
 
     return tb
 
