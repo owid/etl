@@ -1,5 +1,5 @@
 definitions:
-  desc_update: The {year} data is incomplete and was last updated {update_date}.
+  desc_update: Data for {year} is incomplete and was last updated on {update_date}.
 tables:
   measles_long_run:
     variables:
