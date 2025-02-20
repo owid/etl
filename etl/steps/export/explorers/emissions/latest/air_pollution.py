@@ -65,12 +65,6 @@ def run(dest_dir: str) -> None:
     df_graphers["Per capita Checkbox"] = per_capita_checkbox
     df_graphers["hasMapTab"] = map_tab
 
-    # Sanity check.
-    error = "Duplicated rows in explorer."
-    assert df_graphers[
-        df_graphers.duplicated(subset=["Pollutant Dropdown", "Sector Dropdown", "Per capita Checkbox"], keep=False)
-    ].empty, error
-
     # Create view for all pollutants.
     # Omit CH4 and N20 in this view.
     for per_capita in [False, True]:
@@ -100,7 +94,7 @@ def run(dest_dir: str) -> None:
         )
 
     # Create breakdown by sector.
-    for pollutant, pollutant_short_name in zip(pollutant_dropdown, pollutant_short_names):
+    for pollutant, pollutant_short_name in list(dict.fromkeys(zip(pollutant_dropdown, pollutant_short_names))):
         for per_capita in [False, True]:
             _columns_for_pollutant = []
             for column in tb.drop(columns=["country", "year"]).columns:
@@ -130,6 +124,12 @@ def run(dest_dir: str) -> None:
                     ),
                 ]
             )
+
+    # Sanity check.
+    error = "Duplicated rows in explorer."
+    assert df_graphers[
+        df_graphers.duplicated(subset=["Pollutant Dropdown", "Sector Dropdown", "Per capita Checkbox"], keep=False)
+    ].empty, error
 
     # Impose that all line charts start at zero.
     df_graphers["yAxisMin"] = 0
