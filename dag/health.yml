@@ -1008,7 +1008,6 @@ steps:
   data://grapher/cancer/2025-02-17/gco_cancer_survival:
     - data://garden/cancer/2025-02-17/gco_cancer_survival
 
-  #
   # Measles deaths historical - Public health reports
   #
   data://meadow/health/2025-02-20/measles_deaths_public_health_reports:
