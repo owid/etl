@@ -179,7 +179,6 @@ EXPECTED_UNITS = {
 }
 
 # Name for the additional "country" representing unallocated emissions (e.g. those included as "global" in the bunkers file).
-# TODO: In the metadata, we should clarify that "Other" doesn't mean "Other countries", but rather "Not possible to allocate to individual countries".
 ENTITY_FOR_UNALLOCATED_EMISSIONS = "Other"
 
 # Regions to create when aggregating data.
@@ -577,7 +576,15 @@ def run(dest_dir: str) -> None:
     assert tb[(tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] < 1970)]["emissions"].sum() == 0, error
     assert tb[(tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] >= 1970)]["emissions"].sum() > 0, error
     tb = tb.loc[~((tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] < 1970)), :].reset_index(drop=True)
-    # TODO: * BC waste becomes flat from 2014 onwards.
+    # * BC emissions from waste become constant from 2014 onwards.
+    #   I will contact the authors about this.
+    error = "Expected BC emissions from waste to be constant from 2014 onwards (which may be a data issue). This issue may have been fixed, so, remove this code."
+    assert (
+        tb.loc[(tb["pollutant"] == "BC") & (tb["sector"] == "Waste") & (tb["year"] >= 2014)]
+        .groupby(["country"], as_index=False, observed=True)
+        .agg({"emissions": "nunique"})["emissions"]
+        == 1
+    ).all(), error
     ####################################################################################################################
 
     # Create an "All sectors" aggregate.
