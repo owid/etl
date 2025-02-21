@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder, create_dataset
@@ -32,6 +33,11 @@ def run(dest_dir: str) -> None:
     )
     tb["case_rate"] = tb["cases"] / tb["population"] * 100000
     tb = tb.drop(columns=["population", "source", "world_pop_share"])
+    tb["cases_static"] = tb["cases"]
+    tb["case_rate_static"] = tb["case_rate"]
+    # Setting the last year's values to NA - for a version that doesn't have the latest data.
+    tb["cases_static"][tb["year"] == tb["year"].max()] = pd.NA
+    tb["case_rate_static"][tb["year"] == tb["year"].max()] = pd.NA
     tb = tb.format(["country", "year"])
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
