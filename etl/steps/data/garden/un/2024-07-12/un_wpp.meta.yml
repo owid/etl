@@ -240,9 +240,15 @@ tables:
         unit: births per 1,000 people
         description_short: |-
           Number of births recorded annually, divided by population in that year. It is based on the civil calendar year, spanning from January 1 to December 31. {definitions.global.dimensions.description_short}
+        description_key:
+          - |-
+            We also have a [long-run indicator](https://ourworldindata.org/grapher/long-run-birth-rate) for birth rate, spanning to earlier years.
+        display:
+          numDecimalPlaces: 1
         presentation:
           title_public: |-
-            Birth rate, {definitions.global.dimensions.title}
+            Birth rate
+          title_variant: "{definitions.global.dimensions.title}"
           grapher_config:
             subtitle: The number of live births occurring during the year, per 1,000 people. {definitions.global.projections}
 
