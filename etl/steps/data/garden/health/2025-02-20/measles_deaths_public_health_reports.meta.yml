@@ -11,10 +11,10 @@ dataset:
   update_period_days: 365
 
 tables:
-  measles_deaths_historical:
+  measles_deaths_public_health_reports:
     variables:
       deaths:
-        title: Number of measles deathsq
+        title: Number of measles deaths
         unit: deaths
         description_short: Reported number of measles deaths in the United States.
         display:

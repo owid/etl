@@ -12,10 +12,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("measles_deaths_historical")
+    ds_meadow = paths.load_dataset("measles_deaths_census_bureau")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("measles_deaths_historical")
+    tb = ds_meadow.read("measles_deaths_census_bureau")
 
     #
     # Process data.
