@@ -104,15 +104,15 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"health/{SNAPSHOT_VERSION}/measles_deaths_historical.csv")
     df = pd.concat(
         [
-            pd.DataFrame(DATA_1919),
-            pd.DataFrame(DATA_1921),
-            pd.DataFrame(DATA_1924),
-            pd.DataFrame(DATA_1925),
-            pd.DataFrame(DATA_1937),
-            pd.DataFrame(DATA_1938),
-            pd.DataFrame(DATA_1939),
-            pd.DataFrame(DATA_1940),
-            pd.DataFrame(DATA_1949),
+            DATA_1919,
+            DATA_1921,
+            DATA_1924,
+            DATA_1925,
+            DATA_1937,
+            DATA_1938,
+            DATA_1939,
+            DATA_1940,
+            DATA_1949,
         ]
     )
     # Download data from source, add file to DVC and upload to S3.
