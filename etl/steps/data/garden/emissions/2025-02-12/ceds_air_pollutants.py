@@ -545,9 +545,18 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # TODO: I have found a few data issues:
-    # * It seems that CH4 and N20 have only non-zero data from 1970 onwards, and all data is exactly zero right before this year. These are probably spurious zeros. So, assert that prior to 1970 all data for these two pollutants is zero, and remove those points.
     # * BC waste becomes flat from 2014 onwards.
     # * Note that, NMVOC oil tanker loading is informed from 1960, and exactly zero before that. This create an abrupt jump in international shipping (but maybe small in the true global total of NMVOC).
+
+    ####################################################################################################################
+    # We have detected some potential data issues.
+    # * CH4 and N20 emissions are exactly zero before 1970, and non-zero data from exactly 1970 onwards, creating an abrupt jump on that year.
+    # I suppose the zeros prior to 1970 are spurious, so they will be removed.
+    error = "Expected CH4 and N2O emissions to be exactly zero before 1970, and nonzero from 1970 on. Data has changed."
+    assert tb[(tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] < 1970)]["emissions"].sum() == 0, error
+    assert tb[(tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] >= 1970)]["emissions"].sum() > 0, error
+    tb = tb.loc[~((tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] < 1970)), :].reset_index(drop=True)
+    ####################################################################################################################
 
     # Create an "All sectors" aggregate.
     tb = pr.concat(
