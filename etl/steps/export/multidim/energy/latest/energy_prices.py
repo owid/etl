@@ -81,6 +81,13 @@ def run(dest_dir: str) -> None:
                     subtitle = "Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). This data is adjusted for inflation and differences in living costs between countries."
                     title_variant = "PPS"
                     footnote = "PPS have been adjusted for inflation, expressed in 2015 prices, using the Harmonised Index of Consumer Prices."
+
+                presentation = {
+                    "titlePublic": title,
+                }
+                if title_variant:
+                    presentation["titleVariant"] = title_variant
+
                 config["views"].append(
                     {
                         "dimensions": {
@@ -104,7 +111,7 @@ def run(dest_dir: str) -> None:
                         "metadata": {
                             "descriptionShort": subtitle,
                             "descriptionKey": description_keys,
-                            "presentation": {"titlePublic": title, "titleVariant": title_variant},
+                            "presentation": presentation,
                         },
                     },
                 )

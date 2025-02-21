@@ -195,8 +195,6 @@ tables:
           { additional_info }
 ```
 
-There are also special variables like `{ TODAY }` that can be used for automatically updated datasets.
-
 ## Using Jinja Templates for Advanced Cases
 
 Even more complex metadata can be generated with [Jinja templates](https://jinja.palletsprojects.com/en/3.1.x/). This is especially useful for datasets in a long format and multiple dimensions, because Jinja lets you dynamically generate text (titles, descriptions, ...) based on the dimension names.
