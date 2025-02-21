@@ -113,6 +113,9 @@ def run(dest_dir: str) -> None:
         tb=tb, indicator_match=INDICATORS_FOR_ANALYSIS, tb_pip=tb_pip, tb_wid=tb_wid, tb_lis=tb_lis
     )
 
+    # Create analysis and grapher tables
+    tables = create_analysis_and_grapher_tables(tb=tb)
+
     # NOTE: For now I am keeping the population and regions addition commented out, because I might use them in the future
 
     # # Add regions
@@ -121,29 +124,12 @@ def run(dest_dir: str) -> None:
     # # Add population
     # tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, year_col="ref_year")
 
-    # Format the table
-    tb = tb.format(
-        keys=[
-            "country",
-            "year",
-            "ref_year",
-            "year_1",
-            "year_2",
-            "excluded_years_1",
-            "excluded_years_2",
-            "maximum_distance_1",
-            "maximum_distance_2",
-            "only_all_series",
-        ],
-        short_name="inequality_comparison",
-    )
-
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
+        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -332,16 +318,24 @@ def match_ref_years(
 
     # Reshape from wide to long format
     tb_match = pd.wide_to_long(
-        tb_match, ["value", "year"], i=["country", "series_code"], j="ref_year", sep="_"
+        tb_match,
+        ["value", "year", "pipreportinglevel", "pipwelfare"],
+        i=["country", "series_code"],
+        j="ref_year",
+        sep="_",
     ).reset_index(drop=False)
+
+    print(tb_match)
 
     # Pivot from long to wide format, creating a column for each series_code
     tb_match = tb_match.pivot(
-        index=["country", "year", "ref_year"],
+        index=["country", "year", "ref_year", "pipreportinglevel", "pipwelfare"],
         columns="series_code",
         values="value",
         join_column_levels_with="_",
     ).reset_index(drop=True)
+
+    print(tb_match)
 
     # Add dimensional identifiers for match
     tb_match["year_1"] = reference_years_list[0]
@@ -362,6 +356,27 @@ def match_ref_years(
     # Replace only_all_series with a more descriptive name
     tb_match["only_all_series"] = tb_match["only_all_series"].replace({True: "Only countries in all sources"})
     tb_match["only_all_series"] = tb_match["only_all_series"].replace({False: "All data points"})
+
+    # Define new columns
+    tb_match["reference_years"] = tb_match["year_1"].astype(str) + "-" + tb_match["year_2"].astype(str)
+    tb_match["excluded_years"] = (
+        tb_match["excluded_years_1"].astype(str) + " | " + tb_match["excluded_years_2"].astype(str)
+    )
+    tb_match["maximum_distances"] = (
+        tb_match["maximum_distance_1"].astype(str) + " | " + tb_match["maximum_distance_2"].astype(str)
+    )
+
+    # Drop columns
+    tb_match = tb_match.drop(
+        columns=[
+            "year_1",
+            "year_2",
+            "excluded_years_1",
+            "excluded_years_2",
+            "maximum_distance_1",
+            "maximum_distance_2",
+        ]
+    )
 
     return tb_match
 
@@ -459,3 +474,60 @@ def add_metadata_from_original_tables(
             tb[col] = tb[col].copy_metadata(tb_lis[match])
 
     return tb
+
+
+def create_analysis_and_grapher_tables(tb: Table) -> List[Table]:
+    """
+    Create two different tables with the same data: one with data for analysis and another with more restricted data for Grapher
+    """
+
+    tb = tb.copy()
+    tb_analysis = tb.copy()
+
+    # Drop columns
+    tb = tb.drop(
+        columns=[
+            "excluded_years",
+            "maximum_distances",
+            "pipwelfare",
+            "pipreportinglevel",
+        ]
+    )
+
+    # Keep the data in unique rows using this index [ "country", "year", "ref_year", "reference_years", "only_all_series"]
+    # I need to do this because the pipwelfare and pipreportinglevel dublicate the data
+    tb = tb.groupby(["country", "year", "ref_year", "reference_years", "only_all_series"], as_index=False).first()
+
+    tb.to_csv("inequality_comparison.csv")
+
+    # Format the table
+    tb = tb.format(
+        keys=[
+            "country",
+            "year",
+            "ref_year",
+            "reference_years",
+            "only_all_series",
+        ],
+        short_name="inequality_comparison",
+    )
+
+    tb_analysis = tb_analysis.format(
+        keys=[
+            "country",
+            "year",
+            "ref_year",
+            "reference_years",
+            "excluded_years",
+            "maximum_distances",
+            "only_all_series",
+            "pipwelfare",
+            "pipreportinglevel",
+        ],
+        short_name="inequality_comparison_analysis",
+    )
+
+    # define a list of tables to return
+    garden_tables = [tb, tb_analysis]
+
+    return garden_tables
