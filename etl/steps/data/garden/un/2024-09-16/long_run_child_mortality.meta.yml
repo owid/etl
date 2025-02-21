@@ -16,6 +16,7 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+        description_key: []
       share_dying_first_five_years:
         title: Share dying in first five years
         unit: "%"
