@@ -29,19 +29,19 @@ DISPLAY_STATE_OPTIONS = {
     gm.ChartStatus.APPROVED.value: {
         "label": "Approve",
         "color": "green",
-        # "icon": ":material/done_outline:",
+        "material_icon": ":material/done_outline:",
         "icon": "✅",
     },
     gm.ChartStatus.REJECTED.value: {
         "label": "Reject",
         "color": "red",
-        # "icon": ":material/delete:",
+        "material_icon": ":material/delete:",
         "icon": "❌",
     },
     gm.ChartStatus.PENDING.value: {
         "label": "Pending",
         "color": "gray",
-        # "icon": ":material/schedule:",
+        "material_icon": ":material/schedule:",
         "icon": "⏳",
     },
 }
@@ -135,7 +135,7 @@ class ChartDiffShow:
         if session is None:
             session = self.source_session
         with st.spinner():
-            status = st.session_state[f"radio-{self.diff.chart_id}"]
+            status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
             self.diff.set_status(session=session, status=status)
 
             # Notify user
@@ -153,7 +153,7 @@ class ChartDiffShow:
         if session is None:
             session = self.source_session
         with st.spinner():
-            status = st.session_state[f"radio-{self.diff.chart_id}"]
+            status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
             self.diff.set_status(session=session, status=status)
 
             # Notify user
@@ -177,10 +177,10 @@ class ChartDiffShow:
         """Header for the production chart."""
         # Everything is fine
         if not self.diff.in_conflict:
-            text_production = f"Production ┃ _{prettify_date(self.diff.target_chart)}_"
+            text_production = f"**Production** :material/event: {prettify_date(self.diff.target_chart)}"
         # Conflict with live
         else:
-            text_production = f":red[Production ┃ _{prettify_date(self.diff.target_chart)}_] ⚠️"
+            text_production = f":red[**Production** :material/event: {prettify_date(self.diff.target_chart)}] ⚠️"
 
         return text_production
 
@@ -189,10 +189,10 @@ class ChartDiffShow:
         """Header for staging chart."""
         # Everything is fine
         if not self.diff.in_conflict:
-            text_staging = f":green[New version ┃ _{prettify_date(self.diff.source_chart)}_]"
+            text_staging = f":green[**New version** :material/today: {prettify_date(self.diff.source_chart)}]"
         # Conflict with live
         else:
-            text_staging = f"New version ┃ _{prettify_date(self.diff.source_chart)}_"
+            text_staging = f"**New version** :material/today: {prettify_date(self.diff.source_chart)}"
 
         return text_staging
 
@@ -248,7 +248,7 @@ class ChartDiffShow:
 
     def _show_chart_diff_controls(self):
         # Three columns: status, refresh, link
-        col1, col2, col3 = st.columns([2, 1, 3])
+        col1, col2, col3 = st.columns([2, 1, 3], vertical_alignment="bottom")
 
         # Status of chart diff: approve, pending, reject
         with col1:
@@ -259,7 +259,7 @@ class ChartDiffShow:
             ):
                 st.radio(
                     label="Did you review the chart?",
-                    key=f"radio-{self.diff.chart_id}",
+                    key=f"status-ctrl-{self.diff.chart_id}",
                     options=self.status_names_binary,
                     horizontal=True,
                     format_func=lambda x: f":{DISPLAY_STATE_OPTIONS_BINARY[x]['color']}-background[{DISPLAY_STATE_OPTIONS_BINARY[x]['label']}]",
@@ -271,39 +271,58 @@ class ChartDiffShow:
                 if self.diff.in_conflict:
                     help_text = "Resolve chart config conflicts before proceeding!"
                 else:
-                    help_text = "Approve or reject the chart. If you are not sure, please leave it as pending."
-                st.radio(
+                    help_text = (
+                        "Charts need to be reviewed before merging your work, otherwise CI/CD will fail in your PR.\n\n"
+                        "- **Approve chart**: After merging your PR, the chart in production will be updated with your edits.\n"
+                        "- **Reject chart**: Your changes will be discarded and the chart in production will remain as is.\n"
+                        "- **Pending**: You can come back later to approve or reject the chart.\n\n"
+                        "Note that CI/CD will fail if any of the chart diffs is pending."
+                    )
+
+                def _format_status(x):
+                    return f"{DISPLAY_STATE_OPTIONS[x]['icon']} {DISPLAY_STATE_OPTIONS[x]['label']}"
+
+                st.segmented_control(
                     label="Approve or reject chart",
-                    key=f"radio-{self.diff.chart_id}",
+                    key=f"status-ctrl-{self.diff.chart_id}",
                     options=self.status_names,
-                    horizontal=True,
-                    format_func=lambda x: f":{DISPLAY_STATE_OPTIONS[x]['color']}-background[{DISPLAY_STATE_OPTIONS[x]['label']}]",
-                    index=self.status_names.index(self.diff.approval_status),  # type: ignore
+                    format_func=lambda x: _format_status(x),
+                    default=self.diff.approval_status,  # type: ignore
                     on_change=self._push_status,
                     disabled=self.diff.in_conflict,
                     help=help_text,
+                    # label_visibility="collapsed",
                 )
 
         # Refresh chart
         with col2:
             st.button(
-                label="🔄 Refresh",
+                label=":material/refresh: Refresh charts",
                 key=f"refresh-btn-{self.diff.chart_id}",
                 help="Get the latest version of the chart from the staging server.",
                 on_click=self._refresh_chart_diff,
+                type="secondary",
             )
-        # Copy link
-        if self.show_link:
-            with col3:
+
+        with col3:
+            # Copy link
+            if self.show_link:
+                # with col3:
                 query_params = f"chart_id={self.diff.chart_id}"
                 # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
+                kwargs = {}
                 if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
-                    st.caption(
-                        f"**{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}**",
-                        help=f"Shown is the link to the remote chart-diff.\n\n Alternatively, local link: {OWID_ENV.wizard_url}?{query_params}",
-                    )
+                    url = f"{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}"
+                    kwargs = {
+                        "body": url,
+                        "help": f"Shown is the link to the remote chart-diff.\n\n Alternatively, local link: {OWID_ENV.wizard_url}?{query_params}",
+                    }
                 else:
-                    st.caption(f"**{OWID_ENV.wizard_url}/chart-diff?{query_params}**")
+                    url = f"{OWID_ENV.wizard_url}/chart-diff?{query_params}"
+                    kwargs = {
+                        "body": url,
+                    }
+                st.caption(**kwargs)
 
     def _show_metadata_diff(self) -> None:
         """Show metadata diff (if applicable).
@@ -404,20 +423,32 @@ class ChartDiffShow:
     def _show_chart_comparison(self) -> None:
         """Show charts (horizontally or vertically)."""
 
-        def _show_charts_comparison_v():
-            """Show charts on top of each other."""
-            # Chart production
+        def _show_chart_old():
             if self.diff.in_conflict:
                 help_text = CONFLICT_HELP_MESSAGE
                 st.markdown(self._header_production_chart, help=help_text)
             else:
                 st.markdown(self._header_production_chart)
+            # st.selectbox(
+            #     "Chart revision",
+            #     options=[self._header_production_chart, "Staging"],
+            #     key=f"prod-review-{self.diff.chart_id}",
+            #     label_visibility="collapsed",
+            # )
             assert self.diff.target_chart is not None
             grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
 
-            # Chart staging
+        def _show_chart_new():
             st.markdown(self._header_staging_chart)
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
+
+        def _show_charts_comparison_v():
+            """Show charts on top of each other."""
+            # Chart production
+            _show_chart_old()
+
+            # Chart staging
+            _show_chart_new()
 
         def _show_charts_comparison_h():
             """Show charts next to each other."""
@@ -425,16 +456,9 @@ class ChartDiffShow:
             col1, col2 = st.columns(2)
 
             with col1:
-                if self.diff.in_conflict:
-                    help_text = CONFLICT_HELP_MESSAGE
-                    st.markdown(self._header_production_chart, help=help_text)
-                else:
-                    st.markdown(self._header_production_chart)
-                assert self.diff.target_chart is not None
-                grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
+                _show_chart_old()
             with col2:
-                st.markdown(self._header_staging_chart)
-                grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
+                _show_chart_new()
 
         # Only one chart: new chart
         if self.diff.target_chart is None:
