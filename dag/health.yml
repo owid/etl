@@ -976,10 +976,34 @@ steps:
   data://grapher/health/2025-02-13/vaccine_confidence:
     - data://garden/health/2025-02-13/vaccine_confidence
 
+  # CDC Measles Cases 1985-present - autoupdate
+  data://meadow/cdc/latest/measles_cases:
+    - snapshot://cdc/latest/measles_cases.json
+  data://garden/cdc/latest/measles_cases:
+    - data://meadow/cdc/latest/measles_cases
+
   #
-  # CDC Measles Cases 1985-present
+  # Historical measles data (1919-1984)
   #
-  data://meadow/cdc/2025-02-18/measles_cases:
-    - snapshot://cdc/2025-02-18/measles_cases.json
-  data://garden/cdc/2025-02-18/measles_cases:
-    - data://meadow/cdc/2025-02-18/measles_cases
+  data://meadow/health/2025-02-19/measles_historical:
+    - snapshot://health/2025-02-19/measles_historical.csv
+  data://garden/health/2025-02-19/measles_historical:
+    - data://meadow/health/2025-02-19/measles_historical
+
+  # Long-run measles data (auto-updated)
+  data://garden/health/latest/measles_long_run:
+    - data://garden/cdc/latest/measles_cases
+    - data://garden/health/2025-02-19/measles_historical
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/latest/measles_long_run:
+    - data://garden/health/latest/measles_long_run
+
+  #
+  # Cancer survival rates (GCO)
+  #
+  data://meadow/cancer/2025-02-17/gco_cancer_survival:
+    - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
+  data://garden/cancer/2025-02-17/gco_cancer_survival:
+    - data://meadow/cancer/2025-02-17/gco_cancer_survival
+  data://grapher/cancer/2025-02-17/gco_cancer_survival:
+    - data://garden/cancer/2025-02-17/gco_cancer_survival
