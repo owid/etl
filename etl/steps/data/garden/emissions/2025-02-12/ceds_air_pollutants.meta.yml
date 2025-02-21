@@ -43,6 +43,9 @@ tables:
         presentation:
           title_public: |-
             {definitions.pollutant_name} emissions from << sector.lower() >>
+          grapher_config:
+            note: |-
+              <% if sector == "International shipping" and pollutant == "NMVOC" %>The abrupt increase in NMVOC emissions in 1960 reflects the introduction of oil tanker loading emissions data.<% endif %>
       emissions_per_capita:
         title: |-
           Per capita {definitions.pollutant_name_lower} emissions from << sector.lower() >>

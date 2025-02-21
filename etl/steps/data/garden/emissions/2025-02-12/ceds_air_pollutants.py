@@ -534,6 +534,31 @@ def run(dest_dir: str) -> None:
     # Combine detailed and bunkers tables (and remove the "fuel" dimension, which for now we don't need).
     tb = combine_detailed_and_bunkers_tables(tb_detailed=tb_detailed, tb_bunkers=tb_bunkers)
 
+    ####################################################################################################################
+    # Fix data issues.
+    # * NMVOC '1A3di_Oil_Tanker_Loading' emissions are exactly zero before 1960, and non-zero from exactly 1960 onwards.
+    #   On the other hand, '1A3di_International-shipping' is non-zero since early 1800s.
+    #   When combining both into a single "International shipping", we see a big jump in 1960.
+    #   So, instead of removing all data prior to 1960, we will add a footnote explaining the abrupt change.
+    #   For now, assert the jump, and in the metadata, add the footnote.
+    assert (
+        tb[(tb["em"] == "NMVOC") & (tb["sector"] == SUBSECTOR_OIL_TANKER_LOADING)][
+            [column for column in tb.columns if column.startswith("x") and int(column.replace("x", "")) < 1960]
+        ]
+        .sum()
+        .sum()
+        == 0
+    )
+    assert (
+        tb[(tb["em"] == "NMVOC") & (tb["sector"] == SUBSECTOR_OIL_TANKER_LOADING)][
+            [column for column in tb.columns if column.startswith("x") and int(column.replace("x", "")) == 1960]
+        ]
+        .sum()
+        .sum()
+        > 0
+    )
+    ####################################################################################################################
+
     # Simplify subsectors into broader categories.
     tb = remap_table_categories(tb=tb)
 
@@ -544,18 +569,15 @@ def run(dest_dir: str) -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    # TODO: I have found a few data issues:
-    # * BC waste becomes flat from 2014 onwards.
-    # * Note that, NMVOC oil tanker loading is informed from 1960, and exactly zero before that. This create an abrupt jump in international shipping (but maybe small in the true global total of NMVOC).
-
     ####################################################################################################################
-    # We have detected some potential data issues.
+    # Fix data issues.
     # * CH4 and N20 emissions are exactly zero before 1970, and non-zero data from exactly 1970 onwards, creating an abrupt jump on that year.
-    # I suppose the zeros prior to 1970 are spurious, so they will be removed.
+    #   I suppose the zeros prior to 1970 are spurious, so they will be removed.
     error = "Expected CH4 and N2O emissions to be exactly zero before 1970, and nonzero from 1970 on. Data has changed."
     assert tb[(tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] < 1970)]["emissions"].sum() == 0, error
     assert tb[(tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] >= 1970)]["emissions"].sum() > 0, error
     tb = tb.loc[~((tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] < 1970)), :].reset_index(drop=True)
+    # TODO: * BC waste becomes flat from 2014 onwards.
     ####################################################################################################################
 
     # Create an "All sectors" aggregate.
