@@ -1,6 +1,11 @@
+dataset:
+  title: Long-run reported cases of measles in the United States
 tables:
   measles_long_run:
     variables:
       cases:
         title: Measles cases
         unit: cases
+      case_rate:
+        title: Measles case rate
+        unit: cases per 100,000 people
