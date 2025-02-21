@@ -14,14 +14,16 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     # Historical data from early 20th C to 1949
-    ds_meadow_hist = paths.load_dataset("measles_deaths_historical")
+    ds_meadow_phr = paths.load_dataset("measles_deaths_public_health_reports")
+    ds_meadow_cb = paths.load_dataset("measles_deaths_census_bureau")
     # Data from WHO mortality database for 1950-present
     ds_who_mort = paths.load_dataset("mortality_database_vaccine_preventable")
     # Load population data to calculate death rates.
     ds_population = paths.load_dataset("population")
     tb_pop = ds_population.read("population")
     # Read table from meadow dataset.
-    tb_hist = ds_meadow_hist.read("measles_deaths_historical")
+    tb_phr = ds_meadow_phr.read("measles_deaths_historical")
+    tb_cb = ds_meadow_cb.read("measles_deaths_census_bureau")
     tb_pres = ds_who_mort.read("mortality_database_vaccine_preventable", reset_metadata="keep_origins")
     tb_pres = tb_pres[
         (tb_pres["cause"] == "Measles")
@@ -32,7 +34,7 @@ def run(dest_dir: str) -> None:
     tb_pres = tb_pres[["country", "year", "number"]]
     tb_pres = tb_pres.rename(columns={"number": "deaths"})
     # Combine the historical and present data.
-    tb = pr.concat([tb_hist, tb_pres], short_name="measles_deaths_long_run", ignore_index=True)
+    tb = pr.concat([tb_phr, tb_cb, tb_pres], short_name="measles_deaths_long_run", ignore_index=True)
 
     tb = pr.merge(
         tb,

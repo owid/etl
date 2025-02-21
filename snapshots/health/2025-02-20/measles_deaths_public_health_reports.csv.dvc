@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical Measles Deaths - United States
+    title: Historical measless deaths in the United States - Public Health Reports
     description: |-
       Data on historical measles deaths in the United States, compiled from a selection of sources.
 
@@ -25,12 +25,10 @@ meta:
 
       * 1940: Public Health Reports, Vol. 57, No. 7 - [Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases](https://www.jstor.org/stable/4584013)
 
-      * 1949: Statistical Abstract of the United States: 1952, United States Census Bureau - [Part 2 - Vital Statistics and Health and Medical Care](https://www.census.gov/library/publications/1952/compendia/statab/73ed.html)
-
-    date_published: "1952-09-01"
+    date_published: "1942-02-13"
 
     # Citation
-    producer: Public Health Reports; US Census Bureau
+    producer: Public Health Reports
     citation_full: |-
       Public Health Reports, Vol. 36, No. 8. The Notifiable Diseases: Prevalence during 1919 in States.
 
@@ -48,16 +46,14 @@ meta:
 
       Public Health Reports, Vol. 57, No. 7 - Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases.
 
-      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States 1944-45.
-
     # Files
-    url_main: https://www.jstor.org/stable/4575902; https://www.jstor.org/stable/4576538; https://www.jstor.org/stable/4577735; https://www.jstor.org/stable/4578131; https://stacks.cdc.gov/view/cdc/69651/cdc_69651_DS1.pdf; https://www.jstor.org/stable/4583204; https://www.jstor.org/stable/4583620; https://www.jstor.org/stable/4584013; https://www.census.gov/library/publications/1952/compendia/statab/73ed.html
+    url_main: https://www.jstor.org/stable/4584013
     date_accessed: 2025-02-20
 
     # License
     license:
       name: Public domain
 outs:
-  - md5: 98ba368f16e82a1b20bdc56eb33bf494
-    size: 640
-    path: measles_deaths_historical.csv
+  - md5: cd3cddecad699645b8382175c85fa1c0
+    size: 534
+    path: measles_deaths_public_health_reports.csv
