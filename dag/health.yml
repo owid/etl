@@ -1007,3 +1007,25 @@ steps:
     - data://meadow/cancer/2025-02-17/gco_cancer_survival
   data://grapher/cancer/2025-02-17/gco_cancer_survival:
     - data://garden/cancer/2025-02-17/gco_cancer_survival
+
+  # Measles deaths historical - Public health reports
+  #
+  data://meadow/health/2025-02-20/measles_deaths_public_health_reports:
+    - snapshot://health/2025-02-20/measles_deaths_public_health_reports.csv
+  data://garden/health/2025-02-20/measles_deaths_public_health_reports:
+    - data://meadow/health/2025-02-20/measles_deaths_public_health_reports
+
+  # Measles deaths historical - US Census Bureau
+  data://meadow/health/2025-02-20/measles_deaths_census_bureau:
+    - snapshot://health/2025-02-20/measles_deaths_census_bureau.csv
+  data://garden/health/2025-02-20/measles_deaths_census_bureau:
+    - data://meadow/health/2025-02-20/measles_deaths_census_bureau
+
+  # Measles deaths long run
+  data://garden/health/2025-02-20/measles_deaths_long_run:
+    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+    - data://garden/health/2025-02-20/measles_deaths_census_bureau
+    - data://garden/health/2025-02-20/measles_deaths_public_health_reports
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-02-20/measles_deaths_long_run:
+    - data://garden/health/2025-02-20/measles_deaths_long_run
