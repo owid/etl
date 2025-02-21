@@ -548,7 +548,7 @@ def _get_params(component, key):
             return params
 
 
-def st_cache_data(func=None, *, custom_text="Running...", show_spinner=False, **cache_kwargs):
+def st_cache_data(func=None, *, custom_text="Running...", show_spinner=False, show_time=False, **cache_kwargs):
     """
     A custom decorator that wraps `st.cache_data` and adds support for a `custom_text` argument.
 
@@ -565,7 +565,7 @@ def st_cache_data(func=None, *, custom_text="Running...", show_spinner=False, **
 
         @wraps(f)
         def wrapper(*args, **kwargs):
-            with st.spinner(custom_text):
+            with st.spinner(custom_text, show_time=show_time):
                 return cached_func(*args, **kwargs)
 
         return wrapper
