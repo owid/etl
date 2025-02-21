@@ -67,6 +67,9 @@ tables:
         description_key:
           - Assumes current age-specific fertility rates remain constant throughout a woman's lifetime.
           - Does not account for potential changes in social, economic, or health conditions that could affect fertility rates.
+        presentation:
+          title_public: "Fertility rate: births per woman"
+          attribution: HFD
 
       tfr40:
         title: |-
@@ -207,6 +210,9 @@ tables:
           - This indicator serves as a foundational statistic for calculating other fertility measures.
         display:
           numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            subtitle: The total number of live births recorded in a given year. A live birth refers to the delivery of a child displaying any sign of life, and the total count of live births excludes any stillbirths.
 
   cohort:
     variables:
