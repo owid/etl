@@ -60,6 +60,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb_meadow = ds_meadow.read("wdi", safe_types=False)
+    tb_metadata = ds_meadow.read("wdi_metadata", safe_types=False)
 
     tb = geo.harmonize_countries(
         df=tb_meadow,
@@ -74,7 +75,7 @@ def run(dest_dir: str) -> None:
     tb_garden = tb
 
     log.info("wdi.add_variable_metadata")
-    tb_garden = add_variable_metadata(tb_garden)
+    tb_garden = add_variable_metadata(tb_garden, tb_metadata)
 
     tb_omm = mk_omms(tb_garden)
     tb_garden = tb_garden.join(tb_omm, how="outer")
@@ -491,13 +492,8 @@ def _fetch_metadata_for_indicator(indicator_code: str) -> Dict[str, str]:
     }
 
 
-def load_variable_metadata(indicator_codes: list[str]) -> pd.DataFrame:
-    snap = paths.load_snapshot()
-    zf = zipfile.ZipFile(snap.path)
-    df_vars = pd.read_csv(zf.open("WDISeries.csv"))
-
+def load_variable_metadata(df_vars: Table, indicator_codes: list[str]) -> pd.DataFrame:
     df_vars.dropna(how="all", axis=1, inplace=True)
-    df_vars.columns = df_vars.columns.map(underscore)
     df_vars.rename(columns={"series_code": "indicator_code"}, inplace=True)
 
     # Fetch missing indicator metadata
@@ -510,6 +506,8 @@ def load_variable_metadata(indicator_codes: list[str]) -> pd.DataFrame:
     indicators_without_meta |= set(df_vars.loc[df_vars.indicator_name.isnull(), "indicator_code"])
 
     # Fetch metadata for missing indicators
+    # NOTE: this should be ideally in the snapshot, but there are only a few indicators like this so it's
+    #   not worth it
     log.info("wdi.missing_metadata", n_indicators=len(indicators_without_meta))
     df_missing = pd.DataFrame([_fetch_metadata_for_indicator(code) for code in indicators_without_meta])
 
@@ -539,11 +537,11 @@ def load_variable_metadata(indicator_codes: list[str]) -> pd.DataFrame:
     return df_vars.set_index("indicator_code")
 
 
-def add_variable_metadata(table: Table) -> Table:
-    var_codes = table.columns.tolist()
-    indicator_codes = [table[col].m.title for col in table.columns]
+def add_variable_metadata(tb: Table, tb_metadata: Table) -> Table:
+    var_codes = tb.columns.tolist()
+    indicator_codes = [tb[col].m.title for col in tb.columns]
 
-    df_vars = load_variable_metadata(indicator_codes)
+    df_vars = load_variable_metadata(tb_metadata, indicator_codes)
 
     missing_var_codes = set(var_codes) - set(df_vars.index)
     if missing_var_codes:
@@ -551,7 +549,7 @@ def add_variable_metadata(table: Table) -> Table:
 
     clean_source_mapping = load_clean_source_mapping()
 
-    table.update_metadata_from_yaml(paths.metadata_path, "wdi", extra_variables="ignore")
+    tb.update_metadata_from_yaml(paths.metadata_path, "wdi", extra_variables="ignore")
 
     # construct metadata for each variable
     for var_code in var_codes:
@@ -565,19 +563,19 @@ def add_variable_metadata(table: Table) -> Table:
         assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json. Run update_metadata.ipynb or check non-breaking spaces.'
 
         # create an origin with WDI source name as producer
-        table[var_code].m.origins[0].producer = clean_source["name"]
+        tb[var_code].m.origins[0].producer = clean_source["name"]
 
-        table[var_code].m.description_from_producer = create_description(var)
+        tb[var_code].m.description_from_producer = create_description(var)
 
-    if not all([len(table[var_code].origins) == 1 for var_code in var_codes]):
-        missing = [var_code for var_code in var_codes if len(table[var_code].origins) != 1]
+    if not all([len(tb[var_code].origins) == 1 for var_code in var_codes]):
+        missing = [var_code for var_code in var_codes if len(tb[var_code].origins) != 1]
         raise RuntimeError(
             "Expected each variable code to have one origin, but the following variables "
             f"do not: {missing}. Are the source names for these variables "
             "missing from `wdi.sources.json`?"
         )
 
-    return table
+    return tb
 
 
 def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:

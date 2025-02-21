@@ -84,11 +84,14 @@ def run(dest_dir: str) -> None:
         # Add original code as titles
         tb[col].m.title = indicator_code_map[col]
 
+    # Load metadata from snapshot.
+    tb_meta = Table(pd.read_csv(zf.open("WDISeries.csv")), short_name="wdi_metadata", underscore=True)
+
     #
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_meadow = create_dataset(dest_dir, tables=[tb, tb_meta], default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
