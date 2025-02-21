@@ -8,4 +8,4 @@ tables:
         display:
           entityAnnotationsMap: "United States: Data for {year} is incomplete"
         presentation:
-          attribution: Public Health Reports (1919-1925); US Census Bureau (1945); Centers for Disease Control and Prevention (1994; 2025)
+          attribution: Public Health Reports (1919-1925); US Census Bureau (1945); Centers for Disease Control and Prevention (1994; {year})
