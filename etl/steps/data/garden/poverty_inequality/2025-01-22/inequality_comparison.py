@@ -325,8 +325,6 @@ def match_ref_years(
         sep="_",
     ).reset_index(drop=False)
 
-    print(tb_match)
-
     # Pivot from long to wide format, creating a column for each series_code
     tb_match = tb_match.pivot(
         index=["country", "year", "ref_year", "pipreportinglevel", "pipwelfare"],
@@ -334,8 +332,6 @@ def match_ref_years(
         values="value",
         join_column_levels_with="_",
     ).reset_index(drop=True)
-
-    print(tb_match)
 
     # Add dimensional identifiers for match
     tb_match["year_1"] = reference_years_list[0]
