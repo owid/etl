@@ -13,7 +13,7 @@ echo '--- Update measles'
 cd /home/owid/etl
 
 uv run python snapshots/cdc/latest/measles_cases.py
-
+uv etlr data://grapher/health/latest/measles_long_run --force
 # commit to master will trigger ETL which is gonna run the step
 echo '--- Commit and push changes'
 
