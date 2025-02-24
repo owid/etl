@@ -602,11 +602,13 @@ def run(dest_dir: str) -> None:
 
     ####################################################################################################################
     # Fix data issues.
-    # * NMVOC '1A3di_Oil_Tanker_Loading' emissions are exactly zero before 1960, and non-zero from exactly 1960 onwards.
+    # * All tanker oil loading data is exactly zero for CH4, CO, CO2, N2O, NH3, NOx, and SO2.
+    #   For BC and OC, it is nonzero before and after 1960.
+    #   However, NMVOC, it is exactly zero before 1960 and nonzero (with an abrupt jump) from 1960 onwards.
     #   On the other hand, '1A3di_International-shipping' is non-zero since early 1800s.
     #   When combining both into a single "International shipping", we see a big jump in 1960.
-    #   So, instead of removing all data prior to 1960, we will add a footnote explaining the abrupt change.
-    #   For now, assert the jump, and in the metadata, add the footnote.
+    # NOTE: There is a similar issue related to international shipping, that will be addressed later.
+    error = "Expected abrupt jump in NMVOC emissions from tanker oil loading for all countries in 1960. Data has changed, so consider changing or removing the footnote."
     assert (
         tb[(tb["em"] == "NMVOC") & (tb["sector"] == SUBSECTOR_OIL_TANKER_LOADING)][
             [column for column in tb.columns if column.startswith("x") and int(column.replace("x", "")) < 1960]
@@ -614,7 +616,7 @@ def run(dest_dir: str) -> None:
         .sum()
         .sum()
         == 0
-    )
+    ), error
     assert (
         tb[(tb["em"] == "NMVOC") & (tb["sector"] == SUBSECTOR_OIL_TANKER_LOADING)][
             [column for column in tb.columns if column.startswith("x") and int(column.replace("x", "")) == 1960]
@@ -622,7 +624,7 @@ def run(dest_dir: str) -> None:
         .sum()
         .sum()
         > 0
-    )
+    ), error
     ####################################################################################################################
 
     # Simplify subsectors into broader categories.
@@ -652,6 +654,36 @@ def run(dest_dir: str) -> None:
         .agg({"emissions": "nunique"})["emissions"]
         == 1
     ).all(), error
+    # * International shipping data for all pollutants (except CH4 and N2O) has an abrupt jump from zero for individual countries in 1960.
+    #   Remove those spurious zeros for International shipping, such that the sum of all emissions prior to 1960 (for a given country-pollutant) are exactly zero.
+    # NOTE: For NMVOC, there is an additional jump in 1960 global data due to the inclusion of tanker oil loading data on that specific year; in that case (where there is an abrupt jump in global data) I will add a footnote.
+    error = "Expected abrupt jump in emissions from international shipping for individual countries (e.g. UK) in 1960. Data has changed, so fix this part of the code."
+    for pollutant in ["CO", "NH₃", "OC", "SO₂", "NOₓ"]:
+        assert (
+            tb[
+                (tb["country"] == "United Kingdom")
+                & (tb["pollutant"] == pollutant)
+                & (tb["sector"] == "International shipping")
+                & (tb["year"] < 1960)
+            ]["emissions"].sum()
+            == 0
+        ), error
+        assert (
+            tb[
+                (tb["country"] == "United Kingdom")
+                & (tb["pollutant"] == pollutant)
+                & (tb["sector"] == "International shipping")
+                & (tb["year"] == 1960)
+            ]["emissions"].sum()
+            > 0
+        ), error
+    _zero_pre_1960 = (
+        tb[(tb["sector"] == "International shipping") & (tb["year"] < 1960)]
+        .groupby(["country", "pollutant"], as_index=False, observed=True)["emissions"]
+        .transform("sum")
+        == 0
+    )
+    tb = tb.drop(_zero_pre_1960[_zero_pre_1960].index).reset_index(drop=True)
     ####################################################################################################################
 
     # Create an "All sectors" aggregate.
