@@ -116,7 +116,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Create analysis and grapher tables
-    tables = create_analysis_and_grapher_tables(tb=tb)
+    garden_tables = create_analysis_and_grapher_tables(tb=tb)
 
     # NOTE: For now I am keeping the population and regions addition commented out, because I might use them in the future
 
@@ -131,7 +131,7 @@ def run(dest_dir: str) -> None:
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
+        dest_dir, tables=garden_tables, check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
     )
 
     # Save changes in the new garden dataset.

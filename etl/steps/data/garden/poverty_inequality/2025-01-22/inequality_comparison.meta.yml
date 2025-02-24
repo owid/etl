@@ -12,7 +12,7 @@ definitions:
 
       Additionally, for the World Bank Poverty and Inequality Platform dataset, we rank multiple matchings following this order of preference:
         1. The same welfare concept (first income, then consumption).
-        2. The same reporting level (first national, then urban, then rural).
+        2. The same reporting level (first national, then urban, then rural, then different).
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
