@@ -1,7 +1,5 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from datetime import datetime
-
 from etl.helpers import PathFinder, create_dataset, last_date_accessed
 
 # Get paths and naming conventions for current step.
