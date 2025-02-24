@@ -75,8 +75,6 @@ def run(dest_dir: str) -> None:
         # Append extracted values.
         variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
         pollutant_dropdown.append(pollutant)
-        if sector == ALL_SECTORS_LABEL_OLD:
-            sector = ALL_SECTORS_LABEL_NEW
         sector_dropdown.append(sector)
         per_capita_checkbox.append(per_capita)
         map_tab.append(True)
@@ -91,38 +89,41 @@ def run(dest_dir: str) -> None:
     df_graphers["hasMapTab"] = map_tab
 
     # Create view for all pollutants.
-    # Omit CH4 and N20 in this view.
-    for per_capita in [False, True]:
-        _columns = [
-            f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"
-            for column in tb.columns
-            if column.endswith("all_sectors")
-            if (("per_capita" in column) == per_capita)
-            if "_ch4_" not in column
-            if "_n2o_" not in column
-        ]
-        df_graphers = pd.concat(
-            [
-                df_graphers,
-                pd.DataFrame(
-                    {
-                        "yVariableIds": [_columns],
-                        "title": "Per capita emissions of air pollutants from all sectors"
-                        if per_capita
-                        else "Emissions of air pollutants from all sectors",
-                        "subtitle": "Measured in kilograms and split by major pollutant."
-                        if per_capita
-                        else "Measured in tonnes and split by major pollutant.",
-                        "Pollutant Dropdown": ALL_POLLUTANTS_LABEL,
-                        "Sector Dropdown": ALL_SECTORS_LABEL_NEW,
-                        "Per capita Checkbox": per_capita,
-                        "hasMapTab": False,
-                        "selectedFacetStrategy": "metric",
-                        "facetYDomain": "independent",
-                    }
-                ),
+    # TODO: Generalize this to all sectors, but after display name has been deleted, otherwise all sectors will have the same title in the faceted view.
+    # for sector in sorted(set(df_graphers["Sector Dropdown"])):
+    for sector in [ALL_SECTORS_LABEL_OLD]:
+        sector_short_name = sector.lower().replace(" ", "_")
+        for per_capita in [False, True]:
+            _columns = [
+                f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"
+                for column in tb.columns
+                if column.endswith(sector_short_name)
+                if (("per_capita" in column) == per_capita)
+                # if "_ch4_" not in column
+                # if "_n2o_" not in column
             ]
-        )
+            df_graphers = pd.concat(
+                [
+                    df_graphers,
+                    pd.DataFrame(
+                        {
+                            "yVariableIds": [_columns],
+                            "title": f"Per capita emissions of air pollutants from {sector.lower()}"
+                            if per_capita
+                            else f"Emissions of air pollutants from {sector.lower()}",
+                            "subtitle": "Measured in kilograms and split by major pollutant."
+                            if per_capita
+                            else "Measured in tonnes and split by major pollutant.",
+                            "Pollutant Dropdown": ALL_POLLUTANTS_LABEL,
+                            "Sector Dropdown": sector,
+                            "Per capita Checkbox": per_capita,
+                            "hasMapTab": False,
+                            "selectedFacetStrategy": "metric",
+                            "facetYDomain": "independent",
+                        }
+                    ),
+                ]
+            )
 
     # Create breakdown by sector.
     for pollutant, pollutant_short_name in list(dict.fromkeys(zip(pollutant_dropdown, pollutant_short_names))):
@@ -169,6 +170,11 @@ def run(dest_dir: str) -> None:
                     ),
                 ]
             )
+
+    # Rename all sectors label in sector dropdown.
+    df_graphers["Sector Dropdown"] = df_graphers["Sector Dropdown"].replace(
+        ALL_SECTORS_LABEL_OLD, ALL_SECTORS_LABEL_NEW
+    )
 
     # Sanity check.
     error = "Duplicated rows in explorer."
