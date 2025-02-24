@@ -89,6 +89,7 @@ def run(dest_dir: str) -> None:
             series=INDICATORS_FOR_ANALYSIS.keys(),
             reference_years=reference_years,
             only_all_series=False,
+            exclude_different_welfare=True,
         )
 
         # Append the table to the list
@@ -100,6 +101,7 @@ def run(dest_dir: str) -> None:
             series=INDICATORS_FOR_ANALYSIS.keys(),
             reference_years=reference_years,
             only_all_series=True,
+            exclude_different_welfare=True,
         )
 
         # Append the table to the list
@@ -144,6 +146,8 @@ def match_ref_years(
     series: List[str],
     reference_years: Dict[int, Dict[str, int]],
     only_all_series: bool,
+    exclude_different_welfare: bool = True,
+    exclude_different_reporting_level: bool = False,
 ) -> Table:
     """
     Match series to reference years.
@@ -187,36 +191,24 @@ def match_ref_years(
                 on=["country", "series_code"],
                 suffixes=("", f"_{y}"),
             )
-            # References to column names work differently depending on if there are 2 or more reference years. Treat these cases separately.
-            if len(reference_years_list) == 2:
-                # Categorize the pipwelfare match
-                tb_match["pipwelfarecat"] = tb_match.apply(cat_welfare, args=("pipwelfare", f"pipwelfare_{y}"), axis=1)
+            # Categorize the pipwelfare match
+            tb_match["pipwelfarecat"] = tb_match.apply(cat_welfare, args=("pipwelfare", f"pipwelfare_{y}"), axis=1)
 
-                # Categorize the pipreportinglevel match
-                tb_match["pipreportinglevelcat"] = tb_match.apply(
-                    cat_reportinglevel, args=("pipreportinglevel", f"pipreportinglevel_{y}"), axis=1
-                )
+            # Categorize the pipreportinglevel match
+            tb_match["pipreportinglevelcat"] = tb_match.apply(
+                cat_reportinglevel, args=("pipreportinglevel", f"pipreportinglevel_{y}"), axis=1
+            )
 
-                # Add a column that gives the distance between the observation years
-                tb_match[f"distance_{reference_years_list[-2]}_{y}"] = abs(tb_match["year"] - tb_match[f"year_{y}"])
+            if exclude_different_welfare:
+                # Exclude non-matching welfare types (99)
+                tb_match = tb_match[tb_match["pipwelfarecat"] != 99].reset_index(drop=True)
 
-            else:
-                # Categorize the pipwelfare match
-                tb_match["pipwelfarecat"] = tb_match.apply(
-                    cat_welfare, args=(f"pipwelfare_{reference_years_list[-2]}", f"pipwelfare_{y}"), axis=1
-                )
+            if exclude_different_reporting_level:
+                # Exclude non-matching reporting levels (99)
+                tb_match = tb_match[tb_match["pipreportinglevelcat"] != 99].reset_index(drop=True)
 
-                # Categorize the pipreportinglevel match
-                tb_match["pipreportinglevelcat"] = tb_match.apply(
-                    cat_reportinglevel,
-                    args=(f"pipreportinglevel_{reference_years_list[-2]}", f"pipreportinglevel_{y}"),
-                    axis=1,
-                )
-
-                # Add a column that gives the distance between the observation years
-                tb_match[f"distance_{reference_years_list[-2]}_{y}"] = abs(
-                    tb_match[f"year_{reference_years_list[-2]}"] - tb_match[f"year_{y}"]
-                )
+            # Add a column that gives the distance between the observation years
+            tb_match[f"distance_{reference_years_list[-2]}_{y}"] = abs(tb_match["year"] - tb_match[f"year_{y}"])
 
             # Filter tb_match according to best pipwelfarecat
             min_values = tb_match.groupby(["country", "series_code"])["pipwelfarecat"].transform("min")
@@ -394,7 +386,7 @@ def cat_welfare(row, col1, col2):
     elif row[col1] == "consumption" and row[col2] == "consumption":
         return 2
     else:
-        return 3
+        return 99  # As in: "error"
 
 
 def cat_reportinglevel(row, col1, col2):
@@ -411,7 +403,7 @@ def cat_reportinglevel(row, col1, col2):
     elif row[col1] == "rural" and row[col2] == "rural":
         return 3
     else:
-        return 4
+        return 99  # As in: "error"
 
 
 def add_regions_columns(tb: Table, ds_regions: Dataset) -> Table:
