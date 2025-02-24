@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: UK Department for Transport
+    title: road_miles_uk
+    citation_full: Transport Statistics Great Britain. Department for Transport.
+    url_main: https://www.gov.uk/government/publications/transport-statistics-great-britain-guidance
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSNWsvbJEUJ6DaF5cEOs34UHwZOyZw_2QKaJk6VSdHRg070XGauUthG405OrniZhqaAD5RQXtSHIegl/pub?output=csv
+    date_accessed: '2025-02-03'
+    date_published: '2024'
+  name: Road miles in the UK (Department for Transport)
+  description: ''
+  license: {}
+outs:
+  - md5: fa75204e914273d0ea4e4a0a5bee41d3
+    size: 1728
+    path: road_miles_uk.csv

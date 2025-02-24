@@ -7,8 +7,18 @@ NOTE: This only works with >1.35 (nightly) version of Streamlit.
 
 import streamlit as st
 
+from apps.wizard import utils
 from apps.wizard.config import WIZARD_CONFIG
 from etl.paths import DOCS_DIR
+
+# Profiler: Start profiler if debug mode is enabled
+PROFILER = None
+args = utils.parse_args_from_cmd()
+if args.debug:
+    PROFILER = utils.start_profiler()
+
+# Enable Sentry if SENTRY_DSN is in .env
+utils.enable_sentry_for_streamlit()
 
 ###########################################
 # DEFINE PAGES
@@ -94,3 +104,7 @@ st.logo(
     size="large",
     # link="https://google.com",  # TODO: would be cool if we could link to an internal page (and not only external). Check streamlit issues, and consider creating one.
 )
+
+# Stop profiler if applicable
+if args.debug and (PROFILER is not None):
+    PROFILER.stop()

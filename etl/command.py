@@ -36,7 +36,7 @@ from etl.steps import (
     select_dirty_steps,
 )
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 # NOTE: I tried enabling this, but ran into weird errors with unit tests and inconsistencies
 #   with owid libraries. It's better to wait for an official pandas 3.0 release and update
@@ -292,8 +292,26 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    # if export is not set, remove all steps
-    if not export:
+    if export:
+        # If there were any "export://multidim" steps, keep them in the dag, to be executed.
+        for step in list(dag.keys()):
+            if step.startswith("export://multidim/"):
+                # We want to execute export steps after any grapher://grapher steps,
+                # to ensure that any indicators required by the mdim step are already pushed to DB.
+                # To achieve that, replace "data://grapher" dependencies with "grapher://grapher".
+                # NOTE: If any dependency of the export step is a data-private://grapher step, it will need to be run with the "--private" flag, otherwise the export step may fail.
+                dag[step] = {
+                    re.sub(r"^(data|data-private)://", "grapher://", dep)
+                    if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep)
+                    else dep
+                    for dep in dag[step]
+                }
+
+        # Finally, ensure that the added grapher://grapher steps will be executed,
+        # by activating the "grapher" flag.
+        grapher = True
+    else:
+        # If there were any "export://" steps in the dag, remove them.
         dag = {step: deps for step, deps in dag.items() if not step.startswith("export://")}
 
     # If --grapher is set, add all steps for upserting to DB
@@ -307,6 +325,9 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
             for dep in deps:
                 if dep.startswith("grapher://"):
                     dag[dep] = steps[dep]
+
+    # Validate the DAG
+    _check_dag_completeness(dag)
 
     return dag
 
@@ -671,6 +692,16 @@ def _check_public_private_steps(dag: DAG) -> None:
     common = private_steps & public_steps
     if common:
         raise ValueError(f"Dataset has both public and private version: {common}")
+
+
+def _check_dag_completeness(dag: DAG) -> None:
+    """Make sure the DAG is complete, i.e. all dependencies are there."""
+    for step, deps in dag.items():
+        for dep in deps:
+            if re.match(r"^(snapshot|walden|snapshot-private|walden-private|github|etag)://", dep):
+                pass
+            elif dep not in dag:
+                raise ValueError(f"Step {step} depends {dep} which is not in the DAG.")
 
 
 if __name__ == "__main__":

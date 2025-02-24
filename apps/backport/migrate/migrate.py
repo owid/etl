@@ -17,7 +17,7 @@ from etl.files import yaml_dump
 from etl.metadata_export import metadata_export
 from etl.paths import DAG_DIR, SNAPSHOTS_DIR, STEP_DIR
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 log = structlog.get_logger()
 

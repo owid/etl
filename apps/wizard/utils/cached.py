@@ -1,3 +1,10 @@
+"""Cached functions.
+
+For DB-related ones, the pattern can be a bit confusing:
+- apps.wizard.utils.cached makes use of etl.grapher.io
+- etl.grapher.io makes use of etl.grapher.model
+"""
+
 import json
 import logging
 import subprocess
@@ -11,7 +18,7 @@ from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
 from apps.utils.map_datasets import get_grapher_changes
-from etl.config import OWID_ENV, OWIDEnv
+from etl.config import ENV_GRAPHER_USER_ID, OWID_ENV, OWIDEnv
 from etl.db import get_engine
 from etl.git_helpers import get_changed_files
 from etl.grapher import io as gio
@@ -27,6 +34,16 @@ logging.getLogger("streamlit.runtime.caching.cache_data_api").setLevel(logging.E
 @st.cache_data
 def load_entity_ids(entity_ids: Optional[List[int]] = None):
     return gio.load_entity_mapping(entity_ids)
+
+
+@st.cache_data(show_spinner=False)
+def execute_bash_command(cmd):
+    """Execute a command and get its output."""
+    try:
+        result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        return e.stderr
 
 
 @st.cache_data
@@ -71,6 +88,11 @@ def load_dataset_uris_new_in_server() -> List[str]:
 @st.cache_data
 def load_dataset_uris() -> List[str]:
     return gio.load_dataset_uris()
+
+
+@st.cache_data
+def indicators_used_in_charts(indicator_ids: List[int]) -> List[int]:
+    return gio.filter_indicators_used_in_charts(indicator_ids)
 
 
 @st.cache_data
@@ -204,22 +226,46 @@ def get_tailscale_ip_to_user_map():
     return ip_to_user
 
 
-@st.cache_data
-def get_grapher_user_id(user_ip: str) -> Optional[int]:
-    """Get the Grapher user ID associated with the given Tailscale IP address."""
+########################################################################
+# TODO: Functions below do not use CACHE, and should be moved elsewhere
+########################################################################
+def get_grapher_user_from_ip(user_ip: Optional[str] = None) -> gm.User:
+    """Get the Grapher user associated with the given Tailscale IP address.
+
+    If no IP is given, it'll try to extract it from the header context.
+    """
+    # Get ip if none is given
+    if user_ip is None:
+        user_ip = st.context.headers.get("X-Forwarded-For")
+
     # Get Tailscale IP-to-User mapping
     ip_to_user_map = get_tailscale_ip_to_user_map()
 
     # Get the Tailscale display name / github username associated with the client's IP address
-    github_user_name = ip_to_user_map.get(user_ip)
+    github_username = ip_to_user_map.get(user_ip)
 
-    if not github_user_name:
-        return None
+    if not github_username:
+        raise ValueError(f"No Github username found for IP address {user_ip}")
 
     with Session(get_engine()) as session:
-        grapher_user = gm.User.load_user(session, github_user_name)
+        return gm.User.load_user(session, github_username=github_username)
 
-    if grapher_user:
-        return grapher_user.id
+
+def get_grapher_user_from_env() -> gm.User:
+    """Get the Grapher user based on the environment variable.
+
+    This function is typically used when working in localhost.
+    """
+    # Use local env variable if user_ip is not provided (when on localhost)
+    with Session(get_engine()) as session:
+        assert ENV_GRAPHER_USER_ID, "GRAPHER_USER_ID is not set!"
+        return gm.User.load_user(session, id=int(ENV_GRAPHER_USER_ID))
+
+
+def get_grapher_user() -> gm.User:
+    """Get the Grapher user based on IP if working on staging server or from env
+    if working locally."""
+    if OWID_ENV.env_local == "dev":
+        return get_grapher_user_from_env()
     else:
-        return None
+        return get_grapher_user_from_ip()

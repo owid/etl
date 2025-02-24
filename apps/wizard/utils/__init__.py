@@ -20,17 +20,18 @@ from datetime import date
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Union, cast
 
-import bugsnag
 import numpy as np
 import streamlit as st
 from owid.catalog import Dataset
+from sentry_sdk import capture_exception
 from sqlalchemy.orm import Session
 from structlog import get_logger
 from typing_extensions import Self
+from wfork_streamlit_profiler import Profiler
 
 from apps.wizard.utils.defaults import load_wizard_defaults, update_wizard_defaults_from_form
 from apps.wizard.utils.step_form import StepForm
-from etl.config import OWID_ENV, enable_bugsnag
+from etl.config import OWID_ENV, SENTRY_DSN, enable_sentry
 from etl.db import read_sql
 from etl.files import ruamel_dump, ruamel_load
 from etl.metadata_export import main as metadata_export
@@ -91,6 +92,23 @@ DUMMY_DATA = {
 }
 # Session state to track staging creation time
 VARNAME_STAGING_CREATION_TIME = "staging_creation_time"
+
+
+def start_profiler() -> Profiler:
+    """Usage:
+    ```
+    # after imports and before any other code
+    PROFILER = start_profiler()
+
+    # app code
+    ...
+
+    # at the end of the app
+    PROFILER.stop()
+    """
+    profiler = Profiler()
+    profiler.start()
+    return profiler
 
 
 def get_namespaces(step_type: str) -> List[str]:
@@ -386,16 +404,22 @@ class AppState:
     @classproperty
     def args(cls: "AppState") -> argparse.Namespace:
         """Get arguments passed from command line."""
-        if "args" in st.session_state:
-            return st.session_state["args"]
-        else:
-            parser = argparse.ArgumentParser()
-            parser.add_argument("--phase")
-            parser.add_argument("--run-checks", action="store_true")
-            parser.add_argument("--dummy-data", action="store_true")
-            args = parser.parse_args()
-            st.session_state["args"] = args
+        return parse_args_from_cmd()
+
+
+def parse_args_from_cmd() -> argparse.Namespace:
+    """Get arguments passed from command line."""
+    if "args" in st.session_state:
         return st.session_state["args"]
+    else:
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--debug", action="store_true")
+        # parser.add_argument("--phase")
+        parser.add_argument("--run-checks", action="store_true")
+        parser.add_argument("--dummy-data", action="store_true")
+        args = parser.parse_args()
+        st.session_state["args"] = args
+    return st.session_state["args"]
 
 
 def extract(error_message: str) -> List[Any]:
@@ -532,22 +556,34 @@ def metadata_export_basic(dataset_path: str | None = None, dataset: Dataset | No
     return output_path
 
 
-def enable_bugsnag_for_streamlit():
-    """Enable bugsnag for streamlit. Uses this workaround
+def enable_sentry_for_streamlit():
+    """Enable Sentry for streamlit. Uses this workaround
     https://github.com/streamlit/streamlit/issues/3426#issuecomment-1848429254
     """
-    enable_bugsnag()
+    # Quit if SENTRY_DSN is not set
+    if not SENTRY_DSN:
+        return
 
-    # error_util = sys.modules["streamlit.error_util"]
+    enable_sentry()
+
     error_util = sys.modules["streamlit.error_util"]
     original_handler = error_util.handle_uncaught_app_exception
 
-    def bugsnag_handler(exception: Exception) -> None:
-        """Pass the provided exception through to bugsnag."""
-        bugsnag.notify(exception)
+    def sentry_handler(exception: Exception) -> None:
+        """Pass the provided exception through to Sentry."""
+        capture_exception(exception)
         return original_handler(exception)
 
-    error_util.handle_uncaught_app_exception = bugsnag_handler  # type: ignore
+    # Streamlit doesn't have exception hook, hack it by patching
+    # all places where handle_uncaught_app_exception is called
+    modules_to_patch = [
+        "streamlit.runtime.scriptrunner.exec_code",
+        "streamlit.error_util",
+    ]
+
+    for module_name in modules_to_patch:
+        module = sys.modules[module_name]
+        module.handle_uncaught_app_exception = sentry_handler  # type: ignore
 
 
 def _get_staging_creation_time(session: Session):
@@ -599,3 +635,7 @@ def as_list(s):
         except (ValueError, SyntaxError):
             return s
     return s
+
+
+# Enable sentry when apps.wizard.utils is loaded
+enable_sentry_for_streamlit()

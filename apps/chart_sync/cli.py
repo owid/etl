@@ -3,13 +3,13 @@ import re
 from typing import Any, Dict, Optional
 
 import click
-import requests
 import structlog
 from rich import print
 from rich_click.rich_command import RichCommand
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
+from apps.owidbot import github_utils as gh_utils
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader, configs_are_equal
 from apps.wizard.utils import get_staging_creation_time
 from etl import config
@@ -18,7 +18,7 @@ from etl.datadiff import _dict_diff
 from etl.grapher import model as gm
 from etl.slack_helpers import send_slack_message
 
-config.enable_bugsnag()
+config.enable_sentry()
 
 log = structlog.get_logger()
 
@@ -95,7 +95,7 @@ def cli(
     ```
     """
     if _is_commit_sha(source):
-        source = _get_git_branch_from_commit_sha(source)
+        source = gh_utils.get_git_branch_from_commit_sha(source)
         log.info("chart_sync.use_branch", branch=source)
 
     source_engine = OWIDEnv.from_staging_or_env_file(source).get_engine()
@@ -239,21 +239,6 @@ def cli(
 
 def _is_commit_sha(source: str) -> bool:
     return re.match(r"[0-9a-f]{40}", source) is not None
-
-
-def _get_git_branch_from_commit_sha(commit_sha: str) -> str:
-    """Get the branch name from a merged pull request commit sha. This is useful for Buildkite jobs where we only have the commit sha."""
-    # get all pull requests for the commit
-    pull_requests = requests.get(f"https://api.github.com/repos/owid/etl/commits/{commit_sha}/pulls").json()
-
-    # filter the closed ones
-    closed_pull_requests = [pr for pr in pull_requests if pr["state"] == "closed"]
-
-    # get the branch of the most recent one
-    if closed_pull_requests:
-        return closed_pull_requests[0]["head"]["ref"]
-    else:
-        raise ValueError(f"No closed pull requests found for commit {commit_sha}")
 
 
 def _notify_slack_chart_update(chart_id: int, source: str, diff: ChartDiff, dry_run: bool) -> None:

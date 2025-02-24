@@ -1,0 +1,24 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 30
+
+tables:
+  measles_cases:
+    variables:
+      cases:
+        title: Number of measles cases
+        unit: cases
+      states_with_cases:
+        title: Number of states with measles cases
+        unit: states
+      outbreaks_n:
+        title: Number of measles outbreaks
+        unit: outbreaks

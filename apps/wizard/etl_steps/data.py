@@ -296,7 +296,7 @@ def render_form_main():
         with col1:
             label = "Indicators tag"
             if USING_TAGS_DEFAULT:
-                label += f"\n\n:red[Using a 2024 March snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
+                label += f"\n\n:red[Using a 2025 February snapshot of the tags. Couldn't connect to database `{DB_NAME}` in host `{DB_HOST}`.]"
 
             namespace = APP_STATE.vars[namespace_key].replace("_", " ")
             default_last = None
@@ -501,6 +501,13 @@ if step_selected:
     )
 else:
     st.warning("Select at least one step to create.")
+
+with st.sidebar:
+    with st.popover("Preview instructions after generating files"):
+        st.markdown(
+            "This is a preview of the instructions that will be shown after generating the files. It uses generic namings like `namespace`, `short_name`, etc. The instructions with actual valid names are shown after submitting the form."
+        )
+        render_instructions(key="auxiliary")
 
 #########################################################
 # SUBMISSION ############################################

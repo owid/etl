@@ -318,7 +318,7 @@ steps:
   data://grapher/worldbank_wdi/2022-05-26/wdi:
     - data://garden/worldbank_wdi/2022-05-26/wdi
 
-  # UN SDG - archive
+  # UN SDG
   data://meadow/un/2023-01-24/un_sdg:
     - snapshot://un/2023-01-24/un_sdg.feather
   data://garden/un/2023-01-24/un_sdg:
@@ -344,6 +344,64 @@ steps:
     - data-private://meadow/antibiotics/2024-12-02/total_pathogen_bloodstream_amr
   data-private://grapher/antibiotics/2024-12-02/total_pathogen_bloodstream_amr:
     - data-private://garden/antibiotics/2024-12-02/total_pathogen_bloodstream_amr
+
+  #  World Peace Foundation - Famines
+  data://meadow/wpf/2024-10-03/famines:
+    - snapshot://wpf/2024-10-03/famines.xlsx
+  data://garden/wpf/2024-10-03/famines:
+    - data://meadow/wpf/2024-10-03/famines
+    - data://garden/regions/2023-01-01/regions
+
+  data://grapher/wpf/2024-10-03/famines:
+    - data://garden/wpf/2024-10-03/famines
+  data://garden/wpf/2024-10-03/total_famines_by_year_decade:
+    - data://garden/wpf/2024-10-03/famines
+    - data://garden/demography/2024-07-15/population
+  data://grapher/wpf/2024-10-03/total_famines_by_year_decade:
+    - data://garden/wpf/2024-10-03/total_famines_by_year_decade
+
+  data://garden/wpf/2024-10-03/famines_by_regime_gdp:
+    - data://garden/wpf/2024-10-03/famines
+    - data://garden/democracy/2024-03-07/vdem
+    - data://garden/ggdc/2024-04-26/maddison_project_database
+  data://grapher/wpf/2024-10-03/famines_by_regime_gdp:
+    - data://garden/wpf/2024-10-03/famines_by_regime_gdp
+
+  data://garden/wpf/2024-10-03/famines_by_factor:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_factor:
+    - data://garden/wpf/2024-10-03/famines_by_factor
+
+  data://garden/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines
+  data://grapher/wpf/2024-10-03/famines_by_place:
+    - data://garden/wpf/2024-10-03/famines_by_place
+
+  # Missing Data - Children out of school
+  data://garden/missing_data/2024-03-26/children_out_of_school:
+    - data://garden/wb/2024-06-10/gender_statistics
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2023-03-31/population
+  data://grapher/missing_data/2024-03-26/children_out_of_school:
+    - data://garden/missing_data/2024-03-26/children_out_of_school
+
+  # Switched to external/owid_grapher/latest/regions for external (e.g. owid-grapher) use-cases.
+  data://grapher/regions/latest/regions:
+    - data://garden/regions/2023-01-01/regions
+
+  # OECD Official Development Assistance (ODA)
+  data://meadow/oecd/2024-08-21/official_development_assistance:
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac1.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac2a.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac5.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_crs.zip
+  data://garden/oecd/2024-08-21/official_development_assistance:
+    - data://meadow/oecd/2024-08-21/official_development_assistance
+    - data://garden/demography/2024-07-15/population
+  data://grapher/oecd/2024-08-21/official_development_assistance:
+    - data://garden/oecd/2024-08-21/official_development_assistance
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

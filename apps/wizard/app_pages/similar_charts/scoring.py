@@ -155,7 +155,7 @@ class ScoringModel:
         return ret
 
 
-@st.cache_data(show_spinner=True, persist="disk")
+@st.cache_data(show_spinner=False, persist="disk")
 def gpt_diverse_charts(
     chosen_chart: Chart, _charts: list[Chart], _n: int = 30, system_prompt=DEFAULT_SYSTEM_PROMPT
 ) -> dict[str, str]:

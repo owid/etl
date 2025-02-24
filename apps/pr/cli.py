@@ -63,9 +63,6 @@ from etl.paths import BASE_DIR
 # Initialize logger.
 log = get_logger()
 
-# URL of the Github API, to be used to create a draft pull request in the ETL repos.
-GITHUB_API_URL = "https://api.github.com/repos/owid/etl/pulls"
-
 # Style for questionary
 SHELL_FORM_STYLE = questionary.Style(
     [
@@ -332,7 +329,7 @@ def create_pr(repo, work_branch, base_branch, pr_title):
         "body": "",
         "draft": True,
     }
-    response = requests.post(GITHUB_API_URL, json=data, headers=headers)
+    response = requests.post("https://api.github.com/repos/owid/etl/pulls", json=data, headers=headers)
     if response.status_code == 201:
         js = response.json()
         log.info(f"Draft pull request created successfully at {js['html_url']}.")

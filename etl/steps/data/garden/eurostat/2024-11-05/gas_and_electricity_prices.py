@@ -568,6 +568,8 @@ def find_best_combination_of_components(tb: Table) -> None:
     # * The prices and components datasets coincide reasonably well. To recover prices, it seems that the components to be added up are just "Energy and supply", "Network costs", and "Taxes, fees, levies, and charges". For most countries, this combination gives a good agreement with the prices dataset. However, for some countries, there is a significant discrepancy.
     # * Numerically, I have checked that for all price components datasets, "Taxes, fees, levies and charges" coincides with the sum of 'Capacity taxes', 'Environmental taxes', 'Nuclear taxes', 'Renewable taxes', 'Value added tax (VAT)', 'Other'. For some country-years, there is a small discrepancy.
     # * What's not so clear is what happens with the "allowances". Is "Taxes, fees, levies, and charges allowance" the sum of all other "* allowance"? It's hard to know, since it's non-zero only once (nrg_pc_204_c Netherlands 2023). At that point, it does coincide with the sum of all other "* allowance". But there are other instances of non-zero "* allowance" where "Taxes...allowance" is not defined. It may be possible that allowances are not included in the prices dataset.
+    # NOTE:
+    # After communicating with Eurostat, they confirmed that the total price should indeed be the result of adding up "Energy and supply", "Network costs", and "Taxes, fees, levies, and charges". The allowances should not be added, they are already incorporated in the price including taxes.
 
 
 def plot_final_comparison_between_prices_and_components_data(tb: Table) -> None:

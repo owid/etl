@@ -1,57 +1,25 @@
-from pathlib import Path
+from owid.catalog import Table, Variable
 
-from owid import catalog
-from owid.catalog import Dataset, Table, Variable
-
-from etl.helpers import PathFinder
-
-CURRENT_DIR = Path(__file__).parent
-METADATA_PATH = CURRENT_DIR / "vehicles.meta.yml"
-SHORT_NAME = "vehicles"
-NAMESPACE = "who"
-VERSION = "2024-05-20"
+from etl.helpers import PathFinder, create_dataset
 
 paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    ds = Dataset.create_empty(dest_dir)
+    ds_gho = paths.load_dataset("gho")
+    tb_gho = ds_gho.read("number_of_registered_vehicles").loc[:, ["country", "year", "number_of_registered_vehicles"]]
+
     ds_population = paths.load_dataset("population")
+    tb_population = ds_population.read("population").loc[:, ["country", "year", "population"]]
+
     # Create and add table
-    table = make_table(ds_population)
+    table = make_combined(tb_gho, tb_population)
 
     # Set an appropriate index and sort conveniently
-    table = table.format(["country", "year"], sort_columns=True)
+    tb = table.format(["country", "year"], sort_columns=True)
 
-    # Add table to dataset
-    ds.add(table)
-
-    # Add metadata to dataset.
-    ds.metadata.update_from_yaml(METADATA_PATH, if_source_exists="replace")
-    ds.metadata.short_name = SHORT_NAME
-    ds.metadata.namespace = NAMESPACE
-    ds.metadata.version = VERSION
-
-    # Save
+    ds = create_dataset(dest_dir, tables=[tb])
     ds.save()
-
-
-def make_table(ds_population: Dataset) -> Table:
-    # Load WHO GHO data
-    table_gho = load_gho()
-    # Load population data
-    tb_population = ds_population["population"].reset_index()
-    tb_population = tb_population[["country", "year", "population"]]
-    # Combine sources
-    table = make_combined(table_gho, tb_population)
-    table.update_metadata_from_yaml(METADATA_PATH, "vehicles")
-    return table
-
-
-def load_gho() -> Table:
-    gho = catalog.find_latest(dataset="gho", table="number_of_registered_vehicles").reset_index()
-    gho = gho[["country", "year", "number_of_registered_vehicles"]]
-    return gho
 
 
 def make_combined(table_gho: Table, table_population: Table) -> Table:
@@ -66,5 +34,8 @@ def make_combined(table_gho: Table, table_population: Table) -> Table:
         ),
     )
     # Filter columns and drop NA values
-    table = table[["registered_vehicles_per_thousand"]].dropna(subset=["registered_vehicles_per_thousand"], how="all")
+    table = table.loc[:, ["registered_vehicles_per_thousand"]].dropna(
+        subset=["registered_vehicles_per_thousand"], how="all"
+    )
+    table.m.short_name = "vehicles"
     return table.reset_index()

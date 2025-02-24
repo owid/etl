@@ -12,16 +12,17 @@ If you want to add a new table to ORM, add --tables mytable to the command above
 Another option is to run `show create table mytable;` in MySQL and then ask ChatGPT to convert it to SQLAlchemy 2 ORM.
 
 It is often necessary to add `default=None` or `init=False` to make pyright happy.
+
+You might have to run `uv pip install mysqlclient` to install missing MySQLDb.
 """
 
 import copy
 import io
 import json
-import random
 from datetime import date, datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union, get_args, overload
+from typing import Any, Dict, List, Literal, Optional, Set, Union, get_args, overload
 
 import humps
 import numpy as np
@@ -308,8 +309,13 @@ class User(Base):
     lastSeen: Mapped[Optional[datetime]] = mapped_column(DateTime)
 
     @classmethod
-    def load_user(cls, session: Session, github_username: str) -> Optional["User"]:
-        return session.scalars(select(cls).where(cls.githubUsername == github_username)).one_or_none()
+    def load_user(cls, session: Session, id: Optional[int] = None, github_username: Optional[str] = None) -> "User":
+        if id:
+            return session.scalars(select(cls).where(cls.id == id)).one()
+        elif github_username:
+            return session.scalars(select(cls).where(cls.githubUsername == github_username)).one()
+        else:
+            raise ValueError("Either id or github_username must be provided")
 
 
 class ChartRevisions(Base):
@@ -913,7 +919,7 @@ class PostsGdocs(Base):
     publishedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
     revisionId: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
-    breadcrumbs: Mapped[Optional[dict]] = mapped_column(JSON)
+    manualBreadcrumbs: Mapped[Optional[dict]] = mapped_column(JSON)
     markdown: Mapped[Optional[str]] = mapped_column(LONGTEXT)
 
 
@@ -1088,10 +1094,9 @@ class Variable(Base):
             name="variables_sourceId_31fce80a_fk_sources_id",
         ),
         Index("idx_catalogPath", "catalogPath", unique=True),
-        Index("unique_short_name_per_dataset", "shortName", "datasetId", unique=True),
         Index("variables_code_fk_dst_id_7bde8c2a_uniq", "code", "datasetId", unique=True),
         Index("variables_datasetId_50a98bfd_fk_datasets_id", "datasetId"),
-        Index("variables_name_fk_dst_id_f7453c33_uniq", "name", "datasetId", unique=True),
+        Index("idx_name_dataset", "name", "datasetId"),
         Index("variables_sourceId_31fce80a_fk_sources_id", "sourceId"),
     )
 
@@ -1141,53 +1146,11 @@ class Variable(Base):
 
         cls = self.__class__
 
-        # NOTE: matching on catalogPath would be better, but we still have
-        # index `variables.unique_short_name_per_dataset` in MySQL which
-        # doesn't let us do that
-        # q = select(cls).where(
-        #     cls.catalogPath == self.catalogPath,
-        #     cls.datasetId == self.datasetId,
-        # )
-        # ds = session.scalars(q).one_or_none()
-
-        # try matching on shortName first
         q = select(cls).where(
-            or_(
-                cls.shortName == self.shortName,
-                # NOTE: we used to slugify shortName which replaced double underscore by a single underscore
-                # this was a bug, we should have kept the double underscore
-                # match even those variables and correct their shortName
-                cls.shortName == self.shortName.replace("__", "_"),
-            ),
+            cls.catalogPath == self.catalogPath,
             cls.datasetId == self.datasetId,
         )
         ds = session.scalars(q).one_or_none()
-
-        # try matching on name if there was no match on shortName
-        if not ds:
-            q = select(cls).where(
-                cls.name == self.name,
-                cls.datasetId == self.datasetId,
-            )
-            ds = session.scalars(q).one_or_none()
-
-        # there's a unique index on `name` which can cause conflict if we swap names of two variables
-        # in that case, we append "(conflict)" to the name of the conflicting variable (it will be cleaned
-        # after all variables are upserted)
-        # we wouldn't need this if we dropped the requirement for unique index on `name`, but I'm afraid
-        # of other functions in owid-grapher that could rely on it
-        if ds and ds.shortName:
-            q = select(cls).where(
-                cls.name == self.name,
-                cls.shortName != self.shortName,
-                cls.datasetId == self.datasetId,
-            )
-            conflict = session.scalars(q).one_or_none()
-            if conflict:
-                # modify the conflicting variable name, it'll be cleaned up later
-                conflict.name = f"{conflict.name} (conflict {random.randint(0, 1000)})"
-                session.add(conflict)
-                session.commit()
 
         if not ds:
             ds = self
@@ -1394,10 +1357,12 @@ class Variable(Base):
     ) -> "Variable" | List["Variable"]:
         """Load a variable from the DB by its catalog path."""
         assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+        # Return Variable if columns is None and return Row object if columns is provided
+        execute = session.execute if columns else session.scalars
         if isinstance(catalog_path, str):
-            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath == catalog_path)).one()
+            return execute(_select_columns(cls, columns).where(cls.catalogPath == catalog_path)).one()  # type: ignore
         elif isinstance(catalog_path, list):
-            return session.scalars(_select_columns(cls, columns).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
+            return execute(_select_columns(cls, columns).where(cls.catalogPath.in_(catalog_path))).all()  # type: ignore
 
     @overload
     @classmethod
@@ -1414,10 +1379,13 @@ class Variable(Base):
         cls, session: Session, variable_id: int | List[int], columns: Optional[List[str]] = None
     ) -> "Variable" | List["Variable"]:
         """Load a variable (or list of variables) from the DB by its ID path."""
+        # Return Variable if columns is None and return Row object if columns is provided
+        execute = session.execute if columns else session.scalars
+
         if isinstance(variable_id, int):
-            return session.scalars(_select_columns(cls, columns).where(cls.id == variable_id)).one()
+            return execute(_select_columns(cls, columns).where(cls.id == variable_id)).one()  # type: ignore
         elif isinstance(variable_id, list):
-            return session.scalars(_select_columns(cls, columns).where(cls.id.in_(variable_id))).all()  # type: ignore
+            return execute(_select_columns(cls, columns).where(cls.id.in_(variable_id))).all()  # type: ignore
 
     @classmethod
     def catalog_paths_to_variable_ids(cls, session: Session, catalog_paths: List[str]) -> Dict[str, int]:
@@ -1544,6 +1512,24 @@ class ChartDimensions(Base):
     variableId: Mapped[int] = mapped_column(Integer)
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
+
+    @classmethod
+    def chart_ids_with_indicators(cls, session: Session, indicator_ids: List[int]) -> List[int]:
+        """Return a list of chart IDs that have any of the given indicators."""
+        query = select(cls.chartId).where(cls.variableId.in_(indicator_ids))
+        return list(session.scalars(query).all())
+
+    @classmethod
+    def indicators_in_charts(cls, session: Session, chart_ids: List[int]) -> Set[int]:
+        """Return a list of indicator IDs that are in any of the given charts."""
+        query = select(cls.variableId).where(cls.chartId.in_(chart_ids))
+        return set(session.scalars(query).all())
+
+    @classmethod
+    def filter_indicators_used_in_charts(cls, session: Session, indicator_ids: List[int]) -> List[int]:
+        """Reduce the input list of indicator IDs to only those used in charts."""
+        query = select(cls.variableId).where(cls.variableId.in_(indicator_ids))
+        return list(set(session.scalars(query).all()))
 
 
 class Origin(Base):

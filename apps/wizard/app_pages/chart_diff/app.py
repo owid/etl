@@ -10,10 +10,11 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_grapher
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
-from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines
+from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines, indicators_in_charts
 from apps.wizard.utils import set_states
 from apps.wizard.utils.components import Pagination
 from etl.config import OWID_ENV
+from etl.grapher import model as gm
 
 log = get_logger()
 
@@ -81,6 +82,9 @@ def get_chart_diffs():
         )
     )
 
+    # Get indicators used in charts
+    st.session_state.indicators_in_charts = indicators_in_charts(list(st.session_state.chart_diffs.keys()))
+
     # Init, can be changed by the toggle
     st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
 
@@ -106,6 +110,16 @@ def filter_chart_diffs():
         # Filter based on query params
         if "chart_id" in st.query_params:
             chart_ids = list(map(int, st.query_params.get_all("chart_id")))
+            st.session_state.chart_diffs_filtered = {
+                k: v for k, v in st.session_state.chart_diffs_filtered.items() if v.chart_id in chart_ids
+            }
+        if "indicator_id" in st.query_params:
+            indicator_ids = list(map(int, st.query_params.get_all("indicator_id")))
+
+            # Get all charts containing any of the selected indicators
+            with Session(SOURCE_ENGINE) as session:
+                chart_ids = gm.ChartDimensions.chart_ids_with_indicators(session, indicator_ids)
+
             st.session_state.chart_diffs_filtered = {
                 k: v for k, v in st.session_state.chart_diffs_filtered.items() if v.chart_id in chart_ids
             }
@@ -189,6 +203,8 @@ def _show_options_filters():
 
         # Chart ID filter
         _apply_search_filters("chart-diff-filter-id", "chart_id")
+        # Indicator filter
+        _apply_search_filters("chart-diff-filter-indicator", "indicator_id")
         # Slug filter
         _apply_search_filters("chart-diff-filter-slug", "chart_slug")
         # Change type filter
@@ -236,6 +252,15 @@ def _show_options_filters():
             placeholder="Search for a slug",
             key="chart-diff-filter-slug",
             help="Filter chart diffs with charts with slugs containing any of the given words (fuzzy match).",
+        )
+        st.multiselect(
+            label="Select indicators",
+            options=sorted(st.session_state.indicators_in_charts.keys()),
+            format_func=lambda s: f"[{s}] {st.session_state.indicators_in_charts[s]}",
+            default=[int(n) for n in st.query_params.get_all("indicator_id")],  # type: ignore
+            key="chart-diff-filter-indicator",
+            help="Filter chart diffs to charts containing any of the selected indicators.",
+            placeholder="Select indicator IDs",
         )
 
         st.form_submit_button(

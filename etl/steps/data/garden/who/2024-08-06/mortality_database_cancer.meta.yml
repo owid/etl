@@ -11,7 +11,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
+  title: WHO Mortality Database - Cancer Deaths
 
 tables:
   mortality_database_cancer:
@@ -19,7 +19,10 @@ tables:
       number:
         title: Deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>
         description_short: Reported total deaths from << cause.lower() >> in << sex.lower() >> aged << age_group.lower() >>.
-        description_key: ["The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>."]
+        description_key:
+          [
+            "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>.",
+          ]
         unit: deaths
         display:
           numDecimalPlaces: 0
@@ -30,7 +33,10 @@ tables:
       percentage_of_cause_specific_deaths_out_of_total_deaths:
         title: Share of total deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>
         description_short: Share of total reported deaths in << sex.lower() >> in those aged << age_group.lower() >> that are from << cause.lower() >>.
-        description_key: ["The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>."]
+        description_key:
+          [
+            "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>.",
+          ]
         unit: "%"
         short_unit: "%"
         display:
@@ -42,7 +48,10 @@ tables:
       age_standardized_death_rate_per_100_000_standard_population:
         title: Age-standardized deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people
         description_short: Reported deaths from << cause.lower() >> in << sex.lower() >> in those aged << age_group.lower() >> per 100,000 people.
-        description_key: ["The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>."]
+        description_key:
+          [
+            "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>.",
+          ]
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
@@ -53,7 +62,10 @@ tables:
       death_rate_per_100_000_population:
         title: Deaths from << cause.lower() >> per 100,000 people in, << sex.lower() >> aged << age_group.lower() >>
         description_short: Reported deaths from << cause.lower() >> per 100,000 people in, << sex.lower() >> aged << age_group.lower() >>.
-        description_key: ["The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>."]
+        description_key:
+          [
+            "The International Classification of Diseases (Version 10) codes that define << cause.lower() >> are << icd10_codes  >>.",
+          ]
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1

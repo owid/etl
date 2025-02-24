@@ -21,7 +21,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-@click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
+@click.option("--path-to-file", "-f", prompt=True, type=str, help="Path to local data file.")
 def main(upload: bool, path_to_file: str) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"who/{SNAPSHOT_VERSION}/avian_influenza_ah5n1.csv")

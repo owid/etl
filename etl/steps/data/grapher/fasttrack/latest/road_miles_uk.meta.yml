@@ -1,0 +1,15 @@
+dataset:
+  title: Road miles in the UK (Department for Transport)
+  description: ''
+  licenses:
+    - {}
+tables:
+  road_miles_uk:
+    variables:
+      road_miles:
+        title: Road miles
+        unit: passenger kilometers
+        short_unit: p-km
+        display:
+          conversionFactor: 1000000000
+        description: The number of passenger kilometers travelled on the roads in cars, vans, buses and motorcycles.

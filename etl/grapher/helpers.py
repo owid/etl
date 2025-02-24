@@ -13,6 +13,7 @@ import structlog
 from owid import catalog
 from owid.catalog import warnings
 from owid.catalog.utils import dynamic_yaml_load, dynamic_yaml_to_dict, underscore
+from owid.catalog.yaml_metadata import merge_with_shared_meta
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
@@ -286,13 +287,14 @@ def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[s
     """Load YAML file and render Jinja in all fields. Return a dictionary.
 
     Usage:
+        # Create a playground.ipynb next to YAML file and run this in notebook
         from etl.grapher import helpers as gh
-        from etl import paths
 
-        tb = Dataset(paths.DATA_DIR / "garden/who/2024-07-30/ghe")['ghe']
-        gh.render_variable_meta(tb.my_col.m, dim_dict={"sex": "male"})
+        m = gh.render_yaml_file("ghe.meta.yml", dim_dict={"sex": "male"})
+        m['tables']['ghe']['variables']['death_count']
     """
-    meta = dynamic_yaml_to_dict(dynamic_yaml_load(path))
+    path_or_io = merge_with_shared_meta(Path(path))
+    meta = dynamic_yaml_to_dict(dynamic_yaml_load(path_or_io))
     return _expand_jinja(meta, dim_dict)
 
 
@@ -300,10 +302,11 @@ def render_variable_meta(meta: catalog.VariableMeta, dim_dict: Dict[str, str]) -
     """Render Jinja in all fields of VariableMeta. Return a new VariableMeta object.
 
     Usage:
-        # Create a playground.ipynb next to YAML file and run this in notebook
         from etl.grapher import helpers as gh
-        m = gh.render_yaml_file("ghe.meta.yml", dim_dict={"sex": "male"})
-        m['tables']['ghe']['variables']['death_count']
+        from etl import paths
+
+        tb = Dataset(paths.DATA_DIR / "garden/who/2024-07-30/ghe")['ghe']
+        gh.render_variable_meta(tb.my_col.m, dim_dict={"sex": "male"})
     """
     # TODO: move this as a method to VariableMeta class
     return _expand_jinja(meta.copy(), dim_dict)

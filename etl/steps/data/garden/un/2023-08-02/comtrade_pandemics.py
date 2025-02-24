@@ -189,16 +189,22 @@ def add_regions(tb: Table, ds_regions: Dataset) -> Table:
         "South America",
         "Oceania",
     ]
+    # Load population
+    population = paths.load_dataset("population").read("population")
     for region in regions:
         countries_in_region = geo.list_members_of_region(
             region=region,
             ds_regions=ds_regions,
         )
+        countries_that_must_have_data = geo.list_countries_in_region_that_must_have_data(
+            region=region,
+            population=population,
+        )
         tb_region = geo.add_region_aggregates(
             tb,
             region,
             countries_in_region=countries_in_region,
-            countries_that_must_have_data="auto",
+            countries_that_must_have_data=countries_that_must_have_data,
             num_allowed_nans_per_year=None,
             frac_allowed_nans_per_year=0.2,
         )

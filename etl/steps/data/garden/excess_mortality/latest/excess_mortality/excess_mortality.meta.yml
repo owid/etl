@@ -22,11 +22,11 @@ definitions:
         baseColorScheme: RdYlBu
         customNumericValues:
           - -50
-          - -25
+          - -20
           - -10
           - 0
           - 10
-          - 25
+          - 20
           - 50
           - 100
   origins:
@@ -68,8 +68,10 @@ definitions:
       - *origin_hmd
       - *origin_wmd
     description_key:
+      - Excess deaths is estimated as _Excess deaths = Number of reported deaths - Number of expected deaths_. Excess mortality goes beyond confirmed COVID-19 fatalities by capturing all deaths above a projected baseline, including indirect deaths from pandemic-related disruptions.
       - All-cause mortality data is from the Human Mortality Database (HMD) Short-term Mortality Fluctuations project and the World Mortality Dataset (WMD). Both sources are updated weekly.
-      - "We do not use the data from some countries in WMD because they fail to meet the following data quality criteria: 1) at least three years of historical data; and 2) data published either weekly or monthly. The full list of excluded countries and reasons for exclusion can be found in this spreadsheet: https://docs.google.com/spreadsheets/d/1JPMtzsx-smO3_K4ReK_HMeuVLEzVZ71qHghSuAfG788/edit?usp=sharing."
+      - We use the baseline estimates by [Ariel Karlinsky and Dmitry Kobak (2021)](https://elifesciences.org/articles/69336) as part of their World Mortality Dataset (WMD).
+      - "We do not use the data from some countries in WMD because they fail to meet the following data quality criteria: 1) at least three years of historical data; and 2) data published either weekly or monthly. The full list of excluded countries and reasons for exclusion can be found in [this spreadsheet](https://docs.google.com/spreadsheets/d/1JPMtzsx-smO3_K4ReK_HMeuVLEzVZ71qHghSuAfG788/edit?usp=sharing)."
 
 dataset:
   title: Excess Mortality (various sources)
@@ -103,8 +105,6 @@ tables:
         display:
           name: Excess mortality P-scores, 5-year average baseline, all ages
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       p_avg_0_14:
         title: p_avg_0_14
@@ -115,8 +115,6 @@ tables:
         display:
           name: Ages 0–14
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       p_avg_15_64:
         title: p_avg_15_64
@@ -127,8 +125,6 @@ tables:
         display:
           name: Ages 15–64
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       p_avg_65_74:
         title: p_avg_65_74
@@ -139,8 +135,6 @@ tables:
         display:
           name: Ages 65–74
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       p_avg_75_84:
         title: p_avg_75_84
@@ -151,8 +145,6 @@ tables:
         display:
           name: Ages 75–84
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       p_avg_85p:
         title: p_avg_85p
@@ -163,8 +155,6 @@ tables:
         display:
           name: Ages 85+
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
 
       # p_proj_*
@@ -177,8 +167,6 @@ tables:
         display:
           name: Excess mortality P-scores, projected baseline, all ages.
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           tolerance: 30
           numDecimalPlaces: 0
         origins:
@@ -200,8 +188,6 @@ tables:
         display:
           name: Ages 0–14
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
         origins:
           - *origin_hmd
@@ -216,8 +202,6 @@ tables:
         display:
           name: Ages 15–64
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
         origins:
           - *origin_hmd
@@ -232,8 +216,6 @@ tables:
         display:
           name: Ages 65–74
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
         origins:
           - *origin_hmd
@@ -248,8 +230,6 @@ tables:
         display:
           name: Ages 75–84
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
         origins:
           - *origin_hmd
@@ -264,8 +244,6 @@ tables:
         display:
           name: Ages 85+
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
         origins:
           - *origin_hmd
@@ -305,8 +283,6 @@ tables:
         description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2015.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       deaths_2016_all_ages:
         title: deaths_2016_all_ages
@@ -315,8 +291,6 @@ tables:
         description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2016.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       deaths_2017_all_ages:
         title: deaths_2017_all_ages
@@ -325,8 +299,6 @@ tables:
         description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2017.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       deaths_2018_all_ages:
         title: deaths_2018_all_ages
@@ -335,8 +307,6 @@ tables:
         description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2018.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       deaths_2019_all_ages:
         title: deaths_2019_all_ages
@@ -345,8 +315,6 @@ tables:
         description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2019.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       deaths_2020_all_ages:
         title: deaths_2020_all_ages
@@ -355,8 +323,6 @@ tables:
         description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2020.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       deaths_2021_all_ages:
         title: deaths_2021_all_ages
@@ -365,8 +331,6 @@ tables:
         description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2021.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       deaths_2022_all_ages:
         title: deaths_2022_all_ages
@@ -375,8 +339,6 @@ tables:
         description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2022.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       deaths_2023_all_ages:
         title: deaths_2023_all_ages
@@ -385,8 +347,6 @@ tables:
         description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2023.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       deaths_2024_all_ages:
         title: deaths_2024_all_ages
@@ -395,8 +355,6 @@ tables:
         description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2024.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
       deaths_since_2020_all_ages:
         title: deaths_since_2020_all_ages
@@ -405,8 +363,6 @@ tables:
         description_short: Reported number of weekly or monthly deaths from all causes for all ages since 2020.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
 
       # other metrics
@@ -417,8 +373,6 @@ tables:
         description_short: The number of excess deaths; calculated as reported deaths minus projected deaths.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
         origins:
           - *origin_hmd
           - *origin_wmd
@@ -427,11 +381,9 @@ tables:
         title: excess_per_million_proj_all_ages
         # title: Excess deaths per million people (projected, all ages)
         unit: ""
-        description_short: The number of excess deaths per million people in the population; calculated as reported deaths minus projected deaths
+        description_short: The number of excess deaths per million people in the population; calculated as reported deaths minus projected deaths.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
         origins:
           - *origin_hmd
           - *origin_wmd
@@ -443,8 +395,6 @@ tables:
         description_short: The average number of weekly or monthly deaths from all causes for all ages over the years 2015–2019.
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
       projected_deaths_since_2020_all_ages:
         title: projected_deaths_since_2020_all_ages
         # title: Projected number of deaths (2020–2022, all ages)
@@ -453,8 +403,6 @@ tables:
         display:
           name: Projected, 2020
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
           numDecimalPlaces: 0
         origins:
           - *origin_kk
@@ -462,13 +410,11 @@ tables:
         title: cum_excess_proj_all_ages
         # title: Cumulative excess of deaths (projected, all ages)
         unit: "deaths"
-        description_short: The cumulative number of excess deaths; cumulated starting 1 January 2020
+        description_short: The cumulative number of excess deaths; cumulated starting 1 January 2020.
         display:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-          yearIsDay: true
-          zeroDay: 2020-01-01
         origins:
           - *origin_hmd
           - *origin_wmd
@@ -481,6 +427,7 @@ tables:
             map:
               colorScale:
                 <<: *color_scale_counts
+                customNumericMinValue: 0
                 customNumericValues:
                   - 0
                   - 100000
@@ -499,8 +446,6 @@ tables:
         description_short: The cumulative number of projected deaths; cumulated starting 1 January 2020
         display:
           includeInTable: true
-          yearIsDay: true
-          zeroDay: 2020-01-01
         origins:
           - *origin_kk
       cum_p_proj_all_ages:
@@ -508,14 +453,12 @@ tables:
         # title: Cumulative p-score (projected, all ages)
         unit: "%"
         short_unit: "%"
-        description_short: Cumulative P-scores using projected baseline for all ages
+        description_short: Cumulative P-scores using projected baseline for all ages.
         display:
           name: Excess mortality cumulative P-scores, projected baseline, all ages
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-          yearIsDay: true
-          zeroDay: 2020-01-01
         origins:
           - *origin_hmd
           - *origin_wmd
@@ -530,13 +473,11 @@ tables:
         title: cum_excess_per_million_proj_all_ages
         # title: Cumulative excess deaths per million people (projected, all ages)
         unit: "deaths per million people"
-        description_short: The cumulative number of excess deaths per million people in the population; cumulated starting 1 January 2020
+        description_short: The cumulative number of excess deaths per million people in the population; cumulated starting 1 January 2020.
         display:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-          yearIsDay: true
-          zeroDay: 2020-01-01
         origins:
           - *origin_hmd
           - *origin_wmd
@@ -563,7 +504,7 @@ tables:
       time:
         title: Time
         unit: ""
-        description_short: The week or month number in the year
+        description_short: The week or month number in the year.
         display:
           includeInTable: true
         origins:
@@ -573,7 +514,7 @@ tables:
       time_unit:
         title: Time unit
         unit: ""
-        description_short: Denotes whether the “time” column values are weekly or monthly
+        description_short: Denotes whether the “time” column values are weekly or monthly.
         display:
           includeInTable: true
         origins:
@@ -591,8 +532,6 @@ tables:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-          yearIsDay: true
-          zeroDay: 2020-01-01
         origins:
           - *origin_hmd
           - *origin_wmd
@@ -625,8 +564,6 @@ tables:
           numDecimalPlaces: 0
           includeInTable: true
           tolerance: 30
-          yearIsDay: true
-          zeroDay: 2020-01-01
         origins:
           - *origin_hmd
           - *origin_wmd

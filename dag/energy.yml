@@ -171,13 +171,6 @@ steps:
   #
   data://grapher/energy/2024-06-20/uk_historical_electricity:
     - data://garden/energy/2024-06-20/uk_historical_electricity
-
-
-  #
-  # Multi-dim indicators
-  #
-  export://multidim/energy/latest/energy:
-    - grapher://grapher/energy/2024-06-20/primary_energy_consumption
   #
   # IRENA - Renewable electricity capacity.
   #
@@ -229,26 +222,6 @@ steps:
   data://grapher/energy/2024-11-15/photovoltaic_cost_and_capacity:
     - data://garden/energy/2024-11-15/photovoltaic_cost_and_capacity
   #
-  # Eurostat - Energy statistics, prices of natural gas and electricity
-  #
-  data://meadow/eurostat/2024-11-05/gas_and_electricity_prices:
-    - snapshot://eurostat/2024-11-05/gas_and_electricity_prices.zip
-  #
-  # Eurostat - Energy statistics, prices of natural gas and electricity
-  #
-  data://garden/eurostat/2024-11-05/gas_and_electricity_prices:
-    - data://meadow/eurostat/2024-11-05/gas_and_electricity_prices
-  #
-  # Ember - European wholesale electricity prices
-  #
-  data://meadow/ember/2024-11-20/european_wholesale_electricity_prices:
-    - snapshot://ember/2024-11-20/european_wholesale_electricity_prices.csv
-  #
-  # Ember - European wholesale electricity prices
-  #
-  data://garden/ember/2024-11-20/european_wholesale_electricity_prices:
-    - data://meadow/ember/2024-11-20/european_wholesale_electricity_prices
-  #
   # IEA - Fossil fuel subsidies
   #
   data://meadow/iea/2024-11-20/fossil_fuel_subsidies:
@@ -264,18 +237,76 @@ steps:
   data://grapher/iea/2024-11-20/fossil_fuel_subsidies:
     - data://garden/iea/2024-11-20/fossil_fuel_subsidies
   #
+  # Benchmark Mineral Intelligence - Battery cell prices.
+  #
+  data-private://meadow/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
+    - snapshot-private://benchmark_mineral_intelligence/2024-11-29/battery_cell_prices.xlsx
+    - snapshot-private://benchmark_mineral_intelligence/2024-11-29/battery_cell_prices_by_chemistry.xlsx
+  #
+  # Benchmark Mineral Intelligence - Battery cell prices.
+  #
+  data-private://garden/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
+    - data-private://meadow/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices
+  #
+  # Benchmark Mineral Intelligence - Battery cell prices.
+  #
+  data-private://grapher/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices:
+    - data-private://garden/benchmark_mineral_intelligence/2024-11-29/battery_cell_prices
+  #
+  # Eurostat - Harmonised index of consumer prices (HICP)
+  #
+  data://meadow/eurostat/2025-02-03/harmonised_index_of_consumer_prices:
+    - snapshot://eurostat/2025-02-03/harmonised_index_of_consumer_prices.gz
+  #
+  # Eurostat - Harmonised index of consumer prices (HICP)
+  #
+  data://garden/eurostat/2025-02-03/harmonised_index_of_consumer_prices:
+    - data://meadow/eurostat/2025-02-03/harmonised_index_of_consumer_prices
+  #
+  # Eurostat - Producer prices in industry
+  #
+  data://meadow/eurostat/2025-02-03/producer_prices_in_industry:
+    - snapshot://eurostat/2025-02-03/producer_prices_in_industry.gz
+  #
+  # Eurostat - Producer prices in industry
+  #
+  data://garden/eurostat/2025-02-03/producer_prices_in_industry:
+    - data://meadow/eurostat/2025-02-03/producer_prices_in_industry
+  #
+  # Eurostat - Energy statistics, prices of natural gas and electricity
+  #
+  data://meadow/eurostat/2025-02-03/gas_and_electricity_prices:
+    - snapshot://eurostat/2025-02-03/gas_and_electricity_prices.zip
+  #
+  # Eurostat - Energy statistics, prices of natural gas and electricity
+  #
+  data://garden/eurostat/2025-02-03/gas_and_electricity_prices:
+    - data://meadow/eurostat/2025-02-03/gas_and_electricity_prices
+    - data://garden/eurostat/2025-02-03/harmonised_index_of_consumer_prices
+  #
+  # Ember - European wholesale electricity prices
+  #
+  data://meadow/ember/2025-02-03/european_wholesale_electricity_prices:
+    - snapshot://ember/2025-02-03/european_wholesale_electricity_prices.csv
+  #
+  # Ember - European wholesale electricity prices
+  #
+  data://garden/ember/2025-02-03/european_wholesale_electricity_prices:
+    - data://meadow/ember/2025-02-03/european_wholesale_electricity_prices
+    - data://garden/eurostat/2025-02-03/producer_prices_in_industry
+  #
   # Energy prices
   #
-  data://garden/energy/2024-11-20/energy_prices:
-    - data://garden/eurostat/2024-11-05/gas_and_electricity_prices
-    - data://garden/ember/2024-11-20/european_wholesale_electricity_prices
+  data://garden/energy/2025-02-03/energy_prices:
+    - data://garden/eurostat/2025-02-03/gas_and_electricity_prices
+    - data://garden/ember/2025-02-03/european_wholesale_electricity_prices
   #
   # Energy prices
   #
-  data://grapher/energy/2024-11-20/energy_prices:
-    - data://garden/energy/2024-11-20/energy_prices
+  data://grapher/energy/2025-02-03/energy_prices:
+    - data://garden/energy/2025-02-03/energy_prices
   #
   # Energy prices explorer
   #
   export://multidim/energy/latest/energy_prices:
-    - data://grapher/energy/2024-11-20/energy_prices
+    - data://grapher/energy/2025-02-03/energy_prices

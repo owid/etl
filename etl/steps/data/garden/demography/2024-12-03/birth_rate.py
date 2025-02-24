@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
 
     # Add historical variant
     tb["birth_rate_hist"] = tb["birth_rate"].copy()
-    tb.loc[tb["year"] > YEAR_WPP_PROJ_START, "birth_rate_hist"] = pd.NA
+    tb.loc[tb["year"] >= YEAR_WPP_PROJ_START, "birth_rate_hist"] = pd.NA
 
     # Format
     tb = tb.format(["country", "year"])

@@ -1,5 +1,8 @@
+import io
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Union
+
+import yaml
 
 from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 
@@ -34,9 +37,12 @@ def update_metadata_from_yaml(
     params = DatasetMeta._params_yaml(tb.metadata.dataset or DatasetMeta())
     params.update(yaml_params or {})
 
+    # Add definitions from shared.meta.yml if it exists
+    path_or_io = merge_with_shared_meta(Path(path))
+
     # load YAML file as dictionary
     # TODO: tb.metadata.dataset reference shouldn't exist
-    annot = dynamic_yaml_to_dict(dynamic_yaml_load(path, params))
+    annot = dynamic_yaml_to_dict(dynamic_yaml_load(path_or_io, params))
 
     tb.metadata.short_name = table_name
 
@@ -77,6 +83,50 @@ def update_metadata_from_yaml(
     # update table attributes
     tb_meta_dict = _merge_table_metadata(tb.m.to_dict(), t_annot)
     tb.metadata = TableMeta.from_dict(tb_meta_dict)
+
+
+def merge_with_shared_meta(path: Path) -> Union[io.StringIO, Path]:
+    """Merge metadata with shared.meta.yml if it exists."""
+    shared_meta_path = path.parent / "shared.meta.yml"
+    if shared_meta_path.exists():
+        # Load shared.meta.yml
+        with open(shared_meta_path) as f:
+            shared = yaml.safe_load(f)
+
+        # Load the original meta file
+        with open(path) as f:
+            meta = yaml.safe_load(f)
+
+        if "definitions" not in meta and "definitions" in shared:
+            meta["definitions"] = {}
+
+        if "macros" not in meta and "macros" in shared:
+            meta["macros"] = ""
+
+        # Combine definitions
+        for k, v in shared.items():
+            # Append macros
+            if k == "macros":
+                meta["macros"] = v + meta["macros"]
+
+            # Combine definitions
+            elif k == "definitions":
+                for kk, vv in v.items():
+                    meta["definitions"].setdefault(kk, vv)
+
+            # Other fields are not supported yet
+            else:
+                raise NotImplementedError(f"Cannot merge {k} from shared.meta.yml")
+
+        # Create a new file with combined definitions
+        s = io.StringIO()
+        yaml.dump(meta, s, default_flow_style=False)
+
+        s.seek(0)
+
+        return s
+    else:
+        return path
 
 
 def _merge_variable_metadata(
@@ -127,7 +177,7 @@ def _validate_variables(t_annot: dict, tb: Table) -> None:
     table_variable_names = tb.columns
     extra_variable_names = yaml_variable_names - table_variable_names
     if extra_variable_names:
-        raise ValueError(f"Table {tb.metadata.short_name} has extra variables: {extra_variable_names}")
+        raise ValueError(f"Table {tb.metadata.short_name} has extra variables: {sorted(list(extra_variable_names))}")
 
 
 def _flatten(lst: List[Any]) -> List[str]:
