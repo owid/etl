@@ -14,8 +14,10 @@ paths = PathFinder(__file__)
 # Label to use for the breakdown by sector in the sector dropdown.
 BREAKDOWN_BY_SECTOR_LABEL = "Breakdown by sector"
 
-# Label to use for all sectors in the sector dropdown.
-ALL_SECTORS_LABEL = "All sectors"
+# Old and new labels the all sectors in the sector dropdown.
+# NOTE: The old label should coincide with the one used in the garden step.
+ALL_SECTORS_LABEL_OLD = "All sectors"
+ALL_SECTORS_LABEL_NEW = "All sectors (total)"
 
 # Label to use for all pollutants in the pollutants dropdown.
 ALL_POLLUTANTS_LABEL = "All pollutants"
@@ -73,6 +75,8 @@ def run(dest_dir: str) -> None:
         # Append extracted values.
         variable_ids.append([f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"])
         pollutant_dropdown.append(pollutant)
+        if sector == ALL_SECTORS_LABEL_OLD:
+            sector = ALL_SECTORS_LABEL_NEW
         sector_dropdown.append(sector)
         per_capita_checkbox.append(per_capita)
         map_tab.append(True)
@@ -110,7 +114,7 @@ def run(dest_dir: str) -> None:
                         if per_capita
                         else "Measured in tonnes and split by major pollutant.",
                         "Pollutant Dropdown": ALL_POLLUTANTS_LABEL,
-                        "Sector Dropdown": ALL_SECTORS_LABEL,
+                        "Sector Dropdown": ALL_SECTORS_LABEL_NEW,
                         "Per capita Checkbox": per_capita,
                         "hasMapTab": False,
                         "selectedFacetStrategy": "metric",
@@ -176,8 +180,8 @@ def run(dest_dir: str) -> None:
     df_graphers["yAxisMin"] = 0
 
     # Sort rows conveniently.
-    sector_categories = [ALL_SECTORS_LABEL, BREAKDOWN_BY_SECTOR_LABEL] + sorted(
-        set(df_graphers["Sector Dropdown"]) - {ALL_SECTORS_LABEL, BREAKDOWN_BY_SECTOR_LABEL}
+    sector_categories = [ALL_SECTORS_LABEL_NEW, BREAKDOWN_BY_SECTOR_LABEL] + sorted(
+        set(df_graphers["Sector Dropdown"]) - {ALL_SECTORS_LABEL_NEW, BREAKDOWN_BY_SECTOR_LABEL}
     )
     df_graphers["Sector Dropdown"] = pd.Categorical(
         df_graphers["Sector Dropdown"],
@@ -192,7 +196,7 @@ def run(dest_dir: str) -> None:
     df_graphers["defaultView"] = False
     df_graphers.loc[
         (df_graphers["Pollutant Dropdown"] == ALL_POLLUTANTS_LABEL)
-        & (df_graphers["Sector Dropdown"] == ALL_SECTORS_LABEL)
+        & (df_graphers["Sector Dropdown"] == ALL_SECTORS_LABEL_NEW)
         & (~df_graphers["Per capita Checkbox"]),
         "defaultView",
     ] = True
