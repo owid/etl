@@ -106,7 +106,9 @@ def run(dest_dir: str) -> None:
                         "title": "Per capita emissions of air pollutants from all sectors"
                         if per_capita
                         else "Emissions of air pollutants from all sectors",
-                        "subtitle": "Measured in tonnes and split by major pollutant.",
+                        "subtitle": "Measured in kilograms and split by major pollutant."
+                        if per_capita
+                        else "Measured in tonnes and split by major pollutant.",
                         "Pollutant Dropdown": ALL_POLLUTANTS_LABEL,
                         "Sector Dropdown": ALL_SECTORS_LABEL,
                         "Per capita Checkbox": per_capita,
