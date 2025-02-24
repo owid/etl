@@ -1,8 +1,15 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  common_icu: &common_icu |-
+    For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
+  common_key: &common_key
+    - Hospital and ICU data are sourced from official providers and collated by Our World in Data, but no new datapoints have been added since 13 August 2024.
+    - Gaps in more recent hospitalization trends may exist due to the cessation of regular updates after August 2024.
+  common_icu_key: &common_icu_key
+    - *common_icu
+    - Hospital and ICU data are sourced from official providers and collated by Our World in Data, but no new datapoints have been added since 13 August 2024.
+    - Gaps in more recent hospitalization trends may exist due to the cessation of regular updates after August 2024.
   others:
-    icu: &icu |-
-      For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
     zero_day: &zero_day
       zeroDay: 2020-01-21
       yearIsDay: true
@@ -27,8 +34,9 @@ tables:
       # Occupancy in hospital
       daily_occupancy_hosp:
         title: Daily hospital occupancy
-        description_short: Number of COVID-19 patients in hospital on a given day
+        description_short: Number of COVID-19 patients in hospital on a given day.
         unit: "patients"
+        description_key: *common_key
         display:
           numDecimalPlaces: 0
           tolerance: 15
@@ -48,6 +56,7 @@ tables:
         title: Daily hospital occupancy per million
         description_short: Number of COVID-19 patients in hospital on a given day, per million people.
         unit: "patients per million people"
+        description_key: *common_key
         display:
           numDecimalPlaces: 2
           tolerance: 15
@@ -69,6 +78,7 @@ tables:
         title: Weekly new hospital admissions
         description_short: Number of COVID-19 patients newly admitted to hospitals in a given week (reporting date and the preceding six days).
         unit: "patients"
+        description_key: *common_key
         display:
           numDecimalPlaces: 0
           tolerance: 15
@@ -89,6 +99,7 @@ tables:
         title: Weekly new hospital admissions per million
         description_short: Number of COVID-19 patients newly admitted to hospitals in a given week (reporting date and the preceding six days), per million people
         unit: "patients per million people"
+        description_key: *common_key
         display:
           name: Hospital admissions (per 1M)
           numDecimalPlaces: 2
@@ -111,9 +122,8 @@ tables:
       daily_occupancy_icu:
         title: Daily ICU occupancy
         description_short: Number of COVID-19 patients in ICU on a given day.
-        description_key:
-          - *icu
         unit: "patients in ICU"
+        description_key: *common_icu_key
         display:
           numDecimalPlaces: 0
           tolerance: 15
@@ -121,7 +131,7 @@ tables:
         presentation:
           grapher_config:
             title: Number of COVID-19 patients in intensive care (ICU)
-            note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
+            note: *common_icu
             hasMapTab: true
             originUrl: ourworldindata.org/coronavirus
             map:
@@ -133,8 +143,7 @@ tables:
       daily_occupancy_icu_per_1m:
         title: Daily ICU occupancy per million
         description_short: Number of COVID-19 patients in ICU on a given day, per million people.
-        description_key:
-          - *icu
+        description_key: *common_icu_key
         unit: "patients per million people"
         display:
           name: Patients in ICU (per 1M)
@@ -144,7 +153,7 @@ tables:
         presentation:
           grapher_config:
             title: Number of COVID-19 patients in intensive care (ICU) per million people
-            note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
+            note: *common_icu
             hasMapTab: true
             originUrl: ourworldindata.org/coronaviru
             map:
@@ -158,8 +167,7 @@ tables:
       weekly_admissions_icu:
         title: Weekly new ICU admissions
         description_short: Number of COVID-19 patients newly admitted to ICU in a given week (reporting date and the preceding six days).
-        description_key:
-          - *icu
+        description_key: *common_icu_key
         unit: "patients"
         display:
           numDecimalPlaces: 0
@@ -169,7 +177,7 @@ tables:
           grapher_config:
             title: Weekly new ICU admissions for COVID-19
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
-            note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
+            note: *common_icu
             hasMapTab: true
             originUrl: ourworldindata.org/coronavirus
             map:
@@ -181,8 +189,7 @@ tables:
       weekly_admissions_icu_per_1m:
         title: Weekly new ICU admissions per million
         description_short: Number of COVID-19 patients newly admitted to ICU in a given week (reporting date and the preceding six days), per million people.
-        description_key:
-          - *icu
+        description_key: *common_icu_key
         unit: "patients per million people"
         display:
           numDecimalPlaces: 2
@@ -192,7 +199,7 @@ tables:
           grapher_config:
             title: Weekly new ICU admissions for COVID-19 per million people
             subtitle: Weekly admissions refer to the cumulative number of new admissions over the previous week.
-            note: For countries where the number of ICU patients is not reported, we display the closest metric (patients ventilated or in critical condition).
+            note: *common_icu
             hasMapTab: true
             originUrl: ourworldindata.org/coronavirus
             map:

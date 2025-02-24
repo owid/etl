@@ -47,7 +47,7 @@ steps:
   data://grapher/war/2024-08-26/ucdp:
     - data://garden/war/2024-08-26/ucdp
 
-  # UCDP (with candidate data, latest available)
+  # [TODO: ARCHIVE] UCDP (with candidate data, latest available)
   data://meadow/war/2024-11-22/ucdp_ced:
     - snapshot://war/2024-11-22/ucdp_ced_v24_0_10.csv
     - snapshot://war/2024-11-22/ucdp_ced_v24_01_24_09.csv
@@ -59,6 +59,18 @@ steps:
     - data://garden/countries/2024-08-27/gleditsch
   data://grapher/war/2024-11-22/ucdp_preview:
     - data://garden/war/2024-11-22/ucdp_preview
+
+  # UCDP (with candidate data, latest available)
+  data://meadow/war/latest/ucdp_ced:
+    - snapshot://war/latest/ucdp_ced_v24_01_24_12.csv
+  data://garden/war/latest/ucdp_preview:
+    - data://meadow/war/latest/ucdp_ced
+    - data://garden/demography/2024-07-15/population
+    - data://garden/geography/2023-11-28/nat_earth_110
+    - data://meadow/war/2024-08-26/ucdp
+    - data://garden/countries/2024-08-27/gleditsch
+  data://grapher/war/latest/ucdp_preview:
+    - data://garden/war/latest/ucdp_preview
 
   # PRIO v3.1
   data://meadow/war/2023-09-21/prio_v31:

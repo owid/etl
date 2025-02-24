@@ -55,6 +55,8 @@ definitions:
       <% elif risk_factor == "all" and age_group != "all" %>
       The estimated incidence rate of tuberculosis cases in {definitions.sex} aged {definitions.age_group}, per 100,000 people.
       <%- endif -%>
+dataset:
+  title: Global Tuberculosis Report - Disaggregated Burden Estimates
 tables:
   burden_disaggregated:
     variables:

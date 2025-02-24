@@ -1,0 +1,49 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical Measles Cases - United States
+    description: |-
+      Data on historical measles cases in the United States, compiled from a selection of government sources.
+
+      Sources for each year are as follows:
+
+      * 1919: Public Health Reports (1896-1970), Vol. 36, No. 8 - [The Notifiable Diseases: Prevalence during 1919 in States](https://www.jstor.org/stable/4575902?seq=25)
+
+      * 1921: Public Health Reports Vol. 37, No. 41 - [The Notifiable Diseases: Prevalence during 1921 in States. Anthrax, Cerebrospinal Meningitis, Dengue, Diphtheria, Gonorrhea, Influenza, Malaria, Measles, Pneumonia, Poliomyelitis, Rabies, Rocky Mountain Spotted Fever, Scarlet Fever, Septic Sore Throat, Smallpox, Syphilis, Tuberculosis (All Forms and Pulmonary), Typhoid Fever, and Typhus Fever](https://www.jstor.org/stable/4576538?seq=1)
+
+      * 1924: Public Health Reports Vol. 40, No. 51 - [The Notifiable Diseases: Prevalence during 1924 in States](https://www.jstor.org/stable/4577735?seq=34)
+
+      * 1925: Public Health Reports Vol. 42, No. 1 - [The Notifiable Diseases: Prevalence during 1924 in States](https://www.jstor.org/stable/4578131?seq=2)
+
+      * 1938-1943: US Census Bureau - [Part 2 - Vital Statistics, Statistical Abstract of the United States 1944-45](https://www.census.gov/library/publications/1945/compendia/statab/66ed.html)
+
+      * 1944-1984: [Morbidity and Mortality Weekly Report Annual Supplement Summary 1993 Vol. 42, No. 53 by the Centers for Disease Control and Prevention (CDC), US Public Health Service](https://www.cdc.gov/mmwr/preview/index93.html)
+
+    date_published: "1994-10-21"
+
+    # Citation
+    producer: Public Health Reports; US Census Bureau; Centers for Disease Control and Prevention
+    citation_full: |-
+      Public Health Reports (1896-1970), Vol. 36, No. 8. The Notifiable Diseases: Prevalence during 1919 in States.
+
+      Public Health Reports Vol. 37, No. 41. The Notifiable Diseases: Prevalence during 1921 in States. Anthrax, Cerebrospinal Meningitis, Dengue, Diphtheria, Gonorrhea, Influenza, Malaria, Measles, Pneumonia, Poliomyelitis, Rabies, Rocky Mountain Spotted Fever, Scarlet Fever, Septic Sore Throat, Smallpox, Syphilis, Tuberculosis (All Forms and Pulmonary), Typhoid Fever, and Typhus Fever.
+
+      Public Health Reports Vol. 40, No. 51. The Notifiable Diseases: Prevalence during 1924 in States.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States 1944-45.
+
+      Morbidity and Mortality Weekly Report Annual Supplement Summary 1993 Vol. 42, No. 53 by the Centers for Disease Control and Prevention (CDC), US Public Health Service.
+
+    # Files
+    url_main: https://www.jstor.org/stable/4575902?seq=25; https://www.jstor.org/stable/4577735?seq=34; https://www.jstor.org/stable/4578131?seq=2; https://www.census.gov/library/publications/1945/compendia/statab/66ed.html; https://www.cdc.gov/mmwr/preview/index93.html
+    date_accessed: 2025-02-19
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: 8c6be10bba15a4d419027d218c5d1d0e
+    size: 3717
+    path: measles_historical.csv

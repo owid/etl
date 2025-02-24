@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: OECD
+    title: 'OECD Official Development Assistance (ODA) - CRS: Creditor Reporting System (flows)'
+    description: |-
+      The objective of the CRS Aid Activity database is to provide a set of readily available granular data that enables analysis on where aid goes, what purposes it serves and what policies it aims to implement, on a comparable basis for all providers who report their activity-level statistics to the OECD. Data are collected on individual projects and programmes, with a range of attributes for each activity.
+    citation_full: 'OECD (2024). OECD Official Development Assistance (ODA) - CRS: Creditor Reporting System (flows). OECD Data Explorer.'
+    url_main: https://www.oecd.org/en/topics/policy-issues/official-development-assistance-oda.html
+    url_download: https://stats.oecd.org/wbos/fileview2.aspx?IDFile=50f0355e-8f61-4230-85f3-90b4db45bfc9
+    date_accessed: '2025-02-19'
+    date_published: '2024-12-23'
+    license:
+      name: OECD Terms & conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: c22ae926eb365db94e3086e09d7515ab
+    size: 910468945
+    path: official_development_assistance_crs.zip

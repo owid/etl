@@ -171,13 +171,6 @@ steps:
   #
   data://grapher/energy/2024-06-20/uk_historical_electricity:
     - data://garden/energy/2024-06-20/uk_historical_electricity
-
-
-  #
-  # Multi-dim indicators
-  #
-  export://multidim/energy/latest/energy:
-    - grapher://grapher/energy/2024-06-20/primary_energy_consumption
   #
   # IRENA - Renewable electricity capacity.
   #

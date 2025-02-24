@@ -2,6 +2,7 @@
 definitions:
   common:
     presentation:
+      attribution_short: HMD
       topic_tags:
         - Fertility Rate
 
@@ -58,6 +59,7 @@ tables:
         description_short: |-
           The total number of births per 1,000 people in <<month>>.
         display:
+          numDecimalPlaces: 1
           name: |-
             Birth rate
 

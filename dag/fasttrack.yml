@@ -206,3 +206,5 @@ steps:
     - snapshot://fasttrack/latest/right_wrong_track_data.csv
   data-private://grapher/fasttrack/latest/replacement_fertility_basten_scherbov:
     - snapshot-private://fasttrack/latest/replacement_fertility_basten_scherbov.csv
+  data://grapher/fasttrack/latest/skaaning_democracy_di:
+    - snapshot://fasttrack/latest/skaaning_democracy_di.csv

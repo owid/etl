@@ -515,6 +515,7 @@ class PathFinder:
 
     @property
     def mdim_path(self) -> Path:
+        """TODO: worth aligning with `metadata_path` (add missing '.meta'), maybe even just deprecate this and use `metadata_path`."""
         assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
         return self.directory / (self.short_name + ".yml")
 
@@ -587,7 +588,7 @@ class PathFinder:
         elif channel == "walden":
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
+            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data{is_private_suffix}://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
         else:
             raise UnknownChannel
 
@@ -646,8 +647,11 @@ class PathFinder:
             else:
                 return _step
 
+    def side_file(self, filename: str) -> Path:
+        return self.directory / filename
+
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> set[str]:
         # Current step should be in the dag.
         if self.step not in self.dag:
             raise CurrentStepMustBeInDag
@@ -705,7 +709,7 @@ class PathFinder:
         elif len(matches) > 1:
             raise MultipleMatchingStepsAmongDependencies(step_name=self.step_name)
 
-        dependency = matches[0]
+        dependency = next(iter(matches))
 
         return dependency
 
@@ -784,9 +788,9 @@ class PathFinder:
         return config
 
 
-def _match_dependencies(pattern: str, dependencies: List[str]) -> List[str]:
+def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
     regex = re.compile(pattern)
-    return [dependency for dependency in dependencies if regex.match(dependency)]
+    return {dependency for dependency in dependencies if regex.match(dependency)}
 
 
 def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:
@@ -1218,7 +1222,10 @@ def get_schema_from_url(schema_url: str) -> dict:
 
 
 def last_date_accessed(tb: Table) -> str:
-    """Get maximum date_accessed from all origins in the table and display it in a specific format. This
-    should be a replacement for {TODAY} in YAML templates."""
+    """Get maximum date_accessed from all origins in the table and display it in a specific format.
+
+    Usage:
+        create_dataset(..., yaml_params={"date_accessed": last_date_accessed(tb)})
+    """
     date_accessed = max([origin.date_accessed for col in tb.columns for origin in tb[col].m.origins])
     return dt.datetime.strptime(date_accessed, "%Y-%m-%d").strftime("%d %B %Y")

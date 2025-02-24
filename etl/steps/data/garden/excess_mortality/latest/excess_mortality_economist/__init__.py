@@ -11,7 +11,7 @@ paths = PathFinder(__file__)
 def run(dest_dir: str) -> None:
     # Load table
     ds_meadow = paths.load_dataset()
-    tb = ds_meadow["excess_mortality_economist"].reset_index()
+    tb = ds_meadow.read("excess_mortality_economist")
 
     # Set type
     tb = tb.astype({"country": "string", "date": "datetime64[ns]"})

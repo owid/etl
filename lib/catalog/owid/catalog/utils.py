@@ -1,13 +1,11 @@
 import dataclasses
-import datetime as dt
 import hashlib
 import re
 from dataclasses import fields, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional, Type, TypeVar, Union, get_args, get_origin, overload
+from typing import Any, Dict, Optional, TextIO, Type, TypeVar, Union, get_args, get_origin, overload
 
 import dynamic_yaml
-import pytz
 import structlog
 import yaml
 from unidecode import unidecode
@@ -184,18 +182,24 @@ def validate_underscore(name: Optional[str], object_name: str = "Name") -> None:
         raise NameError(f"{object_name} must be snake_case. Change `{name}` to `{underscore(name, validate=False)}`")
 
 
-def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
-    with open(path) as istream:
-        yd = dynamic_yaml.load(istream)
+def dynamic_yaml_load(source: Union[Path, str, TextIO], params: Dict = {}) -> dict:
+    """
+    Loads a YAML file from a path, string, or StringIO-like object, and updates it with given parameters.
+
+    Args:
+        source (Union[Path, str, TextIO]): File path, string, or a file-like object (e.g., StringIO).
+        params (dict): Parameters to update in the loaded YAML.
+
+    Returns:
+        dict: The parsed YAML data with updated parameters.
+    """
+    if isinstance(source, (str, Path)):
+        with open(source) as istream:
+            yd = dynamic_yaml.load(istream)
+    else:  # Assume it's a file-like object (StringIO, BytesIO, etc.)
+        yd = dynamic_yaml.load(source)
 
     yd.update(params)
-
-    # additional parameters
-    # NOTE: TODAY is dynamic and can depend on the time of creation. This goes against our
-    #   philosophy of having deterministic outputs from snapshots and its use is therefore
-    #   discouraged. You should use origin.date_accessed instead if possible.
-    #   We only keep it here because of its convenience for COVID and AI automatic updates.
-    yd["TODAY"] = dt.datetime.now().astimezone(pytz.timezone("Europe/London")).strftime("%-d %B %Y")
 
     return yd
 
@@ -327,3 +331,13 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
             init_args[field_name] = v
 
     return cls(**init_args)
+
+
+def remove_details_on_demand(text: str) -> str:
+    # Remove references to details on demand from a text.
+    # Example: "This is a [description](#dod:something)." -> "This is a description."
+    regex = r"\(\#dod\:.*\)"
+    if "(#dod:" in text:
+        text = re.sub(regex, "", text).replace("[", "").replace("]", "")
+
+    return text

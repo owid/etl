@@ -1,5 +1,4 @@
 from etl import multidim
-from etl.db import get_engine
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -42,7 +41,6 @@ def run(dest_dir: str) -> None:
     )
 
     # Create special view for the stacked area chart of total consumer price by components.
-    table_name = paths.get_dependency_step_name("energy_prices").replace("data://", "")
     for source in ["electricity", "gas"]:
         price_components = [
             # The total price is (to a very good approximation) equivalent to the combination of "Energy and supply", "Network costs", and "Taxes, fees, levies, and charges".
@@ -83,6 +81,13 @@ def run(dest_dir: str) -> None:
                     subtitle = "Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). This data is adjusted for inflation and differences in living costs between countries."
                     title_variant = "PPS"
                     footnote = "PPS have been adjusted for inflation, expressed in 2015 prices, using the Harmonised Index of Consumer Prices."
+
+                presentation = {
+                    "titlePublic": title,
+                }
+                if title_variant:
+                    presentation["titleVariant"] = title_variant
+
                 config["views"].append(
                     {
                         "dimensions": {
@@ -93,7 +98,7 @@ def run(dest_dir: str) -> None:
                             "unit": unit,
                         },
                         "indicators": {
-                            "y": [f"{table_name}/energy_prices_annual#{indicator}" for indicator in indicators],
+                            "y": [f"energy_prices_annual#{indicator}" for indicator in indicators],
                         },
                         "config": {
                             "chartTypes": ["StackedBar"],
@@ -106,7 +111,7 @@ def run(dest_dir: str) -> None:
                         "metadata": {
                             "descriptionShort": subtitle,
                             "descriptionKey": description_keys,
-                            "presentation": {"titlePublic": title, "titleVariant": title_variant},
+                            "presentation": presentation,
                         },
                     },
                 )
@@ -114,4 +119,8 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    multidim.upsert_multidim_data_page(slug="mdd-energy-prices", config=config, engine=get_engine())
+    multidim.upsert_multidim_data_page(
+        slug="mdd-energy-prices",
+        config=config,
+        dependencies=paths.dependencies,
+    )
