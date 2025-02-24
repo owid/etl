@@ -155,6 +155,8 @@ steps:
     - snapshot://health/2025-01-22/unaids_gam.csv
     - snapshot://health/2025-01-22/unaids_epi.csv
     - snapshot://health/2025-01-22/unaids_ncpi.csv
+  data://meadow/health/2023-08-22/unaids_deaths_averted_art:
+    - snapshot://health/2023-08-22/unaids_deaths_averted_art.xlsx
 
   data://garden/health/2025-01-22/unaids:
     - data://garden/regions/2023-01-01/regions
