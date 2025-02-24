@@ -59,7 +59,6 @@ CHART_PER_PAGE = 10
 if WARN_MSG:
     st.warning("- " + "\n\n- ".join(WARN_MSG))
 
-
 ########################################
 # FUNCTIONS
 ########################################

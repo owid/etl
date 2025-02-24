@@ -294,12 +294,22 @@ class ChartDiff:
 
     def get_all_approvals(self, session: Session) -> List[gm.ChartDiffApprovals]:
         """Get history of chart diff."""
+
         # Get history
         history = gm.ChartDiffApprovals.get_all(
             session,
             chart_id=self.chart_id,
         )
         return history
+
+    def get_all_approvals_df(self) -> pd.DataFrame:
+        """Get history of chart diff."""
+        df = OWID_ENV.read_sql(f"SELECT * FROM chart_diff_approvals WHERE chartId = {self.chart_id}")
+        return df
+
+    def get_last_chart_revision(self, session: Session, timestamp=None) -> gm.ChartRevisions:
+        """Get history of chart diff."""
+        return gm.ChartRevisions.get_latest(session, self.chart_id, timestamp)
 
     def approve(self, session: Session) -> None:
         """Approve chart diff."""
