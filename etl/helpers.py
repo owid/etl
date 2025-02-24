@@ -647,6 +647,9 @@ class PathFinder:
             else:
                 return _step
 
+    def side_file(self, filename: str) -> Path:
+        return self.directory / filename
+
     @property
     def dependencies(self) -> set[str]:
         # Current step should be in the dag.
