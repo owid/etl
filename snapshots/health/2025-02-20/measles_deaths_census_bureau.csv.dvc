@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical measless deaths in the United States - US Census Bureau
+    description: |-
+      Data on reported measles deaths in the United States, from the United States Census Bureau: [Part 2 - Vital Statistics and Health and Medical Care](https://www.census.gov/library/publications/1952/compendia/statab/73ed.html)
+
+    date_published: "1952-09-01"
+
+    # Citation
+    producer: US Census Bureau
+    citation_full: |-
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States 1944-45.
+
+    # Files
+    url_main: https://www.census.gov/library/publications/1952/compendia/statab/73ed.html
+    date_accessed: 2025-02-20
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: 57ef9c78556cfe23cc9a0687b987523b
+    size: 126
+    path: measles_deaths_census_bureau.csv

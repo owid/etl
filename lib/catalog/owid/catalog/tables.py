@@ -219,6 +219,57 @@ class Table(pd.DataFrame):
         metadata_filename = splitext(path)[0] + ".meta.json"
         self._save_metadata(metadata_filename)
 
+    @property
+    def codebook(self) -> pd.DataFrame:
+        """
+        Return a codebook for this table.
+        """
+
+        # Define how to show attributions and URLs in the sources column.
+        def _prepare_attributions(attribution: str, url_main: str) -> str:
+            return f"{attribution} ( {url_main} )"
+
+        # Initialize lists to store the codebook information.
+        columns = []
+        titles = []
+        descriptions = []
+        sources = []
+        for column in self.columns:
+            md = self[column].metadata
+            columns.append(column)
+            titles.append(getattr(md.presentation, "title_public", None) or md.title)
+            # Use short description (after removing details on demand, if any).
+            descriptions.append(utils.remove_details_on_demand(md.description_short))
+            sources.append(
+                "; ".join(
+                    dict.fromkeys(
+                        _prepare_attributions(
+                            origin.attribution if origin.attribution else origin.producer, origin.url_main
+                        )
+                        for origin in md.origins
+                    )
+                )
+            )
+
+        # Create a DataFrame with the codebook.
+        codebook = pd.DataFrame({"column": columns, "title": titles, "description": descriptions, "sources": sources})
+
+        return codebook
+
+    def to_excel(
+        self,
+        excel_writer: Any,
+        with_metadata=True,
+        sheet_name="data",
+        metadata_sheet_name="metadata",
+        **kwargs: Any,
+    ) -> None:
+        # Save data and codebook to an excel file.
+        with pd.ExcelWriter(excel_writer) as writer:  # type: ignore
+            super().to_excel(writer, sheet_name=sheet_name, **kwargs)
+            if with_metadata:
+                self.codebook.to_excel(writer, sheet_name=metadata_sheet_name)
+
     def to_feather(
         self,
         path: Any,

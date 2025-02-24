@@ -390,6 +390,18 @@ steps:
   data://grapher/regions/latest/regions:
     - data://garden/regions/2023-01-01/regions
 
+  # OECD Official Development Assistance (ODA)
+  data://meadow/oecd/2024-08-21/official_development_assistance:
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac1.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac2a.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac5.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_crs.zip
+  data://garden/oecd/2024-08-21/official_development_assistance:
+    - data://meadow/oecd/2024-08-21/official_development_assistance
+    - data://garden/demography/2024-07-15/population
+  data://grapher/oecd/2024-08-21/official_development_assistance:
+    - data://garden/oecd/2024-08-21/official_development_assistance
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml

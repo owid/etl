@@ -14,6 +14,9 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: {{cookiecutter.update_period_days}}
+{%- if cookiecutter.is_private %}
+  non_redistributable: true
+{%- endif %}
 
 
 tables:
