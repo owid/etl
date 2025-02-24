@@ -266,7 +266,7 @@ An alternative is examining `VariableMeta`
 
 ```python
 from owid.catalog import Dataset
-from etl.grapher import helpers as gh
+import etl.grapher.helpers as gh
 from etl import paths
 
 tb = Dataset(paths.DATA_DIR / "garden/who/2024-07-30/ghe")['ghe']
