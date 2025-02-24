@@ -28,21 +28,21 @@ definitions:
     "International aviation" includes air pollutant emissions from fuel combustion in aircraft operating on international routes.
   description_key_international_shipping: |-
     "International shipping" includes air pollutant emissions from fuel combustion in ships engaged in international transport. It also covers emissions from oil tanker loading, the transfer of crude oil or petroleum products between storage facilities and transport systems such as tankers.
-  description_key_transportation: |-
-    "Transportation" includes air pollutant emissions from fuel combustion in road, rail, and domestic navigation.
+  description_key_transport: |-
+    "Transport" includes air pollutant emissions from fuel combustion in road, rail, and domestic navigation.
   description_key_solvents: |-
     "Solvents" includes air pollutant emissions from industrial and consumer applications such as degreasing, painting, and chemical manufacturing.
   description_key_waste: |-
     "Waste" includes air pollutant emissions from solid waste disposal, waste combustion, wastewater handling, and other waste management processes.
   description_key_combined: &description_key_combined
-    - <% if sector == "All sectors" or sector == "Agriculture" %> {definitions.description_key_agriculture} <% elif sector == "Buildings" %> {definitions.description_key_buildings} <% elif sector == "Domestic aviation" %> {definitions.description_key_domestic_aviation} <% elif sector == "Energy" %> {definitions.description_key_energy} <% elif sector == "Industry" %> {definitions.description_key_industry} <% elif sector == "International aviation" %> {definitions.description_key_international_aviation} <% elif sector == "International shipping" %> {definitions.description_key_international_shipping} <% elif sector == "Transportation" %> {definitions.description_key_transportation} <% elif sector == "Solvents" %> {definitions.description_key_solvents} <% elif sector == "Waste" %> {definitions.description_key_waste} <% endif %>
+    - <% if sector == "All sectors" or sector == "Agriculture" %> {definitions.description_key_agriculture} <% elif sector == "Buildings" %> {definitions.description_key_buildings} <% elif sector == "Domestic aviation" %> {definitions.description_key_domestic_aviation} <% elif sector == "Energy" %> {definitions.description_key_energy} <% elif sector == "Industry" %> {definitions.description_key_industry} <% elif sector == "International aviation" %> {definitions.description_key_international_aviation} <% elif sector == "International shipping" %> {definitions.description_key_international_shipping} <% elif sector == "Transport" %> {definitions.description_key_transport} <% elif sector == "Solvents" %> {definitions.description_key_solvents} <% elif sector == "Waste" %> {definitions.description_key_waste} <% endif %>
     - <% if sector == "All sectors" %> {definitions.description_key_buildings} <% endif %>
     - <% if sector == "All sectors" %> {definitions.description_key_domestic_aviation} <% endif %>
     - <% if sector == "All sectors" %> {definitions.description_key_energy} <% endif %>
     - <% if sector == "All sectors" %> {definitions.description_key_industry} <% endif %>
     - <% if sector == "All sectors" %> {definitions.description_key_international_aviation} <% endif %>
     - <% if sector == "All sectors" %> {definitions.description_key_international_shipping} <% endif %>
-    - <% if sector == "All sectors" %> {definitions.description_key_transportation} <% endif %>
+    - <% if sector == "All sectors" %> {definitions.description_key_transport} <% endif %>
     - <% if sector == "All sectors" %> {definitions.description_key_solvents} <% endif %>
     - <% if sector == "All sectors" %> {definitions.description_key_waste} <% endif %>
     - Emissions assigned to "Other" are those that are included in the global total, but cannot be allocated to any specific countries.

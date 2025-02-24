@@ -119,7 +119,7 @@ SECTOR_MAPPING = {
         "2D_Other-product-use",
     ],
     # "Transportation (TRA)".
-    "Transportation": [
+    "Transport": [
         "1A3b_Road",
         "1A3c_Rail",
         "1A3dii_Domestic-navigation",
@@ -550,7 +550,7 @@ def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -
 
 def remap_table_categories(tb: Table) -> Table:
     # We don't need the detailed sectorial information.
-    # So, map detailed subsectors into broader sectors, e.g. "Transportation", "Agriculture".
+    # So, map detailed subsectors into broader sectors, e.g. "Transport", "Agriculture".
     subsector_to_sector = {
         subsector: sector for sector, subsectors in SECTOR_MAPPING.items() for subsector in subsectors
     }
