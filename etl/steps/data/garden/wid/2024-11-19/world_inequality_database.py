@@ -8,7 +8,6 @@ NOTE: To extract the log of the process (to review sanity checks, for example), 
 
 """
 
-
 import owid.catalog.processing as pr
 from owid.catalog import Table
 from shared import add_metadata_vars, add_metadata_vars_distribution
