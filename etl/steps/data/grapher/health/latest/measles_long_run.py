@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder, create_dataset, last_date_accessed
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -18,8 +18,6 @@ def run(dest_dir: str) -> None:
     # Read table from garden dataset.
     tb = ds_garden.read("measles_long_run", reset_index=False)
     assert tb["cases"].metadata.origins[1].title == "CDC Yearly measles cases (1985-present)"
-    publication_date = tb["cases"].metadata.origins[1].date_published
-    year, update_date = format_description_short(publication_date)
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
@@ -28,16 +26,8 @@ def run(dest_dir: str) -> None:
         tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_garden.metadata,
-        yaml_params={"year": year, "update_date": update_date},
+        yaml_params={"year": last_date_accessed(tb)[-4:], "update_date": last_date_accessed(tb)},
     )
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
-
-
-def format_description_short(publication_date: str) -> str:
-    date_obj = datetime.strptime(publication_date, "%Y-%m-%d")
-    formatted_date = date_obj.strftime("%d %B %Y")
-    year = datetime.now().year
-    update_date = formatted_date
-    return year, update_date
