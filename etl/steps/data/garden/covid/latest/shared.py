@@ -3,6 +3,7 @@ from typing import Any, Dict, Hashable, Optional, Set, cast
 
 import numpy as np
 import pandas as pd
+import pytz
 from owid.catalog import Dataset, Table
 from owid.catalog.processing import concat
 
@@ -39,11 +40,14 @@ def run(dest_dir: str, paths: PathFinder) -> None:
     # Create a new table and ensure all columns are snake-case.
     tb = Table(df, short_name=paths.short_name, underscore=True)
 
+    # Pass today to the template. It'd be better to get this information from the snapshot.
+    TODAY = dt.datetime.now().astimezone(pytz.timezone("Europe/London")).strftime("%-d %B %Y")
+
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the snapshot.
-    ds_garden = create_dataset(dest_dir, tables=[tb])
+    ds_garden = create_dataset(dest_dir, tables=[tb], yaml_params={"TODAY": TODAY})
 
     ds_garden.metadata.sources[0].date_accessed = str(dt.date.today())
 

@@ -647,6 +647,9 @@ class PathFinder:
             else:
                 return _step
 
+    def side_file(self, filename: str) -> Path:
+        return self.directory / filename
+
     @property
     def dependencies(self) -> set[str]:
         # Current step should be in the dag.
@@ -1219,7 +1222,10 @@ def get_schema_from_url(schema_url: str) -> dict:
 
 
 def last_date_accessed(tb: Table) -> str:
-    """Get maximum date_accessed from all origins in the table and display it in a specific format. This
-    should be a replacement for {TODAY} in YAML templates."""
+    """Get maximum date_accessed from all origins in the table and display it in a specific format.
+
+    Usage:
+        create_dataset(..., yaml_params={"date_accessed": last_date_accessed(tb)})
+    """
     date_accessed = max([origin.date_accessed for col in tb.columns for origin in tb[col].m.origins])
     return dt.datetime.strptime(date_accessed, "%Y-%m-%d").strftime("%d %B %Y")

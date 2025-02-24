@@ -1,5 +1,4 @@
 import dataclasses
-import datetime as dt
 import hashlib
 import re
 from dataclasses import fields, is_dataclass
@@ -7,7 +6,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional, TextIO, Type, TypeVar, Union, get_args, get_origin, overload
 
 import dynamic_yaml
-import pytz
 import structlog
 import yaml
 from unidecode import unidecode
@@ -202,13 +200,6 @@ def dynamic_yaml_load(source: Union[Path, str, TextIO], params: Dict = {}) -> di
         yd = dynamic_yaml.load(source)
 
     yd.update(params)
-
-    # additional parameters
-    # NOTE: TODAY is dynamic and can depend on the time of creation. This goes against our
-    #   philosophy of having deterministic outputs from snapshots and its use is therefore
-    #   discouraged. You should use origin.date_accessed instead if possible.
-    #   We only keep it here because of its convenience for COVID and AI automatic updates.
-    yd["TODAY"] = dt.datetime.now().astimezone(pytz.timezone("Europe/London")).strftime("%-d %B %Y")
 
     return yd
 

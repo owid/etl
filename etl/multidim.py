@@ -5,6 +5,7 @@
 - We should try to keep explorers in mind, and see this tooling as something we may want to use for them, too.
 """
 
+import json
 import re
 from collections import defaultdict
 from copy import deepcopy
@@ -14,6 +15,7 @@ from typing import Any, Dict, List, Optional, Set, Union
 import pandas as pd
 import yaml
 from deprecated import deprecated
+from jsonschema import ValidationError, validate
 from owid.catalog import Dataset, Table
 from sqlalchemy.engine import Engine
 from structlog import get_logger
@@ -23,7 +25,7 @@ from etl.config import OWID_ENV, OWIDEnv
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
 from etl.helpers import map_indicator_path_to_id
-from etl.paths import DATA_DIR
+from etl.paths import DATA_DIR, SCHEMAS_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -211,6 +213,7 @@ def _upsert_multidim_data_page(slug: str, config: dict, owid_env: Optional[OWIDE
         owid_env = OWID_ENV
 
     # Validate config
+    validate_schema(config)
     validate_multidim_config(config, owid_env.engine)
 
     # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
@@ -410,6 +413,16 @@ def get_indicators_in_view(view):
                     }
                 )
     return indicators_view
+
+
+def validate_schema(config: dict) -> None:
+    schema_path = SCHEMAS_DIR / "multidim-schema.json"
+    with open(schema_path) as f:
+        schema = json.load(f)
+    try:
+        validate(instance=config, schema=schema)
+    except ValidationError as e:
+        raise ValueError(f"Config validation error: {e.message}")
 
 
 def validate_multidim_config(config: dict, engine: Engine) -> None:
