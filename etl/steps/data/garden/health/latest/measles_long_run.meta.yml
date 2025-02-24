@@ -4,10 +4,10 @@ tables:
   measles_long_run:
     variables:
       cases:
-        title: Reported measles cases (updated monthly)
+        title: Reported measles cases (updated weekly)
         unit: cases
       case_rate:
-        title: Reported measles case rate (updated monthly)
+        title: Reported measles case rate (updated weekly)
         unit: cases per 100,000 people
       cases_static:
         title: Reported measles cases
