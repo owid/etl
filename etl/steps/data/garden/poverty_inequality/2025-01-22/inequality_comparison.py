@@ -494,8 +494,6 @@ def create_analysis_and_grapher_tables(tb: Table) -> List[Table]:
     # I need to do this because the pipwelfare and pipreportinglevel dublicate the data
     tb = tb.groupby(["country", "year", "ref_year", "reference_years", "only_all_series"], as_index=False).first()
 
-    tb.to_csv("inequality_comparison.csv")
-
     # Format the table
     tb = tb.format(
         keys=[
