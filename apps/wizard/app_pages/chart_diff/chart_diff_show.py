@@ -449,7 +449,7 @@ class ChartDiffShow:
                     with st.container(height=40, border=False):
                         options = {
                             "prod": self._header_production_chart_plain,
-                            "last": f"Last approved ({prettify_date(chartrev_last_appr)} - REV {chartrev_last_appr.id})",
+                            "last": f"Last approved on staging ({prettify_date(chartrev_last_appr)} - REV {chartrev_last_appr.id})",
                         }
                         option = st.selectbox(
                             "Chart revision",
