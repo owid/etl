@@ -335,6 +335,21 @@ class ChartRevisions(Base):
     config: Mapped[Optional[dict]] = mapped_column(JSON)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
+    @classmethod
+    def get_latest(cls, session: Session, chart_id: int, updatedAt=None) -> "ChartRevisions":
+        """query should be: SELECT * FROM chart_revisions WHERE chartId = {self.chart_id} AND updatedAt <= '{timestamp}' ORDER BY updatedAt DESC LIMIT 1 if timestamp is given!"""
+        revision = session.scalars(
+            select(cls)
+            .where(and_(cls.chartId == chart_id, cls.updatedAt <= updatedAt) if updatedAt else cls.chartId == chart_id)
+            .order_by(cls.updatedAt.desc())
+            .limit(1)
+        ).one_or_none()
+
+        if revision is None:
+            raise NoResultFound()
+
+        return revision
+
 
 class ChartConfig(Base):
     __tablename__ = "chart_configs"
