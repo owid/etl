@@ -59,8 +59,6 @@ steps:
     - data://garden/lis/2025-01-24/luxembourg_income_study
     - data://garden/wb/2024-01-22/thousand_bins_distribution
     - data://garden/worldbank_wdi/2024-05-20/wdi
-  data://grapher/poverty_inequality/2025-01-22/inequality_comparison:
-    - data://garden/poverty_inequality/2025-01-22/inequality_comparison
 
   # Inequality comparison data
   data://garden/poverty_inequality/2025-01-22/inequality_comparison:
@@ -70,6 +68,8 @@ steps:
     - data://garden/wb/2024-10-07/world_bank_pip
     - data://garden/wid/2024-05-24/world_inequality_database
     - data://garden/lis/2025-01-24/luxembourg_income_study
+  data://grapher/poverty_inequality/2025-01-22/inequality_comparison:
+    - data://garden/poverty_inequality/2025-01-22/inequality_comparison
 
   # Global Multidimensional Poverty Index
   data://meadow/ophi/2024-10-28/multidimensional_poverty_index:
