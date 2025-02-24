@@ -265,6 +265,7 @@ d["tables"]["ghe"]["variables"]["death_count"]
 An alternative is examining `VariableMeta`
 
 ```python
+from owid.catalog import Dataset
 import etl.grapher.helpers as gh
 from etl import paths
 
