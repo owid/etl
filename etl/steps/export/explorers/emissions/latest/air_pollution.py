@@ -1,6 +1,7 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
 
 import pandas as pd
+from owid.catalog.utils import underscore
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_explorer
@@ -23,15 +24,15 @@ ALL_SECTORS_LABEL_NEW = "All sectors (total)"
 ALL_POLLUTANTS_LABEL = "All pollutants"
 
 POLLUTANT_NAME = {
-    "BC": "Black carbon",
-    "CH₄": "Methane",
-    "CO": "Carbon monoxide",
     "NH₃": "Ammonia",
+    "BC": "Black carbon",
+    "CO": "Carbon monoxide",
+    "CH₄": "Methane",
     "NOₓ": "Nitrogen oxides",
     "N₂O": "Nitrous oxide",
+    "NMVOC": "Non-methane volatile organic compounds",
     "OC": "Organic carbon",
     "SO₂": "Sulfur dioxide",
-    "NMVOC": "Non-methane volatile organic compounds",
 }
 
 
@@ -89,19 +90,22 @@ def run(dest_dir: str) -> None:
     df_graphers["hasMapTab"] = map_tab
 
     # Create view for all pollutants.
-    # TODO: Generalize this to all sectors, but after display name has been deleted, otherwise all sectors will have the same title in the faceted view.
-    # for sector in sorted(set(df_graphers["Sector Dropdown"])):
-    for sector in [ALL_SECTORS_LABEL_OLD]:
+    # TODO: Remove display name in the garden step, otherwise all sectors will have the same title in the faceted view.
+    # for sector in [ALL_SECTORS_LABEL_OLD]:
+    for sector in sorted(set(df_graphers["Sector Dropdown"])):
         sector_short_name = sector.lower().replace(" ", "_")
         for per_capita in [False, True]:
-            _columns = [
-                f"{ds.metadata.uri}/{tb.metadata.short_name}#{column}"
-                for column in tb.columns
-                if column.endswith(sector_short_name)
-                if (("per_capita" in column) == per_capita)
-                # if "_ch4_" not in column
-                # if "_n2o_" not in column
-            ]
+            _columns = []
+            for pollutant_short_name in [underscore(key) for key in POLLUTANT_NAME.keys()]:
+                column = [
+                    column
+                    for column in tb.columns
+                    if (f"_{pollutant_short_name}_" in column)
+                    and (("per_capita" in column) == per_capita)
+                    and (sector_short_name in column)
+                ]
+                if len(column) == 1:
+                    _columns.append(f"{ds.metadata.uri}/{tb.metadata.short_name}#{column[0]}")
             df_graphers = pd.concat(
                 [
                     df_graphers,
