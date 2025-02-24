@@ -6,7 +6,7 @@ definitions:
   pollutant_description_short: |-
     <% if pollutant == "BC" %>Black carbon (BC) is a soot-like pollutant formed from the burning of biomass and fossil fuels. It is a major contributor to particulate matter pollution, and contributes to climate change by absorbing sunlight.
     <% elif pollutant == "CH₄" %>Methane (CH₄) is a greenhouse gas that contributes to the formation of ground-level ozone, a harmful air pollutant. Key sources of methane include agriculture, landfills, and fossil fuel extraction.
-    <% elif pollutant == "CO" %>Carbon monoxide (CO) is a pollutant produced from the incomplete combustion of carbon-based fuels such as oil, gas, wood, and coal.
+    <% elif pollutant == "CO" %>Carbon monoxide (CO) is a pollutant produced from the incomplete combustion of carbon-based fuels such as oil, gas, wood, and coal. CO is a harmful gas that contributes to both outdoor and indoor air pollution.
     <% elif pollutant == "N₂O" %>Nitrous oxide (N₂O) is a greenhouse gas that contributes to air pollution by depleting the stratospheric ozone layer and influencing atmospheric chemistry. Major sources include agriculture, industrial processes, and fossil fuel combustion.
     <% elif pollutant == "NH₃" %>Ammonia (NH₃) is a gas which can mix with other gases – such as nitrogen oxides and sulphur dioxide – to form particulate matter. Its main sources are the use of manure and fertilizers in agriculture, and emissions from industry.
     <% elif pollutant == "NMVOC" %>Non-methane volatile organic compounds (NMVOCs) are pollutants formed from the burning of biomass and fossil fuels. NMVOCs can lead to the formation of other local air pollutants, such as ozone.
@@ -15,7 +15,7 @@ definitions:
     <% elif pollutant == "SO₂" %>Sulphur dioxide (SO₂) is an air pollutant formed from the burning of fuels that contain sulphur, such as coal. SO₂ is one of the main chemicals that forms acid rain.
     <%- endif -%>
   description_key_agriculture: |-
-    "Agriculture" includes air pollutant emissions from biological processes such as manure management, rice cultivation, soil processes, and livestock enteric fermentation. It also covers indirect N₂O emissions from non-agricultural nitrogen sources and fuel combustion in agricultural machinery, forestry, and fishing.
+    "Agriculture" includes air pollutant emissions from biological processes such as manure management, rice cultivation, soil processes, and livestock digestive processes. It also covers indirect N₂O emissions from non-agricultural nitrogen sources and fuel combustion in agricultural machinery, forestry, and fishing.
   description_key_buildings: |-
     "Buildings" includes air pollutant emissions from fuel combustion in residential, commercial, and institutional buildings. Key sources include heating, cooking, and other energy use in homes, offices, and public facilities.
   description_key_domestic_aviation: |-
@@ -51,6 +51,7 @@ definitions:
       topic_tags:
         - Air Pollution
     processing_level: major
+  # NOTE: Processing description will be added programmatically, based on the sectorial mapping.
 
 dataset:
   update_period_days: 365

@@ -138,6 +138,71 @@ SECTOR_MAPPING = {
     ],
 }
 
+# Subsector titles to use in the processing description.
+SUBSECTOR_TITLES = {
+    "1A1a_Electricity-autoproducer": "Electricity production (autoproducer) (1A1a)",
+    "1A1a_Electricity-public": "Electricity production (public) (1A1a)",
+    "1A1a_Heat-production": "Heat production (1A1a)",
+    "1A1bc_Other-transformation": "Other energy transformation (1A1bc)",
+    "1B1_Fugitive-solid-fuels": "Fugitive emissions from solid fuels (1B1)",
+    "1B2_Fugitive-petr": "Fugitive emissions from petroleum (1B2)",
+    "1B2d_Fugitive-other-energy": "Fugitive emissions from other energy sources (1B2d)",
+    "7A_Fossil-fuel-fires": "Fossil fuel fires (7A)",
+    "1B2b_Fugitive-NG-distr": "Fugitive emissions from natural gas distribution (1B2b)",
+    "1B2b_Fugitive-NG-prod": "Fugitive emissions from natural gas production (1B2b)",
+    "1A5_Other-unspecified": "Other fuel use (unspecified) (1A5)",
+    "1A2a_Ind-Comb-Iron-steel": "Industrial combustion - Iron and steel (1A2a)",
+    "1A2b_Ind-Comb-Non-ferrous-metals": "Industrial combustion - Non-ferrous metals (1A2b)",
+    "1A2c_Ind-Comb-Chemicals": "Industrial combustion - Chemicals (1A2c)",
+    "1A2d_Ind-Comb-Pulp-paper": "Industrial combustion - Pulp and paper (1A2d)",
+    "1A2e_Ind-Comb-Food-tobacco": "Industrial combustion - Food and tobacco (1A2e)",
+    "1A2f_Ind-Comb-Non-metalic-minerals": "Industrial combustion - Non-metallic minerals (1A2f)",
+    "1A2g_Ind-Comb-Construction": "Industrial combustion - Construction (1A2g)",
+    "1A2g_Ind-Comb-machinery": "Industrial combustion - Machinery (1A2g)",
+    "1A2g_Ind-Comb-mining-quarying": "Industrial combustion - Mining and quarrying (1A2g)",
+    "1A2g_Ind-Comb-other": "Industrial combustion - Other (1A2g)",
+    "1A2g_Ind-Comb-textile-leather": "Industrial combustion - Textile and leather (1A2g)",
+    "1A2g_Ind-Comb-transpequip": "Industrial combustion - Transport equipment (1A2g)",
+    "1A2g_Ind-Comb-wood-products": "Industrial combustion - Wood products (1A2g)",
+    "2A1_Cement-production": "Cement production (2A1)",
+    "2A2_Lime-production": "Lime production (2A2)",
+    "2Ax_Other-minerals": "Other mineral production (2Ax)",
+    "2B_Chemical-industry": "Chemical industry (2B)",
+    "2C1_Iron-steel-alloy-prod": "Iron and steel alloy production (2C1)",
+    "2C3_Aluminum-production": "Aluminum production (2C3)",
+    "2C4_Non-Ferrous-other-metals": "Other non-ferrous metal production (2C4)",
+    "2H_Pulp-and-paper-food-beverage-wood": "Pulp and paper, food, beverage, and wood processing (2H)",
+    "2B2_Chemicals-Nitric-acid": "Nitric acid production (2B2)",
+    "2B3_Chemicals-Adipic-acid": "Adipic acid production (2B3)",
+    "2D_Degreasing-Cleaning": "Degreasing and cleaning (2D)",
+    "2D_Paint-application": "Paint application (2D)",
+    "2D_Chemical-products-manufacture-processing": "Chemical products manufacture and processing (2D)",
+    "2D_Other-product-use": "Other product use (2D)",
+    "1A3b_Road": "Road transportation (1A3b)",
+    "1A3c_Rail": "Rail transportation (1A3c)",
+    "1A3dii_Domestic-navigation": "Domestic navigation (1A3dii)",
+    "1A3eii_Other-transp": "Other transport (1A3eii)",
+    "5A_Solid-waste-disposal": "Solid waste disposal (5A)",
+    "5C_Waste-combustion": "Waste combustion (5C)",
+    "5D_Wastewater-handling": "Wastewater handling (5D)",
+    "5E_Other-waste-handling": "Other waste handling (5E)",
+    "6A_Other-in-total": "Other waste sources (6A)",
+    "6B_Other-not-in-total": "Unspecified waste sources (6B)",
+    "3B_Manure-management": "Manure management (3B)",
+    "3D_Rice-Cultivation": "Rice cultivation (3D)",
+    "3D_Soil-emissions": "Soil emissions (3D)",
+    "3E_Enteric-fermentation": "Enteric fermentation (3E)",
+    "3I_Agriculture-other": "Other agricultural emissions (3I)",
+    "7BC_Indirect-N2O-non-agricultural-N": "Indirect N₂O emissions (non-agricultural sources) (7BC)",
+    "1A4c_Agriculture-forestry-fishing": "Fuel use in agriculture, forestry, and fishing (1A4c)",
+    "1A4a_Commercial-institutional": "Commercial and institutional buildings (1A4a)",
+    "1A4b_Residential": "Residential buildings (1A4b)",
+    "1A3ai_International-aviation": "International aviation (1A3ai)",
+    "1A3aii_Domestic-aviation": "Domestic aviation (1A3aii)",
+    "1A3di_International-shipping": "International shipping (1A3di)",
+    "1A3di_Oil_Tanker_Loading": "Oil tanker loading (1A3di)",
+}
+
 # Subsectors expected in the bunkers table.
 BUNKERS_SECTORS = [
     SUBSECTOR_INTERNATIONAL_AVIATION,
@@ -233,6 +298,8 @@ def sanity_check_inputs(tb_detailed: Table, tb_bunkers: Table) -> None:
     error = "List of subsectors in the bunkers table has changed."
     assert set(tb_bunkers["sector"]) == set(BUNKERS_SECTORS), error
     assert set(BUNKERS_SECTORS) < set(all_subsectors), error
+    error = "The list of subsectors in the mapping does not coincide with the list of human-readable subsector titles."
+    assert set(sum(list(SECTOR_MAPPING.values()), [])) == set(SUBSECTOR_TITLES.keys()), error
 
     # Check that units are as expected.
     error = "Each pollutant was expected to have just one unit."
@@ -619,6 +686,17 @@ def run(dest_dir: str) -> None:
 
     # Improve table format.
     tb = tb.format(["country", "year", "pollutant", "sector"])
+
+    # Add a processing description where the sectorial mapping is specified.
+    mapping_codes = "\n".join(
+        f"* {sector}: " + ", ".join(sorted(SUBSECTOR_TITLES[subsector] for subsector in subsectors)) + "."
+        for sector, subsectors in sorted(SECTOR_MAPPING.items())
+    )
+    description_processing = (
+        f"Subsectors have been mapped into broader sectors as follows (using CEDS codes):\n{mapping_codes}"
+    )
+    for column in ["emissions", "emissions_per_capita"]:
+        tb[column].metadata.description_processing = description_processing
 
     #
     # Save outputs.
