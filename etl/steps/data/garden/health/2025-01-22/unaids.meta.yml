@@ -87,12 +87,12 @@ tables:
         title: "AIDS mortality - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "deaths per 100,000 people"
         description_short: |-
-          Total number of <<sex+' ' if sex != 'total' else ''>>people <<'aged ' + age + ' ' if age != 'total' else ''>>who have died from AIDS-related causes, per 100 000 people. This is the <<estimate.title()>> estimate.
+          Total number of <<sex+' ' if sex != 'total' else ''>>people <<'aged ' + age + ' ' if age != 'total' else ''>>who have died from AIDS-related causes, per 100 000 people. This is the <<estimate.lower() >> estimate.
         description_from_producer: |-
           The number of people dying from AIDS-related causes can be obtained using a variety of measures, including through a vital registration system adjusted for misreporting, as part of a facility- or population-based survey that may include verbal autopsy and through mathematical modelling using such tools as Spectrum. Modelling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying. In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be incorporated into these models to derive estimates of the number of AIDS-related deaths.
 
           More details:
-          - Consolidated guidelines on person-centred HIV strategic information: strengthening routine data for impact. Geneva: World Health Organization; 2022 (https://www.who.int/publications/i/item/9789240055315)
+          - Consolidated guidelines on person-centred HIV strategic information: strengthening routine data for impact. Geneva: World Health Organization; 2022 (https://web.archive.org/web/20250201130605/https://www.who.int/publications/i/item/9789240055315)
           - Spectrum software. Glastonbury (CT): Avenir Health; 2024 (http://www.avenirhealth.org/software-spectrum.php).
         presentation:
           title_public: "AIDS mortality per 100,000 people"
@@ -101,7 +101,7 @@ tables:
         title: "Children (0-17) orphaned due to AIDS deaths - <<estimate.title()>> estimate"
         unit: "children"
         description_short: |-
-          Number of children, aged 17 and under, who have been orphaned by the death of one or both parents from AIDS at any point in their lives. This is the <<estimate.title()>> estimate.
+          Number of children, aged 17 and under, who have been orphaned by the death of one or both parents from AIDS at any point in their lives. This is the <<estimate.lower() >> estimate.
         description_key:
           - |-
             An orphan is defined as a child under 18 years old who has lost at least one parent:
@@ -113,13 +113,13 @@ tables:
         display:
           numDecimalPlaces: 0
         presentation:
-          title_public: "Children orphaned due to AIDS deaths"
+          title_public: "Children orphaned due to AIDS"
 
       deaths_plhiv_all_causes:
         title: "Deaths among people living with HIV (all causes) - <<estimate.title()>> estimate"
         unit: "deaths"
         description_short: |-
-          Deaths occurring among individuals diagnosed with HIV, regardless of the direct cause. It encompasses all-cause mortality within the HIV-positive population, providing a comprehensive view of the mortality burden in this group. This is the <<estimate.title()>> estimate.
+          Deaths occurring among individuals diagnosed with HIV, regardless of the direct cause. It encompasses all-cause mortality within the HIV-positive population, providing a comprehensive view of the mortality burden in this group. This is the <<estimate.lower() >> estimate.
         description_key:
           - Reflects the overall mortality burden within the HIV-positive population.
           - Includes deaths from all causes, not limited to AIDS-related illnesses.
@@ -289,7 +289,7 @@ tables:
         title: "Deaths averted due to antiretroviral therapy - <<estimate.title()>> estimate"
         unit: deaths
         description_short: |-
-          The number of deaths prevented as a direct result of Antiretroviral Therapy (ART) among people living with HIV. It is calculated by comparing the observed mortality rates in individuals receiving ART to the estimated mortality rates in the absence of such treatment. This is the <<estimate.title()>> estimate.
+          The number of deaths prevented as a direct result of Antiretroviral Therapy (ART) among people living with HIV. It is calculated by comparing the observed mortality rates in individuals receiving ART to the estimated mortality rates in the absence of such treatment. This is the <<estimate.lower() >> estimate.
         description_key:
           - "{definitions.art_description}"
           - Antiretroviral therapy (ART) has significantly reduced the number of AIDS-related deaths since its introduction in 1996.
@@ -303,7 +303,7 @@ tables:
         title: "People living with HIV receiving ART - Age: <<age>> - Sex: <<sex>>"
         unit: "people"
         description_short: |-
-          Number of {definitions.people_dimension} living with HIV on antiretroviral therapy. This is the <<estimate.title()>> estimate.
+          Number of {definitions.people_dimension} living with HIV on antiretroviral therapy. This is the <<estimate.lower() >> estimate.
         description_from_producer: |-
           The number of adults and children who are on antiretroviral therapy at the end of the reporting period. It should include people on antiretroviral therapy in the private sector (if these data are available). The count should include pregnant women living with HIV who are receiving lifelong antiretroviral therapy.
 
@@ -320,7 +320,7 @@ tables:
         title: "Share of people living with HIV receiving ART - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "%"
         description_short: |-
-          Percentage of individuals diagnosed with HIV who are currently receiving antiretroviral therapy. This is the <<estimate.title()>> estimate.
+          Percentage of individuals diagnosed with HIV who are currently receiving antiretroviral therapy. This is the <<estimate.lower() >> estimate.
         description_key:
           - "{definitions.art_description}"
         presentation:
@@ -333,7 +333,7 @@ tables:
         title: "New HIV Infections averted due to PMTCT - <<estimate.title()>> estimate"
         unit: "infections"
         description_short: |-
-          New HIV infections among children (aged 0-14 years) prevented through the implementation of Prevention of Mother-to-Child Transmission (PMTCT) programs. This is the <<estimate.title()>> estimate.
+          New HIV infections among children (aged 0-14 years) prevented through the implementation of Prevention of Mother-to-Child Transmission (PMTCT) programs. This is the <<estimate.lower() >> estimate.
         description_key:
           - PMTCT programs include the provision of antiretroviral therapy to pregnant and breastfeeding women living with HIV, which significantly reduces the risk of HIV transmission to their infants.
         display:
@@ -374,7 +374,7 @@ tables:
         title: "Coverage of pregnant women who receive ARV for preventing MTCT - <<estimate.title()>> estimate"
         unit: "%"
         description_short: |-
-          Share of pregnant women who received antiretroviral for preventing mother-to-child transmission. This is the <<estimate.title()>> estimate.
+          Share of pregnant women who received antiretroviral for preventing mother-to-child transmission. This is the <<estimate.lower() >> estimate.
         description_key:
           - "{definitions.art_description}"
         presentation:
@@ -384,7 +384,7 @@ tables:
         title: "Mother-to-child HIV transmission rate - <<estimate.title()>> estimate"
         unit: "infected children per 1,000 children"
         description_short: |-
-          The number of children born to HIV-positive mothers who acquire HIV during pregnancy, labor, delivery, or breastfeeding, per 1,000 children. This is the <<estimate.title()>> estimate.
+          The number of children born to HIV-positive mothers who acquire HIV during pregnancy, labor, delivery, or breastfeeding, per 1,000 children. This is the <<estimate.lower() >> estimate.
         description_from_producer: |-
           The mother-to-child transmission probability differs with the antiretroviral drug regimen received and infant-feeding practices. The transmission can be calculated by using the Spectrum model.
 
@@ -409,7 +409,7 @@ tables:
         title: "HIV-exposed children (0-14) who are uninfected - <<estimate.title()>> estimate"
         unit: "children"
         description_short: |-
-          Number of children, aged 14 and under, who have been exposed to HIV but haven't been infected. This is the <<estimate.title()>> estimate.
+          Number of children, aged 14 and under, who have been exposed to HIV but haven't been infected. This is the <<estimate.lower() >> estimate.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -422,9 +422,9 @@ tables:
         title: "HIV Incidence per 1,000 population - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "infections per 1,000 people"
         description_short: |-
-          Number of {definitions.people_dimension} newly infected with HIV in the last year per 1,000 uninfected people. This is the <<estimate.title()>> estimate.
+          Number of {definitions.people_dimension} newly infected with HIV in the last year per 1,000 uninfected people. This is the <<estimate.lower() >> estimate.
         description_key:
-          - HIV incidence measures progress towards ending the AIDS epidemic and is a crucial metric in the [WHO 2022 Consolidated guidelines](https://www.who.int/publications/i/item/9789240055315) on person-centered HIV strategic information.
+          - HIV incidence measures progress towards ending the AIDS epidemic and is a crucial metric in the [WHO 2022 Consolidated guidelines](https://web.archive.org/web/20250201130605/https://www.who.int/publications/i/item/9789240055315) on person-centered HIV strategic information.
           - According to the WHO 2022 Consolidated guidelines, the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
         description_from_producer: |-
           Method of measurement:
@@ -439,7 +439,7 @@ tables:
           Disaggregated data reported for the numerator should be used to monitor progress towards eliminating new child infections and reducing the number of new HIV infections among adolescent girls and young women to below 100,000 per year.
 
         presentation:
-          title_public: "HIV new infections per 1,000 individuals"
+          title_public: "New infections of HIV per 1,000 people"
 
       hiv_prevalence:
         title: "HIV prevalence - Sex: <<sex>> - Age: <<age>> - <<estimate.title()>> estimate"
@@ -449,7 +449,6 @@ tables:
           Share of {definitions.people_dimension} who test positive for HIV at a given time. This is the << estimate >> estimate.
         description_key:
           - Known as "HIV prevalence", it is estimated by dividing the number of people in a given group who tested positive for HIV by all the people that were tested.
-          - It reflects the overall burden of HIV within a specific population and provides insight into the scale of the epidemic, which is essential for planning and resource allocation.
         presentation:
           title_public: "Share of the population living with HIV"
 
@@ -457,21 +456,22 @@ tables:
         title: "New HIV Infections - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "infections"
         description_short: |-
-          The number of {definitions.people_dimension} newly infected with HIV in the last 12 months. This is the <<estimate.title()>> estimate.
+          The number of {definitions.people_dimension} newly infected with HIV in the last 12 months. This is the <<estimate.lower() >> estimate.
         description_key:
           - Also known as "HIV incidence", help health organizations assess whether prevention efforts are successfully reducing HIV transmission rates or if emerging challenges are creating new infection pathways.
-          - This indicator measures progress towards ending the AIDS epidemic and is a crucial metric in the [WHO 2022 Consolidated guidelines](https://www.who.int/publications/i/item/9789240055315) on person-centered HIV strategic information.
-          - According to the WHO 2022 Consolidated guidelines, the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
+          - According to the [WHO 2022 Consolidated guidelines](https://web.archive.org/web/20250201130605/https://www.who.int/publications/i/item/9789240055315), the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
         display:
           numDecimalPlaces: 0
+          numSignificantFigures: 3
+          roundingMode: "significantFigures"
         presentation:
-          title_public: "HIV new infections"
+          title_public: "New HIV infections"
 
       plwh:
         title: "People living with HIV - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "people"
         description_short: |-
-          Number of {definitions.people_dimension} living with HIV at the end of the reporting period. This is the <<estimate.title()>> estimate.
+          Number of {definitions.people_dimension} living with HIV at the end of the reporting period. This is the <<estimate.lower() >> estimate.
         display:
           numDecimalPlaces: 0
         presentation:
@@ -484,7 +484,7 @@ tables:
         title: "HIV incidence-to-mortality ratio - <<estimate.title()>> estimate"
         unit: ""
         description_short: |-
-          The ratio of new HIV infections to AIDS-related deaths within a specific time frame. This is the <<estimate.title()>> estimate.
+          The ratio of new HIV infections to AIDS-related deaths within a specific time frame. This is the <<estimate.lower() >> estimate.
         description_key:
           - An Incidence-to-Mortality Ratio (IMR) below 1.0 indicates that the number of new HIV infections is less than the number of deaths among people living with HIV, suggesting a declining epidemic.
           - The IMR is used to assess the progress towards controlling the HIV epidemic and is considered alongside other metrics such as the incidence-prevalence ratio.
@@ -496,7 +496,7 @@ tables:
         title: "HIV incidence-to-prevalence ratio - <<estimate.title()>> estimate"
         unit: ""
         description_short: |-
-          The ratio of new HIV infections (incidence) to the total number of people living with HIV (prevalence) within a specific time frame. This is the <<estimate.title()>> estimate.
+          The ratio of new HIV infections (incidence) to the total number of people living with HIV (prevalence) within a specific time frame. This is the <<estimate.lower() >> estimate.
         description_key:
           - A declining incidence-to-prevalence ratio indicates progress in controlling the HIV epidemic, as it reflects a decrease in new infections relative to the existing number of people living with HIV.
         presentation:
@@ -560,7 +560,7 @@ tables:
         title: "Share of adults (15+) with unsuppressed viral load - Sex: <<sex>>"
         unit: "%"
         description_short: |-
-          The share of {definitions.people_dimension} living with HIV whose viral load remains detectable above the suppression threshold, indicating ongoing challenges in maintaining effective HIV treatment and potential risks of disease progression and transmission. This is the <<estimate.title()>> estimate.
+          The share of {definitions.people_dimension} living with HIV whose viral load remains detectable above the suppression threshold, indicating ongoing challenges in maintaining effective HIV treatment and potential risks of disease progression and transmission. This is the <<estimate.lower() >> estimate.
         presentation:
           title_public: "Share of adults with unsuppressed viral load"
 
@@ -568,7 +568,7 @@ tables:
         title: "Share of people living with HIV who have suppressed viral loads - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "%"
         description_short: |-
-          The share of {definitions.people_dimension} living with HIV who have achieved viral suppression, representing the proportion of patients successfully managing their HIV through effective antiretroviral therapy. This is the <<estimate.title()>> estimate.
+          The share of {definitions.people_dimension} living with HIV who have achieved viral suppression, representing the proportion of patients successfully managing their HIV through effective antiretroviral therapy. This is the <<estimate.lower() >> estimate.
         description_key:
           - Viral suppression represents the third and final 90 of the global target, aiming to ensure that patients on ART achieve and maintain viral suppression. This minimizes their risk of disease progression and HIV transmission. Achieving viral suppression is crucial for service quality, as an unsuppressed viral load may indicate suboptimal treatment adherence and the potential for developing and spreading drug resistance.
         presentation:
@@ -578,7 +578,7 @@ tables:
         title: "Share of people on ART who achieve viral suppression - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
         unit: "%"
         description_short: |-
-          The share of {definitions.people_dimension} receiving antiretroviral therapy (ART) who successfully achieve viral suppression, measuring the clinical efficacy of HIV treatment at the individual patient level. This is the <<estimate.title()>> estimate.
+          The share of {definitions.people_dimension} receiving antiretroviral therapy (ART) who successfully achieve viral suppression, measuring the clinical efficacy of HIV treatment at the individual patient level. This is the <<estimate.lower() >> estimate.
         presentation:
           title_public: "Share of {definitions.people_term} on ART who achieve viral suppression"
 
@@ -878,13 +878,15 @@ tables:
       tb_patients_tested_positive_hiv:
         title: TB patients tested positive for HIV
         unit: patients
-        description_short: "Number of tuberculosis (new and relapsed) patients that tested positive for HIV."
+        description_short: "Estimated number of tuberculosis (new and relapsed) patients that tested positive for HIV."
         description_key:
-          - "**Coinfection risk**: People with TB are strongly advised to be tested for HIV because HIV weakens the immune system, increasing vulnerability to TB and complicating treatment outcomes."
-          - "**Indicator of integrated care**: The proportion of TB patients testing positive for HIV reflects how well HIV-TB coinfection is being identified in clinical settings, guiding coordinated treatment and prevention."
-          - "**Critical for reducing mortality**: Early detection of HIV in TB patients enables timely antiretroviral therapy and TB treatment, which can significantly lower the risk of severe illness and death."
+          - "People with tuberculosis (TB) are strongly advised to be tested for HIV because HIV weakens the immune system, increasing vulnerability to TB and complicating treatment outcomes."
+          - "The proportion of TB patients testing positive for HIV reflects how well HIV-TB coinfection is being identified in clinical settings, guiding coordinated treatment and prevention."
+          - "Early detection of HIV in TB patients enables timely antiretroviral therapy and TB treatment, which can significantly lower the risk of severe illness and death."
         display:
           numDecimalPlaces: 0
+        presentation:
+          title_public: "Tuberculosis patients who tested positive for HIV"
 
   gam_sex:
     variables:
@@ -1004,17 +1006,17 @@ tables:
 
       domestic_spending_fund_source:
         title: "HIV expenditure by origin of resources - Origin: <<group>>"
+        #  The reported HIV expenditures by program or service should align with the number of individuals who received these services, as documented in other sections of Global AIDS Monitoring.
         description_short: |-
           <% if group == "total" %>
-          Total in-country spending on HIV programs and services. The reported HIV expenditures by program or service should align with the number of individuals who received these services, as documented in other sections of Global AIDS Monitoring.
+          Total in-country spending on HIV programs and services.
           <%- else %>
-          In-country spending on HIV programs and services categorized, from source '<<group>>'. The reported HIV expenditures by program or service should align with the number of individuals who received these services, as documented in other sections of Global AIDS Monitoring.
+          In-country spending on HIV programs and services categorized, from source '<<group>>'.
           <% endif %>
         unit: constant 2019 US$
         short_unit: "$"
         description_key:
-          - "This indicator captures*in-country HIV programme expenditures from various financing sources (e.g., domestic, international, etc.), ensuring standardized tracking of how much is spent and where."
-          - "The expenditures reported should align with the numbers of people receiving HIV services, providing actionable data for **resource allocation and mobilization** decisions."
+          - "This indicator captures in-country HIV programme expenditures from various financing sources (e.g., domestic, international, etc.), ensuring standardized tracking of how much is spent and where."
         description_from_producer: |-
           The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources. There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
 
@@ -1028,7 +1030,7 @@ tables:
 
           More details: https://indicatorregistry.unaids.org/indicator/aids-spending
         presentation:
-          title_public: HIV expenditure on prevention and treatment
+          title_public: Expenditure on HIV prevention and treatment
           title_variant: <<"sourced from " + group if group != "total">>
           grapher_config:
             title: |-
@@ -1155,10 +1157,13 @@ tables:
         description_short: <<estimate.title()>> estimate of the number of deaths from people living with HIV that are related to tuberculosis.
         display:
           numDecimalPlaces: 0
+        # ([GLOBAL AIDS STRATEGY 2021-2026](https://www.unaids.org/en/resources/documents/2021/2021-2026-global-AIDS-strategy))
         description_key:
           - Tuberculosis (TB) is the top cause of death among people living with HIV despite being preventable and treatable. Lack of integrated TB-HIV services and low uptake of preventive treatments contribute to these avoidable deaths.
-          - "People-centred approaches that combine TB and HIV screening, diagnosis, and treatment—as well as address other comorbidities—can significantly reduce TB-related deaths among people living with HIV ([GLOBAL AIDS STRATEGY 2021-2026](https://www.unaids.org/en/resources/documents/2021/2021-2026-global-AIDS-strategy))."
-          - "Inequalities undermine care: Key and vulnerable groups, including children and young people, often face barriers to holistic HIV-TB services, underscoring the need for community-based support and targeted strategies to bridge these gaps."
+          - "People with TB are strongly advised to be tested for HIV because HIV weakens the immune system, increasing vulnerability to TB and complicating treatment outcomes."
+          - Improved screening, diagnosis, and treatment can significantly reduce TB-related deaths among people living with HIV.
+          # - "People-centred approaches that combine TB and HIV screening, diagnosis, and treatment—as well as address other comorbidities—can significantly reduce TB-related deaths among people living with HIV."
+          # - "Inequalities undermine care: Key and vulnerable groups, including children and young people, often face barriers to holistic HIV-TB services, underscoring the need for community-based support and targeted strategies to bridge these gaps."
         presentation:
           title_public: Tuberculosis-related deaths among people living with HIV
 
@@ -1686,11 +1691,11 @@ tables:
           title_public: |-
             <% if group == "high-risk sex" %>
             Share of people using a condom at last high-risk sex
-            <% else %>
-            Share of <<group>> using a condom
-            <% endif %>
+            <%- else %>
+            Condom use among <<group>>
+            <%- endif %>
           title_variant: |-
-            <%- if sex not in ["other", "total"] %>
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men") %>
             <<sex>>s<<", " if age != "total">>
             <%- endif %>
             <%- if age != "total" %>
