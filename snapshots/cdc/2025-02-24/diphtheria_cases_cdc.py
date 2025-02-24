@@ -9,12 +9,11 @@ from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
-
-# Data for 1919
-DATA_1919_1940 = pd.DataFrame(
+# Data for 1937 - 2022 (except 1938-43 inclusive as that's from the census bureau)
+DATA_CDC = pd.DataFrame(
     {
         "country": ["United States"] * 79,
-        "year": [1937, range(1944, 2003)],
+        "year": [1937] + list(range(1944, 2023)),
         "deaths": [
             28356,
             14150,
@@ -80,6 +79,22 @@ DATA_1919_1940 = pd.DataFrame(
             0,
             0,
             0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            0,
+            0,
+            0,
+            1,
+            2,
+            1,
+            0,
+            1,
         ],
         "source": [
             "https://stacks.cdc.gov/view/cdc/69651/cdc_69651_DS1.pdf",
@@ -92,6 +107,15 @@ DATA_1919_1940 = pd.DataFrame(
             "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm4853a1.htm",
             "https://www.jstor.org/stable/23310295",
             ["https://www.jstor.org/stable/23317332"] * 6,
+            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5653a1.htm",
+            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5754a1.htm",
+            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5853a1.htm",
+            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5953a1.htm",
+            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6153a1.htm",
+            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6253a1.htm",
+            "https://www.cdc.gov/mmwr/volumes/63/wr/mm6354a1.htm",
+            "https://www.cdc.gov/mmwr/volumes/63/wr/mm6354a1.htm",
+            ["https://wonder.cdc.gov/nndss-annual-summary.html"] * 7,
         ],
     }
 )
@@ -102,7 +126,7 @@ DATA_1919_1940 = pd.DataFrame(
 def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"health/{SNAPSHOT_VERSION}/measles_deaths_public_health_reports.csv")
-    df = DATA_1919_1940
+    df = DATA_CDC
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload, data=df)
 
