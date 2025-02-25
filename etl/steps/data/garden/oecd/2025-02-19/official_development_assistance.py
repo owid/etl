@@ -572,10 +572,6 @@ def remove_jumps_in_the_data_and_unneeded_cols(tb: Table) -> Table:
         (tb["country"] == "Non-DAC countries (OECD)") & (tb["year"] == 2007), "i_oda_net_disbursements_per_capita"
     ] = None
 
-    # Remove rows where country = Non-DAC countries (OECD) and year 2023
-    # This is because the data is not complete until December 2024
-    tb = tb[~((tb["country"] == "Non-DAC countries (OECD)") & (tb["year"] == 2023))].reset_index(drop=True)
-
     # Remove columns
     tb = tb.drop(
         columns=["oda_bilateral_2_grant_equivalents", "oda_multilateral_2_grant_equivalents", "i_oda_grant_equivalents"]
