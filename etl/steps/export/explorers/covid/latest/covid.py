@@ -1,4 +1,6 @@
-"""Load a grapher dataset and create an explorer dataset with its tsv file."""
+"""Load a grapher dataset and create an explorer dataset with its tsv file.
+
+This step contains tooling that should moved to a more general module so that it can be easily used by other explorer steps!"""
 
 import pandas as pd
 
@@ -18,43 +20,43 @@ OPTION_TYPES = {
     "checkbox": "Checkbox",
 }
 RELATED = {
-    "Confirmed deaths": {
+    "deaths": {
         "text": "Since 8 March, we rely on data from the WHO for confirmed cases and deaths",
         "link": "https://ourworldindata.org/covid-jhu-who",
     },
-    "Confirmed cases": {
+    "cases": {
         "text": "Since 8 March, we rely on data from the WHO for confirmed cases and deaths",
         "link": "https://ourworldindata.org/covid-jhu-who",
     },
-    "Cases and deaths": {
+    "cases_deaths": {
         "text": "Since 8 March, we rely on data from the WHO for confirmed cases and deaths",
         "link": "https://ourworldindata.org/covid-jhu-who",
     },
-    "Case fatality rate": {
+    "cfr": {
         "text": "Since 8 March, we rely on data from the WHO for confirmed cases and deaths",
         "link": "https://ourworldindata.org/covid-jhu-who",
     },
-    "Reproduction rate": {
+    "r": {
         "text": "Since 8 March, we rely on data from the WHO for confirmed cases and deaths",
         "link": "https://ourworldindata.org/metrics-explained-covid19-stringency-index",
     },
-    "Stringency index": {
+    "stringency": {
         "text": "What is the COVID-19 Stringency Index?",
         "link": "https://ourworldindata.org/covid-jhu-who",
     },
-    "Tests": {
+    "tests": {
         "text": "Data on tests is no longer updated since June 2022",
         "link": "https://ourworldindata.org/covid-testing-data-archived",
     },
-    "Tests per case": {
+    "tests_cases": {
         "text": "Data on tests is no longer updated since June 2022",
         "link": "https://ourworldindata.org/covid-testing-data-archived",
     },
-    "Share of positive tests": {
+    "tests_pos": {
         "text": "Data on tests is no longer updated since June 2022",
         "link": "https://ourworldindata.org/covid-testing-data-archived",
     },
-    "Cases, tests, positive and reproduction rate": {
+    "cases_tests_pos_r": {
         "text": "Data on tests is no longer updated since June 2022",
         "link": "https://ourworldindata.org/covid-testing-data-archived",
     },
@@ -167,11 +169,11 @@ def run(dest_dir: str) -> None:
         if "config" in view:
             for field in fields_optional:
                 if field in view["config"]:
-                    if isinstance(view[field], bool):
-                        v = str(view[field]).lower()
+                    if isinstance(view["config"][field], bool):
+                        v = str(view["config"][field]).lower()
                         record[field] = v
                     else:
-                        record[field] = view[field]
+                        record[field] = view["config"][field]
 
         # Add record
         records.append(record)
