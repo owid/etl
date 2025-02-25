@@ -221,11 +221,3 @@ def bake_dimensions_view(dimensions_display, view):
         else:
             view_dimensions[dimensions_display[slug_dim]["widget_name"]] = slug_choice
     return view_dimensions
-
-
-def bake_ids(view):
-    """Prepare variable IDs for Explorer."""
-    indicators_y = view["indicators"]["y"]
-    if isinstance(indicators_y, str):
-        indicators_y = [indicators_y]
-    return [var_id["variableId"] for var_id in var_ids]
