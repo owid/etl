@@ -1047,10 +1047,9 @@ steps:
     - data://meadow/us_census_bureau/2025-02-25/diphtheria_cases
 
   #
-  # TODO: add step name (just something recognizable)
+  # US - reported diphtheria cases - long-run
   #
   data://garden/health/2025-02-25/diphtheria_cases:
-    - data://meadow/health/2025-02-25/diphtheria_cases
     - data://garden/us_census_bureau/2025-02-25/diphtheria_cases
     - data://garden/cdc/2025-02-25/diphtheria_cases
     - data://garden/demography/2024-07-15/population
