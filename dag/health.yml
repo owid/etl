@@ -1021,3 +1021,29 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/health/2025-02-20/measles_deaths_long_run:
     - data://garden/health/2025-02-20/measles_deaths_long_run
+
+  #
+  # Diphtheria cases - US CDC
+  #
+  data://meadow/cdc/2025-02-25/diphtheria_cases:
+    - snapshot://cdc/2025-02-24/diphtheria_cases.csv
+  data://garden/cdc/2025-02-25/diphtheria_cases:
+    - data://meadow/cdc/2025-02-25/diphtheria_cases
+
+  #
+  # Historical diphtheria cases - US Census Bureau
+  #
+  data://meadow/us_census_bureau/2025-02-25/diphtheria_cases:
+    - snapshot://us_census_bureau/2025-02-25/diphtheria_cases.csv
+  data://garden/us_census_bureau/2025-02-25/diphtheria_cases:
+    - data://meadow/us_census_bureau/2025-02-25/diphtheria_cases
+
+  #
+  # US - reported diphtheria cases - long-run
+  #
+  data://garden/health/2025-02-25/diphtheria_cases:
+    - data://garden/us_census_bureau/2025-02-25/diphtheria_cases
+    - data://garden/cdc/2025-02-25/diphtheria_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-02-25/diphtheria_cases:
+    - data://garden/health/2025-02-25/diphtheria_cases
