@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.data_helpers import geo
+from owid.catalog import processing as pr
+
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -12,17 +13,25 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("diphtheria_cases")
-
+    ds_meadow_cdc = paths.load_dataset("diphtheria_cases", namespace="cdc")
+    ds_meadow_census = paths.load_dataset("diphtheria_cases", namespace="us_census_bureau")
+    ds_population = paths.load_dataset("population")
     # Read table from meadow dataset.
-    tb = ds_meadow.read("diphtheria_cases")
+    tb_cdc = ds_meadow_cdc.read("diphtheria_cases")
+    tb_census = ds_meadow_census.read("diphtheria_cases")
+    tb_population = ds_population.read("population")
 
-    #
+    tb = pr.concat([tb_cdc, tb_census], short_name="diphtheria_cases").sort_values("year").reset_index(drop=True)
+    tb = pr.merge(
+        tb,
+        tb_population,
+        on=["country", "year"],
+        how="left",
+    )
+    tb["case_rate"] = tb["cases"] / tb["population"] * 1000000
+    tb = tb.drop(columns=["population", "source_x", "source_y", "world_pop_share"])
     # Process data.
     #
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
     tb = tb.format(["country", "year"])
 
     #
