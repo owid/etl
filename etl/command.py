@@ -296,10 +296,13 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
         # If there were any "export://multidim" steps, keep them in the dag, to be executed.
         for step in list(dag.keys()):
             if step.startswith("export://multidim/"):
+                # If private is false and any of the dependencies are private, continue
+                if not private and any(_is_private_step(dep) for dep in dag[step]):
+                    continue
+
                 # We want to execute export steps after any grapher://grapher steps,
                 # to ensure that any indicators required by the mdim step are already pushed to DB.
                 # To achieve that, replace "data://grapher" dependencies with "grapher://grapher".
-                # NOTE: If any dependency of the export step is a data-private://grapher step, it will need to be run with the "--private" flag, otherwise the export step may fail.
                 dag[step] = {
                     re.sub(r"^(data|data-private)://", "grapher://", dep)
                     if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep)
@@ -701,7 +704,7 @@ def _check_dag_completeness(dag: DAG) -> None:
             if re.match(r"^(snapshot|walden|snapshot-private|walden-private|github|etag)://", dep):
                 pass
             elif dep not in dag:
-                raise ValueError(f"Step {step} depends {dep} which is not in the DAG.")
+                raise ValueError(f"Step {step} depends on {dep} which is not in the DAG.")
 
 
 if __name__ == "__main__":

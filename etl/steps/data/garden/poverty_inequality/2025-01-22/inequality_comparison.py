@@ -35,9 +35,9 @@ INDICATORS_FOR_ANALYSIS = {
     "gini_wid_pretaxNational_perAdult": "p0p100_gini_pretax",
     "p99p100Share_wid_pretaxNational_perAdult": "p99p100_share_pretax",
     "p90p100Share_wid_pretaxNational_perAdult": "p90p100_share_pretax",
-    "gini_wid_posttaxNational_perAdult": "p0p100_gini_posttax_nat",
-    "p99p100Share_wid_posttaxNational_perAdult": "p99p100_share_posttax_nat",
-    "p90p100Share_wid_posttaxNational_perAdult": "p90p100_share_posttax_nat",
+    # "gini_wid_posttaxNational_perAdult": "p0p100_gini_posttax_nat",
+    # "p99p100Share_wid_posttaxNational_perAdult": "p99p100_share_posttax_nat",
+    # "p90p100Share_wid_posttaxNational_perAdult": "p90p100_share_posttax_nat",
 }
 
 
@@ -47,36 +47,13 @@ INDICATORS_FOR_ANALYSIS = {
 # min_interval: minimum distance between the observation year and the reference year
 REFERENCE_YEARS = [
     {
-        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2018: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
-    },
-    {
-        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2018: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
-    },
-    {
-        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2019: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
-    },
-    {
-        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2019: {"maximum_distance": 5, "tie_break_strategy": "higher", "min_interval": 0},
-    },
-    {
-        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2020: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
-    },
-    {
-        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2020: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
-    },
-    {
-        1980: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2023: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
-    },
-    {
-        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0},
-        2023: {"maximum_distance": 2, "tie_break_strategy": "higher", "min_interval": 0},
+        1993: {"maximum_distance": 5, "tie_break_strategy": "lower", "min_interval": 0, "excluded_years": [1988, 1989]},
+        2019: {
+            "maximum_distance": 5,
+            "tie_break_strategy": "higher",
+            "min_interval": 0,
+            "excluded_years": [2020, 2021, 2022, 2023, 2024],
+        },
     },
 ]
 
@@ -98,7 +75,7 @@ def run(dest_dir: str) -> None:
     tb_wid = ds_wid.read("world_inequality_database")
     tb_lis = ds_lis.read("luxembourg_income_study")
 
-    # Change types of some columns to avoid issues with filering and missing values on merge
+    # Change types of some columns to avoid issues with filtering and missing values on merge
     tb = tb.astype({"pipreportinglevel": "object", "pipwelfare": "object", "series_code": "object"})
 
     #### SET REF YEARS AND THEN RUN ####
@@ -112,6 +89,7 @@ def run(dest_dir: str) -> None:
             series=INDICATORS_FOR_ANALYSIS.keys(),
             reference_years=reference_years,
             only_all_series=False,
+            exclude_different_welfare=True,
         )
 
         # Append the table to the list
@@ -123,6 +101,7 @@ def run(dest_dir: str) -> None:
             series=INDICATORS_FOR_ANALYSIS.keys(),
             reference_years=reference_years,
             only_all_series=True,
+            exclude_different_welfare=True,
         )
 
         # Append the table to the list
@@ -136,6 +115,9 @@ def run(dest_dir: str) -> None:
         tb=tb, indicator_match=INDICATORS_FOR_ANALYSIS, tb_pip=tb_pip, tb_wid=tb_wid, tb_lis=tb_lis
     )
 
+    # Create analysis and grapher tables
+    garden_tables = create_analysis_and_grapher_tables(tb=tb)
+
     # NOTE: For now I am keeping the population and regions addition commented out, because I might use them in the future
 
     # # Add regions
@@ -144,17 +126,12 @@ def run(dest_dir: str) -> None:
     # # Add population
     # tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, year_col="ref_year")
 
-    # Format the table
-    tb = tb.format(
-        keys=["country", "year", "ref_year", "year_1", "year_2", "only_all_series"], short_name="inequality_comparison"
-    )
-
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
+        dest_dir, tables=garden_tables, check_variables_metadata=True, default_metadata=ds_pov_ineq.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -169,6 +146,8 @@ def match_ref_years(
     series: List[str],
     reference_years: Dict[int, Dict[str, int]],
     only_all_series: bool,
+    exclude_different_welfare: bool = True,
+    exclude_different_reporting_level: bool = False,
 ) -> Table:
     """
     Match series to reference years.
@@ -194,6 +173,9 @@ def match_ref_years(
             f"No data found for reference year {y}. Please check `maximum_distance` ({reference_years[y]['maximum_distance']})."
         )
 
+        # Filter tb_year according to excluded years
+        tb_year = tb_year[~tb_year["year"].isin(reference_years[y]["excluded_years"])].reset_index(drop=True)
+
         # Calculate the distance between the observation year and the reference year (absolute value)
         tb_year["distance"] = abs(tb_year["year"] - y)
 
@@ -209,36 +191,24 @@ def match_ref_years(
                 on=["country", "series_code"],
                 suffixes=("", f"_{y}"),
             )
-            # References to column names work differently depending on if there are 2 or more reference years. Treat these cases separately.
-            if len(reference_years_list) == 2:
-                # Categorize the pipwelfare match
-                tb_match["pipwelfarecat"] = tb_match.apply(cat_welfare, args=("pipwelfare", f"pipwelfare_{y}"), axis=1)
+            # Categorize the pipwelfare match
+            tb_match["pipwelfarecat"] = tb_match.apply(cat_welfare, args=("pipwelfare", f"pipwelfare_{y}"), axis=1)
 
-                # Categorize the pipreportinglevel match
-                tb_match["pipreportinglevelcat"] = tb_match.apply(
-                    cat_reportinglevel, args=("pipreportinglevel", f"pipreportinglevel_{y}"), axis=1
-                )
+            # Categorize the pipreportinglevel match
+            tb_match["pipreportinglevelcat"] = tb_match.apply(
+                cat_reportinglevel, args=("pipreportinglevel", f"pipreportinglevel_{y}"), axis=1
+            )
 
-                # Add a column that gives the distance between the observation years
-                tb_match[f"distance_{reference_years_list[-2]}_{y}"] = abs(tb_match["year"] - tb_match[f"year_{y}"])
+            if exclude_different_welfare:
+                # Exclude non-matching welfare types (99)
+                tb_match = tb_match[tb_match["pipwelfarecat"] != 99].reset_index(drop=True)
 
-            else:
-                # Categorize the pipwelfare match
-                tb_match["pipwelfarecat"] = tb_match.apply(
-                    cat_welfare, args=(f"pipwelfare_{reference_years_list[-2]}", f"pipwelfare_{y}"), axis=1
-                )
+            if exclude_different_reporting_level:
+                # Exclude non-matching reporting levels (99)
+                tb_match = tb_match[tb_match["pipreportinglevelcat"] != 99].reset_index(drop=True)
 
-                # Categorize the pipreportinglevel match
-                tb_match["pipreportinglevelcat"] = tb_match.apply(
-                    cat_reportinglevel,
-                    args=(f"pipreportinglevel_{reference_years_list[-2]}", f"pipreportinglevel_{y}"),
-                    axis=1,
-                )
-
-                # Add a column that gives the distance between the observation years
-                tb_match[f"distance_{reference_years_list[-2]}_{y}"] = abs(
-                    tb_match[f"year_{reference_years_list[-2]}"] - tb_match[f"year_{y}"]
-                )
+            # Add a column that gives the distance between the observation years
+            tb_match[f"distance_{reference_years_list[-2]}_{y}"] = abs(tb_match["year"] - tb_match[f"year_{y}"])
 
             # Filter tb_match according to best pipwelfarecat
             min_values = tb_match.groupby(["country", "series_code"])["pipwelfarecat"].transform("min")
@@ -340,12 +310,16 @@ def match_ref_years(
 
     # Reshape from wide to long format
     tb_match = pd.wide_to_long(
-        tb_match, ["value", "year"], i=["country", "series_code"], j="ref_year", sep="_"
+        tb_match,
+        ["value", "year", "pipreportinglevel", "pipwelfare"],
+        i=["country", "series_code"],
+        j="ref_year",
+        sep="_",
     ).reset_index(drop=False)
 
     # Pivot from long to wide format, creating a column for each series_code
     tb_match = tb_match.pivot(
-        index=["country", "year", "ref_year"],
+        index=["country", "year", "ref_year", "pipreportinglevel", "pipwelfare"],
         columns="series_code",
         values="value",
         join_column_levels_with="_",
@@ -356,9 +330,41 @@ def match_ref_years(
     tb_match["year_2"] = reference_years_list[1]
     tb_match["only_all_series"] = only_all_series
 
+    # For excluded years, if list is empty, set to "No excluded years"
+    for y in [0, 1]:
+        excluded_years_list = reference_years[reference_years_list[y]]["excluded_years"]
+        if not excluded_years_list:
+            tb_match[f"excluded_years_{y+1}"] = "No"
+        else:
+            tb_match[f"excluded_years_{y+1}"] = "Yes"
+
+        maximum_distance = reference_years[reference_years_list[y]]["maximum_distance"]
+        tb_match[f"maximum_distance_{y+1}"] = maximum_distance
+
     # Replace only_all_series with a more descriptive name
-    tb_match["only_all_series"] = tb_match["only_all_series"].replace({True: "Only countries with data in all series"})
-    tb_match["only_all_series"] = tb_match["only_all_series"].replace({False: "All data points for each series"})
+    tb_match["only_all_series"] = tb_match["only_all_series"].replace({True: "Only countries in all sources"})
+    tb_match["only_all_series"] = tb_match["only_all_series"].replace({False: "All data points"})
+
+    # Define new columns
+    tb_match["reference_years"] = tb_match["year_1"].astype(str) + "-" + tb_match["year_2"].astype(str)
+    tb_match["excluded_years"] = (
+        tb_match["excluded_years_1"].astype(str) + " | " + tb_match["excluded_years_2"].astype(str)
+    )
+    tb_match["maximum_distances"] = (
+        tb_match["maximum_distance_1"].astype(str) + " | " + tb_match["maximum_distance_2"].astype(str)
+    )
+
+    # Drop columns
+    tb_match = tb_match.drop(
+        columns=[
+            "year_1",
+            "year_2",
+            "excluded_years_1",
+            "excluded_years_2",
+            "maximum_distance_1",
+            "maximum_distance_2",
+        ]
+    )
 
     return tb_match
 
@@ -380,7 +386,7 @@ def cat_welfare(row, col1, col2):
     elif row[col1] == "consumption" and row[col2] == "consumption":
         return 2
     else:
-        return 3
+        return 99  # As in: "error"
 
 
 def cat_reportinglevel(row, col1, col2):
@@ -397,7 +403,7 @@ def cat_reportinglevel(row, col1, col2):
     elif row[col1] == "rural" and row[col2] == "rural":
         return 3
     else:
-        return 4
+        return 99  # As in: "error"
 
 
 def add_regions_columns(tb: Table, ds_regions: Dataset) -> Table:
@@ -456,3 +462,58 @@ def add_metadata_from_original_tables(
             tb[col] = tb[col].copy_metadata(tb_lis[match])
 
     return tb
+
+
+def create_analysis_and_grapher_tables(tb: Table) -> List[Table]:
+    """
+    Create two different tables with the same data: one with data for analysis and another with more restricted data for Grapher
+    """
+
+    tb = tb.copy()
+    tb_analysis = tb.copy()
+
+    # Drop columns
+    tb = tb.drop(
+        columns=[
+            "excluded_years",
+            "maximum_distances",
+            "pipwelfare",
+            "pipreportinglevel",
+        ]
+    )
+
+    # Keep the data in unique rows using this index [ "country", "year", "ref_year", "reference_years", "only_all_series"]
+    # I need to do this because the pipwelfare and pipreportinglevel dublicate the data
+    tb = tb.groupby(["country", "year", "ref_year", "reference_years", "only_all_series"], as_index=False).first()
+
+    # Format the table
+    tb = tb.format(
+        keys=[
+            "country",
+            "year",
+            "ref_year",
+            "reference_years",
+            "only_all_series",
+        ],
+        short_name="inequality_comparison",
+    )
+
+    tb_analysis = tb_analysis.format(
+        keys=[
+            "country",
+            "year",
+            "ref_year",
+            "reference_years",
+            "excluded_years",
+            "maximum_distances",
+            "only_all_series",
+            "pipwelfare",
+            "pipreportinglevel",
+        ],
+        short_name="inequality_comparison_analysis",
+    )
+
+    # define a list of tables to return
+    garden_tables = [tb, tb_analysis]
+
+    return garden_tables
