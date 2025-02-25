@@ -17,12 +17,12 @@ tables:
       cases:
         title: Diphtheria cases
         unit: cases
-        description_short: Reported number of diphtheria cases in the United States.
+        description_short: Reported diphtheria cases in the United States.
         display:
           numDecimalPlaces: 0
       case_rate:
-        title: Diphtheria case rate
+        title: Diphtheria cases per million people
         unit: cases per million people
-        description_short: Reported number of diphtheria cases per million people in the United States.
+        description_short: Reported diphtheria cases per million people in the United States.
         display:
           numDecimalPlaces: 1
