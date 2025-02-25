@@ -735,6 +735,15 @@ steps:
   data://grapher/oecd/2025-02-19/official_development_assistance:
     - data://garden/oecd/2025-02-19/official_development_assistance
 
+
+  # OECD Social Expenditure Database
+  data://meadow/oecd/2025-02-25/social_expenditure:
+    - snapshot://oecd/2025-02-25/social_expenditure.csv
+  data://garden/oecd/2025-02-25/social_expenditure:
+    - data://meadow/oecd/2025-02-25/social_expenditure
+  data://grapher/oecd/2025-02-25/social_expenditure:
+    - data://garden/oecd/2025-02-25/social_expenditure
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
