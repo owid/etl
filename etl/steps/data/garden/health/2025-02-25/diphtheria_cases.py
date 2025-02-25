@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     tb_census = ds_meadow_census.read("diphtheria_cases")
     tb_population = ds_population.read("population")
     # Combine the data from the two sources
-    tb = pr.concat([tb_cdc, tb_census], short_name="diphtheria_cases").sort_values("year").reset_index(drop=True)
+    tb = pr.concat([tb_census, tb_cdc], short_name="diphtheria_cases").sort_values("year").reset_index(drop=True)
     # Combine with population data
     tb = pr.merge(
         tb,
