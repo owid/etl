@@ -3,9 +3,9 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical measless deaths in the United States - Centers for Disease Control and Prevention
+    title: Historical diphtheria cases in the United States - Centers for Disease Control and Prevention
     description: |-
-      Data on historical measles deaths in the United States, compiled from a selection of sources.
+      Data on historical diphtheria cases in the United States, compiled from a selection of sources from the US CDC.
 
       Sources for each year are as follows:
 
@@ -69,3 +69,7 @@ meta:
     # License
     license:
       name: Public domain
+outs:
+  - md5: 00c7f34cb6f5889fd302839ae23ee438
+    size: 5581
+    path: diphtheria_cases_cdc.csv

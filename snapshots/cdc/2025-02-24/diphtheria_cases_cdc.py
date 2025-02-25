@@ -126,7 +126,7 @@ DATA_CDC = pd.DataFrame(
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"health/{SNAPSHOT_VERSION}/diphtheria_cases_cdc.csv")
+    snap = Snapshot(f"cdc/{SNAPSHOT_VERSION}/diphtheria_cases_cdc.csv")
     df = DATA_CDC
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload, data=df)
