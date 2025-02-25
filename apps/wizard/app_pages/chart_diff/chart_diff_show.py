@@ -7,7 +7,7 @@ If you want to learn more about it, start from its `show` method.
 import difflib
 import json
 import os
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, Tuple, cast
 
 import pandas as pd
 import streamlit as st
@@ -429,37 +429,40 @@ class ChartDiffShow:
             cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
             st.info(cost_msg)
 
-    def _show_chart_comparison(self, chartrev_last_appr=None) -> None:
+    def _show_chart_comparison(self, chartrev_last_appr=None) -> Tuple[Any, str]:
         """Show charts (horizontally or vertically)."""
 
         def _show_chart_old():
-            if self.diff.in_conflict:
-                st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
-            else:
-                if chartrev_last_appr is None:
-                    st.markdown(self._header_production_chart)
+            if (chartrev_last_appr is not None) and (not self.diff.in_conflict):
+                with st.container(height=40, border=False):
+                    options = {
+                        "prod": self._header_production_chart_plain,
+                        "last": f"Last approved on staging ({prettify_date(chartrev_last_appr)} - REV {chartrev_last_appr.id})",
+                    }
+                    option = st.selectbox(
+                        "Chart revision",
+                        options=options.keys(),
+                        format_func=lambda x: options[x],
+                        key=f"prod-review-{self.diff.chart_id}",
+                        label_visibility="collapsed",
+                    )
 
+                if option == "prod":
                     assert self.diff.target_chart is not None
                     grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
+                elif option == "last":
+                    grapher_chart(chart_config=chartrev_last_appr.config, owid_env=SOURCE)
+                    return chartrev_last_appr.config, False
+            else:
+                if self.diff.in_conflict:
+                    st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
                 else:
-                    with st.container(height=40, border=False):
-                        options = {
-                            "prod": self._header_production_chart_plain,
-                            "last": f"Last approved on staging ({prettify_date(chartrev_last_appr)} - REV {chartrev_last_appr.id})",
-                        }
-                        option = st.selectbox(
-                            "Chart revision",
-                            options=options.keys(),
-                            format_func=lambda x: options[x],
-                            key=f"prod-review-{self.diff.chart_id}",
-                            label_visibility="collapsed",
-                        )
+                    st.markdown(self._header_production_chart)
+                assert self.diff.target_chart is not None
+                grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
 
-                    if option == "prod":
-                        assert self.diff.target_chart is not None
-                        grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
-                    elif option == "last":
-                        grapher_chart(chart_config=chartrev_last_appr.config, owid_env=SOURCE)
+            assert self.diff.target_chart is not None
+            return self.diff.target_chart.config, True
 
         def _show_chart_new():
             if chartrev_last_appr is None:
@@ -472,10 +475,12 @@ class ChartDiffShow:
         def _show_charts_comparison_v():
             """Show charts on top of each other."""
             # Chart production
-            _show_chart_old()
+            config_ref, is_prod = _show_chart_old()
 
             # Chart staging
             _show_chart_new()
+
+            return config_ref, is_prod
 
         def _show_charts_comparison_h():
             """Show charts next to each other."""
@@ -483,14 +488,16 @@ class ChartDiffShow:
             col1, col2 = st.columns(2)
 
             with col1:
-                _show_chart_old()
+                config_ref, is_prod = _show_chart_old()
             with col2:
                 _show_chart_new()
+            return config_ref, is_prod
 
         # Only one chart: new chart
         if self.diff.target_chart is None:
             st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
+            config_ref = self.diff.source_chart.config
         # Two charts, actual diff
         else:
             # Detect arrangement type
@@ -500,9 +507,9 @@ class ChartDiffShow:
 
             # Show charts
             if arrange_vertical:
-                _show_charts_comparison_v()
+                config_ref, is_prod = _show_charts_comparison_v()
             else:
-                _show_charts_comparison_h()
+                config_ref, is_prod = _show_charts_comparison_h()
 
             # Enable/disable vertical arrangement
             st.toggle(
@@ -511,15 +518,17 @@ class ChartDiffShow:
                 # on_change=None,
             )
 
-    def _show_config_diff(self) -> None:
+        return config_ref, is_prod
+
+    def _show_config_diff(self, config_ref, fromfile: str = "production") -> None:
         assert (
             self.diff.target_chart is not None
         ), "We detected this diff to be a chart modification, but couldn't find target chart!"
 
-        config_1 = self.diff.target_chart.config
+        # config_1 = self.diff.target_chart.config
         config_2 = self.diff.source_chart.config
 
-        _show_dict_diff(config_1, config_2)
+        _show_dict_diff(config_ref, config_2, fromfile=fromfile)
 
     def _show_approval_history(self, df: pd.DataFrame):
         """Show history of approvals of a chart-diff."""
@@ -586,9 +595,9 @@ class ChartDiffShow:
         if self.diff.is_modified:
             tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Status log"])
             with tab1:
-                self._show_chart_comparison(chart_revision_last_approved)
+                config_ref, is_prod = self._show_chart_comparison(chart_revision_last_approved)
             with tab2:
-                self._show_config_diff()
+                self._show_config_diff(config_ref, "production" if is_prod else "last revision")
             with tab3:
                 self._show_approval_history(df_approvals)
 
@@ -596,7 +605,7 @@ class ChartDiffShow:
         elif self.diff.is_new:
             tab1, tab2 = st.tabs(["Chart", "Status log"])
             with tab1:
-                self._show_chart_comparison(chart_revision_last_approved)
+                _ = self._show_chart_comparison(chart_revision_last_approved)
             with tab2:
                 self._show_approval_history(df_approvals)
 
@@ -615,7 +624,7 @@ class ChartDiffShow:
             self._show()
 
 
-def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any]):
+def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str, tofile: str = "staging"):
     """Get diff of two dictionaries.
 
     Useful for chart config diffs, indicator metadata diffs, etc.
@@ -626,8 +635,8 @@ def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any]):
     diff = difflib.unified_diff(
         d1.splitlines(keepends=True),
         d2.splitlines(keepends=True),
-        fromfile="production",
-        tofile="staging",
+        fromfile=fromfile,
+        tofile=tofile,
     )
 
     diff_string = "".join(diff)
@@ -640,12 +649,12 @@ def st_show_diff(diff_str):
     st.code(diff_str, line_numbers=True, language="diff")
 
 
-def _show_dict_diff(dix_1: Dict[str, Any], dix_2: Dict[str, Any]):
+def _show_dict_diff(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str):
     """Show diff of two dictionaries.
 
     Used to show chart config diffs, indicator metadata diffs, etc.
     """
-    diff_str = compare_dictionaries(dix_1, dix_2)
+    diff_str = compare_dictionaries(dix_1, dix_2, fromfile=fromfile)
     st_show_diff(diff_str)
 
 
