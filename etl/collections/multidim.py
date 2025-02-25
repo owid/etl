@@ -21,6 +21,7 @@ from sqlalchemy.engine import Engine
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
+from etl.collections.utils import records_to_dictionary
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
@@ -746,18 +747,8 @@ def combine_config_dimensions(
         - I think we need to add more checks to ensure that there is nothing weird being produced here.
     """
 
-    def _build_reference_dix(records, key: str):
-        """Transform: [{key: ..., a: ..., b: ...}, ...] -> {key: {a: ..., b: ...}, ...}."""
-
-        dix = {}
-        for record in records:
-            assert key in record, f"`{key}` not found in record: {record}!"
-            dix[record[key]] = {k: v for k, v in record.items() if k != key}
-
-        return dix
-
     config_dimensions_combined = deepcopy(config_dimensions)
-    dims_overwrite = _build_reference_dix(config_dimensions_yaml, "slug")
+    dims_overwrite = records_to_dictionary(config_dimensions_yaml, "slug")
 
     # Overwrite dimensions
     for dim in config_dimensions_combined:
@@ -771,7 +762,7 @@ def combine_config_dimensions(
 
             # Overwrite choices
             if "choices" in dim_overwrite:
-                choices_overwrite = _build_reference_dix(
+                choices_overwrite = records_to_dictionary(
                     dim_overwrite["choices"],
                     "slug",
                 )
