@@ -2,7 +2,6 @@
 #  helpers.py
 #  etl
 #
-
 import datetime as dt
 import re
 import sys
@@ -520,6 +519,12 @@ class PathFinder:
         return self.directory / (self.short_name + ".yml")
 
     @property
+    def config_path(self) -> Path:
+        """Config file. Used in `multidim` and `explorer` ETL steps."""
+        # assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
+        return self.directory / (self.short_name + ".config.yml")
+
+    @property
     def directory(self) -> Path:
         # If the current file is a directory, it's a step with multiple files.
         if self.f.is_dir():
@@ -779,13 +784,20 @@ class PathFinder:
         assert len(deps) == 1
         return deps[0].replace("etag://", "https://")
 
-    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
+    def load_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
         if filename is not None:
             path = self.directory / Path(filename)
         elif path is None:
             path = self.mdim_path
         config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
         return config
+
+    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
+        """Replace code to use `self.load_config`."""
+        return self.load_config(filename, path)
+
+    def load_explorer_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
+        return self.load_config(filename, path)
 
 
 def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
