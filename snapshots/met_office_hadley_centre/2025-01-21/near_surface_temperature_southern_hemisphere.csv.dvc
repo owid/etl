@@ -1,6 +1,6 @@
 meta:
   origin:
-    producer: Met Office Hadley Centre
+    producer: Adapted from Met Office Hadley Centre
     title: HadCRUT5
     description: |-
       The HadCRUT5 near surface temperature data set is produced by blending data from the CRUTEM5 surface air temperature dataset and the HadSST4 sea-surface temperature dataset.
