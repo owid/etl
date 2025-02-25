@@ -38,7 +38,7 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns=COLUMNS_TO_KEEP)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tables = [tb.format(["country", "year"])]
+    tables = [tb.format(["country", "year", "indicator", "expenditure_source", "spending_type", "programme_type"])]
 
     #
     # Save outputs.
