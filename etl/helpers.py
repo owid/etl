@@ -788,7 +788,7 @@ class PathFinder:
         if filename is not None:
             path = self.directory / Path(filename)
         elif path is None:
-            path = self.mdim_path
+            path = self.config_path
         config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
         return config
 
