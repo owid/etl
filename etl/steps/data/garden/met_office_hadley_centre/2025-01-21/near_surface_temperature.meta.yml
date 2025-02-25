@@ -9,6 +9,8 @@ definitions:
 
     description_processing: |-
       We switch from using 1961-1990 to using 1861-1890 as our baseline to better show how temperatures have changed since pre-industrial times. For each region, we calculate the mean temperature anomaly for 1961–1990 and for 1861–1890. The difference between these two means serves as the adjustment factor. This factor is applied uniformly to all temperature readings and their confidence intervals to ensure that both the central values and the associated uncertainty bounds are correctly shifted relative to the new 1861–1890 baseline.
+    display:
+      numDecimalPlaces: 1
   presentation:
     topic_tags:
     - Climate Change
