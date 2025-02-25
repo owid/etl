@@ -563,7 +563,7 @@ def remove_jumps_in_the_data_and_unneeded_cols(tb: Table) -> Table:
 
     # For i_oda_net_disbursements_share_gni
     tb.loc[
-        (tb["country"] == "Non-DAC countries (OECD)"),
+        (tb["country"] == "Non-DAC countries (OECD)") & (tb["year"] <= 1991),
         "i_oda_net_disbursements_share_gni",
     ] = None
 
