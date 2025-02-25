@@ -132,6 +132,7 @@ def push_new_charts(charts: List[gm.Chart]) -> None:
         st.success(
             "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
         )
+        st_wizard_page_link("anomalist")
         st_wizard_page_link("chart-diff")
 
 
