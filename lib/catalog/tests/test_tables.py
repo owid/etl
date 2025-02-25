@@ -596,6 +596,15 @@ def test_merge_categoricals(table_1, table_2, origins) -> None:
     assert tb.country.m.origins[0] == origins[1]
 
 
+def test_merge_with_dimensions(table_1, table_2) -> None:
+    table_1.a.m.dimensions = {"sex": "male"}
+    table_2.c.m.dimensions = {"sex": "female"}
+    tb = tables.merge(table_1[["country", "year", "a"]], table_2[["country", "year", "c"]], on=["country", "year"])
+
+    assert tb.a.m.dimensions == {"sex": "male"}
+    assert tb.c.m.dimensions == {"sex": "female"}
+
+
 def test_concat_categoricals(table_1, table_2, origins) -> None:
     table_1.country.m.origins = [origins[1]]
     table_2.loc[0, "country"] = "Poland"
@@ -868,6 +877,24 @@ def test_pivot_metadata_propagation():
 
     # It should not affect the other variable
     assert tb_p["g1_s2"].m.presentation.title_public == "Value"
+
+
+def test_pivot_dimensions():
+    tb = Table(
+        pd.DataFrame(
+            {
+                "year": [2020, 2021, 2022],
+                "group": ["g1", "g1", "g1"],
+                "subgroup": ["s1", "s1", "s2"],
+                "value": [1, 2, 3],
+            }
+        )
+    )
+    tb["value"].m.presentation = VariablePresentationMeta(title_public="Value")
+    tb_p = tb.pivot(index="year", columns=["group", "subgroup"], values="value", join_column_levels_with="_")
+
+    assert tb_p.g1_s1.m.dimensions == {"group": "g1", "subgroup": "s1"}
+    assert tb_p.g1_s2.m.dimensions == {"group": "g1", "subgroup": "s2"}
 
 
 def test_get_unique_sources_from_tables(table_1, sources):

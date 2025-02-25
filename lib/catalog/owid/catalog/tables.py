@@ -1647,6 +1647,10 @@ def pivot(
         # There may be a way to allow for both.
         table[column].metadata = column_metadata
 
+        # Fill dimensions
+        if isinstance(column, tuple) and isinstance(columns, list):
+            table[column].m.dimensions = dict(zip(columns, column))
+
     # Transfer also the metadata of the index columns.
     # Note: This metadata will only be accessible if columns are reset and flattened to one level.
     for index_column in list(table.index.names):

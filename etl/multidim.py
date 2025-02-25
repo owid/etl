@@ -671,19 +671,16 @@ class MDIMConfigExpander:
         """Build dataframe with dimensional information from table tb."""
         records = []
         for col in tb.columns:
-            if tb[col].metadata.additional_info and ("dimensions" in tb[col].metadata.additional_info):
-                dims = tb[col].metadata.additional_info["dimensions"]
-
-                assert "originalShortName" in dims, "Missing indicator name in dimensions metadata!"
+            dims = tb[col].m.dimensions
+            if dims:
+                assert tb[col].m.original_short_name, "Missing metadata.original_short_name for dimensions!"
                 row = {
-                    "indicator": dims["originalShortName"],
                     "short_name": col,
+                    # TODO: how is this useful? can we live without it? can it be None?
+                    "indicator": tb[col].m.original_short_name,
                 }
                 # Add dimensional info
-                assert "filters" in dims, "Missing filters in dimensions metadata!"
-                filters = dims["filters"]
-                for f in filters:
-                    row[f["name"]] = f["value"]
+                row = {**row, **dims}
 
                 # Add entry to records
                 records.append(row)
@@ -704,7 +701,9 @@ class MDIMConfigExpander:
         # If no indicator name is provided, there should only be one in the table!
         if indicator_name is None:
             if len(indicator_names) != 1:
-                raise ValueError("There are multiple indicators, but no `indicator_name` was provided.")
+                raise ValueError(
+                    f"There are multiple indicators {indicator_names}, but no `indicator_name` was provided."
+                )
             # If only one indicator available, set it as the indicator name
             indicator_name = indicator_names[0]
         # If indicator name is given, make sure it is present in the table!
@@ -849,110 +848,6 @@ def _check_intersection_iters(
         raise ValueError(
             f"Unexpected items: {', '.join([f'`{d}`' for d in items_unexpected])}. Please review `{key_name}`!"
         )
-
-
-####################################################################################################
-# DEPRECATED FUNCTIONS
-####################################################################################################
-@deprecated("This function relies on specific column naming convention. Use `expand_config` instead.")
-def generate_views_for_dimensions(
-    dimensions, tables, dimensions_order_in_slug=None, additional_config=None, warn_on_missing_combinations=True
-):
-    """Generate individual views for all possible combinations of dimensions in a list of flattened tables.
-
-    Parameters
-    ----------
-    dimensions : List[Dict[str, Any]]
-        Dimensions, as given in the configuration of the multidim step, e.g.
-        [
-            {'slug': 'frequency', 'name': 'Frequency', 'choices': [{'slug': 'annual','name': 'Annual'}, {'slug': 'monthly', 'name': 'Monthly'}]},
-            {'slug': 'source', 'name': 'Energy source', 'choices': [{'slug': 'electricity', 'name': 'Electricity'}, {'slug': 'gas', 'name': 'Gas'}]},
-            ...
-        ]
-    tables : List[Table]
-        Tables whose indicator views will be generated.
-    dimensions_order_in_slug : Tuple[str], optional
-        Dimension names, as they appear in "dimensions", and in the order in which they are spelled out in indicator names. For example, if indicator names are, e.g. annual_electricity_euros, then dimensions_order_in_slug would be ("frequency", "source", "unit").
-    additional_config : _type_, optional
-        Additional config fields to add to each view, e.g.
-        {"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"}
-    warn_on_missing_combinations : bool, optional
-        True to warn if any combination of dimensions is not found among the indicators in the given tables.
-
-    Returns
-    -------
-    results : List[Dict[str, Any]]
-        Views configuration, e.g.
-        [
-            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'euro'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_euro'},
-            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'pps'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_pps'},
-            ...
-        ]
-
-    """
-    # Extract all choices for each dimension as (slug, choice_slug) pairs.
-    choices = {dim["slug"]: [choice["slug"] for choice in dim["choices"]] for dim in dimensions}
-    dimension_slugs_in_config = set(choices.keys())
-
-    # Sanity check for dimensions_order_in_slug.
-    if dimensions_order_in_slug:
-        dimension_slugs_in_order = set(dimensions_order_in_slug)
-
-        # Check if any slug in the order is missing from the config.
-        missing_slugs = dimension_slugs_in_order - dimension_slugs_in_config
-        if missing_slugs:
-            raise ValueError(
-                f"The following dimensions are in 'dimensions_order_in_slug' but not in the config: {missing_slugs}"
-            )
-
-        # Check if any slug in the config is missing from the order.
-        extra_slugs = dimension_slugs_in_config - dimension_slugs_in_order
-        if extra_slugs:
-            log.warning(
-                f"The following dimensions are in the config but not in 'dimensions_order_in_slug': {extra_slugs}"
-            )
-
-        # Reorder choices to match the specified order.
-        choices = {dim: choices[dim] for dim in dimensions_order_in_slug if dim in choices}
-
-    # Generate all combinations of the choices.
-    all_combinations = list(product(*choices.values()))
-
-    # Create the views.
-    results = []
-    for combination in all_combinations:
-        # Map dimension slugs to the chosen values.
-        dimension_mapping = {dim_slug: choice for dim_slug, choice in zip(choices.keys(), combination)}
-        slug_combination = "_".join(combination)
-
-        # Find relevant tables for the current combination.
-        relevant_table = []
-        for table in tables:
-            if slug_combination in table:
-                relevant_table.append(table)
-
-        # Handle missing or multiple table matches.
-        if len(relevant_table) == 0:
-            if warn_on_missing_combinations:
-                log.warning(f"Combination {slug_combination} not found in tables")
-            continue
-        elif len(relevant_table) > 1:
-            log.warning(f"Combination {slug_combination} found in multiple tables: {relevant_table}")
-
-        # Construct the indicator path.
-        indicator_path = f"{relevant_table[0].metadata.dataset.uri}/{relevant_table[0].metadata.short_name}#{trim_long_variable_name(slug_combination)}"
-        indicators = {
-            "y": indicator_path,
-        }
-        # Append the combination to results.
-        results.append({"dimensions": dimension_mapping, "indicators": indicators})
-
-    if additional_config:
-        # Include additional fields in all results.
-        for result in results:
-            result.update({"config": additional_config})
-
-    return results
 
 
 def group_views(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:

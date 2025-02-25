@@ -10,7 +10,7 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, Tuple, TypeVar, Union
 
 import mistune
 import pandas as pd
@@ -196,6 +196,21 @@ class VariablePresentationMeta(MetaBase):
     faqs: List[FaqLink] = field(default_factory=list)
 
 
+# TODO: should I keep it or not?
+@dataclass(frozen=True)
+class Dimensions:
+    """Encapsulates dimensions in an immutable, hashable structure."""
+
+    items: Tuple[Tuple[str, Any], ...]
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "Dimensions":
+        return cls(items=tuple(sorted(d.items())))
+
+    def to_dict(self) -> Dict[str, Any]:
+        return dict(self.items)
+
+
 @pruned_json
 @dataclass(eq=False)
 class VariableMeta(MetaBase):
@@ -255,6 +270,12 @@ class VariableMeta(MetaBase):
 
     # List of categories for ordinal type indicators
     sort: List[str] = field(default_factory=list)
+
+    # Dimensions
+    # Dictionary of dimensions
+    dimensions: Optional[Dict[str, Any]] = None
+    # Original short name of the indicator before flattening
+    original_short_name: Optional[str] = None
 
     @property
     def schema_version(self) -> int:
