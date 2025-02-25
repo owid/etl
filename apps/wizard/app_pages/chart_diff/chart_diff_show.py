@@ -590,7 +590,6 @@ class ChartDiffShow:
             df_approvals_past = df_approvals.loc[df_approvals["status"] == "approved"]
             if not df_approvals_past.empty:
                 timestamp = df_approvals_past["updatedAt"].max()
-                st.write(timestamp)
                 # Find the revision that was approved
                 chart_revision_last_approved = self.diff.get_last_chart_revision(self.source_session, timestamp)
 
