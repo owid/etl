@@ -1,8 +1,8 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
 
 import pandas as pd
-import yaml
 
+from etl.collections.utils import records_to_dictionary
 from etl.helpers import PathFinder, create_explorer
 
 # Get paths and naming conventions for current step.
@@ -61,13 +61,13 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load grapher config from YAML
-    with open(f"{paths.directory}/covid.config.yml", "r") as file:
-        config = yaml.safe_load(file)
+    config = paths.load_explorer_config()
+
     header = config["config"]
     grapher_views = config["views"]
-    grapher_options = config["options"]
+    grapher_dimensions = config["dimensions"]
 
-    # Load necessry tables
+    # Load necessary tables
     # ds = paths.load_dataset("cases_deaths")
     # tb = ds.read("cases_deaths")
 
@@ -77,21 +77,42 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Prepare grapher table of explorer.
 
+    # Prepare Dimension display dictionary
+    dimensions_display = records_to_dictionary(grapher_dimensions, key="slug")
+    for slug, values in dimensions_display.items():
+        # Sanity checks
+        assert "name" in values, f"name not found for dimension: {slug}!"
+        assert "presentation" in values, f"presentation not found for dimension: {slug}!"
+        assert "type" in values["presentation"], f"type not found for dimension: {slug}!"
+
+        # Index choices
+        if "choices" not in values:
+            assert values["presentation"]["type"] == "checkbox", f"Choices not found for dimension: {slug}!"
+        else:
+            values["choices"] = records_to_dictionary(values["choices"], key="slug")
+
+        # Widget name
+        values["widget_name"] = f"{values['name']} {values['presentation']['type'].title()}"
+
+    # Prepare grapher table of explorer.
     records = []
     for view in grapher_views:
+        # Build dimensions dictionary for a view
+        dimensions = bake_dimensions_view(
+            dimensions_display=dimensions_display,
+            view=view,
+        )
         # Get options and variable IDs
-        options = bake_options(grapher_options, view["options"])
-        var_ids = bake_ids(view["indicator"])
+        var_ids = bake_ids(view["indicators"])
 
         record = {
             "yVariableIds": var_ids,
-            **options,
+            **dimensions,
         }
 
         # Tweak view
-        name = view["options"][0]
+        name = view["dimensions"]["metric"]
         if name in RELATED:
             view["relatedQuestionText"] = RELATED[name]["text"]
             view["relatedQuestionUrl"] = RELATED[name]["link"]
@@ -141,11 +162,12 @@ def run(dest_dir: str) -> None:
             df_grapher[field] = default
 
     # Set dtypes
-    df_grapher = df_grapher.astype(
-        {
-            "timelineMinTime": "Int64",
-        }
-    )
+    if "timelineMinTime" in df_grapher.columns:
+        df_grapher = df_grapher.astype(
+            {
+                "timelineMinTime": "Int64",
+            }
+        )
     #
     # Save outputs.
     #
@@ -154,25 +176,23 @@ def run(dest_dir: str) -> None:
     ds_explorer.save()
 
 
-def bake_options(graphers_options, view_options):
-    # inputs:
-    # grapher_options, view_options
+def bake_dimensions_view(dimensions_display, view):
+    """Prepare view config for Explorer.
 
-    dix = {}
-    for i, option in enumerate(graphers_options):
-        title = f"{option['name']} {OPTION_TYPES.get(option['type'])}"
-        if i >= len(view_options):
-            if "default" not in option:
-                raise Exception(f"Value for option {option['name']} not given, and there is no default!")
-            dix[title] = option["default"]
+    Given is dimension_slug: choice_slug. We need to convert it to dimension_name: choice_name (using dimensions_display).
+    """
+    view_dimensions = {}
+    for slug_dim, slug_choice in view["dimensions"].items():
+        if "choices" in dimensions_display[slug_dim]:
+            view_dimensions[dimensions_display[slug_dim]["widget_name"]] = dimensions_display[slug_dim]["choices"][
+                slug_choice
+            ]["name"]
         else:
-            dix[title] = view_options[i]
-    return dix
+            view_dimensions[dimensions_display[slug_dim]["widget_name"]] = slug_choice
+    return view_dimensions
 
 
-def bake_ids(var_ids):
-    if isinstance(var_ids, str):
-        return [var_ids]
-    elif isinstance(var_ids, list):
-        return var_ids
-    raise TypeError("Variable ID should either be a string or a list of strings.")
+def bake_ids(view):
+    """Prepare variable IDs for Explorer."""
+    indicators_y = view["indicators"]["y"]
+    return [var_id["variableId"] for var_id in var_ids]
