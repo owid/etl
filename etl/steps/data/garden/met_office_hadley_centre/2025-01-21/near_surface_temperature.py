@@ -13,15 +13,19 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("near_surface_temperature")
     tb_meadow = ds_meadow["near_surface_temperature"].reset_index()
-    cols = ["temperature_anomaly", "lower_limit", "upper_limit"]
+    # Calculate the adjustment factors based only on temperature_anomaly
     adjustment_factors = (
-        tb_meadow[tb_meadow["year"].between(1961, 1990)].groupby("region")[cols].mean()
-        - tb_meadow[tb_meadow["year"].between(1850, 1900)].groupby("region")[cols].mean()
+        tb_meadow[tb_meadow["year"].between(1961, 1990)].groupby("region")["temperature_anomaly"].mean()
+        - tb_meadow[tb_meadow["year"].between(1850, 1900)].groupby("region")["temperature_anomaly"].mean()
     )
 
-    # Apply region-specific adjustments
+    columns_to_adjust = ["temperature_anomaly", "lower_limit", "upper_limit"]  # Add any other columns as needed
+
+    # Apply the temperature_anomaly adjustment factor to all specified columns
     for region in adjustment_factors.index:
-        tb_meadow.loc[tb_meadow["region"] == region, cols] += adjustment_factors.loc[region, cols]
+        for column in columns_to_adjust:
+            tb_meadow.loc[tb_meadow["region"] == region, column] -= adjustment_factors[region]
+
     tb_meadow = tb_meadow.format(["region", "year"])
     #
     # Save outputs.
