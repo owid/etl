@@ -1,11 +1,12 @@
 definitions:
   common:
     description_key:
-      - Temperature anomalies show how many degrees Celsius temperatures have changed compared to the 1861-1890 period. This early period is used as a baseline because it represents climate conditions before major human impacts.
+      - Temperature anomalies show how many degrees Celsius temperatures have changed compared to the 1861-1890 period. According to the source, the 1861–1890 period is often used to highlight how temperatures have changed since pre-industrial times.
+      - This early period is used as a baseline because it represents climate conditions before major human impacts.
       - The data includes separate measurements for the Northern and Southern Hemispheres, which helps researchers analyze regional differences.
       - The global temperature anomaly is the average of both hemisphere measurements.
     description_from_producer: |-
-      The 1961-90 period is most often used because it is the period recommended by the World Meteorological Organisation. In some cases other periods are used. For global average temperatures, an 1861-1890 period is sometimes used to show the warming since the "pre-industrial" period.
+       The 1961-90 period is most often used as a baseline because it is the period recommended by the World Meteorological Organisation. In some cases other periods are used. For global average temperatures, an 1861-1890 period is sometimes used to show the warming since the "pre-industrial" period.
     description_processing: |-
       We switch from using 1961-1990 to using 1861-1890 as our baseline to better show how temperatures have changed since pre-industrial times. For each region, we calculate the mean temperature anomaly for 1961–1990 and for 1861–1890. The difference between these two means serves as the adjustment factor. This factor is applied uniformly to both the temperature anomalies and the confidence intervals to ensure that both the central values and the associated uncertainty bounds are correctly shifted relative to the new 1861–1890 baseline.
     processing_level: major
@@ -14,6 +15,8 @@ definitions:
   presentation:
     topic_tags:
     - Climate Change
+    grapher_config:
+      note: The period between 1861–1890 is used as a baseline to better reflect temperature changes since pre-industrial times, as recommended by the source.
 
 dataset:
   update_period_days: 90
