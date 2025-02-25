@@ -2,7 +2,12 @@
 
 import pandas as pd
 
-from etl.collections.utils import records_to_dictionary
+from etl.collections.utils import (
+    expand_catalog_paths,
+    get_indicators_in_view,
+    get_tables_by_name_mapping,
+    records_to_dictionary,
+)
 from etl.helpers import PathFinder, create_explorer
 
 # Get paths and naming conventions for current step.
@@ -77,8 +82,11 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # 1. Obtain `dimensions_display` dictionary. This helps later when remixing the Explorer configuration.
+    # 2. Obtain `tables_by_name`: This helps in expanding the indicator paths if incomplete (e.g. table_name#short_name -> complete URI based on dependencies).
+    # 3. Obtain `df_grapher`: This is the final DataFrame that will be saved as the Explorer dataset. It is basically a different presentation of the config
 
-    # Prepare Dimension display dictionary
+    # 1. Prepare Dimension display dictionary
     dimensions_display = records_to_dictionary(grapher_dimensions, key="slug")
     for slug, values in dimensions_display.items():
         # Sanity checks
@@ -95,21 +103,41 @@ def run(dest_dir: str) -> None:
         # Widget name
         values["widget_name"] = f"{values['name']} {values['presentation']['type'].title()}"
 
-    # Prepare grapher table of explorer.
+    # 2. Get table information by table name, and table URI
+    tables_by_name = get_tables_by_name_mapping(paths.dependencies)
+
+    # 3. Remix configuration to generate explorer-friendly graphers table.
     records = []
     for view in grapher_views:
+        # Expand catalog paths
+        expand_catalog_paths(view, tables_by_name)
+
         # Build dimensions dictionary for a view
         dimensions = bake_dimensions_view(
             dimensions_display=dimensions_display,
             view=view,
         )
         # Get options and variable IDs
-        var_ids = bake_ids(view["indicators"])
+        indicator_paths = get_indicators_in_view(view)
 
+        # Build record
         record = {
-            "yVariableIds": var_ids,
             **dimensions,
         }
+        y = [v["path"] for v in indicator_paths if v["dimension"] == "y"]
+        x = [v["path"] for v in indicator_paths if v["dimension"] == "x"]
+        # size = [v["path"] for v in var_ids if v["dimension"] == "size"]
+        # color = [v["path"] for v in var_ids if v["dimension"] == "color"]
+        if y:
+            record["yVariableIds"] = y
+        if x:
+            record["xVariableIds"] = x
+
+        # TODO: which names do these use?
+        # if size:
+        #     record["sizeVariableIds"] = size
+        # if color:
+        #     record["colorVariableIds"] = color
 
         # Tweak view
         name = view["dimensions"]["metric"]
@@ -136,13 +164,14 @@ def run(dest_dir: str) -> None:
             "relatedQuestionUrl",
             "tab",
         ]
-        for field in fields_optional:
-            if field in view:
-                if isinstance(view[field], bool):
-                    v = str(view[field]).lower()
-                    record[field] = v
-                else:
-                    record[field] = view[field]
+        if "config" in view:
+            for field in fields_optional:
+                if field in view["config"]:
+                    if isinstance(view[field], bool):
+                        v = str(view[field]).lower()
+                        record[field] = v
+                    else:
+                        record[field] = view[field]
 
         # Add record
         records.append(record)
@@ -195,4 +224,6 @@ def bake_dimensions_view(dimensions_display, view):
 def bake_ids(view):
     """Prepare variable IDs for Explorer."""
     indicators_y = view["indicators"]["y"]
+    if isinstance(indicators_y, str):
+        indicators_y = [indicators_y]
     return [var_id["variableId"] for var_id in var_ids]
