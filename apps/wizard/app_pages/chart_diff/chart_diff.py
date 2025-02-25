@@ -65,6 +65,10 @@ class ChartDiff:
         self.modified_checksum = modified_checksum
         self.edited_in_staging = edited_in_staging
 
+        # Get revisions
+        self.df_approvals = self.get_all_approvals_df()
+        self.last_chart_revision_approved = None
+
         # Cached
         self._in_conflict = None
         self._change_types = None
@@ -288,6 +292,10 @@ class ChartDiff:
             chart_diff = cls(
                 source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging, error
             )
+
+            # Add last revision
+            chart_diff.set_last_approved_chart_revision(source_session)
+
             chart_diffs.append(chart_diff)
 
         return chart_diffs
@@ -481,6 +489,14 @@ class ChartDiff:
         checksums_diff[checksums_source.isna()] = False
 
         return checksums_diff
+
+    def set_last_approved_chart_revision(self, session):
+        if not self.is_approved and not self.df_approvals.empty:
+            df_approvals_past = self.df_approvals.loc[self.df_approvals["status"] == "approved"]
+            if not df_approvals_past.empty:
+                timestamp = df_approvals_past["updatedAt"].max()
+                # Find the revision that was approved
+                self.last_chart_revision_approved = self.get_last_chart_revision(session, timestamp)
 
 
 class ChartDiffsLoader:

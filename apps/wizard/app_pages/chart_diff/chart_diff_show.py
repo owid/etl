@@ -429,15 +429,15 @@ class ChartDiffShow:
             cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
             st.info(cost_msg)
 
-    def _show_chart_comparison(self, chartrev_last_appr=None) -> Tuple[Any, bool]:
+    def _show_chart_comparison(self) -> Tuple[Any, bool]:
         """Show charts (horizontally or vertically)."""
 
         def _show_chart_old():
-            if (chartrev_last_appr is not None) and (not self.diff.in_conflict):
+            if (self.diff.last_chart_revision_approved is not None) and (not self.diff.in_conflict):
                 with st.container(height=40, border=False):
                     options = {
                         "prod": self._header_production_chart_plain,
-                        "last": f"Last approved on staging ({prettify_date(chartrev_last_appr)} - REV {chartrev_last_appr.id})",
+                        "last": f"Last approved on staging ({prettify_date(self.diff.last_chart_revision_approved)} - REV {self.diff.last_chart_revision_approved.id})",
                     }
                     option = st.selectbox(
                         "Chart revision",
@@ -451,8 +451,8 @@ class ChartDiffShow:
                     assert self.diff.target_chart is not None
                     grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
                 elif option == "last":
-                    grapher_chart(chart_config=chartrev_last_appr.config, owid_env=SOURCE)
-                    return chartrev_last_appr.config, False
+                    grapher_chart(chart_config=self.diff.last_chart_revision_approved.config, owid_env=SOURCE)
+                    return self.diff.last_chart_revision_approved.config, False
             else:
                 if self.diff.in_conflict:
                     st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
@@ -465,7 +465,7 @@ class ChartDiffShow:
             return self.diff.target_chart.config, True
 
         def _show_chart_new():
-            if chartrev_last_appr is None:
+            if self.diff.last_chart_revision_approved is None:
                 st.markdown(self._header_staging_chart)
             else:
                 with st.container(height=40, border=False):
@@ -582,34 +582,34 @@ class ChartDiffShow:
             self._show_metadata_diff()
 
         # Get approval history
-        df_approvals = self.diff.get_all_approvals_df()
+        # df_approvals = self.diff.get_all_approvals_df()
 
         # Get latest approved revision
-        chart_revision_last_approved = None
-        if not self.diff.is_approved and not df_approvals.empty:
-            df_approvals_past = df_approvals.loc[df_approvals["status"] == "approved"]
-            if not df_approvals_past.empty:
-                timestamp = df_approvals_past["updatedAt"].max()
-                # Find the revision that was approved
-                chart_revision_last_approved = self.diff.get_last_chart_revision(self.source_session, timestamp)
+        # chart_revision_last_approved = None
+        # if not self.diff.is_approved and not df_approvals.empty:
+        #     df_approvals_past = df_approvals.loc[df_approvals["status"] == "approved"]
+        #     if not df_approvals_past.empty:
+        #         timestamp = df_approvals_past["updatedAt"].max()
+        #         # Find the revision that was approved
+        #         chart_revision_last_approved = self.diff.get_last_chart_revision(self.source_session, timestamp)
 
         # SHOW MODIFIED CHART
         if self.diff.is_modified:
             tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Status log"])
             with tab1:
-                config_ref, is_prod = self._show_chart_comparison(chart_revision_last_approved)
+                config_ref, is_prod = self._show_chart_comparison()
             with tab2:
                 self._show_config_diff(config_ref, "production" if is_prod else "last revision")
             with tab3:
-                self._show_approval_history(df_approvals)
+                self._show_approval_history(self.diff.df_approvals)
 
         # SHOW NEW CHART
         elif self.diff.is_new:
             tab1, tab2 = st.tabs(["Chart", "Status log"])
             with tab1:
-                _ = self._show_chart_comparison(chart_revision_last_approved)
+                _ = self._show_chart_comparison()
             with tab2:
-                self._show_approval_history(df_approvals)
+                self._show_approval_history(self.diff.df_approvals)
 
     @st.fragment
     def show(self):
