@@ -14,11 +14,11 @@ HOW TO EXECUTE:
 
 1. Open this do-file in a local installation of Stata (execution time: ~40 minutes)
 2. It generates four files, which exclude and include extrapolations. They need to be imported as snapshots in the ETL, as
-	python snapshots/wid/2024-11-19/world_inequality_database.py --path-to-file snapshots/wid/2024-11-19/wid_indices_992j_exclude.csv
-	python snapshots/wid/2024-11-19/world_inequality_database_with_extrapolations.py --path-to-file snapshots/wid/2024-11-19/wid_indices_992j_include.csv
-	python snapshots/wid/2024-11-19/world_inequality_database_distribution.py --path-to-file snapshots/wid/2024-11-19/wid_distribution_992j_exclude.csv
-	python snapshots/wid/2024-11-19/world_inequality_database_distribution_with_extrapolations.py --path-to-file snapshots/wid/2024-11-19/wid_distribution_992j_include.csv
-	python snapshots/wid/2024-11-19/world_inequality_database_fiscal.py --path-to-file snapshots/wid/2024-11-19/wid_indices_fiscal_992ijt_exclude.csv
+	python snapshots/wid/2025-02-25/world_inequality_database.py --path-to-file snapshots/wid/2025-02-25/wid_indices_992j_exclude.csv
+	python snapshots/wid/2025-02-25/world_inequality_database_with_extrapolations.py --path-to-file snapshots/wid/2025-02-25/wid_indices_992j_include.csv
+	python snapshots/wid/2025-02-25/world_inequality_database_distribution.py --path-to-file snapshots/wid/2025-02-25/wid_distribution_992j_exclude.csv
+	python snapshots/wid/2025-02-25/world_inequality_database_distribution_with_extrapolations.py --path-to-file snapshots/wid/2025-02-25/wid_distribution_992j_include.csv
+	python snapshots/wid/2025-02-25/world_inequality_database_fiscal.py --path-to-file snapshots/wid/2025-02-25/wid_indices_fiscal_992ijt_exclude.csv
 3. After the execution above ends, delete the csv files created by this do-file.
 
 	(Change the date for future updates)
