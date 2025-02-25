@@ -12,10 +12,10 @@ from copy import deepcopy
 from itertools import product
 from typing import Any, Dict, List, Optional, Set, Union
 
+import fastjsonschema
 import pandas as pd
 import yaml
 from deprecated import deprecated
-from jsonschema import ValidationError, validate
 from owid.catalog import Dataset, Table
 from sqlalchemy.engine import Engine
 from structlog import get_logger
@@ -419,10 +419,13 @@ def validate_schema(config: dict) -> None:
     schema_path = SCHEMAS_DIR / "multidim-schema.json"
     with open(schema_path) as f:
         schema = json.load(f)
+
+    validator = fastjsonschema.compile(schema)
+
     try:
-        validate(instance=config, schema=schema)
-    except ValidationError as e:
-        raise ValueError(f"Config validation error: {e.message}")
+        validator(config)  # type: ignore
+    except fastjsonschema.JsonSchemaException as e:
+        raise ValueError(f"Config validation error: {e.message}")  # type: ignore
 
 
 def validate_multidim_config(config: dict, engine: Engine) -> None:
