@@ -483,7 +483,7 @@ def combine_detailed_and_bunkers_tables(tb_detailed: Table, tb_bunkers: Table) -
     tb_detailed = (
         tb_detailed.drop(columns=["fuel"])
         .groupby(["em", "country", "sector", "units"], as_index=False, observed=True)
-        .sum()
+        .sum(min_count=1)
     )
 
     # Rename bunkers table consistently with the detailed table.
@@ -557,7 +557,7 @@ def remap_table_categories(tb: Table) -> Table:
     tb["sector"] = map_series(
         tb["sector"], mapping=subsector_to_sector, warn_on_missing_mappings=True, warn_on_unused_mappings=True
     )
-    tb = tb.groupby(["em", "country", "sector"], as_index=False, observed=True).sum()
+    tb = tb.groupby(["em", "country", "sector"], as_index=False, observed=True).sum(min_count=1)
 
     # Rename columns conveniently.
     tb = tb.rename(columns={"em": "pollutant"}, errors="raise")
@@ -607,17 +607,14 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns={column: int(column[1:]) for column in tb.columns if column.startswith("x")})
     tb = tb.melt(id_vars=["pollutant", "country", "sector"], var_name="year", value_name="emissions")
 
+    # Drop rows with no data.
+    tb = tb.dropna(subset=["emissions"]).reset_index(drop=True)
+
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     ####################################################################################################################
     # Fix data issues.
-    # * CH4 and N20 emissions are exactly zero before 1970, and non-zero data from exactly 1970 onwards, creating an abrupt jump on that year.
-    #   I suppose the zeros prior to 1970 are spurious, so they will be removed.
-    error = "Expected CH4 and N2O emissions to be exactly zero before 1970, and nonzero from 1970 on. Data has changed."
-    assert tb[(tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] < 1970)]["emissions"].sum() == 0, error
-    assert tb[(tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] >= 1970)]["emissions"].sum() > 0, error
-    tb = tb.loc[~((tb["pollutant"].isin(["CH₄", "N₂O"])) & (tb["year"] < 1970)), :].reset_index(drop=True)
     # * BC emissions from waste become constant from 2014 onwards.
     #   I will contact the authors about this.
     error = "Expected BC emissions from waste to be constant from 2014 onwards (which may be a data issue). This issue may have been fixed, so, remove this code."
@@ -627,7 +624,7 @@ def run(dest_dir: str) -> None:
         .agg({"emissions": "nunique"})["emissions"]
         == 1
     ).all(), error
-    # * International shipping data for all pollutants (except CH4 and N2O) has an abrupt jump from zero for individual countries in 1960.
+    # * International shipping data for several pollutants has an abrupt jump from zero for individual countries in 1960.
     #   Remove those spurious zeros for International shipping, such that the sum of all emissions prior to 1960 (for a given country-pollutant) are exactly zero.
     #   NOTE: For NMVOC, the issue is a little different, and will be tackled separately.
     error = "Expected abrupt jump in emissions from international shipping for individual countries (e.g. UK) in 1960."
@@ -714,6 +711,7 @@ def run(dest_dir: str) -> None:
         ds_regions=ds_regions,
         ds_income_groups=ds_income_groups,
         index_columns=["country", "year", "pollutant", "sector"],
+        min_num_values_per_year=1,
     )
 
     # Add per capita variables.
