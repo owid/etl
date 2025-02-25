@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     # Compute adjustment factors per region
     adjustment_factors = (
         tb_meadow[tb_meadow["year"].between(1961, 1990)].groupby("region").mean()
-        - tb_meadow[tb_meadow["year"].between(1850, 1990)].groupby("region").mean()
+        - tb_meadow[tb_meadow["year"].between(1850, 1900)].groupby("region").mean()
     )
 
     # Apply region-specific adjustments

@@ -4,6 +4,8 @@ definitions:
       - Temperature anomalies are given in degrees Celsius relative to the average temperature over the period 1961-1990.
       - Temperature anomalies are available for the Northern Hemisphere and the Southern Hemisphere.
       - The global mean is calculated by averaging anomalies for northern and southern hemispheres.
+    description_from_producer:  |-
+      The 1961-90 period is most often used because it is the period recommended by the WMO (World Meteorological Organisation). In some cases other periods are used. For example, satellite data are typically only available from 1979 onwards so it would not be possible to construct either a 1961-1990 or a 1971-2000 climatology. For global average temperatures, an 1861-1890 period is sometimes used to show the warming since the "pre-industrial" period.
   presentation:
     topic_tags:
     - Climate Change
