@@ -1,4 +1,7 @@
+from typing import Any, Dict, List
+
 from owid.catalog.utils import underscore
+from pandas import DataFrame
 
 from etl import multidim
 from etl.helpers import PathFinder
@@ -7,7 +10,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-# TODO: this is duplicated in YAML file
+# Price components to include in the views
 INCLUDE_PRICE_COMPONENTS = [
     "total_price_including_taxes",
     "wholesale",
@@ -15,37 +18,14 @@ INCLUDE_PRICE_COMPONENTS = [
 ]
 
 
-def run(dest_dir: str) -> None:
-    #
-    # Load inputs.
-    #
-    # Load Eurostat data on gas and electricity prices.
-    ds_grapher = paths.load_dataset("energy_prices")
-
-    # Read table of prices in euros.
-    tb_annual = ds_grapher.read("energy_prices_annual", reset_index=False)
-    tb_monthly = ds_grapher.read("energy_prices_monthly", reset_index=False)
-
-    #
-    # Process data.
-    #
-    # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
-
-    common_view_config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-        "chartTypes": ["LineChart"],
-        "hasMapTab": True,
-        "tab": "map",
-        "map": {
-            "projection": "Europe",
-            "colorScale": {"baseColorScheme": "YlOrBr"},
-        },
-    }
-
-    # Rename dimensions (this should happen sooner in the pipeline).
+def prepare_annual_data(tb_annual: DataFrame) -> List[str]:
+    """
+    Prepare annual energy price data by standardizing dimensions and filtering columns.
+    """
     use_cols_annual = []
+
     for col in tb_annual.columns:
+        # Standardize dimension names
         new_dims = {}
         for k, v in tb_annual[col].m.dimensions.items():
             if k == "consumer_type":
@@ -58,11 +38,17 @@ def run(dest_dir: str) -> None:
         tb_annual[col].m.dimensions = new_dims
         tb_annual[col].m.original_short_name = "price"
 
-        # Only display certain columns
+        # Only display columns with relevant price components
         if tb_annual[col].m.dimensions["price_component"] in INCLUDE_PRICE_COMPONENTS:
             use_cols_annual.append(col)
 
-    # Rename dimensions for monthly
+    return use_cols_annual
+
+
+def prepare_monthly_data(tb_monthly: DataFrame) -> None:
+    """
+    Prepare monthly energy price data by standardizing dimensions.
+    """
     col = "monthly_electricity_all_wholesale_euro"
     tb_monthly[col].m.dimensions = {
         "consumer": "all",
@@ -73,24 +59,13 @@ def run(dest_dir: str) -> None:
     }
     tb_monthly[col].m.original_short_name = "price"
 
-    # Create views.
-    dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
 
-    annual_config = multidim.expand_config(
-        tb_annual.loc[:, use_cols_annual],
-        indicator_name="price",
-        dimensions=dimensions,
-        common_view_config=common_view_config,
-    )
-    monthly_config = multidim.expand_config(
-        tb_monthly.loc[:, ["monthly_electricity_all_wholesale_euro"]],
-        indicator_name="price",
-        dimensions=dimensions,
-        common_view_config=common_view_config,
-    )
-    config["views"] = annual_config["views"] + monthly_config["views"]
+def create_stacked_component_views(tb_annual: DataFrame) -> List[Dict[str, Any]]:
+    """
+    Create stacked bar chart views for energy price components.
+    """
+    component_views = []
 
-    # Create special view for the stacked area chart of total consumer price by components.
     for source in ["electricity", "gas"]:
         price_components = [
             # The total price is (to a very good approximation) equivalent to the combination of "Energy and supply", "Network costs", and "Taxes, fees, levies, and charges".
@@ -110,12 +85,17 @@ def run(dest_dir: str) -> None:
             "value_added_tax_vat",
             "other",
         ]
+
+        # Add nuclear taxes only for electricity
         if source == "electricity":
             price_components.append("nuclear_taxes")
+
         for consumer in ["household", "non_household"]:
             for unit in ["euro", "pps"]:
-                title = f"{source.capitalize()} price components for {consumer.replace('_', '-')} consumers"
+                # Create indicator list for this view
                 indicators = [f"annual_{source}_{consumer}_{component}_{unit}" for component in price_components]
+
+                # Gather description keys from all indicators
                 description_keys = list(
                     dict.fromkeys(sum([tb_annual[indicator].metadata.description_key for indicator in indicators], []))
                 )
@@ -123,6 +103,8 @@ def run(dest_dir: str) -> None:
                 description_keys += [
                     'Some price components can be negative. For example, a negative "All other taxes" component may occur when governments introduce compensation measures during periods of high electricity prices to reduce costs for consumers.'
                 ]
+
+                # Configure unit-specific text
                 if unit == "euro":
                     subtitle = "Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are adjusted for inflation but not for differences in living costs between countries."
                     title_variant = None
@@ -132,13 +114,16 @@ def run(dest_dir: str) -> None:
                     title_variant = "PPS"
                     footnote = "PPS have been adjusted for inflation, expressed in 2015 prices, using the Harmonised Index of Consumer Prices."
 
+                # Create title and presentation settings
+                title = f"{source.capitalize()} price components for {consumer.replace('_', '-')} consumers"
                 presentation = {
                     "titlePublic": title,
                 }
                 if title_variant:
                     presentation["titleVariant"] = title_variant
 
-                config["views"].append(
+                # Add the complete view configuration
+                component_views.append(
                     {
                         "dimensions": {
                             "frequency": "annual",
@@ -163,8 +148,66 @@ def run(dest_dir: str) -> None:
                             "descriptionKey": description_keys,
                             "presentation": presentation,
                         },
-                    },
+                    }
                 )
+
+    return component_views
+
+
+def run(dest_dir: str) -> None:
+    """
+    Main function to process energy price data and create multidimensional data views.
+    """
+    #
+    # Load inputs.
+    #
+    ds_grapher = paths.load_dataset("energy_prices")
+    tb_annual = ds_grapher.read("energy_prices_annual", reset_index=False)
+    tb_monthly = ds_grapher.read("energy_prices_monthly", reset_index=False)
+
+    #
+    # Process data.
+    #
+    config = paths.load_mdim_config()
+
+    # Define common view configuration
+    common_view_config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+        "chartTypes": ["LineChart"],
+        "hasMapTab": True,
+        "tab": "map",
+        "map": {
+            "projection": "Europe",
+            "colorScale": {"baseColorScheme": "YlOrBr"},
+        },
+    }
+
+    # Prepare data
+    use_cols_annual = prepare_annual_data(tb_annual)
+    prepare_monthly_data(tb_monthly)
+
+    # Create standard line/map views
+    dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
+    annual_config = multidim.expand_config(
+        tb_annual.loc[:, use_cols_annual],
+        indicator_name="price",
+        dimensions=dimensions,
+        common_view_config=common_view_config,
+    )
+
+    monthly_config = multidim.expand_config(
+        tb_monthly.loc[:, ["monthly_electricity_all_wholesale_euro"]],
+        indicator_name="price",
+        dimensions=dimensions,
+        common_view_config=common_view_config,
+    )
+
+    # Combine standard views
+    config["views"] = annual_config["views"] + monthly_config["views"]
+
+    # Create and add stacked component views
+    component_views = create_stacked_component_views(tb_annual)
+    config["views"].extend(component_views)
 
     #
     # Save outputs.
