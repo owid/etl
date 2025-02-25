@@ -33,17 +33,17 @@ DISPLAY_STATE_OPTIONS = {
         "material_icon": ":material/done_outline:",
         "icon": "✅",
     },
-    gm.ChartStatus.REJECTED.value: {
-        "label": "Reject",
-        "color": "red",
-        "material_icon": ":material/delete:",
-        "icon": "❌",
-    },
     gm.ChartStatus.PENDING.value: {
         "label": "Pending",
         "color": "gray",
         "material_icon": ":material/schedule:",
         "icon": "⏳",
+    },
+    gm.ChartStatus.REJECTED.value: {
+        "label": "Reject",
+        "color": "red",
+        "material_icon": ":material/delete:",
+        "icon": "❌",
     },
 }
 DISPLAY_STATE_OPTIONS_BINARY = {
@@ -293,7 +293,7 @@ class ChartDiffShow:
                     )
 
                 def _format_status(x):
-                    return f"{DISPLAY_STATE_OPTIONS[x]['icon']} {DISPLAY_STATE_OPTIONS[x]['label']}"
+                    return f":{DISPLAY_STATE_OPTIONS[x]['color']}[{DISPLAY_STATE_OPTIONS[x]['material_icon']}] {DISPLAY_STATE_OPTIONS[x]['label']}"
 
                 st.segmented_control(
                     label="Approve or reject chart",
@@ -429,7 +429,7 @@ class ChartDiffShow:
             cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
             st.info(cost_msg)
 
-    def _show_chart_comparison(self, chartrev_last_appr=None) -> Tuple[Any, str]:
+    def _show_chart_comparison(self, chartrev_last_appr=None) -> Tuple[Any, bool]:
         """Show charts (horizontally or vertically)."""
 
         def _show_chart_old():
@@ -472,7 +472,7 @@ class ChartDiffShow:
                     st.markdown(self._header_staging_chart)
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
-        def _show_charts_comparison_v():
+        def _show_charts_comparison_v() -> Tuple[Any, bool]:
             """Show charts on top of each other."""
             # Chart production
             config_ref, is_prod = _show_chart_old()
@@ -482,7 +482,7 @@ class ChartDiffShow:
 
             return config_ref, is_prod
 
-        def _show_charts_comparison_h():
+        def _show_charts_comparison_h() -> Tuple[Any, bool]:
             """Show charts next to each other."""
             # Create two columns for the iframes
             col1, col2 = st.columns(2)
@@ -494,6 +494,7 @@ class ChartDiffShow:
             return config_ref, is_prod
 
         # Only one chart: new chart
+        is_prod = True
         if self.diff.target_chart is None:
             st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
@@ -586,8 +587,10 @@ class ChartDiffShow:
         # Get latest approved revision
         chart_revision_last_approved = None
         if not self.diff.is_approved and not df_approvals.empty:
-            timestamp = df_approvals.loc[df_approvals["status"] == "approved", "updatedAt"].max()
-            if timestamp is not None:
+            df_approvals_past = df_approvals.loc[df_approvals["status"] == "approved"]
+            if not df_approvals_past.empty:
+                timestamp = df_approvals_past["updatedAt"].max()
+                st.write(timestamp)
                 # Find the revision that was approved
                 chart_revision_last_approved = self.diff.get_last_chart_revision(self.source_session, timestamp)
 
