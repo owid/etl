@@ -6,9 +6,9 @@ definitions:
       - The global temperature anomaly is the average of both hemisphere measurements.
     description_from_producer: |-
       The 1961-90 period is most often used because it is the period recommended by the World Meteorological Organisation. In some cases other periods are used. For global average temperatures, an 1861-1890 period is sometimes used to show the warming since the "pre-industrial" period.
-
     description_processing: |-
       We switch from using 1961-1990 to using 1861-1890 as our baseline to better show how temperatures have changed since pre-industrial times. For each region, we calculate the mean temperature anomaly for 1961–1990 and for 1861–1890. The difference between these two means serves as the adjustment factor. This factor is applied uniformly to both the temperature anomalies and the confidence intervals to ensure that both the central values and the associated uncertainty bounds are correctly shifted relative to the new 1861–1890 baseline.
+    processing_level: major
     display:
       numDecimalPlaces: 1
   presentation:
