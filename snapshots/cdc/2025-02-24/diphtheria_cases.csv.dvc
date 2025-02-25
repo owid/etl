@@ -70,6 +70,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: 00c7f34cb6f5889fd302839ae23ee438
-    size: 5581
-    path: diphtheria_cases_cdc.csv
+  - md5: 05372ac0d8dbbbe2d77d288cee29791b
+    size: 5580
+    path: diphtheria_cases.csv
