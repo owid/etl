@@ -90,9 +90,11 @@ def run(dest_dir: str) -> None:
     df_graphers["hasMapTab"] = map_tab
 
     # Create view for all pollutants.
-    # TODO: Remove display name in the garden step, otherwise all sectors will have the same title in the faceted view.
-    # for sector in [ALL_SECTORS_LABEL_OLD]:
-    for sector in sorted(set(df_graphers["Sector Dropdown"])):
+    # NOTE: Here, we could create a vew not only for "All sectors" but also for each individual sector. But there is a technical problem: The display name of each indicator would be the same, and therefore the faceted view of all pollutants for a given sector would show the same name (the sector name) on top of each small chart. To achieve this, we would probably need to create duplicates of indicators, with a different set of display names.
+    # Also note that having this dropdown with all sectors as options (which doesn't contain a "Breakdown by sector") causes that, for any other pollutant view (e.g. "Agriculture") the Sector dropdown will show "Breakdown by sector" at the bottom. This happens because "All pollutants" is the first option in the Pollutants dropdown, which therefore sets the order of sectors in the sectors dropdown.
+    # So, for now, we'll keep only one option for "Sector Dropdown" when "All pollutants" is selected.
+    # for sector in sorted(set(df_graphers["Sector Dropdown"])):
+    for sector in [ALL_SECTORS_LABEL_OLD]:
         sector_short_name = sector.lower().replace(" ", "_")
         for per_capita in [False, True]:
             _columns = []
@@ -189,6 +191,15 @@ def run(dest_dir: str) -> None:
     # Impose that all line charts start at zero.
     df_graphers["yAxisMin"] = 0
 
+    # Choose which indicator to show by default when opening the explorer.
+    df_graphers["defaultView"] = False
+    df_graphers.loc[
+        (df_graphers["Pollutant Dropdown"] == ALL_POLLUTANTS_LABEL)
+        & (df_graphers["Sector Dropdown"] == ALL_SECTORS_LABEL_NEW)
+        & (~df_graphers["Per capita Checkbox"]),
+        "defaultView",
+    ] = True
+
     # Sort rows conveniently.
     sector_categories = [ALL_SECTORS_LABEL_NEW, BREAKDOWN_BY_SECTOR_LABEL] + sorted(
         set(df_graphers["Sector Dropdown"]) - {ALL_SECTORS_LABEL_NEW, BREAKDOWN_BY_SECTOR_LABEL}
@@ -201,15 +212,6 @@ def run(dest_dir: str) -> None:
     df_graphers = df_graphers.sort_values(["Pollutant Dropdown", "Sector Dropdown", "Per capita Checkbox"]).reset_index(
         drop=True
     )
-
-    # Choose which indicator to show by default when opening the explorer.
-    df_graphers["defaultView"] = False
-    df_graphers.loc[
-        (df_graphers["Pollutant Dropdown"] == ALL_POLLUTANTS_LABEL)
-        & (df_graphers["Sector Dropdown"] == ALL_SECTORS_LABEL_NEW)
-        & (~df_graphers["Per capita Checkbox"]),
-        "defaultView",
-    ] = True
 
     # Prepare explorer metadata.
     config = {
