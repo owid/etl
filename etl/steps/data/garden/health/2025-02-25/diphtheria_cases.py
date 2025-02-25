@@ -20,14 +20,16 @@ def run(dest_dir: str) -> None:
     tb_cdc = ds_meadow_cdc.read("diphtheria_cases")
     tb_census = ds_meadow_census.read("diphtheria_cases")
     tb_population = ds_population.read("population")
-
+    # Combine the data from the two sources
     tb = pr.concat([tb_cdc, tb_census], short_name="diphtheria_cases").sort_values("year").reset_index(drop=True)
+    # Combine with population data
     tb = pr.merge(
         tb,
         tb_population,
         on=["country", "year"],
         how="left",
     )
+    # Calculate case rate
     tb["case_rate"] = tb["cases"] / tb["population"] * 1000000
     tb = tb.drop(columns=["population", "source_x", "source_y", "world_pop_share"])
     # Process data.
