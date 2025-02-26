@@ -548,7 +548,14 @@ def _get_params(component, key):
             return params
 
 
-def st_cache_data(func=None, *, custom_text="Running...", show_spinner=False, show_time=False, **cache_kwargs):
+def st_cache_data(
+    func: Optional[Callable] = None,
+    *,
+    custom_text: str = "Running...",
+    show_spinner: bool = False,
+    show_time: bool = False,
+    **cache_kwargs,
+):
     """
     A custom decorator that wraps `st.cache_data` and adds support for a `custom_text` argument.
 
@@ -556,6 +563,7 @@ def st_cache_data(func=None, *, custom_text="Running...", show_spinner=False, sh
         func: The function to be cached.
         custom_text (str): The custom spinner text to display.
         show_spinner (bool): Whether to show the default Streamlit spinner message. Defaults to False.
+        show_time (bool): Whether to show the elapsed time. Defaults to False.
         **cache_kwargs: Additional arguments passed to `st.cache_data`.
     """
 
