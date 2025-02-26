@@ -9,28 +9,34 @@ definitions:
       numDecimalPlaces: 0
     unit: "constant 2022 US$"
     short_unit: "$"
+dataset:
+  title: Global Tuberculosis Report - Expenditure and Utilisation
 tables:
   expenditure:
     variables:
       exp_cpp_dstb:
         title: Average cost of drugs spent per patient starting first-line TB treatment
         description_short: Average cost of drugs spent per patient starting first-line TB treatment, excluding buffer stock.
-        description_from_producer: Average cost of drugs spent per patient starting first-line TB treatment, excluding buffer
+        description_from_producer:
+          Average cost of drugs spent per patient starting first-line TB treatment, excluding buffer
           stock (US Dollars)
       exp_cpp_mdr:
         title: Average cost of drugs spent per patient starting multidrug-resistant tuberculosis treatment
         description_short: Average cost of drugs spent per patient starting multidrug-resistant tuberculosis treatment, excluding buffer stock.
-        description_from_producer: Average cost of drugs spent per patient starting second-line treatment for MDR-TB, excluding
+        description_from_producer:
+          Average cost of drugs spent per patient starting second-line treatment for MDR-TB, excluding
           buffer stock (US Dollars)
       exp_cpp_xdr:
         title: Average cost of drugs spent per patient starting extensively drug-resistant tuberculosis treatment
         description_short: Average cost of drugs spent per patient starting extensively drug-resistant tuberculosis treatment, excluding buffer stock.
-        description_from_producer: Average cost of drugs spent per patient starting pre-XDR/XDR-TB treatment, excluding buffer
+        description_from_producer:
+          Average cost of drugs spent per patient starting pre-XDR/XDR-TB treatment, excluding buffer
           stock (US Dollars)
       exp_cpp_tpt:
         title: Average cost of drugs spent per person starting tuberculosis preventive treatment
         description_short: Average cost of drugs spent per person starting tuberculosis preventive treatment, excluding buffer stock.
-        description_from_producer: Average cost of drugs spent per person starting TB preventive treatment, excluding buffer
+        description_from_producer:
+          Average cost of drugs spent per person starting TB preventive treatment, excluding buffer
           stock (US Dollars)
       exp_lab:
         title: Expenditure on laboratory services
@@ -43,7 +49,8 @@ tables:
       exp_staff:
         title: Expenditure on National Tuberculosis Programme staff
         description_short: Actual expenditure on National Tuberculosis Programme staff (central unit staff and subnational TB staff).
-        description_from_producer: Actual expenditure on National Tuberculosis Programme staff (central unit staff and subnational TB
+        description_from_producer:
+          Actual expenditure on National Tuberculosis Programme staff (central unit staff and subnational TB
           staff)  (US Dollars)
       rcvd_staff:
         title: Funding received for National Tuberculosis Programme staff
@@ -153,42 +160,48 @@ tables:
         title: Visits to health facilities after diagnosis for patients starting first-line TB treatment
         unit: visits
         description_short: Typical number of visits to a health facility after diagnosis for patients starting first-line TB treatment.
-        description_from_producer: Typical number of visits to a health facility after diagnosis for patients starting first-line
+        description_from_producer:
+          Typical number of visits to a health facility after diagnosis for patients starting first-line
           TB treatment
       hcfvisit_mdr:
         title: Visits to health facilities after diagnosis for patients starting multidrug or extensively drug resistant treatment
         unit: visits
         short_unit: ""
         description_short: Typical number of visits to a health facility after diagnosis for patients starting  multidrug or extensively drug resistant tuberculosis treatment.
-        description_from_producer: Typical number of visits to a health facility after diagnosis for patients starting MDR-TB/XDR-TB
+        description_from_producer:
+          Typical number of visits to a health facility after diagnosis for patients starting MDR-TB/XDR-TB
           treatment
       hospd_dstb_prct:
         title: Percentage of patients starting first-line tuberculosis treatment that are hospitalized
         unit: "%"
         short_unit: "%"
         description_short: Estimated percentage of patients starting first-line tuberculosis treatment that are hospitalized.
-        description_from_producer: Estimated percentage of patients starting first-line TB treatment that are hospitalized
+        description_from_producer:
+          Estimated percentage of patients starting first-line TB treatment that are hospitalized
           (%)
       hospd_mdr_prct:
         title: Percentage of patients starting multidrug or extensively drug resistant tuberculosis treatment that are hospitalized
         unit: "%"
         short_unit: "%"
         description_short: Estimated percentage of patients starting  multidrug or extensively drug resistant tuberculosis treatment that are hospitalized.
-        description_from_producer: Estimated percentage of patients starting MDR-TB/XDR-TB treatment that are hospitalized
+        description_from_producer:
+          Estimated percentage of patients starting MDR-TB/XDR-TB treatment that are hospitalized
           (%)
       hospd_dstb_dur:
         title: Average duration of stay if patients starting first-line tuberculosis treatment are hospitalized
         unit: "days"
         short_unit: ""
         description_short: Estimated average duration of stay if patients starting first-line tuberculosis treatment are hospitalized.
-        description_from_producer: Estimated average duration of stay if patients starting first-line TB treatment are hospitalized
+        description_from_producer:
+          Estimated average duration of stay if patients starting first-line TB treatment are hospitalized
           (days)
       hospd_mdr_dur:
         title: Average duration of stay if patients starting multidrug or extensively drug resistant tuberculosis treatment are hospitalized
         unit: "days"
         short_unit: ""
         description_short: Estimated average duration of stay if patients starting multidrug or extensively drug resistant tuberculosis treatment are hospitalized.
-        description_from_producer: Estimated average duration of stay if patients starting MDR-TB/XDR-TB treatment are hospitalized
+        description_from_producer:
+          Estimated average duration of stay if patients starting MDR-TB/XDR-TB treatment are hospitalized
           (days)
       hosp_type_mdr:
         title: Type of facility most often used if patients starting multidrug or extensively drug resistant tuberculosis treatment are hospitalized

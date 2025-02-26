@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Harmonised index of consumer prices (HICP)
+    # NOTE: The date_published is specified in "last update" on the top of url_main.
+    # But it seems that it's regularly updated, so it could be replaced by date_accessed.
+    date_published: "2025-02-03"
+
+    # Citation
+    producer: Eurostat
+    citation_full: |-
+      Eurostat - Harmonised index of consumer prices (HICP, 2025).
+
+    # Files
+    url_main: https://ec.europa.eu/eurostat/databrowser/view/prc_hicp_midx__custom_13200491/default/table?lang=en
+    # NOTE: In theory, there is a startPeriod parameter, but when adding "startPeriod=2015-01", the API returns an error:
+    # <faultstring>EXTRACTION_TOO_BIG: The requested extraction is too big, estimated 7644780 rows, max authorised is 5000000, please change your filters to reduce the extraction size</faultstring>
+    # which is a bit contradictory, given that I'm trying to reduce the number of rows.
+    # So, for now, I will download all years (~63MB), but adding compression (~15MB).
+    url_download: https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/prc_hicp_midx?format=TSV&compressed=true
+    date_accessed: 2025-02-03
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ec.europa.eu/eurostat/web/main/help/copyright-notice
+outs:
+  - md5: 6ac69d1fbd50aaea81ef789ad20eec25
+    size: 14510830
+    path: harmonised_index_of_consumer_prices.gz

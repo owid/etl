@@ -1,0 +1,61 @@
+title:
+  title: "Energy prices"
+  titleVariant: "European electricity and gas"
+defaultSelection:
+  - "European Union (27)"
+topicTags:
+  - "Energy"
+dimensions:
+  - slug: "source"
+    name: "Energy source"
+    choices:
+      - slug: "electricity"
+        name: "Electricity"
+      - slug: "gas"
+        name: "Gas"
+  - slug: "frequency"
+    name: "Frequency"
+    choices:
+      - slug: "annual"
+        name: "Annual"
+      - slug: "monthly"
+        name: "Monthly"
+  - slug: "price_component"
+    name: "Price type"
+    choices:
+      - slug: "total_price_including_taxes"
+        name: "Consumer price"
+        description: "Consumer price including all taxes and levies"
+        group: Total price
+      - slug: "wholesale"
+        name: "Wholesale price"
+        description: "Market price of electricity before taxes and fees"
+        group: Total price
+      - slug: "consumer_price_components"
+        name: "Consumer price components"
+        description: "Consumer price separated in its individual components"
+        group: Price components disaggregated
+  - slug: "consumer"
+    name: "User type"
+    choices:
+      - slug: "household"
+        name: "Households"
+        description: "Residential consumers using energy for domestic purposes like heating and lighting"
+      - slug: "non_household"
+        name: "Non-households"
+        description: "Commercial and industrial consumers, including services, offices, and agriculture"
+      - slug: "all"
+        name: "Electricity market"
+        # description: "All consumers"
+  - slug: "unit"
+    name: "Unit"
+    choices:
+      - slug: "euro"
+        name: "Euro"
+        description: "Price in euros, adjusted for inflation"
+      - slug: "pps"
+        name: "PPS"
+        description: "Price in Purchasing Power Standard, adjusted for inflation and cost of living"
+views:
+  # Views will be filled out programmatically.
+  []

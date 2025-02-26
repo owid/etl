@@ -219,6 +219,57 @@ class Table(pd.DataFrame):
         metadata_filename = splitext(path)[0] + ".meta.json"
         self._save_metadata(metadata_filename)
 
+    @property
+    def codebook(self) -> pd.DataFrame:
+        """
+        Return a codebook for this table.
+        """
+
+        # Define how to show attributions and URLs in the sources column.
+        def _prepare_attributions(attribution: str, url_main: str) -> str:
+            return f"{attribution} ( {url_main} )"
+
+        # Initialize lists to store the codebook information.
+        columns = []
+        titles = []
+        descriptions = []
+        sources = []
+        for column in self.columns:
+            md = self[column].metadata
+            columns.append(column)
+            titles.append(getattr(md.presentation, "title_public", None) or md.title)
+            # Use short description (after removing details on demand, if any).
+            descriptions.append(utils.remove_details_on_demand(md.description_short))
+            sources.append(
+                "; ".join(
+                    dict.fromkeys(
+                        _prepare_attributions(
+                            origin.attribution if origin.attribution else origin.producer, origin.url_main
+                        )
+                        for origin in md.origins
+                    )
+                )
+            )
+
+        # Create a DataFrame with the codebook.
+        codebook = pd.DataFrame({"column": columns, "title": titles, "description": descriptions, "sources": sources})
+
+        return codebook
+
+    def to_excel(
+        self,
+        excel_writer: Any,
+        with_metadata=True,
+        sheet_name="data",
+        metadata_sheet_name="metadata",
+        **kwargs: Any,
+    ) -> None:
+        # Save data and codebook to an excel file.
+        with pd.ExcelWriter(excel_writer) as writer:  # type: ignore
+            super().to_excel(writer, sheet_name=sheet_name, **kwargs)
+            if with_metadata:
+                self.codebook.to_excel(writer, sheet_name=metadata_sheet_name)
+
     def to_feather(
         self,
         path: Any,
@@ -335,8 +386,13 @@ class Table(pd.DataFrame):
         return self
 
     @classmethod
-    def _add_metadata(cls, tb: "Table", path: str, primary_key: Optional[list[str]] = None) -> None:
+    def _add_metadata(
+        cls, tb: "Table", path: str, primary_key: Optional[list[str]] = None, load_data: bool = True
+    ) -> None:
         """Read metadata from JSON sidecar and add it to the dataframe."""
+        if not load_data:
+            log.warning("Using load_data=False is only supported when reading feather format.")
+
         metadata = cls._read_metadata(path)
 
         if primary_key is None:
@@ -351,7 +407,7 @@ class Table(pd.DataFrame):
             tb.set_index(primary_key, inplace=True)
 
     @classmethod
-    def read_feather(cls, path: Union[str, Path], **kwargs) -> "Table":
+    def read_feather(cls, path: Union[str, Path], load_data: bool = True, **kwargs) -> "Table":
         """
         Read the table from feather plus accompanying JSON sidecar.
 
@@ -364,7 +420,13 @@ class Table(pd.DataFrame):
             raise ValueError(f'filename must end in ".feather": {path}')
 
         # load the data and add metadata
-        df = Table(pd.read_feather(path))
+        if not load_data:
+            metadata = cls._read_metadata(path)
+            columns = list(metadata["fields"].keys())
+            df = Table(pd.DataFrame(columns=columns))
+        else:
+            df = Table(pd.read_feather(path))
+
         cls._add_metadata(df, path, **kwargs)
         return df
 

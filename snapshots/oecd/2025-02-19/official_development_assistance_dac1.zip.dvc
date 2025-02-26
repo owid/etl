@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: OECD
+    title: 'OECD Official Development Assistance (ODA) - DAC1: Flows by provider (ODA+OOF+Private)'
+    description: |-
+      This database provides aggregates on official development assistance (ODA), other official flows (OOF) and flows from non-governmental organisations (NGOs) or philanthropic foundations. These statistics are shown by provider over time.
+    citation_full: 'OECD (2025). OECD Official Development Assistance (ODA) - DAC1: Flows by provider (ODA+OOF+Private). OECD Data Explorer.'
+    url_main: https://www.oecd.org/en/topics/policy-issues/official-development-assistance-oda.html
+    url_download: https://stats.oecd.org/wbos/fileview2.aspx?IDFile=570b240e-df9c-4586-b53d-99946fac437d
+    date_accessed: '2025-02-19'
+    date_published: '2025-02-17'
+    license:
+      name: OECD Terms & conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: ca5306acf44db9da7c52d926c7059d6a
+    size: 17353939
+    path: official_development_assistance_dac1.zip

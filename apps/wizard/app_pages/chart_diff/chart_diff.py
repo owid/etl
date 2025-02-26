@@ -65,6 +65,10 @@ class ChartDiff:
         self.modified_checksum = modified_checksum
         self.edited_in_staging = edited_in_staging
 
+        # Get revisions
+        self.df_approvals = self.get_all_approvals_df()
+        self.last_chart_revision_approved = None
+
         # Cached
         self._in_conflict = None
         self._change_types = None
@@ -248,7 +252,7 @@ class ChartDiff:
         checksums_diff = cls._get_checksums(source_session, target_session, chart_ids)
 
         # Get all slugs from target
-        slugs_in_target = cls._get_chart_slugs(target_session)
+        slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
 
         # Build chart diffs
         chart_diffs = []
@@ -288,18 +292,32 @@ class ChartDiff:
             chart_diff = cls(
                 source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging, error
             )
+
+            # Add last revision
+            chart_diff.set_last_approved_chart_revision(source_session)
+
             chart_diffs.append(chart_diff)
 
         return chart_diffs
 
     def get_all_approvals(self, session: Session) -> List[gm.ChartDiffApprovals]:
         """Get history of chart diff."""
+
         # Get history
         history = gm.ChartDiffApprovals.get_all(
             session,
             chart_id=self.chart_id,
         )
         return history
+
+    def get_all_approvals_df(self) -> pd.DataFrame:
+        """Get history of chart diff."""
+        df = OWID_ENV.read_sql(f"SELECT * FROM chart_diff_approvals WHERE chartId = {self.chart_id}")
+        return df
+
+    def get_last_chart_revision(self, session: Session, timestamp=None) -> gm.ChartRevisions:
+        """Get history of chart diff."""
+        return gm.ChartRevisions.get_latest(session, self.chart_id, timestamp)
 
     def approve(self, session: Session) -> None:
         """Approve chart diff."""
@@ -374,9 +392,19 @@ class ChartDiff:
         }
 
     @staticmethod
-    def _get_chart_slugs(target_session: Session) -> set[str]:
-        slugs_redirects = set(read_sql("SELECT slug FROM chart_slug_redirects", target_session)["slug"])
-        slugs = set(read_sql("SELECT slug FROM chart_configs", target_session)["slug"])
+    def _get_chart_slugs(target_session: Session, slugs: Optional[set[str]] = None) -> set[str]:
+        """Get all chart slugs. Use `slugs` to filter slugs as this can be slow otherwise."""
+        if slugs is not None:
+            where = "WHERE slug IN %(slugs)s"
+            params = {"slugs": tuple(slugs)}
+        else:
+            where = ""
+            params = {}
+
+        slugs_redirects = set(
+            read_sql(f"SELECT slug FROM chart_slug_redirects {where}", target_session, params=params)["slug"]
+        )
+        slugs = set(read_sql(f"SELECT slug FROM chart_configs {where}", target_session, params=params)["slug"])
         return slugs | slugs_redirects
 
     @staticmethod
@@ -461,6 +489,14 @@ class ChartDiff:
         checksums_diff[checksums_source.isna()] = False
 
         return checksums_diff
+
+    def set_last_approved_chart_revision(self, session):
+        if not self.is_approved and not self.df_approvals.empty:
+            df_approvals_past = self.df_approvals.loc[self.df_approvals["status"] == "approved"]
+            if not df_approvals_past.empty:
+                timestamp = df_approvals_past["updatedAt"].max()
+                # Find the revision that was approved
+                self.last_chart_revision_approved = self.get_last_chart_revision(session, timestamp)
 
 
 class ChartDiffsLoader:

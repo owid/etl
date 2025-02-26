@@ -129,7 +129,7 @@ def get_scores(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
     """Combine and reduce scores dataframe."""
     df = combine_and_reduce_scores_df(anomalies)
 
-    # Add a population score, an analytics score, and a weighted score.
+    # Add a population score, an analytics (views last 14 days) score, and a weighted score.
     df = add_auxiliary_scores(df=df)
 
     return df

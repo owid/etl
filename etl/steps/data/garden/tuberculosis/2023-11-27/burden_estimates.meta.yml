@@ -5,7 +5,8 @@ definitions:
     presentation:
       topic_tags:
         - Tuberculosis
-
+dataset:
+  title: Global Tuberculosis Report - Burden Estimates
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 tables:

@@ -8,6 +8,8 @@ definitions:
     display:
       numDecimalPlaces: 0
     processing_level: major
+dataset:
+  title: Global Tuberculosis Report - Drug resistance testing in TB patients
 tables:
   drug_resistance_surveillance:
     variables:

@@ -150,29 +150,22 @@ steps:
     - data://garden/un/2023-08-02/comtrade_pandemics
 
   # UNAIDS
-  data://meadow/health/2023-08-09/unaids:
-    - snapshot://health/2023-08-09/unaids.csv
-  data://meadow/health/2023-08-11/unaids_hiv_children:
-    - snapshot://health/2023-08-11/unaids_hiv_children.xlsx
+  data://meadow/health/2025-01-22/unaids:
+    - snapshot://health/2025-01-22/unaids_kpa.csv
+    - snapshot://health/2025-01-22/unaids_gam.csv
+    - snapshot://health/2025-01-22/unaids_epi.csv
+    - snapshot://health/2025-01-22/unaids_ncpi.csv
   data://meadow/health/2023-08-22/unaids_deaths_averted_art:
     - snapshot://health/2023-08-22/unaids_deaths_averted_art.xlsx
-  data://meadow/health/2023-08-22/unaids_gap_art:
-    - snapshot://health/2023-08-22/unaids_gap_art.xlsx
-  data://meadow/health/2023-08-22/unaids_condom_msm:
-    - snapshot://health/2023-08-22/unaids_condom_msm.xlsx
 
-  data://garden/health/2023-08-09/unaids:
-    - data://meadow/health/2023-08-09/unaids
-    - data://meadow/health/2023-08-11/unaids_hiv_children
-    - data://meadow/health/2023-08-22/unaids_condom_msm
-    - data://meadow/health/2023-08-22/unaids_gap_art
-    - data://meadow/health/2023-08-22/unaids_deaths_averted_art
-    - data://garden/demography/2023-03-31/population
+  data://garden/health/2025-01-22/unaids:
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2023-04-30/income_groups
+    - data://meadow/health/2025-01-22/unaids
+    - data://meadow/health/2023-08-22/unaids_deaths_averted_art
+    - data://garden/wb/2024-07-29/income_groups
 
-  data://grapher/health/2023-08-09/unaids:
-    - data://garden/health/2023-08-09/unaids
+  data://grapher/health/2025-01-22/unaids:
+    - data://garden/health/2025-01-22/unaids
 
   # OECD Road accidents & passenger travel
   data://meadow/oecd/2024-07-01/road_accidents:
@@ -187,6 +180,9 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/oecd/2024-07-01/road_accidents:
     - data://garden/oecd/2024-07-01/road_accidents
+
+  data://garden/oecd/2018-03-11/road_deaths_and_injuries:
+    - snapshot://oecd/2018-03-11/road_deaths_and_injuries.feather
 
   # Kucharski
   data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski:
@@ -323,14 +319,6 @@ steps:
     - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
   data://grapher/tuberculosis/2023-11-27/unhlm_commitments:
     - data://garden/tuberculosis/2023-11-27/unhlm_commitments
-
-  # OECD Health Expenditure and Financing Database
-  data://meadow/oecd/2024-02-23/health_expenditure:
-    - snapshot://oecd/2024-02-23/health_expenditure.csv
-  data://garden/oecd/2024-02-23/health_expenditure:
-    - data://meadow/oecd/2024-02-23/health_expenditure
-  data://grapher/oecd/2024-02-23/health_expenditure:
-    - data://garden/oecd/2024-02-23/health_expenditure
 
   # Global Health Observatory (GHO) from WHO
   data://meadow/who/2024-01-03/gho:
@@ -666,7 +654,7 @@ steps:
 
   # Multi-dim indicators
   export://multidim/health/latest/causes_of_death:
-    - grapher://grapher/ihme_gbd/2024-05-20/gbd_cause
+    - data-private://grapher/ihme_gbd/2024-05-20/gbd_cause
 
   # GBD 2021 - GBD Risk Factors cancer specific
   data-private://meadow/ihme_gbd/2024-08-26/gbd_risk_cancer:
@@ -945,21 +933,139 @@ steps:
   #
   # US Long-run measles
   #
-  data://meadow/health/2025-01-22/measles:
-    - snapshot://health/2025-01-22/measles.zip
-  data://garden/health/2025-01-22/measles:
-    - data://meadow/health/2025-01-22/measles
+  data://meadow/health/2025-01-22/measles_state_level:
+    - snapshot://health/2025-01-22/measles_state_level.zip
+  data://garden/health/2025-01-22/measles_state_level:
+    - data://meadow/health/2025-01-22/measles_state_level
     - data://garden/demography/2025-01-23/us_state_population
     - data://garden/demography/2024-07-15/population
     - snapshot://fasttrack/latest/cdc_measles.csv
-    - data://garden/cdc/2025-01-26/measles
-  data://grapher/health/2025-01-22/measles:
-    - data://garden/health/2025-01-22/measles
+    - data://garden/cdc/2025-01-26/measles_state_level
+  data://grapher/health/2025-01-22/measles_state_level:
+    - data://garden/health/2025-01-22/measles_state_level
 
   #
   # TODO: add step name (just something recognizable)
   #
-  data://meadow/cdc/2025-01-26/measles:
-    - snapshot://cdc/2025-01-26/measles.txt
-  data://garden/cdc/2025-01-26/measles:
-    - data://meadow/cdc/2025-01-26/measles
+  data://meadow/cdc/2025-01-26/measles_state_level:
+    - snapshot://cdc/2025-01-26/measles_state_level.txt
+  data://garden/cdc/2025-01-26/measles_state_level:
+    - data://meadow/cdc/2025-01-26/measles_state_level
+  #
+  # WHO Vaccine Safety
+  #
+  data://meadow/who/2025-01-28/vaccine_safety:
+    - snapshot://who/2025-01-28/vaccine_safety.xlsx
+  data://garden/who/2025-01-28/vaccine_safety:
+    - data://meadow/who/2025-01-28/vaccine_safety
+  data://grapher/who/2025-01-28/vaccine_safety:
+    - data://garden/who/2025-01-28/vaccine_safety
+
+  #
+  # GAVI Eligibility
+  #
+  data://meadow/gavi/2025-02-11/eligibility:
+    - snapshot://gavi/2025-02-11/eligibility.csv
+  data://garden/gavi/2025-02-11/eligibility:
+    - data://meadow/gavi/2025-02-11/eligibility
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/gavi/2025-02-11/eligibility:
+    - data://garden/gavi/2025-02-11/eligibility
+
+  #
+  # Vaccine confidence
+  #
+  data://meadow/health/2025-02-13/vaccine_confidence:
+    - snapshot://health/2025-02-13/vaccine_confidence.csv
+  data://garden/health/2025-02-13/vaccine_confidence:
+    - data://meadow/health/2025-02-13/vaccine_confidence
+  data://grapher/health/2025-02-13/vaccine_confidence:
+    - data://garden/health/2025-02-13/vaccine_confidence
+
+  # CDC Measles Cases 1985-present - autoupdate
+  data://meadow/cdc/latest/measles_cases:
+    - snapshot://cdc/latest/measles_cases.json
+  data://garden/cdc/latest/measles_cases:
+    - data://meadow/cdc/latest/measles_cases
+
+  #
+  # Historical measles data (1919-1984)
+  #
+  data://meadow/health/2025-02-19/measles_historical:
+    - snapshot://health/2025-02-19/measles_historical.csv
+  data://garden/health/2025-02-19/measles_historical:
+    - data://meadow/health/2025-02-19/measles_historical
+
+  # Long-run measles data (auto-updated)
+  data://garden/health/latest/measles_long_run:
+    - data://garden/cdc/latest/measles_cases
+    - data://garden/health/2025-02-19/measles_historical
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/latest/measles_long_run:
+    - data://garden/health/latest/measles_long_run
+
+  #
+  # Cancer survival rates (GCO)
+  #
+  data://meadow/cancer/2025-02-17/gco_cancer_survival:
+    - snapshot://cancer/2025-02-17/gco_cancer_survival.csv
+  data://garden/cancer/2025-02-17/gco_cancer_survival:
+    - data://meadow/cancer/2025-02-17/gco_cancer_survival
+  data://grapher/cancer/2025-02-17/gco_cancer_survival:
+    - data://garden/cancer/2025-02-17/gco_cancer_survival
+
+  # Measles deaths historical - Public health reports
+  #
+  data://meadow/health/2025-02-20/measles_deaths_public_health_reports:
+    - snapshot://health/2025-02-20/measles_deaths_public_health_reports.csv
+  data://garden/health/2025-02-20/measles_deaths_public_health_reports:
+    - data://meadow/health/2025-02-20/measles_deaths_public_health_reports
+
+  # Measles deaths historical - US Census Bureau
+  data://meadow/health/2025-02-20/measles_deaths_census_bureau:
+    - snapshot://health/2025-02-20/measles_deaths_census_bureau.csv
+  data://garden/health/2025-02-20/measles_deaths_census_bureau:
+    - data://meadow/health/2025-02-20/measles_deaths_census_bureau
+
+  # Measles deaths long run
+  data://garden/health/2025-02-20/measles_deaths_long_run:
+    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+    - data://garden/health/2025-02-20/measles_deaths_census_bureau
+    - data://garden/health/2025-02-20/measles_deaths_public_health_reports
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-02-20/measles_deaths_long_run:
+    - data://garden/health/2025-02-20/measles_deaths_long_run
+
+  #
+  # Diphtheria cases - US CDC
+  #
+  data://meadow/cdc/2025-02-25/diphtheria_cases:
+    - snapshot://cdc/2025-02-24/diphtheria_cases.csv
+  data://garden/cdc/2025-02-25/diphtheria_cases:
+    - data://meadow/cdc/2025-02-25/diphtheria_cases
+
+  #
+  # Historical diphtheria cases - US Census Bureau
+  #
+  data://meadow/us_census_bureau/2025-02-25/diphtheria_cases:
+    - snapshot://us_census_bureau/2025-02-25/diphtheria_cases.csv
+  data://garden/us_census_bureau/2025-02-25/diphtheria_cases:
+    - data://meadow/us_census_bureau/2025-02-25/diphtheria_cases
+
+  #
+  # US - reported diphtheria cases - long-run
+  #
+  data://garden/health/2025-02-25/diphtheria_cases:
+    - data://garden/us_census_bureau/2025-02-25/diphtheria_cases
+    - data://garden/cdc/2025-02-25/diphtheria_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-02-25/diphtheria_cases:
+    - data://garden/health/2025-02-25/diphtheria_cases
+
+  # OECD Health Expenditure and Financing Database
+  data://meadow/oecd/2025-02-25/health_expenditure:
+    - snapshot://oecd/2025-02-25/health_expenditure.csv
+  data://garden/oecd/2025-02-25/health_expenditure:
+    - data://meadow/oecd/2025-02-25/health_expenditure
+  data://grapher/oecd/2025-02-25/health_expenditure:
+    - data://garden/oecd/2025-02-25/health_expenditure

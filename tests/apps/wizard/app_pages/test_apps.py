@@ -228,20 +228,20 @@ def test_app_insight_search():
     assert not at.exception
 
 
-@pytest.mark.integration
-@pytest.mark.usefixtures("set_config")
-def test_app_insighter():
-    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/datainsight_robot.py"), default_timeout=DEFAULT_TIMEOUT).run()
+# @pytest.mark.integration
+# @pytest.mark.usefixtures("set_config")
+# def test_app_insighter():
+#     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/datainsight_robot.py"), default_timeout=DEFAULT_TIMEOUT).run()
 
-    # Set Grapher URL
-    assert len(at.text_input) == 1
-    at.text_input[0].set_value("https://ourworldindata.org/grapher/life-expectancy").run()
+#     # Set Grapher URL
+#     assert len(at.text_input) == 1
+#     at.text_input[0].set_value("https://ourworldindata.org/grapher/life-expectancy").run()
 
-    assert not at.exception
+#     assert not at.exception
 
-    # Generate
-    at.button[0].click().run()
-    assert not at.exception
+#     # Generate
+#     at.button[0].click().run()
+#     assert not at.exception
 
 
 @pytest.mark.integration

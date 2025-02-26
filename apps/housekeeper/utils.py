@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -37,10 +37,20 @@ This chart has been mostly edited by 'Max Roser' and 'Esteban Ortiz-Ospina'. The
 ...
 """
 
+# Today and one year ago
+TODAY = datetime.today()
+YEAR_AGO = TODAY.replace(year=TODAY.year - 1)
+
 
 def get_reviews_id(object_type: str):
     with Session(OWID_ENV.engine) as session:
         return gm.HousekeeperReview.load_reviews_object_id(session, object_type=object_type)
+
+
+def get_charts_with_slug_rename_last_year():
+    query = f"""SELECT chart_id FROM chart_slug_redirects WHERE createdAt >= '{YEAR_AGO.strftime('%Y-%m-%d')}'"""
+    df = OWID_ENV.read_sql(query)
+    return df["chart_id"].tolist()
 
 
 def add_reviews(object_type: str, object_id: int):

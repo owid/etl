@@ -47,10 +47,14 @@ def run(dest_dir: str) -> None:
     # Filter out just the bits of the data we want
     tb = filter_data(tb)
     tb = round_down_year(tb)
-    # add regional data for count variables
-    tb = add_regional_totals_for_counts(tb, ds_regions)
-    # add regional population weighted averages for rate variables
-    tb = add_population_weighted_regional_averages_for_rates(tb, ds_population, ds_regions)
+
+    # get regional data for count variables
+    tb_counts_regions = regional_aggregates_counts(tb, ds_regions, ds_population, threshold=0.8)
+    # get regional population weighted averages for rate variables
+    tb_rates_regions = population_weighted_regional_averages(tb, ds_population, ds_regions, threshold=0.8)
+
+    # Adding regional aggregates to table
+    tb = pr.concat([tb, tb_counts_regions, tb_rates_regions])
 
     # Removing commas from the unit of measure
     tb["unit_of_measure"] = tb["unit_of_measure"].str.replace(",", "", regex=False)
@@ -93,65 +97,92 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def add_regional_totals_for_counts(tb: Table, ds_regions: Dataset) -> Table:
-    """
-    Adding regional sums for variables that are counts
-    """
+def regional_aggregates_counts(tb: Table, ds_regions: Dataset, ds_population: Dataset, threshold: float = 0.8) -> Table:
+    """Adds regional aggregates for count variables. Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
+    Returns: Table with regional aggregates for count variables. ONLY includes regions"""
+
     tb_counts = tb[tb["unit_of_measure"] == "Number of deaths"]
 
-    tb_all_regions = Table()
-    for region in REGIONS:
-        regions = geo.list_members_of_region(region=region, ds_regions=ds_regions)
-        tb_region = tb_counts[tb_counts["country"].isin(regions)]
-        tb_region = (
-            tb_region.groupby(["year", "indicator", "sex", "wealth_quintile"])[
-                ["obs_value", "lower_bound", "upper_bound"]
-            ]
-            .sum()
-            .reset_index()
-        )
-        tb_region["country"] = region
-        tb_region["unit_of_measure"] = "Number of deaths"
-        tb_all_regions = pr.concat([tb_all_regions, tb_region])
+    tb_counts = geo.add_population_to_table(tb_counts, ds_population)
+    tb_counts = tb_counts.dropna(subset=["population"])
 
-    tb = pr.concat([tb, tb_all_regions])
+    # add regions to table (summing obs_value, lower_bound and upper_bound and population)
+    tb_counts = geo.add_regions_to_table(
+        tb_counts,
+        ds_regions,
+        index_columns=["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile"],
+    )
 
-    return tb
+    # filtering only on regions
+    tb_counts = tb_counts[tb_counts["country"].isin(REGIONS)]
+
+    # renaming population column and adding total population (for regions)
+    tb_counts = tb_counts.rename(columns={"population": "population_covered"})
+    tb_counts = geo.add_population_to_table(tb_counts, ds_population, population_col="total_population")
+
+    # calculating share of population covered and filtering on years above threshold
+    tb_counts["share_of_population"] = tb_counts["population_covered"] / tb_counts["total_population"]
+    tb_counts = tb_counts[tb_counts["share_of_population"] >= threshold]
+
+    tb_counts = tb_counts.drop(columns=["population_covered", "total_population", "share_of_population"])
+
+    return tb_counts
 
 
-def add_population_weighted_regional_averages_for_rates(
-    tb: Table, ds_population: Dataset, ds_regions: Dataset
+def population_weighted_regional_averages(
+    tb: Table, ds_population: Dataset, ds_regions: Dataset, threshold: float = 0.8
 ) -> Table:
-    """
-    Adding population-weighted averages for the death rates
-    """
+    """Adds population-weighted averages of death rates for the regions. Only includes year and regions where enough countries have data such that the population coverage is above the threshold.
+    Returns: Table with population-weighted averages of death rates for the regions. ONLY includes regions"""
+
     tb_rates = tb[tb["unit_of_measure"] != "Number of deaths"]
+
+    # adding population to the table and dropping rows with missing population
     tb_rates = geo.add_population_to_table(tb_rates, ds_population)
-    msk = tb_rates["population"].isna()
-    # Dropping out regions that don't have a population
-    tb_rates = tb_rates[~msk]
+    tb_rates = tb_rates.dropna(subset=["population"])
 
+    # calculating column for population weighted death rates
     tb_rates["obs_value_pop"] = tb_rates["obs_value"] * tb_rates["population"]
-    tb_rates = tb_rates.drop(columns=["lower_bound", "upper_bound"])
-    tb_all_regions = Table()
-    for region in REGIONS:
-        regions = geo.list_members_of_region(region=region, ds_regions=ds_regions)
-        tb_region = tb_rates[tb_rates["country"].isin(regions)]
-        tb_region = (
-            tb_region.groupby(["year", "indicator", "sex", "wealth_quintile", "unit_of_measure"])[
-                ["obs_value_pop", "population"]
-            ]
-            .sum()
-            .reset_index()
-        )
-        tb_region["country"] = region
-        tb_region["obs_value"] = tb_region["obs_value_pop"] / tb_region["population"]
-        tb_region = tb_region.drop(columns=["obs_value_pop", "population"])
-        tb_all_regions = pr.concat([tb_all_regions, tb_region])
+    tb_rates["lower_bound_pop"] = tb_rates["lower_bound"] * tb_rates["population"]
+    tb_rates["upper_bound_pop"] = tb_rates["upper_bound"] * tb_rates["population"]
+    tb_rates = tb_rates.drop(columns=["lower_bound", "upper_bound", "obs_value"])
 
-    tb = pr.concat([tb, tb_all_regions])
+    # adding regions to the table (summing obs_value_pop, obs_value and population)
+    tb_rates = geo.add_regions_to_table(
+        tb_rates,
+        ds_regions,
+        index_columns=["country", "year", "indicator", "sex", "unit_of_measure", "wealth_quintile"],
+    )
 
-    return tb
+    # filtering only on regions
+    tb_rates = tb_rates[tb_rates["country"].isin(REGIONS)]
+
+    # renaming population column and adding total population (for regions)
+    tb_rates = tb_rates.rename(columns={"population": "population_covered"})
+    tb_rates = geo.add_population_to_table(tb_rates, ds_population, population_col="total_population")
+
+    # calculating population weighted death rates & share of population covered
+    tb_rates["obs_value"] = tb_rates["obs_value_pop"] / tb_rates["population_covered"]
+    tb_rates["lower_bound"] = tb_rates["lower_bound_pop"] / tb_rates["population_covered"]
+    tb_rates["upper_bound"] = tb_rates["upper_bound_pop"] / tb_rates["population_covered"]
+    tb_rates["share_of_population"] = tb_rates["population_covered"] / tb_rates["total_population"]
+
+    # filtering out regions where the share of population covered is below the threshold
+    tb_rates = tb_rates[tb_rates["share_of_population"] >= threshold]
+
+    # dropping unnecessary columns
+    tb_rates = tb_rates.drop(
+        columns=[
+            "obs_value_pop",
+            "lower_bound_pop",
+            "upper_bound_pop",
+            "population_covered",
+            "total_population",
+            "share_of_population",
+        ]
+    )
+
+    return tb_rates
 
 
 def convert_to_percentage(tb: Table) -> Table:

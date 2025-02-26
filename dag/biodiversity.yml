@@ -1,13 +1,13 @@
 # Biodiversity - cherry blossom dataset
 steps:
   # Cherry blossom
-  data://meadow/biodiversity/2024-01-25/cherry_blossom:
+  data://meadow/biodiversity/2025-01-29/cherry_blossom:
     - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
-    - snapshot://biodiversity/2024-01-31/cherry_blossom.csv
-  data://garden/biodiversity/2024-01-25/cherry_blossom:
-    - data://meadow/biodiversity/2024-01-25/cherry_blossom
-  data://grapher/biodiversity/2024-01-25/cherry_blossom:
-    - data://garden/biodiversity/2024-01-25/cherry_blossom
+    - snapshot://biodiversity/2025-01-29/cherry_blossom.csv
+  data://garden/biodiversity/2025-01-29/cherry_blossom:
+    - data://meadow/biodiversity/2025-01-29/cherry_blossom
+  data://grapher/biodiversity/2025-01-29/cherry_blossom:
+    - data://garden/biodiversity/2025-01-29/cherry_blossom
 
   # Invasive species -  Seebens et al
   data://meadow/biodiversity/2024-08-12/invasive_species:
@@ -38,7 +38,7 @@ steps:
     - data://garden/biodiversity/2024-09-30/living_planet_index_completeness
 
   #
-  # TODO: add step name (just something recognizable)
+  # IUCN Number of species in each extinction risk category
   #
   data://meadow/biodiversity/2024-12-23/iucn_number_each_status:
     - snapshot://biodiversity/2024-12-23/iucn_number_each_status.csv

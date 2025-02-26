@@ -2,7 +2,6 @@
 #  helpers.py
 #  etl
 #
-
 import datetime as dt
 import re
 import sys
@@ -63,21 +62,6 @@ def downloaded(url: str) -> Iterator[str]:
                 tmp.write(chunk)
 
         yield tmp.name
-
-
-def _get_github_branches(org: str, repo: str) -> List[Any]:
-    import requests
-
-    url = f"https://api.github.com/repos/{org}/{repo}/branches?per_page=100"
-    resp = requests.get(url, headers={"Accept": "application/vnd.github.v3+json"}, verify=TLS_VERIFY)
-    if resp.status_code != 200:
-        raise Exception(f"got {resp.status_code} from {url}")
-
-    branches = cast(List[Any], resp.json())
-    if len(branches) == 100:
-        raise Exception("reached single page limit, should paginate request")
-
-    return branches
 
 
 def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
@@ -530,8 +514,15 @@ class PathFinder:
 
     @property
     def mdim_path(self) -> Path:
+        """TODO: worth aligning with `metadata_path` (add missing '.meta'), maybe even just deprecate this and use `metadata_path`."""
         assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
         return self.directory / (self.short_name + ".yml")
+
+    @property
+    def config_path(self) -> Path:
+        """Config file. Used in `multidim` and `explorer` ETL steps."""
+        # assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
+        return self.directory / (self.short_name + ".config.yml")
 
     @property
     def directory(self) -> Path:
@@ -602,7 +593,7 @@ class PathFinder:
         elif channel == "walden":
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
+            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data{is_private_suffix}://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
         else:
             raise UnknownChannel
 
@@ -661,8 +652,11 @@ class PathFinder:
             else:
                 return _step
 
+    def side_file(self, filename: str) -> Path:
+        return self.directory / filename
+
     @property
-    def dependencies(self) -> List[str]:
+    def dependencies(self) -> set[str]:
         # Current step should be in the dag.
         if self.step not in self.dag:
             raise CurrentStepMustBeInDag
@@ -688,7 +682,8 @@ class PathFinder:
             short_name=short_name,
             is_private=is_private,
         )
-        matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+        deps = self.dependencies
+        matches = _match_dependencies(pattern, deps)
 
         # If no step was found and is_private was not specified, try again assuming step is private.
         if (len(matches) == 0) and (is_private is None):
@@ -700,7 +695,7 @@ class PathFinder:
                 short_name=short_name,
                 is_private=True,
             )
-            matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+            matches = _match_dependencies(pattern, self.dependencies)
 
         # If not step was found and channel is "grapher", try again assuming this is a grapher://grapher step.
         if (len(matches) == 0) and (channel == "grapher"):
@@ -712,14 +707,14 @@ class PathFinder:
                 short_name=short_name,
                 is_private=is_private,
             )
-            matches = [dependency for dependency in self.dependencies if bool(re.match(pattern, dependency))]
+            matches = _match_dependencies(pattern, self.dependencies)
 
         if len(matches) == 0:
             raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
         elif len(matches) > 1:
             raise MultipleMatchingStepsAmongDependencies(step_name=self.step_name)
 
-        dependency = matches[0]
+        dependency = next(iter(matches))
 
         return dependency
 
@@ -789,13 +784,25 @@ class PathFinder:
         assert len(deps) == 1
         return deps[0].replace("etag://", "https://")
 
-    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, str]:
+    def load_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
         if filename is not None:
             path = self.directory / Path(filename)
         elif path is None:
-            path = self.mdim_path
+            path = self.config_path
         config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
         return config
+
+    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
+        """Replace code to use `self.load_config`."""
+        return self.load_config(filename, path)
+
+    def load_explorer_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
+        return self.load_config(filename, path)
+
+
+def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
+    regex = re.compile(pattern)
+    return {dependency for dependency in dependencies if regex.match(dependency)}
 
 
 def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:
@@ -1180,8 +1187,16 @@ def create_explorer(
 ) -> Explorer:
     # Extract information about this step from dest_dir.
     channel, namespace, version, short_name = str(dest_dir).split("/")[-4:]
+
+    # If the name of the explorer is specified in config, take that, otherwise use the step's short_name.
+    # NOTE: This is the expected name of the explorer tsv file.
+    if "name" in config:
+        explorer_name = config["name"]
+    else:
+        explorer_name = short_name
+
     # Initialize explorer.
-    explorer = Explorer.from_owid_content(short_name)
+    explorer = Explorer.from_owid_content(explorer_name)
     # Add a comment to avoid manual edits.
     explorer.comments = [
         f"# DO NOT EDIT THIS FILE MANUALLY. IT WAS GENERATED BY ETL step '{channel}/{namespace}/{version}/{short_name}'."
@@ -1227,7 +1242,10 @@ def get_schema_from_url(schema_url: str) -> dict:
 
 
 def last_date_accessed(tb: Table) -> str:
-    """Get maximum date_accessed from all origins in the table and display it in a specific format. This
-    should be a replacement for {TODAY} in YAML templates."""
+    """Get maximum date_accessed from all origins in the table and display it in a specific format.
+
+    Usage:
+        create_dataset(..., yaml_params={"date_accessed": last_date_accessed(tb)})
+    """
     date_accessed = max([origin.date_accessed for col in tb.columns for origin in tb[col].m.origins])
     return dt.datetime.strptime(date_accessed, "%Y-%m-%d").strftime("%d %B %Y")

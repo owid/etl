@@ -7,10 +7,9 @@ from typing import Dict
 
 import owid.catalog.processing as pr
 import pandas as pd
-from owid.catalog import Dataset, Table
+from owid.catalog import Table
 
-from etl.helpers import PathFinder
-from etl.steps.data.converters import convert_snapshot_metadata
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -50,26 +49,24 @@ def run(dest_dir: str) -> None:
 
     # Create a new meadow dataset with the same metadata as the snapshot.
     snap = paths.load_snapshot("lis_keyvars.csv")
-    ds_meadow = Dataset.create_empty(dest_dir, metadata=convert_snapshot_metadata(snap.metadata))
 
-    # Ensure the version of the new dataset corresponds to the version of current step.
-    ds_meadow.metadata.version = paths.version
-    ds_meadow.metadata.short_name = "luxembourg_income_study"
+    tables = process_tables(age_dict=AGE_DICT, snapshots_dict=SNAPSHOTS_DICT, tb_countries_regions=tb_countries_regions)
 
-    ds_meadow = edit_snapshots_and_add_to_dataset(
-        ds_meadow=ds_meadow, age_dict=AGE_DICT, snapshots_dict=SNAPSHOTS_DICT, tb_countries_regions=tb_countries_regions
-    )
+    # Create a new grapher dataset with the same metadata as the garden dataset.
+    ds = create_dataset(dest_dir, tables=tables, default_metadata=snap.metadata)
 
-    # Save changes in the new garden dataset.
-    ds_meadow.save()
+    # finally save the dataset
+    ds.save()
 
 
-def edit_snapshots_and_add_to_dataset(
-    ds_meadow: Dataset, age_dict: Dict[str, str], snapshots_dict: Dict[str, list], tb_countries_regions: Table
-) -> Dataset:
+def process_tables(
+    age_dict: Dict[str, str], snapshots_dict: Dict[str, list], tb_countries_regions: Table
+) -> list[Table]:
     """
     Format year and country of each table and add them to the meadow dataset.
     """
+
+    tables = []
 
     for age, age_suffix in age_dict.items():
         for tb_name, tb_ids in snapshots_dict.items():
@@ -121,7 +118,6 @@ def edit_snapshots_and_add_to_dataset(
                 short_name=f"{tb_name}{age_suffix}",
             )
 
-            # Add the new table to the meadow dataset.
-            ds_meadow.add(tb)
+            tables.append(tb)
 
-    return ds_meadow
+    return tables

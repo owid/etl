@@ -597,6 +597,7 @@ def create_updated_dependency_graph(
                         namespace=get_namespace_from_dag_line(dependency),
                     )
                     # Rename the dag line of the dependency appropriately (if its version changed).
+                    assert dependency_new_version is not None
                     new_dependency = dependency.replace(dependency_old_version, dependency_new_version)
                 new_dependencies.append(new_dependency)
 

@@ -21,14 +21,17 @@ import pandas as pd
 import sentry_sdk
 import structlog
 from dotenv import dotenv_values, load_dotenv
+from joblib import Memory
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from etl.paths import BASE_DIR
+from etl.paths import BASE_DIR, CACHE_DIR
 
 log = structlog.get_logger()
 
 ENV_FILE = Path(env.get("ENV_FILE", BASE_DIR / ".env"))
+
+memory = Memory(CACHE_DIR, verbose=0)
 
 
 def get_username():
@@ -56,18 +59,13 @@ def get_container_name(branch_name):
     # Ensure the container name is less than 63 characters
     # however, we truncate it to 28 characters to be consistent with Cloudflare's
     # 28 character limit (see https://community.cloudflare.com/t/algorithm-to-generate-a-preview-dns-subdomain-from-a-branch-name/477633)
-    # TODO: these ifs were added to be backward compatible with existing branches that are longer than 28 characters
-    #   remove them once they get merged
-    if normalized_branch in (
-        "variable-selector-catalog-path",
-        "grapher-page-dynamic-thumbnail",
-        "data-fertility-rate-effective",
-        "add-reset-metadata-origin-option",
-        "data-battery-cell-prices-private",
-    ):
-        limit = 50
-    else:
-        limit = 28
+    #
+    # This function is duplicated in these places, make sure to change all of them:
+    #     https://github.com/owid/ops/blob/main/templates/lxc-manager/prune_staging_containers.py
+    #     https://github.com/owid/ops/blob/main/templates/lxc-manager/shared
+    #     https://github.com/owid/etl/blob/master/etl/config.py#L50
+
+    limit = 28
 
     container_name = f"staging-site-{normalized_branch[:limit]}"
     # Remove trailing hyphens
@@ -191,6 +189,9 @@ GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 # only upsert indicators matching this filter, this is useful for fast development
 # of data pages for a single indicator
 GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
+
+# if set, always upload grapher data & metadata JSON files even if checksums match
+FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
 
 # if set, don't delete indicators from MySQL, only append / update new ones
 # you can use this to only process subset of indicators in your step to
@@ -591,3 +592,14 @@ OWID_ENV = OWIDEnv(
         DB_HOST=DB_HOST,
     )
 )
+
+
+# Validate config
+def no_trailing_slash(url: str | None) -> None:
+    if url is not None and url.endswith("/"):
+        raise ValueError(f"Env {url} should not have a trailing slash.")
+
+
+env_vars = [ADMIN_HOST, TAILSCALE_ADMIN_HOST, DATA_API_URL, BAKED_VARIABLES_PATH, R2_SNAPSHOTS_PUBLIC_READ]
+for env_var in env_vars:
+    no_trailing_slash(env_var)
