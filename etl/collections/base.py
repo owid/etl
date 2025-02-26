@@ -10,7 +10,6 @@ THINGS TO SOLVE:
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, TypeVar
 
-import yaml
 from owid.catalog.meta import MetaBase
 
 T = TypeVar("T")
