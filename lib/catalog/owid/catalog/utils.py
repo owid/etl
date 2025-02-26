@@ -305,11 +305,21 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
         if type(None) in args:
             filtered_args = tuple(a for a in args if a is not type(None))
             if len(filtered_args) == 1:
+                # Save the original field_type for Optional[List[...]] case
                 field_type = filtered_args[0]
+                # For Optional[List[...]] case, update the origin and args
+                if get_origin(field_type) is list:
+                    origin = list
+                    args = get_args(field_type)
 
         if origin is list:
-            item_type = args[0]
-            init_args[field_name] = [dataclass_from_dict(item_type, item) for item in v]
+            # Check if we have type arguments (e.g. List[str])
+            if args:
+                item_type = args[0]
+                init_args[field_name] = [dataclass_from_dict(item_type, item) for item in v]
+            else:
+                # No type arguments, just use the values as-is
+                init_args[field_name] = v
         elif origin is dict:
             key_type, value_type = args
             init_args[field_name] = {k: dataclass_from_dict(value_type, item) for k, item in v.items()}
