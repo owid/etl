@@ -1,6 +1,10 @@
 """WIP: Drafting a model for dealing with MDIM/Explorer configuration.
 
 This should be aligned with the MDIM schema.
+
+THINGS TO SOLVE:
+
+    - If an attribute is Optional, MetaBase.from_dict is not correctly loading it as the appropriate class when given.
 """
 
 from dataclasses import dataclass
@@ -8,8 +12,10 @@ from typing import Any, Dict, List, Optional
 
 import yaml
 from owid.catalog.meta import MetaBase
+from owid.catalog.utils import pruned_json
 
 
+@pruned_json
 @dataclass
 class Indicator(MetaBase):
     path: str
@@ -19,6 +25,7 @@ class Indicator(MetaBase):
         print("POST ViewIndicators!")
 
 
+@pruned_json
 @dataclass
 class ViewIndicators(MetaBase):
     """Indicators in a MDIM/Explorer view."""
@@ -55,6 +62,7 @@ class ViewIndicators(MetaBase):
         return super().from_dict(data)
 
 
+@pruned_json
 @dataclass
 class View(MetaBase):
     """MDIM/Explorer view configuration."""
@@ -66,6 +74,7 @@ class View(MetaBase):
     metadata: Optional[Any] = None
 
 
+@pruned_json
 @dataclass
 class DimensionChoice(MetaBase):
     slug: str
@@ -73,6 +82,7 @@ class DimensionChoice(MetaBase):
     description: Optional[str] = None
 
 
+@pruned_json
 @dataclass
 class Dimension(MetaBase):
     """MDIM/Explorer dimension configuration."""
@@ -84,6 +94,7 @@ class Dimension(MetaBase):
     presentation: Optional[Dict[str, Any]] = None
 
 
+@pruned_json
 @dataclass
 class Collection(MetaBase):
     """Overall MDIM/Explorer config"""
@@ -98,5 +109,5 @@ class Collection(MetaBase):
 filename = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
 with open(filename) as istream:
     yml = yaml.safe_load(istream)
-# cfg = Config.from_dict(yml)
+collection = Collection.from_dict(yml)
 # cfg.views[0].indicators.y
