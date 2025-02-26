@@ -7,13 +7,11 @@
 
 import json
 from copy import deepcopy
-from itertools import product
 from typing import Any, Dict, List, Optional, Set, Union
 
 import fastjsonschema
 import pandas as pd
 import yaml
-from deprecated import deprecated
 from owid.catalog import Table
 from sqlalchemy.engine import Engine
 from structlog import get_logger
@@ -28,7 +26,6 @@ from etl.collections.utils import (
 )
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import read_sql
-from etl.grapher.io import trim_long_variable_name
 from etl.helpers import map_indicator_path_to_id
 from etl.paths import SCHEMAS_DIR
 
