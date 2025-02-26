@@ -1,8 +1,7 @@
 definitions:
   common:
     description_key:
-      - Temperature anomalies show how many degrees Celsius temperatures have changed compared to the 1861-1890 period. According to the source, the 1861–1890 period is often used to highlight how temperatures have changed since pre-industrial times.
-      - This early period is used as a baseline because it represents climate conditions before major human impacts.
+      - Temperature anomalies show how many degrees Celsius temperatures have changed compared to the 1861-1890 period. This baseline period is commonly used to highlight the changes in temperature since pre-industrial times, prior to major human impacts.
       - The data includes separate measurements for the Northern and Southern Hemispheres, which helps researchers analyze regional differences.
       - The global temperature anomaly is the average of both hemisphere measurements.
     description_from_producer: |-

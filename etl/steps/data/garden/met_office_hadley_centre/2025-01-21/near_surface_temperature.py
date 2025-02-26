@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("near_surface_temperature")
-    tb_meadow = ds_meadow["near_surface_temperature"].reset_index()
+    tb_meadow = ds_meadow.read("near_surface_temperature")
     # Switch from using 1961-1990 to using 1861-1890 as our baseline to better show how temperatures have changed since pre-industrial times.
     # Calculate the adjustment factors based only on temperature_anomaly
     adjustment_factors = (
