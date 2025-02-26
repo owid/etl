@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("measles.txt")
+    snap = paths.load_snapshot("measles_state_level.txt")
     tb = snap.read_csv(delimiter="\t")
     # Drop the metadata rows at the bottom of the table.
     tb = tb.dropna(subset=["Disease"])

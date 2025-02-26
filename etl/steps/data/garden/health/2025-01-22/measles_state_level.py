@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset - the Project Tycho dataset.
-    ds_meadow = paths.load_dataset("measles", namespace="health")
+    ds_meadow = paths.load_dataset("measles_state_level", namespace="health")
     # Load the fast track of the CDC archive for 2002-2015
     ds_measles_cdc_archive = paths.load_snapshot("cdc_measles")
     # Load the CDC dataset for 2016-2022
@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     ds_us_pop = paths.load_dataset("population")  # population for the whole of the United States
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("measles")
+    tb = ds_meadow.read("measles_state_level")
     tb_cdc_archive = ds_measles_cdc_archive.read_csv()
     tb_cdc_state = ds_measles_cdc.read("state_measles")
     tb_cdc_national = ds_measles_cdc.read("national_measles")
