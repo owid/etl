@@ -1,9 +1,80 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: minor
     presentation:
       topic_tags:
         - Government Spending
+    description_key:
+      - "{definitions.key_social_expenditure}"
+      - "{definitions.key_expenditure_source}"
+      - "{definitions.key_spending_type}"
+    description_from_producer: |-
+      _Social expenditures_
+      The provision by public and private institutions of benefits to, and financial contributions targeted at, households and individuals in order to provide support during circumstances which adversely affect their welfare, provided that the provision of the benefits and financial contributions constitutes neither a direct payment for a particular good or service nor an individual contract or transfer.
+
+  short_spending_type: |-
+    <% if spending_type == "Total" %>
+    Includes both in-cash and in-kind benefits
+    <% elif spending_type == "In cash spending" %>
+    Includes only in-cash benefits
+    <% elif spending_type == "In kind spending" %>
+    Includes only in-kind benefits
+    <%- endif -%>
+
+  key_social_expenditure: |-
+    Social expenditure is defined as the provision of benefits and financial contributions to households and individuals in order to provide welfare support. These benefits and financial contributions can be provided by public or private institutions and are not direct payments for a particular good or service, nor are they individual contracts or transfers.
+
+  key_expenditure_source: |-
+    <% if expenditure_source == "Mandatory private and voluntary private" %>
+    Mandatory private and voluntary private social expenditure represents the total social expenditure provided by the private sector. This includes benefits provided by privately operated programmes that involve the redistribution of resources across households, as well as social support stipulated by legislation but operated through the private sector.
+    <% elif expenditure_source == "Public" %>
+    Public social expenditure is social spending with financial flows controlled by the general government, as social insurance and social assistance payments. This includes, for example, sickness benefits financed by compulsory employer and employee contributions (receipts) to social insurance funds.
+    <% elif expenditure_source == "Public and mandatory private" %>
+    Public and mandatory private social expenditure combines social spending with financial flows controlled by the general government, with social support stipulated by legislation but operated through the private sector.
+    <% elif expenditure_source == "Voluntary private" %>
+    Voluntary private social expenditure are benefits provided bt privately operated programmes that involve the redistribution of resources across households. This includes, for example, benefits provided by NGOs, and benefit coming from tax advantaged individual plans and collective (often employment-related) support arrangements, such as for example, pensions, childcare support, and employment-related health plans.
+    <% elif expenditure_source == "Mandatory private" %>
+    Mandatory private social expenditure is social support stipulated by legislation but operated through the private sector. This includes, for example, direct sickness payments by employers to their absent employees as legislated by public authorities, or benefits coming from mandatory contributions to private insurance funds.
+    <% elif expenditure_source == "Net public" %>
+    Net public social expenditure includes public social expenditure accounting for the effect of the tax system by direct and indirect taxation and by tax breaks for social purposes. It represents the true budgetary effort made by the government in providing social support.
+    <% elif expenditure_source == "Net total" %>
+    Net total social expenditure includes both public and private expenditure and accounts for the effect of the tax system by direct and indirect taxation and by tax breaks for social purposes.
+    <%- endif -%>
+
+  key_spending_type: |-
+    <% if spending_type == "Total" %>
+    Total spending represents both in cash and in kind social expenditure. "In cash" refers to the provision of benefits in the form of cash payments, while "in kind" refers to the provision of benefits in the form of goods and services.
+    <% elif spending_type == "In cash spending" %>
+    In cash spending refers to the provision of benefits in the form of cash payments.
+    <% elif spending_type == "In kind spending" %>
+    In kind spending refers to the provision of benefits in the form of goods and services.
+    <%- endif -%>
+
+  key_programme_type_category: |-
+    <% if programme_type_category == "Old age" %>
+    The category "Old age" includes social expenditure programs on old-age pensions.
+    <% elif programme_type_category == "Survivors" %>
+    The category "Survivors" includes social expenditure programs that provide the spouse or dependent of a deceased person with a benefit.
+    <% elif programme_type_category == "Incapacity related" %>
+    The category "Incapacity-related benefits" includes social expenditure programs because of complete or partial inability to work due to disability. The disability can be congenital or the result of an accident or illness.
+    <% elif programme_type_category == "Health" %>
+    The category "Health" includes social expenditure programs that provide health care services and benefits.
+    <% elif programme_type_category == "Family" %>
+    The category "Family" includes social expenditure programs that support families (i.e., excluding one-person households). Benefits are often related to the cost associated with raising children or with the support of other dependents.
+    <% elif programme_type_category == "Active labour market programs" %>
+    The category "Active labour market programs" (ALMPs) includes social expenditure (other than education) aimed at the improvement of the beneficiaries' prospects of finding employment or increase their earnings capacity.
+    <% elif programme_type_category == "Unemployment" %>
+    The category "Unemployment" includes social expenditure programs that provide compensations for unemployment.
+    <% elif programme_type_category == "Housing" %>
+    The category "Housing" includes social expenditure programs that provide rent subsidies and other benefits to help with housing costs.
+    <% elif programme_type_category == "Other social policy areas" %>
+    The category "Other social policy areas" includes social expenditure programs that for various reasons do not fit into any defined category. It also includes expenditure related to immigrants, refugees, and indigenous people.
+    <% elif programme_type_category == "Old age and survivors" %>
+    The category "Old age and survivors" includes social expenditure programs that provide benefits to both the elderly and the survivors of deceased persons.
+    <% elif programme_type_category == "Total" %>
+    This indicator includes all social expenditure programs, which are old age, survivors, incapacity-related benefits, health, family, active labour market programs, unemployment, housing, and other social policy areas.
+    <%- endif -%>
 
 
 # Learn more about the available fields:
@@ -15,44 +86,44 @@ dataset:
 tables:
   social_expenditure:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+      share_of_gdp:
+        title: Social expenditure as a share of GDP - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: "<<expenditure_source>> social expenditure divided by [gross domestic product](#dod:gdp), expressed as a percentage. {definitions.short_spending_type} in the program category <<programme_type_category>> (<<programme_type>>)."
+        presentation:
+          title_public: Social expenditure as a share of GDP
+          title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
+        display:
+          name: Social expenditure as a share of GDP
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      share_of_gov_expenditure:
+        title: Social expenditure as a share of government expenditure - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
+        unit: "% of government expenditure"
+        short_unit: "%"
+        description_short: "<<expenditure_source>> social expenditure divided by total government expenditure, expressed as a percentage. {definitions.short_spending_type} in the program category <<programme_type_category>> (<<programme_type>>)."
+        presentation:
+          title_public: Social expenditure as a share of government expenditure
+          title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
+        display:
+          name: Testing variable
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      usd_per_person_ppp:
+        title: Social expenditure per capita - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
+        unit: "international-$ in 2015 prices"
+        short_unit: "$"
+        description_short: "<<expenditure_source>> social expenditure divided by the population of the country. {definitions.short_spending_type} in the program category <<programme_type_category>> (<<programme_type>>)."
+        presentation:
+          title_public: Social expenditure per capita
+          title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
+        display:
+          name: Testing variable
+          numDecimalPlaces: 0
+          tolerance: 5
+
+
 

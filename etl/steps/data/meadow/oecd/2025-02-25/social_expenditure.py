@@ -19,56 +19,57 @@ COLUMNS_TO_KEEP = {
     "Observation status": "status",
 }
 
+# Define programme type codes and its main category
 PROGRAMME_TYPE_CODES = {
-    "_T": "Total",
-    "TP01": "Old age and survivors",
-    "TP11": "Old age",
-    "TP111": "Pension - Old age",
-    "TP112": "Early retirement pension",
-    "TP113": "Other cash benefits - Old age",
-    "TP121": "Residential care / Home - Old age",
-    "TP122": "Other benefits in kind - Old age",
-    "TP21": "Survivors",
-    "TP211": "Pension - Survivors",
-    "TP212": "Other cash benefits - Survivors",
-    "TP221": "Funeral expenses",
-    "TP222": "Other benefits in kind - Survivors",
-    "TP31": "Incapacity related",
-    "TP311": "Disability pensions",
-    "TP312": "Pensions (occupational injury and disease)",
-    "TP313": "Paid sick leave (occupational injury and disease)",
-    "TP314": "Paid sick leave (other sickness daily allowances)",
-    "TP315": "Other cash benefits - Incapacity related",
-    "TP321": "Residential care / Home - Incapacity related",
-    "TP322": "Rehabilitation services",
-    "TP323": "Other benefits in kind - Incapacity related",
-    "TP41": "Health",
-    "TP51": "Family",
-    "TP511": "Family allowances",
-    "TP512": "Maternity and parental leave",
-    "TP513": "Other cash benefits - Family",
-    "TP521": "Early childhood education and care (ECEC)",
-    "TP522": "Home help / Accomodation",
-    "TP523": "Other benefits in kind - Family",
-    "TP60": "Active labour market programmes",
-    "TP601": "PES and Administration",
-    "TP602": "Training",
-    "TP603": "Job Rotation and Job Sharing",
-    "TP604": "Employment Incentives",
-    "TP605": "Supported Employment and Rehabilitation",
-    "TP606": "Direct Job Creation",
-    "TP607": "Start",
-    "TP71": "Unemployment",
-    "TP711": "Unemployment compensation / severance pay",
-    "TP712": "Early retirement for labour market reasons",
-    "TP82": "Housing",
-    "TP821": "Housing assistance",
-    "TP822": "Other benefits in kind - Housing",
-    "TP91": "Other social policy areas",
-    "TP911": "Income maintenance",
-    "TP912": "Other cash benefits - Other social policy areas",
-    "TP921": "Social assistance",
-    "TP922": "Other benefits in kind - Other social policy areas",
+    "_T": {"new_name": "Total", "category": "Total"},
+    "TP01": {"new_name": "Total", "category": "Old age and survivors"},
+    "TP11": {"new_name": "Total", "category": "Old age"},
+    "TP111": {"new_name": "Pension", "category": "Old age"},
+    "TP112": {"new_name": "Early retirement pension", "category": "Old age"},
+    "TP113": {"new_name": "Other cash benefits", "category": "Old age"},
+    "TP121": {"new_name": "Residential care and home-help services", "category": "Old age"},
+    "TP122": {"new_name": "Other benefits in kind", "category": "Old age"},
+    "TP21": {"new_name": "Total", "category": "Survivors"},
+    "TP211": {"new_name": "Pension", "category": "Survivors"},
+    "TP212": {"new_name": "Other cash benefits", "category": "Survivors"},
+    "TP221": {"new_name": "Funeral expenses", "category": "Survivors"},
+    "TP222": {"new_name": "Other benefits in kind", "category": "Survivors"},
+    "TP31": {"new_name": "Total", "category": "Incapacity related"},
+    "TP311": {"new_name": "Disability pensions", "category": "Incapacity related"},
+    "TP312": {"new_name": "Pensions (occupational injury and disease)", "category": "Incapacity related"},
+    "TP313": {"new_name": "Paid sick leave (occupational injury and disease)", "category": "Incapacity related"},
+    "TP314": {"new_name": "Paid sick leave (other sickness daily allowances)", "category": "Incapacity related"},
+    "TP315": {"new_name": "Other cash benefits", "category": "Incapacity related"},
+    "TP321": {"new_name": "Residential care and home-help services", "category": "Incapacity related"},
+    "TP322": {"new_name": "Rehabilitation services", "category": "Incapacity related"},
+    "TP323": {"new_name": "Other benefits in kind", "category": "Incapacity related"},
+    "TP41": {"new_name": "Total", "category": "Health"},
+    "TP51": {"new_name": "Total", "category": "Family"},
+    "TP511": {"new_name": "Family allowances", "category": "Family"},
+    "TP512": {"new_name": "Maternity and parental leave", "category": "Family"},
+    "TP513": {"new_name": "Other cash benefits", "category": "Family"},
+    "TP521": {"new_name": "Early childhood education and care (ECEC)", "category": "Family"},
+    "TP522": {"new_name": "Home help and accommodation", "category": "Family"},
+    "TP523": {"new_name": "Other benefits in kind", "category": "Family"},
+    "TP60": {"new_name": "Total", "category": "Active labour market programs"},
+    "TP601": {"new_name": "PES and Administration", "category": "Active labour market programs"},
+    "TP602": {"new_name": "Training", "category": "Active labour market programs"},
+    "TP603": {"new_name": "Job rotation and job sharing", "category": "Active labour market programs"},
+    "TP604": {"new_name": "Employment incentives", "category": "Active labour market programs"},
+    "TP605": {"new_name": "Supported employment and rehabilitation", "category": "Active labour market programs"},
+    "TP606": {"new_name": "Direct job creation", "category": "Active labour market programs"},
+    "TP607": {"new_name": "Start-up incentives", "category": "Active labour market programs"},
+    "TP71": {"new_name": "Total", "category": "Unemployment"},
+    "TP711": {"new_name": "Unemployment compensation and severance pay", "category": "Unemployment"},
+    "TP712": {"new_name": "Early retirement for labour market reasons", "category": "Unemployment"},
+    "TP82": {"new_name": "Total", "category": "Housing"},
+    "TP821": {"new_name": "Housing assistance", "category": "Housing"},
+    "TP822": {"new_name": "Other benefits in kind", "category": "Housing"},
+    "TP91": {"new_name": "Total", "category": "Other social policy areas"},
+    "TP911": {"new_name": "Income maintenance", "category": "Other social policy areas"},
+    "TP912": {"new_name": "Other cash benefits", "category": "Other social policy areas"},
+    "TP921": {"new_name": "Social assistance", "category": "Other social policy areas"},
+    "TP922": {"new_name": "Other benefits in kind", "category": "Other social policy areas"},
 }
 
 
@@ -91,16 +92,13 @@ def run(dest_dir: str) -> None:
     # Rename columns.
     tb = tb.rename(columns=COLUMNS_TO_KEEP)
 
-    # Map programme type codes to their descriptions.
-    tb["programme_type"] = map_series(
-        series=tb["programme_type"],
-        mapping=PROGRAMME_TYPE_CODES,
-        warn_on_missing_mappings=True,
-        warn_on_unused_mappings=True,
-        show_full_warning=False,
-    )
+    # Map indicator codes to their descriptions and create a new column called programme_type_category
+    for code, mapping in PROGRAMME_TYPE_CODES.items():
+        tb.loc[tb["programme_type"] == code, "programme_type_category"] = mapping["category"]
+        tb.loc[tb["programme_type"] == code, "programme_type"] = mapping["new_name"]
 
-    tb["programme_type"] = tb["programme_type"].copy_metadata(tb["country"])
+    # Drop rows with missing values.
+    tb = tb.dropna(subset=["value"])
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [
@@ -111,6 +109,7 @@ def run(dest_dir: str) -> None:
                 "indicator",
                 "expenditure_source",
                 "spending_type",
+                "programme_type_category",
                 "programme_type",
             ]
         )

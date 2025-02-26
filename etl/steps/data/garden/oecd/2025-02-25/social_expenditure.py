@@ -6,6 +6,13 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define indicator columns and their new names.
+INDICATOR_COLUMNS = {
+    "Percentage of GDP": "share_of_gdp",
+    "Percentage of general government expenditure": "share_of_gov_expenditure",
+    "US dollars per person, PPP converted": "usd_per_person_ppp",
+}
+
 
 def run(dest_dir: str) -> None:
     #
@@ -23,7 +30,21 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    tb = tb.format(["country", "year"])
+
+    # Pivot table to have indicator as columns.
+    tb = tb.pivot(
+        index=["country", "year", "expenditure_source", "spending_type", "programme_type_category", "programme_type"],
+        columns="indicator",
+        values="value",
+        join_column_levels_with="_",
+    )
+
+    # Rename columns
+    tb = tb.rename(columns=INDICATOR_COLUMNS)
+
+    tb = tb.format(
+        ["country", "year", "expenditure_source", "spending_type", "programme_type_category", "programme_type"]
+    )
 
     #
     # Save outputs.
