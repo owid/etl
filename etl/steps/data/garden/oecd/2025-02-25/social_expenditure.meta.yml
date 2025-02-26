@@ -11,6 +11,7 @@ definitions:
       - "{definitions.key_spending_type}"
     description_from_producer: |-
       _Social expenditures_
+
       The provision by public and private institutions of benefits to, and financial contributions targeted at, households and individuals in order to provide support during circumstances which adversely affect their welfare, provided that the provision of the benefits and financial contributions constitutes neither a direct payment for a particular good or service nor an individual contract or transfer.
 
   short_spending_type: |-
@@ -23,7 +24,7 @@ definitions:
     <%- endif -%>
 
   key_social_expenditure: |-
-    Social expenditure is defined as the provision of benefits and financial contributions to households and individuals in order to provide welfare support. These benefits and financial contributions can be provided by public or private institutions and are not direct payments for a particular good or service, nor are they individual contracts or transfers.
+    Social expenditure is defined as the provision of benefits and financial contributions to households and individuals in order to provide welfare support. These benefits and financial contributions can be provided by public or private institutions.
 
   key_expenditure_source: |-
     <% if expenditure_source == "Mandatory private and voluntary private" %>
