@@ -8,11 +8,36 @@ THINGS TO SOLVE:
 """
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, TypeVar
 
 import yaml
 from owid.catalog.meta import MetaBase
-from owid.catalog.utils import pruned_json
+
+T = TypeVar("T")
+
+
+def prune_dict(d: dict) -> dict:
+    """Remove all keys starting with underscore and all empty values from a dictionary."""
+    out = {}
+    for k, v in d.items():
+        if not k.startswith("_") and v not in [None, {}]:
+            if isinstance(v, dict):
+                out[k] = prune_dict(v)
+            elif isinstance(v, list):
+                out[k] = [prune_dict(x) if isinstance(x, dict) else x for x in v if x not in [None, {}]]
+            else:
+                out[k] = v
+    return out
+
+
+def pruned_json(cls: T) -> T:
+    orig = cls.to_dict  # type: ignore
+
+    # only keep non-null public variables
+    # calling original to_dict returns dictionaries, not objects
+    cls.to_dict = lambda self, **kwargs: prune_dict(orig(self, **kwargs))  # type: ignore
+
+    return cls
 
 
 @pruned_json
@@ -30,9 +55,9 @@ class ViewIndicators(MetaBase):
     # TODO: these attributes should ALL be Optional.
     # NOTE: currently MetaBase.from_dict not loading Optional fields with appropriate class
     y: List[Indicator]
-    x: Optional[List[Indicator]] = None
-    size: Optional[List[Indicator]] = None
-    color: Optional[List[Indicator]] = None
+    x: Optional[Indicator] = None
+    size: Optional[Indicator] = None
+    color: Optional[Indicator] = None
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> "ViewIndicators":
@@ -54,9 +79,15 @@ class ViewIndicators(MetaBase):
                     data[dim] = coerced_items
                 else:
                     if isinstance(data[dim], str):
-                        data[dim] = [{"catalogPath": data[dim]}]
+                        if dim == "y":
+                            data[dim] = [{"catalogPath": data[dim]}]
+                        else:
+                            data[dim] = {"catalogPath": data[dim]}
                     else:
-                        data[dim] = [data[dim]]
+                        if dim == "y":
+                            data[dim] = [data[dim]]
+                        else:
+                            data[dim] = data[dim]
 
         # Now that data is in the expected shape, let the parent class handle the rest
         return super().from_dict(data)

@@ -19,6 +19,7 @@ from sqlalchemy.engine import Engine
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
+from etl.collections.base import Multidim
 from etl.collections.utils import (
     expand_catalog_paths,
     extract_catalog_path,
@@ -182,6 +183,38 @@ def upsert_multidim_data_page(
     dependencies = paths.dependencies
     mdim_catalog_path = f"{paths.namespace}/{paths.version}/{paths.short_name}#{mdim_name or paths.short_name}"
 
+    # Edit views
+    process_mdim_views(config, dependencies=dependencies)
+
+    # TODO: Possibly add other edits (to dimensions?)
+
+    # Upsert to DB
+    _upsert_multidim_data_page(mdim_catalog_path, config, owid_env)
+
+
+def upsert_multidim_data_page_2(
+    mdim: Multidim, paths: PathFinder, mdim_name: Optional[str] = None, owid_env: Optional[OWIDEnv] = None
+) -> None:
+    """Import MDIM config to DB.
+
+    Args:
+    -----
+
+    slug: str
+        Slug of the MDIM page. MDIM will be published at /slug
+    config: dict
+        MDIM configuration.
+    paths: PathFinder
+        Pass `paths = PathFinder(__file__)` from the script where this function is called.
+    mdim_name: str
+        Name of the MDIM page. Default is short_name from mdim catalog path.
+    owid_env: Optional[OWIDEnv]
+        Environment where to publish the MDIM page.
+    """
+    dependencies = paths.dependencies
+    mdim_catalog_path = f"{paths.namespace}/{paths.version}/{paths.short_name}#{mdim_name or paths.short_name}"
+
+    config = mdim.to_dict()
     # Edit views
     process_mdim_views(config, dependencies=dependencies)
 
