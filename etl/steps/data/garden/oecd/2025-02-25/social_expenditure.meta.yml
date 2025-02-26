@@ -14,13 +14,13 @@ definitions:
 
       The provision by public and private institutions of benefits to, and financial contributions targeted at, households and individuals in order to provide support during circumstances which adversely affect their welfare, provided that the provision of the benefits and financial contributions constitutes neither a direct payment for a particular good or service nor an individual contract or transfer.
 
-  short_spending_type: |-
+  short_spending_programme_type: |-
     <% if spending_type == "Total" %>
-    Includes both in-cash and in-kind benefits
+    Includes both in-cash and in-kind benefits in the program category <<programme_type_category>> (<<programme_type>>).
     <% elif spending_type == "In cash spending" %>
-    Includes only in-cash benefits
+    Includes only in-cash benefits in the program category <<programme_type_category>> (<<programme_type>>).
     <% elif spending_type == "In kind spending" %>
-    Includes only in-kind benefits
+    Includes only in-kind benefits in the program category <<programme_type_category>> (<<programme_type>>).
     <%- endif -%>
 
   key_social_expenditure: |-
@@ -91,7 +91,7 @@ tables:
         title: Social expenditure as a share of GDP - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
         unit: "% of GDP"
         short_unit: "%"
-        description_short: "<<expenditure_source>> social expenditure divided by [gross domestic product](#dod:gdp), expressed as a percentage. {definitions.short_spending_type} in the program category <<programme_type_category>> (<<programme_type>>)."
+        description_short: "<<expenditure_source>> social expenditure divided by [gross domestic product](#dod:gdp), expressed as a percentage. {definitions.short_spending_programme_type}"
         presentation:
           title_public: Social expenditure as a share of GDP
           title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
@@ -104,7 +104,7 @@ tables:
         title: Social expenditure as a share of government expenditure - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
         unit: "% of government expenditure"
         short_unit: "%"
-        description_short: "<<expenditure_source>> social expenditure divided by total government expenditure, expressed as a percentage. {definitions.short_spending_type} in the program category <<programme_type_category>> (<<programme_type>>)."
+        description_short: "<<expenditure_source>> social expenditure divided by total government expenditure, expressed as a percentage. {definitions.short_spending_programme_type}"
         presentation:
           title_public: Social expenditure as a share of government expenditure
           title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
@@ -117,7 +117,7 @@ tables:
         title: Social expenditure per capita - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
         unit: "international-$ in 2015 prices"
         short_unit: "$"
-        description_short: "<<expenditure_source>> social expenditure divided by the population of the country. {definitions.short_spending_type} in the program category <<programme_type_category>> (<<programme_type>>)."
+        description_short: "<<expenditure_source>> social expenditure divided by the population of the country. {definitions.short_spending_programme_type}"
         presentation:
           title_public: Social expenditure per capita
           title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
