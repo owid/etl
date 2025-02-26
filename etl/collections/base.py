@@ -154,10 +154,10 @@ class Multidim(Collection):
 
 
 # # def main():
-f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases_tests.yml"
-with open(f_mdim) as istream:
-    cfg_mdim = yaml.safe_load(istream)
-mdim = Multidim.from_dict(cfg_mdim)
+# f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases_tests.yml"
+# with open(f_mdim) as istream:
+#     cfg_mdim = yaml.safe_load(istream)
+# mdim = Multidim.from_dict(cfg_mdim)
 
 # f_explorer = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
 # with open(f_explorer) as istream:
