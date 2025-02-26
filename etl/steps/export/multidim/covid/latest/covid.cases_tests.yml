@@ -100,7 +100,7 @@ views:
       <<: *config_base
       title: "COVID-19: Daily tests vs. daily new confirmed cases per million people"
       selectedEntityNames: []
-      excludedEntities:
-        - 97
-        - 201
-        - 21
+      excludedEntityNames:
+        - Armenia
+        - Peru
+        - Ecuador
