@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb_cdc = ds_meadow_cdc.read("diphtheria_cases")
     tb_census = ds_meadow_census.read("diphtheria_cases")
-    tb_population = ds_population.read("population")
+    tb_population = ds_population.read("population", reset_metadata="keep_origins")
     # Combine the data from the two sources
     tb = pr.concat([tb_census, tb_cdc], short_name="diphtheria_cases").sort_values("year").reset_index(drop=True)
     # Combine with population data
