@@ -12,10 +12,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("measles")
+    ds_meadow = paths.load_dataset("measles_state_level")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("measles")
+    tb = ds_meadow.read("measles_state_level")
     tb = tb.drop(columns=["notes", "disease_code", "year_code", "regions_states_code"])
     tb["disease"] = tb["disease"].str.replace("Measles, ", "")
     tb = geo.harmonize_countries(

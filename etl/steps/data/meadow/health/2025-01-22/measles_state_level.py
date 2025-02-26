@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("measles.zip")
+    snap = paths.load_snapshot("measles_state_level.zip")
 
     # Load data from snapshot.
     tb = snap.read_in_archive("US.14189004.csv", low_memory=False)

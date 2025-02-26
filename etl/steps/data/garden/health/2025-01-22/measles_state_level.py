@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Load the fast track of the CDC archive for 2002-2015
     ds_measles_cdc_archive = paths.load_snapshot("cdc_measles")
     # Load the CDC dataset for 2016-2022
-    ds_measles_cdc = paths.load_dataset("measles", namespace="cdc")
+    ds_measles_cdc = paths.load_dataset("measles_state_level", namespace="cdc")
     ds_pop = paths.load_dataset("us_state_population")
     ds_us_pop = paths.load_dataset("population")  # population for the whole of the United States
 

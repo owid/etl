@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("measles")
+    ds_garden = paths.load_dataset("measles_state_level")
 
     # Read table from garden dataset.
     tb = ds_garden.read("measles", reset_index=False)
