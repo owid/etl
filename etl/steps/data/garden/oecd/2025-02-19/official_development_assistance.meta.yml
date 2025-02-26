@@ -622,6 +622,509 @@ tables:
           entityAnnotationsMap: *entity_annotations_alternative_2
           <<: *common_display
 
+      i_a_1_budget_support_grant_equivalents:
+        title: ODA by donor - Budget support - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents budget support. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Budget support
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Budget support
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_2_bilateral_core_contributions_pooled_programmes_funds_grant_equivalents:
+        title: ODA by donor - Bilateral core contributions & pooled programmes & funds - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents bilateral core contributions & pooled programmes & funds. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Bilateral core contributions & pooled programmes & funds
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Bilateral core contributions & pooled programmes & funds
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_3_project_type_interventions_grant_equivalents:
+        title: ODA by donor - Project-type interventions - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents project-type interventions. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Project-type interventions
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Project-type interventions
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_4_experts_other_technical_assistance_grant_equivalents:
+        title: ODA by donor - Experts and other technical assistance - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents experts and other technical assistance. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Experts and other technical assistance
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Experts and other technical assistance
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_5_scholarships_student_costs_donor_countries_grant_equivalents:
+        title: ODA by donor - Scholarships and student costs in donor countries - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents scholarships and student costs in donor countries. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Scholarships and student costs in donor countries
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Scholarships and student costs in donor countries
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_6_debt_relief_grant_equivalents:
+        title: ODA by donor - Debt relief - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents debt relief. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Debt relief
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Debt relief
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_7_administrative_costs_not_included_elsewhere_grant_equivalents:
+        title: ODA by donor - Administrative costs not included elsewhere - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents administrative costs not included elsewhere. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Administrative costs not included elsewhere
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Administrative costs not included elsewhere
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_8_other_in_donor_expenditures_grant_equivalents:
+        title: ODA by donor - Other in-donor expenditures - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents other in-donor expenditures. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Other in-donor expenditures
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Other in-donor expenditures
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_8_1_development_awareness_grant_equivalents:
+        title: ODA by donor - Development awareness - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents development awareness. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Development awareness
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Development awareness
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_8_2_refugees_in_donor_countries_grant_equivalents:
+        title: ODA by donor - Refugees in donor countries - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents refugees in donor countries. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Refugees in donor countries
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Refugees in donor countries
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_9_recoveries_bilateral_oda_grants_negative_commitments_grant_equivalents:
+        title: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments - Grant equivalents"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents recoveries on bilateral ODA grants / negative commitments. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments"
+          title_variant: Grant equivalents
+        display:
+          name: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments"
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      # i_a_10_other_loans_repayments_grant_equivalents:
+      #   title: "ODA by donor - Other loans repayments - Grant equivalents"
+      #   unit: "constant {definitions.inflation_year} US$"
+      #   short_unit: "$"
+      #   description_short: "[Official development assistance](#dod:oda) component that represents other loans repayments. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+      #   description_key:
+      #     - "{definitions.key_oda}"
+      #     - "{definitions.key_grant_equivalents}"
+      #     - "{definitions.key_oda_coverage_limits}"
+      #     - "{definitions.key_constant_usd}"
+      #   presentation:
+      #     title_public: "ODA by donor - Other loans repayments"
+      #     title_variant: Grant equivalents
+      #   display:
+      #     name: "ODA by donor - Other loans repayments"
+      #     numDecimalPlaces: 0
+      #     <<: *common_display
+
+      i_a_11_private_sector_instruments_grant_equivalents:
+        title: "ODA by donor - Private sector instruments - Grant equivalents"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents private sector instruments. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: "ODA by donor - Private sector instruments"
+          title_variant: Grant equivalents
+        display:
+          name: "ODA by donor - Private sector instruments"
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      # i_a_12_other_oda_not_assigned_to_the_above_categories_historical_series_grant_equivalents:
+      #   title: "ODA by donor - Other ODA not assigned to the above categories (historical series) - Grant equivalents"
+      #   unit: "constant {definitions.inflation_year} US$"
+      #   short_unit: "$"
+      #   description_short: "[Official development assistance](#dod:oda) component that represents other ODA not assigned to the above categories (historical series). {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+      #   description_key:
+      #     - "{definitions.key_oda}"
+      #     - "{definitions.key_grant_equivalents}"
+      #     - "{definitions.key_oda_coverage_limits}"
+      #     - "{definitions.key_constant_usd}"
+      #   presentation:
+      #     title_public: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
+      #     title_variant: Grant equivalents
+      #   display:
+      #     name: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
+      #     numDecimalPlaces: 0
+      #     <<: *common_display
+
+      i_a_1_budget_support_net_disbursements:
+        title: ODA by donor - Budget support - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents budget support. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Budget support
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Budget support
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_2_bilateral_core_contributions_pooled_programmes_funds_net_disbursements:
+        title: ODA by donor - Bilateral core contributions & pooled programmes & funds - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents bilateral core contributions & pooled programmes & funds. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Bilateral core contributions & pooled programmes & funds
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Bilateral core contributions & pooled programmes & funds
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_3_project_type_interventions_net_disbursements:
+        title: ODA by donor - Project-type interventions - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents project-type interventions. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Project-type interventions
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Project-type interventions
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_4_experts_other_technical_assistance_net_disbursements:
+        title: ODA by donor - Experts and other technical assistance - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents experts and other technical assistance. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Experts and other technical assistance
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Experts and other technical assistance
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_5_scholarships_student_costs_donor_countries_net_disbursements:
+        title: ODA by donor - Scholarships and student costs in donor countries - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents scholarships and student costs in donor countries. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Scholarships and student costs in donor countries
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Scholarships and student costs in donor countries
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_6_debt_relief_net_disbursements:
+        title: ODA by donor - Debt relief - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents debt relief. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Debt relief
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Debt relief
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_7_administrative_costs_not_included_elsewhere_net_disbursements:
+        title: ODA by donor - Administrative costs not included elsewhere - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents administrative costs not included elsewhere. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Administrative costs not included elsewhere
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Administrative costs not included elsewhere
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_8_other_in_donor_expenditures_net_disbursements:
+        title: ODA by donor - Other in-donor expenditures - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents other in-donor expenditures. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Other in-donor expenditures
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Other in-donor expenditures
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_8_1_development_awareness_net_disbursements:
+        title: ODA by donor - Development awareness - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents development awareness. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Development awareness
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Development awareness
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_8_2_refugees_in_donor_countries_net_disbursements:
+        title: ODA by donor - Refugees in donor countries - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents refugees in donor countries. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Refugees in donor countries
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Refugees in donor countries
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_9_recoveries_bilateral_oda_grants_negative_commitments_net_disbursements:
+        title: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments - Net disbursements"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents recoveries on bilateral ODA grants / negative commitments. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments"
+          title_variant: Net disbursements
+        display:
+          name: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments"
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      i_a_10_other_loans_repayments_net_disbursements:
+        title: "ODA by donor - Other loans repayments - Net disbursements"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents other loans repayments. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: "ODA by donor - Other loans repayments"
+          title_variant: Net disbursements
+        display:
+          name: "ODA by donor - Other loans repayments"
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      # i_a_11_private_sector_instruments_net_disbursements:
+      #   title: "ODA by donor - Private sector instruments - Net disbursements"
+      #   unit: "constant {definitions.inflation_year} US$"
+      #   short_unit: "$"
+      #   description_short: "[Official development assistance](#dod:oda) component that represents private sector instruments. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+      #   description_key:
+      #     - "{definitions.key_oda}"
+      #     - "{definitions.key_net_disbursements}"
+      #     - "{definitions.key_oda_coverage_limits}"
+      #     - "{definitions.key_constant_usd}"
+      #   presentation:
+      #     title_public: "ODA by donor - Private sector instruments"
+      #     title_variant: Net disbursements
+      #   display:
+      #     name: "ODA by donor - Private sector instruments"
+      #     numDecimalPlaces: 0
+      #     <<: *common_display
+
+      i_a_12_other_oda_not_assigned_to_the_above_categories_historical_series_net_disbursements:
+        title: "ODA by donor - Other ODA not assigned to the above categories (historical series) - Net disbursements"
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents other ODA not assigned to the above categories (historical series). {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
+          title_variant: Net disbursements
+        display:
+          name: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
+          numDecimalPlaces: 0
+          <<: *common_display
 
       # From DAC2A dataset, but "inverted" to show data by donor
       grants:

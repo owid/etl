@@ -1,0 +1,746 @@
+epi:
+  # Total
+  ALL_AGES:
+    age: total
+    sex: total
+    estimate: central
+  ESTIMATE_ALL_AGES:
+    age: total
+    sex: total
+    estimate: central
+  TOTAL:
+    age: total
+    sex: total
+    estimate: central
+  ESTIMATE_TOTAL:
+    age: total
+    sex: total
+    estimate: central
+  ESTIMATE:
+    age: total
+    sex: total
+    estimate: central
+
+  HIGH_ESTIMATE_TOTAL:
+    age: total
+    sex: total
+    estimate: high
+  HIGH_ESTIMATE_ALL_AGES:
+    age: total
+    sex: total
+    estimate: high
+  HIGH_ESTIMATE:
+    age: total
+    sex: total
+    estimate: high
+
+  LOW_ESTIMATE_ALL_AGES:
+    age: total
+    sex: total
+    estimate: low
+  LOW_ESTIMATE:
+    age: total
+    sex: total
+    estimate: low
+  LOW_ESTIMATE_TOTAL:
+    age: total
+    sex: total
+    estimate: low
+
+  # ERROR HERE, because of AIDS_MORTALITY_1000_POP! #
+  FEMALES_ALL_ESTIMATE:
+    age: total
+    sex: female
+    estimate: central
+  ESTIMATE_FEMALES:
+    age: total
+    sex: female
+    estimate: central
+
+  FEMALES_ALL_HIGH_ESTIMATE:
+    age: total
+    sex: female
+    estimate: high
+  HIGH_ESTIMATE_FEMALES:
+    age: total
+    sex: female
+    estimate: high
+
+  FEMALES_ALL_LOW_ESTIMATE:
+    age: total
+    sex: female
+    estimate: low
+  LOW_ESTIMATE_FEMALES:
+    age: total
+    sex: female
+    estimate: low
+
+  MALES_ALL_ESTIMATE:
+    age: total
+    sex: male
+    estimate: central
+  ESTIMATE_MALES:
+    age: total
+    sex: male
+    estimate: central
+
+  MALES_ALL_HIGH_ESTIMATE:
+    age: total
+    sex: male
+    estimate: high
+  HIGH_ESTIMATE_MALES:
+    age: total
+    sex: male
+    estimate: high
+
+  MALES_ALL_LOW_ESTIMATE:
+    age: total
+    sex: male
+    estimate: low
+  LOW_ESTIMATE_MALES:
+    age: total
+    sex: male
+    estimate: low
+
+  PROGRAM_DATA:
+    age: total
+    sex: total
+    estimate: program
+
+  # 0-14
+  ESTIMATE_0_14:
+    age: 0-14
+    sex: total
+    estimate: central
+  "0_14":
+    age: 0-14
+    sex: total
+    estimate: central
+
+  HIGH_ESTIMATE_0_14:
+    age: 0-14
+    sex: total
+    estimate: high
+
+  LOW_ESTIMATE_0_14:
+    age: 0-14
+    sex: total
+    estimate: low
+
+  # 0-17
+  ESTIMATE_0_17:
+    age: 0-17
+    sex: total
+    estimate: central
+
+  HIGH_ESTIMATE_0_17:
+    age: 0-17
+    sex: total
+    estimate: high
+
+  LOW_ESTIMATE_0_17:
+    age: 0-17
+    sex: total
+    estimate: low
+
+  # 10-19
+  10_19_ESTIMATE:
+    age: 10-19
+    sex: total
+    estimate: central
+
+  10_19_HIGH_ESTIMATE:
+    age: 10-19
+    sex: total
+    estimate: high
+
+  10_19_LOW_ESTIMATE:
+    age: 10-19
+    sex: total
+    estimate: low
+
+  FEMALES_10_19_ESTIMATE:
+    age: 10-19
+    sex: female
+    estimate: central
+
+  FEMALES_10_19_HIGH_ESTIMATE:
+    age: 10-19
+    sex: female
+    estimate: high
+
+  FEMALES_10_19_LOW_ESTIMATE:
+    age: 10-19
+    sex: female
+    estimate: low
+
+  MALES_10_19_ESTIMATE:
+    age: 10-19
+    sex: male
+    estimate: central
+
+  MALES_10_19_HIGH_ESTIMATE:
+    age: 10-19
+    sex: male
+    estimate: high
+
+  MALES_10_19_LOW_ESTIMATE:
+    age: 10-19
+    sex: male
+    estimate: low
+
+  # 15-24
+  15_24_ESTIMATE:
+    age: 15-24
+    sex: total
+    estimate: central
+
+  15_24_HIGH_ESTIMATE:
+    age: 15-24
+    sex: total
+    estimate: high
+
+  15_24_LOW_ESTIMATE:
+    age: 15-24
+    sex: total
+    estimate: low
+
+  FEMALES_15_24_ESTIMATE:
+    age: 15-24
+    sex: female
+    estimate: central
+
+  ESTIMATE_FEMALES_15_24_MODELLED:
+    age: 15-24
+    sex: female
+    estimate: central
+
+  FEMALES_15_24_HIGH_ESTIMATE:
+    age: 15-24
+    sex: female
+    estimate: high
+  HIGH_ESTIMATE_FEMALES_15_24_MODELLED:
+    age: 15-24
+    sex: female
+    estimate: high
+
+  FEMALES_15_24_LOW_ESTIMATE:
+    age: 15-24
+    sex: female
+    estimate: low
+  LOW_ESTIMATE_FEMALES_15_24_MODELLED:
+    age: 15-24
+    sex: female
+    estimate: low
+
+  MALES_15_24_ESTIMATE:
+    age: 15-24
+    sex: male
+    estimate: central
+  ESTIMATE_MALES_15_24_MODELLED:
+    age: 15-24
+    sex: male
+    estimate: central
+
+  MALES_15_24_HIGH_ESTIMATE:
+    age: 15-24
+    sex: male
+    estimate: high
+  HIGH_ESTIMATE_MALES_15_24_MODELLED:
+    age: 15-24
+    sex: male
+    estimate: high
+
+  MALES_15_24_LOW_ESTIMATE:
+    age: 15-24
+    sex: male
+    estimate: low
+  LOW_ESTIMATE_MALES_15_24_MODELLED:
+    age: 15-24
+    sex: male
+    estimate: low
+
+  # 15-49
+  ESTIMATE_15_49:
+    age: 15-49
+    sex: total
+    estimate: central
+  ESTIMATE_15_49_MODELLED:
+    age: 15-49
+    sex: total
+    estimate: central
+
+  HIGH_ESTIMATE_15_49:
+    age: 15-49
+    sex: total
+    estimate: high
+  HIGH_ESTIMATE_15_49_MODELLED:
+    age: 15-49
+    sex: total
+    estimate: high
+
+  LOW_ESTIMATE_15_49:
+    age: 15-49
+    sex: total
+    estimate: low
+  LOW_ESTIMATE_15_49_MODELLED:
+    age: 15-49
+    sex: total
+    estimate: low
+
+  FEMALES_ADULTS_ESTIMATE:
+    age: 15-49
+    sex: female
+    estimate: central
+
+  FEMALES_ADULTS_HIGH_ESTIMATE:
+    age: 15-49
+    sex: female
+    estimate: high
+
+  FEMALES_ADULTS_LOW_ESTIMATE:
+    age: 15-49
+    sex: female
+    estimate: low
+
+  MALES_ADULTS_ESTIMATE:
+    age: 15-49
+    sex: male
+    estimate: central
+
+  MALES_ADULTS_HIGH_ESTIMATE:
+    age: 15-49
+    sex: male
+    estimate: high
+
+  MALES_ADULTS_LOW_ESTIMATE:
+    age: 15-49
+    sex: male
+    estimate: low
+
+  # 15+
+  ESTIMATE_15_AND_UP:
+    age: 15+
+    sex: total
+    estimate: central
+  15_AND_UP:
+    age: 15+
+    sex: total
+    estimate: central
+
+  HIGH_ESTIMATE_15_AND_UP:
+    age: 15+
+    sex: total
+    estimate: high
+
+  LOW_ESTIMATE_15_AND_UP:
+    age: 15+
+    sex: total
+    estimate: low
+
+  FEMALE_ADULTS:
+    age: 15+
+    sex: female
+    estimate: central
+  ESTIMATE_FEMALES_15_AND_UP:
+    age: 15+
+    sex: female
+    estimate: central
+
+  HIGH_ESTIMATE_FEMALES_15_AND_UP:
+    age: 15+
+    sex: female
+    estimate: high
+
+  LOW_ESTIMATE_FEMALES_15_AND_UP:
+    age: 15+
+    sex: female
+    estimate: low
+
+  MALE_ADULTS:
+    age: 15+
+    sex: male
+    estimate: central
+  ESTIMATE_MALES_15_AND_UP:
+    age: 15+
+    sex: male
+    estimate: central
+
+  HIGH_ESTIMATE_MALES_15_AND_UP:
+    age: 15+
+    sex: male
+    estimate: high
+
+  LOW_ESTIMATE_MALES_15_AND_UP:
+    age: 15+
+    sex: male
+    estimate: low
+
+  # 50+
+  50_AND_UP_ESTIMATE:
+    age: 50+
+    sex: total
+    estimate: central
+
+  50_AND_UP_HIGH_ESTIMATE:
+    age: 50+
+    sex: total
+    estimate: high
+
+  50_AND_UP_LOW_ESTIMATE:
+    age: 50+
+    sex: total
+    estimate: low
+
+  FEMALES_50_AND_UP_ESTIMATE:
+    age: 50+
+    sex: female
+    estimate: central
+
+  FEMALES_50_AND_UP_HIGH_ESTIMATE:
+    age: 50+
+    sex: female
+    estimate: high
+
+  FEMALES_50_AND_UP_LOW_ESTIMATE:
+    age: 50+
+    sex: female
+    estimate: low
+
+  MALES_50_AND_UP_ESTIMATE:
+    age: 50+
+    sex: male
+    estimate: central
+
+  MALES_50_AND_UP_HIGH_ESTIMATE:
+    age: 50+
+    sex: male
+    estimate: high
+
+  MALES_50_AND_UP_LOW_ESTIMATE:
+    age: 50+
+    sex: male
+    estimate: low
+
+gam:
+  "0_14":
+    sex: total
+    age: 0-14
+  "10_14":
+    age: 10-14
+  "15_19":
+    age: 15-19
+  "15_49":
+    age: 15-49
+  "1_9":
+    age: 1-9
+  "20_24":
+    age: 20-24
+  "25_49":
+    age: 25-49
+  25_AND_UP:
+    age: 25+
+  "30_49":
+    age: 30-49
+  50_AND_UP:
+    age: 50+
+  ALL_AGES:
+    age: total
+  ALL_SEXES:
+    sex: total
+  ALL_SEXES_15_24_ALL_QUESTIONS:
+    age: 15-24
+    sex: total
+    group: all questions
+  ALL_SEXES_15_49:
+    sex: "total"
+    age: "15-49"
+  DISTRIBUTED:
+    sex: "total"
+    age: "total" # CHECK
+    group: "distributed"
+  DOMESTIC:
+    group: "domestic"
+  DOMESTIC_PUBLIC:
+    group: "domestic public"
+  ESTIMATE:
+    sex: total
+    age: total
+    estimate: central
+  FEMALES:
+    sex: "female"
+    age: "total"
+  FEMALES_15_19:
+    sex: "female"
+    age: "15-19"
+  FEMALES_15_19_NO_ALL_QUESTIONS:
+    sex: "female"
+    age: "15-19"
+    group: all questions
+  FEMALES_15_19_NO_QUESTION_1:
+    sex: "female"
+    age: "15-19"
+    group: "question 1"
+  FEMALES_15_19_NO_QUESTION_2:
+    sex: "female"
+    age: "15-19"
+    group: "question 2"
+  FEMALES_15_24_ALL_QUESTIONS:
+    sex: "female"
+    age: "15-24"
+    group: "all questions"
+  FEMALES_15_49:
+    sex: "female"
+    age: "15-49"
+  FEMALES_20_24:
+    sex: "female"
+    age: "20-24"
+  FEMALES_20_24_NO_ALL_QUESTIONS:
+    sex: "female"
+    age: "20-24"
+    group: "all questions"
+  FEMALES_20_24_NO_QUESTION_1:
+    sex: "female"
+    age: "20-24"
+    group: "question 1"
+  FEMALES_20_24_NO_QUESTION_2:
+    sex: "female"
+    age: "20-24"
+    group: "question 2"
+  FEMALES_25_49:
+    sex: "female"
+    age: "25-49"
+  FEMALES_25_49_NO_ALL_QUESTIONS:
+    sex: "female"
+    age: "25-49"
+    group: "all questions"
+  FEMALES_25_49_NO_QUESTION_1:
+    sex: "female"
+    age: "25-49"
+    group: "question 1"
+  FEMALES_25_49_NO_QUESTION_2:
+    sex: "female"
+    age: "25-49"
+    group: "question 2"
+  FEMALES_NO_ALL_QUESTIONS:
+    sex: "female"
+    age: "total"
+    group: "all questions"
+  FEMALES_NO_QUESTION_1:
+    sex: "female"
+    age: "total"
+    group: "question 1"
+  FEMALES_NO_QUESTION_2:
+    sex: "female"
+    age: "total"
+    group: "question 2"
+  FEMALE_ADULTS:
+    sex: "female"
+    age: "15+"
+  FEMALE_CONDOMS_NGO:
+    sex: "female"
+    age: "total"
+    group: "NGO"
+  FEMALE_CONDOMS_PRIVATE:
+    sex: "female"
+    age: "total"
+    group: "private"
+  FEMALE_CONDOMS_PUBLIC:
+    sex: "female"
+    age: "total"
+    group: "public"
+  FEMALE_CONDOMS_TOTAL:
+    sex: "female"
+    age: "total"
+    group: "total"
+  FORMAL_HEALTHCARE:
+    group: "formal healthcare"
+  GLOBAL_FUND:
+    group: "global fund"
+  HEPATITIS_B_FEMALES:
+    sex: "female"
+    age: "total"
+    hepatitis: "B"
+  HEPATITIS_B_GTE_25:
+    sex: "total"
+    age: "25+"
+    hepatitis: "B"
+  HEPATITIS_B_LT_25:
+    sex: "total"
+    age: "0-25"
+    hepatitis: "B"
+  HEPATITIS_B_MALES:
+    sex: "male"
+    age: "total"
+    hepatitis: "B"
+  HEPATITIS_B_TOTAL:
+    sex: "total"
+    age: "total"
+    hepatitis: "B"
+  HEPATITIS_C_FEMALES:
+    sex: "female"
+    age: "total"
+    hepatitis: "C"
+  HEPATITIS_C_GTE_25:
+    sex: "total"
+    age: "25+"
+    hepatitis: "C"
+  HEPATITIS_C_LT_25:
+    sex: "total"
+    age: "0-25"
+    hepatitis: "C"
+  HEPATITIS_C_MALES:
+    sex: "male"
+    age: "total"
+    hepatitis: "C"
+  HEPATITIS_C_TOTAL:
+    sex: "total"
+    age: "total"
+    hepatitis: "C"
+  HEPATITIS_C_TRANSGENDER:
+    sex: "total"
+    age: "total"
+    group: transgender
+    hepatitis: "C"
+  HIGH_ESTIMATE:
+    estimate: "high"
+  HIV_RELATED:
+    group: "HIV-related"
+  INTERNATIONAL:
+    group: "international"
+  LESS_1:
+    age: "0-1"
+  LESS_25:
+    age: "0-25"
+  LOW_ESTIMATE:
+    estimate: "low"
+  MALES:
+    sex: "male"
+    age: "total"
+  MALES_15_19:
+    sex: "male"
+    age: "15-19"
+  MALES_15_19_NO_ALL_QUESTIONS:
+    sex: "male"
+    age: "15-19"
+    group: "all questions"
+  MALES_15_19_NO_QUESTION_1:
+    sex: "male"
+    age: "15-19"
+    group: "question 1"
+  MALES_15_19_NO_QUESTION_2:
+    sex: "male"
+    age: "15-19"
+    group: "question 2"
+  MALES_15_24_ALL_QUESTIONS:
+    sex: "male"
+    age: "15-24"
+    group: "all questions"
+  MALES_15_49:
+    sex: "male"
+    age: "15-49"
+  MALES_20_24:
+    sex: "male"
+    age: "20-24"
+  MALES_20_24_NO_ALL_QUESTIONS:
+    sex: "male"
+    age: "20-24"
+    group: "all questions"
+  MALES_20_24_NO_QUESTION_1:
+    sex: "male"
+    age: "20-24"
+    group: "question 1"
+  MALES_20_24_NO_QUESTION_2:
+    sex: "male"
+    age: "20-24"
+    group: "question 2"
+  MALES_25_49:
+    sex: "male"
+    age: "25-49"
+  MALES_25_49_NO_ALL_QUESTIONS:
+    sex: "male"
+    age: "25-49"
+    group: "all questions"
+  MALES_25_49_NO_QUESTION_1:
+    sex: "male"
+    age: "25-49"
+    group: "question 1"
+  MALES_25_49_NO_QUESTION_2:
+    sex: "male"
+    age: "25-49"
+    group: "question 2"
+  MALES_NO_ALL_QUESTIONS:
+    sex: "male"
+    age: "total"
+    group: "all questions"
+  MALES_NO_QUESTION_1:
+    sex: "male"
+    age: "total"
+    group: "question 1"
+  MALES_NO_QUESTION_2:
+    sex: "male"
+    age: "total"
+    group: "question 2"
+  MALE_ADULTS:
+    sex: "male"
+    age: "15+"
+  MALE_CONDOMS_NGO:
+    sex: "male"
+    age: "total"
+    group: "NGO"
+  MALE_CONDOMS_PRIVATE:
+    sex: "male"
+    age: "total"
+    group: "private"
+  MALE_CONDOMS_PUBLIC:
+    sex: "male"
+    age: "total"
+    group: "public"
+  MALE_CONDOMS_TOTAL:
+    sex: "male"
+    age: "total"
+    group: "total"
+  NON_HIV_RELATED:
+    group: "non-HIV related"
+  OTHER_INTERNATIONAL:
+    group: "other international"
+  PEPFAR:
+    group: "PEPFAR"
+  PRIVATE:
+    group: "private"
+  PROCURED:
+    sex: "total"
+    age: "total"
+    group: "procured"
+  RURAL:
+    group: "rural"
+  TOTAL:
+    sex: "total"
+    age: "total"
+    group: "total"
+  TOTAL_NO_ALL_QUESTIONS:
+    sex: "total"
+    age: "total"
+    group: "all questions"
+  TOTAL_NO_QUESTION_1:
+    sex: "total"
+    age: "total"
+    group: "question 1"
+  TOTAL_NO_QUESTION_2:
+    sex: "total"
+    age: "total"
+    group: "question 2"
+  TRADITIONAL:
+    group: "traditional"
+  TRANSGENDER:
+    group: "transgender"
+  TRANSMAN:
+    group: "transman"
+  TRANSOTHER:
+    group: "transother"
+  TRANSWOMAN:
+    group: "transwoman"
+  URBAN:
+    group: "urban"
+  US_BILATERAL:
+    group: "US bilateral"

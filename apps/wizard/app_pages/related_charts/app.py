@@ -10,7 +10,7 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.related_charts import data, scoring
 from apps.wizard.utils import embeddings as emb
-from apps.wizard.utils.components import st_horizontal, st_multiselect_wider, url_persist
+from apps.wizard.utils.components import st_cache_data, st_horizontal, st_multiselect_wider, url_persist
 from etl import paths
 from etl.config import OWID_ENV
 from etl.db import get_engine
@@ -62,11 +62,10 @@ def get_charts() -> list[data.Chart]:
 
 
 @log_time
-@st.cache_data(show_spinner=False)
+@st_cache_data("Loading coviews...", show_spinner=True, show_time=True)
 def get_coviews() -> pd.Series:
     """Return a Series with the number of coviewed sessions for each chart over the last 365 days."""
-    with st.spinner("Loading coviews..."):
-        return data.get_coviews_sessions(after_date=str(dt.date.today() - dt.timedelta(days=365)), min_sessions=3)
+    return data.get_coviews_sessions(after_date=str(dt.date.today() - dt.timedelta(days=365)), min_sessions=3)
 
 
 @log_time

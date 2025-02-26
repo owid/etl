@@ -310,6 +310,7 @@ def filter_df(df: pd.DataFrame):
         - `anomalist_min_year`: minimum year to filter.
         - `anomalist_max_year`: maximum year to filter.
         - `anomalist_sorting_strategy`: sorting strategy.
+        - `anomalist_only_in_charts`: show only anomalies from indicators used in charts.
     """
     # Filter dataframe
     df = _filter_df(
@@ -324,6 +325,7 @@ def filter_df(df: pd.DataFrame):
         min_population_score=st.session_state.anomalist_min_population_score,
         min_analytics_score=st.session_state.anomalist_min_analytics_score,
         min_scale_score=st.session_state.anomalist_min_scale_score,
+        only_in_charts=st.session_state.anomalist_only_in_charts,
     )
     ## Sort dataframe
     df, st.session_state.anomalist_sorting_columns = _sort_df(df, st.session_state.anomalist_sorting_strategy)
@@ -343,6 +345,7 @@ def _filter_df(
     min_population_score,
     min_analytics_score,
     min_scale_score,
+    only_in_charts,
 ) -> pd.DataFrame:
     """Used in filter_df."""
     ## Year and scores
@@ -364,6 +367,10 @@ def _filter_df(
     # Indicators
     if len(indicators) > 0:
         df = df[df["indicator_id"].isin(indicators)]
+    # Indicators used in charts
+    if only_in_charts:
+        indicators_in_use = cached.indicators_used_in_charts(list(df["indicator_id"].unique()))
+        df = df[df["indicator_id"].isin(indicators_in_use)]
 
     return df
 
@@ -743,11 +750,11 @@ if st.session_state.anomalist_df is not None:
                         """
                         Sort anomalies by a certain criteria.
 
-                        - **Relevance**: This is a combined score based on the anomaly score, the scale of the anomaly, the population in the country, and the views of charts using this indicator.
+                        - **Relevance**: This is a combined score based on the anomaly score, the scale of the anomaly, the population in the country, and the views (last 14 days) of charts using this indicator.
                         - **Anomaly score**: The anomaly detection algorithm assigns a score to each anomaly based on its significance.
                         - **Scale**: Scale score, based on how big the anomaly as a share of the range of values of the indicator.
                         - **Population**: Population score, based on the population in the affected country.
-                        - **Views**: Views of charts using this indicator.
+                        - **Views**: Views of charts using this indicator in the last 14 days.
                         """
                     ),
                     key="anomalist_sorting_strategy",
@@ -781,6 +788,12 @@ if st.session_state.anomalist_df is not None:
                 )
 
         with st.expander("Advanced options", expanded=st.session_state.anomalist_expander_advanced_options):
+            url_persist(st.checkbox)(
+                "Only indicators used in charts",
+                key="anomalist_only_in_charts",
+                help="Show only anomalies for indicators that are used in charts.",
+            )
+            st.markdown("**Scores**")
             for score_name in ["weighted", "anomaly", "scale", "population", "analytics"]:
                 # For some reason, if the slider minimum value is zero, streamlit raises an error when the slider is
                 # dragged to the minimum. Set it to a small, non-zero number.

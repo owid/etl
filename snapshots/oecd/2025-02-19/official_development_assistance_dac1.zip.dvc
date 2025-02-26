@@ -13,6 +13,6 @@ meta:
       name: OECD Terms & conditions
       url: https://www.oecd.org/en/about/terms-conditions.html
 outs:
-  - md5: 6246a3738f246d28fbe7659b59098952
-    size: 17732300
+  - md5: ca5306acf44db9da7c52d926c7059d6a
+    size: 17353939
     path: official_development_assistance_dac1.zip

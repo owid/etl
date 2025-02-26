@@ -69,3 +69,7 @@ steps:
     - snapshot://fasttrack/latest/pepfar_patients_currently_receiving_art_formatted.csv
   data-private://grapher/fasttrack/latest/conflict_deaths_combined:
     - snapshot-private://fasttrack/latest/conflict_deaths_combined.csv
+  data://grapher/fasttrack/latest/air_pollution_ceds:
+    - snapshot://fasttrack/latest/air_pollution_ceds.csv
+  data://grapher/fasttrack/latest/air_pollution_ceds_by_sector:
+    - snapshot://fasttrack/latest/air_pollution_ceds_by_sector.csv

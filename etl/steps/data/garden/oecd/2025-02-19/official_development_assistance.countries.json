@@ -71,7 +71,6 @@
   "Asian Infrastructure Investment Bank [AIIB]": "Asian Infrastructure Investment Bank",
   "Bernard van Leer Foundation": "Bernard van Leer Foundation",
   "Bezos Earth Fund": "Bezos Earth Fund",
-  "Bill & Melinda Gates Foundation": "Bill & Melinda Gates Foundation",
   "Bloomberg Family Foundation": "Bloomberg Family Foundation",
   "CGIAR": "CGIAR",
   "COVID-19 Response and Recovery Multi-Partner Trust Fund [UN COVID-19 MPTF]": "UN COVID-19 Multi-Partner Trust Fund",
@@ -424,5 +423,8 @@
   "UN Development Coordination Office [UNDCO]": "UN Development Coordination Office (UNDCO)",
   "Good Ventures Foundation": "Good Ventures Foundation",
   "Van Leer Foundation": "Van Leer Foundation",
-  "IMF Resilience and Sustainability Trust [IMF-RST]": "IMF Resilience and Sustainability Trust (IMF-RST)"
+  "IMF Resilience and Sustainability Trust [IMF-RST]": "IMF Resilience and Sustainability Trust (IMF-RST)",
+  "Gates Foundation": "Gates Foundation",
+  "Private Infrastructure Development Group": "Private Infrastructure Development Group",
+  "UN Office on Drugs and Crime [UNODC]": "UN Office on Drugs and Crime (UNODC)"
 }

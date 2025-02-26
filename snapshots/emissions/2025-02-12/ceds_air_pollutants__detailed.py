@@ -14,7 +14,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"cdc/{SNAPSHOT_VERSION}/measles_cases.json")
+    snap = Snapshot(f"emissions/{SNAPSHOT_VERSION}/ceds_air_pollutants__detailed.zip")
 
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload)

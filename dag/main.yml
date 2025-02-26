@@ -30,9 +30,6 @@ steps:
   data://grapher/ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
 
-  data://meadow/oecd/2016-06-01/regional_wellbeing:
-    - walden://oecd/2016-06-01/regional_wellbeing
-
   # Malnutrition
   data://grapher/malnutrition/2024-12-16/malnutrition:
     - data://garden/malnutrition/2024-12-16/malnutrition

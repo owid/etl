@@ -9,11 +9,11 @@ meta:
     url_main: https://www.oecd.org/en/topics/policy-issues/official-development-assistance-oda.html
     url_download: https://stats.oecd.org/wbos/fileview2.aspx?IDFile=87917fc3-d015-4c13-8605-dfcf5211802f
     date_accessed: '2025-02-19'
-    date_published: '2024-02-17'
+    date_published: '2025-02-17'
     license:
       name: OECD Terms & conditions
       url: https://www.oecd.org/en/about/terms-conditions.html
 outs:
-  - md5: 8dabd8751ee03d7f18fc40afcb4202ef
-    size: 66686104
+  - md5: f5e1491b8c993914e7f1adb0f848bc71
+    size: 77276314
     path: official_development_assistance_dac2a.zip
