@@ -18,18 +18,14 @@ class ViewConfig:
     """MDIM/Explorer view configuration."""
 
     dimensions: Dict[str, str]
-    indicators: "IndicatorSelection"
+    indicators: "ViewIndicators"
     config: Optional[Any]
     metadata: Optional[Any]
 
 
-class DimensionConfig:
-    """MDIM/Explorer dimension configuration."""
+class ViewIndicators:
+    """Indicators in a MDIM/Explorer view."""
 
-    choices: List["ChoiceConfig"]
-
-
-class IndicatorSelection:
     y: Optional[List["Indicator"]]
     x: Optional[List["Indicator"]]
     size: Optional[List["Indicator"]]
@@ -39,6 +35,12 @@ class IndicatorSelection:
 class Indicator:
     path: str
     display: Dict[str, Any]
+
+
+class DimensionConfig:
+    """MDIM/Explorer dimension configuration."""
+
+    choices: List["ChoiceConfig"]
 
 
 class ChoiceConfig:
