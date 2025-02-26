@@ -26,9 +26,9 @@ dimensions:
       - slug: xm_count
         name: Excess mortality (count)
       - slug: deaths
-        name: Deaths
+        name: Confirmed deaths
       - slug: cases
-        name: Cases
+        name: Confirmed cases
       - slug: cases_deaths
         name: Cases and Deaths
       - slug: patients
@@ -461,7 +461,7 @@ views:
   #######################
   - dimensions:
       metric: patients
-      interval: daily_new
+      interval: daily
       relative: false
     indicators:
       y: hospital#daily_occupancy_hosp
@@ -470,7 +470,7 @@ views:
 
   - dimensions:
       metric: patients
-      interval: daily_new
+      interval: daily
       relative: true
     indicators:
       y: hospital#daily_occupancy_hosp_per_1m
@@ -499,7 +499,7 @@ views:
   #######################
   - dimensions:
       metric: icu_patients
-      interval: daily_new
+      interval: daily
       relative: false
     indicators:
       y: hospital#daily_occupancy_icu
@@ -508,7 +508,7 @@ views:
 
   - dimensions:
       metric: icu_patients
-      interval: daily_new
+      interval: daily
       relative: true
     indicators:
       y: hospital#daily_occupancy_icu_per_1m
