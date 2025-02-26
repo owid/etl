@@ -29,7 +29,7 @@ from etl.collections.utils import (
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
-from etl.helpers import map_indicator_path_to_id
+from etl.helpers import PathFinder, map_indicator_path_to_id
 from etl.paths import SCHEMAS_DIR
 
 # Initialize logger.
@@ -161,7 +161,7 @@ def expand_config(
 
 
 def upsert_multidim_data_page(
-    slug: str, config: dict, dependencies: Set[str] = set(), owid_env: Optional[OWIDEnv] = None
+    config: dict, paths: PathFinder, mdim_name: Optional[str] = None, owid_env: Optional[OWIDEnv] = None
 ) -> None:
     """Import MDIM config to DB.
 
@@ -172,16 +172,23 @@ def upsert_multidim_data_page(
         Slug of the MDIM page. MDIM will be published at /slug
     config: dict
         MDIM configuration.
+    paths: PathFinder
+        Pass `paths = PathFinder(__file__)` from the script where this function is called.
+    mdim_name: str
+        Name of the MDIM page. Default is short_name from mdim catalog path.
     owid_env: Optional[OWIDEnv]
         Environment where to publish the MDIM page.
     """
+    dependencies = paths.dependencies
+    mdim_catalog_path = f"{paths.namespace}/{paths.version}/{paths.short_name}#{mdim_name or paths.short_name}"
+
     # Edit views
     process_mdim_views(config, dependencies=dependencies)
 
     # TODO: Possibly add other edits (to dimensions?)
 
-    # Upser to DB
-    _upsert_multidim_data_page(slug, config, owid_env)
+    # Upsert to DB
+    _upsert_multidim_data_page(mdim_catalog_path, config, owid_env)
 
 
 def process_mdim_views(config: dict, dependencies: Set[str]):
@@ -211,7 +218,7 @@ def process_mdim_views(config: dict, dependencies: Set[str]):
             pass
 
 
-def _upsert_multidim_data_page(slug: str, config: dict, owid_env: Optional[OWIDEnv] = None) -> None:
+def _upsert_multidim_data_page(mdim_catalog_path: str, config: dict, owid_env: Optional[OWIDEnv] = None) -> None:
     """Actual upsert to DB."""
     # Ensure we have an environment set
     if owid_env is None:
@@ -227,7 +234,7 @@ def _upsert_multidim_data_page(slug: str, config: dict, owid_env: Optional[OWIDE
 
     # Upsert config via Admin API
     admin_api = AdminAPI(owid_env)
-    admin_api.put_mdim_config(slug, config)
+    admin_api.put_mdim_config(mdim_catalog_path, config)
 
 
 def build_view_metadata_multi(indicators: List[Dict[str, str]], tables_by_uri: Dict[str, Table]):

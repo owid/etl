@@ -107,7 +107,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    multidim.upsert_multidim_data_page(slug="mdd-energy-prices", config=config, engine=get_engine())
+    multidim.upsert_multidim_data_page(config=config, paths=paths)
 
 ```
 
