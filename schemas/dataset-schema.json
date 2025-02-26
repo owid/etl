@@ -1345,12 +1345,11 @@
                             }
                           }
                         },
-                        "excludedEntities": {
+                        "excludedEntityNames": {
                           "type": "array",
-                          "description": "Entities that should be excluded from the chart",
+                          "description": "Entity names that should be excluded from the chart",
                           "items": {
-                            "type": "integer",
-                            "minimum": 0
+                            "type": "string"
                           }
                         },
                         "xAxis": {
@@ -1413,9 +1412,9 @@
                         },
                         "includedEntities": {
                           "type": "array",
-                          "description": "Entities to include. Opposite of excludedEntities. If this is set then all entities not specified here are excluded.",
+                          "description": "Entity names to include. Opposite of includedEntityNames. If this is set then all entities not specified here are excluded.",
                           "items": {
-                            "type": "number"
+                            "type": "string"
                           }
                         },
                         "entityTypePlural": {

@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Annual Estimates of the Population for each of the States in the USA
+    description: |-
+      Data for "Resident Population" from 1900 to present are estimates as of July 1.
+    date_published: "2024-12-23"
+
+    # Citation
+    producer: U.S. Census Bureau
+    citation_full: |-
+      U.S. Census Bureau, Resident Population of each state, retrieved from FRED, Federal Reserve Bank of St. Louis; https://fred.stlouisfed.org/series/ALPOP, January 23, 2025.
+
+
+
+    # Files
+    url_main: https://fred.stlouisfed.org/release/tables?rid=118&eid=259194#snid=259195
+    date_accessed: 2025-01-23
+
+    # License
+    license:
+      name: FRED® Services General License
+      url: https://fred.stlouisfed.org/legal/
+
+outs:
+  - md5: 05733393109308906082c38c40c80678
+    size: 275649
+    path: us_state_population.csv
