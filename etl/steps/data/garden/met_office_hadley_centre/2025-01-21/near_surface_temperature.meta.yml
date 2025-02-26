@@ -16,7 +16,7 @@ definitions:
     topic_tags:
     - Climate Change
     grapher_config:
-      note: The period between 1861–1890 is used as a baseline to better reflect temperature changes since pre-industrial times, as recommended by the source.
+      note: The period between 1861–1890 is used as a baseline to better reflect temperature changes since pre-industrial times, [as recommended by the source](https://www.metoffice.gov.uk/hadobs/indicators/index.html#:~:text=The%201961%2D90%20period%20is,other%20parts%20of%20the%20world.).
 
 dataset:
   update_period_days: 90
