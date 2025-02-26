@@ -21,9 +21,6 @@ class Indicator(MetaBase):
     path: str
     display: Optional[Dict[str, Any]] = None
 
-    def __post_init__(self):
-        print("POST ViewIndicators!")
-
 
 @pruned_json
 @dataclass
@@ -99,15 +96,33 @@ class Dimension(MetaBase):
 class Collection(MetaBase):
     """Overall MDIM/Explorer config"""
 
-    config: Dict[str, str]
     dimensions: List[Dimension]
     views: List[View]
 
 
+@pruned_json
+@dataclass
+class Explorer(Collection):
+    config: Dict[str, str]
+
+
+@pruned_json
+@dataclass
+class Multidim(Collection):
+    title: Dict[str, str]
+    defaultSelection: List[str]
+    topicTags: Optional[List[str]] = None
+    definitions: Optional[Any] = None
+
+
 # def main():
-#     filename = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases.yml"
-filename = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
-with open(filename) as istream:
-    yml = yaml.safe_load(istream)
-collection = Collection.from_dict(yml)
+f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases.yml"
+with open(f_mdim) as istream:
+    cfg_mdim = yaml.safe_load(istream)
+mdim = Multidim.from_dict(cfg_mdim)
+
+f_explorer = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
+with open(f_explorer) as istream:
+    cfg_explorer = yaml.safe_load(istream)
+explorer = Explorer.from_dict(cfg_explorer)
 # cfg.views[0].indicators.y
