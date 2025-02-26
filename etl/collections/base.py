@@ -18,7 +18,7 @@ from owid.catalog.utils import pruned_json
 @pruned_json
 @dataclass
 class Indicator(MetaBase):
-    path: str
+    catalogPath: str
     display: Optional[Dict[str, Any]] = None
 
 
@@ -43,17 +43,20 @@ class ViewIndicators(MetaBase):
         # Coerce each dimension field (y, x, size, color) from [str, ...] -> [{'path': str}, ...]
         for dim in ("y", "x", "size", "color"):
             if dim in data:
-                if isinstance(data[dim], str):
-                    data[dim] = [{"path": data[dim]}]
                 if isinstance(data[dim], list):
                     coerced_items = []
                     for item in data[dim]:
                         if isinstance(item, str):
-                            coerced_items.append({"path": item})
+                            coerced_items.append({"catalogPath": item})
                         else:
                             # If already a dict or something else, leave it as-is
                             coerced_items.append(item)
                     data[dim] = coerced_items
+                else:
+                    if isinstance(data[dim], str):
+                        data[dim] = [{"catalogPath": data[dim]}]
+                    else:
+                        data[dim] = [data[dim]]
 
         # Now that data is in the expected shape, let the parent class handle the rest
         return super().from_dict(data)
@@ -120,10 +123,10 @@ class Multidim(Collection):
 
 
 # # def main():
-# f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases.yml"
-# with open(f_mdim) as istream:
-#     cfg_mdim = yaml.safe_load(istream)
-# mdim = Multidim.from_dict(cfg_mdim)
+f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases_tests.yml"
+with open(f_mdim) as istream:
+    cfg_mdim = yaml.safe_load(istream)
+mdim = Multidim.from_dict(cfg_mdim)
 
 # f_explorer = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
 # with open(f_explorer) as istream:
