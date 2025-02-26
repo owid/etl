@@ -103,26 +103,30 @@ class Collection(MetaBase):
 @pruned_json
 @dataclass
 class Explorer(Collection):
+    """Model for Explorer configuration."""
+
     config: Dict[str, str]
 
 
 @pruned_json
 @dataclass
 class Multidim(Collection):
+    """Model for MDIM configuration."""
+
     title: Dict[str, str]
     defaultSelection: List[str]
     topicTags: Optional[List[str]] = None
     definitions: Optional[Any] = None
 
 
-# def main():
-f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases.yml"
-with open(f_mdim) as istream:
-    cfg_mdim = yaml.safe_load(istream)
-mdim = Multidim.from_dict(cfg_mdim)
+# # def main():
+# f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases.yml"
+# with open(f_mdim) as istream:
+#     cfg_mdim = yaml.safe_load(istream)
+# mdim = Multidim.from_dict(cfg_mdim)
 
-f_explorer = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
-with open(f_explorer) as istream:
-    cfg_explorer = yaml.safe_load(istream)
-explorer = Explorer.from_dict(cfg_explorer)
-# cfg.views[0].indicators.y
+# f_explorer = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
+# with open(f_explorer) as istream:
+#     cfg_explorer = yaml.safe_load(istream)
+# explorer = Explorer.from_dict(cfg_explorer)
+# # cfg.views[0].indicators.y
