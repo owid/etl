@@ -1,0 +1,33 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Reported measles cases in the United States - State Level
+tables:
+  measles:
+    variables:
+      case_count:
+        title: Reported number of measles cases
+        unit: cases
+      case_rate:
+        title: Measles case rate per 100,000 population
+        description_short: The number of measles cases per 100,000 population.
+        unit: cases per 100,000 population
+        processing_level: major
+  national_measles:
+    variables:
+      national_case_count:
+        title: Reported number of measles cases in the United States
+        unit: cases
+      national_case_rate:
+        title: Reported cases of measles in the United States per 100,000 population
+        description_short: The number of measles cases per 100,000 population
+        unit: cases per 100,000 population
+        processing_level: major

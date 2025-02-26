@@ -282,8 +282,8 @@
                             "hideAnnotationFieldsInTitle": {
                                 "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.006.json#/properties/hideAnnotationFieldsInTitle"
                             },
-                            "excludedEntities": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.006.json#/properties/excludedEntities"
+                            "excludedEntityNames": {
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.006.json#/properties/excludedEntityNames"
                             },
                             "xAxis": {
                                 "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.006.json#/properties/xAxis"
@@ -321,8 +321,8 @@
                             "hideFacetControl": {
                                 "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.006.json#/properties/hideFacetControl"
                             },
-                            "includedEntities": {
-                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.006.json#/properties/includedEntities"
+                            "includedEntityNames": {
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.006.json#/properties/includedEntityNames"
                             },
                             "entityTypePlural": {
                                 "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.006.json#/properties/entityTypePlural"
