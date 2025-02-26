@@ -314,7 +314,7 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
             key_type, value_type = args
             init_args[field_name] = {k: dataclass_from_dict(value_type, item) for k, item in v.items()}
         elif dataclasses.is_dataclass(field_type):
-            init_args[field_name] = dataclass_from_dict(field_type, v)  # type: ignore
+            init_args[field_name] = field_type.from_dict(v)  # type: ignore
         elif isinstance(field_type, type) and field_type not in (Any,):
             try:
                 init_args[field_name] = field_type(v)
