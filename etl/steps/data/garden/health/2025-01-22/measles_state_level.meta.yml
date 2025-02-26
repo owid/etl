@@ -9,7 +9,6 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-dataset:
   title: Reported measles cases in the United States - State Level
 tables:
   measles:
