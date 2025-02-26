@@ -47,9 +47,9 @@ definitions:
     <% if spending_type == "Total" %>
     Total spending represents both in cash and in kind social expenditure. "In cash" refers to the provision of benefits in the form of cash payments, while "in kind" refers to the provision of benefits in the form of goods and services.
     <% elif spending_type == "In cash spending" %>
-    In cash spending refers to the provision of benefits in the form of cash payments.
+    In-cash spending refers to the provision of benefits in the form of cash payments.
     <% elif spending_type == "In kind spending" %>
-    In kind spending refers to the provision of benefits in the form of goods and services.
+    In-kind spending refers to the provision of benefits in the form of goods and services.
     <%- endif -%>
 
   key_programme_type_category: |-
