@@ -126,10 +126,10 @@ views:
       relative: false
     indicators:
       y:
-        - excess_mortality_economist#cumulative_estimated_daily_excess_deaths
-        - excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot
-        - excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top
-        - cases_deaths#total_deaths
+        - path: excess_mortality_economist#cumulative_estimated_daily_excess_deaths
+        - path: excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot
+        - path: excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top
+        - path: cases_deaths#total_deaths
     config:
       title: Estimated cumulative excess deaths during COVID-19
       subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown.
