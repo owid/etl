@@ -1,9 +1,24 @@
 """Load a garden dataset and create a grapher dataset."""
 
+from joblib import Memory
+
 from etl.helpers import PathFinder, create_dataset
+from etl.paths import CACHE_DIR
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+memory = Memory(CACHE_DIR, verbose=0)
+
+
+@memory.cache()
+def load():
+    ds_garden = paths.load_dataset("gbd_cause")
+    ds_garden.metadata.title = "Global Burden of Disease - Cause - Deaths"
+    # Read table from garden dataset.
+    tb_deaths = ds_garden["gbd_cause_deaths"]
+
+    return tb_deaths[tb_deaths.index.get_level_values("cause").str.contains("bladder")]
 
 
 def run(dest_dir: str) -> None:
@@ -12,12 +27,16 @@ def run(dest_dir: str) -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("gbd_cause")
+    """
     ds_garden.metadata.title = "Global Burden of Disease - Cause - Deaths"
     # Read table from garden dataset.
     tb_deaths = ds_garden["gbd_cause_deaths"]
+    """
     #
     # Process data.
     #
+
+    tb_deaths = load()
 
     #
     # Save outputs.

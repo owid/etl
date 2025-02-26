@@ -149,6 +149,11 @@ def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any
     """Add dimensions to metadata and expand Jinja in metadata fields."""
     # add info about dimensions to metadata
     if dim_dict:
+        meta.dimensions = {dim_name: sanitize_numpy(dim_value) for dim_name, dim_value in dim_dict.items()}
+        meta.original_short_name = column
+        meta.original_title = meta.title
+
+        # Soon to be deprecated
         meta.additional_info = {
             "dimensions": {
                 "originalShortName": column,

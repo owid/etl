@@ -274,8 +274,10 @@ class VariableMeta(MetaBase):
     # Dimensions
     # Dictionary of dimensions
     dimensions: Optional[Dict[str, Any]] = None
-    # Original short name of the indicator before flattening
+    # Original short name and title of the indicator before flattening
     original_short_name: Optional[str] = None
+    # TODO: it's possible that we might not need `original_title` at all
+    original_title: Optional[str] = None
 
     @property
     def schema_version(self) -> int:
@@ -401,6 +403,14 @@ class DatasetMeta(MetaBase):
 
 @pruned_json
 @dataclass(eq=False)
+class TableDimension(MetaBase):
+    name: str
+    slug: str
+    description: Optional[str] = None
+
+
+@pruned_json
+@dataclass(eq=False)
 class TableMeta(MetaBase):
     # data about this table
     short_name: Optional[str] = None
@@ -410,6 +420,9 @@ class TableMeta(MetaBase):
     # a reference back to the dataset
     dataset: Optional[DatasetMeta] = field(compare=False, default=None)
     primary_key: List[str] = field(default_factory=list)
+
+    # table dimensions
+    dimensions: Optional[List[TableDimension]] = None
 
     @property
     def checked_name(self) -> str:
