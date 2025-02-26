@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 from owid.catalog.utils import underscore
 from pandas import DataFrame
 
-from etl import multidim
+from etl.collections import multidim
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.

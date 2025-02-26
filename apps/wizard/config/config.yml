@@ -141,6 +141,58 @@ sections:
         icon: ":material/analytics:"
         image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Wikimedia_Product_Analytics_team_logo.svg/512px-Wikimedia_Product_Analytics_team_logo.svg.png"
 
+  - title: "Search"
+    description: |-
+      Browse our content.
+    apps:
+      - title: "Insight search"
+        alias: insight_search
+        description: "Browse DIs"
+        maintainer: "@pablo"
+        entrypoint: app_pages/insight_search/app.py
+        icon: ":material/search:"
+        image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
+      - title: "Indicator search"
+        alias: indicator_search
+        description: "Find similar indicators"
+        maintainer: "@mojmir"
+        entrypoint: app_pages/indicator_search/app.py
+        icon: ":material/search:"
+        image_url: "https://www.shutterstock.com/image-vector/standard-ph-chart-aqueous-solution-600nw-2007387788.jpg"
+      - title: "Similar charts"
+        alias: similar_charts
+        description: "Find similar charts"
+        maintainer: "@mojmir"
+        entrypoint: app_pages/similar_charts/app.py
+        icon: ":material/bar_chart:"
+        image_url: "https://media.istockphoto.com/id/1296381479/vector/set-of-simple-infographic-graphs-and-charts-data-visualization-statistics-and-business.jpg?s=612x612&w=0&k=20&c=JpEoP-6w16OwVC49Sq2PEI8-dHF1CZnm7rHyL5DoxqA="
+      - title: "Related charts"
+        alias: related_charts
+        description: "Find related charts"
+        maintainer: "@mojmir"
+        entrypoint: app_pages/related_charts/app.py
+        icon: ":material/bar_chart:"
+        image_url: "https://static.vecteezy.com/system/resources/previews/011/091/185/non_2x/constellation-interconnected-colored-dots-cartoon-logo-concept-bubbles-structure-shape-isolated-icon-connected-color-beats-illustration-for-science-technology-and-medical-graphic-free-vector.jpg"
+
+  - title: "Assistant"
+    description: |-
+      Research tools.
+    apps:
+      - title: "Insighter"
+        alias: insighter
+        description: "Data insights with GPT"
+        maintainer: "@daniel"
+        entrypoint: app_pages/datainsight_robot.py
+        icon: ":material/stylus_note:"
+        image_url: "https://cdn.cpdonline.co.uk/wp-content/uploads/2023/08/03153310/Starting-To-Become-A-Writer-1200x350.jpg"
+      - title: "Chart animation"
+        alias: chart-animation
+        description: "Animate charts (GIF/video)"
+        maintainer: "@pablo"
+        entrypoint: app_pages/chart_animation.py
+        icon: ":material/animated_images:"
+        image_url: "https://img.freepik.com/free-photo/abstract-yellow-smooth-wave-lines_1017-24863.jpg"
+
   - title: "Explorers"
     description: |-
       Explorer tools.
@@ -160,46 +212,6 @@ sections:
         icon: ":material/explore:"
         image_url: "https://upload.wikimedia.org/wikipedia/en/1/18/Dora_the_Explorer_2004_album_cover.jpg"
 
-  - title: "Research"
-    description: |-
-      Research tools.
-    apps:
-      - title: "Insight search"
-        alias: insight_search
-        description: "Smart-browse DIs"
-        maintainer: "@pablo"
-        entrypoint: app_pages/insight_search/app.py
-        icon: ":material/search:"
-        image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
-      - title: "Insighter"
-        alias: insighter
-        description: "Data insights with GPT"
-        maintainer: "@daniel"
-        entrypoint: app_pages/datainsight_robot.py
-        icon: ":material/stylus_note:"
-        image_url: "https://cdn.cpdonline.co.uk/wp-content/uploads/2023/08/03153310/Starting-To-Become-A-Writer-1200x350.jpg"
-      - title: "Indicator search"
-        alias: indicator_search
-        description: "Browse data indicators by their semantic similarity"
-        maintainer: "@mojmir"
-        entrypoint: app_pages/indicator_search/app.py
-        icon: ":material/search:"
-        image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
-      - title: "Similar charts"
-        alias: similar_charts
-        description: "Find similar charts"
-        maintainer: "@mojmir"
-        entrypoint: app_pages/similar_charts/app.py
-        icon: ":material/bar_chart:"
-        image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
-      - title: "Related charts"
-        alias: related_charts
-        description: "Find related charts"
-        maintainer: "@mojmir"
-        entrypoint: app_pages/related_charts/app.py
-        icon: ":material/bar_chart:"
-        image_url: "https://img.freepik.com/premium-photo/librarian-cataloging-new-books-library-database_1237301-1719.jpg"
-
   - title: "Misc"
     description: |-
       Other helpful tools in the ETL ecosystem.
@@ -218,13 +230,6 @@ sections:
         entrypoint: app_pages/owidle.py
         icon: ":material/videogame_asset:"
         image_url: "https://t3.ftcdn.net/jpg/06/26/23/36/360_F_626233679_tesiSRP9Jinq5wS0ZgbdJ6k5adupmgKl.jpg"
-      - title: "Chart animation"
-        alias: chart-animation
-        description: "Animate charts (GIF/video)"
-        maintainer: "@pablo"
-        entrypoint: app_pages/chart_animation.py
-        icon: ":material/animated_images:"
-        image_url: "https://img.freepik.com/free-photo/abstract-yellow-smooth-wave-lines_1017-24863.jpg"
 
   # - title: "Metadata"
   #   description: |-

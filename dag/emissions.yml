@@ -146,3 +146,27 @@ steps:
   #
   data://grapher/emissions/2024-11-21/national_contributions:
     - data://garden/emissions/2024-11-21/national_contributions
+  #
+  # Hoesly et al. (2024): CEDS air pollutants
+  #
+  data://meadow/emissions/2025-02-12/ceds_air_pollutants:
+    - snapshot://emissions/2025-02-12/ceds_air_pollutants__detailed.zip
+    - snapshot://emissions/2025-02-12/ceds_air_pollutants__bunkers.zip
+  #
+  # Hoesly et al. (2024): CEDS air pollutants
+  #
+  data://garden/emissions/2025-02-12/ceds_air_pollutants:
+    - data://meadow/emissions/2025-02-12/ceds_air_pollutants
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/demography/2024-07-15/population
+  #
+  # Hoesly et al. (2024): CEDS air pollutants
+  #
+  data://grapher/emissions/2025-02-12/ceds_air_pollutants:
+    - data://garden/emissions/2025-02-12/ceds_air_pollutants
+  #
+  # Emissions - Air pollution explorer
+  #
+  export://explorers/emissions/latest/air_pollution:
+    - data://grapher/emissions/2025-02-12/ceds_air_pollutants

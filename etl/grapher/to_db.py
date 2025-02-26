@@ -286,7 +286,11 @@ def upsert_table(
 
         # variable exists
         else:
-            if db_variable.dataChecksum == checksum_data and db_variable.metadataChecksum == checksum_metadata:
+            if (
+                not config.FORCE_UPLOAD
+                and db_variable.dataChecksum == checksum_data
+                and db_variable.metadataChecksum == checksum_metadata
+            ):
                 if verbose:
                     log.info("upsert_table.skipped_no_changes", size=len(df), variable_id=db_variable.id)
                 return
@@ -299,10 +303,10 @@ def upsert_table(
 
             futures = {}
             with ThreadPoolExecutor() as executor:
-                if db_variable.dataChecksum != checksum_data:
+                if config.FORCE_UPLOAD or db_variable.dataChecksum != checksum_data:
                     futures["data"] = executor.submit(upsert_data, df, db_variable.s3_data_path())
 
-                if db_variable.metadataChecksum != checksum_metadata:
+                if config.FORCE_UPLOAD or db_variable.metadataChecksum != checksum_metadata:
                     futures["metadata"] = executor.submit(upsert_metadata, **upsert_metadata_kwargs)
 
             if futures:

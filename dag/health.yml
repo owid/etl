@@ -320,14 +320,6 @@ steps:
   data://grapher/tuberculosis/2023-11-27/unhlm_commitments:
     - data://garden/tuberculosis/2023-11-27/unhlm_commitments
 
-  # OECD Health Expenditure and Financing Database
-  data://meadow/oecd/2024-02-23/health_expenditure:
-    - snapshot://oecd/2024-02-23/health_expenditure.csv
-  data://garden/oecd/2024-02-23/health_expenditure:
-    - data://meadow/oecd/2024-02-23/health_expenditure
-  data://grapher/oecd/2024-02-23/health_expenditure:
-    - data://garden/oecd/2024-02-23/health_expenditure
-
   # Global Health Observatory (GHO) from WHO
   data://meadow/who/2024-01-03/gho:
     - snapshot://who/2024-01-03/gho.zip
@@ -1021,3 +1013,37 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/health/2025-02-20/measles_deaths_long_run:
     - data://garden/health/2025-02-20/measles_deaths_long_run
+
+  #
+  # Diphtheria cases - US CDC
+  #
+  data://meadow/cdc/2025-02-25/diphtheria_cases:
+    - snapshot://cdc/2025-02-24/diphtheria_cases.csv
+  data://garden/cdc/2025-02-25/diphtheria_cases:
+    - data://meadow/cdc/2025-02-25/diphtheria_cases
+
+  #
+  # Historical diphtheria cases - US Census Bureau
+  #
+  data://meadow/us_census_bureau/2025-02-25/diphtheria_cases:
+    - snapshot://us_census_bureau/2025-02-25/diphtheria_cases.csv
+  data://garden/us_census_bureau/2025-02-25/diphtheria_cases:
+    - data://meadow/us_census_bureau/2025-02-25/diphtheria_cases
+
+  #
+  # US - reported diphtheria cases - long-run
+  #
+  data://garden/health/2025-02-25/diphtheria_cases:
+    - data://garden/us_census_bureau/2025-02-25/diphtheria_cases
+    - data://garden/cdc/2025-02-25/diphtheria_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-02-25/diphtheria_cases:
+    - data://garden/health/2025-02-25/diphtheria_cases
+
+  # OECD Health Expenditure and Financing Database
+  data://meadow/oecd/2025-02-25/health_expenditure:
+    - snapshot://oecd/2025-02-25/health_expenditure.csv
+  data://garden/oecd/2025-02-25/health_expenditure:
+    - data://meadow/oecd/2025-02-25/health_expenditure
+  data://grapher/oecd/2025-02-25/health_expenditure:
+    - data://garden/oecd/2025-02-25/health_expenditure

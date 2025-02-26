@@ -190,6 +190,9 @@ GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 # of data pages for a single indicator
 GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
 
+# if set, always upload grapher data & metadata JSON files even if checksums match
+FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
+
 # if set, don't delete indicators from MySQL, only append / update new ones
 # you can use this to only process subset of indicators in your step to
 # speed up development. It's up to you how you define filtering logic in your step

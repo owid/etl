@@ -71,9 +71,9 @@ views:
 
 ```
 
-The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.multidim.expand_config`).
+The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.collections.multidim.expand_config`).
 
-You can also combine manually defined views with generated ones. See the `etl.multidim` module for available helper functions or refer to examples from `etl/steps/export/multidim/`. Feel free to add or modify the helper functions as needed.
+You can also combine manually defined views with generated ones. See the `etl.collections.multidim` module for available helper functions or refer to examples from `etl/steps/export/multidim/`. Feel free to add or modify the helper functions as needed.
 
 The export step loads the data dependencies and the config YAML file, adds `views` to the config, and then pushes the configuration to the database.
 

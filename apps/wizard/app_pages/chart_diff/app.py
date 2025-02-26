@@ -59,7 +59,6 @@ CHART_PER_PAGE = 10
 if WARN_MSG:
     st.warning("- " + "\n\n- ".join(WARN_MSG))
 
-
 ########################################
 # FUNCTIONS
 ########################################
@@ -69,7 +68,7 @@ def get_chart_diffs():
     """Get chart diffs."""
     # Get actual charts
     if st.session_state.chart_diffs == {}:
-        with st.spinner("Getting charts from database..."):
+        with st.spinner("Getting charts from database...", show_time=True):
             st.session_state.chart_diffs = get_chart_diffs_from_grapher(SOURCE_ENGINE, TARGET_ENGINE)
 
     # Sort charts
