@@ -311,7 +311,7 @@ steps:
   export://multidim/energy/latest/energy_prices:
     - data://grapher/energy/2025-02-03/energy_prices
   #
-  # Lazard - Levelized Cost of Energy+
+  # Lazard - Levelized Cost of Energy
   #
   data://meadow/lazard/2025-02-25/levelized_cost_of_energy:
     - snapshot://lazard/2025-02-25/levelized_cost_of_energy.csv
