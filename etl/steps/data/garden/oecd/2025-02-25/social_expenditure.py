@@ -43,6 +43,9 @@ def run(dest_dir: str) -> None:
     # Rename columns
     tb = tb.rename(columns=INDICATOR_COLUMNS)
 
+    # Change the categories of the total rows in the table.
+    tb = change_total_categories(tb)
+
     tb = tb.format(
         ["country", "year", "expenditure_source", "spending_type", "programme_type_category", "programme_type"]
     )
@@ -57,3 +60,17 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new garden dataset.
     ds_garden.save()
+
+
+def change_total_categories(tb):
+    """
+    Change the categories of the total rows in the table.
+    This allows for easier reading of data pages.
+    """
+    tb.loc[tb["spending_type"] == "Total", "spending_type"] = "In-cash and in-kind spending"
+    tb.loc[tb["spending_type"] == "In cash spending", "spending_type"] = "In-cash spending"
+    tb.loc[tb["spending_type"] == "In kind spending", "spending_type"] = "In-kind spending"
+
+    tb.loc[tb["programme_type_category"] == "Total", "programme_type_category"] = "All"
+
+    return tb

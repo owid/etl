@@ -3,6 +3,12 @@ definitions:
   common:
     processing_level: minor
     presentation:
+      title_variant: |-
+        <% if expenditure_source == "Net total" or expenditure_source == "Net public" %>
+        <<expenditure_source>>
+        <%- else %>
+        <<expenditure_source>>, <<spending_type.lower()>>, <<programme_type_category.lower()>> programs (<<programme_type.lower()>>)
+        <%- endif %>
       topic_tags:
         - Government Spending
       attribution_short: OECD
@@ -15,11 +21,11 @@ definitions:
   ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2015 prices.
 
   short_spending_type: |-
-    <% if spending_type == "Total" %>
+    <% if spending_type == "In-cash and in-kind spending" %>
     Includes both in-cash and in-kind benefits
-    <%- elif spending_type == "In cash spending" %>
+    <%- elif spending_type == "In-cash spending" %>
     Includes only in-cash benefits
-    <%- elif spending_type == "In kind spending" %>
+    <%- elif spending_type == "In-kind spending" %>
     Includes only in-kind benefits
     <%- endif %>
 
@@ -47,11 +53,11 @@ definitions:
     <%- endif %>
 
   key_spending_type: |-
-    <%- if spending_type == "Total" %>
+    <%- if spending_type == "In-cash and in-kind spending" %>
     Total spending represents both in cash and in kind social expenditure. "In cash" refers to the provision of benefits in the form of cash payments, while "in kind" refers to the provision of benefits in the form of goods and services.
-    <%- elif spending_type == "In cash spending" %>
+    <%- elif spending_type == "In-cash spending" %>
     In-cash spending refers to the provision of benefits in the form of cash payments.
-    <%- elif spending_type == "In kind spending" %>
+    <%- elif spending_type == "In-kind spending" %>
     In-kind spending refers to the provision of benefits in the form of goods and services.
     <%- endif -%>
 
@@ -67,7 +73,7 @@ definitions:
     <%- elif programme_type_category == "Family" %>
     The category _Family_ includes social expenditure programs that support families (i.e., excluding one-person households). Benefits are often related to the cost associated with raising children or with the support of other dependents.
     <%- elif programme_type_category == "Active labor market programs" %>
-    The category _Active labor market programs_ (ALMPs) includes social expenditure (other than education) aimed at the improvement of the beneficiaries' prospects of finding employment or increase their earnings capacity.
+    The category _Active labor market programs_ includes social expenditure (other than education) aimed at the improvement of the beneficiaries' prospects of finding employment or increase their earnings capacity.
     <%- elif programme_type_category == "Unemployment" %>
     The category _Unemployment_ includes social expenditure programs that provide compensations for unemployment.
     <%- elif programme_type_category == "Housing" %>
@@ -76,7 +82,7 @@ definitions:
     The category _Other social policy areas_ includes social expenditure programs that for various reasons do not fit into any defined category. It also includes expenditure related to immigrants, refugees, and indigenous people.
     <%- elif programme_type_category == "Old age and survivors" %>
     The category _Old age and survivors_ includes social expenditure programs that provide benefits to both the elderly and the survivors of deceased persons.
-    <%- elif programme_type_category == "Total" %>
+    <%- elif programme_type_category == "All" %>
     This indicator includes all social expenditure programs, which are old age, survivors, incapacity-related benefits, health, family, active labor market programs, unemployment, housing, and other social policy areas.
     <%- endif %>
 
@@ -98,7 +104,7 @@ tables:
   social_expenditure:
     variables:
       share_of_gdp:
-        title: Social expenditure as a share of GDP - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
+        title: Social expenditure as a share of GDP - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> programs (<<programme_type>>)
         unit: "% of GDP"
         short_unit: "%"
         description_short: "<<expenditure_source>> social expenditure divided by [gross domestic product](#dod:gdp), expressed as a percentage. {definitions.short_spending_programme_type}"
@@ -109,14 +115,13 @@ tables:
           - "{definitions.key_programme_type}"
         presentation:
           title_public: Social expenditure as a share of GDP
-          title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
         display:
           name: Social expenditure as a share of GDP
           numDecimalPlaces: 1
           tolerance: 5
 
       share_of_gov_expenditure:
-        title: Social expenditure as a share of government expenditure - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
+        title: Social expenditure as a share of government expenditure - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> programs (<<programme_type>>)
         unit: "% of government expenditure"
         short_unit: "%"
         description_short: "<<expenditure_source>> social expenditure divided by total government expenditure, expressed as a percentage. {definitions.short_spending_programme_type}"
@@ -127,14 +132,13 @@ tables:
           - "{definitions.key_programme_type}"
         presentation:
           title_public: Social expenditure as a share of government expenditure
-          title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
         display:
           name: Social expenditure as a share of government expenditure
           numDecimalPlaces: 1
           tolerance: 5
 
       usd_per_person_ppp:
-        title: Social expenditure per capita - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
+        title: Social expenditure per capita - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> programs (<<programme_type>>)
         unit: "international-$ in 2015 prices"
         short_unit: "$"
         description_short: "<<expenditure_source>> social expenditure divided by the population of the country. {definitions.short_spending_programme_type} {definitions.ppp_adjustment}"
@@ -147,7 +151,6 @@ tables:
           - "{definitions.ppp_prices}"
         presentation:
           title_public: Social expenditure per capita
-          title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
