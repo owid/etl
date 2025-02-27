@@ -124,7 +124,7 @@ tables:
         title: Social expenditure per capita - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
         unit: "international-$ in 2015 prices"
         short_unit: "$"
-        description_short: "<<expenditure_source>> social expenditure divided by the population of the country. {definitions.short_spending_programme_type} {definitions.ppp}"
+        description_short: "<<expenditure_source>> social expenditure divided by the population of the country. {definitions.short_spending_programme_type} {definitions.ppp_adjustment}"
         description_key:
           - "{definitions.key_social_expenditure}"
           - "{definitions.key_expenditure_source}"
