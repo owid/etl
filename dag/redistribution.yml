@@ -1,3 +1,5 @@
+# This one includes datasets on spending and revenue, for the government spending and taxes topic pages
+
 steps:
   # UNU-WIDER Government Revenue Dataset
   data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
@@ -14,6 +16,14 @@ steps:
     - data://meadow/imf/2024-06-12/public_finances_modern_history
   data://grapher/imf/2024-06-12/public_finances_modern_history:
     - data://garden/imf/2024-06-12/public_finances_modern_history
+
+  # OECD Health Expenditure and Financing Database
+  data://meadow/oecd/2025-02-25/health_expenditure:
+    - snapshot://oecd/2025-02-25/health_expenditure.csv
+  data://garden/oecd/2025-02-25/health_expenditure:
+    - data://meadow/oecd/2025-02-25/health_expenditure
+  data://grapher/oecd/2025-02-25/health_expenditure:
+    - data://garden/oecd/2025-02-25/health_expenditure
 
   # OECD Social Expenditure Database
   data://meadow/oecd/2025-02-25/social_expenditure:
