@@ -52,7 +52,7 @@ def run(dest_dir: str) -> None:
     # Calculate the adjustment factors based only on temperature_anomaly
     adjustment_factors = (
         tb[tb["year"].between(1951, 1980)].groupby("location")["temperature_anomaly"].mean()
-        - tb[tb["year"].between(1861, 1890)].groupby("location")["temperature_anomaly"].mean()
+        - tb[tb["year"].between(1880, 1900)].groupby("location")["temperature_anomaly"].mean()
     )
     # Apply the temperature_anomaly adjustment factor
     # The adjustment factor is applied uniformly to the temperature anomalies and their confidence intervals to ensure that both the central values and the associated uncertainty bounds are correctly shifted relative to the new 1861–1890 baseline.
