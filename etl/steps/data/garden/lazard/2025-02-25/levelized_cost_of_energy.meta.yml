@@ -18,7 +18,6 @@ tables:
         short_unit: $/MWh
         processing_level: major
         description_processing: |-
-          - Prices have been adjusted for inflation using the U.S. GDP deflator from the World Bank (World Development Indicators, [NY.GDP.DEFL.ZS](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US)). To convert the original prices in current US$ to constant {BASE_DOLLAR_YEAR} US$, they were divided by the deflator values referenced to {BASE_DOLLAR_YEAR_ORIGINAL} and then multiplied by the deflator value of {BASE_DOLLAR_YEAR}. For years where the deflator did not have data, additional values were extracted using Gross Domestic Product: Implicit Price Deflator (Federal Reserve Economic Data, ).
           - Prices have been adjusted for inflation using the U.S. GDP deflator from the World Bank (World Development Indicators, [NY.GDP.DEFL.ZS](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US)). To convert the original prices in current US$ to constant {BASE_DOLLAR_YEAR} US$, they were divided by the deflator value for {BASE_DOLLAR_YEAR_ORIGINAL} and then multiplied by the deflator value for {BASE_DOLLAR_YEAR}. Where World Bank data was unavailable, missing values were supplemented using the Gross Domestic Product: Implicit Price Deflator from the Federal Reserve Economic Data ([GDPDEF](https://fred.stlouisfed.org/series/GDPDEF)).
 
         presentation:
