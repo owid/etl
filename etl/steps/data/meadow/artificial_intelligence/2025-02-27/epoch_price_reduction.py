@@ -1,6 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-import pandas as pd
+import numpy as np
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -26,7 +26,12 @@ def run(dest_dir: str) -> None:
     #
     tb = tb[["bench", "threshold_model", "end_date", "price_reduction_factor_per_year"]]
     tb["year"] = 2025
+    # Convert price_reduction_factor_per_year to float
     tb["price_reduction_factor_per_year"] = tb["price_reduction_factor_per_year"].astype(float)
+
+    # Express price_reduction_factor_per_year in logarithmic scale
+    tb["price_reduction_factor_per_year_log"] = np.log(tb["price_reduction_factor_per_year"])
+
     tb = tb.drop(columns=["end_date"])
     tb = tb.format(["bench", "threshold_model", "year"])
 
